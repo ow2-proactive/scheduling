@@ -7,14 +7,15 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -230,8 +231,8 @@ public class SchedulerProxyUIWithDSupport extends CachingSchedulerProxyUserInter
      * @throws ActiveObjectCreationException
      */
 
-    public static SchedulerProxyUIWithDSupport getActiveInstance() throws ActiveObjectCreationException,
-            NodeException {
+    public static synchronized SchedulerProxyUIWithDSupport getActiveInstance()
+            throws ActiveObjectCreationException, NodeException {
         if (activeInstance != null)
             return activeInstance;
 
@@ -295,7 +296,7 @@ public class SchedulerProxyUIWithDSupport extends CachingSchedulerProxyUserInter
     public void init(String url, CredData credData) throws SchedulerException, LoginException {
         // first we load the list of awaited jobs
         loadAwaitedJobs();
-        // then we call super.init() which will create the connection to the
+        //  we call super.init() which will create the connection to the
         // scheduler and subscribe as event listener
         super.init(url, credData);
         // now we can can check if we need to transfer any data
@@ -366,14 +367,15 @@ public class SchedulerProxyUIWithDSupport extends CachingSchedulerProxyUserInter
             return super.submit(job);
         }
 
-        String[] push_pull_urls = prepareDataFolderAndUpdateJob(job, localInputFolderPath, push_url,
-                localOutputFolderPath, pull_url);
+        String newFolderName = createNewFolderName();
+        String push_Url_update = prepareJobInput(job, localInputFolderPath, push_url, newFolderName);
+        String pull_url_update = prepareJobOutput(job, localOutputFolderPath, pull_url, newFolderName);
 
         pushData(job, localInputFolderPath);
         JobId id = super.submit(job);
 
         AwaitedJob aj = new AwaitedJob(id.toString(), localInputFolderPath, job.getInputSpace(),
-            push_pull_urls[0], localOutputFolderPath, job.getOutputSpace(), push_pull_urls[1]);
+            push_Url_update, localOutputFolderPath, job.getOutputSpace(), pull_url_update);
 
         addAwaitedJob(aj);
         return id;
@@ -387,12 +389,149 @@ public class SchedulerProxyUIWithDSupport extends CachingSchedulerProxyUserInter
         logger_util.debug("Created remote folder: " + fUri);
     }
 
+    //    /**
+    //     *
+    //     * This method will create remote folders for the input and output of this
+    //     * job and update the inputSpace and outputSpace job properties. If the
+    //     * localInputFolder parameter is null, or push_url is null, no action will
+    //     * be performed concerning this job's input. If the localOutputFolder
+    //     * parameter is null, or pull_url no action will be performed concerning
+    //     * this job's output.
+    //     *
+    //     * <p/>
+    //     * We suppose there is file storage accessible by the client application as
+    //     * well as the tasks on the computation nodes.
+    //     * <p/>
+    //     * This storage could be different for input and for output.
+    //     * <p/>
+    //     * The input storage can be accessed, by the client application, using the
+    //     * push_url and by the tasks on the nodes using the job's input space url.
+    //     * <p/>
+    //     * This output storage can be accessed, by the client application, using the
+    //     * pull_url and by the tasks on the nodes using the job's output space url.
+    //     *
+    //     * <p/>
+    //     * Prepare Input Data Transfer
+    //     *
+    //     * A folder will be created at push_url/NewFolder/input (which, from the
+    //     * nodes side, is the job.InputSpace/NewFolder/input) . The InputSpace
+    //     * property of the job will be changed to the new location. job.InputSpace =
+    //     * job.InputSpace/NewFolder/input
+    //     * <p/>
+    //     *
+    //     * A generic information will be attached to the job containing the local
+    //     * input folder path.
+    //     *
+    //     * Prepare Output Data Transfer
+    //     *
+    //     * A folder will be created at pull_url/NewFolder/output (which, from the
+    //     * nodes side, is job.OutputSpace/NewFolder/output).
+    //     * <p/>
+    //     * The OutputSpace property of the job will be changed to the new location.
+    //     * job.OutputSpace = job.OutputSpace/NewFolder/output
+    //     * <p/>
+    //     * A generic information will be attached to the job containing the local
+    //     * output folder path
+    //     *
+    //     * NewFolder is a random name.
+    //     *
+    //     * @param job
+    //     * @param localInputFolder
+    //     *            path to the input folder on local machine if null, no actions
+    //     *            will be performed concerning the input data for this job
+    //     *
+    //     * @param push_url
+    //     *            the url where input data is to be pushed before the job
+    //     *            submission
+    //     *
+    //     * @param localOutputFolder
+    //     *            path to the output folder on local machine if null, no actions
+    //     *            will be performed concerning the output data for this job
+    //     *
+    //     * @param pull_url
+    //     *            - the url where the data is to be retrieved after the job is
+    //     *            finished
+    //     *
+    //     *
+    //     * @return an array of 2 String elements representing the value of the
+    //     *         suffixes added to the job's input space and respectively output
+    //     *         space properties.
+    //     * @throws FileSystemException
+    //     */
+    //    private String[] prepareDataFolderAndUpdateJob(Job job, String localInputFolder, String push_url,
+    //            String localOutputFolder, String pull_url) throws FileSystemException {
+    //
+    //        // Choose a random name for a new folder to be created
+    //        String newFolderName = "" + System.currentTimeMillis() + new Random().nextInt(1000);
+    //
+    //        // if the job defines an input space
+    //        // and the localInputFolder is not null
+    //        // create a remote folder for the input data
+    //        // and update the InputSpace property of the job to reference that
+    //        // folder
+    //
+    //        String inputSpace_url = job.getInputSpace();
+    //        String push_url_updated = "";
+    //        String pull_url_updated = "";
+    //
+    //        // the input folder, on the remote input space, relative to the root url
+    //        String inputFolder = "";
+    //        if ((localInputFolder != null) && (inputSpace_url != null) && (!inputSpace_url.equals("")) &&
+    //            (push_url != null)) {
+    //            inputFolder = newFolderName + "/input";
+    //            push_url_updated = push_url + "//" + inputFolder;
+    //            String inputSpace_url_updated = inputSpace_url + "//" + inputFolder;
+    //            createFolder(push_url_updated);
+    //            job.setInputSpace(inputSpace_url_updated);
+    //            job.addGenericInformation(GENERIC_INFO_INPUT_FOLDER_PROPERTY_NAME, new File(localInputFolder)
+    //                    .getAbsolutePath());
+    //
+    //            job.addGenericInformation(GENERIC_INFO_PUSH_URL_PROPERTY_NAME, push_url_updated);
+    //        }
+    //
+    //        // if the job defines an output space
+    //        // and the localOutputFolder is not null
+    //        // create a remote folder for the output data
+    //        // and update the OutputSpace property of the job to reference that
+    //        // folder
+    //
+    //        String outputSpace_url = job.getOutputSpace();
+    //        // the input folder, on the remote output space, relative to the root
+    //        // url
+    //        String outputFolder = "";
+    //
+    //        if ((localOutputFolder != null) && (outputSpace_url != null) && (!outputSpace_url.equals("")) &&
+    //            (pull_url != null)) {
+    //            outputFolder = newFolderName + "/output";
+    //
+    //            pull_url_updated = pull_url + "//" + outputFolder;
+    //            String outputSpace_url_updated = outputSpace_url + "//" + outputFolder;
+    //            createFolder(pull_url_updated);
+    //
+    //            job.setOutputSpace(outputSpace_url_updated);
+    //            job.addGenericInformation(GENERIC_INFO_OUTPUT_FOLDER_PROPERTY_NAME, new File(localOutputFolder)
+    //                    .getAbsolutePath());
+    //            job.addGenericInformation(GENERIC_INFO_PULL_URL_PROPERTY_NAME, pull_url_updated);
+    //
+    //        }
+    //        return new String[] { push_url_updated, pull_url_updated };
+    //    }
+
+    private String createNewFolderName() {
+        String user = System.getProperty("user.name");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd_HH.mm.ss.SSS");
+        Date now = new Date();
+        String strDate = sdf.format(now);
+
+        String newFolderName = user + "_" + strDate;
+        return newFolderName;
+
+    }
+
     /**
      * 
-     * This method will create remote folders for the input and output of this
-     * job and update the inputSpace and outputSpace job properties. If the
-     * localInputFolder parameter is null, or push_url is null, no action will
-     * be performed concerning this job's input. If the localOutputFolder
+     * This method will create a remote folder for output of this
+     * job and update the outputSpace job property. If the localOutputFolder
      * parameter is null, or pull_url no action will be performed concerning
      * this job's output.
      * 
@@ -402,23 +541,10 @@ public class SchedulerProxyUIWithDSupport extends CachingSchedulerProxyUserInter
      * <p/>
      * This storage could be different for input and for output.
      * <p/>
-     * The input storage can be accessed, by the client application, using the
-     * push_url and by the tasks on the nodes using the job's input space url.
-     * <p/>
+     *
      * This output storage can be accessed, by the client application, using the
      * pull_url and by the tasks on the nodes using the job's output space url.
      * 
-     * <p/>
-     * Prepare Input Data Transfer
-     * 
-     * A folder will be created at push_url/NewFolder/input (which, from the
-     * nodes side, is the job.InputSpace/NewFolder/input) . The InputSpace
-     * property of the job will be changed to the new location. job.InputSpace =
-     * job.InputSpace/NewFolder/input
-     * <p/>
-     * 
-     * A generic information will be attached to the job containing the local
-     * input folder path.
      * 
      * Prepare Output Data Transfer
      * 
@@ -431,16 +557,8 @@ public class SchedulerProxyUIWithDSupport extends CachingSchedulerProxyUserInter
      * A generic information will be attached to the job containing the local
      * output folder path
      * 
-     * NewFolder is a random name.
      * 
      * @param job
-     * @param localInputFolder
-     *            path to the input folder on local machine if null, no actions
-     *            will be performed concerning the input data for this job
-     * 
-     * @param push_url
-     *            the url where input data is to be pushed before the job
-     *            submission
      * 
      * @param localOutputFolder
      *            path to the output folder on local machine if null, no actions
@@ -450,18 +568,90 @@ public class SchedulerProxyUIWithDSupport extends CachingSchedulerProxyUserInter
      *            - the url where the data is to be retrieved after the job is
      *            finished
      * 
+     * @param newFolderName
+     *            name of the folder to be used for pushing the output
      * 
-     * @return an array of 2 String elements representing the value of the
-     *         suffixes added to the job's input space and respectively output
-     *         space properties.
+     * @return a String representing the updated value of the pull_url
      * @throws FileSystemException
      */
-    private String[] prepareDataFolderAndUpdateJob(Job job, String localInputFolder, String push_url,
-            String localOutputFolder, String pull_url) throws FileSystemException {
+    private String prepareJobOutput(Job job, String localOutputFolder, String pull_url, String newFolderName)
+            throws FileSystemException {
+        // if the job defines an output space
+        // and the localOutputFolder is not null
+        // create a remote folder for the output data
+        // and update the OutputSpace property of the job to reference that
+        // folder
+        String outputSpace_url = job.getOutputSpace();
+        String pull_url_updated = "";
 
-        // Choose a random name for a new folder to be created
-        String newFolderName = "" + System.currentTimeMillis() + new Random().nextInt(1000);
+        // the output folder, on the remote output space, relative to the root
+        // url
+        String outputFolder = "";
 
+        if ((localOutputFolder != null) && (outputSpace_url != null) && (!outputSpace_url.equals("")) &&
+            (pull_url != null)) {
+            outputFolder = newFolderName + "/output";
+
+            pull_url_updated = pull_url + "//" + outputFolder;
+            String outputSpace_url_updated = outputSpace_url + "//" + outputFolder;
+            createFolder(pull_url_updated);
+
+            job.setOutputSpace(outputSpace_url_updated);
+            job.addGenericInformation(GENERIC_INFO_OUTPUT_FOLDER_PROPERTY_NAME, new File(localOutputFolder)
+                    .getAbsolutePath());
+            job.addGenericInformation(GENERIC_INFO_PULL_URL_PROPERTY_NAME, pull_url_updated);
+        }
+
+        return pull_url_updated;
+    }
+
+    /**
+     *
+     * This method will create a remote folder for the input data of this
+     * job and update the inputSpace job property.
+     * If the  localInputFolder parameter is null, or push_url is null, no action will
+     * be performed concerning this job's input.
+     *
+     * <p/>
+     * We suppose there is file storage accessible by the client application as
+     * well as the tasks on the computation nodes.
+     * <p/>
+     * This storage could be different for input and for output.
+     * <p/>
+     * The input storage can be accessed, by the client application, using the
+     * push_url and by the tasks on the nodes using the job's input space url.
+     * <p/>
+     *
+     * Prepare Input Data Transfer
+     *
+     * A folder will be created at push_url/newFolderName/input (which, from the
+     * nodes side, is the job.InputSpace/newFolderName/input) . The InputSpace
+     * property of the job will be changed to the new location. job.InputSpace =
+     * job.InputSpace/NewFolder/input
+     * <p/>
+     *
+     * A generic information will be attached to the job containing the local
+     * input folder path.
+     *
+     *
+     * @param job
+     * @param localInputFolder
+     *            path to the input folder on local machine if null, no actions
+     *            will be performed concerning the input data for this job
+     *
+     * @param push_url
+     *            the url where input data is to be pushed before the job
+     *            submission
+     *
+     * @param newFolderName
+     *            name of the new folder to be created
+     *
+     * @return  String representing the updated value of the push_url
+     *
+     * @throws FileSystemException
+     */
+    private String prepareJobInput(Job job, String localInputFolder, String push_url, String newFolderName)
+            throws FileSystemException {
         // if the job defines an input space
         // and the localInputFolder is not null
         // create a remote folder for the input data
@@ -470,7 +660,6 @@ public class SchedulerProxyUIWithDSupport extends CachingSchedulerProxyUserInter
 
         String inputSpace_url = job.getInputSpace();
         String push_url_updated = "";
-        String pull_url_updated = "";
 
         // the input folder, on the remote input space, relative to the root url
         String inputFolder = "";
@@ -493,26 +682,8 @@ public class SchedulerProxyUIWithDSupport extends CachingSchedulerProxyUserInter
         // and update the OutputSpace property of the job to reference that
         // folder
 
-        String outputSpace_url = job.getOutputSpace();
-        // the input folder, on the remote output space, relative to the root
-        // url
-        String outputFolder = "";
+        return push_url_updated;
 
-        if ((localOutputFolder != null) && (outputSpace_url != null) && (!outputSpace_url.equals("")) &&
-            (pull_url != null)) {
-            outputFolder = newFolderName + "/output";
-
-            pull_url_updated = pull_url + "//" + outputFolder;
-            String outputSpace_url_updated = outputSpace_url + "//" + outputFolder;
-            createFolder(pull_url_updated);
-
-            job.setOutputSpace(outputSpace_url_updated);
-            job.addGenericInformation(GENERIC_INFO_OUTPUT_FOLDER_PROPERTY_NAME, new File(localOutputFolder)
-                    .getAbsolutePath());
-            job.addGenericInformation(GENERIC_INFO_PULL_URL_PROPERTY_NAME, pull_url_updated);
-
-        }
-        return new String[] { push_url_updated, pull_url_updated };
     }
 
     /**
@@ -708,7 +879,7 @@ public class SchedulerProxyUIWithDSupport extends CachingSchedulerProxyUserInter
     /**
      * creates the list of {@link AwaitedJob} from the statusFile
      */
-    protected synchronized void loadAwaitedJobs() {
+    protected void loadAwaitedJobs() {
         statusFile = new File(statusFilename);
         if (!statusFile.isFile()) {
             return;
@@ -812,6 +983,8 @@ public class SchedulerProxyUIWithDSupport extends CachingSchedulerProxyUserInter
         switch (status) {
             case KILLED: {
                 logger_util.info("The job " + id + "has been killed. No data will be transfered");
+                removeAwaitedJob(id.toString());
+
                 break;
             }
             case FINISHED: {
@@ -953,7 +1126,7 @@ public class SchedulerProxyUIWithDSupport extends CachingSchedulerProxyUserInter
             return false;
     }
 
-    protected synchronized void addAwaitedJob(AwaitedJob aj) {
+    protected void addAwaitedJob(AwaitedJob aj) {
         this.awaitedJobs.put(aj.getJobId(), aj);
         try {
             this.saveAwaitedJobsToFile();
@@ -966,7 +1139,7 @@ public class SchedulerProxyUIWithDSupport extends CachingSchedulerProxyUserInter
         }
     }
 
-    protected synchronized void removeAwaitedJob(String id) {
+    protected void removeAwaitedJob(String id) {
         this.awaitedJobs.remove(id);
 
         try {
@@ -1025,7 +1198,7 @@ public class SchedulerProxyUIWithDSupport extends CachingSchedulerProxyUserInter
                     logger_util
                             .info("Job  " +
                                 jobId +
-                                " will be removed from the known job list. The system will not attempt again to retrieve data for this job. You couyld try to manually copy the data from the location  " +
+                                " will be removed from the known job list. The system will not attempt again to retrieve data for this job. You could try to manually copy the data from the location  " +
                                 sourceUrl);
 
                     for (ISchedulerEventListenerExtended l : eventListeners) {
