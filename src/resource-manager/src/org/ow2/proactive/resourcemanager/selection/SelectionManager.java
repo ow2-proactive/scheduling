@@ -280,6 +280,7 @@ public abstract class SelectionManager {
             }
         }
 
+        ScriptException scriptException = null;
         try {
             // launching
             Collection<Future<Node>> matchedNodes = scriptExecutorThreadPool.invokeAll(scriptExecutors,
@@ -302,7 +303,8 @@ public abstract class SelectionManager {
                     } catch (ExecutionException e) {
                         // SCHEDULING-954 : an exception in script call is considered as an exception
                         // thrown by the script itself.
-                        throw new ScriptException("Exception occurs in selection script call", e.getCause());
+                        scriptException = new ScriptException("Exception occurs in selection script call", e
+                                .getCause());
                     }
                 } else {
                     // no script result was obtained
@@ -315,6 +317,11 @@ public abstract class SelectionManager {
             }
         } catch (InterruptedException e1) {
             logger.warn("Interrupting the selection manager");
+        }
+
+        // if the script passes on some nodes ignore the exception
+        if (scriptException != null && matched.size() == 0) {
+            throw scriptException;
         }
 
         return matched;
