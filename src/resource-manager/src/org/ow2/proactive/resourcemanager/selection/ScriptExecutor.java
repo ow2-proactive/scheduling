@@ -88,46 +88,52 @@ public class ScriptExecutor implements Callable<Node> {
                 }
 
                 logger.info("Executing script " + script.hashCode() + " on node " + rmnode.getNodeURL());
-                ScriptResult<Boolean> scriptResult = rmnode.executeScript(script);
+                try {
+                    ScriptResult<Boolean> scriptResult = rmnode.executeScript(script);
 
-                // SCHEDULING-883 : scripts must be executed sequentially to avoid unexpected script side effect
-                //scriptExecitionResults.add(scriptResult);
+                    // SCHEDULING-883 : scripts must be executed sequentially to avoid unexpected script side effect
+                    //scriptExecitionResults.add(scriptResult);
 
-                // processing the results
-                if (!MOP.isReifiedObject(scriptResult) && scriptResult.getException() != null) {
-                    // could not create script execution handler
-                    // probably the node id down
-                    logger.warn("Cannot execute script " + script.hashCode() + " on the node " +
-                        rmnode.getNodeURL(), scriptResult.getException());
-                    logger.warn("Checking if the node " + rmnode.getNodeURL() + " is still alive");
-                    rmnode.getNodeSource().pingNode(rmnode.getNode());
+                    // processing the results
+                    if (!MOP.isReifiedObject(scriptResult) && scriptResult.getException() != null) {
+                        // could not create script execution handler
+                        // probably the node id down
+                        logger.warn("Cannot execute script " + script.hashCode() + " on the node " +
+                            rmnode.getNodeURL(), scriptResult.getException());
+                        logger.warn("Checking if the node " + rmnode.getNodeURL() + " is still alive");
+                        rmnode.getNodeSource().pingNode(rmnode.getNode());
 
+                        nodeMatch = false;
+                        break;
+                    } else {
+
+                        try {
+                            PAFuture.waitFor(scriptResult,
+                                    PAResourceManagerProperties.RM_SELECT_SCRIPT_TIMEOUT.getValueAsInt());
+                        } catch (ProActiveTimeoutException e) {
+                            // do not produce an exception here
+                            nodeMatch = false;
+                            break;
+                        }
+
+                        if (scriptResult != null && scriptResult.errorOccured()) {
+                            nodeMatch = false;
+                            exception = new ScriptException(scriptResult.getException());
+                            break;
+                        }
+
+                        // processing script result and updating knowledge base of
+                        // selection manager at the same time. Returns whether node is selected.
+                        if (!manager.processScriptResult(script, scriptResult, rmnode)) {
+                            nodeMatch = false;
+                            break;
+                        }
+
+                    }
+                } catch (Exception ex) {
+                    // proactive or network exception occurred when script was executed
                     nodeMatch = false;
-                    break;
-                } else {
-
-                    try {
-                        PAFuture.waitFor(scriptResult, PAResourceManagerProperties.RM_SELECT_SCRIPT_TIMEOUT
-                                .getValueAsInt());
-                    } catch (ProActiveTimeoutException e) {
-                        // do not produce an exception here
-                        nodeMatch = false;
-                        break;
-                    }
-
-                    if (scriptResult != null && scriptResult.errorOccured()) {
-                        nodeMatch = false;
-                        exception = new ScriptException(scriptResult.getException());
-                        break;
-                    }
-
-                    // processing script result and updating knowledge base of
-                    // selection manager at the same time. Returns whether node is selected.
-                    if (!manager.processScriptResult(script, scriptResult, rmnode)) {
-                        nodeMatch = false;
-                        break;
-                    }
-
+                    exception = new ScriptException(ex);
                 }
             }
         }
@@ -153,6 +159,7 @@ public class ScriptExecutor implements Callable<Node> {
         }
 
         if (exception != null) {
+            logger.warn("Exception occured on then node " + rmnode.getNodeURL(), exception);
             throw exception;
         }
         if (nodeMatch) {
