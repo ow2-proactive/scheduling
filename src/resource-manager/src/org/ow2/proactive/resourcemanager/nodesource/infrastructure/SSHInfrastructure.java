@@ -169,12 +169,13 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
         }
         //we set the log4j configuration file
         String log4jcmd = CentralPAPropertyRepository.LOG4J.getCmdLine();
-        if (!this.javaOptions.contains(log4jcmd) && targetOSObj.equals(OperatingSystem.CYGWIN)) {
-            //especially on cygwin, there is an issue if no log4j configuration is provided
+        if (!this.javaOptions.contains(log4jcmd)) {
             sb.append(log4jcmd);
             if (containsSpace) {
                 sb.append("\"");
             }
+            // log4j only understands urls
+            sb.append("file:");
             sb.append(schedulingPath);
             sb.append(fs);
             sb.append("config");

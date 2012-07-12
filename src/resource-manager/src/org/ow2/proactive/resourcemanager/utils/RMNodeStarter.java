@@ -63,13 +63,16 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.Parser;
+import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.config.xml.ProActiveConfigurationParser;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
+import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.utils.JVMPropertiesPreloader;
 import org.ow2.proactive.authentication.crypto.Credentials;
@@ -287,7 +290,6 @@ public class RMNodeStarter {
         try {
             //this call takes JVM properties into account
             args = JVMPropertiesPreloader.overrideJVMProperties(args);
-            checkLog4jConfiguration();
             RMNodeStarter starter = new RMNodeStarter();
             starter.doMain(args);
         } catch (Throwable t) {
@@ -305,11 +307,16 @@ public class RMNodeStarter {
     }
 
     protected void doMain(final String args[]) {
+
         this.parseCommandLine(args);
+
+        configureLogging(nodeName);
+
         this.readAndSetTheRank();
         this.node = this.createLocalNode(nodeName);
+
         this.nodeURL = node.getNodeInformation().getURL();
-        System.out.println(this.nodeURL);
+        logger.info("URL of this node " + this.nodeURL);
 
         configureForDataSpace(node);
         if (nodeSourceName != null && nodeSourceName.length() > 0) {
@@ -321,7 +328,7 @@ public class RMNodeStarter {
             ResourceManager rm = this.registerInRM(credentials, rmURL, nodeName, nodeSourceName);
 
             if (rm != null) {
-                System.out.println("Connected to the Resource Manager at " + rmURL +
+                logger.info("Connected to the Resource Manager at " + rmURL +
                     System.getProperty("line.separator"));
                 // start pinging...
                 // ping the im to see if we are still connected
@@ -340,23 +347,68 @@ public class RMNodeStarter {
                         }// while connected
                     } catch (Throwable e) {
                         // no more connected to the RM
-                        System.out
-                                .println("The connection to the Resource Manager has been lost. The application will exit.");
-                        e.printStackTrace();
+                        logger.error(ExitStatus.RM_NO_PING.description, e);
                         System.exit(ExitStatus.RM_NO_PING.exitCode);
                     }
 
                     // if we are here it means we lost the connection. just exit..
-                    System.out.println("The Resource Manager has been shutdown. The application will exit. ");
-                    System.err.println(ExitStatus.RM_IS_SHUTDOWN.description);
+                    logger.error(ExitStatus.RM_IS_SHUTDOWN.description);
                     System.exit(ExitStatus.RM_IS_SHUTDOWN.exitCode);
                 }
             } else {
                 // Force system exit to bypass daemon threads
-                System.err.println(ExitStatus.RMNODE_EXIT_FORCED.description);
+                logger.error(ExitStatus.RMNODE_EXIT_FORCED.description);
                 System.exit(ExitStatus.RMNODE_EXIT_FORCED.exitCode);
             }
         }
+    }
+
+    /*
+     * Sets system properties "proactive.home" and "node.name" (used to parameterize the default
+     * log4j-defaultNode configuration file). Re-configures log4j for the new values of the properties to
+     * take effect.
+     */
+    private static void configureLogging(String nodeName) {
+
+        String proActiveHome = System.getProperty(CentralPAPropertyRepository.PA_HOME.getName());
+
+        if (proActiveHome == null) {
+            try {
+                proActiveHome = ProActiveRuntimeImpl.getProActiveRuntime().getProActiveHome();
+            } catch (ProActiveException e) {
+                throw new RuntimeException("Cannot find ProActive home", e);
+            }
+            System.setProperty(CentralPAPropertyRepository.PA_HOME.getName(), proActiveHome);
+        }
+
+        System.setProperty("node.name", nodeName);
+
+        LogManager.resetConfiguration();
+
+        String log4jConfigPropertyValue = System.getProperty(CentralPAPropertyRepository.LOG4J.getName());
+
+        // (re-)configure log4j so that system properties set above take effect
+        if (log4jConfigPropertyValue != null) {
+            // log4j.configuration property is set (to a URL), use its value
+            URL url;
+            try {
+                url = new URL(log4jConfigPropertyValue);
+            } catch (MalformedURLException e) {
+                throw new RuntimeException(
+                    "Malformed log4j.configuration value: " + log4jConfigPropertyValue, e);
+            }
+            PropertyConfigurator.configure(url);
+            logger.info("Reconfigured log4j using " + log4jConfigPropertyValue);
+        } else {
+            // log4j.configuration property is not set, use default log4j configuration for node
+            String log4jConfig = proActiveHome + File.separator + "config" + File.separator + "log4j" +
+                File.separator + "log4j-defaultNode";
+            // set log4j.configuration to stop ProActiveLogger#load from reconfiguring log4j once again
+            System.setProperty(CentralPAPropertyRepository.LOG4J.getName(), "file:" + log4jConfig);
+            PropertyConfigurator.configure(log4jConfig);
+            logger.info("Configured log4j using " + log4jConfig);
+        }
+
     }
 
     /**
@@ -398,7 +450,7 @@ public class RMNodeStarter {
                     try {
                         credentials = Credentials.getCredentials(cl.getOptionValue(OPTION_CREDENTIAL_FILE));
                     } catch (KeyException ke) {
-                        System.err.println(ExitStatus.CRED_UNREADABLE.description);
+                        logger.error(ExitStatus.CRED_UNREADABLE.description);
                         System.exit(ExitStatus.CRED_UNREADABLE.exitCode);
                     }
                     // The name of the env variable that contains
@@ -406,7 +458,7 @@ public class RMNodeStarter {
                     final String variableName = cl.getOptionValue(OPTION_CREDENTIAL_ENV);
                     final String value = System.getenv(variableName);
                     if (value == null) {
-                        System.err.println(ExitStatus.CRED_ENVIRONMENT.description);
+                        logger.error(ExitStatus.CRED_ENVIRONMENT.description);
                         System.exit(ExitStatus.CRED_ENVIRONMENT.exitCode);
                     }
                     try {
@@ -471,7 +523,7 @@ public class RMNodeStarter {
             }
         } catch (Throwable t) {
             printHelp = true;
-            System.out.println(t.getMessage());
+            logger.info(t.getMessage());
             t.printStackTrace();
             System.exit(ExitStatus.FAILED_TO_LAUNCH.exitCode);
         } finally {
@@ -603,54 +655,6 @@ public class RMNodeStarter {
     }
 
     /**
-     * To define the default log4j configuration if log4j.configuration property has not been set.
-     */
-    public static void checkLog4jConfiguration() {
-        try {
-            String log4jPath = System.getProperty("log4j.configuration");
-            if (log4jPath == null) {
-                //either sched-home/dist/lib/PA-RM.jar or sched-home/classes/resource-manager/
-                File origin = new File(RMNodeStarter.class.getProtectionDomain().getCodeSource()
-                        .getLocation().getFile());
-                File parent = origin.getParentFile();
-                configuration: {
-                    while (parent != null && parent.isDirectory()) {
-                        File[] childs = parent.listFiles();
-                        for (File child : childs) {
-                            if ("config".equals(child.getName())) {
-                                //we have found the sched-home/config/ directory!
-                                log4jPath = child.getAbsolutePath() + File.separator + "log4j" +
-                                    File.separator + "log4j-defaultNode";
-                                File log4j = new File(log4jPath);
-                                if (log4j.exists()) {
-                                    URL log4jURL;
-                                    try {
-                                        log4jURL = log4j.toURL();
-                                        PropertyConfigurator.configure(log4jURL);
-                                        System.setProperty("log4j.configuration", log4jPath);
-                                        logger.trace("log4j.configuration not set, " + log4jPath +
-                                            " defiined as default log4j configuration.");
-                                    } catch (MalformedURLException e) {
-                                        logger.trace("Cannot configure log4j", e);
-                                    }
-                                } else {
-                                    logger.trace("Log4J configuration not found. Cannot configure log4j");
-                                }
-                                break configuration;
-                            }
-                        }
-                        parent = parent.getParentFile();
-                    }
-                }
-            } else {
-                logger.trace("Does not override log4j.configuration");
-            }
-        } catch (Exception ex) {
-            logger.trace("Cannot set log4j Configuration", ex);
-        }
-    }
-
-    /**
      * Tries to join to the Resource Manager with a specified timeout
      * at the given URL, logs with provided credentials and adds the local node to
      * the Resource Manager. Handles all errors/exceptions.
@@ -666,13 +670,11 @@ public class RMNodeStarter {
         try {
             auth = RMConnection.waitAndJoin(fullUrl, WAIT_ON_JOIN_TIMEOUT_IN_MS);
             if (auth == null) {
-                System.out.println(ExitStatus.RMAUTHENTICATION_NULL.description);
-                System.err.println(ExitStatus.RMAUTHENTICATION_NULL.description);
+                logger.error(ExitStatus.RMAUTHENTICATION_NULL.description);
                 System.exit(ExitStatus.RMAUTHENTICATION_NULL.exitCode);
             }
         } catch (Throwable t) {
-            System.out.println("Unable to join the Resource Manager at " + rmURL);
-            t.printStackTrace();
+            logger.error("Unable to join the Resource Manager at " + rmURL, t);
             System.exit(ExitStatus.RMNODE_ADD_ERROR.exitCode);
         }
 
@@ -681,13 +683,11 @@ public class RMNodeStarter {
         try {
             rm = auth.login(credentials);
             if (rm == null) {
-                System.out.println(ExitStatus.RM_NULL.description);
-                System.err.println(ExitStatus.RM_NULL.description);
+                logger.error(ExitStatus.RM_NULL.description);
                 System.exit(ExitStatus.RM_NULL.exitCode);
             }
         } catch (Throwable t) {
-            System.out.println("Unable to log into the Resource Manager at " + rmURL);
-            t.printStackTrace();
+            logger.error("Unable to log into the Resource Manager at " + rmURL, t);
             System.exit(ExitStatus.RMNODE_ADD_ERROR.exitCode);
         }
 
@@ -744,33 +744,32 @@ public class RMNodeStarter {
                     // try to remove previous URL if different...
                     String previousURL = this.getAndDeleteNodeURL(nodeName, rank);
                     if (previousURL != null && !previousURL.equals(this.nodeURL)) {
-                        System.out
-                                .println("Different previous URL registered by this agent has been found. Remove previous registration.");
+                        logger
+                                .info("Different previous URL registered by this agent has been found. Remove previous registration.");
                         rm.removeNode(previousURL, true);
                     }
                     // store the node URL
                     this.storeNodeURL(nodeName, rank, this.nodeURL);
-                    System.out.println("Node " + this.nodeURL + " added. URL is stored in " +
+                    logger.info("Node " + this.nodeURL + " added. URL is stored in " +
                         getNodeURLFilename(nodeName, rank));
                 } else {
-                    System.out.println("Node " + this.nodeURL + " added.");
+                    logger.info("Node " + this.nodeURL + " added.");
                 }
             } else { // not yet registered
-                System.out.println("Attempt number " + attempts + " out of " + NB_OF_ADD_NODE_ATTEMPTS +
+                logger.info("Attempt number " + attempts + " out of " + NB_OF_ADD_NODE_ATTEMPTS +
                     " to add the local node to the Resource Manager at " + rmURL + " has failed.");
                 try {
                     Thread.sleep(ADD_NODE_ATTEMPTS_DELAY_IN_MS);
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    logger.info("Interrupted", e);
                 }
             }
         }// while
 
         if (!isNodeAdded) {
             // if not registered
-            System.out.println("The Resource Manager was unable to add the local node " + this.nodeURL +
-                " after " + NB_OF_ADD_NODE_ATTEMPTS + " attempts. The application will exit.");
-            System.err.println(ExitStatus.RMNODE_ADD_ERROR.description);
+            logger.error("The Resource Manager was unable to add the local node " + this.nodeURL + " after " +
+                NB_OF_ADD_NODE_ATTEMPTS + " attempts. The application will exit.");
             System.exit(ExitStatus.RMNODE_ADD_ERROR.exitCode);
         }
         return rm;
@@ -779,15 +778,15 @@ public class RMNodeStarter {
     protected void readAndSetTheRank() {
         String rankAsString = System.getProperty(RANK_PROP_NAME);
         if (rankAsString == null) {
-            System.out.println("[WARNING] Rank is not set. Previous URLs will not be stored");
+            logger.warn("Rank is not set. Previous URLs will not be stored");
             this.removePrevious = false;
         } else {
             try {
                 this.rank = Integer.parseInt(rankAsString);
                 this.removePrevious = true;
-                System.out.println("Rank is " + this.rank);
+                logger.info("Rank is " + this.rank);
             } catch (Throwable e) {
-                System.out.println("[WARNING] Rank cannot be read due to " + e.getMessage() +
+                logger.warn("Rank cannot be read due to " + e.getMessage() +
                     ". Previous URLs will not be stored");
                 this.removePrevious = false;
             }
@@ -804,13 +803,11 @@ public class RMNodeStarter {
         try {
             localNode = NodeFactory.createLocalNode(nodeName, false, null, null);
             if (localNode == null) {
-                System.out.println("The node returned by the NodeFactory is null");
-                System.err.println(RMNodeStarter.ExitStatus.RMNODE_NULL.description);
+                logger.error(RMNodeStarter.ExitStatus.RMNODE_NULL.description);
                 System.exit(RMNodeStarter.ExitStatus.RMNODE_NULL.exitCode);
             }
         } catch (Throwable t) {
-            System.out.println("Unable to create the local node " + nodeName);
-            t.printStackTrace();
+            logger.error("Unable to create the local node " + nodeName, t);
             System.exit(RMNodeStarter.ExitStatus.RMNODE_ADD_ERROR.exitCode);
         }
         return localNode;
@@ -826,7 +823,7 @@ public class RMNodeStarter {
         try {
             File f = new File(getNodeURLFilename(nodeName, rank));
             if (f.exists()) {
-                System.out.println("[WARNING] NodeURL file already exists ; delete it.");
+                logger.warn("NodeURL file already exists ; delete it.");
                 f.delete();
             }
             BufferedWriter out = new BufferedWriter(new FileWriter(f));
@@ -834,8 +831,7 @@ public class RMNodeStarter {
             out.write(System.getProperty("line.separator"));
             out.close();
         } catch (IOException e) {
-            System.out.println("[WARNING] NodeURL cannot be created.");
-            e.printStackTrace();
+            logger.warn("NodeURL cannot be created.", e);
         }
     }
 

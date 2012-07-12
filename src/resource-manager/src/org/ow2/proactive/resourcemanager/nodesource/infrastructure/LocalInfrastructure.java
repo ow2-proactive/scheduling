@@ -112,8 +112,9 @@ public class LocalInfrastructure extends InfrastructureManager {
             if (containsSpace) {
                 paProperties += "\"";
             }
-            //often needs this specific log4j config on windows... because of tty problems??
-            paProperties += rmHome + "config" + osObj.fs + "log4j" + osObj.fs + "rm-log4j-server";
+            // log4j only understands urls
+            paProperties += "file:";
+            paProperties += rmHome + "config" + osObj.fs + "log4j" + osObj.fs + "log4j-defaultNode";
             if (containsSpace) {
                 paProperties += "\"";
             }
