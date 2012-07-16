@@ -42,8 +42,9 @@ import java.util.ArrayList;
 import java.util.Date;
 
 /**
- * Provides some methods used by the scheduler or the GUI to display some tips properly.
- *
+ * Provides some methods used by the scheduler or the GUI to display some tips
+ * properly.
+ * 
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */
@@ -52,7 +53,7 @@ public class Tools {
     /**
      * Format the given integer 'toFormat' to a String containing 'nbChar'
      * characters
-     *
+     * 
      * @param toFormat
      *            the number to format
      * @param nbChar
@@ -72,7 +73,7 @@ public class Tools {
     /**
      * Format 2 long times into a single duration as a String. The string will
      * contains the duration in Days, hours, minutes, seconds, and millis.
-     *
+     * 
      * @param start
      *            the first date (time)
      * @param end
@@ -119,7 +120,8 @@ public class Tools {
         tmp = (int) duration;
 
         if (tmp > 0) {
-            formatted = tmp + " day" + ((tmp > 1) ? "s" : "") + " - " + formatted;
+            formatted = tmp + " day" + ((tmp > 1) ? "s" : "") + " - "
+                    + formatted;
         }
 
         return formatted;
@@ -127,8 +129,9 @@ public class Tools {
 
     /**
      * Return the given date as a formatted string.
-     *
-     * @param time the date as a long.
+     * 
+     * @param time
+     *            the date as a long.
      * @return the given date as a formatted string.
      */
     public static String getFormattedDate(long time) {
@@ -170,12 +173,13 @@ public class Tools {
     }
 
     /**
-     * Format the given string and return a long that correspond
-     * to the time represented by the given string.<br />
+     * Format the given string and return a long that correspond to the time
+     * represented by the given string.<br />
      * If the string is not proper, 0 will be returned.
-     *
-     * @param pattern a time pattern that must be in [[HH:]MM:]SS
-     * 			where HH, MM, and SS are numbers
+     * 
+     * @param pattern
+     *            a time pattern that must be in [[HH:]MM:]SS where HH, MM, and
+     *            SS are numbers
      * @return a long corresponding to the given time.
      */
     public static long formatDate(String pattern) {
@@ -187,7 +191,8 @@ public class Tools {
         long date = 0;
         try {
             for (int i = splitted.length - 1; i >= 0; i--) {
-                date += Integer.parseInt(splitted[i]) * factor[i + 3 - splitted.length];
+                date += Integer.parseInt(splitted[i])
+                        * factor[i + 3 - splitted.length];
             }
             return date;
         } catch (NumberFormatException e) {
@@ -196,9 +201,11 @@ public class Tools {
     }
 
     /**
-     * Normalize the given URL into an URL that only contains protocol://host:port/
-     *
-     * @param url the url to transform
+     * Normalize the given URL into an URL that only contains
+     * protocol://host:port/
+     * 
+     * @param url
+     *            the url to transform
      * @return an URL that only contains protocol://host:port/
      */
     public static String getHostURL(String url) {
@@ -214,16 +221,19 @@ public class Tools {
     }
 
     /**
-     * Parse a command line in order to split it into a string array.
-     * This method provides the parsing as followed :<br />
-     *  - It is split according to the 'white space' character.<br />
-     *  - It is possible to escape white space character using the '%' character.<br />
-     *  - To write this '%' special char, just escape it ( '%%' ).<br />
-     * For example, the string "cmd arg1 arg% 2 arg%%% 3 arg4%% 5" will return the following string array :<br />
-     *   [cmd,arg1,arg 2,arg% 3,arg4%,5]<br />
-     * <br />This method can be mostlikely used for Runtime.exec(String[]) method.
-     *
-     * @param cmdLine The command line to parse.
+     * Parse a command line in order to split it into a string array. This
+     * method provides the parsing as followed :<br />
+     * - It is split according to the 'white space' character.<br />
+     * - It is possible to escape white space character using the '%' character.<br />
+     * - To write this '%' special char, just escape it ( '%%' ).<br />
+     * For example, the string "cmd arg1 arg% 2 arg%%% 3 arg4%% 5" will return
+     * the following string array :<br />
+     * [cmd,arg1,arg 2,arg% 3,arg4%,5]<br />
+     * <br />
+     * This method can be mostlikely used for Runtime.exec(String[]) method.
+     * 
+     * @param cmdLine
+     *            The command line to parse.
      * @return a string array that represents the parsed command line.
      */
     public static String[] parseCommandLine(String cmdLine) {
@@ -234,18 +244,18 @@ public class Tools {
         char[] cs = cmdLine.toCharArray();
         while (i < cs.length) {
             switch (cs[i]) {
-                case specialToken:
-                    if (i + 1 < cs.length) {
-                        tmp.append(cs[i + 1]);
-                        i++;
-                    }
-                    break;
-                case ' ':
-                    tokens.add(tmp.toString());
-                    tmp = new StringBuilder();
-                    break;
-                default:
-                    tmp.append(cs[i]);
+            case specialToken:
+                if (i + 1 < cs.length) {
+                    tmp.append(cs[i + 1]);
+                    i++;
+                }
+                break;
+            case ' ':
+                tokens.add(tmp.toString());
+                tmp = new StringBuilder();
+                break;
+            default:
+                tmp.append(cs[i]);
             }
             i++;
         }
@@ -257,7 +267,7 @@ public class Tools {
 
     /**
      * Return the extension of shell script depending the current OS
-     *
+     * 
      * @return the extension of shell script depending the current OS
      */
     public static String shellExtension() {
@@ -269,9 +279,11 @@ public class Tools {
     }
 
     /**
-     * Get the columned string according to the given ObjectArrayFormatter descriptor.
-     *
-     * @param oaf the ObjectArrayFormatter describing how to print the array.
+     * Get the columned string according to the given ObjectArrayFormatter
+     * descriptor.
+     * 
+     * @param oaf
+     *            the ObjectArrayFormatter describing how to print the array.
      * @return the columned string according the given descriptor
      */
     public static String getStringAsArray(ArrayFormatter oaf) {

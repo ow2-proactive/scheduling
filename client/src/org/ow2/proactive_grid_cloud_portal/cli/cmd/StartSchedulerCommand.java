@@ -44,23 +44,25 @@ import org.apache.http.client.methods.HttpPut;
 
 public class StartSchedulerCommand extends AbstractCommand implements Command {
 
-	public StartSchedulerCommand() {
-	}
+    public StartSchedulerCommand() {
+    }
 
-	@Override
-	public void execute() throws Exception {
-		HttpPut request = new HttpPut(resourceUrl("start"));
-		HttpResponse response = execute(request);
-		if (statusCode(OK) == statusCode(response)) {
-			boolean success = readValue(response, Boolean.TYPE);
-			if (success) {
-				writeLine("Scheduler is started");
-			} else {
-				writeLine("Scheudler cannot be started");
-			}
-		} else {
-			handleError("An error occured while attempting to start the scheduler ..", response);
-		}
-	}
+    @Override
+    public void execute() throws Exception {
+        HttpPut request = new HttpPut(resourceUrl("start"));
+        HttpResponse response = execute(request);
+        if (statusCode(OK) == statusCode(response)) {
+            boolean success = readValue(response, Boolean.TYPE);
+            if (success) {
+                writeLine("Scheduler is started");
+            } else {
+                writeLine("Scheudler cannot be started");
+            }
+        } else {
+            handleError(
+                    "An error occured while attempting to start the scheduler ..",
+                    response);
+        }
+    }
 
 }

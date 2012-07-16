@@ -38,16 +38,16 @@
 package org.ow2.proactive_grid_cloud_portal.cli.cmd;
 
 public abstract class AbstractTaskCommand extends AbstractJobCommand implements
-		Command {
-	protected String taskId;
+        Command {
+    protected String taskId;
 
-	public AbstractTaskCommand(String jobId, String taskId) {
-		super(jobId);
-		this.taskId = taskId;
-	}
+    public AbstractTaskCommand(String jobId, String taskId) {
+        super(jobId);
+        this.taskId = taskId;
+    }
 
-	protected String task() {
-		return String.format("task('%s')", taskId);
-	}
+    protected String task() {
+        return String.format("task('%s')", taskId);
+    }
 
 }

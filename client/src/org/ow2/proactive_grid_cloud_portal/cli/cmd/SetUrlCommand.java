@@ -38,15 +38,15 @@
 package org.ow2.proactive_grid_cloud_portal.cli.cmd;
 
 public class SetUrlCommand extends AbstractCommand implements Command {
-	private String schedulerUrl;
+    private String schedulerUrl;
 
-	public SetUrlCommand(String schedulerUrl) {
-		this.schedulerUrl = schedulerUrl;
-	}
+    public SetUrlCommand(String schedulerUrl) {
+        this.schedulerUrl = schedulerUrl;
+    }
 
-	@Override
-	public void execute() throws Exception {
-		applicationContext().setSchedulerUrl(schedulerUrl);
-	}
+    @Override
+    public void execute() throws Exception {
+        applicationContext().setSchedulerUrl(schedulerUrl);
+    }
 
 }

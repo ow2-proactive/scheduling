@@ -43,26 +43,26 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 
 public class GetTaskOutputCommand extends AbstractTaskCommand implements
-		Command {
+        Command {
 
-	public GetTaskOutputCommand(String jobId, String taskId) {
-		super(jobId, taskId);
-	}
+    public GetTaskOutputCommand(String jobId, String taskId) {
+        super(jobId, taskId);
+    }
 
-	@Override
-	public void execute() throws Exception {
-		HttpGet request = new HttpGet(resourceUrl("jobs/" + jobId + "/tasks/"
-				+ taskId + "/result/log/all"));
-		HttpResponse response = execute(request);
-		if (statusCode(OK) == statusCode(response)) {
-			writeLine(task() + " output:");
-			writeLine(string(response));
+    @Override
+    public void execute() throws Exception {
+        HttpGet request = new HttpGet(resourceUrl("jobs/" + jobId + "/tasks/"
+                + taskId + "/result/log/all"));
+        HttpResponse response = execute(request);
+        if (statusCode(OK) == statusCode(response)) {
+            writeLine("%s output:", task());
+            writeLine("%s", string(response));
 
-		} else {
-			handleError("An error occured while retrieving " + task()
-					+ " output ..", response);
-		}
+        } else {
+            handleError("An error occured while retrieving " + task()
+                    + " output ..", response);
+        }
 
-	}
+    }
 
 }

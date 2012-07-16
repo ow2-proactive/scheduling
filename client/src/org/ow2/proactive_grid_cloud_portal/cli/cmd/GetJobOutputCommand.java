@@ -48,30 +48,30 @@ import org.codehaus.jackson.type.TypeReference;
 
 public class GetJobOutputCommand extends AbstractJobCommand implements Command {
 
-	public GetJobOutputCommand(String jobId) {
-		super(jobId);
-	}
+    public GetJobOutputCommand(String jobId) {
+        super(jobId);
+    }
 
-	@Override
-	public void execute() throws Exception {
-		HttpGet request = new HttpGet(resourceUrl("jobs/" + jobId
-				+ "/result/value"));
-		HttpResponse response = execute(request);
-		if (statusCode(OK) == statusCode(response)) {
-			writeLine(job() + " output:");
-			Map<String, String> jobOutputs = readValue(response,
-					new TypeReference<Map<String, String>>() {
-					});
-			for (String key : jobOutputs.keySet()) {
-				writeLine(key + " : " + jobOutputs.get(key));
-			}
-		} else if (statusCode(NO_CONTENT) == statusCode(response)) {
-			writeLine("Job('%s') output not available", jobId);
+    @Override
+    public void execute() throws Exception {
+        HttpGet request = new HttpGet(resourceUrl("jobs/" + jobId
+                + "/result/value"));
+        HttpResponse response = execute(request);
+        if (statusCode(OK) == statusCode(response)) {
+            writeLine("%s output:", job());
+            Map<String, String> jobOutputs = readValue(response,
+                    new TypeReference<Map<String, String>>() {
+                    });
+            for (String key : jobOutputs.keySet()) {
+                writeLine("%s : %s", key, jobOutputs.get(key));
+            }
+        } else if (statusCode(NO_CONTENT) == statusCode(response)) {
+            writeLine("Job('%s') output not available", jobId);
 
-		} else {
-			handleError("Error occured while retrieving " + job()
-					+ " output ..", response);
-		}
-	}
+        } else {
+            handleError("Error occured while retrieving " + job()
+                    + " output ..", response);
+        }
+    }
 
 }

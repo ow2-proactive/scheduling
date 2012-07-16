@@ -44,26 +44,26 @@ import org.apache.http.client.methods.HttpPut;
 
 public class FreezeSchedulerCommand extends AbstractCommand implements Command {
 
-	public FreezeSchedulerCommand() {
-	}
+    public FreezeSchedulerCommand() {
+    }
 
-	@Override
-	public void execute() throws Exception {
-		HttpPut request = new HttpPut(resourceUrl("freeze"));
-		HttpResponse response = execute(request);
+    @Override
+    public void execute() throws Exception {
+        HttpPut request = new HttpPut(resourceUrl("freeze"));
+        HttpResponse response = execute(request);
 
-		if (statusCode(OK) == statusCode(response)) {
-			Boolean success = readValue(response, Boolean.TYPE);
-			if (success) {
-				writeLine("scheduler is frozen ..");
-			} else {
-				writeLine("scheduler can not be frozen ..");
-			}
-		} else {
-			handleError(
-					"Error occured while trying to freeze the scheduler ..",
-					response);
-		}
-	}
+        if (statusCode(OK) == statusCode(response)) {
+            Boolean success = readValue(response, Boolean.TYPE);
+            if (success) {
+                writeLine("scheduler is frozen ..");
+            } else {
+                writeLine("scheduler can not be frozen ..");
+            }
+        } else {
+            handleError(
+                    "Error occured while trying to freeze the scheduler ..",
+                    response);
+        }
+    }
 
 }

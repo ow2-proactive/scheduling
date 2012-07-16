@@ -38,14 +38,14 @@
 package org.ow2.proactive_grid_cloud_portal.cli.cmd;
 
 public class SetCaCertsCommand extends AbstractCommand implements Command {
-	private String trustStorePath;
-	
-	public SetCaCertsCommand(String trustStorePath) {
-		this.trustStorePath = trustStorePath;
-	}
+    private String trustStorePath;
 
-	@Override
-	public void execute() throws Exception {
-		System.setProperty("javax.net.ssl.trustStore", trustStorePath);
-	}
+    public SetCaCertsCommand(String trustStorePath) {
+        this.trustStorePath = trustStorePath;
+    }
+
+    @Override
+    public void execute() throws Exception {
+        System.setProperty("javax.net.ssl.trustStore", trustStorePath);
+    }
 }

@@ -44,23 +44,25 @@ import org.apache.http.client.methods.HttpPut;
 
 public class StopSchedulerCommand extends AbstractCommand implements Command {
 
-	public StopSchedulerCommand() {
-	}
+    public StopSchedulerCommand() {
+    }
 
-	@Override
-	public void execute() throws Exception {
-		HttpPut request = new HttpPut(resourceUrl("stop"));
-		HttpResponse response = execute(request);
-		if (statusCode(OK) == statusCode(response)) {
-			boolean success = readValue(response, Boolean.TYPE);
-			if (success) {
-				writeLine("Scheduler is stopped");
-			} else {
-				writeLine("Scheudler cannot be stopped");
-			}
-		} else {
-			handleError("An error occured while attempting to stop the scheduler ..", response);
-		}
-	}
+    @Override
+    public void execute() throws Exception {
+        HttpPut request = new HttpPut(resourceUrl("stop"));
+        HttpResponse response = execute(request);
+        if (statusCode(OK) == statusCode(response)) {
+            boolean success = readValue(response, Boolean.TYPE);
+            if (success) {
+                writeLine("Scheduler is stopped");
+            } else {
+                writeLine("Scheudler cannot be stopped");
+            }
+        } else {
+            handleError(
+                    "An error occured while attempting to stop the scheduler ..",
+                    response);
+        }
+    }
 
 }

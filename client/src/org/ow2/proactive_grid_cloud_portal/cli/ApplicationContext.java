@@ -41,12 +41,9 @@ import static org.ow2.proactive_grid_cloud_portal.cli.RestConstants.DFLT_SESSION
 import static org.ow2.proactive_grid_cloud_portal.cli.RestConstants.DFLT_SESSION_FILE_EXT;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 
 import javax.script.ScriptEngine;
 
-import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -55,153 +52,153 @@ import org.ow2.proactive_grid_cloud_portal.cli.console.AbstractDevice;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpClientUtil;
 
 public class ApplicationContext {
-	
-	private static ApplicationContext instance;
 
-	private String user;
-	private String password;
-	private String alias;
-	private String credFilePathname;
-	private String sessionId;
-	private AbstractDevice device;
-	private boolean termiated = false;
-	private String schedulerUrl;
-	private ObjectMapper objectMapper;
-	private boolean insecureAccess = false;
-	private boolean newSession = false;
-	private ScriptEngine engine;
+    private static ApplicationContext instance;
 
-	private ApplicationContext() {
-	}
+    private String user;
+    private String password;
+    private String alias;
+    private String credFilePathname;
+    private String sessionId;
+    private AbstractDevice device;
+    private boolean termiated = false;
+    private String schedulerUrl;
+    private ObjectMapper objectMapper;
+    private boolean insecureAccess = false;
+    private boolean newSession = false;
+    private ScriptEngine engine;
 
-	public static synchronized ApplicationContext instance() {
-		if (instance == null) {
-			instance = new ApplicationContext();
-		}
-		return instance;
-	}
-	
-	public static void deleteSession(String user) {
-		File sessionFile = new File(DFLT_SESSION_DIR, user
-				+ DFLT_SESSION_FILE_EXT);
-		if (sessionFile.exists()) {
-			sessionFile.delete();
-		}
-	}
-	
-	public void setUser(String user) {
-		this.user = user;
-	}
+    private ApplicationContext() {
+    }
 
-	public String getUser() {
-		return user;
-	}
+    public static synchronized ApplicationContext instance() {
+        if (instance == null) {
+            instance = new ApplicationContext();
+        }
+        return instance;
+    }
 
-	public void setDevice(AbstractDevice device) {
-		this.device = device;
-	}
+    public static void deleteSession(String user) {
+        File sessionFile = new File(DFLT_SESSION_DIR, user
+                + DFLT_SESSION_FILE_EXT);
+        if (sessionFile.exists()) {
+            sessionFile.delete();
+        }
+    }
 
-	public void setSchedulerUrl(String schedulerUrl) {
-		this.schedulerUrl = schedulerUrl;
-	}
+    public void setUser(String user) {
+        this.user = user;
+    }
 
-	public void setObjectMapper(ObjectMapper objectMapper) {
-		this.objectMapper = objectMapper;
-	}
+    public String getUser() {
+        return user;
+    }
 
-	public boolean isNewSession() {
-		return newSession;
-	}
+    public void setDevice(AbstractDevice device) {
+        this.device = device;
+    }
 
-	public void setNewSession(boolean newSession) {
-		this.newSession = newSession;
-	}
+    public void setSchedulerUrl(String schedulerUrl) {
+        this.schedulerUrl = schedulerUrl;
+    }
 
-	public synchronized void init(String schedulerUrl, AbstractDevice console) {
-		this.schedulerUrl = schedulerUrl;
-	}
+    public void setObjectMapper(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
 
-	public AbstractDevice getDevice() {
-		return device;
-	}
+    public boolean isNewSession() {
+        return newSession;
+    }
 
-	public boolean isTermiated() {
-		return termiated;
-	}
+    public void setNewSession(boolean newSession) {
+        this.newSession = newSession;
+    }
 
-	public void setTerminated(boolean termiated) {
-		this.termiated = termiated;
-	}
+    public synchronized void init(String schedulerUrl, AbstractDevice console) {
+        this.schedulerUrl = schedulerUrl;
+    }
 
-	public HttpResponse executeClient(HttpUriRequest request) throws Exception {
-		if (sessionId != null) {
-			request.setHeader("sessionid", sessionId);
-		}
-		DefaultHttpClient client = new DefaultHttpClient();
-		if ("https".equals(request.getURI().getScheme())
-				&& allowInsecureAccess()) {
-			HttpClientUtil.setInsecureAccess(client);
-		}
-		return client.execute(request);
-	}
+    public AbstractDevice getDevice() {
+        return device;
+    }
 
-	public String getSchedulerUrl() {
-		return schedulerUrl;
-	}
+    public boolean isTermiated() {
+        return termiated;
+    }
 
-	public ObjectMapper getObjectMapper() {
-		return objectMapper;
-	}
+    public void setTerminated(boolean termiated) {
+        this.termiated = termiated;
+    }
 
-	public void setSessionId(String sessionId) {
-		this.sessionId = sessionId;
-	}
+    public HttpResponse executeClient(HttpUriRequest request) throws Exception {
+        if (sessionId != null) {
+            request.setHeader("sessionid", sessionId);
+        }
+        DefaultHttpClient client = new DefaultHttpClient();
+        if ("https".equals(request.getURI().getScheme())
+                && allowInsecureAccess()) {
+            HttpClientUtil.setInsecureAccess(client);
+        }
+        return client.execute(request);
+    }
 
-	public String getSessionId() {
-		return sessionId;
-	}
+    public String getSchedulerUrl() {
+        return schedulerUrl;
+    }
 
-	public boolean logged() {
-		return sessionId != null;
-	}
+    public ObjectMapper getObjectMapper() {
+        return objectMapper;
+    }
 
-	public String getPassword() {
-		return password;
-	}
+    public void setSessionId(String sessionId) {
+        this.sessionId = sessionId;
+    }
 
-	public void setPassword(String password) {
-		this.password = password;
-	}
+    public String getSessionId() {
+        return sessionId;
+    }
 
-	public boolean allowInsecureAccess() {
-		return insecureAccess;
-	}
+    public boolean logged() {
+        return sessionId != null;
+    }
 
-	public void allowInsecureAccess(boolean insecure) {
-		this.insecureAccess = insecure;
-	}
-	
-	public String getAlias() {
-		return alias;
-	}
+    public String getPassword() {
+        return password;
+    }
 
-	public void setAlias(String alias) {
-		this.alias = alias;
-	}
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
-	public String getCredFilePathname() {
-		return credFilePathname;
-	}
+    public boolean allowInsecureAccess() {
+        return insecureAccess;
+    }
 
-	public void setCredFilePathname(String credFilePathname) {
-		this.credFilePathname = credFilePathname;
-	}
+    public void allowInsecureAccess(boolean insecure) {
+        this.insecureAccess = insecure;
+    }
 
-	public ScriptEngine getEngine() {
-		return engine;
-	}
+    public String getAlias() {
+        return alias;
+    }
 
-	public void setEngine(ScriptEngine engine) {
-		this.engine = engine;
-	}
+    public void setAlias(String alias) {
+        this.alias = alias;
+    }
+
+    public String getCredFilePathname() {
+        return credFilePathname;
+    }
+
+    public void setCredFilePathname(String credFilePathname) {
+        this.credFilePathname = credFilePathname;
+    }
+
+    public ScriptEngine getEngine() {
+        return engine;
+    }
+
+    public void setEngine(ScriptEngine engine) {
+        this.engine = engine;
+    }
 }

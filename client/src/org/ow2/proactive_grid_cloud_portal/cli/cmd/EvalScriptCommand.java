@@ -15,46 +15,46 @@ import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 
 public class EvalScriptCommand extends AbstractCommand implements Command {
 
-	private String scriptPathname;
-	private String scriptArgs;
+    private String scriptPathname;
+    private String scriptArgs;
 
-	public EvalScriptCommand(String scriptPathname, String scriptArgs) {
-		this.scriptPathname = scriptPathname;
-		this.scriptArgs = scriptArgs;
-	}
+    public EvalScriptCommand(String scriptPathname, String scriptArgs) {
+        this.scriptPathname = scriptPathname;
+        this.scriptArgs = scriptArgs;
+    }
 
-	@Override
-	public void execute() throws Exception {
-		ApplicationContext context = ApplicationContext.instance();
-		Writer writer = applicationContext().getDevice().getWriter();
-		ScriptEngine engine = null;
-		if (context.getEngine() != null) {
-			engine = context.getEngine();
-		} else {
-			ScriptEngineManager mgr = new ScriptEngineManager();
-			engine = mgr.getEngineByExtension("js");
-			engine.getContext().setWriter(writer);
-			context.setEngine(engine);
-		}
-		try {
-			engine.getContext().getBindings(ScriptContext.ENGINE_SCOPE)
-					.putAll(bindings(scriptArgs));
-			String script = read(new File(scriptPathname));
-			engine.eval(script);
-		} catch (ScriptException e) {
-			e.printStackTrace(new PrintWriter(writer, true));
-		}
-	}
+    @Override
+    public void execute() throws Exception {
+        ApplicationContext context = ApplicationContext.instance();
+        Writer writer = applicationContext().getDevice().getWriter();
+        ScriptEngine engine = null;
+        if (context.getEngine() != null) {
+            engine = context.getEngine();
+        } else {
+            ScriptEngineManager mgr = new ScriptEngineManager();
+            engine = mgr.getEngineByExtension("js");
+            engine.getContext().setWriter(writer);
+            context.setEngine(engine);
+        }
+        try {
+            engine.getContext().getBindings(ScriptContext.ENGINE_SCOPE)
+                    .putAll(bindings(scriptArgs));
+            String script = read(new File(scriptPathname));
+            engine.eval(script);
+        } catch (ScriptException e) {
+            e.printStackTrace(new PrintWriter(writer, true));
+        }
+    }
 
-	private Map<String, String> bindings(String bindingString) {
-		Map<String, String> bindings = new HashMap<String, String>();
-		String[] pairs = bindingString.split(",");
-		for (String pair : pairs) {
-			String[] nameValue = pair.split("=");
-			bindings.put(nameValue[0], nameValue[1]);
-		}
-		return bindings;
+    private Map<String, String> bindings(String bindingString) {
+        Map<String, String> bindings = new HashMap<String, String>();
+        String[] pairs = bindingString.split(",");
+        for (String pair : pairs) {
+            String[] nameValue = pair.split("=");
+            bindings.put(nameValue[0], nameValue[1]);
+        }
+        return bindings;
 
-	}
+    }
 
 }

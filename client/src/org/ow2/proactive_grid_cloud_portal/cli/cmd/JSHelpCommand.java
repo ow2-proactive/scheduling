@@ -44,29 +44,29 @@ import org.ow2.proactive_grid_cloud_portal.cli.utils.ArrayFormatter;
 
 public class JSHelpCommand extends AbstractCommand implements Command {
 
-	public JSHelpCommand() {
-	}
+    public JSHelpCommand() {
+    }
 
-	@Override
-	public void execute() throws Exception {
-		ArrayFormatter formatter = new ArrayFormatter();
-		formatter.setMaxColumnLength(100);
-		formatter.setSpace(2);
-		ArrayList<String> titles = new ArrayList<String>();
-		titles.add("Command");
-		titles.add("Description");
-		formatter.setTitle(titles);
-		formatter.addEmptyLine();
-		ArrayList<String> row;
-		for (RestCommand command : RestCommand.values()) {
-			if (command.getJsOpt() != null) {
-				row = new ArrayList<String>();
-				row.add(command.getJsOpt());
-				row.add(command.getDescription());
-				formatter.addLine(row);
-			}
-		}
-		writeLine(string(formatter));
-	}
+    @Override
+    public void execute() throws Exception {
+        ArrayFormatter formatter = new ArrayFormatter();
+        formatter.setMaxColumnLength(100);
+        formatter.setSpace(2);
+        ArrayList<String> titles = new ArrayList<String>();
+        titles.add("Command");
+        titles.add("Description");
+        formatter.setTitle(titles);
+        formatter.addEmptyLine();
+        ArrayList<String> row;
+        for (RestCommand command : RestCommand.values()) {
+            if (command.getJsOpt() != null) {
+                row = new ArrayList<String>();
+                row.add(command.getJsOpt());
+                row.add(command.getDescription());
+                formatter.addLine(row);
+            }
+        }
+        writeLine(string(formatter));
+    }
 
 }

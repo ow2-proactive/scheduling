@@ -120,153 +120,153 @@ import org.ow2.proactive_grid_cloud_portal.cli.cmd.SubmitJobCommand;
  */
 public class CommandFactory {
 
-	private static Map<String, Class<? extends AbstractCommand>> commands = new HashMap<String, Class<? extends AbstractCommand>>();
+    private static Map<String, Class<? extends AbstractCommand>> commands = new HashMap<String, Class<? extends AbstractCommand>>();
 
-	static {
-		commands.put(opt(URL), SetUrlCommand.class);
-		commands.put(opt(HELP), HelpCommand.class);
-		commands.put(opt(INSECURE), SetInsecureAccessCommand.class);
-		commands.put(opt(CACERTS), SetCaCertsCommand.class);
-		commands.put(opt(CACERTS_PASSWORD), SetCaCertsPassCommand.class);
-		commands.put(opt(LOGIN), LoggingCommand.class);
-		commands.put(opt(PASSWORD), SetPasswordCommand.class);
-		commands.put(opt(LOGIN_WITH_CREDENTIALS),
-				LoggingWithCredentialsCommand.class);
-		commands.put(opt(EVAL_SCRIPT), EvalScriptCommand.class);
-		commands.put(opt(START_SCHEDULER), StartSchedulerCommand.class);
-		commands.put(opt(STOP_SCHEDULER), StopSchedulerCommand.class);
-		commands.put(opt(PAUSE_SCHEDULER), PauseSchedulerCommand.class);
-		commands.put(opt(RESUME_SCHEDULER), ResumeSchedulerCommand.class);
-		commands.put(opt(FREEZE_SCHEDULER), FreezeSchedulerCommand.class);
-		commands.put(opt(KILL_SCHEDULER), KillSchedulerCommand.class);
+    static {
+        commands.put(opt(URL), SetUrlCommand.class);
+        commands.put(opt(HELP), HelpCommand.class);
+        commands.put(opt(INSECURE), SetInsecureAccessCommand.class);
+        commands.put(opt(CACERTS), SetCaCertsCommand.class);
+        commands.put(opt(CACERTS_PASSWORD), SetCaCertsPassCommand.class);
+        commands.put(opt(LOGIN), LoggingCommand.class);
+        commands.put(opt(PASSWORD), SetPasswordCommand.class);
+        commands.put(opt(LOGIN_WITH_CREDENTIALS),
+                LoggingWithCredentialsCommand.class);
+        commands.put(opt(EVAL_SCRIPT), EvalScriptCommand.class);
+        commands.put(opt(START_SCHEDULER), StartSchedulerCommand.class);
+        commands.put(opt(STOP_SCHEDULER), StopSchedulerCommand.class);
+        commands.put(opt(PAUSE_SCHEDULER), PauseSchedulerCommand.class);
+        commands.put(opt(RESUME_SCHEDULER), ResumeSchedulerCommand.class);
+        commands.put(opt(FREEZE_SCHEDULER), FreezeSchedulerCommand.class);
+        commands.put(opt(KILL_SCHEDULER), KillSchedulerCommand.class);
 
-		commands.put(opt(GET_STATS), GetStatsCommand.class);
-		commands.put(opt(LIST_JOBS), ListJobsCommand.class);
-		commands.put(opt(LINK_RM), LinkResourceManagerCommand.class);
+        commands.put(opt(GET_STATS), GetStatsCommand.class);
+        commands.put(opt(LIST_JOBS), ListJobsCommand.class);
+        commands.put(opt(LINK_RM), LinkResourceManagerCommand.class);
 
-		commands.put(opt(SUBMIT_JOB_DESC), SubmitJobCommand.class);
-		commands.put(opt(SUBMIT_JOB_ARCH), SubmitJobCommand.class);
+        commands.put(opt(SUBMIT_JOB_DESC), SubmitJobCommand.class);
+        commands.put(opt(SUBMIT_JOB_ARCH), SubmitJobCommand.class);
 
-		commands.put(opt(GET_JOB_OUTPUT), GetJobOutputCommand.class);
-		commands.put(opt(GET_JOB_RESULT), GetJobResultCommand.class);
+        commands.put(opt(GET_JOB_OUTPUT), GetJobOutputCommand.class);
+        commands.put(opt(GET_JOB_RESULT), GetJobResultCommand.class);
 
-		commands.put(opt(CHANGE_JOB_PRIORITY), ChangeJobPriorityCommand.class);
-		commands.put(opt(GET_JOB_STATE), GetJobStateCommand.class);
+        commands.put(opt(CHANGE_JOB_PRIORITY), ChangeJobPriorityCommand.class);
+        commands.put(opt(GET_JOB_STATE), GetJobStateCommand.class);
 
-		commands.put(opt(PAUSE_JOB), PauseJobCommand.class);
-		commands.put(opt(RESUME_JOB), ResumeJobCommand.class);
-		commands.put(opt(KILL_JOB), KillJobCommand.class);
-		commands.put(opt(REMOVE_JOB), RemoveJobCommand.class);
+        commands.put(opt(PAUSE_JOB), PauseJobCommand.class);
+        commands.put(opt(RESUME_JOB), ResumeJobCommand.class);
+        commands.put(opt(KILL_JOB), KillJobCommand.class);
+        commands.put(opt(REMOVE_JOB), RemoveJobCommand.class);
 
-		commands.put(opt(GET_TASK_OUTPUT), GetTaskOutputCommand.class);
-		commands.put(opt(GET_TASK_RESULT), GetTaskResultCommand.class);
-		commands.put(opt(PREEMPT_TASK), PreemptTaskCommand.class);
-		commands.put(opt(RESTART_TASK), RestartTaskCommand.class);
+        commands.put(opt(GET_TASK_OUTPUT), GetTaskOutputCommand.class);
+        commands.put(opt(GET_TASK_RESULT), GetTaskResultCommand.class);
+        commands.put(opt(PREEMPT_TASK), PreemptTaskCommand.class);
+        commands.put(opt(RESTART_TASK), RestartTaskCommand.class);
 
-		commands.put(opt(START_IMODE), StartIModeCommand.class);
-	}
+        commands.put(opt(START_IMODE), StartIModeCommand.class);
+    }
 
-	private CommandFactory() {
-	}
+    private CommandFactory() {
+    }
 
-	private static String opt(RestCommand command) {
-		return command.getOpt();
-	}
+    private static String opt(RestCommand command) {
+        return command.getOpt();
+    }
 
-	/**
-	 * Returns an ordered {@link Command} list for specified user arguments.
-	 * 
-	 * @param cli
-	 *            the command-line arguments
-	 * @return an ordered {@link Command} list.
-	 */
-	public static List<Command> getCommandList(CommandLine cli) {
-		LinkedList<Command> list = new LinkedList<Command>();
-		Map<String, Command> map = getCommands(cli);
-		if (map.containsKey(opt(HELP))) {
-			list.add(map.remove(opt(HELP)));
-			return list;
-		}
+    /**
+     * Returns an ordered {@link Command} list for specified user arguments.
+     * 
+     * @param cli
+     *            the command-line arguments
+     * @return an ordered {@link Command} list.
+     */
+    public static List<Command> getCommandList(CommandLine cli) {
+        LinkedList<Command> list = new LinkedList<Command>();
+        Map<String, Command> map = getCommands(cli);
+        if (map.containsKey(opt(HELP))) {
+            list.add(map.remove(opt(HELP)));
+            return list;
+        }
 
-		if (map.containsKey(opt(URL))) {
-			list.addFirst(map.remove(opt(URL)));
-		}
+        if (map.containsKey(opt(URL))) {
+            list.addFirst(map.remove(opt(URL)));
+        }
 
-		if (map.containsKey(opt(INSECURE))) {
-			list.add(map.remove(opt(INSECURE)));
-		} else if (map.containsKey(opt(CACERTS))) {
-			list.add(map.remove(opt(CACERTS)));
-			if (map.containsKey(opt(CACERTS_PASSWORD))) {
-				list.add(map.remove(opt(CACERTS_PASSWORD)));
-			}
-		}
+        if (map.containsKey(opt(INSECURE))) {
+            list.add(map.remove(opt(INSECURE)));
+        } else if (map.containsKey(opt(CACERTS))) {
+            list.add(map.remove(opt(CACERTS)));
+            if (map.containsKey(opt(CACERTS_PASSWORD))) {
+                list.add(map.remove(opt(CACERTS_PASSWORD)));
+            }
+        }
 
-		if (map.containsKey(opt(PASSWORD))) {
-			list.add(map.remove(opt(PASSWORD)));
-		}
+        if (map.containsKey(opt(PASSWORD))) {
+            list.add(map.remove(opt(PASSWORD)));
+        }
 
-		if (map.containsKey(opt(LOGIN))) {
-			list.add(map.remove(opt(LOGIN)));
+        if (map.containsKey(opt(LOGIN))) {
+            list.add(map.remove(opt(LOGIN)));
 
-		} else if (map.containsKey(opt(LOGIN_WITH_CREDENTIALS))) {
-			list.add(map.remove(opt(LOGIN_WITH_CREDENTIALS)));
-		}
+        } else if (map.containsKey(opt(LOGIN_WITH_CREDENTIALS))) {
+            list.add(map.remove(opt(LOGIN_WITH_CREDENTIALS)));
+        }
 
-		list.addAll(map.values());
+        list.addAll(map.values());
 
-		return list;
-	}
+        return list;
+    }
 
-	private static Map<String, Command> getCommands(CommandLine cli) {
-		Map<String, Command> cliCommands = new HashMap<String, Command>();
-		for (Option o : cli.getOptions()) {
-			cliCommands.put(o.getOpt(), getCommand(o));
-		}
-		return cliCommands;
-	}
+    private static Map<String, Command> getCommands(CommandLine cli) {
+        Map<String, Command> cliCommands = new HashMap<String, Command>();
+        for (Option o : cli.getOptions()) {
+            cliCommands.put(o.getOpt(), getCommand(o));
+        }
+        return cliCommands;
+    }
 
-	private static Command getCommand(Option opt) {
-		try {
-			Class<?> commandClass = commands.get(opt.getOpt());
-			Constructor<?>[] ctors = commandClass.getConstructors();
-			if (ctors.length > 0) {
-				Constructor<?> selected = null;
-				int numOfCtorParams = (opt.getValues() == null) ? 0 : opt
-						.getValues().length;
-				for (Constructor<?> ctor : ctors) {
-					// naive way of selecting the most suitable ctor
-					if (numOfCtorParams == ctor.getParameterTypes().length) {
-						selected = ctor;
-						break;
-					}
-				}
-				if (selected != null) {
-					return getInstance(selected, opt.getValues());
-				}
-			}
+    private static Command getCommand(Option opt) {
+        try {
+            Class<?> commandClass = commands.get(opt.getOpt());
+            Constructor<?>[] ctors = commandClass.getConstructors();
+            if (ctors.length > 0) {
+                Constructor<?> selected = null;
+                int numOfCtorParams = (opt.getValues() == null) ? 0 : opt
+                        .getValues().length;
+                for (Constructor<?> ctor : ctors) {
+                    // naive way of selecting the most suitable ctor
+                    if (numOfCtorParams == ctor.getParameterTypes().length) {
+                        selected = ctor;
+                        break;
+                    }
+                }
+                if (selected != null) {
+                    return getInstance(selected, opt.getValues());
+                }
+            }
 
-			throw new IllegalArgumentException(
-					String.format(
-							"%s %s %s%n%s %s",
-							"No suitable command found for",
-							opt.getOpt(),
-							opt.getValuesList(),
-							"Check whether you have specified all required arguments for",
-							opt.getOpt()));
-		} catch (IllegalArgumentException e) {
-			throw e;
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
+            throw new IllegalArgumentException(
+                    String.format(
+                            "%s %s %s%n%s %s",
+                            "No suitable command found for",
+                            opt.getOpt(),
+                            opt.getValuesList(),
+                            "Check whether you have specified all required arguments for",
+                            opt.getOpt()));
+        } catch (IllegalArgumentException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
-	private static Command getInstance(Constructor<?> ctor, String[] args)
-			throws Exception {
-		Object[] ctorArgs = new Object[ctor.getParameterTypes().length];
-		if (args != null) {
-			System.arraycopy(args, 0, ctorArgs, 0, args.length);
-		}
-		return (Command) ctor.newInstance(ctorArgs);
-	}
+    private static Command getInstance(Constructor<?> ctor, String[] args)
+            throws Exception {
+        Object[] ctorArgs = new Object[ctor.getParameterTypes().length];
+        if (args != null) {
+            System.arraycopy(args, 0, ctorArgs, 0, args.length);
+        }
+        return (Command) ctor.newInstance(ctorArgs);
+    }
 
 }

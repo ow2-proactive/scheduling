@@ -44,24 +44,26 @@ import org.apache.http.client.methods.HttpPut;
 
 public class RestartTaskCommand extends AbstractTaskCommand implements Command {
 
-	public RestartTaskCommand(String jobId, String taskId) {
-		super(jobId, taskId);
-	}
+    public RestartTaskCommand(String jobId, String taskId) {
+        super(jobId, taskId);
+    }
 
-	@Override
-	public void execute() throws Exception {
-		HttpPut request = new HttpPut(resourceUrl("jobs/" + jobId + "/tasks/" + taskId + "/restart"));
-		HttpResponse response = execute(request);
-		if (statusCode(OK) == statusCode(response)) {
-			boolean success = readValue(response, Boolean.TYPE).booleanValue();
-			if (success) {
-				writeLine(task() + " restarted");
-			} else {
-				writeLine(task() + " cannot be restarted .. ");
-			}
-		} else {
-			handleError("An error occured while attempting to restart " + task(), response);
-		}
-	}
+    @Override
+    public void execute() throws Exception {
+        HttpPut request = new HttpPut(resourceUrl("jobs/" + jobId + "/tasks/"
+                + taskId + "/restart"));
+        HttpResponse response = execute(request);
+        if (statusCode(OK) == statusCode(response)) {
+            boolean success = readValue(response, Boolean.TYPE).booleanValue();
+            if (success) {
+                writeLine("%s restarted", task());
+            } else {
+                writeLine("%s cannot be restarted .. ", task());
+            }
+        } else {
+            handleError("An error occured while attempting to restart "
+                    + task(), response);
+        }
+    }
 
 }

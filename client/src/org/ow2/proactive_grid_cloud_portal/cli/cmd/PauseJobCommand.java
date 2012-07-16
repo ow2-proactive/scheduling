@@ -35,7 +35,6 @@
  * $$PROACTIVE_INITIAL_DEV$$
  */
 
-
 package org.ow2.proactive_grid_cloud_portal.cli.cmd;
 
 import static org.ow2.proactive_grid_cloud_portal.cli.ResponseStatus.OK;
@@ -45,26 +44,26 @@ import org.apache.http.client.methods.HttpPut;
 
 public class PauseJobCommand extends AbstractJobCommand implements Command {
 
-	public PauseJobCommand(String jobId) {
-		super(jobId);
-	}
+    public PauseJobCommand(String jobId) {
+        super(jobId);
+    }
 
-	@Override
-	public void execute() throws Exception {
-		HttpPut request = new HttpPut(resourceUrl("jobs/" + jobId + "/pause"));
-		HttpResponse response = execute(request);
-		if (statusCode(OK) == statusCode(response)) {
-			boolean success = readValue(response, Boolean.TYPE);
-			if (success) {
-				writeLine(job() + " paused");
-			} else {
-				writeLine(job() + " cannot be pause");
-			}
-		} else {
-			handleError("An error occured while attempting to pause " + job(),
-					response);
-		}
+    @Override
+    public void execute() throws Exception {
+        HttpPut request = new HttpPut(resourceUrl("jobs/" + jobId + "/pause"));
+        HttpResponse response = execute(request);
+        if (statusCode(OK) == statusCode(response)) {
+            boolean success = readValue(response, Boolean.TYPE);
+            if (success) {
+                writeLine("%s paused", job());
+            } else {
+                writeLine("%s cannot be pause", job());
+            }
+        } else {
+            handleError("An error occured while attempting to pause " + job(),
+                    response);
+        }
 
-	}
+    }
 
 }

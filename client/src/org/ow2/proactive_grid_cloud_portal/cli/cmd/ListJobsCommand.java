@@ -54,94 +54,94 @@ import org.ow2.proactive_grid_cloud_portal.cli.utils.ArrayFormatter;
 
 public class ListJobsCommand extends AbstractCommand implements Command {
 
-	public ListJobsCommand() {
-	}
+    public ListJobsCommand() {
+    }
 
-	@Override
-	public void execute() throws Exception {
-		String resourceUrl = resourceUrl("revisionandstate");
-		HttpGet request = new HttpGet(resourceUrl);
-		HttpResponse response = execute(request);
+    @Override
+    public void execute() throws Exception {
+        String resourceUrl = resourceUrl("revisionandstate");
+        HttpGet request = new HttpGet(resourceUrl);
+        HttpResponse response = execute(request);
 
-		if (statusCode(OK) == statusCode(response)) {
-			Map<Long, SchedulerStateView> stateMap = readValue(response,
-					new TypeReference<Map<Long, SchedulerStateView>>() {
-					});
-			SchedulerStateView state = stateMap.entrySet().iterator().next()
-					.getValue();
+        if (statusCode(OK) == statusCode(response)) {
+            Map<Long, SchedulerStateView> stateMap = readValue(response,
+                    new TypeReference<Map<Long, SchedulerStateView>>() {
+                    });
+            SchedulerStateView state = stateMap.entrySet().iterator().next()
+                    .getValue();
 
-			ArrayFormatter oaf = new ArrayFormatter();
-			oaf.setMaxColumnLength(30);
-			oaf.setSpace(4);
+            ArrayFormatter oaf = new ArrayFormatter();
+            oaf.setMaxColumnLength(30);
+            oaf.setSpace(4);
 
-			List<String> columnNames = new ArrayList<String>();
-			columnNames.add("ID");
-			columnNames.add("NAME");
-			columnNames.add("OWNER");
-			columnNames.add("PRIORITY");
-			columnNames.add("PROJECT");
-			columnNames.add("STATUS");
-			columnNames.add("START AT");
-			columnNames.add("DURATION");
-			oaf.setTitle(columnNames);
+            List<String> columnNames = new ArrayList<String>();
+            columnNames.add("ID");
+            columnNames.add("NAME");
+            columnNames.add("OWNER");
+            columnNames.add("PRIORITY");
+            columnNames.add("PROJECT");
+            columnNames.add("STATUS");
+            columnNames.add("START AT");
+            columnNames.add("DURATION");
+            oaf.setTitle(columnNames);
 
-			oaf.addEmptyLine();
+            oaf.addEmptyLine();
 
-			List<JobStateView> pendingJobs = Arrays.asList(state
-					.getPendingJobs());
-			Collections.sort(pendingJobs);
-			List<JobStateView> runningJobs = Arrays.asList(state
-					.getRunningJobs());
-			Collections.sort(runningJobs);
-			List<JobStateView> finishedJobs = Arrays.asList(state
-					.getFinishedJobs());
-			Collections.sort(finishedJobs);
+            List<JobStateView> pendingJobs = Arrays.asList(state
+                    .getPendingJobs());
+            Collections.sort(pendingJobs);
+            List<JobStateView> runningJobs = Arrays.asList(state
+                    .getRunningJobs());
+            Collections.sort(runningJobs);
+            List<JobStateView> finishedJobs = Arrays.asList(state
+                    .getFinishedJobs());
+            Collections.sort(finishedJobs);
 
-			for (JobStateView js : finishedJobs) {
-				oaf.addLine(rowList(js));
-			}
+            for (JobStateView js : finishedJobs) {
+                oaf.addLine(rowList(js));
+            }
 
-			if (runningJobs.size() > 0) {
-				oaf.addEmptyLine();
-			}
-			for (JobStateView js : state.getRunningJobs()) {
-				oaf.addLine(rowList(js));
-			}
+            if (runningJobs.size() > 0) {
+                oaf.addEmptyLine();
+            }
+            for (JobStateView js : state.getRunningJobs()) {
+                oaf.addLine(rowList(js));
+            }
 
-			if (pendingJobs.size() > 0) {
-				oaf.addEmptyLine();
-			}
-			for (JobStateView js : pendingJobs) {
-				oaf.addLine(rowList(js));
-			}
+            if (pendingJobs.size() > 0) {
+                oaf.addEmptyLine();
+            }
+            for (JobStateView js : pendingJobs) {
+                oaf.addLine(rowList(js));
+            }
 
-			writeLine(oaf.getAsString());
+            writeLine(oaf.getAsString());
 
-		} else {
-			handleError(
-					"An error occured while retriving jobs list from the scheduler ..",
-					response);
-		}
-	}
+        } else {
+            handleError(
+                    "An error occured while retriving jobs list from the scheduler ..",
+                    response);
+        }
+    }
 
-	private List<String> rowList(JobStateView js) {
-		List<String> row = new ArrayList<String>();
-		row.add(String.valueOf(js.getId()));
-		row.add(js.getName());
-		row.add(js.getOwner());
-		row.add(js.getPriority().toString());
-		row.add(js.getProjectName());
-		row.add(js.getJobInfo().getStatus());
+    private List<String> rowList(JobStateView js) {
+        List<String> row = new ArrayList<String>();
+        row.add(String.valueOf(js.getId()));
+        row.add(js.getName());
+        row.add(js.getOwner());
+        row.add(js.getPriority().toString());
+        row.add(js.getProjectName());
+        row.add(js.getJobInfo().getStatus());
 
-		String date = formattedDate(js.getJobInfo().getStartTime());
-		if (js.getJobInfo().getStartTime() != -1)
-			date += " (" + formattedElapsedTime(js.getJobInfo().getStartTime())
-					+ ")";
-		row.add(date);
-		row.add(formattedDuration(js.getJobInfo().getStartTime(), js
-				.getJobInfo().getFinishedTime()));
+        String date = formattedDate(js.getJobInfo().getStartTime());
+        if (js.getJobInfo().getStartTime() != -1)
+            date += " (" + formattedElapsedTime(js.getJobInfo().getStartTime())
+                    + ")";
+        row.add(date);
+        row.add(formattedDuration(js.getJobInfo().getStartTime(), js
+                .getJobInfo().getFinishedTime()));
 
-		return row;
-	}
+        return row;
+    }
 
 }

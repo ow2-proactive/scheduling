@@ -45,33 +45,33 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 
 public class LinkResourceManagerCommand extends AbstractCommand implements
-		Command {
+        Command {
 
-	private String rmUrl;
+    private String rmUrl;
 
-	public LinkResourceManagerCommand(String rmUrl) {
-		this.rmUrl = rmUrl;
-	}
+    public LinkResourceManagerCommand(String rmUrl) {
+        this.rmUrl = rmUrl;
+    }
 
-	@Override
-	public void execute() throws Exception {
-		HttpPost request = new HttpPost(resourceUrl("linkrm"));
-		StringEntity entity = new StringEntity("rmurl=" + rmUrl, APPLICATION_FORM_URLENCODED);
-		request.setEntity(entity);
-		HttpResponse response = execute(request);
-		if (statusCode(OK) == statusCode(response)) {
-			boolean success = readValue(response, Boolean.TYPE);
-			if (success) {
-				writeLine("New resource manager(" + rmUrl
-						+ ") relinked successfully");
-			} else {
-				writeLine("Cannot relink to new resource manager(" + rmUrl
-						+ ")");
-			}
-		} else {
-			handleError("An error occured while relink ..", response);
-		}
+    @Override
+    public void execute() throws Exception {
+        HttpPost request = new HttpPost(resourceUrl("linkrm"));
+        StringEntity entity = new StringEntity("rmurl=" + rmUrl,
+                APPLICATION_FORM_URLENCODED);
+        request.setEntity(entity);
+        HttpResponse response = execute(request);
+        if (statusCode(OK) == statusCode(response)) {
+            boolean success = readValue(response, Boolean.TYPE);
+            if (success) {
+                writeLine("New resource manager('%s') relinked successfully",
+                        rmUrl);
+            } else {
+                writeLine("Cannot relink to new resource manager('%s')", rmUrl);
+            }
+        } else {
+            handleError("An error occured while relink ..", response);
+        }
 
-	}
+    }
 
 }

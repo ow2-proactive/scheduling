@@ -7,12 +7,12 @@ package org.ow2.proactive_grid_cloud_portal.cli.cmd;
  */
 public interface Command {
 
-	/**
-	 * Executes the specific REST CLI command.
-	 * 
-	 * @throws Exception
-	 *             if an error occurred while executing the command.
-	 */
-	public void execute() throws Exception;
+    /**
+     * Executes the specific REST CLI command.
+     * 
+     * @throws Exception
+     *             if an error occurred while executing the command.
+     */
+    public void execute() throws Exception;
 
 }

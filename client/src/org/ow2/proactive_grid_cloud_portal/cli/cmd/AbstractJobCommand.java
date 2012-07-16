@@ -38,15 +38,15 @@
 package org.ow2.proactive_grid_cloud_portal.cli.cmd;
 
 public abstract class AbstractJobCommand extends AbstractCommand implements
-		Command {
+        Command {
 
-	protected String jobId;
+    protected String jobId;
 
-	public AbstractJobCommand(String jobId) {
-		this.jobId = jobId;
-	}
+    public AbstractJobCommand(String jobId) {
+        this.jobId = jobId;
+    }
 
-	protected String job() {
-		return String.format("job('%s')", jobId);
-	}
+    protected String job() {
+        return String.format("job('%s')", jobId);
+    }
 }

@@ -44,26 +44,26 @@ import org.apache.http.client.methods.HttpGet;
 import org.ow2.proactive_grid_cloud_portal.cli.json.TaskResultView;
 
 public class GetTaskResultCommand extends AbstractTaskCommand implements
-		Command {
+        Command {
 
-	public GetTaskResultCommand(String jobId, String taskId) {
-		super(jobId, taskId);
-	}
+    public GetTaskResultCommand(String jobId, String taskId) {
+        super(jobId, taskId);
+    }
 
-	@Override
-	public void execute() throws Exception {
-		HttpGet request = new HttpGet(resourceUrl("jobs/" + jobId + "/tasks/"
-				+ taskId + "/result"));
-		HttpResponse response = execute(request);
-		if (statusCode(OK) == statusCode(response)) {
-			TaskResultView taskResult = readValue(response,
-					TaskResultView.class);
-			writeLine(task() + " result:");
-			writeLine(object(taskResult.getSerializedValue()).toString());
+    @Override
+    public void execute() throws Exception {
+        HttpGet request = new HttpGet(resourceUrl("jobs/" + jobId + "/tasks/"
+                + taskId + "/result"));
+        HttpResponse response = execute(request);
+        if (statusCode(OK) == statusCode(response)) {
+            TaskResultView taskResult = readValue(response,
+                    TaskResultView.class);
+            writeLine("%s result:", task());
+            writeLine(object(taskResult.getSerializedValue()).toString());
 
-		} else {
-			handleError("An error occured while retrieving " + task()
-					+ " result ..", response);
-		}
-	}
+        } else {
+            handleError("An error occured while retrieving " + task()
+                    + " result ..", response);
+        }
+    }
 }

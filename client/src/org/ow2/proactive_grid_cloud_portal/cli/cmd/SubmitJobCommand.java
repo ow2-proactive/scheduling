@@ -51,39 +51,39 @@ import org.apache.http.entity.mime.content.FileBody;
 import org.ow2.proactive_grid_cloud_portal.cli.json.JobIdView;
 
 public class SubmitJobCommand extends AbstractCommand implements Command {
-	private String pathname;
+    private String pathname;
 
-	public SubmitJobCommand(String pathname) {
-		this.pathname = pathname;
-	}
+    public SubmitJobCommand(String pathname) {
+        this.pathname = pathname;
+    }
 
-	@Override
-	public void execute() throws Exception {
-		HttpPost request = new HttpPost(resourceUrl("submit"));
+    @Override
+    public void execute() throws Exception {
+        HttpPost request = new HttpPost(resourceUrl("submit"));
 
-		File jobFile = new File(pathname);
-		if (!jobFile.exists()) {
-			throw new IllegalArgumentException(pathname + " does not exist ..");
-		}
-		String contentType = URLConnection.getFileNameMap().getContentTypeFor(
-				pathname);
-		MultipartEntity multipartEntity = new MultipartEntity();
-		if (APPLICATION_XML.getMimeType().equals(contentType)) {
-			multipartEntity.addPart("descriptor", new FileBody(jobFile,
-					APPLICATION_XML.getMimeType()));
-		} else {
-			multipartEntity.addPart("archive", new FileBody(jobFile,
-					APPLICATION_OCTET_STREAM.getMimeType()));
-		}
-		request.setEntity(multipartEntity);
-		HttpResponse response = execute(request);
-		if (statusCode(OK) == statusCode(response)) {
-			JobIdView jobId = readValue(response, JobIdView.class);
-			writeLine("Job(" + pathname + ") submitted successfully .. => job("
-					+ jobId.getId() + ")");
-		} else {
-			handleError("An error occured while submitting job(" + pathname
-					+ ")", response);
-		}
-	}
+        File jobFile = new File(pathname);
+        if (!jobFile.exists()) {
+            throw new IllegalArgumentException(pathname + " does not exist ..");
+        }
+        String contentType = URLConnection.getFileNameMap().getContentTypeFor(
+                pathname);
+        MultipartEntity multipartEntity = new MultipartEntity();
+        if (APPLICATION_XML.getMimeType().equals(contentType)) {
+            multipartEntity.addPart("descriptor", new FileBody(jobFile,
+                    APPLICATION_XML.getMimeType()));
+        } else {
+            multipartEntity.addPart("archive", new FileBody(jobFile,
+                    APPLICATION_OCTET_STREAM.getMimeType()));
+        }
+        request.setEntity(multipartEntity);
+        HttpResponse response = execute(request);
+        if (statusCode(OK) == statusCode(response)) {
+            JobIdView jobId = readValue(response, JobIdView.class);
+            writeLine("Job('%s') submitted successfully .. => job('%d')",
+                    pathname, jobId.getId());
+        } else {
+            handleError("An error occured while submitting job(" + pathname
+                    + ")", response);
+        }
+    }
 }

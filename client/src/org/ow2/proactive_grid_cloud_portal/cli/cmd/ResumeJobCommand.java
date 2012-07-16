@@ -44,25 +44,25 @@ import org.apache.http.client.methods.HttpPut;
 
 public class ResumeJobCommand extends AbstractJobCommand implements Command {
 
-	public ResumeJobCommand(String jobId) {
-		super(jobId);
-	}
+    public ResumeJobCommand(String jobId) {
+        super(jobId);
+    }
 
-	@Override
-	public void execute() throws Exception {
-		HttpPut request = new HttpPut(resourceUrl("jobs/" + jobId + "/resume"));
-		HttpResponse response = execute(request);
-		if (statusCode(OK) == statusCode(response)) {
-			boolean success = readValue(response, Boolean.TYPE);
-			if (success) {
-				writeLine(job() + " resumed");
-			} else {
-				writeLine(job() + " cannot be resumed");
-			}
-		} else {
-			handleError("An error occured while attempting to resume " + job(),
-					response);
-		}
-	}
+    @Override
+    public void execute() throws Exception {
+        HttpPut request = new HttpPut(resourceUrl("jobs/" + jobId + "/resume"));
+        HttpResponse response = execute(request);
+        if (statusCode(OK) == statusCode(response)) {
+            boolean success = readValue(response, Boolean.TYPE);
+            if (success) {
+                writeLine(job() + " resumed");
+            } else {
+                writeLine(job() + " cannot be resumed");
+            }
+        } else {
+            handleError("An error occured while attempting to resume " + job(),
+                    response);
+        }
+    }
 
 }

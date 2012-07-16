@@ -43,25 +43,25 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPut;
 
 public class ChangeJobPriorityCommand extends AbstractJobCommand implements
-		Command {
-	private String priorityValue;
+        Command {
+    private String priorityValue;
 
-	public ChangeJobPriorityCommand(String jobId, String priorityValue) {
-		super(jobId);
-		this.priorityValue = priorityValue;
-	}
+    public ChangeJobPriorityCommand(String jobId, String priorityValue) {
+        super(jobId);
+        this.priorityValue = priorityValue;
+    }
 
-	@Override
-	public void execute() throws Exception {
-		String resourceUrl = resourceUrl("jobs/" + jobId + "/priority/byvalue/"
-				+ priorityValue);
-		HttpPut request = new HttpPut(resourceUrl);
-		HttpResponse response = execute(request);
-		if (statusCode(NO_CONTENT) == statusCode(response)) {
-			writeLine("Job('%s') priority changed to '%s'", jobId,
-					priorityValue);
-		} else {
-			handleError("Error occured while executing ..", response);
-		}
-	}
+    @Override
+    public void execute() throws Exception {
+        String resourceUrl = resourceUrl("jobs/" + jobId + "/priority/byvalue/"
+                + priorityValue);
+        HttpPut request = new HttpPut(resourceUrl);
+        HttpResponse response = execute(request);
+        if (statusCode(NO_CONTENT) == statusCode(response)) {
+            writeLine("Job('%s') priority changed to '%s'", jobId,
+                    priorityValue);
+        } else {
+            handleError("Error occured while executing ..", response);
+        }
+    }
 }

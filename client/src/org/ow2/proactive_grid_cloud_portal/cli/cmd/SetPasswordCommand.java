@@ -38,15 +38,15 @@
 package org.ow2.proactive_grid_cloud_portal.cli.cmd;
 
 public class SetPasswordCommand extends AbstractCommand implements Command {
-	private String password;
+    private String password;
 
-	public SetPasswordCommand(String password) {
-		this.password = password;
-	}
+    public SetPasswordCommand(String password) {
+        this.password = password;
+    }
 
-	@Override
-	public void execute() throws Exception {
-		applicationContext().setPassword(password);
-	}
+    @Override
+    public void execute() throws Exception {
+        applicationContext().setPassword(password);
+    }
 
 }

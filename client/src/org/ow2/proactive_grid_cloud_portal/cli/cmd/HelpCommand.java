@@ -45,23 +45,23 @@ import org.ow2.proactive_grid_cloud_portal.cli.Main;
 
 public class HelpCommand extends AbstractCommand implements Command {
 
-	private static final String USAGE = "rest-cli [-u <server-url>] "
-			+ "[-k | -ca <store-path>  [-cap <store-pass>]] "
-			+ "[-l <login-name> [-p <password>] | -c <cerd-file-path>] "
-			+ "[-start | -stop | -pause | -resume | -freeze | -kill | -lj | -stats "
-			+ "| -s | -sa | -js | -jo | -jr | -sj | -pj | -rj | -rmj "
-			+ "| -to | -tr | -pt | -rt | -h | -sf | -i]";
+    private static final String USAGE = "rest-cli [-u <server-url>] "
+            + "[-k | -ca <store-path>  [-cap <store-pass>]] "
+            + "[-l <login-name> [-p <password>] | -c <cerd-file-path>] "
+            + "[-start | -stop | -pause | -resume | -freeze | -kill | -lj | -stats "
+            + "| -s | -sa | -js | -jo | -jr | -sj | -pj | -rj | -rmj "
+            + "| -to | -tr | -pt | -rt | -h | -sf | -i]";
 
-	public HelpCommand() {
-	}
+    public HelpCommand() {
+    }
 
-	@Override
-	public void execute() throws Exception {
-		HelpFormatter formatter = new HelpFormatter();
-		Writer writer = applicationContext().getDevice().getWriter();
-		PrintWriter pw = new PrintWriter(writer, true);
-		formatter.printHelp(pw,
-				110, USAGE, "", Main.options(), formatter.getLeftPadding(),
-				formatter.getDescPadding(), "", false);		
-	}
+    @Override
+    public void execute() throws Exception {
+        HelpFormatter formatter = new HelpFormatter();
+        Writer writer = applicationContext().getDevice().getWriter();
+        PrintWriter pw = new PrintWriter(writer, true);
+        formatter.printHelp(pw, 110, USAGE, "", Main.options(),
+                formatter.getLeftPadding(), formatter.getDescPadding(), "",
+                false);
+    }
 }

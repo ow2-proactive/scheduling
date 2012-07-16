@@ -14,6 +14,7 @@ importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.LinkResourceManagerComma
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.GetStatsCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.ListJobsCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.SubmitJobCommand);
+importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.GetJobStateCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.ChangeJobPriorityCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.PauseJobCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.ResumeJobCommand);
@@ -21,7 +22,6 @@ importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.KillJobCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.RemoveJobCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.GetJobResultCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.GetJobOutputCommand);
-importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.GetJobStateCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.PreemptTaskCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.RestartTaskCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.GetTaskOutputCommand);

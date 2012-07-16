@@ -49,29 +49,29 @@ import org.ow2.proactive_grid_cloud_portal.cli.json.TaskResultView;
 
 public class GetJobResultCommand extends AbstractJobCommand implements Command {
 
-	public GetJobResultCommand(String jobId) {
-		super(jobId);
-	}
+    public GetJobResultCommand(String jobId) {
+        super(jobId);
+    }
 
-	@Override
-	public void execute() throws Exception {
-		HttpGet request = new HttpGet(resourceUrl("jobs/" + jobId + "/result"));
-		HttpResponse response = execute(request);
-		if (statusCode(OK) == statusCode(response)) {
-			writeLine(job() + " result:");
-			JobResultView jobResult = readValue(response, JobResultView.class);
-			Map<String, TaskResultView> allResults = jobResult.getAllResults();
-			for (String taskName : allResults.keySet()) {
-				writeLine(taskName + " : "
-						+ object(allResults.get(taskName).getSerializedValue()));
-			}
-		} else if (statusCode(NO_CONTENT) == statusCode(response)) {
-			writeLine("Job('%s') result not available", jobId);
+    @Override
+    public void execute() throws Exception {
+        HttpGet request = new HttpGet(resourceUrl("jobs/" + jobId + "/result"));
+        HttpResponse response = execute(request);
+        if (statusCode(OK) == statusCode(response)) {
+            writeLine("%s result:", job());
+            JobResultView jobResult = readValue(response, JobResultView.class);
+            Map<String, TaskResultView> allResults = jobResult.getAllResults();
+            for (String taskName : allResults.keySet()) {
+                writeLine(taskName + " : "
+                        + object(allResults.get(taskName).getSerializedValue()));
+            }
+        } else if (statusCode(NO_CONTENT) == statusCode(response)) {
+            writeLine("Job('%s') result not available", jobId);
 
-		} else {
-			handleError("Error occured while retrieving " + job()
-					+ " results ..", response);
-		}
-	}
+        } else {
+            handleError("Error occured while retrieving " + job()
+                    + " results ..", response);
+        }
+    }
 
 }

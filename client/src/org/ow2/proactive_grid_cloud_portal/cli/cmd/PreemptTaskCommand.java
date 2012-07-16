@@ -44,28 +44,35 @@ import org.apache.http.client.methods.HttpPut;
 
 public class PreemptTaskCommand extends AbstractTaskCommand implements Command {
 
-	public PreemptTaskCommand(String jobId, String taskId) {
-		this(jobId, taskId, null);
-	}
-	
-	public PreemptTaskCommand(String jobId, String taskId, String delay) {
-		super(jobId, taskId);
-	}
+    public PreemptTaskCommand(String jobId, String taskId) {
+        this(jobId, taskId, null);
+    }
 
-	@Override
-	public void execute() throws Exception {
-		HttpPut request = new HttpPut(resourceUrl("jobs/" + jobId + "/tasks/" + taskId + "/preempt"));
-		HttpResponse response = execute(request);
-		if (statusCode(OK) == statusCode(response)) {
-			boolean success = readValue(response, Boolean.TYPE).booleanValue();
-			if (success) {
-				writeLine(task() + " has been stopped and will be rescheduled after 5 seconds");
-			} else {
-				writeLine(task() + " cannot be stopped, most likely it is not running .. ");
-			}
-		} else {
-			handleError("An error occured while attempting to preemt " + task(), response);
-		}
-	}
+    public PreemptTaskCommand(String jobId, String taskId, String delay) {
+        super(jobId, taskId);
+    }
+
+    @Override
+    public void execute() throws Exception {
+        HttpPut request = new HttpPut(resourceUrl("jobs/" + jobId + "/tasks/"
+                + taskId + "/preempt"));
+        HttpResponse response = execute(request);
+        if (statusCode(OK) == statusCode(response)) {
+            boolean success = readValue(response, Boolean.TYPE).booleanValue();
+            if (success) {
+                writeLine(
+                        "%s has been stopped and will be rescheduled after 5 seconds",
+                        task());
+            } else {
+                writeLine(
+                        "%s cannot be stopped, most likely it is not running .. ",
+                        task());
+            }
+        } else {
+            handleError(
+                    "An error occured while attempting to preemt " + task(),
+                    response);
+        }
+    }
 
 }

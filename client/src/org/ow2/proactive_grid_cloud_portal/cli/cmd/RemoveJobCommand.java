@@ -44,25 +44,25 @@ import org.apache.http.client.methods.HttpDelete;
 
 public class RemoveJobCommand extends AbstractJobCommand implements Command {
 
-	public RemoveJobCommand(String jobId) {
-		super(jobId);
-	}
+    public RemoveJobCommand(String jobId) {
+        super(jobId);
+    }
 
-	@Override
-	public void execute() throws Exception {
-		HttpDelete request = new HttpDelete(resourceUrl("jobs/" + jobId));
-		HttpResponse response = execute(request);
-		if (statusCode(OK) == statusCode(response)) {
-			boolean success = readValue(response, Boolean.TYPE);
-			if (success) {
-				writeLine(job() + " removed");
-			} else {
-				writeLine(job() + " cannot be removed");
-			}
-		} else {
-			handleError("An error occured while attempting to remove " + job(),
-					response);
-		}
-	}
+    @Override
+    public void execute() throws Exception {
+        HttpDelete request = new HttpDelete(resourceUrl("jobs/" + jobId));
+        HttpResponse response = execute(request);
+        if (statusCode(OK) == statusCode(response)) {
+            boolean success = readValue(response, Boolean.TYPE);
+            if (success) {
+                writeLine("%s removed", job());
+            } else {
+                writeLine("%s cannot be removed", job());
+            }
+        } else {
+            handleError("An error occured while attempting to remove " + job(),
+                    response);
+        }
+    }
 
 }

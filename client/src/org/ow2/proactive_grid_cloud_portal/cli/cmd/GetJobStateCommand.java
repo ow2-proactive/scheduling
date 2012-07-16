@@ -54,97 +54,97 @@ import org.ow2.proactive_grid_cloud_portal.cli.utils.Tools;
 
 public class GetJobStateCommand extends AbstractJobCommand implements Command {
 
-	public GetJobStateCommand(String jobId) {
-		super(jobId);
-	}
+    public GetJobStateCommand(String jobId) {
+        super(jobId);
+    }
 
-	@Override
-	public void execute() throws Exception {
-		HttpGet request = new HttpGet(resourceUrl("jobs/" + jobId));
-		HttpResponse response = execute(request);
-		if (statusCode(OK) == statusCode(response)) {
-			JobStateView jobState = readValue(response, JobStateView.class);
+    @Override
+    public void execute() throws Exception {
+        HttpGet request = new HttpGet(resourceUrl("jobs/" + jobId));
+        HttpResponse response = execute(request);
+        if (statusCode(OK) == statusCode(response)) {
+            JobStateView jobState = readValue(response, JobStateView.class);
 
-			String jobInfo = (new StringBuilder()).append(job())
-					.append("\tNAME: ").append(jobState.getName())
-					.append("\tOWNER: ").append(jobState.getOwner())
-					.append("\tSTATUS: ")
-					.append(jobState.getJobInfo().getStatus())
-					.append("\t#TASKS: ")
-					.append(jobState.getJobInfo().getTotalNumberOfTasks())
-					.toString();
+            String jobInfo = (new StringBuilder()).append(job())
+                    .append("\tNAME: ").append(jobState.getName())
+                    .append("\tOWNER: ").append(jobState.getOwner())
+                    .append("\tSTATUS: ")
+                    .append(jobState.getJobInfo().getStatus())
+                    .append("\t#TASKS: ")
+                    .append(jobState.getJobInfo().getTotalNumberOfTasks())
+                    .toString();
 
-			// create formatter
-			ArrayFormatter oaf = new ArrayFormatter();
-			oaf.setMaxColumnLength(30);
-			// space between column
-			oaf.setSpace(2);
-			// title line
-			List<String> list = new ArrayList<String>();
-			list.add("ID");
-			list.add("NAME");
-			list.add("ITER");
-			list.add("DUP");
-			list.add("STATUS");
-			list.add("HOSTNAME");
-			list.add("EXEC DURATION");
-			list.add("TOT DURATION");
-			list.add("#NODES USED");
-			list.add("#EXECUTIONS");
-			list.add("#NODES KILLED");
-			oaf.setTitle(list);
-			// separator
-			oaf.addEmptyLine();
-			// add each lines
-			Collection<TaskStateView> tasks = jobState.getTasks().values();
-			// TaskState.setSortingBy(sort);
-			// Collections.sort(tasks);
-			for (TaskStateView taskState : tasks) {
-				list = new ArrayList<String>();
-				TaskInfoView taskInfo = taskState.getTaskInfo();
-				TaskIdView taskId = taskInfo.getTaskId();
+            // create formatter
+            ArrayFormatter oaf = new ArrayFormatter();
+            oaf.setMaxColumnLength(30);
+            // space between column
+            oaf.setSpace(2);
+            // title line
+            List<String> list = new ArrayList<String>();
+            list.add("ID");
+            list.add("NAME");
+            list.add("ITER");
+            list.add("DUP");
+            list.add("STATUS");
+            list.add("HOSTNAME");
+            list.add("EXEC DURATION");
+            list.add("TOT DURATION");
+            list.add("#NODES USED");
+            list.add("#EXECUTIONS");
+            list.add("#NODES KILLED");
+            oaf.setTitle(list);
+            // separator
+            oaf.addEmptyLine();
+            // add each lines
+            Collection<TaskStateView> tasks = jobState.getTasks().values();
+            // TaskState.setSortingBy(sort);
+            // Collections.sort(tasks);
+            for (TaskStateView taskState : tasks) {
+                list = new ArrayList<String>();
+                TaskInfoView taskInfo = taskState.getTaskInfo();
+                TaskIdView taskId = taskInfo.getTaskId();
 
-				list.add(taskId.getId());
-				list.add(taskId.getReadableName());
-				list.add((taskState.getIterationIndex() > 0) ? ""
-						+ taskState.getIterationIndex() : "");
-				list.add((taskState.getReplicationIndex() > 0) ? ""
-						+ taskState.getReplicationIndex() : "");
-				list.add(taskInfo.getTaskStatus());
-				list.add((taskInfo.getExecutionHostName() == null) ? "unknown"
-						: taskInfo.getExecutionHostName());
-				list.add(Tools.getFormattedDuration(0,
-						taskInfo.getExecutionDuration()));
-				list.add(Tools.getFormattedDuration(taskInfo.getFinishedTime(),
-						taskInfo.getStartTime()));
-				list.add("" + taskState.getNumberOfNodesNeeded());
-				if (taskState.getMaxNumberOfExecution()
-						- taskInfo.getNumberOfExecutionLeft() < taskState
-							.getMaxNumberOfExecution()) {
-					list.add((taskState.getMaxNumberOfExecution()
-							- taskInfo.getNumberOfExecutionLeft() + 1)
-							+ "/" + taskState.getMaxNumberOfExecution());
-				} else {
-					list.add((taskState.getMaxNumberOfExecution() - taskInfo
-							.getNumberOfExecutionLeft())
-							+ "/"
-							+ taskState.getMaxNumberOfExecution());
-				}
-				list.add((taskState.getMaxNumberOfExecutionOnFailure() - taskInfo
-						.getNumberOfExecutionOnFailureLeft())
-						+ "/"
-						+ taskState.getMaxNumberOfExecutionOnFailure());
-				oaf.addLine(list);
-			}
-			// print formatter
-			writeLine(jobInfo);
-			writeLine("");
-			writeLine(string(oaf));
-		} else {
-			handleError("Error occured whiling retrieving " + job()
-					+ " state ..", response);
-		}
+                list.add(taskId.getId());
+                list.add(taskId.getReadableName());
+                list.add((taskState.getIterationIndex() > 0) ? ""
+                        + taskState.getIterationIndex() : "");
+                list.add((taskState.getReplicationIndex() > 0) ? ""
+                        + taskState.getReplicationIndex() : "");
+                list.add(taskInfo.getTaskStatus());
+                list.add((taskInfo.getExecutionHostName() == null) ? "unknown"
+                        : taskInfo.getExecutionHostName());
+                list.add(Tools.getFormattedDuration(0,
+                        taskInfo.getExecutionDuration()));
+                list.add(Tools.getFormattedDuration(taskInfo.getFinishedTime(),
+                        taskInfo.getStartTime()));
+                list.add("" + taskState.getNumberOfNodesNeeded());
+                if (taskState.getMaxNumberOfExecution()
+                        - taskInfo.getNumberOfExecutionLeft() < taskState
+                            .getMaxNumberOfExecution()) {
+                    list.add((taskState.getMaxNumberOfExecution()
+                            - taskInfo.getNumberOfExecutionLeft() + 1)
+                            + "/" + taskState.getMaxNumberOfExecution());
+                } else {
+                    list.add((taskState.getMaxNumberOfExecution() - taskInfo
+                            .getNumberOfExecutionLeft())
+                            + "/"
+                            + taskState.getMaxNumberOfExecution());
+                }
+                list.add((taskState.getMaxNumberOfExecutionOnFailure() - taskInfo
+                        .getNumberOfExecutionOnFailureLeft())
+                        + "/"
+                        + taskState.getMaxNumberOfExecutionOnFailure());
+                oaf.addLine(list);
+            }
+            // print formatter
+            writeLine(jobInfo);
+            writeLine("");
+            writeLine(string(oaf));
+        } else {
+            handleError("Error occured whiling retrieving " + job()
+                    + " state ..", response);
+        }
 
-	}
+    }
 
 }

@@ -62,178 +62,179 @@ import org.ow2.proactive_grid_cloud_portal.cli.utils.Tools;
 
 public abstract class AbstractCommand implements Command {
 
-	public AbstractCommand() {
-	}
+    public AbstractCommand() {
+    }
 
-	protected static String string(HttpResponse response) throws Exception {
-		return EntityUtils.toString(response.getEntity());
-	}
+    protected static String string(HttpResponse response) throws Exception {
+        return EntityUtils.toString(response.getEntity());
+    }
 
-	protected static String string(ArrayFormatter oaf) {
-		return Tools.getStringAsArray(oaf);
-	}
+    protected static String string(ArrayFormatter oaf) {
+        return Tools.getStringAsArray(oaf);
+    }
 
-	protected static String formattedDate(long time) {
-		return Tools.getFormattedDate(time);
-	}
+    protected static String formattedDate(long time) {
+        return Tools.getFormattedDate(time);
+    }
 
-	protected static String formattedElapsedTime(long time) {
-		return Tools.getElapsedTime(time);
-	}
+    protected static String formattedElapsedTime(long time) {
+        return Tools.getElapsedTime(time);
+    }
 
-	protected static String formattedDuration(long start, long end) {
-		return Tools.getFormattedDuration(start, end);
-	}
+    protected static String formattedDuration(long start, long end) {
+        return Tools.getFormattedDuration(start, end);
+    }
 
-	protected static Object object(byte[] bytes) throws Exception {
-		if (bytes == null) {
-			return "[NULL]";
-		}
-		return ObjectUtils.object(bytes);
-	}
+    protected static Object object(byte[] bytes) throws Exception {
+        if (bytes == null) {
+            return "[NULL]";
+        }
+        return ObjectUtils.object(bytes);
+    }
 
-	protected static int statusCode(ResponseStatus status) {
-		return status.statusCode();
-	}
+    protected static int statusCode(ResponseStatus status) {
+        return status.statusCode();
+    }
 
-	protected static int statusCode(HttpResponse response) {
-		return response.getStatusLine().getStatusCode();
-	}
+    protected static int statusCode(HttpResponse response) {
+        return response.getStatusLine().getStatusCode();
+    }
 
-	protected static String md5Checksum(File file) throws Exception {
-		return DigestUtils.md5Hex(new FileInputStream(file));
-	}
+    protected static String md5Checksum(File file) throws Exception {
+        return DigestUtils.md5Hex(new FileInputStream(file));
+    }
 
-	protected static void write(File file, String content) throws IOException {
-		org.apache.commons.io.FileUtils.writeStringToFile(file, content);
-		file.setReadable(true, true);
-		file.setWritable(true, true);
-	}
+    protected static void write(File file, String content) throws IOException {
+        org.apache.commons.io.FileUtils.writeStringToFile(file, content);
+        file.setReadable(true, true);
+        file.setWritable(true, true);
+    }
 
-	protected static String read(File file) throws IOException {
-		return FileUtils.readFileToString(file);
-	}
+    protected static String read(File file) throws IOException {
+        return FileUtils.readFileToString(file);
+    }
 
-	protected static byte[] byteArray(File file) throws IOException {
-		return FileUtils.readFileToByteArray(file);
-	}
+    protected static byte[] byteArray(File file) throws IOException {
+        return FileUtils.readFileToByteArray(file);
+    }
 
-	protected ApplicationContext applicationContext() {
-		return ApplicationContext.instance();
-	}
+    protected ApplicationContext applicationContext() {
+        return ApplicationContext.instance();
+    }
 
-	protected <T> T readValue(HttpResponse response, Class<T> valueType)
-			throws Exception {
-		return applicationContext().getObjectMapper().readValue(
-				response.getEntity().getContent(), valueType);
-	}
+    protected <T> T readValue(HttpResponse response, Class<T> valueType)
+            throws Exception {
+        return applicationContext().getObjectMapper().readValue(
+                response.getEntity().getContent(), valueType);
+    }
 
-	protected <T> T readValue(HttpResponse response, TypeReference<T> valueType)
-			throws Exception {
-		return applicationContext().getObjectMapper().readValue(
-				response.getEntity().getContent(), valueType);
-	}
+    protected <T> T readValue(HttpResponse response, TypeReference<T> valueType)
+            throws Exception {
+        return applicationContext().getObjectMapper().readValue(
+                response.getEntity().getContent(), valueType);
+    }
 
-	protected String resourceUrl(String resource) {
-		return applicationContext().getSchedulerUrl() + "/scheduler/" + resource;
-	}
+    protected String resourceUrl(String resource) {
+        return applicationContext().getSchedulerUrl() + "/scheduler/"
+                + resource;
+    }
 
-	protected void writeLine(String format, Object... args) throws Exception {
-		applicationContext().getDevice().writeLine(format, args);
-	}
+    protected void writeLine(String format, Object... args) throws Exception {
+        applicationContext().getDevice().writeLine(format, args);
+    }
 
-	protected String readLine(String format, Object... args) throws IOException {
-		return applicationContext().getDevice().readLine(format, args);
-	}
+    protected String readLine(String format, Object... args) throws IOException {
+        return applicationContext().getDevice().readLine(format, args);
+    }
 
-	protected Writer writer() {
-		return applicationContext().getDevice().getWriter();
-	}
+    protected Writer writer() {
+        return applicationContext().getDevice().getWriter();
+    }
 
-	protected char[] readPassword(String format, Object... args)
-			throws IOException {
-		return applicationContext().getDevice().readPassword(format, args);
-	}
+    protected char[] readPassword(String format, Object... args)
+            throws IOException {
+        return applicationContext().getDevice().readPassword(format, args);
+    }
 
-	protected HttpResponse execute(HttpUriRequest request) throws Exception {
-		if (request.getURI().getScheme().equals("https")) {
+    protected HttpResponse execute(HttpUriRequest request) throws Exception {
+        if (request.getURI().getScheme().equals("https")) {
 
-		}
-		return applicationContext().executeClient(request);
-	}
+        }
+        return applicationContext().executeClient(request);
+    }
 
-	protected void handleError(String errorMessage, HttpResponse response)
-			throws Exception {
-		String responseContent = string(response);
-		ErrorView errorView = null;
-		try {
-			errorView = applicationContext().getObjectMapper().readValue(
-					responseContent.getBytes(), ErrorView.class);
-		} catch (Throwable error) {
-			// ignore
-		}
-		if (errorView != null) {
-			writeError(errorMessage, errorView);
-		} else {
-			writeError(errorMessage, responseContent);
-		}
-	}
+    protected void handleError(String errorMessage, HttpResponse response)
+            throws Exception {
+        String responseContent = string(response);
+        ErrorView errorView = null;
+        try {
+            errorView = applicationContext().getObjectMapper().readValue(
+                    responseContent.getBytes(), ErrorView.class);
+        } catch (Throwable error) {
+            // ignore
+        }
+        if (errorView != null) {
+            writeError(errorMessage, errorView);
+        } else {
+            writeError(errorMessage, responseContent);
+        }
+    }
 
-	private void writeError(String errorMsg, String responseContent)
-			throws Exception {
-		writeLine(errorMsg);
+    private void writeError(String errorMsg, String responseContent)
+            throws Exception {
+        writeLine(errorMsg);
 
-		String errorMessage = null, errorCode = null;
-		BufferedReader reader = new BufferedReader(new StringReader(
-				responseContent));
+        String errorMessage = null, errorCode = null;
+        BufferedReader reader = new BufferedReader(new StringReader(
+                responseContent));
 
-		String line = reader.readLine();
-		while ((line = reader.readLine()) != null) {
-			if (line.startsWith("errorMessage:")) {
-				errorMessage = line.substring(line.indexOf(':')).trim();
-				break;
-			}
-		}
+        String line = reader.readLine();
+        while ((line = reader.readLine()) != null) {
+            if (line.startsWith("errorMessage:")) {
+                errorMessage = line.substring(line.indexOf(':')).trim();
+                break;
+            }
+        }
 
-		while ((line = reader.readLine()) != null) {
-			if (line.startsWith("httpErrorCode:")) {
-				errorCode = line.substring(line.indexOf(':')).trim();
-				break;
-			}
-		}
+        while ((line = reader.readLine()) != null) {
+            if (line.startsWith("httpErrorCode:")) {
+                errorCode = line.substring(line.indexOf(':')).trim();
+                break;
+            }
+        }
 
-		if (errorCode != null) {
-			writeLine("%s %s", "HTTP Error Code:", errorCode);
-		}
+        if (errorCode != null) {
+            writeLine("%s %s", "HTTP Error Code:", errorCode);
+        }
 
-		if (errorMessage != null) {
-			writeLine("%s %s", "Error Message:", errorMessage);
-		}
+        if (errorMessage != null) {
+            writeLine("%s %s", "Error Message:", errorMessage);
+        }
 
-		while ((line = reader.readLine()) != null) {
-			if (line.startsWith("stackTrace:")) {
-				while ((line = reader.readLine()) != null) {
-					writeLine(line);
-				}
-				break;
-			}
-		}
+        while ((line = reader.readLine()) != null) {
+            if (line.startsWith("stackTrace:")) {
+                while ((line = reader.readLine()) != null) {
+                    writeLine(line);
+                }
+                break;
+            }
+        }
 
-		if (errorCode == null && errorMessage == null) {
-			writeLine("%s%n%s", "Error Message:", responseContent);
-		}
-	}
+        if (errorCode == null && errorMessage == null) {
+            writeLine("%s%n%s", "Error Message:", responseContent);
+        }
+    }
 
-	private void writeError(String errorMessage, ErrorView error)
-			throws Exception {
-		if (statusCode(FORBIDDEN) == error.getHttpErrorCode()) {
-			// this exception would be handled at an upper level ..
-			throw new RestCliException(error.getHttpErrorCode(),
-					error.getErrorMessage());
-		}
-		writeLine(errorMessage);
-		writeLine("%s %s", "HTTP Error Code:", error.getHttpErrorCode());
-		writeLine("%s %s", "Error Message:", error.getErrorMessage());
-		writeLine("%s%n%s", "Stack Trace:", error.getStackTrace());
-	}
+    private void writeError(String errorMessage, ErrorView error)
+            throws Exception {
+        if (statusCode(FORBIDDEN) == error.getHttpErrorCode()) {
+            // this exception would be handled at an upper level ..
+            throw new RestCliException(error.getHttpErrorCode(),
+                    error.getErrorMessage());
+        }
+        writeLine(errorMessage);
+        writeLine("%s %s", "HTTP Error Code:", error.getHttpErrorCode());
+        writeLine("%s %s", "Error Message:", error.getErrorMessage());
+        writeLine("%s%n%s", "Stack Trace:", error.getStackTrace());
+    }
 }

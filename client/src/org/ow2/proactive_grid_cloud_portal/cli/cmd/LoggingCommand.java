@@ -51,58 +51,58 @@ import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 
 public class LoggingCommand extends AbstractCommand implements Command {
 
-	private String username;
+    private String username;
 
-	public LoggingCommand(String username) {
-		this.username = username;
-	}
+    public LoggingCommand(String username) {
+        this.username = username;
+    }
 
-	@Override
-	public void execute() throws Exception {
-		ApplicationContext context = applicationContext();
-		context.setUser(username);
-		File userSessionFile = userSessionFile(username);
-		if (userSessionFile.exists()) {
-			context.setSessionId(read(userSessionFile));
-			context.setNewSession(false);
-			return;
-		}
+    @Override
+    public void execute() throws Exception {
+        ApplicationContext context = applicationContext();
+        context.setUser(username);
+        File userSessionFile = userSessionFile(username);
+        if (userSessionFile.exists()) {
+            context.setSessionId(read(userSessionFile));
+            context.setNewSession(false);
+            return;
+        }
 
-		String password = context.getPassword();
-		if (password == null) {
-			password = new String(readPassword("password:"));
-		}
+        String password = context.getPassword();
+        if (password == null) {
+            password = new String(readPassword("password:"));
+        }
 
-		HttpPost request = new HttpPost(resourceUrl("login"));
-		StringEntity entity = new StringEntity("username=" + username
-				+ "&password=" + password, APPLICATION_FORM_URLENCODED);
-		request.setEntity(entity);
-		HttpResponse response = execute(request);
+        HttpPost request = new HttpPost(resourceUrl("login"));
+        StringEntity entity = new StringEntity("username=" + username
+                + "&password=" + password, APPLICATION_FORM_URLENCODED);
+        request.setEntity(entity);
+        HttpResponse response = execute(request);
 
-		if (statusCode(OK) == statusCode(response)) {
-			String sessionId = string(response).trim();
-			context.setSessionId(sessionId);
-			context.setNewSession(true);
-			write(userSessionFile, sessionId);
-			if (!setOwnerOnly(userSessionFile)) {
-				writeLine(
-						"Warning !! : Possible security risk .. unable to limit the access rights of the session-id file ('%s')",
-						userSessionFile.getAbsoluteFile());
-			}
-			writeLine("successfully renew session id");
+        if (statusCode(OK) == statusCode(response)) {
+            String sessionId = string(response).trim();
+            context.setSessionId(sessionId);
+            context.setNewSession(true);
+            write(userSessionFile, sessionId);
+            if (!setOwnerOnly(userSessionFile)) {
+                writeLine(
+                        "Warning !! : Possible security risk .. unable to limit the access rights of the session-id file ('%s')",
+                        userSessionFile.getAbsoluteFile());
+            }
+            writeLine("successfully renew session id");
 
-		} else {
-			handleError("Logging error: ", response);
-		}
-	}
+        } else {
+            handleError("Logging error: ", response);
+        }
+    }
 
-	private File userSessionFile(String username) {
-		return new File(DFLT_SESSION_DIR, username + DFLT_SESSION_FILE_EXT);
-	}
+    private File userSessionFile(String username) {
+        return new File(DFLT_SESSION_DIR, username + DFLT_SESSION_FILE_EXT);
+    }
 
-	private boolean setOwnerOnly(File file) {
-		return file.setReadable(false, false) && file.setReadable(true, true)
-				&& file.setWritable(false, false)
-				&& file.setWritable(true, true) && file.setExecutable(false);
-	}
+    private boolean setOwnerOnly(File file) {
+        return file.setReadable(false, false) && file.setReadable(true, true)
+                && file.setWritable(false, false)
+                && file.setWritable(true, true) && file.setExecutable(false);
+    }
 }

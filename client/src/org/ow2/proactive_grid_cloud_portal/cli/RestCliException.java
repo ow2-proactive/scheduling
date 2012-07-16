@@ -38,25 +38,25 @@
 package org.ow2.proactive_grid_cloud_portal.cli;
 
 public class RestCliException extends Exception {
-	
-	private static final long serialVersionUID = 1L;
-	private int errorCode;
-	
-	public RestCliException(int errorCode, String message) {
-		this(errorCode, message, null);
-	}
 
-	public RestCliException(int errorCode, Throwable cause) {
-		this(errorCode, null, cause);
-	}
-	
-	public RestCliException(int errorCode, String message, Throwable cause) {
-		super(message, cause);
-		this.errorCode = errorCode;
-	}
-	
-	public int errorCode() {
-		return errorCode;
-	}
+    private static final long serialVersionUID = 1L;
+    private int errorCode;
+
+    public RestCliException(int errorCode, String message) {
+        this(errorCode, message, null);
+    }
+
+    public RestCliException(int errorCode, Throwable cause) {
+        this(errorCode, null, cause);
+    }
+
+    public RestCliException(int errorCode, String message, Throwable cause) {
+        super(message, cause);
+        this.errorCode = errorCode;
+    }
+
+    public int errorCode() {
+        return errorCode;
+    }
 
 }

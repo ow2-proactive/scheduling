@@ -49,41 +49,41 @@ import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 
 public class StartIModeCommand extends AbstractCommand implements Command {
 
-	private ScriptEngine engine;
+    private ScriptEngine engine;
 
-	public StartIModeCommand() {
-		ApplicationContext context = ApplicationContext.instance();
-		if (context.getEngine() != null) {
-			engine = context.getEngine();
-		} else {
+    public StartIModeCommand() {
+        ApplicationContext context = ApplicationContext.instance();
+        if (context.getEngine() != null) {
+            engine = context.getEngine();
+        } else {
 
-			ScriptEngineManager mgr = new ScriptEngineManager();
-			engine = mgr.getEngineByExtension("js");
-			engine.getContext().setWriter(
-					applicationContext().getDevice().getWriter());
-			context.setEngine(engine);
-		}
-		try {
-			InputStream is = StartIModeCommand.class
-					.getResourceAsStream("RestfulSchedulerActions.js");
-			engine.eval(new InputStreamReader(is));
-		} catch (ScriptException e) {
-			throw new RuntimeException(e);
-		}
-	}
+            ScriptEngineManager mgr = new ScriptEngineManager();
+            engine = mgr.getEngineByExtension("js");
+            engine.getContext().setWriter(
+                    applicationContext().getDevice().getWriter());
+            context.setEngine(engine);
+        }
+        try {
+            InputStream is = StartIModeCommand.class
+                    .getResourceAsStream("RestfulSchedulerActions.js");
+            engine.eval(new InputStreamReader(is));
+        } catch (ScriptException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
-	@Override
-	public void execute() throws Exception {
-		while (!applicationContext().isTermiated()) {
-			try {
-				engine.eval(readLine("rest-cli>"));
-			} catch (ScriptException se) {
-				writeLine("An error occured while executing the script ..");
-				Throwable cause = se.getCause();
-				se.printStackTrace((PrintWriter) writer());
-				writeLine("");
-			}
-		}
-	}
+    @Override
+    public void execute() throws Exception {
+        while (!applicationContext().isTermiated()) {
+            try {
+                engine.eval(readLine("rest-cli>"));
+            } catch (ScriptException se) {
+                writeLine("An error occured while executing the script ..");
+                Throwable cause = se.getCause();
+                se.printStackTrace((PrintWriter) writer());
+                writeLine("");
+            }
+        }
+    }
 
 }

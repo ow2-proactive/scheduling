@@ -37,7 +37,6 @@
 
 package org.ow2.proactive_grid_cloud_portal.cli.cmd;
 
-
 import static org.ow2.proactive_grid_cloud_portal.cli.ResponseStatus.OK;
 
 import org.apache.http.HttpResponse;
@@ -45,25 +44,25 @@ import org.apache.http.client.methods.HttpPut;
 
 public class KillJobCommand extends AbstractJobCommand implements Command {
 
-	public KillJobCommand(String jobId) {
-		super(jobId);
-	}
+    public KillJobCommand(String jobId) {
+        super(jobId);
+    }
 
-	@Override
-	public void execute() throws Exception {
-		HttpPut request = new HttpPut(resourceUrl("jobs/" + jobId + "/kill"));
-		HttpResponse response = execute(request);
-		if (statusCode(OK) == statusCode(response)) {
-			boolean success = readValue(response, Boolean.TYPE);
-			if (success) {
-				writeLine(job() + " killed");
-			} else {
-				writeLine(job() + " cannot be killed");
-			}
-		} else {
-			handleError("An error occured while attempting to kill " + job(),
-					response);
-		}
-	}
+    @Override
+    public void execute() throws Exception {
+        HttpPut request = new HttpPut(resourceUrl("jobs/" + jobId + "/kill"));
+        HttpResponse response = execute(request);
+        if (statusCode(OK) == statusCode(response)) {
+            boolean success = readValue(response, Boolean.TYPE);
+            if (success) {
+                writeLine("%s killed", job());
+            } else {
+                writeLine("%s cannot be killed", job());
+            }
+        } else {
+            handleError("An error occured while attempting to kill " + job(),
+                    response);
+        }
+    }
 
 }

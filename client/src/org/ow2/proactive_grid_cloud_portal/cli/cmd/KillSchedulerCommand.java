@@ -44,23 +44,25 @@ import org.apache.http.client.methods.HttpPut;
 
 public class KillSchedulerCommand extends AbstractCommand implements Command {
 
-	public KillSchedulerCommand() {
-	}
+    public KillSchedulerCommand() {
+    }
 
-	@Override
-	public void execute() throws Exception {
-		HttpPut request = new HttpPut(resourceUrl("kill"));
-		HttpResponse response = execute(request);
-		if (statusCode(OK) == statusCode(response)) {
-			boolean success = readValue(response, Boolean.TYPE);
-			if (success) {
-				writeLine("Scheduler is killed");
-			} else {
-				writeLine("Scheudler cannot be killed");
-			}
-		} else {
-			handleError("An error occured while attempting to kill the scheduler ..", response);
-		}
-	}
+    @Override
+    public void execute() throws Exception {
+        HttpPut request = new HttpPut(resourceUrl("kill"));
+        HttpResponse response = execute(request);
+        if (statusCode(OK) == statusCode(response)) {
+            boolean success = readValue(response, Boolean.TYPE);
+            if (success) {
+                writeLine("Scheduler is killed");
+            } else {
+                writeLine("Scheudler cannot be killed");
+            }
+        } else {
+            handleError(
+                    "An error occured while attempting to kill the scheduler ..",
+                    response);
+        }
+    }
 
 }

@@ -51,37 +51,37 @@ import org.ow2.proactive_grid_cloud_portal.cli.utils.ArrayFormatter;
 
 public class GetStatsCommand extends AbstractCommand implements Command {
 
-	public GetStatsCommand() {
-	}
+    public GetStatsCommand() {
+    }
 
-	@Override
-	public void execute() throws Exception {
-		HttpGet request = new HttpGet(resourceUrl("stats"));
-		HttpResponse response = execute(request);
-		if (statusCode(OK) == statusCode(response)) {
-			Map<String, String> stats = readValue(response,
-					new TypeReference<Map<String, String>>() {
-					});
-			ArrayFormatter oaf = new ArrayFormatter();
-			oaf.setMaxColumnLength(80);
-			oaf.setSpace(2);
-			List<String> columnNames = new ArrayList<String>();
-			columnNames.add("");
-			columnNames.add("");
-			oaf.setTitle(columnNames);
-			for (Entry<String, String> e : stats.entrySet()) {
-				List<String> row = new ArrayList<String>();
-				row.add(e.getKey());
-				row.add(e.getValue());
-				oaf.addLine(row);
-			}
-			writeLine(string(oaf));
-		} else {
-			handleError(
-					"Error occured while retrieving scheduler statistics ..",
-					response);
-		}
+    @Override
+    public void execute() throws Exception {
+        HttpGet request = new HttpGet(resourceUrl("stats"));
+        HttpResponse response = execute(request);
+        if (statusCode(OK) == statusCode(response)) {
+            Map<String, String> stats = readValue(response,
+                    new TypeReference<Map<String, String>>() {
+                    });
+            ArrayFormatter oaf = new ArrayFormatter();
+            oaf.setMaxColumnLength(80);
+            oaf.setSpace(2);
+            List<String> columnNames = new ArrayList<String>();
+            columnNames.add("");
+            columnNames.add("");
+            oaf.setTitle(columnNames);
+            for (Entry<String, String> e : stats.entrySet()) {
+                List<String> row = new ArrayList<String>();
+                row.add(e.getKey());
+                row.add(e.getValue());
+                oaf.addLine(row);
+            }
+            writeLine(string(oaf));
+        } else {
+            handleError(
+                    "Error occured while retrieving scheduler statistics ..",
+                    response);
+        }
 
-	}
+    }
 
 }

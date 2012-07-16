@@ -38,21 +38,17 @@
 package org.ow2.proactive_grid_cloud_portal.cli;
 
 public enum ResponseStatus {
-	
-	OK(200),
-	NO_CONTENT(204),
-	FORBIDDEN(401);
-	
-	private int statusCode;
-	
-	ResponseStatus(int statusCode) {
-		this.statusCode = statusCode;
-	}
-	
-	public int statusCode() {
-		return statusCode;
-	}
+
+    OK(200), NO_CONTENT(204), FORBIDDEN(401);
+
+    private int statusCode;
+
+    ResponseStatus(int statusCode) {
+        this.statusCode = statusCode;
+    }
+
+    public int statusCode() {
+        return statusCode;
+    }
 
 }
-
-
