@@ -60,4 +60,8 @@ public class NodeSourceEventMonitor extends RMEventMonitor {
         return nodeSourceName;
     }
 
+    public String toString() {
+        return super.toString() + " " + nodeSourceName;
+    }
+
 }

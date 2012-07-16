@@ -83,4 +83,12 @@ public class NodeEventMonitor extends RMEventMonitor {
         this.nodeEvent = nodeEvent;
     }
 
+    public String toString() {
+        if (nodeEvent != null) {
+            return nodeEvent.toString();
+        }
+
+        return super.toString() + " " + nodeUrl;
+    }
+
 }

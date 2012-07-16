@@ -313,4 +313,19 @@ public class RMMonitorsHandler {
         }
         throw new ProActiveTimeoutException("timeout elapsed");
     }
+
+    public synchronized void dumpEvents() {
+        System.out.println("RM events");
+        for (RMEventType e : stateEvents) {
+            System.out.println(e);
+        }
+        System.out.println("RM node source events");
+        for (NodeSourceEventMonitor e : nodeSourcesEvent) {
+            System.out.println(e);
+        }
+        System.out.println("RM node events");
+        for (NodeEventMonitor e : nodesEvent) {
+            System.out.println(e);
+        }
+    }
 }

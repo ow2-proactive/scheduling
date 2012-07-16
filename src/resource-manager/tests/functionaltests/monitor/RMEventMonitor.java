@@ -121,4 +121,11 @@ public class RMEventMonitor {
     public void setTimeouted(boolean timeouted) {
         this.timeouted = timeouted;
     }
+
+    /**
+     * String representation
+     */
+    public String toString() {
+        return waitedEvent.toString();
+    }
 }

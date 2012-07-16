@@ -612,7 +612,7 @@ public class RMTHelper {
         resourceManager = auth.login(connectedUserCreds);
     }
 
-    private RMMonitorsHandler getMonitorsHandler() {
+    public RMMonitorsHandler getMonitorsHandler() {
         if (monitorsHandler == null) {
             monitorsHandler = new RMMonitorsHandler();
         }
