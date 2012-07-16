@@ -53,7 +53,7 @@ public class TestSchedulerProxyUIWithDSSupport extends SchedulerConsecutive {
     public static final String dataServerFolderPath = System.getProperty("java.io.tmpdir") + File.separator +
         "testDS_remoteFolder";
 
-    public static long TIMEOUT = 10000;
+    public static long TIMEOUT = 40000;
 
     private File inputLocalFolder;
     private File outputLocalFolder;
