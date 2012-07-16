@@ -147,7 +147,7 @@ public class TestSchedulerProxyUIWithDSSupport extends SchedulerConsecutive {
         TaskFlowJob job = new TaskFlowJob();
         JavaTask testTask = new JavaTask();
         testTask.setName("TestJavaTask");
-        testTask.setExecutableClassName(TestDataJavaExecutable.class.getName());
+        testTask.setExecutableClassName(SimpleJavaExecutable.class.getName());
         job.setInputSpace(dataServerURI);
         job.setOutputSpace(dataServerURI);
 

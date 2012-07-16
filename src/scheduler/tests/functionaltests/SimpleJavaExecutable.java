@@ -20,7 +20,7 @@ import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
  * @author esalagea
  *
  */
-public class TestDataJavaExecutable extends JavaExecutable {
+public class SimpleJavaExecutable extends JavaExecutable {
 
     @Override
     public Serializable execute(TaskResult... results) throws Throwable {
