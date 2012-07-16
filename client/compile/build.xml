@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project name="REST CLI Porject" basedir="." default="compile">
+	<property name="version" value="SNAPSHOT" />
+	<property name="src.dir" value="${basedir}/../src" />
+	<property name="lib.dir" value="${basedir}/../lib" />
+	<property name="conf" value="${basedir}/../conf" />
+	<property name="build.dir" value="${basedir}/../build" />
+	<property name="dist.dir" value="${basedir}/../dist" />
+	<property name="rest.cli.jarfile" value="${dist.dir}/rest-cli-${version}.jar" />
+	<path id="compile.class.path">
+		<fileset dir="${lib.dir}">
+			<include name="**/*.jar" />
+		</fileset>
+	</path>
+	<target name="clean">
+		<delete dir="${build.dir}" />
+		<delete dir="${dist.dir}" />
+	</target>
+	<target name="compile">
+		<mkdir dir="${build.dir}" />
+		<mkdir dir="${dist.dir}" />
+		<javac srcdir="${src.dir}" destdir="${build.dir}" source="1.6" target="1.6">
+			<classpath refid="compile.class.path" />
+		</javac>
+		<copy todir="${build.dir}">
+			<fileset dir="${src.dir}" excludes="**/*.java" />
+		</copy>
+		<jar basedir="${build.dir}" destfile="${rest.cli.jarfile}" />
+	</target>
+	<target name="src-dist" depends="clean,compile">
+		<property name="src.dist.dir" value="${dist.dir}/rest-cli-${version}-src" />
+		<mkdir dir="${src.dist.dir}" />
+		<copy todir="${src.dist.dir}">
+			<fileset dir="${basedir}/../">
+				<include name="src/**" />
+				<include name="lib/**" />
+				<include name="conf/**" />
+				<include name="compile/build.xml" />
+				<include name="bin/rest-cli.sh" />
+				<include name="README" />
+			</fileset>
+		</copy>
+		<zip destfile="${src.dist.dir}.zip" basedir="${dist.dir}" includes="rest-cli-${version}-src/**" />
+	</target>
+	<target name="all" depends="clean,compile" />
+</project>
