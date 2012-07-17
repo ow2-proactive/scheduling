@@ -120,6 +120,8 @@ public class TestNSAdminPermissions extends RMConsecutive {
             // adding the node as provider
             providerRMAccess.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
             helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+            // node becomes free
+            helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         } catch (Exception e) {
             Assert.assertTrue(false);
         }
@@ -140,6 +142,8 @@ public class TestNSAdminPermissions extends RMConsecutive {
             // adding the node as provider
             providerRMAccess.addNode(node2.getNodeInformation().getURL(), nsName).getBooleanValue();
             helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+            // node becomes free
+            helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         } catch (Exception e) {
             e.printStackTrace();
             Assert.assertTrue(false);
