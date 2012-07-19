@@ -105,7 +105,7 @@
 	-->
 
 	<target name="junit.rm" depends="deploy.rm" description="Run resource manager's tests">
-		<junitMacro testsuite="rm.testsuite" testclasspath="rm.test.classpath" log4jconfig="-Dlog4j.configuration=file:${base.dir}/compile/rm-log4j">
+		<junitMacro testsuite="rm.testsuite" testclasspath="rm.test.classpath" log4jconfig="-Dlog4j.configuration=file:${base.dir}/config/log4j/log4j-junit">
 			<jvmargs>
 				<jvmarg value="-DneighborHost=${neighborHost}" />
 				<jvmarg value="-DdistantHost=${distantHost}" />
