@@ -60,7 +60,7 @@ import org.ow2.proactive.utils.FileToBytesConverter;
 
 
 /**
- * Class with main which instantiates a Resource Manager.
+ * Class with main which instantiates a resource manager.
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
@@ -83,8 +83,8 @@ public class RMStarter {
         help.setRequired(false);
         options.addOption(help);
 
-        Option noDeploy = new Option("ln", "localNodes", false, "start Resource Manager deploying default " +
-            DEFAULT_NUMBER_OF_NODES + " local nodes");
+        Option noDeploy = new Option("ln", "localNodes", false,
+            "start the resource manager deploying default " + DEFAULT_NUMBER_OF_NODES + " local nodes");
         noDeploy.setArgName("localNodes");
         noDeploy.setRequired(false);
         options.addOption(noDeploy);
@@ -102,7 +102,7 @@ public class RMStarter {
         HelpFormatter hf = new HelpFormatter();
         hf.setWidth(120);
         hf.printHelp("rm-start", options, true);
-        logger.info("\n Notice : Without argument, Resource Manager starts without any computing node.");
+        logger.info("\n Notice : Without argument, the resource manager starts without any computing node.");
         System.exit(1);
     }
 
@@ -126,7 +126,7 @@ public class RMStarter {
                 displayHelp();
             }
 
-            logger.info("Starting Resource Manager, Please wait...");
+            logger.info("Starting the resource manager...");
             RMFactory.setOsJavaProperty();
 
             boolean localNodes = false;
@@ -144,7 +144,6 @@ public class RMStarter {
 
             // starting clean resource manager
             RMAuthentication auth = RMFactory.startLocal();
-            logger.info("Resource Manager successfully created on " + auth.getHostURL());
 
             if (localNodes) {
                 ResourceManager resourceManager = auth.login(Credentials
@@ -160,6 +159,10 @@ public class RMStarter {
                         new Object[] { "", creds, DEFAULT_NUMBER_OF_NODES, nodeTimeout, "" },
                         StaticPolicy.class.getName(), null);
                 resourceManager.disconnect();
+                logger.info("The resource manager with " + DEFAULT_NUMBER_OF_NODES +
+                    " local nodes created on " + auth.getHostURL());
+            } else {
+                logger.info("The resource manager created on " + auth.getHostURL());
             }
 
         } catch (ParseException e1) {

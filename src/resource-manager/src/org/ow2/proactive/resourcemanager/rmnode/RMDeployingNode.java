@@ -447,7 +447,6 @@ public final class RMDeployingNode implements RMNode, Serializable {
     public String getJMXUrl(JMXTransportProtocol protocol) {
         return null;
     }
-
 }
 
 /**

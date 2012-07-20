@@ -21,7 +21,7 @@ log4j.appender.RM.File=${pa.rm.home}/.logs/RM.log
 log4j.appender.RM.MaxFileSize=100MB
 log4j.appender.RM.MaxBackupIndex=10
 log4j.appender.RM.layout=org.apache.log4j.PatternLayout
-log4j.appender.RM.layout.ConversionPattern=[%d{ISO8601} %-5p] [RM.%C{1}.%M] %m%n
+log4j.appender.RM.layout.ConversionPattern=[%d{ISO8601} %-5p] %m%n
 
 # CONSOLE appender
 log4j.appender.CONSOLE=org.apache.log4j.ConsoleAppender

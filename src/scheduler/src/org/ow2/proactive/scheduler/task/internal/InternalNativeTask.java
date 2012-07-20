@@ -107,7 +107,7 @@ public class InternalNativeTask extends InternalTask {
             NodeException {
         NativeTaskLauncher launcher;
 
-        logger.info("Create native task launcher");
+        logger.info("task " + getTaskInfo().getTaskId() + " creating native task launcher");
         TaskLauncherInitializer tli = getDefaultTaskLauncherInitializer(job);
         launcher = (NativeTaskLauncher) PAActiveObject.newActive(NativeTaskLauncher.class.getName(),
                 new Object[] { tli }, node);

@@ -485,7 +485,6 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         // Get the previous state of the node needed for the event
         final NodeState previousNodeState = rmNode.getState();
         try {
-            logger.debug("The node " + rmNode.getNodeURL() + " owned by " + rmNode.getOwner() + " is free");
             Client client = rmNode.getOwner();
             if (client == null) {
                 // node has been just configured, so the user initiated this action is the node provider
@@ -1080,7 +1079,6 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             // if the resource manager is about to shutdown, do not provide any node
             return new NodeSet();
         } else {
-            logger.info(caller + " requested " + number + " nodes");
             if (descriptor == null) {
                 descriptor = TopologyDescriptor.ARBITRARY;
             }

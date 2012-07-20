@@ -388,7 +388,7 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
     public void queueEvent(RMEvent event) {
         //dispatch event
         if (logger.isDebugEnabled()) {
-            logger.debug("Queueing event '" + event.toString() + "'");
+            logger.debug(event.toString() + " event");
         }
 
         synchronized (dispatchers) {

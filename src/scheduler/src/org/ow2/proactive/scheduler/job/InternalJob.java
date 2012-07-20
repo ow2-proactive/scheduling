@@ -423,7 +423,6 @@ public abstract class InternalJob extends JobState {
      * @param td the task which has just been started.
      */
     public void startTask(InternalTask td) {
-        logger.debug(" ");
         setNumberOfPendingTasks(getNumberOfPendingTasks() - 1);
         setNumberOfRunningTasks(getNumberOfRunningTasks() + 1);
 
@@ -455,7 +454,6 @@ public abstract class InternalJob extends JobState {
      * Updates count for running to pending event.
      */
     public void newWaitingTask() {
-        logger.debug(" ");
         setNumberOfPendingTasks(getNumberOfPendingTasks() + 1);
         setNumberOfRunningTasks(getNumberOfRunningTasks() - 1);
         if (getNumberOfRunningTasks() == 0 && getStatus() != JobStatus.PAUSED) {
@@ -469,7 +467,6 @@ public abstract class InternalJob extends JobState {
      * @param task the task which has to be restarted.
      */
     public void reStartTask(InternalTask task) {
-        logger.debug(" ");
         getJobDescriptor().reStart(task.getId());
         task.setProgress(0);
         if (getStatus() == JobStatus.PAUSED) {
@@ -497,7 +494,6 @@ public abstract class InternalJob extends JobState {
      */
     public InternalTask terminateTask(boolean errorOccurred, TaskId taskId, SchedulerFrontend frontend,
             FlowAction action, TaskResultImpl result) {
-        logger.debug(" ");
         final InternalTask descriptor = tasks.get(taskId);
         descriptor.setFinishedTime(System.currentTimeMillis());
         descriptor.setStatus(errorOccurred ? TaskStatus.FAULTY : TaskStatus.FINISHED);
@@ -1035,7 +1031,6 @@ public abstract class InternalJob extends JobState {
      * @param id the id of the task to start and terminate.
      */
     public void simulateStartAndTerminate(TaskId id) {
-        logger.debug(" ");
         getJobDescriptor().start(id);
         getJobDescriptor().terminate(id);
     }
@@ -1047,7 +1042,6 @@ public abstract class InternalJob extends JobState {
      * @param jobStatus type of the failure on this job. (failed/canceled/killed)
      */
     public void failed(TaskId taskId, JobStatus jobStatus) {
-        logger.debug(" ");
         if (jobStatus != JobStatus.KILLED) {
             InternalTask descriptor = tasks.get(taskId);
             if (descriptor.getStartTime() > 0) {
@@ -1108,7 +1102,6 @@ public abstract class InternalJob extends JobState {
      * Set all properties following a job submitting.
      */
     public void submitAction() {
-        logger.debug(" ");
         setSubmittedTime(System.currentTimeMillis());
         setStatus(JobStatus.PENDING);
     }
@@ -1118,7 +1111,6 @@ public abstract class InternalJob extends JobState {
      * The task may have a consistent id and job info.
      */
     public synchronized void prepareTasks() {
-        logger.debug(" ");
         //get tasks
         ArrayList<InternalTask> sorted = getITasks();
         //sort task according to the ID
@@ -1140,7 +1132,6 @@ public abstract class InternalJob extends JobState {
      * set the taskStatusModify to "null" : setTaskStatusModify(null);
      */
     public void start() {
-        logger.debug(" ");
         setStartTime(System.currentTimeMillis());
         setNumberOfPendingTasks(getTotalNumberOfTasks());
         setNumberOfRunningTasks(0);
@@ -1160,7 +1151,6 @@ public abstract class InternalJob extends JobState {
      * Set all properties in order to terminate the job.
      */
     public void terminate() {
-        logger.debug(" ");
         setStatus(JobStatus.FINISHED);
         setFinishedTime(System.currentTimeMillis());
         if (jobDataSpaceApplication != null) {
@@ -1178,7 +1168,6 @@ public abstract class InternalJob extends JobState {
      * @return true if the job has correctly been paused, false if not.
      */
     public boolean setPaused() {
-        logger.debug(" ");
         if (jobInfo.getStatus() == JobStatus.PAUSED) {
             return false;
         }
@@ -1210,7 +1199,6 @@ public abstract class InternalJob extends JobState {
      * @return true if the job has correctly been unpaused, false if not.
      */
     public boolean setUnPause() {
-        logger.debug(" ");
         if (jobInfo.getStatus() != JobStatus.PAUSED) {
             return false;
         }

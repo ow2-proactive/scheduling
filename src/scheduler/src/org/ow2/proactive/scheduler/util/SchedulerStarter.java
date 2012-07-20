@@ -149,38 +149,29 @@ public class SchedulerStarter {
                     logger.info("RM URL : " + rm);
                 }
 
-                logger.info("Starting Scheduler, Please wait...");
-                boolean onlySched = false;
+                logger.info("Starting the scheduler...");
 
                 if (rm != null) {
                     try {
-                        logger.info("Trying to connect to Resource Manager on " + rm);
+                        logger.info("Connecting to the resource manager on " + rm);
                         SchedulerFactory.tryJoinRM(new URI(rm));
-                        onlySched = true;
                     } catch (Exception e) {
-                        logger.error("ERROR while connecting the RM on " + rm + ", no RM found !");
+                        logger.error("ERROR while connecting to the RM on " + rm + ", no RM found !");
                         System.exit(2);
                     }
                 } else {
                     rm = getLocalAdress();
                     URI uri = new URI(rm);
                     //trying to connect to a started local RM
-                    logger.info("Trying to connect to a started Resource Manager on " + uri);
                     try {
                         SchedulerFactory.tryJoinRM(uri);
-                        logger
-                                .info("Resource Manager URL was not specified, connection made to the local Resource Manager at " +
-                                    uri);
+                        logger.info("Connected to the existing resource manager at " + uri);
                     } catch (Exception e) {
-                        logger.info("Resource Manager doesn't exist on the local host");
                         try {
                             //Starting a local RM using default deployment descriptor
                             RMFactory.setOsJavaProperty();
-                            logger.info("Trying to start a local Resource Manager");
+                            logger.info("Starting the resource manager...");
                             rmAuth = RMFactory.startLocal();
-
-                            logger
-                                    .info("Trying to connect the local Resource Manager using Scheduler identity");
 
                             //creating default node source
                             ResourceManager rman = rmAuth.login(Credentials
@@ -197,24 +188,22 @@ public class SchedulerStarter {
                                             defaulNodesNumber, defaultNodesTimemout, "" }, StaticPolicy.class
                                             .getName(), null);
 
-                            logger.info("Resource Manager created on " + rmAuth.getHostURL());
+                            logger.info("The resource manager with " + defaulNodesNumber +
+                                " local nodes created on " + rmAuth.getHostURL());
                         } catch (AlreadyBoundException abe) {
-                            logger.error("Resource Manager already exists on local host", abe);
+                            logger.error("The resource manager already exists on local host", abe);
                             System.exit(4);
                         } catch (ActiveObjectCreationException aoce) {
-                            logger.error("Unable to create local Resource Manager", aoce);
+                            logger.error("Unable to create local resource manager", aoce);
                             System.exit(5);
                         }
                     }
                 }
 
                 try {
-                    if (!onlySched) {
-                        logger.info("Starting scheduler...");
-                    }
                     SchedulerAuthenticationInterface sai = SchedulerFactory.startLocal(new URI(rm),
                             policyFullName);
-                    logger.info("Scheduler successfully created on " + sai.getHostURL());
+                    logger.info("The scheduler created on " + sai.getHostURL());
                 } catch (AdminSchedulerException e) {
                     logger.warn("", e);
                 }

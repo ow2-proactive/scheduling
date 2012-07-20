@@ -426,9 +426,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
             logger.info(ex.getMessage());
             throw ex;
         }
-        logger.info("Preparing and settings job submission");
         //setting the job properties
-
         job.setOwner(ident.getUsername());
         //prepare tasks in order to be send into the core
         job.prepareTasks();
@@ -441,8 +439,8 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
         ident.addSubmit();
         //send update user event
         usersUpdated(new NotificationData<UserIdentification>(SchedulerEvent.USERS_UPDATE, ident));
-        logger.info("New job submitted '" + job.getId() + "' containing " + job.getTotalNumberOfTasks() +
-            " tasks (owner is '" + job.getOwner() + "')");
+        logger.info("job  " + job.getId() + " submitted: name '" + userJob.getName() + "', tasks '" +
+            job.getTotalNumberOfTasks() + "', owner '" + job.getOwner() + "'");
         return job.getId();
     }
 
@@ -1153,7 +1151,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
     private void dispatchSchedulerStateUpdated(SchedulerEvent eventType) {
         try {
             if (logger.isDebugEnabled()) {
-                logger.debug("Dispatch event '" + eventType.toString() + "'");
+                logger.debug("event [" + eventType.toString() + "]");
             }
             for (UserIdentificationImpl userId : identifications.values()) {
                 //if this user has a listener
@@ -1179,8 +1177,8 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
     private void dispatchJobSubmitted(JobState job) {
         try {
             if (logger.isDebugEnabled()) {
-                logger.debug("Dispatch event '" + SchedulerEvent.JOB_SUBMITTED + "', job: " +
-                    job.getJobInfo().getJobId());
+                logger.debug("job  " + job.getJobInfo().getJobId() + " event [" +
+                    SchedulerEvent.JOB_SUBMITTED + "]");
             }
             for (UserIdentificationImpl userId : identifications.values()) {
                 //if this user has a listener
@@ -1216,8 +1214,8 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
     private void dispatchJobStateUpdated(String owner, NotificationData<JobInfo> notification) {
         try {
             if (logger.isDebugEnabled()) {
-                logger.debug("Dispatch event '" + notification.getEventType() + "', job: " +
-                    notification.getData().getJobId());
+                logger.debug("job  " + notification.getData().getJobId() + " event [" +
+                    notification.getEventType() + "]");
             }
             for (UserIdentificationImpl userId : identifications.values()) {
                 //if this user has a listener
@@ -1249,8 +1247,8 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
     private void dispatchTaskStateUpdated(String owner, NotificationData<TaskInfo> notification) {
         try {
             if (logger.isDebugEnabled()) {
-                logger.debug("Dispatch event '" + notification.getEventType() + "', task: " +
-                    notification.getData().getTaskId());
+                logger.debug("task " + notification.getData().getTaskId() + " event [" +
+                    notification.getEventType() + "]");
             }
             for (UserIdentificationImpl userId : identifications.values()) {
                 //if this user has a listener
@@ -1282,7 +1280,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
             boolean checkForDownUser) {
         try {
             if (logger.isDebugEnabled()) {
-                logger.debug("Dispatch event '" + notification.getEventType() + "'");
+                logger.debug("event [" + notification.getEventType() + "]");
             }
             for (UserIdentificationImpl userId : identifications.values()) {
                 //if this user has a listener
