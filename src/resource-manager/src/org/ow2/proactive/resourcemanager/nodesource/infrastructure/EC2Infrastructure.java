@@ -45,8 +45,8 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.Map.Entry;
 
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
@@ -59,6 +59,7 @@ import org.ow2.proactive.resourcemanager.utils.RMNodeStarter.CommandLineBuilder;
 import org.ow2.proactive.resourcemanager.utils.RMNodeStarter.OperatingSystem;
 import org.ow2.proactive.utils.FileToBytesConverter;
 
+import com.xerox.amazonws.ec2.ImageDescription;
 import com.xerox.amazonws.ec2.ReservationDescription.Instance;
 
 
@@ -74,6 +75,13 @@ import com.xerox.amazonws.ec2.ReservationDescription.Instance;
  * them at the same time when necessary.
  * Node acquisition suffers a 2mn delay at best, and node release is immediate
  * 
+ * 
+ * AmazonEc2 AMI requirements (all platforms):
+ * 		- java command is in the execution path
+ * 		- RM_HOME environment variable points to the installation folder of the Resource manager
+ * 		- at boot time, the instance executes the command received as user data 
+ * 		  (accessible, for instance, from http://169.254.169.254/latest/user-data)	
+ * 
  * @author The ProActive Team
  * @since ProActive Scheduling 1.0
  *
@@ -83,11 +91,15 @@ public class EC2Infrastructure extends InfrastructureManager {
     /**
      * The java home path on the ec2 instance
      */
-    private static final String REMOTE_JAVA_EXE = "/root/JDK/bin/java";
+    private static final String REMOTE_JAVA_EXE = "java";
+
     /**
      * The resource manager home on the ec2 instance
+     * 
      */
-    private static final String REMOTE_RM_HOME = "/usr/share/ProActive";
+    private static final String REMOTE_RM_HOME_WIN = "%RM_HOME%";
+
+    private static final String REMOTE_RM_HOME_UNIX = "$RM_HOME";
 
     @Configurable(fileBrowser = true, description = "Absolute path of EC2 configuration file")
     protected File configurationFile;
@@ -97,8 +109,12 @@ public class EC2Infrastructure extends InfrastructureManager {
      * The credentials as a String BASE64 encoded
      */
     private String creds64;
-    @Configurable(description = "The http port used by the node\n on the EC2 instance")
-    protected Integer nodeHttpPort = 80;
+
+    @Configurable(description = "The communication protocol the remote node")
+    protected String communicationProtocol = "pamr";
+
+    @Configurable(description = "Additional JVM options \n Ex: -Dproperty1=value1 -Dproperty2=value2")
+    protected String additionalJVMOptions;
 
     /** Deployment data */
     protected EC2Deployer ec2d;
@@ -181,6 +197,15 @@ public class EC2Infrastructure extends InfrastructureManager {
         CommandLineBuilder clb = this.buildEC2CommandLine();
         try {
             String cmd = clb.buildCommandLine(true);
+
+            //Add Additional jvm options
+            if ((additionalJVMOptions != null) && (additionalJVMOptions.trim() != "")) {
+                cmd = cmd + " " + additionalJVMOptions;
+            }
+            logger
+                    .info(this.getClass().getName() + "-executing commmand for nodes deployment.\n cmd= " +
+                        cmd);
+            //            System.out.println(this.getClass().getName()+ "-executing commmand for nodes deployment.\n cmd= "+cmd);
             deployingNodeURL = super.addDeployingNode(clb.getNodeName(), cmd,
                     "Deploying node on EC2 instance", TIMEOUT_DELAY);
             //we always deploy one by one to be able to match an instance with a deploying node
@@ -257,22 +282,31 @@ public class EC2Infrastructure extends InfrastructureManager {
      */
     private CommandLineBuilder buildEC2CommandLine() {
         CommandLineBuilder result = super.getEmptyCommandLineBuilder();
-        result.setTargetOS(OperatingSystem.UNIX);
+
+        ImageDescription descr = ec2d.getAvailableImages(this.imgd, true);
         result.setRmURL(this.rmUrl);
         result.setCredentialsValueAndNullOthers(this.creds64);
-        result.setRmHome(REMOTE_RM_HOME);
         result.setJavaPath(REMOTE_JAVA_EXE);
         Map<String, String> properties = new HashMap<String, String>();
-        //we only use http as communication protocol
-        properties.put(CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getName(), "http");
-        properties.put(CentralPAPropertyRepository.PA_XMLHTTP_PORT.getName(), Integer
-                .toString(this.nodeHttpPort));
-        properties.put(PAResourceManagerProperties.RM_HOME.getKey(), REMOTE_RM_HOME);
-        properties.put(CentralPAPropertyRepository.PA_HOME.getName(), REMOTE_RM_HOME);
+        properties
+                .put(CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getName(), communicationProtocol);
         result.setPaProperties(properties);
         String nodeSourceName = this.nodeSource.getName();
         result.setSourceName(nodeSourceName);
-        String nodeName = "VIRT-EC2-" + nodeSourceName + "-node-" + ProActiveCounter.getUniqID();
+        String nodeName = "EC2-" + nodeSourceName + "-node-" + ProActiveCounter.getUniqID();
+
+        if (descr.getPlatform().contains("windows")) {
+            result.setTargetOS(OperatingSystem.WINDOWS);
+            result.setRmHome(REMOTE_RM_HOME_WIN);
+            properties.put(PAResourceManagerProperties.RM_HOME.getKey(), REMOTE_RM_HOME_WIN);
+            properties.put(CentralPAPropertyRepository.PA_HOME.getName(), REMOTE_RM_HOME_WIN);
+        } else {
+            result.setTargetOS(OperatingSystem.UNIX);
+            result.setRmHome(REMOTE_RM_HOME_UNIX);
+            properties.put(PAResourceManagerProperties.RM_HOME.getKey(), REMOTE_RM_HOME_UNIX);
+            properties.put(CentralPAPropertyRepository.PA_HOME.getName(), REMOTE_RM_HOME_UNIX);
+        }
+
         result.setNodeName(nodeName);
         return result;
     }
@@ -283,13 +317,16 @@ public class EC2Infrastructure extends InfrastructureManager {
      * @param parameters
      *            parameters[0]: Configuration file as byte array
      *            parameters[1]: RM credentials
-     *            parameters[2]: HTTP node port
+     *            parameters[2]: communication protocol
+     *            parameters[3]: additional jvm args
+     *            parameters[4]: EC2 server URL
      */
     @Override
     public void configure(Object... parameters) {
-
         /** parameters look fine */
-        if (parameters != null && parameters.length == 3) {
+        if (parameters != null && parameters.length == 4) {
+
+            // ======  parameters[0]: Configuration file as byte array ======
 
             if (parameters[0] == null) {
                 throw new IllegalArgumentException("EC2 config file must be specified");
@@ -307,21 +344,27 @@ public class EC2Infrastructure extends InfrastructureManager {
                 readConf(PAResourceManagerProperties.RM_EC2_PATH_PROPERTY_NAME.getValueAsString());
                 logger.debug("Expected File as 1st parameter for EC2Infrastructure: " + e.getMessage());
             }
+
+            // ============= parameters[1]: RM credentials ==============
             if (parameters[1] == null) {
                 throw new IllegalArgumentException("Credentials must be specified");
             }
             this.creds64 = new String((byte[]) parameters[1]);
-            String nodep = parameters[2].toString();
 
-            try {
-                int pp = Integer.parseInt(nodep);
-                if (pp < 10 || pp > 65535) {
-                    throw new Exception("Out of range");
-                }
-                this.nodeHttpPort = pp;
-            } catch (Exception e) {
-                throw new IllegalArgumentException("Invalid value for parameter Node Port", e);
+            // ================= parameters[2]: communication protocol ==============
+            //TODO: check known protocol 
+            if (parameters[2] == null) {
+
+                throw new IllegalArgumentException("Communication protocol must be specified");
             }
+
+            this.communicationProtocol = parameters[2].toString();
+
+            // ================= parameters[3]: additional jvm args =================
+            if (parameters[3] == null) {
+                this.additionalJVMOptions = "";
+            } else
+                this.additionalJVMOptions = parameters[3].toString();
         }
 
         /**
@@ -414,19 +457,44 @@ public class EC2Infrastructure extends InfrastructureManager {
         if (!props.containsKey("MAX_INST"))
             throw new IllegalArgumentException("Missing property MAX_INST in: " + path);
 
+        String logInfo = "*************************************** \n";
+        logInfo += "EC2 configuratioin: \n";
         this.ec2d = new EC2Deployer(props.getProperty("AWS_AKEY"), props.getProperty("AWS_SKEY"), props
                 .getProperty("AWS_USER"));
+        logInfo += "AWS_USER=" + props.getProperty("AWS_USER") + "\n";
+        logInfo += "ASW_AKEY=" + props.getProperty("AWS_AKEY") + "\n";
 
         this.imgd = props.getProperty("AMI");
+        logInfo += "AMI=" + props.getProperty("AMI") + "\n";
         int maxInsts = 1;
         try {
             maxInsts = Integer.parseInt(props.getProperty("MAX_INST"));
+            logInfo += "MAX_INST=" + props.getProperty("MAX_INST") + "\n";
+
         } catch (Exception e) {
             maxInsts = 1;
+            logInfo += "Exception occured while parsing MAX_INST value " + props.getProperty("MAX_INST") +
+                "\n";
+            logInfo += "MAX_INST=1 \n";
         }
 
         this.ec2d.setNumInstances(1, maxInsts);
         this.ec2d.setInstanceType(props.getProperty("INSTANCE_TYPE"));
+        logInfo += "INSTANCE_TYPE=" + props.getProperty("INSTANCE_TYPE") + "\n";
+
+        String ec2Url = null;
+        if (props.containsKey("EC2_HOST")) {
+            ec2Url = props.getProperty("EC2_HOST");
+
+        }
+        if (ec2Url != null) {
+            ec2d.setEc2RegionHost(ec2Url);
+            logInfo += "EC2_HOST=" + props.getProperty("EC2_HOST") + "\n";
+        }
+
+        logInfo += "*************************************** \n";
+        //        System.out.println(logInfo);
+        logger.info(logInfo);
 
         try {
             in.close();

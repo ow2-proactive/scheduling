@@ -39,7 +39,10 @@ package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
@@ -104,6 +107,26 @@ public class EC2Deployer implements java.io.Serializable {
     private InstanceType instanceType;
 
     /**
+     * Once an image descriptor is retrieved, cache it 
+     */
+    private Map<String, ImageDescription> cachedImageDescriptors = Collections
+            .synchronizedMap(new HashMap<String, ImageDescription>());
+
+    /**
+     * EC2 server URL - the EC2 zone used depends on this url
+     * Leave null for ec2 default behavior
+     */
+    private String ec2RegionHost = null;
+
+    public String getEc2RegionHost() {
+        return ec2RegionHost;
+    }
+
+    public void setEc2RegionHost(String ec2ServerURL) {
+        this.ec2RegionHost = ec2ServerURL;
+    }
+
+    /**
      * Constructs a new node deployer for Amazon EC2
      */
     public EC2Deployer() {
@@ -158,16 +181,18 @@ public class EC2Deployer implements java.io.Serializable {
             // this should happen frequently,
             // as keys can't be generated more than once without being deleted,
 
-            // logger.warn("Can't regen keypair");
-            //			e.printStackTrace();
+            logger.warn("Can't regen keypair ", e);
         }
         this.active = true;
-
         return EC2Requester;
     }
 
     private Jec2 getEC2Wrapper() {
-        return resetKeys(this.AWS_AKEY, this.AWS_SKEY, this.AWS_USER);
+        Jec2 jec2 = resetKeys(this.AWS_AKEY, this.AWS_SKEY, this.AWS_USER);
+        if (ec2RegionHost != null) {
+            jec2.setRegionUrl(ec2RegionHost);
+        }
+        return jec2;
     }
 
     /**
@@ -211,8 +236,12 @@ public class EC2Deployer implements java.io.Serializable {
      */
     public ImageDescription getAvailableImages(String amiId, boolean all) {
 
-        Jec2 ec2req = getEC2Wrapper();
+        synchronized (cachedImageDescriptors) {
+            if (cachedImageDescriptors.containsKey(amiId))
+                return cachedImageDescriptors.get(amiId);
+        }
 
+        Jec2 ec2req = getEC2Wrapper();
         if (ec2req == null)
             return null;
 
@@ -220,7 +249,9 @@ public class EC2Deployer implements java.io.Serializable {
 
         for (ImageDescription img : imgs) {
             if (img.getImageId().equals(amiId))
-                return img;
+                //cache it 
+                cachedImageDescriptors.put(amiId, img);
+            return img;
         }
 
         logger.error("Could nod find AMI: " + amiId);
@@ -384,12 +415,15 @@ public class EC2Deployer implements java.io.Serializable {
         }
 
         try {
+            //Do not force large instance, small works fine on windows. Let the user chose. 
+
             if (imgd.getArchitecture().equals("x86_64")) {
                 if (instanceType != InstanceType.XLARGE && instanceType != InstanceType.XLARGE_HCPU &&
                     instanceType != InstanceType.LARGE) {
-                    logger.debug("AMI " + imgd.getImageId() + " is x86_64 Arch," +
-                        " forcing Large instance type.");
-                    instanceType = InstanceType.LARGE;
+                    logger.warn("AMI " + imgd.getImageId() + " is  " + imgd.getPlatform() + " x86_64 Arch," +
+                        " it might not be compatible with the chosen Instance Type " +
+                        instanceType.getTypeId());
+                    //instanceType = InstanceType.LARGE;
                 }
             }
 
