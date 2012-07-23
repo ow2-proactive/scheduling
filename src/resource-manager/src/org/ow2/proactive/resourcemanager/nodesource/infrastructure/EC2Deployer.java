@@ -249,9 +249,11 @@ public class EC2Deployer implements java.io.Serializable {
 
         for (ImageDescription img : imgs) {
             if (img.getImageId().equals(amiId))
+            {
                 //cache it 
                 cachedImageDescriptors.put(amiId, img);
-            return img;
+            	return img;
+            }
         }
 
         logger.error("Could nod find AMI: " + amiId);
