@@ -7,4 +7,5 @@ workingDir=$(dirname $0)
 
 CLASS="org.objectweb.proactive.extensions.vfsprovider.gui.ServerBrowser"
 
-eval $JAVACMD "$CLASS" $@
+JAVACMD+=($CLASS $@)
+exec "${JAVACMD[@]}"
