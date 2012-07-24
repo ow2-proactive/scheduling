@@ -191,7 +191,10 @@ public enum PAResourceManagerProperties {
     /** Topology feature enable option */
     RM_TOPOLOGY_ENABLED("pa.rm.topology.enabled", PropertyType.BOOLEAN),
 
-    RM_TOPOLOGY_PINGER("pa.rm.topology.pinger.class", PropertyType.STRING);
+    RM_TOPOLOGY_PINGER("pa.rm.topology.pinger.class", PropertyType.STRING),
+
+    /** Resource Manager selection process logs*/
+    RM_SELECTION_LOGS_LOCATION("pa.rm.logs.selection.location", PropertyType.STRING);
 
     /* ***************************************************************************** */
     /* ***************************************************************************** */

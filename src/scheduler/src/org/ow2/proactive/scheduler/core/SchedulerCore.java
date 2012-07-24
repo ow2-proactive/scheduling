@@ -36,6 +36,7 @@
  */
 package org.ow2.proactive.scheduler.core;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -72,7 +73,6 @@ import org.objectweb.proactive.core.remoteobject.RemoteObjectExposer;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
 import org.objectweb.proactive.core.remoteobject.RemoteRemoteObject;
 import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.objectweb.proactive.utils.NamedThreadFactory;
 import org.ow2.proactive.db.DatabaseManager.FilteredExceptionCallback;
@@ -101,6 +101,7 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
@@ -125,6 +126,8 @@ import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalNativeTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
+import org.ow2.proactive.scheduler.util.JobLogger;
+import org.ow2.proactive.scheduler.util.TaskLogger;
 import org.ow2.proactive.scheduler.util.classloading.TaskClassServer;
 import org.ow2.proactive.utils.NodeSet;
 
@@ -143,7 +146,9 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
         FilteredExceptionCallback {
 
     /** Scheduler logger */
-    public static final Logger logger = ProActiveLogger.getLogger(SchedulerCore.class);
+    public static final Logger logger = Logger.getLogger(SchedulerCore.class);
+    public static final TaskLogger tlogger = TaskLogger.getInstance();
+    public static final JobLogger jlogger = JobLogger.getInstance();
 
     /** Number of threads used to call TaskLauncher.terminate() */
     private static final int TERMINATE_THREAD_NUMBER = PASchedulerProperties.SCHEDULER_STARTTASK_THREADNUMBER
@@ -259,18 +264,18 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
     protected void addTaskClassServer(JobId jid, byte[] userClasspathJarFile, boolean deflateJar)
             throws ClassServerException {
         if (getTaskClassServer(jid) != null) {
-            throw new ClassServerException("job  " + jid + " classServer already exists");
+            throw new ClassServerException("job " + jid + " classServer already exists");
         }
         try {
             // create remote task classserver 
-            logger.info("job  " + jid + " creating the remote task classServer");
+            jlogger.info(jid, "creating the remote task classServer");
             TaskClassServer localReference = new TaskClassServer(jid);
             RemoteObjectExposer<TaskClassServer> remoteExposer = new RemoteObjectExposer<TaskClassServer>(
                 TaskClassServer.class.getName(), localReference);
             URI uri = RemoteObjectHelper.generateUrl(jid.toString());
             RemoteRemoteObject rro = remoteExposer.createRemoteObject(uri);
             // must activate through local ref to avoid copy of the classpath content !
-            logger.info("job  " + jid + " activating local reference");
+            jlogger.info(jid, "activating local reference");
             localReference.activate(userClasspathJarFile, deflateJar);
             // store references
             classServers.put(jid, (TaskClassServer) new RemoteObjectAdapter(rro).getObjectProxy());
@@ -300,7 +305,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
      * @return true if a taskClassServer has been removed, false otherwise.
      */
     protected boolean removeTaskClassServer(JobId jid) {
-        logger.info("job  " + jid + " removing TaskClassServer");
+        jlogger.info(jid, "removing TaskClassServer");
         // desactivate tcs
         TaskClassServer tcs = classServers.remove(jid);
         if (tcs != null) {
@@ -310,11 +315,10 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
         RemoteObjectExposer<TaskClassServer> roe = remoteClassServers.remove(jid);
         if (roe != null) {
             try {
-                logger.info("job  " + jid + " unregistering remote TaskClassServer");
+                jlogger.info(jid, "unregistering remote TaskClassServer");
                 roe.unregisterAll();
             } catch (ProActiveException e) {
-                logger.error("job  " + jid + " unable to unregister remote taskClassServer because : " +
-                    e.getMessage());
+                jlogger.error(jid, "unable to unregister remote taskClassServer because : " + e.getMessage());
                 logger.error("", e);
             }
         }
@@ -355,7 +359,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
         try {
             final SchedulerCore schedulerStub = (SchedulerCore) PAActiveObject.getStubOnThis();
             //remove loggers
-            logger.info("job  " + jid + " cleaning loggers");
+            jlogger.info(jid, "cleaning loggers");
             Logger l = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + jid);
             l.removeAllAppenders();
             this.jobsToBeLogged.remove(jid);
@@ -511,7 +515,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
      * @param eventType the type of event to send with the job state updated
      */
     void updateTaskInfosList(InternalJob currentJob, SchedulerEvent eventType) {
-        logger.info("job  " + currentJob.getId() + " front-end event [" + eventType + "]");
+        jlogger.info(currentJob.getId(), "front-end event [" + eventType + "]");
         //send event to listeners.
         try {
             frontend.jobStateUpdated(currentJob.getOwner(), new NotificationData<JobInfo>(eventType,
@@ -767,25 +771,25 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                             } catch (NullPointerException e) {
                                 //should not happened, but avoid restart if execInfo or launcher is null
                                 //nothing to do
-                                if (logger.isDebugEnabled()) {
-                                    logger.debug("task " + td.getId() + " getProgress failed", e);
+                                if (tlogger.isDebugEnabled()) {
+                                    tlogger.debug(td.getId(), "getProgress failed", e);
                                 }
                             } catch (IllegalArgumentException e) {
                                 //thrown by (1)
                                 //avoid setting bad value, no event if bad
-                                if (logger.isDebugEnabled()) {
-                                    logger.debug("task " + td.getId() + " getProgress failed", e);
+                                if (tlogger.isDebugEnabled()) {
+                                    tlogger.debug(td.getId(), "getProgress failed", e);
                                 }
                             } catch (ProgressPingerException e) {
                                 //thrown by (2) in one of this two cases :
                                 // * when user has overridden getProgress method and the method throws an exception
                                 // * if forked JVM process is dead
                                 //nothing to do in any case
-                                if (logger.isDebugEnabled()) {
-                                    logger.debug("task " + td.getId() + " getProgress failed", e);
+                                if (tlogger.isDebugEnabled()) {
+                                    tlogger.debug(td.getId(), "getProgress failed", e);
                                 }
                             } catch (Throwable t) {
-                                logger.info("task " + td.getId() + " node failed", t);
+                                tlogger.info(td.getId(), "node failed", t);
 
                                 if (restartTaskOnNodeFailure(job, td, schedulerStub)) {
                                     break;
@@ -816,7 +820,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             return false;
         }
         if (!jobs.containsKey(job.getId())) {
-            logger.info("task " + td.getId() + " restarting task for not running job " + job.getId());
+            tlogger.info(td.getId(), "restarting task for not running job " + job.getId());
             return false;
         }
 
@@ -825,8 +829,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
         //manage restart
         td.decreaseNumberOfExecutionOnFailureLeft();
 
-        logger.info("task " + td.getId() + " number of retry on failure left " +
-            td.getNumberOfExecutionOnFailureLeft());
+        tlogger.info(td.getId(), "number of retry on failure left " + td.getNumberOfExecutionOnFailureLeft());
 
         if (td.getNumberOfExecutionOnFailureLeft() > 0) {
             td.setStatus(TaskStatus.WAITING_ON_FAILURE);
@@ -838,7 +841,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
 
             dbManager.taskRestarted(job, td, null);
 
-            logger.info("task " + td.getId() + " is waiting for restart");
+            tlogger.info(td.getId(), " is waiting for restart");
             return false;
         } else {
             //this call must be sequential with the core active object to avoid
@@ -932,15 +935,15 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
         JobStatus currentStatus = job.getStatus();
         if (currentStatus == JobStatus.CANCELED || currentStatus == JobStatus.FAILED ||
             currentStatus == JobStatus.KILLED || currentStatus == JobStatus.FINISHED) {
-            logger.info("job  " + job.getId() + " ending request for already ended job");
+            jlogger.info(job.getId(), "ending request for already ended job");
             // job is already ended nothing to do
             return;
         }
 
         if (task != null) {
-            logger.info("job  " + job.getId() + " ending request caused by task " + task.getId());
+            jlogger.info(job.getId(), "ending request caused by task " + task.getId());
         } else {
-            logger.info("job  " + job.getId() + " ending request");
+            jlogger.info(job.getId(), "ending request");
         }
 
         for (InternalTask td : job.getITasks()) {
@@ -953,7 +956,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
 
                 //try to terminate the task
                 try {
-                    logger.info("task " + td.getId() + " terminating");
+                    tlogger.info(td.getId(), "terminating");
                     td.getExecuterInformations().getLauncher().terminate(false);
                 } catch (Exception e) { /* (nothing to do) */
                     logger.debug("", e);
@@ -1009,7 +1012,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
         updateTaskInfosList(job, pendingJob ? SchedulerEvent.JOB_PENDING_TO_FINISHED
                 : SchedulerEvent.JOB_RUNNING_TO_FINISHED);
 
-        logger.info("job  " + job.getId() + " finished (" + jobStatus + ")");
+        jlogger.info(job.getId(), "finished (" + jobStatus + ")");
     }
 
     private ExecutorService threadPoolForTerminateTL;
@@ -1042,13 +1045,13 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
         boolean hasBeenReleased = false;
         int nativeIntegerResult = 0;
         JobId jobId = taskId.getJobId();
-        logger.info("task " + taskId + " terminate request");
+        tlogger.info(taskId, "terminate request");
         InternalJob job = jobs.get(jobId);
 
         //if job has been canceled or failed, it is possible that a task has finished just before
         //the failure of the job. In this rare case, the job may not exist anymore.
         if (job == null) {
-            logger.info("job  " + jobId + " does not exist anymore");
+            jlogger.info(jobId, "does not exist anymore");
             return;
         }
 
@@ -1099,7 +1102,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             //Check if an exception or error occurred during task execution...
             boolean errorOccurred = false;
             if (descriptor instanceof InternalNativeTask) {
-                logger.debug("task " + taskId + " is a native task");
+                tlogger.debug(taskId, "is a native task");
                 try {
                     // try to get the result, res.value can throw an exception,
                     // it means that the process has failed before the end.
@@ -1133,18 +1136,18 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                     //ie:command not found
                     //just note that an error occurred.
                     errorOccurred = true;
-                    logger.error("task " + taskId + " error", spe);
+                    tlogger.error(taskId, "error", spe);
                 } catch (Throwable e) {
                     //in any other case, note that an error occurred but the user must be informed.
                     errorOccurred = true;
-                    logger.error("task " + taskId + " error", e);
+                    tlogger.error(taskId, "error", e);
                 }
             } else {
-                logger.debug("task " + taskId + " is a java task");
+                tlogger.debug(taskId, "is a java task");
                 errorOccurred = res.hadException();
             }
 
-            logger.info("task " + taskId + " finished with" + (errorOccurred ? "" : "out") + " errors");
+            tlogger.info(taskId, "finished with" + (errorOccurred ? "" : "out") + " errors");
 
             //if an error occurred
             if (errorOccurred) {
@@ -1214,7 +1217,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                 }
             }
 
-            logger.info("task " + taskId + " result added to job " + job.getId());
+            tlogger.info(taskId, "result added to job " + job.getId());
             //to be done before terminating the task, once terminated it is not running anymore..
             job.getRunningTaskDescriptor(taskId);
             descriptor = job.terminateTask(errorOccurred, taskId, frontend, res.getAction(), res);
@@ -1224,7 +1227,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                 //terminating job
                 job.terminate();
                 runningJobs.remove(job);
-                logger.info("job  " + jobId + " terminated");
+                jlogger.info(jobId, "terminated");
                 terminateJobHandling(job.getId());
             }
 
@@ -1239,8 +1242,8 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             frontend.taskStateUpdated(job.getOwner(), new NotificationData<TaskInfo>(
                 SchedulerEvent.TASK_RUNNING_TO_FINISHED, descriptor.getTaskInfo()));
             //if this job is finished (every task have finished)
-            logger.info("job  " + job.getId() + " finished tasks " + job.getNumberOfFinishedTasks() +
-                ", total tasks " + job.getTotalNumberOfTasks() + ", finished " + job.isFinished());
+            jlogger.info(job.getId(), "finished tasks " + job.getNumberOfFinishedTasks() + ", total tasks " +
+                job.getTotalNumberOfTasks() + ", finished " + job.isFinished());
             if (job.isFinished()) {
                 //send event to client
                 frontend.jobStateUpdated(job.getOwner(), new NotificationData<JobInfo>(
@@ -1354,7 +1357,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
      */
     @RunActivityFiltered(id = "external")
     public void listenJobLogs(JobId jobId, AppenderProvider appenderProvider) throws UnknownJobException {
-        logger.info("job  " + jobId + " listening logs");
+        jlogger.info(jobId, "listening logs");
         Logger jobLogger = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + jobId);
 
         // create the appender to the remote listener
@@ -1362,8 +1365,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
         try {
             clientAppender = appenderProvider.getAppender();
         } catch (LogForwardingException e) {
-            logger.error("job  " + jobId + " cannot create an appender");
-            logger.error("", e);
+            jlogger.error(jobId, "cannot create an appender", e);
             throw new InternalException("Cannot create an appender for job " + jobId, e);
         }
 
@@ -1398,8 +1400,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                                 taskLauncher.activateLogs(this.lfs.getAppenderProvider());
                             }
                         } catch (LogForwardingException e) {
-                            logger.error("task " + tid + " cannot create an appender provider", e);
-                            logger.error("", e);
+                            tlogger.error(tid, " cannot create an appender provider", e);
                         }
                     }
                 }
@@ -1414,7 +1415,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             // handle finished jobs
             initJobLogging(jobId, jobLogger, clientAppender);
 
-            logger.info("job  " + jobId + " listening logs already finished job");
+            jlogger.info(jobId, "listening logs already finished job");
             // for finished tasks, add logs events "manually"
 
             Collection<TaskResult> allRes = result.getAllResults().values();
@@ -1423,7 +1424,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                 this.flushTaskLogs(tr, jobLogger, clientAppender);
             }
             // as the job is finished, close appenders
-            logger.info("job  " + jobId + " cleaning loggers for already finished job");
+            jlogger.info(jobId, "cleaning loggers for already finished job");
             jobLogger.removeAllAppenders(); // close appenders...
             this.jobsToBeLogged.remove(jobId);
         }
@@ -1470,7 +1471,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
      */
     @ImmediateService
     public JobResult getJobResult(final JobId jobId) throws UnknownJobException {
-        logger.info("job  " + jobId + " trying to get the job result");
+        jlogger.info(jobId, "trying to get the job result");
 
         JobResult result = dbManager.loadJobResult(jobId);
         if (result == null) {
@@ -1492,8 +1493,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                         }
                     };
                     removeJobTimer.schedule(tt, SCHEDULER_REMOVED_JOB_DELAY);
-                    logger.info("job  " + jobId + " will be removed in " +
-                        (SCHEDULER_REMOVED_JOB_DELAY / 1000) + "sec");
+                    jlogger.info(jobId, "will be removed in " + (SCHEDULER_REMOVED_JOB_DELAY / 1000) + "sec");
                 } catch (Exception e) {
                     logger.error("", e);
                 }
@@ -1511,7 +1511,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
      */
     public TaskResult getTaskResultFromIncarnation(JobId jobId, String taskName, int inc)
             throws UnknownJobException, UnknownTaskException {
-        logger.info("task " + taskName + " trying to get the task result, incarnation " + inc);
+        jlogger.info(jobId, "trying to get the task result, incarnation " + inc);
 
         if (inc < 0) {
             throw new IllegalArgumentException("Incarnation must be 0 or greater.");
@@ -1520,7 +1520,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
         try {
             TaskResult result = dbManager.loadTaskResult(jobId, taskName, inc);
             if (result == null) {
-                logger.info("Task " + taskName + " is not finished");
+                jlogger.info(jobId, taskName + " is not finished");
                 return null;
             } else {
                 return result;
@@ -1534,7 +1534,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
      * {@inheritDoc}
      */
     public boolean removeJob(JobId jobId) {
-        logger.info("job  " + jobId + " remove request");
+        logger.info("job " + jobId + " removing");
         InternalJob job = jobs.remove(jobId);
         if (job == null) {
             // load job data, JobInfo is needed to send event
@@ -1553,13 +1553,32 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             //remove from DataBase
             boolean rfdb = PASchedulerProperties.JOB_REMOVE_FROM_DB.getValueAsBoolean();
             dbManager.removeJob(jobId, job.getRemovedTime(), rfdb);
-            logger.info("job  " + jobId + " removed");
+            logger.info("job " + jobId + " removed");
+
+            // removing job logs
+            if (PASchedulerProperties.SCHEDULER_JOB_LOGS_LOCATION.isSet()) {
+                String logsLocation = PASchedulerProperties
+                        .getAbsolutePath(PASchedulerProperties.SCHEDULER_JOB_LOGS_LOCATION.getValueAsString());
+                for (TaskId t : job.getHMTasks().keySet()) {
+                    File f = new File(logsLocation + t);
+                    if (f.exists()) {
+                        logger.info("Removing file " + f.getAbsolutePath());
+                        f.delete();
+                    }
+                }
+                File f = new File(logsLocation + jobId);
+                if (f.exists()) {
+                    logger.info("Removing file " + f.getAbsolutePath());
+                    f.delete();
+                }
+            }
+
             //send event to front-end
             frontend.jobStateUpdated(job.getOwner(), new NotificationData<JobInfo>(
                 SchedulerEvent.JOB_REMOVE_FINISHED, job.getJobInfo()));
             return true;
         } else {
-            logger.warn("job  " + jobId + " has already been removed or is not finished");
+            logger.warn("job" + jobId + " has already been removed or is not finished");
             return false;
         }
     }
@@ -1742,7 +1761,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
         boolean change = job.setPaused();
 
         if (change) {
-            logger.debug("job  " + jobId + " has just been paused !");
+            jlogger.debug(jobId, "has just been paused !");
             dbManager.updateJobAndTasksState(job);
         }
 
@@ -1768,7 +1787,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
         boolean change = job.setUnPause();
 
         if (change) {
-            logger.debug("job  " + jobId + " has just been resumed !");
+            jlogger.debug(jobId, "has just been resumed !");
             dbManager.updateJobAndTasksState(job);
         }
 
@@ -1786,7 +1805,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             return false;
         }
 
-        logger.info("job  " + jobId + " kill request");
+        jlogger.info(jobId, "kill request");
         InternalJob job = jobs.get(jobId);
 
         if (job == null || job.getStatus() == JobStatus.KILLED) {
@@ -1835,11 +1854,11 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             return false;
         }
 
-        logger.info("task " + taskName + " killing");
+        jlogger.info(jobId, taskName + " killing");
         InternalJob job = jobs.get(jobId);
 
         if (job == null) {
-            logger.info("job  " + jobId + " does not exist");
+            jlogger.info(jobId, "does not exist");
             throw new UnknownJobException(jobId);
         }
 
@@ -1857,7 +1876,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
      * {@inheritDoc}
      */
     public void changeJobPriority(JobId jobId, JobPriority priority) {
-        logger.info("job  " + jobId + " request to change the priority to " + priority);
+        jlogger.info(jobId, "request to change the priority to " + priority);
         InternalJob job = jobs.get(jobId);
         job.setPriority(priority);
 
@@ -2118,8 +2137,8 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                     if (toWait > 0) {
                         removeJobTimer.schedule(tt, toWait);
                     }
-                    logger.debug("job  " + job.getId() + " will be removed in " +
-                        (SCHEDULER_REMOVED_JOB_DELAY / 1000) + "sec");
+                    jlogger.debug(job.getId(), "will be removed in " + (SCHEDULER_REMOVED_JOB_DELAY / 1000) +
+                        "sec");
                 } catch (Exception e) {
                 }
             }

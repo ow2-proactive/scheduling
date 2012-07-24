@@ -39,6 +39,7 @@ package org.ow2.proactive.scheduler.core;
 import java.security.KeyException;
 import java.security.PrivateKey;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -51,7 +52,6 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.utils.NamedThreadFactory;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.common.RMState;
@@ -66,6 +66,7 @@ import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.core.rmproxies.RMProxyCreationException;
+import org.ow2.proactive.scheduler.core.rmproxies.UserRMProxy;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptorImpl;
 import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
@@ -75,9 +76,12 @@ import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.ExecutableContainerInitializer;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
+import org.ow2.proactive.scheduler.util.JobLogger;
+import org.ow2.proactive.scheduler.util.TaskLogger;
 import org.ow2.proactive.scripting.ScriptException;
 import org.ow2.proactive.threading.TimeoutThreadPoolExecutor;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
+import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.Formatter;
 import org.ow2.proactive.utils.NodeSet;
 
@@ -91,7 +95,9 @@ import org.ow2.proactive.utils.NodeSet;
 final class SchedulingMethodImpl implements SchedulingMethod {
 
     /** Scheduler logger */
-    protected static final Logger logger = ProActiveLogger.getLogger(SchedulingMethodImpl.class);
+    public static final Logger logger = Logger.getLogger(SchedulerCore.class);
+    public static final TaskLogger tlogger = TaskLogger.getInstance();
+    public static final JobLogger jlogger = JobLogger.getInstance();
 
     /** Number of time to retry an active object creation if it fails to create */
     protected static final int ACTIVEOBJECT_CREATION_RETRY_TIME_NUMBER = 3;
@@ -323,7 +329,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
                 } else {
                     //check if the task is compatible with the other previous one
                     if (referent.equals(new SchedulingTaskComparator(internalTask, currentJob.getOwner()))) {
-                        logger.debug("task " + internalTask.getId() + " scheduling");
+                        tlogger.debug(internalTask.getId(), "scheduling");
                         neededResource += neededNodes;
                         maxResource -= neededNodes;
                         toFill.add(etd);
@@ -376,11 +382,25 @@ final class SchedulingMethodImpl implements SchedulingMethod {
             }
 
             try {
-                nodeSet = core.rmProxiesManager.getUserRMProxy(currentJob.getOwner(),
-                        currentJob.getCredentials()).getNodes(neededResourcesNumber, descriptor,
-                        internalTask.getSelectionScripts(), internalTask.getNodeExclusion(), bestEffort);
+                Criteria criteria = new Criteria(neededResourcesNumber);
+                criteria.setTopology(descriptor);
+                criteria.setScripts(internalTask.getSelectionScripts());
+                criteria.setBlackList(internalTask.getNodeExclusion());
+                criteria.setBestEffort(bestEffort);
+
+                Collection<String> computationDescriptors = new ArrayList<String>(tasksToSchedule.size());
+                for (EligibleTaskDescriptor task : tasksToSchedule) {
+                    computationDescriptors.add(task.getTaskId().toString());
+                }
+
+                criteria.setComputationDescriptors(computationDescriptors);
+
+                UserRMProxy rmProxy = core.rmProxiesManager.getUserRMProxy(currentJob.getOwner(), currentJob
+                        .getCredentials());
+
+                nodeSet = rmProxy.getNodes(criteria);
             } catch (TopologyDisabledException tde) {
-                logger.info("job  " + currentJob.getId() + " will be canceled as the topology is disabled");
+                jlogger.info(currentJob.getId(), "will be canceled as the topology is disabled");
                 simulateJobStartAndCancelIt(tasksToSchedule, "Topology is disabled");
                 return null;
             }
@@ -434,7 +454,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
                 core.runningJobs.add(ij);
                 //update tasks events list and send it to front-end
                 core.updateTaskInfosList(ij, SchedulerEvent.JOB_PENDING_TO_RUNNING);
-                logger.info("job  " + ij.getId() + " started");
+                jlogger.info(ij.getId(), "started");
             }
             //selection script has failed : end the job
             core.endJob(ij, it, null, errorMsg, JobStatus.CANCELED);
@@ -448,7 +468,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
      * @param task the task to be initialized
      */
     protected void loadAndInit(InternalJob job, InternalTask task) {
-        logger.debug("task " + task.getId() + " initializing the executable container");
+        tlogger.debug(task.getId(), "initializing the executable container");
         ExecutableContainer container = core.getDBManager().loadExecutableContainer(task);
         task.setExecutableContainer(container);
 
@@ -520,7 +540,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
                 //set nodes in the executable container
                 task.getExecutableContainer().setNodes(nodes);
 
-                logger.info("task " + task.getId() + " deploying");
+                tlogger.info(task.getId(), "deploying");
 
                 finalizeStarting(job, task, node, launcher);
 
@@ -552,7 +572,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
      * @param launcher the taskLauncher that has just been launched
      */
     void finalizeStarting(InternalJob job, InternalTask task, Node node, TaskLauncher launcher) {
-        logger.info("task " + task.getId() + " started on " +
+        tlogger.info(task.getId(), "started on " +
             node.getNodeInformation().getVMInformation().getHostName() + "(node: " +
             node.getNodeInformation().getName() + ")");
         // set the different informations on job
@@ -566,7 +586,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
             core.runningJobs.add(job);
             //update tasks events list and send it to front-end
             core.updateTaskInfosList(job, SchedulerEvent.JOB_PENDING_TO_RUNNING);
-            logger.info("job  " + job.getId() + " started");
+            jlogger.info(job.getId(), "started");
 
             firstTaskStarted = true;
         } else {

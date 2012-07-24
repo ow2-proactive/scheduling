@@ -54,6 +54,7 @@ import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.ow2.proactive.utils.FileUtils;
 
 
 /**

@@ -29,4 +29,3 @@ log4j.appender.SCHEDULER.layout.ConversionPattern=[%d{ISO8601} %-5p] %m%n
 # CONSOLE appender
 log4j.appender.CONSOLE=org.apache.log4j.ConsoleAppender
 log4j.appender.CONSOLE.layout=org.apache.log4j.PatternLayout
-

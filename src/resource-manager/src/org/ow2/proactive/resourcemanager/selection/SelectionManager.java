@@ -52,6 +52,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
+import org.apache.log4j.MDC;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.Node;
@@ -68,8 +69,9 @@ import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptException;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.SelectionScript;
-import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
+import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
+import org.ow2.proactive.utils.appenders.MultipleFileAppender;
 
 
 /**
@@ -146,33 +148,35 @@ public abstract class SelectionManager {
     public abstract boolean processScriptResult(SelectionScript script, ScriptResult<Boolean> scriptResult,
             RMNode rmnode);
 
-    public NodeSet selectNodes(int number, TopologyDescriptor topologyDescriptor,
-            List<SelectionScript> scripts, NodeSet exclusion, Client client, boolean bestEffort) {
+    public NodeSet selectNodes(Criteria criteria, Client client) {
 
-        logger.info(client + " requested " + number + " nodes with " + topologyDescriptor);
+        // logging selection script execution into tasks logs
+        MDC.getContext().put(MultipleFileAppender.FILE_NAMES, criteria.getComputationDescriptors());
+
+        logger.info(client + " requested " + criteria.getSize() + " nodes with " + criteria.getTopology());
         if (logger.isDebugEnabled()) {
-            if (scripts != null && scripts.size() > 0) {
+            if (criteria.getScripts() != null && criteria.getScripts().size() > 0) {
                 logger.debug("Selection scripts:");
-                for (SelectionScript s : scripts) {
+                for (SelectionScript s : criteria.getScripts()) {
                     logger.debug(s);
                 }
             }
 
-            if (exclusion != null && exclusion.size() > 0) {
-                logger.debug("Exclusion nodes:");
-                for (Node n : exclusion) {
+            if (criteria.getBlackList() != null && criteria.getBlackList().size() > 0) {
+                logger.debug("Black list nodes:");
+                for (Node n : criteria.getBlackList()) {
                     logger.debug(n);
                 }
             }
         }
 
         // can throw Exception if topology is disabled
-        TopologyHandler handler = RMCore.topologyManager.getHandler(topologyDescriptor);
+        TopologyHandler handler = RMCore.topologyManager.getHandler(criteria.getTopology());
 
         List<RMNode> freeNodes = rmcore.getFreeNodes();
         // filtering out the "free node list"
         // removing exclusion and checking permissions
-        List<RMNode> filteredNodes = filterOut(freeNodes, exclusion, client);
+        List<RMNode> filteredNodes = filterOut(freeNodes, criteria.getBlackList(), client);
 
         if (filteredNodes.size() == 0) {
             return new NodeSet();
@@ -180,21 +184,22 @@ public abstract class SelectionManager {
 
         // arranging nodes according to the selection policy
         // if could be shuffling or node source priorities
-        List<RMNode> afterPolicyNodes = selectionPolicy.arrangeNodes(number, filteredNodes, client);
+        List<RMNode> afterPolicyNodes = selectionPolicy.arrangeNodes(criteria.getSize(), filteredNodes,
+                client);
 
         // arranging nodes for script execution
-        List<RMNode> arrangedNodes = arrangeNodesForScriptExecution(afterPolicyNodes, scripts);
+        List<RMNode> arrangedNodes = arrangeNodesForScriptExecution(afterPolicyNodes, criteria.getScripts());
 
         List<Node> matchedNodes = null;
-        if (topologyDescriptor.isTopologyBased()) {
+        if (criteria.getTopology().isTopologyBased()) {
             // run scripts on all available nodes
-            matchedNodes = runScripts(arrangedNodes, scripts);
+            matchedNodes = runScripts(arrangedNodes, criteria.getScripts());
         } else {
             // run scripts not on all nodes, but always on missing number of nodes
             // until required node set is found
             matchedNodes = new LinkedList<Node>();
-            while (matchedNodes.size() < number) {
-                int requiredNodesNumber = number - matchedNodes.size();
+            while (matchedNodes.size() < criteria.getSize()) {
+                int requiredNodesNumber = criteria.getSize() - matchedNodes.size();
                 int numberOfNodesForScriptExecution = requiredNodesNumber;
 
                 if (numberOfNodesForScriptExecution < SELECTION_THEADS_NUMBER) {
@@ -209,7 +214,7 @@ public abstract class SelectionManager {
 
                 List<RMNode> subset = arrangedNodes.subList(0, Math.min(numberOfNodesForScriptExecution,
                         arrangedNodes.size()));
-                matchedNodes.addAll(runScripts(subset, scripts));
+                matchedNodes.addAll(runScripts(subset, criteria.getScripts()));
                 // removing subset of arrangedNodes
                 subset.clear();
 
@@ -225,12 +230,12 @@ public abstract class SelectionManager {
         // selecting subset according to topology requirements
         // TopologyHandler handler = RMCore.topologyManager.getHandler(topologyDescriptor);
 
-        if (topologyDescriptor.isTopologyBased()) {
-            logger.debug("Filtering nodes with topology " + topologyDescriptor);
+        if (criteria.getTopology().isTopologyBased()) {
+            logger.debug("Filtering nodes with topology " + criteria.getTopology());
         }
-        NodeSet selectedNodes = handler.select(number, matchedNodes);
+        NodeSet selectedNodes = handler.select(criteria.getSize(), matchedNodes);
 
-        if (selectedNodes.size() < number && !bestEffort) {
+        if (selectedNodes.size() < criteria.getSize() && !criteria.isBestEffort()) {
             selectedNodes.clear();
             if (selectedNodes.getExtraNodes() != null) {
                 selectedNodes.getExtraNodes().clear();
@@ -266,6 +271,8 @@ public abstract class SelectionManager {
             selectedNodes.getExtraNodes().size() + " extra nodes"
                 : "";
         logger.info(client + " will get " + selectedNodes.size() + " nodes " + extraNodes);
+
+        MDC.getContext().remove(MultipleFileAppender.FILE_NAMES);
         return selectedNodes;
     }
 

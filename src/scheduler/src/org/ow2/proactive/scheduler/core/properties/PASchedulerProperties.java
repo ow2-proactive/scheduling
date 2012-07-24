@@ -236,6 +236,9 @@ public enum PASchedulerProperties {
     /** Log forwarder provider */
     LOGS_FORWARDING_PROVIDER("pa.scheduler.logs.provider", PropertyType.STRING),
 
+    // Put logs dedicated to jobs/tasks to this location 
+    SCHEDULER_JOB_LOGS_LOCATION("pa.scheduler.job.logs.location", PropertyType.STRING),
+
     //    /** Log max size (in lines per tasks) */
     //    LOGS_MAX_SIZE("pa.scheduler.logs.maxsize", PropertyType.INTEGER),
 

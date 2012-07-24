@@ -122,6 +122,7 @@ import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
+import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
 
 
@@ -1070,20 +1071,31 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     /**
      * {@inheritDoc}
      */
-    public NodeSet getNodes(int number, TopologyDescriptor descriptor, List<SelectionScript> selectionScrips,
+    public NodeSet getNodes(int number, TopologyDescriptor topology, List<SelectionScript> selectionScrips,
             NodeSet exclusion, boolean bestEffort) {
 
-        if (number <= 0) {
-            throw new IllegalArgumentException("Illegal node number " + number);
+        Criteria criteria = new Criteria(number);
+
+        criteria.setTopology(topology);
+        criteria.setScripts(selectionScrips);
+        criteria.setBlackList(exclusion);
+        criteria.setBestEffort(bestEffort);
+
+        return getNodes(criteria);
+    }
+
+    @Override
+    public NodeSet getNodes(Criteria criteria) {
+        if (criteria.getSize() <= 0) {
+            throw new IllegalArgumentException("Illegal node number " + criteria.getSize());
         } else if (this.toShutDown) {
             // if the resource manager is about to shutdown, do not provide any node
             return new NodeSet();
         } else {
-            if (descriptor == null) {
-                descriptor = TopologyDescriptor.ARBITRARY;
+            if (criteria.getTopology() == null) {
+                criteria.setTopology(TopologyDescriptor.ARBITRARY);
             }
-            return selectionManager.selectNodes(number, descriptor, selectionScrips, exclusion, caller,
-                    bestEffort);
+            return selectionManager.selectNodes(criteria, caller);
         }
     }
 
@@ -1733,4 +1745,5 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             this.internalUnlockNode(rmnode);
         }
     }
+
 }

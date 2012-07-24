@@ -67,6 +67,7 @@ import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
+import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
 
 
@@ -216,5 +217,10 @@ public class TestRMProxy implements ResourceManager {
     public NodeSet getNodes(int number, TopologyDescriptor descriptor,
             List<SelectionScript> selectionScriptsList, NodeSet exclusion, boolean bestEffort) {
         return this.getNodes(number, descriptor, selectionScriptsList, exclusion, bestEffort);
+    }
+
+    @Override
+    public NodeSet getNodes(Criteria criteria) {
+        return target.getNodes(criteria);
     }
 }

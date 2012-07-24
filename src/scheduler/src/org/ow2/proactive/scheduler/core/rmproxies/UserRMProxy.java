@@ -39,15 +39,13 @@ package org.ow2.proactive.scheduler.core.rmproxies;
 import java.net.URI;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scripting.Script;
-import org.ow2.proactive.scripting.SelectionScript;
-import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
+import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
 
 
@@ -67,9 +65,7 @@ public class UserRMProxy {
         this.credentials = credentials;
     }
 
-    public NodeSet getNodes(int number, TopologyDescriptor descriptor,
-            List<SelectionScript> selectionScriptsList, NodeSet exclusion, boolean bestEffort)
-            throws RMProxyCreationException {
+    public NodeSet getNodes(Criteria criteria) throws RMProxyCreationException {
 
         RMProxiesManager.Connection rmConnection = proxiesManager.getCurrentRMConnection();
 
@@ -83,8 +79,7 @@ public class UserRMProxy {
             }
         }
 
-        NodeSet nodeSet = proxyActiveObject.getNodes(number, descriptor, selectionScriptsList, exclusion,
-                bestEffort);
+        NodeSet nodeSet = proxyActiveObject.getNodes(criteria);
         return nodeSet;
     }
 

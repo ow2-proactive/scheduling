@@ -49,10 +49,12 @@ import org.ow2.proactive.resourcemanager.common.event.RMEvent;
 import org.ow2.proactive.resourcemanager.frontend.topology.Topology;
 import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
 import org.ow2.proactive.resourcemanager.nodesource.policy.NodeSourcePolicyFactory;
+import org.ow2.proactive.resourcemanager.utils.TargetType;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
+import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
 
 
@@ -235,6 +237,7 @@ public interface ResourceManager {
      * @param selectionScript criterion to be verified by the returned nodes
      * @return a list of nodes
      */
+    @Deprecated
     public NodeSet getAtMostNodes(int number, SelectionScript selectionScript);
 
     /**
@@ -250,6 +253,7 @@ public interface ResourceManager {
      * @param exclusion a list of node which should not be in the result set
      * @return a list of nodes
      */
+    @Deprecated
     public NodeSet getAtMostNodes(int number, SelectionScript selectionScript, NodeSet exclusion);
 
     /**
@@ -266,6 +270,7 @@ public interface ResourceManager {
      * @param exclusion a list of node which should not be in the result set
      * @return a list of nodes
      */
+    @Deprecated
     public NodeSet getAtMostNodes(int number, List<SelectionScript> selectionScriptsList, NodeSet exclusion);
 
     /**
@@ -284,6 +289,7 @@ public interface ResourceManager {
      * @param exclusion a list of node which should not be in the result set
      * @return a list of nodes
      */
+    @Deprecated
     public NodeSet getAtMostNodes(int number, TopologyDescriptor descriptor,
             List<SelectionScript> selectionScriptsList, NodeSet exclusion);
 
@@ -305,11 +311,22 @@ public interface ResourceManager {
      * @param selectionScriptList criteria to be verified by the returned nodes
      * @param exclusion a list of node which should not be in the result set
      * @param bestEffort the mode of node aggregation
-     * 
+     *  
      * @return a list of nodes
      */
+    @Deprecated
     public NodeSet getNodes(int number, TopologyDescriptor descriptor,
             List<SelectionScript> selectionScriptsList, NodeSet exclusion, boolean bestEffort);
+
+    /**
+     * Finds and books nodes for computations.
+     * Nodes should satisfy specified criteria. 
+     * 
+     * @param nodes criteria 
+     * @see {@link Criteria}
+     * @return a list of nodes according to the criteria
+     */
+    public NodeSet getNodes(Criteria criteria);
 
     /**
      * Releases the node after computations. The specified node is marked as free and become

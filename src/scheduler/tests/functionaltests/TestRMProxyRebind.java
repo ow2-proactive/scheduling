@@ -53,6 +53,7 @@ import org.ow2.proactive.scheduler.core.rmproxies.PerUserConnectionRMProxiesMana
 import org.ow2.proactive.scheduler.core.rmproxies.RMProxiesManager;
 import org.ow2.proactive.scheduler.core.rmproxies.SingleConnectionRMProxiesManager;
 import org.ow2.proactive.scheduler.core.rmproxies.UserRMProxy;
+import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
 
 
@@ -129,7 +130,7 @@ public class TestRMProxyRebind extends MultipleRMTBase {
 
         UserRMProxy proxy1 = proxiesManager.getUserRMProxy("admin", user1Credentials);
         System.out.println("Get one node with RM1");
-        NodeSet rm1NodeSet1 = proxy1.getNodes(1, null, null, null, false);
+        NodeSet rm1NodeSet1 = proxy1.getNodes(new Criteria(1));
         waitWhenNodeSetAcquired(rm1NodeSet1, 1, helper1);
         checkFreeNodes(rm1, NODES_NUMBER - 1);
         checkFreeNodes(rm2, NODES_NUMBER);
@@ -138,7 +139,7 @@ public class TestRMProxyRebind extends MultipleRMTBase {
                 .getFreeNodesNumber());
 
         System.out.println("Get one node with RM1");
-        NodeSet rm1NodeSet2 = proxy1.getNodes(1, null, null, null, false);
+        NodeSet rm1NodeSet2 = proxy1.getNodes(new Criteria(1));
         waitWhenNodeSetAcquired(rm1NodeSet2, 1, helper1);
         checkFreeNodes(rm1, NODES_NUMBER - 2);
         checkFreeNodes(rm2, NODES_NUMBER);
@@ -154,7 +155,7 @@ public class TestRMProxyRebind extends MultipleRMTBase {
         Assert.assertTrue(proxiesManager.getSchedulerRMProxy().isActive().getBooleanValue());
 
         System.out.println("Get one node with RM2");
-        NodeSet rm2NodeSet1 = proxy1.getNodes(1, null, null, null, false);
+        NodeSet rm2NodeSet1 = proxy1.getNodes(new Criteria(1));
         waitWhenNodeSetAcquired(rm2NodeSet1, 1, helper2);
         checkFreeNodes(rm1, NODES_NUMBER - 2);
         checkFreeNodes(rm2, NODES_NUMBER - 1);
@@ -163,7 +164,7 @@ public class TestRMProxyRebind extends MultipleRMTBase {
                 .getFreeNodesNumber());
 
         System.out.println("Get two nodes with RM2");
-        NodeSet rm2NodeSet2 = proxy1.getNodes(2, null, null, null, false);
+        NodeSet rm2NodeSet2 = proxy1.getNodes(new Criteria(2));
         waitWhenNodeSetAcquired(rm2NodeSet2, 2, helper2);
         checkFreeNodes(rm1, NODES_NUMBER - 2);
         checkFreeNodes(rm2, NODES_NUMBER - 3);

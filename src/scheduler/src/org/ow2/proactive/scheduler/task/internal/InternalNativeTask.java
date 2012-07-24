@@ -46,19 +46,18 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
-import org.apache.log4j.Logger;
 import org.hibernate.annotations.AccessType;
 import org.hibernate.annotations.Proxy;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.NativeExecutableContainer;
 import org.ow2.proactive.scheduler.task.launcher.NativeTaskLauncher;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncherInitializer;
+import org.ow2.proactive.scheduler.util.TaskLogger;
 
 
 /**
@@ -77,7 +76,7 @@ import org.ow2.proactive.scheduler.task.launcher.TaskLauncherInitializer;
 @XmlRootElement(name = "task")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class InternalNativeTask extends InternalTask {
-    public static final Logger logger = ProActiveLogger.getLogger(InternalNativeTask.class);
+    public static final TaskLogger logger = TaskLogger.getInstance();
 
     @Id
     @GeneratedValue
@@ -107,7 +106,7 @@ public class InternalNativeTask extends InternalTask {
             NodeException {
         NativeTaskLauncher launcher;
 
-        logger.info("task " + getTaskInfo().getTaskId() + " creating native task launcher");
+        logger.info(getTaskInfo().getTaskId(), "creating native task launcher");
         TaskLauncherInitializer tli = getDefaultTaskLauncherInitializer(job);
         launcher = (NativeTaskLauncher) PAActiveObject.newActive(NativeTaskLauncher.class.getName(),
                 new Object[] { tli }, node);

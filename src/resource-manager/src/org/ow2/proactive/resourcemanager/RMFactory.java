@@ -36,6 +36,7 @@
  */
 package org.ow2.proactive.resourcemanager;
 
+import java.io.File;
 import java.io.IOException;
 import java.rmi.AlreadyBoundException;
 
@@ -55,6 +56,9 @@ import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProper
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
+import org.ow2.proactive.resourcemanager.selection.SelectionManager;
+import org.ow2.proactive.utils.FileUtils;
+import org.ow2.proactive.utils.appenders.MultipleFileAppender;
 
 
 /**
@@ -98,6 +102,9 @@ public class RMFactory {
                 //configure application
                 configure(initializer);
             }
+
+            configureLog4j();
+
             Node nodeRM = NodeFactory.createLocalNode(PAResourceManagerProperties.RM_NODE_NAME
                     .getValueAsString(), false, null, null);
             String RMCoreName = RMConstants.NAME_ACTIVE_OBJECT_RMCORE;
@@ -135,6 +142,29 @@ public class RMFactory {
         s = initializer.getRMHomePath();
         if (s != null) {
             System.setProperty(PAResourceManagerProperties.RM_HOME.getKey(), s);
+        }
+    }
+
+    private static void configureLog4j() {
+
+        // Log4j configuration for selection process (if enabled)
+        if (PAResourceManagerProperties.RM_SELECTION_LOGS_LOCATION.isSet()) {
+
+            String logsLocation = PAResourceManagerProperties
+                    .getAbsolutePath(PAResourceManagerProperties.RM_SELECTION_LOGS_LOCATION
+                            .getValueAsString());
+
+            boolean cleanStart = PAResourceManagerProperties.RM_DB_HIBERNATE_DROPDB.getValueAsBoolean();
+            if (cleanStart) {
+                // removing selection logs directory
+                logger.info("Removing logs " + logsLocation);
+                FileUtils.removeDir(new File(logsLocation));
+            }
+
+            Logger selectionLogger = Logger.getLogger(SelectionManager.class.getPackage().getName());
+            MultipleFileAppender appender = new MultipleFileAppender();
+            appender.setFilesLocation(logsLocation);
+            selectionLogger.addAppender(appender);
         }
     }
 

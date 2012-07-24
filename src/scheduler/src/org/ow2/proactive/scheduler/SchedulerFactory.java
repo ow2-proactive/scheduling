@@ -36,6 +36,7 @@
  */
 package org.ow2.proactive.scheduler;
 
+import java.io.File;
 import java.net.URI;
 
 import javax.security.auth.login.LoginException;
@@ -48,6 +49,7 @@ import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
+import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.scheduler.authentication.SchedulerAuthentication;
@@ -59,6 +61,10 @@ import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.core.SchedulerFrontend;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.exception.AdminSchedulerException;
+import org.ow2.proactive.scheduler.util.JobLogger;
+import org.ow2.proactive.scheduler.util.TaskLogger;
+import org.ow2.proactive.utils.FileUtils;
+import org.ow2.proactive.utils.appenders.FileAppender;
 
 
 /**
@@ -123,6 +129,7 @@ public class SchedulerFactory {
             }
             try {
                 tryJoinRM(rmURL);
+                configureLog4j();
                 String policy = initializer.getPolicyFullClassName();
                 //start scheduler
                 createScheduler(rmURL, policy);
@@ -168,6 +175,31 @@ public class SchedulerFactory {
         s = initializer.getSchedulerHomePath();
         if (s != null) {
             System.setProperty(PASchedulerProperties.SCHEDULER_HOME.getKey(), s);
+        }
+    }
+
+    private static void configureLog4j() {
+        // Log4j configuration for jobs/tasks (if enabled)
+        if (PASchedulerProperties.SCHEDULER_JOB_LOGS_LOCATION.isSet()) {
+            String logsLocation = PASchedulerProperties
+                    .getAbsolutePath(PASchedulerProperties.SCHEDULER_JOB_LOGS_LOCATION.getValueAsString());
+
+            boolean cleanStart = PASchedulerProperties.SCHEDULER_DB_HIBERNATE_DROPDB.getValueAsBoolean();
+            if (cleanStart) {
+                // removing selection logs directory
+                logger.info("Removing logs " + logsLocation);
+                FileUtils.removeDir(new File(logsLocation));
+            }
+
+            Logger jobLogger = Logger.getLogger(JobLogger.class);
+            FileAppender appender = new FileAppender();
+            appender.setFilesLocation(logsLocation);
+            jobLogger.addAppender(appender);
+
+            Logger taskLogger = Logger.getLogger(TaskLogger.class);
+            appender = new FileAppender();
+            appender.setFilesLocation(logsLocation);
+            taskLogger.addAppender(appender);
         }
     }
 
@@ -222,6 +254,7 @@ public class SchedulerFactory {
             logger.info("Scheduler is now ready to be started !");
         } catch (Exception e) {
             logger.error(e);
+            e.printStackTrace();
             throw new AdminSchedulerException(e.getMessage());
         }
     }

@@ -248,11 +248,10 @@ public class EC2Deployer implements java.io.Serializable {
         List<ImageDescription> imgs = this.getAvailableImages(all);
 
         for (ImageDescription img : imgs) {
-            if (img.getImageId().equals(amiId))
-            {
+            if (img.getImageId().equals(amiId)) {
                 //cache it 
                 cachedImageDescriptors.put(amiId, img);
-            	return img;
+                return img;
             }
         }
 

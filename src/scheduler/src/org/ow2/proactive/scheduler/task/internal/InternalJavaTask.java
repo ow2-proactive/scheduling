@@ -45,18 +45,17 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlTransient;
 
-import org.apache.log4j.Logger;
 import org.hibernate.annotations.AccessType;
 import org.hibernate.annotations.Proxy;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.JavaExecutableContainer;
 import org.ow2.proactive.scheduler.task.launcher.JavaTaskLauncher;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
+import org.ow2.proactive.scheduler.util.TaskLogger;
 
 
 /**
@@ -73,7 +72,7 @@ import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class InternalJavaTask extends InternalTask {
 
-    public static final Logger logger = ProActiveLogger.getLogger(InternalJavaTask.class);
+    public static final TaskLogger logger = TaskLogger.getInstance();
 
     @Id
     @GeneratedValue
@@ -107,7 +106,7 @@ public class InternalJavaTask extends InternalTask {
     public TaskLauncher createLauncher(InternalJob job, Node node) throws ActiveObjectCreationException,
             NodeException {
 
-        logger.info("task " + getTaskInfo().getTaskId() + " creating java task launcher");
+        logger.info(getTaskInfo().getTaskId(), "creating java task launcher");
         TaskLauncher launcher = (TaskLauncher) PAActiveObject.newActive(JavaTaskLauncher.class.getName(),
                 new Object[] { getDefaultTaskLauncherInitializer(job) }, node);
         setExecuterInformations(new ExecuterInformations(launcher, node));

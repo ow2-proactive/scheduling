@@ -27,8 +27,7 @@ import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptHandler;
 import org.ow2.proactive.scripting.ScriptLoader;
 import org.ow2.proactive.scripting.ScriptResult;
-import org.ow2.proactive.scripting.SelectionScript;
-import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
+import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
 
 
@@ -88,9 +87,8 @@ public class RMProxyActiveObject {
     }
 
     @ImmediateService
-    public NodeSet getNodes(int number, TopologyDescriptor descriptor,
-            List<SelectionScript> selectionScriptsList, NodeSet exclusion, boolean bestEffort) {
-        return rm.getNodes(number, descriptor, selectionScriptsList, exclusion, bestEffort);
+    public NodeSet getNodes(Criteria criteria) {
+        return rm.getNodes(criteria);
     }
 
     @ImmediateService

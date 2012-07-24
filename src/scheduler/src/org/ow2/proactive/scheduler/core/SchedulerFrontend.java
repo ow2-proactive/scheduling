@@ -55,7 +55,6 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.mop.MOP;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.permissions.MethodCallPermission;
@@ -108,6 +107,8 @@ import org.ow2.proactive.scheduler.permissions.ChangePriorityPermission;
 import org.ow2.proactive.scheduler.permissions.ConnectToResourceManagerPermission;
 import org.ow2.proactive.scheduler.permissions.GetOwnStateOnlyPermission;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
+import org.ow2.proactive.scheduler.util.JobLogger;
+import org.ow2.proactive.scheduler.util.TaskLogger;
 
 
 /**
@@ -123,7 +124,9 @@ import org.ow2.proactive.scheduler.task.internal.InternalTask;
 public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Scheduler, RunActive {
 
     /** Scheduler logger */
-    public static final Logger logger = ProActiveLogger.getLogger(SchedulerFrontend.class);
+    public static final Logger logger = Logger.getLogger(SchedulerCore.class);
+    public static final TaskLogger tlogger = TaskLogger.getInstance();
+    public static final JobLogger jlogger = JobLogger.getInstance();
 
     /** A repeated warning message */
     private static final String ACCESS_DENIED = "Access denied ! You are not connected or your session has expired !";
@@ -439,7 +442,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
         ident.addSubmit();
         //send update user event
         usersUpdated(new NotificationData<UserIdentification>(SchedulerEvent.USERS_UPDATE, ident));
-        logger.info("job  " + job.getId() + " submitted: name '" + userJob.getName() + "', tasks '" +
+        jlogger.info(job.getId(), "submitted: name '" + userJob.getName() + "', tasks '" +
             job.getTotalNumberOfTasks() + "', owner '" + job.getOwner() + "'");
         return job.getId();
     }
@@ -456,7 +459,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
                 "You do not have permission to get the result of this job !");
 
         if (!ij.isFinished()) {
-            logger.info("Job '" + jobId + "' is not finished");
+            jlogger.info(jobId, "is not finished");
             return null;
         }
 
@@ -971,9 +974,9 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
         }
 
         if (jobs.get(jobId).isFinished()) {
-            String msg = "Job '" + jobId + "' is already finished";
-            logger.info(msg);
-            throw new JobAlreadyFinishedException(msg);
+            String msg = " is already finished";
+            jlogger.info(jobId, msg);
+            throw new JobAlreadyFinishedException("Job " + jobId + msg);
         }
 
         scheduler.changeJobPriority(jobId, priority);
@@ -1165,7 +1168,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
             }
             clearListeners();
         } catch (SecurityException e) {
-            logger.error(e);
+            logger.error("", e);
         }
     }
 
@@ -1177,8 +1180,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
     private void dispatchJobSubmitted(JobState job) {
         try {
             if (logger.isDebugEnabled()) {
-                logger.debug("job  " + job.getJobInfo().getJobId() + " event [" +
-                    SchedulerEvent.JOB_SUBMITTED + "]");
+                jlogger.debug(job.getJobInfo().getJobId(), " event [" + SchedulerEvent.JOB_SUBMITTED + "]");
             }
             for (UserIdentificationImpl userId : identifications.values()) {
                 //if this user has a listener
@@ -1201,7 +1203,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
             }
             clearListeners();
         } catch (SecurityException e) {
-            logger.error(e);
+            logger.error("", e);
         }
     }
 
@@ -1214,8 +1216,15 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
     private void dispatchJobStateUpdated(String owner, NotificationData<JobInfo> notification) {
         try {
             if (logger.isDebugEnabled()) {
-                logger.debug("job  " + notification.getData().getJobId() + " event [" +
-                    notification.getEventType() + "]");
+                // if in process of job removal do not use jlogger as job log file
+                // was already removed and it will create it again
+                if (notification.getEventType() == SchedulerEvent.JOB_REMOVE_FINISHED) {
+                    logger.debug("job " + notification.getData().getJobId() + " event [" +
+                        notification.getEventType() + "]");
+                } else {
+                    jlogger.debug(notification.getData().getJobId(), " event [" +
+                        notification.getEventType() + "]");
+                }
             }
             for (UserIdentificationImpl userId : identifications.values()) {
                 //if this user has a listener
@@ -1234,7 +1243,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
             }
             clearListeners();
         } catch (SecurityException e) {
-            logger.error(e);
+            logger.error("", e);
         }
     }
 
@@ -1247,8 +1256,8 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
     private void dispatchTaskStateUpdated(String owner, NotificationData<TaskInfo> notification) {
         try {
             if (logger.isDebugEnabled()) {
-                logger.debug("task " + notification.getData().getTaskId() + " event [" +
-                    notification.getEventType() + "]");
+                tlogger.debug(notification.getData().getTaskId(), "event [" + notification.getEventType() +
+                    "]");
             }
             for (UserIdentificationImpl userId : identifications.values()) {
                 //if this user has a listener
@@ -1267,7 +1276,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
             }
             clearListeners();
         } catch (SecurityException e) {
-            logger.error(e);
+            logger.error("", e);
         }
     }
 
@@ -1303,7 +1312,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
                 clearListeners();
             }
         } catch (SecurityException e) {
-            logger.error(e);
+            logger.error("", e);
         }
         this.jmxHelper.getSchedulerRuntimeMBean().usersUpdatedEvent(notification);
     }

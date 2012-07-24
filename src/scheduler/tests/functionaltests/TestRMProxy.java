@@ -57,6 +57,7 @@ import org.ow2.proactive.scheduler.core.rmproxies.SchedulerRMProxy;
 import org.ow2.proactive.scheduler.core.rmproxies.SingleConnectionRMProxiesManager;
 import org.ow2.proactive.scheduler.core.rmproxies.UserRMProxy;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
+import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
 import org.ow2.tests.FunctionalTest;
 
@@ -158,8 +159,8 @@ public class TestRMProxy extends FunctionalTest {
             throws Exception {
         System.out.println("Request nodes for two users");
 
-        NodeSet nodeSet1 = proxy1.getNodes(1, null, null, null, false);
-        NodeSet nodeSet2 = proxy2.getNodes(2, null, null, null, false);
+        NodeSet nodeSet1 = proxy1.getNodes(new Criteria(1));
+        NodeSet nodeSet2 = proxy2.getNodes(new Criteria(2));
         waitWhenNodeSetAcquired(nodeSet1, 1);
         waitWhenNodeSetAcquired(nodeSet2, 2);
 
@@ -184,7 +185,7 @@ public class TestRMProxy extends FunctionalTest {
     private void requestTooManyNodes(UserRMProxy proxy, ResourceManager rm) throws Exception {
         System.out.println("Request more nodes than RM has");
 
-        NodeSet nodeSet = proxy.getNodes(NODES_NUMBER + 1, null, null, null, false);
+        NodeSet nodeSet = proxy.getNodes(new Criteria(NODES_NUMBER + 1));
         PAFuture.waitFor(nodeSet);
         Assert.assertEquals(0, nodeSet.size());
         Assert.assertEquals(NODES_NUMBER, rm.getState().getFreeNodesNumber());
@@ -194,7 +195,9 @@ public class TestRMProxy extends FunctionalTest {
         System.out.println("Request NodeSet with extra nodes");
 
         TopologyDescriptor topology = TopologyDescriptor.SINGLE_HOST_EXCLUSIVE;
-        NodeSet nodeSet = proxy.getNodes(1, topology, null, null, false);
+        Criteria criteria = new Criteria(1);
+        criteria.setTopology(topology);
+        NodeSet nodeSet = proxy.getNodes(criteria);
         PAFuture.waitFor(nodeSet);
         Assert.assertEquals(1, nodeSet.size());
         Assert.assertNotNull("Extra nodes are expected", nodeSet.getExtraNodes());
@@ -211,7 +214,7 @@ public class TestRMProxy extends FunctionalTest {
 
         List<NodeSet> nodeSets = new ArrayList<NodeSet>();
         for (int i = 0; i < NODES_NUMBER; i++) {
-            nodeSets.add(proxy.getNodes(1, null, null, null, false));
+            nodeSets.add(proxy.getNodes(new Criteria(1)));
         }
 
         for (NodeSet nodeSet : nodeSets) {
@@ -227,7 +230,7 @@ public class TestRMProxy extends FunctionalTest {
     private void requestReleaseOneNode(UserRMProxy proxy, ResourceManager rm) throws Exception {
         System.out.println("Request and release single node");
 
-        NodeSet nodeSet = proxy.getNodes(1, null, null, null, false);
+        NodeSet nodeSet = proxy.getNodes(new Criteria(1));
         waitWhenNodeSetAcquired(nodeSet, 1);
 
         proxy.releaseNodes(nodeSet);
@@ -239,7 +242,7 @@ public class TestRMProxy extends FunctionalTest {
     private void testSplitNodeSet(UserRMProxy proxy, ResourceManager rm) throws Exception {
         System.out.println("Request as single NodeSet, release it as two NodeSets");
 
-        NodeSet nodeSet = proxy.getNodes(3, null, null, null, false);
+        NodeSet nodeSet = proxy.getNodes(new Criteria(3));
         waitWhenNodeSetAcquired(nodeSet, 3);
         Assert.assertEquals(NODES_NUMBER - 3, rm.getState().getFreeNodesNumber());
 
