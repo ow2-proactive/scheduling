@@ -137,8 +137,8 @@ eval $JAVACMD \
 
 SCHED_PID=$!
 
-SCHED_LINE="Scheduler successfully created on "
-RM_LINE="Resource Manager created on "
+SCHED_LINE="The scheduler created on "
+RM_LINE="The resource manager with 4 local nodes created on "
 
 while true; do
 	if [ "$(grep "$SCHED_LINE" $SCHED_OUT)" ]; then

@@ -36,11 +36,14 @@
  */
 package org.ow2.proactive.scheduler.core;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -84,8 +87,10 @@ import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
+import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
@@ -1485,4 +1490,70 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
         }
     }
 
+    @Override
+    @ImmediateService
+    public String getJobServerLogs(String jobId) throws UnknownJobException, NotConnectedException,
+            PermissionException {
+        JobId id = JobIdImpl.makeJobId(jobId);
+        checkJobOwner("getJobServerLogs", id, "You do not have permissions to get the logs of this job");
+
+        String folderName = PASchedulerProperties.SCHEDULER_HOME.getValueAsString() +
+            System.getProperty("file.separator") +
+            PASchedulerProperties.SCHEDULER_JOB_LOGS_LOCATION.getValueAsString();
+
+        StringBuilder result = new StringBuilder();
+        File jobLogsFile = new File(folderName + jobId);
+        if (jobLogsFile.exists()) {
+            try {
+                result.append("================= Job " + jobId + " logs =================\n");
+                result.append(new Scanner(jobLogsFile).useDelimiter("\\Z").next());
+
+                for (TaskState t : jobsMap.get(id).getTasks()) {
+                    result.append("\n================ Task " + t.getId() + " logs =================\n");
+                    result.append(getTaskServerLogs(t.getId()));
+                }
+
+                return result.toString();
+            } catch (FileNotFoundException e) {
+                // should be be here
+                logger.warn(e);
+            }
+        }
+
+        return "Cannot retieve logs for job " + jobId;
+    }
+
+    @Override
+    @ImmediateService
+    public String getTaskServerLogs(String jobId, String taskName) throws UnknownJobException,
+            UnknownTaskException, NotConnectedException, PermissionException {
+
+        JobId id = JobIdImpl.makeJobId(jobId);
+        checkJobOwner("getTaskServerLogs", id, "You do not have permission to get the task logs of this job");
+
+        for (TaskState t : jobsMap.get(id).getTasks()) {
+            if (t.getName().equals(taskName)) {
+                return getTaskServerLogs(t.getId());
+            }
+        }
+
+        throw new UnknownTaskException("Unknow task " + taskName + " in job " + jobId);
+    }
+
+    public String getTaskServerLogs(TaskId id) {
+        String folderName = PASchedulerProperties.SCHEDULER_HOME.getValueAsString() +
+            System.getProperty("file.separator") +
+            PASchedulerProperties.SCHEDULER_JOB_LOGS_LOCATION.getValueAsString();
+
+        File taskLogsFile = new File(folderName + id);
+        if (taskLogsFile.exists()) {
+            try {
+                return new Scanner(taskLogsFile).useDelimiter("\\Z").next();
+            } catch (FileNotFoundException e) {
+                // should not be here
+                logger.warn(e);
+            }
+        }
+        return "Cannot retrieve logs for task " + id;
+    }
 }

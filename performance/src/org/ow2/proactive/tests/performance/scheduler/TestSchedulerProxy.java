@@ -356,4 +356,15 @@ public class TestSchedulerProxy implements Scheduler {
         target.renewSession();
     }
 
+    @Override
+    public String getJobServerLogs(String id) throws UnknownJobException, NotConnectedException,
+            PermissionException {
+        return target.getJobServerLogs(id);
+    }
+
+    @Override
+    public String getTaskServerLogs(String id, String taskName) throws UnknownJobException,
+            UnknownTaskException, NotConnectedException, PermissionException {
+        return target.getTaskServerLogs(id, taskName);
+    }
 }

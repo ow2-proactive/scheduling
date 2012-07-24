@@ -47,7 +47,7 @@ SCHEDULER_CONFIG=$SCHEDULER_CONFIG" -Dpa.scheduler.dataspace.globalurl=\"/tmp/\"
 eval $JAVACMD $SCHEDULER_CONFIG -Dderby.stream.error.file=\"$PA_SCHEDULER/.logs/derby.log\" $opt org.ow2.proactive.scheduler.util.SchedulerStarter | tee $SCHEDULER_OUT 2>&1 &
 
 SCHEDULER_PID=$!
-SCHEDULER_LINE="Scheduler successfully created on "
+SCHEDULER_LINE="The scheduler created on "
 while true; do
         if [ "$(grep "$SCHEDULER_LINE" $SCHEDULER_OUT)" ]; then
                 SCHEDULER_URL=$(grep "$SCHEDULER_LINE" $SCHEDULER_OUT| sed -e "s/^${SCHEDULER_LINE}\(.*\)/\1/g")

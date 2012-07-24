@@ -218,3 +218,6 @@ function reconnect(schedURL){
 	s_.reconnect_();
 }
 
+function logs(jobId,taskName){
+	s_.logs_([jobId, taskName]);
+}

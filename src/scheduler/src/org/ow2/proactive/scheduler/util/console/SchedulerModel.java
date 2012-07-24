@@ -50,6 +50,7 @@ import java.util.Map.Entry;
 
 import javax.security.auth.login.LoginException;
 
+import org.apache.commons.cli.Option;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.authentication.crypto.Credentials;
@@ -180,6 +181,7 @@ public class SchedulerModel extends ConsoleModel {
                 .add(new Command("jobstate(id[,taskSort])",
                     "Get the current state of the given job (parameter is an int or a string representing the jobId)"));
         commands.add(new Command("listjobs()", "Display the list of jobs managed by the scheduler"));
+        commands.add(new Command("logs(jobId,[taskName])", "Get server logs of given job or task"));
         commands.add(new Command("stats()", "Display some statistics about the Scheduler"));
         commands.add(new Command("myaccount()", "Display current user account information"));
         commands.add(new Command("account(username)", "Display account information by username"));
@@ -1162,6 +1164,27 @@ public class SchedulerModel extends ConsoleModel {
             oaf.addLine(list);
         }
         print(Tools.getStringAsArray(oaf));
+    }
+
+    /**
+     * Retrieves logs for particular job or tasks
+     */
+    public void logs_(String[] optionValues) {
+        if (optionValues == null || optionValues.length < 1) {
+            model.error("Please specify at least job id. Start with --help for more informations");
+        }
+        try {
+            String jobId = optionValues[0];
+            if (optionValues.length == 1) {
+                print(scheduler.getJobServerLogs(jobId));
+            } else {
+                String taskName = optionValues[1];
+                print(scheduler.getTaskServerLogs(jobId, taskName));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            handleExceptionDisplay("*ERROR*", e);
+        }
     }
 
 }

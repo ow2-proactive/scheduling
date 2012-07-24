@@ -359,5 +359,4 @@ public interface SchedulerCoreMethods {
      * @throws PermissionException if you have not enough permission to access this method.
      */
     public boolean reloadPolicyConfiguration() throws NotConnectedException, PermissionException;
-
 }

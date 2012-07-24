@@ -550,4 +550,16 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
         return mbeaninfoviewer.getMappedInfo(mbeanNameAsString);
     }
 
+    @Override
+    public String getJobServerLogs(String id) throws UnknownJobException, NotConnectedException,
+            PermissionException {
+        return uischeduler.getJobServerLogs(id);
+    }
+
+    @Override
+    public String getTaskServerLogs(String id, String taskName) throws UnknownJobException,
+            UnknownTaskException, NotConnectedException, PermissionException {
+        return uischeduler.getTaskServerLogs(id, taskName);
+    }
+
 }

@@ -477,4 +477,41 @@ public interface Scheduler extends SchedulerCoreMethods {
      */
     public void renewSession() throws NotConnectedException;
 
+    /**
+     * Retrieves server logs for a job with the given id.
+     * Only the job owner of admin if the scheduler can request
+     * these logs.
+     * 
+     * It's a combination of corresponding tasks logs belonging to this job
+     * plus some extra job specific information.
+     * 
+     * @param id of the job for which logs are requested
+     * 
+     * @return job's logs
+     * @throws UnknownJobException if the job does not exist.
+     * @throws NotConnectedException if you are not authenticated.
+     * @throws PermissionException if you have not enough permission to access this method.
+     */
+    public String getJobServerLogs(String id) throws UnknownJobException, NotConnectedException,
+            PermissionException;
+
+    /**
+     * Retrieves server logs for a task with the given id.
+     * Only the job owner of admin if the scheduler can request
+     * these logs.
+     * 
+     * It's a combination of corresponding tasks logs belonging to this job
+     * plus some extra job specific information.
+     * 
+     * @param id of the job where the task is.
+     * @param taskName the name of the task.
+     * 
+     * @return tasks's logs
+     * @throws UnknownJobException if the job does not exist.
+     * @throws UnknownTaskException if this task does not exist in the job.
+     * @throws NotConnectedException if you are not authenticated.
+     * @throws PermissionException if you have not enough permission to access this method.
+     */
+    public String getTaskServerLogs(String id, String taskName) throws UnknownJobException,
+            UnknownTaskException, NotConnectedException, PermissionException;
 }

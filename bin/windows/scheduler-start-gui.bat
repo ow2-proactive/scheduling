@@ -166,12 +166,12 @@ IF [%_result%]==[] (
 set SCHED_URL_STR=
 set RM_URL_STR=
 :WaitLoop
-        for /f "tokens=*" %%i in ('FINDSTR /C:"Resource Manager created on" %SCHED_OUT%') do set RM_URL_STR=%%i
+        for /f "tokens=*" %%i in ('FINDSTR /C:"The resource manager with 4 local nodes created on" %SCHED_OUT%') do set RM_URL_STR=%%i
         IF NOT ["%RM_URL_STR%"]==[""] (
                 SET RM_URL=%RM_URL_STR:~28%
         )
 
-        for /f "tokens=*" %%i in ('FINDSTR /C:"Scheduler successfully created on" %SCHED_OUT%') do set SCHED_URL_STR=%%i
+        for /f "tokens=*" %%i in ('FINDSTR /C:"The scheduler created on" %SCHED_OUT%') do set SCHED_URL_STR=%%i
         IF ["%SCHED_URL_STR%"]==[""] (
                 echo Waiting for the scheduler...
                 call :delay 5 

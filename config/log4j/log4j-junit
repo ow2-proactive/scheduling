@@ -9,6 +9,11 @@ log4j.logger.org.ow2.proactive.resourcemanager=INFO
 log4j.logger.org.hibernate=WARN
 log4j.logger.com.mchange=WARN
 
+log4j.logger.org.ow2.proactive.scheduler.util.JobLogger=DEBUG, JOB_FILES
+log4j.logger.org.ow2.proactive.scheduler.util.TaskLogger=DEBUG, TASK_FILES
+log4j.logger.org.ow2.proactive.resourcemanager.selection=DEBUG, SELECTION_FILES
+
 log4j.appender.CONSOLE=org.apache.log4j.ConsoleAppender
 log4j.appender.CONSOLE.layout=org.apache.log4j.PatternLayout
 log4j.appender.CONSOLE.layout.ConversionPattern=[%d{ISO8601} %-5p] [%C{1}.%M] %m%n
+

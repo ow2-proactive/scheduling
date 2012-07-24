@@ -567,6 +567,12 @@ public class SchedulerController {
         opt.setArgs(1);
         actionGroup.addOption(opt);
 
+        opt = new Option("ll", "logs", true, control + "Get server logs of given job or task");
+        opt.setArgName("jobId [taskName]");
+        opt.setRequired(false);
+        opt.setArgs(2);
+        actionGroup.addOption(opt);
+
         options.addOptionGroup(actionGroup);
 
         return actionGroup;
@@ -627,6 +633,9 @@ public class SchedulerController {
                 model.error("taskoutput must have two arguments. Start with --help for more informations");
             }
             model.toutput_(optionValues[0], optionValues[1]);
+        } else if (cmd.hasOption("logs")) {
+            String[] optionValues = cmd.getOptionValues("logs");
+            model.logs_(optionValues);
         } else if (cmd.hasOption("jobpriority")) {
             try {
                 model.priority_(cmd.getOptionValues("jobpriority")[0], cmd.getOptionValues("jobpriority")[1]);

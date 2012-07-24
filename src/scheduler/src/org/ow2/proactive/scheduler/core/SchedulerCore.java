@@ -2155,5 +2155,4 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
         frontend.schedulerStateUpdated(SchedulerEvent.DB_DOWN);
         kill(SchedulerStatus.DB_DOWN);
     }
-
 }
