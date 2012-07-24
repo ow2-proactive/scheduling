@@ -41,7 +41,9 @@ import java.io.Serializable;
 import java.security.Permission;
 import java.util.HashMap;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.apache.log4j.Priority;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
@@ -393,7 +395,7 @@ public class RMNodeImpl implements RMNode, Serializable {
     public synchronized void clean() throws NodeException {
         handler = null;
         try {
-            logger.debug("Cleaning the node " + nodeURL);
+            logger.debug(nodeURL + " : cleaning");
             node.killAllActiveObjects();
         } catch (IOException e) {
             throw new NodeException("Node is down");
@@ -547,4 +549,5 @@ public class RMNodeImpl implements RMNode, Serializable {
     public String getJMXUrl(JMXTransportProtocol protocol) {
         return jmxUrls[protocol.ordinal()];
     }
+
 }

@@ -107,7 +107,7 @@ public class InternalJavaTask extends InternalTask {
     public TaskLauncher createLauncher(InternalJob job, Node node) throws ActiveObjectCreationException,
             NodeException {
 
-        logger.info("Create java task launcher");
+        logger.info("task " + getTaskInfo().getTaskId() + " creating java task launcher");
         TaskLauncher launcher = (TaskLauncher) PAActiveObject.newActive(JavaTaskLauncher.class.getName(),
                 new Object[] { getDefaultTaskLauncherInitializer(job) }, node);
         setExecuterInformations(new ExecuterInformations(launcher, node));

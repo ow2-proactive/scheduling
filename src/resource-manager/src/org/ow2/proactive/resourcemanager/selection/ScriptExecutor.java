@@ -81,13 +81,13 @@ public class ScriptExecutor implements Callable<Node> {
             for (SelectionScript script : selectionScriptList) {
                 if (manager.isPassed(script, rmnode)) {
                     // already executed static script
-                    logger.info("Skipping script execution " + script.hashCode() + " on node " +
-                        rmnode.getNodeURL());
+                    logger.info(rmnode.getNodeURL() + " : " + script.hashCode() +
+                        " skipping script execution");
                     //scriptExecitionResults.add(new ScriptResult<Boolean>(true));
                     continue;
                 }
 
-                logger.info("Executing script " + script.hashCode() + " on node " + rmnode.getNodeURL());
+                logger.info(rmnode.getNodeURL() + " : " + script.hashCode() + " executing");
                 try {
                     ScriptResult<Boolean> scriptResult = rmnode.executeScript(script);
 
@@ -98,9 +98,9 @@ public class ScriptExecutor implements Callable<Node> {
                     if (!MOP.isReifiedObject(scriptResult) && scriptResult.getException() != null) {
                         // could not create script execution handler
                         // probably the node id down
-                        logger.warn("Cannot execute script " + script.hashCode() + " on the node " +
-                            rmnode.getNodeURL(), scriptResult.getException());
-                        logger.warn("Checking if the node " + rmnode.getNodeURL() + " is still alive");
+                        logger.warn(rmnode.getNodeURL() + " : " + script.hashCode() + " exception",
+                                scriptResult.getException());
+                        logger.warn(rmnode.getNodeURL() + " : pinging the node");
                         rmnode.getNodeSource().pingNode(rmnode.getNode());
 
                         nodeMatch = false;
@@ -119,7 +119,20 @@ public class ScriptExecutor implements Callable<Node> {
                         if (scriptResult != null && scriptResult.errorOccured()) {
                             nodeMatch = false;
                             exception = new ScriptException(scriptResult.getException());
+                            logger.warn(rmnode.getNodeURL() + " : exception during the script execution",
+                                    scriptResult.getException());
                             break;
+                        }
+
+                        if (logger.isDebugEnabled()) {
+                            if (scriptResult.getResult()) {
+                                logger.debug(rmnode.getNodeURL() + " : " + script.hashCode() + " result " +
+                                    scriptResult.getResult());
+                            }
+                            if (scriptResult.getOutput() != null && scriptResult.getOutput().length() > 0) {
+                                logger.debug(rmnode.getNodeURL() + " : " + script.hashCode() + " output\n" +
+                                    scriptResult.getOutput());
+                            }
                         }
 
                         // processing script result and updating knowledge base of
@@ -132,34 +145,40 @@ public class ScriptExecutor implements Callable<Node> {
                     }
                 } catch (Exception ex) {
                     // proactive or network exception occurred when script was executed
+                    logger.warn(rmnode.getNodeURL() + " : " + script.hashCode() + " exception", ex);
                     nodeMatch = false;
                     exception = new ScriptException(ex);
+                    break;
                 }
             }
         }
 
         manager.scriptExecutionFinished(rmnode.getNodeURL());
         if (logger.isDebugEnabled()) {
-            logger.debug("Node " + rmnode.getNodeURL() + " matched: " + nodeMatch);
+            if (nodeMatch) {
+                logger.debug(rmnode.getNodeURL() + " : selected");
+            } else {
+                logger.debug(rmnode.getNodeURL() + " : not selected");
+            }
         }
 
         // cleaning the node
         try {
             rmnode.clean();
         } catch (Throwable t) {
-            logger.warn("Exception while cleaning the node " + rmnode.getNodeURL() + ": " + t.getMessage());
-            logger.warn("Checking if the node " + rmnode.getNodeURL() + " is alive");
+            logger.warn(rmnode.getNodeURL() + " : exception in cleaning", t);
+            logger.warn(rmnode.getNodeURL() + " : pinging the node");
             try {
                 // 'pingNode' call can fail with exception if NodeSource was destroyed
                 rmnode.getNodeSource().pingNode(rmnode.getNode());
             } catch (Throwable pingError) {
-                logger.warn("NodeSource seems to be removed: " + rmnode.getNodeSourceName(), pingError);
+                logger.warn(rmnode.getNodeURL() + " : nodeSource " + rmnode.getNodeSourceName() +
+                    " seems to be removed ", pingError);
             }
             return null;
         }
 
         if (exception != null) {
-            logger.warn("Exception occured on then node " + rmnode.getNodeURL(), exception);
             throw exception;
         }
         if (nodeMatch) {

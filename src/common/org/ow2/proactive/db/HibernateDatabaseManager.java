@@ -123,7 +123,7 @@ public abstract class HibernateDatabaseManager implements DatabaseManager, Filte
      */
     protected SessionFactory getSessionFactory() {
         //build if not
-        getDevLogger().debug("Request to build the Hibernate session Factory");
+        getLogger().debug("Request to build the Hibernate session Factory");
         build();
         return sessionFactory;
     }
@@ -161,13 +161,13 @@ public abstract class HibernateDatabaseManager implements DatabaseManager, Filte
         try {
             if (sessionFactory == null) {
                 // Build the SessionFactory
-                getDevLogger().info(
+                getLogger().info(
                         "Building Hibernate session Factory (configuration File : " + getConfigFile() + " )");
                 sessionFactory = configuration.buildSessionFactory();
                 globalSession = new ThreadLocal<Session>();
             }
         } catch (Throwable ex) {
-            getDevLogger().error("Initial SessionFactory creation failed.", ex);
+            getLogger().error("Initial SessionFactory creation failed.", ex);
             throw new DatabaseManagerException("Initial SessionFactory creation failed.", ex);
         }
     }
@@ -177,12 +177,12 @@ public abstract class HibernateDatabaseManager implements DatabaseManager, Filte
      */
     public void close() {
         try {
-            getDevLogger().info("Closing current session");
+            getLogger().info("Closing current session");
             sessionFactory.getCurrentSession().close();
-            getDevLogger().info("Closing session factory");
+            getLogger().info("Closing session factory");
             sessionFactory.close();
         } catch (Exception e) {
-            getDevLogger().error("Error while closing database", e);
+            getLogger().error("Error while closing database", e);
         } finally {
             globalSession = null;
             sessionFactory = null;
@@ -196,7 +196,7 @@ public abstract class HibernateDatabaseManager implements DatabaseManager, Filte
             callback.workWithDatabase(this);
             commitTransaction();
         } catch (Throwable t) {
-            getDevLogger().error("", t);
+            getLogger().error("", t);
             rollbackTransaction();
         }
     }
@@ -219,7 +219,7 @@ public abstract class HibernateDatabaseManager implements DatabaseManager, Filte
                     s.beginTransaction();
                     globalSession.set(s);
                 } catch (Exception e) {
-                    getDevLogger().error("Error while starting transaction", e);
+                    getLogger().error("Error while starting transaction", e);
                     this.exceptionHandler.handle("Error while starting transaction", e);
                 }
             }
@@ -240,7 +240,7 @@ public abstract class HibernateDatabaseManager implements DatabaseManager, Filte
                 s.getTransaction().commit();
                 s.close();
             } catch (Exception e) {
-                getDevLogger().error("Error while committing transaction", e);
+                getLogger().error("Error while committing transaction", e);
                 this.exceptionHandler.handle("Error while committing transaction", e);
             } finally {
                 globalSession.set(null);
@@ -262,7 +262,7 @@ public abstract class HibernateDatabaseManager implements DatabaseManager, Filte
                 s.getTransaction().rollback();
                 s.close();
             } catch (Exception e) {
-                getDevLogger().error("Error while rollbacking", e);
+                getLogger().error("Error while rollbacking", e);
                 this.exceptionHandler.handle("Error while rollbacking", e);
             } finally {
                 globalSession.set(null);
@@ -279,7 +279,7 @@ public abstract class HibernateDatabaseManager implements DatabaseManager, Filte
         try {
             session.close();
         } catch (Exception e) {
-            getDevLogger().error("Error while closing session", e);
+            getLogger().error("Error while closing session", e);
             this.exceptionHandler.handle("Error while closing session", e);
         }
     }
@@ -288,7 +288,7 @@ public abstract class HibernateDatabaseManager implements DatabaseManager, Filte
         try {
             session.close();
         } catch (Exception e) {
-            getDevLogger().error("Error while closing session", e);
+            getLogger().error("Error while closing session", e);
             this.exceptionHandler.handle("Error while closing session", e);
         }
     }
@@ -302,7 +302,7 @@ public abstract class HibernateDatabaseManager implements DatabaseManager, Filte
     private Session beginTransaction() {
         Session s = globalSession.get();
         //if a session has been manually opened by a user, use it
-        getDevLogger().debug("Open new session, global session is " + ((s == null) ? "null" : "set"));
+        getLogger().debug("Open new session, global session is " + ((s == null) ? "null" : "set"));
         if (s != null) {
             return s;
         }
@@ -324,7 +324,7 @@ public abstract class HibernateDatabaseManager implements DatabaseManager, Filte
         }
         session.getTransaction().commit();
         session.close();
-        getDevLogger().debug("Transaction committed and closed");
+        getLogger().debug("Transaction committed and closed");
     }
 
     /**
@@ -341,9 +341,9 @@ public abstract class HibernateDatabaseManager implements DatabaseManager, Filte
         try {
             session.getTransaction().rollback();
             closeSession(session);
-            getDevLogger().debug("Transaction rolledback and closed");
+            getLogger().debug("Transaction rolledback and closed");
         } catch (Exception e) {
-            getDevLogger().error("Error while rollback", e);
+            getLogger().error("Error while rollback", e);
         }
     }
 
@@ -357,11 +357,11 @@ public abstract class HibernateDatabaseManager implements DatabaseManager, Filte
         checkIsEntity(o);
         Session session = beginTransaction();
         try {
-            getDevLogger().debug("Registering new Object : " + o.getClass().getName());
+            getLogger().debug("Registering new Object : " + o.getClass().getName());
             session.save(o);
             commitTransaction(session);
         } catch (Throwable e) {
-            getDevLogger().error("", e);
+            getLogger().error("", e);
             rollbackTransaction(session);
             this.exceptionHandler.handle("Unable to store the given object !", e);
         }
@@ -377,11 +377,11 @@ public abstract class HibernateDatabaseManager implements DatabaseManager, Filte
         checkIsEntity(o);
         Session session = beginTransaction();
         try {
-            getDevLogger().info("Deleting Object : " + o.getClass().getName());
+            getLogger().info("Deleting Object : " + o.getClass().getName());
             session.delete(o);
             commitTransaction(session);
         } catch (Throwable e) {
-            getDevLogger().error("", e);
+            getLogger().error("", e);
             rollbackTransaction(session);
             this.exceptionHandler.handle("Unable to delete the given object !", e);
         }
@@ -398,11 +398,11 @@ public abstract class HibernateDatabaseManager implements DatabaseManager, Filte
         checkIsEntity(o);
         Session session = beginTransaction();
         try {
-            getDevLogger().debug("Updating Object : " + o.getClass().getName());
+            getLogger().debug("Updating Object : " + o.getClass().getName());
             session.update(o);
             commitTransaction(session);
         } catch (Throwable e) {
-            getDevLogger().error("", e);
+            getLogger().error("", e);
             rollbackTransaction(session);
             this.exceptionHandler.handle("Unable to update the given object !", e);
         }
@@ -432,10 +432,10 @@ public abstract class HibernateDatabaseManager implements DatabaseManager, Filte
         //the goal is take advantage of polymorphism, so don't check if the class is an entity
         //A given class may return its object and every sub-object of this class.
         //checkIsEntity(egClass);
-        getDevLogger().info("Trying to recover " + egClass + " using " + conditions.length + " conditions");
+        getLogger().debug("Recovering " + egClass + " using " + conditions.length + " conditions");
         Session session = getSessionFactory().openSession();
         try {
-            getDevLogger().info("Creating query...");
+            getLogger().debug("Creating query...");
             StringBuilder conds = new StringBuilder("");
             if (conditions != null && conditions.length > 0) {
                 conds.append(" WHERE");
@@ -446,24 +446,24 @@ public abstract class HibernateDatabaseManager implements DatabaseManager, Filte
             }
             String squery = "SELECT c from " + egClass.getName() + " c" + conds.toString();
             Query query = session.createQuery(squery);
-            getDevLogger().debug("Created query : " + squery);
+            getLogger().debug("Created query : " + squery);
             if (conditions != null && conditions.length > 0) {
                 for (int i = 0; i < conditions.length; i++) {
                     query.setParameter("C" + i, conditions[i].getValue());
-                    getDevLogger().debug("Set parameter '" + "C" + i + "' value=" + conditions[i].getValue());
+                    getLogger().debug("Set parameter '" + "C" + i + "' value=" + conditions[i].getValue());
                 }
             }
             return query.list();
         } catch (org.hibernate.exception.LockAcquisitionException LockAcq) {
-            getDevLogger().info("", LockAcq);
+            getLogger().info("", LockAcq);
             throw LockAcq;
         } catch (Exception e) {
-            getDevLogger().error("", e);
+            getLogger().error("", e);
             this.exceptionHandler.handle("Unable to recover the objects !", e);
             return null;//should not be reached as the previous line will throw an exception
         } finally {
             closeSession(session);
-            getDevLogger().debug("Session closed");
+            getLogger().debug("Session closed");
         }
     }
 
@@ -485,7 +485,7 @@ public abstract class HibernateDatabaseManager implements DatabaseManager, Filte
         String hql;
         Field[] fields = getDeclaredFields(clazz, true);
         boolean hasAlterable = false;
-        getDevLogger().debug("Synchronizing " + o.getClass().getName());
+        getLogger().debug("Synchronizing " + o.getClass().getName());
         //start transaction
         Session session = beginTransaction();
         try {
@@ -493,19 +493,19 @@ public abstract class HibernateDatabaseManager implements DatabaseManager, Filte
             id.setAccessible(true);
             for (Field f : fields) {
                 if (f.isAnnotationPresent(Alterable.class)) {
-                    getDevLogger().debug("Found alterable field : " + f.getName());
+                    getLogger().debug("Found alterable field : " + f.getName());
                     hasAlterable = true;
                     //create the request (ie:SET c.field=:alterableXX) with a specific id
                     hql = hqlUpdate + "c." + f.getName() + " = :" + ALTERABLE_REQUEST_FIELD;
                     hql += " WHERE c." + hibernateId + " = :" + OBJECTID_REQUEST_FIELD;
                     Query query = session.createQuery(hql);
-                    getDevLogger().debug("Created query : " + hql);
+                    getLogger().debug("Created query : " + hql);
                     f.setAccessible(true);
                     query.setParameter(ALTERABLE_REQUEST_FIELD, f.get(o));
-                    getDevLogger().debug("Set parameter '" + ALTERABLE_REQUEST_FIELD + "' value=" + f.get(o));
+                    getLogger().debug("Set parameter '" + ALTERABLE_REQUEST_FIELD + "' value=" + f.get(o));
                     //Set identifier for WHERE clause
                     query.setParameter(OBJECTID_REQUEST_FIELD, id.get(o));
-                    getDevLogger().debug(
+                    getLogger().debug(
                             "Set WHERE clause parameter '" + OBJECTID_REQUEST_FIELD + "' value=" + id.get(o));
                     //execute request
                     query.executeUpdate();
@@ -513,16 +513,16 @@ public abstract class HibernateDatabaseManager implements DatabaseManager, Filte
             }
             if (!hasAlterable) {
                 //if there is no alterable fields (open session is closed in the 'finally')
-                getDevLogger()
+                getLogger()
                         .warn(
                                 "Synchronize has been called on an object that does not contains any @alterable field");
                 return;
             }
             //commit
             commitTransaction(session);
-            getDevLogger().debug("Transaction committed");
+            getLogger().debug("Transaction committed");
         } catch (Throwable e) {
-            getDevLogger().error("", e);
+            getLogger().error("", e);
             rollbackTransaction(session);
             this.exceptionHandler.handle("Unable to synchronize this object !", e);
         }
@@ -550,7 +550,7 @@ public abstract class HibernateDatabaseManager implements DatabaseManager, Filte
                 f.setAccessible(true);
                 //if it is unloadable and null
                 if (f.isAnnotationPresent(Unloadable.class) && f.get(o) == null) {
-                    getDevLogger().debug("Found unloadable null field : " + f.getName());
+                    getLogger().debug("Found unloadable null field : " + f.getName());
                     Object value;
                     //related to improvement SCHEDULING-161 - to FIX : REMOVE FROM HERE
                     Any any = f.getAnnotation(Any.class);
@@ -565,7 +565,7 @@ public abstract class HibernateDatabaseManager implements DatabaseManager, Filte
                             f.getAnnotation(JoinColumn.class).name() + " FROM " +
                             clazz.getAnnotation(Table.class).name() + " c" + " WHERE c." + hibernateId +
                             " = " + fid.get(o).toString();
-                        getDevLogger().debug("Created query : " + squery);
+                        getLogger().debug("Created query : " + squery);
                         Query query = session.createSQLQuery(squery);
                         //get results
                         Object[] values = (Object[]) query.uniqueResult();
@@ -585,7 +585,7 @@ public abstract class HibernateDatabaseManager implements DatabaseManager, Filte
                             " = :" + OBJECTID_REQUEST_FIELD;
                         //create HQL request
                         query = session.createQuery(squery);
-                        getDevLogger().debug("Created query : " + squery);
+                        getLogger().debug("Created query : " + squery);
                         //In SQL language, hibernate id is stored as a BigInteger -> in HQL as a long.
                         long lvalue;
                         try {
@@ -594,7 +594,7 @@ public abstract class HibernateDatabaseManager implements DatabaseManager, Filte
                             lvalue = ((BigDecimal) values[1]).longValue();
                         }
                         query.setParameter(OBJECTID_REQUEST_FIELD, lvalue);
-                        getDevLogger().debug("Set parameter '" + OBJECTID_REQUEST_FIELD + "=" + lvalue);
+                        getLogger().debug("Set parameter '" + OBJECTID_REQUEST_FIELD + "=" + lvalue);
                         value = query.uniqueResult();
                     } else {
                         //SCHEDULING-161 - to FIX : TO HERE
@@ -602,9 +602,9 @@ public abstract class HibernateDatabaseManager implements DatabaseManager, Filte
                         String squery = "SELECT c." + f.getName() + " FROM " + clazz.getName() +
                             " c WHERE c." + hibernateId + " = :" + OBJECTID_REQUEST_FIELD;
                         Query query = session.createQuery(squery);
-                        getDevLogger().debug("Created query : " + squery);
+                        getLogger().debug("Created query : " + squery);
                         query.setParameter(OBJECTID_REQUEST_FIELD, fid.get(o));
-                        getDevLogger().debug("Set parameter '" + OBJECTID_REQUEST_FIELD + "=" + fid.get(o));
+                        getLogger().debug("Set parameter '" + OBJECTID_REQUEST_FIELD + "=" + fid.get(o));
                         value = query.uniqueResult();
                     }//SCHEDULING-161 - to FIX : and HERE
                     //... store it in the object
@@ -612,11 +612,11 @@ public abstract class HibernateDatabaseManager implements DatabaseManager, Filte
                 }
             }
         } catch (Exception e) {
-            getDevLogger().error("", e);
+            getLogger().error("", e);
             this.exceptionHandler.handle("Unable to load this object [" + o + "]", e);
         } finally {
             closeSession(session);
-            getDevLogger().debug("Session closed");
+            getLogger().debug("Session closed");
         }
     }
 
@@ -629,19 +629,19 @@ public abstract class HibernateDatabaseManager implements DatabaseManager, Filte
     public void unload(Object o) {
         Class<?> clazz = o.getClass();
         Field[] fields = getDeclaredFields(clazz, true);
-        getDevLogger().debug("Unloading object : " + o.getClass().getName());
+        getLogger().debug("Unloading object : " + o.getClass().getName());
         try {
             //for each @unloadable field and non-primitive type
             for (Field f : fields) {
                 if (f.isAnnotationPresent(Unloadable.class) && !f.getType().isPrimitive()) {
-                    getDevLogger().debug("SET null to unloadable non primitive field : " + f.getName());
+                    getLogger().debug("SET null to unloadable non primitive field : " + f.getName());
                     //the the value to null
                     f.setAccessible(true);
                     f.set(o, null);
                 }
             }
         } catch (Exception e) {
-            getDevLogger().error("", e);
+            getLogger().error("", e);
             this.exceptionHandler.handle("Unable to unload one or more fields !", e);
         }
     }
@@ -657,10 +657,10 @@ public abstract class HibernateDatabaseManager implements DatabaseManager, Filte
         }
         StatelessSession session = getSessionFactory().openStatelessSession();
         try {
-            getDevLogger().debug("Executing query '" + nativeQuery + "'");
+            getLogger().debug("Executing query '" + nativeQuery + "'");
             return session.createSQLQuery(nativeQuery).list();
         } catch (Exception e) {
-            getDevLogger().error("", e);
+            getLogger().error("", e);
             //this exception will not be handled by exception manager as it is read only and not error prone
             //as it is in a separate thread
             //we let exceptionhandler handle only exception coming from core request
@@ -752,11 +752,6 @@ public abstract class HibernateDatabaseManager implements DatabaseManager, Filte
      * @return logger for release purposes
      */
     public abstract Logger getLogger();
-
-    /**
-     * @return logger for debug purposes
-     */
-    public abstract Logger getDevLogger();
 
     /**
      * {@inheritDoc}

@@ -340,8 +340,6 @@ public class InternalJobFactory {
      */
     private static void setJobCommonProperties(Job job, InternalJob jobToSet)
             throws IllegalArgumentException, IllegalAccessException {
-        logger.info("Setting job common properties");
-
         autoCopyfields(CommonAttribute.class, job, jobToSet);
         autoCopyfields(Job.class, job, jobToSet);
         //special behavior
@@ -358,8 +356,6 @@ public class InternalJobFactory {
      */
     private static void setTaskCommonProperties(Job userJob, Task task, InternalTask taskToSet)
             throws IllegalArgumentException, IllegalAccessException {
-        logger.debug("Setting task common properties");
-
         autoCopyfields(CommonAttribute.class, task, taskToSet);
         autoCopyfields(Task.class, task, taskToSet);
 

@@ -161,7 +161,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
             return numberOfTaskStarted;
         }
 
-        logger.info("Number of tasks ready to be scheduled : " + taskRetrivedFromPolicy.size());
+        logger.info("eligible tasks : " + taskRetrivedFromPolicy.size());
 
         while (!taskRetrivedFromPolicy.isEmpty()) {
             //get rmState and update it in scheduling policy
@@ -169,7 +169,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
             core.policy.setRMState(rmState);
             internalPolicy.RMState = rmState;
             int freeResourcesNb = rmState.getFreeNodesNumber();
-            logger.info("Number of free resources : " + freeResourcesNb);
+            logger.info("eligible nodes : " + freeResourcesNb);
             //if there is no free resources, stop it right now
             if (freeResourcesNb == 0) {
                 break;
@@ -183,7 +183,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
                 neededResourcesNumber = getNextcompatibleTasks(taskRetrivedFromPolicy, freeResourcesNb,
                         tasksToSchedule);
             }
-            logger.debug("Number of nodes to ask for : " + neededResourcesNumber);
+            logger.debug("required number of nodes : " + neededResourcesNumber);
             if (neededResourcesNumber == 0) {
                 break;
             }
@@ -267,10 +267,6 @@ final class SchedulingMethodImpl implements SchedulingMethod {
             }
         }
 
-        if (list.size() > 0) {
-            logger.info("Number of jobs containing tasks to be scheduled : " + list.size());
-        }
-
         return list;
     }
 
@@ -303,7 +299,6 @@ final class SchedulingMethodImpl implements SchedulingMethod {
             int neededNodes = internalTask.getNumberOfNodesNeeded();
             SchedulingTaskComparator referent = new SchedulingTaskComparator(internalTask, currentJob
                     .getOwner());
-            logger.debug("Get the most nodes matching the current selection ");
             boolean firstLoop = true;
             do {
                 if (!firstLoop) {
@@ -328,6 +323,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
                 } else {
                     //check if the task is compatible with the other previous one
                     if (referent.equals(new SchedulingTaskComparator(internalTask, currentJob.getOwner()))) {
+                        logger.debug("task " + internalTask.getId() + " scheduling");
                         neededResource += neededNodes;
                         maxResource -= neededNodes;
                         toFill.add(etd);
@@ -357,21 +353,12 @@ final class SchedulingMethodImpl implements SchedulingMethod {
         NodeSet nodeSet = new NodeSet();
 
         if (neededResourcesNumber <= 0) {
-            throw new IllegalArgumentException("Args 'neededResourcesNumber' must be > 0");
+            throw new IllegalArgumentException("'neededResourcesNumber' must be greater than 0");
         }
 
         EligibleTaskDescriptor etd = tasksToSchedule.getFirst();
         InternalJob currentJob = core.jobs.get(etd.getJobId());
         InternalTask internalTask = currentJob.getIHMTasks().get(etd.getTaskId());
-
-        if (logger.isDebugEnabled()) {
-            SchedulingTaskComparator referent = new SchedulingTaskComparator(internalTask, currentJob
-                    .getOwner());
-            logger.debug("Referent task         : " + internalTask.getId());
-            logger.debug("Selection script(s)   : " +
-                ((referent.getSsHashCode() == 0) ? "no" : "yes (" + referent.getSsHashCode() + ")"));
-            logger.debug("Node(s) exclusion     : " + internalTask.getNodeExclusion());
-        }
 
         try {
             TopologyDescriptor descriptor = null;
@@ -393,14 +380,14 @@ final class SchedulingMethodImpl implements SchedulingMethod {
                         currentJob.getCredentials()).getNodes(neededResourcesNumber, descriptor,
                         internalTask.getSelectionScripts(), internalTask.getNodeExclusion(), bestEffort);
             } catch (TopologyDisabledException tde) {
-                logger.info("Cancel job " + currentJob.getName() + " as the topology is disabled");
+                logger.info("job  " + currentJob.getId() + " will be canceled as the topology is disabled");
                 simulateJobStartAndCancelIt(tasksToSchedule, "Topology is disabled");
                 return null;
             }
             //the following line is used to unwrap the future, warning when moving or removing
             //it may also throw a ScriptException which is a RuntimeException
             PAFuture.waitFor(nodeSet, true);
-            logger.debug("Got " + nodeSet.size() + " node(s)");
+            logger.debug("provided nodes " + nodeSet.size());
             return nodeSet;
         } catch (ScriptException e) {
             Throwable t = e;
@@ -447,7 +434,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
                 core.runningJobs.add(ij);
                 //update tasks events list and send it to front-end
                 core.updateTaskInfosList(ij, SchedulerEvent.JOB_PENDING_TO_RUNNING);
-                logger.info("Job '" + ij.getId() + "' started");
+                logger.info("job  " + ij.getId() + " started");
             }
             //selection script has failed : end the job
             core.endJob(ij, it, null, errorMsg, JobStatus.CANCELED);
@@ -461,7 +448,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
      * @param task the task to be initialized
      */
     protected void loadAndInit(InternalJob job, InternalTask task) {
-        logger.debug("Load and Initialize the executable container for task '" + task.getId() + "'");
+        logger.debug("task " + task.getId() + " initializing the executable container");
         ExecutableContainer container = core.getDBManager().loadExecutableContainer(task);
         task.setExecutableContainer(container);
 
@@ -533,8 +520,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
                 //set nodes in the executable container
                 task.getExecutableContainer().setNodes(nodes);
 
-                logger.info("Starting deployment of task '" + task.getName() + "' for job '" + job.getId() +
-                    "'");
+                logger.info("task " + task.getId() + " deploying");
 
                 finalizeStarting(job, task, node, launcher);
 
@@ -566,7 +552,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
      * @param launcher the taskLauncher that has just been launched
      */
     void finalizeStarting(InternalJob job, InternalTask task, Node node, TaskLauncher launcher) {
-        logger.info("Task '" + task.getId() + "' started on " +
+        logger.info("task " + task.getId() + " started on " +
             node.getNodeInformation().getVMInformation().getHostName() + "(node: " +
             node.getNodeInformation().getName() + ")");
         // set the different informations on job
@@ -580,7 +566,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
             core.runningJobs.add(job);
             //update tasks events list and send it to front-end
             core.updateTaskInfosList(job, SchedulerEvent.JOB_PENDING_TO_RUNNING);
-            logger.info("Job '" + job.getId() + "' started");
+            logger.info("job  " + job.getId() + " started");
 
             firstTaskStarted = true;
         } else {

@@ -342,4 +342,11 @@ public class SelectionScript extends Script<Boolean> {
         }
         return toReturn;
     }
+
+    /**
+     * String representation
+     */
+    public String toString() {
+        return hashCode() + "\n" + script;
+    }
 }

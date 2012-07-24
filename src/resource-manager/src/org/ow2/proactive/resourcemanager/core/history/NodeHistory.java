@@ -163,7 +163,7 @@ public class NodeHistory {
             DatabaseManager.getInstance().update(prev);
         }
 
-        logger.debug("Updating previous item for node " + nodeUrl);
+        logger.debug(nodeUrl + " : updating history");
     }
 
     /**

@@ -181,11 +181,9 @@ public class ResourceManagerController {
                     url = RM_DEFAULT_URL;
                 }
 
-                logger.info("Trying to connect RM on " + url);
+                logger.info("Connecting to the RM on " + url);
                 auth = RMConnection.join(url);
                 logger.info("\t-> Connection established on " + url);
-
-                logger.info(newline + "Connecting to the RM");
 
                 if (cmd.hasOption("l")) {
                     user = cmd.getOptionValue("l");

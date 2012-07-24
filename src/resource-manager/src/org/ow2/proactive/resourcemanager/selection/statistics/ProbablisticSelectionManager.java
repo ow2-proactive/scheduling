@@ -108,22 +108,11 @@ public class ProbablisticSelectionManager extends SelectionManager {
     public List<RMNode> arrangeNodesForScriptExecution(final List<RMNode> nodes, List<SelectionScript> scripts) {
 
         long startTime = System.currentTimeMillis();
-        logger.debug("Arranging nodes");
-
         boolean scriptSpecified = scripts != null && scripts.size() > 0;
 
         // if no scripts are specified return filtered free nodes
         if (!scriptSpecified) {
-            logger.debug("Selection script was not specified");
             return nodes;
-        }
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("Selection scripts count is " + scripts.size() + ": ");
-            for (SelectionScript script : scripts) {
-                logger.debug("Content of the script with id " + script.hashCode() + ":\n" +
-                    script.getScript());
-            }
         }
 
         try {
@@ -162,8 +151,7 @@ public class ProbablisticSelectionManager extends SelectionManager {
                     (System.currentTimeMillis() - startTime) + " ms) :");
                 if (res.size() > 0) {
                     for (RMNode rmnode : res) {
-                        logger.debug("Node url: " + rmnode.getNodeURL() + ", probability: " +
-                            intersectionMap.get(rmnode));
+                        logger.debug(rmnode.getNodeURL() + " : probability " + intersectionMap.get(rmnode));
                     }
                 } else {
                     logger.debug("None");
@@ -193,8 +181,8 @@ public class ProbablisticSelectionManager extends SelectionManager {
                 Probability p = probabilities.get(digest).get(rmnode);
                 String scriptType = script.isDynamic() ? "dynamic" : "static";
                 if (logger.isDebugEnabled())
-                    logger.debug("Known " + scriptType + " script " + script.hashCode() + " for node " +
-                        rmnode.getNodeURL());
+                    logger.debug(rmnode.getNodeURL() + " : " + script.hashCode() + " known " + scriptType +
+                        " script");
                 return p.value() == 1;
             }
         } catch (NoSuchAlgorithmException e) {
@@ -202,7 +190,7 @@ public class ProbablisticSelectionManager extends SelectionManager {
         }
 
         if (logger.isDebugEnabled())
-            logger.debug("Unknown script " + script.hashCode() + " for node " + rmnode.getNodeURL());
+            logger.debug(rmnode.getNodeURL() + " : " + script.hashCode() + " unknown script");
         return false;
     }
 
@@ -266,8 +254,8 @@ public class ProbablisticSelectionManager extends SelectionManager {
             }
 
             if (logger.isDebugEnabled()) {
-                logger.debug("Adding data to knowledge base - script: " + script.hashCode() + ", node: " +
-                    rmnode.getNodeURL() + ", probability: " + probability);
+                logger.debug(rmnode.getNodeURL() + " : script " + script.hashCode() + ", probability " +
+                    probability);
             }
 
             probabilities.get(digest).put(rmnode, probability);

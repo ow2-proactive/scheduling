@@ -149,6 +149,23 @@ public abstract class SelectionManager {
     public NodeSet selectNodes(int number, TopologyDescriptor topologyDescriptor,
             List<SelectionScript> scripts, NodeSet exclusion, Client client, boolean bestEffort) {
 
+        logger.info(client + " requested " + number + " nodes with " + topologyDescriptor);
+        if (logger.isDebugEnabled()) {
+            if (scripts != null && scripts.size() > 0) {
+                logger.debug("Selection scripts:");
+                for (SelectionScript s : scripts) {
+                    logger.debug(s);
+                }
+            }
+
+            if (exclusion != null && exclusion.size() > 0) {
+                logger.debug("Exclusion nodes:");
+                for (Node n : exclusion) {
+                    logger.debug(n);
+                }
+            }
+        }
+
         // can throw Exception if topology is disabled
         TopologyHandler handler = RMCore.topologyManager.getHandler(topologyDescriptor);
 
@@ -207,7 +224,10 @@ public abstract class SelectionManager {
         // now we have a list of nodes which match to selection scripts
         // selecting subset according to topology requirements
         // TopologyHandler handler = RMCore.topologyManager.getHandler(topologyDescriptor);
-        logger.info("Looking for nodes using " + topologyDescriptor);
+
+        if (topologyDescriptor.isTopologyBased()) {
+            logger.debug("Filtering nodes with topology " + topologyDescriptor);
+        }
         NodeSet selectedNodes = handler.select(number, matchedNodes);
 
         if (selectedNodes.size() < number && !bestEffort) {
@@ -267,13 +287,16 @@ public abstract class SelectionManager {
         // creating script executors object to be run in dedicated thread pool
         List<Callable<Node>> scriptExecutors = new LinkedList<Callable<Node>>();
         synchronized (inProgress) {
-            logger.debug("Scripts are executing on " + inProgress.size() + " nodes");
+            if (inProgress.size() > 0) {
+                logger.warn(inProgress.size() + " nodes are in process of script execution");
+                for (String nodeName : inProgress) {
+                    logger.warn(nodeName);
+
+                }
+                logger.warn("Something is wrong on these nodes");
+            }
             for (RMNode node : candidates) {
-                if (inProgress.contains(node.getNodeURL())) {
-                    if (logger.isDebugEnabled())
-                        logger.debug("Script execution is in progress on node " + node.getNodeURL() +
-                            " - skipping.");
-                } else {
+                if (!inProgress.contains(node.getNodeURL())) {
                     inProgress.add(node.getNodeURL());
                     scriptExecutors.add(new ScriptExecutor(node, scripts, this));
                 }

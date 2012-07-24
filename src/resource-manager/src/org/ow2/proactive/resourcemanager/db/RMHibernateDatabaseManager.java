@@ -62,11 +62,6 @@ public class RMHibernateDatabaseManager extends HibernateDatabaseManager {
     }
 
     @Override
-    public Logger getDevLogger() {
-        return logger;
-    }
-
-    @Override
     public Logger getLogger() {
         return logger;
     }
