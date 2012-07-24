@@ -38,11 +38,13 @@ package org.ow2.proactive.tests.performance.scheduler;
 
 import java.security.KeyException;
 
+import javax.management.JMException;
 import javax.security.auth.login.LoginException;
 
 import org.objectweb.proactive.api.PAActiveObject;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
@@ -72,6 +74,8 @@ public class TestSchedulerProxy implements Scheduler {
 
     protected Scheduler target;
 
+    private String jmxROUrl;
+
     public static TestSchedulerProxy connectWithProxy(String url, CredData credData, long timeout)
             throws Exception {
         TestSchedulerProxy proxy = PAActiveObject.newActive(TestSchedulerProxy.class, new Object[] {});
@@ -80,10 +84,15 @@ public class TestSchedulerProxy implements Scheduler {
     }
 
     public void init(String url, CredData credData, long timeout) throws ConnectionException, LoginException,
-            KeyException, AlreadyConnectedException {
+            KeyException, AlreadyConnectedException, JMException {
         SchedulerAuthenticationInterface auth = SchedulerConnection.waitAndJoin(url, timeout);
         Credentials cred = Credentials.createCredentials(credData, auth.getPublicKey());
         target = auth.login(cred);
+        jmxROUrl = auth.getJMXConnectorURL(JMXTransportProtocol.RO);
+    }
+
+    public String getJmxROUrl() {
+        return jmxROUrl;
     }
 
     @Override

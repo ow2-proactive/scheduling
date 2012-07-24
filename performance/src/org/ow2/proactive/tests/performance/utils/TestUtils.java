@@ -36,8 +36,14 @@
  */
 package org.ow2.proactive.tests.performance.utils;
 
+import java.util.HashMap;
 import java.util.Random;
 
+import javax.management.remote.JMXConnector;
+import javax.management.remote.JMXConnectorFactory;
+import javax.management.remote.JMXServiceURL;
+
+import org.ow2.proactive.jmx.provider.JMXProviderUtils;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 
@@ -45,6 +51,13 @@ import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 public class TestUtils {
 
     private static Random random = new Random();
+
+    public static JMXConnector jmxConnect(String url, String login, String password) throws Exception {
+        final HashMap<String, Object> env = new HashMap<String, Object>(1);
+        env.put(JMXConnector.CREDENTIALS, new Object[] { login, password });
+        env.put(JMXConnectorFactory.PROTOCOL_PROVIDER_PACKAGES, JMXProviderUtils.RO_PROVIDER_PKGS);
+        return JMXConnectorFactory.connect(new JMXServiceURL(url), env);
+    }
 
     public static String getRequiredProperty(String name) {
         String value = System.getProperty(name);

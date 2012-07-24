@@ -55,6 +55,10 @@ public abstract class BaseJMeterRMClient extends BaseJMeterClient {
 
     private TestRMProxy rmProxy;
 
+    protected static final String DEFAULT_ADMIN_LOGIN = "admin";
+
+    protected static final String DEFAULT_ADMIN_PASSWORD = "admin";
+
     @Override
     public Arguments getDefaultParameters() {
         Arguments args = super.getDefaultParameters();

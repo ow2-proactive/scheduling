@@ -36,7 +36,6 @@
  */
 package org.ow2.proactive.tests.performance.deployment;
 
-import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -72,9 +71,6 @@ public class DeploymentTestUtils {
         } catch (UnknownHostException e) {
             System.out.println("Unknow host error for host " + hostName + ": " + e);
             return null;
-        } catch (IOException e) {
-            System.out.println("Error when checking access to the host " + hostName + ": " + e);
-            return null;
         }
     }
 
@@ -90,7 +86,8 @@ public class DeploymentTestUtils {
         }
         List<String> output = executor.getOutput();
         if (output.isEmpty()) {
-            throw new TestExecutionException("Empty output for command finding free port");
+            throw new TestExecutionException("Empty output for command finding free port. Error output: " +
+                executor.getErrorOutput());
         }
         try {
             return Integer.valueOf(output.get(0));

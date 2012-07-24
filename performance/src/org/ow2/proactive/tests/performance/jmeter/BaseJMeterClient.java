@@ -150,6 +150,14 @@ public abstract class BaseJMeterClient extends AbstractJavaSamplerClient {
         for (String name : args.getArgumentsAsMap().keySet()) {
             logInfo(name + " = " + context.getParameter(name));
         }
+
+    }
+
+    protected static void assertTrue(boolean value, String message, SampleResult result) {
+        if (!value) {
+            result.setSuccessful(false);
+            result.setResponseMessage(message);
+        }
     }
 
 }

@@ -41,6 +41,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import javax.management.JMException;
 import javax.security.auth.login.LoginException;
 
 import org.objectweb.proactive.api.PAActiveObject;
@@ -50,6 +51,7 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
@@ -72,11 +74,19 @@ public class TestRMProxy implements ResourceManager {
 
     protected ResourceManager target;
 
-    public void init(String url, CredData credData) throws RMException, KeyException, LoginException {
+    private String jmxROUrl;
+
+    public void init(String url, CredData credData) throws RMException, KeyException, LoginException,
+            JMException {
         RMAuthentication rmAuth = RMConnection.join(url);
         Credentials cred = Credentials.createCredentials(credData, rmAuth.getPublicKey());
 
         this.target = rmAuth.login(cred);
+        this.jmxROUrl = rmAuth.getJMXConnectorURL(JMXTransportProtocol.RO);
+    }
+
+    public String getJmxROUrl() {
+        return jmxROUrl;
     }
 
     public RMInitialState syncAddEventListener(RMEventListener listener, RMEventType... events) {

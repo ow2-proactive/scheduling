@@ -285,6 +285,9 @@ Configurable parameters:
 If this parameter is 'true' then script still always returns 'true' but test on each iteration inserts some random string in the script text, it is used to stress RM's logic which tries to predict script execution result using script content hash.</li>
 </ul>
 
+<h4>Use RM JMX scenario</h4> 
+This scenario is implemented in the RMJMXClient class. Scenario connects to the JMX interface provided by the RM and invokes various operations provided by the RM MBeans. It measures time required to call getters on the MyAccountMBean and RuntimeDataMBean.  
+
 <h4>Create node source scenarios</h4> 
 There are two scenarios creating new node sources. One scenario uses SSH Infrastructure and another one Command Line infrastructure
 (scenarios are implemented in the SSHInfrastructureNodeSourceCreateClient and CLIInfrastructureNodeSourceCreateClient).
@@ -477,6 +480,9 @@ Configurable parameters:
 <ul>
 <li><b>submitAndKillTasksUsersNumber</b> (scheduler.test.properties) number of threads executing scenario</li>
 </ul>
+
+<h4>Use Scheduler JMX scenario</h4> 
+This scenario is implemented in the SchedulerJMXClient class. Scenario connects to the JMX interface provided by the SchedulerJMXClient and invokes various operations provided by the SchedulerJMXClient MBeans. It measures time required to call getters on the MyAccountMBean and RuntimeDataMBean.  
 
 
 <h4>Event handling load</h4>

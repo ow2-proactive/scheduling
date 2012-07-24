@@ -215,6 +215,8 @@
                 <property name="nodeRequestTopology" value="${nodeRequestTopology}" />
                 <property name="selectionScriptDynamicContent" value="${selectionScriptDynamicContent}" />
 
+                <property name="rmJmxUsageUsers" value="${rmJmxUsageUsers}" />
+            	
                 <property name="createNodeSourceHosts" value="${createNodeSourceHosts}" />
                 <property name="createNodeSourceUseAllHosts" value="${createNodeSourceUseAllHosts}" />
                 <property name="createNodeSourceNodesPerHost" value="${createNodeSourceNodesPerHost}" />
@@ -230,7 +232,7 @@
 
                 <jmeterarg value="-j" />
                 <jmeterarg value="${basedir}/results/jmeter.log" />
-                
+            	
             </jmeter>
 
             <xslt classpathref="xslt.classpath" in="${basedir}/results/@{testplan}.jtl" out="${basedir}/results/@{testplan}.html" style="${basedir}/jmeter/config/jmeter-results-report_21.xsl" />
@@ -299,6 +301,8 @@
                 
                 <property name="schedulerConnectUsersNumber" value="${schedulerConnectUsersNumber}" />
                 
+                <property name="schedulerJmxUsageUsers" value="${schedulerJmxUsageUsers}" />
+            	
                 <property name="hugeJobTasksNumber" value="${hugeJobTasksNumber}" />
                 <property name="hugeJobCompleteTimeout" value="${hugeJobCompleteTimeout}" />
                 

@@ -61,6 +61,10 @@ public abstract class BaseJMeterSchedulerClient extends BaseJMeterClient {
 
     public static final String PARAM_SCHEDULING_PATH = "schedulingPath";
 
+    protected static final String DEFAULT_ADMIN_LOGIN = "admin";
+
+    protected static final String DEFAULT_ADMIN_PASSWORD = "admin";
+
     protected String schedulingPath;
 
     protected String testsClasspath;
