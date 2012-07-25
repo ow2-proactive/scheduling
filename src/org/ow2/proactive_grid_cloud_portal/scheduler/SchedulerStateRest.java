@@ -216,7 +216,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      */
     @GET
     @Path("jobsinfo")
-    @Produces( { "application/json", "application/xml" })
+    @Produces({ "application/json", "application/xml" })
     public List<UserJobInfo> jobsinfo(@HeaderParam("sessionid")
     String sessionId, @QueryParam("index")
     @DefaultValue("-1")
@@ -272,7 +272,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @GET
     @GZIP
     @Path("revisionjobsinfo")
-    @Produces( { "application/json", "application/xml" })
+    @Produces({ "application/json", "application/xml" })
     public Map<AtomicLong, List<UserJobInfo>> revisionAndjobsinfo(@HeaderParam("sessionid")
     String sessionId, @QueryParam("index")
     @DefaultValue("-1")
@@ -451,7 +451,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      */
     @GET
     @Path("state")
-    @Produces( { "application/json", "application/xml" })
+    @Produces({ "application/json", "application/xml" })
     public SchedulerState schedulerState(@HeaderParam("sessionid")
     String sessionId) throws PermissionException, NotConnectedException, CacheNotYetInitialized {
         Scheduler s = checkAccess(sessionId, "/scheduler/state");
@@ -468,7 +468,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      */
     @GET
     @Path("state/revision")
-    @Produces( { "application/json", "application/xml" })
+    @Produces({ "application/json", "application/xml" })
     public long schedulerStateRevision(@HeaderParam("sessionid")
     String sessionId) throws PermissionException, NotConnectedException {
         Scheduler s = checkAccess(sessionId, "/scheduler/revision");
@@ -488,7 +488,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      */
     @GET
     @Path("revisionandstate")
-    @Produces( { "application/json", "application/xml" })
+    @Produces({ "application/json", "application/xml" })
     public Map<AtomicLong, SchedulerState> getSchedulerStateAndRevision(@HeaderParam("sessionid")
     String sessionId) throws PermissionException, NotConnectedException, CacheNotYetInitialized {
         Scheduler s = checkAccess(sessionId, "/scheduler/staterevision");
@@ -506,7 +506,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      */
     @GET
     @Path("state/myjobsonly")
-    @Produces( { "application/json", "application/xml" })
+    @Produces({ "application/json", "application/xml" })
     public SchedulerState getSchedulerStateMyJobsOnly(@HeaderParam("sessionid")
     String sessionId) throws PermissionException, NotConnectedException {
         Scheduler s = checkAccess(sessionId, "/scheduler/myjobsonly");
@@ -523,7 +523,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      */
     @GET
     @Path("jobs/{jobid}")
-    @Produces( { "application/json", "application/xml" })
+    @Produces({ "application/json", "application/xml" })
     @XmlJavaTypeAdapter(value = PersistentMapConverter.class, type = PersistentMap.class)
     public JobState listJobs(@HeaderParam("sessionid")
     String sessionId, @PathParam("jobid")
@@ -739,6 +739,24 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     /**
+     *  Returns job server logs
+     * @param sessionId a valid session id
+     * @param jobId the id of the job
+     * @return job traces from the scheduler and resource manager
+    */
+    @GET
+    @GZIP
+    @Path("jobs/{jobid}/log/server")
+    @Produces("application/json")
+    public String jobServerLog(@HeaderParam("sessionid")
+    String sessionId, @PathParam("jobid")
+    String jobId) throws NotConnectedException, UnknownJobException, UnknownTaskException,
+            PermissionException {
+        Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/log/server");
+        return s.getJobServerLogs(jobId);
+    }
+
+    /**
      * Kill the job represented by jobId.<br>
      * 
      * @param sessionId
@@ -904,7 +922,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @GET
     @GZIP
     @Path("jobs/{jobid}/map")
-    @Produces( { "application/json", "application/xml" })
+    @Produces({ "application/json", "application/xml" })
     public String getJobMap(@HeaderParam("sessionid")
     String sessionId, @PathParam("jobid")
     String jobId) throws IOException {
@@ -1188,6 +1206,27 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             return "";
         }
 
+    }
+
+    /**
+     *  Returns task server logs
+     * @param sessionId a valid session id
+     * @param jobId the id of the job
+     * @param taskname the name of the task
+     * @return task traces from the scheduler and resource manager
+    */
+    @GET
+    @GZIP
+    @Path("jobs/{jobid}/tasks/{taskname}/log/server")
+    @Produces("application/json")
+    public String taskServerLog(@HeaderParam("sessionid")
+    String sessionId, @PathParam("jobid")
+    String jobId, @PathParam("taskname")
+    String taskname) throws NotConnectedException, UnknownJobException, UnknownTaskException,
+            PermissionException {
+
+        Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/tasks/" + taskname + "/log/server");
+        return s.getTaskServerLogs(jobId, taskname);
     }
 
     /**
@@ -1478,9 +1517,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     /*
-     * // Kept for later use if we discover that using MultipartInput does not
-     * // longer match our needs. Uploads of byte-encoded job descriptors for
-     * instance.
+     * // Kept for later use if we discover that using MultipartInput does not // longer match our
+     * needs. Uploads of byte-encoded job descriptors for instance.
      * 
      * @POST
      * 
@@ -1488,8 +1526,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      * 
      * public String submit(@Context HttpServletRequest req) throws Exception {
      * 
-     * FileItemFactory factory = new DiskFileItemFactory(); ServletFileUpload
-     * upload = new ServletFileUpload(factory);
+     * FileItemFactory factory = new DiskFileItemFactory(); ServletFileUpload upload = new
+     * ServletFileUpload(factory);
      * 
      * List items = upload.parseRequest(req); Iterator iter = items.iterator();
      * 
@@ -1499,11 +1537,10 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      * 
      * } else { if (!item.isFormField()) {
      * 
-     * String fileName = item.getName(); System.out.println("File Name:" +
-     * fileName);
+     * String fileName = item.getName(); System.out.println("File Name:" + fileName);
      * 
-     * File fullFile = new File(item.getName()); File savedFile = new
-     * File("/test", fullFile.getName());
+     * File fullFile = new File(item.getName()); File savedFile = new File("/test",
+     * fullFile.getName());
      * 
      * item.write(savedFile); } } }
      * 
@@ -1795,22 +1832,18 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
         // activate the cache mechanism at first login
         /*
-         * synchronized(this) { try { if ((isCacheEnabled) && (cachedState ==
-         * null)){ cachedState = PAActiveObject.newActive(
-         * CachingSchedulerProxyUserInterface.class, new Object[] {});
+         * synchronized(this) { try { if ((isCacheEnabled) && (cachedState == null)){ cachedState =
+         * PAActiveObject.newActive( CachingSchedulerProxyUserInterface.class, new Object[] {});
          * 
          * 
-         * cachedState.init(PortalConfiguration.getProperties().getProperty(
-         * PortalConfiguration. scheduler_url),
-         * PortalConfiguration.getProperties
-         * ().getProperty(PortalConfiguration.scheduler_cache_login ),
-         * PortalConfiguration
-         * .getProperties().getProperty(PortalConfiguration.scheduler_cache_password
-         * )); } } catch (Throwable e) { logger.warn(
-         * "unable to log in using the 'caching' account with username '" +
-         * PortalConfiguration
-         * .getProperties().getProperty(PortalConfiguration.scheduler_cache_login
-         * )+ ", cache is disabled"); } }
+         * cachedState.init(PortalConfiguration.getProperties().getProperty( PortalConfiguration.
+         * scheduler_url), PortalConfiguration.getProperties
+         * ().getProperty(PortalConfiguration.scheduler_cache_login ), PortalConfiguration
+         * .getProperties().getProperty(PortalConfiguration.scheduler_cache_password )); } } catch
+         * (Throwable e) { logger.warn(
+         * "unable to log in using the 'caching' account with username '" + PortalConfiguration
+         * .getProperties().getProperty(PortalConfiguration.scheduler_cache_login )+
+         * ", cache is disabled"); } }
          */
 
         MySchedulerProxyUserInterface scheduler;
@@ -1870,8 +1903,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             }
 
             username = multipart.getUsername();
-            CredData credData = new CredData(CredData.parseLogin(multipart.getUsername()), CredData
-                    .parseDomain(multipart.getUsername()), multipart.getPassword(), multipart.getSshKey());
+            CredData credData = new CredData(CredData.parseLogin(multipart.getUsername()),
+                CredData.parseDomain(multipart.getUsername()), multipart.getPassword(), multipart.getSshKey());
             scheduler.init(url, credData);
         }
 
@@ -1951,9 +1984,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      * 
      * needs some tests
      * 
-     * @Path("stats/allaccounts") public String
-     * getStatisticsOnAllAccounts(@HeaderParam("sessionid") final String
-     * sessionId) throws NotConnectedException, PermissionException { final
+     * @Path("stats/allaccounts") public String getStatisticsOnAllAccounts(@HeaderParam("sessionid")
+     * final String sessionId) throws NotConnectedException, PermissionException { final
      * SchedulerProxyUserInterface s = checkAccess(sessionId);
      * 
      * return s.getInfo("ProActiveScheduler:name=AllAccounts"); }
@@ -1993,9 +2025,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         PublicKey pubKey = auth.getPublicKey();
 
         try {
-            Credentials cred = Credentials.createCredentials(new CredData(CredData.parseLogin(multipart
-                    .getUsername()), CredData.parseDomain(multipart.getUsername()), multipart.getPassword(),
-                multipart.getSshKey()), pubKey);
+            Credentials cred = Credentials.createCredentials(
+                    new CredData(CredData.parseLogin(multipart.getUsername()), CredData.parseDomain(multipart
+                            .getUsername()), multipart.getPassword(), multipart.getSshKey()), pubKey);
 
             return cred.getBase64();
         } catch (KeyException e) {

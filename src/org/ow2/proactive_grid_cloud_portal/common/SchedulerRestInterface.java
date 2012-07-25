@@ -127,7 +127,7 @@ public interface SchedulerRestInterface {
      */
     @GET
     @Path("jobsinfo")
-    @Produces( { "application/json", "application/xml" })
+    @Produces({ "application/json", "application/xml" })
     public abstract List<UserJobInfo> jobsinfo(@HeaderParam("sessionid")
     String sessionId, @QueryParam("index")
     @DefaultValue("-1")
@@ -155,7 +155,7 @@ public interface SchedulerRestInterface {
     @GET
     @GZIP
     @Path("revisionjobsinfo")
-    @Produces( { "application/json", "application/xml" })
+    @Produces({ "application/json", "application/xml" })
     public abstract Map<AtomicLong, List<UserJobInfo>> revisionAndjobsinfo(@HeaderParam("sessionid")
     String sessionId, @QueryParam("index")
     @DefaultValue("-1")
@@ -179,7 +179,7 @@ public interface SchedulerRestInterface {
      */
     @GET
     @Path("state")
-    @Produces( { "application/json", "application/xml" })
+    @Produces({ "application/json", "application/xml" })
     public abstract SchedulerState schedulerState(@HeaderParam("sessionid")
     String sessionId) throws PermissionException, NotConnectedException, CacheNotYetInitialized;
 
@@ -190,7 +190,7 @@ public interface SchedulerRestInterface {
      */
     @GET
     @Path("state/revision")
-    @Produces( { "application/json", "application/xml" })
+    @Produces({ "application/json", "application/xml" })
     public abstract long schedulerStateRevision(@HeaderParam("sessionid")
     String sessionId) throws PermissionException, NotConnectedException;
 
@@ -203,7 +203,7 @@ public interface SchedulerRestInterface {
      */
     @GET
     @Path("revisionandstate")
-    @Produces( { "application/json", "application/xml" })
+    @Produces({ "application/json", "application/xml" })
     public abstract Map<AtomicLong, SchedulerState> getSchedulerStateAndRevision(@HeaderParam("sessionid")
     String sessionId) throws PermissionException, NotConnectedException, CacheNotYetInitialized;
 
@@ -215,7 +215,7 @@ public interface SchedulerRestInterface {
     */
     @GET
     @Path("state/myjobsonly")
-    @Produces( { "application/json", "application/xml" })
+    @Produces({ "application/json", "application/xml" })
     public abstract SchedulerState getSchedulerStateMyJobsOnly(@HeaderParam("sessionid")
     String sessionId) throws PermissionException, NotConnectedException;
 
@@ -226,7 +226,7 @@ public interface SchedulerRestInterface {
      */
     @GET
     @Path("jobs/{jobid}")
-    @Produces( { "application/json", "application/xml" })
+    @Produces({ "application/json", "application/xml" })
     @XmlJavaTypeAdapter(value = PersistentMapConverter.class, type = PersistentMap.class)
     public abstract JobState listJobs(@HeaderParam("sessionid")
     String sessionId, @PathParam("jobid")
@@ -278,6 +278,21 @@ public interface SchedulerRestInterface {
     public abstract boolean removeJob(@HeaderParam("sessionid")
     String sessionId, @PathParam("jobid")
     String jobId) throws NotConnectedException, UnknownJobException, PermissionException;
+
+    /**
+     *  Returns job server logs
+     * @param sessionId a valid session id
+     * @param jobId the id of the job
+     * @return job traces from the scheduler and resource manager
+    */
+    @GET
+    @GZIP
+    @Path("jobs/{jobid}/log/server")
+    @Produces("application/json")
+    public abstract String jobServerLog(@HeaderParam("sessionid")
+    String sessionId, @PathParam("jobid")
+    String jobId) throws NotConnectedException, UnknownJobException, UnknownTaskException,
+            PermissionException;
 
     /**
     * Kill the job represented by jobId.<br>
@@ -466,6 +481,23 @@ public interface SchedulerRestInterface {
     @Path("jobs/{jobid}/tasks/{taskname}/result/log/out")
     @Produces("application/json")
     public abstract String tasklogout(@HeaderParam("sessionid")
+    String sessionId, @PathParam("jobid")
+    String jobId, @PathParam("taskname")
+    String taskname) throws NotConnectedException, UnknownJobException, UnknownTaskException,
+            PermissionException;
+
+    /**
+     *  Returns task server logs
+     * @param sessionId a valid session id
+     * @param jobId the id of the job
+     * @param taskname the name of the task
+     * @return task traces from the scheduler and resource manager
+    */
+    @GET
+    @GZIP
+    @Path("jobs/{jobid}/tasks/{taskname}/log/server")
+    @Produces("application/json")
+    public abstract String taskServerLog(@HeaderParam("sessionid")
     String sessionId, @PathParam("jobid")
     String jobId, @PathParam("taskname")
     String taskname) throws NotConnectedException, UnknownJobException, UnknownTaskException,
