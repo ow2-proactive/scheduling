@@ -19,8 +19,8 @@ import org.ow2.proactive.tests.performance.utils.TestUtils;
  * Test scenario 'Use RM JMX'.
  * <p/>
  * Scenario connects to the JMX interface provided by the RM and invokes various 
- * operations provided by the RM MBeans. It measures time required to call 
- * getters on the MyAccountMBean and RuntimeDataMBean.
+ * operations provided by the RM MBeans. It measures time required to connect to JMX, execute getters on all beans
+ * and disconnect.
  * 
  * @author ProActive team
  *
@@ -42,6 +42,7 @@ public class RMJMXClient extends BaseJMeterRMClient {
 
         SampleResult result = new SampleResult();
         result.setSuccessful(true);
+        result.sampleStart();
 
         JMXConnector jmxConnector;
 
@@ -50,10 +51,8 @@ public class RMJMXClient extends BaseJMeterRMClient {
                 .getRmPassword());
         try {
             MBeanServerConnection connection = jmxConnector.getMBeanServerConnection();
-            result.sampleStart();
             checkMyAccountsMBean(connection, result);
             checkRuntimeDataMBean(connection, result);
-            result.sampleEnd();
         } finally {
             jmxConnector.close();
         }
@@ -68,6 +67,7 @@ public class RMJMXClient extends BaseJMeterRMClient {
             jmxConnector.close();
         }
 
+        result.sampleEnd();
         return result;
     }
 

@@ -286,7 +286,7 @@ If this parameter is 'true' then script still always returns 'true' but test on 
 </ul>
 
 <h4>Use RM JMX scenario</h4> 
-This scenario is implemented in the RMJMXClient class. Scenario connects to the JMX interface provided by the RM and invokes various operations provided by the RM MBeans. It measures time required to call getters on the MyAccountMBean and RuntimeDataMBean.  
+This scenario is implemented in the RMJMXClient class. Scenario connects to the JMX interface provided by the RM and invokes various operations provided by the RM MBeans. It measures time required to connect to JMX, execute getters on all beans and disconnect.  
 
 <h4>Create node source scenarios</h4> 
 There are two scenarios creating new node sources. One scenario uses SSH Infrastructure and another one Command Line infrastructure
@@ -482,7 +482,7 @@ Configurable parameters:
 </ul>
 
 <h4>Use Scheduler JMX scenario</h4> 
-This scenario is implemented in the SchedulerJMXClient class. Scenario connects to the JMX interface provided by the SchedulerJMXClient and invokes various operations provided by the SchedulerJMXClient MBeans. It measures time required to call getters on the MyAccountMBean and RuntimeDataMBean.  
+This scenario is implemented in the SchedulerJMXClient class. Scenario connects to the JMX interface provided by the SchedulerJMXClient and invokes various operations provided by the SchedulerJMXClient MBeans. It measures time required to connect to JMX, execute getters on all beans and disconnect.  
 
 
 <h4>Event handling load</h4>

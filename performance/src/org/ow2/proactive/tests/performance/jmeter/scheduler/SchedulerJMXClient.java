@@ -20,7 +20,8 @@ import org.ow2.proactive.tests.performance.utils.TestUtils;
  * <p/>
  * Scenario connects to the JMX interface provided by the SchedulerJMXClient 
  * and invokes various operations provided by the SchedulerJMXClient MBeans. 
- * It measures time required to call getters on the MyAccountMBean and RuntimeDataMBean.
+ * It measures time required to connect to JMX, execute getters on all beans
+ * and disconnect.
  * 
  * @author ProActive team
  *
@@ -42,6 +43,7 @@ public class SchedulerJMXClient extends BaseJMeterSchedulerClient {
 
         SampleResult result = new SampleResult();
         result.setSuccessful(true);
+        result.sampleStart();
 
         JMXConnector jmxConnector;
 
@@ -50,10 +52,8 @@ public class SchedulerJMXClient extends BaseJMeterSchedulerClient {
                 connectionParameters.getSchedulerPassword());
         try {
             MBeanServerConnection connection = jmxConnector.getMBeanServerConnection();
-            result.sampleStart();
             checkMyAccountsMBean(connection, result);
             checkRuntimeDataMBean(connection, result);
-            result.sampleEnd();
         } finally {
             jmxConnector.close();
         }
@@ -68,6 +68,7 @@ public class SchedulerJMXClient extends BaseJMeterSchedulerClient {
             jmxConnector.close();
         }
 
+        result.sampleEnd();
         return result;
     }
 
