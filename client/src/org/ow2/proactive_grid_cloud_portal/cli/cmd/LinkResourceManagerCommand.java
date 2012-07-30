@@ -32,7 +32,7 @@
  *  Contributor(s):
  *
  * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * $$ACTIVEEON_INITIAL_DEV$$
  */
 
 package org.ow2.proactive_grid_cloud_portal.cli.cmd;
@@ -63,13 +63,12 @@ public class LinkResourceManagerCommand extends AbstractCommand implements
         if (statusCode(OK) == statusCode(response)) {
             boolean success = readValue(response, Boolean.TYPE);
             if (success) {
-                writeLine("New resource manager('%s') relinked successfully",
-                        rmUrl);
+                writeLine("New resource manager relinked successfully.");
             } else {
-                writeLine("Cannot relink to new resource manager('%s')", rmUrl);
+                writeLine("Cannot relink '%s'.", rmUrl);
             }
         } else {
-            handleError("An error occured while relink ..", response);
+            handleError("An error occurred while relinking:", response);
         }
 
     }

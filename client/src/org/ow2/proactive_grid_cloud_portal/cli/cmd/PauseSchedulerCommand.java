@@ -17,13 +17,13 @@ public class PauseSchedulerCommand extends AbstractCommand implements Command {
         if (statusCode(OK) == statusCode(response)) {
             boolean success = readValue(response, Boolean.TYPE);
             if (success) {
-                writeLine("Scheduler is paused");
+                writeLine("Scheduler successfully paused.");
             } else {
-                writeLine("Scheudler cannot be paused");
+                writeLine("Cannot pause scheduler.");
             }
         } else {
             handleError(
-                    "An error occured while attempting to pause the scheduler ..",
+                    "An error occurred while attempting to pause scheduler:",
                     response);
         }
     }

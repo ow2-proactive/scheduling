@@ -32,7 +32,7 @@
  *  Contributor(s):
  *
  * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * $$ACTIVEEON_INITIAL_DEV$$
  */
 
 package org.ow2.proactive_grid_cloud_portal.cli.cmd;
@@ -52,13 +52,13 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.util.EntityUtils;
 import org.codehaus.jackson.type.TypeReference;
+import org.ow2.proactive.utils.ObjectArrayFormatter;
+import org.ow2.proactive.utils.Tools;
+import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.ResponseStatus;
 import org.ow2.proactive_grid_cloud_portal.cli.RestCliException;
-import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.json.ErrorView;
-import org.ow2.proactive_grid_cloud_portal.cli.utils.ArrayFormatter;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.ObjectUtils;
-import org.ow2.proactive_grid_cloud_portal.cli.utils.Tools;
 
 public abstract class AbstractCommand implements Command {
 
@@ -69,7 +69,7 @@ public abstract class AbstractCommand implements Command {
         return EntityUtils.toString(response.getEntity());
     }
 
-    protected static String string(ArrayFormatter oaf) {
+    protected static String string(ObjectArrayFormatter oaf) {
         return Tools.getStringAsArray(oaf);
     }
 
@@ -157,9 +157,6 @@ public abstract class AbstractCommand implements Command {
     }
 
     protected HttpResponse execute(HttpUriRequest request) throws Exception {
-        if (request.getURI().getScheme().equals("https")) {
-
-        }
         return applicationContext().executeClient(request);
     }
 

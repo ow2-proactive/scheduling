@@ -32,7 +32,7 @@
  *  Contributor(s):
  *
  * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * $$ACTIVEEON_INITIAL_DEV$$
  */
 
 package org.ow2.proactive_grid_cloud_portal.cli.console;
@@ -116,9 +116,15 @@ public class JLineDevice extends AbstractDevice {
     private String[] getCommandsAsArray() {
         ArrayList<String> cmds = new ArrayList<String>();
         for (RestCommand command : RestCommand.values()) {
-            if (command.getJsOpt() != null) {
-                cmds.add(command.getJsOpt());
-            }
+			if (command.getJsOpt() != null) {
+				String jsCommand = command.getJsOpt();
+				int index = jsCommand.indexOf('(');
+				if ((jsCommand.indexOf(')') - index) == 1) {
+					cmds.add(jsCommand.substring(0, index + 2));
+				} else {
+					cmds.add(jsCommand.substring(0, index + 1));
+				}
+			}
         }
         return cmds.toArray(new String[cmds.size()]);
     }

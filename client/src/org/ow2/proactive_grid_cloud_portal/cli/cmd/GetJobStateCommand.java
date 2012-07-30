@@ -32,7 +32,7 @@
  *  Contributor(s):
  *
  * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * $$ACTIVEEON_INITIAL_DEV$$
  */
 
 package org.ow2.proactive_grid_cloud_portal.cli.cmd;
@@ -45,12 +45,12 @@ import java.util.List;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.ow2.proactive.utils.ObjectArrayFormatter;
+import org.ow2.proactive.utils.Tools;
 import org.ow2.proactive_grid_cloud_portal.cli.json.JobStateView;
 import org.ow2.proactive_grid_cloud_portal.cli.json.TaskIdView;
 import org.ow2.proactive_grid_cloud_portal.cli.json.TaskInfoView;
 import org.ow2.proactive_grid_cloud_portal.cli.json.TaskStateView;
-import org.ow2.proactive_grid_cloud_portal.cli.utils.ArrayFormatter;
-import org.ow2.proactive_grid_cloud_portal.cli.utils.Tools;
 
 public class GetJobStateCommand extends AbstractJobCommand implements Command {
 
@@ -75,7 +75,7 @@ public class GetJobStateCommand extends AbstractJobCommand implements Command {
                     .toString();
 
             // create formatter
-            ArrayFormatter oaf = new ArrayFormatter();
+            ObjectArrayFormatter oaf = new ObjectArrayFormatter();
             oaf.setMaxColumnLength(30);
             // space between column
             oaf.setSpace(2);
@@ -141,8 +141,9 @@ public class GetJobStateCommand extends AbstractJobCommand implements Command {
             writeLine("");
             writeLine(string(oaf));
         } else {
-            handleError("Error occured whiling retrieving " + job()
-                    + " state ..", response);
+            handleError(String.format(
+                    "An error occurred while retrieving %s state:", job()),
+                    response);
         }
 
     }

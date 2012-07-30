@@ -32,7 +32,7 @@
  *  Contributor(s):
  *
  * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * $$ACTIVEEON_INITIAL_DEV$$
  */
 
 package org.ow2.proactive_grid_cloud_portal.cli;
@@ -92,7 +92,7 @@ public class Main {
             try {
                 writeError(
                         new PrintWriter(System.err, true),
-                        "An error occured when obtaining the console device ..",
+                        "An error occurred while obtaining the console device:",
                         ioe);
             } catch (IOException ioe2) {
                 // ignore
@@ -133,7 +133,7 @@ public class Main {
         } catch (Throwable error) {
             try {
                 writeError(writer(applicationContext),
-                        "An error occured while executing ..", error);
+                        "An error occurred:", error);
             } catch (IOException e) {
                 // Ignore
             }
@@ -156,14 +156,14 @@ public class Main {
                 if (sessionIdentifier != null) {
                     File sessionFile = sessionFile(sessionIdentifier);
                     if (sessionFile.exists()) {
-                        sessionFile.delete(); // clear session ..
+                        sessionFile.delete(); // clear session
                     }
                 }
                 executeCommandList(commands);
             } catch (Throwable error) {
                 try {
                     writeError(writer(applicationContext),
-                            "An error occured while executing ..", error);
+                            "An error occurred:", error);
                 } catch (IOException e) {
                     // ignore
                 }

@@ -32,7 +32,7 @@
  *  Contributor(s):
  *
  * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * $$ACTIVEEON_INITIAL_DEV$$
  */
 
 package org.ow2.proactive_grid_cloud_portal.cli.cmd;
@@ -60,10 +60,10 @@ public class SubmitJobCommand extends AbstractCommand implements Command {
     @Override
     public void execute() throws Exception {
         HttpPost request = new HttpPost(resourceUrl("submit"));
-
         File jobFile = new File(pathname);
         if (!jobFile.exists()) {
-            throw new IllegalArgumentException(pathname + " does not exist ..");
+            throw new IllegalArgumentException(String.format(
+                    "'%s' does not exist.", pathname));
         }
         String contentType = URLConnection.getFileNameMap().getContentTypeFor(
                 pathname);
@@ -79,11 +79,12 @@ public class SubmitJobCommand extends AbstractCommand implements Command {
         HttpResponse response = execute(request);
         if (statusCode(OK) == statusCode(response)) {
             JobIdView jobId = readValue(response, JobIdView.class);
-            writeLine("Job('%s') submitted successfully .. => job('%d')",
-                    pathname, jobId.getId());
+            writeLine("Job('%s') successfully submitted: job('%d')", pathname,
+                    jobId.getId());
         } else {
-            handleError("An error occured while submitting job(" + pathname
-                    + ")", response);
+            handleError(String.format(
+                    "An error occurred while attempting to submit job('%s'):",
+                    pathname), response);
         }
     }
 }

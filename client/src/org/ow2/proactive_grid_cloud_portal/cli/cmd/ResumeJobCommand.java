@@ -32,7 +32,7 @@
  *  Contributor(s):
  *
  * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * $$ACTIVEEON_INITIAL_DEV$$
  */
 
 package org.ow2.proactive_grid_cloud_portal.cli.cmd;
@@ -55,12 +55,13 @@ public class ResumeJobCommand extends AbstractJobCommand implements Command {
         if (statusCode(OK) == statusCode(response)) {
             boolean success = readValue(response, Boolean.TYPE);
             if (success) {
-                writeLine(job() + " resumed");
+                writeLine("%s resumed successfully.", job());
             } else {
-                writeLine(job() + " cannot be resumed");
+                writeLine("Cannot resume %s.", job());
             }
         } else {
-            handleError("An error occured while attempting to resume " + job(),
+            handleError(String.format(
+                    "An error occurred while attempting to resume %s:", job()),
                     response);
         }
     }

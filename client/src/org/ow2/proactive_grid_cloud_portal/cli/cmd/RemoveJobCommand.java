@@ -32,7 +32,7 @@
  *  Contributor(s):
  *
  * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * $$ACTIVEEON_INITIAL_DEV$$
  */
 
 package org.ow2.proactive_grid_cloud_portal.cli.cmd;
@@ -55,12 +55,13 @@ public class RemoveJobCommand extends AbstractJobCommand implements Command {
         if (statusCode(OK) == statusCode(response)) {
             boolean success = readValue(response, Boolean.TYPE);
             if (success) {
-                writeLine("%s removed", job());
+                writeLine("%s sucessfully removed.", job());
             } else {
-                writeLine("%s cannot be removed", job());
+                writeLine("Cannot remove %s.", job());
             }
         } else {
-            handleError("An error occured while attempting to remove " + job(),
+            handleError(String.format(
+                    "An error occurred while attempting to remove %s:", job()),
                     response);
         }
     }

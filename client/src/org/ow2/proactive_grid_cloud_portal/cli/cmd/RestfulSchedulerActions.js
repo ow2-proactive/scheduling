@@ -1,8 +1,9 @@
 importClass(org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext);
+importClass(org.ow2.proactive_grid_cloud_portal.cli.RestCliException);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.JSHelpCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.SetUrlCommand);
-importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.LoggingCommand);
-importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.LoggingWithCredentialsCommand);
+importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.LoginCommand);
+importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.LoginWithCredentialsCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.EvalScriptCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.StartSchedulerCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.StopSchedulerCommand);
@@ -39,108 +40,108 @@ function url(url) {
 
 function login(user) {
         s.deleteSession(user);
-	(new LoggingCommand('' + user)).execute();
+	(new LoginCommand('' + user)).execute();
 }
 
 function loginwithcredentials(pathname) {
 	s.deleteSession('' + s.getAlias());
-	(new LoggingWithCredentialsCommand('' + pathname)).execute();
+	(new LoginWithCredentialsCommand('' + pathname)).execute();
 }
 
 function submit(pathname) {
-	(new SubmitJobCommand('' + pathname)).execute();
+    execute(new SubmitJobCommand('' + pathname));
 }
 
 function submitarchive(pathname) {
-	(new SubmitJobCommand('' + pathname)).execute();
+    execute(new SubmitJobCommand('' + pathname));
 }
 
 function jobpriority(jobId,priority) {
-	(new ChangeJobPriorityCommand('' + jobId, '' + priority)).execute();
+	execute(new ChangeJobPriorityCommand('' + jobId, '' + priority));
 }
 
 function pausejob(jobId) {
-	(new PauseJobCommand('' + jobId)).execute();
+    execute(new PauseJobCommand('' + jobId));
 }
 
 function resumejob(jobId) {
-	(new ResumeJobCommand('' + jobId)).execute();
+    execute(new ResumeJobCommand('' + jobId));
 }
 
 function killjob(jobId) {
-	(new KillJobCommand('' + jobId)).execute();
+    execute(new KillJobCommand('' + jobId));
 }
 
 function removejob(jobId) {
-	(new RemoveJobCommand('' + jobId)).execute();
+	execute(new RemoveJobCommand('' + jobId));
 }
 
 function jobstate(jobId) {
-	(new GetJobStateCommand('' + jobId)).execute();
+	execute(new GetJobStateCommand('' + jobId));
 }
 
 function listjobs() {
-	(new ListJobsCommand()).execute();
+    execute(new ListJobsCommand());
 }
 
 function stats() {
-	(new GetStatsCommand()).execute();
+    execute(new GetStatsCommand());
 }
 
 function jobresult(jobId) {
-	(new GetJobResultCommand('' + jobId)).execute();
+    execute(new GetJobResultCommand('' + jobId));
 }
 
 function joboutput(jobId) {
-	(new GetJobOutputCommand('' + jobId)).execute();
+    execute(new GetJobOutputCommand('' + jobId));
 }
 
 function taskresult(jobId,taskId) {
-	(new GetTaskResultCommand('' + jobId, '' + taskId)).execute();
+    execute(new GetTaskResultCommand('' + jobId, '' + taskId));
 }
 
 function taskoutput(jobId,taskId) {
-	(new GetTaskOutputCommand('' + jobId, '' + taskId)).execute();
+	execute(new GetTaskOutputCommand('' + jobId, '' + taskId));
 }
 
 function preempttask(jobId,taskId) {
-	(new PreemptTaskCommand('' + jobId, '' + taskId)).execute();
+    execute(new PreemptTaskCommand('' + jobId, '' + taskId));
 }
 
 function restarttask(jobId,taskId) {
-	(new RestartTaskCommand('' + jobId, '' + taskId)).execute();
+    execute(new RestartTaskCommand('' + jobId, '' + taskId));
 }
 
 function start() {
-	(new StartSchedulerCommand()).execute();
+    execute(new StartSchedulerCommand());
 }
 
 function stop() {
-	(new StopSchedulerCommand()).execute();
+    execute(new StopSchedulerCommand());
 }
 
 function pause() {
-	(new PauseSchedulerCommand()).execute();
+    execute(new PauseSchedulerCommand());
 }
 
 function resume() {
-	(new ResumeSchedulerCommand()).execute();
+    execute(new ResumeSchedulerCommand());
 }
 
 function freeze() {
-	(new FreezeSchedulerCommand()).execute();
+    execute(new FreezeSchedulerCommand());
 }
 
 function kill() {
-	(new KillSchedulerCommand()).execute();
+    execute(new KillSchedulerCommand());
 }
 
 function script(path,args) {
-	(new EvalScriptCommand('' + path, '' + args)).execute();
+	execute(new EvalScriptCommand('' + path, '' + args));
 }
 
 function linkrm(rmUrl) {
-	(new LinkResourceManagerCommand('' + rmUrl)).execute();	
+    execute(new LinkResourceManagerCommand('' + rmUrl));	
 }
 
 function reconnect() {
@@ -156,4 +157,25 @@ function reconnect() {
 
 function exit() {
 	s.setTerminated(true);	
+}
+
+function execute(cmd) {
+	try {
+		cmd.execute();
+	} catch (e) {
+		if (e.javaException instanceof RestCliException
+				&& e.javaException.errorCode() == 401 && !s.isNewSession()) {
+			s.clearSession();
+			if (s.getAlias() != null) {
+				loginwithcredentials(s.getCredFilePathname());
+			} else if (s.getUser() != null) {
+				login(s.getUser());
+			} else {
+				throw e;
+			}
+			cmd.execute();
+		} else {
+			throw e;
+		}
+	}
 }

@@ -28,15 +28,6 @@ Dependencies :
   Provides console device with support for history and auto command completion.
 - commons-io-2.4
   Convenient library for I/O functions. 
-  
-Features: 
-
-- Lightweight
-
-- Scriptability 
-
-- Sessions
-  
 
 Build:
 
@@ -79,5 +70,5 @@ Notes:
   - You can add the issuer certificate to your trust store.
   or 
   - You can specify another trust store which contains the issuer certificate.
-  (e.g. -ca <conf>/cacerts  (-cap changeit)
+  (e.g. -ca <trust-store-path>  [-cap <password>])
   

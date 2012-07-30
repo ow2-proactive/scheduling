@@ -32,7 +32,7 @@
  *  Contributor(s):
  *
  * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * $$ACTIVEEON_INITIAL_DEV$$
  */
 
 package org.ow2.proactive_grid_cloud_portal.cli.cmd;
@@ -54,13 +54,13 @@ public class KillSchedulerCommand extends AbstractCommand implements Command {
         if (statusCode(OK) == statusCode(response)) {
             boolean success = readValue(response, Boolean.TYPE);
             if (success) {
-                writeLine("Scheduler is killed");
+                writeLine("Scheduler successfully killed.");
             } else {
-                writeLine("Scheudler cannot be killed");
+                writeLine("Cannot kill scheduler.");
             }
         } else {
             handleError(
-                    "An error occured while attempting to kill the scheduler ..",
+                    "An error occurred while attempting to kill scheduler:",
                     response);
         }
     }

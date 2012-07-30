@@ -32,7 +32,7 @@
  *  Contributor(s):
  *
  * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * $$ACTIVEEON_INITIAL_DEV$$
  */
 
 package org.ow2.proactive_grid_cloud_portal.cli.cmd;
@@ -76,12 +76,13 @@ public class StartIModeCommand extends AbstractCommand implements Command {
     public void execute() throws Exception {
         while (!applicationContext().isTermiated()) {
             try {
-                engine.eval(readLine("rest-cli>"));
+                engine.eval(readLine("> "));
+            } catch (NullPointerException npe) {
+            	// EOF (<Ctrl> + <D>) 
+            	break;
             } catch (ScriptException se) {
-                writeLine("An error occured while executing the script ..");
-                Throwable cause = se.getCause();
+                writeLine("An error occurred while executing the script:");
                 se.printStackTrace((PrintWriter) writer());
-                writeLine("");
             }
         }
     }

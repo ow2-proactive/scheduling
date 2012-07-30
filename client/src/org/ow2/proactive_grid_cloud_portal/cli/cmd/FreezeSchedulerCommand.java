@@ -32,7 +32,7 @@
  *  Contributor(s):
  *
  * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * $$ACTIVEEON_INITIAL_DEV$$
  */
 
 package org.ow2.proactive_grid_cloud_portal.cli.cmd;
@@ -55,13 +55,13 @@ public class FreezeSchedulerCommand extends AbstractCommand implements Command {
         if (statusCode(OK) == statusCode(response)) {
             Boolean success = readValue(response, Boolean.TYPE);
             if (success) {
-                writeLine("scheduler is frozen ..");
+                writeLine("Scheduler successfully frozen.");
             } else {
-                writeLine("scheduler can not be frozen ..");
+                writeLine("Cannot freeze scheduler.");
             }
         } else {
             handleError(
-                    "Error occured while trying to freeze the scheduler ..",
+                    "Error occurred while trying to freeze the scheduler:",
                     response);
         }
     }

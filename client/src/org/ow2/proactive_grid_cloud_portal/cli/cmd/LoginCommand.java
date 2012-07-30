@@ -32,12 +32,12 @@
  *  Contributor(s):
  *
  * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * $$ACTIVEEON_INITIAL_DEV$$
  */
 
 package org.ow2.proactive_grid_cloud_portal.cli.cmd;
 
-import static org.apache.http.entity.ContentType.APPLICATION_OCTET_STREAM;
+import static org.apache.http.entity.ContentType.APPLICATION_FORM_URLENCODED;
 import static org.ow2.proactive_grid_cloud_portal.cli.ResponseStatus.OK;
 import static org.ow2.proactive_grid_cloud_portal.cli.RestConstants.DFLT_SESSION_DIR;
 import static org.ow2.proactive_grid_cloud_portal.cli.RestConstants.DFLT_SESSION_FILE_EXT;
@@ -46,40 +46,39 @@ import java.io.File;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.mime.MultipartEntity;
-import org.apache.http.entity.mime.content.ByteArrayBody;
+import org.apache.http.entity.StringEntity;
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 
-public class LoggingWithCredentialsCommand extends AbstractCommand implements
-        Command {
-    private String pathname;
+public class LoginCommand extends AbstractCommand implements Command {
 
-    public LoggingWithCredentialsCommand(String pathname) {
-        this.pathname = pathname;
+    private String username;
+
+    public LoginCommand(String username) {
+        this.username = username;
     }
 
     @Override
     public void execute() throws Exception {
-        File credentialFile = new File(pathname);
-        String alias = md5Checksum(credentialFile);
-        File userSessionFile = userSessionFile(alias);
         ApplicationContext context = applicationContext();
+        context.setUser(username);
+        File userSessionFile = userSessionFile(username);
         if (userSessionFile.exists()) {
-            context.setAlias(alias);
-            context.setCredFilePathname(pathname);
             context.setSessionId(read(userSessionFile));
             context.setNewSession(false);
             return;
         }
 
-        HttpPost request = new HttpPost(resourceUrl("login"));
-        MultipartEntity entity = new MultipartEntity();
-        entity.addPart("credential",
-                new ByteArrayBody(byteArray(credentialFile),
-                        APPLICATION_OCTET_STREAM.getMimeType()));
-        request.setEntity(entity);
+        String password = context.getPassword();
+        if (password == null) {
+            password = new String(readPassword("password:"));
+        }
 
-        HttpResponse response = context.executeClient(request);
+        HttpPost request = new HttpPost(resourceUrl("login"));
+        StringEntity entity = new StringEntity("username=" + username
+                + "&password=" + password, APPLICATION_FORM_URLENCODED);
+        request.setEntity(entity);
+        HttpResponse response = execute(request);
+
         if (statusCode(OK) == statusCode(response)) {
             String sessionId = string(response).trim();
             context.setSessionId(sessionId);
@@ -87,14 +86,13 @@ public class LoggingWithCredentialsCommand extends AbstractCommand implements
             write(userSessionFile, sessionId);
             if (!setOwnerOnly(userSessionFile)) {
                 writeLine(
-                        "Warning !! : Possible security risk .. unable to limit the access rights of the session-id file ('%s')",
+                        "Warning! Possible security risk: unable to limit access rights of the session-id file '%s'",
                         userSessionFile.getAbsoluteFile());
             }
-            writeLine("successfully renewed session-id ..");
+            writeLine("Session id successfully renewed.");
 
         } else {
-
-            handleError("Logging error: ", response);
+            handleError("An error occurred while logging:", response);
         }
     }
 
@@ -103,10 +101,8 @@ public class LoggingWithCredentialsCommand extends AbstractCommand implements
     }
 
     private boolean setOwnerOnly(File file) {
-        // effectively set file permission to 600
         return file.setReadable(false, false) && file.setReadable(true, true)
                 && file.setWritable(false, false)
                 && file.setWritable(true, true) && file.setExecutable(false);
     }
-
 }

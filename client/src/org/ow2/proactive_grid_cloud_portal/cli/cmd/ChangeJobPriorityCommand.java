@@ -32,7 +32,7 @@
  *  Contributor(s):
  *
  * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * $$ACTIVEEON_INITIAL_DEV$$
  */
 
 package org.ow2.proactive_grid_cloud_portal.cli.cmd;
@@ -58,10 +58,11 @@ public class ChangeJobPriorityCommand extends AbstractJobCommand implements
         HttpPut request = new HttpPut(resourceUrl);
         HttpResponse response = execute(request);
         if (statusCode(NO_CONTENT) == statusCode(response)) {
-            writeLine("Job('%s') priority changed to '%s'", jobId,
-                    priorityValue);
+            writeLine("%s priority changed successfully.", job());
         } else {
-            handleError("Error occured while executing ..", response);
+            handleError(String.format(
+                    "An error occurred while changing %s priority:", job()),
+                    response);
         }
     }
 }

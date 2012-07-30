@@ -32,7 +32,7 @@
  *  Contributor(s):
  *
  * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * $$ACTIVEEON_INITIAL_DEV$$
  */
 
 package org.ow2.proactive_grid_cloud_portal.cli.cmd;
@@ -54,13 +54,13 @@ public class StopSchedulerCommand extends AbstractCommand implements Command {
         if (statusCode(OK) == statusCode(response)) {
             boolean success = readValue(response, Boolean.TYPE);
             if (success) {
-                writeLine("Scheduler is stopped");
+                writeLine("Scheduler successfully stopped.");
             } else {
-                writeLine("Scheudler cannot be stopped");
+                writeLine("Cannot stop scheduler.");
             }
         } else {
             handleError(
-                    "An error occured while attempting to stop the scheduler ..",
+                    "An error occurred while attempting to stop scheduler:",
                     response);
         }
     }

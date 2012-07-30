@@ -32,7 +32,7 @@
  *  Contributor(s):
  *
  * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * $$ACTIVEEON_INITIAL_DEV$$
  */
 
 package org.ow2.proactive_grid_cloud_portal.cli.cmd;
@@ -59,10 +59,9 @@ public class GetTaskOutputCommand extends AbstractTaskCommand implements
             writeLine("%s", string(response));
 
         } else {
-            handleError("An error occured while retrieving " + task()
-                    + " output ..", response);
+            handleError(String.format(
+                    "An error occurred while retrieving %s output:", task()),
+                    response);
         }
-
     }
-
 }

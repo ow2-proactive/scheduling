@@ -32,15 +32,15 @@
  *  Contributor(s):
  *
  * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * $$ACTIVEEON_INITIAL_DEV$$
  */
 
 package org.ow2.proactive_grid_cloud_portal.cli.cmd;
 
 import java.util.ArrayList;
 
+import org.ow2.proactive.utils.ObjectArrayFormatter;
 import org.ow2.proactive_grid_cloud_portal.cli.RestCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.utils.ArrayFormatter;
 
 public class JSHelpCommand extends AbstractCommand implements Command {
 
@@ -49,7 +49,7 @@ public class JSHelpCommand extends AbstractCommand implements Command {
 
     @Override
     public void execute() throws Exception {
-        ArrayFormatter formatter = new ArrayFormatter();
+        ObjectArrayFormatter formatter = new ObjectArrayFormatter();
         formatter.setMaxColumnLength(100);
         formatter.setSpace(2);
         ArrayList<String> titles = new ArrayList<String>();

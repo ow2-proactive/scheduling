@@ -32,7 +32,7 @@
  *  Contributor(s):
  *
  * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * $$ACTIVEEON_INITIAL_DEV$$
  */
 
 package org.ow2.proactive_grid_cloud_portal.cli;
@@ -94,7 +94,7 @@ public enum RestCommand {
             "listjobs()"),
 
     LINK_RM("lrm", "linkrm", "Reconnect a resource manager to the scheduler",
-            "rm_url", 1, false, "linkrm(rm_url"),
+            "rm_url", 1, false, "linkrm(rm_url)"),
 
     GET_JOB_OUTPUT("jo", "joboutput", "Retrieve the output of specified job",
             "job_id", 1, false, "joboutput(id)"),

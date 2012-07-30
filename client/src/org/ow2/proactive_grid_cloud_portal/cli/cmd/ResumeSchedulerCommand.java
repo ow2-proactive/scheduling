@@ -17,13 +17,13 @@ public class ResumeSchedulerCommand extends AbstractCommand implements Command {
         if (statusCode(OK) == statusCode(response)) {
             boolean success = readValue(response, Boolean.TYPE);
             if (success) {
-                writeLine("Scheduler is resumed");
+                writeLine("Scheduler successfully resumed.");
             } else {
-                writeLine("Scheudler cannot be resumed");
+                writeLine("Cannot resume scheduler.");
             }
         } else {
             handleError(
-                    "An error occured while attempting to resume the scheduler ..",
+                    "An error occurred while attempting to resume scheduler:",
                     response);
         }
     }

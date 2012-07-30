@@ -32,7 +32,7 @@
  *  Contributor(s):
  *
  * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * $$ACTIVEEON_INITIAL_DEV$$
  */
 
 package org.ow2.proactive_grid_cloud_portal.cli.cmd;
@@ -48,9 +48,9 @@ import java.util.Map;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.codehaus.jackson.type.TypeReference;
+import org.ow2.proactive.utils.ObjectArrayFormatter;
 import org.ow2.proactive_grid_cloud_portal.cli.json.JobStateView;
 import org.ow2.proactive_grid_cloud_portal.cli.json.SchedulerStateView;
-import org.ow2.proactive_grid_cloud_portal.cli.utils.ArrayFormatter;
 
 public class ListJobsCommand extends AbstractCommand implements Command {
 
@@ -70,7 +70,7 @@ public class ListJobsCommand extends AbstractCommand implements Command {
             SchedulerStateView state = stateMap.entrySet().iterator().next()
                     .getValue();
 
-            ArrayFormatter oaf = new ArrayFormatter();
+            ObjectArrayFormatter oaf = new ObjectArrayFormatter();
             oaf.setMaxColumnLength(30);
             oaf.setSpace(4);
 
@@ -118,9 +118,7 @@ public class ListJobsCommand extends AbstractCommand implements Command {
             writeLine(oaf.getAsString());
 
         } else {
-            handleError(
-                    "An error occured while retriving jobs list from the scheduler ..",
-                    response);
+            handleError("An error occurred while retriving job list:", response);
         }
     }
 

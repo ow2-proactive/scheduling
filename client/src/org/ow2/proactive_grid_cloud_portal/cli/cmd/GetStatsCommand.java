@@ -32,7 +32,7 @@
  *  Contributor(s):
  *
  * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * $$ACTIVEEON_INITIAL_DEV$$
  */
 
 package org.ow2.proactive_grid_cloud_portal.cli.cmd;
@@ -47,7 +47,7 @@ import java.util.Map.Entry;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.codehaus.jackson.type.TypeReference;
-import org.ow2.proactive_grid_cloud_portal.cli.utils.ArrayFormatter;
+import org.ow2.proactive.utils.ObjectArrayFormatter;
 
 public class GetStatsCommand extends AbstractCommand implements Command {
 
@@ -62,7 +62,7 @@ public class GetStatsCommand extends AbstractCommand implements Command {
             Map<String, String> stats = readValue(response,
                     new TypeReference<Map<String, String>>() {
                     });
-            ArrayFormatter oaf = new ArrayFormatter();
+            ObjectArrayFormatter oaf = new ObjectArrayFormatter();
             oaf.setMaxColumnLength(80);
             oaf.setSpace(2);
             List<String> columnNames = new ArrayList<String>();
@@ -77,9 +77,7 @@ public class GetStatsCommand extends AbstractCommand implements Command {
             }
             writeLine(string(oaf));
         } else {
-            handleError(
-                    "Error occured while retrieving scheduler statistics ..",
-                    response);
+            handleError("An error occurred while retrieving stats:", response);
         }
 
     }

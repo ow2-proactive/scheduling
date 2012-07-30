@@ -32,7 +32,7 @@
  *  Contributor(s):
  *
  * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * $$ACTIVEEON_INITIAL_DEV$$
  */
 
 package org.ow2.proactive_grid_cloud_portal.cli;
@@ -201,4 +201,16 @@ public class ApplicationContext {
     public void setEngine(ScriptEngine engine) {
         this.engine = engine;
     }
+    
+	public void clearSession() {
+		String sessionIdentifier = (user != null) ? user : alias;
+		if (sessionIdentifier != null) {
+			File sessionFile = new File(DFLT_SESSION_DIR, sessionIdentifier
+					+ DFLT_SESSION_FILE_EXT);
+			if (sessionFile.exists()) {
+				sessionFile.delete();
+			}
+		}
+	}
+
 }

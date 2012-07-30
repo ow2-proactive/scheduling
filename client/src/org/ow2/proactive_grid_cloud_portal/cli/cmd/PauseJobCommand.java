@@ -32,7 +32,7 @@
  *  Contributor(s):
  *
  * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * $$ACTIVEEON_INITIAL_DEV$$
  */
 
 package org.ow2.proactive_grid_cloud_portal.cli.cmd;
@@ -55,13 +55,13 @@ public class PauseJobCommand extends AbstractJobCommand implements Command {
         if (statusCode(OK) == statusCode(response)) {
             boolean success = readValue(response, Boolean.TYPE);
             if (success) {
-                writeLine("%s paused", job());
+                writeLine("%s successfully paused.", job());
             } else {
-                writeLine("%s cannot be pause", job());
+                writeLine("Cannot pause %s.", job());
             }
         } else {
-            handleError("An error occured while attempting to pause " + job(),
-                    response);
+            handleError("An error occurred while attempting to pause %s:"
+                    + job(), response);
         }
 
     }

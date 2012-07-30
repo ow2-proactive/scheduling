@@ -32,7 +32,7 @@
  *  Contributor(s):
  *
  * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * $$ACTIVEEON_INITIAL_DEV$$
  */
 
 package org.ow2.proactive_grid_cloud_portal.cli.cmd;
@@ -61,16 +61,16 @@ public class PreemptTaskCommand extends AbstractTaskCommand implements Command {
             boolean success = readValue(response, Boolean.TYPE).booleanValue();
             if (success) {
                 writeLine(
-                        "%s has been stopped and will be rescheduled after 5 seconds",
+                        "%s has been stopped and will be rescheduled after 5 seconds.",
                         task());
             } else {
                 writeLine(
-                        "%s cannot be stopped, most likely it is not running .. ",
+                        "%s cannot be stopped and most likely it is not running.",
                         task());
             }
         } else {
-            handleError(
-                    "An error occured while attempting to preemt " + task(),
+            handleError(String.format(
+                    "An error occurred while attempting to preemt %s:", task()),
                     response);
         }
     }

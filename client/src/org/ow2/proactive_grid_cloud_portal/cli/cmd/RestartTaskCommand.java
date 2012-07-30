@@ -32,7 +32,7 @@
  *  Contributor(s):
  *
  * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * $$ACTIVEEON_INITIAL_DEV$$
  */
 
 package org.ow2.proactive_grid_cloud_portal.cli.cmd;
@@ -56,13 +56,15 @@ public class RestartTaskCommand extends AbstractTaskCommand implements Command {
         if (statusCode(OK) == statusCode(response)) {
             boolean success = readValue(response, Boolean.TYPE).booleanValue();
             if (success) {
-                writeLine("%s restarted", task());
+                writeLine("%s successfully restarted.", task());
             } else {
-                writeLine("%s cannot be restarted .. ", task());
+                writeLine("Cannot restart %s.", task());
             }
         } else {
-            handleError("An error occured while attempting to restart "
-                    + task(), response);
+            handleError(
+                    String.format(
+                            "An error occurred while attempting to restart %s:",
+                            task()), response);
         }
     }
 

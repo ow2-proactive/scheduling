@@ -32,7 +32,7 @@
  *  Contributor(s):
  *
  * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * $$ACTIVEEON_INITIAL_DEV$$
  */
 
 package org.ow2.proactive_grid_cloud_portal.cli;
@@ -95,8 +95,8 @@ import org.ow2.proactive_grid_cloud_portal.cli.cmd.KillJobCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.KillSchedulerCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.LinkResourceManagerCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.ListJobsCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.LoggingCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.LoggingWithCredentialsCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.LoginCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.LoginWithCredentialsCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.PauseJobCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.PauseSchedulerCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.PreemptTaskCommand;
@@ -128,10 +128,10 @@ public class CommandFactory {
         commands.put(opt(INSECURE), SetInsecureAccessCommand.class);
         commands.put(opt(CACERTS), SetCaCertsCommand.class);
         commands.put(opt(CACERTS_PASSWORD), SetCaCertsPassCommand.class);
-        commands.put(opt(LOGIN), LoggingCommand.class);
+        commands.put(opt(LOGIN), LoginCommand.class);
         commands.put(opt(PASSWORD), SetPasswordCommand.class);
         commands.put(opt(LOGIN_WITH_CREDENTIALS),
-                LoggingWithCredentialsCommand.class);
+                LoginWithCredentialsCommand.class);
         commands.put(opt(EVAL_SCRIPT), EvalScriptCommand.class);
         commands.put(opt(START_SCHEDULER), StartSchedulerCommand.class);
         commands.put(opt(STOP_SCHEDULER), StopSchedulerCommand.class);
@@ -211,9 +211,13 @@ public class CommandFactory {
         } else if (map.containsKey(opt(LOGIN_WITH_CREDENTIALS))) {
             list.add(map.remove(opt(LOGIN_WITH_CREDENTIALS)));
         }
-
-        list.addAll(map.values());
-
+        
+        if (map.isEmpty()) {
+        	list.add(new StartIModeCommand());
+        } else {
+        	list.addAll(map.values());	
+        }
+        
         return list;
     }
 

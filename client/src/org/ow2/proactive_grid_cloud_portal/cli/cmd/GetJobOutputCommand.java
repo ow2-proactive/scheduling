@@ -32,7 +32,7 @@
  *  Contributor(s):
  *
  * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * $$ACTIVEEON_INITIAL_DEV$$
  */
 
 package org.ow2.proactive_grid_cloud_portal.cli.cmd;
@@ -66,11 +66,12 @@ public class GetJobOutputCommand extends AbstractJobCommand implements Command {
                 writeLine("%s : %s", key, jobOutputs.get(key));
             }
         } else if (statusCode(NO_CONTENT) == statusCode(response)) {
-            writeLine("Job('%s') output not available", jobId);
+            writeLine("%s output not available.", job());
 
         } else {
-            handleError("Error occured while retrieving " + job()
-                    + " output ..", response);
+            handleError(String.format(
+                    "An error occurred while retrieving %s output:", job()),
+                    response);
         }
     }
 
