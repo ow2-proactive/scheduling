@@ -263,6 +263,11 @@ public enum PASchedulerProperties {
      */
     RESOURCE_MANAGER_SINGLE_CONNECTION("pa.scheduler.resourcemanager.authentication.single",
             PropertyType.BOOLEAN),
+            
+    /** Set a timeout for initial connection to the RM connection (in ms) */
+    RESOURCE_MANAGER_CONNECTION_TIMEOUT("pa.scheduler.resourcemanager.connection.timeout",
+            PropertyType.INTEGER),
+
 
     /* ***************************************************************** */
     /* ********************** HIBERNATE PROPERTIES ********************* */
