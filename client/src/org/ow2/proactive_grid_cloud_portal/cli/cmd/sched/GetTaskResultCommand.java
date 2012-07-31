@@ -35,33 +35,39 @@
  * $$ACTIVEEON_INITIAL_DEV$$
  */
 
-package org.ow2.proactive_grid_cloud_portal.cli.cmd;
+package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
 
 import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
-import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractTaskCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
+import org.ow2.proactive_grid_cloud_portal.cli.json.TaskResultView;
+import org.ow2.proactive_grid_cloud_portal.cli.utils.ObjectUtility;
 
-public class GetTaskOutputCommand extends AbstractTaskCommand implements
+public class GetTaskResultCommand extends AbstractTaskCommand implements
         Command {
 
-    public GetTaskOutputCommand(String jobId, String taskId) {
+    public GetTaskResultCommand(String jobId, String taskId) {
         super(jobId, taskId);
     }
 
     @Override
     public void execute() throws Exception {
         HttpGet request = new HttpGet(resourceUrl("jobs/" + jobId + "/tasks/"
-                + taskId + "/result/log/all"));
+                + taskId + "/result"));
         HttpResponse response = execute(request);
         if (statusCode(OK) == statusCode(response)) {
-            writeLine("%s output:", task());
-            writeLine("%s", StringUtility.string(response));
+            TaskResultView taskResult = readValue(response,
+                    TaskResultView.class);
+            writeLine("%s result:", task());
+            writeLine(ObjectUtility.object(taskResult.getSerializedValue())
+                    .toString());
 
         } else {
             handleError(String.format(
-                    "An error occurred while retrieving %s output:", task()),
+                    "An error occurred while retrieving %s result:", task()),
                     response);
         }
     }

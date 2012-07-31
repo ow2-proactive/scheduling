@@ -1,29 +1,31 @@
-package org.ow2.proactive_grid_cloud_portal.cli.cmd;
+package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
 
 import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPut;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 
-public class PauseSchedulerCommand extends AbstractCommand implements Command {
+public class ResumeCommand extends AbstractCommand implements Command {
 
-    public PauseSchedulerCommand() {
+    public ResumeCommand() {
     }
 
     @Override
     public void execute() throws Exception {
-        HttpPut request = new HttpPut(resourceUrl("pause"));
+        HttpPut request = new HttpPut(resourceUrl("resume"));
         HttpResponse response = execute(request);
         if (statusCode(OK) == statusCode(response)) {
             boolean success = readValue(response, Boolean.TYPE);
             if (success) {
-                writeLine("Scheduler successfully paused.");
+                writeLine("Scheduler successfully resumed.");
             } else {
-                writeLine("Cannot pause scheduler.");
+                writeLine("Cannot resume scheduler.");
             }
         } else {
             handleError(
-                    "An error occurred while attempting to pause scheduler:",
+                    "An error occurred while attempting to resume scheduler:",
                     response);
         }
     }

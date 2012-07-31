@@ -80,39 +80,39 @@ import java.util.Map;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.ChangeJobPriorityCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.EvalScriptCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.FreezeSchedulerCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.GetJobOutputCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.GetJobResultCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.GetJobStateCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.GetStatsCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.GetTaskOutputCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.GetTaskResultCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.HelpCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.KillJobCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.KillSchedulerCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.LinkResourceManagerCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.ListJobsCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.LoginCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.LoginWithCredentialsCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.PauseJobCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.PauseSchedulerCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.PreemptTaskCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.RemoveJobCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.RestartTaskCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.ResumeJobCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.ResumeSchedulerCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.SetCaCertsCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.SetCaCertsPassCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.SetInsecureAccessCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.SetPasswordCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.SetUrlCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.StartIModeCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.StartSchedulerCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.StopSchedulerCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.SubmitJobCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.ChangeJobPriorityCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.FreezeCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.GetJobOutputCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.GetJobResultCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.GetJobStateCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.SchedStatsCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.GetTaskOutputCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.GetTaskResultCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.SchedHelpCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.KillJobCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.KillCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.LinkRmCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.ListJobCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.PauseJobCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.PauseCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.PreemptTaskCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.RemoveJobCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.RestartTaskCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.ResumeJobCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.ResumeCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.StartCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.StopCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.SubmitJobCommand;
 
 /**
  * {@link CommandFactory} builds an ordered {@link Command} list for a given
@@ -124,7 +124,7 @@ public class CommandFactory {
 
     static {
         commands.put(opt(URL), SetUrlCommand.class);
-        commands.put(opt(HELP), HelpCommand.class);
+        commands.put(opt(HELP), SchedHelpCommand.class);
         commands.put(opt(INSECURE), SetInsecureAccessCommand.class);
         commands.put(opt(CACERTS), SetCaCertsCommand.class);
         commands.put(opt(CACERTS_PASSWORD), SetCaCertsPassCommand.class);
@@ -133,16 +133,16 @@ public class CommandFactory {
         commands.put(opt(LOGIN_WITH_CREDENTIALS),
                 LoginWithCredentialsCommand.class);
         commands.put(opt(EVAL_SCRIPT), EvalScriptCommand.class);
-        commands.put(opt(START_SCHEDULER), StartSchedulerCommand.class);
-        commands.put(opt(STOP_SCHEDULER), StopSchedulerCommand.class);
-        commands.put(opt(PAUSE_SCHEDULER), PauseSchedulerCommand.class);
-        commands.put(opt(RESUME_SCHEDULER), ResumeSchedulerCommand.class);
-        commands.put(opt(FREEZE_SCHEDULER), FreezeSchedulerCommand.class);
-        commands.put(opt(KILL_SCHEDULER), KillSchedulerCommand.class);
+        commands.put(opt(START_SCHEDULER), StartCommand.class);
+        commands.put(opt(STOP_SCHEDULER), StopCommand.class);
+        commands.put(opt(PAUSE_SCHEDULER), PauseCommand.class);
+        commands.put(opt(RESUME_SCHEDULER), ResumeCommand.class);
+        commands.put(opt(FREEZE_SCHEDULER), FreezeCommand.class);
+        commands.put(opt(KILL_SCHEDULER), KillCommand.class);
 
-        commands.put(opt(GET_STATS), GetStatsCommand.class);
-        commands.put(opt(LIST_JOBS), ListJobsCommand.class);
-        commands.put(opt(LINK_RM), LinkResourceManagerCommand.class);
+        commands.put(opt(GET_STATS), SchedStatsCommand.class);
+        commands.put(opt(LIST_JOBS), ListJobCommand.class);
+        commands.put(opt(LINK_RM), LinkRmCommand.class);
 
         commands.put(opt(SUBMIT_JOB_DESC), SubmitJobCommand.class);
         commands.put(opt(SUBMIT_JOB_ARCH), SubmitJobCommand.class);

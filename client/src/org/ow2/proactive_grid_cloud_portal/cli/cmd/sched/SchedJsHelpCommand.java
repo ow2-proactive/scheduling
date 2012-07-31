@@ -35,44 +35,41 @@
  * $$ACTIVEEON_INITIAL_DEV$$
  */
 
-package org.ow2.proactive_grid_cloud_portal.cli.cmd;
+package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
 
-import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
+import java.util.ArrayList;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpPut;
+import org.ow2.proactive.utils.ObjectArrayFormatter;
+import org.ow2.proactive_grid_cloud_portal.cli.RestCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
+import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
 
-public class PreemptTaskCommand extends AbstractTaskCommand implements Command {
+public class SchedJsHelpCommand extends AbstractCommand implements Command {
 
-    public PreemptTaskCommand(String jobId, String taskId) {
-        this(jobId, taskId, null);
-    }
-
-    public PreemptTaskCommand(String jobId, String taskId, String delay) {
-        super(jobId, taskId);
+    public SchedJsHelpCommand() {
     }
 
     @Override
     public void execute() throws Exception {
-        HttpPut request = new HttpPut(resourceUrl("jobs/" + jobId + "/tasks/"
-                + taskId + "/preempt"));
-        HttpResponse response = execute(request);
-        if (statusCode(OK) == statusCode(response)) {
-            boolean success = readValue(response, Boolean.TYPE).booleanValue();
-            if (success) {
-                writeLine(
-                        "%s has been stopped and will be rescheduled after 5 seconds.",
-                        task());
-            } else {
-                writeLine(
-                        "%s cannot be stopped and most likely it is not running.",
-                        task());
+        ObjectArrayFormatter formatter = new ObjectArrayFormatter();
+        formatter.setMaxColumnLength(100);
+        formatter.setSpace(2);
+        ArrayList<String> titles = new ArrayList<String>();
+        titles.add("Command");
+        titles.add("Description");
+        formatter.setTitle(titles);
+        formatter.addEmptyLine();
+        ArrayList<String> row;
+        for (RestCommand command : RestCommand.values()) {
+            if (command.getJsOpt() != null) {
+                row = new ArrayList<String>();
+                row.add(command.getJsOpt());
+                row.add(command.getDescription());
+                formatter.addLine(row);
             }
-        } else {
-            handleError(String.format(
-                    "An error occurred while attempting to preemt %s:", task()),
-                    response);
         }
+        writeLine(StringUtility.string(formatter));
     }
 
 }

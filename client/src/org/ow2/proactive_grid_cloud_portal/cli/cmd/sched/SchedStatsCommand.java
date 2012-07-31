@@ -35,35 +35,54 @@
  * $$ACTIVEEON_INITIAL_DEV$$
  */
 
-package org.ow2.proactive_grid_cloud_portal.cli.cmd;
+package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
 
 import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpPut;
+import org.apache.http.client.methods.HttpGet;
+import org.codehaus.jackson.type.TypeReference;
+import org.ow2.proactive.utils.ObjectArrayFormatter;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
+import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
 
-public class FreezeSchedulerCommand extends AbstractCommand implements Command {
+public class SchedStatsCommand extends AbstractCommand implements Command {
 
-    public FreezeSchedulerCommand() {
+    public SchedStatsCommand() {
     }
 
     @Override
     public void execute() throws Exception {
-        HttpPut request = new HttpPut(resourceUrl("freeze"));
+        HttpGet request = new HttpGet(resourceUrl("stats"));
         HttpResponse response = execute(request);
-
         if (statusCode(OK) == statusCode(response)) {
-            Boolean success = readValue(response, Boolean.TYPE);
-            if (success) {
-                writeLine("Scheduler successfully frozen.");
-            } else {
-                writeLine("Cannot freeze scheduler.");
+            Map<String, String> stats = readValue(response,
+                    new TypeReference<Map<String, String>>() {
+                    });
+            ObjectArrayFormatter oaf = new ObjectArrayFormatter();
+            oaf.setMaxColumnLength(80);
+            oaf.setSpace(2);
+            List<String> columnNames = new ArrayList<String>();
+            columnNames.add("");
+            columnNames.add("");
+            oaf.setTitle(columnNames);
+            for (Entry<String, String> e : stats.entrySet()) {
+                List<String> row = new ArrayList<String>();
+                row.add(e.getKey());
+                row.add(e.getValue());
+                oaf.addLine(row);
             }
+            writeLine(StringUtility.string(oaf));
         } else {
-            handleError(
-                    "Error occurred while trying to freeze the scheduler:",
-                    response);
+            handleError("An error occurred while retrieving stats:", response);
         }
+
     }
 
 }

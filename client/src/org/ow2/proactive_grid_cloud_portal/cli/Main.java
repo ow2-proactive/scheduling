@@ -57,7 +57,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.HelpCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.SchedHelpCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.console.AbstractDevice;
 
 /**
@@ -77,7 +77,7 @@ public class Main {
                         null);
                 ApplicationContext.instance().setDevice(
                         AbstractDevice.getConsole(STARDARD));
-                (new HelpCommand()).execute();
+                (new SchedHelpCommand()).execute();
             } catch (Exception e) {
                 e.printStackTrace();
                 // Ignore

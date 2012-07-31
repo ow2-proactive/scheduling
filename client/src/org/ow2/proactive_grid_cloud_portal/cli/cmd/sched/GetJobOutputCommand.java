@@ -35,52 +35,46 @@
  * $$ACTIVEEON_INITIAL_DEV$$
  */
 
-package org.ow2.proactive_grid_cloud_portal.cli.cmd;
+package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
 
+import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.NO_CONTENT;
 import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.codehaus.jackson.type.TypeReference;
-import org.ow2.proactive.utils.ObjectArrayFormatter;
-import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractJobCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 
-public class GetStatsCommand extends AbstractCommand implements Command {
+public class GetJobOutputCommand extends AbstractJobCommand implements Command {
 
-    public GetStatsCommand() {
+    public GetJobOutputCommand(String jobId) {
+        super(jobId);
     }
 
     @Override
     public void execute() throws Exception {
-        HttpGet request = new HttpGet(resourceUrl("stats"));
+        HttpGet request = new HttpGet(resourceUrl("jobs/" + jobId
+                + "/result/value"));
         HttpResponse response = execute(request);
         if (statusCode(OK) == statusCode(response)) {
-            Map<String, String> stats = readValue(response,
+            writeLine("%s output:", job());
+            Map<String, String> jobOutputs = readValue(response,
                     new TypeReference<Map<String, String>>() {
                     });
-            ObjectArrayFormatter oaf = new ObjectArrayFormatter();
-            oaf.setMaxColumnLength(80);
-            oaf.setSpace(2);
-            List<String> columnNames = new ArrayList<String>();
-            columnNames.add("");
-            columnNames.add("");
-            oaf.setTitle(columnNames);
-            for (Entry<String, String> e : stats.entrySet()) {
-                List<String> row = new ArrayList<String>();
-                row.add(e.getKey());
-                row.add(e.getValue());
-                oaf.addLine(row);
+            for (String key : jobOutputs.keySet()) {
+                writeLine("%s : %s", key, jobOutputs.get(key));
             }
-            writeLine(StringUtility.string(oaf));
-        } else {
-            handleError("An error occurred while retrieving stats:", response);
-        }
+        } else if (statusCode(NO_CONTENT) == statusCode(response)) {
+            writeLine("%s output not available.", job());
 
+        } else {
+            handleError(String.format(
+                    "An error occurred while retrieving %s output:", job()),
+                    response);
+        }
     }
 
 }

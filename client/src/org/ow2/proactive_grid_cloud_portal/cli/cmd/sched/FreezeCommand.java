@@ -35,38 +35,37 @@
  * $$ACTIVEEON_INITIAL_DEV$$
  */
 
-package org.ow2.proactive_grid_cloud_portal.cli.cmd;
+package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
 
 import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
 
 import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.ow2.proactive_grid_cloud_portal.cli.json.TaskResultView;
-import org.ow2.proactive_grid_cloud_portal.cli.utils.ObjectUtility;
+import org.apache.http.client.methods.HttpPut;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 
-public class GetTaskResultCommand extends AbstractTaskCommand implements
-        Command {
+public class FreezeCommand extends AbstractCommand implements Command {
 
-    public GetTaskResultCommand(String jobId, String taskId) {
-        super(jobId, taskId);
+    public FreezeCommand() {
     }
 
     @Override
     public void execute() throws Exception {
-        HttpGet request = new HttpGet(resourceUrl("jobs/" + jobId + "/tasks/"
-                + taskId + "/result"));
+        HttpPut request = new HttpPut(resourceUrl("freeze"));
         HttpResponse response = execute(request);
-        if (statusCode(OK) == statusCode(response)) {
-            TaskResultView taskResult = readValue(response,
-                    TaskResultView.class);
-            writeLine("%s result:", task());
-            writeLine(ObjectUtility.object(taskResult.getSerializedValue())
-                    .toString());
 
+        if (statusCode(OK) == statusCode(response)) {
+            Boolean success = readValue(response, Boolean.TYPE);
+            if (success) {
+                writeLine("Scheduler successfully frozen.");
+            } else {
+                writeLine("Cannot freeze scheduler.");
+            }
         } else {
-            handleError(String.format(
-                    "An error occurred while retrieving %s result:", task()),
+            handleError(
+                    "Error occurred while trying to freeze the scheduler:",
                     response);
         }
     }
+
 }

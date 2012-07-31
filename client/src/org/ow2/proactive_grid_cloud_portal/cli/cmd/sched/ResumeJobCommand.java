@@ -35,39 +35,37 @@
  * $$ACTIVEEON_INITIAL_DEV$$
  */
 
-package org.ow2.proactive_grid_cloud_portal.cli.cmd;
+package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
 
-import java.util.ArrayList;
+import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
 
-import org.ow2.proactive.utils.ObjectArrayFormatter;
-import org.ow2.proactive_grid_cloud_portal.cli.RestCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpPut;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractJobCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 
-public class JSHelpCommand extends AbstractCommand implements Command {
+public class ResumeJobCommand extends AbstractJobCommand implements Command {
 
-    public JSHelpCommand() {
+    public ResumeJobCommand(String jobId) {
+        super(jobId);
     }
 
     @Override
     public void execute() throws Exception {
-        ObjectArrayFormatter formatter = new ObjectArrayFormatter();
-        formatter.setMaxColumnLength(100);
-        formatter.setSpace(2);
-        ArrayList<String> titles = new ArrayList<String>();
-        titles.add("Command");
-        titles.add("Description");
-        formatter.setTitle(titles);
-        formatter.addEmptyLine();
-        ArrayList<String> row;
-        for (RestCommand command : RestCommand.values()) {
-            if (command.getJsOpt() != null) {
-                row = new ArrayList<String>();
-                row.add(command.getJsOpt());
-                row.add(command.getDescription());
-                formatter.addLine(row);
+        HttpPut request = new HttpPut(resourceUrl("jobs/" + jobId + "/resume"));
+        HttpResponse response = execute(request);
+        if (statusCode(OK) == statusCode(response)) {
+            boolean success = readValue(response, Boolean.TYPE);
+            if (success) {
+                writeLine("%s resumed successfully.", job());
+            } else {
+                writeLine("Cannot resume %s.", job());
             }
+        } else {
+            handleError(String.format(
+                    "An error occurred while attempting to resume %s:", job()),
+                    response);
         }
-        writeLine(StringUtility.string(formatter));
     }
 
 }

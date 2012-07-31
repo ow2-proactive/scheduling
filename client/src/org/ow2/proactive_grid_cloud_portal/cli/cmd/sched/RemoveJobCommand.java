@@ -35,44 +35,36 @@
  * $$ACTIVEEON_INITIAL_DEV$$
  */
 
-package org.ow2.proactive_grid_cloud_portal.cli.cmd;
+package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
 
-import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.NO_CONTENT;
 import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
 
-import java.util.Map;
-
 import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.ow2.proactive_grid_cloud_portal.cli.json.JobResultView;
-import org.ow2.proactive_grid_cloud_portal.cli.json.TaskResultView;
-import org.ow2.proactive_grid_cloud_portal.cli.utils.ObjectUtility;
+import org.apache.http.client.methods.HttpDelete;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractJobCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 
-public class GetJobResultCommand extends AbstractJobCommand implements Command {
+public class RemoveJobCommand extends AbstractJobCommand implements Command {
 
-    public GetJobResultCommand(String jobId) {
+    public RemoveJobCommand(String jobId) {
         super(jobId);
     }
 
     @Override
     public void execute() throws Exception {
-        HttpGet request = new HttpGet(resourceUrl("jobs/" + jobId + "/result"));
+        HttpDelete request = new HttpDelete(resourceUrl("jobs/" + jobId));
         HttpResponse response = execute(request);
         if (statusCode(OK) == statusCode(response)) {
-            writeLine("%s result:", job());
-            JobResultView jobResult = readValue(response, JobResultView.class);
-            Map<String, TaskResultView> allResults = jobResult.getAllResults();
-            for (String taskName : allResults.keySet()) {
-                writeLine(taskName + " : "
-                        + ObjectUtility.object(allResults.get(taskName).getSerializedValue()));
+            boolean success = readValue(response, Boolean.TYPE);
+            if (success) {
+                writeLine("%s sucessfully removed.", job());
+            } else {
+                writeLine("Cannot remove %s.", job());
             }
-        } else if (statusCode(NO_CONTENT) == statusCode(response)) {
-            writeLine("%s result not available.", job());
-
         } else {
-            handleError(
-                    String.format("An error occurred while retrieving %s result:"
-                            + job()), response);
+            handleError(String.format(
+                    "An error occurred while attempting to remove %s:", job()),
+                    response);
         }
     }
 

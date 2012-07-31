@@ -35,35 +35,44 @@
  * $$ACTIVEEON_INITIAL_DEV$$
  */
 
-package org.ow2.proactive_grid_cloud_portal.cli.cmd;
+package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
 
+import static org.apache.http.entity.ContentType.APPLICATION_FORM_URLENCODED;
 import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
 
 import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpPut;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 
-public class ResumeJobCommand extends AbstractJobCommand implements Command {
+public class LinkRmCommand extends AbstractCommand implements
+        Command {
 
-    public ResumeJobCommand(String jobId) {
-        super(jobId);
+    private String rmUrl;
+
+    public LinkRmCommand(String rmUrl) {
+        this.rmUrl = rmUrl;
     }
 
     @Override
     public void execute() throws Exception {
-        HttpPut request = new HttpPut(resourceUrl("jobs/" + jobId + "/resume"));
+        HttpPost request = new HttpPost(resourceUrl("linkrm"));
+        StringEntity entity = new StringEntity("rmurl=" + rmUrl,
+                APPLICATION_FORM_URLENCODED);
+        request.setEntity(entity);
         HttpResponse response = execute(request);
         if (statusCode(OK) == statusCode(response)) {
             boolean success = readValue(response, Boolean.TYPE);
             if (success) {
-                writeLine("%s resumed successfully.", job());
+                writeLine("New resource manager relinked successfully.");
             } else {
-                writeLine("Cannot resume %s.", job());
+                writeLine("Cannot relink '%s'.", rmUrl);
             }
         } else {
-            handleError(String.format(
-                    "An error occurred while attempting to resume %s:", job()),
-                    response);
+            handleError("An error occurred while relinking:", response);
         }
+
     }
 
 }

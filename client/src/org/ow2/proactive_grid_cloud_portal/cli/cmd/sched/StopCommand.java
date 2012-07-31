@@ -35,33 +35,34 @@
  * $$ACTIVEEON_INITIAL_DEV$$
  */
 
-package org.ow2.proactive_grid_cloud_portal.cli.cmd;
+package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
 
 import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPut;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 
-public class KillJobCommand extends AbstractJobCommand implements Command {
+public class StopCommand extends AbstractCommand implements Command {
 
-    public KillJobCommand(String jobId) {
-        super(jobId);
+    public StopCommand() {
     }
 
     @Override
     public void execute() throws Exception {
-        HttpPut request = new HttpPut(resourceUrl("jobs/" + jobId + "/kill"));
+        HttpPut request = new HttpPut(resourceUrl("stop"));
         HttpResponse response = execute(request);
         if (statusCode(OK) == statusCode(response)) {
             boolean success = readValue(response, Boolean.TYPE);
             if (success) {
-                writeLine("%s successfully killed.", job());
+                writeLine("Scheduler successfully stopped.");
             } else {
-                writeLine("Cannot kill %s:", job());
+                writeLine("Cannot stop scheduler.");
             }
         } else {
-            handleError(String.format(
-                    "An error occurred while attempting to kill %s:", job()),
+            handleError(
+                    "An error occurred while attempting to stop scheduler:",
                     response);
         }
     }

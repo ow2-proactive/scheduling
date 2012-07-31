@@ -35,33 +35,46 @@
  * $$ACTIVEEON_INITIAL_DEV$$
  */
 
-package org.ow2.proactive_grid_cloud_portal.cli.cmd;
+package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
 
-import java.io.PrintWriter;
-import java.io.Writer;
+import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
 
-import org.apache.commons.cli.HelpFormatter;
-import org.ow2.proactive_grid_cloud_portal.cli.Main;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpPut;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractTaskCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 
-public class HelpCommand extends AbstractCommand implements Command {
+public class PreemptTaskCommand extends AbstractTaskCommand implements Command {
 
-    private static final String USAGE = "rest-cli [-u <server-url>] "
-            + "[-k | -ca <store-path>  [-cap <store-pass>]] "
-            + "[-l <login-name> [-p <password>] | -c <cerd-file-path>] "
-            + "[-start | -stop | -pause | -resume | -freeze | -kill | -lj | -stats "
-            + "| -s | -sa | -js | -jo | -jr | -sj | -pj | -rj | -rmj "
-            + "| -to | -tr | -pt | -rt | -h | -sf | -i]";
+    public PreemptTaskCommand(String jobId, String taskId) {
+        this(jobId, taskId, null);
+    }
 
-    public HelpCommand() {
+    public PreemptTaskCommand(String jobId, String taskId, String delay) {
+        super(jobId, taskId);
     }
 
     @Override
     public void execute() throws Exception {
-        HelpFormatter formatter = new HelpFormatter();
-        Writer writer = context().getDevice().getWriter();
-        PrintWriter pw = new PrintWriter(writer, true);
-        formatter.printHelp(pw, 110, USAGE, "", Main.options(),
-                formatter.getLeftPadding(), formatter.getDescPadding(), "",
-                false);
+        HttpPut request = new HttpPut(resourceUrl("jobs/" + jobId + "/tasks/"
+                + taskId + "/preempt"));
+        HttpResponse response = execute(request);
+        if (statusCode(OK) == statusCode(response)) {
+            boolean success = readValue(response, Boolean.TYPE).booleanValue();
+            if (success) {
+                writeLine(
+                        "%s has been stopped and will be rescheduled after 5 seconds.",
+                        task());
+            } else {
+                writeLine(
+                        "%s cannot be stopped and most likely it is not running.",
+                        task());
+            }
+        } else {
+            handleError(String.format(
+                    "An error occurred while attempting to preemt %s:", task()),
+                    response);
+        }
     }
+
 }

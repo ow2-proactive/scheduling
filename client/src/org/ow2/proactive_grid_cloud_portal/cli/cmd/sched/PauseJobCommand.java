@@ -35,44 +35,37 @@
  * $$ACTIVEEON_INITIAL_DEV$$
  */
 
-package org.ow2.proactive_grid_cloud_portal.cli.cmd;
+package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
 
-import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.NO_CONTENT;
 import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
 
-import java.util.Map;
-
 import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.codehaus.jackson.type.TypeReference;
+import org.apache.http.client.methods.HttpPut;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractJobCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 
-public class GetJobOutputCommand extends AbstractJobCommand implements Command {
+public class PauseJobCommand extends AbstractJobCommand implements Command {
 
-    public GetJobOutputCommand(String jobId) {
+    public PauseJobCommand(String jobId) {
         super(jobId);
     }
 
     @Override
     public void execute() throws Exception {
-        HttpGet request = new HttpGet(resourceUrl("jobs/" + jobId
-                + "/result/value"));
+        HttpPut request = new HttpPut(resourceUrl("jobs/" + jobId + "/pause"));
         HttpResponse response = execute(request);
         if (statusCode(OK) == statusCode(response)) {
-            writeLine("%s output:", job());
-            Map<String, String> jobOutputs = readValue(response,
-                    new TypeReference<Map<String, String>>() {
-                    });
-            for (String key : jobOutputs.keySet()) {
-                writeLine("%s : %s", key, jobOutputs.get(key));
+            boolean success = readValue(response, Boolean.TYPE);
+            if (success) {
+                writeLine("%s successfully paused.", job());
+            } else {
+                writeLine("Cannot pause %s.", job());
             }
-        } else if (statusCode(NO_CONTENT) == statusCode(response)) {
-            writeLine("%s output not available.", job());
-
         } else {
-            handleError(String.format(
-                    "An error occurred while retrieving %s output:", job()),
-                    response);
+            handleError("An error occurred while attempting to pause %s:"
+                    + job(), response);
         }
+
     }
 
 }

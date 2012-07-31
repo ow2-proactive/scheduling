@@ -35,37 +35,36 @@
  * $$ACTIVEEON_INITIAL_DEV$$
  */
 
-package org.ow2.proactive_grid_cloud_portal.cli.cmd;
+package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
 
-import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
+import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.NO_CONTENT;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPut;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractJobCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 
-public class RestartTaskCommand extends AbstractTaskCommand implements Command {
+public class ChangeJobPriorityCommand extends AbstractJobCommand implements
+        Command {
+    private String priorityValue;
 
-    public RestartTaskCommand(String jobId, String taskId) {
-        super(jobId, taskId);
+    public ChangeJobPriorityCommand(String jobId, String priorityValue) {
+        super(jobId);
+        this.priorityValue = priorityValue;
     }
 
     @Override
     public void execute() throws Exception {
-        HttpPut request = new HttpPut(resourceUrl("jobs/" + jobId + "/tasks/"
-                + taskId + "/restart"));
+        String resourceUrl = resourceUrl("jobs/" + jobId + "/priority/byvalue/"
+                + priorityValue);
+        HttpPut request = new HttpPut(resourceUrl);
         HttpResponse response = execute(request);
-        if (statusCode(OK) == statusCode(response)) {
-            boolean success = readValue(response, Boolean.TYPE).booleanValue();
-            if (success) {
-                writeLine("%s successfully restarted.", task());
-            } else {
-                writeLine("Cannot restart %s.", task());
-            }
+        if (statusCode(NO_CONTENT) == statusCode(response)) {
+            writeLine("%s priority changed successfully.", job());
         } else {
-            handleError(
-                    String.format(
-                            "An error occurred while attempting to restart %s:",
-                            task()), response);
+            handleError(String.format(
+                    "An error occurred while changing %s priority:", job()),
+                    response);
         }
     }
-
 }

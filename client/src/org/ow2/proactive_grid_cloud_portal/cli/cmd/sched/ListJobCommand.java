@@ -35,7 +35,7 @@
  * $$ACTIVEEON_INITIAL_DEV$$
  */
 
-package org.ow2.proactive_grid_cloud_portal.cli.cmd;
+package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
 
 import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
 
@@ -49,13 +49,15 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.codehaus.jackson.type.TypeReference;
 import org.ow2.proactive.utils.ObjectArrayFormatter;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.cli.json.JobStateView;
 import org.ow2.proactive_grid_cloud_portal.cli.json.SchedulerStateView;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
 
-public class ListJobsCommand extends AbstractCommand implements Command {
+public class ListJobCommand extends AbstractCommand implements Command {
 
-    public ListJobsCommand() {
+    public ListJobCommand() {
     }
 
     @Override

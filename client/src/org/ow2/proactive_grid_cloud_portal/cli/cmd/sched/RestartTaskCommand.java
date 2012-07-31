@@ -35,34 +35,39 @@
  * $$ACTIVEEON_INITIAL_DEV$$
  */
 
-package org.ow2.proactive_grid_cloud_portal.cli.cmd;
+package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
 
-import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.NO_CONTENT;
+import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPut;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractTaskCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 
-public class ChangeJobPriorityCommand extends AbstractJobCommand implements
-        Command {
-    private String priorityValue;
+public class RestartTaskCommand extends AbstractTaskCommand implements Command {
 
-    public ChangeJobPriorityCommand(String jobId, String priorityValue) {
-        super(jobId);
-        this.priorityValue = priorityValue;
+    public RestartTaskCommand(String jobId, String taskId) {
+        super(jobId, taskId);
     }
 
     @Override
     public void execute() throws Exception {
-        String resourceUrl = resourceUrl("jobs/" + jobId + "/priority/byvalue/"
-                + priorityValue);
-        HttpPut request = new HttpPut(resourceUrl);
+        HttpPut request = new HttpPut(resourceUrl("jobs/" + jobId + "/tasks/"
+                + taskId + "/restart"));
         HttpResponse response = execute(request);
-        if (statusCode(NO_CONTENT) == statusCode(response)) {
-            writeLine("%s priority changed successfully.", job());
+        if (statusCode(OK) == statusCode(response)) {
+            boolean success = readValue(response, Boolean.TYPE).booleanValue();
+            if (success) {
+                writeLine("%s successfully restarted.", task());
+            } else {
+                writeLine("Cannot restart %s.", task());
+            }
         } else {
-            handleError(String.format(
-                    "An error occurred while changing %s priority:", job()),
-                    response);
+            handleError(
+                    String.format(
+                            "An error occurred while attempting to restart %s:",
+                            task()), response);
         }
     }
+
 }

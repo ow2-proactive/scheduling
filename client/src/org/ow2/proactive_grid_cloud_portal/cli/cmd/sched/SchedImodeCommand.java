@@ -35,7 +35,7 @@
  * $$ACTIVEEON_INITIAL_DEV$$
  */
 
-package org.ow2.proactive_grid_cloud_portal.cli.cmd;
+package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -46,12 +46,14 @@ import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 
-public class StartIModeCommand extends AbstractCommand implements Command {
+public class SchedImodeCommand extends AbstractCommand implements Command {
 
     private ScriptEngine engine;
 
-    public StartIModeCommand() {
+    public SchedImodeCommand() {
         ApplicationContext context = ApplicationContext.instance();
         if (context.getEngine() != null) {
             engine = context.getEngine();
@@ -63,7 +65,7 @@ public class StartIModeCommand extends AbstractCommand implements Command {
             context.setEngine(engine);
         }
         try {
-            InputStream is = StartIModeCommand.class
+            InputStream is = SchedImodeCommand.class
                     .getResourceAsStream("RestfulSchedulerActions.js");
             engine.eval(new InputStreamReader(is));
         } catch (ScriptException e) {

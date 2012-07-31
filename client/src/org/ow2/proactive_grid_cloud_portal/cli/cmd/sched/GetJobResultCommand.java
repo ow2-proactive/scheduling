@@ -35,35 +35,47 @@
  * $$ACTIVEEON_INITIAL_DEV$$
  */
 
-package org.ow2.proactive_grid_cloud_portal.cli.cmd;
+package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
 
+import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.NO_CONTENT;
 import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
 
+import java.util.Map;
+
 import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpPut;
+import org.apache.http.client.methods.HttpGet;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractJobCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
+import org.ow2.proactive_grid_cloud_portal.cli.json.JobResultView;
+import org.ow2.proactive_grid_cloud_portal.cli.json.TaskResultView;
+import org.ow2.proactive_grid_cloud_portal.cli.utils.ObjectUtility;
 
-public class PauseJobCommand extends AbstractJobCommand implements Command {
+public class GetJobResultCommand extends AbstractJobCommand implements Command {
 
-    public PauseJobCommand(String jobId) {
+    public GetJobResultCommand(String jobId) {
         super(jobId);
     }
 
     @Override
     public void execute() throws Exception {
-        HttpPut request = new HttpPut(resourceUrl("jobs/" + jobId + "/pause"));
+        HttpGet request = new HttpGet(resourceUrl("jobs/" + jobId + "/result"));
         HttpResponse response = execute(request);
         if (statusCode(OK) == statusCode(response)) {
-            boolean success = readValue(response, Boolean.TYPE);
-            if (success) {
-                writeLine("%s successfully paused.", job());
-            } else {
-                writeLine("Cannot pause %s.", job());
+            writeLine("%s result:", job());
+            JobResultView jobResult = readValue(response, JobResultView.class);
+            Map<String, TaskResultView> allResults = jobResult.getAllResults();
+            for (String taskName : allResults.keySet()) {
+                writeLine(taskName + " : "
+                        + ObjectUtility.object(allResults.get(taskName).getSerializedValue()));
             }
-        } else {
-            handleError("An error occurred while attempting to pause %s:"
-                    + job(), response);
-        }
+        } else if (statusCode(NO_CONTENT) == statusCode(response)) {
+            writeLine("%s result not available.", job());
 
+        } else {
+            handleError(
+                    String.format("An error occurred while retrieving %s result:"
+                            + job()), response);
+        }
     }
 
 }

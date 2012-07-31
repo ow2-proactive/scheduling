@@ -35,34 +35,36 @@
  * $$ACTIVEEON_INITIAL_DEV$$
  */
 
-package org.ow2.proactive_grid_cloud_portal.cli.cmd;
+package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
 
 import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
 
 import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpPut;
+import org.apache.http.client.methods.HttpGet;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractTaskCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
+import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
 
-public class KillSchedulerCommand extends AbstractCommand implements Command {
+public class GetTaskOutputCommand extends AbstractTaskCommand implements
+        Command {
 
-    public KillSchedulerCommand() {
+    public GetTaskOutputCommand(String jobId, String taskId) {
+        super(jobId, taskId);
     }
 
     @Override
     public void execute() throws Exception {
-        HttpPut request = new HttpPut(resourceUrl("kill"));
+        HttpGet request = new HttpGet(resourceUrl("jobs/" + jobId + "/tasks/"
+                + taskId + "/result/log/all"));
         HttpResponse response = execute(request);
         if (statusCode(OK) == statusCode(response)) {
-            boolean success = readValue(response, Boolean.TYPE);
-            if (success) {
-                writeLine("Scheduler successfully killed.");
-            } else {
-                writeLine("Cannot kill scheduler.");
-            }
+            writeLine("%s output:", task());
+            writeLine("%s", StringUtility.string(response));
+
         } else {
-            handleError(
-                    "An error occurred while attempting to kill scheduler:",
+            handleError(String.format(
+                    "An error occurred while retrieving %s output:", task()),
                     response);
         }
     }
-
 }

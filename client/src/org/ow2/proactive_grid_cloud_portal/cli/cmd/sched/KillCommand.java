@@ -35,32 +35,34 @@
  * $$ACTIVEEON_INITIAL_DEV$$
  */
 
-package org.ow2.proactive_grid_cloud_portal.cli.cmd;
+package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
 
 import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPut;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 
-public class StartSchedulerCommand extends AbstractCommand implements Command {
+public class KillCommand extends AbstractCommand implements Command {
 
-    public StartSchedulerCommand() {
+    public KillCommand() {
     }
 
     @Override
     public void execute() throws Exception {
-        HttpPut request = new HttpPut(resourceUrl("start"));
+        HttpPut request = new HttpPut(resourceUrl("kill"));
         HttpResponse response = execute(request);
         if (statusCode(OK) == statusCode(response)) {
             boolean success = readValue(response, Boolean.TYPE);
             if (success) {
-                writeLine("Scheduler successfully started.");
+                writeLine("Scheduler successfully killed.");
             } else {
-                writeLine("Cannot start scheduler.");
+                writeLine("Cannot kill scheduler.");
             }
         } else {
             handleError(
-                    "An error occurred while attempting to start scheduler:",
+                    "An error occurred while attempting to kill scheduler:",
                     response);
         }
     }

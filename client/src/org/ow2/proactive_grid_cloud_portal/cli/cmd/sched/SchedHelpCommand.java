@@ -35,35 +35,35 @@
  * $$ACTIVEEON_INITIAL_DEV$$
  */
 
-package org.ow2.proactive_grid_cloud_portal.cli.cmd;
+package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
 
-import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
+import java.io.PrintWriter;
+import java.io.Writer;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpDelete;
+import org.apache.commons.cli.HelpFormatter;
+import org.ow2.proactive_grid_cloud_portal.cli.Main;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 
-public class RemoveJobCommand extends AbstractJobCommand implements Command {
+public class SchedHelpCommand extends AbstractCommand implements Command {
 
-    public RemoveJobCommand(String jobId) {
-        super(jobId);
+    private static final String USAGE = "rest-cli [-u <server-url>] "
+            + "[-k | -ca <store-path>  [-cap <store-pass>]] "
+            + "[-l <login-name> [-p <password>] | -c <cerd-file-path>] "
+            + "[-start | -stop | -pause | -resume | -freeze | -kill | -lj | -stats "
+            + "| -s | -sa | -js | -jo | -jr | -sj | -pj | -rj | -rmj "
+            + "| -to | -tr | -pt | -rt | -h | -sf | -i]";
+
+    public SchedHelpCommand() {
     }
 
     @Override
     public void execute() throws Exception {
-        HttpDelete request = new HttpDelete(resourceUrl("jobs/" + jobId));
-        HttpResponse response = execute(request);
-        if (statusCode(OK) == statusCode(response)) {
-            boolean success = readValue(response, Boolean.TYPE);
-            if (success) {
-                writeLine("%s sucessfully removed.", job());
-            } else {
-                writeLine("Cannot remove %s.", job());
-            }
-        } else {
-            handleError(String.format(
-                    "An error occurred while attempting to remove %s:", job()),
-                    response);
-        }
+        HelpFormatter formatter = new HelpFormatter();
+        Writer writer = context().getDevice().getWriter();
+        PrintWriter pw = new PrintWriter(writer, true);
+        formatter.printHelp(pw, 110, USAGE, "", Main.options(),
+                formatter.getLeftPadding(), formatter.getDescPadding(), "",
+                false);
     }
-
 }
