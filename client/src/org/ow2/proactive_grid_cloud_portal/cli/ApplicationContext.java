@@ -62,7 +62,8 @@ public class ApplicationContext {
     private String sessionId;
     private AbstractDevice device;
     private boolean termiated = false;
-    private String schedulerUrl;
+    private String restServerUrl;
+    private String resourceType;
     private ObjectMapper objectMapper;
     private boolean insecureAccess = false;
     private boolean newSession = false;
@@ -98,8 +99,8 @@ public class ApplicationContext {
         this.device = device;
     }
 
-    public void setSchedulerUrl(String schedulerUrl) {
-        this.schedulerUrl = schedulerUrl;
+    public void setRestServerUrl(String restServerUrl) {
+        this.restServerUrl = restServerUrl;
     }
 
     public void setObjectMapper(ObjectMapper objectMapper) {
@@ -115,7 +116,7 @@ public class ApplicationContext {
     }
 
     public synchronized void init(String schedulerUrl, AbstractDevice console) {
-        this.schedulerUrl = schedulerUrl;
+        this.restServerUrl = schedulerUrl;
     }
 
     public AbstractDevice getDevice() {
@@ -146,8 +147,8 @@ public class ApplicationContext {
         }
     }
 
-    public String getSchedulerUrl() {
-        return schedulerUrl;
+    public String getRestServerUrl() {
+        return restServerUrl;
     }
 
     public ObjectMapper getObjectMapper() {
@@ -204,6 +205,14 @@ public class ApplicationContext {
 
     public void setEngine(ScriptEngine engine) {
         this.engine = engine;
+    }
+    
+    public void setResourceType(String resourceType) {
+        this.resourceType = resourceType;
+    }
+    
+    public String getResourceType() {
+        return resourceType;
     }
     
 	public void clearSession() {

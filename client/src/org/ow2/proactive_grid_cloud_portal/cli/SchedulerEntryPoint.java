@@ -35,18 +35,19 @@
  * $$ACTIVEEON_INITIAL_DEV$$
  */
 
-package org.ow2.proactive_grid_cloud_portal.cli.cmd;
+package org.ow2.proactive_grid_cloud_portal.cli;
 
-public class SetUrlCommand extends AbstractCommand implements Command {
-    private String schedulerUrl;
+import static org.ow2.proactive_grid_cloud_portal.cli.RestConstants.SCHEDULER_RESOURCE_TYPE;
 
-    public SetUrlCommand(String schedulerUrl) {
-        this.schedulerUrl = schedulerUrl;
-    }
+public class SchedulerEntryPoint extends EntryPoint {
 
     @Override
-    public void execute() throws Exception {
-       context().setRestServerUrl(schedulerUrl);
+    protected String resourceType() {
+        return SCHEDULER_RESOURCE_TYPE;
+    }
+
+    public static void main(String... args) {
+        (new SchedulerEntryPoint()).run(args);
     }
 
 }

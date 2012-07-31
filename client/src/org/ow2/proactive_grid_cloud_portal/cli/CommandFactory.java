@@ -37,41 +37,17 @@
 
 package org.ow2.proactive_grid_cloud_portal.cli;
 
-import static org.ow2.proactive_grid_cloud_portal.cli.RestCommand.CACERTS;
-import static org.ow2.proactive_grid_cloud_portal.cli.RestCommand.CACERTS_PASSWORD;
-import static org.ow2.proactive_grid_cloud_portal.cli.RestCommand.CHANGE_JOB_PRIORITY;
-import static org.ow2.proactive_grid_cloud_portal.cli.RestCommand.EVAL_SCRIPT;
-import static org.ow2.proactive_grid_cloud_portal.cli.RestCommand.FREEZE_SCHEDULER;
-import static org.ow2.proactive_grid_cloud_portal.cli.RestCommand.GET_JOB_OUTPUT;
-import static org.ow2.proactive_grid_cloud_portal.cli.RestCommand.GET_JOB_RESULT;
-import static org.ow2.proactive_grid_cloud_portal.cli.RestCommand.GET_JOB_STATE;
-import static org.ow2.proactive_grid_cloud_portal.cli.RestCommand.GET_STATS;
-import static org.ow2.proactive_grid_cloud_portal.cli.RestCommand.GET_TASK_OUTPUT;
-import static org.ow2.proactive_grid_cloud_portal.cli.RestCommand.GET_TASK_RESULT;
-import static org.ow2.proactive_grid_cloud_portal.cli.RestCommand.HELP;
-import static org.ow2.proactive_grid_cloud_portal.cli.RestCommand.INSECURE;
-import static org.ow2.proactive_grid_cloud_portal.cli.RestCommand.KILL_JOB;
-import static org.ow2.proactive_grid_cloud_portal.cli.RestCommand.KILL_SCHEDULER;
-import static org.ow2.proactive_grid_cloud_portal.cli.RestCommand.LINK_RM;
-import static org.ow2.proactive_grid_cloud_portal.cli.RestCommand.LIST_JOBS;
-import static org.ow2.proactive_grid_cloud_portal.cli.RestCommand.LOGIN;
-import static org.ow2.proactive_grid_cloud_portal.cli.RestCommand.LOGIN_WITH_CREDENTIALS;
-import static org.ow2.proactive_grid_cloud_portal.cli.RestCommand.PASSWORD;
-import static org.ow2.proactive_grid_cloud_portal.cli.RestCommand.PAUSE_JOB;
-import static org.ow2.proactive_grid_cloud_portal.cli.RestCommand.PAUSE_SCHEDULER;
-import static org.ow2.proactive_grid_cloud_portal.cli.RestCommand.PREEMPT_TASK;
-import static org.ow2.proactive_grid_cloud_portal.cli.RestCommand.REMOVE_JOB;
-import static org.ow2.proactive_grid_cloud_portal.cli.RestCommand.RESTART_TASK;
-import static org.ow2.proactive_grid_cloud_portal.cli.RestCommand.RESUME_JOB;
-import static org.ow2.proactive_grid_cloud_portal.cli.RestCommand.RESUME_SCHEDULER;
-import static org.ow2.proactive_grid_cloud_portal.cli.RestCommand.START_IMODE;
-import static org.ow2.proactive_grid_cloud_portal.cli.RestCommand.START_SCHEDULER;
-import static org.ow2.proactive_grid_cloud_portal.cli.RestCommand.STOP_SCHEDULER;
-import static org.ow2.proactive_grid_cloud_portal.cli.RestCommand.SUBMIT_JOB_ARCH;
-import static org.ow2.proactive_grid_cloud_portal.cli.RestCommand.SUBMIT_JOB_DESC;
-import static org.ow2.proactive_grid_cloud_portal.cli.RestCommand.URL;
+import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_INVALID_ARGUMENTS;
+import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.CACERTS;
+import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.CACERTS_PASSWORD;
+import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.CREDENTIALS;
+import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.INSECURE;
+import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.LOGIN;
+import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.PASSWORD;
+import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.SCHED_HELP;
+import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.URL;
 
-import java.lang.reflect.Constructor;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -79,99 +55,58 @@ import java.util.Map;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
+import org.apache.commons.cli.Options;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.EvalScriptCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.LoginCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.LoginWithCredentialsCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.SetCaCertsCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.SetCaCertsPassCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.SetInsecureAccessCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.SetPasswordCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.SetUrlCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.StartIModeCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.ChangeJobPriorityCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.FreezeCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.GetJobOutputCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.GetJobResultCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.GetJobStateCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.SchedStatsCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.GetTaskOutputCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.GetTaskResultCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.SchedHelpCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.KillJobCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.KillCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.LinkRmCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.ListJobCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.PauseJobCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.PauseCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.PreemptTaskCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.RemoveJobCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.RestartTaskCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.ResumeJobCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.ResumeCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.StartCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.StopCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.SubmitJobCommand;
 
 /**
  * {@link CommandFactory} builds an ordered {@link Command} list for a given
  * user argument set.
  */
-public class CommandFactory {
+public abstract class CommandFactory {
 
-    private static Map<String, Class<? extends AbstractCommand>> commands = new HashMap<String, Class<? extends AbstractCommand>>();
+    public static final int SCHEDULER = 1;
+    public static final int RM = 2;
+
+    private static final Map<String, CommandSet.Entry> commonCmdMap;
 
     static {
-        commands.put(opt(URL), SetUrlCommand.class);
-        commands.put(opt(HELP), SchedHelpCommand.class);
-        commands.put(opt(INSECURE), SetInsecureAccessCommand.class);
-        commands.put(opt(CACERTS), SetCaCertsCommand.class);
-        commands.put(opt(CACERTS_PASSWORD), SetCaCertsPassCommand.class);
-        commands.put(opt(LOGIN), LoginCommand.class);
-        commands.put(opt(PASSWORD), SetPasswordCommand.class);
-        commands.put(opt(LOGIN_WITH_CREDENTIALS),
-                LoginWithCredentialsCommand.class);
-        commands.put(opt(EVAL_SCRIPT), EvalScriptCommand.class);
-        commands.put(opt(START_SCHEDULER), StartCommand.class);
-        commands.put(opt(STOP_SCHEDULER), StopCommand.class);
-        commands.put(opt(PAUSE_SCHEDULER), PauseCommand.class);
-        commands.put(opt(RESUME_SCHEDULER), ResumeCommand.class);
-        commands.put(opt(FREEZE_SCHEDULER), FreezeCommand.class);
-        commands.put(opt(KILL_SCHEDULER), KillCommand.class);
-
-        commands.put(opt(GET_STATS), SchedStatsCommand.class);
-        commands.put(opt(LIST_JOBS), ListJobCommand.class);
-        commands.put(opt(LINK_RM), LinkRmCommand.class);
-
-        commands.put(opt(SUBMIT_JOB_DESC), SubmitJobCommand.class);
-        commands.put(opt(SUBMIT_JOB_ARCH), SubmitJobCommand.class);
-
-        commands.put(opt(GET_JOB_OUTPUT), GetJobOutputCommand.class);
-        commands.put(opt(GET_JOB_RESULT), GetJobResultCommand.class);
-
-        commands.put(opt(CHANGE_JOB_PRIORITY), ChangeJobPriorityCommand.class);
-        commands.put(opt(GET_JOB_STATE), GetJobStateCommand.class);
-
-        commands.put(opt(PAUSE_JOB), PauseJobCommand.class);
-        commands.put(opt(RESUME_JOB), ResumeJobCommand.class);
-        commands.put(opt(KILL_JOB), KillJobCommand.class);
-        commands.put(opt(REMOVE_JOB), RemoveJobCommand.class);
-
-        commands.put(opt(GET_TASK_OUTPUT), GetTaskOutputCommand.class);
-        commands.put(opt(GET_TASK_RESULT), GetTaskResultCommand.class);
-        commands.put(opt(PREEMPT_TASK), PreemptTaskCommand.class);
-        commands.put(opt(RESTART_TASK), RestartTaskCommand.class);
-
-        commands.put(opt(START_IMODE), StartIModeCommand.class);
+        commonCmdMap = new HashMap<String, CommandSet.Entry>();
+        for (CommandSet.Entry entry : CommandSet.COMMON_COMMANDS) {
+            commonCmdMap.put(opt(entry), entry);
+        }
     }
 
-    private CommandFactory() {
+    public static CommandFactory getCommandFactory(int type) {
+        switch (type) {
+        case SCHEDULER:
+            return new SchedulerCommandFactory();
+        default:
+            throw new CLIException(REASON_INVALID_ARGUMENTS, String.format(
+                    "Unknow AbstractCommandFactory type['%d']", type));
+        }
     }
 
-    private static String opt(RestCommand command) {
-        return command.getOpt();
+    static void put(CommandSet.Entry entry, Map<String, CommandSet.Entry> map) {
+        map.put(opt(entry), entry);
     }
+    
+    static Map<String, CommandSet.Entry> supportedCommandMap() {
+        return commonCmdMap;
+    }
+
+    static String opt(CommandSet.Entry entry) {
+        return entry.opt();
+    }
+
+    public abstract Options supportedOptions();
+
+    public abstract List<Command> getCommandList(CommandLine cli);
+
+    public abstract void addCommandEntry(CommandSet.Entry entry);
+
+    public abstract Command commandForOption(Option option);
+
+    public abstract CommandSet.Entry[] supportedCommandEntries();
 
     /**
      * Returns an ordered {@link Command} list for specified user arguments.
@@ -180,11 +115,11 @@ public class CommandFactory {
      *            the command-line arguments
      * @return an ordered {@link Command} list.
      */
-    public static List<Command> getCommandList(CommandLine cli) {
+    protected List<Command> getCommandList(CommandLine cli, Map<String, Command> map) {
         LinkedList<Command> list = new LinkedList<Command>();
-        Map<String, Command> map = getCommands(cli);
-        if (map.containsKey(opt(HELP))) {
-            list.add(map.remove(opt(HELP)));
+
+        if (map.containsKey(opt(SCHED_HELP))) {
+            list.add(map.remove(opt(SCHED_HELP)));
             return list;
         }
 
@@ -208,69 +143,44 @@ public class CommandFactory {
         if (map.containsKey(opt(LOGIN))) {
             list.add(map.remove(opt(LOGIN)));
 
-        } else if (map.containsKey(opt(LOGIN_WITH_CREDENTIALS))) {
-            list.add(map.remove(opt(LOGIN_WITH_CREDENTIALS)));
+        } else if (map.containsKey(opt(CREDENTIALS))) {
+            list.add(map.remove(opt(CREDENTIALS)));
         }
-        
-        if (map.isEmpty()) {
-        	list.add(new StartIModeCommand());
-        } else {
-        	list.addAll(map.values());	
-        }
-        
+
         return list;
     }
 
-    private static Map<String, Command> getCommands(CommandLine cli) {
+    protected Map<String, Command> commandMapInstance(CommandLine cli,
+            final Map<String, CommandSet.Entry> supportedCommandEntryMap) {
         Map<String, Command> cliCommands = new HashMap<String, Command>();
         for (Option o : cli.getOptions()) {
-            cliCommands.put(o.getOpt(), getCommand(o));
+            cliCommands.put(o.getOpt(),
+                    getCommandForOption(o, supportedCommandEntryMap));
         }
         return cliCommands;
     }
 
-    private static Command getCommand(Option opt) {
-        try {
-            Class<?> commandClass = commands.get(opt.getOpt());
-            Constructor<?>[] ctors = commandClass.getConstructors();
-            if (ctors.length > 0) {
-                Constructor<?> selected = null;
-                int numOfCtorParams = (opt.getValues() == null) ? 0 : opt
-                        .getValues().length;
-                for (Constructor<?> ctor : ctors) {
-                    // naive way of selecting the most suitable ctor
-                    if (numOfCtorParams == ctor.getParameterTypes().length) {
-                        selected = ctor;
-                        break;
-                    }
-                }
-                if (selected != null) {
-                    return getInstance(selected, opt.getValues());
-                }
-            }
-
-            throw new IllegalArgumentException(
-                    String.format(
-                            "%s %s %s%n%s %s",
-                            "No suitable command found for",
-                            opt.getOpt(),
-                            opt.getValuesList(),
-                            "Check whether you have specified all required arguments for",
-                            opt.getOpt()));
-        } catch (IllegalArgumentException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    protected Command getCommandForOption(Option opt,
+            final Map<String, CommandSet.Entry> commandMap) {
+        return commandMap.get(opt.getOpt()).commandObject(opt);
     }
-
-    private static Command getInstance(Constructor<?> ctor, String[] args)
-            throws Exception {
-        Object[] ctorArgs = new Object[ctor.getParameterTypes().length];
-        if (args != null) {
-            System.arraycopy(args, 0, ctorArgs, 0, args.length);
+    
+    protected Options createOptions(Collection<CommandSet.Entry> entries) {
+        Options options = new Options();
+        for (CommandSet.Entry entry : entries) {
+            Option option = new Option(entry.opt(), entry.longOpt(),
+                    entry.hasArgs(), entry.description());
+            if (entry.numOfArgs() > 0) {
+                option.setArgs(entry.numOfArgs());
+            } else if (entry.hasArgs() && entry.numOfArgs() == -1) {
+                option.setArgs(Integer.MAX_VALUE);
+            }
+            if (entry.argNames() != null) {
+                option.setArgName(entry.argNames());
+            }
+            options.addOption(option);
         }
-        return (Command) ctor.newInstance(ctorArgs);
+        return options;
     }
 
 }

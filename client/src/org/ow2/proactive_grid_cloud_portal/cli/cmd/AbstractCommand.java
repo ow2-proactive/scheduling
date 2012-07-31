@@ -91,7 +91,7 @@ public abstract class AbstractCommand implements Command {
     }
 
     protected String resourceUrl(String resource) {
-        return context().getSchedulerUrl() + "/" + resource;
+        return context().getRestServerUrl() + "/" + resource;
     }
 
     protected void writeLine(String format, Object... args) {

@@ -46,8 +46,6 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.ow2.proactive_grid_cloud_portal.cli.RestCommand;
-
 import jline.ArgumentCompletor;
 import jline.ClassNameCompletor;
 import jline.Completor;
@@ -56,6 +54,8 @@ import jline.FileNameCompletor;
 import jline.History;
 import jline.MultiCompletor;
 import jline.SimpleCompletor;
+
+import org.ow2.proactive_grid_cloud_portal.cli.CommandSet;
 
 public class JLineDevice extends AbstractDevice {
     private static final int HLENGTH = 20;
@@ -73,12 +73,7 @@ public class JLineDevice extends AbstractDevice {
         writer = new PrintWriter(out, true);
         reader = new ConsoleReader(in, writer);
         reader.setHistory(new History(hfile));
-        Completor[] completors = new Completor[] {
-                new SimpleCompletor(getCommandsAsArray()),
-                new ClassNameCompletor(), new FileNameCompletor() };
-        reader.addCompletor(new ArgumentCompletor(
-                new MultiCompletor(completors)));
-
+        
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
             public void run() {
                 writeHistory();
@@ -113,20 +108,29 @@ public class JLineDevice extends AbstractDevice {
         }
     }
 
-    private String[] getCommandsAsArray() {
-        ArrayList<String> cmds = new ArrayList<String>();
-        for (RestCommand command : RestCommand.values()) {
-			if (command.getJsOpt() != null) {
-				String jsCommand = command.getJsOpt();
-				int index = jsCommand.indexOf('(');
-				if ((jsCommand.indexOf(')') - index) == 1) {
-					cmds.add(jsCommand.substring(0, index + 2));
-				} else {
-					cmds.add(jsCommand.substring(0, index + 1));
-				}
-			}
+    private String[] getCommandsAsArray(CommandSet.Entry[] entries) {
+        List<String> cmds = new ArrayList<String>();
+        for (CommandSet.Entry entry : entries) {
+            if (entry.jsCommand() != null) {
+                String jsCommand = entry.jsCommand();
+                int index = jsCommand.indexOf('(');
+                if ((jsCommand.indexOf(')') - index) == 1) {
+                    cmds.add(jsCommand.substring(0, index + 2));
+                } else {
+                    cmds.add(jsCommand.substring(0, index + 1));
+                }
+            }
         }
+
         return cmds.toArray(new String[cmds.size()]);
+    }
+
+    public void setCommands(CommandSet.Entry[] entries) throws IOException {
+        Completor[] completors = new Completor[] {
+                new SimpleCompletor(getCommandsAsArray(entries)),
+                new ClassNameCompletor(), new FileNameCompletor() };
+        reader.addCompletor(new ArgumentCompletor(
+                new MultiCompletor(completors)));
     }
 
     @Override

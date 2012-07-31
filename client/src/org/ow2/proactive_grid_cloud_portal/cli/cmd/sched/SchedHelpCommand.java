@@ -37,11 +37,14 @@
 
 package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
 
+import static org.ow2.proactive_grid_cloud_portal.cli.CommandFactory.SCHEDULER;
+
 import java.io.PrintWriter;
 import java.io.Writer;
 
 import org.apache.commons.cli.HelpFormatter;
-import org.ow2.proactive_grid_cloud_portal.cli.Main;
+import org.apache.commons.cli.Options;
+import org.ow2.proactive_grid_cloud_portal.cli.CommandFactory;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 
@@ -62,7 +65,9 @@ public class SchedHelpCommand extends AbstractCommand implements Command {
         HelpFormatter formatter = new HelpFormatter();
         Writer writer = context().getDevice().getWriter();
         PrintWriter pw = new PrintWriter(writer, true);
-        formatter.printHelp(pw, 110, USAGE, "", Main.options(),
+        Options options = CommandFactory.getCommandFactory(SCHEDULER)
+                .supportedOptions();
+        formatter.printHelp(pw, 110, USAGE, "", options,
                 formatter.getLeftPadding(), formatter.getDescPadding(), "",
                 false);
     }
