@@ -150,8 +150,10 @@ public abstract class SelectionManager {
 
     public NodeSet selectNodes(Criteria criteria, Client client) {
 
-        // logging selection script execution into tasks logs
-        MDC.getContext().put(MultipleFileAppender.FILE_NAMES, criteria.getComputationDescriptors());
+        if (criteria.getComputationDescriptors() != null) {
+            // logging selection script execution into tasks logs
+            MDC.getContext().put(MultipleFileAppender.FILE_NAMES, criteria.getComputationDescriptors());
+        }
 
         logger.info(client + " requested " + criteria.getSize() + " nodes with " + criteria.getTopology());
         if (logger.isDebugEnabled()) {
