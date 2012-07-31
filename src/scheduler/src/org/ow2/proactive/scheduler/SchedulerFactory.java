@@ -49,7 +49,6 @@ import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
-import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.scheduler.authentication.SchedulerAuthentication;
@@ -129,7 +128,6 @@ public class SchedulerFactory {
             }
             try {
                 tryJoinRM(rmURL);
-                configureLog4j();
                 String policy = initializer.getPolicyFullClassName();
                 //start scheduler
                 createScheduler(rmURL, policy);
@@ -252,6 +250,7 @@ public class SchedulerFactory {
 
             //ready
             logger.info("Scheduler is now ready to be started !");
+            configureLog4j();
         } catch (Exception e) {
             logger.error(e);
             e.printStackTrace();

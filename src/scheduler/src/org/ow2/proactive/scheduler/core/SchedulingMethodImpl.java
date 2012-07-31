@@ -329,7 +329,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
                 } else {
                     //check if the task is compatible with the other previous one
                     if (referent.equals(new SchedulingTaskComparator(internalTask, currentJob.getOwner()))) {
-                        tlogger.debug(internalTask.getId(), "scheduling");
+                        tlogger.info(internalTask.getId(), "scheduling");
                         neededResource += neededNodes;
                         maxResource -= neededNodes;
                         toFill.add(etd);

@@ -76,6 +76,7 @@ import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.proactive.utils.FileUtils;
 
 import functionaltests.common.InputStreamReaderThread;
 import functionaltests.common.CommonTUtils;
@@ -299,25 +300,7 @@ public class SchedulerTHelper {
                 return name.startsWith("PA_JVM");
             }
         })) {
-            removeDir(f);
-        }
-    }
-
-    /* remove directories recursively */
-    private static void removeDir(File dir) {
-        if (dir != null) {
-            if (dir.isDirectory()) {
-                File[] files = dir.listFiles();
-                if (files != null) {
-                    for (File f : files) {
-                        removeDir(f);
-                    }
-                }
-            }
-            try {
-                dir.delete();
-            } catch (Exception e) {
-            }
+            FileUtils.removeDir(f);
         }
     }
 

@@ -99,7 +99,7 @@ public class TestJobServerLogs extends SchedulerConsecutive {
                 .getAbsolutePath());
         Thread.sleep(5000);
         jobLogs = SchedulerTHelper.getSchedulerInterface().getJobServerLogs(pendingJobId.toString());
-        if (!jobLogs.contains("RM 0 nodes found after scripts execution")) {
+        if (!jobLogs.contains("0 nodes found after scripts execution")) {
             System.out.println("Incorrect job server logs");
             System.out.println(jobLogs);
             Assert.fail("RM output is not correct");
