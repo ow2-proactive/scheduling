@@ -38,7 +38,7 @@
 package org.ow2.proactive_grid_cloud_portal.cli.cmd;
 
 import static org.apache.http.entity.ContentType.APPLICATION_FORM_URLENCODED;
-import static org.ow2.proactive_grid_cloud_portal.cli.ResponseStatus.OK;
+import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
 import static org.ow2.proactive_grid_cloud_portal.cli.RestConstants.DFLT_SESSION_DIR;
 import static org.ow2.proactive_grid_cloud_portal.cli.RestConstants.DFLT_SESSION_FILE_EXT;
 
@@ -48,6 +48,8 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
+import org.ow2.proactive_grid_cloud_portal.cli.utils.FileUtility;
+import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
 
 public class LoginCommand extends AbstractCommand implements Command {
 
@@ -59,11 +61,11 @@ public class LoginCommand extends AbstractCommand implements Command {
 
     @Override
     public void execute() throws Exception {
-        ApplicationContext context = applicationContext();
+        ApplicationContext context = context();
         context.setUser(username);
         File userSessionFile = userSessionFile(username);
         if (userSessionFile.exists()) {
-            context.setSessionId(read(userSessionFile));
+            context.setSessionId(FileUtility.read(userSessionFile));
             context.setNewSession(false);
             return;
         }
@@ -80,10 +82,10 @@ public class LoginCommand extends AbstractCommand implements Command {
         HttpResponse response = execute(request);
 
         if (statusCode(OK) == statusCode(response)) {
-            String sessionId = string(response).trim();
+            String sessionId = StringUtility.string(response).trim();
             context.setSessionId(sessionId);
             context.setNewSession(true);
-            write(userSessionFile, sessionId);
+            FileUtility.write(userSessionFile, sessionId);
             if (!setOwnerOnly(userSessionFile)) {
                 writeLine(
                         "Warning! Possible security risk: unable to limit access rights of the session-id file '%s'",

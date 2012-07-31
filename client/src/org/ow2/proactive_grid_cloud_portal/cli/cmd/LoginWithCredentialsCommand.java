@@ -38,7 +38,7 @@
 package org.ow2.proactive_grid_cloud_portal.cli.cmd;
 
 import static org.apache.http.entity.ContentType.APPLICATION_OCTET_STREAM;
-import static org.ow2.proactive_grid_cloud_portal.cli.ResponseStatus.OK;
+import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
 import static org.ow2.proactive_grid_cloud_portal.cli.RestConstants.DFLT_SESSION_DIR;
 import static org.ow2.proactive_grid_cloud_portal.cli.RestConstants.DFLT_SESSION_FILE_EXT;
 
@@ -49,6 +49,8 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.ByteArrayBody;
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
+import org.ow2.proactive_grid_cloud_portal.cli.utils.FileUtility;
+import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
 
 public class LoginWithCredentialsCommand extends AbstractCommand implements
         Command {
@@ -61,13 +63,13 @@ public class LoginWithCredentialsCommand extends AbstractCommand implements
     @Override
     public void execute() throws Exception {
         File credentialFile = new File(pathname);
-        String alias = md5Checksum(credentialFile);
+        String alias = FileUtility.md5Checksum(credentialFile);
         File userSessionFile = userSessionFile(alias);
-        ApplicationContext context = applicationContext();
+        ApplicationContext context = context();
         if (userSessionFile.exists()) {
             context.setAlias(alias);
             context.setCredFilePathname(pathname);
-            context.setSessionId(read(userSessionFile));
+            context.setSessionId(FileUtility.read(userSessionFile));
             context.setNewSession(false);
             return;
         }
@@ -75,16 +77,16 @@ public class LoginWithCredentialsCommand extends AbstractCommand implements
         HttpPost request = new HttpPost(resourceUrl("login"));
         MultipartEntity entity = new MultipartEntity();
         entity.addPart("credential",
-                new ByteArrayBody(byteArray(credentialFile),
+                new ByteArrayBody(FileUtility.byteArray(credentialFile),
                         APPLICATION_OCTET_STREAM.getMimeType()));
         request.setEntity(entity);
 
         HttpResponse response = context.executeClient(request);
         if (statusCode(OK) == statusCode(response)) {
-            String sessionId = string(response).trim();
+            String sessionId = StringUtility.string(response).trim();
             context.setSessionId(sessionId);
             context.setNewSession(true);
-            write(userSessionFile, sessionId);
+            FileUtility.write(userSessionFile, sessionId);
             if (!setOwnerOnly(userSessionFile)) {
                 writeLine(
                         "Warning! Possible security risk: unable to limit access rights of session-id file '%s'",

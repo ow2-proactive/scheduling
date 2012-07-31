@@ -37,7 +37,7 @@
 
 package org.ow2.proactive_grid_cloud_portal.cli.cmd;
 
-import static org.ow2.proactive_grid_cloud_portal.cli.ResponseStatus.OK;
+import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -51,6 +51,7 @@ import org.codehaus.jackson.type.TypeReference;
 import org.ow2.proactive.utils.ObjectArrayFormatter;
 import org.ow2.proactive_grid_cloud_portal.cli.json.JobStateView;
 import org.ow2.proactive_grid_cloud_portal.cli.json.SchedulerStateView;
+import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
 
 public class ListJobsCommand extends AbstractCommand implements Command {
 
@@ -131,13 +132,15 @@ public class ListJobsCommand extends AbstractCommand implements Command {
         row.add(js.getProjectName());
         row.add(js.getJobInfo().getStatus());
 
-        String date = formattedDate(js.getJobInfo().getStartTime());
+        String date = StringUtility.formattedDate(js.getJobInfo()
+                .getStartTime());
         if (js.getJobInfo().getStartTime() != -1)
-            date += " (" + formattedElapsedTime(js.getJobInfo().getStartTime())
-                    + ")";
+            date += " ("
+                    + StringUtility.formattedElapsedTime(js.getJobInfo()
+                            .getStartTime()) + ")";
         row.add(date);
-        row.add(formattedDuration(js.getJobInfo().getStartTime(), js
-                .getJobInfo().getFinishedTime()));
+        row.add(StringUtility.formattedDuration(js.getJobInfo().getStartTime(),
+                js.getJobInfo().getFinishedTime()));
 
         return row;
     }

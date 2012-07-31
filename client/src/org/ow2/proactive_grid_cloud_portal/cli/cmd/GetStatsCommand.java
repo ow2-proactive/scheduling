@@ -37,7 +37,7 @@
 
 package org.ow2.proactive_grid_cloud_portal.cli.cmd;
 
-import static org.ow2.proactive_grid_cloud_portal.cli.ResponseStatus.OK;
+import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,6 +48,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.codehaus.jackson.type.TypeReference;
 import org.ow2.proactive.utils.ObjectArrayFormatter;
+import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
 
 public class GetStatsCommand extends AbstractCommand implements Command {
 
@@ -75,7 +76,7 @@ public class GetStatsCommand extends AbstractCommand implements Command {
                 row.add(e.getValue());
                 oaf.addLine(row);
             }
-            writeLine(string(oaf));
+            writeLine(StringUtility.string(oaf));
         } else {
             handleError("An error occurred while retrieving stats:", response);
         }

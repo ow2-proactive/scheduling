@@ -37,138 +37,104 @@
 
 package org.ow2.proactive_grid_cloud_portal.cli.cmd;
 
-import static org.ow2.proactive_grid_cloud_portal.cli.ResponseStatus.FORBIDDEN;
+import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_IO_ERROR;
+import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_UNAUTHORIZED_ACCESS;
+import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.FORBIDDEN;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.Writer;
 
-import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.util.EntityUtils;
 import org.codehaus.jackson.type.TypeReference;
-import org.ow2.proactive.utils.ObjectArrayFormatter;
-import org.ow2.proactive.utils.Tools;
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
-import org.ow2.proactive_grid_cloud_portal.cli.ResponseStatus;
-import org.ow2.proactive_grid_cloud_portal.cli.RestCliException;
+import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
+import org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus;
 import org.ow2.proactive_grid_cloud_portal.cli.json.ErrorView;
-import org.ow2.proactive_grid_cloud_portal.cli.utils.ObjectUtils;
+import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
 
 public abstract class AbstractCommand implements Command {
 
     public AbstractCommand() {
     }
 
-    protected static String string(HttpResponse response) throws Exception {
-        return EntityUtils.toString(response.getEntity());
-    }
-
-    protected static String string(ObjectArrayFormatter oaf) {
-        return Tools.getStringAsArray(oaf);
-    }
-
-    protected static String formattedDate(long time) {
-        return Tools.getFormattedDate(time);
-    }
-
-    protected static String formattedElapsedTime(long time) {
-        return Tools.getElapsedTime(time);
-    }
-
-    protected static String formattedDuration(long start, long end) {
-        return Tools.getFormattedDuration(start, end);
-    }
-
-    protected static Object object(byte[] bytes) throws Exception {
-        if (bytes == null) {
-            return "[NULL]";
-        }
-        return ObjectUtils.object(bytes);
-    }
-
-    protected static int statusCode(ResponseStatus status) {
+    protected int statusCode(HttpResponseStatus status) {
         return status.statusCode();
     }
 
-    protected static int statusCode(HttpResponse response) {
+    protected int statusCode(HttpResponse response) {
         return response.getStatusLine().getStatusCode();
     }
 
-    protected static String md5Checksum(File file) throws Exception {
-        return DigestUtils.md5Hex(new FileInputStream(file));
-    }
-
-    protected static void write(File file, String content) throws IOException {
-        org.apache.commons.io.FileUtils.writeStringToFile(file, content);
-        file.setReadable(true, true);
-        file.setWritable(true, true);
-    }
-
-    protected static String read(File file) throws IOException {
-        return FileUtils.readFileToString(file);
-    }
-
-    protected static byte[] byteArray(File file) throws IOException {
-        return FileUtils.readFileToByteArray(file);
-    }
-
-    protected ApplicationContext applicationContext() {
+    protected ApplicationContext context() {
         return ApplicationContext.instance();
     }
 
-    protected <T> T readValue(HttpResponse response, Class<T> valueType)
-            throws Exception {
-        return applicationContext().getObjectMapper().readValue(
-                response.getEntity().getContent(), valueType);
+    protected <T> T readValue(HttpResponse response, Class<T> valueType) {
+        try {
+            return context().getObjectMapper().readValue(
+                    response.getEntity().getContent(), valueType);
+        } catch (IOException ioe) {
+            throw new CLIException(REASON_IO_ERROR, ioe);
+        }
     }
 
-    protected <T> T readValue(HttpResponse response, TypeReference<T> valueType)
-            throws Exception {
-        return applicationContext().getObjectMapper().readValue(
-                response.getEntity().getContent(), valueType);
+    protected <T> T readValue(HttpResponse response, TypeReference<T> valueType) {
+        try {
+            return context().getObjectMapper().readValue(
+                    response.getEntity().getContent(), valueType);
+        } catch (IOException ioe) {
+            throw new CLIException(REASON_IO_ERROR, ioe);
+        }
     }
 
     protected String resourceUrl(String resource) {
-        return applicationContext().getSchedulerUrl() + "/scheduler/"
-                + resource;
+        return context().getSchedulerUrl() + "/" + resource;
     }
 
-    protected void writeLine(String format, Object... args) throws Exception {
-        applicationContext().getDevice().writeLine(format, args);
+    protected void writeLine(String format, Object... args) {
+        try {
+            context().getDevice().writeLine(format, args);
+        } catch (IOException ioe) {
+            throw new CLIException(REASON_IO_ERROR, ioe);
+        }
     }
 
-    protected String readLine(String format, Object... args) throws IOException {
-        return applicationContext().getDevice().readLine(format, args);
+    protected String readLine(String format, Object... args) {
+        try {
+            return context().getDevice().readLine(format, args);
+        } catch (IOException ioe) {
+            throw new CLIException(REASON_IO_ERROR, ioe);
+        }
     }
 
     protected Writer writer() {
-        return applicationContext().getDevice().getWriter();
+        return context().getDevice().getWriter();
     }
 
-    protected char[] readPassword(String format, Object... args)
-            throws IOException {
-        return applicationContext().getDevice().readPassword(format, args);
+    protected char[] readPassword(String format, Object... args) {
+        try {
+            return context().getDevice().readPassword(format, args);
+        } catch (IOException ioe) {
+            throw new CLIException(REASON_IO_ERROR, ioe);
+        }
     }
 
-    protected HttpResponse execute(HttpUriRequest request) throws Exception {
-        return applicationContext().executeClient(request);
+    protected HttpResponse execute(HttpUriRequest request) {
+        return context().executeClient(request);
     }
 
-    protected void handleError(String errorMessage, HttpResponse response)
-            throws Exception {
-        String responseContent = string(response);
+    protected void handleError(String errorMessage, HttpResponse response) {
+        String responseContent = StringUtility.string(response);
         ErrorView errorView = null;
         try {
-            errorView = applicationContext().getObjectMapper().readValue(
+            errorView = context().getObjectMapper().readValue(
                     responseContent.getBytes(), ErrorView.class);
         } catch (Throwable error) {
-            // ignore
+            // if an ErrorView object can't be built from the response. Hence
+            // process the response as a string
         }
         if (errorView != null) {
             writeError(errorMessage, errorView);
@@ -177,27 +143,31 @@ public abstract class AbstractCommand implements Command {
         }
     }
 
-    private void writeError(String errorMsg, String responseContent)
-            throws Exception {
+    private void writeError(String errorMsg, String responseContent) {
         writeLine(errorMsg);
 
         String errorMessage = null, errorCode = null;
         BufferedReader reader = new BufferedReader(new StringReader(
                 responseContent));
 
-        String line = reader.readLine();
-        while ((line = reader.readLine()) != null) {
-            if (line.startsWith("errorMessage:")) {
-                errorMessage = line.substring(line.indexOf(':')).trim();
-                break;
+        String line = null;
+        try {
+            line = reader.readLine();
+            while ((line = reader.readLine()) != null) {
+                if (line.startsWith("errorMessage:")) {
+                    errorMessage = line.substring(line.indexOf(':')).trim();
+                    break;
+                }
             }
-        }
 
-        while ((line = reader.readLine()) != null) {
-            if (line.startsWith("httpErrorCode:")) {
-                errorCode = line.substring(line.indexOf(':')).trim();
-                break;
+            while ((line = reader.readLine()) != null) {
+                if (line.startsWith("httpErrorCode:")) {
+                    errorCode = line.substring(line.indexOf(':')).trim();
+                    break;
+                }
             }
+        } catch (IOException ioe) {
+            throw new CLIException(REASON_IO_ERROR, ioe);
         }
 
         if (errorCode != null) {
@@ -208,13 +178,17 @@ public abstract class AbstractCommand implements Command {
             writeLine("%s %s", "Error Message:", errorMessage);
         }
 
-        while ((line = reader.readLine()) != null) {
-            if (line.startsWith("stackTrace:")) {
-                while ((line = reader.readLine()) != null) {
-                    writeLine(line);
+        try {
+            while ((line = reader.readLine()) != null) {
+                if (line.startsWith("stackTrace:")) {
+                    while ((line = reader.readLine()) != null) {
+                        writeLine(line);
+                    }
+                    break;
                 }
-                break;
             }
+        } catch (IOException ioe) {
+            throw new CLIException(REASON_IO_ERROR, ioe);
         }
 
         if (errorCode == null && errorMessage == null) {
@@ -222,11 +196,10 @@ public abstract class AbstractCommand implements Command {
         }
     }
 
-    private void writeError(String errorMessage, ErrorView error)
-            throws Exception {
+    private void writeError(String errorMessage, ErrorView error) {
         if (statusCode(FORBIDDEN) == error.getHttpErrorCode()) {
             // this exception would be handled at an upper level ..
-            throw new RestCliException(error.getHttpErrorCode(),
+            throw new CLIException(REASON_UNAUTHORIZED_ACCESS,
                     error.getErrorMessage());
         }
         writeLine(errorMessage);

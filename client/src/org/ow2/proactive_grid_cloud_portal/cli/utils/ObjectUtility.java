@@ -35,28 +35,28 @@
  * $$ACTIVEEON_INITIAL_DEV$$
  */
 
-package org.ow2.proactive_grid_cloud_portal.cli;
+package org.ow2.proactive_grid_cloud_portal.cli.utils;
 
-public class RestCliException extends Exception {
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 
-    private static final long serialVersionUID = 1L;
-    private int errorCode;
+public class ObjectUtility {
 
-    public RestCliException(int errorCode, String message) {
-        this(errorCode, message, null);
-    }
-
-    public RestCliException(int errorCode, Throwable cause) {
-        this(errorCode, null, cause);
-    }
-
-    public RestCliException(int errorCode, String message, Throwable cause) {
-        super(message, cause);
-        this.errorCode = errorCode;
-    }
-
-    public int errorCode() {
-        return errorCode;
+    public static Object object(byte[] bytes) { 
+        if (bytes == null) {
+            return "[NULL]";
+        }
+        try {
+            return new ObjectInputStream(new ByteArrayInputStream(bytes))
+                    .readObject();
+        } catch (ClassNotFoundException cnfe) {
+            return String.format("[De-serialization error : %s]",
+                    cnfe.getMessage());
+        } catch (IOException ioe) {
+            return String.format("[De-serialization error : %s]",
+                    ioe.getMessage());
+        }
     }
 
 }

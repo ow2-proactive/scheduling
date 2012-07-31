@@ -37,11 +37,12 @@
 
 package org.ow2.proactive_grid_cloud_portal.cli.cmd;
 
-import static org.ow2.proactive_grid_cloud_portal.cli.ResponseStatus.OK;
+import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.ow2.proactive_grid_cloud_portal.cli.json.TaskResultView;
+import org.ow2.proactive_grid_cloud_portal.cli.utils.ObjectUtility;
 
 public class GetTaskResultCommand extends AbstractTaskCommand implements
         Command {
@@ -59,7 +60,8 @@ public class GetTaskResultCommand extends AbstractTaskCommand implements
             TaskResultView taskResult = readValue(response,
                     TaskResultView.class);
             writeLine("%s result:", task());
-            writeLine(object(taskResult.getSerializedValue()).toString());
+            writeLine(ObjectUtility.object(taskResult.getSerializedValue())
+                    .toString());
 
         } else {
             handleError(String.format(

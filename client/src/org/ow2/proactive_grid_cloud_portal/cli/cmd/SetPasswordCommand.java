@@ -46,7 +46,7 @@ public class SetPasswordCommand extends AbstractCommand implements Command {
 
     @Override
     public void execute() throws Exception {
-        applicationContext().setPassword(password);
+       context().setPassword(password);
     }
 
 }

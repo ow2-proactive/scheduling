@@ -32,28 +32,59 @@
  *  Contributor(s):
  *
  * ################################################################
- * $$ACTIVEEON_INITIAL_DEV$$
+ * %$ACTIVEEON_INITIAL_DEV$
  */
 
 package org.ow2.proactive_grid_cloud_portal.cli.utils;
 
-import java.io.ByteArrayInputStream;
+import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_IO_ERROR;
+import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_OTHER;
+
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
 
-public class ObjectUtils {
+import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.io.FileUtils;
+import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 
-    public static Object object(byte[] bytes) {
+public class FileUtility {
+    
+    public static String md5Checksum(File file) {
         try {
-            return new ObjectInputStream(new ByteArrayInputStream(bytes))
-                    .readObject();
-        } catch (ClassNotFoundException cnfe) {
-            return String.format("[De-serialization error : %s]",
-                    cnfe.getMessage());
+            return DigestUtils.md5Hex(new FileInputStream(file));
         } catch (IOException ioe) {
-            return String.format("[De-serialization error : %s]",
-                    ioe.getMessage());
+            throw new CLIException(REASON_IO_ERROR, ioe);
         }
+    }
+    
+    public static void write(File file, String content) {
+        try {
+            org.apache.commons.io.FileUtils.writeStringToFile(file, content);
+        } catch (IOException ioe) {
+            throw new CLIException(REASON_OTHER, ioe);
+        }
+        file.setReadable(true, true);
+        file.setWritable(true, true);
+    }
+    
+    public static String read(File file) {
+        try {
+            return FileUtils.readFileToString(file);
+        } catch (IOException ioe) {
+            throw new CLIException(REASON_IO_ERROR, ioe);
+        }
+    }
+    
+    public static byte[] byteArray(File file) {
+        try {
+            return FileUtils.readFileToByteArray(file);
+        } catch (IOException ioe) {
+            throw new CLIException(REASON_IO_ERROR, ioe);
+        }
+    }
+    
+    private FileUtility() {
     }
 
 }

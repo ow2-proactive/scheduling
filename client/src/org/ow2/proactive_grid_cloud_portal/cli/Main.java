@@ -38,7 +38,7 @@
 package org.ow2.proactive_grid_cloud_portal.cli;
 
 import static org.codehaus.jackson.map.DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES;
-import static org.ow2.proactive_grid_cloud_portal.cli.ResponseStatus.FORBIDDEN;
+import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.FORBIDDEN;
 import static org.ow2.proactive_grid_cloud_portal.cli.RestConstants.DFLT_REST_SCHEDULER_URL;
 import static org.ow2.proactive_grid_cloud_portal.cli.RestConstants.DFLT_SESSION_DIR;
 import static org.ow2.proactive_grid_cloud_portal.cli.RestConstants.DFLT_SESSION_FILE_EXT;
@@ -125,8 +125,8 @@ public class Main {
 
         try {
             executeCommandList(commands);
-        } catch (RestCliException e) {
-            if (FORBIDDEN.statusCode() == e.errorCode()
+        } catch (CLIException e) {
+            if (FORBIDDEN.statusCode() == e.reason()
                     && !applicationContext.isNewSession()) {
                 authorizationError = true;
             }

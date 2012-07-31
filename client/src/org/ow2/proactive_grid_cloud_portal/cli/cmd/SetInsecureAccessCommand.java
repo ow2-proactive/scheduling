@@ -45,7 +45,7 @@ public class SetInsecureAccessCommand extends AbstractCommand implements
 
     @Override
     public void execute() throws Exception {
-        applicationContext().allowInsecureAccess(true);
+        context().allowInsecureAccess(true);
     }
 
 }

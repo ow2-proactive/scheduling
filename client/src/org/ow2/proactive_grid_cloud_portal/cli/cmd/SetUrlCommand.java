@@ -46,7 +46,7 @@ public class SetUrlCommand extends AbstractCommand implements Command {
 
     @Override
     public void execute() throws Exception {
-        applicationContext().setSchedulerUrl(schedulerUrl);
+       context().setSchedulerUrl(schedulerUrl);
     }
 
 }

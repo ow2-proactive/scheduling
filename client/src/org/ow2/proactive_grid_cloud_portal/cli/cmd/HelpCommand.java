@@ -58,7 +58,7 @@ public class HelpCommand extends AbstractCommand implements Command {
     @Override
     public void execute() throws Exception {
         HelpFormatter formatter = new HelpFormatter();
-        Writer writer = applicationContext().getDevice().getWriter();
+        Writer writer = context().getDevice().getWriter();
         PrintWriter pw = new PrintWriter(writer, true);
         formatter.printHelp(pw, 110, USAGE, "", Main.options(),
                 formatter.getLeftPadding(), formatter.getDescPadding(), "",

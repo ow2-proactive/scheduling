@@ -49,7 +49,7 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.ow2.proactive_grid_cloud_portal.cli.console.AbstractDevice;
-import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpClientUtil;
+import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpUtility;
 
 public class ApplicationContext {
 
@@ -130,16 +130,20 @@ public class ApplicationContext {
         this.termiated = termiated;
     }
 
-    public HttpResponse executeClient(HttpUriRequest request) throws Exception {
+    public HttpResponse executeClient(HttpUriRequest request) {
         if (sessionId != null) {
             request.setHeader("sessionid", sessionId);
         }
         DefaultHttpClient client = new DefaultHttpClient();
-        if ("https".equals(request.getURI().getScheme())
-                && allowInsecureAccess()) {
-            HttpClientUtil.setInsecureAccess(client);
+        try {
+            if ("https".equals(request.getURI().getScheme())
+                    && allowInsecureAccess()) {
+                HttpUtility.setInsecureAccess(client);
+            }
+            return client.execute(request);
+        } catch (Exception e) {
+            throw new CLIException(CLIException.REASON_OTHER, e);
         }
-        return client.execute(request);
     }
 
     public String getSchedulerUrl() {

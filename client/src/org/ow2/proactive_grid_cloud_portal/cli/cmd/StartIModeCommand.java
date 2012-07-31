@@ -59,8 +59,7 @@ public class StartIModeCommand extends AbstractCommand implements Command {
 
             ScriptEngineManager mgr = new ScriptEngineManager();
             engine = mgr.getEngineByExtension("js");
-            engine.getContext().setWriter(
-                    applicationContext().getDevice().getWriter());
+            engine.getContext().setWriter(context().getDevice().getWriter());
             context.setEngine(engine);
         }
         try {
@@ -74,12 +73,12 @@ public class StartIModeCommand extends AbstractCommand implements Command {
 
     @Override
     public void execute() throws Exception {
-        while (!applicationContext().isTermiated()) {
+        while (!context().isTermiated()) {
             try {
                 engine.eval(readLine("> "));
             } catch (NullPointerException npe) {
-            	// EOF (<Ctrl> + <D>) 
-            	break;
+                // EOF (<Ctrl> + <D>)
+                break;
             } catch (ScriptException se) {
                 writeLine("An error occurred while executing the script:");
                 se.printStackTrace((PrintWriter) writer());

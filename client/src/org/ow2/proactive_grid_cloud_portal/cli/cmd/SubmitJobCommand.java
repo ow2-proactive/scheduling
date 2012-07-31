@@ -39,7 +39,7 @@ package org.ow2.proactive_grid_cloud_portal.cli.cmd;
 
 import static org.apache.http.entity.ContentType.APPLICATION_OCTET_STREAM;
 import static org.apache.http.entity.ContentType.APPLICATION_XML;
-import static org.ow2.proactive_grid_cloud_portal.cli.ResponseStatus.OK;
+import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
 
 import java.io.File;
 import java.net.URLConnection;

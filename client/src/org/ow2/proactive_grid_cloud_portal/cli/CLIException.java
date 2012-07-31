@@ -32,37 +32,36 @@
  *  Contributor(s):
  *
  * ################################################################
- * $$ACTIVEEON_INITIAL_DEV$$
+ * $$PROACTIVE_INITIAL_DEV$$
  */
 
-package org.ow2.proactive_grid_cloud_portal.cli.cmd;
+package org.ow2.proactive_grid_cloud_portal.cli;
 
-import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
+public class CLIException extends RuntimeException {
+    
+    public static final int REASON_UNAUTHORIZED_ACCESS = 1;
+    public static final int REASON_IO_ERROR = 2;
+    public static final int REASON_INVALID_ARGUMENTS = 3;
+    public static final int REASON_OTHER = 4;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpPut;
+    private static final long serialVersionUID = 1L;
+    private int reason;
 
-public class StartSchedulerCommand extends AbstractCommand implements Command {
-
-    public StartSchedulerCommand() {
+    public CLIException(int reason, String message) {
+        this(reason, message, null);
     }
 
-    @Override
-    public void execute() throws Exception {
-        HttpPut request = new HttpPut(resourceUrl("start"));
-        HttpResponse response = execute(request);
-        if (statusCode(OK) == statusCode(response)) {
-            boolean success = readValue(response, Boolean.TYPE);
-            if (success) {
-                writeLine("Scheduler successfully started.");
-            } else {
-                writeLine("Cannot start scheduler.");
-            }
-        } else {
-            handleError(
-                    "An error occurred while attempting to start scheduler:",
-                    response);
-        }
+    public CLIException(int reason, Throwable cause) {
+        this(reason, null, cause);
+    }
+
+    public CLIException(int reason, String message, Throwable cause) {
+        super(message, cause);
+        this.reason = reason;
+    }
+
+    public int reason() {
+        return reason;
     }
 
 }

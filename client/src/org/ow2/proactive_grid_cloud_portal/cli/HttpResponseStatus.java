@@ -37,13 +37,13 @@
 
 package org.ow2.proactive_grid_cloud_portal.cli;
 
-public enum ResponseStatus {
+public enum HttpResponseStatus {
 
     OK(200), NO_CONTENT(204), FORBIDDEN(401);
 
     private int statusCode;
 
-    ResponseStatus(int statusCode) {
+    HttpResponseStatus(int statusCode) {
         this.statusCode = statusCode;
     }
 

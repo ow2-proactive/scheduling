@@ -41,6 +41,7 @@ import java.util.ArrayList;
 
 import org.ow2.proactive.utils.ObjectArrayFormatter;
 import org.ow2.proactive_grid_cloud_portal.cli.RestCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
 
 public class JSHelpCommand extends AbstractCommand implements Command {
 
@@ -66,7 +67,7 @@ public class JSHelpCommand extends AbstractCommand implements Command {
                 formatter.addLine(row);
             }
         }
-        writeLine(string(formatter));
+        writeLine(StringUtility.string(formatter));
     }
 
 }

@@ -37,8 +37,8 @@
 
 package org.ow2.proactive_grid_cloud_portal.cli.cmd;
 
-import static org.ow2.proactive_grid_cloud_portal.cli.ResponseStatus.NO_CONTENT;
-import static org.ow2.proactive_grid_cloud_portal.cli.ResponseStatus.OK;
+import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.NO_CONTENT;
+import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
 
 import java.util.Map;
 
@@ -46,6 +46,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.ow2.proactive_grid_cloud_portal.cli.json.JobResultView;
 import org.ow2.proactive_grid_cloud_portal.cli.json.TaskResultView;
+import org.ow2.proactive_grid_cloud_portal.cli.utils.ObjectUtility;
 
 public class GetJobResultCommand extends AbstractJobCommand implements Command {
 
@@ -63,7 +64,7 @@ public class GetJobResultCommand extends AbstractJobCommand implements Command {
             Map<String, TaskResultView> allResults = jobResult.getAllResults();
             for (String taskName : allResults.keySet()) {
                 writeLine(taskName + " : "
-                        + object(allResults.get(taskName).getSerializedValue()));
+                        + ObjectUtility.object(allResults.get(taskName).getSerializedValue()));
             }
         } else if (statusCode(NO_CONTENT) == statusCode(response)) {
             writeLine("%s result not available.", job());

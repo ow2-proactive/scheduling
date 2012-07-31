@@ -37,7 +37,7 @@
 
 package org.ow2.proactive_grid_cloud_portal.cli.cmd;
 
-import static org.ow2.proactive_grid_cloud_portal.cli.ResponseStatus.NO_CONTENT;
+import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.NO_CONTENT;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPut;

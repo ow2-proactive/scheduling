@@ -37,7 +37,7 @@
 
 package org.ow2.proactive_grid_cloud_portal.cli.cmd;
 
-import static org.ow2.proactive_grid_cloud_portal.cli.ResponseStatus.OK;
+import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -51,6 +51,7 @@ import org.ow2.proactive_grid_cloud_portal.cli.json.JobStateView;
 import org.ow2.proactive_grid_cloud_portal.cli.json.TaskIdView;
 import org.ow2.proactive_grid_cloud_portal.cli.json.TaskInfoView;
 import org.ow2.proactive_grid_cloud_portal.cli.json.TaskStateView;
+import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
 
 public class GetJobStateCommand extends AbstractJobCommand implements Command {
 
@@ -139,7 +140,7 @@ public class GetJobStateCommand extends AbstractJobCommand implements Command {
             // print formatter
             writeLine(jobInfo);
             writeLine("");
-            writeLine(string(oaf));
+            writeLine(StringUtility.string(oaf));
         } else {
             handleError(String.format(
                     "An error occurred while retrieving %s state:", job()),
