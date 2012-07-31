@@ -44,6 +44,7 @@ import java.util.Map;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractJobCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.cli.json.JobResultView;
@@ -57,7 +58,7 @@ public class GetJobResultCommand extends AbstractJobCommand implements Command {
     }
 
     @Override
-    public void execute() throws Exception {
+    public void execute() throws CLIException {
         HttpGet request = new HttpGet(resourceUrl("jobs/" + jobId + "/result"));
         HttpResponse response = execute(request);
         if (statusCode(OK) == statusCode(response)) {

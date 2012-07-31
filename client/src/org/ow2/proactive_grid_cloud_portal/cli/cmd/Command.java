@@ -1,5 +1,7 @@
 package org.ow2.proactive_grid_cloud_portal.cli.cmd;
 
+import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
+
 /**
  * {@link Command} represents an object whose responsibility is to execute a
  * specific REST CLI command. If necessary it uses the REST API, creates the
@@ -13,6 +15,6 @@ public interface Command {
      * @throws Exception
      *             if an error occurred while executing the command.
      */
-    public void execute() throws Exception;
+    public void execute() throws CLIException;
 
 }

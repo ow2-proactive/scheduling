@@ -39,6 +39,7 @@ package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
 
 import static org.apache.http.entity.ContentType.APPLICATION_OCTET_STREAM;
 import static org.apache.http.entity.ContentType.APPLICATION_XML;
+import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_INVALID_ARGUMENTS;
 import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
 
 import java.io.File;
@@ -48,6 +49,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.FileBody;
+import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.cli.json.JobIdView;
@@ -60,12 +62,12 @@ public class SubmitJobCommand extends AbstractCommand implements Command {
     }
 
     @Override
-    public void execute() throws Exception {
+    public void execute() throws CLIException {
         HttpPost request = new HttpPost(resourceUrl("submit"));
         File jobFile = new File(pathname);
         if (!jobFile.exists()) {
-            throw new IllegalArgumentException(String.format(
-                    "'%s' does not exist.", pathname));
+            throw new CLIException(REASON_INVALID_ARGUMENTS,
+                    String.format("'%s' does not exist.", pathname));
         }
         String contentType = URLConnection.getFileNameMap().getContentTypeFor(
                 pathname);

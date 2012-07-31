@@ -44,6 +44,7 @@ import java.io.Writer;
 
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
+import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.CommandFactory;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
@@ -61,7 +62,7 @@ public class SchedHelpCommand extends AbstractCommand implements Command {
     }
 
     @Override
-    public void execute() throws Exception {
+    public void execute() throws CLIException {
         HelpFormatter formatter = new HelpFormatter();
         Writer writer = context().getDevice().getWriter();
         PrintWriter pw = new PrintWriter(writer, true);

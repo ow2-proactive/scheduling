@@ -48,6 +48,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
+import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.FileUtility;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
 
@@ -60,7 +61,7 @@ public class LoginCommand extends AbstractCommand implements Command {
     }
 
     @Override
-    public void execute() throws Exception {
+    public void execute() throws CLIException {
         ApplicationContext context = context();
         context.setUser(username);
         File userSessionFile = userSessionFile(username);

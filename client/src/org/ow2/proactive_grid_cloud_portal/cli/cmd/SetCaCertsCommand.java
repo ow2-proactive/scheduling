@@ -37,6 +37,8 @@
 
 package org.ow2.proactive_grid_cloud_portal.cli.cmd;
 
+import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
+
 public class SetCaCertsCommand extends AbstractCommand implements Command {
     private String trustStorePath;
 
@@ -45,7 +47,7 @@ public class SetCaCertsCommand extends AbstractCommand implements Command {
     }
 
     @Override
-    public void execute() throws Exception {
+    public void execute() throws CLIException {
         System.setProperty("javax.net.ssl.trustStore", trustStorePath);
     }
 }

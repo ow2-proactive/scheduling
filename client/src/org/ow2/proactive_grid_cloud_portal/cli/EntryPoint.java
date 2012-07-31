@@ -88,11 +88,10 @@ public abstract class EntryPoint {
         } catch (ParseException pe) {
             writeError((PrintWriter) console.getWriter(), pe.getMessage(), null);
             // print usage
-            try {
-                commandFactory.commandForOption(new Option("h", null))
-                        .execute();
-            } catch (Exception e) {
-
+            Command help = commandFactory
+                    .commandForOption(new Option("h", null));
+            if (help != null) {
+                help.execute();
             }
             System.exit(1);
         }
@@ -171,8 +170,7 @@ public abstract class EntryPoint {
 
     private CommandFactory getCommandFactory(String resourceType) {
         if (SCHEDULER_RESOURCE_TYPE.equals(resourceType)) {
-            return CommandFactory
-                    .getCommandFactory(SCHEDULER);
+            return CommandFactory.getCommandFactory(SCHEDULER);
         } else {
             throw new CLIException(REASON_INVALID_ARGUMENTS, String.format(
                     "Unknown resource-type('%s')", resourceType));

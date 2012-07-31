@@ -46,6 +46,7 @@ import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
+import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 
@@ -74,7 +75,7 @@ public class SchedImodeCommand extends AbstractCommand implements Command {
     }
 
     @Override
-    public void execute() throws Exception {
+    public void execute() throws CLIException {
         while (!context().isTermiated()) {
             try {
                 engine.eval(readLine("> "));

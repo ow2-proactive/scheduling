@@ -12,6 +12,7 @@ import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
+import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.FileUtility;
 
 public class EvalScriptCommand extends AbstractCommand implements Command {
@@ -25,7 +26,7 @@ public class EvalScriptCommand extends AbstractCommand implements Command {
     }
 
     @Override
-    public void execute() throws Exception {
+    public void execute() throws CLIException {
         ApplicationContext context = ApplicationContext.instance();
         Writer writer = context().getDevice().getWriter();
         ScriptEngine engine = null;
@@ -37,10 +38,12 @@ public class EvalScriptCommand extends AbstractCommand implements Command {
             engine.getContext().setWriter(writer);
             context.setEngine(engine);
         }
-        try {
+        if (scriptArgs != null) {
             engine.getContext().getBindings(ScriptContext.ENGINE_SCOPE)
                     .putAll(bindings(scriptArgs));
-            String script = FileUtility.read(new File(scriptPathname));
+        }
+        String script = FileUtility.read(new File(scriptPathname));
+        try {
             engine.eval(script);
         } catch (ScriptException e) {
             e.printStackTrace(new PrintWriter(writer, true));

@@ -41,6 +41,7 @@ import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractTaskCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
@@ -53,7 +54,7 @@ public class GetTaskOutputCommand extends AbstractTaskCommand implements
     }
 
     @Override
-    public void execute() throws Exception {
+    public void execute() throws CLIException {
         HttpGet request = new HttpGet(resourceUrl("jobs/" + jobId + "/tasks/"
                 + taskId + "/result/log/all"));
         HttpResponse response = execute(request);

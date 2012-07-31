@@ -41,6 +41,7 @@ import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPut;
+import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractTaskCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 
@@ -55,7 +56,7 @@ public class PreemptTaskCommand extends AbstractTaskCommand implements Command {
     }
 
     @Override
-    public void execute() throws Exception {
+    public void execute() throws CLIException {
         HttpPut request = new HttpPut(resourceUrl("jobs/" + jobId + "/tasks/"
                 + taskId + "/preempt"));
         HttpResponse response = execute(request);

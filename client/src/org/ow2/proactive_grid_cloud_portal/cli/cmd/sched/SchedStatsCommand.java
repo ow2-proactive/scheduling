@@ -48,6 +48,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.codehaus.jackson.type.TypeReference;
 import org.ow2.proactive.utils.ObjectArrayFormatter;
+import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
@@ -58,7 +59,7 @@ public class SchedStatsCommand extends AbstractCommand implements Command {
     }
 
     @Override
-    public void execute() throws Exception {
+    public void execute() throws CLIException {
         HttpGet request = new HttpGet(resourceUrl("stats"));
         HttpResponse response = execute(request);
         if (statusCode(OK) == statusCode(response)) {

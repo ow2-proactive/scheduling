@@ -49,6 +49,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.ByteArrayBody;
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
+import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.FileUtility;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
 
@@ -61,7 +62,7 @@ public class LoginWithCredentialsCommand extends AbstractCommand implements
     }
 
     @Override
-    public void execute() throws Exception {
+    public void execute() throws CLIException {
         File credentialFile = new File(pathname);
         String alias = FileUtility.md5Checksum(credentialFile);
         File userSessionFile = userSessionFile(alias);

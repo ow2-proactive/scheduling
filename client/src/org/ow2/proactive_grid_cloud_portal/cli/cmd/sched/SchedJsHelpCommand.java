@@ -58,7 +58,7 @@ public class SchedJsHelpCommand extends AbstractCommand implements Command {
     }
 
     @Override
-    public void execute() throws Exception {
+    public void execute() throws CLIException {
         printHelp(COMMON_COMMANDS, SCHED_ONLY,
                 new CommandSet.Entry[] { SCHED_JS_HELP });
     }

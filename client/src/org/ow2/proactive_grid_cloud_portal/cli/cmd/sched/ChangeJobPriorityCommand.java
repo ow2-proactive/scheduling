@@ -41,6 +41,7 @@ import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.NO_CONT
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPut;
+import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractJobCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 
@@ -54,7 +55,7 @@ public class ChangeJobPriorityCommand extends AbstractJobCommand implements
     }
 
     @Override
-    public void execute() throws Exception {
+    public void execute() throws CLIException {
         String resourceUrl = resourceUrl("jobs/" + jobId + "/priority/byvalue/"
                 + priorityValue);
         HttpPut request = new HttpPut(resourceUrl);

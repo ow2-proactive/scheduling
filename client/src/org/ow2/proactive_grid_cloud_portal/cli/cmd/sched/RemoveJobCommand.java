@@ -41,6 +41,7 @@ import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpDelete;
+import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractJobCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 
@@ -51,7 +52,7 @@ public class RemoveJobCommand extends AbstractJobCommand implements Command {
     }
 
     @Override
-    public void execute() throws Exception {
+    public void execute() throws CLIException {
         HttpDelete request = new HttpDelete(resourceUrl("jobs/" + jobId));
         HttpResponse response = execute(request);
         if (statusCode(OK) == statusCode(response)) {

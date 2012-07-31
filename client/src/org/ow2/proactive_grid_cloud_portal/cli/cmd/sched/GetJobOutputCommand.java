@@ -45,6 +45,7 @@ import java.util.Map;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.codehaus.jackson.type.TypeReference;
+import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractJobCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 
@@ -55,7 +56,7 @@ public class GetJobOutputCommand extends AbstractJobCommand implements Command {
     }
 
     @Override
-    public void execute() throws Exception {
+    public void execute() throws CLIException {
         HttpGet request = new HttpGet(resourceUrl("jobs/" + jobId
                 + "/result/value"));
         HttpResponse response = execute(request);
