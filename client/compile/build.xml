@@ -36,7 +36,7 @@
 				<include name="lib/**" />
 				<include name="conf/**" />
 				<include name="compile/build.xml" />
-				<include name="bin/rest-cli.sh" />
+				<include name="bin/**" />
 				<include name="README" />
 			</fileset>
 		</copy>

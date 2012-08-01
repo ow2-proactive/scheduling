@@ -40,8 +40,10 @@ package org.ow2.proactive_grid_cloud_portal.cli;
 import static org.codehaus.jackson.map.DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES;
 import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_INVALID_ARGUMENTS;
 import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_UNAUTHORIZED_ACCESS;
+import static org.ow2.proactive_grid_cloud_portal.cli.CommandFactory.RM;
 import static org.ow2.proactive_grid_cloud_portal.cli.CommandFactory.SCHEDULER;
 import static org.ow2.proactive_grid_cloud_portal.cli.RestConstants.DFLT_REST_SCHEDULER_URL;
+import static org.ow2.proactive_grid_cloud_portal.cli.RestConstants.RM_RESOURCE_TYPE;
 import static org.ow2.proactive_grid_cloud_portal.cli.RestConstants.SCHEDULER_RESOURCE_TYPE;
 
 import java.io.IOException;
@@ -171,6 +173,8 @@ public abstract class EntryPoint {
     private CommandFactory getCommandFactory(String resourceType) {
         if (SCHEDULER_RESOURCE_TYPE.equals(resourceType)) {
             return CommandFactory.getCommandFactory(SCHEDULER);
+        }else if (RM_RESOURCE_TYPE.equals(resourceType)){
+            return CommandFactory.getCommandFactory(RM);
         } else {
             throw new CLIException(REASON_INVALID_ARGUMENTS, String.format(
                     "Unknown resource-type('%s')", resourceType));

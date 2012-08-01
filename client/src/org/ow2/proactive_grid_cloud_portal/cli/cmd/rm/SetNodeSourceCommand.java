@@ -35,18 +35,23 @@
  * $$ACTIVEEON_INITIAL_DEV$$
  */
 
-package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
+package org.ow2.proactive_grid_cloud_portal.cli.cmd.rm;
 
-import java.io.InputStream;
+import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
 
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractIModeCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
+public class SetNodeSourceCommand extends AbstractCommand {
+    public static final String SET_NODE_SOURCE = "org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.SetNodeSourceCommand.setNodeSource";
 
-public class SchedImodeCommand extends AbstractIModeCommand implements Command {
+    private String nodeSource;
+
+    public SetNodeSourceCommand(String nodeSource) {
+        this.nodeSource = nodeSource;
+    }
 
     @Override
-    protected InputStream script() {
-        return getClass().getResourceAsStream("RestfulSchedulerActions.js");
+    public void execute() throws CLIException {
+        context().setProperty(SET_NODE_SOURCE, nodeSource);
     }
 
 }

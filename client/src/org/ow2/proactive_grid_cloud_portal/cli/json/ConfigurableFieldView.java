@@ -32,21 +32,32 @@
  *  Contributor(s):
  *
  * ################################################################
- * $$ACTIVEEON_INITIAL_DEV$$
+ * $ACTIVEEON_INITIAL_DEV$
  */
 
-package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
+package org.ow2.proactive_grid_cloud_portal.cli.json;
 
-import java.io.InputStream;
-
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractIModeCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
-
-public class SchedImodeCommand extends AbstractIModeCommand implements Command {
-
-    @Override
-    protected InputStream script() {
-        return getClass().getResourceAsStream("RestfulSchedulerActions.js");
+public class ConfigurableFieldView {
+    private String name;
+    private String value;
+    private FieldMataDataView meta;
+    
+    public String getName() {
+        return name;
     }
-
+    public void setName(String name) {
+        this.name = name;
+    }
+    public String getValue() {
+        return value;
+    }
+    public void setValue(String value) {
+        this.value = value;
+    }
+    public FieldMataDataView getMeta() {
+        return meta;
+    }
+    public void setMeta(FieldMataDataView meta) {
+        this.meta = meta;
+    }
 }

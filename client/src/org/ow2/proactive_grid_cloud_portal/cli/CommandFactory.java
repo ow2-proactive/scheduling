@@ -80,6 +80,8 @@ public abstract class CommandFactory {
         switch (type) {
         case SCHEDULER:
             return new SchedulerCommandFactory();
+        case RM:
+            return new RmCommandFactory();
         default:
             throw new CLIException(REASON_INVALID_ARGUMENTS, String.format(
                     "Unknow AbstractCommandFactory type['%d']", type));

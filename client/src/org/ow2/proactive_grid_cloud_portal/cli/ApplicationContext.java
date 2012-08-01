@@ -41,6 +41,8 @@ import static org.ow2.proactive_grid_cloud_portal.cli.RestConstants.DFLT_SESSION
 import static org.ow2.proactive_grid_cloud_portal.cli.RestConstants.DFLT_SESSION_FILE_EXT;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.script.ScriptEngine;
 
@@ -49,6 +51,7 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.ow2.proactive_grid_cloud_portal.cli.console.AbstractDevice;
+import org.ow2.proactive_grid_cloud_portal.cli.json.PluginView;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpUtility;
 
 public class ApplicationContext {
@@ -67,6 +70,10 @@ public class ApplicationContext {
     private ObjectMapper objectMapper;
     private boolean insecureAccess = false;
     private boolean newSession = false;
+    private Map<String, PluginView> infrastructures;
+    private Map<String, PluginView> policies;
+    private Map<String, Object> properties = new HashMap<String, Object>();
+    private boolean forced;
     private ScriptEngine engine;
 
     private ApplicationContext() {
@@ -206,24 +213,56 @@ public class ApplicationContext {
     public void setEngine(ScriptEngine engine) {
         this.engine = engine;
     }
-    
+
     public void setResourceType(String resourceType) {
         this.resourceType = resourceType;
     }
-    
+
     public String getResourceType() {
         return resourceType;
     }
     
-	public void clearSession() {
-		String sessionIdentifier = (user != null) ? user : alias;
-		if (sessionIdentifier != null) {
-			File sessionFile = new File(DFLT_SESSION_DIR, sessionIdentifier
-					+ DFLT_SESSION_FILE_EXT);
-			if (sessionFile.exists()) {
-				sessionFile.delete();
-			}
-		}
-	}
+    public Map<String, PluginView> getInfrastructures() {
+        return infrastructures;
+    }
+
+    public void setInfrastructures(Map<String, PluginView> infrastructures) {
+        this.infrastructures = infrastructures;
+    }
+
+    public Map<String, PluginView> getPolicies() {
+        return policies;
+    }
+
+    public void setPolicies(Map<String, PluginView> policies) {
+        this.policies = policies;
+    }
+
+    public void setProperty(String key, Object value) {
+        properties.put(key, value);
+    }
+
+    public <T> T getProperty(String key, Class<T> type) {
+        return type.cast(properties.get(key));
+    }
+    
+    public boolean isForced() {
+        return forced;
+    }
+
+    public void setForced(boolean forced) {
+        this.forced = forced;
+    }
+
+    public void clearSession() {
+        String sessionIdentifier = (user != null) ? user : alias;
+        if (sessionIdentifier != null) {
+            File sessionFile = new File(DFLT_SESSION_DIR, sessionIdentifier
+                    + DFLT_SESSION_FILE_EXT);
+            if (sessionFile.exists()) {
+                sessionFile.delete();
+            }
+        }
+    }
 
 }

@@ -35,18 +35,28 @@
  * $$ACTIVEEON_INITIAL_DEV$$
  */
 
-package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
+package org.ow2.proactive_grid_cloud_portal.cli.json;
 
-import java.io.InputStream;
+import java.util.Map;
 
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractIModeCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
+public class TopologyView {
+    private Map<String, Map<String, String>> distances;
+    private Map<String, String> hosts;
 
-public class SchedImodeCommand extends AbstractIModeCommand implements Command {
+    public Map<String, Map<String, String>> getDistances() {
+        return distances;
+    }
 
-    @Override
-    protected InputStream script() {
-        return getClass().getResourceAsStream("RestfulSchedulerActions.js");
+    public void setDistances(Map<String, Map<String, String>> distances) {
+        this.distances = distances;
+    }
+
+    public Map<String, String> getHosts() {
+        return hosts;
+    }
+
+    public void setHosts(Map<String, String> hosts) {
+        this.hosts = hosts;
     }
 
 }

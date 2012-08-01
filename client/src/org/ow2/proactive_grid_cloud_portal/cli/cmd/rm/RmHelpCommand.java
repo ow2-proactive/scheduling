@@ -35,18 +35,34 @@
  * $$ACTIVEEON_INITIAL_DEV$$
  */
 
-package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
+package org.ow2.proactive_grid_cloud_portal.cli.cmd.rm;
 
-import java.io.InputStream;
+import static org.ow2.proactive_grid_cloud_portal.cli.CommandFactory.RM;
 
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractIModeCommand;
+import java.io.PrintWriter;
+import java.io.Writer;
+
+import org.apache.commons.cli.HelpFormatter;
+import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
+import org.ow2.proactive_grid_cloud_portal.cli.CommandFactory;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 
-public class SchedImodeCommand extends AbstractIModeCommand implements Command {
+public class RmHelpCommand extends AbstractCommand implements Command {
+
+    private static final String USAGE = "USAGE:";
+
+    public RmHelpCommand() {
+    }
 
     @Override
-    protected InputStream script() {
-        return getClass().getResourceAsStream("RestfulSchedulerActions.js");
+    public void execute() throws CLIException {
+        HelpFormatter formatter = new HelpFormatter();
+        Writer writer = context().getDevice().getWriter();
+        PrintWriter pw = new PrintWriter(writer, true);
+        formatter.printHelp(pw, 110, USAGE, "", CommandFactory
+                .getCommandFactory(RM).supportedOptions(), formatter
+                .getLeftPadding(), formatter.getDescPadding(), "", false);
     }
 
 }

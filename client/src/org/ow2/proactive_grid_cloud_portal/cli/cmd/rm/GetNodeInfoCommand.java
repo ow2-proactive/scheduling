@@ -35,26 +35,50 @@
  * $$ACTIVEEON_INITIAL_DEV$$
  */
 
-package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
+package org.ow2.proactive_grid_cloud_portal.cli.cmd.rm;
 
-import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.COMMON_COMMANDS;
-import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.EXIT;
-import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.SCHED_JS_HELP;
-import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.SCHED_ONLY;
+import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
-import org.ow2.proactive_grid_cloud_portal.cli.CommandSet;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractJsHelpCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
+import org.ow2.proactive_grid_cloud_portal.cli.json.NodeEventView;
+import org.ow2.proactive_grid_cloud_portal.cli.json.RmStateView;
 
-public class SchedJsHelpCommand extends AbstractJsHelpCommand implements Command {
+public class GetNodeInfoCommand extends AbstractCommand implements Command {
 
-    public SchedJsHelpCommand() {
+    private String nodeUrl;
+
+    public GetNodeInfoCommand(String nodeUrl) {
+        this.nodeUrl = nodeUrl;
     }
 
     @Override
     public void execute() throws CLIException {
-        printHelp(COMMON_COMMANDS, SCHED_ONLY,
-                new CommandSet.Entry[] {EXIT, SCHED_JS_HELP });
+
+        HttpGet request = new HttpGet(resourceUrl("monitoring"));
+        HttpResponse response = execute(request);
+        if (statusCode(OK) == statusCode(response)) {
+            RmStateView state = readValue(response, RmStateView.class);
+            NodeEventView[] nodeEvents = state.getNodesEvents();
+            NodeEventView target = null;
+            for (NodeEventView nodeEvent : nodeEvents) {
+                if (nodeUrl.equals(nodeEvent.getNodeUrl())) {
+                    target = nodeEvent;
+                    break;
+                }
+            }
+            if (target == null) {
+                writeLine("Cannot find node: '%s'", nodeUrl);
+                return;
+            }
+            writeLine("%s", target.getNodeInfo());
+        } else {
+            handleError("An error occurred while retrieving node info.",
+                    response);
+        }
     }
+
 }

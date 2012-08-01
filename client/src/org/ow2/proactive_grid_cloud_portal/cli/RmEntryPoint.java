@@ -32,21 +32,21 @@
  *  Contributor(s):
  *
  * ################################################################
- * $$ACTIVEEON_INITIAL_DEV$$
+ * $PROACTIVE_INITIAL_DEV$
  */
 
-package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
+package org.ow2.proactive_grid_cloud_portal.cli;
 
-import java.io.InputStream;
+import static org.ow2.proactive_grid_cloud_portal.cli.RestConstants.RM_RESOURCE_TYPE;
 
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractIModeCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
-
-public class SchedImodeCommand extends AbstractIModeCommand implements Command {
+public class RmEntryPoint extends EntryPoint {
 
     @Override
-    protected InputStream script() {
-        return getClass().getResourceAsStream("RestfulSchedulerActions.js");
+    protected String resourceType() {
+        return RM_RESOURCE_TYPE;
     }
-
+    
+    public static void main(String[] args) {
+        (new RmEntryPoint()).run(args);
+    }
 }

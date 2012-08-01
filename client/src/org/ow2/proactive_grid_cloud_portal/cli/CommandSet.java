@@ -46,6 +46,7 @@ import java.lang.reflect.InvocationTargetException;
 import org.apache.commons.cli.Option;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.EvalScriptCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.ExitCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.LoginCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.LoginWithCredentialsCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.SetCaCertsCommand;
@@ -53,6 +54,26 @@ import org.ow2.proactive_grid_cloud_portal.cli.cmd.SetCaCertsPassCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.SetInsecureAccessCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.SetPasswordCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.SetUrlCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.AddNodeCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.CreateNodeSourceCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.ForceCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.GetNodeInfoCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.GetTopologyCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.ListInfrastructureCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.ListNodeCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.ListNodeSourceCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.ListPolicyCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.LockNodeCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.RemoveNodeCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.RemoveNodeSourceCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.RmHelpCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.RmImodeCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.RmJsHelpCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.RmStatsCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.SetInfrastructureCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.SetNodeSourceCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.SetPolicyCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.UnlockNodeCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.ChangeJobPriorityCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.FreezeCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.GetJobOutputCommand;
@@ -135,6 +156,11 @@ public class CommandSet {
             .description(
                     "Allow connections to SSL sites without certs verification")
             .commandClass(SetInsecureAccessCommand.class).entry();
+    
+    public static final CommandSet.Entry EXIT = CommandSetEntryBuilder
+            .newInstance().opt("").longOpt("")
+            .description("Exit interactive shell").jsCommand("exit()")
+            .commandClass(ExitCommand.class).entry();
 
     public static final CommandSet.Entry SUBMIT_DESC = CommandSetEntryBuilder
             .newInstance().opt("s").longOpt("submit")
@@ -310,11 +336,132 @@ public class CommandSet {
             .newInstance().opt("i").longOpt("imode")
             .description("Interactive mode of the REST CLI")
             .commandClass(SchedImodeCommand.class).entry();
-    
+
+    public static final CommandSet.Entry NODE_ADD = CommandSetEntryBuilder
+            .newInstance().opt("a").longOpt("addnodes")
+            .description("Add the specified nodes by their URLs").hasArgs(true)
+            .argNames("node-url").jsCommand("addnode(node-url[,node-source])")
+            .commandClass(AddNodeCommand.class).entry();
+
+    public static final CommandSet.Entry NS_CREATE = CommandSetEntryBuilder
+            .newInstance().opt("cn").longOpt("createns")
+            .description("Create new node source").hasArgs(true)
+            .argNames("node-source").jsCommand("createns(node-source)")
+            .commandClass(CreateNodeSourceCommand.class).entry();
+
+    public static final CommandSet.Entry NODE_REMOVE = CommandSetEntryBuilder
+            .newInstance().opt("d").longOpt("removenodes")
+            .description("Remove the specified node").hasArgs(true)
+            .numOfArgs(1).argNames("node-url")
+            .jsCommand("removenode(node-url)")
+            .commandClass(RemoveNodeCommand.class).entry();
+
+    public static final CommandSet.Entry FORCE = CommandSetEntryBuilder
+            .newInstance()
+            .opt("f")
+            .longOpt("force")
+            .description(
+                    "Do not wait for buys nodes to be freed before removal")
+            .commandClass(ForceCommand.class).entry();
+
+    public static final CommandSet.Entry INFRASTRUCTURE = CommandSetEntryBuilder
+            .newInstance().opt("in").longOpt("infrastructure")
+            .description("Specify an infrastructure for the node source")
+            .hasArgs(true).argNames("param1 param2 ...")
+            .commandClass(SetInfrastructureCommand.class).entry();
+
+    public static final CommandSet.Entry POLICY = CommandSetEntryBuilder
+            .newInstance().opt("po").longOpt("policy")
+            .description("Specify a policy for the node source").hasArgs(true)
+            .argNames("param1 param2 ...").commandClass(SetPolicyCommand.class)
+            .entry();
+
+    public static final CommandSet.Entry NODE_LIST = CommandSetEntryBuilder
+            .newInstance().opt("ln").longOpt("listnodes")
+            .description("List nodes handled by the Resoruce Manager")
+            .jsCommand("listnodes([node-source])")
+            .commandClass(ListNodeCommand.class).entry();
+
+    public static final CommandSet.Entry NS_LIST = CommandSetEntryBuilder
+            .newInstance().opt("lns").longOpt("listns")
+            .description("List node-sources handled by the Resource Manager")
+            .jsCommand("listns()").commandClass(ListNodeSourceCommand.class)
+            .entry();
+
+    public static final CommandSet.Entry NODE_LOCK = CommandSetEntryBuilder
+            .newInstance().opt("lon").longOpt("locknodes")
+            .description("Lock specified nodes").hasArgs(true)
+            .argNames("node1-url node2-url ...")
+            .jsCommand("locknodes([node1-url,node2-url,...])")
+            .commandClass(LockNodeCommand.class).entry();
+
+    public static final CommandSet.Entry NODE_INFO = CommandSetEntryBuilder
+            .newInstance().opt("ni").longOpt("nodeinfo")
+            .description("Retrieve info of specified node").hasArgs(true)
+            .numOfArgs(1).argNames("node-url")
+            .commandClass(GetNodeInfoCommand.class)
+            .jsCommand("nodeinfo(node-url)").entry();
+
+    public static final CommandSet.Entry NS = CommandSetEntryBuilder
+            .newInstance().opt("ns").longOpt("nodesource")
+            .description("Specify node source name").hasArgs(true)
+            .argNames("node-source").commandClass(SetNodeSourceCommand.class)
+            .entry();
+
+    public static final CommandSet.Entry NS_REMOVE = CommandSetEntryBuilder
+            .newInstance().opt("r").longOpt("removens")
+            .description("Remove specified node source").hasArgs(true)
+            .argNames("node-source").jsCommand("removens(node-source)")
+            .commandClass(RemoveNodeSourceCommand.class).entry();
+
+    public static final CommandSet.Entry TOPOLOGY = CommandSetEntryBuilder
+            .newInstance().opt("t").longOpt("topology")
+            .description("Retrieve node topology").jsCommand("topology()")
+            .commandClass(GetTopologyCommand.class).entry();
+
+    public static final CommandSet.Entry NODE_UNLOCK = CommandSetEntryBuilder
+            .newInstance().opt("ulon").longOpt("unlocknodes")
+            .description("Unlock specified nodes").hasArgs(true)
+            .argNames("node1-url node2-url ...")
+            .jsCommand("unlocknodes([node1-url,node2-url,...])")
+            .commandClass(UnlockNodeCommand.class).entry();
+
+    public static final CommandSet.Entry INFRASTRUCTURE_LIST = CommandSetEntryBuilder
+            .newInstance().opt("li").longOpt("listinfra")
+            .description("List supported infrastructure types")
+            .jsCommand("listinfrastructures()")
+            .commandClass(ListInfrastructureCommand.class).entry;
+
+    public static final CommandSet.Entry POLICY_LIST = CommandSetEntryBuilder
+            .newInstance().opt("lp").longOpt("listpolicy")
+            .description("List supported policy types")
+            .jsCommand("listpolicies()").commandClass(ListPolicyCommand.class).entry;
+
+    public static final CommandSet.Entry RM_IMODE = CommandSetEntryBuilder
+            .newInstance().opt("i").longOpt("interactive")
+            .description("Interactive mode of REST CLI")
+            .commandClass(RmImodeCommand.class).entry();
+
+    public static final CommandSet.Entry RM_HELP = CommandSetEntryBuilder
+            .newInstance()
+            .opt("h")
+            .longOpt("help")
+            .description(
+                    "Prints the usage of REST command-line client for Resource Manager")
+            .commandClass(RmHelpCommand.class).entry();
+
+    public static final CommandSet.Entry RM_STATS = CommandSetEntryBuilder
+            .newInstance().opt("stats").longOpt("statistics")
+            .description("Retrieve current resource manager statistics")
+            .jsCommand("stats()").commandClass(RmStatsCommand.class).entry();
+
     public static final CommandSet.Entry SCHED_JS_HELP = CommandSetEntryBuilder
             .newInstance().opt("").longOpt("").description("Interactive help")
             .jsCommand("help()").commandClass(SchedJsHelpCommand.class).entry();
 
+    public static final CommandSet.Entry RM_JS_HELP = CommandSetEntryBuilder
+            .newInstance().opt("").longOpt("").description("Interactive help")
+            .jsCommand("help()").commandClass(RmJsHelpCommand.class).entry();
 
     /**
      * CommandSet.Entry objects which are common to both Scheduler and Resource
@@ -331,6 +478,13 @@ public class CommandSet {
             SUBMIT_ARCH, JOB_STATE, JOB_OUTPUT, JOB_RESULT, JOB_PRIORITY,
             JOB_PAUSE, JOB_RESUME, JOB_KILL, JOB_REMOVE, TASK_RESTART,
             TASK_PREEMPT, TASK_OUTPUT, TASK_RESULT, SCHED_IMODE, SCHED_HELP };
+    
+    /** CommandSet.Entry objects which are specific to Resource Manager CLI */
+    public static final CommandSet.Entry[] RM_ONLY = new CommandSet.Entry[] {
+            NODE_ADD, NODE_LIST, NODE_INFO, NODE_LOCK, NODE_UNLOCK,
+            NODE_REMOVE, NS_CREATE, NS_LIST, NS_REMOVE, NS, INFRASTRUCTURE,
+            INFRASTRUCTURE_LIST, POLICY, POLICY_LIST, TOPOLOGY, FORCE,
+            RM_STATS, RM_IMODE, RM_HELP };
 
     private CommandSet() {
     }

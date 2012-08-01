@@ -35,18 +35,32 @@
  * $$ACTIVEEON_INITIAL_DEV$$
  */
 
-package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
+package org.ow2.proactive_grid_cloud_portal.cli.cmd.rm;
 
-import java.io.InputStream;
+import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
 
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractIModeCommand;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 
-public class SchedImodeCommand extends AbstractIModeCommand implements Command {
+public class ShutdownCommand extends AbstractCommand implements Command {
 
     @Override
-    protected InputStream script() {
-        return getClass().getResourceAsStream("RestfulSchedulerActions.js");
+    public void execute() throws CLIException {
+        HttpGet request = new HttpGet(resourceUrl("shutdown"));
+        HttpResponse response = execute(request);
+        if (statusCode(OK) == statusCode(response)) {
+            boolean success = readValue(response, Boolean.TYPE);
+            if (success) {
+                writeLine("%s", "Resource manager shutdown successfully.");
+            } else {
+                writeLine("%s", "Cannot shutdown resource manager.");
+            }
+        } else {
+            handleError("An error occurred while shutting down:", response);
+        }
     }
 
 }

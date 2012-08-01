@@ -35,18 +35,34 @@
  * $$ACTIVEEON_INITIAL_DEV$$
  */
 
-package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
+package org.ow2.proactive_grid_cloud_portal.cli.json;
 
-import java.io.InputStream;
+public class NodeSourceView {
+    private String sourceName;
+    private String sourceDescription;
+    private String nodeSourceAdmin;
 
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractIModeCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
-
-public class SchedImodeCommand extends AbstractIModeCommand implements Command {
-
-    @Override
-    protected InputStream script() {
-        return getClass().getResourceAsStream("RestfulSchedulerActions.js");
+    public String getSourceName() {
+        return sourceName;
     }
 
+    public void setSourceName(String sourceName) {
+        this.sourceName = sourceName;
+    }
+
+    public String getSourceDescription() {
+        return sourceDescription;
+    }
+
+    public void setSourceDescription(String sourceDescription) {
+        this.sourceDescription = sourceDescription;
+    }
+
+    public String getNodeSourceAdmin() {
+        return nodeSourceAdmin;
+    }
+
+    public void setNodeSourceAdmin(String nodeSourceAdmin) {
+        this.nodeSourceAdmin = nodeSourceAdmin;
+    }
 }

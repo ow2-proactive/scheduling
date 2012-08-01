@@ -32,21 +32,46 @@
  *  Contributor(s):
  *
  * ################################################################
- * $$ACTIVEEON_INITIAL_DEV$$
+ * $ACTIVEEON_INITIAL_DEV$
  */
 
-package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
+package org.ow2.proactive_grid_cloud_portal.cli.json;
 
-import java.io.InputStream;
+public class FieldMataDataView {
 
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractIModeCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
+    public enum Type {
+        FILE("fileBrowser"),
 
-public class SchedImodeCommand extends AbstractIModeCommand implements Command {
+        CREDENTIALS("credential"),
 
-    @Override
-    protected InputStream script() {
-        return getClass().getResourceAsStream("RestfulSchedulerActions.js");
+        NONE("none"),
+
+        PASSWORD_TEXT("password");
+
+        private String name;
+
+        Type(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
     }
 
+    private String type;
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public Type type() {
+        return Type.valueOf(type);
+
+    }
 }
