@@ -185,7 +185,9 @@ public class TestRMProxy extends FunctionalTest {
     private void requestTooManyNodes(UserRMProxy proxy, ResourceManager rm) throws Exception {
         System.out.println("Request more nodes than RM has");
 
-        NodeSet nodeSet = proxy.getNodes(new Criteria(NODES_NUMBER + 1));
+        Criteria criteria = new Criteria(NODES_NUMBER + 1);
+        criteria.setBestEffort(false);
+        NodeSet nodeSet = proxy.getNodes(criteria);
         PAFuture.waitFor(nodeSet);
         Assert.assertEquals(0, nodeSet.size());
         Assert.assertEquals(NODES_NUMBER, rm.getState().getFreeNodesNumber());
