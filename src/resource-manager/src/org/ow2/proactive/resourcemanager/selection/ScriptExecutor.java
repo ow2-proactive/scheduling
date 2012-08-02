@@ -154,7 +154,7 @@ public class ScriptExecutor implements Callable<Node> {
         }
 
         manager.scriptExecutionFinished(rmnode.getNodeURL());
-        if (logger.isDebugEnabled()) {
+        if (selectionScriptSpecified && logger.isDebugEnabled()) {
             if (nodeMatch) {
                 logger.debug(rmnode.getNodeURL() + " : selected");
             } else {

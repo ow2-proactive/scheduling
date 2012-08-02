@@ -155,9 +155,10 @@ public abstract class SelectionManager {
             MDC.getContext().put(MultipleFileAppender.FILE_NAMES, criteria.getComputationDescriptors());
         }
 
+        boolean hasScripts = criteria.getScripts() != null && criteria.getScripts().size() > 0;
         logger.info(client + " requested " + criteria.getSize() + " nodes with " + criteria.getTopology());
         if (logger.isDebugEnabled()) {
-            if (criteria.getScripts() != null && criteria.getScripts().size() > 0) {
+            if (hasScripts) {
                 logger.debug("Selection scripts:");
                 for (SelectionScript s : criteria.getScripts()) {
                     logger.debug(s);
@@ -226,7 +227,9 @@ public abstract class SelectionManager {
             }
         }
 
-        logger.debug(matchedNodes.size() + " nodes found after scripts execution for " + client);
+        if (hasScripts) {
+            logger.debug(matchedNodes.size() + " nodes found after scripts execution for " + client);
+        }
 
         // now we have a list of nodes which match to selection scripts
         // selecting subset according to topology requirements
@@ -273,6 +276,12 @@ public abstract class SelectionManager {
             selectedNodes.getExtraNodes().size() + " extra nodes"
                 : "";
         logger.info(client + " will get " + selectedNodes.size() + " nodes " + extraNodes);
+
+        if (logger.isDebugEnabled()) {
+            for (Node n : selectedNodes) {
+                logger.debug(n.getNodeInformation().getURL());
+            }
+        }
 
         MDC.getContext().remove(MultipleFileAppender.FILE_NAMES);
         return selectedNodes;
