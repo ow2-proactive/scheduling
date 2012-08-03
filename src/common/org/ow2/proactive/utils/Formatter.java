@@ -39,7 +39,7 @@ package org.ow2.proactive.utils;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-
+import java.io.Writer;
 
 /**
  * Formatter is a class grouping tools for formatting
@@ -49,36 +49,35 @@ import java.io.StringWriter;
  */
 public final class Formatter {
 
-    /**
-     * Return the stack trace of the given exception in a string.
-     *
-     * @param e an exception or throwable
-     * @return the stack trace of the given exception in a string.
-     */
-    public static String stackTraceToString(Throwable e) {
-        if (e == null) {
-            return null;
-        }
-        String retValue = null;
-        StringWriter sw = null;
-        PrintWriter pw = null;
-        try {
-            sw = new StringWriter();
-            pw = new PrintWriter(sw);
-            for (StackTraceElement el : e.getStackTrace()) {
-                pw.print(el.toString());
-            }
-            retValue = sw.toString();
-        } finally {
-            try {
-                if (pw != null)
-                    pw.close();
-                if (sw != null)
-                    sw.close();
-            } catch (IOException ignore) {
-            }
-        }
-        return retValue;
-    }
+	/**
+	 * Return the stack trace of the given exception in a string.
+	 *
+	 * @param e
+	 *            an exception or throwable
+	 * @return the stack trace of the given exception in a string.
+	 */
+		public static String stackTraceToString(Throwable aThrowable) {
+		Writer result = null;
+		PrintWriter printWriter = null;
+		try {
+			result = new StringWriter();
+			printWriter = new PrintWriter(result);
+			aThrowable.printStackTrace(printWriter);
+		}  finally {
+			if (printWriter != null)
+				printWriter.close();
+			if (result != null)
+				try {
+					result.close();
+				} catch (Exception e) {
+						//was not able to produce the String representing the exception
+						System.out.println("Could not get the stacktrace for the following ex: ");
+						aThrowable.printStackTrace();
+						System.out.println("An exception occured while constructing the String representation of the exception above: ");
+						e.printStackTrace();
+				}
+		}
+		return result.toString();
+	}
 
 }
