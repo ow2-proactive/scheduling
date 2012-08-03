@@ -48,6 +48,7 @@ import org.codehaus.jackson.type.TypeReference;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractJobCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
+import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
 
 public class GetJobOutputCommand extends AbstractJobCommand implements Command {
 
@@ -61,13 +62,15 @@ public class GetJobOutputCommand extends AbstractJobCommand implements Command {
                 + "/result/value"));
         HttpResponse response = execute(request);
         if (statusCode(OK) == statusCode(response)) {
-            writeLine("%s output:", job());
-            Map<String, String> jobOutputs = readValue(response,
+            Map<String, String> jobOutput = readValue(response,
                     new TypeReference<Map<String, String>>() {
                     });
-            for (String key : jobOutputs.keySet()) {
-                writeLine("%s : %s", key, jobOutputs.get(key));
+            resultStack().push(jobOutput);
+            if (!context().isSilent()) {
+                writeLine("%s",
+                        StringUtility.jobOutputAsString(job(), jobOutput));
             }
+
         } else if (statusCode(NO_CONTENT) == statusCode(response)) {
             writeLine("%s output not available.", job());
 
@@ -77,5 +80,4 @@ public class GetJobOutputCommand extends AbstractJobCommand implements Command {
                     response);
         }
     }
-
 }

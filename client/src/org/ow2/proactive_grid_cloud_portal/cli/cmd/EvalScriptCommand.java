@@ -42,7 +42,7 @@ public class EvalScriptCommand extends AbstractCommand implements Command {
             engine.getContext().getBindings(ScriptContext.ENGINE_SCOPE)
                     .putAll(bindings(scriptArgs));
         }
-        String script = FileUtility.read(new File(scriptPathname));
+        String script = FileUtility.readFileToString(new File(scriptPathname));
         try {
             engine.eval(script);
         } catch (ScriptException e) {

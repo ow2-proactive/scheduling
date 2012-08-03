@@ -58,6 +58,7 @@ public class RestartTaskCommand extends AbstractTaskCommand implements Command {
         HttpResponse response = execute(request);
         if (statusCode(OK) == statusCode(response)) {
             boolean success = readValue(response, Boolean.TYPE).booleanValue();
+            resultStack().push(success);
             if (success) {
                 writeLine("%s successfully restarted.", task());
             } else {

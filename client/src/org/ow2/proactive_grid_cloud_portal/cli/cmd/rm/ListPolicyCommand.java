@@ -55,32 +55,36 @@ public class ListPolicyCommand extends AbstractCommand implements Command {
 
     @Override
     public void execute() throws CLIException {
-        Map<String, PluginView> policies = context().getPolicies();
-        if (policies == null) {
+        Map<String, PluginView> knownPolicyMap = context().getPolicies();
+        if (knownPolicyMap == null) {
             HttpGet request = new HttpGet(resourceUrl("policies"));
             HttpResponse response = execute(request);
             if (statusCode(OK) == statusCode(response)) {
-                policies = new HashMap<String, PluginView>();
                 List<PluginView> pluginViewList = readValue(response,
                         new TypeReference<List<PluginView>>() {
                         });
+                resultStack().push(
+                        pluginViewList.toArray(new PluginView[pluginViewList
+                                .size()]));
+                knownPolicyMap = new HashMap<String, PluginView>();
                 for (PluginView pluginView : pluginViewList) {
-                    policies.put(pluginView.getPluginName(), pluginView);
+                    knownPolicyMap.put(pluginView.getPluginName(), pluginView);
                 }
-                context().setPolicies(policies);
+                context().setPolicies(knownPolicyMap);
             } else {
                 handleError(
                         "An error occurred while retrieving supported policy types:",
                         response);
             }
         }
-        if (policies != null) {
-            writeLine("%n%s:%n","Supported policy types");
-            for (PluginView policy : policies.values()) {
-                writeLine("%s%n", policy.toString());
+        if (!context().isSilent()) {
+            if (knownPolicyMap != null) {
+                writeLine("%n%s:%n", "Supported policy types");
+                for (PluginView policy : knownPolicyMap.values()) {
+                    writeLine("%s%n", policy.toString());
+                }
             }
         }
 
     }
-
 }

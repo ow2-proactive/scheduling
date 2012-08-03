@@ -39,17 +39,14 @@ package org.ow2.proactive_grid_cloud_portal.cli.cmd.rm;
 
 import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
-import org.ow2.proactive.utils.ObjectArrayFormatter;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.cli.json.NodeSourceView;
 import org.ow2.proactive_grid_cloud_portal.cli.json.RmStateView;
+import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
 
 public class ListNodeSourceCommand extends AbstractCommand implements Command {
 
@@ -59,32 +56,13 @@ public class ListNodeSourceCommand extends AbstractCommand implements Command {
         HttpResponse response = execute(request);
         if (statusCode(OK) == statusCode(response)) {
             RmStateView state = readValue(response, RmStateView.class);
-            
-            ObjectArrayFormatter formatter = new ObjectArrayFormatter();
-            formatter.setMaxColumnLength(80);
-            formatter.setSpace(4);
-            
-            List<String> titles = new ArrayList<String>();
-            titles.add("SOURCE_NAME");
-            titles.add("DESCRIPTION");
-            titles.add("ADMINISTRATOR");
-            formatter.setTitle(titles);
-            
-            formatter.addEmptyLine();
-            
             NodeSourceView[] nodeSources = state.getNodeSource();
-            for (NodeSourceView ns : nodeSources) {
-                List<String> line = new ArrayList<String>();
-                line.add(ns.getSourceName());
-                line.add(ns.getSourceDescription());
-                line.add(ns.getNodeSourceAdmin());
-                formatter.addLine(line);
+            resultStack().push(nodeSources);
+            if (!context().isSilent()) {
+                writeLine("%s", StringUtility.string(nodeSources));   
             }
-            
-            writeLine(formatter.getAsString());
-            
         } else {
-            handleError("An error occurred while retrieving node sources.",
+            handleError("An error occurred while retrieving node sources:",
                     response);
         }
     }

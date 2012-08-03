@@ -57,6 +57,7 @@ public class KillJobCommand extends AbstractJobCommand implements Command {
         HttpResponse response = execute(request);
         if (statusCode(OK) == statusCode(response)) {
             boolean success = readValue(response, Boolean.TYPE);
+            resultStack().push(success);
             if (success) {
                 writeLine("%s successfully killed.", job());
             } else {

@@ -42,14 +42,16 @@ import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_OTHER;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 
 public class FileUtility {
-    
+
     public static String md5Checksum(File file) {
         try {
             return DigestUtils.md5Hex(new FileInputStream(file));
@@ -57,8 +59,8 @@ public class FileUtility {
             throw new CLIException(REASON_IO_ERROR, ioe);
         }
     }
-    
-    public static void write(File file, String content) {
+
+    public static void writeStringToFile(File file, String content) {
         try {
             org.apache.commons.io.FileUtils.writeStringToFile(file, content);
         } catch (IOException ioe) {
@@ -67,15 +69,15 @@ public class FileUtility {
         file.setReadable(true, true);
         file.setWritable(true, true);
     }
-    
-    public static String read(File file) {
+
+    public static String readFileToString(File file) {
         try {
             return FileUtils.readFileToString(file);
         } catch (IOException ioe) {
             throw new CLIException(REASON_IO_ERROR, ioe);
         }
     }
-    
+
     public static byte[] byteArray(File file) {
         try {
             return FileUtils.readFileToByteArray(file);
@@ -83,7 +85,26 @@ public class FileUtility {
             throw new CLIException(REASON_IO_ERROR, ioe);
         }
     }
-    
+
+    public static void writeByteArrayToFile(byte[] data, File file) {
+        try {
+            FileUtils.writeByteArrayToFile(file, data);
+        } catch (IOException ioe) {
+            throw new CLIException(REASON_IO_ERROR, ioe);
+        }
+    }
+
+    public static void writeObjectToFile(Object object, File file) {
+        try {
+            FileOutputStream fos = new FileOutputStream(file);
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            oos.writeObject(object);
+            oos.close();
+        } catch (IOException ioe) {
+            throw new CLIException(REASON_IO_ERROR, ioe);
+        }
+    }
+
     private FileUtility() {
     }
 

@@ -16,7 +16,5 @@ CLASSPATH=$(find "$LIB" -name '*.jar' -printf '%p:' | sed 's/:$//')
 CLASSPATH=$CLASSPATH:$(find "$DIST" -name '*.jar' -printf '%p:' | sed 's/:$//')
 
 "$JAVA_HOME"/bin/java -classpath $CLASSPATH \
--Djava.security.manager \
--Djava.security.policy="$CONF/java.policy" \
 org.ow2.proactive_grid_cloud_portal.cli.SchedulerEntryPoint "$@"
 

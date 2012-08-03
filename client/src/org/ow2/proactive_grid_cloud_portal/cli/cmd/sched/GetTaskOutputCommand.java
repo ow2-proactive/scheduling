@@ -59,9 +59,12 @@ public class GetTaskOutputCommand extends AbstractTaskCommand implements
                 + taskId + "/result/log/all"));
         HttpResponse response = execute(request);
         if (statusCode(OK) == statusCode(response)) {
-            writeLine("%s output:", task());
-            writeLine("%s", StringUtility.string(response));
-
+            String output = StringUtility.string(response);
+            resultStack().push(output);
+            if (!context().isSilent()) {
+                writeLine("%s",
+                        StringUtility.taskOutputAsString(task(), output));
+            }
         } else {
             handleError(String.format(
                     "An error occurred while retrieving %s output:", task()),

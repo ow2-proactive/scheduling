@@ -45,6 +45,9 @@ import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.INSECURE;
 import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.LOGIN;
 import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.PASSWORD;
 import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.SCHED_HELP;
+import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.SESSION;
+import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.SESSION_FILE;
+import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.SILENT;
 import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.URL;
 
 import java.util.Collection;
@@ -91,7 +94,7 @@ public abstract class CommandFactory {
     static void put(CommandSet.Entry entry, Map<String, CommandSet.Entry> map) {
         map.put(opt(entry), entry);
     }
-    
+
     static Map<String, CommandSet.Entry> supportedCommandMap() {
         return commonCmdMap;
     }
@@ -117,12 +120,17 @@ public abstract class CommandFactory {
      *            the command-line arguments
      * @return an ordered {@link Command} list.
      */
-    protected List<Command> getCommandList(CommandLine cli, Map<String, Command> map) {
+    protected List<Command> getCommandList(CommandLine cli,
+            Map<String, Command> map) {
         LinkedList<Command> list = new LinkedList<Command>();
 
         if (map.containsKey(opt(SCHED_HELP))) {
             list.add(map.remove(opt(SCHED_HELP)));
             return list;
+        }
+
+        if (map.containsKey(opt(SILENT))) {
+            list.add(map.remove(opt(SILENT)));
         }
 
         if (map.containsKey(opt(URL))) {
@@ -131,11 +139,20 @@ public abstract class CommandFactory {
 
         if (map.containsKey(opt(INSECURE))) {
             list.add(map.remove(opt(INSECURE)));
+            
         } else if (map.containsKey(opt(CACERTS))) {
             list.add(map.remove(opt(CACERTS)));
+            
             if (map.containsKey(opt(CACERTS_PASSWORD))) {
                 list.add(map.remove(opt(CACERTS_PASSWORD)));
             }
+        }
+
+        if (map.containsKey(opt(SESSION))) {
+            list.add(map.remove(opt(SESSION)));
+
+        } else if (map.containsKey(opt(SESSION_FILE))) {
+            list.add(map.remove(opt(SESSION_FILE)));
         }
 
         if (map.containsKey(opt(PASSWORD))) {
@@ -166,7 +183,7 @@ public abstract class CommandFactory {
             final Map<String, CommandSet.Entry> commandMap) {
         return commandMap.get(opt.getOpt()).commandObject(opt);
     }
-    
+
     protected Options createOptions(Collection<CommandSet.Entry> entries) {
         Options options = new Options();
         for (CommandSet.Entry entry : entries) {

@@ -41,6 +41,8 @@ import static org.apache.http.entity.ContentType.APPLICATION_FORM_URLENCODED;
 import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_INVALID_ARGUMENTS;
 import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
 
+import java.sql.ResultSet;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -77,8 +79,9 @@ public class UnlockNodeCommand extends AbstractCommand implements Command {
                 APPLICATION_FORM_URLENCODED));
         HttpResponse response = execute(request);
         if (statusCode(OK) == statusCode(response)) {
-            boolean successful = readValue(response, Boolean.TYPE);
-            if (successful) {
+            boolean success = readValue(response, Boolean.TYPE);
+            resultStack().push(success);
+            if (success) {
                 writeLine("Node(s) unlocked successfully.");
             } else {
                 writeLine("Cannot unlock node(s).");

@@ -37,6 +37,7 @@
 
 package org.ow2.proactive_grid_cloud_portal.cli;
 
+import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.OUTPUT;
 import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.SCHED_HELP;
 
 import java.util.Collection;
@@ -72,7 +73,11 @@ class SchedulerCommandFactory extends CommandFactory {
         if (commands.isEmpty()) {
             commandList.add(new SchedImodeCommand());
         } else {
+            Command output = commands.remove(opt(OUTPUT));
             commandList.addAll(commands.values());
+            if (output != null) {
+                commandList.add(output);
+            }
         }
         return commandList;
     }

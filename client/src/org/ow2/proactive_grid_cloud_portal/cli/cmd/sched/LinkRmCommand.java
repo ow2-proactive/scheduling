@@ -65,6 +65,7 @@ public class LinkRmCommand extends AbstractCommand implements
         HttpResponse response = execute(request);
         if (statusCode(OK) == statusCode(response)) {
             boolean success = readValue(response, Boolean.TYPE);
+            resultStack().push(success);
             if (success) {
                 writeLine("New resource manager relinked successfully.");
             } else {

@@ -71,81 +71,17 @@ public class ListJobCommand extends AbstractCommand implements Command {
             Map<Long, SchedulerStateView> stateMap = readValue(response,
                     new TypeReference<Map<Long, SchedulerStateView>>() {
                     });
-            SchedulerStateView state = stateMap.entrySet().iterator().next()
-                    .getValue();
-
-            ObjectArrayFormatter oaf = new ObjectArrayFormatter();
-            oaf.setMaxColumnLength(30);
-            oaf.setSpace(4);
-
-            List<String> columnNames = new ArrayList<String>();
-            columnNames.add("ID");
-            columnNames.add("NAME");
-            columnNames.add("OWNER");
-            columnNames.add("PRIORITY");
-            columnNames.add("PROJECT");
-            columnNames.add("STATUS");
-            columnNames.add("START AT");
-            columnNames.add("DURATION");
-            oaf.setTitle(columnNames);
-
-            oaf.addEmptyLine();
-
-            List<JobStateView> pendingJobs = Arrays.asList(state
-                    .getPendingJobs());
-            Collections.sort(pendingJobs);
-            List<JobStateView> runningJobs = Arrays.asList(state
-                    .getRunningJobs());
-            Collections.sort(runningJobs);
-            List<JobStateView> finishedJobs = Arrays.asList(state
-                    .getFinishedJobs());
-            Collections.sort(finishedJobs);
-
-            for (JobStateView js : finishedJobs) {
-                oaf.addLine(rowList(js));
+            SchedulerStateView schedulerState = stateMap.entrySet().iterator()
+                    .next().getValue();
+            resultStack().push(schedulerState);
+            if (!context().isSilent()) {
+                writeLine("%s",
+                        StringUtility.schedulerStateAsString(schedulerState));
             }
-
-            if (runningJobs.size() > 0) {
-                oaf.addEmptyLine();
-            }
-            for (JobStateView js : state.getRunningJobs()) {
-                oaf.addLine(rowList(js));
-            }
-
-            if (pendingJobs.size() > 0) {
-                oaf.addEmptyLine();
-            }
-            for (JobStateView js : pendingJobs) {
-                oaf.addLine(rowList(js));
-            }
-
-            writeLine(oaf.getAsString());
-
+            
         } else {
             handleError("An error occurred while retriving job list:", response);
         }
-    }
-
-    private List<String> rowList(JobStateView js) {
-        List<String> row = new ArrayList<String>();
-        row.add(String.valueOf(js.getId()));
-        row.add(js.getName());
-        row.add(js.getOwner());
-        row.add(js.getPriority().toString());
-        row.add(js.getProjectName());
-        row.add(js.getJobInfo().getStatus());
-
-        String date = StringUtility.formattedDate(js.getJobInfo()
-                .getStartTime());
-        if (js.getJobInfo().getStartTime() != -1)
-            date += " ("
-                    + StringUtility.formattedElapsedTime(js.getJobInfo()
-                            .getStartTime()) + ")";
-        row.add(date);
-        row.add(StringUtility.formattedDuration(js.getJobInfo().getStartTime(),
-                js.getJobInfo().getFinishedTime()));
-
-        return row;
     }
 
 }

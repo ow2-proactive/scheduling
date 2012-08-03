@@ -49,11 +49,16 @@ import org.ow2.proactive_grid_cloud_portal.cli.cmd.EvalScriptCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.ExitCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.LoginCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.LoginWithCredentialsCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.PrintSessionCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.SetCaCertsCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.SetCaCertsPassCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.SetInsecureAccessCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.SetPasswordCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.SetSessionCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.SetSessionFileCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.SetSilentCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.SetUrlCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.OutputCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.AddNodeCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.CreateNodeSourceCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.ForceCommand;
@@ -112,6 +117,20 @@ public class CommandSet {
             .argNames("server-url").jsCommand("url(url)")
             .commandClass(SetUrlCommand.class).entry();
 
+    public static final CommandSet.Entry SESSION = CommandSetEntryBuilder
+            .newInstance().opt("si").longOpt("session-id")
+            .description("the session id of this session").hasArgs(true)
+            .numOfArgs(1).argNames("session-id")
+            .jsCommand("setSessionId(sessionId)")
+            .commandClass(SetSessionCommand.class).entry();
+
+    public static final CommandSet.Entry SESSION_FILE = CommandSetEntryBuilder
+            .newInstance().opt("sif").longOpt("session-id-file")
+            .description("the session id file for this session").hasArgs(true)
+            .numOfArgs(1).argNames("session-file")
+            .jsCommand("setSessionIdFile(sessionIdFile)")
+            .commandClass(SetSessionFileCommand.class).entry();
+
     public static final CommandSet.Entry LOGIN = CommandSetEntryBuilder
             .newInstance().opt("l").longOpt("login")
             .description("the login name to connect to REST server")
@@ -156,7 +175,26 @@ public class CommandSet {
             .description(
                     "Allow connections to SSL sites without certs verification")
             .commandClass(SetInsecureAccessCommand.class).entry();
-    
+
+    public static final CommandSet.Entry SILENT = CommandSetEntryBuilder
+            .newInstance().opt("z").longOpt("silent")
+            .description("Runs the command-line client in the silent mode.")
+            .jsCommand("silent()").commandClass(SetSilentCommand.class).entry();
+
+    public static final CommandSet.Entry PRINT = CommandSetEntryBuilder
+            .newInstance().opt("pr").longOpt("print")
+            .description("Print the session id").jsCommand("prints()")
+            .commandClass(PrintSessionCommand.class).entry();
+
+    public static final CommandSet.Entry OUTPUT = CommandSetEntryBuilder
+            .newInstance()
+            .opt("o")
+            .longOpt("output-file")
+            .description(
+                    "Output the result of command execution to specified file")
+            .hasArgs(true).numOfArgs(1).commandClass(OutputCommand.class)
+            .entry();
+
     public static final CommandSet.Entry EXIT = CommandSetEntryBuilder
             .newInstance().opt("").longOpt("")
             .description("Exit interactive shell").jsCommand("exit()")
@@ -468,8 +506,8 @@ public class CommandSet {
      * Manager CLIs
      */
     public static final CommandSet.Entry[] COMMON_COMMANDS = new CommandSet.Entry[] {
-            URL, LOGIN, PASSWORD, CREDENTIALS, INSECURE, CACERTS,
-            CACERTS_PASSWORD, EVAL };
+            URL, SESSION, SESSION_FILE, LOGIN, PASSWORD, CREDENTIALS, INSECURE,
+            CACERTS, CACERTS_PASSWORD, EVAL, SILENT, PRINT, OUTPUT };
 
     /** CommandSet.Entry objects which are specific to Scheduler CLI */
     public static final CommandSet.Entry[] SCHED_ONLY = new CommandSet.Entry[] {
@@ -478,7 +516,7 @@ public class CommandSet {
             SUBMIT_ARCH, JOB_STATE, JOB_OUTPUT, JOB_RESULT, JOB_PRIORITY,
             JOB_PAUSE, JOB_RESUME, JOB_KILL, JOB_REMOVE, TASK_RESTART,
             TASK_PREEMPT, TASK_OUTPUT, TASK_RESULT, SCHED_IMODE, SCHED_HELP };
-    
+
     /** CommandSet.Entry objects which are specific to Resource Manager CLI */
     public static final CommandSet.Entry[] RM_ONLY = new CommandSet.Entry[] {
             NODE_ADD, NODE_LIST, NODE_INFO, NODE_LOCK, NODE_UNLOCK,

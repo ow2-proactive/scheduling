@@ -79,6 +79,7 @@ public class RemoveNodeCommand extends AbstractCommand implements Command {
         HttpResponse response = execute(request);
         if (statusCode(OK) == statusCode(response)) {
             boolean successful = readValue(response, Boolean.TYPE);
+            resultStack().push(successful);
             if (successful) {
                 writeLine("Node('%s') successfully removed.", nodeUrl);
             } else {

@@ -46,6 +46,7 @@ import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractTaskCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.cli.json.TaskResultView;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.ObjectUtility;
+import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
 
 public class GetTaskResultCommand extends AbstractTaskCommand implements
         Command {
@@ -62,10 +63,11 @@ public class GetTaskResultCommand extends AbstractTaskCommand implements
         if (statusCode(OK) == statusCode(response)) {
             TaskResultView taskResult = readValue(response,
                     TaskResultView.class);
-            writeLine("%s result:", task());
-            writeLine(ObjectUtility.object(taskResult.getSerializedValue())
-                    .toString());
-
+            resultStack().push(taskResult);
+            if (!context().isSilent()) {
+                writeLine("%s",
+                        StringUtility.taskResultAsString(task(), taskResult));
+            }
         } else {
             handleError(String.format(
                     "An error occurred while retrieving %s result:", task()),

@@ -38,21 +38,16 @@
 package org.ow2.proactive_grid_cloud_portal.cli.cmd;
 
 import static org.apache.http.entity.ContentType.APPLICATION_FORM_URLENCODED;
+import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_OTHER;
 import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
-import static org.ow2.proactive_grid_cloud_portal.cli.RestConstants.DFLT_SESSION_DIR;
-import static org.ow2.proactive_grid_cloud_portal.cli.RestConstants.DFLT_SESSION_FILE_EXT;
-
-import java.io.File;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
-import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
-import org.ow2.proactive_grid_cloud_portal.cli.utils.FileUtility;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
 
-public class LoginCommand extends AbstractCommand implements Command {
+public class LoginCommand extends AbstractLoginCommand implements Command {
 
     private String username;
 
@@ -61,51 +56,27 @@ public class LoginCommand extends AbstractCommand implements Command {
     }
 
     @Override
-    public void execute() throws CLIException {
-        ApplicationContext context = context();
-        context.setUser(username);
-        File userSessionFile = userSessionFile(username);
-        if (userSessionFile.exists()) {
-            context.setSessionId(FileUtility.read(userSessionFile));
-            context.setNewSession(false);
-            return;
-        }
-
-        String password = context.getPassword();
+    protected String login() throws CLIException {
+        String password = context().getPassword();
         if (password == null) {
             password = new String(readPassword("password:"));
         }
-
         HttpPost request = new HttpPost(resourceUrl("login"));
         StringEntity entity = new StringEntity("username=" + username
                 + "&password=" + password, APPLICATION_FORM_URLENCODED);
         request.setEntity(entity);
         HttpResponse response = execute(request);
-
         if (statusCode(OK) == statusCode(response)) {
-            String sessionId = StringUtility.string(response).trim();
-            context.setSessionId(sessionId);
-            context.setNewSession(true);
-            FileUtility.write(userSessionFile, sessionId);
-            if (!setOwnerOnly(userSessionFile)) {
-                writeLine(
-                        "Warning! Possible security risk: unable to limit access rights of the session-id file '%s'",
-                        userSessionFile.getAbsoluteFile());
-            }
-            writeLine("Session id successfully renewed.");
-
+            return StringUtility.string(response).trim();
         } else {
             handleError("An error occurred while logging:", response);
+            throw new CLIException(REASON_OTHER,
+                    "An error occurred while logging.");
         }
     }
 
-    private File userSessionFile(String username) {
-        return new File(DFLT_SESSION_DIR, username + DFLT_SESSION_FILE_EXT);
-    }
-
-    private boolean setOwnerOnly(File file) {
-        return file.setReadable(false, false) && file.setReadable(true, true)
-                && file.setWritable(false, false)
-                && file.setWritable(true, true) && file.setExecutable(false);
+    @Override
+    protected String alias() {
+        return username;
     }
 }

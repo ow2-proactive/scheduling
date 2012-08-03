@@ -62,39 +62,10 @@ public class GetTopologyCommand extends AbstractCommand implements Command {
         HttpResponse response = execute(request);
         if (statusCode(OK) == statusCode(response)) {
             TopologyView topology = readValue(response, TopologyView.class);
-            Set<String> hostList = topology.getDistances().keySet();
-            writeLine("%nHost list(%d):", hostList.size());
-            for (String host : hostList) {
-                writeLine("%s", host);
+            resultStack().push(topology);
+            if (!context().isSilent()) {
+                writeLine("%s", StringUtility.string(topology));
             }
-
-            writeLine("%n%s:", "Host  view");
-            ObjectArrayFormatter formatter = new ObjectArrayFormatter();
-            formatter.setMaxColumnLength(80);
-            formatter.setSpace(4);
-
-            List<String> titles = new ArrayList<String>();
-            titles.add("Host");
-            titles.add("Distance (µs)");
-            titles.add("Host");
-            formatter.setTitle(titles);
-            formatter.addEmptyLine();
-
-            List<String> line;
-            for (String host : hostList) {
-                Map<String, String> hostTopology = topology.getDistances().get(
-                        host);
-                if (hostTopology != null) {
-                    for (String anotherHost : hostTopology.keySet()) {
-                        line = new ArrayList<String>();
-                        line.add(host);
-                        line.add(hostTopology.get(anotherHost));
-                        line.add(anotherHost);
-                        formatter.addLine(line);
-                    }
-                }
-            }
-            writeLine("%s", StringUtility.string(formatter));
         } else {
             handleError("An error occurred while retrieving the topology:",
                     response);

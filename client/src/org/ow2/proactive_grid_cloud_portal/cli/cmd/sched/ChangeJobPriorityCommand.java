@@ -61,6 +61,7 @@ public class ChangeJobPriorityCommand extends AbstractJobCommand implements
         HttpPut request = new HttpPut(resourceUrl);
         HttpResponse response = execute(request);
         if (statusCode(NO_CONTENT) == statusCode(response)) {
+            resultStack().push(Boolean.TRUE);
             writeLine("%s priority changed successfully.", job());
         } else {
             handleError(String.format(

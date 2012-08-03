@@ -45,6 +45,8 @@ import static org.ow2.proactive_grid_cloud_portal.cli.CommandFactory.SCHEDULER;
 import static org.ow2.proactive_grid_cloud_portal.cli.RestConstants.DFLT_REST_SCHEDULER_URL;
 import static org.ow2.proactive_grid_cloud_portal.cli.RestConstants.RM_RESOURCE_TYPE;
 import static org.ow2.proactive_grid_cloud_portal.cli.RestConstants.SCHEDULER_RESOURCE_TYPE;
+import static org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractLoginCommand.RENEW_SESSION;
+import static org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractLoginCommand.RETRY_LOGIN;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -74,11 +76,15 @@ public abstract class EntryPoint {
 
         try {
             commandFactory = getCommandFactory(resourceType());
+            console = AbstractDevice.getConsole(AbstractDevice.STARDARD);
+            /*
             console = (JLineDevice) AbstractDevice
                     .getConsole(AbstractDevice.JLINE);
             ((JLineDevice) console).setCommands(commandFactory
                     .supportedCommandEntries());
+                    */
             context.setDevice(console);
+            
 
             Options options = commandFactory.supportedOptions();
             cli = (new GnuParser()).parse(options, args);
@@ -125,6 +131,7 @@ public abstract class EntryPoint {
                 writeError(writer(context), "An error occurred:", error);
             }
         } catch (Throwable e) {
+            e.printStackTrace();
             writeError(writer(context), "An error occurred:", e);
         }
 
@@ -136,9 +143,10 @@ public abstract class EntryPoint {
          * after clearing the existing session. This will effectively re-execute
          * the user command after with a new session-id.
          */
-        if (authorizationError) {
+        if (authorizationError
+                && context.getProperty(RETRY_LOGIN, Boolean.TYPE, false)) {
             try {
-                context.clearSession();
+                context.setProperty(RENEW_SESSION, true);
                 executeCommandList(commands);
             } catch (Throwable error) {
                 writeError(writer(context),
@@ -173,7 +181,7 @@ public abstract class EntryPoint {
     private CommandFactory getCommandFactory(String resourceType) {
         if (SCHEDULER_RESOURCE_TYPE.equals(resourceType)) {
             return CommandFactory.getCommandFactory(SCHEDULER);
-        }else if (RM_RESOURCE_TYPE.equals(resourceType)){
+        } else if (RM_RESOURCE_TYPE.equals(resourceType)) {
             return CommandFactory.getCommandFactory(RM);
         } else {
             throw new CLIException(REASON_INVALID_ARGUMENTS, String.format(

@@ -79,6 +79,7 @@ public class CreateNodeSourceCommand extends AbstractCommand implements Command 
         HttpResponse response = execute(request);
         if (statusCode(OK) == statusCode(response)) {
             boolean success = readValue(response, Boolean.TYPE);
+            resultStack().push(success);
             if (success) {
                 writeLine("Node source successfully created.");
             } else {

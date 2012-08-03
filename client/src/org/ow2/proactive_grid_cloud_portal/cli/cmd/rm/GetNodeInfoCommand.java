@@ -74,6 +74,7 @@ public class GetNodeInfoCommand extends AbstractCommand implements Command {
                 writeLine("Cannot find node: '%s'", nodeUrl);
                 return;
             }
+            resultStack().push(target);
             writeLine("%s", target.getNodeInfo());
         } else {
             handleError("An error occurred while retrieving node info.",

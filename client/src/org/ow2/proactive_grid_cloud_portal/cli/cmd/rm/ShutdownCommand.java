@@ -53,6 +53,7 @@ public class ShutdownCommand extends AbstractCommand implements Command {
         HttpResponse response = execute(request);
         if (statusCode(OK) == statusCode(response)) {
             boolean success = readValue(response, Boolean.TYPE);
+            resultStack().push(success);
             if (success) {
                 writeLine("%s", "Resource manager shutdown successfully.");
             } else {

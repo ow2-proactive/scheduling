@@ -62,6 +62,7 @@ public class PreemptTaskCommand extends AbstractTaskCommand implements Command {
         HttpResponse response = execute(request);
         if (statusCode(OK) == statusCode(response)) {
             boolean success = readValue(response, Boolean.TYPE).booleanValue();
+            resultStack().push(success);
             if (success) {
                 writeLine(
                         "%s has been stopped and will be rescheduled after 5 seconds.",

@@ -44,13 +44,12 @@ import java.util.List;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
-import org.ow2.proactive.utils.ObjectArrayFormatter;
-import org.ow2.proactive.utils.Tools;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.cli.json.NodeEventView;
 import org.ow2.proactive_grid_cloud_portal.cli.json.RmStateView;
+import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
 
 public class ListNodeCommand extends AbstractCommand implements Command {
     private String nodeSource = null;
@@ -68,49 +67,25 @@ public class ListNodeCommand extends AbstractCommand implements Command {
         HttpResponse response = execute(request);
         if (statusCode(OK) == statusCode(response)) {
             RmStateView state = readValue(response, RmStateView.class);
-            ObjectArrayFormatter formatter = new ObjectArrayFormatter();
-            formatter.setMaxColumnLength(80);
-            formatter.setSpace(4);
-
-            List<String> titles = new ArrayList<String>();
-            titles.add("SOURCE_NAME");
-            titles.add("HOST_NAME");
-            titles.add("STATE");
-            titles.add("SINCE");
-            titles.add("URL");
-            titles.add("PROVIDER");
-            titles.add("USED_BY");
-            formatter.setTitle(titles);
-
-            formatter.addEmptyLine();
-
             NodeEventView[] nodeEvents = state.getNodesEvents();
+            List<NodeEventView> selected = new ArrayList<NodeEventView>();
             if (nodeEvents != null) {
                 for (NodeEventView nodeEvent : nodeEvents) {
                     if (nodeSource != null
                             && !nodeSource.equals(nodeEvent.getNodeSource())) {
                         // node source doesn't match
                         continue;
+                    } else {
+                        selected.add(nodeEvent);
                     }
-                    List<String> line = new ArrayList<String>();
-                    line.add(nodeEvent.getNodeSource());
-                    line.add(nodeEvent.getHostName());
-                    line.add(nodeEvent.getNodeState().toString());
-                    long timestamp = Long.parseLong(nodeEvent.getTimeStamp());
-                    String date = Tools.getFormattedDate(timestamp);
-                    if (timestamp != -1) {
-                        date += " (" + Tools.getElapsedTime(timestamp) + ")";
-                    }
-                    line.add(date);
-                    line.add(nodeEvent.getNodeUrl());
-                    line.add(nodeEvent.getNodeProvider() == null ? ""
-                            : nodeEvent.getNodeProvider());
-                    line.add(nodeEvent.getNodeOwner() == null ? "" : nodeEvent
-                            .getNodeOwner());
-                    formatter.addLine(line);
                 }
             }
-            writeLine(formatter.getAsString());
+            NodeEventView[] selectedNodeEvents = selected
+                    .toArray(new NodeEventView[selected.size()]);
+            resultStack().push(selectedNodeEvents);
+            if (!context().isSilent()) {
+                writeLine("%s", StringUtility.string(selectedNodeEvents));
+            }
 
         } else {
             handleError("An error occurred while retrieving nodes:", response);

@@ -38,9 +38,9 @@
 package org.ow2.proactive_grid_cloud_portal.cli.cmd;
 
 import static org.apache.http.entity.ContentType.APPLICATION_OCTET_STREAM;
+import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_INVALID_ARGUMENTS;
+import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_OTHER;
 import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
-import static org.ow2.proactive_grid_cloud_portal.cli.RestConstants.DFLT_SESSION_DIR;
-import static org.ow2.proactive_grid_cloud_portal.cli.RestConstants.DFLT_SESSION_FILE_EXT;
 
 import java.io.File;
 
@@ -48,12 +48,11 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.ByteArrayBody;
-import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.FileUtility;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
 
-public class LoginWithCredentialsCommand extends AbstractCommand implements
+public class LoginWithCredentialsCommand extends AbstractLoginCommand implements
         Command {
     private String pathname;
 
@@ -62,54 +61,30 @@ public class LoginWithCredentialsCommand extends AbstractCommand implements
     }
 
     @Override
-    public void execute() throws CLIException {
-        File credentialFile = new File(pathname);
-        String alias = FileUtility.md5Checksum(credentialFile);
-        File userSessionFile = userSessionFile(alias);
-        ApplicationContext context = context();
-        if (userSessionFile.exists()) {
-            context.setAlias(alias);
-            context.setCredFilePathname(pathname);
-            context.setSessionId(FileUtility.read(userSessionFile));
-            context.setNewSession(false);
-            return;
+    protected String login() throws CLIException {
+        File credentials = new File(pathname);
+        if (!credentials.exists()) {
+            throw new CLIException(REASON_INVALID_ARGUMENTS, String.format(
+                    "File does not exist: %s", credentials.getAbsolutePath()));
         }
-
         HttpPost request = new HttpPost(resourceUrl("login"));
         MultipartEntity entity = new MultipartEntity();
         entity.addPart("credential",
-                new ByteArrayBody(FileUtility.byteArray(credentialFile),
+                new ByteArrayBody(FileUtility.byteArray(credentials),
                         APPLICATION_OCTET_STREAM.getMimeType()));
         request.setEntity(entity);
-
-        HttpResponse response = context.executeClient(request);
+        HttpResponse response = context().executeClient(request);
         if (statusCode(OK) == statusCode(response)) {
-            String sessionId = StringUtility.string(response).trim();
-            context.setSessionId(sessionId);
-            context.setNewSession(true);
-            FileUtility.write(userSessionFile, sessionId);
-            if (!setOwnerOnly(userSessionFile)) {
-                writeLine(
-                        "Warning! Possible security risk: unable to limit access rights of session-id file '%s'",
-                        userSessionFile.getAbsoluteFile());
-            }
-            writeLine("Session id successfully renewed.");
-
+            return StringUtility.string(response).trim();
         } else {
-
             handleError("An error occurred while logging: ", response);
+            throw new CLIException(REASON_OTHER,
+                    "An error occurred while logging.");
         }
     }
 
-    private File userSessionFile(String username) {
-        return new File(DFLT_SESSION_DIR, username + DFLT_SESSION_FILE_EXT);
+    @Override
+    protected String alias() {
+        return FileUtility.md5Checksum(new File(pathname));
     }
-
-    private boolean setOwnerOnly(File file) {
-        // effectively set file permission to 600
-        return file.setReadable(false, false) && file.setReadable(true, true)
-                && file.setWritable(false, false)
-                && file.setWritable(true, true) && file.setExecutable(false);
-    }
-
 }

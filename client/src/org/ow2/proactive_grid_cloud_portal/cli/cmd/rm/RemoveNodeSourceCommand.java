@@ -74,6 +74,7 @@ public class RemoveNodeSourceCommand extends AbstractCommand implements Command 
         HttpResponse response = execute(request);
         if (statusCode(response) == statusCode(OK)) {
             boolean success = readValue(response, Boolean.TYPE);
+            resultStack().push(success);
             if (success) {
                 writeLine("Node source '%s' deleted successfully.", nodeSource);
             } else {

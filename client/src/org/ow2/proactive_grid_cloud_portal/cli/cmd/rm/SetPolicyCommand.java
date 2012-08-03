@@ -117,7 +117,7 @@ public class SetPolicyCommand extends AbstractCommand implements Command {
             if (!FILE.equals(field.getMeta().type())) {
                 buffer.append("&policyParameters=").append(field.getValue());
             } else {
-                String contents = FileUtility.read(new File(field.getValue()));
+                String contents = FileUtility.readFileToString(new File(field.getValue()));
                 buffer.append("&policyFileParameters=").append(contents);
             }
         }

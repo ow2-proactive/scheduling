@@ -45,6 +45,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.Writer;
+import java.util.Stack;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
@@ -96,10 +97,12 @@ public abstract class AbstractCommand implements Command {
     }
 
     protected void writeLine(String format, Object... args) {
-        try {
-            context().getDevice().writeLine(format, args);
-        } catch (IOException ioe) {
-            throw new CLIException(REASON_IO_ERROR, ioe);
+        if (!context().isSilent()) {
+            try {
+                context().getDevice().writeLine(format, args);
+            } catch (IOException ioe) {
+                throw new CLIException(REASON_IO_ERROR, ioe);
+            }
         }
     }
 
@@ -122,18 +125,27 @@ public abstract class AbstractCommand implements Command {
             throw new CLIException(REASON_IO_ERROR, ioe);
         }
     }
-
+    
+    @SuppressWarnings("rawtypes")
+    protected Stack resultStack() {
+        return context().resultStack();
+    }
+    
     protected HttpResponse execute(HttpUriRequest request) {
         return context().executeClient(request);
     }
 
+    @SuppressWarnings("unchecked")
     protected void handleError(String errorMessage, HttpResponse response) {
         String responseContent = StringUtility.string(response);
         ErrorView errorView = null;
         try {
             errorView = context().getObjectMapper().readValue(
                     responseContent.getBytes(), ErrorView.class);
+            resultStack().push(errorView);
+            
         } catch (Throwable error) {
+            resultStack().push(responseContent);
             // if an ErrorView object can't be built from the response. Hence
             // process the response as a string
         }

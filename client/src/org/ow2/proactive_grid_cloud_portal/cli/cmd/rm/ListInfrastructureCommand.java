@@ -65,6 +65,7 @@ public class ListInfrastructureCommand extends AbstractCommand implements
                 List<PluginView> pluginViewList = readValue(response,
                         new TypeReference<List<PluginView>>() {
                         });
+                resultStack().push(pluginViewList);
                 for (PluginView pluginView : pluginViewList) {
                     infrastructures.put(pluginView.getPluginName(), pluginView);
                 }
@@ -75,10 +76,12 @@ public class ListInfrastructureCommand extends AbstractCommand implements
                         response);
             }
         }
-        if (infrastructures != null) {
-            writeLine("%n%s:%n", "Supported infrastructure types");
-            for (PluginView pluginView : infrastructures.values()) {
-                writeLine("%s%n", pluginView.toString());
+        if (!context().isSilent()) {
+            if (infrastructures != null) {
+                writeLine("%n%s:%n", "Supported infrastructure types");
+                for (PluginView pluginView : infrastructures.values()) {
+                    writeLine("%s%n", pluginView.toString());
+                }
             }
         }
     }

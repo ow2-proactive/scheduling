@@ -66,20 +66,11 @@ public class SchedStatsCommand extends AbstractCommand implements Command {
             Map<String, String> stats = readValue(response,
                     new TypeReference<Map<String, String>>() {
                     });
-            ObjectArrayFormatter oaf = new ObjectArrayFormatter();
-            oaf.setMaxColumnLength(80);
-            oaf.setSpace(2);
-            List<String> columnNames = new ArrayList<String>();
-            columnNames.add("");
-            columnNames.add("");
-            oaf.setTitle(columnNames);
-            for (Entry<String, String> e : stats.entrySet()) {
-                List<String> row = new ArrayList<String>();
-                row.add(e.getKey());
-                row.add(e.getValue());
-                oaf.addLine(row);
+            resultStack().push(stats);
+            if (!context().isSilent()) {
+                writeLine("%s", StringUtility.statsAsString(stats));
             }
-            writeLine(StringUtility.string(oaf));
+          
         } else {
             handleError("An error occurred while retrieving stats:", response);
         }

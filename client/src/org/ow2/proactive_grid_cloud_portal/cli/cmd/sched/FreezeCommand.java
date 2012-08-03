@@ -57,6 +57,7 @@ public class FreezeCommand extends AbstractCommand implements Command {
 
         if (statusCode(OK) == statusCode(response)) {
             Boolean success = readValue(response, Boolean.TYPE);
+            resultStack().push(success);
             if (success) {
                 writeLine("Scheduler successfully frozen.");
             } else {

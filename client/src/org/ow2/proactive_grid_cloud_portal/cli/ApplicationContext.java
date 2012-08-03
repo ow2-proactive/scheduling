@@ -43,6 +43,7 @@ import static org.ow2.proactive_grid_cloud_portal.cli.RestConstants.DFLT_SESSION
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Stack;
 
 import javax.script.ScriptEngine;
 
@@ -50,6 +51,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.util.ClassUtil;
 import org.ow2.proactive_grid_cloud_portal.cli.console.AbstractDevice;
 import org.ow2.proactive_grid_cloud_portal.cli.json.PluginView;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpUtility;
@@ -74,6 +76,9 @@ public class ApplicationContext {
     private Map<String, PluginView> policies;
     private Map<String, Object> properties = new HashMap<String, Object>();
     private boolean forced;
+    private boolean silent = false;
+    @SuppressWarnings("rawtypes")
+    private Stack resultStack = new Stack();
     private ScriptEngine engine;
 
     private ApplicationContext() {
@@ -221,7 +226,7 @@ public class ApplicationContext {
     public String getResourceType() {
         return resourceType;
     }
-    
+
     public Map<String, PluginView> getInfrastructures() {
         return infrastructures;
     }
@@ -243,15 +248,36 @@ public class ApplicationContext {
     }
 
     public <T> T getProperty(String key, Class<T> type) {
-        return type.cast(properties.get(key));
+        return (T) properties.get(key);
     }
-    
+
+    public <T> T getProperty(String key, Class<T> type, T dflt) {
+        return (getProperty(key, type) == null) ? dflt : getProperty(key, type);
+    }
+
     public boolean isForced() {
         return forced;
     }
 
     public void setForced(boolean forced) {
         this.forced = forced;
+    }
+
+    public boolean isSilent() {
+        return silent;
+    }
+
+    public void setSilent(boolean silent) {
+        this.silent = silent;
+    }
+
+    @SuppressWarnings("rawtypes")
+    public Stack resultStack() {
+        return resultStack;
+    }
+
+    public boolean emptyResultStack() {
+        return resultStack.isEmpty();
     }
 
     public void clearSession() {
@@ -264,5 +290,4 @@ public class ApplicationContext {
             }
         }
     }
-
 }

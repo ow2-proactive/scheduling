@@ -39,21 +39,12 @@ package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
 
 import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
-import org.ow2.proactive.utils.ObjectArrayFormatter;
-import org.ow2.proactive.utils.Tools;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractJobCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.cli.json.JobStateView;
-import org.ow2.proactive_grid_cloud_portal.cli.json.TaskIdView;
-import org.ow2.proactive_grid_cloud_portal.cli.json.TaskInfoView;
-import org.ow2.proactive_grid_cloud_portal.cli.json.TaskStateView;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
 
 public class GetJobStateCommand extends AbstractJobCommand implements Command {
@@ -68,82 +59,11 @@ public class GetJobStateCommand extends AbstractJobCommand implements Command {
         HttpResponse response = execute(request);
         if (statusCode(OK) == statusCode(response)) {
             JobStateView jobState = readValue(response, JobStateView.class);
-
-            String jobInfo = (new StringBuilder()).append(job())
-                    .append("\tNAME: ").append(jobState.getName())
-                    .append("\tOWNER: ").append(jobState.getOwner())
-                    .append("\tSTATUS: ")
-                    .append(jobState.getJobInfo().getStatus())
-                    .append("\t#TASKS: ")
-                    .append(jobState.getJobInfo().getTotalNumberOfTasks())
-                    .toString();
-
-            // create formatter
-            ObjectArrayFormatter oaf = new ObjectArrayFormatter();
-            oaf.setMaxColumnLength(30);
-            // space between column
-            oaf.setSpace(2);
-            // title line
-            List<String> list = new ArrayList<String>();
-            list.add("ID");
-            list.add("NAME");
-            list.add("ITER");
-            list.add("DUP");
-            list.add("STATUS");
-            list.add("HOSTNAME");
-            list.add("EXEC DURATION");
-            list.add("TOT DURATION");
-            list.add("#NODES USED");
-            list.add("#EXECUTIONS");
-            list.add("#NODES KILLED");
-            oaf.setTitle(list);
-            // separator
-            oaf.addEmptyLine();
-            // add each lines
-            Collection<TaskStateView> tasks = jobState.getTasks().values();
-            // TaskState.setSortingBy(sort);
-            // Collections.sort(tasks);
-            for (TaskStateView taskState : tasks) {
-                list = new ArrayList<String>();
-                TaskInfoView taskInfo = taskState.getTaskInfo();
-                TaskIdView taskId = taskInfo.getTaskId();
-
-                list.add(taskId.getId());
-                list.add(taskId.getReadableName());
-                list.add((taskState.getIterationIndex() > 0) ? ""
-                        + taskState.getIterationIndex() : "");
-                list.add((taskState.getReplicationIndex() > 0) ? ""
-                        + taskState.getReplicationIndex() : "");
-                list.add(taskInfo.getTaskStatus());
-                list.add((taskInfo.getExecutionHostName() == null) ? "unknown"
-                        : taskInfo.getExecutionHostName());
-                list.add(Tools.getFormattedDuration(0,
-                        taskInfo.getExecutionDuration()));
-                list.add(Tools.getFormattedDuration(taskInfo.getFinishedTime(),
-                        taskInfo.getStartTime()));
-                list.add("" + taskState.getNumberOfNodesNeeded());
-                if (taskState.getMaxNumberOfExecution()
-                        - taskInfo.getNumberOfExecutionLeft() < taskState
-                            .getMaxNumberOfExecution()) {
-                    list.add((taskState.getMaxNumberOfExecution()
-                            - taskInfo.getNumberOfExecutionLeft() + 1)
-                            + "/" + taskState.getMaxNumberOfExecution());
-                } else {
-                    list.add((taskState.getMaxNumberOfExecution() - taskInfo
-                            .getNumberOfExecutionLeft())
-                            + "/"
-                            + taskState.getMaxNumberOfExecution());
-                }
-                list.add((taskState.getMaxNumberOfExecutionOnFailure() - taskInfo
-                        .getNumberOfExecutionOnFailureLeft())
-                        + "/"
-                        + taskState.getMaxNumberOfExecutionOnFailure());
-                oaf.addLine(list);
+            resultStack().push(jobState);
+            if (!context().isSilent()) {
+                writeLine("%s", StringUtility.jobStateAsString(job(), jobState));
             }
-            // print formatter
-            writeLine(jobInfo);
-            writeLine("");
-            writeLine(StringUtility.string(oaf));
+
         } else {
             handleError(String.format(
                     "An error occurred while retrieving %s state:", job()),

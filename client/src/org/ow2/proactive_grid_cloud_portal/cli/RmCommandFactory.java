@@ -38,6 +38,7 @@
 package org.ow2.proactive_grid_cloud_portal.cli;
 
 import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.INFRASTRUCTURE;
+import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.OUTPUT;
 import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.POLICY;
 import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.RM_HELP;
 
@@ -82,7 +83,11 @@ class RmCommandFactory extends CommandFactory {
         if (commands.isEmpty()) {
             commandList.add(new RmImodeCommand());
         } else {
+            Command output = commands.remove(opt(OUTPUT));
             commandList.addAll(commands.values());
+            if (output != null) {
+                commandList.add(output);
+            }
         }
         return commandList;
     }

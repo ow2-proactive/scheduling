@@ -50,6 +50,7 @@ import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.cli.json.JobResultView;
 import org.ow2.proactive_grid_cloud_portal.cli.json.TaskResultView;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.ObjectUtility;
+import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
 
 public class GetJobResultCommand extends AbstractJobCommand implements Command {
 
@@ -62,20 +63,19 @@ public class GetJobResultCommand extends AbstractJobCommand implements Command {
         HttpGet request = new HttpGet(resourceUrl("jobs/" + jobId + "/result"));
         HttpResponse response = execute(request);
         if (statusCode(OK) == statusCode(response)) {
-            writeLine("%s result:", job());
             JobResultView jobResult = readValue(response, JobResultView.class);
-            Map<String, TaskResultView> allResults = jobResult.getAllResults();
-            for (String taskName : allResults.keySet()) {
-                writeLine(taskName + " : "
-                        + ObjectUtility.object(allResults.get(taskName).getSerializedValue()));
+            resultStack().push(jobResult);
+            if (!context().isForced()) {
+                writeLine("%s",
+                        StringUtility.jobResultAsString(job(), jobResult));
             }
         } else if (statusCode(NO_CONTENT) == statusCode(response)) {
             writeLine("%s result not available.", job());
 
         } else {
-            handleError(
-                    String.format("An error occurred while retrieving %s result:"
-                            + job()), response);
+            handleError(String.format(
+                    "An error occurred while retrieving %s result:", job()),
+                    response);
         }
     }
 

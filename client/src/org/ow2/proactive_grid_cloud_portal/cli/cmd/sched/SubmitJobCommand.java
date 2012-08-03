@@ -83,6 +83,7 @@ public class SubmitJobCommand extends AbstractCommand implements Command {
         HttpResponse response = execute(request);
         if (statusCode(OK) == statusCode(response)) {
             JobIdView jobId = readValue(response, JobIdView.class);
+            resultStack().push(jobId);
             writeLine("Job('%s') successfully submitted: job('%d')", pathname,
                     jobId.getId());
         } else {
