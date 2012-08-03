@@ -99,6 +99,32 @@ public class SchedulerFactory {
         return RMConnection.join(uriRM.toString());
     }
 
+    /** Try to join Resource Manager at given URI with a timeout.
+     * A timeout of zero means an infinite timeout. The connection will then
+     * block until connection is established or an error occurs.
+     * 
+     * @param uriRM the resource manager URL
+     * @param timeout timeout to establish connection (in ms)
+     * @return a Resource Manager authentication interface if success.
+     * @throws RMException if no RM could be joined at this URI.
+     */
+    public static RMAuthentication waitAndJoinRM(URI uriRM, long timeout) throws RMException {
+        return RMConnection.waitAndJoin(uriRM.toString(), timeout);
+    }
+
+    /**
+     * Try to join Resource Manager at given URI.
+     * Waits undefinitely until connectino with RM is established or an error
+     * occurs.
+     * 
+     * @param uriRM the resource manager URL
+     * @return a Resource Manager authentication interface if success.
+     * @throws RMException if no RM could be joined at this URI.
+     */
+    public static RMAuthentication waitAndJoinRM(URI uriRM) throws RMException {
+        return RMConnection.waitAndJoin(uriRM.toString());
+    }
+
     /**
      * Creates and starts a Scheduler on the local host using the given initializer to configure it.
      * Only one Scheduler can be started by JVM.

@@ -7,8 +7,7 @@ workingDir=`dirname $0`
 yjp=-agentlib:yjpagent
 opt="-Xms128m -Xmx2048m"
 
-eval $JAVACMD -Dpa.scheduler.db.hibernate.dropdb=true -Dpa.rm.db.hibernate.dropdb=true -Dderby.stream.error.file=\"$PA_SCHEDULER/.logs/derby.log\" $opt org.ow2.proactive.scheduler.util.SchedulerStarter $@
+JAVACMD+=(-Dpa.scheduler.db.hibernate.dropdb=true -Dpa.rm.db.hibernate.dropdb=true -Dderby.stream.error.file="$PA_SCHEDULER/.logs/derby.log" $opt org.ow2.proactive.scheduler.util.SchedulerStarter $@)
 
-retCode=$?
-echo
-exit $retCode
+exec "${JAVACMD[@]}"
+

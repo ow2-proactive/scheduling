@@ -12,9 +12,6 @@ echo
 
 workingDir=`dirname $0`
 . $workingDir/env log4j-defaultNode
-eval $JAVACMD org.ow2.proactive.resourcemanager.utils.RMNodeStarter "$@"
+JAVACMD+=(org.ow2.proactive.resourcemanager.utils.RMNodeStarter $@)
+exec "${JAVACMD[@]}"
 
-retCode=$?
-echo
-echo ---------------------------------------------------------
-exit $retCode
