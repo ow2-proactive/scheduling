@@ -224,6 +224,28 @@ public class LocalInfrastructure extends InfrastructureManager {
             //clean up the process
             proc.destroy();
             this.nodeNameToProcess.remove(nodeName);
+        } else {
+            // listening output & error of forked process in separated threads
+            // otherwise the process may hang
+
+            final Process process = proc;
+            Thread out = new Thread(new Runnable() {
+                public void run() {
+                    Utils.consumeProcessStream(process.getInputStream());
+                }
+            });
+            out.setName("Node " + nodeName + " output listener ");
+            out.setDaemon(true);
+            out.start();
+
+            Thread err = new Thread(new Runnable() {
+                public void run() {
+                    Utils.consumeProcessStream(process.getErrorStream());
+                }
+            });
+            err.setName("Node " + nodeName + " error listener ");
+            err.setDaemon(true);
+            err.start();
         }
         this.isDeployingNodeLost.remove(depNodeURL);
         this.isNodeAcquired.remove(nodeName);

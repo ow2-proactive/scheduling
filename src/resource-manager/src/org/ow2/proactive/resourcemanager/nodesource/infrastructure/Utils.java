@@ -39,6 +39,7 @@ package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -220,5 +221,23 @@ public class Utils {
             }
         }
         return sb.toString();
+    }
+
+    /**
+     * Consumes everything written by a stream. 
+     */
+    public static void consumeProcessStream(InputStream stream) {
+        BufferedReader br = new BufferedReader(new InputStreamReader(stream));
+        try {
+            while (br.readLine()!=null) {
+                br.readLine();
+            }
+        } catch (IOException e) {
+        } finally {
+            try {
+                br.close();
+            } catch (IOException e) {
+            }
+        }
     }
 }
