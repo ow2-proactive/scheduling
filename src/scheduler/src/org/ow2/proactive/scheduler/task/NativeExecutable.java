@@ -332,7 +332,7 @@ public class NativeExecutable extends Executable {
                 logger.error("", e);
                 //exception during process
                 //means that for most cases, user is not responsible
-                throw new RunningProcessException(e.getMessage());
+                throw new RunningProcessException(e.getMessage(), e);
             }
         } finally {
             if (nodesFiles != null) {

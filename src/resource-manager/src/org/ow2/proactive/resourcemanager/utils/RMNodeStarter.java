@@ -86,6 +86,7 @@ import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.node.jmx.SigarExposer;
 import org.ow2.proactive.resourcemanager.nodesource.dataspace.DataSpaceNodeConfigurationAgent;
+import org.ow2.proactive.utils.Formatter;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -426,7 +427,7 @@ public class RMNodeStarter {
         } catch (Throwable t) {
             logger.error("Cannot configure dataSpace", t);
             try {
-                node.setProperty(DATASPACES_STATUS_PROP_NAME, t.getMessage());
+                node.setProperty(DATASPACES_STATUS_PROP_NAME, Formatter.stackTraceToString(t));
             } catch (ProActiveException e) {
                 logger.error("Cannot contact the node", e);
             }

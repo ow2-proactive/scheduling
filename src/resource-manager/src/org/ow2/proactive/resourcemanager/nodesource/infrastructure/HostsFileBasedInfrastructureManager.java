@@ -217,7 +217,7 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
                         throw new IllegalArgumentException("Cannot launch less than one runtime per host.");
                     }
                 } catch (Exception e) {
-                    logger.warn("Error while parsing hosts file: " + e.getMessage());
+                    logger.warn("Error while parsing hosts file: " + e.getMessage(), e);
                     num = 1;
                 }
             }

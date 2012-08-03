@@ -109,7 +109,7 @@ public abstract class SelectionManager {
             Class<?> policyClass = Class.forName(policyClassName);
             selectionPolicy = (SelectionPolicy) policyClass.newInstance();
         } catch (Exception e) {
-            logger.error("Cannot use the specified policy class: " + e.getMessage());
+            logger.error("Cannot use the specified policy class: " + policyClassName, e);
             logger.warn("Using the default class: " + ShufflePolicy.class.getName());
             selectionPolicy = new ShufflePolicy();
         }

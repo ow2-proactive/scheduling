@@ -229,7 +229,7 @@ public class Utils {
     public static void consumeProcessStream(InputStream stream) {
         BufferedReader br = new BufferedReader(new InputStreamReader(stream));
         try {
-            while (br.readLine()!=null) {
+            while (br.readLine() != null) {
                 br.readLine();
             }
         } catch (IOException e) {

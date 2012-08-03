@@ -193,7 +193,7 @@ public class AOSchedulerWorker extends AOWorker implements SchedulerEventListene
             try {
                 scheduler.killJob(id);
             } catch (SchedulerException e) {
-                logger.error(e.getMessage());
+                logger.error(e.getMessage(), e);
             }
         }
         processing.clear();

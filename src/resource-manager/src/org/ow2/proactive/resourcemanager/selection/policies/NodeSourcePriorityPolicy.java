@@ -101,7 +101,7 @@ public class NodeSourcePriorityPolicy implements SelectionPolicy {
                     }
                     br.close();
                 } catch (Exception e) {
-                    throw new RuntimeException(e.getMessage());
+                    throw new RuntimeException(e.getMessage(), e);
                 }
             }
         } else {

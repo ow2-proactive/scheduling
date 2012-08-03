@@ -154,7 +154,8 @@ public class SchedulerStarter {
                 if (rm != null) {
                     try {
                         logger.info("Connecting to the resource manager on " + rm);
-                        int rmConnectionTimeout = PASchedulerProperties.RESOURCE_MANAGER_CONNECTION_TIMEOUT.getValueAsInt();
+                        int rmConnectionTimeout = PASchedulerProperties.RESOURCE_MANAGER_CONNECTION_TIMEOUT
+                                .getValueAsInt();
                         SchedulerFactory.waitAndJoinRM(new URI(rm), rmConnectionTimeout);
                     } catch (Exception e) {
                         logger.error("ERROR while connecting to the RM on " + rm + ", no RM found !");

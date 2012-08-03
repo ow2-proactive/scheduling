@@ -222,7 +222,7 @@ public final class JMXClientHelper {
         } catch (Exception e) {
             // At this point the JMX-RO infrastructure was not started throw an Exception
             throw new RuntimeException("Unable to obtain the URL of the JMX-RO connector server due to " +
-                e.getMessage());
+                e.getMessage(), e);
         }
         try {
             return JMXConnectorFactory.connect(jmxRoServiceURL, env);

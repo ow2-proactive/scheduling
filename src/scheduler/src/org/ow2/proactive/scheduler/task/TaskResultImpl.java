@@ -299,10 +299,10 @@ public class TaskResultImpl implements TaskResult {
                 thrown = this.instanciateException(this.getTaskClassLoader());
             } catch (IOException e) {
                 throw new InternalSchedulerException("Cannot instanciate exception thrown by the task " +
-                    this.id + " : " + e.getMessage());
+                    this.id + " : " + e.getMessage(), e);
             } catch (ClassNotFoundException e) {
                 throw new InternalSchedulerException("Cannot instanciate exception thrown by the task " +
-                    this.id + " : " + e.getMessage());
+                    this.id + " : " + e.getMessage(), e);
             }
             throw thrown;
         } else {
@@ -311,11 +311,11 @@ public class TaskResultImpl implements TaskResult {
             } catch (IOException e) {
                 logger.error("", e);
                 throw new InternalSchedulerException("Cannot instanciate result of the task " + this.id +
-                    " : " + e.getMessage());
+                    " : " + e.getMessage(), e);
             } catch (ClassNotFoundException e) {
                 logger.error("", e);
                 throw new InternalSchedulerException("Cannot instanciate result of the task " + this.id +
-                    " : " + e.getMessage());
+                    " : " + e.getMessage(), e);
             }
         }
     }
@@ -329,10 +329,10 @@ public class TaskResultImpl implements TaskResult {
                 return this.instanciateException(this.getTaskClassLoader());
             } catch (IOException e) {
                 return new InternalSchedulerException("Cannot instanciate exception thrown by the task " +
-                    this.id + " : " + e.getMessage());
+                    this.id + " : " + e.getMessage(), e);
             } catch (ClassNotFoundException e) {
                 return new InternalSchedulerException("Cannot instanciate exception thrown by the task " +
-                    this.id + " : " + e.getMessage());
+                    this.id + " : " + e.getMessage(), e);
             }
         } else {
             return null;

@@ -342,7 +342,7 @@ public class EC2Infrastructure extends InfrastructureManager {
                 ff.delete();
             } catch (Exception e) {
                 readConf(PAResourceManagerProperties.RM_EC2_PATH_PROPERTY_NAME.getValueAsString());
-                logger.debug("Expected File as 1st parameter for EC2Infrastructure: " + e.getMessage());
+                logger.error("Expected File as 1st parameter for EC2Infrastructure: " + e.getMessage(), e);
             }
 
             // ============= parameters[1]: RM credentials ==============
@@ -440,7 +440,7 @@ public class EC2Infrastructure extends InfrastructureManager {
             in = new FileInputStream(fp);
             props.load(in);
         } catch (Exception e) {
-            throw new IllegalArgumentException("Error while reading EC2 properties: " + e.getMessage());
+            throw new IllegalArgumentException("Error while reading EC2 properties: " + e.getMessage(), e);
         }
 
         /** check all mandatory fields are present */

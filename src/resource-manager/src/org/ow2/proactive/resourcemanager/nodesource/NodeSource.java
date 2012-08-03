@@ -287,8 +287,7 @@ public class NodeSource implements InitActive, RunActive {
             logger.info("The node " + nodeUrl + " has been successfully looked up");
         } catch (Exception e) {
             logger.warn("Cannot look up the node " + nodeUrl + " within " + lookUpTimeout + " ms due to " +
-                e.getMessage());
-            logger.debug("Detailled lookup exception :", e);
+                e.getMessage(), e);
             throw new AddingNodesException(e);
         }
 
@@ -474,7 +473,7 @@ public class NodeSource implements InitActive, RunActive {
                 closeDataSpaceConfiguration(node);
                 infrastructureManager.internalRemoveNode(node);
             } catch (RMException e) {
-                logger.error(e.getCause().getMessage());
+                logger.error(e.getCause().getMessage(), e);
             }
         } else {
             Node downNode = downNodes.remove(nodeUrl);

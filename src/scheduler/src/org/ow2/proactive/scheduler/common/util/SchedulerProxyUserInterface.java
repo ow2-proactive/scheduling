@@ -214,7 +214,7 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
                 LoggerManager.getLogger().error(
                         "Error when callling " + this.getClass().getCanonicalName() +
                             " -> isConnected() method: " + e.getMessage() +
-                            ". The connection is considered lost. ");
+                            ". The connection is considered lost. ", e);
                 return false;
             }
     }

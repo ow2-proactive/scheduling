@@ -326,7 +326,7 @@ public final class PAAgentServiceRMStarter {
             }
         } catch (Throwable t) {
             printHelp = true;
-            System.out.println(t.getMessage());
+            t.printStackTrace();
             return;
         } finally {
             if (printHelp) {

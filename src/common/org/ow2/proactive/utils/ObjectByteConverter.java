@@ -167,7 +167,7 @@ public final class ObjectByteConverter {
                 input = bos.toByteArray();
             } catch (DataFormatException dfe) {
                 //convert into io exception to fit previous behavior
-                throw new IOException("Compressed data format is invalid : " + dfe.getMessage());
+                throw new IOException("Compressed data format is invalid : " + dfe.getMessage(), dfe);
             } finally {
                 if (bos != null) {
                     bos.close();
