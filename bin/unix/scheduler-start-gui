@@ -126,8 +126,8 @@ done
 
 SCHED_OUT=$(mktemp --tmpdir)
 
-eval $JAVACMD \
-	-Dderby.stream.error.file=\"$PA_SCHEDULER/.logs/derby.log\" \
+"${JAVACMD[@]}" \
+	-Dderby.stream.error.file="$PA_SCHEDULER/.logs/derby.log" \
 	$DROP_DB \
 	$SCHED_JVM_X_OPTS \
 	org.ow2.proactive.scheduler.util.SchedulerStarter \
