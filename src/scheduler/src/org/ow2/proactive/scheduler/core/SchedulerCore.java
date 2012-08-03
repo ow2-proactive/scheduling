@@ -101,7 +101,6 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
@@ -1535,7 +1534,8 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
      */
     public boolean removeJob(JobId jobId) {
         logger.info("job " + jobId + " removing");
-        InternalJob job = jobs.remove(jobId);
+
+        InternalJob job = jobs.get(jobId);
         if (job == null) {
             // load job data, JobInfo is needed to send event
             job = dbManager.loadJobWithoutTasks(jobId);
@@ -1543,6 +1543,15 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
 
         if (job != null) {
             job.setRemovedTime(System.currentTimeMillis());
+
+            if (job.getStatus() == JobStatus.RUNNING) {
+                killJob(jobId);
+            }
+
+            // cleaning all internal structures
+            jobs.remove(jobId);
+            runningJobs.remove(job);
+            pendingJobs.remove(job);
 
             // close log buffer
             AsyncAppender jobLog = this.jobsToBeLogged.remove(jobId);
