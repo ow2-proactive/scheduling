@@ -192,6 +192,9 @@ public class TestTaskRestore extends FunctionalTest {
         job.addTask(javaTask2);
         job.addTask(nativeTask1);
 
+        System.out.println("Submit pending job");
+        SchedulerTHelper.submitJob(createPendingJob());
+
         System.out.println("Submit job");
         JobId jobId = SchedulerTHelper.submitJob(job);
         System.out.println("Submitted job " + jobId);
@@ -209,6 +212,7 @@ public class TestTaskRestore extends FunctionalTest {
         System.out.println("get state");
         SchedulerState state = scheduler.getState();
         Assert.assertEquals(1, state.getRunningJobs().size());
+        Assert.assertEquals(1, state.getPendingJobs().size());
 
         System.out.println("State: " + state.getPendingJobs().size() + " " + state.getRunningJobs().size() +
             " " + state.getFinishedJobs().size());
@@ -216,6 +220,11 @@ public class TestTaskRestore extends FunctionalTest {
         JobState jobState = state.getRunningJobs().get(0);
         Assert.assertEquals(1, jobState.getNumberOfFinishedTasks());
         Assert.assertEquals(2, jobState.getNumberOfPendingTasks() + jobState.getNumberOfRunningTasks());
+
+        JobState pendingJobState = state.getPendingJobs().get(0);
+        Assert.assertEquals(-1, pendingJobState.getStartTime());
+        Assert.assertEquals(-1, pendingJobState.getFinishedTime());
+        Assert.assertEquals(-1, pendingJobState.getRemovedTime());
 
         SchedulerTHelper.waitForEventJobFinished(jobId);
 
@@ -271,6 +280,20 @@ public class TestTaskRestore extends FunctionalTest {
             System.out.println(taskResult.getOutput().getAllLogs(false));
             System.out.println("Task result value: " + taskResult.value());
         }
+    }
+
+    private TaskFlowJob createPendingJob() throws Exception {
+        TaskFlowJob job = new TaskFlowJob();
+        job.setName("Test pending job");
+        job.setCancelJobOnError(false);
+
+        JavaTask javaTask = new JavaTask();
+        javaTask.setExecutableClassName(TestJavaTask1.class.getName());
+        javaTask.setName("Task");
+        javaTask.setSelectionScript(new SelectionScript("selected = false;", "JavaScript", false));
+        job.addTask(javaTask);
+
+        return job;
     }
 
 }

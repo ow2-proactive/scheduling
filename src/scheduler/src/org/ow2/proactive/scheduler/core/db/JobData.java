@@ -130,7 +130,10 @@ public class JobData {
         JobData jobRuntimeData = new JobData();
         jobRuntimeData.setMaxNumberOfExecution(job.getMaxNumberOfExecution());
         jobRuntimeData.setCancelJobOnError(job.isCancelJobOnError());
-        jobRuntimeData.setSubmittedTime(System.currentTimeMillis());
+        jobRuntimeData.setSubmittedTime(job.getSubmittedTime());
+        jobRuntimeData.setStartTime(job.getStartTime());
+        jobRuntimeData.setFinishedTime(job.getFinishedTime());
+        jobRuntimeData.setRemovedTime(job.getRemovedTime());
         jobRuntimeData.setJobName(job.getName());
         jobRuntimeData.setDescription(job.getDescription());
         jobRuntimeData.setProjectName(job.getProjectName());
@@ -145,7 +148,6 @@ public class JobData {
         jobRuntimeData.setNumberOfRunningTasks(job.getNumberOfRunningTasks());
         jobRuntimeData.setNumberOfFinishedTasks(job.getNumberOfFinishedTasks());
         jobRuntimeData.setTotalNumberOfTasks(job.getTotalNumberOfTasks());
-        jobRuntimeData.setRemovedTime(job.getRemovedTime());
 
         JobEnvironment jobEnv = job.getEnvironment();
         if (jobEnv != null && jobEnv.getJobClasspath() != null) {
