@@ -314,7 +314,7 @@ public class StringUtility {
                     + taskState.getMaxNumberOfExecutionOnFailure());
             formatter.addLine(list);
         }
-        buffer.append("\n");
+        buffer.append('\n');
         buffer.append(Tools.getStringAsArray(formatter));
         return buffer.toString();
     }

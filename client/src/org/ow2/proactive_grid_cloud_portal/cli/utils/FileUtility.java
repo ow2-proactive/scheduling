@@ -95,13 +95,22 @@ public class FileUtility {
     }
 
     public static void writeObjectToFile(Object object, File file) {
+        FileOutputStream outputStream = null;
         try {
-            FileOutputStream fos = new FileOutputStream(file);
-            ObjectOutputStream oos = new ObjectOutputStream(fos);
-            oos.writeObject(object);
-            oos.close();
+            outputStream = new FileOutputStream(file);
+            ObjectOutputStream decorated = new ObjectOutputStream(outputStream);
+            decorated.writeObject(object);
+            decorated.flush();
         } catch (IOException ioe) {
             throw new CLIException(REASON_IO_ERROR, ioe);
+        } finally {
+            if (outputStream != null) {
+                try {
+                    outputStream.close();
+                } catch (IOException e) {
+                    // ignore
+                }
+            }
         }
     }
 

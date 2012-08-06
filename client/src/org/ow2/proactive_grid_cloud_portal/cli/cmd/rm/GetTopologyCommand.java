@@ -39,14 +39,8 @@ package org.ow2.proactive_grid_cloud_portal.cli.cmd.rm;
 
 import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
-import org.ow2.proactive.utils.ObjectArrayFormatter;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
@@ -63,7 +57,7 @@ public class GetTopologyCommand extends AbstractCommand implements Command {
         if (statusCode(OK) == statusCode(response)) {
             TopologyView topology = readValue(response, TopologyView.class);
             resultStack().push(topology);
-            if (!context().isSilent()) {
+            if (!currentContext().isSilent()) {
                 writeLine("%s", StringUtility.string(topology));
             }
         } else {

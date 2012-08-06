@@ -60,7 +60,7 @@ public class GetJobStateCommand extends AbstractJobCommand implements Command {
         if (statusCode(OK) == statusCode(response)) {
             JobStateView jobState = readValue(response, JobStateView.class);
             resultStack().push(jobState);
-            if (!context().isSilent()) {
+            if (!currentContext().isSilent()) {
                 writeLine("%s", StringUtility.jobStateAsString(job(), jobState));
             }
 

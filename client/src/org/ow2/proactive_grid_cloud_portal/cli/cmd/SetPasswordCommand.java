@@ -37,6 +37,8 @@
 
 package org.ow2.proactive_grid_cloud_portal.cli.cmd;
 
+import static org.ow2.proactive_grid_cloud_portal.cli.cmd.LoginCommand.PASSWORD;
+
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 
 public class SetPasswordCommand extends AbstractCommand implements Command {
@@ -48,7 +50,7 @@ public class SetPasswordCommand extends AbstractCommand implements Command {
 
     @Override
     public void execute() throws CLIException {
-       context().setPassword(password);
+       currentContext().setProperty(PASSWORD, password);
     }
 
 }

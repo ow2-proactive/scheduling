@@ -66,7 +66,7 @@ public class GetJobOutputCommand extends AbstractJobCommand implements Command {
                     new TypeReference<Map<String, String>>() {
                     });
             resultStack().push(jobOutput);
-            if (!context().isSilent()) {
+            if (!currentContext().isSilent()) {
                 writeLine("%s",
                         StringUtility.jobOutputAsString(job(), jobOutput));
             }

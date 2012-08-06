@@ -45,7 +45,6 @@ import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractTaskCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.cli.json.TaskResultView;
-import org.ow2.proactive_grid_cloud_portal.cli.utils.ObjectUtility;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
 
 public class GetTaskResultCommand extends AbstractTaskCommand implements
@@ -64,7 +63,7 @@ public class GetTaskResultCommand extends AbstractTaskCommand implements
             TaskResultView taskResult = readValue(response,
                     TaskResultView.class);
             resultStack().push(taskResult);
-            if (!context().isSilent()) {
+            if (!currentContext().isSilent()) {
                 writeLine("%s",
                         StringUtility.taskResultAsString(task(), taskResult));
             }

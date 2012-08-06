@@ -55,7 +55,7 @@ public class ListPolicyCommand extends AbstractCommand implements Command {
 
     @Override
     public void execute() throws CLIException {
-        Map<String, PluginView> knownPolicyMap = context().getPolicies();
+        Map<String, PluginView> knownPolicyMap = currentContext().getPolicies();
         if (knownPolicyMap == null) {
             HttpGet request = new HttpGet(resourceUrl("policies"));
             HttpResponse response = execute(request);
@@ -70,14 +70,14 @@ public class ListPolicyCommand extends AbstractCommand implements Command {
                 for (PluginView pluginView : pluginViewList) {
                     knownPolicyMap.put(pluginView.getPluginName(), pluginView);
                 }
-                context().setPolicies(knownPolicyMap);
+                currentContext().setPolicies(knownPolicyMap);
             } else {
                 handleError(
                         "An error occurred while retrieving supported policy types:",
                         response);
             }
         }
-        if (!context().isSilent()) {
+        if (!currentContext().isSilent()) {
             if (knownPolicyMap != null) {
                 writeLine("%n%s:%n", "Supported policy types");
                 for (PluginView policy : knownPolicyMap.values()) {

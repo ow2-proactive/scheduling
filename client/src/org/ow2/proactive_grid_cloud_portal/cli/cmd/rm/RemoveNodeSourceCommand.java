@@ -61,7 +61,7 @@ public class RemoveNodeSourceCommand extends AbstractCommand implements Command 
     }
 
     public void execute() throws CLIException {
-        if (context().isForced()) {
+        if (currentContext().isForced()) {
             preempt = true;
         }
         HttpPost request = new HttpPost(resourceUrl("nodesource/remove"));

@@ -83,7 +83,7 @@ public class ListNodeCommand extends AbstractCommand implements Command {
             NodeEventView[] selectedNodeEvents = selected
                     .toArray(new NodeEventView[selected.size()]);
             resultStack().push(selectedNodeEvents);
-            if (!context().isSilent()) {
+            if (!currentContext().isSilent()) {
                 writeLine("%s", StringUtility.string(selectedNodeEvents));
             }
 

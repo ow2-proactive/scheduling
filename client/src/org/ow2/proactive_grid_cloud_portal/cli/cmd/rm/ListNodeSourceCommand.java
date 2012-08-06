@@ -58,7 +58,7 @@ public class ListNodeSourceCommand extends AbstractCommand implements Command {
             RmStateView state = readValue(response, RmStateView.class);
             NodeSourceView[] nodeSources = state.getNodeSource();
             resultStack().push(nodeSources);
-            if (!context().isSilent()) {
+            if (!currentContext().isSilent()) {
                 writeLine("%s", StringUtility.string(nodeSources));   
             }
         } else {

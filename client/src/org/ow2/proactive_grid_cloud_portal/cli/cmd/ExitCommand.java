@@ -43,7 +43,7 @@ public class ExitCommand extends AbstractCommand implements Command {
 
     @Override
     public void execute() throws CLIException {
-        context().setTerminated(true);
+        currentContext().setTerminated(true);
     }
 
 }

@@ -53,7 +53,6 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.util.ClassUtil;
 import org.ow2.proactive_grid_cloud_portal.cli.console.AbstractDevice;
 import org.ow2.proactive_grid_cloud_portal.cli.json.PluginView;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpUtility;
@@ -61,11 +60,6 @@ import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpUtility;
 public class ApplicationContext {
 
     private static ApplicationContext instance;
-
-    private String user;
-    private String password;
-    private String alias;
-    private String credFilePathname;
     private String sessionId;
     private AbstractDevice device;
     private boolean termiated = false;
@@ -73,7 +67,6 @@ public class ApplicationContext {
     private String resourceType;
     private ObjectMapper objectMapper;
     private boolean insecureAccess = false;
-    private boolean newSession = false;
     private Map<String, PluginView> infrastructures;
     private Map<String, PluginView> policies;
     private Map<String, Object> properties = new HashMap<String, Object>();
@@ -101,14 +94,6 @@ public class ApplicationContext {
         }
     }
 
-    public void setUser(String user) {
-        this.user = user;
-    }
-
-    public String getUser() {
-        return user;
-    }
-
     public void setDevice(AbstractDevice device) {
         this.device = device;
     }
@@ -119,14 +104,6 @@ public class ApplicationContext {
 
     public void setObjectMapper(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
-    }
-
-    public boolean isNewSession() {
-        return newSession;
-    }
-
-    public void setNewSession(boolean newSession) {
-        this.newSession = newSession;
     }
 
     public synchronized void init(String schedulerUrl, AbstractDevice console) {
@@ -177,40 +154,12 @@ public class ApplicationContext {
         return sessionId;
     }
 
-    public boolean logged() {
-        return sessionId != null;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
     public boolean allowInsecureAccess() {
         return insecureAccess;
     }
 
     public void allowInsecureAccess(boolean insecure) {
         this.insecureAccess = insecure;
-    }
-
-    public String getAlias() {
-        return alias;
-    }
-
-    public void setAlias(String alias) {
-        this.alias = alias;
-    }
-
-    public String getCredFilePathname() {
-        return credFilePathname;
-    }
-
-    public void setCredFilePathname(String credFilePathname) {
-        this.credFilePathname = credFilePathname;
     }
 
     public ScriptEngine getEngine() {
@@ -224,10 +173,6 @@ public class ApplicationContext {
             engine.getContext().setWriter(getDevice().getWriter());
         }
         return engine;
-    }
-
-    public void setEngine(ScriptEngine engine) {
-        this.engine = engine;
     }
 
     public void setResourceType(String resourceType) {
@@ -285,20 +230,5 @@ public class ApplicationContext {
     @SuppressWarnings("rawtypes")
     public Stack resultStack() {
         return resultStack;
-    }
-
-    public boolean emptyResultStack() {
-        return resultStack.isEmpty();
-    }
-
-    public void clearSession() {
-        String sessionIdentifier = (user != null) ? user : alias;
-        if (sessionIdentifier != null) {
-            File sessionFile = new File(DFLT_SESSION_DIR, sessionIdentifier
-                    + DFLT_SESSION_FILE_EXT);
-            if (sessionFile.exists()) {
-                sessionFile.delete();
-            }
-        }
     }
 }

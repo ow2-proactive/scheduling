@@ -61,7 +61,7 @@ public class GetTaskOutputCommand extends AbstractTaskCommand implements
         if (statusCode(OK) == statusCode(response)) {
             String output = StringUtility.string(response);
             resultStack().push(output);
-            if (!context().isSilent()) {
+            if (!currentContext().isSilent()) {
                 writeLine("%s",
                         StringUtility.taskOutputAsString(task(), output));
             }

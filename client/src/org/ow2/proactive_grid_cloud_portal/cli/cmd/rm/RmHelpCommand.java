@@ -58,7 +58,7 @@ public class RmHelpCommand extends AbstractCommand implements Command {
     @Override
     public void execute() throws CLIException {
         HelpFormatter formatter = new HelpFormatter();
-        Writer writer = context().getDevice().getWriter();
+        Writer writer = currentContext().getDevice().getWriter();
         PrintWriter pw = new PrintWriter(writer, true);
         formatter.printHelp(pw, 110, USAGE, "", CommandFactory
                 .getCommandFactory(RM).supportedOptions(), formatter

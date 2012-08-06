@@ -54,7 +54,7 @@ public abstract class AbstractIModeCommand extends AbstractCommand implements
 
     @Override
     public void execute() throws CLIException {
-        ScriptEngine engine = context().getEngine();
+        ScriptEngine engine = currentContext().getEngine();
         try {
             // load supported functions
             engine.eval(new InputStreamReader(script()));
@@ -62,7 +62,7 @@ public abstract class AbstractIModeCommand extends AbstractCommand implements
             throw new CLIException(CLIException.REASON_OTHER, error);
         }
 
-        while (!context().isTermiated()) {
+        while (!currentContext().isTermiated()) {
             try {
                 String command = readLine("> ");
                 if (command == null) {

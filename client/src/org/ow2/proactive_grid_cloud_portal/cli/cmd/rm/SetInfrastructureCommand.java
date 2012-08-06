@@ -82,7 +82,7 @@ public class SetInfrastructureCommand extends AbstractCommand implements
 
     @Override
     public void execute() throws CLIException {
-        Map<String, PluginView> infrastructures = context()
+        Map<String, PluginView> infrastructures = currentContext()
                 .getInfrastructures();
         if (infrastructures == null) {
             HttpGet request = new HttpGet(resourceUrl("infrastructures"));
@@ -95,7 +95,7 @@ public class SetInfrastructureCommand extends AbstractCommand implements
                 for (PluginView pluginView : pluginViewList) {
                     infrastructures.put(pluginView.getPluginName(), pluginView);
                 }
-                context().setInfrastructures(infrastructures);
+                currentContext().setInfrastructures(infrastructures);
             } else {
                 throw new CLIException(REASON_OTHER,
                         "Unable to retrieve known infrastructure types.");
@@ -129,6 +129,6 @@ public class SetInfrastructureCommand extends AbstractCommand implements
             }
         }
 
-        context().setProperty(SET_INFRASTRUCTURE, buffer.toString());
+        currentContext().setProperty(SET_INFRASTRUCTURE, buffer.toString());
     }
 }

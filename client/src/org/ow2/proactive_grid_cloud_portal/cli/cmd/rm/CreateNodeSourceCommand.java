@@ -60,15 +60,15 @@ public class CreateNodeSourceCommand extends AbstractCommand implements Command 
 
     @Override
     public void execute() throws CLIException {
-        String infrastructure = context().getProperty(SET_INFRASTRUCTURE,
+        String infrastructure = currentContext().getProperty(SET_INFRASTRUCTURE,
                 String.class);
-        String policy = context().getProperty(SET_POLICY, String.class);
+        String policy = currentContext().getProperty(SET_POLICY, String.class);
         if (infrastructure == null || policy == null) {
             throw new CLIException(REASON_INVALID_ARGUMENTS,
                     "No value is specified for one of infrastructure or policy parameters");
         }
-        if (context().getProperty(SET_NODE_SOURCE, String.class) != null) {
-            nodeSource = context().getProperty(SET_NODE_SOURCE, String.class);
+        if (currentContext().getProperty(SET_NODE_SOURCE, String.class) != null) {
+            nodeSource = currentContext().getProperty(SET_NODE_SOURCE, String.class);
         }
         HttpPost request = new HttpPost(resourceUrl("nodesource/create"));
         String requestContents = (new StringBuilder())

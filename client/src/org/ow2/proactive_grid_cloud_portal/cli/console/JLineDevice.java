@@ -38,6 +38,7 @@
 package org.ow2.proactive_grid_cloud_portal.cli.console;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
@@ -70,7 +71,7 @@ public class JLineDevice extends AbstractDevice {
         if (!hfile.exists()) {
             File parentFile = hfile.getParentFile();
             if (!parentFile.exists()) {
-                parentFile.mkdir();
+                parentFile.mkdirs();
             }
             hfile.createNewFile();
         }
@@ -90,13 +91,15 @@ public class JLineDevice extends AbstractDevice {
     }
 
     private void writeHistory() {
+        FileOutputStream outStream = null;
         try {
             File hfile = new File(HFILE);
             if (hfile.exists()) {
                 hfile.delete();
             }
             hfile.createNewFile();
-            PrintWriter pw = new PrintWriter(hfile);
+            outStream = new FileOutputStream(hfile);
+            PrintWriter decorated = new PrintWriter(outStream);
             @SuppressWarnings("rawtypes")
             List historyList = reader.getHistory().getHistoryList();
             if (historyList.size() > HLENGTH) {
@@ -104,11 +107,20 @@ public class JLineDevice extends AbstractDevice {
                         historyList.size());
             }
             for (int index = 0; index < historyList.size(); index++) {
-                pw.println(historyList.get(index));
+                decorated.println(historyList.get(index));
             }
-            pw.flush();
-            pw.close();
+            decorated.flush();
         } catch (IOException fnfe) {
+            // can't do much 
+            
+        } finally {
+            if (outStream != null) {
+                try {
+                    outStream.close();
+                } catch (IOException e) {
+                    // ignore
+                }
+            }
         }
     }
 

@@ -45,7 +45,7 @@ public class ForceCommand extends AbstractCommand implements Command{
 
     @Override
     public void execute() throws CLIException {
-        context().setForced(true);
+        currentContext().setForced(true);
     }
 
 }

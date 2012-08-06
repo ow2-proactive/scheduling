@@ -41,8 +41,6 @@ import static org.apache.http.entity.ContentType.APPLICATION_FORM_URLENCODED;
 import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_INVALID_ARGUMENTS;
 import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
 
-import java.sql.ResultSet;
-
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;

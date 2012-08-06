@@ -148,10 +148,10 @@ function linkrm(rmUrl) {
 }
 
 function reconnect() {
-	if (s.getAlias() != null) {
-		loginwithcredentials(s.getCredFilePathname());
-	} else if (s.getUser() != null) {
-		login(s.getUser());
+	if (getCredFile(s) != null) {
+		loginwithcredentials(getCredFile(s));
+	} else if (getUser(s) != null) {
+		login(getUser(s));
 	} else {
 		print('use either login(username) or loginwithcredentials(cred-file) function\n')
 
@@ -162,9 +162,17 @@ function exit() {
 	s.setTerminated(true);	
 }
 
+function getUser() {
+	return s.getProperty(LoginCommand.USERNAME, java.lang.String.prototype);
+}
+
+function getCredFile() {
+	return s.getProperty(LoginWithCredentialsCommand.CRED_FILE, java.lang.String.prototype);
+}
+
 function printWelcomeMsg() {
     print('Type help() for interactive help \r\n');
-    if (s.getUser() == null && s.getAlias() == null) {
+    if (getUser() == null && getCredFile() == null) {
         print('Warning: You are not currently logged in.\r\n');
     }
 }
@@ -177,10 +185,10 @@ function execute(cmd) {
                 && (e.javaException.reason() == CLIException.REASON_UNAUTHORIZED_ACCESS)
                 && s.getProperty(AbstractLoginCommand.RETRY_LOGIN, java.lang.Boolean.TYPE, false)) {
             s.setProperty(AbstractLoginCommand.RENEW_SESSION, true);
-            if (s.getCredFilePathname() != null) {
-            	execute(new LoginWithCredentialsCommand(s.getCredFilePathname()));
-            } else if (s.getUser() != null) {
-            	execute(new LoginCommand(s.getUser()));
+            if (getCredFile() != null) {
+            	execute(new LoginWithCredentialsCommand(getCredFile()));
+            } else if (getUser() != null) {
+            	execute(new LoginCommand(getUser()));
             } else {
                 throw e;
             }

@@ -67,8 +67,8 @@ public class AddNodeCommand extends AbstractCommand implements Command {
         HttpPost request = new HttpPost(resourceUrl("node"));
         StringBuilder buffer = new StringBuilder();
         buffer.append("nodeurl=" + HttpUtility.encodeUrl(nodeUrl));
-        if (context().getProperty(SET_NODE_SOURCE, String.class) != null) {
-            nodeSource = context().getProperty(SET_NODE_SOURCE, String.class);
+        if (currentContext().getProperty(SET_NODE_SOURCE, String.class) != null) {
+            nodeSource = currentContext().getProperty(SET_NODE_SOURCE, String.class);
         }
         if (nodeSource != null) {
             buffer.append("&nodesource=").append(nodeSource);

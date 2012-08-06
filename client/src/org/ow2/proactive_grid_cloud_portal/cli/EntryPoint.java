@@ -76,8 +76,7 @@ public abstract class EntryPoint {
 
         try {
             commandFactory = getCommandFactory(resourceType());
-            console = (JLineDevice) AbstractDevice
-                    .getConsole(AbstractDevice.JLINE);
+            console = AbstractDevice.getConsole(AbstractDevice.JLINE);
             ((JLineDevice) console).setCommands(commandFactory
                     .supportedCommandEntries());
             context.setDevice(console);
@@ -120,8 +119,7 @@ public abstract class EntryPoint {
         try {
             executeCommandList(commands);
         } catch (CLIException error) {
-            if (REASON_UNAUTHORIZED_ACCESS == error.reason()
-                    && !context.isNewSession()) {
+            if (REASON_UNAUTHORIZED_ACCESS == error.reason()) {
                 authorizationError = true;
             } else {
                 writeError(writer(context), "An error occurred:", error);
@@ -151,7 +149,7 @@ public abstract class EntryPoint {
         }
     }
 
-    private void executeCommandList(List<Command> commands) throws Exception {
+    private void executeCommandList(List<Command> commands) throws CLIException {
         for (Command c : commands) {
             c.execute();
         }

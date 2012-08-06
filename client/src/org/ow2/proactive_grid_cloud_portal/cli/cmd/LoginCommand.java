@@ -49,6 +49,9 @@ import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
 
 public class LoginCommand extends AbstractLoginCommand implements Command {
 
+    public static final String USERNAME = "org.ow2.proactive_grid_cloud_portal.cli.cmd.LoginCommand.username";
+    public static final String PASSWORD = "org.ow2.proactive_grid_cloud_portal.cli.cmd.LoginCommand.password";
+
     private String username;
 
     public LoginCommand(String username) {
@@ -57,7 +60,7 @@ public class LoginCommand extends AbstractLoginCommand implements Command {
 
     @Override
     protected String login() throws CLIException {
-        String password = context().getPassword();
+        String password = currentContext().getProperty(PASSWORD, String.class);
         if (password == null) {
             password = new String(readPassword("password:"));
         }
@@ -82,6 +85,6 @@ public class LoginCommand extends AbstractLoginCommand implements Command {
 
     @Override
     protected void setCredentials() {
-        context().setUser(username);
+        currentContext().setProperty(USERNAME, username);
     }
 }

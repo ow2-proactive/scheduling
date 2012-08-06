@@ -67,7 +67,7 @@ public class RemoveNodeCommand extends AbstractCommand implements Command {
         HttpPost request = new HttpPost(resourceUrl("node/remove"));
         StringBuilder buffer = new StringBuilder();
         buffer.append("url=").append(HttpUtility.encodeUrl(nodeUrl));
-        if (context().isForced()) {
+        if (currentContext().isForced()) {
             preempt = true;
         }
         if (preempt) {

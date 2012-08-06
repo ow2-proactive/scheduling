@@ -76,7 +76,7 @@ public class RmStatsCommand extends AbstractCommand implements Command {
                     });
             MBeanInfoView[] stats = new MBeanInfoView[infoList.size()];
             resultStack().push(stats);
-            if (!context().isSilent()) {
+            if (!currentContext().isSilent()) {
                 writeLine("%s", StringUtility.mBeanInfoAsString(stats));
             }
         } else {

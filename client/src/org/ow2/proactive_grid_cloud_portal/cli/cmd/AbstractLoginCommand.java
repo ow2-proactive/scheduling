@@ -56,7 +56,7 @@ public abstract class AbstractLoginCommand extends AbstractCommand implements
     @Override
     public void execute() throws CLIException {
         setCredentials();
-        ApplicationContext context = context();
+        ApplicationContext context = currentContext();
         Boolean renewSession = context.getProperty(RENEW_SESSION, Boolean.TYPE,
                 false);
         Boolean persistSession = context.getProperty(PERSIST_SESSION,
@@ -109,8 +109,8 @@ public abstract class AbstractLoginCommand extends AbstractCommand implements
 
     private void writeToSessionFile(File sessionFile, String sessionId) {
         File parentFile = sessionFile.getParentFile();
-        if (parentFile.exists()) {
-            parentFile.mkdir();
+        if (!parentFile.exists()) {
+            parentFile.mkdirs();
         }
         FileUtility.writeStringToFile(sessionFile, sessionId);
         if (!setOwnerOnly(sessionFile)) {
@@ -123,7 +123,7 @@ public abstract class AbstractLoginCommand extends AbstractCommand implements
 
     private File sessionFile() {
         String filename = (new StringBuilder()).append(alias()).append('-')
-                .append(context().getResourceType())
+                .append(currentContext().getResourceType())
                 .append(DFLT_SESSION_FILE_EXT).toString();
         return new File(DFLT_SESSION_DIR, filename);
     }

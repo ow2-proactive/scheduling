@@ -78,7 +78,7 @@ public class SetPolicyCommand extends AbstractCommand implements Command {
 
     @Override
     public void execute() throws CLIException {
-        Map<String, PluginView> knownPolicies = context().getPolicies();
+        Map<String, PluginView> knownPolicies = currentContext().getPolicies();
         if (knownPolicies == null) {
             HttpGet request = new HttpGet(resourceUrl("policies"));
             HttpResponse response = execute(request);
@@ -90,7 +90,7 @@ public class SetPolicyCommand extends AbstractCommand implements Command {
                 for (PluginView pluginView : pluginViewList) {
                     knownPolicies.put(pluginView.getPluginName(), pluginView);
                 }
-                context().setPolicies(knownPolicies);
+                currentContext().setPolicies(knownPolicies);
             } else {
                 throw new CLIException(REASON_OTHER,
                         "Unable to retrieve known policy types.");
@@ -121,6 +121,6 @@ public class SetPolicyCommand extends AbstractCommand implements Command {
                 buffer.append("&policyFileParameters=").append(contents);
             }
         }
-        context().setProperty(SET_POLICY, buffer.toString());
+        currentContext().setProperty(SET_POLICY, buffer.toString());
     }
 }

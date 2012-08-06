@@ -55,7 +55,7 @@ public class ListInfrastructureCommand extends AbstractCommand implements
         Command {
     @Override
     public void execute() throws CLIException {
-        Map<String, PluginView> infrastructures = context()
+        Map<String, PluginView> infrastructures = currentContext()
                 .getInfrastructures();
         if (infrastructures == null) {
             HttpGet request = new HttpGet(resourceUrl("infrastructures"));
@@ -69,14 +69,14 @@ public class ListInfrastructureCommand extends AbstractCommand implements
                 for (PluginView pluginView : pluginViewList) {
                     infrastructures.put(pluginView.getPluginName(), pluginView);
                 }
-                context().setInfrastructures(infrastructures);
+                currentContext().setInfrastructures(infrastructures);
             } else {
                 handleError(
                         "An error occurred while retrieving supported infrastructure types:",
                         response);
             }
         }
-        if (!context().isSilent()) {
+        if (!currentContext().isSilent()) {
             if (infrastructures != null) {
                 writeLine("%n%s:%n", "Supported infrastructure types");
                 for (PluginView pluginView : infrastructures.values()) {

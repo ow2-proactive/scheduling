@@ -47,7 +47,7 @@ public class SetInsecureAccessCommand extends AbstractCommand implements
 
     @Override
     public void execute() throws CLIException {
-        context().allowInsecureAccess(true);
+        currentContext().allowInsecureAccess(true);
     }
 
 }

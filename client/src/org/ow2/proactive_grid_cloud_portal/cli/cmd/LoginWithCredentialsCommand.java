@@ -54,6 +54,8 @@ import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
 
 public class LoginWithCredentialsCommand extends AbstractLoginCommand implements
         Command {
+    public static final String CRED_FILE = "org.ow2.proactive_grid_cloud_portal.cli.cmd.LoginWithCredentials.credFile";
+
     private String pathname;
 
     public LoginWithCredentialsCommand(String pathname) {
@@ -73,7 +75,7 @@ public class LoginWithCredentialsCommand extends AbstractLoginCommand implements
                 new ByteArrayBody(FileUtility.byteArray(credentials),
                         APPLICATION_OCTET_STREAM.getMimeType()));
         request.setEntity(entity);
-        HttpResponse response = context().executeClient(request);
+        HttpResponse response = currentContext().executeClient(request);
         if (statusCode(OK) == statusCode(response)) {
             return StringUtility.string(response).trim();
         } else {
@@ -90,6 +92,6 @@ public class LoginWithCredentialsCommand extends AbstractLoginCommand implements
 
     @Override
     protected void setCredentials() {
-        context().setCredFilePathname(pathname);
+        currentContext().setProperty(CRED_FILE, pathname);
     }
 }

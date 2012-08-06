@@ -51,7 +51,7 @@ public class SetNodeSourceCommand extends AbstractCommand {
 
     @Override
     public void execute() throws CLIException {
-        context().setProperty(SET_NODE_SOURCE, nodeSource);
+        currentContext().setProperty(SET_NODE_SOURCE, nodeSource);
     }
 
 }

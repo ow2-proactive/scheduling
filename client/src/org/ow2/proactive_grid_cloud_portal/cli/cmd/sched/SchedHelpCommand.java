@@ -64,7 +64,7 @@ public class SchedHelpCommand extends AbstractCommand implements Command {
     @Override
     public void execute() throws CLIException {
         HelpFormatter formatter = new HelpFormatter();
-        Writer writer = context().getDevice().getWriter();
+        Writer writer = currentContext().getDevice().getWriter();
         PrintWriter pw = new PrintWriter(writer, true);
         Options options = CommandFactory.getCommandFactory(SCHEDULER)
                 .supportedOptions();

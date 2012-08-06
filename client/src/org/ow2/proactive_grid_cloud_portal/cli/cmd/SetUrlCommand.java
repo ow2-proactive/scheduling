@@ -48,7 +48,7 @@ public class SetUrlCommand extends AbstractCommand implements Command {
 
     @Override
     public void execute() throws CLIException {
-       context().setRestServerUrl(restServerUrl);
+       currentContext().setRestServerUrl(restServerUrl);
     }
 
 }

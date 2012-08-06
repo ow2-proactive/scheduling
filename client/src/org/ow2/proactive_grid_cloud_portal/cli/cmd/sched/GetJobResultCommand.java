@@ -40,16 +40,12 @@ package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
 import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.NO_CONTENT;
 import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
 
-import java.util.Map;
-
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractJobCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.cli.json.JobResultView;
-import org.ow2.proactive_grid_cloud_portal.cli.json.TaskResultView;
-import org.ow2.proactive_grid_cloud_portal.cli.utils.ObjectUtility;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
 
 public class GetJobResultCommand extends AbstractJobCommand implements Command {
@@ -65,7 +61,7 @@ public class GetJobResultCommand extends AbstractJobCommand implements Command {
         if (statusCode(OK) == statusCode(response)) {
             JobResultView jobResult = readValue(response, JobResultView.class);
             resultStack().push(jobResult);
-            if (!context().isForced()) {
+            if (!currentContext().isForced()) {
                 writeLine("%s",
                         StringUtility.jobResultAsString(job(), jobResult));
             }

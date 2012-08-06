@@ -58,9 +58,6 @@ import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
 
 public abstract class AbstractCommand implements Command {
 
-    public AbstractCommand() {
-    }
-
     protected int statusCode(HttpResponseStatus status) {
         return status.statusCode();
     }
@@ -69,13 +66,13 @@ public abstract class AbstractCommand implements Command {
         return response.getStatusLine().getStatusCode();
     }
 
-    protected ApplicationContext context() {
+    protected ApplicationContext currentContext() {
         return ApplicationContext.instance();
     }
 
     protected <T> T readValue(HttpResponse response, Class<T> valueType) {
         try {
-            return context().getObjectMapper().readValue(
+            return currentContext().getObjectMapper().readValue(
                     response.getEntity().getContent(), valueType);
         } catch (IOException ioe) {
             throw new CLIException(REASON_IO_ERROR, ioe);
@@ -84,7 +81,7 @@ public abstract class AbstractCommand implements Command {
 
     protected <T> T readValue(HttpResponse response, TypeReference<T> valueType) {
         try {
-            return context().getObjectMapper().readValue(
+            return currentContext().getObjectMapper().readValue(
                     response.getEntity().getContent(), valueType);
         } catch (IOException ioe) {
             throw new CLIException(REASON_IO_ERROR, ioe);
@@ -92,14 +89,14 @@ public abstract class AbstractCommand implements Command {
     }
 
     protected String resourceUrl(String resource) {
-        return context().getRestServerUrl() + "/" + context().getResourceType()
+        return currentContext().getRestServerUrl() + "/" + currentContext().getResourceType()
                 + "/" + resource;
     }
 
     protected void writeLine(String format, Object... args) {
-        if (!context().isSilent()) {
+        if (!currentContext().isSilent()) {
             try {
-                context().getDevice().writeLine(format, args);
+                currentContext().getDevice().writeLine(format, args);
             } catch (IOException ioe) {
                 throw new CLIException(REASON_IO_ERROR, ioe);
             }
@@ -108,19 +105,19 @@ public abstract class AbstractCommand implements Command {
 
     protected String readLine(String format, Object... args) {
         try {
-            return context().getDevice().readLine(format, args);
+            return currentContext().getDevice().readLine(format, args);
         } catch (IOException ioe) {
             throw new CLIException(REASON_IO_ERROR, ioe);
         }
     }
 
     protected Writer writer() {
-        return context().getDevice().getWriter();
+        return currentContext().getDevice().getWriter();
     }
 
     protected char[] readPassword(String format, Object... args) {
         try {
-            return context().getDevice().readPassword(format, args);
+            return currentContext().getDevice().readPassword(format, args);
         } catch (IOException ioe) {
             throw new CLIException(REASON_IO_ERROR, ioe);
         }
@@ -128,11 +125,11 @@ public abstract class AbstractCommand implements Command {
     
     @SuppressWarnings("rawtypes")
     protected Stack resultStack() {
-        return context().resultStack();
+        return currentContext().resultStack();
     }
     
     protected HttpResponse execute(HttpUriRequest request) {
-        return context().executeClient(request);
+        return currentContext().executeClient(request);
     }
 
     @SuppressWarnings("unchecked")
@@ -140,7 +137,7 @@ public abstract class AbstractCommand implements Command {
         String responseContent = StringUtility.string(response);
         ErrorView errorView = null;
         try {
-            errorView = context().getObjectMapper().readValue(
+            errorView = currentContext().getObjectMapper().readValue(
                     responseContent.getBytes(), ErrorView.class);
             resultStack().push(errorView);
             
@@ -165,14 +162,13 @@ public abstract class AbstractCommand implements Command {
 
         String line = null;
         try {
-            line = reader.readLine();
             while ((line = reader.readLine()) != null) {
                 if (line.startsWith("errorMessage:")) {
                     errorMessage = line.substring(line.indexOf(':')).trim();
                     break;
                 }
             }
-
+            
             while ((line = reader.readLine()) != null) {
                 if (line.startsWith("httpErrorCode:")) {
                     errorCode = line.substring(line.indexOf(':')).trim();

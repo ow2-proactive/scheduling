@@ -39,15 +39,11 @@ package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
 
 import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.codehaus.jackson.type.TypeReference;
-import org.ow2.proactive.utils.ObjectArrayFormatter;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
@@ -67,7 +63,7 @@ public class SchedStatsCommand extends AbstractCommand implements Command {
                     new TypeReference<Map<String, String>>() {
                     });
             resultStack().push(stats);
-            if (!context().isSilent()) {
+            if (!currentContext().isSilent()) {
                 writeLine("%s", StringUtility.statsAsString(stats));
             }
           
