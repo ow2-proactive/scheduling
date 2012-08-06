@@ -55,6 +55,7 @@ public abstract class AbstractLoginCommand extends AbstractCommand implements
 
     @Override
     public void execute() throws CLIException {
+        setCredentials();
         ApplicationContext context = context();
         Boolean renewSession = context.getProperty(RENEW_SESSION, Boolean.TYPE,
                 false);
@@ -103,6 +104,8 @@ public abstract class AbstractLoginCommand extends AbstractCommand implements
     protected abstract String login() throws CLIException;
 
     protected abstract String alias();
+    
+    protected abstract void setCredentials();
 
     private void writeToSessionFile(File sessionFile, String sessionId) {
         File parentFile = sessionFile.getParentFile();

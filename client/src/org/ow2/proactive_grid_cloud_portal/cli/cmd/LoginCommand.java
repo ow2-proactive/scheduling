@@ -79,4 +79,9 @@ public class LoginCommand extends AbstractLoginCommand implements Command {
     protected String alias() {
         return username;
     }
+
+    @Override
+    protected void setCredentials() {
+        context().setUser(username);
+    }
 }

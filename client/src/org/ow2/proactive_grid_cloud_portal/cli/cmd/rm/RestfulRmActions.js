@@ -35,12 +35,12 @@ function url(url) {
 }
 
 function login(user) {
-    s.deleteSession(user);
+    s.setSessionId(null);
     execute(new LoginCommand('' + user));
 }
 
 function loginwithcredentials(pathname) {
-    s.deleteSession('' + s.getAlias());
+    s.setSessionId(null);
     execute(new LoginWithCredentialsCommand('' + pathname));
 }
 
@@ -136,12 +136,14 @@ function execute(cmd) {
     try {
         cmd.execute();
     } catch (e) {
-        if (e.javaException instanceof CLIException && (e.javaException.reason() == CLIException.REASON_UNAUTHORIZED_ACCESS) && !s.isNewSession()) {
-            s.clearSession();
-            if (s.getAlias() != null) {
-                loginwithcredentials(s.getCredFilePathname());
+        if (e.javaException instanceof CLIException 
+                && (e.javaException.reason() == CLIException.REASON_UNAUTHORIZED_ACCESS)
+                && s.getProperty(AbstractLoginCommand.RETRY_LOGIN, java.lang.Boolean.TYPE, false)) {
+            s.setProperty(AbstractLoginCommand.RENEW_SESSION, true);
+            if (s.getCredFilePathname() != null) {
+            	execute(new LoginWithCredentialsCommand(s.getCredFilePathname()));
             } else if (s.getUser() != null) {
-                login(s.getUser());
+            	execute(new LoginCommand(s.getUser()));
             } else {
                 throw e;
             }

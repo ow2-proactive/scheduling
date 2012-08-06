@@ -1,6 +1,7 @@
 importClass(org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.CLIException);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.SetUrlCommand);
+importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractLoginCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.LoginCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.LoginWithCredentialsCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.EvalScriptCommand);
@@ -41,12 +42,12 @@ function url(url) {
 }
 
 function login(user) {
-	s.deleteSession(user);
+    s.setSessionId(null);
 	execute(new LoginCommand('' + user));
 }
 
 function loginwithcredentials(pathname) {
-	s.deleteSession('' + s.getAlias());
+	s.setSessionId(null);
 	execute(new LoginWithCredentialsCommand('' + pathname));
 }
 
@@ -169,22 +170,23 @@ function printWelcomeMsg() {
 }
 
 function execute(cmd) {
-	try {
-		cmd.execute();
-	} catch (e) {
-		if (e.javaException instanceof RestCliException
-				&& e.javaException.errorCode() == 401 && !s.isNewSession()) {
-			s.clearSession();
-			if (s.getAlias() != null) {
-				loginwithcredentials(s.getCredFilePathname());
-			} else if (s.getUser() != null) {
-				login(s.getUser());
-			} else {
-				throw e;
-			}
-			cmd.execute();
-		} else {
-			throw e;
-		}
-	}
+    try {
+        cmd.execute();
+    } catch (e) {
+        if (e.javaException instanceof CLIException 
+                && (e.javaException.reason() == CLIException.REASON_UNAUTHORIZED_ACCESS)
+                && s.getProperty(AbstractLoginCommand.RETRY_LOGIN, java.lang.Boolean.TYPE, false)) {
+            s.setProperty(AbstractLoginCommand.RENEW_SESSION, true);
+            if (s.getCredFilePathname() != null) {
+            	execute(new LoginWithCredentialsCommand(s.getCredFilePathname()));
+            } else if (s.getUser() != null) {
+            	execute(new LoginCommand(s.getUser()));
+            } else {
+                throw e;
+            }
+            cmd.execute();
+        } else {
+            throw e;
+        }
+    }
 }

@@ -87,4 +87,9 @@ public class LoginWithCredentialsCommand extends AbstractLoginCommand implements
     protected String alias() {
         return FileUtility.md5Checksum(new File(pathname));
     }
+
+    @Override
+    protected void setCredentials() {
+        context().setCredFilePathname(pathname);
+    }
 }
