@@ -51,14 +51,14 @@ public abstract class AbstractLoginCommand extends AbstractCommand implements
 
     public static final String RETRY_LOGIN = "org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractLoginCommand.retryLogin";
     public static final String RENEW_SESSION = "org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractLoginCommand.renew";
-    private static final String IS_DEFAULT_SESSION = "org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractLoginCommand.default";
+    private static final String PERSIST_SESSION = "org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractLoginCommand.default";
 
     @Override
     public void execute() throws CLIException {
         ApplicationContext context = context();
         Boolean renewSession = context.getProperty(RENEW_SESSION, Boolean.TYPE,
                 false);
-        Boolean isDefaultSession = context.getProperty(IS_DEFAULT_SESSION,
+        Boolean persistSession = context.getProperty(PERSIST_SESSION,
                 Boolean.TYPE, false);
         String sessionId = context.getSessionId();
 
@@ -70,28 +70,28 @@ public abstract class AbstractLoginCommand extends AbstractCommand implements
         }
 
         if (sessionId == null) {
-            File defaultSessionFile = defaultSessionFile();
-            if (defaultSessionFile.exists()) {
-                sessionId = FileUtility.readFileToString(defaultSessionFile);
+            File sessionFile = sessionFile();
+            if (sessionFile.exists()) {
+                sessionId = FileUtility.readFileToString(sessionFile);
                 context.setProperty(RETRY_LOGIN, true);
 
             } else {
                 sessionId = login();
                 context.setProperty(RETRY_LOGIN, false);
-                writeToSessionFile(defaultSessionFile, sessionId);
+                writeToSessionFile(sessionFile, sessionId);
             }
-            context.setProperty(IS_DEFAULT_SESSION, true);
+            context.setProperty(PERSIST_SESSION, true);
 
         } else {
             if (renewSession) {
                 sessionId = login();
                 context.setProperty(RETRY_LOGIN, false);
-                if (isDefaultSession) {
-                    File defaultSessionFile = defaultSessionFile();
-                    if (defaultSessionFile.exists()) {
-                        defaultSessionFile.delete();
+                if (persistSession) {
+                    File sessionFile = sessionFile();
+                    if (sessionFile.exists()) {
+                        sessionFile.delete();
                     }
-                    writeToSessionFile(defaultSessionFile, sessionId);
+                    writeToSessionFile(sessionFile, sessionId);
                     writeLine("Session id successfully renewed.");
                 }
             }
@@ -105,6 +105,10 @@ public abstract class AbstractLoginCommand extends AbstractCommand implements
     protected abstract String alias();
 
     private void writeToSessionFile(File sessionFile, String sessionId) {
+        File parentFile = sessionFile.getParentFile();
+        if (parentFile.exists()) {
+            parentFile.mkdir();
+        }
         FileUtility.writeStringToFile(sessionFile, sessionId);
         if (!setOwnerOnly(sessionFile)) {
             writeLine(
@@ -114,8 +118,11 @@ public abstract class AbstractLoginCommand extends AbstractCommand implements
 
     }
 
-    private File defaultSessionFile() {
-        return new File(DFLT_SESSION_DIR, alias() + DFLT_SESSION_FILE_EXT);
+    private File sessionFile() {
+        String filename = (new StringBuilder()).append(alias()).append('-')
+                .append(context().getResourceType())
+                .append(DFLT_SESSION_FILE_EXT).toString();
+        return new File(DFLT_SESSION_DIR, filename);
     }
 
     private boolean setOwnerOnly(File file) {

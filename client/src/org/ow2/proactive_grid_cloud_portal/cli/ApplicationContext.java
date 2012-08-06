@@ -37,6 +37,7 @@
 
 package org.ow2.proactive_grid_cloud_portal.cli;
 
+import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_OTHER;
 import static org.ow2.proactive_grid_cloud_portal.cli.RestConstants.DFLT_SESSION_DIR;
 import static org.ow2.proactive_grid_cloud_portal.cli.RestConstants.DFLT_SESSION_FILE_EXT;
 
@@ -46,6 +47,7 @@ import java.util.Map;
 import java.util.Stack;
 
 import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
@@ -212,6 +214,15 @@ public class ApplicationContext {
     }
 
     public ScriptEngine getEngine() {
+        if (engine == null) {
+            ScriptEngineManager mgr = new ScriptEngineManager();
+            engine = mgr.getEngineByExtension("js");
+            if (engine == null) {
+                throw new CLIException(REASON_OTHER,
+                        "Cannot obtain JavaScript engine instance.");
+            }
+            engine.getContext().setWriter(getDevice().getWriter());
+        }
         return engine;
     }
 

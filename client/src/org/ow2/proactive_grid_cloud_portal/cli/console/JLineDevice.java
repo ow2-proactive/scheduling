@@ -68,6 +68,10 @@ public class JLineDevice extends AbstractDevice {
     public JLineDevice(InputStream in, PrintStream out) throws IOException {
         File hfile = new File(HFILE);
         if (!hfile.exists()) {
+            File parentFile = hfile.getParentFile();
+            if (!parentFile.exists()) {
+                parentFile.mkdir();
+            }
             hfile.createNewFile();
         }
         writer = new PrintWriter(out, true);

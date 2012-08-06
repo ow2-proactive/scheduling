@@ -9,7 +9,6 @@ fi
 BASEDIR=$(cd $(dirname $0);pwd)
 
 LIB=$(dirname $BASEDIR)/lib
-CONF=$(dirname $BASEDIR)/conf
 DIST=$(dirname $BASEDIR)/dist
 
 CLASSPATH=$(find "$LIB" -name '*.jar' -printf '%p:' | sed 's/:$//')

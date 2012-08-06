@@ -27,17 +27,9 @@ public class EvalScriptCommand extends AbstractCommand implements Command {
 
     @Override
     public void execute() throws CLIException {
-        ApplicationContext context = ApplicationContext.instance();
-        Writer writer = context().getDevice().getWriter();
-        ScriptEngine engine = null;
-        if (context.getEngine() != null) {
-            engine = context.getEngine();
-        } else {
-            ScriptEngineManager mgr = new ScriptEngineManager();
-            engine = mgr.getEngineByExtension("js");
-            engine.getContext().setWriter(writer);
-            context.setEngine(engine);
-        }
+        ApplicationContext context = context();
+        ScriptEngine engine = context.getEngine();
+        Writer writer = context.getDevice().getWriter();
         if (scriptArgs != null) {
             engine.getContext().getBindings(ScriptContext.ENGINE_SCOPE)
                     .putAll(bindings(scriptArgs));

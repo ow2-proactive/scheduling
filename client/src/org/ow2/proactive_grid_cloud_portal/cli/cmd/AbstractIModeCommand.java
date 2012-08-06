@@ -42,29 +42,19 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 
 import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 
 public abstract class AbstractIModeCommand extends AbstractCommand implements
         Command {
-    public static final String EXECUTION_ERROR = "abstract.imode.command.execution.error";
-    private ScriptEngine engine;
 
     public AbstractIModeCommand() {
-        if (context().getEngine() != null) {
-            engine = context().getEngine();
-        } else {
-            ScriptEngineManager mgr = new ScriptEngineManager();
-            engine = mgr.getEngineByExtension("js");
-            engine.getContext().setWriter(context().getDevice().getWriter());
-            context().setEngine(engine);
-        }
     }
 
     @Override
     public void execute() throws CLIException {
+        ScriptEngine engine = context().getEngine();
         try {
             // load supported functions
             engine.eval(new InputStreamReader(script()));
@@ -75,14 +65,14 @@ public abstract class AbstractIModeCommand extends AbstractCommand implements
         while (!context().isTermiated()) {
             try {
                 String command = readLine("> ");
+                if (command == null) {
+                    break; // EOF, exit interactive shell
+                }
                 engine.eval(command);
             } catch (ScriptException se) {
                 writeLine("An error occurred while executing the script:");
                 se.printStackTrace(new PrintWriter(writer(), true));
-            } catch (NullPointerException ne) {
-                // EOF, exit interactive shell
-                break;
-            } 
+            }
         }
     }
 

@@ -49,7 +49,9 @@ import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.SESSION;
 import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.SESSION_FILE;
 import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.SILENT;
 import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.URL;
+import static org.ow2.proactive_grid_cloud_portal.cli.RestConstants.DFLT_SESSION_DIR;
 
+import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -60,6 +62,7 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.LoginWithCredentialsCommand;
 
 /**
  * {@link CommandFactory} builds an ordered {@link Command} list for a given
@@ -139,10 +142,10 @@ public abstract class CommandFactory {
 
         if (map.containsKey(opt(INSECURE))) {
             list.add(map.remove(opt(INSECURE)));
-            
+
         } else if (map.containsKey(opt(CACERTS))) {
             list.add(map.remove(opt(CACERTS)));
-            
+
             if (map.containsKey(opt(CACERTS_PASSWORD))) {
                 list.add(map.remove(opt(CACERTS_PASSWORD)));
             }
@@ -164,6 +167,17 @@ public abstract class CommandFactory {
 
         } else if (map.containsKey(opt(CREDENTIALS))) {
             list.add(map.remove(opt(CREDENTIALS)));
+
+        } else {
+            // auto login
+            String resourceType = ApplicationContext.instance()
+                    .getResourceType();
+            String filename = resourceType + ".cc";
+            File credFile = new File(DFLT_SESSION_DIR, filename);
+            if (credFile.exists()) {
+                list.add(new LoginWithCredentialsCommand(credFile
+                        .getAbsolutePath()));
+            }
         }
 
         return list;

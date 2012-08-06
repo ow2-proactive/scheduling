@@ -40,15 +40,15 @@ package org.ow2.proactive_grid_cloud_portal.cli.cmd;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 
 public class SetUrlCommand extends AbstractCommand implements Command {
-    private String schedulerUrl;
+    private String restServerUrl;
 
     public SetUrlCommand(String schedulerUrl) {
-        this.schedulerUrl = schedulerUrl;
+        this.restServerUrl = schedulerUrl;
     }
 
     @Override
     public void execute() throws CLIException {
-       context().setRestServerUrl(schedulerUrl);
+       context().setRestServerUrl(restServerUrl);
     }
 
 }

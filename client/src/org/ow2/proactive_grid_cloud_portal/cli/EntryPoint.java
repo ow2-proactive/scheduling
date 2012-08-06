@@ -76,15 +76,11 @@ public abstract class EntryPoint {
 
         try {
             commandFactory = getCommandFactory(resourceType());
-            console = AbstractDevice.getConsole(AbstractDevice.STARDARD);
-            /*
             console = (JLineDevice) AbstractDevice
                     .getConsole(AbstractDevice.JLINE);
             ((JLineDevice) console).setCommands(commandFactory
                     .supportedCommandEntries());
-                    */
             context.setDevice(console);
-            
 
             Options options = commandFactory.supportedOptions();
             cli = (new GnuParser()).parse(options, args);
@@ -94,7 +90,7 @@ public abstract class EntryPoint {
             System.exit(1);
 
         } catch (ParseException pe) {
-            writeError((PrintWriter) console.getWriter(), pe.getMessage(), null);
+            writeError((PrintWriter) console.getWriter(), pe.getMessage(), pe);
             // print usage
             Command help = commandFactory
                     .commandForOption(new Option("h", null));
