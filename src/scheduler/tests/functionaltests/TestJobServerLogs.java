@@ -38,11 +38,18 @@ package functionaltests;
 
 import java.io.File;
 import java.net.URL;
+import java.util.Random;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.ow2.proactive.scheduler.common.exception.UserException;
+import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
+import org.ow2.proactive.scheduler.examples.WaitAndPrint;
+import org.ow2.proactive.scripting.SelectionScript;
 
 
 /**
@@ -60,8 +67,21 @@ public class TestJobServerLogs extends SchedulerConsecutive {
     private static URL simpleJobDescriptor = TestJobTaskFlowSubmission.class
             .getResource("/functionaltests/descriptors/Job_simple.xml");
 
-    private static URL pendingJobDescriptor = TestJobTaskFlowSubmission.class
-            .getResource("/functionaltests/descriptors/Job_pending.xml");
+    private final String SCRIPT_OUTPUT = "SCRIPT_OUTPUT_" + Math.random();
+
+    private Job createPendingJob() throws Exception {
+        final TaskFlowJob job = new TaskFlowJob();
+        JavaTask task = new JavaTask();
+        task.setName("jt");
+        task.setExecutableClassName(WaitAndPrint.class.getName());
+        task.addArgument("sleepTime", "1");
+
+        task.addSelectionScript(new SelectionScript("print('" + SCRIPT_OUTPUT + "'); selected = false;",
+            "javascript"));
+        job.addTask(task);
+
+        return job;
+    }
 
     @Test
     public void test() throws Exception {
@@ -95,8 +115,7 @@ public class TestJobServerLogs extends SchedulerConsecutive {
             }
         }
 
-        JobId pendingJobId = SchedulerTHelper.submitJob(new File(pendingJobDescriptor.toURI())
-                .getAbsolutePath());
+        JobId pendingJobId = SchedulerTHelper.submitJob(createPendingJob());
         Thread.sleep(5000);
         jobLogs = SchedulerTHelper.getSchedulerInterface().getJobServerLogs(pendingJobId.toString());
         if (!jobLogs.contains("0 nodes found after scripts execution")) {
@@ -105,7 +124,7 @@ public class TestJobServerLogs extends SchedulerConsecutive {
             Assert.fail("RM output is not correct");
         }
 
-        if (!jobLogs.contains("Hostname <> NON_EXISTING_HOST ==> not selected")) {
+        if (!jobLogs.contains(SCRIPT_OUTPUT)) {
             System.out.println("Incorrect job server logs");
             System.out.println(jobLogs);
             Assert.fail("No script output");
