@@ -1201,12 +1201,19 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      *            node to set
      * @throws NodeException if the node can't be set busy
      */
-    public void setBusyNode(final String nodeUrl, Client owner) throws NodeException {
+    public void setBusyNode(final String nodeUrl, Client owner) throws NodeException, NotConnectedException {
         final RMNode rmNode = this.allNodes.get(nodeUrl);
         if (rmNode == null) {
             logger.error("Unknown node " + nodeUrl);
             return;
         }
+
+        if (!clients.containsKey(owner.getId())) {
+            logger.warn(nodeUrl + " cannot set busy as the client disconnected " + owner);
+            throw new NotConnectedException("Client " + owner.getId() +
+                " is not connected to the resource manager");
+        }
+
         // If the node is already busy no need to go further
         if (rmNode.isBusy()) {
             return;

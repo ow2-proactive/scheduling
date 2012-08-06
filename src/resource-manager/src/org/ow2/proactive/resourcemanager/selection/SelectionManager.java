@@ -62,6 +62,7 @@ import org.objectweb.proactive.utils.NamedThreadFactory;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
+import org.ow2.proactive.resourcemanager.exception.NotConnectedException;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 import org.ow2.proactive.resourcemanager.selection.policies.ShufflePolicy;
 import org.ow2.proactive.resourcemanager.selection.topology.TopologyHandler;
@@ -252,6 +253,10 @@ public abstract class SelectionManager {
             try {
                 // Synchronous call
                 rmcore.setBusyNode(node.getNodeInformation().getURL(), client);
+            } catch (NotConnectedException e) {
+                // client has disconnected during getNodes request
+                logger.warn(e.getMessage(), e);
+                return null;
             } catch (NodeException e) {
                 // if something happened with node after scripts were executed
                 // just return less nodes and do not restart the search
@@ -265,6 +270,10 @@ public abstract class SelectionManager {
                 try {
                     // synchronous call
                     rmcore.setBusyNode(node.getNodeInformation().getURL(), client);
+                } catch (NotConnectedException e) {
+                    // client has disconnected during getNodes request
+                    logger.warn(e.getMessage(), e);
+                    return null;
                 } catch (NodeException e) {
                     selectedNodes.getExtraNodes().remove(node);
                     rmcore.setDownNode(node.getNodeInformation().getURL());
