@@ -48,9 +48,14 @@ public class RunningProcessException extends ProcessException {
 
     /**
      * Attaches a message to the Exception
-     * @param msg message attached
+     * @param message message attached
      */
-    public RunningProcessException(String msg) {
-        super(msg);
+    public RunningProcessException(String message) {
+        super(message);
     }
+
+    public RunningProcessException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
 }
