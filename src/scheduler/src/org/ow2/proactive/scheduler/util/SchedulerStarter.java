@@ -119,7 +119,7 @@ public class SchedulerStarter {
             "p",
             "policy",
             true,
-            "the complete name of the scheduling policy to use (default org.ow2.proactive.scheduler.policy.PriorityPolicy)");
+            "the complete name of the scheduling policy to use (default org.ow2.proactive.scheduler.policy.DefaultPolicy)");
         policy.setArgName("policy");
         policy.setRequired(false);
         options.addOption(policy);

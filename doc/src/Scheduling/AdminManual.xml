@@ -192,7 +192,7 @@ PASchedulerProperties.updateProperties("your_property_file");
 					</listitem>
 					<listitem>
 						<para>
-							<emphasis role="italics">pa.scheduler.policy</emphasis>: Scheduler default policy full name (default is org.ow2.proactive.scheduler.policy.PriorityPolicy).
+							<emphasis role="italics">pa.scheduler.policy</emphasis>: Scheduler default policy full name (default is org.ow2.proactive.scheduler.policy.DefaultPolicy).
 							The policy specifies here has to be in the Scheduler classpath.
 						</para>
 					</listitem>
@@ -520,18 +520,18 @@ PASchedulerProperties.updateProperties("your_property_file");
 						<listitem>
 							<para>
 								<emphasis>The scheduling policy</emphasis> that will be started with the Scheduler
-								(using "-p org.ow2.proactive.scheduler.policy.PriorityPolicy" option).
-								By default, it will use the <emphasis>PriorityPolicy</emphasis> provided with the package.
+								(using "-p org.ow2.proactive.scheduler.policy.DefaultPolicy" option).
+								By default, it will use the <emphasis>DefaultPolicy</emphasis> provided with the package.
 							</para>
 						</listitem>
 					</itemizedlist>
 				</para>
 				<para>
 					For example, the following line will launch a scheduler on a Resource Manager started on "localhost" (which is in fact, the same as 'no argument'). It will also use
-					the 'PriorityPolicy' scheduling policy:
+					the 'DefaultPolicy' scheduling policy:
 				</para>
 				<para>
-					<code>scheduler-start[.bat] -u rmi://localhost/ -p org.ow2.proactive.scheduler.policy.PriorityPolicy</code>
+					<code>scheduler-start[.bat] -u rmi://localhost/ -p org.ow2.proactive.scheduler.policy.DefaultPolicy</code>
 				</para>
 				<para>
 					By default, the "config/authentication/" directory has to contain the two authentication files (group and login).
@@ -566,7 +566,7 @@ SchedulerInitializer init = new SchedulerInitializer();
 init.setSchedulerHomePath("/path/to/Scheduler/home");
 init.setProActiveConfiguration("/path/to/PAconfigurationFile");
 init.setSchedulerPropertiesConfiguration("/path/to/SchedulerPropertiesFile");
-init.setPolicyFullClassName(PriorityPolicy.class.getName());
+init.setPolicyFullClassName(DefaultPolicy.class.getName());
 
 System.out.println("Starting Scheduler, please wait...");
 SchedulerAuthenticationInterface sAuth = SchedulerFactory.startLocal(rmAuth.getHostURL(),init);
@@ -624,7 +624,7 @@ System.out.println("RM successfully started at : " + rmAuth.getHostURL());
 
 //starting scheduler...
 System.out.println("Starting Scheduler, please wait...");
-SchedulerAuthenticationInterface sAuth = SchedulerFactory.startLocal(rmAuth.getHostURL(),PriorityPolicy.class.getName());
+SchedulerAuthenticationInterface sAuth = SchedulerFactory.startLocal(rmAuth.getHostURL(),DefaultPolicy.class.getName());
 System.out.println("Scheduler successfully started at : " + sAuth.getHostURL());
 
 				</programlisting>
@@ -645,7 +645,7 @@ System.out.println("Scheduler successfully started at : " + sAuth.getHostURL());
 SchedulerFactory.createScheduler(
 	credentials,
 	new URI("rmi://host:port/"),
-	"org.ow2.proactive.scheduler.policy.PriorityPolicy");
+	"org.ow2.proactive.scheduler.policy.DefaultPolicy");
 				</programlisting>
 				<para>
 					where arguments are the sames plus a <emphasis>credentials</emphasis>
@@ -809,7 +809,7 @@ Scheduler scheduler = auth.login(Credentials.getCredentials());
 				</para>
 				<programlisting language="java">
 //scheduler is the AdminSchedulerInterface returned in the previous sections
-scheduler.changePolicy(org.ow2.proactive.scheduler.policy.PriorityPolicy.class);
+scheduler.changePolicy(org.ow2.proactive.scheduler.policy.DefaultPolicy.class);
 				</programlisting>
 			</section>
 		</section>
@@ -1216,7 +1216,7 @@ scheduler.changePolicy(org.ow2.proactive.scheduler.policy.PriorityPolicy.class);
 					if the scheduler is already running.
 				</para>
 				<para>
-					Here is the interface which has to be implemented. The default implementation is <emphasis>PriorityPolicy</emphasis>
+					Here is the interface which has to be implemented. The default implementation is <emphasis>DefaultPolicy</emphasis>
 					in the same package:
 				</para>
 				<programlisting language="java">
@@ -1242,7 +1242,7 @@ public abstract class Policy implements Serializable {
 					Scheduler policy to illustrate it:
 				</para>
 				<programlisting language="java">
-public class PriorityPolicy implements PolicyInterface {
+public class DefaultPolicy implements PolicyInterface {
 
 	/**
 	 * This method returns the tasks using FIFO policy according to the jobs priorities.
