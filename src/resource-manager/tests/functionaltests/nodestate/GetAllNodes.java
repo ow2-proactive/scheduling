@@ -41,6 +41,8 @@ import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
+import org.ow2.proactive.utils.Criteria;
+import org.ow2.proactive.utils.NodeSet;
 
 
 public class GetAllNodes {
@@ -51,7 +53,9 @@ public class GetAllNodes {
             Credentials cred = Credentials.createCredentials(new CredData("demo", "demo"), auth
                     .getPublicKey());
             ResourceManager rm = auth.login(cred);
-            rm.getAtMostNodes(rm.getState().getFreeNodesNumber(), null);
+            NodeSet nodes = rm.getNodes(new Criteria(rm.getState().getFreeNodesNumber()));
+            // use nodes to block until the future is available
+            System.out.println("Got " + nodes.size());
         } catch (Exception e) {
             e.printStackTrace();
         }
