@@ -1144,6 +1144,9 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             } else {
                 tlogger.debug(taskId, "is a java task");
                 errorOccurred = res.hadException();
+                if (errorOccurred) {
+                    tlogger.error(taskId, "error", res.getException());
+                }
             }
 
             tlogger.info(taskId, "finished with" + (errorOccurred ? "" : "out") + " errors");
