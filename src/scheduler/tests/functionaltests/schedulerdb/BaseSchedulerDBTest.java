@@ -382,7 +382,8 @@ public class BaseSchedulerDBTest {
         }
         InternalJob internalJob = InternalJobFactory.createJob(job, getDefaultCredentials());
         internalJob.setOwner(userName);
-
+        internalJob.submitAction();
+        
         dbManager.newJobSubmitted(internalJob);
 
         return internalJob;
