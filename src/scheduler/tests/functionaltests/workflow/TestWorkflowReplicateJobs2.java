@@ -42,50 +42,19 @@ package functionaltests.workflow;
  * @author The ProActive Team
  * @since ProActive Scheduling 2.2
  */
-public class TestWorkflowReplicateJobs2 extends TWorkflowJobs {
-
-    // private static final String[][] jobs = 
-    @Override
-    public final String[][] getJobs() {
-        return new String[][] {
-
-        // 1: nested replicate: block -> block -> block
-                { "T 0", "T1 1", "T1*1 1", "T2 2", "T2*1 2", "T2*2 2", "T2*3 2", "T3 3", "T4 4", "T3*1 3",
-                        "T4*1 4", "T3*2 3", "T4*2 4", "T3*3 3", "T4*3 4", "T3*4 3", "T4*4 4", "T3*5 3",
-                        "T4*5 4", "T3*6 3", "T4*6 4", "T3*7 3", "T4*7 4", "T3*8 3", "T4*8 4", "T3*9 3",
-                        "T4*9 4", "T3*10 3", "T4*10 4", "T3*11 3", "T4*11 4", "T5 13", "T5*1 13", "T5*2 13",
-                        "T5*3 13", "T6 27", "T6*1 27", "T7 55" },
-                // 2: nested replicate: block -> block -> single task
-                { "T 0", "T1 1", "T1*1 1", "T2 2", "T2*1 2", "T2*2 2", "T2*3 2", "T3 3", "T3*1 3", "T3*2 3",
-                        "T3*3 3", "T3*4 3", "T3*5 3", "T3*6 3", "T3*7 3", "T3*8 3", "T3*9 3", "T3*10 3",
-                        "T3*11 3", "T4 10", "T4*1 10", "T4*2 10", "T4*3 10", "T5 11", "T5*1 11", "T5*2 11",
-                        "T5*3 11", "T6 23", "T6*1 23", "T7 47" },
-
-                // 3: complex nested replicate
-                { "T 0", "T1 1", "T2 2", "T2*1 2", "T4 3", "T4*1 3", "T4*2 3", "T4*3 3", "T8 4", "T8*1 4",
-                        "T8*2 4", "T8*3 4", "T20 5", "T20*1 5", "T20*2 5", "T20*3 5", "T20*4 5", "T20*5 5",
-                        "T20*6 5", "T20*7 5", "T20*8 5", "T20*9 5", "T20*10 5", "T20*11 5", "T13 16",
-                        "T13*1 16", "T13*2 16", "T13*3 16", "T19 33", "T19*1 33", "T3 2", "T3*1 2", "T5 3",
-                        "T5*1 3", "T6 3", "T6*1 3", "T7 4", "T7*1 4", "T7*2 4", "T7*3 4", "T9 5", "T9*1 5",
-                        "T9*2 5", "T9*3 5", "T9*4 5", "T9*5 5", "T9*6 5", "T9*7 5", "T9*8 5", "T9*9 5",
-                        "T9*10 5", "T9*11 5", "T10 5", "T10*1 5", "T10*2 5", "T10*3 5", "T10*4 5", "T10*5 5",
-                        "T10*6 5", "T10*7 5", "T10*8 5", "T10*9 5", "T10*10 5", "T10*11 5", "T18 6",
-                        "T18*1 6", "T18*2 6", "T18*3 6", "T18*4 6", "T18*5 6", "T18*6 6", "T18*7 6",
-                        "T18*8 6", "T18*9 6", "T18*10 6", "T18*11 6", "T11 34", "T11*1 34", "T11*2 34",
-                        "T11*3 34", "T17 72", "T17*1 72", "T14 211", "T16 212", "T15 212" },
-
-        //                
-        };
-
-    }
-
-    @Override
-    public final String getJobPrefix() {
-        return "/functionaltests/workflow/descriptors/flow_duplicate_2_";
-    }
-
+public class TestWorkflowReplicateJobs2 extends TRepJobs {
     @org.junit.Test
     public void run() throws Throwable {
-        internalRun();
+        String prefix = "/functionaltests/workflow/descriptors/flow_duplicate_2_";
+
+        TRepCase t1 = new TRepCase(prefix + "1.xml", 38,
+            "T6,2,54 T7,1,55 T,1,0 T4,12,48 T5,4,52 T1,2,2 T3,12,36 T2,4,8");
+        TRepCase t2 = new TRepCase(prefix + "2.xml", 30,
+            "T6,2,46 T7,1,47 T,1,0 T4,4,40 T5,4,44 T1,2,2 T3,12,36 T2,4,8");
+        TRepCase t3 = new TRepCase(prefix + "3.xml", 85,
+            "T1,1,1 T3,2,4 T2,2,4 T6,2,6 T,1,0 T7,4,16 T4,4,12 T10,12,60 T5,2,6 T11,4,136 T8,4,16 "
+                + "T13,4,64 T14,1,211 T9,12,60 T15,1,212 T16,1,212 T17,2,144 T18,12,72 T19,2,66 T20,12,60");
+
+        testJobs(t1, t2, t3);
     }
 }

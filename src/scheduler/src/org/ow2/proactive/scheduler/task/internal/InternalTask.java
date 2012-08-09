@@ -49,6 +49,7 @@ import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlTransient;
@@ -73,9 +74,6 @@ import org.ow2.proactive.scheduler.core.annotation.TransientInSerialization;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
-import org.ow2.proactive.scheduler.task.ForkedJavaExecutableContainer;
-import org.ow2.proactive.scheduler.task.JavaExecutableContainer;
-import org.ow2.proactive.scheduler.task.NativeExecutableContainer;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskInfoImpl;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
@@ -304,9 +302,7 @@ public abstract class InternalTask extends TaskState {
             nt = (InternalTask) this.replicate();
 
             // when nesting REPLICATE actions, the replication index of the original tasks will change
-            if (!loopAction) {
-                this.setReplicationIndex(dupIndex);
-            } else {
+            if (loopAction) {
                 nt.setIterationIndex(this.getIterationIndex() + 1);
             }
 

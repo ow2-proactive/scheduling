@@ -83,7 +83,7 @@ runs = 2;
 importPackage(java.io);
 var ID   = 9 + "_" + $REP;
 var RUNS = 2;
-var f = new File(java.lang.System.getProperty("java.io.tmpdir"), "test_flow_lock_" + ID);
+var f = new File(java.lang.System.getProperty("java.io.tmpdir"), "fc5_1" + ID);
 var it = 0;
 if (f.exists()) {
 var input = new BufferedReader(new FileReader(f));
@@ -125,7 +125,7 @@ loop = false;
 importPackage(java.io);
 var ID   = 4 + "_" + $REP;
 var RUNS = 2;
-var f = new File(java.lang.System.getProperty("java.io.tmpdir"), "test_flow_lock_" + ID);
+var f = new File(java.lang.System.getProperty("java.io.tmpdir"), "fc5_2" + ID);
 var it = 0;
 if (f.exists()) {
 var input = new BufferedReader(new FileReader(f));

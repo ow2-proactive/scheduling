@@ -46,47 +46,22 @@ import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
  * @author The ProActive Team
  * @since ProActive Scheduling 2.2
  */
-public class TestWorkflowComplexJobs4 extends TWorkflowJobs {
-
-    @Override
-    public String getJobPrefix() {
-        return "/functionaltests/workflow/descriptors/flow_complex_4_";
-    }
-
-    @Override
-    public String[][] getJobs() {
-        return new String[][] {
-                { "T 0", "T1 1", "T2 2", "T3 -1", "T4 3", "T1*1 1", "T2*1 2", "T3*1 -1", "T4*1 3", "T1*2 1",
-                        "T2*2 2", "T3*2 -1", "T4*2 3", "T5 10" },
-
-                { "T 0", "T1 1", "T5 -1", "T6 -1", "T2 2", "T3 3", "T3*1 3", "T3*2 3", "T4 10", "T7 11" },
-
-                { "T 0", "T1 1", "T2 -1", "T3 -1", "T6 2", "T7 3", "T8 4", "T7*1 3", "T8*1 4", "T7*2 3",
-                        "T8*2 4", "T9 13", "T4 14", "T1*1 1", "T2*1 -1", "T3*1 -1", "T6*1 2", "T7*3 3",
-                        "T8*3 4", "T7*4 3", "T8*4 4", "T7*5 3", "T8*5 4", "T9*1 13", "T4*1 14", "T5 29" },
-
-                { "T16 0", "T 1", "T1 -1", "T14 -1", "T2 2", "T11 -1", "T12 -1", "T3 3", "T4 4", "T5 5",
-                        "T7 6", "T19 7", "T19*1 7", "T19*2 7", "T19*3 7", "T20 29", "T6 35", "T10 36",
-                        "T8 -1", "T9 -1", "T4*1 4", "T5*1 5", "T7*1 6", "T19*4 7", "T19*5 7", "T19*6 7",
-                        "T19*7 7", "T20*1 29", "T6*1 35", "T10*1 36", "T8*1 -1", "T9*1 -1", "T4*2 4",
-                        "T5*2 5", "T7*2 6", "T19*8 7", "T19*9 7", "T19*10 7", "T19*11 7", "T20*2 29",
-                        "T6*2 35", "T10*2 36", "T8*2 -1", "T9*2 -1", "T21 109", "T13 110", "T15 111",
-
-                        "T*1 1", "T1*1 -1", "T14*1 -1", "T2*1 2", "T11*1 -1", "T12*1 -1", "T3*1 3", "T4*3 4",
-                        "T5*3 5", "T7*3 6", "T19*12 7", "T19*13 7", "T19*14 7", "T19*15 7", "T20*3 29",
-                        "T6*3 35", "T10*3 36", "T8*3 -1", "T9*3 -1", "T4*4 4", "T5*4 5", "T7*4 6",
-                        "T19*16 7", "T19*17 7", "T19*18 7", "T19*19 7", "T20*4 29", "T6*4 35", "T10*4 36",
-                        "T8*4 -1", "T9*4 -1", "T4*5 4", "T5*5 5", "T7*5 6", "T19*20 7", "T19*21 7",
-                        "T19*22 7", "T19*23 7", "T20*5 29", "T6*5 35", "T10*5 36", "T8*5 -1", "T9*5 -1",
-                        "T21*1 109", "T13*1 110", "T15*1 111",
-
-                        "T18 223", "T17 223" }
-        //            
-        };
-    }
-
+public class TestWorkflowComplexJobs4 extends TRepJobs {
     @org.junit.Test
     public void run() throws Throwable {
-        internalRun();
+        String prefix = "/functionaltests/workflow/descriptors/flow_complex_4_";
+
+        TRepCase t1 = new TRepCase(prefix + "1.xml", 14, "T,1,0 T4,3,9 T5,1,10 T1,3,3 T3,3,-3 T2,3,6");
+        TRepCase t2 = new TRepCase(prefix + "2.xml", 10,
+            "T6,1,-1 T7,1,11 T,1,0 T4,1,10 T5,1,-1 T1,1,1 T3,3,9 T2,1,2");
+        TRepCase t3 = new TRepCase(prefix + "3.xml", 26,
+            "T6,2,4 T7,6,18 T,1,0 T4,2,28 T5,1,29 T8,6,24 T9,2,26 T1,2,2 T3,2,-2 " + "T2,2,-2");
+        TRepCase t4 = new TRepCase(prefix + "4.xml", 95,
+            "T1,2,-2 T3,2,6 T2,2,4 T6,6,210 T,2,2 T7,6,36 T4,6,24 T10,6,216 "
+                + "T5,6,30 T11,2,-2 T12,2,-2 T13,2,220 T8,6,-6 T9,6,-6 T14,2,-2 "
+                + "T15,2,222 T16,1,0 T17,1,223 T18,1,223 T21,2,218 T19,24,168 " + "T20,6,174");
+
+        testJobs(t1, t2, t3, t4);
     }
+
 }

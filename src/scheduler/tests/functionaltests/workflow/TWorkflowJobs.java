@@ -67,7 +67,7 @@ import functionaltests.SchedulerTHelper;
 
 
 /**
- * Tests the correctness of workflow-controlled jobs
+ * Tests the correctness of loop / if based workflow-controlled jobs
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 2.2
@@ -220,7 +220,7 @@ public abstract class TWorkflowJobs extends SchedulerConsecutive {
      * @param expectedDependences 
      * @throws Throwable
      */
-    public static void testJob(String jobPath, Map<String, Long> expectedResults,
+    public void testJob(String jobPath, Map<String, Long> expectedResults,
             Map<String, Set<String>> expectedDependences) throws Throwable {
         List<String> skip = new ArrayList<String>();
         for (Entry<String, Long> er : expectedResults.entrySet()) {
@@ -228,7 +228,8 @@ public abstract class TWorkflowJobs extends SchedulerConsecutive {
                 skip.add(er.getKey());
             }
         }
-        JobId id = testJobSubmission(jobPath, skip);
+        Job jobToTest = JobFactory.getFactory().createJob(jobPath);
+        JobId id = testJobSubmission(jobToTest, skip);
 
         JobResult res = SchedulerTHelper.getJobResult(id);
         Assert.assertFalse(SchedulerTHelper.getJobResult(id).hadException());
@@ -242,7 +243,7 @@ public abstract class TWorkflowJobs extends SchedulerConsecutive {
         SchedulerTHelper.waitForEventJobRemoved(id);
     }
 
-    public static void compareResults(String prefix, Map<String, Long> expectedResults, JobResult jobResult)
+    public void compareResults(String prefix, Map<String, Long> expectedResults, JobResult jobResult)
             throws Throwable {
         for (Entry<String, TaskResult> result : jobResult.getAllResults().entrySet()) {
             Long expected = expectedResults.get(result.getKey());
@@ -275,7 +276,7 @@ public abstract class TWorkflowJobs extends SchedulerConsecutive {
             skipped + "): ", expectedResults.size(), jobResult.getAllResults().size() + skipped);
     }
 
-    public static void compareDependences(JobState js, Map<String, Set<String>> expectedDependences) {
+    public void compareDependences(JobState js, Map<String, Set<String>> expectedDependences) {
         for (TaskState ts : js.getTasks()) {
             String taskName = ts.getId().getReadableName();
             if (expectedDependences.containsKey(taskName)) {
@@ -296,10 +297,4 @@ public abstract class TWorkflowJobs extends SchedulerConsecutive {
             }
         }
     }
-
-    public static JobId testJobSubmission(String jobDescPath, List<String> skip) throws Exception {
-        Job jobToTest = JobFactory.getFactory().createJob(jobDescPath);
-        return testJobSubmission(jobToTest, skip);
-    }
-
 }

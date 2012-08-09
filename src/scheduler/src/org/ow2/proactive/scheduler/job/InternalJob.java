@@ -250,19 +250,6 @@ public abstract class InternalJob extends JobState {
 
             this.tasks.put(it.replicatedId, replicated);
             newTasks.put(replicated, it.originalId);
-
-            // when nesting REPLICATE, the original replicated task can have its Replication Index changed:
-            // the new Replication Id of the original task is the lowest id among replicated tasks minus one
-            int minDup = Integer.MAX_VALUE;
-            for (ReplicatedTask it2 : this.jobInfo.getTasksReplicated()) {
-                String iDup = InternalTask.getInitialName(it2.replicatedId.getReadableName());
-                String iOr = InternalTask.getInitialName(it.originalId.getReadableName());
-                if (iDup.equals(iOr)) {
-                    int iDupId = InternalTask.getReplicationIndexFromName(it2.replicatedId.getReadableName());
-                    minDup = Math.min(iDupId, minDup);
-                }
-            }
-            original.setReplicationIndex(minDup - 1);
         }
 
         // recreate deps contained in the data struct
@@ -861,8 +848,9 @@ public abstract class InternalJob extends JobState {
                             for (Entry<TaskId, InternalTask> it : dup.entrySet()) {
                                 InternalTask nt = it.getValue();
                                 nt.setJobInfo(getJobInfo());
+                                int dupIndex = getNextReplicationIndex(InternalTask.getInitialName(nt
+                                        .getName()), nt.getIterationIndex());
                                 this.addTask(nt);
-                                int dupIndex = initiator.getReplicationIndex() * runs + i;
                                 nt.setReplicationIndex(dupIndex);
                             }
                             modifiedTasks.addAll(dup.values());
@@ -989,6 +977,17 @@ public abstract class InternalJob extends JobState {
             newTasks.add(new ClientTaskState(task));
         }
         return newTasks;
+    }
+
+    private int getNextReplicationIndex(String baseName, int iteration) {
+        int rep = 0;
+        for (InternalTask it : this.tasks.values()) {
+            String name = InternalTask.getInitialName(it.getName());
+            if (baseName.equals(name) && iteration == it.getIterationIndex()) {
+                rep = Math.max(rep, it.getReplicationIndex() + 1);
+            }
+        }
+        return rep;
     }
 
     /**
