@@ -171,9 +171,7 @@ public class SchedulerStateRecoverHelper {
                     case FAILED:
                     case FINISHED:
                     case FAULTY:
-                        // SKIPPED is not included :
-                        // such task should never be eligible because no dependency 
-                        // points to it and it will never be executed
+                    case SKIPPED:
                         tasksList.add(task);
                 }
             } else {

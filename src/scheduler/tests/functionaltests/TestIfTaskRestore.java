@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.Serializable;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -17,7 +16,6 @@ import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.tests.FunctionalTest;
 
 
-@Ignore
 public class TestIfTaskRestore extends FunctionalTest {
 
     public static class TaskA extends JavaExecutable {

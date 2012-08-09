@@ -44,7 +44,10 @@ import java.util.Map.Entry;
 import org.junit.Assert;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
+import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.task.TaskState;
+import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.tests.FunctionalTest;
 
 import functionaltests.SchedulerTHelper;
@@ -148,5 +151,42 @@ public class TestWorkflowRecoveryInterrupted extends FunctionalTest {
         }
         SchedulerTHelper.log("Job " + path + " checked");
 
+        /*** job 3 : branching */
+        path = new File(TestWorkflowRecoveryInterrupted.class.getResource(job_prefix + "3.xml").toURI())
+                .getAbsolutePath();
+        id = SchedulerTHelper.submitJob(path);
+        SchedulerTHelper.log("Submitted job " + path);
+        SchedulerTHelper.waitForEventTaskFinished(id, "A");
+
+        SchedulerTHelper.log("Task A finished, crashing scheduler...");
+        SchedulerTHelper.killAndRestartScheduler(new File(SchedulerTHelper.class.getResource(
+                "config/functionalTSchedulerProperties-updateDB.ini").toURI()).getAbsolutePath());
+        SchedulerTHelper.getSchedulerInterface();
+
+        SchedulerTHelper.getSchedulerInterface().getJobState(id);
+
+        SchedulerTHelper.waitForEventJobFinished(id);
+        SchedulerTHelper.log("Job finished: " + path);
+
+        JobState js = SchedulerTHelper.getSchedulerInterface().getJobState(id);
+        Assert.assertEquals(4, js.getTasks().size());
+
+        for (int i = 0; i < 4; i++) {
+            TaskState ts = js.getTasks().get(i);
+            String name = ts.getName();
+            if (name.equals("A")) {
+                Assert.assertEquals(TaskStatus.FINISHED, ts.getStatus());
+            } else if (name.equals("B")) {
+                Assert.assertEquals(TaskStatus.FINISHED, ts.getStatus());
+            } else if (name.equals("C")) {
+                Assert.assertEquals(TaskStatus.SKIPPED, ts.getStatus());
+            } else if (name.equals("D")) {
+                Assert.assertEquals(TaskStatus.FINISHED, ts.getStatus());
+            } else {
+                Assert.fail();
+            }
+        }
+
+        SchedulerTHelper.log("Job " + path + " checked");
     }
 }

@@ -635,7 +635,8 @@ public abstract class InternalJob extends JobState {
                                 targetElse = it;
                             }
                         } else if (action.getTargetContinuation().equals(it.getName())) {
-                            if (findTaskUp(initiator.getName(), it).equals(initiator)) {
+                            InternalTask up = findTaskUp(initiator.getName(), it);
+                            if (up != null && up.equals(initiator)) {
                                 targetJoin = it;
                             }
                         }
@@ -729,7 +730,7 @@ public abstract class InternalJob extends JobState {
 
                     List<TaskId> tev = new ArrayList<TaskId>(elseTasks.size());
                     for (InternalTask it : elseTasks) {
-                        it.setFinishedTime(System.currentTimeMillis());
+                        it.setFinishedTime(descriptor.getFinishedTime() + 1);
                         it.setStatus(TaskStatus.SKIPPED);
                         it.setExecutionDuration(0);
                         setNumberOfPendingTasks(getNumberOfPendingTasks() - 1);

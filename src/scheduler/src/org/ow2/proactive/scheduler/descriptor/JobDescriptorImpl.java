@@ -540,7 +540,6 @@ public class JobDescriptorImpl implements JobDescriptor {
                 }
             }
         }
-
         runningTasks.remove(taskId);
     }
 

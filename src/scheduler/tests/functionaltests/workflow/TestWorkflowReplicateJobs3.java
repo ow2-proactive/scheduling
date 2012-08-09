@@ -36,7 +36,6 @@
  */
 package functionaltests.workflow;
 
-
 /**
  * Tests the correctness of workflow-controlled jobs
  *
@@ -45,15 +44,13 @@ package functionaltests.workflow;
  *
  */
 public class TestWorkflowReplicateJobs3 extends TRepJobs {
-	@org.junit.Test
-	public void run() throws Throwable {
-		String prefix = "/functionaltests/workflow/descriptors/flow_duplicate_3_";
+    @org.junit.Test
+    public void run() throws Throwable {
+        String prefix = "/functionaltests/workflow/descriptors/flow_duplicate_3_";
 
-		TRepCase t1 = new TRepCase(prefix + "1.xml", 9,
-				"A,1,0 B,2,2 C,3,6 D,2,8 E,1,9");
-		TRepCase t2 = new TRepCase(prefix + "2.xml", 20,
-				"A,1,0 B,3,3 C,6,12 D,6,18 E,3,21 F,1,22");
-		
-		testJobs(t1, t2);
-	}
+        TRepCase t1 = new TRepCase(prefix + "1.xml", 9, "A,1,0 B,2,2 C,3,6 D,2,8 E,1,9");
+        TRepCase t2 = new TRepCase(prefix + "2.xml", 20, "A,1,0 B,3,3 C,6,12 D,6,18 E,3,21 F,1,22");
+
+        testJobs(t1, t2);
+    }
 }
