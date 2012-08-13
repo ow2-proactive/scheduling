@@ -20,6 +20,6 @@ if [ "$command" = "start" ]; then
         CLASS="org.objectweb.proactive.extensions.vfsprovider.console.PADataserverStarter"
 fi
 
-JAVACMD+=($CLASS $@)
+JAVACMD+=($CLASS "$@")
 exec "${JAVACMD[@]}"
 
