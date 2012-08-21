@@ -1082,9 +1082,9 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                 ((TaskResultImpl) taskResult).setPreviousResult(oldRes);
             } else if (jobStatus == JobStatus.CANCELED) {
                 taskResult = (TaskResult) PAFuture.getFutureValue(taskResult);
+
                 ((JobResultImpl) job.getJobResult()).addTaskResult(task.getName(), taskResult, task
                         .isPreciousResult());
-                ((TaskResultImpl) taskResult).setPreviousResult(oldRes);
             }
 
             //add the result in database
@@ -1202,6 +1202,26 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             // HANDLE DESCRIPTORS
             res.setPreviewerClassName(descriptor.getResultPreview());
             res.setJobClasspath(job.getEnvironment().getJobClasspath()); // can be null
+
+			if (descriptor.getNumberOfExecutionLeft() < descriptor
+					.getMaxNumberOfExecution()) {
+				// This task has failed already, it might have a previous result.
+				// We attach the previous result to the new result so
+				// that hibernate can reach all these objects
+				try {
+					TaskResult prev = getTaskResultFromIncarnation(job.getId(),
+							taskId.getReadableName(), 0);
+					if (prev != null) {
+						updateTaskIdReferences(prev, descriptor.getId());
+						res.setPreviousResult((TaskResultImpl) prev);
+					}
+				} catch (IllegalArgumentException e) {
+					logger_dev.debug(
+							"Should be 'incarnation 0 does not exist': ", e);
+				} catch (Throwable t) {
+					logger_dev.error("Failed to recover previous result", t);
+				}
+			}
 
             logger.info("Task '" + taskId + "' on job '" + jobId + "' terminated");
 
@@ -1474,6 +1494,11 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                     f.set(res, id);
                     break;
                 }
+            }
+
+            TaskResult prev = ((TaskResultImpl) res).getPreviousResult();
+            if (prev != null) {
+                updateTaskIdReferences(prev, id);
             }
         } catch (Exception e) {
             logger_dev.error("", e);
