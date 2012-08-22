@@ -141,7 +141,8 @@ public class NonBlockingCoreTest extends RMConsecutive {
 
         String nsName = "NonBlockingCoreTest";
         RMTHelper.log("Creating a node source " + nsName);
-        int nsNodesNumber = helper.createNodeSource(nsName);
+        int nsNodesNumber = 1;
+        helper.createNodeSource(nsName, nsNodesNumber);
 
         assertTrue(resourceManager.getState().getTotalNodesNumber() == nsNodesNumber + initialNodeNumber);
         assertTrue(resourceManager.getState().getFreeNodesNumber() == nsNodesNumber + initialNodeNumber);
