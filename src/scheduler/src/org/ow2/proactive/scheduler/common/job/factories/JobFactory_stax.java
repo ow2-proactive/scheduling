@@ -1311,7 +1311,7 @@ public class JobFactory_stax extends JobFactory {
                 ;
             current = cursorExec.getLocalName();
             ArrayList<String> command = new ArrayList<String>(0);
-            if (XMLTags.SCRIPT_STATICCOMMAND.matches(cursorExec.getLocalName())) {
+            if (XMLTags.NATIVE_TASK_STATICCOMMAND.matches(cursorExec.getLocalName())) {
                 String attr_ = null;
                 String current_ = null;
                 try {
@@ -1350,7 +1350,7 @@ public class JobFactory_stax extends JobFactory {
                 } catch (Exception e) {
                     throw new JobCreationException(current_, attr_, e);
                 }
-            } else if (XMLTags.SCRIPT_DYNAMICCOMMAND.matches(cursorExec.getLocalName())) {
+            } else if (XMLTags.NATIVE_EXECUTABLE_DYNAMICCOMMAND.matches(cursorExec.getLocalName())) {
                 String attr_ = null;
                 String current_ = null;
                 try {

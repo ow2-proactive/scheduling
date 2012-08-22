@@ -47,34 +47,35 @@ import java.util.Map;
  * @since ProActive Scheduling 2.1
  */
 public enum XMLTags {
-    //Are define only the needed tags. If more are needed, just create them.
-    //JOBS
+    // Are define only the needed tags. If more are needed, just create them.
+    // JOBS
     JOB("job"), TASKFLOW("taskFlow"), JOB_CLASSPATHES("jobClasspath"), JOB_PATH_ELEMENT("pathElement"),
-    //COMMON
+    // COMMON
     COMMON_DESCRIPTION("description"), COMMON_GENERIC_INFORMATION("genericInformation"), COMMON_INFO("info"),
-    //VARIABLES
+    // VARIABLES
     VARIABLES("variables"), VARIABLE("variable"),
-    //TASKS
+    // TASKS
     TASK("task"), JAVA_EXECUTABLE("javaExecutable"), NATIVE_EXECUTABLE("nativeExecutable"), TASK_DEPENDENCES(
-            "depends"), TASK_DEPENDENCES_TASK("task"), TASK_PARAMETER("parameter"),
-    //TOPOLOGY
+            "depends"), TASK_DEPENDENCES_TASK("task"), TASK_PARAMETERS("parameters"), TASK_PARAMETER(
+            "parameter"), NATIVE_TASK_STATICCOMMAND("staticCommand"), NATIVE_EXECUTABLE_DYNAMICCOMMAND(
+            "dynamicCommand"), NATIVE_TASK_ARGUMENTS("arguments"), NATIVE_TASK_ARGUMENT("argument"),
+    // TOPOLOGY
     PARALLEL_ENV("parallel"), TOPOLOGY("topology"), TOPOLOGY_ARBITRARY("arbitrary"), TOPOLOGY_BEST_PROXIMITY(
             "bestProximity"), TOPOLOGY_THRESHOLD_PROXIMITY("thresholdProximity"), TOPOLOGY_SINGLE_HOST(
             "singleHost"), TOPOLOGY_SINGLE_HOST_EXCLUSIVE("singleHostExclusive"), TOPOLOGY_MULTIPLE_HOSTS_EXCLUSIVE(
             "multipleHostsExclusive"), TOPOLOGY_DIFFERENT_HOSTS_EXCLUSIVE("differentHostsExclusive"),
 
-    //SCRIPTS
+    // SCRIPTS
     SCRIPT_SELECTION("selection"), SCRIPT_PRE("pre"), SCRIPT_POST("post"), SCRIPT_CLEANING("cleaning"), SCRIPT_SCRIPT(
-            "script"), SCRIPT_STATICCOMMAND("staticCommand"), SCRIPT_DYNAMICCOMMAND("dynamicCommand"), SCRIPT_ARGUMENTS(
-            "arguments"), SCRIPT_ARGUMENT("argument"), SCRIPT_FILE("file"), SCRIPT_CODE("code"), SCRIPT_GENERATION(
-            "generation"),
-    //FORK ENVIRONMENT
+            "script"), SCRIPT_ARGUMENTS("arguments"), SCRIPT_ARGUMENT("argument"), SCRIPT_FILE("file"), SCRIPT_CODE(
+            "code"), SCRIPT_GENERATION("generation"),
+    // FORK ENVIRONMENT
     FORK_ENVIRONMENT("forkEnvironment"), FORK_SYSTEM_PROPERTIES("SystemEnvironment"), FORK_SYSTEM_PROPERTY(
             "variable"), FORK_JVM_ARGS("jvmArgs"), FORK_JVM_ARG("jvmArg"), FORK_ADDITIONAL_CLASSPATH(
-            "additionalClasspath"), SCRIPT_ENV("envScript"),
+            "additionalClasspath"), FORK_PATH_ELEMENT("pathElement"), SCRIPT_ENV("envScript"),
     // FLOW CONTROL
     FLOW("controlFlow"), FLOW_IF("if"), FLOW_REPLICATE("replicate"), FLOW_LOOP("loop"),
-    //DATASPACES
+    // DATASPACES
     DS_INPUTSPACE("inputSpace"), DS_OUTPUTSPACE("outputSpace"), DS_INPUTFILES("inputFiles"), DS_OUTPUTFILES(
             "outputFiles"), DS_FILES("files");
 
@@ -96,13 +97,14 @@ public enum XMLTags {
     private static Map<String, XMLTags> namesToEnum = null;
 
     /**
-     * Get the XMLTags enum corresponding to the given xml tag name.
-     * This method ignores the case.
-     * Argument cannot be null.
+     * Get the XMLTags enum corresponding to the given xml tag name. This method
+     * ignores the case. Argument cannot be null.
      *
-     * @param xmlName the XML tag name as a string
+     * @param xmlName
+     *            the XML tag name as a string
      * @return the corresponding XML tag.
-     * @throws IllegalArgumentException if the tag name does not exist
+     * @throws IllegalArgumentException
+     *             if the tag name does not exist
      */
     public static XMLTags getFromXMLName(String xmlName) {
         if (xmlName == null) {
@@ -126,7 +128,8 @@ public enum XMLTags {
     /**
      * Return true if the given XML name matches this XMLAttributes
      *
-     * @param xmlName the XML tag name as a String.
+     * @param xmlName
+     *            the XML tag name as a String.
      * @return true only if the given XML name matches this XMLTags
      */
     public boolean matches(String xmlName) {

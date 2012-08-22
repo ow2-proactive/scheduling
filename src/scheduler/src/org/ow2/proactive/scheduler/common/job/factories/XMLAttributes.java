@@ -55,7 +55,8 @@ public enum XMLAttributes {
             "maxNumberOfExecution"), COMMON_NAME("name"), COMMON_VALUE("value"),
     //TASKS
     TASK_RESULTPREVIEW("resultPreviewClass"), TASK_PRECIOUSRESULT("preciousResult"), TASK_PRECIOUSLOGS(
-            "preciousLogs"), TASK_CLASSNAME("class"), TASK_WALLTIME("walltime"), TASK_RUNASME("runAsMe"),
+            "preciousLogs"), TASK_CLASSNAME("class"), TASK_WALLTIME("walltime"), TASK_RUNASME("runAsMe"), TASK_DEPENDS_REF(
+            "ref"),
     //NATIVE TASK ATTRIBUTES
     TASK_NB_NODES("numberOfNodes"), TASK_COMMAND_VALUE("value"), TASK_WORKDING_DIR("workingDir"),
     //TOPOLOGY
@@ -67,7 +68,7 @@ public enum XMLAttributes {
     // FLOW CONTROL
     FLOW_BLOCK("block"), FLOW_TARGET("target"), FLOW_ELSE("else"), FLOW_CONTINUATION("continuation"),
     //DATASPACES
-    DS_INCLUDES("includes"), DS_EXCLUDES("excludes"), DS_ACCESSMODE("accessMode"),
+    DS_INCLUDES("includes"), DS_EXCLUDES("excludes"), DS_ACCESSMODE("accessMode"), DS_URL("url"),
     //NOT USED IN XML FACTORY BUT USED IN XML DESCRIPTION
     PATH("path"), LANGUAGE("language");
 
