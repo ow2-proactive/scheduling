@@ -991,15 +991,6 @@ public abstract class TaskLauncher {
                     return;
                 }
 
-                // flush and close stdout/err
-                try {
-                    this.finalizeLoggers();
-                } catch (RuntimeException e) {
-                    // exception should not be thrown to the scheduler core
-                    // the result has been computed and must be returned !
-                    logger.warn("Loggers are not shutdown !", e);
-                }
-
                 ArrayList<DataSpacesFileObject> results = new ArrayList<DataSpacesFileObject>();
                 FileSystemException toBeThrown = null;
 
@@ -1066,6 +1057,16 @@ public abstract class TaskLauncher {
     }
 
     protected void copyScratchDataToOutput() throws FileSystemException {
+
+        // flushing and closing stdout/err even if it's not dataspace aware task
+        try {
+            this.finalizeLoggers();
+        } catch (RuntimeException e) {
+            // exception should not be thrown to the scheduler core
+            // the result has been computed and must be returned !
+            logger.warn("Loggers are not shutdown !", e);
+        }
+
         if (isDataspaceAware()) {
             if (this.storeLogs) {
                 if (this.outputFiles == null) {
