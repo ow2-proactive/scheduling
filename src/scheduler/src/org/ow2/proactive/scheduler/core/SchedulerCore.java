@@ -2111,6 +2111,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                 case KILLED:
                     break;
                 case PAUSED:
+                    currentlyRunningTasks.put(job.getId(), new Hashtable<TaskId, TaskLauncher>());
                     // restart classserver if needed
                     createTaskClassServer(job);
             }
