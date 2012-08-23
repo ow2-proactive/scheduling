@@ -13,7 +13,6 @@ import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.util.dsclient.ISchedulerEventListenerExtended;
 
 import functionaltests.monitor.EventMonitor;
-import functionaltests.monitor.JobEventMonitor;
 
 
 public class MyEventListener implements ISchedulerEventListenerExtended, Serializable {

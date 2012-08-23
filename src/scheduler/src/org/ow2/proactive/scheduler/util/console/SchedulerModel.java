@@ -50,7 +50,6 @@ import java.util.Map.Entry;
 
 import javax.security.auth.login.LoginException;
 
-import org.apache.commons.cli.Option;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.authentication.crypto.Credentials;

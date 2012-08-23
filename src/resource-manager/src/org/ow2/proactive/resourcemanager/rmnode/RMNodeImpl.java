@@ -41,9 +41,7 @@ import java.io.Serializable;
 import java.security.Permission;
 import java.util.HashMap;
 
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.apache.log4j.Priority;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;

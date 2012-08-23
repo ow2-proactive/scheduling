@@ -36,7 +36,6 @@
  */
 package org.ow2.proactive.utils;
 
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;

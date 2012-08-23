@@ -52,13 +52,10 @@ import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingServiceDe
 import org.objectweb.proactive.extensions.vfsprovider.FileSystemServerDeployer;
 import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
-import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.utils.TargetType;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.scripting.SimpleScript;
-
-import com.sun.msv.reader.trex.ng.NGNameState.NsNameState;
 
 import functionaltests.RMConsecutive;
 import functionaltests.RMTHelper;

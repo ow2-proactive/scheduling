@@ -1,7 +1,5 @@
 package org.ow2.proactive.scheduler.ext.mapreduce;
 
-import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;

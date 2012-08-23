@@ -55,7 +55,6 @@ import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
-import org.ow2.proactive.resourcemanager.core.history.NodeHistory;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;

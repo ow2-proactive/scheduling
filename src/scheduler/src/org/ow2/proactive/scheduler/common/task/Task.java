@@ -56,7 +56,6 @@ import org.ow2.proactive.scheduler.common.task.flow.FlowBlock;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.SelectionScript;
-import org.ow2.proactive.scripting.SimpleScript;
 
 
 /**

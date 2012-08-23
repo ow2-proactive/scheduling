@@ -38,11 +38,8 @@ package functionaltests;
 
 import java.io.File;
 import java.net.URL;
-import java.util.Random;
-
 import org.junit.Assert;
 import org.junit.Test;
-import org.ow2.proactive.scheduler.common.exception.UserException;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;

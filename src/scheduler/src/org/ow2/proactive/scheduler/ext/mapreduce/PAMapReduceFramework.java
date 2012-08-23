@@ -1,6 +1,5 @@
 package org.ow2.proactive.scheduler.ext.mapreduce;
 
-import java.io.File;
 import java.io.IOException;
 
 import org.apache.hadoop.conf.Configuration;

@@ -46,7 +46,6 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
-import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
