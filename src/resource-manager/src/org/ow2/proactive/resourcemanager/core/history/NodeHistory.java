@@ -47,7 +47,6 @@ import javax.persistence.Transient;
 
 import org.apache.log4j.Logger;
 import org.hibernate.annotations.Index;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.db.Condition;
 import org.ow2.proactive.db.ConditionComparator;
 import org.ow2.proactive.resourcemanager.common.NodeState;
@@ -66,7 +65,7 @@ import org.ow2.proactive.resourcemanager.db.DatabaseManager;
 @Table(name = "NodeHistory")
 public class NodeHistory {
 
-    public static final Logger logger = ProActiveLogger.getLogger(NodeHistory.class);
+    public static final Logger logger = Logger.getLogger(NodeHistory.class);
 
     @Id
     @GeneratedValue

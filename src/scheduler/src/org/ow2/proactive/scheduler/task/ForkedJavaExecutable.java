@@ -62,7 +62,6 @@ import org.objectweb.proactive.core.body.future.FutureProxy;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.pamr.PAMRConfig;
 import org.objectweb.proactive.extensions.processbuilder.OSProcessBuilder;
 import org.objectweb.proactive.extensions.processbuilder.exception.NotImplementedException;
@@ -98,7 +97,7 @@ import org.ow2.proactive.utils.FileToBytesConverter;
  */
 public class ForkedJavaExecutable extends JavaExecutable implements ForkerStarterCallback {
 
-    public static final Logger logger = ProActiveLogger.getLogger(ForkedJavaExecutable.class);
+    public static final Logger logger = Logger.getLogger(ForkedJavaExecutable.class);
 
     /** Fork environment script binding name */
     public static final String FORKENV_BINDING_NAME = "forkEnvironment";

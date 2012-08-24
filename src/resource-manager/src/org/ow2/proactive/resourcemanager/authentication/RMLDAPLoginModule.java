@@ -39,7 +39,6 @@ package org.ow2.proactive.resourcemanager.authentication;
 import java.io.File;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.authentication.LDAPLoginModule;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 
@@ -106,6 +105,6 @@ public class RMLDAPLoginModule extends LDAPLoginModule {
      * Returns logger for authentication
      */
     public Logger getLogger() {
-        return ProActiveLogger.getLogger(RMLDAPLoginModule.class);
+        return Logger.getLogger(RMLDAPLoginModule.class);
     }
 }

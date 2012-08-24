@@ -16,7 +16,6 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAEventProgramming;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.authentication.crypto.Credentials;
@@ -34,7 +33,7 @@ import org.ow2.proactive.utils.NodeSet;
 @ActiveObject
 public class RMProxyActiveObject {
 
-    protected static final Logger logger = ProActiveLogger.getLogger(RMProxyActiveObject.class);
+    protected static final Logger logger = Logger.getLogger(RMProxyActiveObject.class);
 
     protected ResourceManager rm;
 

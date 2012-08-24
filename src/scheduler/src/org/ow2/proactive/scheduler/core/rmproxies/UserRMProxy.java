@@ -42,7 +42,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.utils.Criteria;
@@ -51,7 +50,7 @@ import org.ow2.proactive.utils.NodeSet;
 
 public class UserRMProxy {
 
-    private static final Logger logger = ProActiveLogger.getLogger(UserRMProxy.class);
+    private static final Logger logger = Logger.getLogger(UserRMProxy.class);
 
     private final Credentials credentials;
 

@@ -46,7 +46,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.utils.NamedThreadFactory;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
@@ -62,7 +61,7 @@ import org.ow2.proactive.threading.ReifiedMethodCall;
  */
 public class ClientRequestHandler {
 
-    public static final Logger logger = ProActiveLogger.getLogger(ClientRequestHandler.class);
+    public static final Logger logger = Logger.getLogger(ClientRequestHandler.class);
 
     /** Number of threads used by the thread pool for clients events sending */
     private static final int THREAD_NUMBER = PASchedulerProperties.SCHEDULER_LISTENERS_THREADNUMBER

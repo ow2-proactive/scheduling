@@ -50,7 +50,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
@@ -82,7 +81,7 @@ import org.ow2.proactive.resourcemanager.utils.RMNodeStarter.OperatingSystem;
 public abstract class InfrastructureManager implements Serializable {
 
     /** class' logger */
-    protected static final Logger logger = ProActiveLogger.getLogger(InfrastructureManager.class);
+    protected static final Logger logger = Logger.getLogger(InfrastructureManager.class);
 
     /** manager's node source */
     protected NodeSource nodeSource;

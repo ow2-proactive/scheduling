@@ -57,7 +57,6 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.utils.NamedThreadFactory;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.core.RMCore;
@@ -82,7 +81,7 @@ import org.ow2.proactive.utils.appenders.MultipleFileAppender;
  */
 public abstract class SelectionManager {
 
-    private final static Logger logger = ProActiveLogger.getLogger(SelectionManager.class);
+    private final static Logger logger = Logger.getLogger(SelectionManager.class);
 
     private RMCore rmcore;
 

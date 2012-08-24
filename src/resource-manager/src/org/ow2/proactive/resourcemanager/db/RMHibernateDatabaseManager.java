@@ -37,7 +37,6 @@
 package org.ow2.proactive.resourcemanager.db;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.db.HibernateDatabaseManager;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 
@@ -53,7 +52,7 @@ import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProper
  */
 public class RMHibernateDatabaseManager extends HibernateDatabaseManager {
 
-    public static final Logger logger = ProActiveLogger.getLogger(RMHibernateDatabaseManager.class);
+    public static final Logger logger = Logger.getLogger(RMHibernateDatabaseManager.class);
 
     @Override
     public String getConfigFile() {

@@ -38,7 +38,6 @@ package org.ow2.proactive.scheduler.common;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.authentication.Connection;
 import org.ow2.proactive.scheduler.common.exception.ConnectionException;
 
@@ -69,7 +68,7 @@ public class SchedulerConnection extends Connection<SchedulerAuthenticationInter
      * @see org.ow2.proactive.authentication.Loggable#getLogger()
      */
     public Logger getLogger() {
-        return ProActiveLogger.getLogger(SchedulerConnection.class);
+        return Logger.getLogger(SchedulerConnection.class);
     }
 
     /**

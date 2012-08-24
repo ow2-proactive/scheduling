@@ -53,7 +53,6 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.ForkedJavaExecutableContainer;
@@ -76,7 +75,7 @@ import org.ow2.proactive.scheduler.task.launcher.TaskLauncherInitializer;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class InternalForkedJavaTask extends InternalJavaTask {
 
-    public static final Logger logger = ProActiveLogger.getLogger(InternalForkedJavaTask.class);
+    public static final Logger logger = Logger.getLogger(InternalForkedJavaTask.class);
 
     /** Policy content for the forked VM (declared as static element to be cached) */
     @Transient

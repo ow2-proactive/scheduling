@@ -57,7 +57,6 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.remoteobject.AbstractRemoteObjectFactory;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectFactory;
 import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.utils.JVMPropertiesPreloader;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.RMFactory;
@@ -87,7 +86,7 @@ import org.ow2.proactive.utils.Tools;
  */
 public class SchedulerStarter {
     //shows how to run the scheduler
-    private static Logger logger = ProActiveLogger.getLogger(SchedulerStarter.class);
+    private static Logger logger = Logger.getLogger(SchedulerStarter.class);
 
     public static final String defaultPolicy = PASchedulerProperties.SCHEDULER_DEFAULT_POLICY
             .getValueAsString();

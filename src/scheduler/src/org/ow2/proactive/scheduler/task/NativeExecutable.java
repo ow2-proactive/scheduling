@@ -54,7 +54,6 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.processbuilder.OSProcessBuilder;
 import org.objectweb.proactive.extensions.processbuilder.exception.NotImplementedException;
 import org.ow2.proactive.scheduler.common.exception.UserException;
@@ -85,7 +84,7 @@ import org.ow2.proactive.utils.Tools;
  */
 public class NativeExecutable extends Executable {
 
-    public static final Logger logger = ProActiveLogger.getLogger(NativeExecutable.class);
+    public static final Logger logger = Logger.getLogger(NativeExecutable.class);
 
     private static String GENERATION_SCRIPT_ERR = "\nNo command eligible was found by generation script.\n"
         + "A generation script must define a variable named 'command' which contains "

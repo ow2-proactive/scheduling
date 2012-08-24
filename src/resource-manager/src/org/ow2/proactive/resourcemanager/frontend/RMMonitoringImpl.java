@@ -56,7 +56,6 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.request.Request;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.resourcemanager.authentication.Client;
@@ -89,7 +88,7 @@ import org.ow2.proactive.resourcemanager.utils.AtomicRMStatisticsHolder;
  */
 @ActiveObject
 public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActive, RunActive {
-    private static final Logger logger = ProActiveLogger.getLogger(RMMonitoringImpl.class);
+    private static final Logger logger = Logger.getLogger(RMMonitoringImpl.class);
 
     // Attributes
     private RMCore rmcore;

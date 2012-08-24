@@ -40,7 +40,6 @@ import java.io.Serializable;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.resourcemanager.authentication.Client;
@@ -68,7 +67,7 @@ import org.ow2.proactive.resourcemanager.nodesource.utils.NamesConvertor;
 public abstract class NodeSourcePolicy implements Serializable {
 
     /** logger */
-    private static Logger logger = ProActiveLogger.getLogger(NodeSourcePolicy.class);
+    private static Logger logger = Logger.getLogger(NodeSourcePolicy.class);
     /** Node source of the policy */
     protected NodeSource nodeSource;
 

@@ -43,7 +43,6 @@ import javax.management.ObjectName;
 import javax.management.StandardMBean;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.jmx.AbstractJMXHelper;
 import org.ow2.proactive.jmx.RRDDataStore;
 import org.ow2.proactive.scheduler.core.account.SchedulerAccountsManager;
@@ -62,7 +61,7 @@ import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
  * @since ProActive Scheduling 1.0
  */
 public class SchedulerJMXHelper extends AbstractJMXHelper {
-    private static final Logger LOGGER = ProActiveLogger.getLogger(SchedulerJMXHelper.class);
+    private static final Logger LOGGER = Logger.getLogger(SchedulerJMXHelper.class);
 
     public static final String RUNTIMEDATA_MBEAN_NAME = "ProActiveScheduler:name=RuntimeData";
     public static final String MYACCOUNT_MBEAN_NAME = "ProActiveScheduler:name=MyAccount";
@@ -125,7 +124,7 @@ public class SchedulerJMXHelper extends AbstractJMXHelper {
             }
 
             setDataStore(new RRDDataStore((StandardMBean) schedulerRuntimeMBean, dataBasePath,
-                PASchedulerProperties.SCHEDULER_RRD_STEP.getValueAsInt(), ProActiveLogger
+                PASchedulerProperties.SCHEDULER_RRD_STEP.getValueAsInt(), Logger
                         .getLogger(SchedulerJMXHelper.class)));
 
         } catch (Exception e) {

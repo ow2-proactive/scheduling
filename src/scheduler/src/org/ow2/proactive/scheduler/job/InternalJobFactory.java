@@ -45,7 +45,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.exception.InternalException;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
@@ -78,7 +77,7 @@ import org.ow2.proactive.scheduler.task.internal.InternalTask;
  */
 public class InternalJobFactory {
 
-    public static final Logger logger = ProActiveLogger.getLogger(InternalJobFactory.class);
+    public static final Logger logger = Logger.getLogger(InternalJobFactory.class);
 
     /**
      * Create a new internal job with the given job (user).

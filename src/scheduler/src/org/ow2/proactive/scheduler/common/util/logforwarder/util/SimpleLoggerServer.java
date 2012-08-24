@@ -47,11 +47,10 @@ import java.util.Vector;
 import org.apache.log4j.Appender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 public class SimpleLoggerServer implements Runnable {
-    public static final Logger logger = ProActiveLogger.getLogger(SimpleLoggerServer.class);
+    public static final Logger logger = Logger.getLogger(SimpleLoggerServer.class);
 
     // socket port
     private int port;

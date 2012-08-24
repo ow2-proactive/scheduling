@@ -54,7 +54,6 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.Parser;
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.authentication.AuthenticationImpl;
 import org.ow2.proactive.authentication.Connection;
 import org.ow2.proactive.utils.FileToBytesConverter;
@@ -228,7 +227,7 @@ public class CreateCredentials {
                 Connection<AuthenticationImpl> conn = new Connection<AuthenticationImpl>(
                         AuthenticationImpl.class) {
                     public Logger getLogger() {
-                        return ProActiveLogger.getLogger("pa.scheduler.credentials");
+                        return Logger.getLogger("pa.scheduler.credentials");
                     }
                 };
                 AuthenticationImpl auth = conn.connect(url);

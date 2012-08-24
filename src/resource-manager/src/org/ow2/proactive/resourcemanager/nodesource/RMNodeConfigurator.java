@@ -45,7 +45,6 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
 import org.ow2.proactive.resourcemanager.core.RMCore;
@@ -60,7 +59,7 @@ import org.ow2.proactive.resourcemanager.utils.RMNodeStarter;
 @ActiveObject
 public class RMNodeConfigurator implements RunActive {
     /** class' logger */
-    private static final Logger logger = ProActiveLogger.getLogger(RMNodeConfigurator.class);
+    private static final Logger logger = Logger.getLogger(RMNodeConfigurator.class);
     /** rmcore reference to be able to add the node to the core after the configuration went well */
     private RMCore rmcore;
 

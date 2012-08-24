@@ -63,7 +63,6 @@ import org.apache.commons.cli.Parser;
 import org.apache.commons.cli.UnrecognizedOptionException;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.utils.JVMPropertiesPreloader;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
@@ -92,7 +91,7 @@ public class ResourceManagerController {
 
     protected static final String control = "<ctl> ";
     protected static final String newline = System.getProperty("line.separator");
-    protected static Logger logger = ProActiveLogger.getLogger(ResourceManagerController.class);
+    protected static Logger logger = Logger.getLogger(ResourceManagerController.class);
     protected static ResourceManagerController shell;
 
     private String commandName = "rm-client";

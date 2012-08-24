@@ -56,7 +56,6 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.job.JobEnvironment;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
@@ -98,7 +97,7 @@ import org.w3c.dom.Text;
  */
 public class Job2XMLTransformer {
 
-    public static Logger logger = ProActiveLogger.getLogger(Job2XMLTransformer.class);
+    public static Logger logger = Logger.getLogger(Job2XMLTransformer.class);
     public static final String XSD_LOCATION = "urn:proactive:jobdescriptor:dev ../../src/scheduler/src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.xsd";
 
     public Job2XMLTransformer() {

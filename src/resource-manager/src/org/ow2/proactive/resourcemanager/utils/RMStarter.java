@@ -46,7 +46,6 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.Parser;
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.utils.JVMPropertiesPreloader;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.RMFactory;
@@ -69,7 +68,7 @@ public class RMStarter {
     /**
      * Log4j logger name.
      */
-    private static Logger logger = ProActiveLogger.getLogger(RMStarter.class);
+    private static Logger logger = Logger.getLogger(RMStarter.class);
 
     private static Options options = new Options();
 

@@ -51,7 +51,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.xml.bind.annotation.XmlTransient;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobType;
 import org.ow2.proactive.scheduler.common.task.Task;
@@ -74,7 +73,7 @@ import org.ow2.proactive.scheduler.task.internal.InternalTask;
  */
 public class JobDescriptorImpl implements JobDescriptor {
 
-    public static final Logger logger = ProActiveLogger.getLogger(JobDescriptorImpl.class);
+    public static final Logger logger = Logger.getLogger(JobDescriptorImpl.class);
 
     private InternalJob internalJob;
 

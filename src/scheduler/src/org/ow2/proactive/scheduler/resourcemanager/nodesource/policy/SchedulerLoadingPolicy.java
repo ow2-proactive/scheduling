@@ -46,7 +46,6 @@ import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.body.exceptions.BodyTerminatedRequestException;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.resourcemanager.authentication.Client;
@@ -72,7 +71,7 @@ import org.ow2.proactive.scheduler.common.task.TaskStatus;
 public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements InitActive, RunActive,
         RMEventListener {
 
-    protected static Logger logger = ProActiveLogger.getLogger(SchedulerLoadingPolicy.class);
+    protected static Logger logger = Logger.getLogger(SchedulerLoadingPolicy.class);
 
     private Map<JobId, Integer> activeTasks;
     private int activeTask = 0;

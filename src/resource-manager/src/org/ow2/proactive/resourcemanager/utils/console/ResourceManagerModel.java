@@ -54,7 +54,7 @@ import java.util.Map.Entry;
 import javax.security.auth.login.LoginException;
 
 import org.objectweb.proactive.core.ProActiveRuntimeException;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
@@ -119,7 +119,7 @@ public class ResourceManagerModel extends ConsoleModel {
     }
 
     protected ResourceManagerModel(boolean allowExitCommand) {
-        super(ProActiveLogger.getLogger(ResourceManagerModel.class));
+        super(Logger.getLogger(ResourceManagerModel.class));
         this.allowExitCommand = allowExitCommand;
         commands.add(new Command("addnode(nodeURL, nsName)",
             "Add node to the given node source (parameters is a string representing the node URL to add &"

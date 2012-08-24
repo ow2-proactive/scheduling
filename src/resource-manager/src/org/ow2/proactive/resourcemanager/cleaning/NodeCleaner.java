@@ -39,7 +39,6 @@ package org.ow2.proactive.resourcemanager.cleaning;
 import java.util.concurrent.Callable;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 
 
@@ -49,7 +48,7 @@ import org.ow2.proactive.resourcemanager.rmnode.RMNode;
  */
 public class NodeCleaner implements Callable<Boolean> {
 
-    private final static Logger logger = ProActiveLogger.getLogger(NodeCleaner.class);
+    private final static Logger logger = Logger.getLogger(NodeCleaner.class);
     private RMNode rmnode;
 
     /**

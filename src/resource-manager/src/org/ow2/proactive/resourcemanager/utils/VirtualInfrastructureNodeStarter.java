@@ -43,7 +43,6 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.VirtualInfrastructure;
 
 
@@ -62,7 +61,7 @@ public final class VirtualInfrastructureNodeStarter {
     public static final int message_length = 1000;
 
     /** PALogger */
-    private static Logger logger = ProActiveLogger.getLogger(VirtualInfrastructureNodeStarter.class);
+    private static Logger logger = Logger.getLogger(VirtualInfrastructureNodeStarter.class);
 
     /**
      * Creates a new instance of this class and calls registersInRm method. The

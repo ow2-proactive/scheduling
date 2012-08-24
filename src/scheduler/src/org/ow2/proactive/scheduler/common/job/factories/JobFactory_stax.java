@@ -63,7 +63,6 @@ import org.iso_relax.verifier.Schema;
 import org.iso_relax.verifier.Verifier;
 import org.iso_relax.verifier.VerifierConfigurationException;
 import org.iso_relax.verifier.VerifierFactory;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -107,7 +106,7 @@ import org.xml.sax.SAXParseException;
  */
 public class JobFactory_stax extends JobFactory {
 
-    public static Logger logger = ProActiveLogger.getLogger(JobFactory_stax.class);
+    public static Logger logger = Logger.getLogger(JobFactory_stax.class);
     /** Location of the schema used to parse job descriptor. */
     public static final String SCHEMA_LOCATION = "/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.rng";
     /** Variables styleScheet location. */

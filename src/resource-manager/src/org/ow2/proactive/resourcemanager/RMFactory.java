@@ -48,7 +48,6 @@ import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.core.RMCore;
@@ -76,7 +75,7 @@ import org.ow2.proactive.utils.appenders.MultipleFileAppender;
 public class RMFactory {
 
     /** Logger of the RMFactory */
-    private static final Logger logger = ProActiveLogger.getLogger(RMFactory.class);
+    private static final Logger logger = Logger.getLogger(RMFactory.class);
 
     /** RMCore interface of the created Resource manager */
     private static RMCore rmcore = null;

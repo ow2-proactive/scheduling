@@ -46,7 +46,6 @@ import javax.persistence.Table;
 
 import org.apache.log4j.Logger;
 import org.hibernate.annotations.Index;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.db.Condition;
 import org.ow2.proactive.db.ConditionComparator;
 import org.ow2.proactive.resourcemanager.authentication.Client;
@@ -62,7 +61,7 @@ import org.ow2.proactive.resourcemanager.db.DatabaseManager;
 @Table(name = "UserHistory")
 public class UserHistory {
 
-    public static final Logger logger = ProActiveLogger.getLogger(UserHistory.class);
+    public static final Logger logger = Logger.getLogger(UserHistory.class);
 
     @Id
     @GeneratedValue

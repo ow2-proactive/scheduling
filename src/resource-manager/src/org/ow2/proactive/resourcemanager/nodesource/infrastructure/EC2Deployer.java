@@ -46,8 +46,6 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
-
 import com.xerox.amazonws.ec2.EC2Exception;
 import com.xerox.amazonws.ec2.ImageDescription;
 import com.xerox.amazonws.ec2.InstanceType;
@@ -70,7 +68,7 @@ import com.xerox.amazonws.ec2.ReservationDescription.Instance;
 public class EC2Deployer implements java.io.Serializable {
 
     /** logger */
-    protected static Logger logger = ProActiveLogger.getLogger(EC2Deployer.class);
+    protected static Logger logger = Logger.getLogger(EC2Deployer.class);
 
     /** Access Key */
     private String AWS_AKEY;

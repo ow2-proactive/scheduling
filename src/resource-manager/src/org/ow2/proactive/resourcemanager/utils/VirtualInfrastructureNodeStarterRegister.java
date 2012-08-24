@@ -42,7 +42,6 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
@@ -71,7 +70,7 @@ public final class VirtualInfrastructureNodeStarterRegister {
     private static final int RM_WAIT_ON_JOIN_TIMEOUT_IN_MS = 60000;
 
     /**	PALogger */
-    private static Logger logger = ProActiveLogger.getLogger(VirtualInfrastructureNodeStarterRegister.class);
+    private static Logger logger = Logger.getLogger(VirtualInfrastructureNodeStarterRegister.class);
 
     /**
      * Creates a new instance of this class and calls registersInRm method. The

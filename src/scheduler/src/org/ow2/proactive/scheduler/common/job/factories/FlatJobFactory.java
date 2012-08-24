@@ -44,7 +44,6 @@ import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
@@ -83,7 +82,7 @@ public class FlatJobFactory {
     /**
      * Log4j logger name
      */
-    public static Logger logger = ProActiveLogger.getLogger(FlatJobFactory.class);
+    public static Logger logger = Logger.getLogger(FlatJobFactory.class);
 
     /**
      * comment character used to ignore line in text file containing

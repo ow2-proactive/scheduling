@@ -40,7 +40,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 import org.ow2.proactive.resourcemanager.selection.SelectionPolicy;
@@ -53,7 +52,7 @@ import org.ow2.proactive.resourcemanager.selection.SelectionPolicy;
  */
 public class ShufflePolicy implements SelectionPolicy {
 
-    private final static Logger logger = ProActiveLogger.getLogger(ShufflePolicy.class);
+    private final static Logger logger = Logger.getLogger(ShufflePolicy.class);
 
     /**
      * Do shuffling here.

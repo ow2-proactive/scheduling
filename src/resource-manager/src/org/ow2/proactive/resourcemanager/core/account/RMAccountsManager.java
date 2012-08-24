@@ -41,7 +41,7 @@ import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Table;
 
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.apache.log4j.Logger;
 import org.ow2.proactive.account.AbstractAccountsManager;
 import org.ow2.proactive.resourcemanager.core.history.NodeHistory;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
@@ -63,7 +63,7 @@ public final class RMAccountsManager extends AbstractAccountsManager<RMAccount> 
      * Create a new instance of this class.
      */
     public RMAccountsManager() {
-        super("Resource Manager Accounts Refresher", ProActiveLogger.getLogger(RMAccountsManager.class));
+        super("Resource Manager Accounts Refresher", Logger.getLogger(RMAccountsManager.class));
         // Get the database manager
         this.dbmanager = DatabaseManager.getInstance();
     }

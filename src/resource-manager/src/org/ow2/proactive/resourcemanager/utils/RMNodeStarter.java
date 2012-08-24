@@ -73,7 +73,6 @@ import org.objectweb.proactive.core.config.xml.ProActiveConfigurationParser;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.utils.JVMPropertiesPreloader;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.jmx.PermissionChecker;
@@ -107,7 +106,7 @@ public class RMNodeStarter {
     protected Node node;
 
     /** Class' logger */
-    protected static final Logger logger = ProActiveLogger.getLogger(RMNodeStarter.class);
+    protected static final Logger logger = Logger.getLogger(RMNodeStarter.class);
 
     /** The default name of the node */
     protected static final String PAAGENT_DEFAULT_NODE_NAME = "PA-AGENT_NODE";

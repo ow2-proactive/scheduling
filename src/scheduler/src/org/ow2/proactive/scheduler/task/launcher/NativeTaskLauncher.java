@@ -43,7 +43,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.objectweb.proactive.extensions.dataspaces.exceptions.DataSpacesException;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
@@ -65,7 +64,7 @@ import org.ow2.proactive.scheduler.task.TaskResultImpl;
 @ActiveObject
 public class NativeTaskLauncher extends TaskLauncher {
 
-    public static final Logger logger = ProActiveLogger.getLogger(NativeTaskLauncher.class);
+    public static final Logger logger = Logger.getLogger(NativeTaskLauncher.class);
 
     private static final String DATASPACE_TAG = "$LOCALSPACE";
 

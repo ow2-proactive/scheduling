@@ -45,7 +45,6 @@ import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.ext.filessplitmerge.exceptions.ExceptionToStringHelper;
 
 
@@ -227,7 +226,7 @@ public class LoggerManager implements GenericLogger {
         }
 
         if (epfLogger == null) {
-            epfLogger = ProActiveLogger.getLogger(EPF_LOGGERR_NAME);
+            epfLogger = Logger.getLogger(EPF_LOGGERR_NAME);
 
         }
         return epfLogger;

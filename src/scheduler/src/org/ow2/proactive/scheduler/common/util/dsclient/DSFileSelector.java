@@ -8,7 +8,6 @@ import org.apache.commons.vfs.FileSelectInfo;
 import org.apache.commons.vfs.FileSelector;
 import org.apache.log4j.Logger;
 
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.dataspaces.vfs.selector.fast.FastFileSelector;
 import org.objectweb.proactive.extensions.dataspaces.vfs.selector.fast.SelectorUtils;
 
@@ -27,7 +26,7 @@ import org.objectweb.proactive.extensions.dataspaces.vfs.selector.fast.SelectorU
  */
 public class DSFileSelector implements FileSelector {
 
-    public static final Logger logger_util = ProActiveLogger.getLogger(DSFileSelector.class);
+    public static final Logger logger_util = Logger.getLogger(DSFileSelector.class);
 
     Set<String> includes = new HashSet<String>();
     Set<String> excludes = new HashSet<String>();

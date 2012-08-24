@@ -43,7 +43,7 @@ import java.util.Collection;
 import java.util.Properties;
 
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.RMException;
@@ -136,7 +136,7 @@ public class NodeSourcePolicyFactory {
                 Class<?> cls = Class.forName(className.toString());
                 supportedPolicies.add(cls);
             } catch (ClassNotFoundException e) {
-                ProActiveLogger.getLogger(NodeSourcePolicyFactory.class).warn(
+                Logger.getLogger(NodeSourcePolicyFactory.class).warn(
                         "Cannot find class " + className.toString());
             }
         }

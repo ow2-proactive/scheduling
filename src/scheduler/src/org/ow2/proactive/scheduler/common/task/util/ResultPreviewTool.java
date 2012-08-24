@@ -52,7 +52,6 @@ import javax.swing.border.EtchedBorder;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 
 
@@ -64,7 +63,7 @@ import org.ow2.proactive.scheduler.common.SchedulerConstants;
 @PublicAPI
 public class ResultPreviewTool {
 
-    public static Logger logger = ProActiveLogger.getLogger(ResultPreviewTool.class);
+    public static Logger logger = Logger.getLogger(ResultPreviewTool.class);
 
     /**
      * Name of the environment variable for windows home directory

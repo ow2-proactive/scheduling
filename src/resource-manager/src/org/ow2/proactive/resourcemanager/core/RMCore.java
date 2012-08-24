@@ -68,7 +68,6 @@ import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
@@ -170,7 +169,7 @@ import org.ow2.proactive.utils.NodeSet;
 public class RMCore implements ResourceManager, InitActive, RunActive {
 
     /** Log4J logger name for RMCore */
-    private final static Logger logger = ProActiveLogger.getLogger(RMCore.class);
+    private final static Logger logger = Logger.getLogger(RMCore.class);
 
     /** If RMCore Active object */
     private String id;

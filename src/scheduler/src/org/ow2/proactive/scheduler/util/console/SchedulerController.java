@@ -60,7 +60,6 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.Parser;
 import org.apache.commons.cli.UnrecognizedOptionException;
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.utils.JVMPropertiesPreloader;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
@@ -93,7 +92,7 @@ public class SchedulerController {
 
     protected static final String control = "<ctl> ";
     protected static final String newline = System.getProperty("line.separator");
-    protected static Logger logger = ProActiveLogger.getLogger(SchedulerController.class);
+    protected static Logger logger = Logger.getLogger(SchedulerController.class);
     protected static SchedulerController shell;
 
     protected CommandLine cmd = null;

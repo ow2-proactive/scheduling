@@ -43,7 +43,6 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
 import org.objectweb.proactive.extensions.dataspaces.api.FileSelector;
 import org.objectweb.proactive.extensions.dataspaces.api.PADataSpaces;
@@ -58,7 +57,7 @@ import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
 public class JobDataSpaceApplication implements Serializable {
 
-    public static final Logger logger = ProActiveLogger.getLogger(JobDataSpaceApplication.class);
+    public static final Logger logger = Logger.getLogger(JobDataSpaceApplication.class);
 
     private long applicationId;
     private String namingServiceURL;

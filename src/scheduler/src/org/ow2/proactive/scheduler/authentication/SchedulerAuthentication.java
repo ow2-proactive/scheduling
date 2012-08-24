@@ -42,7 +42,6 @@ import javax.security.auth.login.LoginException;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.authentication.AuthenticationImpl;
 import org.ow2.proactive.authentication.crypto.Credentials;
@@ -72,7 +71,7 @@ import org.ow2.proactive.utils.Tools;
 public class SchedulerAuthentication extends AuthenticationImpl implements SchedulerAuthenticationInterface {
 
     /** Scheduler logger */
-    public static final Logger logger = ProActiveLogger.getLogger(SchedulerAuthentication.class);
+    public static final Logger logger = Logger.getLogger(SchedulerAuthentication.class);
 
     /** The scheduler front-end connected to this authentication interface */
     private SchedulerFrontend frontend;
@@ -133,7 +132,7 @@ public class SchedulerAuthentication extends AuthenticationImpl implements Sched
      * @see org.ow2.proactive.authentication.Loggable#getLogger()
      */
     public Logger getLogger() {
-        return ProActiveLogger.getLogger(SchedulerAuthentication.class);
+        return Logger.getLogger(SchedulerAuthentication.class);
     }
 
     /**

@@ -40,7 +40,6 @@ import java.io.Serializable;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extensions.dataspaces.core.BaseScratchSpaceConfiguration;
 import org.objectweb.proactive.extensions.dataspaces.core.DataSpacesNodes;
@@ -54,7 +53,7 @@ import org.objectweb.proactive.extensions.dataspaces.core.DataSpacesNodes;
  */
 public class DataSpaceNodeConfigurationAgent implements Serializable {
 
-    private static Logger logger = ProActiveLogger.getLogger(DataSpaceNodeConfigurationAgent.class);
+    private static Logger logger = Logger.getLogger(DataSpaceNodeConfigurationAgent.class);
 
     /** 
      * This property is used by scheduling when configuring node and must be renamed carefully.

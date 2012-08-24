@@ -47,7 +47,6 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
@@ -88,7 +87,7 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     protected Scheduler uischeduler;
     protected MBeanInfoViewer mbeaninfoviewer;
 
-    public static final Logger logger = ProActiveLogger.getLogger(SchedulerProxyUserInterface.class);
+    public static final Logger logger = Logger.getLogger(SchedulerProxyUserInterface.class);
 
     /*
      * a reference to a stub on this active object

@@ -45,7 +45,6 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.authentication.principals.UserNamePrincipal;
 import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
 import org.ow2.proactive.permissions.PrincipalPermission;
@@ -83,7 +82,7 @@ import org.ow2.proactive.scripting.SelectionScript;
  */
 public class RMNodeImpl implements RMNode, Serializable {
 
-    private final static Logger logger = ProActiveLogger.getLogger(RMNodeImpl.class);
+    private final static Logger logger = Logger.getLogger(RMNodeImpl.class);
 
     /** HashMap associates a selection Script to its result on the node */
     private HashMap<SelectionScript, Integer> scriptStatus;

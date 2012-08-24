@@ -40,7 +40,6 @@ import java.net.URI;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.job.Job;
 
@@ -57,7 +56,7 @@ import org.ow2.proactive.scheduler.common.job.Job;
 @PublicAPI
 public abstract class JobFactory {
 
-    public static Logger logger = ProActiveLogger.getLogger(JobFactory.class);
+    public static Logger logger = Logger.getLogger(JobFactory.class);
 
     /** Temp dir to store temporary archive content */
     public static final String JOBFACTORY_TMPDIR_PROPERTY = "pas.jobfactory.tmpdir";

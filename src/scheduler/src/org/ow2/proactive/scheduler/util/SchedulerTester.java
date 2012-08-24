@@ -50,7 +50,6 @@ import java.util.StringTokenizer;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.Scheduler;
@@ -74,7 +73,7 @@ public class SchedulerTester {
     /** directory containing jobs to be submitted */
     public static String JOBS_HOME;
     /** Scheduler loggers. */
-    public static Logger logger = ProActiveLogger.getLogger(SchedulerTester.class);
+    public static Logger logger = Logger.getLogger(SchedulerTester.class);
 
     // scheduler connection
     private static final String DEFAULT_URL = "//localhost/";

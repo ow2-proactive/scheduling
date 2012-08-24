@@ -47,7 +47,6 @@ import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.body.request.Request;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.core.RMCore;
@@ -60,7 +59,7 @@ import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProper
 @ActiveObject
 public class ClientPinger implements InitActive, RunActive {
 
-    private static final Logger logger = ProActiveLogger.getLogger(ClientPinger.class);
+    private static final Logger logger = Logger.getLogger(ClientPinger.class);
 
     private AtomicBoolean active = new AtomicBoolean(true);
     private RMCore rmcore;

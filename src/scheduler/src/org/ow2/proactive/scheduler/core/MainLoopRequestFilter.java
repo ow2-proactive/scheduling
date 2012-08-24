@@ -42,7 +42,6 @@ import java.util.ArrayList;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestFilter;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.core.annotation.RunActivityFiltered;
 
 
@@ -55,7 +54,7 @@ import org.ow2.proactive.scheduler.core.annotation.RunActivityFiltered;
  * @since ProActive Scheduling 0.9
  */
 public class MainLoopRequestFilter implements RequestFilter {
-    public static final Logger logger = ProActiveLogger.getLogger(MainLoopRequestFilter.class);
+    public static final Logger logger = Logger.getLogger(MainLoopRequestFilter.class);
     private ArrayList<String> methodNames = new ArrayList<String>();
 
     /**

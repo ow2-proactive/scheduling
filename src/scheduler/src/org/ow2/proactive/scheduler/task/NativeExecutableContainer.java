@@ -46,7 +46,6 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.exception.ExecutableCreationException;
 import org.ow2.proactive.scheduler.common.task.executable.Executable;
 import org.ow2.proactive.scripting.GenerationScript;
@@ -60,7 +59,7 @@ import org.ow2.proactive.scripting.InvalidScriptException;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class NativeExecutableContainer extends ExecutableContainer {
 
-    public static final Logger logger = ProActiveLogger.getLogger(NativeExecutableContainer.class);
+    public static final Logger logger = Logger.getLogger(NativeExecutableContainer.class);
 
     // actual executable data
     private String[] command;

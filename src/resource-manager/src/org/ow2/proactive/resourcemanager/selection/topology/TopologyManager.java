@@ -51,7 +51,6 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.topology.Topology;
 import org.ow2.proactive.resourcemanager.frontend.topology.TopologyDisabledException;
@@ -78,7 +77,7 @@ import org.ow2.proactive.utils.NodeSet;
 public class TopologyManager {
 
     // logger
-    private final static Logger logger = ProActiveLogger.getLogger(TopologyManager.class);
+    private final static Logger logger = Logger.getLogger(TopologyManager.class);
 
     // hosts distances
     private TopologyImpl topology = new TopologyImpl();

@@ -50,7 +50,6 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.ImmediateService;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.mop.StubObject;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.objectweb.proactive.extensions.dataspaces.core.BaseScratchSpaceConfiguration;
 import org.objectweb.proactive.extensions.dataspaces.core.DataSpacesNodes;
@@ -73,7 +72,7 @@ import org.ow2.proactive.scheduler.task.TaskResultImpl;
 @ActiveObject
 public class JavaTaskLauncher extends TaskLauncher {
 
-    public static final Logger logger = ProActiveLogger.getLogger(JavaTaskLauncher.class);
+    public static final Logger logger = Logger.getLogger(JavaTaskLauncher.class);
 
     /**
      * ProActive Empty Constructor

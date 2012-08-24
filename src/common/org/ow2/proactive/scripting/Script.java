@@ -56,7 +56,6 @@ import javax.script.ScriptEngineManager;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.utils.BoundedStringWriter;
 
 
@@ -76,7 +75,7 @@ public abstract class Script<E> implements Serializable {
     public static final int DEFAULT_OUTPUT_MAX_SIZE = 125;
 
     /** Loggers */
-    public static final Logger logger = ProActiveLogger.getLogger(Script.class);
+    public static final Logger logger = Logger.getLogger(Script.class);
 
     /** Variable name for script arguments */
     public static final String ARGUMENTS_NAME = "args";

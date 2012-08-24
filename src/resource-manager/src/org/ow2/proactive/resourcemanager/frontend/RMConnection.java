@@ -38,7 +38,6 @@ package org.ow2.proactive.resourcemanager.frontend;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.authentication.Connection;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
@@ -63,7 +62,7 @@ public class RMConnection extends Connection<RMAuthentication> {
     }
 
     public Logger getLogger() {
-        return ProActiveLogger.getLogger(RMConnection.class);
+        return Logger.getLogger(RMConnection.class);
     }
 
     public static synchronized RMConnection getInstance() {

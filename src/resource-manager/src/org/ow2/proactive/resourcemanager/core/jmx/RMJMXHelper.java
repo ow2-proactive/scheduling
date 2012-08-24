@@ -41,7 +41,6 @@ import javax.management.ObjectName;
 import javax.management.StandardMBean;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.jmx.AbstractJMXHelper;
 import org.ow2.proactive.jmx.RRDDataStore;
 import org.ow2.proactive.resourcemanager.core.account.RMAccountsManager;
@@ -63,7 +62,7 @@ import org.ow2.proactive.resourcemanager.frontend.RMMonitoringImpl;
  */
 public final class RMJMXHelper extends AbstractJMXHelper {
 
-    private static final Logger LOGGER = ProActiveLogger.getLogger(RMJMXHelper.class);
+    private static final Logger LOGGER = Logger.getLogger(RMJMXHelper.class);
 
     /** The name of the Resource Manager bean */
     public static final String RUNTIMEDATA_MBEAN_NAME = "ProActiveResourceManager:name=RuntimeData";
@@ -116,7 +115,7 @@ public final class RMJMXHelper extends AbstractJMXHelper {
                 PAResourceManagerProperties.RM_RRD_DATABASE_NAME.getValueAsString();
 
             setDataStore(new RRDDataStore((StandardMBean) anonymMBean, dataBaseName,
-                PAResourceManagerProperties.RM_RRD_STEP.getValueAsInt(), ProActiveLogger
+                PAResourceManagerProperties.RM_RRD_STEP.getValueAsInt(), Logger
                         .getLogger(RMJMXHelper.class)));
         } catch (Exception e) {
             LOGGER.error("Unable to register the ResourceManagerRuntimeMBean", e);

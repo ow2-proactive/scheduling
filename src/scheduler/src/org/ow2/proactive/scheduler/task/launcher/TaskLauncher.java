@@ -66,7 +66,6 @@ import org.objectweb.proactive.annotation.ImmediateService;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.ProActiveInet;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
 import org.objectweb.proactive.extensions.dataspaces.api.PADataSpaces;
 import org.objectweb.proactive.extensions.dataspaces.core.DataSpacesNodes;
@@ -120,7 +119,7 @@ import org.ow2.proactive.utils.Formatter;
  */
 public abstract class TaskLauncher {
 
-    public static final Logger logger = ProActiveLogger.getLogger(TaskLauncher.class);
+    public static final Logger logger = Logger.getLogger(TaskLauncher.class);
 
     //Scratch dir property : we cannot take the key property from DataSpaceNodeConfigurationAgent class in RM.
     //we should not depend from RM package in this class.

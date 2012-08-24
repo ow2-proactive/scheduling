@@ -43,7 +43,6 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.ImmediateService;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.exception.ForkedJavaTaskException;
@@ -71,7 +70,7 @@ import org.ow2.proactive.scheduler.task.TaskResultImpl;
 @ActiveObject
 public class ForkedJavaTaskLauncher extends JavaTaskLauncher implements ForkerStarterCallback {
 
-    public static final Logger logger = ProActiveLogger.getLogger(ForkedJavaTaskLauncher.class);
+    public static final Logger logger = Logger.getLogger(ForkedJavaTaskLauncher.class);
 
     private TaskLauncherInitializer initializer;
 

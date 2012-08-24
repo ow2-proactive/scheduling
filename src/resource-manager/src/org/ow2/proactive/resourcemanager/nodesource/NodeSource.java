@@ -56,7 +56,6 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
@@ -97,7 +96,7 @@ import org.ow2.proactive.resourcemanager.rmnode.RMNodeImpl;
 @ActiveObject
 public class NodeSource implements InitActive, RunActive {
 
-    private static Logger logger = ProActiveLogger.getLogger(NodeSource.class);
+    private static Logger logger = Logger.getLogger(NodeSource.class);
     private int pingFrequency = PAResourceManagerProperties.RM_NODE_SOURCE_PING_FREQUENCY.getValueAsInt();
 
     /** Default name */

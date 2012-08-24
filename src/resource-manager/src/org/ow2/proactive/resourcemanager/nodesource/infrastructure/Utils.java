@@ -48,7 +48,6 @@ import java.net.InetAddress;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.ssh.SSHClient;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 
@@ -57,7 +56,7 @@ import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProper
  * A class where static utility methods are welcome
  */
 public class Utils {
-    private static final Logger logger = ProActiveLogger.getLogger(Utils.class);
+    private static final Logger logger = Logger.getLogger(Utils.class);
 
     /**
      * Execute a specific command on a remote host through SSH

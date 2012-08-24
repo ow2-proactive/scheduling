@@ -54,7 +54,6 @@ import javax.xml.bind.annotation.XmlTransient;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.converter.ByteToObjectConverter;
 import org.objectweb.proactive.core.util.converter.ObjectToByteConverter;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.db.annotation.Unloadable;
 import org.ow2.proactive.db.types.BigString;
 import org.ow2.proactive.scheduler.common.exception.InternalSchedulerException;
@@ -79,7 +78,7 @@ import org.ow2.proactive.utils.Formatter;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 public class TaskResultImpl implements TaskResult {
-    public static final Logger logger = ProActiveLogger.getLogger(TaskResultImpl.class);
+    public static final Logger logger = Logger.getLogger(TaskResultImpl.class);
 
     /** The task identification of the result */
     private TaskId id = null;

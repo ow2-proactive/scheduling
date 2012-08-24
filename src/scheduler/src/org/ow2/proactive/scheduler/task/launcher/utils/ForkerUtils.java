@@ -40,7 +40,6 @@ import java.security.KeyException;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.processbuilder.OSUser;
 import org.objectweb.proactive.extensions.processbuilder.PAOSProcessBuilderFactory;
 import org.ow2.proactive.authentication.crypto.CredData;
@@ -56,7 +55,7 @@ import org.ow2.proactive.scheduler.task.launcher.TaskLauncher.OneShotDecrypter;
  */
 public final class ForkerUtils {
 
-    private static final Logger logger = ProActiveLogger.getLogger(ForkerUtils.class);
+    private static final Logger logger = Logger.getLogger(ForkerUtils.class);
 
     /** System property Key of the fork method */
     private static final String FORK_METHOD_KEY = "pas.launcher.forkas.method";

@@ -42,7 +42,6 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.resourcemanager.authentication.Client;
@@ -61,7 +60,7 @@ import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
  */
 @ActiveObject
 public class CronPolicy extends NodeSourcePolicy implements InitActive {
-    protected static Logger logger = ProActiveLogger.getLogger(CronPolicy.class);
+    protected static Logger logger = Logger.getLogger(CronPolicy.class);
 
     /**
      * Initial time for nodes acquisition

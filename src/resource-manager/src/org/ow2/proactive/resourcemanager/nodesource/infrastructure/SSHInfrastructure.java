@@ -46,7 +46,6 @@ import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.ssh.SSHClient;
 import org.objectweb.proactive.core.util.ProActiveCounter;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.RMException;
@@ -81,7 +80,7 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
     /**
      * class' logger
      */
-    private static final Logger logger = ProActiveLogger.getLogger(SSHInfrastructure.class);
+    private static final Logger logger = Logger.getLogger(SSHInfrastructure.class);
 
     /**
      * ShhClient options (@see {@link SSHClient})

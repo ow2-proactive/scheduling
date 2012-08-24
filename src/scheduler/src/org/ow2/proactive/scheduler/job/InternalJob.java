@@ -53,7 +53,6 @@ import java.util.TreeMap;
 import javax.xml.bind.annotation.XmlTransient;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.db.annotation.Alterable;
@@ -96,7 +95,7 @@ import org.ow2.proactive.scheduler.task.internal.InternalTask;
  * @since ProActive Scheduling 0.9
  */
 public abstract class InternalJob extends JobState {
-    public static final Logger logger = ProActiveLogger.getLogger(InternalJob.class);
+    public static final Logger logger = Logger.getLogger(InternalJob.class);
 
     /** Owner of the job */
     private String owner = "";

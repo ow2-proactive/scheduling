@@ -42,7 +42,6 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
@@ -60,7 +59,7 @@ import org.ow2.proactive.threading.CallableWithTimeoutAction;
  */
 public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
 
-    private static final Logger logger = ProActiveLogger.getLogger(TimedDoTaskAction.class);
+    private static final Logger logger = Logger.getLogger(TimedDoTaskAction.class);
 
     private final InternalJob job;
 

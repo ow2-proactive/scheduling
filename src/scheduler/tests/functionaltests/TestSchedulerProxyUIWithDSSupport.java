@@ -15,7 +15,7 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.utils.TimeoutAccounter;
 import org.ow2.proactive.authentication.Connection;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
@@ -75,7 +75,7 @@ public class TestSchedulerProxyUIWithDSSupport extends SchedulerConsecutive {
     public void init() throws Exception {
 
         // log all data transfer related events
-        ProActiveLogger.getLogger(SchedulerProxyUserInterface.class).setLevel(Level.DEBUG);
+        Logger.getLogger(SchedulerProxyUserInterface.class).setLevel(Level.DEBUG);
 
         workLocalFolder = new File(workFolderPath);
         inputLocalFolder = new File(workLocalFolder, "input");

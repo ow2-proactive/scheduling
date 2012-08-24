@@ -42,7 +42,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Properties;
 
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.apache.log4j.Logger;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 
@@ -119,7 +119,7 @@ public class InfrastructureManagerFactory {
                 Class<?> cls = Class.forName(className.toString());
                 supportedInfrastructures.add(cls);
             } catch (ClassNotFoundException e) {
-                ProActiveLogger.getLogger(InfrastructureManagerFactory.class).warn(
+                Logger.getLogger(InfrastructureManagerFactory.class).warn(
                         "Cannot find class " + className.toString());
             }
         }

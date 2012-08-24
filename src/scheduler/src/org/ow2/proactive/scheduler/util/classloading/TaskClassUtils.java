@@ -44,13 +44,12 @@ import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.utils.FileToBytesConverter;
 
 
 public class TaskClassUtils {
 
-    public static final Logger logger = ProActiveLogger.getLogger(TaskClassUtils.class);
+    public static final Logger logger = Logger.getLogger(TaskClassUtils.class);
 
     /**
     * Look for a classfile into a directory.

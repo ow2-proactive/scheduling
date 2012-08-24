@@ -46,7 +46,6 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.exception.RMException;
@@ -83,7 +82,7 @@ import org.ow2.proactive.utils.appenders.FileAppender;
 public class SchedulerFactory {
 
     /** Logger to be used for all messages related to the scheduler */
-    public static final Logger logger = ProActiveLogger.getLogger(SchedulerFactory.class);
+    public static final Logger logger = Logger.getLogger(SchedulerFactory.class);
 
     private static boolean allowNullInit = false;
     private static boolean schedulerStarted = false;

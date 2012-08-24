@@ -41,7 +41,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.exception.ExecutableCreationException;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.JavaExecutableInitializer;
@@ -60,7 +59,7 @@ import org.ow2.proactive.scheduler.common.task.util.ByteArrayWrapper;
  */
 public class ForkedJavaExecutableContainer extends JavaExecutableContainer {
 
-    public static final Logger logger = ProActiveLogger.getLogger(ForkedJavaExecutableContainer.class);
+    public static final Logger logger = Logger.getLogger(ForkedJavaExecutableContainer.class);
 
     /** Environment of a new dedicated JVM */
     protected ForkEnvironment forkEnvironment = null;

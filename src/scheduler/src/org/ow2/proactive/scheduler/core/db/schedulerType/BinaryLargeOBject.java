@@ -48,7 +48,6 @@ import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.usertype.UserType;
 import org.objectweb.proactive.core.util.converter.ByteToObjectConverter;
 import org.objectweb.proactive.core.util.converter.ObjectToByteConverter;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
@@ -61,7 +60,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  */
 public class BinaryLargeOBject implements UserType {
 
-    public static final Logger logger = ProActiveLogger.getLogger(BinaryLargeOBject.class);
+    public static final Logger logger = Logger.getLogger(BinaryLargeOBject.class);
 
     /**
      * @see org.hibernate.usertype.UserType#sqlTypes()

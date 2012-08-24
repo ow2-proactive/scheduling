@@ -19,7 +19,6 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.exception.ConstraintViolationException;
 import org.hibernate.transform.DistinctRootEntityResultTransformer;
 import org.junit.Test;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.db.DatabaseManager.FilteredExceptionCallback;
 import org.ow2.proactive.db.DatabaseManagerException;
 import org.ow2.proactive.db.DatabaseManagerExceptionHandler;
@@ -61,9 +60,9 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
 
     private static final String JAVA_PROPERTYNAME_NODB = "scheduler.database.nodb";
 
-    private static final Logger logger = ProActiveLogger.getLogger(SchedulerDBManager.class);
+    private static final Logger logger = Logger.getLogger(SchedulerDBManager.class);
 
-    private static final Logger debugLogger = ProActiveLogger.getLogger(SchedulerDBManager.class);
+    private static final Logger debugLogger = Logger.getLogger(SchedulerDBManager.class);
 
     private static final Set<JobStatus> finishedJobStatuses;
 

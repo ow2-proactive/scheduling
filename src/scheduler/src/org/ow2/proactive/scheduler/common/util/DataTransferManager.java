@@ -13,7 +13,6 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
@@ -46,7 +45,7 @@ public class DataTransferManager {
      */
     protected Set<String> awaitedJobsIds = Collections.synchronizedSet(new HashSet<String>());
 
-    public static final Logger logger = ProActiveLogger.getLogger(DataTransferManager.class);
+    public static final Logger logger = Logger.getLogger(DataTransferManager.class);
 
     protected static String statusFilename = "dataTransfer.status";
     /**
