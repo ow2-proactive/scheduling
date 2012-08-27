@@ -45,9 +45,9 @@ import java.util.Set;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.util.converter.ByteToObjectConverter;
-import org.objectweb.proactive.core.util.converter.ObjectToByteConverter;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
+import org.ow2.proactive.scheduler.common.util.Object2ByteConverter;
 
 
 /**
@@ -137,7 +137,7 @@ public class JavaTask extends Task {
         } else {
             byte[] serialized = null;
             try {
-                serialized = ObjectToByteConverter.ObjectStream.convert(value);
+                serialized = Object2ByteConverter.convertObject2Byte(value);
                 this.serializedArguments.put(name, serialized);
             } catch (IOException e) {
                 throw new IllegalArgumentException("Cannot add argument " + name + " in task " + this.name, e);
@@ -155,7 +155,7 @@ public class JavaTask extends Task {
     public Serializable getArgument(String name) throws IOException, ClassNotFoundException {
         byte[] serializedValue = this.serializedArguments.get(name);
         if (serializedValue != null) {
-            return (Serializable) ByteToObjectConverter.ObjectStream.convert(serializedValue);
+            return (Serializable) Object2ByteConverter.convertByte2Object(serializedValue);
         } else {
             return null;
         }

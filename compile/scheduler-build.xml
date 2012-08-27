@@ -249,6 +249,7 @@
 				<include name="org/ow2/proactive/scheduler/util/process/ThreadReader.java" />
 				<include name="org/ow2/proactive/scheduler/util/process/ProcessTreeKiller.java" />
 				<include name="org/ow2/proactive/scheduler/common/Main.java" />
+				<include name="org/ow2/proactive/scheduler/common/util/Object2ByteConverter.java" />
 				<include name="org/ow2/proactive/scheduler/common/util/logforwarder/appenders/AsyncAppenderWithStorage.java" />
 				<include name="org/ow2/proactive/scheduler/common/util/logforwarder/appenders/EmptyAppender.java" />
 				<include name="org/ow2/proactive/scheduler/common/util/logforwarder/appenders/SocketAppenderWithSSHTunneling.java" />
