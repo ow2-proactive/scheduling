@@ -38,9 +38,9 @@ package functionaltests;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
@@ -261,19 +261,7 @@ public class TestListenJobLogs extends SchedulerConsecutive {
         logger.removeAllAppenders();
         logger.addAppender(appender4);
         scheduler.listenJobLogs(jobId, logForwardingService.getAppenderProvider());
-
-        /*
-         *  TODO: at the time of this writing output of different tasks is received in random order, 
-         *  so can't check lists for equals, otherwise could replace following logic with this line:
-         *  
-         *  appender4.waitForLoggingEvent(LOG_EVENT_TIMEOUT, "output1", "output2", "output3");
-         */
-        Thread.sleep(LOG_EVENT_TIMEOUT);
-        List<String> possibleOutput1 = Arrays.asList(new String[] { "output1", "output2", "output3" });
-        List<String> possibleOutput2 = Arrays.asList(new String[] { "output3", "output1", "output2" });
-        List<String> output = appender4.getActualMessages();
-        Assert.assertTrue("Unexpected output: " + output + " expected is " + possibleOutput1 + " or " +
-            possibleOutput2, output.equals(possibleOutput1) || output.equals(possibleOutput2));
+        appender4.waitForLoggingEvent(LOG_EVENT_TIMEOUT, "output1", "output2", "output3");
 
         System.out.println("Check job result");
 
@@ -316,7 +304,10 @@ public class TestListenJobLogs extends SchedulerConsecutive {
                     break;
                 }
             }
-            Assert.assertEquals("Didn't receive expected events", expectedMessagesList, actualMessages);
+
+            Assert.assertTrue("Didn't receive expected events, expected: " + expectedMessagesList +
+                ", actual: " + actualMessages, CollectionUtils.isEqualCollection(expectedMessagesList,
+                    actualMessages));
             actualMessages.clear();
         }
 
