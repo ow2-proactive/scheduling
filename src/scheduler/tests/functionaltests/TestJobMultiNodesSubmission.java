@@ -38,6 +38,7 @@ package functionaltests;
 
 import java.io.File;
 import java.net.URL;
+import java.util.List;
 import java.util.Map.Entry;
 
 import org.junit.Assert;
@@ -45,7 +46,9 @@ import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
+import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.task.TaskState;
 
 
 /**
@@ -93,6 +96,11 @@ public class TestJobMultiNodesSubmission extends SchedulerConsecutive {
         //check RM has 4 busy nodes
         RMState rms = rmAdmin.getState();
         Assert.assertEquals(4, rms.getTotalNodesNumber() - rms.getFreeNodesNumber());
+
+        JobState js = SchedulerTHelper.getSchedulerInterface().getJobState(id);
+        List<TaskState> tasks = js.getTasks();
+        TaskState ts = tasks.get(0);
+        Assert.assertEquals(4, ts.getNumberOfNodesNeeded());
 
         //wait for job to be finished
         SchedulerTHelper.waitForEventJobFinished(id);

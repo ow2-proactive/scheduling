@@ -58,6 +58,8 @@ public final class ClientTaskState extends TaskState {
         this.cancelJobOnError = taskState.isCancelJobOnError();
         this.maxNumberOfExecution = taskState.getMaxNumberOfExecution();
 
+        this.setParallelEnvironment(taskState.getParallelEnvironment());
+
         // Store only task IDs here; #restoreDependences is later called by
         // ClientJobState in order for this instance to store references to the
         // same ClientTaskState instances as the ones held in the
@@ -139,16 +141,6 @@ public final class ClientTaskState extends TaskState {
     public List<OutputSelector> getOutputFilesList() {
         throw new RuntimeException(
             "Not implemented: the output files atttribute is not available on client side.");
-    }
-
-    /**
-     * This property is not available for this implementation. Calling this
-     * method will throw a RuntimeException
-     */
-    @Override
-    public ParallelEnvironment getParallelEnvironment() {
-        throw new RuntimeException(
-            "Not implemented: the ParallelEnvironment  atttribute is not available on client side.");
     }
 
     /**
