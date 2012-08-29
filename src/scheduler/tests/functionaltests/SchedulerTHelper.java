@@ -315,6 +315,7 @@ public class SchedulerTHelper {
 
             // sometimes RM_NODE object isn't removed from the RMI registry after JVM with RM is killed (SCHEDULING-1498)
             CommonTUtils.cleanupRMActiveObjectRegistry();
+            CommonTUtils.cleanupActiveObjectRegistry(SchedulerConstants.SCHEDULER_DEFAULT_NAME);
         }
         schedulerAuth = null;
         adminSchedInterface = null;
