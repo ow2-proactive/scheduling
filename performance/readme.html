@@ -157,6 +157,19 @@ If already running PAMR router should be used then following parameters are requ
 <li><b>test.deploy.pamr.existingRouterPort</b> (common.test.properties) PAMR router port</li>
 </ul>
 
+<h4><a id="deploy_amqp">AMQP broker parameters:</a></h4>
+<p>
+If AMQP protocol is used for RM deployment then additional parameters should be set.
+</p>
+<p>
+Tests don't start AMQP broker, broker should be started manually and following test parameters should be set:
+</p>
+<ul>
+<li><b>test.deploy.amqp.host</b> (common.test.properties) AMQP broker host</li>
+<li><b>test.deploy.amqp.port</b> (common.test.properties) AMQP broker port</li>
+</ul>
+<p>
+
 <h3><a id="deploy_config_scheduler">Scheduler test</a></h3>
 This section explains deployment configuration necessary to execute Scheduler test. Before executing Scheduler test it necessary 
 to start RM with nodes and Scheduler (and additionally PAMR router if PAMR protocol is used).

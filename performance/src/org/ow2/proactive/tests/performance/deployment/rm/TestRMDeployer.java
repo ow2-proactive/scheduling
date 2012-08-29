@@ -79,7 +79,7 @@ public class TestRMDeployer extends TestDeployer {
 
     public static final long RM_START_TIMEOUT = 5 * 60000;
 
-    public static final long RM_NODE_DEPLOY_TIMEOUT = 2 * 60000;
+    public static final long RM_NODE_DEPLOY_TIMEOUT = 5 * 60000;
 
     private final List<String> rmNodesHosts;
 

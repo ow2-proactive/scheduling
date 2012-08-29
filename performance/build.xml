@@ -136,6 +136,9 @@
                 <jvmarg value="-Drm.deploy.pamr.serverReservedId=0:resource_manager" />
                 <jvmarg value="-Dscheduler.deploy.pamr.serverReservedId=1:scheduler" />
 
+                <jvmarg value="-Dtest.deploy.amqp.host=${test.deploy.amqp.host}" />
+                <jvmarg value="-Dtest.deploy.amqp.port=${test.deploy.amqp.port}" />
+                	            	
                 <jvmarg value="-Drm.deploy.rmHost=${rm.deploy.rmHost}" />
                 <jvmarg value="-Drm.deploy.dropDB=${rm.deploy.dropDB}" />
                 <jvmarg value="-Drm.deploy.javaOpts=${rm.deploy.javaOpts}" />
@@ -316,7 +319,7 @@
         </sequential>
 
     </macrodef>
-
+	
     <target name="run-scheduler-test" depends="compile.tests, copy.libs.to.jmeter" description="Run JMeter Scheduler test (Scheduler should be already deployed)">
         <run-scheduler-jmeter-test testplan="scheduler1" targetSchedulerUrl="${targetSchedulerUrl}" clientproactiveconfig="${basedir}/config/DefaultClientProActiveConfiguration.xml" />
         <fail if="scheduler-scheduler1-failed" message="JMeter test failed" />
