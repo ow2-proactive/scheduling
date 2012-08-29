@@ -218,6 +218,8 @@ public abstract class TestDeployer {
             return new TestPamrProtocolHelper(serverHostEnv, getPamrServedReservedId());
         } else if (protocol.equalsIgnoreCase("rmi")) {
             return new TestRMIProtocolHelper(serverHostEnv);
+        } else if (protocol.equals("amqp")) {
+            return TestAmqpProtocolHelper.createUsingSystemProperties(serverHostEnv);
         } else {
             throw new IllegalArgumentException("Test doesn't support protocol " + protocol);
         }

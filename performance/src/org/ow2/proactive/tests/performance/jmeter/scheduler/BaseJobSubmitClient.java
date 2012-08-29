@@ -171,7 +171,9 @@ public abstract class BaseJobSubmitClient extends BaseJMeterSchedulerClient {
             }
         }
         result.setSuccessful(!hasErrors);
-        result.setResponseMessage("Some job tasks had exceptions");
+        if (hasErrors) {
+            result.setResponseMessage("Some job tasks had exceptions");
+        }
     }
 
     protected long getJobCompleteTimeout() {
