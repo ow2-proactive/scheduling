@@ -128,7 +128,10 @@ public class SchedulerTStarter implements Serializable {
                 nodes[i] = node;
             }
             for (int i = 0; i < RM_NODE_NUMBER; i++) {
-                rmAdmin.addNode(nodes[i].getNodeInformation().getURL());
+                // adding nodes to the RM and waiting while they will be registered
+                // without waiting test can finish earlier than nodes will be added to the RM
+                // which on windows leads to test execution hang up due to running processes
+                rmAdmin.addNode(nodes[i].getNodeInformation().getURL()).getBooleanValue();
             }
         }
     }
