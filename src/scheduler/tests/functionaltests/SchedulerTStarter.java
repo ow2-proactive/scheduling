@@ -64,7 +64,7 @@ public class SchedulerTStarter implements Serializable {
 
     protected String rmUsername = "demo";
     protected String rmPassword = "demo";
-    private static final int RM_NODE_NUMBER = 5;
+    public static final int RM_NODE_NUMBER = 5;
 
     protected static String schedulerDefaultURL = "//Localhost/";
 
@@ -128,10 +128,7 @@ public class SchedulerTStarter implements Serializable {
                 nodes[i] = node;
             }
             for (int i = 0; i < RM_NODE_NUMBER; i++) {
-                // adding nodes to the RM and waiting while they will be registered
-                // without waiting test can finish earlier than nodes will be added to the RM
-                // which on windows leads to test execution hang up due to running processes
-                rmAdmin.addNode(nodes[i].getNodeInformation().getURL()).getBooleanValue();
+                rmAdmin.addNode(nodes[i].getNodeInformation().getURL());
             }
         }
     }
