@@ -52,10 +52,7 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.ProActiveInet;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
-import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
-import org.ow2.proactive.resourcemanager.frontend.RMConnection;
-import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
@@ -81,8 +78,8 @@ import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.utils.FileUtils;
 
-import functionaltests.common.CommonTUtils;
 import functionaltests.common.InputStreamReaderThread;
+import functionaltests.common.CommonTUtils;
 import functionaltests.monitor.MonitorEventReceiver;
 import functionaltests.monitor.SchedulerMonitorsHandler;
 
@@ -293,21 +290,6 @@ public class SchedulerTHelper {
 
         System.out.println("Waiting for the Scheduler using URL: " + url);
         schedulerAuth = SchedulerConnection.waitAndJoin(url);
-        System.out.println("The Scheduler is up and running");
-
-        // Waiting while all the nodes will be registered in the RM.
-        // Without waiting test can finish earlier than nodes are added.
-        // It leads to test execution hang up on windows due to running processes.
-
-        RMAuthentication rmAuth = RMConnection.waitAndJoin(url);
-        Credentials cred = Credentials.createCredentials(new CredData(username, password), rmAuth
-                .getPublicKey());
-        ResourceManager rm = rmAuth.login(cred);
-        while (rm.getState().getTotalAliveNodesNumber() < SchedulerTStarter.RM_NODE_NUMBER) {
-            System.out.println("Waiting for nodes deployment");
-            Thread.sleep(1000);
-        }
-        System.out.println("Nodes are deployed");
     }
 
     /* convenience method to clean TMP from dataspace when executing test */
