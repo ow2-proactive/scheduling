@@ -53,6 +53,7 @@ import org.objectweb.proactive.core.util.ProActiveInet;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
+import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
@@ -78,8 +79,8 @@ import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.utils.FileUtils;
 
-import functionaltests.common.InputStreamReaderThread;
 import functionaltests.common.CommonTUtils;
+import functionaltests.common.InputStreamReaderThread;
 import functionaltests.monitor.MonitorEventReceiver;
 import functionaltests.monitor.SchedulerMonitorsHandler;
 
@@ -290,6 +291,22 @@ public class SchedulerTHelper {
 
         System.out.println("Waiting for the Scheduler using URL: " + url);
         schedulerAuth = SchedulerConnection.waitAndJoin(url);
+        System.out.println("The Scheduler is up and running");
+
+        if (localnodes) {
+            // Waiting while all the nodes will be registered in the RM.
+            // Without waiting test can finish earlier than nodes are added.
+            // It leads to test execution hang up on windows due to running processes.
+
+            RMTHelper rmHelper = RMTHelper.getDefaultInstance();
+            System.setProperty("url", url);
+            ResourceManager rm = rmHelper.getResourceManager();
+            while (rm.getState().getTotalAliveNodesNumber() < SchedulerTStarter.RM_NODE_NUMBER) {
+                System.out.println("Waiting for nodes deployment");
+                Thread.sleep(1000);
+            }
+            System.out.println("Nodes are deployed");
+        }
     }
 
     /* convenience method to clean TMP from dataspace when executing test */
@@ -319,6 +336,7 @@ public class SchedulerTHelper {
         }
         schedulerAuth = null;
         adminSchedInterface = null;
+        RMTHelper.getDefaultInstance().reset();
     }
 
     /**

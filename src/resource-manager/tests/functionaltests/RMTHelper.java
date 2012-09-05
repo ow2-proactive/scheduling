@@ -385,6 +385,13 @@ public class RMTHelper {
             // sometimes RM_NODE object isn't removed from the RMI registry after JVM with RM is killed (SCHEDULING-1498)
             CommonTUtils.cleanupRMActiveObjectRegistry();
         }
+        reset();
+    }
+
+    /**
+     * Resets the RMTHelper
+     */
+    public void reset() throws Exception {
         auth = null;
         resourceManager = null;
         eventReceiver = null;
