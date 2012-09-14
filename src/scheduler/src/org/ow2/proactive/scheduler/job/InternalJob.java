@@ -48,8 +48,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.TreeMap;
-
 import javax.xml.bind.annotation.XmlTransient;
 
 import org.apache.log4j.Logger;
@@ -211,163 +209,8 @@ public abstract class InternalJob extends JobState {
                 }
             }
         }
-        // replicated tasks have been added through FlowAction#REPLICATE
-        if (this.jobInfo.getTasksReplicated() != null) {
-            updateTasksReplicated();
-        }
-        // replicated tasks have been added through FlowAction#LOOP
-        if (this.jobInfo.getTasksLooped() != null) {
-            updateTasksLooped();
-        }
     }
 
-    /**
-     * Updates this job when tasks were replicated due to a {@link FlowActionType#REPLICATE} action
-     * <p>
-     * The internal state of the job will change: new tasks will be added,
-     * existing tasks will be modified.
-     */
-    private void updateTasksReplicated() {
-        // key: replicated task / value : id of the original task
-        // originalId not used as key because tasks can be replicated multiple times
-        Map<InternalTask, TaskId> newTasks = new TreeMap<InternalTask, TaskId>();
-
-        // create the new tasks
-        for (ReplicatedTask it : this.jobInfo.getTasksReplicated()) {
-            InternalTask original = this.tasks.get(it.originalId);
-            InternalTask replicated = null;
-            try {
-                replicated = (InternalTask) original.replicate();
-            } catch (Exception e) {
-            }
-            replicated.setId(it.replicatedId);
-            // for some reason the indices are embedded in the Readable name and not where they belong
-            int dupId = InternalTask.getReplicationIndexFromName(it.replicatedId.getReadableName());
-            int itId = InternalTask.getIterationIndexFromName(it.replicatedId.getReadableName());
-            replicated.setReplicationIndex(dupId);
-            replicated.setIterationIndex(itId);
-
-            this.tasks.put(it.replicatedId, replicated);
-            newTasks.put(replicated, it.originalId);
-        }
-
-        // recreate deps contained in the data struct
-        for (ReplicatedTask it : this.jobInfo.getTasksReplicated()) {
-            InternalTask newtask = this.tasks.get(it.replicatedId);
-            for (TaskId depId : it.deps) {
-                InternalTask dep = this.tasks.get(depId);
-                newtask.addDependence(dep);
-            }
-        }
-
-        // plug mergers
-        List<InternalTask> toAdd = new ArrayList<InternalTask>();
-        for (InternalTask old : this.tasks.values()) {
-            // task is not a replicated one, has dependencies
-            if (!newTasks.containsValue(old.getId()) && old.hasDependences()) {
-                for (InternalTask oldDep : old.getIDependences()) {
-                    // one of its dependencies is a replicated task
-                    if (newTasks.containsValue(oldDep.getId())) {
-                        // connect those replicated tasks to the merger
-                        for (Entry<InternalTask, TaskId> newTask : newTasks.entrySet()) {
-                            if (newTask.getValue().equals(oldDep.getId())) {
-                                toAdd.add(newTask.getKey());
-                            }
-                        }
-                    }
-                }
-                // avoids concurrent modification
-                for (InternalTask newDep : toAdd) {
-                    old.addDependence(newDep);
-                }
-                toAdd.clear();
-            }
-        }
-
-    }
-
-    /**
-     * Updates this job when tasks were replicated due to a {@link FlowActionType#LOOP} action
-     * <p>
-     * The internal state of the job will change: new tasks will be added,
-     * existing tasks will be modified.
-     */
-    private void updateTasksLooped() {
-        Map<TaskId, InternalTask> newTasks = new TreeMap<TaskId, InternalTask>();
-
-        // create the new tasks
-        for (ReplicatedTask it : this.jobInfo.getTasksLooped()) {
-            InternalTask original = this.tasks.get(it.originalId);
-            InternalTask replicated = null;
-            try {
-                replicated = (InternalTask) original.replicate();
-            } catch (Exception e) {
-            }
-            replicated.setId(it.replicatedId);
-            // for some reason the indices are embedded in the Readable name and not where they belong
-            int dupId = InternalTask.getReplicationIndexFromName(it.replicatedId.getReadableName());
-            int itId = InternalTask.getIterationIndexFromName(it.replicatedId.getReadableName());
-            replicated.setReplicationIndex(dupId);
-            replicated.setIterationIndex(itId);
-
-            this.tasks.put(it.replicatedId, replicated);
-            newTasks.put(it.originalId, replicated);
-        }
-
-        InternalTask oldInit = null;
-        // recreate deps contained in the data struct
-        for (ReplicatedTask it : this.jobInfo.getTasksLooped()) {
-            InternalTask newtask = this.tasks.get(it.replicatedId);
-            for (TaskId depId : it.deps) {
-                InternalTask dep = this.tasks.get(depId);
-                if (!newTasks.containsValue(dep)) {
-                    oldInit = dep;
-                }
-                newtask.addDependence(dep);
-            }
-        }
-
-        // find mergers
-        InternalTask newInit = null;
-        InternalTask merger = null;
-        for (InternalTask old : this.tasks.values()) {
-            // the merger is not a replicated task, nor has been replicated
-            if (!newTasks.containsKey(old.getId()) && !newTasks.containsValue(old) && old.hasDependences()) {
-                for (InternalTask oldDep : old.getIDependences()) {
-                    // merger's deps contains the initiator of the LOOP
-                    if (oldDep.equals(oldInit)) {
-                        merger = old;
-                        break;
-                    }
-                }
-                if (merger != null) {
-                    break;
-                }
-            }
-        }
-
-        // merger can be null
-        if (merger != null) {
-            // find new initiator
-            Map<TaskId, InternalTask> newTasks2 = new HashMap<TaskId, InternalTask>();
-            for (InternalTask it : newTasks.values()) {
-                newTasks2.put(it.getId(), it);
-            }
-            for (InternalTask it : newTasks.values()) {
-                if (it.hasDependences()) {
-                    for (InternalTask dep : it.getIDependences()) {
-                        newTasks2.remove(dep.getId());
-                    }
-                }
-            }
-            for (InternalTask it : newTasks2.values()) {
-                newInit = it;
-                break;
-            }
-            merger.getIDependences().remove(oldInit);
-            merger.addDependence(newInit);
-        }
-    }
 
     /**
      * @see org.ow2.proactive.scheduler.common.job.JobState#getJobInfo()
@@ -1301,24 +1144,6 @@ public abstract class InternalJob extends JobState {
      */
     public void setTaskFinishedTimeModify(Map<TaskId, Long> taskFinishedTimeModify) {
         jobInfo.setTaskFinishedTimeModify(taskFinishedTimeModify);
-    }
-
-    /**
-     * To set the tasksReplicated
-     *
-     * @param d tasksReplicated
-     */
-    public void setReplicatedTasksModify(List<ReplicatedTask> d) {
-        jobInfo.setTasksReplicated(d);
-    }
-
-    /**
-     * To set the tasksLooped
-     *
-     * @param d tasksLooped
-     */
-    public void setLoopedTasksModify(List<ReplicatedTask> d) {
-        jobInfo.setTasksLooped(d);
     }
 
     /**

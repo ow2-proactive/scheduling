@@ -269,46 +269,6 @@ public class JobInfoImpl implements JobInfo {
     }
 
     /**
-     * Used as an argument for {@link SchedulerEvent#TASK_REPLICATED} to
-     * specify which tasks were replicated
-     * 
-     * @param m list of the replicated tasks
-     */
-    public void setTasksReplicated(List<ReplicatedTask> m) {
-        this.tasksReplicated = m;
-    }
-
-    /**
-     * Used as an argument for {@link SchedulerEvent#TASK_REPLICATED} to
-     * specify which tasks were replicated
-     * 
-     * @return a list of the replicated tasks
-     */
-    public List<ReplicatedTask> getTasksReplicated() {
-        return this.tasksReplicated;
-    }
-
-    /**
-     * Used as an argument for {@link SchedulerEvent#TASK_REPLICATED} to
-     * specify which tasks were replicated
-     * 
-     * @param m list of the replicated tasks
-     */
-    public void setTasksLooped(List<ReplicatedTask> m) {
-        this.tasksLooped = m;
-    }
-
-    /**
-     * Used as an argument for {@link SchedulerEvent#TASK_REPLICATED} to
-     * specify which tasks were replicated
-     * 
-     * @return a list of the replicated tasks
-     */
-    public List<ReplicatedTask> getTasksLooped() {
-        return this.tasksLooped;
-    }
-
-    /**
      * Used as an argument for {@link SchedulerEvent#TASK_SKIPPED} to
      * specify which tasks were skipped
      * 
