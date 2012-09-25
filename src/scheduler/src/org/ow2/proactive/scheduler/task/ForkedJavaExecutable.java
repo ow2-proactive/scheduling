@@ -59,9 +59,12 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.body.future.FutureMonitoring;
 import org.objectweb.proactive.core.body.future.FutureProxy;
+import org.objectweb.proactive.core.config.PAProperty;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
+import org.objectweb.proactive.extensions.amqp.AMQPConfig;
+import org.objectweb.proactive.extensions.amqp.federation.AMQPFederationConfig;
 import org.objectweb.proactive.extensions.pamr.PAMRConfig;
 import org.objectweb.proactive.extensions.processbuilder.OSProcessBuilder;
 import org.objectweb.proactive.extensions.processbuilder.exception.NotImplementedException;
@@ -468,18 +471,28 @@ public class ForkedJavaExecutable extends JavaExecutable implements ForkerStarte
             }
         }
 
+        propagateProtocolProperties(command);
+    }
+
+    private void propagateProtocolProperties(List<String> command) {
         //TODO SCHEDULING-1302 : WORK AROUND
         //automatically propagate PAMR props to the forked JVM if defined on the forker.
-        if (PAMRConfig.PA_NET_ROUTER_ADDRESS.isSet()) {
-            command.add(PAMRConfig.PA_NET_ROUTER_ADDRESS.getCmdLine() +
-                PAMRConfig.PA_NET_ROUTER_ADDRESS.getValue());
-        }
-        if (PAMRConfig.PA_NET_ROUTER_PORT.isSet()) {
-            command
-                    .add(PAMRConfig.PA_NET_ROUTER_PORT.getCmdLine() +
-                        PAMRConfig.PA_NET_ROUTER_PORT.getValue());
-        }
+        PAProperty[] properitiesToPropagate = { PAMRConfig.PA_NET_ROUTER_ADDRESS,
+                PAMRConfig.PA_NET_ROUTER_PORT, AMQPConfig.PA_AMQP_BROKER_ADDRESS,
+                AMQPConfig.PA_AMQP_BROKER_PORT, AMQPConfig.PA_AMQP_BROKER_USER,
+                AMQPConfig.PA_AMQP_BROKER_PASSWORD, AMQPConfig.PA_AMQP_BROKER_VHOST,
+                AMQPFederationConfig.PA_AMQP_FEDERATION_BROKER_ADDRESS,
+                AMQPFederationConfig.PA_AMQP_FEDERATION_BROKER_PORT,
+                AMQPFederationConfig.PA_AMQP_FEDERATION_BROKER_USER,
+                AMQPFederationConfig.PA_AMQP_FEDERATION_BROKER_PASSWORD,
+                AMQPFederationConfig.PA_AMQP_FEDERATION_BROKER_VHOST,
+                AMQPFederationConfig.PA_AMQP_FEDERATION_BROKER_MAPPING_FILE };
 
+        for (PAProperty property : properitiesToPropagate) {
+            if (property.isSet()) {
+                command.add(property.getCmdLine() + property.getValueAsString());
+            }
+        }
     }
 
     /**
