@@ -39,11 +39,12 @@ package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
 
 import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
 
-import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpDelete;
+import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractJobCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
+import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
 
 public class RemoveJobCommand extends AbstractJobCommand implements Command {
 
@@ -52,21 +53,22 @@ public class RemoveJobCommand extends AbstractJobCommand implements Command {
     }
 
     @Override
-    public void execute() throws CLIException {
-        HttpDelete request = new HttpDelete(resourceUrl("jobs/" + jobId));
-        HttpResponse response = execute(request);
+    public void execute(ApplicationContext currentContext) throws CLIException {
+        HttpDelete request = new HttpDelete(
+                currentContext.getResourceUrl("jobs/" + jobId));
+        HttpResponseWrapper response = execute(request, currentContext);
         if (statusCode(OK) == statusCode(response)) {
-            boolean success = readValue(response, Boolean.TYPE);
-            resultStack().push(success);
+            boolean success = readValue(response, Boolean.TYPE, currentContext);
+            resultStack(currentContext).push(success);
             if (success) {
-                writeLine("%s sucessfully removed.", job());
+                writeLine(currentContext, "%s sucessfully removed.", job());
             } else {
-                writeLine("Cannot remove %s.", job());
+                writeLine(currentContext, "Cannot remove %s.", job());
             }
         } else {
             handleError(String.format(
                     "An error occurred while attempting to remove %s:", job()),
-                    response);
+                    response, currentContext);
         }
     }
 

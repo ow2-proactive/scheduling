@@ -39,6 +39,7 @@ package org.ow2.proactive_grid_cloud_portal.cli.cmd;
 
 import java.io.IOException;
 
+import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
 
@@ -48,11 +49,13 @@ public class PrintSessionCommand extends AbstractCommand implements Command {
     }
 
     @Override
-    public void execute() throws CLIException {
-        String sessionId = currentContext().getSessionId();
+    public void execute(ApplicationContext currentContext) throws CLIException {
+        String sessionId = currentContext.getSessionId();
         if (!StringUtility.isEmpty(sessionId)) {
             try {
-                currentContext().getDevice().writeLine("%s", sessionId);
+                // we directly write to the device in order to by-pass the
+                // silent mode.
+                currentContext.getDevice().writeLine("%s", sessionId);
             } catch (IOException ioe) {
                 throw new CLIException(CLIException.REASON_IO_ERROR, ioe);
             }

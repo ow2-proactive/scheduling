@@ -40,6 +40,7 @@ package org.ow2.proactive_grid_cloud_portal.cli.cmd;
 import java.io.File;
 import java.util.Stack;
 
+import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.json.TaskResultView;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.FileUtility;
@@ -52,12 +53,12 @@ public class OutputCommand extends AbstractCommand implements Command {
     }
 
     @Override
-    public void execute() throws CLIException {
+    public void execute(ApplicationContext currentContext) throws CLIException {
         File outFile = new File(pathname);
         if (outFile.exists()) {
             outFile.delete();
         }
-        Stack resultStack = resultStack();
+        Stack resultStack = resultStack(currentContext);
         if (!resultStack.isEmpty()) {
             Object result = resultStack.peek();
             if (result instanceof String) {
@@ -71,7 +72,7 @@ public class OutputCommand extends AbstractCommand implements Command {
                 FileUtility.writeObjectToFile(result, outFile);
             }
         } else {
-            writeLine("No result available to write.");
+            writeLine(currentContext, "No result available to write.");
         }
     }
 

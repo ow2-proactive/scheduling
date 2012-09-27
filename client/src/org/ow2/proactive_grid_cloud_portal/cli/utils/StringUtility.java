@@ -41,6 +41,8 @@ import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_IO_ERR
 import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_OTHER;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -50,6 +52,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import org.apache.commons.codec.binary.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.ParseException;
 import org.apache.http.util.EntityUtils;
@@ -78,7 +81,7 @@ public class StringUtility {
         return array == null || array.length == 0;
     }
 
-    public static String string(ObjectArrayFormatter oaf) {
+    public static String objectArrayFormatterAsString(ObjectArrayFormatter oaf) {
         return Tools.getStringAsArray(oaf);
     }
 
@@ -94,14 +97,8 @@ public class StringUtility {
         return Tools.getFormattedDuration(start, end);
     }
 
-    public static String string(HttpResponse response) {
-        try {
-            return EntityUtils.toString(response.getEntity());
-        } catch (ParseException pe) {
-            throw new CLIException(REASON_OTHER, pe);
-        } catch (IOException ioe) {
-            throw new CLIException(REASON_IO_ERROR, ioe);
-        }
+    public static String responseAsString(HttpResponseWrapper response) {
+            return StringUtils.newStringUtf8(response.getContent());
     }
 
     public static String string(TopologyView topology) {
@@ -137,7 +134,7 @@ public class StringUtility {
             }
         }
 
-        buffer.append(string(formatter));
+        buffer.append(objectArrayFormatterAsString(formatter));
         return buffer.toString();
     }
 
@@ -419,6 +416,14 @@ public class StringUtility {
             formatter.addLine(row);
         }
         return Tools.getStringAsArray(formatter);
+    }
+    
+    public static String stackTraceAsString(Throwable error) {
+        StringWriter out = new StringWriter();
+        PrintWriter writer = new PrintWriter(out);
+        error.printStackTrace(writer);
+        writer.flush();
+        return out.toString();
     }
 
     private StringUtility() {

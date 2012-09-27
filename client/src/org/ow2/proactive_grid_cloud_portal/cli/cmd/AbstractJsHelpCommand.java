@@ -42,6 +42,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.ow2.proactive.utils.ObjectArrayFormatter;
+import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.CommandSet;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
@@ -49,7 +50,8 @@ import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
 public abstract class AbstractJsHelpCommand extends AbstractCommand implements
         Command {
 
-    public void printHelp(CommandSet.Entry[]... entrySet) throws CLIException {
+    public void printHelp(ApplicationContext currentContext,
+            CommandSet.Entry[]... entrySet) throws CLIException {
         ObjectArrayFormatter formatter = new ObjectArrayFormatter();
         formatter.setMaxColumnLength(100);
         formatter.setSpace(2);
@@ -74,7 +76,7 @@ public abstract class AbstractJsHelpCommand extends AbstractCommand implements
                 formatter.addLine(line);
             }
         }
-
-        writeLine(StringUtility.string(formatter));
+        writeLine(currentContext, "%s",
+                StringUtility.objectArrayFormatterAsString(formatter));
     }
 }

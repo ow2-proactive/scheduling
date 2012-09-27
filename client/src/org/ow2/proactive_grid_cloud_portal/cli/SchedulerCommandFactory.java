@@ -63,10 +63,12 @@ class SchedulerCommandFactory extends CommandFactory {
     }
 
     @Override
-    public List<Command> getCommandList(CommandLine cli) {
+    public List<Command> getCommandList(CommandLine cli,
+            ApplicationContext currentContext) {
         Map<String, Command> commands = commandMapInstance(cli,
                 schedSupportedCmdMap);
-        List<Command> commandList = super.getCommandList(cli, commands);
+        List<Command> commandList = super.getCommandList(cli, commands,
+                currentContext);
         if (cli.hasOption(opt(SCHED_HELP))) {
             return commandList;
         }

@@ -41,9 +41,11 @@ import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.NO_CONT
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPut;
+import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractJobCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
+import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
 
 public class ChangeJobPriorityCommand extends AbstractJobCommand implements
         Command {
@@ -55,18 +57,19 @@ public class ChangeJobPriorityCommand extends AbstractJobCommand implements
     }
 
     @Override
-    public void execute() throws CLIException {
-        String resourceUrl = resourceUrl("jobs/" + jobId + "/priority/byvalue/"
-                + priorityValue);
+    public void execute(ApplicationContext currentContext) throws CLIException {
+        String resourceUrl = currentContext.getResourceUrl("jobs/" + jobId
+                + "/priority/byvalue/" + priorityValue);
         HttpPut request = new HttpPut(resourceUrl);
-        HttpResponse response = execute(request);
+        HttpResponseWrapper response = execute(request, currentContext);
         if (statusCode(NO_CONTENT) == statusCode(response)) {
-            resultStack().push(Boolean.TRUE);
-            writeLine("%s priority changed successfully.", job());
+            resultStack(currentContext).push(Boolean.TRUE);
+            writeLine(currentContext, "%s priority changed successfully.",
+                    job());
         } else {
             handleError(String.format(
                     "An error occurred while changing %s priority:", job()),
-                    response);
+                    response, currentContext);
         }
     }
 }

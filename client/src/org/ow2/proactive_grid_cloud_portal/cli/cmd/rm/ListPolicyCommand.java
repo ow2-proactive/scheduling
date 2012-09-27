@@ -46,42 +46,45 @@ import java.util.Map;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.codehaus.jackson.type.TypeReference;
+import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.cli.json.PluginView;
+import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
 
 public class ListPolicyCommand extends AbstractCommand implements Command {
 
     @Override
-    public void execute() throws CLIException {
-        Map<String, PluginView> knownPolicyMap = currentContext().getPolicies();
+    public void execute(ApplicationContext currentContext) throws CLIException {
+        Map<String, PluginView> knownPolicyMap = currentContext.getPolicies();
         if (knownPolicyMap == null) {
-            HttpGet request = new HttpGet(resourceUrl("policies"));
-            HttpResponse response = execute(request);
+            HttpGet request = new HttpGet(
+                    currentContext.getResourceUrl("policies"));
+            HttpResponseWrapper response = execute(request, currentContext);
             if (statusCode(OK) == statusCode(response)) {
                 List<PluginView> pluginViewList = readValue(response,
                         new TypeReference<List<PluginView>>() {
-                        });
-                resultStack().push(
+                        }, currentContext);
+                resultStack(currentContext).push(
                         pluginViewList.toArray(new PluginView[pluginViewList
                                 .size()]));
                 knownPolicyMap = new HashMap<String, PluginView>();
                 for (PluginView pluginView : pluginViewList) {
                     knownPolicyMap.put(pluginView.getPluginName(), pluginView);
                 }
-                currentContext().setPolicies(knownPolicyMap);
+                currentContext.setPolicies(knownPolicyMap);
             } else {
                 handleError(
                         "An error occurred while retrieving supported policy types:",
-                        response);
+                        response, currentContext);
             }
         }
-        if (!currentContext().isSilent()) {
+        if (!currentContext.isSilent()) {
             if (knownPolicyMap != null) {
-                writeLine("%n%s:%n", "Supported policy types");
+                writeLine(currentContext, "%n%s:%n", "Supported policy types");
                 for (PluginView policy : knownPolicyMap.values()) {
-                    writeLine("%s%n", policy.toString());
+                    writeLine(currentContext, "%s%n", policy.toString());
                 }
             }
         }

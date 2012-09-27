@@ -41,12 +41,13 @@ import static org.apache.http.entity.ContentType.APPLICATION_FORM_URLENCODED;
 import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
 import static org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.SetNodeSourceCommand.SET_NODE_SOURCE;
 
-import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
+import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
+import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpUtility;
 
 public class AddNodeCommand extends AbstractCommand implements Command {
@@ -63,12 +64,12 @@ public class AddNodeCommand extends AbstractCommand implements Command {
     }
 
     @Override
-    public void execute() throws CLIException {
-        HttpPost request = new HttpPost(resourceUrl("node"));
+    public void execute(ApplicationContext currentContext) throws CLIException {
+        HttpPost request = new HttpPost(currentContext.getResourceUrl("node"));
         StringBuilder buffer = new StringBuilder();
         buffer.append("nodeurl=" + HttpUtility.encodeUrl(nodeUrl));
-        if (currentContext().getProperty(SET_NODE_SOURCE, String.class) != null) {
-            nodeSource = currentContext().getProperty(SET_NODE_SOURCE, String.class);
+        if (currentContext.getProperty(SET_NODE_SOURCE, String.class) != null) {
+            nodeSource = currentContext.getProperty(SET_NODE_SOURCE, String.class);
         }
         if (nodeSource != null) {
             buffer.append("&nodesource=").append(nodeSource);
@@ -76,17 +77,17 @@ public class AddNodeCommand extends AbstractCommand implements Command {
         StringEntity entity = new StringEntity(buffer.toString(),
                 APPLICATION_FORM_URLENCODED);
         request.setEntity(entity);
-        HttpResponse response = execute(request);
+        HttpResponseWrapper response = execute(request, currentContext);
         if (statusCode(OK) == statusCode(response)) {
-            boolean successful = readValue(response, Boolean.TYPE);
-            resultStack().push(successful);
+            boolean successful =  readValue(response, Boolean.TYPE, currentContext);
+            currentContext.resultStack().push(successful);
             if (successful) {
-                writeLine("Node('%s') added successfully.", nodeUrl);
+                writeLine(currentContext, "Node('%s') added successfully.", nodeUrl);
             } else {
-                writeLine("Cannot add node('%s').", nodeUrl);
+                writeLine(currentContext, "Cannot add node('%s').", nodeUrl);
             }
         } else {
-            handleError("An error occurred while adding the node:", response);
+            handleError("An error occurred while adding the node:", response, currentContext);
         }
     }
 }

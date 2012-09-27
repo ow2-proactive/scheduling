@@ -39,11 +39,12 @@ package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
 
 import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
 
-import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPut;
+import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
+import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
 
 public class FreezeCommand extends AbstractCommand implements Command {
 
@@ -51,22 +52,21 @@ public class FreezeCommand extends AbstractCommand implements Command {
     }
 
     @Override
-    public void execute() throws CLIException {
-        HttpPut request = new HttpPut(resourceUrl("freeze"));
-        HttpResponse response = execute(request);
+    public void execute(ApplicationContext currentContext) throws CLIException {
+        HttpPut request = new HttpPut(currentContext.getResourceUrl("freeze"));
+        HttpResponseWrapper response = execute(request, currentContext);
 
         if (statusCode(OK) == statusCode(response)) {
-            Boolean success = readValue(response, Boolean.TYPE);
-            resultStack().push(success);
+            Boolean success = readValue(response, Boolean.TYPE, currentContext);
+            resultStack(currentContext).push(success);
             if (success) {
-                writeLine("Scheduler successfully frozen.");
+                writeLine(currentContext, "Scheduler successfully frozen.");
             } else {
-                writeLine("Cannot freeze scheduler.");
+                writeLine(currentContext, "Cannot freeze scheduler.");
             }
         } else {
-            handleError(
-                    "Error occurred while trying to freeze the scheduler:",
-                    response);
+            handleError("Error occurred while trying to freeze the scheduler:",
+                    response, currentContext);
         }
     }
 

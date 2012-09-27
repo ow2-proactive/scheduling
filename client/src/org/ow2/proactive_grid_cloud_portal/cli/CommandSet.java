@@ -49,6 +49,7 @@ import org.ow2.proactive_grid_cloud_portal.cli.cmd.EvalScriptCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.ExitCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.LoginCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.LoginWithCredentialsCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.OutputCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.PrintSessionCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.SetCaCertsCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.SetCaCertsPassCommand;
@@ -58,7 +59,6 @@ import org.ow2.proactive_grid_cloud_portal.cli.cmd.SetSessionCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.SetSessionFileCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.SetSilentCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.SetUrlCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.OutputCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.AddNodeCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.CreateNodeSourceCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.ForceCommand;
@@ -532,78 +532,195 @@ public class CommandSet {
      */
     public static class Entry implements Comparable<Entry> {
 
+        /**
+         * Name of this option.
+         */
         private String opt;
+        /**
+         * Long name of this option.
+         */
         private String longOpt;
+        /**
+         * Description of this option.
+         */
         private String description;
+        /**
+         * Interactive shell command description of this option.
+         */
         private String jsCommand = null;
+        /**
+         * Indicates whether this option has one or more arguments.
+         */
         private boolean hasArgs = false;
+        /**
+         * Argument names of this option.
+         */
         private String argNames;
+        /**
+         * Number of arguments of this option.
+         */
         private int numOfArgs = -1;
+        /**
+         * Name of the Command class responsible for processing this option.
+         */
         private Class<?> commandClass;
 
         private Entry() {
         }
 
+        /**
+         * Returns the name of this option.
+         * 
+         * @return the name of this option.
+         */
         public String opt() {
             return opt;
         }
 
+        /**
+         * Sets the name of this option.
+         * 
+         * @param opt
+         */
         private void setOpt(String opt) {
             this.opt = opt;
         }
 
+        /**
+         * Returns the long name of this option.
+         * 
+         * @return the long name of this option.
+         */
         public String longOpt() {
             return longOpt;
         }
 
+        /**
+         * Sets the long name of this option.
+         * 
+         * @param longOpt
+         *            the long name of this option.
+         */
         private void setLongOpt(String longOpt) {
             this.longOpt = longOpt;
         }
 
+        /**
+         * Returns the description of this option.
+         * 
+         * @return the description of this option.
+         */
         public String description() {
             return description;
         }
 
+        /**
+         * Sets the description of this option.
+         * 
+         * @param description
+         *            the description of this option.
+         */
         private void setDescription(String description) {
             this.description = description;
         }
 
+        /**
+         * Returns the description of interactive shell command of this option.
+         * 
+         * @return the interactive shell command description.
+         */
         public String jsCommand() {
             return jsCommand;
         }
 
+        /**
+         * Sets the description of interactive shell command of this option.
+         * 
+         * @param jsCommand
+         *            the interactive shell command description.
+         */
         private void setJsCommand(String jsCommand) {
             this.jsCommand = jsCommand;
         }
 
+        /**
+         * Returns <tt>ture</tt> if this option has one or more arguments.
+         * 
+         * @return <tt>true</tt> if this option has one or more arguments.
+         */
         public boolean hasArgs() {
             return hasArgs;
         }
 
+        /**
+         * Sets whether this option has one or more arguments.
+         * 
+         * @param hasArgs
+         *            whether this option has one or more arguments.
+         */
         private void setHasArgs(boolean hasArgs) {
             this.hasArgs = hasArgs;
         }
 
+        /**
+         * Returns the argument names of this option.
+         * 
+         * @return the argument names.
+         */
         public String argNames() {
             return argNames;
         }
 
+        /**
+         * Sets the argument names of this option.
+         * 
+         * @param argNames
+         *            the argument names.
+         */
         public void setArgNames(String argNames) {
             this.argNames = argNames;
         }
 
+        /**
+         * Returns the number of arguments of this option. If not specified,
+         * returns <tt>-1</tt>.
+         * 
+         * @return the number of arguments of this option.
+         */
         public int numOfArgs() {
             return numOfArgs;
         }
 
+        /**
+         * Sets the number of arguments of this option.
+         * 
+         * @param numOfArgs
+         *            the number of arguments of this option.
+         */
         private void setNumOfArgs(int numOfArgs) {
             this.numOfArgs = numOfArgs;
         }
 
+        /**
+         * Returns an instance of Command class which is responsible for
+         * processing this option along with any arguments specified.
+         * 
+         * @param option
+         *            a wrapper instance which contains arguments of this
+         *            option.
+         * @return
+         */
         public Command commandObject(Option option) {
             return CommandSetEntryHelper.newCommandObject(option, commandClass);
         }
 
+        /**
+         * Sets the name of the Command type responsible for processing this
+         * option.
+         * 
+         * @param commandClass
+         *            the class name of the Command type.
+         */
         public void setCommandClass(Class<?> commandClass) {
             this.commandClass = commandClass;
         }

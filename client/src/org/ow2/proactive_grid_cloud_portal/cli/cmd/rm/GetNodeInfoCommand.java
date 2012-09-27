@@ -41,11 +41,13 @@ import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.cli.json.NodeEventView;
 import org.ow2.proactive_grid_cloud_portal.cli.json.RmStateView;
+import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
 
 public class GetNodeInfoCommand extends AbstractCommand implements Command {
 
@@ -56,12 +58,14 @@ public class GetNodeInfoCommand extends AbstractCommand implements Command {
     }
 
     @Override
-    public void execute() throws CLIException {
+    public void execute(ApplicationContext currentContext) throws CLIException {
 
-        HttpGet request = new HttpGet(resourceUrl("monitoring"));
-        HttpResponse response = execute(request);
+        HttpGet request = new HttpGet(
+                currentContext.getResourceUrl("monitoring"));
+        HttpResponseWrapper response = execute(request, currentContext);
         if (statusCode(OK) == statusCode(response)) {
-            RmStateView state = readValue(response, RmStateView.class);
+            RmStateView state = readValue(response, RmStateView.class,
+                    currentContext);
             NodeEventView[] nodeEvents = state.getNodesEvents();
             NodeEventView target = null;
             for (NodeEventView nodeEvent : nodeEvents) {
@@ -71,14 +75,14 @@ public class GetNodeInfoCommand extends AbstractCommand implements Command {
                 }
             }
             if (target == null) {
-                writeLine("Cannot find node: '%s'", nodeUrl);
+                writeLine(currentContext, "Cannot find node: '%s'", nodeUrl);
                 return;
             }
-            resultStack().push(target);
-            writeLine("%s", target.getNodeInfo());
+            resultStack(currentContext).push(target);
+            writeLine(currentContext, "%s", target.getNodeInfo());
         } else {
             handleError("An error occurred while retrieving node info.",
-                    response);
+                    response, currentContext);
         }
     }
 

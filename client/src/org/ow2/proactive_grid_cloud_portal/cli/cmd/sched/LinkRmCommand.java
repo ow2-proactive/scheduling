@@ -40,15 +40,15 @@ package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
 import static org.apache.http.entity.ContentType.APPLICATION_FORM_URLENCODED;
 import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
 
-import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
+import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
+import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
 
-public class LinkRmCommand extends AbstractCommand implements
-        Command {
+public class LinkRmCommand extends AbstractCommand implements Command {
 
     private String rmUrl;
 
@@ -57,22 +57,24 @@ public class LinkRmCommand extends AbstractCommand implements
     }
 
     @Override
-    public void execute() throws CLIException {
-        HttpPost request = new HttpPost(resourceUrl("linkrm"));
+    public void execute(ApplicationContext currentContext) throws CLIException {
+        HttpPost request = new HttpPost(currentContext.getResourceUrl("linkrm"));
         StringEntity entity = new StringEntity("rmurl=" + rmUrl,
                 APPLICATION_FORM_URLENCODED);
         request.setEntity(entity);
-        HttpResponse response = execute(request);
+        HttpResponseWrapper response = execute(request, currentContext);
         if (statusCode(OK) == statusCode(response)) {
-            boolean success = readValue(response, Boolean.TYPE);
-            resultStack().push(success);
+            boolean success = readValue(response, Boolean.TYPE, currentContext);
+            resultStack(currentContext).push(success);
             if (success) {
-                writeLine("New resource manager relinked successfully.");
+                writeLine(currentContext,
+                        "New resource manager relinked successfully.");
             } else {
-                writeLine("Cannot relink '%s'.", rmUrl);
+                writeLine(currentContext, "Cannot relink '%s'.", rmUrl);
             }
         } else {
-            handleError("An error occurred while relinking:", response);
+            handleError("An error occurred while relinking:", response,
+                    currentContext);
         }
 
     }

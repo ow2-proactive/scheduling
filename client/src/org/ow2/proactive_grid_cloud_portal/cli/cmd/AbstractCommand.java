@@ -44,117 +44,142 @@ import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.FORBIDD
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
-import java.io.Writer;
 import java.util.Stack;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.conn.ClientConnectionManager;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.conn.PoolingClientConnectionManager;
+import org.apache.http.params.HttpParams;
 import org.codehaus.jackson.type.TypeReference;
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus;
 import org.ow2.proactive_grid_cloud_portal.cli.json.ErrorView;
+import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
+import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpUtility;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
 
 public abstract class AbstractCommand implements Command {
+
+    protected static HttpClient threadSafeClient() {
+        DefaultHttpClient client = new DefaultHttpClient();
+        ClientConnectionManager mgr = client.getConnectionManager();
+        HttpParams params = client.getParams();
+        client = new DefaultHttpClient(new PoolingClientConnectionManager(
+                mgr.getSchemeRegistry()), params);
+        return client;
+    }
 
     protected int statusCode(HttpResponseStatus status) {
         return status.statusCode();
     }
 
-    protected int statusCode(HttpResponse response) {
-        return response.getStatusLine().getStatusCode();
+    protected int statusCode(HttpResponseWrapper response) {
+        return response.getStatusCode();
     }
 
-    protected ApplicationContext currentContext() {
-        return ApplicationContext.instance();
-    }
-
-    protected <T> T readValue(HttpResponse response, Class<T> valueType) {
+    protected <T> T readValue(HttpResponseWrapper response, Class<T> valueType,
+            ApplicationContext currentContext) {
         try {
-            return currentContext().getObjectMapper().readValue(
-                    response.getEntity().getContent(), valueType);
+            return currentContext.getObjectMapper().readValue(
+                    response.getContent(), valueType);
         } catch (IOException ioe) {
             throw new CLIException(REASON_IO_ERROR, ioe);
         }
     }
 
-    protected <T> T readValue(HttpResponse response, TypeReference<T> valueType) {
+    protected <T> T readValue(HttpResponseWrapper response,
+            TypeReference<T> valueType, ApplicationContext currentContext) {
         try {
-            return currentContext().getObjectMapper().readValue(
-                    response.getEntity().getContent(), valueType);
+            return currentContext.getObjectMapper().readValue(
+                    response.getContent(), valueType);
         } catch (IOException ioe) {
             throw new CLIException(REASON_IO_ERROR, ioe);
         }
+
     }
 
-    protected String resourceUrl(String resource) {
-        return currentContext().getRestServerUrl() + "/" + currentContext().getResourceType()
-                + "/" + resource;
-    }
-
-    protected void writeLine(String format, Object... args) {
-        if (!currentContext().isSilent()) {
+    protected void writeLine(ApplicationContext currentContext, String format,
+            Object... args) {
+        if (!currentContext.isSilent()) {
             try {
-                currentContext().getDevice().writeLine(format, args);
+                currentContext.getDevice().writeLine(format, args);
             } catch (IOException ioe) {
                 throw new CLIException(REASON_IO_ERROR, ioe);
             }
         }
     }
 
-    protected String readLine(String format, Object... args) {
+    protected String readLine(ApplicationContext currentContext, String format,
+            Object... args) {
         try {
-            return currentContext().getDevice().readLine(format, args);
+            return currentContext.getDevice().readLine(format, args);
         } catch (IOException ioe) {
             throw new CLIException(REASON_IO_ERROR, ioe);
         }
     }
 
-    protected Writer writer() {
-        return currentContext().getDevice().getWriter();
-    }
-
-    protected char[] readPassword(String format, Object... args) {
+    protected char[] readPassword(ApplicationContext currentContext,
+            String format, Object... args) {
         try {
-            return currentContext().getDevice().readPassword(format, args);
+            return currentContext.getDevice().readPassword(format, args);
         } catch (IOException ioe) {
             throw new CLIException(REASON_IO_ERROR, ioe);
         }
     }
-    
-    @SuppressWarnings("rawtypes")
-    protected Stack resultStack() {
-        return currentContext().resultStack();
-    }
-    
-    protected HttpResponse execute(HttpUriRequest request) {
-        return currentContext().executeClient(request);
+
+    protected HttpResponseWrapper execute(HttpUriRequest request,
+            ApplicationContext currentContext) {
+        String sessionId = currentContext.getSessionId();
+        if (sessionId != null) {
+            request.setHeader("sessionid", sessionId);
+        }
+        HttpClient client = threadSafeClient();
+        try {
+            if ("https".equals(request.getURI().getScheme())
+                    && currentContext.canInsecureAccess()) {
+                HttpUtility.setInsecureAccess(client);
+            }
+            HttpResponse response = client.execute(request);
+            return new HttpResponseWrapper(response);
+
+        } catch (Exception e) {
+            throw new CLIException(CLIException.REASON_OTHER, e);
+        } finally {
+            ((HttpRequestBase) request).releaseConnection();
+        }
     }
 
     @SuppressWarnings("unchecked")
-    protected void handleError(String errorMessage, HttpResponse response) {
-        String responseContent = StringUtility.string(response);
+    protected void handleError(String errorMessage,
+            HttpResponseWrapper response, ApplicationContext currentContext) {
+        String responseContent = StringUtility.responseAsString(response);
+        Stack resultStack = resultStack(currentContext);
         ErrorView errorView = null;
         try {
-            errorView = currentContext().getObjectMapper().readValue(
+            errorView = currentContext.getObjectMapper().readValue(
                     responseContent.getBytes(), ErrorView.class);
-            resultStack().push(errorView);
-            
+            resultStack.push(errorView);
+
         } catch (Throwable error) {
-            resultStack().push(responseContent);
+            resultStack.push(responseContent);
             // if an ErrorView object can't be built from the response. Hence
             // process the response as a string
         }
         if (errorView != null) {
-            writeError(errorMessage, errorView);
+            writeError(errorMessage, errorView, currentContext);
         } else {
-            writeError(errorMessage, responseContent);
+            writeError(errorMessage, responseContent, currentContext);
         }
     }
 
-    private void writeError(String errorMsg, String responseContent) {
-        writeLine(errorMsg);
+    private void writeError(String errorMsg, String responseContent,
+            ApplicationContext currentContext) {
+        writeLine(currentContext, errorMsg);
 
         String errorMessage = null, errorCode = null;
         BufferedReader reader = new BufferedReader(new StringReader(
@@ -168,7 +193,7 @@ public abstract class AbstractCommand implements Command {
                     break;
                 }
             }
-            
+
             while ((line = reader.readLine()) != null) {
                 if (line.startsWith("httpErrorCode:")) {
                     errorCode = line.substring(line.indexOf(':')).trim();
@@ -180,18 +205,18 @@ public abstract class AbstractCommand implements Command {
         }
 
         if (errorCode != null) {
-            writeLine("%s %s", "HTTP Error Code:", errorCode);
+            writeLine(currentContext, "%s %s", "HTTP Error Code:", errorCode);
         }
 
         if (errorMessage != null) {
-            writeLine("%s %s", "Error Message:", errorMessage);
+            writeLine(currentContext, "%s %s", "Error Message:", errorMessage);
         }
 
         try {
             while ((line = reader.readLine()) != null) {
                 if (line.startsWith("stackTrace:")) {
                     while ((line = reader.readLine()) != null) {
-                        writeLine(line);
+                        writeLine(currentContext, line);
                     }
                     break;
                 }
@@ -201,19 +226,28 @@ public abstract class AbstractCommand implements Command {
         }
 
         if (errorCode == null && errorMessage == null) {
-            writeLine("%s%n%s", "Error Message:", responseContent);
+            writeLine(currentContext, "%s%n%s", "Error Message:",
+                    responseContent);
         }
     }
 
-    private void writeError(String errorMessage, ErrorView error) {
+    public Stack resultStack(ApplicationContext currentContext) {
+        return currentContext.resultStack();
+    }
+
+    private void writeError(String errorMessage, ErrorView error,
+            ApplicationContext currentContext) {
         if (statusCode(FORBIDDEN) == error.getHttpErrorCode()) {
             // this exception would be handled at an upper level ..
             throw new CLIException(REASON_UNAUTHORIZED_ACCESS,
                     error.getErrorMessage());
         }
-        writeLine(errorMessage);
-        writeLine("%s %s", "HTTP Error Code:", error.getHttpErrorCode());
-        writeLine("%s %s", "Error Message:", error.getErrorMessage());
-        writeLine("%s%n%s", "Stack Trace:", error.getStackTrace());
+        writeLine(currentContext, errorMessage);
+        writeLine(currentContext, "%s %s", "HTTP Error Code:",
+                error.getHttpErrorCode());
+        writeLine(currentContext, "%s %s", "Error Message:",
+                error.getErrorMessage());
+        writeLine(currentContext, "%s%n%s", "Stack Trace:",
+                error.getStackTrace());
     }
 }

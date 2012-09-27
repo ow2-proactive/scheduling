@@ -37,6 +37,7 @@
 
 package org.ow2.proactive_grid_cloud_portal.cli.cmd;
 
+import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 
 public class SetInsecureAccessCommand extends AbstractCommand implements
@@ -46,8 +47,8 @@ public class SetInsecureAccessCommand extends AbstractCommand implements
     }
 
     @Override
-    public void execute() throws CLIException {
-        currentContext().allowInsecureAccess(true);
+    public void execute(ApplicationContext currentContext) throws CLIException {
+        currentContext.setInsecureAccess(true);
     }
 
 }

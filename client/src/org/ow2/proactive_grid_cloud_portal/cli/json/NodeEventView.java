@@ -47,6 +47,8 @@ public class NodeEventView {
     private String nodeUrl;
     private String nodeProvider;
     private String nodeOwner;
+    private String defaultJMXUrl;
+    private String proactiveJMXUrl;
 
     public String getHostName() {
         return hostName;
@@ -118,5 +120,21 @@ public class NodeEventView {
 
     public void setTimeStamp(String timeStamp) {
         this.timeStamp = timeStamp;
+    }
+
+    public String getDefaultJMXUrl() {
+        return defaultJMXUrl;
+    }
+
+    public void setDefaultJMXUrl(String defaultJMXUrl) {
+        this.defaultJMXUrl = defaultJMXUrl;
+    }
+
+    public String getProactiveJMXUrl() {
+        return proactiveJMXUrl;
+    }
+
+    public void setProactiveJMXUrl(String proactiveJMXUrl) {
+        this.proactiveJMXUrl = proactiveJMXUrl;
     }
 }

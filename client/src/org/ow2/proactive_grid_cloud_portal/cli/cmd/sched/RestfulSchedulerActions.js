@@ -1,10 +1,11 @@
-importClass(org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext);
+importClass(org.ow2.proactive_grid_cloud_portal.cli.ApplicationContextImpl);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.CLIException);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.SetUrlCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractLoginCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.LoginCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.LoginWithCredentialsCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.EvalScriptCommand);
+importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractIModeCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.SchedJsHelpCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.StartCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.StopCommand);
@@ -29,7 +30,7 @@ importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.RestartTaskCommand
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.GetTaskOutputCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.GetTaskResultCommand);
 
-var s = ApplicationContext.instance();
+var currentContext = ApplicationContextImpl.currentContext();
 
 printWelcomeMsg();
 
@@ -42,12 +43,12 @@ function url(url) {
 }
 
 function login(user) {
-    s.setSessionId(null);
+    currentContext.setSessionId(null);
 	execute(new LoginCommand('' + user));
 }
 
 function loginwithcredentials(pathname) {
-	s.setSessionId(null);
+	currentContext.setSessionId(null);
 	execute(new LoginWithCredentialsCommand('' + pathname));
 }
 
@@ -148,10 +149,10 @@ function linkrm(rmUrl) {
 }
 
 function reconnect() {
-	if (getCredFile(s) != null) {
-		loginwithcredentials(getCredFile(s));
-	} else if (getUser(s) != null) {
-		login(getUser(s));
+	if (getCredFile(currentContext) != null) {
+		loginwithcredentials(getCredFile(currentContext));
+	} else if (getUser(currentContext) != null) {
+		login(getUser(currentContext));
 	} else {
 		print('use either login(username) or loginwithcredentials(cred-file) function\n')
 
@@ -159,15 +160,15 @@ function reconnect() {
 }
 
 function exit() {
-	s.setTerminated(true);	
+	currentContext.setProperty(AbstractIModeCommand.TERMINATE, true);	
 }
 
 function getUser() {
-	return s.getProperty(LoginCommand.USERNAME, java.lang.String.prototype);
+	return currentContext.getProperty(LoginCommand.USERNAME, java.lang.String.prototype);
 }
 
 function getCredFile() {
-	return s.getProperty(LoginWithCredentialsCommand.CRED_FILE, java.lang.String.prototype);
+	return currentContext.getProperty(LoginWithCredentialsCommand.CRED_FILE, java.lang.String.prototype);
 }
 
 function printWelcomeMsg() {
@@ -179,12 +180,12 @@ function printWelcomeMsg() {
 
 function execute(cmd) {
     try {
-        cmd.execute();
+        cmd.execute(currentContext);
     } catch (e) {
         if (e.javaException instanceof CLIException 
                 && (e.javaException.reason() == CLIException.REASON_UNAUTHORIZED_ACCESS)
-                && s.getProperty(AbstractLoginCommand.RETRY_LOGIN, java.lang.Boolean.TYPE, false)) {
-            s.setProperty(AbstractLoginCommand.RENEW_SESSION, true);
+                && currentContext.getProperty(AbstractLoginCommand.PROP_PERSISTED_SESSION, java.lang.Boolean.TYPE, false)) {
+            currentContext.setProperty(AbstractLoginCommand.PROP_RENEW_SESSION, true);
             if (getCredFile() != null) {
             	execute(new LoginWithCredentialsCommand(getCredFile()));
             } else if (getUser() != null) {
@@ -192,7 +193,7 @@ function execute(cmd) {
             } else {
                 throw e;
             }
-            cmd.execute();
+            cmd.execute(currentContext);
         } else {
             throw e;
         }

@@ -48,8 +48,10 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.ByteArrayBody;
+import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.FileUtility;
+import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
 
 public class LoginWithCredentialsCommand extends AbstractLoginCommand implements
@@ -63,35 +65,38 @@ public class LoginWithCredentialsCommand extends AbstractLoginCommand implements
     }
 
     @Override
-    protected String login() throws CLIException {
+    protected String login(ApplicationContext currentContext)
+            throws CLIException {
         File credentials = new File(pathname);
         if (!credentials.exists()) {
             throw new CLIException(REASON_INVALID_ARGUMENTS, String.format(
                     "File does not exist: %s", credentials.getAbsolutePath()));
         }
-        HttpPost request = new HttpPost(resourceUrl("login"));
+        HttpPost request = new HttpPost(currentContext.getResourceUrl("login"));
         MultipartEntity entity = new MultipartEntity();
         entity.addPart("credential",
                 new ByteArrayBody(FileUtility.byteArray(credentials),
                         APPLICATION_OCTET_STREAM.getMimeType()));
         request.setEntity(entity);
-        HttpResponse response = currentContext().executeClient(request);
+        HttpResponseWrapper response = execute(request, currentContext);
         if (statusCode(OK) == statusCode(response)) {
-            return StringUtility.string(response).trim();
+            return StringUtility.responseAsString(response).trim();
         } else {
-            handleError("An error occurred while logging: ", response);
+            handleError("An error occurred while logging: ", response,
+                    currentContext);
             throw new CLIException(REASON_OTHER,
                     "An error occurred while logging.");
         }
     }
 
     @Override
-    protected String alias() {
+    protected String getAlias(ApplicationContext currentContext) {
+        String pathname = currentContext.getProperty(CRED_FILE, String.class);
         return FileUtility.md5Checksum(new File(pathname));
     }
 
     @Override
-    protected void setCredentials() {
-        currentContext().setProperty(CRED_FILE, pathname);
+    protected void setAlias(ApplicationContext currentContext) {
+        currentContext.setProperty(CRED_FILE, pathname);
     }
 }

@@ -44,9 +44,11 @@ import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
+import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
+import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpUtility;
 
 public class RemoveNodeCommand extends AbstractCommand implements Command {
@@ -63,11 +65,12 @@ public class RemoveNodeCommand extends AbstractCommand implements Command {
     }
 
     @Override
-    public void execute() throws CLIException {
-        HttpPost request = new HttpPost(resourceUrl("node/remove"));
+    public void execute(ApplicationContext currentContext) throws CLIException {
+        HttpPost request = new HttpPost(
+                currentContext.getResourceUrl("node/remove"));
         StringBuilder buffer = new StringBuilder();
         buffer.append("url=").append(HttpUtility.encodeUrl(nodeUrl));
-        if (currentContext().isForced()) {
+        if (currentContext.isForced()) {
             preempt = true;
         }
         if (preempt) {
@@ -76,17 +79,20 @@ public class RemoveNodeCommand extends AbstractCommand implements Command {
         StringEntity entity = new StringEntity(buffer.toString(),
                 APPLICATION_FORM_URLENCODED);
         request.setEntity(entity);
-        HttpResponse response = execute(request);
+        HttpResponseWrapper response = execute(request, currentContext);
         if (statusCode(OK) == statusCode(response)) {
-            boolean successful = readValue(response, Boolean.TYPE);
-            resultStack().push(successful);
+            boolean successful = readValue(response, Boolean.TYPE,
+                    currentContext);
+            resultStack(currentContext).push(successful);
             if (successful) {
-                writeLine("Node('%s') successfully removed.", nodeUrl);
+                writeLine(currentContext, "Node('%s') successfully removed.",
+                        nodeUrl);
             } else {
-                writeLine("Cannot remove node: '%s'", nodeUrl);
+                writeLine(currentContext, "Cannot remove node: '%s'", nodeUrl);
             }
         } else {
-            handleError("An error occurred while removing node:", response);
+            handleError("An error occurred while removing node:", response,
+                    currentContext);
         }
     }
 

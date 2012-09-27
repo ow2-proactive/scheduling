@@ -37,6 +37,7 @@
 
 package org.ow2.proactive_grid_cloud_portal.cli.cmd;
 
+import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 
 public class SetSessionCommand extends AbstractCommand implements Command {
@@ -47,8 +48,8 @@ public class SetSessionCommand extends AbstractCommand implements Command {
     }
 
     @Override
-    public void execute() throws CLIException {
-        currentContext().setSessionId(session);
+    public void execute(ApplicationContext currentContext) throws CLIException {
+        currentContext.setSessionId(session);
     }
 
 }

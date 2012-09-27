@@ -41,13 +41,14 @@ import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
 
 import java.util.Map;
 
-import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.codehaus.jackson.type.TypeReference;
+import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.cli.json.SchedulerStateView;
+import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
 
 public class ListJobCommand extends AbstractCommand implements Command {
@@ -56,25 +57,26 @@ public class ListJobCommand extends AbstractCommand implements Command {
     }
 
     @Override
-    public void execute() throws CLIException {
-        String resourceUrl = resourceUrl("revisionandstate");
-        HttpGet request = new HttpGet(resourceUrl);
-        HttpResponse response = execute(request);
+    public void execute(ApplicationContext currentContext) throws CLIException {
+        HttpGet request = new HttpGet(
+                currentContext.getResourceUrl("revisionandstate"));
+        HttpResponseWrapper response = execute(request, currentContext);
 
         if (statusCode(OK) == statusCode(response)) {
             Map<Long, SchedulerStateView> stateMap = readValue(response,
                     new TypeReference<Map<Long, SchedulerStateView>>() {
-                    });
+                    }, currentContext);
             SchedulerStateView schedulerState = stateMap.entrySet().iterator()
                     .next().getValue();
-            resultStack().push(schedulerState);
-            if (!currentContext().isSilent()) {
-                writeLine("%s",
+            resultStack(currentContext).push(schedulerState);
+            if (!currentContext.isSilent()) {
+                writeLine(currentContext, "%s",
                         StringUtility.schedulerStateAsString(schedulerState));
             }
-            
+
         } else {
-            handleError("An error occurred while retriving job list:", response);
+            handleError("An error occurred while retriving job list:",
+                    response, currentContext);
         }
     }
 

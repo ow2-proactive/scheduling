@@ -62,10 +62,9 @@ public class EvalScriptCommand extends AbstractCommand implements Command {
     }
 
     @Override
-    public void execute() throws CLIException {
-        ApplicationContext context = currentContext();
-        ScriptEngine engine = context.getEngine();
-        Writer writer = context.getDevice().getWriter();
+    public void execute(ApplicationContext currentContext) throws CLIException {
+        ScriptEngine engine = currentContext.getEngine();
+        Writer writer = currentContext.getDevice().getWriter();
         if (scriptArgs != null) {
             engine.getContext().getBindings(ScriptContext.ENGINE_SCOPE)
                     .putAll(bindings(scriptArgs));
@@ -86,7 +85,6 @@ public class EvalScriptCommand extends AbstractCommand implements Command {
             bindings.put(nameValue[0], nameValue[1]);
         }
         return bindings;
-
     }
 
 }

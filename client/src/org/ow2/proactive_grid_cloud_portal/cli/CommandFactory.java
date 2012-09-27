@@ -108,7 +108,7 @@ public abstract class CommandFactory {
 
     public abstract Options supportedOptions();
 
-    public abstract List<Command> getCommandList(CommandLine cli);
+    public abstract List<Command> getCommandList(CommandLine cli, ApplicationContext currentContext);
 
     public abstract void addCommandEntry(CommandSet.Entry entry);
 
@@ -124,7 +124,7 @@ public abstract class CommandFactory {
      * @return an ordered {@link Command} list.
      */
     protected List<Command> getCommandList(CommandLine cli,
-            Map<String, Command> map) {
+            Map<String, Command> map, ApplicationContext currentContext) {
         LinkedList<Command> list = new LinkedList<Command>();
 
         if (map.containsKey(opt(SCHED_HELP))) {
@@ -170,8 +170,7 @@ public abstract class CommandFactory {
 
         } else {
             // auto login
-            String resourceType = ApplicationContext.instance()
-                    .getResourceType();
+            String resourceType = currentContext.getResourceType();
             String filename = resourceType + ".cc";
             File credFile = new File(DFLT_SESSION_DIR, filename);
             if (credFile.exists()) {

@@ -39,22 +39,25 @@ package org.ow2.proactive_grid_cloud_portal.cli.cmd;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 
+import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
+import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
 
 public abstract class AbstractIModeCommand extends AbstractCommand implements
         Command {
+
+    public static final String TERMINATE = "org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractIModeCommand.terminate";
 
     public AbstractIModeCommand() {
     }
 
     @Override
-    public void execute() throws CLIException {
-        ScriptEngine engine = currentContext().getEngine();
+    public void execute(ApplicationContext currentContext) throws CLIException {
+        ScriptEngine engine = currentContext.getEngine();
         try {
             // load supported functions
             engine.eval(new InputStreamReader(script()));
@@ -62,16 +65,17 @@ public abstract class AbstractIModeCommand extends AbstractCommand implements
             throw new CLIException(CLIException.REASON_OTHER, error);
         }
 
-        while (!currentContext().isTermiated()) {
+        while (!currentContext.getProperty(TERMINATE, Boolean.TYPE, false)) {
             try {
-                String command = readLine("> ");
+                String command = readLine(currentContext, "> ");
                 if (command == null) {
                     break; // EOF, exit interactive shell
                 }
                 engine.eval(command);
             } catch (ScriptException se) {
-                writeLine("An error occurred while executing the script:");
-                se.printStackTrace(new PrintWriter(writer(), true));
+                writeLine(currentContext, "%s\n%s",
+                        "An error occurred while executing the script:",
+                        StringUtility.stackTraceAsString(se));
             }
         }
     }

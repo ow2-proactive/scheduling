@@ -37,6 +37,7 @@
 
 package org.ow2.proactive_grid_cloud_portal.cli.cmd.rm;
 
+import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
 
@@ -50,8 +51,8 @@ public class SetNodeSourceCommand extends AbstractCommand {
     }
 
     @Override
-    public void execute() throws CLIException {
-        currentContext().setProperty(SET_NODE_SOURCE, nodeSource);
+    public void execute(ApplicationContext currentContext) throws CLIException {
+        currentContext.setProperty(SET_NODE_SOURCE, nodeSource);
     }
 
 }

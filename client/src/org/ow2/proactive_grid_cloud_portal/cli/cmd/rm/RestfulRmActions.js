@@ -1,10 +1,11 @@
-importClass(org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext);
+importClass(org.ow2.proactive_grid_cloud_portal.cli.ApplicationContextImpl);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.CLIException);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.RmJsHelpCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.SetUrlCommand);
+importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractLoginCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.LoginCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.LoginWithCredentialsCommand);
-importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.ExitCommand);
+importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractIModeCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.AddNodeCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.RemoveNodeCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.SetInfrastructureCommand);
@@ -22,7 +23,7 @@ importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.RmStatsCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.GetTopologyCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.ShutdownCommand);
 
-var s = ApplicationContext.instance();
+var currentContext = ApplicationContextImpl.currentContext();
 
 printWelcomeMsg();
 
@@ -35,12 +36,12 @@ function url(url) {
 }
 
 function login(user) {
-    s.setSessionId(null);
+    currentContext.setSessionId(null);
     execute(new LoginCommand('' + user));
 }
 
 function loginwithcredentials(pathname) {
-    s.setSessionId(null);
+    currentContext.setSessionId(null);
     execute(new LoginWithCredentialsCommand('' + pathname));
 }
 
@@ -111,51 +112,51 @@ function shutdown() {
 }
 
 function reconnect() {
-    if (s.getAlias() != null) {
-        loginwithcredentials(s.getCredFilePathname());
-    } else if (s.getUser() != null) {
-        login(s.getUser());
-    } else {
-        print('use either login(username) or loginwithcredentials(cred-file) function\n')
+	if (getCredFile(currentContext) != null) {
+		loginwithcredentials(getCredFile(currentContext));
+	} else if (getUser(currentContext) != null) {
+		login(getUser(currentContext));
+	} else {
+		print('use either login(username) or loginwithcredentials(cred-file) function\n')
 
-    }
+	}
 }
 
 function exit() {
-	execute(new ExitCommand());
+	currentContext.setProperty(AbstractIModeCommand.TERMINATE, true);	
 }
 
-function getUser() {
-	return s.getProperty(LoginCommand.USERNAME, java.lang.String.prototype);
+function getUser(context) {
+	return context.getProperty(LoginCommand.USERNAME, java.lang.String.prototype);
 }
 
-function getCredFile() {
-	return s.getProperty(LoginWithCredentialsCommand.CRED_FILE, java.lang.String.prototype);
+function getCredFile(context) {
+	return context.getProperty(LoginWithCredentialsCommand.CRED_FILE, java.lang.String.prototype);
 }
 
 function printWelcomeMsg() {
     print('Type help() for interactive help \r\n');
-     if (getUser() == null && getCredFile() == null) {
+     if (getUser(currentContext) == null && getCredFile(currentContext) == null) {
         print('Warning: You are not currently logged in.\r\n');
     }
 }
 
 function execute(cmd) {
     try {
-        cmd.execute();
+        cmd.execute(currentContext);
     } catch (e) {
         if (e.javaException instanceof CLIException 
                 && (e.javaException.reason() == CLIException.REASON_UNAUTHORIZED_ACCESS)
-                && s.getProperty(AbstractLoginCommand.RETRY_LOGIN, java.lang.Boolean.TYPE, false)) {
-            s.setProperty(AbstractLoginCommand.RENEW_SESSION, true);
-            if (getCredFile() != null) {
-            	execute(new LoginWithCredentialsCommand(getCredFile()));
-            } else if (getUser() != null) {
-            	execute(new LoginCommand(getUser()));
+                && currentContext.getProperty(AbstractLoginCommand.PROP_PERSISTED_SESSION, java.lang.Boolean.TYPE, false)) {
+            currentContext.setProperty(AbstractLoginCommand.PROP_RENEW_SESSION, true);
+            if (getCredFile(currentContext) != null) {
+            	execute(new LoginWithCredentialsCommand(getCredFile(currentContext)));
+            } else if (getUser(currentContext) != null) {
+            	execute(new LoginCommand(getUser(currentContext)));
             } else {
                 throw e;
             }
-            cmd.execute();
+            cmd.execute(currentContext);
         } else {
             throw e;
         }

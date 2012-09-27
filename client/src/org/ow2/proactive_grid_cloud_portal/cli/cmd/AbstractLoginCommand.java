@@ -49,81 +49,100 @@ import org.ow2.proactive_grid_cloud_portal.cli.utils.FileUtility;
 public abstract class AbstractLoginCommand extends AbstractCommand implements
         Command {
 
-    public static final String RETRY_LOGIN = "org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractLoginCommand.retryLogin";
-    public static final String RENEW_SESSION = "org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractLoginCommand.renew";
-    private static final String PERSIST_SESSION = "org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractLoginCommand.default";
+    public static final boolean RENEW_SESSION_BY_DEFAULT = false;
+    public static final boolean PERSIST_SESSION_BY_DEFAULT = true;
+
+    public static final String PROP_PERSISTED_SESSION = "org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractLoginCommand.persistedSession";
+    public static final String PROP_RENEW_SESSION = "org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractLoginCommand.renewSession";
+    public static final String PROP_ENABLE_PERSISTENCE = "org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractLoginCommand.enablePersistence";
 
     @Override
-    public void execute() throws CLIException {
-        setCredentials();
-        ApplicationContext context = currentContext();
-        Boolean renewSession = context.getProperty(RENEW_SESSION, Boolean.TYPE,
-                false);
-        Boolean persistSession = context.getProperty(PERSIST_SESSION,
-                Boolean.TYPE, false);
-        String sessionId = context.getSessionId();
+    public void execute(ApplicationContext currentContext) throws CLIException {
+        setAlias(currentContext);
+        boolean renewSession = currentContext.getProperty(PROP_RENEW_SESSION,
+                Boolean.TYPE, RENEW_SESSION_BY_DEFAULT);
+        boolean persistSession = currentContext.getProperty(
+                PROP_ENABLE_PERSISTENCE, Boolean.TYPE, PERSIST_SESSION_BY_DEFAULT);
+        String sessionId = currentContext.getSessionId();
 
         if (sessionId != null && !renewSession) {
             // session id is set explicitly and no update request. But in case
             // of a failure we can always retry.
-            context.setProperty(RETRY_LOGIN, true);
+            currentContext.setProperty(PROP_PERSISTED_SESSION, true);
+            currentContext.setProperty(PROP_ENABLE_PERSISTENCE, false);
             return;
         }
 
-        if (sessionId == null) {
-            File sessionFile = sessionFile();
-            if (sessionFile.exists()) {
-                sessionId = FileUtility.readFileToString(sessionFile);
-                context.setProperty(RETRY_LOGIN, true);
-
-            } else {
-                sessionId = login();
-                context.setProperty(RETRY_LOGIN, false);
-                writeToSessionFile(sessionFile, sessionId);
-            }
-            context.setProperty(PERSIST_SESSION, true);
+        if (renewSession) {
+            System.out.println("renewing .. ");
+            sessionId = getSessionIdFromServer(currentContext);
+            writeLine(currentContext, "Session id successfully renewed.");
 
         } else {
-            if (renewSession) {
-                sessionId = login();
-                context.setProperty(RETRY_LOGIN, false);
-                if (persistSession) {
-                    File sessionFile = sessionFile();
-                    if (sessionFile.exists()) {
-                        sessionFile.delete();
-                    }
-                    writeToSessionFile(sessionFile, sessionId);
-                    writeLine("Session id successfully renewed.");
-                }
+            // at this point, session-id is null
+            if (persistSession) {
+                sessionId = getSessionIdFromFile(currentContext);
             }
+            if (sessionId == null) {
+                sessionId = getSessionIdFromServer(currentContext);
+            }
+
         }
-        context.setSessionId(sessionId);
-        resultStack().push(sessionId);
+        currentContext.setSessionId(sessionId);
+        resultStack(currentContext).push(sessionId);
     }
 
-    protected abstract String login() throws CLIException;
+    protected abstract String login(ApplicationContext currentContext)
+            throws CLIException;
 
-    protected abstract String alias();
-    
-    protected abstract void setCredentials();
+    protected abstract String getAlias(ApplicationContext currentContext);
 
-    private void writeToSessionFile(File sessionFile, String sessionId) {
-        File parentFile = sessionFile.getParentFile();
-        if (!parentFile.exists()) {
-            parentFile.mkdirs();
+    protected abstract void setAlias(ApplicationContext currentContext);
+
+    private String getSessionIdFromFile(ApplicationContext currentContext) {
+        File sessionFile = sessionFile(currentContext);
+        if (sessionFile.exists()) {
+            currentContext.setProperty(PROP_PERSISTED_SESSION, true);
+            return FileUtility.readFileToString(sessionFile);
+        }
+        return null;
+    }
+
+    private String getSessionIdFromServer(ApplicationContext currentContext) {
+        currentContext.setProperty(PROP_PERSISTED_SESSION, false);
+        String sessionId = login(currentContext);
+        if (currentContext
+                .getProperty(PROP_ENABLE_PERSISTENCE, Boolean.TYPE, true)) {
+            writeToSessionFile(sessionFile(currentContext), sessionId,
+                    currentContext);
+        }
+        return sessionId;
+    }
+
+    private void writeToSessionFile(File sessionFile, String sessionId,
+            ApplicationContext currentContext) {
+        if (sessionFile.exists()) {
+            sessionFile.delete();
+        } else {
+            File parentFile = sessionFile.getParentFile();
+            if (!parentFile.exists()) {
+                parentFile.mkdirs();
+            }
         }
         FileUtility.writeStringToFile(sessionFile, sessionId);
         if (!setOwnerOnly(sessionFile)) {
             writeLine(
+                    currentContext,
                     "Warning! Possible security risk: unable to limit access rights of session-id file '%s'",
                     sessionFile.getAbsoluteFile());
         }
 
     }
 
-    private File sessionFile() {
-        String filename = (new StringBuilder()).append(alias()).append('-')
-                .append(currentContext().getResourceType())
+    private File sessionFile(ApplicationContext currentContext) {
+        String filename = (new StringBuilder())
+                .append(getAlias(currentContext)).append('-')
+                .append(currentContext.getResourceType())
                 .append(DFLT_SESSION_FILE_EXT).toString();
         return new File(DFLT_SESSION_DIR, filename);
     }

@@ -45,8 +45,8 @@ import static org.ow2.proactive_grid_cloud_portal.cli.CommandFactory.SCHEDULER;
 import static org.ow2.proactive_grid_cloud_portal.cli.RestConstants.DFLT_REST_SCHEDULER_URL;
 import static org.ow2.proactive_grid_cloud_portal.cli.RestConstants.RM_RESOURCE_TYPE;
 import static org.ow2.proactive_grid_cloud_portal.cli.RestConstants.SCHEDULER_RESOURCE_TYPE;
-import static org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractLoginCommand.RENEW_SESSION;
-import static org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractLoginCommand.RETRY_LOGIN;
+import static org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractLoginCommand.PROP_RENEW_SESSION;
+import static org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractLoginCommand.PROP_PERSISTED_SESSION;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -72,14 +72,15 @@ public abstract class EntryPoint {
         CommandLine cli = null;
         AbstractDevice console = null;
 
-        ApplicationContext context = ApplicationContext.instance();
+        ApplicationContext currentContext = ApplicationContextImpl
+                .currentContext();
 
         try {
             commandFactory = getCommandFactory(resourceType());
             console = AbstractDevice.getConsole(AbstractDevice.JLINE);
             ((JLineDevice) console).setCommands(commandFactory
                     .supportedCommandEntries());
-            context.setDevice(console);
+            currentContext.setDevice(console);
 
             Options options = commandFactory.supportedOptions();
             cli = (new GnuParser()).parse(options, args);
@@ -94,39 +95,39 @@ public abstract class EntryPoint {
             Command help = commandFactory
                     .commandForOption(new Option("h", null));
             if (help != null) {
-                help.execute();
+                help.execute(currentContext);
             }
             System.exit(1);
         }
 
-        context.setObjectMapper(new ObjectMapper().configure(
+        currentContext.setObjectMapper(new ObjectMapper().configure(
                 FAIL_ON_UNKNOWN_PROPERTIES, false));
-        context.setRestServerUrl(DFLT_REST_SCHEDULER_URL);
-        context.setResourceType(resourceType());
+        currentContext.setRestServerUrl(DFLT_REST_SCHEDULER_URL);
+        currentContext.setResourceType(resourceType());
 
         // retrieve the (ordered) command list corresponding to command-line
         // arguments
         List<Command> commands = null;
         try {
-            commands = commandFactory.getCommandList(cli);
+            commands = commandFactory.getCommandList(cli, currentContext);
         } catch (CLIException e) {
-            writeError(writer(context), "", e);
+            writeError(writer(currentContext), "", e);
             System.exit(1);
         }
 
         boolean authorizationError = false;
 
         try {
-            executeCommandList(commands);
+            executeCommandList(commands, currentContext);
         } catch (CLIException error) {
             if (REASON_UNAUTHORIZED_ACCESS == error.reason()) {
                 authorizationError = true;
             } else {
-                writeError(writer(context), "An error occurred:", error);
+                writeError(writer(currentContext), "An error occurred:", error);
             }
         } catch (Throwable e) {
             e.printStackTrace();
-            writeError(writer(context), "An error occurred:", e);
+            writeError(writer(currentContext), "An error occurred:", e);
         }
 
         /*
@@ -134,24 +135,27 @@ public abstract class EntryPoint {
          * obtaining a new session-id even if a login with credentials
          * specified. However if the REST server responds with an authorization
          * error (e.g. due to session timeout), it re-executes the commands list
-         * after clearing the existing session. This will effectively re-execute
-         * the user command after with a new session-id.
+         * with AbstractLoginCommand.PROP_RENEW_SESSION property set to 'true'.
+         * This will effectively re-execute the user command with a new
+         * session-id from server.
          */
         if (authorizationError
-                && context.getProperty(RETRY_LOGIN, Boolean.TYPE, false)) {
+                && currentContext.getProperty(PROP_PERSISTED_SESSION,
+                        Boolean.TYPE, false)) {
             try {
-                context.setProperty(RENEW_SESSION, true);
-                executeCommandList(commands);
+                currentContext.setProperty(PROP_RENEW_SESSION, true);
+                executeCommandList(commands, currentContext);
             } catch (Throwable error) {
-                writeError(writer(context),
+                writeError(writer(currentContext),
                         "An error occurred while execution:", error);
             }
         }
     }
 
-    private void executeCommandList(List<Command> commands) throws CLIException {
-        for (Command c : commands) {
-            c.execute();
+    private void executeCommandList(List<Command> commandList,
+            ApplicationContext currentContext) throws CLIException {
+        for (Command command : commandList) {
+            command.execute(currentContext);
         }
     }
 

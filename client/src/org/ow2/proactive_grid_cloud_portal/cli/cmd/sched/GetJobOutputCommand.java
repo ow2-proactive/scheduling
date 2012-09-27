@@ -42,12 +42,13 @@ import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
 
 import java.util.Map;
 
-import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.codehaus.jackson.type.TypeReference;
+import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractJobCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
+import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
 
 public class GetJobOutputCommand extends AbstractJobCommand implements Command {
@@ -57,27 +58,27 @@ public class GetJobOutputCommand extends AbstractJobCommand implements Command {
     }
 
     @Override
-    public void execute() throws CLIException {
-        HttpGet request = new HttpGet(resourceUrl("jobs/" + jobId
-                + "/result/value"));
-        HttpResponse response = execute(request);
+    public void execute(ApplicationContext currentContext) throws CLIException {
+        HttpGet request = new HttpGet(currentContext.getResourceUrl("jobs/"
+                + jobId + "/result/value"));
+        HttpResponseWrapper response = execute(request, currentContext);
         if (statusCode(OK) == statusCode(response)) {
             Map<String, String> jobOutput = readValue(response,
                     new TypeReference<Map<String, String>>() {
-                    });
-            resultStack().push(jobOutput);
-            if (!currentContext().isSilent()) {
-                writeLine("%s",
+                    }, currentContext);
+            resultStack(currentContext).push(jobOutput);
+            if (!currentContext.isSilent()) {
+                writeLine(currentContext, "%s",
                         StringUtility.jobOutputAsString(job(), jobOutput));
             }
 
         } else if (statusCode(NO_CONTENT) == statusCode(response)) {
-            writeLine("%s output not available.", job());
+            writeLine(currentContext, "%s output not available.", job());
 
         } else {
             handleError(String.format(
                     "An error occurred while retrieving %s output:", job()),
-                    response);
+                    response, currentContext);
         }
     }
 }

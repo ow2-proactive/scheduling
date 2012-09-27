@@ -37,6 +37,7 @@
 
 package org.ow2.proactive_grid_cloud_portal.cli.cmd;
 
+import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 
 /**
@@ -52,6 +53,6 @@ public interface Command {
      * @throws Exception
      *             if an error occurred while executing the command.
      */
-    public void execute() throws CLIException;
+    public void execute(ApplicationContext currentContext) throws CLIException;
 
 }

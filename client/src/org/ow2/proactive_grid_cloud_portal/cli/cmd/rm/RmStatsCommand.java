@@ -44,10 +44,12 @@ import java.util.List;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.codehaus.jackson.type.TypeReference;
+import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.cli.json.MBeanInfoView;
+import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
 
 public class RmStatsCommand extends AbstractCommand implements Command {
@@ -60,7 +62,7 @@ public class RmStatsCommand extends AbstractCommand implements Command {
             "ConfiguringNodesCount", "MaxToBeReleasedNodes" };
 
     @Override
-    public void execute() throws CLIException {
+    public void execute(ApplicationContext currentContext) throws CLIException {
         StringBuilder url = new StringBuilder();
         url.append("info/ProActiveResourceManager:name=RuntimeData?");
         int index = 0;
@@ -68,19 +70,22 @@ public class RmStatsCommand extends AbstractCommand implements Command {
         while (index < RUNTIME_DATA_ATTR.length) {
             url.append("&attr=").append(RUNTIME_DATA_ATTR[index++]);
         }
-        HttpGet request = new HttpGet(resourceUrl(url.toString()));
-        HttpResponse response = execute(request);
+        HttpGet request = new HttpGet(currentContext.getResourceUrl(url
+                .toString()));
+        HttpResponseWrapper response = execute(request, currentContext);
         if (statusCode(OK) == statusCode(response)) {
             List<MBeanInfoView> infoList = readValue(response,
                     new TypeReference<List<MBeanInfoView>>() {
-                    });
+                    }, currentContext);
             MBeanInfoView[] stats = new MBeanInfoView[infoList.size()];
-            resultStack().push(stats);
-            if (!currentContext().isSilent()) {
-                writeLine("%s", StringUtility.mBeanInfoAsString(stats));
+            resultStack(currentContext).push(stats);
+            if (!currentContext.isSilent()) {
+                writeLine(currentContext, "%s",
+                        StringUtility.mBeanInfoAsString(stats));
             }
         } else {
-            handleError("An error occurred while retrieving stats:", response);
+            handleError("An error occurred while retrieving stats:", response,
+                    currentContext);
         }
 
     }

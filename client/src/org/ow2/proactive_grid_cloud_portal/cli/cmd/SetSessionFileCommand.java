@@ -39,6 +39,7 @@ package org.ow2.proactive_grid_cloud_portal.cli.cmd;
 
 import java.io.File;
 
+import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.FileUtility;
 
@@ -50,10 +51,10 @@ public class SetSessionFileCommand extends AbstractCommand implements Command {
     }
 
     @Override
-    public void execute() throws CLIException {
+    public void execute(ApplicationContext currentContext) throws CLIException {
         File file = new File(sessionFile);
         if (file.exists()) {
-            currentContext().setSessionId(FileUtility.readFileToString(file));
+            currentContext.setSessionId(FileUtility.readFileToString(file));
 
         } else {
             throw new CLIException(CLIException.REASON_INVALID_ARGUMENTS,

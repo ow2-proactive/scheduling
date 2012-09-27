@@ -39,11 +39,12 @@ package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
 
 import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
 
-import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPut;
+import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
+import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
 
 public class ResumeCommand extends AbstractCommand implements Command {
 
@@ -51,21 +52,21 @@ public class ResumeCommand extends AbstractCommand implements Command {
     }
 
     @Override
-    public void execute() throws CLIException {
-        HttpPut request = new HttpPut(resourceUrl("resume"));
-        HttpResponse response = execute(request);
+    public void execute(ApplicationContext currentContext) throws CLIException {
+        HttpPut request = new HttpPut(currentContext.getResourceUrl("resume"));
+        HttpResponseWrapper response = execute(request, currentContext);
         if (statusCode(OK) == statusCode(response)) {
-            boolean success = readValue(response, Boolean.TYPE);
-            resultStack().push(success);
+            boolean success = readValue(response, Boolean.TYPE, currentContext);
+            resultStack(currentContext).push(success);
             if (success) {
-                writeLine("Scheduler successfully resumed.");
+                writeLine(currentContext, "Scheduler successfully resumed.");
             } else {
-                writeLine("Cannot resume scheduler.");
+                writeLine(currentContext, "Cannot resume scheduler.");
             }
         } else {
             handleError(
                     "An error occurred while attempting to resume scheduler:",
-                    response);
+                    response, currentContext);
         }
     }
 

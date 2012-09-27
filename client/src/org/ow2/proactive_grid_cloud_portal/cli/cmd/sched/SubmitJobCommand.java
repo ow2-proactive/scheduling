@@ -45,14 +45,15 @@ import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
 import java.io.File;
 import java.net.URLConnection;
 
-import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.FileBody;
+import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.cli.json.JobIdView;
+import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
 
 public class SubmitJobCommand extends AbstractCommand implements Command {
     private String pathname;
@@ -62,12 +63,12 @@ public class SubmitJobCommand extends AbstractCommand implements Command {
     }
 
     @Override
-    public void execute() throws CLIException {
-        HttpPost request = new HttpPost(resourceUrl("submit"));
+    public void execute(ApplicationContext currentContext) throws CLIException {
+        HttpPost request = new HttpPost(currentContext.getResourceUrl("submit"));
         File jobFile = new File(pathname);
         if (!jobFile.exists()) {
-            throw new CLIException(REASON_INVALID_ARGUMENTS,
-                    String.format("'%s' does not exist.", pathname));
+            throw new CLIException(REASON_INVALID_ARGUMENTS, String.format(
+                    "'%s' does not exist.", pathname));
         }
         String contentType = URLConnection.getFileNameMap().getContentTypeFor(
                 pathname);
@@ -80,16 +81,18 @@ public class SubmitJobCommand extends AbstractCommand implements Command {
                     APPLICATION_OCTET_STREAM.getMimeType()));
         }
         request.setEntity(multipartEntity);
-        HttpResponse response = execute(request);
+        HttpResponseWrapper response = execute(request, currentContext);
         if (statusCode(OK) == statusCode(response)) {
-            JobIdView jobId = readValue(response, JobIdView.class);
-            resultStack().push(jobId);
-            writeLine("Job('%s') successfully submitted: job('%d')", pathname,
+            JobIdView jobId = readValue(response, JobIdView.class,
+                    currentContext);
+            resultStack(currentContext).push(jobId);
+            writeLine(currentContext,
+                    "Job('%s') successfully submitted: job('%d')", pathname,
                     jobId.getId());
         } else {
             handleError(String.format(
                     "An error occurred while attempting to submit job('%s'):",
-                    pathname), response);
+                    pathname), response, currentContext);
         }
     }
 }

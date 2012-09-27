@@ -44,9 +44,11 @@ import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
+import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
+import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpUtility;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
 
@@ -63,8 +65,9 @@ public class UnlockNodeCommand extends AbstractCommand implements Command {
     }
 
     @Override
-    public void execute() throws CLIException {
-        HttpPost request = new HttpPost(resourceUrl("node/unlock"));
+    public void execute(ApplicationContext currentContext) throws CLIException {
+        HttpPost request = new HttpPost(
+                currentContext.getResourceUrl("node/unlock"));
         StringBuilder buffer = new StringBuilder();
         buffer.append("nodeurls=").append(nodeUrls[0]);
         if (nodeUrls.length > 1) {
@@ -75,17 +78,18 @@ public class UnlockNodeCommand extends AbstractCommand implements Command {
         }
         request.setEntity(new StringEntity(buffer.toString(),
                 APPLICATION_FORM_URLENCODED));
-        HttpResponse response = execute(request);
+        HttpResponseWrapper response = execute(request, currentContext);
         if (statusCode(OK) == statusCode(response)) {
-            boolean success = readValue(response, Boolean.TYPE);
-            resultStack().push(success);
+            boolean success = readValue(response, Boolean.TYPE, currentContext);
+            resultStack(currentContext).push(success);
             if (success) {
-                writeLine("Node(s) unlocked successfully.");
+                writeLine(currentContext, "Node(s) unlocked successfully.");
             } else {
-                writeLine("Cannot unlock node(s).");
+                writeLine(currentContext, "Cannot unlock node(s).");
             }
         } else {
-            handleError("An error occurred while unlocking nodes:", response);
+            handleError("An error occurred while unlocking nodes:", response,
+                    currentContext);
         }
 
     }

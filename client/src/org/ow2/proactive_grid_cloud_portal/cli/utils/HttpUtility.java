@@ -38,6 +38,7 @@
 package org.ow2.proactive_grid_cloud_portal.cli.utils;
 
 import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -75,6 +76,14 @@ public class HttpUtility {
                 SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
         Scheme https = new Scheme("https", 443, socketFactory);
         client.getConnectionManager().getSchemeRegistry().register(https);
+    }
+    
+    public static String encode(String unescaped) {
+        try {
+            return URLEncoder.encode(unescaped, DFLT_CHARSET);
+        } catch (UnsupportedEncodingException e) {
+           throw new CLIException(CLIException.REASON_OTHER, e);
+        }
     }
 
     private static class RelaxedTrustStrategy implements TrustStrategy {

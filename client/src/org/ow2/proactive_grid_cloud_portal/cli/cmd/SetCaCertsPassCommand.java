@@ -37,6 +37,7 @@
 
 package org.ow2.proactive_grid_cloud_portal.cli.cmd;
 
+import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 
 public class SetCaCertsPassCommand extends AbstractCommand implements Command {
@@ -47,7 +48,7 @@ public class SetCaCertsPassCommand extends AbstractCommand implements Command {
     }
 
     @Override
-    public void execute() throws CLIException {
+    public void execute(ApplicationContext currentContext) throws CLIException {
         trustStorePass = (trustStorePass == null || trustStorePass.isEmpty()) ? "changeit"
                 : trustStorePass.trim();
         System.setProperty("javax.net.ssl.trustStorePassword", trustStorePass);

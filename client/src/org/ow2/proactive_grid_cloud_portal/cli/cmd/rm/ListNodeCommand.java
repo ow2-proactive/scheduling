@@ -44,11 +44,13 @@ import java.util.List;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.cli.json.NodeEventView;
 import org.ow2.proactive_grid_cloud_portal.cli.json.RmStateView;
+import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
 
 public class ListNodeCommand extends AbstractCommand implements Command {
@@ -62,33 +64,39 @@ public class ListNodeCommand extends AbstractCommand implements Command {
     }
 
     @Override
-    public void execute() throws CLIException {
-        HttpGet request = new HttpGet(resourceUrl("monitoring"));
-        HttpResponse response = execute(request);
+    public void execute(ApplicationContext currentContext) throws CLIException {
+        HttpGet request = new HttpGet(
+                currentContext.getResourceUrl("monitoring"));
+        HttpResponseWrapper response = execute(request, currentContext);
         if (statusCode(OK) == statusCode(response)) {
-            RmStateView state = readValue(response, RmStateView.class);
+            RmStateView state = readValue(response, RmStateView.class,
+                    currentContext);
             NodeEventView[] nodeEvents = state.getNodesEvents();
-            List<NodeEventView> selected = new ArrayList<NodeEventView>();
+            NodeEventView[] selectedNodeEvents = null;
             if (nodeEvents != null) {
-                for (NodeEventView nodeEvent : nodeEvents) {
-                    if (nodeSource != null
-                            && !nodeSource.equals(nodeEvent.getNodeSource())) {
-                        // node source doesn't match
-                        continue;
-                    } else {
-                        selected.add(nodeEvent);
+                if (nodeSource == null) {
+                    selectedNodeEvents = nodeEvents;
+                } else {
+                    List<NodeEventView> selectedList = new ArrayList<NodeEventView>();
+                    for (NodeEventView nodeEvent : nodeEvents) {
+                        if (!nodeSource.equals(nodeEvent.getNodeSource())) {
+                            // node source doesn't match
+                            continue;
+                        } else {
+                            selectedList.add(nodeEvent);
+                        }
                     }
+                    selectedNodeEvents = selectedList
+                            .toArray(new NodeEventView[selectedList.size()]);
                 }
             }
-            NodeEventView[] selectedNodeEvents = selected
-                    .toArray(new NodeEventView[selected.size()]);
-            resultStack().push(selectedNodeEvents);
-            if (!currentContext().isSilent()) {
-                writeLine("%s", StringUtility.string(selectedNodeEvents));
-            }
+            resultStack(currentContext).push(selectedNodeEvents);
+            writeLine(currentContext, "%s",
+                    StringUtility.string(selectedNodeEvents));
 
         } else {
-            handleError("An error occurred while retrieving nodes:", response);
+            handleError("An error occurred while retrieving nodes:", response,
+                    currentContext);
         }
     }
 

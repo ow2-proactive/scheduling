@@ -42,6 +42,7 @@ import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.EXIT;
 import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.SCHED_JS_HELP;
 import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.SCHED_ONLY;
 
+import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.CommandSet;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractJsHelpCommand;
@@ -53,8 +54,8 @@ public class SchedJsHelpCommand extends AbstractJsHelpCommand implements Command
     }
 
     @Override
-    public void execute() throws CLIException {
-        printHelp(COMMON_COMMANDS, SCHED_ONLY,
+    public void execute(ApplicationContext currentContext) throws CLIException {
+        printHelp(currentContext, COMMON_COMMANDS, SCHED_ONLY,
                 new CommandSet.Entry[] {EXIT, SCHED_JS_HELP });
     }
 }

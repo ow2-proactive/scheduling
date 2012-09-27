@@ -66,10 +66,12 @@ class RmCommandFactory extends CommandFactory {
     }
 
     @Override
-    public List<Command> getCommandList(CommandLine cli) {
+    public List<Command> getCommandList(CommandLine cli,
+            ApplicationContext currentContext) {
         Map<String, Command> commands = commandMapInstance(cli,
                 rmSupportedCmdMap);
-        List<Command> commandList = getCommandList(cli, commands);
+        List<Command> commandList = getCommandList(cli, commands,
+                currentContext);
         if (cli.hasOption(opt(RM_HELP))) {
             return commandList;
         }

@@ -39,11 +39,12 @@ package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
 
 import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
 
-import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPut;
+import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractTaskCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
+import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
 
 public class PreemptTaskCommand extends AbstractTaskCommand implements Command {
 
@@ -56,26 +57,29 @@ public class PreemptTaskCommand extends AbstractTaskCommand implements Command {
     }
 
     @Override
-    public void execute() throws CLIException {
-        HttpPut request = new HttpPut(resourceUrl("jobs/" + jobId + "/tasks/"
-                + taskId + "/preempt"));
-        HttpResponse response = execute(request);
+    public void execute(ApplicationContext currentContext) throws CLIException {
+        HttpPut request = new HttpPut(currentContext.getResourceUrl("jobs/"
+                + jobId + "/tasks/" + taskId + "/preempt"));
+        HttpResponseWrapper response = execute(request, currentContext);
         if (statusCode(OK) == statusCode(response)) {
-            boolean success = readValue(response, Boolean.TYPE).booleanValue();
-            resultStack().push(success);
+            boolean success = readValue(response, Boolean.TYPE, currentContext);
+            resultStack(currentContext).push(success);
             if (success) {
                 writeLine(
+                        currentContext,
                         "%s has been stopped and will be rescheduled after 5 seconds.",
                         task());
             } else {
                 writeLine(
+                        currentContext,
                         "%s cannot be stopped and most likely it is not running.",
                         task());
             }
         } else {
-            handleError(String.format(
-                    "An error occurred while attempting to preemt %s:", task()),
-                    response);
+            handleError(
+                    String.format(
+                            "An error occurred while attempting to preemt %s:",
+                            task()), response, currentContext);
         }
     }
 

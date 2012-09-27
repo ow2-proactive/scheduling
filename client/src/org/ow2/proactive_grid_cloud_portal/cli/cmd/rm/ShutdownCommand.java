@@ -41,26 +41,31 @@ import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
+import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
 
 public class ShutdownCommand extends AbstractCommand implements Command {
 
     @Override
-    public void execute() throws CLIException {
-        HttpGet request = new HttpGet(resourceUrl("shutdown"));
-        HttpResponse response = execute(request);
+    public void execute(ApplicationContext currentContext) throws CLIException {
+        HttpGet request = new HttpGet(currentContext.getResourceUrl("shutdown"));
+        HttpResponseWrapper response = execute(request, currentContext);
         if (statusCode(OK) == statusCode(response)) {
-            boolean success = readValue(response, Boolean.TYPE);
-            resultStack().push(success);
+            boolean success = readValue(response, Boolean.TYPE, currentContext);
+            resultStack(currentContext).push(success);
             if (success) {
-                writeLine("%s", "Resource manager shutdown successfully.");
+                writeLine(currentContext, "%s",
+                        "Resource manager shutdown successfully.");
             } else {
-                writeLine("%s", "Cannot shutdown resource manager.");
+                writeLine(currentContext, "%s",
+                        "Cannot shutdown resource manager.");
             }
         } else {
-            handleError("An error occurred while shutting down:", response);
+            handleError("An error occurred while shutting down:", response,
+                    currentContext);
         }
     }
 

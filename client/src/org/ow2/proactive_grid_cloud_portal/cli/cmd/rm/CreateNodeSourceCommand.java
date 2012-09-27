@@ -47,9 +47,11 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
+import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
+import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
 
 public class CreateNodeSourceCommand extends AbstractCommand implements Command {
     private String nodeSource;
@@ -59,35 +61,38 @@ public class CreateNodeSourceCommand extends AbstractCommand implements Command 
     }
 
     @Override
-    public void execute() throws CLIException {
-        String infrastructure = currentContext().getProperty(SET_INFRASTRUCTURE,
+    public void execute(ApplicationContext currentContext) throws CLIException {
+        String infrastructure = currentContext.getProperty(SET_INFRASTRUCTURE,
                 String.class);
-        String policy = currentContext().getProperty(SET_POLICY, String.class);
+        String policy = currentContext.getProperty(SET_POLICY, String.class);
         if (infrastructure == null || policy == null) {
             throw new CLIException(REASON_INVALID_ARGUMENTS,
                     "No value is specified for one of infrastructure or policy parameters");
         }
-        if (currentContext().getProperty(SET_NODE_SOURCE, String.class) != null) {
-            nodeSource = currentContext().getProperty(SET_NODE_SOURCE, String.class);
+        if (currentContext.getProperty(SET_NODE_SOURCE, String.class) != null) {
+            nodeSource = currentContext.getProperty(SET_NODE_SOURCE,
+                    String.class);
         }
-        HttpPost request = new HttpPost(resourceUrl("nodesource/create"));
+        HttpPost request = new HttpPost(
+                currentContext.getResourceUrl("nodesource/create"));
         String requestContents = (new StringBuilder())
                 .append("nodeSourceName=").append(nodeSource).append('&')
                 .append(infrastructure).append('&').append(policy).toString();
         request.setEntity(new StringEntity(requestContents,
                 ContentType.APPLICATION_FORM_URLENCODED));
-        HttpResponse response = execute(request);
+        HttpResponseWrapper response = execute(request, currentContext);
         if (statusCode(OK) == statusCode(response)) {
-            boolean success = readValue(response, Boolean.TYPE);
-            resultStack().push(success);
+            boolean success = readValue(response, Boolean.TYPE, currentContext);
+            resultStack(currentContext).push(success);
             if (success) {
-                writeLine("Node source successfully created.");
+                writeLine(currentContext, "Node source successfully created.");
             } else {
-                writeLine("Cannot create node source: %s", nodeSource);
+                writeLine(currentContext, "%s %s",
+                        "Cannot create node source:", nodeSource);
             }
         } else {
             handleError("An error occurred while creating node source:",
-                    response);
+                    response, currentContext);
 
         }
     }

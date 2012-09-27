@@ -46,43 +46,47 @@ import java.util.Map;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.codehaus.jackson.type.TypeReference;
+import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.cli.json.PluginView;
+import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
 
 public class ListInfrastructureCommand extends AbstractCommand implements
         Command {
     @Override
-    public void execute() throws CLIException {
-        Map<String, PluginView> infrastructures = currentContext()
+    public void execute(ApplicationContext currentContext) throws CLIException {
+        Map<String, PluginView> infrastructures = currentContext
                 .getInfrastructures();
         if (infrastructures == null) {
-            HttpGet request = new HttpGet(resourceUrl("infrastructures"));
-            HttpResponse response = execute(request);
+            HttpGet request = new HttpGet(
+                    currentContext.getResourceUrl("infrastructures"));
+            HttpResponseWrapper response = execute(request, currentContext);
             if (statusCode(OK) == statusCode(response)) {
                 infrastructures = new HashMap<String, PluginView>();
                 List<PluginView> pluginViewList = readValue(response,
                         new TypeReference<List<PluginView>>() {
-                        });
-                resultStack().push(pluginViewList);
+                        }, currentContext);
+                resultStack(currentContext).push(pluginViewList);
                 for (PluginView pluginView : pluginViewList) {
                     infrastructures.put(pluginView.getPluginName(), pluginView);
                 }
-                currentContext().setInfrastructures(infrastructures);
+                currentContext.setInfrastructures(infrastructures);
             } else {
                 handleError(
                         "An error occurred while retrieving supported infrastructure types:",
-                        response);
+                        response, currentContext);
             }
         }
-        if (!currentContext().isSilent()) {
-            if (infrastructures != null) {
-                writeLine("%n%s:%n", "Supported infrastructure types");
-                for (PluginView pluginView : infrastructures.values()) {
-                    writeLine("%s%n", pluginView.toString());
-                }
+
+        if (infrastructures != null) {
+            writeLine(currentContext, "%n%s:%n",
+                    "Supported infrastructure types");
+            for (PluginView pluginView : infrastructures.values()) {
+                writeLine(currentContext, "%s%n", pluginView.toString());
             }
         }
+
     }
 }

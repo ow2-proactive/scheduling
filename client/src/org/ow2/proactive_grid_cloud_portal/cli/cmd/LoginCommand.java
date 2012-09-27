@@ -41,10 +41,11 @@ import static org.apache.http.entity.ContentType.APPLICATION_FORM_URLENCODED;
 import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_OTHER;
 import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
 
-import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
+import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
+import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
 
 public class LoginCommand extends AbstractLoginCommand implements Command {
@@ -59,32 +60,34 @@ public class LoginCommand extends AbstractLoginCommand implements Command {
     }
 
     @Override
-    protected String login() throws CLIException {
-        String password = currentContext().getProperty(PASSWORD, String.class);
+    protected String login(ApplicationContext currentContext)
+            throws CLIException {
+        String password = currentContext.getProperty(PASSWORD, String.class);
         if (password == null) {
-            password = new String(readPassword("password:"));
+            password = new String(readPassword(currentContext, "password:"));
         }
-        HttpPost request = new HttpPost(resourceUrl("login"));
+        HttpPost request = new HttpPost(currentContext.getResourceUrl("login"));
         StringEntity entity = new StringEntity("username=" + username
                 + "&password=" + password, APPLICATION_FORM_URLENCODED);
         request.setEntity(entity);
-        HttpResponse response = execute(request);
+        HttpResponseWrapper response = execute(request, currentContext);
         if (statusCode(OK) == statusCode(response)) {
-            return StringUtility.string(response).trim();
+            return StringUtility.responseAsString(response).trim();
         } else {
-            handleError("An error occurred while logging:", response);
+            handleError("An error occurred while logging:", response,
+                    currentContext);
             throw new CLIException(REASON_OTHER,
                     "An error occurred while logging.");
         }
     }
 
     @Override
-    protected String alias() {
-        return username;
+    protected String getAlias(ApplicationContext currentContext) {
+        return currentContext.getProperty(USERNAME, String.class);
     }
 
     @Override
-    protected void setCredentials() {
-        currentContext().setProperty(USERNAME, username);
+    protected void setAlias(ApplicationContext currentContext) {
+        currentContext.setProperty(USERNAME, username);
     }
 }

@@ -50,20 +50,21 @@ import java.util.Map;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.codehaus.jackson.type.TypeReference;
+import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.cli.json.ConfigurableFieldView;
 import org.ow2.proactive_grid_cloud_portal.cli.json.PluginView;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.FileUtility;
+import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
 
 public class SetPolicyCommand extends AbstractCommand implements Command {
-    public static final String SET_POLICY
-            = "org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.SetPolicyCommand.setPolicy";
+    public static final String SET_POLICY = "org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.SetPolicyCommand.setPolicy";
     private String policyType;
     private String[] policyArgs;
 
-    public SetPolicyCommand(String[] args) {
+    public SetPolicyCommand(String... args) {
         if (!(args.length > 0)) {
             throw new CLIException(REASON_INVALID_ARGUMENTS,
                     "At least one argument required.");
@@ -77,20 +78,21 @@ public class SetPolicyCommand extends AbstractCommand implements Command {
     }
 
     @Override
-    public void execute() throws CLIException {
-        Map<String, PluginView> knownPolicies = currentContext().getPolicies();
+    public void execute(ApplicationContext currentContext) throws CLIException {
+        Map<String, PluginView> knownPolicies = currentContext.getPolicies();
         if (knownPolicies == null) {
-            HttpGet request = new HttpGet(resourceUrl("policies"));
-            HttpResponse response = execute(request);
+            HttpGet request = new HttpGet(
+                    currentContext.getResourceUrl("policies"));
+            HttpResponseWrapper response = execute(request, currentContext);
             if (statusCode(OK) == statusCode(response)) {
                 knownPolicies = new HashMap<String, PluginView>();
                 List<PluginView> pluginViewList = readValue(response,
                         new TypeReference<List<PluginView>>() {
-                        });
+                        }, currentContext);
                 for (PluginView pluginView : pluginViewList) {
                     knownPolicies.put(pluginView.getPluginName(), pluginView);
                 }
-                currentContext().setPolicies(knownPolicies);
+                currentContext.setPolicies(knownPolicies);
             } else {
                 throw new CLIException(REASON_OTHER,
                         "Unable to retrieve known policy types.");
@@ -117,10 +119,11 @@ public class SetPolicyCommand extends AbstractCommand implements Command {
             if (!FILE.equals(field.getMeta().type())) {
                 buffer.append("&policyParameters=").append(field.getValue());
             } else {
-                String contents = FileUtility.readFileToString(new File(field.getValue()));
+                String contents = FileUtility.readFileToString(new File(field
+                        .getValue()));
                 buffer.append("&policyFileParameters=").append(contents);
             }
         }
-        currentContext().setProperty(SET_POLICY, buffer.toString());
+        currentContext.setProperty(SET_POLICY, buffer.toString());
     }
 }

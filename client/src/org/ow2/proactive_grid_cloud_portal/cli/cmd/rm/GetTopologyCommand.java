@@ -41,28 +41,30 @@ import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.cli.json.TopologyView;
+import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
 
 public class GetTopologyCommand extends AbstractCommand implements Command {
 
     @Override
-    public void execute() throws CLIException {
-
-        HttpGet request = new HttpGet(resourceUrl("topology"));
-        HttpResponse response = execute(request);
+    public void execute(ApplicationContext currentContext) throws CLIException {
+        HttpGet request = new HttpGet(currentContext.getResourceUrl("topology"));
+        HttpResponseWrapper response = execute(request, currentContext);
         if (statusCode(OK) == statusCode(response)) {
-            TopologyView topology = readValue(response, TopologyView.class);
-            resultStack().push(topology);
-            if (!currentContext().isSilent()) {
-                writeLine("%s", StringUtility.string(topology));
+            TopologyView topology = readValue(response, TopologyView.class,
+                    currentContext);
+            resultStack(currentContext).push(topology);
+            if (!currentContext.isSilent()) {
+                writeLine(currentContext, "%s", StringUtility.string(topology));
             }
         } else {
             handleError("An error occurred while retrieving the topology:",
-                    response);
+                    response, currentContext);
         }
 
     }

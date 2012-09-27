@@ -62,7 +62,7 @@ public class FileUtility {
 
     public static void writeStringToFile(File file, String content) {
         try {
-            org.apache.commons.io.FileUtils.writeStringToFile(file, content);
+            FileUtils.writeStringToFile(file, content);
         } catch (IOException ioe) {
             throw new CLIException(REASON_OTHER, ioe);
         }

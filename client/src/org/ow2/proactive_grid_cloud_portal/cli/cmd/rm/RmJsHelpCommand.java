@@ -40,6 +40,7 @@ package org.ow2.proactive_grid_cloud_portal.cli.cmd.rm;
 import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.EXIT;
 import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.RM_JS_HELP;
 
+import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.CommandSet;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractJsHelpCommand;
@@ -48,8 +49,8 @@ import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 public class RmJsHelpCommand extends AbstractJsHelpCommand implements Command {
 
     @Override
-    public void execute() throws CLIException {
-        printHelp(CommandSet.COMMON_COMMANDS, CommandSet.RM_ONLY,
+    public void execute(ApplicationContext currentContext) throws CLIException {
+        printHelp(currentContext, CommandSet.COMMON_COMMANDS, CommandSet.RM_ONLY,
                 new CommandSet.Entry[] {EXIT, RM_JS_HELP });
     }
 
