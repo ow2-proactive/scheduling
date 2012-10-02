@@ -134,7 +134,7 @@ should be accessible by the SSH from the host where tests are executed.
 <li><b>rm.deploy.rmNodesPerHosts</b> (rm.test.properties) how many nodes RM should start on each host after start-up</li>
 <li><b>optional rm.deploy.rmNodesSourcesNumber</b> (rm.test.properties) how many NodeSources should use RM to deploy
 nodes (1 by default), this value can't be bigger then number of available hosts. 
-It it more than one then RM equally divides available hosts between all NodeSources </li>
+If it is more than one then RM equally divides available hosts between all NodeSources </li>
 </ul>
 
 <h4><a id="deploy_pamr">PAMR router parameters:</a></h4>
@@ -167,6 +167,14 @@ Tests don't start AMQP broker, broker should be started manually and following t
 <ul>
 <li><b>test.deploy.amqp.host</b> (common.test.properties) AMQP broker host</li>
 <li><b>test.deploy.amqp.port</b> (common.test.properties) AMQP broker port</li>
+<li>optional parameter <b>test.deploy.amqp.user</b> (common.test.properties) AMQP broker user</li>
+<li>optional parameter <b>test.deploy.amqp.password</b> (common.test.properties) AMQP broker password</li>
+<li>optional parameter <b>test.deploy.amqp.socketfactory</b> (common.test.properties) socket factory used to establish connection
+to the AMQP broker. It can be 'plain' if regular socket factory should be used, or 'ssh' if sockets using ssh tunnel should be used.</li>
+<li>optional parameter <b>test.deploy.amqp.ssh.key_directory</b> (common.test.properties) parameter of ssh tunnel connection, can be set if ssh tunnel is used to connect to the broker</li>
+<li>optional parameter <b>test.deploy.amqp.ssh.known_hosts</b> (common.test.properties) parameter of ssh tunnel connection, can be set if ssh tunnel is used to connect to the broker</li>
+<li>optional parameter <b>test.deploy.amqp.ssh.username</b> (common.test.properties) parameter of ssh tunnel connection, can be set if ssh tunnel is used to connect to the broker</li>
+<li>optional parameter <b>test.deploy.amqp.ssh.port</b> (common.test.properties) parameter of ssh tunnel connection, can be set if ssh tunnel is used to connect to the broker</li>
 </ul>
 <p>
 
@@ -210,6 +218,9 @@ should be accessible by the SSH from the host where tests are executed.
 
 <p>
 If PAMR protocol is used for Scheduler and RM deployment then additional <a href="#deploy_pamr">PAMR parameters</a> should be set.
+</p>
+<p>
+If AMQP protocol is used for Scheduler and RM deployment then additional <a href="#deploy_amqp">AMQP broker parameters</a> should be set.
 </p>
 
   

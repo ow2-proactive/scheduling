@@ -260,6 +260,11 @@ public class TestRMDeployer extends TestDeployer {
 
         byte[] creds = serverHostEnv.getEnv().getSchedulingFolder().getRMCredentialsBytes();
 
+        String nodeJavaOpts = System.getProperty("rm.deploy.rmNodesJavaOpts");
+        if (nodeJavaOpts != null && !nodeJavaOpts.isEmpty()) {
+            javaOptions += " " + nodeJavaOpts;
+        }
+
         Object[] infrastructureParameters = new Object[] { rmUrl, hostsListString.toString().getBytes(),
                 timeout, attempt, sshOptions, nodesTestEnv.getJavaPath(),
                 nodesTestEnv.getSchedulingFolder().getRootDirPath(), targetOs, javaOptions.toString(), creds };

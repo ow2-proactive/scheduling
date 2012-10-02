@@ -138,10 +138,19 @@
 
                 <jvmarg value="-Dtest.deploy.amqp.host=${test.deploy.amqp.host}" />
                 <jvmarg value="-Dtest.deploy.amqp.port=${test.deploy.amqp.port}" />
+                <jvmarg value="-Dtest.deploy.amqp.user=${test.deploy.amqp.user}" />
+                <jvmarg value="-Dtest.deploy.amqp.password=${test.deploy.amqp.password}" />
+                <jvmarg value="-Dtest.deploy.amqp.vhost=${test.deploy.amqp.vhost}" />
+                <jvmarg value="-Dtest.deploy.amqp.socketfactory=${test.deploy.amqp.socketfactory}" />
+                <jvmarg value="-Dtest.deploy.amqp.ssh.key_directory=${test.deploy.amqp.ssh.key_directory}" />
+                <jvmarg value="-Dtest.deploy.amqp.ssh.known_hosts=${test.deploy.amqp.ssh.known_hosts}" />
+                <jvmarg value="-Dtest.deploy.amqp.ssh.username=${test.deploy.amqp.ssh.username}" />
+                <jvmarg value="-Dtest.deploy.amqp.ssh.port=${test.deploy.amqp.ssh.port}" />
                 	            	
                 <jvmarg value="-Drm.deploy.rmHost=${rm.deploy.rmHost}" />
                 <jvmarg value="-Drm.deploy.dropDB=${rm.deploy.dropDB}" />
                 <jvmarg value="-Drm.deploy.javaOpts=${rm.deploy.javaOpts}" />
+                <jvmarg value="-Drm.deploy.rmNodesJavaOpts=${rm.deploy.rmNodesJavaOpts}" />
                 <jvmarg value="-Drm.deploy.rmNodesHosts=${rm.deploy.rmNodesHosts}" />
                 <jvmarg value="-Drm.deploy.rmNodesPerHosts=${rm.deploy.rmNodesPerHosts}" />
                 <jvmarg value="-Drm.deploy.rmNodesSourcesNumber=${rm.deploy.rmNodesSourcesNumber}" />
