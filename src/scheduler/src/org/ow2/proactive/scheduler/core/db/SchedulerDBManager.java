@@ -2,6 +2,7 @@ package org.ow2.proactive.scheduler.core.db;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -137,6 +138,7 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
 
             configuration.setProperty("hibernate.id.new_generator_mappings", "true");
             configuration.setProperty("hibernate.jdbc.use_streams_for_binary", "true");
+            configuration.setProperty("hibernate.connection.isolation", "2");
 
             sessionFactory = configuration.buildSessionFactory();
         } catch (Throwable ex) {
@@ -175,6 +177,292 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
             }
         } catch (Exception e) {
             debugLogger.error("Error while closing database", e);
+        }
+    }
+
+    public long getFinishedJobsCount() {
+        return getJobsNumberWithStatus(finishedJobStatuses);
+    }
+
+    public long getPendingJobsCount() {
+        return getJobsNumberWithStatus(Arrays.asList(JobStatus.PAUSED, JobStatus.PENDING));
+    }
+
+    public long getRunningJobsCount() {
+        return getJobsNumberWithStatus(Arrays.asList(JobStatus.RUNNING, JobStatus.STALLED));
+    }
+
+    public long getTotalJobsCount() {
+        return runWithoutTransaction(new SessionWork<Long>() {
+
+            @Override
+            Long executeWork(Session session) {
+                Query query = session.createQuery("select count(*) from JobData where removedTime = -1");
+                Long count = (Long) query.uniqueResult();
+                return count;
+            }
+
+        });
+    }
+
+    private long getJobsNumberWithStatus(final Collection<JobStatus> status) {
+        return runWithoutTransaction(new SessionWork<Long>() {
+
+            @Override
+            Long executeWork(Session session) {
+                Query query = session.createQuery(
+                        "select count(*) from JobData where status in (:status) and removedTime = -1")
+                        .setParameterList("status", status);
+
+                Long count = (Long) query.uniqueResult();
+                return count;
+            }
+
+        });
+    }
+
+    public long getFinishedTasksCount() {
+        return runWithoutTransaction(new SessionWork<Long>() {
+
+            @Override
+            Long executeWork(Session session) {
+                Query query = session
+                        .createQuery(
+                                "select count(*) from TaskData task where taskStatus in (:taskStatus) and task.jobData.removedTime = -1")
+                        .setParameterList("taskStatus", Arrays.asList(TaskStatus.FINISHED, TaskStatus.FAULTY));
+
+                Long count = (Long) query.uniqueResult();
+                return count;
+            }
+
+        });
+    }
+
+    public long getPendingTasksCount() {
+        return runWithoutTransaction(new SessionWork<Long>() {
+
+            @Override
+            Long executeWork(Session session) {
+                Collection<TaskStatus> taskStatus = Arrays.asList(TaskStatus.SUBMITTED, TaskStatus.PAUSED,
+                        TaskStatus.PENDING, TaskStatus.WAITING_ON_ERROR, TaskStatus.WAITING_ON_FAILURE);
+                Query query = session
+                        .createQuery(
+                                "select count(*) from TaskData task where taskStatus in (:taskStatus) and task.jobData.status in (:jobStatus) and task.jobData.removedTime = -1")
+                        .setParameterList("jobStatus", notFinishedJobStatuses).setParameterList("taskStatus",
+                                taskStatus);
+
+                Long count = (Long) query.uniqueResult();
+                return count;
+            }
+
+        });
+    }
+
+    public long getRunningTasksCount() {
+        return runWithoutTransaction(new SessionWork<Long>() {
+
+            @Override
+            Long executeWork(Session session) {
+                Query query = session.createQuery(
+                        "select count(*) from TaskData task where taskStatus in (:taskStatus) "
+                            + "and task.jobData.status in (:jobStatus) and task.jobData.removedTime = -1")
+                        .setParameterList("jobStatus", notFinishedJobStatuses).setParameterList("taskStatus",
+                                Arrays.asList(TaskStatus.RUNNING));
+
+                Long count = (Long) query.uniqueResult();
+                return count;
+            }
+
+        });
+    }
+
+    public long getTotalTasksCount() {
+        return runWithoutTransaction(new SessionWork<Long>() {
+
+            @Override
+            Long executeWork(Session session) {
+                Query query = session
+                        .createQuery("select count(*) from TaskData task where task.jobData.removedTime = -1");
+                Long count = (Long) query.uniqueResult();
+                return count;
+            }
+
+        });
+    }
+
+    public double getMeanJobPendingTime() {
+        return runWithoutTransaction(new SessionWork<Double>() {
+            @Override
+            Double executeWork(Session session) {
+                Query query = session
+                        .createQuery("select avg(startTime - submittedTime) from JobData where startTime > 0 and submittedTime > 0");
+                Double result = (Double) query.uniqueResult();
+                return result == null ? 0 : result;
+            }
+
+        });
+    }
+
+    public double getMeanJobExecutionTime() {
+        return runWithoutTransaction(new SessionWork<Double>() {
+            @Override
+            Double executeWork(Session session) {
+                Query query = session
+                        .createQuery("select avg(finishedTime - startTime) from JobData where startTime > 0 and finishedTime > 0");
+                Double result = (Double) query.uniqueResult();
+                return result == null ? 0 : result;
+            }
+
+        });
+    }
+
+    public double getMeanJobSubmittingPeriod() {
+        return runWithoutTransaction(new SessionWork<Double>() {
+            @Override
+            Double executeWork(Session session) {
+                Query query = session
+                        .createQuery("select count(*), min(submittedTime), max(submittedTime) from JobData");
+                Object[] result = (Object[]) query.uniqueResult();
+                Long count = (Long) result[0];
+                Long minSubmittedTime = (Long) result[1];
+                Long maxSubmittedTime = (Long) result[2];
+                if (count < 2) {
+                    return 0d;
+                } else {
+                    return (maxSubmittedTime - minSubmittedTime) / (double) (count - 1);
+                }
+            }
+
+        });
+    }
+
+    public long getJobRunningTime(final String jobId) {
+        final long id = Long.parseLong(jobId);
+        Long result = runWithoutTransaction(new SessionWork<Long>() {
+            @Override
+            Long executeWork(Session session) {
+                JobData jobData = (JobData) session.get(JobData.class, id);
+                if (jobData == null) {
+                    return null;
+                }
+                if (jobData.getFinishedTime() > 0) {
+                    return jobData.getFinishedTime() - jobData.getStartTime();
+                } else {
+                    return null;
+                }
+            }
+        });
+        if (result == null) {
+            throw new IllegalArgumentException("Job doesn't exists or didn't finish execution");
+        } else {
+            return result;
+        }
+    }
+
+    public long getJobPendingTime(final String jobId) {
+        final long id = Long.parseLong(jobId);
+        Long result = runWithoutTransaction(new SessionWork<Long>() {
+            @Override
+            Long executeWork(Session session) {
+                JobData jobData = (JobData) session.get(JobData.class, id);
+                if (jobData == null) {
+                    return null;
+                }
+                if (jobData.getStartTime() > 0) {
+                    return jobData.getStartTime() - jobData.getSubmittedTime();
+                } else {
+                    return null;
+                }
+            }
+        });
+        if (result == null) {
+            throw new IllegalArgumentException("Job doesn't exists or didn't start execution");
+        } else {
+            return result;
+        }
+    }
+
+    public double getMeanTaskPendingTime(final String jobId) {
+        final long id = Long.parseLong(jobId);
+        Double result = runWithoutTransaction(new SessionWork<Double>() {
+            @Override
+            Double executeWork(Session session) {
+                Query jobSubmittedTimeQuery = session.createQuery(
+                        "select submittedTime from JobData where id = :id").setParameter("id", id);
+                Long jobSubmittedTime = (Long) jobSubmittedTimeQuery.uniqueResult();
+                if (jobSubmittedTime == null) {
+                    return null;
+                }
+                Query query = session
+                        .createQuery(
+                                "select avg(startTime - :jobSubmittedTime) from TaskData task where task.jobData.id = :id and task.startTime > 0")
+                        .setParameter("id", id).setParameter("jobSubmittedTime", jobSubmittedTime);
+
+                Double result = (Double) query.uniqueResult();
+                return result == null ? 0 : result;
+            }
+
+        });
+        if (result == null) {
+            throw new IllegalArgumentException("Job doesn't exists");
+        } else {
+            return result;
+        }
+    }
+
+    public double getMeanTaskRunningTime(String jobId) {
+        final long id = Long.parseLong(jobId);
+        Double result = runWithoutTransaction(new SessionWork<Double>() {
+            @Override
+            Double executeWork(Session session) {
+                Query jobQuery = session.createQuery("select id from JobData where id = :id").setParameter(
+                        "id", id);
+                if (jobQuery.uniqueResult() == null) {
+                    return null;
+                }
+
+                Query query = session
+                        .createQuery(
+                                "select avg(task.finishedTime - task.startTime) from TaskData task where task.startTime > 0 and task.finishedTime > 0 and task.jobData.id = :id")
+                        .setParameter("id", id);
+
+                Double result = (Double) query.uniqueResult();
+                return result == null ? 0 : result;
+            }
+
+        });
+        if (result == null) {
+            throw new IllegalArgumentException("Job doesn't exists");
+        } else {
+            return result;
+        }
+    }
+
+    public int getTotalNumberOfHostsUsed(String jobId) {
+        final long id = Long.parseLong(jobId);
+        Long result = runWithoutTransaction(new SessionWork<Long>() {
+            @Override
+            Long executeWork(Session session) {
+                Query jobQuery = session.createQuery("select id from JobData where id = :id").setParameter(
+                        "id", id);
+                if (jobQuery.uniqueResult() == null) {
+                    return null;
+                }
+
+                Query query = session
+                        .createQuery(
+                                "select count(distinct executionHostName) from TaskData task where task.jobData.id = :id")
+                        .setParameter("id", id);
+
+                Long result = (Long) query.uniqueResult();
+                return result;
+            }
+
+        });
+        if (result == null) {
+            throw new IllegalArgumentException("Job doesn't exists");
+        } else {
+            return result.intValue();
         }
     }
 

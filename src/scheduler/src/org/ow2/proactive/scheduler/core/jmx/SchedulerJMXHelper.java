@@ -46,6 +46,7 @@ import org.apache.log4j.Logger;
 import org.ow2.proactive.jmx.AbstractJMXHelper;
 import org.ow2.proactive.jmx.RRDDataStore;
 import org.ow2.proactive.scheduler.core.account.SchedulerAccountsManager;
+import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
 import org.ow2.proactive.scheduler.core.jmx.mbean.AllAccountsMBeanImpl;
 import org.ow2.proactive.scheduler.core.jmx.mbean.ManagementMBeanImpl;
 import org.ow2.proactive.scheduler.core.jmx.mbean.MyAccountMBeanImpl;
@@ -77,13 +78,16 @@ public class SchedulerJMXHelper extends AbstractJMXHelper {
     /** The Scheduler Runtime MBean */
     private RuntimeDataMBeanImpl schedulerRuntimeMBean;
 
+    private final SchedulerDBManager dbManager;
+
     /**
      * Creates a new instance of this class.
      * @param accountsManager the accounts manager
      */
-    public SchedulerJMXHelper(final SchedulerAccountsManager accountsManager) {
+    public SchedulerJMXHelper(SchedulerAccountsManager accountsManager, SchedulerDBManager dbManager) {
         super(LOGGER);
         this.accountsManager = accountsManager;
+        this.dbManager = dbManager;
         SchedulerJMXHelper.instance = this;
     }
 
@@ -107,7 +111,7 @@ public class SchedulerJMXHelper extends AbstractJMXHelper {
     public void registerMBeans(final MBeanServer mbs) {
         // Register the Scheduler runtime MBean into the MBean server
         try {
-            this.schedulerRuntimeMBean = new RuntimeDataMBeanImpl();
+            this.schedulerRuntimeMBean = new RuntimeDataMBeanImpl(dbManager);
             final ObjectName name = new ObjectName(RUNTIMEDATA_MBEAN_NAME);
             mbs.registerMBean(this.schedulerRuntimeMBean, name);
 

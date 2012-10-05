@@ -630,6 +630,7 @@ public class TaskData {
     }
 
     @Column(name = "STATUS", nullable = false)
+    @Index(name = "task_status_index")
     public TaskStatus getTaskStatus() {
         return taskStatus;
     }

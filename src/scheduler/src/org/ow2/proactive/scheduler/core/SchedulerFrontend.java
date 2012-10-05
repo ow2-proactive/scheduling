@@ -212,7 +212,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
         this.dirtyList = new HashSet<UniqueID>();
         this.currentJobToSubmit = new InternalJobWrapper();
         this.accountsManager = new SchedulerAccountsManager(dbManager);
-        this.jmxHelper = new SchedulerJMXHelper(this.accountsManager);
+        this.jmxHelper = new SchedulerJMXHelper(accountsManager, dbManager);
         this.jobsMap = new HashMap<JobId, JobState>();
 
         logger.info("Creating scheduler Front-end...");
@@ -300,8 +300,6 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
             prepare(jobStates, js, true);
         }
 
-        // rebuild JMX object
-        this.jmxHelper.getSchedulerRuntimeMBean().recover(jobStates);
         //once recovered, activate scheduler communication
         authentication.setActivated(true);
     }
@@ -1378,7 +1376,6 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
         jobsMap.put(job.getId(), storedJobState);
         sState.getPendingJobs().add(storedJobState);
         dispatchJobSubmitted(job);
-        this.jmxHelper.getSchedulerRuntimeMBean().jobSubmittedEvent(job);
     }
 
     /**
@@ -1392,7 +1389,6 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
                 sState.getPendingJobs().remove(js);
                 sState.getRunningJobs().add(js);
                 dispatchJobStateUpdated(owner, notification);
-                this.jmxHelper.getSchedulerRuntimeMBean().jobStateUpdatedEvent(notification);
                 break;
             case JOB_PAUSED:
             case JOB_RESUMED:
@@ -1400,7 +1396,6 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
             case TASK_REPLICATED:
             case TASK_SKIPPED:
                 dispatchJobStateUpdated(owner, notification);
-                this.jmxHelper.getSchedulerRuntimeMBean().jobStateUpdatedEvent(notification);
                 break;
             case JOB_PENDING_TO_FINISHED:
                 sState.getPendingJobs().remove(js);
@@ -1408,7 +1403,6 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
                 //set this job finished, user can get its result
                 jobs.get(notification.getData().getJobId()).setFinished(true);
                 dispatchJobStateUpdated(owner, notification);
-                this.jmxHelper.getSchedulerRuntimeMBean().jobStateUpdatedEvent(notification);
                 break;
             case JOB_RUNNING_TO_FINISHED:
                 sState.getRunningJobs().remove(js);
@@ -1416,7 +1410,6 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
                 //set this job finished, user can get its result
                 jobs.get(notification.getData().getJobId()).setFinished(true);
                 dispatchJobStateUpdated(owner, notification);
-                this.jmxHelper.getSchedulerRuntimeMBean().jobStateUpdatedEvent(notification);
                 break;
             case JOB_REMOVE_FINISHED:
                 //removing jobs from the global list : this job is no more managed
@@ -1424,7 +1417,6 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
                 jobsMap.remove(js.getId());
                 jobs.remove(notification.getData().getJobId());
                 dispatchJobStateUpdated(owner, notification);
-                this.jmxHelper.getSchedulerRuntimeMBean().jobStateUpdatedEvent(notification);
                 break;
             default:
                 logger.warn("**WARNING** - Unconsistent update type received from Scheduler Core : " +
@@ -1442,7 +1434,6 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
             case TASK_RUNNING_TO_FINISHED:
             case TASK_WAITING_FOR_RESTART:
                 dispatchTaskStateUpdated(owner, notification);
-                this.jmxHelper.getSchedulerRuntimeMBean().taskStateUpdatedEvent(notification);
                 break;
             case TASK_PROGRESS:
                 //this event can be sent while task is already finished,

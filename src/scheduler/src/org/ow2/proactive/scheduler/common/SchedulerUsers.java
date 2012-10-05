@@ -81,6 +81,10 @@ public class SchedulerUsers implements Serializable {
         return tmp;
     }
 
+    public int getUsersCount() {
+        return users.size();
+    }
+
     /**
      * Update the list of users with this given user.
      * As this method could both add or remove user, it doesn't use the default SET.remove() or SET.add() methods.

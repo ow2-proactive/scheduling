@@ -86,15 +86,11 @@ public class SchedulerJMXClient extends BaseJMeterSchedulerClient {
         assertTrue(!bean.getStatus().isEmpty(), "Unexpected status", result);
         assertTrue(bean.getTotalJobsCount() >= 0, "Unexpected TotalJobsCount", result);
         assertTrue(bean.getTotalTasksCount() >= 0, "Unexpected TotalTasksCount", result);
-
-        // uncomment when SCHEDULING-1676, SCHEDULING-1677 are fixed 
-        /*
         assertTrue(bean.getConnectedUsersCount() >= 1, "Unexpected ConnectedUsersCount:" +
-                bean.getConnectedUsersCount(), result);
+            bean.getConnectedUsersCount(), result);
         assertTrue(bean.getPendingTasksCount() >= 0, "Unexpected PendingTasksCount", result);
         assertTrue(bean.getFinishedTasksCount() >= 0, "Unexpected FinishedTasksCount", result);
         assertTrue(bean.getRunningTasksCount() >= 0, "Unexpected RunningTasksCount", result);
-         */
     }
 
     private void checkAllAccountsMBean(MBeanServerConnection connection, String username, SampleResult result)
