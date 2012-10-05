@@ -57,8 +57,7 @@ public final class SchedulerAccountsManager extends AbstractAccountsManager<Sche
      * Create a new instance of this class.
      */
     public SchedulerAccountsManager(SchedulerDBManager dbManager) {
-        super("Scheduler Accounts Manager Refresher", Logger
-                .getLogger(SchedulerAccountsManager.class));
+        super("Scheduler Accounts Manager Refresher", Logger.getLogger(SchedulerAccountsManager.class));
 
         this.dbManager = dbManager;
     }

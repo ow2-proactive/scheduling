@@ -400,7 +400,9 @@ public enum PASchedulerProperties {
                 if (filename == null) {
                     filename = DEFAULT_PROPERTIES_FILE;
                 }
-                prop.load(new FileInputStream(filename));
+                FileInputStream stream = new FileInputStream(filename);
+                prop.load(stream);
+                stream.close();
                 setUserJavaProperties();
 
             } catch (IOException e) {
@@ -433,7 +435,9 @@ public enum PASchedulerProperties {
         getProperties(null);
         Properties ptmp = new Properties();
         try {
-            ptmp.load(new FileInputStream(filename));
+            FileInputStream stream = new FileInputStream(filename);
+            ptmp.load(stream);
+            stream.close();
             for (Object o : ptmp.keySet()) {
                 prop.setProperty((String) o, (String) ptmp.get(o));
             }

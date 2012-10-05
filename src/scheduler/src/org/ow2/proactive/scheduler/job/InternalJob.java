@@ -211,7 +211,6 @@ public abstract class InternalJob extends JobState {
         }
     }
 
-
     /**
      * @see org.ow2.proactive.scheduler.common.job.JobState#getJobInfo()
      */

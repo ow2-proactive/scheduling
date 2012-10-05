@@ -439,6 +439,7 @@ public class EC2Infrastructure extends InfrastructureManager {
         try {
             in = new FileInputStream(fp);
             props.load(in);
+            in.close();
         } catch (Exception e) {
             throw new IllegalArgumentException("Error while reading EC2 properties: " + e.getMessage(), e);
         }

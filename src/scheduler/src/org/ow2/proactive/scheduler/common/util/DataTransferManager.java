@@ -137,7 +137,9 @@ public class DataTransferManager {
 
         String awaitedJobs = "";
         Properties properties = new Properties();
-        properties.load(new FileInputStream(statusFile));
+        FileInputStream stream = new FileInputStream(statusFile);
+        properties.load(stream);
+        stream.close();
         awaitedJobs = properties.getProperty(awaitedJobsAttrName);
         if ((awaitedJobs == null) || (awaitedJobs.length() == 0))
             return;

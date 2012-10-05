@@ -113,6 +113,7 @@ public class LoggerManager implements GenericLogger {
             InputStream in = LoggerManager.class.getResourceAsStream(log4jFileName);
             try {
                 p.load(in);
+                in.close();
             } catch (IOException e1) {
                 System.err.println("Failed to read the default configuration file:" + e1.getMessage());
             }
