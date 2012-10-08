@@ -443,6 +443,15 @@ public class RMNodeStarter {
                 rmURL = cl.getOptionValue(OPTION_RM_URL);
             }
 
+            try {
+                logger.info("Detecting a network interface to bind the node");
+                String networkInterface = RMConnection.getNetworkInterfaceFor(rmURL);
+                logger.info("Node will be bounded to the following network interface " + networkInterface);
+                CentralPAPropertyRepository.PA_NET_INTERFACE.setValue(networkInterface);
+            } catch (Exception e) {
+                logger.warn("Unable to detect the network interface", e);
+            }
+
             // if the user doesn't provide a rm URL, we don't care about the credentials
             if (rmURL != null) {
                 // The path to the file that contains the credential

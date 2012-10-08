@@ -36,10 +36,17 @@
  */
 package org.ow2.proactive.authentication;
 
+import java.io.IOException;
 import java.io.Serializable;
+import java.net.NetworkInterface;
+import java.net.Socket;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.UnknownHostException;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.remoteobject.AbstractRemoteObjectFactory;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectFactory;
 import org.objectweb.proactive.core.util.ProActiveInet;
@@ -214,5 +221,33 @@ public abstract class Connection<T extends Authentication> implements Loggable, 
             url += "/";
         }
         return url;
+    }
+
+    /**
+     * Selects a network interface for proactive runtime based on provided url.
+     * 
+     * @throws IOException if an I/O error occurs when creating the socket. 
+     * @throws UnknownHostException if the IP address of the host could not be determined.
+     * @throws URISyntaxException if the given string violates RFC&nbsp;2396,
+     */
+    public static String getNetworkInterfaceFor(String url) throws UnknownHostException, IOException,
+            URISyntaxException {
+
+        if (url != null && CentralPAPropertyRepository.PA_NET_INTERFACE.getValue() == null &&
+            CentralPAPropertyRepository.PA_NET_NETMASK.getValue() == null) {
+            URI parsedUrl = new URI(url);
+            int port = parsedUrl.getPort();
+            if (port == -1) {
+                // use default port for rmi
+                port = 1099;
+            }
+
+            Socket socket = new Socket(parsedUrl.getHost(), port);
+            NetworkInterface ni = NetworkInterface.getByInetAddress(socket.getLocalAddress());
+
+            return ni.getName();
+        }
+
+        throw new IllegalStateException("The network interface is already selected");
     }
 }

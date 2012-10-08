@@ -180,6 +180,16 @@ public class ResourceManagerController {
                     url = RM_DEFAULT_URL;
                 }
 
+                try {
+                    logger.debug("Detecting a network interface to bind the client runtime");
+                    String networkInterface = RMConnection.getNetworkInterfaceFor(url);
+                    logger.debug("The runtime will be bounded to the following network interface " +
+                        networkInterface);
+                    CentralPAPropertyRepository.PA_NET_INTERFACE.setValue(networkInterface);
+                } catch (Exception e) {
+                    logger.debug("Unable to detect the network interface", e);
+                }
+
                 logger.info("Connecting to the RM on " + url);
                 auth = RMConnection.join(url);
                 logger.info("\t-> Connection established on " + url);

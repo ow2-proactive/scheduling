@@ -60,6 +60,7 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.Parser;
 import org.apache.commons.cli.UnrecognizedOptionException;
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.utils.JVMPropertiesPreloader;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
@@ -179,6 +180,17 @@ public class SchedulerController {
                 } else {
                     url = SCHEDULER_DEFAULT_URL;
                 }
+
+                try {
+                    logger.debug("Detecting a network interface to bind the client runtime");
+                    String networkInterface = SchedulerConnection.getNetworkInterfaceFor(url);
+                    logger.debug("The runtime will be bounded to the following network interface " +
+                        networkInterface);
+                    CentralPAPropertyRepository.PA_NET_INTERFACE.setValue(networkInterface);
+                } catch (Exception e) {
+                    logger.debug("Unable to detect the network interface", e);
+                }
+
                 logger.info("Trying to connect Scheduler on " + url);
                 auth = SchedulerConnection.join(url);
                 logger.info("\t-> Connection established on " + url);
