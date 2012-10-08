@@ -206,7 +206,9 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
     private boolean authenticateUserFromFile(String username, String password) throws LoginException {
         Properties props = new Properties();
         try {
-            props.load(new FileInputStream(new File(loginFile)));
+            FileInputStream stream = new FileInputStream(new File(loginFile));
+            props.load(stream);
+            stream.close();
         } catch (FileNotFoundException e) {
             throw new LoginException(e.toString());
         } catch (IOException e) {
@@ -239,7 +241,9 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
                 }
             }
             reader.close();
-            groups.load(new FileInputStream(new File(groupFile)));
+            FileInputStream stream = new FileInputStream(new File(groupFile));
+            groups.load(stream);
+            stream.close();
         } catch (FileNotFoundException e) {
             throw new LoginException(e.toString());
         } catch (IOException e) {

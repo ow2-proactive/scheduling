@@ -155,7 +155,9 @@ public class SelectionUtils {
         // Opening of the property file
         Properties props = new Properties();
         try {
-            props.load(new FileInputStream(configFilePath));
+            FileInputStream stream = new FileInputStream(configFilePath);
+            props.load(stream);
+            stream.close();
         } catch (IOException e) {
             e.printStackTrace();
             return false;

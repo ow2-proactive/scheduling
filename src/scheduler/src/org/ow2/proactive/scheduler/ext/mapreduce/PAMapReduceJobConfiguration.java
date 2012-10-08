@@ -212,6 +212,7 @@ public class PAMapReduceJobConfiguration {
                 InputStream is = new FileInputStream(propertyFile);
                 fileLoaded = propertyFile.exists();
                 properties.load(is);
+                is.close();
             } catch (FileNotFoundException e) {
                 // thrown by
                 // "InputStream is = new FileInputStream(propertyFile);"

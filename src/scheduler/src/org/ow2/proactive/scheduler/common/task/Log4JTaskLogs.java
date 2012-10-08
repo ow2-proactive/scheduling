@@ -166,8 +166,7 @@ public class Log4JTaskLogs implements TaskLogs {
                 try {
                     this.serializedAllEvents = ObjectByteConverter.objectToByteArray(errorEvent, true);
                 } catch (IOException e1) {
-                    Logger.getLogger(Log4JTaskLogs.class).error(
-                            "Could not convert to serialized events", e1);
+                    Logger.getLogger(Log4JTaskLogs.class).error("Could not convert to serialized events", e1);
                 }
             }
             this.allEvents = null;

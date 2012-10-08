@@ -2,6 +2,7 @@ package org.ow2.proactive.scheduler.ext.mapreduce;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 
 import org.apache.hadoop.conf.Configuration;
@@ -617,8 +618,10 @@ public enum PAMapReduceFrameworkProperties {
             try {
                 propertiesFileName = PAMapReduceFramework.PA_MAPREDUCE_FRAMEWORK_PROPERTIES_FILE_NAME;
                 properties = new Properties();
-                properties.load(Thread.currentThread().getContextClassLoader().getResourceAsStream(
-                        propertiesFileName));
+                InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream(
+                        propertiesFileName);
+                properties.load(in);
+                in.close();
                 fileLoaded = true;
             } catch (NullPointerException npe) {
                 npe.printStackTrace();

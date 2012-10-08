@@ -90,6 +90,7 @@ public class WindowsEC2RMStarter {
             Properties props = new Properties();
             ByteArrayInputStream in = new ByteArrayInputStream(getUrl(userData).getBytes());
             props.load(in);
+            in.close();
 
             rmCred = props.getProperty("creds");
             rmUrl = props.getProperty("rmUrl");

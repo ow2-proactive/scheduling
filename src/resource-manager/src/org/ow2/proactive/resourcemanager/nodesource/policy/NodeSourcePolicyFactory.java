@@ -126,7 +126,9 @@ public class NodeSourcePolicyFactory {
                     propFileName;
             }
 
-            properties.load(new FileInputStream(propFileName));
+            FileInputStream stream = new FileInputStream(propFileName);
+            properties.load(stream);
+            stream.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
