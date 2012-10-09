@@ -13,7 +13,7 @@
 
 		<!-- JAVA EMBEDDED DATABASE : DERBY -->
         <property name="connection.driver_class">org.apache.derby.jdbc.EmbeddedDriver</property>
-        <property name="connection.url">jdbc:derby:../../SCHEDULER_DB;create=true</property>
+        <property name="connection.url">jdbc:derby:${pa.scheduler.home}/SCHEDULER_DB;create=true</property>
         <property name="dialect">org.hibernate.dialect.DerbyTenFiveDialect</property>
 
         <!-- H2 DATABASE -->

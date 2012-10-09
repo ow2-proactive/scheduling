@@ -36,7 +36,11 @@
  */
 package org.ow2.proactive.resourcemanager.db;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.ow2.proactive.db.HibernateDatabaseManager;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 
@@ -58,6 +62,14 @@ public class RMHibernateDatabaseManager extends HibernateDatabaseManager {
     public String getConfigFile() {
         return PAResourceManagerProperties.getAbsolutePath(PAResourceManagerProperties.RM_DB_HIBERNATE_CONFIG
                 .getValueAsString());
+    }
+
+    @Override
+    protected Map<String, String> getPropertiesToReplaceInConfig() {
+        Map<String, String> propertiesToReplace = new HashMap<String, String>(2);
+        propertiesToReplace.put("${proactive.home}", CentralPAPropertyRepository.PA_HOME.getValue());
+        propertiesToReplace.put("${pa.rm.home}", PAResourceManagerProperties.RM_HOME.getValueAsString());
+        return propertiesToReplace;
     }
 
     @Override

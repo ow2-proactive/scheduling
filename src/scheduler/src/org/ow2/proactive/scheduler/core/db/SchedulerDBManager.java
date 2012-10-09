@@ -1,6 +1,8 @@
 package org.ow2.proactive.scheduler.core.db;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -12,6 +14,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -20,9 +23,11 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.exception.ConstraintViolationException;
 import org.hibernate.transform.DistinctRootEntityResultTransformer;
 import org.junit.Test;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.ow2.proactive.db.DatabaseManager.FilteredExceptionCallback;
 import org.ow2.proactive.db.DatabaseManagerException;
 import org.ow2.proactive.db.DatabaseManagerExceptionHandler;
+import org.ow2.proactive.db.HibernateDatabaseManager;
 import org.ow2.proactive.db.DatabaseManagerExceptionHandler.DBMEHandler;
 import org.ow2.proactive.scheduler.common.job.JobEnvironment;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -55,6 +60,7 @@ import org.ow2.proactive.scheduler.task.internal.InternalJavaTask;
 import org.ow2.proactive.scheduler.task.internal.InternalNativeTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scripting.InvalidScriptException;
+import org.ow2.proactive.utils.FileToBytesConverter;
 
 
 public class SchedulerDBManager implements FilteredExceptionCallback {
@@ -102,11 +108,18 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
             File configFile = new File(PASchedulerProperties
                     .getAbsolutePath(PASchedulerProperties.SCHEDULER_DB_HIBERNATE_CONFIG.getValueAsString()));
 
-            boolean drop = PASchedulerProperties.SCHEDULER_DB_HIBERNATE_DROPDB.getValueAsBoolean();
-
             logger.info("Initializing Scheduler DB using Hibernate config " + configFile.getAbsolutePath());
 
-            return new SchedulerDBManager(new Configuration().configure(configFile), drop);
+            Map<String, String> propertiesToReplace = new HashMap<String, String>(2);
+            propertiesToReplace.put("${proactive.home}", CentralPAPropertyRepository.PA_HOME.getValue());
+            propertiesToReplace.put("${pa.scheduler.home}", PASchedulerProperties.SCHEDULER_HOME
+                    .getValueAsString());
+
+            Configuration configuration = HibernateDatabaseManager.createConfiguration(configFile,
+                    propertiesToReplace);
+
+            boolean drop = PASchedulerProperties.SCHEDULER_DB_HIBERNATE_DROPDB.getValueAsBoolean();
+            return new SchedulerDBManager(configuration, drop);
         }
     }
 

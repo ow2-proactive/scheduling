@@ -37,10 +37,12 @@
 package org.ow2.proactive.db;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,6 +53,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.Table;
 
 import org.apache.log4j.Logger;
+import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -63,6 +66,7 @@ import org.ow2.proactive.db.DatabaseManager.FilteredExceptionCallback;
 import org.ow2.proactive.db.DatabaseManagerExceptionHandler.DBMEHandler;
 import org.ow2.proactive.db.annotation.Alterable;
 import org.ow2.proactive.db.annotation.Unloadable;
+import org.ow2.proactive.utils.FileToBytesConverter;
 
 
 /**
@@ -98,6 +102,30 @@ public abstract class HibernateDatabaseManager implements DatabaseManager, Filte
     //callback object to be notified of exception filtered if needed, can be null
     protected FilteredExceptionCallback callback = null;
 
+    public static Configuration createConfiguration(File configFile, Map<String, String> propertiesToReplace) {
+        try {
+            String configContent = new String(FileToBytesConverter.convertFileToByteArray(configFile));
+
+            for (Map.Entry<String, String> property : propertiesToReplace.entrySet()) {
+                configContent = configContent.replace(property.getKey(), property.getValue());
+            }
+
+            Configuration configuration;
+
+            File modifiedFile = File.createTempFile("dbconfig", "tmp");
+            try {
+                FileToBytesConverter.convertByteArrayToFile(configContent.getBytes(), modifiedFile);
+                configuration = new Configuration().configure(modifiedFile);
+            } finally {
+                modifiedFile.delete();
+            }
+
+            return configuration;
+        } catch (IOException e) {
+            throw new HibernateException("Failed to load Hibernate configuration", e);
+        }
+    }
+
     /**
      * Create a new instance of HibernateDatabaseManager
      */
@@ -106,7 +134,9 @@ public abstract class HibernateDatabaseManager implements DatabaseManager, Filte
         //Create configuration from hibernate.cfg.xml using XML file for mapping
         //configuration = new Configuration().configure(new File(configurationFile));
         //Create configuration from hibernate.cfg.xml using Hibernate annotation
-        this.configuration = new Configuration().configure(new File(getConfigFile()));
+        File configFile = new File(getConfigFile());
+        Map<String, String> propertiesToReplace = getPropertiesToReplaceInConfig();
+        this.configuration = createConfiguration(configFile, propertiesToReplace);
         this.sessionlock = new Object();
         this.idFields = new HashMap<Class<?>, Field>();
         this.globalSession = new ThreadLocal<Session>();
@@ -114,6 +144,10 @@ public abstract class HibernateDatabaseManager implements DatabaseManager, Filte
             new Class[] { org.hibernate.exception.JDBCConnectionException.class }, DBMEHandler.FILTER_ALL,
             this);
         this.sessionFactory = null;
+    }
+
+    protected Map<String, String> getPropertiesToReplaceInConfig() {
+        return Collections.emptyMap();
     }
 
     /**
