@@ -45,15 +45,17 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
+
 import javax.xml.bind.annotation.XmlTransient;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
 import org.ow2.proactive.authentication.crypto.Credentials;
-import org.ow2.proactive.db.annotation.Alterable;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.exception.ExecutableCreationException;
@@ -76,7 +78,6 @@ import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
 import org.ow2.proactive.scheduler.descriptor.JobDescriptorImpl;
 import org.ow2.proactive.scheduler.descriptor.TaskDescriptor;
-import org.ow2.proactive.scheduler.job.JobInfoImpl.ReplicatedTask;
 import org.ow2.proactive.scheduler.task.ClientTaskState;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
@@ -102,7 +103,6 @@ public abstract class InternalJob extends JobState {
     protected Map<TaskId, InternalTask> tasks = new HashMap<TaskId, InternalTask>();
 
     /** Informations (that can be modified) about job execution */
-    @Alterable
     protected JobInfoImpl jobInfo = new JobInfoImpl();
 
     /** Job descriptor for dependences management */
@@ -882,7 +882,7 @@ public abstract class InternalJob extends JobState {
      * @param taskId the task that has been the cause to failure. Can be null if the job has been killed
      * @param jobStatus type of the failure on this job. (failed/canceled/killed)
      */
-    public void failed(TaskId taskId, JobStatus jobStatus) {
+    public Set<TaskId> failed(TaskId taskId, JobStatus jobStatus) {
         if (jobStatus != JobStatus.KILLED) {
             InternalTask descriptor = tasks.get(taskId);
             if (descriptor.getStartTime() > 0) {
@@ -902,18 +902,22 @@ public abstract class InternalJob extends JobState {
         //creating list of status
         HashMap<TaskId, TaskStatus> hts = new HashMap<TaskId, TaskStatus>();
         HashMap<TaskId, Long> htl = new HashMap<TaskId, Long>();
+        Set<TaskId> updatedTasks = new HashSet<TaskId>();
 
         for (InternalTask td : tasks.values()) {
             if (!td.getId().equals(taskId)) {
                 if (td.getStatus() == TaskStatus.RUNNING) {
                     td.setStatus(TaskStatus.ABORTED);
                     td.setFinishedTime(System.currentTimeMillis());
+                    updatedTasks.add(td.getId());
                 } else if (td.getStatus() == TaskStatus.WAITING_ON_ERROR ||
                     td.getStatus() == TaskStatus.WAITING_ON_FAILURE) {
                     td.setStatus(TaskStatus.NOT_RESTARTED);
+                    updatedTasks.add(td.getId());
                 } else if (td.getStatus() != TaskStatus.FINISHED && td.getStatus() != TaskStatus.FAILED &&
                     td.getStatus() != TaskStatus.FAULTY && td.getStatus() != TaskStatus.SKIPPED) {
                     td.setStatus(TaskStatus.NOT_STARTED);
+                    updatedTasks.add(td.getId());
                 }
             }
 
@@ -927,6 +931,8 @@ public abstract class InternalJob extends JobState {
         if (jobDataSpaceApplication != null) {
             jobDataSpaceApplication.terminateDataSpaceApplication();
         }
+
+        return updatedTasks;
     }
 
     /**

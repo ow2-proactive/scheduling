@@ -17,6 +17,7 @@ import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.JobType;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
+import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.core.db.SchedulerStateRecoverHelper;
@@ -121,9 +122,9 @@ public class TestLoadSchedulerClientState extends BaseSchedulerDBTest {
         dbManager.jobTaskStarted(job, task2, false);
 
         // task 2 finished with error, stop job
-        job.failed(task2.getId(), JobStatus.CANCELED);
+        Set<TaskId> ids = job.failed(task2.getId(), JobStatus.CANCELED);
         TaskResultImpl res = new TaskResultImpl(null, new TestException("message", "data"), null, 0);
-        dbManager.updateAfterTaskFinished(job, task2, res);
+        dbManager.updateAfterJobFailed(job, task2, res, ids);
 
         SchedulerStateRecoverHelper stateRecoverHelper = new SchedulerStateRecoverHelper(dbManager);
 

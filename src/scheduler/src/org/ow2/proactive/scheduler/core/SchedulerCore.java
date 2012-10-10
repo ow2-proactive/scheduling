@@ -47,6 +47,7 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
@@ -973,17 +974,17 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
         boolean pendingJob = false;
         //if job has been killed
         if (jobStatus == JobStatus.KILLED) {
-            job.failed(null, jobStatus);
+            Set<TaskId> tasksToUpdate = job.failed(null, jobStatus);
             //the next line will try to remove job from each list.
             //once removed, it won't be removed from remaining list, but we ensure that the job is in only one of the list.
             if (!runningJobs.remove(job)) {
                 pendingJob = pendingJobs.remove(job);
             }
 
-            dbManager.updateAfterJobKilled(job);
+            dbManager.updateAfterJobKilled(job, tasksToUpdate);
         } else {
             //if not killed
-            job.failed(task.getId(), jobStatus);
+            Set<TaskId> tasksToUpdate = job.failed(task.getId(), jobStatus);
 
             //store the exception into jobResult / To prevent from empty task result (when job canceled), create one
             boolean noResult = (jobStatus == JobStatus.CANCELED && taskResult == null);
@@ -992,7 +993,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                     errorMsg), -1, null);
             }
 
-            dbManager.updateAfterTaskFinished(job, task, taskResult);
+            dbManager.updateAfterJobFailed(job, task, taskResult, tasksToUpdate);
 
             runningJobs.remove(job);
 
@@ -1093,8 +1094,6 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             }
             // at this point, the TaskLauncher can be terminated
             terminateTaskLauncher(taskLauncher, taskId, terminateOptions.isNormalTermination());
-
-            updateTaskIdReferences(res, descriptor.getId());
 
             //Check if an exception or error occurred during task execution...
             boolean errorOccurred = false;
@@ -1309,32 +1308,6 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
         }
         //if not found in pending and running, terminate proxy
         rmProxiesManager.terminateUserRMProxy(job.getOwner());
-    }
-
-    /**
-     * For Hibernate use : a Hibernate session cannot accept two different java objects with the same
-     * Hibernate identifier.
-     * To avoid this duplicate object (due to serialization),
-     * this method will join taskId references in the Job result graph object.
-     *
-     * @param jobResult the result in which to join cross dependences
-     * @param res the current result to check. (avoid searching for any)
-     * @param id the taskId reference known by the Scheduler
-     */
-    private void updateTaskIdReferences(TaskResult res, TaskId id) {
-        try {
-            //find the taskId field
-            for (Field f : TaskResultImpl.class.getDeclaredFields()) {
-                if (f.getType().equals(TaskId.class)) {
-                    f.setAccessible(true);
-                    //set to the existing reference
-                    f.set(res, id);
-                    break;
-                }
-            }
-        } catch (Exception e) {
-            logger.error("", e);
-        }
     }
 
     private void initJobLogging(JobId jobId, Logger jobLogger, Appender clientAppender) {

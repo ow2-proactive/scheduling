@@ -1,8 +1,6 @@
 package org.ow2.proactive.scheduler.core.db;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -14,7 +12,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -27,8 +24,8 @@ import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.ow2.proactive.db.DatabaseManager.FilteredExceptionCallback;
 import org.ow2.proactive.db.DatabaseManagerException;
 import org.ow2.proactive.db.DatabaseManagerExceptionHandler;
-import org.ow2.proactive.db.HibernateDatabaseManager;
 import org.ow2.proactive.db.DatabaseManagerExceptionHandler.DBMEHandler;
+import org.ow2.proactive.db.HibernateDatabaseManager;
 import org.ow2.proactive.scheduler.common.job.JobEnvironment;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
@@ -60,7 +57,6 @@ import org.ow2.proactive.scheduler.task.internal.InternalJavaTask;
 import org.ow2.proactive.scheduler.task.internal.InternalNativeTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scripting.InvalidScriptException;
-import org.ow2.proactive.utils.FileToBytesConverter;
 
 
 public class SchedulerDBManager implements FilteredExceptionCallback {
@@ -939,8 +935,13 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
         }, false);
     }
 
-    public void updateAfterJobKilled(final InternalJob job) {
-        updateAfterTaskFinished(job, null, null);
+    public void updateAfterJobKilled(InternalJob job, Set<TaskId> tasksToUpdate) {
+        updateAfterTaskFinished(job, null, null, tasksToUpdate);
+    }
+
+    public void updateAfterJobFailed(InternalJob job, InternalTask finishedTask, TaskResultImpl result,
+            Set<TaskId> tasksToUpdate) {
+        updateAfterTaskFinished(job, finishedTask, result, tasksToUpdate);
     }
 
     public void updateJobAndTasksState(final InternalJob job) {
@@ -971,16 +972,26 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
 
     public void updateAfterTaskFinished(final InternalJob job, final InternalTask finishedTask,
             final TaskResultImpl result) {
+        updateAfterTaskFinished(job, finishedTask, result, new HashSet<TaskId>(1));
+    }
+
+    private void updateAfterTaskFinished(final InternalJob job, final InternalTask finishedTask,
+            final TaskResultImpl result, final Set<TaskId> tasksToUpdate) {
         runWithTransaction(new SessionWork<Void>() {
             @Override
             Void executeWork(Session session) {
                 String taskUpdate = "update TaskData task set task.taskStatus = :taskStatus, "
                     + "task.finishedTime = :finishedTime, " + "task.executionDuration = :executionDuration "
-                    + "where task.id = :taskId and task.finishedTime < 0";
+                    + "where task.id = :taskId";
 
                 Query taskUpdateQuery = session.createQuery(taskUpdate);
 
-                for (TaskState task : job.getTasks()) {
+                if (finishedTask != null) {
+                    tasksToUpdate.add(finishedTask.getId());
+                }
+
+                for (TaskId id : tasksToUpdate) {
+                    InternalTask task = job.getIHMTasks().get(id);
                     TaskData.DBTaskId taskId = taskId(task.getId());
 
                     TaskInfo taskInfo = task.getTaskInfo();
