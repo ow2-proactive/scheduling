@@ -39,7 +39,6 @@ package org.ow2.proactive.scheduler.core;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.Collection;
@@ -118,6 +117,7 @@ import org.ow2.proactive.scheduler.core.rmproxies.UserRMProxy;
 import org.ow2.proactive.scheduler.exception.ProgressPingerException;
 import org.ow2.proactive.scheduler.exception.RunningProcessException;
 import org.ow2.proactive.scheduler.exception.StartProcessException;
+import org.ow2.proactive.scheduler.job.ChangedTasksInfo;
 import org.ow2.proactive.scheduler.job.ClientJobState;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.InternalJobWrapper;
@@ -527,8 +527,6 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
         currentJob.setTaskStatusModify(null);
         // used when a job has failed
         currentJob.setTaskFinishedTimeModify(null);
-        // also skipped tasks
-        currentJob.setSkippedTasksModify(null);
     }
 
     SchedulerDBManager getDBManager() {
@@ -1219,7 +1217,9 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             tlogger.info(taskId, "result added to job " + job.getId());
             //to be done before terminating the task, once terminated it is not running anymore..
             job.getRunningTaskDescriptor(taskId);
-            descriptor = job.terminateTask(errorOccurred, taskId, frontend, res.getAction(), res);
+            ChangedTasksInfo changesInfo = job.terminateTask(errorOccurred, taskId, frontend,
+                    res.getAction(), res);
+            descriptor = job.getIHMTasks().get(taskId);
 
             //update job info if it is terminated
             if (job.isFinished()) {
@@ -1232,7 +1232,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
 
             //Update database
             if (res.getAction() != null) {
-                dbManager.updateAfterWorkflowTaskFinished(job, descriptor, res);
+                dbManager.updateAfterWorkflowTaskFinished(job, changesInfo, res);
             } else {
                 dbManager.updateAfterTaskFinished(job, descriptor, res);
             }

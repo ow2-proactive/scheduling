@@ -10,6 +10,7 @@ import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
 import org.ow2.proactive.scheduler.common.task.flow.FlowBlock;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scheduler.core.db.SchedulerStateRecoverHelper;
+import org.ow2.proactive.scheduler.job.ChangedTasksInfo;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
@@ -30,12 +31,12 @@ public class TestRestoreWorkflowJobs extends BaseSchedulerDBTest {
         startTask(job, mainTask);
         dbManager.jobTaskStarted(job, mainTask, true);
 
-        TaskResultImpl result = new TaskResultImpl(null, "ok", null, 0, null);
+        TaskResultImpl result = new TaskResultImpl(mainTask.getId(), "ok", null, 0, null);
         FlowAction action = new FlowAction(FlowActionType.REPLICATE);
         action.setDupNumber(2);
-        job.terminateTask(false, mainTask.getId(), null, action, result);
+        ChangedTasksInfo changesInfo = job.terminateTask(false, mainTask.getId(), null, action, result);
 
-        dbManager.updateAfterWorkflowTaskFinished(job, mainTask, result);
+        dbManager.updateAfterWorkflowTaskFinished(job, changesInfo, result);
 
         SchedulerStateRecoverHelper recoverHelper = new SchedulerStateRecoverHelper(dbManager);
 

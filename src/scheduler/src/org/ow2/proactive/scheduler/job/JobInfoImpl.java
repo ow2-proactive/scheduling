@@ -36,10 +36,11 @@
  */
 package org.ow2.proactive.scheduler.job;
 
-import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -104,40 +105,18 @@ public class JobInfoImpl implements JobInfo {
     private JobStatus status = JobStatus.PENDING;
 
     /** to know if the job has to be removed after the fixed admin delay or not */
-    private boolean toBeRemoved = false;
+    private boolean toBeRemoved;
 
     /** If this status is not null, it means the tasks have to change their status */
     //not Hibernate informations
-    private Map<TaskId, TaskStatus> taskStatusModify = null;
+    private Map<TaskId, TaskStatus> taskStatusModify;
 
     /** If this finished time is not null, it means the tasks have to change their finished time */
     //not Hibernate informations
-    private Map<TaskId, Long> taskFinishedTimeModify = null;
-
-    /**
-     * contains the ids of the original and the replicated task,
-     * as well as ids of the dependencies of the replicated task
-     */
-    public static class ReplicatedTask implements Serializable {
-        public TaskId originalId = null;
-        public TaskId replicatedId = null;
-        public List<TaskId> deps = null;
-
-        public ReplicatedTask(TaskId original, TaskId replicated) {
-            this.originalId = original;
-            this.replicatedId = replicated;
-            this.deps = new ArrayList<TaskId>();
-        }
-    }
-
-    /** Tasks replicated by a Control Flow Action */
-    private List<ReplicatedTask> tasksReplicated = null;
-
-    /** Tasks loop by a Control Flow Action */
-    private List<ReplicatedTask> tasksLooped = null;
+    private Map<TaskId, Long> taskFinishedTimeModify;
 
     /** Tasks skipped by a Control Flow Action */
-    private List<TaskId> tasksSkipped = null;
+    private Set<TaskId> tasksSkipped;
 
     private List<ClientTaskState> modifiedTasks;
 
@@ -269,26 +248,6 @@ public class JobInfoImpl implements JobInfo {
     }
 
     /**
-     * Used as an argument for {@link SchedulerEvent#TASK_SKIPPED} to
-     * specify which tasks were skipped
-     * 
-     * @param m list of the skipped tasks
-     */
-    public void setTasksSkipped(List<TaskId> m) {
-        this.tasksSkipped = m;
-    }
-
-    /**
-     * Used as an argument for {@link SchedulerEvent#TASK_SKIPPED} to
-     * specify which tasks were skipped
-     * 
-     * @return a list of the skipped tasks
-     */
-    public List<TaskId> getTasksSkipped() {
-        return this.tasksSkipped;
-    }
-
-    /**
      * @see org.ow2.proactive.scheduler.common.job.JobInfo#getNumberOfFinishedTasks()
      */
     public int getNumberOfFinishedTasks() {
@@ -399,12 +358,35 @@ public class JobInfoImpl implements JobInfo {
         return getClass().getSimpleName() + "[" + jobId + "]";
     }
 
-    public void setModifiedTasks(List<ClientTaskState> tasks) {
-        this.modifiedTasks = tasks;
+    public void setTasksChanges(ChangedTasksInfo changesInfo, InternalJob job) {
+        this.modifiedTasks = new ArrayList<ClientTaskState>(changesInfo.getNewTasks().size() +
+            changesInfo.getUpdatedTasks().size());
+        for (TaskId id : changesInfo.getNewTasks()) {
+            modifiedTasks.add(new ClientTaskState(job.getIHMTasks().get(id)));
+        }
+        for (TaskId id : changesInfo.getUpdatedTasks()) {
+            modifiedTasks.add(new ClientTaskState(job.getIHMTasks().get(id)));
+        }
+        this.tasksSkipped = new HashSet<TaskId>(changesInfo.getSkippedTasks());
+    }
+
+    public void clearTasksChanges() {
+        modifiedTasks = null;
+        tasksSkipped = null;
     }
 
     public List<ClientTaskState> getModifiedTasks() {
         return this.modifiedTasks;
+    }
+
+    /**
+     * Used as an argument for {@link SchedulerEvent#TASK_SKIPPED} to
+     * specify which tasks were skipped
+     * 
+     * @return a set of the skipped tasks
+     */
+    public Set<TaskId> getTasksSkipped() {
+        return this.tasksSkipped;
     }
 
 }

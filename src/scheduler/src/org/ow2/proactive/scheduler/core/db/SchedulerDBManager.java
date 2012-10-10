@@ -43,6 +43,7 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scheduler.core.account.SchedulerAccount;
 import org.ow2.proactive.scheduler.core.db.TaskData.DBTaskId;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.proactive.scheduler.job.ChangedTasksInfo;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.job.JobResultImpl;
@@ -605,7 +606,9 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
         return runWithoutTransaction(new SessionWork<InternalJob>() {
             @Override
             InternalJob executeWork(Session session) {
-                JobData jobData = (JobData) session.get(JobData.class, jobId(id));
+                Query jobQuery = session.createQuery("from JobData where id = :id and removedTime = -1")
+                        .setParameter("id", jobId(id));
+                JobData jobData = (JobData) jobQuery.uniqueResult();
                 if (jobData == null) {
                     return null;
                 } else {
@@ -865,7 +868,7 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
         });
     }
 
-    public void updateAfterWorkflowTaskFinished(final InternalJob job, final InternalTask finishedTask,
+    public void updateAfterWorkflowTaskFinished(final InternalJob job, final ChangedTasksInfo changesInfo,
             final TaskResultImpl result) {
         runWithTransaction(new SessionWork<Void>() {
             @Override
@@ -889,24 +892,32 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
 
                 JobData jobRuntimeData = (JobData) session.load(JobData.class, jobId);
 
-                List<TaskData> taskRuntimeDataList = new ArrayList<TaskData>();
-
-                List<InternalTask> tasks = new ArrayList<InternalTask>();
-                List<InternalTask> newTasks = new ArrayList<InternalTask>();
-
-                for (InternalTask task : job.getITasks()) {
-                    TaskData taskData = (TaskData) session.get(TaskData.class, taskId(task));
-                    if (taskData == null) {
-                        newTasks.add(task);
-                    } else {
-                        taskData.updateMutableAttributes(task);
-                        session.update(taskData);
-                        taskRuntimeDataList.add(taskData);
-                        tasks.add(task);
-                    }
+                List<DBTaskId> taskIds = new ArrayList<TaskData.DBTaskId>(changesInfo.getSkippedTasks()
+                        .size() +
+                    changesInfo.getUpdatedTasks().size());
+                for (TaskId id : changesInfo.getSkippedTasks()) {
+                    taskIds.add(taskId(id));
+                }
+                for (TaskId id : changesInfo.getUpdatedTasks()) {
+                    taskIds.add(taskId(id));
                 }
 
-                for (InternalTask task : newTasks) {
+                List<TaskData> taskRuntimeDataList = new ArrayList<TaskData>();
+                List<InternalTask> tasks = new ArrayList<InternalTask>();
+
+                Query tasksQuery = session.createQuery("from TaskData where id in (:ids)").setParameterList(
+                        "ids", taskIds);
+                List<TaskData> tasksToUpdate = tasksQuery.list();
+                for (TaskData taskData : tasksToUpdate) {
+                    InternalTask task = job.getIHMTasks().get(taskData.createTaskId(job));
+                    taskData.updateMutableAttributes(task);
+                    session.update(taskData);
+                    taskRuntimeDataList.add(taskData);
+                    tasks.add(task);
+                }
+
+                for (TaskId newTaskId : changesInfo.getNewTasks()) {
+                    InternalTask task = job.getIHMTasks().get(newTaskId);
                     if (task.getExecutableContainer() == null) {
                         InternalTask from = task.getReplicatedFrom();
                         ExecutableContainer container = from.getExecutableContainer();
@@ -922,7 +933,7 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
 
                 saveTaskDependencies(session, tasks, taskRuntimeDataList);
 
-                TaskData.DBTaskId taskId = taskId(finishedTask.getId());
+                TaskData.DBTaskId taskId = taskId(result.getTaskId());
                 saveTaskResult(taskId, result, session);
 
                 if (finishedJobStatuses.contains(job.getStatus())) {

@@ -36,6 +36,9 @@ public class TestJobOperations extends BaseSchedulerDBTest {
         Assert.assertEquals(JobStatus.PENDING, job.getJobInfo().getStatus());
         Assert.assertEquals(JobPriority.HIGHEST, job.getJobInfo().getPriority());
 
+        dbManager.removeJob(job.getId(), System.currentTimeMillis(), false);
+        Assert.assertNull(dbManager.loadJobWithoutTasks(job.getId()));
+
         Assert.assertNull(dbManager.loadJobWithoutTasks(JobIdImpl.makeJobId("123456789")));
     }
 

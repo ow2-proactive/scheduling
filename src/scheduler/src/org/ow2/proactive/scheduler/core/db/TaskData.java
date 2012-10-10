@@ -320,9 +320,12 @@ public class TaskData {
         return taskData;
     }
 
+    TaskId createTaskId(InternalJob internalJob) {
+        return TaskIdImpl.createTaskId(internalJob.getId(), getTaskName(), getId().getTaskId(), false);
+    }
+
     InternalTask toInternalTask(InternalJob internalJob) {
-        TaskId taskId = TaskIdImpl.createTaskId(internalJob.getId(), getTaskName(), getId().getTaskId(),
-                false);
+        TaskId taskId = createTaskId(internalJob);
 
         InternalTask internalTask;
 
