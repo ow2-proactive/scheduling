@@ -130,6 +130,7 @@ import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.TaskLogger;
 import org.ow2.proactive.scheduler.util.classloading.TaskClassServer;
 import org.ow2.proactive.utils.NodeSet;
+import org.ow2.proactive.utils.Tools;
 
 
 /**
@@ -2045,8 +2046,20 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
      *
      */
     private void recover() {
+        long loadJobPeriod;
+        if (PASchedulerProperties.SCHEDULER_DB_LOAD_JOB_PERIOD.isSet()) {
+            String periodStr = PASchedulerProperties.SCHEDULER_DB_LOAD_JOB_PERIOD.getValueAsString();
+            try {
+                loadJobPeriod = Tools.parsePeriod(periodStr);
+            } catch (IllegalArgumentException e) {
+                logger.warn("Invalid load job period string: " + periodStr + ", this setting is ignored", e);
+                loadJobPeriod = -1;
+            }
+        } else {
+            loadJobPeriod = -1;
+        }
         SchedulerStateRecoverHelper.RecoveredSchedulerState recoveredState = new SchedulerStateRecoverHelper(
-            dbManager).recover();
+            dbManager).recover(loadJobPeriod);
 
         this.jobs = new HashMap<JobId, InternalJob>();
 

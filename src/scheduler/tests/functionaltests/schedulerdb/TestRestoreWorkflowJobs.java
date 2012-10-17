@@ -50,7 +50,7 @@ public class TestRestoreWorkflowJobs extends BaseSchedulerDBTest {
                         true).withPending(task("T3*1", TaskStatus.SUBMITTED), true).withPending(
                         task("T4", TaskStatus.PENDING), true).withEligible("T1", "T1*1");
 
-        checkRecoveredState(recoverHelper.recover(), state().withRunning(expectedJob));
+        checkRecoveredState(recoverHelper.recover(-1), state().withRunning(expectedJob));
     }
 
     static JavaTask task(String name) {

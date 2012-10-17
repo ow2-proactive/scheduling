@@ -41,7 +41,7 @@ public class TestTaskIdGeneration extends BaseSchedulerDBTest {
         checkIds(job);
 
         SchedulerStateRecoverHelper recoverHelper = new SchedulerStateRecoverHelper(dbManager);
-        SchedulerStateRecoverHelper.RecoveredSchedulerState state = recoverHelper.recover();
+        SchedulerStateRecoverHelper.RecoveredSchedulerState state = recoverHelper.recover(-1);
         Collection<InternalJob> jobs = state.getPendingJobs();
         Assert.assertEquals(1, jobs.size());
         job = jobs.iterator().next();

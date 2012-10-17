@@ -70,7 +70,7 @@ public class SchedulerStateRecoverHelper {
         this.dbManager = dbManager;
     }
 
-    public RecoveredSchedulerState recover() {
+    public RecoveredSchedulerState recover(long loadJobPeriod) {
         List<InternalJob> notFinishedJobs = dbManager.loadNotFinishedJobs(true);
 
         Vector<InternalJob> pendingJobs = new Vector<InternalJob>();
@@ -137,7 +137,8 @@ public class SchedulerStateRecoverHelper {
             }
         }
 
-        Vector<InternalJob> finishedJobs = new Vector<InternalJob>(dbManager.loadFinishedJobs(false));
+        Vector<InternalJob> finishedJobs = new Vector<InternalJob>(dbManager.loadFinishedJobs(false,
+                loadJobPeriod));
 
         return new RecoveredSchedulerState(pendingJobs, runningJobs, finishedJobs);
     }

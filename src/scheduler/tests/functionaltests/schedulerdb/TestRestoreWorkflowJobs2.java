@@ -38,7 +38,7 @@ public class TestRestoreWorkflowJobs2 extends BaseSchedulerDBTest {
         dbManager.updateAfterWorkflowTaskFinished(job, changesInfo, result);
 
         SchedulerStateRecoverHelper recoverHelper = new SchedulerStateRecoverHelper(dbManager);
-        SchedulerStateRecoverHelper.RecoveredSchedulerState state = recoverHelper.recover();
+        SchedulerStateRecoverHelper.RecoveredSchedulerState state = recoverHelper.recover(-1);
         job = state.getRunningJobs().get(0);
         System.out.println("OK");
     }

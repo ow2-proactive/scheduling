@@ -281,4 +281,64 @@ public class Tools {
     public static String getStringAsArray(ObjectArrayFormatter oaf) {
         return oaf.getAsString();
     }
+
+    /**
+     * Translates time period string into milliseconds. Period string should
+     * contain symbol indication length of the period: 
+     * <ul>
+     * <li>'s' - seconds
+     * <li>'m' - minutes
+     * <li>'h' - hours
+     * <li>'d' - days
+     * </ul> 
+     * 
+     * Examples of valid time period expressions:
+     * <ul>
+     * <li>'1m' - one minute
+     * <li>'1d 10h' - one day and ten hours
+     * </ul>
+     */
+    public static long parsePeriod(String periodString) {
+        periodString = periodString.trim();
+        if (periodString.isEmpty()) {
+            throw new IllegalArgumentException("Period string is empty");
+        }
+
+        long total = 0;
+
+        StringBuilder numberStr = new StringBuilder();
+        for (int i = 0; i < periodString.length(); i++) {
+            char ch = periodString.charAt(i);
+            if (Character.isSpaceChar(ch)) {
+                continue;
+            } else if (Character.isDigit(ch)) {
+                numberStr.append(ch);
+            } else {
+                long millis;
+                if (ch == 's') {
+                    millis = 1000;
+                } else if (ch == 'm') {
+                    millis = 1000 * 60;
+                } else if (ch == 'h') {
+                    millis = 1000 * 60 * 60;
+                } else if (ch == 'd') {
+                    millis = 1000 * 60 * 60 * 24;
+                } else {
+                    throw new IllegalArgumentException("Invalid period string: " + ch);
+                }
+                if (numberStr.length() == 0) {
+                    throw new IllegalArgumentException("Period length isn't specified");
+                }
+
+                total += Long.valueOf(numberStr.toString()) * millis;
+                numberStr = new StringBuilder();
+            }
+        }
+
+        if (numberStr.length() != 0) {
+            throw new IllegalArgumentException("Period string isn't specified");
+        }
+
+        return total;
+    }
 }

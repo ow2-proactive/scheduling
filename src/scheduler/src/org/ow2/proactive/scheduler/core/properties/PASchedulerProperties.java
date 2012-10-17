@@ -281,6 +281,16 @@ public enum PASchedulerProperties {
      */
     SCHEDULER_DB_HIBERNATE_DROPDB("pa.scheduler.db.hibernate.dropdb", PropertyType.BOOLEAN),
 
+    /**
+     * This property is used to limit number of finished jobs loaded from the database 
+     * at scheduler startup. For example setting this property to '10d' means that
+     * scheduler should load only finished jobs which were submitted during last
+     * 10 days. In the period expression it is also possible to use symbols 'h' (hours) 
+     * and 'm' (minutes).
+     * If property isn't set then all finished jobs are loaded. 
+     */
+    SCHEDULER_DB_LOAD_JOB_PERIOD("pa.scheduler.db.load.job.period", PropertyType.STRING),
+
     /* ***************************************************************** */
     /* ********************** MATLAB/SCILAB PROPERTIES ***************** */
     /* ***************************************************************** */

@@ -51,7 +51,7 @@ public class TestLoadSchedulerClientState extends BaseSchedulerDBTest {
         SchedulerStateRecoverHelper stateRecoverHelper = new SchedulerStateRecoverHelper(dbManager);
         SchedulerStateRecoverHelper.RecoveredSchedulerState recovered;
 
-        recovered = stateRecoverHelper.recover();
+        recovered = stateRecoverHelper.recover(-1);
 
         JobStateMatcher expectedJob;
 
@@ -70,7 +70,7 @@ public class TestLoadSchedulerClientState extends BaseSchedulerDBTest {
         expectedJob = job(job.getId(), JobStatus.STALLED).withFinished(
                 task("task1", TaskStatus.FINISHED).checkFinished()).withPending(
                 task("task2", TaskStatus.PENDING), true).withEligible("task2");
-        recovered = stateRecoverHelper.recover();
+        recovered = stateRecoverHelper.recover(-1);
         checkRecoveredState(recovered, state().withRunning(expectedJob));
 
         job = recovered.getRunningJobs().get(0);
@@ -84,7 +84,7 @@ public class TestLoadSchedulerClientState extends BaseSchedulerDBTest {
         expectedJob = job(job.getId(), JobStatus.FINISHED).withFinished(
                 task("task1", TaskStatus.FINISHED).checkFinished()).withFinished(
                 task("task2", TaskStatus.FINISHED).checkFinished());
-        recovered = stateRecoverHelper.recover();
+        recovered = stateRecoverHelper.recover(-1);
         checkRecoveredState(recovered, state().withFinished(expectedJob));
     }
 
@@ -132,7 +132,7 @@ public class TestLoadSchedulerClientState extends BaseSchedulerDBTest {
                 task("task1", TaskStatus.ABORTED).checkFinished(), false).withFinished(
                 task("task2", TaskStatus.FAULTY).checkFinished()).checkFinished();
 
-        checkRecoveredState(stateRecoverHelper.recover(), state().withFinished(expectedJob));
+        checkRecoveredState(stateRecoverHelper.recover(-1), state().withFinished(expectedJob));
     }
 
     @Test
@@ -189,7 +189,7 @@ public class TestLoadSchedulerClientState extends BaseSchedulerDBTest {
 
         SchedulerStateRecoverHelper stateRecoverHelper = new SchedulerStateRecoverHelper(dbManager);
 
-        SchedulerState state = stateRecoverHelper.recover().getSchedulerState();
+        SchedulerState state = stateRecoverHelper.recover(-1).getSchedulerState();
 
         Assert.assertEquals("Unexpected jobs number", 2, state.getPendingJobs().size());
 

@@ -580,21 +580,34 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
     }
 
     public List<InternalJob> loadNotFinishedJobs(boolean fullState) {
-        return loadJobs(fullState, notFinishedJobStatuses);
+        return loadJobs(fullState, notFinishedJobStatuses, -1);
     }
 
-    public List<InternalJob> loadFinishedJobs(boolean fullState) {
-        return loadJobs(fullState, finishedJobStatuses);
+    public List<InternalJob> loadFinishedJobs(boolean fullState, long period) {
+        return loadJobs(fullState, finishedJobStatuses, period);
     }
 
-    private List<InternalJob> loadJobs(final boolean fullState, final Collection<JobStatus> status) {
+    private List<InternalJob> loadJobs(final boolean fullState, final Collection<JobStatus> status,
+            final long period) {
         return runWithoutTransaction(new SessionWork<List<InternalJob>>() {
             @Override
             @SuppressWarnings("unchecked")
             List<InternalJob> executeWork(Session session) {
-                List<Long> ids = session.createQuery(
-                        "select id from JobData where status in (:status) and removedTime = -1")
-                        .setParameterList("status", status).list();
+                Query query;
+                if (period > 0) {
+                    long minSubmittedTime = System.currentTimeMillis() - period;
+                    query = session
+                            .createQuery(
+                                    "select id from JobData where status in (:status) and removedTime = -1 and submittedTime >= :minSubmittedTime")
+                            .setParameter("minSubmittedTime", minSubmittedTime).setParameterList("status",
+                                    status);
+                } else {
+                    query = session.createQuery(
+                            "select id from JobData where status in (:status) and removedTime = -1")
+                            .setParameterList("status", status);
+                }
+
+                List<Long> ids = query.list();
 
                 return loadInternalJobs(fullState, session, ids);
             }
@@ -868,6 +881,7 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
         });
     }
 
+    @SuppressWarnings("unchecked")
     public void updateAfterWorkflowTaskFinished(final InternalJob job, final ChangedTasksInfo changesInfo,
             final TaskResultImpl result) {
         runWithTransaction(new SessionWork<Void>() {

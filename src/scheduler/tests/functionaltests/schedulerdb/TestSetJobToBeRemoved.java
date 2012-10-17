@@ -22,7 +22,7 @@ public class TestSetJobToBeRemoved extends BaseSchedulerDBTest {
         dbManager.jobSetToBeRemoved(job.getId());
 
         SchedulerStateRecoverHelper recoverHelper = new SchedulerStateRecoverHelper(dbManager);
-        Collection<InternalJob> jobs = recoverHelper.recover().getPendingJobs();
+        Collection<InternalJob> jobs = recoverHelper.recover(-1).getPendingJobs();
         Assert.assertEquals(1, jobs.size());
         job = jobs.iterator().next();
 

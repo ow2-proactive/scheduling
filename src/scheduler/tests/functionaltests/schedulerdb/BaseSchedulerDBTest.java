@@ -372,10 +372,15 @@ public class BaseSchedulerDBTest {
     }
 
     public InternalJob defaultSubmitJob(TaskFlowJob job) throws Exception {
-        return defaultSubmitJob(job, DEFAULT_USER_NAME);
+        return defaultSubmitJob(job, DEFAULT_USER_NAME, -1);
     }
 
     public InternalJob defaultSubmitJob(TaskFlowJob job, String userName) throws Exception {
+        return defaultSubmitJob(job, userName, -1);
+    }
+
+    public InternalJob defaultSubmitJob(TaskFlowJob job, String userName, long submittedTime)
+            throws Exception {
         System.out.println("Submit new job");
         if (job.getTasks().isEmpty()) {
             job.addTask(createDefaultTask("default test task"));
@@ -383,7 +388,9 @@ public class BaseSchedulerDBTest {
         InternalJob internalJob = InternalJobFactory.createJob(job, getDefaultCredentials());
         internalJob.setOwner(userName);
         internalJob.submitAction();
-
+        if (submittedTime > 0) {
+            internalJob.setSubmittedTime(submittedTime);
+        }
         dbManager.newJobSubmitted(internalJob);
 
         return internalJob;

@@ -36,7 +36,7 @@ public class TestSchedulerTasksStateRecover extends BaseSchedulerDBTest {
 
         SchedulerStateRecoverHelper.RecoveredSchedulerState state;
 
-        state = checkRecoveredState(recoverHelper.recover(), state().withRunning(expectedJob));
+        state = checkRecoveredState(recoverHelper.recover(-1), state().withRunning(expectedJob));
 
         job = state.getRunningJobs().get(0);
         task = job.getTask("task1");
@@ -48,7 +48,7 @@ public class TestSchedulerTasksStateRecover extends BaseSchedulerDBTest {
         job.reStartTask(task);
         dbManager.taskRestarted(job, task, null);
 
-        state = checkRecoveredState(recoverHelper.recover(), state().withRunning(expectedJob));
+        state = checkRecoveredState(recoverHelper.recover(-1), state().withRunning(expectedJob));
 
         // check it is possible to load ExecutableContainer for restored task
         job = state.getRunningJobs().get(0);
@@ -59,7 +59,7 @@ public class TestSchedulerTasksStateRecover extends BaseSchedulerDBTest {
     @Test
     public void testRecover() throws Exception {
         SchedulerStateRecoverHelper recoverHelper = new SchedulerStateRecoverHelper(dbManager);
-        SchedulerStateRecoverHelper.RecoveredSchedulerState state = recoverHelper.recover();
+        SchedulerStateRecoverHelper.RecoveredSchedulerState state = recoverHelper.recover(-1);
         Assert.assertEquals(0, state.getFinishedJobs().size());
         Assert.assertEquals(0, state.getRunningJobs().size());
         Assert.assertEquals(0, state.getPendingJobs().size());
@@ -83,7 +83,7 @@ public class TestSchedulerTasksStateRecover extends BaseSchedulerDBTest {
                 false).withPending(task("task2", TaskStatus.SUBMITTED), false).withPending(
                 task("task3", TaskStatus.SUBMITTED), false).withEligible("task3");
 
-        state = checkRecoveredState(recoverHelper.recover(), state().withPending(expectedJob));
+        state = checkRecoveredState(recoverHelper.recover(-1), state().withPending(expectedJob));
 
         job = state.getPendingJobs().get(0);
         EligibleTaskDescriptor task = job.getJobDescriptor().getEligibleTasks().iterator().next();
@@ -96,7 +96,7 @@ public class TestSchedulerTasksStateRecover extends BaseSchedulerDBTest {
         expectedJob = job(job.getId(), JobStatus.FINISHED).withPending(task("task1", TaskStatus.SUBMITTED),
                 false).withPending(task("task2", TaskStatus.SUBMITTED), false).withPending(
                 task("task3", TaskStatus.SUBMITTED), false).withEligible("task3");
-        state = checkRecoveredState(recoverHelper.recover(), state().withFinished(expectedJob));
+        state = checkRecoveredState(recoverHelper.recover(-1), state().withFinished(expectedJob));
 
         job = state.getFinishedJobs().get(0);
         task = job.getJobDescriptor().getEligibleTasks().iterator().next();

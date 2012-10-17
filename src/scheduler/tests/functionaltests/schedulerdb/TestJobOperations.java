@@ -72,7 +72,7 @@ public class TestJobOperations extends BaseSchedulerDBTest {
 
     private InternalJob recoverJob() {
         SchedulerStateRecoverHelper recoverHelper = new SchedulerStateRecoverHelper(dbManager);
-        Collection<InternalJob> jobs = recoverHelper.recover().getPendingJobs();
+        Collection<InternalJob> jobs = recoverHelper.recover(-1).getPendingJobs();
         Assert.assertEquals(1, jobs.size());
         return jobs.iterator().next();
     }
