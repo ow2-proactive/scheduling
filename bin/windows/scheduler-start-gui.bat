@@ -1,13 +1,19 @@
 @echo off
 SETLOCAL
 
+call init.bat scheduler-log4j-server
+
+set JPS="%JAVA_HOME%\bin\jps.exe"
+IF not exist %JPS% (
+        echo Error: can't find jps tool: %JPS%
+        goto :eof
+)
+
 call :find_process_by_cmd SchedulerStarter
 IF NOT [%_result%]==[] (
         echo Error: scheduler is already running on this machine
         goto :eof
 )
-
-call init.bat scheduler-log4j-server
 
 set SCHED_JVM_X_OPTS=-Xms128m -Xmx2048m
 set SCHED_JVM_D_OPTS=
@@ -114,7 +120,7 @@ IF [%1]==[] goto :ParamParseEndLoop
 
     set TMP_VAR=%~1
     IF %TMP_VAR:~0,2% == -D (
-        set SCHED_JVM_D_OPTS=%TMP_VAR% %SCHED_JVM_D_OPTS%    
+        set SCHED_JVM_D_OPTS="%TMP_VAR%" %SCHED_JVM_D_OPTS%    
         goto :ParamParseShift
     )
 
@@ -148,7 +154,7 @@ set SCHED_OUT=SchedulerStarter.output
 
 SETLOCAL ENABLEDELAYEDEXPANSION
 call init.bat scheduler-log4j-server
-echo %JAVA_CMD% org.ow2.proactive.scheduler.util.SchedulerStarter > run.tmp.bat
+echo %JAVA_CMD% %SCHED_JVM_D_OPTS% org.ow2.proactive.scheduler.util.SchedulerStarter > run.tmp.bat
 echo EXIT >> run.tmp.bat
 
 echo Starting the scheduler (starter output is redirected to the %SCHED_OUT%)
@@ -168,7 +174,7 @@ set RM_URL_STR=
 :WaitLoop
         for /f "tokens=*" %%i in ('FINDSTR /C:"The resource manager with 4 local nodes created on" %SCHED_OUT%') do set RM_URL_STR=%%i
         IF NOT ["%RM_URL_STR%"]==[""] (
-                SET RM_URL=%RM_URL_STR:~28%
+                SET RM_URL=%RM_URL_STR:~50%
         )
 
         for /f "tokens=*" %%i in ('FINDSTR /C:"The scheduler created on" %SCHED_OUT%') do set SCHED_URL_STR=%%i
@@ -176,7 +182,7 @@ set RM_URL_STR=
                 echo Waiting for the scheduler...
                 call :delay 5 
         ) ELSE (
-                SET SCHED_URL=%SCHED_URL_STR:~34%
+                SET SCHED_URL=%SCHED_URL_STR:~24%
                 GOTO :EndWaitLoop
         )
 
@@ -192,7 +198,7 @@ set RM_URL_STR=
 set CMD=-A %REST_WAR% -p %PORT%
 
 IF %DO_SCHED% == true (
-    IF NOT [%SCHED_URL%]==[] (
+    IF NOT ["%SCHED_URL%"]==[] (
         echo Scheduler URL: %SCHED_URL%
     ) ELSE (
         echo Error: Could not determine Scheduler URL
@@ -201,7 +207,7 @@ IF %DO_SCHED% == true (
     set CMD=%CMD% -S %SCHED_WAR% -s %SCHED_URL%
 )
 IF %DO_RM% == true (
-    IF NOT [%RM_URL%]==[] (
+    IF NOT ["%RM_URL%"]==[] (
         echo RM URL: %RM_URL%
     ) ELSE (
         echo Error: Could not determine RM URL
@@ -220,27 +226,31 @@ goto :eof
 :find_process_by_pid 
         SETLOCAL
         set COMMAND_PID=
-        rem wmic process where (ProcessId=%1) get CommandLine,ProcessId
-        wmic process where (ProcessId=%1) get ProcessId /Value 2>NUL | FIND "=" > tmpFile
+        set result=
+        %JPS% | findstr /b /l %1% > tmpFile
         SET /p COMMAND_PID=<tmpFile
         IF NOT ["%COMMAND_PID%"]==[""] (
-                SET COMMAND_PID=%COMMAND_PID:~10%
+            SET result=OK
+        ) ELSE (
+            SET result=
         )
         DEL tmpFile
-        ENDLOCAL & SET _result=%COMMAND_PID%
+        ENDLOCAL & SET _result=%result%
         goto :eof
 
 :find_process_by_cmd 
         SETLOCAL
         set COMMAND_PID=
-        rem wmic process where (CommandLine like "%%%*%%" and not CommandLine like "%%wmic%%") get CommandLine,ProcessId /Value
-        wmic process where (CommandLine like "%%%*%%" and not CommandLine like "%%wmic%%") get ProcessId /Value 2>NUL | FIND "=" > tmpFile
+        set result=
+        %JPS% | findstr %1% > tmpFile
         SET /p COMMAND_PID=<tmpFile
         IF NOT ["%COMMAND_PID%"]==[""] (
-                SET COMMAND_PID=%COMMAND_PID:~10%
+            SET result=%COMMAND_PID:~0,-17%
+        ) ELSE (
+            SET result=
         )
         DEL tmpFile
-        ENDLOCAL & SET _result=%COMMAND_PID%
+        ENDLOCAL & SET _result=%result%
         goto :eof
 
 :print_help
