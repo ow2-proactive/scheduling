@@ -116,7 +116,7 @@ public class JobInfoImpl implements JobInfo {
     private Map<TaskId, Long> taskFinishedTimeModify;
 
     /** Tasks skipped by a Control Flow Action */
-    private Set<TaskId> tasksSkipped;
+    private List<TaskId> tasksSkipped;
 
     private List<ClientTaskState> modifiedTasks;
 
@@ -367,7 +367,7 @@ public class JobInfoImpl implements JobInfo {
         for (TaskId id : changesInfo.getUpdatedTasks()) {
             modifiedTasks.add(new ClientTaskState(job.getIHMTasks().get(id)));
         }
-        this.tasksSkipped = new HashSet<TaskId>(changesInfo.getSkippedTasks());
+        this.tasksSkipped = new ArrayList<TaskId>(changesInfo.getSkippedTasks());
     }
 
     public void clearTasksChanges() {
@@ -385,7 +385,7 @@ public class JobInfoImpl implements JobInfo {
      * 
      * @return a set of the skipped tasks
      */
-    public Set<TaskId> getTasksSkipped() {
+    public List<TaskId> getTasksSkipped() {
         return this.tasksSkipped;
     }
 
