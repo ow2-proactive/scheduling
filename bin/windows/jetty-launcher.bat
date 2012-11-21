@@ -110,6 +110,14 @@ set POL="%BASE_TEMP_DIR%\java.security.policy"
 
 set SCHED_DIR="%BASE_TEMP_DIR%\sched"
 
+set JAVA="%JAVA_HOME%\bin\java"
+
+set LIB_DIR=%CD%\..\..\dist\lib
+set CP=%LIB_DIR%\jetty-6.1.18.jar
+set CP=%CP%;%LIB_DIR%\jetty-util-6.1.18.jar
+set CP=%CP%;%LIB_DIR%\servlet-api-2.5-6.1.11.jar
+set CP=%CP%;%LIB_DIR%\ProActive_SRM-common.jar
+
 mkdir %REST_DIR%
 IF %VERBOSE% == true (
     echo Deploying REST Server in %REST_DIR% 
@@ -162,14 +170,6 @@ IF NOT [%SCHED%]==[] (
     set APPS=%APPS% %SCHED_DIR% 
 )
 
-set JAVA="%JAVA_HOME%\bin\java"
-
-set LIB_DIR=%CD%\..\..\lib
-set CP=%LIB_DIR%\ProActive\jetty-6.1.18.jar
-set CP=%CP%;%LIB_DIR%\ProActive\jetty-util-6.1.18.jar
-set CP=%CP%;%LIB_DIR%\ProActive\servlet-api-2.5-6.1.11.jar
-set CP=%CP%;%CD%\..\..\dist\lib\ProActive_SRM-common.jar
-
 set CLASS=org.ow2.proactive.utils.JettyLauncher
 
 set LOG=
@@ -189,17 +189,33 @@ set CLASSPATH=%CP%
 goto :eof
 
 :unzip
+    REM Using jruby interpreter to unzip since Windows doesn't have a built-in ZIP command
+
     SETLOCAL
-    set CLASSPATH=..\..\compile\lib\ant-launcher.jar;%CLASSPATH%
-    "%JAVA_HOME%\bin\java" "-Dant.home=../../compile" "-Dant.library.dir=../../compile/lib" org.apache.tools.ant.launch.Launcher -buildfile utils.xml -Dzip_src=%1 -Dzip_dest=%2 unzip
+    SET CLASSPATH=%LIB_DIR%\jruby.jar;%LIB_DIR%\ProActive_Scheduler-client.jar;%LIB_DIR%\ProActive_SRM-common.jar;%CLASSPATH%
+    SET CMD="Java::org.ow2.proactive.scheduler.common.util.ZipUtils.unzip(Java::java.util.zip.ZipFile.new('%1'),Java::java.io.File.new('%2'))"
+    "%JAVA_HOME%\bin\java" org.jruby.Main -e %CMD%     
     ENDLOCAL
+
     goto :eof
 
 :set_property
-    SETLOCAL
-    set CLASSPATH=..\..\compile\lib\ant-launcher.jar;%CLASSPATH%
-    "%JAVA_HOME%\bin\java" "-Dant.home=../../compile" "-Dant.library.dir=../../compile/lib" org.apache.tools.ant.launch.Launcher -buildfile utils.xml -Dfile=%1 -Dproperty=%2 -Dvalue=%3 set_property
+    REM Using jruby interpreter to change a specified property in the specified file
+    REM %1 - path of the properties file
+    REM %2 - property name
+    REM %3 - property value
+
+    SETLOCAL enabledelayedexpansion
+    SET path=%1
+
+    REM escape quotes in path
+    Set path=!path:"=!
+
+    set CLASSPATH=%LIB_DIR%\jruby.jar
+    set CMD="f=Java::java.io.File.new('%path%');prop=Java::java.util.Properties.new();prop.load(Java::java.io.FileInputStream.new(f));prop.setProperty('%2','%3');prop.store(Java::java.io.FileOutputStream.new(f),'')"
+    "%JAVA_HOME%\bin\java" org.jruby.Main -e %CMD%
     ENDLOCAL
+
     goto :eof
 
 :createTempDir
