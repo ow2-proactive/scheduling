@@ -1,5 +1,6 @@
 @echo off
 SETLOCAL
+SETLOCAL ENABLEDELAYEDEXPANSION
 
 call init.bat scheduler-log4j-server
 
@@ -152,14 +153,12 @@ IF %DO_RM% == true (
 
 set SCHED_OUT=SchedulerStarter.output
 
-SETLOCAL ENABLEDELAYEDEXPANSION
 call init.bat scheduler-log4j-server
 echo %JAVA_CMD% %SCHED_JVM_D_OPTS% org.ow2.proactive.scheduler.util.SchedulerStarter > run.tmp.bat
 echo EXIT >> run.tmp.bat
 
 echo Starting the scheduler (starter output is redirected to the %SCHED_OUT%)
 START /B "Scheduler" run.tmp.bat > %SCHED_OUT%
-ENDLOCAL
 
 call :find_process_by_cmd SchedulerStarter
 IF [%_result%]==[] (
@@ -169,20 +168,22 @@ IF [%_result%]==[] (
         set SCHED_PID=%_result%
 )
 
+set RM_MATCH=The resource manager with 4 local nodes created on 
+set SCHED_MATCH=The scheduler created on 
 set SCHED_URL_STR=
 set RM_URL_STR=
 :WaitLoop
-        for /f "tokens=*" %%i in ('FINDSTR /C:"The resource manager with 4 local nodes created on" %SCHED_OUT%') do set RM_URL_STR=%%i
+        for /f "tokens=*" %%i in ('FINDSTR /C:"%RM_MATCH%" %SCHED_OUT%') do set RM_URL_STR=%%i
         IF NOT ["%RM_URL_STR%"]==[""] (
-                SET RM_URL=%RM_URL_STR:~50%
+                 SET RM_URL=!RM_URL_STR:%RM_MATCH%=! 
         )
 
-        for /f "tokens=*" %%i in ('FINDSTR /C:"The scheduler created on" %SCHED_OUT%') do set SCHED_URL_STR=%%i
+        for /f "tokens=*" %%i in ('FINDSTR /C:"%SCHED_MATCH%" %SCHED_OUT%') do set SCHED_URL_STR=%%i
         IF ["%SCHED_URL_STR%"]==[""] (
                 echo Waiting for the scheduler...
                 call :delay 5 
         ) ELSE (
-                SET SCHED_URL=%SCHED_URL_STR:~24%
+                SET SCHED_URL=!SCHED_URL_STR:%SCHED_MATCH%=!
                 GOTO :EndWaitLoop
         )
 
@@ -277,7 +278,7 @@ goto :eof
         goto :eof
 
 :delay
-        choice /T %1 /d y > NUL
+        ping -n %1 127.0.0.1 > NUL
         goto :eof
 
 :eof
