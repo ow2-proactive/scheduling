@@ -18,7 +18,6 @@
 		<jvmarg value='${jvmargDefinedByIM}'/>
 		<jvmarg value="-Dpas.launcher.forkas.method=pwd"/>
 		<applicationClasspath>
-				<pathElement base="proactive" relpath="/dist/lib/script-js.jar"/>
 				<pathElement base="proactive" relpath="/dist/lib/jruby-engine.jar"/>
 				<pathElement base="proactive" relpath="/dist/lib/jython-engine.jar"/>
 				<pathElement base="proactive" relpath="/dist/lib/commons-logging-1.0.4.jar"/>

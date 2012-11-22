@@ -21,13 +21,11 @@
 			<include name="bouncycastle.jar" />
 			<include name="commons-codec-1.3.jar" />
 			<include name="commons-logging-1.1.1.jar" />
-			<include name="common/script/js.jar" />
 			<include name="mapreduce/hadoop-0.20.2-core.jar" />
 			<include name="http-2.0.4.jar" />
 			<include name="javassist.jar" />
 			<include name="log4j.jar" />
 			<include name="netty-3.2.0.ALPHA2.jar" />
-			<include name="script-js.jar" />
 		</fileset>
 
 		<fileset dir="${dist.lib.dir}">

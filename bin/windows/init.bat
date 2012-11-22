@@ -39,7 +39,6 @@ IF EXIST "%PA_SCHEDULER%\classes\scheduler" (
 ) ELSE (
 	rem Script engines must be added to classpath to be found
 	rem it must also placed before jars containing jar-index
-	SET JARS=%PA_SCHEDULER%\dist\lib\script-js.jar
 	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\jruby-engine.jar
 	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\sigar\sigar.jar
 	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\jython-engine.jar

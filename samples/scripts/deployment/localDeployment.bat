@@ -15,7 +15,6 @@ set JAVA_OPTS_NODE=-Djava.security.policy=%RM_HOME_NODE%\config\security.java.po
 set CREDENTIALS="UPDATE_ME"
 
 set CLASSPATH=%CLASSPATH%;
-set CLASSPATH=%CLASSPATH%;%RM_HOME_NODE%\dist\lib\script-js.jar
 set CLASSPATH=%CLASSPATH%;%RM_HOME_NODE%\dist\lib\jruby-engine.jar
 set CLASSPATH=%CLASSPATH%;%RM_HOME_NODE%\dist\lib\jython-engine.jar
 set CLASSPATH=%CLASSPATH%;%RM_HOME_NODE%\dist\lib\commons-logging-1.1.1.jar
