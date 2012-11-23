@@ -320,31 +320,16 @@ public class RMTHelper {
             PAResourceManagerProperties.RM_HOME.getValueAsString());
 
         String home = PAResourceManagerProperties.RM_HOME.getValueAsString();
+        String distLib = home + File.separator + "dist" + File.separator + "lib" + File.separator;
         StringBuilder classpath = new StringBuilder();
-        classpath.append(home + File.separator + "dist" + File.separator + "lib" + File.separator +
-            "ProActive_tests.jar");
-        classpath.append(File.pathSeparator);
-        classpath.append(home + File.separator + "dist" + File.separator + "lib" + File.separator +
-            "ProActive_SRM-common.jar");
-        classpath.append(File.pathSeparator);
-        classpath.append(home + File.separator + "dist" + File.separator + "lib" + File.separator +
-            "ProActive_ResourceManager.jar");
-        classpath.append(File.pathSeparator);
-        classpath.append(home + File.separator + "dist" + File.separator + "lib" + File.separator +
-            "ProActive.jar");
-        classpath.append(File.pathSeparator);
-        classpath.append(home + File.separator + "dist" + File.separator + "lib" + File.separator +
-            "script-js.jar");
-        classpath.append(File.pathSeparator);
-        classpath.append(home + File.separator + "dist" + File.separator + "lib" + File.separator +
-            "jruby-engine.jar");
-        classpath.append(File.pathSeparator);
-        classpath.append(home + File.separator + "dist" + File.separator + "lib" + File.separator +
-            "jython-engine.jar");
-        classpath.append(File.pathSeparator);
+        for (String name : new String[] { "ProActive_tests.jar", "ProActive_SRM-common.jar",
+                "ProActive_ResourceManager.jar", "ProActive.jar", "jruby-engine.jar", "jython-engine.jar" }) {
+            classpath.append(distLib).append(name).append(File.pathSeparator);
+        }
         classpath.append(home + File.separator + "classes" + File.separator + "schedulerTests");
         classpath.append(File.pathSeparator);
         classpath.append(home + File.separator + "classes" + File.separator + "resource-managerTests");
+
         commandLine.add("-cp");
         commandLine.add(classpath.toString());
         commandLine.add(CentralPAPropertyRepository.PA_TEST.getCmdLine() + "true");
