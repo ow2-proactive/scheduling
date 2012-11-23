@@ -62,9 +62,9 @@ public abstract class TestDeployer {
 
     protected final TestProtocolHelper protocolHelper;
 
-    static final String[] requiredJARs = { "script-js.jar", "gson-2.1.jar", "jruby-engine.jar",
-            "jython-engine.jar", "commons-logging-1.1.1.jar", "ProActive_Scheduler-core.jar",
-            "ProActive_SRM-common.jar", "ProActive_ResourceManager.jar", "ProActive_Scheduler-worker.jar",
+    static final String[] requiredJARs = { "gson-2.1.jar", "jruby-engine.jar", "jython-engine.jar",
+            "commons-logging-1.1.1.jar", "ProActive_Scheduler-core.jar", "ProActive_SRM-common.jar",
+            "ProActive_ResourceManager.jar", "ProActive_Scheduler-worker.jar",
             "ProActive_Scheduler-mapreduce.jar", "commons-httpclient-3.1.jar", "commons-codec-1.3.jar",
             "ProActive.jar" };
 

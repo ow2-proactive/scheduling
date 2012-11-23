@@ -928,7 +928,7 @@ public class RMNodeStarter {
         private Properties paPropProperties;
         private String paPropString;
         private int addAttempts = -1, addAttemptsDelay = -1;
-        private final String[] requiredJARs = { "script-js.jar", "jruby-engine.jar", "sigar/sigar.jar",
+        private final String[] requiredJARs = { "jruby-engine.jar", "sigar/sigar.jar",
                 "jython-engine.jar",
                 "commons-logging-1.1.1.jar",
                 "ProActive_Scheduler-core.jar",// SCHEDULING-1338 and SCHEDULING-1307 : core required for forked java task
