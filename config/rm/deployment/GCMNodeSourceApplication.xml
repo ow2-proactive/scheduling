@@ -28,7 +28,7 @@
 					<pathElement base="proactive" relpath="/dist/lib/commons-httpclient-3.1.jar"/>
 					<pathElement base="proactive" relpath="/dist/lib/commons-codec-1.3.jar"/>
 					<pathElement base="proactive" relpath="/dist/lib/jruby.jar"/>
-					<pathElement base="proactive" relpath="/dist/lib/jython.jar"/> -->
+					<pathElement base="proactive" relpath="/dist/lib/jython.jar"/>
 				</applicationClasspath>
 				<securityPolicy base="proactive" relpath="/config/security.java.policy-client"/>
 				<log4jProperties base="proactive" relpath="/config/log4j/log4j-defaultNode"/>
