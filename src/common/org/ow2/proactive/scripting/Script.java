@@ -36,14 +36,7 @@
  */
 package org.ow2.proactive.scripting;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.io.Reader;
-import java.io.Serializable;
+import java.io.*;
 import java.net.URL;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -55,6 +48,8 @@ import javax.script.ScriptEngineFactory;
 import javax.script.ScriptEngineManager;
 
 import org.apache.log4j.Logger;
+import org.jruby.RubyException;
+import org.jruby.exceptions.RaiseException;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.utils.BoundedStringWriter;
 
@@ -273,8 +268,23 @@ public abstract class Script<E> implements Serializable {
 
             return result;
         } catch (Throwable e) {
+            Throwable cause = e.getCause();
+            if (cause instanceof RaiseException) {
+                // fix for SCHEDULING-1742 if it's a jruby exception we capture the real ruby stack
+                RaiseException re = (RaiseException) cause;
+                RubyException rbe = re.getException();
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                PrintStream ps = new PrintStream(baos);
+                rbe.printBacktrace(ps);
+                ps.flush();
+                String stack = baos.toString();
+                Exception finale = new Exception(rbe.message + "\n" + stack, e);
+                logger.error("", finale);
+                return new ScriptResult<E>(new Exception("An exception occurred while executing the script ",
+                    finale));
+            }
             logger.error("", e);
-            return new ScriptResult<E>(new Exception("An exception occured while executing the script ", e));
+            return new ScriptResult<E>(new Exception("An exception occurred while executing the script ", e));
 
         }
     }
