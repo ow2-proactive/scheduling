@@ -280,7 +280,7 @@ public abstract class Script<E> implements Serializable {
                 String stack = baos.toString();
                 // The initial Throwable "e" must NOT be put as the cause of the final exception as "e" can unfortunately
                 // contain a reference to a org.jruby.runtime.CallType object which is NOT SERIALIZABLE
-                Exception finale = new Exception(rbe.message + "\n" + stack);
+                Exception finale = new Exception(rbe.message + System.getProperty("line.separator") + stack);
                 logger.error("", finale);
                 return new ScriptResult<E>(new Exception("An exception occurred while executing the script ",
                     finale));
