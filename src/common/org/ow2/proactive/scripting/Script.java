@@ -278,7 +278,9 @@ public abstract class Script<E> implements Serializable {
                 rbe.printBacktrace(ps);
                 ps.flush();
                 String stack = baos.toString();
-                Exception finale = new Exception(rbe.message + "\n" + stack, e);
+                // The initial Throwable "e" must NOT be put as the cause of the final exception as "e" can unfortunately
+                // contain a reference to a org.jruby.runtime.CallType object which is NOT SERIALIZABLE
+                Exception finale = new Exception(rbe.message + "\n" + stack);
                 logger.error("", finale);
                 return new ScriptResult<E>(new Exception("An exception occurred while executing the script ",
                     finale));
