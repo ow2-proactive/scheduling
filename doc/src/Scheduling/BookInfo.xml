@@ -2,7 +2,7 @@
 <info xmlns="http://docbook.org/ns/docbook" version="5.0">
 	<title>ProActive Scheduling <systemitem role="VERSION"/> Documentation</title>
 	<subtitle role="motto">An Open Source Solution for Enterprise Grids &amp; Clouds</subtitle>
-	<subtitle role="main">ProActive Scheduling</subtitle>
+	<subtitle role="main">Orchestration &amp; Scheduling</subtitle>
 
 <!-- to change the version and date look in the html.xsl
 and compile/build.xml as the date
