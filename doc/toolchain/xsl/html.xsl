@@ -25,7 +25,7 @@
 	<!--- - - - - - - - - - - - - - - - - - - - - - - - - - -->
 	<xsl:template name="user.footer.content">
 		<P align="right" class="copyright">
-			© 1997-2010
+			© 1997-2012
 			<A href="http://www-sop.inria.fr/">
 				INRIA/University of Nice-Sophia Antipolis/ActiveEon
 			</A>

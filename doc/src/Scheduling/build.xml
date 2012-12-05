@@ -135,7 +135,7 @@
             <link href="http://fractal.objectweb.org/current/doc/javadoc/fractal/" />
             <link href="http://java.sun.com/j2se/1.5.0/docs/api/"/>
             <doctitle><![CDATA[Scheduler ${version}<br><a href='../multiple_html/index.html'>(documentation is here)</a><br>]]></doctitle>
-            <bottom><![CDATA[<i>Copyright 1997-2009 INRIA All Rights Reserved.</i>]]></bottom>
+            <bottom><![CDATA[<i>Copyright 1997-2012 INRIA All Rights Reserved.</i>]]></bottom>
 
             <group title="Scheduler">
                 <package name="org.ow2.proactive.scheduler*" />
@@ -184,7 +184,7 @@
             <link href="http://fractal.objectweb.org/current/doc/javadoc/fractal/" />
             <link href="http://java.sun.com/j2se/1.5.0/docs/api/"/>
             <doctitle><![CDATA[Scheduler ${version}<br><a href='../multiple_html/index.html'>(documentation is here)</a><br>]]></doctitle>
-            <bottom><![CDATA[<i>Copyright 1997-2009 INRIA All Rights Reserved.</i>]]></bottom>
+            <bottom><![CDATA[<i>Copyright 1997-2012 INRIA All Rights Reserved.</i>]]></bottom>
 
             <group title="Scheduler">
                 <package name="org.ow2.proactive.scheduler*" />

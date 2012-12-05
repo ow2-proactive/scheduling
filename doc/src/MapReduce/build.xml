@@ -142,7 +142,7 @@
 				<a href='../multiple_html/index.html'>(documentation is here)</a>
 				<br>]]></doctitle>
 				<bottom>
-					<![CDATA[<i>Copyright 1997-2009 INRIA All Rights Reserved.</i>]]></bottom>
+					<![CDATA[<i>Copyright 1997-2012 INRIA All Rights Reserved.</i>]]></bottom>
 
 			<group title="Scheduler">
 				<package name="org.ow2.proactive.scheduler*" />
@@ -203,7 +203,7 @@
 				<a href='../multiple_html/index.html'>(documentation is here)</a>
 				<br>]]></doctitle>
 				<bottom>
-					<![CDATA[<i>Copyright 1997-2009 INRIA All Rights Reserved.</i>]]></bottom>
+					<![CDATA[<i>Copyright 1997-2012 INRIA All Rights Reserved.</i>]]></bottom>
 
 			<group title="Scheduler">
 				<package name="org.ow2.proactive.scheduler*" />
