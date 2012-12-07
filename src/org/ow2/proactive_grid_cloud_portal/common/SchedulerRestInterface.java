@@ -94,6 +94,8 @@ import org.ow2.proactive_grid_cloud_portal.webapp.PersistentMapConverter;
 @Path("/scheduler/")
 public interface SchedulerRestInterface {
 
+    String ENCODING = "utf-8";
+
     /**
      * Returns the ids of the current jobs under a list of string.
      * @param sessionId a valid session id
@@ -337,15 +339,19 @@ public interface SchedulerRestInterface {
     String jobId) throws IOException;
 
     /**
-     * Returns an image corresponding of a jobid
-     * @param sessionId a valid session id
-     * @param jobId the job id
-     * @return a map corresponding of a <code>jobId</code>
-     * @throws IOException when it is not possible to access to the archive
+     * Returns a base64 utf-8 encoded png image corresponding to the jobid
+     *
+     * @param sessionId
+     *            a valid session id
+     * @param jobId
+     *            the job id
+     * @return Returns a base64 encoded png image corresponding to the jobid
+     * @throws IOException
+     *             when it is not possible to access to the archive
      */
     @GET
     @Path("jobs/{jobid}/image")
-    @Produces("application/json")
+    @Produces("application/json;charset=" + ENCODING)
     public String getJobImage(@HeaderParam("sessionid")
     String sessionId, @PathParam("jobid")
     String jobId) throws IOException;

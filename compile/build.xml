@@ -18,6 +18,7 @@
     <property name="build.dir" value="${projectRoot}/build" />
     <property name="dist.dir" value="${projectRoot}/dist" />
 	<property name="classes.dir" value="${build.dir}/classes" />
+	<property name="classes.tests.dir" value="${build.dir}/test-classes" />
 	<property name="lib.dir" value="${projectRoot}/lib" />
 	<property name="war.root" value="${projectRoot}/WebContent" />
 	<property name="webinf" value="${war.root}/WEB-INF" />
@@ -25,6 +26,17 @@
 	<property name="webinf.classes.dir" value="${war.root}/WEB-INF/classes" />
 	<property name="webinf.lib.doc" value="${war.root}/WEB-INF/doc" />
 	<property name="src.dir" value="${projectRoot}/src" />
+    <property name="src.tests.dir"    value="${projectRoot}/tests" />
+    <property name="junit.dir"    value="${projectRoot}/junitReports" />
+
+	<path id="test.classpath">
+		<pathelement location="${classes.dir}"/>
+		<pathelement location="${classes.tests.dir}"/>
+		<path refid="src.classpath"/>
+		<fileset dir="${lib.dir}/test">
+			<include name="**/*.jar"/>
+		</fileset>
+	</path>
 
 	<!-- 
 		 Compile all
@@ -38,9 +50,10 @@
 
     <target name="prepare" description="Create dir for class files">
 		<mkdir dir="${classes.dir}" />
+        <mkdir dir="${classes.tests.dir}" />
         <mkdir dir="${dist.dir}" />
-		<mkdir dir="${webinf.lib.dir}" />
-		<mkdir dir="${war.root}/doc" />
+        <mkdir dir="${webinf.lib.dir}" />
+        <mkdir dir="${war.root}/doc" />
 		<copy todir="${webinf.classes.dir}">
 			<fileset dir="${webinf}">
 				<include name="log4j.properties" />
@@ -50,11 +63,13 @@
 
 	<target name="clean" description="Delete class files">
 		<delete dir="${classes.dir}" />
-		<delete dir="${webinf.classes.dir}" />
-		<delete dir="${webinf.lib.dir}" />
-		<delete dir="${war.root}/doc" />
-		<delete dir="${build.dir}" />
+        <delete dir="${classes.tests.dir}" />
+        <delete dir="${webinf.classes.dir}" />
+        <delete dir="${webinf.lib.dir}" />
+        <delete dir="${war.root}/doc" />
+        <delete dir="${build.dir}" />
         <delete dir="${dist.dir}" />
+        <delete dir="${junit.dir}" />
 		<delete>
 		  <fileset dir="." includes="SchedulingRest-*.war" />
 		</delete>
@@ -77,6 +92,9 @@
 		<javac srcdir="${src.dir}" destdir="${classes.dir}" deprecation="false" failonerror="true" debug="true">
 			<classpath refid="src.classpath" />
 		</javac>
+        <javac srcdir="${src.tests.dir}" destdir="${classes.tests.dir}" deprecation="false" failonerror="true" debug="true">
+            <classpath refid="test.classpath" />
+        </javac>
 		
 		<taskdef name="stubGenerator" classname="ant.AntStubGenerator" classpathref="src.classpath" />
 		<typedef name="class" classname="ant.AntStubGeneratorClass" classpathref="src.classpath" />
@@ -88,7 +106,7 @@
 	</target>
 
 
-	<target name="war" depends="compile,doc,schedulingrest-common-jar,schedulingrest-scheduler-jar,schedulingrest-rm-jar" description="Generate the war file">
+	<target name="war" depends="compile,junit,doc,schedulingrest-common-jar,schedulingrest-scheduler-jar,schedulingrest-rm-jar" description="Generate the war file">
 		<!-- copy classes -->
 		<!--
 		<copy todir="WebContent/WEB-INF/classes">
@@ -217,6 +235,30 @@
 				<attribute name="Specification-Version" value="${scheduler.version}" />
 			</manifest>
 		</jar>
+	</target>
+
+	<macrodef name="junitMacro">
+		<attribute name="testdir"/>
+		<sequential>
+			<delete dir="${junit.dir}"/>
+			<mkdir dir="${junit.dir}"/>
+			<junit printsummary="yes" forkmode="perTest" showoutput="true" timeout="300000" haltonfailure="true">
+
+				<classpath>
+					<path refid="test.classpath"/>
+				</classpath>
+
+				<formatter type="xml"/>
+
+				<batchtest fork="yes" todir="${junit.dir}">
+					<fileset dir="@{testdir}"/>
+				</batchtest>
+			</junit>
+		</sequential>
+	</macrodef>
+
+	<target name="junit" depends="compile" description="Run rest tests">
+		<junitMacro testdir="${src.tests.dir}"/>
 	</target>
 
 </project>

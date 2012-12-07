@@ -23,6 +23,7 @@ see build/build.properties for all available options).
 
 An ant file is provided, targets are 
   - compile -- compile the source code
+  - junit   -- run tests
   - war     -- create the war file to be deployed within a J2EE server
   - clean   -- perform cleanup
 

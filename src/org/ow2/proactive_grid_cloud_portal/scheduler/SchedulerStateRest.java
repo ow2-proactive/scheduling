@@ -75,6 +75,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.hibernate.collection.internal.PersistentMap;
 import org.jboss.resteasy.annotations.GZIP;
@@ -870,24 +871,15 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     /**
-     * Returns a base64 encoded png image corresponding to the jobid
-     * 
-     * @param sessionId
-     *            a valid session id
-     * @param jobId
-     *            the job id
-     * @return Returns a base64 encoded png image corresponding to the jobid
-     * @throws IOException
-     *             when it is not possible to access to the archive
+     * {@inheritDoc}
      */
     @GET
     @Path("jobs/{jobid}/image")
-    @Produces("application/json")
+    @Produces("application/json;charset=" + ENCODING)
     public String getJobImage(@HeaderParam("sessionid")
     String sessionId, @PathParam("jobid")
     String jobId) throws IOException {
 
-        String image = "";
         InputStream ips = null;
         String enc = null;
         ZipFile jobArchive = new ZipFile(PortalConfiguration.jobIdToPath(jobId));
@@ -896,14 +888,10 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             throw new IOException("the file JOB-INF/image.png was not found in the job archive");
         }
         ips = new BufferedInputStream(jobArchive.getInputStream(imageEntry));
-        int octet;
-        while ((octet = ips.read()) != -1) {
-            image += (char) octet;
-        }
-        ips.close();
+        String image = IOUtils.toString(ips, ENCODING);
 
         // Encode in Base64
-        enc = new String(org.apache.commons.codec.binary.Base64.encodeBase64(image.getBytes()));
+        enc = new String(org.apache.commons.codec.binary.Base64.encodeBase64(image.getBytes(ENCODING)), ENCODING);
 
         return enc;
     }
