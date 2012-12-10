@@ -569,7 +569,7 @@ public class HelloTask extends JavaExecutable{
 				</para>
 				<para>
 				There are tree priority levels: lowest, low, normal. Actually, there are five levels,
-		but the two other levels (high and highest) can only be setted by the administrator of the scheduler.
+		but the two other levels (high and highest) can only be set by the administrator of the scheduler.
 				</para>
 			</listitem>
 		</itemizedlist>
@@ -735,14 +735,14 @@ public class HelloTask extends JavaExecutable{
 	<para>
 		<code>rm-client -localNodes</code>
 	</para>
-	<note><para>The command <emphasis>rm-client</emphasis> can also be used in iteractive mode. Just type <code>rm-client</code> and then type '?' or 'help()' to learn how to use it in this mode.</para></note>
+	<note><para>The command <emphasis>rm-client</emphasis> can also be used in interactive mode. Just type <code>rm-client</code> and then type '?' or 'help()' to learn how to use it in this mode.</para></note>
 	</section>
 
 	<section xml:id="submission"><info><title>Submit the job</title></info>
 
 	<para>
 	Finally, submit your job using the <emphasis>scheduler-client</emphasis> script. This script can be used not only for submitting a job, but also, for instance, for retrieving a result (see <xref linkend="retrieve_result"/>).
-	Type <code>scheduler-client -h</code> to find out all you can do wiht this script.
+	Type <code>scheduler-client -h</code> to find out all you can do with this script.
 	</para>
 	<para>
 	For submitting your job, type the following line:
@@ -799,7 +799,7 @@ public class HelloTask extends JavaExecutable{
 	<section xml:id="sched_gui"><info><title>Using the GUI client application for job submission</title></info>
 
 	<para>
-		An RCP graphical user interface exists for jobs submition and results consultation.
+		An RCP graphical user interface exists for jobs submission and results consultation.
 		Download the <emphasis>Scheduler RCP Client</emphasis> from
     <uri xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www.activeeon.com/products">http://www.activeeon.com/products</uri> and uncompress the application.
 		Then, go to the Scheduler directory of uncompressed files, and launch the program:
@@ -837,7 +837,7 @@ public class HelloTask extends JavaExecutable{
 	</para>
 	<para>
 	  To submit a new Job to the Scheduler, use the submit button in the toolbar, or
-	  activate the Scheduler menu and Submit submenu as pictured, the click 'Submit an XML Job file':
+	  activate the Scheduler menu and Submit sub menu as pictured, the click 'Submit an XML Job file':
 	</para>
 	<figure xml:id="rcp_submit"><info><title>Context menu</title></info>
 
@@ -870,7 +870,7 @@ public class HelloTask extends JavaExecutable{
 		<para>
 		A very useful functionality is the possibility to add a selection script to a task.
 		This selection script provides ability for the scheduler to find and select a node
-		respecting criteria for the good execution of a task. Let's complete our previous nativ
+		respecting criteria for the good execution of a task. Let's complete our previous native
 		job example with a verification script, specifying that the executable nativTask must be
 		executed on a Unix/Linux system.
 		</para>
@@ -915,7 +915,7 @@ else
 			</programlisting>
 		<para>
 		There is just one rule to know for verifying scripts creation: the script has to contain a variable
-		named "<emphasis role="bold">selected</emphasis>" which has to be setted to true or false at the end of script execution.
+		named "<emphasis role="bold">selected</emphasis>" which has to be set to true or false at the end of script execution.
 		Node selection mechanism is simple: Scheduler asks to Resource Manager one or several nodes that verify that script.
 		So Resource Manager will execute this script on its nodes. If after execution, one of its node has its "selected" variable set to true,
 		Resource manager considers that this node verify selection script and gives node to scheduler

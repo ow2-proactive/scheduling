@@ -492,7 +492,7 @@ public class WordCount {
             </para>
         </section>
         <section>
-            <info><title>Running the exmaple</title></info>
+            <info><title>Running the example</title></info>
             <para>
                 To compile and run the example, take the following steps:
             </para>

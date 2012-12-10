@@ -90,7 +90,7 @@
 						exposed to the external world (in term of number of entry points).
 						The number of running JVMs per host and
 						nodes per JVM are up to the resource providers but here there is always
-						a tradeoff between performance and reliability. The maximum performance
+						a trade off between performance and reliability. The maximum performance
 						can be achieved when only one JVM is running on host and all users
 						run their computation on this JVM simultaneously having an access to the
 						same address space in memory. If it is not acceptable, only one node per JVM can be
@@ -163,7 +163,7 @@
 								<para>
 									<emphasis>Lost</emphasis> -
 									The deployment of the node has failed for some reason. The node
-									has never been added to the resource manager and won't be useable.
+									has never been added to the resource manager and won't be usable.
 								</para>
 							</listitem>
 							<listitem>

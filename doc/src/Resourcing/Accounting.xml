@@ -17,7 +17,7 @@
 					initiated by a user considered as a node provider.
 				 </para>
 				<para>
-					A node can be added, through the API, as a result of a deployement process, through an agent or manually from the command line interface.
+					A node can be added, through the API, as a result of a deployment process, through an agent or manually from the command line interface.
 				</para>
 			</listitem>
 			<listitem>

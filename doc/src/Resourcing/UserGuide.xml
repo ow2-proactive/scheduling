@@ -28,12 +28,12 @@
 			<para>To learn more about the command line interface, please refer to <xref linkend="CommandLineInterface" />.</para>
 		</warning>
 		<para>
-		  Connecting to the resource manager implicates using a keypair infrastructure to establish a secure channel on
+		  Connecting to the resource manager implicates using a key pair infrastructure to establish a secure channel on
 		  which the credentials (username and password) will be sent securely. There are three ways to connect
 		  to the Resource Manager, as described in the example above:
 		  <orderedlist>
 		    <listitem><para>
-			Retreive the Credentials from disk: supposes the script <emphasis>create-cred[.bat]</emphasis> was previously used to generate those credentials.
+			Retrieve the Credentials from disk: supposes the script <emphasis>create-cred[.bat]</emphasis> was previously used to generate those credentials.
 			It requires knowing the location of the public key corresponding to the private key that will be used for decryption on server side.
 			To obtain the key, you need to contact the administrator of the Scheduler.
 		      </para>
@@ -44,7 +44,7 @@
 # use rmi://example.com/RMAUTHENTICATION's public key to generate credentials for user 'admin' with pass 'admin' in non-interactive mode
 /bin/unix $ ./create-cred -R rmi://example.com/RMAUTHENTICATION -o $HOME/.proactive/my_encrypted_credentials -l admin -p admin
 ]]></programlisting>
-			Credentials can now be retreived when properly designated by the <emphasis>pa.common.auth.credentials</emphasis> property; i.e. using
+			Credentials can now be retrieved when properly designated by the <emphasis>pa.common.auth.credentials</emphasis> property; i.e. using
 			<emphasis>java -Dpa.common.auth.credentials=$HOME/.proactive/my_encrypted_credentials</emphasis>. Please type <literal>create-cred -h</literal>
 			to have a complete list of possible options.
 		    </para></listitem>
@@ -73,7 +73,7 @@
 	</para>
 	<programlisting language="java"><textobject><textdata fileref="automatic_snippets/UserGuide_GetNodes.snip"/></textobject></programlisting>
 	<para>
-		In the example above, we have requested <literal>nbOfNodes</literal> nodes providing <literal>selectionScipt</literal> as criteria. The resource
+		In the example above, we have requested <literal>nbOfNodes</literal> nodes providing <literal>selectionScript</literal> as criteria. The resource
 		manager does not guaranty that it will find <literal>nbOfNodes</literal> nodes, but it will provide as many nodes as it can.
 		<literal>selectionScript</literal> be <literal>null</literal> and in this case, no particular selection will be performed (all nodes will be accepted).
 		Let us now request nodes with some criteria. Criteria are described in selection scripts
@@ -84,7 +84,7 @@
 	</para>
 	<programlisting language="java"><textobject><textdata fileref="automatic_snippets/UserGuide_LinuxScript.snip"/></textobject></programlisting>
 	<para>
-		In the previous example, we have written the script directly in a String object but it is fortunatly possible to write it in a file and use this
+		In the previous example, we have written the script directly in a String object but it is fortunately possible to write it in a file and use this
 		file for creating a SelectionScript object.
 	</para>
 	<programlisting language="java"><textobject><textdata fileref="automatic_snippets/UserGuide_WindowsScript.snip"/></textobject></programlisting>
@@ -167,7 +167,7 @@
 					 By specifying this descriptor in <emphasis>ResourceManager.getAtMostNodes</emphasis> user may get
 					 more nodes than he asked when host capacity exceeds the requested number of nodes.
 					 For instance if a user requests 1 node but there is only a free host with 5 nodes on it,
-					 all these 5 nodes will be provided to the user. To be more presize in the target node set
+					 all these 5 nodes will be provided to the user. To be more precise in the target node set
 					 1 node will be presented in the main list and 4 nodes in the extra list (see <emphasis>NodeSet.getExtraNodes()</emphasis>).
 					 The resource manager tries to find the optimal host minimizing the waist of resources, 
 					 namely if user requested k nodes
@@ -214,8 +214,8 @@
 			            </listitem>
 			            <listitem>
 			                <para>
-							   If not the resource manager finds the machine with closest capasity to k and
-							   repeats the procedure for (k - "found host capacicy") nodes number.
+							   If not the resource manager finds the machine with closest capacity to k and
+							   repeats the procedure for (k - "found host capacity") nodes number.
 			                </para>
 			            </listitem>
 			            <listitem>

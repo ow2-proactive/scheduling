@@ -41,7 +41,7 @@
 				<listitem>
 				<para>
 					<emphasis role="bold">If you are using the Eclipse plugins set</emphasis>, install it as an eclipse plugin
-					and restart Eclipse. To do this, copy all the jar files from the <literal>plugins/</literal> directory of your Resource Manager RCP distirbution into
+					and restart Eclipse. To do this, copy all the jar files from the <literal>plugins/</literal> directory of your Resource Manager RCP distribution into
 					the <literal>plugins/</literal> directory of your Eclipse distribution and restart Eclipse.
 					</para>
 				</listitem>
@@ -247,7 +247,7 @@
 			</figure>
 			<itemizedlist>
 				<listitem><para>
-					<emphasis role="bold">[1] Connect</emphasis> - Open the connection dialiog box.</para>
+					<emphasis role="bold">[1] Connect</emphasis> - Open the connection dialog box.</para>
 				</listitem>
 				<listitem><para>
 					<emphasis role="bold">[2] Disconnect</emphasis> - Leave the current Resource Manager.</para>
@@ -273,7 +273,7 @@
 					<emphasis role="bold">[8] Runtime information</emphasis> - Show runtime information in the form of graphics.</para>
 				</listitem>
 				<listitem><para>
-					<emphasis role="bold">[9] Accouting information</emphasis> - Show accounting information in the form of graphics.</para>
+					<emphasis role="bold">[9] Accounting information</emphasis> - Show accounting information in the form of graphics.</para>
 				</listitem>
 			</itemizedlist>
 			<para>
@@ -310,7 +310,7 @@
 			    To do so, it needs to know some information, assumed to be true for all hosts:
 			  <itemizedlist>
 				  <listitem><para>
-				  <emphasis role="bold">Rm Url</emphasis> - The resource manager's url that will be used by the deployed nodes to register by themself.
+				  <emphasis role="bold">Rm Url</emphasis> - The resource manager's url that will be used by the deployed nodes to register by themselves.
 				  </para></listitem>
 				  <listitem><para>
 				  <emphasis role="bold">SSH Options</emphasis> - Options you can pass to the SSHClient executable ( -l inria to specify the user for instance )

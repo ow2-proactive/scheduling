@@ -29,7 +29,7 @@
 	</section>
 	<section xml:id="rm_admin_console"><info><title>Interacting with the resource manager</title></info>
 	<para><emphasis>rm-client[.bat]</emphasis>, in <literal>bin/[os]</literal> directory, provides a way to connect to the resource manager
-	and manipulate it in command line mode. This scrips supports a bunch of options:
+	and manipulate it in command line mode. This script supports a bunch of options:
 	</para>
 	<programlisting><textobject><textdata fileref="code_snippets/admin/rm-client-help.txt"/></textobject></programlisting>
 	<para>
@@ -66,13 +66,13 @@
 	<section xml:id="rm_admin_js_console"><info><title>Interactive mode</title></info>
 	<para>
 		Another way to interact with the resource manager is using the interactive mode of the
-		controller. Interactive mode correspond to a JavaScript console, which is able to manage the resouce manager.
+		controller. Interactive mode correspond to a JavaScript console, which is able to manage the resource manager.
 		To start it in this mode, just launch the <emphasis role="bold">bin/[os]/rm-client[.bat]</emphasis> command without any parameter.
 		Once connected, type ? or help() to get the list of provided functions:
 	</para>
 		<screen> addnode(nodeURL, nsName)         Add node to the given node source (parameters is a string representing the node URL to add and an optional string representing the node source in which to add the node)
  removenode(nodeURL,preempt)      Remove the given node (parameter is a string representing the node URL, node is removed immediately if second parameter is true)
- createns(nsName,infr,pol)        Create a new node source with specified name, infrastructure and policy (e.g. createns('myname', ['infrastrucure', 'param1', ...], ['policy', 'param1', ...]))
+ createns(nsName,infr,pol)        Create a new node source with specified name, infrastructure and policy (e.g. createns('myname', ['infrastructure', 'param1', ...], ['policy', 'param1', ...]))
  removens(nsName,preempt)         Remove the given node source (parameter is a string representing the node source name to remove, nodeSource is removed immediately if second parameter is true)
  locknode(nodeURL)                Locks the node
  unlocknode(nodeURL)              Unlocks the node

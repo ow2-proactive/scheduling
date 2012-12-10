@@ -305,7 +305,7 @@ EmbarrasinglyParrallelApplication.instance().initApplication(url, userName, pass
 			</listitem>
 			<listitem>
 				<para>
-					the <literal>ProstTreatmentManager</literal> object is initiated. It
+					the <literal>PostTreatmentManager</literal> object is initiated. It
 					reads a file on system to find out if there are any
 					jobs submitted in previous sessions that need post
 					treatment operations. If there are any, it will

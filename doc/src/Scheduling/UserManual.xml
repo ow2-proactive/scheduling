@@ -173,7 +173,7 @@ job.setEnv(je);
 			<para> ProActive Scheduler provides a way to define a job with a simple plain text file. This method is simpler than an XML file but presents less features.
 			</para>
 			<para>
-			If you just need to launch a set of native tasks in parallel, <emphasis>without dependancies between tasks</emphasis>, you can create a simple text file
+			If you just need to launch a set of native tasks in parallel, <emphasis>without dependencies between tasks</emphasis>, you can create a simple text file
 			and write a list of native commands to submit:
 			</para>
 			<programlisting language="sh">
@@ -302,7 +302,7 @@ public void init(Map&lt;String, Serializable&gt; args) {
 				<para>
 					As shown in the following lines, the given array of TaskResults (<emphasis>results</emphasis>)
 					will be an array of two results (TaskResult 2 and 3) in this order
-					if the dependences of Task 5 is Task 2 and Task 3 in this order.
+					if the dependencies of Task 5 is Task 2 and Task 3 in this order.
 					Therefore you can use them to perform Task 5 process.
 					<programlisting language="java">
 @Override
@@ -715,11 +715,11 @@ task2.setGenerationScript(gscript);
 					<listitem>
 						<para>
 							<emphasis>inputFiles</emphasis> (optional) -
-							selects files to be transfered to the task execution side.
+							selects files to be transferred to the task execution side.
 							It is possible to add a set of files to be copied from the
 							INPUT or OUTPUT space to the worker side. Files can be selected one by one or
 							through regular expressions. For each selected files, an access mode specify
-							if the files has to be transfered from INPUT, OUTPUT space or if transfer is
+							if the files has to be transferred from INPUT, OUTPUT space or if transfer is
 							not needed.
 							(see <xref linkend="Dataspace"/> for more details).
 						</para>
@@ -727,13 +727,13 @@ task2.setGenerationScript(gscript);
 					<listitem>
 						<para>
 							<emphasis>outputFiles</emphasis> (optional) -
-							selects files to be transfered to the OUTPUT space.
+							selects files to be transferred to the OUTPUT space.
 							It is possible to add a set of files to be copied from
 							the worker side to the OUTPUT space of the job. Files can be selected one by one or
 							through regular expressions. For each selected files, an access mode specify
-							if the files has to be transfered to OUTPUT space or if no transfer is
+							if the files has to be transferred to OUTPUT space or if no transfer is
 							needed (see <xref linkend="Dataspace"/> for more details).
-							If needed, the value of the Job ID can be refered as <emphasis>$JID</emphasis> in
+							If needed, the value of the Job ID can be referred as <emphasis>$JID</emphasis> in
 							the output files; it allows to separate produced file per job.
 						</para>
 					</listitem>
@@ -752,7 +752,7 @@ task2.setGenerationScript(gscript);
 							defines whether the logs (ouput/errput) of a task is important and have to be stored in a file.
 							<emphasis>Dataspaces must be properly configured to use this option !</emphasis>
 							If this option is set to true, the logs produced by the task are stored in a file in the localspace
-							during execution. This file is automatically transfered in outputspace, as if it is specified in outputFiles.
+							during execution. This file is automatically transferred in outputspace, as if it is specified in outputFiles.
 							(see <xref linkend="Dataspace"/> for more details).
 							The naming convention is the following : <code>TaskLogs-[jobid]-[taskname].log</code>
 						</para>
@@ -841,7 +841,7 @@ task2.setGenerationScript(gscript);
 												</para>
 											</listitem>
 										</itemizedlist>
-										Use this environment variable in your own native process to get these informations back.
+										Use this environment variable in your own native process to get this information back.
 									</para>
 								</listitem>
 							</itemizedlist>
@@ -896,7 +896,7 @@ task2.setGenerationScript(gscript);
 							The purpose of a Forked Java Task is to gain more flexibility with
 							respect to the execution environment of a task.
 							A new JVM is started with an inherited classpath and (possibly) add classpath or redefined Java home path, JVM arguments,
-							sytem environment, working directory or set a script to programmatically configure this fork environment.
+							system environment, working directory or set a script to programmatically configure this fork environment.
 						</para>
 						<para>
 							A Forked Java Task is just defined as a Java Task with a forkEnvironment element.
@@ -949,7 +949,7 @@ task2.setGenerationScript(gscript);
 										to add/change each items of the fork environment programmatically.
 										This script will be executed on worker side. We provide a variable named "forkEnvironment" which
 										is exactly representing the java object that was set at client side plus the local worker environment.
-										For exemple, if user set the PATH variable to append "my/path", the fork environment in the script
+										For example, if user set the PATH variable to append "my/path", the fork environment in the script
 										will contain a variable PATH that will be "LOCAL_PATH_VARIABLE:my/path" where LOCAL_PATH_VARIABLE is
 										the PATH content of the process to be started.
 										In this script, the "forkEnvironment" variable can be used exactly as it is in java API.
@@ -961,7 +961,7 @@ task2.setGenerationScript(gscript);
 					<listitem>
 						<para>
 							<emphasis>parameters</emphasis> (optional, only for Java and ProActive Task) -
-							defines some parameters to be transfered to the executable.
+							defines some parameters to be transferred to the executable.
 							This is best explained
 							in <xref linkend="define_executable_java"/>. Each parameter is define with a name and a value
 							and will be passed to the Java Executable as an <code>Map</code>.
@@ -994,7 +994,7 @@ task2.setGenerationScript(gscript);
 									<literal>
 										public abstract String getTextualDescription(TaskResult result);
 									</literal>.
-									This method, similarily to
+									This method, similarly to
 									<literal>
 										String Object.toString()
 									</literal>
@@ -1160,7 +1160,7 @@ task2.setGenerationScript(gscript);
 					<listitem>
 						<para>
 							<emphasis>using an ssh key</emphasis> provided by the administrator : if workers are configured,
-							the administrator should have gave user a sshkey. User must first create a credential containing this key :
+							the administrator should have gave user a ssh key. User must first create a credential containing this key :
 						</para>
 						<para>
 							<emphasis>bin/unix/create-cred -F config/authentication/keys/pub.key -l username -p userpwd -k path/to/private/sshkey -o myCredentials.cred</emphasis> :
@@ -1217,7 +1217,7 @@ task2.setGenerationScript(gscript);
 			  Each job execution has an unique INPUT and OUTPUT definition.
 			  In addition to these, the GLOBAL space is an input/output space that is always configured by the Scheduler administrator,
 			  and is accessible by all nodes. The GLOBAL space can be used as a intermediary storage available for all nodes that is
-			  cheaper to acces than the OUTPUT space.
+			  cheaper to access than the OUTPUT space.
 			</para>
 			<para>
 			  GLOBAL space has to be set by the Scheduler administrator through the <emphasis>pa.scheduler.dataspace.globalurl</emphasis> property.
@@ -1260,7 +1260,7 @@ task2.setGenerationScript(gscript);
 					</itemizedlist>
 				</para>
 				<para>
-					The same description is abviously possible in job java API:
+					The same description is obviously possible in job java API:
 				</para>
 				<programlisting language="java">
 //...
@@ -1281,7 +1281,7 @@ job.setOutputSpace("paprmi://host:1099/myOutputSpace?proactive_vfs_provider_path
 			<section xml:id="Dataspace_tasks"><info><title>Specifying data spaces in the tasks</title></info>
 				<para>
 					A task can define a set of input and output files. Input files can be picked from
-					the job INPUT, OUTPUT or GLOBAL space. To specify a file to be transfered, it is necessary to set
+					the job INPUT, OUTPUT or GLOBAL space. To specify a file to be transferred, it is necessary to set
 					two mandatory fields. A third is also useful but is not mandatory:
 					<itemizedlist>
 						<listitem>
@@ -1295,8 +1295,8 @@ job.setOutputSpace("paprmi://host:1099/myOutputSpace?proactive_vfs_provider_path
 						</listitem>
 						<listitem>
 							<para>
-								<emphasis>accessMode</emphasis>: specify if the selected files has to be transfered from
-								INPUT or OUTPUT or GLOBAL, to OUTPUT or GLOBAL, or not transfered. (mandatory)
+								<emphasis>accessMode</emphasis>: specify if the selected files has to be transferred from
+								INPUT or OUTPUT or GLOBAL, to OUTPUT or GLOBAL, or not transferred. (mandatory)
 								Possible values for the input files are: 'transferFromInputSpace', 'transferFromOutputSpace', 'transferFromGlobalSpace', 'none'.
 								Possible values for the output files are: 'transferToOutputSpace','transferToGlobalSpace',  'none'.
 							</para>
@@ -1317,14 +1317,14 @@ job.setOutputSpace("paprmi://host:1099/myOutputSpace?proactive_vfs_provider_path
 				<programlisting language="xml"><textobject><textdata fileref="code_snippets/job_descriptors/task_dataspace.xml"/></textobject></programlisting>
 				<para>
 					Until now, LOCALSPACE will be used as the root of the space local to the task execution (green data space on the picture above).
-					In this example, the file 'tata' located at the root of the INPUT space will be transfered from INPUT
-					space to LOCALSPACE and every 'toto*.txt' files excepted 'toto*2.txt' in the 'txt' directory will be transfered from OUTPUT space
-					to LOCALSPACE. Additionally, files matching 'tutu*.txt' excepted 'tutu*2.txt' in the 'dat' directory will be transfered from GLOBAL space to LOCAL space.
+					In this example, the file 'tata' located at the root of the INPUT space will be transferred from INPUT
+					space to LOCALSPACE and every 'toto*.txt' files excepted 'toto*2.txt' in the 'txt' directory will be transferred from OUTPUT space
+					to LOCALSPACE. Additionally, files matching 'tutu*.txt' excepted 'tutu*2.txt' in the 'dat' directory will be transferred from GLOBAL space to LOCAL space.
 				</para>
 				<para>
-					At the end of the execution, every produced files 'titi*.dat' excepted the 'titi*1.dat' files will be transfered
+					At the end of the execution, every produced files 'titi*.dat' excepted the 'titi*1.dat' files will be transferred
 					from LOCALSPACE to OUTPUT space. Additionally, the 'titi*.bak' excepted 'titi*1.bak' will be transferred from LOCAL space to GLOBAL space.
-					The 'titi*.txt' files won't be transfered, it is just identified as an output file by the Scheduler.
+					The 'titi*.txt' files won't be transferred, it is just identified as an output file by the Scheduler.
 				</para>
 				<para>
 					Here's the same description using the java API:
@@ -1391,7 +1391,7 @@ t.setCommandLine(new String[]{"myExec", "$LOCALSPACE/tata", "$LOCALSPACE/txt", "
 				<section xml:id="Dataspace_java"><info><title>Retrieving spaces and files in a java task</title></info>
 					<para>
 						For java task, everything can be done using the dataspace API inside the javaExecutable.
-						Transferring files works as well, but it is also possible to handle non-transfered files.
+						Transferring files works as well, but it is also possible to handle non-transferred files.
 						6 methods are available in the JavaExecutable to retrieve Spaces or files:
 						<itemizedlist>
 							<listitem>
@@ -1468,7 +1468,7 @@ public class DSTest extends JavaExecutable {
 	public Serializable execute(TaskResult... args) throws Throwable {
 		//create titi1.dat from tata in the LOCALSPACE as it is copied
 		getLocalFile("titi1.dat").copyFrom(getLocalFile("tata"),FileSelector.SELECT_SELF);
-		//create titi2.dat -> will be transfered to OUTPUT space at the end
+		//create titi2.dat -> will be transferred to OUTPUT space at the end
 		getLocalFile("titi2.dat").createFile();
 		//list toto*.txt in txt dir from LOCALSPACE as they are copied
 		//toto*2.txt is not printed as it is exclude
@@ -1476,11 +1476,11 @@ public class DSTest extends JavaExecutable {
 			System.out.println(dsfo.getRealURI());
 			System.out.println(dsfo.getVirtualURI());
 		}
-		//create titi3.dat -> will be transfered to OUTPUT space at the end
+		//create titi3.dat -> will be transferred to OUTPUT space at the end
 		getLocalFile("titi3.dat").createFile();
-		//create titi12.txt -> won't be transfered to OUTPUT space
+		//create titi12.txt -> won't be transferred to OUTPUT space
 		getLocalFile("titi12.txt").createFile();
-		//create titi123.txt directly in the OUTPUT space as it won't be transfered
+		//create titi123.txt directly in the OUTPUT space as it won't be transferred
 		getOutputFile("titi123.txt").copyFrom(getInputFile("txt/toto12.txt"), FileSelector.SELECT_SELF);
 		//as expected, OUTPUT space will contain :
 		//titi2.dat : copied automatically
@@ -1807,7 +1807,7 @@ done</programlisting>
 				  <para>
 					Task B will be replicated, as it depends on task A, but so will
 					tasks C, D and E as they are included in the same <emphasis>task block</emphasis>.
-					Tasks B and E are resepectively the start and end block tasks.
+					Tasks B and E are respectively the start and end block tasks.
 				  </para>
 				</listitem>
 				<listitem>
@@ -1931,12 +1931,12 @@ if (result % 2) {
 				  <listitem>
 					<para>
 					  The <emphasis>loop</emphasis> control flow action requires setting the <emphasis>loop</emphasis>,
-					  which will determine wheter looping to the statically defined target is performed,
+					  which will determine whether looping to the statically defined target is performed,
 					  or if the normal flow is executed as would a continue instruction do in a programming language:
 				<programlisting language="java"><![CDATA[
 loop = new java.lang.Boolean(result);
 ]]></programlisting>
-				The assigned valuee needs to be a boolean.
+				The assigned value needs to be a boolean.
 					</para>
 				  </listitem>
 				</itemizedlist>
@@ -2354,12 +2354,12 @@ try {
 }
 				</programlisting>
 				<para>
-				  Connecting to the Scheduler implicates using a keypair infrastructure to establish a secure channel on
+				  Connecting to the Scheduler implicates using a key pair infrastructure to establish a secure channel on
 				  which the credentials (username and password) will be sent securely. There are two ways to connect
 				  to the Scheduler, as described in the example above:
 				  <orderedlist>
 				    <listitem><para>
-					Retreive the Credentials from disk: supposes the script <emphasis>create-cred[.bat]</emphasis> was previously used to generate those credentials.
+					Retrieve the Credentials from disk: supposes the script <emphasis>create-cred[.bat]</emphasis> was previously used to generate those credentials.
 					It requires knowing the location of the public key corresponding to the private key that will be used for decryption on server side.
 					To obtain the key, you can either have it on your local drive, or ask the remote Scheduler:
 				      </para>
@@ -2372,7 +2372,7 @@ try {
 # also store user ssh private key in credentials to be able to execute task under user ID
 /bin/unix $ ./create-cred -S rmi://example.com:1099/ -o $HOME/.proactive/my_encrypted_credentials -l admin -p admin -k $HOME/.ssh/id_rsa
 ]]></programlisting>
-					Credentials can now be retreived when properly designated by the <emphasis>pa.common.auth.credentials</emphasis> property; ie using
+					Credentials can now be retrieved when properly designated by the <emphasis>pa.common.auth.credentials</emphasis> property; ie using
 					<emphasis>java -Dpa.common.auth.credentials=$HOME/.proactive/my_encrypted_credentials</emphasis>. Please type <literal>create-cred -h</literal> to
 					have the complete list of possible options.
 				    </para></listitem>
@@ -2600,7 +2600,7 @@ scheduler.addEventListener(mySchedulerEventListener, true, SchedulerEvent.JOB_RU
 				</itemizedlist>
 				<para>
 				  To use the controller, you can either type your login and password in interactive mode, or use the <emphasis>--use-cred</emphasis> option
-				  to attempt retreiving encrypted credentials from disk.
+				  to attempt retrieving encrypted credentials from disk.
 				  In both cases, the credentials need to be encrypted when transiting on the network: you need to have the Scheduler's public key, corresponding
 				  to the private key that will be used to decrypt the credentials.
 				  <orderedlist>
@@ -2618,7 +2618,7 @@ scheduler.addEventListener(mySchedulerEventListener, true, SchedulerEvent.JOB_RU
 # use rmi://example.com/'s public key to generate credentials for user 'admin' with pass 'admin' in non-interactive mode
 /bin/unix $ ./create-cred -S rmi://example.com/ -o $HOME/.proactive/my_encrypted_credentials -l admin -p admin
 ]]></programlisting>
-					When running the controller, Credentials will now be retreived when properly designated by the
+					When running the controller, Credentials will now be retrieved when properly designated by the
 					<emphasis>pa.common.auth.credentials</emphasis> property; ie. using
 					<emphasis>java -Dpa.common.auth.pubkey=$HOME/.proactive/my_encrypted_credentials</emphasis>,
 					or when using the <emphasis>--credentials PATH</emphasis> option.
@@ -2723,7 +2723,7 @@ job_PI
 					As you can see, the provided methods are useful to make basic actions. It is also possible to get
 					instances from Scheduler API. As shown, the <emphasis role="italics">myResult = result(1)</emphasis> instruction
 					leads to get an instance of JobResult in the 'myResult' variable. As in Java, use the method of the JobResult API
-					to get other informations. Here is an example:
+					to get other information. Here is an example:
 				</para>
 				<programlisting>
   &gt; prio = myResult.getJobInfo().getPriority();
@@ -2778,9 +2778,9 @@ Job successfully submitted ! (id=6)
 Job successfully submitted ! (id=7)
 
   &gt; for (i=0;i&lt;5;i++){jobresult(i);}
-Error on job 0 : The job represented by this ID is unknow !
-Error on job 1 : The job represented by this ID is unknow !
-Error on job 2 : The job represented by this ID is unknow !
+Error on job 0 : The job represented by this ID is unknown !
+Error on job 1 : The job represented by this ID is unknown !
+Error on job 2 : The job represented by this ID is unknown !
 Job 3 result =&gt;
 
 	 Average1 : 3.1416381333333336

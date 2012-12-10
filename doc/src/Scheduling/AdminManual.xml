@@ -1296,7 +1296,7 @@ public class DefaultPolicy implements PolicyInterface {
 		    Regardless of which method is actually used to perform the authentication,
 		    credentials need to be passed from the client to the Scheduler, through the network.
 		    The data will be encrypted with an AES symmetric secret key to allow unlimited credentials size,
-		    and the AES key itself will be encrypted with an RSA keypair.
+		    and the AES key itself will be encrypted with an RSA key pair.
 
 		    <figure xml:id="scheduler_crypto_pic"><info><title>Credentials encryption</title></info>
 		      <mediaobject>
@@ -1309,7 +1309,7 @@ public class DefaultPolicy implements PolicyInterface {
 
 
 		  <para>
-		    The Keypair can be generated with the <emphasis>key-gen[.bat]</emphasis> script:
+		    The Key pair can be generated with the <emphasis>key-gen[.bat]</emphasis> script:
 		    <screen><![CDATA[
 bin/unix$ ./key-gen -p $HOME/.proactive/priv.key -P $HOME/.proactive/pub.key
 ]]></screen>

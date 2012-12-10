@@ -71,7 +71,7 @@
 		<itemizedlist>
 			<listitem>
 				<para>
-					<emphasis>Bridge Networking</emphasis> - Here, the network routing is made at the 3rd level of the OSI/ISO stack. Your computer's NIC binded to your
+					<emphasis>Bridge Networking</emphasis> - Here, the network routing is made at the 3rd level of the OSI/ISO stack. Your computer's NIC bound to your
 					company/internet network is setup in <quote>PROMISCUOUS MODE</quote> to intercept not only packet intended for the host/dom0 IP but also
 					for newly created Virtual interfaces designed to provide network to virtual machines. Depending on what kind of virtualization product you use, you
 					may have to create the virtual interfaces by yourself (brctl/openvpn on linux systems &amp; Network Manager on Windows). With this solution, your
@@ -133,7 +133,7 @@
 					monitor. The Resource Manager on its side "polls" the virtual machine monitor to know when the
 					newly created RM Nodes are available and registers them. This second method is more attractive
 					if you want to use Scheduler aware policies for example because the Resource Manager will
-					cache available nodes for futur reuse. In case of remote registration, you must ensure that
+					cache available nodes for future reuse. In case of remote registration, you must ensure that
 					the Resource Manager is able to contact RM Nodes (that means that the communication protocol
 					used for communication is well suited for the kind of network connection used. For example, in case
 					of NAT User, you will have to use ProActive Message Routing Protocol i.e. PAMR).
@@ -169,13 +169,13 @@
 		<listitem>
 			<para>
 				<emphasis>RMUrl</emphasis> field holds the Resource Manager's url that will be used to connect remotely, from the virtual
-				machine, by the RM Nodes to register themself as available. If you do not fill this field, local node registration will
+				machine, by the RM Nodes to register themselves as available. If you do not fill this field, local node registration will
 				be used.
 			</para>
 		</listitem>
 		<listitem>
 			<para>
-				<emphasis>infrastructure</emphasis> - Kind of virtualized infrastructre	to manage. For the time being, only <link linkend="virtualization-vmware">vmware</link>, <link linkend="virtualization-xenserver">xenserver</link> and <link linkend="virtualization-virtualbox">virtualbox</link> are supported.
+				<emphasis>infrastructure</emphasis> - Kind of virtualized infrastructure	to manage. For the time being, only <link linkend="virtualization-vmware">vmware</link>, <link linkend="virtualization-xenserver">xenserver</link> and <link linkend="virtualization-virtualbox">virtualbox</link> are supported.
 			</para>
 		</listitem>
 		<listitem>
@@ -241,7 +241,7 @@
 			The <emphasis>VMM Url</emphasis> field holds the address of your VMware virtual machine monitor. For VMware
 			Virtual Infrastructure compliant products, most often, it is either <emphasis role="italics">http://yourAddress:8222/sdk</emphasis>
 			or <emphasis role="italics">https://youAddress:8333/sdk</emphasis> by default. If you decide to provide a <emphasis>VM Max</emphasis> number
-			greater than 1, the Resource Manager is allowed to clone the template virtual machine for provisionning.
+			greater than 1, the Resource Manager is allowed to clone the template virtual machine for provisioning.
 			The clone feature for VMware product is provided by the product itself. The clone virtual machine shares
 			the entire set of device of the cloned virtual machine. The templates virtual disk(s) is(are) attached
 			to the clone in independent-nonpersistent mode, that means that every power off on the clone will
@@ -265,11 +265,11 @@
 			You must modify the <literal>rm-node-starter</literal> scripts in the virtual machine to match your current Resource Manager setup.
 		</para>
 		<para>
-			Because Citrix does not provide any equivalent of VMware guest tools, we use the embeded mysql server to
+			Because Citrix does not provide any equivalent of VMware guest tools, we use the embedded mysql server to
 			hold deployment information. To be able to access these data from the inside of the virtual machine, we
 			use the python XenAPI.py lib to connect to the running XenServer and get the pieces of information.
 			They are stored in the XenServer DataStore at the VirtualMachine object level as a Hashtable. All the
-			data holded by this table are retrieved thanks to one of the virtual machine MAC address (XenServer
+			data hold by this table are retrieved thanks to one of the virtual machine MAC address (XenServer
 			ensures that every allocated MAC address is different). Thus, to be sure that the Node acquisition will
 			be effective, you must ensure the uniqueness of MAC address for your entire virtual infrastructure.
 			<emphasis>You also need to fill</emphasis> the associated server information located in the file
@@ -282,7 +282,7 @@
 			a RM Node pool. The <emphasis>Infrastructure</emphasis> field appearing on the snapshot above must contain the value "xenserver".
 			The <emphasis>VMM Url</emphasis> field holds the address of your XenServer.
 			By default this is the http url of the server. If you decide to provide a <emphasis>VM Max</emphasis> number
-			greater than 1, the Resource Manager is allowed to clone the template virtual machine for provisionning.
+			greater than 1, the Resource Manager is allowed to clone the template virtual machine for provisioning.
 			The clone feature is provided by the virtual machine monitor. The way XenServer clone a virtual machine relies
 			on the underlying disk store file system type. If you want to enable efficient clone feature (using
 			differential disks) you must ensure that the virtual disks used by your template virtual machine are stored
@@ -313,7 +313,7 @@
 			<screen>VBoxManage setproperty websrvauthlibrary null</screen>
 			and restart vboxwebsrv.
 			If you decide to provide a <emphasis>VM Max</emphasis> number
-			greater than 1, the Resource Manager is allowed to clone the template virtual machine for provisionning.
+			greater than 1, the Resource Manager is allowed to clone the template virtual machine for provisioning.
 			The clone feature is not provided by xVM Virtualbox itself. To emulate it, you must snapshot the template
 			virtual machine. The snapshot for Virtualbox is in fact the creation of a new differential disk hierarchy.
 			That means that every newly created virtual machine attached to this snapshot will create a new differential
@@ -346,7 +346,7 @@
 			The <emphasis>VMM Url</emphasis> field holds the address of the Hyper-V host and depends on the protocol you want to use.
 			For WinRM, use a url like: <emphasis>http(s)://your.host.com/wsman</emphasis>, for WMI, use the FQDN of your server.
 			If you decide to provide a <emphasis>VM Max</emphasis> number
-			greater than 1, the Resource Manager is allowed to clone the template virtual machine for provisionning.
+			greater than 1, the Resource Manager is allowed to clone the template virtual machine for provisioning.
 			The clone feature is not provided by Hyper-V itself. To emulate it, we create a new virtual machine with a differencing hard disk attached to the template virtual machine's hard disk.
 			When the clone virtual machines are not used anymore, they are destroyed, and so do the attached differencing hard disks. If a problem occurs during destruction
 			time, the best way to come back to a clean environment state is to remove every clone virtual machine by hand with their associated differencing hard disks.

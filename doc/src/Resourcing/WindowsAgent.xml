@@ -141,7 +141,7 @@
 			node identified by the url "rmi://192.168.1.62:1099/toto"</para>
 		<note>
 			<para>
-				This piece of code should be executed on a seperate JVM.
+				This piece of code should be executed on a separate JVM.
 				Moreover, this test is more useful for the RMI Registration connection type since for the Resource Manager one,
 				you can directly see whether the node has been started.
 			</para>

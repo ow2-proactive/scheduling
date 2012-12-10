@@ -181,7 +181,7 @@ rmURL maxNodes serviceUrl userName password trustStore trustStorePassword javaPa
 				<para>
 					<emphasis>GCM customized infrastructure</emphasis> can deploy/remove
 					a single node to/from the infrastructure described in GCM descriptor.
-					It makes possible to use this insfrastructure manager together with
+					It makes possible to use this infrastructure manager together with
 					more precise policies such as "scheduler aware policy" (see below).
 					In order to create such node source user has to specify GCMD
 					and hosts list. GCMD has to define a deployment of
@@ -222,7 +222,7 @@ rmURL maxNodes serviceUrl userName password trustStore trustStorePassword javaPa
 			<itemizedlist>
 				<listitem>
 					<para>
-						<emphasis role="bold">Rm Url</emphasis> - The resource manager's url that will be used by the deployed nodes to register by themself.
+						<emphasis role="bold">Rm Url</emphasis> - The resource manager's url that will be used by the deployed nodes to register by themselves.
 					</para>
 				</listitem>
 				<listitem>
@@ -290,7 +290,7 @@ test.example.net 5
 			<itemizedlist>
 				<listitem>
 					<para>
-						<emphasis role="bold">Rm Url</emphasis> - The resource manager's url that will be used by the deployed nodes to register by themself.
+						<emphasis role="bold">Rm Url</emphasis> - The resource manager's url that will be used by the deployed nodes to register by themselves.
 					</para>
 				</listitem>
 				<listitem>
@@ -734,7 +734,7 @@ test.example.net 5
 						<para><emphasis role="bold">schedulerUrl</emphasis> - Url of the Scheduler</para>
 					</listitem>
 					<listitem>
-						<para><emphasis role="bold">schedulerCredentialsPath</emphasis> - Path to the credentials used for scheduler authentification.</para>
+						<para><emphasis role="bold">schedulerCredentialsPath</emphasis> - Path to the credentials used for scheduler authentication.</para>
 					</listitem>
 					<listitem>
 						<para><emphasis role="bold">idleTime</emphasis> - idle time in millisecond to wait before removing all nodes (default is 60000).</para>
@@ -796,7 +796,7 @@ test.example.net 5
 						<para><emphasis role="bold">schedulerUrl</emphasis> - Url of the Scheduler</para>
 					</listitem>
 					<listitem>
-						<para><emphasis role="bold">schedulerCredentialsPath</emphasis> - Path to the credentials used for scheduler authentification.</para>
+						<para><emphasis role="bold">schedulerCredentialsPath</emphasis> - Path to the credentials used for scheduler authentication.</para>
 					</listitem>
 					<listitem>
 						<para><emphasis role="bold">refreshTime</emphasis> - time between each calculation of the number of needed nodes.</para>
@@ -812,7 +812,7 @@ test.example.net 5
 						it does not means that there will be exactly <emphasis role="italics">N</emphasis> tasks
 						executed on each node. This factor is just used to compute the total number of nodes. For instance, let us assume that this factor is 3 and that we schedule 100
 						tasks. In that case, we will have 34 (= upper bound of 100/3) started nodes. Once one task finished and the refresh time passed,
-						one node will be removed since 99 divided by 3 is 33. When there will remain 96 tasks (asuming that no other tasks are scheduled meanwhile),
+						one node will be removed since 99 divided by 3 is 33. When there will remain 96 tasks (assuming that no other tasks are scheduled meanwhile),
 						an other node will be removed at the next calculation time, and so on and so forth... </para>
 					</listitem>
 					<listitem>
@@ -868,7 +868,7 @@ test.example.net 5
 						<para><emphasis role="bold">schedulerUrl</emphasis> - Url of the Scheduler</para>
 					</listitem>
 					<listitem>
-						<para><emphasis role="bold">schedulerCredentialsPath</emphasis> - Path to the credentials used for scheduler authentification.</para>
+						<para><emphasis role="bold">schedulerCredentialsPath</emphasis> - Path to the credentials used for scheduler authentication.</para>
 					</listitem>
 					<listitem>
 						<para><emphasis role="bold">refreshTime</emphasis> - time between each calculation of the number of needed nodes.</para>
@@ -884,7 +884,7 @@ test.example.net 5
 						it does not means that there will be exactly <emphasis role="italics">N</emphasis> tasks
 						executed on each node. This factor is just used to compute the total number of nodes. For instance, let us assume that this factor is 3 and that we schedule 100
 						tasks. In that case, we will have 34 (= upper bound of 100/3) started nodes. Once one task finished and the refresh time passed,
-						one node will be removed since 99 divided by 3 is 33. When there will remain 96 tasks (asuming that no other tasks are scheduled meanwhile),
+						one node will be removed since 99 divided by 3 is 33. When there will remain 96 tasks (assuming that no other tasks are scheduled meanwhile),
 						an other node will be removed at the next calculation time, and so on and so forth... </para>
 					</listitem>
 					<listitem>
@@ -953,7 +953,7 @@ test.example.net 5
 						<para><emphasis role="bold">schedulerUrl</emphasis> - Url of the Scheduler</para>
 					</listitem>
 					<listitem>
-						<para><emphasis role="bold">schedulerCredentialsPath</emphasis> - Path to the credentials used for scheduler authentification.</para>
+						<para><emphasis role="bold">schedulerCredentialsPath</emphasis> - Path to the credentials used for scheduler authentication.</para>
 					</listitem>
 					<listitem>
 						<para><emphasis role="bold">refreshTime</emphasis> - time between each calculation of the number of needed nodes.</para>
@@ -969,7 +969,7 @@ test.example.net 5
 						it does not means that there will be exactly <emphasis role="italics">N</emphasis> tasks
 						executed on each node. This factor is just used to compute the total number of nodes. For instance, let us assume that this factor is 3 and that we schedule 100
 						tasks. In that case, we will have 34 (= upper bound of 100/3) started nodes. Once one task finished and the refresh time passed,
-						one node will be removed since 99 divided by 3 is 33. When there will remain 96 tasks (asuming that no other tasks are scheduled meanwhile),
+						one node will be removed since 99 divided by 3 is 33. When there will remain 96 tasks (assuming that no other tasks are scheduled meanwhile),
 						an other node will be removed at the next calculation time, and so on and so forth... </para>
 					</listitem>
 					<listitem>
@@ -1038,7 +1038,7 @@ test.example.net 5
 						<para><emphasis role="bold">schedulerUrl</emphasis> - Url of the Scheduler</para>
 					</listitem>
 					<listitem>
-						<para><emphasis role="bold">schedulerCredentialsPath</emphasis> - Path to the credentials used for scheduler authentification.</para>
+						<para><emphasis role="bold">schedulerCredentialsPath</emphasis> - Path to the credentials used for scheduler authentication.</para>
 					</listitem>
 					<listitem>
 						<para><emphasis role="bold">preemptive</emphasis> - Preemptive parameter indicates the way of releasing nodes. If it is true, nodes will be released
@@ -1052,7 +1052,7 @@ test.example.net 5
 						it does not means that there will be exactly <emphasis role="italics">N</emphasis> tasks
 						executed on each node. This factor is just used to compute the total number of nodes. For instance, let us assume that this factor is 3 and that we schedule 100
 						tasks. In that case, we will have 34 (= upper bound of 100/3) started nodes. Once one task finished and the refresh time passed,
-						one node will be removed since 99 divided by 3 is 33. When there will remain 96 tasks (asuming that no other tasks are scheduled meanwhile),
+						one node will be removed since 99 divided by 3 is 33. When there will remain 96 tasks (assuming that no other tasks are scheduled meanwhile),
 						an other node will be removed at the next calculation time, and so on and so forth... </para>
 					</listitem>
 					<listitem>
