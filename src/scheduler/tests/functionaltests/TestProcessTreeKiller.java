@@ -67,16 +67,13 @@ public class TestProcessTreeKiller extends SchedulerConsecutive {
     private static URL nativeWindowsExecLauncher = TestProcessTreeKiller.class
             .getResource("/functionaltests/executables/PTK_launcher.bat");
 
-    private static String unixPTKProcessName = "PTK_process.sh";
-
     private static String unixSleepName = "sleep";
-
-    private static URL nativeLinuxDetachedProcess = TestProcessTreeKiller.class
-            .getResource("/functionaltests/executables/" + unixPTKProcessName);
 
     private static int detachedProcNumber = 4;
 
     private final static int wait_time = 12000;
+
+    private final static int wait_kill_time = 60000;
 
     /**
      * Tests start here.
@@ -166,36 +163,14 @@ public class TestProcessTreeKiller extends SchedulerConsecutive {
             SchedulerTHelper.waitForEventJobFinished(id1);
 
             //we should have 1 time number of detached processes
-            switch (OperatingSystem.getOperatingSystem()) {
-                case windows:
-                    runningDetachedProcNumber = getProcessNumberWindows("TestSleep.exe");
-                    break;
-                case unix:
-                    runningDetachedProcNumber = getProcessNumber(unixSleepName);
-                    break;
-                default:
-                    throw new IllegalStateException("Unsupported operating system");
-            }
-            SchedulerTHelper.log("number of processes : " + runningDetachedProcNumber);
-            Assert.assertEquals(detachedProcNumber, runningDetachedProcNumber);
+            waitProcessesAreKilled(detachedProcNumber);
 
             //kill the second job
             SchedulerTHelper.getSchedulerInterface().killJob(id2);
             SchedulerTHelper.waitForEventJobFinished(id2);
 
             //we should have 0 detached processes
-            switch (OperatingSystem.getOperatingSystem()) {
-                case windows:
-                    runningDetachedProcNumber = getProcessNumberWindows("TestSleep.exe");
-                    break;
-                case unix:
-                    runningDetachedProcNumber = getProcessNumber(unixSleepName);
-                    break;
-                default:
-                    throw new IllegalStateException("Unsupported operating system");
-            }
-            SchedulerTHelper.log("number of processes : " + runningDetachedProcNumber);
-            Assert.assertEquals(0, runningDetachedProcNumber);
+            waitProcessesAreKilled(0);
 
             JobResult res = SchedulerTHelper.getJobResult(id1);
             Assert.assertEquals(JobStatus.KILLED, res.getJobInfo().getStatus());
@@ -203,6 +178,33 @@ public class TestProcessTreeKiller extends SchedulerConsecutive {
             res = SchedulerTHelper.getJobResult(id2);
             Assert.assertEquals(JobStatus.KILLED, res.getJobInfo().getStatus());
         }
+    }
+
+    /*
+     * Process are killed asynchronously, need wait some time  
+     */
+    private void waitProcessesAreKilled(int expectedNumber) throws Exception {
+        int runningDetachedProcNumber = 0;
+        long stopTime = System.currentTimeMillis() + wait_kill_time;
+        while (System.currentTimeMillis() < stopTime) {
+            switch (OperatingSystem.getOperatingSystem()) {
+                case windows:
+                    runningDetachedProcNumber = getProcessNumberWindows("TestSleep.exe");
+                    break;
+                case unix:
+                    runningDetachedProcNumber = getProcessNumber(unixSleepName);
+                    break;
+                default:
+                    throw new IllegalStateException("Unsupported operating system");
+            }
+            SchedulerTHelper.log("number of processes : " + runningDetachedProcNumber);
+            if (runningDetachedProcNumber == expectedNumber) {
+                break;
+            } else {
+                Thread.sleep(2000);
+            }
+        }
+        Assert.assertEquals(expectedNumber, runningDetachedProcNumber);
     }
 
     private void killAll(String processName) throws Throwable {

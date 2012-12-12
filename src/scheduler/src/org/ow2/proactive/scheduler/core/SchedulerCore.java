@@ -41,10 +41,12 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Timer;
@@ -801,6 +803,18 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
     }
 
     boolean restartTaskOnNodeFailure(InternalJob job, InternalTask td, SchedulerCore schedulerStub) {
+        //check if the job or task has not been terminated while pinging
+        if (!jobs.containsKey(job.getId())) {
+            tlogger.info(td.getId(), "restarting task for not running job " + job.getId());
+            return false;
+        }
+
+        Hashtable<TaskId, TaskLauncher> runningTasks = currentlyRunningTasks.get(job.getId());
+        if (runningTasks == null || (runningTasks.remove(td.getId()) == null)) {
+            logger.info("Try to restart not running task");
+            return false;
+        }
+
         try {
             logger.info("Try to free failed node set");
             //free execution node even if it is dead
@@ -809,16 +823,6 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
         } catch (Exception e) {
             //just save the rest of the method execution
             logger.debug("Failed to free failed node set", e);
-        }
-
-        //check if the task has not been terminated while pinging
-        if (currentlyRunningTasks.get(job.getId()).remove(td.getId()) == null) {
-            logger.info("Try to restart not running task");
-            return false;
-        }
-        if (!jobs.containsKey(job.getId())) {
-            tlogger.info(td.getId(), "restarting task for not running job " + job.getId());
-            return false;
         }
 
         //re-init progress as it is failed
@@ -924,7 +928,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
      * @param errorMsg the error message to send in the task result.
      * @param jobStatus the type of the end for this job. (failed/canceled/killed)
      */
-    void endJob(InternalJob job, InternalTask task, TaskResultImpl taskResult, String errorMsg,
+    void endJob(final InternalJob job, InternalTask task, TaskResultImpl taskResult, String errorMsg,
             JobStatus jobStatus) {
         jobs.remove(job.getId());
 
@@ -943,31 +947,42 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             jlogger.info(job.getId(), "ending request");
         }
 
+        final List<InternalTask> tasksToTerminate = new ArrayList<InternalTask>();
+
         for (InternalTask td : job.getITasks()) {
             if (td.getStatus() == TaskStatus.RUNNING) {
                 //remove previous read progress
                 td.setProgress(0);
-
-                //get the nodes that are used for this descriptor
-                NodeSet nodes = td.getExecuterInformations().getNodes();
-
-                //try to terminate the task
-                try {
-                    tlogger.info(td.getId(), "terminating");
-                    td.getExecuterInformations().getLauncher().terminate(false);
-                } catch (Exception e) { /* (nothing to do) */
-                    logger.debug("", e);
-                }
-
-                try {
-                    //free every execution nodes
-                    ((UserRMProxy) rmProxiesManager.getUserRMProxy(job.getOwner(), job.getCredentials()))
-                            .releaseNodes(nodes, td.getCleaningScript());
-                } catch (Throwable e) {
-                    logger.debug("", e);
-                    //we did our best
-                }
+                tasksToTerminate.add(td);
             }
+        }
+
+        if (!tasksToTerminate.isEmpty()) {
+            threadPoolForTerminateTL.execute(new Runnable() {
+                public void run() {
+                    for (InternalTask td : tasksToTerminate) {
+                        //get the nodes that are used for this descriptor
+                        NodeSet nodes = td.getExecuterInformations().getNodes();
+
+                        //try to terminate the task
+                        try {
+                            tlogger.info(td.getId(), "terminating");
+                            td.getExecuterInformations().getLauncher().terminate(false);
+                        } catch (Exception e) { /* (nothing to do) */
+                            logger.debug("", e);
+                        }
+
+                        try {
+                            //free every execution nodes
+                            ((UserRMProxy) rmProxiesManager.getUserRMProxy(job.getOwner(), job
+                                    .getCredentials())).releaseNodes(nodes, td.getCleaningScript());
+                        } catch (Throwable e) {
+                            logger.debug("", e);
+                            //we did our best
+                        }
+                    }
+                }
+            });
         }
 
         boolean pendingJob = false;
@@ -2046,17 +2061,17 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
      *
      */
     private void recover() {
-        long loadJobPeriod;
+        long loadJobPeriod = -1;
         if (PASchedulerProperties.SCHEDULER_DB_LOAD_JOB_PERIOD.isSet()) {
             String periodStr = PASchedulerProperties.SCHEDULER_DB_LOAD_JOB_PERIOD.getValueAsString();
-            try {
-                loadJobPeriod = Tools.parsePeriod(periodStr);
-            } catch (IllegalArgumentException e) {
-                logger.warn("Invalid load job period string: " + periodStr + ", this setting is ignored", e);
-                loadJobPeriod = -1;
+            if (periodStr != null && !periodStr.isEmpty()) {
+                try {
+                    loadJobPeriod = Tools.parsePeriod(periodStr);
+                } catch (IllegalArgumentException e) {
+                    logger.warn("Invalid load job period string: " + periodStr + ", this setting is ignored",
+                            e);
+                }
             }
-        } else {
-            loadJobPeriod = -1;
         }
         SchedulerStateRecoverHelper.RecoveredSchedulerState recoveredState = new SchedulerStateRecoverHelper(
             dbManager).recover(loadJobPeriod);

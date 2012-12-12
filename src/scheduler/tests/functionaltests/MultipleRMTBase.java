@@ -107,21 +107,6 @@ public class MultipleRMTBase extends FunctionalTest {
         }
     }
 
-    protected void createNodeSource(RMTHelper helper, int rmiPort, int nodesNumber) throws Exception {
-        Map<String, String> map = new HashMap<String, String>(1);
-        map.put(CentralPAPropertyRepository.PA_RMI_PORT.getName(), String.valueOf(rmiPort));
-        for (int i = 0; i < nodesNumber; i++) {
-            String nodeName = "node-" + i;
-            String nodeUrl = "rmi://localhost:" + rmiPort + "/" + nodeName;
-            helper.createNode(nodeName, nodeUrl, map, null);
-            helper.getResourceManager().addNode(nodeUrl);
-        }
-        helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.DEFAULT);
-        for (int i = 0; i < nodesNumber; i++) {
-            helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        }
-    }
-
     private static void writeStringToFile(File file, String string) throws IOException {
         OutputStream out = new BufferedOutputStream(new FileOutputStream(file));
         try {

@@ -40,6 +40,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -64,6 +65,7 @@ import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProper
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
+import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.LocalInfrastructure;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
@@ -227,6 +229,28 @@ public class RMTHelper {
     public TNode createNode(String nodeName, Map<String, String> vmParameters) throws IOException,
             NodeException {
         return createNode(nodeName, null, vmParameters, null);
+    }
+
+    public void createNodeSource(int rmiPort, int nodesNumber) throws Exception {
+        createNodeSource(rmiPort, nodesNumber, null);
+    }
+
+    public void createNodeSource(int rmiPort, int nodesNumber, List<String> vmOptions) throws Exception {
+        Map<String, String> map = new HashMap<String, String>(1);
+        map.put(CentralPAPropertyRepository.PA_RMI_PORT.getName(), String.valueOf(rmiPort));
+        map
+                .put(CentralPAPropertyRepository.PA_HOME.getName(), CentralPAPropertyRepository.PA_HOME
+                        .getValue());
+        for (int i = 0; i < nodesNumber; i++) {
+            String nodeName = "node-" + i;
+            String nodeUrl = "rmi://localhost:" + rmiPort + "/" + nodeName;
+            createNode(nodeName, nodeUrl, map, vmOptions);
+            getResourceManager().addNode(nodeUrl);
+        }
+        waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.DEFAULT);
+        for (int i = 0; i < nodesNumber; i++) {
+            waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        }
     }
 
     /**
