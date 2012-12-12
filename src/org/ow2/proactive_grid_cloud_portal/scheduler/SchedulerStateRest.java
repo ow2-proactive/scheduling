@@ -888,10 +888,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             throw new IOException("the file JOB-INF/image.png was not found in the job archive");
         }
         ips = new BufferedInputStream(jobArchive.getInputStream(imageEntry));
-        String image = IOUtils.toString(ips, ENCODING);
-
         // Encode in Base64
-        enc = new String(org.apache.commons.codec.binary.Base64.encodeBase64(image.getBytes(ENCODING)), ENCODING);
+        enc = new String(org.apache.commons.codec.binary.Base64.encodeBase64(IOUtils.toByteArray(ips)), ENCODING);
 
         return enc;
     }
