@@ -81,14 +81,19 @@ public class TestJobFork extends SchedulerConsecutive {
 
         String taskForked1Name = "Fork1";
         String taskForked2Name = "Fork2";
+
         TaskFlowJob job = (TaskFlowJob) JobFactory_stax.getFactory().createJob(
                 new File(jobDescriptor.toURI()).getAbsolutePath());
+
+        String[] commandLine;
         if (OperatingSystem.getOperatingSystem() == OperatingSystem.windows) {
-            ((NativeTask) job.getTask(task1Name)).setCommandLine("cmd", "/C", "ping", "127.0.0.1", "-n",
-                    "20", ">", "NUL");
-            ((NativeTask) job.getTask(taskForked1Name)).setCommandLine("cmd", "/C", "ping", "127.0.0.1",
-                    "-n", "20", ">", "NUL");
+            commandLine = new String[] { "cmd", "/C", "ping", "127.0.0.1", "-n", "20", ">", "NUL" };
+        } else {
+            commandLine = new String[] { "ping", "-c", "20", "127.0.0.1" };
         }
+        ((NativeTask) job.getTask(task1Name)).setCommandLine(commandLine);
+        ((NativeTask) job.getTask(taskForked1Name)).setCommandLine(commandLine);
+
         JobId id = SchedulerTHelper.submitJob(job);
 
         SchedulerTHelper.log("Job submitted, id " + id.toString());

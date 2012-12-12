@@ -36,9 +36,6 @@
  */
 package functionaltests;
 
-import java.io.File;
-import java.net.URL;
-
 import org.junit.Assert;
 import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -47,7 +44,6 @@ import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
-import org.ow2.proactive.scheduler.common.job.factories.JobFactory_stax;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
@@ -75,9 +71,6 @@ import org.ow2.proactive.scheduler.common.task.TaskStatus;
  */
 public class TestJobNativeSubmission extends SchedulerConsecutive {
 
-    private static URL jobDescriptor = TestJobNativeSubmission.class
-            .getResource("/functionaltests/descriptors/Job_nativ.xml");
-
     /**
      * Tests start here.
      *
@@ -85,17 +78,27 @@ public class TestJobNativeSubmission extends SchedulerConsecutive {
      */
     @org.junit.Test
     public void run() throws Throwable {
-
         String task1Name = "task1";
         String task2Name = "task2";
 
         //test submission and event reception
-        TaskFlowJob job = (TaskFlowJob) JobFactory_stax.getFactory().createJob(
-                new File(jobDescriptor.toURI()).getAbsolutePath());
+        TaskFlowJob job = new TaskFlowJob();
+        NativeTask task1 = new NativeTask();
+        task1.setName(task1Name);
         if (OperatingSystem.getOperatingSystem() == OperatingSystem.windows) {
-            ((NativeTask) job.getTask(task1Name)).setCommandLine("cmd", "/C", "ping", "127.0.0.1", "-n",
-                    "10", ">", "NUL");
+            task1.setCommandLine("cmd", "/C", "ping", "127.0.0.1", "-n", "10", ">", "NUL");
+        } else {
+            task1.setCommandLine("ping", "-c", "5", "127.0.0.1");
         }
+        job.addTask(task1);
+
+        NativeTask task2 = new NativeTask();
+        task2.setName(task2Name);
+        task2.addDependence(task1);
+        task2.setCommandLine("invalid_command");
+
+        job.addTask(task2);
+
         JobId id = SchedulerTHelper.submitJob(job);
 
         SchedulerTHelper.log("Job submitted, id " + id.toString());

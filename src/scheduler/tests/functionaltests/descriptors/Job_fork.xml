@@ -9,11 +9,7 @@
 	<taskFlow>
 		<task name="Task1">
 			<nativeExecutable>
-				<staticCommand
-					value="${WORK_DIR}/nativTask">
-					<arguments>
-						<argument value="2"/>
-					</arguments>
+				<staticCommand value="TO BE SET BY TEST">
 				</staticCommand>
 			</nativeExecutable>
 		</task>
@@ -33,11 +29,7 @@
 		</task>
 		<task name="Fork1" walltime="5" >
 			<nativeExecutable>
-				<staticCommand
-					value="${WORK_DIR}/nativTask">
-					<arguments>
-						<argument value="2"/>
-					</arguments>
+				<staticCommand value="TO BE SET BY TEST">
 				</staticCommand>
 			</nativeExecutable>
 		</task>
