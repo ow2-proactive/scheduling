@@ -242,10 +242,14 @@ public abstract class Connection<T extends Authentication> implements Loggable, 
                 port = 1099;
             }
 
-            Socket socket = new Socket(parsedUrl.getHost(), port);
-            NetworkInterface ni = NetworkInterface.getByInetAddress(socket.getLocalAddress());
-
-            return ni.getName();
+            Socket socket = null;
+            try {
+                socket = new Socket(parsedUrl.getHost(), port);
+                NetworkInterface ni = NetworkInterface.getByInetAddress(socket.getLocalAddress());
+                return ni.getName();
+            } finally {
+                socket.close();
+            }
         }
 
         throw new IllegalStateException("The network interface is already selected");

@@ -89,8 +89,6 @@ import org.ow2.proactive.utils.console.StdOutConsole;
  */
 public class SchedulerController {
 
-    protected static final String SCHEDULER_DEFAULT_URL = Tools.getHostURL("//localhost/");
-
     protected static final String control = "<ctl> ";
     protected static final String newline = System.getProperty("line.separator");
     protected static Logger logger = Logger.getLogger(SchedulerController.class);
@@ -145,8 +143,7 @@ public class SchedulerController {
         username.setRequired(false);
         options.addOption(username);
 
-        Option schedulerURL = new Option("u", "url", true, "The scheduler URL (default " +
-            SCHEDULER_DEFAULT_URL + ")");
+        Option schedulerURL = new Option("u", "url", true, "The scheduler URL");
         schedulerURL.setArgName("schedulerURL");
         schedulerURL.setRequired(false);
         options.addOption(schedulerURL);
@@ -178,7 +175,7 @@ public class SchedulerController {
                 if (cmd.hasOption("url")) {
                     url = cmd.getOptionValue("url");
                 } else {
-                    url = SCHEDULER_DEFAULT_URL;
+                    url = null;
                 }
 
                 try {
@@ -191,9 +188,9 @@ public class SchedulerController {
                     logger.debug("Unable to detect the network interface", e);
                 }
 
-                logger.info("Trying to connect Scheduler on " + url);
+                logger.info("Trying to connect Scheduler on " + (url == null ? "localhost" : url));
                 auth = SchedulerConnection.join(url);
-                logger.info("\t-> Connection established on " + url);
+                logger.info("\t-> Connection established on " + (url == null ? "localhost" : url));
 
                 logger.info(newline + "Connecting client to the Scheduler");
 
@@ -236,7 +233,8 @@ public class SchedulerController {
                         // first attempt at getting the pubkey : ask the scheduler
                         SchedulerAuthenticationInterface auth = SchedulerConnection.join(url);
                         pubKey = auth.getPublicKey();
-                        logger.info("Retrieved public key from Scheduler at " + url);
+                        logger.info("Retrieved public key from Scheduler at " +
+                            (url == null ? "localhost" : url));
                     } catch (Exception e) {
                         try {
                             // second attempt : try default location
