@@ -87,8 +87,6 @@ import org.ow2.proactive.utils.console.VisualConsole;
  */
 public class ResourceManagerController {
 
-    private static final String RM_DEFAULT_URL = getHostURL("//localhost/");
-
     protected static final String control = "<ctl> ";
     protected static final String newline = System.getProperty("line.separator");
     protected static Logger logger = Logger.getLogger(ResourceManagerController.class);
@@ -146,8 +144,7 @@ public class ResourceManagerController {
         username.setRequired(false);
         options.addOption(username);
 
-        Option rmURL = new Option("u", "rmURL", true, "The Resource manager URL (default " + RM_DEFAULT_URL +
-            ")");
+        Option rmURL = new Option("u", "rmURL", true, "The Resource manager URL");
         rmURL.setArgName("rmURL");
         rmURL.setArgs(1);
         rmURL.setRequired(false);
@@ -177,7 +174,7 @@ public class ResourceManagerController {
                 if (cmd.hasOption("u")) {
                     url = cmd.getOptionValue("u");
                 } else {
-                    url = RM_DEFAULT_URL;
+                    url = null;
                 }
 
                 try {
@@ -190,9 +187,9 @@ public class ResourceManagerController {
                     logger.debug("Unable to detect the network interface", e);
                 }
 
-                logger.info("Connecting to the RM on " + url);
+                logger.info("Connecting to the RM on " + (url == null ? "localhost" : url));
                 auth = RMConnection.join(url);
-                logger.info("\t-> Connection established on " + url);
+                logger.info("\t-> Connection established on " + (url == null ? "localhost" : url));
 
                 if (cmd.hasOption("l")) {
                     user = cmd.getOptionValue("l");
@@ -232,7 +229,8 @@ public class ResourceManagerController {
                         // first attempt at getting the pubkey : ask the RM
                         RMAuthentication auth = RMConnection.join(url);
                         pubKey = auth.getPublicKey();
-                        logger.info("Retrieved public key from Resource Manager at " + url);
+                        logger.info("Retrieved public key from Resource Manager at " +
+                            (url == null ? "localhost" : url));
                     } catch (Exception e) {
                         try {
                             // second attempt : try default location
@@ -575,20 +573,6 @@ public class ResourceManagerController {
             return true;
         }
         return false;
-    }
-
-    /**
-     * Normalize the given URL into an URL that only contains protocol://host:port/
-     *
-     * @param url the url to transform
-     * @return an URL that only contains protocol://host:port/
-     */
-    public static String getHostURL(String url) {
-        URI uri = URI.create(url);
-        String scheme = (uri.getScheme() == null) ? "rmi" : uri.getScheme();
-        String host = (uri.getHost() == null) ? "localhost" : uri.getHost();
-        int port = (uri.getPort() == -1) ? CentralPAPropertyRepository.PA_RMI_PORT.getValue() : uri.getPort();
-        return scheme + "://" + host + ":" + port + "/";
     }
 
     /**
