@@ -118,7 +118,7 @@
   </authorgroup>
       <citetitle>Interactive and descriptor-based deployment of object-oriented grid applications</citetitle>
       <pagenums>93--102</pagenums>
-      <bibliosource class="uri">http://www-sop.inria.fr/oasis/Julien.Vayssiere/publications/hpdc2002vayssiere.pdf</bibliosource>
+      <bibliosource class="uri">http://www-sop.inria.fr/oasis/personnel/Julien.Vayssiere/publications/hpdc2002_vayssiere.pdf</bibliosource>
     </biblioset>
     <biblioset role="proceedings">
       <confgroup>
@@ -139,7 +139,7 @@
    <author><personname><firstname>Matthieu</firstname><surname>Morel</surname></personname></author>
   </authorgroup>
       <citetitle>From distributed objects to hierarchical grid components</citetitle>
-      <bibliosource class="uri">http://www-sop.inria.fr/oasis/ProActive/doc/HierarchicalGridComponents.pdf</bibliosource>
+      <bibliosource class="uri">http://proactive.activeeon.com//userfiles/file/papers/HierarchicalGridComponents.pdf</bibliosource>
     </biblioset>
     <biblioset role="proceedings">
       <confgroup>
@@ -210,7 +210,7 @@
   </authorgroup>
       <citetitle>Towards seamless computing and metacomputing in java</citetitle>
       <pagenums>1043--1061</pagenums>
-      <bibliosource class="uri">http://www-sop.inria.fr/oasis/proactive/doc/javallCPE.ps</bibliosource>
+      <bibliosource class="uri">http://proactive.activeeon.com//userfiles/file/papers/javallCPE.ps</bibliosource>
     </biblioset>
     <biblioset role="proceedings">
       <confgroup>
@@ -232,7 +232,7 @@
    <author><personname><firstname>Henri E.</firstname><surname>Bal</surname></personname></author>
   </authorgroup>
       <citetitle>A High Performance Java Middleware with a Real Application</citetitle>
-      <bibliosource class="uri">http://www-sop.inria.fr/oasis/proactive/doc/sc2004.pdf</bibliosource>
+      <bibliosource class="uri">http://proactive.activeeon.com//userfiles/file/papers/sc2004.pdf</bibliosource>
      </biblioset>
     <biblioset role="proceedings">
       <confgroup><conftitle>Proceedings of the Supercomputing conference</conftitle>
