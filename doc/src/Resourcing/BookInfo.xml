@@ -77,9 +77,9 @@ to -->
 	</legalnotice>
 
 	<legalnotice xml:id="BugTrackingSystem">
-		<title>Bug-Traking System</title>
+		<title>Bug-Tracking System</title>
 		<para>
-			<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://bugs.activeeon.com/browse/PROACTIVE" />
+			<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://bugs.activeeon.com/browse/SCHEDULING" />
 		</para>
 	</legalnotice>
 
