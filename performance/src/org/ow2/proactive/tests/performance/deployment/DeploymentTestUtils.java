@@ -56,17 +56,13 @@ public class DeploymentTestUtils {
 
     static final String KILL_COMMAND = "kill";
 
-    static final String DIR_TEST_COMMAND = "cd";
+    static final String[] dirTestCommand(String path) {
+        return new String[] { "test", "-d", path };
+    }
 
     public static InetAddress checkHostIsAvailable(String hostName) {
         try {
             InetAddress hostAddr = InetAddress.getByName(hostName.trim());
-            /*
-            if (!hostAddr.isReachable(30000)) {
-                System.out.println("ERROR: InetAddress.isReachable is false for " + hostName);
-                return null;
-            }
-             */
             return hostAddr;
         } catch (UnknownHostException e) {
             System.out.println("Unknow host error for host " + hostName + ": " + e);
@@ -98,7 +94,7 @@ public class DeploymentTestUtils {
 
     public static boolean isJavaIsAvailable(InetAddress hostAddr, String javaPath)
             throws InterruptedException {
-        SSHProcessExecutor executor = SSHProcessExecutor.createExecutorSaveOutput("java -version", hostAddr,
+        ProcessExecutor executor = SSHProcessExecutor.createExecutorSaveOutput("java -version", hostAddr,
                 javaPath, "-version");
         return executor.executeAndWaitCompletion(10000, true);
     }
@@ -116,8 +112,8 @@ public class DeploymentTestUtils {
     }
 
     public static boolean isPathIsAvailable(InetAddress hostAddr, String path) throws InterruptedException {
-        SSHProcessExecutor executor = SSHProcessExecutor.createExecutorSaveOutput(DIR_TEST_COMMAND, hostAddr,
-                DIR_TEST_COMMAND, path);
+        ProcessExecutor executor = SSHProcessExecutor.createExecutorSaveOutput("check is directory",
+                hostAddr, dirTestCommand(path));
         return executor.executeAndWaitCompletion(10000, true);
     }
 
@@ -148,7 +144,7 @@ public class DeploymentTestUtils {
 
     public static List<String> listProcesses(InetAddress hostAddr, String stringToFind)
             throws InterruptedException {
-        SSHProcessExecutor ps = SSHProcessExecutor.createExecutorSaveOutput(PS_COMMAND, hostAddr, PS_COMMAND,
+        ProcessExecutor ps = SSHProcessExecutor.createExecutorSaveOutput(PS_COMMAND, hostAddr, PS_COMMAND,
                 "-ef");
         if (!ps.executeAndWaitCompletion(10000, true)) {
             return null;
@@ -164,7 +160,7 @@ public class DeploymentTestUtils {
 
     public static boolean killProcessesUsingPgrep(InetAddress hostAddr, String stringToFind)
             throws InterruptedException {
-        SSHProcessExecutor grep = SSHProcessExecutor.createExecutorSaveOutput(PGREP_COMMAND, hostAddr,
+        ProcessExecutor grep = SSHProcessExecutor.createExecutorSaveOutput(PGREP_COMMAND, hostAddr,
                 PGREP_COMMAND, "-f", stringToFind);
         grep.executeAndWaitCompletion(10000, false);
 
@@ -184,7 +180,7 @@ public class DeploymentTestUtils {
                 System.out.println("Invalid PID was detected: " + outputLine);
             }
         }
-        SSHProcessExecutor kill = SSHProcessExecutor.createExecutorSaveOutput(KILL_COMMAND, hostAddr,
+        ProcessExecutor kill = SSHProcessExecutor.createExecutorSaveOutput(KILL_COMMAND, hostAddr,
                 killCommand.toArray(new String[killCommand.size()]));
         return kill.executeAndWaitCompletion(10000, true);
     }

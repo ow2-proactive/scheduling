@@ -83,14 +83,29 @@ public class HostTestEnv {
     }
 
     public void createFileInEnv(File localFile, String targetFileName) throws Exception {
-        List<String> command = new ArrayList<String>();
-        command.add("rsync");
-        command.add(localFile.getAbsolutePath());
-        command.add(host.getHostName() + ":" + targetFileName);
-        ProcessExecutor rsync = new ProcessExecutor("rsync", command, false, true);
-        if (!rsync.executeAndWaitCompletion(10000, true)) {
-            throw new TestExecutionException("Failed to copy file '" + localFile.getAbsolutePath() +
-                "' to the " + host + ":" + targetFileName);
+        if (host.isLoopbackAddress()) {
+            File targetFile = new File(targetFileName);
+            if (!localFile.equals(targetFile)) {
+                List<String> command = new ArrayList<String>();
+                command.add("cp");
+                command.add(localFile.getAbsolutePath());
+                command.add(targetFileName);
+                ProcessExecutor cp = new ProcessExecutor("cp", command, false, true);
+                if (!cp.executeAndWaitCompletion(10000, true)) {
+                    throw new TestExecutionException("Failed to copy file '" + localFile.getAbsolutePath() +
+                        "' to the " + targetFileName);
+                }
+            }
+        } else {
+            List<String> command = new ArrayList<String>();
+            command.add("rsync");
+            command.add(localFile.getAbsolutePath());
+            command.add(host.getHostName() + ":" + targetFileName);
+            ProcessExecutor rsync = new ProcessExecutor("rsync", command, false, true);
+            if (!rsync.executeAndWaitCompletion(10000, true)) {
+                throw new TestExecutionException("Failed to copy file '" + localFile.getAbsolutePath() +
+                    "' to the " + host + ":" + targetFileName);
+            }
         }
     }
 }

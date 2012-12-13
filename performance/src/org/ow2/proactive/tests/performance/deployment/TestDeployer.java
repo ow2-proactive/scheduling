@@ -145,7 +145,9 @@ public abstract class TestDeployer {
             error = t;
             return null;
         } finally {
-            executor.killProcess();
+            if (executor.isRunningRemotely()) {
+                executor.killProcess();
+            }
 
             if (error != null) {
                 System.out.println("Error during server deployment: " + error);

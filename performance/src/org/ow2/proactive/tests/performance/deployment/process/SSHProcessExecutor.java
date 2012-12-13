@@ -46,41 +46,50 @@ public class SSHProcessExecutor extends ProcessExecutor {
 
     private static final String SSH_PATH = "ssh";
 
-    public static SSHProcessExecutor createExecutorSaveOutput(String commandName, InetAddress host,
+    public static ProcessExecutor createExecutorSaveOutput(String commandName, InetAddress host,
             String... command) {
         return createExecutorSaveOutput(commandName, host, Arrays.asList(command));
     }
 
-    public static SSHProcessExecutor createExecutorSaveOutput(String commandName, InetAddress host,
+    public static ProcessExecutor createExecutorSaveOutput(String commandName, InetAddress host,
             List<String> command) {
         return createExecutor(commandName, host, false, true, command);
     }
 
-    public static SSHProcessExecutor createExecutorPrintOutput(String commandName, InetAddress host,
+    public static ProcessExecutor createExecutorPrintOutput(String commandName, InetAddress host,
             String... command) {
         return createExecutorPrintOutput(commandName, host, Arrays.asList(command));
     }
 
-    public static SSHProcessExecutor createExecutorPrintOutput(String commandName, InetAddress host,
+    public static ProcessExecutor createExecutorPrintOutput(String commandName, InetAddress host,
             List<String> command) {
         return createExecutor(commandName, host, true, false, command);
     }
 
-    private static SSHProcessExecutor createExecutor(String commandName, InetAddress host,
-            boolean printOutput, boolean saveOutput, List<String> command) {
-        List<String> sshCommand = new ArrayList<String>();
-        sshCommand.add(SSH_PATH);
-        sshCommand.add("-o");
-        sshCommand.add("StrictHostKeyChecking no");
-        sshCommand.add(host.getHostName());
-        sshCommand.addAll(command);
-        return new SSHProcessExecutor("'" + commandName + " on " + host + "'", sshCommand, printOutput,
-            saveOutput);
+    private static ProcessExecutor createExecutor(String commandName, InetAddress host, boolean printOutput,
+            boolean saveOutput, List<String> command) {
+        if (host.isLoopbackAddress()) {
+            ProcessExecutor executor = new ProcessExecutor(commandName, command, printOutput, saveOutput);
+            return executor;
+        } else {
+            List<String> sshCommand = new ArrayList<String>();
+            sshCommand.add(SSH_PATH);
+            sshCommand.add("-o");
+            sshCommand.add("StrictHostKeyChecking no");
+            sshCommand.add(host.getHostName());
+            sshCommand.addAll(command);
+            return new SSHProcessExecutor("'" + commandName + " on " + host + "'", sshCommand, printOutput,
+                saveOutput);
+        }
     }
 
     private SSHProcessExecutor(String commandName, List<String> command, boolean printOutput,
             boolean saveOutput) {
         super(commandName, command, printOutput, saveOutput);
+    }
+
+    public boolean isRunningRemotely() {
+        return true;
     }
 
 }

@@ -38,6 +38,8 @@ package org.ow2.proactive.tests.performance.deployment.rm;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
@@ -54,6 +56,7 @@ import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
+import org.ow2.proactive.resourcemanager.nodesource.infrastructure.LocalInfrastructure;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.SSHInfrastructure;
 import org.ow2.proactive.resourcemanager.nodesource.policy.AccessType;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
@@ -248,36 +251,59 @@ public class TestRMDeployer extends TestDeployer {
 
     private boolean createNodeSource(ResourceManager rm, String rmUrl, String javaOptions,
             List<String> hosts, String nodeSourceName) throws Exception {
-        StringBuilder hostsListString = new StringBuilder();
-        for (String hostName : hosts) {
-            hostsListString.append(String.format("%s %d\n", hostName, rmNodesPerHost));
-        }
+        final int timeout = 60000;
 
-        int timeout = 60000;
-        int attempt = 1;
-        String sshOptions = "";
-        String targetOs = "UNIX";
+        final Object[] policyParameters = new Object[] { AccessType.ALL.toString(), AccessType.ALL.toString() };
+        final byte[] creds = serverHostEnv.getEnv().getSchedulingFolder().getRMCredentialsBytes();
 
-        byte[] creds = serverHostEnv.getEnv().getSchedulingFolder().getRMCredentialsBytes();
+        final String infractructure;
+        final Object[] infrastructureParameters;
 
         String nodeJavaOpts = System.getProperty("rm.deploy.rmNodesJavaOpts");
         if (nodeJavaOpts != null && !nodeJavaOpts.isEmpty()) {
             javaOptions += " " + nodeJavaOpts;
         }
 
-        Object[] infrastructureParameters = new Object[] { rmUrl, hostsListString.toString().getBytes(),
-                timeout, attempt, sshOptions, nodesTestEnv.getJavaPath(),
-                nodesTestEnv.getSchedulingFolder().getRootDirPath(), targetOs, javaOptions.toString(), creds };
+        if (isLocalHost(hosts)) {
+            infractructure = LocalInfrastructure.class.getName();
+            infrastructureParameters = new Object[] { rmUrl, creds, rmNodesPerHost, timeout, javaOptions };
 
-        Object[] policyParameters = new Object[] { AccessType.ALL.toString(), AccessType.ALL.toString() };
+            System.out.println(String.format(
+                    "Creating node source, local infrastructure, rmUrl=%s, hosts=%d, javaOptions: %s", rmUrl,
+                    rmNodesPerHost, javaOptions.toString()));
+        } else {
+            infractructure = SSHInfrastructure.class.getName();
 
-        System.out.println(String.format(
-                "Creating node source, ssh infrastructure, rmUrl=%s, hostsList=%s, javaOptions: %s", rmUrl,
-                hostsListString, javaOptions.toString()));
+            StringBuilder hostsListString = new StringBuilder();
+            for (String hostName : hosts) {
+                hostsListString.append(String.format("%s %d\n", hostName, rmNodesPerHost));
+            }
 
-        BooleanWrapper result = rm.createNodeSource(nodeSourceName, SSHInfrastructure.class.getName(),
-                infrastructureParameters, StaticPolicy.class.getName(), policyParameters);
+            int attempt = 1;
+            String sshOptions = "";
+            String targetOs = "UNIX";
+
+            infrastructureParameters = new Object[] { rmUrl, hostsListString.toString().getBytes(), timeout,
+                    attempt, sshOptions, nodesTestEnv.getJavaPath(),
+                    nodesTestEnv.getSchedulingFolder().getRootDirPath(), targetOs, javaOptions.toString(),
+                    creds };
+
+            System.out.println(String.format(
+                    "Creating node source, ssh infrastructure, rmUrl=%s, hostsList=%s, javaOptions: %s",
+                    rmUrl, hostsListString, javaOptions.toString()));
+        }
+
+        BooleanWrapper result = rm.createNodeSource(nodeSourceName, infractructure, infrastructureParameters,
+                StaticPolicy.class.getName(), policyParameters);
         return result.getBooleanValue();
+    }
+
+    private boolean isLocalHost(List<String> hosts) throws UnknownHostException {
+        if (hosts.size() == 1) {
+            return InetAddress.getByName(hosts.get(0)).isLoopbackAddress();
+        } else {
+            return false;
+        }
     }
 
     @Override

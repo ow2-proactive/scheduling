@@ -130,4 +130,8 @@ public class ProcessExecutor {
         return waiterThread.isProcessFinished();
     }
 
+    public boolean isRunningRemotely() {
+        return false;
+    }
+
 }
