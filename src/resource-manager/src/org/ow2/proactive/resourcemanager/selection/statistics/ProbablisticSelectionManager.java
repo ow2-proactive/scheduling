@@ -75,7 +75,7 @@ public class ProbablisticSelectionManager extends SelectionManager {
 
     // contains an information about already executed scripts
     // script digest => node => probability
-    private HashMap<String, HashMap<RMNode, Probability>> probabilities;
+    private HashMap<String, HashMap<String, Probability>> probabilities;
 
     // in order to avoid OOM when the number of scripts exceeds the limit
     // we could :
@@ -91,7 +91,7 @@ public class ProbablisticSelectionManager extends SelectionManager {
 
     public ProbablisticSelectionManager(RMCore rmcore) {
         super(rmcore);
-        this.probabilities = new HashMap<String, HashMap<RMNode, Probability>>();
+        this.probabilities = new HashMap<String, HashMap<String, Probability>>();
     }
 
     /**
@@ -122,8 +122,9 @@ public class ProbablisticSelectionManager extends SelectionManager {
                 double intersectionProbability = 1;
                 for (SelectionScript script : scripts) {
                     String digest = new String(script.digest());
-                    if (probabilities.containsKey(digest) && probabilities.get(digest).containsKey(rmnode)) {
-                        double probability = probabilities.get(digest).get(rmnode).value();
+                    if (probabilities.containsKey(digest) &&
+                        probabilities.get(digest).containsKey(rmnode.getNodeURL())) {
+                        double probability = probabilities.get(digest).get(rmnode.getNodeURL()).value();
                         if (probability == 0) {
                             intersection = false;
                             break;
@@ -176,8 +177,9 @@ public class ProbablisticSelectionManager extends SelectionManager {
         String digest;
         try {
             digest = new String(script.digest());
-            if (probabilities.containsKey(digest) && probabilities.get(digest).containsKey(rmnode)) {
-                Probability p = probabilities.get(digest).get(rmnode);
+            if (probabilities.containsKey(digest) &&
+                probabilities.get(digest).containsKey(rmnode.getNodeURL())) {
+                Probability p = probabilities.get(digest).get(rmnode.getNodeURL());
                 String scriptType = script.isDynamic() ? "dynamic" : "static";
                 if (logger.isDebugEnabled())
                     logger.debug(rmnode.getNodeURL() + " : " + script.hashCode() + " known " + scriptType +
@@ -211,8 +213,9 @@ public class ProbablisticSelectionManager extends SelectionManager {
         try {
             String digest = new String(script.digest());
             Probability probability = new Probability(Probability.defaultValue());
-            if (probabilities.containsKey(digest) && probabilities.get(digest).containsKey(rmnode)) {
-                probability = probabilities.get(digest).get(rmnode);
+            if (probabilities.containsKey(digest) &&
+                probabilities.get(digest).containsKey(rmnode.getNodeURL())) {
+                probability = probabilities.get(digest).get(rmnode.getNodeURL());
                 assert (probability.value() >= 0 && probability.value() <= 1);
             }
 
@@ -247,7 +250,7 @@ public class ProbablisticSelectionManager extends SelectionManager {
                     }
                 }
                 // adding a new script record
-                probabilities.put(digest, new HashMap<RMNode, Probability>());
+                probabilities.put(digest, new HashMap<String, Probability>());
                 logger.debug("Scripts cache size " + probabilities.size());
                 digestQueue.offer(digest);
             }
@@ -257,7 +260,7 @@ public class ProbablisticSelectionManager extends SelectionManager {
                     probability);
             }
 
-            probabilities.get(digest).put(rmnode, probability);
+            probabilities.get(digest).put(rmnode.getNodeURL().intern(), probability);
 
         } catch (NoSuchAlgorithmException e) {
             logger.error(e.getMessage(), e);
