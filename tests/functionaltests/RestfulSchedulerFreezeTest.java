@@ -48,16 +48,16 @@ public class RestfulSchedulerFreezeTest extends AbstractRestFuncTestCase {
     @BeforeClass
     public static void beforeClass() throws Exception {
         try {
-            RestFuncTHelper.startSchedulerWebapp();
+            RestFuncTHelper.startRestfulSchedulerWebapp();
         } catch (Exception e) {
-            RestFuncTHelper.stopSchedulerWebapp();
+            RestFuncTHelper.stopRestfulSchedulerWebapp();
             throw e;
         }
     }
 
     @AfterClass
     public static void afterClass() {
-        RestFuncTHelper.stopSchedulerWebapp();
+        RestFuncTHelper.stopRestfulSchedulerWebapp();
     }
 
     @Test

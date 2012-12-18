@@ -50,6 +50,7 @@ import org.jboss.resteasy.plugins.server.tjws.TJWSEmbeddedJaxrsServer;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
+import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
@@ -63,6 +64,7 @@ import org.ow2.proactive.resourcemanager.utils.RMStarter;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
+import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.util.SchedulerStarter;
 import org.ow2.proactive_grid_cloud_portal.rm.RMSessionMapper;
@@ -76,7 +78,6 @@ import org.ow2.proactive_grid_cloud_portal.webapp.JacksonProvider;
 import org.ow2.proactive_grid_cloud_portal.webapp.PersistentMapConverter;
 import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
 
-import functionaltests.utils.ProcessStateMonitor;
 import functionaltests.utils.ProcessStreamReader;
 import functionaltests.utils.RestFuncTUtils;
 
@@ -143,7 +144,7 @@ public class RestFuncTHelper {
     private RestFuncTHelper() {
     }
 
-    public static void startSchedulerWebapp() throws Exception {
+    public static void startRestfulSchedulerWebapp() throws Exception {
         PortalConfiguration.load(getdefaultPortalPropertiesPathname());
         String rmUrl = startResourceManager();
         startScheduler(rmUrl);
@@ -152,7 +153,7 @@ public class RestFuncTHelper {
         startResourceManagerSessionsCleaner();
     }
 
-    public static void stopSchedulerWebapp() {
+    public static void stopRestfulSchedulerWebapp() {
         stopEmbeddedServer();
         stopSchedulerSessionsCleaner();
         stopScheduler();
@@ -187,11 +188,7 @@ public class RestFuncTHelper {
         ProcessBuilder processBuilder = new ProcessBuilder(commandList);
         processBuilder.redirectErrorStream(true);
         rmProcess = processBuilder.start();
-
-        ProcessStateMonitor rmState = new ProcessStateMonitor("rm-process",
-                rmProcess);
-        rmState.start();
-
+        
         ProcessStreamReader out = new ProcessStreamReader(
                 "rm-process-output: ", rmProcess.getInputStream(), System.out);
         out.start();
@@ -275,10 +272,6 @@ public class RestFuncTHelper {
         processBuilder.redirectErrorStream(true);
         schedProcess = processBuilder.start();
 
-        ProcessStateMonitor schedState = new ProcessStateMonitor(
-                "scheduler-process", schedProcess);
-        schedState.start();
-
         ProcessStreamReader out = new ProcessStreamReader(
                 "scheduler-process-output: ", schedProcess.getInputStream(),
                 System.out);
@@ -307,17 +300,41 @@ public class RestFuncTHelper {
 
     public static void stopRm() {
         if (rmProcess != null) {
-            RestFuncTUtils.destory(rmProcess);
+            System.out.println("Shutting down resource manager process.");
             try {
-                RestFuncTUtils.cleanupRMActiveObjectRegistry();
-            } catch (Throwable t) {
+                RestFuncTUtils.destory(rmProcess);
+            } catch (Throwable error) {
+                System.err
+                        .println("An error occurred while shutting down resource manager process:");
+                error.printStackTrace();
+            } finally {
+                try {
+                    RestFuncTUtils.cleanupRMActiveObjectRegistry();
+                } catch (Throwable error) {
+                    System.err.println("An error occurred while cleaning up:");
+                    error.printStackTrace();
+                }
             }
         }
     }
 
     public static void stopScheduler() {
+        System.out.println("Shutting down scheduler process.");
         if (schedProcess != null) {
-            RestFuncTUtils.destory(schedProcess);
+            try {
+                RestFuncTUtils.destory(schedProcess);
+            } catch (Throwable error) {
+                System.err
+                        .println("An error occurred while shutting down scheduler process:");
+                error.printStackTrace();
+            } finally {
+                try {
+                    RestFuncTUtils
+                            .cleanupActiveObjectRegistry(SchedulerConstants.SCHEDULER_DEFAULT_NAME);
+                } catch (Throwable error) {
+
+                }
+            }
         }
     }
 
@@ -336,12 +353,20 @@ public class RestFuncTHelper {
         providerFactory.registerProvider(JacksonProvider.class);
         dispatcher.getRegistry()
                 .addPerRequestResource(SchedulerStateRest.class);
-        restfulSchedulerUrl = String.format("http://localhost:%d/scheduler/", serverPort);
+        restfulSchedulerUrl = String.format("http://localhost:%d/scheduler/",
+                serverPort);
     }
 
     public static void stopEmbeddedServer() {
-        if (embedded != null) {
-            embedded.stop();
+        try {
+            if (embedded != null) {
+                System.out.println("Shutting down embedded server.");
+                embedded.stop();
+            }
+        } catch (Throwable error) {
+            System.err
+                    .println("An error occurred while shutting down embedded server:");
+            error.printStackTrace();
         }
     }
 

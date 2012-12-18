@@ -39,15 +39,11 @@ package functionaltests.utils;
 
 import java.io.Closeable;
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.ServerSocket;
-import java.net.Socket;
 import java.net.URI;
 import java.net.URL;
 import java.security.PublicKey;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.remoteobject.AbstractRemoteObjectFactory;
@@ -57,18 +53,20 @@ import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
-import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 
 public class RestFuncTUtils {
 
     private RestFuncTUtils() {
     }
 
-    public static void destory(Process process) {
+    public static void destory(Process process) throws Exception {
         close(process.getOutputStream());
         close(process.getInputStream());
         close(process.getErrorStream());
         process.destroy();
+        process.waitFor();
+        System.out.println(String.format("Process ended with exit code %d. ",
+                process.exitValue()));
     }
 
     private static void close(Closeable stream) {

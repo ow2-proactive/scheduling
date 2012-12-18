@@ -28,6 +28,7 @@
 	<property name="src.dir" value="${projectRoot}/src" />
     <property name="src.tests.dir"    value="${projectRoot}/tests" />
     <property name="junit.dir"    value="${projectRoot}/junitReports" />
+    <property name="junit.grant.all.policy" value="${src.tests.dir}/functionaltests/config/client-java.security.policy" />
 
 	<path id="test.classpath">
 		<pathelement location="${classes.dir}"/>
@@ -92,10 +93,7 @@
 		<javac srcdir="${src.dir}" destdir="${classes.dir}" deprecation="false" failonerror="true" debug="true">
 			<classpath refid="src.classpath" />
 		</javac>
-        <javac srcdir="${src.tests.dir}" destdir="${classes.tests.dir}" deprecation="false" failonerror="true" debug="true">
-            <classpath refid="test.classpath" />
-        </javac>
-		
+	
 		<taskdef name="stubGenerator" classname="ant.AntStubGenerator" classpathref="src.classpath" />
 		<typedef name="class" classname="ant.AntStubGeneratorClass" classpathref="src.classpath" />
 		
@@ -105,8 +103,17 @@
 		
 	</target>
 
+	<target name="compile.tests" depends="compile">
+		<javac srcdir="${src.tests.dir}" destdir="${classes.tests.dir}" deprecation="false" failonerror="true" debug="true">
+			<classpath refid="test.classpath" />
+		</javac>
+		<copy todir="${classes.tests.dir}" overwrite="true">
+			<fileset dir="${src.tests.dir}" excludes="**/*.java" />
+		</copy>
+	</target>
 
-	<target name="war" depends="compile,junit,doc,schedulingrest-common-jar,schedulingrest-scheduler-jar,schedulingrest-rm-jar" description="Generate the war file">
+
+	<target name="war" depends="compile,doc,schedulingrest-common-jar,schedulingrest-scheduler-jar,schedulingrest-rm-jar" description="Generate the war file">
 		<!-- copy classes -->
 		<!--
 		<copy todir="WebContent/WEB-INF/classes">
@@ -240,10 +247,15 @@
 	<macrodef name="junitMacro">
 		<attribute name="testdir"/>
 		<sequential>
+			<fail unless="restapi.test.rm.home" message="restapi.test.rm.home property not defined" />
+			<fail unless="restapi.test.scheduler.home" message="restapi.test.scheduler.home property not defined" />
 			<delete dir="${junit.dir}"/>
 			<mkdir dir="${junit.dir}"/>
-			<junit printsummary="yes" forkmode="perTest" showoutput="true" timeout="300000" haltonfailure="true">
-
+			<junit printsummary="yes" showoutput="true" timeout="300000" haltonfailure="true">
+				<jvmarg value="-Djava.security.manager"/>
+				<jvmarg value="-Djava.security.policy=${junit.grant.all.policy}"/>					
+				<jvmarg value="-Drestapi.test.rm.home=${restapi.test.rm.home}"/>
+				<jvmarg value="-Drestapi.test.scheduler.home=${restapi.test.scheduler.home}"/>
 				<classpath>
 					<path refid="test.classpath"/>
 				</classpath>
@@ -251,13 +263,19 @@
 				<formatter type="xml"/>
 
 				<batchtest fork="yes" todir="${junit.dir}">
-					<fileset dir="@{testdir}"/>
+					<fileset dir="@{testdir}">
+						<include name="**/SchedulerStateRestTest.java" />
+						<include name="**/RestSchedulerJobTaskTest.java" />
+						<include name="**/RestSchedulerTest.java" />
+						<include name="**/RestfulSchedulerFreezeTest" />
+						<include name="**/RestSchedulerKillTest" />
+					</fileset>
 				</batchtest>
 			</junit>
 		</sequential>
 	</macrodef>
 
-	<target name="junit" depends="compile" description="Run rest tests">
+	<target name="junit" depends="compile.tests" description="Run rest tests">
 		<junitMacro testdir="${src.tests.dir}"/>
 	</target>
 

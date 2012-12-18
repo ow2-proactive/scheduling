@@ -49,9 +49,9 @@ public class RestSchedulerKillTest extends AbstractRestFuncTestCase {
     @BeforeClass
     public static void beforeClass() throws Exception {
         try {
-            RestFuncTHelper.startSchedulerWebapp();
+            RestFuncTHelper.startRestfulSchedulerWebapp();
         } catch (Exception e) {
-            RestFuncTHelper.stopSchedulerWebapp();
+            RestFuncTHelper.stopRestfulSchedulerWebapp();
             throw e;
         }
     }
