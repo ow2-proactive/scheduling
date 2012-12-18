@@ -878,7 +878,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @Produces("application/json;charset=" + ENCODING)
     public String getJobImage(@HeaderParam("sessionid")
     String sessionId, @PathParam("jobid")
-    String jobId) throws IOException {
+    String jobId) throws IOException, NotConnectedException {
+        checkAccess(sessionId);
 
         InputStream ips = null;
         String enc = null;
@@ -911,7 +912,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @Produces({ "application/json", "application/xml" })
     public String getJobMap(@HeaderParam("sessionid")
     String sessionId, @PathParam("jobid")
-    String jobId) throws IOException {
+    String jobId) throws IOException, NotConnectedException {
+        checkAccess(sessionId);
+
         String map = "";
         InputStream ips;
 

@@ -336,7 +336,7 @@ public interface SchedulerRestInterface {
     @Produces("application/xml")
     public String getJobMap(@HeaderParam("sessionid")
     String sessionId, @PathParam("jobid")
-    String jobId) throws IOException;
+    String jobId) throws IOException, NotConnectedException;
 
     /**
      * Returns a base64 utf-8 encoded png image corresponding to the jobid
@@ -354,7 +354,7 @@ public interface SchedulerRestInterface {
     @Produces("application/json;charset=" + ENCODING)
     public String getJobImage(@HeaderParam("sessionid")
     String sessionId, @PathParam("jobid")
-    String jobId) throws IOException;
+    String jobId) throws IOException, NotConnectedException;
 
     /**
      * Returns a list of taskState 

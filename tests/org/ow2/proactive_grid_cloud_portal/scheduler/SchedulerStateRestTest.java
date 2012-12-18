@@ -43,6 +43,9 @@ import org.jboss.resteasy.plugins.server.tjws.TJWSEmbeddedJaxrsServer;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
+import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 
 import java.io.File;
@@ -88,12 +91,13 @@ public class SchedulerStateRestTest {
         callGetJobImageAndVerifyOutput();
     }
 
-    private void callGetJobImageAndVerifyOutput() throws IOException {
+    private void callGetJobImageAndVerifyOutput() throws IOException, NotConnectedException {
         String pngIn = "ê";
         String jobId = createJobArchive(pngIn);
+        String sessionId = SchedulerSessionMapper.getInstance().add(new SchedulerProxyUserInterfaceForTests(), "bob");
 
         SchedulerRestInterface client = ProxyFactory.create(SchedulerRestInterface.class, "http://localhost:" + port + "/");
-        String pngAsBase64String = client.getJobImage("42", jobId);
+        String pngAsBase64String = client.getJobImage(sessionId, jobId);
         String pngOut = new String(Base64.decodeBase64(pngAsBase64String.getBytes(SchedulerRestInterface.ENCODING)), SchedulerRestInterface.ENCODING);
 
         assertEquals(pngIn, pngOut);
