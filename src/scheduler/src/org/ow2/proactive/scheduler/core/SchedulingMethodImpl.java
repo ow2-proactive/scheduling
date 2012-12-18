@@ -202,7 +202,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
             try {
                 while (nodeSet != null && !nodeSet.isEmpty()) {
                     EligibleTaskDescriptor taskDescriptor = tasksToSchedule.removeFirst();
-                    currentJob = core.jobs.get(taskDescriptor.getJobId());
+                    currentJob = core.jobsState.runningAndPendingJobs().get(taskDescriptor.getJobId());
                     InternalTask internalTask = currentJob.getIHMTasks().get(taskDescriptor.getTaskId());
 
                     // load and Initialize the executable container
@@ -262,13 +262,13 @@ final class SchedulingMethodImpl implements SchedulingMethod {
         ArrayList<JobDescriptor> list = new ArrayList<JobDescriptor>();
 
         //add running jobs
-        for (InternalJob j : core.runningJobs) {
+        for (InternalJob j : core.jobsState.runningJobs()) {
             list.add(j.getJobDescriptor());
         }
 
         //if scheduler is not paused, add pending jobs
         if (core.status != SchedulerStatus.PAUSED) {
-            for (InternalJob j : core.pendingJobs) {
+            for (InternalJob j : core.jobsState.pendingJobs()) {
                 list.add(j.getJobDescriptor());
             }
         }
@@ -300,7 +300,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
         if (maxResource > 0 && !bagOfTasks.isEmpty()) {
             EligibleTaskDescriptor etd = bagOfTasks.removeFirst();
             ((EligibleTaskDescriptorImpl) etd).addAttempt();
-            InternalJob currentJob = core.jobs.get(etd.getJobId());
+            InternalJob currentJob = core.jobsState.runningAndPendingJobs().get(etd.getJobId());
             InternalTask internalTask = currentJob.getIHMTasks().get(etd.getTaskId());
             int neededNodes = internalTask.getNumberOfNodesNeeded();
             SchedulingTaskComparator referent = new SchedulingTaskComparator(internalTask, currentJob
@@ -312,7 +312,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
                     if (!bagOfTasks.isEmpty()) {
                         etd = bagOfTasks.removeFirst();
                         ((EligibleTaskDescriptorImpl) etd).addAttempt();
-                        currentJob = core.jobs.get(etd.getJobId());
+                        currentJob = core.jobsState.runningAndPendingJobs().get(etd.getJobId());
                         internalTask = currentJob.getIHMTasks().get(etd.getTaskId());
                         neededNodes = internalTask.getNumberOfNodesNeeded();
                     }
@@ -363,7 +363,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
         }
 
         EligibleTaskDescriptor etd = tasksToSchedule.getFirst();
-        InternalJob currentJob = core.jobs.get(etd.getJobId());
+        InternalJob currentJob = core.jobsState.runningAndPendingJobs().get(etd.getJobId());
         InternalTask internalTask = currentJob.getIHMTasks().get(etd.getTaskId());
 
         try {
@@ -440,7 +440,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
             String errorMsg) {
         Set<InternalJob> alreadyDone = new HashSet<InternalJob>();
         for (EligibleTaskDescriptor eltd : tasksToSchedule) {
-            InternalJob ij = core.jobs.get(eltd.getJobId());
+            InternalJob ij = core.jobsState.runningAndPendingJobs().get(eltd.getJobId());
             InternalTask it = ij.getIHMTasks().get(eltd.getTaskId());
             if (alreadyDone.contains(ij)) {
                 continue;
@@ -450,8 +450,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
             // set the different informations on job if it is the first task of this job
             if (ij.getStartTime() < 0) {
                 ij.start();
-                core.pendingJobs.remove(ij);
-                core.runningJobs.add(ij);
+                core.jobsState.jobStarted(ij);
                 //update tasks events list and send it to front-end
                 core.updateTaskInfosList(ij, SchedulerEvent.JOB_PENDING_TO_RUNNING);
                 jlogger.info(ij.getId(), "started");
@@ -582,8 +581,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
         if (job.getStartTime() < 0) {
             // if it is the first task of this job
             job.start();
-            core.pendingJobs.remove(job);
-            core.runningJobs.add(job);
+            core.jobsState.jobStarted(job);
             //update tasks events list and send it to front-end
             core.updateTaskInfosList(job, SchedulerEvent.JOB_PENDING_TO_RUNNING);
             jlogger.info(job.getId(), "started");
@@ -599,7 +597,8 @@ final class SchedulingMethodImpl implements SchedulingMethod {
         core.getDBManager().jobTaskStarted(job, task, firstTaskStarted);
 
         //set this task as started
-        core.currentlyRunningTasks.get(task.getJobId()).put(task.getId(), launcher);
+        core.jobsState.taskStarted(task, launcher);
+
         // send task event to front-end
         core.frontend.taskStateUpdated(job.getOwner(), new NotificationData<TaskInfo>(
             SchedulerEvent.TASK_PENDING_TO_RUNNING, task.getTaskInfo()));

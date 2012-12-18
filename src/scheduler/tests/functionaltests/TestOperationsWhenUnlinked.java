@@ -74,6 +74,8 @@ public class TestOperationsWhenUnlinked extends FunctionalTest {
 
     static final String TASK_NAME = "Test task";
 
+    static final long EVENT_TIMEOUT = 30000;
+    
     public static class TestJavaTask extends JavaExecutable {
 
         @Override
@@ -137,7 +139,7 @@ public class TestOperationsWhenUnlinked extends FunctionalTest {
         helper.killRM();
 
         System.out.println("Waiting RM_DOWN event");
-        SchedulerTHelper.waitForEventSchedulerState(SchedulerEvent.RM_DOWN, 30000);
+        SchedulerTHelper.waitForEventSchedulerState(SchedulerEvent.RM_DOWN, EVENT_TIMEOUT);
 
         System.out.println("Killing job1");
         if (!scheduler.killJob(jobId1)) {
@@ -148,8 +150,8 @@ public class TestOperationsWhenUnlinked extends FunctionalTest {
             Assert.fail("Failed to kill job " + jobId2);
         }
 
-        SchedulerTHelper.waitForEventJobFinished(jobId1);
-        SchedulerTHelper.waitForEventPendingJobFinished(jobId2, 30000);
+        SchedulerTHelper.waitForEventJobFinished(jobId1, EVENT_TIMEOUT);
+        SchedulerTHelper.waitForEventPendingJobFinished(jobId2, EVENT_TIMEOUT);
 
         checkJobResult(scheduler, jobId1, 1);
         checkJobResult(scheduler, jobId2, 0);
@@ -165,7 +167,7 @@ public class TestOperationsWhenUnlinked extends FunctionalTest {
         helper.killRM();
 
         System.out.println("Waiting RM_DOWN event");
-        SchedulerTHelper.waitForEventSchedulerState(SchedulerEvent.RM_DOWN, 30000);
+        SchedulerTHelper.waitForEventSchedulerState(SchedulerEvent.RM_DOWN, EVENT_TIMEOUT);
 
         System.out.println("Submitting new job");
         JobId jobId2 = scheduler.submit(createJob());
@@ -189,8 +191,8 @@ public class TestOperationsWhenUnlinked extends FunctionalTest {
         }
 
         System.out.println("Waiting when jobs finish");
-        SchedulerTHelper.waitForEventJobFinished(jobId1);
-        SchedulerTHelper.waitForEventJobFinished(jobId2);
+        SchedulerTHelper.waitForEventJobFinished(jobId1, EVENT_TIMEOUT);
+        SchedulerTHelper.waitForEventJobFinished(jobId2, EVENT_TIMEOUT);
 
         checkJobResult(scheduler, jobId1, 1);
         checkJobResult(scheduler, jobId2, 1);
