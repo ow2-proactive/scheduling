@@ -14,6 +14,8 @@
 		<format property="rest_api.version" pattern="yyyyMMddHHmm" locale="en,UK" />
 	</tstamp>
 
+    <property name="doc.footer" value="Copyright 2007-2012 Activeeon All Rights Reserved." />
+
     <property name="projectRoot" value="${basedir}/.." />
     <property name="build.dir" value="${projectRoot}/build" />
     <property name="dist.dir" value="${projectRoot}/dist" />
@@ -162,20 +164,17 @@
 	</target>
 
 	<target name="doc" depends="doc-jaxrs">
-
 	</target>
 
-
 	<target name="doc-jaxrs" depends="doc-jaxb" description="Generate JAX-RS documentation">
-		<javadoc useexternalfile="true" classpathref="src.classpath" sourcepath="${src.dir}" destdir="${build.dir}/jaxrsdocs/" extdirs="${lib.dir}" doclet="com.lunatech.doclets.jax.jaxrs.JAXRSDoclet" docletpathref="src.classpath" footer="Copyright 2007-2011 Activeeon All Rights Reserved. ">
+		<javadoc useexternalfile="true" classpathref="src.classpath" sourcepath="${src.dir}" destdir="${build.dir}/jaxrsdocs/" extdirs="${lib.dir}" doclet="com.lunatech.doclets.jax.jaxrs.JAXRSDoclet" docletpathref="src.classpath" footer="${doc.footer}">
 			<package name="org.ow2.proactive_grid_cloud_portal.*" />
 			<link href="jaxbdocs/" />
 		</javadoc>
 	</target>
 
-
 	<target name="doc-jaxb" description="Generate JAXB documentation">
-		<javadoc useexternalfile="true" classpathref="src.classpath" sourcepath="${src.dir}" destdir="${build.dir}/jaxbdocs/" extdirs="${lib.dir}" doclet="com.lunatech.doclets.jax.jaxb.JAXBDoclet" docletpathref="src.classpath" footer="Copyright 2007-2011 Activeeon All Rights Reserved. ">
+		<javadoc useexternalfile="true" classpathref="src.classpath" sourcepath="${src.dir}" destdir="${build.dir}/jaxbdocs/" extdirs="${lib.dir}" doclet="com.lunatech.doclets.jax.jaxb.JAXBDoclet" docletpathref="src.classpath" footer="${doc.footer}">
 			<package name="org.ow2.proactive_grid_cloud_portal.*" />
 		</javadoc>
 	</target>
