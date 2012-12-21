@@ -37,6 +37,7 @@
 package functionaltests;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.URL;
 import java.security.PublicKey;
@@ -188,7 +189,7 @@ public class RestFuncTHelper {
         ProcessBuilder processBuilder = new ProcessBuilder(commandList);
         processBuilder.redirectErrorStream(true);
         rmProcess = processBuilder.start();
-        
+
         ProcessStreamReader out = new ProcessStreamReader(
                 "rm-process-output: ", rmProcess.getInputStream(), System.out);
         out.start();
@@ -198,10 +199,9 @@ public class RestFuncTHelper {
         String url = "rmi://localhost:" + port + "/";
 
         RMAuthentication rmAuth = RMConnection.waitAndJoin(url,
-                TimeUnit.SECONDS.toMillis(30));
+                TimeUnit.SECONDS.toMillis(60));
 
-        Credentials rmCredentials = RestFuncTUtils.createCredentials("admin",
-                "admin", rmAuth.getPublicKey());
+        Credentials rmCredentials = getRmCredentials();
         ResourceManager rm = rmAuth.login(rmCredentials);
 
         RMEventMonitor rmEventMonitor = new RMEventMonitor();
@@ -262,6 +262,8 @@ public class RestFuncTHelper {
                 + "file:" + getSchedLog4JConfigPathname());
         commandList.add(PASchedulerProperties.SCHEDULER_DEFAULT_FJT_LOG4J
                 .getCmdLine() + "file:" + getForkedTaskLog4JConfigPathname());
+        commandList.add(PASchedulerProperties.RESOURCE_MANAGER_CREDS
+                .getCmdLine() + "config/authentication/rm.cred");
         commandList.add("-cp");
         commandList.add(getClassPath());
         commandList.add(SchedulerStarter.class.getName());
@@ -281,7 +283,7 @@ public class RestFuncTHelper {
                 .getValueAsString();
         String url = "rmi://localhost:" + port + "/";
         SchedulerAuthenticationInterface schedAuth = SchedulerConnection
-                .waitAndJoin(url, TimeUnit.SECONDS.toMillis(30));
+                .waitAndJoin(url, TimeUnit.SECONDS.toMillis(60));
         schedulerPublicKey = schedAuth.getPublicKey();
         Credentials schedCred = RestFuncTUtils.createCredentials("admin",
                 "admin", schedulerPublicKey);
@@ -460,6 +462,12 @@ public class RestFuncTHelper {
     private static String getSchedHome() throws Exception {
         return RestFuncTestConfig.getInstance().getProperty(
                 RestFuncTestConfig.RESTAPI_TEST_SCHEDULER_HOME);
+    }
+
+    private static Credentials getRmCredentials() throws Exception {
+        File rmCredentails = new File(getRmHome(),
+                "config/authentication/rm.cred");
+        return Credentials.getCredentials(new FileInputStream(rmCredentails));
     }
 
     private static String getClassPath() throws Exception {
