@@ -36,6 +36,7 @@
  */
 package org.ow2.proactive.resourcemanager.selection;
 
+import java.security.Permission;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -58,6 +59,9 @@ import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.utils.NamedThreadFactory;
+import org.ow2.proactive.authentication.principals.IdentityPrincipal;
+import org.ow2.proactive.authentication.principals.TokenPrincipal;
+import org.ow2.proactive.permissions.PrincipalPermission;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
@@ -179,7 +183,7 @@ public abstract class SelectionManager {
         List<RMNode> freeNodes = rmcore.getFreeNodes();
         // filtering out the "free node list"
         // removing exclusion and checking permissions
-        List<RMNode> filteredNodes = filterOut(freeNodes, criteria.getBlackList(), client);
+        List<RMNode> filteredNodes = filterOut(freeNodes, criteria, client);
 
         if (filteredNodes.size() == 0) {
             return new NodeSet();
@@ -384,7 +388,24 @@ public abstract class SelectionManager {
      * @param client
      * @return
      */
-    private List<RMNode> filterOut(List<RMNode> freeNodes, NodeSet exclusion, Client client) {
+    private List<RMNode> filterOut(List<RMNode> freeNodes, Criteria criteria, Client client) {
+
+        NodeSet exclusion = criteria.getBlackList();
+
+        Permission tokenPermission = null;
+        boolean nodeWithTokenRequested = criteria.getNodeAccessToken() != null &&
+            criteria.getNodeAccessToken().length() > 0;
+        if (nodeWithTokenRequested) {
+            logger.debug("Node access token specified " + criteria.getNodeAccessToken());
+
+            TokenPrincipal tokenPrincipal = new TokenPrincipal(criteria.getNodeAccessToken());
+            client.getSubject().getPrincipals().add(tokenPrincipal);
+
+            Set<IdentityPrincipal> identities = new HashSet<IdentityPrincipal>();
+            identities.add(tokenPrincipal);
+            tokenPermission = new PrincipalPermission(client.getName(), identities);
+
+        }
 
         List<RMNode> filteredList = new ArrayList<RMNode>();
 
@@ -397,6 +418,12 @@ public abstract class SelectionManager {
             } catch (SecurityException e) {
                 // client does not have an access to this node
                 logger.debug(e.getMessage());
+                continue;
+            }
+
+            // if the node access token is specified we filtered out all nodes
+            // with other tokens but must also filter out nodes without tokens
+            if (nodeWithTokenRequested && !node.isProtectedByToken()) {
                 continue;
             }
 

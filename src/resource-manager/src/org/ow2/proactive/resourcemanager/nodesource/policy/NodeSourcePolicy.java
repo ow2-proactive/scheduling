@@ -68,15 +68,16 @@ public abstract class NodeSourcePolicy implements Serializable {
 
     /** logger */
     private static Logger logger = Logger.getLogger(NodeSourcePolicy.class);
+
     /** Node source of the policy */
     protected NodeSource nodeSource;
 
     // Users who can get nodes for computations from this node source
-    @Configurable(description = "ME|users=name1,name2,groups=group1,group2|ALL")
+    @Configurable(description = "ME|users=name1,name2;groups=group1,group2;tokens=t1,t2|ALL")
     private AccessType userAccessType = AccessType.ALL;
 
     // Users who can add/remove nodes to/from this node source
-    @Configurable(description = "ME|users=name1,name2,groups=group1,group2|ALL")
+    @Configurable(description = "ME|users=name1,name2;groups=group1,group2|ALL")
     private AccessType providerAccessType = AccessType.ME;
 
     /**

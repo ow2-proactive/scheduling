@@ -43,6 +43,7 @@ import java.util.Set;
 
 import org.ow2.proactive.authentication.principals.GroupNamePrincipal;
 import org.ow2.proactive.authentication.principals.IdentityPrincipal;
+import org.ow2.proactive.authentication.principals.TokenPrincipal;
 import org.ow2.proactive.authentication.principals.UserNamePrincipal;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 
@@ -80,6 +81,7 @@ public class AccessType implements Serializable {
     private String type;
     private String[] users;
     private String[] groups;
+    private String[] tokens;
 
     private AccessType() {
     }
@@ -106,7 +108,7 @@ public class AccessType implements Serializable {
             accessType.type = type;
 
             // parsing the string in the following format
-            // users=name1,name2,groups=group1,group2
+            // users=name1,name2;groups=group1,group2
             HashMap<String, String[]> values = new HashMap<String, String[]>();
             String[] semicolon = type.split(";");
             if (semicolon.length == 0) {
@@ -123,8 +125,9 @@ public class AccessType implements Serializable {
 
             accessType.users = values.get("users");
             accessType.groups = values.get("groups");
+            accessType.tokens = values.get("tokens");
 
-            if (accessType.users == null && accessType.groups == null) {
+            if (accessType.users == null && accessType.groups == null && accessType.tokens == null) {
                 throw new IllegalArgumentException("Incorrect parameter value " + type);
             }
         }
@@ -151,6 +154,13 @@ public class AccessType implements Serializable {
     }
 
     /**
+     * Gets the list of tokens if the following syntax was used tokens=t1,t2.
+     */
+    public String[] getTokens() {
+        return tokens;
+    }
+
+    /**
      * Returns a set of identity principals for the specified user depending
      * on the node source access type.
      */
@@ -173,6 +183,11 @@ public class AccessType implements Serializable {
         if (groups != null) {
             for (String group : groups) {
                 identities.add(new GroupNamePrincipal(group));
+            }
+        }
+        if (tokens != null) {
+            for (String token : tokens) {
+                identities.add(new TokenPrincipal(token));
             }
         }
         return identities;

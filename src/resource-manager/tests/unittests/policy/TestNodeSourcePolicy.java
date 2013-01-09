@@ -219,6 +219,11 @@ public class TestNodeSourcePolicy extends FunctionalTest {
             return null;
         }
 
+        @Override
+        public boolean isProtectedByToken() {
+            return false;
+        }
+
     }
 
     /** Actions to be Perform by this test.

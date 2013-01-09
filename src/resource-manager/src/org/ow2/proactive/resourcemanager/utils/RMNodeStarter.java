@@ -120,6 +120,13 @@ public class RMNodeStarter {
     /** Name of the java property to set the data spaces configuration status */
     public final static String DATASPACES_STATUS_PROP_NAME = "proactive.dataspaces.status";
 
+    /** If this property is added to node properties then this
+     *  node will be provides for 
+     * computations only if criteria have the same access token.
+     * 
+     */
+    public static final String NODE_ACCESS_TOKEN = "proactive.node.access.token";
+
     /**
      * The starter will try to connect to the Resource Manager before killing
      * itself that means that it will try to connect during
@@ -814,6 +821,10 @@ public class RMNodeStarter {
             if (localNode == null) {
                 logger.error(RMNodeStarter.ExitStatus.RMNODE_NULL.description);
                 System.exit(RMNodeStarter.ExitStatus.RMNODE_NULL.exitCode);
+            }
+            // setting system properties to node (they will be accessible remotely) 
+            for (Object key : System.getProperties().keySet()) {
+                localNode.setProperty(key.toString(), System.getProperty(key.toString()));
             }
         } catch (Throwable t) {
             logger.error("Unable to create the local node " + nodeName, t);

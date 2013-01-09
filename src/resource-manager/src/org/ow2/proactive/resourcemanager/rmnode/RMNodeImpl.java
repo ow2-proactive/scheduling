@@ -137,6 +137,9 @@ public class RMNodeImpl implements RMNode, Serializable {
 
     private String[] jmxUrls;
 
+    /** true if node is protected with token */
+    private boolean protectedByToken = false;
+
     /** Create an RMNode Object.
      * A Created node begins to be free.
      * @param node ProActive node deployed.
@@ -547,4 +550,11 @@ public class RMNodeImpl implements RMNode, Serializable {
         return jmxUrls[protocol.ordinal()];
     }
 
+    public boolean isProtectedByToken() {
+        return protectedByToken;
+    }
+
+    public void setProtectedByToken(boolean protectedByToken) {
+        this.protectedByToken = protectedByToken;
+    }
 }

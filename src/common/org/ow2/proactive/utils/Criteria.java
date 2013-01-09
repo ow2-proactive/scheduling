@@ -71,6 +71,8 @@ public class Criteria implements Serializable {
     private boolean bestEffort = true;
     // optional computation descriptors
     private Collection<String> computationDescriptors;
+    // token for accessing nodes
+    private String nodeAccessToken;
 
     /**
      * Creates criteria instance
@@ -160,4 +162,25 @@ public class Criteria implements Serializable {
     public void setComputationDescriptors(Collection<String> computationDescriptors) {
         this.computationDescriptors = computationDescriptors;
     }
+
+    /**
+     * If a token is specified the resource manager only looks for nodes having this token.
+     * If no token is specified in the criteria, nodes protected by token will not be selected.
+     *
+     * @return a key for accessing nodes
+     */
+    public String getNodeAccessToken() {
+        return nodeAccessToken;
+    }
+
+    /**
+     * If key is specified the resource manager only looks for nodes having this token.
+     * If no token is specified in the criteria, nodes protected by token will not be selected.
+     *
+     * @param nodeAccessKey
+     */
+    public void setNodeAccessToken(String nodeAccessToken) {
+        this.nodeAccessToken = nodeAccessToken;
+    }
+
 }

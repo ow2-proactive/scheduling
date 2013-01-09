@@ -43,6 +43,7 @@ import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
+import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
 
 import functionaltests.RMConsecutive;
@@ -50,28 +51,11 @@ import functionaltests.RMTHelper;
 
 
 /**
- *  Test checks "node users" parameter of the node source, which defines
- *  who can use nodes from it. Possible values of this parameter:
- *  ME(ns creator), MY_GROUPS, PROVIDER, PROVIDER_GROUPS, ALL
+ *  Checking node usage permissions defining by the following property in the NodeSourcePolicy
  *
- *	1. If set to ME, only ns creator can use nodes
+ *  @Configurable(description = "ME|users=name1,name2;groups=group1,group2;tokens=t1,t2|ALL")
+ *  private AccessType userAccessType = AccessType.ALL;
  *
- *	2. If set to MY_GROUPS, only people from creator groups can use nodes
- *
- *	3. If set to PROVIDER, only the node provider can use its own nodes
- *
- *  4. If set to PROVIDER_GROUPS, the node provider + people from its groups
- *     can use nodes of this provider.
- *
- *  5. If set to ALL no restriction on the nodes utilization.
- *  
- *  6. If set to a specific user/group only those users can add/remove (can remove only their nodes)
- *
- *  We suppose that the resource manager is configured in the way that
- *  3 users exist: admin, nsadmin, user
- *  admin and nsadmin are in the same group ("nsadmins")
- *
- *  Checking all possible combination of permissions.
  */
 public class TestNSNodesPermissions extends RMConsecutive {
 
@@ -94,7 +78,7 @@ public class TestNSNodesPermissions extends RMConsecutive {
         //we eat the configuring to free nodeevent
         helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
-        NodeSet nodes = nsadmin.getAtMostNodes(1, null);
+        NodeSet nodes = nsadmin.getNodes(new Criteria(1));
         //we eat free -> busy
         helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         Assert.assertEquals(1, nodes.size());
@@ -103,7 +87,7 @@ public class TestNSNodesPermissions extends RMConsecutive {
         helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
         ResourceManager user = helper.getResourceManager(null, "radmin", "pwd");
-        nodes = user.getAtMostNodes(1, null);
+        nodes = user.getNodes(new Criteria(1));
         Assert.assertEquals("User cannot get foreign node", 0, nodes.size());
 
         user.addNode(node2.getNodeInformation().getURL(), nsName).getBooleanValue();
@@ -112,7 +96,7 @@ public class TestNSNodesPermissions extends RMConsecutive {
         helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node2.getNodeInformation().getURL());
 
         nsadmin = helper.getResourceManager(null, "nsadmin", "pwd");
-        nodes = nsadmin.getAtMostNodes(2, null);
+        nodes = nsadmin.getNodes(new Criteria(2));
         //we eat free -> busy * 2
         helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
@@ -140,7 +124,7 @@ public class TestNSNodesPermissions extends RMConsecutive {
         helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
         user = helper.getResourceManager(null, "radmin", "pwd");
-        nodes = user.getAtMostNodes(1, null);
+        nodes = user.getNodes(new Criteria(1));
         Assert.assertEquals("User cannot get foreign node", 0, nodes.size());
 
         user.addNode(node2.getNodeInformation().getURL(), nsName).getBooleanValue();
@@ -149,7 +133,7 @@ public class TestNSNodesPermissions extends RMConsecutive {
         helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
         nsadmin = helper.getResourceManager(null, "nsadmin", "pwd");
-        nodes = nsadmin.getAtMostNodes(2, null);
+        nodes = nsadmin.getNodes(new Criteria(2));
         Assert.assertEquals(2, nodes.size());
         //we eat free -> busy * 2
         helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
@@ -186,7 +170,7 @@ public class TestNSNodesPermissions extends RMConsecutive {
         helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
         // admin can get 2 nodes as it has AllPermissions
-        nodes = admin.getAtMostNodes(2, null);
+        nodes = admin.getNodes(new Criteria(2));
         Assert.assertEquals("Admin did not get foreign node", 2, nodes.size());
         //we eat free -> busy * 2
         helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
@@ -197,7 +181,7 @@ public class TestNSNodesPermissions extends RMConsecutive {
         helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
         user = helper.getResourceManager(null, "radmin", "pwd");
-        nodes = admin.getAtMostNodes(2, null);
+        nodes = admin.getNodes(new Criteria(2));
         Assert.assertEquals(1, nodes.size());
         //we eat free -> busy
         helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
@@ -206,7 +190,7 @@ public class TestNSNodesPermissions extends RMConsecutive {
         helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
         nsadmin = helper.getResourceManager(null, "nsadmin", "pwd");
-        nodes = nsadmin.getAtMostNodes(2, null);
+        nodes = nsadmin.getNodes(new Criteria(2));
         Assert.assertEquals("Have got a foreign node", 0, nodes.size());
         nsadmin.releaseNodes(nodes);
 
@@ -237,7 +221,7 @@ public class TestNSNodesPermissions extends RMConsecutive {
         helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
         // admin can get 2 nodes as it has AllPermissions
-        nodes = admin.getAtMostNodes(2, null);
+        nodes = admin.getNodes(new Criteria(2));
         Assert.assertEquals("Admin did not get foreign node", 2, nodes.size());
         //we eat free -> busy * 2
         helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
@@ -248,7 +232,7 @@ public class TestNSNodesPermissions extends RMConsecutive {
         helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
         user = helper.getResourceManager(null, "radmin", "pwd");
-        nodes = admin.getAtMostNodes(2, null);
+        nodes = admin.getNodes(new Criteria(2));
         Assert.assertEquals(1, nodes.size());
         Assert.assertTrue(nodes.get(0).getNodeInformation().getURL().contains("node1"));
         //we eat free -> busy
@@ -258,7 +242,7 @@ public class TestNSNodesPermissions extends RMConsecutive {
         helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
         nsadmin = helper.getResourceManager(null, "nsadmin", "pwd");
-        nodes = nsadmin.getAtMostNodes(2, null);
+        nodes = nsadmin.getNodes(new Criteria(2));
         Assert.assertEquals("Have not get an admin node", 1, nodes.size());
         Assert.assertTrue(nodes.get(0).getNodeInformation().getURL().contains("node2"));
         //we eat free -> busy
@@ -286,13 +270,18 @@ public class TestNSNodesPermissions extends RMConsecutive {
         helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
         nsadmin = helper.getResourceManager(null, "nsadmin", "pwd");
-        nodes = nsadmin.getAtMostNodes(1, null);
+        Criteria criteria = new Criteria(1);
+        nodes = nsadmin.getNodes(criteria);
         Assert.assertEquals("Have got a foreign node", 1, nodes.size());
         //we eat the free to busy
         helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         nsadmin.releaseNodes(nodes);
         //we eat the busy to free
         helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+
+        criteria.setNodeAccessToken("non_existing_token");
+        nodes = nsadmin.getNodes(criteria);
+        Assert.assertEquals("Got a regular node while requesting a node with token", 0, nodes.size());
 
         // removing the node source
         admin = helper.getResourceManager(null, "admin", "admin");
@@ -313,18 +302,18 @@ public class TestNSNodesPermissions extends RMConsecutive {
         helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
         user = helper.getResourceManager(null, "radmin", "pwd");
-        nodes = user.getAtMostNodes(1, null);
+        nodes = user.getNodes(new Criteria(1));
         Assert.assertEquals("User cannot get foreign node", 0, nodes.size());
 
         user.addNode(node2.getNodeInformation().getURL(), nsName).getBooleanValue();
         helper.waitForNodeEvent(RMEventType.NODE_ADDED, node2.getNodeInformation().getURL());
         //we eat the configuring to free nodeevent
         helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        nodes = user.getAtMostNodes(1, null);
+        nodes = user.getNodes(new Criteria(1));
         Assert.assertEquals("User cannot even your own node", 0, nodes.size());
 
         nsadmin = helper.getResourceManager(null, "nsadmin", "pwd");
-        nodes = nsadmin.getAtMostNodes(2, null);
+        nodes = nsadmin.getNodes(new Criteria(2));
         Assert.assertEquals(2, nodes.size());
         //we eat free -> busy * 2
         helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
@@ -354,18 +343,18 @@ public class TestNSNodesPermissions extends RMConsecutive {
         helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
         user = helper.getResourceManager(null, "radmin", "pwd");
-        nodes = user.getAtMostNodes(1, null);
+        nodes = user.getNodes(new Criteria(1));
         Assert.assertEquals("User cannot get foreign node", 0, nodes.size());
 
         user.addNode(node2.getNodeInformation().getURL(), nsName).getBooleanValue();
         helper.waitForNodeEvent(RMEventType.NODE_ADDED, node2.getNodeInformation().getURL());
         //we eat the configuring to free nodeevent
         helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        nodes = user.getAtMostNodes(1, null);
+        nodes = user.getNodes(new Criteria(1));
         Assert.assertEquals("User cannot even your own node", 0, nodes.size());
 
         nsadmin = helper.getResourceManager(null, "nsadmin", "pwd");
-        nodes = nsadmin.getAtMostNodes(2, null);
+        nodes = nsadmin.getNodes(new Criteria(2));
         Assert.assertEquals(2, nodes.size());
         //we eat free -> busy * 2
         helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
@@ -377,7 +366,7 @@ public class TestNSNodesPermissions extends RMConsecutive {
 
         // removing the node source
         admin = helper.getResourceManager(null, "admin", "admin");
-        nodes = admin.getAtMostNodes(2, null);
+        nodes = admin.getNodes(new Criteria(2));
         Assert.assertEquals(2, nodes.size());
         //we eat free -> busy * 2
         helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
@@ -392,7 +381,59 @@ public class TestNSNodesPermissions extends RMConsecutive {
         helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
         helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
 
-        RMTHelper.log("Test6.3 - specific users and groups");
+        RMTHelper.log("Test6.3 - specific tokens");
+        admin = helper.getResourceManager(null, "admin", "admin");
+        admin.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null,
+                StaticPolicy.class.getName(), new Object[] { "tokens=token1,token2", "ALL" })
+                .getBooleanValue();
+
+        node = helper.createNode("node1").getNode();
+        admin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
+        helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+        //we eat the configuring to free nodeevent
+        helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+
+        criteria = new Criteria(1);
+        criteria.setNodeAccessToken("token1");
+        nodes = admin.getNodes(criteria);
+        Assert.assertEquals(1, nodes.size());
+        helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        admin.releaseNodes(nodes);
+        helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+
+        criteria.setNodeAccessToken("token2");
+        nodes = admin.getNodes(criteria);
+        Assert.assertEquals(1, nodes.size());
+        helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        admin.releaseNodes(nodes);
+        helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+
+        // admin has the right to get the node anyway
+        criteria.setNodeAccessToken("token3");
+        nodes = admin.getNodes(criteria);
+        Assert.assertEquals(1, nodes.size());
+        helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        admin.releaseNodes(nodes);
+        helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+
+        user = helper.getResourceManager(null, "radmin", "pwd");
+        criteria = new Criteria(1);
+        nodes = user.getNodes(criteria);
+        Assert.assertEquals(0, nodes.size());
+
+        criteria.setNodeAccessToken("token1");
+        nodes = user.getNodes(criteria);
+        helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        user.releaseNodes(nodes);
+        helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+
+        // removing the node source
+        admin = helper.getResourceManager(null, "admin", "admin");
+        admin.removeNodeSource(nsName, true).getBooleanValue();
+        helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+        helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
+
+        RMTHelper.log("Test6.4 - specific users and groups");
         admin = helper.getResourceManager(null, "admin", "admin");
         admin.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null,
                 StaticPolicy.class.getName(), new Object[] { "users=radmin;groups=nsadmins", "ALL" })
@@ -406,7 +447,7 @@ public class TestNSNodesPermissions extends RMConsecutive {
         helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
         user = helper.getResourceManager(null, "radmin", "pwd");
-        nodes = user.getAtMostNodes(1, null);
+        nodes = user.getNodes(new Criteria(1));
         Assert.assertEquals("User did not get a node but had a right to get it", 1, nodes.size());
         helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         nsadmin.releaseNodes(nodes);
@@ -416,7 +457,7 @@ public class TestNSNodesPermissions extends RMConsecutive {
         helper.waitForNodeEvent(RMEventType.NODE_ADDED, node2.getNodeInformation().getURL());
         //we eat the configuring to free nodeevent
         helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        nodes = user.getAtMostNodes(2, null);
+        nodes = user.getNodes(new Criteria(2));
         Assert.assertEquals("User did not get nodes but had a right to get them", 2, nodes.size());
         helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
@@ -425,7 +466,7 @@ public class TestNSNodesPermissions extends RMConsecutive {
         helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
         nsadmin = helper.getResourceManager(null, "nsadmin", "pwd");
-        nodes = nsadmin.getAtMostNodes(2, null);
+        nodes = nsadmin.getNodes(new Criteria(2));
         Assert.assertEquals(2, nodes.size());
         //we eat free -> busy * 2
         helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
@@ -439,6 +480,48 @@ public class TestNSNodesPermissions extends RMConsecutive {
         admin = helper.getResourceManager(null, "admin", "admin");
         admin.removeNodeSource(nsName, true).getBooleanValue();
         helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+        helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+        helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
+
+        RMTHelper.log("Test6.5 - specific users and token");
+        admin = helper.getResourceManager(null, "admin", "admin");
+        admin.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null,
+                StaticPolicy.class.getName(), new Object[] { "users=radmin;tokens=token1", "ALL" })
+                .getBooleanValue();
+
+        node = helper.createNode("node1").getNode();
+        admin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
+        helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+        //we eat the configuring to free nodeevent
+        helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+
+        user = helper.getResourceManager(null, "radmin", "pwd");
+        criteria = new Criteria(1);
+        criteria.setNodeAccessToken("token1");
+        nodes = user.getNodes(criteria);
+        Assert.assertEquals("User did not get a node but had a right to get it", 1, nodes.size());
+        helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        nsadmin.releaseNodes(nodes);
+        helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+
+        criteria.setNodeAccessToken("token2"); // still will get a node as radmin user
+        nodes = nsadmin.getNodes(criteria);
+        Assert.assertEquals(1, nodes.size());
+        helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        nsadmin.releaseNodes(nodes);
+        helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+
+        nsadmin = helper.getResourceManager(null, "nsadmin", "pwd");
+        criteria.setNodeAccessToken("token1");
+        nodes = nsadmin.getNodes(criteria);
+        Assert.assertEquals(1, nodes.size());
+        helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        nsadmin.releaseNodes(nodes);
+        helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+
+        // removing the node source
+        admin = helper.getResourceManager(null, "admin", "admin");
+        admin.removeNodeSource(nsName, true).getBooleanValue();
         helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
         helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
 

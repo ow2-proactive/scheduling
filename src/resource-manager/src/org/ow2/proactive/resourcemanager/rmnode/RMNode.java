@@ -299,4 +299,9 @@ public interface RMNode extends Comparable<RMNode> {
      * @return a jmx url 
      */
     public String getJMXUrl(JMXTransportProtocol protocol);
+
+    /**
+     * @return true if node is protected with token 
+     */
+    public boolean isProtectedByToken();
 }

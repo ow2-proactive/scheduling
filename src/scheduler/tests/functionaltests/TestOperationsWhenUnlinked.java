@@ -75,7 +75,7 @@ public class TestOperationsWhenUnlinked extends FunctionalTest {
     static final String TASK_NAME = "Test task";
 
     static final long EVENT_TIMEOUT = 30000;
-    
+
     public static class TestJavaTask extends JavaExecutable {
 
         @Override

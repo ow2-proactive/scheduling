@@ -41,6 +41,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -59,6 +60,8 @@ import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
+import org.ow2.proactive.authentication.principals.IdentityPrincipal;
+import org.ow2.proactive.authentication.principals.TokenPrincipal;
 import org.ow2.proactive.authentication.principals.UserNamePrincipal;
 import org.ow2.proactive.permissions.PrincipalPermission;
 import org.ow2.proactive.resourcemanager.authentication.Client;
@@ -77,6 +80,7 @@ import org.ow2.proactive.resourcemanager.nodesource.policy.NodeSourcePolicy;
 import org.ow2.proactive.resourcemanager.rmnode.RMDeployingNode;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 import org.ow2.proactive.resourcemanager.rmnode.RMNodeImpl;
+import org.ow2.proactive.resourcemanager.utils.RMNodeStarter;
 
 
 /**
@@ -371,10 +375,34 @@ public class NodeSource implements InitActive, RunActive {
             permissionOwner = provider;
         }
         // now selecting the type (user or group) and construct the permission
-        PrincipalPermission nodeAccessPermission = new PrincipalPermission(
-            node.getNodeInformation().getURL(), nodeUserAccessType.getIdentityPrincipals(permissionOwner));
+        Set<IdentityPrincipal> principals = (Set<IdentityPrincipal>) nodeUserAccessType
+                .getIdentityPrincipals(permissionOwner);
 
-        return new RMNodeImpl(node, stub, provider, nodeAccessPermission);
+        boolean tokenInNode = false;
+        boolean tokenInNodeSource = nodeUserAccessType.getTokens() != null &&
+            nodeUserAccessType.getTokens().length > 0;
+
+        try {
+            String nodeAccessToken = node.getProperty(RMNodeStarter.NODE_ACCESS_TOKEN);
+            tokenInNode = nodeAccessToken != null && nodeAccessToken.length() > 0;
+
+            if (tokenInNode) {
+                logger.debug("Node " + node.getNodeInformation().getURL() + " is protected by access token " +
+                    nodeAccessToken);
+                // it overrides all other principals
+                principals.clear();
+                principals.add(new TokenPrincipal(nodeAccessToken));
+            }
+        } catch (Exception e) {
+            throw new AddingNodesException(e);
+        }
+
+        PrincipalPermission nodeAccessPermission = new PrincipalPermission(
+            node.getNodeInformation().getURL(), principals);
+        RMNodeImpl rmnode = new RMNodeImpl(node, stub, provider, nodeAccessPermission);
+
+        rmnode.setProtectedByToken(tokenInNode || tokenInNodeSource);
+        return rmnode;
     }
 
     /**
