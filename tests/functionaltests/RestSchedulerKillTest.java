@@ -58,7 +58,7 @@ public class RestSchedulerKillTest extends AbstractRestFuncTestCase {
 
     @AfterClass
     public static void afterClass() {
-        RestFuncTHelper.stopEmbeddedServer();
+        RestFuncTHelper.stopRestfulSchedulerWebapp();
     }
 
     @Test

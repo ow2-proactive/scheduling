@@ -263,11 +263,11 @@
 
 				<batchtest fork="yes" todir="${junit.dir}">
 					<fileset dir="@{testdir}">
-						<include name="**/SchedulerStateRestTest.java" />
+						<include name="org/ow2/proactive_grid_cloud_portal/**/*Test.java" />
 						<include name="**/RestSchedulerJobTaskTest.java" />
 						<include name="**/RestSchedulerTest.java" />
-						<include name="**/RestfulSchedulerFreezeTest" />
-						<include name="**/RestSchedulerKillTest" />
+						<include name="**/RestfulSchedulerFreezeTest.java" />
+						<include name="**/RestSchedulerKillTest.java" />
 					</fileset>
 				</batchtest>
 			</junit>
