@@ -248,6 +248,9 @@
 				<include name="org/ow2/proactive/scheduler/util/process/CaseInsensitiveComparator.java" />
 				<include name="org/ow2/proactive/scheduler/util/process/ThreadReader.java" />
 				<include name="org/ow2/proactive/scheduler/util/process/ProcessTreeKiller.java" />
+                <include name="org/ow2/proactive/scheduler/util/process/Environment.java" />
+                <include name="org/ow2/proactive/scheduler/util/process/OperatingSystem.java" />
+                <include name="org/ow2/proactive/scheduler/util/process/OperatingSystemFamily.java" />
 				<include name="org/ow2/proactive/scheduler/common/Main.java" />
 				<include name="org/ow2/proactive/scheduler/common/util/Object2ByteConverter.java" />
 				<include name="org/ow2/proactive/scheduler/common/util/logforwarder/appenders/AsyncAppenderWithStorage.java" />

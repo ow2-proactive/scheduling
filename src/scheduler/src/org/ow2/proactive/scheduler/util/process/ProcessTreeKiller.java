@@ -36,30 +36,18 @@
  */
 package org.ow2.proactive.scheduler.util.process;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.jvnet.winp.WinProcess;
 import org.jvnet.winp.WinpException;
 import org.ow2.proactive.utils.FileToBytesConverter;
+
+import java.io.*;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 /**
@@ -69,6 +57,9 @@ import org.ow2.proactive.utils.FileToBytesConverter;
  * @since 1.201
  */
 public abstract class ProcessTreeKiller {
+
+    protected org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ProcessTreeKiller.class);
+
     /**
      * Kills the given process (like {@link Process#destroy()}
      * but also attempts to kill descendant processes created from the given
@@ -101,6 +92,13 @@ public abstract class ProcessTreeKiller {
      * @param modelEnvVars the model environment variables characterizing the process.
      */
     public abstract void kill(Process proc, Map<String, String> modelEnvVars);
+
+    /**
+     * Similar to kill(proc, modelEnvVars but doesn't require a main process, simply kill all processes which map a specific
+     * Env model
+     * @param modelEnvVars the model environment variables characterizing the process.
+     */
+    public abstract void kill(Map<String, String> modelEnvVars);
 
     /**
      * Creates a magic cookie that can be used as the model environment variable
@@ -141,6 +139,7 @@ public abstract class ProcessTreeKiller {
 
         for (Entry<String, String> e : modelEnvVar.entrySet()) {
             String v = envVar.get(e.getKey());
+            logger.debug("Matching Env Var " + e.getKey() + " , expected: " + e.getValue() + " found: " + v);
             if (v == null || !v.equals(e.getValue()))
                 return false; // no match
         }
@@ -159,6 +158,11 @@ public abstract class ProcessTreeKiller {
         @Override
         public void kill(Process proc, Map<String, String> modelEnvVars) {
             proc.destroy();
+        }
+
+        @Override
+        public void kill(Map<String, String> modelEnvVars) {
+            // do nothing
         }
     };
 
@@ -184,20 +188,36 @@ public abstract class ProcessTreeKiller {
         public void kill(Process proc, Map<String, String> modelEnvVars) {
             kill(proc);
 
-            for (WinProcess p : WinProcess.all()) {
-                if (p.getPid() < 10)
-                    continue; // ignore system processes like "idle process"
+            kill(modelEnvVars);
+        }
 
-                boolean matched;
-                try {
-                    matched = hasMatchingEnvVars(p.getEnvironmentVariables(), modelEnvVars);
-                } catch (WinpException e) {
-                    // likely a missing privilege
-                    continue;
+        @Override
+        public void kill(Map<String, String> modelEnvVars) {
+            if (modelEnvVars != null) {
+                for (WinProcess p : WinProcess.all()) {
+                    if (p.getPid() < 10)
+                        continue; // ignore system processes like "idle process"
+                    if (logger.isDebugEnabled()) {
+                        try {
+                            String cmdLine = p.getCommandLine();
+                            logger.debug("Analysing process " + p.getPid() + " : " + cmdLine);
+                        } catch (Exception e) {
+                            logger.debug("Analysing process " + p.getPid() + " : (cmd line unacessible)");
+                        }
+
+                    }
+                    boolean matched;
+                    try {
+                        matched = hasMatchingEnvVars(p.getEnvironmentVariables(), modelEnvVars);
+                    } catch (WinpException e) {
+                        logger.debug(e.getMessage());
+                        // likely a missing privilege
+                        continue;
+                    }
+
+                    if (matched)
+                        p.killRecursively();
                 }
-
-                if (matched)
-                    p.killRecursively();
             }
         }
 
@@ -238,6 +258,14 @@ public abstract class ProcessTreeKiller {
             if (modelEnvVars == null) {
                 p.killRecursively();
             } else {
+                kill(modelEnvVars);
+            }
+        }
+
+        @Override
+        public void kill(Map<String, String> modelEnvVars) {
+            if (modelEnvVars != null) {
+                S system = createSystem();
                 for (UnixProcess lp : system) {
                     if (hasMatchingEnvVars(lp.getEnvVars(), modelEnvVars))
                         lp.kill();

@@ -36,19 +36,6 @@
  */
 package org.ow2.proactive.scheduler.task;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintStream;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Random;
-
 import org.apache.log4j.Appender;
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Logger;
@@ -89,6 +76,10 @@ import org.ow2.proactive.scripting.ScriptHandler;
 import org.ow2.proactive.scripting.ScriptLoader;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.utils.FileToBytesConverter;
+
+import java.io.*;
+import java.util.*;
+import java.util.Map.Entry;
 
 
 /**
@@ -204,6 +195,11 @@ public class ForkedJavaExecutable extends JavaExecutable implements ForkerStarte
 
             if (!isKilled()) {
                 // if killed, the dataspace clean has been performed while calling kill()
+                try {
+                    newJavaTaskLauncher.killChildrenProcesses();
+                } catch (Throwable e) {
+                    logger.warn("Unable to kill children processes of remote task launcher.", e);
+                }
                 try {
                     newJavaTaskLauncher.closeNodeConfiguration();
                 } catch (Throwable e) {
@@ -787,9 +783,18 @@ public class ForkedJavaExecutable extends JavaExecutable implements ForkerStarte
      */
     @Override
     public void kill() {
+
         // close dataspaces before killing
         // so that we try to clean sctatch dir
         if (newJavaTaskLauncher != null) {
+            // we call the killing process on the forked jvm, this will kill as well its children processes
+            // kill all children processes
+            try {
+                newJavaTaskLauncher.killChildrenProcesses();
+            } catch (Exception e) {
+                logger.warn("Unable to kill children processes of remote task launcher.", e);
+            }
+
             try {
                 newJavaTaskLauncher.closeNodeConfiguration();
             } catch (Throwable e) {

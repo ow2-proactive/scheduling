@@ -36,12 +36,6 @@
  */
 package org.ow2.proactive.scheduler.task.launcher;
 
-import java.io.File;
-import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.net.URI;
-
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.objectweb.proactive.extensions.dataspaces.exceptions.DataSpacesException;
@@ -53,6 +47,12 @@ import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.NativeExecutable;
 import org.ow2.proactive.scheduler.task.NativeExecutableInitializer;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
+
+import java.io.File;
+import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.net.URI;
 
 
 /**
@@ -224,6 +224,11 @@ public class NativeTaskLauncher extends TaskLauncher {
             } else {
                 res = null;
             }
+
+            // kill all children processes
+
+            killChildrenProcesses();
+
             // finalize task in any cases (killed or not)
             terminateDataSpace();
             if (isWallTime()) {
