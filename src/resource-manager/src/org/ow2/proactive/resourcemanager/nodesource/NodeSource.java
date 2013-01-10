@@ -381,7 +381,13 @@ public class NodeSource implements InitActive, RunActive {
         try {
             DataSpaceNodeConfigurationAgent conf = (DataSpaceNodeConfigurationAgent) PAActiveObject
                     .newActive(DataSpaceNodeConfigurationAgent.class.getName(), null, node);
-            conf.closeNodeConfiguration();
+            // This call might be a blocking call when a file system is unreachable
+            BooleanWrapper result = conf.closeNodeConfiguration();
+            PAFuture.waitFor(result, DataSpaceNodeConfigurationAgent.DATASPACE_CLOSE_TIMEOUT);
+            if (result.getBooleanValue()) {
+                logger.debug("Dataspaces are successfully closed for node " +
+                    node.getNodeInformation().getURL());
+            }
         } catch (Throwable t) {
             logger.warn("Cannot close dataSpaces configuration", t);
         }
