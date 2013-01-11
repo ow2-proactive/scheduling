@@ -320,7 +320,7 @@ public abstract class InfrastructureManager implements Serializable {
 
     public void acquireAllNodes(Map<String, ?> nodeConfiguration) {
         throw new UnsupportedOperationException(
-                "Node configuration is not implemented for this infrastructure manager.");
+            "Node configuration is not implemented for this infrastructure manager.");
     }
 
     /**
@@ -382,12 +382,15 @@ public abstract class InfrastructureManager implements Serializable {
     protected final RMNodeStarter.CommandLineBuilder getDefaultCommandLineBuilder(OperatingSystem targetOS) {
         RMNodeStarter.CommandLineBuilder result = new RMNodeStarter.CommandLineBuilder();
         String javaPath = (System.getenv("JAVA_HOME") != null ? System.getenv("JAVA_HOME") : System
-                .getProperty("java.home")) + targetOS.fs + "bin" + targetOS.fs + "java";
+                .getProperty("java.home")) +
+            targetOS.fs + "bin" + targetOS.fs + "java";
         result.setJavaPath(javaPath);
         result.setTargetOS(targetOS);
         if (CentralPAPropertyRepository.PA_CONFIGURATION_FILE.isSet()) {
             try {
-                result.setPaProperties(new File(CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getValue()));
+                result
+                        .setPaProperties(new File(CentralPAPropertyRepository.PA_CONFIGURATION_FILE
+                                .getValue()));
             } catch (IOException e) {
                 logger.debug("Cannot set default pa configuration file for " +
                     RMNodeStarter.CommandLineBuilder.class.getSimpleName(), e);
@@ -523,9 +526,10 @@ public abstract class InfrastructureManager implements Serializable {
                     try {
                         toRunWhenOK.run();
                     } catch (Exception e) {
-                        logger.warn(
-                                "An exception occurred while running implementation's code whereas the node " +
-                                    nodeName + " was found.", e);
+                        logger
+                                .warn(
+                                        "An exception occurred while running implementation's code whereas the node " +
+                                            nodeName + " was found.", e);
                     }
                 }
                 return true;
@@ -534,9 +538,10 @@ public abstract class InfrastructureManager implements Serializable {
                     try {
                         toRunWhenKO.run();
                     } catch (Exception e) {
-                        logger.warn(
-                                "An exception occurred while running implementation's code whereas the node " +
-                                    nodeName + " was not found.", e);
+                        logger
+                                .warn(
+                                        "An exception occurred while running implementation's code whereas the node " +
+                                            nodeName + " was not found.", e);
                     }
                 }
                 return false;

@@ -69,6 +69,10 @@ import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingService
  */
 @PublicAPI
 public interface Scheduler extends SchedulerCoreMethods {
+
+    /** Attribute name in task the generic information indicating that the task requires a node protedcted by token */
+    public static final String NODE_ACCESS_TOKEN = "NODE_ACCESS_TOKEN";
+
     /**
      * Submit a new job to the scheduler.
      * A user can only managed their jobs.

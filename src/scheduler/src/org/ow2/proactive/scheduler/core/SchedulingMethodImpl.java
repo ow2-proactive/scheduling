@@ -57,6 +57,7 @@ import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.frontend.topology.TopologyDisabledException;
 import org.ow2.proactive.scheduler.common.NotificationData;
+import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
@@ -388,9 +389,9 @@ final class SchedulingMethodImpl implements SchedulingMethod {
                 criteria.setBlackList(internalTask.getNodeExclusion());
                 criteria.setBestEffort(bestEffort);
 
-                if (internalTask.getGenericInformations().containsKey(SchedulerCore.NODE_ACCESS_TOKEN)) {
+                if (internalTask.getGenericInformations().containsKey(Scheduler.NODE_ACCESS_TOKEN)) {
                     criteria.setNodeAccessToken(internalTask.getGenericInformations().get(
-                            SchedulerCore.NODE_ACCESS_TOKEN));
+                            Scheduler.NODE_ACCESS_TOKEN));
                 }
 
                 Collection<String> computationDescriptors = new ArrayList<String>(tasksToSchedule.size());
