@@ -185,6 +185,9 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
     private static final long SCHEDULER_AUTO_REMOVED_JOB_DELAY = PASchedulerProperties.SCHEDULER_AUTOMATIC_REMOVED_JOB_DELAY
             .getValueAsInt() * 1000;
 
+    /** Attribute name in task the generic information indicating that the task requires a node protedcted by token */
+    public static final String NODE_ACCESS_TOKEN = "NODE_ACCESS_TOKEN";
+
     /** Direct link to the current job to submit. */
     private InternalJobWrapper currentJobToSubmit;
 

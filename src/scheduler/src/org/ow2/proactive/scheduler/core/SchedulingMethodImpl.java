@@ -98,7 +98,6 @@ final class SchedulingMethodImpl implements SchedulingMethod {
     public static final Logger logger = Logger.getLogger(SchedulerCore.class);
     public static final TaskLogger tlogger = TaskLogger.getInstance();
     public static final JobLogger jlogger = JobLogger.getInstance();
-    private static final String NODE_ACCESS_TOKEN = "NODE_ACCESS_TOKEN";
 
     /** Number of time to retry an active object creation if it fails to create */
     protected static final int ACTIVEOBJECT_CREATION_RETRY_TIME_NUMBER = 3;
@@ -389,8 +388,9 @@ final class SchedulingMethodImpl implements SchedulingMethod {
                 criteria.setBlackList(internalTask.getNodeExclusion());
                 criteria.setBestEffort(bestEffort);
 
-                if (internalTask.getGenericInformations().containsKey(NODE_ACCESS_TOKEN)) {
-                    criteria.setNodeAccessToken(internalTask.getGenericInformations().get(NODE_ACCESS_TOKEN));
+                if (internalTask.getGenericInformations().containsKey(SchedulerCore.NODE_ACCESS_TOKEN)) {
+                    criteria.setNodeAccessToken(internalTask.getGenericInformations().get(
+                            SchedulerCore.NODE_ACCESS_TOKEN));
                 }
 
                 Collection<String> computationDescriptors = new ArrayList<String>(tasksToSchedule.size());

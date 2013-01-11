@@ -95,13 +95,17 @@ public class SchedulingTaskComparator {
         //if the parallel environment is specified for any of tasks => not equal
         boolean isParallel = task.isParallel() || tcomp.task.isParallel();
 
+        boolean requireNodeWithTokern = task.getGenericInformations().containsKey(
+                SchedulerCore.NODE_ACCESS_TOKEN) ||
+            tcomp.task.getGenericInformations().containsKey(SchedulerCore.NODE_ACCESS_TOKEN);
+
         // if topology is specified for any of task => not equal
         // for now topology is allowed only for parallel tasks which is
         // checked before
 
         // boolean topologySpecified = task.isTopologySpecified() || tcomp.task.isTopologySpecified();
         //add the 5 tests to the returned value
-        return sameSsHash && sameNodeEx && sameOwner && !isParallel;
+        return sameSsHash && sameNodeEx && sameOwner && !isParallel && !requireNodeWithTokern;
     }
 
     /**
