@@ -56,6 +56,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/ProActive/tablelayout.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ProActive/trilead-ssh2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ProActive/winp-1.5.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/ProActive/commons-cli-1.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/common/script/jruby.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/common/script/jython.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/common/rngpack-1.1a.jar"/>
@@ -161,6 +162,5 @@
 	<classpathentry exported="true" kind="lib" path="compile/lib/junit-4.11-SNAPSHOT-20120416-1530.jar"/>
 	<classpathentry kind="lib" path="dist/lib/commons-io-1.2.jar"/>
 	<classpathentry kind="lib" path="compile/lib/tools.jar"/>
-	<classpathentry kind="lib" path="/home/osmirnov/projects/proactive/scheduling/lib/ProActive/commons-cli-1.2.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>
