@@ -467,6 +467,10 @@ public class NodeSource implements InitActive, RunActive {
 
         infrastructureManager.acquireNode();
     }
+    
+    public void acquireNodes(int n, Map<String, ?> nodeConfiguration) {
+        infrastructureManager.acquireNodes(n, nodeConfiguration);
+    }
 
     /**
      * Requests all nodes to be acquired from the infrastructure.
@@ -480,6 +484,10 @@ public class NodeSource implements InitActive, RunActive {
         }
 
         infrastructureManager.acquireAllNodes();
+    }
+    
+    public void acquireAllNodes(Map<String, ?> nodeConfiguration) {
+        infrastructureManager.acquireAllNodes(nodeConfiguration);
     }
 
     /**
