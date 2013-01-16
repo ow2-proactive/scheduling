@@ -59,6 +59,7 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.converter.MakeDeepCopy;
 import org.ow2.proactive.db.annotation.Unloadable;
+import org.ow2.proactive.db.types.BigString;
 import org.ow2.proactive.scheduler.common.exception.ExecutableCreationException;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
@@ -77,6 +78,7 @@ import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskInfoImpl;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
+import org.ow2.proactive.scheduler.task.launcher.TaskLauncher.SchedulerVars;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncherInitializer;
 import org.ow2.proactive.utils.NodeSet;
 
@@ -1147,4 +1149,81 @@ public abstract class InternalTask extends TaskState {
         return fieldsToSerialize;
     }
 
+    /**
+     * 
+     * Return generic info replacing $PAS_JOB_NAME, $PAS_JOB_ID, $PAS_TASK_NAME, $PAS_TASK_ID, $PAS_TASK_ITERATION
+     * $PAS_TASK_REPLICATION by it's actual value
+     * 
+     */
+    public Map<String, String> getGenericInformations() {
+
+        if (taskInfo == null || genericInformations == null) {
+            // task is not yet properly initialized
+            return new HashMap<String, String>();
+        }
+
+        Map<String, String> info = new HashMap<String, String>();
+        for (Entry<String, BigString> e : this.genericInformations.entrySet()) {
+            String key = e.getKey();
+            BigString bigValue = e.getValue();
+            String value = bigValue.getValue();
+
+            for (SchedulerVars variable : SchedulerVars.values()) {
+                String javaStyleProperty = variable.toString();
+                String envStyleProperty = "$" + javaStyleProperty.toUpperCase().replace('.', '_');
+
+                String replaceWith = null;
+                switch (variable) {
+                    case JAVAENV_JOB_ID_VARNAME:
+                        if (taskInfo.getJobId() != null) {
+                            replaceWith = taskInfo.getJobId().toString();
+                        }
+                        break;
+                    case JAVAENV_JOB_NAME_VARNAME:
+                        if (taskInfo.getJobId() != null) {
+                            replaceWith = taskInfo.getJobId().getReadableName();
+                        }
+                        break;
+                    case JAVAENV_TASK_ID_VARNAME:
+                        if (taskInfo.getTaskId() != null) {
+                            replaceWith = taskInfo.getTaskId().toString();
+                        }
+                        break;
+                    case JAVAENV_TASK_NAME_VARNAME:
+                        if (taskInfo.getTaskId() != null) {
+                            replaceWith = taskInfo.getName();
+                        }
+                        break;
+                    case JAVAENV_TASK_ITERATION:
+                        replaceWith = String.valueOf(iteration);
+                        break;
+                    case JAVAENV_TASK_REPLICATION:
+                        replaceWith = String.valueOf(replication);
+                        break;
+                }
+
+                if (replaceWith != null) {
+                    value = value.replace(envStyleProperty, replaceWith);
+                }
+            }
+
+            info.put(key, value);
+        }
+
+        return info;
+    }
+
+    /**
+     * 
+     * Gets the task generic information. 
+     * @param replaceVariables - if set to true method replaces variables in the generic information
+     * 
+     */
+    public Map<String, String> getGenericInformations(boolean replaceVariables) {
+        if (replaceVariables) {
+            return this.getGenericInformations();
+        } else {
+            return super.getGenericInformations();
+        }
+    }
 }

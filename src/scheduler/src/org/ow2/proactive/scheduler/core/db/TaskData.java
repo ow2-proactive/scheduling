@@ -279,7 +279,7 @@ public class TaskData {
         taskData.setNumberOfExecutionOnFailureLeft(PASchedulerProperties.NUMBER_OF_EXECUTION_ON_FAILURE
                 .getValueAsInt());
         taskData.setNumberOfExecutionLeft(task.getMaxNumberOfExecution());
-        taskData.setGenericInformation(task.getGenericInformations());
+        taskData.setGenericInformation(task.getGenericInformations(false));
         taskData.updateMutableAttributes(task);
 
         if (task.getSelectionScripts() != null) {

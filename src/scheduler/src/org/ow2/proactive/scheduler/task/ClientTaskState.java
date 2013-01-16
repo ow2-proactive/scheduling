@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.ow2.proactive.scheduler.common.Scheduler;
-import org.ow2.proactive.scheduler.common.task.ParallelEnvironment;
 import org.ow2.proactive.scheduler.common.task.RestartMode;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
@@ -59,6 +58,7 @@ public final class ClientTaskState extends TaskState {
         this.maxNumberOfExecution = taskState.getMaxNumberOfExecution();
 
         this.setParallelEnvironment(taskState.getParallelEnvironment());
+        this.setGenericInformations(taskState.getGenericInformations());
 
         // Store only task IDs here; #restoreDependences is later called by
         // ClientJobState in order for this instance to store references to the
