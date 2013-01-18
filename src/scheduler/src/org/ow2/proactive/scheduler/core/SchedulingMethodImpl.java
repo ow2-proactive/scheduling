@@ -111,7 +111,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
 
     protected int activeObjectCreationRetryTimeNumber;
 
-    protected SchedulerCore core = null;
+    protected SchedulerCore core;
 
     protected TimeoutThreadPoolExecutor threadPool;
 
@@ -479,7 +479,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
 
         ExecutableContainerInitializer eci = new ExecutableContainerInitializer();
         // TCS can be null for non-java task
-        eci.setClassServer(core.getTaskClassServer(job.getId()));
+        eci.setClassServer(core.classServers.getTaskClassServer(job.getId()));
         task.getExecutableContainer().init(eci);
     }
 
