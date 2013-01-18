@@ -139,7 +139,7 @@ public class JobData {
         jobRuntimeData.setProjectName(job.getProjectName());
         jobRuntimeData.setInputSpace(job.getInputSpace());
         jobRuntimeData.setOutputSpace(job.getOutputSpace());
-        jobRuntimeData.setGenericInformation(job.getGenericInformations());
+        jobRuntimeData.setGenericInformation(job.getGenericInformations(false));
         jobRuntimeData.setStatus(job.getStatus());
         jobRuntimeData.setOwner(job.getOwner());
         jobRuntimeData.setCredentials(job.getCredentials());
