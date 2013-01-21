@@ -37,8 +37,6 @@
 package org.ow2.proactive.scheduler.core;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.ArrayList;
@@ -64,14 +62,8 @@ import org.objectweb.proactive.annotation.ImmediateService;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.api.PALifeCycle;
-import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.body.request.RequestFilter;
-import org.objectweb.proactive.core.remoteobject.RemoteObjectAdapter;
-import org.objectweb.proactive.core.remoteobject.RemoteObjectExposer;
-import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
-import org.objectweb.proactive.core.remoteobject.RemoteRemoteObject;
-import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.objectweb.proactive.utils.NamedThreadFactory;
 import org.ow2.proactive.db.DatabaseManager.FilteredExceptionCallback;
@@ -105,7 +97,6 @@ import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingService;
 import org.ow2.proactive.scheduler.core.annotation.RunActivityFiltered;
-import org.ow2.proactive.scheduler.core.db.JobClasspathContent;
 import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
 import org.ow2.proactive.scheduler.core.db.SchedulerStateRecoverHelper;
 import org.ow2.proactive.scheduler.core.jmx.SchedulerJMXHelper;
@@ -127,7 +118,6 @@ import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
 import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.TaskLogger;
-import org.ow2.proactive.scheduler.util.classloading.TaskClassServer;
 import org.ow2.proactive.utils.NodeSet;
 import org.ow2.proactive.utils.Tools;
 
@@ -209,6 +199,8 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
     /** Thread Pool used to get task progress status */
     private ExecutorService threadPool;
 
+    private ExecutorService threadPoolForTerminateTL;
+
     /** Timer used for remove result method (transient because Timer is not serializable) */
     private Timer removeJobTimer;
     /** Timer used for restarting tasks */
@@ -226,24 +218,10 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
     /** Jobs that must be logged into the corresponding appenders */
     Hashtable<JobId, AsyncAppender> jobsToBeLogged;
 
-    /** ClassLoading */
-    // contains taskCLassServer for currently running jobs
-    protected Hashtable<JobId, TaskClassServer> classServers;
-    protected Hashtable<JobId, RemoteObjectExposer<TaskClassServer>> remoteClassServers;
-
     /** Dataspaces Naming service */
     DataSpaceServiceStarter dataSpaceNSStarter;
 
-    /**
-     * Return the task classserver for the job jid.<br>
-     * return null if the classServer is undefine for the given jobId.
-     * 
-     * @param jid the job id 
-     * @return the task classserver for the job jid
-     */
-    public TaskClassServer getTaskClassServer(JobId jid) {
-        return classServers.get(jid);
-    }
+    SchedulerClassServers classServers;
 
     /**
      * Create a new taskClassServer for the job jid
@@ -254,66 +232,6 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
      */
     protected void addTaskClassServer(JobId jid, byte[] userClasspathJarFile, boolean deflateJar)
             throws ClassServerException {
-        if (getTaskClassServer(jid) != null) {
-            throw new ClassServerException("job " + jid + " classServer already exists");
-        }
-        try {
-            // create remote task classserver 
-            jlogger.info(jid, "creating the remote task classServer");
-            TaskClassServer localReference = new TaskClassServer(jid);
-            RemoteObjectExposer<TaskClassServer> remoteExposer = new RemoteObjectExposer<TaskClassServer>(
-                TaskClassServer.class.getName(), localReference);
-            URI uri = RemoteObjectHelper.generateUrl(jid.toString());
-            RemoteRemoteObject rro = remoteExposer.createRemoteObject(uri);
-            // must activate through local ref to avoid copy of the classpath content !
-            jlogger.info(jid, "activating local reference");
-            localReference.activate(userClasspathJarFile, deflateJar);
-            // store references
-            classServers.put(jid, (TaskClassServer) new RemoteObjectAdapter(rro).getObjectProxy());
-            remoteClassServers.put(jid, remoteExposer);// stored to be unregistered later
-        } catch (FileNotFoundException e) {
-            logger.error("", e);
-            throw new ClassServerException("Unable to create class server for job " + jid + " because " +
-                e.getMessage());
-        } catch (IOException e) {
-            logger.error("", e);
-            throw new ClassServerException("Unable to create class server for job " + jid + " because " +
-                e.getMessage());
-        } catch (UnknownProtocolException e) {
-            logger.error("", e);
-            throw new ClassServerException("Unable to create class server for job " + jid + " because " +
-                e.getMessage());
-        } catch (ProActiveException e) {
-            logger.error("", e);
-            throw new ClassServerException("Unable to create class server for job " + jid + " because " +
-                e.getMessage());
-        }
-    }
-
-    /**
-     * Remove the taskClassServer for the job jid.
-     * Delete the classpath associated in SchedulerCore.tmpJarFilesDir.
-     * @return true if a taskClassServer has been removed, false otherwise.
-     */
-    protected boolean removeTaskClassServer(JobId jid) {
-        jlogger.info(jid, "removing TaskClassServer");
-        // desactivate tcs
-        TaskClassServer tcs = classServers.remove(jid);
-        if (tcs != null) {
-            tcs.desactivate();
-        }
-        // unexport remote object
-        RemoteObjectExposer<TaskClassServer> roe = remoteClassServers.remove(jid);
-        if (roe != null) {
-            try {
-                jlogger.info(jid, "unregistering remote TaskClassServer");
-                roe.unregisterAll();
-            } catch (ProActiveException e) {
-                jlogger.error(jid, "unable to unregister remote taskClassServer because : " + e.getMessage());
-                logger.error("", e);
-            }
-        }
-        return (tcs != null);
     }
 
     /**
@@ -354,7 +272,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             Logger l = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + jid);
             l.removeAllAppenders();
             this.jobsToBeLogged.remove(jid);
-            removeTaskClassServer(jid);
+            classServers.removeTaskClassServer(jid);
             //auto remove
             if (SCHEDULER_AUTO_REMOVED_JOB_DELAY > 0) {
                 try {
@@ -391,9 +309,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
     public SchedulerCore(URI rmURL, SchedulerFrontend frontend, SchedulerDBManager dbManager,
             String policyFullName, InternalJobWrapper jobSubmitLink) {
         try {
-            // create classloading tools
-            this.classServers = new Hashtable<JobId, TaskClassServer>();
-            this.remoteClassServers = new Hashtable<JobId, RemoteObjectExposer<TaskClassServer>>();
+            this.classServers = new SchedulerClassServers(dbManager);
             this.dbManager = dbManager;
 
             //try connect to RM with Scheduler user
@@ -872,7 +788,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
         // TODO cdelbe : create classserver only when job is running ?
 
         // TODO: here can get classpath content directly from InternalJob
-        createTaskClassServer(job);
+        classServers.createTaskClassServer(job);
 
         jobsState.jobSubmitted(job);
 
@@ -997,8 +913,6 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
 
         jlogger.info(job.getId(), "finished (" + jobStatus + ")");
     }
-
-    private ExecutorService threadPoolForTerminateTL;
 
     /**
      * Invoke by a task when it is about to finish.
@@ -1379,28 +1293,6 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
         } else {
             l.info(logs.getStdoutLogs(false));
             l.error(logs.getStderrLogs(false));
-        }
-    }
-
-    /**
-     * Create a taskclassserver for this job if a jobclasspath is set
-     */
-    private void createTaskClassServer(InternalJob job) {
-        // restart classserver if needed
-        try {
-            String[] classpath = job.getEnvironment().getJobClasspath();
-            if (classpath != null && classpath.length > 0) {
-                JobClasspathContent cp = dbManager.loadJobClasspathContent(job.getEnvironment()
-                        .getJobClasspathCRC());
-                if (cp == null) {
-                    throw new ClassServerException("No classpath content is available for job " +
-                        job.getJobInfo().getJobId());
-                }
-                this.addTaskClassServer(job.getId(), cp.getClasspathContent(), cp.isContainsJarFiles());
-            }
-        } catch (ClassServerException e) {
-            throw new IllegalStateException("Cannot create TaskClassServer for job " +
-                job.getJobInfo().getJobId(), e);
         }
     }
 
@@ -2027,7 +1919,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
             switch (job.getStatus()) {
                 case PENDING:
                     // restart classserver if needed
-                    createTaskClassServer(job);
+                    classServers.createTaskClassServer(job);
                     break;
                 case STALLED:
                 case RUNNING:
@@ -2035,7 +1927,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                     job.startDataSpaceApplication(dataSpaceNSStarter.getNamingService(), dataSpaceNSStarter
                             .getNamingServiceURL());
                     // restart classServer if needed
-                    createTaskClassServer(job);
+                    classServers.createTaskClassServer(job);
                     break;
                 case FINISHED:
                 case CANCELED:
@@ -2044,7 +1936,7 @@ public class SchedulerCore implements SchedulerCoreMethods, TaskTerminateNotific
                     break;
                 case PAUSED:
                     // restart classserver if needed
-                    createTaskClassServer(job);
+                    classServers.createTaskClassServer(job);
             }
             //unload job environment once handled
             // DatabaseManager.getInstance().unload(job.getEnvironment());
