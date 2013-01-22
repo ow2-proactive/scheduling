@@ -36,20 +36,6 @@
  */
 package org.ow2.proactive.scheduler.task;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
-import java.util.StringTokenizer;
-
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
@@ -66,12 +52,11 @@ import org.ow2.proactive.scheduler.task.launcher.TaskLauncher.SchedulerVars;
 import org.ow2.proactive.scheduler.task.launcher.utils.ForkerUtils;
 import org.ow2.proactive.scheduler.util.process.ProcessTreeKiller;
 import org.ow2.proactive.scheduler.util.process.ThreadReader;
-import org.ow2.proactive.scripting.GenerationScript;
-import org.ow2.proactive.scripting.PropertyUtils;
-import org.ow2.proactive.scripting.ScriptHandler;
-import org.ow2.proactive.scripting.ScriptLoader;
-import org.ow2.proactive.scripting.ScriptResult;
+import org.ow2.proactive.scripting.*;
 import org.ow2.proactive.utils.Tools;
+
+import java.io.*;
+import java.util.*;
 
 
 /**
@@ -314,16 +299,17 @@ public class NativeExecutable extends Executable {
             try {
                 // redirect streams
                 BufferedReader sout = new BufferedReader(new InputStreamReader(process.getInputStream()));
-                BufferedReader serr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
                 Thread tsout = new Thread(new ThreadReader(sout, System.out, this));
-                Thread tserr = new Thread(new ThreadReader(serr, System.err, this));
                 tsout.start();
-                tserr.start();
                 // wait for process completion
                 process.waitFor();
                 // wait for log flush
+                // In case the process spawned other native subprocesses, the join will ensure to wait until those processes
+                // are properly finished (indeed the IO Stream should remain alive while the subprocesses live)
+                // This may look unuseful to do so, but often end-user programs are started via a simple batch or bash script which terminates
+                // quickly but starts and configure a main executable program. Without this wait, our task would stop
+                // instead of waiting for the main program to finish
                 tsout.join();
-                tserr.join();
 
                 //killTreeProcess(process);
                 return process.exitValue();
@@ -356,6 +342,7 @@ public class NativeExecutable extends Executable {
         } else {
             ospb = ForkerUtils.getOSProcessBuilderFactory().getBuilder();
         }
+        ospb.redirectErrorStream(true);
         //add command and directory
         ospb.command(this.command);
         ospb.directory(this.wDirFile);

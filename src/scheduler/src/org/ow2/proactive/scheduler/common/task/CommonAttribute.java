@@ -211,4 +211,23 @@ public abstract class CommonAttribute implements Serializable {
         }
     }
 
+    protected Map<String, String> applyReplacementsOnGenericInformation(Map<String, String> replacements) {
+        Map<String, String> replacedGenericInformation = new HashMap<String, String>();
+        for (Entry<String, BigString> e : this.genericInformations.entrySet()) {
+            String key = e.getKey();
+            BigString bigValue = e.getValue();
+            String value = bigValue.getValue();
+
+            for (Entry<String, String> replacement : replacements.entrySet()) {
+                String javaStyleProperty = replacement.getKey();
+                String envStyleProperty = "$" + javaStyleProperty.toUpperCase().replace('.', '_');
+                value = value.replace(envStyleProperty, replacement.getValue());
+            }
+
+            replacedGenericInformation.put(key, value);
+        }
+        return replacedGenericInformation;
+    }
+
+
 }

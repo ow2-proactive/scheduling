@@ -81,6 +81,7 @@ import org.ow2.proactive.scheduler.descriptor.TaskDescriptor;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
+import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
 
 
 /**
@@ -1390,6 +1391,41 @@ public abstract class InternalJob extends JobState {
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     *
+     * Return generic info replacing $PAS_JOB_NAME, $PAS_JOB_ID, $PAS_TASK_NAME, $PAS_TASK_ID, $PAS_TASK_ITERATION
+     * $PAS_TASK_REPLICATION by it's actual value
+     *
+     */
+    public Map<String, String> getGenericInformations() {
+        if (genericInformations == null) {
+            // task is not yet properly initialized
+            return new HashMap<String, String>();
+        }
+
+        Map<String, String> replacements = new HashMap<String, String>();
+        JobId jobId = jobInfo.getJobId();
+        if (jobId != null) {
+            replacements.put(TaskLauncher.SchedulerVars.JAVAENV_JOB_ID_VARNAME.toString(), jobId.toString());
+            replacements.put(TaskLauncher.SchedulerVars.JAVAENV_JOB_NAME_VARNAME.toString(), jobId.getReadableName());
+        }
+        return applyReplacementsOnGenericInformation(replacements);
+    }
+
+    /**
+     *
+     * Gets the task generic information.
+     * @param replaceVariables - if set to true method replaces variables in the generic information
+     *
+     */
+    public Map<String, String> getGenericInformations(boolean replaceVariables) {
+        if (replaceVariables) {
+            return this.getGenericInformations();
+        } else {
+            return super.getGenericInformations();
         }
     }
 

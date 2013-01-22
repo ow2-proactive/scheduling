@@ -1,5 +1,5 @@
-SET file=%0
-SET DIR=%file%\..
 echo Process tree killer test : detached command
 
-cmd /C "%DIR%\TestSleep.exe"
+echo Running in : %CD%
+
+start /B cmd.exe /C TestSleep.exe > NUL 2>&1

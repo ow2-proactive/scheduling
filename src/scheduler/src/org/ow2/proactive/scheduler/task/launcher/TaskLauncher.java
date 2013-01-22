@@ -36,25 +36,6 @@
  */
 package org.ow2.proactive.scheduler.task.launcher;
 
-import java.io.IOException;
-import java.io.PrintStream;
-import java.lang.reflect.Method;
-import java.security.KeyException;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.StringTokenizer;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import org.apache.log4j.Appender;
 import org.apache.log4j.FileAppender;
 import org.apache.log4j.Logger;
@@ -78,11 +59,7 @@ import org.ow2.proactive.db.types.BigString;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.exception.UserException;
-import org.ow2.proactive.scheduler.common.task.ExecutableInitializer;
-import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
-import org.ow2.proactive.scheduler.common.task.TaskId;
-import org.ow2.proactive.scheduler.common.task.TaskLogs;
-import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.task.*;
 import org.ow2.proactive.scheduler.common.task.dataspaces.FileSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
@@ -99,12 +76,17 @@ import org.ow2.proactive.scheduler.exception.ProgressPingerException;
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.KillTask;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
-import org.ow2.proactive.scripting.PropertyUtils;
-import org.ow2.proactive.scripting.Script;
-import org.ow2.proactive.scripting.ScriptHandler;
-import org.ow2.proactive.scripting.ScriptLoader;
-import org.ow2.proactive.scripting.ScriptResult;
+import org.ow2.proactive.scheduler.util.process.Environment;
+import org.ow2.proactive.scheduler.util.process.ProcessTreeKiller;
+import org.ow2.proactive.scripting.*;
 import org.ow2.proactive.utils.Formatter;
+
+import java.io.IOException;
+import java.io.PrintStream;
+import java.lang.reflect.Method;
+import java.security.*;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 
 /**
@@ -128,6 +110,14 @@ public abstract class TaskLauncher {
     // Standard out/err are stored to be restored after execution
     public static final PrintStream SYSTEM_OUT = System.out;
     public static final PrintStream SYSTEM_ERR = System.err;
+
+    private static String COOKIE_ENV = "TL_COOKIE";
+
+    private String last_cookie_value;
+
+    private boolean isCookieSet = false;
+
+    private Map<String, String> modelEnvVar = null;
 
     public static final String EXECUTION_SUCCEED_BINDING_NAME = "success";
     public static final String DS_SCRATCH_BINDING_NAME = "localspace";
@@ -278,6 +268,8 @@ public abstract class TaskLauncher {
     private void init() {
         // plug stdout/err into a socketAppender
         this.initLoggers();
+        // set the cookie used to mark children processes
+        this.setPTKCookie();
         // set scheduler defined env variables
         this.initEnv();
         logger.debug("TaskLauncher initialized");
@@ -422,6 +414,70 @@ public abstract class TaskLauncher {
         // previously exported and propagated vars must be deleted
         System.clearProperty(PropertyUtils.EXPORTED_PROPERTIES_VAR_NAME);
         System.clearProperty(PropertyUtils.PROPAGATED_PROPERTIES_VAR_NAME);
+    }
+
+    /**
+     * This method sets a cookie among the system environment variables of this JVM.
+     * This cookie will be used later during the task termination to kill all children processes
+     */
+    protected void setPTKCookie() {
+        // the node name is added to the cookie to be sure that there can be no overlapping
+        // between the different nodes of the same machine
+        if (taskId.value() != null) {
+            last_cookie_value = taskId.value() + "_" + ProcessTreeKiller.createCookie();
+        } else {
+            last_cookie_value = ProcessTreeKiller.createCookie();
+        }
+        Environment.setenv(COOKIE_ENV, last_cookie_value, true);
+        modelEnvVar = new HashMap<String, String>();
+        modelEnvVar.put(COOKIE_ENV, last_cookie_value);
+        isCookieSet = true;
+    }
+
+    /**
+     * This method unsets the cookie previously set by setPTKCookie.
+     */
+    protected void unsetPTKCookie() {
+        try {
+            Environment.unsetenv(COOKIE_ENV);
+        } catch (Exception e) {
+            logger.error("Exception when unsetting the cookie", e);
+        }
+        isCookieSet = false;
+    }
+
+    /**
+     * This methods reset the same cookie which was previously used
+     */
+    protected void resetPTKCookie() {
+        Environment.setenv(COOKIE_ENV, last_cookie_value, true);
+    }
+
+    protected boolean isPTKCookieSet() {
+        return isCookieSet;
+    }
+
+    /**
+     * This method kills all children processes possibly spawned by this task
+     * It makes sure it is called only once
+     */
+    @ImmediateService
+    public boolean killChildrenProcesses() {
+        // We first start a dummy process which will inherit the cookie env variable.
+        if (isPTKCookieSet()) {
+            logger.debug("Killing children process of task");
+            // unsets the cookie for the current Java process
+            unsetPTKCookie();
+
+            try {
+                // kills all processes tagged by the env cookie
+                ProcessTreeKiller.get().kill(modelEnvVar);
+            } catch (Throwable e) {
+                logger.warn("Unable to kill children processes", e);
+            }
+
+        }
+        return true;
     }
 
     /**
@@ -725,8 +781,18 @@ public abstract class TaskLauncher {
         if (!normalTermination) {
             this.hasBeenKilled = true;
             if (this.currentExecutable != null) {
-                this.currentExecutable.kill();
-                this.currentExecutable = null;
+                try {
+                    this.currentExecutable.kill();
+
+                } catch (Exception e) {
+                    logger.warn("Exception occurred while executing kill on task " + taskId.value(), e);
+                } finally {
+                    this.currentExecutable = null;
+                    // kill Children Processes and unsets the cookie
+                    // kill all children processes
+
+                    killChildrenProcesses();
+                }
             }
 
             // unset env
@@ -822,7 +888,9 @@ public abstract class TaskLauncher {
                 }
             } catch (Exception e) {
                 logger
-                        .warn("There was a problem while terminating dataSpaces. Dataspaces on this node might not work anymore.");
+                        .warn("There was a problem while terminating dataSpaces. Dataspaces on this node might not work anymore : " +
+                            e.getMessage());
+                logger.debug(e);
                 // cannot add this message to dataspaces status as it is called in finally block
             }
         }

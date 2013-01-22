@@ -36,16 +36,6 @@
  */
 package org.ow2.proactive.scheduler.task.launcher;
 
-import java.io.Serializable;
-import java.lang.reflect.InvocationTargetException;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.ImmediateService;
 import org.objectweb.proactive.api.PAActiveObject;
@@ -62,6 +52,12 @@ import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
+
+import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.*;
 
 
 /**
@@ -207,6 +203,10 @@ public class JavaTaskLauncher extends TaskLauncher {
             } else {
                 res = null;
             }
+
+            // kill all children processes
+
+            killChildrenProcesses();
 
             // finalize doTask
             terminateDataSpace();

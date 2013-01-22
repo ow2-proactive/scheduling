@@ -37,6 +37,7 @@
 package org.ow2.proactive.resourcemanager.nodesource.policy;
 
 import java.io.Serializable;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
@@ -153,6 +154,17 @@ public abstract class NodeSourcePolicy implements Serializable {
         }
     }
 
+    public void acquireNodes(int n, Map<String, ?> nodeConfiguration) {
+        if (n < 0) {
+            throw new IllegalArgumentException("Negative nodes number " + n);
+        }
+        if (n == 0) {
+            return;
+        }
+        info("Acquiring " + n + " nodes with configuration");
+        nodeSource.acquireNodes(n, nodeConfiguration);
+    }
+
     /**
      * Asynchronous request to acquires all possible nodes from infrastructure
      */
@@ -165,7 +177,7 @@ public abstract class NodeSourcePolicy implements Serializable {
      * Removes n nodes from the node source
      *
      * @param n number of nodes
-     * @param preemtive if true remove nodes immediately without waiting while they will be freed
+     * @param preemptive if true remove nodes immediately without waiting while they will be freed
      */
     protected void removeNodes(int n, boolean preemptive) {
         info("Removing " + n + " nodes");
@@ -176,7 +188,7 @@ public abstract class NodeSourcePolicy implements Serializable {
      * Removes a node from the node source
      *
      * @param url the URL of the node
-     * @param preemtive if true remove nodes immediately without waiting while they will be freed
+     * @param preemptive if true remove nodes immediately without waiting while they will be freed
      */
     protected void removeNode(String url, boolean preemptive) {
         info("Removing node at " + url);

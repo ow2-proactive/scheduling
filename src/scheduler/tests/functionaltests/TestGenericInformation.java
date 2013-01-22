@@ -40,6 +40,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 
 import junit.framework.Assert;
+import org.junit.Test;
 
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -58,7 +59,7 @@ import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
  * $PAS_TASK_REPLICATION are replaced by it's actual value in generic information.
  * 
  */
-public class TestTaskGenericInfo extends SchedulerConsecutive {
+public class TestGenericInformation extends SchedulerConsecutive {
 
     private final String TASK_NAME = "task name";
     private final String JOB_NAME = "job name";
@@ -71,7 +72,7 @@ public class TestTaskGenericInfo extends SchedulerConsecutive {
         }
     }
 
-    @org.junit.Test
+    @Test
     public void run() throws Throwable {
         testRegularJob();
         testWithReplication();
@@ -80,6 +81,7 @@ public class TestTaskGenericInfo extends SchedulerConsecutive {
     private TaskFlowJob createJob() throws Exception {
         TaskFlowJob job = new TaskFlowJob();
         job.setName(JOB_NAME);
+        setGenericInfo(job);
 
         JavaTask javaTask = new JavaTask();
         javaTask.setExecutableClassName(TestJavaTask.class.getName());
@@ -89,6 +91,11 @@ public class TestTaskGenericInfo extends SchedulerConsecutive {
         job.addTask(javaTask);
 
         return job;
+    }
+
+    private void setGenericInfo(TaskFlowJob job) {
+        job.addGenericInformation("PAS_JOB_NAME", "$PAS_JOB_NAME");
+        job.addGenericInformation("PAS_JOB_ID", "$PAS_JOB_ID");
     }
 
     private static void setGenericInfo(JavaTask javaTask) {
@@ -106,7 +113,21 @@ public class TestTaskGenericInfo extends SchedulerConsecutive {
         SchedulerTHelper.log("Job submitted, id " + jobId.toString());
         JobState js = SchedulerTHelper.waitForEventJobSubmitted(jobId);
 
+        checkJobState(js);
         checkTaskState(js.getTasks().get(0));
+    }
+
+    public void checkJobState(JobState jobState) {
+
+        HashMap<String, String> expected = new HashMap<String, String>();
+        expected.put("PAS_JOB_NAME", jobState.getId().getReadableName());
+        expected.put("PAS_JOB_ID", jobState.getId().toString());
+
+        for (String key : expected.keySet()) {
+            Assert.assertEquals("Wrong value for " + key, expected.get(key), jobState
+                    .getGenericInformations().get(key));
+            System.out.println(key + " is " + expected.get(key) + " - good");
+        }
     }
 
     public void checkTaskState(TaskState taskState) {
@@ -124,7 +145,6 @@ public class TestTaskGenericInfo extends SchedulerConsecutive {
                     .getGenericInformations().get(key));
             System.out.println(key + " is " + expected.get(key) + " - good");
         }
-
     }
 
     private TaskFlowJob createJobWithReplication() throws Exception {

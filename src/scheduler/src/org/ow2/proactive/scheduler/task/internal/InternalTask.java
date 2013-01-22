@@ -59,7 +59,6 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.converter.MakeDeepCopy;
 import org.ow2.proactive.db.annotation.Unloadable;
-import org.ow2.proactive.db.types.BigString;
 import org.ow2.proactive.scheduler.common.exception.ExecutableCreationException;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
@@ -78,7 +77,6 @@ import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskInfoImpl;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
-import org.ow2.proactive.scheduler.task.launcher.TaskLauncher.SchedulerVars;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncherInitializer;
 import org.ow2.proactive.utils.NodeSet;
 
@@ -1162,55 +1160,21 @@ public abstract class InternalTask extends TaskState {
             return new HashMap<String, String>();
         }
 
-        Map<String, String> info = new HashMap<String, String>();
-        for (Entry<String, BigString> e : this.genericInformations.entrySet()) {
-            String key = e.getKey();
-            BigString bigValue = e.getValue();
-            String value = bigValue.getValue();
-
-            for (SchedulerVars variable : SchedulerVars.values()) {
-                String javaStyleProperty = variable.toString();
-                String envStyleProperty = "$" + javaStyleProperty.toUpperCase().replace('.', '_');
-
-                String replaceWith = null;
-                switch (variable) {
-                    case JAVAENV_JOB_ID_VARNAME:
-                        if (taskInfo.getJobId() != null) {
-                            replaceWith = taskInfo.getJobId().toString();
-                        }
-                        break;
-                    case JAVAENV_JOB_NAME_VARNAME:
-                        if (taskInfo.getJobId() != null) {
-                            replaceWith = taskInfo.getJobId().getReadableName();
-                        }
-                        break;
-                    case JAVAENV_TASK_ID_VARNAME:
-                        if (taskInfo.getTaskId() != null) {
-                            replaceWith = taskInfo.getTaskId().toString();
-                        }
-                        break;
-                    case JAVAENV_TASK_NAME_VARNAME:
-                        if (taskInfo.getTaskId() != null) {
-                            replaceWith = taskInfo.getName();
-                        }
-                        break;
-                    case JAVAENV_TASK_ITERATION:
-                        replaceWith = String.valueOf(iteration);
-                        break;
-                    case JAVAENV_TASK_REPLICATION:
-                        replaceWith = String.valueOf(replication);
-                        break;
-                }
-
-                if (replaceWith != null) {
-                    value = value.replace(envStyleProperty, replaceWith);
-                }
-            }
-
-            info.put(key, value);
+        Map<String, String> replacements = new HashMap<String, String>();
+        JobId jobId = taskInfo.getJobId();
+        if (jobId != null) {
+            replacements.put(TaskLauncher.SchedulerVars.JAVAENV_JOB_ID_VARNAME.toString(), jobId.toString());
+            replacements.put(TaskLauncher.SchedulerVars.JAVAENV_JOB_NAME_VARNAME.toString(), jobId.getReadableName());
         }
+        TaskId taskId = taskInfo.getTaskId();
+        if (taskId != null) {
+            replacements.put(TaskLauncher.SchedulerVars.JAVAENV_TASK_ID_VARNAME.toString(), taskId.toString());
+            replacements.put(TaskLauncher.SchedulerVars.JAVAENV_TASK_NAME_VARNAME.toString(), taskId.getReadableName());
+        }
+        replacements.put(TaskLauncher.SchedulerVars.JAVAENV_TASK_ITERATION.toString(), String.valueOf(iteration));
+        replacements.put(TaskLauncher.SchedulerVars.JAVAENV_TASK_REPLICATION.toString(), String.valueOf(replication));
 
-        return info;
+        return applyReplacementsOnGenericInformation(replacements);
     }
 
     /**
