@@ -1076,7 +1076,7 @@ command="[working_dir]/nativTask"
 	</para>
 	<itemizedlist>
 		<listitem><para>
-			<emphasis role="bold">$PAS_JOB_NAME</emphasis> - Job's name defined in its XML descriptor</para>
+			<emphasis role="bold">$PAS_JOB_NAME</emphasis> - job's name defined in its XML descriptor</para>
 		</listitem>
 		<listitem><para>
 			<emphasis role="bold">$PAS_JOB_ID</emphasis> - unique job's ID given at submission time.</para>
@@ -1101,6 +1101,43 @@ command="[working_dir]/nativTask"
 	its name corresponds to current task's ID environment exported variable. So this job is made of a XMl job descriptor, a native executable,
 	and shell script which performs the launching.
 	</para>
+	
+	<para>
+	Also the following variables can be used in the job generic information.
+	</para>
+	<itemizedlist>
+		<listitem><para>
+			<emphasis role="bold">$PAS_JOB_NAME</emphasis> - job's name defined in its XML descriptor</para>
+		</listitem>
+		<listitem><para>
+			<emphasis role="bold">$PAS_JOB_ID</emphasis> - unique job's ID given at submission time.</para>
+		</listitem>
+	</itemizedlist>
+	<para>
+	or task generic information
+	</para>
+	<itemizedlist>
+		<listitem><para>
+			<emphasis role="bold">$PAS_JOB_NAME</emphasis> - job's name defined in its XML descriptor</para>
+		</listitem>
+		<listitem><para>
+			<emphasis role="bold">$PAS_JOB_ID</emphasis> - unique job's ID given at submission time.</para>
+		</listitem>
+		<listitem>		<para>
+			<emphasis role="bold">$PAS_TASK_NAME</emphasis> - name of the task currently
+			 launched (name defined in XML descriptor).</para>
+		</listitem>
+		<listitem><para>
+			<emphasis role="bold">$PAS_TASK_ID</emphasis> - unique task's ID.</para>
+		</listitem>
+		<listitem><para>
+			<emphasis role="bold">$PAS_TASK_ITERATION</emphasis> - iteration index of a task.</para>
+		</listitem>
+		<listitem><para>
+			<emphasis role="bold">$PAS_TASK_REPLICATION</emphasis> - replication index of a taks.</para>
+		</listitem>
+	</itemizedlist>
+	
 	<section xml:id="xml_file_output"><info><title>XML job description</title></info>
 
 		<para>

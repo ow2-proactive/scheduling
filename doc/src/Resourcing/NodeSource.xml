@@ -94,7 +94,15 @@ rmURL maxNodes serviceUrl userName password trustStore trustStorePassword javaPa
 										<para><emphasis role="bold">"ME"</emphasis> - Only the node source creator </para>
 									</listitem>
 									<listitem>
-										<para><emphasis role="bold">"users=user1,user2;groups=group1,group2"</emphasis> - Only specific users or groups (for our example user1, user2, group1 and group2). It is possible to specify only groups or only users.</para>
+										<para><emphasis role="bold">"users=user1,user2;groups=group1,group2;tokens=t1,t2"</emphasis>
+										 - Only specific users, groups or tokens.
+										 I.e. <emphasis role="bold">users=user1</emphasis> - node access is limited to user1;
+										 <emphasis role="bold">users=user1;groups=group1</emphasis> - node access is limited to
+										 user1 and all users from group group1; <emphasis role="bold">users=user1;tokens=t1</emphasis> -
+										 node access is limited to user1 or anyone who specified token t1. If node access is protected by
+										 a token, node will not be found by the resource manager (getNodes request) unless the corresponding
+										 token is specified.
+										 </para>
 									</listitem>
 									<listitem>
 										<para><emphasis role="bold">"ALL"</emphasis> - Everybody</para>

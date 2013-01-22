@@ -881,6 +881,14 @@ scheduler.changePolicy(org.ow2.proactive.scheduler.policy.DefaultPolicy.class);
 							This property is automatically propagated in the forked JVM if forked task is used.
 						</para>
 					</listitem>
+					<listitem>
+						<para>
+							<emphasis>proactive.node.access.token</emphasis> protects a node to be used by regular tasks. If this property is 
+							set this node can be used only by tasks with the same token in ther generic information
+						</para>
+
+						<programlisting language="xml"><textobject><textdata fileref="code_snippets/job_descriptors/task_generic_info.xml"/></textobject></programlisting>
+					</listitem>
 				</itemizedlist>
 			</para>
 		</section>
