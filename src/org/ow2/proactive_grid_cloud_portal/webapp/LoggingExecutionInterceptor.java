@@ -42,6 +42,7 @@ import java.lang.reflect.Method;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.ext.Provider;
 
+import org.apache.commons.lang3.time.StopWatch;
 import org.apache.log4j.Logger;
 import org.jboss.resteasy.annotations.interception.DecoderPrecedence;
 import org.jboss.resteasy.annotations.interception.ServerInterceptor;
@@ -52,7 +53,6 @@ import org.jboss.resteasy.spi.interception.ClientExecutionInterceptor;
 import org.jboss.resteasy.spi.interception.MessageBodyReaderContext;
 import org.jboss.resteasy.spi.interception.MessageBodyReaderInterceptor;
 import org.jboss.resteasy.util.HttpHeaderNames;
-import org.jboss.util.StopWatch;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
