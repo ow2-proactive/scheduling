@@ -36,7 +36,6 @@
  */
 package org.ow2.proactive.resourcemanager.core;
 
-import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.Permission;
@@ -88,12 +87,11 @@ import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.core.account.RMAccountsManager;
-import org.ow2.proactive.resourcemanager.core.history.Alive;
-import org.ow2.proactive.resourcemanager.core.history.NodeHistory;
 import org.ow2.proactive.resourcemanager.core.history.UserHistory;
 import org.ow2.proactive.resourcemanager.core.jmx.RMJMXHelper;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
-import org.ow2.proactive.resourcemanager.db.DatabaseManager;
+import org.ow2.proactive.resourcemanager.db.NodeSourceData;
+import org.ow2.proactive.resourcemanager.db.RMDBManager;
 import org.ow2.proactive.resourcemanager.exception.AddingNodesException;
 import org.ow2.proactive.resourcemanager.exception.NotConnectedException;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
@@ -228,8 +226,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     /** utility ao used to configure nodes (compute topology, configure dataspaces...) */
     private RMNodeConfigurator nodeConfigurator;
 
-    /** the last time when RMCore seemed to be alive */
-    private Alive alive;
+    private RMDBManager dataBaseManager;
 
     /**
      * ProActive Empty constructor
@@ -289,50 +286,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             PAActiveObject.registerByName(PAActiveObject.getStubOnThis(),
                     RMConstants.NAME_ACTIVE_OBJECT_RMCORE);
 
-            logger.info("Starting Hibernate...");
-            boolean drop = PAResourceManagerProperties.RM_DB_HIBERNATE_DROPDB.getValueAsBoolean();
-            logger.info("Drop DB : " + drop);
-            if (drop) {
-                DatabaseManager.getInstance().setProperty("hibernate.hbm2ddl.auto", "create");
-                // dropping RRD data base as well
-                File ddrDB = new File(PAResourceManagerProperties.RM_HOME.getValueAsString() +
-                    System.getProperty("file.separator") +
-                    PAResourceManagerProperties.RM_RRD_DATABASE_NAME.getValueAsString());
-                if (ddrDB.exists()) {
-                    ddrDB.delete();
-                }
-
-            }
-            DatabaseManager.getInstance().build();
-            logger.info("Hibernate successfully started !");
-
-            if (!drop) {
-
-                List<Alive> selected = DatabaseManager.getInstance().recover(Alive.class);
-                if (selected.size() == 1) {
-                    alive = selected.get(0);
-
-                    // to keep the data base consistency updating all nodes history with
-                    // the last alive time stamp
-                    NodeHistory.recover(alive);
-                    // updating end times of user connections
-                    UserHistory.recover(alive);
-
-                    // updating alive time stamp
-                    alive.setTime(System.currentTimeMillis());
-                    alive.update();
-
-                } else if (selected.size() > 1) {
-                    logger
-                            .error("Inconsistency in the data base (Alive table). Cannot be more than one record.");
-                }
-            }
-
-            if (alive == null) {
-                alive = new Alive();
-                alive.setTime(System.currentTimeMillis());
-                alive.save();
-            }
+            dataBaseManager = RMDBManager.getInstance();
 
             if (logger.isDebugEnabled()) {
                 logger.debug("Creating RMAuthentication active object");
@@ -402,6 +356,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             authentication.setActivated(true);
             clientPinger.ping();
 
+            restoreNodeSources();
+
         } catch (ActiveObjectCreationException e) {
             logger.error("", e);
         } catch (NodeException e) {
@@ -416,14 +372,17 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         }
     }
 
+    private void restoreNodeSources() {
+        for (NodeSourceData nsd : dataBaseManager.getNodeSources()) {
+            createNodeSource(nsd);
+        }
+    }
+
     /**
      * RunActivity periodically send "alive" event to listeners
      */
     public void runActivity(Body body) {
         Service service = new Service(body);
-
-        long timeStamp = System.currentTimeMillis();
-        long delta = 0;
 
         // recalculating nodes number only once per policy period
         while (body.isActive()) {
@@ -443,16 +402,6 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                 } catch (Throwable e) {
                     logger.error("Cannot serve request: " + request, e);
                 }
-            }
-
-            delta += System.currentTimeMillis() - timeStamp;
-            timeStamp = System.currentTimeMillis();
-
-            if (delta > PAResourceManagerProperties.RM_ALIVE_EVENT_FREQUENCY.getValueAsInt()) {
-                alive.setTime(timeStamp);
-                alive.update();
-
-                delta = 0;
             }
         }
     }
@@ -858,30 +807,50 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * @param policyType name of the policy type. It passed as a string due to pluggable approach {@link NodeSourcePolicyFactory}
      * @param policyParameters parameters for policy creation
      */
+
     public BooleanWrapper createNodeSource(String nodeSourceName, String infrastructureType,
             Object[] infrastructureParameters, String policyType, Object[] policyParameters) {
 
-        //checking that nsname doesn't contain invalid characters and doesn't exist yet
         if (nodeSourceName == null) {
             throw new IllegalArgumentException("Node Source name cannot be null");
         }
         nodeSourceName = nodeSourceName.trim();
-        checkNodeSourceName(nodeSourceName);
 
-        logger.info("Creating a node source : " + nodeSourceName);
+        NodeSourceData nodeSourceData = new NodeSourceData(nodeSourceName, infrastructureType,
+            infrastructureParameters, policyType, policyParameters, caller);
+        boolean added = dataBaseManager.addNodeSource(nodeSourceData);
 
-        InfrastructureManager im = InfrastructureManagerFactory.create(infrastructureType,
-                infrastructureParameters);
-        NodeSourcePolicy policy = NodeSourcePolicyFactory.create(policyType, infrastructureType,
-                policyParameters);
+        try {
+            return createNodeSource(nodeSourceData);
+        } catch (RuntimeException ex) {
+            if (added) {
+                dataBaseManager.removeNodeSource(nodeSourceName);
+            }
+            throw ex;
+        }
+    }
+
+    private BooleanWrapper createNodeSource(NodeSourceData data) {
+
+        //checking that nsname doesn't contain invalid characters and doesn't exist yet
+        checkNodeSourceName(data.getName());
+
+        logger.info("Creating a node source : " + data.getName());
+
+        InfrastructureManager im = InfrastructureManagerFactory.create(data.getInfrastructureType(), data
+                .getInfrastructureParameters());
+        NodeSourcePolicy policy = NodeSourcePolicyFactory.create(data.getPolicyType(), data
+                .getInfrastructureType(), data.getPolicyParameters());
 
         NodeSource nodeSource;
+        Client provider = new Client(data.getProviderSubject(), false);
         try {
-            nodeSource = (NodeSource) PAActiveObject.newActive(NodeSource.class.getName(), new Object[] {
-                    this.getUrl(), nodeSourceName, caller, im, policy, PAActiveObject.getStubOnThis(),
-                    this.monitoring }, nodeRM);
+            nodeSource = new NodeSource(this.getUrl(), data.getName(), provider, im, policy,
+                (RMCore) PAActiveObject.getStubOnThis(), this.monitoring);
+            nodeSource = PAActiveObject.turnActive(nodeSource, nodeRM);
         } catch (Exception e) {
-            throw new RuntimeException("Cannot create node source " + nodeSourceName, e);
+            logger.error(e.getMessage(), e);
+            throw new RuntimeException("Cannot create node source " + data.getName(), e);
         }
 
         // Adding access to the core for node source and policy.
@@ -895,11 +864,11 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
         BooleanWrapper result = nodeSource.activate();
         if (!result.getBooleanValue()) {
-            logger.error("Node source " + nodeSourceName + " cannot be activated");
+            logger.error("Node source " + data.getName() + " cannot be activated");
         }
 
-        Client nsService = new Client(caller.getSubject(), false);
-        Client policyService = new Client(caller.getSubject(), false);
+        Client nsService = new Client(provider.getSubject(), false);
+        Client policyService = new Client(provider.getSubject(), false);
 
         nsService.setId(nsId);
         policyService.setId(policyId);
@@ -907,12 +876,13 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         RMCore.clients.put(nsId, nsService);
         RMCore.clients.put(policyId, policyService);
 
-        this.nodeSources.put(nodeSourceName, nodeSource);
+        this.nodeSources.put(data.getName(), nodeSource);
+
         // generate the event of node source creation
         this.monitoring.nodeSourceEvent(new RMNodeSourceEvent(nodeSource, RMEventType.NODESOURCE_CREATED,
-            caller.getName()));
+            provider.getName()));
 
-        logger.info("Node source " + nodeSourceName + " has been successfully created by " + caller);
+        logger.info("Node source " + data.getName() + " has been successfully created by " + provider);
 
         return new BooleanWrapper(true);
     }
@@ -1342,6 +1312,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             //because node source doesn't know anymore its down nodes
             removeAllNodes(sourceName, preempt);
             nodeSource.shutdown(caller);
+            dataBaseManager.removeNodeSource(sourceName);
+
             return new BooleanWrapper(true);
         } else {
             throw new IllegalArgumentException("Unknown node source " + sourceName);
@@ -1397,7 +1369,9 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             nodesCleaner.cleanAndRelease(nodesToRelease);
             // update the connection info in the DB
             if (client.getHistory() != null) {
-                client.getHistory().update();
+                UserHistory userHistory = client.getHistory();
+                userHistory.setEndTime(System.currentTimeMillis());
+                dataBaseManager.updateUserHistory(userHistory);
             }
             logger.info(client + " disconnected from " + client.getId().shortString());
         } else {

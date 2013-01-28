@@ -181,6 +181,11 @@ public enum PAResourceManagerProperties {
     RM_DB_HIBERNATE_DROPDB("pa.rm.db.hibernate.dropdb", PropertyType.BOOLEAN),
 
     /**
+     * Drop only node sources from the database.
+     */
+    RM_DB_HIBERNATE_DROPDB_NODESOURCES("pa.rm.db.hibernate.dropdb.nodesources", PropertyType.BOOLEAN),
+
+    /**
      * The period of sending "alive" event to resource manager's listeners.
      */
     RM_ALIVE_EVENT_FREQUENCY("pa.rm.aliveevent.frequency", PropertyType.INTEGER),

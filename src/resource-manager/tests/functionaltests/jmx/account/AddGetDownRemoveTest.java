@@ -58,6 +58,7 @@ import org.ow2.proactive.resourcemanager.core.jmx.mbean.ManagementMBean;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
+import org.ow2.proactive.utils.Criteria;
 
 import functionaltests.RMConsecutive;
 import functionaltests.RMTHelper;
@@ -125,7 +126,7 @@ public final class AddGetDownRemoveTest extends RMConsecutive {
 
         // 2) GET the same node
         final long beforeGetTime = System.currentTimeMillis();
-        node = r.getAtMostNodes(1, null).get(0);
+        node = r.getNodes(new Criteria(1)).get(0);
 
         // Sleep a certain amount of time that will be the minimum amount of the GET->RELEASE duration 
         Thread.sleep(GR_DURATION);

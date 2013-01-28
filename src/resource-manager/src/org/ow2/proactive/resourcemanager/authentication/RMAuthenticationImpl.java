@@ -55,6 +55,7 @@ import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.core.history.UserHistory;
 import org.ow2.proactive.resourcemanager.core.jmx.RMJMXHelper;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
+import org.ow2.proactive.resourcemanager.db.RMDBManager;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 
 
@@ -98,7 +99,7 @@ public class RMAuthenticationImpl extends AuthenticationImpl implements RMAuthen
 
         RMCore.clients.put(client.getId(), client);
         UserHistory history = new UserHistory(client);
-        history.save();
+        RMDBManager.getInstance().saveUserHistory(history);
 
         client.setHistory(history);
 

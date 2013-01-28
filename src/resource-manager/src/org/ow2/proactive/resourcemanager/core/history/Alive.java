@@ -42,8 +42,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import org.ow2.proactive.resourcemanager.db.DatabaseManager;
-
 
 /**
  * 
@@ -72,13 +70,5 @@ public class Alive {
 
     public void setTime(long time) {
         this.time = time;
-    }
-
-    public void save() {
-        DatabaseManager.getInstance().register(this);
-    }
-
-    public void update() {
-        DatabaseManager.getInstance().update(this);
     }
 }

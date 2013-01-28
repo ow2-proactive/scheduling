@@ -45,7 +45,7 @@ import org.apache.log4j.Logger;
 import org.ow2.proactive.account.AbstractAccountsManager;
 import org.ow2.proactive.resourcemanager.core.history.NodeHistory;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
-import org.ow2.proactive.resourcemanager.db.DatabaseManager;
+import org.ow2.proactive.resourcemanager.db.RMDBManager;
 
 
 /**
@@ -57,7 +57,7 @@ import org.ow2.proactive.resourcemanager.db.DatabaseManager;
 public final class RMAccountsManager extends AbstractAccountsManager<RMAccount> {
 
     /** Scheduler database manager used to submit SQL requests */
-    private final org.ow2.proactive.db.DatabaseManager dbmanager;
+    private final RMDBManager dbmanager;
 
     /**
      * Create a new instance of this class.
@@ -65,7 +65,7 @@ public final class RMAccountsManager extends AbstractAccountsManager<RMAccount> 
     public RMAccountsManager() {
         super("Resource Manager Accounts Refresher", Logger.getLogger(RMAccountsManager.class));
         // Get the database manager
-        this.dbmanager = DatabaseManager.getInstance();
+        this.dbmanager = RMDBManager.getInstance();
     }
 
     /**
@@ -106,24 +106,14 @@ public final class RMAccountsManager extends AbstractAccountsManager<RMAccount> 
             String wereBusy = "SELECT SUM(" + endTime + "-" + startTime + ") " + "FROM " + history +
                 " WHERE " + userName + "='" + user + "' AND " + endTime + " <> 0 AND " + nodeState + " = 1";
 
-            // counting the time of unfinished actions
-            // select SUM(CURRENT_TIME-startTime) from History where endTime = 0 and nodeState = 1 and userName='NAME'
+            List<?> rows = dbmanager.sqlQuery(wereBusy);
+            account.usedNodeTime += aggregateNodeUsageTime(rows);
+
             String areBusy = "SELECT SUM(" + System.currentTimeMillis() + "-" + startTime + ") " + "FROM " +
                 history + " WHERE " + userName + "='" + user + "' AND " + endTime + " = 0 AND " + nodeState +
                 " = 1";
-            List<?> rows = dbmanager.sqlQuery(wereBusy + " UNION " + areBusy);
-
-            for (Object row : rows) {
-                try {
-                    if (row != null) {
-                        // result could be empty or null
-                        account.usedNodeTime += Long.parseLong(row.toString());
-                    }
-                } catch (RuntimeException e) {
-                    logger.warn(e.getMessage(), e);
-                    account.usedNodeTime = 0;
-                }
-            }
+            rows = dbmanager.sqlQuery(areBusy);
+            account.usedNodeTime += aggregateNodeUsageTime(rows);
 
             // select SUM(endTime-startTime), COUNT(DISTINCT nodeUrl) from History where endTime <> 0 and nodeState in (0,1,3,6,7) and providerName='rm'
             String wereProvided = "SELECT COUNT(DISTINCT " + nodeUrl + "), SUM(" + endTime + "-" + startTime +
@@ -133,33 +123,68 @@ public final class RMAccountsManager extends AbstractAccountsManager<RMAccount> 
             String areProvided = "SELECT 0, SUM(" + System.currentTimeMillis() + "-" + startTime + ") " +
                 "FROM " + history + " WHERE " + providerName + "='" + user + "' AND " + endTime +
                 " = 0 AND " + nodeState + " in (0,1,3,6,7)";
-            rows = dbmanager.sqlQuery(wereProvided + " UNION " + areProvided);
 
-            for (Object row : rows) {
-                Object[] columns = (Object[]) row;
-                if (columns.length > 0 && columns[0] != null) {
-                    try {
-                        // result could be empty or null
-                        account.providedNodesCount += Integer.parseInt(columns[0].toString());
-                    } catch (RuntimeException e) {
-                        logger.warn(e.getMessage(), e);
-                        account.providedNodesCount = 0;
-                    }
-                }
-                if (columns.length > 1 && columns[1] != null) {
-                    try {
-                        // result could be empty or null
-                        account.providedNodeTime += Long.parseLong(columns[1].toString());
-                    } catch (RuntimeException e) {
-                        logger.warn(e.getMessage(), e);
-                        account.providedNodeTime = 0;
-                    }
-                }
-            }
+            rows = dbmanager.sqlQuery(wereProvided);
+            account.providedNodesCount += aggregateProvidedNodesCount(rows);
+            account.providedNodeTime += aggregateProvidedNodeTime(rows);
+
+            rows = dbmanager.sqlQuery(areProvided);
+            account.providedNodesCount += aggregateProvidedNodesCount(rows);
+            account.providedNodeTime += aggregateProvidedNodeTime(rows);
 
             return account;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private int aggregateNodeUsageTime(List<?> rows) {
+        int usedNodeTime = 0;
+        for (Object row : rows) {
+            try {
+                if (row != null) {
+                    // result could be empty or null
+                    usedNodeTime += Long.parseLong(row.toString());
+                }
+            } catch (RuntimeException e) {
+                logger.warn(e.getMessage(), e);
+                usedNodeTime = 0;
+            }
+        }
+        return usedNodeTime;
+    }
+
+    private int aggregateProvidedNodesCount(List<?> rows) {
+        int providedNodesCount = 0;
+        for (Object row : rows) {
+            Object[] columns = (Object[]) row;
+            if (columns.length > 0 && columns[0] != null) {
+                try {
+                    // result could be empty or null
+                    providedNodesCount += Integer.parseInt(columns[0].toString());
+                } catch (RuntimeException e) {
+                    logger.warn(e.getMessage(), e);
+                    providedNodesCount = 0;
+                }
+            }
+        }
+        return providedNodesCount;
+    }
+
+    private int aggregateProvidedNodeTime(List<?> rows) {
+        int providedNodeTime = 0;
+        for (Object row : rows) {
+            Object[] columns = (Object[]) row;
+            if (columns.length > 1 && columns[1] != null) {
+                try {
+                    // result could be empty or null
+                    providedNodeTime += Long.parseLong(columns[1].toString());
+                } catch (RuntimeException e) {
+                    logger.warn(e.getMessage(), e);
+                    providedNodeTime = 0;
+                }
+            }
+        }
+        return providedNodeTime;
     }
 }

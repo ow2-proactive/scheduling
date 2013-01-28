@@ -57,11 +57,6 @@
         <!-- Here are every type describe by hibernate's annotations.
         Each Hibernate entity class must be referenced here. -->
 
-        <!-- Events -->
-        <mapping class="org.ow2.proactive.resourcemanager.core.history.NodeHistory"/>
-        <mapping class="org.ow2.proactive.resourcemanager.core.history.UserHistory"/>
-        <mapping class="org.ow2.proactive.resourcemanager.core.history.Alive"/>
-
     </session-factory>
 
 </hibernate-configuration>

@@ -36,8 +36,6 @@
  */
 package org.ow2.proactive.resourcemanager.core.history;
 
-import java.util.List;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -46,10 +44,7 @@ import javax.persistence.Table;
 
 import org.apache.log4j.Logger;
 import org.hibernate.annotations.Index;
-import org.ow2.proactive.db.Condition;
-import org.ow2.proactive.db.ConditionComparator;
 import org.ow2.proactive.resourcemanager.authentication.Client;
-import org.ow2.proactive.resourcemanager.db.DatabaseManager;
 
 
 /**
@@ -92,44 +87,7 @@ public class UserHistory {
         this.startTime = System.currentTimeMillis();
     }
 
-    /**
-     * Saves user connection information
-     */
-    public void save() {
-        // registering the new history record		
-        DatabaseManager.getInstance().register(this);
-    }
-
-    /**
-     * Updates the time when user disconnects
-     */
-    public void update() {
-        this.endTime = System.currentTimeMillis();
-        DatabaseManager.getInstance().update(this);
-    }
-
-    /**
-     * After the resource manager is terminated some history records may not have the end time stamp.
-     * We set it at the moment of next RM start taking the time from Alive table.
-     */
-    public static void recover(Alive alive) {
-
-        List<UserHistory> records = DatabaseManager.getInstance().recover(UserHistory.class,
-                new Condition("endTime", ConditionComparator.EQUALS_TO, new Long(0)));
-
-        for (UserHistory record : records) {
-            if (record.startTime < alive.getTime()) {
-                // alive time bigger than start time of the history record
-                // marking the end of this record as last RM alive time
-                record.endTime = alive.getTime();
-            } else {
-                // the event happened after last RM alive time update
-                // just put endTime = startTime
-                record.endTime = record.startTime;
-            }
-            DatabaseManager.getInstance().update(record);
-        }
-
-        logger.debug("Restoring the user history: " + records.size() + " raws updated");
+    public void setEndTime(long endTime) {
+        this.endTime = endTime;
     }
 }

@@ -36,8 +36,6 @@
  */
 package org.ow2.proactive.resourcemanager.core.history;
 
-import java.util.List;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -47,12 +45,9 @@ import javax.persistence.Transient;
 
 import org.apache.log4j.Logger;
 import org.hibernate.annotations.Index;
-import org.ow2.proactive.db.Condition;
-import org.ow2.proactive.db.ConditionComparator;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
-import org.ow2.proactive.resourcemanager.db.DatabaseManager;
 
 
 /**
@@ -101,7 +96,7 @@ public class NodeHistory {
 
     // indicates that new record in the data base will be created for this event
     @Transient
-    private boolean createNewRecord;
+    private boolean storeInDataBase;
 
     /**
      * Default constructor for Hibernate
@@ -123,7 +118,7 @@ public class NodeHistory {
         this.nodeState = event.getNodeState();
         this.startTime = event.getTimeStamp();
 
-        createNewRecord = true;
+        storeInDataBase = true;
         // do not store TO_BE REMOVED record as it reflects nothing
         //
         // when the node is removed do not create a new record - 
@@ -131,63 +126,81 @@ public class NodeHistory {
         if (NodeState.TO_BE_REMOVED == event.getNodeState() ||
             RMEventType.NODE_REMOVED == event.getEventType()) {
             // new node history event
-            createNewRecord = false;
+            storeInDataBase = false;
             logger.debug("Creating new line in the data base for " + event);
         }
     }
 
-    /**
-     * Updates the previous history record and creates a new one if necessary
-     */
-    public void save() {
-        // updating the previous history record
-        updatePreviousItem();
-
-        if (createNewRecord) {
-            // registering the new history record		
-            DatabaseManager.getInstance().register(this);
-        }
+    public String getNodeUrl() {
+        return nodeUrl;
     }
 
-    /**
-     * Updates the previous history record, namely sets the end time of the previous node state
-     */
-    private void updatePreviousItem() {
-        List<NodeHistory> previousRecords = DatabaseManager.getInstance().recover(NodeHistory.class,
-                new Condition("nodeUrl", ConditionComparator.EQUALS_TO, this.nodeUrl),
-                new Condition("endTime", ConditionComparator.EQUALS_TO, new Long(0)));
-
-        for (NodeHistory prev : previousRecords) {
-            prev.endTime = startTime;
-            DatabaseManager.getInstance().update(prev);
-        }
-
-        logger.debug(nodeUrl + " : updating history");
+    public void setNodeUrl(String nodeUrl) {
+        this.nodeUrl = nodeUrl;
     }
 
-    /**
-     * After the resource manager is terminated some history records may not have end time stamp.
-     * We set it at the moment of next RM start taking the time from Alive table.
-     */
-    public static void recover(Alive alive) {
-
-        List<NodeHistory> records = DatabaseManager.getInstance().recover(NodeHistory.class,
-                new Condition("endTime", ConditionComparator.EQUALS_TO, new Long(0)));
-
-        for (NodeHistory record : records) {
-            if (record.startTime < alive.getTime()) {
-                // alive time bigger than start time of the history record
-                // marking the end of this record as last RM alive time
-                record.endTime = alive.getTime();
-            } else {
-                // the event happened after last RM alive time update
-                // just put endTime = startTime
-                record.endTime = record.startTime;
-            }
-            DatabaseManager.getInstance().update(record);
-        }
-
-        logger.debug("Restoring the node history: " + records.size() + " raws updated");
-
+    public String getHost() {
+        return host;
     }
+
+    public void setHost(String host) {
+        this.host = host;
+    }
+
+    public String getNodeSource() {
+        return nodeSource;
+    }
+
+    public void setNodeSource(String nodeSource) {
+        this.nodeSource = nodeSource;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public String getProviderName() {
+        return providerName;
+    }
+
+    public void setProviderName(String providerName) {
+        this.providerName = providerName;
+    }
+
+    public NodeState getNodeState() {
+        return nodeState;
+    }
+
+    public void setNodeState(NodeState nodeState) {
+        this.nodeState = nodeState;
+    }
+
+    public long getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(long startTime) {
+        this.startTime = startTime;
+    }
+
+    public long getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(long endTime) {
+        this.endTime = endTime;
+    }
+
+    public boolean isStoreInDataBase() {
+        return storeInDataBase;
+    }
+
+    public void setStoreInDataBase(boolean storeInDataBase) {
+        this.storeInDataBase = storeInDataBase;
+    }
+
 }
