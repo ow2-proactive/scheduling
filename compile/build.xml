@@ -73,6 +73,7 @@
         <delete dir="${build.dir}" />
         <delete dir="${dist.dir}" />
         <delete dir="${junit.dir}" />
+        <delete dir="${projectRoot}/tmp" />
 		<delete>
 		  <fileset dir="." includes="SchedulingRest-*.war" />
 		</delete>
