@@ -24,12 +24,21 @@ public final class PerUserConnectionRMProxiesManager extends RMProxiesManager {
 
     private final Object connectionStateLock = new Object();
 
+    private URI rmURI;
+
     public PerUserConnectionRMProxiesManager(URI rmURI, Credentials schedulerProxyCredentials)
             throws RMException, RMProxyCreationException {
         super(schedulerProxyCredentials);
         rebindRMProxiesManager(rmURI);
 
         schedulerRMProxy = new SchedulerRMProxy(this);
+    }
+
+    @Override
+    public URI getRmUrl() {
+        synchronized (connectionStateLock) {
+            return rmURI;
+        }
     }
 
     @Override
@@ -44,6 +53,7 @@ public final class PerUserConnectionRMProxiesManager extends RMProxiesManager {
                 rmProxyActiveObject.terminateProxy();
             }
             rmProxyActiveObject = RMProxyActiveObject.createAOProxy(auth, schedulerProxyCredentials);
+            this.rmURI = rmURI;
         }
     }
 
@@ -83,9 +93,11 @@ public final class PerUserConnectionRMProxiesManager extends RMProxiesManager {
                 }
                 userProxiesMap.clear();
             }
-            rmProxyActiveObject.terminateProxy();
-            rmProxyActiveObject = null;
-            currentRMConnection = null;
+            if (rmProxyActiveObject != null) {
+                rmProxyActiveObject.terminateProxy();
+                rmProxyActiveObject = null;
+                currentRMConnection = null;
+            }
         }
     }
 

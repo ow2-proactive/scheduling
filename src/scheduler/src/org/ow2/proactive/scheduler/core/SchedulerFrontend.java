@@ -47,6 +47,8 @@ import java.util.Scanner;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
@@ -59,7 +61,9 @@ import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
+import org.objectweb.proactive.utils.NamedThreadFactory;
 import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.db.DatabaseManagerException;
 import org.ow2.proactive.permissions.MethodCallPermission;
 import org.ow2.proactive.policy.ClientsPolicy;
 import org.ow2.proactive.scheduler.authentication.SchedulerAuthentication;
@@ -98,13 +102,14 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.core.account.SchedulerAccountsManager;
 import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
+import org.ow2.proactive.scheduler.core.db.SchedulerStateRecoverHelper;
 import org.ow2.proactive.scheduler.core.jmx.SchedulerJMXHelper;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.proactive.scheduler.core.rmproxies.RMProxiesManager;
 import org.ow2.proactive.scheduler.job.ClientJobState;
 import org.ow2.proactive.scheduler.job.IdentifiedJob;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.InternalJobFactory;
-import org.ow2.proactive.scheduler.job.InternalJobWrapper;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.job.UserIdentificationImpl;
 import org.ow2.proactive.scheduler.permissions.ChangePolicyPermission;
@@ -114,6 +119,7 @@ import org.ow2.proactive.scheduler.permissions.GetOwnStateOnlyPermission;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.TaskLogger;
+import org.ow2.proactive.utils.Tools;
 
 
 /**
@@ -128,8 +134,12 @@ import org.ow2.proactive.scheduler.util.TaskLogger;
 @ActiveObject
 public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Scheduler, RunActive {
 
+    /** Delay to wait for between getting a job result and removing the job concerned */
+    private static final long SCHEDULER_REMOVED_JOB_DELAY = PASchedulerProperties.SCHEDULER_REMOVED_JOB_DELAY
+            .getValueAsInt() * 1000;
+
     /** Scheduler logger */
-    public static final Logger logger = Logger.getLogger(SchedulerCore.class);
+    public static final Logger logger = Logger.getLogger(SchedulingService.class);
     public static final TaskLogger tlogger = TaskLogger.getInstance();
     public static final JobLogger jlogger = JobLogger.getInstance();
 
@@ -161,12 +171,6 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
     /** Full name of the policy class */
     private String policyFullName;
 
-    /** Implementation of scheduler main structure */
-    private SchedulerCore scheduler;
-
-    /** Direct link to the current job to submit. */
-    private InternalJobWrapper currentJobToSubmit;
-
     /** Job identification management */
     private Map<JobId, IdentifiedJob> jobs;
 
@@ -182,6 +186,8 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
     /** Scheduler state maintains by this class : avoid charging the core from some request */
     private SchedulerStateImpl sState;
     private Map<JobId, JobState> jobsMap;
+
+    private SchedulingService schedulingService;
 
     private SchedulerDBManager dbManager;
 
@@ -210,7 +216,6 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
         this.identifications = new HashMap<UniqueID, UserIdentificationImpl>();
         this.credentials = new HashMap<UniqueID, Credentials>();
         this.dirtyList = new HashSet<UniqueID>();
-        this.currentJobToSubmit = new InternalJobWrapper();
         this.accountsManager = new SchedulerAccountsManager(dbManager);
         this.jmxHelper = new SchedulerJMXHelper(accountsManager, dbManager);
         this.jobsMap = new HashMap<JobId, JobState>();
@@ -249,10 +254,36 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
             authentication = PAActiveObject.newActive(SchedulerAuthentication.class,
                     new Object[] { PAActiveObject.getStubOnThis() });
             //creating scheduler core
-            logger.info("Creating scheduler core...");
-            SchedulerCore scheduler_local = new SchedulerCore(rmURL, (SchedulerFrontend) PAActiveObject
-                    .getStubOnThis(), dbManager, policyFullName, currentJobToSubmit);
-            scheduler = (SchedulerCore) PAActiveObject.turnActive(scheduler_local);
+
+            RMProxiesManager rmProxiesManager = RMProxiesManager.createRMProxiesManager(rmURL);
+            rmProxiesManager.getSchedulerRMProxy();
+
+            DataSpaceServiceStarter dsServiceStarter = new DataSpaceServiceStarter();
+            dsServiceStarter.startNamingService();
+
+            SchedulingInfrastructure infrastructure = new SchedulingInfrastructureImpl(dbManager,
+                rmProxiesManager, dsServiceStarter, Executors.newFixedThreadPool(10, new NamedThreadFactory(
+                    "SchedulingServiceThread")), new ScheduledThreadPoolExecutor(2, new NamedThreadFactory(
+                    "SchedulingServiceTimerThread")));
+
+            long loadJobPeriod = -1;
+            if (PASchedulerProperties.SCHEDULER_DB_LOAD_JOB_PERIOD.isSet()) {
+                String periodStr = PASchedulerProperties.SCHEDULER_DB_LOAD_JOB_PERIOD.getValueAsString();
+                if (periodStr != null && !periodStr.isEmpty()) {
+                    try {
+                        loadJobPeriod = Tools.parsePeriod(periodStr);
+                    } catch (IllegalArgumentException e) {
+                        logger.warn("Invalid load job period string: " + periodStr +
+                            ", this setting is ignored", e);
+                    }
+                }
+            }
+
+            SchedulerStateRecoverHelper.RecoveredSchedulerState recoveredState = new SchedulerStateRecoverHelper(
+                infrastructure.getDBManager()).recover(loadJobPeriod);
+
+            this.schedulingService = new SchedulingService(infrastructure, (SchedulerFrontend) PAActiveObject
+                    .getStubOnThis(), recoveredState, policyFullName, null);
 
             logger.info("Registering scheduler...");
             PAActiveObject.registerByName(authentication, SchedulerConstants.SCHEDULER_DEFAULT_NAME);
@@ -260,6 +291,8 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
             // Boot the JMX helper
             logger.info("Booting jmx...");
             this.jmxHelper.boot(authentication);
+
+            recover(recoveredState.getSchedulerState());
 
             // run !!
         } catch (Exception e) {
@@ -276,13 +309,11 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
     /* ########################################################################################### */
 
     /**
-     * Called by the scheduler core to recover the front-end.
+     * Called to recover the front-end.
      * This method may have to rebuild the different list of userIdentification
      * and job/user association.
-     * 
-     * @param jobList the jobList that may appear in this front-end.
      */
-    public void recover(SchedulerStateImpl sState) {
+    private void recover(SchedulerStateImpl sState) {
         //default state = started
         this.sState = sState;
         Set<JobState> jobStates = new HashSet<JobState>();
@@ -385,7 +416,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
                 "You do not have permission to submit a job !");
 
         //check if the scheduler is stopped
-        if (!scheduler.isSubmitPossible()) {
+        if (!schedulingService.isSubmitPossible()) {
             String msg = "Scheduler is stopped, cannot submit job";
             logger.info(msg);
             throw new SubmissionClosedException(msg);
@@ -434,11 +465,9 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
         }
         //setting the job properties
         job.setOwner(ident.getUsername());
-        //prepare tasks in order to be send into the core
-        job.prepareTasks();
-        //statically reference the job to submit
-        currentJobToSubmit.setJob(job);
-        scheduler.submit();
+
+        schedulingService.submitJob(job);
+
         //put the job inside the frontend management list
         jobs.put(job.getId(), new IdentifiedJob(job.getId(), ident));
         //increase number of submit for this user
@@ -454,7 +483,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
      * {@inheritDoc}
      */
     @ImmediateService
-    public JobResult getJobResult(JobId jobId) throws NotConnectedException, PermissionException,
+    public JobResult getJobResult(final JobId jobId) throws NotConnectedException, PermissionException,
             UnknownJobException {
 
         //checking permissions
@@ -466,8 +495,19 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
             return null;
         }
 
-        //asking the scheduler for the result
-        JobResult result = scheduler.getJobResult(jobId);
+        jlogger.info(jobId, "trying to get the job result");
+
+        JobResult result = dbManager.loadJobResult(jobId);
+        if (result == null) {
+            throw new UnknownJobException(jobId);
+        }
+
+        if (!result.getJobInfo().isToBeRemoved() && SCHEDULER_REMOVED_JOB_DELAY > 0) {
+            //remember that this job is to be removed
+            dbManager.jobSetToBeRemoved(jobId);
+            schedulingService.scheduleJobRemove(jobId, SCHEDULER_REMOVED_JOB_DELAY);
+            jlogger.info(jobId, "will be removed in " + (SCHEDULER_REMOVED_JOB_DELAY / 1000) + "sec");
+        }
 
         return result;
     }
@@ -523,10 +563,23 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
             throw new IllegalArgumentException("Incarnation must be 0 or greater.");
         }
 
-        //asking the scheduler for the result
-        TaskResult result = scheduler.getTaskResultFromIncarnation(jobId, taskName, inc);
+        jlogger.info(jobId, "trying to get the task result, incarnation " + inc);
 
-        return result;
+        if (inc < 0) {
+            throw new IllegalArgumentException("Incarnation must be 0 or greater.");
+        }
+
+        try {
+            TaskResult result = dbManager.loadTaskResult(jobId, taskName, inc);
+            if (result == null) {
+                jlogger.info(jobId, taskName + " is not finished");
+                return null;
+            } else {
+                return result;
+            }
+        } catch (DatabaseManagerException e) {
+            throw new UnknownTaskException("Unknown task " + taskName + ", job: " + jobId);
+        }
     }
 
     /**
@@ -537,7 +590,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
             UnknownTaskException, PermissionException {
         //checking permissions
         checkJobOwner("killTask", jobId, "You do not have permission to kill this task !");
-        return scheduler.killTask(jobId, taskName);
+        return schedulingService.killTask(jobId, taskName);
     }
 
     /**
@@ -557,7 +610,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
             UnknownJobException, UnknownTaskException, PermissionException {
         //checking permissions
         checkJobOwner("restartTask", jobId, "You do not have permission to restart this task !");
-        return scheduler.restartTask(jobId, taskName, restartDelay);
+        return schedulingService.restartTask(jobId, taskName, restartDelay);
     }
 
     /**
@@ -577,7 +630,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
             UnknownJobException, UnknownTaskException, PermissionException {
         //checking permissions
         checkJobOwner("preemptTask", jobId, "You do not have permission to preempt this task !");
-        return scheduler.preemptTask(jobId, taskName, restartDelay);
+        return schedulingService.preemptTask(jobId, taskName, restartDelay);
     }
 
     /**
@@ -599,7 +652,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
         checkJobOwner("removeJob", jobId, "You do not have permission to remove this job !");
 
         //asking the scheduler for the result
-        return scheduler.removeJob(jobId);
+        return schedulingService.removeJob(jobId);
     }
 
     /**
@@ -610,7 +663,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
         //checking permissions
         checkJobOwner("listenJobLogs", jobId, "You do not have permission to listen the log of this job !");
 
-        scheduler.listenJobLogs(jobId, appenderProvider);
+        schedulingService.listenJobLogs(jobId, appenderProvider);
     }
 
     /**
@@ -789,7 +842,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
      */
     public boolean start() throws NotConnectedException, PermissionException {
         checkPermission("start", "You do not have permission to start the scheduler !");
-        return scheduler.start();
+        return schedulingService.start();
     }
 
     /**
@@ -797,7 +850,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
      */
     public boolean stop() throws NotConnectedException, PermissionException {
         checkPermission("stop", "You do not have permission to stop the scheduler !");
-        return scheduler.stop();
+        return schedulingService.stop();
     }
 
     /**
@@ -805,7 +858,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
      */
     public boolean pause() throws NotConnectedException, PermissionException {
         checkPermission("pause", "You do not have permission to pause the scheduler !");
-        return scheduler.pause();
+        return schedulingService.pause();
     }
 
     /**
@@ -813,7 +866,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
      */
     public boolean freeze() throws NotConnectedException, PermissionException {
         checkPermission("freeze", "You do not have permission to freeze the scheduler !");
-        return scheduler.freeze();
+        return schedulingService.freeze();
     }
 
     /**
@@ -821,7 +874,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
      */
     public boolean resume() throws NotConnectedException, PermissionException {
         checkPermission("resume", "You do not have permission to resume the scheduler !");
-        return scheduler.resume();
+        return schedulingService.resume();
     }
 
     /**
@@ -829,7 +882,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
      */
     public boolean shutdown() throws NotConnectedException, PermissionException {
         checkPermission("shutdown", "You do not have permission to shutdown the scheduler !");
-        return scheduler.shutdown();
+        return schedulingService.shutdown();
     }
 
     /**
@@ -837,7 +890,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
      */
     public boolean kill() throws NotConnectedException, PermissionException {
         checkPermission("kill", "You do not have permission to kill the scheduler !");
-        return scheduler.kill();
+        return schedulingService.kill();
     }
 
     /**
@@ -933,8 +986,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
     public boolean pauseJob(JobId jobId) throws NotConnectedException, UnknownJobException,
             PermissionException {
         checkJobOwner("pauseJob", jobId, "You do not have permission to pause this job !");
-
-        return scheduler.pauseJob(jobId);
+        return schedulingService.pauseJob(jobId);
     }
 
     /**
@@ -943,8 +995,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
     public boolean resumeJob(JobId jobId) throws NotConnectedException, UnknownJobException,
             PermissionException {
         checkJobOwner("resumeJob", jobId, "You do not have permission to resume this job !");
-
-        return scheduler.resumeJob(jobId);
+        return schedulingService.resumeJob(jobId);
     }
 
     /**
@@ -953,8 +1004,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
     public boolean killJob(JobId jobId) throws NotConnectedException, UnknownJobException,
             PermissionException {
         checkJobOwner("killJob", jobId, "You do not have permission to kill this job !");
-
-        return scheduler.killJob(jobId);
+        return schedulingService.killJob(jobId);
     }
 
     /**
@@ -982,7 +1032,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
             throw new JobAlreadyFinishedException("Job " + jobId + msg);
         }
 
-        scheduler.changeJobPriority(jobId, priority);
+        schedulingService.changeJobPriority(jobId, priority);
     }
 
     /**
@@ -1060,7 +1110,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
             throw ex;
         }
         policyFullName = newPolicyClassname;
-        return scheduler.changePolicy(newPolicyClassname);
+        return schedulingService.changePolicy(newPolicyClassname);
     }
 
     /**
@@ -1080,7 +1130,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
             logger.info(ex.getMessage());
             throw ex;
         }
-        return scheduler.linkResourceManager(rmURL);
+        return schedulingService.linkResourceManager(rmURL);
     }
 
     /**
@@ -1089,7 +1139,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
     public boolean reloadPolicyConfiguration() throws NotConnectedException, PermissionException {
         checkPermission("reloadPolicyConfiguration",
                 "You do not have permission to reload policy configuration !");
-        return scheduler.reloadPolicyConfiguration();
+        return schedulingService.reloadPolicyConfiguration();
     }
 
     /**

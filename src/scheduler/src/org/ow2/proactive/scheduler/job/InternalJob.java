@@ -72,7 +72,7 @@ import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
 import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
 import org.ow2.proactive.scheduler.common.task.flow.FlowBlock;
-import org.ow2.proactive.scheduler.core.SchedulerFrontend;
+import org.ow2.proactive.scheduler.core.SchedulerStateUpdate;
 import org.ow2.proactive.scheduler.core.annotation.TransientInSerialization;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
@@ -320,8 +320,8 @@ public abstract class InternalJob extends JobState {
      * @param action a Control Flow Action that will potentially create new tasks inside the job
      * @return the taskDescriptor that has just been terminated.
      */
-    public ChangedTasksInfo terminateTask(boolean errorOccurred, TaskId taskId, SchedulerFrontend frontend,
-            FlowAction action, TaskResultImpl result) {
+    public ChangedTasksInfo terminateTask(boolean errorOccurred, TaskId taskId,
+            SchedulerStateUpdate frontend, FlowAction action, TaskResultImpl result) {
         final InternalTask descriptor = tasks.get(taskId);
         descriptor.setFinishedTime(System.currentTimeMillis());
         descriptor.setStatus(errorOccurred ? TaskStatus.FAULTY : TaskStatus.FINISHED);
@@ -1327,8 +1327,6 @@ public abstract class InternalJob extends JobState {
         return jobDataSpaceApplication;
     }
 
-    private transient Map<String, InternalTask> tasknameITaskMapping = null;
-
     /**
      * Return the internal task associated with the given task name for this job.
      *
@@ -1337,16 +1335,20 @@ public abstract class InternalJob extends JobState {
      * @throws UnknownTaskException if the given taskName does not exist.
      */
     public InternalTask getTask(String taskName) throws UnknownTaskException {
-        if (tasknameITaskMapping == null) {
-            tasknameITaskMapping = new HashMap<String, InternalTask>(tasks.size());
-            for (InternalTask it : tasks.values()) {
-                tasknameITaskMapping.put(it.getId().getReadableName(), it);
+        for (InternalTask task : tasks.values()) {
+            if (task.getId().getReadableName().equals(taskName)) {
+                return task;
             }
         }
-        if (tasknameITaskMapping.containsKey(taskName)) {
-            return tasknameITaskMapping.get(taskName);
+        throw new UnknownTaskException("'" + taskName + "' does not exist in this job.");
+    }
+
+    public InternalTask getTask(TaskId taskId) throws UnknownTaskException {
+        InternalTask task = tasks.get(taskId);
+        if (task != null) {
+            return task;
         } else {
-            throw new UnknownTaskException("'" + taskName + "' does not exist in this job.");
+            throw new UnknownTaskException("'" + taskId + "' does not exist in this job.");
         }
     }
 
@@ -1410,7 +1412,8 @@ public abstract class InternalJob extends JobState {
         JobId jobId = jobInfo.getJobId();
         if (jobId != null) {
             replacements.put(TaskLauncher.SchedulerVars.JAVAENV_JOB_ID_VARNAME.toString(), jobId.toString());
-            replacements.put(TaskLauncher.SchedulerVars.JAVAENV_JOB_NAME_VARNAME.toString(), jobId.getReadableName());
+            replacements.put(TaskLauncher.SchedulerVars.JAVAENV_JOB_NAME_VARNAME.toString(), jobId
+                    .getReadableName());
         }
         return applyReplacementsOnGenericInformation(replacements);
     }

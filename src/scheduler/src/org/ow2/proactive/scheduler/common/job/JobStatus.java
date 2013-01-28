@@ -51,50 +51,53 @@ public enum JobStatus implements java.io.Serializable {
     /**
      * The job is waiting to be scheduled.
      */
-    PENDING("Pending"),
+    PENDING("Pending", true),
     /**
      * The job is running. Actually at least one of its task has been scheduled.
      */
-    RUNNING("Running"),
+    RUNNING("Running", true),
     /**
      * The job has been launched but no task are currently running.
      */
-    STALLED("Stalled"),
+    STALLED("Stalled", true),
     /**
      * The job is finished. Every tasks are finished.
      */
-    FINISHED("Finished"),
+    FINISHED("Finished", false),
     /**
      * The job is paused waiting for user to resume it.
      */
-    PAUSED("Paused"),
+    PAUSED("Paused", true),
     /**
      * The job has been canceled due to user exception and order.
      * This status runs when a user exception occurs in a task
      * and when the user has asked to cancel On exception.
      */
-    CANCELED("Canceled"),
+    CANCELED("Canceled", false),
     /**
      * The job has failed. One or more tasks have failed (due to resources failure).
      * There is no more executionOnFailure left for a task.
      */
-    FAILED("Failed"),
+    FAILED("Failed", false),
     /**
      * The job has been killed by a user..
      * Nothing can be done anymore on this job expect read execution informations
      * such as output, time, etc...
      */
-    KILLED("Killed");
+    KILLED("Killed", false);
 
     /** The textual definition of the status */
-    private String definition;
+    private final String definition;
+
+    private final boolean jobAlive;
 
     /**
      * Default constructor.
      * @param def the textual definition of the status.
      */
-    JobStatus(String def) {
+    JobStatus(String def, boolean jobAlive) {
         definition = def;
+        this.jobAlive = jobAlive;
     }
 
     /**
@@ -104,4 +107,9 @@ public enum JobStatus implements java.io.Serializable {
     public String toString() {
         return definition;
     }
+
+    public boolean isJobAlive() {
+        return jobAlive;
+    }
+
 }

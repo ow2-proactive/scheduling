@@ -108,6 +108,8 @@ public abstract class RMProxiesManager {
         this.schedulerProxyCredentials = schedulerProxyCredentials;
     }
 
+    public abstract URI getRmUrl();
+
     /**
      * Rebind a RMProxiesManager to another RM using its URI (example : "rmi://localhost:1099/" ).
      *
