@@ -47,7 +47,9 @@
 
     <target name="copy.dependencies" description="Copy dependencies from the compiled Scheduling project">
         <copy todir="${lib.dir}/scheduling">
-            <fileset dir="${scheduling.project.dir}/dist/lib" includes="*/**" />
+            <fileset dir="${scheduling.project.dir}/dist/lib" includes="*/**" >
+				<exclude name="netty*.jar"/>
+			</fileset>
         </copy>
     </target>
 

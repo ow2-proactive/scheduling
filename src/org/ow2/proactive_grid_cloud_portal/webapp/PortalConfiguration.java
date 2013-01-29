@@ -42,7 +42,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Properties;
 
-
 public class PortalConfiguration {
 
     public static String scheduler_url = "scheduler.url";
@@ -56,6 +55,13 @@ public class PortalConfiguration {
     public static String rm_cache_password = "rm.cache.password";
     public static String rm_cache_credential = "rm.cache.credential";
     public static String rm_cache_refreshrate = "rm.cache.refreshrate";
+
+    public static String novnc_enabled = "novnc.enabled";
+    public static String novnc_port = "novnc.port";
+    public static String novnc_secured = "novnc.secured";
+    public static String novnc_keystore = "novnc.keystore";
+    public static String novnc_password = "novnc.password";
+    public static String novnc_keypassword = "novnc.keypassword";
 
     private static Properties properties;
     public static String lease_renew_rate = "lease.renew.rate";
