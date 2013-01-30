@@ -33,6 +33,8 @@ import org.ow2.proactive.scheduler.exception.RunningProcessException;
 import org.ow2.proactive.scheduler.job.ChangedTasksInfo;
 import org.ow2.proactive.scheduler.job.ClientJobState;
 import org.ow2.proactive.scheduler.job.InternalJob;
+import org.ow2.proactive.scheduler.job.JobInfoImpl;
+import org.ow2.proactive.scheduler.task.TaskInfoImpl;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalNativeTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
@@ -133,7 +135,7 @@ class LiveJobs {
             dbManager.changeJobPriority(jobId, priority);
 
             listener.jobStateUpdated(jobData.job.getOwner(), new NotificationData<JobInfo>(
-                SchedulerEvent.JOB_CHANGE_PRIORITY, jobData.job.getJobInfo()));
+                SchedulerEvent.JOB_CHANGE_PRIORITY, new JobInfoImpl((JobInfoImpl) jobData.job.getJobInfo())));
         } finally {
             jobData.unlock();
         }
@@ -241,8 +243,10 @@ class LiveJobs {
         if (task.getNumberOfExecutionOnFailureLeft() > 0) {
             task.setStatus(TaskStatus.WAITING_ON_FAILURE);
             jobData.job.newWaitingTask();
-            listener.taskStateUpdated(jobData.job.getOwner(), new NotificationData<TaskInfo>(
-                SchedulerEvent.TASK_WAITING_FOR_RESTART, task.getTaskInfo()));
+            listener
+                    .taskStateUpdated(jobData.job.getOwner(), new NotificationData<TaskInfo>(
+                        SchedulerEvent.TASK_WAITING_FOR_RESTART, new TaskInfoImpl((TaskInfoImpl) task
+                                .getTaskInfo())));
             jobData.job.reStartTask(task);
             dbManager.taskRestarted(jobData.job, task, null);
             tlogger.info(task.getId(), " is waiting for restart");
@@ -291,7 +295,7 @@ class LiveJobs {
         job.newWaitingTask();
         dbManager.updateAfterTaskFinished(job, task, result);
         listener.taskStateUpdated(job.getOwner(), new NotificationData<TaskInfo>(
-            SchedulerEvent.TASK_WAITING_FOR_RESTART, task.getTaskInfo()));
+            SchedulerEvent.TASK_WAITING_FOR_RESTART, new TaskInfoImpl((TaskInfoImpl) task.getTaskInfo())));
 
         terminationData.addRestartData(task.getId(), waitTime);
     }
@@ -339,7 +343,7 @@ class LiveJobs {
         dbManager.jobTaskStarted(job, task, firstTaskStarted);
 
         listener.taskStateUpdated(job.getOwner(), new NotificationData<TaskInfo>(
-            SchedulerEvent.TASK_PENDING_TO_RUNNING, task.getTaskInfo()));
+            SchedulerEvent.TASK_PENDING_TO_RUNNING, new TaskInfoImpl((TaskInfoImpl) task.getTaskInfo())));
 
         //fill previous task progress with 0, means task has started
         task.setProgress(0);
@@ -604,14 +608,14 @@ class LiveJobs {
 
         //send event
         listener.taskStateUpdated(job.getOwner(), new NotificationData<TaskInfo>(
-            SchedulerEvent.TASK_RUNNING_TO_FINISHED, task.getTaskInfo()));
+            SchedulerEvent.TASK_RUNNING_TO_FINISHED, new TaskInfoImpl((TaskInfoImpl) task.getTaskInfo())));
         //if this job is finished (every task have finished)
         jlogger.info(job.getId(), "finished tasks " + job.getNumberOfFinishedTasks() + ", total tasks " +
             job.getTotalNumberOfTasks() + ", finished " + jobFinished);
         if (jobFinished) {
             //send event to client
             listener.jobStateUpdated(job.getOwner(), new NotificationData<JobInfo>(
-                SchedulerEvent.JOB_RUNNING_TO_FINISHED, job.getJobInfo()));
+                SchedulerEvent.JOB_RUNNING_TO_FINISHED, new JobInfoImpl((JobInfoImpl) job.getJobInfo())));
         }
     }
 
@@ -681,7 +685,8 @@ class LiveJobs {
             if (!noResult) {
                 //send task event if there was a result
                 listener.taskStateUpdated(job.getOwner(), new NotificationData<TaskInfo>(
-                    SchedulerEvent.TASK_RUNNING_TO_FINISHED, task.getTaskInfo()));
+                    SchedulerEvent.TASK_RUNNING_TO_FINISHED, new TaskInfoImpl((TaskInfoImpl) task
+                            .getTaskInfo())));
             }
         }
 
@@ -721,7 +726,7 @@ class LiveJobs {
     private void updateTaskInfosList(InternalJob currentJob, SchedulerEvent eventType) {
         try {
             listener.jobStateUpdated(currentJob.getOwner(), new NotificationData<JobInfo>(eventType,
-                currentJob.getJobInfo()));
+                new JobInfoImpl((JobInfoImpl) currentJob.getJobInfo())));
         } catch (Throwable t) {
             //Just to prevent update method error
         }

@@ -96,7 +96,7 @@ public class ClientRequestHandler {
     /** Events queue to be stored */
     private final LinkedList<ReifiedMethodCall> eventCallsToStore;
     /** Cross reference to the front-end : used to mark client as dirty */
-    private final SchedulerFrontend frontend;
+    private final SchedulerFrontendState frontend;
 
     /**
      * Create a new instance of ClientRequestHandler
@@ -105,7 +105,8 @@ public class ClientRequestHandler {
      * @param clientId the Id of the client on which to talk to.
      * @param client the reference on the client itself.
      */
-    public ClientRequestHandler(SchedulerFrontend frontend, UniqueID clientId, SchedulerEventListener client) {
+    public ClientRequestHandler(SchedulerFrontendState frontend, UniqueID clientId,
+            SchedulerEventListener client) {
         this.client = client;
         this.frontend = frontend;
         this.clientId = clientId;

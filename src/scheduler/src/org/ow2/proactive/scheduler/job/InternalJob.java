@@ -438,7 +438,7 @@ public abstract class InternalJob extends JobState {
                         this.jobInfo.setTasksChanges(changesInfo, this);
                         // notify frontend that tasks were added and modified
                         frontend.jobStateUpdated(this.getOwner(), new NotificationData<JobInfo>(
-                            SchedulerEvent.TASK_REPLICATED, this.getJobInfo()));
+                            SchedulerEvent.TASK_REPLICATED, new JobInfoImpl(jobInfo)));
                         this.jobInfo.clearTasksChanges();
 
                         didAction = true;

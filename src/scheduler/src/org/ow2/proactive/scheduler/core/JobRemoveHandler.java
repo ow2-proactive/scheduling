@@ -12,6 +12,7 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.InternalJob;
+import org.ow2.proactive.scheduler.job.JobInfoImpl;
 
 
 class JobRemoveHandler implements Callable<Boolean> {
@@ -65,7 +66,7 @@ class JobRemoveHandler implements Callable<Boolean> {
 
         //send event to front-end
         service.listener.jobStateUpdated(job.getOwner(), new NotificationData<JobInfo>(
-            SchedulerEvent.JOB_REMOVE_FINISHED, job.getJobInfo()));
+            SchedulerEvent.JOB_REMOVE_FINISHED, new JobInfoImpl((JobInfoImpl) job.getJobInfo())));
 
         return true;
     }

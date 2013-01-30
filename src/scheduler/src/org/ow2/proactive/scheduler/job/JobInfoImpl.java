@@ -37,6 +37,7 @@
 package org.ow2.proactive.scheduler.job;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -120,8 +121,38 @@ public class JobInfoImpl implements JobInfo {
 
     private List<ClientTaskState> modifiedTasks;
 
-    /** Hibernate default constructor */
     public JobInfoImpl() {
+    }
+
+    /*
+     * Copy constructor is used to pass job information to the event listener 
+     * (SchedulerStateUpdate)
+     */
+    public JobInfoImpl(JobInfoImpl jobInfo) {
+        this.jobId = jobInfo.getJobId();
+        this.submittedTime = jobInfo.getSubmittedTime();
+        this.startTime = jobInfo.getStartTime();
+        this.finishedTime = jobInfo.getFinishedTime();
+        this.removedTime = jobInfo.getRemovedTime();
+        this.totalNumberOfTasks = jobInfo.getTotalNumberOfTasks();
+        this.numberOfPendingTasks = jobInfo.getNumberOfPendingTasks();
+        this.numberOfRunningTasks = jobInfo.getNumberOfRunningTasks();
+        this.numberOfFinishedTasks = jobInfo.getNumberOfFinishedTasks();
+        this.priority = jobInfo.getPriority();
+        this.status = jobInfo.getStatus();
+        this.toBeRemoved = jobInfo.toBeRemoved;
+        if (jobInfo.taskStatusModify != null) {
+            this.taskStatusModify = new HashMap<TaskId, TaskStatus>(jobInfo.taskStatusModify);
+        }
+        if (jobInfo.getTaskFinishedTimeModify() != null) {
+            this.taskFinishedTimeModify = new HashMap<TaskId, Long>(jobInfo.getTaskFinishedTimeModify());
+        }
+        if (jobInfo.getTasksSkipped() != null) {
+            this.tasksSkipped = new HashSet<TaskId>(jobInfo.getTasksSkipped());
+        }
+        if (jobInfo.getModifiedTasks() != null) {
+            this.modifiedTasks = new ArrayList<ClientTaskState>(jobInfo.getModifiedTasks());
+        }
     }
 
     /**

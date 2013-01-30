@@ -36,23 +36,10 @@
  */
 package org.ow2.proactive.scheduler.task;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Lob;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlTransient;
 
-import org.hibernate.annotations.AccessType;
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
-import org.hibernate.annotations.Proxy;
-import org.ow2.proactive.db.annotation.Alterable;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.task.Task;
@@ -71,75 +58,60 @@ import org.ow2.proactive.scheduler.job.JobInfoImpl;
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */
-@Entity
-@Table(name = "TASK_INFO")
-@AccessType("field")
-@Proxy(lazy = false)
 @XmlAccessorType(XmlAccessType.FIELD)
 public class TaskInfoImpl implements TaskInfo {
 
     private static final String HOSTNAME_SEPARATOR = ",";
 
-    @Id
-    @GeneratedValue
-    @SuppressWarnings("unused")
-    @XmlTransient
-    private long hId;
-
     /** id of the task */
-    @Cascade(CascadeType.ALL)
-    @OneToOne(fetch = FetchType.EAGER, targetEntity = TaskIdImpl.class)
     private TaskId taskId = null;
 
     /** informations about the job */
-    @Cascade(CascadeType.ALL)
-    @OneToOne(fetch = FetchType.EAGER, targetEntity = JobInfoImpl.class)
     @XmlTransient
     private JobInfo jobInfo = null;
 
     /** task started time */
-    @Alterable
-    @Column(name = "START_TIME")
     private long startTime = -1;
 
     /** task finished time : DEFAULT HAS TO BE SET TO -1 */
-    @Alterable
-    @Column(name = "FINISHED_TIME")
     private long finishedTime = -1;
 
     /** task real execution time : DEFAULT HAS TO BE SET TO -1 */
-    @Alterable
-    @Column(name = "EXEC_DURATION")
     private long executionDuration = -1;
 
     /** Current taskStatus of the task */
-    @Alterable
-    @Column(name = "TASK_STATE")
     private TaskStatus taskStatus = TaskStatus.SUBMITTED;
 
     /** Current progress value of the task */
-    @Alterable
-    @Column(name = "PROGRESS")
     private int progress = 0;
 
     /** name of the host where the task is executed */
-    @Alterable
-    @Column(name = "EXEC_HOSTNAME", length = Integer.MAX_VALUE)
-    @Lob
     private String executionHostName;
 
     /** Number of executions left */
-    @Alterable
-    @Column(name = "NB_EXEC_LEFT")
     private int numberOfExecutionLeft = 1;
 
     /** Number of execution left for this task in case of failure (node down) */
-    @Alterable
-    @Column(name = "NB_EXEC_ON_FAILURE_LEFT")
     private int numberOfExecutionOnFailureLeft = 1;
 
-    /** Hibernate default constructor */
     public TaskInfoImpl() {
+    }
+
+    /*
+     * Copy constructor is used to pass task information to the event listener 
+     * (SchedulerStateUpdate)
+     */
+    public TaskInfoImpl(TaskInfoImpl taskInfo) {
+        this.taskId = taskInfo.getTaskId();
+        this.jobInfo = new JobInfoImpl((JobInfoImpl) taskInfo.getJobInfo());
+        this.startTime = taskInfo.getStartTime();
+        this.finishedTime = taskInfo.getFinishedTime();
+        this.executionDuration = taskInfo.getExecutionDuration();
+        this.taskStatus = taskInfo.getStatus();
+        this.progress = taskInfo.getProgress();
+        this.executionHostName = taskInfo.getExecutionHostName();
+        this.numberOfExecutionLeft = taskInfo.getNumberOfExecutionLeft();
+        this.numberOfExecutionOnFailureLeft = taskInfo.getNumberOfExecutionOnFailureLeft();
     }
 
     /**
