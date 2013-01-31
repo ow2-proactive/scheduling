@@ -271,6 +271,47 @@ public class JavaTaskLauncher extends TaskLauncher {
         return true;
     }
 
+    @ImmediateService
+    public void killForkedJavaTaskLauncher() {
+        this.hasBeenKilled = true;
+        if (this.currentExecutable != null) {
+            try {
+                this.currentExecutable.kill();
+
+            } catch (Throwable e) {
+                logger.warn("Exception occurred while executing kill on task " + taskId.value(), e);
+            } finally {
+                this.currentExecutable = null;
+                // kill Children Processes and unsets the cookie
+                // kill all children processes
+                try {
+                    killChildrenProcesses();
+                } catch (Throwable t) {
+                    logger.warn("Exception when killing children processes", t);
+                }
+            }
+        }
+        try {
+            closeNodeConfiguration();
+        } catch (Throwable t) {
+            logger.warn("Exception when closing node configuration", t);
+        }
+        try {
+            // unset env
+            this.unsetEnv();
+        } catch (Throwable t) {
+            logger.warn("Exception when unsetEnv", t);
+        }
+        // reset stdout/err
+        try {
+            this.finalizeLoggers();
+        } catch (Throwable e) {
+            logger.warn("Loggers are not shutdown", e);
+        }
+
+        PAActiveObject.terminateActiveObject(true);
+    }
+
     /**
      * Close node dataspace configuration !
      * MUST ONLY BE USED BY FORKED EXECUTABLE

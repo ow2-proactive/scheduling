@@ -80,6 +80,13 @@ public class TestProcessTreeKiller extends SchedulerConsecutive {
     private static String unixSleepName = "sleep";
     private static String windowsSleepName = "TestSleep.exe";
 
+    String tmpDir = System.getProperty("java.io.tmpdir");
+
+    public TestProcessTreeKiller() {
+        // This sets the test timer to a big number
+        timeout = 600000;
+    }
+
     /**
      * Tests start here.
      *
@@ -119,6 +126,7 @@ public class TestProcessTreeKiller extends SchedulerConsecutive {
             String task2Name = "TestTK2";
             task2.setName(task2Name);
             task2.addArgument("sleep", 2);
+            task2.addArgument("tname", task2Name);
             task2.setExecutableClassName(JavaSpawnExecutable.class.getName());
             job2.addTask(task2);
 
@@ -131,6 +139,7 @@ public class TestProcessTreeKiller extends SchedulerConsecutive {
             task3.setForkEnvironment(new ForkEnvironment());
             String task3Name = "TestTK3";
             task3.addArgument("sleep", 3);
+            task3.addArgument("tname", task3Name);
             task3.setName(task3Name);
             task3.setExecutableClassName(JavaSpawnExecutable.class.getName());
             job3.addTask(task3);
@@ -174,6 +183,15 @@ public class TestProcessTreeKiller extends SchedulerConsecutive {
             SchedulerTHelper.log("************** Third job killed *************");
 
             TestProcessTreeKiller.waitUntilKProcesses(0);
+
+            // We make sure that the kill method for job 2 and job 3 have been killed
+            File killFileTask2 = new File(tmpDir, task2Name + ".tmp");
+            Assert.assertTrue(killFileTask2 + " exists", killFileTask2.exists());
+            killFileTask2.delete();
+
+            File killFileTask3 = new File(tmpDir, task3Name + ".tmp");
+            Assert.assertTrue(killFileTask3 + " exists", killFileTask3.exists());
+            killFileTask3.delete();
 
             JobResult res = SchedulerTHelper.getJobResult(id1);
             Assert.assertEquals(JobStatus.KILLED, res.getJobInfo().getStatus());
@@ -291,7 +309,7 @@ public class TestProcessTreeKiller extends SchedulerConsecutive {
 
         switch (OperatingSystem.getOperatingSystem()) {
             case windows:
-                runningDetachedProcNumber = getProcessNumberWindows("TestSleep.exe");
+                runningDetachedProcNumber = getProcessNumberWindows(windowsSleepName);
                 break;
             case unix:
                 runningDetachedProcNumber = getProcessNumber(unixSleepName);

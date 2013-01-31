@@ -784,7 +784,7 @@ public abstract class TaskLauncher {
                 try {
                     this.currentExecutable.kill();
 
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     logger.warn("Exception occurred while executing kill on task " + taskId.value(), e);
                 } finally {
                     this.currentExecutable = null;
@@ -806,7 +806,7 @@ public abstract class TaskLauncher {
                 logger.warn("Loggers are not shutdown !", e);
             }
         }
-        PAActiveObject.terminateActiveObject(normalTermination);
+        PAActiveObject.terminateActiveObject(!normalTermination);
     }
 
     /**
