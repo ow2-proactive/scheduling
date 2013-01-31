@@ -179,12 +179,11 @@ public class SchedulingService {
 
         infrastructure.schedule(new Runnable() {
             public void run() {
-                while (true)
-                    if (jobs.getRunningTasks().isEmpty()) {
-                        listener.schedulerStateUpdated(SchedulerEvent.SHUTDOWN);
-                    } else {
-                        infrastructure.schedule(this, 5000);
-                    }
+                if (jobs.getRunningTasks().isEmpty()) {
+                    listener.schedulerStateUpdated(SchedulerEvent.SHUTDOWN);
+                } else {
+                    infrastructure.schedule(this, 5000);
+                }
             }
         }, 5000);
 
@@ -321,7 +320,7 @@ public class SchedulingService {
 
     public void submitJob(InternalJob job) {
         try {
-            infrastructure.submit(new SubmitHandler(this, job)).get();
+            infrastructure.getClientOperationsThreadPool().submit(new SubmitHandler(this, job)).get();
         } catch (Exception e) {
             throw handleFutureWaitException(e);
         }
@@ -332,7 +331,7 @@ public class SchedulingService {
             if (status.isShuttingDown()) {
                 return false;
             }
-            return infrastructure.submit(new Callable<Boolean>() {
+            return infrastructure.getClientOperationsThreadPool().submit(new Callable<Boolean>() {
                 @Override
                 public Boolean call() throws Exception {
                     return jobs.pauseJob(jobId);
@@ -346,7 +345,7 @@ public class SchedulingService {
 
     public boolean resumeJob(final JobId jobId) {
         try {
-            return infrastructure.submit(new Callable<Boolean>() {
+            return infrastructure.getClientOperationsThreadPool().submit(new Callable<Boolean>() {
                 @Override
                 public Boolean call() throws Exception {
                     return jobs.resumeJob(jobId);
@@ -363,7 +362,7 @@ public class SchedulingService {
             return;
         }
         try {
-            infrastructure.submit(new Runnable() {
+            infrastructure.getClientOperationsThreadPool().submit(new Runnable() {
                 @Override
                 public void run() {
                     jlogger.info(jobId, "request to change the priority to " + priority);
@@ -377,7 +376,8 @@ public class SchedulingService {
 
     public boolean removeJob(JobId jobId) {
         try {
-            return infrastructure.submit(new JobRemoveHandler(this, jobId)).get();
+            return infrastructure.getClientOperationsThreadPool().submit(new JobRemoveHandler(this, jobId))
+                    .get();
         } catch (Exception e) {
             throw handleFutureWaitException(e);
         }
@@ -392,7 +392,7 @@ public class SchedulingService {
             if (status.isUnusable()) {
                 return;
             }
-            infrastructure.submit(new Runnable() {
+            infrastructure.getInternalOperationsThreadPool().submit(new Runnable() {
                 @Override
                 public void run() {
                     TerminationData terminationData = jobs.restartTaskOnNodeFailure(task);
@@ -422,7 +422,7 @@ public class SchedulingService {
             if (status.isUnusable()) {
                 return false;
             }
-            return infrastructure.submit(new Callable<Boolean>() {
+            return infrastructure.getClientOperationsThreadPool().submit(new Callable<Boolean>() {
                 @Override
                 public Boolean call() throws Exception {
                     TerminationData terminationData = jobs.killJob(jobId);
@@ -439,7 +439,8 @@ public class SchedulingService {
 
     void submitTerminationDataHandler(TerminationData terminationData) {
         if (!terminationData.isEmpty()) {
-            getInfrastructure().submit(new TerminationDataHandler(terminationData));
+            getInfrastructure().getInternalOperationsThreadPool().submit(
+                    new TerminationDataHandler(terminationData));
         }
     }
 
@@ -449,7 +450,7 @@ public class SchedulingService {
             if (status.isUnusable()) {
                 return false;
             }
-            return infrastructure.submit(new Callable<Boolean>() {
+            return infrastructure.getClientOperationsThreadPool().submit(new Callable<Boolean>() {
                 @Override
                 public Boolean call() throws Exception {
                     TerminationData terminationData = jobs.killTask(jobId, taskName);
@@ -477,7 +478,7 @@ public class SchedulingService {
             if (status.isUnusable()) {
                 return false;
             }
-            return infrastructure.submit(new Callable<Boolean>() {
+            return infrastructure.getClientOperationsThreadPool().submit(new Callable<Boolean>() {
                 @Override
                 public Boolean call() throws Exception {
                     TerminationData terminationData = jobs.restartTask(jobId, taskName, restartDelay);
@@ -502,7 +503,7 @@ public class SchedulingService {
     public boolean preemptTask(final JobId jobId, final String taskName, final int restartDelay)
             throws UnknownJobException, UnknownTaskException {
         try {
-            return infrastructure.submit(new Callable<Boolean>() {
+            return infrastructure.getClientOperationsThreadPool().submit(new Callable<Boolean>() {
                 @Override
                 public Boolean call() throws Exception {
                     TerminationData terminationData = jobs.preemptTask(jobId, taskName, restartDelay);
@@ -527,7 +528,7 @@ public class SchedulingService {
     public void listenJobLogs(final JobId jobId, final AppenderProvider appenderProvider)
             throws UnknownJobException {
         try {
-            infrastructure.submit(new Callable<Void>() {
+            infrastructure.getClientOperationsThreadPool().submit(new Callable<Void>() {
                 @Override
                 public Void call() throws UnknownJobException {
                     getListenJobLogsSupport().listenJobLogs(jobId, appenderProvider);
@@ -546,7 +547,7 @@ public class SchedulingService {
     }
 
     public void taskTerminatedWithResult(final TaskId taskId, final TaskResult taskResult) {
-        infrastructure.submit(new Runnable() {
+        infrastructure.getInternalOperationsThreadPool().submit(new Runnable() {
             @Override
             public void run() {
                 TerminationData terminationData = jobs.taskTerminatedWithResult(taskId,

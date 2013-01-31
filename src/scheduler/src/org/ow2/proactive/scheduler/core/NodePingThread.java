@@ -23,7 +23,7 @@ class NodePingThread extends Thread {
             try {
                 Thread.sleep(SCHEDULER_NODE_PING_FREQUENCY);
                 for (final RunningTaskData taskData : service.jobs.getRunningTasks()) {
-                    service.getInfrastructure().submit(new Runnable() {
+                    service.getInfrastructure().getInternalOperationsThreadPool().submit(new Runnable() {
                         public void run() {
                             service.pingTaskNode(taskData);
                         }

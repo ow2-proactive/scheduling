@@ -160,8 +160,8 @@
 	<classpathentry exported="true" kind="lib" path="lib/common/hibernate/core/jboss-logging-3.1.0.GA.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/common/hibernate/core/jboss-transaction-api_1.1_spec-1.0.0.Final.jar"/>
 	<classpathentry exported="true" kind="lib" path="compile/lib/junit-4.11-SNAPSHOT-20120416-1530.jar"/>
-	<classpathentry kind="lib" path="dist/lib/commons-io-1.2.jar"/>
 	<classpathentry kind="lib" path="compile/lib/tools.jar"/>
 	<classpathentry kind="lib" path="compile/lib/mockito-all-1.9.5.jar"/>
+	<classpathentry kind="lib" path="lib/ProActive/commons-io-1.2.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>

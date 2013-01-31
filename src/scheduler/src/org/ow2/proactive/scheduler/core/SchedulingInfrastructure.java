@@ -1,7 +1,7 @@
 package org.ow2.proactive.scheduler.core;
 
 import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
+import java.util.concurrent.ExecutorService;
 
 import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
 import org.ow2.proactive.scheduler.core.rmproxies.RMProxiesManager;
@@ -15,9 +15,9 @@ public interface SchedulingInfrastructure {
 
     SchedulerDBManager getDBManager();
 
-    Future<?> submit(Runnable runnable);
+    ExecutorService getClientOperationsThreadPool();
 
-    <T> Future<T> submit(Callable<T> task);
+    ExecutorService getInternalOperationsThreadPool();
 
     void schedule(Runnable runnable, long delay);
 

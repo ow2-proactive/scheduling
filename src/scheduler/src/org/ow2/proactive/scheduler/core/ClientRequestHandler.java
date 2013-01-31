@@ -68,7 +68,7 @@ public class ClientRequestHandler {
             .getValueAsInt();
     /** thread pool */
     private static final ExecutorService threadPoolForNetworkCalls = Executors.newFixedThreadPool(
-            THREAD_NUMBER, new NamedThreadFactory("ClientRequestHandlerPool"));
+            THREAD_NUMBER, new NamedThreadFactory("ClientEventHandlerPool"));
 
     private static final AtomicInteger requestLeft = new AtomicInteger();
 

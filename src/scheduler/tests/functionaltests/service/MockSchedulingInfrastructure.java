@@ -6,8 +6,10 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
+import java.util.concurrent.AbstractExecutorService;
 import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -33,7 +35,9 @@ public class MockSchedulingInfrastructure implements SchedulingInfrastructure {
 
     private final SchedulerDBManager dbManager;
 
-    private final ScheduledExecutorService executorService = new ScheduledThreadPoolExecutor(5);
+    private final ScheduledExecutorService scheduledExecutorService = new ScheduledThreadPoolExecutor(5);
+
+    private final ExecutorService executorService;
 
     private SchedulerClassServers classServers = Mockito.mock(SchedulerClassServers.class);
 
@@ -46,6 +50,39 @@ public class MockSchedulingInfrastructure implements SchedulingInfrastructure {
     public MockSchedulingInfrastructure(SchedulerDBManager dbManager) throws Exception {
         this.dbManager = dbManager;
         this.dsStarter = mock(DataSpaceServiceStarter.class);
+
+        executorService = new AbstractExecutorService() {
+
+            @Override
+            public void execute(Runnable command) {
+                command.run();
+            }
+
+            @Override
+            public List<Runnable> shutdownNow() {
+                return null;
+            }
+
+            @Override
+            public void shutdown() {
+
+            }
+
+            @Override
+            public boolean isTerminated() {
+                return false;
+            }
+
+            @Override
+            public boolean isShutdown() {
+                return false;
+            }
+
+            @Override
+            public boolean awaitTermination(long timeout, TimeUnit unit) throws InterruptedException {
+                return false;
+            }
+        };
 
         UserRMProxy userProxy = mock(UserRMProxy.class);
         doAnswer(new Answer<Void>() {
@@ -70,7 +107,7 @@ public class MockSchedulingInfrastructure implements SchedulingInfrastructure {
     }
 
     public void shutdown() {
-        executorService.shutdownNow();
+        scheduledExecutorService.shutdownNow();
     }
 
     @Override
@@ -94,28 +131,19 @@ public class MockSchedulingInfrastructure implements SchedulingInfrastructure {
     }
 
     @Override
-    public Future<?> submit(Runnable runnable) {
-        System.out.println("Requested to submit: " + runnable);
-        Future<?> future = executorService.submit(runnable);
-        try {
-            future.get();
-        } catch (Exception e) {
-            Assert.fail("Unexpected exception: " + e);
-        }
-        return future;
+    public ExecutorService getClientOperationsThreadPool() {
+        return executorService;
     }
 
     @Override
-    public <T> Future<T> submit(Callable<T> task) {
-        System.out.println("Requested to submit: " + task);
-        Future<T> future = executorService.submit(task);
-        return future;
+    public ExecutorService getInternalOperationsThreadPool() {
+        return executorService;
     }
 
     @Override
     public void schedule(Runnable runnable, long delay) {
         System.out.println("Requested to schedule " + runnable + ", delay: " + delay);
-        ScheduledFuture<?> future = executorService.schedule(runnable, 1, TimeUnit.MILLISECONDS);
+        ScheduledFuture<?> future = scheduledExecutorService.schedule(runnable, 1, TimeUnit.MILLISECONDS);
         try {
             future.get();
         } catch (Exception e) {
@@ -126,7 +154,7 @@ public class MockSchedulingInfrastructure implements SchedulingInfrastructure {
     @Override
     public void schedule(Callable<?> task, long delay) {
         System.out.println("Requested to schedule " + task + ", delay: " + delay);
-        ScheduledFuture<?> future = executorService.schedule(task, 1, TimeUnit.MILLISECONDS);
+        ScheduledFuture<?> future = scheduledExecutorService.schedule(task, 1, TimeUnit.MILLISECONDS);
         try {
             future.get();
         } catch (Exception e) {

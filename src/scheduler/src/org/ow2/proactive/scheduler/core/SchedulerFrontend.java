@@ -40,6 +40,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.net.URI;
 import java.util.Scanner;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
@@ -191,10 +192,17 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
             DataSpaceServiceStarter dsServiceStarter = new DataSpaceServiceStarter();
             dsServiceStarter.startNamingService();
 
+            ExecutorService clientThreadPool = Executors.newFixedThreadPool(
+                    PASchedulerProperties.SCHEDULER_CLIENT_POOL_NBTHREAD.getValueAsInt(),
+                    new NamedThreadFactory("ClientRequestsThreadPool"));
+
+            ExecutorService internalThreadPool = Executors.newFixedThreadPool(
+                    PASchedulerProperties.SCHEDULER_INTERNAL_POOL_NBTHREAD.getValueAsInt(),
+                    new NamedThreadFactory("InternalOperationsThreadPool"));
+
             SchedulingInfrastructure infrastructure = new SchedulingInfrastructureImpl(dbManager,
-                rmProxiesManager, dsServiceStarter, Executors.newFixedThreadPool(10, new NamedThreadFactory(
-                    "SchedulingServiceThread")), new ScheduledThreadPoolExecutor(2, new NamedThreadFactory(
-                    "SchedulingServiceTimerThread")));
+                rmProxiesManager, dsServiceStarter, clientThreadPool, internalThreadPool,
+                new ScheduledThreadPoolExecutor(2, new NamedThreadFactory("SchedulingServiceTimerThread")));
 
             long loadJobPeriod = -1;
             if (PASchedulerProperties.SCHEDULER_DB_LOAD_JOB_PERIOD.isSet()) {

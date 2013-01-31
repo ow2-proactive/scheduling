@@ -101,9 +101,6 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
     /** Maximum blocking time for the do task action */
     protected static final int DOTASK_ACTION_TIMEOUT = PASchedulerProperties.SCHEDULER_STARTTASK_TIMEOUT
             .getValueAsInt();
-    /** MAximum number of thread used for the doTask action */
-    protected static final int DOTASK_ACTION_THREADNUMBER = PASchedulerProperties.SCHEDULER_STARTTASK_THREADNUMBER
-            .getValueAsInt();
 
     protected int activeObjectCreationRetryTimeNumber;
 
@@ -123,7 +120,8 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
         terminateNotification = new TerminateNotification(schedulingService);
         terminateNotification = PAActiveObject.turnActive(terminateNotification);
 
-        this.threadPool = TimeoutThreadPoolExecutor.newFixedThreadPool(DOTASK_ACTION_THREADNUMBER,
+        this.threadPool = TimeoutThreadPoolExecutor.newFixedThreadPool(
+                PASchedulerProperties.SCHEDULER_STARTTASK_THREADNUMBER.getValueAsInt(),
                 new NamedThreadFactory("DoTask_Action"));
         this.internalPolicy = new InternalPolicy();
         this.corePrivateKey = Credentials.getPrivateKey(PASchedulerProperties
