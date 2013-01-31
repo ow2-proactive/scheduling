@@ -39,7 +39,6 @@ package org.ow2.proactive.scheduler.core;
 import java.io.File;
 import java.io.Serializable;
 
-import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.extensions.dataspaces.core.DataSpacesNodes;
 import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
@@ -48,7 +47,7 @@ import org.objectweb.proactive.extensions.vfsprovider.FileSystemServerDeployer;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
 
-public final class DataSpaceServiceStarter implements Serializable {
+public class DataSpaceServiceStarter implements Serializable {
 
     private static final String DEFAULT_LOCAL = System.getProperty("java.io.tmpdir") + File.separator +
         "scheduling";
@@ -75,8 +74,7 @@ public final class DataSpaceServiceStarter implements Serializable {
         namingServiceURL = namingServiceDeployer.getNamingServiceURL();
         namingService = NamingService.createNamingServiceStub(namingServiceURL);
         //set default INPUT/OUTPUT spaces if needed
-        String hostname = PAActiveObject.getActiveObjectNode(PAActiveObject.getStubOnThis())
-                .getVMInformation().getHostName();
+        String hostname = NodeFactory.getDefaultNode().getVMInformation().getHostName();
         //variable used to precise exception
         String currentDir = null;
         try {

@@ -18,6 +18,8 @@ public final class SingleConnectionRMProxiesManager extends RMProxiesManager {
 
     private RMProxyActiveObject currentRMProxy;
 
+    private URI rmURI;
+
     public SingleConnectionRMProxiesManager(URI rmURI, Credentials schedulerProxyCredentials)
             throws RMException, RMProxyCreationException {
         super(schedulerProxyCredentials);
@@ -28,11 +30,17 @@ public final class SingleConnectionRMProxiesManager extends RMProxiesManager {
     }
 
     @Override
+    synchronized public URI getRmUrl() {
+        return rmURI;
+    }
+
+    @Override
     synchronized public void rebindRMProxiesManager(URI rmURI) throws RMException, RMProxyCreationException {
         String rmUrl = rmURI.toString();
         RMAuthentication auth = RMConnection.join(rmUrl);
         currentRMConnection = new Connection(rmURI, auth);
         currentRMProxy = RMProxyActiveObject.createAOProxy(auth, schedulerProxyCredentials);
+        this.rmURI = rmURI;
     }
 
     @Override
@@ -42,10 +50,12 @@ public final class SingleConnectionRMProxiesManager extends RMProxiesManager {
 
     @Override
     public synchronized void terminateAllProxies() {
-        userRMProxy.terminate();
-        currentRMProxy.terminateProxy();
-        currentRMConnection = null;
-        currentRMProxy = null;
+        if (currentRMConnection != null) {
+            userRMProxy.terminate();
+            currentRMProxy.terminateProxy();
+            currentRMConnection = null;
+            currentRMProxy = null;
+        }
     }
 
     @Override

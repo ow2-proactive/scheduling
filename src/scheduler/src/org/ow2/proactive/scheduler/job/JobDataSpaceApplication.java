@@ -42,13 +42,16 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
 import org.objectweb.proactive.extensions.dataspaces.api.FileSelector;
 import org.objectweb.proactive.extensions.dataspaces.api.PADataSpaces;
+import org.objectweb.proactive.extensions.dataspaces.core.DataSpacesImpl;
 import org.objectweb.proactive.extensions.dataspaces.core.DataSpacesNodes;
 import org.objectweb.proactive.extensions.dataspaces.core.InputOutputSpaceConfiguration;
 import org.objectweb.proactive.extensions.dataspaces.core.SpaceInstanceInfo;
+import org.objectweb.proactive.extensions.dataspaces.core.SpaceType;
 import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -164,22 +167,22 @@ public class JobDataSpaceApplication implements Serializable {
         // remove GLOBAL sub directory for this job
         if (PASchedulerProperties.DATASPACE_GLOBAL_URL.isSet()) {
             try {
-                DataSpacesNodes.configureNode(PAActiveObject.getActiveObjectNode(PAActiveObject
-                        .getStubOnThis()), null);
-                DataSpacesNodes.configureApplication(PAActiveObject.getActiveObjectNode(PAActiveObject
-                        .getStubOnThis()), this.applicationId, this.namingServiceURL);
+                Node node = NodeFactory.getDefaultNode();
+                DataSpacesNodes.configureNode(node, null);
+                DataSpacesNodes.configureApplication(node, this.applicationId, this.namingServiceURL);
 
-                DataSpacesFileObject global = PADataSpaces.resolveOutput(SchedulerConstants.GLOBALSPACE_NAME);
+                DataSpacesImpl impl = DataSpacesNodes.getDataSpacesImpl(node);
+                DataSpacesFileObject global = impl.resolveInputOutput(SchedulerConstants.GLOBALSPACE_NAME,
+                        SpaceType.OUTPUT, null);
                 global.delete(FileSelector.SELECT_ALL);
                 global.delete();
             } catch (Throwable e) {
                 logger.warn("Could not clear GLOBAL subdir", e);
             } finally {
                 try {
-                    DataSpacesNodes.tryCloseNodeApplicationConfig(PAActiveObject
-                            .getActiveObjectNode(PAActiveObject.getStubOnThis()));
-                    DataSpacesNodes.closeNodeConfig(PAActiveObject.getActiveObjectNode(PAActiveObject
-                            .getStubOnThis()));
+                    Node node = NodeFactory.getDefaultNode();
+                    DataSpacesNodes.tryCloseNodeApplicationConfig(node);
+                    DataSpacesNodes.closeNodeConfig(node);
                 } catch (Throwable e) {
                 }
             }

@@ -65,6 +65,8 @@ public class TestKilledJobResult extends SchedulerConsecutive {
         System.out.println("Waiting for task1 to finish");
         SchedulerTHelper.waitForEventTaskFinished(jobId, "task1");
 
+        SchedulerTHelper.waitForEventTaskRunning(jobId, "task2");
+
         Scheduler scheduler = SchedulerTHelper.getSchedulerInterface();
 
         System.out.println("Killing job");

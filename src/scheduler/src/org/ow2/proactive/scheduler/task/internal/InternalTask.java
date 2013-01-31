@@ -175,26 +175,25 @@ public abstract class InternalTask extends TaskState {
      */
     @Override
     public TaskState replicate() throws ExecutableCreationException {
-        /* this implementation deep copies everything using serialization.
-         * however the new InternalTask cannot be strictly identical and 
-         * we have to handle the following special cases:
+        /*
+         * this implementation deep copies everything using serialization. however the new
+         * InternalTask cannot be strictly identical and we have to handle the following special
+         * cases:
          * 
-         * - ExecutableContainer is transient and not copied during serialization.
-         * It needs to be manually copied, and added to the InternalTask replica
+         * - ExecutableContainer is transient and not copied during serialization. It needs to be
+         * manually copied, and added to the InternalTask replica
          * 
-         * - Using the TaskInfo of _this_ gives us a FINISHED task, need to explicitely
-         * create a new clean one.
+         * - Using the TaskInfo of _this_ gives us a FINISHED task, need to explicitely create a new
+         * clean one.
          * 
-         * - InternalTask dependencies need to be nulled as they contain references
-         * to other InternalTasks, and will be rewritten later anyway
+         * - InternalTask dependencies need to be nulled as they contain references to other
+         * InternalTasks, and will be rewritten later anyway
          * 
-         * - Most of the objects down the object graph contain Hibernate @Id fields.
-         * If all those fields are not set to 0 when inserting the object in DB,
-         * insertion will fail. 
+         * - Most of the objects down the object graph contain Hibernate @Id fields. If all those
+         * fields are not set to 0 when inserting the object in DB, insertion will fail.
          * 
-         * - Collections are mapped to specific Hibernate internal collections at runtime,
-         * which contain references to the @Id fields mentionned above. They need to be
-         * reset too.
+         * - Collections are mapped to specific Hibernate internal collections at runtime, which
+         * contain references to the @Id fields mentionned above. They need to be reset too.
          */
 
         InternalTask replicatedTask = null;
@@ -224,13 +223,11 @@ public abstract class InternalTask extends TaskState {
 
         replicatedTask.setReplicatedFrom(this);
 
-        /* uncomment this to have a close look at the serialized graph
-         * you will need to add some jars (http://xstream.codehaus.org/) to the classpath
-        XStream x = new XStream();
-        String sx = x.toXML(replicatedTask);
-        System.out.println("----------");
-        System.out.println(sx);
-        System.out.println("----------");
+        /*
+         * uncomment this to have a close look at the serialized graph you will need to add some
+         * jars (http://xstream.codehaus.org/) to the classpath XStream x = new XStream(); String sx
+         * = x.toXML(replicatedTask); System.out.println("----------"); System.out.println(sx);
+         * System.out.println("----------");
          */
 
         // We cannot register the newly created InternalTask for DB insertion now,
@@ -1164,15 +1161,20 @@ public abstract class InternalTask extends TaskState {
         JobId jobId = taskInfo.getJobId();
         if (jobId != null) {
             replacements.put(TaskLauncher.SchedulerVars.JAVAENV_JOB_ID_VARNAME.toString(), jobId.toString());
-            replacements.put(TaskLauncher.SchedulerVars.JAVAENV_JOB_NAME_VARNAME.toString(), jobId.getReadableName());
+            replacements.put(TaskLauncher.SchedulerVars.JAVAENV_JOB_NAME_VARNAME.toString(), jobId
+                    .getReadableName());
         }
         TaskId taskId = taskInfo.getTaskId();
         if (taskId != null) {
-            replacements.put(TaskLauncher.SchedulerVars.JAVAENV_TASK_ID_VARNAME.toString(), taskId.toString());
-            replacements.put(TaskLauncher.SchedulerVars.JAVAENV_TASK_NAME_VARNAME.toString(), taskId.getReadableName());
+            replacements
+                    .put(TaskLauncher.SchedulerVars.JAVAENV_TASK_ID_VARNAME.toString(), taskId.toString());
+            replacements.put(TaskLauncher.SchedulerVars.JAVAENV_TASK_NAME_VARNAME.toString(), taskId
+                    .getReadableName());
         }
-        replacements.put(TaskLauncher.SchedulerVars.JAVAENV_TASK_ITERATION.toString(), String.valueOf(iteration));
-        replacements.put(TaskLauncher.SchedulerVars.JAVAENV_TASK_REPLICATION.toString(), String.valueOf(replication));
+        replacements.put(TaskLauncher.SchedulerVars.JAVAENV_TASK_ITERATION.toString(), String
+                .valueOf(iteration));
+        replacements.put(TaskLauncher.SchedulerVars.JAVAENV_TASK_REPLICATION.toString(), String
+                .valueOf(replication));
 
         return applyReplacementsOnGenericInformation(replacements);
     }

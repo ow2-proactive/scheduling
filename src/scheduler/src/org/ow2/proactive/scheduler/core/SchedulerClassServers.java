@@ -18,9 +18,9 @@ import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.classloading.TaskClassServer;
 
 
-final class SchedulerClassServers {
+public class SchedulerClassServers {
 
-    private static final Logger logger = Logger.getLogger(SchedulerCore.class);
+    private static final Logger logger = Logger.getLogger(SchedulingService.class);
 
     private static final JobLogger jlogger = JobLogger.getInstance();
 

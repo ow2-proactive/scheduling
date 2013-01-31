@@ -52,72 +52,79 @@ public enum TaskStatus implements java.io.Serializable {
     /**
      * The task has just been submitted by the user.
      */
-    SUBMITTED("Submitted"),
+    SUBMITTED("Submitted", true),
     /**
      * The task is in the scheduler pending queue.
      */
-    PENDING("Pending"),
+    PENDING("Pending", true),
     /**
      * The task is paused.
      */
-    PAUSED("Paused"),
+    PAUSED("Paused", true),
     /**
      * The task is executing.
      */
-    RUNNING("Running"),
+    RUNNING("Running", true),
     /**
      * The task is waiting for restart after an error. (ie:native code != 0 or exception)
      */
-    WAITING_ON_ERROR("Faulty..."),
+    WAITING_ON_ERROR("Faulty...", true),
     /**
      * The task is waiting for restart after a failure. (ie:node down)
      */
-    WAITING_ON_FAILURE("Failed..."),
+    WAITING_ON_FAILURE("Failed...", true),
     /**
      * The task is failed
      * (only if max execution time has been reached and the node on which it was started is down).
      */
-    FAILED("Resource down"),
+    FAILED("Resource down", false),
     /**
      * The task could not be started.<br>
      * It means that the task could not be started due to
      * dependences failure.
      */
-    NOT_STARTED("Could not start"),
+    NOT_STARTED("Could not start", false),
     /**
      * The task could not be restarted.<br>
      * It means that the task could not be restarted after an error
      * during the previous execution
      */
-    NOT_RESTARTED("Could not restart"),
+    NOT_RESTARTED("Could not restart", false),
     /**
      * The task has been aborted by an exception on an other task. (job is cancelOnError=true)
      * Can be also in this status if the job is killed while the concerned task was running.
      */
-    ABORTED("Aborted"),
+    ABORTED("Aborted", false),
     /**
      * The task has finished execution with error code (!=0) or exception.
      */
-    FAULTY("Faulty"),
+    FAULTY("Faulty", false),
     /**
      * The task has finished execution.
      */
-    FINISHED("Finished"),
+    FINISHED("Finished", false),
     /**
      * The task was not executed: it was the non-selected branch of an IF/ELSE control flow action
      */
-    SKIPPED("Skipped");
+    SKIPPED("Skipped", false);
 
     /** The name of the current status. */
     private String name;
+
+    private final boolean taskAlive;
 
     /**
      * Implicit constructor of a status.
      *
      * @param name the name of the status.
      */
-    TaskStatus(String name) {
+    TaskStatus(String name, boolean taskAlive) {
         this.name = name;
+        this.taskAlive = taskAlive;
+    }
+
+    public boolean isTaskAlive() {
+        return taskAlive;
     }
 
     /**

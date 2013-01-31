@@ -36,15 +36,12 @@
  */
 package org.ow2.proactive.scheduler.core;
 
-import java.security.KeyException;
 import java.security.PrivateKey;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
@@ -56,23 +53,22 @@ import org.objectweb.proactive.utils.NamedThreadFactory;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.frontend.topology.TopologyDisabledException;
-import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.Scheduler;
-import org.ow2.proactive.scheduler.common.SchedulerEvent;
-import org.ow2.proactive.scheduler.common.SchedulerStatus;
-import org.ow2.proactive.scheduler.common.job.JobStatus;
+import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
+import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobType;
 import org.ow2.proactive.scheduler.common.task.TaskId;
-import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.proactive.scheduler.core.rmproxies.RMProxiesManager;
 import org.ow2.proactive.scheduler.core.rmproxies.RMProxyCreationException;
-import org.ow2.proactive.scheduler.core.rmproxies.UserRMProxy;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptorImpl;
 import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
 import org.ow2.proactive.scheduler.descriptor.TaskDescriptor;
 import org.ow2.proactive.scheduler.job.InternalJob;
+import org.ow2.proactive.scheduler.policy.Policy;
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.ExecutableContainerInitializer;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
@@ -93,10 +89,10 @@ import org.ow2.proactive.utils.NodeSet;
  * @author The ProActive Team
  * @since ProActive Scheduling 2.0
  */
-final class SchedulingMethodImpl implements SchedulingMethod {
+public final class SchedulingMethodImpl implements SchedulingMethod {
 
     /** Scheduler logger */
-    public static final Logger logger = Logger.getLogger(SchedulerCore.class);
+    public static final Logger logger = Logger.getLogger(SchedulingService.class);
     public static final TaskLogger tlogger = TaskLogger.getInstance();
     public static final JobLogger jlogger = JobLogger.getInstance();
 
@@ -111,7 +107,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
 
     protected int activeObjectCreationRetryTimeNumber;
 
-    protected SchedulerCore core;
+    protected final SchedulingService schedulingService;
 
     protected TimeoutThreadPoolExecutor threadPool;
 
@@ -119,17 +115,27 @@ final class SchedulingMethodImpl implements SchedulingMethod {
 
     private InternalPolicy internalPolicy;
 
-    SchedulingMethodImpl(SchedulerCore core) {
-        this.core = core;
+    private TaskTerminateNotification terminateNotification;
+
+    public SchedulingMethodImpl(SchedulingService schedulingService) throws Exception {
+        this.schedulingService = schedulingService;
+
+        terminateNotification = new TerminateNotification(schedulingService);
+        terminateNotification = PAActiveObject.turnActive(terminateNotification);
+
         this.threadPool = TimeoutThreadPoolExecutor.newFixedThreadPool(DOTASK_ACTION_THREADNUMBER,
                 new NamedThreadFactory("DoTask_Action"));
         this.internalPolicy = new InternalPolicy();
-        try {
-            this.corePrivateKey = Credentials.getPrivateKey(PASchedulerProperties
-                    .getAbsolutePath(PASchedulerProperties.SCHEDULER_AUTH_PRIVKEY_PATH.getValueAsString()));
-        } catch (KeyException e) {
-            SchedulerCore.exitFailure(e, null);
-        }
+        this.corePrivateKey = Credentials.getPrivateKey(PASchedulerProperties
+                .getAbsolutePath(PASchedulerProperties.SCHEDULER_AUTH_PRIVKEY_PATH.getValueAsString()));
+    }
+
+    RMProxiesManager getRMProxiesManager() {
+        return schedulingService.getInfrastructure().getRMProxiesManager();
+    }
+
+    private void releaseNodes(InternalJob job, NodeSet nodeSet) throws RMProxyCreationException {
+        getRMProxiesManager().getUserRMProxy(job.getOwner(), job.getCredentials()).releaseNodes(nodeSet);
     }
 
     /**
@@ -151,106 +157,111 @@ final class SchedulingMethodImpl implements SchedulingMethod {
      * @return the number of tasks that have been started
      */
     public int schedule() {
+        Policy currentPolicy = schedulingService.getPolicy();
+
         int numberOfTaskStarted = 0;
         //Number of time to retry an active object creation before leaving scheduling loop
         activeObjectCreationRetryTimeNumber = ACTIVEOBJECT_CREATION_RETRY_TIME_NUMBER;
 
         //get job Descriptor list with eligible jobs (running and pending)
-        ArrayList<JobDescriptor> jobDescriptorList = createJobDescriptorList();
+        Map<JobId, JobDescriptor> jobMap = schedulingService.lockJobsToSchedule();
+        try {
+            List<JobDescriptor> descriptors = new ArrayList<JobDescriptor>(jobMap.size());
+            descriptors.addAll(jobMap.values());
 
-        //ask the policy all the tasks to be schedule according to the jobs list.
-        //and filter them using internal policy
-        LinkedList<EligibleTaskDescriptor> taskRetrivedFromPolicy = internalPolicy.filter(core.policy
-                .getOrderedTasks(jobDescriptorList));
+            //ask the policy all the tasks to be schedule according to the jobs list.
+            //and filter them using internal policy
+            LinkedList<EligibleTaskDescriptor> taskRetrivedFromPolicy = internalPolicy.filter(currentPolicy
+                    .getOrderedTasks(descriptors));
 
-        //if there is no task to scheduled, return
-        if (taskRetrivedFromPolicy == null || taskRetrivedFromPolicy.size() == 0) {
-            return numberOfTaskStarted;
-        }
-
-        logger.info("eligible tasks : " + taskRetrivedFromPolicy.size());
-
-        while (!taskRetrivedFromPolicy.isEmpty()) {
-            //get rmState and update it in scheduling policy
-            RMState rmState = core.rmProxiesManager.getSchedulerRMProxy().getState();
-            core.policy.setRMState(rmState);
-            internalPolicy.RMState = rmState;
-            int freeResourcesNb = rmState.getFreeNodesNumber();
-            logger.info("eligible nodes : " + freeResourcesNb);
-            //if there is no free resources, stop it right now
-            if (freeResourcesNb == 0) {
-                break;
+            //if there is no task to scheduled, return
+            if (taskRetrivedFromPolicy == null || taskRetrivedFromPolicy.size() == 0) {
+                return numberOfTaskStarted;
             }
 
-            //get the next compatible tasks from the whole returned policy tasks
-            LinkedList<EligibleTaskDescriptor> tasksToSchedule = new LinkedList<EligibleTaskDescriptor>();
-            int neededResourcesNumber = 0;
-            while (taskRetrivedFromPolicy.size() > 0 && neededResourcesNumber == 0) {
-                //the loop will search for next compatible task until it find something
-                neededResourcesNumber = getNextcompatibleTasks(taskRetrivedFromPolicy, freeResourcesNb,
-                        tasksToSchedule);
-            }
-            logger.debug("required number of nodes : " + neededResourcesNumber);
-            if (neededResourcesNumber == 0) {
-                break;
-            }
+            logger.info("eligible tasks : " + taskRetrivedFromPolicy.size());
 
-            NodeSet nodeSet = getRMNodes(neededResourcesNumber, tasksToSchedule);
+            while (!taskRetrivedFromPolicy.isEmpty()) {
+                //get rmState and update it in scheduling policy
+                RMState rmState = getRMProxiesManager().getSchedulerRMProxy().getState();
+                currentPolicy.setRMState(rmState);
+                internalPolicy.RMState = rmState;
+                int freeResourcesNb = rmState.getFreeNodesNumber();
+                logger.info("eligible nodes : " + freeResourcesNb);
+                //if there is no free resources, stop it right now
+                if (freeResourcesNb == 0) {
+                    break;
+                }
 
-            //start selected tasks
-            Node node = null;
-            InternalJob currentJob = null;
-            try {
-                while (nodeSet != null && !nodeSet.isEmpty()) {
-                    EligibleTaskDescriptor taskDescriptor = tasksToSchedule.removeFirst();
-                    currentJob = core.jobsState.runningAndPendingJobs().get(taskDescriptor.getJobId());
-                    InternalTask internalTask = currentJob.getIHMTasks().get(taskDescriptor.getTaskId());
+                //get the next compatible tasks from the whole returned policy tasks
+                LinkedList<EligibleTaskDescriptor> tasksToSchedule = new LinkedList<EligibleTaskDescriptor>();
+                int neededResourcesNumber = 0;
+                while (taskRetrivedFromPolicy.size() > 0 && neededResourcesNumber == 0) {
+                    //the loop will search for next compatible task until it find something
+                    neededResourcesNumber = getNextcompatibleTasks(jobMap, taskRetrivedFromPolicy,
+                            freeResourcesNb, tasksToSchedule);
+                }
+                logger.debug("required number of nodes : " + neededResourcesNumber);
+                if (neededResourcesNumber == 0) {
+                    break;
+                }
 
-                    // load and Initialize the executable container
-                    loadAndInit(currentJob, internalTask);
+                NodeSet nodeSet = getRMNodes(jobMap, neededResourcesNumber, tasksToSchedule);
 
-                    //create launcher and try to start the task
-                    node = nodeSet.get(0);
-                    numberOfTaskStarted++;
-                    createExecution(nodeSet, node, currentJob, internalTask, taskDescriptor);
+                //start selected tasks
+                Node node = null;
+                InternalJob currentJob = null;
+                try {
+                    while (nodeSet != null && !nodeSet.isEmpty()) {
+                        EligibleTaskDescriptor taskDescriptor = tasksToSchedule.removeFirst();
+                        currentJob = jobMap.get(taskDescriptor.getJobId()).getInternal();
+                        InternalTask internalTask = currentJob.getIHMTasks().get(taskDescriptor.getTaskId());
 
-                    //if every task that should be launched have been removed
-                    if (tasksToSchedule.isEmpty()) {
-                        //get back unused nodes to the RManager
-                        if (!nodeSet.isEmpty()) {
-                            core.rmProxiesManager.getUserRMProxy(currentJob.getOwner(),
-                                    currentJob.getCredentials()).releaseNodes(nodeSet);
+                        // load and Initialize the executable container
+                        loadAndInit(internalTask);
+
+                        //create launcher and try to start the task
+                        node = nodeSet.get(0);
+                        numberOfTaskStarted++;
+                        createExecution(nodeSet, node, currentJob, internalTask, taskDescriptor);
+
+                        //if every task that should be launched have been removed
+                        if (tasksToSchedule.isEmpty()) {
+                            //get back unused nodes to the RManager
+                            if (!nodeSet.isEmpty()) {
+                                releaseNodes(currentJob, nodeSet);
+                            }
+                            //and leave the loop
+                            break;
                         }
-                        //and leave the loop
-                        break;
+                    }
+                } catch (ActiveObjectCreationException e1) {
+                    //Something goes wrong with the active object creation (createLauncher)
+                    logger.warn("An exception occured while creating the task launcher.", e1);
+                    //so try to get back every remaining nodes to the resource manager
+                    try {
+                        releaseNodes(currentJob, nodeSet);
+                    } catch (Exception e2) {
+                        logger.info("Unable to get back the nodeSet to the RM", e2);
+                    }
+                    if (--activeObjectCreationRetryTimeNumber == 0) {
+                        return numberOfTaskStarted;
+                    }
+                } catch (Exception e1) {
+                    //if we are here, it is that something append while launching the current task.
+                    logger.warn("An exception occured while starting task.", e1);
+                    //so try to get back every remaining nodes to the resource manager
+                    try {
+                        releaseNodes(currentJob, nodeSet);
+                    } catch (Exception e2) {
+                        logger.info("Unable to get back the nodeSet to the RM", e2);
                     }
                 }
-            } catch (ActiveObjectCreationException e1) {
-                //Something goes wrong with the active object creation (createLauncher)
-                logger.warn("An exception occured while creating the task launcher.", e1);
-                //so try to get back every remaining nodes to the resource manager
-                try {
-                    core.rmProxiesManager.getUserRMProxy(currentJob.getOwner(), currentJob.getCredentials())
-                            .releaseNodes(nodeSet);
-                } catch (Exception e2) {
-                    logger.info("Unable to get back the nodeSet to the RM", e2);
-                }
-                if (--activeObjectCreationRetryTimeNumber == 0) {
-                    return numberOfTaskStarted;
-                }
-            } catch (Exception e1) {
-                //if we are here, it is that something append while launching the current task.
-                logger.warn("An exception occured while starting task.", e1);
-                //so try to get back every remaining nodes to the resource manager
-                try {
-                    core.rmProxiesManager.getUserRMProxy(currentJob.getOwner(), currentJob.getCredentials())
-                            .releaseNodes(nodeSet);
-                } catch (Exception e2) {
-                    logger.info("Unable to get back the nodeSet to the RM", e2);
-                }
             }
+            return numberOfTaskStarted;
+        } finally {
+            schedulingService.unlockJobsToSchedule(jobMap.values());
         }
-        return numberOfTaskStarted;
     }
 
     /**
@@ -259,23 +270,18 @@ final class SchedulingMethodImpl implements SchedulingMethod {
      *
      * @return eligible job descriptor list
      */
-    protected ArrayList<JobDescriptor> createJobDescriptorList() {
-        ArrayList<JobDescriptor> list = new ArrayList<JobDescriptor>();
-
-        //add running jobs
-        for (InternalJob j : core.jobsState.runningJobs()) {
-            list.add(j.getJobDescriptor());
-        }
-
-        //if scheduler is not paused, add pending jobs
-        if (core.status != SchedulerStatus.PAUSED) {
-            for (InternalJob j : core.jobsState.pendingJobs()) {
-                list.add(j.getJobDescriptor());
-            }
-        }
-
-        return list;
-    }
+    /*
+     * protected ArrayList<JobDescriptor> createJobDescriptorList() { ArrayList<JobDescriptor> list
+     * = new ArrayList<JobDescriptor>();
+     * 
+     * //add running jobs for (InternalJob j : core.jobsState.runningJobs()) {
+     * list.add(j.getJobDescriptor()); }
+     * 
+     * //if scheduler is not paused, add pending jobs if (core.status != SchedulerStatus.PAUSED) {
+     * for (InternalJob j : core.jobsState.pendingJobs()) { list.add(j.getJobDescriptor()); } }
+     * 
+     * return list; }
+     */
 
     /**
      * Extract the n first compatible tasks from the first argument list,
@@ -292,7 +298,8 @@ final class SchedulingMethodImpl implements SchedulingMethod {
      * 		  by these tasks does not exceed the given max resource number.
      * @return the number of nodes needed to start every task present in the 'toFill' argument at the end of the method.
      */
-    protected int getNextcompatibleTasks(LinkedList<EligibleTaskDescriptor> bagOfTasks, int maxResource,
+    protected int getNextcompatibleTasks(Map<JobId, JobDescriptor> jobsMap,
+            LinkedList<EligibleTaskDescriptor> bagOfTasks, int maxResource,
             LinkedList<EligibleTaskDescriptor> toFill) {
         if (toFill == null || bagOfTasks == null) {
             throw new IllegalArgumentException("The two given lists must not be null !");
@@ -301,7 +308,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
         if (maxResource > 0 && !bagOfTasks.isEmpty()) {
             EligibleTaskDescriptor etd = bagOfTasks.removeFirst();
             ((EligibleTaskDescriptorImpl) etd).addAttempt();
-            InternalJob currentJob = core.jobsState.runningAndPendingJobs().get(etd.getJobId());
+            InternalJob currentJob = jobsMap.get(etd.getJobId()).getInternal();
             InternalTask internalTask = currentJob.getIHMTasks().get(etd.getTaskId());
             int neededNodes = internalTask.getNumberOfNodesNeeded();
             SchedulingTaskComparator referent = new SchedulingTaskComparator(internalTask, currentJob
@@ -313,7 +320,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
                     if (!bagOfTasks.isEmpty()) {
                         etd = bagOfTasks.removeFirst();
                         ((EligibleTaskDescriptorImpl) etd).addAttempt();
-                        currentJob = core.jobsState.runningAndPendingJobs().get(etd.getJobId());
+                        currentJob = jobsMap.get(etd.getJobId()).getInternal();
                         internalTask = currentJob.getIHMTasks().get(etd.getTaskId());
                         neededNodes = internalTask.getNumberOfNodesNeeded();
                     }
@@ -356,7 +363,8 @@ final class SchedulingMethodImpl implements SchedulingMethod {
      * 		   An empty nodeSet if no nodes could be found
      * 		   null if the their was an exception when asking for the nodes (ie : selection script has failed)
      */
-    protected NodeSet getRMNodes(int neededResourcesNumber, LinkedList<EligibleTaskDescriptor> tasksToSchedule) {
+    protected NodeSet getRMNodes(Map<JobId, JobDescriptor> jobMap, int neededResourcesNumber,
+            LinkedList<EligibleTaskDescriptor> tasksToSchedule) {
         NodeSet nodeSet = new NodeSet();
 
         if (neededResourcesNumber <= 0) {
@@ -364,7 +372,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
         }
 
         EligibleTaskDescriptor etd = tasksToSchedule.getFirst();
-        InternalJob currentJob = core.jobsState.runningAndPendingJobs().get(etd.getJobId());
+        InternalJob currentJob = jobMap.get(etd.getJobId()).getInternal();
         InternalTask internalTask = currentJob.getIHMTasks().get(etd.getTaskId());
 
         try {
@@ -401,13 +409,11 @@ final class SchedulingMethodImpl implements SchedulingMethod {
 
                 criteria.setComputationDescriptors(computationDescriptors);
 
-                UserRMProxy rmProxy = core.rmProxiesManager.getUserRMProxy(currentJob.getOwner(), currentJob
-                        .getCredentials());
-
-                nodeSet = rmProxy.getNodes(criteria);
+                nodeSet = getRMProxiesManager().getUserRMProxy(currentJob.getOwner(),
+                        currentJob.getCredentials()).getNodes(criteria);
             } catch (TopologyDisabledException tde) {
                 jlogger.info(currentJob.getId(), "will be canceled as the topology is disabled");
-                simulateJobStartAndCancelIt(tasksToSchedule, "Topology is disabled");
+                schedulingService.simulateJobStartAndCancelIt(tasksToSchedule, "Topology is disabled");
                 return null;
             }
             //the following line is used to unwrap the future, warning when moving or removing
@@ -423,7 +429,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
             logger.info("Selection script throws an exception : " + t);
             logger.debug("", t);
             //simulate jobs starts and cancel it
-            simulateJobStartAndCancelIt(tasksToSchedule, "Selection script has failed : " +
+            schedulingService.simulateJobStartAndCancelIt(tasksToSchedule, "Selection script has failed : " +
                 Formatter.stackTraceToString(t));
             //leave the method by ss failure
             return null;
@@ -431,38 +437,11 @@ final class SchedulingMethodImpl implements SchedulingMethod {
             logger.info("Failed to create User RM Proxy : " + e.getMessage());
             logger.debug("", e);
             //simulate jobs starts and cancel it
-            simulateJobStartAndCancelIt(tasksToSchedule,
+            schedulingService.simulateJobStartAndCancelIt(tasksToSchedule,
                     "Failed to create User RM Proxy : Authentication Failed to Resource Manager for user '" +
                         currentJob.getOwner() + "'");
             //leave the method by ss failure
             return null;
-        }
-    }
-
-    /**
-     * simulate jobs starts and cancel it
-     */
-    private void simulateJobStartAndCancelIt(LinkedList<EligibleTaskDescriptor> tasksToSchedule,
-            String errorMsg) {
-        Set<InternalJob> alreadyDone = new HashSet<InternalJob>();
-        for (EligibleTaskDescriptor eltd : tasksToSchedule) {
-            InternalJob ij = core.jobsState.runningAndPendingJobs().get(eltd.getJobId());
-            InternalTask it = ij.getIHMTasks().get(eltd.getTaskId());
-            if (alreadyDone.contains(ij)) {
-                continue;
-            } else {
-                alreadyDone.add(ij);
-            }
-            // set the different informations on job if it is the first task of this job
-            if (ij.getStartTime() < 0) {
-                ij.start();
-                core.jobsState.jobStarted(ij);
-                //update tasks events list and send it to front-end
-                core.updateTaskInfosList(ij, SchedulerEvent.JOB_PENDING_TO_RUNNING);
-                jlogger.info(ij.getId(), "started");
-            }
-            //selection script has failed : end the job
-            core.endJob(ij, it, null, errorMsg, JobStatus.CANCELED);
         }
     }
 
@@ -472,14 +451,15 @@ final class SchedulingMethodImpl implements SchedulingMethod {
      * @param job the job owning the task to be initialized
      * @param task the task to be initialized
      */
-    protected void loadAndInit(InternalJob job, InternalTask task) {
+    protected void loadAndInit(InternalTask task) {
         tlogger.debug(task.getId(), "initializing the executable container");
-        ExecutableContainer container = core.getDBManager().loadExecutableContainer(task);
+        ExecutableContainer container = getDBManager().loadExecutableContainer(task);
         task.setExecutableContainer(container);
 
         ExecutableContainerInitializer eci = new ExecutableContainerInitializer();
         // TCS can be null for non-java task
-        eci.setClassServer(core.classServers.getTaskClassServer(job.getId()));
+        SchedulerClassServers classServers = schedulingService.getInfrastructure().getTaskClassServer();
+        eci.setClassServer(classServers.getTaskClassServer(task.getJobId()));
         task.getExecutableContainer().init(eci);
     }
 
@@ -500,8 +480,9 @@ final class SchedulingMethodImpl implements SchedulingMethod {
         //enough nodes to be launched at same time for a communicating task
         if (nodeSet.size() >= task.getNumberOfNodesNeeded()) {
             //start dataspace app for this job
-            job.startDataSpaceApplication(core.dataSpaceNSStarter.getNamingService(), core.dataSpaceNSStarter
-                    .getNamingServiceURL());
+            DataSpaceServiceStarter dsStarter = schedulingService.getInfrastructure()
+                    .getDataSpaceServiceStarter();
+            job.startDataSpaceApplication(dsStarter.getNamingService(), dsStarter.getNamingServiceURL());
 
             //create launcher
             launcher = task.createLauncher(job, node);
@@ -520,9 +501,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
                 }
 
                 // activate loggers for this task if needed
-                if (core.jobsToBeLogged.containsKey(job.getId())) {
-                    launcher.activateLogs(core.lfs.getAppenderProvider());
-                }
+                schedulingService.getListenJobLogsSupport().activeLogsIfNeeded(job.getId(), launcher);
 
                 // Set to empty array to emulate varargs behavior (i.e. not defined is
                 // equivalent to empty array, not null.
@@ -535,7 +514,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
                     for (int i = 0; i < resultSize; i++) {
                         parentIds.add(taskDescriptor.getParents().get(i).getTaskId());
                     }
-                    Map<TaskId, TaskResult> taskResults = core.getDBManager().loadTasksResults(job.getId(),
+                    Map<TaskId, TaskResult> taskResults = getDBManager().loadTasksResults(job.getId(),
                             parentIds);
                     for (int i = 0; i < resultSize; i++) {
                         params[i] = taskResults.get(taskDescriptor.getParents().get(i).getTaskId());
@@ -549,15 +528,14 @@ final class SchedulingMethodImpl implements SchedulingMethod {
 
                 finalizeStarting(job, task, node, launcher);
 
-                threadPool.submitWithTimeout(new TimedDoTaskAction(job, task, launcher, core,
-                    (SchedulerCore) PAActiveObject.getStubOnThis(), params, corePrivateKey),
-                        DOTASK_ACTION_TIMEOUT, TimeUnit.MILLISECONDS);
+                threadPool.submitWithTimeout(new TimedDoTaskAction(job, task, launcher, schedulingService,
+                    terminateNotification, params, corePrivateKey), DOTASK_ACTION_TIMEOUT,
+                        TimeUnit.MILLISECONDS);
             } catch (Exception t) {
                 try {
                     //if there was a problem, free nodeSet for multi-nodes task
                     nodes.add(node);
-                    core.rmProxiesManager.getUserRMProxy(job.getOwner(), job.getCredentials()).releaseNodes(
-                            nodes);
+                    releaseNodes(job, nodes);
                 } catch (Throwable ni) {
                     //miam miam
                 }
@@ -580,35 +558,11 @@ final class SchedulingMethodImpl implements SchedulingMethod {
         tlogger.info(task.getId(), "started on " +
             node.getNodeInformation().getVMInformation().getHostName() + "(node: " +
             node.getNodeInformation().getName() + ")");
-        // set the different informations on job
 
-        boolean firstTaskStarted;
+        schedulingService.taskStarted(job, task, launcher);
+    }
 
-        if (job.getStartTime() < 0) {
-            // if it is the first task of this job
-            job.start();
-            core.jobsState.jobStarted(job);
-            //update tasks events list and send it to front-end
-            core.updateTaskInfosList(job, SchedulerEvent.JOB_PENDING_TO_RUNNING);
-            jlogger.info(job.getId(), "started");
-
-            firstTaskStarted = true;
-        } else {
-            firstTaskStarted = false;
-        }
-
-        // set the different informations on task
-        job.startTask(task);
-
-        core.getDBManager().jobTaskStarted(job, task, firstTaskStarted);
-
-        //set this task as started
-        core.jobsState.taskStarted(task, launcher);
-
-        // send task event to front-end
-        core.frontend.taskStateUpdated(job.getOwner(), new NotificationData<TaskInfo>(
-            SchedulerEvent.TASK_PENDING_TO_RUNNING, task.getTaskInfo()));
-        //fill previous task progress with 0, means task has started
-        task.setProgress(0);
+    private SchedulerDBManager getDBManager() {
+        return schedulingService.getInfrastructure().getDBManager();
     }
 }

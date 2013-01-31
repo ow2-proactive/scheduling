@@ -51,6 +51,7 @@
 
 		<pathelement location="${base.dir}/compile/lib/hamcrest-all-1.3.0RC2.jar"/>
 		<pathelement location="${base.dir}/compile/lib/junit-4.11-SNAPSHOT-20120416-1530.jar"/>
+        <pathelement location="${base.dir}/compile/lib/mockito-all-1.9.5.jar"/>
 		<pathelement location="${cl.common.dir}" />
 	</path>
 

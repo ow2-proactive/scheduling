@@ -44,6 +44,7 @@ import java.security.PublicKey;
 import org.apache.log4j.Logger;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
@@ -67,9 +68,9 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
 
     private final TaskLauncher launcher;
 
-    private final SchedulerCore core;
+    private final SchedulingService schedulingService;
 
-    private final SchedulerCore coreStub;
+    private final TaskTerminateNotification terminateNotification;
 
     private final TaskResult[] parameters;
 
@@ -82,17 +83,16 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
      *
      * @param task the internal task
      * @param launcher the launcher of the task
-     * @param core SchedulerCore
-     * @param coreStub the stub on SchedulerCore
      * @param parameters the parameters to be given to the task
      */
-    public TimedDoTaskAction(InternalJob job, InternalTask task, TaskLauncher launcher, SchedulerCore core,
-            SchedulerCore coreStub, TaskResult[] parameters, PrivateKey corePk) {
+    public TimedDoTaskAction(InternalJob job, InternalTask task, TaskLauncher launcher,
+            SchedulingService schedulingService, TaskTerminateNotification terminateNotification,
+            TaskResult[] parameters, PrivateKey corePk) {
         this.job = job;
         this.task = task;
         this.launcher = launcher;
-        this.core = core;
-        this.coreStub = coreStub;
+        this.schedulingService = schedulingService;
+        this.terminateNotification = terminateNotification;
         this.parameters = parameters;
         this.corePk = corePk;
     }
@@ -104,7 +104,7 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
         try {
             fillContainerWithEncryption();
             // try launch the task
-            launcher.doTask(coreStub, task.getExecutableContainer(), parameters);
+            launcher.doTask(terminateNotification, task.getExecutableContainer(), parameters);
         } catch (Throwable e) {
             logger.warn("Failed to start task: " + e.getMessage(), e);
             restartTask();
@@ -137,7 +137,6 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
     public void timeoutAction() {
         try {
             logger.warn("Task start timeout for task '" + task.getId() + "'");
-            core.terminateTaskLauncher(launcher, task.getId(), false);
             restartTask();
         } catch (Throwable e) {
             logger.warn("Exception during submit timeout handling: " + e.getMessage(), e);
@@ -149,7 +148,7 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
             return;
         }
         logger.info("Trying to restart task '" + task.getId() + "'");
-        core.restartTaskOnNodeFailure(job, task, coreStub);
+        schedulingService.restartTaskOnNodeFailure(task);
         taskWasRestarted = true;
     }
 }

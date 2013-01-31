@@ -162,5 +162,6 @@
 	<classpathentry exported="true" kind="lib" path="compile/lib/junit-4.11-SNAPSHOT-20120416-1530.jar"/>
 	<classpathentry kind="lib" path="dist/lib/commons-io-1.2.jar"/>
 	<classpathentry kind="lib" path="compile/lib/tools.jar"/>
+	<classpathentry kind="lib" path="compile/lib/mockito-all-1.9.5.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>

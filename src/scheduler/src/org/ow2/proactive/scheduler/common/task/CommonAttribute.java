@@ -229,5 +229,4 @@ public abstract class CommonAttribute implements Serializable {
         return replacedGenericInformation;
     }
 
-
 }
