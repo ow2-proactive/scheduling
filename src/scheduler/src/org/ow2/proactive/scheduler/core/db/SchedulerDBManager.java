@@ -930,6 +930,7 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
                     tasks.add(task);
                 }
 
+                int counter = 0;
                 for (TaskId newTaskId : changesInfo.getNewTasks()) {
                     InternalTask task = job.getIHMTasks().get(newTaskId);
                     if (task.getExecutableContainer() == null) {
@@ -943,6 +944,10 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
                     TaskData taskData = saveNewTask(session, jobRuntimeData, task);
                     taskRuntimeDataList.add(taskData);
                     tasks.add(task);
+                    if (++counter % 50 == 0) {
+                        session.flush();
+                        session.clear();
+                    }
                 }
 
                 saveTaskDependencies(session, tasks, taskRuntimeDataList);
