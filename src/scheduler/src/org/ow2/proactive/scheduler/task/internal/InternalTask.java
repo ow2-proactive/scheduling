@@ -58,7 +58,6 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.converter.MakeDeepCopy;
-import org.ow2.proactive.db.annotation.Unloadable;
 import org.ow2.proactive.scheduler.common.exception.ExecutableCreationException;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
@@ -112,7 +111,6 @@ public abstract class InternalTask extends TaskState {
     private NodeSet nodeExclusion = null;
 
     /** Contains the user executable */
-    @Unloadable
     @TransientInSerialization
     @XmlTransient
     protected ExecutableContainer executableContainer = null;

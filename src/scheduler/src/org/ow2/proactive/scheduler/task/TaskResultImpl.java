@@ -54,7 +54,6 @@ import javax.xml.bind.annotation.XmlTransient;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.converter.ByteToObjectConverter;
 import org.objectweb.proactive.core.util.converter.ObjectToByteConverter;
-import org.ow2.proactive.db.annotation.Unloadable;
 import org.ow2.proactive.db.types.BigString;
 import org.ow2.proactive.scheduler.common.exception.InternalSchedulerException;
 import org.ow2.proactive.scheduler.common.task.ResultPreview;
@@ -84,30 +83,25 @@ public class TaskResultImpl implements TaskResult {
     private TaskId id = null;
 
     /** The value of the result if no exception occurred as a byte array */
-    @Unloadable
     private byte[] serializedValue = null;
     /** The value of the result if no exception occurred */
     private transient Serializable value = null;
 
     /** The exception thrown by the task as a byte array */
-    @Unloadable
     private byte[] serializedException = null;
     /** The exception thrown by the task */
     private transient Throwable exception = null;
 
     /** Task output */
-    @Unloadable
     private TaskLogs output = null;
 
     /** Description definition of this result */
-    @Unloadable
     private String previewerClassName = null;
 
     /** An instance that describe how to display the result of this task. */
     private transient ResultPreview descriptor = null;
 
     // this classpath is used on client side to instantiate the previewer (can be null)
-    @Unloadable
     private String[] jobClasspath;
 
     /** result of the FlowScript if there was one, or null */
@@ -117,7 +111,6 @@ public class TaskResultImpl implements TaskResult {
     private long taskDuration = -1;
 
     /** All the properties propagated through Exporter.propagateProperty() */
-    // @Unloadable // BUG ? DON't WORK WITH UNLOADABLE
     private Map<String, BigString> propagatedProperties;
 
     public TaskResultImpl(TaskId id, byte[] serializedValue, byte[] serializedException, TaskLogs output,
