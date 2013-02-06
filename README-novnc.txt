@@ -2,7 +2,7 @@ The Rest API module embeds a Java websocket proxy to allow noVNC clients to conn
 
 See:
 https://github.com/kanaka/noVNC
-https://github.com/jribble/Java-Websockify (custom implementation)
+https://github.com/jribble/Java-Websockify (custom implementation from http://gitorious.ow2.org/ow2-proactive/java-websockify)
 Alternatives analysis: https://docs.google.com/a/activeeon.com/document/d/13GbShf2THqxOf4N_JZIGwEVgWieN54KAGN8kKWiOGyg/edit
 
 The websocket proxy, using netty, will be started with the Rest API on a different port.
