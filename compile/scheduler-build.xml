@@ -278,8 +278,6 @@
 				<include name="org/ow2/proactive/scheduler/common/job/JobId.java" />
 				<include name="org/ow2/proactive/scheduler/common/job/JobStatus.java" />
 				<include name="org/ow2/proactive/scheduler/common/job/JobState.java" />
-				<include name="org/ow2/proactive/scheduler/common/db/annotation/Alterable.java" />
-				<include name="org/ow2/proactive/scheduler/common/db/annotation/Unloadable.java" />
 				<include name="org/ow2/proactive/scheduler/common/exception/UserException.java" />
 				<include name="org/ow2/proactive/scheduler/common/exception/DependenceFailedException.java" />
 				<include name="org/ow2/proactive/scheduler/common/exception/ExecutableCreationException.java" />

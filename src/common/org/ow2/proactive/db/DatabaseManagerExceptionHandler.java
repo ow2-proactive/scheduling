@@ -36,7 +36,6 @@
  */
 package org.ow2.proactive.db;
 
-import org.ow2.proactive.db.DatabaseManager.FilteredExceptionCallback;
 
 
 /**

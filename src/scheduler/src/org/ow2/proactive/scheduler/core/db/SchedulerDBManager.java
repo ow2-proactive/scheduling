@@ -1,6 +1,7 @@
 package org.ow2.proactive.scheduler.core.db;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -12,6 +13,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -21,11 +23,10 @@ import org.hibernate.exception.ConstraintViolationException;
 import org.hibernate.transform.DistinctRootEntityResultTransformer;
 import org.junit.Test;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
-import org.ow2.proactive.db.DatabaseManager.FilteredExceptionCallback;
 import org.ow2.proactive.db.DatabaseManagerException;
 import org.ow2.proactive.db.DatabaseManagerExceptionHandler;
 import org.ow2.proactive.db.DatabaseManagerExceptionHandler.DBMEHandler;
-import org.ow2.proactive.db.HibernateDatabaseManager;
+import org.ow2.proactive.db.FilteredExceptionCallback;
 import org.ow2.proactive.scheduler.common.job.JobEnvironment;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
@@ -58,6 +59,7 @@ import org.ow2.proactive.scheduler.task.internal.InternalJavaTask;
 import org.ow2.proactive.scheduler.task.internal.InternalNativeTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scripting.InvalidScriptException;
+import org.ow2.proactive.utils.FileToBytesConverter;
 
 
 public class SchedulerDBManager implements FilteredExceptionCallback {
@@ -112,8 +114,7 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
             propertiesToReplace.put("${pa.scheduler.home}", PASchedulerProperties.SCHEDULER_HOME
                     .getValueAsString());
 
-            Configuration configuration = HibernateDatabaseManager.createConfiguration(configFile,
-                    propertiesToReplace);
+            Configuration configuration = createConfiguration(configFile, propertiesToReplace);
 
             boolean drop = PASchedulerProperties.SCHEDULER_DB_HIBERNATE_DROPDB.getValueAsBoolean();
             return new SchedulerDBManager(configuration, drop);
@@ -1534,5 +1535,30 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
     private static long jobId(JobId jobId) {
         return Long.valueOf(jobId.value());
     }
+    
+    private static Configuration createConfiguration(File configFile, Map<String, String> propertiesToReplace) {
+        try {
+            String configContent = new String(FileToBytesConverter.convertFileToByteArray(configFile));
+
+            for (Map.Entry<String, String> property : propertiesToReplace.entrySet()) {
+                configContent = configContent.replace(property.getKey(), property.getValue());
+            }
+
+            Configuration configuration;
+
+            File modifiedFile = File.createTempFile("dbconfig", "tmp");
+            try {
+                FileToBytesConverter.convertByteArrayToFile(configContent.getBytes(), modifiedFile);
+                configuration = new Configuration().configure(modifiedFile);
+            } finally {
+                modifiedFile.delete();
+            }
+
+            return configuration;
+        } catch (IOException e) {
+            throw new HibernateException("Failed to load Hibernate configuration", e);
+        }
+    }
+
 
 }
