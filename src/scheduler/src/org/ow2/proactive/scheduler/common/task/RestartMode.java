@@ -36,19 +36,11 @@
  */
 package org.ow2.proactive.scheduler.common.task;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 
-import org.hibernate.annotations.AccessType;
-import org.hibernate.annotations.Proxy;
 import org.objectweb.proactive.annotation.PublicAPI;
 
 
@@ -60,16 +52,9 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * @since ProActive 4.0
  */
 @PublicAPI
-@Entity
-@Table(name = "RESTART_MODE")
-@AccessType("field")
-@Proxy(lazy = false)
 @XmlRootElement(name = "restartmode")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class RestartMode implements java.io.Serializable {
-
-    // WARNING, DO NOT CHANGE index property in RestartMode construction,
-    // 1="Anywhere", 2="Elsewhere" (Changing the index can create inconsistent state in DB)
 
     /**
      * The task will be restarted according to its possible resources.
@@ -80,23 +65,11 @@ public class RestartMode implements java.io.Serializable {
      */
     public static final RestartMode ELSEWHERE = new RestartMode(2, "Elsewhere");
 
-    @Id
-    @GeneratedValue
-    @SuppressWarnings("unused")
-    @XmlTransient
-    private long hId;
-
-    @Column(name = "INDEX_")
     @XmlAttribute
     private int index;
 
-    @Column(name = "DESCRIPTION")
     @XmlAttribute
     private String description;
-
-    /** HIBERNATE default constructor */
-    private RestartMode() {
-    }
 
     /**
      * Implicit constructor of a restart mode.

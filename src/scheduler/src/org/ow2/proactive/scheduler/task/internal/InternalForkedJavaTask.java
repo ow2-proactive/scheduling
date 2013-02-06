@@ -39,16 +39,10 @@ package org.ow2.proactive.scheduler.task.internal;
 import java.io.BufferedReader;
 import java.io.FileReader;
 
-import javax.persistence.Entity;
-import javax.persistence.MappedSuperclass;
-import javax.persistence.Table;
-import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 
 import org.apache.log4j.Logger;
-import org.hibernate.annotations.AccessType;
-import org.hibernate.annotations.Proxy;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
@@ -67,26 +61,18 @@ import org.ow2.proactive.scheduler.task.launcher.TaskLauncherInitializer;
  * @author The ProActive Team
  * @since ProActive Scheduling 1.1
  */
-@Entity
-@Table(name = "I_FORKED_TASK")
-@MappedSuperclass
-@AccessType("field")
-@Proxy(lazy = false)
 @XmlAccessorType(XmlAccessType.FIELD)
 public class InternalForkedJavaTask extends InternalJavaTask {
 
     public static final Logger logger = Logger.getLogger(InternalForkedJavaTask.class);
 
     /** Policy content for the forked VM (declared as static element to be cached) */
-    @Transient
     private static StringBuilder policyContent = null;
 
     /** Log4j content for the forked VM (declared as static element to be cached) */
-    @Transient
     private static StringBuilder log4JContent = null;
 
     /** PAConfiguration content for the forked VM (declared as static element to be cached) */
-    @Transient
     private static StringBuilder paConfigContent = null;
 
     /**

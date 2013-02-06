@@ -38,21 +38,9 @@ package org.ow2.proactive.scheduler.common.task.dataspaces;
 
 import java.io.Serializable;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlTransient;
 
-import org.hibernate.annotations.AccessType;
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
-import org.hibernate.annotations.Proxy;
 import org.objectweb.proactive.annotation.PublicAPI;
 
 
@@ -63,23 +51,11 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * @since ProActive Scheduling 1.1
  */
 @PublicAPI
-@Entity
-@Table(name = "OUTPUT_SELECTOR")
-@AccessType("field")
-@Proxy(lazy = false)
 @XmlAccessorType(XmlAccessType.FIELD)
 public class OutputSelector implements Serializable {
 
-    @Id
-    @GeneratedValue
-    @XmlTransient
-    protected long hId;
-
-    @Cascade(CascadeType.ALL)
-    @OneToOne(fetch = FetchType.EAGER, targetEntity = FileSelector.class)
     private FileSelector outputFiles = null;
 
-    @Column(name = "OUTPUT_MODE")
     private OutputAccessMode mode;
 
     public OutputSelector() {

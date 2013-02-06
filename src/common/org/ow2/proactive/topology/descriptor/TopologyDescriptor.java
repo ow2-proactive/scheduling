@@ -38,16 +38,6 @@ package org.ow2.proactive.topology.descriptor;
 
 import java.io.Serializable;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
-import javax.persistence.Table;
-
-import org.hibernate.annotations.AccessType;
-import org.hibernate.annotations.Proxy;
 import org.objectweb.proactive.annotation.PublicAPI;
 
 
@@ -60,11 +50,6 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * use one of predefined constants when it is sufficient.
  */
 @PublicAPI
-@Entity
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@Table(name = "TOPOLOGY_DESCRIPTOR")
-@AccessType("field")
-@Proxy(lazy = false)
 public class TopologyDescriptor implements Serializable {
 
     /** no constraint on node location */
@@ -89,10 +74,6 @@ public class TopologyDescriptor implements Serializable {
      */
     public static final TopologyDescriptor DIFFERENT_HOSTS_EXCLUSIVE = new DifferentHostsExclusiveDescriptor();
 
-    @Id
-    @GeneratedValue
-    private long hibernateId;
-
     /**
      * the flag indicated that descriptor requires the topology information in the resource manager.
      * It affects the scripts execution strategy: if true selection scripts are executed on all nodes
@@ -101,7 +82,6 @@ public class TopologyDescriptor implements Serializable {
      * If this field is set to false the descriptor could be used even when the topology is
      * disabled in the resource manager.
      */
-    @Column(name = "TOPOLOGY_BASED")
     private boolean topologyBased;
 
     /**
