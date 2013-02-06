@@ -1010,6 +1010,21 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
         runWithTransaction(new SessionWork<Void>() {
             @Override
             Void executeWork(Session session) {
+                long jobId = jobId(job);
+
+                String jobUpdate = "update JobData set status = :status, "
+                    + "finishedTime = :finishedTime, numberOfPendingTasks = :numberOfPendingTasks, "
+                    + "numberOfFinishedTasks = :numberOfFinishedTasks, "
+                    + "numberOfRunningTasks = :numberOfRunningTasks where id = :jobId";
+
+                JobInfo jobInfo = job.getJobInfo();
+
+                session.createQuery(jobUpdate).setParameter("status", jobInfo.getStatus()).setParameter(
+                        "finishedTime", jobInfo.getFinishedTime()).setParameter("numberOfPendingTasks",
+                        jobInfo.getNumberOfPendingTasks()).setParameter("numberOfFinishedTasks",
+                        jobInfo.getNumberOfFinishedTasks()).setParameter("numberOfRunningTasks",
+                        jobInfo.getNumberOfRunningTasks()).setParameter("jobId", jobId).executeUpdate();
+
                 String taskUpdate = "update TaskData task set task.taskStatus = :taskStatus, "
                     + "task.finishedTime = :finishedTime, " + "task.executionDuration = :executionDuration "
                     + "where task.id = :taskId";
@@ -1031,27 +1046,15 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
                             taskInfo.getExecutionDuration()).setParameter("taskId", taskId).executeUpdate();
                 }
 
-                long jobId = jobId(job);
-
-                String jobUpdate = "update JobData set status = :status, "
-                    + "finishedTime = :finishedTime, numberOfPendingTasks = :numberOfPendingTasks, "
-                    + "numberOfFinishedTasks = :numberOfFinishedTasks, "
-                    + "numberOfRunningTasks = :numberOfRunningTasks where id = :jobId";
-
-                JobInfo jobInfo = job.getJobInfo();
-
-                session.createQuery(jobUpdate).setParameter("status", jobInfo.getStatus()).setParameter(
-                        "finishedTime", jobInfo.getFinishedTime()).setParameter("numberOfPendingTasks",
-                        jobInfo.getNumberOfPendingTasks()).setParameter("numberOfFinishedTasks",
-                        jobInfo.getNumberOfFinishedTasks()).setParameter("numberOfRunningTasks",
-                        jobInfo.getNumberOfRunningTasks()).setParameter("jobId", jobId).executeUpdate();
-
                 if (result != null) {
                     TaskData.DBTaskId taskId = taskId(finishedTask.getId());
                     saveTaskResult(taskId, result, session);
                 }
 
                 if (finishedJobStatuses.contains(job.getStatus())) {
+                    session.flush();
+                    session.clear();
+
                     removeJobRuntimeData(session, jobId);
                 }
 
