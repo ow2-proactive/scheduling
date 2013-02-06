@@ -231,6 +231,7 @@
 		<jar jarfile="${webinf.lib.dir}/schedulingrest-scheduler-${rest_api.version}.jar">
 			<fileset dir="${classes.dir}">
 				<include name="org/ow2/proactive_grid_cloud_portal/scheduler/**" />
+				<include name="org/ow2/proactive_grid_cloud_portal/novnc/**" />
 				<include name="pa/stub/org/ow2/proactive_grid_cloud_portal/scheduler/**" />
 			</fileset>
 			<manifest>
