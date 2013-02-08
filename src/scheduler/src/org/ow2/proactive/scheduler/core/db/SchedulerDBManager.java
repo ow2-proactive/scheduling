@@ -1535,7 +1535,7 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
     private static long jobId(JobId jobId) {
         return Long.valueOf(jobId.value());
     }
-    
+
     private static Configuration createConfiguration(File configFile, Map<String, String> propertiesToReplace) {
         try {
             String configContent = new String(FileToBytesConverter.convertFileToByteArray(configFile));
@@ -1559,6 +1559,5 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
             throw new HibernateException("Failed to load Hibernate configuration", e);
         }
     }
-
 
 }
