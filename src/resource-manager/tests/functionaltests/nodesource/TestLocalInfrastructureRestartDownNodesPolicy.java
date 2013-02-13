@@ -49,7 +49,6 @@ import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProper
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.LocalInfrastructure;
 import org.ow2.proactive.resourcemanager.nodesource.policy.RestartDownNodesPolicy;
-import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.FileToBytesConverter;
 import org.ow2.proactive.utils.NodeSet;
@@ -68,7 +67,7 @@ public class TestLocalInfrastructureRestartDownNodesPolicy extends RMConsecutive
 
     protected int defaultDescriptorNodesNb = 3;
 
-    protected void createNodeSourceWithNodes(String sourceName) throws Exception {
+    protected void createNodeSourceWithNodes(String sourceName, Object[] policyParameters) throws Exception {
         RMTHelper helper = RMTHelper.getDefaultInstance();
 
         // creating node source
@@ -77,7 +76,7 @@ public class TestLocalInfrastructureRestartDownNodesPolicy extends RMConsecutive
                 .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
         helper.getResourceManager().createNodeSource(sourceName, LocalInfrastructure.class.getName(),
                 new Object[] { "", creds, defaultDescriptorNodesNb, RMTHelper.defaultNodesTimeout, "" },
-                RestartDownNodesPolicy.class.getName(), new Object[] { "ALL", "ALL", "10000" });
+                RestartDownNodesPolicy.class.getName(), policyParameters);
 
         helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, sourceName);
         for (int i = 0; i < defaultDescriptorNodesNb; i++) {
@@ -104,12 +103,22 @@ public class TestLocalInfrastructureRestartDownNodesPolicy extends RMConsecutive
 
         RMTHelper helper = RMTHelper.getDefaultInstance();
         ResourceManager resourceManager = helper.getResourceManager();
-        RMTHelper.log("Test 1 - restart down nodes policy");
-        createNodeSourceWithNodes(source1);
+        RMTHelper.log("Test 0 - create down nodes policy with null parameters (null is a valid input)");
+        createNodeSourceWithNodes("Node_source_0", null);
 
-        RMState s = resourceManager.getState();
-        Assert.assertEquals(defaultDescriptorNodesNb, s.getTotalNodesNumber());
-        Assert.assertEquals(defaultDescriptorNodesNb, s.getFreeNodesNumber());
+        RMState stateTest0 = resourceManager.getState();
+        Assert.assertEquals(defaultDescriptorNodesNb, stateTest0.getTotalNodesNumber());
+        Assert.assertEquals(defaultDescriptorNodesNb, stateTest0.getFreeNodesNumber());
+
+        resourceManager.removeNodeSource("Node_source_0",true);
+
+        RMTHelper.log("Test 1 - restart down nodes policy");
+        createNodeSourceWithNodes(source1, new Object[]{"ALL", "ALL", "10000"});
+
+
+        RMState stateTest1 = resourceManager.getState();
+        Assert.assertEquals(defaultDescriptorNodesNb, stateTest1.getTotalNodesNumber());
+        Assert.assertEquals(defaultDescriptorNodesNb, stateTest1.getFreeNodesNumber());
 
         NodeSet ns = resourceManager.getNodes(new Criteria(defaultDescriptorNodesNb));
 
@@ -118,7 +127,6 @@ public class TestLocalInfrastructureRestartDownNodesPolicy extends RMConsecutive
         }
 
         String nodeUrl = ns.get(0).getNodeInformation().getURL();
-
         helper.killNode(nodeUrl);
 
         RMNodeEvent ev = helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
@@ -129,7 +137,7 @@ public class TestLocalInfrastructureRestartDownNodesPolicy extends RMConsecutive
         helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
-        Assert.assertEquals(defaultDescriptorNodesNb, s.getTotalNodesNumber());
-        Assert.assertEquals(defaultDescriptorNodesNb, s.getTotalAliveNodesNumber());
+        Assert.assertEquals(defaultDescriptorNodesNb, stateTest1.getTotalNodesNumber());
+        Assert.assertEquals(defaultDescriptorNodesNb, stateTest1.getTotalAliveNodesNumber());
     }
 }
