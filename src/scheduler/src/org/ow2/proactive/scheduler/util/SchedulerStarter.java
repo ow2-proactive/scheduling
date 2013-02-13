@@ -65,7 +65,7 @@ import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProper
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.LocalInfrastructure;
-import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
+import org.ow2.proactive.resourcemanager.nodesource.policy.RestartDownNodesPolicy;
 import org.ow2.proactive.scheduler.SchedulerFactory;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
@@ -186,8 +186,8 @@ public class SchedulerStarter {
                                                 .getValueAsString())));
                             rman.createNodeSource(NodeSource.LOCAL_INFRASTRUCTURE_NAME,
                                     LocalInfrastructure.class.getName(), new Object[] { "", creds,
-                                            defaulNodesNumber, defaultNodesTimemout, "" }, StaticPolicy.class
-                                            .getName(), null);
+                                            defaulNodesNumber, defaultNodesTimemout, "" },
+                                    RestartDownNodesPolicy.class.getName(), null);
 
                             logger.info("The resource manager with " + defaulNodesNumber +
                                 " local nodes created on " + rmAuth.getHostURL());

@@ -823,6 +823,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         try {
             return createNodeSource(nodeSourceData);
         } catch (RuntimeException ex) {
+            logger.error(ex.getMessage(), ex);
             if (added) {
                 dataBaseManager.removeNodeSource(nodeSourceName);
             }

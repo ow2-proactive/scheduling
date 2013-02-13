@@ -38,17 +38,6 @@ package org.ow2.proactive.scheduler.common.task.util;
 
 import java.io.Serializable;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Lob;
-import javax.persistence.Table;
-import javax.xml.bind.annotation.XmlTransient;
-
-import org.hibernate.annotations.AccessType;
-import org.hibernate.annotations.Proxy;
-import org.hibernate.annotations.Type;
 import org.objectweb.proactive.annotation.PublicAPI;
 
 
@@ -60,27 +49,8 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * @since ProActive Scheduling 1.1
  */
 @PublicAPI
-@Entity
-@Table(name = "BYTEARRAY_WRAPPER")
-@AccessType("field")
-@Proxy(lazy = false)
 public class ByteArrayWrapper implements Serializable {
-    @Id
-    @GeneratedValue
-    @Column(name = "ID")
-    @SuppressWarnings("unused")
-    @XmlTransient
-    private long hId;
-
-    @Column(name = "VALUE", updatable = false, length = Integer.MAX_VALUE)
-    @Type(type = "org.ow2.proactive.scheduler.core.db.schedulerType.BinaryLargeOBject")
-    @Lob
     private byte[] byteArray;
-
-    /** HIBERNATE default constructor */
-    @SuppressWarnings("unused")
-    private ByteArrayWrapper() {
-    }
 
     /**
      * Create a new instance of ByteArrayWrapper.

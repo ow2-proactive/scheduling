@@ -53,8 +53,8 @@ import java.util.Map.Entry;
 
 import javax.security.auth.login.LoginException;
 
-import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
@@ -67,7 +67,7 @@ import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.frontend.topology.Topology;
 import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager;
-import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
+import org.ow2.proactive.resourcemanager.nodesource.policy.RestartDownNodesPolicy;
 import org.ow2.proactive.resourcemanager.utils.TargetType;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptResult;
@@ -444,7 +444,7 @@ public class ResourceManagerModel extends ConsoleModel {
                 imName = imInputParams[0];
             }
 
-            String policyName = StaticPolicy.class.getName();
+            String policyName = RestartDownNodesPolicy.class.getName();
             if (policyInputParams != null && policyInputParams.length > 1) {
                 policyName = policyInputParams[0];
             }

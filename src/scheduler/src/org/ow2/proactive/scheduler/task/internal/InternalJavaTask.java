@@ -36,17 +36,9 @@
  */
 package org.ow2.proactive.scheduler.task.internal;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.MappedSuperclass;
-import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlTransient;
 
-import org.hibernate.annotations.AccessType;
-import org.hibernate.annotations.Proxy;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
@@ -64,20 +56,10 @@ import org.ow2.proactive.scheduler.util.TaskLogger;
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */
-@Entity
-@Table(name = "I_JAVATASK")
-@MappedSuperclass
-@AccessType("field")
-@Proxy(lazy = false)
 @XmlAccessorType(XmlAccessType.FIELD)
 public class InternalJavaTask extends InternalTask {
 
     public static final TaskLogger logger = TaskLogger.getInstance();
-
-    @Id
-    @GeneratedValue
-    @XmlTransient
-    protected long hId;
 
     /**
      * ProActive empty constructor
@@ -100,7 +82,7 @@ public class InternalJavaTask extends InternalTask {
      * @param node the node on which to create the launcher.
      * @return the created launcher as an activeObject.
      * @throws ActiveObjectCreationException If an active object creation failed.
-     * @throws NodeException 
+     * @throws NodeException
      */
     @Override
     public TaskLauncher createLauncher(InternalJob job, Node node) throws ActiveObjectCreationException,

@@ -1,7 +1,7 @@
 package org.ow2.proactive.scheduler.core;
 
 import java.net.URI;
-import java.util.Hashtable;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
@@ -24,15 +24,15 @@ public class SchedulerClassServers {
 
     private static final JobLogger jlogger = JobLogger.getInstance();
 
-    private final Hashtable<JobId, TaskClassServer> classServers;
+    private final ConcurrentHashMap<JobId, TaskClassServer> classServers;
 
-    private final Hashtable<JobId, RemoteObjectExposer<TaskClassServer>> remoteClassServers;
+    private final ConcurrentHashMap<JobId, RemoteObjectExposer<TaskClassServer>> remoteClassServers;
 
     private final SchedulerDBManager dbManager;
 
     SchedulerClassServers(SchedulerDBManager dbManager) {
-        this.classServers = new Hashtable<JobId, TaskClassServer>();
-        this.remoteClassServers = new Hashtable<JobId, RemoteObjectExposer<TaskClassServer>>();
+        this.classServers = new ConcurrentHashMap<JobId, TaskClassServer>();
+        this.remoteClassServers = new ConcurrentHashMap<JobId, RemoteObjectExposer<TaskClassServer>>();
         this.dbManager = dbManager;
     }
 
@@ -83,18 +83,23 @@ public class SchedulerClassServers {
     /**
      * Create a taskclassserver for this job if a jobclasspath is set
      */
-    void createTaskClassServer(InternalJob job) {
+    void createTaskClassServer(InternalJob job, boolean loadFromDB) {
         // restart classserver if needed
         try {
             String[] classpath = job.getEnvironment().getJobClasspath();
             if (classpath != null && classpath.length > 0) {
-                JobClasspathContent cp = dbManager.loadJobClasspathContent(job.getEnvironment()
-                        .getJobClasspathCRC());
-                if (cp == null) {
-                    throw new ClassServerException("No classpath content is available for job " +
-                        job.getJobInfo().getJobId());
+                if (loadFromDB) {
+                    JobClasspathContent cp = dbManager.loadJobClasspathContent(job.getEnvironment()
+                            .getJobClasspathCRC());
+                    if (cp == null) {
+                        throw new ClassServerException("No classpath content is available for job " +
+                            job.getJobInfo().getJobId());
+                    }
+                    addTaskClassServer(job.getId(), cp.getClasspathContent(), cp.isContainsJarFiles());
+                } else {
+                    addTaskClassServer(job.getId(), job.getEnvironment().clearJobClasspathContent(), job
+                            .getEnvironment().containsJarFile());
                 }
-                addTaskClassServer(job.getId(), cp.getClasspathContent(), cp.isContainsJarFiles());
             }
         } catch (ClassServerException e) {
             throw new IllegalStateException("Cannot create TaskClassServer for job " +

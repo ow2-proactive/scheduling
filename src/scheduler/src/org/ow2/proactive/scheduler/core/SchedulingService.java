@@ -740,7 +740,7 @@ public class SchedulingService {
             switch (job.getStatus()) {
                 case PENDING:
                     // restart classserver if needed
-                    infrastructure.getTaskClassServer().createTaskClassServer(job);
+                    infrastructure.getTaskClassServer().createTaskClassServer(job, false);
                     break;
                 case STALLED:
                 case RUNNING:
@@ -748,7 +748,7 @@ public class SchedulingService {
                     job.startDataSpaceApplication(dsStarter.getNamingService(), dsStarter
                             .getNamingServiceURL());
                     // restart classServer if needed
-                    classServers.createTaskClassServer(job);
+                    classServers.createTaskClassServer(job, false);
                     break;
                 case FINISHED:
                 case CANCELED:
@@ -757,7 +757,7 @@ public class SchedulingService {
                     break;
                 case PAUSED:
                     // restart classserver if needed
-                    classServers.createTaskClassServer(job);
+                    classServers.createTaskClassServer(job, false);
             }
         }
     }

@@ -1,6 +1,9 @@
 # Static nodes acquisition
 org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy
 
+# Static nodes acquisition but tries to restart down nodes
+org.ow2.proactive.resourcemanager.nodesource.policy.RestartDownNodesPolicy
+
 # Nodes acquisition for particular time slot
 org.ow2.proactive.resourcemanager.nodesource.policy.TimeSlotPolicy
 

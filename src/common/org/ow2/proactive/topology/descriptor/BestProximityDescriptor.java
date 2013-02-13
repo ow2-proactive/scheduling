@@ -36,12 +36,6 @@
  */
 package org.ow2.proactive.topology.descriptor;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
-import javax.persistence.Transient;
-
-import org.hibernate.annotations.AccessType;
-import org.hibernate.annotations.Proxy;
 import org.objectweb.proactive.annotation.PublicAPI;
 
 
@@ -58,13 +52,8 @@ import org.objectweb.proactive.annotation.PublicAPI;
  *
  */
 @PublicAPI
-@Entity
-@DiscriminatorValue("BestProximity")
-@AccessType("field")
-@Proxy(lazy = false)
 public class BestProximityDescriptor extends TopologyDescriptor {
 
-    @Transient
     protected DistanceFunction function;
 
     /**

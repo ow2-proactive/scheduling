@@ -36,11 +36,6 @@
  */
 package org.ow2.proactive.scheduler.job;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -73,7 +68,6 @@ import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
 import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
 import org.ow2.proactive.scheduler.common.task.flow.FlowBlock;
 import org.ow2.proactive.scheduler.core.SchedulerStateUpdate;
-import org.ow2.proactive.scheduler.core.annotation.TransientInSerialization;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
 import org.ow2.proactive.scheduler.descriptor.JobDescriptorImpl;
@@ -106,23 +100,19 @@ public abstract class InternalJob extends JobState {
     protected JobInfoImpl jobInfo = new JobInfoImpl();
 
     /** Job descriptor for dependences management */
-    @TransientInSerialization
     @XmlTransient
     private JobDescriptor jobDescriptor;
 
     /** DataSpace application manager for this job */
     //Not DB managed, created once needed.
-    @TransientInSerialization
     @XmlTransient
     private JobDataSpaceApplication jobDataSpaceApplication;
 
     /** Initial waiting time for a task before restarting in millisecond */
-    @TransientInSerialization
     private long restartWaitingTimer = PASchedulerProperties.REEXECUTION_INITIAL_WAITING_TIME.getValueAsInt();
 
     /** used credentials to fork as user id. Can be null, or contain user/pwd[/key] */
     @XmlTransient
-    @TransientInSerialization
     private Credentials credentials = null;
 
     /** Hibernate default constructor */
@@ -313,7 +303,7 @@ public abstract class InternalJob extends JobState {
      * Also, apply a Control Flow Action if provided.
      * This may alter the number of tasks in the job,
      * events have to be sent accordingly.
-     * 
+     *
      * @param errorOccurred has an error occurred for this termination
      * @param taskId the task to terminate.
      * @param frontend Used to notify all listeners of the replication of tasks, triggered by the FlowAction
@@ -344,7 +334,7 @@ public abstract class InternalJob extends JobState {
             switch (action.getType()) {
                 /*
                  * LOOP action
-                 * 
+                 *
                  */
                 case LOOP: {
 
@@ -448,7 +438,7 @@ public abstract class InternalJob extends JobState {
 
                     /*
                      * IF action
-                     * 
+                     *
                      */
                 case IF:
 
@@ -607,7 +597,7 @@ public abstract class InternalJob extends JobState {
 
                     /*
                      * REPLICATE action
-                     * 
+                     *
                      */
                 case REPLICATE:
 
@@ -679,7 +669,7 @@ public abstract class InternalJob extends JobState {
                                     .getNumberOfPendingTasks() +
                                 dup.size());
 
-                            // pointers to the new replicated tasks corresponding the begin and 
+                            // pointers to the new replicated tasks corresponding the begin and
                             // the end of the block ; can be the same
                             InternalTask newTarget = null;
                             InternalTask newEnd = null;
@@ -825,9 +815,9 @@ public abstract class InternalJob extends JobState {
     /**
      * Walk up <code>down</code>'s dependences until
      * a task <code>name</code> is met
-     * 
+     *
      * also walks weak references created by {@link FlowActionType#IF}
-     * 
+     *
      * @return the task names <code>name</code>, or null
      */
     private InternalTask findTaskUp(String name, InternalTask down) {
@@ -927,7 +917,7 @@ public abstract class InternalJob extends JobState {
 
     /**
      * Get a task descriptor that is in the running task queue.
-     * 
+     *
      * @param id the id of the task descriptor to retrieve.
      * @return the task descriptor associated to this id, or null if not running.
      */
@@ -1001,7 +991,7 @@ public abstract class InternalJob extends JobState {
      * Paused every running and submitted tasks in this pending job.
      * After this method and for better performances you may have to
      * set the taskStatusModify to "null" : setTaskStatusModify(null);
-     * 
+     *
      * @return true if the job has correctly been paused, false if not.
      */
     public boolean setPaused() {
@@ -1032,7 +1022,7 @@ public abstract class InternalJob extends JobState {
      * Status of every paused tasks becomes pending or submitted in this pending job.
      * After this method and for better performances you may have to
      * set the taskStatusModify to "null" : setTaskStatusModify(null);
-     * 
+     *
      * @return true if the job has correctly been unpaused, false if not.
      */
     public boolean setUnPause() {
@@ -1283,7 +1273,7 @@ public abstract class InternalJob extends JobState {
 
     /**
      * Get the next restart waiting time in millis.
-     * 
+     *
      * @return the next restart waiting time in millis.
      */
     public long getNextWaitingTime(int executionNumber) {
@@ -1349,50 +1339,6 @@ public abstract class InternalJob extends JobState {
             return task;
         } else {
             throw new UnknownTaskException("'" + taskId + "' does not exist in this job.");
-        }
-    }
-
-    //********************************************************************
-    //************************* SERIALIZATION ****************************
-    //********************************************************************
-
-    /**
-     * <b>IMPORTANT : </b><br />
-     * Using hibernate does not allow to have java transient fields that is inserted in database anyway.<br />
-     * Hibernate defined @Transient annotation meaning the field won't be inserted in database.
-     * If the java transient modifier is set for a field, so the hibernate @Transient annotation becomes
-     * useless and the field won't be inserted in DB anyway.<br />
-     * For performance reason, some field must be java transient but not hibernate transient.
-     * These fields are annotated with @TransientInSerialization.
-     * The @TransientInSerialization describe the fields that won't be serialized by java since the two following
-     * methods describe the serialization process.
-     */
-
-    private void writeObject(ObjectOutputStream out) throws IOException {
-        try {
-            Map<String, Object> toSerialize = new HashMap<String, Object>();
-            Field[] fields = InternalJob.class.getDeclaredFields();
-            for (Field f : fields) {
-                if (!f.isAnnotationPresent(TransientInSerialization.class) &&
-                    !Modifier.isStatic(f.getModifiers())) {
-                    toSerialize.put(f.getName(), f.get(this));
-                }
-            }
-            out.writeObject(toSerialize);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-        try {
-            Map<String, Object> map = (Map<String, Object>) in.readObject();
-            for (Entry<String, Object> e : map.entrySet()) {
-                InternalJob.class.getDeclaredField(e.getKey()).set(this, e.getValue());
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
         }
     }
 

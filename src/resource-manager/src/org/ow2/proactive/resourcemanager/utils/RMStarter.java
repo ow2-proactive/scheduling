@@ -54,6 +54,7 @@ import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProper
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.LocalInfrastructure;
+import org.ow2.proactive.resourcemanager.nodesource.policy.RestartDownNodesPolicy;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.utils.FileToBytesConverter;
 
@@ -156,7 +157,7 @@ public class RMStarter {
                             .getValueAsString())));
                 resourceManager.createNodeSource(nodeSourceName, LocalInfrastructure.class.getName(),
                         new Object[] { "", creds, DEFAULT_NUMBER_OF_NODES, nodeTimeout, "" },
-                        StaticPolicy.class.getName(), null);
+                        RestartDownNodesPolicy.class.getName(), null);
                 resourceManager.disconnect();
                 logger.info("The resource manager with " + DEFAULT_NUMBER_OF_NODES +
                     " local nodes created on " + auth.getHostURL());

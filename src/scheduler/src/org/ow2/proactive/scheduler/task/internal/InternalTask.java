@@ -36,11 +36,6 @@
  */
 package org.ow2.proactive.scheduler.task.internal;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -49,7 +44,6 @@ import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlTransient;
@@ -58,7 +52,6 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.converter.MakeDeepCopy;
-import org.ow2.proactive.db.annotation.Unloadable;
 import org.ow2.proactive.scheduler.common.exception.ExecutableCreationException;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
@@ -70,7 +63,6 @@ import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
 import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
 import org.ow2.proactive.scheduler.common.task.flow.FlowBlock;
-import org.ow2.proactive.scheduler.core.annotation.TransientInSerialization;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
@@ -94,28 +86,23 @@ import org.ow2.proactive.utils.NodeSet;
 public abstract class InternalTask extends TaskState {
 
     /** Parents list : null if no dependences */
-    // WARNING  #writeObject() refers to this field's name as a String 
     @XmlTransient
-    private List<InternalTask> ideps = null;
+    private transient List<InternalTask> ideps = null;
 
     /** Informations about the launcher and node */
     //These informations are not required during task process
-    @TransientInSerialization
-    private ExecuterInformations executerInformations;
+    private transient ExecuterInformations executerInformations;
 
     /** Task information : this is the informations that can change during process. */
     private TaskInfoImpl taskInfo = new TaskInfoImpl();
 
     /** Node exclusion for this task if desired */
-    @TransientInSerialization
     @XmlTransient
-    private NodeSet nodeExclusion = null;
+    private transient NodeSet nodeExclusion = null;
 
     /** Contains the user executable */
-    @Unloadable
-    @TransientInSerialization
     @XmlTransient
-    protected ExecutableContainer executableContainer = null;
+    protected transient ExecutableContainer executableContainer = null;
 
     /** Maximum number of execution for this task in case of failure (node down) */
     private int maxNumberOfExecutionOnFailure = PASchedulerProperties.NUMBER_OF_EXECUTION_ON_FAILURE
@@ -127,40 +114,22 @@ public abstract class InternalTask extends TaskState {
     /** replication number if the task was replicated by a REPLICATE control flow action */
     private int replication = 0;
 
-    /** If this{@link #getFlowBlock()} != {@link FlowBlock#NONE}, 
+    /** If this{@link #getFlowBlock()} != {@link FlowBlock#NONE},
      * each start block has a matching end block and vice versa */
     private String matchingBlock = null;
 
     /** if this task is the JOIN task of a {@link FlowActionType#IF} action,
      * this list contains the 2 end-points (tagged {@link FlowBlock#END}) of the
      * IF and ELSE branches */
-    @TransientInSerialization
     @XmlTransient
-    private List<InternalTask> joinedBranches = null;
+    private transient List<InternalTask> joinedBranches = null;
 
     /** if this task is the IF or ELSE task of a {@link FlowActionType#IF} action,
      * this fields points to the task performing the corresponding IF action */
-    @TransientInSerialization
     @XmlTransient
-    private InternalTask ifBranch = null;
+    private transient InternalTask ifBranch = null;
 
-    /** If unsure, always leave this to false
-     * when true, {@link #ideps} should not be included in the serialization of this object.
-     * setting this flag just before serialization prevents large object graphs from being
-     * serialized when dependencies are not wanted.
-     */
-    @TransientInSerialization
-    @XmlTransient
-    private boolean skipIdepsInSerialization = false;
-
-    /**
-     * List of non-static fields that don't have the
-     * {@link TransientInSerialization} annotation
-     **/
-    private static final List<Field> fieldsToSerialize = getFieldsToSerialize();
-
-    @TransientInSerialization
-    private InternalTask replicatedFrom;
+    private transient InternalTask replicatedFrom;
 
     void setReplicatedFrom(InternalTask replicatedFrom) {
         this.replicatedFrom = replicatedFrom;
@@ -179,19 +148,19 @@ public abstract class InternalTask extends TaskState {
          * this implementation deep copies everything using serialization. however the new
          * InternalTask cannot be strictly identical and we have to handle the following special
          * cases:
-         * 
+         *
          * - ExecutableContainer is transient and not copied during serialization. It needs to be
          * manually copied, and added to the InternalTask replica
-         * 
+         *
          * - Using the TaskInfo of _this_ gives us a FINISHED task, need to explicitely create a new
          * clean one.
-         * 
+         *
          * - InternalTask dependencies need to be nulled as they contain references to other
          * InternalTasks, and will be rewritten later anyway
-         * 
+         *
          * - Most of the objects down the object graph contain Hibernate @Id fields. If all those
          * fields are not set to 0 when inserting the object in DB, insertion will fail.
-         * 
+         *
          * - Collections are mapped to specific Hibernate internal collections at runtime, which
          * contain references to the @Id fields mentionned above. They need to be reset too.
          */
@@ -201,13 +170,10 @@ public abstract class InternalTask extends TaskState {
         // while replicating it "only" loses tasks args in db...
         //ExecutableContainer replicatedContainer = null;
         try {
-            this.skipIdepsInSerialization = true;
             // Deep copy of the InternalTask using serialization
             replicatedTask = (InternalTask) MakeDeepCopy.WithProActiveObjectStream.makeDeepCopy(this);
         } catch (Throwable t) {
             throw new ExecutableCreationException("Failed to serialize task", t);
-        } finally {
-            this.skipIdepsInSerialization = false;
         }
 
         // ideps contain references to other InternalTasks, it needs to be removed.
@@ -237,16 +203,16 @@ public abstract class InternalTask extends TaskState {
     }
 
     /**
-     * Accumulates in <code>acc</code>  replications of all the tasks that recursively 
+     * Accumulates in <code>acc</code>  replications of all the tasks that recursively
      * depend on <code>this</code> until <code>target</code> is met
-     * 
+     *
      * @param acc tasks accumulator
      * @param target stopping condition
      * @param loopAction true if the action performed is a LOOP, false is it is a replicate
      * @param dupIndex replication index threshold if <code>ifAction == true</code>
      *                 replication index to set to the old tasks if <code>ifAction == false</code>
      * @param itIndex iteration index threshold it <code>ifAction == true</code>
-     *        
+     *
      * @throws ExecutableCreationException one task could not be replicated
      */
     public void replicateTree(Map<TaskId, InternalTask> acc, TaskId target, boolean loopAction, int dupIndex,
@@ -281,7 +247,7 @@ public abstract class InternalTask extends TaskState {
 
     /**
      * Internal recursive delegate of {@link #replicateTree(Map, TaskId)} for task replication
-     * 
+     *
      * @param acc accumulator
      * @param target end condition
      * @param loopAction true if the action performed is a LOOP, false is it is a replicate
@@ -338,7 +304,7 @@ public abstract class InternalTask extends TaskState {
 
     /**
      * Internal recursive delegate of {@link #replicateTree(Map, TaskId)} for dependence replication
-     * 
+     *
      * @param acc accumulator
      * @param target end condition
      * @param loopAction true if the action performed is an if, false is it is a replicate
@@ -453,10 +419,10 @@ public abstract class InternalTask extends TaskState {
      * direct or indirect, of <code>parent</code>
      * <p>
      * Direct dependence means through {@link Task#getDependencesList()},
-     * indirect dependence means through weak dependences induced by 
+     * indirect dependence means through weak dependences induced by
      * {@link FlowActionType#IF}, materialized by
      * {@link InternalTask#getIfBranch()} and {@link InternalTask#getJoinedBranches()}.
-     * 
+     *
      * @param parent the dependence to find
      * @return true if this depends on <code>parent</code>
      */
@@ -514,7 +480,7 @@ public abstract class InternalTask extends TaskState {
 
     /**
      * Return a container for the user executable represented by this task descriptor.
-     * 
+     *
      * @return the user executable represented by this task descriptor.
      */
     public ExecutableContainer getExecutableContainer() {
@@ -642,7 +608,7 @@ public abstract class InternalTask extends TaskState {
 
     /**
      * Set the real execution duration for the task.
-     * 
+     *
      * @param duration the real duration of the execution of the task
      */
     public void setExecutionDuration(long duration) {
@@ -710,7 +676,7 @@ public abstract class InternalTask extends TaskState {
 
     /**
      * Returns the node Exclusion group.
-     * 
+     *
      * @return the node Exclusion group.
      */
     public NodeSet getNodeExclusion() {
@@ -820,9 +786,9 @@ public abstract class InternalTask extends TaskState {
     }
 
     /**
-     * Constructs the suffix to append to a task name so that is 
+     * Constructs the suffix to append to a task name so that is
      * can be unique among replicated tasks in complex taskflows with loops/replications
-     * 
+     *
      * @return the String suffix to append to a replicated task so that
      * it can be distinguished from the original
      */
@@ -890,7 +856,7 @@ public abstract class InternalTask extends TaskState {
     /**
      * Extracts the replication index from a non ambiguous name:
      * <p>ie: getReplicationIndexFromName("task1*3") returns 3.
-     * 
+     *
      * @param name non ambiguous task name
      * @return the replication index contained in the name
      */
@@ -905,7 +871,7 @@ public abstract class InternalTask extends TaskState {
     /**
      * Extracts the iteration index from a non ambiguous name:
      * <p>ie: getIterationIndexFromName("task1#3") returns 3.
-     * 
+     *
      * @param name non ambiguous task name
      * @return the replication index contained in the name
      */
@@ -922,7 +888,7 @@ public abstract class InternalTask extends TaskState {
      * Set the iteration number of this task if it was replicated by a IF flow operations
      * <p>
      * Updates the Task's name consequently, see {@link Task#setName(String)}
-     * 
+     *
      * @param it iteration number, must be >= 0
      */
     public void setIterationIndex(int it) {
@@ -944,7 +910,7 @@ public abstract class InternalTask extends TaskState {
 
     /**
      * Set the replication number of this task if it was replicated by a REPLICATE flow operations
-     * 
+     *
      * @param it iteration number, must be >= 0
      */
     public void setReplicationIndex(int it) {
@@ -968,18 +934,18 @@ public abstract class InternalTask extends TaskState {
      * Control Flow Blocks are formed with pairs of {@link FlowBlock#START} and {@link FlowBlock#END}
      * on tasks. The Matching Block of a Task represents the corresponding
      * {@link FlowBlock#START} of a Task tagged {@link FlowBlock#END}, and vice-versa.
-     * 
+     *
      * @return the name of the Task matching the block started or ended in this task, or null
      */
     public String getMatchingBlock() {
         return this.matchingBlock;
     }
 
-    /**            
+    /**
      * Control Flow Blocks are formed with pairs of {@link FlowBlock#START} and {@link FlowBlock#END}
      * on tasks. The Matching Block of a Task represents the corresponding
      * {@link FlowBlock#START} of a Task tagged {@link FlowBlock#END}, and vice-versa.
-     * 
+     *
      * @param s the name of the Task matching the block started or ended in this task
      */
     public void setMatchingBlock(String s) {
@@ -992,7 +958,7 @@ public abstract class InternalTask extends TaskState {
      * branch. Similarly, there exist no dependency between the IF or ELSE branches
      * and the JOIN task.
      * This method provides an easy way to check if this task joins an IF/ELSE action
-     * 
+     *
      * @return a List of String containing the end-points of the IF and ELSE branches
      *         joined by this task, or null if it does not merge anything.
      */
@@ -1005,8 +971,8 @@ public abstract class InternalTask extends TaskState {
      * there exist no hard dependency between the initiator of the action and the IF or ELSE
      * branch. Similarly, there exist no dependency between the IF or ELSE branches
      * and the JOIN task.
-     * 
-     * @param branches sets the List of String containing the end-points 
+     *
+     * @param branches sets the List of String containing the end-points
      *        of the IF and ELSE branches joined by this task
      */
     public void setJoinedBranches(List<InternalTask> branches) {
@@ -1019,7 +985,7 @@ public abstract class InternalTask extends TaskState {
      * branch. Similarly, there exist no dependency between the IF or ELSE branches
      * and the JOIN task.
      * This method provides an easy way to check if this task is an IF/ELSE branch.
-     * 
+     *
      * @return the name of the initiator of the IF action that this task is a branch of
      */
     public InternalTask getIfBranch() {
@@ -1031,7 +997,7 @@ public abstract class InternalTask extends TaskState {
      * there exist no hard dependency between the initiator of the action and the IF or ELSE
      * branch. Similarly, there exist no dependency between the IF or ELSE branches
      * and the JOIN task.
-     * 
+     *
      * @return the name of the initiator of the IF action that this task is a branch of
      */
     public void setIfBranch(InternalTask branch) {
@@ -1041,7 +1007,7 @@ public abstract class InternalTask extends TaskState {
     /**
      * Prepare and return the default task launcher initializer (ie the one that works for every launcher)<br>
      * Concrete launcher may have to add values to the created initializer to bring more information to the launcher.
-     * 
+     *
      * @return the default created task launcher initializer
      */
     protected TaskLauncherInitializer getDefaultTaskLauncherInitializer(InternalJob job) {
@@ -1078,77 +1044,11 @@ public abstract class InternalTask extends TaskState {
         return false;
     }
 
-    //********************************************************************
-    //************************* SERIALIZATION ****************************
-    //********************************************************************
-
     /**
-     * Serialize this instance. Include only the fields contained in the
-     * {@link #fieldsToSerialize}. <br/>
-     * 
-     * If {@link #skipIdepsInSerialization} is true when this method is called,
-     * {@link #ideps} will not be included in the serialized object.
-     */
-
-    private void writeObject(ObjectOutputStream out) throws IOException {
-        try {
-            Map<String, Object> toSerialize = new HashMap<String, Object>();
-            for (Field f : fieldsToSerialize) {
-                // skip the "ideps" field if the skipIdepsInSerialization flag is set
-                if (!(this.skipIdepsInSerialization && (f.getName() == "ideps"))) {
-                    toSerialize.put(f.getName(), f.get(this));
-                }
-            }
-            out.writeObject(toSerialize);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-        try {
-            Map<String, Object> map = (Map<String, Object>) in.readObject();
-            for (Entry<String, Object> e : map.entrySet()) {
-                InternalTask.class.getDeclaredField(e.getKey()).set(this, e.getValue());
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    /**
-     * Create a list of non-static fields without
-     * {@link TransientInSerialization} annotation for later use by the
-     * {@link #writeObject} method. <br/>
-     * 
-     * Note that {@link TransientInSerialization} is used to annotate the fields
-     * of this class that should not be serialized by Java serialization. <br/>
-     * 
-     * Also note that <b>transient</b> modifier cannot be used instead of
-     * {@link TransientInSerialization} because, for performance reasons, some
-     * fields must be Java-transient but not Hibernate-transient; such fields
-     * can have neither the {@link Transient} annotation nor the
-     * <b>transient</b> modifier.
-     * 
-     */
-    private static List<Field> getFieldsToSerialize() {
-        List<Field> fieldsToSerialize = new ArrayList<Field>();
-        Field[] fields = InternalTask.class.getDeclaredFields();
-        for (Field f : fields) {
-            if (!f.isAnnotationPresent(TransientInSerialization.class) &&
-                !Modifier.isStatic(f.getModifiers())) {
-                fieldsToSerialize.add(f);
-            }
-        }
-        return fieldsToSerialize;
-    }
-
-    /**
-     * 
+     *
      * Return generic info replacing $PAS_JOB_NAME, $PAS_JOB_ID, $PAS_TASK_NAME, $PAS_TASK_ID, $PAS_TASK_ITERATION
      * $PAS_TASK_REPLICATION by it's actual value
-     * 
+     *
      */
     public Map<String, String> getGenericInformations() {
 
@@ -1180,10 +1080,10 @@ public abstract class InternalTask extends TaskState {
     }
 
     /**
-     * 
-     * Gets the task generic information. 
+     *
+     * Gets the task generic information.
      * @param replaceVariables - if set to true method replaces variables in the generic information
-     * 
+     *
      */
     public Map<String, String> getGenericInformations(boolean replaceVariables) {
         if (replaceVariables) {

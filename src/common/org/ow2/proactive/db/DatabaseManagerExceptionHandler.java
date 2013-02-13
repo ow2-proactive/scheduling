@@ -36,9 +36,6 @@
  */
 package org.ow2.proactive.db;
 
-import org.ow2.proactive.db.DatabaseManager.FilteredExceptionCallback;
-
-
 /**
  * ExceptionHandler is used by database manager to handle the raised exception.<br/>
  * This class just contains a handle method that will throw an exception (or not) depending on the status

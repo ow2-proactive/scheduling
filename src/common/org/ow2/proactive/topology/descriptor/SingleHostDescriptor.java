@@ -36,11 +36,6 @@
  */
 package org.ow2.proactive.topology.descriptor;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
-
-import org.hibernate.annotations.AccessType;
-import org.hibernate.annotations.Proxy;
 import org.objectweb.proactive.annotation.PublicAPI;
 
 
@@ -48,10 +43,6 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * This descriptor allows to select nodes on the single hosts.
  */
 @PublicAPI
-@Entity
-@DiscriminatorValue("SingleHost")
-@AccessType("field")
-@Proxy(lazy = false)
 public class SingleHostDescriptor extends TopologyDescriptor {
 
     /**

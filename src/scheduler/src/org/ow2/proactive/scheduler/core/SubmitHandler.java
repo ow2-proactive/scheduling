@@ -21,12 +21,7 @@ class SubmitHandler implements Runnable {
     public void run() {
         logger.info("Submitting a new job '" + job.getName() + "'");
 
-        service.jobs.jobSubmitted(job);
-
-        // TODO cdelbe : create classserver only when job is running ?
-        // TODO: here to create classserver can get classpath content directly from InternalJob
-        job.getEnvironment().clearJobClasspathContent();
-        service.infrastructure.getTaskClassServer().createTaskClassServer(job);
+        service.jobs.jobSubmitted(job, service.infrastructure.getTaskClassServer());
     }
 
 }

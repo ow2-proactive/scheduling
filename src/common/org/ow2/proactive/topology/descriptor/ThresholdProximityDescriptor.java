@@ -37,11 +37,7 @@
 package org.ow2.proactive.topology.descriptor;
 
 import javax.persistence.Column;
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
 
-import org.hibernate.annotations.AccessType;
-import org.hibernate.annotations.Proxy;
 import org.objectweb.proactive.annotation.PublicAPI;
 
 
@@ -51,10 +47,6 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * threshold proximity with all nodes from the pivot.
  */
 @PublicAPI
-@Entity
-@DiscriminatorValue("ThresholdProximity")
-@AccessType("field")
-@Proxy(lazy = false)
 public class ThresholdProximityDescriptor extends BestProximityDescriptor {
 
     @Column(name = "THRESHOLD")
