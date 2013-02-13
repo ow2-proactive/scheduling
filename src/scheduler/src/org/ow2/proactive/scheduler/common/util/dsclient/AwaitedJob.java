@@ -1,5 +1,9 @@
 package org.ow2.proactive.scheduler.common.util.dsclient;
 
+import java.io.Serializable;
+import java.util.HashMap;
+
+
 /**
  * A job which has been submitted to the scheduler and whose output data needs
  * to be transfered after termination.
@@ -7,7 +11,7 @@ package org.ow2.proactive.scheduler.common.util.dsclient;
  * @author esalagea
  * 
  */
-public class AwaitedJob {
+public class AwaitedJob implements Serializable {
 
     private String jobId;
 
@@ -15,6 +19,17 @@ public class AwaitedJob {
     private String localInputFolder;
     private String inputSpaceURL;
     private String pushURL;
+    private HashMap<String, AwaitedTask> awaitedTasks;
+    private boolean isolateTaskOutputs;
+    private boolean automaticTransfer;
+
+    public boolean isIsolateTaskOutputs() {
+        return isolateTaskOutputs;
+    }
+
+    public void setIsolateTaskOutputs(boolean isolateTaskOutputs) {
+        this.isolateTaskOutputs = isolateTaskOutputs;
+    }
 
     public void setPushURL(String pushURL) {
         this.pushURL = pushURL;
@@ -41,7 +56,8 @@ public class AwaitedJob {
     }
 
     public AwaitedJob(String jobId, String localInputFolder, String inputSpaceURL, String push_url,
-            String localOutputFolder, String outputSpaceURL, String pull_url) {
+            String localOutputFolder, String outputSpaceURL, String pull_url, boolean isolatetaskOutputs,
+            boolean automaticTransfer, HashMap<String, AwaitedTask> awaitedTasks) {
         super();
         this.jobId = jobId;
         this.localInputFolder = localInputFolder;
@@ -50,6 +66,9 @@ public class AwaitedJob {
         this.outputSpaceURL = outputSpaceURL;
         this.pushURL = push_url;
         this.pullURL = pull_url;
+        this.awaitedTasks = awaitedTasks;
+        this.isolateTaskOutputs = isolatetaskOutputs;
+        this.automaticTransfer = automaticTransfer;
     }
 
     public String getJobId() {
@@ -92,4 +111,36 @@ public class AwaitedJob {
         this.outputSpaceURL = outputSpaceURL;
     }
 
+    public HashMap<String, AwaitedTask> getAwaitedTasks() {
+        return awaitedTasks;
+    }
+
+    public AwaitedTask getAwaitedTask(String tname) {
+        return awaitedTasks.get(tname);
+    }
+
+    public void removeAwaitedTask(String tname) {
+        this.awaitedTasks.remove(tname);
+    }
+
+    public void setAwaitedTasks(HashMap<String, AwaitedTask> awaitedTasks) {
+        this.awaitedTasks = awaitedTasks;
+    }
+
+    public boolean isAutomaticTransfer() {
+        return automaticTransfer;
+    }
+
+    public void setAutomaticTransfer(boolean automaticTransfer) {
+        this.automaticTransfer = automaticTransfer;
+    }
+
+    @Override
+    public String toString() {
+        return "AwaitedJob{" + "jobId='" + jobId + '\'' + ", localInputFolder='" + localInputFolder + '\'' +
+            ", inputSpaceURL='" + inputSpaceURL + '\'' + ", pushURL='" + pushURL + '\'' +
+            ", isolateTaskOutputs=" + isolateTaskOutputs + ", automaticTransfer=" + automaticTransfer +
+            ", localOutputFolder='" + localOutputFolder + '\'' + ", outputSpaceURL='" + outputSpaceURL +
+            '\'' + ", pullURL='" + pullURL + '\'' + '}';
+    }
 }

@@ -70,6 +70,9 @@ public class SchedulerConstants {
     /** Name of the GlobalSpace for DataSpaces registration */
     public static final String GLOBALSPACE_NAME = "GLOBALSPACE";
 
+    /** Default taskid directory name (used in TaskLauncher) */
+    public static final String TASKID_DIR_DEFAULT_NAME = "TASKID";
+
     /**
      * Marker in the task output to locate the remote connection hint
      *  

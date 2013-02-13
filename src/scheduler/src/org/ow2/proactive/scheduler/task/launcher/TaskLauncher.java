@@ -856,6 +856,18 @@ public abstract class TaskLauncher {
                 SCRATCH = PADataSpaces.resolveScratchForAO();
                 INPUT = PADataSpaces.resolveDefaultInput();
                 OUTPUT = PADataSpaces.resolveDefaultOutput();
+                String realURI = OUTPUT.getRealURI();
+                // Look for the [TASKID] pattern at the end of the dataspace URI
+                if (realURI.contains(SchedulerConstants.TASKID_DIR_DEFAULT_NAME)) {
+                    // resolve the taskid subfolder
+                    DataSpacesFileObject tidOutput = OUTPUT.resolveFile(taskId.toString());
+                    // create this subfolder
+                    tidOutput.createFolder();
+                    // assign it to the output space
+                    OUTPUT = tidOutput;
+                    logger.debug(SchedulerConstants.TASKID_DIR_DEFAULT_NAME +
+                        " pattern found, changed OUTPUT SPACE to : " + OUTPUT.getRealURI());
+                }
                 try {
                     GLOBAL = PADataSpaces.resolveOutput(SchedulerConstants.GLOBALSPACE_NAME);
                 } catch (Throwable t) {

@@ -353,6 +353,10 @@ public class SchedulerTHelper {
         System.out.println("------------------------------ " + s);
     }
 
+    public static void log(Exception e) {
+        e.printStackTrace();
+    }
+
     /**
      * Return Scheduler authentication interface. Start Scheduler with test
      * configuration file, if scheduler is not yet started.

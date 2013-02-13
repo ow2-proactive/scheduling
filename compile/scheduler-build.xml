@@ -53,6 +53,7 @@
 			<class name="org.ow2.proactive.scheduler.task.launcher.NativeTaskLauncher" />
 			<class name="org.ow2.proactive.scheduler.ext.filessplitmerge.event.InternalSchedulerEventListener" />
 			<class name="org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface" />
+            <class name="org.ow2.proactive.scheduler.common.util.dsclient.SmartProxy" />
 			<class name="org.ow2.proactive.scheduler.common.util.CachingSchedulerProxyUserInterface" />
 		</stubGenerator>
 
