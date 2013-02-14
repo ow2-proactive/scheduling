@@ -36,10 +36,6 @@
  */
 package org.ow2.tests;
 
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.atomic.AtomicReference;
-
 import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.Assume;
@@ -50,6 +46,10 @@ import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.xml.VariableContractImpl;
 import org.objectweb.proactive.utils.SafeTimerTask;
 
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.atomic.AtomicReference;
+
 
 @Ignore
 public class FunctionalTest {
@@ -59,7 +59,7 @@ public class FunctionalTest {
 
     static final protected Logger logger = Logger.getLogger("testsuite");
     /** Timeout before the test gets killed. */
-    static final private long timeout = CentralPAPropertyRepository.PA_TEST_TIMEOUT.getValue();
+    protected long timeout = CentralPAPropertyRepository.PA_TEST_TIMEOUT.getValue();
     /** Timer to kill the test after the timeout. */
     static final private Timer timer = new Timer("functional test timer", true);
     static final private AtomicReference<TimerTask> timerTask = new AtomicReference<TimerTask>();

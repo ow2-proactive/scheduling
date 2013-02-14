@@ -283,7 +283,8 @@ public final class RMNodeEvent extends RMEvent {
      */
     @Override
     public String toString() {
-        return this.nodeUrl + " : " + this.getEventType() + "[" + this.nodeState + "]";
+        return this.nodeUrl + " : " + this.getEventType() +
+            ((counter > 0) ? " counter: " + counter + " " : "") + "[" + this.nodeState + "]";
     }
 
     /**

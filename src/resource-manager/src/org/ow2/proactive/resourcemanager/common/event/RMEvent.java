@@ -58,6 +58,8 @@ public class RMEvent implements Serializable {
     /** the resource manager client which initiates the event */
     protected String initiator;
     protected long timeStamp;
+    /** event count sent to this client during the session */
+    protected long counter;
 
     /**
      * ProActive empty constructor
@@ -114,10 +116,26 @@ public class RMEvent implements Serializable {
     }
 
     /**
+     * Gets the number of events sent to a client during the current session.
+     * @return the number of events sent to a client during the current session
+     */
+    public long getCounter() {
+        return counter;
+    }
+
+    /**
+     * Sets the number of events sent to a client during the current session.
+     * @param counter to set
+     */
+    public void setCounter(long counter) {
+        this.counter = counter;
+    }
+
+    /**
      * @see java.lang.Object#toString()
      */
     @Override
     public String toString() {
-        return this.type + "[" + this.RMUrl + "]";
+        return this.type + ((counter > 0) ? " counter: " + counter + " " : "") + "[" + this.RMUrl + "]";
     }
 }
