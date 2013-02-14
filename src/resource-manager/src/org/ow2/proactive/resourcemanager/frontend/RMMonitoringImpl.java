@@ -160,6 +160,8 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
 
         protected AtomicBoolean inProcess = new AtomicBoolean(false);
 
+        protected long counter = 0;
+
         public EventDispatcher(Client client, RMEventListener listener, RMEventType[] eventTypes) {
             this.client = client;
             this.listener = listener;
@@ -245,6 +247,7 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
         public void queueEvent(RMEvent event) {
             synchronized (events) {
                 if (eventTypes == null || eventTypes.contains(event.getEventType())) {
+                    event.setCounter(counter++);
                     events.add(event);
 
                     if (inProcess.get()) {
