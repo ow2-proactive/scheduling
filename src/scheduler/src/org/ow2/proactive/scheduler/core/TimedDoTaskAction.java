@@ -40,12 +40,18 @@ import java.security.KeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
+import org.ow2.proactive.scheduler.common.job.JobType;
+import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.descriptor.TaskDescriptor;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
@@ -64,6 +70,8 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
 
     private final InternalJob job;
 
+    private final TaskDescriptor taskDescriptor;
+
     private final InternalTask task;
 
     private final TaskLauncher launcher;
@@ -71,8 +79,6 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
     private final SchedulingService schedulingService;
 
     private final TaskTerminateNotification terminateNotification;
-
-    private final TaskResult[] parameters;
 
     private final PrivateKey corePk;
 
@@ -85,15 +91,15 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
      * @param launcher the launcher of the task
      * @param parameters the parameters to be given to the task
      */
-    public TimedDoTaskAction(InternalJob job, InternalTask task, TaskLauncher launcher,
+    public TimedDoTaskAction(InternalJob job, TaskDescriptor taskDescriptor, TaskLauncher launcher,
             SchedulingService schedulingService, TaskTerminateNotification terminateNotification,
-            TaskResult[] parameters, PrivateKey corePk) {
+            PrivateKey corePk) {
         this.job = job;
-        this.task = task;
+        this.taskDescriptor = taskDescriptor;
+        this.task = taskDescriptor.getInternal();
         this.launcher = launcher;
         this.schedulingService = schedulingService;
         this.terminateNotification = terminateNotification;
-        this.parameters = parameters;
         this.corePk = corePk;
     }
 
@@ -102,9 +108,30 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
      */
     public Void call() throws Exception {
         try {
+            // Set to empty array to emulate varargs behavior (i.e. not defined is
+            // equivalent to empty array, not null.
+            TaskResult[] params = new TaskResult[0];
+            //if job is TASKSFLOW, preparing the list of parameters for this task.
+            int resultSize = taskDescriptor.getParents().size();
+            if ((job.getType() == JobType.TASKSFLOW) && (resultSize > 0) && task.handleResultsArguments()) {
+                params = new TaskResult[resultSize];
+                List<TaskId> parentIds = new ArrayList<TaskId>(resultSize);
+                for (int i = 0; i < resultSize; i++) {
+                    parentIds.add(taskDescriptor.getParents().get(i).getTaskId());
+                }
+                Map<TaskId, TaskResult> taskResults = schedulingService.getInfrastructure().getDBManager()
+                        .loadTasksResults(job.getId(), parentIds);
+                for (int i = 0; i < resultSize; i++) {
+                    params[i] = taskResults.get(taskDescriptor.getParents().get(i).getTaskId());
+                }
+            }
+
+            // activate loggers for this task if needed
+            schedulingService.getListenJobLogsSupport().activeLogsIfNeeded(job.getId(), launcher);
+
             fillContainerWithEncryption();
             // try launch the task
-            launcher.doTask(terminateNotification, task.getExecutableContainer(), parameters);
+            launcher.doTask(terminateNotification, task.getExecutableContainer(), params);
         } catch (Throwable e) {
             logger.warn("Failed to start task: " + e.getMessage(), e);
             restartTask();

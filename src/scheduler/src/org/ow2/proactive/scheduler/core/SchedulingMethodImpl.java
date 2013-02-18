@@ -263,25 +263,6 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
     }
 
     /**
-     * Create the eligible job descriptor list.
-     * This list contains every eligible jobs containing eligible tasks.
-     *
-     * @return eligible job descriptor list
-     */
-    /*
-     * protected ArrayList<JobDescriptor> createJobDescriptorList() { ArrayList<JobDescriptor> list
-     * = new ArrayList<JobDescriptor>();
-     * 
-     * //add running jobs for (InternalJob j : core.jobsState.runningJobs()) {
-     * list.add(j.getJobDescriptor()); }
-     * 
-     * //if scheduler is not paused, add pending jobs if (core.status != SchedulerStatus.PAUSED) {
-     * for (InternalJob j : core.jobsState.pendingJobs()) { list.add(j.getJobDescriptor()); } }
-     * 
-     * return list; }
-     */
-
-    /**
      * Extract the n first compatible tasks from the first argument list,
      * and return them according that the extraction is stopped when the maxResource number is reached.<br>
      * Two tasks are compatible if and only if they have the same list of selection script and
@@ -498,27 +479,6 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                     nodeSet.clear();
                 }
 
-                // activate loggers for this task if needed
-                schedulingService.getListenJobLogsSupport().activeLogsIfNeeded(job.getId(), launcher);
-
-                // Set to empty array to emulate varargs behavior (i.e. not defined is
-                // equivalent to empty array, not null.
-                TaskResult[] params = new TaskResult[0];
-                //if job is TASKSFLOW, preparing the list of parameters for this task.
-                int resultSize = taskDescriptor.getParents().size();
-                if ((job.getType() == JobType.TASKSFLOW) && (resultSize > 0) && task.handleResultsArguments()) {
-                    params = new TaskResult[resultSize];
-                    List<TaskId> parentIds = new ArrayList<TaskId>(resultSize);
-                    for (int i = 0; i < resultSize; i++) {
-                        parentIds.add(taskDescriptor.getParents().get(i).getTaskId());
-                    }
-                    Map<TaskId, TaskResult> taskResults = getDBManager().loadTasksResults(job.getId(),
-                            parentIds);
-                    for (int i = 0; i < resultSize; i++) {
-                        params[i] = taskResults.get(taskDescriptor.getParents().get(i).getTaskId());
-                    }
-                }
-
                 //set nodes in the executable container
                 task.getExecutableContainer().setNodes(nodes);
 
@@ -526,8 +486,8 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
                 finalizeStarting(job, task, node, launcher);
 
-                threadPool.submitWithTimeout(new TimedDoTaskAction(job, task, launcher, schedulingService,
-                    terminateNotification, params, corePrivateKey), DOTASK_ACTION_TIMEOUT,
+                threadPool.submitWithTimeout(new TimedDoTaskAction(job, taskDescriptor, launcher,
+                    schedulingService, terminateNotification, corePrivateKey), DOTASK_ACTION_TIMEOUT,
                         TimeUnit.MILLISECONDS);
             } catch (Exception t) {
                 try {
