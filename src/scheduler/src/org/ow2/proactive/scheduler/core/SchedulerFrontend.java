@@ -807,7 +807,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
             }
         }
 
-        return "Cannot retieve logs for job " + jobId;
+        return "Cannot retrieve logs for job " + jobId;
     }
 
     @Override
