@@ -134,7 +134,7 @@ public class ForkedJavaExecutable extends JavaExecutable implements ForkerStarte
     /**
      * Initialize the executable using the given executable Initializer.
      *
-     * @param execContainer the executable Initializer used to init the executable itself
+     * @param execInitializer the executable Initializer used to init the executable itself
      *
      * @throws Exception an exception if something goes wrong during executable initialization.
      */
@@ -788,27 +788,21 @@ public class ForkedJavaExecutable extends JavaExecutable implements ForkerStarte
         // so that we try to clean sctatch dir
         if (newJavaTaskLauncher != null) {
             // we call the killing process on the forked jvm, this will kill as well its children processes
-            // kill all children processes
+            // we do that before closing the node configuration to avoir handles kept by subprocesses
             try {
-                newJavaTaskLauncher.killChildrenProcesses();
-            } catch (Exception e) {
-                logger.warn("Unable to kill children processes of remote task launcher.", e);
-            }
-
-            try {
-                newJavaTaskLauncher.closeNodeConfiguration();
+                newJavaTaskLauncher.killForkedJavaTaskLauncher();
             } catch (Throwable e) {
-                logger.warn("Unable to close dataspaces while killing forked JVM.", e);
+                logger.debug("Exception when killing Forked Java Task Launcher, this may be normal.", e);
             }
         }
-        // kill anyway !
+        // set the task status to killed
         super.kill();
     }
 
     /**
      * Simple AppenderProvider that provides an appender that redirect all logs
      * on REAL stdout/stderr, i.e. OUT and ERR defined by the system.
-     * @see TaskLauncher.SYSTEM_OUT
+     * @see TaskLauncher
 
      */
     public static class StdAppenderProvider implements AppenderProvider {

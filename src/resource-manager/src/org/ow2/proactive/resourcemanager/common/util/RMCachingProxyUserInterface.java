@@ -56,7 +56,9 @@ import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
 import javax.security.auth.login.LoginException;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.jmx.JMXClientHelper;
@@ -84,6 +86,8 @@ import org.ow2.proactive.resourcemanager.frontend.RMMonitoringImpl;
 @ActiveObject
 public class RMCachingProxyUserInterface extends RMProxyUserInterface implements RMEventListener {
 
+    private Logger logger = ProActiveLogger.getLogger(RMCachingProxyUserInterface.class);
+
     protected RMAuthentication rmAuth;
     protected RMMonitoringImpl rmMonitoring;
     protected RMInitialState rmInitialState;
@@ -92,6 +96,8 @@ public class RMCachingProxyUserInterface extends RMProxyUserInterface implements
 
     protected JMXConnector nodeConnector;
     protected String nodeConnectorUrl;
+
+    protected long counter = 0;
 
     public boolean init(String url, Credentials credentials) throws RMException, KeyException, LoginException {
 
@@ -104,10 +110,28 @@ public class RMCachingProxyUserInterface extends RMProxyUserInterface implements
 
         // here we log on using an empty login field to ensure that
         // credentials are used.
-
         this.jmxClient = new JMXClientHelper(rmAuth, new Object[] { "", credentials });
         this.jmxClient.connect();
         return true;
+    }
+
+    private void checkCounter(RMEvent event) {
+
+        if (counter > 0 && counter != event.getCounter() - 1) {
+            logger.warn("Missing events detected - reseting the rm state");
+            logger.warn("Local event counter is " + counter + " vs. rm event counter " + event.getCounter());
+            try {
+                this.target.getMonitoring().removeRMEventListener();
+            } catch (RMException e) {
+                logger.error(e.getMessage(), e);
+            }
+            rmInitialState = this.target.getMonitoring().addRMEventListener(
+                    (RMEventListener) PAActiveObject.getStubOnThis());
+            counter = 0;
+        } else {
+            counter = event.getCounter();
+        }
+
     }
 
     /**
@@ -122,7 +146,7 @@ public class RMCachingProxyUserInterface extends RMProxyUserInterface implements
                 RMstate = RMEventType.SHUTDOWN;
                 break;
         }
-
+        checkCounter(event);
     }
 
     /**
@@ -143,6 +167,7 @@ public class RMCachingProxyUserInterface extends RMProxyUserInterface implements
                 break;
         }
 
+        checkCounter(event);
     }
 
     /**
@@ -171,6 +196,7 @@ public class RMCachingProxyUserInterface extends RMProxyUserInterface implements
                 break;
 
         }
+        checkCounter(event);
     }
 
     /**

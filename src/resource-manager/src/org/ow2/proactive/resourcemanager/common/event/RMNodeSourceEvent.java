@@ -141,6 +141,7 @@ public class RMNodeSourceEvent extends RMEvent {
      */
     @Override
     public String toString() {
-        return this.getEventType() + "[" + getSourceName() + "]";
+        return this.getEventType() + ((counter > 0) ? " counter: " + counter + " " : "") + "[" +
+            getSourceName() + "]";
     }
 }

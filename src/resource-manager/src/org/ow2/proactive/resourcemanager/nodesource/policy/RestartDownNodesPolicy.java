@@ -71,7 +71,7 @@ public class RestartDownNodesPolicy extends NodeSourcePolicy {
     @Override
     public BooleanWrapper configure(Object... policyParameters) {
         BooleanWrapper parentConfigured = super.configure(policyParameters);
-        if (policyParameters.length > 2) {
+        if (policyParameters!= null && policyParameters.length > 2) {
             checkNodeStateEach = Integer.parseInt(policyParameters[2].toString());
         }
         return parentConfigured;

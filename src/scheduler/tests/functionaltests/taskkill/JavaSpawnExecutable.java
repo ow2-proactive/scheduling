@@ -42,11 +42,9 @@ import org.ow2.proactive.scheduler.util.process.OperatingSystemFamily;
 import org.ow2.proactive.scheduler.util.process.ProcessTreeKiller;
 import org.ow2.proactive.scheduler.util.process.ThreadReader;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.InputStreamReader;
-import java.io.Serializable;
+import java.io.*;
 import java.net.URL;
+import java.util.Map;
 
 
 /**
@@ -71,6 +69,22 @@ public class JavaSpawnExecutable extends JavaExecutable {
             .getResource("/functionaltests/executables/PTK_launcher2.bat");
 
     Integer sleep;
+
+    String tname;
+
+    String tmpdir = System.getProperty("java.io.tmpdir");
+
+    File killFile;
+
+    @Override
+    public void init(Map<String, Serializable> args) throws Exception {
+        super.init(args);
+        tname = (String) args.get("tname");
+        killFile = new File(tmpdir, tname + ".tmp");
+        if (killFile.exists()) {
+            killFile.delete();
+        }
+    }
 
     @Override
     public Serializable execute(TaskResult... results) throws Throwable {
@@ -97,6 +111,17 @@ public class JavaSpawnExecutable extends JavaExecutable {
         Thread.sleep(sleep * 10000); // we sleep 2 sec
 
         return true;
+    }
+
+    @Override
+    public void kill() {
+        System.out.println(this.getClass() + " KILL method called !");
+        try {
+            killFile.createNewFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        super.kill();
     }
 
     public static String[] getNativeExecLauncher(boolean alternate) throws Exception {
