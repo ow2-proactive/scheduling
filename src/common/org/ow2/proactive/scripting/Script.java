@@ -128,19 +128,31 @@ public abstract class Script<E> implements Serializable {
 
     /** Create a script from a file.
      * @param file a file containing the script's source code.
+     * @param engineName String representing the execution engine
      * @param parameters script's execution arguments.
      * @throws InvalidScriptException if the creation fails.
      */
-    public Script(File file, String[] parameters) throws InvalidScriptException {
-        getEngineName(file.getPath());
+    public Script(File file, String engineName, String[] parameters) throws InvalidScriptException {
+        if (engineName == null) {
+            getEngineName(file.getPath());
+        }
 
         try {
-            storeScript(file);
+            script = readFile(file);
         } catch (IOException e) {
             throw new InvalidScriptException("Unable to read script : " + file.getAbsolutePath(), e);
         }
         this.id = file.getPath();
         this.parameters = parameters;
+    }
+
+    /** Create a script from a file.
+     * @param file a file containing the script's source code.
+     * @param parameters script's execution arguments.
+     * @throws InvalidScriptException if the creation fails.
+     */
+    public Script(File file, String[] parameters) throws InvalidScriptException {
+        this(file, null, parameters);
     }
 
     /** Create a script from a file.
@@ -333,7 +345,7 @@ public abstract class Script<E> implements Serializable {
     }
 
     /** Create string script from file */
-    protected void storeScript(File file) throws IOException {
+    public static String readFile(File file) throws IOException {
         BufferedReader buf = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
         StringBuilder builder = new StringBuilder();
         String tmp = null;
@@ -342,7 +354,7 @@ public abstract class Script<E> implements Serializable {
             builder.append(tmp + "\n");
         }
 
-        script = builder.toString();
+        return builder.toString();
     }
 
     public String getEngineName() {

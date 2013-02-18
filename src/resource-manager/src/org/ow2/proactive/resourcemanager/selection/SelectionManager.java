@@ -36,6 +36,7 @@
  */
 package org.ow2.proactive.resourcemanager.selection;
 
+import java.io.File;
 import java.security.Permission;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -96,6 +97,8 @@ public abstract class SelectionManager {
 
     private Set<String> inProgress;
 
+    protected HashSet<String> authorizedSelectionScripts = null;
+
     // the policy for arranging nodes
     private SelectionPolicy selectionPolicy;
 
@@ -116,6 +119,35 @@ public abstract class SelectionManager {
             logger.error("Cannot use the specified policy class: " + policyClassName, e);
             logger.warn("Using the default class: " + ShufflePolicy.class.getName());
             selectionPolicy = new ShufflePolicy();
+        }
+
+        loadAuthorizedScriptsSignatures();
+    }
+
+    /**
+     * Loads authorized selection scripts.
+     */
+    public void loadAuthorizedScriptsSignatures() {
+        String dirName = PAResourceManagerProperties.RM_EXECUTE_SCRIPT_AUTHORIZED_DIR.getValueAsString();
+        if (dirName != null) {
+            logger.info("The resource manager will accept only selection scripts from " + dirName);
+            File folder = new File(dirName);
+            if (folder.exists() && folder.isDirectory()) {
+                authorizedSelectionScripts = new HashSet<String>();
+                for (File file : folder.listFiles()) {
+                    if (file.isFile()) {
+                        try {
+                            String script = SelectionScript.readFile(file);
+                            logger.debug("Adding authorized selection script " + file.getAbsolutePath());
+                            authorizedSelectionScripts.add(SelectionScript.digest(script));
+                        } catch (Exception e) {
+                            logger.error(e.getMessage(), e);
+                        }
+                    }
+                }
+            } else {
+                logger.error("Invalid dir name for authorized scripts " + dirName);
+            }
         }
     }
 
@@ -193,6 +225,9 @@ public abstract class SelectionManager {
         // if could be shuffling or node source priorities
         List<RMNode> afterPolicyNodes = selectionPolicy.arrangeNodes(criteria.getSize(), filteredNodes,
                 client);
+
+        // checking if all scripts are authorized
+        checkAuthorizedScripts(criteria.getScripts());
 
         // arranging nodes for script execution
         List<RMNode> arrangedNodes = arrangeNodesForScriptExecution(afterPolicyNodes, criteria.getScripts());
@@ -297,6 +332,21 @@ public abstract class SelectionManager {
 
         MDC.getContext().remove(MultipleFileAppender.FILE_NAMES);
         return selectedNodes;
+    }
+
+    /**
+     * Checks is all scripts are authorized. If not throws an exception.
+     */
+    private void checkAuthorizedScripts(List<SelectionScript> scripts) {
+        if (authorizedSelectionScripts == null)
+            return;
+
+        for (SelectionScript script : scripts) {
+            if (!authorizedSelectionScripts.contains(SelectionScript.digest(script.getScript()))) {
+                // unauthorized selection script
+                throw new SecurityException("Cannot execute unauthorized script " + script.getScript());
+            }
+        }
     }
 
     /**

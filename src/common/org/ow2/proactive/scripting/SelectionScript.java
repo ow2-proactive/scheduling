@@ -139,6 +139,17 @@ public class SelectionScript extends Script<Boolean> {
     }
 
     /** Create a selection script from a file.
+     * @param file a file containing the script
+     * @param engineName String a script execution engine.
+     * @param parameters script execution arguments.
+     * @throws InvalidScriptException if the creation fails.
+     */
+    public SelectionScript(File file, String engineName, String[] parameters) throws InvalidScriptException {
+        super(file, engineName, parameters);
+        buildSelectionScriptId();
+    }
+
+    /** Create a selection script from a file.
      * @param file a file containing script code
      * @param parameters script execution arguments.
      * @param dynamic tell if script is dynamic or static
@@ -304,6 +315,17 @@ public class SelectionScript extends Script<Boolean> {
      */
     public byte[] digest() throws NoSuchAlgorithmException {
         return MessageDigest.getInstance("MD5").digest(id_);
+    }
+
+    /**
+     * Get MD5 hash value of the script without parameters
+     */
+    public static String digest(String script) {
+        try {
+            return new String(MessageDigest.getInstance("MD5").digest(script.getBytes()));
+        } catch (NoSuchAlgorithmException e) {
+            return script;
+        }
     }
 
     /** Compare two arrays of bytes

@@ -88,6 +88,12 @@ public enum PAResourceManagerProperties {
      *  {@link SelectionManager#executeScript(org.ow2.proactive.scripting.Script, java.util.HashMap)}*/
     RM_EXECUTE_SCRIPT_TIMEOUT("pa.rm.execute.script.timeout", PropertyType.INTEGER),
 
+    /** 
+     * If set to non-null value the resource manager executes only scripts from
+     * this directory. All other selection scripts will be rejected.
+     */
+    RM_EXECUTE_SCRIPT_AUTHORIZED_DIR("pa.rm.select.script.authorized.dir", PropertyType.STRING),
+
     /** Timeout in ms for node lookup */
     RM_NODELOOKUP_TIMEOUT("pa.rm.nodelookup.timeout", PropertyType.INTEGER),
 
