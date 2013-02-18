@@ -42,6 +42,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Properties;
 
+
 public class PortalConfiguration {
 
     public static String scheduler_url = "scheduler.url";
@@ -68,7 +69,12 @@ public class PortalConfiguration {
 
     public static void load(File f) throws FileNotFoundException, IOException {
         properties = new Properties();
-        properties.load(new FileInputStream(f));
+        FileInputStream in = new FileInputStream(f);
+        try {
+            properties.load(in);
+        } finally {
+            in.close();
+        }
     }
 
     public static Properties getProperties() {

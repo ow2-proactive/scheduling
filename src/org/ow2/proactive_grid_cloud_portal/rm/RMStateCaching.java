@@ -82,7 +82,7 @@ public class RMStateCaching {
      * <p>
      * Thread frequency can be customized using {@link PortalConfiguration#rm_cache_refreshrate}
      * <p>
-     * Cached object can be retreived using {@link #getRMInitialState()}
+     * Cached object can be retrieved using {@link #getRMInitialState()}
      * <p>
      * Stop this thread by calling {@link #kill()}
      */
@@ -110,8 +110,7 @@ public class RMStateCaching {
             try {
                 if (rm == null) {
                     rm = PAActiveObject.newActive(RMCachingProxyUserInterface.class, new Object[] {});
-                    File f = new File(cred_path);
-                    if (f.exists()) {
+                    if (cred_path != null && new File(cred_path).exists()) {
                         Credentials cred = Credentials.getCredentials(cred_path);
                         rm.init(url, cred);
                     } else {
@@ -123,8 +122,10 @@ public class RMStateCaching {
                     }
                 }
             } catch (Exception e) {
-                PAActiveObject.terminateActiveObject(rm, true);
-                rm = null;
+                if (rm != null) {
+                    PAActiveObject.terminateActiveObject(rm, true);
+                    rm = null;
+                }
                 new Sleeper(8 * 1000).sleep();
                 continue;
             }
@@ -143,9 +144,7 @@ public class RMStateCaching {
                         long t2 = System.currentTimeMillis();
                         logger.debug("updated RM initial state in " + (t2 - t1) + "ms");
                     } catch (Throwable t) {
-                        logger
-                                .error("Exception occurrend while updating RM state cache, connection reset",
-                                        t);
+                        logger.error("Exception occurrend while updating RM state cache, connection reset", t);
                         init_();
                     }
 

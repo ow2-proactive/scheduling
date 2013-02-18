@@ -48,10 +48,8 @@ import java.util.concurrent.TimeUnit;
 
 import org.jboss.resteasy.core.Dispatcher;
 import org.jboss.resteasy.plugins.server.tjws.TJWSEmbeddedJaxrsServer;
-import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
-import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
@@ -68,23 +66,15 @@ import org.ow2.proactive.scheduler.common.SchedulerConnection;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.util.SchedulerStarter;
-import org.ow2.proactive_grid_cloud_portal.rm.RMSessionMapper;
-import org.ow2.proactive_grid_cloud_portal.rm.RMSessionsCleaner;
-import org.ow2.proactive_grid_cloud_portal.scheduler.IntWrapperConverter;
-import org.ow2.proactive_grid_cloud_portal.scheduler.RestartModeConverter;
-import org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerSessionMapper;
-import org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerSessionsCleaner;
 import org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest;
-import org.ow2.proactive_grid_cloud_portal.webapp.JacksonProvider;
-import org.ow2.proactive_grid_cloud_portal.webapp.PersistentMapConverter;
-import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
+import org.ow2.proactive_grid_cloud_portal.webapp.RestRuntime;
 
 import functionaltests.utils.ProcessStreamReader;
 import functionaltests.utils.RestFuncTUtils;
 
+
 public class RestFuncTHelper {
-    private static URL defaultJobXml = AbstractRestFuncTestCase.class
-            .getResource("config/test-job.xml");
+    private static URL defaultJobXml = AbstractRestFuncTestCase.class.getResource("config/test-job.xml");
 
     private static URL defaultPortalProperties = RestFuncTHelper.class
             .getResource("config/defaultPortal.properties");
@@ -92,17 +82,14 @@ public class RestFuncTHelper {
     private static URL serverJavaPolicy = RestFuncTHelper.class
             .getResource("config/server-java.security.policy");
 
-    private static URL rmHibernateConfig = RestFuncTHelper.class
-            .getResource("config/rmHibernateConfig.xml");
+    private static URL rmHibernateConfig = RestFuncTHelper.class.getResource("config/rmHibernateConfig.xml");
 
     private static URL schedHibernateConfig = RestFuncTHelper.class
             .getResource("config/schedHibernateConfig.xml");
 
-    private static URL defaultPAConfigFile = RestFuncTHelper.class
-            .getResource("config/defaultPAConfig.xml");
+    private static URL defaultPAConfigFile = RestFuncTHelper.class.getResource("config/defaultPAConfig.xml");
 
-    private static URL rmLog4jConfig = RestFuncTHelper.class
-            .getResource("config/rmLog4JConfig.properties");
+    private static URL rmLog4jConfig = RestFuncTHelper.class.getResource("config/rmLog4JConfig.properties");
 
     private static URL schedLog4JConfig = RestFuncTHelper.class
             .getResource("config/schedLog4JConfig.properties");
@@ -110,13 +97,11 @@ public class RestFuncTHelper {
     private static URL forkedTaskLog4JConfig = RestFuncTHelper.class
             .getResource("config/forkedTaskLog4JConfig.properties");
 
-    private static final String[] requiredJARs = { "script-js.jar",
-            "gson-2.1.jar", "jruby-engine.jar", "jython-engine.jar",
-            "commons-logging-1.1.1.jar", "ProActive_Scheduler-core.jar",
-            "ProActive_SRM-common.jar", "ProActive_ResourceManager.jar",
-            "ProActive_Scheduler-worker.jar",
-            "ProActive_Scheduler-mapreduce.jar", "commons-httpclient-3.1.jar",
-            "commons-codec-1.3.jar", "ProActive.jar" };
+    private static final String[] requiredJARs = { "script-js.jar", "gson-2.1.jar", "jruby-engine.jar",
+            "jython-engine.jar", "commons-logging-1.1.1.jar", "ProActive_Scheduler-core.jar",
+            "ProActive_SRM-common.jar", "ProActive_ResourceManager.jar", "ProActive_Scheduler-worker.jar",
+            "ProActive_Scheduler-mapreduce.jar", "commons-httpclient-3.1.jar", "commons-codec-1.3.jar",
+            "ProActive.jar" };
 
     private static final String defaultNodeSourceName = "_DEFAULT_NODE_SOURCE_";
 
@@ -138,27 +123,20 @@ public class RestFuncTHelper {
 
     private static PublicKey schedulerPublicKey;
 
-    private static SchedulerSessionsCleaner schedulerSessionsCleaner;
-
-    private static RMSessionsCleaner rmSessionsCleaner;
+    private static RestRuntime restRuntime;
 
     private RestFuncTHelper() {
     }
 
     public static void startRestfulSchedulerWebapp() throws Exception {
-        PortalConfiguration.load(getdefaultPortalPropertiesPathname());
         String rmUrl = startResourceManager();
         startScheduler(rmUrl);
         startEmbeddedServer();
-        startSchedulerSessionsCleaner();
-        startResourceManagerSessionsCleaner();
     }
 
     public static void stopRestfulSchedulerWebapp() {
         stopEmbeddedServer();
-        stopSchedulerSessionsCleaner();
         stopScheduler();
-        stopRmSessionCleaner();
         stopRm();
     }
 
@@ -168,21 +146,18 @@ public class RestFuncTHelper {
         commandList.add(javaPath);
         commandList.add("-Djava.security.manager");
         commandList.add("-Djava.security.policy");
-        commandList.add(CentralPAPropertyRepository.JAVA_SECURITY_POLICY
-                .getCmdLine() + getServerSecurityPolicyPathname());
+        commandList.add(CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getCmdLine() +
+            getServerSecurityPolicyPathname());
         String dropDB = System.getProperty("rm.deploy.dropDB", "true");
-        commandList.add(PAResourceManagerProperties.RM_DB_HIBERNATE_DROPDB
-                .getCmdLine() + dropDB);
-        commandList.add(PAResourceManagerProperties.RM_DB_HIBERNATE_CONFIG
-                .getCmdLine() + getRmHibernateConfigPathname());
-        commandList.add(CentralPAPropertyRepository.PA_HOME.getCmdLine()
-                + getRmHome());
-        commandList.add(PAResourceManagerProperties.RM_HOME.getCmdLine()
-                + getRmHome());
-        commandList.add(CentralPAPropertyRepository.PA_CONFIGURATION_FILE
-                .getCmdLine() + getDefaultPAConfigPathname());
-        commandList.add(CentralPAPropertyRepository.LOG4J.getCmdLine()
-                + "file:" + getRmLog4JConfigPathname());
+        commandList.add(PAResourceManagerProperties.RM_DB_HIBERNATE_DROPDB.getCmdLine() + dropDB);
+        commandList.add(PAResourceManagerProperties.RM_DB_HIBERNATE_CONFIG.getCmdLine() +
+            getRmHibernateConfigPathname());
+        commandList.add(CentralPAPropertyRepository.PA_HOME.getCmdLine() + getRmHome());
+        commandList.add(PAResourceManagerProperties.RM_HOME.getCmdLine() + getRmHome());
+        commandList.add(CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getCmdLine() +
+            getDefaultPAConfigPathname());
+        commandList
+                .add(CentralPAPropertyRepository.LOG4J.getCmdLine() + "file:" + getRmLog4JConfigPathname());
         commandList.add("-cp");
         commandList.add(getClassPath());
         commandList.add(RMStarter.class.getName());
@@ -190,25 +165,21 @@ public class RestFuncTHelper {
         processBuilder.redirectErrorStream(true);
         rmProcess = processBuilder.start();
 
-        ProcessStreamReader out = new ProcessStreamReader(
-                "rm-process-output: ", rmProcess.getInputStream(), System.out);
+        ProcessStreamReader out = new ProcessStreamReader("rm-process-output: ", rmProcess.getInputStream(),
+            System.out);
         out.start();
 
-        String port = CentralPAPropertyRepository.PA_RMI_PORT
-                .getValueAsString();
+        String port = CentralPAPropertyRepository.PA_RMI_PORT.getValueAsString();
         String url = "rmi://localhost:" + port + "/";
 
-        RMAuthentication rmAuth = RMConnection.waitAndJoin(url,
-                TimeUnit.SECONDS.toMillis(60));
+        RMAuthentication rmAuth = RMConnection.waitAndJoin(url, TimeUnit.SECONDS.toMillis(60));
 
         Credentials rmCredentials = getRmCredentials();
         ResourceManager rm = rmAuth.login(rmCredentials);
 
         RMEventMonitor rmEventMonitor = new RMEventMonitor();
-        RMEventListener eventListener = RMEventListener
-                .createEventListener(rmEventMonitor);
-        RMInitialState state = rm.getMonitoring().addRMEventListener(
-                eventListener);
+        RMEventListener eventListener = RMEventListener.createEventListener(rmEventMonitor);
+        RMInitialState state = rm.getMonitoring().addRMEventListener(eventListener);
         PAFuture.waitFor(state);
         state.getNodeSource().size();
 
@@ -216,21 +187,19 @@ public class RestFuncTHelper {
         return url;
     }
 
-    public static void createNodeSource(ResourceManager rm, Credentials rmCred,
-            RMEventMonitor rmEventMonitor) throws Exception {
-        String nodeSourceName = defaultNodeSourceName
-                + System.currentTimeMillis();
+    public static void createNodeSource(ResourceManager rm, Credentials rmCred, RMEventMonitor rmEventMonitor)
+            throws Exception {
+        String nodeSourceName = defaultNodeSourceName + System.currentTimeMillis();
 
         RMEventMonitor.RMNodesDeployedWaitCondition waitCondition = new RMEventMonitor.RMNodesDeployedWaitCondition(
-                nodeSourceName, defaultNumberOfNodes);
+            nodeSourceName, defaultNumberOfNodes);
         rmEventMonitor.addWaitCondition(waitCondition);
 
-        Object[] infrastructureParams = new Object[] { "", rmCred.getBase64(),
-                defaultNumberOfNodes, defaultNodeTimeout,
-                RestFuncTUtils.buildJvmParameters() };
-        BooleanWrapper nodeSourceCreated = rm.createNodeSource(nodeSourceName,
-                LocalInfrastructure.class.getName(), infrastructureParams,
-                StaticPolicy.class.getName(), null);
+        Object[] infrastructureParams = new Object[] { "", rmCred.getBase64(), defaultNumberOfNodes,
+                defaultNodeTimeout, RestFuncTUtils.buildJvmParameters() };
+        BooleanWrapper nodeSourceCreated = rm
+                .createNodeSource(nodeSourceName, LocalInfrastructure.class.getName(), infrastructureParams,
+                        StaticPolicy.class.getName(), null);
         if (!nodeSourceCreated.getBooleanValue()) {
             stopRm();
             throw new RuntimeException("Unable to create node sources.");
@@ -245,25 +214,22 @@ public class RestFuncTHelper {
         commandList.add(javaPath);
         commandList.add("-Djava.security.manager");
         commandList.add("-Djava.security.policy");
-        commandList.add(CentralPAPropertyRepository.JAVA_SECURITY_POLICY
-                .getCmdLine() + getServerSecurityPolicyPathname());
+        commandList.add(CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getCmdLine() +
+            getServerSecurityPolicyPathname());
         String dropDB = System.getProperty("scheduler.deploy.dropDB", "true");
-        commandList.add(PASchedulerProperties.SCHEDULER_DB_HIBERNATE_DROPDB
-                .getCmdLine() + dropDB);
-        commandList.add(PASchedulerProperties.SCHEDULER_DB_HIBERNATE_CONFIG
-                .getCmdLine() + getShedHibernateConfigPathname());
-        commandList.add(CentralPAPropertyRepository.PA_HOME.getCmdLine()
-                + getSchedHome());
-        commandList.add(PASchedulerProperties.SCHEDULER_HOME.getCmdLine()
-                + getSchedHome());
-        commandList.add(CentralPAPropertyRepository.PA_CONFIGURATION_FILE
-                .getCmdLine() + getDefaultPAConfigPathname());
-        commandList.add(CentralPAPropertyRepository.LOG4J.getCmdLine()
-                + "file:" + getSchedLog4JConfigPathname());
-        commandList.add(PASchedulerProperties.SCHEDULER_DEFAULT_FJT_LOG4J
-                .getCmdLine() + "file:" + getForkedTaskLog4JConfigPathname());
-        commandList.add(PASchedulerProperties.RESOURCE_MANAGER_CREDS
-                .getCmdLine() + "config/authentication/rm.cred");
+        commandList.add(PASchedulerProperties.SCHEDULER_DB_HIBERNATE_DROPDB.getCmdLine() + dropDB);
+        commandList.add(PASchedulerProperties.SCHEDULER_DB_HIBERNATE_CONFIG.getCmdLine() +
+            getShedHibernateConfigPathname());
+        commandList.add(CentralPAPropertyRepository.PA_HOME.getCmdLine() + getSchedHome());
+        commandList.add(PASchedulerProperties.SCHEDULER_HOME.getCmdLine() + getSchedHome());
+        commandList.add(CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getCmdLine() +
+            getDefaultPAConfigPathname());
+        commandList.add(CentralPAPropertyRepository.LOG4J.getCmdLine() + "file:" +
+            getSchedLog4JConfigPathname());
+        commandList.add(PASchedulerProperties.SCHEDULER_DEFAULT_FJT_LOG4J.getCmdLine() + "file:" +
+            getForkedTaskLog4JConfigPathname());
+        commandList.add(PASchedulerProperties.RESOURCE_MANAGER_CREDS.getCmdLine() +
+            "config/authentication/rm.cred");
         commandList.add("-cp");
         commandList.add(getClassPath());
         commandList.add(SchedulerStarter.class.getName());
@@ -274,19 +240,16 @@ public class RestFuncTHelper {
         processBuilder.redirectErrorStream(true);
         schedProcess = processBuilder.start();
 
-        ProcessStreamReader out = new ProcessStreamReader(
-                "scheduler-process-output: ", schedProcess.getInputStream(),
-                System.out);
+        ProcessStreamReader out = new ProcessStreamReader("scheduler-process-output: ",
+            schedProcess.getInputStream(), System.out);
         out.start();
 
-        String port = CentralPAPropertyRepository.PA_RMI_PORT
-                .getValueAsString();
+        String port = CentralPAPropertyRepository.PA_RMI_PORT.getValueAsString();
         String url = "rmi://localhost:" + port + "/";
-        SchedulerAuthenticationInterface schedAuth = SchedulerConnection
-                .waitAndJoin(url, TimeUnit.SECONDS.toMillis(60));
+        SchedulerAuthenticationInterface schedAuth = SchedulerConnection.waitAndJoin(url,
+                TimeUnit.SECONDS.toMillis(60));
         schedulerPublicKey = schedAuth.getPublicKey();
-        Credentials schedCred = RestFuncTUtils.createCredentials("admin",
-                "admin", schedulerPublicKey);
+        Credentials schedCred = RestFuncTUtils.createCredentials("admin", "admin", schedulerPublicKey);
         scheduler = schedAuth.login(schedCred);
 
         return url;
@@ -306,8 +269,7 @@ public class RestFuncTHelper {
             try {
                 RestFuncTUtils.destory(rmProcess);
             } catch (Throwable error) {
-                System.err
-                        .println("An error occurred while shutting down resource manager process:");
+                System.err.println("An error occurred while shutting down resource manager process:");
                 error.printStackTrace();
             } finally {
                 try {
@@ -326,13 +288,11 @@ public class RestFuncTHelper {
             try {
                 RestFuncTUtils.destory(schedProcess);
             } catch (Throwable error) {
-                System.err
-                        .println("An error occurred while shutting down scheduler process:");
+                System.err.println("An error occurred while shutting down scheduler process:");
                 error.printStackTrace();
             } finally {
                 try {
-                    RestFuncTUtils
-                            .cleanupActiveObjectRegistry(SchedulerConstants.SCHEDULER_DEFAULT_NAME);
+                    RestFuncTUtils.cleanupActiveObjectRegistry(SchedulerConstants.SCHEDULER_DEFAULT_NAME);
                 } catch (Throwable error) {
 
                 }
@@ -347,16 +307,12 @@ public class RestFuncTHelper {
         embedded.setRootResourcePath("/");
         embedded.start();
         Dispatcher dispatcher = embedded.getDeployment().getDispatcher();
-        ResteasyProviderFactory providerFactory = dispatcher
-                .getProviderFactory();
-        providerFactory.addStringConverter(RestartModeConverter.class);
-        providerFactory.addStringConverter(IntWrapperConverter.class);
-        providerFactory.registerProvider(PersistentMapConverter.class);
-        providerFactory.registerProvider(JacksonProvider.class);
-        dispatcher.getRegistry()
-                .addPerRequestResource(SchedulerStateRest.class);
-        restfulSchedulerUrl = String.format("http://localhost:%d/scheduler/",
-                serverPort);
+
+        restRuntime = new RestRuntime();
+        restRuntime.start(dispatcher.getProviderFactory(), getdefaultPortalPropertiesPathname(), null, null);
+        dispatcher.getRegistry().addPerRequestResource(SchedulerStateRest.class);
+
+        restfulSchedulerUrl = String.format("http://localhost:%d/scheduler/", serverPort);
     }
 
     public static void stopEmbeddedServer() {
@@ -364,39 +320,12 @@ public class RestFuncTHelper {
             if (embedded != null) {
                 System.out.println("Shutting down embedded server.");
                 embedded.stop();
+
+                restRuntime.stop();
             }
         } catch (Throwable error) {
-            System.err
-                    .println("An error occurred while shutting down embedded server:");
+            System.err.println("An error occurred while shutting down embedded server:");
             error.printStackTrace();
-        }
-    }
-
-    public static void startSchedulerSessionsCleaner() throws Exception {
-        schedulerSessionsCleaner = new SchedulerSessionsCleaner(
-                SchedulerSessionMapper.getInstance());
-        Thread cleanerThread = new Thread(schedulerSessionsCleaner,
-                "Scheduler Sessions Cleaner Thread");
-        cleanerThread.setDaemon(true);
-        cleanerThread.start();
-    }
-
-    public static void stopSchedulerSessionsCleaner() {
-        if (schedulerSessionsCleaner != null) {
-            schedulerSessionsCleaner.stop();
-        }
-    }
-
-    public static void startResourceManagerSessionsCleaner() throws Exception {
-        rmSessionsCleaner = new RMSessionsCleaner(RMSessionMapper.getInstance());
-        Thread rm = new Thread(rmSessionsCleaner, "RM Sessions Cleaner Thread");
-        rm.setDaemon(true);
-        rm.start();
-    }
-
-    public static void stopRmSessionCleaner() {
-        if (rmSessionsCleaner != null) {
-            rmSessionsCleaner.stop();
         }
     }
 
@@ -455,28 +384,23 @@ public class RestFuncTHelper {
     }
 
     private static String getRmHome() throws Exception {
-        return RestFuncTestConfig.getInstance().getProperty(
-                RestFuncTestConfig.RESTAPI_TEST_RM_HOME);
+        return RestFuncTestConfig.getInstance().getProperty(RestFuncTestConfig.RESTAPI_TEST_RM_HOME);
     }
 
     private static String getSchedHome() throws Exception {
-        return RestFuncTestConfig.getInstance().getProperty(
-                RestFuncTestConfig.RESTAPI_TEST_SCHEDULER_HOME);
+        return RestFuncTestConfig.getInstance().getProperty(RestFuncTestConfig.RESTAPI_TEST_SCHEDULER_HOME);
     }
 
     private static Credentials getRmCredentials() throws Exception {
-        File rmCredentails = new File(getRmHome(),
-                "config/authentication/rm.cred");
+        File rmCredentails = new File(getRmHome(), "config/authentication/rm.cred");
         return Credentials.getCredentials(new FileInputStream(rmCredentails));
     }
 
     private static String getClassPath() throws Exception {
         StringBuilder classpath = new StringBuilder();
-        String libPath = getRmHome() + File.separator + "dist" + File.separator
-                + "lib";
+        String libPath = getRmHome() + File.separator + "dist" + File.separator + "lib";
         for (String jar : requiredJARs) {
-            classpath.append(libPath).append(File.separator).append(jar)
-                    .append(File.pathSeparatorChar);
+            classpath.append(libPath).append(File.separator).append(jar).append(File.pathSeparatorChar);
         }
 
         return classpath.toString();
