@@ -187,7 +187,8 @@ public class SchedulerStarter {
                             rman.createNodeSource(NodeSource.LOCAL_INFRASTRUCTURE_NAME,
                                     LocalInfrastructure.class.getName(), new Object[] { "", creds,
                                             defaulNodesNumber, defaultNodesTimemout, "" },
-                                    RestartDownNodesPolicy.class.getName(), new Object[] { "ALL", "ALL", "10000" });
+                                    RestartDownNodesPolicy.class.getName(), new Object[] { "ALL", "ALL",
+                                            "10000" });
 
                             logger.info("The resource manager with " + defaulNodesNumber +
                                 " local nodes created on " + rmAuth.getHostURL());
