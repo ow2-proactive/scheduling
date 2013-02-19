@@ -374,7 +374,11 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
     private void restoreNodeSources() {
         for (NodeSourceData nsd : dataBaseManager.getNodeSources()) {
-            createNodeSource(nsd);
+            try {
+                createNodeSource(nsd);
+            } catch (Throwable t) {
+                logger.error(t.getMessage(), t);
+            }
         }
     }
 
