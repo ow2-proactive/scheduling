@@ -30,6 +30,8 @@ import org.ow2.proactive.db.DatabaseManagerException;
 import org.ow2.proactive.db.DatabaseManagerExceptionHandler;
 import org.ow2.proactive.db.DatabaseManagerExceptionHandler.DBMEHandler;
 import org.ow2.proactive.db.FilteredExceptionCallback;
+import org.ow2.proactive.db.SortParameter;
+import org.ow2.proactive.scheduler.common.JobSortParameter;
 import org.ow2.proactive.scheduler.common.job.JobEnvironment;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
@@ -180,7 +182,8 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
     }
 
     public List<JobInfo> getJobs(final int offset, final int limit, final String user, final boolean pending,
-            final boolean runnning, final boolean finished) {
+            final boolean runnning, final boolean finished,
+            final List<SortParameter<JobSortParameter>> sortParameters) {
         if (limit == 0) {
             throw new IllegalArgumentException("Range can't be 0");
         }
@@ -218,7 +221,36 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
                     criteria.add(Restrictions.in("status", status.toArray(new JobStatus[status.size()])));
                 }
 
-                criteria.addOrder(Property.forName("id").asc());
+                if (sortParameters != null) {
+                    Property property;
+                    for (SortParameter<JobSortParameter> param : sortParameters) {
+                        switch (param.getParameter()) {
+                            case ID:
+                                property = Property.forName("id");
+                                break;
+                            case NAME:
+                                property = Property.forName("jobName");
+                                break;
+                            case OWNER:
+                                property = Property.forName("owner");
+                                break;
+                            case PRIORITY:
+                                property = Property.forName("priority");
+                                break;
+                            case STATE:
+                                property = Property.forName("status");
+                                break;
+                            default:
+                                throw new IllegalArgumentException("Unsupported sort paramter: " +
+                                    param.getParameter());
+                        }
+                        if (param.getSortOrder().isAscending()) {
+                            criteria.addOrder(property.asc());
+                        } else {
+                            criteria.addOrder(property.desc());
+                        }
+                    }
+                }
 
                 List<JobData> jobsList = criteria.list();
                 List<JobInfo> result = new ArrayList<JobInfo>(jobsList.size());

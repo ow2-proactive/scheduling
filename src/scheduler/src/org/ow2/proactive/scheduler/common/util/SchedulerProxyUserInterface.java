@@ -51,7 +51,9 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.db.SortParameter;
 import org.ow2.proactive.scheduler.common.JobFilterCriteria;
+import org.ow2.proactive.scheduler.common.JobSortParameter;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
@@ -565,9 +567,10 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     }
 
     @Override
-    public List<JobInfo> getJobs(int index, int range, JobFilterCriteria filterCriteria)
-            throws NotConnectedException, PermissionException {
-        return uischeduler.getJobs(index, range, filterCriteria);
+    public List<JobInfo> getJobs(int index, int range, JobFilterCriteria filterCriteria,
+            List<SortParameter<JobSortParameter>> sortParameters) throws NotConnectedException,
+            PermissionException {
+        return uischeduler.getJobs(index, range, filterCriteria, sortParameters);
     }
 
 }

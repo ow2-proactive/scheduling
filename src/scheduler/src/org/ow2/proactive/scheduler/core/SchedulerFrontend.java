@@ -58,9 +58,11 @@ import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.objectweb.proactive.utils.NamedThreadFactory;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.db.DatabaseManagerException;
+import org.ow2.proactive.db.SortParameter;
 import org.ow2.proactive.policy.ClientsPolicy;
 import org.ow2.proactive.scheduler.authentication.SchedulerAuthentication;
 import org.ow2.proactive.scheduler.common.JobFilterCriteria;
+import org.ow2.proactive.scheduler.common.JobSortParameter;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
@@ -831,8 +833,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
      */
     @Override
     @ImmediateService
-    public List<JobInfo> getJobs(int offset, int limit, JobFilterCriteria filterCriteria)
-            throws NotConnectedException, PermissionException {
+    public List<JobInfo> getJobs(int offset, int limit, JobFilterCriteria filterCriteria,
+            List<SortParameter<JobSortParameter>> sortParameters) throws NotConnectedException,
+            PermissionException {
         UserIdentificationImpl ident = frontendState.checkPermission("loadJobs",
                 "You don't have permissions to load jobs");
         frontendState.checkOwnStatePermission(filterCriteria.isMyJobsOnly(), ident);
@@ -844,7 +847,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
             user = null;
         }
         return dbManager.getJobs(offset, limit, user, filterCriteria.isPending(), filterCriteria.isRunning(),
-                filterCriteria.isFinished());
+                filterCriteria.isFinished(), sortParameters);
     }
 
     private String getTaskServerLogs(TaskId id) {

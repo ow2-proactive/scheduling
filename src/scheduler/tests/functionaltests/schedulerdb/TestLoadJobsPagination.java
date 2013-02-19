@@ -8,6 +8,9 @@ import java.util.List;
 import junit.framework.Assert;
 
 import org.junit.Test;
+import org.ow2.proactive.db.SortOrder;
+import org.ow2.proactive.db.SortParameter;
+import org.ow2.proactive.scheduler.common.JobSortParameter;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
@@ -31,8 +34,88 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
         return job;
     }
 
+    private TaskFlowJob createJob(String name, JobPriority priority) throws Exception {
+        TaskFlowJob job = new TaskFlowJob();
+        job.setName(name);
+        job.setPriority(priority);
+        JavaTask task = new JavaTask();
+        task.setExecutableClassName("className");
+        job.addTask(task);
+        return job;
+    }
+
     @Test
-    public void test() throws Exception {
+    public void testSorting() throws Exception {
+        InternalJob job1 = defaultSubmitJob(createJob("A", JobPriority.IDLE), "user_a"); // 1
+        defaultSubmitJob(createJob("B", JobPriority.LOWEST), "user_b"); // 2
+        InternalJob job3 = defaultSubmitJob(createJob("C", JobPriority.LOW), "user_c"); // 3
+        defaultSubmitJob(createJob("A", JobPriority.NORMAL), "user_d"); // 4
+        InternalJob job5 = defaultSubmitJob(createJob("B", JobPriority.HIGH), "user_e"); // 5
+        defaultSubmitJob(createJob("C", JobPriority.HIGHEST), "user_f"); // 6
+
+        // change status for some jobs 
+        job1.failed(null, JobStatus.KILLED);
+        dbManager.updateAfterJobKilled(job1, Collections.<TaskId> emptySet());
+        job3.failed(null, JobStatus.KILLED);
+        dbManager.updateAfterJobKilled(job3, Collections.<TaskId> emptySet());
+        job5.failed(null, JobStatus.KILLED);
+        dbManager.updateAfterJobKilled(job5, Collections.<TaskId> emptySet());
+
+        List<JobInfo> jobs;
+
+        jobs = dbManager.getJobs(0, 10, null, true, true, true,
+                sortParameters(new SortParameter<JobSortParameter>(JobSortParameter.ID, SortOrder.ASC)));
+        checkJobs(jobs, 1, 2, 3, 4, 5, 6);
+
+        jobs = dbManager.getJobs(0, 10, null, true, true, true,
+                sortParameters(new SortParameter<JobSortParameter>(JobSortParameter.ID, SortOrder.DESC)));
+        checkJobs(jobs, 6, 5, 4, 3, 2, 1);
+
+        jobs = dbManager.getJobs(0, 10, null, true, true, true, sortParameters(
+                new SortParameter<JobSortParameter>(JobSortParameter.NAME, SortOrder.ASC),
+                new SortParameter<JobSortParameter>(JobSortParameter.ID, SortOrder.ASC)));
+        checkJobs(jobs, 1, 4, 2, 5, 3, 6);
+
+        jobs = dbManager.getJobs(0, 10, null, true, true, true, sortParameters(
+                new SortParameter<JobSortParameter>(JobSortParameter.NAME, SortOrder.ASC),
+                new SortParameter<JobSortParameter>(JobSortParameter.ID, SortOrder.DESC)));
+        checkJobs(jobs, 4, 1, 5, 2, 6, 3);
+
+        jobs = dbManager.getJobs(0, 10, null, true, true, true,
+                sortParameters(new SortParameter<JobSortParameter>(JobSortParameter.OWNER, SortOrder.ASC)));
+        checkJobs(jobs, 1, 2, 3, 4, 5, 6);
+
+        jobs = dbManager.getJobs(0, 10, null, true, true, true,
+                sortParameters(new SortParameter<JobSortParameter>(JobSortParameter.OWNER, SortOrder.DESC)));
+        checkJobs(jobs, 6, 5, 4, 3, 2, 1);
+
+        jobs = dbManager
+                .getJobs(0, 10, null, true, true, true, sortParameters(new SortParameter<JobSortParameter>(
+                    JobSortParameter.PRIORITY, SortOrder.ASC)));
+        checkJobs(jobs, 1, 2, 3, 4, 5, 6);
+
+        jobs = dbManager
+                .getJobs(0, 10, null, true, true, true, sortParameters(new SortParameter<JobSortParameter>(
+                    JobSortParameter.PRIORITY, SortOrder.DESC)));
+        checkJobs(jobs, 6, 5, 4, 3, 2, 1);
+
+        jobs = dbManager.getJobs(0, 10, null, true, true, true, sortParameters(
+                new SortParameter<JobSortParameter>(JobSortParameter.STATE, SortOrder.ASC),
+                new SortParameter<JobSortParameter>(JobSortParameter.ID, SortOrder.ASC)));
+        checkJobs(jobs, 2, 4, 6, 1, 3, 5);
+
+        jobs = dbManager.getJobs(0, 10, null, true, true, true, sortParameters(
+                new SortParameter<JobSortParameter>(JobSortParameter.STATE, SortOrder.DESC),
+                new SortParameter<JobSortParameter>(JobSortParameter.ID, SortOrder.ASC)));
+        checkJobs(jobs, 1, 3, 5, 2, 4, 6);
+    }
+
+    List<SortParameter<JobSortParameter>> sortParameters(SortParameter<JobSortParameter>... params) {
+        return Arrays.asList(params);
+    }
+
+    @Test
+    public void testPagingAndFilteting() throws Exception {
         InternalJob job;
         InternalTask task;
 
@@ -74,7 +157,10 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
 
         List<JobInfo> jobs;
 
-        jobs = dbManager.getJobs(5, 1, null, true, true, true);
+        List<SortParameter<JobSortParameter>> sortParameters = new ArrayList<SortParameter<JobSortParameter>>();
+        sortParameters.add(new SortParameter<JobSortParameter>(JobSortParameter.ID, SortOrder.ASC));
+
+        jobs = dbManager.getJobs(5, 1, null, true, true, true, sortParameters);
         JobInfo jobInfo = jobs.get(0);
         Assert.assertEquals("6", jobInfo.getJobId().value());
         Assert.assertEquals(JobStatus.FINISHED, jobInfo.getStatus());
@@ -86,67 +172,67 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
         Assert.assertEquals(JobPriority.NORMAL, jobInfo.getPriority());
         Assert.assertEquals(DEFAULT_USER_NAME, jobInfo.getJobOwner());
 
-        jobs = dbManager.getJobs(0, 10, null, true, true, true);
+        jobs = dbManager.getJobs(0, 10, null, true, true, true, sortParameters);
         checkJobs(jobs, 1, 2, 3, 4, 5, 6, 7);
 
-        jobs = dbManager.getJobs(-1, -1, null, true, true, true);
+        jobs = dbManager.getJobs(-1, -1, null, true, true, true, sortParameters);
         checkJobs(jobs, 1, 2, 3, 4, 5, 6, 7);
 
-        jobs = dbManager.getJobs(-1, 5, null, true, true, true);
+        jobs = dbManager.getJobs(-1, 5, null, true, true, true, sortParameters);
         checkJobs(jobs, 1, 2, 3, 4, 5);
 
-        jobs = dbManager.getJobs(2, -1, null, true, true, true);
+        jobs = dbManager.getJobs(2, -1, null, true, true, true, sortParameters);
         checkJobs(jobs, 3, 4, 5, 6, 7);
 
         try {
-            jobs = dbManager.getJobs(0, 0, null, true, true, true);
+            jobs = dbManager.getJobs(0, 0, null, true, true, true, sortParameters);
             Assert.fail();
         } catch (IllegalArgumentException e) {
         }
 
-        jobs = dbManager.getJobs(0, 1, null, true, true, true);
+        jobs = dbManager.getJobs(0, 1, null, true, true, true, sortParameters);
         checkJobs(jobs, 1);
 
-        jobs = dbManager.getJobs(0, 3, null, true, true, true);
+        jobs = dbManager.getJobs(0, 3, null, true, true, true, sortParameters);
         checkJobs(jobs, 1, 2, 3);
 
-        jobs = dbManager.getJobs(1, 10, null, true, true, true);
+        jobs = dbManager.getJobs(1, 10, null, true, true, true, sortParameters);
         checkJobs(jobs, 2, 3, 4, 5, 6, 7);
 
-        jobs = dbManager.getJobs(5, 10, null, true, true, true);
+        jobs = dbManager.getJobs(5, 10, null, true, true, true, sortParameters);
         checkJobs(jobs, 6, 7);
 
-        jobs = dbManager.getJobs(6, 10, null, true, true, true);
+        jobs = dbManager.getJobs(6, 10, null, true, true, true, sortParameters);
         checkJobs(jobs, 7);
 
-        jobs = dbManager.getJobs(7, 10, null, true, true, true);
+        jobs = dbManager.getJobs(7, 10, null, true, true, true, sortParameters);
         checkJobs(jobs);
 
-        jobs = dbManager.getJobs(0, 10, DEFAULT_USER_NAME, true, true, true);
+        jobs = dbManager.getJobs(0, 10, DEFAULT_USER_NAME, true, true, true, sortParameters);
         checkJobs(jobs, 1, 3, 4, 6, 7);
 
-        jobs = dbManager.getJobs(0, 10, "user1", true, true, true);
+        jobs = dbManager.getJobs(0, 10, "user1", true, true, true, sortParameters);
         checkJobs(jobs, 2);
 
-        jobs = dbManager.getJobs(0, 10, DEFAULT_USER_NAME, true, false, false);
+        jobs = dbManager.getJobs(0, 10, DEFAULT_USER_NAME, true, false, false, sortParameters);
         checkJobs(jobs, 1);
 
-        jobs = dbManager.getJobs(0, 10, DEFAULT_USER_NAME, false, true, false);
+        jobs = dbManager.getJobs(0, 10, DEFAULT_USER_NAME, false, true, false, sortParameters);
         checkJobs(jobs, 3);
 
-        jobs = dbManager.getJobs(0, 10, DEFAULT_USER_NAME, false, false, true);
+        jobs = dbManager.getJobs(0, 10, DEFAULT_USER_NAME, false, false, true, sortParameters);
         checkJobs(jobs, 4, 6, 7);
 
-        jobs = dbManager.getJobs(0, 10, DEFAULT_USER_NAME, false, true, true);
+        jobs = dbManager.getJobs(0, 10, DEFAULT_USER_NAME, false, true, true, sortParameters);
         checkJobs(jobs, 3, 4, 6, 7);
 
-        jobs = dbManager.getJobs(0, 10, DEFAULT_USER_NAME, true, false, true);
+        jobs = dbManager.getJobs(0, 10, DEFAULT_USER_NAME, true, false, true, sortParameters);
         checkJobs(jobs, 1, 4, 6, 7);
 
-        jobs = dbManager.getJobs(0, 10, DEFAULT_USER_NAME, true, true, false);
+        jobs = dbManager.getJobs(0, 10, DEFAULT_USER_NAME, true, true, false, sortParameters);
         checkJobs(jobs, 1, 3);
 
-        jobs = dbManager.getJobs(0, 10, DEFAULT_USER_NAME, false, false, false);
+        jobs = dbManager.getJobs(0, 10, DEFAULT_USER_NAME, false, false, false, sortParameters);
         checkJobs(jobs);
     }
 

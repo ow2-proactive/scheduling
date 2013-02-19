@@ -39,6 +39,7 @@ package org.ow2.proactive.scheduler.common;
 import java.util.List;
 
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.ow2.proactive.db.SortParameter;
 import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
@@ -819,7 +820,8 @@ public interface Scheduler {
     public String getTaskServerLogs(String id, String taskName) throws UnknownJobException,
             UnknownTaskException, NotConnectedException, PermissionException;
 
-    public List<JobInfo> getJobs(int offset, int limit, JobFilterCriteria filterCriteria)
-            throws NotConnectedException, PermissionException;
+    public List<JobInfo> getJobs(int offset, int limit, JobFilterCriteria filterCriteria,
+            List<SortParameter<JobSortParameter>> sortParameters) throws NotConnectedException,
+            PermissionException;
 
 }

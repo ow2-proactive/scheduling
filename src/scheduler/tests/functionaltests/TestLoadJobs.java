@@ -11,7 +11,10 @@ import org.junit.Test;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.db.SortOrder;
+import org.ow2.proactive.db.SortParameter;
 import org.ow2.proactive.scheduler.common.JobFilterCriteria;
+import org.ow2.proactive.scheduler.common.JobSortParameter;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
@@ -82,13 +85,13 @@ public class TestLoadJobs extends SchedulerConsecutive {
         List<JobInfo> jobs;
         JobInfo job;
 
-        jobs = scheduler.getJobs(0, 1, criteria(true, true, true, true));
+        jobs = scheduler.getJobs(0, 1, criteria(true, true, true, true), null);
         checkJobs(jobs);
 
         jobId = scheduler.submit(createJob(communicationObjectUrl));
         SchedulerTHelper.waitForEventTaskRunning(jobId, "Test task");
 
-        jobs = scheduler.getJobs(0, 1, criteria(true, true, true, true));
+        jobs = scheduler.getJobs(0, 1, criteria(true, true, true, true), null);
         checkJobs(jobs, 1);
         job = jobs.get(0);
         Assert.assertEquals("Test job", job.getJobId().getReadableName());
@@ -109,17 +112,28 @@ public class TestLoadJobs extends SchedulerConsecutive {
         scheduler.submit(createJob(communicationObjectUrl));
         scheduler.submit(createJob(communicationObjectUrl));
 
-        jobs = scheduler.getJobs(0, 10, criteria(true, false, false, true));
+        jobs = scheduler.getJobs(0, 10, criteria(true, false, false, true), null);
         checkJobs(jobs);
 
-        jobs = scheduler.getJobs(1, 10, criteria(true, true, true, true));
+        jobs = scheduler.getJobs(1, 10, criteria(true, true, true, true), null);
         checkJobs(jobs, 2, 3);
 
-        jobs = scheduler.getJobs(1, 1, criteria(true, true, true, true));
+        jobs = scheduler.getJobs(1, 1, criteria(true, true, true, true), null);
         checkJobs(jobs, 2);
 
-        jobs = scheduler.getJobs(0, 10, criteria(true, true, true, true));
+        jobs = scheduler.getJobs(0, 10, criteria(true, true, true, true), null);
         checkJobs(jobs, 1, 2, 3);
+
+        List<SortParameter<JobSortParameter>> sortParameters = new ArrayList<SortParameter<JobSortParameter>>();
+
+        sortParameters.add(new SortParameter<JobSortParameter>(JobSortParameter.ID, SortOrder.ASC));
+        jobs = scheduler.getJobs(0, 10, criteria(true, true, true, true), sortParameters);
+        checkJobs(jobs, 1, 2, 3);
+
+        sortParameters.clear();
+        sortParameters.add(new SortParameter<JobSortParameter>(JobSortParameter.ID, SortOrder.DESC));
+        jobs = scheduler.getJobs(0, 10, criteria(true, true, true, true), sortParameters);
+        checkJobs(jobs, 3, 2, 1);
 
         communicationObject.setCanFinish(true);
 
@@ -127,10 +141,10 @@ public class TestLoadJobs extends SchedulerConsecutive {
             SchedulerTHelper.waitForEventJobFinished(jobInfo.getJobId(), 30000);
         }
 
-        jobs = scheduler.getJobs(0, 10, criteria(true, true, true, false));
+        jobs = scheduler.getJobs(0, 10, criteria(true, true, true, false), null);
         checkJobs(jobs);
 
-        jobs = scheduler.getJobs(0, 10, criteria(true, false, false, true));
+        jobs = scheduler.getJobs(0, 10, criteria(true, false, false, true), null);
         checkJobs(jobs, 1, 2, 3);
 
         scheduler.disconnect();
@@ -148,10 +162,10 @@ public class TestLoadJobs extends SchedulerConsecutive {
         SchedulerState state = scheduler.addEventListener((SchedulerEventListener) eventReceiver, true, true);
         monitorsHandler.init(state);
 
-        jobs = scheduler.getJobs(0, 10, criteria(false, true, true, true));
+        jobs = scheduler.getJobs(0, 10, criteria(false, true, true, true), null);
         checkJobs(jobs, 1, 2, 3);
 
-        jobs = scheduler.getJobs(0, 10, criteria(true, true, true, true));
+        jobs = scheduler.getJobs(0, 10, criteria(true, true, true, true), null);
         checkJobs(jobs);
 
         communicationObject.setCanFinish(false);
@@ -159,37 +173,37 @@ public class TestLoadJobs extends SchedulerConsecutive {
         jobId = scheduler.submit(createJob(communicationObjectUrl));
         monitorsHandler.waitForEventTask(SchedulerEvent.TASK_PENDING_TO_RUNNING, jobId, "Test task", 30000);
 
-        jobs = scheduler.getJobs(0, 10, criteria(true, true, true, true));
+        jobs = scheduler.getJobs(0, 10, criteria(true, true, true, true), null);
         checkJobs(jobs, 4);
 
-        jobs = scheduler.getJobs(0, 10, criteria(true, false, false, true));
+        jobs = scheduler.getJobs(0, 10, criteria(true, false, false, true), null);
         checkJobs(jobs);
 
-        jobs = scheduler.getJobs(0, 10, criteria(false, true, true, true));
+        jobs = scheduler.getJobs(0, 10, criteria(false, true, true, true), null);
         checkJobs(jobs, 1, 2, 3, 4);
 
-        jobs = scheduler.getJobs(2, 10, criteria(false, true, true, true));
+        jobs = scheduler.getJobs(2, 10, criteria(false, true, true, true), null);
         checkJobs(jobs, 3, 4);
 
         communicationObject.setCanFinish(true);
         monitorsHandler.waitForFinishedJob(jobId, 30000);
 
-        jobs = scheduler.getJobs(0, 10, criteria(true, false, false, true));
+        jobs = scheduler.getJobs(0, 10, criteria(true, false, false, true), null);
         checkJobs(jobs, 4);
 
-        jobs = scheduler.getJobs(0, 10, criteria(false, false, false, true));
+        jobs = scheduler.getJobs(0, 10, criteria(false, false, false, true), null);
         checkJobs(jobs, 1, 2, 3, 4);
 
-        jobs = scheduler.getJobs(1, 1, criteria(false, false, false, true));
+        jobs = scheduler.getJobs(1, 1, criteria(false, false, false, true), null);
         checkJobs(jobs, 2);
 
-        jobs = scheduler.getJobs(1, 2, criteria(false, false, false, true));
+        jobs = scheduler.getJobs(1, 2, criteria(false, false, false, true), null);
         checkJobs(jobs, 2, 3);
 
-        jobs = scheduler.getJobs(2, 1, criteria(false, false, false, true));
+        jobs = scheduler.getJobs(2, 1, criteria(false, false, false, true), null);
         checkJobs(jobs, 3);
 
-        jobs = scheduler.getJobs(2, 2, criteria(false, false, false, true));
+        jobs = scheduler.getJobs(2, 2, criteria(false, false, false, true), null);
         checkJobs(jobs, 3, 4);
 
         scheduler.disconnect();
