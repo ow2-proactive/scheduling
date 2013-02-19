@@ -90,9 +90,6 @@ import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
 public abstract class InternalJob extends JobState {
     public static final Logger logger = Logger.getLogger(InternalJob.class);
 
-    /** Owner of the job */
-    private String owner = "";
-
     /** List of every tasks in this job. */
     protected Map<TaskId, InternalTask> tasks = new HashMap<TaskId, InternalTask>();
 
@@ -1241,7 +1238,7 @@ public abstract class InternalJob extends JobState {
      */
     @Override
     public String getOwner() {
-        return owner;
+        return jobInfo.getJobOwner();
     }
 
     /**
@@ -1250,7 +1247,7 @@ public abstract class InternalJob extends JobState {
      * @param owner the owner to set.
      */
     public void setOwner(String owner) {
-        this.owner = owner;
+        this.jobInfo.setJobOwner(owner);
     }
 
     /**

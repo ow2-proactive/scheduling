@@ -39,6 +39,7 @@ package org.ow2.proactive.scheduler.core;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.net.URI;
+import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -59,6 +60,7 @@ import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.db.DatabaseManagerException;
 import org.ow2.proactive.policy.ClientsPolicy;
 import org.ow2.proactive.scheduler.authentication.SchedulerAuthentication;
+import org.ow2.proactive.scheduler.common.JobFilterCriteria;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
@@ -77,6 +79,7 @@ import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
 import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
@@ -823,7 +826,28 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
         throw new UnknownTaskException("Unknow task " + taskName + " in job " + jobId);
     }
 
-    public String getTaskServerLogs(TaskId id) {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @ImmediateService
+    public List<JobInfo> loadJobs(int index, int range, JobFilterCriteria filterCriteria)
+            throws NotConnectedException, PermissionException {
+        UserIdentificationImpl ident = frontendState.checkPermission("loadJobs",
+                "You don't have permissions to load jobs");
+        frontendState.checkOwnStatePermission(filterCriteria.isMyJobsOnly(), ident);
+
+        String user;
+        if (filterCriteria.isMyJobsOnly()) {
+            user = ident.getUsername();
+        } else {
+            user = null;
+        }
+        return dbManager.loadJobs(index, range, user, filterCriteria.isPending(), filterCriteria.isRunning(),
+                filterCriteria.isFinished());
+    }
+
+    private String getTaskServerLogs(TaskId id) {
         String folderName = PASchedulerProperties.SCHEDULER_HOME.getValueAsString() +
             System.getProperty("file.separator") +
             PASchedulerProperties.SCHEDULER_JOB_LOGS_LOCATION.getValueAsString();

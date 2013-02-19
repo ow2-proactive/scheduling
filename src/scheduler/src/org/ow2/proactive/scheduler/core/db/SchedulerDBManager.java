@@ -13,12 +13,15 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.criterion.Property;
+import org.hibernate.criterion.Restrictions;
 import org.hibernate.exception.ConstraintViolationException;
 import org.hibernate.transform.DistinctRootEntityResultTransformer;
 import org.junit.Test;
@@ -80,14 +83,28 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
         finishedJobStatuses.add(JobStatus.FINISHED);
     }
 
+    private static final Set<JobStatus> pendingJobStatuses;
+
+    static {
+        pendingJobStatuses = new HashSet<JobStatus>();
+        pendingJobStatuses.add(JobStatus.PENDING);
+    }
+
+    private static final Set<JobStatus> runningJobStatuses;
+
+    static {
+        runningJobStatuses = new HashSet<JobStatus>();
+        runningJobStatuses.add(JobStatus.PAUSED);
+        runningJobStatuses.add(JobStatus.STALLED);
+        runningJobStatuses.add(JobStatus.RUNNING);
+    }
+
     private static final Set<JobStatus> notFinishedJobStatuses;
 
     static {
         notFinishedJobStatuses = new HashSet<JobStatus>();
-        notFinishedJobStatuses.add(JobStatus.PAUSED);
-        notFinishedJobStatuses.add(JobStatus.PENDING);
-        notFinishedJobStatuses.add(JobStatus.STALLED);
-        notFinishedJobStatuses.add(JobStatus.RUNNING);
+        notFinishedJobStatuses.addAll(runningJobStatuses);
+        notFinishedJobStatuses.addAll(pendingJobStatuses);
     }
 
     private final SessionFactory sessionFactory;
@@ -100,7 +117,7 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
 
     }
 
-    public synchronized static SchedulerDBManager createUsingProperties() {
+    public static SchedulerDBManager createUsingProperties() {
         if (System.getProperty(JAVA_PROPERTYNAME_NODB) != null) {
             return createInMemorySchedulerDBManager();
         } else {
@@ -160,6 +177,60 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
         this.exceptionHandler = new DatabaseManagerExceptionHandler(
             new Class[] { org.hibernate.exception.JDBCConnectionException.class }, DBMEHandler.FILTER_ALL,
             this);
+    }
+
+    public List<JobInfo> loadJobs(final int index, final int range, final String user, final boolean pending,
+            final boolean runnning, final boolean finished) {
+        if (range == 0) {
+            throw new IllegalArgumentException("Range can't be 0");
+        }
+
+        if (!pending && !runnning && !finished) {
+            return Collections.emptyList();
+        }
+
+        return runWithoutTransaction(new SessionWork<List<JobInfo>>() {
+            @Override
+            @SuppressWarnings("unchecked")
+            List<JobInfo> executeWork(Session session) {
+                Criteria criteria = session.createCriteria(JobData.class);
+                if (range > 0) {
+                    criteria.setMaxResults(range);
+                }
+                if (index >= 0) {
+                    criteria.setFirstResult(index);
+                }
+                if (user != null) {
+                    criteria.add(Restrictions.eq("owner", user));
+                }
+                boolean allJobs = pending && runnning && finished;
+                if (!allJobs) {
+                    Set<JobStatus> status = new HashSet<JobStatus>();
+                    if (pending) {
+                        status.addAll(pendingJobStatuses);
+                    }
+                    if (runnning) {
+                        status.addAll(runningJobStatuses);
+                    }
+                    if (finished) {
+                        status.addAll(finishedJobStatuses);
+                    }
+                    criteria.add(Restrictions.in("status", status.toArray(new JobStatus[status.size()])));
+                }
+
+                criteria.addOrder(Property.forName("id").asc());
+
+                List<JobData> jobsList = criteria.list();
+                List<JobInfo> result = new ArrayList<JobInfo>(jobsList.size());
+                for (JobData jobData : jobsList) {
+                    JobInfo jobInfo = jobData.toJobInfo();
+                    result.add(jobInfo);
+                }
+
+                return result;
+            }
+
+        });
     }
 
     @Override
