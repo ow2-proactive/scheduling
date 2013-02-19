@@ -372,9 +372,9 @@ public class TestSchedulerProxy implements Scheduler {
     }
 
     @Override
-    public List<JobInfo> loadJobs(int index, int range, JobFilterCriteria filterCriteria)
+    public List<JobInfo> getJobs(int index, int range, JobFilterCriteria filterCriteria)
             throws NotConnectedException, PermissionException {
-        return target.loadJobs(index, range, filterCriteria);
+        return target.getJobs(index, range, filterCriteria);
     }
 
 }
