@@ -110,11 +110,10 @@ public class TestLocalInfrastructureRestartDownNodesPolicy extends RMConsecutive
         Assert.assertEquals(defaultDescriptorNodesNb, stateTest0.getTotalNodesNumber());
         Assert.assertEquals(defaultDescriptorNodesNb, stateTest0.getFreeNodesNumber());
 
-        resourceManager.removeNodeSource("Node_source_0",true);
+        resourceManager.removeNodeSource("Node_source_0", true);
 
         RMTHelper.log("Test 1 - restart down nodes policy");
-        createNodeSourceWithNodes(source1, new Object[]{"ALL", "ALL", "10000"});
-
+        createNodeSourceWithNodes(source1, new Object[] { "ALL", "ALL", "10000" });
 
         RMState stateTest1 = resourceManager.getState();
         Assert.assertEquals(defaultDescriptorNodesNb, stateTest1.getTotalNodesNumber());

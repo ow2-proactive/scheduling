@@ -477,6 +477,8 @@ public abstract class InfrastructureManager implements Serializable {
      * @return true if the method ran successfully, false otherwise.
      */
     protected final boolean declareDeployingNodeLost(String toUpdateURL, String description) {
+        logger.warn("Declaring node as lost: " + toUpdateURL + ", " + description);
+
         RMDeployingNode pn = null;
         //we need to atomically move the node from the deploying collection to the lost one.
         synchronized (deployingNodes) {

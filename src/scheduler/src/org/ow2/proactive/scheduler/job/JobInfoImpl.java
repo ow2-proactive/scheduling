@@ -72,6 +72,8 @@ public class JobInfoImpl implements JobInfo {
     /** job id  : must be initialize to a value in order to create temp taskId */
     private JobId jobId = JobIdImpl.makeJobId("0");
 
+    private String owner;
+
     /** job submitted time */
     private long submittedTime = -1;
 
@@ -130,6 +132,7 @@ public class JobInfoImpl implements JobInfo {
      */
     public JobInfoImpl(JobInfoImpl jobInfo) {
         this.jobId = jobInfo.getJobId();
+        this.owner = jobInfo.owner;
         this.submittedTime = jobInfo.getSubmittedTime();
         this.startTime = jobInfo.getStartTime();
         this.finishedTime = jobInfo.getFinishedTime();
@@ -153,6 +156,15 @@ public class JobInfoImpl implements JobInfo {
         if (jobInfo.getModifiedTasks() != null) {
             this.modifiedTasks = new ArrayList<ClientTaskState>(jobInfo.getModifiedTasks());
         }
+    }
+
+    @Override
+    public String getJobOwner() {
+        return owner;
+    }
+
+    public void setJobOwner(String owner) {
+        this.owner = owner;
     }
 
     /**

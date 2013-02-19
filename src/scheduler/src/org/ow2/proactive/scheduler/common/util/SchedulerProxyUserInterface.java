@@ -39,6 +39,7 @@ package org.ow2.proactive.scheduler.common.util;
 import java.io.Serializable;
 import java.security.KeyException;
 import java.security.PublicKey;
+import java.util.List;
 import java.util.Map;
 
 import javax.security.auth.login.LoginException;
@@ -50,6 +51,9 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.db.SortParameter;
+import org.ow2.proactive.scheduler.common.JobFilterCriteria;
+import org.ow2.proactive.scheduler.common.JobSortParameter;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
@@ -68,6 +72,7 @@ import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
 import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
@@ -559,6 +564,13 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     public String getTaskServerLogs(String id, String taskName) throws UnknownJobException,
             UnknownTaskException, NotConnectedException, PermissionException {
         return uischeduler.getTaskServerLogs(id, taskName);
+    }
+
+    @Override
+    public List<JobInfo> getJobs(int index, int range, JobFilterCriteria filterCriteria,
+            List<SortParameter<JobSortParameter>> sortParameters) throws NotConnectedException,
+            PermissionException {
+        return uischeduler.getJobs(index, range, filterCriteria, sortParameters);
     }
 
 }

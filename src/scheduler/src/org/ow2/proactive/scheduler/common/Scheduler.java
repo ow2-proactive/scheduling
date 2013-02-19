@@ -36,7 +36,10 @@
  */
 package org.ow2.proactive.scheduler.common;
 
+import java.util.List;
+
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.ow2.proactive.db.SortParameter;
 import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
@@ -47,12 +50,14 @@ import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
 import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingService;
+import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.policy.Policy;
 
 
@@ -814,4 +819,9 @@ public interface Scheduler {
      */
     public String getTaskServerLogs(String id, String taskName) throws UnknownJobException,
             UnknownTaskException, NotConnectedException, PermissionException;
+
+    public List<JobInfo> getJobs(int offset, int limit, JobFilterCriteria filterCriteria,
+            List<SortParameter<JobSortParameter>> sortParameters) throws NotConnectedException,
+            PermissionException;
+
 }
