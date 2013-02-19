@@ -64,6 +64,7 @@ import functionaltests.jobs.NonTerminatingJob;
 import functionaltests.jobs.SimpleJob;
 import functionaltests.utils.RestFuncTUtils;
 
+
 public abstract class AbstractRestFuncTestCase {
 
     private static final int STATUS_OK = 200;
@@ -74,9 +75,7 @@ public abstract class AbstractRestFuncTestCase {
         if (session == null) {
             synchronized (AbstractRestFuncTestCase.class) {
                 if (session == null) {
-                    session = getSession(
-                            RestFuncTHelper.getRestfulSchedulerUrl(),
-                            getLogin(), getPassword());
+                    session = getSession(RestFuncTHelper.getRestfulSchedulerUrl(), getLogin(), getPassword());
                 }
             }
 
@@ -104,8 +103,7 @@ public abstract class AbstractRestFuncTestCase {
         assertEquals(STATUS_OK, getStatusCode(response));
     }
 
-    protected void assertContentNotEmpty(HttpResponse response)
-            throws Exception {
+    protected void assertContentNotEmpty(HttpResponse response) throws Exception {
         String content = getContent(response);
         assertNotNull(content);
         assertTrue(content.length() != 0);
@@ -119,8 +117,7 @@ public abstract class AbstractRestFuncTestCase {
         return EntityUtils.toString(response.getEntity());
     }
 
-    protected HttpResponse executeUriRequest(HttpUriRequest request)
-            throws Exception {
+    protected HttpResponse executeUriRequest(HttpUriRequest request) throws Exception {
         return (new DefaultHttpClient()).execute(request);
     }
 
@@ -168,10 +165,10 @@ public abstract class AbstractRestFuncTestCase {
         return RestFuncTestConfig.getInstance().getPassword();
     }
 
-    protected String submitDefaultJob() throws Exception {
+    protected JobId submitDefaultJob() throws Exception {
         Job job = defaultJob();
         JobId jobId = getScheduler().submit(job);
-        return jobId.value();
+        return jobId;
     }
 
     protected String submitFinishedJob() throws Exception {
@@ -187,10 +184,25 @@ public abstract class AbstractRestFuncTestCase {
             jobState = scheduler.getJobState(jobId);
         }
         if (!JobStatus.FINISHED.equals(jobState.getStatus())) {
-            throw new RuntimeException(String.format(
-                    "Job(%s) didnot finish propertly.", jobId));
+            throw new RuntimeException(String.format("Job(%s) did not finish properly.", jobId));
         }
         return jobId.value();
+    }
+
+    protected void waitJobState(JobId jobId, JobStatus status, long timeout) throws Exception {
+        long stopTime = System.currentTimeMillis() + timeout;
+
+        while (System.currentTimeMillis() < stopTime) {
+            JobState jobState = getScheduler().getJobState(jobId);
+            if (jobState.getStatus().equals(status)) {
+                return;
+            } else {
+                Thread.sleep(1000);
+            }
+        }
+
+        Assert.fail("Failed to wait when " + jobId + " is " + status + ", current status is " +
+            getScheduler().getJobState(jobId).getStatus());
     }
 
     protected String submitPendingJobId() throws Exception {
@@ -220,7 +232,6 @@ public abstract class AbstractRestFuncTestCase {
 
         job.addTask(task);
         return job;
-        //
     }
 
     private Job pendingJob() throws Exception {
@@ -246,21 +257,18 @@ public abstract class AbstractRestFuncTestCase {
         return job;
     }
 
-    private String getSession(String schedulerUrl, String username,
-            String password) throws Exception {
+    private String getSession(String schedulerUrl, String username, String password) throws Exception {
         String resourceUrl = getResourceUrl("login");
         HttpPost httpPost = new HttpPost(resourceUrl);
         StringBuilder buffer = new StringBuilder();
-        buffer.append("username=").append(username).append("&password=")
-                .append(password);
+        buffer.append("username=").append(username).append("&password=").append(password);
         StringEntity entity = new StringEntity(buffer.toString());
         entity.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         httpPost.setEntity(entity);
         HttpResponse response = (new DefaultHttpClient()).execute(httpPost);
         String responseContent = EntityUtils.toString(response.getEntity());
         if (STATUS_OK != getStatusCode(response)) {
-            throw new RuntimeException(String.format(
-                    "Authentication error: %n%s", responseContent));
+            throw new RuntimeException(String.format("Authentication error: %n%s", responseContent));
         } else {
             return responseContent;
         }

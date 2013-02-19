@@ -128,7 +128,7 @@ public class RestFuncTUtils {
         }
     }
 
-    public static String getClassPath(Class clazz) throws Exception {
+    public static String getClassPath(Class<?> clazz) throws Exception {
         String name = (new StringBuilder()).append('/')
                 .append(clazz.getName().replace('.', '/')).append(".class")
                 .toString();

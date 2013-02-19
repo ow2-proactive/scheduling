@@ -105,7 +105,7 @@ public class RestFuncTHelper {
 
     private static final String defaultNodeSourceName = "_DEFAULT_NODE_SOURCE_";
 
-    private static final int defaultNumberOfNodes = 1;
+    static final int defaultNumberOfNodes = 1;
 
     private static final long defaultNodeTimeout = 20 * 1000;
 
