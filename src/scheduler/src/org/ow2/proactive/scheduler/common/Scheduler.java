@@ -819,7 +819,7 @@ public interface Scheduler {
     public String getTaskServerLogs(String id, String taskName) throws UnknownJobException,
             UnknownTaskException, NotConnectedException, PermissionException;
 
-    public List<JobInfo> loadJobs(int index, int range, JobFilterCriteria filterCriteria)
+    public List<JobInfo> getJobs(int offset, int limit, JobFilterCriteria filterCriteria)
             throws NotConnectedException, PermissionException;
 
 }

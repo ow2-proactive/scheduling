@@ -565,9 +565,9 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     }
 
     @Override
-    public List<JobInfo> loadJobs(int index, int range, JobFilterCriteria filterCriteria)
+    public List<JobInfo> getJobs(int index, int range, JobFilterCriteria filterCriteria)
             throws NotConnectedException, PermissionException {
-        return uischeduler.loadJobs(index, range, filterCriteria);
+        return uischeduler.getJobs(index, range, filterCriteria);
     }
 
 }

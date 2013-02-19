@@ -831,7 +831,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
      */
     @Override
     @ImmediateService
-    public List<JobInfo> loadJobs(int index, int range, JobFilterCriteria filterCriteria)
+    public List<JobInfo> getJobs(int offset, int limit, JobFilterCriteria filterCriteria)
             throws NotConnectedException, PermissionException {
         UserIdentificationImpl ident = frontendState.checkPermission("loadJobs",
                 "You don't have permissions to load jobs");
@@ -843,7 +843,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
         } else {
             user = null;
         }
-        return dbManager.loadJobs(index, range, user, filterCriteria.isPending(), filterCriteria.isRunning(),
+        return dbManager.getJobs(offset, limit, user, filterCriteria.isPending(), filterCriteria.isRunning(),
                 filterCriteria.isFinished());
     }
 

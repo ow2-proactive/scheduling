@@ -179,9 +179,9 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
             this);
     }
 
-    public List<JobInfo> loadJobs(final int index, final int range, final String user, final boolean pending,
+    public List<JobInfo> getJobs(final int offset, final int limit, final String user, final boolean pending,
             final boolean runnning, final boolean finished) {
-        if (range == 0) {
+        if (limit == 0) {
             throw new IllegalArgumentException("Range can't be 0");
         }
 
@@ -194,11 +194,11 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
             @SuppressWarnings("unchecked")
             List<JobInfo> executeWork(Session session) {
                 Criteria criteria = session.createCriteria(JobData.class);
-                if (range > 0) {
-                    criteria.setMaxResults(range);
+                if (limit > 0) {
+                    criteria.setMaxResults(limit);
                 }
-                if (index >= 0) {
-                    criteria.setFirstResult(index);
+                if (offset >= 0) {
+                    criteria.setFirstResult(offset);
                 }
                 if (user != null) {
                     criteria.add(Restrictions.eq("owner", user));
