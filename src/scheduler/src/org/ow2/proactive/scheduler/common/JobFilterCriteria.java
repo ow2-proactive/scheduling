@@ -2,7 +2,9 @@ package org.ow2.proactive.scheduler.common;
 
 import java.io.Serializable;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 
+@PublicAPI
 public class JobFilterCriteria implements Serializable {
 
     private final boolean myJobsOnly;
