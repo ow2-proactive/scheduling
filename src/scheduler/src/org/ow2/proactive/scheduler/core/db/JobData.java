@@ -23,6 +23,7 @@ import org.hibernate.type.SerializableToBlobType;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.job.JobEnvironment;
 import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.job.InternalJob;
@@ -88,6 +89,7 @@ public class JobData {
     JobInfoImpl createJobInfo(JobId jobId) {
         JobInfoImpl jobInfo = new JobInfoImpl();
         jobInfo.setJobId(jobId);
+        jobInfo.setJobOwner(getOwner());
         jobInfo.setStatus(getStatus());
         jobInfo.setTotalNumberOfTasks(getTotalNumberOfTasks());
         jobInfo.setNumberOfPendingTasks(getNumberOfPendingTasks());
@@ -102,6 +104,12 @@ public class JobData {
         if (isToBeRemoved()) {
             jobInfo.setToBeRemoved();
         }
+        return jobInfo;
+    }
+
+    JobInfo toJobInfo() {
+        JobId jobIdInstance = new JobIdImpl(getId(), getJobName());
+        JobInfoImpl jobInfo = createJobInfo(jobIdInstance);
         return jobInfo;
     }
 

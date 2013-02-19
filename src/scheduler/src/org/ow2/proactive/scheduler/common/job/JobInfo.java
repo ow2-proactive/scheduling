@@ -59,6 +59,13 @@ public interface JobInfo extends Serializable {
     public JobId getJobId();
 
     /**
+     * Get job owner 
+     * 
+     * @return job owner
+     */
+    public String getJobOwner();
+
+    /**
      * To get the finishedTime
      *
      * @return the finishedTime

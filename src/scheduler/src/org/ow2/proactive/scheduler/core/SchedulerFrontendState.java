@@ -278,7 +278,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
      * @param ui the user identification
      * @throws PermissionException if permission is denied
      */
-    private void checkOwnStatePermission(boolean myOnly, UserIdentificationImpl ui)
+    synchronized void checkOwnStatePermission(boolean myOnly, UserIdentificationImpl ui)
             throws PermissionException {
         ui.checkPermission(new GetOwnStateOnlyPermission(myOnly), ui.getUsername() +
             " does not have permissions to retrieve full state");

@@ -37,6 +37,7 @@
 package org.ow2.proactive.tests.performance.scheduler;
 
 import java.security.KeyException;
+import java.util.List;
 
 import javax.management.JMException;
 import javax.security.auth.login.LoginException;
@@ -45,6 +46,7 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
+import org.ow2.proactive.scheduler.common.JobFilterCriteria;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
@@ -63,6 +65,7 @@ import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
 import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
@@ -367,4 +370,11 @@ public class TestSchedulerProxy implements Scheduler {
             UnknownTaskException, NotConnectedException, PermissionException {
         return target.getTaskServerLogs(id, taskName);
     }
+
+    @Override
+    public List<JobInfo> loadJobs(int index, int range, JobFilterCriteria filterCriteria)
+            throws NotConnectedException, PermissionException {
+        return target.loadJobs(index, range, filterCriteria);
+    }
+
 }
