@@ -39,6 +39,7 @@ package org.ow2.proactive_grid_cloud_portal.common;
 import java.io.IOException;
 import java.io.Serializable;
 import java.security.KeyException;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -79,6 +80,7 @@ import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
+import org.ow2.proactive.scheduler.common.usage.JobUsage;
 import org.ow2.proactive_grid_cloud_portal.scheduler.UserJobInfo;
 
 
@@ -792,4 +794,26 @@ public interface SchedulerRestInterface {
     public byte[] getCreateCredential(@MultipartForm
     LoginForm multipart) throws ConnectionException, LoginException, InternalSchedulerException;
 
+    /**
+     * Returns details on job and task execution times for the caller's executions.
+     * <p>
+     * Only the jobs finished between the start date and the end date will be returned:
+     * i.e startDate <= job.finishedTime <= endDate.
+     *</p>
+     * @param sessionId a valid session id to idenfiy the caller
+     * @param startDate must not be null, inclusive
+     * @param endDate must not be null, inclusive
+     * @return a list of {@link JobUsage} objects where job finished times are between start date and end date
+     * @throws NotConnectedException if user not logger in
+     * @throws PermissionException if user has insufficient rights
+     *
+     * @see org.ow2.proactive.scheduler.common.usage.SchedulerUsage#getMyAccountUsage(java.util.Date, java.util.Date)
+     */
+    @GET
+    @Path("usage/myaccount")
+    @Produces("application/json")
+    List<JobUsage> getUsageOnMyAccount(@HeaderParam("sessionid") String sessionId,
+                                                    @QueryParam("startdate") Date startDate,
+                                                    @QueryParam("enddate") Date endDate)
+            throws NotConnectedException, PermissionException;
 }

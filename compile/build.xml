@@ -106,7 +106,6 @@
 		<typedef name="class" classname="ant.AntStubGeneratorClass" classpathref="src.classpath" />
 		
 		<stubGenerator srcDir="${classes.dir}" refclasspath="src.classpath">
-		    <class name="org.ow2.proactive_grid_cloud_portal.scheduler.MySchedulerProxyUserInterface" />
             <class name="org.ow2.proactive_grid_cloud_portal.scheduler.EventListener" />
 		</stubGenerator>
 		

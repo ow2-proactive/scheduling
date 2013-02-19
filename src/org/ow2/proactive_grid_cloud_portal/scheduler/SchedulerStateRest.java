@@ -36,6 +36,46 @@
  */
 package org.ow2.proactive_grid_cloud_portal.scheduler;
 
+import org.ow2.proactive.authentication.crypto.CredData;
+import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.db.SortOrder;
+import org.ow2.proactive.db.SortParameter;
+import org.ow2.proactive.scheduler.common.JobFilterCriteria;
+import org.ow2.proactive.scheduler.common.JobSortParameter;
+import org.ow2.proactive.scheduler.common.Scheduler;
+import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
+import org.ow2.proactive.scheduler.common.SchedulerConnection;
+import org.ow2.proactive.scheduler.common.SchedulerStatus;
+import org.ow2.proactive.scheduler.common.exception.ConnectionException;
+import org.ow2.proactive.scheduler.common.exception.InternalSchedulerException;
+import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
+import org.ow2.proactive.scheduler.common.exception.JobCreationException;
+import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
+import org.ow2.proactive.scheduler.common.exception.PermissionException;
+import org.ow2.proactive.scheduler.common.exception.SchedulerException;
+import org.ow2.proactive.scheduler.common.exception.SubmissionClosedException;
+import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
+import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
+import org.ow2.proactive.scheduler.common.job.Job;
+import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobInfo;
+import org.ow2.proactive.scheduler.common.job.JobPriority;
+import org.ow2.proactive.scheduler.common.job.JobResult;
+import org.ow2.proactive.scheduler.common.job.JobState;
+import org.ow2.proactive.scheduler.common.job.factories.FlatJobFactory;
+import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
+import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.task.TaskState;
+import org.ow2.proactive.scheduler.common.usage.JobUsage;
+import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
+import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
+import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
+import org.ow2.proactive.scheduler.task.TaskResultImpl;
+import org.ow2.proactive_grid_cloud_portal.common.LoginForm;
+import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
+import org.ow2.proactive_grid_cloud_portal.webapp.DateFormatter;
+import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
@@ -43,13 +83,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.security.KeyException;
 import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -85,43 +125,6 @@ import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.CircularArrayList;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.ow2.proactive.authentication.crypto.CredData;
-import org.ow2.proactive.authentication.crypto.Credentials;
-import org.ow2.proactive.db.SortOrder;
-import org.ow2.proactive.db.SortParameter;
-import org.ow2.proactive.scheduler.common.JobFilterCriteria;
-import org.ow2.proactive.scheduler.common.JobSortParameter;
-import org.ow2.proactive.scheduler.common.Scheduler;
-import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
-import org.ow2.proactive.scheduler.common.SchedulerConnection;
-import org.ow2.proactive.scheduler.common.SchedulerStatus;
-import org.ow2.proactive.scheduler.common.exception.ConnectionException;
-import org.ow2.proactive.scheduler.common.exception.InternalSchedulerException;
-import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
-import org.ow2.proactive.scheduler.common.exception.JobCreationException;
-import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
-import org.ow2.proactive.scheduler.common.exception.PermissionException;
-import org.ow2.proactive.scheduler.common.exception.SchedulerException;
-import org.ow2.proactive.scheduler.common.exception.SubmissionClosedException;
-import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
-import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
-import org.ow2.proactive.scheduler.common.job.Job;
-import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobInfo;
-import org.ow2.proactive.scheduler.common.job.JobPriority;
-import org.ow2.proactive.scheduler.common.job.JobResult;
-import org.ow2.proactive.scheduler.common.job.JobState;
-import org.ow2.proactive.scheduler.common.job.factories.FlatJobFactory;
-import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
-import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.ow2.proactive.scheduler.common.task.TaskState;
-import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
-import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
-import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
-import org.ow2.proactive.scheduler.task.TaskResultImpl;
-import org.ow2.proactive_grid_cloud_portal.common.LoginForm;
-import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
-import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
 
 
 /**
@@ -168,7 +171,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     int range) throws NotConnectedException, PermissionException {
         Scheduler s = checkAccess(sessionId, "/scheduler/jobs");
 
-        List<JobInfo> jobs = s.getJobs(index, range, new JobFilterCriteria(false, true, true, true), 
+        List<JobInfo> jobs = s.getJobs(index, range, new JobFilterCriteria(false, true, true, true),
                 DEFAULT_JOB_SORT_PARAMS);
         List<String> ids = new ArrayList<String>(jobs.size());
         for (JobInfo jobInfo : jobs) {
@@ -182,7 +185,6 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      * call a method on the scheduler's frontend in order to renew the lease the
      * user has on this frontend. see PORTAL-70
      * 
-     * @param sessionId
      * @throws PermissionException
      * @throws NotConnectedException
      */
@@ -283,7 +285,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
 
         HashMap<Long, List<UserJobInfo>> map = new HashMap<Long, List<UserJobInfo>>(1);
-        map.put(new Long(SchedulerStateListener.getInstance().getSchedulerStateRevision()), jobs);
+        map.put(SchedulerStateListener.getInstance().getSchedulerStateRevision(), jobs);
         return map;
     }
 
@@ -307,9 +309,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     /**
      * Returns a JobState of the job identified by the id <code>jobid</code>
      * 
-     * @param sessionid
+     * @param sessionId
      *            a valid session id
-     * @param jobid
+     * @param jobId
      *            the id of the job to retrieve
      */
     @GET
@@ -331,9 +333,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      * stream currently available logs, call this method several times to get
      * the complete output.
      * 
-     * @param sessionid
+     * @param sessionId
      *            a valid session id
-     * @param jobid
+     * @param jobId
      *            the id of the job to retrieve
      * @throws IOException
      * @throws LogForwardingException
@@ -365,7 +367,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         if (jo != null) {
             CircularArrayList<String> cl = jo.getCl();
             int size = cl.size();
-            StringBuffer mes = new StringBuffer();
+            StringBuilder mes = new StringBuilder();
             for (int i = 0; i < size; i++) {
                 mes.append(cl.remove(0));
             }
@@ -380,9 +382,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      * number of available bytes in the stream or -1 if the stream does not
      * exist.
      * 
-     * @param sessionid
+     * @param sessionId
      *            a valid session id
-     * @param jobid
+     * @param jobId
      *            the id of the job to retrieve
      * @throws IOException
      * @throws LogForwardingException
@@ -410,9 +412,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     /**
      * remove the live log object.
      * 
-     * @param sessionid
+     * @param sessionId
      *            a valid session id
-     * @param jobid
+     * @param jobId
      *            the id of the job to retrieve
      * @throws IOException
      * @throws LogForwardingException
@@ -439,9 +441,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      * Returns the job result associated to the job referenced by the id
      * <code>jobid</code>
      * 
-     * @param sessionid
+     * @param sessionId
      *            a valid session id
-     * @result the job result of the corresponding job
+     * @return the job result of the corresponding job
      */
     @GET
     @GZIP
@@ -463,9 +465,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      * result, one has to call the following restful service
      * jobs/{jobid}/tasks/{taskname}/result/serializedvalue
      * 
-     * @param sessionid
+     * @param sessionId
      *            a valid session id
-     * @param jobid
+     * @param jobId
      *            a job id
      */
     @GET
@@ -634,7 +636,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      * 
      * @param sessionId
      *            a valid session id
-     * @param the
+     * @param jobId
      *            jobid one wants to list the tasks' name
      * @return a list of tasks' name
      */
@@ -667,7 +669,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     String jobId) throws IOException, NotConnectedException {
         checkAccess(sessionId);
 
-        InputStream ips = null;
+        InputStream ips;
         ZipFile jobArchive = new ZipFile(PortalConfiguration.jobIdToPath(jobId));
         ZipEntry imageEntry = jobArchive.getEntry("JOB-INF/image.png");
         if (imageEntry == null) {
@@ -675,9 +677,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
         ips = new BufferedInputStream(jobArchive.getInputStream(imageEntry));
         // Encode in Base64
-        String enc = new String(org.apache.commons.codec.binary.Base64.encodeBase64(IOUtils.toByteArray(ips)), ENCODING);
 
-        return enc;
+        return new String(org.apache.commons.codec.binary.Base64.encodeBase64(IOUtils.toByteArray(ips)), ENCODING);
     }
 
     /**
@@ -998,12 +999,11 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      * associated to the session id in the session map. If not, a
      * NotConnectedException is thrown specifying the invalid access *
      * 
-     * @param sessionId
      * @return the scheduler linked to the session id, an NotConnectedException,
      *         if no such mapping exists.
      * @throws NotConnectedException
      */
-    public SchedulerProxyUserInterface checkAccess(String sessionId, String path)
+    private SchedulerProxyUserInterface checkAccess(String sessionId, String path)
             throws NotConnectedException {
         SchedulerSession ss = SchedulerSessionMapper.getInstance().getSchedulerSession(sessionId);
         if (ss == null) {
@@ -1134,8 +1134,6 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      * 
      * @param sessionId
      *            a valid session id
-     * @param jobId
-     *            the id of the job
      * @return the <code>jobid</code> of the newly created job
      * @throws IOException
      *             if the job was not correctly uploaded/stored
@@ -1161,24 +1159,11 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             });
             tmp = File.createTempFile("job", "d");
 
-            try {
-                OutputStream os = new FileOutputStream(tmp);
-                try {
-                    byte[] buffer = new byte[4096];
-                    for (int n; (n = is.read(buffer)) != -1;) {
-                        os.write(buffer, 0, n);
-                    }
-                } finally {
-                    os.close();
-                }
-            } finally {
-                is.close();
-            }
+            IOUtils.copy(is, new FileOutputStream(tmp));
 
-            Job j = null;
+            Job j;
             boolean isAnArchive = false;
-            if (part1.getMediaType().toString().toLowerCase()
-                    .indexOf(MediaType.APPLICATION_XML.toLowerCase()) > -1) {
+            if (part1.getMediaType().toString().toLowerCase().contains(MediaType.APPLICATION_XML.toLowerCase())) {
                 // the job sent is the xml file
                 j = JobFactory.getFactory().createJob(tmp.getAbsolutePath());
             } else {
@@ -1482,8 +1467,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     String username, @FormParam("password")
     String password) throws LoginException, SchedulerException, KeyException, ActiveObjectCreationException,
             NodeException {
-        MySchedulerProxyUserInterface scheduler;
-        scheduler = PAActiveObject.newActive(MySchedulerProxyUserInterface.class, new Object[] {});
+        SchedulerProxyUserInterface scheduler;
+        scheduler = PAActiveObject.newActive(SchedulerProxyUserInterface.class, new Object[] {});
 
         String url = PortalConfiguration.getProperties().getProperty(PortalConfiguration.scheduler_url);
 
@@ -1493,7 +1478,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
         scheduler.init(url, username, password);
 
-        String sessionId = "" + SchedulerSessionMapper.getInstance().add(scheduler, username);
+        String sessionId = SchedulerSessionMapper.getInstance().add(scheduler, username);
         logger.info("binding user " + username + " to session " + sessionId);
         return sessionId;
     }
@@ -1503,14 +1488,12 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      * submitting - 2 fields username & password - a credential file with field
      * name 'credential'
      * 
-     * @param multipart
      * @return the session id associated to this new connection
      * @throws ActiveObjectCreationException
      * @throws NodeException
      * @throws KeyException
      * @throws LoginException
      * @throws SchedulerException
-     * @throws IOException
      */
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
@@ -1520,8 +1503,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     LoginForm multipart) throws ActiveObjectCreationException, NodeException, KeyException, LoginException,
             SchedulerException {
 
-        MySchedulerProxyUserInterface scheduler = PAActiveObject.newActive(
-                MySchedulerProxyUserInterface.class, new Object[] {});
+        SchedulerProxyUserInterface scheduler = PAActiveObject.newActive(
+                SchedulerProxyUserInterface.class, new Object[]{});
         String username = null;
         String url = PortalConfiguration.getProperties().getProperty(PortalConfiguration.scheduler_url);
 
@@ -1544,10 +1527,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             scheduler.init(url, credData);
         }
 
-        String sessionId = "" + SchedulerSessionMapper.getInstance().add(scheduler, username);
-        // logger.info("binding user "+ " to session " + sessionId );
-        return sessionId;
-
+        return SchedulerSessionMapper.getInstance().add(scheduler, username);
     }
 
     /**
@@ -1647,5 +1627,18 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         } catch (KeyException e) {
             throw new InternalSchedulerException(e);
         }
+    }
+
+    @GET
+    @Path("usage/myaccount")
+    @Produces("application/json")
+    @Override
+    public List<JobUsage> getUsageOnMyAccount(
+            @HeaderParam("sessionid") String sessionId,
+            @QueryParam("startdate") @DateFormatter.DateFormat() Date startDate,
+            @QueryParam("enddate") @DateFormatter.DateFormat() Date endDate)
+            throws NotConnectedException, PermissionException {
+        Scheduler scheduler = checkAccess(sessionId);
+        return scheduler.getMyAccountUsage(startDate, endDate);
     }
 }
