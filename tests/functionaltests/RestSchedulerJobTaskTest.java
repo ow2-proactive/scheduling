@@ -36,8 +36,6 @@
  */
 package functionaltests;
 
-//import static functionaltests.RestFuncTestConstants.DEFAULT_JOB_ID;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -68,6 +66,7 @@ import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 
 import functionaltests.utils.RestFuncTUtils;
+
 
 public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
 
@@ -107,8 +106,8 @@ public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
         String url = getResourceUrl("login");
         HttpPost httpPost = new HttpPost(url);
         StringBuilder buffer = new StringBuilder();
-        buffer.append("username=").append(config.getLogin())
-                .append("&password=").append(config.getPassword());
+        buffer.append("username=").append(config.getLogin()).append("&password=")
+                .append(config.getPassword());
         StringEntity entity = new StringEntity(buffer.toString());
         entity.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         httpPost.setEntity(entity);
@@ -120,15 +119,13 @@ public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
     @Test
     public void testLoginWithCredentials() throws Exception {
         RestFuncTestConfig config = RestFuncTestConfig.getInstance();
-        Credentials credentials = RestFuncTUtils.createCredentials(
-                config.getLogin(), config.getPassword(),
+        Credentials credentials = RestFuncTUtils.createCredentials(config.getLogin(), config.getPassword(),
                 RestFuncTHelper.getSchedulerPublicKey());
         String schedulerUrl = getResourceUrl("login");
         HttpPost httpPost = new HttpPost(schedulerUrl);
         MultipartEntity multipartEntity = new MultipartEntity();
-        multipartEntity.addPart("credential",
-                new ByteArrayBody(credentials.getBase64(),
-                        MediaType.APPLICATION_OCTET_STREAM, null));
+        multipartEntity.addPart("credential", new ByteArrayBody(credentials.getBase64(),
+            MediaType.APPLICATION_OCTET_STREAM, null));
         httpPost.setEntity(multipartEntity);
         HttpResponse response = executeUriRequest(httpPost);
         assertHttpStatusOK(response);
@@ -142,8 +139,7 @@ public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
         setSessionHeader(httpPost);
         File jobFile = RestFuncTHelper.getDefaultJobXmlfile();
         MultipartEntity multipartEntity = new MultipartEntity();
-        multipartEntity.addPart("", new FileBody(jobFile,
-                MediaType.APPLICATION_XML));
+        multipartEntity.addPart("", new FileBody(jobFile, MediaType.APPLICATION_XML));
         httpPost.setEntity(multipartEntity);
         HttpResponse response = executeUriRequest(httpPost);
         assertHttpStatusOK(response);
@@ -161,17 +157,14 @@ public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
         HttpResponse response = executeUriRequest(httpGet);
         assertHttpStatusOK(response);
         JSONObject jsonObj = toJsonObject(response);
-        assertJobOwner((JSONArray) jsonObj.get("pendingJobs"),
-                config.getLogin());
-        assertJobOwner((JSONArray) jsonObj.get("runningJobs"),
-                config.getLogin());
-        assertJobOwner((JSONArray) jsonObj.get("finishedJobs"),
-                config.getLogin());
+        assertJobOwner((JSONArray) jsonObj.get("pendingJobs"), config.getLogin());
+        assertJobOwner((JSONArray) jsonObj.get("runningJobs"), config.getLogin());
+        assertJobOwner((JSONArray) jsonObj.get("finishedJobs"), config.getLogin());
     }
 
     @Test
-    public void testLitJobs() throws Exception {
-        String jobId = submitDefaultJob();
+    public void testListJobs() throws Exception {
+        String jobId = submitDefaultJob().value();
         String resource = jobId;
         String schedulerUrl = getResourceUrl("jobs/" + resource);
         HttpGet httpGet = new HttpGet(schedulerUrl);
@@ -210,7 +203,7 @@ public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
 
     @Test(expected = UnknownJobException.class)
     public void testRemoveJob() throws Exception {
-        String jobId = submitDefaultJob();
+        String jobId = submitDefaultJob().value();
         String resource = "jobs/" + jobId;
         String schedulerUrl = getResourceUrl(resource);
         HttpDelete delete = new HttpDelete(schedulerUrl);
@@ -237,7 +230,7 @@ public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
 
     @Test
     public void testGetJobTaskIds() throws Exception {
-        String jobId = submitDefaultJob();
+        String jobId = submitDefaultJob().value();
         String resource = "jobs/" + jobId + "/tasks";
         String schedulerUrl = getResourceUrl(resource);
         HttpGet httpGet = new HttpGet(schedulerUrl);
@@ -250,7 +243,7 @@ public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
 
     @Test
     public void testJobTaskStates() throws Exception {
-        String jobId = submitDefaultJob();
+        String jobId = submitDefaultJob().value();
         String resource = "jobs/" + jobId + "/taskstates";
         String schedulerUrl = getResourceUrl(resource);
         HttpGet httpGet = new HttpGet(schedulerUrl);
@@ -265,13 +258,13 @@ public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
         JSONObject jobInfo = (JSONObject) job.get("jobInfo");
         JSONObject jobId = (JSONObject) jobInfo.get("jobId");
         String actual = jobId.get("id").toString();
-        assertTrue(actual.equals(expected));
+        assertEquals(expected, actual);
     }
 
     private void assertJobOwner(JSONArray jobs, String owner) {
         for (int i = 0; i < jobs.size(); i++) {
             JSONObject job = (JSONObject) jobs.get(i);
-            assertTrue(job.get("owner").equals(owner));
+            assertEquals(owner, job.get("owner"));
         }
     }
 
