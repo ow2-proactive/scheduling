@@ -88,6 +88,7 @@ import org.ow2.proactive.scheduler.permissions.ChangePolicyPermission;
 import org.ow2.proactive.scheduler.permissions.ChangePriorityPermission;
 import org.ow2.proactive.scheduler.permissions.ConnectToResourceManagerPermission;
 import org.ow2.proactive.scheduler.permissions.GetOwnStateOnlyPermission;
+import org.ow2.proactive.scheduler.task.internal.InternalJavaTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.TaskLogger;
@@ -357,6 +358,18 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
 
         //get the internal job.
         InternalJob job = InternalJobFactory.createJob(userJob, this.credentials.get(id));
+
+        if (!PASchedulerProperties.ALLOW_JAVA_TASKS.getValueAsBoolean()) {
+            // java tasks that are executed in nodes are prohibited
+            // reject the submission of jobs with java tasks
+            for (InternalTask it : job.getITasks()) {
+                if (it.getClass().equals(InternalJavaTask.class)) {
+                    logger.warn("Attempt to submit a java task when it's disactivated");
+                    throw new JobCreationException("Usage of java tasks is prohibited (please replace task " +
+                        it.getName() + " by forked java task)");
+                }
+            }
+        }
 
         //setting job informations
         if (job.getTasks().size() == 0) {
