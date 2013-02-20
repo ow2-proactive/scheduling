@@ -128,10 +128,9 @@ public abstract class SelectionManager {
      * Loads authorized selection scripts.
      */
     public void loadAuthorizedScriptsSignatures() {
-        if (PAResourceManagerProperties.RM_EXECUTE_SCRIPT_AUTHORIZED_DIR.getValueAsString() != null) {
-            String dirName = PAResourceManagerProperties
-                    .getAbsolutePath(PAResourceManagerProperties.RM_EXECUTE_SCRIPT_AUTHORIZED_DIR
-                            .getValueAsString());
+        String dirName = PAResourceManagerProperties.RM_EXECUTE_SCRIPT_AUTHORIZED_DIR.getValueAsString();
+        if (dirName != null && dirName.length() > 0) {
+            dirName = PAResourceManagerProperties.getAbsolutePath(dirName);
 
             logger.info("The resource manager will accept only selection scripts from " + dirName);
             File folder = new File(dirName);
