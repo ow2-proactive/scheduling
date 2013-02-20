@@ -197,6 +197,9 @@ public enum PASchedulerProperties {
     /** Maximum number of execution for a task in case of failure (node down) */
     NUMBER_OF_EXECUTION_ON_FAILURE("pa.scheduler.task.numberofexecutiononfailure", PropertyType.INTEGER),
 
+    /** If false user cannot execute java tasks in nodes and must use either forked java tasks of native tasks */
+    ALLOW_JAVA_TASKS("pa.scheduler.task.allowjavatasks", PropertyType.BOOLEAN),
+
     /* ***************************************************************** */
     /* ********************** DATASPACES PROPERTIES ******************** */
     /* ***************************************************************** */
