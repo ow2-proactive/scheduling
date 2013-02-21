@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 
+
 @PublicAPI
 public class JobFilterCriteria implements Serializable {
 

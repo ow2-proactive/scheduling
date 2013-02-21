@@ -37,9 +37,11 @@
 package org.ow2.proactive.scheduler.core;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Timer;
@@ -83,6 +85,7 @@ import org.ow2.proactive.scheduler.job.ClientJobState;
 import org.ow2.proactive.scheduler.job.IdentifiedJob;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.InternalJobFactory;
+import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
 import org.ow2.proactive.scheduler.job.UserIdentificationImpl;
 import org.ow2.proactive.scheduler.permissions.ChangePolicyPermission;
 import org.ow2.proactive.scheduler.permissions.ChangePriorityPermission;
@@ -925,6 +928,18 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                 logger.warn("**WARNING** - Unconsistent update type received from Scheduler Core : " +
                     notification.getEventType());
         }
+    }
+
+    synchronized List<SchedulerUserInfo> getUsers() {
+        List<SchedulerUserInfo> users = new ArrayList<SchedulerUserInfo>(identifications.size());
+        for (UserIdentification user : identifications.values()) {
+            users.add(new SchedulerUserInfo(user.getHostName(), 
+                    user.getUsername(), 
+                    user.getConnectionTime(), 
+                    user.getLastSubmitTime(), 
+                    user.getSubmitNumber()));
+        }
+        return users;
     }
 
 }

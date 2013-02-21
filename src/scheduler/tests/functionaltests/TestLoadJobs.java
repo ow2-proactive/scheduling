@@ -28,6 +28,7 @@ import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
+import org.ow2.tests.FunctionalTest;
 
 import functionaltests.monitor.MonitorEventReceiver;
 import functionaltests.monitor.SchedulerMonitorsHandler;
@@ -37,7 +38,7 @@ import functionaltests.monitor.SchedulerMonitorsHandler;
  * Test against method Scheduler.loadJobs 
  *
  */
-public class TestLoadJobs extends SchedulerConsecutive {
+public class TestLoadJobs extends FunctionalTest {
 
     public static class CommunicationObject {
 
