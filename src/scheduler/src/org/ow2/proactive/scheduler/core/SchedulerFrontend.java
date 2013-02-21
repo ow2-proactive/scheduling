@@ -97,6 +97,7 @@ import org.ow2.proactive.scheduler.core.rmproxies.RMProxiesManager;
 import org.ow2.proactive.scheduler.job.IdentifiedJob;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
+import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
 import org.ow2.proactive.scheduler.job.UserIdentificationImpl;
 import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.TaskLogger;
@@ -658,6 +659,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     /**
      * {@inheritDoc}
      */
+    @ImmediateService
     public JobState getJobState(JobId jobId) throws NotConnectedException, UnknownJobException,
             PermissionException {
         return frontendState.getJobState(jobId);
@@ -848,6 +850,18 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
         }
         return dbManager.getJobs(offset, limit, user, filterCriteria.isPending(), filterCriteria.isRunning(),
                 filterCriteria.isFinished(), sortParameters);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @ImmediateService
+    public List<SchedulerUserInfo> getUsers() throws NotConnectedException, PermissionException {
+        UserIdentificationImpl ident = frontendState.checkPermission("getUsers",
+                "You don't have permissions to get users");
+        frontendState.checkOwnStatePermission(false, ident);
+        return frontendState.getUsers();
     }
 
     private String getTaskServerLogs(TaskId id) {

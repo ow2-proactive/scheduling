@@ -34,7 +34,7 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.ow2.proactive.db;
+package org.ow2.proactive.scheduler.job;
 
 import java.io.Serializable;
 
@@ -42,23 +42,45 @@ import org.objectweb.proactive.annotation.PublicAPI;
 
 
 @PublicAPI
-public class SortParameter<T> implements Serializable {
+public class SchedulerUserInfo implements Serializable {
 
-    private final T parameter;
+    private final String hostName;
 
-    private final SortOrder sortOrder;
+    private final String username;
 
-    public SortParameter(T parameter, SortOrder sortOrder) {
-        this.parameter = parameter;
-        this.sortOrder = sortOrder;
+    private final long connectionTime;
+
+    private final long lastSubmitTime;
+
+    private final int submitNumber;
+
+    public SchedulerUserInfo(String hostName, String username, long connectionTime, long lastSubmitTime,
+            int submitNumber) {
+        this.hostName = hostName;
+        this.username = username;
+        this.connectionTime = connectionTime;
+        this.lastSubmitTime = lastSubmitTime;
+        this.submitNumber = submitNumber;
     }
 
-    public T getParameter() {
-        return parameter;
+    public String getHostName() {
+        return hostName;
     }
 
-    public SortOrder getSortOrder() {
-        return sortOrder;
+    public String getUsername() {
+        return username;
+    }
+
+    public long getConnectionTime() {
+        return connectionTime;
+    }
+
+    public long getLastSubmitTime() {
+        return lastSubmitTime;
+    }
+
+    public int getSubmitNumber() {
+        return submitNumber;
     }
 
 }

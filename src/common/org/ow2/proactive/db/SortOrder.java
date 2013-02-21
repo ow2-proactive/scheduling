@@ -38,6 +38,7 @@ package org.ow2.proactive.db;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 
+
 @PublicAPI
 public enum SortOrder {
     ASC(true), DESC(false);

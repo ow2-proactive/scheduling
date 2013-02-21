@@ -73,6 +73,7 @@ import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
+import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
 
 
 public class TestSchedulerProxy implements Scheduler {
@@ -378,6 +379,11 @@ public class TestSchedulerProxy implements Scheduler {
             List<SortParameter<JobSortParameter>> sortParameters) throws NotConnectedException,
             PermissionException {
         return target.getJobs(index, range, filterCriteria, sortParameters);
+    }
+
+    @Override
+    public List<SchedulerUserInfo> getUsers() throws NotConnectedException, PermissionException {
+        return target.getUsers();
     }
 
 }

@@ -79,6 +79,7 @@ import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.ext.filessplitmerge.logging.LoggerManager;
+import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
 import org.ow2.proactive.utils.console.MBeanInfoViewer;
 
 
@@ -571,6 +572,11 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
             List<SortParameter<JobSortParameter>> sortParameters) throws NotConnectedException,
             PermissionException {
         return uischeduler.getJobs(index, range, filterCriteria, sortParameters);
+    }
+
+    @Override
+    public List<SchedulerUserInfo> getUsers() throws NotConnectedException, PermissionException {
+        return uischeduler.getUsers();
     }
 
 }
