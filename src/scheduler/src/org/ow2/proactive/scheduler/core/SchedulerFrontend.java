@@ -474,6 +474,11 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
      */
     public void listenJobLogs(JobId jobId, AppenderProvider appenderProvider) throws NotConnectedException,
             UnknownJobException, PermissionException {
+
+        if (!schedulingService.getListenJobLogsSupport().isEnabled()) {
+            throw new PermissionException("Listening to job logs is disabled by administrator");
+        }
+
         //checking permissions
         frontendState.checkJobOwner("listenJobLogs", jobId,
                 "You do not have permission to listen the log of this job !");
