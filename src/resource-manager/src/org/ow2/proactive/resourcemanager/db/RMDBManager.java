@@ -140,7 +140,7 @@ public class RMDBManager {
             sessionFactory = configuration.buildSessionFactory();
 
             List<?> lastAliveTime = sqlQuery("from Alive");
-            if (lastAliveTime.size() == 0) {
+            if (lastAliveTime == null || lastAliveTime.size() == 0) {
                 createRmAliveTime();
             } else if (!drop) {
                 if (dropNS) {
