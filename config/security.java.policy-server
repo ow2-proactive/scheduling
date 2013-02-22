@@ -77,6 +77,8 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.getJobServerLogs";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.getTaskServerLogs";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.loadJobs";
+    permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.getUsers";
+    
 
     // Example of granting users the administrative rights (e.g. to reload configuration of the resource manager or scheduler)
     //permission javax.management.MBeanPermission "org.ow2.proactive.resourcemanager.core.jmx.mbean.ManagementMBeanImpl#*[*:*]","*";

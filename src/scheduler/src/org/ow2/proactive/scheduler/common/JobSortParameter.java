@@ -38,6 +38,7 @@ package org.ow2.proactive.scheduler.common;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 
+
 @PublicAPI
 public enum JobSortParameter {
     ID, STATE, OWNER, PRIORITY, NAME
