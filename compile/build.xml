@@ -14,7 +14,8 @@
 		<format property="rest_api.version" pattern="yyyyMMddHHmm" locale="en,UK" />
 	</tstamp>
 
-    <property name="doc.footer" value="Copyright 2007-2012 Activeeon All Rights Reserved." />
+    <property name="doc.footer" value="Copyright 1997-2013 ActiveEon/INRIA/University of Nice-Sophia Antipolis" />
+    <property name="doc.header" value="&lt;table style=&quot;color:#555555;font-size: 9pt;&quot;&gt; &lt;tr&gt; &lt;td&gt; &lt;img src= &quot;{@docRoot}/../../images/logo-ProActive_small.png&quot;&gt; &lt;/td&gt; &lt;td width= &quot;500&quot;&gt; &lt;h5&gt;An Open Source Solution for Enterprise Grids &amp; Clouds&lt;/h5&gt; &lt;h2&gt;ProActive Scheduling &amp; Resourcing &lt;/h2&gt; &lt;h2&gt;Rest Interface - version ${rest_api.version}&lt;/h4&gt; &lt;h4 class=&quot;author&quot; &gt;&lt;span class=&quot;surname&quot;&gt;Copyright 1997-2013 ActiveEon/INRIA/University of Nice-Sophia Antipolis&lt;/span&gt;&lt;/h4&gt; &lt;/td&gt;  &lt;td&gt;  &lt;a href= &quot;http://www.activeeon.com/&quot;&gt;&lt;img border=&quot;0&quot; src= &quot;{@docRoot}/../../images/logo-ActiveEon.png&quot; alt=&quot;ActiveEon&quot; title=&quot;ActiveEon: a Professional Open Source company, co-developing and providing support for ProActive Parallel Suite&quot;&gt;&lt;/a&gt;  &lt;a href= &quot;http://www.ow2.org/&quot;&gt;&lt;img border=&quot;0&quot; src= &quot;{@docRoot}/../../images/logo-OW2_small.png&quot; alt=&quot;OW2&quot; title=&quot;OW2 Consortium&quot; &gt;&lt;/a&gt; &lt;br&gt;  &lt;a href=&quot;http://www.inria.fr&quot;&gt;&lt;img border=&quot;0&quot; src=&quot;{@docRoot}/../../images/logo-INRIA_small.png&quot; alt=&quot;INRIA&quot; title=&quot;A CNRS-INRIA-UNSA Research team&quot;&gt;&lt;/a&gt;  &lt;a href= &quot;http://www.unice.fr&quot;&gt;&lt;img border=&quot;0&quot; src= &quot;{@docRoot}/../../images/logo-UNSA_small.png&quot; alt=&quot;UNSA&quot; title=&quot;A CNRS-INRIA-UNSA Research team&quot;&gt;&lt;/a&gt;  &lt;a href=&quot;http://www.cnrs.fr&quot; &gt;&lt;img border=&quot;0&quot; src=&quot;{@docRoot}/../../images/logo-CNRS_small.png&quot; alt= &quot;CNRS-I3S&quot; title=&quot;A CNRS-INRIA-UNSA Research team&quot;&gt;&lt;/a&gt; &lt;/td&gt;  &lt;/tr&gt; &lt;/table&gt;" />
 
     <property name="projectRoot" value="${basedir}/.." />
     <property name="build.dir" value="${projectRoot}/build" />
@@ -72,6 +73,7 @@
         <delete dir="${webinf.classes.dir}" />
         <delete dir="${webinf.lib.dir}" />
         <delete dir="${war.root}/doc" />
+        <delete dir="${war.root}/index.html" />
         <delete dir="${build.dir}" />
         <delete dir="${dist.dir}" />
         <delete dir="${junit.dir}" />
@@ -141,18 +143,6 @@
 			</fileset>
 		</copy>
 
-		<!-- copy doc content -->
-		<copy todir="${war.root}/doc">
-			<fileset dir="${build.dir}/jaxrsdocs/">
-				<include name="**/*" />
-			</fileset>
-		</copy>
-		<copy todir="${war.root}/doc">
-			<fileset dir="${build.dir}/">
-				<include name="jaxbdocs/" />
-			</fileset>
-		</copy>
-
 		<war destfile="${dist.dir}/SchedulingRest-${rest_api.version}.war" webxml="${webinf}/web.xml" basedir="${war.root}">
 			<manifest>
 				<!-- Who is building this jar? -->
@@ -168,18 +158,45 @@
 	</target>
 
 	<target name="doc" depends="doc-jaxrs">
+		<!-- copy doc content -->
+		<copy todir="${war.root}/doc/jaxrsdocs">
+			<fileset dir="${build.dir}/jaxrsdocs/">
+				<include name="**/*" />
+			</fileset>
+		</copy>
+		<copy todir="${war.root}/doc/jaxbdocs">
+			<fileset dir="${build.dir}/jaxbdocs/">
+				<include name="**/*" />
+			</fileset>
+		</copy>
+		<copy todir="${war.root}" filtering="true">
+			<filterset>
+				<filter token="rest_api.version" value="${rest_api.version}" />
+			</filterset>
+			<fileset dir="${projectRoot}/doc">
+				<include name="**/*" />
+			</fileset>
+		</copy>
 	</target>
 
 	<target name="doc-jaxrs" depends="doc-jaxb" description="Generate JAX-RS documentation">
-		<javadoc useexternalfile="true" classpathref="src.classpath" sourcepath="${src.dir}" destdir="${build.dir}/jaxrsdocs/" extdirs="${lib.dir}" doclet="com.lunatech.doclets.jax.jaxrs.JAXRSDoclet" docletpathref="src.classpath" footer="${doc.footer}">
+		<javadoc useexternalfile="true"
+				 classpathref="src.classpath" sourcepath="${src.dir}"
+				 destdir="${build.dir}/jaxrsdocs/" extdirs="${lib.dir}"
+				 doclet="com.lunatech.doclets.jax.jaxrs.JAXRSDoclet" docletpathref="src.classpath"
+				 footer="${doc.footer}" header="${doc.header}">
 			<package name="org.ow2.proactive_grid_cloud_portal.*" />
-			<link href="jaxbdocs/" />
+			<link href="../jaxbdocs/" />
 		</javadoc>
 	</target>
 
 	<target name="doc-jaxb" description="Generate JAXB documentation">
-		<javadoc useexternalfile="true" classpathref="src.classpath" sourcepath="${src.dir}" destdir="${build.dir}/jaxbdocs/" extdirs="${lib.dir}" doclet="com.lunatech.doclets.jax.jaxb.JAXBDoclet" docletpathref="src.classpath" footer="${doc.footer}">
-			<package name="org.ow2.proactive_grid_cloud_portal.*" />
+		<javadoc useexternalfile="true"
+				 classpathref="src.classpath" sourcepath="${src.dir}"
+				 destdir="${build.dir}/jaxbdocs/" extdirs="${lib.dir}"
+				 doclet="com.lunatech.doclets.jax.jaxb.JAXBDoclet" docletpathref="src.classpath"
+				 footer="${doc.footer}" header="${doc.header}">
+		<package name="org.ow2.proactive_grid_cloud_portal.*" />
 		</javadoc>
 	</target>
 
