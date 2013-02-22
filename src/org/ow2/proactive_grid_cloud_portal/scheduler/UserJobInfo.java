@@ -53,52 +53,26 @@ import org.ow2.proactive.scheduler.common.job.JobInfo;
  */
 @XmlRootElement
 public class UserJobInfo implements Serializable {
-    /*
-     * the id of the job
-     */
-    private String jobId;
-
-    /*
-     * the job's owner
-     */
-    private String jobOwner;
-
-    /*
-     * Jobinfo of the job
-     */
+    
     private JobInfo jobInfo;
 
     public UserJobInfo() {
     }
 
-    public UserJobInfo(String jobid, String jobOwner, JobInfo jobinfo) {
-        this.jobId = jobid;
-        this.jobOwner = jobOwner;
+    public UserJobInfo(JobInfo jobinfo) {
         this.jobInfo = jobinfo;
     }
 
     public String getJobid() {
-        return jobId;
-    }
-
-    public void setJobid(String jobid) {
-        this.jobId = jobid;
+        return jobInfo.getJobId().value();
     }
 
     public String getJobOwner() {
-        return jobOwner;
-    }
-
-    public void setJobOwner(String jobOwner) {
-        this.jobOwner = jobOwner;
+        return jobInfo.getJobOwner();
     }
 
     public JobInfo getJobinfo() {
         return jobInfo;
-    }
-
-    public void setJobinfo(JobInfo jobinfo) {
-        this.jobInfo = jobinfo;
     }
 
 }

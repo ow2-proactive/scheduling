@@ -41,7 +41,6 @@ import java.io.Serializable;
 import java.security.KeyException;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicLong;
 
 import javax.security.auth.login.LoginException;
 import javax.ws.rs.Consumes;
@@ -57,15 +56,12 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
-import org.hibernate.collection.internal.PersistentMap;
 import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.node.NodeException;
-import org.ow2.proactive.scheduler.common.SchedulerState;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.exception.ConnectionException;
 import org.ow2.proactive.scheduler.common.exception.InternalSchedulerException;
@@ -80,17 +76,12 @@ import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
-import org.ow2.proactive.scheduler.common.job.UserIdentification;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
+import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
 import org.ow2.proactive_grid_cloud_portal.scheduler.UserJobInfo;
-import org.ow2.proactive_grid_cloud_portal.scheduler.CacheNotYetInitialized;
-import org.ow2.proactive_grid_cloud_portal.webapp.PersistentMapConverter;
 
 
-/**
- * fdsfsd
- */
 @Path("/scheduler/")
 public interface SchedulerRestInterface {
 
@@ -102,7 +93,6 @@ public interface SchedulerRestInterface {
      * @param index optional, if a sublist has to be returned the index of the sublist
      * @param range optional, if a sublist has to be returned, the range of the sublist
      * @return a list of jobs' ids under the form of a list of string
-     * @throws CacheNotYetInitialized if the cache is not yet initialized
     */
     @GET
     @Path("jobs")
@@ -112,7 +102,7 @@ public interface SchedulerRestInterface {
     @DefaultValue("-1")
     int index, @QueryParam("range")
     @DefaultValue("-1")
-    int range) throws NotConnectedException, PermissionException, CacheNotYetInitialized;
+    int range) throws NotConnectedException, PermissionException;
 
     /**
      * Returns a subset of the scheduler state, including pending, running, finished
@@ -125,7 +115,6 @@ public interface SchedulerRestInterface {
      * @param range optional, if a sublist has to be returned, the range of the sublist
      * @param sessionId a valid session id
      * @return a list of UserJobInfo
-     * @throws CacheNotYetInitialized if the cache is not yet initialized
      */
     @GET
     @Path("jobsinfo")
@@ -135,7 +124,7 @@ public interface SchedulerRestInterface {
     @DefaultValue("-1")
     int index, @QueryParam("range")
     @DefaultValue("-1")
-    int range) throws PermissionException, NotConnectedException, CacheNotYetInitialized;
+    int range) throws PermissionException, NotConnectedException;
 
     /**
      * Returns a map containing one entry with the revision id as key and the 
@@ -158,7 +147,7 @@ public interface SchedulerRestInterface {
     @GZIP
     @Path("revisionjobsinfo")
     @Produces({ "application/json", "application/xml" })
-    public abstract Map<AtomicLong, List<UserJobInfo>> revisionAndjobsinfo(@HeaderParam("sessionid")
+    public abstract Map<Long, List<UserJobInfo>> revisionAndjobsinfo(@HeaderParam("sessionid")
     String sessionId, @QueryParam("index")
     @DefaultValue("-1")
     int index, @QueryParam("range")
@@ -174,18 +163,6 @@ public interface SchedulerRestInterface {
     boolean finished) throws PermissionException, NotConnectedException;
 
     /**
-     * Returns the state of the scheduler
-     * @param sessionId a valid session id.
-     * @return the scheduler state 
-     * @throws CacheNotYetInitialized
-     */
-    @GET
-    @Path("state")
-    @Produces({ "application/json", "application/xml" })
-    public abstract SchedulerState schedulerState(@HeaderParam("sessionid")
-    String sessionId) throws PermissionException, NotConnectedException, CacheNotYetInitialized;
-
-    /**
      * Returns the revision number of the scheduler state
      * @param sessionId a valid session id.
      * @return the revision of the scheduler state 
@@ -195,32 +172,7 @@ public interface SchedulerRestInterface {
     @Produces({ "application/json", "application/xml" })
     public abstract long schedulerStateRevision(@HeaderParam("sessionid")
     String sessionId) throws PermissionException, NotConnectedException;
-
-    /**
-     * Returns a map with only one entry containing as key the revision and as content
-     * the scheduler state
-     * @param sessionId a valid session id.
-     * @return a map of one entry containing the revision and the corresponding scheduler state 
-     * @throws CacheNotYetInitialized
-     */
-    @GET
-    @Path("revisionandstate")
-    @Produces({ "application/json", "application/xml" })
-    public abstract Map<AtomicLong, SchedulerState> getSchedulerStateAndRevision(@HeaderParam("sessionid")
-    String sessionId) throws PermissionException, NotConnectedException, CacheNotYetInitialized;
-
-    /**
-     * returns only the jobs of the current user
-     * @param sessionId a valid session id
-     * @return a scheduler state that contains only the jobs of the user that
-     * owns the session <code>sessionid</code>  
-    */
-    @GET
-    @Path("state/myjobsonly")
-    @Produces({ "application/json", "application/xml" })
-    public abstract SchedulerState getSchedulerStateMyJobsOnly(@HeaderParam("sessionid")
-    String sessionId) throws PermissionException, NotConnectedException;
-
+    
     /**
      * Returns a JobState of the job identified by the id <code>jobid</code>
      * @param sessionid a valid session id
@@ -229,7 +181,6 @@ public interface SchedulerRestInterface {
     @GET
     @Path("jobs/{jobid}")
     @Produces({ "application/json", "application/xml" })
-    @XmlJavaTypeAdapter(value = PersistentMapConverter.class, type = PersistentMap.class)
     public abstract JobState listJobs(@HeaderParam("sessionid")
     String sessionId, @PathParam("jobid")
     String jobId) throws NotConnectedException, UnknownJobException, PermissionException;
@@ -798,7 +749,7 @@ public interface SchedulerRestInterface {
     @GZIP
     @Path("users")
     @Produces("application/json")
-    public List<UserIdentification> getUsers(@HeaderParam("sessionid")
+    public List<SchedulerUserInfo> getUsers(@HeaderParam("sessionid")
     final String sessionId) throws NotConnectedException, PermissionException;
 
     /**

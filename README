@@ -61,10 +61,6 @@ Scheduler
 	list job by ids
   rest/scheduler/jobsinfo  
 	list jobs by ids+additional data (class : rest_api.UserJobInfo)  
-  rest/scheduler/state				
-	scheduler state (SchedulerState)
-  rest/scheduler/state/myjobsonly
-	scheduler state containing only jobs of the current user
 
   rest/scheduler/jobs/{jobid}
 	job state of job {jobid} (JobState class)

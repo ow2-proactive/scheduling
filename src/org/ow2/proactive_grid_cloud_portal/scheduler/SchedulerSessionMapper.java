@@ -46,20 +46,16 @@ import org.ow2.proactive_grid_cloud_portal.common.SessionIdGenerator;
 
 public class SchedulerSessionMapper {
 
-    private Map<String, SchedulerSession> sessions;
-    private static SchedulerSessionMapper sessionMapper;
+    private static final SchedulerSessionMapper sessionMapper = new SchedulerSessionMapper();
 
-    //    private long currentSessionid = 0l;
+    public static SchedulerSessionMapper getInstance() {
+        return sessionMapper;
+    }
+
+    private Map<String, SchedulerSession> sessions;
 
     private SchedulerSessionMapper() {
         sessions = new ConcurrentHashMap<String, SchedulerSession>();
-    }
-
-    public static synchronized SchedulerSessionMapper getInstance() {
-        if (sessionMapper == null) {
-            sessionMapper = new SchedulerSessionMapper();
-        }
-        return sessionMapper;
     }
 
     public String add(SchedulerProxyUserInterface s, String username) {
@@ -86,7 +82,6 @@ public class SchedulerSessionMapper {
      * @param key the session id
      */
     public void remove(String key) {
-
         SchedulerSession ss = sessions.remove(key);
         if (ss != null) {
             SchedulerProxyUserInterface proxy = ss.getScheduler();

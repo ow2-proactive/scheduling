@@ -40,8 +40,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Iterator;
-import java.util.Properties;
 import java.util.Map.Entry;
+import java.util.Properties;
 
 import org.apache.log4j.PropertyConfigurator;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
@@ -59,7 +59,7 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.IntWrapperConverter;
 import org.ow2.proactive_grid_cloud_portal.scheduler.RestartModeConverter;
 import org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerSessionMapper;
 import org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerSessionsCleaner;
-import org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateCaching;
+import org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateListener;
 
 
 public class RestRuntime {
@@ -72,7 +72,6 @@ public class RestRuntime {
             File paConfig) {
         dispatcher.addStringConverter(RestartModeConverter.class);
         dispatcher.addStringConverter(IntWrapperConverter.class);
-        dispatcher.registerProvider(PersistentMapConverter.class);
         dispatcher.registerProvider(JacksonProvider.class);
 
         try {
@@ -110,8 +109,8 @@ public class RestRuntime {
 
         System.setProperty("scheduler.database.nodb", "true");
 
-        // initialize the scheduler's state cache
-        SchedulerStateCaching.init();
+        SchedulerStateListener.getInstance().start();
+
         RMStateCaching.init();
 
         // start the scheduler session cleaner
@@ -166,7 +165,7 @@ public class RestRuntime {
         schedulerSessionCleaner.stop();
         rmSessionCleaner.stop();
 
-        SchedulerStateCaching.setKill(true);
+        SchedulerStateListener.getInstance().kill();
         RMStateCaching.kill();
 
         // force the shutdown of the runtime

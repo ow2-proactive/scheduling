@@ -151,29 +151,23 @@ public class RestSchedulerJobPaginationTest extends AbstractRestFuncTestCase {
         JSONObject job = null;
         
         jobs = getRequestJSONArray(getResourceUrl("jobsinfo"));
-        for (int i = 0; i < jobs.size(); i++) {
-            if(((JSONObject)jobs.get(i)).get("jobid").equals("1")) {
-                job = (JSONObject)jobs.get(i);
-                break;
-            }
-        }
-        Assert.assertNotNull(job);
-        checkJob(job, JobStatus.KILLED, 0, 0);
+        checkJob(findJob("1", jobs), JobStatus.KILLED, 0, 0);
 
         map = getRequestJSONObject(getResourceUrl("revisionjobsinfo"));
         Assert.assertEquals(1, map.keySet().size());
         jobs = (JSONArray) map.get(map.keySet().iterator().next());
-        job = null;
-        for (int i = 0; i < jobs.size(); i++) {
-            if(((JSONObject)jobs.get(i)).get("jobid").equals("1")) {
-                job = (JSONObject)jobs.get(i);
-                break;
-            }
-        }
-        Assert.assertNotNull(job);
-        checkJob(job, JobStatus.KILLED, 0, 0);
+        checkJob(findJob("1", jobs), JobStatus.KILLED, 0, 0);
 
         checkPagingRequests2();
+    }
+    private JSONObject findJob(String id, JSONArray jobs) {
+        for (int i = 0; i < jobs.size(); i++) {
+            if(((JSONObject)jobs.get(i)).get("jobid").equals(id)) {
+                return (JSONObject)jobs.get(i);
+            }
+        }
+        Assert.fail("Failed to find job " + id + ", all jobs: " + jobs);
+        return null;
     }
 
     void checkFiltering1() throws Exception {

@@ -6,12 +6,7 @@ scheduler.cache.password=w_pwd
 scheduler.cache.credential=
 
 #cache refresh rate in ms
-scheduler.cache.refreshrate=3500
 rm.cache.refreshrate=3500
-
-#lease renew for the user that cache the scheduler state (ms)
-#every 10 min by default
-lease.renew.rate=600000
 
 rm.url=@RM_URL@
 # rm user that is used as cache

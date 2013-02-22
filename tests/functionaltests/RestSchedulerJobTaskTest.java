@@ -148,21 +148,6 @@ public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
     }
 
     @Test
-    public void testSchedulerStateMyJobsOnly() throws Exception {
-        submitDefaultJob();
-        RestFuncTestConfig config = RestFuncTestConfig.getInstance();
-        String schedulerUrl = getResourceUrl("state/myjobsonly");
-        HttpGet httpGet = new HttpGet(schedulerUrl);
-        setSessionHeader(httpGet);
-        HttpResponse response = executeUriRequest(httpGet);
-        assertHttpStatusOK(response);
-        JSONObject jsonObj = toJsonObject(response);
-        assertJobOwner((JSONArray) jsonObj.get("pendingJobs"), config.getLogin());
-        assertJobOwner((JSONArray) jsonObj.get("runningJobs"), config.getLogin());
-        assertJobOwner((JSONArray) jsonObj.get("finishedJobs"), config.getLogin());
-    }
-
-    @Test
     public void testListJobs() throws Exception {
         String jobId = submitDefaultJob().value();
         String resource = jobId;

@@ -49,7 +49,6 @@ public class PortalConfiguration {
     public static String scheduler_cache_login = "scheduler.cache.login";
     public static String scheduler_cache_password = "scheduler.cache.password";
     public static String scheduler_cache_credential = "scheduler.cache.credential";
-    public static String scheduler_cache_refreshrate = "scheduler.cache.refreshrate";
     public static String scheduler_logforwardingservice_provider = "scheduler.logforwardingservice.provider";
     public static String rm_url = "rm.url";
     public static String rm_cache_login = "rm.cache.login";
@@ -65,7 +64,6 @@ public class PortalConfiguration {
     public static String novnc_keypassword = "novnc.keypassword";
 
     private static Properties properties;
-    public static String lease_renew_rate = "lease.renew.rate";
 
     public static void load(File f) throws FileNotFoundException, IOException {
         properties = new Properties();
