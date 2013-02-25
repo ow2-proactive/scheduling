@@ -37,33 +37,36 @@
 
 package org.ow2.proactive_grid_cloud_portal.cli.json;
 
-public class SchedulerStateView {
 
-    private JobStateView[] finishedJobs;
-    private JobStateView[] pendingJobs;
-    private JobStateView[] runningJobs;
+public class UserJobInfoView {
 
-    public JobStateView[] getFinishedJobs() {
-        return finishedJobs;
+    private String jobId;
+    
+    private String jobOwner;
+    
+    private JobInfoView jobInfo;
+
+    public String getJobId() {
+        return jobId;
     }
-
-    public void setFinishedJobs(JobStateView[] finishedJobs) {
-        this.finishedJobs = finishedJobs;
+    
+    public void setJobId(String jobId) {
+        this.jobId = jobId;
     }
-
-    public JobStateView[] getPendingJobs() {
-        return pendingJobs;
+    
+    public String getJobOwner() {
+        return jobOwner;
     }
-
-    public void setPendingJobs(JobStateView[] pendingJobs) {
-        this.pendingJobs = pendingJobs;
+    
+    public void setJobOwner(String jobOwner) {
+        this.jobOwner = jobOwner;
     }
-
-    public JobStateView[] getRunningJobs() {
-        return runningJobs;
+    
+    public JobInfoView getJobinfo() {
+        return jobInfo;
     }
-
-    public void setRunningJobs(JobStateView[] runningJobs) {
-        this.runningJobs = runningJobs;
+    
+    public void setJobinfo(JobInfoView jobInfo) {
+        this.jobInfo = jobInfo;
     }
 }

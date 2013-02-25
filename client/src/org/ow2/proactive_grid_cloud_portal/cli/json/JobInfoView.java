@@ -44,6 +44,7 @@ public class JobInfoView {
     private String status;
     private JobIdView jobId;
     private int totalNumberOfTasks;
+    private String priority;
 
     public JobIdView getJobId() {
         return jobId;
@@ -84,4 +85,13 @@ public class JobInfoView {
     public void setTotalNumberOfTasks(int totalNumberOfTasks) {
         this.totalNumberOfTasks = totalNumberOfTasks;
     }
+
+    public String getPriority() {
+        return priority;
+    }
+
+    public void setPriority(String priority) {
+        this.priority = priority;
+    }
+    
 }

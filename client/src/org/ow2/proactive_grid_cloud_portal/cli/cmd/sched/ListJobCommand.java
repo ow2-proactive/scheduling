@@ -39,6 +39,7 @@ package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
 
 import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
 
+import java.util.List;
 import java.util.Map;
 
 import org.apache.http.client.methods.HttpGet;
@@ -47,7 +48,7 @@ import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
-import org.ow2.proactive_grid_cloud_portal.cli.json.SchedulerStateView;
+import org.ow2.proactive_grid_cloud_portal.cli.json.UserJobInfoView;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
 
@@ -59,19 +60,19 @@ public class ListJobCommand extends AbstractCommand implements Command {
     @Override
     public void execute(ApplicationContext currentContext) throws CLIException {
         HttpGet request = new HttpGet(
-                currentContext.getResourceUrl("revisionandstate"));
+                currentContext.getResourceUrl("revisionjobsinfo"));
         HttpResponseWrapper response = execute(request, currentContext);
 
         if (statusCode(OK) == statusCode(response)) {
-            Map<Long, SchedulerStateView> stateMap = readValue(response,
-                    new TypeReference<Map<Long, SchedulerStateView>>() {
+            Map<Long, List<UserJobInfoView>> stateMap = readValue(response,
+                    new TypeReference<Map<Long, List<UserJobInfoView>>>() {
                     }, currentContext);
-            SchedulerStateView schedulerState = stateMap.entrySet().iterator()
+            List<UserJobInfoView> jobs = stateMap.entrySet().iterator()
                     .next().getValue();
-            resultStack(currentContext).push(schedulerState);
+            resultStack(currentContext).push(jobs);
             if (!currentContext.isSilent()) {
                 writeLine(currentContext, "%s",
-                        StringUtility.schedulerStateAsString(schedulerState));
+                        StringUtility.jobsAsString(jobs));
             }
 
         } else {

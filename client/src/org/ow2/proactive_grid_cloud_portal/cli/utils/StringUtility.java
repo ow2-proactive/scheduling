@@ -37,39 +37,30 @@
 
 package org.ow2.proactive_grid_cloud_portal.cli.utils;
 
-import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_IO_ERROR;
-import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_OTHER;
-
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.commons.codec.binary.StringUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.ParseException;
-import org.apache.http.util.EntityUtils;
 import org.ow2.proactive.utils.ObjectArrayFormatter;
 import org.ow2.proactive.utils.Tools;
-import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
+import org.ow2.proactive_grid_cloud_portal.cli.json.JobInfoView;
 import org.ow2.proactive_grid_cloud_portal.cli.json.JobResultView;
 import org.ow2.proactive_grid_cloud_portal.cli.json.JobStateView;
 import org.ow2.proactive_grid_cloud_portal.cli.json.MBeanInfoView;
 import org.ow2.proactive_grid_cloud_portal.cli.json.NodeEventView;
 import org.ow2.proactive_grid_cloud_portal.cli.json.NodeSourceView;
-import org.ow2.proactive_grid_cloud_portal.cli.json.SchedulerStateView;
 import org.ow2.proactive_grid_cloud_portal.cli.json.TaskIdView;
 import org.ow2.proactive_grid_cloud_portal.cli.json.TaskInfoView;
 import org.ow2.proactive_grid_cloud_portal.cli.json.TaskResultView;
 import org.ow2.proactive_grid_cloud_portal.cli.json.TaskStateView;
 import org.ow2.proactive_grid_cloud_portal.cli.json.TopologyView;
+import org.ow2.proactive_grid_cloud_portal.cli.json.UserJobInfoView;
 
 public class StringUtility {
 
@@ -316,7 +307,7 @@ public class StringUtility {
         return buffer.toString();
     }
     
-    public static String schedulerStateAsString(SchedulerStateView schedulerState) {
+    public static String jobsAsString(List<UserJobInfoView> jobs) {
         ObjectArrayFormatter formatter = new ObjectArrayFormatter();
         formatter.setMaxColumnLength(30);
         formatter.setSpace(4);
@@ -326,7 +317,6 @@ public class StringUtility {
         columnNames.add("NAME");
         columnNames.add("OWNER");
         columnNames.add("PRIORITY");
-        columnNames.add("PROJECT");
         columnNames.add("STATUS");
         columnNames.add("START AT");
         columnNames.add("DURATION");
@@ -334,55 +324,31 @@ public class StringUtility {
 
         formatter.addEmptyLine();
 
-        List<JobStateView> pendingJobs = Arrays.asList(schedulerState
-                .getPendingJobs());
-        Collections.sort(pendingJobs);
-        List<JobStateView> runningJobs = Arrays.asList(schedulerState
-                .getRunningJobs());
-        Collections.sort(runningJobs);
-        List<JobStateView> finishedJobs = Arrays.asList(schedulerState
-                .getFinishedJobs());
-        Collections.sort(finishedJobs);
-
-        for (JobStateView js : finishedJobs) {
-            formatter.addLine(rowList(js));
+        for (UserJobInfoView job : jobs) {
+            formatter.addLine(rowList(job));
         }
-
-        if (runningJobs.size() > 0) {
-            formatter.addEmptyLine();
-        }
-        for (JobStateView js : schedulerState.getRunningJobs()) {
-            formatter.addLine(rowList(js));
-        }
-
-        if (pendingJobs.size() > 0) {
-            formatter.addEmptyLine();
-        }
-        for (JobStateView js : pendingJobs) {
-            formatter.addLine(rowList(js));
-        }
-
+        
         return Tools.getStringAsArray(formatter);
     }
 
-    private static List<String> rowList(JobStateView js) {
+    private static List<String> rowList(UserJobInfoView userJobInfo) {
+        JobInfoView jobInfo = userJobInfo.getJobinfo();
+        
         List<String> row = new ArrayList<String>();
-        row.add(String.valueOf(js.getId()));
-        row.add(js.getName());
-        row.add(js.getOwner());
-        row.add(js.getPriority().toString());
-        row.add(js.getProjectName());
-        row.add(js.getJobInfo().getStatus());
+        row.add(String.valueOf(jobInfo.getJobId().getId()));
+        row.add(jobInfo.getJobId().getReadableName());
+        row.add(userJobInfo.getJobOwner());
+        row.add(jobInfo.getPriority());
+        row.add(jobInfo.getStatus());
 
-        String date = StringUtility.formattedDate(js.getJobInfo()
-                .getStartTime());
-        if (js.getJobInfo().getStartTime() != -1)
+        long startTime = jobInfo.getStartTime();
+        String date = StringUtility.formattedDate(startTime);
+        if (startTime != -1)
             date += " ("
-                    + StringUtility.formattedElapsedTime(js.getJobInfo()
-                            .getStartTime()) + ")";
+                    + StringUtility.formattedElapsedTime(startTime) + ")";
         row.add(date);
-        row.add(StringUtility.formattedDuration(js.getJobInfo().getStartTime(),
-                js.getJobInfo().getFinishedTime()));
+        row.add(StringUtility.formattedDuration(startTime,
+                jobInfo.getFinishedTime()));
 
         return row;
     }

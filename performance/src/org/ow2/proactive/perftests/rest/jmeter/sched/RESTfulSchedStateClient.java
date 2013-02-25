@@ -41,8 +41,7 @@ import org.apache.jmeter.protocol.java.sampler.JavaSamplerContext;
 import org.apache.jmeter.samplers.SampleResult;
 
 /**
- * Retrieves scheduler state (set of pending, running and finished jobs)
- * iteratively.
+ * Retrieves list of scheduler jobs iteratively.
  * 
  */
 public class RESTfulSchedStateClient extends BaseRESTfulSchedClient {
@@ -89,8 +88,8 @@ public class RESTfulSchedStateClient extends BaseRESTfulSchedClient {
 
     private SampleResult fetchSchedulerState(int index, int offset) {
         String resourceUrl = (new StringBuilder(getConnection().getUrl()))
-                .append("/revisionandstate?index=").append(index)
+                .append("/revisionjobsinfo?index=").append(index)
                 .append("&range=").append(offset).toString();
-        return getResource(getClientSession(), "scheduler state", resourceUrl);
+        return getResource(getClientSession(), "scheduler jobs", resourceUrl);
     }
 }
