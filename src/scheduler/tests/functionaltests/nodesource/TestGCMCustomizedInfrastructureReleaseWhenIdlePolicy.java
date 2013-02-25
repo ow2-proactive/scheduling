@@ -39,14 +39,13 @@ package functionaltests.nodesource;
 import java.io.File;
 import java.net.URISyntaxException;
 
+import functionaltests.RMTHelper;
+import functionaltests.SchedulerTHelper;
 import org.ow2.proactive.resourcemanager.RMFactory;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.GCMCustomisedInfrastructure;
 import org.ow2.proactive.scheduler.resourcemanager.nodesource.policy.ReleaseResourcesWhenSchedulerIdle;
 import org.ow2.proactive.utils.FileToBytesConverter;
-
-import functionaltests.RMTHelper;
-import functionaltests.SchedulerTHelper;
 
 
 /**
@@ -59,6 +58,7 @@ import functionaltests.SchedulerTHelper;
  * in this test it's not required.
  *
  */
+@SuppressWarnings("deprecation")
 public class TestGCMCustomizedInfrastructureReleaseWhenIdlePolicy extends
         TestGCMInfrastructureReleaseWhenIdlePolicy {
 

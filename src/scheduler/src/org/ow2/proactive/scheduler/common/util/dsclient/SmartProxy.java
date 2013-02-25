@@ -40,6 +40,26 @@ package org.ow2.proactive.scheduler.common.util.dsclient;
  * @author The ProActive Team
  */
 
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.ThreadFactory;
+
+import javax.security.auth.login.LoginException;
+
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSelector;
 import org.apache.commons.vfs.FileSystemException;
@@ -58,18 +78,29 @@ import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
-import org.ow2.proactive.scheduler.common.exception.*;
-import org.ow2.proactive.scheduler.common.job.*;
-import org.ow2.proactive.scheduler.common.task.*;
+import org.ow2.proactive.scheduler.common.exception.JobCreationException;
+import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
+import org.ow2.proactive.scheduler.common.exception.PermissionException;
+import org.ow2.proactive.scheduler.common.exception.SchedulerException;
+import org.ow2.proactive.scheduler.common.exception.SubmissionClosedException;
+import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
+import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
+import org.ow2.proactive.scheduler.common.job.Job;
+import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobInfo;
+import org.ow2.proactive.scheduler.common.job.JobState;
+import org.ow2.proactive.scheduler.common.job.JobStatus;
+import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.job.UserIdentification;
+import org.ow2.proactive.scheduler.common.task.Task;
+import org.ow2.proactive.scheduler.common.task.TaskId;
+import org.ow2.proactive.scheduler.common.task.TaskInfo;
+import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.task.TaskState;
+import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
-
-import javax.security.auth.login.LoginException;
-import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.concurrent.*;
 
 
 /**

@@ -561,6 +561,7 @@ public abstract class InternalJob extends JobState {
                         it.setFinishedTime(descriptor.getFinishedTime() + 1);
                         it.setStatus(TaskStatus.SKIPPED);
                         it.setExecutionDuration(0);
+
                         changesInfo.taskSkipped(it);
                         setNumberOfPendingTasks(getNumberOfPendingTasks() - 1);
                         setNumberOfFinishedTasks(getNumberOfFinishedTasks() + 1);

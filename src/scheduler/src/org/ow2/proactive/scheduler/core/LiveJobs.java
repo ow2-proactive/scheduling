@@ -15,6 +15,7 @@ import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.exception.TaskAbortedException;
 import org.ow2.proactive.scheduler.common.exception.TaskPreemptedException;
+import org.ow2.proactive.scheduler.common.exception.TaskRestartedException;
 import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
 import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -494,7 +495,7 @@ class LiveJobs {
             TerminationData terminationData = TerminationData.newTerminationData();
             terminationData.addTaskData(taskData, false);
 
-            TaskResultImpl taskResult = new TaskResultImpl(task.getId(), new TaskAbortedException(
+            TaskResultImpl taskResult = new TaskResultImpl(task.getId(), new TaskRestartedException(
                 "Aborted by user"), new SimpleTaskLogs("", "Aborted by user"), System.currentTimeMillis() -
                 task.getStartTime());
 

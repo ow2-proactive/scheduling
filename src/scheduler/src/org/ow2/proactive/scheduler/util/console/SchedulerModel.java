@@ -218,9 +218,6 @@ public class SchedulerModel extends ConsoleModel {
         }
     }
 
-    /**
-     * @see org.ow2.proactive.scheduler.common.util.userconsole.UserSchedulerModel#initialize()
-     */
     @Override
     protected void initialize() throws IOException {
         super.initialize();
@@ -438,6 +435,7 @@ public class SchedulerModel extends ConsoleModel {
                 }
             } else {
                 print("Job " + jobId + " is not finished !");
+                return null;
             }
             return result;
         } catch (Exception e) {
@@ -580,8 +578,9 @@ public class SchedulerModel extends ConsoleModel {
 
     public void toutput_(String jobId, String taskName) {
         try {
-            TaskResult result = scheduler.getTaskResult(jobId, taskName);
+            TaskResult result = null;
 
+            result = scheduler.getTaskResult(jobId, taskName);
             if (result != null) {
                 try {
                     print(taskName + " output :");
@@ -592,6 +591,7 @@ public class SchedulerModel extends ConsoleModel {
             } else {
                 print("Task '" + taskName + "' is not finished !");
             }
+
         } catch (Exception e) {
             handleExceptionDisplay("Error on task " + taskName, e);
         }
@@ -810,7 +810,7 @@ public class SchedulerModel extends ConsoleModel {
 
     /**
      * Execute a JS command file with arguments.
-     * 
+     *
      * @param params command file path must be the first param
      */
     public void execWithParam_(String... params) {
@@ -1099,7 +1099,7 @@ public class SchedulerModel extends ConsoleModel {
     /**
      * Connect the scheduler using given authentication interface and creadentials
      *
-     * @param auth the authentication interface on which to connect
+     * @param auth        the authentication interface on which to connect
      * @param credentials the credentials to be used for the connection
      * @throws LoginException If bad credentials are provided
      */
@@ -1136,7 +1136,7 @@ public class SchedulerModel extends ConsoleModel {
 
     /**
      * Print a map on two column
-     * 
+     *
      * @param map the map to be printed
      */
     private void printMap(Map<String, String> map) {

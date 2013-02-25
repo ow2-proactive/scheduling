@@ -37,6 +37,8 @@
 package org.ow2.proactive.scheduler.common.exception;
 
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.task.TaskId;
 
 
 /**
@@ -47,6 +49,12 @@ import org.objectweb.proactive.annotation.PublicAPI;
  */
 @PublicAPI
 public class UnknownTaskException extends SchedulerException {
+
+    private JobId jobId;
+
+    private String taskName;
+
+    private TaskId taskId;
 
     /**
      * Create a new instance of UnknownTaskException
@@ -61,6 +69,18 @@ public class UnknownTaskException extends SchedulerException {
      * Create a new instance of UnknownTaskException
      */
     public UnknownTaskException() {
+    }
+
+    public UnknownTaskException(String taskName, JobId jobId) {
+        super("The task " + taskName + "of job " + jobId + " is unknown !");
+        this.jobId = jobId;
+        this.taskName = taskName;
+    }
+
+    public UnknownTaskException(TaskId taskId, JobId jobId) {
+        super("The task " + taskId + "of job " + jobId + " is unknown !");
+        this.jobId = jobId;
+        this.taskId = taskId;
     }
 
     /**

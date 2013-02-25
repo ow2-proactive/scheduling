@@ -36,6 +36,16 @@
  */
 package org.ow2.proactive.scheduler.task.launcher;
 
+import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.ImmediateService;
 import org.objectweb.proactive.api.PAActiveObject;
@@ -52,12 +62,6 @@ import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
-
-import java.io.Serializable;
-import java.lang.reflect.InvocationTargetException;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.concurrent.*;
 
 
 /**
@@ -104,6 +108,7 @@ public class JavaTaskLauncher extends TaskLauncher {
             ExecutableContainer executableContainer, TaskResult... results) {
         long duration = -1;
         long sample = 0;
+        long intervalms = 0;
         // Executable result (res or ex)
         Throwable exception = null;
         Serializable userResult = null;
@@ -117,8 +122,8 @@ public class JavaTaskLauncher extends TaskLauncher {
             sample = System.nanoTime();
             //copy datas from OUTPUT or INPUT to local scratch
             copyInputDataToScratch();
-            sample = System.nanoTime() - sample;
-            logger.info("Time spent copying INPUT datas to SCRATCH : " + sample + " ms");
+            intervalms = Math.round(Math.ceil((System.nanoTime() - sample) / 1000));
+            logger.info("Time spent copying INPUT datas to SCRATCH : " + intervalms + " ms");
 
             if (!hasBeenKilled) {
                 // set exported vars
@@ -169,8 +174,8 @@ public class JavaTaskLauncher extends TaskLauncher {
                 sample = System.nanoTime();
                 //copy output file
                 copyScratchDataToOutput();
-                sample = System.nanoTime() - sample;
-                logger.info("Time spent copying SCRATCH datas to OUTPUT : " + sample + " ms");
+                intervalms = Math.round(Math.ceil((System.nanoTime() - sample) / 1000));
+                logger.info("Time spent copying SCRATCH datas to OUTPUT : " + intervalms + " ms");
             }
         } catch (Throwable ex) {
             logger.debug("Exception occured while running task " + this.taskId + ": ", ex);

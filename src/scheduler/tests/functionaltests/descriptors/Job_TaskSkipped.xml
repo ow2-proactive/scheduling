@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job xmlns="urn:proactive:jobdescriptor:dev" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:proactive:jobdescriptor:dev ../../../src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.xsd"
+	name="job_killer" priority="normal" cancelJobOnError="false">
+	<description>The second task will be skipped</description>
+    <taskFlow>
+        <task name="T" maxNumberOfExecution="1">
+            <description></description>
+            <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
+            </javaExecutable>
+            <controlFlow block="none" >
+                <if target="T1" else="T2" continuation="">
+                    <script>
+                        <code language="javascript">
+                            // <![CDATA[
+  branch = "if";
+// ]]>
+                        </code>
+                    </script>
+                </if>
+            </controlFlow>
+        </task>
+        <task name="T1" maxNumberOfExecution="1">
+            <description>  </description>
+            <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
+            </javaExecutable>
+        </task>
+        <task name="T2" maxNumberOfExecution="1">
+            <description></description>
+            <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
+            </javaExecutable>
+        </task>
+    </taskFlow>
+</job>

@@ -127,7 +127,7 @@ public interface Scheduler extends SchedulerUsage {
      * If the job does not exist, an UnknownJobException is sent with the proper message.<br>
      * So, if you have the right to kill this task and if the job and task name exist and is running,
      * the task will be killed and this method will return <code>true</code>.<br/>
-     * In any other cases a {@link schedulerException} will be thrown.<br>
+     * In any other cases a {@link SchedulerException} will be thrown.<br>
      *
      * @param jobId the job containing the task to be killed.
      * @param taskName the name of the task to kill.
@@ -148,7 +148,7 @@ public interface Scheduler extends SchedulerUsage {
      * So, if you have the right to restart this task and if the job and task name exist and is running,
      * the task will be restarted and this method will return <code>true</code>.<br/>
      * The given delay is the delay between the task termination and it's eligibility to be re-scheduled.
-     * In any other cases a {@link schedulerException} will be thrown.<br><br/>
+     * In any other cases a {@link SchedulerException} will be thrown.<br><br/>
      *
      * After this call, the following situations can occur :
      * <ul>
@@ -176,7 +176,7 @@ public interface Scheduler extends SchedulerUsage {
      * So, if you have the right to stop this task and if the job and task name exist and is running,
      * the task will be stopped and restarted later and this method will return <code>true</code>.<br/>
      * The given delay is the delay between the task termination and it's eligibility to be re-scheduled.
-     * In any other cases a {@link schedulerException} will be thrown.<br><br/>
+     * In any other cases a {@link SchedulerException} will be thrown.<br><br/>
      *
      * @param jobId the job containing the task to be stopped.
      * @param taskName the name of the task to stop.
@@ -530,7 +530,7 @@ public interface Scheduler extends SchedulerUsage {
      * If the job does not exist, an UnknownJobException is sent with the proper message.<br>
      * So, if you have the right to kill this task and if the job and task name exist and is running,
      * the task will be killed and this method will return <code>true</code>.<br/>
-     * In any other cases a {@link schedulerException} will be thrown.<br>
+     * In any other cases a {@link SchedulerException} will be thrown.<br>
      *
      * @param jobId the job containing the task to be killed.
      * @param taskName the name of the task to kill.
@@ -551,7 +551,7 @@ public interface Scheduler extends SchedulerUsage {
      * So, if you have the right to restart this task and if the job and task name exist and is running,
      * the task will be restarted and this method will return <code>true</code>.<br/>
      * The given delay is the delay between the task termination and it's eligibility to be re-scheduled.
-     * In any other cases a {@link schedulerException} will be thrown.<br><br/>
+     * In any other cases a {@link SchedulerException} will be thrown.<br><br/>
      *
      * After this call, the following situations can occur :
      * <ul>
@@ -579,7 +579,7 @@ public interface Scheduler extends SchedulerUsage {
      * So, if you have the right to stop this task and if the job and task name exist and is running,
      * the task will be stopped and restarted later and this method will return <code>true</code>.<br/>
      * The given delay is the delay between the task termination and it's eligibility to be re-scheduled.
-     * In any other cases a {@link schedulerException} will be thrown.<br><br/>
+     * In any other cases a {@link SchedulerException} will be thrown.<br><br/>
      *
      * @param jobId the job containing the task to be stopped.
      * @param taskName the name of the task to stop.

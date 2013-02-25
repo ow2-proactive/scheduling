@@ -108,7 +108,9 @@ public class TestMultipleUsersMakingMassivGetResultRequest extends SchedulerCons
                             JobResult jr = null;
                             while (jr == null) {
                                 Thread.sleep(getResultDelay);
+
                                 jr = user.getJobResult(id);
+
                             }
                             if (System.currentTimeMillis() - start > jobSubmissionDuration) {
                                 SchedulerTHelper.log(Thread.currentThread().getName() + " -> Terminate");

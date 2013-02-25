@@ -83,10 +83,13 @@ public class EC2Policy extends SchedulerLoadingPolicy {
      * System.currentTimeMillis()) is actually when it was registered in the RM,
      * not the VM startup in AWS accounting, which probably occurred ~2mn sooner
      */
-    private HashMap<String, Long> nodes = null;
+    private HashMap<String, Long> nodes = new HashMap<String, Long>();
 
+    /**
+     * EC2Policy AO empty non-arg constructor
+     */
     public EC2Policy() {
-        this.nodes = new HashMap<String, Long>();
+
     }
 
     @Override

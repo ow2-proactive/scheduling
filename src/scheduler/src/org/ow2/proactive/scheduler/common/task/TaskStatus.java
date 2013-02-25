@@ -91,7 +91,7 @@ public enum TaskStatus implements java.io.Serializable {
      */
     NOT_RESTARTED("Could not restart", false),
     /**
-     * The task has been aborted by an exception on an other task. (job is cancelOnError=true)
+     * The task has been aborted by an exception on an other task while the task is running. (job is cancelOnError=true)
      * Can be also in this status if the job is killed while the concerned task was running.
      */
     ABORTED("Aborted", false),
