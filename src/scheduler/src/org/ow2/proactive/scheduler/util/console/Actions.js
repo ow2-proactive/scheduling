@@ -144,7 +144,7 @@ function exec(commandFilePath){
 }
 
 function listjobs(){
-	return s_.schedulerState_();
+	return s_.listjobs_();
 }
 
 function stats(){

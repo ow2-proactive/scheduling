@@ -40,9 +40,12 @@ public class DSFileSelector implements FileSelector {
 
         String buri = fileInfo.getBaseFolder().getURL().toString();
         String furi = fileInfo.getFile().getURL().toString();
-        String name = furi.replaceFirst(buri + "/?", "");
+        // we replace in a raw way the base uri (this replacement is not interpreted as a regex)
+        String name = furi.replace(buri, "");
+        // we remove any prepending slashes to the path remaining
+        name = name.replaceFirst("/*", "");
 
-        // logger_util.debug("Checking file " + name + "("+ furi+")");
+        logger_util.debug("Checking file " + name + "(" + furi + ")");
 
         if (isIncluded(name)) {
             if (!isExcluded(name)) {

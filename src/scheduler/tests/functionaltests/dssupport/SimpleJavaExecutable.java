@@ -1,19 +1,14 @@
-package functionaltests;
-
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.Serializable;
-import java.net.URI;
+package functionaltests.dssupport;
 
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 
+import java.io.*;
+import java.net.URI;
+
 
 /**
- * A simple java executable used by {@link TestSchedulerProxyUIWithDSSupport}
+ * A simple java executable used by {@link TestSmartProxy}
  * For all files in the localspace (non recursive into folders) creates an
  * output file with the same content and the .out extension.
  *
@@ -40,8 +35,9 @@ public class SimpleJavaExecutable extends JavaExecutable {
             } else {
                 System.out.println(file.getAbsolutePath() + " is not a file. ");
             }
-
-            File fout = new File(file.getAbsolutePath().concat(".out"));
+            String new_name = file.getName().replace("input", "output");
+            new_name = new_name.replace(TestSmartProxy.inputFileExt, TestSmartProxy.outputFileExt);
+            File fout = new File(file.getCanonicalFile().getParent(), new_name);
             FileReader fr = new FileReader(file);
             BufferedReader br = new BufferedReader(fr);
             BufferedWriter bw = new BufferedWriter(new FileWriter(fout));

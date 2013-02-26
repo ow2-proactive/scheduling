@@ -75,7 +75,7 @@ public class SchedulingService {
         this.infrastructure = infrastructure;
         this.listener = listener;
         this.jobs = new LiveJobs(infrastructure.getDBManager(), listener);
-        this.listenJobLogsSupport = new ListenJobLogsSupport(infrastructure.getDBManager(), jobs);
+        this.listenJobLogsSupport = ListenJobLogsSupport.newInstance(infrastructure.getDBManager(), jobs);
         if (recoveredState != null) {
             recover(recoveredState);
         }

@@ -221,6 +221,8 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
                     criteria.add(Restrictions.in("status", status.toArray(new JobStatus[status.size()])));
                 }
 
+                criteria.add(Restrictions.eq("removedTime", -1L));
+                
                 if (sortParameters != null) {
                     Property property;
                     for (SortParameter<JobSortParameter> param : sortParameters) {

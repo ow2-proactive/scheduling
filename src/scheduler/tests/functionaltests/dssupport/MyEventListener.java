@@ -1,7 +1,6 @@
-package functionaltests;
+package functionaltests.dssupport;
 
-import java.io.Serializable;
-
+import functionaltests.monitor.EventMonitor;
 import org.junit.Assert;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
@@ -12,7 +11,7 @@ import org.ow2.proactive.scheduler.common.job.UserIdentification;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.util.dsclient.ISchedulerEventListenerExtended;
 
-import functionaltests.monitor.EventMonitor;
+import java.io.Serializable;
 
 
 public class MyEventListener implements ISchedulerEventListenerExtended, Serializable {
@@ -20,6 +19,8 @@ public class MyEventListener implements ISchedulerEventListenerExtended, Seriali
     boolean jobFinished = false;
     boolean pullDataFinished = false;
     JobId jobId;
+    int count = 0;
+    boolean synchronous = false;
 
     EventMonitor monitor;
 
@@ -36,6 +37,15 @@ public class MyEventListener implements ISchedulerEventListenerExtended, Seriali
 
     }
 
+    public void reset() {
+        jobFinished = false;
+        count = 0;
+    }
+
+    public synchronized void setSynchronous(boolean synchronous) {
+        this.synchronous = synchronous;
+    }
+
     /**
      * to be called directly on the java object (not on the remote active
      * reference) the monitor needs to be copied by reference
@@ -46,19 +56,19 @@ public class MyEventListener implements ISchedulerEventListenerExtended, Seriali
 
     @Override
     public void schedulerStateUpdatedEvent(SchedulerEvent eventType) {
-        System.out.println("MyEvenetListener.schedulerStateUpdatedEvent() ");
+        System.out.println("MyEventListener.schedulerStateUpdatedEvent() ");
 
     }
 
     @Override
     public void jobSubmittedEvent(JobState job) {
-        System.out.println("MyEvenetListener.jobSubmittedEvent()");
+        System.out.println("MyEventListener.jobSubmittedEvent()");
 
     }
 
     @Override
     public void jobStateUpdatedEvent(NotificationData<JobInfo> notification) {
-        System.out.println("TestDSClient.MyEvenetListener.jobStateUpdatedEvent() " + notification);
+        System.out.println("MyEventListener.jobStateUpdatedEvent() " + notification);
 
         JobId id = notification.getData().getJobId();
         if (!id.equals(jobId))
@@ -67,37 +77,48 @@ public class MyEventListener implements ISchedulerEventListenerExtended, Seriali
         SchedulerEvent event = notification.getEventType();
         if (event == SchedulerEvent.JOB_RUNNING_TO_FINISHED) {
             jobFinished = true;
+            if (synchronous) {
+                synchronized (monitor) {
+                    System.out.println("[MyEventListener] job finished event occured for " + jobId);
+                    monitor.setEventOccured();
+                    monitor.notifyAll();
+                }
+            }
         }
     }
 
     @Override
     public void taskStateUpdatedEvent(NotificationData<TaskInfo> notification) {
-        System.out.println("taskStateUpdatedEvent()");
-
+        System.out.println("MyEventListener.taskStateUpdatedEvent()");
     }
 
     @Override
     public void usersUpdatedEvent(NotificationData<UserIdentification> notification) {
-        System.out.println("MyEvenetListener.usersUpdatedEvent()");
-
+        System.out.println("MyEventListener.usersUpdatedEvent()");
     }
 
     @Override
-    public void pullDataFinished(String jobId, String localFolderPath) {
+    public void pullDataFinished(String jobId, String taskName, String localFolderPath) {
 
         if (!jobId.equals(this.jobId.toString()))
             return;
 
         synchronized (monitor) {
-            monitor.setEventOccured();
-            System.out.println("set event occured for " + monitor);
+            count++;
+            System.out.println("[MyEventListener] pull data finished event occured for " + taskName);
+            if (count == TestSmartProxy.NB_TASKS) {
+                count = 0;
+                monitor.setEventOccured();
+                monitor.notifyAll();
+            }
         }
     }
 
     @Override
-    public void pullDataFailed(String jobId, String remoteFolder_URL, Throwable t) {
+    public void pullDataFailed(String jobId, String taskName, String remoteFolder_URL, Throwable t) {
         t.printStackTrace();
-        Assert.assertTrue("Pull data operation failed: " + t.getMessage(), false);
+        count = 0;
+        Assert.assertTrue("[MyEventListener] Pull data operation failed: " + t.getMessage(), false);
     }
 
     /**
