@@ -37,6 +37,7 @@
 package org.ow2.proactive.tests.performance.scheduler;
 
 import java.security.KeyException;
+import java.util.Date;
 import java.util.List;
 
 import javax.management.JMException;
@@ -72,6 +73,7 @@ import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.usage.JobUsage;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
 
@@ -386,4 +388,8 @@ public class TestSchedulerProxy implements Scheduler {
         return target.getUsers();
     }
 
+    @Override
+    public List<JobUsage> getMyAccountUsage(Date startDate, Date endDate) throws NotConnectedException, PermissionException {
+        return target.getMyAccountUsage(startDate, endDate);
+    }
 }

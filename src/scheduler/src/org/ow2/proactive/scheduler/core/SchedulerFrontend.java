@@ -39,6 +39,7 @@ package org.ow2.proactive.scheduler.core;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.net.URI;
+import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
@@ -87,6 +88,7 @@ import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.usage.JobUsage;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.core.account.SchedulerAccountsManager;
 import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
@@ -867,6 +869,16 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
                 "You don't have permissions to get users");
         frontendState.checkOwnStatePermission(false, ident);
         return frontendState.getUsers();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<JobUsage> getMyAccountUsage(Date startDate, Date endDate) throws NotConnectedException, PermissionException {
+        UserIdentificationImpl ident = frontendState.checkPermission("getMyAccountUsage",
+                "You don't have permissions to get usage data for your account");
+        return dbManager.getUsage(ident.getUsername(), startDate, endDate);
     }
 
     private String getTaskServerLogs(TaskId id) {

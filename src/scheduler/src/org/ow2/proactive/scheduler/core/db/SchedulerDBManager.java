@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -14,6 +15,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
+import org.hibernate.FetchMode;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -46,6 +48,7 @@ import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
+import org.ow2.proactive.scheduler.common.usage.JobUsage;
 import org.ow2.proactive.scheduler.core.account.SchedulerAccount;
 import org.ow2.proactive.scheduler.core.db.TaskData.DBTaskId;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
@@ -264,6 +267,34 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
                 return result;
             }
 
+        });
+    }
+
+    public List<JobUsage> getUsage(final String userName, final Date startDate, final Date endDate) {
+        return runWithoutTransaction(new SessionWork<List<JobUsage>>() {
+            @Override
+            @SuppressWarnings("unchecked")
+            List<JobUsage> executeWork(Session session) {
+                if (startDate == null || endDate == null) {
+                    throw new DatabaseManagerException("Start and end dates can't be null.");
+                }
+
+                Criteria criteria = session.createCriteria(JobData.class);
+                criteria.setFetchMode("tasks", FetchMode.JOIN);
+                criteria.add(Restrictions.eq("owner", userName));
+                criteria.add(Restrictions.and(
+                        Restrictions.ge("finishedTime", startDate.getTime()),
+                        Restrictions.le("finishedTime", endDate.getTime())));
+
+                List<JobData> jobsList = criteria.list();
+
+                List<JobUsage> result = new ArrayList<JobUsage>(jobsList.size());
+                for (JobData jobData : jobsList) {
+                    JobUsage jobUsage = jobData.toJobUsage();
+                    result.add(jobUsage);
+                }
+                return result;
+            }
         });
     }
 

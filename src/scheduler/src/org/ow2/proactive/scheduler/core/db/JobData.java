@@ -26,10 +26,13 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
+import org.ow2.proactive.scheduler.common.usage.JobUsage;
+import org.ow2.proactive.scheduler.common.usage.TaskUsage;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.InternalTaskFlowJob;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.job.JobInfoImpl;
+import org.ow2.proactive.scheduler.task.TaskIdImpl;
 
 
 @Entity
@@ -400,4 +403,14 @@ public class JobData {
         this.credentials = credentials;
     }
 
+    JobUsage toJobUsage() {
+        JobIdImpl jobId = new JobIdImpl(getId(), getJobName());
+        JobUsage jobUsage = new JobUsage(jobId.value(), getJobName(),
+                getFinishedTime() - getStartTime());
+        for (TaskData taskData : getTasks()) {
+            TaskUsage taskUsage = taskData.toTaskUsage(jobId);
+            jobUsage.add(taskUsage);
+        }
+        return jobUsage;
+    }
 }
