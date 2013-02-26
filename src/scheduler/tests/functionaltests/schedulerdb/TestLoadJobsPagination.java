@@ -110,10 +110,6 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
         checkJobs(jobs, 1, 3, 5, 2, 4, 6);
     }
 
-    List<SortParameter<JobSortParameter>> sortParameters(SortParameter<JobSortParameter>... params) {
-        return Arrays.asList(params);
-    }
-
     @Test
     public void testPagingAndFilteting() throws Exception {
         InternalJob job;
@@ -155,6 +151,10 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
         job.failed(job.getITasks().get(0).getId(), JobStatus.CANCELED);
         dbManager.updateAfterJobKilled(job, Collections.<TaskId> emptySet());
 
+        // job marked as removed, method 'getJobs' shouldn't return it
+        job = defaultSubmitJob(createJob());
+        dbManager.removeJob(job.getId(), System.currentTimeMillis(), false);
+        
         List<JobInfo> jobs;
 
         List<SortParameter<JobSortParameter>> sortParameters = new ArrayList<SortParameter<JobSortParameter>>();
@@ -234,6 +234,10 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
 
         jobs = dbManager.getJobs(0, 10, DEFAULT_USER_NAME, false, false, false, sortParameters);
         checkJobs(jobs);
+    }
+
+    private List<SortParameter<JobSortParameter>> sortParameters(SortParameter<JobSortParameter>... params) {
+        return Arrays.asList(params);
     }
 
     private void checkJobs(List<JobInfo> jobs, Integer... expectedIds) {
