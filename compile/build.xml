@@ -73,6 +73,7 @@
         <delete dir="${webinf.classes.dir}" />
         <delete dir="${webinf.lib.dir}" />
         <delete dir="${war.root}/doc" />
+        <delete dir="${war.root}/images" />
         <delete dir="${war.root}/index.html" />
         <delete dir="${build.dir}" />
         <delete dir="${dist.dir}" />
@@ -158,14 +159,19 @@
 	</target>
 
 	<target name="doc" depends="doc-jaxrs">
-		<!-- copy doc content -->
+		<copy todir="${build.dir}">
+			<fileset dir="${projectRoot}/doc/">
+				<include name="**/*" />
+			</fileset>
+		</copy>
+		<!-- copy doc content to war folder -->
 		<copy todir="${war.root}/doc/jaxrsdocs">
-			<fileset dir="${build.dir}/jaxrsdocs/">
+			<fileset dir="${build.dir}/doc/jaxrsdocs/">
 				<include name="**/*" />
 			</fileset>
 		</copy>
 		<copy todir="${war.root}/doc/jaxbdocs">
-			<fileset dir="${build.dir}/jaxbdocs/">
+			<fileset dir="${build.dir}/doc/jaxbdocs/">
 				<include name="**/*" />
 			</fileset>
 		</copy>
@@ -182,7 +188,7 @@
 	<target name="doc-jaxrs" depends="doc-jaxb" description="Generate JAX-RS documentation">
 		<javadoc useexternalfile="true"
 				 classpathref="src.classpath" sourcepath="${src.dir}"
-				 destdir="${build.dir}/jaxrsdocs/" extdirs="${lib.dir}"
+				 destdir="${build.dir}/doc/jaxrsdocs/" extdirs="${lib.dir}"
 				 doclet="com.lunatech.doclets.jax.jaxrs.JAXRSDoclet" docletpathref="src.classpath"
 				 footer="${doc.footer}" header="${doc.header}">
 			<package name="org.ow2.proactive_grid_cloud_portal.*" />
@@ -193,7 +199,7 @@
 	<target name="doc-jaxb" description="Generate JAXB documentation">
 		<javadoc useexternalfile="true"
 				 classpathref="src.classpath" sourcepath="${src.dir}"
-				 destdir="${build.dir}/jaxbdocs/" extdirs="${lib.dir}"
+				 destdir="${build.dir}/doc/jaxbdocs/" extdirs="${lib.dir}"
 				 doclet="com.lunatech.doclets.jax.jaxb.JAXBDoclet" docletpathref="src.classpath"
 				 footer="${doc.footer}" header="${doc.header}">
 		<package name="org.ow2.proactive_grid_cloud_portal.*" />
