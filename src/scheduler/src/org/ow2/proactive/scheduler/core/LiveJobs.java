@@ -95,11 +95,15 @@ class LiveJobs {
         for (JobId jobId : jobs.keySet()) {
             JobData jobData = lockJob(jobId);
             if (jobData != null) {
-                InternalJob job = jobData.job;
-                if (job.getStatus() == JobStatus.PAUSED) {
-                    job.setUnPause();
-                    dbManager.updateJobAndTasksState(job);
-                    updateTaskInfosList(job, SchedulerEvent.JOB_RESUMED);
+                try {
+                    InternalJob job = jobData.job;
+                    if (job.getStatus() == JobStatus.PAUSED) {
+                        job.setUnPause();
+                        dbManager.updateJobAndTasksState(job);
+                        updateTaskInfosList(job, SchedulerEvent.JOB_RESUMED);
+                    }
+                } finally {
+                    jobData.unlock();
                 }
             }
         }
@@ -305,14 +309,21 @@ class LiveJobs {
         TerminationData terminationData = TerminationData.newTerminationData();
         for (EligibleTaskDescriptor eltd : tasksToSchedule) {
             JobId jobId = eltd.getJobId();
-            JobData jobData = checkJobAccess(jobId);
             if (!terminationData.jobTeminated(jobId)) {
-                if (jobData.job.getStartTime() < 0) {
-                    jobData.job.start();
-                    updateTaskInfosList(jobData.job, SchedulerEvent.JOB_PENDING_TO_RUNNING);
-                    jlogger.info(jobId, "started");
+                JobData jobData = lockJob(jobId);
+                if (jobData != null) {
+                    try {
+                        if (jobData.job.getStartTime() < 0) {
+                            jobData.job.start();
+                            updateTaskInfosList(jobData.job, SchedulerEvent.JOB_PENDING_TO_RUNNING);
+                            jlogger.info(jobId, "started");
+                        }
+                        endJob(jobData, terminationData, eltd.getInternal(), null, errorMsg,
+                                JobStatus.CANCELED);
+                    } finally {
+                        jobData.unlock();
+                    }
                 }
-                endJob(jobData, terminationData, eltd.getInternal(), null, errorMsg, JobStatus.CANCELED);
             }
         }
         return terminationData;

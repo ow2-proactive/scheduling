@@ -48,41 +48,50 @@ public class MockSchedulingInfrastructure implements SchedulingInfrastructure {
     private RMProxiesManager rmProxiesManager;
 
     public MockSchedulingInfrastructure(SchedulerDBManager dbManager) throws Exception {
+        this(dbManager, null);
+    }
+
+    public MockSchedulingInfrastructure(SchedulerDBManager dbManager, ExecutorService executorService)
+            throws Exception {
         this.dbManager = dbManager;
         this.dsStarter = mock(DataSpaceServiceStarter.class);
 
-        executorService = new AbstractExecutorService() {
+        if (executorService == null) {
+            this.executorService = new AbstractExecutorService() {
 
-            @Override
-            public void execute(Runnable command) {
-                command.run();
-            }
+                @Override
+                public void execute(Runnable command) {
+                    command.run();
+                }
 
-            @Override
-            public List<Runnable> shutdownNow() {
-                return null;
-            }
+                @Override
+                public List<Runnable> shutdownNow() {
+                    return null;
+                }
 
-            @Override
-            public void shutdown() {
+                @Override
+                public void shutdown() {
 
-            }
+                }
 
-            @Override
-            public boolean isTerminated() {
-                return false;
-            }
+                @Override
+                public boolean isTerminated() {
+                    return false;
+                }
 
-            @Override
-            public boolean isShutdown() {
-                return false;
-            }
+                @Override
+                public boolean isShutdown() {
+                    return false;
+                }
 
-            @Override
-            public boolean awaitTermination(long timeout, TimeUnit unit) throws InterruptedException {
-                return false;
-            }
-        };
+                @Override
+                public boolean awaitTermination(long timeout, TimeUnit unit) throws InterruptedException {
+                    return false;
+                }
+            };
+        } else {
+            this.executorService = executorService;
+        }
 
         UserRMProxy userProxy = mock(UserRMProxy.class);
         doAnswer(new Answer<Void>() {
