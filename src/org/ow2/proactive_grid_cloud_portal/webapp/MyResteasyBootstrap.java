@@ -40,11 +40,15 @@ import java.io.File;
 
 import javax.servlet.ServletContextEvent;
 
+import org.apache.log4j.Logger;
 import org.jboss.resteasy.plugins.server.servlet.ResteasyBootstrap;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 public class MyResteasyBootstrap extends ResteasyBootstrap {
+
+    private static final Logger LOGGER = ProActiveLogger.getLogger(MyResteasyBootstrap.class);
 
     private RestRuntime restRuntime;
 
@@ -63,13 +67,13 @@ public class MyResteasyBootstrap extends ResteasyBootstrap {
 
     @Override
     public void contextDestroyed(ServletContextEvent event) {
-        System.out.println("shutting down ProActive Rest API at " +
+        LOGGER.info("shutting down ProActive Rest API at " +
             event.getServletContext().getContextPath());
 
         restRuntime.stop();
 
         super.contextDestroyed(event);
-        System.out.println("ProActive Rest API shutdown sequence completed");
+        LOGGER.info("ProActive Rest API shutdown sequence completed");
 
     }
 }

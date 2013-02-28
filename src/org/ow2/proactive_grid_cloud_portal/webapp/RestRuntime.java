@@ -43,11 +43,14 @@ import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Properties;
 
+import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.config.xml.ProActiveConfigurationParser;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
+
 import org.ow2.proactive.resourcemanager.common.util.RMCachingProxyUserInterface;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
@@ -63,6 +66,8 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateListener;
 
 
 public class RestRuntime {
+
+    private static final Logger LOGGER = ProActiveLogger.getLogger(RestRuntime.class);
 
     private SchedulerSessionsCleaner schedulerSessionCleaner;
 
@@ -89,8 +94,7 @@ public class RestRuntime {
                 in.close();
                 PropertyConfigurator.configure(p);
             } catch (Exception e1) {
-                System.err
-                        .println("Failed to read the portal's log4j file: " + log4jConfig.getAbsolutePath());
+                LOGGER.error("Failed to read the portal's log4j file: " + log4jConfig.getAbsolutePath(), e1);
             }
         }
 
@@ -145,7 +149,7 @@ public class RestRuntime {
                 e.printStackTrace();
             } finally {
                 SchedulerSessionMapper.getInstance().remove(sessionids[i]);
-                System.out.println("Scheduler session id " + sessionids[i] + "terminated");
+                LOGGER.debug("Scheduler session id " + sessionids[i] + "terminated");
             }
         }
 
@@ -158,7 +162,7 @@ public class RestRuntime {
                 e.printStackTrace();
             } finally {
                 RMSessionMapper.getInstance().remove(sessionids[i]);
-                System.out.println("RM session id " + sessionids[i] + "terminated");
+                LOGGER.debug("RM session id " + sessionids[i] + "terminated");
             }
         }
 
