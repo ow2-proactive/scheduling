@@ -91,4 +91,17 @@ public class BaseServiceTest {
             }
         }).get();
     }
+
+    static void runInAnotherThreadNoWait(final TestRunnable runnable) throws Exception {
+        executorService.submit(new Runnable() {
+            public void run() {
+                try {
+                    runnable.run();
+                } catch (Throwable t) {
+                    Assert.fail("Unexpected exception: " + t);
+                    t.printStackTrace(System.out);
+                }
+            }
+        });
+    }
 }

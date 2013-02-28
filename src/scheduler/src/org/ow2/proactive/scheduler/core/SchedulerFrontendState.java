@@ -933,11 +933,8 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     synchronized List<SchedulerUserInfo> getUsers() {
         List<SchedulerUserInfo> users = new ArrayList<SchedulerUserInfo>(identifications.size());
         for (UserIdentification user : identifications.values()) {
-            users.add(new SchedulerUserInfo(user.getHostName(), 
-                    user.getUsername(), 
-                    user.getConnectionTime(), 
-                    user.getLastSubmitTime(), 
-                    user.getSubmitNumber()));
+            users.add(new SchedulerUserInfo(user.getHostName(), user.getUsername(), user.getConnectionTime(),
+                user.getLastSubmitTime(), user.getSubmitNumber()));
         }
         return users;
     }

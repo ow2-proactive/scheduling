@@ -313,9 +313,14 @@ public class SchedulingService {
     /*
      * Should be called only by scheduling method impl while it holds job lock
      */
-    void simulateJobStartAndCancelIt(List<EligibleTaskDescriptor> tasksToSchedule, String errorMsg) {
-        TerminationData terminationData = jobs.simulateJobStart(tasksToSchedule, errorMsg);
-        submitTerminationDataHandler(terminationData);
+    public void simulateJobStartAndCancelIt(final List<EligibleTaskDescriptor> tasksToSchedule,
+            final String errorMsg) {
+        infrastructure.getInternalOperationsThreadPool().submit(new Runnable() {
+            public void run() {
+                TerminationData terminationData = jobs.simulateJobStart(tasksToSchedule, errorMsg);
+                terminationData.handleTermination(SchedulingService.this);
+            }
+        });
     }
 
     public void submitJob(InternalJob job) {
