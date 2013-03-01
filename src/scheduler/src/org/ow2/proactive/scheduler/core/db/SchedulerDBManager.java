@@ -26,7 +26,6 @@ import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.exception.ConstraintViolationException;
 import org.hibernate.transform.DistinctRootEntityResultTransformer;
-import org.junit.Test;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.ow2.proactive.db.DatabaseManagerException;
 import org.ow2.proactive.db.DatabaseManagerExceptionHandler;
@@ -975,7 +974,6 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
         });
     }
 
-    @Test
     public void taskRestarted(final InternalJob job, final InternalTask task, final TaskResultImpl result) {
         runWithTransaction(new SessionWork<Void>() {
             @Override
