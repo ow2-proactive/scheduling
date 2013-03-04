@@ -393,20 +393,16 @@ public class SchedulingService {
     }
 
     public void restartTaskOnNodeFailure(final InternalTask task) {
-        try {
-            if (status.isUnusable()) {
-                return;
-            }
-            infrastructure.getInternalOperationsThreadPool().submit(new Runnable() {
-                @Override
-                public void run() {
-                    TerminationData terminationData = jobs.restartTaskOnNodeFailure(task);
-                    terminationData.handleTermination(SchedulingService.this);
-                }
-            }).get();
-        } catch (Exception e) {
-            throw handleFutureWaitException(e);
+        if (status.isUnusable()) {
+            return;
         }
+        infrastructure.getInternalOperationsThreadPool().submit(new Runnable() {
+            @Override
+            public void run() {
+                TerminationData terminationData = jobs.restartTaskOnNodeFailure(task);
+                terminationData.handleTermination(SchedulingService.this);
+            }
+        });
     }
 
     class TerminationDataHandler implements Runnable {
