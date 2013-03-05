@@ -248,7 +248,9 @@ public abstract class Connection<T extends Authentication> implements Loggable, 
                 NetworkInterface ni = NetworkInterface.getByInetAddress(socket.getLocalAddress());
                 return ni.getName();
             } finally {
-                socket.close();
+                if (socket != null) {
+                    socket.close();
+                }
             }
         }
 
