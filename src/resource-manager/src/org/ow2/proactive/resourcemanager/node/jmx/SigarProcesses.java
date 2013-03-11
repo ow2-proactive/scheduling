@@ -36,6 +36,7 @@
  */
 package org.ow2.proactive.resourcemanager.node.jmx;
 
+import java.util.List;
 import org.hyperic.sigar.Sigar;
 import org.hyperic.sigar.SigarException;
 import org.hyperic.sigar.cmd.Ps;
@@ -52,7 +53,15 @@ public class SigarProcesses implements SigarProcessesMXBean {
 
         for (int i = 0; i < pids.length; i++) {
             long pid = pids[i];
-            result[i] = new ProcessInfo(Ps.getInfo(sigar, pid));
+            List info = Ps.getInfo(sigar, pid); // Add standard info. 
+            info.add(sigar.getProcArgs(pid));   // Add also arguments of 
+                                                // each process. 
+            info.add(sigar.getProcCpu(pid).
+            		getPercent());				// Add cpu usage (perc.).
+            // TODO see why sigar.getProcCpu(pid).getPercent()
+            // returns '0.0' always.
+            
+            result[i] = new ProcessInfo(info);
         }
 
         return result;
