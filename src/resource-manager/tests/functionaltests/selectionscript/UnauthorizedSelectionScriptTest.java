@@ -49,8 +49,8 @@ import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
+import org.ow2.tests.FunctionalTest;
 
-import functionaltests.RMConsecutive;
 import functionaltests.RMTHelper;
 
 
@@ -58,7 +58,7 @@ import functionaltests.RMTHelper;
  * Test checks that only authorized scripts can be executed in the resource manager
  * if property pa.rm.select.script.authorized.dir is set
  */
-public class UnauthorizedSelectionScriptTest extends RMConsecutive {
+public class UnauthorizedSelectionScriptTest extends FunctionalTest {
 
     @org.junit.Test
     public void action() throws Exception {
