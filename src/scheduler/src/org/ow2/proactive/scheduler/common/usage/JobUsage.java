@@ -1,6 +1,5 @@
 /*
- * ################################################################
- *
+ *  *
  * ProActive Parallel Suite(TM): The Java(TM) library for
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
@@ -31,55 +30,56 @@
  *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s):
  *
- * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ *  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.common.exception;
+package org.ow2.proactive.scheduler.common.usage;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.xml.bind.annotation.XmlRootElement;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 
-
 /**
- * Exception generated when a task is aborted (killed while it's running)
+ * Job information for accounting / usage purpose.
  *
  * @author The ProActive Team
- * @since ProActive Scheduling 3.0
+ * @since ProActive Scheduling 3.4
  */
 @PublicAPI
-public class TaskAbortedException extends SchedulerException {
+@XmlRootElement
+public class JobUsage implements Serializable {
+    private final String jobId;
+    private final String jobName;
+    private final long jobDuration;
 
-    /**
-     * Create a new instance of TaskAbortedException
-     *
-     * @param msg the message to attach.
-     */
-    public TaskAbortedException(String msg) {
-        super(msg);
+    private List<TaskUsage> taskUsages = new ArrayList<TaskUsage>();
+
+    public JobUsage(String jobId, String jobName, long jobDuration) {
+        this.jobId = jobId;
+        this.jobName = jobName;
+        this.jobDuration = jobDuration;
     }
 
-    /**
-     * Create a new instance of TaskAbortedException
-     */
-    public TaskAbortedException() {
+    public void add(TaskUsage taskUsage) {
+        taskUsages.add(taskUsage);
     }
 
-    /**
-     * Create a new instance of TaskAbortedException
-     *
-     * @param msg the message to attach.
-     * @param cause the cause of the exception.
-     */
-    public TaskAbortedException(String msg, Throwable cause) {
-        super(msg, cause);
+    public String getJobId() {
+        return jobId;
     }
 
-    /**
-     * Create a new instance of TaskAbortedException
-     *
-     * @param cause the cause of the exception.
-     */
-    public TaskAbortedException(Throwable cause) {
-        super(cause);
+    public String getJobName() {
+        return jobName;
     }
 
+    public long getJobDuration() {
+        return jobDuration;
+    }
+
+    public List<TaskUsage> getTaskUsages() {
+        return taskUsages;
+    }
 }

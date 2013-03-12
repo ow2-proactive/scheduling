@@ -39,6 +39,7 @@ package org.ow2.proactive.scheduler.common.util;
 import java.io.Serializable;
 import java.security.KeyException;
 import java.security.PublicKey;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -77,6 +78,7 @@ import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.usage.JobUsage;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.ext.filessplitmerge.logging.LoggerManager;
 import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
@@ -577,6 +579,11 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     @Override
     public List<SchedulerUserInfo> getUsers() throws NotConnectedException, PermissionException {
         return uischeduler.getUsers();
+    }
+
+    @Override
+    public List<JobUsage> getMyAccountUsage(Date startDate, Date endDate) throws NotConnectedException, PermissionException {
+        return uischeduler.getMyAccountUsage(startDate, endDate);
     }
 
 }

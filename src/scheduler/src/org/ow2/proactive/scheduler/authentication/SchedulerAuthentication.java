@@ -150,7 +150,7 @@ public class SchedulerAuthentication extends AuthenticationImpl implements Sched
         try {
             return SchedulerJMXHelper.getInstance().getAddress(JMXTransportProtocol.RMI).toString();
         } catch (JMException e) {
-            return null; // TODO: FORWARD THE JMException
+            throw new RuntimeException(e);
         }
     }
 

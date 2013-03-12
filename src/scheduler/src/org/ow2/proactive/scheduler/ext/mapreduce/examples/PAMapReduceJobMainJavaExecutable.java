@@ -242,7 +242,8 @@ public class PAMapReduceJobMainJavaExecutable extends JavaExecutable {
         if (scheduler != null) {
             try {
                 int sleepingTime = 15000;
-                while (scheduler.getJobResult(actualMapReduceJobId) == null) {
+                while (!scheduler.getJobState(actualMapReduceJobId).isFinished()) {
+
                     Thread.sleep(sleepingTime);
                     System.out.println("Sleeping for: " + sleepingTime);
                 }

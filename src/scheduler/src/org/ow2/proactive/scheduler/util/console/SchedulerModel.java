@@ -42,6 +42,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -50,13 +51,16 @@ import java.util.Map.Entry;
 
 import javax.security.auth.login.LoginException;
 
-import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.db.SortOrder;
+import org.ow2.proactive.db.SortParameter;
+import org.ow2.proactive.scheduler.common.JobFilterCriteria;
+import org.ow2.proactive.scheduler.common.JobSortParameter;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
-import org.ow2.proactive.scheduler.common.SchedulerState;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.exception.AlreadyConnectedException;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
@@ -68,6 +72,7 @@ import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
+import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.factories.FlatJobFactory;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
@@ -102,9 +107,12 @@ public class SchedulerModel extends ConsoleModel {
     static {
         TaskState.setSortingBy(TaskState.SORT_BY_ID);
         TaskState.setSortingOrder(TaskState.ASC_ORDER);
-        JobState.setSortingBy(JobState.SORT_BY_ID);
-        JobState.setSortingOrder(JobState.ASC_ORDER);
     }
+
+    @SuppressWarnings("unchecked")
+    private static final List<SortParameter<JobSortParameter>> JOB_SORT_PARAMS = Arrays.asList(
+            new SortParameter<JobSortParameter>(JobSortParameter.STATE, SortOrder.ASC),
+            new SortParameter<JobSortParameter>(JobSortParameter.ID, SortOrder.ASC));
 
     /**
      * Get this model. Also specify if the exit command should do something or not
@@ -210,9 +218,6 @@ public class SchedulerModel extends ConsoleModel {
         }
     }
 
-    /**
-     * @see org.ow2.proactive.scheduler.common.util.userconsole.UserSchedulerModel#initialize()
-     */
     @Override
     protected void initialize() throws IOException {
         super.initialize();
@@ -430,6 +435,7 @@ public class SchedulerModel extends ConsoleModel {
                 }
             } else {
                 print("Job " + jobId + " is not finished !");
+                return null;
             }
             return result;
         } catch (Exception e) {
@@ -572,8 +578,9 @@ public class SchedulerModel extends ConsoleModel {
 
     public void toutput_(String jobId, String taskName) {
         try {
-            TaskResult result = scheduler.getTaskResult(jobId, taskName);
+            TaskResult result = null;
 
+            result = scheduler.getTaskResult(jobId, taskName);
             if (result != null) {
                 try {
                     print(taskName + " output :");
@@ -584,6 +591,7 @@ public class SchedulerModel extends ConsoleModel {
             } else {
                 print("Task '" + taskName + "' is not finished !");
             }
+
         } catch (Exception e) {
             handleExceptionDisplay("Error on task " + taskName, e);
         }
@@ -679,15 +687,15 @@ public class SchedulerModel extends ConsoleModel {
         }
     }
 
-    public SchedulerState schedulerState_() {
+    public void listjobs_() {
         List<String> list;
         try {
-            SchedulerState state = scheduler.getState();
+            List<JobInfo> jobs = scheduler.getJobs(0, -1, new JobFilterCriteria(false, true, true, true),
+                    JOB_SORT_PARAMS);
 
-            if (state.getPendingJobs().size() + state.getRunningJobs().size() +
-                state.getFinishedJobs().size() == 0) {
-                print("\n\tThere is no jobs handled by the Scheduler");
-                return state;
+            if (jobs.size() == 0) {
+                print("\n\tThere are no jobs handled by the Scheduler");
+                return;
             }
             //create formatter
             ObjectArrayFormatter oaf = new ObjectArrayFormatter();
@@ -700,55 +708,41 @@ public class SchedulerModel extends ConsoleModel {
             list.add("NAME");
             list.add("OWNER");
             list.add("PRIORITY");
-            list.add("PROJECT");
             list.add("STATUS");
             list.add("START AT");
             list.add("DURATION");
             oaf.setTitle(list);
-            //separator
-            oaf.addEmptyLine();
-            //sort lists
-            Collections.sort(state.getPendingJobs());
-            Collections.sort(state.getRunningJobs());
-            Collections.sort(state.getFinishedJobs());
-            //add lines to formatter
-            for (JobState js : state.getFinishedJobs()) {
-                oaf.addLine(makeList(js));
+
+            JobStatus status = null;
+            for (JobInfo jobInfo : jobs) {
+                if (!jobInfo.getStatus().equals(status)) {
+                    oaf.addEmptyLine();
+                }
+                oaf.addLine(makeList(jobInfo));
+                status = jobInfo.getStatus();
             }
-            if (state.getRunningJobs().size() > 0) {
-                oaf.addEmptyLine();
-            }
-            for (JobState js : state.getRunningJobs()) {
-                oaf.addLine(makeList(js));
-            }
-            if (state.getPendingJobs().size() > 0) {
-                oaf.addEmptyLine();
-            }
-            for (JobState js : state.getPendingJobs()) {
-                oaf.addLine(makeList(js));
-            }
+
             //print formatter
             print(Tools.getStringAsArray(oaf));
-            return state;
         } catch (Exception e) {
             handleExceptionDisplay("Error while getting list of jobs", e);
-            return null;
         }
     }
 
-    private List<String> makeList(JobState js) {
+    private List<String> makeList(JobInfo jobInfo) {
         List<String> list = new ArrayList<String>();
-        list.add(js.getId().toString());
-        list.add(js.getName());
-        list.add(js.getOwner());
-        list.add(js.getPriority().toString());
-        list.add(js.getProjectName());
-        list.add(js.getStatus().toString());
-        String date = Tools.getFormattedDate(js.getStartTime());
-        if (js.getStartTime() != -1)
-            date += " (" + Tools.getElapsedTime(js.getStartTime()) + ")";
+        list.add(jobInfo.getJobId().value());
+        list.add(jobInfo.getJobId().getReadableName());
+        list.add(jobInfo.getJobOwner());
+        list.add(jobInfo.getPriority().toString());
+        list.add(jobInfo.getStatus().toString());
+        long startTime = jobInfo.getStartTime();
+        String date = Tools.getFormattedDate(startTime);
+        if (startTime != -1) {
+            date += " (" + Tools.getElapsedTime(startTime) + ")";
+        }
         list.add(date);
-        list.add(Tools.getFormattedDuration(js.getStartTime(), js.getFinishedTime()));
+        list.add(Tools.getFormattedDuration(startTime, jobInfo.getFinishedTime()));
         return list;
     }
 
@@ -816,7 +810,7 @@ public class SchedulerModel extends ConsoleModel {
 
     /**
      * Execute a JS command file with arguments.
-     * 
+     *
      * @param params command file path must be the first param
      */
     public void execWithParam_(String... params) {
@@ -1105,7 +1099,7 @@ public class SchedulerModel extends ConsoleModel {
     /**
      * Connect the scheduler using given authentication interface and creadentials
      *
-     * @param auth the authentication interface on which to connect
+     * @param auth        the authentication interface on which to connect
      * @param credentials the credentials to be used for the connection
      * @throws LoginException If bad credentials are provided
      */
@@ -1142,7 +1136,7 @@ public class SchedulerModel extends ConsoleModel {
 
     /**
      * Print a map on two column
-     * 
+     *
      * @param map the map to be printed
      */
     private void printMap(Map<String, String> map) {

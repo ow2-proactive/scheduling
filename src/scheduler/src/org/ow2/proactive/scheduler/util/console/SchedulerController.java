@@ -663,7 +663,7 @@ public class SchedulerController {
             }
             model.jobState_(optionValues[0], sort);
         } else if (cmd.hasOption("listjobs")) {
-            model.schedulerState_();
+            model.listjobs_();
         } else if (cmd.hasOption("stats")) {
             model.showRuntimeData_();
         } else if (cmd.hasOption("ma")) {

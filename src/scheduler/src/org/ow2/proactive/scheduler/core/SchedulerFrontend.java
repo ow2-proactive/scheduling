@@ -39,6 +39,7 @@ package org.ow2.proactive.scheduler.core;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.net.URI;
+import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
@@ -77,6 +78,9 @@ import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.exception.SubmissionClosedException;
+import org.ow2.proactive.scheduler.common.exception.TaskCouldNotRestartException;
+import org.ow2.proactive.scheduler.common.exception.TaskCouldNotStartException;
+import org.ow2.proactive.scheduler.common.exception.TaskSkippedException;
 import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
 import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
 import org.ow2.proactive.scheduler.common.job.Job;
@@ -85,8 +89,11 @@ import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
+import org.ow2.proactive.scheduler.common.task.SimpleTaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.usage.JobUsage;
+import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.core.account.SchedulerAccountsManager;
 import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
@@ -99,6 +106,7 @@ import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
 import org.ow2.proactive.scheduler.job.UserIdentificationImpl;
+import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.TaskLogger;
 import org.ow2.proactive.utils.Tools;
@@ -383,7 +391,43 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
 
         try {
             TaskResult result = dbManager.loadTaskResult(jobId, taskName, inc);
+            // handling special statuses
+            TaskState ts = frontendState.getTaskState(jobId, taskName);
+            switch (ts.getStatus()) {
+                case NOT_STARTED:
+                    if (result == null) {
+                        return new TaskResultImpl(frontendState.getTaskId(jobId, taskName),
+                            new TaskCouldNotStartException(), new SimpleTaskLogs("",
+                                "The task could not start due to dependency failure"), 0);
+                    } else {
+                        Throwable newException = new TaskCouldNotStartException(
+                            "The task could not start due to dependency failure", result.getException());
+                        ((TaskResultImpl) result).setException(newException);
+                    }
+                    break;
+                case NOT_RESTARTED:
+                    if (result == null) {
+                        return new TaskResultImpl(
+                            frontendState.getTaskId(jobId, taskName),
+                            new TaskCouldNotRestartException(),
+                            new SimpleTaskLogs("",
+                                "The task could not be restarted after an error during the previous execution"),
+                            0);
+                    } else {
+                        Throwable newException = new TaskCouldNotRestartException(
+                            "The task could not be restarted after an error during the previous execution",
+                            result.getException());
+                        ((TaskResultImpl) result).setException(newException);
+                    }
+                    break;
+                case SKIPPED:
+                    // result should always be null
+                    return new TaskResultImpl(frontendState.getTaskId(jobId, taskName),
+                        new TaskSkippedException(), new SimpleTaskLogs("",
+                            "The task was skipped in the workflow"), 0);
+            }
             if (result == null) {
+                //otherwise the task is not finished
                 jlogger.info(jobId, taskName + " is not finished");
                 return null;
             } else {
@@ -474,6 +518,11 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
      */
     public void listenJobLogs(JobId jobId, AppenderProvider appenderProvider) throws NotConnectedException,
             UnknownJobException, PermissionException {
+
+        if (!schedulingService.getListenJobLogsSupport().isEnabled()) {
+            throw new PermissionException("Listening to job logs is disabled by administrator");
+        }
+
         //checking permissions
         frontendState.checkJobOwner("listenJobLogs", jobId,
                 "You do not have permission to listen the log of this job !");
@@ -809,7 +858,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
             }
         }
 
-        return "Cannot retieve logs for job " + jobId;
+        return "Cannot retrieve logs for job " + jobId;
     }
 
     @Override
@@ -862,6 +911,16 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
                 "You don't have permissions to get users");
         frontendState.checkOwnStatePermission(false, ident);
         return frontendState.getUsers();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<JobUsage> getMyAccountUsage(Date startDate, Date endDate) throws NotConnectedException, PermissionException {
+        UserIdentificationImpl ident = frontendState.checkPermission("getMyAccountUsage",
+                "You don't have permissions to get usage data for your account");
+        return dbManager.getUsage(ident.getUsername(), startDate, endDate);
     }
 
     private String getTaskServerLogs(TaskId id) {

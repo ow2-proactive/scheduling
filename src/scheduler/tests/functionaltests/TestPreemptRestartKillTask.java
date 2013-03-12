@@ -42,6 +42,7 @@ import java.net.URL;
 import org.junit.Assert;
 import org.ow2.proactive.scheduler.common.exception.TaskAbortedException;
 import org.ow2.proactive.scheduler.common.exception.TaskPreemptedException;
+import org.ow2.proactive.scheduler.common.exception.TaskRestartedException;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobState;
@@ -62,7 +63,7 @@ import org.ow2.proactive.scheduler.common.task.TaskStatus;
  * - stop execution
  * - restart later without side effect
  * Restart task must :
- * - stop execution (ends like a normal termination with TaskAbortedException)
+ * - stop execution (ends like a normal termination with TaskRestartedException)
  * - restart later if possible, fails the job if 'failJobOnError'
  * Kill task must :
  * - stop execution
@@ -113,7 +114,7 @@ public class TestPreemptRestartKillTask extends SchedulerConsecutive {
         SchedulerTHelper.log("Wait for event t2 waiting for restart");
         //running jobs list must have only one job, task t2 must have number of execution to 1
         TaskInfo ti2 = SchedulerTHelper.waitForEventTaskWaitingForRestart(id, "t2");
-        //task result for t2 must be available with TaskAbortedException
+        //task result for t2 must be available with TaskRestartedException
         TaskResult tr2 = SchedulerTHelper.getSchedulerInterface().getTaskResult(id, "t2");
         SchedulerTHelper.log("Wait for event t2 running");
 
@@ -124,7 +125,7 @@ public class TestPreemptRestartKillTask extends SchedulerConsecutive {
         SchedulerTHelper.log("Wait for event t2 waiting for restart again");
         //running jobs list must have only one job, task t2 must have number of execution to 2
         TaskInfo ti3 = SchedulerTHelper.waitForEventTaskWaitingForRestart(id, "t2");
-        //task result for t2 must be available with TaskAbortedException
+        //task result for t2 must be available with TaskRestartedException
         TaskResult tr3 = SchedulerTHelper.getSchedulerInterface().getTaskResult(id, "t2");
 
         //ensure every tasks are running at this point
@@ -135,7 +136,7 @@ public class TestPreemptRestartKillTask extends SchedulerConsecutive {
         SchedulerTHelper.getSchedulerInterface().killTask(id, "t3");
         SchedulerTHelper.log("Wait for event t3 finished");
         SchedulerTHelper.waitForEventTaskFinished(id, "t3");
-        //task result for t3 must be available with TaskAbortedException
+        //task result for t3 must be available with TaskRestartedException
         TaskResult tr4 = SchedulerTHelper.getSchedulerInterface().getTaskResult(id, "t3");
 
         SchedulerTHelper.log("Kill t4");
@@ -145,7 +146,7 @@ public class TestPreemptRestartKillTask extends SchedulerConsecutive {
         SchedulerTHelper.log("Wait for event job finished");
         //finished jobs list must have only one job
         JobInfo ji4 = SchedulerTHelper.waitForEventJobFinished(id);
-        //task result for t4 must be TaskAbortedException
+        //task result for t4 must be TaskRestartedException
         JobState j4 = SchedulerTHelper.getSchedulerInterface().getJobState(id);
         TaskResult tr5 = SchedulerTHelper.getSchedulerInterface().getTaskResult(id, "t4");
 
@@ -154,10 +155,10 @@ public class TestPreemptRestartKillTask extends SchedulerConsecutive {
         Assert.assertTrue(tr1.getException() instanceof TaskPreemptedException);
         //check result j2
         Assert.assertEquals(3, ti2.getNumberOfExecutionLeft());
-        Assert.assertTrue(tr2.getException() instanceof TaskAbortedException);
+        Assert.assertTrue(tr2.getException() instanceof TaskRestartedException);
         //check result j3
         Assert.assertEquals(2, ti3.getNumberOfExecutionLeft());
-        Assert.assertTrue(tr3.getException() instanceof TaskAbortedException);
+        Assert.assertTrue(tr3.getException() instanceof TaskRestartedException);
         //check result tr4
         Assert.assertTrue(tr4.getException() instanceof TaskAbortedException);
         //check result j4

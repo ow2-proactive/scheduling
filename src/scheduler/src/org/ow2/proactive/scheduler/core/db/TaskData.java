@@ -37,8 +37,10 @@ import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scheduler.common.task.flow.FlowBlock;
+import org.ow2.proactive.scheduler.common.usage.TaskUsage;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.InternalJob;
+import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalForkedJavaTask;
 import org.ow2.proactive.scheduler.task.internal.InternalJavaTask;
@@ -778,6 +780,14 @@ public class TaskData {
         }
         parallelEnvNodesNumber = env.getNodesNumber();
         convertTopologyDescriptor(env.getTopologyDescriptor());
+    }
+
+    TaskUsage toTaskUsage(JobIdImpl jobId) {
+        TaskId taskId = TaskIdImpl.createTaskId(jobId, getTaskName(), getId().getTaskId(), false);
+
+        return new TaskUsage(taskId.value(), getTaskName(),
+                getStartTime(), getFinishedTime(), getExecutionDuration(),
+                getParallelEnvironment() == null ? 1 : getParallelEnvironment().getNodesNumber());
     }
 
 }

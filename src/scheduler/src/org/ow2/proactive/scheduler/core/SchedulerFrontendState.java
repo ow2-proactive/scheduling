@@ -66,6 +66,7 @@ import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.exception.SubmissionClosedException;
 import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
+import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
@@ -560,6 +561,58 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         return jobsMap.get(jobId);
     }
 
+    synchronized TaskState getTaskState(JobId jobId, TaskId taskId) throws NotConnectedException,
+            UnknownJobException, UnknownTaskException, PermissionException {
+        checkJobOwner("getJobState", jobId, "You do not have permission to get the state of this task !");
+        if (jobsMap.get(jobId) == null) {
+            throw new UnknownJobException(jobId);
+        }
+        TaskState ts = jobsMap.get(jobId).getHMTasks().get(taskId);
+        if (ts == null) {
+            throw new UnknownTaskException(taskId, jobId);
+        }
+        return ts;
+    }
+
+    synchronized TaskState getTaskState(JobId jobId, String taskName) throws NotConnectedException,
+            UnknownJobException, UnknownTaskException, PermissionException {
+        checkJobOwner("getJobState", jobId, "You do not have permission to get the state of this task !");
+        if (jobsMap.get(jobId) == null) {
+            throw new UnknownJobException(jobId);
+        }
+        TaskId taskId = null;
+        for (TaskId t : getJobTasks(jobId)) {
+            if (t.getReadableName().equals(taskName)) {
+                taskId = t;
+            }
+        }
+        if (taskId == null) {
+            throw new UnknownTaskException(taskName, jobId);
+        }
+        TaskState ts = jobsMap.get(jobId).getHMTasks().get(taskId);
+        if (ts == null) {
+            throw new UnknownTaskException(taskId, jobId);
+        }
+        return ts;
+    }
+
+    synchronized TaskId getTaskId(JobId jobId, String taskName) throws UnknownTaskException,
+            UnknownJobException {
+        if (jobsMap.get(jobId) == null) {
+            throw new UnknownJobException(jobId);
+        }
+        TaskId taskId = null;
+        for (TaskId t : getJobTasks(jobId)) {
+            if (t.getReadableName().equals(taskName)) {
+                taskId = t;
+            }
+        }
+        if (taskId == null) {
+            throw new UnknownTaskException(taskName, jobId);
+        }
+        return taskId;
+    }
+
     synchronized void checkChangePolicy() throws NotConnectedException, PermissionException {
         UniqueID id = checkAccess();
 
@@ -933,11 +986,8 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     synchronized List<SchedulerUserInfo> getUsers() {
         List<SchedulerUserInfo> users = new ArrayList<SchedulerUserInfo>(identifications.size());
         for (UserIdentification user : identifications.values()) {
-            users.add(new SchedulerUserInfo(user.getHostName(), 
-                    user.getUsername(), 
-                    user.getConnectionTime(), 
-                    user.getLastSubmitTime(), 
-                    user.getSubmitNumber()));
+            users.add(new SchedulerUserInfo(user.getHostName(), user.getUsername(), user.getConnectionTime(),
+                user.getLastSubmitTime(), user.getSubmitNumber()));
         }
         return users;
     }

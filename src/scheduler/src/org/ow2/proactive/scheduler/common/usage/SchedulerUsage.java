@@ -1,6 +1,5 @@
 /*
- * ################################################################
- *
+ *  *
  * ProActive Parallel Suite(TM): The Java(TM) library for
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
@@ -31,55 +30,39 @@
  *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s):
  *
- * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ *  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.common.exception;
+package org.ow2.proactive.scheduler.common.usage;
+
+import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
+import org.ow2.proactive.scheduler.common.exception.PermissionException;
+import org.ow2.proactive.scheduler.common.usage.JobUsage;
+
+import java.util.Date;
+import java.util.List;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 
-
 /**
- * Exception generated when a task is aborted (killed while it's running)
+ * Scheduler interface for accounting information, usage data and statistics.
  *
  * @author The ProActive Team
- * @since ProActive Scheduling 3.0
+ * @since ProActive Scheduling 3.4
  */
 @PublicAPI
-public class TaskAbortedException extends SchedulerException {
+public interface SchedulerUsage {
 
     /**
-     * Create a new instance of TaskAbortedException
-     *
-     * @param msg the message to attach.
+     * Returns details on job and task execution times for the caller's executions.
+     * <p>
+     * Only the jobs finished between the start date and the end date will be returned:
+     * i.e startDate <= job.finishedTime <= endDate.
+     *</p>
+     * @param startDate must not be null, inclusive
+     * @param endDate must not be null, inclusive
+     * @return a list of {@link JobUsage} objects where job finished times are between start date and end date
+     * @throws NotConnectedException if the caller is not connecter
+     * @throws PermissionException if the caller hasn't the permission to call this method
      */
-    public TaskAbortedException(String msg) {
-        super(msg);
-    }
-
-    /**
-     * Create a new instance of TaskAbortedException
-     */
-    public TaskAbortedException() {
-    }
-
-    /**
-     * Create a new instance of TaskAbortedException
-     *
-     * @param msg the message to attach.
-     * @param cause the cause of the exception.
-     */
-    public TaskAbortedException(String msg, Throwable cause) {
-        super(msg, cause);
-    }
-
-    /**
-     * Create a new instance of TaskAbortedException
-     *
-     * @param cause the cause of the exception.
-     */
-    public TaskAbortedException(Throwable cause) {
-        super(cause);
-    }
-
+    List<JobUsage> getMyAccountUsage(Date startDate, Date endDate) throws NotConnectedException, PermissionException;
 }

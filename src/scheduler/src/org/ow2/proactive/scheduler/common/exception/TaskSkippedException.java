@@ -1,6 +1,5 @@
 /*
- * ################################################################
- *
+ *  *
  * ProActive Parallel Suite(TM): The Java(TM) library for
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
@@ -31,8 +30,7 @@
  *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s):
  *
- * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ *  * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.ow2.proactive.scheduler.common.exception;
 
@@ -40,45 +38,46 @@ import org.objectweb.proactive.annotation.PublicAPI;
 
 
 /**
- * Exception generated when a task is aborted (killed while it's running)
+ * Exception generated when the job skip a task
  *
  * @author The ProActive Team
- * @since ProActive Scheduling 3.0
+ * @since ProActive Scheduling 3.4
  */
 @PublicAPI
-public class TaskAbortedException extends SchedulerException {
+public class TaskSkippedException extends SchedulerException {
 
     /**
-     * Create a new instance of TaskAbortedException
+     * Create a new instance of TaskSkippedException
      *
      * @param msg the message to attach.
      */
-    public TaskAbortedException(String msg) {
-        super(msg);
+    public TaskSkippedException(String msg) {
+        super("The task was skipped in the workflow");
     }
 
     /**
-     * Create a new instance of TaskAbortedException
+     * Create a new instance of TaskSkippedException
      */
-    public TaskAbortedException() {
+    public TaskSkippedException() {
+        super();
     }
 
     /**
-     * Create a new instance of TaskAbortedException
+     * Create a new instance of TaskSkippedException
      *
      * @param msg the message to attach.
      * @param cause the cause of the exception.
      */
-    public TaskAbortedException(String msg, Throwable cause) {
+    public TaskSkippedException(String msg, Throwable cause) {
         super(msg, cause);
     }
 
     /**
-     * Create a new instance of TaskAbortedException
+     * Create a new instance of TaskSkippedException
      *
      * @param cause the cause of the exception.
      */
-    public TaskAbortedException(Throwable cause) {
+    public TaskSkippedException(Throwable cause) {
         super(cause);
     }
 

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job xmlns="urn:proactive:jobdescriptor:dev" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:proactive:jobdescriptor:dev ../../../src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.xsd"
+	name="job_killer" priority="normal" cancelJobOnError="true">
+	<description>The second task of this job will not be started</description>
+	<taskFlow>
+        <task name="t0">
+            <description>task will throw an exception</description>
+            <javaExecutable class="org.ow2.proactive.scheduler.examples.AbortJob">
+            </javaExecutable>
+        </task>
+		<task name="t1">
+			<description>task WaitAndPrint - will sleep for 10s</description>
+            <depends>
+                <task ref="t0"/>
+            </depends>
+			<javaExecutable class="org.ow2.proactive.scheduler.examples.WaitAndPrint">
+				<parameters>
+					<parameter name="sleepTime" value="10"/>
+					<parameter name="number" value="1"/>
+				</parameters>
+			</javaExecutable>
+		</task>
+	</taskFlow>
+</job>

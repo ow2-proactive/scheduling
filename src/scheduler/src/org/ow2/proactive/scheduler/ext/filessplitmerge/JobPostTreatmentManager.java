@@ -55,6 +55,7 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.utils.NamedThreadFactory;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
+import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
@@ -239,7 +240,7 @@ public abstract class JobPostTreatmentManager implements Observer {
                         // JobPostTreatmentManager.tpe.execute(pt);
                     }
                 }
-            } catch (SchedulerException e) {
+            } catch (UnknownJobException e) {
                 // TODO Auto-generated catch block
                 // e.printStackTrace();
                 LoggerManager
@@ -251,6 +252,14 @@ public abstract class JobPostTreatmentManager implements Observer {
                 // jobsToRemove.add(id);
                 this.removeAwaitedJob(id);
                 // ProActiveGold.getLogger().info(ExceptionToStringHelper.getStackTrace(e));
+            } catch (SchedulerException e) {
+                LoggerManager
+                        .getInstane()
+                        .error(
+                                "The job with id=" +
+                                    id +
+                                    " seems to be awaited but there is an exception when calling getJobResult. Results for this job will not be merged. \n",
+                                e);
             } catch (IllegalArgumentException ie) {
                 LoggerManager
                         .getInstane()

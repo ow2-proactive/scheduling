@@ -40,45 +40,46 @@ import org.objectweb.proactive.annotation.PublicAPI;
 
 
 /**
- * Exception generated when a task is aborted (killed while it's running)
+ * Exception generated when user or admin restart a task.<br>
+ * The current execution terminates immediately throwing this exception. The task can be restarted later.
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 3.0
  */
 @PublicAPI
-public class TaskAbortedException extends SchedulerException {
+public class TaskRestartedException extends SchedulerException {
 
     /**
-     * Create a new instance of TaskAbortedException
+     * Create a new instance of TaskRestartedException
      *
      * @param msg the message to attach.
      */
-    public TaskAbortedException(String msg) {
+    public TaskRestartedException(String msg) {
         super(msg);
     }
 
     /**
-     * Create a new instance of TaskAbortedException
+     * Create a new instance of TaskRestartedException
      */
-    public TaskAbortedException() {
+    public TaskRestartedException() {
     }
 
     /**
-     * Create a new instance of TaskAbortedException
+     * Create a new instance of TaskRestartedException
      *
      * @param msg the message to attach.
      * @param cause the cause of the exception.
      */
-    public TaskAbortedException(String msg, Throwable cause) {
+    public TaskRestartedException(String msg, Throwable cause) {
         super(msg, cause);
     }
 
     /**
-     * Create a new instance of TaskAbortedException
+     * Create a new instance of TaskRestartedException
      *
      * @param cause the cause of the exception.
      */
-    public TaskAbortedException(Throwable cause) {
+    public TaskRestartedException(Throwable cause) {
         super(cause);
     }
 

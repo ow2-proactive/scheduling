@@ -163,5 +163,6 @@
 	<classpathentry kind="lib" path="compile/lib/tools.jar"/>
 	<classpathentry kind="lib" path="compile/lib/mockito-all-1.9.5.jar"/>
 	<classpathentry kind="lib" path="lib/ProActive/commons-io-1.2.jar"/>
+	<classpathentry kind="lib" path="lib/common/jdbm-2_4.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>

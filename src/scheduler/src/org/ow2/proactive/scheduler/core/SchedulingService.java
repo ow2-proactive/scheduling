@@ -75,7 +75,7 @@ public class SchedulingService {
         this.infrastructure = infrastructure;
         this.listener = listener;
         this.jobs = new LiveJobs(infrastructure.getDBManager(), listener);
-        this.listenJobLogsSupport = new ListenJobLogsSupport(infrastructure.getDBManager(), jobs);
+        this.listenJobLogsSupport = ListenJobLogsSupport.newInstance(infrastructure.getDBManager(), jobs);
         if (recoveredState != null) {
             recover(recoveredState);
         }
@@ -313,9 +313,14 @@ public class SchedulingService {
     /*
      * Should be called only by scheduling method impl while it holds job lock
      */
-    void simulateJobStartAndCancelIt(List<EligibleTaskDescriptor> tasksToSchedule, String errorMsg) {
-        TerminationData terminationData = jobs.simulateJobStart(tasksToSchedule, errorMsg);
-        submitTerminationDataHandler(terminationData);
+    public void simulateJobStartAndCancelIt(final List<EligibleTaskDescriptor> tasksToSchedule,
+            final String errorMsg) {
+        infrastructure.getInternalOperationsThreadPool().submit(new Runnable() {
+            public void run() {
+                TerminationData terminationData = jobs.simulateJobStart(tasksToSchedule, errorMsg);
+                terminationData.handleTermination(SchedulingService.this);
+            }
+        });
     }
 
     public void submitJob(InternalJob job) {
@@ -388,20 +393,16 @@ public class SchedulingService {
     }
 
     public void restartTaskOnNodeFailure(final InternalTask task) {
-        try {
-            if (status.isUnusable()) {
-                return;
-            }
-            infrastructure.getInternalOperationsThreadPool().submit(new Runnable() {
-                @Override
-                public void run() {
-                    TerminationData terminationData = jobs.restartTaskOnNodeFailure(task);
-                    terminationData.handleTermination(SchedulingService.this);
-                }
-            }).get();
-        } catch (Exception e) {
-            throw handleFutureWaitException(e);
+        if (status.isUnusable()) {
+            return;
         }
+        infrastructure.getInternalOperationsThreadPool().submit(new Runnable() {
+            @Override
+            public void run() {
+                TerminationData terminationData = jobs.restartTaskOnNodeFailure(task);
+                terminationData.handleTermination(SchedulingService.this);
+            }
+        });
     }
 
     class TerminationDataHandler implements Runnable {

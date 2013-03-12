@@ -153,7 +153,6 @@ public class SimpleHelloWorld {
                     Thread.sleep(2000);
                     result = scheduler.getJobResult(jobId);
 
-                    //the result is null if the job is not finished.
                 } catch (SchedulerException se) {
                     se.printStackTrace();
                 } catch (InterruptedException e) {

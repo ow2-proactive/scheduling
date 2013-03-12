@@ -153,8 +153,8 @@ public class TaskResultImpl implements TaskResult {
      * @param output the output of the task.
      * @param execDuration the execution duration of the task itself
      */
-    public TaskResultImpl(TaskId id, Throwable value, TaskLogs output, long execDuration) {
-        this(id, value, output, execDuration, null);
+    public TaskResultImpl(TaskId id, Throwable exception, TaskLogs output, long execDuration) {
+        this(id, exception, output, execDuration, null);
     }
 
     /**
@@ -213,22 +213,28 @@ public class TaskResultImpl implements TaskResult {
         this.taskDuration = execDuration;
         this.exception = exception;
         this.propagatedProperties = propagatedProperties;
+        this.serializedException = computeSerializedException(exception);
+    }
+
+    private static byte[] computeSerializedException(Throwable exception) {
+        byte[] answer = new byte[0];
         try {
             //try to serialize the user exception
-            this.serializedException = ObjectToByteConverter.ObjectStream.convert(exception);
+            answer = ObjectToByteConverter.ObjectStream.convert(exception);
         } catch (IOException ioe2) {
             //cannot serialize the exception
             logger.error("", ioe2);
             try {
                 //serialize a NotSerializableException with the cause message
-                this.serializedException = ObjectToByteConverter.ObjectStream
-                        .convert(new NotSerializableException(ioe2.getMessage()));
+                answer = ObjectToByteConverter.ObjectStream.convert(new NotSerializableException(ioe2
+                        .getMessage()));
             } catch (IOException ioe3) {
                 //this should not append as the NotSerializableException is serializable and
                 //the given argument is a string (also serializable)
                 logger.error("", ioe3);
             }
         }
+        return answer;
     }
 
     /**
@@ -254,14 +260,14 @@ public class TaskResultImpl implements TaskResult {
     }
 
     /**
-     * @param the output of the task
+     * @param l logs of the task
      */
     public void setLogs(TaskLogs l) {
         this.output = l;
     }
 
     /**
-     * @param propagatedProperties the map of all properties that has been propagated through Exporter.propagateProperty
+     * @param props the map of all properties that has been propagated through Exporter.propagateProperty
      */
     public void setPropagatedProperties(Map<String, BigString> props) {
         this.propagatedProperties = props;
@@ -272,6 +278,11 @@ public class TaskResultImpl implements TaskResult {
      */
     public boolean hadException() {
         return serializedException != null;
+    }
+
+    public void setException(Throwable ex) {
+        this.exception = ex;
+        this.serializedException = computeSerializedException(ex);
     }
 
     /**

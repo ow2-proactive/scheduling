@@ -127,7 +127,7 @@ public abstract class TaskState extends Task implements Comparable<TaskState> {
      * If the Task was submitted, a call to this method will throw a
      * RuntimeException. Dependences cannot be added to a task at runtime.
      *
-     * @param task the parent tasks to add to this task.
+     * @param tasks the parent tasks to add to this task.
      * @throws IllegalStateException if this task was already submitted to the scheduler
      */
     @Override
@@ -208,6 +208,14 @@ public abstract class TaskState extends Task implements Comparable<TaskState> {
     public abstract TaskInfo getTaskInfo();
 
     /**
+     * Returns true if the task is not alive any more (a task is alive when it's waiting to be executed or being executed
+     * @return true if the task is alive
+     */
+    public boolean isTaskAlive() {
+        return getTaskInfo().getStatus().isTaskAlive();
+    }
+
+    /**
      * To get the finishedTime
      *
      * @return the finishedTime
@@ -244,9 +252,9 @@ public abstract class TaskState extends Task implements Comparable<TaskState> {
     }
 
     /**
-     * To get the status of this job
+     * To get the status of this task
      *
-     * @return the status of this job
+     * @return the status of this task
      */
     public TaskStatus getStatus() {
         return getTaskInfo().getStatus();

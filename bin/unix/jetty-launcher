@@ -197,7 +197,7 @@ EOF
 
 JVM_OPTS=$JVM_OPTS" -Djava.security.manager -Djava.security.policy=$POL"
 
-CLASSPATH=$CP
+export CLASSPATH=$CP
 $JAVA $JVM_OPTS $CLASS -p $PORT $LOG $APPS
 
 exit $?

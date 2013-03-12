@@ -151,16 +151,17 @@ public class GetHostsFromSchedulerTestExecutor extends Thread {
 
             JobResult result = scheduler.getJobResult(jobId);
 
-            if (result != null) {
-                System.out.println("Result for test job:");
-                for (TaskResult taskResult : result.getAllResults().values()) {
-                    System.out.println("Task: " + taskResult.getTaskId());
-                    System.out.println("Task has exception: " + taskResult.getException());
-                    // System.out.println("Task std out:\n" + taskResult.getOutput().getStdoutLogs(true));
-                    // System.out.println("Task std err:\n" + taskResult.getOutput().getStderrLogs(true));
-                }
-            } else {
+            if (result == null) {
                 System.out.println("No result for test job");
+                return false;
+            }
+
+            System.out.println("Result for test job:");
+            for (TaskResult taskResult : result.getAllResults().values()) {
+                System.out.println("Task: " + taskResult.getTaskId());
+                System.out.println("Task has exception: " + taskResult.getException());
+                // System.out.println("Task std out:\n" + taskResult.getOutput().getStdoutLogs(true));
+                // System.out.println("Task std err:\n" + taskResult.getOutput().getStderrLogs(true));
             }
 
             return ok;

@@ -1,6 +1,5 @@
 /*
- * ################################################################
- *
+ *  *
  * ProActive Parallel Suite(TM): The Java(TM) library for
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
@@ -31,8 +30,7 @@
  *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s):
  *
- * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ *  * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.ow2.proactive.scheduler.common.exception;
 
@@ -40,45 +38,47 @@ import org.objectweb.proactive.annotation.PublicAPI;
 
 
 /**
- * Exception generated when a task is aborted (killed while it's running)
+ * Exception generated when a task could not be restarted after an error
+ * during the previous execution
  *
  * @author The ProActive Team
- * @since ProActive Scheduling 3.0
+ * @since ProActive Scheduling 3.4
  */
 @PublicAPI
-public class TaskAbortedException extends SchedulerException {
+public class TaskCouldNotRestartException extends SchedulerException {
 
     /**
-     * Create a new instance of TaskAbortedException
+     * Create a new instance of TaskCouldNotRestartException
      *
      * @param msg the message to attach.
      */
-    public TaskAbortedException(String msg) {
+    public TaskCouldNotRestartException(String msg) {
         super(msg);
     }
 
     /**
-     * Create a new instance of TaskAbortedException
+     * Create a new instance of TaskCouldNotRestartException
      */
-    public TaskAbortedException() {
+    public TaskCouldNotRestartException() {
+        super("The task could not be restarted after an error during the previous execution");
     }
 
     /**
-     * Create a new instance of TaskAbortedException
+     * Create a new instance of TaskCouldNotRestartException
      *
      * @param msg the message to attach.
      * @param cause the cause of the exception.
      */
-    public TaskAbortedException(String msg, Throwable cause) {
+    public TaskCouldNotRestartException(String msg, Throwable cause) {
         super(msg, cause);
     }
 
     /**
-     * Create a new instance of TaskAbortedException
+     * Create a new instance of TaskCouldNotRestartException
      *
      * @param cause the cause of the exception.
      */
-    public TaskAbortedException(Throwable cause) {
+    public TaskCouldNotRestartException(Throwable cause) {
         super(cause);
     }
 
