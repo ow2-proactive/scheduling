@@ -115,7 +115,7 @@ public class RMAuthenticationImpl extends AuthenticationImpl implements RMAuthen
             PAActiveObject.registerByName(PAActiveObject.getStubOnThis(),
                     RMConstants.NAME_ACTIVE_OBJECT_RMAUTHENTICATION);
         } catch (ProActiveException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
             PAActiveObject.terminateActiveObject(true);
         }
     }

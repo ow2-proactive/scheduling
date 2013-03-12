@@ -220,6 +220,7 @@ public abstract class SelectionManager {
         List<RMNode> filteredNodes = filterOut(freeNodes, criteria, client);
 
         if (filteredNodes.size() == 0) {
+            logger.debug(client + " will get 0 nodes");
             return new NodeSet();
         }
 
@@ -444,7 +445,6 @@ public abstract class SelectionManager {
 
         NodeSet exclusion = criteria.getBlackList();
 
-        Permission tokenPermission = null;
         boolean nodeWithTokenRequested = criteria.getNodeAccessToken() != null &&
             criteria.getNodeAccessToken().length() > 0;
         if (nodeWithTokenRequested) {
@@ -452,11 +452,6 @@ public abstract class SelectionManager {
 
             TokenPrincipal tokenPrincipal = new TokenPrincipal(criteria.getNodeAccessToken());
             client.getSubject().getPrincipals().add(tokenPrincipal);
-
-            Set<IdentityPrincipal> identities = new HashSet<IdentityPrincipal>();
-            identities.add(tokenPrincipal);
-            tokenPermission = new PrincipalPermission(client.getName(), identities);
-
         }
 
         List<RMNode> filteredList = new ArrayList<RMNode>();
