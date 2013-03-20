@@ -95,6 +95,7 @@ import org.ow2.proactive.scheduler.permissions.GetOwnStateOnlyPermission;
 import org.ow2.proactive.scheduler.task.internal.InternalJavaTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.util.JobLogger;
+import org.ow2.proactive.scheduler.util.SendMail;
 import org.ow2.proactive.scheduler.util.TaskLogger;
 
 
@@ -912,40 +913,38 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
             case JOB_PENDING_TO_RUNNING:
                 sState.getPendingJobs().remove(js);
                 sState.getRunningJobs().add(js);
-                dispatchJobStateUpdated(owner, notification);
                 break;
             case JOB_PAUSED:
             case JOB_RESUMED:
             case JOB_CHANGE_PRIORITY:
             case TASK_REPLICATED:
             case TASK_SKIPPED:
-                dispatchJobStateUpdated(owner, notification);
                 break;
             case JOB_PENDING_TO_FINISHED:
                 sState.getPendingJobs().remove(js);
                 sState.getFinishedJobs().add(js);
                 //set this job finished, user can get its result
                 jobs.get(notification.getData().getJobId()).setFinished(true);
-                dispatchJobStateUpdated(owner, notification);
                 break;
             case JOB_RUNNING_TO_FINISHED:
                 sState.getRunningJobs().remove(js);
                 sState.getFinishedJobs().add(js);
                 //set this job finished, user can get its result
                 jobs.get(notification.getData().getJobId()).setFinished(true);
-                dispatchJobStateUpdated(owner, notification);
                 break;
             case JOB_REMOVE_FINISHED:
                 //removing jobs from the global list : this job is no more managed
                 sState.getFinishedJobs().remove(js);
                 jobsMap.remove(js.getId());
                 jobs.remove(notification.getData().getJobId());
-                dispatchJobStateUpdated(owner, notification);
                 break;
             default:
                 logger.warn("**WARNING** - Unconsistent update type received from Scheduler Core : " +
                     notification.getEventType());
+                return;
         }
+        dispatchJobStateUpdated(owner, notification);
+        new JobEmailNotification(js, notification).checkAndSend();
     }
 
     @Override

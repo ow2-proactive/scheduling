@@ -301,7 +301,11 @@ public enum PASchedulerProperties {
     /** Tells where to find matlab worker configuration file */
     MATLAB_WORKER_CONFIGURATION_FILE("pa.scheduler.ext.matlab.config.worker", PropertyType.STRING),
     /** Tells where to find scilab worker configuration file */
-    SCILAB_WORKER_CONFIGURATION_FILE("pa.scheduler.ext.scilab.config.worker", PropertyType.STRING);
+    SCILAB_WORKER_CONFIGURATION_FILE("pa.scheduler.ext.scilab.config.worker", PropertyType.STRING),
+
+    EMAIL_NOTIFICATIONS_ENABLED("pa.scheduler.notifications.email.enabled", PropertyType.BOOLEAN),
+
+    EMAIL_NOTIFICATIONS_SENDER_ADDRESS("pa.scheduler.notifications.email.from", PropertyType.STRING);
 
     /* ***************************************************************************** */
     /* ***************************************************************************** */

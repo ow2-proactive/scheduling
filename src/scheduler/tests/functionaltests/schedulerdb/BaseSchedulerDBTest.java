@@ -135,7 +135,7 @@ public class BaseSchedulerDBTest {
 
     }
 
-    static Credentials getDefaultCredentials() throws Exception {
+    public static Credentials getDefaultCredentials() throws Exception {
         if (defaultCredentials == null) {
             defaultCredentials = Credentials.createCredentials(DEFAULT_USER_NAME, "admin",
                     PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_AUTH_PUBKEY_PATH
