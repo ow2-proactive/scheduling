@@ -36,7 +36,10 @@
  */
 package org.ow2.proactive.resourcemanager.core.jmx;
 
+import java.util.ArrayList;
+
 import javax.management.MBeanServer;
+import javax.management.MBeanServerFactory;
 import javax.management.ObjectName;
 import javax.management.StandardMBean;
 
@@ -148,6 +151,16 @@ public final class RMJMXHelper extends AbstractJMXHelper {
         }
     }
 
+    /**
+     * Return a list of registered MBeanServers. 
+     *
+     * @param agentId the agentId of the MBeanServer to find.
+     */
+    public static ArrayList<MBeanServer> findMBeanServer(String agentId){
+    	return MBeanServerFactory.findMBeanServer(agentId);
+    }
+    
+    
     /**
      * {@inheritDoc}
      */
