@@ -158,9 +158,18 @@
 	</target>
 
 	<target name="doc" depends="doc-jaxrs">
+		<!--build dir is used to expose documentation in CI-->
+		<copy todir="${build.dir}" filtering="true">
+			<filterset>
+				<filter token="rest_api.version" value="${rest_api.version}"/>
+			</filterset>
+			<fileset dir="${projectRoot}/doc">
+				<include name="**/*.html"/>
+			</fileset>
+		</copy>
 		<copy todir="${build.dir}">
-			<fileset dir="${projectRoot}/doc/">
-				<include name="**/*"/>
+			<fileset dir="${projectRoot}/doc">
+				<include name="**/*.png"/>
 			</fileset>
 		</copy>
 		<!-- copy doc content to war folder -->
