@@ -50,13 +50,17 @@ import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.net.ServerSocket;
 import java.nio.charset.Charset;
+import java.util.Arrays;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class SchedulerStateRestTest {
 
@@ -90,16 +94,61 @@ public class SchedulerStateRestTest {
         callGetJobImageAndVerifyOutput();
     }
 
+    // this more of a documentation of how to read the output of getJobImage rather than a test
+    @Test
+    public void testRealImage_UTF8() throws Exception {
+        changeEncoding("UTF-8");
+
+        InputStream inputJob = getClass().getResourceAsStream("job_512.zip");
+        String jobId = createJobArchive(inputJob);
+
+        String pngAsBase64String = getJobImageAsBase64String(jobId);
+        byte[] pngOut = Base64.decodeBase64(pngAsBase64String.getBytes(SchedulerRestInterface.ENCODING));
+
+        assertTrue(Arrays.equals(getImageFromJobArchive("job_512.zip"), pngOut));
+    }
+
+    // this more of a documentation of how to read the output of getJobImage rather than a test
+    @Test
+    public void testRealImage_Cp1252() throws Exception {
+        changeEncoding("Cp1252");
+
+        InputStream inputJob = getClass().getResourceAsStream("job_512.zip");
+        String jobId = createJobArchive(inputJob);
+
+        String pngAsBase64String = getJobImageAsBase64String(jobId);
+        byte[] pngOut = Base64.decodeBase64(pngAsBase64String.getBytes(SchedulerRestInterface.ENCODING));
+
+        assertTrue(Arrays.equals(getImageFromJobArchive("job_512.zip"), pngOut));
+    }
+
+    private byte[] getImageFromJobArchive(String jobArchive) throws IOException {
+        ZipFile zipFile = new ZipFile(getClass().getResource(jobArchive).getFile());
+        ZipEntry entry = zipFile.getEntry("JOB-INF/image.png");
+        return IOUtils.toByteArray(zipFile.getInputStream(entry));
+    }
+
     private void callGetJobImageAndVerifyOutput() throws IOException, NotConnectedException {
         String pngIn = "ê";
         String jobId = createJobArchive(pngIn);
-        String sessionId = SchedulerSessionMapper.getInstance().add(new SchedulerProxyUserInterfaceForTests(), "bob");
-
-        SchedulerRestInterface client = ProxyFactory.create(SchedulerRestInterface.class, "http://localhost:" + port + "/");
-        String pngAsBase64String = client.getJobImage(sessionId, jobId);
+        String pngAsBase64String = getJobImageAsBase64String(jobId);
         String pngOut = new String(Base64.decodeBase64(pngAsBase64String.getBytes(SchedulerRestInterface.ENCODING)), SchedulerRestInterface.ENCODING);
 
         assertEquals(pngIn, pngOut);
+    }
+
+    private String getJobImageAsBase64String(String jobId) throws IOException, NotConnectedException {
+        String sessionId = SchedulerSessionMapper.getInstance().add(new SchedulerProxyUserInterfaceForTests(), "bob");
+
+        SchedulerRestInterface client = ProxyFactory.create(SchedulerRestInterface.class, "http://localhost:" + port + "/");
+        return client.getJobImage(sessionId, jobId);
+    }
+
+    private String createJobArchive(InputStream jobArchive) throws IOException {
+        File jobZip = File.createTempFile("job_", ".zip");
+        jobZip.deleteOnExit();
+        IOUtils.copy(jobArchive, new FileOutputStream(jobZip));
+        return jobZip.getName().replaceAll("job_", "").replaceAll(".zip", "");
     }
 
     private String createJobArchive(String pngIn) throws IOException {
