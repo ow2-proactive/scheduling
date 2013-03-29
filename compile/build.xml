@@ -160,28 +160,37 @@
 	<target name="doc" depends="doc-jaxrs">
 		<copy todir="${build.dir}">
 			<fileset dir="${projectRoot}/doc/">
-				<include name="**/*" />
+				<include name="**/*"/>
 			</fileset>
 		</copy>
 		<!-- copy doc content to war folder -->
 		<copy todir="${war.root}/doc/jaxrsdocs">
 			<fileset dir="${build.dir}/doc/jaxrsdocs/">
-				<include name="**/*" />
+				<include name="**/*"/>
 			</fileset>
 		</copy>
 		<copy todir="${war.root}/doc/jaxbdocs">
 			<fileset dir="${build.dir}/doc/jaxbdocs/">
-				<include name="**/*" />
+				<include name="**/*"/>
 			</fileset>
 		</copy>
 		<copy todir="${war.root}" filtering="true">
 			<filterset>
-				<filter token="rest_api.version" value="${rest_api.version}" />
+				<filter token="rest_api.version" value="${rest_api.version}"/>
 			</filterset>
 			<fileset dir="${projectRoot}/doc">
-				<include name="**/*" />
+				<include name="**/*.html"/>
 			</fileset>
 		</copy>
+		<copy todir="${war.root}">
+			<fileset dir="${projectRoot}/doc">
+				<include name="**/*.png"/>
+			</fileset>
+		</copy>
+		<zip destfile="${dist.dir}/SchedulingRest-Documentation-${rest_api.version}.zip">
+			<zipfileset dir="${build.dir}/doc/" prefix="doc"/>
+			<zipfileset dir="${build.dir}/images/" prefix="images"/>
+		</zip>
 	</target>
 
 	<target name="doc-jaxrs" depends="doc-jaxb" description="Generate JAX-RS documentation">
