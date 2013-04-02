@@ -112,6 +112,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.jboss.resteasy.annotations.GZIP;
@@ -365,14 +366,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
 
         if (jo != null) {
-            CircularArrayList<String> cl = jo.getCl();
-            int size = cl.size();
-            StringBuilder mes = new StringBuilder();
-            for (int i = 0; i < size; i++) {
-                mes.append(cl.remove(0));
-            }
-            return mes.toString();
-
+            return jo.toString();
         }
 
         return "";
@@ -677,8 +671,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
         ips = new BufferedInputStream(jobArchive.getInputStream(imageEntry));
         // Encode in Base64
-
-        return new String(org.apache.commons.codec.binary.Base64.encodeBase64(IOUtils.toByteArray(ips)), ENCODING);
+        return new String(Base64.encodeBase64(IOUtils.toByteArray(ips)), ENCODING);
     }
 
     /**

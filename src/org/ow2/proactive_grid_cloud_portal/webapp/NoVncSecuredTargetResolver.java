@@ -40,6 +40,7 @@ import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
 import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
+import org.ow2.proactive_grid_cloud_portal.scheduler.JobsOutputController;
 import org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerSession;
 import org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerSessionMapper;
 
@@ -75,6 +76,11 @@ public class NoVncSecuredTargetResolver implements IProxyTargetResolver {
         String jobId = parameters.get("jobId");
         String taskName = parameters.get("taskName");
 
+        return doResolve(sessionId, jobId, taskName);
+    }
+
+    // package-protected for testing
+    InetSocketAddress doResolve(String sessionId, String jobId, String taskName) {
         if (sessionId == null || jobId == null || taskName == null) {
             LOGGER.warn("One of the web socket path parameter is missing (sessionId, jobId, taskName).");
             return null;
@@ -91,15 +97,16 @@ public class NoVncSecuredTargetResolver implements IProxyTargetResolver {
         try {
             TaskResult taskResult = scheduler.getTaskResult(jobId, taskName);
 
-            String paRemoteConnectionLine = retrievePaRemoteConnectionLine(taskResult.getOutput().getAllLogs(false));
+            String paRemoteConnectionLine = retrievePaRemoteConnectionLine(session, jobId, taskResult);
+
             if (paRemoteConnectionLine == null) {
                 LOGGER.warn("Could not retrieve VNC connection information in task's logs");
                 return null;
             }
 
             String[] paRemoteConnectionArgs = paRemoteConnectionLine.split(";");
-            if(paRemoteConnectionArgs.length != 4){
-                LOGGER.warn("Missing arguments in PA_REMOTE_CONNECTION string, format should be PA_REMOTE_CONNECTION;$taskId;vnc;ip:port");
+            if (paRemoteConnectionArgs.length != 4) {
+                LOGGER.warn("Missing arguments in PA_REMOTE_CONNECTION string, format should be PA_REMOTE_CONNECTION;$taskId;vnc;host:port");
                 return null;
             }
             String taskId = paRemoteConnectionArgs[1];
@@ -142,6 +149,32 @@ public class NoVncSecuredTargetResolver implements IProxyTargetResolver {
             map.put(name, value);
         }
         return map;
+    }
+
+    private String retrievePaRemoteConnectionLine(SchedulerSession session, String jobId, TaskResult taskResult) {
+        String paRemoteConnectionLine = retrievePaRemoteConnectionLine(taskResult.getOutput().getAllLogs(false));
+
+        if (paRemoteConnectionLine == null) {
+            String liveLogs = getJobLiveLogs(session, jobId);
+            if (liveLogs != null) {
+                return retrievePaRemoteConnectionLine(liveLogs);
+            }
+        }
+        return paRemoteConnectionLine;
+    }
+
+    private String getJobLiveLogs(SchedulerSession session, String jobId) {
+        try {
+            return getJobsOutputController().createJobOutput(session, jobId).getJobOutput().toString();
+        } catch (Exception e) {
+            LOGGER.warn("Could not retrieve live logs", e);
+            return null;
+        }
+    }
+
+    // For testing
+    JobsOutputController getJobsOutputController() {
+        return JobsOutputController.getInstance();
     }
 
     private String retrievePaRemoteConnectionLine(String logs) {

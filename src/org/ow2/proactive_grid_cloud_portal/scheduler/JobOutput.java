@@ -189,4 +189,14 @@ public class JobOutput {
         return cl;
     }
 
+    @Override
+    public String toString() {
+        CircularArrayList<String> cl = getCl();
+        int size = cl.size();
+        StringBuilder mes = new StringBuilder();
+        for (int i = 0; i < size; i++) {
+            mes.append(cl.remove(0));
+        }
+        return mes.toString();
+    }
 }

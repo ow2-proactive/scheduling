@@ -43,3 +43,30 @@ Expose it as an environment variable so jobs can retrieve it and print out the P
 
 
 Otherwise we could use the nova get-vnc-console command to expose a direct URL to connect to the Openstack noVNC.
+
+-------------------------------------------------------------------------------
+
+How to run a job that creates a display?
+
+Script example
+
+#!/bin/bash
+
+for disp in $(seq 10 100)
+do
+    echo "Trying to use display $disp and port 5900+$disp"
+    Xvnc :$disp -geometry 1280x1024 -SecurityTypes None &
+    xvnc_pid=$!
+    ps -p $xvnc_pid
+    if [ $? -eq 0 ]; then
+        # magic string to enable remote visualization
+        echo "PA_REMOTE_CONNECTION;$PAS_TASK_ID;vnc;$(hostname):$(($disp + 5900))"
+        export DISPLAY=:$disp
+        # RUN YOUR GUI BASED APPLICATION HERE (with nohup)
+        xclock
+
+        kill $xvnc_pid
+        echo "[debug] Display closed"
+        exit
+    fi
+done
