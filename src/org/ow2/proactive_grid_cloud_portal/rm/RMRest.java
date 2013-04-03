@@ -120,14 +120,12 @@ public class RMRest {
         }
 
         RMSessionMapper.getInstance().getSessionsLastAccessToClient().put(sessionId,
-                new Long(System.currentTimeMillis()));
+                System.currentTimeMillis());
         return s;
     }
 
     /**
-     * log into the resource manager using an form containing 2 fields 
-     * @param username
-     * @param password
+     * Log into the resource manager using an form containing 2 fields
      * @return the sessionid of the user if succeed
      * @throws RMException 
      * @throws LoginException 
@@ -155,6 +153,14 @@ public class RMRest {
 
     }
 
+    /**
+     * Disconnects from resource manager and releases all the nodes taken by
+     * user for computations.
+     *
+     * @param sessionId
+     *            a valid session id
+     * @throws NotConnectedException
+     */
     @POST
     @Path("disconnect")
     @Produces("application/json")
@@ -217,7 +223,7 @@ public class RMRest {
 
     /**
      * Returns the initial state of the resource manager
-     * @param sessionId
+     * @param sessionId a valid session id
      * @return the initial state of the resource manager 
      * @throws NotConnectedException 
      */
@@ -251,7 +257,7 @@ public class RMRest {
     /**
      * Adds an existing node to the default node source of the resource manager.
      *
-     * @param sessionId
+     * @param sessionId a valid session id
      * @param nodeUrl
      *            the url of the node
      * @return true if new node is added successfully
@@ -313,28 +319,8 @@ public class RMRest {
     }
 
     /**
-     * Disconnects from resource manager and releases all the nodes taken by
-     * user for computations.
-     *
-     * @param sessionId
-     *            a valid session id
-     * @return true if successfully disconnected
-     * @throws NotConnectedException 
-     */
-    @POST
-    @Path("disconnect")
-    @Produces("application/json")
-    public boolean disconnect(@HeaderParam("sessionid")
-    String sessionId) throws NotConnectedException {
-        ResourceManager rm = checkAccess(sessionId);
-        RMSessionMapper.getInstance().getSessionsMap().remove(rm);
-        return rm.disconnect().getBooleanValue();
-    }
-
-    /**
      * Create a NodeSource
      * <p>
-     *
      *
      * @param sessionId
      *            current session id
@@ -422,8 +408,8 @@ public class RMRest {
     /**
      * Returns the ping frequency of a node source
      *
-     * @param sessionId
-     * @param sourceName
+     * @param sessionId a valid session id
+     * @param sourceName a node source
      * @return the ping frequency
      * @throws NotConnectedException 
      */
@@ -441,8 +427,8 @@ public class RMRest {
     /**
      * Release a node
      *
-     * @param sessionId
-     * @param url
+     * @param sessionId a valid session id
+     * @param url node's URL
      * @return true of the node has been released
      * @throws NodeException
      * @throws NotConnectedException 
@@ -462,10 +448,10 @@ public class RMRest {
     /**
      * Delete a node
      *
-     * @param sessionId
-     * @param nodeUrl
-     * @param preempt
-     * @return
+     * @param sessionId a valid session id
+     * @param nodeUrl node's URL
+     * @param preempt if true remove node source immediatly whithout waiting for nodes to be freed
+     * @return true if the node is removed successfully, false or exception otherwise
      * @throws NotConnectedException 
      */
     @POST
@@ -482,10 +468,10 @@ public class RMRest {
     /**
      * Delete a nodesource
      *
-     * @param sessionId
-     * @param sourceName
-     * @param preempt
-     * @return
+     * @param sessionId a valid session id
+     * @param sourceName a node source
+     * @param preempt if true remove node source immediatly whithout waiting for nodes to be freed
+     * @return true if the node is removed successfully, false or exception otherwise
      * @throws NotConnectedException 
      */
     @POST
@@ -543,8 +529,8 @@ public class RMRest {
      * Retrieves attributes of the specified mbean.
      * 
      * @param sessionId current session
-     * @param name of mbean
      * @param nodeJmxUrl mbean server url
+     * @param objectName name of mbean
      * @param attrs set of mbean attributes
      * 
      * @return mbean attributes values
@@ -592,28 +578,13 @@ public class RMRest {
     }
 
     /**
-     * Each node source scan its nodes periodically to check their states. This
-     * method changes the period of nodes scanning.
-     *
-     * @param arg0
-     * @param arg1
-     * @return
-     * @throws NotConnectedException 
-     */
-    public boolean setNodeSourcePingFrequency(@HeaderParam("sessionid")
-    String sessionId, int frequency, String sourcename) throws NotConnectedException {
-        ResourceManager rm = checkAccess(sessionId);
-        return rm.setNodeSourcePingFrequency(frequency, sourcename).getBooleanValue();
-    }
-
-    /**
      * Initiate the shutdowns the resource manager. During the shutdown resource
      * manager removed all the nodes and kills them if necessary.
      * RMEvent(SHUTDOWN) will be send when the shutdown is finished.
      *
-     * @param sessionId
-     * @param arg0
-     * @return
+     * @param sessionId a valid session
+     * @param preempt if true shutdown immediatly whithout waiting for nodes to be freed
+     * @return true if the shutdown process is successfully triggered, runtime exception otherwise
      * @throws NotConnectedException 
      */
     @GET
@@ -662,7 +633,7 @@ public class RMRest {
     /**
      * Returns the list of supported node source infrastructures descriptors.
      *
-     * @param sessionId
+     * @param sessionId a valid session
      * @return the list of supported node source infrastructures descriptors
      * @throws NotConnectedException 
      */
@@ -679,7 +650,7 @@ public class RMRest {
     /**
      * Returns the list of supported node source policies descriptors.
      *
-     * @param sessionId
+     * @param sessionId a valid session
      * @return the list of supported node source policies descriptors
      * @throws NotConnectedException 
      */
@@ -696,9 +667,9 @@ public class RMRest {
     /**
      * Returns the attributes <code>attr</code> of the mbean
      * registered as <code>name<code>
-     * @param sessionId
+     * @param sessionId a valid session
      * @param name mbean's object name
-     * @param attr attributes to enumerate
+     * @param attrs attributes to enumerate
      * @return returns the attributes of the mbean 
      * @throws InstanceNotFoundException
      * @throws IntrospectionException
@@ -723,7 +694,7 @@ public class RMRest {
             return rm.getMBeanInfo(name);
 
         } else {
-            return rm.getMBeanAttributes(name, attrs.toArray(new String[] {}));
+            return rm.getMBeanAttributes(name, attrs.toArray(new String[attrs.size()]));
         }
     }
 
@@ -739,7 +710,7 @@ public class RMRest {
      *    "AverageActivity" }</pre>
      * 
      * 
-     * @param sessionId
+     * @param sessionId a valid session
      * @param range a String of 5 chars, one for each stat history source, indicating the time range to fetch
      *      for each source. Each char can be:<ul>
      *            <li>'a' 1 minute
@@ -810,7 +781,7 @@ public class RMRest {
         DecimalFormat formatter = new DecimalFormat("###.###");
 
         // construct the JSON response directly in a String
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         result.append("{");
 
         for (int i = 0; i < dataSources.length; i++) {
@@ -849,7 +820,7 @@ public class RMRest {
             FetchRequest req = db.createFetchRequest(ConsolFun.AVERAGE, timeStart, timeEnd);
             req.setFilter(dataSource);
             FetchData fetchData = req.fetchData();
-            result.append("\"" + dataSource + "\":[");
+            result.append("\"").append(dataSource).append("\":[");
 
             double[] values = fetchData.getValues(dataSource);
             for (int j = 0; j < values.length; j++) {
