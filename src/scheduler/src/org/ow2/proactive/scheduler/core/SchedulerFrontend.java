@@ -876,7 +876,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
             }
         }
 
-        throw new UnknownTaskException("Unknow task " + taskName + " in job " + jobId);
+        throw new UnknownTaskException("Unknown task " + taskName + " in job " + jobId);
     }
 
     /**

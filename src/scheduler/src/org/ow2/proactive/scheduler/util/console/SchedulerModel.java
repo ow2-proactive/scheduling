@@ -1168,7 +1168,7 @@ public class SchedulerModel extends ConsoleModel {
         }
         try {
             String jobId = optionValues[0];
-            if (optionValues.length == 1) {
+            if (optionValues.length == 1 || optionValues.length==2&&optionValues[1]=="undefined") {
                 print(scheduler.getJobServerLogs(jobId));
             } else {
                 String taskName = optionValues[1];
