@@ -38,6 +38,7 @@ import java.io.Serializable;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 
+
 /**
  * Task information for accounting / usage purpose.
  *
@@ -54,7 +55,8 @@ public class TaskUsage implements Serializable {
     private final long taskExecutionDuration;
     private final int taskNodeNumber;
 
-    public TaskUsage(String taskId, String taskName, long taskStartTime, long taskFinishedTime, long taskExecutionDuration, int taskNodeNumber) {
+    public TaskUsage(String taskId, String taskName, long taskStartTime, long taskFinishedTime,
+            long taskExecutionDuration, int taskNodeNumber) {
 
         this.taskId = taskId;
         this.taskName = taskName;

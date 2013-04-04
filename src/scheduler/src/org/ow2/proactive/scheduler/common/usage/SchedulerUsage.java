@@ -43,6 +43,7 @@ import java.util.List;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 
+
 /**
  * Scheduler interface for accounting information, usage data and statistics.
  *
@@ -64,5 +65,6 @@ public interface SchedulerUsage {
      * @throws NotConnectedException if the caller is not connecter
      * @throws PermissionException if the caller hasn't the permission to call this method
      */
-    List<JobUsage> getMyAccountUsage(Date startDate, Date endDate) throws NotConnectedException, PermissionException;
+    List<JobUsage> getMyAccountUsage(Date startDate, Date endDate) throws NotConnectedException,
+            PermissionException;
 }

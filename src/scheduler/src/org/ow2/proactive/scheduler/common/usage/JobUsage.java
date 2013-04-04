@@ -42,6 +42,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 
+
 /**
  * Job information for accounting / usage purpose.
  *
