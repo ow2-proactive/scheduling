@@ -39,12 +39,11 @@ package org.ow2.proactive_grid_cloud_portal.scheduler;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 import org.jboss.resteasy.client.ProxyFactory;
-import org.jboss.resteasy.plugins.server.tjws.TJWSEmbeddedJaxrsServer;
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
+import org.ow2.proactive_grid_cloud_portal.RestTestServer;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 
 import java.io.File;
@@ -52,7 +51,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
-import java.net.ServerSocket;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.zip.ZipEntry;
@@ -62,24 +60,11 @@ import java.util.zip.ZipOutputStream;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class SchedulerStateRestTest {
-
-    private static TJWSEmbeddedJaxrsServer server;
-    private static int port;
+public class SchedulerStateRestTest extends RestTestServer {
 
     @BeforeClass
-    public static void startServer() throws IOException {
-        server = new TJWSEmbeddedJaxrsServer();
-        port = findFreePort();
-        server.setPort(port);
-        server.setRootResourcePath("/");
-        server.start();
-        server.getDeployment().getDispatcher().getRegistry().addSingletonResource(new SchedulerStateRest());
-    }
-
-    @AfterClass
-    public static void stopServer() {
-        server.stop();
+    public static void setUpRest() throws Exception {
+        addResource(new SchedulerStateRest());
     }
 
     @Test
@@ -170,11 +155,5 @@ public class SchedulerStateRestTest {
         defaultCharsetField.set(null, Charset.forName(s));
     }
 
-    private static int findFreePort() throws IOException {
-        ServerSocket server = new ServerSocket(0);
-        int port = server.getLocalPort();
-        server.close();
-        return port;
-    }
 }
 

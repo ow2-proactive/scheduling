@@ -55,6 +55,7 @@ import javax.management.ObjectName;
 import javax.management.ReflectionException;
 import javax.security.auth.login.LoginException;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
@@ -583,15 +584,17 @@ public class RMRest {
      * RMEvent(SHUTDOWN) will be send when the shutdown is finished.
      *
      * @param sessionId a valid session
-     * @param preempt if true shutdown immediatly whithout waiting for nodes to be freed
+     * @param preempt if true shutdown immediatly whithout waiting for nodes to be freed, default value is false
      * @return true if the shutdown process is successfully triggered, runtime exception otherwise
      * @throws NotConnectedException 
      */
     @GET
     @Path("shutdown")
     @Produces("application/json")
-    public boolean shutdown(@HeaderParam("sessionid")
-    String sessionId, boolean preempt) throws NotConnectedException {
+    public boolean shutdown(
+            @HeaderParam("sessionid") String sessionId,
+            @QueryParam("preempt") @DefaultValue("false") boolean preempt
+    ) throws NotConnectedException {
         ResourceManager rm = checkAccess(sessionId);
         return rm.shutdown(preempt).getBooleanValue();
     }
