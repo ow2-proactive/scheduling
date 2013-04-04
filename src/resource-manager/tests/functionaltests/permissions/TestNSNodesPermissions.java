@@ -408,13 +408,10 @@ public class TestNSNodesPermissions extends RMConsecutive {
         admin.releaseNodes(nodes);
         helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
-        // admin has the right to get the node anyway
+        // admin also does not have the right to get the node
         criteria.setNodeAccessToken("token3");
         nodes = admin.getNodes(criteria);
-        Assert.assertEquals(1, nodes.size());
-        helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        admin.releaseNodes(nodes);
-        helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        Assert.assertEquals(0, nodes.size());
 
         user = helper.getResourceManager(null, "radmin", "pwd");
         criteria = new Criteria(1);
@@ -504,12 +501,9 @@ public class TestNSNodesPermissions extends RMConsecutive {
         nsadmin.releaseNodes(nodes);
         helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
-        criteria.setNodeAccessToken("token2"); // still will get a node as radmin user
+        criteria.setNodeAccessToken("token2"); // will not get a node as don't have the token "token2"
         nodes = nsadmin.getNodes(criteria);
-        Assert.assertEquals(1, nodes.size());
-        helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        nsadmin.releaseNodes(nodes);
-        helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        Assert.assertEquals(0, nodes.size());
 
         nsadmin = helper.getResourceManager(null, "nsadmin", "pwd");
         criteria.setNodeAccessToken("token1");

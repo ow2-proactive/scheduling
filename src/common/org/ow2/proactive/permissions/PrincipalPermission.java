@@ -105,6 +105,9 @@ public class PrincipalPermission extends ClientPermission {
         return new PrincipalPermissionCollection();
     }
 
+    public boolean hasPrincipal(IdentityPrincipal principal) {
+        return principals.contains(principal);
+    }
 }
 
 final class PrincipalPermissionCollection extends PermissionCollection implements Serializable {
