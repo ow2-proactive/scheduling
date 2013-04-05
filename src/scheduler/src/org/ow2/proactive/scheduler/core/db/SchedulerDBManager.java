@@ -280,6 +280,7 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
 
                 Criteria criteria = session.createCriteria(JobData.class);
                 criteria.setFetchMode("tasks", FetchMode.JOIN);
+                criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
                 criteria.add(Restrictions.eq("owner", userName));
                 criteria.add(Restrictions.and(Restrictions.ge("finishedTime", startDate.getTime()),
                         Restrictions.le("finishedTime", endDate.getTime())));

@@ -16,7 +16,6 @@ import java.util.List;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 
@@ -40,12 +39,13 @@ public class TestUsageData extends BaseSchedulerDBTest {
     public void testNonEmptyDatabase() throws Exception {
         Date beforeJobExecution = new Date();
 
-        InternalJob job = defaultSubmitJob(createJob("job", "task1"), USER_WITH_JOBS);
-        InternalTask task = job.getITasks().get(0);
+        InternalJob job = defaultSubmitJob(createJob("job", "task1", "task2", "task3"), USER_WITH_JOBS);
 
         job.start();
-        startTask(job, task);
-        finishTask(job, task);
+        for (InternalTask task : job.getITasks()) {
+            startTask(job, task);
+            finishTask(job, task);
+        }
 
         Date afterJobExecution = new Date();
 
@@ -63,26 +63,29 @@ public class TestUsageData extends BaseSchedulerDBTest {
 
         List<JobUsage> usagesWithinJobRun = dbManager.getUsage(USER_WITH_JOBS, beforeJobExecution,
                 afterJobExecution);
-        assertFalse(usagesWithinJobRun.isEmpty());
+        assertEquals(1, usagesWithinJobRun.size());
+        assertEquals(3, usagesWithinJobRun.get(0).getTaskUsages().size());
 
         JobUsage onlyOneUsage = usagesWithinJobRun.get(0);
         assertEquals("job", onlyOneUsage.getJobName());
         assertTrue(onlyOneUsage.getJobDuration() > 0);
 
         TaskUsage onlyOneTaskUsage = onlyOneUsage.getTaskUsages().get(0);
-        assertEquals("task1", onlyOneTaskUsage.getTaskName());
+        assertTrue(onlyOneTaskUsage.getTaskName().contains("task"));
         assertEquals(1, onlyOneTaskUsage.getTaskNodeNumber());
         assertTrue(onlyOneTaskUsage.getTaskExecutionDuration() > 0);
     }
 
-    private TaskFlowJob createJob(String name, String taskName) throws Exception {
+    private TaskFlowJob createJob(String name, String... taskNames) throws Exception {
         TaskFlowJob job = new TaskFlowJob();
         job.setName(name);
         job.setPriority(JobPriority.IDLE);
-        JavaTask task = new JavaTask();
-        task.setName(taskName);
-        task.setExecutableClassName("className");
-        job.addTask(task);
+        for (String taskName : taskNames) {
+            JavaTask task = new JavaTask();
+            task.setName(taskName);
+            task.setExecutableClassName("className");
+            job.addTask(task);
+        }
         return job;
     }
 
