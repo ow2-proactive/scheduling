@@ -37,7 +37,6 @@
 package org.ow2.proactive.resourcemanager.selection;
 
 import java.io.File;
-import java.security.Permission;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -60,7 +59,6 @@ import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.utils.NamedThreadFactory;
-import org.ow2.proactive.authentication.principals.IdentityPrincipal;
 import org.ow2.proactive.authentication.principals.TokenPrincipal;
 import org.ow2.proactive.permissions.PrincipalPermission;
 import org.ow2.proactive.resourcemanager.authentication.Client;
@@ -447,10 +445,12 @@ public abstract class SelectionManager {
 
         boolean nodeWithTokenRequested = criteria.getNodeAccessToken() != null &&
             criteria.getNodeAccessToken().length() > 0;
+
+        TokenPrincipal tokenPrincipal = null;
         if (nodeWithTokenRequested) {
             logger.debug("Node access token specified " + criteria.getNodeAccessToken());
 
-            TokenPrincipal tokenPrincipal = new TokenPrincipal(criteria.getNodeAccessToken());
+            tokenPrincipal = new TokenPrincipal(criteria.getNodeAccessToken());
             client.getSubject().getPrincipals().add(tokenPrincipal);
         }
 
@@ -472,6 +472,18 @@ public abstract class SelectionManager {
             // with other tokens but must also filter out nodes without tokens
             if (nodeWithTokenRequested && !node.isProtectedByToken()) {
                 continue;
+            }
+
+            // if client has AllPermissions he sill can get a node with any token
+            // we will avoid it here
+            if (nodeWithTokenRequested && tokenPrincipal != null) {
+                PrincipalPermission perm = (PrincipalPermission) node.getUserPermission();
+                // checking explicitly that node has this token identity
+                if (!perm.hasPrincipal(tokenPrincipal)) {
+                    logger.debug(client + " does not have required token to get the node " + node.getNodeURL() +
+                        " from " + node.getNodeSource().getName());
+                    continue;
+                }
             }
 
             if (!contains(exclusion, node)) {

@@ -582,7 +582,8 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     }
 
     @Override
-    public List<JobUsage> getMyAccountUsage(Date startDate, Date endDate) throws NotConnectedException, PermissionException {
+    public List<JobUsage> getMyAccountUsage(Date startDate, Date endDate) throws NotConnectedException,
+            PermissionException {
         return uischeduler.getMyAccountUsage(startDate, endDate);
     }
 

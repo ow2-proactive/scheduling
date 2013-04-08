@@ -49,16 +49,20 @@ public class TestUsageData extends BaseSchedulerDBTest {
 
         Date afterJobExecution = new Date();
 
-        List<JobUsage> usagesBeforeJobRan = dbManager.getUsage(USER_WITH_JOBS, beforeJobExecution, beforeJobExecution);
+        List<JobUsage> usagesBeforeJobRan = dbManager.getUsage(USER_WITH_JOBS, beforeJobExecution,
+                beforeJobExecution);
         assertTrue(usagesBeforeJobRan.isEmpty());
 
-        List<JobUsage> usagesAfterJobRan = dbManager.getUsage(USER_WITH_JOBS, afterJobExecution, afterJobExecution);
+        List<JobUsage> usagesAfterJobRan = dbManager.getUsage(USER_WITH_JOBS, afterJobExecution,
+                afterJobExecution);
         assertTrue(usagesAfterJobRan.isEmpty());
 
-        List<JobUsage> usagesForDifferentUser = dbManager.getUsage(USER_WITHOUT_JOBS, beforeJobExecution, afterJobExecution);
+        List<JobUsage> usagesForDifferentUser = dbManager.getUsage(USER_WITHOUT_JOBS, beforeJobExecution,
+                afterJobExecution);
         assertTrue(usagesForDifferentUser.isEmpty());
 
-        List<JobUsage> usagesWithinJobRun = dbManager.getUsage(USER_WITH_JOBS, beforeJobExecution, afterJobExecution);
+        List<JobUsage> usagesWithinJobRun = dbManager.getUsage(USER_WITH_JOBS, beforeJobExecution,
+                afterJobExecution);
         assertFalse(usagesWithinJobRun.isEmpty());
 
         JobUsage onlyOneUsage = usagesWithinJobRun.get(0);

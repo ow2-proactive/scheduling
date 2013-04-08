@@ -224,7 +224,7 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
                 }
 
                 criteria.add(Restrictions.eq("removedTime", -1L));
-                
+
                 if (sortParameters != null) {
                     Property property;
                     for (SortParameter<JobSortParameter> param : sortParameters) {
@@ -281,8 +281,7 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
                 Criteria criteria = session.createCriteria(JobData.class);
                 criteria.setFetchMode("tasks", FetchMode.JOIN);
                 criteria.add(Restrictions.eq("owner", userName));
-                criteria.add(Restrictions.and(
-                        Restrictions.ge("finishedTime", startDate.getTime()),
+                criteria.add(Restrictions.and(Restrictions.ge("finishedTime", startDate.getTime()),
                         Restrictions.le("finishedTime", endDate.getTime())));
 
                 List<JobData> jobsList = criteria.list();

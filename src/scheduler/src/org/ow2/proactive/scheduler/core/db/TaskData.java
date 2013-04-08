@@ -785,9 +785,9 @@ public class TaskData {
     TaskUsage toTaskUsage(JobIdImpl jobId) {
         TaskId taskId = TaskIdImpl.createTaskId(jobId, getTaskName(), getId().getTaskId(), false);
 
-        return new TaskUsage(taskId.value(), getTaskName(),
-                getStartTime(), getFinishedTime(), getExecutionDuration(),
-                getParallelEnvironment() == null ? 1 : getParallelEnvironment().getNodesNumber());
+        return new TaskUsage(taskId.value(), getTaskName(), getStartTime(), getFinishedTime(),
+            getExecutionDuration(), getParallelEnvironment() == null ? 1 : getParallelEnvironment()
+                    .getNodesNumber());
     }
 
 }

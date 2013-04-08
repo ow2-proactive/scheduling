@@ -165,6 +165,7 @@ public class TestNSAdminPermissions extends RMConsecutive {
         try {
             adminRMAccess.removeNodeSource(nsName, true).getBooleanValue();
         } catch (Exception e) {
+            e.printStackTrace();
             Assert.assertTrue(false);
         }
 
