@@ -78,9 +78,6 @@ import org.ow2.proactive.scheduler.policy.Policy;
 @PublicAPI
 public interface Scheduler extends SchedulerUsage {
 
-    /** Attribute name in task the generic information indicating that the task requires a node protedcted by token */
-    public static final String NODE_ACCESS_TOKEN = "NODE_ACCESS_TOKEN";
-
     /**
      * Get the result for the given jobId.
      * A user can only get HIS result back except if he is admin.<br>

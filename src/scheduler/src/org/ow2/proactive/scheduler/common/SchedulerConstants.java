@@ -87,4 +87,7 @@ public class SchedulerConstants {
 
     /** Separator character for the String located by the {@link #REMOTE_CONNECTION_MARKER} */
     public static final char REMOTE_CONNECTION_SEPARATOR = ';';
+
+    /** Attribute name in task the generic information indicating that the task requires a node protedcted by token */
+    public static final String NODE_ACCESS_TOKEN = "NODE_ACCESS_TOKEN";
 }

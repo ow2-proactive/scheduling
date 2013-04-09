@@ -53,12 +53,9 @@ import org.objectweb.proactive.utils.NamedThreadFactory;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.frontend.topology.TopologyDisabledException;
-import org.ow2.proactive.scheduler.common.Scheduler;
+import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobType;
-import org.ow2.proactive.scheduler.common.task.TaskId;
-import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.core.rmproxies.RMProxiesManager;
@@ -290,8 +287,8 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
             InternalJob currentJob = jobsMap.get(etd.getJobId()).getInternal();
             InternalTask internalTask = currentJob.getIHMTasks().get(etd.getTaskId());
             int neededNodes = internalTask.getNumberOfNodesNeeded();
-            SchedulingTaskComparator referent = new SchedulingTaskComparator(internalTask, currentJob
-                    .getOwner());
+            SchedulingTaskComparator referent = new SchedulingTaskComparator(internalTask,
+                currentJob.getOwner());
             boolean firstLoop = true;
             do {
                 if (!firstLoop) {
@@ -376,9 +373,9 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                 criteria.setBlackList(internalTask.getNodeExclusion());
                 criteria.setBestEffort(bestEffort);
 
-                if (internalTask.getGenericInformations().containsKey(Scheduler.NODE_ACCESS_TOKEN)) {
+                if (internalTask.getGenericInformations().containsKey(SchedulerConstants.NODE_ACCESS_TOKEN)) {
                     criteria.setNodeAccessToken(internalTask.getGenericInformations().get(
-                            Scheduler.NODE_ACCESS_TOKEN));
+                            SchedulerConstants.NODE_ACCESS_TOKEN));
                 }
 
                 Collection<String> computationDescriptors = new ArrayList<String>(tasksToSchedule.size());
