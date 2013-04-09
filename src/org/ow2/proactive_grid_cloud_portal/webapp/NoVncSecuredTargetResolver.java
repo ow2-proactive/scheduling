@@ -38,14 +38,19 @@ import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
 import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
+import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
 import org.ow2.proactive_grid_cloud_portal.scheduler.JobsOutputController;
 import org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerSession;
 import org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerSessionMapper;
 
 import java.net.InetSocketAddress;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.netiq.websockify.IProxyTargetResolver;
@@ -65,7 +70,11 @@ public class NoVncSecuredTargetResolver implements IProxyTargetResolver {
     private static final Logger LOGGER = ProActiveLogger.getLogger(NoVncSecuredTargetResolver.class);
 
     private static final String PLATFORM_INDEPENDENT_LINE_BREAK = "\r\n?|\n";
+
     private static final String PA_REMOTE_CONNECTION = "PA_REMOTE_CONNECTION";
+    private static final String PA_REMOTE_CONNECTION_SEPARATOR = ";";
+    private static final String PA_REMOTE_CONNECTION_HOST_PORT_SEPARATOR = ":";
+
     private static final String VNC_PROTOCOL = "vnc";
 
     @Override
@@ -96,32 +105,11 @@ public class NoVncSecuredTargetResolver implements IProxyTargetResolver {
 
         try {
             TaskResult taskResult = scheduler.getTaskResult(jobId, taskName);
+            List<String> paRemoteConnectionLines = retrievePaRemoteConnectionLines(session, jobId,
+                    taskResult);
 
-            String paRemoteConnectionLine = retrievePaRemoteConnectionLine(session, jobId, taskResult);
-
-            if (paRemoteConnectionLine == null) {
-                LOGGER.warn("Could not retrieve VNC connection information in task's logs");
-                return null;
-            }
-
-            String[] paRemoteConnectionArgs = paRemoteConnectionLine.split(";");
-            if (paRemoteConnectionArgs.length != 4) {
-                LOGGER.warn("Missing arguments in PA_REMOTE_CONNECTION string, format should be PA_REMOTE_CONNECTION;$taskId;vnc;host:port");
-                return null;
-            }
-            String taskId = paRemoteConnectionArgs[1];
-            String type = paRemoteConnectionArgs[2];
-            String args = paRemoteConnectionArgs[3];
-
-            if (taskId.equals(taskResult.getTaskId().value()) && VNC_PROTOCOL.equals(type)) {
-                String[] targetHostAndPort = args.split(":");
-                String vncHost = targetHostAndPort[0];
-                String vncPort = targetHostAndPort[1];
-                LOGGER.debug("Proxying to " + vncHost + ":" + vncPort);
-                return new InetSocketAddress(vncHost, Integer.parseInt(vncPort));
-            } else {
-                LOGGER.warn("Protocol or task unknown in PA_REMOTE_CONNECTION string");
-            }
+            String taskIdFromTaskName = retrieveTaskId(taskName, scheduler.getJobState(jobId));
+            return resolveVncTargetFromLogs(paRemoteConnectionLines, taskIdFromTaskName);
 
         } catch (NotConnectedException e) {
             LOGGER.warn("Failed to connect to scheduler", e);
@@ -133,6 +121,77 @@ public class NoVncSecuredTargetResolver implements IProxyTargetResolver {
             LOGGER.warn("Not allowed to access task", e);
         }
         return null;
+    }
+
+    private InetSocketAddress resolveVncTargetFromLogs(List<String> paRemoteConnectionLines, String taskIdFromTaskName) {
+        for (String paRemoteConnectionLine : paRemoteConnectionLines) {
+            String[] paRemoteConnectionArgs = paRemoteConnectionLine.split(PA_REMOTE_CONNECTION_SEPARATOR);
+            if (paRemoteConnectionArgs.length == 4) {
+                String taskId = paRemoteConnectionArgs[1];
+                String type = paRemoteConnectionArgs[2];
+                String args = paRemoteConnectionArgs[3];
+
+                if (taskId.equals(taskIdFromTaskName) && VNC_PROTOCOL.equals(type)) {
+                    String[] targetHostAndPort = args.split(PA_REMOTE_CONNECTION_HOST_PORT_SEPARATOR);
+                    String vncHost = targetHostAndPort[0];
+                    String vncPort = targetHostAndPort[1];
+                    LOGGER.debug("Proxying to " + vncHost + ":" + vncPort);
+                    return new InetSocketAddress(vncHost, Integer.parseInt(vncPort));
+                } else {
+                    LOGGER.debug("Protocol or task unknown in PA_REMOTE_CONNECTION string (" + paRemoteConnectionLine + ")");
+                }
+            } else {
+                LOGGER.debug(
+                        "Missing arguments in PA_REMOTE_CONNECTION string, " +
+                                "(" + paRemoteConnectionLine + ")" +
+                                "format should be PA_REMOTE_CONNECTION;$taskId;vnc;host:port");
+            }
+        }
+        LOGGER.warn("Could not find the PA_REMOTE_CONNECTION string");
+        return null;
+    }
+
+    private static String retrieveTaskId(String taskName, JobState jobState) {
+        for (TaskState taskState : jobState.getHMTasks().values()) {
+            if (taskState.getName().equals(taskName)) {
+                return taskState.getId().value();
+            }
+        }
+        return null;
+    }
+
+    private List<String> retrievePaRemoteConnectionLines(SchedulerSession session, String jobId, TaskResult taskResult) {
+        List<String> paRemoteConnectionLines = Collections.emptyList();
+        String liveLogs = getJobLiveLogs(session, jobId);
+        if (liveLogs != null) {
+            paRemoteConnectionLines = retrievePaRemoteConnectionLines(liveLogs);
+        }
+        if (paRemoteConnectionLines.isEmpty()) {
+            if (taskResult != null && taskResult.getOutput() != null) {
+                paRemoteConnectionLines = retrievePaRemoteConnectionLines(taskResult.getOutput().getAllLogs(
+                        false));
+            }
+        }
+        return paRemoteConnectionLines;
+    }
+
+    private String getJobLiveLogs(SchedulerSession session, String jobId) {
+        try {
+            return getJobsOutputController().createJobOutput(session, jobId).getJobOutput().toString();
+        } catch (Exception e) {
+            LOGGER.warn("Could not retrieve live logs", e);
+            return null;
+        }
+    }
+
+    private List<String> retrievePaRemoteConnectionLines(String logs) {
+        List<String> lines = new ArrayList<String>();
+        for (String line : lineByLine(logs)) {
+            if (line.contains(PA_REMOTE_CONNECTION)) {
+                lines.add(line);
+            }
+        }
+        return lines;
     }
 
     private static Map<String, String> getQueryMap(String query) {
@@ -151,42 +210,12 @@ public class NoVncSecuredTargetResolver implements IProxyTargetResolver {
         return map;
     }
 
-    private String retrievePaRemoteConnectionLine(SchedulerSession session, String jobId, TaskResult taskResult) {
-        String paRemoteConnectionLine = retrievePaRemoteConnectionLine(taskResult.getOutput().getAllLogs(false));
-
-        if (paRemoteConnectionLine == null) {
-            String liveLogs = getJobLiveLogs(session, jobId);
-            if (liveLogs != null) {
-                return retrievePaRemoteConnectionLine(liveLogs);
-            }
-        }
-        return paRemoteConnectionLine;
-    }
-
-    private String getJobLiveLogs(SchedulerSession session, String jobId) {
-        try {
-            return getJobsOutputController().createJobOutput(session, jobId).getJobOutput().toString();
-        } catch (Exception e) {
-            LOGGER.warn("Could not retrieve live logs", e);
-            return null;
-        }
+    private static String[] lineByLine(String lines) {
+        return lines.split(PLATFORM_INDEPENDENT_LINE_BREAK);
     }
 
     // For testing
     JobsOutputController getJobsOutputController() {
         return JobsOutputController.getInstance();
-    }
-
-    private String retrievePaRemoteConnectionLine(String logs) {
-        for (String line : lineByLine(logs)) {
-            if (line.contains(PA_REMOTE_CONNECTION)) {
-                return line;
-            }
-        }
-        return null;
-    }
-
-    private String[] lineByLine(String lines) {
-        return lines.split(PLATFORM_INDEPENDENT_LINE_BREAK);
     }
 }
