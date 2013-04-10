@@ -184,6 +184,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     /** HashMap of NodeSource active objects */
     private HashMap<String, NodeSource> nodeSources;
 
+    private ArrayList<String> brokenNodeSources;
+
     /** HashMaps of nodes known by the RMCore */
     private HashMap<String, RMNode> allNodes;
 
@@ -252,6 +254,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         this.nodeRM = nodeRM;
 
         nodeSources = new HashMap<String, NodeSource>();
+        brokenNodeSources = new ArrayList<String>();
         allNodes = new HashMap<String, RMNode>();
         freeNodes = new ArrayList<RMNode>();
 
@@ -373,11 +376,14 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     private void restoreNodeSources() {
-        for (NodeSourceData nsd : dataBaseManager.getNodeSources()) {
+        Collection<NodeSourceData> nodeSources = dataBaseManager.getNodeSources();
+        logger.info("Number of node sources to restore " + nodeSources.size());
+        for (NodeSourceData nsd : nodeSources) {
             try {
                 createNodeSource(nsd);
             } catch (Throwable t) {
                 logger.error(t.getMessage(), t);
+                brokenNodeSources.add(nsd.getName());
             }
         }
     }
@@ -1317,6 +1323,12 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             //because node source doesn't know anymore its down nodes
             removeAllNodes(sourceName, preempt);
             nodeSource.shutdown(caller);
+            dataBaseManager.removeNodeSource(sourceName);
+
+            return new BooleanWrapper(true);
+        } else if (brokenNodeSources.contains(sourceName)) {
+            logger.info(caller + " requested removal of the " + sourceName + " node source (broken)");
+            brokenNodeSources.remove(sourceName);
             dataBaseManager.removeNodeSource(sourceName);
 
             return new BooleanWrapper(true);
