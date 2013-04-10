@@ -93,9 +93,10 @@ public class NoVncSecuredTargetResolverTest {
         when(schedulerMock.getTaskResult("42", "remoteVisuTask")).thenReturn(
                 new TaskResultImpl(
                         TaskIdImpl.createTaskId(new JobIdImpl(42, "job"), "remoteVisuTask", 1, false),
-                        "value",
+                        new byte[0],
+                        new byte[0],
                         new SimpleTaskLogs("PA_REMOTE_CONNECTION;1;vnc;node.grid.com:5900", ""),
-                        1000
+                        Collections.<String, String>emptyMap()
                 )
         );
 
@@ -111,9 +112,10 @@ public class NoVncSecuredTargetResolverTest {
         when(schedulerMock.getTaskResult("42", "remoteVisuTask")).thenReturn(
                 new TaskResultImpl(
                         TaskIdImpl.createTaskId(new JobIdImpl(42, "job"), "remoteVisuTask", 1, false),
-                        "value",
+                        new byte[0],
+                        new byte[0],
                         new SimpleTaskLogs("PA_REMOTE_CONNECTION\nPA_REMOTE_CONNECTION;1;vnc;node.grid.com:5900", ""),
-                        1000
+                        Collections.<String, String>emptyMap()
                 )
         );
 
@@ -147,12 +149,13 @@ public class NoVncSecuredTargetResolverTest {
         when(schedulerMock.getTaskResult("42", "remoteVisuTask")).thenReturn(
                 new TaskResultImpl(
                         TaskIdImpl.createTaskId(new JobIdImpl(42, "job"), "remoteVisuTask", 1, false),
-                        "value",
+                        new byte[0],
+                        new byte[0],
                         new SimpleTaskLogs("", ""),
-                        1000
+                        Collections.<String, String>emptyMap()
                 )
         );
-        final JobsOutputController jobsOutputController = createLiveLogs("PA_REMOTE_CONNECTION;1;vnc;node.grid.com:5900");
+        final JobsOutputController jobsOutputController = createLiveLogs("[Visualization_task@node2;10:38:06]PA_REMOTE_CONNECTION;1;vnc;node.grid.com:5900");
 
         InetSocketAddress targetVncHost = new NoVncSecuredTargetResolver() {
             @Override
@@ -171,12 +174,13 @@ public class NoVncSecuredTargetResolverTest {
         when(schedulerMock.getTaskResult("42", "remoteVisuTask")).thenReturn(
                 new TaskResultImpl(
                         TaskIdImpl.createTaskId(new JobIdImpl(42, "job"), "remoteVisuTask", 1, false),
-                        "value",
+                        new byte[0],
+                        new byte[0],
                         new SimpleTaskLogs("", ""),
-                        1000
+                        Collections.<String, String>emptyMap()
                 )
         );
-        final JobsOutputController jobsOutputController = createLiveLogs("PA_REMOTE_CONNECTION\nPA_REMOTE_CONNECTION;1;vnc;node.grid.com:5900");
+        final JobsOutputController jobsOutputController = createLiveLogs("PA_REMOTE_CONNECTION\nPA_REMOTE_CONNECTION;1;vnc;node.grid.com:5900 ");
 
         InetSocketAddress targetVncHost = new NoVncSecuredTargetResolver() {
             @Override

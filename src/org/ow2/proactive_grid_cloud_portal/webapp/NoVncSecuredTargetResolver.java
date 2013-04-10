@@ -125,27 +125,27 @@ public class NoVncSecuredTargetResolver implements IProxyTargetResolver {
 
     private InetSocketAddress resolveVncTargetFromLogs(List<String> paRemoteConnectionLines, String taskIdFromTaskName) {
         for (String paRemoteConnectionLine : paRemoteConnectionLines) {
-            String[] paRemoteConnectionArgs = paRemoteConnectionLine.split(PA_REMOTE_CONNECTION_SEPARATOR);
-            if (paRemoteConnectionArgs.length == 4) {
-                String taskId = paRemoteConnectionArgs[1];
-                String type = paRemoteConnectionArgs[2];
-                String args = paRemoteConnectionArgs[3];
+            String[] paRemoteConnectionArgs = paRemoteConnectionLine.split(PA_REMOTE_CONNECTION);
+            if (paRemoteConnectionArgs.length == 2) {
+                paRemoteConnectionArgs = paRemoteConnectionArgs[1].split(PA_REMOTE_CONNECTION_SEPARATOR);
+                if (paRemoteConnectionArgs.length == 4) {
+                    String taskId = paRemoteConnectionArgs[1];
+                    String type = paRemoteConnectionArgs[2];
+                    String args = paRemoteConnectionArgs[3];
 
-                if (taskId.equals(taskIdFromTaskName) && VNC_PROTOCOL.equals(type)) {
-                    String[] targetHostAndPort = args.split(PA_REMOTE_CONNECTION_HOST_PORT_SEPARATOR);
-                    String vncHost = targetHostAndPort[0];
-                    String vncPort = targetHostAndPort[1];
-                    LOGGER.debug("Proxying to " + vncHost + ":" + vncPort);
-                    return new InetSocketAddress(vncHost, Integer.parseInt(vncPort));
-                } else {
-                    LOGGER.debug("Protocol or task unknown in PA_REMOTE_CONNECTION string (" + paRemoteConnectionLine + ")");
+                    if (taskId.equals(taskIdFromTaskName) && VNC_PROTOCOL.equals(type)) {
+                        String[] targetHostAndPort = args.split(PA_REMOTE_CONNECTION_HOST_PORT_SEPARATOR);
+                        String vncHost = targetHostAndPort[0].trim();
+                        String vncPort = targetHostAndPort[1].trim();
+                        LOGGER.debug("Proxying to " + vncHost + ":" + vncPort);
+                        return new InetSocketAddress(vncHost, Integer.parseInt(vncPort));
+                    } else {
+                        LOGGER.debug("Protocol or task unknown in PA_REMOTE_CONNECTION string (" + paRemoteConnectionLine + ")");
+                    }
                 }
-            } else {
-                LOGGER.debug(
-                        "Missing arguments in PA_REMOTE_CONNECTION string, " +
-                                "(" + paRemoteConnectionLine + ")" +
-                                "format should be PA_REMOTE_CONNECTION;$taskId;vnc;host:port");
             }
+            LOGGER.debug("Missing arguments in PA_REMOTE_CONNECTION string, "
+                    + "(" + paRemoteConnectionLine + ")" + "format should be PA_REMOTE_CONNECTION;$taskId;vnc;host:port");
         }
         LOGGER.warn("Could not find the PA_REMOTE_CONNECTION string");
         return null;
