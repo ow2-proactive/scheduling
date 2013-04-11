@@ -124,7 +124,6 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.util.CircularArrayList;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
@@ -366,7 +365,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
 
         if (jo != null) {
-            return jo.toString();
+            return jo.fetchNewLogs();
         }
 
         return "";
@@ -396,7 +395,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         JobOutputAppender joa = ss.getJobOutputAppender();
 
         if (joa != null) {
-            return joa.getJobOutput().getCl().size();
+            return joa.getJobOutput().size();
         }
 
         return -1;

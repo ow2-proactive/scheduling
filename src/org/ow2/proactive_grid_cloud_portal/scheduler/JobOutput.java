@@ -39,164 +39,45 @@ package org.ow2.proactive_grid_cloud_portal.scheduler;
 import org.objectweb.proactive.core.util.CircularArrayList;
 
 
-/**
- * This class allow to write message in the default Message console
- *
- * @author The ProActive Team
- * @since ProActive Scheduling 0.9
- */
 public class JobOutput {
 
-    public static class RemoteHint {
-        public String appType;
-        public String url;
+    private CircularArrayList<String> currentLogs;
+    private CircularArrayList<String> allLogs;
 
-        /** if the other fields are null, this explains why; 
-         * put it in the error message */
-        public String errorMsg;
-
-        public RemoteHint(String appType, String url) {
-            this.appType = appType;
-            this.url = url;
-        }
-
-        public RemoteHint(String errorMsg) {
-            this.errorMsg = errorMsg;
-        }
+    public JobOutput() {
+        currentLogs = new CircularArrayList<String>(50);
+        allLogs = new CircularArrayList<String>(50);
     }
 
-    private String name;
-
-    private CircularArrayList<String> cl;
-
-    // -------------------------------------------------------------------- //
-    // --------------------------- constructor ---------------------------- //
-    // -------------------------------------------------------------------- //
-    /**
-     * The default constructor.
-     *
-     * @param name the name.
-     */
-    public JobOutput(String name) {
-        this.name = name;
-    }
-
-    public JobOutput(String name, CircularArrayList<String> cl) {
-        this(name);
-        this.cl = cl;
-    }
-
-    // -------------------------------------------------------------------- //
-    // ----------------------------- private ------------------------------ //
-    // -------------------------------------------------------------------- //
-    /**
-     * Logs a message to the console
-     *
-     * @param message the message to log
-     * @param color the color
-     */
-    private synchronized void log_(String message) {
-        getCl().add(message);
-    }
-
-    // -------------------------------------------------------------------- //
-    // ------------------------------ public ------------------------------ //
-    // -------------------------------------------------------------------- //
-    /**
-     * Directly call the method {@link #log(String, Color)} with the given
-     * message and the FATAL_COLOR color
-     *
-     * @param message the message
-     * @see #FATAL_COLOR
-     */
-    public synchronized void fatal(String message) {
-        log(message);
-    }
-
-    /**
-     * Directly call the method {@link #log(String, Color)} with the given
-     * message and the ERROR_COLOR color
-     *
-     * @param message the message
-     * @see #ERROR_COLOR
-     */
-    public synchronized void error(String message) {
-        log(message);
-    }
-
-    /**
-     * Directly call the method {@link #log(String, Color)} with the given
-     * message and the WARN_COLOR color
-     *
-     * @param message the message
-     * @see #WARN_COLOR
-     */
-    public synchronized void warn(String message) {
-        log(message);
-    }
-
-    /**
-     * Directly call the method {@link #log(String, Color)} with the given
-     * message and the DEFAULT_COLOR color
-     *
-     * @param message the message
-     * @see #DEFAULT_COLOR
-     */
     public synchronized void log(String message) {
-        log_(message);
+        currentLogs.add(message);
+        allLogs.add(message);
     }
 
     /**
-     * Directly call the method {@link #log(String, Color)} with the given
-     * message and the DEBUG_COLOR color
-     *
-     * @param message the message
-     * @see #DEBUG_COLOR
+     * @return the logs appended since last call, i.e logs are removed when fetched
      */
-    public synchronized void debug(String message) {
-        log(message);
-    }
-
-    /**
-     * Directly call the method {@link #log(String, Color)} with the given
-     * message and the INFO_COLOR color
-     *
-     * @param message the message
-     * @see #INFO_COLOR
-     */
-    public synchronized void info(String message) {
-        log(message);
-    }
-
-    /**
-     * Directly call the method {@link #log(String, Color)} with the given
-     * message and the TRACE_COLOR color
-     *
-     * @param message the message
-     * @see #TRACE_COLOR
-     */
-    public synchronized void trace(String message) {
-        log(message);
-    }
-
-    /**
-     * Do nothing.
-     */
-    public synchronized void off() {
-    }
-
-    public CircularArrayList<String> getCl() {
-        return cl;
-    }
-
-    @Override
-    public String toString() {
-        CircularArrayList<String> cl = getCl();
-        int size = cl.size();
+    public synchronized String fetchNewLogs() {
+        int size = currentLogs.size();
         StringBuilder mes = new StringBuilder();
         for (int i = 0; i < size; i++) {
-            mes.append(cl.remove(0));
+            mes.append(currentLogs.remove(0));
         }
         return mes.toString();
+    }
+
+    /**
+     * @return all the logs since creation, i.e logs are not removed
+     */
+    public synchronized String fetchAllLogs() {
+        StringBuilder mes = new StringBuilder();
+        for (String aSavedOutput : allLogs) {
+            mes.append(aSavedOutput);
+        }
+        return mes.toString();
+    }
+
+    public synchronized int size() {
+        return currentLogs.size();
     }
 }

@@ -42,7 +42,6 @@ import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
-import org.ow2.proactive_grid_cloud_portal.scheduler.JobsOutputController;
 import org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerSession;
 import org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerSessionMapper;
 
@@ -105,7 +104,7 @@ public class NoVncSecuredTargetResolver implements IProxyTargetResolver {
 
         try {
             TaskResult taskResult = scheduler.getTaskResult(jobId, taskName);
-            List<String> paRemoteConnectionLines = retrievePaRemoteConnectionLines(session, jobId,
+            List<String> paRemoteConnectionLines = retrievePaRemoteConnectionLines(session,
                     taskResult);
 
             String taskIdFromTaskName = retrieveTaskId(taskName, scheduler.getJobState(jobId));
@@ -160,9 +159,9 @@ public class NoVncSecuredTargetResolver implements IProxyTargetResolver {
         return null;
     }
 
-    private List<String> retrievePaRemoteConnectionLines(SchedulerSession session, String jobId, TaskResult taskResult) {
+    private List<String> retrievePaRemoteConnectionLines(SchedulerSession session, TaskResult taskResult) {
         List<String> paRemoteConnectionLines = Collections.emptyList();
-        String liveLogs = getJobLiveLogs(session, jobId);
+        String liveLogs = getJobLiveLogs(session);
         if (liveLogs != null) {
             paRemoteConnectionLines = retrievePaRemoteConnectionLines(liveLogs);
         }
@@ -175,9 +174,9 @@ public class NoVncSecuredTargetResolver implements IProxyTargetResolver {
         return paRemoteConnectionLines;
     }
 
-    private String getJobLiveLogs(SchedulerSession session, String jobId) {
+    private String getJobLiveLogs(SchedulerSession session) {
         try {
-            return getJobsOutputController().createJobOutput(session, jobId).getJobOutput().toString();
+            return session.getJobOutputAppender().getJobOutput().fetchAllLogs();
         } catch (Exception e) {
             LOGGER.warn("Could not retrieve live logs", e);
             return null;
@@ -214,8 +213,4 @@ public class NoVncSecuredTargetResolver implements IProxyTargetResolver {
         return lines.split(PLATFORM_INDEPENDENT_LINE_BREAK);
     }
 
-    // For testing
-    JobsOutputController getJobsOutputController() {
-        return JobsOutputController.getInstance();
-    }
 }

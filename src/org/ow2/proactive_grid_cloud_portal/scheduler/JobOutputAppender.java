@@ -56,7 +56,6 @@ import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 public class JobOutputAppender extends AppenderSkeleton {
 
     private JobOutput jobOutput = null;
-    private SchedulerSession ss;
     private String jobId;
 
     // -------------------------------------------------------------------- //
@@ -73,7 +72,6 @@ public class JobOutputAppender extends AppenderSkeleton {
     public JobOutputAppender(SchedulerSession ss, String jobId, AppenderProvider ap, JobOutput jobOutput)
             throws NotConnectedException, UnknownJobException, PermissionException {
         this.name = "Appender for job output";
-        this.ss = ss;
         this.jobOutput = jobOutput;
         this.jobId = jobId;
 
@@ -114,7 +112,7 @@ public class JobOutputAppender extends AppenderSkeleton {
     @Override
     protected void append(LoggingEvent event) {
         if (!super.closed) {
-            jobOutput.getCl().add(
+            jobOutput.log(
                     this.layout != null ? this.layout.format(event) : event.getRenderedMessage());
         }
     }
