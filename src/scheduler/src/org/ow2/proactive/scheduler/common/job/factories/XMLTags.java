@@ -76,8 +76,8 @@ public enum XMLTags {
     // FLOW CONTROL
     FLOW("controlFlow"), FLOW_IF("if"), FLOW_REPLICATE("replicate"), FLOW_LOOP("loop"),
     // DATASPACES
-    DS_INPUTSPACE("inputSpace"), DS_OUTPUTSPACE("outputSpace"), DS_INPUTFILES("inputFiles"), DS_OUTPUTFILES(
-            "outputFiles"), DS_FILES("files");
+    DS_INPUTSPACE("inputSpace"), DS_OUTPUTSPACE("outputSpace"), DS_GLOBALSPACE("globalSpace"), DS_USERSPACE(
+            "userSpace"), DS_INPUTFILES("inputFiles"), DS_OUTPUTFILES("outputFiles"), DS_FILES("files");
 
     private String xmlName;
 

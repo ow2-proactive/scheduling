@@ -80,6 +80,8 @@ public abstract class Job extends CommonAttribute {
 
     protected String inputSpace = null;
     protected String outputSpace = null;
+    protected String globalSpace = null;
+    protected String userSpace = null;
 
     /** ProActive Empty Constructor */
     public Job() {
@@ -220,9 +222,36 @@ public abstract class Job extends CommonAttribute {
     /**
      * Set the output Space value to the given outputSpace value
      *
-     * @param outputDataSpaceURL the outputDataSpaceURL to set
+     * @param outputSpace the outputDataSpaceURL to set
      */
     public void setOutputSpace(String outputSpace) {
         this.outputSpace = outputSpace;
     }
+
+    public String getGlobalSpace() {
+        return globalSpace;
+    }
+
+    /**
+     * Set the global Space value to the given GLOBAL space string value
+     *
+     * @param globalSpace the globalDataSpaceURL to set
+     */
+    public void setGlobalSpace(String globalSpace) {
+        this.globalSpace = globalSpace;
+    }
+
+    public String getUserSpace() {
+        return userSpace;
+    }
+
+    /**
+     * Set the USER space value to the given USER space string value
+     *
+     * @param userSpace the userDataSpaceURL to set
+     */
+    public void setUserSpace(String userSpace) {
+        this.userSpace = userSpace;
+    }
+
 }

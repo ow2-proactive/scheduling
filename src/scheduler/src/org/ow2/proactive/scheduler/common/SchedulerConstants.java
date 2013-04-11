@@ -70,6 +70,9 @@ public class SchedulerConstants {
     /** Name of the GlobalSpace for DataSpaces registration */
     public static final String GLOBALSPACE_NAME = "GLOBALSPACE";
 
+    /** Name of the GlobalSpace for DataSpaces registration */
+    public static final String USERSPACE_NAME = "USERSPACE";
+
     /** Default taskid directory name (used in TaskLauncher) */
     public static final String TASKID_DIR_DEFAULT_NAME = "TASKID";
 
@@ -90,4 +93,9 @@ public class SchedulerConstants {
 
     /** Attribute name in task the generic information indicating that the task requires a node protedcted by token */
     public static final String NODE_ACCESS_TOKEN = "NODE_ACCESS_TOKEN";
+
+    /**
+     * The Application ID used by the scheduler for local Dataspaces
+     */
+    public static long SCHEDULER_DATASPACE_APPLICATION_ID = 0;
 }

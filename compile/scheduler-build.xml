@@ -189,6 +189,7 @@
 
 		<!-- Convert Relax NG schema from compact syntax to W3C Schema -->
 		<trang failonerror="true" input="${schemas.dir}/${export.schema.name}.rnc" output="${schemas.dir}/${export.schema.name}.xsd" />
+        <!-- remove unwanted tags in the final results -->
 		<xslt style="${base.dir}/dev/lib/trang/removeStuff.xsl" in="${schemas.dir}/${export.schema.name}.xsd" out="${schemas.dir}/temp.xsd" />
 		<delete>
 			<fileset dir="${schemas.dir}/">

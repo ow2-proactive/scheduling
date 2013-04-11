@@ -79,6 +79,20 @@ import org.ow2.proactive.scheduler.policy.Policy;
 public interface Scheduler extends SchedulerUsage {
 
     /**
+     * Returns the USER DataSpace URI associated with the current user
+     * @return user USER Space URI
+     * @throws NotConnectedException if you are not authenticated.
+     */
+    public String getUserSpaceURI() throws NotConnectedException;
+
+    /**
+     * Returns the GLOBAL DataSpace URI available to all users
+     * @return user GLOBAL Space URI
+     * @throws NotConnectedException if you are not authenticated.
+     */
+    public String getGlobalSpaceURI() throws NotConnectedException;
+
+    /**
      * Get the result for the given jobId.
      * A user can only get HIS result back except if he is admin.<br>
      * If the job does not exist, a schedulerException is sent with the proper message.<br>

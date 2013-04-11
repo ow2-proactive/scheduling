@@ -99,6 +99,7 @@
 							The INPUT space URL represents an abstract (or real) link to a real dataSpace.
 							It is used for data transfer and offers a way to get files to be computed
 							on the task execution side. (see <xref linkend="Dataspace" /> for details)
+                            If it is not defined in the job, one will be provided by the scheduler as default.
 						</para>
 					</listitem>
 					<listitem>
@@ -107,8 +108,28 @@
 							The OUTPUT space URL represents an abstract (or real) link to a real dataSpace.
 							It is used for data transfer and offers a way to put produced files from the task
 							execution side to this OUTPUT space. (see <xref linkend="Dataspace" /> for details)
+                            If it is not defined in the job, one will be provided by the scheduler as default.
 						</para>
 					</listitem>
+                    <listitem>
+                        <para>
+                            <emphasis>globalSpace</emphasis> (optional) - URL that define the GLOBAL space of the job.
+                            The GLOBAL space URL is like an INPUT or OUTPUT space but has the particularity to be shared by all users and all jobs.
+                            If it is not defined in the job, one will be provided by the scheduler as default. The scheduler
+                            USER space URI and local Path are accessible via the methods getGlobalSpaceURI() and getGlobalSpacePath()
+                            of the <emphasis>Scheduler</emphasis> interface available in the Java API.
+                        </para>
+                    </listitem>
+                    <listitem>
+                        <para>
+                            <emphasis>userSpace</emphasis> (optional) - URL that define the USER space of the job.
+                            The USER space URL is like a GLOBAL space but is specific to one user.
+                            If it is not defined in the job, one will be provided by the scheduler as default. This default USER space
+                            will be created for each user when he first connects to the scheduler. The scheduler
+                            USER space URI and local Path are accessible via the methods getUserSpaceURI() and getUserSpacePath()
+                            of the <emphasis>Scheduler</emphasis> interface available in the Java API.
+                        </para>
+                    </listitem>
 				</itemizedlist>
 			</para>
 				<warning><para> The jobClasspath mechanism relies on the file transfer. The size of the jobClasspath
@@ -1296,9 +1317,9 @@ job.setOutputSpace("paprmi://host:1099/myOutputSpace?proactive_vfs_provider_path
 						<listitem>
 							<para>
 								<emphasis>accessMode</emphasis>: specify if the selected files has to be transferred from
-								INPUT or OUTPUT or GLOBAL, to OUTPUT or GLOBAL, or not transferred. (mandatory)
-								Possible values for the input files are: 'transferFromInputSpace', 'transferFromOutputSpace', 'transferFromGlobalSpace', 'none'.
-								Possible values for the output files are: 'transferToOutputSpace','transferToGlobalSpace',  'none'.
+								INPUT, OUTPUT, GLOBAL or USER, to OUTPUT, GLOBAL or USER, or not transferred. (mandatory)
+								Possible values for the input files are: 'transferFromInputSpace', 'transferFromOutputSpace', 'transferFromGlobalSpace', 'transferFromUserSpace', 'none'.
+								Possible values for the output files are: 'transferToOutputSpace','transferToGlobalSpace','transferToUserSpace',  'none'.
 							</para>
 						</listitem>
 						<listitem>
@@ -1415,6 +1436,13 @@ t.setCommandLine(new String[]{"myExec", "$LOCALSPACE/tata", "$LOCALSPACE/txt", "
 									(Warning ! Files are probably not on the node host)
 								</para>
 							</listitem>
+                            <listitem>
+                                <para>
+                                    <emphasis>getUserSpace()</emphasis>: retrieves the root of USER space.
+                                    You will get a DataSpacesFileObject on which it is possible to perform some file operations.
+                                    (Warning ! Files are probably not on the node host)
+                                </para>
+                            </listitem>
 							<listitem>
 								<para>
 									<emphasis>getLocalSpace()</emphasis>: retrieves the root of the LOCAL space.
@@ -1448,6 +1476,15 @@ t.setCommandLine(new String[]{"myExec", "$LOCALSPACE/tata", "$LOCALSPACE/txt", "
 									(Warning ! Files are probably not on the node host)
 								</para>
 							</listitem>
+                            <listitem>
+                                <para>
+                                    <emphasis>getUserFile(pathName)</emphasis>: selects the file located at "pathName" in the USER space.
+                                    "pathName" has to be relative to the root of the USER.
+                                    You will get a DataSpacesFileObject on which it is possible to perform some file operations.
+                                    File can be moved, copied, read or written.
+                                    (Warning ! Files are probably not on the node host)
+                                </para>
+                            </listitem>
 							<listitem>
 								<para>
 									<emphasis>getLocalFile(pathName)</emphasis>: selects the file located at "pathName" in the LOCAL space.

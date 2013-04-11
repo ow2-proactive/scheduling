@@ -46,12 +46,18 @@ import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 public class DSWorker extends JavaExecutable {
 
     //set automatically by java executable
-    private String pc;
-    private String pd;
+    private String paa;
+    private String pbb;
+    private String pcc;
+    private String paaa;
+    private String pbbb;
+    private String pccc;
 
     @Override
     public Serializable execute(TaskResult... results) throws Throwable {
-        getOutputFile(pd).copyFrom(getOutputFile(pc), FileSelector.SELECT_SELF);
+        getOutputFile(paaa).copyFrom(getOutputFile(paa), FileSelector.SELECT_SELF);
+        getGlobalFile(pbbb).copyFrom(getGlobalFile(pbb), FileSelector.SELECT_SELF);
+        getUserFile(pccc).copyFrom(getUserFile(pcc), FileSelector.SELECT_SELF);
         return 0;
     }
 

@@ -1,5 +1,9 @@
 package functionaltests.schedulerdb;
 
+import java.util.Date;
+import java.util.List;
+
+import org.junit.Test;
 import org.ow2.proactive.db.DatabaseManagerException;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
@@ -9,11 +13,6 @@ import org.ow2.proactive.scheduler.common.usage.TaskUsage;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
-
-import java.util.Date;
-import java.util.List;
-
-import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;

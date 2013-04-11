@@ -38,23 +38,13 @@ package org.ow2.proactive.scheduler.job;
 
 import java.io.File;
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.node.NodeFactory;
-import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
-import org.objectweb.proactive.extensions.dataspaces.api.FileSelector;
 import org.objectweb.proactive.extensions.dataspaces.api.PADataSpaces;
-import org.objectweb.proactive.extensions.dataspaces.core.DataSpacesImpl;
-import org.objectweb.proactive.extensions.dataspaces.core.DataSpacesNodes;
-import org.objectweb.proactive.extensions.dataspaces.core.InputOutputSpaceConfiguration;
-import org.objectweb.proactive.extensions.dataspaces.core.SpaceInstanceInfo;
-import org.objectweb.proactive.extensions.dataspaces.core.SpaceType;
 import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.core.DataSpaceServiceStarter;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
 
@@ -83,79 +73,81 @@ public class JobDataSpaceApplication implements Serializable {
      * Start dataspace configuration and application for this job
      * This method will set the OUTPUT and OUTPUT fileObject that can be passed to node
      *
-     * @param inputURL the input URL given in the job, if null default scheduler INPUT space URL will be used
-     * @param outputURL the output URL given in the job, if null default scheduler OUTPUT space URL will be used
-     * @param username the owner of the job
-     * @param id unique identificator for the current job; used to separated GLOBAL space among jobs
+     * @param inputURL  the url of the input space given in the job, if null default scheduler INPUT space URL will be used
+     * @param outputURL the url of the output space given in the job, if null default scheduler OUTPUT space URL will be used
+     * @param globalURL the url of the global space given in the job, if null default scheduler GLOBAL space URL will be used
+     * @param userURL   the url of the user space given in the job, if null default scheduler USER space URL will be used
+     * @param username  the owner of the job
+     * @param jobId     unique identifier for the current job; can used to separated GLOBAL space among jobs
      */
-    public void startDataSpaceApplication(String inputURL, String outputURL, String username, JobId jobId) {
+    public void startDataSpaceApplication(String inputURL, String outputURL, String globalURL,
+            String userURL, String username, JobId jobId) {
         if (!alreadyRegistered) {
             try {
-                // create list of spaces
-                Set<SpaceInstanceInfo> predefinedSpaces = new HashSet<SpaceInstanceInfo>();
-                InputOutputSpaceConfiguration isc;
-                InputOutputSpaceConfiguration osc;
-                InputOutputSpaceConfiguration glob;
 
                 // create INPUT space
                 if (inputURL != null) {
-                    isc = InputOutputSpaceConfiguration.createInputSpaceConfiguration(inputURL, null, null,
-                            PADataSpaces.DEFAULT_IN_OUT_NAME);
+                    DataSpaceServiceStarter.createSpace(applicationId, PADataSpaces.DEFAULT_IN_OUT_NAME,
+                            inputURL, null, null, true, false);
                 } else {
-                    String localpath = null;
-                    String hostname = null;
-                    if (PASchedulerProperties.DATASPACE_DEFAULTINPUTURL_LOCALPATH.isSet() &&
-                        PASchedulerProperties.DATASPACE_DEFAULTINPUTURL_HOSTNAME.isSet()) {
-                        localpath = PASchedulerProperties.DATASPACE_DEFAULTINPUTURL_LOCALPATH
-                                .getValueAsString() +
-                            File.separator + username;
-                        hostname = PASchedulerProperties.DATASPACE_DEFAULTINPUTURL_HOSTNAME
-                                .getValueAsString();
-                    }
-                    isc = InputOutputSpaceConfiguration.createInputSpaceConfiguration(
-                            PASchedulerProperties.DATASPACE_DEFAULTINPUTURL.getValueAsString() + username,
-                            localpath, hostname, PADataSpaces.DEFAULT_IN_OUT_NAME);
+                    String localpath = PASchedulerProperties.DATASPACE_DEFAULTINPUT_LOCALPATH
+                            .getValueAsStringOrNull();
+                    String hostname = PASchedulerProperties.DATASPACE_DEFAULTINPUT_HOSTNAME
+                            .getValueAsStringOrNull();
+                    DataSpaceServiceStarter.createSpace(applicationId, PADataSpaces.DEFAULT_IN_OUT_NAME,
+                            PASchedulerProperties.DATASPACE_DEFAULTINPUT_URL.getValueAsString() + username,
+                            localpath != null ? localpath + File.separator + username : null, hostname, true,
+                            false);
                 }
                 // create OUTPUT space
                 if (outputURL != null) {
-                    osc = InputOutputSpaceConfiguration.createOutputSpaceConfiguration(outputURL, null, null,
-                            PADataSpaces.DEFAULT_IN_OUT_NAME);
+                    DataSpaceServiceStarter.createSpace(applicationId, PADataSpaces.DEFAULT_IN_OUT_NAME,
+                            outputURL, null, null, false, false);
                 } else {
-                    String localpath = null;
-                    String hostname = null;
-                    if (PASchedulerProperties.DATASPACE_DEFAULTOUTPUTURL_LOCALPATH.isSet() &&
-                        PASchedulerProperties.DATASPACE_DEFAULTOUTPUTURL_HOSTNAME.isSet()) {
-                        localpath = PASchedulerProperties.DATASPACE_DEFAULTOUTPUTURL_LOCALPATH
-                                .getValueAsString() +
-                            File.separator + username;
-                        hostname = PASchedulerProperties.DATASPACE_DEFAULTOUTPUTURL_HOSTNAME
-                                .getValueAsString();
-                    }
-                    osc = InputOutputSpaceConfiguration.createOutputSpaceConfiguration(
-                            PASchedulerProperties.DATASPACE_DEFAULTOUTPUTURL.getValueAsString() + username,
-                            localpath, hostname, PADataSpaces.DEFAULT_IN_OUT_NAME);
+                    String localpath = PASchedulerProperties.DATASPACE_DEFAULTOUTPUT_LOCALPATH
+                            .getValueAsStringOrNull();
+                    String hostname = PASchedulerProperties.DATASPACE_DEFAULTOUTPUT_HOSTNAME
+                            .getValueAsStringOrNull();
+                    DataSpaceServiceStarter.createSpace(applicationId, PADataSpaces.DEFAULT_IN_OUT_NAME,
+                            PASchedulerProperties.DATASPACE_DEFAULTOUTPUT_URL.getValueAsString() + username,
+                            localpath != null ? localpath + File.separator + username : null, hostname,
+                            false, false);
+                }
+                // create GLOBAL shared space
+                if (globalURL != null) {
+                    DataSpaceServiceStarter.createSpace(applicationId, SchedulerConstants.GLOBALSPACE_NAME,
+                            globalURL, null, null, false, false);
+                } else {
+                    String localpath = PASchedulerProperties.DATASPACE_DEFAULTGLOBAL_LOCALPATH
+                            .getValueAsStringOrNull();
+                    String hostname = PASchedulerProperties.DATASPACE_DEFAULTGLOBAL_HOSTNAME
+                            .getValueAsStringOrNull();
+
+                    DataSpaceServiceStarter.createSpace(applicationId, SchedulerConstants.GLOBALSPACE_NAME,
+                            PASchedulerProperties.DATASPACE_DEFAULTGLOBAL_URL.getValueAsString(), localpath,
+                            hostname, false, false);
                 }
 
-                if (PASchedulerProperties.DATASPACE_GLOBAL_URL.isSet()) {
-                    String localpath = null;
-                    String hostname = null;
-                    if (PASchedulerProperties.DATASPACE_GLOBAL_URL_LOCALPATH.isSet() &&
-                        PASchedulerProperties.DATASPACE_GLOBAL_URL_HOSTNAME.isSet()) {
-                        localpath = PASchedulerProperties.DATASPACE_GLOBAL_URL_LOCALPATH.getValueAsString() +
-                            File.separator + jobId.value();
-                        hostname = PASchedulerProperties.DATASPACE_GLOBAL_URL_LOCALPATH.getValueAsString();
+                // create USER space for this job, the application ID of this user space will be the AppId of the job
+                if (userURL != null) {
+                    DataSpaceServiceStarter.createSpace(applicationId, SchedulerConstants.USERSPACE_NAME,
+                            userURL, null, null, false, false);
+                } else {
+                    String localpath = PASchedulerProperties.DATASPACE_DEFAULTUSER_LOCALPATH
+                            .getValueAsStringOrNull();
+                    String hostname = PASchedulerProperties.DATASPACE_DEFAULTUSER_HOSTNAME
+                            .getValueAsStringOrNull();
+                    if (localpath != null) {
+                        localpath = localpath + File.separator + username;
+                        File localPathFile = new File(localpath);
+                        if (!localPathFile.exists()) {
+                            localPathFile.mkdirs();
+                        }
                     }
-                    glob = InputOutputSpaceConfiguration.createOutputSpaceConfiguration(
-                            PASchedulerProperties.DATASPACE_GLOBAL_URL.getValueAsString() + File.separator +
-                                jobId.value(), localpath, hostname, SchedulerConstants.GLOBALSPACE_NAME);
-
-                    predefinedSpaces.add(new SpaceInstanceInfo(applicationId, glob));
+                    DataSpaceServiceStarter.createSpace(applicationId, SchedulerConstants.USERSPACE_NAME,
+                            PASchedulerProperties.DATASPACE_DEFAULTUSER_URL.getValueAsString() + username,
+                            localpath, hostname, false, false);
                 }
-
-                predefinedSpaces.add(new SpaceInstanceInfo(applicationId, isc));
-                predefinedSpaces.add(new SpaceInstanceInfo(applicationId, osc));
-                // register application
-                namingService.registerApplication(applicationId, predefinedSpaces);
                 alreadyRegistered = true;
             } catch (Exception e) {
                 logger.warn("", e);
@@ -164,30 +156,6 @@ public class JobDataSpaceApplication implements Serializable {
     }
 
     public void terminateDataSpaceApplication() {
-        // remove GLOBAL sub directory for this job
-        if (PASchedulerProperties.DATASPACE_GLOBAL_URL.isSet()) {
-            try {
-                Node node = NodeFactory.getDefaultNode();
-                DataSpacesNodes.configureNode(node, null);
-                DataSpacesNodes.configureApplication(node, this.applicationId, this.namingServiceURL);
-
-                DataSpacesImpl impl = DataSpacesNodes.getDataSpacesImpl(node);
-                DataSpacesFileObject global = impl.resolveInputOutput(SchedulerConstants.GLOBALSPACE_NAME,
-                        SpaceType.OUTPUT, null);
-                global.delete(FileSelector.SELECT_ALL);
-                global.delete();
-            } catch (Throwable e) {
-                logger.warn("Could not clear GLOBAL subdir", e);
-            } finally {
-                try {
-                    Node node = NodeFactory.getDefaultNode();
-                    DataSpacesNodes.tryCloseNodeApplicationConfig(node);
-                    DataSpacesNodes.closeNodeConfig(node);
-                } catch (Throwable e) {
-                }
-            }
-        }
-
         try {
             namingService.unregisterApplication(applicationId);
         } catch (Exception e) {

@@ -412,6 +412,10 @@ public class JobFactory_stax extends JobFactory {
                             jtmp.setInputSpace(getIOSpace(cursorJob));
                         } else if (XMLTags.DS_OUTPUTSPACE.matches(current)) {
                             jtmp.setOutputSpace(getIOSpace(cursorJob));
+                        } else if (XMLTags.DS_GLOBALSPACE.matches(current)) {
+                            jtmp.setGlobalSpace(getIOSpace(cursorJob));
+                        } else if (XMLTags.DS_USERSPACE.matches(current)) {
+                            jtmp.setGlobalSpace(getIOSpace(cursorJob));
                         } else if (XMLTags.TASKFLOW.matches(current)) {
                             job = new TaskFlowJob();
                             continu = false;
@@ -431,6 +435,8 @@ public class JobFactory_stax extends JobFactory {
             job.setGenericInformations(jtmp.getGenericInformations());
             job.setInputSpace(jtmp.getInputSpace());
             job.setOutputSpace(jtmp.getOutputSpace());
+            job.setGlobalSpace(jtmp.getGlobalSpace());
+            job.setUserSpace(jtmp.getUserSpace());
         } catch (JobCreationException jce) {
             jce.pushTag(cursorJob.getLocalName());
             throw jce;
@@ -1103,7 +1109,7 @@ public class JobFactory_stax extends JobFactory {
      * Leave the method with cursor at the end of the corresponding script.
      *
      * @param cursorScript the streamReader with the cursor on the corresponding script tag (pre, post, cleaning, selection, generation).
-     * @param selection nature of the script : 1 : selection
+     * @param type nature of the script : 1 : selection
      *                                         2 : flow
      *                                         3 : else
      * @return the script defined at the specified cursor.

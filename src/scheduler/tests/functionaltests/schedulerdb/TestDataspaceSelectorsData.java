@@ -33,29 +33,36 @@ public class TestDataspaceSelectorsData extends BaseSchedulerDBTest {
         FileSelector fileSelector;
 
         task.addInputFiles(new FileSelector(inInclude1, inExclude1), InputAccessMode.TransferFromGlobalSpace);
+        task.addInputFiles(new FileSelector(inInclude1, inExclude1), InputAccessMode.TransferFromUserSpace);
         fileSelector = new FileSelector(inInclude2, inExclude2);
         fileSelector.setCaseSensitive(false);
         task.addInputFiles(fileSelector, InputAccessMode.TransferFromInputSpace);
 
         task.addOutputFiles(new FileSelector(outInclude1, outExclude1),
                 OutputAccessMode.TransferToGlobalSpace);
+        task.addOutputFiles(new FileSelector(outInclude1, outExclude1), OutputAccessMode.TransferToUserSpace);
         fileSelector = new FileSelector(outInclude2, outExclude2);
         fileSelector.setCaseSensitive(false);
-        task.addOutputFiles(fileSelector, OutputAccessMode.TransferToGlobalSpace);
+        task.addOutputFiles(fileSelector, OutputAccessMode.TransferToOutputSpace);
 
         jobDef.addTask(task);
 
         InternalJob job = defaultSubmitJobAndLoadInternal(true, jobDef);
         InternalTask task1 = job.getTask("task1");
-        Assert.assertEquals(2, task1.getInputFilesList().size());
+        Assert.assertEquals(3, task1.getInputFilesList().size());
         Assert.assertEquals(InputAccessMode.TransferFromGlobalSpace, task1.getInputFilesList().get(0)
                 .getMode());
-        Assert.assertEquals(2, task1.getOutputFilesList().size());
+        Assert
+                .assertEquals(InputAccessMode.TransferFromUserSpace, task1.getInputFilesList().get(1)
+                        .getMode());
+        Assert.assertEquals(3, task1.getOutputFilesList().size());
 
         checkSelector(task1.getInputFilesList().get(0).getInputFiles(), inInclude1, inExclude1, true);
-        checkSelector(task1.getInputFilesList().get(1).getInputFiles(), inInclude2, inExclude2, false);
+        checkSelector(task1.getInputFilesList().get(1).getInputFiles(), inInclude1, inExclude1, true);
+        checkSelector(task1.getInputFilesList().get(2).getInputFiles(), inInclude2, inExclude2, false);
         checkSelector(task1.getOutputFilesList().get(0).getOutputFiles(), outInclude1, outExclude1, true);
-        checkSelector(task1.getOutputFilesList().get(1).getOutputFiles(), outInclude2, outExclude2, false);
+        checkSelector(task1.getOutputFilesList().get(1).getOutputFiles(), outInclude1, outExclude1, true);
+        checkSelector(task1.getOutputFilesList().get(2).getOutputFiles(), outInclude2, outExclude2, false);
     }
 
     private void checkSelector(FileSelector selector, String[] inc, String[] exc, boolean cs) {

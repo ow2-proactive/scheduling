@@ -37,6 +37,7 @@
 package org.ow2.proactive.scripting;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -71,7 +72,12 @@ public class ScriptHandler implements Serializable {
         try {
             return script.execute(additionalBindings);
         } catch (Throwable t) {
-            return new ScriptResult<T>(t);
+            ScriptException se = new ScriptException("An exception occurred while executing the script " +
+                script.getClass().getSimpleName() +
+                ((script.parameters != null) ? " with parameters=" + Arrays.asList(script.parameters) : "") +
+                ", and content:\n" + script.getScript(), t);
+
+            return new ScriptResult<T>(se);
         }
     }
 

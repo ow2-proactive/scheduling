@@ -34,14 +34,13 @@
  */
 package org.ow2.proactive.scheduler.common.usage;
 
-import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
-import org.ow2.proactive.scheduler.common.exception.PermissionException;
-import org.ow2.proactive.scheduler.common.usage.JobUsage;
-
 import java.util.Date;
 import java.util.List;
 
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
+import org.ow2.proactive.scheduler.common.exception.PermissionException;
+
 
 
 /**

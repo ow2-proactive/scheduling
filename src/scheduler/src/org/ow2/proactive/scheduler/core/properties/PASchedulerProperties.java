@@ -36,12 +36,12 @@
  */
 package org.ow2.proactive.scheduler.core.properties;
 
-import org.objectweb.proactive.annotation.PublicAPI;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
+
+import org.objectweb.proactive.annotation.PublicAPI;
 
 
 /**
@@ -205,32 +205,38 @@ public enum PASchedulerProperties {
     /* ***************************************************************** */
 
     /** Default INPUT space URL. Used to define INPUT space of each job that does not define an INPUT space. */
-    DATASPACE_DEFAULTINPUTURL("pa.scheduler.dataspace.defaultinputurl", PropertyType.STRING),
+    DATASPACE_DEFAULTINPUT_URL("pa.scheduler.dataspace.defaultinput.url", PropertyType.STRING),
 
     /** Default INPUT space path. Used to define the same INPUT space but with a local (faster) access (if possible). */
-    DATASPACE_DEFAULTINPUTURL_LOCALPATH("pa.scheduler.dataspace.defaultinputurl.localpath",
-            PropertyType.STRING),
+    DATASPACE_DEFAULTINPUT_LOCALPATH("pa.scheduler.dataspace.defaultinput.localpath", PropertyType.STRING),
 
     /** Host name from which the localpath is accessible */
-    DATASPACE_DEFAULTINPUTURL_HOSTNAME("pa.scheduler.dataspace.defaultinputurl.hostname", PropertyType.STRING),
+    DATASPACE_DEFAULTINPUT_HOSTNAME("pa.scheduler.dataspace.defaultinput.hostname", PropertyType.STRING),
 
     /** The same for the OUPUT */
-    DATASPACE_DEFAULTOUTPUTURL("pa.scheduler.dataspace.defaultoutputurl", PropertyType.STRING),
+    DATASPACE_DEFAULTOUTPUT_URL("pa.scheduler.dataspace.defaultoutput.url", PropertyType.STRING),
     /** */
-    DATASPACE_DEFAULTOUTPUTURL_LOCALPATH("pa.scheduler.dataspace.defaultoutputurl.localpath",
-            PropertyType.STRING),
+    DATASPACE_DEFAULTOUTPUT_LOCALPATH("pa.scheduler.dataspace.defaultoutput.localpath", PropertyType.STRING),
     /** */
-    DATASPACE_DEFAULTOUTPUTURL_HOSTNAME("pa.scheduler.dataspace.defaultoutputurl.hostname",
-            PropertyType.STRING),
+    DATASPACE_DEFAULTOUTPUT_HOSTNAME("pa.scheduler.dataspace.defaultoutput.hostname", PropertyType.STRING),
 
-    /** GlobalSpace URL : DataSpaces for all nodes */
-    DATASPACE_GLOBAL_URL("pa.scheduler.dataspace.globalurl", PropertyType.STRING),
+    /** Default Global space URL for all user. This space is supposed public to all users.
+     * Used to define a Global space of each job that does not define a Global space
+     **/
+    DATASPACE_DEFAULTGLOBAL_URL("pa.scheduler.dataspace.defaultglobal.url", PropertyType.STRING),
+    /** */
+    DATASPACE_DEFAULTGLOBAL_LOCALPATH("pa.scheduler.dataspace.defaultglobal.localpath", PropertyType.STRING),
+    /** */
+    DATASPACE_DEFAULTGLOBAL_HOSTNAME("pa.scheduler.dataspace.defaultglobal.hostname", PropertyType.STRING),
 
-    /** GlobalSpace local shortcut */
-    DATASPACE_GLOBAL_URL_LOCALPATH("pa.scheduler.dataspace.globalurl.localpath", PropertyType.STRING),
-
-    /** GlobalSpace local shortcut hostname */
-    DATASPACE_GLOBAL_URL_HOSTNAME("pa.scheduler.dataspace.globalurl.hostname", PropertyType.STRING),
+    /** Default User Space URL
+     * Used to define a User space of each job which doesn't define one, the actual User Space will be inferred
+     * from this space by appending the username in the path */
+    DATASPACE_DEFAULTUSER_URL("pa.scheduler.dataspace.defaultuser.url", PropertyType.STRING),
+    /** */
+    DATASPACE_DEFAULTUSER_LOCALPATH("pa.scheduler.dataspace.defaultuser.localpath", PropertyType.STRING),
+    /** */
+    DATASPACE_DEFAULTUSER_HOSTNAME("pa.scheduler.dataspace.defaultuser.hostname", PropertyType.STRING),
 
     /* ***************************************************************** */
     /* ************************* LOGS PROPERTIES *********************** */
@@ -523,6 +529,25 @@ public enum PASchedulerProperties {
             return prop.getProperty(key);
         } else {
             return "";
+        }
+    }
+
+    /**
+     * Returns the value of this property as a string.
+     * If the property is not defined, then null is returned
+     *
+     * @return the value of this property.
+     */
+    public String getValueAsStringOrNull() {
+        Properties prop = getProperties(null);
+        if (fileLoaded) {
+            String ret = prop.getProperty(key);
+            if ("".equals(ret)) {
+                return null;
+            }
+            return ret;
+        } else {
+            return null;
         }
     }
 

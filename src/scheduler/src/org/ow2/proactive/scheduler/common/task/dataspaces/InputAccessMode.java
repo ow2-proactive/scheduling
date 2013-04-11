@@ -54,6 +54,8 @@ public enum InputAccessMode {
     TransferFromOutputSpace("TransferFromOutputSpace"),
     /** GLOBAL to LOCAL */
     TransferFromGlobalSpace("TransferFromGlobalSpace"),
+    /** USER to LOCAL */
+    TransferFromUserSpace("TransferFromUserSpace"),
     /** Do nothing */
     none("none");
 
@@ -70,6 +72,8 @@ public enum InputAccessMode {
             return TransferFromOutputSpace;
         } else if (TransferFromGlobalSpace.title.equalsIgnoreCase(accessMode)) {
             return TransferFromGlobalSpace;
+        } else if (TransferFromUserSpace.title.equalsIgnoreCase(accessMode)) {
+            return TransferFromUserSpace;
         } else if (none.title.equalsIgnoreCase(accessMode)) {
             return none;
         } else {

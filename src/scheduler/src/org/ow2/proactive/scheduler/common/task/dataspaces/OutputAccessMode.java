@@ -52,6 +52,8 @@ public enum OutputAccessMode {
     TransferToOutputSpace("TransferToOutputSpace"),
     /** LOCAL to GLOBAL */
     TransferToGlobalSpace("TransferToGlobalSpace"),
+    /** LOCAL to GLOBAL */
+    TransferToUserSpace("TransferToUserSpace"),
     /** Do nothing */
     none("none");
 
@@ -66,6 +68,8 @@ public enum OutputAccessMode {
             return TransferToOutputSpace;
         } else if (TransferToGlobalSpace.title.equalsIgnoreCase(accessMode)) {
             return TransferToGlobalSpace;
+        } else if (TransferToUserSpace.title.equalsIgnoreCase(accessMode)) {
+            return TransferToUserSpace;
         } else if (none.title.equalsIgnoreCase(accessMode)) {
             return none;
         } else {

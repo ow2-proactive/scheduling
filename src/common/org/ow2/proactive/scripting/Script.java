@@ -38,6 +38,7 @@ package org.ow2.proactive.scripting;
 
 import java.io.*;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -297,8 +298,12 @@ public abstract class Script<E> implements Serializable {
                 return new ScriptResult<E>(new Exception("An exception occurred while executing the script ",
                     finale));
             }
-            logger.error("", e);
-            return new ScriptResult<E>(new Exception("An exception occurred while executing the script ", e));
+            ScriptException se = new ScriptException("An exception occurred while executing the script " +
+                this.getClass().getSimpleName() +
+                (parameters != null ? " with parameters=" + Arrays.asList(parameters) : "") +
+                ", and content:\n" + script, e);
+            logger.error("", se);
+            return new ScriptResult<E>(se);
 
         }
     }

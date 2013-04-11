@@ -56,6 +56,14 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
+import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
+import org.objectweb.proactive.extensions.dataspaces.api.PADataSpaces;
+import org.objectweb.proactive.extensions.dataspaces.core.InputOutputSpaceConfiguration;
+import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
+import org.objectweb.proactive.extensions.dataspaces.exceptions.ConfigurationException;
+import org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemException;
+import org.objectweb.proactive.extensions.dataspaces.exceptions.NotConfiguredException;
+import org.objectweb.proactive.extensions.dataspaces.exceptions.SpaceNotFoundException;
 import org.objectweb.proactive.utils.NamedThreadFactory;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.db.DatabaseManagerException;
@@ -92,8 +100,8 @@ import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.task.SimpleTaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.ow2.proactive.scheduler.common.usage.JobUsage;
 import org.ow2.proactive.scheduler.common.task.TaskState;
+import org.ow2.proactive.scheduler.common.usage.JobUsage;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.core.account.SchedulerAccountsManager;
 import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
@@ -124,28 +132,49 @@ import org.ow2.proactive.utils.Tools;
 @ActiveObject
 public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
 
-    /** Delay to wait for between getting a job result and removing the job concerned */
+    /**
+     * Delay to wait for between getting a job result and removing the job concerned
+     */
     private static final long SCHEDULER_REMOVED_JOB_DELAY = PASchedulerProperties.SCHEDULER_REMOVED_JOB_DELAY
             .getValueAsInt() * 1000;
 
-    /** Scheduler logger */
+    /**
+     * Scheduler logger
+     */
     public static final Logger logger = Logger.getLogger(SchedulingService.class);
     public static final TaskLogger tlogger = TaskLogger.getInstance();
     public static final JobLogger jlogger = JobLogger.getInstance();
 
-    /** Temporary rmURL at starting process */
+    /**
+     * Temporary rmURL at starting process
+     */
     private URI rmURL;
 
-    /** Authentication Interface */
+    /**
+     * Authentication Interface
+     */
     private SchedulerAuthentication authentication;
 
-    /** Full name of the policy class */
+    /**
+     * Full name of the policy class
+     */
     private String policyFullName;
 
-    /** Users Statistics Manager */
+    /**
+     * Users Statistics Manager
+     */
     private SchedulerAccountsManager accountsManager;
 
-    /** JMX Helper reference */
+    /**
+     * Naming service used for DataSpaces
+     */
+    private NamingService namingService;
+
+    private DataSpacesFileObject globalSpace;
+
+    /**
+     * JMX Helper reference
+     */
     private SchedulerJMXHelper jmxHelper;
 
     private SchedulingService schedulingService;
@@ -169,8 +198,8 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     /**
      * Scheduler Front-end constructor.
      *
-     * @param rmURL a started Resource Manager URL which
-     *              be able to managed the resource used by scheduler.
+     * @param rmURL               a started Resource Manager URL which
+     *                            be able to managed the resource used by scheduler.
      * @param policyFullClassName the full class name of the policy to use.
      */
     public SchedulerFrontend(URI rmURL, String policyFullClassName) {
@@ -246,6 +275,24 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
             logger.info("Registering scheduler...");
             PAActiveObject.registerByName(authentication, SchedulerConstants.SCHEDULER_DEFAULT_NAME);
             authentication.setActivated(true);
+
+            // get Global Space
+            DataSpaceServiceStarter dsStarter = schedulingService.getInfrastructure()
+                    .getDataSpaceServiceStarter();
+
+            namingService = dsStarter.getNamingService();
+            try {
+                globalSpace = PADataSpaces.resolveOutput(SchedulerConstants.GLOBALSPACE_NAME);
+            } catch (SpaceNotFoundException e) {
+                logger.error("", e);
+            } catch (FileSystemException e) {
+                logger.error("", e);
+            } catch (NotConfiguredException e) {
+                logger.error("", e);
+            } catch (ConfigurationException e) {
+                logger.error("", e);
+            }
+
             // run !!
         } catch (Exception e) {
             logger.error("", e);
@@ -264,13 +311,63 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
      * Connect a new user on the scheduler.
      * This user can interact with the scheduler according to his right.
      *
-     * @param sourceBodyID the source ID of the connected object representing a user
+     * @param sourceBodyID   the source ID of the connected object representing a user
      * @param identification the identification of the connected user
      * @throws SchedulerException If an error occurred during connection with the front-end.
      */
     public void connect(UniqueID sourceBodyID, UserIdentificationImpl identification, Credentials cred)
             throws AlreadyConnectedException {
         frontendState.connect(sourceBodyID, identification, cred);
+        registerUserSpace(identification);
+    }
+
+    /**
+     * This method creates a dedicated USER space for the user which successfully connected
+     * This USER space is a subspace of the scheduler default USER space,
+     * A sub-folder named with the username is created to contain the USER space
+     *
+     * @param identification
+     */
+    private void registerUserSpace(UserIdentificationImpl identification) {
+        if (frontendState.getUserSpace(identification) == null) {
+            DataSpacesFileObject userSpace = null;
+            InputOutputSpaceConfiguration user;
+
+            String userSpaceName = SchedulerConstants.USERSPACE_NAME + "_" + identification.getUsername();
+
+            if (!PASchedulerProperties.DATASPACE_DEFAULTUSER_URL.isSet()) {
+                logger.error("URL of the default USER space is not set");
+                throw new IllegalStateException("The URL of the default USER space is not set");
+            }
+
+            String localpath = PASchedulerProperties.DATASPACE_DEFAULTUSER_LOCALPATH.getValueAsStringOrNull();
+            String hostname = PASchedulerProperties.DATASPACE_DEFAULTUSER_HOSTNAME.getValueAsStringOrNull();
+            if (localpath != null) {
+                localpath = localpath + File.separator + identification.getUsername();
+                File localPathFile = new File(localpath);
+                if (!localPathFile.exists()) {
+                    localPathFile.mkdirs();
+                }
+            }
+
+            try {
+                // create the User Space for the given user
+                DataSpaceServiceStarter.createSpace(SchedulerConstants.SCHEDULER_DATASPACE_APPLICATION_ID,
+                        userSpaceName, PASchedulerProperties.DATASPACE_DEFAULTUSER_URL.getValueAsString() +
+                            File.separator + identification.getUsername(), localpath, hostname, false, true);
+
+                // immediately retrieve the User Space
+                userSpace = PADataSpaces.resolveOutput(userSpaceName);
+                logger.info("USER space for user " + identification.getUsername() + " is at " +
+                    userSpace.getRealURI());
+            } catch (Exception e) {
+                logger.error("", e);
+            }
+            // register the user GlobalSpace to the frontend state
+            frontendState.registerGlobalUserSpace(identification, userSpace);
+
+        }
+
     }
 
     /**
@@ -297,6 +394,39 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
         frontendState.jobSubmitted(job, ident);
 
         return job.getId();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getUserSpaceURI() throws NotConnectedException {
+        return frontendState.getUserSpace().getRealURI();
+    }
+
+    /**
+     * Returns the USER DataSpace Path associated with the current user
+     * This path is accessible only on the local file system of the scheduler
+     * @return user USER Space Path
+     * @throws NotConnectedException if you are not authenticated.
+     */
+    public String getUserSpacePath() throws NotConnectedException {
+        return frontendState.getUserSpacePath();
+    }
+
+    @Override
+    public String getGlobalSpaceURI() throws NotConnectedException {
+        return globalSpace.getRealURI();
+    }
+
+    /**
+     * Returns the GLOBAL DataSpace Path available to all users
+     * This path is accessible only on the local file system of the scheduler
+     * @return user GLOBAL Space Path
+     * @throws NotConnectedException if you are not authenticated.
+     */
+    public String getGlobalSpacePath() throws NotConnectedException {
+        return PASchedulerProperties.DATASPACE_DEFAULTGLOBAL_LOCALPATH.getValueAsString();
     }
 
     /**
@@ -790,7 +920,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
 
     /**
      * Terminate the schedulerConnexion active object and then this object.
-     * 
+     *
      * @return always true;
      */
     public boolean terminate() {
@@ -887,7 +1017,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     public List<JobInfo> getJobs(int offset, int limit, JobFilterCriteria filterCriteria,
             List<SortParameter<JobSortParameter>> sortParameters) throws NotConnectedException,
             PermissionException {
-        UserIdentificationImpl ident = frontendState.checkPermission("loadJobs",
+        UserIdentificationImpl ident = frontendState.checkPermission("getJobs",
                 "You don't have permissions to load jobs");
 
         boolean myJobsOnly = filterCriteria.isMyJobsOnly();

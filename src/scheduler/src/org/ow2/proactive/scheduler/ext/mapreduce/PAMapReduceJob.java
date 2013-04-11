@@ -294,6 +294,14 @@ public class PAMapReduceJob {
                 logger.debug("The value of the output space of the ProActive MapReduce job is '" +
                     paMapReduceJobConfiguration.getOutputSpace() + "'");
 
+                tmpMapReduceWorkflow.setGlobalSpace(paMapReduceJobConfiguration.getGlobalSpace());
+                logger.debug("The value of the global space of the ProActive MapReduce job is '" +
+                    paMapReduceJobConfiguration.getGlobalSpace() + "'");
+
+                tmpMapReduceWorkflow.setUserSpace(paMapReduceJobConfiguration.getUserSpace());
+                logger.debug("The value of the user space of the ProActive MapReduce job is '" +
+                    paMapReduceJobConfiguration.getUserSpace() + "'");
+
                 // Set the classpath of the job
                 String[] classpath = paMapReduceJobConfiguration.getClasspath();
                 if (classpath != null) {
@@ -1015,7 +1023,7 @@ public class PAMapReduceJob {
      * Submit the TaskFlowJob representation of the Hadoop Job to the ProActive
      * Scheduler
      *
-     * @param taskFlowJob
+     * @param mapReduceWorkflow
      *            : the ProActive TaksFlowJob representation of the Hadoop Job
      * @return boolean true if the job is submitted successfully, false
      *         otherwise
@@ -1490,8 +1498,6 @@ public class PAMapReduceJob {
     /**
      * Initialize the list that represents the required properties that must be
      * set to be able to build the ProActive MapReduce taskflow
-     *
-     * @param requiredConfigurationProperties
      */
     protected List<String> initRequiredConfigurationProperties() {
         List<String> requiredConfigurationPropertyList = new ArrayList<String>();

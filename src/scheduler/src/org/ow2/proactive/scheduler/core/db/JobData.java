@@ -32,7 +32,6 @@ import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.InternalTaskFlowJob;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.job.JobInfoImpl;
-import org.ow2.proactive.scheduler.task.TaskIdImpl;
 
 
 @Entity
@@ -83,6 +82,10 @@ public class JobData {
 
     private String outputSpace;
 
+    private String globalSpace;
+
+    private String userSpace;
+
     private String description;
 
     private String projectName;
@@ -130,6 +133,8 @@ public class JobData {
         internalJob.setDescription(getDescription());
         internalJob.setInputSpace(getInputSpace());
         internalJob.setOutputSpace(getOutputSpace());
+        internalJob.setGlobalSpace(getGlobalSpace());
+        internalJob.setUserSpace(getGlobalSpace());
         internalJob.setMaxNumberOfExecution(getMaxNumberOfExecution());
         internalJob.setCancelJobOnError(isCancelJobOnError());
 
@@ -150,6 +155,8 @@ public class JobData {
         jobRuntimeData.setProjectName(job.getProjectName());
         jobRuntimeData.setInputSpace(job.getInputSpace());
         jobRuntimeData.setOutputSpace(job.getOutputSpace());
+        jobRuntimeData.setGlobalSpace(job.getGlobalSpace());
+        jobRuntimeData.setUserSpace(job.getUserSpace());
         jobRuntimeData.setGenericInformation(job.getGenericInformations(false));
         jobRuntimeData.setStatus(job.getStatus());
         jobRuntimeData.setOwner(job.getOwner());
@@ -253,6 +260,24 @@ public class JobData {
 
     public void setOutputSpace(String outputSpace) {
         this.outputSpace = outputSpace;
+    }
+
+    @Column(name = "GLOBAL_SPACE", updatable = false)
+    public String getGlobalSpace() {
+        return globalSpace;
+    }
+
+    public void setGlobalSpace(String globalSpace) {
+        this.globalSpace = globalSpace;
+    }
+
+    @Column(name = "USER_SPACE", updatable = false)
+    public String getUserSpace() {
+        return userSpace;
+    }
+
+    public void setUserSpace(String userSpace) {
+        this.userSpace = userSpace;
     }
 
     @Column(name = "DESCRIPTION", length = 1000, updatable = false)

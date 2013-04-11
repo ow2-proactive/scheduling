@@ -36,6 +36,7 @@
  */
 package org.ow2.proactive.scheduler.core;
 
+import java.io.File;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -51,6 +52,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.mop.MOP;
+import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.permissions.MethodCallPermission;
 import org.ow2.proactive.scheduler.common.NotificationData;
@@ -76,10 +78,6 @@ import org.ow2.proactive.scheduler.common.job.UserIdentification;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskState;
-import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
-import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
-import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
-import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scheduler.core.jmx.SchedulerJMXHelper;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.ClientJobState;
@@ -95,7 +93,6 @@ import org.ow2.proactive.scheduler.permissions.GetOwnStateOnlyPermission;
 import org.ow2.proactive.scheduler.task.internal.InternalJavaTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.util.JobLogger;
-import org.ow2.proactive.scheduler.util.SendMail;
 import org.ow2.proactive.scheduler.util.TaskLogger;
 
 
@@ -128,6 +125,9 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     /** Map that link uniqueID to user credentials */
     private final Map<UniqueID, Credentials> credentials;
 
+    /** Map that link uniqueID to user global spaces */
+    private final Map<String, DataSpacesFileObject> userGlobalSpaces;
+
     /** List used to mark the user that does not respond anymore */
     private final Set<UniqueID> dirtyList;
 
@@ -153,6 +153,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         this.jobsMap = new HashMap<JobId, JobState>();
         this.jobs = new HashMap<JobId, IdentifiedJob>();
         this.sessionTimer = new Timer("SessionTimer");
+        this.userGlobalSpaces = new HashMap<String, DataSpacesFileObject>();
 
         this.sState = sState;
         recover(sState);
@@ -278,6 +279,46 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     }
 
     /**
+     * Registers a global user space in the state
+     * @param identification
+     * @param space
+     */
+    synchronized void registerGlobalUserSpace(UserIdentificationImpl identification,
+            DataSpacesFileObject space) {
+        userGlobalSpaces.put(identification.getUsername(), space);
+    }
+
+    /**
+     * Returns the global user space associated with the provided user
+     * @return
+     * @throws NotConnectedException
+     */
+    synchronized DataSpacesFileObject getUserSpace(UserIdentificationImpl identification) {
+        return userGlobalSpaces.get(identification.getUsername());
+    }
+
+    /**
+     * Returns the global user space associated with the currently connected user
+     * @return
+     * @throws NotConnectedException
+     */
+    synchronized DataSpacesFileObject getUserSpace() throws NotConnectedException {
+        UniqueID uid = checkAccess();
+        return getUserSpace(identifications.get(uid));
+    }
+
+    /**
+     * Returns the global user space associated with the currently connected user
+     * @return
+     * @throws NotConnectedException
+     */
+    synchronized String getUserSpacePath() throws NotConnectedException {
+        UniqueID uid = checkAccess();
+        return PASchedulerProperties.DATASPACE_DEFAULTUSER_LOCALPATH + File.separator +
+            identifications.get(uid).getUsername();
+    }
+
+    /**
      * Check if the given user can get the state as it is demanded (full or user only)
      *
      * @param myOnly true, if the user wants only its events or jobs, false if user want the full state
@@ -381,30 +422,6 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
             String msg = "This job does not contain Tasks !! Insert tasks before submitting job";
             logger.info(msg);
             throw new JobCreationException(msg);
-        }
-
-        // if no GLOBAL spaces, reject a job that attempts to use it
-        if (!PASchedulerProperties.DATASPACE_GLOBAL_URL.isSet()) {
-            for (InternalTask it : job.getITasks()) {
-                if (it.getInputFilesList() != null) {
-                    for (InputSelector in : it.getInputFilesList()) {
-                        if (in.getMode().equals(InputAccessMode.TransferFromGlobalSpace)) {
-                            throw new JobCreationException(
-                                "Use of GLOBAL SPACES is disabled in this Scheduler (INPUT for task: " +
-                                    it.getName() + ")");
-                        }
-                    }
-                }
-                if (it.getOutputFilesList() != null) {
-                    for (OutputSelector out : it.getOutputFilesList()) {
-                        if (out.getMode().equals(OutputAccessMode.TransferToGlobalSpace)) {
-                            throw new JobCreationException(
-                                "Use of GLOBAL SPACES is disabled in this Scheduler (OUTPUT for task: " +
-                                    it.getName() + ")");
-                        }
-                    }
-                }
-            }
         }
 
         //verifying that the user has right to set the given priority to his job.

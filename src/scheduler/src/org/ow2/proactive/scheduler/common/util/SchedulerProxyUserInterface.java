@@ -80,6 +80,7 @@ import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.usage.JobUsage;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
+import org.ow2.proactive.scheduler.core.SchedulerFrontend;
 import org.ow2.proactive.scheduler.ext.filessplitmerge.logging.LoggerManager;
 import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
 import org.ow2.proactive.utils.console.MBeanInfoViewer;
@@ -273,6 +274,24 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
         }
 
         return uischeduler.getJobResult(jobId);
+    }
+
+    @Override
+    public String getUserSpaceURI() throws NotConnectedException {
+        return uischeduler.getUserSpaceURI();
+    }
+
+    public String getUserSpacePath() throws NotConnectedException {
+        return ((SchedulerFrontend) uischeduler).getUserSpacePath();
+    }
+
+    @Override
+    public String getGlobalSpaceURI() throws NotConnectedException {
+        return uischeduler.getGlobalSpaceURI();
+    }
+
+    public String getGlobalSpacePath() throws NotConnectedException {
+        return ((SchedulerFrontend) uischeduler).getGlobalSpacePath();
     }
 
     @Override

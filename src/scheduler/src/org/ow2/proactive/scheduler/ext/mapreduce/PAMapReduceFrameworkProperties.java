@@ -118,6 +118,19 @@ public enum PAMapReduceFrameworkProperties {
     WORKFLOW_OUTPUT_SPACE("org.ow2.proactive.scheduler.ext.mapreduce.workflow.outputSpace",
             PropertyType.STRING),
 
+    /**
+     * The property used to store the value of the global data space of the
+     * ProActive MapReduce job
+     */
+    WORKFLOW_GLOBAL_SPACE("org.ow2.proactive.scheduler.ext.mapreduce.workflow.globalSpace",
+            PropertyType.STRING),
+
+    /**
+     * The property used to store the value of the global data space of the
+     * ProActive MapReduce job
+     */
+    WORKFLOW_USER_SPACE("org.ow2.proactive.scheduler.ext.mapreduce.workflow.userSpace", PropertyType.STRING),
+
     WORKFLOW_PROJECT_NAME("org.ow2.proactive.scheduler.ext.mapreduce.workflow.projectName",
             PropertyType.STRING),
 

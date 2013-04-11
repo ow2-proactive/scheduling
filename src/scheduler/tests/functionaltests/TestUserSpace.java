@@ -61,25 +61,25 @@ import org.ow2.tests.FunctionalTest;
 
 
 /**
- * Submits a job using the default Global User Space, it checks at the end that the output files can be accessed in the Global Space
+ * Submits a job using the default USER Space, it checks at the end that the output files can be accessed in the USER Space
  * <p>
  * This test does :
  * <ul><li>write inFiles to INPUT
  * <li>task A: transfer inFiles from INPUT to SCRATCH
  * <li>task A: copy SCRATCH/inFiles to SCRATCH/inFiles.glob.A in pre-script
- * <li>task A: transfer inFiles.glob.A from SCRATCH to GLOBAL
- * <li>task B: transfer inFiles.glob.A from GLOBAL to SCRATCH
+ * <li>task A: transfer inFiles.glob.A from SCRATCH to USER
+ * <li>task B: transfer inFiles.glob.A from USER to SCRATCH
  * <li>task B: copy SCRATCH/inFiles.glob.A to SCRATCH/inFiles.out in pre-script
  * <li>task B: transfer inFiles.out from SCRATCH to OUTPUT
  * </ul>
- * Then, the test checks that the GLOBAL space has been cleared; and that inFiles.out have
+ * Then, the test checks that the USER space has been cleared; and that inFiles.out have
  * been copied to OUTPUT and are identical to the ones written in the INPUT.
  * 
  * 
  * @author The ProActive Team
  * @since ProActive Scheduling 2.2
  */
-public class TestGlobalSpace extends FunctionalTest {
+public class TestUserSpace extends FunctionalTest {
 
     private static final String[][] inFiles = { { "A", "Content of A" }, { "B", "not much" },
             { "_1234", "!@#%$@%54vc54\b\t\\\\\nasd123!@#", "res1", "one of the output files" },
@@ -170,7 +170,7 @@ public class TestGlobalSpace extends FunctionalTest {
         A.setName("A");
         for (String[] file : inFiles) {
             A.addInputFiles(file[0], InputAccessMode.TransferFromInputSpace);
-            A.addOutputFiles(file[0] + ".glob.A", OutputAccessMode.TransferToGlobalSpace);
+            A.addOutputFiles(file[0] + ".glob.A", OutputAccessMode.TransferToUserSpace);
         }
         A.setPreScript(new SimpleScript(scriptA, "javascript"));
         job.addTask(A);
@@ -180,7 +180,7 @@ public class TestGlobalSpace extends FunctionalTest {
         B.setName("B");
         B.addDependence(A);
         for (String[] file : inFiles) {
-            B.addInputFiles(file[0] + ".glob.A", InputAccessMode.TransferFromGlobalSpace);
+            B.addInputFiles(file[0] + ".glob.A", InputAccessMode.TransferFromUserSpace);
             B.addOutputFiles(file[0] + ".out", OutputAccessMode.TransferToOutputSpace);
         }
         B.setPreScript(new SimpleScript(scriptB, "javascript"));
@@ -210,7 +210,7 @@ public class TestGlobalSpace extends FunctionalTest {
         Assert.assertFalse(SchedulerTHelper.getJobResult(id).hadException());
 
         /**
-         * check: inFiles > IN > LOCAL A > GLOBAL > LOCAL B > OUT 
+         * check: inFiles > IN > LOCAL A > GLOBAL > LOCAL B > OUT
          */
         for (int i = 0; i < inFiles.length; i++) {
             File f = new File(outPath + File.separator + inFiles[i][0] + ".out");
@@ -225,24 +225,24 @@ public class TestGlobalSpace extends FunctionalTest {
         /**
          * check that the file produced is accessible in the global user space via the scheduler API
          */
-        String globalURI = sched.getGlobalSpaceURI();
-        String globalPath = ((SchedulerFrontend) sched).getGlobalSpacePath();
+        String userURI = sched.getUserSpaceURI();
+        System.out.println("User URI is " + userURI);
+        String userPath = ((SchedulerFrontend) sched).getUserSpacePath();
         FileSystemManager fsManager = null;
 
         {
             try {
                 fsManager = VFSFactory.createDefaultFileSystemManager();
             } catch (FileSystemException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
                 logger.error("Could not create Default FileSystem Manager", e);
             }
         }
         for (String[] file : inFiles) {
-            FileObject outFile = fsManager.resolveFile(globalURI + "/" + file[0] + ".glob.A");
+            FileObject outFile = fsManager.resolveFile(userURI + "/" + file[0] + ".glob.A");
             System.out.println("Checking existence of " + outFile.getURL());
             Assert.assertTrue(outFile.getURL() + " exists", outFile.exists());
-            File outFile2 = new File(globalPath, file[0] + ".glob.A");
+            File outFile2 = new File(userPath, file[0] + ".glob.A");
             System.out.println("Checking existence of " + outFile2);
             Assert.assertTrue(outFile2 + " exists", outFile2.exists());
         }
@@ -251,8 +251,8 @@ public class TestGlobalSpace extends FunctionalTest {
 
     /**
      * @param files Writes files: {{filename1, filecontent1},...,{filenameN, filecontentN}}
-     * @param path in this director 
-     * @throws IOException
+     * @param path in this director
+     * @throws java.io.IOException
      */
     private void writeFiles(String[][] files, String path) throws IOException {
         for (String[] file : files) {

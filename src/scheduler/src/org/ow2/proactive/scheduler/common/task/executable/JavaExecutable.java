@@ -75,7 +75,7 @@ public abstract class JavaExecutable extends Executable {
     /**
      * Initialize the executable using the given executable Initializer.
      *
-     * @param execContainer the executable Initializer used to init the executable itself
+     * @param execInitializer the executable Initializer used to init the executable itself
      *
      * @throws Exception an exception if something goes wrong during executable initialization.
      */
@@ -223,10 +223,10 @@ public abstract class JavaExecutable extends Executable {
      * GLOBAL space is shared among all nodes and all users.
      * GLOBAL space can be a local or a distant space.
      *
-     * @return the root of the OUTPUT space
+     * @return the root of the GLOBAL space
      * @throws FileSystemException if the node is not configured for DATASPACE,
      *                             if the node is not properly configured,
-     *                             or if the OUTPUT space cannot be reached or has not be found.
+     *                             or if the GLOBAL space cannot be reached or has not be found.
      */
     public final DataSpacesFileObject getGlobalSpace() throws FileSystemException {
         try {
@@ -237,6 +237,31 @@ public abstract class JavaExecutable extends Executable {
             throw new FileSystemException("Configuration problems for GLOBAL space");
         } catch (ConfigurationException e) {
             throw new FileSystemException("GLOBAL space not found");
+        }
+    }
+
+    /**
+     * Retrieve the root of the USER space. This allow you to resolve files, copy, move, delete, etc...
+     * from and to other defined spaces.<br />
+     * The USER space is a full access space reserved to the current user, so you can get files, create, move, copy, etc...</br>
+     * It's real path is defined by the USER space specified by the Scheduler administrator.<br />
+     * USER space is shared among all nodes but specific to one user
+     * USER space can be a local or a distant space.
+     *
+     * @return the root of the OUTPUT space
+     * @throws FileSystemException if the node is not configured for DATASPACE,
+     *                             if the node is not properly configured,
+     *                             or if the USER space cannot be reached or has not be found.
+     */
+    public final DataSpacesFileObject getUserSpace() throws FileSystemException {
+        try {
+            return PADataSpaces.resolveOutput(SchedulerConstants.USERSPACE_NAME);
+        } catch (NotConfiguredException e) {
+            throw new FileSystemException("Node is not configured for USER space");
+        } catch (SpaceNotFoundException e) {
+            throw new FileSystemException("Configuration problems for USER space");
+        } catch (ConfigurationException e) {
+            throw new FileSystemException("USER space not found");
         }
     }
 
@@ -304,14 +329,28 @@ public abstract class JavaExecutable extends Executable {
      * Retrieve the given file resolved relative to the GLOBAL space.<br />
      *
      * @param path the file path to be resolve relative to the GLOBAL space.
-     * @return the given file resolved in the OUTPUT space
+     * @return the given file resolved in the GLOBAL space
      * @throws FileSystemException if the node is not configured for DATASPACE,
      *                             if the node is not properly configured,
      *                             or if the GLOBAL space cannot be reached or has not be found.
-     * @see #getOutputSpace() for details
+     * @see #getGlobalSpace() for details
      */
     public final DataSpacesFileObject getGlobalFile(String path) throws FileSystemException {
         return getGlobalSpace().resolveFile(path);
+    }
+
+    /**
+     * Retrieve the given file resolved relative to the USER space.<br />
+     *
+     * @param path the file path to be resolve relative to the USER space.
+     * @return the given file resolved in the USER space
+     * @throws FileSystemException if the node is not configured for DATASPACE,
+     *                             if the node is not properly configured,
+     *                             or if the USER space cannot be reached or has not be found.
+     * @see #getUserSpace() for details
+     */
+    public final DataSpacesFileObject getUserFile(String path) throws FileSystemException {
+        return getUserSpace().resolveFile(path);
     }
 
     /**

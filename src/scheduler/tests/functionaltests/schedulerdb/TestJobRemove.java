@@ -214,8 +214,10 @@ public class TestJobRemove extends BaseSchedulerDBTest {
 
         task.addInputFiles("f1", InputAccessMode.TransferFromGlobalSpace);
         task.addInputFiles("f2", InputAccessMode.TransferFromInputSpace);
+        task.addInputFiles("f3", InputAccessMode.TransferFromUserSpace);
         task.addOutputFiles("f1", OutputAccessMode.TransferToGlobalSpace);
         task.addOutputFiles("f2", OutputAccessMode.TransferToOutputSpace);
+        task.addOutputFiles("f3", OutputAccessMode.TransferToUserSpace);
     }
 
     private void checkAllEntitiesDeleted(String... skipClasses) {

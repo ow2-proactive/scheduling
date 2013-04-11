@@ -451,6 +451,48 @@ public class PAMapReduceJobConfiguration {
     }
 
     /**
+     * Set the GLOBAL space ProActive MapReduce workflow
+     *
+     * @param globalSpaceString
+     *            the {@link String} that represents the GLOBAL space of the
+     *            ProActive MapReduce workflow
+     */
+    public void setGlobalSpace(String globalSpaceString) {
+        properties.setProperty(PAMapReduceFrameworkProperties.WORKFLOW_GLOBAL_SPACE.key, globalSpaceString);
+    }
+
+    /**
+     * Retrieve GLOBAL space of the ProActive MapReduce workflow
+     *
+     * @return the {@link String} that represents the GLOBAL space of the
+     *         ProActive MapReduce workflow
+     */
+    public String getGlobalSpace() {
+        return properties.getProperty(PAMapReduceFrameworkProperties.WORKFLOW_GLOBAL_SPACE.key);
+    }
+
+    /**
+     * Set the USER space ProActive MapReduce workflow
+     *
+     * @param userSpaceString
+     *            the {@link String} that represents the USER space of the
+     *            ProActive MapReduce workflow
+     */
+    public void setUserSpace(String userSpaceString) {
+        properties.setProperty(PAMapReduceFrameworkProperties.WORKFLOW_USER_SPACE.key, userSpaceString);
+    }
+
+    /**
+     * Retrieve USER space of the ProActive MapReduce workflow
+     *
+     * @return the {@link String} that represents the USER space of the
+     *         ProActive MapReduce workflow
+     */
+    public String getUserSpace() {
+        return properties.getProperty(PAMapReduceFrameworkProperties.WORKFLOW_USER_SPACE.key);
+    }
+
+    /**
      * Set the classpath of the ProActive Job
      *
      * @param classpath
@@ -1699,7 +1741,7 @@ public class PAMapReduceJobConfiguration {
      * Set the JVM arguments. This method act as the
      * {@link PAMapReduceJobConfiguration#addJVMArguments(String[])}
      *
-     * @param jvmArguments
+     * @param arguments
      *            the JVM arguments to set
      */
     public void setJVMArguments(String[] arguments) {
@@ -1709,7 +1751,7 @@ public class PAMapReduceJobConfiguration {
     /**
      * Add the specified JVM argument to the list of existing JVM arguments
      *
-     * @param jvmArgument
+     * @param argument
      *            the JVM argument to add
      */
     public void addJVMArgument(String argument) {
@@ -1720,7 +1762,7 @@ public class PAMapReduceJobConfiguration {
      * Add the list of specified JVM arguments to the list of existing JVM
      * arguments
      *
-     * @param jvmArguments
+     * @param arguments
      *            the list of JVM arguments to add
      */
     public void addJVMArguments(String[] arguments) {
