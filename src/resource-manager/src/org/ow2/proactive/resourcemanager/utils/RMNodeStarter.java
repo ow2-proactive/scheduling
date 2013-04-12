@@ -269,8 +269,10 @@ public class RMNodeStarter {
         // The number of attempts option
         final Option addNodeAttempts = new Option(new Character(OPTION_ADD_NODE_ATTEMPTS).toString(),
             "addNodeAttempts", true,
-            "number of attempts to add the local node to the resource manager before quitting (default is " +
-                NB_OF_ADD_NODE_ATTEMPTS + ")");
+            "number of attempts to add the local node to the resource manager. Default is " +
+                NB_OF_ADD_NODE_ATTEMPTS + "). When 0 is specified node remains alive without " +
+                "trying to add itself to the RM. Otherwise the process is terminated when number " +
+                "of attempts exceeded.");
         addNodeAttempts.setRequired(false);
         addNodeAttempts.setArgName("number");
         options.addOption(addNodeAttempts);
@@ -344,7 +346,7 @@ public class RMNodeStarter {
                 // ping is optional, that allows other implementation
                 // of RMNodeStarter to be cached for futur use by the
                 // infrastructure manager
-                if (PING_DELAY_IN_MS > 0) {
+                if (PING_DELAY_IN_MS > 0 && NB_OF_ADD_NODE_ATTEMPTS > 0) {
                     try {
                         while (rm.nodeIsAvailable(this.getNodeURL()).getBooleanValue()) {
                             try {
@@ -736,6 +738,11 @@ public class RMNodeStarter {
                     JMXTransportProtocol.RO).toString());
         } catch (Exception e) {
             logger.error("", e);
+        }
+
+        if (NB_OF_ADD_NODE_ATTEMPTS == 0) {
+            // no need to add the node to the resource manager
+            return rm;
         }
 
         // 4 - Add the created node to the Resource Manager with a specified
