@@ -1,6 +1,8 @@
 package org.ow2.proactive_grid_cloud_portal.cli;
 
-import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_OTHER;
+import org.ow2.proactive_grid_cloud_portal.cli.console.AbstractDevice;
+import org.ow2.proactive_grid_cloud_portal.cli.json.PluginView;
+import org.ow2.proactive_grid_cloud_portal.scheduler.client.SchedulerRestClient;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,8 +12,8 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
 import org.codehaus.jackson.map.ObjectMapper;
-import org.ow2.proactive_grid_cloud_portal.cli.console.AbstractDevice;
-import org.ow2.proactive_grid_cloud_portal.cli.json.PluginView;
+
+import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_OTHER;
 
 public class ApplicationContextImpl implements ApplicationContext {
 
@@ -26,6 +28,7 @@ public class ApplicationContextImpl implements ApplicationContext {
 
     private String sessionId;
     private String restServerUrl;
+    private SchedulerRestClient restClient;
     private boolean insecureAccess;
     private String resourceType;
     private boolean forced;
@@ -52,6 +55,12 @@ public class ApplicationContextImpl implements ApplicationContext {
     @Override
     public void setRestServerUrl(String restServerUrl) {
         this.restServerUrl = restServerUrl;
+        this.restClient = new SchedulerRestClient(restServerUrl);
+    }
+
+    @Override
+    public SchedulerRestClient getRestClient() {
+        return restClient;
     }
 
     @Override

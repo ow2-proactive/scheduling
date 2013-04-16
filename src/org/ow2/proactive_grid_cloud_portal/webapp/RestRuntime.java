@@ -36,12 +36,44 @@
  */
 package org.ow2.proactive_grid_cloud_portal.webapp;
 
+import org.ow2.proactive.resourcemanager.common.util.RMCachingProxyUserInterface;
+import org.ow2.proactive.scheduler.common.Scheduler;
+import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
+import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
+import org.ow2.proactive.scheduler.common.exception.PermissionException;
+import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
+import org.ow2.proactive_grid_cloud_portal.common.exceptionmapper.ExceptionToJson;
+import org.ow2.proactive_grid_cloud_portal.rm.RMSessionMapper;
+import org.ow2.proactive_grid_cloud_portal.rm.RMSessionsCleaner;
+import org.ow2.proactive_grid_cloud_portal.rm.RMStateCaching;
+import org.ow2.proactive_grid_cloud_portal.scheduler.IntWrapperConverter;
+import org.ow2.proactive_grid_cloud_portal.scheduler.RestartModeConverter;
+import org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerSessionMapper;
+import org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerSessionsCleaner;
+import org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateListener;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.JobCreationRestException;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SchedulerRestException;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SubmissionClosedRestException;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException;
+
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
-import java.util.Iterator;
+import java.lang.reflect.Type;
+import java.net.HttpURLConnection;
+import java.security.KeyException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.Set;
+
+import javax.security.auth.login.LoginException;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.ExceptionMapper;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
@@ -51,30 +83,36 @@ import org.objectweb.proactive.core.config.xml.ProActiveConfigurationParser;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
-import org.ow2.proactive.resourcemanager.common.util.RMCachingProxyUserInterface;
-import org.ow2.proactive.scheduler.common.Scheduler;
-import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
-import org.ow2.proactive.scheduler.common.exception.PermissionException;
-import org.ow2.proactive_grid_cloud_portal.rm.RMSessionMapper;
-import org.ow2.proactive_grid_cloud_portal.rm.RMSessionsCleaner;
-import org.ow2.proactive_grid_cloud_portal.rm.RMStateCaching;
-import org.ow2.proactive_grid_cloud_portal.scheduler.IntWrapperConverter;
-import org.ow2.proactive_grid_cloud_portal.scheduler.RestartModeConverter;
-import org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerSessionMapper;
-import org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerSessionsCleaner;
-import org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateListener;
-
 
 public class RestRuntime {
 
     private static final Logger LOGGER = ProActiveLogger.getLogger(RestRuntime.class);
 
     private SchedulerSessionsCleaner schedulerSessionCleaner;
-
     private RMSessionsCleaner rmSessionCleaner;
+
+    private static Map<Class,Integer> EXCEPTION_MAPPINGS = new HashMap<Class, Integer>();
+    static {
+        EXCEPTION_MAPPINGS.put(IOException.class, HttpURLConnection.HTTP_NOT_FOUND);
+        EXCEPTION_MAPPINGS.put(JobAlreadyFinishedException.class, HttpURLConnection.HTTP_NOT_FOUND);
+        EXCEPTION_MAPPINGS.put(JobCreationRestException.class, HttpURLConnection.HTTP_NOT_FOUND);
+        EXCEPTION_MAPPINGS.put(KeyException.class, HttpURLConnection.HTTP_NOT_FOUND);
+        EXCEPTION_MAPPINGS.put(LoginException.class, HttpURLConnection.HTTP_NOT_FOUND);
+        EXCEPTION_MAPPINGS.put(NotConnectedRestException.class, HttpURLConnection.HTTP_UNAUTHORIZED);
+        EXCEPTION_MAPPINGS.put(PermissionRestException.class, HttpURLConnection.HTTP_NOT_FOUND);
+        EXCEPTION_MAPPINGS.put(SchedulerRestException.class, HttpURLConnection.HTTP_NOT_FOUND);
+        EXCEPTION_MAPPINGS.put(Throwable.class, HttpURLConnection.HTTP_INTERNAL_ERROR);
+        EXCEPTION_MAPPINGS.put(RuntimeException.class, HttpURLConnection.HTTP_INTERNAL_ERROR);
+        EXCEPTION_MAPPINGS.put(SubmissionClosedRestException.class, HttpURLConnection.HTTP_NOT_FOUND);
+        EXCEPTION_MAPPINGS.put(UnknownJobRestException.class, HttpURLConnection.HTTP_NOT_FOUND);
+        EXCEPTION_MAPPINGS.put(UnknownTaskException.class, HttpURLConnection.HTTP_NOT_FOUND);
+    }
 
     public void start(ResteasyProviderFactory dispatcher, File configurationFile, File log4jConfig,
             File paConfig) {
+
+        addExceptionMappers(dispatcher);
+
         dispatcher.addStringConverter(RestartModeConverter.class);
         dispatcher.addStringConverter(IntWrapperConverter.class);
         dispatcher.registerProvider(JacksonProvider.class);
@@ -103,10 +141,9 @@ public class RestRuntime {
 
             p = ProActiveConfigurationParser.parse(paConfig.getAbsolutePath(), p);
 
-            Iterator<Entry<Object, Object>> i = p.entrySet().iterator();
-            while (i.hasNext()) {
-                Entry<Object, Object> tmp = i.next();
-                ProActiveConfiguration.getInstance().setProperty("" + tmp.getKey(), "" + tmp.getValue(),
+            for (Entry<Object, Object> tmp : p.entrySet()) {
+                ProActiveConfiguration.getInstance().setProperty(tmp.getKey().toString(),
+                        tmp.getValue().toString(),
                         false);
             }
         }
@@ -130,11 +167,28 @@ public class RestRuntime {
         rm.start();
     }
 
+    private void addExceptionMappers(ResteasyProviderFactory dispatcher) {
+        for (final Entry<Class, Integer> exceptionMapping : EXCEPTION_MAPPINGS.entrySet()) {
+            dispatcher.addExceptionMapper(new ExceptionMapper<Throwable>() {
+                @Override
+                public Response toResponse(Throwable throwable) {
+                    ExceptionToJson js = new ExceptionToJson();
+                    js.setErrorMessage(throwable.getMessage());
+                    js.setHttpErrorCode(exceptionMapping.getValue());
+                    js.setStackTrace(ProActiveLogger.getStackTraceAsString(throwable));
+                    js.setException(throwable);
+                    js.setExceptionClass(throwable.getClass().getName());
+                    return Response.status(exceptionMapping.getValue()).entity(js).build();
+                }
+            }, (Type) exceptionMapping.getKey());
+        }
+    }
+
     public void stop() {
         // happily terminate sessions
 
-        String[] sessionids = SchedulerSessionMapper.getInstance().getSessionsMap().keySet()
-                .toArray(new String[] {});
+        Set<String> schedulerSessionIds = SchedulerSessionMapper.getInstance().getSessionsMap().keySet();
+        String[] sessionids = schedulerSessionIds.toArray(new String[schedulerSessionIds.size()]);
         int i = 0;
         for (; i < sessionids.length; i++) {
             Scheduler s = SchedulerSessionMapper.getInstance().getSessionsMap().get(sessionids[i])
@@ -142,24 +196,23 @@ public class RestRuntime {
             try {
                 s.disconnect();
             } catch (NotConnectedException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                LOGGER.warn(e);
             } catch (PermissionException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                LOGGER.warn(e);
             } finally {
                 SchedulerSessionMapper.getInstance().remove(sessionids[i]);
                 LOGGER.debug("Scheduler session id " + sessionids[i] + "terminated");
             }
         }
 
-        sessionids = RMSessionMapper.getInstance().getSessionsMap().keySet().toArray(new String[] {});
+        Set<String> rmSessionIds = RMSessionMapper.getInstance().getSessionsMap().keySet();
+        sessionids = rmSessionIds.toArray(new String[rmSessionIds.size()]);
         for (; i < sessionids.length; i++) {
             RMCachingProxyUserInterface s = RMSessionMapper.getInstance().getSessionsMap().get(sessionids[i]);
             try {
                 s.disconnect();
             } catch (Throwable e) {
-                e.printStackTrace();
+                LOGGER.warn(e);
             } finally {
                 RMSessionMapper.getInstance().remove(sessionids[i]);
                 LOGGER.debug("RM session id " + sessionids[i] + "terminated");

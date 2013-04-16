@@ -144,6 +144,12 @@
 		<stubGenerator srcDir="${classes.dir}" refclasspath="src.classpath">
             <class name="org.ow2.proactive_grid_cloud_portal.scheduler.EventListener" />
 		</stubGenerator>
+
+		<copy todir="${classes.dir}">
+			<fileset dir="${src.dir}">
+				<include name="**/*.xml"/>
+			</fileset>
+		</copy>
 		
 	</target>
 
@@ -175,6 +181,9 @@
 				<include name="**/*.jar" />
 			</fileset>
 			<fileset dir="${lib.dir}/misc">
+				<include name="**/*.jar" />
+			</fileset>
+			<fileset dir="${lib.dir}/dozer">
 				<include name="**/*.jar" />
 			</fileset>
 		</copy>
@@ -314,6 +323,29 @@
 				<!-- Information about the program itself -->
 				<attribute name="Implementation-Vendor" value="ActiveEon" />
 				<attribute name="Implementation-Title" value="Scheduling Rest Scheduler" />
+				<!-- -->
+				<attribute name="Implementation-Version" value="${rest_api.version}" />
+				<attribute name="Specification-Version" value="${scheduler.version}" />
+			</manifest>
+		</jar>
+	</target>
+
+	<target name="schedulingrest-scheduler-client-jar" depends="compile" description="create the jar containing the API interface and POJOs used to build a Scheduler's client">
+		<jar jarfile="${dist.dir}/scheduler-rest-client-${rest_api.version}.jar">
+			<fileset dir="${classes.dir}">
+				<include name="org/ow2/proactive_grid_cloud_portal/scheduler/dto/**" />
+				<include name="org/ow2/proactive_grid_cloud_portal/scheduler/exception/**" />
+				<include name="org/ow2/proactive_grid_cloud_portal/scheduler/client/**" />
+				<include name="org/ow2/proactive_grid_cloud_portal/common/SchedulerRestInterface.class" />
+				<include name="org/ow2/proactive_grid_cloud_portal/common/dto/**" />
+				<include name="org/ow2/proactive_grid_cloud_portal/common/exceptionmapper/**" />
+			</fileset>
+			<manifest>
+				<!-- Who is building this jar? -->
+				<attribute name="Built-By" value="${user.name}" />
+				<!-- Information about the program itself -->
+				<attribute name="Implementation-Vendor" value="ActiveEon" />
+				<attribute name="Implementation-Title" value="Scheduling Rest Client" />
 				<!-- -->
 				<attribute name="Implementation-Version" value="${rest_api.version}" />
 				<attribute name="Specification-Version" value="${scheduler.version}" />

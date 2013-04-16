@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mappings xmlns="http://dozer.sourceforge.net"
+		  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		  xsi:schemaLocation="http://dozer.sourceforge.net
+          http://dozer.sourceforge.net/schema/beanmapping.xsd">
+
+	<mapping>
+		<class-a>org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobStateData</class-a>
+		<class-b>org.ow2.proactive.scheduler.common.job.JobState</class-b>
+		<field>
+			<a>tasks</a>
+			<b>hMTasks</b>
+			<a-hint>org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskStateData</a-hint>
+			<b-hint>org.ow2.proactive.scheduler.common.task.TaskState</b-hint>
+		</field>
+	</mapping>
+
+	<mapping>
+		<class-a>org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData</class-a>
+		<class-b>org.ow2.proactive.scheduler.common.job.JobId</class-b>
+		<field>
+			<a>id</a>
+			<b get-method="value" >value</b>
+		</field>
+	</mapping>
+
+	<mapping>
+		<class-a>org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskIdData</class-a>
+		<class-b>org.ow2.proactive.scheduler.common.task.TaskId</class-b>
+		<field>
+			<a>id</a>
+			<b get-method="value" >value</b>
+		</field>
+	</mapping>
+
+	<mapping>
+		<class-a>org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobResultData</class-a>
+		<class-b>org.ow2.proactive.scheduler.common.job.JobResult</class-b>
+		<field>
+			<a>id</a>
+			<b>jobId</b>
+		</field>
+		<field>
+			<a>allResults</a>
+			<b>allResults</b>
+			<a-hint>org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskResultData</a-hint>
+		</field>
+	</mapping>
+
+	<mapping>
+		<class-a>org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskResultData</class-a>
+		<class-b>org.ow2.proactive.scheduler.common.task.TaskResult</class-b>
+		<field>
+			<a>id</a>
+			<b>taskId</b>
+		</field>
+		<field>
+			<a>serializedValue</a>
+			<b>serializedValue</b>
+		</field>
+	</mapping>
+
+	<mapping>
+		<class-a>org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskInfoData</class-a>
+		<class-b>org.ow2.proactive.scheduler.common.task.TaskInfo</class-b>
+		<field>
+			<a>taskStatus</a>
+			<b>status</b>
+		</field>
+	</mapping>
+
+</mappings>

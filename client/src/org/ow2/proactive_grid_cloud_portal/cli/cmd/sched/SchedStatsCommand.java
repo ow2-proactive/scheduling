@@ -37,18 +37,14 @@
 
 package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
 
-import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
-
-import java.util.Map;
-
-import org.apache.http.client.methods.HttpGet;
-import org.codehaus.jackson.type.TypeReference;
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
-import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
+import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
+
+import java.util.Map;
 
 public class SchedStatsCommand extends AbstractCommand implements Command {
 
@@ -57,21 +53,17 @@ public class SchedStatsCommand extends AbstractCommand implements Command {
 
     @Override
     public void execute(ApplicationContext currentContext) throws CLIException {
-        HttpGet request = new HttpGet(currentContext.getResourceUrl("stats"));
-        HttpResponseWrapper response = execute(request, currentContext);
-        if (statusCode(OK) == statusCode(response)) {
-            Map<String, String> stats = readValue(response,
-                    new TypeReference<Map<String, String>>() {
-                    }, currentContext);
+
+        SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
+        try {
+            Map<String, String> stats = scheduler.getStatistics(currentContext.getSessionId());
             resultStack(currentContext).push(stats);
             if (!currentContext.isSilent()) {
                 writeLine(currentContext, "%s",
                         StringUtility.statsAsString(stats));
             }
-
-        } else {
-            handleError("An error occurred while retrieving stats:", response,
-                    currentContext);
+        } catch (Exception e) {
+            handleError("An error occurred while retrieving stats:", e, currentContext);
         }
 
     }

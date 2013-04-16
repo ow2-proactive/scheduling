@@ -45,22 +45,33 @@ import org.jboss.resteasy.spi.StringParameterUnmarshaller;
 import org.jboss.resteasy.util.FindAnnotation;
 
 /**
+ * Will try to parse a date as string in ISO 8601 format or fall back on default Date.toString() format (when
+ * using the Java REST API).
  * @see <a href="http://docs.jboss.org/resteasy/2.0.0.GA/userguide/html/StringConverter.html#StringParamUnmarshaller">
  *      From Resteasy documentation</a>
  */
 public class DateFormatter implements StringParameterUnmarshaller<Date> {
+    /** Format used by Date#toString() */
+    private static final String TO_STRING_FORMAT = "EEE MMM dd HH:mm:ss zzz yyyy";
+
     private SimpleDateFormat formatter;
+    private SimpleDateFormat toStringFormatter;
 
     public void setAnnotations(Annotation[] annotations) {
         DateFormat format = FindAnnotation.findAnnotation(annotations, DateFormat.class);
         formatter = new SimpleDateFormat(format.value());
+        toStringFormatter = new SimpleDateFormat(TO_STRING_FORMAT);
     }
 
     public Date fromString(String str) {
         try {
             return formatter.parse(str);
-        } catch (Exception e) {
-            throw new IllegalArgumentException(e);
+        } catch (Exception iso8601Exception) {
+            try {
+                return toStringFormatter.parse(str);
+            } catch (Exception toStringFormatException) {
+                throw new IllegalArgumentException(toStringFormatException);
+            }
         }
     }
 

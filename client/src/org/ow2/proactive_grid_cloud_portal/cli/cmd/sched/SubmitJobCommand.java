@@ -37,23 +37,18 @@
 
 package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
 
-import static org.apache.http.entity.ContentType.APPLICATION_OCTET_STREAM;
-import static org.apache.http.entity.ContentType.APPLICATION_XML;
-import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_INVALID_ARGUMENTS;
-import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
-
 import java.io.File;
+import java.io.FileInputStream;
 import java.net.URLConnection;
 
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.mime.MultipartEntity;
-import org.apache.http.entity.mime.content.FileBody;
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
-import org.ow2.proactive_grid_cloud_portal.cli.json.JobIdView;
-import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
+
+import static org.apache.http.entity.ContentType.APPLICATION_XML;
+import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_INVALID_ARGUMENTS;
 
 public class SubmitJobCommand extends AbstractCommand implements Command {
     private String pathname;
@@ -64,35 +59,30 @@ public class SubmitJobCommand extends AbstractCommand implements Command {
 
     @Override
     public void execute(ApplicationContext currentContext) throws CLIException {
-        HttpPost request = new HttpPost(currentContext.getResourceUrl("submit"));
         File jobFile = new File(pathname);
         if (!jobFile.exists()) {
             throw new CLIException(REASON_INVALID_ARGUMENTS, String.format(
                     "'%s' does not exist.", pathname));
         }
-        String contentType = URLConnection.getFileNameMap().getContentTypeFor(
-                pathname);
-        MultipartEntity multipartEntity = new MultipartEntity();
-        if (APPLICATION_XML.getMimeType().equals(contentType)) {
-            multipartEntity.addPart("descriptor", new FileBody(jobFile,
-                    APPLICATION_XML.getMimeType()));
-        } else {
-            multipartEntity.addPart("archive", new FileBody(jobFile,
-                    APPLICATION_OCTET_STREAM.getMimeType()));
-        }
-        request.setEntity(multipartEntity);
-        HttpResponseWrapper response = execute(request, currentContext);
-        if (statusCode(OK) == statusCode(response)) {
-            JobIdView jobId = readValue(response, JobIdView.class,
-                    currentContext);
-            resultStack(currentContext).push(jobId);
+        try {
+            String contentType = URLConnection.getFileNameMap().getContentTypeFor(
+                    pathname);
+            JobIdData jobId;
+            if (APPLICATION_XML.getMimeType().equals(contentType)) {
+                jobId = currentContext.getRestClient().submitXml(
+                        currentContext.getSessionId(), new FileInputStream(jobFile));
+            } else {
+                jobId = currentContext.getRestClient().submitJobArchive(
+                        currentContext.getSessionId(), new FileInputStream(jobFile));
+            }
             writeLine(currentContext,
                     "Job('%s') successfully submitted: job('%d')", pathname,
                     jobId.getId());
-        } else {
+            resultStack(currentContext).push(jobId);
+        } catch (Exception e) {
             handleError(String.format(
                     "An error occurred while attempting to submit job('%s'):",
-                    pathname), response, currentContext);
+                    pathname), e, currentContext);
         }
     }
 }

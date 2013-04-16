@@ -37,14 +37,11 @@
 
 package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
 
-import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
-
-import org.apache.http.client.methods.HttpPut;
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
-import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
+import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 
 public class StopCommand extends AbstractCommand implements Command {
 
@@ -53,20 +50,17 @@ public class StopCommand extends AbstractCommand implements Command {
 
     @Override
     public void execute(ApplicationContext currentContext) throws CLIException {
-        HttpPut request = new HttpPut(currentContext.getResourceUrl("stop"));
-        HttpResponseWrapper response = execute(request, currentContext);
-        if (statusCode(OK) == statusCode(response)) {
-            boolean success = readValue(response, Boolean.TYPE, currentContext);
+        SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
+        try {
+            boolean success = scheduler.stopScheduler(currentContext.getSessionId());
             resultStack(currentContext).push(success);
             if (success) {
                 writeLine(currentContext, "Scheduler successfully stopped.");
             } else {
                 writeLine(currentContext, "Cannot stop scheduler.");
             }
-        } else {
-            handleError(
-                    "An error occurred while attempting to stop scheduler:",
-                    response, currentContext);
+        } catch (Exception e) {
+            handleError("An error occurred while attempting to stop scheduler:", e, currentContext);
         }
     }
 

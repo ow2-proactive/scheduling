@@ -37,16 +37,11 @@
 
 package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
 
-import static org.apache.http.entity.ContentType.APPLICATION_FORM_URLENCODED;
-import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
-
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
-import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
+import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 
 public class LinkRmCommand extends AbstractCommand implements Command {
 
@@ -58,13 +53,9 @@ public class LinkRmCommand extends AbstractCommand implements Command {
 
     @Override
     public void execute(ApplicationContext currentContext) throws CLIException {
-        HttpPost request = new HttpPost(currentContext.getResourceUrl("linkrm"));
-        StringEntity entity = new StringEntity("rmurl=" + rmUrl,
-                APPLICATION_FORM_URLENCODED);
-        request.setEntity(entity);
-        HttpResponseWrapper response = execute(request, currentContext);
-        if (statusCode(OK) == statusCode(response)) {
-            boolean success = readValue(response, Boolean.TYPE, currentContext);
+        SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
+        try {
+            boolean success = scheduler.killScheduler(currentContext.getSessionId(), rmUrl);
             resultStack(currentContext).push(success);
             if (success) {
                 writeLine(currentContext,
@@ -72,8 +63,8 @@ public class LinkRmCommand extends AbstractCommand implements Command {
             } else {
                 writeLine(currentContext, "Cannot relink '%s'.", rmUrl);
             }
-        } else {
-            handleError("An error occurred while relinking:", response,
+        } catch (Exception e) {
+            handleError("An error occurred while relinking:", e,
                     currentContext);
         }
 

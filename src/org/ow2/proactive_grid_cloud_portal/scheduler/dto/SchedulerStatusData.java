@@ -1,0 +1,83 @@
+/*
+ *  *
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
+ *
+ * Copyright (C) 1997-2011 INRIA/University of
+ *                 Nice-Sophia Antipolis/ActiveEon
+ * Contact: proactive@ow2.org or contact@activeeon.com
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 or 3
+ * or a different license than the AGPL.
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://proactive.inria.fr/team_members.htm
+ *  Contributor(s):
+ *
+ *  * $$PROACTIVE_INITIAL_DEV$$
+ */
+package org.ow2.proactive_grid_cloud_portal.scheduler.dto;
+
+public enum SchedulerStatusData {
+    /**
+     * The scheduler is running. Jobs can be submitted.
+     * Get the jobs results is possible.
+     * It can be paused, stopped or shutdown.
+     */
+    STARTED,
+    /**
+     * The scheduler is stopped. Jobs cannot be submitted anymore.
+     * It will terminate every submitted jobs.
+     * Get the jobs results is possible.
+     * It can be started or shutdown.
+     */
+    STOPPED,
+    /**
+     * The scheduler is in freeze mode.
+     * It means that every running tasks will be terminated,
+     * but the running jobs will wait for the scheduler to resume.
+     * It can be resumed, stopped, paused or shutdown.
+     */
+    FROZEN,
+    /**
+     * The scheduler is paused.
+     * It means that every running jobs will be terminated.
+     * It can be resumed, stopped, frozen or shutdown.
+     */
+    PAUSED,
+    /**
+     * The scheduler is shutting down,
+     * It will terminate all running jobs (during this time, get jobs results is possible),
+     * then it will serialize every remaining jobs results that still are in the finished queue.
+     * Finally, it will shutdown the scheduler.
+     */
+    SHUTTING_DOWN,
+    /**
+     * The scheduler is unlinked with RM,
+     * This can be due to the crash of the resource manager.
+     * This status will block every called to the scheduler except the terminate one
+     * and the call to reconnect to a new Resource Manager.
+     */
+    UNLINKED,
+    /**
+     * The scheduler has been killed, nothing can be done anymore.
+     * (Similar to Ctrl-C)
+     */
+    KILLED
+}

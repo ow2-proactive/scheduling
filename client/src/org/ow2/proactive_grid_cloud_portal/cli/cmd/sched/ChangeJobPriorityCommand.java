@@ -37,15 +37,11 @@
 
 package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
 
-import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.NO_CONTENT;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpPut;
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractJobCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
-import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
+import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 
 public class ChangeJobPriorityCommand extends AbstractJobCommand implements
         Command {
@@ -58,18 +54,16 @@ public class ChangeJobPriorityCommand extends AbstractJobCommand implements
 
     @Override
     public void execute(ApplicationContext currentContext) throws CLIException {
-        String resourceUrl = currentContext.getResourceUrl("jobs/" + jobId
-                + "/priority/byvalue/" + priorityValue);
-        HttpPut request = new HttpPut(resourceUrl);
-        HttpResponseWrapper response = execute(request, currentContext);
-        if (statusCode(NO_CONTENT) == statusCode(response)) {
+        SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
+        try {
+            scheduler.schedulerChangeJobPriorityByValue(currentContext.getSessionId(), jobId, priorityValue);
             resultStack(currentContext).push(Boolean.TRUE);
             writeLine(currentContext, "%s priority changed successfully.",
                     job());
-        } else {
+        } catch (Exception e) {
             handleError(String.format(
                     "An error occurred while changing %s priority:", job()),
-                    response, currentContext);
+                    e, currentContext);
         }
     }
 }

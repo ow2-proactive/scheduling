@@ -53,6 +53,9 @@ public class ExceptionToJson implements Serializable {
     private String errorMessage;
     private String stackTrace;
 
+    private Throwable exception;
+    private String exceptionClass;
+
     public ExceptionToJson() {
     }
 
@@ -79,6 +82,22 @@ public class ExceptionToJson implements Serializable {
 
     public void setStackTrace(String stackTrace) {
         this.stackTrace = stackTrace;
+    }
+
+    public Throwable getException() {
+        return exception;
+    }
+
+    public void setException(Throwable exception) {
+        this.exception = exception;
+    }
+
+    public String getExceptionClass() {
+        return exceptionClass;
+    }
+
+    public void setExceptionClass(String exceptionClass) {
+        this.exceptionClass = exceptionClass;
     }
 
 }

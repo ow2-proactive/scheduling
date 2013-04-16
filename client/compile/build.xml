@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<project name="REST CLI Porject" basedir="." default="compile">
+<project name="REST CLI Project" basedir="." default="compile">
 	<property name="version" value="SNAPSHOT" />
 	<property name="src.dir" value="${basedir}/../src" />
 	<property name="lib.dir" value="${basedir}/../lib" />
 	<property name="conf" value="${basedir}/../conf" />
 	<property name="build.dir" value="${basedir}/../build" />
 	<property name="dist.dir" value="${basedir}/../dist" />
+	<property name="rest.client.jarfile" value="${basedir}/../../dist/scheduler-rest-client-*.jar" />
 	<property name="rest.cli.jarfile" value="${dist.dir}/rest-cli-${version}.jar" />
 	<path id="compile.class.path">
 		<fileset dir="${lib.dir}">
@@ -16,7 +17,12 @@
 		<delete dir="${build.dir}" />
 		<delete dir="${dist.dir}" />
 	</target>
-	<target name="compile">
+	<target name="copy-scheduler-client-lib">
+		<copy todir="${lib.dir}">
+			<fileset file="${rest.client.jarfile}" />
+		</copy>
+	</target>
+	<target name="compile" depends="copy-scheduler-client-lib">
 		<mkdir dir="${build.dir}" />
 		<mkdir dir="${dist.dir}" />
 		<javac srcdir="${src.dir}" destdir="${build.dir}" source="1.6" target="1.6" debug="on">

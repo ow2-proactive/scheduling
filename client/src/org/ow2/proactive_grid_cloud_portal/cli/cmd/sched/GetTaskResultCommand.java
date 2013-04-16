@@ -37,16 +37,13 @@
 
 package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
 
-import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
-
-import org.apache.http.client.methods.HttpGet;
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractTaskCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
-import org.ow2.proactive_grid_cloud_portal.cli.json.TaskResultView;
-import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
+import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskResultData;
 
 public class GetTaskResultCommand extends AbstractTaskCommand implements
         Command {
@@ -57,21 +54,19 @@ public class GetTaskResultCommand extends AbstractTaskCommand implements
 
     @Override
     public void execute(ApplicationContext currentContext) throws CLIException {
-        HttpGet request = new HttpGet(currentContext.getResourceUrl("jobs/"
-                + jobId + "/tasks/" + taskId + "/result"));
-        HttpResponseWrapper response = execute(request, currentContext);
-        if (statusCode(OK) == statusCode(response)) {
-            TaskResultView taskResult = readValue(response,
-                    TaskResultView.class, currentContext);
+
+        SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
+        try {
+            TaskResultData taskResult = scheduler.taskresult(currentContext.getSessionId(), jobId, taskId);
             resultStack(currentContext).push(taskResult);
             if (!currentContext.isSilent()) {
                 writeLine(currentContext, "%s",
                         StringUtility.taskResultAsString(task(), taskResult));
             }
-        } else {
+        } catch (Exception e) {
             handleError(String.format(
                     "An error occurred while retrieving %s result:", task()),
-                    response, currentContext);
+                    e, currentContext);
         }
     }
 }

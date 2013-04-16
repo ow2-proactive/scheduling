@@ -37,16 +37,13 @@
 
 package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
 
-import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
-
-import org.apache.http.client.methods.HttpGet;
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractJobCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
-import org.ow2.proactive_grid_cloud_portal.cli.json.JobStateView;
-import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
+import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobStateData;
 
 public class GetJobStateCommand extends AbstractJobCommand implements Command {
 
@@ -56,22 +53,18 @@ public class GetJobStateCommand extends AbstractJobCommand implements Command {
 
     @Override
     public void execute(ApplicationContext currentContext) throws CLIException {
-        HttpGet request = new HttpGet(currentContext.getResourceUrl("jobs/"
-                + jobId));
-        HttpResponseWrapper response = execute(request, currentContext);
-        if (statusCode(OK) == statusCode(response)) {
-            JobStateView jobState = readValue(response, JobStateView.class,
-                    currentContext);
+        SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
+        try {
+            JobStateData jobState = scheduler.listJobs(currentContext.getSessionId(), jobId);
             resultStack(currentContext).push(jobState);
             if (!currentContext.isSilent()) {
                 writeLine(currentContext, "%s",
                         StringUtility.jobStateAsString(job(), jobState));
             }
-
-        } else {
+        } catch (Exception e) {
             handleError(String.format(
                     "An error occurred while retrieving %s state:", job()),
-                    response, currentContext);
+                    e, currentContext);
         }
 
     }

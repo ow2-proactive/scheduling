@@ -37,19 +37,19 @@
 
 package org.ow2.proactive_grid_cloud_portal.cli.cmd;
 
-import static org.ow2.proactive_grid_cloud_portal.cli.RestConstants.DFLT_SESSION_DIR;
-import static org.ow2.proactive_grid_cloud_portal.cli.RestConstants.DFLT_SESSION_FILE_EXT;
-
 import java.io.File;
 
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.FileUtility;
 
+import static org.ow2.proactive_grid_cloud_portal.cli.RestConstants.DFLT_SESSION_DIR;
+import static org.ow2.proactive_grid_cloud_portal.cli.RestConstants.DFLT_SESSION_FILE_EXT;
+
 public abstract class AbstractLoginCommand extends AbstractCommand implements
         Command {
 
-    public static final boolean RENEW_SESSION_BY_DEFAULT = false;
+    public static final boolean RENEW_SESSION_BY_DEFAULT = true;
     public static final boolean PERSIST_SESSION_BY_DEFAULT = true;
 
     public static final String PROP_PERSISTED_SESSION = "org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractLoginCommand.persistedSession";

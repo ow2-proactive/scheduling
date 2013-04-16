@@ -37,14 +37,11 @@
 
 package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
 
-import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
-
-import org.apache.http.client.methods.HttpPut;
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractTaskCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
-import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
+import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 
 public class PreemptTaskCommand extends AbstractTaskCommand implements Command {
 
@@ -58,11 +55,9 @@ public class PreemptTaskCommand extends AbstractTaskCommand implements Command {
 
     @Override
     public void execute(ApplicationContext currentContext) throws CLIException {
-        HttpPut request = new HttpPut(currentContext.getResourceUrl("jobs/"
-                + jobId + "/tasks/" + taskId + "/preempt"));
-        HttpResponseWrapper response = execute(request, currentContext);
-        if (statusCode(OK) == statusCode(response)) {
-            boolean success = readValue(response, Boolean.TYPE, currentContext);
+        SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
+        try {
+            boolean success = scheduler.preemptTask(currentContext.getSessionId(), jobId, taskId);
             resultStack(currentContext).push(success);
             if (success) {
                 writeLine(
@@ -75,11 +70,11 @@ public class PreemptTaskCommand extends AbstractTaskCommand implements Command {
                         "%s cannot be stopped and most likely it is not running.",
                         task());
             }
-        } else {
+        } catch (Exception e) {
             handleError(
                     String.format(
                             "An error occurred while attempting to preemt %s:",
-                            task()), response, currentContext);
+                            task()), e, currentContext);
         }
     }
 

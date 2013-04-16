@@ -36,8 +36,8 @@
  */
 package org.ow2.proactive_grid_cloud_portal.scheduler;
 
-import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
@@ -66,7 +66,7 @@ public class SchedulerStateRestSecurityTest {
                     method.invoke(restInterface, params);
                     fail(method + " should throw a NotConnectedException");
                 } catch (InvocationTargetException exception) {
-                    if (!exception.getCause().getClass().equals(NotConnectedException.class)) {
+                    if (!exception.getCause().getClass().equals(NotConnectedRestException.class)) {
                         fail(method + " should throw a NotConnectedException");
                     }
                 }

@@ -37,9 +37,13 @@
 
 package org.ow2.proactive_grid_cloud_portal.cli.cmd;
 
-import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_IO_ERROR;
-import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_UNAUTHORIZED_ACCESS;
-import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.FORBIDDEN;
+import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
+import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
+import org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus;
+import org.ow2.proactive_grid_cloud_portal.cli.json.ErrorView;
+import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
+import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpUtility;
+import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -55,13 +59,10 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.PoolingClientConnectionManager;
 import org.apache.http.params.HttpParams;
 import org.codehaus.jackson.type.TypeReference;
-import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
-import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
-import org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus;
-import org.ow2.proactive_grid_cloud_portal.cli.json.ErrorView;
-import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
-import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpUtility;
-import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
+
+import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_IO_ERROR;
+import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_UNAUTHORIZED_ACCESS;
+import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.FORBIDDEN;
 
 public abstract class AbstractCommand implements Command {
 
@@ -175,6 +176,15 @@ public abstract class AbstractCommand implements Command {
         } else {
             writeError(errorMessage, responseContent, currentContext);
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    protected void handleError(String errorMessage,
+                               Exception cause, ApplicationContext currentContext) {
+        String causeMessage = cause.getMessage();
+        Stack resultStack = resultStack(currentContext);
+        resultStack.push(causeMessage);
+        writeError(errorMessage, causeMessage, currentContext);
     }
 
     private void writeError(String errorMsg, String responseContent,

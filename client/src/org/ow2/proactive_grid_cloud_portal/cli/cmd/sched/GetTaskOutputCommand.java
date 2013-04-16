@@ -37,15 +37,12 @@
 
 package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
 
-import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
-
-import org.apache.http.client.methods.HttpGet;
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractTaskCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
-import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
+import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 
 public class GetTaskOutputCommand extends AbstractTaskCommand implements
         Command {
@@ -56,20 +53,18 @@ public class GetTaskOutputCommand extends AbstractTaskCommand implements
 
     @Override
     public void execute(ApplicationContext currentContext) throws CLIException {
-        HttpGet request = new HttpGet(currentContext.getResourceUrl("jobs/"
-                + jobId + "/tasks/" + taskId + "/result/log/all"));
-        HttpResponseWrapper response = execute(request, currentContext);
-        if (statusCode(OK) == statusCode(response)) {
-            String output = StringUtility.responseAsString(response);
+        SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
+        try {
+            String output = scheduler.tasklog(currentContext.getSessionId(), jobId, taskId);
             resultStack(currentContext).push(output);
             if (!currentContext.isSilent()) {
                 writeLine(currentContext, "%s",
                         StringUtility.taskOutputAsString(task(), output));
             }
-        } else {
+        } catch (Exception e) {
             handleError(String.format(
                     "An error occurred while retrieving %s output:", task()),
-                    response, currentContext);
+                    e, currentContext);
         }
     }
 }

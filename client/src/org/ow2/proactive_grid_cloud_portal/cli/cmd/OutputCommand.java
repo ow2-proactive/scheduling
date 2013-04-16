@@ -42,8 +42,8 @@ import java.util.Stack;
 
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
-import org.ow2.proactive_grid_cloud_portal.cli.json.TaskResultView;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.FileUtility;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskResultData;
 
 public class OutputCommand extends AbstractCommand implements Command {
     private String pathname;
@@ -63,10 +63,10 @@ public class OutputCommand extends AbstractCommand implements Command {
             Object result = resultStack.peek();
             if (result instanceof String) {
                 FileUtility.writeStringToFile(outFile, (String) result);
-            } else if (result instanceof TaskResultView) {
+            } else if (result instanceof TaskResultData) {
                 FileUtility
                         .writeByteArrayToFile(
-                                ((TaskResultView) result).getSerializedValue(),
+                                ((TaskResultData) result).getSerializedValue(),
                                 outFile);
             } else {
                 FileUtility.writeObjectToFile(result, outFile);

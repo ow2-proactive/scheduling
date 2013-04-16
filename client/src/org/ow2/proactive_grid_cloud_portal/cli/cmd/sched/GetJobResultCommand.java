@@ -37,17 +37,13 @@
 
 package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
 
-import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.NO_CONTENT;
-import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
-
-import org.apache.http.client.methods.HttpGet;
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractJobCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
-import org.ow2.proactive_grid_cloud_portal.cli.json.JobResultView;
-import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
+import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobResultData;
 
 public class GetJobResultCommand extends AbstractJobCommand implements Command {
 
@@ -57,24 +53,18 @@ public class GetJobResultCommand extends AbstractJobCommand implements Command {
 
     @Override
     public void execute(ApplicationContext currentContext) throws CLIException {
-        HttpGet request = new HttpGet(currentContext.getResourceUrl("jobs/"
-                + jobId + "/result"));
-        HttpResponseWrapper response = execute(request, currentContext);
-        if (statusCode(OK) == statusCode(response)) {
-            JobResultView jobResult = readValue(response, JobResultView.class,
-                    currentContext);
+        SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
+        try {
+            JobResultData jobResult = scheduler.jobResult(currentContext.getSessionId(), jobId);
             resultStack(currentContext).push(jobResult);
             if (!currentContext.isForced()) {
                 writeLine(currentContext, "%s",
                         StringUtility.jobResultAsString(job(), jobResult));
             }
-        } else if (statusCode(NO_CONTENT) == statusCode(response)) {
-            writeLine(currentContext, "%s result not available.", job());
-
-        } else {
+        } catch (Exception e) {
             handleError(String.format(
                     "An error occurred while retrieving %s result:", job()),
-                    response, currentContext);
+                    e, currentContext);
         }
     }
 

@@ -36,23 +36,6 @@
  */
 package functionaltests;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import junit.framework.Assert;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPut;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerState;
 import org.ow2.proactive.scheduler.common.job.JobEnvironment;
@@ -63,8 +46,24 @@ import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import functionaltests.jobs.NonTerminatingJob;
 import functionaltests.utils.RestFuncTUtils;
+import junit.framework.Assert;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPut;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 
 /**
@@ -239,14 +238,14 @@ public class RestSchedulerJobPaginationTest extends AbstractRestFuncTestCase {
     private void checkJob(JSONObject job, JobStatus status, int runningTasks, int finishedTasks) throws Exception {
         Assert.assertEquals("1", job.get("jobid"));
         Assert.assertEquals(getLogin(), job.get("jobOwner"));
-        JSONObject jobInfo = (JSONObject) job.get("jobinfo");
+        JSONObject jobInfo = (JSONObject) job.get("jobInfo");
         Assert.assertEquals(status.name(), jobInfo.get("status"));
         Assert.assertEquals(JobPriority.NORMAL.name(), jobInfo.get("priority"));
-        Assert.assertEquals(Long.valueOf(runningTasks), jobInfo.get("numberOfRunningTasks"));
-        Assert.assertEquals(Long.valueOf(finishedTasks), jobInfo.get("numberOfFinishedTasks"));
-        Assert.assertEquals(Long.valueOf(0), jobInfo.get("numberOfPendingTasks"));
-        Assert.assertEquals(Long.valueOf(1), jobInfo.get("totalNumberOfTasks"));
-        Assert.assertEquals(Long.valueOf(-1), jobInfo.get("removedTime"));
+        Assert.assertEquals((long) runningTasks, jobInfo.get("numberOfRunningTasks"));
+        Assert.assertEquals((long) finishedTasks, jobInfo.get("numberOfFinishedTasks"));
+        Assert.assertEquals((long) 0, jobInfo.get("numberOfPendingTasks"));
+        Assert.assertEquals((long) 1, jobInfo.get("totalNumberOfTasks"));
+        Assert.assertEquals((long) -1, jobInfo.get("removedTime"));
     }
 
     JSONArray getRequestJSONArray(String url) throws Exception {

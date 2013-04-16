@@ -36,15 +36,9 @@
  */
 package org.ow2.proactive_grid_cloud_portal.scheduler;
 
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.io.IOUtils;
-import org.jboss.resteasy.client.ProxyFactory;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive_grid_cloud_portal.RestTestServer;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -56,6 +50,12 @@ import java.util.Arrays;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
+
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.IOUtils;
+import org.jboss.resteasy.client.ProxyFactory;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -113,7 +113,7 @@ public class SchedulerStateRestTest extends RestTestServer {
         return IOUtils.toByteArray(zipFile.getInputStream(entry));
     }
 
-    private void callGetJobImageAndVerifyOutput() throws IOException, NotConnectedException {
+    private void callGetJobImageAndVerifyOutput() throws IOException, NotConnectedRestException {
         String pngIn = "ê";
         String jobId = createJobArchive(pngIn);
         String pngAsBase64String = getJobImageAsBase64String(jobId);
@@ -122,7 +122,7 @@ public class SchedulerStateRestTest extends RestTestServer {
         assertEquals(pngIn, pngOut);
     }
 
-    private String getJobImageAsBase64String(String jobId) throws IOException, NotConnectedException {
+    private String getJobImageAsBase64String(String jobId) throws IOException, NotConnectedRestException {
         String sessionId = SchedulerSessionMapper.getInstance().add(new SchedulerProxyUserInterfaceForTests(), "bob");
 
         SchedulerRestInterface client = ProxyFactory.create(SchedulerRestInterface.class, "http://localhost:" + port + "/");

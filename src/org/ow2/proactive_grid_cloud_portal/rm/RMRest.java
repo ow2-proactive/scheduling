@@ -89,7 +89,7 @@ import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.NodeSet;
-import org.ow2.proactive_grid_cloud_portal.common.LoginForm;
+import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
 import org.ow2.proactive_grid_cloud_portal.common.StatHistoryCaching;
 import org.ow2.proactive_grid_cloud_portal.common.StatHistoryCaching.StatHistoryCacheEntry;
 import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;

@@ -37,20 +37,16 @@
 
 package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
 
-import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
-
 import java.util.List;
 import java.util.Map;
 
-import org.apache.http.client.methods.HttpGet;
-import org.codehaus.jackson.type.TypeReference;
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
-import org.ow2.proactive_grid_cloud_portal.cli.json.UserJobInfoView;
-import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
+import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.UserJobData;
 
 public class ListJobCommand extends AbstractCommand implements Command {
 
@@ -59,25 +55,19 @@ public class ListJobCommand extends AbstractCommand implements Command {
 
     @Override
     public void execute(ApplicationContext currentContext) throws CLIException {
-        HttpGet request = new HttpGet(
-                currentContext.getResourceUrl("revisionjobsinfo"));
-        HttpResponseWrapper response = execute(request, currentContext);
 
-        if (statusCode(OK) == statusCode(response)) {
-            Map<Long, List<UserJobInfoView>> stateMap = readValue(response,
-                    new TypeReference<Map<Long, List<UserJobInfoView>>>() {
-                    }, currentContext);
-            List<UserJobInfoView> jobs = stateMap.entrySet().iterator()
-                    .next().getValue();
+        SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
+        try {
+            Map<Long, List<UserJobData>> stateMap = scheduler.revisionAndjobsinfo(
+                    currentContext.getSessionId(), -1, -1, false, true, true, true);
+            List<UserJobData> jobs = stateMap.entrySet().iterator().next().getValue();
             resultStack(currentContext).push(jobs);
             if (!currentContext.isSilent()) {
                 writeLine(currentContext, "%s",
                         StringUtility.jobsAsString(jobs));
             }
-
-        } else {
-            handleError("An error occurred while retriving job list:",
-                    response, currentContext);
+        } catch (Exception e) {
+            handleError("An error occurred while retriving job list:", e, currentContext);
         }
     }
 
