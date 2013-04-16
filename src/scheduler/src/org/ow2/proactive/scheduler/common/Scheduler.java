@@ -818,6 +818,23 @@ public interface Scheduler extends SchedulerUsage {
     public String getTaskServerLogs(String id, String taskName) throws UnknownJobException,
             UnknownTaskException, NotConnectedException, PermissionException;
 
+
+    /**
+     * Retrieves a job list of the scheduler.
+     *
+     * @param offset says to start from this job is
+     * @param limit max number of jobs to retrieve
+     * @param filterCriteria defines types of job (myonly, pending, running, finished).
+     * Important! If user tries to get all jobs (myonly is false) but does not have permissions to do it
+     * (namely GetOwnStateOnlyPermission(true)) user will get his own jobs instead of a PermissionException.
+     * This behavior should simplify the client design.
+     *
+     * @param sortParameters defines in how jobs must be sorted
+     *
+     * @return jobs list according to all criteria
+     * @throws NotConnectedException if you are not authenticated.
+     * @throws PermissionException if you have not enough permission to access this method.
+     */
     public List<JobInfo> getJobs(int offset, int limit, JobFilterCriteria filterCriteria,
             List<SortParameter<JobSortParameter>> sortParameters) throws NotConnectedException,
             PermissionException;

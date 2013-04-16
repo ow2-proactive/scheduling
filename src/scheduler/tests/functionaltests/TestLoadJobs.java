@@ -208,6 +208,28 @@ public class TestLoadJobs extends FunctionalTest {
         checkJobs(jobs, 3, 4);
 
         scheduler.disconnect();
+
+        // connect as a user who can see only its own jobs
+        cred = Credentials.createCredentials(new CredData("guest", "pwd"), auth.getPublicKey());
+        scheduler = auth.login(cred);
+
+        monitorsHandler = new SchedulerMonitorsHandler();
+        eventReceiver = new MonitorEventReceiver(monitorsHandler);
+        eventReceiver = (MonitorEventReceiver) PAActiveObject.turnActive(eventReceiver);
+        state = scheduler.addEventListener((SchedulerEventListener) eventReceiver, true, true);
+        monitorsHandler.init(state);
+
+        JobId myjob = scheduler.submit(createJob(communicationObjectUrl));
+        int myjobId = Integer.parseInt(myjob.value());
+
+        jobs = scheduler.getJobs(0, 10, criteria(true, true, true, true), null);
+        checkJobs(jobs, myjobId);
+
+        jobs = scheduler.getJobs(0, 10, criteria(false, true, true, true), null);
+        checkJobs(jobs, myjobId);
+
+        scheduler.disconnect();
+
     }
 
     private void checkJobs(List<JobInfo> jobs, Integer... expectedIds) {

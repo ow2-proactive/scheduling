@@ -889,10 +889,23 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
             PermissionException {
         UserIdentificationImpl ident = frontendState.checkPermission("loadJobs",
                 "You don't have permissions to load jobs");
-        frontendState.checkOwnStatePermission(filterCriteria.isMyJobsOnly(), ident);
+
+        boolean myJobsOnly = filterCriteria.isMyJobsOnly();
+        try {
+            frontendState.checkOwnStatePermission(myJobsOnly, ident);
+        } catch (PermissionException ex) {
+            // user does not have a right to retrieve all jobs
+            // limit it to its own jobs
+            if (!myJobsOnly) {
+                myJobsOnly = true;
+                frontendState.checkOwnStatePermission(myJobsOnly, ident);
+            } else {
+                throw ex;
+            }
+        }
 
         String user;
-        if (filterCriteria.isMyJobsOnly()) {
+        if (myJobsOnly) {
             user = ident.getUsername();
         } else {
             user = null;
