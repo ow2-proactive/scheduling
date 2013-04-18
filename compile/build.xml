@@ -360,7 +360,8 @@
 			<fail unless="restapi.test.scheduler.home" message="restapi.test.scheduler.home property not defined" />
 			<delete dir="${junit.dir}"/>
 			<mkdir dir="${junit.dir}"/>
-			<junit printsummary="yes" showoutput="true" timeout="300000" haltonfailure="true">
+			<junit printsummary="yes" showoutput="false" errorProperty="test.failed" failureProperty="test.failed" timeout="300000">
+
 				<jvmarg value="-Djava.security.manager"/>
 				<jvmarg value="-Djava.security.policy=${junit.grant.all.policy}"/>					
 				<jvmarg value="-Drestapi.test.rm.home=${restapi.test.rm.home}"/>
@@ -368,9 +369,7 @@
 				<classpath>
 					<path refid="test.classpath"/>
 				</classpath>
-
 				<formatter type="xml"/>
-
 				<batchtest fork="yes" todir="${junit.dir}">
 					<fileset dir="@{testdir}">
 						<include name="org/ow2/proactive_grid_cloud_portal/**/*Test.java" />
@@ -383,6 +382,16 @@
 					</fileset>
 				</batchtest>
 			</junit>
+			
+		<junitreport todir="${junit.dir}">
+			<fileset dir="${junit.dir}">
+  			  <include name="TEST-*.xml"/>
+			</fileset>			
+			<report format="frames" todir="${junit.dir}/html"/>
+		</junitreport>
+		<fail if="test.failed">
+			Tests failed. Check ${junit.dir}
+		</fail>
 		</sequential>
 	</macrodef>
 
