@@ -158,6 +158,15 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher implements ForkerSt
 
             if (storeLogs) {
                 // copy only task output, others files are copied by the forked JavaTaskLauncher
+
+                // logs must be finalized before copying the task output, otherwise truncated files will be sent
+                try {
+                    this.finalizeLoggers();
+                } catch (RuntimeException e) {
+                    // exception should not be thrown to the scheduler core
+                    // the result has been computed and must be returned !
+                    logger.warn("Loggers are not shutdown !", e);
+                }
                 copyScratchDataToOutput(getTaskOutputSelectors());
             }
 

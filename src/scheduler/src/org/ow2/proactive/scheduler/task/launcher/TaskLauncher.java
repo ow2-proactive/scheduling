@@ -1278,6 +1278,11 @@ public abstract class TaskLauncher {
 
     protected void copyScratchDataToOutput() throws FileSystemException {
 
+        // Handling traditional output files
+        if (isDataspaceAware()) {
+            copyScratchDataToOutput(outputFiles);
+        }
+
         // flushing and closing stdout/err even if it's not dataspace aware task
         try {
             this.finalizeLoggers();
@@ -1287,14 +1292,11 @@ public abstract class TaskLauncher {
             logger.warn("Loggers are not shutdown !", e);
         }
 
+        // Handling logFile separately
         if (isDataspaceAware()) {
             if (this.storeLogs) {
-                if (this.outputFiles == null) {
-                    this.outputFiles = new ArrayList<OutputSelector>();
-                }
-                this.outputFiles.addAll(getTaskOutputSelectors());
+                copyScratchDataToOutput(getTaskOutputSelectors());
             }
-            copyScratchDataToOutput(outputFiles);
         }
     }
 
