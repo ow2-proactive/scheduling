@@ -9,4 +9,5 @@
 	&JMX;
 	&GUI;
 	&WUI;
+	&EmailNotification;
 </chapter>

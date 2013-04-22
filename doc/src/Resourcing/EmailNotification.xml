@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="Email_Notifications">
+	<info>
+		<title>Email notifications</title>
+	</info>
+	<para>
+		The ProActive Resource Manager can be configured to send emails to administrators when unexpected
+		events occur. The following logging configuration file
+		<emphasis>rm-log4j-server</emphasis>
+		illustrates such behavior:
+		<programlisting>
+# Default: INFO level, RM file appender
+log4j.rootLogger=INFO, RM
+
+# The original file has been stripped out
+# ...
+
+# Use email notification for
+log4j.logger.org.ow2.proactive.resourcemanager.db=INFO, MAIL
+
+# The original file has been stripped out
+# ...
+
+# Email notification on errors
+log4j.appender.MAIL=org.apache.log4j.net.SMTPAppender
+log4j.appender.MAIL.SMTPHost=smtp.mycompany.com
+log4j.appender.MAIL.Threshold=ERROR
+log4j.appender.MAIL.BufferSize=1
+log4j.appender.MAIL.Subject=ProActive Error
+log4j.appender.MAIL.From=myresourcemanager@mycompany.com
+log4j.appender.MAIL.To=admin@mycompany.com
+log4j.appender.MAIL.layout=org.apache.log4j.PatternLayout
+log4j.appender.MAIL.layout.ConversionPattern=[%d{ISO8601} %-5p] %m%n
+		</programlisting>
+
+		Here if an error occurs, an email will be sent to admin@mycompany.com using the SMTP
+		server
+		smtp.mycompany.com. Depending on your company's email server configuration, the access to
+		the
+		SMTP server might require authentication. One solution would be to install a
+		<emphasis>mail transfer
+			agent
+		</emphasis>
+		relaying emails from the Resource Manager to your company's email server. Postfix can be used
+		for that purpose.
+	</para>
+	<para>
+		Possible values for email notification threshold are:<emphasis>DEBUG</emphasis>,<emphasis>
+		INFO</emphasis>,<emphasis>WARN</emphasis>,<emphasis>ERROR</emphasis>,<emphasis>
+		FATAL</emphasis>.
+	</para>
+	<para>
+		Interesting loggers to configure are:
+		<itemizedlist>
+			<listitem>
+				<para>
+					<emphasis>org.ow2.proactive.resourcemanager.db</emphasis>
+					for database errors
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<emphasis>org.ow2.proactive.resourcemanager.nodesource.infrastructure</emphasis>
+					for errors related to node sources
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<emphasis>org.ow2.proactive.resourcemanager.util.RMStarter</emphasis>
+					for errors during startup
+				</para>
+			</listitem>
+		</itemizedlist>
+	</para>
+</section>
