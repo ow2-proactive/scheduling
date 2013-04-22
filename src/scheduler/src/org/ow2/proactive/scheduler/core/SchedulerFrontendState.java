@@ -36,7 +36,6 @@
  */
 package org.ow2.proactive.scheduler.core;
 
-import java.io.File;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -295,27 +294,6 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
      */
     synchronized DataSpacesFileObject getUserSpace(UserIdentificationImpl identification) {
         return userGlobalSpaces.get(identification.getUsername());
-    }
-
-    /**
-     * Returns the global user space associated with the currently connected user
-     * @return
-     * @throws NotConnectedException
-     */
-    synchronized DataSpacesFileObject getUserSpace() throws NotConnectedException {
-        UniqueID uid = checkAccess();
-        return getUserSpace(identifications.get(uid));
-    }
-
-    /**
-     * Returns the global user space associated with the currently connected user
-     * @return
-     * @throws NotConnectedException
-     */
-    synchronized String getUserSpacePath() throws NotConnectedException {
-        UniqueID uid = checkAccess();
-        return PASchedulerProperties.DATASPACE_DEFAULTUSER_LOCALPATH + File.separator +
-            identifications.get(uid).getUsername();
     }
 
     /**

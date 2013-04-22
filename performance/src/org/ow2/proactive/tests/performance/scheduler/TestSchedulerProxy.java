@@ -105,20 +105,20 @@ public class TestSchedulerProxy implements Scheduler {
     }
 
     @Override
-    public String getUserSpaceURI() throws NotConnectedException {
+    public String getUserSpaceURI() throws NotConnectedException, PermissionException {
         return target.getUserSpaceURI();
     }
 
-    public String getUserSpacePath() throws NotConnectedException {
+    public String getUserSpacePath() throws NotConnectedException, PermissionException {
         return ((SchedulerFrontend) target).getUserSpacePath();
     }
 
     @Override
-    public String getGlobalSpaceURI() throws NotConnectedException {
+    public String getGlobalSpaceURI() throws NotConnectedException, PermissionException {
         return target.getGlobalSpaceURI();
     }
 
-    public String getGlobalSpacePath() throws NotConnectedException {
+    public String getGlobalSpacePath() throws NotConnectedException, PermissionException {
         return ((SchedulerFrontend) target).getGlobalSpacePath();
     }
 

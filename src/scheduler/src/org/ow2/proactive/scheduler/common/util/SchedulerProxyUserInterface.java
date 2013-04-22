@@ -277,20 +277,20 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     }
 
     @Override
-    public String getUserSpaceURI() throws NotConnectedException {
+    public String getUserSpaceURI() throws NotConnectedException, PermissionException {
         return uischeduler.getUserSpaceURI();
     }
 
-    public String getUserSpacePath() throws NotConnectedException {
+    public String getUserSpacePath() throws NotConnectedException, PermissionException {
         return ((SchedulerFrontend) uischeduler).getUserSpacePath();
     }
 
     @Override
-    public String getGlobalSpaceURI() throws NotConnectedException {
+    public String getGlobalSpaceURI() throws NotConnectedException, PermissionException {
         return uischeduler.getGlobalSpaceURI();
     }
 
-    public String getGlobalSpacePath() throws NotConnectedException {
+    public String getGlobalSpacePath() throws NotConnectedException, PermissionException {
         return ((SchedulerFrontend) uischeduler).getGlobalSpacePath();
     }
 

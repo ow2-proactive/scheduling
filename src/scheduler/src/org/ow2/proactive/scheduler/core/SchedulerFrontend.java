@@ -59,7 +59,6 @@ import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
 import org.objectweb.proactive.extensions.dataspaces.api.PADataSpaces;
 import org.objectweb.proactive.extensions.dataspaces.core.InputOutputSpaceConfiguration;
-import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
 import org.objectweb.proactive.extensions.dataspaces.exceptions.ConfigurationException;
 import org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemException;
 import org.objectweb.proactive.extensions.dataspaces.exceptions.NotConfiguredException;
@@ -166,10 +165,8 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     private SchedulerAccountsManager accountsManager;
 
     /**
-     * Naming service used for DataSpaces
+     * Scheduler's Global Space
      */
-    private NamingService namingService;
-
     private DataSpacesFileObject globalSpace;
 
     /**
@@ -277,10 +274,6 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
             authentication.setActivated(true);
 
             // get Global Space
-            DataSpaceServiceStarter dsStarter = schedulingService.getInfrastructure()
-                    .getDataSpaceServiceStarter();
-
-            namingService = dsStarter.getNamingService();
             try {
                 globalSpace = PADataSpaces.resolveOutput(SchedulerConstants.GLOBALSPACE_NAME);
             } catch (SpaceNotFoundException e) {
@@ -400,8 +393,12 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
      * {@inheritDoc}
      */
     @Override
-    public String getUserSpaceURI() throws NotConnectedException {
-        return frontendState.getUserSpace().getRealURI();
+    public String getUserSpaceURI() throws NotConnectedException, PermissionException {
+
+        UserIdentificationImpl ident = frontendState.checkPermission("getUserSpaceURI",
+                "You don't have permissions to read the USER Space URI");
+
+        return frontendState.getUserSpace(ident).getRealURI();
     }
 
     /**
@@ -410,12 +407,17 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
      * @return user USER Space Path
      * @throws NotConnectedException if you are not authenticated.
      */
-    public String getUserSpacePath() throws NotConnectedException {
-        return frontendState.getUserSpacePath();
+    public String getUserSpacePath() throws NotConnectedException, PermissionException {
+        UserIdentificationImpl ident = frontendState.checkPermission("getUserSpacePath",
+                "You don't have permissions to read the USER Space Path");
+        return PASchedulerProperties.DATASPACE_DEFAULTUSER_LOCALPATH + File.separator + ident.getUsername();
     }
 
     @Override
-    public String getGlobalSpaceURI() throws NotConnectedException {
+    public String getGlobalSpaceURI() throws NotConnectedException, PermissionException {
+        UserIdentificationImpl ident = frontendState.checkPermission("getGlobalSpaceURI",
+                "You don't have permissions to read the GLOBAL Space URI");
+
         return globalSpace.getRealURI();
     }
 
@@ -425,7 +427,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
      * @return user GLOBAL Space Path
      * @throws NotConnectedException if you are not authenticated.
      */
-    public String getGlobalSpacePath() throws NotConnectedException {
+    public String getGlobalSpacePath() throws NotConnectedException, PermissionException {
+        UserIdentificationImpl ident = frontendState.checkPermission("getGlobalSpacePath",
+                "You don't have permissions to read the GLOBAL Space Path");
         return PASchedulerProperties.DATASPACE_DEFAULTGLOBAL_LOCALPATH.getValueAsString();
     }
 

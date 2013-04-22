@@ -83,14 +83,14 @@ public interface Scheduler extends SchedulerUsage {
      * @return user USER Space URI
      * @throws NotConnectedException if you are not authenticated.
      */
-    public String getUserSpaceURI() throws NotConnectedException;
+    public String getUserSpaceURI() throws NotConnectedException, PermissionException;
 
     /**
      * Returns the GLOBAL DataSpace URI available to all users
      * @return user GLOBAL Space URI
      * @throws NotConnectedException if you are not authenticated.
      */
-    public String getGlobalSpaceURI() throws NotConnectedException;
+    public String getGlobalSpaceURI() throws NotConnectedException, PermissionException;
 
     /**
      * Get the result for the given jobId.
