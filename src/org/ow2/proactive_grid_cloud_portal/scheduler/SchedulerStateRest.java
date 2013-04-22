@@ -1274,8 +1274,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     /**
-     * changes the priority of a job
-     * 
+     * Changes the priority of a job, see {@link JobPriority}.
      * @param sessionId
      *            a valid session id
      * @param jobId
@@ -1286,6 +1285,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      * @throws UnknownJobException
      * @throws PermissionException
      * @throws JobAlreadyFinishedException
+     *
+     * @see JobPriority for priority mapping
      */
     @PUT
     @Path("jobs/{jobid}/priority/byname/{name}")
@@ -1299,8 +1300,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     /**
-     * changes the priority of a job
-     * 
+     * Changes the priority of a job, see {@link JobPriority}.
+     *
      * @param sessionId
      *            a valid session id
      * @param jobId
@@ -1312,6 +1313,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      * @throws UnknownJobException
      * @throws PermissionException
      * @throws JobAlreadyFinishedException
+     *
+     * @see JobPriority for priority mapping
      */
     @PUT
     @Path("jobs/{jobid}/priority/byvalue/{value}")
