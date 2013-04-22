@@ -167,7 +167,7 @@ public class TestXMLTransformer extends FunctionalTest {
             String message = "Could not create Job object from generated xml. \n";
             message += "Generated xml content was : \n ****** " + xmlFile2.getAbsolutePath() +
                 " ***********\n ";
-            message += FileUtils.readFileToString(xmlFile2, null);
+            message += FileUtils.readFileToString(xmlFile2);
             message += "\n *************************** ";
             throw new Exception(message, e);
         }
@@ -179,7 +179,7 @@ public class TestXMLTransformer extends FunctionalTest {
             message += "Reason: " + comparator.getDifferenceMessage() + "\n";
             message += "Generated xml content was : \n ****** " + xmlFile2.getAbsolutePath() +
                 " *********** \n ";
-            message += FileUtils.readFileToString(xmlFile2, null);
+            message += FileUtils.readFileToString(xmlFile2);
             message += "\n *************************** ";
             Assert.fail(message);
         }

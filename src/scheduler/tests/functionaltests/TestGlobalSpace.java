@@ -215,8 +215,7 @@ public class TestGlobalSpace extends FunctionalTest {
         for (int i = 0; i < inFiles.length; i++) {
             File f = new File(outPath + File.separator + inFiles[i][0] + ".out");
             Assert.assertTrue("File does not exist: " + f.getAbsolutePath(), f.exists());
-            Assert.assertEquals("Original and copied files differ", inFiles[i][1], FileUtils
-                    .readFileToString(f, null));
+            Assert.assertEquals("Original and copied files differ", inFiles[i][1], FileUtils.readFileToString(f));
             f.delete();
             File inf = new File(inPath + File.separator + inFiles[i][0]);
             inf.delete();
