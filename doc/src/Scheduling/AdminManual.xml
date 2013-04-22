@@ -1290,11 +1290,11 @@ public class DefaultPolicy implements PolicyInterface {
 		</para>
 		<itemizedlist>
 			 <listitem><para><emphasis>user level:</emphasis> enables to submit jobs (see waiting queue, jobs running and jobs finished). They can change priority of their jobs, with 3 priority levels:
-			 lowest, low and normal. They are able to see their jobs output, cancel and retrieve results only from their own jobs.
+			 lowest, low and normal (see <emphasis>org.ow2.proactive.scheduler.common.job.JobPriority</emphasis>). They are able to see their jobs output, cancel and retrieve results only from their own jobs.
 			 They cannot perform actions on jobs submitted by other users.</para>
 			 </listitem>
 			 <listitem><para><emphasis>admin level:</emphasis> enables to pause, stop and restart scheduler, cancel or retrieve results of any job,
-			 change priority of any job, with 5 priority levels: lowest, low, normal, high and highest.</para>
+			 change priority of any job, with 5 priority levels: lowest, low, normal, high and highest (see <emphasis>org.ow2.proactive.scheduler.common.job.JobPriority</emphasis>).</para>
 			 </listitem>
 		</itemizedlist>
 
