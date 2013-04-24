@@ -8,7 +8,8 @@ if [ $# = 0 ]; then
         echo "Usage: pa-dataserver COMMAND [options]"
         echo "where COMMAND is one of the following:"
         echo "  start           start the ProActive data server"
-        echo "For a command help try COMMAND --help"
+        echo "ProActive system properties can be set using command line too."
+        echo "  Syntax is: -Dproperty=value"
         exit 1
 fi
 

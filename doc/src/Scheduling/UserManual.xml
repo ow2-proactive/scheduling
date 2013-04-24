@@ -1278,6 +1278,13 @@ task2.setGenerationScript(gscript);
 								if more than one server is started on the same host. ('myOutputSpace' in the example).
 							</para>
 						</listitem>
+						<listitem>
+							<para>
+								ProActive system properties can also be set using command line
+								(-Dproperty=value). For instance, the port can be configured using
+								-Dproactive.rmi.port=1099 given that RMI is used.
+							</para>
+						</listitem>
 					</itemizedlist>
 				</para>
 				<para>
