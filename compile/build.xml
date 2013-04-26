@@ -252,8 +252,6 @@
 			<fileset dir="${classes.dir}">
 				<include name="org/ow2/proactive_grid_cloud_portal/rm/**" />
 			</fileset>
-
-
 			<manifest>
 				<!-- Who is building this jar? -->
 				<attribute name="Built-By" value="${user.name}" />
@@ -263,7 +261,6 @@
 				<!-- -->
 				<attribute name="Implementation-Version" value="${rest_api.version}" />
 				<attribute name="Specification-Version" value="${scheduler.version}" />
-
 			</manifest>
 		</jar>
 	</target>
@@ -295,7 +292,7 @@
 			<fail unless="restapi.test.scheduler.home" message="restapi.test.scheduler.home property not defined" />
 			<delete dir="${junit.dir}"/>
 			<mkdir dir="${junit.dir}"/>
-			<junit printsummary="yes" showoutput="false" timeout="300000" haltonfailure="true">
+			<junit printsummary="yes" showoutput="true" timeout="300000" haltonfailure="true">
 				<jvmarg value="-Djava.security.manager"/>
 				<jvmarg value="-Djava.security.policy=${junit.grant.all.policy}"/>					
 				<jvmarg value="-Drestapi.test.rm.home=${restapi.test.rm.home}"/>
@@ -311,9 +308,10 @@
 						<include name="org/ow2/proactive_grid_cloud_portal/**/*Test.java" />
 						<include name="**/RestSchedulerJobTaskTest.java" />
 						<include name="**/RestSchedulerTest.java" />
-						<include name="**/RestfulSchedulerFreezeTest.java" />
+                        <include name="**/RestfulSchedulerFreezeTest.java" />
                         <include name="**/RestSchedulerKillTest.java" />
-						<include name="**/RestSchedulerJobPaginationTest.java" />
+                        <include name="**/RestSchedulerJobPaginationTest.java" />
+                        <include name="**/RestSchedulerPushPullFileTest.java" />
 					</fileset>
 				</batchtest>
 			</junit>

@@ -54,6 +54,7 @@ public class RestSchedulerTest extends AbstractRestFuncTestCase {
         try {
             RestFuncTHelper.startRestfulSchedulerWebapp();
         } catch (Exception e) {
+            e.printStackTrace();
             RestFuncTHelper.stopRestfulSchedulerWebapp();
             throw e;
         }

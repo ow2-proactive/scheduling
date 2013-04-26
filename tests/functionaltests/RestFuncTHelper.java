@@ -286,6 +286,7 @@ public class RestFuncTHelper {
         System.out.println("Shutting down scheduler process.");
         if (schedProcess != null) {
             try {
+                schedProcess.destroy();
                 RestFuncTUtils.destory(schedProcess);
             } catch (Throwable error) {
                 System.err.println("An error occurred while shutting down scheduler process:");

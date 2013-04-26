@@ -82,6 +82,7 @@ public class RestSchedulerJobPaginationTest extends AbstractRestFuncTestCase {
         try {
             RestFuncTHelper.startRestfulSchedulerWebapp();
         } catch (Exception e) {
+            e.printStackTrace();
             RestFuncTHelper.stopRestfulSchedulerWebapp();
             throw e;
         }

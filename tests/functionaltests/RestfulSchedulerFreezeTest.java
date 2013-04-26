@@ -50,6 +50,7 @@ public class RestfulSchedulerFreezeTest extends AbstractRestFuncTestCase {
         try {
             RestFuncTHelper.startRestfulSchedulerWebapp();
         } catch (Exception e) {
+            e.printStackTrace();
             RestFuncTHelper.stopRestfulSchedulerWebapp();
             throw e;
         }

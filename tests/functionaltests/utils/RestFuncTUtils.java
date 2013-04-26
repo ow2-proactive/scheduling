@@ -60,11 +60,10 @@ public class RestFuncTUtils {
     }
 
     public static void destory(Process process) throws Exception {
+        process.destroy();
         close(process.getOutputStream());
         close(process.getInputStream());
         close(process.getErrorStream());
-        process.destroy();
-        process.waitFor();
         System.out.println(String.format("Process ended with exit code %d. ",
                 process.exitValue()));
     }
@@ -132,9 +131,10 @@ public class RestFuncTUtils {
         String name = (new StringBuilder()).append('/')
                 .append(clazz.getName().replace('.', '/')).append(".class")
                 .toString();
+        String osName = name.replace('/',File.separator.charAt(0));
         URL resource = clazz.getResource(name);
         String absolutePath = (new File(resource.toURI())).getAbsolutePath();
-        return absolutePath.substring(0, absolutePath.indexOf(name));
+        return absolutePath.substring(0, absolutePath.indexOf(osName));
     }
 
     public static int findFreePort() throws Exception {

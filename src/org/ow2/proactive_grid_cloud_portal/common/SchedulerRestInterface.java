@@ -37,6 +37,7 @@
 package org.ow2.proactive_grid_cloud_portal.common;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.security.KeyException;
 import java.util.Date;
@@ -79,8 +80,8 @@ import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
-import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
 import org.ow2.proactive.scheduler.common.usage.JobUsage;
+import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
 import org.ow2.proactive_grid_cloud_portal.scheduler.UserJobInfo;
 
 
@@ -177,8 +178,6 @@ public interface SchedulerRestInterface {
     
     /**
      * Returns a JobState of the job identified by the id <code>jobid</code>
-     * @param sessionid a valid session id
-     * @param jobid the id of the job to retrieve
      */
     @GET
     @Path("jobs/{jobid}")
@@ -190,7 +189,6 @@ public interface SchedulerRestInterface {
     /**
      * Returns the job result associated to the job referenced by the 
      * id <code>jobid</code>
-     * @param sessionid a valid session id
      * @result the job result of the corresponding job  
      */
     @GET
@@ -208,8 +206,6 @@ public interface SchedulerRestInterface {
      * string 'Unknown value type'. To get the serialized form of a given result,
      * one has to call the following restful service 
      * jobs/{jobid}/tasks/{taskname}/result/serializedvalue
-     * @param sessionid a valid session id
-     * @param jobid a job id
      */
     @GET
     @GZIP
@@ -266,7 +262,6 @@ public interface SchedulerRestInterface {
     /**
      * Returns a list of the name of the tasks belonging to job <code>jobId</code>
      * @param sessionId a valid session id
-     * @param the jobid one wants to list the tasks' name
      * @return a list of tasks' name 
      */
     @GET
@@ -502,6 +497,7 @@ public interface SchedulerRestInterface {
      * @throws PermissionException
      * @throws SubmissionClosedException
      */
+
     @POST
     @Path("submitflat")
     @Produces("application/json")
@@ -516,7 +512,6 @@ public interface SchedulerRestInterface {
     /**
      * Submits a job to the scheduler 
      * @param sessionId a valid session id
-     * @param jobId the id of the job
      * @return the <code>jobid</code> of the newly created job 
      */
     @POST
@@ -526,6 +521,58 @@ public interface SchedulerRestInterface {
     public abstract JobId submit(@HeaderParam("sessionid")
     String sessionId, MultipartFormDataInput multipart) throws IOException, JobCreationException,
             NotConnectedException, PermissionException, SubmissionClosedException;
+
+
+    /**
+     * Pushes a file from the local file system into the given DataSpace
+     * @param sessionId a valid session id
+     * @param spaceName the name of the DataSpace
+     * @param filePath the path where to put the file
+     * @param multipart the form data containing :
+     *   - fileName the name of the file that will be created on the DataSpace
+     *   - fileContent the content of the file
+     * @return true if the transfer succeeded
+     * @see org.ow2.proactive.scheduler.common.SchedulerConstants for spaces names
+     */
+    @POST
+    @Path("dataspace/{spaceName}/{filePath}")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces("application/json")
+    public abstract boolean pushFile(@HeaderParam("sessionid") String sessionId,@PathParam("spaceName") String spaceName,@PathParam("filePath") String filePath,
+                                     MultipartFormDataInput multipart) throws IOException,
+            NotConnectedException, PermissionException;
+
+    /**
+     * Either Pulls a file from the given DataSpace to the local file system
+     * or list the content of a directory if the path refers to a directory
+     * In the case the path to a file is given, the content of this file will be returns as an input stream
+     * In the case the path to a directory is given, the input stream returned will be a text stream containing at each line
+     * the content of the directory
+     * @param sessionId a valid session id
+     * @param spaceName the name of the data space involved (GLOBAL or USER)
+     * @param filePath the path to the file or directory whose content must be received
+      */
+    @GET
+    @Path("dataspace/{spaceName}/{filePath}")
+    @Produces(MediaType.APPLICATION_OCTET_STREAM)
+    public abstract InputStream pullFile(
+            @HeaderParam("sessionid") String sessionId,
+            @PathParam("spaceName") String spaceName,@PathParam("filePath") String filePath) throws IOException,
+            NotConnectedException, PermissionException;
+
+    /**
+     * Deletes a file or recursively delete a directory from the given DataSpace
+     * @param sessionId a valid session id
+     * @param spaceName the name of the data space involved (GLOBAL or USER)
+     * @param filePath the path to the file or directory whose content must be received     */
+    @DELETE
+    @Path("dataspace/{spaceName}/{filePath}")
+    public abstract boolean deleteFile(
+            @HeaderParam("sessionid") String sessionId,
+            @PathParam("spaceName") String spaceName,@PathParam("filePath") String filePath) throws IOException,
+            NotConnectedException, PermissionException;
+
+
 
     /**
      * terminates the session id <code>sessionId</code>

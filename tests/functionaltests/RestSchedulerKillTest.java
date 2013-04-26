@@ -36,13 +36,13 @@
  */
 package functionaltests;
 
-import static org.ow2.proactive.scheduler.common.SchedulerStatus.KILLED;
-
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPut;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import static org.ow2.proactive.scheduler.common.SchedulerStatus.KILLED;
 
 public class RestSchedulerKillTest extends AbstractRestFuncTestCase {
 
@@ -51,6 +51,7 @@ public class RestSchedulerKillTest extends AbstractRestFuncTestCase {
         try {
             RestFuncTHelper.startRestfulSchedulerWebapp();
         } catch (Exception e) {
+            e.printStackTrace();
             RestFuncTHelper.stopRestfulSchedulerWebapp();
             throw e;
         }

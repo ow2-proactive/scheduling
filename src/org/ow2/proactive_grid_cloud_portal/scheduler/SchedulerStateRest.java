@@ -36,6 +36,64 @@
  */
 package org.ow2.proactive_grid_cloud_portal.scheduler;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.io.Serializable;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.security.KeyException;
+import java.security.PublicKey;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+
+import javax.security.auth.login.LoginException;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.FormParam;
+import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
+
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.vfs.FileObject;
+import org.apache.commons.vfs.FileSystemException;
+import org.apache.commons.vfs.FileSystemManager;
+import org.apache.commons.vfs.FileType;
+import org.apache.commons.vfs.Selectors;
+import org.apache.log4j.Logger;
+import org.jboss.resteasy.annotations.GZIP;
+import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
+import org.jboss.resteasy.plugins.providers.multipart.InputPart;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
+import org.jboss.resteasy.util.GenericType;
+import org.objectweb.proactive.ActiveObjectCreationException;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PAFuture;
+import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extensions.dataspaces.vfs.VFSFactory;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.db.SortOrder;
@@ -45,6 +103,7 @@ import org.ow2.proactive.scheduler.common.JobSortParameter;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
+import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.exception.ConnectionException;
 import org.ow2.proactive.scheduler.common.exception.InternalSchedulerException;
@@ -76,56 +135,6 @@ import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 import org.ow2.proactive_grid_cloud_portal.webapp.DateFormatter;
 import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.io.Serializable;
-import java.security.KeyException;
-import java.security.PublicKey;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-
-import javax.security.auth.login.LoginException;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.FormParam;
-import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
-
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
-import org.jboss.resteasy.annotations.GZIP;
-import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
-import org.jboss.resteasy.plugins.providers.multipart.InputPart;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
-import org.jboss.resteasy.util.GenericType;
-import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.api.PAFuture;
-import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
-
 
 /**
  * this class exposes the Scheduler as a RESTful service.
@@ -140,6 +149,19 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     public static final String UNKNOWN_VALUE_TYPE = "Unknown value type";
 
     private static final Logger logger = ProActiveLogger.getLogger(SchedulerStateRest.class);
+
+    private static FileSystemManager fsManager = null;
+
+    static {
+        {
+            try {
+                fsManager = VFSFactory.createDefaultFileSystemManager();
+            } catch (FileSystemException e) {
+                e.printStackTrace();
+                logger.error("Could not create Default FileSystem Manager", e);
+            }
+        }
+    }
 
     @SuppressWarnings("unchecked")
     private static final List<SortParameter<JobSortParameter>> DEFAULT_JOB_SORT_PARAMS = Arrays.asList(
@@ -1190,6 +1212,169 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             }
         }
 
+    }
+
+
+    @Override
+    public boolean pushFile(@HeaderParam("sessionid") String sessionId,@PathParam("spaceName") String spaceName,@PathParam("filePath") String filePath,
+                            MultipartFormDataInput multipart) throws IOException, NotConnectedException, PermissionException {
+        Scheduler s = checkAccess(sessionId, "pushFile");
+        String spaceURI = null;
+
+        Map<String, List<InputPart>> formDataMap = multipart.getFormDataMap();
+
+        String fileName = formDataMap.get("fileName").get(0).getBody(String.class, null);
+
+        InputStream fileContent = formDataMap.get("fileContent").get(0).getBody(InputStream.class, null);
+
+        if (fileName == null) {
+            throw new IllegalArgumentException("Wrong file name : " + fileName);
+        }
+
+        if (SchedulerConstants.GLOBALSPACE_NAME.equals(spaceName)) {
+            spaceURI = s.getGlobalSpaceURI();
+
+        } else if (SchedulerConstants.USERSPACE_NAME.equals(spaceName)) {
+            spaceURI = s.getUserSpaceURI();
+        } else {
+            throw new IllegalArgumentException("Wrong Data Space name : " + spaceName);
+        }
+
+        String destUri = spaceURI + "/" + (filePath != null ? filePath : "");
+        if (!destUri.endsWith("/")) {
+            destUri += "/";
+        }
+        destUri += fileName;
+        FileObject destfo = fsManager.resolveFile(destUri);
+        if (!destfo.isWriteable()) {
+            RuntimeException ex = new IllegalArgumentException("File " + filePath + " is not writable in space " + spaceName);
+            logger.error(ex);
+            throw ex;
+        }
+        if (destfo.exists()) {
+            destfo.delete();
+        }
+        // used to create the necessary directories if needed
+        destfo.createFile();
+        URL targetUrl = destfo.getURL();
+
+        if (targetUrl.toString().startsWith("file:")) {
+            // if the url is a file:// url, we push directly the InputStream to the destination file
+        File targetFile = null;
+        try {
+            targetFile = new File(targetUrl.toURI());
+        } catch (URISyntaxException e) {
+            throw new IllegalStateException(e);
+        }
+        logger.info("[pushFile] pushing input file to " + targetFile);
+        FileUtils.copyInputStreamToFile(fileContent, targetFile);
+        } else {
+            // in the other case, we need to push the inputStream to a tempFile and then transfer the file via dataspaces
+            File tmpFile = File.createTempFile("pushedFile",".tmp");
+            try {
+            FileUtils.copyInputStreamToFile(fileContent, tmpFile);
+            FileObject sourcefo = fsManager.resolveFile(tmpFile.getCanonicalPath());
+            destfo.copyFrom(sourcefo, Selectors.SELECT_SELF);
+            } finally {
+                tmpFile.delete();
+            }
+        }
+
+        return true;
+
+    }
+
+    @Override
+    public InputStream pullFile(
+            @HeaderParam("sessionid") String sessionId, @PathParam("spaceName") String spaceName,@PathParam("filePath") String filePath) throws IOException,
+            NotConnectedException, PermissionException {
+
+        Scheduler s = checkAccess(sessionId, "pullFile");
+
+        String spaceURI = null;
+
+        if (SchedulerConstants.GLOBALSPACE_NAME.equals(spaceName)) {
+            spaceURI = s.getGlobalSpaceURI();
+        } else if (SchedulerConstants.USERSPACE_NAME.equals(spaceName)) {
+            spaceURI = s.getUserSpaceURI();
+        } else {
+            RuntimeException ex = new IllegalArgumentException("Wrong Data Space name : " + spaceName);
+            logger.error(ex);
+            throw ex;
+        }
+        if (filePath == null) {
+            RuntimeException ex = new IllegalArgumentException("Wrong file path : " + filePath);
+            logger.error(ex);
+            throw ex;
+        }
+        FileObject sourcefo = fsManager.resolveFile(spaceURI + "/" + filePath);
+        if (!sourcefo.exists() || !sourcefo.isReadable()) {
+            RuntimeException ex = new IllegalArgumentException("File " + filePath + " does not exist or is not readable in space " + spaceName);
+            logger.error(ex);
+            throw ex;
+        }
+
+        if (sourcefo.getType().equals(FileType.FOLDER)) {
+            logger.info("[pullFile] reading directory content from " + sourcefo.getURL());
+             // if it's a folder we return an InputStream listing its content
+            StringBuilder sb = new StringBuilder();
+            String nl = System.getProperty("line.separator");
+            for (FileObject fo : sourcefo.getChildren()) {
+                sb.append(fo.getName().getBaseName()+nl);
+
+            }
+            return IOUtils.toInputStream(sb.toString());
+
+        } else if (sourcefo.getType().equals(FileType.FILE)){
+            logger.info("[pullFile] reading file content from " + sourcefo.getURL());
+            return sourcefo.getContent().getInputStream();
+        } else {
+            RuntimeException ex = new IllegalArgumentException("File " + filePath + " has an unsupported type " + sourcefo.getType());
+            logger.error(ex);
+            throw ex;
+        }
+
+    }
+
+    @Override
+    public boolean deleteFile(@HeaderParam("sessionid") String sessionId, @PathParam("spaceName") String spaceName, @PathParam("filePath") String filePath) throws IOException, NotConnectedException, PermissionException {
+        Scheduler s = checkAccess(sessionId, "pullFile");
+
+        String spaceURI = null;
+
+        if (SchedulerConstants.GLOBALSPACE_NAME.equals(spaceName)) {
+            spaceURI = s.getGlobalSpaceURI();
+        } else if (SchedulerConstants.USERSPACE_NAME.equals(spaceName)) {
+            spaceURI = s.getUserSpaceURI();
+        } else {
+            RuntimeException ex = new IllegalArgumentException("Wrong Data Space name : " + spaceName);
+            logger.error(ex);
+            throw ex;
+        }
+        if (filePath == null) {
+            RuntimeException ex = new IllegalArgumentException("Wrong file path : " + filePath);
+            logger.error(ex);
+            throw ex;
+        }
+
+        FileObject sourcefo = fsManager.resolveFile(spaceURI + "/" + filePath);
+        if (!sourcefo.exists() || !sourcefo.isWriteable()) {
+            RuntimeException ex = new IllegalArgumentException("File or Folder " + filePath + " does not exist or is not writable in space " + spaceName);
+            logger.error(ex);
+            throw ex;
+        }
+        if (sourcefo.getType().equals(FileType.FILE)) {
+            logger.info("[deleteFile] deleting file " + sourcefo.getURL());
+            sourcefo.delete();
+        } else if (sourcefo.getType().equals(FileType.FOLDER)) {
+            logger.info("[deleteFile] deleting folder (and all its descendants) " + sourcefo.getURL());
+            sourcefo.delete(Selectors.SELECT_ALL);
+        } else {
+            RuntimeException ex = new IllegalArgumentException("File " + filePath + " has an unsupported type " + sourcefo.getType());
+            logger.error(ex);
+            throw ex;
+        }
+        return true;
     }
 
     /**
