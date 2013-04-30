@@ -18,7 +18,9 @@
     <property name="doc.header" value="&lt;table style=&quot;color:#555555;font-size: 9pt;&quot;&gt; &lt;tr&gt; &lt;td&gt; &lt;img src= &quot;{@docRoot}/../../images/logo-ProActive_small.png&quot;&gt; &lt;/td&gt; &lt;td width= &quot;500&quot;&gt; &lt;h5&gt;An Open Source Solution for Enterprise Grids &amp; Clouds&lt;/h5&gt; &lt;h2&gt;ProActive Scheduling &amp; Resourcing &lt;/h2&gt; &lt;h2&gt;Rest Interface - version ${rest_api.version}&lt;/h4&gt; &lt;h4 class=&quot;author&quot; &gt;&lt;span class=&quot;surname&quot;&gt;Copyright 1997-2013 ActiveEon/INRIA/University of Nice-Sophia Antipolis&lt;/span&gt;&lt;/h4&gt; &lt;/td&gt;  &lt;td&gt;  &lt;a href= &quot;http://www.activeeon.com/&quot;&gt;&lt;img border=&quot;0&quot; src= &quot;{@docRoot}/../../images/logo-ActiveEon.png&quot; alt=&quot;ActiveEon&quot; title=&quot;ActiveEon: a Professional Open Source company, co-developing and providing support for ProActive Parallel Suite&quot;&gt;&lt;/a&gt;  &lt;a href= &quot;http://www.ow2.org/&quot;&gt;&lt;img border=&quot;0&quot; src= &quot;{@docRoot}/../../images/logo-OW2_small.png&quot; alt=&quot;OW2&quot; title=&quot;OW2 Consortium&quot; &gt;&lt;/a&gt; &lt;br&gt;  &lt;a href=&quot;http://www.inria.fr&quot;&gt;&lt;img border=&quot;0&quot; src=&quot;{@docRoot}/../../images/logo-INRIA_small.png&quot; alt=&quot;INRIA&quot; title=&quot;A CNRS-INRIA-UNSA Research team&quot;&gt;&lt;/a&gt;  &lt;a href= &quot;http://www.unice.fr&quot;&gt;&lt;img border=&quot;0&quot; src= &quot;{@docRoot}/../../images/logo-UNSA_small.png&quot; alt=&quot;UNSA&quot; title=&quot;A CNRS-INRIA-UNSA Research team&quot;&gt;&lt;/a&gt;  &lt;a href=&quot;http://www.cnrs.fr&quot; &gt;&lt;img border=&quot;0&quot; src=&quot;{@docRoot}/../../images/logo-CNRS_small.png&quot; alt= &quot;CNRS-I3S&quot; title=&quot;A CNRS-INRIA-UNSA Research team&quot;&gt;&lt;/a&gt; &lt;/td&gt;  &lt;/tr&gt; &lt;/table&gt;" />
 
     <property name="projectRoot" value="${basedir}/.." />
+    <property name="compile.dir" value="${projectRoot}/compile" />
     <property name="build.dir" value="${projectRoot}/build" />
+    <property name="dev.dir" value="${projectRoot}/dev" />
     <property name="dist.dir" value="${projectRoot}/dist" />
 	<property name="classes.dir" value="${build.dir}/classes" />
 	<property name="classes.tests.dir" value="${build.dir}/test-classes" />
@@ -83,6 +85,40 @@
 		  <fileset dir="." includes="SchedulingRest-*.war" />
 		</delete>
 	</target>
+
+    <macrodef name="eclipse_format_m">
+        <attribute name="loglevel" default="WARN" />
+        <element name="sourcefileset" optional="false" />
+
+        <sequential>
+            <taskdef name="javaformatter" classname="org.hibernate.tool.ant.JavaFormatterTask">
+                <classpath>
+                    <fileset dir="${dev.dir}/lib">
+                        <include name="*.jar" />
+                    </fileset>
+                </classpath>
+            </taskdef>
+
+            <copy file="${compile.dir}/eclipse_formatter_config.xml" tofile="${compile.dir}/eclipse_formatter_config.properties" />
+
+            <replaceregexp file="${compile.dir}/eclipse_formatter_config.properties" match='^&lt;(.xml|/?profile).*' replace="" byline="true" />
+
+            <replaceregexp file="${compile.dir}/eclipse_formatter_config.properties" match='.*\"(.*)\".*\"(.*)\".*' replace="\1=\2" byline="true" />
+
+            <javaformatter configurationFile="eclipse_formatter_config.properties">
+                <sourcefileset />
+            </javaformatter>
+        </sequential>
+    </macrodef>
+
+    <target name="format" description="hibernate's eclipse-based source code formatter">
+        <eclipse_format_m>
+            <sourcefileset>
+                <fileset dir="${src.dir}" includes="**/*.java" />
+                <fileset dir="${src.tests.dir}" includes="**/*.java" />
+            </sourcefileset>
+        </eclipse_format_m>
+    </target>
 
 	<path id="src.classpath">
 		<fileset dir="${lib.dir}">
