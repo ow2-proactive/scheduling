@@ -59,6 +59,7 @@ import org.jboss.resteasy.client.ProxyFactory;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataOutput;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
+
 public class SchedulerRestClient {
 
     private SchedulerRestInterface scheduler;
@@ -81,9 +82,8 @@ public class SchedulerRestClient {
     }
 
     private JobIdData submit(String sessionId, InputStream job, MediaType mediaType) throws Exception {
-        ClientRequest request = new ClientRequest(restEndpointURL +
-                addSlashIfMissing(restEndpointURL)
-                + "scheduler/submit");
+        ClientRequest request = new ClientRequest(restEndpointURL + addSlashIfMissing(restEndpointURL) +
+            "scheduler/submit");
         request.header("sessionid", sessionId);
         MultipartFormDataOutput formData = new MultipartFormDataOutput();
         formData.addFormData("file", job, mediaType);
@@ -103,17 +103,16 @@ public class SchedulerRestClient {
         return scheduler;
     }
 
-    private static SchedulerRestInterface createRestProxy(ResteasyProviderFactory provider, String restEndpointURL) {
-        final SchedulerRestInterface schedulerRestClient = ProxyFactory.create(
-                SchedulerRestInterface.class, restEndpointURL, provider,
-                Collections.<String, Object>emptyMap());
+    private static SchedulerRestInterface createRestProxy(ResteasyProviderFactory provider,
+            String restEndpointURL) {
+        final SchedulerRestInterface schedulerRestClient = ProxyFactory.create(SchedulerRestInterface.class,
+                restEndpointURL, provider, Collections.<String, Object> emptyMap());
         return createExceptionProxy(schedulerRestClient);
     }
 
     private static SchedulerRestInterface createExceptionProxy(final SchedulerRestInterface scheduler) {
         return (SchedulerRestInterface) Proxy.newProxyInstance(SchedulerRestInterface.class.getClassLoader(),
-                new Class[]{SchedulerRestInterface.class},
-                new RestClientExceptionHandler(scheduler));
+                new Class[] { SchedulerRestInterface.class }, new RestClientExceptionHandler(scheduler));
     }
 
     private static class RestClientExceptionHandler implements InvocationHandler {
@@ -130,9 +129,8 @@ public class SchedulerRestClient {
                 return method.invoke(scheduler, args);
             } catch (InvocationTargetException targetException) {
                 if (targetException.getTargetException() instanceof ClientResponseFailure) {
-                    ExceptionToJson json = (ExceptionToJson) ((ClientResponseFailure)
-                            targetException.getTargetException()).getResponse().getEntity(
-                            ExceptionToJson.class);
+                    ExceptionToJson json = (ExceptionToJson) ((ClientResponseFailure) targetException
+                            .getTargetException()).getResponse().getEntity(ExceptionToJson.class);
 
                     throw rebuildException(json);
                 }
@@ -140,7 +138,9 @@ public class SchedulerRestClient {
             }
         }
 
-        private Exception rebuildException(ExceptionToJson json) throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
+        private Exception rebuildException(ExceptionToJson json) throws ClassNotFoundException,
+                NoSuchMethodException, InstantiationException, IllegalAccessException,
+                InvocationTargetException {
             Throwable serverException = json.getException();
             String exceptionClassName = json.getExceptionClass();
 

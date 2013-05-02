@@ -585,10 +585,10 @@ public class RMRest {
     @GET
     @Path("shutdown")
     @Produces("application/json")
-    public boolean shutdown(
-            @HeaderParam("sessionid") String sessionId,
-            @QueryParam("preempt") @DefaultValue("false") boolean preempt
-    ) throws NotConnectedException {
+    public boolean shutdown(@HeaderParam("sessionid")
+    String sessionId, @QueryParam("preempt")
+    @DefaultValue("false")
+    boolean preempt) throws NotConnectedException {
         ResourceManager rm = checkAccess(sessionId);
         return rm.shutdown(preempt).getBooleanValue();
     }

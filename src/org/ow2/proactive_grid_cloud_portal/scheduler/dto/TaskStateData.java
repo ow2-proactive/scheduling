@@ -39,6 +39,7 @@ package org.ow2.proactive_grid_cloud_portal.scheduler.dto;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
+
 @XmlRootElement
 public class TaskStateData {
 
@@ -95,8 +96,7 @@ public class TaskStateData {
         return maxNumberOfExecutionOnFailure;
     }
 
-    public void setMaxNumberOfExecutionOnFailure(
-            int maxNumberOfExecutionOnFailure) {
+    public void setMaxNumberOfExecutionOnFailure(int maxNumberOfExecutionOnFailure) {
         this.maxNumberOfExecutionOnFailure = maxNumberOfExecutionOnFailure;
     }
 
@@ -112,14 +112,12 @@ public class TaskStateData {
         return parallelEnvironment;
     }
 
-    public void setParallelEnvironment(
-            ParallelEnvironmentData parallelEnvironment) {
+    public void setParallelEnvironment(ParallelEnvironmentData parallelEnvironment) {
         this.parallelEnvironment = parallelEnvironment;
     }
 
     public int getNumberOfNodesNeeded() {
-        return (parallelEnvironment != null) ? parallelEnvironment
-                .getNodesNumber() : 1;
+        return (parallelEnvironment != null) ? parallelEnvironment.getNodesNumber() : 1;
     }
 
 }

@@ -41,6 +41,7 @@ import java.util.Arrays;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
+
 @XmlRootElement
 public class TaskResultData {
 
@@ -65,9 +66,6 @@ public class TaskResultData {
 
     @Override
     public String toString() {
-        return "TaskResultData{" +
-                "id=" + id +
-                ", serializedValue=" + Arrays.toString(serializedValue) +
-                '}';
+        return "TaskResultData{" + "id=" + id + ", serializedValue=" + Arrays.toString(serializedValue) + '}';
     }
 }

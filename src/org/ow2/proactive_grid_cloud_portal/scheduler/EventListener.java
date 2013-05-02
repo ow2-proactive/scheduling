@@ -9,6 +9,7 @@ import org.ow2.proactive.scheduler.common.job.UserIdentification;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateListener.State;
 
+
 public class EventListener implements SchedulerEventListener {
 
     private State state;

@@ -43,6 +43,7 @@ import org.jboss.resteasy.plugins.server.tjws.TJWSEmbeddedJaxrsServer;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
+
 public class RestTestServer {
     protected static int port;
     private static TJWSEmbeddedJaxrsServer server;

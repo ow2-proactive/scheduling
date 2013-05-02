@@ -36,6 +36,7 @@ package org.ow2.proactive_grid_cloud_portal.scheduler;
 
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
 
+
 public class SchedulerProxyUserInterfaceForTests extends SchedulerProxyUserInterface {
 
     /**

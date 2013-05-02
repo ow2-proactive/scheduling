@@ -182,10 +182,10 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @SuppressWarnings("unchecked")
     private static final List<SortParameter<JobSortParameter>> DEFAULT_JOB_SORT_PARAMS = Arrays.asList(
             new SortParameter<JobSortParameter>(JobSortParameter.STATE, SortOrder.ASC),
-            new SortParameter<JobSortParameter>(JobSortParameter.ID, SortOrder.DESC)
-    );
+            new SortParameter<JobSortParameter>(JobSortParameter.ID, SortOrder.DESC));
 
-    private static final Mapper mapper = new DozerBeanMapper(Collections.singletonList("org/ow2/proactive_grid_cloud_portal/scheduler/dozer-mappings.xml"));
+    private static final Mapper mapper = new DozerBeanMapper(Collections
+            .singletonList("org/ow2/proactive_grid_cloud_portal/scheduler/dozer-mappings.xml"));
 
     /**
      * Returns the ids of the current jobs under a list of string.
@@ -258,7 +258,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      */
     @GET
     @Path("jobsinfo")
-    @Produces({ "application/json", "application/xml" })
+    @Produces( { "application/json", "application/xml" })
     public List<UserJobData> jobsinfo(@HeaderParam("sessionid")
     String sessionId, @QueryParam("index")
     @DefaultValue("-1")
@@ -268,10 +268,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         try {
             Scheduler s = checkAccess(sessionId, "/scheduler/jobsinfo");
 
-            List<JobInfo> jobInfoList = s.getJobs(index,
-                    range,
-                    new JobFilterCriteria(false, true, true, true),
-                    DEFAULT_JOB_SORT_PARAMS);
+            List<JobInfo> jobInfoList = s.getJobs(index, range,
+                    new JobFilterCriteria(false, true, true, true), DEFAULT_JOB_SORT_PARAMS);
             List<UserJobData> userJobInfoList = new ArrayList<UserJobData>(jobInfoList.size());
             for (JobInfo jobInfo : jobInfoList) {
                 userJobInfoList.add(new UserJobData(mapper.map(jobInfo, JobInfoData.class)));
@@ -312,7 +310,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @GET
     @GZIP
     @Path("revisionjobsinfo")
-    @Produces({ "application/json", "application/xml" })
+    @Produces( { "application/json", "application/xml" })
     public Map<Long, List<UserJobData>> revisionAndjobsinfo(@HeaderParam("sessionid")
     String sessionId, @QueryParam("index")
     @DefaultValue("-1")
@@ -333,9 +331,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
             boolean onlyUserJobs = (myJobs && user != null && user.trim().length() > 0);
 
-            List<JobInfo> jobsInfo = s.getJobs(index, range,
-                    new JobFilterCriteria(onlyUserJobs, pending, running, finished),
-                    DEFAULT_JOB_SORT_PARAMS);
+            List<JobInfo> jobsInfo = s.getJobs(index, range, new JobFilterCriteria(onlyUserJobs, pending,
+                running, finished), DEFAULT_JOB_SORT_PARAMS);
             List<UserJobData> jobs = new ArrayList<UserJobData>(jobsInfo.size());
             for (JobInfo jobInfo : jobsInfo) {
                 jobs.add(new UserJobData(mapper.map(jobInfo, JobInfoData.class)));
@@ -360,7 +357,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      */
     @GET
     @Path("state/revision")
-    @Produces({ "application/json", "application/xml" })
+    @Produces( { "application/json", "application/xml" })
     public long schedulerStateRevision(@HeaderParam("sessionid")
     String sessionId) throws NotConnectedRestException {
         Scheduler s = checkAccess(sessionId, "/scheduler/revision");
@@ -378,7 +375,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      */
     @GET
     @Path("jobs/{jobid}")
-    @Produces({ "application/json", "application/xml" })
+    @Produces( { "application/json", "application/xml" })
     public JobStateData listJobs(@HeaderParam("sessionid")
     String sessionId, @PathParam("jobid")
     String jobId) throws NotConnectedRestException, UnknownJobRestException, PermissionRestException {
@@ -416,8 +413,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @Produces("application/json")
     @Override
     public String getLiveLogJob(@HeaderParam("sessionid")
-                                    String sessionId, @PathParam("jobid")
-                                    String jobId) throws NotConnectedRestException, UnknownJobRestException, PermissionRestException,
+    String sessionId, @PathParam("jobid")
+    String jobId) throws NotConnectedRestException, UnknownJobRestException, PermissionRestException,
             LogForwardingRestException, IOException {
         try {
             checkAccess(sessionId, "/scheduler/jobs/" + jobId + "/livelog");
@@ -447,7 +444,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             throw new NotConnectedRestException(e);
         } catch (UnknownJobException e) {
             throw new UnknownJobRestException(e);
-        }catch (LogForwardingException e) {
+        } catch (LogForwardingException e) {
             throw new LogForwardingRestException(e);
         }
     }
@@ -466,8 +463,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @Path("jobs/{jobid}/livelog/available")
     @Produces("application/json")
     public int getLiveLogJobAvailable(@HeaderParam("sessionid")
-                                      String sessionId, @PathParam("jobid")
-                                      String jobId) throws NotConnectedRestException {
+    String sessionId, @PathParam("jobid")
+    String jobId) throws NotConnectedRestException {
         checkAccess(sessionId, "/scheduler/jobs/" + jobId + "/livelog/available");
         SchedulerSession ss = SchedulerSessionMapper.getInstance().getSchedulerSession(sessionId);
 
@@ -495,8 +492,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @Path("jobs/{jobid}/livelog")
     @Produces("application/json")
     public boolean deleteLiveLogJob(@HeaderParam("sessionid")
-                                    String sessionId, @PathParam("jobid")
-                                    String jobId) throws NotConnectedRestException {
+    String sessionId, @PathParam("jobid")
+    String jobId) throws NotConnectedRestException {
         checkAccess(sessionId, "delete /scheduler/jobs/livelog" + jobId);
         SchedulerSession ss = SchedulerSessionMapper.getInstance().getSchedulerSession(sessionId);
 
@@ -634,8 +631,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @Produces("application/json")
     public String jobServerLog(@HeaderParam("sessionid")
     String sessionId, @PathParam("jobid")
-    String jobId) throws NotConnectedRestException, UnknownJobRestException,
-            PermissionRestException {
+    String jobId) throws NotConnectedRestException, UnknownJobRestException, PermissionRestException {
         try {
             Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/log/server");
             return s.getJobServerLogs(jobId);
@@ -722,9 +718,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @PUT
     @Path("jobs/{jobid}/tasks/{taskname}/preempt")
     public boolean preemptTask(@HeaderParam("sessionid")
-                               String sessionId, @PathParam("jobid")
-                               String jobid, @PathParam("taskname")
-                               String taskname) throws NotConnectedRestException, UnknownJobRestException, UnknownTaskRestException,
+    String sessionId, @PathParam("jobid")
+    String jobid, @PathParam("taskname")
+    String taskname) throws NotConnectedRestException, UnknownJobRestException, UnknownTaskRestException,
             PermissionRestException {
         try {
             Scheduler s = checkAccess(sessionId, "PUT jobs/" + jobid + "/tasks/" + taskname + "/preempt");
@@ -754,9 +750,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @PUT
     @Path("jobs/{jobid}/tasks/{taskname}/restart")
     public boolean restartTask(@HeaderParam("sessionid")
-                               String sessionId, @PathParam("jobid")
-                               String jobid, @PathParam("taskname")
-                               String taskname) throws NotConnectedRestException, UnknownJobRestException, UnknownTaskRestException,
+    String sessionId, @PathParam("jobid")
+    String jobid, @PathParam("taskname")
+    String taskname) throws NotConnectedRestException, UnknownJobRestException, UnknownTaskRestException,
             PermissionRestException {
         try {
             Scheduler s = checkAccess(sessionId, "PUT jobs/" + jobid + "/tasks/" + taskname + "/restart");
@@ -843,7 +839,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @GET
     @GZIP
     @Path("jobs/{jobid}/map")
-    @Produces({ "application/json", "application/xml" })
+    @Produces( { "application/json", "application/xml" })
     public String getJobMap(@HeaderParam("sessionid")
     String sessionId, @PathParam("jobid")
     String jobId) throws IOException, NotConnectedRestException {
@@ -1219,7 +1215,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         if (ss == null) {
             // logger.trace("not found a scheduler frontend for sessionId " +
             // sessionId);
-            throw new NotConnectedRestException("you are not connected to the scheduler, you should log on first");
+            throw new NotConnectedRestException(
+                "you are not connected to the scheduler, you should log on first");
         }
 
         SchedulerProxyUserInterface s = ss.getScheduler();
@@ -1227,7 +1224,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         if (s == null) {
             // logger.trace("not found a scheduler frontend for sessionId " +
             // sessionId);
-            throw new NotConnectedRestException("you are not connected to the scheduler, you should log on first");
+            throw new NotConnectedRestException(
+                "you are not connected to the scheduler, you should log on first");
         }
         // logger.trace("found a scheduler frontend for sessionId " + sessionId
         // + ", path =" + path);
@@ -1375,8 +1373,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces("application/json")
     public JobIdData submit(@HeaderParam("sessionid")
-    String sessionId, MultipartFormDataInput multipart) throws JobCreationRestException, NotConnectedRestException,
-            PermissionRestException, SubmissionClosedRestException, IOException {
+    String sessionId, MultipartFormDataInput multipart) throws JobCreationRestException,
+            NotConnectedRestException, PermissionRestException, SubmissionClosedRestException, IOException {
         try {
             Scheduler s = checkAccess(sessionId, "submit");
 
@@ -1445,8 +1443,11 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     @Override
-    public boolean pushFile(@HeaderParam("sessionid") String sessionId,@PathParam("spaceName") String spaceName,@PathParam("filePath") String filePath,
-                            MultipartFormDataInput multipart) throws IOException, NotConnectedRestException, PermissionRestException {
+    public boolean pushFile(@HeaderParam("sessionid")
+    String sessionId, @PathParam("spaceName")
+    String spaceName, @PathParam("filePath")
+    String filePath, MultipartFormDataInput multipart) throws IOException, NotConnectedRestException,
+            PermissionRestException {
         Scheduler s = checkAccess(sessionId, "pushFile");
 
         Map<String, List<InputPart>> formDataMap = multipart.getFormDataMap();
@@ -1468,7 +1469,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         destUri += fileName;
         FileObject destfo = fsManager.resolveFile(destUri);
         if (!destfo.isWriteable()) {
-            RuntimeException ex = new IllegalArgumentException("File " + filePath + " is not writable in space " + spaceName);
+            RuntimeException ex = new IllegalArgumentException("File " + filePath +
+                " is not writable in space " + spaceName);
             logger.error(ex);
             throw ex;
         }
@@ -1481,21 +1483,21 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
         if (targetUrl.toString().startsWith("file:")) {
             // if the url is a file:// url, we push directly the InputStream to the destination file
-        File targetFile = null;
-        try {
-            targetFile = new File(targetUrl.toURI());
-        } catch (URISyntaxException e) {
-            throw new IllegalStateException(e);
-        }
-        logger.info("[pushFile] pushing input file to " + targetFile);
-        FileUtils.copyInputStreamToFile(fileContent, targetFile);
+            File targetFile = null;
+            try {
+                targetFile = new File(targetUrl.toURI());
+            } catch (URISyntaxException e) {
+                throw new IllegalStateException(e);
+            }
+            logger.info("[pushFile] pushing input file to " + targetFile);
+            FileUtils.copyInputStreamToFile(fileContent, targetFile);
         } else {
             // in the other case, we need to push the inputStream to a tempFile and then transfer the file via dataspaces
-            File tmpFile = File.createTempFile("pushedFile",".tmp");
+            File tmpFile = File.createTempFile("pushedFile", ".tmp");
             try {
-            FileUtils.copyInputStreamToFile(fileContent, tmpFile);
-            FileObject sourcefo = fsManager.resolveFile(tmpFile.getCanonicalPath());
-            destfo.copyFrom(sourcefo, Selectors.SELECT_SELF);
+                FileUtils.copyInputStreamToFile(fileContent, tmpFile);
+                FileObject sourcefo = fsManager.resolveFile(tmpFile.getCanonicalPath());
+                destfo.copyFrom(sourcefo, Selectors.SELECT_SELF);
             } finally {
                 tmpFile.delete();
             }
@@ -1506,9 +1508,10 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     @Override
-    public InputStream pullFile(
-            @HeaderParam("sessionid") String sessionId, @PathParam("spaceName") String spaceName,@PathParam("filePath") String filePath) throws IOException,
-            NotConnectedRestException, PermissionRestException {
+    public InputStream pullFile(@HeaderParam("sessionid")
+    String sessionId, @PathParam("spaceName")
+    String spaceName, @PathParam("filePath")
+    String filePath) throws IOException, NotConnectedRestException, PermissionRestException {
 
         Scheduler s = checkAccess(sessionId, "pullFile");
 
@@ -1520,27 +1523,29 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
         FileObject sourcefo = fsManager.resolveFile(spaceURI + "/" + filePath);
         if (!sourcefo.exists() || !sourcefo.isReadable()) {
-            RuntimeException ex = new IllegalArgumentException("File " + filePath + " does not exist or is not readable in space " + spaceName);
+            RuntimeException ex = new IllegalArgumentException("File " + filePath +
+                " does not exist or is not readable in space " + spaceName);
             logger.error(ex);
             throw ex;
         }
 
         if (sourcefo.getType().equals(FileType.FOLDER)) {
             logger.info("[pullFile] reading directory content from " + sourcefo.getURL());
-             // if it's a folder we return an InputStream listing its content
+            // if it's a folder we return an InputStream listing its content
             StringBuilder sb = new StringBuilder();
             String nl = System.getProperty("line.separator");
             for (FileObject fo : sourcefo.getChildren()) {
-                sb.append(fo.getName().getBaseName()+nl);
+                sb.append(fo.getName().getBaseName() + nl);
 
             }
             return IOUtils.toInputStream(sb.toString());
 
-        } else if (sourcefo.getType().equals(FileType.FILE)){
+        } else if (sourcefo.getType().equals(FileType.FILE)) {
             logger.info("[pullFile] reading file content from " + sourcefo.getURL());
             return sourcefo.getContent().getInputStream();
         } else {
-            RuntimeException ex = new IllegalArgumentException("File " + filePath + " has an unsupported type " + sourcefo.getType());
+            RuntimeException ex = new IllegalArgumentException("File " + filePath +
+                " has an unsupported type " + sourcefo.getType());
             logger.error(ex);
             throw ex;
         }
@@ -1548,8 +1553,10 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     @Override
-    public boolean deleteFile(@HeaderParam("sessionid") String sessionId, @PathParam("spaceName") String spaceName, @PathParam("filePath") String filePath)
-            throws IOException, NotConnectedRestException, PermissionRestException {
+    public boolean deleteFile(@HeaderParam("sessionid")
+    String sessionId, @PathParam("spaceName")
+    String spaceName, @PathParam("filePath")
+    String filePath) throws IOException, NotConnectedRestException, PermissionRestException {
         Scheduler s = checkAccess(sessionId, "pullFile");
 
         String spaceURI = resolveSpaceUri(s, spaceName);
@@ -1561,7 +1568,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
         FileObject sourcefo = fsManager.resolveFile(spaceURI + "/" + filePath);
         if (!sourcefo.exists() || !sourcefo.isWriteable()) {
-            RuntimeException ex = new IllegalArgumentException("File or Folder " + filePath + " does not exist or is not writable in space " + spaceName);
+            RuntimeException ex = new IllegalArgumentException("File or Folder " + filePath +
+                " does not exist or is not writable in space " + spaceName);
             logger.error(ex);
             throw ex;
         }
@@ -1572,14 +1580,16 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             logger.info("[deleteFile] deleting folder (and all its descendants) " + sourcefo.getURL());
             sourcefo.delete(Selectors.SELECT_ALL);
         } else {
-            RuntimeException ex = new IllegalArgumentException("File " + filePath + " has an unsupported type " + sourcefo.getType());
+            RuntimeException ex = new IllegalArgumentException("File " + filePath +
+                " has an unsupported type " + sourcefo.getType());
             logger.error(ex);
             throw ex;
         }
         return true;
     }
 
-    private String resolveSpaceUri(Scheduler s, String spaceName) throws NotConnectedRestException, PermissionRestException {
+    private String resolveSpaceUri(Scheduler s, String spaceName) throws NotConnectedRestException,
+            PermissionRestException {
         try {
             if (SchedulerConstants.GLOBALSPACE_NAME.equals(spaceName)) {
                 return s.getGlobalSpaceURI();
@@ -1726,9 +1736,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             throw new PermissionRestException(e);
         } catch (NotConnectedException e) {
             throw new NotConnectedRestException(e);
-        } catch (JobAlreadyFinishedException e){
+        } catch (JobAlreadyFinishedException e) {
             throw new JobAlreadyFinishedRestException(e);
-        } catch (UnknownJobException e){
+        } catch (UnknownJobException e) {
             throw new UnknownJobRestException(e);
         }
     }
@@ -1810,8 +1820,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         try {
             Scheduler s = checkAccess(sessionId, "status");
             renewLeaseForClient(s);
-            return SchedulerStatusData.valueOf(
-                    SchedulerStateListener.getInstance().getSchedulerStatus(s).name());
+            return SchedulerStatusData.valueOf(SchedulerStateListener.getInstance().getSchedulerStatus(s)
+                    .name());
         } catch (PermissionException e) {
             throw new PermissionRestException(e);
         } catch (NotConnectedException e) {
@@ -1833,14 +1843,14 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @Produces("application/json")
     public boolean startScheduler(@HeaderParam("sessionid")
     final String sessionId) throws NotConnectedRestException, PermissionRestException {
-       try {
-           Scheduler s = checkAccess(sessionId, "start");
-           return s.start();
-       } catch (PermissionException e) {
-           throw new PermissionRestException(e);
-       } catch (NotConnectedException e) {
-           throw new NotConnectedRestException(e);
-       }
+        try {
+            Scheduler s = checkAccess(sessionId, "start");
+            return s.start();
+        } catch (PermissionException e) {
+            throw new PermissionRestException(e);
+        } catch (NotConnectedException e) {
+            throw new NotConnectedRestException(e);
+        }
     }
 
     /**
@@ -1883,16 +1893,16 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @Path("linkrm")
     @Produces("application/json")
     public boolean linkRm(@HeaderParam("sessionid")
-                              final String sessionId, @FormParam("rmurl")
-                              String rmURL) throws NotConnectedRestException, PermissionRestException {
-       try {
-           Scheduler s = checkAccess(sessionId, "linkrm");
-           return s.linkResourceManager(rmURL);
-       } catch (PermissionException e) {
-           throw new PermissionRestException(e);
-       } catch (NotConnectedException e) {
-           throw new NotConnectedRestException(e);
-       }
+    final String sessionId, @FormParam("rmurl")
+    String rmURL) throws NotConnectedRestException, PermissionRestException {
+        try {
+            Scheduler s = checkAccess(sessionId, "linkrm");
+            return s.linkResourceManager(rmURL);
+        } catch (PermissionException e) {
+            throw new PermissionRestException(e);
+        } catch (NotConnectedException e) {
+            throw new NotConnectedRestException(e);
+        }
     }
 
     /**
@@ -1907,7 +1917,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @Path("isconnected")
     @Produces("application/json")
     public boolean isConnected(@HeaderParam("sessionid")
-                               final String sessionId) throws NotConnectedRestException {
+    final String sessionId) throws NotConnectedRestException {
         Scheduler s = checkAccess(sessionId, "isconnected");
         return s.isConnected();
     }
@@ -1932,7 +1942,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     String password) throws LoginException, SchedulerRestException {
         try {
             SchedulerProxyUserInterface scheduler = PAActiveObject.newActive(
-                    SchedulerProxyUserInterface.class, new Object[]{});
+                    SchedulerProxyUserInterface.class, new Object[] {});
 
             String url = PortalConfiguration.getProperties().getProperty(PortalConfiguration.scheduler_url);
 
@@ -1969,11 +1979,10 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @Path("login")
     @Produces("application/json")
     public String loginWithCredential(@MultipartForm
-    LoginForm multipart) throws  LoginException, KeyException,
-            SchedulerRestException {
+    LoginForm multipart) throws LoginException, KeyException, SchedulerRestException {
         try {
             SchedulerProxyUserInterface scheduler = PAActiveObject.newActive(
-                    SchedulerProxyUserInterface.class, new Object[]{});
+                    SchedulerProxyUserInterface.class, new Object[] {});
             String username = null;
             String url = PortalConfiguration.getProperties().getProperty(PortalConfiguration.scheduler_url);
 
@@ -1991,9 +2000,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                 }
 
                 username = multipart.getUsername();
-                CredData credData = new CredData(CredData.parseLogin(multipart.getUsername()),
-                        CredData.parseDomain(multipart.getUsername()), multipart.getPassword(),
-                        multipart.getSshKey());
+                CredData credData = new CredData(CredData.parseLogin(multipart.getUsername()), CredData
+                        .parseDomain(multipart.getUsername()), multipart.getPassword(), multipart.getSshKey());
                 scheduler.init(url, credData);
             }
 
@@ -2112,11 +2120,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             PublicKey pubKey = auth.getPublicKey();
 
             try {
-                Credentials cred = Credentials.createCredentials(
-                        new CredData(CredData.parseLogin(multipart.getUsername()),
-                                CredData.parseDomain(multipart
-                                        .getUsername()), multipart.getPassword(), multipart.getSshKey()),
-                        pubKey);
+                Credentials cred = Credentials.createCredentials(new CredData(CredData.parseLogin(multipart
+                        .getUsername()), CredData.parseDomain(multipart.getUsername()), multipart
+                        .getPassword(), multipart.getSshKey()), pubKey);
 
                 return cred.getBase64();
             } catch (KeyException e) {
@@ -2131,11 +2137,12 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @Path("usage/myaccount")
     @Produces("application/json")
     @Override
-    public List<JobUsageData> getUsageOnMyAccount(
-            @HeaderParam("sessionid") String sessionId,
-            @QueryParam("startdate") @DateFormatter.DateFormat() Date startDate,
-            @QueryParam("enddate") @DateFormatter.DateFormat() Date endDate)
-            throws NotConnectedRestException, PermissionRestException {
+    public List<JobUsageData> getUsageOnMyAccount(@HeaderParam("sessionid")
+    String sessionId, @QueryParam("startdate")
+    @DateFormatter.DateFormat()
+    Date startDate, @QueryParam("enddate")
+    @DateFormatter.DateFormat()
+    Date endDate) throws NotConnectedRestException, PermissionRestException {
         try {
             Scheduler scheduler = checkAccess(sessionId);
             return map(scheduler.getMyAccountUsage(startDate, endDate), JobUsageData.class);

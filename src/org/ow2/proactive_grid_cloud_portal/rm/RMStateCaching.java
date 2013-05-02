@@ -144,7 +144,9 @@ public class RMStateCaching {
                         long t2 = System.currentTimeMillis();
                         logger.debug("updated RM initial state in " + (t2 - t1) + "ms");
                     } catch (Throwable t) {
-                        logger.error("Exception occurrend while updating RM state cache, connection reset", t);
+                        logger
+                                .error("Exception occurrend while updating RM state cache, connection reset",
+                                        t);
                         init_();
                     }
 

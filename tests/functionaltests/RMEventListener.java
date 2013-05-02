@@ -46,20 +46,18 @@ import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.frontend.RMGroupEventListener;
 
 
-public class RMEventListener extends RMGroupEventListener implements
-        Serializable {
+public class RMEventListener extends RMGroupEventListener implements Serializable {
 
     private RMEventMonitor eventMonitor;
 
-    public static RMEventListener createEventListener(
-            RMEventMonitor eventMonitor) throws Exception {
+    public static RMEventListener createEventListener(RMEventMonitor eventMonitor) throws Exception {
         RMEventListener listener = new RMEventListener(eventMonitor);
         return PAActiveObject.turnActive(listener);
     }
 
     public RMEventListener() {
     }
-    
+
     public RMEventListener(RMEventMonitor eventMonitor) {
         this.eventMonitor = eventMonitor;
     }

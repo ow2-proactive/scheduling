@@ -44,6 +44,7 @@ import org.junit.Test;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
 
+
 public class RestfulSchedulerFreezeTest extends AbstractRestFuncTestCase {
     @BeforeClass
     public static void beforeClass() throws Exception {

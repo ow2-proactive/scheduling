@@ -54,6 +54,7 @@ import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 
+
 public class RestFuncTUtils {
 
     private RestFuncTUtils() {
@@ -64,8 +65,7 @@ public class RestFuncTUtils {
         close(process.getOutputStream());
         close(process.getInputStream());
         close(process.getErrorStream());
-        System.out.println(String.format("Process ended with exit code %d. ",
-                process.exitValue()));
+        System.out.println(String.format("Process ended with exit code %d. ", process.exitValue()));
     }
 
     private static void close(Closeable stream) {
@@ -77,45 +77,34 @@ public class RestFuncTUtils {
     }
 
     public static final String getJavaPathFromSystemProperties() {
-        return (new StringBuilder()).append(System.getProperty("java.home"))
-                .append(File.separator).append("bin").append(File.separator)
-                .append("java").toString();
+        return (new StringBuilder()).append(System.getProperty("java.home")).append(File.separator).append(
+                "bin").append(File.separator).append("java").toString();
     }
 
-    public static Credentials createCredentials(String login, String password,
-            PublicKey pubKey) throws Exception {
-        return Credentials.createCredentials(
-                new CredData(CredData.parseLogin(login), CredData
-                        .parseDomain(login), password), pubKey);
+    public static Credentials createCredentials(String login, String password, PublicKey pubKey)
+            throws Exception {
+        return Credentials.createCredentials(new CredData(CredData.parseLogin(login), CredData
+                .parseDomain(login), password), pubKey);
     }
 
     public static String buildJvmParameters() {
         StringBuilder jvmParameters = new StringBuilder();
-        jvmParameters
-                .append(CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL
-                        .getCmdLine());
-        jvmParameters
-                .append(CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL
-                        .getValue());
+        jvmParameters.append(CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getCmdLine());
+        jvmParameters.append(CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getValue());
         return jvmParameters.toString();
     }
 
     public static void cleanupRMActiveObjectRegistry() throws Exception {
-        cleanupActiveObjectRegistry(
-                PAResourceManagerProperties.RM_NODE_NAME.getValueAsString(),
-                RMConstants.NAME_ACTIVE_OBJECT_RMCORE,
-                RMConstants.NAME_ACTIVE_OBJECT_RMADMIN,
-                RMConstants.NAME_ACTIVE_OBJECT_RMAUTHENTICATION,
-                RMConstants.NAME_ACTIVE_OBJECT_RMUSER,
+        cleanupActiveObjectRegistry(PAResourceManagerProperties.RM_NODE_NAME.getValueAsString(),
+                RMConstants.NAME_ACTIVE_OBJECT_RMCORE, RMConstants.NAME_ACTIVE_OBJECT_RMADMIN,
+                RMConstants.NAME_ACTIVE_OBJECT_RMAUTHENTICATION, RMConstants.NAME_ACTIVE_OBJECT_RMUSER,
                 RMConstants.NAME_ACTIVE_OBJECT_RMMONITORING);
     }
 
-    public static void cleanupActiveObjectRegistry(String... namesToRemove)
-            throws Exception {
+    public static void cleanupActiveObjectRegistry(String... namesToRemove) throws Exception {
         String url = "//" + ProActiveInet.getInstance().getHostname();
 
-        RemoteObjectFactory factory = AbstractRemoteObjectFactory
-                .getDefaultRemoteObjectFactory();
+        RemoteObjectFactory factory = AbstractRemoteObjectFactory.getDefaultRemoteObjectFactory();
         for (URI uri : factory.list(new URI(url))) {
             for (String name : namesToRemove) {
                 if (uri.getPath().endsWith(name)) {
@@ -128,10 +117,9 @@ public class RestFuncTUtils {
     }
 
     public static String getClassPath(Class<?> clazz) throws Exception {
-        String name = (new StringBuilder()).append('/')
-                .append(clazz.getName().replace('.', '/')).append(".class")
-                .toString();
-        String osName = name.replace('/',File.separator.charAt(0));
+        String name = (new StringBuilder()).append('/').append(clazz.getName().replace('.', '/')).append(
+                ".class").toString();
+        String osName = name.replace('/', File.separator.charAt(0));
         URL resource = clazz.getResource(name);
         String absolutePath = (new File(resource.toURI())).getAbsolutePath();
         return absolutePath.substring(0, absolutePath.indexOf(osName));

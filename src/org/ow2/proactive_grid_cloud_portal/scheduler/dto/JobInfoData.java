@@ -150,18 +150,10 @@ public class JobInfoData {
 
     @Override
     public String toString() {
-        return "JobInfoData{" +
-                "startTime=" + startTime +
-                ", finishedTime=" + finishedTime +
-                ", submittedTime=" + submittedTime +
-                ", status='" + status + '\'' +
-                ", jobId=" + jobId +
-                ", totalNumberOfTasks=" + totalNumberOfTasks +
-                ", numberOfPendingTasks=" + numberOfPendingTasks +
-                ", numberOfRunningTasks=" + numberOfRunningTasks +
-                ", numberOfFinishedTasks=" + numberOfFinishedTasks +
-                ", priority='" + priority + '\'' +
-                ", jobOwner='" + jobOwner + '\'' +
-                '}';
+        return "JobInfoData{" + "startTime=" + startTime + ", finishedTime=" + finishedTime +
+            ", submittedTime=" + submittedTime + ", status='" + status + '\'' + ", jobId=" + jobId +
+            ", totalNumberOfTasks=" + totalNumberOfTasks + ", numberOfPendingTasks=" + numberOfPendingTasks +
+            ", numberOfRunningTasks=" + numberOfRunningTasks + ", numberOfFinishedTasks=" +
+            numberOfFinishedTasks + ", priority='" + priority + '\'' + ", jobOwner='" + jobOwner + '\'' + '}';
     }
 }

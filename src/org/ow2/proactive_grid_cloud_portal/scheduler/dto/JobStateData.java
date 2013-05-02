@@ -41,6 +41,7 @@ import java.util.Map;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
+
 @XmlRootElement
 public class JobStateData {
     private String name;
@@ -104,14 +105,9 @@ public class JobStateData {
 
     @Override
     public String toString() {
-        return "JobStateData{" +
-                "name='" + name + '\'' +
-                ", priority='" + priority + '\'' +
-                ", owner='" + owner + '\'' +
-                ", jobInfo=" + jobInfo +
-                ", projectName='" + projectName + '\'' +
-                ", tasks=" + tasks +
-                '}';
+        return "JobStateData{" + "name='" + name + '\'' + ", priority='" + priority + '\'' + ", owner='" +
+            owner + '\'' + ", jobInfo=" + jobInfo + ", projectName='" + projectName + '\'' + ", tasks=" +
+            tasks + '}';
     }
 
 }

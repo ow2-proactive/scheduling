@@ -47,10 +47,11 @@ import org.junit.Test;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
 
+
 public class RestSchedulerTest extends AbstractRestFuncTestCase {
 
     @BeforeClass
-    public static void beforeClass() throws Exception{
+    public static void beforeClass() throws Exception {
         try {
             RestFuncTHelper.startRestfulSchedulerWebapp();
         } catch (Exception e) {

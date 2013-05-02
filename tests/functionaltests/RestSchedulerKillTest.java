@@ -44,6 +44,7 @@ import org.junit.Test;
 
 import static org.ow2.proactive.scheduler.common.SchedulerStatus.KILLED;
 
+
 public class RestSchedulerKillTest extends AbstractRestFuncTestCase {
 
     @BeforeClass

@@ -50,6 +50,7 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.dto.UserJobData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
+
 public class SchedulerClientExample {
 
     public static void main(String[] args) throws Exception {
@@ -61,7 +62,7 @@ public class SchedulerClientExample {
 
         // JOB SUBMISSION
         File xmlJobFile = new File(
-                "/home/ybonnaffe/src/cloud_service_provider_conectors/cloudstack/vminfo_job.xml");
+            "/home/ybonnaffe/src/cloud_service_provider_conectors/cloudstack/vminfo_job.xml");
         JobIdData xmlJob = client.submitXml(sessionId, new FileInputStream(xmlJobFile));
         System.out.println(xmlJob.getReadableName() + " " + xmlJob.getId());
 
@@ -87,14 +88,12 @@ public class SchedulerClientExample {
         TaskResultData taskresult = scheduler.taskresult(sessionId, Long.toString(flatJob.getId()), "task_1");
         System.out.println(ToStringBuilder.reflectionToString(taskresult));
 
-
-        List<TaskStateData> jobTaskStates = scheduler.getJobTaskStates(sessionId,
-                Long.toString(flatJob.getId()));
+        List<TaskStateData> jobTaskStates = scheduler.getJobTaskStates(sessionId, Long.toString(flatJob
+                .getId()));
         System.out.println(ToStringBuilder.reflectionToString(jobTaskStates));
 
         TaskStateData task_1 = scheduler.jobtasks(sessionId, Long.toString(flatJob.getId()), "task_1");
         System.out.println(ToStringBuilder.reflectionToString(task_1));
-
 
         // OTHER CALLS
 
@@ -102,11 +101,9 @@ public class SchedulerClientExample {
         System.out.println(users);
         System.out.println(users.size());
 
-
-        Map<Long, List<UserJobData>> map = scheduler.revisionAndjobsinfo(sessionId, 0, 50, true,
-                true, true, true);
+        Map<Long, List<UserJobData>> map = scheduler.revisionAndjobsinfo(sessionId, 0, 50, true, true, true,
+                true);
         System.out.println(map);
-
 
         System.out.println(scheduler.getSchedulerStatus(sessionId));
         System.out.println(scheduler.getUsageOnMyAccount(sessionId, new Date(), new Date()));
@@ -121,6 +118,5 @@ public class SchedulerClientExample {
         }
 
     }
-
 
 }

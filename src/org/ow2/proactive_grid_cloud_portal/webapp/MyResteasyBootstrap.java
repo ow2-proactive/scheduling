@@ -40,10 +40,10 @@ import java.io.File;
 
 import javax.servlet.ServletContextEvent;
 
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.apache.log4j.Logger;
 import org.jboss.resteasy.plugins.server.servlet.ResteasyBootstrap;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 public class MyResteasyBootstrap extends ResteasyBootstrap {
@@ -59,16 +59,15 @@ public class MyResteasyBootstrap extends ResteasyBootstrap {
 
         restRuntime = new RestRuntime();
 
-        restRuntime.start(dispatcher,
-                new File(event.getServletContext().getRealPath("WEB-INF/portal.properties")), new File(event
-                        .getServletContext().getRealPath("WEB-INF/log4j.properties")), new File(event
-                        .getServletContext().getRealPath("WEB-INF/ProActiveConfiguration.xml")));
+        restRuntime.start(dispatcher, new File(event.getServletContext().getRealPath(
+                "WEB-INF/portal.properties")), new File(event.getServletContext().getRealPath(
+                "WEB-INF/log4j.properties")), new File(event.getServletContext().getRealPath(
+                "WEB-INF/ProActiveConfiguration.xml")));
     }
 
     @Override
     public void contextDestroyed(ServletContextEvent event) {
-        LOGGER.info("shutting down ProActive Rest API at " +
-            event.getServletContext().getContextPath());
+        LOGGER.info("shutting down ProActive Rest API at " + event.getServletContext().getContextPath());
 
         restRuntime.stop();
 

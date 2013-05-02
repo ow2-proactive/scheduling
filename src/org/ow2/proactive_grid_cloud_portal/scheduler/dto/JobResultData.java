@@ -41,6 +41,7 @@ import java.util.Map;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
+
 @XmlRootElement
 public class JobResultData {
 
@@ -65,9 +66,6 @@ public class JobResultData {
 
     @Override
     public String toString() {
-        return "JobResultData{" +
-                "id=" + id +
-                ", allResults=" + allResults +
-                '}';
+        return "JobResultData{" + "id=" + id + ", allResults=" + allResults + '}';
     }
 }

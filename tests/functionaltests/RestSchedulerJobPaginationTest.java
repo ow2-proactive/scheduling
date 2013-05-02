@@ -113,7 +113,7 @@ public class RestSchedulerJobPaginationTest extends AbstractRestFuncTestCase {
 
         JobId jobId1 = getScheduler().submit(createJob());
         waitJobState(jobId1, JobStatus.RUNNING, 30000);
-        
+
         JobId jobId2 = submitDefaultJob();
         JobId jobId3 = submitDefaultJob();
 
@@ -139,17 +139,17 @@ public class RestSchedulerJobPaginationTest extends AbstractRestFuncTestCase {
         setSessionHeader(httpPut);
         HttpResponse response = executeUriRequest(httpPut);
         assertHttpStatusOK(response);
-        
+
         waitJobState(jobId1, JobStatus.KILLED, 30000);
         waitJobState(jobId2, JobStatus.FINISHED, 30000);
         waitJobState(jobId3, JobStatus.FINISHED, 30000);
 
         checkFiltering2();
-        
+
         // check 'jobsinfo' and 'revisionjobsinfo' provide updated job's attributes
 
         JSONObject job = null;
-        
+
         jobs = getRequestJSONArray(getResourceUrl("jobsinfo"));
         checkJob(findJob("1", jobs), JobStatus.KILLED, 0, 0);
 
@@ -160,10 +160,11 @@ public class RestSchedulerJobPaginationTest extends AbstractRestFuncTestCase {
 
         checkPagingRequests2();
     }
+
     private JSONObject findJob(String id, JSONArray jobs) {
         for (int i = 0; i < jobs.size(); i++) {
-            if(((JSONObject)jobs.get(i)).get("jobid").equals(id)) {
-                return (JSONObject)jobs.get(i);
+            if (((JSONObject) jobs.get(i)).get("jobid").equals(id)) {
+                return (JSONObject) jobs.get(i);
             }
         }
         Assert.fail("Failed to find job " + id + ", all jobs: " + jobs);
@@ -235,7 +236,8 @@ public class RestSchedulerJobPaginationTest extends AbstractRestFuncTestCase {
         checkRevisionJobsInfo(url);
     }
 
-    private void checkJob(JSONObject job, JobStatus status, int runningTasks, int finishedTasks) throws Exception {
+    private void checkJob(JSONObject job, JobStatus status, int runningTasks, int finishedTasks)
+            throws Exception {
         Assert.assertEquals("1", job.get("jobid"));
         Assert.assertEquals(getLogin(), job.get("jobOwner"));
         JSONObject jobInfo = (JSONObject) job.get("jobInfo");
@@ -350,7 +352,9 @@ public class RestSchedulerJobPaginationTest extends AbstractRestFuncTestCase {
             JSONObject job = (JSONObject) jobs.get(i);
             actual.add((String) job.get("jobid"));
         }
-        Assert.assertEquals("Unexpected result of 'revisionjobsinfo' request (" + url + ")", expected, actual);
+        Assert
+                .assertEquals("Unexpected result of 'revisionjobsinfo' request (" + url + ")", expected,
+                        actual);
     }
 
 }

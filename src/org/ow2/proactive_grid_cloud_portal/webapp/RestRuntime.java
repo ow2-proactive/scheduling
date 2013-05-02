@@ -82,6 +82,7 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
+
 public class RestRuntime {
 
     private static final Logger LOGGER = ProActiveLogger.getLogger(RestRuntime.class);
@@ -89,7 +90,7 @@ public class RestRuntime {
     private SchedulerSessionsCleaner schedulerSessionCleaner;
     private RMSessionsCleaner rmSessionCleaner;
 
-    private static Map<Class,Integer> EXCEPTION_MAPPINGS = new HashMap<Class, Integer>();
+    private static Map<Class, Integer> EXCEPTION_MAPPINGS = new HashMap<Class, Integer>();
     static {
         EXCEPTION_MAPPINGS.put(IOException.class, HttpURLConnection.HTTP_NOT_FOUND);
         EXCEPTION_MAPPINGS.put(JobAlreadyFinishedException.class, HttpURLConnection.HTTP_NOT_FOUND);
@@ -139,8 +140,7 @@ public class RestRuntime {
 
             for (Entry<Object, Object> tmp : p.entrySet()) {
                 ProActiveConfiguration.getInstance().setProperty(tmp.getKey().toString(),
-                        tmp.getValue().toString(),
-                        false);
+                        tmp.getValue().toString(), false);
             }
         }
 
@@ -215,8 +215,7 @@ public class RestRuntime {
         Set<String> schedulerSessionIds = SchedulerSessionMapper.getInstance().getSessionsMap().keySet();
         List<String> sessionids = new ArrayList<String>(schedulerSessionIds);
         for (String sessionid : sessionids) {
-            Scheduler s = SchedulerSessionMapper.getInstance().getSessionsMap().get(sessionid)
-                    .getScheduler();
+            Scheduler s = SchedulerSessionMapper.getInstance().getSessionsMap().get(sessionid).getScheduler();
             try {
                 s.disconnect();
             } catch (Throwable e) {

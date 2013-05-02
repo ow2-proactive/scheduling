@@ -49,6 +49,7 @@ import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.frontend.RMEventListener;
 
+
 public class RMEventMonitor implements RMEventListener {
 
     private List<RMEventMonitor.RMWaitCondition> waitConditions = new ArrayList<RMEventMonitor.RMWaitCondition>();
@@ -59,8 +60,7 @@ public class RMEventMonitor implements RMEventListener {
         }
     }
 
-    public boolean waitFor(RMEventMonitor.RMWaitCondition waitCondition,
-            long timeout) {
+    public boolean waitFor(RMEventMonitor.RMWaitCondition waitCondition, long timeout) {
         synchronized (waitConditions) {
             if (!waitConditions.contains(waitCondition)) {
                 throw new IllegalArgumentException("Unknown wait condition.");
@@ -126,8 +126,7 @@ public class RMEventMonitor implements RMEventListener {
         private Set<String> deployedNodes = new HashSet<String>();
         private boolean nodesDeploymentFailed = false;
 
-        public RMNodesDeployedWaitCondition(String nodeSource,
-                int expectedNumOfNodes) {
+        public RMNodesDeployedWaitCondition(String nodeSource, int expectedNumOfNodes) {
             this.nodeSource = nodeSource;
             this.expectedNumOfNodes = expectedNumOfNodes;
         }
@@ -138,17 +137,13 @@ public class RMEventMonitor implements RMEventListener {
                 return;
             }
             if (!deployedNodes.contains(nodeEvent.getNodeUrl())) {
-                if (RMEventType.NODE_STATE_CHANGED.equals(nodeEvent
-                        .getEventType())) {
+                if (RMEventType.NODE_STATE_CHANGED.equals(nodeEvent.getEventType())) {
                     if (NodeState.FREE.equals(nodeEvent.getNodeState())) {
                         deployedNodes.add(nodeEvent.getNodeUrl());
                     } else {
-                        System.out
-                                .println(String
-                                        .format("Error, unexpected node state: %s (host:%s, nodeinfo:%s)",
-                                                nodeEvent.getNodeState(),
-                                                nodeEvent.getHostName(),
-                                                nodeEvent.getNodeInfo()));
+                        System.out.println(String.format(
+                                "Error, unexpected node state: %s (host:%s, nodeinfo:%s)", nodeEvent
+                                        .getNodeState(), nodeEvent.getHostName(), nodeEvent.getNodeInfo()));
                         nodesDeploymentFailed = true;
                     }
                     notifyAll();

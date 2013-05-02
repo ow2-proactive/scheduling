@@ -41,6 +41,7 @@ import java.io.FileInputStream;
 import java.net.URL;
 import java.util.Properties;
 
+
 public class RestFuncTestConfig {
 
     public static final String RESTAPI_TEST_LOGIN = "restapi.test.login";
@@ -48,11 +49,11 @@ public class RestFuncTestConfig {
     public static final String RESTAPI_TEST_SCHEDULER_HOME = "restapi.test.scheduler.home";
     public static final String RESTAPI_TEST_RM_HOME = "restapi.test.rm.home";
     public static final String RESTAPI_TEST_PORT = "restapi.test.port";
-    
+
     private static final RestFuncTestConfig instance = new RestFuncTestConfig();
-    
+
     private Properties props;
-    
+
     private RestFuncTestConfig() {
         try {
             init();
@@ -61,15 +62,13 @@ public class RestFuncTestConfig {
         }
     }
 
-    public synchronized static RestFuncTestConfig getInstance()
-            throws Exception {
+    public synchronized static RestFuncTestConfig getInstance() throws Exception {
         return instance;
     }
 
     private void init() throws Exception {
         props = new Properties();
-        URL url = RestFuncTestConfig.class
-                .getResource("config/restapi-test.properties");
+        URL url = RestFuncTestConfig.class.getResource("config/restapi-test.properties");
         FileInputStream fis = new FileInputStream(new File(url.toURI()));
         props.load(fis);
         props.putAll(System.getProperties());
@@ -82,7 +81,7 @@ public class RestFuncTestConfig {
     public String getPassword() {
         return props.getProperty(RESTAPI_TEST_PASSWORD);
     }
-    
+
     public String getProperty(String key) {
         return props.getProperty(key);
     }

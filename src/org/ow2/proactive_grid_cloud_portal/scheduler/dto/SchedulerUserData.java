@@ -36,12 +36,13 @@ package org.ow2.proactive_grid_cloud_portal.scheduler.dto;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
+
 @XmlRootElement
 public class SchedulerUserData {
-    private  String hostName;
-    private  String username;
-    private  long connectionTime;
-    private  long lastSubmitTime;
+    private String hostName;
+    private String username;
+    private long connectionTime;
+    private long lastSubmitTime;
     private int submitNumber;
 
     public SchedulerUserData() {
@@ -89,12 +90,8 @@ public class SchedulerUserData {
 
     @Override
     public String toString() {
-        return "SchedulerUserData{" +
-                "hostName='" + hostName + '\'' +
-                ", username='" + username + '\'' +
-                ", connectionTime=" + connectionTime +
-                ", lastSubmitTime=" + lastSubmitTime +
-                ", submitNumber=" + submitNumber +
-                '}';
+        return "SchedulerUserData{" + "hostName='" + hostName + '\'' + ", username='" + username + '\'' +
+            ", connectionTime=" + connectionTime + ", lastSubmitTime=" + lastSubmitTime + ", submitNumber=" +
+            submitNumber + '}';
     }
 }

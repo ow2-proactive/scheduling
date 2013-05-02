@@ -197,9 +197,8 @@ public class RestFuncTHelper {
 
         Object[] infrastructureParams = new Object[] { "", rmCred.getBase64(), defaultNumberOfNodes,
                 defaultNodeTimeout, RestFuncTUtils.buildJvmParameters() };
-        BooleanWrapper nodeSourceCreated = rm
-                .createNodeSource(nodeSourceName, LocalInfrastructure.class.getName(), infrastructureParams,
-                        StaticPolicy.class.getName(), null);
+        BooleanWrapper nodeSourceCreated = rm.createNodeSource(nodeSourceName, LocalInfrastructure.class
+                .getName(), infrastructureParams, StaticPolicy.class.getName(), null);
         if (!nodeSourceCreated.getBooleanValue()) {
             stopRm();
             throw new RuntimeException("Unable to create node sources.");
@@ -240,14 +239,14 @@ public class RestFuncTHelper {
         processBuilder.redirectErrorStream(true);
         schedProcess = processBuilder.start();
 
-        ProcessStreamReader out = new ProcessStreamReader("scheduler-process-output: ",
-            schedProcess.getInputStream(), System.out);
+        ProcessStreamReader out = new ProcessStreamReader("scheduler-process-output: ", schedProcess
+                .getInputStream(), System.out);
         out.start();
 
         String port = CentralPAPropertyRepository.PA_RMI_PORT.getValueAsString();
         String url = "rmi://localhost:" + port + "/";
-        SchedulerAuthenticationInterface schedAuth = SchedulerConnection.waitAndJoin(url,
-                TimeUnit.SECONDS.toMillis(60));
+        SchedulerAuthenticationInterface schedAuth = SchedulerConnection.waitAndJoin(url, TimeUnit.SECONDS
+                .toMillis(60));
         schedulerPublicKey = schedAuth.getPublicKey();
         Credentials schedCred = RestFuncTUtils.createCredentials("admin", "admin", schedulerPublicKey);
         scheduler = schedAuth.login(schedCred);

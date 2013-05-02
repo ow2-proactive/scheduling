@@ -112,8 +112,7 @@ public class JobOutputAppender extends AppenderSkeleton {
     @Override
     protected void append(LoggingEvent event) {
         if (!super.closed) {
-            jobOutput.log(
-                    this.layout != null ? this.layout.format(event) : event.getRenderedMessage());
+            jobOutput.log(this.layout != null ? this.layout.format(event) : event.getRenderedMessage());
         }
     }
 

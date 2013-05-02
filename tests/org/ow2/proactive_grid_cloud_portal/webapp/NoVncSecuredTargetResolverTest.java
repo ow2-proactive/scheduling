@@ -60,6 +60,7 @@ import static junit.framework.Assert.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+
 public class NoVncSecuredTargetResolverTest {
 
     private final SchedulerProxyUserInterface schedulerMock = mock(SchedulerProxyUserInterface.class);
@@ -78,7 +79,8 @@ public class NoVncSecuredTargetResolverTest {
 
     @Test
     public void testSessionIdIsChecked() throws Exception {
-        InetSocketAddress targetVncHost = new NoVncSecuredTargetResolver().doResolve("non_existing_session", "42", "remoteVisuTask");
+        InetSocketAddress targetVncHost = new NoVncSecuredTargetResolver().doResolve("non_existing_session",
+                "42", "remoteVisuTask");
         assertNull(targetVncHost);
     }
 
@@ -86,16 +88,13 @@ public class NoVncSecuredTargetResolverTest {
     public void testMagicStringFoundInLogs() throws Exception {
         String sessionId = SchedulerSessionMapper.getInstance().add(schedulerMock, "bob");
         when(schedulerMock.getTaskResult("42", "remoteVisuTask")).thenReturn(
-                new TaskResultImpl(
-                        TaskIdImpl.createTaskId(new JobIdImpl(42, "job"), "remoteVisuTask", 1, false),
-                        new byte[0],
-                        new byte[0],
-                        new SimpleTaskLogs("PA_REMOTE_CONNECTION;1;vnc;node.grid.com:5900", ""),
-                        Collections.<String, String>emptyMap()
-                )
-        );
+                new TaskResultImpl(TaskIdImpl.createTaskId(new JobIdImpl(42, "job"), "remoteVisuTask", 1,
+                        false), new byte[0], new byte[0], new SimpleTaskLogs(
+                    "PA_REMOTE_CONNECTION;1;vnc;node.grid.com:5900", ""), Collections
+                        .<String, String> emptyMap()));
 
-        InetSocketAddress targetVncHost = new NoVncSecuredTargetResolver().doResolve(sessionId, "42", "remoteVisuTask");
+        InetSocketAddress targetVncHost = new NoVncSecuredTargetResolver().doResolve(sessionId, "42",
+                "remoteVisuTask");
 
         assertEquals(5900, targetVncHost.getPort());
         assertEquals("node.grid.com", targetVncHost.getHostName());
@@ -105,16 +104,13 @@ public class NoVncSecuredTargetResolverTest {
     public void testMagicStringFoundInLogs_MagicStringOnSeveralLines() throws Exception {
         String sessionId = SchedulerSessionMapper.getInstance().add(schedulerMock, "bob");
         when(schedulerMock.getTaskResult("42", "remoteVisuTask")).thenReturn(
-                new TaskResultImpl(
-                        TaskIdImpl.createTaskId(new JobIdImpl(42, "job"), "remoteVisuTask", 1, false),
-                        new byte[0],
-                        new byte[0],
-                        new SimpleTaskLogs("PA_REMOTE_CONNECTION\nPA_REMOTE_CONNECTION;1;vnc;node.grid.com:5900", ""),
-                        Collections.<String, String>emptyMap()
-                )
-        );
+                new TaskResultImpl(TaskIdImpl.createTaskId(new JobIdImpl(42, "job"), "remoteVisuTask", 1,
+                        false), new byte[0], new byte[0], new SimpleTaskLogs(
+                    "PA_REMOTE_CONNECTION\nPA_REMOTE_CONNECTION;1;vnc;node.grid.com:5900", ""), Collections
+                        .<String, String> emptyMap()));
 
-        InetSocketAddress targetVncHost = new NoVncSecuredTargetResolver().doResolve(sessionId, "42", "remoteVisuTask");
+        InetSocketAddress targetVncHost = new NoVncSecuredTargetResolver().doResolve(sessionId, "42",
+                "remoteVisuTask");
 
         assertEquals(5900, targetVncHost.getPort());
         assertEquals("node.grid.com", targetVncHost.getHostName());
@@ -123,10 +119,12 @@ public class NoVncSecuredTargetResolverTest {
     @Test
     public void testMagicStringFoundInLiveLogs_TaskNotFinished() throws Exception {
         String sessionId = SchedulerSessionMapper.getInstance().add(schedulerMock, "bob");
-        SchedulerSessionMapper.getInstance().getSchedulerSession(sessionId).setJobOutputAppender(createLiveLogs("PA_REMOTE_CONNECTION;1;vnc;node.grid.com:5900"));
+        SchedulerSessionMapper.getInstance().getSchedulerSession(sessionId).setJobOutputAppender(
+                createLiveLogs("PA_REMOTE_CONNECTION;1;vnc;node.grid.com:5900"));
         when(schedulerMock.getTaskResult("42", "remoteVisuTask")).thenReturn(null);
 
-        InetSocketAddress targetVncHost = new NoVncSecuredTargetResolver().doResolve(sessionId, "42", "remoteVisuTask");
+        InetSocketAddress targetVncHost = new NoVncSecuredTargetResolver().doResolve(sessionId, "42",
+                "remoteVisuTask");
 
         assertEquals(5900, targetVncHost.getPort());
         assertEquals("node.grid.com", targetVncHost.getHostName());
@@ -135,18 +133,18 @@ public class NoVncSecuredTargetResolverTest {
     @Test
     public void testMagicStringFoundInLiveLogs() throws Exception {
         String sessionId = SchedulerSessionMapper.getInstance().add(schedulerMock, "bob");
-        SchedulerSessionMapper.getInstance().getSchedulerSession(sessionId).setJobOutputAppender(createLiveLogs("[Visualization_task@node2;10:38:06]PA_REMOTE_CONNECTION;1;vnc;node.grid.com:5900"));
+        SchedulerSessionMapper
+                .getInstance()
+                .getSchedulerSession(sessionId)
+                .setJobOutputAppender(
+                        createLiveLogs("[Visualization_task@node2;10:38:06]PA_REMOTE_CONNECTION;1;vnc;node.grid.com:5900"));
         when(schedulerMock.getTaskResult("42", "remoteVisuTask")).thenReturn(
-                new TaskResultImpl(
-                        TaskIdImpl.createTaskId(new JobIdImpl(42, "job"), "remoteVisuTask", 1, false),
-                        new byte[0],
-                        new byte[0],
-                        new SimpleTaskLogs("", ""),
-                        Collections.<String, String>emptyMap()
-                )
-        );
+                new TaskResultImpl(TaskIdImpl.createTaskId(new JobIdImpl(42, "job"), "remoteVisuTask", 1,
+                        false), new byte[0], new byte[0], new SimpleTaskLogs("", ""), Collections
+                        .<String, String> emptyMap()));
 
-        InetSocketAddress targetVncHost = new NoVncSecuredTargetResolver().doResolve(sessionId, "42", "remoteVisuTask");
+        InetSocketAddress targetVncHost = new NoVncSecuredTargetResolver().doResolve(sessionId, "42",
+                "remoteVisuTask");
 
         assertEquals(5900, targetVncHost.getPort());
         assertEquals("node.grid.com", targetVncHost.getHostName());
@@ -155,18 +153,15 @@ public class NoVncSecuredTargetResolverTest {
     @Test
     public void testMagicStringFoundInLiveLogs_MagicStringOnSeveralLines() throws Exception {
         String sessionId = SchedulerSessionMapper.getInstance().add(schedulerMock, "bob");
-        SchedulerSessionMapper.getInstance().getSchedulerSession(sessionId).setJobOutputAppender(createLiveLogs("PA_REMOTE_CONNECTION\nPA_REMOTE_CONNECTION;1;vnc;node.grid.com:5900 "));
+        SchedulerSessionMapper.getInstance().getSchedulerSession(sessionId).setJobOutputAppender(
+                createLiveLogs("PA_REMOTE_CONNECTION\nPA_REMOTE_CONNECTION;1;vnc;node.grid.com:5900 "));
         when(schedulerMock.getTaskResult("42", "remoteVisuTask")).thenReturn(
-                new TaskResultImpl(
-                        TaskIdImpl.createTaskId(new JobIdImpl(42, "job"), "remoteVisuTask", 1, false),
-                        new byte[0],
-                        new byte[0],
-                        new SimpleTaskLogs("", ""),
-                        Collections.<String, String>emptyMap()
-                )
-        );
+                new TaskResultImpl(TaskIdImpl.createTaskId(new JobIdImpl(42, "job"), "remoteVisuTask", 1,
+                        false), new byte[0], new byte[0], new SimpleTaskLogs("", ""), Collections
+                        .<String, String> emptyMap()));
 
-        InetSocketAddress targetVncHost = new NoVncSecuredTargetResolver().doResolve(sessionId, "42", "remoteVisuTask");
+        InetSocketAddress targetVncHost = new NoVncSecuredTargetResolver().doResolve(sessionId, "42",
+                "remoteVisuTask");
 
         assertEquals(5900, targetVncHost.getPort());
         assertEquals("node.grid.com", targetVncHost.getHostName());

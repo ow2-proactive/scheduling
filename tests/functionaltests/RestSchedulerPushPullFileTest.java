@@ -66,6 +66,7 @@ import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.core.SchedulerFrontend;
 import org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest;
 
+
 /**
  * RestSchedulerPushPullFileTest
  *
@@ -110,11 +111,12 @@ public class RestSchedulerPushPullFileTest extends AbstractRestFuncTestCase {
     public void testPushPull() throws Exception {
         Scheduler scheduler = RestFuncTHelper.getScheduler();
 
-        String destPath= "test/push/pull";
+        String destPath = "test/push/pull";
 
-        String[] spacesNames = {SchedulerConstants.GLOBALSPACE_NAME, SchedulerConstants.USERSPACE_NAME};
+        String[] spacesNames = { SchedulerConstants.GLOBALSPACE_NAME, SchedulerConstants.USERSPACE_NAME };
 
-        String[] spacesPaths = {((SchedulerFrontend) scheduler).getGlobalSpacePath(), ((SchedulerFrontend) scheduler).getUserSpacePath()};
+        String[] spacesPaths = { ((SchedulerFrontend) scheduler).getGlobalSpacePath(),
+                ((SchedulerFrontend) scheduler).getUserSpacePath() };
 
         for (int i = 0; i < spacesNames.length; i++) {
             String spaceName = spacesNames[i];
@@ -122,13 +124,14 @@ public class RestSchedulerPushPullFileTest extends AbstractRestFuncTestCase {
             File testPushFile = RestFuncTHelper.getDefaultJobXmlfile();
             // you can test pushing pulling a big file :
             // testPushFile = new File("path_to_a_big_file");
-            File destFile = new File(new File(spacePath,destPath), testPushFile.getName());
+            File destFile = new File(new File(spacePath, destPath), testPushFile.getName());
             if (destFile.exists()) {
                 destFile.delete();
             }
 
             // PUSHING THE FILE
-            String pushfileUrl = getResourceUrl("dataspace/"+spaceName+"/"+URLEncoder.encode(destPath, "UTF-8"));
+            String pushfileUrl = getResourceUrl("dataspace/" + spaceName + "/" +
+                URLEncoder.encode(destPath, "UTF-8"));
 
             HttpPost reqPush = new HttpPost(pushfileUrl);
             setSessionHeader(reqPush);
@@ -136,8 +139,8 @@ public class RestSchedulerPushPullFileTest extends AbstractRestFuncTestCase {
 
             MultipartEntity multipartEntity = new MultipartEntity();
             multipartEntity.addPart("fileName", new StringBody(testPushFile.getName()));
-            multipartEntity.addPart("fileContent", new InputStreamBody(FileUtils.openInputStream(testPushFile),
-                    MediaType.APPLICATION_OCTET_STREAM, null));
+            multipartEntity.addPart("fileContent", new InputStreamBody(FileUtils
+                    .openInputStream(testPushFile), MediaType.APPLICATION_OCTET_STREAM, null));
             reqPush.setEntity(multipartEntity);
             HttpResponse response = executeUriRequest(reqPush);
 
@@ -146,10 +149,12 @@ public class RestSchedulerPushPullFileTest extends AbstractRestFuncTestCase {
 
             Assert.assertTrue(destFile + " exists", destFile.exists());
 
-            Assert.assertTrue("Original file and result are equals for " + spaceName, FileUtils.contentEquals(testPushFile, destFile));
+            Assert.assertTrue("Original file and result are equals for " + spaceName, FileUtils
+                    .contentEquals(testPushFile, destFile));
 
             // LISTING THE TARGET DIRECTORY
-            String pullListUrl = getResourceUrl("dataspace/"+spaceName+"/"+ URLEncoder.encode(destPath, "UTF-8"));
+            String pullListUrl = getResourceUrl("dataspace/" + spaceName + "/" +
+                URLEncoder.encode(destPath, "UTF-8"));
 
             HttpGet reqPullList = new HttpGet(pullListUrl);
             setSessionHeader(reqPullList);
@@ -161,11 +166,12 @@ public class RestSchedulerPushPullFileTest extends AbstractRestFuncTestCase {
 
             InputStream is = response2.getEntity().getContent();
             List<String> lines = IOUtils.readLines(is);
-            Assert.assertTrue("Nb Files == 1",lines.size() == 1);
-            Assert.assertTrue("Pushed file correctly listed",lines.get(0).equals(testPushFile.getName()));
+            Assert.assertTrue("Nb Files == 1", lines.size() == 1);
+            Assert.assertTrue("Pushed file correctly listed", lines.get(0).equals(testPushFile.getName()));
 
             // PULLING THE FILE
-            String pullfileUrl = getResourceUrl("dataspace/"+spaceName+"/"+URLEncoder.encode(destPath+"/"+testPushFile.getName(), "UTF-8"));
+            String pullfileUrl = getResourceUrl("dataspace/" + spaceName + "/" +
+                URLEncoder.encode(destPath + "/" + testPushFile.getName(), "UTF-8"));
 
             HttpGet reqPull = new HttpGet(pullfileUrl);
             setSessionHeader(reqPull);
@@ -180,10 +186,12 @@ public class RestSchedulerPushPullFileTest extends AbstractRestFuncTestCase {
             File answerFile = File.createTempFile("answer", ".xml");
             FileUtils.copyInputStreamToFile(is2, answerFile);
 
-            Assert.assertTrue("Original file and result are equals for " + spaceName, FileUtils.contentEquals(answerFile, testPushFile));
+            Assert.assertTrue("Original file and result are equals for " + spaceName, FileUtils
+                    .contentEquals(answerFile, testPushFile));
 
             // DELETING THE HIERARCHY
-            String deleteUrl = getResourceUrl("dataspace/"+spaceName+"/"+ URLEncoder.encode("test", "UTF-8"));
+            String deleteUrl = getResourceUrl("dataspace/" + spaceName + "/" +
+                URLEncoder.encode("test", "UTF-8"));
             HttpDelete reqDelete = new HttpDelete(deleteUrl);
             setSessionHeader(reqDelete);
 

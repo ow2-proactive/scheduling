@@ -58,6 +58,7 @@ import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
+
 /**
  * A target resolved for websocket proxy capable of reading parameters from the websocket path.
  * <br/>
@@ -104,8 +105,7 @@ public class NoVncSecuredTargetResolver implements IProxyTargetResolver {
 
         try {
             TaskResult taskResult = scheduler.getTaskResult(jobId, taskName);
-            List<String> paRemoteConnectionLines = retrievePaRemoteConnectionLines(session,
-                    taskResult);
+            List<String> paRemoteConnectionLines = retrievePaRemoteConnectionLines(session, taskResult);
 
             String taskIdFromTaskName = retrieveTaskId(taskName, scheduler.getJobState(jobId));
             return resolveVncTargetFromLogs(paRemoteConnectionLines, taskIdFromTaskName);
@@ -122,7 +122,8 @@ public class NoVncSecuredTargetResolver implements IProxyTargetResolver {
         return null;
     }
 
-    private InetSocketAddress resolveVncTargetFromLogs(List<String> paRemoteConnectionLines, String taskIdFromTaskName) {
+    private InetSocketAddress resolveVncTargetFromLogs(List<String> paRemoteConnectionLines,
+            String taskIdFromTaskName) {
         for (String paRemoteConnectionLine : paRemoteConnectionLines) {
             String[] paRemoteConnectionArgs = paRemoteConnectionLine.split(PA_REMOTE_CONNECTION);
             if (paRemoteConnectionArgs.length == 2) {
@@ -139,12 +140,13 @@ public class NoVncSecuredTargetResolver implements IProxyTargetResolver {
                         LOGGER.debug("Proxying to " + vncHost + ":" + vncPort);
                         return new InetSocketAddress(vncHost, Integer.parseInt(vncPort));
                     } else {
-                        LOGGER.debug("Protocol or task unknown in PA_REMOTE_CONNECTION string (" + paRemoteConnectionLine + ")");
+                        LOGGER.debug("Protocol or task unknown in PA_REMOTE_CONNECTION string (" +
+                            paRemoteConnectionLine + ")");
                     }
                 }
             }
-            LOGGER.debug("Missing arguments in PA_REMOTE_CONNECTION string, "
-                    + "(" + paRemoteConnectionLine + ")" + "format should be PA_REMOTE_CONNECTION;$taskId;vnc;host:port");
+            LOGGER.debug("Missing arguments in PA_REMOTE_CONNECTION string, " + "(" + paRemoteConnectionLine +
+                ")" + "format should be PA_REMOTE_CONNECTION;$taskId;vnc;host:port");
         }
         LOGGER.warn("Could not find the PA_REMOTE_CONNECTION string");
         return null;

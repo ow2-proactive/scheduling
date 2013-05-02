@@ -51,7 +51,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement
 public class UserJobData implements Serializable {
-    
+
     private JobInfoData jobInfo;
 
     public UserJobData() {
@@ -79,8 +79,6 @@ public class UserJobData implements Serializable {
 
     @Override
     public String toString() {
-        return "UserJobData{" +
-                "jobInfo=" + jobInfo +
-                '}';
+        return "UserJobData{" + "jobInfo=" + jobInfo + '}';
     }
 }

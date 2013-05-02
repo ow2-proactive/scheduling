@@ -60,6 +60,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+
 public class SchedulerStateRestTest extends RestTestServer {
 
     @BeforeClass
@@ -117,15 +118,18 @@ public class SchedulerStateRestTest extends RestTestServer {
         String pngIn = "ê";
         String jobId = createJobArchive(pngIn);
         String pngAsBase64String = getJobImageAsBase64String(jobId);
-        String pngOut = new String(Base64.decodeBase64(pngAsBase64String.getBytes(SchedulerRestInterface.ENCODING)), SchedulerRestInterface.ENCODING);
+        String pngOut = new String(Base64.decodeBase64(pngAsBase64String
+                .getBytes(SchedulerRestInterface.ENCODING)), SchedulerRestInterface.ENCODING);
 
         assertEquals(pngIn, pngOut);
     }
 
     private String getJobImageAsBase64String(String jobId) throws IOException, NotConnectedRestException {
-        String sessionId = SchedulerSessionMapper.getInstance().add(new SchedulerProxyUserInterfaceForTests(), "bob");
+        String sessionId = SchedulerSessionMapper.getInstance().add(
+                new SchedulerProxyUserInterfaceForTests(), "bob");
 
-        SchedulerRestInterface client = ProxyFactory.create(SchedulerRestInterface.class, "http://localhost:" + port + "/");
+        SchedulerRestInterface client = ProxyFactory.create(SchedulerRestInterface.class,
+                "http://localhost:" + port + "/");
         return client.getJobImage(sessionId, jobId);
     }
 
@@ -156,4 +160,3 @@ public class SchedulerStateRestTest extends RestTestServer {
     }
 
 }
-

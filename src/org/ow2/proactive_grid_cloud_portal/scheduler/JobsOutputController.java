@@ -36,17 +36,16 @@
  */
 package org.ow2.proactive_grid_cloud_portal.scheduler;
 
+import java.io.IOException;
+
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingService;
 import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
-
-import java.io.IOException;
-
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
@@ -72,7 +71,7 @@ public class JobsOutputController {
         try {
             lfs.initialize();
         } catch (LogForwardingException e) {
-            LOGGER.warn("Could not initialize log forwarding service",e);
+            LOGGER.warn("Could not initialize log forwarding service", e);
         }
     }
 

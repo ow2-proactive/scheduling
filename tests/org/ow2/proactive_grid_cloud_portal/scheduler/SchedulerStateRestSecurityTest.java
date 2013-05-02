@@ -51,6 +51,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.fail;
 
+
 public class SchedulerStateRestSecurityTest {
 
     private final SchedulerRestInterface restInterface = new SchedulerStateRest();
@@ -88,9 +89,9 @@ public class SchedulerStateRestSecurityTest {
     }
 
     private boolean parameterIsSessionId(Class<?> sessionIdParameterType, Annotation sessionIdAnnotation) {
-        return sessionIdParameterType.equals(String.class)
-                && sessionIdAnnotation.annotationType().equals(HeaderParam.class)
-                && ((HeaderParam) sessionIdAnnotation).value().equals("sessionid");
+        return sessionIdParameterType.equals(String.class) &&
+            sessionIdAnnotation.annotationType().equals(HeaderParam.class) &&
+            ((HeaderParam) sessionIdAnnotation).value().equals("sessionid");
     }
 
     private Object[] createMethodParameters(Method method) throws IllegalAccessException {
@@ -121,6 +122,4 @@ public class SchedulerStateRestSecurityTest {
         defaultValues.put(boolean.class, false);
     }
 
-
 }
-

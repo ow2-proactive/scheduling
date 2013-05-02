@@ -39,6 +39,7 @@ package org.ow2.proactive_grid_cloud_portal.scheduler.dto;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
+
 @XmlRootElement
 public class TaskInfoData {
     private TaskIdData taskId;
@@ -102,8 +103,7 @@ public class TaskInfoData {
         return numberOfExecutionOnFailureLeft;
     }
 
-    public void setNumberOfExecutionOnFailureLeft(
-            int numberOfExecutionOnFailureLeft) {
+    public void setNumberOfExecutionOnFailureLeft(int numberOfExecutionOnFailureLeft) {
         this.numberOfExecutionOnFailureLeft = numberOfExecutionOnFailureLeft;
     }
 
