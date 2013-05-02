@@ -1882,9 +1882,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @POST
     @Path("linkrm")
     @Produces("application/json")
-    public boolean killScheduler(@HeaderParam("sessionid")
-    final String sessionId, @FormParam("rmurl")
-    String rmURL) throws NotConnectedRestException, PermissionRestException {
+    public boolean linkRm(@HeaderParam("sessionid")
+                              final String sessionId, @FormParam("rmurl")
+                              String rmURL) throws NotConnectedRestException, PermissionRestException {
        try {
            Scheduler s = checkAccess(sessionId, "linkrm");
            return s.linkResourceManager(rmURL);
