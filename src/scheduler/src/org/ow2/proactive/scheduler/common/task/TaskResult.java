@@ -82,6 +82,13 @@ public interface TaskResult extends Serializable {
     public Serializable value() throws Throwable;
 
     /**
+     * Get the serialized value of the task.
+     *
+     * @return the value of the task, null if an exception occurred.
+     */
+    byte[] getSerializedValue();
+
+    /**
      * If a FlowScript was executed on this task, its result
      * is stored it so that the action can be performed later when
      * processed by the core.
