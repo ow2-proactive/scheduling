@@ -66,8 +66,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
-import org.jboss.resteasy.annotations.GZIP;
-import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
@@ -86,13 +84,12 @@ import org.ow2.proactive.resourcemanager.frontend.topology.Topology;
 import org.ow2.proactive.resourcemanager.nodesource.common.ConfigurableField;
 import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
-import org.ow2.proactive.scripting.SelectionScript;
-import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
-import org.ow2.proactive.utils.NodeSet;
-import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
 import org.ow2.proactive_grid_cloud_portal.common.StatHistoryCaching;
 import org.ow2.proactive_grid_cloud_portal.common.StatHistoryCaching.StatHistoryCacheEntry;
+import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
 import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
+import org.jboss.resteasy.annotations.GZIP;
+import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import org.rrd4j.ConsolFun;
 import org.rrd4j.core.FetchData;
 import org.rrd4j.core.FetchRequest;
@@ -201,10 +198,7 @@ public class RMRest {
             rm.init(url, credData);
         }
 
-        String sessionId = RMSessionMapper.getInstance().add(rm);
-        //      logger.info("binding user "+  " to session " + sessionId );
-        return sessionId;
-
+        return RMSessionMapper.getInstance().add(rm);
     }
 
     /**
@@ -599,13 +593,6 @@ public class RMRest {
         return rm.shutdown(preempt).getBooleanValue();
     }
 
-    public NodeSet getAtMostNodes(@HeaderParam("sessionid")
-    String sessionId, int number, TopologyDescriptor descriptor, List<SelectionScript> selectionScriptsList,
-            NodeSet exclusion) throws NotConnectedException {
-        ResourceManager rm = checkAccess(sessionId);
-        return rm.getAtMostNodes(number, descriptor, selectionScriptsList, exclusion);
-    }
-
     @GET
     @Path("topology")
     @Produces("application/json")
@@ -613,24 +600,6 @@ public class RMRest {
     String sessionId) throws NotConnectedException {
         ResourceManager rm = checkAccess(sessionId);
         return PAFuture.getFutureValue(rm.getTopology());
-    }
-
-    public NodeSet getAtMostNodes(@HeaderParam("sessionid")
-    String sessionId, int arg0, SelectionScript arg1) throws NotConnectedException {
-        ResourceManager rm = checkAccess(sessionId);
-        return rm.getAtMostNodes(arg0, arg1);
-    }
-
-    public NodeSet getAtMostNodes(@HeaderParam("sessionid")
-    String sessionId, int arg0, SelectionScript arg1, NodeSet arg2) throws NotConnectedException {
-        ResourceManager rm = checkAccess(sessionId);
-        return rm.getAtMostNodes(arg0, arg1, arg2);
-    }
-
-    public NodeSet getAtMostNodes(@HeaderParam("sessionid")
-    String sessionId, int arg0, List<SelectionScript> arg1, NodeSet arg2) throws NotConnectedException {
-        ResourceManager rm = checkAccess(sessionId);
-        return rm.getAtMostNodes(arg0, arg1, arg2);
     }
 
     /**
