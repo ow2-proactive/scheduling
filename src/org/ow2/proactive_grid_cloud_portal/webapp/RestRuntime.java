@@ -99,8 +99,6 @@ public class RestRuntime {
         EXCEPTION_MAPPINGS.put(NotConnectedRestException.class, HttpURLConnection.HTTP_UNAUTHORIZED);
         EXCEPTION_MAPPINGS.put(PermissionRestException.class, HttpURLConnection.HTTP_NOT_FOUND);
         EXCEPTION_MAPPINGS.put(SchedulerRestException.class, HttpURLConnection.HTTP_NOT_FOUND);
-        EXCEPTION_MAPPINGS.put(Throwable.class, HttpURLConnection.HTTP_INTERNAL_ERROR);
-        EXCEPTION_MAPPINGS.put(RuntimeException.class, HttpURLConnection.HTTP_INTERNAL_ERROR);
         EXCEPTION_MAPPINGS.put(SubmissionClosedRestException.class, HttpURLConnection.HTTP_NOT_FOUND);
         EXCEPTION_MAPPINGS.put(UnknownJobRestException.class, HttpURLConnection.HTTP_NOT_FOUND);
         EXCEPTION_MAPPINGS.put(UnknownTaskException.class, HttpURLConnection.HTTP_NOT_FOUND);
