@@ -36,11 +36,32 @@
  */
 package org.ow2.proactive_grid_cloud_portal.webapp;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.Type;
+import java.net.HttpURLConnection;
+import java.security.KeyException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Properties;
+import java.util.Set;
+
+import javax.security.auth.login.LoginException;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.ExceptionMapper;
+
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
+import org.objectweb.proactive.core.config.xml.ProActiveConfigurationParser;
+import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.resourcemanager.common.util.RMCachingProxyUserInterface;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
-import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
-import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
 import org.ow2.proactive_grid_cloud_portal.common.exceptionmapper.ExceptionToJson;
 import org.ow2.proactive_grid_cloud_portal.rm.RMSessionMapper;
@@ -57,32 +78,9 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestExc
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SchedulerRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SubmissionClosedRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Type;
-import java.net.HttpURLConnection;
-import java.security.KeyException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Properties;
-import java.util.Set;
-
-import javax.security.auth.login.LoginException;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.ExceptionMapper;
-
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
-import org.objectweb.proactive.core.config.ProActiveConfiguration;
-import org.objectweb.proactive.core.config.xml.ProActiveConfigurationParser;
-import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
-
 
 public class RestRuntime {
 
@@ -186,38 +184,8 @@ public class RestRuntime {
 
     public void stop() {
         // happily terminate sessions
-
-        Set<String> schedulerSessionIds = SchedulerSessionMapper.getInstance().getSessionsMap().keySet();
-        String[] sessionids = schedulerSessionIds.toArray(new String[schedulerSessionIds.size()]);
-        int i = 0;
-        for (; i < sessionids.length; i++) {
-            Scheduler s = SchedulerSessionMapper.getInstance().getSessionsMap().get(sessionids[i])
-                    .getScheduler();
-            try {
-                s.disconnect();
-            } catch (NotConnectedException e) {
-                LOGGER.warn(e);
-            } catch (PermissionException e) {
-                LOGGER.warn(e);
-            } finally {
-                SchedulerSessionMapper.getInstance().remove(sessionids[i]);
-                LOGGER.debug("Scheduler session id " + sessionids[i] + "terminated");
-            }
-        }
-
-        Set<String> rmSessionIds = RMSessionMapper.getInstance().getSessionsMap().keySet();
-        sessionids = rmSessionIds.toArray(new String[rmSessionIds.size()]);
-        for (; i < sessionids.length; i++) {
-            RMCachingProxyUserInterface s = RMSessionMapper.getInstance().getSessionsMap().get(sessionids[i]);
-            try {
-                s.disconnect();
-            } catch (Throwable e) {
-                LOGGER.warn(e);
-            } finally {
-                RMSessionMapper.getInstance().remove(sessionids[i]);
-                LOGGER.debug("RM session id " + sessionids[i] + "terminated");
-            }
-        }
+        terminateSchedulerSessions();
+        terminateRmSessions();
 
         schedulerSessionCleaner.stop();
         rmSessionCleaner.stop();
@@ -227,6 +195,39 @@ public class RestRuntime {
 
         // force the shutdown of the runtime
         ProActiveRuntimeImpl.getProActiveRuntime().cleanJvmFromPA();
+    }
+
+    private void terminateRmSessions() {
+        Set<String> schedulerSessionIds = RMSessionMapper.getInstance().getSessionsMap().keySet();
+        List<String> sessionids = new ArrayList<String>(schedulerSessionIds);
+        for (String sessionid : sessionids) {
+            RMCachingProxyUserInterface s = RMSessionMapper.getInstance().getSessionsMap().get(sessionid);
+            try {
+                s.disconnect();
+            } catch (Throwable e) {
+                LOGGER.warn(e);
+            } finally {
+                RMSessionMapper.getInstance().remove(sessionid);
+                LOGGER.debug("RM session id " + sessionid + "terminated");
+            }
+        }
+    }
+
+    private void terminateSchedulerSessions() {
+        Set<String> schedulerSessionIds = SchedulerSessionMapper.getInstance().getSessionsMap().keySet();
+        List<String> sessionids = new ArrayList<String>(schedulerSessionIds);
+        for (String sessionid : sessionids) {
+            Scheduler s = SchedulerSessionMapper.getInstance().getSessionsMap().get(sessionid)
+                    .getScheduler();
+            try {
+                s.disconnect();
+            } catch (Throwable e) {
+                LOGGER.warn(e);
+            } finally {
+                SchedulerSessionMapper.getInstance().remove(sessionid);
+                LOGGER.debug("Scheduler session id " + sessionid + "terminated");
+            }
+        }
     }
 
 }
