@@ -55,7 +55,7 @@ public class LinkRmCommand extends AbstractCommand implements Command {
     public void execute(ApplicationContext currentContext) throws CLIException {
         SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
         try {
-            boolean success = scheduler.killScheduler(currentContext.getSessionId(), rmUrl);
+            boolean success = scheduler.linkRm(currentContext.getSessionId(), rmUrl);
             resultStack(currentContext).push(success);
             if (success) {
                 writeLine(currentContext,
