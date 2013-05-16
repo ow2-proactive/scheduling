@@ -47,19 +47,32 @@ public class ForkedJavaTaskData extends CommonJavaTaskData {
         ForkEnvironment forkEnv = new ForkEnvironment();
         forkEnv.setJavaHome(javaHome);
         forkEnv.setWorkingDir(workingDir);
-        for (String classpath : getAdditionalClasspath()) {
-            forkEnv.addAdditionalClasspath(classpath);
+
+        List<String> additionalClasspath = getAdditionalClasspath();
+        if (additionalClasspath != null) {
+            for (String classpath : additionalClasspath) {
+                forkEnv.addAdditionalClasspath(classpath);
+            }
         }
-        for (String jvmArg : getJvmArguments()) {
-            forkEnv.addJVMArgument(jvmArg);
+
+        List<String> jvmArguments = getJvmArguments();
+        if (jvmArguments != null) {
+            for (String jvmArg : jvmArguments) {
+                forkEnv.addJVMArgument(jvmArg);
+            }
         }
-        for (EnvironmentModifierData envModifier : getEnvModifiers()) {
-            if (envModifier.getAppendChar() != 0) {
-                forkEnv.addSystemEnvironmentVariable(envModifier.getName(), envModifier.getValue(),
-                        envModifier.getAppendChar());
-            } else {
-                forkEnv.addSystemEnvironmentVariable(envModifier.getName(), envModifier.getValue(),
-                        envModifier.isAppend());
+
+        List<EnvironmentModifierData> envModifiers = getEnvModifiers();
+
+        if (envModifiers != null) {
+            for (EnvironmentModifierData envModifier : envModifiers) {
+                if (envModifier.getAppendChar() != 0) {
+                    forkEnv.addSystemEnvironmentVariable(envModifier.getName(), envModifier.getValue(),
+                            envModifier.getAppendChar());
+                } else {
+                    forkEnv.addSystemEnvironmentVariable(envModifier.getName(), envModifier.getValue(),
+                            envModifier.isAppend());
+                }
             }
         }
         if (envScript != null) {
