@@ -142,12 +142,12 @@ RM_LINE="The resource manager with 4 local nodes created on "
 
 while true; do
 	if [ "$(grep "$SCHED_LINE" $SCHED_OUT)" ]; then
-		SCHED_URL=$(grep "$SCHED_LINE" $SCHED_OUT| sed -e "s/^${SCHED_LINE}\(.*\)/\1/g")
+		SCHED_URL=$(grep "$SCHED_LINE" $SCHED_OUT| sed -e "s/^.*${SCHED_LINE}\(.*\)/\1/g"| head -n 1)
 		break;
 	fi
 
 	if [ "$(grep "$RM_LINE" $SCHED_OUT)" ]; then
-		RM_URL=$(grep "$RM_LINE" $SCHED_OUT| sed -e "s/^${RM_LINE}\(.*\)/\1/g")
+		RM_URL=$(grep "$RM_LINE" $SCHED_OUT| sed -e "s/^.*${RM_LINE}\(.*\)/\1/g"| head -n 1)
 	fi
 
 	if [ ! "$(ps | grep $SCHED_PID)" ]; then
