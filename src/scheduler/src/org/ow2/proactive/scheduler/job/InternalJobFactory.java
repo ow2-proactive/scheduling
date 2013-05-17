@@ -44,7 +44,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.log4j.Logger;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.exception.InternalException;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
@@ -55,16 +54,20 @@ import org.ow2.proactive.scheduler.common.job.factories.FlowError;
 import org.ow2.proactive.scheduler.common.task.CommonAttribute;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
+import org.ow2.proactive.scheduler.common.task.ScriptTask;
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.task.ForkedJavaExecutableContainer;
 import org.ow2.proactive.scheduler.task.JavaExecutableContainer;
 import org.ow2.proactive.scheduler.task.NativeExecutableContainer;
+import org.ow2.proactive.scheduler.task.ScriptExecutableContainer;
 import org.ow2.proactive.scheduler.task.internal.InternalForkedJavaTask;
 import org.ow2.proactive.scheduler.task.internal.InternalJavaTask;
 import org.ow2.proactive.scheduler.task.internal.InternalNativeTask;
+import org.ow2.proactive.scheduler.task.internal.InternalScriptTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
+import org.apache.log4j.Logger;
 
 
 /**
@@ -249,6 +252,8 @@ public class InternalJobFactory {
             return createTask(userJob, (NativeTask) task);
         } else if (task instanceof JavaTask) {
             return createTask(userJob, (JavaTask) task);
+        } else if (task instanceof ScriptTask) {
+            return createTask(userJob, (ScriptTask) task);
         } else {
             String msg = "The task you intend to add is unknown ! (type : " + task.getClass().getName() + ")";
             logger.info(msg);
@@ -327,6 +332,17 @@ public class InternalJobFactory {
             throw new JobCreationException(e);
         }
         return nativeTask;
+    }
+
+    private static InternalTask createTask(Job userJob, ScriptTask task) throws JobCreationException {
+        InternalScriptTask scriptTask = new InternalScriptTask(new ScriptExecutableContainer(task.getScript()));
+        //set task common properties
+        try {
+            setTaskCommonProperties(userJob, task, scriptTask);
+        } catch (Exception e) {
+            throw new JobCreationException(e);
+        }
+        return scriptTask;
     }
 
     /**

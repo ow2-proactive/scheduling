@@ -42,16 +42,15 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
 
-import junit.framework.Assert;
-
-import org.apache.commons.io.FileUtils;
-import org.junit.Before;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.job.factories.Job2XMLTransformer;
 import org.ow2.proactive.scheduler.common.job.factories.JobComparator;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory_stax;
 import org.ow2.tests.FunctionalTest;
+import junit.framework.Assert;
+import org.apache.commons.io.FileUtils;
+import org.junit.Before;
 
 
 /**
@@ -74,9 +73,9 @@ public class TestXMLTransformer extends FunctionalTest {
 
     private static File tmpFolder = new File(System.getProperty("java.io.tmpdir"));
 
-    private static String executablePathPropertyName = "EXEC_PATH";
-    private static String workingDirPropName = "WDIR";
-    private static String cmdPropName = "WCOM";
+    private static final String executablePathPropertyName = "EXEC_PATH";
+    private static final String workingDirPropName = "WDIR";
+    private static final String cmdPropName = "WCOM";
 
     /**
      * set system properties required by different job descriptors
@@ -145,9 +144,6 @@ public class TestXMLTransformer extends FunctionalTest {
      *
      * 4. Compare job1 and job2
      *
-     *
-     * @param xmlFile
-     * @throws Exception
      */
     private void transformAndCompare(File xmlFile) throws Exception {
         System.out.println("TestXMLTransformer.transformAndCompare() " + xmlFile.getAbsolutePath());
@@ -160,7 +156,7 @@ public class TestXMLTransformer extends FunctionalTest {
         transformer.job2xmlFile(job1, xmlFile2);
 
         // xmlFile2 to job2
-        TaskFlowJob job2 = null;
+        TaskFlowJob job2;
         try {
             job2 = (TaskFlowJob) (JobFactory.getFactory().createJob(xmlFile2.getAbsolutePath()));
         } catch (Exception e) {
@@ -185,8 +181,7 @@ public class TestXMLTransformer extends FunctionalTest {
         }
 
         // delete temporary file
-        xmlFile2.delete();
-
+        FileUtils.forceDelete(xmlFile2);
     }
 
 }

@@ -48,6 +48,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
@@ -58,11 +59,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.events.XMLEvent;
 
-import org.apache.log4j.Logger;
-import org.iso_relax.verifier.Schema;
-import org.iso_relax.verifier.Verifier;
-import org.iso_relax.verifier.VerifierConfigurationException;
-import org.iso_relax.verifier.VerifierFactory;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -75,6 +71,7 @@ import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.common.task.ParallelEnvironment;
 import org.ow2.proactive.scheduler.common.task.RestartMode;
+import org.ow2.proactive.scheduler.common.task.ScriptTask;
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.dataspaces.FileSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
@@ -88,9 +85,15 @@ import org.ow2.proactive.scripting.GenerationScript;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.scripting.SimpleScript;
+import org.ow2.proactive.scripting.TaskScript;
 import org.ow2.proactive.topology.descriptor.ThresholdProximityDescriptor;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.Tools;
+import org.apache.log4j.Logger;
+import org.iso_relax.verifier.Schema;
+import org.iso_relax.verifier.Verifier;
+import org.iso_relax.verifier.VerifierConfigurationException;
+import org.iso_relax.verifier.VerifierFactory;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
@@ -107,14 +110,7 @@ import org.xml.sax.SAXParseException;
 public class JobFactory_stax extends JobFactory {
 
     public static Logger logger = Logger.getLogger(JobFactory_stax.class);
-    /** Location of the schema used to parse job descriptor. */
-    public static final String SCHEMA_LOCATION = "/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.rng";
-    /** Variables styleScheet location. */
-    public static final String STYLESHEET_LOCATION = "/org/ow2/proactive/scheduler/common/xml/stylesheets/variables.xsl";
-    /** Job name space. */
-    public static final String JOB_NAMESPACE = "urn:proactive:jobdescriptor:dev";
-    /** Job prefix. */
-    public static final String JOB_PREFIX = "js";
+
     /** Variables pattern definition */
     //private static final Pattern variablesPattern = Pattern.compile(".*\\$\\{[^\\}]+\\}.*", Pattern.DOTALL);
     private static final String variablesPattern = "\\$\\{[^\\}]+\\}";
@@ -244,8 +240,6 @@ public class JobFactory_stax extends JobFactory {
                 //remove temporary created directory : dest
                 ZipUtils.removeDir(dest);
             }
-        } catch (JobCreationException jce) {
-            throw jce;
         } catch (IOException e) {
             throw new JobCreationException(e);
         }
@@ -295,10 +289,10 @@ public class JobFactory_stax extends JobFactory {
      * @param file the file to validate
      */
     private void validate(File file) throws URISyntaxException, VerifierConfigurationException, SAXException,
-            IOException {
+            IOException, XMLStreamException {
         // We use sun multi validator (msv)
         VerifierFactory vfactory = new com.sun.msv.verifier.jarv.TheFactoryImpl();
-        InputStream schemaStream = this.getClass().getResourceAsStream(SCHEMA_LOCATION);
+        InputStream schemaStream = this.getClass().getResourceAsStream(findSchemaByNamespaceUsed(file));
         Schema schema = vfactory.compileSchema(schemaStream);
         Verifier verifier = schema.newVerifier();
         ValidatingErrorHandler veh = new ValidatingErrorHandler();
@@ -310,6 +304,31 @@ public class JobFactory_stax extends JobFactory {
         }
         if (veh.mistakes > 0) {
             throw new SAXException(veh.mistakesStack.toString());
+        }
+    }
+
+    private String findSchemaByNamespaceUsed(File file) throws FileNotFoundException, XMLStreamException {
+        XMLStreamReader cursorRoot = xmlif.createXMLStreamReader(new FileReader(file));
+        String current;
+        try {
+            int eventType;
+            while (cursorRoot.hasNext()) {
+                eventType = cursorRoot.next();
+                if (eventType == XMLEvent.START_ELEMENT) {
+                    current = cursorRoot.getLocalName();
+                    if (XMLTags.JOB.matches(current)) {
+                        String namespace = cursorRoot.getName().getNamespaceURI();
+                        return Schemas.SCHEMAS_BY_NAMESPACE.get(namespace).location;
+                    }
+                }
+            }
+            return Schemas.SCHEMA_LATEST.location;
+        } catch (Exception e) {
+            return Schemas.SCHEMA_LATEST.location;
+        } finally {
+            if (cursorRoot != null) {
+                cursorRoot.close();
+            }
         }
     }
 
@@ -553,7 +572,7 @@ public class JobFactory_stax extends JobFactory {
                         break;
                 }
             }
-            return pathEntries.toArray(new String[] {});
+            return pathEntries.toArray(new String[pathEntries.size()]);
         } catch (JobCreationException jce) {
             jce.pushTag(cursorClasspath.getLocalName());
             throw jce;
@@ -757,6 +776,9 @@ public class JobFactory_stax extends JobFactory {
                         } else if (XMLTags.NATIVE_EXECUTABLE.matches(current)) {
                             toReturn = (taskToFill != null) ? taskToFill : new NativeTask();
                             setNativeExecutable((NativeTask) toReturn, cursorTask);
+                        }  else if (XMLTags.SCRIPT_EXECUTABLE.matches(current)) {
+                            toReturn = (taskToFill != null) ? taskToFill : new ScriptTask();
+                            ((ScriptTask)toReturn).setScript(new TaskScript(createScript(cursorTask)));
                         }
                         break;
                     case XMLEvent.END_ELEMENT:
@@ -833,14 +855,14 @@ public class JobFactory_stax extends JobFactory {
                                     if (selector == null) {
                                         selector = new FileSelector();
                                     }
-                                    selector.setIncludes(new String[] { replace(cursorTask
-                                            .getAttributeValue(i)) });
+                                    selector.setIncludes(replace(cursorTask
+                                            .getAttributeValue(i)));
                                 } else if (XMLAttributes.DS_EXCLUDES.matches(attrName)) {
                                     if (selector == null) {
                                         selector = new FileSelector();
                                     }
-                                    selector.setExcludes(new String[] { replace(cursorTask
-                                            .getAttributeValue(i)) });
+                                    selector.setExcludes(replace(cursorTask
+                                            .getAttributeValue(i)));
                                 } else if (XMLAttributes.DS_ACCESSMODE.matches(attrName)) {
                                     accessMode = replace(cursorTask.getAttributeValue(i));
                                 }
@@ -981,7 +1003,7 @@ public class JobFactory_stax extends JobFactory {
             }
         }
         FlowScript sc = null;
-        Script<?> internalScript = null;
+        Script<?> internalScript;
         try {
             internalScript = createScript(cursorTask, 2);
             switch (FlowActionType.parse(type)) {
@@ -1207,7 +1229,7 @@ public class JobFactory_stax extends JobFactory {
         String selectionTag = cursorScript.getLocalName();
         String current = null;
         try {
-            SelectionScript newOne = null;
+            SelectionScript newOne;
             int eventType;
             while (cursorScript.hasNext()) {
                 eventType = cursorScript.next();
@@ -1278,12 +1300,12 @@ public class JobFactory_stax extends JobFactory {
                             break;
                         case XMLEvent.END_ELEMENT:
                             if (XMLTags.SCRIPT_ARGUMENTS.matches(cursorArgs.getLocalName())) {
-                                return args.toArray(new String[] {});
+                                return args.toArray(new String[args.size()]);
                             }
                             break;
                     }
                 }
-                return args.toArray(new String[] {});
+                return args.toArray(new String[args.size()]);
             } catch (JobCreationException jce) {
                 jce.pushTag(cursorArgs.getLocalName());
                 throw jce;
@@ -1343,7 +1365,7 @@ public class JobFactory_stax extends JobFactory {
                                 break;
                             case XMLEvent.END_ELEMENT:
                                 if (XMLTags.NATIVE_EXECUTABLE.matches(cursorExec.getLocalName())) {
-                                    nativeTask.setCommandLine(command.toArray(new String[] {}));
+                                    nativeTask.setCommandLine(command.toArray(new String[command.size()]));
                                     return;
                                 }
                                 break;
@@ -1657,7 +1679,7 @@ public class JobFactory_stax extends JobFactory {
          */
         public void error(SAXParseException exception) throws SAXException {
             appendAndPrintMessage("ERROR:" + exception.getMessage() + " at line " +
-                exception.getLineNumber() + ", column " + exception.getColumnNumber());
+                    exception.getLineNumber() + ", column " + exception.getColumnNumber());
         }
 
         /**
@@ -1665,7 +1687,7 @@ public class JobFactory_stax extends JobFactory {
          */
         public void fatalError(SAXParseException exception) throws SAXException {
             appendAndPrintMessage("ERROR:" + exception.getMessage() + " at line " +
-                exception.getLineNumber() + ", column " + exception.getColumnNumber());
+                    exception.getLineNumber() + ", column " + exception.getColumnNumber());
         }
 
         /**
@@ -1673,12 +1695,11 @@ public class JobFactory_stax extends JobFactory {
          */
         public void warning(SAXParseException exception) throws SAXException {
             appendAndPrintMessage("WARNING:" + exception.getMessage() + " at line " +
-                exception.getLineNumber() + ", column " + exception.getColumnNumber());
+                    exception.getLineNumber() + ", column " + exception.getColumnNumber());
         }
 
         private void appendAndPrintMessage(String msg) {
-            mistakesStack.append(msg + "\n");
-            System.err.println(msg);
+            mistakesStack.append(msg).append("\n");
             mistakes++;
         }
     }
@@ -1730,11 +1751,11 @@ public class JobFactory_stax extends JobFactory {
                 logger.debug("clean : " + t.getCleaningScript());
                 try {
                     logger.debug("ifsel : length=" + t.getInputFilesList().size());
-                } catch (NullPointerException npe) {
+                } catch (NullPointerException ignored) {
                 }
                 try {
                     logger.debug("ofsel : inc=" + t.getOutputFilesList().size());
-                } catch (NullPointerException npe) {
+                } catch (NullPointerException ignored) {
                 }
                 if (t.getDependencesList() != null) {
                     String dep = "dep   : ";
@@ -1765,8 +1786,10 @@ public class JobFactory_stax extends JobFactory {
                         logger.debug("forkScr: " + ((JavaTask) t).getForkEnvironment().getEnvScript());
                     }
                 } else if (t instanceof NativeTask) {
-                    logger.debug("cmd   : " + ((NativeTask) t).getCommandLine());
+                    logger.debug("cmd   : " + Arrays.toString(((NativeTask) t).getCommandLine()));
                     logger.debug("gensc : " + ((NativeTask) t).getGenerationScript());
+                } else if (t instanceof ScriptTask) {
+                    logger.debug("script   : " + ((ScriptTask) t).getScript());
                 }
                 logger.debug("--------------------------------------------------");
             }

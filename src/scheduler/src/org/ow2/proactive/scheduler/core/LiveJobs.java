@@ -10,7 +10,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.exception.TaskAbortedException;
@@ -42,6 +41,7 @@ import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
 import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.TaskLogger;
+import org.apache.log4j.Logger;
 
 
 class LiveJobs {
@@ -418,7 +418,7 @@ class LiveJobs {
                     return terminationData;
                 }
             } else {
-                tlogger.debug(taskId, "is a java task");
+                tlogger.debug(taskId, "is a java or a script task");
                 errorOccurred = result.hadException();
                 if (errorOccurred) {
                     tlogger.error(taskId, "error", result.getException());

@@ -13,19 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
-import org.hibernate.Criteria;
-import org.hibernate.FetchMode;
-import org.hibernate.HibernateException;
-import org.hibernate.Query;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
-import org.hibernate.cfg.Configuration;
-import org.hibernate.criterion.Property;
-import org.hibernate.criterion.Restrictions;
-import org.hibernate.exception.ConstraintViolationException;
-import org.hibernate.transform.DistinctRootEntityResultTransformer;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.ow2.proactive.db.DatabaseManagerException;
 import org.ow2.proactive.db.DatabaseManagerExceptionHandler;
@@ -60,14 +47,29 @@ import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.ForkedJavaExecutableContainer;
 import org.ow2.proactive.scheduler.task.JavaExecutableContainer;
 import org.ow2.proactive.scheduler.task.NativeExecutableContainer;
+import org.ow2.proactive.scheduler.task.ScriptExecutableContainer;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalForkedJavaTask;
 import org.ow2.proactive.scheduler.task.internal.InternalJavaTask;
 import org.ow2.proactive.scheduler.task.internal.InternalNativeTask;
+import org.ow2.proactive.scheduler.task.internal.InternalScriptTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.utils.FileToBytesConverter;
+import org.apache.log4j.Logger;
+import org.hibernate.Criteria;
+import org.hibernate.FetchMode;
+import org.hibernate.HibernateException;
+import org.hibernate.Query;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
+import org.hibernate.cfg.Configuration;
+import org.hibernate.criterion.Property;
+import org.hibernate.criterion.Restrictions;
+import org.hibernate.exception.ConstraintViolationException;
+import org.hibernate.transform.DistinctRootEntityResultTransformer;
 
 
 public class SchedulerDBManager implements FilteredExceptionCallback {
@@ -162,6 +164,7 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
             configuration.addAnnotatedClass(JavaTaskData.class);
             configuration.addAnnotatedClass(ForkedJavaTaskData.class);
             configuration.addAnnotatedClass(NativeTaskData.class);
+            configuration.addAnnotatedClass(ScriptTaskData.class);
             configuration.addAnnotatedClass(ScriptData.class);
             configuration.addAnnotatedClass(EnvironmentModifierData.class);
             configuration.addAnnotatedClass(SelectorData.class);
@@ -1531,6 +1534,10 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
             NativeExecutableContainer container = (NativeExecutableContainer) task.getExecutableContainer();
             NativeTaskData nativeTaskData = NativeTaskData.createNativeTaskData(taskRuntimeData, container);
             session.save(nativeTaskData);
+        } else if (task.getClass().equals(InternalScriptTask.class)) {
+            ScriptExecutableContainer container = (ScriptExecutableContainer) task.getExecutableContainer();
+            ScriptTaskData scriptTaskData = ScriptTaskData.createScriptTaskData(taskRuntimeData, container);
+            session.save(scriptTaskData);
         } else {
             throw new IllegalArgumentException("Unexpected task class: " + task.getClass());
         }
@@ -1571,6 +1578,14 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
             } else if (task.getClass().equals(InternalNativeTask.class)) {
                 NativeTaskData taskData = (NativeTaskData) session.createQuery(
                         "from NativeTaskData td where td.taskData.id = :taskId").setParameter("taskId",
+                        taskId(task)).uniqueResult();
+
+                if (taskData != null) {
+                    container = taskData.createExecutableContainer();
+                }
+            } else if (task.getClass().equals(InternalScriptTask.class)) {
+                ScriptTaskData taskData = (ScriptTaskData) session.createQuery(
+                        "from ScriptTaskData td where td.taskData.id = :taskId").setParameter("taskId",
                         taskId(task)).uniqueResult();
 
                 if (taskData != null) {

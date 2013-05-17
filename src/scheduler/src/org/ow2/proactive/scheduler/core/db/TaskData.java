@@ -20,16 +20,6 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import org.hibernate.annotations.BatchSize;
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
-import org.hibernate.annotations.ForeignKey;
-import org.hibernate.annotations.Index;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
-import org.hibernate.annotations.Parameter;
-import org.hibernate.annotations.Type;
-import org.hibernate.type.SerializableToBlobType;
 import org.ow2.proactive.scheduler.common.task.ParallelEnvironment;
 import org.ow2.proactive.scheduler.common.task.RestartMode;
 import org.ow2.proactive.scheduler.common.task.TaskId;
@@ -45,6 +35,7 @@ import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalForkedJavaTask;
 import org.ow2.proactive.scheduler.task.internal.InternalJavaTask;
 import org.ow2.proactive.scheduler.task.internal.InternalNativeTask;
+import org.ow2.proactive.scheduler.task.internal.InternalScriptTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.topology.descriptor.ArbitraryTopologyDescriptor;
@@ -55,6 +46,16 @@ import org.ow2.proactive.topology.descriptor.SingleHostDescriptor;
 import org.ow2.proactive.topology.descriptor.SingleHostExclusiveDescriptor;
 import org.ow2.proactive.topology.descriptor.ThresholdProximityDescriptor;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
+import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
+import org.hibernate.annotations.ForeignKey;
+import org.hibernate.annotations.Index;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+import org.hibernate.annotations.Parameter;
+import org.hibernate.annotations.Type;
+import org.hibernate.type.SerializableToBlobType;
 
 
 @Entity
@@ -63,10 +64,9 @@ import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 public class TaskData {
 
     private static final String JAVA_TASK = "JAVA_TASK";
-
     private static final String FORKED_JAVA_TASK = "FORKED_JAVA_TASK";
-
     private static final String NATIVE_TASK = "NATIVE_TASK";
+    private static final String SCRIPT_TASK = "SCRIPT_TASK";
 
     private DBTaskId id;
 
@@ -337,6 +337,8 @@ public class TaskData {
             internalTask = new InternalForkedJavaTask();
         } else if (taskType.equals(NATIVE_TASK)) {
             internalTask = new InternalNativeTask();
+        } else if (taskType.equals(SCRIPT_TASK)) {
+            internalTask = new InternalScriptTask();
         } else {
             throw new IllegalStateException("Unexpecpected stored task type: " + taskType);
         }
@@ -530,6 +532,8 @@ public class TaskData {
             taskType = FORKED_JAVA_TASK;
         } else if (task.getClass().equals(InternalNativeTask.class)) {
             taskType = NATIVE_TASK;
+        } else if (task.getClass().equals(InternalScriptTask.class)) {
+            taskType = SCRIPT_TASK;
         } else {
             throw new IllegalArgumentException("Unexpected task type: " + task.getClass());
         }

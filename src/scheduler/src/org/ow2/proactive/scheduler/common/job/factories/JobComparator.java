@@ -46,7 +46,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.ow2.proactive.scheduler.common.job.JobEnvironment;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.CommonAttribute;
@@ -54,6 +53,7 @@ import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.common.task.ParallelEnvironment;
+import org.ow2.proactive.scheduler.common.task.ScriptTask;
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
@@ -61,6 +61,7 @@ import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.topology.descriptor.ThresholdProximityDescriptor;
+import org.apache.commons.collections.CollectionUtils;
 
 
 public class JobComparator {
@@ -73,7 +74,6 @@ public class JobComparator {
      * explaining the first difference encountered. Returns an empty string if
      * the
      *
-     * @return
      */
     public String getDifferenceMessage() {
         return stack.toString();
@@ -86,10 +86,6 @@ public class JobComparator {
      * 			   job1 serialized to xml produces job1.xml
      * 			   job1.xml loaded in java produces job2
      * 		then isEqual(job1,job2) == true
-     *
-     * @param job1
-     * @param job2
-     * @return
      *
      * @throws ClassNotFoundException
      * @throws IOException
@@ -359,6 +355,13 @@ public class JobComparator {
                 return false;
         }
 
+        if(t1 instanceof ScriptTask) {
+            ScriptTask st1 = (ScriptTask) t1;
+            ScriptTask st2 = (ScriptTask) t2;
+            if (!isEqualScript(st1.getScript(), st2.getScript()))
+                return false;
+        }
+
         return true;
     }
 
@@ -468,9 +471,6 @@ public class JobComparator {
      * parameters in the script code and then just compare the script text. This
      * is because the Job2XMLTransformer inlines the script parameters
      *
-     * @param s1
-     * @param s2
-     * @return
      */
     private boolean isEqualScript(Script s1, Script s2) {
         if ((s1 == null) && (s2 == null))
@@ -495,9 +495,6 @@ public class JobComparator {
      * Compares the element in the 2 lists in the exact order they appear in the
      * lists
      *
-     * @param l1
-     * @param l2
-     * @return
      */
     private boolean isEqualInputFiles(List<InputSelector> l1, List<InputSelector> l2) {
         if ((l1 == null) && (l2 == null))
@@ -512,8 +509,7 @@ public class JobComparator {
             return false;
         }
 
-        for (int k = 0; k < l1.size(); k++) {
-            InputSelector is1 = l1.get(k);
+        for (InputSelector is1 : l1) {
             InputSelector is2 = l2.get(2);
             if (is1.getMode().equals(is2.getMode()))
                 return false;
@@ -539,9 +535,6 @@ public class JobComparator {
      * lists FIXME: bad object design in the data space layer provides us to
      * unify the similar code in this method and isEqualInputFiles
      *
-     * @param l1
-     * @param l2
-     * @return
      */
     private boolean isEqualOutputFiles(List<OutputSelector> l1, List<OutputSelector> l2) {
         if ((l1 == null) && (l2 == null))
@@ -555,8 +548,7 @@ public class JobComparator {
         if (l1.size() != l2.size())
             return false;
 
-        for (int k = 0; k < l1.size(); k++) {
-            OutputSelector os1 = l1.get(k);
+        for (OutputSelector os1 : l1) {
             OutputSelector os2 = l2.get(2);
             if (os1.getMode().equals(os2.getMode()))
                 return false;
