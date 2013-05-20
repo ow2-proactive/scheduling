@@ -36,30 +36,97 @@
  */
 package org.ow2.proactive_grid_cloud_portal.rm;
 
-import org.ow2.proactive.resourcemanager.common.util.RMCachingProxyUserInterface;
-import org.ow2.proactive_grid_cloud_portal.RestTestServer;
-
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.util.Collections;
+import java.util.Locale;
+import java.util.Random;
 
+import javax.management.Attribute;
+import javax.management.AttributeList;
+import javax.management.ObjectName;
+
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.ow2.proactive.resourcemanager.common.util.RMCachingProxyUserInterface;
+import org.ow2.proactive_grid_cloud_portal.RestTestServer;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.jboss.resteasy.client.ProxyFactory;
+import org.jrobin.core.RrdException;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.mockito.Matchers;
+import org.rrd4j.ConsolFun;
+import org.rrd4j.DsType;
+import org.rrd4j.core.RrdDb;
+import org.rrd4j.core.RrdDef;
+import org.rrd4j.core.Sample;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-
 public class RMRestTest extends RestTestServer {
+
+    private static final double EXPECTED_RRD_VALUE = 1.042;
 
     @BeforeClass
     public static void setUpRest() throws Exception {
         addResource(new RMRest());
+    }
+
+    // PORTAL-286
+    @Test
+    public void testStatsHistory_Locale_Fr() throws Exception {
+        Locale.setDefault(Locale.FRANCE);
+
+        JSONObject jsonObject = callGetStatHistory();
+
+        assertEquals(EXPECTED_RRD_VALUE, (Double) ((JSONArray) jsonObject.get("AverageActivity")).get(0), 0.001);
+
+    }
+
+    private JSONObject callGetStatHistory() throws Exception {
+        RMCachingProxyUserInterface rmMock = mock(RMCachingProxyUserInterface.class);
+        String sessionId = RMSessionMapper.getInstance().add(rmMock);
+
+        AttributeList value = new AttributeList(
+                Collections.singletonList(new Attribute("test", createRrdDb().getBytes())));
+        when(rmMock.getMBeanAttributes(Matchers.<ObjectName>any(), Matchers.<String[]>any())).thenReturn(
+                value);
+        RMRestInterface client = ProxyFactory.create(RMRestInterface.class, "http://localhost:" + port + "/");
+
+        String statHistory = client.getStatHistory(sessionId, "hhhhh");
+        return (JSONObject) new JSONParser().parse(statHistory);
+    }
+
+    private RrdDb createRrdDb() throws IOException, RrdException {
+        final long start = (System.currentTimeMillis() - 10000) / 1000;
+        final long end = System.currentTimeMillis() / 1000;
+
+        RrdDef rrdDef = new RrdDef("testDB", start - 1, 300);
+        for (String dataSource : RMRest.dataSources) {
+            rrdDef.addDatasource(dataSource, DsType.GAUGE, 600, 0, Double.NaN);
+        }
+        rrdDef.addArchive(ConsolFun.AVERAGE, 0.5, 1, 150);
+        RrdDb rrdDb = new RrdDb(rrdDef, org.rrd4j.core.RrdBackendFactory.getFactory("MEMORY"));
+        Sample sample = rrdDb.createSample();
+
+        long time = start;
+        while (time <= end + 172800L) {
+            sample.setTime(time);
+            for (String dataSource : RMRest.dataSources) {
+                sample.setValue(dataSource, 1.042);
+            }
+            sample.update();
+            time += new Random().nextDouble() * 300 + 1;
+        }
+        return rrdDb;
     }
 
     @Test

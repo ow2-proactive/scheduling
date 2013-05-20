@@ -42,8 +42,10 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.security.KeyException;
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 import javax.management.Attribute;
@@ -97,7 +99,7 @@ import org.rrd4j.core.RrdDb;
 
 
 @Path("/rm")
-public class RMRest {
+public class RMRest implements RMRestInterface {
 
     protected static final String[] dataSources = { //
     // "AverageInactivity", // redundant with AverageActivity
@@ -131,6 +133,7 @@ public class RMRest {
      * @throws NodeException 
      * @throws ActiveObjectCreationException 
      */
+    @Override
     @POST
     @Path("login")
     @Produces("application/json")
@@ -159,6 +162,7 @@ public class RMRest {
      *            a valid session id
      * @throws NotConnectedException
      */
+    @Override
     @POST
     @Path("disconnect")
     @Produces("application/json")
@@ -176,6 +180,7 @@ public class RMRest {
      * @see org.ow2.proactive_grid_cloud_portal.SchedulerRestInterface#loginWithCredential(org.ow2.
      * proactive_grid_cloud_portal.LoginForm)
      */
+    @Override
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Path("login")
@@ -207,6 +212,7 @@ public class RMRest {
      * @return Returns the state of the scheduler
      * @throws NotConnectedException 
      */
+    @Override
     @GET
     @Path("state")
     @Produces("application/json")
@@ -222,6 +228,7 @@ public class RMRest {
      * @return the initial state of the resource manager 
      * @throws NotConnectedException 
      */
+    @Override
     @GET
     @GZIP
     @Path("monitoring")
@@ -240,6 +247,7 @@ public class RMRest {
      * @return true if the resource manager is operational.
      * @throws NotConnectedException 
      */
+    @Override
     @GET
     @Path("isactive")
     @Produces("application/json")
@@ -258,6 +266,7 @@ public class RMRest {
      * @return true if new node is added successfully
      * @throws NotConnectedException 
      */
+    @Override
     @POST
     @Produces("application/json")
     @Path("node")
@@ -281,6 +290,7 @@ public class RMRest {
      *         otherwise
      * @throws NotConnectedException 
      */
+    @Override
     @POST
     @Path("node")
     @Produces("application/json")
@@ -303,6 +313,7 @@ public class RMRest {
      * @return true if the node nodeUrl is registered and not down
      * @throws NotConnectedException 
      */
+    @Override
     @GET
     @Path("node/isavailable")
     @Produces("application/json")
@@ -338,6 +349,7 @@ public class RMRest {
      * @return true if a node source has been created
      * @throws NotConnectedException 
      */
+    @Override
     @POST
     @Path("nodesource/create")
     @Produces("application/json")
@@ -409,6 +421,7 @@ public class RMRest {
      * @throws NotConnectedException 
      */
 
+    @Override
     @POST
     @Path("nodesource/pingfrequency")
     @Produces("application/json")
@@ -428,6 +441,7 @@ public class RMRest {
      * @throws NodeException
      * @throws NotConnectedException 
      */
+    @Override
     @POST
     @Path("node/release")
     @Produces("application/json")
@@ -449,6 +463,7 @@ public class RMRest {
      * @return true if the node is removed successfully, false or exception otherwise
      * @throws NotConnectedException 
      */
+    @Override
     @POST
     @Path("node/remove")
     @Produces("application/json")
@@ -469,6 +484,7 @@ public class RMRest {
      * @return true if the node is removed successfully, false or exception otherwise
      * @throws NotConnectedException 
      */
+    @Override
     @POST
     @Path("nodesource/remove")
     @Produces("application/json")
@@ -490,6 +506,7 @@ public class RMRest {
      * @return true when all nodes were free and have been locked
      * @throws NotConnectedException 
      */
+    @Override
     @POST
     @Path("node/lock")
     @Produces("application/json")
@@ -510,6 +527,7 @@ public class RMRest {
      * @return true when all nodes were locked and have been unlocked
      * @throws NotConnectedException 
      */
+    @Override
     @POST
     @Path("node/unlock")
     @Produces("application/json")
@@ -530,6 +548,7 @@ public class RMRest {
      * 
      * @return mbean attributes values
      */
+    @Override
     @GET
     @GZIP
     @Produces("application/json")
@@ -556,6 +575,7 @@ public class RMRest {
      * 
      * @return mbean attributes values
      */
+    @Override
     @GET
     @GZIP
     @Produces("application/json")
@@ -582,6 +602,7 @@ public class RMRest {
      * @return true if the shutdown process is successfully triggered, runtime exception otherwise
      * @throws NotConnectedException 
      */
+    @Override
     @GET
     @Path("shutdown")
     @Produces("application/json")
@@ -593,6 +614,7 @@ public class RMRest {
         return rm.shutdown(preempt).getBooleanValue();
     }
 
+    @Override
     @GET
     @Path("topology")
     @Produces("application/json")
@@ -609,6 +631,7 @@ public class RMRest {
      * @return the list of supported node source infrastructures descriptors
      * @throws NotConnectedException 
      */
+    @Override
     @GET
     @GZIP
     @Path("infrastructures")
@@ -626,6 +649,7 @@ public class RMRest {
      * @return the list of supported node source policies descriptors
      * @throws NotConnectedException 
      */
+    @Override
     @GET
     @GZIP
     @Path("policies")
@@ -649,6 +673,7 @@ public class RMRest {
      * @throws IOException
      * @throws NotConnectedException 
      */
+    @Override
     @GET
     @GZIP
     @Path("info/{name}")
@@ -703,6 +728,7 @@ public class RMRest {
      * @throws InterruptedException
      * @throws NotConnectedException 
      */
+    @Override
     @GET
     @GZIP
     @Path("stathistory")
@@ -749,8 +775,11 @@ public class RMRest {
         RrdDb db = new RrdDb(rrd4jDb.getAbsolutePath(), true);
 
         long timeEnd = db.getLastUpdateTime();
+        // force float separator for JSON parsing
+        DecimalFormatSymbols otherSymbols = new DecimalFormatSymbols(Locale.US);
+        otherSymbols.setDecimalSeparator('.');
         // formatting will greatly reduce response size
-        DecimalFormat formatter = new DecimalFormat("###.###");
+        DecimalFormat formatter = new DecimalFormat("###.###", otherSymbols);
 
         // construct the JSON response directly in a String
         StringBuilder result = new StringBuilder();
@@ -824,6 +853,7 @@ public class RMRest {
      * Returns the version of the rest api
      * @return returns the version of the rest api
      */
+    @Override
     @GET
     @Path("version")
     public String getVersion() {
