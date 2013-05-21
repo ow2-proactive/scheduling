@@ -287,8 +287,8 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
             InternalJob currentJob = jobsMap.get(etd.getJobId()).getInternal();
             InternalTask internalTask = currentJob.getIHMTasks().get(etd.getTaskId());
             int neededNodes = internalTask.getNumberOfNodesNeeded();
-            SchedulingTaskComparator referent = new SchedulingTaskComparator(internalTask,
-                currentJob.getOwner());
+            SchedulingTaskComparator referent = new SchedulingTaskComparator(internalTask, currentJob
+                    .getOwner());
             boolean firstLoop = true;
             do {
                 if (!firstLoop) {

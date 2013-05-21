@@ -54,13 +54,12 @@ public class SigarProcesses implements SigarProcessesMXBean {
         for (int i = 0; i < pids.length; i++) {
             long pid = pids[i];
             List info = Ps.getInfo(sigar, pid); // Add standard info. 
-            info.add(sigar.getProcArgs(pid));   // Add also arguments of 
-                                                // each process. 
-            info.add(sigar.getProcCpu(pid).
-            		getPercent());				// Add cpu usage (perc.).
+            info.add(sigar.getProcArgs(pid)); // Add also arguments of 
+            // each process. 
+            info.add(sigar.getProcCpu(pid).getPercent()); // Add cpu usage (perc.).
             // TODO see why sigar.getProcCpu(pid).getPercent()
             // returns '0.0' always.
-            
+
             result[i] = new ProcessInfo(info);
         }
 

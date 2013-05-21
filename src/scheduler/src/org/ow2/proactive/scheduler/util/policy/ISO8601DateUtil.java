@@ -40,6 +40,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+
 /**
  * Helper class for converting ISO datetime strings of the following format:
  * "2008-03-01T13:00:00+01:00".
@@ -50,51 +51,51 @@ import java.util.Date;
  */
 public class ISO8601DateUtil {
 
-	/*
-	 * Provides thread-safe access for a SimpleDateFormat instance.
-	 */
-	private static final ThreadLocal<SimpleDateFormat> df = new ThreadLocal<SimpleDateFormat>() {
-		@Override
-		protected SimpleDateFormat initialValue() {
-			return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
-		}
+    /*
+     * Provides thread-safe access for a SimpleDateFormat instance.
+     */
+    private static final ThreadLocal<SimpleDateFormat> df = new ThreadLocal<SimpleDateFormat>() {
+        @Override
+        protected SimpleDateFormat initialValue() {
+            return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+        }
 
-	};
+    };
 
-	// non-instantiable
-	private ISO8601DateUtil() {
-	}
+    // non-instantiable
+    private ISO8601DateUtil() {
+    }
 
-	/**
-	 * Convert java.util.Date instance into a ISO8601 complaint string.
-	 * 
-	 * @param date
-	 *            a java.util.Date instance
-	 * @return ISO8601 complaint string
-	 */
-	public static final String parse(final Date date) {
-		String formatted = df.get().format(date);
-		return formatted.substring(0, 22) + ":" + formatted.substring(22);
-	}
+    /**
+     * Convert java.util.Date instance into a ISO8601 complaint string.
+     * 
+     * @param date
+     *            a java.util.Date instance
+     * @return ISO8601 complaint string
+     */
+    public static final String parse(final Date date) {
+        String formatted = df.get().format(date);
+        return formatted.substring(0, 22) + ":" + formatted.substring(22);
+    }
 
-	/**
-	 * Convert ISO8601 complaint string into a java.util.Date instance.
-	 * 
-	 * @param source
-	 *            ISO8601 complaint string
-	 * @return a java.util.Date instance
-	 * @throws ParseException
-	 *             if the string does not have required length
-	 */
-	public static final Date toDate(final String source) throws ParseException {
-		String s = source.replace("Z", "+00:00");
-		try {
-			s = s.substring(0, 22) + s.substring(23);
-		} catch (IndexOutOfBoundsException e) {
-			throw new ParseException("Invalid length", 0);
-		}
-		return df.get().parse(s);
+    /**
+     * Convert ISO8601 complaint string into a java.util.Date instance.
+     * 
+     * @param source
+     *            ISO8601 complaint string
+     * @return a java.util.Date instance
+     * @throws ParseException
+     *             if the string does not have required length
+     */
+    public static final Date toDate(final String source) throws ParseException {
+        String s = source.replace("Z", "+00:00");
+        try {
+            s = s.substring(0, 22) + s.substring(23);
+        } catch (IndexOutOfBoundsException e) {
+            throw new ParseException("Invalid length", 0);
+        }
+        return df.get().parse(s);
 
-	}
+    }
 
 }

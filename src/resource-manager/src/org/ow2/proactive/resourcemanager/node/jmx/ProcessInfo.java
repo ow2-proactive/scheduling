@@ -53,7 +53,7 @@ public class ProcessInfo {
     private String description;
     private String[] commandline;
     private String cpuPerc;
-    
+
     public ProcessInfo() {
     }
 
@@ -68,7 +68,7 @@ public class ProcessInfo {
         state = it.next().toString();
         cpuTime = it.next().toString();
         description = it.next().toString();
-        commandline = (String[])it.next();
+        commandline = (String[]) it.next();
         cpuPerc = it.next().toString();
     }
 
@@ -111,7 +111,7 @@ public class ProcessInfo {
     public String[] getCommandline() {
         return commandline;
     }
-    
+
     public String getCpuPerc() {
         return cpuPerc;
     }

@@ -832,7 +832,6 @@ public interface Scheduler extends SchedulerUsage {
     public String getTaskServerLogs(String id, String taskName) throws UnknownJobException,
             UnknownTaskException, NotConnectedException, PermissionException;
 
-
     /**
      * Retrieves a job list of the scheduler.
      *

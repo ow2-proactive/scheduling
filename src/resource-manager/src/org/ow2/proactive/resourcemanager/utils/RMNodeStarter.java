@@ -717,7 +717,8 @@ public class RMNodeStarter {
                 ResourceManager rm = null;
                 try {
                     rm = rmAuth.login(cred);
-                    if (NB_OF_ADD_NODE_ATTEMPTS==0) return true;
+                    if (NB_OF_ADD_NODE_ATTEMPTS == 0)
+                        return true;
 
                     boolean isAdmin = rm.isNodeAdmin(node.getNodeInformation().getURL()).getBooleanValue();
                     if (!isAdmin) {

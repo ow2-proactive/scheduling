@@ -48,6 +48,7 @@ import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
 import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
 import org.ow2.proactive.scheduler.util.policy.ISO8601DateUtil;
 
+
 /**
  * ExtendedSchedulerPolicy class provides:
  * 
@@ -63,72 +64,68 @@ import org.ow2.proactive.scheduler.util.policy.ISO8601DateUtil;
  */
 public class ExtendedSchedulerPolicy extends DefaultPolicy {
 
-	private static final Logger logger = Logger
-			.getLogger(ExtendedSchedulerPolicy.class);
+    private static final Logger logger = Logger.getLogger(ExtendedSchedulerPolicy.class);
 
-	public static final String GENERIC_INFORMATION_KEY_START_AT = "START_AT";
+    public static final String GENERIC_INFORMATION_KEY_START_AT = "START_AT";
 
-	/*
-	 * Utilize 'startAt' generic info and filter any tasks that should not be
-	 * scheduled for current execution cycle.
-	 */
-	@Override
-	public Vector<EligibleTaskDescriptor> getOrderedTasks(
-			List<JobDescriptor> jobDescList) {
-		Date now = new Date();
-		Vector<EligibleTaskDescriptor> executionCycleTasks = new Vector<EligibleTaskDescriptor>();
-		// sorts the JobDescriptor list by 'priority'.
-		Collections.sort(jobDescList);
-		for (JobDescriptor jobDesc : jobDescList) {
-			Collection<EligibleTaskDescriptor> eligibleTasks = jobDesc
-					.getEligibleTasks();
-			for (EligibleTaskDescriptor candidate : eligibleTasks) {
-				String startAt = getStartAtValue(jobDesc, candidate);
-				if (startAt == null) {
-					executionCycleTasks.add(candidate);
-				} else {
-					try {
-						if (now.after(ISO8601DateUtil.toDate(startAt))) {
-							executionCycleTasks.add(candidate);
+    /*
+     * Utilize 'startAt' generic info and filter any tasks that should not be
+     * scheduled for current execution cycle.
+     */
+    @Override
+    public Vector<EligibleTaskDescriptor> getOrderedTasks(List<JobDescriptor> jobDescList) {
+        Date now = new Date();
+        Vector<EligibleTaskDescriptor> executionCycleTasks = new Vector<EligibleTaskDescriptor>();
+        // sorts the JobDescriptor list by 'priority'.
+        Collections.sort(jobDescList);
+        for (JobDescriptor jobDesc : jobDescList) {
+            Collection<EligibleTaskDescriptor> eligibleTasks = jobDesc.getEligibleTasks();
+            for (EligibleTaskDescriptor candidate : eligibleTasks) {
+                String startAt = getStartAtValue(jobDesc, candidate);
+                if (startAt == null) {
+                    executionCycleTasks.add(candidate);
+                } else {
+                    try {
+                        if (now.after(ISO8601DateUtil.toDate(startAt))) {
+                            executionCycleTasks.add(candidate);
 
-						} else {
-							if (logger.isTraceEnabled()) {
-								logger.trace(String
-										.format("Task [jobId:\"%s\", taskId:\"%s\"] is scheduled to be executed at %s."
-												+ " It will not be scheduled for this execution cycle at %s.",
-												jobDesc.getJobId(),
-												candidate.getTaskId(), startAt,
-												ISO8601DateUtil.parse(now)));
-							}
-						}
-					} catch (ParseException e) {
-						logger.error(
-								String.format(
-										"An error occurred while processing 'startAt' generic info.%n"
-												+ "Task ([job-id:\"%s\", task-id:\"%s\"]) will be scheduled immediately for execution.",
-										jobDesc.getJobId().toString(),
-										candidate.getTaskId().toString()), e);
-						executionCycleTasks.add(candidate);
-					}
+                        } else {
+                            if (logger.isTraceEnabled()) {
+                                logger.trace(String.format(
+                                        "Task [jobId:\"%s\", taskId:\"%s\"] is scheduled to be executed at %s."
+                                            + " It will not be scheduled for this execution cycle at %s.",
+                                        jobDesc.getJobId(), candidate.getTaskId(), startAt, ISO8601DateUtil
+                                                .parse(now)));
+                            }
+                        }
+                    } catch (ParseException e) {
+                        logger
+                                .error(
+                                        String
+                                                .format(
+                                                        "An error occurred while processing 'startAt' generic info.%n"
+                                                            + "Task ([job-id:\"%s\", task-id:\"%s\"]) will be scheduled immediately for execution.",
+                                                        jobDesc.getJobId().toString(), candidate.getTaskId()
+                                                                .toString()), e);
+                        executionCycleTasks.add(candidate);
+                    }
 
-				}
-			}
-		}
-		return executionCycleTasks;
-	}
+                }
+            }
+        }
+        return executionCycleTasks;
+    }
 
-	/*
-	 * START_AT property defined at task level always has the precedence over
-	 * the same property defined job level.
-	 */
-	private String getStartAtValue(JobDescriptor jobDesc,
-			EligibleTaskDescriptor taskDesc) {
-		String startAt = taskDesc.getInternal().getGenericInformations()
-				.get(GENERIC_INFORMATION_KEY_START_AT);
-		if (startAt == null) {
-			startAt = jobDesc.getInternal().getGenericInformations()
-					.get(GENERIC_INFORMATION_KEY_START_AT);
-		}
-		return startAt;
-	}
+    /*
+     * START_AT property defined at task level always has the precedence over
+     * the same property defined job level.
+     */
+    private String getStartAtValue(JobDescriptor jobDesc, EligibleTaskDescriptor taskDesc) {
+        String startAt = taskDesc.getInternal().getGenericInformations()
+                .get(GENERIC_INFORMATION_KEY_START_AT);
+        if (startAt == null) {
+            startAt = jobDesc.getInternal().getGenericInformations().get(GENERIC_INFORMATION_KEY_START_AT);
+        }
+        return startAt;
+    }
 }

@@ -156,11 +156,10 @@ public final class RMJMXHelper extends AbstractJMXHelper {
      *
      * @param agentId the agentId of the MBeanServer to find.
      */
-    public static ArrayList<MBeanServer> findMBeanServer(String agentId){
-    	return MBeanServerFactory.findMBeanServer(agentId);
+    public static ArrayList<MBeanServer> findMBeanServer(String agentId) {
+        return MBeanServerFactory.findMBeanServer(agentId);
     }
-    
-    
+
     /**
      * {@inheritDoc}
      */

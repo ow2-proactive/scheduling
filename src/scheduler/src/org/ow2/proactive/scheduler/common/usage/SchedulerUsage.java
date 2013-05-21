@@ -42,7 +42,6 @@ import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
 
 
-
 /**
  * Scheduler interface for accounting information, usage data and statistics.
  *

@@ -480,8 +480,8 @@ public abstract class SelectionManager {
                 PrincipalPermission perm = (PrincipalPermission) node.getUserPermission();
                 // checking explicitly that node has this token identity
                 if (!perm.hasPrincipal(tokenPrincipal)) {
-                    logger.debug(client + " does not have required token to get the node " + node.getNodeURL() +
-                        " from " + node.getNodeSource().getName());
+                    logger.debug(client + " does not have required token to get the node " +
+                        node.getNodeURL() + " from " + node.getNodeSource().getName());
                     continue;
                 }
             }
