@@ -101,7 +101,7 @@ class LiveJobs {
                     if (job.getStatus() == JobStatus.PAUSED) {
                         job.setUnPause();
                         dbManager.updateJobAndTasksState(job);
-                        updateTaskInfosList(job, SchedulerEvent.JOB_RESUMED);
+                        updateJobInSchedulerState(job, SchedulerEvent.JOB_RESUMED);
                     }
                 } finally {
                     jobData.unlock();
@@ -153,17 +153,18 @@ class LiveJobs {
         }
         try {
             InternalJob job = jobData.job;
-            boolean change = job.setUnPause();
+            Set<TaskId> updatedTasks = job.setUnPause();
 
-            if (change) {
+            if (updatedTasks.size() > 0) {
                 jlogger.debug(jobId, "has just been resumed !");
                 dbManager.updateJobAndTasksState(job);
+                updateTasksInSchedulerState(job, updatedTasks);
             }
 
             //update tasks events list and send it to front-end
-            updateTaskInfosList(job, SchedulerEvent.JOB_RESUMED);
+            updateJobInSchedulerState(job, SchedulerEvent.JOB_RESUMED);
 
-            return change;
+            return updatedTasks.size() > 0;
         } finally {
             jobData.unlock();
         }
@@ -177,17 +178,18 @@ class LiveJobs {
         try {
             InternalJob job = jobData.job;
 
-            boolean change = job.setPaused();
+            Set<TaskId> updatedTasks = job.setPaused();
 
-            if (change) {
+            if (updatedTasks.size() > 0) {
                 jlogger.debug(jobId, "has just been paused !");
                 dbManager.updateJobAndTasksState(job);
+                updateTasksInSchedulerState(job, updatedTasks);
             }
 
             //update tasks events list and send it to front-end
-            updateTaskInfosList(job, SchedulerEvent.JOB_PAUSED);
+            updateJobInSchedulerState(job, SchedulerEvent.JOB_PAUSED);
 
-            return change;
+            return updatedTasks.size() > 0;
         } finally {
             jobData.unlock();
         }
@@ -316,7 +318,7 @@ class LiveJobs {
                     try {
                         if (jobData.job.getStartTime() < 0) {
                             jobData.job.start();
-                            updateTaskInfosList(jobData.job, SchedulerEvent.JOB_PENDING_TO_RUNNING);
+                            updateJobInSchedulerState(jobData.job, SchedulerEvent.JOB_PENDING_TO_RUNNING);
                             jlogger.info(jobId, "started");
                         }
                         endJob(jobData, terminationData, eltd.getInternal(), null, errorMsg,
@@ -344,7 +346,7 @@ class LiveJobs {
         if (job.getStartTime() < 0) {
             // if it is the first task of this job
             job.start();
-            updateTaskInfosList(job, SchedulerEvent.JOB_PENDING_TO_RUNNING);
+            updateJobInSchedulerState(job, SchedulerEvent.JOB_PENDING_TO_RUNNING);
             jlogger.info(job.getId(), "started");
             firstTaskStarted = true;
         } else {
@@ -682,6 +684,8 @@ class LiveJobs {
         if (jobStatus == JobStatus.KILLED) {
             Set<TaskId> tasksToUpdate = job.failed(null, jobStatus);
             dbManager.updateAfterJobKilled(job, tasksToUpdate);
+            updateTasksInSchedulerState(job, tasksToUpdate);
+
         } else {
             //if not killed
             Set<TaskId> tasksToUpdate = job.failed(task.getId(), jobStatus);
@@ -694,19 +698,26 @@ class LiveJobs {
             }
 
             dbManager.updateAfterJobFailed(job, task, taskResult, tasksToUpdate);
-
-            if (!noResult) {
-                //send task event if there was a result
-                listener.taskStateUpdated(job.getOwner(), new NotificationData<TaskInfo>(
-                    SchedulerEvent.TASK_RUNNING_TO_FINISHED, new TaskInfoImpl((TaskInfoImpl) task
-                            .getTaskInfo())));
-            }
+            updateTasksInSchedulerState(job, tasksToUpdate);
         }
 
         //update job and tasks events list and send it to front-end
-        updateTaskInfosList(job, event);
+        updateJobInSchedulerState(job, event);
 
         jlogger.info(job.getId(), "finished (" + jobStatus + ")");
+    }
+
+    private void updateTasksInSchedulerState(InternalJob job, Set<TaskId> tasksToUpdate) {
+        for (TaskId tid : tasksToUpdate) {
+            try {
+                InternalTask t = job.getTask(tid);
+                TaskInfo ti = new TaskInfoImpl((TaskInfoImpl) t.getTaskInfo());
+                listener.taskStateUpdated(job.getOwner(), new NotificationData<TaskInfo>(
+                    SchedulerEvent.TASK_RUNNING_TO_FINISHED, ti));
+            } catch (UnknownTaskException e) {
+                logger.error(e);
+            }
+        }
     }
 
     private JobData lockJob(JobId jobId) {
@@ -736,17 +747,13 @@ class LiveJobs {
         }
     }
 
-    private void updateTaskInfosList(InternalJob currentJob, SchedulerEvent eventType) {
+    private void updateJobInSchedulerState(InternalJob currentJob, SchedulerEvent eventType) {
         try {
             listener.jobStateUpdated(currentJob.getOwner(), new NotificationData<JobInfo>(eventType,
                 new JobInfoImpl((JobInfoImpl) currentJob.getJobInfo())));
         } catch (Throwable t) {
             //Just to prevent update method error
         }
-        // don't forget to set the task status modify to null
-        currentJob.setTaskStatusModify(null);
-        // used when a job has failed
-        currentJob.setTaskFinishedTimeModify(null);
     }
 
 }

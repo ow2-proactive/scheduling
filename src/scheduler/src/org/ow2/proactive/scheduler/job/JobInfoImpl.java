@@ -110,14 +110,6 @@ public class JobInfoImpl implements JobInfo {
     /** to know if the job has to be removed after the fixed admin delay or not */
     private boolean toBeRemoved;
 
-    /** If this status is not null, it means the tasks have to change their status */
-    //not Hibernate informations
-    private Map<TaskId, TaskStatus> taskStatusModify;
-
-    /** If this finished time is not null, it means the tasks have to change their finished time */
-    //not Hibernate informations
-    private Map<TaskId, Long> taskFinishedTimeModify;
-
     /** Tasks skipped by a Control Flow Action */
     private Set<TaskId> tasksSkipped;
 
@@ -144,12 +136,6 @@ public class JobInfoImpl implements JobInfo {
         this.priority = jobInfo.getPriority();
         this.status = jobInfo.getStatus();
         this.toBeRemoved = jobInfo.toBeRemoved;
-        if (jobInfo.taskStatusModify != null) {
-            this.taskStatusModify = new HashMap<TaskId, TaskStatus>(jobInfo.taskStatusModify);
-        }
-        if (jobInfo.getTaskFinishedTimeModify() != null) {
-            this.taskFinishedTimeModify = new HashMap<TaskId, Long>(jobInfo.getTaskFinishedTimeModify());
-        }
         if (jobInfo.getTasksSkipped() != null) {
             this.tasksSkipped = new HashSet<TaskId>(jobInfo.getTasksSkipped());
         }
@@ -252,42 +238,6 @@ public class JobInfoImpl implements JobInfo {
      */
     public int getTotalNumberOfTasks() {
         return totalNumberOfTasks;
-    }
-
-    /**
-     * To set the taskStatusModify
-     *
-     * @param taskStatusModify the taskStatusModify to set
-     */
-    public void setTaskStatusModify(Map<TaskId, TaskStatus> taskStatusModify) {
-        this.taskStatusModify = taskStatusModify;
-    }
-
-    /**
-     * To get the taskStatusModify
-     *
-     * @return the taskStatusModify
-     */
-    public Map<TaskId, TaskStatus> getTaskStatusModify() {
-        return taskStatusModify;
-    }
-
-    /**
-     * To set the taskFinishedTimeModify
-     *
-     * @param taskFinishedTimeModify the taskStatusModify to set
-     */
-    public void setTaskFinishedTimeModify(Map<TaskId, Long> taskFinishedTimeModify) {
-        this.taskFinishedTimeModify = taskFinishedTimeModify;
-    }
-
-    /**
-     * To get the taskFinishedTimeModify
-     *
-     * @return the taskFinishedTimeModify
-     */
-    public Map<TaskId, Long> getTaskFinishedTimeModify() {
-        return taskFinishedTimeModify;
     }
 
     /**

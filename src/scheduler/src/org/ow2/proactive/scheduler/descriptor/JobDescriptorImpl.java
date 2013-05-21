@@ -552,27 +552,23 @@ public class JobDescriptorImpl implements JobDescriptor {
         runningTasks.clear();
     }
 
-    /**
-     * Update the list of eligible tasks according to the status of each task.
-     * This method is called only if user pause a job.
-     *
-     * @param taskStatus the taskId with their current status.
-     */
-    public void update(Map<TaskId, TaskStatus> taskStatus) {
-        for (Entry<TaskId, TaskStatus> tid : taskStatus.entrySet()) {
-            if (tid.getValue() == TaskStatus.PAUSED) {
-                TaskDescriptor lt = eligibleTasks.get(tid.getKey());
+    public void pause(TaskId taskId) {
+        if (getInternal().getType() == JobType.TASKSFLOW) {
+            TaskDescriptor lt = runningTasks.get(taskId);
 
-                if (lt != null) {
-                    pausedTasks.put(tid.getKey(), eligibleTasks.remove(tid.getKey()));
-                }
-            } else if ((tid.getValue() == TaskStatus.PENDING) || (tid.getValue() == TaskStatus.SUBMITTED)) {
-                EligibleTaskDescriptor lt = (EligibleTaskDescriptor) pausedTasks.get(tid.getKey());
+            if (lt != null) {
+                pausedTasks.put(taskId, eligibleTasks.remove(taskId));
+            }
+        }
+    }
 
-                if (lt != null) {
-                    eligibleTasks.put(tid.getKey(), lt);
-                    pausedTasks.remove(tid.getKey());
-                }
+    public void unpause(TaskId taskId) {
+        if (getInternal().getType() == JobType.TASKSFLOW) {
+            EligibleTaskDescriptor lt = (EligibleTaskDescriptor) runningTasks.get(taskId);
+
+            if (lt != null) {
+                eligibleTasks.put(taskId, lt);
+                pausedTasks.remove(taskId);
             }
         }
     }

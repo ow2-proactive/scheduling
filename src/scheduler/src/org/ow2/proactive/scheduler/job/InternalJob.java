@@ -73,6 +73,7 @@ import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
 import org.ow2.proactive.scheduler.descriptor.JobDescriptorImpl;
 import org.ow2.proactive.scheduler.descriptor.TaskDescriptor;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
+import org.ow2.proactive.scheduler.task.TaskInfoImpl;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
@@ -158,11 +159,6 @@ public abstract class InternalJob extends JobState {
         }
     }
 
-    /**
-     * To update the content of this job with a jobInfo.
-     *
-     * @param info the JobInfo to set
-     */
     @Override
     public synchronized void update(JobInfo info) {
         if (!getId().equals(info.getJobId())) {
@@ -172,27 +168,13 @@ public abstract class InternalJob extends JobState {
         }
         //update job info
         this.jobInfo = (JobInfoImpl) info;
-        //update task status if needed
-        if (this.jobInfo.getTaskStatusModify() != null) {
-            for (TaskId id : tasks.keySet()) {
-                tasks.get(id).setStatus(this.jobInfo.getTaskStatusModify().get(id));
-            }
-        }
-        //update task finished time if needed
-        if (this.jobInfo.getTaskFinishedTimeModify() != null) {
-            for (TaskId id : tasks.keySet()) {
-                if (this.jobInfo.getTaskFinishedTimeModify().containsKey(id)) {
-                    //a null send to a long setter throws a NullPointerException so, here is the fix
-                    tasks.get(id).setFinishedTime(this.jobInfo.getTaskFinishedTimeModify().get(id));
-                }
-            }
-        }
+
         // update skipped tasks
         if (this.jobInfo.getTasksSkipped() != null) {
             for (TaskId id : tasks.keySet()) {
                 if (this.jobInfo.getTasksSkipped().contains(id)) {
-                    InternalTask it = tasks.get(id);
-                    it.setStatus(TaskStatus.SKIPPED);
+                    TaskInfoImpl taskInfo = (TaskInfoImpl) tasks.get(id).getTaskInfo();
+                    taskInfo.setStatus(TaskStatus.SKIPPED);
                 }
             }
         }
@@ -286,9 +268,7 @@ public abstract class InternalJob extends JobState {
         task.setProgress(0);
         if (getStatus() == JobStatus.PAUSED) {
             task.setStatus(TaskStatus.PAUSED);
-            HashMap<TaskId, TaskStatus> hts = new HashMap<TaskId, TaskStatus>();
-            hts.put(task.getId(), task.getStatus());
-            getJobDescriptor().update(hts);
+            getJobDescriptor().pause(task.getId());
         } else {
             task.setStatus(TaskStatus.PENDING);
         }
@@ -331,7 +311,6 @@ public abstract class InternalJob extends JobState {
             switch (action.getType()) {
                 /*
                  * LOOP action
-                 *
                  */
                 case LOOP: {
 
@@ -435,7 +414,6 @@ public abstract class InternalJob extends JobState {
 
                     /*
                      * IF action
-                     *
                      */
                 case IF:
 
@@ -595,7 +573,6 @@ public abstract class InternalJob extends JobState {
 
                     /*
                      * REPLICATE action
-                     *
                      */
                 case REPLICATE:
 
@@ -743,8 +720,7 @@ public abstract class InternalJob extends JobState {
                 }
 
                     /*
-                     * CONTINUE action :
-                     * - continue taskflow as if no action was provided
+                     * CONTINUE action : - continue taskflow as if no action was provided
                      */
                 case CONTINUE:
 
@@ -785,16 +761,6 @@ public abstract class InternalJob extends JobState {
         if (!didAction) {
             getJobDescriptor().terminate(taskId);
         }
-
-        //creating list of status for the jobDescriptor
-        HashMap<TaskId, TaskStatus> hts = new HashMap<TaskId, TaskStatus>(tasks.size());
-
-        for (InternalTask td : tasks.values()) {
-            hts.put(td.getId(), td.getStatus());
-        }
-
-        //updating job descriptor for eligible task
-        getJobDescriptor().update(hts);
 
         return changesInfo;
     }
@@ -866,6 +832,9 @@ public abstract class InternalJob extends JobState {
             if (descriptor.getStartTime() > 0) {
                 descriptor.setFinishedTime(System.currentTimeMillis());
                 setNumberOfFinishedTasks(getNumberOfFinishedTasks() + 1);
+                if (descriptor.getExecutionDuration() < 0) {
+                    descriptor.setExecutionDuration(descriptor.getFinishedTime() - descriptor.getStartTime());
+                }
             }
             descriptor.setStatus((jobStatus == JobStatus.FAILED) ? TaskStatus.FAILED : TaskStatus.FAULTY);
             //terminate this job descriptor
@@ -878,8 +847,6 @@ public abstract class InternalJob extends JobState {
         setStatus(jobStatus);
 
         //creating list of status
-        HashMap<TaskId, TaskStatus> hts = new HashMap<TaskId, TaskStatus>();
-        HashMap<TaskId, Long> htl = new HashMap<TaskId, Long>();
         Set<TaskId> updatedTasks = new HashSet<TaskId>();
 
         for (InternalTask td : tasks.values()) {
@@ -887,6 +854,9 @@ public abstract class InternalJob extends JobState {
                 if (td.getStatus() == TaskStatus.RUNNING) {
                     td.setStatus(TaskStatus.ABORTED);
                     td.setFinishedTime(System.currentTimeMillis());
+                    if (td.getStartTime() > 0 && td.getExecutionDuration() < 0) {
+                        td.setExecutionDuration(td.getFinishedTime() - td.getStartTime());
+                    }
                     updatedTasks.add(td.getId());
                 } else if (td.getStatus() == TaskStatus.WAITING_ON_ERROR ||
                     td.getStatus() == TaskStatus.WAITING_ON_FAILURE) {
@@ -898,13 +868,7 @@ public abstract class InternalJob extends JobState {
                     updatedTasks.add(td.getId());
                 }
             }
-
-            htl.put(td.getId(), td.getFinishedTime());
-            hts.put(td.getId(), td.getStatus());
         }
-
-        setTaskStatusModify(hts);
-        setTaskFinishedTimeModify(htl);
 
         if (jobDataSpaceApplication != null) {
             jobDataSpaceApplication.terminateDataSpaceApplication();
@@ -968,8 +932,6 @@ public abstract class InternalJob extends JobState {
             td.setStatus(TaskStatus.PENDING);
             taskStatus.put(td.getId(), TaskStatus.PENDING);
         }
-
-        setTaskStatusModify(taskStatus);
     }
 
     /**
@@ -992,28 +954,24 @@ public abstract class InternalJob extends JobState {
      *
      * @return true if the job has correctly been paused, false if not.
      */
-    public boolean setPaused() {
+    public Set<TaskId> setPaused() {
+        Set<TaskId> updatedTasks = new HashSet<TaskId>();
+
         if (jobInfo.getStatus() == JobStatus.PAUSED) {
-            return false;
+            return updatedTasks;
         }
 
         jobInfo.setStatus(JobStatus.PAUSED);
-
-        HashMap<TaskId, TaskStatus> hts = new HashMap<TaskId, TaskStatus>();
 
         for (InternalTask td : tasks.values()) {
             if ((td.getStatus() != TaskStatus.FINISHED) && (td.getStatus() != TaskStatus.RUNNING) &&
                 (td.getStatus() != TaskStatus.SKIPPED) && (td.getStatus() != TaskStatus.FAULTY)) {
                 td.setStatus(TaskStatus.PAUSED);
+                getJobDescriptor().pause(td.getId());
+                updatedTasks.add(td.getId());
             }
-
-            hts.put(td.getId(), td.getStatus());
         }
-
-        getJobDescriptor().update(hts);
-        setTaskStatusModify(hts);
-
-        return true;
+        return updatedTasks;
     }
 
     /**
@@ -1023,9 +981,11 @@ public abstract class InternalJob extends JobState {
      *
      * @return true if the job has correctly been unpaused, false if not.
      */
-    public boolean setUnPause() {
+    public Set<TaskId> setUnPause() {
+        Set<TaskId> updatedTasks = new HashSet<TaskId>();
+
         if (jobInfo.getStatus() != JobStatus.PAUSED) {
-            return false;
+            return updatedTasks;
         }
 
         if ((getNumberOfPendingTasks() + getNumberOfRunningTasks() + getNumberOfFinishedTasks()) == 0) {
@@ -1036,26 +996,23 @@ public abstract class InternalJob extends JobState {
             jobInfo.setStatus(JobStatus.RUNNING);
         }
 
-        HashMap<TaskId, TaskStatus> hts = new HashMap<TaskId, TaskStatus>();
-
         for (InternalTask td : tasks.values()) {
             if (jobInfo.getStatus() == JobStatus.PENDING) {
                 td.setStatus(TaskStatus.SUBMITTED);
+                updatedTasks.add(td.getId());
             } else if ((jobInfo.getStatus() == JobStatus.RUNNING) ||
                 (jobInfo.getStatus() == JobStatus.STALLED)) {
                 if ((td.getStatus() != TaskStatus.FINISHED) && (td.getStatus() != TaskStatus.RUNNING) &&
                     (td.getStatus() != TaskStatus.SKIPPED) && (td.getStatus() != TaskStatus.FAULTY)) {
                     td.setStatus(TaskStatus.PENDING);
+                    updatedTasks.add(td.getId());
                 }
             }
 
-            hts.put(td.getId(), td.getStatus());
+            getJobDescriptor().unpause(td.getId());
         }
 
-        getJobDescriptor().update(hts);
-        setTaskStatusModify(hts);
-
-        return true;
+        return updatedTasks;
     }
 
     /**
@@ -1109,24 +1066,6 @@ public abstract class InternalJob extends JobState {
      */
     public Map<TaskId, InternalTask> getIHMTasks() {
         return tasks;
-    }
-
-    /**
-     * To set the taskStatusModify
-     *
-     * @param taskStatusModify the taskStatusModify to set
-     */
-    public void setTaskStatusModify(Map<TaskId, TaskStatus> taskStatusModify) {
-        jobInfo.setTaskStatusModify(taskStatusModify);
-    }
-
-    /**
-     * To set the taskFinishedTimeModify
-     *
-     * @param taskFinishedTimeModify the taskFinishedTimeModify to set
-     */
-    public void setTaskFinishedTimeModify(Map<TaskId, Long> taskFinishedTimeModify) {
-        jobInfo.setTaskFinishedTimeModify(taskFinishedTimeModify);
     }
 
     /**

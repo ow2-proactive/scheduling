@@ -53,7 +53,8 @@ public class SchedulingServiceTest5 extends BaseServiceTest {
 
         Assert.assertTrue(service.killJob(jobDesc.getJobId()));
         listener.assertEvents(SchedulerEvent.JOB_PENDING_TO_RUNNING, SchedulerEvent.TASK_PENDING_TO_RUNNING,
-                SchedulerEvent.TASK_PENDING_TO_RUNNING, SchedulerEvent.JOB_RUNNING_TO_FINISHED);
+                SchedulerEvent.TASK_PENDING_TO_RUNNING, SchedulerEvent.TASK_RUNNING_TO_FINISHED,
+                SchedulerEvent.TASK_RUNNING_TO_FINISHED, SchedulerEvent.JOB_RUNNING_TO_FINISHED);
         infrastructure.assertRequests(2);
 
         Assert.assertFalse(service.killJob(jobDesc.getJobId()));

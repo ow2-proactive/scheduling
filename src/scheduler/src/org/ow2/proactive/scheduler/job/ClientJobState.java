@@ -111,22 +111,6 @@ public final class ClientJobState extends JobState {
         }
         // update job info
         this.jobInfo = (JobInfoImpl) info;
-        // update task status if needed
-        if (this.jobInfo.getTaskStatusModify() != null) {
-            for (TaskId id : tasks.keySet()) {
-                TaskInfoImpl taskInfo = (TaskInfoImpl) tasks.get(id).getTaskInfo();
-                taskInfo.setStatus(this.jobInfo.getTaskStatusModify().get(id));
-            }
-        }
-        // update task finished time if needed
-        if (this.jobInfo.getTaskFinishedTimeModify() != null) {
-            for (TaskId id : tasks.keySet()) {
-                if (this.jobInfo.getTaskFinishedTimeModify().containsKey(id)) {
-                    TaskInfoImpl taskInfo = (TaskInfoImpl) tasks.get(id).getTaskInfo();
-                    taskInfo.setFinishedTime(this.jobInfo.getTaskFinishedTimeModify().get(id));
-                }
-            }
-        }
         // update skipped tasks
         if (this.jobInfo.getTasksSkipped() != null) {
             for (TaskId id : tasks.keySet()) {

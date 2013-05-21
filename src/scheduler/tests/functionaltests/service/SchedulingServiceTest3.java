@@ -64,7 +64,7 @@ public class SchedulingServiceTest3 extends BaseServiceTest {
 
         listener.assertEvents(SchedulerEvent.JOB_PENDING_TO_RUNNING, SchedulerEvent.TASK_PENDING_TO_RUNNING,
                 SchedulerEvent.TASK_PENDING_TO_RUNNING, SchedulerEvent.TASK_RUNNING_TO_FINISHED,
-                SchedulerEvent.JOB_RUNNING_TO_FINISHED);
+                SchedulerEvent.TASK_RUNNING_TO_FINISHED, SchedulerEvent.JOB_RUNNING_TO_FINISHED);
 
         infrastructure.assertRequests(2);
     }

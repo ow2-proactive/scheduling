@@ -44,9 +44,12 @@ import org.junit.Test;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
+import org.ow2.proactive.scheduler.common.job.JobState;
+import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.tests.FunctionalTest;
 
@@ -75,8 +78,25 @@ public class TestPauseJobRecover extends FunctionalTest {
         System.out.println("Waiting for task1 to start");
         SchedulerTHelper.waitForEventTaskRunning(jobId, "task1");
 
+        JobState js = SchedulerTHelper.getSchedulerInterface().getJobState(jobId);
+        Assert.assertEquals(JobStatus.RUNNING, js.getStatus());
+        Assert.assertEquals(TaskStatus.RUNNING, js.getTasks().get(0).getStatus());
+        Assert.assertEquals(TaskStatus.PENDING, js.getTasks().get(1).getStatus());
+
         System.out.println("Pause the job " + jobId);
         SchedulerTHelper.getSchedulerInterface().pauseJob(jobId);
+
+        js = SchedulerTHelper.getSchedulerInterface().getJobState(jobId);
+        Assert.assertEquals(JobStatus.PAUSED, js.getStatus());
+        Assert.assertEquals(TaskStatus.RUNNING, js.getTasks().get(0).getStatus());
+        Assert.assertEquals(TaskStatus.PAUSED, js.getTasks().get(1).getStatus());
+
+        SchedulerTHelper.getSchedulerInterface().resumeJob(jobId);
+
+        js = SchedulerTHelper.getSchedulerInterface().getJobState(jobId);
+        Assert.assertEquals(JobStatus.RUNNING, js.getStatus());
+        Assert.assertEquals(TaskStatus.RUNNING, js.getTasks().get(0).getStatus());
+        Assert.assertEquals(TaskStatus.PENDING, js.getTasks().get(1).getStatus());
 
         //let the task1 finish
         communicationObject.setCanFinish(true);

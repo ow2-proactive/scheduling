@@ -119,7 +119,6 @@ public class SchedulerStateRecoverHelper {
                 if (job.getStatus() == JobStatus.PAUSED) {
                     job.setStatus(JobStatus.STALLED);
                     job.setPaused();
-                    job.setTaskStatusModify(null);
                 }
 
                 //update the count of pending and running task.
@@ -133,7 +132,6 @@ public class SchedulerStateRecoverHelper {
             if (job.getStatus() == JobStatus.PAUSED) {
                 job.setStatus(JobStatus.STALLED);
                 job.setPaused();
-                job.setTaskStatusModify(null);
             }
         }
 

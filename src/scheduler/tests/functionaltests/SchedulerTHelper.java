@@ -233,6 +233,7 @@ public class SchedulerTHelper {
         if (System.getProperty("proactive.test.runAsMe") != null) {
             commandLine.add("-Dproactive.test.runAsMe=true");
         }
+        //commandLine.add("-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8765");
 
         String home = PAResourceManagerProperties.RM_HOME.getValueAsString();
         StringBuilder classpath = new StringBuilder();
