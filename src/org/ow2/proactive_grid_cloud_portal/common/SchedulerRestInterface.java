@@ -793,6 +793,21 @@ public interface SchedulerRestInterface {
     final String sessionId) throws NotConnectedRestException, PermissionRestException;
 
     /**
+     * Users having jobs in the scheduler
+     * 
+     * @param sessionId the session id associated to this new connection
+     * @return list of users
+     * @throws NotConnectedRestException
+     * @throws PermissionRestException
+     */
+    @GET
+    @GZIP
+    @Path("userswithjobs")
+    @Produces("application/json")
+    public List<SchedulerUserData> getUsersWithJobs(@HeaderParam("sessionid")
+    final String sessionId) throws NotConnectedRestException, PermissionRestException;
+
+    /**
      * returns statistics about the scheduler
      * @param sessionId the session id associated to this new connection
      * @return a string containing the statistics
@@ -837,7 +852,7 @@ public interface SchedulerRestInterface {
      * Only the jobs finished between the start date and the end date will be returned:
      * i.e startDate <= job.finishedTime <= endDate.
      *</p>
-     * @param sessionId a valid session id to idenfiy the caller
+     * @param sessionId a valid session id to identify the caller
      * @param startDate must not be null, inclusive
      * @param endDate must not be null, inclusive
      * @return a list of {@link org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobUsageData} objects where job finished times are between start date and end date
@@ -850,7 +865,30 @@ public interface SchedulerRestInterface {
     @Path("usage/myaccount")
     @Produces("application/json")
     List<JobUsageData> getUsageOnMyAccount(@HeaderParam("sessionid")
-    String sessionId, @QueryParam("startdate")
+    String sessionId, Date startDate, @QueryParam("enddate")
+    Date endDate) throws NotConnectedRestException, PermissionRestException;
+    /**
+     * Returns details on job and task execution times for the caller's executions.
+     * <p>
+     * Only the jobs finished between the start date and the end date will be returned:
+     * i.e startDate <= job.finishedTime <= endDate.
+     *</p>
+     * @param sessionId a valid session id to identify the caller
+     * @param user name
+     * @param startDate must not be null, inclusive
+     * @param endDate must not be null, inclusive
+     * @return a list of {@link org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobUsageData} objects where job finished times are between start date and end date
+     * @throws NotConnectedRestException if user not logger in
+     * @throws PermissionRestException if user has insufficient rights
+     *
+     * @see org.ow2.proactive.scheduler.common.usage.SchedulerUsage#getMyAccountUsage(java.util.Date, java.util.Date)
+     */
+    @GET
+    @Path("usage/account")
+    @Produces("application/json")
+    List<JobUsageData> getUsageOnAccount(@HeaderParam("sessionid")
+    String sessionId, @QueryParam("user")
+    String user, @QueryParam("startdate")
     Date startDate, @QueryParam("enddate")
     Date endDate) throws NotConnectedRestException, PermissionRestException;
 

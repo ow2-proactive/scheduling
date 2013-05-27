@@ -2079,6 +2079,31 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
     }
 
+    /**
+     * Users having jobs in the scheduler
+     * 
+     * @param sessionId
+     *            the session id associated to this new connection\
+     * @return list of users
+     * @throws NotConnectedRestException
+     * @throws PermissionRestException
+     */
+    @GET
+    @GZIP
+    @Path("userswithjobs")
+    @Produces("application/json")
+    public List<SchedulerUserData> getUsersWithJobs(@HeaderParam("sessionid")
+    final String sessionId) throws NotConnectedRestException, PermissionRestException {
+        try {
+            Scheduler s = checkAccess(sessionId, "userswithjobs");
+            return map(s.getUsersWithJobs(), SchedulerUserData.class);
+        } catch (PermissionException e) {
+            throw new PermissionRestException(e);
+        } catch (NotConnectedException e) {
+            throw new NotConnectedRestException(e);
+        }
+    }
+
     private static <T> List<T> map(List<?> toMaps, Class<T> type) {
         List<T> result = new ArrayList<T>();
         for (Object toMap : toMaps) {
@@ -2146,6 +2171,26 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         try {
             Scheduler scheduler = checkAccess(sessionId);
             return map(scheduler.getMyAccountUsage(startDate, endDate), JobUsageData.class);
+        } catch (PermissionException e) {
+            throw new PermissionRestException(e);
+        } catch (NotConnectedException e) {
+            throw new NotConnectedRestException(e);
+        }
+    }
+    @GET
+    @Path("usage/account")
+    @Produces("application/json")
+    @Override
+    public List<JobUsageData> getUsageOnAccount(@HeaderParam("sessionid")
+    String sessionId, @QueryParam("user")
+    String user, @QueryParam("startdate")
+    @DateFormatter.DateFormat()
+    Date startDate, @QueryParam("enddate")
+    @DateFormatter.DateFormat()
+    Date endDate) throws NotConnectedRestException, PermissionRestException {
+        try {
+            Scheduler scheduler = checkAccess(sessionId);
+            return map(scheduler.getAccountUsage(user, startDate, endDate), JobUsageData.class);
         } catch (PermissionException e) {
             throw new PermissionRestException(e);
         } catch (NotConnectedException e) {
