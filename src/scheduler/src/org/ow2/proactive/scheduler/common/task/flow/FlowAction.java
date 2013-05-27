@@ -74,6 +74,8 @@ public class FlowAction implements Serializable {
 
     /** Branch that was NOT chosen if  {@link #type} is {@link FlowActionType#IF} */
     private String targetElse = "";
+    
+    private String cronExpr = "";
 
     /**
      * Default constructor
@@ -208,5 +210,13 @@ public class FlowAction implements Serializable {
      */
     public String getTargetContinuation() {
         return this.targetContinuation;
+    }
+    
+    public void setCronExpr(String cronExpr) {
+        this.cronExpr = cronExpr;
+    }
+    
+    public String getCronExpr() {
+        return cronExpr;
     }
 }

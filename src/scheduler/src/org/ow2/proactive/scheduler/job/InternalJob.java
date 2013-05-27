@@ -36,9 +36,13 @@
  */
 package org.ow2.proactive.scheduler.job;
 
+import it.sauronsoftware.cron4j.InvalidPatternException;
+import it.sauronsoftware.cron4j.Predictor;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -77,6 +81,7 @@ import org.ow2.proactive.scheduler.task.TaskInfoImpl;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
+import org.ow2.proactive.scheduler.util.policy.ISO8601DateUtil;
 
 
 /**
@@ -303,7 +308,9 @@ public abstract class InternalJob extends JobState {
 
         ChangedTasksInfo changesInfo = new ChangedTasksInfo();
         changesInfo.taskUpdated(descriptor);
-
+        
+        
+        
         boolean didAction = false;
         if (action != null) {
             InternalTask initiator = tasks.get(taskId);
@@ -313,104 +320,32 @@ public abstract class InternalJob extends JobState {
                  * LOOP action
                  */
                 case LOOP: {
-
-                    {
-                        // find the target of the loop
-                        InternalTask target = null;
-                        if (action.getTarget().equals(initiator.getName())) {
-                            target = initiator;
-                        } else {
-                            target = findTaskUp(action.getTarget(), initiator);
-                        }
-                        TaskId targetId = target.getTaskInfo().getTaskId();
-
-                        logger.info("Control Flow Action LOOP (init:" + initiator.getId() + ";target:" +
-                            target.getId() + ")");
-
-                        // accumulates the tasks between the initiator and the target
-                        Map<TaskId, InternalTask> dup = new HashMap<TaskId, InternalTask>();
-
-                        // replicate the tasks between the initiator and the target
+					// find the target of the loop
+					InternalTask target = null;
+					if (action.getTarget().equals(initiator.getName())) {
+						target = initiator;
+					} else {
+						target = findTaskUp(action.getTarget(), initiator);
+					}
+					didAction = replicateForNextLoopIteration(initiator, target,
+							changesInfo, frontend);
+                if (didAction && action.getCronExpr() != null) {
+                    for (TaskId tid : changesInfo.getNewTasks()) {
+                        InternalTask newTask = tasks.get(tid);
                         try {
-                            initiator.replicateTree(dup, targetId, true, initiator.getReplicationIndex(),
-                                    initiator.getIterationIndex());
-                        } catch (ExecutableCreationException e) {
-                            logger.error("", e);
-                            break;
+                            Date startAt = (new Predictor(action.getCronExpr()))
+                                    .nextMatchingDate();
+                            newTask.addGenericInformation(
+                                    GENERIC_INFO_START_AT_KEY,
+                                    ISO8601DateUtil.parse(startAt));
+                        } catch (InvalidPatternException e) {
+                            // this will not happen as the cron expression is
+                            // already being validated in FlowScript class.
                         }
-
-                        ((JobInfoImpl) this.getJobInfo()).setNumberOfPendingTasks(this.getJobInfo()
-                                .getNumberOfPendingTasks() +
-                            dup.size());
-
-                        // ensure naming unicity
-                        // time-consuming but safe
-                        for (InternalTask nt : dup.values()) {
-                            boolean ok;
-                            do {
-                                ok = true;
-                                for (InternalTask task : tasks.values()) {
-                                    if (nt.getName().equals(task.getName())) {
-                                        nt.setIterationIndex(nt.getIterationIndex() + 1);
-                                        ok = false;
-                                    }
-                                }
-                            } while (!ok);
-                        }
-
-                        // configure the new tasks
-                        InternalTask newTarget = null;
-                        InternalTask newInit = null;
-                        for (Entry<TaskId, InternalTask> it : dup.entrySet()) {
-                            InternalTask nt = it.getValue();
-                            if (target.getId().equals(it.getKey())) {
-                                newTarget = nt;
-                            }
-                            if (initiator.getId().equals(it.getKey())) {
-                                newInit = nt;
-                            }
-                            nt.setJobInfo(getJobInfo());
-                            this.addTask(nt);
-                        }
-                        changesInfo.newTasksAdded(dup.values());
-
-                        // connect replicated tree
-                        newTarget.addDependence(initiator);
-                        changesInfo.taskUpdated(newTarget);
-
-                        // connect mergers
-                        List<InternalTask> mergers = new ArrayList<InternalTask>();
-                        for (InternalTask t : this.tasks.values()) {
-                            if (t.getIDependences() != null) {
-
-                                for (InternalTask p : t.getIDependences()) {
-                                    if (p.getId().equals(initiator.getId())) {
-                                        if (!t.equals(newTarget)) {
-                                            mergers.add(t);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        for (InternalTask t : mergers) {
-                            t.getIDependences().remove(initiator);
-                            t.addDependence(newInit);
-                            changesInfo.taskUpdated(t);
-                        }
-
-                        // propagate the changes in the job descriptor
-                        getJobDescriptor().doLoop(taskId, dup, newTarget, newInit);
-
-                        this.jobInfo.setTasksChanges(changesInfo, this);
-                        // notify frontend that tasks were added and modified
-                        frontend.jobStateUpdated(this.getOwner(), new NotificationData<JobInfo>(
-                            SchedulerEvent.TASK_REPLICATED, new JobInfoImpl(jobInfo)));
-                        this.jobInfo.clearTasksChanges();
-
-                        didAction = true;
-                        break;
                     }
                 }
+                break;
+            }
 
                     /*
                      * IF action
@@ -756,7 +691,7 @@ public abstract class InternalJob extends JobState {
             **/
 
         }
-
+        
         //terminate this task
         if (!didAction) {
             getJobDescriptor().terminate(taskId);
@@ -764,7 +699,97 @@ public abstract class InternalJob extends JobState {
 
         return changesInfo;
     }
+     
+	private boolean replicateForNextLoopIteration(InternalTask initiator,
+			InternalTask target, ChangedTasksInfo changesInfo,
+			SchedulerStateUpdate frontend) {
+	   
+        logger.info("LOOP (init:" + initiator.getId() + ";target:" +
+            target.getId() + ")");
+        
+        // accumulates the tasks between the initiator and the target
+        Map<TaskId, InternalTask> dup = new HashMap<TaskId, InternalTask>();
 
+        // replicate the tasks between the initiator and the target
+        try {
+            initiator.replicateTree(dup, target.getId(), true, initiator.getReplicationIndex(),
+                    initiator.getIterationIndex());
+        } catch (ExecutableCreationException e) {
+            logger.error("", e);
+            return false;
+        }
+
+        ((JobInfoImpl) this.getJobInfo()).setNumberOfPendingTasks(this.getJobInfo()
+                .getNumberOfPendingTasks() +
+            dup.size());
+
+        // ensure naming unicity
+        // time-consuming but safe
+        for (InternalTask nt : dup.values()) {
+            boolean ok;
+            do {
+                ok = true;
+                for (InternalTask task : tasks.values()) {
+                    if (nt.getName().equals(task.getName())) {
+                        nt.setIterationIndex(nt.getIterationIndex() + 1);
+                        ok = false;
+                    }
+                }
+            } while (!ok);
+        }
+
+        // configure the new tasks
+        InternalTask newTarget = null;
+        InternalTask newInit = null;
+        for (Entry<TaskId, InternalTask> it : dup.entrySet()) {
+            InternalTask nt = it.getValue();
+            if (target.getId().equals(it.getKey())) {
+                newTarget = nt;
+            }
+            if (initiator.getId().equals(it.getKey())) {
+                newInit = nt;
+            }
+            nt.setJobInfo(getJobInfo());
+            this.addTask(nt);
+        }
+        changesInfo.newTasksAdded(dup.values());
+
+        // connect replicated tree
+        newTarget.addDependence(initiator);
+        changesInfo.taskUpdated(newTarget);
+
+        // connect mergers
+        List<InternalTask> mergers = new ArrayList<InternalTask>();
+        for (InternalTask t : this.tasks.values()) {
+            if (t.getIDependences() != null) {
+
+                for (InternalTask p : t.getIDependences()) {
+                    if (p.getId().equals(initiator.getId())) {
+                        if (!t.equals(newTarget)) {
+                            mergers.add(t);
+                        }
+                    }
+                }
+            }
+        }
+        for (InternalTask t : mergers) {
+            t.getIDependences().remove(initiator);
+            t.addDependence(newInit);
+            changesInfo.taskUpdated(t);
+        }
+
+        // propagate the changes in the job descriptor
+        getJobDescriptor().doLoop(initiator.getId(), dup, newTarget, newInit);
+
+        this.jobInfo.setTasksChanges(changesInfo, this);
+        // notify frontend that tasks were added and modified
+        frontend.jobStateUpdated(this.getOwner(), new NotificationData<JobInfo>(
+            SchedulerEvent.TASK_REPLICATED, new JobInfoImpl(jobInfo)));
+        this.jobInfo.clearTasksChanges();
+        
+		return true;
+	}
+	
     private int getNextReplicationIndex(String baseName, int iteration) {
         int rep = 0;
         for (InternalTask it : this.tasks.values()) {

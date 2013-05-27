@@ -36,6 +36,9 @@
  */
 package org.ow2.proactive.scheduler.common.task.flow;
 
+import it.sauronsoftware.cron4j.InvalidPatternException;
+import it.sauronsoftware.cron4j.Predictor;
+
 import java.io.Reader;
 import java.io.StringReader;
 
@@ -500,8 +503,22 @@ public class FlowScript extends Script<FlowAction> {
                     return new ScriptResult<FlowAction>(new Exception(msg));
                 } else {
                     if (bindings.containsKey(loopVariable)) {
-                        Boolean enabled = new Boolean(bindings.get(loopVariable).toString());
-
+                        Boolean enabled;
+                        String loopValue = bindings.get(loopVariable)
+                                .toString();
+                        if ("true".equalsIgnoreCase(loopValue)) {
+                            enabled = Boolean.TRUE;
+                        } else if ("false".equalsIgnoreCase(loopValue)) {
+                            enabled = Boolean.FALSE;
+                        } else {
+                            try {
+                                (new Predictor(loopValue)).nextMatchingDate();
+                                enabled = Boolean.TRUE;
+                                act.setCronExpr(loopValue);
+                            } catch (InvalidPatternException e) {
+                                enabled = Boolean.FALSE;
+                            }
+                        }
                         if (enabled) {
                             act.setType(FlowActionType.LOOP);
                             act.setTarget(this.target);
