@@ -852,6 +852,14 @@ public interface Scheduler extends SchedulerUsage {
             List<SortParameter<JobSortParameter>> sortParameters) throws NotConnectedException,
             PermissionException;
 
+    /**
+     * Returns a list of connected users.
+     */
     public List<SchedulerUserInfo> getUsers() throws NotConnectedException, PermissionException;
 
+    /**
+     * Returns a list of users having jobs.
+     * These are meaningful users for accounting {@link SchedulerUsage}
+     */
+    public List<SchedulerUserInfo> getUsersWithJobs() throws NotConnectedException, PermissionException;
 }

@@ -408,8 +408,18 @@ public class TestSchedulerProxy implements Scheduler {
     }
 
     @Override
+    public List<SchedulerUserInfo> getUsersWithJobs() throws NotConnectedException, PermissionException {
+        return target.getUsersWithJobs();
+    }
+
+    @Override
     public List<JobUsage> getMyAccountUsage(Date startDate, Date endDate) throws NotConnectedException,
             PermissionException {
         return target.getMyAccountUsage(startDate, endDate);
+    }
+    @Override
+    public List<JobUsage> getAccountUsage(String user, Date startDate, Date endDate) throws NotConnectedException,
+            PermissionException {
+        return target.getAccountUsage(user, startDate, endDate);
     }
 }

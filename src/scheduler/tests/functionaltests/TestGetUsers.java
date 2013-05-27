@@ -52,7 +52,7 @@ import org.ow2.tests.FunctionalTest;
 
 
 /**
- * Sanity test against method 'Scheduler.getUsers'.
+ * Sanity test against method 'Scheduler.getUsers' and 'Scheduler.getUsersWithJobs'.
  *
  */
 public class TestGetUsers extends FunctionalTest {
@@ -80,10 +80,15 @@ public class TestGetUsers extends FunctionalTest {
     public void test() throws Exception {
         Scheduler scheduler = SchedulerTHelper.getSchedulerInterface();
         List<SchedulerUserInfo> users;
+        List<SchedulerUserInfo> usersWithJobs;
 
         users = scheduler.getUsers();
+        usersWithJobs = scheduler.getUsersWithJobs();
         Assert.assertEquals(1, users.size());
+        Assert.assertEquals(0, usersWithJobs.size());
+
         checkUser(users.get(0), SchedulerTHelper.username, 0, null);
+
         Assert.assertTrue("Unexpected connect time: " + users.get(0).getConnectionTime(), users.get(0)
                 .getConnectionTime() > testStartTime);
         Long connectTime = users.get(0).getConnectionTime();
@@ -91,14 +96,20 @@ public class TestGetUsers extends FunctionalTest {
         scheduler.submit(createJob());
 
         users = scheduler.getUsers();
+        usersWithJobs = scheduler.getUsersWithJobs();
         Assert.assertEquals(1, users.size());
+        Assert.assertEquals(1, usersWithJobs.size());
         checkUser(users.get(0), SchedulerTHelper.username, 1, connectTime);
+        checkUser(usersWithJobs.get(0), SchedulerTHelper.username, 1, null);
 
         scheduler.submit(createJob());
 
         users = scheduler.getUsers();
+        usersWithJobs = scheduler.getUsersWithJobs();
         Assert.assertEquals(1, users.size());
+        Assert.assertEquals(1, usersWithJobs.size());
         checkUser(users.get(0), SchedulerTHelper.username, 2, connectTime);
+        checkUser(usersWithJobs.get(0), SchedulerTHelper.username, 2, null);
     }
 
     private TaskFlowJob createJob() throws Exception {

@@ -1064,11 +1064,34 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
      * {@inheritDoc}
      */
     @Override
+    @ImmediateService
+    public List<SchedulerUserInfo> getUsersWithJobs() throws NotConnectedException, PermissionException {
+        UserIdentificationImpl ident = frontendState.checkPermission("getUsersWithJobs",
+                "You don't have permissions to get users with jobs");
+        frontendState.checkOwnStatePermission(false, ident);
+        return dbManager.loadUsersWithJobs();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public List<JobUsage> getMyAccountUsage(Date startDate, Date endDate) throws NotConnectedException,
             PermissionException {
         UserIdentificationImpl ident = frontendState.checkPermission("getMyAccountUsage",
                 "You don't have permissions to get usage data for your account");
         return dbManager.getUsage(ident.getUsername(), startDate, endDate);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<JobUsage> getAccountUsage(String user, Date startDate, Date endDate) throws NotConnectedException,
+            PermissionException {
+        frontendState.checkPermission("getAccountUsage",
+                "You don't have permissions to get usage data of " + user);
+        return dbManager.getUsage(user, startDate, endDate);
     }
 
     private String getTaskServerLogs(TaskId id) {

@@ -55,6 +55,7 @@ import org.ow2.proactive.scheduler.job.ChangedTasksInfo;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.job.JobResultImpl;
+import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.ForkedJavaExecutableContainer;
 import org.ow2.proactive.scheduler.task.JavaExecutableContainer;
@@ -1596,6 +1597,24 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
                 return loadExecutableContainer(session, task);
             }
 
+        });
+    }
+
+    public List<SchedulerUserInfo> loadUsersWithJobs() {
+        return runWithoutTransaction(new SessionWork<List<SchedulerUserInfo>>() {
+            @Override
+            List<SchedulerUserInfo> executeWork(Session session) {
+                List<SchedulerUserInfo> users = new ArrayList<SchedulerUserInfo>();
+                Query query = session.createQuery("select owner, count(owner), max(submittedTime) from JobData group by owner");
+
+                for (Object obj : query.list()) {
+                    Object[] nameAndCount = (Object[]) obj;
+                    users.add(new SchedulerUserInfo(null, nameAndCount[0].toString(), 0, Long
+                            .parseLong(nameAndCount[2].toString()), Integer
+                            .parseInt(nameAndCount[1].toString())));
+                }
+                return users;
+            }
         });
     }
 
