@@ -16,6 +16,8 @@ import org.ow2.tests.FunctionalTest;
 
 @Consecutive
 public class RMConsecutive extends FunctionalTest {
+    protected final String RM_USER_TEST = "admin";
+    protected final String RM_PASS_TEST = "admin";
 
     @Before
     public void prepareForTest() throws Exception {
@@ -25,7 +27,7 @@ public class RMConsecutive extends FunctionalTest {
             System.out.println("Cleaning the RM before the test execution");
             // clean the state of the RM
             RMTHelper helper = RMTHelper.getDefaultInstance();
-            ResourceManager rm = helper.getResourceManager(null, "admin", "admin");
+            ResourceManager rm = helper.getResourceManager(null, RM_USER_TEST, RM_PASS_TEST);
             int nodeNumber = rm.getState().getTotalNodesNumber();
 
             List<String> sources = new ArrayList<String>();

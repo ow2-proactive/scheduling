@@ -36,7 +36,10 @@
  */
 package org.ow2.proactive.resourcemanager.node.jmx;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.log4j.Logger;
 import org.hyperic.sigar.Sigar;
 import org.hyperic.sigar.SigarException;
 import org.hyperic.sigar.cmd.Ps;
@@ -44,25 +47,36 @@ import org.hyperic.sigar.cmd.Ps;
 
 public class SigarProcesses implements SigarProcessesMXBean {
 
+    /** Log4J logger */
+    private final static Logger logger = Logger.getLogger(SigarProcesses.class);
+    
+    @SuppressWarnings("unchecked")
     @Override
     public ProcessInfo[] getProcesses() throws SigarException {
         Sigar sigar = new Sigar();
         long[] pids = sigar.getProcList();
 
-        ProcessInfo[] result = new ProcessInfo[pids.length];
+        List<ProcessInfo> result = new ArrayList<ProcessInfo>(pids.length);
 
         for (int i = 0; i < pids.length; i++) {
             long pid = pids[i];
-            List info = Ps.getInfo(sigar, pid); // Add standard info. 
-            info.add(sigar.getProcArgs(pid)); // Add also arguments of 
-            // each process. 
-            info.add(sigar.getProcCpu(pid).getPercent()); // Add cpu usage (perc.).
+            try {
+                @SuppressWarnings("rawtypes")
+                List info = Ps.getInfo(sigar, pid);             // Add standard info. 
+                info.add(sigar.getProcArgs(pid));               // Add also arguments of each process. 
+                info.add(sigar.getProcCpu(pid).getPercent());   // Add cpu usage (perc.).
+                
+                result.add(new ProcessInfo(info));
+            } catch (SigarException e) {
+                // Ignore it, probably the process does not exist anymore.
+                logger.warn("Could not get information for PID: " + pid, e);
+            }
+
             // TODO see why sigar.getProcCpu(pid).getPercent()
             // returns '0.0' always.
 
-            result[i] = new ProcessInfo(info);
         }
 
-        return result;
+        return result.toArray(new ProcessInfo[] {});
     }
 }
