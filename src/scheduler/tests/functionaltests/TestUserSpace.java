@@ -42,6 +42,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.net.URI;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.vfs.FileObject;
@@ -49,20 +50,22 @@ import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileSystemManager;
 import org.junit.Assert;
 import org.objectweb.proactive.extensions.dataspaces.vfs.VFSFactory;
+import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
+import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
-import org.ow2.proactive.scheduler.core.SchedulerFrontend;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.tests.FunctionalTest;
 
 
 /**
  * Submits a job using the default USER Space, it checks at the end that the output files can be accessed in the USER Space
- * <p>
+ * <p/>
  * This test does :
  * <ul><li>write inFiles to INPUT
  * <li>task A: transfer inFiles from INPUT to SCRATCH
@@ -74,8 +77,7 @@ import org.ow2.tests.FunctionalTest;
  * </ul>
  * Then, the test checks that the USER space has been cleared; and that inFiles.out have
  * been copied to OUTPUT and are identical to the ones written in the INPUT.
- * 
- * 
+ *
  * @author The ProActive Team
  * @since ProActive Scheduling 2.2
  */
@@ -85,7 +87,10 @@ public class TestUserSpace extends FunctionalTest {
             { "_1234", "!@#%$@%54vc54\b\t\\\\\nasd123!@#", "res1", "one of the output files" },
             { "res2", "second\noutput\nfile" }, { "__.res_3", "third\toutput\nfile\t&^%$$#@!\n" } };
 
+    private static final String pathReplaceFile = "TestPathReplace";
+
     private static String inFileArr = "";
+
     static {
         inFileArr += "[";
         for (int i = 0; i < inFiles.length; i++) {
@@ -142,6 +147,14 @@ public class TestUserSpace extends FunctionalTest {
         "                                                      \n" + //
         "";
 
+    private static final String TestEnvFile = "TestEnv";
+    private static final String scriptCLinux = "testenv.sh";
+    private static final String scriptCLinuxContent = "echo user space is : $USERSPACE \necho HELLO > $USERSPACE/" +
+        TestEnvFile + "\n";
+    private static final String scriptCWindows = "testenv.bat";
+    private static final String scriptCWindowsContent = "echo user space is : %USERSPACE% \necho HELLO > %USERSPACE%\\" +
+        TestEnvFile + "\n";
+
     @org.junit.Test
     public void run() throws Throwable {
 
@@ -155,10 +168,60 @@ public class TestUserSpace extends FunctionalTest {
         out.mkdir();
         String outPath = out.getAbsolutePath();
 
+        FileSystemManager fsManager = null;
+
+        {
+            try {
+                fsManager = VFSFactory.createDefaultFileSystemManager();
+            } catch (FileSystemException e) {
+                e.printStackTrace();
+                logger.error("Could not create Default FileSystem Manager", e);
+            }
+        }
+
+        Scheduler sched = SchedulerTHelper.getSchedulerInterface();
+        String userURI = sched.getUserSpaceURIs().get(0);
+        Assert.assertTrue(userURI.startsWith("file:///"));
+        System.out.println("User URI is " + userURI);
+        String userPath = new File(new URI(userURI)).getAbsolutePath();
+
+        FileObject pathReplaceFO = fsManager.resolveFile(userURI + "/" + pathReplaceFile);
+
+        FileObject envFO = fsManager.resolveFile(userURI + "/" + TestEnvFile);
+        if (pathReplaceFO.exists()) {
+            pathReplaceFO.delete();
+        }
+        if (envFO.exists()) {
+            envFO.delete();
+        }
+
         /**
          * Writes inFiles in INPUT
          */
         writeFiles(inFiles, inPath);
+        File testPathRepl = new File(inPath + File.separator + pathReplaceFile);
+        testPathRepl.createNewFile();
+        PrintWriter out2 = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
+            testPathRepl))));
+        out2.print(pathReplaceFile);
+        out2.close();
+
+        File scriptTestEnv = null;
+        if (OperatingSystem.getOperatingSystem() == OperatingSystem.unix) {
+            scriptTestEnv = new File(inPath + File.separator + scriptCLinux);
+            scriptTestEnv.createNewFile();
+            PrintWriter out3 = new PrintWriter(new BufferedWriter(new OutputStreamWriter(
+                new FileOutputStream(scriptTestEnv))));
+            out3.print(scriptCLinuxContent);
+            out3.close();
+        } else {
+            scriptTestEnv = new File(inPath + File.separator + scriptCWindows);
+            scriptTestEnv.createNewFile();
+            PrintWriter out3 = new PrintWriter(new BufferedWriter(new OutputStreamWriter(
+                new FileOutputStream(scriptTestEnv))));
+            out3.print(scriptCWindowsContent);
+            out3.close();
+        }
 
         TaskFlowJob job = new TaskFlowJob();
         job.setName(this.getClass().getSimpleName());
@@ -186,6 +249,45 @@ public class TestUserSpace extends FunctionalTest {
         B.setPreScript(new SimpleScript(scriptB, "javascript"));
         job.addTask(B);
 
+        // testing $USERSPACE_pattern
+        NativeTask C = new NativeTask();
+        C.setName("C");
+        C.addInputFiles(pathReplaceFile, InputAccessMode.TransferFromInputSpace);
+        switch (OperatingSystem.getOperatingSystem()) {
+            case windows:
+                C.setCommandLine(new String[] { "cmd", "/C",
+                        "type $LOCALSPACE\\" + pathReplaceFile + " > $USERSPACE\\" + pathReplaceFile });
+                break;
+            case unix:
+                C.setCommandLine(new String[] { "/bin/bash", "-c",
+                        "cat $LOCALSPACE/" + pathReplaceFile + " > $USERSPACE/" + pathReplaceFile });
+                break;
+            default:
+                throw new IllegalStateException("Unsupported operating system");
+        }
+        job.addTask(C);
+
+        // testing $USERSPACE environment variable
+        NativeTask D = new NativeTask();
+        D.setName("D");
+        if (OperatingSystem.getOperatingSystem() == OperatingSystem.unix) {
+            D.addInputFiles(scriptCLinux, InputAccessMode.TransferFromInputSpace);
+        } else {
+            D.addInputFiles(scriptCWindows, InputAccessMode.TransferFromInputSpace);
+        }
+        switch (OperatingSystem.getOperatingSystem()) {
+            case windows:
+                D.setCommandLine(new String[] { "cmd", "/C", scriptCWindows });
+                break;
+            case unix:
+                D.setCommandLine(new String[] { "/bin/bash", "-c", "chmod u+x $LOCALSPACE/" + scriptCLinux+";$LOCALSPACE/" + scriptCLinux });
+                break;
+            default:
+                throw new IllegalStateException("Unsupported operating system");
+        }
+        D.setWorkingDir("$LOCALSPACE");
+        job.addTask(D);
+
         /**
          * start scheduler, submit job
          */
@@ -195,7 +297,6 @@ public class TestUserSpace extends FunctionalTest {
             SchedulerTHelper.startScheduler(true, null); //tmpProps.getAbsolutePath());
         }
 
-        Scheduler sched = SchedulerTHelper.getSchedulerInterface();
         JobId id = sched.submit(job);
         while (true) {
             try {
@@ -207,7 +308,8 @@ public class TestUserSpace extends FunctionalTest {
             }
         }
 
-        Assert.assertFalse(SchedulerTHelper.getJobResult(id).hadException());
+        JobResult jr = SchedulerTHelper.getJobResult(id);
+        Assert.assertFalse(jr.hadException());
 
         /**
          * check: inFiles > IN > LOCAL A > GLOBAL > LOCAL B > OUT
@@ -225,19 +327,7 @@ public class TestUserSpace extends FunctionalTest {
         /**
          * check that the file produced is accessible in the global user space via the scheduler API
          */
-        String userURI = sched.getUserSpaceURI();
-        System.out.println("User URI is " + userURI);
-        String userPath = ((SchedulerFrontend) sched).getUserSpacePath();
-        FileSystemManager fsManager = null;
 
-        {
-            try {
-                fsManager = VFSFactory.createDefaultFileSystemManager();
-            } catch (FileSystemException e) {
-                e.printStackTrace();
-                logger.error("Could not create Default FileSystem Manager", e);
-            }
-        }
         for (String[] file : inFiles) {
             FileObject outFile = fsManager.resolveFile(userURI + "/" + file[0] + ".glob.A");
             System.out.println("Checking existence of " + outFile.getURL());
@@ -247,11 +337,21 @@ public class TestUserSpace extends FunctionalTest {
             Assert.assertTrue(outFile2 + " exists", outFile2.exists());
         }
 
+        pathReplaceFO.refresh();
+        System.out.println(jr.getAllResults().get("C").getOutput().getAllLogs(true));
+        System.out.println("Checking existence of " + pathReplaceFO.getURL());
+        Assert.assertTrue(pathReplaceFO.getURL() + " exists", pathReplaceFO.exists());
+
+        envFO.refresh();
+        System.out.println(jr.getAllResults().get("D").getOutput().getAllLogs(true));
+        System.out.println("Checking existence of " + envFO.getURL());
+        Assert.assertTrue(envFO.getURL() + " exists", envFO.exists());
+
     }
 
     /**
      * @param files Writes files: {{filename1, filecontent1},...,{filenameN, filecontentN}}
-     * @param path in this director
+     * @param path  in this director
      * @throws java.io.IOException
      */
     private void writeFiles(String[][] files, String path) throws IOException {

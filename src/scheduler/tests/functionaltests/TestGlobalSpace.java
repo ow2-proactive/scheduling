@@ -42,6 +42,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.net.URI;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.vfs.FileObject;
@@ -55,7 +56,6 @@ import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
-import org.ow2.proactive.scheduler.core.SchedulerFrontend;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.tests.FunctionalTest;
 
@@ -225,8 +225,9 @@ public class TestGlobalSpace extends FunctionalTest {
         /**
          * check that the file produced is accessible in the global user space via the scheduler API
          */
-        String globalURI = sched.getGlobalSpaceURI();
-        String globalPath = ((SchedulerFrontend) sched).getGlobalSpacePath();
+        String globalURI = sched.getGlobalSpaceURIs().get(0);
+        Assert.assertTrue(globalURI.startsWith("file:///"));
+        String globalPath = new File(new URI(globalURI)).getAbsolutePath();
         FileSystemManager fsManager = null;
 
         {

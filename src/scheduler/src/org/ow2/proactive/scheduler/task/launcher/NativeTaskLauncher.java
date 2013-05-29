@@ -41,9 +41,11 @@ import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
+import java.net.URISyntaxException;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
+import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
 import org.objectweb.proactive.extensions.dataspaces.exceptions.DataSpacesException;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.task.ExecutableInitializer;
@@ -66,7 +68,12 @@ public class NativeTaskLauncher extends TaskLauncher {
 
     public static final Logger logger = Logger.getLogger(NativeTaskLauncher.class);
 
-    private static final String DATASPACE_TAG = "$LOCALSPACE";
+    private static final String SCRATCH_DATASPACE = "LOCALSPACE";
+    private static final String SCRATCH_DATASPACE_TAG = "$" + SCRATCH_DATASPACE;
+    private static final String USER_DATASPACE = "USERSPACE";
+    private static final String USER_DATASPACE_TAG = "$" + USER_DATASPACE;
+    private static final String GLOBAL_DATASPACE = "GLOBALSPACE";
+    private static final String GLOBAL_DATASPACE_TAG = "$" + GLOBAL_DATASPACE;
 
     // SCHEDULING-988 : only way to pass nodes to a runAsMe mutlinodes native task.
     /** Tag for identifying in command line tmp file that contains allocated resource for a multi-node task */
@@ -142,7 +149,7 @@ public class NativeTaskLauncher extends TaskLauncher {
             if (!hasBeenKilled) {
                 //init task
                 ExecutableInitializer execInit = executableContainer.createExecutableInitializer();
-                replaceWorkingDirDSTags(execInit);
+                replaceWorkingDirDSAllTags(execInit);
                 replaceTagsInScript(((NativeExecutableInitializer) execInit).getGenerationScript());
                 //decrypt credentials if needed
                 if (executableContainer.isRunAsUser()) {
@@ -162,6 +169,8 @@ public class NativeTaskLauncher extends TaskLauncher {
                 replaceCommandDSTags();
                 // pass the nodesfile as parameter if needed...
                 replaceCommandNodesInfosTags();
+
+                addsDataSpaceEnvVar();
 
                 sample = System.nanoTime();
                 try {
@@ -239,45 +248,73 @@ public class NativeTaskLauncher extends TaskLauncher {
         }
     }
 
-    private void replaceWorkingDirDSTags(ExecutableInitializer execInit) throws Exception {
+    /**
+     * Adds the dataspaces to the environment variables
+     * @throws Exception
+     */
+    private void addsDataSpaceEnvVar() throws Exception {
+        addEnvVar(SCRATCH, SCRATCH_DATASPACE);
+        addEnvVar(GLOBAL, GLOBAL_DATASPACE);
+        addEnvVar(USER, USER_DATASPACE);
+    }
+
+    private void addEnvVar(DataSpacesFileObject fo, String varName) throws URISyntaxException {
+        if (fo != null) {
+            String foUri = (new URI(fo.getRealURI())).toString();
+            if (foUri.startsWith("file:")) {
+                foUri = (new File(new URI(foUri))).getAbsolutePath();
+            }
+            ((NativeExecutable) currentExecutable).addToEnvironmentVariables(varName, foUri);
+        }
+    }
+
+    private void replaceWorkingDirDSAllTags(ExecutableInitializer execInit) throws Exception {
+        replaceWorkingDirDSTag(execInit, SCRATCH_DATASPACE_TAG, SCRATCH);
+        replaceWorkingDirDSTag(execInit, GLOBAL_DATASPACE_TAG, GLOBAL);
+        replaceWorkingDirDSTag(execInit, USER_DATASPACE_TAG, USER);
+    }
+
+    private void replaceWorkingDirDSTag(ExecutableInitializer execInit, String tag, DataSpacesFileObject fo)
+            throws URISyntaxException, DataSpacesException {
         String wd = ((NativeExecutableInitializer) execInit).getWorkingDir();
-        if (wd != null) {
-            // check if this replacement is actually needed
-            if (wd.contains(DATASPACE_TAG)) {
-                if (SCRATCH != null) {
-                    String fullScratchPath = new File(new URI(SCRATCH.getRealURI())).getAbsolutePath();
-                    wd = wd.replace(DATASPACE_TAG, fullScratchPath);
-                    ((NativeExecutableInitializer) execInit).setWorkingDir(wd);
-                } else {
-                    throw new DataSpacesException(
-                        "$LOCALSPACE in workingDir cannot be replaced : dataspaces configuration have failed (see task logs).");
+        if (wd != null && wd.contains(tag)) {
+            if (fo != null) {
+                if (!fo.getRealURI().startsWith("file://")) {
+                    throw new DataSpacesException(tag + " in workingDir cannot be replaced, Space " +
+                        fo.getRealURI() + " is not accessible via the file system.");
                 }
+                String fullPath = new File(new URI(fo.getRealURI())).getAbsolutePath();
+                wd = wd.replace(tag, fullPath);
+                ((NativeExecutableInitializer) execInit).setWorkingDir(wd);
+            } else {
+                throw new DataSpacesException(tag +
+                    " in workingDir cannot be replaced : dataspaces configuration have failed (see task logs).");
             }
         }
     }
 
     private void replaceCommandDSTags() throws Exception {
         String[] cmdElements = ((NativeExecutable) currentExecutable).getCommand();
-        // check if this replacement is actually needed
-        boolean needed = false;
+
         for (int i = 0; i < cmdElements.length; i++) {
-            if (cmdElements[i].contains(DATASPACE_TAG)) {
-                needed = true;
-                break;
-            }
+            cmdElements[i] = replaceCommandDSTag(cmdElements[i], SCRATCH_DATASPACE_TAG, SCRATCH);
+            cmdElements[i] = replaceCommandDSTag(cmdElements[i], GLOBAL_DATASPACE_TAG, GLOBAL);
+            cmdElements[i] = replaceCommandDSTag(cmdElements[i], USER_DATASPACE_TAG, USER);
         }
-        if (needed) {
-            //I cannot use DataSpace to get the local scratch path
-            if (SCRATCH != null) {
-                String fullScratchPath = new File(new URI(SCRATCH.getRealURI())).getAbsolutePath();
-                for (int i = 0; i < cmdElements.length; i++) {
-                    cmdElements[i] = cmdElements[i].replace(DATASPACE_TAG, fullScratchPath);
-                }
+    }
+
+    private String replaceCommandDSTag(String commandElem, String tag, DataSpacesFileObject fo)
+            throws Exception {
+        if (commandElem.contains(tag)) {
+            if (fo != null) {
+                String fullPath = new File(new URI(fo.getRealURI())).getAbsolutePath();
+                commandElem = commandElem.replace(tag, fullPath);
             } else {
-                throw new DataSpacesException(
-                    "$LOCALSPACE in command cannot be replaced : dataspaces configuration have failed (see task logs).");
+                throw new DataSpacesException(tag +
+                    " in command cannot be replaced : dataspaces configuration have failed (see task logs).");
             }
         }
+        return commandElem;
     }
 
     // SCHEDULING-988 : only way to pass nodes to a runAsMe mutlinodes native task.

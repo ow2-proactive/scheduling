@@ -36,6 +36,21 @@
  */
 package org.ow2.proactive.scheduler.task;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Serializable;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
+import java.util.StringTokenizer;
+
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
@@ -52,11 +67,12 @@ import org.ow2.proactive.scheduler.task.launcher.TaskLauncher.SchedulerVars;
 import org.ow2.proactive.scheduler.task.launcher.utils.ForkerUtils;
 import org.ow2.proactive.scheduler.util.process.ProcessTreeKiller;
 import org.ow2.proactive.scheduler.util.process.ThreadReader;
-import org.ow2.proactive.scripting.*;
+import org.ow2.proactive.scripting.GenerationScript;
+import org.ow2.proactive.scripting.PropertyUtils;
+import org.ow2.proactive.scripting.ScriptHandler;
+import org.ow2.proactive.scripting.ScriptLoader;
+import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.utils.Tools;
-
-import java.io.*;
-import java.util.*;
 
 
 /**
@@ -100,6 +116,11 @@ public class NativeExecutable extends Executable {
      * Used by ProcessTreeKiller
      */
     private Map<String, String> modelEnvVar = null;
+
+    /**
+     * additional environment variables
+     */
+    private Map<String, String> otherEnvVar = new HashMap<String, String>();
 
     /** Generated command */
     private String[] command;
@@ -194,10 +215,20 @@ public class NativeExecutable extends Executable {
     }
 
     /**
+     * Adds the given variable to the process environment
+     * @param name name of the environment variable
+     * @param value value of the environment variable
+     */
+    public void addToEnvironmentVariables(String name, String value) {
+        otherEnvVar.put(name, value);
+    }
+
+    /**
      * Build environment variables for this native executable : the task's environment variables :
      * (task name job name, job id, task id...), system environment variables of the JVM,
      * and the cookie environment variable used by ProcessTreeKiller
-     *
+     * @param processEnvAvailable is true if environment can be passed to forked process
+     * if env cannot be passed, throws exception if user intend to alter env.
      */
     private Map<String, String> buildEnvironmentVariables(boolean processEnvAvailable) {
         //Set Model environment variable HashMap for the executable;
@@ -209,7 +240,7 @@ public class NativeExecutable extends Executable {
         Map<String, String> envVarsTab = new HashMap<String, String>();
         //Set environment variables array used to launch the external native command,
         //with system environment variables, ProActive Scheduling environment variables,
-        Map<String, String> taskEnvVariables = new Hashtable<String, String>(4);
+        Map<String, String> taskEnvVariables = new Hashtable<String, String>(15);
         taskEnvVariables.put(SchedulerVars.JAVAENV_JOB_ID_VARNAME.toString(), System
                 .getProperty(SchedulerVars.JAVAENV_JOB_ID_VARNAME.toString()));
         taskEnvVariables.put(SchedulerVars.JAVAENV_JOB_NAME_VARNAME.toString(), System
@@ -228,6 +259,9 @@ public class NativeExecutable extends Executable {
             String value = entry.getValue();
             envVarsTab.put(convertJavaenvNameToSysenvName(name), value);
         }
+
+        // adds the extra environment variable (coming from the TaskLauncher)
+        envVarsTab.putAll(otherEnvVar);
 
         //get exported properties
         String allVars = System.getProperty(PropertyUtils.EXPORTED_PROPERTIES_VAR_NAME);
@@ -359,6 +393,7 @@ public class NativeExecutable extends Executable {
             //has not modified it. Throws an exception if modified, just do nothing if not modified.
             buildEnvironmentVariables(false);
         }
+        logger.info("Running command : " + Arrays.asList(this.command));
         //and start process
         return ospb.start();
     }

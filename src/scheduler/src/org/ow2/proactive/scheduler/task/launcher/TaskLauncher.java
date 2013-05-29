@@ -884,6 +884,7 @@ public abstract class TaskLauncher {
                 SCRATCH = PADataSpaces.resolveScratchForAO();
                 INPUT = PADataSpaces.resolveDefaultInput();
                 OUTPUT = PADataSpaces.resolveDefaultOutput();
+                logger.info("SCRATCH space is " + SCRATCH.getRealURI());
                 logger.info("INPUT space is " + INPUT.getRealURI());
                 logger.info("OUTPUT space is " + OUTPUT.getRealURI());
                 String realURI = OUTPUT.getRealURI();
