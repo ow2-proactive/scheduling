@@ -49,6 +49,7 @@ import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.tests.FunctionalTest;
@@ -80,23 +81,23 @@ public class TestPauseJobRecover extends FunctionalTest {
 
         JobState js = SchedulerTHelper.getSchedulerInterface().getJobState(jobId);
         Assert.assertEquals(JobStatus.RUNNING, js.getStatus());
-        Assert.assertEquals(TaskStatus.RUNNING, js.getTasks().get(0).getStatus());
-        Assert.assertEquals(TaskStatus.PENDING, js.getTasks().get(1).getStatus());
+        Assert.assertEquals(TaskStatus.RUNNING, getTaskState("task1", js).getStatus());
+        Assert.assertEquals(TaskStatus.PENDING, getTaskState("task2", js).getStatus());
 
         System.out.println("Pause the job " + jobId);
         SchedulerTHelper.getSchedulerInterface().pauseJob(jobId);
 
         js = SchedulerTHelper.getSchedulerInterface().getJobState(jobId);
         Assert.assertEquals(JobStatus.PAUSED, js.getStatus());
-        Assert.assertEquals(TaskStatus.RUNNING, js.getTasks().get(0).getStatus());
-        Assert.assertEquals(TaskStatus.PAUSED, js.getTasks().get(1).getStatus());
+        Assert.assertEquals(TaskStatus.RUNNING, getTaskState("task1", js).getStatus());
+        Assert.assertEquals(TaskStatus.PAUSED, getTaskState("task2", js).getStatus());
 
         SchedulerTHelper.getSchedulerInterface().resumeJob(jobId);
 
         js = SchedulerTHelper.getSchedulerInterface().getJobState(jobId);
         Assert.assertEquals(JobStatus.RUNNING, js.getStatus());
-        Assert.assertEquals(TaskStatus.RUNNING, js.getTasks().get(0).getStatus());
-        Assert.assertEquals(TaskStatus.PENDING, js.getTasks().get(1).getStatus());
+        Assert.assertEquals(TaskStatus.RUNNING, getTaskState("task1", js).getStatus());
+        Assert.assertEquals(TaskStatus.PENDING, getTaskState("task2", js).getStatus());
 
         //let the task1 finish
         communicationObject.setCanFinish(true);
@@ -119,6 +120,15 @@ public class TestPauseJobRecover extends FunctionalTest {
         Assert.assertEquals(2, jobResult.getAllResults().size());
         Assert.assertEquals("OK", jobResult.getResult("task1").value().toString());
         Assert.assertEquals("OK", jobResult.getResult("task2").value().toString());
+    }
+
+    private TaskState getTaskState(String taskName, JobState jobState) {
+        for (TaskState ts: jobState.getTasks()) {
+            if (ts.getName().equals(taskName)) {
+                return ts;
+            }
+        }
+        return null;
     }
 
     private TaskFlowJob createJob(String communicationObjectUrl) throws Exception {
