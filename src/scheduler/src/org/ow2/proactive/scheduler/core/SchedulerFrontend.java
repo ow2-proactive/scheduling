@@ -393,44 +393,22 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
      * {@inheritDoc}
      */
     @Override
-    public String getUserSpaceURI() throws NotConnectedException, PermissionException {
-
+    public List<String> getUserSpaceURIs() throws NotConnectedException, PermissionException {
         UserIdentificationImpl ident = frontendState.checkPermission("getUserSpaceURI",
                 "You don't have permissions to read the USER Space URI");
 
-        return frontendState.getUserSpace(ident).getRealURI();
+        return frontendState.getUserSpace(ident).getAllRealURIs();
     }
 
     /**
-     * Returns the USER DataSpace Path associated with the current user
-     * This path is accessible only on the local file system of the scheduler
-     * @return user USER Space Path
-     * @throws NotConnectedException if you are not authenticated.
+     * {@inheritDoc}
      */
-    public String getUserSpacePath() throws NotConnectedException, PermissionException {
-        UserIdentificationImpl ident = frontendState.checkPermission("getUserSpacePath",
-                "You don't have permissions to read the USER Space Path");
-        return PASchedulerProperties.DATASPACE_DEFAULTUSER_LOCALPATH + File.separator + ident.getUsername();
-    }
-
     @Override
-    public String getGlobalSpaceURI() throws NotConnectedException, PermissionException {
+    public List<String> getGlobalSpaceURIs() throws NotConnectedException, PermissionException {
         UserIdentificationImpl ident = frontendState.checkPermission("getGlobalSpaceURI",
                 "You don't have permissions to read the GLOBAL Space URI");
 
-        return globalSpace.getRealURI();
-    }
-
-    /**
-     * Returns the GLOBAL DataSpace Path available to all users
-     * This path is accessible only on the local file system of the scheduler
-     * @return user GLOBAL Space Path
-     * @throws NotConnectedException if you are not authenticated.
-     */
-    public String getGlobalSpacePath() throws NotConnectedException, PermissionException {
-        UserIdentificationImpl ident = frontendState.checkPermission("getGlobalSpacePath",
-                "You don't have permissions to read the GLOBAL Space Path");
-        return PASchedulerProperties.DATASPACE_DEFAULTGLOBAL_LOCALPATH.getValueAsString();
+        return globalSpace.getAllRealURIs();
     }
 
     /**

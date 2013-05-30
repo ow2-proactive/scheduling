@@ -75,7 +75,6 @@ import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.usage.JobUsage;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
-import org.ow2.proactive.scheduler.core.SchedulerFrontend;
 import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
 
 
@@ -105,21 +104,13 @@ public class TestSchedulerProxy implements Scheduler {
     }
 
     @Override
-    public String getUserSpaceURI() throws NotConnectedException, PermissionException {
-        return target.getUserSpaceURI();
-    }
-
-    public String getUserSpacePath() throws NotConnectedException, PermissionException {
-        return ((SchedulerFrontend) target).getUserSpacePath();
+    public List<String> getUserSpaceURIs() throws NotConnectedException, PermissionException {
+        return target.getUserSpaceURIs();
     }
 
     @Override
-    public String getGlobalSpaceURI() throws NotConnectedException, PermissionException {
-        return target.getGlobalSpaceURI();
-    }
-
-    public String getGlobalSpacePath() throws NotConnectedException, PermissionException {
-        return ((SchedulerFrontend) target).getGlobalSpacePath();
+    public List<String> getGlobalSpaceURIs() throws NotConnectedException, PermissionException {
+        return target.getGlobalSpaceURIs();
     }
 
     @Override

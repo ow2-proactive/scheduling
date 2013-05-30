@@ -79,18 +79,18 @@ import org.ow2.proactive.scheduler.policy.Policy;
 public interface Scheduler extends SchedulerUsage {
 
     /**
-     * Returns the USER DataSpace URI associated with the current user
-     * @return user USER Space URI
+     * Returns the USER DataSpace URIs associated with the current user
+     * @return USER Space URIs (one element for each available protocol)
      * @throws NotConnectedException if you are not authenticated.
      */
-    public String getUserSpaceURI() throws NotConnectedException, PermissionException;
+    public List<String> getUserSpaceURIs() throws NotConnectedException, PermissionException;
 
     /**
      * Returns the GLOBAL DataSpace URI available to all users
-     * @return user GLOBAL Space URI
+     * @return GLOBAL Space URIs (one element for each available protocol)
      * @throws NotConnectedException if you are not authenticated.
      */
-    public String getGlobalSpaceURI() throws NotConnectedException, PermissionException;
+    public List<String> getGlobalSpaceURIs() throws NotConnectedException, PermissionException;
 
     /**
      * Get the result for the given jobId.

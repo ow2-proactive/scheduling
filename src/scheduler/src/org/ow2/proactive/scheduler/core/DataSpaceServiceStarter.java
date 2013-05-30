@@ -39,6 +39,7 @@ package org.ow2.proactive.scheduler.core;
 import java.io.File;
 import java.io.Serializable;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -240,18 +241,24 @@ public class DataSpaceServiceStarter implements Serializable {
                 " is already registered");
         }
         InputOutputSpaceConfiguration spaceConf = null;
+        // We add the deployed path to a url list, this way the dataspace will always be accessed preferably by the file system
+        ArrayList<String> urls = new ArrayList<String>();
+        if (path != null) {
+            urls.add("file://" + (path.startsWith("/") ? "" : "/") + path.replace("\\", "/"));
+        }
+        urls.add(url);
         if (inputConfiguration) {
-            spaceConf = InputOutputSpaceConfiguration.createInputSpaceConfiguration(url, path,
+            spaceConf = InputOutputSpaceConfiguration.createInputSpaceConfiguration(urls.get(0), path,
                     hostname != null ? hostname : localhostname, name);
         } else {
-            spaceConf = InputOutputSpaceConfiguration.createOutputSpaceConfiguration(url, path,
+            spaceConf = InputOutputSpaceConfiguration.createOutputSpaceConfiguration(urls.get(0), path,
                     hostname != null ? hostname : localhostname, name);
         }
 
         namingService.register(new SpaceInstanceInfo(appID, spaceConf));
 
         spacesConfigurations.get(appID).add(spaceConf.getName());
-        logger.info("Space " + name + " for appid = " + appID + " with url = " + url + " registered");
+        logger.info("Space " + name + " for appid = " + appID + " with urls = " + urls + " registered");
 
     }
 
