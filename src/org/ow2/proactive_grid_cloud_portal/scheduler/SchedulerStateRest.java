@@ -1592,10 +1592,10 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             PermissionRestException {
         try {
             if (SchedulerConstants.GLOBALSPACE_NAME.equals(spaceName)) {
-                return s.getGlobalSpaceURI();
+                return s.getGlobalSpaceURIs().get(0);
 
             } else if (SchedulerConstants.USERSPACE_NAME.equals(spaceName)) {
-                return s.getUserSpaceURI();
+                return s.getUserSpaceURIs().get(0);
             } else {
                 RuntimeException ex = new IllegalArgumentException("Wrong Data Space name : " + spaceName);
                 logger.error(ex);
