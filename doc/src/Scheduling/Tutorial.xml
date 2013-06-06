@@ -930,7 +930,7 @@ else
 
 		<para>
 		Another functionality is the possibility to define pre and post scripts.
-		For a given task (Java task or native task), it is possible to launch a script before
+		For a given task (Java, Script or Native task), it is possible to launch a script before
 		and after its execution. This possibility can be useful to copy files to a node,
 		or clean a directory before or after task execution, for example. This is a way to separate from business code the preparation of execution environment and its cleaning.
 		This section proposes you to add to your native job example a script which removes a list of files from a specified directory.
@@ -1134,7 +1134,7 @@ command="[working_dir]/nativTask"
 			<emphasis role="bold">$PAS_TASK_ITERATION</emphasis> - iteration index of a task.</para>
 		</listitem>
 		<listitem><para>
-			<emphasis role="bold">$PAS_TASK_REPLICATION</emphasis> - replication index of a taks.</para>
+			<emphasis role="bold">$PAS_TASK_REPLICATION</emphasis> - replication index of a task.</para>
 		</listitem>
 	</itemizedlist>
 	

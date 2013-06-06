@@ -223,7 +223,7 @@ job.setEnv(je);
 	</section>
 	<section xml:id="Create_add_task"><info><title>Create and add a task to a job</title></info>
 		<para>
-			As it has been said, it is possible to create 3 types of tasks. Native and
+			As it has been said, it is possible to create 4 types of tasks. Native, Script and
 			Java tasks can be add to TaskFlow Job, and one ProActive Task to one ProActive Job.
 		</para>
 		<section xml:id="Create_java_task"><info><title>Create and add a Java task</title></info>
@@ -461,7 +461,7 @@ public class ProActiveExample extends JavaExecutable {
 				</para>
 				<programlisting language="xml"><textobject><textdata fileref="code_snippets/job_descriptors/taskFlow_job_complete.xml"/></textobject></programlisting>
 				<para>
-					It is obviously possible to mix Java (with one or more nodes) and Native task inside a taskFlow Job.
+					It is obviously possible to mix Java (with one or more nodes), Script and Native task inside a taskFlow Job.
 					Some other parameters and options can be set into a Java task. The two following examples expose some of them:
 				</para>
 				<programlisting language="xml"><textobject><textdata fileref="code_snippets/job_descriptors/java_task_script.xml"/></textobject></programlisting>
@@ -700,6 +700,117 @@ task2.setGenerationScript(gscript);
 					To have an exhaustive list of available options and theirs functions, please refer to
 					the task explanation section (see <xref linkend="Create_task_explanation"/>).
 				</para>
+			</section>
+		</section>
+
+		<section xml:id="Create_script_task"><info><title>Create and add a Script task</title></info>
+			<para>
+				<emphasis>Note</emphasis>
+				: A script task can only be added to a TaskFlow Job. To learn how to create a TaskFlow job,
+				pleas refer to <xref linkend="Create_TaskFlow_job_xml"/> or <xref linkend="Create_TaskFlow_job_java"/>.
+				Once your TaskFlow job created, you can add as many Java tasks as needed to perform an
+				application.
+			</para>
+			<para>
+				A Script task runs a script specified by the user using <link xlink:href="http://en.wikipedia.org/wiki/Scripting_for_the_Java_Platform">JSR 223</link>.
+				Javascript is supported by Java out of the box and additional script engines can be added by providing the necessary JAR files to the Scheduler and nodes.
+				Script tasks can be useful to create simple tasks that print debugging information.
+			</para>
+			<para>
+				Special variables are exported in the script to be executed to access job and task
+				informations and to send back results to the workflow:
+				<itemizedlist>
+					<listitem>
+						<para><emphasis>result</emphasis>: to return a result from the task, must be a
+							serializable value.
+						</para>
+					</listitem>
+					<listitem>
+						<para><emphasis>progress</emphasis>: to set the progression of the task during its
+							execution. It must be an integer between 0 and 100.
+						</para>
+					</listitem>
+					<listitem>
+						<para><emphasis>results</emphasis>: to access the results from dependent tasks.
+							It is the same object (an array of TaskResult) as results from the
+							Java task (see <xref linkend="define_executable_java"/>) execute method.
+						</para>
+					</listitem>
+				</itemizedlist>
+				Dataspaces objects (see <xref linkend="Dataspace_tasks"/>)
+				are also exposed:
+				<itemizedlist>
+					<listitem>
+						<para><emphasis>localspace</emphasis>: to access the dataspace file object
+							(DataSpacesFileObject) for the local space.
+						</para>
+					</listitem>
+					<listitem>
+						<para><emphasis>global</emphasis>: to access the dataspace file object
+							(DataSpacesFileObject) for the global space.
+						</para>
+					</listitem>
+					<listitem>
+						<para><emphasis>user</emphasis>: to access the dataspace file object
+							(DataSpacesFileObject) for the user space.
+						</para>
+					</listitem>
+					<listitem>
+						<para><emphasis>input</emphasis>: to access the dataspace file object
+							(DataSpacesFileObject) for the input space.
+						</para>
+					</listitem>
+					<listitem>
+						<para><emphasis>output</emphasis>: to access the dataspace file object
+							(DataSpacesFileObject) for the output space.
+						</para>
+					</listitem>
+				</itemizedlist>
+				System properties are also exposed to reiteve job and task runtime information:
+				<itemizedlist>
+					<listitem>
+						<para><emphasis>pas.job.name</emphasis>: job's name defined in its XML descriptor
+						</para>
+					</listitem>
+					<listitem>
+						<para><emphasis>pas.job.id</emphasis>: unique job's ID given at submission time
+						</para>
+					</listitem>
+					<listitem>
+						<para><emphasis>pas.task.name</emphasis>: name of the task currently launched (name defined in XML descriptor)
+						</para>
+					</listitem>
+					<listitem>
+						<para><emphasis>pas.task.id</emphasis>: unique task's ID
+						</para>
+					</listitem>
+					<listitem>
+						<para><emphasis>pas.task.iteration</emphasis>: iteration index of a task
+						</para>
+					</listitem>
+					<listitem>
+						<para><emphasis>pas.task.replication</emphasis>: replication index of a task
+						</para>
+					</listitem>
+				</itemizedlist>
+			</para>
+			<section xml:id="Create_script_task_xml"><info><title>Create and add a Script task using an XML descriptor</title></info>
+				<para>
+					The task is the entity that will be scheduled by ProActive Scheduler.
+					As it has been explained in <xref linkend="what_is_task"/>,
+					it's possible to create and add Script tasks to your TaskFlow Job.
+				</para>
+				<para>
+					Take a look at the following example to understand the syntax of a task:
+				</para>
+				<programlisting language="xml"><textobject><textdata fileref="code_snippets/job_descriptors/script_task_simple.xml"/></textobject></programlisting>
+				<para>
+					<emphasis>Note</emphasis> : The syntax of a script task is very similar to pre and post scripts (see <xref linkend="pre_post"/>).
+				</para>
+				<para>
+					It is also possible to reference an external script file as shown below:
+				</para>
+				<programlisting language="xml"><textobject><textdata fileref="code_snippets/job_descriptors/script_task_file.xml"/></textobject></programlisting>
 			</section>
 		</section>
 
@@ -1543,7 +1654,7 @@ public class DSTest extends JavaExecutable {
 				<section xml:id="Dataspace_scripts"><info><title>Retrieving files in a script</title></info>
 				  <para>
 					Similarly to what is achieved in <xref linkend="Dataspace_java" /> in Java tasks, Dataspace objects are
-					available in the scripted environments of pre, post and flow scripts (flow scripts are similar to
+					available in the scripted environments of pre, post, flow and task scripts (flow scripts are similar to
 					pre/post scripts introduced in <xref linkend="scheduler_workflow" />).
 
 					This allows taking decisions in scripts based, for instance, on the input available to the task
@@ -1923,7 +2034,7 @@ done</programlisting>
 			<section xml:id="scheduler_workflow_script"><info><title>Control Flow Scripts</title></info>
 			  <para>
 				To perform a control flow action such as if, replicate or loop, a <emphasis>Control Flow Script</emphasis> is executed on the execution node.
-				This script takes the result of the task as input; meaning a Java object if it was a Java task, or nothing if it was a native task.
+				This script takes the result of the task as input; meaning a Java object if it was a Java or Script task, or nothing if it was a native task.
 			  </para>
 			  <para>
 				The script is executed on the compute node, just after the task's executable. If the executable is a JavaExecutable and returns a result,

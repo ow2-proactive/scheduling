@@ -157,7 +157,7 @@
 			</para>
 
 			<para>
-				There are 2 types of tasks:
+				There are 3 types of tasks:
 				<itemizedlist>
 					<listitem>
 						<para>
@@ -177,6 +177,14 @@
 							 or by a 'generation script' that can dynamically
 							generate the command line to be executed (for instance, according to the computing node's operating system
 							wherein the task is executed).
+						</para>
+					</listitem>
+
+					<listitem>
+						<para>
+							<emphasis role="bold">SCRIPT</emphasis> - its execution is defined by code written in a scripting language supported by
+							<link xlink:href="http://en.wikipedia.org/wiki/Scripting_for_the_Java_Platform">JSR 223</link>. By default Java
+							supports Javascript.
 						</para>
 					</listitem>
 				</itemizedlist>
