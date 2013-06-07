@@ -2,7 +2,7 @@
 
 	<para>
 		<emphasis role="bold">
-			Scheduler Eclipse Plugin
+			Scheduler Graphical User Interface
 		</emphasis>
 		is a
 		<emphasis role="bold">graphical client</emphasis>
@@ -14,20 +14,15 @@
 		).
 	</para>
 	<para>
-		The Scheduler Graphical Client is a standalone application built on top of
+		The Scheduler Graphical Client is a part of the ProActive Workflow Studio built on top of
 		<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://wiki.eclipse.org/index.php/Rich_Client_Platform">
 		  Eclipse Rich Client Platform (RCP)
 		</link>. It is available for all major platforms (Windows, Mac OS, Linux, Solaris).
 	</para>
-	<para>
-	  Although the plugin is built as a standalone application, it can be integrated in an existing Eclipse
-	  installation by installing only the Scheduler Plugin, allowing the use of the Scheduler Perspective.
-	</para>
 
 	<section xml:id="Starting_GUI"><info><title>Starting  Scheduler Graphical User Interface</title></info>
 		<para>
-		  To start the ProActive Scheduler Client, run the executable named <emphasis>Scheduler</emphasis> (Unix) 
-		  or <emphasis>Scheduler.exe</emphasis> (Windows).
+		  To start the ProActive Scheduler graphical user interface, run the ProActive Workflow Studio and choose the <emphasis>Cloud &amp; Grid</emphasis> perspective.
 		</para>
 		<para>
 			Once started, the main window of the client should look like this:
@@ -79,7 +74,7 @@
 
 	<section xml:id="Scheduler_perspective"><info><title>Scheduler perspective</title></info>
 		<para>
-			Scheduler plugin provides the
+			Scheduler graphical user interface provides the
 			<emphasis role="bold">
 				Scheduler
 				<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://help.eclipse.org/help31/index.jsp?topic=/org.eclipse.platform.doc.user/gettingStarted/qs-43.htm">

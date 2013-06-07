@@ -10,44 +10,12 @@
 		of computing nodes, creation of node sources and removal of nodes.
 	</para>
 	<para>
-		The Resource Manager Eclipse Plugin is available in two forms:
+		The Resource Manager Eclipse Plugin is embedded in the ProActive Workflow Studio.
 	</para>
-	<itemizedlist>
-		<listitem>
-			<para>
-			A <emphasis role="bold">Java stand alone application</emphasis> based on
-			<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://wiki.eclipse.org/index.php/Rich_Client_Platform">
-			Eclipse Rich Client Platform (RCP)
-			</link>, available for any platform (Windows, Linux, Mac OSX, Solaris...).
-			</para>
-		</listitem>
-		<listitem>
-			<para>A set of <emphasis role="bold"> <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www.eclipse.org">
-			Eclipse</link> plugins</emphasis>: with all the functionalities of the stand
-			alone application.
-			</para>
-		</listitem>
-	</itemizedlist>
 
 	<section xml:id="Starting_RM_GUI"><info><title>Launching the Resource Manager GUI</title></info>
 		<para>
-			Depending on the way you get the RM plugin, just follow one of these steps:
-			<itemizedlist>
-				<listitem><para>
-					<emphasis role="bold">If you are using the stand alone application</emphasis>, just start it using the
-					provided executable. ("ResourceManager" on unix, "ResourceManager.exe" on Windows).
-					</para>
-				</listitem>
-				<listitem>
-				<para>
-					<emphasis role="bold">If you are using the Eclipse plugins set</emphasis>, install it as an eclipse plugin
-					and restart Eclipse. To do this, copy all the jar files from the <literal>plugins/</literal> directory of your Resource Manager RCP distribution into
-					the <literal>plugins/</literal> directory of your Eclipse distribution and restart Eclipse.
-					</para>
-				</listitem>
-			</itemizedlist>
-			Then, go to <emphasis role="bold">Window-&gt;Open Perspective-&gt;Other...-&gt;Resource Manager</emphasis>
-			(it could be already opened as it is the default perspective).
+			Start the ProActive Workflow Studio and select the <emphasis>Cloud &amp; Grid</emphasis> perspective.
 		</para>
 		<para>
 			Once started, the first screen displayed is the following one:
