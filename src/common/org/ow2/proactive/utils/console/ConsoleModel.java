@@ -302,6 +302,8 @@ public abstract class ConsoleModel {
                 terminated = true;
             } else {
                 checkIsReady();
+               // cmd = cmd.replace("\\", "\\\\");
+               // cmd = cmd.replace("\\\\\\\\", "\\\\");
                 if (bindings != null && bindings.size() > 0) {
                     Bindings bdgs = engine.getBindings(ScriptContext.ENGINE_SCOPE);
                     if (bdgs != null) {
