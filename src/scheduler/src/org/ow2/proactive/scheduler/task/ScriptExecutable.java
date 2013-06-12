@@ -37,13 +37,12 @@
 package org.ow2.proactive.scheduler.task;
 
 import java.io.Serializable;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
 import org.ow2.proactive.scheduler.common.exception.UserException;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.ow2.proactive.scheduler.common.task.executable.Executable;
+import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
+import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
 import org.ow2.proactive.scripting.ScriptHandler;
 import org.ow2.proactive.scripting.ScriptLoader;
 import org.ow2.proactive.scripting.ScriptResult;
@@ -53,39 +52,30 @@ import org.apache.log4j.Logger;
 
 /**
  * This is the execution entry point for the script task.
- * The execute(TaskResult...) method will be override by the scheduler to launch the script engine.
+ * The execute(TaskResult...) method is used to launch the script engine and run the script.
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 3.4
  */
-public class ScriptExecutable extends Executable {
+public class ScriptExecutable extends JavaExecutable {
 
     public static final Logger logger = Logger.getLogger(ScriptExecutable.class);
 
     private TaskScript script;
-    private Map<String, DataSpacesFileObject> dataspaceBindings;
     /** execution progress value (between 0 and 100), can be updated by the script */
     private final AtomicInteger progress = new AtomicInteger(0);
-
-    /**
-     * Initialize the executable using the given executable container.
-     *
-     * @param execInitializer the executable initializer used to init the executable itself
-     * @throws Exception an exception if something goes wrong during executable initialization.
-     */
-    // WARNING WHEN REMOVE OR RENAME, called by task launcher by introspection
-    private void internalInit(ScriptExecutableInitializer execInitializer) throws Exception {
-        script = execInitializer.getScript();
-        dataspaceBindings = execInitializer.getDataspaceBindings();
-    }
 
     @Override
     public Serializable execute(TaskResult... results) throws Throwable {
         logger.info("Executing script");
         ScriptHandler handler = ScriptLoader.createLocalHandler();
-        for (Map.Entry<String, DataSpacesFileObject> dataspaceEntry : dataspaceBindings.entrySet()) {
-            handler.addBinding(dataspaceEntry.getKey(), dataspaceEntry.getValue());
-        }
+
+        handler.addBinding(TaskLauncher.DS_GLOBAL_BINDING_NAME, getGlobalSpace());
+        handler.addBinding(TaskLauncher.DS_INPUT_BINDING_NAME, getInputSpace());
+        handler.addBinding(TaskLauncher.DS_OUTPUT_BINDING_NAME, getOutputSpace());
+        handler.addBinding(TaskLauncher.DS_SCRATCH_BINDING_NAME, getLocalSpace());
+        handler.addBinding(TaskLauncher.DS_USER_BINDING_NAME, getUserSpace());
+
         handler.addBinding(TaskScript.RESULTS_VARIABLE, results);
         handler.addBinding(TaskScript.PROGRESS_VARIABLE, progress);
         ScriptResult<Serializable> scriptResult = handler.handle(script);
@@ -97,6 +87,10 @@ public class ScriptExecutable extends Executable {
         }
 
         return scriptResult.getResult();
+    }
+
+    public void setScript(TaskScript script) {
+        this.script = script;
     }
 
     @Override

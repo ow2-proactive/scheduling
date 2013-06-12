@@ -33,6 +33,7 @@ import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalForkedJavaTask;
+import org.ow2.proactive.scheduler.task.internal.InternalForkedScriptTask;
 import org.ow2.proactive.scheduler.task.internal.InternalJavaTask;
 import org.ow2.proactive.scheduler.task.internal.InternalNativeTask;
 import org.ow2.proactive.scheduler.task.internal.InternalScriptTask;
@@ -67,6 +68,7 @@ public class TaskData {
     private static final String FORKED_JAVA_TASK = "FORKED_JAVA_TASK";
     private static final String NATIVE_TASK = "NATIVE_TASK";
     private static final String SCRIPT_TASK = "SCRIPT_TASK";
+    private static final String FORKED_SCRIPT_TASK = "FORKED_SCRIPT_TASK";
 
     private DBTaskId id;
 
@@ -339,6 +341,8 @@ public class TaskData {
             internalTask = new InternalNativeTask();
         } else if (taskType.equals(SCRIPT_TASK)) {
             internalTask = new InternalScriptTask();
+        } else if (taskType.equals(FORKED_SCRIPT_TASK)) {
+            internalTask = new InternalForkedScriptTask();
         } else {
             throw new IllegalStateException("Unexpecpected stored task type: " + taskType);
         }
@@ -532,6 +536,8 @@ public class TaskData {
             taskType = FORKED_JAVA_TASK;
         } else if (task.getClass().equals(InternalNativeTask.class)) {
             taskType = NATIVE_TASK;
+        } else if (task.getClass().equals(InternalForkedScriptTask.class)) {
+            taskType = FORKED_SCRIPT_TASK;
         } else if (task.getClass().equals(InternalScriptTask.class)) {
             taskType = SCRIPT_TASK;
         } else {

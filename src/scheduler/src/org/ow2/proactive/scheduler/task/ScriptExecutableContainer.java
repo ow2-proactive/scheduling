@@ -1,6 +1,5 @@
 /*
- * ################################################################
- *
+ *  *
  * ProActive Parallel Suite(TM): The Java(TM) library for
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
@@ -31,80 +30,44 @@
  *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s):
  *
- * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ *  * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.ow2.proactive.scheduler.task;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
+import java.util.Collections;
 
 import org.ow2.proactive.scheduler.common.exception.ExecutableCreationException;
+import org.ow2.proactive.scheduler.common.task.JavaExecutableInitializer;
 import org.ow2.proactive.scheduler.common.task.executable.Executable;
-import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.TaskScript;
-import org.apache.log4j.Logger;
 
-
-@XmlAccessorType(XmlAccessType.FIELD)
-public class ScriptExecutableContainer extends ExecutableContainer {
-
-    public static final Logger logger = Logger.getLogger(ScriptExecutableContainer.class);
-
+/**
+ * Reuse the Java executable container as part of a forked task, specialized for a script execution.
+ * @author The ProActive Team
+ * @since ProActive Scheduling 3.4
+ */
+public class ScriptExecutableContainer extends JavaExecutableContainer {
     private TaskScript script;
 
-    /** Hibernate default constructor */
-    public ScriptExecutableContainer() {
-    }
-
-    /**
-     * Create a new container for a script executable.
-     *
-     * @param command the command to be executed.
-     * @param generated the script that generates the command (can be null).
-     */
     public ScriptExecutableContainer(TaskScript script) {
+        super(ScriptExecutable.class.getName(), Collections.<String, byte[]>emptyMap());
         this.script = script;
     }
 
-    /**
-     * @see ExecutableContainer#getExecutable()
-     */
     @Override
     public Executable getExecutable() throws ExecutableCreationException {
-        return new ScriptExecutable();
+        ScriptExecutable executable = (ScriptExecutable) super.getExecutable();
+        executable.setScript(script);
+        return executable;
     }
 
-    /**
-     * Copy constructor
-     *
-     * @param cont original object to copy
-     */
-    public ScriptExecutableContainer(ScriptExecutableContainer cont) throws ExecutableCreationException {
-        try {
-            this.script = new TaskScript(cont.getScript());
-        } catch (InvalidScriptException e) {
-            throw new ExecutableCreationException("Could not copy script", e);
-        }
-    }
-
-    /**
-     * @see ExecutableContainer#init(ExecutableContainerInitializer)
-     */
     @Override
-    public void init(ExecutableContainerInitializer initializer) {
-        // Nothing to do for now...
-    }
-
-    /**
-     * @see ExecutableContainer#createExecutableInitializer()
-     */
-    @Override
-    public ScriptExecutableInitializer createExecutableInitializer() {
-        ScriptExecutableInitializer nei = new ScriptExecutableInitializer();
-        nei.setScript(script);
-        return nei;
+    public JavaExecutableInitializer createExecutableInitializer() {
+        ScriptExecutableInitializer scriptExecutableInitializer = new ScriptExecutableInitializer(
+                super.createExecutableInitializer());
+        scriptExecutableInitializer.setScript(script);
+        return scriptExecutableInitializer;
     }
 
     public Script getScript() {

@@ -41,9 +41,11 @@ import java.net.URL;
 
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
+import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory_stax;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -56,7 +58,7 @@ public class TestScriptTask extends SchedulerConsecutive {
             .getResource("/functionaltests/descriptors/Job_script_task.xml");
 
     @Test
-    public void run() throws Throwable {
+    public void forkedTasks() throws Throwable {
         TaskFlowJob job = (TaskFlowJob) JobFactory_stax.getFactory().createJob(
                 new File(jobDescriptor.toURI()).getAbsolutePath());
 
@@ -91,6 +93,9 @@ public class TestScriptTask extends SchedulerConsecutive {
         TaskResult fileTaskResult = jobResult.getResult("file");
         assertTrue(fileTaskResult.getOutput().getAllLogs(false).contains("Beginning of clean script"));
 
+        TaskResult fileAndArgsTaskResult = jobResult.getResult("file_and_args");
+        assertTrue(fileAndArgsTaskResult.getOutput().getAllLogs(false).contains("My_Magic_Arg"));
+
         // dataspaces binding should be available
         TaskResult dataspacesTaskResult = jobResult.getResult("dataspaces");
         String dataspacesLogs = dataspacesTaskResult.getOutput().getAllLogs(false);
@@ -99,6 +104,13 @@ public class TestScriptTask extends SchedulerConsecutive {
         assertTrue(dataspacesLogs.contains("user=vfs://"));
         assertTrue(dataspacesLogs.contains("input=vfs://"));
         assertTrue(dataspacesLogs.contains("output=vfs://"));
+
+        // script task should be forked by default
+        JobState jobState = SchedulerTHelper.getSchedulerInterface().getJobState(id);
+        TaskResult killJVMTaskResult = jobResult.getResult("killJVM");
+        TaskState killJVMTaskState = jobState.getHMTasks().get(killJVMTaskResult.getTaskId());
+        System.out.println(killJVMTaskState.getStatus());
+
     }
 
 }

@@ -11,8 +11,10 @@ import javax.persistence.JoinColumns;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import org.ow2.proactive.scheduler.task.ForkedScriptExecutableContainer;
 import org.ow2.proactive.scheduler.task.ScriptExecutableContainer;
 import org.ow2.proactive.scripting.InvalidScriptException;
+import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.TaskScript;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -26,15 +28,29 @@ public class ScriptTaskData {
     private TaskData taskData;
     private ScriptData script;
 
+    static ScriptTaskData createScriptTaskData(TaskData taskData, ForkedScriptExecutableContainer container) {
+        Script script = container.getScript();
+        return createScriptTaskData(taskData, script);
+    }
+
     static ScriptTaskData createScriptTaskData(TaskData taskData, ScriptExecutableContainer container) {
+        Script script = container.getScript();
+        return createScriptTaskData(taskData, script);
+    }
+
+    private static ScriptTaskData createScriptTaskData(TaskData taskData, Script script) {
         ScriptTaskData scriptTaskData = new ScriptTaskData();
         scriptTaskData.setTaskData(taskData);
-        scriptTaskData.setScript(ScriptData.createForScript(container.getScript()));
+        scriptTaskData.setScript(ScriptData.createForScript(script));
         return scriptTaskData;
     }
 
     ScriptExecutableContainer createExecutableContainer() throws InvalidScriptException {
         return new ScriptExecutableContainer(new TaskScript(script.createSimpleScript()));
+    }
+
+    ForkedScriptExecutableContainer createForkedExecutableContainer() throws InvalidScriptException {
+        return new ForkedScriptExecutableContainer(new TaskScript(script.createSimpleScript()));
     }
 
     @Id

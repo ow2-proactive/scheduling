@@ -34,32 +34,32 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.task;
+package org.ow2.proactive.scheduler.task.internal;
 
-import org.ow2.proactive.scheduler.common.task.JavaExecutableInitializer;
-import org.ow2.proactive.scripting.TaskScript;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+
+import org.ow2.proactive.scheduler.task.ExecutableContainer;
+import org.ow2.proactive.scheduler.util.TaskLogger;
 
 
-/**
- * ScriptExecutableInitializer is the class used to store context of script executable initialization.
- *
- * @author The ProActive Team
- * @since ProActive Scheduling 3.4
- */
-public class ScriptExecutableInitializer extends ForkedJavaExecutableInitializer {
+@XmlAccessorType(XmlAccessType.FIELD)
+public class InternalForkedScriptTask extends InternalForkedJavaTask {
+    public static final TaskLogger logger = TaskLogger.getInstance();
 
-    private TaskScript script;
-
-    public ScriptExecutableInitializer(JavaExecutableInitializer execInitializer) {
-        super(execInitializer);
+    /**
+     * ProActive empty constructor.
+     */
+    public InternalForkedScriptTask() {
     }
 
-    public void setScript(TaskScript script) {
-        this.script = script;
-    }
-
-    public TaskScript getScript() {
-        return script;
+    /**
+     * Create a new forked script task descriptor with the given command line.
+     *
+     * @param execContainer the Native Executable Container
+     */
+    public InternalForkedScriptTask(ExecutableContainer execContainer) {
+        this.executableContainer = execContainer;
     }
 
 }

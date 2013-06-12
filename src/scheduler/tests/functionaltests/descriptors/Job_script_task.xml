@@ -55,6 +55,17 @@
 				</script>
 			</scriptExecutable>
 		</task>
+		<task name="file_and_args">
+			<scriptExecutable>
+				<script>
+					<file path="${pa.scheduler.home}/src/scheduler/tests/functionaltests/descriptors/print_arg.js">
+					<arguments>
+						<argument value="My_Magic_Arg"/>
+					</arguments>
+					</file>
+				</script>
+			</scriptExecutable>
+		</task>
 		<task name="dataspaces">
 			<scriptExecutable>
 				<script>
@@ -66,6 +77,25 @@
 						print('output=' + output.getVirtualURI())
 						print('localspace=' + localspace.getVirtualURI())
 						]]>
+					</code>
+				</script>
+			</scriptExecutable>
+		</task>
+		<!-- Should probably be the last one to run -->
+		<task name="killJVM">
+			<depends>
+				<task ref="simple"/>
+				<task ref="return"/>
+				<task ref="results_from_dependent_task"/>
+				<task ref="properties"/>
+				<task ref="file"/>
+				<task ref="file_and_args"/>
+				<task ref="dataspaces"/>
+			</depends>
+			<scriptExecutable>
+				<script>
+					<code language="javascript">
+						java.lang.System.exit(0);
 					</code>
 				</script>
 			</scriptExecutable>

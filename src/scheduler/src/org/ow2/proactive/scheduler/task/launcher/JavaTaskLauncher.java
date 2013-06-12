@@ -46,7 +46,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.ImmediateService;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.mop.StubObject;
@@ -62,6 +61,7 @@ import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
+import org.apache.log4j.Logger;
 
 
 /**
@@ -96,7 +96,6 @@ public class JavaTaskLauncher extends TaskLauncher {
      * @param core The scheduler core to be notify or null if the finalizeTask method is not to be called
      * @param executableContainer contains the task to execute
      * @param results the possible results from parent tasks.(if task flow)
-     * @return a task result representing the result of this task execution.
      */
     @Override
     public void doTask(TaskTerminateNotification core, ExecutableContainer executableContainer,

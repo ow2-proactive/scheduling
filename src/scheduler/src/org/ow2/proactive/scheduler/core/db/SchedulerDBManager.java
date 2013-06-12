@@ -45,12 +45,14 @@ import org.ow2.proactive.scheduler.job.JobResultImpl;
 import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.ForkedJavaExecutableContainer;
+import org.ow2.proactive.scheduler.task.ForkedScriptExecutableContainer;
 import org.ow2.proactive.scheduler.task.JavaExecutableContainer;
 import org.ow2.proactive.scheduler.task.NativeExecutableContainer;
 import org.ow2.proactive.scheduler.task.ScriptExecutableContainer;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalForkedJavaTask;
+import org.ow2.proactive.scheduler.task.internal.InternalForkedScriptTask;
 import org.ow2.proactive.scheduler.task.internal.InternalJavaTask;
 import org.ow2.proactive.scheduler.task.internal.InternalNativeTask;
 import org.ow2.proactive.scheduler.task.internal.InternalScriptTask;
@@ -1536,6 +1538,10 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
             NativeExecutableContainer container = (NativeExecutableContainer) task.getExecutableContainer();
             NativeTaskData nativeTaskData = NativeTaskData.createNativeTaskData(taskRuntimeData, container);
             session.save(nativeTaskData);
+        } else if (task.getClass().equals(InternalForkedScriptTask.class)) {
+            ForkedScriptExecutableContainer container = (ForkedScriptExecutableContainer) task.getExecutableContainer();
+            ScriptTaskData scriptTaskData = ScriptTaskData.createScriptTaskData(taskRuntimeData, container);
+            session.save(scriptTaskData);
         } else if (task.getClass().equals(InternalScriptTask.class)) {
             ScriptExecutableContainer container = (ScriptExecutableContainer) task.getExecutableContainer();
             ScriptTaskData scriptTaskData = ScriptTaskData.createScriptTaskData(taskRuntimeData, container);
@@ -1586,12 +1592,16 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
                     container = taskData.createExecutableContainer();
                 }
             } else if (task.getClass().equals(InternalScriptTask.class)) {
-                ScriptTaskData taskData = (ScriptTaskData) session.createQuery(
-                        "from ScriptTaskData td where td.taskData.id = :taskId").setParameter("taskId",
-                        taskId(task)).uniqueResult();
+                ScriptTaskData taskData = queryScriptTaskData(session, task);
 
                 if (taskData != null) {
                     container = taskData.createExecutableContainer();
+                }
+            } else if (task.getClass().equals(InternalForkedScriptTask.class)) {
+                ScriptTaskData taskData = queryScriptTaskData(session, task);
+
+                if (taskData != null) {
+                    container = taskData.createForkedExecutableContainer();
                 }
             } else {
                 throw new IllegalArgumentException("Unexpected task class: " + task.getClass());
@@ -1605,6 +1615,12 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
         } catch (Exception e) {
             throw new DatabaseManagerException(e);
         }
+    }
+
+    private ScriptTaskData queryScriptTaskData(Session session, InternalTask task) {
+        return (ScriptTaskData) session.createQuery(
+                            "from ScriptTaskData td where td.taskData.id = :taskId").setParameter("taskId",
+                            taskId(task)).uniqueResult();
     }
 
     public ExecutableContainer loadExecutableContainer(final InternalTask task) {

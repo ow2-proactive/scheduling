@@ -39,7 +39,6 @@ package functionaltests;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.Collection;
 
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
@@ -103,7 +102,7 @@ public class TestXMLTransformer extends FunctionalTest {
     public void run() throws Throwable {
 
         File folder = new File(jobDescriptorsFolder.toURI());
-        File[] testJobDescrFiles = folder.listFiles();
+        Collection<File> testJobDescrFiles = FileUtils.listFiles(folder, new String[] { "xml" }, true);
 
         File samplesJobDescrFiles = new File(System.getProperty("pa.scheduler.home") + File.separator +
             "samples" + File.separator + "jobs_descriptors");
@@ -111,8 +110,7 @@ public class TestXMLTransformer extends FunctionalTest {
         System.out.println(samplesJobDescrFiles.getAbsolutePath());
 
         Collection<File> samples = FileUtils.listFiles(samplesJobDescrFiles, new String[] { "xml" }, true);
-
-        samples.addAll(Arrays.asList(testJobDescrFiles));
+        samples.addAll(testJobDescrFiles);
 
         System.out.println("Treating " + samples.size() + " job descriptors.");
 

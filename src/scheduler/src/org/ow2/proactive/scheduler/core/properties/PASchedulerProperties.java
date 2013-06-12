@@ -200,6 +200,9 @@ public enum PASchedulerProperties {
     /** If false user cannot execute java tasks in nodes and must use either forked java tasks of native tasks */
     ALLOW_JAVA_TASKS("pa.scheduler.task.allowjavatasks", PropertyType.BOOLEAN),
 
+    /** If true script tasks are ran in a forked JVM, if false they are ran in the node's JVM */
+    FORKED_SCRIPT_TASKS("pa.scheduler.task.scripttasks.fork", PropertyType.BOOLEAN),
+
     /* ***************************************************************** */
     /* ********************** DATASPACES PROPERTIES ******************** */
     /* ***************************************************************** */

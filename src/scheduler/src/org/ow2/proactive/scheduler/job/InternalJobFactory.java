@@ -59,10 +59,12 @@ import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.task.ForkedJavaExecutableContainer;
+import org.ow2.proactive.scheduler.task.ForkedScriptExecutableContainer;
 import org.ow2.proactive.scheduler.task.JavaExecutableContainer;
 import org.ow2.proactive.scheduler.task.NativeExecutableContainer;
 import org.ow2.proactive.scheduler.task.ScriptExecutableContainer;
 import org.ow2.proactive.scheduler.task.internal.InternalForkedJavaTask;
+import org.ow2.proactive.scheduler.task.internal.InternalForkedScriptTask;
 import org.ow2.proactive.scheduler.task.internal.InternalJavaTask;
 import org.ow2.proactive.scheduler.task.internal.InternalNativeTask;
 import org.ow2.proactive.scheduler.task.internal.InternalScriptTask;
@@ -90,7 +92,7 @@ public class InternalJobFactory {
      * @throws JobCreationException an exception if the factory cannot create the given job.
      */
     public static InternalJob createJob(Job job, Credentials cred) throws JobCreationException {
-        InternalJob iJob = null;
+        InternalJob iJob;
 
         logger.info("Create job '" + job.getName() + "' - " + job.getClass().getName());
 
@@ -154,7 +156,7 @@ public class InternalJobFactory {
         for (Task t : userJob.getTasks()) {
             tasksList.put(t, createTask(userJob, t));
 
-            if (hasPreciousResult == false) {
+            if (!hasPreciousResult) {
                 hasPreciousResult = t.isPreciousResult();
             }
         }
@@ -274,7 +276,7 @@ public class InternalJobFactory {
 
         if (task.getExecutableClassName() != null) {
             // HACK HACK HACK : Get arguments for the task
-            Map<String, byte[]> args = null;
+            Map<String, byte[]> args;
             try {
                 Field f = JavaTask.class.getDeclaredField(JavaTask.ARGS_FIELD_NAME);
                 f.setAccessible(true);
@@ -335,7 +337,12 @@ public class InternalJobFactory {
     }
 
     private static InternalTask createTask(Job userJob, ScriptTask task) throws JobCreationException {
-        InternalScriptTask scriptTask = new InternalScriptTask(new ScriptExecutableContainer(task.getScript()));
+        InternalTask scriptTask;
+        if (PASchedulerProperties.FORKED_SCRIPT_TASKS.getValueAsBoolean()) {
+            scriptTask = new InternalForkedScriptTask(new ForkedScriptExecutableContainer(task.getScript()));
+        } else {
+            scriptTask = new InternalScriptTask(new ScriptExecutableContainer(task.getScript()));
+        }
         //set task common properties
         try {
             setTaskCommonProperties(userJob, task, scriptTask);

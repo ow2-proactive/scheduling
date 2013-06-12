@@ -37,22 +37,22 @@
 package org.ow2.proactive.scheduler.task.launcher;
 
 import java.io.Serializable;
-import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
-import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
-import org.ow2.proactive.scheduler.task.ScriptExecutable;
 import org.ow2.proactive.scheduler.task.ScriptExecutableInitializer;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.apache.log4j.Logger;
 
-
+/**
+ * ScriptTaskLauncher will run a script executable.
+ *
+ * @author The ProActive Team
+ * @since ProActive Scheduling 3.4
+ */
 @ActiveObject
 public class ScriptTaskLauncher extends TaskLauncher {
 
@@ -114,7 +114,6 @@ public class ScriptTaskLauncher extends TaskLauncher {
 
                 // create the executable (will set the context class loader to the taskclassserver)
                 currentExecutable = executableContainer.getExecutable();
-
             }
 
             //launch pre script
@@ -128,21 +127,6 @@ public class ScriptTaskLauncher extends TaskLauncher {
                 //init task
                 ScriptExecutableInitializer initializer = (ScriptExecutableInitializer) executableContainer.createExecutableInitializer();
 
-                Map<String, DataSpacesFileObject> dataspaces = new HashMap<String, DataSpacesFileObject>();
-                dataspaces.put(DS_SCRATCH_BINDING_NAME, this.SCRATCH);
-                dataspaces.put(DS_INPUT_BINDING_NAME, this.INPUT);
-                dataspaces.put(DS_OUTPUT_BINDING_NAME, this.OUTPUT);
-                dataspaces.put(DS_GLOBAL_BINDING_NAME, this.GLOBAL);
-                dataspaces.put(DS_USER_BINDING_NAME, this.USER);
-                initializer.setDataspaceBindings(dataspaces);
-
-                // if an exception occurs in init method, unwrapp the InvocationTargetException
-                // the result of the execution is the user level exception
-                try {
-                    callInternalInit(ScriptExecutable.class, ScriptExecutableInitializer.class, initializer);
-                } catch (InvocationTargetException e) {
-                    throw e.getCause() != null ? e.getCause() : e;
-                }
                 sample = System.nanoTime();
                 try {
                     userResult = currentExecutable.execute(results);

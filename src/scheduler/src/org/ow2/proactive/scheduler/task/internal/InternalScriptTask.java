@@ -44,7 +44,7 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.ow2.proactive.scheduler.job.InternalJob;
-import org.ow2.proactive.scheduler.task.ScriptExecutableContainer;
+import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.launcher.ScriptTaskLauncher;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
 import org.ow2.proactive.scheduler.util.TaskLogger;
@@ -65,7 +65,7 @@ public class InternalScriptTask extends InternalTask {
      *
      * @param execContainer the Native Executable Container
      */
-    public InternalScriptTask(ScriptExecutableContainer execContainer) {
+    public InternalScriptTask(ExecutableContainer execContainer) {
         this.executableContainer = execContainer;
     }
 
