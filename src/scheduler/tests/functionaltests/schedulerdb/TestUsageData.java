@@ -1,18 +1,20 @@
 package functionaltests.schedulerdb;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import org.junit.Test;
 import org.ow2.proactive.db.DatabaseManagerException;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
+import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.usage.JobUsage;
 import org.ow2.proactive.scheduler.common.usage.TaskUsage;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
+import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -39,6 +41,10 @@ public class TestUsageData extends BaseSchedulerDBTest {
         Date beforeJobExecution = new Date();
 
         InternalJob job = defaultSubmitJob(createJob("job", "task1", "task2", "task3"), USER_WITH_JOBS);
+
+        // not started and killed job, should not appear in usage data
+        InternalJob jobToBeKilled = defaultSubmitJob(createJob("job2", "task1"), USER_WITH_JOBS);
+        killJob(jobToBeKilled);
 
         job.start();
         for (InternalTask task : job.getITasks()) {
@@ -86,6 +92,11 @@ public class TestUsageData extends BaseSchedulerDBTest {
             job.addTask(task);
         }
         return job;
+    }
+
+    private void killJob(InternalJob job) {
+        job.setFinishedTime(System.currentTimeMillis());
+        dbManager.updateAfterJobKilled(job, Collections.<TaskId>emptySet());
     }
 
     protected InternalTask startTask(InternalJob job, InternalTask task) throws Exception {

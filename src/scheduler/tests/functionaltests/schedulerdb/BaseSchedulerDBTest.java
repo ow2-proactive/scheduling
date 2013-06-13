@@ -1,10 +1,5 @@
 package functionaltests.schedulerdb;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.is;
-
 import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -14,15 +9,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import junit.framework.Assert;
-
-import org.hamcrest.Description;
-import org.hamcrest.TypeSafeMatcher;
-import org.hibernate.cfg.Configuration;
-import org.junit.After;
-import org.junit.Assume;
-import org.junit.Before;
-import org.junit.Ignore;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.SchedulerState;
@@ -44,6 +30,19 @@ import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.InternalJobFactory;
 import org.ow2.proactive.scheduler.task.internal.ExecuterInformations;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
+import junit.framework.Assert;
+import org.hamcrest.Description;
+import org.hamcrest.TypeSafeMatcher;
+import org.hibernate.cfg.Configuration;
+import org.junit.After;
+import org.junit.Assume;
+import org.junit.Before;
+import org.junit.Ignore;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.is;
 
 
 @Ignore
@@ -381,7 +380,6 @@ public class BaseSchedulerDBTest {
 
     public InternalJob defaultSubmitJob(TaskFlowJob job, String userName, long submittedTime)
             throws Exception {
-        System.out.println("Submit new job");
         if (job.getTasks().isEmpty()) {
             job.addTask(createDefaultTask("default test task"));
         }

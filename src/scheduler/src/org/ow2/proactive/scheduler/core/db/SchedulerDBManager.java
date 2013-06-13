@@ -286,6 +286,8 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
                 criteria.setFetchMode("tasks", FetchMode.JOIN);
                 criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
                 criteria.add(Restrictions.eq("owner", userName));
+                // exclude killed but not started jobs
+                criteria.add(Restrictions.gt("startTime", -1L));
                 criteria.add(Restrictions.and(Restrictions.ge("finishedTime", startDate.getTime()),
                         Restrictions.le("finishedTime", endDate.getTime())));
 
