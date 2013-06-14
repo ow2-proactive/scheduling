@@ -677,6 +677,10 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
                         "delete from ScriptData where id in (select preScript from TaskData where id.jobId = :jobId)"
                             + "or id in (select postScript from TaskData where id.jobId = :jobId) or id in (select cleanScript from TaskData where id.jobId = :jobId) or id in (select flowScript from TaskData where id.jobId = :jobId)")
                 .setParameter("jobId", jobId).executeUpdate();
+        session
+                .createQuery(
+                        "delete from ScriptData where id in (select td.script from ScriptTaskData td where td.taskData.id.jobId = :jobId)")
+                .setParameter("jobId", jobId).executeUpdate();
     }
 
     private void removeJobRuntimeData(Session session, long jobId) {
@@ -689,6 +693,8 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
         session.createQuery("delete from ForkedJavaTaskData where taskData.id.jobId = :jobId").setParameter(
                 "jobId", jobId).executeUpdate();
         session.createQuery("delete from NativeTaskData where taskData.id.jobId = :jobId").setParameter(
+                "jobId", jobId).executeUpdate();
+        session.createQuery("delete from ScriptTaskData where taskData.id.jobId = :jobId").setParameter(
                 "jobId", jobId).executeUpdate();
 
         session.createQuery("delete from SelectorData where taskData.id.jobId = :jobId").setParameter(
