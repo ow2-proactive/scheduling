@@ -34,6 +34,14 @@
  */
 package org.ow2.proactive_grid_cloud_portal.webapp;
 
+import java.net.InetSocketAddress;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
@@ -44,19 +52,10 @@ import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
 import org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerSession;
 import org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerSessionMapper;
-
-import java.net.InetSocketAddress;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.netiq.websockify.IProxyTargetResolver;
 import org.apache.log4j.Logger;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.handler.codec.http.HttpRequest;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
@@ -105,7 +104,7 @@ public class NoVncSecuredTargetResolver implements IProxyTargetResolver {
 
         try {
             TaskResult taskResult = scheduler.getTaskResult(jobId, taskName);
-            List<String> paRemoteConnectionLines = retrievePaRemoteConnectionLines(session, taskResult);
+            List<String> paRemoteConnectionLines = retrievePaRemoteConnectionLines(session, jobId, taskResult);
 
             String taskIdFromTaskName = retrieveTaskId(taskName, scheduler.getJobState(jobId));
             return resolveVncTargetFromLogs(paRemoteConnectionLines, taskIdFromTaskName);
@@ -161,9 +160,10 @@ public class NoVncSecuredTargetResolver implements IProxyTargetResolver {
         return null;
     }
 
-    private List<String> retrievePaRemoteConnectionLines(SchedulerSession session, TaskResult taskResult) {
+    private List<String> retrievePaRemoteConnectionLines(SchedulerSession session, String jobId,
+            TaskResult taskResult) {
         List<String> paRemoteConnectionLines = Collections.emptyList();
-        String liveLogs = getJobLiveLogs(session);
+        String liveLogs = getJobLiveLogs(session, jobId);
         if (liveLogs != null) {
             paRemoteConnectionLines = retrievePaRemoteConnectionLines(liveLogs);
         }
@@ -176,9 +176,9 @@ public class NoVncSecuredTargetResolver implements IProxyTargetResolver {
         return paRemoteConnectionLines;
     }
 
-    private String getJobLiveLogs(SchedulerSession session) {
+    private String getJobLiveLogs(SchedulerSession session, String jobId) {
         try {
-            return session.getJobOutputAppender().getJobOutput().fetchAllLogs();
+            return session.getJobOutputAppender(jobId).getJobOutput().fetchAllLogs();
         } catch (Exception e) {
             LOGGER.warn("Could not retrieve live logs", e);
             return null;

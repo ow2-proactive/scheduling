@@ -36,39 +36,21 @@
  */
 package org.ow2.proactive_grid_cloud_portal.scheduler;
 
-import org.apache.log4j.AppenderSkeleton;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.log4j.spi.LoggingEvent;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
 import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
+import org.apache.log4j.AppenderSkeleton;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.apache.log4j.spi.LoggingEvent;
 
-
-/**
- * A job output appender
- *
- * @author The ProActive Team
- * @since ProActive Scheduling 0.9
- */
 public class JobOutputAppender extends AppenderSkeleton {
 
     private JobOutput jobOutput = null;
     private String jobId;
 
-    // -------------------------------------------------------------------- //
-    // --------------------------- constructor ---------------------------- //
-    // -------------------------------------------------------------------- //
-    /**
-     * The default constructor
-     *
-     * @param jobOutput the job output
-     * @throws PermissionException 
-     * @throws UnknownJobException 
-     * @throws NotConnectedException 
-     */
     public JobOutputAppender(SchedulerSession ss, String jobId, AppenderProvider ap, JobOutput jobOutput)
             throws NotConnectedException, UnknownJobException, PermissionException {
         this.name = "Appender for job output";
@@ -80,19 +62,10 @@ public class JobOutputAppender extends AppenderSkeleton {
         log.setAdditivity(false);
         log.setLevel(Level.ALL);
         log.addAppender(this);
-        ss.setJobOutputAppender(this);
+        ss.addJobOutputAppender(jobId, this);
         ss.getScheduler().listenJobLogs(jobId, ap);
-
     }
 
-    // -------------------------------------------------------------------- //
-    // ------------------------------ public ------------------------------ //
-    // -------------------------------------------------------------------- //
-    /**
-     * To obtains the job output
-     *
-     * @return the job output
-     */
     public JobOutput getJobOutput() {
         return jobOutput;
     }
@@ -103,12 +76,6 @@ public class JobOutputAppender extends AppenderSkeleton {
         log.removeAppender(this);
     }
 
-    // -------------------------------------------------------------------- //
-    // -------------------- extends AppenderSkeleton ---------------------- //
-    // -------------------------------------------------------------------- //
-    /**
-     * @see org.apache.log4j.AppenderSkeleton#append(org.apache.log4j.spi.LoggingEvent)
-     */
     @Override
     protected void append(LoggingEvent event) {
         if (!super.closed) {
@@ -116,24 +83,15 @@ public class JobOutputAppender extends AppenderSkeleton {
         }
     }
 
-    /**
-     * @see org.apache.log4j.AppenderSkeleton#close()
-     */
     @Override
     public void close() {
         super.closed = true;
         jobOutput = null;
     }
 
-    /**
-     * @see org.apache.log4j.AppenderSkeleton#requiresLayout()
-     */
     @Override
     public boolean requiresLayout() {
         return false;
     }
 
-    public String getJobId() {
-        return jobId;
-    }
 }

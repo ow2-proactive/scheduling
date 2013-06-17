@@ -114,11 +114,7 @@ public class RestRuntime {
         dispatcher.addStringConverter(IntWrapperConverter.class);
         dispatcher.registerProvider(JacksonProvider.class);
 
-        try {
-            PortalConfiguration.load(configurationFile);
-        } catch (Exception e) {
-            throw new IllegalStateException("Invalid configuration file", e);
-        }
+        loadProperties(configurationFile);
 
         // configure the loggers
         if (log4jConfig != null) {
@@ -161,6 +157,24 @@ public class RestRuntime {
         Thread rm = new Thread(this.rmSessionCleaner, "RM Sessions Cleaner Thread");
         rm.setDaemon(true);
         rm.start();
+    }
+
+    private void loadProperties(File configurationFile) {
+        FileInputStream propertyFile = null;
+        try {
+            propertyFile = new FileInputStream(configurationFile);
+            PortalConfiguration.load(propertyFile);
+        } catch (Exception e) {
+            throw new IllegalStateException("Invalid configuration file", e);
+        } finally {
+            if (propertyFile != null) {
+                try {
+                    propertyFile.close();
+                } catch (IOException e) {
+                    LOGGER.error("Failed to close portal configuration file", e);
+                }
+            }
+        }
     }
 
     private void addExceptionMappers(ResteasyProviderFactory dispatcher) {

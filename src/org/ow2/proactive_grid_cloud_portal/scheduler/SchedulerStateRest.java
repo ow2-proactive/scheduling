@@ -421,16 +421,11 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             SchedulerSession ss = SchedulerSessionMapper.getInstance().getSchedulerSession(sessionId);
 
             JobOutput jo;
-
-            if (ss.getJobOutputAppender() == null) {
+            JobOutputAppender jobOutputAppender = ss.getJobOutputAppender(jobId);
+            if (jobOutputAppender == null) {
                 jo = JobsOutputController.getInstance().createJobOutput(ss, jobId).getJobOutput();
             } else {
-                if (!jobId.equalsIgnoreCase(ss.getJobOutputAppender().getJobId())) {
-                    ss.getJobOutputAppender().terminate();
-                    ss.setJobOutputAppender(null);
-                    JobsOutputController.getInstance().createJobOutput(ss, jobId);
-                }
-                jo = ss.getJobOutputAppender().getJobOutput();
+                jo = jobOutputAppender.getJobOutput();
             }
 
             if (jo != null) {
@@ -468,14 +463,12 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         checkAccess(sessionId, "/scheduler/jobs/" + jobId + "/livelog/available");
         SchedulerSession ss = SchedulerSessionMapper.getInstance().getSchedulerSession(sessionId);
 
-        JobOutputAppender joa = ss.getJobOutputAppender();
-
+        JobOutputAppender joa = ss.getJobOutputAppender(jobId);
         if (joa != null) {
             return joa.getJobOutput().size();
         }
 
         return -1;
-
     }
 
     /**
@@ -496,11 +489,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     String jobId) throws NotConnectedRestException {
         checkAccess(sessionId, "delete /scheduler/jobs/livelog" + jobId);
         SchedulerSession ss = SchedulerSessionMapper.getInstance().getSchedulerSession(sessionId);
-
-        if (ss.getJobOutputAppender() != null) {
-            ss.getJobOutputAppender().terminate();
-            ss.setJobOutputAppender(null);
-        }
+        ss.removeJobOutAppender(jobId);
         return true;
 
     }
@@ -1448,64 +1437,59 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     String spaceName, @PathParam("filePath")
     String filePath, MultipartFormDataInput multipart) throws IOException, NotConnectedRestException,
             PermissionRestException {
-        try {
-            Scheduler s = checkAccess(sessionId, "pushFile");
+        Scheduler s = checkAccess(sessionId, "pushFile");
 
-            Map<String, List<InputPart>> formDataMap = multipart.getFormDataMap();
+        Map<String, List<InputPart>> formDataMap = multipart.getFormDataMap();
 
-            String fileName = formDataMap.get("fileName").get(0).getBody(String.class, null);
+        String fileName = formDataMap.get("fileName").get(0).getBody(String.class, null);
 
-            InputStream fileContent = formDataMap.get("fileContent").get(0).getBody(InputStream.class, null);
+        InputStream fileContent = formDataMap.get("fileContent").get(0).getBody(InputStream.class, null);
 
-            if (fileName == null) {
-                throw new IllegalArgumentException("Wrong file name : " + fileName);
+        if (fileName == null) {
+            throw new IllegalArgumentException("Wrong file name : " + fileName);
+        }
+
+        String spaceURI = resolveSpaceUri(s, spaceName);
+
+        String destUri = spaceURI + "/" + (filePath != null ? filePath : "");
+        if (!destUri.endsWith("/")) {
+            destUri += "/";
+        }
+        destUri += fileName;
+        FileObject destfo = fsManager.resolveFile(destUri);
+        if (!destfo.isWriteable()) {
+            RuntimeException ex = new IllegalArgumentException("File " + filePath +
+                " is not writable in space " + spaceName);
+            logger.error(ex);
+            throw ex;
+        }
+        if (destfo.exists()) {
+            destfo.delete();
+        }
+        // used to create the necessary directories if needed
+        destfo.createFile();
+        URL targetUrl = destfo.getURL();
+
+        if (targetUrl.toString().startsWith("file:")) {
+            // if the url is a file:// url, we push directly the InputStream to the destination file
+            File targetFile = null;
+            try {
+                targetFile = new File(targetUrl.toURI());
+            } catch (URISyntaxException e) {
+                throw new IllegalStateException(e);
             }
-
-            String spaceURI = resolveSpaceUri(s, spaceName);
-
-            String destUri = spaceURI + "/" + (filePath != null ? filePath : "");
-            if (!destUri.endsWith("/")) {
-                destUri += "/";
+            logger.info("[pushFile] pushing input file to " + targetFile);
+            FileUtils.copyInputStreamToFile(fileContent, targetFile);
+        } else {
+            // in the other case, we need to push the inputStream to a tempFile and then transfer the file via dataspaces
+            File tmpFile = File.createTempFile("pushedFile", ".tmp");
+            try {
+                FileUtils.copyInputStreamToFile(fileContent, tmpFile);
+                FileObject sourcefo = fsManager.resolveFile(tmpFile.getCanonicalPath());
+                destfo.copyFrom(sourcefo, Selectors.SELECT_SELF);
+            } finally {
+                tmpFile.delete();
             }
-            destUri += fileName;
-            FileObject destfo = fsManager.resolveFile(destUri);
-            if (!destfo.isWriteable()) {
-                RuntimeException ex = new IllegalArgumentException("File " + filePath +
-                    " is not writable in space " + spaceName);
-                logger.error(ex);
-                throw ex;
-            }
-            if (destfo.exists()) {
-                destfo.delete();
-            }
-            // used to create the necessary directories if needed
-            destfo.createFile();
-            URL targetUrl = destfo.getURL();
-
-            if (targetUrl.toString().startsWith("file:")) {
-                // if the url is a file:// url, we push directly the InputStream to the destination file
-                File targetFile = null;
-                try {
-                    targetFile = new File(targetUrl.toURI());
-                } catch (URISyntaxException e) {
-                    throw new IllegalStateException(e);
-                }
-                logger.info("[pushFile] pushing input file to " + targetFile);
-                FileUtils.copyInputStreamToFile(fileContent, targetFile);
-            } else {
-                // in the other case, we need to push the inputStream to a tempFile and then transfer the file via dataspaces
-                File tmpFile = File.createTempFile("pushedFile", ".tmp");
-                try {
-                    FileUtils.copyInputStreamToFile(fileContent, tmpFile);
-                    FileObject sourcefo = fsManager.resolveFile(tmpFile.getCanonicalPath());
-                    destfo.copyFrom(sourcefo, Selectors.SELECT_SELF);
-                } finally {
-                    tmpFile.delete();
-                }
-            }
-        } catch (IOException e) {
-            logger.error("An error occurred during push", e);
-            throw e;
         }
 
         return true;
@@ -1519,44 +1503,40 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     String filePath) throws IOException, NotConnectedRestException, PermissionRestException {
 
         Scheduler s = checkAccess(sessionId, "pullFile");
-        try {
-            String spaceURI = resolveSpaceUri(s, spaceName);
-            if (filePath == null) {
-                RuntimeException ex = new IllegalArgumentException("Wrong file path : " + filePath);
-                logger.error(ex);
-                throw ex;
-            }
-            FileObject sourcefo = fsManager.resolveFile(spaceURI + "/" + filePath);
-            if (!sourcefo.exists() || !sourcefo.isReadable()) {
-                RuntimeException ex = new IllegalArgumentException("File " + filePath +
-                    " does not exist or is not readable in space " + spaceName);
-                logger.error(ex);
-                throw ex;
-            }
 
-            if (sourcefo.getType().equals(FileType.FOLDER)) {
-                logger.info("[pullFile] reading directory content from " + sourcefo.getURL());
-                // if it's a folder we return an InputStream listing its content
-                StringBuilder sb = new StringBuilder();
-                String nl = System.getProperty("line.separator");
-                for (FileObject fo : sourcefo.getChildren()) {
-                    sb.append(fo.getName().getBaseName() + nl);
+        String spaceURI = resolveSpaceUri(s, spaceName);
+        if (filePath == null) {
+            RuntimeException ex = new IllegalArgumentException("Wrong file path : " + filePath);
+            logger.error(ex);
+            throw ex;
+        }
+        FileObject sourcefo = fsManager.resolveFile(spaceURI + "/" + filePath);
+        if (!sourcefo.exists() || !sourcefo.isReadable()) {
+            RuntimeException ex = new IllegalArgumentException("File " + filePath +
+                " does not exist or is not readable in space " + spaceName);
+            logger.error(ex);
+            throw ex;
+        }
 
-                }
-                return IOUtils.toInputStream(sb.toString());
+        if (sourcefo.getType().equals(FileType.FOLDER)) {
+            logger.info("[pullFile] reading directory content from " + sourcefo.getURL());
+            // if it's a folder we return an InputStream listing its content
+            StringBuilder sb = new StringBuilder();
+            String nl = System.getProperty("line.separator");
+            for (FileObject fo : sourcefo.getChildren()) {
+                sb.append(fo.getName().getBaseName() + nl);
 
-            } else if (sourcefo.getType().equals(FileType.FILE)) {
-                logger.info("[pullFile] reading file content from " + sourcefo.getURL());
-                return sourcefo.getContent().getInputStream();
-            } else {
-                RuntimeException ex = new IllegalArgumentException("File " + filePath +
-                    " has an unsupported type " + sourcefo.getType());
-                logger.error(ex);
-                throw ex;
             }
-        } catch (IOException e) {
-            logger.error("An error occurred during pull", e);
-            throw e;
+            return IOUtils.toInputStream(sb.toString());
+
+        } else if (sourcefo.getType().equals(FileType.FILE)) {
+            logger.info("[pullFile] reading file content from " + sourcefo.getURL());
+            return sourcefo.getContent().getInputStream();
+        } else {
+            RuntimeException ex = new IllegalArgumentException("File " + filePath +
+                " has an unsupported type " + sourcefo.getType());
+            logger.error(ex);
+            throw ex;
         }
 
     }
@@ -1567,36 +1547,32 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     String spaceName, @PathParam("filePath")
     String filePath) throws IOException, NotConnectedRestException, PermissionRestException {
         Scheduler s = checkAccess(sessionId, "pullFile");
-        try {
-            String spaceURI = resolveSpaceUri(s, spaceName);
-            if (filePath == null) {
-                RuntimeException ex = new IllegalArgumentException("Wrong file path : " + filePath);
-                logger.error(ex);
-                throw ex;
-            }
 
-            FileObject sourcefo = fsManager.resolveFile(spaceURI + "/" + filePath);
-            if (!sourcefo.exists() || !sourcefo.isWriteable()) {
-                RuntimeException ex = new IllegalArgumentException("File or Folder " + filePath +
-                    " does not exist or is not writable in space " + spaceName);
-                logger.error(ex);
-                throw ex;
-            }
-            if (sourcefo.getType().equals(FileType.FILE)) {
-                logger.info("[deleteFile] deleting file " + sourcefo.getURL());
-                sourcefo.delete();
-            } else if (sourcefo.getType().equals(FileType.FOLDER)) {
-                logger.info("[deleteFile] deleting folder (and all its descendants) " + sourcefo.getURL());
-                sourcefo.delete(Selectors.SELECT_ALL);
-            } else {
-                RuntimeException ex = new IllegalArgumentException("File " + filePath +
-                    " has an unsupported type " + sourcefo.getType());
-                logger.error(ex);
-                throw ex;
-            }
-        } catch (IOException e) {
-            logger.error("An error occurred during delete", e);
-            throw e;
+        String spaceURI = resolveSpaceUri(s, spaceName);
+        if (filePath == null) {
+            RuntimeException ex = new IllegalArgumentException("Wrong file path : " + filePath);
+            logger.error(ex);
+            throw ex;
+        }
+
+        FileObject sourcefo = fsManager.resolveFile(spaceURI + "/" + filePath);
+        if (!sourcefo.exists() || !sourcefo.isWriteable()) {
+            RuntimeException ex = new IllegalArgumentException("File or Folder " + filePath +
+                " does not exist or is not writable in space " + spaceName);
+            logger.error(ex);
+            throw ex;
+        }
+        if (sourcefo.getType().equals(FileType.FILE)) {
+            logger.info("[deleteFile] deleting file " + sourcefo.getURL());
+            sourcefo.delete();
+        } else if (sourcefo.getType().equals(FileType.FOLDER)) {
+            logger.info("[deleteFile] deleting folder (and all its descendants) " + sourcefo.getURL());
+            sourcefo.delete(Selectors.SELECT_ALL);
+        } else {
+            RuntimeException ex = new IllegalArgumentException("File " + filePath +
+                " has an unsupported type " + sourcefo.getType());
+            logger.error(ex);
+            throw ex;
         }
         return true;
     }
@@ -2190,7 +2166,6 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             throw new NotConnectedRestException(e);
         }
     }
-
     @GET
     @Path("usage/account")
     @Produces("application/json")

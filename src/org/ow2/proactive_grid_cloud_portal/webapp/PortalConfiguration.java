@@ -37,9 +37,8 @@
 package org.ow2.proactive_grid_cloud_portal.webapp;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 
 
@@ -65,14 +64,9 @@ public class PortalConfiguration {
 
     private static Properties properties;
 
-    public static void load(File f) throws FileNotFoundException, IOException {
+    public static void load(InputStream f) throws IOException {
         properties = new Properties();
-        FileInputStream in = new FileInputStream(f);
-        try {
-            properties.load(in);
-        } finally {
-            in.close();
-        }
+        properties.load(f);
     }
 
     public static Properties getProperties() {

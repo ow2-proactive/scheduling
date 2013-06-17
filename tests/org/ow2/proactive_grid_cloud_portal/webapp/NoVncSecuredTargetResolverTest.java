@@ -34,6 +34,9 @@
  */
 package org.ow2.proactive_grid_cloud_portal.webapp;
 
+import java.net.InetSocketAddress;
+import java.util.Collections;
+
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
@@ -48,10 +51,6 @@ import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive_grid_cloud_portal.scheduler.JobOutput;
 import org.ow2.proactive_grid_cloud_portal.scheduler.JobOutputAppender;
 import org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerSessionMapper;
-
-import java.net.InetSocketAddress;
-import java.util.Collections;
-
 import org.junit.Before;
 import org.junit.Test;
 
@@ -119,7 +118,7 @@ public class NoVncSecuredTargetResolverTest {
     @Test
     public void testMagicStringFoundInLiveLogs_TaskNotFinished() throws Exception {
         String sessionId = SchedulerSessionMapper.getInstance().add(schedulerMock, "bob");
-        SchedulerSessionMapper.getInstance().getSchedulerSession(sessionId).setJobOutputAppender(
+        SchedulerSessionMapper.getInstance().getSchedulerSession(sessionId).addJobOutputAppender("42",
                 createLiveLogs("PA_REMOTE_CONNECTION;1;vnc;node.grid.com:5900"));
         when(schedulerMock.getTaskResult("42", "remoteVisuTask")).thenReturn(null);
 
@@ -136,7 +135,7 @@ public class NoVncSecuredTargetResolverTest {
         SchedulerSessionMapper
                 .getInstance()
                 .getSchedulerSession(sessionId)
-                .setJobOutputAppender(
+                .addJobOutputAppender("42",
                         createLiveLogs("[Visualization_task@node2;10:38:06]PA_REMOTE_CONNECTION;1;vnc;node.grid.com:5900"));
         when(schedulerMock.getTaskResult("42", "remoteVisuTask")).thenReturn(
                 new TaskResultImpl(TaskIdImpl.createTaskId(new JobIdImpl(42, "job"), "remoteVisuTask", 1,
@@ -153,7 +152,7 @@ public class NoVncSecuredTargetResolverTest {
     @Test
     public void testMagicStringFoundInLiveLogs_MagicStringOnSeveralLines() throws Exception {
         String sessionId = SchedulerSessionMapper.getInstance().add(schedulerMock, "bob");
-        SchedulerSessionMapper.getInstance().getSchedulerSession(sessionId).setJobOutputAppender(
+        SchedulerSessionMapper.getInstance().getSchedulerSession(sessionId).addJobOutputAppender("42",
                 createLiveLogs("PA_REMOTE_CONNECTION\nPA_REMOTE_CONNECTION;1;vnc;node.grid.com:5900 "));
         when(schedulerMock.getTaskResult("42", "remoteVisuTask")).thenReturn(
                 new TaskResultImpl(TaskIdImpl.createTaskId(new JobIdImpl(42, "job"), "remoteVisuTask", 1,

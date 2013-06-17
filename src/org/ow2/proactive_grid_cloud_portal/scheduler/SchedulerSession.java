@@ -36,6 +36,9 @@
  */
 package org.ow2.proactive_grid_cloud_portal.scheduler;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
 
 
@@ -44,7 +47,7 @@ public class SchedulerSession {
     protected String sessionId;
     protected SchedulerProxyUserInterface scheduler;
     protected String userName;
-    protected JobOutputAppender jobOutputAppender;
+    protected Map<String, JobOutputAppender> jobOutputAppenders = new HashMap<String, JobOutputAppender>();
 
     public SchedulerProxyUserInterface getScheduler() {
         return scheduler;
@@ -62,26 +65,29 @@ public class SchedulerSession {
         this.userName = userName;
     }
 
-    public JobOutputAppender getJobOutputAppender() {
-        return jobOutputAppender;
+    public JobOutputAppender getJobOutputAppender(String jobId) {
+        return jobOutputAppenders.get(jobId);
     }
 
     @Override
     protected void finalize() throws Throwable {
         super.finalize();
-        this.jobOutputAppender.terminate();
-    }
-
-    public String getSessionId() {
-        return sessionId;
+        for (JobOutputAppender jobOutputAppender : jobOutputAppenders.values()) {
+            jobOutputAppender.terminate();
+        }
     }
 
     public void setSessionId(String sessionId) {
         this.sessionId = sessionId;
     }
 
-    public void setJobOutputAppender(JobOutputAppender joa) {
-        this.jobOutputAppender = joa;
+    public void addJobOutputAppender(String jobId, JobOutputAppender joa) {
+        jobOutputAppenders.put(jobId, joa);
     }
 
+    public void removeJobOutAppender(String jobId) {
+        if (jobOutputAppenders.containsKey(jobId)) {
+            jobOutputAppenders.remove(jobId).terminate();
+        }
+    }
 }
