@@ -12,6 +12,7 @@ import org.ow2.proactive.scheduler.policy.ExtendedSchedulerPolicy;
 
 import functionaltests.SchedulerConsecutive;
 
+
 public abstract class CronCheckBase extends SchedulerConsecutive {
 
     protected static final long job_timeout = TimeUnit.MINUTES.toMillis(5);
@@ -21,8 +22,7 @@ public abstract class CronCheckBase extends SchedulerConsecutive {
 
     @Before
     public void setUp() throws Exception {
-        getSchedulerInterface().changePolicy(
-                ExtendedSchedulerPolicy.class.getName());
+        getSchedulerInterface().changePolicy(ExtendedSchedulerPolicy.class.getName());
     }
 
     @After
@@ -34,8 +34,7 @@ public abstract class CronCheckBase extends SchedulerConsecutive {
                     getSchedulerInterface().killJob(jobId);
                 }
             } catch (Exception e) {
-                System.out.println("An error occurred while killing the job: "
-                        + jobId);
+                System.out.println("An error occurred while killing the job: " + jobId);
                 e.printStackTrace();
             }
         }

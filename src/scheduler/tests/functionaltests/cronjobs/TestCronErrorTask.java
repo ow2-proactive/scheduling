@@ -17,6 +17,7 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 
+
 /**
  * Checks whether the cron task is executed iteratively irrespective of its
  * previous execution state.
@@ -28,8 +29,7 @@ public class TestCronErrorTask extends CronCheckBase {
     public void testCronErrorTask() throws Exception {
         Job errorJob = createJob();
         jobId = submitJob(errorJob);
-        TaskInfo taskInfo = waitForEventTaskFinished(jobId,
-                "CronErrorTask", task_timeout);
+        TaskInfo taskInfo = waitForEventTaskFinished(jobId, "CronErrorTask", task_timeout);
         assertEquals(FAULTY, taskInfo.getStatus());
         waitForEventJobFinished(jobId, job_timeout);
     }
@@ -38,8 +38,7 @@ public class TestCronErrorTask extends CronCheckBase {
         TaskFlowJob job = new TaskFlowJob();
         JavaTask task = new JavaTask();
         task.setName("CronErrorTask");
-        task.setFlowScript(FlowScript.createLoopFlowScript(
-                "loop = '* * * * * '", "CronErrorTask"));
+        task.setFlowScript(FlowScript.createLoopFlowScript("loop = '* * * * * '", "CronErrorTask"));
         task.setExecutableClassName(ErrorExecutable.class.getName());
         job.addTask(task);
         return job;

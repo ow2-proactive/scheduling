@@ -64,6 +64,7 @@ import org.ow2.proactive.scheduler.policy.ExtendedSchedulerPolicy;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.util.policy.ISO8601DateUtil;
 
+
 /**
  * Unit tests for ExtendedSchedulerPolicy class.
  */
@@ -84,67 +85,53 @@ public class TestExtendedSchedulerPolicy {
 
     @Test
     public void testWithoutStartAt() throws Exception {
-        List<JobDescriptor> jobDescList = asList(createJobDescWithTwoTasks(
-                null, null, null));
-        Vector<EligibleTaskDescriptor> orderedTasks = policy
-                .getOrderedTasks(jobDescList);
+        List<JobDescriptor> jobDescList = asList(createJobDescWithTwoTasks(null, null, null));
+        Vector<EligibleTaskDescriptor> orderedTasks = policy.getOrderedTasks(jobDescList);
         assertTrue(orderedTasks != null && orderedTasks.size() == 2);
     }
 
     @Test
     public void testJobStartAtNow() throws Exception {
-        List<JobDescriptor> jobDescList = asList(createJobDescWithTwoTasks(now,
-                null, null));
-        Vector<EligibleTaskDescriptor> orderedTasks = policy
-                .getOrderedTasks(jobDescList);
+        List<JobDescriptor> jobDescList = asList(createJobDescWithTwoTasks(now, null, null));
+        Vector<EligibleTaskDescriptor> orderedTasks = policy.getOrderedTasks(jobDescList);
         assertTrue(orderedTasks != null && orderedTasks.size() == 2);
     }
 
     @Test
     public void testJobStartAtLater() throws Exception {
-        List<JobDescriptor> jobDescList = asList(createJobDescWithTwoTasks(
-                later, null, null));
-        Vector<EligibleTaskDescriptor> orderedTasks = policy
-                .getOrderedTasks(jobDescList);
+        List<JobDescriptor> jobDescList = asList(createJobDescWithTwoTasks(later, null, null));
+        Vector<EligibleTaskDescriptor> orderedTasks = policy.getOrderedTasks(jobDescList);
         assertTrue(orderedTasks != null && orderedTasks.size() == 0);
     }
 
     @Test
     public void testTaskStartAtNow() {
-        List<JobDescriptor> jobDescList = asList(createJobDescWithTwoTasks(
-                null, now, null));
-        Vector<EligibleTaskDescriptor> orderedTasks = policy
-                .getOrderedTasks(jobDescList);
+        List<JobDescriptor> jobDescList = asList(createJobDescWithTwoTasks(null, now, null));
+        Vector<EligibleTaskDescriptor> orderedTasks = policy.getOrderedTasks(jobDescList);
         assertTrue(orderedTasks != null && orderedTasks.size() == 2);
 
     }
 
     @Test
     public void testTaskStartLater() {
-        List<JobDescriptor> jobDescList = asList(createJobDescWithTwoTasks(
-                null, later, null));
-        Vector<EligibleTaskDescriptor> orderedTasks = policy
-                .getOrderedTasks(jobDescList);
+        List<JobDescriptor> jobDescList = asList(createJobDescWithTwoTasks(null, later, null));
+        Vector<EligibleTaskDescriptor> orderedTasks = policy.getOrderedTasks(jobDescList);
         assertTrue(orderedTasks != null && orderedTasks.size() == 1);
         assertNull(startAtValue(first(orderedTasks)));
     }
 
     @Test
     public void testOneTaskStartNowOtherLater() {
-        List<JobDescriptor> jobDescList = asList(createJobDescWithTwoTasks(
-                null, now, later));
-        Vector<EligibleTaskDescriptor> orderedTasks = policy
-                .getOrderedTasks(jobDescList);
+        List<JobDescriptor> jobDescList = asList(createJobDescWithTwoTasks(null, now, later));
+        Vector<EligibleTaskDescriptor> orderedTasks = policy.getOrderedTasks(jobDescList);
         assertTrue(orderedTasks.size() == 1);
         assertEquals(now, startAtValue(first(orderedTasks)));
     }
 
     @Test
     public void testJobStartNowOneTaskStartLater() {
-        List<JobDescriptor> jobDescList = asList(createJobDescWithTwoTasks(now,
-                later, null));
-        Vector<EligibleTaskDescriptor> orderedTasks = policy
-                .getOrderedTasks(jobDescList);
+        List<JobDescriptor> jobDescList = asList(createJobDescWithTwoTasks(now, later, null));
+        Vector<EligibleTaskDescriptor> orderedTasks = policy.getOrderedTasks(jobDescList);
         assertTrue(orderedTasks.size() == 1);
         String startAtValue = startAtValue(first(orderedTasks));
         assertNull(startAtValue);
@@ -152,10 +139,8 @@ public class TestExtendedSchedulerPolicy {
 
     @Test
     public void testJobStartNowOneTaskStartLater2() {
-        List<JobDescriptor> jobDescList = asList(createJobDescWithTwoTasks(now,
-                later, now));
-        Vector<EligibleTaskDescriptor> orderedTasks = policy
-                .getOrderedTasks(jobDescList);
+        List<JobDescriptor> jobDescList = asList(createJobDescWithTwoTasks(now, later, now));
+        Vector<EligibleTaskDescriptor> orderedTasks = policy.getOrderedTasks(jobDescList);
         assertTrue(orderedTasks.size() == 1);
         String startAtValue = startAtValue(first(orderedTasks));
         assertEquals(now, startAtValue);
@@ -163,10 +148,8 @@ public class TestExtendedSchedulerPolicy {
 
     @Test
     public void testJobStartLaterOneTaskStartNow() {
-        List<JobDescriptor> jobDescList = asList(createJobDescWithTwoTasks(
-                later, now, null));
-        Vector<EligibleTaskDescriptor> orderedTasks = policy
-                .getOrderedTasks(jobDescList);
+        List<JobDescriptor> jobDescList = asList(createJobDescWithTwoTasks(later, now, null));
+        Vector<EligibleTaskDescriptor> orderedTasks = policy.getOrderedTasks(jobDescList);
         assertTrue(orderedTasks.size() == 1);
         String startAtValue = startAtValue(first(orderedTasks));
         assertEquals(now, startAtValue);
@@ -174,10 +157,8 @@ public class TestExtendedSchedulerPolicy {
 
     @Test
     public void testJobStartLaterOneTaskStartNow2() {
-        List<JobDescriptor> jobDescList = asList(createJobDescWithTwoTasks(
-                later, now, later));
-        Vector<EligibleTaskDescriptor> orderedTasks = policy
-                .getOrderedTasks(jobDescList);
+        List<JobDescriptor> jobDescList = asList(createJobDescWithTwoTasks(later, now, later));
+        Vector<EligibleTaskDescriptor> orderedTasks = policy.getOrderedTasks(jobDescList);
         assertTrue(orderedTasks.size() == 1);
         String startAtValue = startAtValue(first(orderedTasks));
         assertEquals(now, startAtValue);
@@ -185,10 +166,8 @@ public class TestExtendedSchedulerPolicy {
 
     @Test
     public void testMalformedTaskStartAt() {
-        List<JobDescriptor> jobDescList = asList(createJobDescWithTwoTasks(
-                later, now, "malformed-start-at"));
-        Vector<EligibleTaskDescriptor> orderedTasks = policy
-                .getOrderedTasks(jobDescList);
+        List<JobDescriptor> jobDescList = asList(createJobDescWithTwoTasks(later, now, "malformed-start-at"));
+        Vector<EligibleTaskDescriptor> orderedTasks = policy.getOrderedTasks(jobDescList);
         assertTrue(orderedTasks != null && orderedTasks.size() == 2);
     }
 
@@ -197,17 +176,15 @@ public class TestExtendedSchedulerPolicy {
     }
 
     private String startAtValue(EligibleTaskDescriptor taskDesc) {
-        return taskDesc.getInternal().getGenericInformations()
-                .get(GENERIC_INFO_START_AT_KEY);
+        return taskDesc.getInternal().getGenericInformations().get(GENERIC_INFO_START_AT_KEY);
     }
 
-    private EligibleTaskDescriptor first(
-            List<EligibleTaskDescriptor> taskDescList) {
+    private EligibleTaskDescriptor first(List<EligibleTaskDescriptor> taskDescList) {
         return taskDescList.get(0);
     }
 
-    private JobDescriptor createJobDescWithTwoTasks(String jobStartAt,
-            String oneTaskStartAt, String otherTaskStartAt) {
+    private JobDescriptor createJobDescWithTwoTasks(String jobStartAt, String oneTaskStartAt,
+            String otherTaskStartAt) {
         JobDescriptor jobDesc = mock(JobDescriptor.class);
         JobId jobId = mock(JobId.class);
         stub(jobId.toString()).toReturn("unit-test-job-id");
@@ -217,25 +194,21 @@ public class TestExtendedSchedulerPolicy {
 
         Map<String, String> genericInfo = new HashMap<String, String>();
         genericInfo.put("START_AT", jobStartAt);
-        stub(jobDesc.getInternal().getGenericInformations()).toReturn(
-                genericInfo);
+        stub(jobDesc.getInternal().getGenericInformations()).toReturn(genericInfo);
 
-        Collection<EligibleTaskDescriptor> taskDescList = createTaskDescList(
-                oneTaskStartAt, otherTaskStartAt);
+        Collection<EligibleTaskDescriptor> taskDescList = createTaskDescList(oneTaskStartAt, otherTaskStartAt);
         stub(jobDesc.getEligibleTasks()).toReturn(taskDescList);
 
         return jobDesc;
     }
 
-    private Collection<EligibleTaskDescriptor> createTaskDescList(
-            String oneStartAt, String otherStartAt) {
+    private Collection<EligibleTaskDescriptor> createTaskDescList(String oneStartAt, String otherStartAt) {
         EligibleTaskDescriptor eligibleTaskDescOne = createTaskDesc(oneStartAt);
         EligibleTaskDescriptor eligibleTaskDescTwo = createTaskDesc(otherStartAt);
         @SuppressWarnings("unchecked")
         Iterator<EligibleTaskDescriptor> iterator = mock(Iterator.class);
         when(iterator.hasNext()).thenReturn(true, true, false);
-        when(iterator.next()).thenReturn(eligibleTaskDescOne).thenReturn(
-                eligibleTaskDescTwo);
+        when(iterator.next()).thenReturn(eligibleTaskDescOne).thenReturn(eligibleTaskDescTwo);
         @SuppressWarnings("unchecked")
         Collection<EligibleTaskDescriptor> eligibleTaskDescList = mock(Collection.class);
         stub(eligibleTaskDescList.iterator()).toReturn(iterator);

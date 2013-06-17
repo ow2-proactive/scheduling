@@ -59,10 +59,10 @@ import org.ow2.proactive.scheduler.common.task.util.IntegerWrapper;
 @PublicAPI
 @XmlAccessorType(XmlAccessType.FIELD)
 public abstract class CommonAttribute implements Serializable {
-		
-	/** The key for specifying start at time as generic information */
-	public static final String GENERIC_INFO_START_AT_KEY = "START_AT";
-	
+
+    /** The key for specifying start at time as generic information */
+    public static final String GENERIC_INFO_START_AT_KEY = "START_AT";
+
     /** 
      * Do the job has to cancel when an exception occurs in a task. (default is false) <br />
      * You can override this property inside each task.

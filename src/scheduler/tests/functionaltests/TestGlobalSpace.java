@@ -226,7 +226,7 @@ public class TestGlobalSpace extends FunctionalTest {
          * check that the file produced is accessible in the global user space via the scheduler API
          */
         String globalURI = sched.getGlobalSpaceURIs().get(0);
-        Assert.assertTrue(globalURI.startsWith("file:///"));
+        Assert.assertTrue(globalURI.startsWith("file:"));
         String globalPath = new File(new URI(globalURI)).getAbsolutePath();
         FileSystemManager fsManager = null;
 

@@ -16,6 +16,7 @@ import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 
+
 /**
  * Check whether a task annotated with 'CRON_EXPR' generic info is executed
  * iteratively.
@@ -28,13 +29,11 @@ public class TestCronTask extends CronCheckBase {
         jobId = submitJob(job);
 
         // first iteration
-        TaskInfo taskInfo = waitForEventTaskFinished(jobId, "SimpleCronTask",
-                task_timeout);
+        TaskInfo taskInfo = waitForEventTaskFinished(jobId, "SimpleCronTask", task_timeout);
         assertEquals(FINISHED, taskInfo.getStatus());
 
         // second iteration
-        TaskInfo taskInfo2 = waitForEventTaskFinished(jobId,
-                "SimpleCronTask#1", task_timeout);
+        TaskInfo taskInfo2 = waitForEventTaskFinished(jobId, "SimpleCronTask#1", task_timeout);
         assertEquals(FINISHED, taskInfo2.getStatus());
     }
 
@@ -42,8 +41,7 @@ public class TestCronTask extends CronCheckBase {
         TaskFlowJob job = new TaskFlowJob();
         JavaTask task = new JavaTask();
         task.setName("SimpleCronTask");
-        task.setFlowScript(createLoopFlowScript("loop = '* * * * *'",
-                "SimpleCronTask"));
+        task.setFlowScript(createLoopFlowScript("loop = '* * * * *'", "SimpleCronTask"));
         task.setExecutableClassName(SimpleCronTaskExecutable.class.getName());
         job.addTask(task);
         return job;

@@ -19,6 +19,7 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 
+
 /**
  * Checks whether a cron task is executed iteratively irrespectively of possible
  * errors in previous task executions.
@@ -42,13 +43,11 @@ public class TestUnstableCronTask extends CronCheckBase {
         jobId = submitJob(errorJob);
 
         // first iteration - successful
-        TaskInfo taskInfo = waitForEventTaskFinished(jobId, "UnstableCronTask",
-                task_timeout);
+        TaskInfo taskInfo = waitForEventTaskFinished(jobId, "UnstableCronTask", task_timeout);
         assertEquals(FINISHED, taskInfo.getStatus());
 
         // second iteration - failure
-        TaskInfo taskInfo2 = waitForEventTaskFinished(jobId,
-                "UnstableCronTask#1", task_timeout);
+        TaskInfo taskInfo2 = waitForEventTaskFinished(jobId, "UnstableCronTask#1", task_timeout);
         assertEquals(FAULTY, taskInfo2.getStatus());
 
         waitForEventJobFinished(jobId, job_timeout);
@@ -58,8 +57,7 @@ public class TestUnstableCronTask extends CronCheckBase {
         TaskFlowJob job = new TaskFlowJob();
         JavaTask task = new JavaTask();
         task.setName("UnstableCronTask");
-        task.setFlowScript(FlowScript.createLoopFlowScript(
-                "loop = '* * * * *'", "UnstableCronTask"));
+        task.setFlowScript(FlowScript.createLoopFlowScript("loop = '* * * * *'", "UnstableCronTask"));
         task.setExecutableClassName(UnstableExecutable.class.getName());
         job.addTask(task);
         return job;

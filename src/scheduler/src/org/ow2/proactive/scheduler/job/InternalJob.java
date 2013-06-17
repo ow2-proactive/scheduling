@@ -308,9 +308,7 @@ public abstract class InternalJob extends JobState {
 
         ChangedTasksInfo changesInfo = new ChangedTasksInfo();
         changesInfo.taskUpdated(descriptor);
-        
-        
-        
+
         boolean didAction = false;
         if (action != null) {
             InternalTask initiator = tasks.get(taskId);
@@ -320,32 +318,29 @@ public abstract class InternalJob extends JobState {
                  * LOOP action
                  */
                 case LOOP: {
-					// find the target of the loop
-					InternalTask target = null;
-					if (action.getTarget().equals(initiator.getName())) {
-						target = initiator;
-					} else {
-						target = findTaskUp(action.getTarget(), initiator);
-					}
-					didAction = replicateForNextLoopIteration(initiator, target,
-							changesInfo, frontend);
-                if (didAction && action.getCronExpr() != null) {
-                    for (TaskId tid : changesInfo.getNewTasks()) {
-                        InternalTask newTask = tasks.get(tid);
-                        try {
-                            Date startAt = (new Predictor(action.getCronExpr()))
-                                    .nextMatchingDate();
-                            newTask.addGenericInformation(
-                                    GENERIC_INFO_START_AT_KEY,
-                                    ISO8601DateUtil.parse(startAt));
-                        } catch (InvalidPatternException e) {
-                            // this will not happen as the cron expression is
-                            // already being validated in FlowScript class.
+                    // find the target of the loop
+                    InternalTask target = null;
+                    if (action.getTarget().equals(initiator.getName())) {
+                        target = initiator;
+                    } else {
+                        target = findTaskUp(action.getTarget(), initiator);
+                    }
+                    didAction = replicateForNextLoopIteration(initiator, target, changesInfo, frontend);
+                    if (didAction && action.getCronExpr() != null) {
+                        for (TaskId tid : changesInfo.getNewTasks()) {
+                            InternalTask newTask = tasks.get(tid);
+                            try {
+                                Date startAt = (new Predictor(action.getCronExpr())).nextMatchingDate();
+                                newTask.addGenericInformation(GENERIC_INFO_START_AT_KEY, ISO8601DateUtil
+                                        .parse(startAt));
+                            } catch (InvalidPatternException e) {
+                                // this will not happen as the cron expression is
+                                // already being validated in FlowScript class.
+                            }
                         }
                     }
+                    break;
                 }
-                break;
-            }
 
                     /*
                      * IF action
@@ -691,7 +686,7 @@ public abstract class InternalJob extends JobState {
             **/
 
         }
-        
+
         //terminate this task
         if (!didAction) {
             getJobDescriptor().terminate(taskId);
@@ -699,29 +694,26 @@ public abstract class InternalJob extends JobState {
 
         return changesInfo;
     }
-     
-	private boolean replicateForNextLoopIteration(InternalTask initiator,
-			InternalTask target, ChangedTasksInfo changesInfo,
-			SchedulerStateUpdate frontend) {
-	   
-        logger.info("LOOP (init:" + initiator.getId() + ";target:" +
-            target.getId() + ")");
-        
+
+    private boolean replicateForNextLoopIteration(InternalTask initiator, InternalTask target,
+            ChangedTasksInfo changesInfo, SchedulerStateUpdate frontend) {
+
+        logger.info("LOOP (init:" + initiator.getId() + ";target:" + target.getId() + ")");
+
         // accumulates the tasks between the initiator and the target
         Map<TaskId, InternalTask> dup = new HashMap<TaskId, InternalTask>();
 
         // replicate the tasks between the initiator and the target
         try {
-            initiator.replicateTree(dup, target.getId(), true, initiator.getReplicationIndex(),
-                    initiator.getIterationIndex());
+            initiator.replicateTree(dup, target.getId(), true, initiator.getReplicationIndex(), initiator
+                    .getIterationIndex());
         } catch (ExecutableCreationException e) {
             logger.error("", e);
             return false;
         }
 
-        ((JobInfoImpl) this.getJobInfo()).setNumberOfPendingTasks(this.getJobInfo()
-                .getNumberOfPendingTasks() +
-            dup.size());
+        ((JobInfoImpl) this.getJobInfo())
+                .setNumberOfPendingTasks(this.getJobInfo().getNumberOfPendingTasks() + dup.size());
 
         // ensure naming unicity
         // time-consuming but safe
@@ -786,10 +778,10 @@ public abstract class InternalJob extends JobState {
         frontend.jobStateUpdated(this.getOwner(), new NotificationData<JobInfo>(
             SchedulerEvent.TASK_REPLICATED, new JobInfoImpl(jobInfo)));
         this.jobInfo.clearTasksChanges();
-        
-		return true;
-	}
-	
+
+        return true;
+    }
+
     private int getNextReplicationIndex(String baseName, int iteration) {
         int rep = 0;
         for (InternalTask it : this.tasks.values()) {

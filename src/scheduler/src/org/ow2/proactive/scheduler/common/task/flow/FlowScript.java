@@ -504,8 +504,7 @@ public class FlowScript extends Script<FlowAction> {
                 } else {
                     if (bindings.containsKey(loopVariable)) {
                         Boolean enabled;
-                        String loopValue = bindings.get(loopVariable)
-                                .toString();
+                        String loopValue = bindings.get(loopVariable).toString();
                         if ("true".equalsIgnoreCase(loopValue)) {
                             enabled = Boolean.TRUE;
                         } else if ("false".equalsIgnoreCase(loopValue)) {

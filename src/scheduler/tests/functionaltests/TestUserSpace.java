@@ -181,7 +181,7 @@ public class TestUserSpace extends FunctionalTest {
 
         Scheduler sched = SchedulerTHelper.getSchedulerInterface();
         String userURI = sched.getUserSpaceURIs().get(0);
-        Assert.assertTrue(userURI.startsWith("file:///"));
+        Assert.assertTrue(userURI.startsWith("file:"));
         System.out.println("User URI is " + userURI);
         String userPath = new File(new URI(userURI)).getAbsolutePath();
 
