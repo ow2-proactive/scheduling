@@ -36,6 +36,7 @@ package functionaltests;
 
 import java.io.File;
 import java.io.InputStream;
+import java.net.URI;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
@@ -115,12 +116,12 @@ public class RestSchedulerPushPullFileTest extends AbstractRestFuncTestCase {
 
         String[] spacesNames = { SchedulerConstants.GLOBALSPACE_NAME, SchedulerConstants.USERSPACE_NAME };
 
-        String[] spacesPaths = { ((SchedulerFrontend) scheduler).getGlobalSpaceURIs().get(0),
-                ((SchedulerFrontend) scheduler).getGlobalSpaceURIs().get(0)};
+        String[] spacesUris = { ((SchedulerFrontend) scheduler).getGlobalSpaceURIs().get(0),
+                ((SchedulerFrontend) scheduler).getUserSpaceURIs().get(0) };
 
         for (int i = 0; i < spacesNames.length; i++) {
             String spaceName = spacesNames[i];
-            String spacePath = spacesPaths[i];
+            String spacePath = (new File(new URI(spacesUris[i]))).getAbsolutePath();
             File testPushFile = RestFuncTHelper.getDefaultJobXmlfile();
             // you can test pushing pulling a big file :
             // testPushFile = new File("path_to_a_big_file");
@@ -146,7 +147,6 @@ public class RestSchedulerPushPullFileTest extends AbstractRestFuncTestCase {
 
             System.out.println(response.getStatusLine());
             assertHttpStatusOK(response);
-
             Assert.assertTrue(destFile + " exists", destFile.exists());
 
             Assert.assertTrue("Original file and result are equals for " + spaceName, FileUtils

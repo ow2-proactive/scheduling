@@ -70,6 +70,7 @@ import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
 import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 
+
 @Path("/rm")
 public interface RMRestInterface {
     @POST

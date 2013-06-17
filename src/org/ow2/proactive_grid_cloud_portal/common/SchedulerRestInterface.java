@@ -865,8 +865,10 @@ public interface SchedulerRestInterface {
     @Path("usage/myaccount")
     @Produces("application/json")
     List<JobUsageData> getUsageOnMyAccount(@HeaderParam("sessionid")
-    String sessionId, @QueryParam("startdate") Date startDate, @QueryParam("enddate")
+    String sessionId, @QueryParam("startdate")
+    Date startDate, @QueryParam("enddate")
     Date endDate) throws NotConnectedRestException, PermissionRestException;
+
     /**
      * Returns details on job and task execution times for the caller's executions.
      * <p>

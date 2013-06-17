@@ -71,6 +71,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+
 public class RMRestTest extends RestTestServer {
 
     private static final double EXPECTED_RRD_VALUE = 1.042;
@@ -87,7 +88,8 @@ public class RMRestTest extends RestTestServer {
 
         JSONObject jsonObject = callGetStatHistory();
 
-        assertEquals(EXPECTED_RRD_VALUE, (Double) ((JSONArray) jsonObject.get("AverageActivity")).get(0), 0.001);
+        assertEquals(EXPECTED_RRD_VALUE, (Double) ((JSONArray) jsonObject.get("AverageActivity")).get(0),
+                0.001);
 
     }
 
@@ -95,9 +97,9 @@ public class RMRestTest extends RestTestServer {
         RMCachingProxyUserInterface rmMock = mock(RMCachingProxyUserInterface.class);
         String sessionId = RMSessionMapper.getInstance().add(rmMock);
 
-        AttributeList value = new AttributeList(
-                Collections.singletonList(new Attribute("test", createRrdDb().getBytes())));
-        when(rmMock.getMBeanAttributes(Matchers.<ObjectName>any(), Matchers.<String[]>any())).thenReturn(
+        AttributeList value = new AttributeList(Collections.singletonList(new Attribute("test", createRrdDb()
+                .getBytes())));
+        when(rmMock.getMBeanAttributes(Matchers.<ObjectName> any(), Matchers.<String[]> any())).thenReturn(
                 value);
         RMRestInterface client = ProxyFactory.create(RMRestInterface.class, "http://localhost:" + port + "/");
 
