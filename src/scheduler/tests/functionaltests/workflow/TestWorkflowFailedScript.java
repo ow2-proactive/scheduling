@@ -79,7 +79,7 @@ public class TestWorkflowFailedScript extends SchedulerConsecutive {
      */
     private void testIf() throws Throwable {
         TaskFlowJob job = new TaskFlowJob();
-        job.setName("Test Flow Fail");
+        job.setName(this.getClass().getSimpleName());
         job.setMaxNumberOfExecution(1);
         job.setCancelJobOnError(false);
 

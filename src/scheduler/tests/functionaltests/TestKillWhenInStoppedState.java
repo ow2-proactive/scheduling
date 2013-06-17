@@ -213,7 +213,7 @@ public class TestKillWhenInStoppedState extends SchedulerConsecutive {
 
     private TaskFlowJob createRunningJob() throws Exception {
         TaskFlowJob job = new TaskFlowJob();
-        job.setName("Test running job");
+        job.setName(this.getClass().getSimpleName());
         job.setCancelJobOnError(false);
 
         JavaTask javaTask1 = new JavaTask();

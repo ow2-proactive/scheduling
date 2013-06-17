@@ -138,7 +138,7 @@ public class TestLoadSchedulerClientState extends BaseSchedulerDBTest {
     @Test
     public void testClientStateLoading() throws Exception {
         TaskFlowJob job1 = new TaskFlowJob();
-        job1.setName("test job");
+        job1.setName(this.getClass().getSimpleName());
         job1.setDescription("desc1");
         job1.setProjectName("p1");
         job1.setInputSpace("is1");
@@ -179,7 +179,7 @@ public class TestLoadSchedulerClientState extends BaseSchedulerDBTest {
         InternalJob jobData1 = defaultSubmitJob(job1);
 
         TaskFlowJob job2 = new TaskFlowJob();
-        job2.setName("test job2");
+        job2.setName(this.getClass().getSimpleName() + "_2");
         job2.setGenericInformations(new HashMap<String, String>());
         job2.addTask(createDefaultTask("task1"));
         job2.setPriority(JobPriority.HIGH);

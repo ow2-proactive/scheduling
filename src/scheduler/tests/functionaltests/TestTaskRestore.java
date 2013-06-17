@@ -144,7 +144,7 @@ public class TestTaskRestore extends FunctionalTest {
         String tmp = System.getProperty("java.io.tmpdir") + "/";
 
         TaskFlowJob job = new TaskFlowJob();
-        job.setName("Test job");
+        job.setName(this.getClass().getSimpleName());
 
         JavaTask javaTask1 = new JavaTask();
         javaTask1.setName("task1");
@@ -284,7 +284,7 @@ public class TestTaskRestore extends FunctionalTest {
 
     private TaskFlowJob createPendingJob() throws Exception {
         TaskFlowJob job = new TaskFlowJob();
-        job.setName("Test pending job");
+        job.setName(this.getClass().getSimpleName() + "_pending");
         job.setCancelJobOnError(false);
 
         JavaTask javaTask = new JavaTask();

@@ -103,7 +103,7 @@ public class TestPreciousLogs extends SchedulerConsecutive {
 
     private void testPreciousLogs(boolean createJavaTask, boolean forkEnv) throws Exception {
         TaskFlowJob job = new TaskFlowJob();
-        job.setName("Test job");
+        job.setName(this.getClass().getSimpleName());
         job.setOutputSpace(output.toURI().toString());
 
         Map<String, List<String>> expectedOutput = new LinkedHashMap<String, List<String>>();

@@ -122,7 +122,7 @@ public class TestKillWhenNodeHangs extends FunctionalTest {
 
     private TaskFlowJob createJobWithSleepingTask() throws Exception {
         TaskFlowJob job = new TaskFlowJob();
-        job.setName("Test job");
+        job.setName(this.getClass().getSimpleName());
 
         JavaTask javaTask = new JavaTask();
         javaTask.setName(TASK_NAME);
@@ -137,7 +137,7 @@ public class TestKillWhenNodeHangs extends FunctionalTest {
 
     private TaskFlowJob createJobWithSimpleTask() throws Exception {
         TaskFlowJob job = new TaskFlowJob();
-        job.setName("Test job");
+        job.setName(this.getClass().getSimpleName());
 
         JavaTask javaTask = new JavaTask();
         javaTask.setName(TASK_NAME);

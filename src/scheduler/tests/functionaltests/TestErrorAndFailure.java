@@ -81,7 +81,7 @@ public class TestErrorAndFailure extends SchedulerConsecutive {
         SchedulerTHelper.log("Test 1 : Creating job...");
         //creating job
         TaskFlowJob submittedJob = new TaskFlowJob();
-        submittedJob.setName("Test 12 tasks");
+        submittedJob.setName(this.getClass().getSimpleName() + "_12_tasks");
         submittedJob
                 .setDescription("12 tasks job testing the behavior of error code and normal task ending.");
         submittedJob.setMaxNumberOfExecution(10);

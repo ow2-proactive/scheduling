@@ -1545,7 +1545,8 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
             NativeTaskData nativeTaskData = NativeTaskData.createNativeTaskData(taskRuntimeData, container);
             session.save(nativeTaskData);
         } else if (task.getClass().equals(InternalForkedScriptTask.class)) {
-            ForkedScriptExecutableContainer container = (ForkedScriptExecutableContainer) task.getExecutableContainer();
+            ForkedScriptExecutableContainer container = (ForkedScriptExecutableContainer) task
+                    .getExecutableContainer();
             ScriptTaskData scriptTaskData = ScriptTaskData.createScriptTaskData(taskRuntimeData, container);
             session.save(scriptTaskData);
         } else if (task.getClass().equals(InternalScriptTask.class)) {
@@ -1624,9 +1625,8 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
     }
 
     private ScriptTaskData queryScriptTaskData(Session session, InternalTask task) {
-        return (ScriptTaskData) session.createQuery(
-                            "from ScriptTaskData td where td.taskData.id = :taskId").setParameter("taskId",
-                            taskId(task)).uniqueResult();
+        return (ScriptTaskData) session.createQuery("from ScriptTaskData td where td.taskData.id = :taskId")
+                .setParameter("taskId", taskId(task)).uniqueResult();
     }
 
     public ExecutableContainer loadExecutableContainer(final InternalTask task) {

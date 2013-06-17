@@ -1,5 +1,14 @@
 package functionaltests;
 
+import static junit.framework.Assert.assertFalse;
+import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.fail;
+
+import java.io.Serializable;
+import java.util.Date;
+import java.util.List;
+
+import org.junit.Test;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.Scheduler;
@@ -12,16 +21,6 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.common.usage.JobUsage;
 import org.ow2.tests.FunctionalTest;
-
-import java.io.Serializable;
-import java.util.Date;
-import java.util.List;
-
-import org.junit.Test;
-
-import static junit.framework.Assert.assertFalse;
-import static junit.framework.Assert.assertTrue;
-import static junit.framework.Assert.fail;
 
 
 /**
@@ -65,7 +64,7 @@ public class TestGetUsage extends FunctionalTest {
 
     private TaskFlowJob createJob() throws Exception {
         TaskFlowJob job = new TaskFlowJob();
-        job.setName("Test job");
+        job.setName(this.getClass().getSimpleName());
 
         JavaTask javaTask = new JavaTask();
         javaTask.setExecutableClassName(TestJavaTask.class.getName());

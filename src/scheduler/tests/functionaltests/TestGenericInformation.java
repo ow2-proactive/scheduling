@@ -62,7 +62,7 @@ import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 public class TestGenericInformation extends SchedulerConsecutive {
 
     private final String TASK_NAME = "task name";
-    private final String JOB_NAME = "job name";
+    private final String JOB_NAME = this.getClass().getSimpleName();
 
     public static class TestJavaTask extends JavaExecutable {
         @Override

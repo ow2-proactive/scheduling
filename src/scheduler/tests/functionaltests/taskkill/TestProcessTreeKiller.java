@@ -36,8 +36,12 @@
  */
 package functionaltests.taskkill;
 
-import functionaltests.SchedulerConsecutive;
-import functionaltests.SchedulerTHelper;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
+
 import junit.framework.Assert;
 import org.apache.log4j.Level;
 import org.objectweb.proactive.utils.OperatingSystem;
@@ -51,11 +55,8 @@ import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
 import org.ow2.proactive.scheduler.util.process.ProcessTreeKiller;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
+import functionaltests.SchedulerConsecutive;
+import functionaltests.SchedulerTHelper;
 
 
 /**
@@ -106,7 +107,7 @@ public class TestProcessTreeKiller extends SchedulerConsecutive {
 
             // create job 1 NativeExecutable
             TaskFlowJob job1 = new TaskFlowJob();
-            job1.setName("1");
+            job1.setName(this.getClass().getSimpleName() + "_1");
             job1.setDescription("a command that spawn processes");
 
             NativeTask task1 = new NativeTask();
@@ -119,7 +120,7 @@ public class TestProcessTreeKiller extends SchedulerConsecutive {
 
             // create job 2 simple Java Executable
             TaskFlowJob job2 = new TaskFlowJob();
-            job2.setName("2");
+            job2.setName(this.getClass().getSimpleName() + "_2");
             job2.setDescription("a command that spawn processes");
 
             JavaTask task2 = new JavaTask();
@@ -132,7 +133,7 @@ public class TestProcessTreeKiller extends SchedulerConsecutive {
 
             // create job 3 forked Java Executable
             TaskFlowJob job3 = new TaskFlowJob();
-            job3.setName("3");
+            job3.setName(this.getClass().getSimpleName() + "_3");
             job3.setDescription("a command that spawn processes");
 
             JavaTask task3 = new JavaTask();
@@ -210,7 +211,7 @@ public class TestProcessTreeKiller extends SchedulerConsecutive {
             // This is related to the current implementation of NativeExecutable, as long as there are still some IO streamed
             // from the subprocesses of the main process, the task will wait
             TaskFlowJob job4 = new TaskFlowJob();
-            job4.setName("4");
+            job4.setName(this.getClass().getSimpleName() + "_4");
             job4.setDescription("a command that spawn processes");
 
             NativeTask task4 = new NativeTask();

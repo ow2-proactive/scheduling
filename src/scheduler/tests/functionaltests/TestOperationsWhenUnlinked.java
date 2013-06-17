@@ -218,7 +218,7 @@ public class TestOperationsWhenUnlinked extends FunctionalTest {
 
     private TaskFlowJob createJob() throws Exception {
         TaskFlowJob job = new TaskFlowJob();
-        job.setName("Test job");
+        job.setName(this.getClass().getSimpleName());
 
         JavaTask javaTask = new JavaTask();
         javaTask.setExecutableClassName(TestJavaTask.class.getName());
@@ -230,7 +230,7 @@ public class TestOperationsWhenUnlinked extends FunctionalTest {
 
     private TaskFlowJob createJobWithPendingTask(boolean addNormalTask) throws Exception {
         TaskFlowJob job = new TaskFlowJob();
-        job.setName("Test pending job");
+        job.setName(this.getClass().getSimpleName() + "_pending");
         job.setCancelJobOnError(false);
 
         if (addNormalTask) {

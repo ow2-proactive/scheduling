@@ -242,7 +242,7 @@ public class TestLoadJobs extends FunctionalTest {
 
     private TaskFlowJob createJob(String communicationObjectUrl) throws Exception {
         TaskFlowJob job = new TaskFlowJob();
-        job.setName("Test job");
+        job.setName(this.getClass().getSimpleName());
 
         JavaTask javaTask = new JavaTask();
         javaTask.setExecutableClassName(TestJavaTask.class.getName());

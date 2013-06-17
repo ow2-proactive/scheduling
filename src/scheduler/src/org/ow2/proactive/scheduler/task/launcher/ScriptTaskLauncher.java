@@ -47,6 +47,7 @@ import org.ow2.proactive.scheduler.task.ScriptExecutableInitializer;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.apache.log4j.Logger;
 
+
 /**
  * ScriptTaskLauncher will run a script executable.
  *

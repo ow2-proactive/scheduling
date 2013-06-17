@@ -30,7 +30,7 @@ public class SchedulingServiceTest10 {
 
     private TaskFlowJob createTestJob() throws Exception {
         TaskFlowJob job = new TaskFlowJob();
-        job.setName("Job1");
+        job.setName(this.getClass().getSimpleName());
         JavaTask task1 = new JavaTask();
         task1.setExecutableClassName("class");
         task1.setName("task1");

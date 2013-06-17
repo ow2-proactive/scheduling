@@ -65,7 +65,7 @@ public class TestTaskNotStarted extends SchedulerConsecutive {
      */
     private TaskFlowJob createJob1() throws Exception {
         TaskFlowJob job = new TaskFlowJob();
-        job.setName("Test job1");
+        job.setName(this.getClass().getSimpleName() + "_1");
 
         JavaTask javaTask = new JavaTask();
         javaTask.setExecutableClassName(TestJavaTask.class.getName());
@@ -84,7 +84,7 @@ public class TestTaskNotStarted extends SchedulerConsecutive {
      */
     private TaskFlowJob createJob2() throws Exception {
         TaskFlowJob job = new TaskFlowJob();
-        job.setName("Test job2");
+        job.setName(this.getClass().getSimpleName() + "_2");
 
         JavaTask javaTask1 = new JavaTask();
         javaTask1.setExecutableClassName(TestJavaTask.class.getName());

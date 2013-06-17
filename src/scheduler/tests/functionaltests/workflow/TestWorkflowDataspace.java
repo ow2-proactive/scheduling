@@ -89,7 +89,7 @@ public class TestWorkflowDataspace extends SchedulerConsecutive {
         }
 
         TaskFlowJob job = new TaskFlowJob();
-        job.setName("Test DS flow java");
+        job.setName(TestWorkflowDataspace.class.getSimpleName());
         job.setInputSpace(inputSpace.toURI().toURL().toString());
         job.setOutputSpace(outputSpace.toURI().toURL().toString());
         JobEnvironment env = new JobEnvironment();

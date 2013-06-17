@@ -132,7 +132,7 @@ public class TestListenJobLogs extends SchedulerConsecutive {
     private TaskFlowJob createJob(String communicationObjectUrl1, String communicationObjectUrl2, boolean fork)
             throws Exception {
         TaskFlowJob job = new TaskFlowJob();
-        job.setName("Test job");
+        job.setName(this.getClass().getSimpleName());
 
         JavaTask javaTask1 = new JavaTask();
         javaTask1.setExecutableClassName(TestJavaTask.class.getName());

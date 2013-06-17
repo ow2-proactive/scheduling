@@ -141,7 +141,7 @@ public class TestSmartProxy extends SchedulerConsecutive {
 
     protected TaskFlowJob createTestJob(boolean isolateOutputs) throws Exception {
         TaskFlowJob job = new TaskFlowJob();
-        job.setName("TestDSSupport");
+        job.setName(this.getClass().getSimpleName());
         for (int i = 0; i < NB_TASKS; i++) {
             JavaTask testTask = new JavaTask();
             testTask.setName(TASK_NAME + i);

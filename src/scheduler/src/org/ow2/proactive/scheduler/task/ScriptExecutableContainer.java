@@ -42,6 +42,7 @@ import org.ow2.proactive.scheduler.common.task.executable.Executable;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.TaskScript;
 
+
 /**
  * Reuse the Java executable container as part of a forked task, specialized for a script execution.
  * @author The ProActive Team
@@ -51,7 +52,7 @@ public class ScriptExecutableContainer extends JavaExecutableContainer {
     private TaskScript script;
 
     public ScriptExecutableContainer(TaskScript script) {
-        super(ScriptExecutable.class.getName(), Collections.<String, byte[]>emptyMap());
+        super(ScriptExecutable.class.getName(), Collections.<String, byte[]> emptyMap());
         this.script = script;
     }
 
@@ -64,8 +65,8 @@ public class ScriptExecutableContainer extends JavaExecutableContainer {
 
     @Override
     public JavaExecutableInitializer createExecutableInitializer() {
-        ScriptExecutableInitializer scriptExecutableInitializer = new ScriptExecutableInitializer(
-                super.createExecutableInitializer());
+        ScriptExecutableInitializer scriptExecutableInitializer = new ScriptExecutableInitializer(super
+                .createExecutableInitializer());
         scriptExecutableInitializer.setScript(script);
         return scriptExecutableInitializer;
     }

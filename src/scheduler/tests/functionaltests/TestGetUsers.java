@@ -114,7 +114,7 @@ public class TestGetUsers extends FunctionalTest {
 
     private TaskFlowJob createJob() throws Exception {
         TaskFlowJob job = new TaskFlowJob();
-        job.setName("Test job");
+        job.setName(this.getClass().getSimpleName());
         JavaTask task = new JavaTask();
         task.setExecutableClassName(TestJavaTask.class.getName());
         job.addTask(task);

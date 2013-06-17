@@ -26,7 +26,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
 
     private TaskFlowJob createJob() throws Exception {
         TaskFlowJob job = new TaskFlowJob();
-        job.setName("TestLoadJobsPagination");
+        job.setName(this.getClass().getSimpleName());
         job.setDescription("TestLoadJobsPagination desc");
         JavaTask task = new JavaTask();
         task.setExecutableClassName("className");

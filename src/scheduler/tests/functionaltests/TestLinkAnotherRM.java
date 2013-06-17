@@ -106,7 +106,7 @@ public class TestLinkAnotherRM extends MultipleRMTBase {
 
     private TaskFlowJob createJob(String communicationObjectUrl) throws Exception {
         TaskFlowJob job = new TaskFlowJob();
-        job.setName("Test job");
+        job.setName(this.getClass().getSimpleName());
 
         JavaTask javaTask1 = new JavaTask();
         javaTask1.setExecutableClassName(TestJavaTask1.class.getName());

@@ -48,6 +48,7 @@ import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.TaskScript;
 import org.apache.log4j.Logger;
 
+
 /**
  * This class is a container for forked Script executable. The actual executable is instantiated on the worker node
  * .<br>
@@ -65,7 +66,7 @@ public class ForkedScriptExecutableContainer extends ForkedJavaExecutableContain
     private TaskScript script;
 
     public ForkedScriptExecutableContainer(TaskScript script) {
-        super(ForkedJavaExecutable.class.getName(), Collections.<String, byte[]>emptyMap());
+        super(ForkedJavaExecutable.class.getName(), Collections.<String, byte[]> emptyMap());
         this.script = script;
     }
 
@@ -74,8 +75,9 @@ public class ForkedScriptExecutableContainer extends ForkedJavaExecutableContain
      *
      * @param cont original object to copy
      */
-    public ForkedScriptExecutableContainer(ForkedScriptExecutableContainer cont) throws ExecutableCreationException {
-        super(ForkedJavaExecutable.class.getName(), Collections.<String, byte[]>emptyMap());
+    public ForkedScriptExecutableContainer(ForkedScriptExecutableContainer cont)
+            throws ExecutableCreationException {
+        super(ForkedJavaExecutable.class.getName(), Collections.<String, byte[]> emptyMap());
         try {
             this.script = new TaskScript(cont.getScript());
         } catch (InvalidScriptException e) {

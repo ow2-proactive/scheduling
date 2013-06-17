@@ -28,7 +28,7 @@ public class TestJobRuntimeData extends BaseSchedulerDBTest {
     @Test
     public void testJobRuntimeData() throws Exception {
         TaskFlowJob job = new TaskFlowJob();
-        job.setName("test job");
+        job.setName(this.getClass().getSimpleName());
         job.addTask(createDefaultTask("task1"));
         job.setPriority(JobPriority.LOW);
 

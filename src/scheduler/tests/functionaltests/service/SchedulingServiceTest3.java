@@ -25,7 +25,7 @@ public class SchedulingServiceTest3 extends BaseServiceTest {
 
     private TaskFlowJob createTestJob(boolean cancelJobOnError) throws Exception {
         TaskFlowJob job = new TaskFlowJob();
-        job.setName("Job1");
+        job.setName(this.getClass().getSimpleName());
 
         JavaTask task1 = new JavaTask();
         task1.setName("javaTask");

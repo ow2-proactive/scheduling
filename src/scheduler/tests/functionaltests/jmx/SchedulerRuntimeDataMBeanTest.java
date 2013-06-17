@@ -154,7 +154,7 @@ public class SchedulerRuntimeDataMBeanTest extends FunctionalTest {
 
     private TaskFlowJob createJobWithFailingTask() throws Exception {
         TaskFlowJob job = new TaskFlowJob();
-        job.setName("JobWithFailingTask");
+        job.setName(this.getClass().getSimpleName() + "_FailingTask");
         job.setCancelJobOnError(false);
         JavaTask task = new JavaTask();
         task.setExecutableClassName(FailingTestJavaTask.class.getName());
@@ -167,7 +167,7 @@ public class SchedulerRuntimeDataMBeanTest extends FunctionalTest {
 
     private TaskFlowJob createJobWithMultinodeTask(int nodes) throws Exception {
         TaskFlowJob job = new TaskFlowJob();
-        job.setName("JobWithMultinodeTask");
+        job.setName(this.getClass().getSimpleName() + "_MultinodeTask");
         JavaTask task = new JavaTask();
         task.setExecutableClassName(FailingTestJavaTask.class.getName());
         task.setName("task1");

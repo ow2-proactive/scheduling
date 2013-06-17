@@ -96,7 +96,7 @@ public class TestUsageData extends BaseSchedulerDBTest {
 
     private void killJob(InternalJob job) {
         job.setFinishedTime(System.currentTimeMillis());
-        dbManager.updateAfterJobKilled(job, Collections.<TaskId>emptySet());
+        dbManager.updateAfterJobKilled(job, Collections.<TaskId> emptySet());
     }
 
     protected InternalTask startTask(InternalJob job, InternalTask task) throws Exception {
