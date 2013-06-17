@@ -55,115 +55,107 @@ import javax.management.MalformedObjectNameException;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
 
+
 /**
  * Test checks that the correct RMNode monitoring MBeans with certain attributes
  * are exposed.
  */
 public class TestRMNodeMonitoring extends RMConsecutive {
 
-	public static Map<String, String[]> mbeans = new HashMap<String, String[]>();
+    public static Map<String, String[]> mbeans = new HashMap<String, String[]>();
 
-	/* set of MBeans and its attributes to be checked. */
-	static {
-		mbeans.put("sigar:Type=Cpu", new String[] { "Mhz", "TotalCores" });
-		mbeans.put("sigar:Type=Mem", new String[] { "Total", "Free",
-				"ActualFree" });
-		mbeans.put("sigar:Type=CpuUsage", new String[] { "Idle" });
-		mbeans.put("sigar:Type=Processes", new String[] { "Processes" });
-		mbeans.put("sigar:Type=FileSystem,Name=*", new String[] { "DirName",
-				"Total", "Used" });
-		mbeans.put("sigar:Type=NetInterface,Name=*", new String[] { "Name",
-				"RxBytes", "TxBytes", "Speed", "Hwaddr" });
-	}
+    /* set of MBeans and its attributes to be checked. */
+    static {
+        mbeans.put("sigar:Type=Cpu", new String[] { "Mhz", "TotalCores" });
+        mbeans.put("sigar:Type=Mem", new String[] { "Total", "Free", "ActualFree" });
+        mbeans.put("sigar:Type=CpuUsage", new String[] { "Idle" });
+        mbeans.put("sigar:Type=Processes", new String[] { "Processes" });
+        mbeans.put("sigar:Type=FileSystem,Name=*", new String[] { "DirName", "Total", "Used" });
+        mbeans.put("sigar:Type=NetInterface,Name=*", new String[] { "Name", "RxBytes", "TxBytes", "Speed",
+                "Hwaddr" });
+    }
 
-	@org.junit.Test
-	public void action() throws Exception {
-		/*
-		 * prepare a Node Source with some nodes and get the JMX URL of any
-		 * RMNode in it
-		 */
-		String jmxurl = prepareEnvAndGetRMNodeJmxUrl();
+    @org.junit.Test
+    public void action() throws Exception {
+        /*
+         * prepare a Node Source with some nodes and get the JMX URL of any
+         * RMNode in it
+         */
+        String jmxurl = prepareEnvAndGetRMNodeJmxUrl();
 
-		/* get a jmx connector to retrieve monitoring info from the RMNode */
-		JMXConnector jmxConnector = connectToRMNode(jmxurl);
+        /* get a jmx connector to retrieve monitoring info from the RMNode */
+        JMXConnector jmxConnector = connectToRMNode(jmxurl);
 
-		/* check the existence of each MBean and its attributes */
-		for (String mbean : mbeans.keySet()) {
-			String[] atts = mbeans.get(mbean);
-			for (String att : atts) {
-				Object ret = null;
-				try {
-					RMTHelper.log("Checking MBean '" + mbean + "', attribute '"
-							+ att + "'...");
-					ret = getJMXSigarAttribute(jmxConnector, mbean, att);
-				} catch (Exception e) {
-					// Ignore it.
-				}
-				Assert.assertTrue("MBean " + mbean + " att " + att
-						+ " not found.", ret != null);
-			}
-		}
+        /* check the existence of each MBean and its attributes */
+        for (String mbean : mbeans.keySet()) {
+            String[] atts = mbeans.get(mbean);
+            for (String att : atts) {
+                Object ret = null;
+                try {
+                    RMTHelper.log("Checking MBean '" + mbean + "', attribute '" + att + "'...");
+                    ret = getJMXSigarAttribute(jmxConnector, mbean, att);
+                } catch (Exception e) {
+                    // Ignore it.
+                }
+                Assert.assertTrue("MBean " + mbean + " att " + att + " not found.", ret != null);
+            }
+        }
 
-		RMTHelper.log("End of test");
+        RMTHelper.log("End of test");
 
-	}
+    }
 
-	private String prepareEnvAndGetRMNodeJmxUrl() throws Exception {
+    private String prepareEnvAndGetRMNodeJmxUrl() throws Exception {
 
-		RMTHelper helper = RMTHelper.getDefaultInstance();
+        RMTHelper helper = RMTHelper.getDefaultInstance();
 
-		helper.createNodeSource("TestRMNodeMonitoring");
-		RMTHelper.log("Checking existence of Sigar MBeans...");
+        helper.createNodeSource("TestRMNodeMonitoring");
+        RMTHelper.log("Checking existence of Sigar MBeans...");
 
-		String jmxurl = null;
+        String jmxurl = null;
 
-		RMInitialState state = RMTHelper.getDefaultInstance()
-				.getResourceManager().getMonitoring().getState();
-		for (RMNodeEvent ne : state.getNodesEvents()) {
-			jmxurl = ne.getDefaultJMXUrl();
-			break;
-		}
+        RMInitialState state = RMTHelper.getDefaultInstance().getResourceManager().getMonitoring().getState();
+        for (RMNodeEvent ne : state.getNodesEvents()) {
+            jmxurl = ne.getDefaultJMXUrl();
+            break;
+        }
 
-		Assert.assertTrue("The JMX URL of a node could not be obtained.",
-				jmxurl != null);
+        Assert.assertTrue("The JMX URL of a node could not be obtained.", jmxurl != null);
 
-		RMTHelper.log("JMX URL obtained: " + jmxurl);
+        RMTHelper.log("JMX URL obtained: " + jmxurl);
 
-		return jmxurl;
+        return jmxurl;
 
-	}
+    }
 
-	private JMXConnector connectToRMNode(String jmxurl) throws Exception {
-		Map<String, Object> env = new HashMap<String, Object>();
-		String[] creds = { RM_USER_TEST, RM_PASS_TEST };
-		env.put(JMXConnector.CREDENTIALS, creds);
-		JMXConnector jmxConnector = JMXConnectorFactory.connect(
-				new JMXServiceURL(jmxurl), env);
+    private JMXConnector connectToRMNode(String jmxurl) throws Exception {
+        Map<String, Object> env = new HashMap<String, Object>();
+        String[] creds = { RM_USER_TEST, RM_PASS_TEST };
+        env.put(JMXConnector.CREDENTIALS, creds);
+        JMXConnector jmxConnector = JMXConnectorFactory.connect(new JMXServiceURL(jmxurl), env);
 
-		return jmxConnector;
-	}
+        return jmxConnector;
+    }
 
-	private Object getJMXSigarAttribute(JMXConnector connector, String objname,
-			String attribute) throws MalformedObjectNameException,
-			AttributeNotFoundException, InstanceNotFoundException,
-			MBeanException, ReflectionException, IOException {
+    private Object getJMXSigarAttribute(JMXConnector connector, String objname, String attribute)
+            throws MalformedObjectNameException, AttributeNotFoundException, InstanceNotFoundException,
+            MBeanException, ReflectionException, IOException {
 
-		ObjectName name = null;
+        ObjectName name = null;
 
-		RMTHelper.log("Looking for MBean '" + objname + "'...");
-		Set<ObjectName> names = connector.getMBeanServerConnection()
-				.queryNames(new ObjectName(objname), null);
-		for (ObjectName o : names) {
-			RMTHelper.log("  found: " + o.getCanonicalName());
-			name = o;
-		}
+        RMTHelper.log("Looking for MBean '" + objname + "'...");
+        Set<ObjectName> names = connector.getMBeanServerConnection()
+                .queryNames(new ObjectName(objname), null);
+        for (ObjectName o : names) {
+            RMTHelper.log("  found: " + o.getCanonicalName());
+            name = o;
+        }
 
-		if (name == null) {
-			RMTHelper.log("Not found any '" + objname + "'.");
-			return null;
-		}
+        if (name == null) {
+            RMTHelper.log("Not found any '" + objname + "'.");
+            return null;
+        }
 
-		return connector.getMBeanServerConnection().getAttribute(name,
-				attribute);
-	}
+        return connector.getMBeanServerConnection().getAttribute(name, attribute);
+    }
 }

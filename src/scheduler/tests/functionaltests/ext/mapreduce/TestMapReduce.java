@@ -24,6 +24,7 @@ package functionaltests.ext.mapreduce;
  * Modified for ProActive MapReduce.
  */
 
+import java.io.File;
 import java.io.IOException;
 import java.util.StringTokenizer;
 
@@ -194,8 +195,8 @@ public class TestMapReduce extends SchedulerConsecutive {
     private JobResult submitAndCheck(Job job, PAMapReduceJobConfiguration pamrjc, boolean sort)
             throws Throwable {
 
-        pamrjc.setInputSpace("file://" + helper.getRootDir() + "/in");
-        pamrjc.setOutputSpace("file://" + helper.getRootDir() + "/out");
+        pamrjc.setInputSpace((new File(helper.getRootDir(), "in")).toURI().toURL().toString());
+        pamrjc.setOutputSpace((new File(helper.getRootDir(), "out")).toURI().toURL().toString());
 
         // submit PAMapReduceJob and wait for completion
         JobResult result = MapReduceTHelper.submit(job, pamrjc);

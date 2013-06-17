@@ -355,7 +355,7 @@ public class JobComparator {
                 return false;
         }
 
-        if(t1 instanceof ScriptTask) {
+        if (t1 instanceof ScriptTask) {
             ScriptTask st1 = (ScriptTask) t1;
             ScriptTask st2 = (ScriptTask) t2;
             if (!isEqualScript(st1.getScript(), st2.getScript()))

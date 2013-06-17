@@ -146,8 +146,8 @@ public class TestFaultTolerance extends SchedulerConsecutive {
 
         PAMapReduceJobConfiguration pamrjc = MapReduceTHelper.getConfiguration();
 
-        pamrjc.setInputSpace("file://" + helper.getRootDir() + "/in");
-        pamrjc.setOutputSpace("file://" + helper.getRootDir() + "/out");
+        pamrjc.setInputSpace((new File(helper.getRootDir(), "in")).toURI().toURL().toString());
+        pamrjc.setOutputSpace((new File(helper.getRootDir(), "out")).toURI().toURL().toString());
         pamrjc.setInputSplitSize(20);
         //pamrjc.setMaxNumberOfExecutions(2);
         pamrjc.setMaxNumberOfExecutions(PAMapReduceFramework.MAPPER_PA_TASK, 2);

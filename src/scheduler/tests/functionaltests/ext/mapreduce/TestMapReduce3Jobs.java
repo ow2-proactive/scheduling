@@ -308,8 +308,8 @@ public class TestMapReduce3Jobs extends SchedulerConsecutive {
         genJob.setNumReduceTasks(1);
 
         PAMapReduceJobConfiguration pamrjc = MapReduceTHelper.getConfiguration();
-        pamrjc.setInputSpace("file://" + randomIns);
-        pamrjc.setOutputSpace("file://" + TEST_ROOT_DIR);
+        pamrjc.setInputSpace(new File(randomIns.toString()).toURI().toURL().toString());
+        pamrjc.setOutputSpace(new File(TEST_ROOT_DIR.toString()).toURI().toURL().toString());
 
         MapReduceTHelper.submit(genJob, pamrjc);
 
@@ -362,8 +362,8 @@ public class TestMapReduce3Jobs extends SchedulerConsecutive {
         checkJob.setNumReduceTasks(intermediateReduces);
 
         pamrjc = MapReduceTHelper.getConfiguration();
-        pamrjc.setInputSpace("file://" + TEST_ROOT_DIR);
-        pamrjc.setOutputSpace("file://" + TEST_ROOT_DIR);
+        pamrjc.setInputSpace(new File(TEST_ROOT_DIR.toString()).toURI().toURL().toString());
+        pamrjc.setOutputSpace(new File(TEST_ROOT_DIR.toString()).toURI().toURL().toString());
 
         MapReduceTHelper.submit(checkJob, pamrjc);
 
@@ -392,8 +392,8 @@ public class TestMapReduce3Jobs extends SchedulerConsecutive {
         mergeJob.setNumReduceTasks(1);
 
         pamrjc = MapReduceTHelper.getConfiguration();
-        pamrjc.setInputSpace("file://" + TEST_ROOT_DIR);
-        pamrjc.setOutputSpace("file://" + TEST_ROOT_DIR);
+        pamrjc.setInputSpace(new File(TEST_ROOT_DIR.toString()).toURI().toURL().toString());
+        pamrjc.setOutputSpace(new File(TEST_ROOT_DIR.toString()).toURI().toURL().toString());
 
         MapReduceTHelper.submit(mergeJob, pamrjc);
 

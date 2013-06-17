@@ -529,8 +529,8 @@ public class Job2XMLTransformer {
             } else if (topologyDescr instanceof ThresholdProximityDescriptor) {
                 topologyDescrE = doc.createElement(XMLTags.TOPOLOGY_THRESHOLD_PROXIMITY.getXMLName());
                 long threshold = ((ThresholdProximityDescriptor) topologyDescr).getThreshold();
-                topologyDescrE.setAttribute(XMLAttributes.TOPOLOGY_THRESHOLD.getXMLName(),
-                        Long.toString(threshold));
+                topologyDescrE.setAttribute(XMLAttributes.TOPOLOGY_THRESHOLD.getXMLName(), Long
+                        .toString(threshold));
             } else if (topologyDescr instanceof SingleHostDescriptor) {
                 topologyDescrE = doc.createElement(XMLTags.TOPOLOGY_SINGLE_HOST.getXMLName());
             } else if (topologyDescr instanceof SingleHostExclusiveDescriptor) {

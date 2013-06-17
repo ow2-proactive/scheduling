@@ -776,9 +776,9 @@ public class JobFactory_stax extends JobFactory {
                         } else if (XMLTags.NATIVE_EXECUTABLE.matches(current)) {
                             toReturn = (taskToFill != null) ? taskToFill : new NativeTask();
                             setNativeExecutable((NativeTask) toReturn, cursorTask);
-                        }  else if (XMLTags.SCRIPT_EXECUTABLE.matches(current)) {
+                        } else if (XMLTags.SCRIPT_EXECUTABLE.matches(current)) {
                             toReturn = (taskToFill != null) ? taskToFill : new ScriptTask();
-                            ((ScriptTask)toReturn).setScript(new TaskScript(createScript(cursorTask)));
+                            ((ScriptTask) toReturn).setScript(new TaskScript(createScript(cursorTask)));
                         }
                         break;
                     case XMLEvent.END_ELEMENT:
@@ -855,14 +855,12 @@ public class JobFactory_stax extends JobFactory {
                                     if (selector == null) {
                                         selector = new FileSelector();
                                     }
-                                    selector.setIncludes(replace(cursorTask
-                                            .getAttributeValue(i)));
+                                    selector.setIncludes(replace(cursorTask.getAttributeValue(i)));
                                 } else if (XMLAttributes.DS_EXCLUDES.matches(attrName)) {
                                     if (selector == null) {
                                         selector = new FileSelector();
                                     }
-                                    selector.setExcludes(replace(cursorTask
-                                            .getAttributeValue(i)));
+                                    selector.setExcludes(replace(cursorTask.getAttributeValue(i)));
                                 } else if (XMLAttributes.DS_ACCESSMODE.matches(attrName)) {
                                     accessMode = replace(cursorTask.getAttributeValue(i));
                                 }
@@ -1679,7 +1677,7 @@ public class JobFactory_stax extends JobFactory {
          */
         public void error(SAXParseException exception) throws SAXException {
             appendAndPrintMessage("ERROR:" + exception.getMessage() + " at line " +
-                    exception.getLineNumber() + ", column " + exception.getColumnNumber());
+                exception.getLineNumber() + ", column " + exception.getColumnNumber());
         }
 
         /**
@@ -1687,7 +1685,7 @@ public class JobFactory_stax extends JobFactory {
          */
         public void fatalError(SAXParseException exception) throws SAXException {
             appendAndPrintMessage("ERROR:" + exception.getMessage() + " at line " +
-                    exception.getLineNumber() + ", column " + exception.getColumnNumber());
+                exception.getLineNumber() + ", column " + exception.getColumnNumber());
         }
 
         /**
@@ -1695,7 +1693,7 @@ public class JobFactory_stax extends JobFactory {
          */
         public void warning(SAXParseException exception) throws SAXException {
             appendAndPrintMessage("WARNING:" + exception.getMessage() + " at line " +
-                    exception.getLineNumber() + ", column " + exception.getColumnNumber());
+                exception.getLineNumber() + ", column " + exception.getColumnNumber());
         }
 
         private void appendAndPrintMessage(String msg) {

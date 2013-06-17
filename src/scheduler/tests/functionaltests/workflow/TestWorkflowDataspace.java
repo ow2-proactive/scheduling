@@ -90,8 +90,8 @@ public class TestWorkflowDataspace extends SchedulerConsecutive {
 
         TaskFlowJob job = new TaskFlowJob();
         job.setName("Test DS flow java");
-        job.setInputSpace("file://" + inputSpace.getAbsolutePath());
-        job.setOutputSpace("file://" + outputSpace.getAbsolutePath());
+        job.setInputSpace(inputSpace.toURI().toURL().toString());
+        job.setOutputSpace(outputSpace.toURI().toURL().toString());
         JobEnvironment env = new JobEnvironment();
         env.setJobClasspath(new String[] { System.getProperty("pa.scheduler.home") +
             "/classes/schedulerTests/" });

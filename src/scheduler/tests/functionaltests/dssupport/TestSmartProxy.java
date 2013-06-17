@@ -1,8 +1,11 @@
 package functionaltests.dssupport;
 
-import functionaltests.SchedulerConsecutive;
-import functionaltests.SchedulerTHelper;
-import functionaltests.monitor.EventMonitor;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+
 import jdbm.PrimaryHashMap;
 import jdbm.RecordManager;
 import jdbm.RecordManagerFactory;
@@ -26,10 +29,9 @@ import org.ow2.proactive.scheduler.common.util.dsclient.AwaitedJob;
 import org.ow2.proactive.scheduler.common.util.dsclient.JobDB;
 import org.ow2.proactive.scheduler.common.util.dsclient.SmartProxy;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.net.URISyntaxException;
+import functionaltests.SchedulerConsecutive;
+import functionaltests.SchedulerTHelper;
+import functionaltests.monitor.EventMonitor;
 
 
 /**
@@ -61,8 +63,8 @@ public class TestSmartProxy extends SchedulerConsecutive {
     // private DataServerProvider dataProvider;
     protected String dataServerURI;
 
-    protected String push_url = "file://" + dataServerFolderPath;
-    protected String pull_url = "file://" + dataServerFolderPath;
+    protected String push_url;
+    protected String pull_url;
 
     protected static final String TEST_SESSION_NAME = "TestDSSupport";
 
@@ -76,6 +78,11 @@ public class TestSmartProxy extends SchedulerConsecutive {
     // the proxy to be tested
     protected SmartProxy schedProxy;
     protected MyEventListener eventListener;
+
+    public TestSmartProxy() throws MalformedURLException, URISyntaxException {
+        push_url = (new File(dataServerFolderPath)).toURI().toURL().toExternalForm();
+        pull_url = (new File(dataServerFolderPath)).toURI().toURL().toExternalForm();
+    }
 
     @Before
     public void init() throws Exception {
@@ -94,7 +101,7 @@ public class TestSmartProxy extends SchedulerConsecutive {
         // this simulates a remote data server
         // dataServerURI =
         // dataProvider.deployProActiveDataServer(dataServerFolderPath, "data");
-        dataServerURI = "file://" + dataServerFolderPath;
+        dataServerURI = (new File(dataServerFolderPath)).toURI().toURL().toExternalForm();
 
         // start scheduler and nodes
         SchedulerTHelper.init();

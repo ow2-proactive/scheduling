@@ -225,7 +225,7 @@ public class TestUserSpace extends FunctionalTest {
 
         TaskFlowJob job = new TaskFlowJob();
         job.setName(this.getClass().getSimpleName());
-        job.setInputSpace(in.toURL().toString());
+        job.setInputSpace(in.toURI().toURL().toString());
         job.setOutputSpace(out.toURL().toString());
 
         JavaTask A = new JavaTask();
@@ -280,7 +280,8 @@ public class TestUserSpace extends FunctionalTest {
                 D.setCommandLine(new String[] { "cmd", "/C", scriptCWindows });
                 break;
             case unix:
-                D.setCommandLine(new String[] { "/bin/bash", "-c", "chmod u+x $LOCALSPACE/" + scriptCLinux+";$LOCALSPACE/" + scriptCLinux });
+                D.setCommandLine(new String[] { "/bin/bash", "-c",
+                        "chmod u+x $LOCALSPACE/" + scriptCLinux + ";$LOCALSPACE/" + scriptCLinux });
                 break;
             default:
                 throw new IllegalStateException("Unsupported operating system");

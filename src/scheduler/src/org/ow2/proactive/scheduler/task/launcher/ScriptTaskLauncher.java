@@ -125,7 +125,8 @@ public class ScriptTaskLauncher extends TaskLauncher {
 
             if (!hasBeenKilled) {
                 //init task
-                ScriptExecutableInitializer initializer = (ScriptExecutableInitializer) executableContainer.createExecutableInitializer();
+                ScriptExecutableInitializer initializer = (ScriptExecutableInitializer) executableContainer
+                        .createExecutableInitializer();
 
                 sample = System.nanoTime();
                 try {

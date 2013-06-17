@@ -123,7 +123,7 @@ public class TestPauseJobRecover extends FunctionalTest {
     }
 
     private TaskState getTaskState(String taskName, JobState jobState) {
-        for (TaskState ts: jobState.getTasks()) {
+        for (TaskState ts : jobState.getTasks()) {
             if (ts.getName().equals(taskName)) {
                 return ts;
             }

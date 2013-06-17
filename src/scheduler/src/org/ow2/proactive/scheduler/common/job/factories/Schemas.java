@@ -37,12 +37,13 @@ package org.ow2.proactive.scheduler.common.job.factories;
 import java.util.HashMap;
 import java.util.Map;
 
+
 public enum Schemas {
     SCHEMA_3_1("/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/3.1/schedulerjob.rng",
-            "urn:proactive:jobdescriptor:3.1"),
-    SCHEMA_3_2("/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/3.2/schedulerjob.rng",
-            "urn:proactive:jobdescriptor:3.2"),
-    SCHEMA_DEV("/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.rng",
+            "urn:proactive:jobdescriptor:3.1"), SCHEMA_3_2(
+            "/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/3.2/schedulerjob.rng",
+            "urn:proactive:jobdescriptor:3.2"), SCHEMA_DEV(
+            "/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.rng",
             "urn:proactive:jobdescriptor:dev"),
     // should the last one declared, see #validate
     SCHEMA_LATEST(SCHEMA_3_2.location, SCHEMA_3_2.namespace);

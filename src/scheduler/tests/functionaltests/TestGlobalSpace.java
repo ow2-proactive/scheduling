@@ -162,8 +162,8 @@ public class TestGlobalSpace extends FunctionalTest {
 
         TaskFlowJob job = new TaskFlowJob();
         job.setName(this.getClass().getSimpleName());
-        job.setInputSpace(in.toURL().toString());
-        job.setOutputSpace(out.toURL().toString());
+        job.setInputSpace(in.toURI().toURL().toString());
+        job.setOutputSpace(out.toURI().toURL().toString());
 
         JavaTask A = new JavaTask();
         A.setExecutableClassName("org.ow2.proactive.scheduler.examples.EmptyTask");

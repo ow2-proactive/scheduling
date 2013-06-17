@@ -1644,13 +1644,14 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
             @Override
             List<SchedulerUserInfo> executeWork(Session session) {
                 List<SchedulerUserInfo> users = new ArrayList<SchedulerUserInfo>();
-                Query query = session.createQuery("select owner, count(owner), max(submittedTime) from JobData group by owner");
+                Query query = session
+                        .createQuery("select owner, count(owner), max(submittedTime) from JobData group by owner");
 
                 for (Object obj : query.list()) {
                     Object[] nameAndCount = (Object[]) obj;
                     users.add(new SchedulerUserInfo(null, nameAndCount[0].toString(), 0, Long
-                            .parseLong(nameAndCount[2].toString()), Integer
-                            .parseInt(nameAndCount[1].toString())));
+                            .parseLong(nameAndCount[2].toString()), Integer.parseInt(nameAndCount[1]
+                            .toString())));
                 }
                 return users;
             }

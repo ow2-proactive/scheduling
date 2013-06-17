@@ -1065,10 +1065,10 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
      * {@inheritDoc}
      */
     @Override
-    public List<JobUsage> getAccountUsage(String user, Date startDate, Date endDate) throws NotConnectedException,
-            PermissionException {
-        frontendState.checkPermission("getAccountUsage",
-                "You don't have permissions to get usage data of " + user);
+    public List<JobUsage> getAccountUsage(String user, Date startDate, Date endDate)
+            throws NotConnectedException, PermissionException {
+        frontendState.checkPermission("getAccountUsage", "You don't have permissions to get usage data of " +
+            user);
         return dbManager.getUsage(user, startDate, endDate);
     }
 

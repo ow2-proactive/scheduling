@@ -38,6 +38,7 @@ package org.ow2.proactive.scheduler.core;
 
 import java.io.File;
 import java.io.Serializable;
+import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -219,7 +220,7 @@ public class DataSpaceServiceStarter implements Serializable {
      */
     public static void createSpace(long appID, String name, String url, String path, String hostname,
             boolean inputConfiguration, boolean localConfiguration) throws FileSystemException,
-            URISyntaxException, ProActiveException {
+            URISyntaxException, ProActiveException, MalformedURLException {
         if (!spacesConfigurations.containsKey(new Long(appID))) {
             if (localConfiguration) {
                 if (appidConfigured != null) {
@@ -244,7 +245,8 @@ public class DataSpaceServiceStarter implements Serializable {
         // We add the deployed path to a url list, this way the dataspace will always be accessed preferably by the file system
         ArrayList<String> urls = new ArrayList<String>();
         if (path != null) {
-            urls.add("file://" + (path.startsWith("/") ? "" : "/") + path.replace("\\", "/"));
+            urls.add((new File(path)).toURI().toURL().toExternalForm());
+            //urls.add("file://" + (path.startsWith("/") ? "" : "/") + path.replace("\\", "/"));
         }
         urls.add(url);
         if (inputConfiguration) {

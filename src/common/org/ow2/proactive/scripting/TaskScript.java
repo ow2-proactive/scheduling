@@ -86,8 +86,7 @@ public class TaskScript extends Script<Serializable> {
                 return new ScriptResult<Serializable>((Serializable) result);
             } else {
                 return new ScriptResult<Serializable>(new Exception(
-                    "Bad result format : awaited Serializable, found " +
-                        result.getClass().getName()));
+                    "Bad result format : awaited Serializable, found " + result.getClass().getName()));
             }
         } else {
             // assuming script ran fine
