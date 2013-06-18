@@ -95,7 +95,7 @@ public class TestLoadJobs extends FunctionalTest {
         jobs = scheduler.getJobs(0, 1, criteria(true, true, true, true), null);
         checkJobs(jobs, 1);
         job = jobs.get(0);
-        Assert.assertEquals("Test job", job.getJobId().getReadableName());
+        Assert.assertEquals(this.getClass().getSimpleName(), job.getJobId().getReadableName());
         Assert.assertEquals(1, job.getTotalNumberOfTasks());
         Assert.assertEquals(0, job.getNumberOfFinishedTasks());
         Assert.assertEquals(0, job.getNumberOfPendingTasks());

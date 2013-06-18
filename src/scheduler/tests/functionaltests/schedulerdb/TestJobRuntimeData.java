@@ -54,7 +54,8 @@ public class TestJobRuntimeData extends BaseSchedulerDBTest {
         System.out.println("Load internal job");
         runtimeData = loadInternalJob(true, runtimeData.getId());
 
-        Assert.assertEquals("test job", runtimeData.getJobInfo().getJobId().getReadableName());
+        Assert.assertEquals(this.getClass().getSimpleName(), runtimeData.getJobInfo().getJobId()
+                .getReadableName());
         Assert.assertEquals(JobStatus.RUNNING, runtimeData.getStatus());
         Assert.assertEquals(1, runtimeData.getNumberOfRunningTasks());
         Assert.assertEquals(0, runtimeData.getNumberOfFinishedTasks());
