@@ -1072,7 +1072,7 @@ command="[working_dir]/nativTask"
 	<para>
 	Each job has a specified name in its deployment descriptor as well as a unique job ID given at the moment of job's submission.
 	All tasks have these two same parameters specified at the same time. You can access to these values in task's execution environment, during task's execution.
-	When a native task is launched, the task has also 4 exported environment variables:
+	When a native task is launched, the task has also several exported environment variables:
 	</para>
 	<itemizedlist>
 		<listitem><para>
@@ -1088,6 +1088,15 @@ command="[working_dir]/nativTask"
 		<listitem><para>
 			<emphasis role="bold">$PAS_TASK_ID</emphasis> - unique task's ID.</para>
 		</listitem>
+        <listitem><para>
+            <emphasis role="bold">$JAVA_HOME</emphasis> - home of the Java Virtual Machine used by the task.</para>
+        </listitem>
+        <listitem><para>
+            <emphasis role="bold">$JAVA</emphasis> - path of the java command used by the task.</para>
+        </listitem>
+        <listitem><para>
+            <emphasis role="bold">$PROACTIVE_HOME</emphasis> - home of the ProActive installation used by the task.</para>
+        </listitem>
 	</itemizedlist>
 
 	<para>
