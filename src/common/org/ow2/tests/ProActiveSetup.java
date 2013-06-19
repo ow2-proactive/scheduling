@@ -38,6 +38,8 @@ package org.ow2.tests;
 
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.xml.VariableContractImpl;
@@ -62,7 +64,7 @@ public class ProActiveSetup {
     static final private String VAR_JVM_PARAMETERS = "JVM_PARAMETERS";
 
     /** The parameters to pass to the forked JVMs */
-    final private String jvmParameters;
+    final private List<String> jvmParameters;
     /** The variable contract to pass to GCMA. */
     final private VariableContractImpl vc;
     final private PAMRSetup pamrSetup;
@@ -70,7 +72,7 @@ public class ProActiveSetup {
     public ProActiveSetup() {
         this.pamrSetup = new PAMRSetup();
         this.jvmParameters = buildJvmParameters();
-        this.vc = buildVariableContract(this.jvmParameters);
+        this.vc = buildVariableContract(this.getJvmParameters());
     }
 
     /**
@@ -88,6 +90,14 @@ public class ProActiveSetup {
     }
 
     final public String getJvmParameters() {
+        StringBuilder sb = new StringBuilder();
+        for (String param : jvmParameters) {
+            sb.append(param).append(" ");
+        }
+        return sb.toString().trim();
+    }
+
+    final public List<String> getJvmParametersAsList() {
         return this.jvmParameters;
     }
 
@@ -111,30 +121,19 @@ public class ProActiveSetup {
         return vContract;
     }
 
-    private String buildJvmParameters() {
-        StringBuilder jvmParameters = new StringBuilder(" ");
-
-        jvmParameters.append(CentralPAPropertyRepository.PA_TEST.getCmdLine());
-        jvmParameters.append("true ");
-
-        jvmParameters.append(" -Dproactive.test=true ");
-
-        jvmParameters.append(CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getCmdLine());
-        jvmParameters.append(CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getValue());
-        jvmParameters.append(" ");
+    private List<String> buildJvmParameters() {
+        final ArrayList<String> jvmParameters = new ArrayList<String>();
+        jvmParameters.add(CentralPAPropertyRepository.PA_TEST.getCmdLine() + "true");
+        jvmParameters.add(CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getCmdLine() +
+            CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getValue());
 
         if (PAMRRemoteObjectFactory.PROTOCOL_ID.equals(CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL
                 .getValue())) {
-            jvmParameters.append(PAMRConfig.PA_NET_ROUTER_ADDRESS.getCmdLine());
-            jvmParameters.append(this.pamrSetup.address);
-            jvmParameters.append(" ");
-
-            jvmParameters.append(PAMRConfig.PA_NET_ROUTER_PORT.getCmdLine());
-            jvmParameters.append(this.pamrSetup.port);
-            jvmParameters.append(" ");
+            jvmParameters.add(PAMRConfig.PA_NET_ROUTER_ADDRESS.getCmdLine() + this.pamrSetup.address);
+            jvmParameters.add(PAMRConfig.PA_NET_ROUTER_PORT.getCmdLine() + this.pamrSetup.port);
         }
 
-        return jvmParameters.toString();
+        return jvmParameters;
     }
 
     static private class PAMRSetup {

@@ -40,6 +40,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -276,23 +277,20 @@ public class RMTHelper {
             new org.objectweb.proactive.core.process.AbstractExternalProcess.StandardOutputMessageLogger());
         nodeProcess.setClassname("org.objectweb.proactive.core.node.StartNode");
 
-        String jvmParameters = "";
+        ArrayList<String> jvmParameters = new ArrayList<String>();
         if (vmParameters != null) {
             for (Entry<String, String> entry : vmParameters.entrySet()) {
                 if (!entry.getKey().equals("") && !entry.getValue().equals("")) {
-                    jvmParameters += " -D" + entry.getKey() + "=" + entry.getValue();
+                    jvmParameters.add("-D" + entry.getKey() + "=" + entry.getValue());
                 }
             }
         }
         if (vmOptions != null) {
-            for (String option : vmOptions) {
-                jvmParameters += " " + option;
-            }
+            jvmParameters.addAll(vmOptions);
         }
-
-        jvmParameters += " " + setup.getJvmParameters();
+        jvmParameters.addAll(setup.getJvmParametersAsList());
         nodeProcess.setJvmOptions(jvmParameters);
-        nodeProcess.setParameters(nodeName);
+        nodeProcess.setParameters(Arrays.asList(nodeName));
         nodeProcess.startProcess();
         try {
             Node newNode = null;
