@@ -45,8 +45,8 @@ import javax.security.auth.Subject;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
-import org.objectweb.proactive.core.body.ft.internalmsg.Heartbeat;
 import org.objectweb.proactive.core.body.proxy.BodyProxy;
+import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.mop.Proxy;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.ow2.proactive.authentication.principals.UserNamePrincipal;
@@ -68,17 +68,17 @@ import org.ow2.proactive.resourcemanager.core.history.UserHistory;
  */
 public class Client implements Serializable {
 
-    private static final Heartbeat hb = new Heartbeat();
-    /** client's name */
-    private String name;
+    /** The security entity that represents this client */
+    private final Subject subject;
 
-    private Subject subject;
+    /** Defines if this client has to be pinged */
+    private final boolean pingable;
+
+    /** Client's name */
+    private String name;
 
     /** Unique id of the client */
     private UniqueID id;
-
-    /** Defines if this client has to be pinged */
-    boolean pingable = false;
 
     /** Body of the sender of request */
     private transient UniversalBody body;
@@ -87,6 +87,8 @@ public class Client implements Serializable {
     private transient UserHistory history;
 
     public Client() {
+        this.subject = null;
+        this.pingable = false;
     }
 
     /**
@@ -103,8 +105,9 @@ public class Client implements Serializable {
             this.name = unPrincipal.getName();
         }
         if (pingable) {
-            this.id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
-            this.body = PAActiveObject.getContext().getCurrentRequest().getSender();
+            Request r = PAActiveObject.getContext().getCurrentRequest();
+            this.id = r.getSourceBodyID();
+            this.body = r.getSender();
         }
     }
 
@@ -173,11 +176,11 @@ public class Client implements Serializable {
      */
     public boolean isAlive() {
         if (pingable) {
-            if (body == null) {
+            if (this.body == null) {
                 throw new RuntimeException("Cannot detect if the client " + this + " is alive");
             }
             try {
-                body.receiveFTMessage(hb);
+                return PAActiveObject.pingActiveObject(this.body);
             } catch (Exception e) {
                 return false;
             }
