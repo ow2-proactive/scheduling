@@ -44,13 +44,14 @@ import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory_stax;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.tests.FunctionalTest;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 
-public class TestNonForkedScriptTask extends SchedulerConsecutive {
+public class TestNonForkedScriptTask extends FunctionalTest {
 
     private static URL nonForked_jobDescriptor = TestNonForkedScriptTask.class
             .getResource("/functionaltests/descriptors/Job_non_forked_script_task.xml");
