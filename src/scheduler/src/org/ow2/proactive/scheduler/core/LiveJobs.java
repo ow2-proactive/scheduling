@@ -508,7 +508,7 @@ class LiveJobs {
                             + "You also ask to cancel the job in such a situation !", JobStatus.CANCELED);
                 return terminationData;
             } else if (task.getNumberOfExecutionLeft() > 0) {
-                long waitTime = restartDelay * 1000;
+                long waitTime = restartDelay * 1000l;
                 restartTaskOnError(jobData, task, TaskStatus.WAITING_ON_ERROR, taskResult, waitTime,
                         terminationData);
                 return terminationData;
