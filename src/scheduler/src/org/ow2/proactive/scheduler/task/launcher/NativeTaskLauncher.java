@@ -37,6 +37,7 @@
 package org.ow2.proactive.scheduler.task.launcher;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -44,9 +45,13 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
+import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
 import org.objectweb.proactive.extensions.dataspaces.exceptions.DataSpacesException;
+import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.task.ExecutableInitializer;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
@@ -74,6 +79,20 @@ public class NativeTaskLauncher extends TaskLauncher {
     private static final String USER_DATASPACE_TAG = "$" + USER_DATASPACE;
     private static final String GLOBAL_DATASPACE = "GLOBALSPACE";
     private static final String GLOBAL_DATASPACE_TAG = "$" + GLOBAL_DATASPACE;
+
+    private static final String JAVA_CMD_VAR = "JAVA";
+    private static final String JAVA_CMD_TAG = "$" + JAVA_CMD_VAR;
+    private static final String JAVA_HOME_VAR = "JAVA_HOME";
+    private static final String JAVA_HOME_TAG = "$" + JAVA_HOME_VAR;
+    private static final String PROACTIVE_HOME_VAR = "PROACTIVE_HOME";
+    private static final String PROACTIVE_HOME_TAG = "$" + PROACTIVE_HOME_VAR;
+    private static String PROACTIVE_HOME = null;
+    private static String JAVA_CMD = null;
+
+    static {
+        JAVA_CMD = System.getProperty("java.home") + File.separator + "bin" + File.separator + "java" +
+            ((OperatingSystem.getOperatingSystem() == OperatingSystem.windows) ? ".exe" : "");
+    }
 
     // SCHEDULING-988 : only way to pass nodes to a runAsMe mutlinodes native task.
     /** Tag for identifying in command line tmp file that contains allocated resource for a multi-node task */
@@ -117,6 +136,7 @@ public class NativeTaskLauncher extends TaskLauncher {
         // TaskResult produced by doTask
         TaskResultImpl res;
         try {
+            initProActiveHome();
             //init dataspace
             initDataSpaces();
             replaceTagsInDataspaces();
@@ -149,6 +169,7 @@ public class NativeTaskLauncher extends TaskLauncher {
             if (!hasBeenKilled) {
                 //init task
                 ExecutableInitializer execInit = executableContainer.createExecutableInitializer();
+                replaceWorkingDirPathsTags(execInit);
                 replaceWorkingDirDSAllTags(execInit);
                 replaceTagsInScript(((NativeExecutableInitializer) execInit).getGenerationScript());
                 //decrypt credentials if needed
@@ -165,12 +186,21 @@ public class NativeTaskLauncher extends TaskLauncher {
                 }
 
                 replaceIterationTags(execInit);
+                // replace the JAVA tags in command
+                replaceCommandPathsTags(execInit);
                 //replace dataspace tags in command (if needed) by local scratch directory
                 replaceCommandDSTags();
                 // pass the nodesfile as parameter if needed...
                 replaceCommandNodesInfosTags();
 
                 addsDataSpaceEnvVar();
+
+                // The JAVA env variable
+                ((NativeExecutable) currentExecutable).addToEnvironmentVariables(JAVA_CMD_VAR, JAVA_CMD);
+                ((NativeExecutable) currentExecutable).addToEnvironmentVariables(JAVA_HOME_VAR, System
+                        .getProperty("java.home"));
+                ((NativeExecutable) currentExecutable).addToEnvironmentVariables(PROACTIVE_HOME_VAR,
+                        PROACTIVE_HOME);
 
                 sample = System.nanoTime();
                 try {
@@ -253,12 +283,42 @@ public class NativeTaskLauncher extends TaskLauncher {
      * @throws Exception
      */
     private void addsDataSpaceEnvVar() throws Exception {
-        addEnvVar(SCRATCH, SCRATCH_DATASPACE);
-        addEnvVar(GLOBAL, GLOBAL_DATASPACE);
-        addEnvVar(USER, USER_DATASPACE);
+        addDataSpaceEnvVar(SCRATCH, SCRATCH_DATASPACE);
+        addDataSpaceEnvVar(GLOBAL, GLOBAL_DATASPACE);
+        addDataSpaceEnvVar(USER, USER_DATASPACE);
     }
 
-    private void addEnvVar(DataSpacesFileObject fo, String varName) throws URISyntaxException {
+    private void initProActiveHome() {
+        if (PROACTIVE_HOME == null) {
+            if (CentralPAPropertyRepository.PA_HOME.isSet()) {
+
+                PROACTIVE_HOME = CentralPAPropertyRepository.PA_HOME.getValue();
+            } else {
+                PROACTIVE_HOME = System.getProperty(CentralPAPropertyRepository.PA_HOME.getName());
+            }
+
+            if (PROACTIVE_HOME == null) {
+                try {
+                    PROACTIVE_HOME = ProActiveRuntimeImpl.getProActiveRuntime().getProActiveHome();
+                } catch (ProActiveException e) {
+                    throw new RuntimeException("Cannot find ProActive home", e);
+                }
+                PROACTIVE_HOME.replace("/", File.separator);
+
+            }
+            // cleaning the path
+            try {
+                PROACTIVE_HOME = (new File(PROACTIVE_HOME)).getCanonicalPath();
+            } catch (IOException e) {
+                throw new RuntimeException("Problem occurred when reading ProActive home", e);
+            }
+
+            System.setProperty(CentralPAPropertyRepository.PA_HOME.getName(), PROACTIVE_HOME);
+        }
+
+    }
+
+    private void addDataSpaceEnvVar(DataSpacesFileObject fo, String varName) throws URISyntaxException {
         if (fo != null) {
             String foUri = (new URI(fo.getRealURI())).toString();
             if (foUri.startsWith("file:")) {
@@ -293,6 +353,16 @@ public class NativeTaskLauncher extends TaskLauncher {
         }
     }
 
+    private void replaceWorkingDirPathsTags(ExecutableInitializer execInit) throws Exception {
+        String wd = ((NativeExecutableInitializer) execInit).getWorkingDir();
+        if (wd != null) {
+            wd = wd.replace(JAVA_HOME_TAG, System.getProperty("java.home"));
+            wd = wd.replace(JAVA_CMD_TAG, JAVA_CMD);
+            wd = wd.replace(PROACTIVE_HOME_TAG, PROACTIVE_HOME);
+            ((NativeExecutableInitializer) execInit).setWorkingDir(wd);
+        }
+    }
+
     private void replaceCommandDSTags() throws Exception {
         String[] cmdElements = ((NativeExecutable) currentExecutable).getCommand();
 
@@ -315,6 +385,16 @@ public class NativeTaskLauncher extends TaskLauncher {
             }
         }
         return commandElem;
+    }
+
+    private void replaceCommandPathsTags(ExecutableInitializer execInit) throws Exception {
+        String[] cmdElements = ((NativeExecutable) currentExecutable).getCommand();
+
+        for (int i = 0; i < cmdElements.length; i++) {
+            cmdElements[i] = cmdElements[i].replace(JAVA_HOME_TAG, System.getProperty("java.home"));
+            cmdElements[i] = cmdElements[i].replace(JAVA_CMD_TAG, JAVA_CMD);
+            cmdElements[i] = cmdElements[i].replace(PROACTIVE_HOME_TAG, PROACTIVE_HOME);
+        }
     }
 
     // SCHEDULING-988 : only way to pass nodes to a runAsMe mutlinodes native task.
