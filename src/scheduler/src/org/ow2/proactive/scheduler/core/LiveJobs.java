@@ -547,7 +547,7 @@ class LiveJobs {
                     .currentTimeMillis() -
                 task.getStartTime());
 
-            long waitTime = restartDelay * 1000;
+            long waitTime = restartDelay * 1000l;
             restartTaskOnError(jobData, task, TaskStatus.PENDING, taskResult, waitTime, terminationData);
 
             return terminationData;
