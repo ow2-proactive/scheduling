@@ -132,11 +132,6 @@ public class TestSmartProxy extends SchedulerConsecutive {
         MyEventListener myListenerRemoteReference = PAActiveObject.turnActive(eventListener);
         schedProxy.addEventListener(myListenerRemoteReference);
 
-        File dataTransfer = new File("dataTransfer.status");
-        File dataTransferBak = new File("dataTransfer.status.BAK");
-        dataTransfer.deleteOnExit();
-        dataTransferBak.deleteOnExit();
-
     }
 
     protected TaskFlowJob createTestJob(boolean isolateOutputs) throws Exception {
@@ -287,14 +282,15 @@ public class TestSmartProxy extends SchedulerConsecutive {
             }
         }
 
+        eventListener.reset();
+        eventListener.setSynchronous(!automaticTransfer);
+        eventListener.setMonitor(em);
+
         JobId id = schedProxy.submit(job, localInputFolderPath, push_url, localOutputFolderPath, pull_url,
                 isolateTaskOutputs, automaticTransfer);
-        eventListener.reset();
+
         eventListener.setJobID(id);
 
-        eventListener.setSynchronous(!automaticTransfer);
-
-        eventListener.setMonitor(em);
         Thread.sleep(1000);
         schedProxy.disconnect();
         schedProxy.reconnect();

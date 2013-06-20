@@ -1306,8 +1306,8 @@ public class SmartProxy extends SchedulerProxyUserInterface implements InitActiv
                 transfer();
 
             } catch (Exception e) {
-                logger.error("An error occured while copying files of task " + taskName + " of job " + jobId +
-                    " from " + source + " to " + dest, e);
+                logger.error("An error occurred while copying files of task " + taskName + " of job " +
+                    jobId + " from " + source + " to " + dest, e);
 
                 logger
                         .warn("Task " +
@@ -1332,8 +1332,6 @@ public class SmartProxy extends SchedulerProxyUserInterface implements InitActiv
 
             }// catch
 
-            stubOnThis.removeAwaitedTask(jobId, taskName);
-
             Iterator<ISchedulerEventListenerExtended> it = eventListeners.iterator();
             while (it.hasNext()) {
                 ISchedulerEventListenerExtended l = it.next();
@@ -1344,6 +1342,7 @@ public class SmartProxy extends SchedulerProxyUserInterface implements InitActiv
                     it.remove();
                 }
             }
+            stubOnThis.removeAwaitedTask(jobId, taskName);
         }
 
         @Override
