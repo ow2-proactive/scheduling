@@ -521,6 +521,28 @@ public class SmartProxy extends SchedulerProxyUserInterface implements InitActiv
     }
 
     /**
+     * Convenient shortcut for submit(job, localInputFolderPath, localOutputFolderPath, isolateTaskOutputs, automaticTransfer)
+     * @param job                   job object to be submitted to the Scheduler Server for
+     *                              execution
+     * @param localInputFolderPath  path to the folder containing the input data for this job
+     * @param localOutputFolderPath path to the folder where the output data produced by tasks in
+     *                              this job should be copied
+     * @param isolateTaskOutputs    isolate the output produced by each task in a dedicated subfolder.
+     *                              It will not be possible to reuse a file produced by a task as an input of a latter task,
+     *                              but we guaranty this way that their will be no overlapping of files produced by parallel tasks.
+     * @param automaticTransfer     when this is set to true, the transfer or files between the pull_url shared space to
+     *                              the local machine will be done automatically by the proxy. Notifications according to
+     *                              the ISchedulerEventListenerExtended interface will be sent to the listeners upon transfer
+     *                              completion or failure.
+     */
+    public JobId submit(TaskFlowJob job, String localInputFolderPath, String localOutputFolderPath,
+            boolean isolateTaskOutputs, boolean automaticTransfer) throws NotConnectedException,
+            PermissionException, SubmissionClosedException, JobCreationException, FileSystemException {
+        return submit(job, localInputFolderPath, null, localOutputFolderPath, null, isolateTaskOutputs,
+                automaticTransfer);
+    }
+
+    /**
      * Does the following steps:
      * <ul>
      * <li>Prepares the temporary folders.
@@ -542,11 +564,11 @@ public class SmartProxy extends SchedulerProxyUserInterface implements InitActiv
      *                              execution
      * @param localInputFolderPath  path to the folder containing the input data for this job
      * @param push_url              the url where input data is to be pushed before the job
-     *                              submission
+     *                              submission. if push_url is null, the USER space will be used
      * @param localOutputFolderPath path to the folder where the output data produced by tasks in
      *                              this job should be copied
      * @param pull_url              the url where the data is to be retrieved after the job is
-     *                              finished
+     *                              finished. if push_url is null, the USER space will be used
      * @param isolateTaskOutputs    isolate the output produced by each task in a dedicated subfolder.
      *                              It will not be possible to reuse a file produced by a task as an input of a latter task,
      *                              but we guaranty this way that their will be no overlapping of files produced by parallel tasks.
@@ -566,11 +588,11 @@ public class SmartProxy extends SchedulerProxyUserInterface implements InitActiv
             boolean automaticTransfer) throws NotConnectedException, PermissionException,
             SubmissionClosedException, JobCreationException, FileSystemException {
 
-        if (((push_url == null) || (push_url.equals(""))) && ((pull_url == null) || (pull_url.equals("")))) {
-            logger
-                    .warn("For the job " + job.getId() +
-                        " no push or pull urls are defined. No data will be transfered for this job from the local machine ");
-            return super.submit(job);
+        if ((push_url == null) || (push_url.equals(""))) {
+            push_url = super.getUserSpaceURIs().get(0);
+        }
+        if ((pull_url == null) || (pull_url.equals(""))) {
+            pull_url = super.getUserSpaceURIs().get(0);
         }
 
         String newFolderName = createNewFolderName();
@@ -928,7 +950,12 @@ public class SmartProxy extends SchedulerProxyUserInterface implements InitActiv
 
         AwaitedTask atask = awaitedjob.getAwaitedTask(t_name);
         if (atask == null) {
-            throw new IllegalArgumentException("The task " + t_name + " does not belong to job " + jobId);
+            throw new IllegalArgumentException("The task " + t_name + " does not belong to job " + jobId +
+                " or has already been removed");
+        }
+        if (atask.isTransferring()) {
+            logger.warn("The task " + t_name + " of job " + jobId + " is already transferring its output");
+            return;
         }
         String pull_URL = awaitedjob.getPullURL();
 
@@ -995,6 +1022,7 @@ public class SmartProxy extends SchedulerProxyUserInterface implements InitActiv
         if (awaitedjob.isAutomaticTransfer()) {
             DataTransferProcessor dtp = new DataTransferProcessor(remotePullFolderFO, localfolderFO, jobId,
                 t_name, fileSelector);
+            jobDB.setTaskTransferring(jobId, t_name, true);
             tpe.submit((Runnable) dtp);
         } else {
             logger.debug("Copying files from " + sourceUrl + " to " + destUrl);
@@ -1215,7 +1243,7 @@ public class SmartProxy extends SchedulerProxyUserInterface implements InitActiv
             case FINISHED: {
                 logger.debug("The task " + tname + " from job " + id + " is finished.");
                 if (aj.isAutomaticTransfer()) {
-                    logger.debug("Transfering data for finished task " + tname + " from job " + id);
+                    logger.debug("Transferring data for finished task " + tname + " from job " + id);
                     try {
                         pullDataInternal(aj, id.toString(), tname, aj.getLocalOutputFolder());
                     } catch (FileSystemException e) {

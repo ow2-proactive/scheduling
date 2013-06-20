@@ -34,10 +34,10 @@
  */
 package org.ow2.proactive.scheduler.common.util.dsclient;
 
-import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
-
 import java.io.Serializable;
 import java.util.List;
+
+import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 
 
 /**
@@ -52,6 +52,8 @@ public class AwaitedTask implements Serializable {
     private List<OutputSelector> outputSelectors;
 
     private String taskId;
+
+    private boolean transferring = false;
 
     public AwaitedTask(String taskName, List<OutputSelector> outputSelectors) {
 
@@ -81,6 +83,14 @@ public class AwaitedTask implements Serializable {
 
     public void setTaskId(String taskId) {
         this.taskId = taskId;
+    }
+
+    public boolean isTransferring() {
+        return transferring;
+    }
+
+    public void setTransferring(boolean transferring) {
+        this.transferring = transferring;
     }
 
 }

@@ -34,6 +34,15 @@
  */
 package org.ow2.proactive.scheduler.common.util.dsclient;
 
+import java.io.File;
+import java.io.FilenameFilter;
+import java.io.IOError;
+import java.io.IOException;
+import java.io.InvalidClassException;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import jdbm.PrimaryHashMap;
 import jdbm.RecordManager;
 import jdbm.RecordManagerFactory;
@@ -44,11 +53,6 @@ import org.apache.commons.vfs.Selectors;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.extensions.dataspaces.vfs.VFSFactory;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
-
-import java.io.*;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 
 /**
@@ -285,7 +289,8 @@ public class JobDB {
 
         AwaitedJob aj = awaitedJobs.get(id);
         if (aj == null) {
-            throw new IllegalArgumentException("Job " + id + " not in the awaited list");
+            logger.warn("Job " + id + " not in the awaited list");
+            return;
         }
         logger.debug("Removing knowledge of job " + id);
 
@@ -347,6 +352,33 @@ public class JobDB {
     }
 
     /**
+     * Sets the given task to transferring status. This is to avoid duplicate transfers in case of duplicate events
+     *
+     * @param id    jobID
+     * @param tname task name
+     * @param transferring
+     */
+    protected void setTaskTransferring(String id, String tname, boolean transferring) {
+        AwaitedJob aj = awaitedJobs.get(id);
+        if (aj == null) {
+            logger.warn("Job " + id + " not in the awaited list");
+            return;
+        }
+        AwaitedTask at = aj.getAwaitedTask(tname);
+        if (at == null) {
+            logger.warn("Task " + tname + " from Job " + id + " not in the awaited list");
+            return;
+        }
+        at.setTransferring(transferring);
+        try {
+            this.recMan.commit();
+        } catch (IOException e) {
+            logger.error("Could not save status file after setting transferring mode to task Task " + tname +
+                " from Job" + id, e);
+        }
+    }
+
+    /**
      * Removes from the proxy knowledge all info related with the given task.
      * If all tasks of a job have been removed this way, the job itself will be removed.
      *
@@ -356,12 +388,13 @@ public class JobDB {
     protected void removeAwaitedTask(String id, String tname) {
         AwaitedJob aj = awaitedJobs.get(id);
         if (aj == null) {
-            throw new IllegalArgumentException("Job " + id + " not in the awaited list");
+            logger.warn("Job " + id + " not in the awaited list");
+            return;
         }
         AwaitedTask at = aj.getAwaitedTask(tname);
         if (at == null) {
-            throw new IllegalArgumentException("Task " + tname + " from Job " + id +
-                " not in the awaited list");
+            logger.warn("Task " + tname + " from Job " + id + " not in the awaited list");
+            return;
         }
         logger.debug("Removing knowledge of task " + tname + " from job " + id);
         if (aj.isIsolateTaskOutputs() && at.getTaskId() != null) {
