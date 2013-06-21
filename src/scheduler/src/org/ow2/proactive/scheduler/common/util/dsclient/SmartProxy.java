@@ -304,6 +304,13 @@ public class SmartProxy extends SchedulerProxyUserInterface implements InitActiv
     }
 
     /**
+     * Cleans the job database
+     */
+    public void cleanDatabase() {
+        jobDB.cleanDataBase();
+    }
+
+    /**
      * This method forcefully terminates the activity of the proxy
      * This method should not be called via a proactive stub
      */

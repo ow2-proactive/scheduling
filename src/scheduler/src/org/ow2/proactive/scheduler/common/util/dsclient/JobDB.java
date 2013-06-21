@@ -193,7 +193,7 @@ public class JobDB {
 
     }
 
-    protected void cleanDataBase() {
+    public void cleanDataBase() {
         if (recMan != null) {
             throw new IllegalStateException("Connection to a DB is established, cannot clean it");
         }
