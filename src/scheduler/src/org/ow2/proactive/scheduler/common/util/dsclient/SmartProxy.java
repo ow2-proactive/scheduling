@@ -467,11 +467,13 @@ public class SmartProxy extends SchedulerProxyUserInterface implements InitActiv
 
             for (TaskState ts : js.getTasks()) {
                 String tname = ts.getName();
-                if (awaitedJob.getAwaitedTask(tname) != null) {
+                AwaitedTask at = awaitedJob.getAwaitedTask(tname);
+                if ((at != null) && (!at.isTransferring())) {
                     TaskResult tres = null;
                     try {
                         tres = uischeduler.getTaskResult(id, tname);
                         if (tres != null) {
+                            logger.debug("Synchonizing task " + tname + " of job " + id);
                             taskStateUpdatedEvent(new NotificationData<TaskInfo>(
                                 SchedulerEvent.TASK_RUNNING_TO_FINISHED, ts.getTaskInfo()));
                         }
@@ -923,7 +925,7 @@ public class SmartProxy extends SchedulerProxyUserInterface implements InitActiv
 
         AwaitedJob awaitedjob = jobDB.getAwaitedJob(jobId);
         if (awaitedjob == null) {
-            throw new IllegalArgumentException("The job " + jobId + " is unknown ");
+            throw new IllegalArgumentException("The job " + jobId + " is unknown or has been removed");
         }
         if (awaitedjob.isAutomaticTransfer()) {
             throw new UnsupportedOperationException("Transfer of input files with job " + jobId +

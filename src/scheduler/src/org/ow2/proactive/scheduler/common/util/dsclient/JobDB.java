@@ -370,6 +370,7 @@ public class JobDB {
             return;
         }
         at.setTransferring(transferring);
+        awaitedJobs.put(id, aj);
         try {
             this.recMan.commit();
         } catch (IOException e) {
@@ -423,7 +424,7 @@ public class JobDB {
             removeAwaitedJob(id);
             return;
         } else {
-            awaitedJobs.put(id, aj); // this is done to ensure persistance of the operation
+            awaitedJobs.put(id, aj); // this is done to ensure persistence of the operation
         }
 
         try {
