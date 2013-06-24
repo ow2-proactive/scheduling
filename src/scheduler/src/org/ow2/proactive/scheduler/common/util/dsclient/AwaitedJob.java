@@ -127,6 +127,10 @@ public class AwaitedJob implements Serializable {
         this.awaitedTasks = awaitedTasks;
     }
 
+    public void putAwaitedTask(String tname, AwaitedTask at) {
+        this.awaitedTasks.put(tname, at);
+    }
+
     public boolean isAutomaticTransfer() {
         return automaticTransfer;
     }

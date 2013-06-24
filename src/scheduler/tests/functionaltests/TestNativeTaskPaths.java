@@ -68,7 +68,7 @@ public class TestNativeTaskPaths extends FunctionalTest {
     private static final String OutVarsFileC = "outvarsc";
     private static final String OutVarsFileD = "outvarsd";
     private static final String scriptCLinux = "testenv.sh";
-    private static final String scriptCLinuxContent = "echo \"$JAVA\" \"$PROACTIVE_HOME\" > $LOCALSPACE/" +
+    private static final String scriptCLinuxContent = "echo \\\"$JAVA\\\" \\\"$PROACTIVE_HOME\\\" > $LOCALSPACE/" +
         OutVarsFileD + "\n";
     private static final String scriptCWindows = "testenv.bat";
     private static final String scriptCWindowsContent = "echo \"%JAVA%\" \"%PROACTIVE_HOME%\" > %LOCALSPACE%\\" +
@@ -130,7 +130,7 @@ public class TestNativeTaskPaths extends FunctionalTest {
                 break;
             case unix:
                 C.setCommandLine(new String[] { "/bin/bash", "-c",
-                        "echo \"$JAVA\" \"$PROACTIVE_HOME\" > $LOCALSPACE/" + OutVarsFileC });
+                        "echo \\\"$JAVA\\\" \\\"$PROACTIVE_HOME\\\" > $LOCALSPACE/" + OutVarsFileC });
                 break;
             default:
                 throw new IllegalStateException("Unsupported operating system");

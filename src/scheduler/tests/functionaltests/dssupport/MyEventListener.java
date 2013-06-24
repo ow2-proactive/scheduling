@@ -1,6 +1,7 @@
 package functionaltests.dssupport;
 
-import functionaltests.monitor.EventMonitor;
+import java.io.Serializable;
+
 import org.junit.Assert;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
@@ -11,7 +12,7 @@ import org.ow2.proactive.scheduler.common.job.UserIdentification;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.util.dsclient.ISchedulerEventListenerExtended;
 
-import java.io.Serializable;
+import functionaltests.monitor.EventMonitor;
 
 
 public class MyEventListener implements ISchedulerEventListenerExtended, Serializable {
@@ -29,29 +30,33 @@ public class MyEventListener implements ISchedulerEventListenerExtended, Seriali
      * @param id
      *            of the job this Listener is intrested in
      */
-    public void setJobID(JobId id) {
+    public boolean setJobID(JobId id) {
         this.jobId = id;
+        return true;
     }
 
     public MyEventListener() {
 
     }
 
-    public void reset() {
+    public boolean reset() {
         jobFinished = false;
         count = 0;
+        return true;
     }
 
-    public synchronized void setSynchronous(boolean synchronous) {
+    public synchronized boolean setSynchronous(boolean synchronous) {
         this.synchronous = synchronous;
+        return true;
     }
 
     /**
      * to be called directly on the java object (not on the remote active
      * reference) the monitor needs to be copied by reference
      */
-    public void setMonitor(EventMonitor monitor) {
+    public boolean setMonitor(EventMonitor monitor) {
         this.monitor = monitor;
+        return true;
     }
 
     @Override

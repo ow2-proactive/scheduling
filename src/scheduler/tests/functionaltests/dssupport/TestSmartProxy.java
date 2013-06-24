@@ -6,9 +6,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 
-import jdbm.PrimaryHashMap;
-import jdbm.RecordManager;
-import jdbm.RecordManagerFactory;
 import org.apache.log4j.Level;
 import org.junit.Assert;
 import org.junit.Before;
@@ -25,8 +22,6 @@ import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
-import org.ow2.proactive.scheduler.common.util.dsclient.AwaitedJob;
-import org.ow2.proactive.scheduler.common.util.dsclient.JobDB;
 import org.ow2.proactive.scheduler.common.util.dsclient.SmartProxy;
 
 import functionaltests.SchedulerConsecutive;
@@ -106,19 +101,9 @@ public class TestSmartProxy extends SchedulerConsecutive {
         // start scheduler and nodes
         SchedulerTHelper.init();
 
-        // Clearing old jobs
-        try {
-            RecordManager recMan = RecordManagerFactory.createRecordManager(new File(System
-                    .getProperty("java.io.tmpdir"), TEST_SESSION_NAME).getCanonicalPath());
-            PrimaryHashMap<String, AwaitedJob> awaitedJobs = recMan.hashMap(JobDB.STATUS_RECORD_NAME);
-            awaitedJobs.clear();
-            recMan.commit();
-            recMan.close();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
         schedProxy = SmartProxy.getActiveInstance();
+
+        schedProxy.cleanDatabase();
 
         String schedulerUrl = System.getProperty("url");
         if (schedulerUrl == null || schedulerUrl.equals("${url}")) {
@@ -131,11 +116,6 @@ public class TestSmartProxy extends SchedulerConsecutive {
         eventListener = new MyEventListener();
         MyEventListener myListenerRemoteReference = PAActiveObject.turnActive(eventListener);
         schedProxy.addEventListener(myListenerRemoteReference);
-
-        File dataTransfer = new File("dataTransfer.status");
-        File dataTransferBak = new File("dataTransfer.status.BAK");
-        dataTransfer.deleteOnExit();
-        dataTransferBak.deleteOnExit();
 
     }
 
@@ -287,14 +267,15 @@ public class TestSmartProxy extends SchedulerConsecutive {
             }
         }
 
+        eventListener.reset();
+        eventListener.setSynchronous(!automaticTransfer);
+        eventListener.setMonitor(em);
+
         JobId id = schedProxy.submit(job, localInputFolderPath, push_url, localOutputFolderPath, pull_url,
                 isolateTaskOutputs, automaticTransfer);
-        eventListener.reset();
+
         eventListener.setJobID(id);
 
-        eventListener.setSynchronous(!automaticTransfer);
-
-        eventListener.setMonitor(em);
         Thread.sleep(1000);
         schedProxy.disconnect();
         schedProxy.reconnect();
