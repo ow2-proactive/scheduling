@@ -86,7 +86,7 @@ public class TestJobNativeSubmission extends SchedulerConsecutive {
         NativeTask task1 = new NativeTask();
         task1.setName(task1Name);
         if (OperatingSystem.getOperatingSystem() == OperatingSystem.windows) {
-            task1.setCommandLine("cmd", "/C", "ping", "127.0.0.1", "-n", "10", ">", "NUL");
+            task1.setCommandLine("cmd", "/C", "ping 127.0.0.1 -n 10", ">", "NUL");
         } else {
             task1.setCommandLine("ping", "-c", "5", "127.0.0.1");
         }
