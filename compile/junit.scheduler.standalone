@@ -18,6 +18,14 @@ cleanup () {
 		ps -ef | grep proactive
 }
 
+mktemp_jruby() {
+		PREFIX="proactive"
+		SUFFIX=".tmp"
+		export CLASSPATH=$PA_SCHEDULER/lib/common/script/jruby.jar
+		export CMD="f=Java::java.io.File.createTempFile(Java::java.lang.String.new(\"$PREFIX\"),Java::java.lang.String.new(\"$SUFFIX\"));Java::java.lang.System.out.println(f)"
+		$JAVA_HOME/bin/java org.jruby.Main -e $CMD
+}
+
 cleanup
 
 compileDir=$(cd `dirname $0` && /bin/pwd)
@@ -37,7 +45,7 @@ echo "Erasing previous tests results"
 rm -rf $compileDir/../junitReports/
 
 opt="-Xms128m -Xmx2048m"
-SCHEDULER_OUT=$(mktemp --tmpdir)
+SCHEDULER_OUT=$(mktemp_jruby)
 
 trap cleanup TERM INT
 
