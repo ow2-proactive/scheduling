@@ -108,5 +108,7 @@ public class TestJobNodeAccess extends SchedulerConsecutive {
         RMTHelper.getDefaultInstance().waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
         SchedulerTHelper.waitForEventJobFinished(id2);
+
+        rm.removeNodeSource(nsName, true);
     }
 }
