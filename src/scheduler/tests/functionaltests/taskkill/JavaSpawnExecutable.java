@@ -34,6 +34,14 @@
  */
 package functionaltests.taskkill;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Serializable;
+import java.net.URL;
+import java.util.Map;
+
 import org.apache.log4j.Level;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
@@ -41,10 +49,6 @@ import org.ow2.proactive.scheduler.util.process.OperatingSystem;
 import org.ow2.proactive.scheduler.util.process.OperatingSystemFamily;
 import org.ow2.proactive.scheduler.util.process.ProcessTreeKiller;
 import org.ow2.proactive.scheduler.util.process.ThreadReader;
-
-import java.io.*;
-import java.net.URL;
-import java.util.Map;
 
 
 /**
@@ -124,6 +128,15 @@ public class JavaSpawnExecutable extends JavaExecutable {
         super.kill();
     }
 
+    /**
+     * Returns the path to the native launcher script
+     * In case of Native Executable normal termination test, we use a set of alternate scripts which will not run a
+     * detached executable
+     *
+     * @param alternate to use alternate scripts
+     * @return
+     * @throws Exception
+     */
     public static String[] getNativeExecLauncher(boolean alternate) throws Exception {
         String osName = System.getProperty("os.name");
         OperatingSystem operatingSystem = OperatingSystem.resolveOrError(osName);
@@ -145,7 +158,6 @@ public class JavaSpawnExecutable extends JavaExecutable {
                 break;
             case WINDOWS:
                 if (alternate) {
-                    //nativeExecLauncher = new String[] { "cmd.exe", "/C", new File(TestProcessTreeKiller.nativeWindowsExecLauncher.toURI()).getName(),">", UUID.randomUUID().toString()+".txt"};
                     nativeExecLauncher = new String[] { "cmd.exe", "/C",
                             new File(nativeWindowsExecLauncher2.toURI()).getName() };
                 } else {
