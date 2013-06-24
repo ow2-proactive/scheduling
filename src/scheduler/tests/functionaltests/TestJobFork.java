@@ -87,7 +87,7 @@ public class TestJobFork extends SchedulerConsecutive {
 
         String[] commandLine;
         if (OperatingSystem.getOperatingSystem() == OperatingSystem.windows) {
-            commandLine = new String[] { "cmd", "/C", "ping", "127.0.0.1", "-n", "20", ">", "NUL" };
+            commandLine = new String[] { "cmd", "/C", "ping.exe 127.0.0.1 -n 20", ">", "NUL" };
         } else {
             commandLine = new String[] { "ping", "-c", "20", "127.0.0.1" };
         }
