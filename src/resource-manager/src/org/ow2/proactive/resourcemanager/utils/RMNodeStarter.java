@@ -48,6 +48,9 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.KeyException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -86,6 +89,7 @@ import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.node.jmx.SigarExposer;
 import org.ow2.proactive.resourcemanager.nodesource.dataspace.DataSpaceNodeConfigurationAgent;
 import org.ow2.proactive.utils.Formatter;
+import org.ow2.proactive.utils.Tools;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -943,11 +947,13 @@ public class RMNodeStarter {
      *
      */
     public static final class CommandLineBuilder implements Cloneable {
+        public static final String OBFUSC = "[OBFUSCATED_CRED]";
         private String nodeName, sourceName, javaPath, rmURL, credentialsFile, credentialsValue,
                 credentialsEnv, rmHome;
         private long pingDelay = 30000;
         private Properties paPropProperties;
         private String paPropString;
+        private List<String> paPropList;
         private int addAttempts = -1, addAttemptsDelay = -1;
         private final String[] requiredJARs = { "jruby-engine.jar", "sigar/sigar.jar",
                 "jython-engine.jar",
@@ -1050,18 +1056,28 @@ public class RMNodeStarter {
          * To set a String standing for the ProActive Properties, appended to the built command line without any modification.
          * If a call to {@link #setPaProperties(byte[])} or {@link #setPaProperties(File)} of {@link #setPaProperties(Map)} has already been made, the PAProperties structure will be cleaned up...
          * @param paProp A String standing for the PAProperties ( for instance -Dlog4j.configuration=... or -Dproactive.net.netmask=... )
+         * @deprecated Please use {@link #setPaProperties(List)}
          */
         public void setPaProperties(String paProp) {
-            if (this.paPropProperties != null) {
-                this.paPropProperties = null;
-            }
-            this.paPropString = paProp;
+            this.setPaProperties(Arrays.asList(paProp.split(" ")));
         }
 
         /**
-         * To set the PAproperties of the node. If a previsous call to
+         * To set a list of String standing for the ProActive Properties, appended to the built command line without any modification.
+         * If a call to {@link #setPaProperties(byte[])} or {@link #setPaProperties(File)} of {@link #setPaProperties(Map)} has already been made, the PAProperties structure will be cleaned up...
+         * @param paProp A list of String standing for the PAProperties ( for instance -Dlog4j.configuration=... or -Dproactive.net.netmask=... )
+         */
+        public void setPaProperties(List<String> paPropList) {
+            if (this.paPropProperties != null) {
+                this.paPropProperties = null;
+            }
+            this.paPropList = paPropList;
+        }
+
+        /**
+         * To set the PAproperties of the node. If a previous call to
          * {@link #setPaProperties(byte[])} or {@link #setPaProperties(File)} of {@link #setPaProperties(Map)} has already been made,
-         * this one will overide the previous call. This file must be a valid ProActive XML configuration file.
+         * this one will override the previous call. This file must be a valid ProActive XML configuration file.
          * @param paPropertiesFile the ProActive configuration file
          * @throws IOException if the file is not a ProActive regular file
          */
@@ -1309,147 +1325,118 @@ public class RMNodeStarter {
          * @throws IOException if you supplied a ProActive Configuration file that doesn't exist.
          */
         public String buildCommandLine(boolean displayCreds) throws IOException {
-            Properties paProp = this.getPaProperties();
+            List<String> command = this.buildCommandLineAsList(displayCreds);
+            return Tools.join(command, " ");
+        }
+
+        /**
+         * Same as {@link RMNodeStarter.CommandLineBuilder#buildCommandLine(boolean)} but the command is a list of String.
+         * @param displayCreds if true displays the credentials in the command line if false, obfuscates them
+         * @return The RMNodeStarter command line as a list of String.
+         * @throws IOException if you supplied a ProActive Configuration file that doesn't exist.
+         */
+        public List<String> buildCommandLineAsList(boolean displayCreds) throws IOException {
+            final ArrayList<String> command = new ArrayList<String>();
+            final OperatingSystem os = this.getTargetOS();
+            final Properties paProp = this.getPaProperties();
+
             String rmHome = this.getRmHome();
             if (rmHome != null) {
-                if (!rmHome.endsWith(this.targetOS.fs)) {
-                    rmHome = rmHome + this.targetOS.fs;
+                if (!rmHome.endsWith(os.fs)) {
+                    rmHome = rmHome + os.fs;
                 }
             } else {
                 rmHome = "";
             }
-            String libRoot = rmHome + "dist" + this.targetOS.fs + "lib" + this.targetOS.fs;
-            StringBuilder sb = new StringBuilder();
-            if (this.getJavaPath() != null) {
-                String javaPath = this.getJavaPath();
-                if (javaPath.contains(" ")) {
-                    if (this.getTargetOS().equals(OperatingSystem.UNIX)) {
-                        javaPath = javaPath.replace(" ", "\\ ");
-                    } else {
-                        javaPath = "\"" + javaPath + "\"";
-                    }
-                }
-                sb.append(javaPath);
+
+            final String libRoot = rmHome + "dist" + os.fs + "lib" + os.fs;
+            String javaPath = this.getJavaPath();
+            if (javaPath != null) {
+                command.add(javaPath);
             } else {
                 logger.warn("java path isn't set in RMNodeStarter configuration.");
-                sb.append("java");
+                command.add("java");
             }
 
             //building configuration
             if (paProp != null) {
                 Set<Object> keys = paProp.keySet();
                 for (Object key : keys) {
-                    sb.append(" -D");
-                    sb.append(key.toString());
-                    sb.append("=");
-                    sb.append(paProp.get(key).toString());
+                    command.add("-D" + key + "=" + paProp.get(key));
                 }
             } else {
-                if (this.getPaPropertiesString() != null) {
-                    sb.append(" ");
-                    sb.append(this.getPaPropertiesString());
-                    sb.append(" ");
+                if (this.paPropList != null) {
+                    command.addAll(this.paPropList);
                 }
             }
             //building classpath
-            sb.append(" -cp ");
-            if (this.getTargetOS().equals(OperatingSystem.CYGWIN) ||
-                this.getTargetOS().equals(OperatingSystem.WINDOWS)) {
-                sb.append("\"");//especially on cygwin, we need to quote the cp
-            } else if (this.getTargetOS().equals(OperatingSystem.UNIX) && libRoot.trim().contains(" ")) {
-                sb.append("\"");
-            }
-            sb.append(".");
+            command.add("-cp");
+            final StringBuilder classpath = new StringBuilder('.');
             for (String jar : this.requiredJARs) {
-                sb.append(this.targetOS.ps);
-                sb.append(libRoot);
-                sb.append(jar);
+                classpath.append(os.ps).append(libRoot).append(jar);
             }
-
             // add the content of addons dir on the classpath
-            sb.append(this.targetOS.ps + rmHome + addonsDir);
+            classpath.append(os.ps + rmHome + this.addonsDir);
 
             // add jars inside the addons directory
-
-            File addonsAbsolute = new File(rmHome + addonsDir);
-            File[] addonsJars = addonsAbsolute.listFiles(new FileFilter() {
+            File addonsAbsolute = new File(rmHome + this.addonsDir);
+            addonsAbsolute.listFiles(new FileFilter() {
                 public boolean accept(File pathname) {
-                    return pathname.getName().matches(".*[.]jar");
+                    if (pathname.getName().matches(".*[.]jar")) {
+                        classpath.append(os.ps + pathname.getAbsolutePath());
+                    }
+                    return false;
                 }
             });
-
-            if (addonsJars != null) {
-                for (File addonJar : addonsJars) {
-                    sb.append(this.targetOS.ps + addonJar.getAbsolutePath());
-                }
-            }
-
-            if (this.getTargetOS().equals(OperatingSystem.CYGWIN) ||
-                this.getTargetOS().equals(OperatingSystem.WINDOWS)) {
-                sb.append("\"");//especially on cygwin, we need to quote the cp
-            } else if (this.getTargetOS().equals(OperatingSystem.UNIX) && libRoot.trim().contains(" ")) {
-                sb.append("\"");
-            }
-
-            sb.append(" ");
-            sb.append(RMNodeStarter.class.getName());
+            command.add(classpath.toString());
+            command.add(RMNodeStarter.class.getName());
 
             //appending options
-            if (this.getAddAttempts() != -1) {
-                sb.append(" -");
-                sb.append(OPTION_ADD_NODE_ATTEMPTS);
-                sb.append(" ");
-                sb.append(this.getAddAttempts());
+            int addAttempts = this.getAddAttempts();
+            if (addAttempts != -1) {
+                command.add("-" + OPTION_ADD_NODE_ATTEMPTS);
+                command.add(Integer.toString(addAttempts));
             }
-            if (this.getAddAttemptsDelay() != -1) {
-                sb.append(" -");
-                sb.append(OPTION_ADD_NODE_ATTEMPTS_DELAY);
-                sb.append(" ");
-                sb.append(this.getAddAttemptsDelay());
+            int addAttemptsDelay = this.getAddAttemptsDelay();
+            if (addAttemptsDelay != -1) {
+                command.add("-" + OPTION_ADD_NODE_ATTEMPTS_DELAY);
+                command.add(Integer.toString(addAttemptsDelay));
             }
-            if (this.getCredentialsEnv() != null) {
-                sb.append(" -");
-                sb.append(OPTION_CREDENTIAL_ENV);
-                sb.append(" ");
-                sb.append(this.getCredentialsEnv());
+            String credsEnv = this.getCredentialsEnv();
+            if (credsEnv != null) {
+                command.add("-" + OPTION_CREDENTIAL_ENV);
+                command.add(credsEnv);
             }
-            if (this.getCredentialsFile() != null) {
-                sb.append(" -");
-                sb.append(OPTION_CREDENTIAL_FILE);
-                sb.append(" ");
-                sb.append(this.getCredentialsFile());
+            String credsFile = this.getCredentialsFile();
+            if (credsFile != null) {
+                command.add("-" + OPTION_CREDENTIAL_FILE);
+                command.add(credsFile);
             }
-            if (this.getCredentialsValue() != null) {
-                sb.append(" -");
-                sb.append(OPTION_CREDENTIAL_VAL);
-                sb.append(" ");
-                sb.append(displayCreds ? this.getCredentialsValue() : "[OBFUSCATED_CRED]");
+            String credsValue = this.getCredentialsValue();
+            if (credsValue != null) {
+                command.add("-" + OPTION_CREDENTIAL_VAL);
+                command.add(displayCreds ? credsValue : OBFUSC);
             }
-            if (this.getNodeName() != null) {
-                sb.append(" -");
-                sb.append(OPTION_NODE_NAME);
-                sb.append(" ");
-                sb.append(this.getNodeName());
+            String nodename = this.getNodeName();
+            if (nodename != null) {
+                command.add("-" + OPTION_NODE_NAME);
+                command.add(nodename);
             }
-            if (this.getSourceName() != null) {
-                sb.append(" -");
-                sb.append(OPTION_SOURCE_NAME);
-                sb.append(" ");
-                sb.append(this.getSourceName());
+            String nodesource = this.getSourceName();
+            if (nodesource != null) {
+                command.add("-" + OPTION_SOURCE_NAME);
+                command.add(nodesource);
             }
-            if (this.getRmURL() != null) {
+            String rmurl = this.getRmURL();
+            if (rmurl != null) {
+                command.add("-" + OPTION_RM_URL);
+                command.add(rmurl);
                 //if the rm url != null we can specify a ping delay
                 //it is not relevant if the rm url == null
-                sb.append(" -");
-                sb.append(OPTION_PING_DELAY);
-                sb.append(" ");
-                sb.append(this.getPingDelay());
-                sb.append(" -");
-                sb.append(OPTION_RM_URL);
-                sb.append(" ");
-                sb.append(this.getRmURL());
+                command.add("-" + OPTION_PING_DELAY);
+                command.add(Long.toString(this.getPingDelay()));
             }
-            return sb.toString();
+            return command;
         }
 
         @Override

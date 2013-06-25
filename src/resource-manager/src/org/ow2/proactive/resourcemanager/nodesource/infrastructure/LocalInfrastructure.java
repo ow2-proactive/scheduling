@@ -2,7 +2,11 @@ package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
 
 import java.io.IOException;
 import java.security.KeyException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
@@ -14,6 +18,7 @@ import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 import org.ow2.proactive.resourcemanager.utils.RMNodeStarter.CommandLineBuilder;
 import org.ow2.proactive.resourcemanager.utils.RMNodeStarter.OperatingSystem;
+import org.ow2.proactive.utils.Tools;
 
 
 public class LocalInfrastructure extends InfrastructureManager {
@@ -77,73 +82,47 @@ public class LocalInfrastructure extends InfrastructureManager {
 
     private void acquireNodeImpl() {
         String nodeName = "local-" + this.nodeSource.getName() + "-" + ProActiveCounter.getUniqID();
-        String os = System.getProperty("os.name");
-        OperatingSystem osObj = null;
+        OperatingSystem os = OperatingSystem.UNIX;
         //assuming no cygwin, windows or the "others"...
-        if (os.contains("Windows")) {
-            osObj = OperatingSystem.WINDOWS;
-        } else {
-            osObj = OperatingSystem.UNIX;
+        if (System.getProperty("os.name").contains("Windows")) {
+            os = OperatingSystem.WINDOWS;
         }
         String rmHome = PAResourceManagerProperties.RM_HOME.getValueAsString();
-        if (!rmHome.endsWith(osObj.fs)) {
-            rmHome += osObj.fs;
+        if (!rmHome.endsWith(os.fs)) {
+            rmHome += os.fs;
         }
-        CommandLineBuilder clb = this.getDefaultCommandLineBuilder(osObj);
+        CommandLineBuilder clb = this.getDefaultCommandLineBuilder(os);
         //RM_Home set in bin/unix/env script
         clb.setRmHome(rmHome);
-        boolean containsSpace = false;
-        if (rmHome.contains(" ")) {
-            containsSpace = true;
+        boolean containsSpace = rmHome.contains(" ");
+        ArrayList<String> paPropList = new ArrayList<String>();
+        if (!this.paProperties.contains(CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getName())) {
+            StringBuilder sb = new StringBuilder(CentralPAPropertyRepository.JAVA_SECURITY_POLICY
+                    .getCmdLine());
+            sb.append(rmHome).append("config").append(os.fs).append("security.java.policy-client");
+            paPropList.add(sb.toString());
         }
-        String paProperties = this.paProperties;
-        if (!paProperties.contains(CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getName())) {
-            paProperties += " " + CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getCmdLine();
-            if (containsSpace) {
-                paProperties += "\"";
-            }
-            paProperties += rmHome + "config" + osObj.fs + "security.java.policy-client";
-            if (containsSpace) {
-                paProperties += "\"";
-            }
+        if (!this.paProperties.contains(CentralPAPropertyRepository.LOG4J.getName())) {
+            StringBuilder sb = new StringBuilder(CentralPAPropertyRepository.LOG4J.getCmdLine());
+            sb.append("file:"); // log4j only understands urls
+            sb.append(rmHome).append("config").append(os.fs).append("log4j").append(os.fs).append(
+                    "log4j-defaultNode");
+            paPropList.add(sb.toString());
         }
-        if (!paProperties.contains(CentralPAPropertyRepository.LOG4J.getName())) {
-            paProperties += " " + CentralPAPropertyRepository.LOG4J.getCmdLine();
-            if (containsSpace) {
-                paProperties += "\"";
-            }
-            // log4j only understands urls
-            paProperties += "file:";
-            paProperties += rmHome + "config" + osObj.fs + "log4j" + osObj.fs + "log4j-defaultNode";
-            if (containsSpace) {
-                paProperties += "\"";
-            }
+        if (!this.paProperties.contains(CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getName())) {
+            StringBuilder sb = new StringBuilder(CentralPAPropertyRepository.PA_CONFIGURATION_FILE
+                    .getCmdLine());
+            sb.append(rmHome).append("config").append(os.fs).append("proactive").append(os.fs).append(
+                    "ProActiveConfiguration.xml");
+            paPropList.add(sb.toString());
         }
-        if (!paProperties.contains(CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getName())) {
-            paProperties += " " + CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getCmdLine();
-            if (containsSpace) {
-                paProperties += "\"";
-            }
-            paProperties += rmHome + "config" + osObj.fs + "proactive" + osObj.fs +
-                "ProActiveConfiguration.xml";
-            if (containsSpace) {
-                paProperties += "\"";
-            }
+        if (!this.paProperties.contains(PAResourceManagerProperties.RM_HOME.getKey())) {
+            StringBuilder sb = new StringBuilder(PAResourceManagerProperties.RM_HOME.getCmdLine());
+            sb.append(rmHome);
+            paPropList.add(sb.toString());
         }
-        if (!paProperties.contains(PAResourceManagerProperties.RM_HOME.getKey())) {
-            paProperties += " " + PAResourceManagerProperties.RM_HOME.getCmdLine();
-            if (containsSpace) {
-                paProperties += "\"";
-            }
-            paProperties += rmHome;
-            if (containsSpace) {
-                if (rmHome.endsWith("\\")) {
-                    paProperties += "\\";
-                }
-                paProperties += "\"";
-            }
-        }
-        clb.setPaProperties(paProperties);
+        Collections.addAll(paPropList, this.paProperties.split(" "));
+        clb.setPaProperties(paPropList);
         clb.setNodeName(nodeName);
         try {
             clb.setCredentialsValueAndNullOthers(new String(this.credentials.getBase64()));
@@ -151,38 +130,43 @@ public class LocalInfrastructure extends InfrastructureManager {
             createLostNode(nodeName, "Cannot decrypt credentials value", e);
             return;
         }
-        String cmdLine = null;
+        List<String> cmd = null;
         try {
-            cmdLine = clb.buildCommandLine(true);
+            cmd = clb.buildCommandLineAsList(false);
         } catch (IOException e) {
             createLostNode(nodeName, "Cannot build command line", e);
             return;
         }
-        String obfuscatedCmd = "Launched locally";
-        try {
-            obfuscatedCmd = clb.buildCommandLine(false);
-        } catch (IOException e) {
-            logger.warn("Cannot build obfuscated command line");
-        }
+
+        // The printed cmd with obfuscated credentials
+        final String obfuscatedCmd = Tools.join(cmd, " ");
+
         String depNodeURL = null;
         Process proc = null;
         try {
             this.isNodeAcquired.put(nodeName, false);
-            if (osObj.equals(OperatingSystem.UNIX) && containsSpace) {
+            if (os == OperatingSystem.UNIX && containsSpace) {
                 depNodeURL = this.addDeployingNode(nodeName, SHELL_INTERPRET + " " + SHELL_COMMAND_OPTION +
                     " " + obfuscatedCmd, "Node launched locally", this.nodeTimeout);
-                this.isDeployingNodeLost.put(depNodeURL, false);
+
                 logger
                         .debug("LocalIM detected the libRoot variable contains whitespaces. Running the escaped command prepended with \"" +
                             SHELL_INTERPRET + " " + SHELL_COMMAND_OPTION + "\".");
-                proc = Runtime.getRuntime().exec(
-                        new String[] { SHELL_INTERPRET, SHELL_COMMAND_OPTION, cmdLine });
+
+                List<String> newCmd = Arrays.asList(SHELL_INTERPRET, SHELL_COMMAND_OPTION);
+                newCmd.addAll(cmd);
+                cmd = newCmd;
             } else {
                 depNodeURL = this.addDeployingNode(nodeName, obfuscatedCmd, "Node launched locally",
                         this.nodeTimeout);
-                this.isDeployingNodeLost.put(depNodeURL, false);
-                proc = Runtime.getRuntime().exec(cmdLine);
             }
+
+            // Deobfuscate the cred value
+            Collections.replaceAll(cmd, CommandLineBuilder.OBFUSC, clb.getCredentialsValue());
+
+            this.isDeployingNodeLost.put(depNodeURL, false);
+            proc = (new ProcessBuilder(cmd)).start();
+
             this.nodeNameToProcess.put(nodeName, proc);
         } catch (IOException e) {
             String lf = System.getProperty("line.separator");
@@ -223,6 +207,7 @@ public class LocalInfrastructure extends InfrastructureManager {
                 if (exit != 0) {
                     String lf = System.getProperty("line.separator");
                     String message = "RMNode exit code == " + exit + lf;
+                    message += "Command: " + obfuscatedCmd + lf;
                     String out = Utils.extractProcessOutput(proc);
                     String err = Utils.extractProcessErrput(proc);
                     message += "output: " + out + lf + "errput: " + err;
