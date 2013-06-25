@@ -60,7 +60,7 @@ public class CommonTUtils {
         RemoteObjectFactory factory = AbstractRemoteObjectFactory.getDefaultRemoteObjectFactory();
         for (URI uri : factory.list(new URI(url))) {
             for (String name : namesToRemove) {
-                if (uri.getPath().endsWith(name)) {
+                if (uri.getPath().indexOf(name) != -1) {
                     System.out.println("Unregistering object with URI: " + uri);
                     factory.unregister(uri);
                     break;
