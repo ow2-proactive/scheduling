@@ -53,7 +53,10 @@ import org.ow2.proactive.resourcemanager.nodesource.infrastructure.LocalInfrastr
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.scheduler.SchedulerFactory;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
+import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+
+import functionaltests.common.CommonTUtils;
 
 
 /**
@@ -98,6 +101,9 @@ public class SchedulerTStarter implements Serializable {
         boolean localnodes = Boolean.valueOf(args[0]);
         String schedPropPath = args[1];
         String RMPropPath = args[2];
+
+        CommonTUtils.cleanupRMActiveObjectRegistry();
+        CommonTUtils.cleanupActiveObjectRegistry(SchedulerConstants.SCHEDULER_DEFAULT_NAME, "local-");
 
         PAResourceManagerProperties.updateProperties(RMPropPath);
         PASchedulerProperties.updateProperties(schedPropPath);
