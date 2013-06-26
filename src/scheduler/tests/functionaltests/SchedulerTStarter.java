@@ -134,7 +134,7 @@ public class SchedulerTStarter implements Serializable {
             }
 
             rmAdmin.createNodeSource(NodeSource.DEFAULT, LocalInfrastructure.class.getName(), new Object[] {
-                    "", creds.getBase64(), RM_NODE_NUMBER, RM_NODE_DEPLOYMENT_TIMEOUT, "" },
+                    "", creds.getBase64(), RM_NODE_NUMBER, RM_NODE_DEPLOYMENT_TIMEOUT, "-Dproactive.test=true" },
                     StaticPolicy.class.getName(), new Object[] { "ALL", "ALL" });
         }
     }
