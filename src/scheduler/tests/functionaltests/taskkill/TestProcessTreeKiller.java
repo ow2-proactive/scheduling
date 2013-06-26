@@ -62,8 +62,16 @@ import functionaltests.SchedulerTHelper;
 /**
  * @author ProActive team
  *
- * this test check whether ProcessTreeKiller kill properly detached processes launched
+ * This test check whether ProcessTreeKiller kill properly detached processes launched
  * by a native Task, and only processes launched by this native task.
+ *
+ * It will run an iteration of test; each iteration will test the ProcessTreeKiller for killed jobs and for normally terminated jobs
+ * At each test it will start a single job
+ * The job will contain a JavaTask, a Native Task and a Forked Java Task
+ *
+ * Each task will run a native script (bash or dos), which will run a set 4 detached native executables
+ * The test will check that those detached processes have been killed by the PTK (by listing all processes with the given
+ * name and counting the number of processes
  *
  */
 public class TestProcessTreeKiller extends SchedulerConsecutive {
@@ -145,7 +153,7 @@ public class TestProcessTreeKiller extends SchedulerConsecutive {
             task3.setExecutableClassName(JavaSpawnExecutable.class.getName());
             job3.addTask(task3);
 
-            SchedulerTHelper.log("************** Iteration with Killing *************");
+            SchedulerTHelper.log("************** Test with Job Killing *************");
             //submit three jobs
             JobId id1 = SchedulerTHelper.submitJob(job1);
             JobId id2 = SchedulerTHelper.submitJob(job2);
@@ -203,13 +211,14 @@ public class TestProcessTreeKiller extends SchedulerConsecutive {
             res = SchedulerTHelper.getJobResult(id3);
             Assert.assertEquals(JobStatus.KILLED, res.getJobInfo().getStatus());
 
-            SchedulerTHelper.log("************** Iteration with Normal termination *************");
+            SchedulerTHelper.log("************** Test with Normal Job termination *************");
 
             // The test for normal termination in case of NativeExecutable is slightly different
             // we don't spawn here a native zombie process that will wait forever, because that would mean that the
             // NativeExecutable task will also wait forever !
             // This is related to the current implementation of NativeExecutable, as long as there are still some IO streamed
             // from the subprocesses of the main process, the task will wait
+            // TODO improve the test by finding a way to run a detached process without IO redirection
             TaskFlowJob job4 = new TaskFlowJob();
             job4.setName(this.getClass().getSimpleName() + "_4");
             job4.setDescription("a command that spawn processes");

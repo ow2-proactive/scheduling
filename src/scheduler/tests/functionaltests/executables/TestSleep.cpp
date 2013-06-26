@@ -1,11 +1,11 @@
 // TestSleep.cpp : Defines the entry point for the console application.
 //
 
-#include "stdafx.h"
+#include <stdio.h>
 #include <windows.h>
 
 
-int _tmain(int argc, _TCHAR* argv[])
+int main(int argc, char* argv[])
 {
 	printf("Waiting for 600 seconds...\n");
 	Sleep(600000);
