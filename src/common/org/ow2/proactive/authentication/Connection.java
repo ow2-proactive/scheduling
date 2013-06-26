@@ -71,7 +71,7 @@ public abstract class Connection<T extends Authentication> implements Loggable, 
     private static final String ERROR_CONNECTION_INTERRUPTED = "Connection is interrupted.";
 
     /** Time to wait inside connecting loop retries */
-    private static final int PERIOD = 500; // ms
+    private static final int PERIOD = 5000; // 5 sec	
 
     /** loggers */
     private Logger logger = getLogger();
@@ -157,6 +157,7 @@ public abstract class Connection<T extends Authentication> implements Loggable, 
                     // success
                     break;
                 } catch (Exception e) {
+                    logger.debug("", e);
                     Thread.sleep(Math.min(PERIOD, leftTime));
                     leftTime -= (System.currentTimeMillis() - startTime);
                     if (leftTime <= 0) {

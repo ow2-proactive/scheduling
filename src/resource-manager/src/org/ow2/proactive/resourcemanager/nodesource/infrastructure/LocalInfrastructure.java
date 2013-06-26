@@ -223,7 +223,6 @@ public class LocalInfrastructure extends InfrastructureManager {
                 if (exit != 0) {
                     String lf = System.getProperty("line.separator");
                     String message = "RMNode exit code == " + exit + lf;
-                    message += "Command: " + cmdLine + lf;
                     String out = Utils.extractProcessOutput(proc);
                     String err = Utils.extractProcessErrput(proc);
                     message += "output: " + out + lf + "errput: " + err;

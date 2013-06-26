@@ -42,21 +42,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
+import org.objectweb.proactive.core.node.Node;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.RMFactory;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
-import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
-import org.ow2.proactive.resourcemanager.nodesource.infrastructure.LocalInfrastructure;
-import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.scheduler.SchedulerFactory;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
-import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
-
-import functionaltests.common.CommonTUtils;
 
 
 /**
@@ -70,7 +65,6 @@ public class SchedulerTStarter implements Serializable {
     protected String rmUsername = "demo";
     protected String rmPassword = "demo";
     public static final int RM_NODE_NUMBER = 5;
-    public static final int RM_NODE_DEPLOYMENT_TIMEOUT = 100000;
 
     protected static String schedulerDefaultURL = "//Localhost/";
 
@@ -102,9 +96,6 @@ public class SchedulerTStarter implements Serializable {
         String schedPropPath = args[1];
         String RMPropPath = args[2];
 
-        CommonTUtils.cleanupRMActiveObjectRegistry();
-        CommonTUtils.cleanupActiveObjectRegistry(SchedulerConstants.SCHEDULER_DEFAULT_NAME, "local-");
-
         PAResourceManagerProperties.updateProperties(RMPropPath);
         PASchedulerProperties.updateProperties(schedPropPath);
 
@@ -121,10 +112,8 @@ public class SchedulerTStarter implements Serializable {
 
         SchedulerConnection.waitAndJoin(schedulerDefaultURL);
         if (localnodes) {
-            Credentials creds = Credentials.getCredentials(PAResourceManagerProperties
-                    .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString()));
-
-            ResourceManager rmAdmin = rmAuth.login(creds);
+            ResourceManager rmAdmin = rmAuth.login(Credentials.getCredentials(PAResourceManagerProperties
+                    .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
             Map<String, String> params = new HashMap<String, String>();
             if (System.getProperty("pas.launcher.forkas.method") != null) {
                 params.put("pas.launcher.forkas.method", System.getProperty("pas.launcher.forkas.method"));
@@ -132,10 +121,15 @@ public class SchedulerTStarter implements Serializable {
             if (System.getProperty("proactive.test.runAsMe") != null) {
                 params.put("proactive.test.runAsMe", "true");
             }
-
-            rmAdmin.createNodeSource(NodeSource.DEFAULT, LocalInfrastructure.class.getName(), new Object[] {
-                    "", creds.getBase64(), RM_NODE_NUMBER, RM_NODE_DEPLOYMENT_TIMEOUT, "-Dproactive.test=true" },
-                    StaticPolicy.class.getName(), new Object[] { "ALL", "ALL" });
+            Node[] nodes = new Node[RM_NODE_NUMBER];
+            for (int i = 0; i < RM_NODE_NUMBER; i++) {
+                String nodeName = "default_nodemyao_" + System.currentTimeMillis();
+                Node node = RMTHelper.getDefaultInstance().createNode(nodeName, params).getNode();
+                nodes[i] = node;
+            }
+            for (int i = 0; i < RM_NODE_NUMBER; i++) {
+                rmAdmin.addNode(nodes[i].getNodeInformation().getURL());
+            }
         }
     }
 
