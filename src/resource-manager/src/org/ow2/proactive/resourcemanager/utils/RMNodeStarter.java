@@ -1366,6 +1366,14 @@ public class RMNodeStarter {
                 sb.append(jar);
             }
 
+            if (CentralPAPropertyRepository.PA_TEST.getValue()) {
+                // in tests add classes to nodes classpath
+                sb.append(File.pathSeparator);
+                sb.append(rmHome + File.separator + "classes" + File.separator + "schedulerTests");
+                sb.append(File.pathSeparator);
+                sb.append(rmHome + File.separator + "classes" + File.separator + "resource-managerTests");
+            }
+
             // add the content of addons dir on the classpath
             sb.append(this.targetOS.ps + rmHome + addonsDir);
 

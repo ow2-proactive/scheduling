@@ -86,8 +86,6 @@ public class TestNativeTaskPaths extends FunctionalTest {
         out.delete();
         out.mkdir();
 
-        Scheduler sched = SchedulerTHelper.getSchedulerInterface();
-
         File outc = new File(out, OutVarsFileC);
         File outd = new File(out, OutVarsFileD);
         if (outc.exists()) {
@@ -169,6 +167,7 @@ public class TestNativeTaskPaths extends FunctionalTest {
             SchedulerTHelper.startScheduler(true, null); //tmpProps.getAbsolutePath());
         }
 
+        Scheduler sched = SchedulerTHelper.getSchedulerInterface();
         JobId id = sched.submit(job);
 
         SchedulerTHelper.waitForEventJobFinished(id);

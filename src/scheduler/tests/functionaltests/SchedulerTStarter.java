@@ -36,6 +36,7 @@
  */
 package functionaltests;
 
+import java.io.File;
 import java.io.Serializable;
 import java.net.URI;
 import java.util.HashMap;
@@ -133,7 +134,7 @@ public class SchedulerTStarter implements Serializable {
                 params.put("proactive.test.runAsMe", "true");
             }
 
-            rmAdmin.createNodeSource(NodeSource.DEFAULT, LocalInfrastructure.class.getName(), new Object[] {
+            rmAdmin.createNodeSource("TEST", LocalInfrastructure.class.getName(), new Object[] {
                     "", creds.getBase64(), RM_NODE_NUMBER, RM_NODE_DEPLOYMENT_TIMEOUT, "-Dproactive.test=true" },
                     StaticPolicy.class.getName(), new Object[] { "ALL", "ALL" });
         }
