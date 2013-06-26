@@ -289,15 +289,6 @@ public class TestUserSpace extends FunctionalTest {
         D.setWorkingDir("$LOCALSPACE");
         job.addTask(D);
 
-        /**
-         * start scheduler, submit job
-         */
-        if (consecutiveMode) {
-            SchedulerTHelper.init();
-        } else {
-            SchedulerTHelper.startScheduler(true, null); //tmpProps.getAbsolutePath());
-        }
-
         JobId id = sched.submit(job);
         while (true) {
             try {

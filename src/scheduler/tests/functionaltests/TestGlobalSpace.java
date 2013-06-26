@@ -186,15 +186,6 @@ public class TestGlobalSpace extends FunctionalTest {
         B.setPreScript(new SimpleScript(scriptB, "javascript"));
         job.addTask(B);
 
-        /**
-         * start scheduler, submit job
-         */
-        if (consecutiveMode) {
-            SchedulerTHelper.init();
-        } else {
-            SchedulerTHelper.startScheduler(true, null); //tmpProps.getAbsolutePath());
-        }
-
         Scheduler sched = SchedulerTHelper.getSchedulerInterface();
         JobId id = sched.submit(job);
         while (true) {

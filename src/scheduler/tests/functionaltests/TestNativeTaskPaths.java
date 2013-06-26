@@ -158,15 +158,6 @@ public class TestNativeTaskPaths extends FunctionalTest {
         D.setWorkingDir("$LOCALSPACE");
         job.addTask(D);
 
-        /**
-         * start scheduler, submit job
-         */
-        if (consecutiveMode) {
-            SchedulerTHelper.init();
-        } else {
-            SchedulerTHelper.startScheduler(true, null); //tmpProps.getAbsolutePath());
-        }
-
         Scheduler sched = SchedulerTHelper.getSchedulerInterface();
         JobId id = sched.submit(job);
 
