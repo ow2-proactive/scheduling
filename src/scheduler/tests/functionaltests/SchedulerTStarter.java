@@ -70,7 +70,7 @@ public class SchedulerTStarter implements Serializable {
 
     protected String rmUsername = "demo";
     protected String rmPassword = "demo";
-    public static final int RM_NODE_NUMBER = 5;
+    public static final int RM_NODE_NUMBER = 2;
     public static final int RM_NODE_DEPLOYMENT_TIMEOUT = 100000;
 
     protected static String schedulerDefaultURL = "//Localhost/";
@@ -134,8 +134,8 @@ public class SchedulerTStarter implements Serializable {
                 params.put("proactive.test.runAsMe", "true");
             }
 
-            rmAdmin.createNodeSource("TEST", LocalInfrastructure.class.getName(), new Object[] {
-                    "", creds.getBase64(), RM_NODE_NUMBER, RM_NODE_DEPLOYMENT_TIMEOUT, "-Dproactive.test=true" },
+            rmAdmin.createNodeSource("TEST", LocalInfrastructure.class.getName(), new Object[] { "",
+                    creds.getBase64(), RM_NODE_NUMBER, RM_NODE_DEPLOYMENT_TIMEOUT, "-Dproactive.test=true" },
                     StaticPolicy.class.getName(), new Object[] { "ALL", "ALL" });
         }
     }

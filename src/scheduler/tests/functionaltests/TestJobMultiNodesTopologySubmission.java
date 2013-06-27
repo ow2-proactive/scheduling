@@ -78,6 +78,10 @@ public class TestJobMultiNodesTopologySubmission extends SchedulerConsecutive {
      */
     @org.junit.Test
     public void run() throws Throwable {
+        SchedulerTHelper.getSchedulerAuth();
+        RMTHelper rmHelper = RMTHelper.getDefaultInstance();
+        rmHelper.createNodeSource("extra", 2);
+
         JobId id = SchedulerTHelper.testJobSubmission(new File(jobDescriptor.toURI()).getAbsolutePath(),
                 UserType.ADMIN);
 

@@ -85,8 +85,11 @@ public class TestJobMultiNodesSubmission extends SchedulerConsecutive {
     public void run() throws Throwable {
         //submit job
         JobId id = SchedulerTHelper.submitJob(new File(jobDescriptor.toURI()).getAbsolutePath());
+
         //connect to RM
-        ResourceManager rmAdmin = RMTHelper.getDefaultInstance().getResourceManager();
+        RMTHelper rmHelper = RMTHelper.getDefaultInstance();
+        ResourceManager rmAdmin = rmHelper.getResourceManager();
+        rmHelper.createNodeSource("extra", 3);
 
         //wait job is running
         SchedulerTHelper.waitForEventJobRunning(id);

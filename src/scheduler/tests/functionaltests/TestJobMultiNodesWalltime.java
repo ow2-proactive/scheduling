@@ -39,9 +39,6 @@ package functionaltests;
 import java.io.File;
 import java.net.URL;
 
-import org.junit.Assert;
-import org.ow2.proactive.resourcemanager.common.RMState;
-import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.scheduler.common.job.JobId;
 
 
@@ -66,7 +63,8 @@ public class TestJobMultiNodesWalltime extends SchedulerConsecutive {
         //submit job
         JobId id = SchedulerTHelper.submitJob(new File(jobDescriptor.toURI()).getAbsolutePath());
         //connect to RM
-        ResourceManager rmAdmin = RMTHelper.getDefaultInstance().getResourceManager();
+        RMTHelper rmHelper = RMTHelper.getDefaultInstance();
+        rmHelper.createNodeSource("extra", 3);
 
         //wait job is running
         SchedulerTHelper.waitForEventJobRunning(id);

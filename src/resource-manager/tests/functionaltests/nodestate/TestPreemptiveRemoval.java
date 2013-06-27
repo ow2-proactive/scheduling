@@ -82,7 +82,8 @@ public class TestPreemptiveRemoval extends RMConsecutive {
 
         RMTHelper helper = RMTHelper.getDefaultInstance();
         ResourceManager resourceManager = helper.getResourceManager();
-        int totalNodeNumber = helper.createNodeSource("TestPreemptiveRemoval");
+        int totalNodeNumber = 5;
+        helper.createNodeSource("TestPreemptiveRemoval", totalNodeNumber);
 
         //----------------------------------------------------------
         // Book all nodes deployed by descriptor (user action)
