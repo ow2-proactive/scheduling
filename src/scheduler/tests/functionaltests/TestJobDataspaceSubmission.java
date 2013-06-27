@@ -111,17 +111,17 @@ public class TestJobDataspaceSubmission extends SchedulerConsecutive {
         setup();
 
         TaskFlowJob job = new TaskFlowJob();
-        FileSystemServerDeployer filesServer = new FileSystemServerDeployer(IN, IOSPACE + IN, true, true);
-        String url = filesServer.getVFSRootURL();
+        FileSystemServerDeployer filesServerIn = new FileSystemServerDeployer(IN, IOSPACE + IN, true, true);
+        String url = filesServerIn.getVFSRootURL();
         job.setInputSpace(url);
-        filesServer = new FileSystemServerDeployer(OUT, IOSPACE + OUT, true);
-        url = filesServer.getVFSRootURL();
+        FileSystemServerDeployer filesServerOut = new FileSystemServerDeployer(OUT, IOSPACE + OUT, true);
+        url = filesServerOut.getVFSRootURL();
         job.setOutputSpace(url);
-        filesServer = new FileSystemServerDeployer(GLOB, IOSPACE + GLOB, true);
-        url = filesServer.getVFSRootURL();
+        FileSystemServerDeployer filesServerGlob = new FileSystemServerDeployer(GLOB, IOSPACE + GLOB, true);
+        url = filesServerGlob.getVFSRootURL();
         job.setGlobalSpace(url);
-        filesServer = new FileSystemServerDeployer(USER, IOSPACE + USER, true);
-        url = filesServer.getVFSRootURL();
+        FileSystemServerDeployer filesServerUser = new FileSystemServerDeployer(USER, IOSPACE + USER, true);
+        url = filesServerUser.getVFSRootURL();
         job.setUserSpace(url);
         job.setName(this.getClass().getSimpleName());
 
@@ -315,7 +315,10 @@ public class TestJobDataspaceSubmission extends SchedulerConsecutive {
         fout = new File(userDir.getAbsolutePath() + File.separator + out22);
         Assert.assertEquals(in1 + in4, getContent(fout));
 
-        filesServer.terminate();
+        filesServerIn.terminate();
+        filesServerOut.terminate();
+        filesServerGlob.terminate();
+        filesServerUser.terminate();
         //and clean tmp space
         clean();
     }
