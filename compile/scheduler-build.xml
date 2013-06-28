@@ -172,7 +172,7 @@
 	<!-- ================================================================ -->
 	<!--          Convert Schemas from Relax NG to XMLSchema              -->
 	<!-- ================================================================ -->
-	<target name="convertSchemas" description="convert Schemas from Relax NG Compact Syntax to Relax NG XML Syntax and to XMLSchema inside the scheduler.">
+	<target name="convertSchemas" description="convert Schemas from Relax NG Compact Syntax to Relax NG XML Syntax and to XMLSchema inside the scheduler, for all versions.">
 		<taskdef name="trang" classname="net.amadan.trang.ant.TrangTask">
 			<classpath>
 				<fileset dir="${base.dir}/dev/lib/trang">
@@ -181,24 +181,42 @@
 			</classpath>
 		</taskdef>
 
-		<property name="schemas.dir" value="${src.scheduler.dir}/${scheduler.path}/common/xml/schemas/jobdescriptor/dev" />
-		<property name="export.schema.name" value="schedulerjob" />
+		<property name="schemas.root.dir" value="${src.scheduler.dir}/${scheduler.path}/common/xml/schemas/jobdescriptor" />
+        <path id="trangpath">
+            <dirset dir="${schemas.root.dir}">
+                <include name="*.*"/>
+                <include name="dev"/>
+            </dirset>
+        </path>
+        <property name="trangpathprop" refid="trangpath"/>
+        <echo message="${trangpathprop}">
 
-		<!-- Convert Relax NG schema from compact syntax to xml syntax -->
-		<trang failonerror="true" input="${schemas.dir}/${export.schema.name}.rnc" output="${schemas.dir}/${export.schema.name}.rng" />
+        </echo>
 
-		<!-- Convert Relax NG schema from compact syntax to W3C Schema -->
-		<trang failonerror="true" input="${schemas.dir}/${export.schema.name}.rnc" output="${schemas.dir}/${export.schema.name}.xsd" />
-        <!-- remove unwanted tags in the final results -->
-		<xslt style="${base.dir}/dev/lib/trang/removeStuff.xsl" in="${schemas.dir}/${export.schema.name}.xsd" out="${schemas.dir}/temp.xsd" />
-		<delete>
-			<fileset dir="${schemas.dir}/">
-				<include name="xsi.xsd" />
-				<include name="${export.schema.name}.xsd" />
-			</fileset>
-		</delete>
-		<move file="${schemas.dir}/temp.xsd" tofile="${schemas.dir}/${export.schema.name}.xsd" />
+        <foreach target="convertSchema" param="schemaDir">
+             <path refid="trangpath"/>
+        </foreach>
+
 	</target>
+
+    <target name="convertSchema"  description="convert Schemas for one specific version ">
+        <property name="export.schema.name" value="schedulerjob" />
+
+        <!-- Convert Relax NG schema from compact syntax to xml syntax -->
+        <trang failonerror="true" input="${schemaDir}/${export.schema.name}.rnc" output="${schemaDir}/${export.schema.name}.rng" />
+
+        <!-- Convert Relax NG schema from compact syntax to W3C Schema -->
+        <trang failonerror="true" input="${schemaDir}/${export.schema.name}.rnc" output="${schemaDir}/${export.schema.name}.xsd" />
+        <!-- remove unwanted tags in the final results -->
+        <xslt style="${base.dir}/dev/lib/trang/removeStuff.xsl" in="${schemaDir}/${export.schema.name}.xsd" out="${schemaDir}/temp.xsd" />
+        <delete>
+            <fileset dir="${schemaDir}/">
+                <include name="xsi.xsd" />
+                <include name="${export.schema.name}.xsd" />
+            </fileset>
+        </delete>
+        <move file="${schemaDir}/temp.xsd" tofile="${schemaDir}/${export.schema.name}.xsd" />
+    </target>
 
 	<!-- last scheduler target for worker library -->
 	<target name="deploy.scheduler.worker" depends="deploy.scheduler" description="Generate a worker side Scheduler library">

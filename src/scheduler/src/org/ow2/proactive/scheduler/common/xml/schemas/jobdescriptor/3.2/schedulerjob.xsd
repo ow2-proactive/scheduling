@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:jd="urn:proactive:jobdescriptor:3.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" elementFormDefault="qualified" targetNamespace="urn:proactive:jobdescriptor:3.2">
+<?xml version="1.0" encoding="UTF-8"?><xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jd="urn:proactive:jobdescriptor:3.2" elementFormDefault="qualified" targetNamespace="urn:proactive:jobdescriptor:3.2">
   
   <xs:element name="job">
     <xs:annotation>
@@ -14,6 +13,7 @@
         <xs:element minOccurs="0" ref="jd:inputSpace"/>
         <xs:element minOccurs="0" ref="jd:outputSpace"/>
         <xs:element minOccurs="0" ref="jd:globalSpace"/>
+        <xs:element minOccurs="0" ref="jd:userSpace"/>
         <xs:element ref="jd:taskFlow"/>
       </xs:sequence>
       <xs:attributeGroup ref="jd:jobName"/>

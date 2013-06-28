@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<grammar ns="urn:proactive:jobdescriptor:dev" xmlns:jd="urn:proactive:jobdescriptor:dev" xmlns:doc="http://relaxng.org/ns/compatibility/annotations/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://relaxng.org/ns/structure/1.0" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+<grammar ns="urn:proactive:jobdescriptor:3.0" xmlns:jd="urn:proactive:jobdescriptor:3.0" xmlns:doc="http://relaxng.org/ns/compatibility/annotations/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://relaxng.org/ns/structure/1.0" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
   <start>
     <ref name="job"/>
   </start>
   <define name="job">
     <element name="job">
-      <doc:documentation>Definition of a job for the scheduler </doc:documentation>
+      <doc:documentation>Definition of a job for the scheduler</doc:documentation>
       <optional>
         <ref name="variables"/>
       </optional>
@@ -38,13 +38,10 @@
         <ref name="outputSpace"/>
       </optional>
       <optional>
-        <ref name="globalSpace"/>
-      </optional>
-      <optional>
-        <ref name="userSpace"/>
-      </optional>
-      <optional>
         <ref name="projectName"/>
+      </optional>
+      <optional>
+        <ref name="logFile"/>
       </optional>
       <optional>
         <attribute name="xsi:schemaLocation">
@@ -123,6 +120,15 @@
       </choice>
     </attribute>
   </define>
+  <define name="logFile">
+    <attribute name="logFile">
+      <doc:documentation>The path to a file where the logs of this job will be written</doc:documentation>
+      <choice>
+        <data type="anyURI"/>
+        <ref name="variableRefType"/>
+      </choice>
+    </attribute>
+  </define>
   <define name="jobClasspath">
     <element name="jobClasspath">
       <doc:documentation>The classPath where to find the dependences of your job. It must contain path element</doc:documentation>
@@ -174,13 +180,13 @@
   </define>
   <define name="jobDescription">
     <element name="description">
-      <doc:documentation>Textual description of this job </doc:documentation>
+      <doc:documentation>Textual description of this job</doc:documentation>
       <text/>
     </element>
   </define>
   <define name="taskFlow">
     <element name="taskFlow">
-      <doc:documentation>A job composed of a flow of tasks with or without dependencies </doc:documentation>
+      <doc:documentation>A job composed of a flow of tasks with or without dependencies</doc:documentation>
       <oneOrMore>
         <ref name="task"/>
       </oneOrMore>
@@ -189,7 +195,7 @@
   <!-- +++++++++++++ task -->
   <define name="task">
     <element name="task">
-      <doc:documentation>A task is the smallest computation unit for the scheduler </doc:documentation>
+      <doc:documentation>A task is the smallest computation unit for the scheduler</doc:documentation>
       <ref name="taskName"/>
       <optional>
         <ref name="nodesNumber_t"/>
@@ -211,9 +217,6 @@
       </optional>
       <optional>
         <ref name="preciousResult"/>
-      </optional>
-      <optional>
-        <ref name="preciousLogs"/>
       </optional>
       <optional>
         <ref name="resultPreviewClass"/>
@@ -256,7 +259,7 @@
   </define>
   <define name="taskName">
     <attribute name="name">
-      <doc:documentation>Identification of this task (identifier) </doc:documentation>
+      <doc:documentation>Identification of this task (identifier)</doc:documentation>
       <data type="ID"/>
     </attribute>
   </define>
@@ -310,16 +313,7 @@
   </define>
   <define name="preciousResult">
     <attribute name="preciousResult">
-      <doc:documentation>Do we keep the result among the job results  </doc:documentation>
-      <choice>
-        <data type="boolean"/>
-        <ref name="variableRefType"/>
-      </choice>
-    </attribute>
-  </define>
-  <define name="preciousLogs">
-    <attribute name="preciousLogs">
-      <doc:documentation>Do we keep the logs as file on LOCALSPACE</doc:documentation>
+      <doc:documentation>Do we keep the result among the job results</doc:documentation>
       <choice>
         <data type="boolean"/>
         <ref name="variableRefType"/>
@@ -337,7 +331,7 @@
   </define>
   <define name="depends">
     <element name="depends">
-      <doc:documentation>A list of dependencies for this task </doc:documentation>
+      <doc:documentation>A list of dependencies for this task</doc:documentation>
       <oneOrMore>
         <ref name="dependsTask"/>
       </oneOrMore>
@@ -345,7 +339,7 @@
   </define>
   <define name="dependsTask">
     <element name="task">
-      <doc:documentation>A task from which this task depends </doc:documentation>
+      <doc:documentation>A task from which this task depends</doc:documentation>
       <attribute name="ref">
         <data type="IDREF"/>
       </attribute>
@@ -376,7 +370,7 @@
   </define>
   <define name="selection">
     <element name="selection">
-      <doc:documentation>A script used to select resources that can handle the task </doc:documentation>
+      <doc:documentation>A script used to select resources that can handle the task</doc:documentation>
       <oneOrMore>
         <ref name="selectionScript"/>
       </oneOrMore>
@@ -406,19 +400,19 @@
   <define name="pre">
     <element name="pre">
       <doc:documentation>A script launched before the task execution in the task node</doc:documentation>
-      <ref name="simpleScript"/>
+      <ref name="script"/>
     </element>
   </define>
   <define name="post">
     <element name="post">
       <doc:documentation>A script launched after the task execution in the task node</doc:documentation>
-      <ref name="simpleScript"/>
+      <ref name="script"/>
     </element>
   </define>
   <define name="cleaning">
     <element name="cleaning">
       <doc:documentation>A script launched by the Resource Manager after the task or post script</doc:documentation>
-      <ref name="simpleScript"/>
+      <ref name="script"/>
     </element>
   </define>
   <define name="runAsMe">
@@ -431,7 +425,7 @@
     </attribute>
   </define>
   <!-- +++++++++++++ scripts -->
-  <define name="simpleScript">
+  <define name="script">
     <element name="script">
       <doc:documentation>Definition of a standard script</doc:documentation>
       <choice>
@@ -442,7 +436,7 @@
   </define>
   <define name="selectionScript">
     <element name="script">
-      <doc:documentation>Definition of a specific script which is used for resource selection </doc:documentation>
+      <doc:documentation>Definition of a specific script which is used for resource selection</doc:documentation>
       <optional>
         <ref name="scriptType"/>
       </optional>
@@ -454,13 +448,16 @@
   </define>
   <define name="scriptType">
     <attribute name="type">
-      <doc:documentation>Type of script for the infrastructure manager (default to dynamic)  </doc:documentation>
-      <ref name="scriptTypeT"/>
+      <doc:documentation>Type of script for the infrastructure manager (default to dynamic)</doc:documentation>
+      <choice>
+        <value>dynamic</value>
+        <value>static</value>
+      </choice>
     </attribute>
   </define>
   <define name="codeScript">
     <element name="code">
-      <doc:documentation>Definition of a script by writing directly the code inside the descriptor </doc:documentation>
+      <doc:documentation>Definition of a script by writing directly the code inside the descriptor</doc:documentation>
       <attribute name="language">
         <data type="string"/>
       </attribute>
@@ -469,7 +466,7 @@
   </define>
   <define name="fileScript">
     <element name="file">
-      <doc:documentation>Definition of a script by loading a file </doc:documentation>
+      <doc:documentation>Definition of a script by loading a file</doc:documentation>
       <choice>
         <ref name="path"/>
         <ref name="url"/>
@@ -481,7 +478,7 @@
   </define>
   <define name="path">
     <attribute name="path">
-      <doc:documentation>File path to script definition  </doc:documentation>
+      <doc:documentation>File path to script definition</doc:documentation>
       <choice>
         <data type="anyURI"/>
         <ref name="variableRefType"/>
@@ -490,7 +487,7 @@
   </define>
   <define name="url">
     <attribute name="url">
-      <doc:documentation>Remote script definition, reachable at the given url </doc:documentation>
+      <doc:documentation>Remote script definition, reachable at the given url</doc:documentation>
       <choice>
         <data type="anyURI"/>
         <ref name="variableRefType"/>
@@ -499,7 +496,7 @@
   </define>
   <define name="fileScriptArguments">
     <element name="arguments">
-      <doc:documentation>A list of arguments of this script </doc:documentation>
+      <doc:documentation>A list of arguments of this script</doc:documentation>
       <oneOrMore>
         <ref name="fileScriptArgument"/>
       </oneOrMore>
@@ -507,7 +504,7 @@
   </define>
   <define name="fileScriptArgument">
     <element name="argument">
-      <doc:documentation>An argument of this script  </doc:documentation>
+      <doc:documentation>An argument of this script</doc:documentation>
       <attribute name="value">
         <data type="string"/>
       </attribute>
@@ -565,15 +562,14 @@
   <!-- +++++++++++++ executables -->
   <define name="executable">
     <choice>
-      <doc:documentation>The task executable is the actual code that will be run on the selected resource. It can be a native command or a Java class </doc:documentation>
+      <doc:documentation>The task executable is the actual code that will be run on the selected resource. It can be a native command or a Java class</doc:documentation>
       <ref name="nativeExecutable"/>
       <ref name="javaExecutable"/>
-      <ref name="scriptExecutable"/>
     </choice>
   </define>
   <define name="nativeExecutable">
     <element name="nativeExecutable">
-      <doc:documentation>A native command call, it can be statically described or generated by a script </doc:documentation>
+      <doc:documentation>A native command call, it can be statically described or generated by a script</doc:documentation>
       <choice>
         <ref name="staticCommand"/>
         <ref name="dynamicCommand"/>
@@ -582,7 +578,7 @@
   </define>
   <define name="staticCommand">
     <element name="staticCommand">
-      <doc:documentation>A native command statically defined in the descriptor </doc:documentation>
+      <doc:documentation>A native command statically defined in the descriptor</doc:documentation>
       <attribute name="value">
         <data type="string"/>
       </attribute>
@@ -602,7 +598,7 @@
   </define>
   <define name="commandArguments">
     <element name="arguments">
-      <doc:documentation>List of arguments to the native command (they will be appended at the end of the command) </doc:documentation>
+      <doc:documentation>List of arguments to the native command (they will be appended at the end of the command)</doc:documentation>
       <oneOrMore>
         <ref name="commandArgument"/>
       </oneOrMore>
@@ -617,7 +613,7 @@
   </define>
   <define name="dynamicCommand">
     <element name="dynamicCommand">
-      <doc:documentation>A command generated dynamically </doc:documentation>
+      <doc:documentation>A command generated dynamically</doc:documentation>
       <optional>
         <ref name="workingDir_t"/>
       </optional>
@@ -626,13 +622,13 @@
   </define>
   <define name="generation">
     <element name="generation">
-      <doc:documentation>A command generated by a script </doc:documentation>
-      <ref name="simpleScript"/>
+      <doc:documentation>A command generated by a script</doc:documentation>
+      <ref name="script"/>
     </element>
   </define>
   <define name="javaExecutable">
     <element name="javaExecutable">
-      <doc:documentation>A Java class implementing the Executable interface </doc:documentation>
+      <doc:documentation>A Java class implementing the Executable interface</doc:documentation>
       <ref name="class"/>
       <optional>
         <ref name="forkEnvironment"/>
@@ -644,7 +640,7 @@
   </define>
   <define name="class">
     <attribute name="class">
-      <doc:documentation>The fully qualified class name </doc:documentation>
+      <doc:documentation>The fully qualified class name</doc:documentation>
       <choice>
         <ref name="classPattern"/>
         <ref name="variableRefType"/>
@@ -750,12 +746,12 @@
   <define name="envScript">
     <element name="envScript">
       <doc:documentation>environment script to execute for setting forked process environment</doc:documentation>
-      <ref name="simpleScript"/>
+      <ref name="script"/>
     </element>
   </define>
   <define name="javaParameters">
     <element name="parameters">
-      <doc:documentation>A list of parameters that will be given to the Java task through the init method </doc:documentation>
+      <doc:documentation>A list of parameters that will be given to the Java task through the init method</doc:documentation>
       <oneOrMore>
         <ref name="javaParameter"/>
       </oneOrMore>
@@ -763,7 +759,7 @@
   </define>
   <define name="javaParameter">
     <element name="parameter">
-      <doc:documentation>A parameter in the form of key/value pair </doc:documentation>
+      <doc:documentation>A parameter in the form of key/value pair</doc:documentation>
       <attribute name="name">
         <data type="string"/>
       </attribute>
@@ -772,34 +768,16 @@
       </attribute>
     </element>
   </define>
-  <define name="scriptExecutable">
-    <element name="scriptExecutable">
-      <doc:documentation>A script to be executed as a task</doc:documentation>
-      <ref name="simpleScript"/>
-    </element>
-  </define>
   <!-- +++++++++++++ DataSpaces -->
   <define name="inputSpace">
     <element name="inputSpace">
-      <doc:documentation>INPUT space for the job, this setting overrides the default input space provided by the scheduler. It is typically used to store input files for a single job.</doc:documentation>
+      <doc:documentation>Input space for the job, URL that define root directory containing job needed files</doc:documentation>
       <ref name="url"/>
     </element>
   </define>
   <define name="outputSpace">
     <element name="outputSpace">
-      <doc:documentation>OUTPUT space for the job, this setting overrides the default output space provided by the scheduler. It is typically used to store output files for a single job.</doc:documentation>
-      <ref name="url"/>
-    </element>
-  </define>
-  <define name="globalSpace">
-    <element name="globalSpace">
-      <doc:documentation>GLOBAL space for the job, this setting overrides the default global space provided by the scheduler. It is typically used to store files shared by all users.</doc:documentation>
-      <ref name="url"/>
-    </element>
-  </define>
-  <define name="userSpace">
-    <element name="userSpace">
-      <doc:documentation>USER space for the job, this setting overrides the default user space provided by the scheduler. It is typically used to store files that a user needs across multiple jobs.</doc:documentation>
+      <doc:documentation>Output space for the job, URL that define root directory that will contain job generated output files</doc:documentation>
       <ref name="url"/>
     </element>
   </define>
@@ -872,7 +850,7 @@
       <optional>
         <ref name="targetContinuation"/>
       </optional>
-      <ref name="simpleScript"/>
+      <ref name="script"/>
     </element>
   </define>
   <define name="target">
@@ -897,13 +875,13 @@
     <element name="loop">
       <doc:documentation>looping control flow action</doc:documentation>
       <ref name="target"/>
-      <ref name="simpleScript"/>
+      <ref name="script"/>
     </element>
   </define>
   <define name="actionReplicate">
     <element name="replicate">
       <doc:documentation>replicate control flow action</doc:documentation>
-      <ref name="simpleScript"/>
+      <ref name="script"/>
     </element>
   </define>
   <!-- +++++++++++++ User define types -->
@@ -929,7 +907,6 @@
       <value>transferFromInputSpace</value>
       <value>transferFromOutputSpace</value>
       <value>transferFromGlobalSpace</value>
-      <value>transferFromUserSpace</value>
       <value>none</value>
       <ref name="variableRefType"/>
     </choice>
@@ -938,7 +915,6 @@
     <choice>
       <value>transferToOutputSpace</value>
       <value>transferToGlobalSpace</value>
-      <value>transferToUserSpace</value>
       <value>none</value>
       <ref name="variableRefType"/>
     </choice>
@@ -975,13 +951,6 @@
       <value>start</value>
       <value>end</value>
       <value>none</value>
-    </choice>
-  </define>
-  <define name="scriptTypeT">
-    <choice>
-      <value>dynamic</value>
-      <value>static</value>
-      <ref name="variableRefType"/>
     </choice>
   </define>
   <define name="propertyAppendChar">

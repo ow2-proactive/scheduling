@@ -41,6 +41,9 @@
         <ref name="globalSpace"/>
       </optional>
       <optional>
+        <ref name="userSpace"/>
+      </optional>
+      <optional>
         <ref name="projectName"/>
       </optional>
       <optional>

@@ -32,36 +32,28 @@
  *
  *  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.common.job.factories;
+package functionaltests.schemas;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.io.Serializable;
+
+import org.objectweb.proactive.extensions.dataspaces.api.FileSelector;
+import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 
 
-public enum Schemas {
-    SCHEMA_3_0("/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/3.0/schedulerjob.rng",
-            "urn:proactive:jobdescriptor:3.0"), SCHEMA_3_1(
-            "/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/3.1/schedulerjob.rng",
-            "urn:proactive:jobdescriptor:3.1"), SCHEMA_3_2(
-            "/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/3.2/schedulerjob.rng",
-            "urn:proactive:jobdescriptor:3.2"), SCHEMA_DEV(
-            "/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.rng",
-            "urn:proactive:jobdescriptor:dev"),
-    // should the last one declared, see #validate
-    SCHEMA_LATEST(SCHEMA_3_2.location, SCHEMA_3_2.namespace);
+/**
+ * CopyFiles
+ *
+ * @author The ProActive Team
+ */
+public class CopyFiles extends JavaExecutable {
 
-    String location;
-    String namespace;
+    protected String inputFile;
+    protected String outputFile;
 
-    Schemas(String location, String namespace) {
-        this.location = location;
-        this.namespace = namespace;
-    }
-
-    static Map<String, Schemas> SCHEMAS_BY_NAMESPACE = new HashMap<String, Schemas>();
-    static {
-        for (Schemas schema : Schemas.values()) {
-            SCHEMAS_BY_NAMESPACE.put(schema.namespace, schema);
-        }
+    @Override
+    public Serializable execute(TaskResult... results) throws Throwable {
+        super.getOutputFile(outputFile).copyFrom(super.getInputFile(inputFile), FileSelector.SELECT_SELF);
+        return true;
     }
 }

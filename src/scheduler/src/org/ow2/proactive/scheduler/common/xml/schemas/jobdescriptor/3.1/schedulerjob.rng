@@ -1,982 +1,961 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <grammar ns="urn:proactive:jobdescriptor:3.1" xmlns:jd="urn:proactive:jobdescriptor:3.1" xmlns:doc="http://relaxng.org/ns/compatibility/annotations/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://relaxng.org/ns/structure/1.0" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
-	<start>
-		<ref name="job"/>
-	</start>
-	<define name="job">
-		<element name="job">
-			<doc:documentation>Definition of a job for the scheduler </doc:documentation>
-			<optional>
-				<ref name="variables"/>
-			</optional>
-			<optional>
-				<ref name="jobDescription"/>
-			</optional>
-			<optional>
-				<ref name="jobClasspath"/>
-			</optional>
-			<ref name="jobName"/>
-			<optional>
-				<ref name="priority"/>
-			</optional>
-			<optional>
-				<ref name="cancelJobOnError_j"/>
-			</optional>
-			<optional>
-				<ref name="restartTaskOnError_j"/>
-			</optional>
-			<optional>
-				<ref name="numberOfExecution_j"/>
-			</optional>
-			<optional>
-				<ref name="genericInformation"/>
-			</optional>
-			<optional>
-				<ref name="inputSpace"/>
-			</optional>
-			<optional>
-				<ref name="outputSpace"/>
-			</optional>
-			<optional>
-				<ref name="globalSpace"/>
-			</optional>
-			<optional>
-				<ref name="projectName"/>
-			</optional>
-			<optional>
-				<attribute name="xsi:schemaLocation">
-					<data type="anyURI"/>
-				</attribute>
-			</optional>
-			<ref name="taskFlow"/>
-		</element>
-	</define>
-	<define name="jobName">
-		<attribute name="name">
-			<doc:documentation>Identification of this job</doc:documentation>
-			<data type="string"/>
-		</attribute>
-	</define>
-	<define name="variables">
-		<element name="variables">
-			<doc:documentation>Definition of variables which can be reused throughout this descriptor</doc:documentation>
-			<oneOrMore>
-				<ref name="variable"/>
-			</oneOrMore>
-		</element>
-	</define>
-	<define name="variable">
-		<element name="variable">
-			<doc:documentation>Definition of one variable, the variable can be reused (even in another following variable definition) by using the syntax ${name_of_variable}</doc:documentation>
-			<ref name="variableName"/>
-			<ref name="variableValue"/>
-		</element>
-	</define>
-	<define name="variableName">
-		<attribute name="name">
-			<doc:documentation>Name of a variable</doc:documentation>
-			<data type="string"/>
-		</attribute>
-	</define>
-	<define name="variableValue">
-		<attribute name="value">
-			<doc:documentation>The patterns ${variable_name} will be replaced by this value</doc:documentation>
-			<data type="string"/>
-		</attribute>
-	</define>
-	<define name="priority">
-		<attribute name="priority">
-			<doc:documentation>Priority of the job</doc:documentation>
-			<choice>
-				<ref name="jobPriority"/>
-				<ref name="variableRefType"/>
-			</choice>
-		</attribute>
-	</define>
-	<define name="cancelJobOnError_j">
-		<attribute name="cancelJobOnError">
-			<doc:documentation>For each task, does the job cancel right away if a single task had an error (by opposition to a network failure, memory error, etc...) (default=false)</doc:documentation>
-			<choice>
-				<data type="boolean"/>
-				<ref name="variableRefType"/>
-			</choice>
-		</attribute>
-	</define>
-	<define name="restartTaskOnError_j">
-		<attribute name="restartTaskOnError">
-			<doc:documentation>For each task, where does the task restart if an error occurred ? (default=anywhere)</doc:documentation>
-			<choice>
-				<ref name="restartTaskType"/>
-				<ref name="variableRefType"/>
-			</choice>
-		</attribute>
-	</define>
-	<define name="numberOfExecution_j">
-		<attribute name="maxNumberOfExecution">
-			<doc:documentation>Maximum number of execution for each task (default=1)</doc:documentation>
-			<choice>
-				<data type="nonNegativeInteger"/>
-				<ref name="variableRefType"/>
-			</choice>
-		</attribute>
-	</define>
-	<define name="jobClasspath">
-		<element name="jobClasspath">
-			<doc:documentation>The classPath where to find the dependences of your job. It must contain path element</doc:documentation>
-			<oneOrMore>
-				<ref name="pathElement"/>
-			</oneOrMore>
-		</element>
-	</define>
-	<define name="pathElement">
-		<element name="pathElement">
-			<doc:documentation>Path element (one pathElement for each classpath entry)</doc:documentation>
-			<attribute name="path">
-				<data type="string"/>
-			</attribute>
-		</element>
-	</define>
-	<define name="genericInformation">
-		<element name="genericInformation">
-			<doc:documentation>Definition of any information you would like to get in the policy</doc:documentation>
-			<oneOrMore>
-				<ref name="info"/>
-			</oneOrMore>
-		</element>
-	</define>
-	<define name="info">
-		<element name="info">
-			<doc:documentation>Information that you can get in the policy through the job content</doc:documentation>
-			<ref name="infoName"/>
-			<ref name="infoValue"/>
-		</element>
-	</define>
-	<define name="infoName">
-		<attribute name="name">
-			<doc:documentation>Name of the information variable</doc:documentation>
-			<data type="string"/>
-		</attribute>
-	</define>
-	<define name="infoValue">
-		<attribute name="value">
-			<doc:documentation>Value of the information variable</doc:documentation>
-			<data type="string"/>
-		</attribute>
-	</define>
-	<define name="projectName">
-		<attribute name="projectName">
-			<doc:documentation>Name of the project related to this job. It is also used in the policy to group some jobs together</doc:documentation>
-			<data type="string"/>
-		</attribute>
-	</define>
-	<define name="jobDescription">
-		<element name="description">
-			<doc:documentation>Textual description of this job </doc:documentation>
-			<text/>
-		</element>
-	</define>
-	<define name="taskFlow">
-		<element name="taskFlow">
-			<doc:documentation>A job composed of a flow of tasks with or without dependencies </doc:documentation>
-			<oneOrMore>
-				<ref name="task"/>
-			</oneOrMore>
-		</element>
-	</define>
-	<!-- +++++++++++++ task -->
-	<define name="task">
-		<element name="task">
-			<doc:documentation>A task is the smallest computation unit for the scheduler </doc:documentation>
-			<ref name="taskName"/>
-			<optional>
-				<ref name="nodesNumber_t"/>
-			</optional>
-			<optional>
-				<ref name="cancelJobOnError_t"/>
-			</optional>
-			<optional>
-				<ref name="restartTaskOnError_t"/>
-			</optional>
-			<optional>
-				<ref name="numberOfExecution_t"/>
-			</optional>
-			<optional>
-				<ref name="runAsMe"/>
-			</optional>
-			<optional>
-				<ref name="walltime"/>
-			</optional>
-			<optional>
-				<ref name="preciousResult"/>
-			</optional>
-			<optional>
-				<ref name="preciousLogs"/>
-			</optional>
-			<optional>
-				<ref name="resultPreviewClass"/>
-			</optional>
-			<optional>
-				<ref name="taskDescription"/>
-			</optional>
-			<optional>
-				<ref name="genericInformation"/>
-			</optional>
-			<optional>
-				<ref name="depends"/>
-			</optional>
-			<optional>
-				<ref name="inputFiles"/>
-			</optional>
-			<optional>
-				<ref name="parallel"/>
-			</optional>
-			<optional>
-				<ref name="selection"/>
-			</optional>
-			<optional>
-				<ref name="pre"/>
-			</optional>
-			<ref name="executable"/>
-			<optional>
-				<ref name="flow"/>
-			</optional>
-			<optional>
-				<ref name="post"/>
-			</optional>
-			<optional>
-				<ref name="cleaning"/>
-			</optional>
-			<optional>
-				<ref name="outputFiles"/>
-			</optional>
-		</element>
-	</define>
-	<define name="taskName">
-		<attribute name="name">
-			<doc:documentation>Identification of this task (identifier) </doc:documentation>
-			<data type="ID"/>
-		</attribute>
-	</define>
-	<define name="nodesNumber_t">
-		<attribute name="numberOfNodes">
-			<doc:documentation>number of cores needed for the task (identifier)</doc:documentation>
-			<choice>
-				<data type="positiveInteger"/>
-				<ref name="variableRefType"/>
-			</choice>
-		</attribute>
-	</define>
-	<define name="taskDescription">
-		<element name="description">
-			<doc:documentation>Textual description of this task</doc:documentation>
-			<text/>
-		</element>
-	</define>
-	<define name="walltime">
-		<attribute name="walltime">
-			<doc:documentation>Defines walltime - maximum execution time of the task. (patterns are 'ss' OR 'mm:ss' OR 'hh:mm:ss')</doc:documentation>
-			<choice>
-				<ref name="walltimePattern"/>
-				<ref name="variableRefType"/>
-			</choice>
-		</attribute>
-	</define>
-	<define name="cancelJobOnError_t">
-		<attribute name="cancelJobOnError">
-			<doc:documentation>Does the job cancel right away if a single task had an error (by opposition to a network failure, memory error, etc...)</doc:documentation>
-			<choice>
-				<data type="boolean"/>
-				<ref name="variableRefType"/>
-			</choice>
-		</attribute>
-	</define>
-	<define name="restartTaskOnError_t">
-		<attribute name="restartTaskOnError">
-			<doc:documentation>Where does the task restart if an error occurred ?</doc:documentation>
-			<ref name="restartTaskType"/>
-		</attribute>
-	</define>
-	<define name="numberOfExecution_t">
-		<attribute name="maxNumberOfExecution">
-			<doc:documentation>Maximum number of execution for this task</doc:documentation>
-			<choice>
-				<data type="nonNegativeInteger"/>
-				<ref name="variableRefType"/>
-			</choice>
-		</attribute>
-	</define>
-	<define name="preciousResult">
-		<attribute name="preciousResult">
-			<doc:documentation>Do we keep the result among the job results  </doc:documentation>
-			<choice>
-				<data type="boolean"/>
-				<ref name="variableRefType"/>
-			</choice>
-		</attribute>
-	</define>
-	<define name="preciousLogs">
-		<attribute name="preciousLogs">
-			<doc:documentation>Do we keep the logs as file on LOCALSPACE</doc:documentation>
-			<choice>
-				<data type="boolean"/>
-				<ref name="variableRefType"/>
-			</choice>
-		</attribute>
-	</define>
-	<define name="resultPreviewClass">
-		<attribute name="resultPreviewClass">
-			<doc:documentation>A class implementing the ResultPreview interface which can be used to display the result of this task</doc:documentation>
-			<choice>
-				<ref name="classPattern"/>
-				<ref name="variableRefType"/>
-			</choice>
-		</attribute>
-	</define>
-	<define name="depends">
-		<element name="depends">
-			<doc:documentation>A list of dependencies for this task </doc:documentation>
-			<oneOrMore>
-				<ref name="dependsTask"/>
-			</oneOrMore>
-		</element>
-	</define>
-	<define name="dependsTask">
-		<element name="task">
-			<doc:documentation>A task from which this task depends </doc:documentation>
-			<attribute name="ref">
-				<data type="IDREF"/>
-			</attribute>
-		</element>
-	</define>
-	<define name="parallel">
-		<element name="parallel">
-			<doc:documentation>An information related parallel task including nodes number and topology</doc:documentation>
-			<ref name="nodesNumber_t"/>
-			<optional>
-				<ref name="topology"/>
-			</optional>
-		</element>
-	</define>
-	<define name="topology">
-		<element name="topology">
-			<doc:documentation>A topology descriptor of the parallel task</doc:documentation>
-			<choice>
-				<ref name="arbitrary"/>
-				<ref name="bestProximity"/>
-				<ref name="thresholdProximity"/>
-				<ref name="singleHost"/>
-				<ref name="singleHostExclusive"/>
-				<ref name="multipleHostsExclusive"/>
-				<ref name="differentHostsExclusive"/>
-			</choice>
-		</element>
-	</define>
-	<define name="selection">
-		<element name="selection">
-			<doc:documentation>A script used to select resources that can handle the task </doc:documentation>
-			<oneOrMore>
-				<ref name="selectionScript"/>
-			</oneOrMore>
-		</element>
-	</define>
-	<define name="flow">
-		<element name="controlFlow">
-			<doc:documentation>Flow control : block declaration, flow action</doc:documentation>
-			<optional>
-				<ref name="block"/>
-			</optional>
-			<optional>
-				<choice>
-					<ref name="actionIf"/>
-					<ref name="actionReplicate"/>
-					<ref name="actionLoop"/>
-				</choice>
-			</optional>
-		</element>
-	</define>
-	<define name="block">
-		<attribute name="block">
-			<doc:documentation>block declaration</doc:documentation>
-			<ref name="blockAttr"/>
-		</attribute>
-	</define>
-	<define name="pre">
-		<element name="pre">
-			<doc:documentation>A script launched before the task execution in the task node</doc:documentation>
-			<ref name="simpleScript"/>
-		</element>
-	</define>
-	<define name="post">
-		<element name="post">
-			<doc:documentation>A script launched after the task execution in the task node</doc:documentation>
-			<ref name="simpleScript"/>
-		</element>
-	</define>
-	<define name="cleaning">
-		<element name="cleaning">
-			<doc:documentation>A script launched by the Resource Manager after the task or post script</doc:documentation>
-			<ref name="simpleScript"/>
-		</element>
-	</define>
-	<define name="runAsMe">
-		<attribute name="runAsMe">
-			<doc:documentation>Do we run this task under the job owner user identity</doc:documentation>
-			<choice>
-				<data type="boolean"/>
-				<ref name="variableRefType"/>
-			</choice>
-		</attribute>
-	</define>
-	<!-- +++++++++++++ scripts -->
-	<define name="simpleScript">
-		<element name="script">
-			<doc:documentation>Definition of a standard script</doc:documentation>
-			<choice>
-				<ref name="codeScript"/>
-				<ref name="fileScript"/>
-			</choice>
-		</element>
-	</define>
-	<define name="selectionScript">
-		<element name="script">
-			<doc:documentation>Definition of a specific script which is used for resource selection </doc:documentation>
-			<optional>
-				<ref name="scriptType"/>
-			</optional>
-			<choice>
-				<ref name="codeScript"/>
-				<ref name="fileScript"/>
-			</choice>
-		</element>
-	</define>
-	<define name="scriptType">
-		<attribute name="type">
-			<doc:documentation>Type of script for the infrastructure manager (default to dynamic)  </doc:documentation>
-			<ref name="scriptTypeT"/>
-		</attribute>
-	</define>
-	<define name="codeScript">
-		<element name="code">
-			<doc:documentation>Definition of a script by writing directly the code inside the descriptor </doc:documentation>
-			<attribute name="language">
-				<data type="string"/>
-			</attribute>
-			<text/>
-		</element>
-	</define>
-	<define name="fileScript">
-		<element name="file">
-			<doc:documentation>Definition of a script by loading a file </doc:documentation>
-			<choice>
-				<ref name="path"/>
-				<ref name="url"/>
-			</choice>
-			<optional>
-				<ref name="fileScriptArguments"/>
-			</optional>
-		</element>
-	</define>
-	<define name="path">
-		<attribute name="path">
-			<doc:documentation>File path to script definition  </doc:documentation>
-			<choice>
-				<data type="anyURI"/>
-				<ref name="variableRefType"/>
-			</choice>
-		</attribute>
-	</define>
-	<define name="url">
-		<attribute name="url">
-			<doc:documentation>Remote script definition, reachable at the given url </doc:documentation>
-			<choice>
-				<data type="anyURI"/>
-				<ref name="variableRefType"/>
-			</choice>
-		</attribute>
-	</define>
-	<define name="fileScriptArguments">
-		<element name="arguments">
-			<doc:documentation>A list of arguments of this script </doc:documentation>
-			<oneOrMore>
-				<ref name="fileScriptArgument"/>
-			</oneOrMore>
-		</element>
-	</define>
-	<define name="fileScriptArgument">
-		<element name="argument">
-			<doc:documentation>An argument of this script  </doc:documentation>
-			<attribute name="value">
-				<data type="string"/>
-			</attribute>
-		</element>
-	</define>
-	<!-- +++++++++++++ Topology -->
-	<define name="arbitrary">
-		<element name="arbitrary">
-			<doc:documentation>arbitrary topology</doc:documentation>
-			<empty/>
-		</element>
-	</define>
-	<define name="bestProximity">
-		<element name="bestProximity">
-			<doc:documentation>best nodes proximity</doc:documentation>
-			<empty/>
-		</element>
-	</define>
-	<define name="thresholdProximity">
-		<element name="thresholdProximity">
-			<doc:documentation>threshold nodes proximity</doc:documentation>
-			<ref name="threshold"/>
-		</element>
-	</define>
-	<define name="singleHost">
-		<element name="singleHost">
-			<doc:documentation>nodes on single host</doc:documentation>
-			<empty/>
-		</element>
-	</define>
-	<define name="singleHostExclusive">
-		<element name="singleHostExclusive">
-			<doc:documentation>nodes on single host exclusively</doc:documentation>
-			<empty/>
-		</element>
-	</define>
-	<define name="multipleHostsExclusive">
-		<element name="multipleHostsExclusive">
-			<doc:documentation>nodes on multiple hosts exclusively</doc:documentation>
-			<empty/>
-		</element>
-	</define>
-	<define name="differentHostsExclusive">
-		<element name="differentHostsExclusive">
-			<doc:documentation>nodes on single host exclusively</doc:documentation>
-			<empty/>
-		</element>
-	</define>
-	<define name="threshold">
-		<attribute name="threshold">
-			<doc:documentation>threshold value</doc:documentation>
-			<data type="nonNegativeInteger"/>
-		</attribute>
-	</define>
-	<!-- +++++++++++++ executables -->
-	<define name="executable">
-		<choice>
-			<doc:documentation>The task executable is the actual code that will be run on the selected resource. It can be a native command or a Java class </doc:documentation>
-			<ref name="nativeExecutable"/>
-			<ref name="javaExecutable"/>
-		</choice>
-	</define>
-	<define name="nativeExecutable">
-		<element name="nativeExecutable">
-			<doc:documentation>A native command call, it can be statically described or generated by a script </doc:documentation>
-			<choice>
-				<ref name="staticCommand"/>
-				<ref name="dynamicCommand"/>
-			</choice>
-		</element>
-	</define>
-	<define name="staticCommand">
-		<element name="staticCommand">
-			<doc:documentation>A native command statically defined in the descriptor </doc:documentation>
-			<attribute name="value">
-				<data type="string"/>
-			</attribute>
-			<optional>
-				<ref name="workingDir_t"/>
-			</optional>
-			<optional>
-				<ref name="commandArguments"/>
-			</optional>
-		</element>
-	</define>
-	<define name="workingDir_t">
-		<attribute name="workingDir">
-			<doc:documentation>working dir for native command to execute (ie launching dir, pwd...)</doc:documentation>
-			<data type="string"/>
-		</attribute>
-	</define>
-	<define name="commandArguments">
-		<element name="arguments">
-			<doc:documentation>List of arguments to the native command (they will be appended at the end of the command) </doc:documentation>
-			<oneOrMore>
-				<ref name="commandArgument"/>
-			</oneOrMore>
-		</element>
-	</define>
-	<define name="commandArgument">
-		<element name="argument">
-			<attribute name="value">
-				<data type="string"/>
-			</attribute>
-		</element>
-	</define>
-	<define name="dynamicCommand">
-		<element name="dynamicCommand">
-			<doc:documentation>A command generated dynamically </doc:documentation>
-			<optional>
-				<ref name="workingDir_t"/>
-			</optional>
-			<ref name="generation"/>
-		</element>
-	</define>
-	<define name="generation">
-		<element name="generation">
-			<doc:documentation>A command generated by a script </doc:documentation>
-			<ref name="simpleScript"/>
-		</element>
-	</define>
-	<define name="javaExecutable">
-		<element name="javaExecutable">
-			<doc:documentation>A Java class implementing the Executable interface </doc:documentation>
-			<ref name="class"/>
-			<optional>
-				<ref name="forkEnvironment"/>
-			</optional>
-			<optional>
-				<ref name="javaParameters"/>
-			</optional>
-		</element>
-	</define>
-	<define name="class">
-		<attribute name="class">
-			<doc:documentation>The fully qualified class name </doc:documentation>
-			<choice>
-				<ref name="classPattern"/>
-				<ref name="variableRefType"/>
-			</choice>
-		</attribute>
-	</define>
-	<define name="forkEnvironment">
-		<element name="forkEnvironment">
-			<doc:documentation>Fork environment if needed</doc:documentation>
-			<optional>
-				<ref name="workingDir_t"/>
-			</optional>
-			<optional>
-				<ref name="javaHome"/>
-			</optional>
-			<optional>
-				<ref name="sysProps"/>
-			</optional>
-			<optional>
-				<ref name="jvmArgs"/>
-			</optional>
-			<optional>
-				<ref name="additionalClasspath"/>
-			</optional>
-			<optional>
-				<ref name="envScript"/>
-			</optional>
-		</element>
-	</define>
-	<define name="javaHome">
-		<attribute name="javaHome">
-			<doc:documentation>Path to installed java directory, to this path '/bin/java' will be added, if attribute does not exist only 'java' command will be called</doc:documentation>
-			<choice>
-				<data type="anyURI"/>
-				<ref name="variableRefType"/>
-			</choice>
-		</attribute>
-	</define>
-	<define name="sysProps">
-		<element name="SystemEnvironment">
-			<doc:documentation>a list of sysProp</doc:documentation>
-			<oneOrMore>
-				<ref name="sysProp"/>
-			</oneOrMore>
-		</element>
-	</define>
-	<define name="sysProp">
-		<element name="variable">
-			<doc:documentation>A parameter in the form of key/value pair</doc:documentation>
-			<attribute name="name">
-				<data type="string"/>
-			</attribute>
-			<attribute name="value">
-				<data type="string"/>
-			</attribute>
-			<optional>
-				<ref name="sysPropAppend"/>
-			</optional>
-			<optional>
-				<ref name="sysPropAppendChar"/>
-			</optional>
-		</element>
-	</define>
-	<define name="sysPropAppend">
-		<attribute name="append">
-			<doc:documentation>append or not this property to a previous declared or to the system one</doc:documentation>
-			<choice>
-				<data type="boolean"/>
-				<ref name="variableRefType"/>
-			</choice>
-		</attribute>
-	</define>
-	<define name="sysPropAppendChar">
-		<attribute name="appendChar">
-			<doc:documentation>append character, if set, append mode is ON</doc:documentation>
-			<ref name="propertyAppendChar"/>
-		</attribute>
-	</define>
-	<define name="jvmArgs">
-		<element name="jvmArgs">
-			<doc:documentation>A list of java properties or options</doc:documentation>
-			<oneOrMore>
-				<ref name="jvmArg"/>
-			</oneOrMore>
-		</element>
-	</define>
-	<define name="jvmArg">
-		<element name="jvmArg">
-			<doc:documentation>A list of java properties or options</doc:documentation>
-			<attribute name="value">
-				<data type="string"/>
-			</attribute>
-		</element>
-	</define>
-	<define name="additionalClasspath">
-		<element name="additionalClasspath">
-			<doc:documentation>classpath entries to add to the new java process</doc:documentation>
-			<oneOrMore>
-				<ref name="pathElement"/>
-			</oneOrMore>
-		</element>
-	</define>
-	<define name="envScript">
-		<element name="envScript">
-			<doc:documentation>environment script to execute for setting forked process environment</doc:documentation>
-			<ref name="simpleScript"/>
-		</element>
-	</define>
-	<define name="javaParameters">
-		<element name="parameters">
-			<doc:documentation>A list of parameters that will be given to the Java task through the init method </doc:documentation>
-			<oneOrMore>
-				<ref name="javaParameter"/>
-			</oneOrMore>
-		</element>
-	</define>
-	<define name="javaParameter">
-		<element name="parameter">
-			<doc:documentation>A parameter in the form of key/value pair </doc:documentation>
-			<attribute name="name">
-				<data type="string"/>
-			</attribute>
-			<attribute name="value">
-				<data type="string"/>
-			</attribute>
-		</element>
-	</define>
-	<!-- +++++++++++++ DataSpaces -->
-	<define name="inputSpace">
-		<element name="inputSpace">
-			<doc:documentation>INPUT space for the job, this setting overrides the default input space provided by the scheduler. It is typically used to store input files for a single job.</doc:documentation>
-			<ref name="url"/>
-		</element>
-	</define>
-	<define name="outputSpace">
-		<element name="outputSpace">
-			<doc:documentation>OUTPUT space for the job, this setting overrides the default output space provided by the scheduler. It is typically used to store output files for a single job.</doc:documentation>
-			<ref name="url"/>
-		</element>
-	</define>
-	<define name="globalSpace">
-		<element name="globalSpace">
-			<doc:documentation>GLOBAL space for the job, this setting overrides the default global space provided by the scheduler. It is typically used to store files shared by all users.</doc:documentation>
-			<ref name="url"/>
-		</element>
-	</define>
-	<define name="userSpace">
-		<element name="userSpace">
-			<doc:documentation>USER space for the job, this setting overrides the default user space provided by the scheduler. It is typically used to store files that a user needs across multiple jobs.</doc:documentation>
-			<ref name="url"/>
-		</element>
-	</define>
-	<define name="inputFiles">
-		<element name="inputFiles">
-			<doc:documentation>selection of input files that will be accessible for the application and copied from INPUT/OUTPUT to local system</doc:documentation>
-			<oneOrMore>
-				<ref name="infiles_"/>
-			</oneOrMore>
-		</element>
-	</define>
-	<define name="infiles_">
-		<element name="files">
-			<doc:documentation>description of input files with include, exclude and an access mode</doc:documentation>
-			<ref name="includes_"/>
-			<optional>
-				<ref name="excludes_"/>
-			</optional>
-			<ref name="inaccessMode_"/>
-		</element>
-	</define>
-	<define name="inaccessMode_">
-		<attribute name="accessMode">
-			<doc:documentation>type of access on the selected files</doc:documentation>
-			<ref name="inaccessModeType"/>
-		</attribute>
-	</define>
-	<define name="outputFiles">
-		<element name="outputFiles">
-			<doc:documentation>selection of output files that will be copied from LOCALSPACE to OUTPUT</doc:documentation>
-			<oneOrMore>
-				<ref name="outfiles_"/>
-			</oneOrMore>
-		</element>
-	</define>
-	<define name="outfiles_">
-		<element name="files">
-			<doc:documentation>description of output files with include, exclude and an access mode</doc:documentation>
-			<ref name="includes_"/>
-			<optional>
-				<ref name="excludes_"/>
-			</optional>
-			<ref name="outaccessMode_"/>
-		</element>
-	</define>
-	<define name="outaccessMode_">
-		<attribute name="accessMode">
-			<doc:documentation>type of access on the selected files</doc:documentation>
-			<ref name="outaccessModeType"/>
-		</attribute>
-	</define>
-	<define name="includes_">
-		<attribute name="includes">
-			<doc:documentation>Pattern of the files to include, relative to INPUT or OUTPUT spaces</doc:documentation>
-			<ref name="inexcludePattern"/>
-		</attribute>
-	</define>
-	<define name="excludes_">
-		<attribute name="excludes">
-			<doc:documentation>Pattern of the files to exclude among the included one, relative to INPUT or OUTPUT spaces</doc:documentation>
-			<ref name="inexcludePattern"/>
-		</attribute>
-	</define>
-	<!-- +++++++++++++ Control flow -->
-	<define name="actionIf">
-		<element name="if">
-			<doc:documentation>branching Control flow action</doc:documentation>
-			<ref name="target"/>
-			<ref name="targetElse"/>
-			<optional>
-				<ref name="targetContinuation"/>
-			</optional>
-			<ref name="simpleScript"/>
-		</element>
-	</define>
-	<define name="target">
-		<attribute name="target">
-			<doc:documentation>branching if target</doc:documentation>
-			<data type="string"/>
-		</attribute>
-	</define>
-	<define name="targetElse">
-		<attribute name="else">
-			<doc:documentation>branching else target</doc:documentation>
-			<data type="string"/>
-		</attribute>
-	</define>
-	<define name="targetContinuation">
-		<attribute name="continuation">
-			<doc:documentation>branching else target</doc:documentation>
-			<data type="string"/>
-		</attribute>
-	</define>
-	<define name="actionLoop">
-		<element name="loop">
-			<doc:documentation>looping control flow action</doc:documentation>
-			<ref name="target"/>
-			<ref name="simpleScript"/>
-		</element>
-	</define>
-	<define name="actionReplicate">
-		<element name="replicate">
-			<doc:documentation>replicate control flow action</doc:documentation>
-			<ref name="simpleScript"/>
-		</element>
-	</define>
-	<!-- +++++++++++++ User define types -->
-	<define name="jobPriority">
-		<choice>
-			<value>highest</value>
-			<value>high</value>
-			<value>normal</value>
-			<value>low</value>
-			<value>lowest</value>
-			<ref name="variableRefType"/>
-		</choice>
-	</define>
-	<define name="restartTaskType">
-		<choice>
-			<value>anywhere</value>
-			<value>elsewhere</value>
-			<ref name="variableRefType"/>
-		</choice>
-	</define>
-	<define name="inaccessModeType">
-		<choice>
-			<value>transferFromInputSpace</value>
-			<value>transferFromOutputSpace</value>
-			<value>transferFromGlobalSpace</value>
-			<value>transferFromUserSpace</value>
-			<value>none</value>
-			<ref name="variableRefType"/>
-		</choice>
-	</define>
-	<define name="outaccessModeType">
-		<choice>
-			<value>transferToOutputSpace</value>
-			<value>transferToGlobalSpace</value>
-			<value>transferToUserSpace</value>
-			<value>none</value>
-			<ref name="variableRefType"/>
-		</choice>
-	</define>
-	<define name="classPattern">
-		<data type="string">
-			<param name="pattern">([A-Za-z_$][A-Za-z_0-9$]*\.)*[A-Za-z_$][A-Za-z_0-9$]*</param>
-		</data>
-	</define>
-	<define name="walltimePattern">
-		<data type="string">
-			<param name="pattern">[0-9]*[1-9][0-9]*(:[0-5][0-9]){0,2}</param>
-		</data>
-	</define>
-	<define name="variableRefType">
-		<data type="string">
-			<param name="pattern">$\{[A-Za-z0-9._]+\}</param>
-		</data>
-	</define>
-	<define name="inexcludePattern">
-		<data type="string">
-			<param name="pattern">.+(,.+)*</param>
-		</data>
-	</define>
-	<define name="controlFlowAction">
-		<choice>
-			<value>goto</value>
-			<value>replicate</value>
-			<value>continue</value>
-		</choice>
-	</define>
-	<define name="blockAttr">
-		<choice>
-			<value>start</value>
-			<value>end</value>
-			<value>none</value>
-		</choice>
-	</define>
-	<define name="scriptTypeT">
-		<choice>
-			<value>dynamic</value>
-			<value>static</value>
-			<ref name="variableRefType"/>
-		</choice>
-	</define>
-	<define name="propertyAppendChar">
-		<data type="string">
-			<param name="pattern">.</param>
-		</data>
-	</define>
+  <start>
+    <ref name="job"/>
+  </start>
+  <define name="job">
+    <element name="job">
+      <doc:documentation>Definition of a job for the scheduler </doc:documentation>
+      <optional>
+        <ref name="variables"/>
+      </optional>
+      <optional>
+        <ref name="jobDescription"/>
+      </optional>
+      <optional>
+        <ref name="jobClasspath"/>
+      </optional>
+      <ref name="jobName"/>
+      <optional>
+        <ref name="priority"/>
+      </optional>
+      <optional>
+        <ref name="cancelJobOnError_j"/>
+      </optional>
+      <optional>
+        <ref name="restartTaskOnError_j"/>
+      </optional>
+      <optional>
+        <ref name="numberOfExecution_j"/>
+      </optional>
+      <optional>
+        <ref name="genericInformation"/>
+      </optional>
+      <optional>
+        <ref name="inputSpace"/>
+      </optional>
+      <optional>
+        <ref name="outputSpace"/>
+      </optional>
+      <optional>
+        <ref name="projectName"/>
+      </optional>
+      <optional>
+        <attribute name="xsi:schemaLocation">
+          <data type="anyURI"/>
+        </attribute>
+      </optional>
+      <ref name="taskFlow"/>
+    </element>
+  </define>
+  <define name="jobName">
+    <attribute name="name">
+      <doc:documentation>Identification of this job</doc:documentation>
+      <data type="string"/>
+    </attribute>
+  </define>
+  <define name="variables">
+    <element name="variables">
+      <doc:documentation>Definition of variables which can be reused throughout this descriptor</doc:documentation>
+      <oneOrMore>
+        <ref name="variable"/>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="variable">
+    <element name="variable">
+      <doc:documentation>Definition of one variable, the variable can be reused (even in another following variable definition) by using the syntax ${name_of_variable}</doc:documentation>
+      <ref name="variableName"/>
+      <ref name="variableValue"/>
+    </element>
+  </define>
+  <define name="variableName">
+    <attribute name="name">
+      <doc:documentation>Name of a variable</doc:documentation>
+      <data type="string"/>
+    </attribute>
+  </define>
+  <define name="variableValue">
+    <attribute name="value">
+      <doc:documentation>The patterns ${variable_name} will be replaced by this value</doc:documentation>
+      <data type="string"/>
+    </attribute>
+  </define>
+  <define name="priority">
+    <attribute name="priority">
+      <doc:documentation>Priority of the job</doc:documentation>
+      <choice>
+        <ref name="jobPriority"/>
+        <ref name="variableRefType"/>
+      </choice>
+    </attribute>
+  </define>
+  <define name="cancelJobOnError_j">
+    <attribute name="cancelJobOnError">
+      <doc:documentation>For each task, does the job cancel right away if a single task had an error (by opposition to a network failure, memory error, etc...) (default=false)</doc:documentation>
+      <choice>
+        <data type="boolean"/>
+        <ref name="variableRefType"/>
+      </choice>
+    </attribute>
+  </define>
+  <define name="restartTaskOnError_j">
+    <attribute name="restartTaskOnError">
+      <doc:documentation>For each task, where does the task restart if an error occurred ? (default=anywhere)</doc:documentation>
+      <choice>
+        <ref name="restartTaskType"/>
+        <ref name="variableRefType"/>
+      </choice>
+    </attribute>
+  </define>
+  <define name="numberOfExecution_j">
+    <attribute name="maxNumberOfExecution">
+      <doc:documentation>Maximum number of execution for each task (default=1)</doc:documentation>
+      <choice>
+        <data type="nonNegativeInteger"/>
+        <ref name="variableRefType"/>
+      </choice>
+    </attribute>
+  </define>
+  <define name="jobClasspath">
+    <element name="jobClasspath">
+      <doc:documentation>The classPath where to find the dependences of your job. It must contain path element</doc:documentation>
+      <oneOrMore>
+        <ref name="pathElement"/>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="pathElement">
+    <element name="pathElement">
+      <doc:documentation>Path element (one pathElement for each classpath entry)</doc:documentation>
+      <attribute name="path">
+        <data type="string"/>
+      </attribute>
+    </element>
+  </define>
+  <define name="genericInformation">
+    <element name="genericInformation">
+      <doc:documentation>Definition of any information you would like to get in the policy</doc:documentation>
+      <oneOrMore>
+        <ref name="info"/>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="info">
+    <element name="info">
+      <doc:documentation>Information that you can get in the policy through the job content</doc:documentation>
+      <ref name="infoName"/>
+      <ref name="infoValue"/>
+    </element>
+  </define>
+  <define name="infoName">
+    <attribute name="name">
+      <doc:documentation>Name of the information variable</doc:documentation>
+      <data type="string"/>
+    </attribute>
+  </define>
+  <define name="infoValue">
+    <attribute name="value">
+      <doc:documentation>Value of the information variable</doc:documentation>
+      <data type="string"/>
+    </attribute>
+  </define>
+  <define name="projectName">
+    <attribute name="projectName">
+      <doc:documentation>Name of the project related to this job. It is also used in the policy to group some jobs together</doc:documentation>
+      <data type="string"/>
+    </attribute>
+  </define>
+  <define name="jobDescription">
+    <element name="description">
+      <doc:documentation>Textual description of this job</doc:documentation>
+      <text/>
+    </element>
+  </define>
+  <define name="taskFlow">
+    <element name="taskFlow">
+      <doc:documentation>A job composed of a flow of tasks with or without dependencies</doc:documentation>
+      <oneOrMore>
+        <ref name="task"/>
+      </oneOrMore>
+    </element>
+  </define>
+  <!-- +++++++++++++ task -->
+  <define name="task">
+    <element name="task">
+      <doc:documentation>A task is the smallest computation unit for the scheduler</doc:documentation>
+      <ref name="taskName"/>
+      <optional>
+        <ref name="nodesNumber_t"/>
+      </optional>
+      <optional>
+        <ref name="cancelJobOnError_t"/>
+      </optional>
+      <optional>
+        <ref name="restartTaskOnError_t"/>
+      </optional>
+      <optional>
+        <ref name="numberOfExecution_t"/>
+      </optional>
+      <optional>
+        <ref name="runAsMe"/>
+      </optional>
+      <optional>
+        <ref name="walltime"/>
+      </optional>
+      <optional>
+        <ref name="preciousResult"/>
+      </optional>
+      <optional>
+        <ref name="preciousLogs"/>
+      </optional>
+      <optional>
+        <ref name="resultPreviewClass"/>
+      </optional>
+      <optional>
+        <ref name="taskDescription"/>
+      </optional>
+      <optional>
+        <ref name="genericInformation"/>
+      </optional>
+      <optional>
+        <ref name="depends"/>
+      </optional>
+      <optional>
+        <ref name="inputFiles"/>
+      </optional>
+      <optional>
+        <ref name="parallel"/>
+      </optional>
+      <optional>
+        <ref name="selection"/>
+      </optional>
+      <optional>
+        <ref name="pre"/>
+      </optional>
+      <ref name="executable"/>
+      <optional>
+        <ref name="flow"/>
+      </optional>
+      <optional>
+        <ref name="post"/>
+      </optional>
+      <optional>
+        <ref name="cleaning"/>
+      </optional>
+      <optional>
+        <ref name="outputFiles"/>
+      </optional>
+    </element>
+  </define>
+  <define name="taskName">
+    <attribute name="name">
+      <doc:documentation>Identification of this task (identifier)</doc:documentation>
+      <data type="ID"/>
+    </attribute>
+  </define>
+  <define name="nodesNumber_t">
+    <attribute name="numberOfNodes">
+      <doc:documentation>number of cores needed for the task (identifier)</doc:documentation>
+      <choice>
+        <data type="positiveInteger"/>
+        <ref name="variableRefType"/>
+      </choice>
+    </attribute>
+  </define>
+  <define name="taskDescription">
+    <element name="description">
+      <doc:documentation>Textual description of this task</doc:documentation>
+      <text/>
+    </element>
+  </define>
+  <define name="walltime">
+    <attribute name="walltime">
+      <doc:documentation>Defines walltime - maximum execution time of the task. (patterns are 'ss' OR 'mm:ss' OR 'hh:mm:ss')</doc:documentation>
+      <choice>
+        <ref name="walltimePattern"/>
+        <ref name="variableRefType"/>
+      </choice>
+    </attribute>
+  </define>
+  <define name="cancelJobOnError_t">
+    <attribute name="cancelJobOnError">
+      <doc:documentation>Does the job cancel right away if a single task had an error (by opposition to a network failure, memory error, etc...)</doc:documentation>
+      <choice>
+        <data type="boolean"/>
+        <ref name="variableRefType"/>
+      </choice>
+    </attribute>
+  </define>
+  <define name="restartTaskOnError_t">
+    <attribute name="restartTaskOnError">
+      <doc:documentation>Where does the task restart if an error occurred ?</doc:documentation>
+      <ref name="restartTaskType"/>
+    </attribute>
+  </define>
+  <define name="numberOfExecution_t">
+    <attribute name="maxNumberOfExecution">
+      <doc:documentation>Maximum number of execution for this task</doc:documentation>
+      <choice>
+        <data type="nonNegativeInteger"/>
+        <ref name="variableRefType"/>
+      </choice>
+    </attribute>
+  </define>
+  <define name="preciousResult">
+    <attribute name="preciousResult">
+      <doc:documentation>Do we keep the result among the job results</doc:documentation>
+      <choice>
+        <data type="boolean"/>
+        <ref name="variableRefType"/>
+      </choice>
+    </attribute>
+  </define>
+  <define name="preciousLogs">
+    <attribute name="preciousLogs">
+      <doc:documentation>Do we keep the logs as file on LOCALSPACE</doc:documentation>
+      <choice>
+        <data type="boolean"/>
+        <ref name="variableRefType"/>
+      </choice>
+    </attribute>
+  </define>
+  <define name="resultPreviewClass">
+    <attribute name="resultPreviewClass">
+      <doc:documentation>A class implementing the ResultPreview interface which can be used to display the result of this task</doc:documentation>
+      <choice>
+        <ref name="classPattern"/>
+        <ref name="variableRefType"/>
+      </choice>
+    </attribute>
+  </define>
+  <define name="depends">
+    <element name="depends">
+      <doc:documentation>A list of dependencies for this task</doc:documentation>
+      <oneOrMore>
+        <ref name="dependsTask"/>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="dependsTask">
+    <element name="task">
+      <doc:documentation>A task from which this task depends</doc:documentation>
+      <attribute name="ref">
+        <data type="IDREF"/>
+      </attribute>
+    </element>
+  </define>
+  <define name="parallel">
+    <element name="parallel">
+      <doc:documentation>An information related parallel task including nodes number and topology</doc:documentation>
+      <ref name="nodesNumber_t"/>
+      <optional>
+        <ref name="topology"/>
+      </optional>
+    </element>
+  </define>
+  <define name="topology">
+    <element name="topology">
+      <doc:documentation>A topology descriptor of the parallel task</doc:documentation>
+      <choice>
+        <ref name="arbitrary"/>
+        <ref name="bestProximity"/>
+        <ref name="thresholdProximity"/>
+        <ref name="singleHost"/>
+        <ref name="singleHostExclusive"/>
+        <ref name="multipleHostsExclusive"/>
+        <ref name="differentHostsExclusive"/>
+      </choice>
+    </element>
+  </define>
+  <define name="selection">
+    <element name="selection">
+      <doc:documentation>A script used to select resources that can handle the task</doc:documentation>
+      <oneOrMore>
+        <ref name="selectionScript"/>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="flow">
+    <element name="controlFlow">
+      <doc:documentation>Flow control : block declaration, flow action</doc:documentation>
+      <optional>
+        <ref name="block"/>
+      </optional>
+      <optional>
+        <choice>
+          <ref name="actionIf"/>
+          <ref name="actionReplicate"/>
+          <ref name="actionLoop"/>
+        </choice>
+      </optional>
+    </element>
+  </define>
+  <define name="block">
+    <attribute name="block">
+      <doc:documentation>block declaration</doc:documentation>
+      <ref name="blockAttr"/>
+    </attribute>
+  </define>
+  <define name="pre">
+    <element name="pre">
+      <doc:documentation>A script launched before the task execution in the task node</doc:documentation>
+      <ref name="script"/>
+    </element>
+  </define>
+  <define name="post">
+    <element name="post">
+      <doc:documentation>A script launched after the task execution in the task node</doc:documentation>
+      <ref name="script"/>
+    </element>
+  </define>
+  <define name="cleaning">
+    <element name="cleaning">
+      <doc:documentation>A script launched by the Resource Manager after the task or post script</doc:documentation>
+      <ref name="script"/>
+    </element>
+  </define>
+  <define name="runAsMe">
+    <attribute name="runAsMe">
+      <doc:documentation>Do we run this task under the job owner user identity</doc:documentation>
+      <choice>
+        <data type="boolean"/>
+        <ref name="variableRefType"/>
+      </choice>
+    </attribute>
+  </define>
+  <!-- +++++++++++++ scripts -->
+  <define name="script">
+    <element name="script">
+      <doc:documentation>Definition of a standard script</doc:documentation>
+      <choice>
+        <ref name="codeScript"/>
+        <ref name="fileScript"/>
+      </choice>
+    </element>
+  </define>
+  <define name="selectionScript">
+    <element name="script">
+      <doc:documentation>Definition of a specific script which is used for resource selection</doc:documentation>
+      <optional>
+        <ref name="scriptType"/>
+      </optional>
+      <choice>
+        <ref name="codeScript"/>
+        <ref name="fileScript"/>
+      </choice>
+    </element>
+  </define>
+  <define name="scriptType">
+    <attribute name="type">
+      <doc:documentation>Type of script for the infrastructure manager (default to dynamic)</doc:documentation>
+      <choice>
+        <value>dynamic</value>
+        <value>static</value>
+      </choice>
+    </attribute>
+  </define>
+  <define name="codeScript">
+    <element name="code">
+      <doc:documentation>Definition of a script by writing directly the code inside the descriptor</doc:documentation>
+      <attribute name="language">
+        <data type="string"/>
+      </attribute>
+      <text/>
+    </element>
+  </define>
+  <define name="fileScript">
+    <element name="file">
+      <doc:documentation>Definition of a script by loading a file</doc:documentation>
+      <choice>
+        <ref name="path"/>
+        <ref name="url"/>
+      </choice>
+      <optional>
+        <ref name="fileScriptArguments"/>
+      </optional>
+    </element>
+  </define>
+  <define name="path">
+    <attribute name="path">
+      <doc:documentation>File path to script definition</doc:documentation>
+      <choice>
+        <data type="anyURI"/>
+        <ref name="variableRefType"/>
+      </choice>
+    </attribute>
+  </define>
+  <define name="url">
+    <attribute name="url">
+      <doc:documentation>Remote script definition, reachable at the given url</doc:documentation>
+      <choice>
+        <data type="anyURI"/>
+        <ref name="variableRefType"/>
+      </choice>
+    </attribute>
+  </define>
+  <define name="fileScriptArguments">
+    <element name="arguments">
+      <doc:documentation>A list of arguments of this script</doc:documentation>
+      <oneOrMore>
+        <ref name="fileScriptArgument"/>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="fileScriptArgument">
+    <element name="argument">
+      <doc:documentation>An argument of this script</doc:documentation>
+      <attribute name="value">
+        <data type="string"/>
+      </attribute>
+    </element>
+  </define>
+  <!-- +++++++++++++ Topology -->
+  <define name="arbitrary">
+    <element name="arbitrary">
+      <doc:documentation>arbitrary topology</doc:documentation>
+      <empty/>
+    </element>
+  </define>
+  <define name="bestProximity">
+    <element name="bestProximity">
+      <doc:documentation>best nodes proximity</doc:documentation>
+      <empty/>
+    </element>
+  </define>
+  <define name="thresholdProximity">
+    <element name="thresholdProximity">
+      <doc:documentation>threshold nodes proximity</doc:documentation>
+      <ref name="threshold"/>
+    </element>
+  </define>
+  <define name="singleHost">
+    <element name="singleHost">
+      <doc:documentation>nodes on single host</doc:documentation>
+      <empty/>
+    </element>
+  </define>
+  <define name="singleHostExclusive">
+    <element name="singleHostExclusive">
+      <doc:documentation>nodes on single host exclusively</doc:documentation>
+      <empty/>
+    </element>
+  </define>
+  <define name="multipleHostsExclusive">
+    <element name="multipleHostsExclusive">
+      <doc:documentation>nodes on multiple hosts exclusively</doc:documentation>
+      <empty/>
+    </element>
+  </define>
+  <define name="differentHostsExclusive">
+    <element name="differentHostsExclusive">
+      <doc:documentation>nodes on single host exclusively</doc:documentation>
+      <empty/>
+    </element>
+  </define>
+  <define name="threshold">
+    <attribute name="threshold">
+      <doc:documentation>threshold value</doc:documentation>
+      <data type="nonNegativeInteger"/>
+    </attribute>
+  </define>
+  <!-- +++++++++++++ executables -->
+  <define name="executable">
+    <choice>
+      <doc:documentation>The task executable is the actual code that will be run on the selected resource. It can be a native command or a Java class</doc:documentation>
+      <ref name="nativeExecutable"/>
+      <ref name="javaExecutable"/>
+    </choice>
+  </define>
+  <define name="nativeExecutable">
+    <element name="nativeExecutable">
+      <doc:documentation>A native command call, it can be statically described or generated by a script</doc:documentation>
+      <choice>
+        <ref name="staticCommand"/>
+        <ref name="dynamicCommand"/>
+      </choice>
+    </element>
+  </define>
+  <define name="staticCommand">
+    <element name="staticCommand">
+      <doc:documentation>A native command statically defined in the descriptor</doc:documentation>
+      <attribute name="value">
+        <data type="string"/>
+      </attribute>
+      <optional>
+        <ref name="workingDir_t"/>
+      </optional>
+      <optional>
+        <ref name="commandArguments"/>
+      </optional>
+    </element>
+  </define>
+  <define name="workingDir_t">
+    <attribute name="workingDir">
+      <doc:documentation>working dir for native command to execute (ie launching dir, pwd...)</doc:documentation>
+      <data type="string"/>
+    </attribute>
+  </define>
+  <define name="commandArguments">
+    <element name="arguments">
+      <doc:documentation>List of arguments to the native command (they will be appended at the end of the command)</doc:documentation>
+      <oneOrMore>
+        <ref name="commandArgument"/>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="commandArgument">
+    <element name="argument">
+      <attribute name="value">
+        <data type="string"/>
+      </attribute>
+    </element>
+  </define>
+  <define name="dynamicCommand">
+    <element name="dynamicCommand">
+      <doc:documentation>A command generated dynamically</doc:documentation>
+      <optional>
+        <ref name="workingDir_t"/>
+      </optional>
+      <ref name="generation"/>
+    </element>
+  </define>
+  <define name="generation">
+    <element name="generation">
+      <doc:documentation>A command generated by a script</doc:documentation>
+      <ref name="script"/>
+    </element>
+  </define>
+  <define name="javaExecutable">
+    <element name="javaExecutable">
+      <doc:documentation>A Java class implementing the Executable interface</doc:documentation>
+      <ref name="class"/>
+      <optional>
+        <ref name="forkEnvironment"/>
+      </optional>
+      <optional>
+        <ref name="javaParameters"/>
+      </optional>
+    </element>
+  </define>
+  <define name="class">
+    <attribute name="class">
+      <doc:documentation>The fully qualified class name</doc:documentation>
+      <choice>
+        <ref name="classPattern"/>
+        <ref name="variableRefType"/>
+      </choice>
+    </attribute>
+  </define>
+  <define name="forkEnvironment">
+    <element name="forkEnvironment">
+      <doc:documentation>Fork environment if needed</doc:documentation>
+      <optional>
+        <ref name="workingDir_t"/>
+      </optional>
+      <optional>
+        <ref name="javaHome"/>
+      </optional>
+      <optional>
+        <ref name="sysProps"/>
+      </optional>
+      <optional>
+        <ref name="jvmArgs"/>
+      </optional>
+      <optional>
+        <ref name="additionalClasspath"/>
+      </optional>
+      <optional>
+        <ref name="envScript"/>
+      </optional>
+    </element>
+  </define>
+  <define name="javaHome">
+    <attribute name="javaHome">
+      <doc:documentation>Path to installed java directory, to this path '/bin/java' will be added, if attribute does not exist only 'java' command will be called</doc:documentation>
+      <choice>
+        <data type="anyURI"/>
+        <ref name="variableRefType"/>
+      </choice>
+    </attribute>
+  </define>
+  <define name="sysProps">
+    <element name="SystemEnvironment">
+      <doc:documentation>a list of sysProp</doc:documentation>
+      <oneOrMore>
+        <ref name="sysProp"/>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="sysProp">
+    <element name="variable">
+      <doc:documentation>A parameter in the form of key/value pair</doc:documentation>
+      <attribute name="name">
+        <data type="string"/>
+      </attribute>
+      <attribute name="value">
+        <data type="string"/>
+      </attribute>
+      <optional>
+        <ref name="sysPropAppend"/>
+      </optional>
+      <optional>
+        <ref name="sysPropAppendChar"/>
+      </optional>
+    </element>
+  </define>
+  <define name="sysPropAppend">
+    <attribute name="append">
+      <doc:documentation>append or not this property to a previous declared or to the system one</doc:documentation>
+      <choice>
+        <data type="boolean"/>
+        <ref name="variableRefType"/>
+      </choice>
+    </attribute>
+  </define>
+  <define name="sysPropAppendChar">
+    <attribute name="appendChar">
+      <doc:documentation>append character, if set, append mode is ON</doc:documentation>
+      <ref name="propertyAppendChar"/>
+    </attribute>
+  </define>
+  <define name="jvmArgs">
+    <element name="jvmArgs">
+      <doc:documentation>A list of java properties or options</doc:documentation>
+      <oneOrMore>
+        <ref name="jvmArg"/>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="jvmArg">
+    <element name="jvmArg">
+      <doc:documentation>A list of java properties or options</doc:documentation>
+      <attribute name="value">
+        <data type="string"/>
+      </attribute>
+    </element>
+  </define>
+  <define name="additionalClasspath">
+    <element name="additionalClasspath">
+      <doc:documentation>classpath entries to add to the new java process</doc:documentation>
+      <oneOrMore>
+        <ref name="pathElement"/>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="envScript">
+    <element name="envScript">
+      <doc:documentation>environment script to execute for setting forked process environment</doc:documentation>
+      <ref name="script"/>
+    </element>
+  </define>
+  <define name="javaParameters">
+    <element name="parameters">
+      <doc:documentation>A list of parameters that will be given to the Java task through the init method</doc:documentation>
+      <oneOrMore>
+        <ref name="javaParameter"/>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="javaParameter">
+    <element name="parameter">
+      <doc:documentation>A parameter in the form of key/value pair</doc:documentation>
+      <attribute name="name">
+        <data type="string"/>
+      </attribute>
+      <attribute name="value">
+        <data type="string"/>
+      </attribute>
+    </element>
+  </define>
+  <!-- +++++++++++++ DataSpaces -->
+  <define name="inputSpace">
+    <element name="inputSpace">
+      <doc:documentation>Input space for the job, URL that define root directory containing job needed files</doc:documentation>
+      <ref name="url"/>
+    </element>
+  </define>
+  <define name="outputSpace">
+    <element name="outputSpace">
+      <doc:documentation>Output space for the job, URL that define root directory that will contain job generated output files</doc:documentation>
+      <ref name="url"/>
+    </element>
+  </define>
+  <define name="inputFiles">
+    <element name="inputFiles">
+      <doc:documentation>selection of input files that will be accessible for the application and copied from INPUT/OUTPUT to local system</doc:documentation>
+      <oneOrMore>
+        <ref name="infiles_"/>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="infiles_">
+    <element name="files">
+      <doc:documentation>description of input files with include, exclude and an access mode</doc:documentation>
+      <ref name="includes_"/>
+      <optional>
+        <ref name="excludes_"/>
+      </optional>
+      <ref name="inaccessMode_"/>
+    </element>
+  </define>
+  <define name="inaccessMode_">
+    <attribute name="accessMode">
+      <doc:documentation>type of access on the selected files</doc:documentation>
+      <ref name="inaccessModeType"/>
+    </attribute>
+  </define>
+  <define name="outputFiles">
+    <element name="outputFiles">
+      <doc:documentation>selection of output files that will be copied from LOCALSPACE to OUTPUT</doc:documentation>
+      <oneOrMore>
+        <ref name="outfiles_"/>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="outfiles_">
+    <element name="files">
+      <doc:documentation>description of output files with include, exclude and an access mode</doc:documentation>
+      <ref name="includes_"/>
+      <optional>
+        <ref name="excludes_"/>
+      </optional>
+      <ref name="outaccessMode_"/>
+    </element>
+  </define>
+  <define name="outaccessMode_">
+    <attribute name="accessMode">
+      <doc:documentation>type of access on the selected files</doc:documentation>
+      <ref name="outaccessModeType"/>
+    </attribute>
+  </define>
+  <define name="includes_">
+    <attribute name="includes">
+      <doc:documentation>Pattern of the files to include, relative to INPUT or OUTPUT spaces</doc:documentation>
+      <ref name="inexcludePattern"/>
+    </attribute>
+  </define>
+  <define name="excludes_">
+    <attribute name="excludes">
+      <doc:documentation>Pattern of the files to exclude among the included one, relative to INPUT or OUTPUT spaces</doc:documentation>
+      <ref name="inexcludePattern"/>
+    </attribute>
+  </define>
+  <!-- +++++++++++++ Control flow -->
+  <define name="actionIf">
+    <element name="if">
+      <doc:documentation>branching Control flow action</doc:documentation>
+      <ref name="target"/>
+      <ref name="targetElse"/>
+      <optional>
+        <ref name="targetContinuation"/>
+      </optional>
+      <ref name="script"/>
+    </element>
+  </define>
+  <define name="target">
+    <attribute name="target">
+      <doc:documentation>branching if target</doc:documentation>
+      <data type="string"/>
+    </attribute>
+  </define>
+  <define name="targetElse">
+    <attribute name="else">
+      <doc:documentation>branching else target</doc:documentation>
+      <data type="string"/>
+    </attribute>
+  </define>
+  <define name="targetContinuation">
+    <attribute name="continuation">
+      <doc:documentation>branching else target</doc:documentation>
+      <data type="string"/>
+    </attribute>
+  </define>
+  <define name="actionLoop">
+    <element name="loop">
+      <doc:documentation>looping control flow action</doc:documentation>
+      <ref name="target"/>
+      <ref name="script"/>
+    </element>
+  </define>
+  <define name="actionReplicate">
+    <element name="replicate">
+      <doc:documentation>replicate control flow action</doc:documentation>
+      <ref name="script"/>
+    </element>
+  </define>
+  <!-- +++++++++++++ User define types -->
+  <define name="jobPriority">
+    <choice>
+      <value>highest</value>
+      <value>high</value>
+      <value>normal</value>
+      <value>low</value>
+      <value>lowest</value>
+      <ref name="variableRefType"/>
+    </choice>
+  </define>
+  <define name="restartTaskType">
+    <choice>
+      <value>anywhere</value>
+      <value>elsewhere</value>
+      <ref name="variableRefType"/>
+    </choice>
+  </define>
+  <define name="inaccessModeType">
+    <choice>
+      <value>transferFromInputSpace</value>
+      <value>transferFromOutputSpace</value>
+      <value>transferFromGlobalSpace</value>
+      <value>none</value>
+      <ref name="variableRefType"/>
+    </choice>
+  </define>
+  <define name="outaccessModeType">
+    <choice>
+      <value>transferToOutputSpace</value>
+      <value>transferToGlobalSpace</value>
+      <value>none</value>
+      <ref name="variableRefType"/>
+    </choice>
+  </define>
+  <define name="classPattern">
+    <data type="string">
+      <param name="pattern">([A-Za-z_$][A-Za-z_0-9$]*\.)*[A-Za-z_$][A-Za-z_0-9$]*</param>
+    </data>
+  </define>
+  <define name="walltimePattern">
+    <data type="string">
+      <param name="pattern">[0-9]*[1-9][0-9]*(:[0-5][0-9]){0,2}</param>
+    </data>
+  </define>
+  <define name="variableRefType">
+    <data type="string">
+      <param name="pattern">$\{[A-Za-z0-9._]+\}</param>
+    </data>
+  </define>
+  <define name="inexcludePattern">
+    <data type="string">
+      <param name="pattern">.+(,.+)*</param>
+    </data>
+  </define>
+  <define name="controlFlowAction">
+    <choice>
+      <value>goto</value>
+      <value>replicate</value>
+      <value>continue</value>
+    </choice>
+  </define>
+  <define name="blockAttr">
+    <choice>
+      <value>start</value>
+      <value>end</value>
+      <value>none</value>
+    </choice>
+  </define>
+  <define name="propertyAppendChar">
+    <data type="string">
+      <param name="pattern">.</param>
+    </data>
+  </define>
 </grammar>

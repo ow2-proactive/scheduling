@@ -30,6 +30,7 @@
 	-->
 
 	<taskdef name="if" classname="ise.antelope.tasks.IfTask" />
+    <taskdef name="foreach" classname="net.sf.antcontrib.logic.ForEach" />
 
 	<!-- ************
 		MacroDef Stub generator and checker

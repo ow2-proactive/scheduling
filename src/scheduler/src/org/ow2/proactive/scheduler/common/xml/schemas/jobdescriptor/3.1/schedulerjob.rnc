@@ -6,7 +6,7 @@ start = job
 
 
 job = ## Definition of a job for the scheduler 
-    element job { variables?, jobDescription?, jobClasspath?, jobName , priority?, cancelJobOnError_j?, restartTaskOnError_j?, numberOfExecution_j?, genericInformation?, inputSpace? ,outputSpace? ,globalSpace? ,projectName?, attribute xsi:schemaLocation {xsd:anyURI}?, ( taskFlow ) }
+    element job { variables?, jobDescription?, jobClasspath?, jobName , priority?, cancelJobOnError_j?, restartTaskOnError_j?, numberOfExecution_j?, genericInformation?, inputSpace? ,outputSpace? ,projectName?, attribute xsi:schemaLocation {xsd:anyURI}?, ( taskFlow ) }
 
 jobName = ## Identification of this job
     attribute name { xsd:string }
@@ -40,16 +40,16 @@ infoValue = ## Value of the information variable
 	attribute value {xsd:string}
 projectName = ## Name of the project related to this job. It is also used in the policy to group some jobs together
 	attribute projectName { xsd:string }
-jobDescription = ## Textual description of this job 
+jobDescription = ## Textual description of this job
     element description { text }
-taskFlow = ## A job composed of a flow of tasks with or without dependencies 
+taskFlow = ## A job composed of a flow of tasks with or without dependencies
     element taskFlow { task+ }
 
 
 # +++++++++++++ task
-task = ## A task is the smallest computation unit for the scheduler 
+task = ## A task is the smallest computation unit for the scheduler
     element task { taskName, nodesNumber_t?, cancelJobOnError_t?, restartTaskOnError_t?, numberOfExecution_t?, runAsMe? ,walltime?, preciousResult?, preciousLogs?, resultPreviewClass?, taskDescription?, genericInformation?, depends?, inputFiles?, parallel?, selection?, pre?, executable, flow?, post?, cleaning?, outputFiles?}
-taskName = ## Identification of this task (identifier) 
+taskName = ## Identification of this task (identifier)
     attribute name { xsd:ID }
 nodesNumber_t = ## number of cores needed for the task (identifier)
     attribute numberOfNodes { xsd:positiveInteger | variableRefType }
@@ -63,53 +63,53 @@ restartTaskOnError_t = ## Where does the task restart if an error occurred ?
     attribute restartTaskOnError {restartTaskType}
 numberOfExecution_t = ## Maximum number of execution for this task
     attribute maxNumberOfExecution {xsd:nonNegativeInteger | variableRefType}
-preciousResult = ## Do we keep the result among the job results  
+preciousResult = ## Do we keep the result among the job results
     attribute preciousResult { xsd:boolean | variableRefType}
 preciousLogs = ## Do we keep the logs as file on LOCALSPACE
     attribute preciousLogs { xsd:boolean | variableRefType}
 resultPreviewClass = ## A class implementing the ResultPreview interface which can be used to display the result of this task
     attribute resultPreviewClass { classPattern | variableRefType}
-depends = ## A list of dependencies for this task 
+depends = ## A list of dependencies for this task
     element depends { dependsTask+ }
-dependsTask = ## A task from which this task depends 
+dependsTask = ## A task from which this task depends
     element task { attribute ref { xsd:IDREF} }
 parallel = ## An information related parallel task including nodes number and topology
 	element parallel { nodesNumber_t, topology? }
 topology = ## A topology descriptor of the parallel task
     element topology { arbitrary | bestProximity | thresholdProximity | singleHost | singleHostExclusive | multipleHostsExclusive | differentHostsExclusive }
-selection = ## A script used to select resources that can handle the task 
+selection = ## A script used to select resources that can handle the task
     element selection { selectionScript+ }
 flow = ## Flow control : block declaration, flow action
     element controlFlow { block?, (actionIf | actionReplicate | actionLoop)? }
 block = ## block declaration
     attribute block { blockAttr }
 pre = ## A script launched before the task execution in the task node
-    element pre { simpleScript }
+    element pre { script }
 post = ## A script launched after the task execution in the task node
-    element post { simpleScript }
+    element post { script }
 cleaning = ## A script launched by the Resource Manager after the task or post script
-    element cleaning { simpleScript }
+    element cleaning { script }
 runAsMe = ## Do we run this task under the job owner user identity
     attribute runAsMe { xsd:boolean | variableRefType }
 
 # +++++++++++++ scripts
-simpleScript = ## Definition of a standard script
+script = ## Definition of a standard script
     element script { codeScript | fileScript }
-selectionScript = ## Definition of a specific script which is used for resource selection 
+selectionScript = ## Definition of a specific script which is used for resource selection
     element script { scriptType?, (codeScript | fileScript) }
-scriptType = ## Type of script for the infrastructure manager (default to dynamic)  
-    attribute type { scriptTypeT}
-codeScript = ## Definition of a script by writing directly the code inside the descriptor 
+scriptType = ## Type of script for the infrastructure manager (default to dynamic)
+    attribute type { 'dynamic' | 'static'}
+codeScript = ## Definition of a script by writing directly the code inside the descriptor
     element code { attribute language { xsd:string }, text }
-fileScript = ## Definition of a script by loading a file 
+fileScript = ## Definition of a script by loading a file
     element file { ( path | url), fileScriptArguments? }
-path = ## File path to script definition  
+path = ## File path to script definition
     attribute path { xsd:anyURI | variableRefType}
-url = ## Remote script definition, reachable at the given url 
+url = ## Remote script definition, reachable at the given url
     attribute url { xsd:anyURI | variableRefType}
-fileScriptArguments = ## A list of arguments of this script 
-    element arguments { fileScriptArgument+ } 
-fileScriptArgument = ## An argument of this script  
+fileScriptArguments = ## A list of arguments of this script
+    element arguments { fileScriptArgument+ }
+fileScriptArgument = ## An argument of this script
     element argument { attribute value { xsd:string } }
 
 # +++++++++++++ Topology
@@ -131,25 +131,25 @@ threshold = ## threshold value
      attribute threshold { xsd:nonNegativeInteger }
 
 # +++++++++++++ executables
-executable = ## The task executable is the actual code that will be run on the selected resource. It can be a native command or a Java class 
+executable = ## The task executable is the actual code that will be run on the selected resource. It can be a native command or a Java class
     ( nativeExecutable | javaExecutable )
-    
-nativeExecutable = ## A native command call, it can be statically described or generated by a script 
+
+nativeExecutable = ## A native command call, it can be statically described or generated by a script
     element nativeExecutable { (staticCommand | dynamicCommand) }
-staticCommand = ## A native command statically defined in the descriptor 
+staticCommand = ## A native command statically defined in the descriptor
     element staticCommand { attribute value { xsd:string }, workingDir_t?, commandArguments? }
 workingDir_t = ## working dir for native command to execute (ie launching dir, pwd...)
     attribute workingDir { xsd:string }
-commandArguments = ## List of arguments to the native command (they will be appended at the end of the command) 
+commandArguments = ## List of arguments to the native command (they will be appended at the end of the command)
     element arguments { commandArgument+ }
 commandArgument = element argument { attribute value { xsd:string } }
-dynamicCommand = ## A command generated dynamically 
+dynamicCommand = ## A command generated dynamically
     element dynamicCommand { workingDir_t?, generation }
-generation = ## A command generated by a script 
-    element generation { simpleScript }
-javaExecutable = ## A Java class implementing the Executable interface 
+generation = ## A command generated by a script
+    element generation { script }
+javaExecutable = ## A Java class implementing the Executable interface
     element javaExecutable { class, forkEnvironment?, javaParameters? }
-class = ## The fully qualified class name 
+class = ## The fully qualified class name
     attribute class { classPattern | variableRefType}
 forkEnvironment = ## Fork environment if needed
 	element forkEnvironment { workingDir_t?, javaHome?, sysProps?, jvmArgs?, additionalClasspath?, envScript?}
@@ -170,22 +170,18 @@ jvmArg = ## A list of java properties or options
 additionalClasspath = ## classpath entries to add to the new java process
 	element additionalClasspath { pathElement+ }
 envScript = ## environment script to execute for setting forked process environment
-	element envScript { simpleScript }
-javaParameters = ## A list of parameters that will be given to the Java task through the init method 
+	element envScript { script }
+javaParameters = ## A list of parameters that will be given to the Java task through the init method
     element parameters { javaParameter+ }
-javaParameter = ## A parameter in the form of key/value pair 
+javaParameter = ## A parameter in the form of key/value pair
     element parameter { attribute name { xsd:string }, attribute value { xsd:string } }
 
 
 # +++++++++++++ DataSpaces
-inputSpace = ## INPUT space for the job, this setting overrides the default input space provided by the scheduler. It is typically used to store input files for a single job.
+inputSpace = ## Input space for the job, URL that define root directory containing job needed files
     element inputSpace { url }
-outputSpace = ## OUTPUT space for the job, this setting overrides the default output space provided by the scheduler. It is typically used to store output files for a single job.
+outputSpace = ## Output space for the job, URL that define root directory that will contain job generated output files
     element outputSpace { url }
-globalSpace = ## GLOBAL space for the job, this setting overrides the default global space provided by the scheduler. It is typically used to store files shared by all users.
-    element globalSpace { url }
-userSpace = ## USER space for the job, this setting overrides the default user space provided by the scheduler. It is typically used to store files that a user needs across multiple jobs.
-    element userSpace { url }
 inputFiles = ## selection of input files that will be accessible for the application and copied from INPUT/OUTPUT to local system
     element inputFiles { infiles_+ }
 infiles_ = ## description of input files with include, exclude and an access mode
@@ -206,7 +202,7 @@ excludes_ = ## Pattern of the files to exclude among the included one, relative 
 
 # +++++++++++++ Control flow
 actionIf = ## branching Control flow action
-	 element if { target, targetElse, targetContinuation?, simpleScript }
+	 element if { target, targetElse, targetContinuation?, script }
 target = ## branching if target
     attribute target { xsd:string }
 targetElse = ## branching else target
@@ -214,20 +210,19 @@ targetElse = ## branching else target
 targetContinuation = ## branching else target
     attribute continuation { xsd:string }
 actionLoop = ## looping control flow action
-	 element loop { target, simpleScript }
+	 element loop { target, script }
 actionReplicate = ## replicate control flow action
-	 element replicate { simpleScript }
+	 element replicate { script }
 
 # +++++++++++++ User define types
 jobPriority = 'highest' | 'high' | 'normal' | 'low' | 'lowest' | variableRefType
 restartTaskType = 'anywhere' | 'elsewhere' | variableRefType
-inaccessModeType = 'transferFromInputSpace' | 'transferFromOutputSpace' | 'transferFromGlobalSpace' | 'transferFromUserSpace' | 'none' | variableRefType
-outaccessModeType = 'transferToOutputSpace' | 'transferToGlobalSpace' | 'transferToUserSpace' | 'none' | variableRefType
+inaccessModeType = 'transferFromInputSpace' | 'transferFromOutputSpace' | 'transferFromGlobalSpace' | 'none' | variableRefType
+outaccessModeType = 'transferToOutputSpace' | 'transferToGlobalSpace' | 'none' | variableRefType
 classPattern = xsd:string { pattern="([A-Za-z_$][A-Za-z_0-9$]*\.)*[A-Za-z_$][A-Za-z_0-9$]*" }
 walltimePattern = xsd:string { pattern="[0-9]*[1-9][0-9]*(:[0-5][0-9]){0,2}" }
 variableRefType = xsd:string { pattern="$\{[A-Za-z0-9._]+\}" }
 inexcludePattern = xsd:string { pattern=".+(,.+)*" }
 controlFlowAction = 'goto' | 'replicate' | 'continue'
 blockAttr = 'start' | 'end' | 'none'
-scriptTypeT = 'dynamic' | 'static' | variableRefType
 propertyAppendChar = xsd:string { pattern="." }

@@ -1,8 +1,8 @@
-<?xml version="1.0" encoding="UTF-8"?><xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:jd="urn:proactive:jobdescriptor:dev" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" elementFormDefault="qualified" targetNamespace="urn:proactive:jobdescriptor:dev">
+<?xml version="1.0" encoding="UTF-8"?><xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jd="urn:proactive:jobdescriptor:3.0" elementFormDefault="qualified" targetNamespace="urn:proactive:jobdescriptor:3.0">
   
   <xs:element name="job">
     <xs:annotation>
-      <xs:documentation>Definition of a job for the scheduler </xs:documentation>
+      <xs:documentation>Definition of a job for the scheduler</xs:documentation>
     </xs:annotation>
     <xs:complexType>
       <xs:sequence>
@@ -12,8 +12,6 @@
         <xs:element minOccurs="0" ref="jd:genericInformation"/>
         <xs:element minOccurs="0" ref="jd:inputSpace"/>
         <xs:element minOccurs="0" ref="jd:outputSpace"/>
-        <xs:element minOccurs="0" ref="jd:globalSpace"/>
-        <xs:element minOccurs="0" ref="jd:userSpace"/>
         <xs:element ref="jd:taskFlow"/>
       </xs:sequence>
       <xs:attributeGroup ref="jd:jobName"/>
@@ -53,6 +51,14 @@
         <xs:annotation>
           <xs:documentation>Name of the project related to this job. It is also used in the policy to group some jobs together</xs:documentation>
         </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="logFile">
+        <xs:annotation>
+          <xs:documentation>The path to a file where the logs of this job will be written</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:union memberTypes="xs:anyURI jd:variableRefType"/>
+        </xs:simpleType>
       </xs:attribute>
       
     </xs:complexType>
@@ -139,6 +145,16 @@
       </xs:simpleType>
     </xs:attribute>
   </xs:attributeGroup>
+  <xs:attributeGroup name="logFile">
+    <xs:attribute name="logFile" use="required">
+      <xs:annotation>
+        <xs:documentation>The path to a file where the logs of this job will be written</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:union memberTypes="xs:anyURI jd:variableRefType"/>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
   <xs:element name="jobClasspath">
     <xs:annotation>
       <xs:documentation>The classPath where to find the dependences of your job. It must contain path element</xs:documentation>
@@ -201,14 +217,14 @@
     <xs:sequence>
       <xs:element name="description" type="xs:string">
         <xs:annotation>
-          <xs:documentation>Textual description of this job </xs:documentation>
+          <xs:documentation>Textual description of this job</xs:documentation>
         </xs:annotation>
       </xs:element>
     </xs:sequence>
   </xs:group>
   <xs:element name="taskFlow">
     <xs:annotation>
-      <xs:documentation>A job composed of a flow of tasks with or without dependencies </xs:documentation>
+      <xs:documentation>A job composed of a flow of tasks with or without dependencies</xs:documentation>
     </xs:annotation>
     <xs:complexType>
       <xs:group maxOccurs="unbounded" ref="jd:task"/>
@@ -219,7 +235,7 @@
     <xs:sequence>
       <xs:element name="task">
         <xs:annotation>
-          <xs:documentation>A task is the smallest computation unit for the scheduler </xs:documentation>
+          <xs:documentation>A task is the smallest computation unit for the scheduler</xs:documentation>
         </xs:annotation>
         <xs:complexType>
           <xs:sequence>
@@ -284,15 +300,7 @@
           </xs:attribute>
           <xs:attribute name="preciousResult">
             <xs:annotation>
-              <xs:documentation>Do we keep the result among the job results  </xs:documentation>
-            </xs:annotation>
-            <xs:simpleType>
-              <xs:union memberTypes="xs:boolean jd:variableRefType"/>
-            </xs:simpleType>
-          </xs:attribute>
-          <xs:attribute name="preciousLogs">
-            <xs:annotation>
-              <xs:documentation>Do we keep the logs as file on LOCALSPACE</xs:documentation>
+              <xs:documentation>Do we keep the result among the job results</xs:documentation>
             </xs:annotation>
             <xs:simpleType>
               <xs:union memberTypes="xs:boolean jd:variableRefType"/>
@@ -313,7 +321,7 @@
   <xs:attributeGroup name="taskName">
     <xs:attribute name="name" use="required" type="xs:ID">
       <xs:annotation>
-        <xs:documentation>Identification of this task (identifier) </xs:documentation>
+        <xs:documentation>Identification of this task (identifier)</xs:documentation>
       </xs:annotation>
     </xs:attribute>
   </xs:attributeGroup>
@@ -376,17 +384,7 @@
   <xs:attributeGroup name="preciousResult">
     <xs:attribute name="preciousResult" use="required">
       <xs:annotation>
-        <xs:documentation>Do we keep the result among the job results  </xs:documentation>
-      </xs:annotation>
-      <xs:simpleType>
-        <xs:union memberTypes="xs:boolean jd:variableRefType"/>
-      </xs:simpleType>
-    </xs:attribute>
-  </xs:attributeGroup>
-  <xs:attributeGroup name="preciousLogs">
-    <xs:attribute name="preciousLogs" use="required">
-      <xs:annotation>
-        <xs:documentation>Do we keep the logs as file on LOCALSPACE</xs:documentation>
+        <xs:documentation>Do we keep the result among the job results</xs:documentation>
       </xs:annotation>
       <xs:simpleType>
         <xs:union memberTypes="xs:boolean jd:variableRefType"/>
@@ -405,7 +403,7 @@
   </xs:attributeGroup>
   <xs:element name="depends">
     <xs:annotation>
-      <xs:documentation>A list of dependencies for this task </xs:documentation>
+      <xs:documentation>A list of dependencies for this task</xs:documentation>
     </xs:annotation>
     <xs:complexType>
       <xs:group maxOccurs="unbounded" ref="jd:dependsTask"/>
@@ -415,7 +413,7 @@
     <xs:sequence>
       <xs:element name="task">
         <xs:annotation>
-          <xs:documentation>A task from which this task depends </xs:documentation>
+          <xs:documentation>A task from which this task depends</xs:documentation>
         </xs:annotation>
         <xs:complexType>
           <xs:attribute name="ref" use="required" type="xs:IDREF"/>
@@ -452,7 +450,7 @@
   </xs:element>
   <xs:element name="selection">
     <xs:annotation>
-      <xs:documentation>A script used to select resources that can handle the task </xs:documentation>
+      <xs:documentation>A script used to select resources that can handle the task</xs:documentation>
     </xs:annotation>
     <xs:complexType>
       <xs:group maxOccurs="unbounded" ref="jd:selectionScript"/>
@@ -482,17 +480,17 @@
       </xs:annotation>
     </xs:attribute>
   </xs:attributeGroup>
-  <xs:element name="pre" type="jd:simpleScript">
+  <xs:element name="pre" type="jd:script">
     <xs:annotation>
       <xs:documentation>A script launched before the task execution in the task node</xs:documentation>
     </xs:annotation>
   </xs:element>
-  <xs:element name="post" type="jd:simpleScript">
+  <xs:element name="post" type="jd:script">
     <xs:annotation>
       <xs:documentation>A script launched after the task execution in the task node</xs:documentation>
     </xs:annotation>
   </xs:element>
-  <xs:element name="cleaning" type="jd:simpleScript">
+  <xs:element name="cleaning" type="jd:script">
     <xs:annotation>
       <xs:documentation>A script launched by the Resource Manager after the task or post script</xs:documentation>
     </xs:annotation>
@@ -508,7 +506,7 @@
     </xs:attribute>
   </xs:attributeGroup>
   <!-- +++++++++++++ scripts -->
-  <xs:complexType name="simpleScript">
+  <xs:complexType name="script">
     <xs:sequence>
       <xs:element name="script">
         <xs:annotation>
@@ -527,32 +525,44 @@
     <xs:sequence>
       <xs:element name="script">
         <xs:annotation>
-          <xs:documentation>Definition of a specific script which is used for resource selection </xs:documentation>
+          <xs:documentation>Definition of a specific script which is used for resource selection</xs:documentation>
         </xs:annotation>
         <xs:complexType>
           <xs:choice>
             <xs:element ref="jd:code"/>
             <xs:element ref="jd:file"/>
           </xs:choice>
-          <xs:attribute name="type" type="jd:scriptTypeT">
+          <xs:attribute name="type">
             <xs:annotation>
-              <xs:documentation>Type of script for the infrastructure manager (default to dynamic)  </xs:documentation>
+              <xs:documentation>Type of script for the infrastructure manager (default to dynamic)</xs:documentation>
             </xs:annotation>
+            <xs:simpleType>
+              <xs:restriction base="xs:token">
+                <xs:enumeration value="dynamic"/>
+                <xs:enumeration value="static"/>
+              </xs:restriction>
+            </xs:simpleType>
           </xs:attribute>
         </xs:complexType>
       </xs:element>
     </xs:sequence>
   </xs:group>
   <xs:attributeGroup name="scriptType">
-    <xs:attribute name="type" use="required" type="jd:scriptTypeT">
+    <xs:attribute name="type" use="required">
       <xs:annotation>
-        <xs:documentation>Type of script for the infrastructure manager (default to dynamic)  </xs:documentation>
+        <xs:documentation>Type of script for the infrastructure manager (default to dynamic)</xs:documentation>
       </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="dynamic"/>
+          <xs:enumeration value="static"/>
+        </xs:restriction>
+      </xs:simpleType>
     </xs:attribute>
   </xs:attributeGroup>
   <xs:element name="code">
     <xs:annotation>
-      <xs:documentation>Definition of a script by writing directly the code inside the descriptor </xs:documentation>
+      <xs:documentation>Definition of a script by writing directly the code inside the descriptor</xs:documentation>
     </xs:annotation>
     <xs:complexType mixed="true">
       <xs:attribute name="language" use="required" type="xs:string"/>
@@ -560,13 +570,13 @@
   </xs:element>
   <xs:element name="file">
     <xs:annotation>
-      <xs:documentation>Definition of a script by loading a file </xs:documentation>
+      <xs:documentation>Definition of a script by loading a file</xs:documentation>
     </xs:annotation>
     <xs:complexType>
       <xs:group minOccurs="0" ref="jd:fileScriptArguments"/>
       <xs:attribute name="path">
         <xs:annotation>
-          <xs:documentation>File path to script definition  </xs:documentation>
+          <xs:documentation>File path to script definition</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:union memberTypes="xs:anyURI jd:variableRefType"/>
@@ -574,7 +584,7 @@
       </xs:attribute>
       <xs:attribute name="url">
         <xs:annotation>
-          <xs:documentation>Remote script definition, reachable at the given url </xs:documentation>
+          <xs:documentation>Remote script definition, reachable at the given url</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:union memberTypes="xs:anyURI jd:variableRefType"/>
@@ -585,7 +595,7 @@
   <xs:attributeGroup name="path">
     <xs:attribute name="path" use="required">
       <xs:annotation>
-        <xs:documentation>File path to script definition  </xs:documentation>
+        <xs:documentation>File path to script definition</xs:documentation>
       </xs:annotation>
       <xs:simpleType>
         <xs:union memberTypes="xs:anyURI jd:variableRefType"/>
@@ -595,7 +605,7 @@
   <xs:attributeGroup name="url">
     <xs:attribute name="url" use="required">
       <xs:annotation>
-        <xs:documentation>Remote script definition, reachable at the given url </xs:documentation>
+        <xs:documentation>Remote script definition, reachable at the given url</xs:documentation>
       </xs:annotation>
       <xs:simpleType>
         <xs:union memberTypes="xs:anyURI jd:variableRefType"/>
@@ -606,7 +616,7 @@
     <xs:sequence>
       <xs:element name="arguments">
         <xs:annotation>
-          <xs:documentation>A list of arguments of this script </xs:documentation>
+          <xs:documentation>A list of arguments of this script</xs:documentation>
         </xs:annotation>
         <xs:complexType>
           <xs:group maxOccurs="unbounded" ref="jd:fileScriptArgument"/>
@@ -618,7 +628,7 @@
     <xs:sequence>
       <xs:element name="argument">
         <xs:annotation>
-          <xs:documentation>An argument of this script  </xs:documentation>
+          <xs:documentation>An argument of this script</xs:documentation>
         </xs:annotation>
         <xs:complexType>
           <xs:attribute name="value" use="required" type="xs:string"/>
@@ -682,7 +692,7 @@
   <xs:element name="executable" abstract="true"/>
   <xs:element name="nativeExecutable" substitutionGroup="jd:executable">
     <xs:annotation>
-      <xs:documentation>A native command call, it can be statically described or generated by a script </xs:documentation>
+      <xs:documentation>A native command call, it can be statically described or generated by a script</xs:documentation>
     </xs:annotation>
     <xs:complexType>
       <xs:choice>
@@ -693,7 +703,7 @@
   </xs:element>
   <xs:element name="staticCommand">
     <xs:annotation>
-      <xs:documentation>A native command statically defined in the descriptor </xs:documentation>
+      <xs:documentation>A native command statically defined in the descriptor</xs:documentation>
     </xs:annotation>
     <xs:complexType>
       <xs:group minOccurs="0" ref="jd:commandArguments"/>
@@ -716,7 +726,7 @@
     <xs:sequence>
       <xs:element name="arguments">
         <xs:annotation>
-          <xs:documentation>List of arguments to the native command (they will be appended at the end of the command) </xs:documentation>
+          <xs:documentation>List of arguments to the native command (they will be appended at the end of the command)</xs:documentation>
         </xs:annotation>
         <xs:complexType>
           <xs:group maxOccurs="unbounded" ref="jd:commandArgument"/>
@@ -735,7 +745,7 @@
   </xs:group>
   <xs:element name="dynamicCommand">
     <xs:annotation>
-      <xs:documentation>A command generated dynamically </xs:documentation>
+      <xs:documentation>A command generated dynamically</xs:documentation>
     </xs:annotation>
     <xs:complexType>
       <xs:complexContent>
@@ -754,14 +764,14 @@
       <xs:element ref="jd:generation"/>
     </xs:sequence>
   </xs:complexType>
-  <xs:element name="generation" type="jd:simpleScript">
+  <xs:element name="generation" type="jd:script">
     <xs:annotation>
-      <xs:documentation>A command generated by a script </xs:documentation>
+      <xs:documentation>A command generated by a script</xs:documentation>
     </xs:annotation>
   </xs:element>
   <xs:element name="javaExecutable" substitutionGroup="jd:executable">
     <xs:annotation>
-      <xs:documentation>A Java class implementing the Executable interface </xs:documentation>
+      <xs:documentation>A Java class implementing the Executable interface</xs:documentation>
     </xs:annotation>
     <xs:complexType>
       <xs:sequence>
@@ -774,7 +784,7 @@
   <xs:attributeGroup name="class">
     <xs:attribute name="class" use="required">
       <xs:annotation>
-        <xs:documentation>The fully qualified class name </xs:documentation>
+        <xs:documentation>The fully qualified class name</xs:documentation>
       </xs:annotation>
       <xs:simpleType>
         <xs:union memberTypes="jd:classPattern jd:variableRefType"/>
@@ -896,14 +906,14 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
-  <xs:element name="envScript" type="jd:simpleScript">
+  <xs:element name="envScript" type="jd:script">
     <xs:annotation>
       <xs:documentation>environment script to execute for setting forked process environment</xs:documentation>
     </xs:annotation>
   </xs:element>
   <xs:element name="parameters">
     <xs:annotation>
-      <xs:documentation>A list of parameters that will be given to the Java task through the init method </xs:documentation>
+      <xs:documentation>A list of parameters that will be given to the Java task through the init method</xs:documentation>
     </xs:annotation>
     <xs:complexType>
       <xs:sequence>
@@ -913,22 +923,17 @@
   </xs:element>
   <xs:element name="parameter">
     <xs:annotation>
-      <xs:documentation>A parameter in the form of key/value pair </xs:documentation>
+      <xs:documentation>A parameter in the form of key/value pair</xs:documentation>
     </xs:annotation>
     <xs:complexType>
       <xs:attribute name="name" use="required" type="xs:string"/>
       <xs:attribute name="value" use="required" type="xs:string"/>
     </xs:complexType>
   </xs:element>
-  <xs:element name="scriptExecutable" substitutionGroup="jd:executable" type="jd:simpleScript">
-    <xs:annotation>
-      <xs:documentation>A script to be executed as a task</xs:documentation>
-    </xs:annotation>
-  </xs:element>
   <!-- +++++++++++++ DataSpaces -->
   <xs:element name="inputSpace">
     <xs:annotation>
-      <xs:documentation>INPUT space for the job, this setting overrides the default input space provided by the scheduler. It is typically used to store input files for a single job.</xs:documentation>
+      <xs:documentation>Input space for the job, URL that define root directory containing job needed files</xs:documentation>
     </xs:annotation>
     <xs:complexType>
       <xs:attributeGroup ref="jd:url"/>
@@ -936,23 +941,7 @@
   </xs:element>
   <xs:element name="outputSpace">
     <xs:annotation>
-      <xs:documentation>OUTPUT space for the job, this setting overrides the default output space provided by the scheduler. It is typically used to store output files for a single job.</xs:documentation>
-    </xs:annotation>
-    <xs:complexType>
-      <xs:attributeGroup ref="jd:url"/>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="globalSpace">
-    <xs:annotation>
-      <xs:documentation>GLOBAL space for the job, this setting overrides the default global space provided by the scheduler. It is typically used to store files shared by all users.</xs:documentation>
-    </xs:annotation>
-    <xs:complexType>
-      <xs:attributeGroup ref="jd:url"/>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="userSpace">
-    <xs:annotation>
-      <xs:documentation>USER space for the job, this setting overrides the default user space provided by the scheduler. It is typically used to store files that a user needs across multiple jobs.</xs:documentation>
+      <xs:documentation>Output space for the job, URL that define root directory that will contain job generated output files</xs:documentation>
     </xs:annotation>
     <xs:complexType>
       <xs:attributeGroup ref="jd:url"/>
@@ -1045,7 +1034,7 @@
     </xs:annotation>
     <xs:complexType>
       <xs:complexContent>
-        <xs:extension base="jd:simpleScript">
+        <xs:extension base="jd:script">
           <xs:attributeGroup ref="jd:target"/>
           <xs:attributeGroup ref="jd:targetElse"/>
           <xs:attribute name="continuation" type="xs:string">
@@ -1084,13 +1073,13 @@
     </xs:annotation>
     <xs:complexType>
       <xs:complexContent>
-        <xs:extension base="jd:simpleScript">
+        <xs:extension base="jd:script">
           <xs:attributeGroup ref="jd:target"/>
         </xs:extension>
       </xs:complexContent>
     </xs:complexType>
   </xs:element>
-  <xs:element name="replicate" type="jd:simpleScript">
+  <xs:element name="replicate" type="jd:script">
     <xs:annotation>
       <xs:documentation>replicate control flow action</xs:documentation>
     </xs:annotation>
@@ -1158,11 +1147,6 @@
       </xs:simpleType>
       <xs:simpleType>
         <xs:restriction base="xs:token">
-          <xs:enumeration value="transferFromUserSpace"/>
-        </xs:restriction>
-      </xs:simpleType>
-      <xs:simpleType>
-        <xs:restriction base="xs:token">
           <xs:enumeration value="none"/>
         </xs:restriction>
       </xs:simpleType>
@@ -1178,11 +1162,6 @@
       <xs:simpleType>
         <xs:restriction base="xs:token">
           <xs:enumeration value="transferToGlobalSpace"/>
-        </xs:restriction>
-      </xs:simpleType>
-      <xs:simpleType>
-        <xs:restriction base="xs:token">
-          <xs:enumeration value="transferToUserSpace"/>
         </xs:restriction>
       </xs:simpleType>
       <xs:simpleType>
@@ -1225,20 +1204,6 @@
       <xs:enumeration value="end"/>
       <xs:enumeration value="none"/>
     </xs:restriction>
-  </xs:simpleType>
-  <xs:simpleType name="scriptTypeT">
-    <xs:union memberTypes="jd:variableRefType">
-      <xs:simpleType>
-        <xs:restriction base="xs:token">
-          <xs:enumeration value="dynamic"/>
-        </xs:restriction>
-      </xs:simpleType>
-      <xs:simpleType>
-        <xs:restriction base="xs:token">
-          <xs:enumeration value="static"/>
-        </xs:restriction>
-      </xs:simpleType>
-    </xs:union>
   </xs:simpleType>
   <xs:simpleType name="propertyAppendChar">
     <xs:restriction base="xs:string">
