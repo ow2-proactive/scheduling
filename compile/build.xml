@@ -4,6 +4,15 @@
 
 	<property name="project-name" value="ProActive Grid Cloud Portal" />
 
+	<!--
+		Available properties are:
+			-Dtest='**/RestSchedulerPushPullFileTest.java'	Override the default testsuite for "junit" target
+	-->
+	<!-- ************
+		Taskdefs
+	-->
+	<taskdef name="if" classname="ise.antelope.tasks.IfTask" />
+	
     <property file="${user.home}/.proactive/build.properties" />
 	<property file="${basedir}/build.properties" />
 
@@ -44,6 +53,24 @@
 		</fileset>
 	</path>
 
+
+	<if name="test">
+		<fileset dir="${src.tests.dir}" id="toBeTested">
+			<include name="${test}" />
+		</fileset>
+		<else>
+			<fileset dir="${src.tests.dir}" id="toBeTested">
+				<include name="org/ow2/proactive_grid_cloud_portal/**/*Test.java" />
+				<include name="**/RestSchedulerJobTaskTest.java" />
+				<include name="**/RestSchedulerTest.java" />
+                <include name="**/RestfulSchedulerFreezeTest.java" />
+                <include name="**/RestSchedulerKillTest.java" />
+                <include name="**/RestSchedulerJobPaginationTest.java" />
+                <include name="**/RestSchedulerPushPullFileTest.java" />
+			</fileset>
+		</else>
+	</if>
+	
 	<!-- 
 		 Compile all
 	-->
@@ -352,9 +379,9 @@
 			</manifest>
 		</jar>
 	</target>
-
+	
 	<macrodef name="junitMacro">
-		<attribute name="testdir"/>
+		<attribute name="testsuite" />
 		<sequential>
 			<fail unless="restapi.test.rm.home" message="restapi.test.rm.home property not defined" />
 			<fail unless="restapi.test.scheduler.home" message="restapi.test.scheduler.home property not defined" />
@@ -371,15 +398,7 @@
 				</classpath>
 				<formatter type="xml"/>
 				<batchtest fork="yes" todir="${junit.dir}">
-					<fileset dir="@{testdir}">
-						<include name="org/ow2/proactive_grid_cloud_portal/**/*Test.java" />
-						<include name="**/RestSchedulerJobTaskTest.java" />
-						<include name="**/RestSchedulerTest.java" />
-                        <include name="**/RestfulSchedulerFreezeTest.java" />
-                        <include name="**/RestSchedulerKillTest.java" />
-                        <include name="**/RestSchedulerJobPaginationTest.java" />
-                        <include name="**/RestSchedulerPushPullFileTest.java" />
-					</fileset>
+					<fileset refid="@{testsuite}"/>
 				</batchtest>
 			</junit>
 			
@@ -396,7 +415,7 @@
 	</macrodef>
 
 	<target name="junit" depends="compile.tests" description="Run rest tests">
-		<junitMacro testdir="${src.tests.dir}"/>
+		<junitMacro testsuite="toBeTested"/>
 	</target>
 
 </project>
