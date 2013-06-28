@@ -102,6 +102,7 @@ public class TestProcessTreeKiller extends SchedulerConsecutive {
      */
     @org.junit.Test
     public void run() throws Throwable {
+        SchedulerTHelper.getSchedulerAuth();
         RMTHelper rmHelper = RMTHelper.getDefaultInstance();
         rmHelper.createNodeSource("extra", 3);
 
