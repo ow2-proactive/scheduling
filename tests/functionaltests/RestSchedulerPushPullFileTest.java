@@ -39,6 +39,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import javax.ws.rs.core.MediaType;
@@ -70,7 +71,7 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest;
 
 /**
  * RestSchedulerPushPullFileTest
- *
+ * <p/>
  * This test tries to push and pull a file to the Global and User space
  *
  * @author The ProActive Team
@@ -112,96 +113,115 @@ public class RestSchedulerPushPullFileTest extends AbstractRestFuncTestCase {
     public void testPushPull() throws Exception {
         Scheduler scheduler = RestFuncTHelper.getScheduler();
 
-        String destPath = "test/push/pull";
+        File[] destPaths = { new File("/test/push/pull"), new File("/") };
 
         String[] spacesNames = { SchedulerConstants.GLOBALSPACE_NAME, SchedulerConstants.USERSPACE_NAME };
 
         String[] spacesUris = { ((SchedulerFrontend) scheduler).getGlobalSpaceURIs().get(0),
                 ((SchedulerFrontend) scheduler).getUserSpaceURIs().get(0) };
-
-        for (int i = 0; i < spacesNames.length; i++) {
-            String spaceName = spacesNames[i];
-            String spacePath = (new File(new URI(spacesUris[i]))).getAbsolutePath();
-            File testPushFile = RestFuncTHelper.getDefaultJobXmlfile();
-            // you can test pushing pulling a big file :
-            // testPushFile = new File("path_to_a_big_file");
-            File destFile = new File(new File(spacePath, destPath), testPushFile.getName());
-            if (destFile.exists()) {
-                destFile.delete();
+        for (File destPath : destPaths) {
+            for (int i = 0; i < spacesNames.length; i++) {
+                String spaceName = spacesNames[i];
+                String spacePath = (new File(new URI(spacesUris[i]))).getAbsolutePath();
+                testIt(spaceName, spacePath, destPath, true);
+                testIt(spaceName, spacePath, destPath, false);
             }
-
-            // PUSHING THE FILE
-            String pushfileUrl = getResourceUrl("dataspace/" + spaceName + "/" +
-                URLEncoder.encode(destPath, "UTF-8"));
-
-            HttpPost reqPush = new HttpPost(pushfileUrl);
-            setSessionHeader(reqPush);
-            // we push a xml job as a simple test
-
-            MultipartEntity multipartEntity = new MultipartEntity();
-            multipartEntity.addPart("fileName", new StringBody(testPushFile.getName()));
-            multipartEntity.addPart("fileContent", new InputStreamBody(FileUtils
-                    .openInputStream(testPushFile), MediaType.APPLICATION_OCTET_STREAM, null));
-            reqPush.setEntity(multipartEntity);
-            HttpResponse response = executeUriRequest(reqPush);
-
-            System.out.println(response.getStatusLine());
-            assertHttpStatusOK(response);
-            Assert.assertTrue(destFile + " exists", destFile.exists());
-
-            Assert.assertTrue("Original file and result are equals for " + spaceName, FileUtils
-                    .contentEquals(testPushFile, destFile));
-
-            // LISTING THE TARGET DIRECTORY
-            String pullListUrl = getResourceUrl("dataspace/" + spaceName + "/" +
-                URLEncoder.encode(destPath, "UTF-8"));
-
-            HttpGet reqPullList = new HttpGet(pullListUrl);
-            setSessionHeader(reqPullList);
-
-            HttpResponse response2 = executeUriRequest(reqPullList);
-
-            System.out.println(response2.getStatusLine());
-            assertHttpStatusOK(response2);
-
-            InputStream is = response2.getEntity().getContent();
-            List<String> lines = IOUtils.readLines(is);
-            Assert.assertTrue("Nb Files == 1", lines.size() == 1);
-            Assert.assertTrue("Pushed file correctly listed", lines.get(0).equals(testPushFile.getName()));
-
-            // PULLING THE FILE
-            String pullfileUrl = getResourceUrl("dataspace/" + spaceName + "/" +
-                URLEncoder.encode(destPath + "/" + testPushFile.getName(), "UTF-8"));
-
-            HttpGet reqPull = new HttpGet(pullfileUrl);
-            setSessionHeader(reqPull);
-
-            HttpResponse response3 = executeUriRequest(reqPull);
-
-            System.out.println(response3.getStatusLine());
-            assertHttpStatusOK(response3);
-
-            InputStream is2 = response3.getEntity().getContent();
-
-            File answerFile = File.createTempFile("answer", ".xml");
-            FileUtils.copyInputStreamToFile(is2, answerFile);
-
-            Assert.assertTrue("Original file and result are equals for " + spaceName, FileUtils
-                    .contentEquals(answerFile, testPushFile));
-
-            // DELETING THE HIERARCHY
-            String deleteUrl = getResourceUrl("dataspace/" + spaceName + "/" +
-                URLEncoder.encode("test", "UTF-8"));
-            HttpDelete reqDelete = new HttpDelete(deleteUrl);
-            setSessionHeader(reqDelete);
-
-            HttpResponse response4 = executeUriRequest(reqDelete);
-
-            System.out.println(response4.getStatusLine());
-            assertHttpStatusOK(response4);
-
-            Assert.assertTrue(destFile + " does not exist", !destFile.exists());
-
         }
+    }
+
+    public void testIt(String spaceName, String spacePath, File destPath, boolean encode) throws Exception {
+        File testPushFile = RestFuncTHelper.getDefaultJobXmlfile();
+        // you can test pushing pulling a big file :
+        // testPushFile = new File("path_to_a_big_file");
+        File destFile = new File(new File(spacePath, destPath.toString()), testPushFile.getName());
+        if (destFile.exists()) {
+            destFile.delete();
+        }
+
+        // PUSHING THE FILE
+        String pushfileUrl = getResourceUrl("dataspace/" +
+            spaceName +
+            (encode ? URLEncoder.encode(destPath.toString(), "UTF-8") : destPath.toString()
+                    .replace("\\", "/")));
+        // either we encode or we test human readable path (with no special character inside)
+
+        HttpPost reqPush = new HttpPost(pushfileUrl);
+        setSessionHeader(reqPush);
+        // we push a xml job as a simple test
+
+        MultipartEntity multipartEntity = new MultipartEntity();
+        multipartEntity.addPart("fileName", new StringBody(testPushFile.getName()));
+        multipartEntity.addPart("fileContent", new InputStreamBody(FileUtils.openInputStream(testPushFile),
+            MediaType.APPLICATION_OCTET_STREAM, null));
+        reqPush.setEntity(multipartEntity);
+        HttpResponse response = executeUriRequest(reqPush);
+
+        System.out.println(response.getStatusLine());
+        assertHttpStatusOK(response);
+        Assert.assertTrue(destFile + " exists", destFile.exists());
+
+        Assert.assertTrue("Original file and result are equals for " + spaceName, FileUtils.contentEquals(
+                testPushFile, destFile));
+
+        // LISTING THE TARGET DIRECTORY
+        String pullListUrl = getResourceUrl("dataspace/" +
+            spaceName +
+            "/" +
+            (encode ? URLEncoder.encode(destPath.toString(), "UTF-8") : destPath.toString()
+                    .replace("\\", "/")));
+
+        HttpGet reqPullList = new HttpGet(pullListUrl);
+        setSessionHeader(reqPullList);
+
+        HttpResponse response2 = executeUriRequest(reqPullList);
+
+        System.out.println(response2.getStatusLine());
+        assertHttpStatusOK(response2);
+
+        InputStream is = response2.getEntity().getContent();
+        List<String> lines = IOUtils.readLines(is);
+        HashSet<String> content = new HashSet<String>(lines);
+        System.out.println(lines);
+        Assert.assertTrue("Pushed file correctly listed", content.contains(testPushFile.getName()));
+
+        // PULLING THE FILE
+        String pullfileUrl = getResourceUrl("dataspace/" +
+            spaceName +
+            "/" +
+            (encode ? URLEncoder.encode(destPath.toString() + "/" + testPushFile.getName(), "UTF-8")
+                    : destPath.toString().replace("\\", "/") + "/" + testPushFile.getName()));
+
+        HttpGet reqPull = new HttpGet(pullfileUrl);
+        setSessionHeader(reqPull);
+
+        HttpResponse response3 = executeUriRequest(reqPull);
+
+        System.out.println(response3.getStatusLine());
+        assertHttpStatusOK(response3);
+
+        InputStream is2 = response3.getEntity().getContent();
+
+        File answerFile = File.createTempFile("answer", ".xml");
+        FileUtils.copyInputStreamToFile(is2, answerFile);
+
+        Assert.assertTrue("Original file and result are equals for " + spaceName, FileUtils.contentEquals(
+                answerFile, testPushFile));
+
+        // DELETING THE HIERARCHY
+        File rootDir = destPath;
+        while (rootDir.getParentFile() != null) {
+            rootDir = rootDir.getParentFile();
+        }
+        String deleteUrl = getResourceUrl("dataspace/" + spaceName + "/" +
+            (encode ? URLEncoder.encode(rootDir.toString(), "UTF-8") : rootDir.toString().replace("\\", "/")));
+        HttpDelete reqDelete = new HttpDelete(deleteUrl);
+        setSessionHeader(reqDelete);
+
+        HttpResponse response4 = executeUriRequest(reqDelete);
+
+        System.out.println(response4.getStatusLine());
+        assertHttpStatusOK(response4);
+
+        Assert.assertTrue(destFile + " does not exist", !destFile.exists());
     }
 }

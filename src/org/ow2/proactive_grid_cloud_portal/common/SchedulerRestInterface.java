@@ -528,15 +528,15 @@ public interface SchedulerRestInterface {
      * Pushes a file from the local file system into the given DataSpace
      * @param sessionId a valid session id
      * @param spaceName the name of the DataSpace
-     * @param filePath the path where to put the file
+     * @param filePath the path inside the DataSpace  where to put the file e.g. "/myfolder"
      * @param multipart the form data containing :
      *   - fileName the name of the file that will be created on the DataSpace
      *   - fileContent the content of the file
      * @return true if the transfer succeeded
      * @see org.ow2.proactive.scheduler.common.SchedulerConstants for spaces names
-     */
+     **/
     @POST
-    @Path("dataspace/{spaceName}/{filePath}")
+    @Path("dataspace/{spaceName:[a-zA-Z][a-zA-Z_0-9]*}{filePath:.*}")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces("application/json")
     public abstract boolean pushFile(@HeaderParam("sessionid")
@@ -554,9 +554,9 @@ public interface SchedulerRestInterface {
      * @param sessionId a valid session id
      * @param spaceName the name of the data space involved (GLOBAL or USER)
      * @param filePath the path to the file or directory whose content must be received
-      */
+     **/
     @GET
-    @Path("dataspace/{spaceName}/{filePath}")
+    @Path("dataspace/{spaceName:[a-zA-Z][a-zA-Z_0-9]*}{filePath:.*}")
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
     public abstract InputStream pullFile(@HeaderParam("sessionid")
     String sessionId, @PathParam("spaceName")
@@ -567,9 +567,10 @@ public interface SchedulerRestInterface {
      * Deletes a file or recursively delete a directory from the given DataSpace
      * @param sessionId a valid session id
      * @param spaceName the name of the data space involved (GLOBAL or USER)
-     * @param filePath the path to the file or directory whose content must be received     */
+     * @param filePath the path to the file or directory which must be deleted
+     **/
     @DELETE
-    @Path("dataspace/{spaceName}/{filePath}")
+    @Path("dataspace/{spaceName:[a-zA-Z][a-zA-Z_0-9]*}{filePath:.*}")
     public abstract boolean deleteFile(@HeaderParam("sessionid")
     String sessionId, @PathParam("spaceName")
     String spaceName, @PathParam("filePath")
