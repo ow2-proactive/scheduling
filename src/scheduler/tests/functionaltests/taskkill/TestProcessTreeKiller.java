@@ -55,6 +55,7 @@ import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
 import org.ow2.proactive.scheduler.util.process.ProcessTreeKiller;
 
+import functionaltests.RMTHelper;
 import functionaltests.SchedulerConsecutive;
 import functionaltests.SchedulerTHelper;
 
@@ -77,8 +78,6 @@ import functionaltests.SchedulerTHelper;
 public class TestProcessTreeKiller extends SchedulerConsecutive {
 
     public static URL launchersDir = TestProcessTreeKiller.class.getResource("/functionaltests/executables");
-
-    private final static int wait_time = 15000;
 
     private final static int wait_kill_time = 60000;
 
@@ -103,6 +102,8 @@ public class TestProcessTreeKiller extends SchedulerConsecutive {
      */
     @org.junit.Test
     public void run() throws Throwable {
+        RMTHelper rmHelper = RMTHelper.getDefaultInstance();
+        rmHelper.createNodeSource("extra", 3);
 
         org.apache.log4j.Logger.getLogger(ProcessTreeKiller.class).setLevel(Level.DEBUG);
         org.apache.log4j.Logger.getLogger(TaskLauncher.class).setLevel(Level.DEBUG);

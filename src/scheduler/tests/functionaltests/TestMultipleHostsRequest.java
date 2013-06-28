@@ -41,7 +41,6 @@ import java.net.URL;
 
 import org.junit.Assert;
 import org.objectweb.proactive.utils.OperatingSystem;
-import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobResult;
