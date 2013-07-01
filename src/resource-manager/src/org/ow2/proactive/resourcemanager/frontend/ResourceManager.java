@@ -388,10 +388,25 @@ public interface ResourceManager {
     /**
      * Executes the script on the specified targets depending on the target type {@link TargetType}.
      * 
-     * 
-     * @param <T> The parameterized result type of the script 
+     * @param a script to execute 
      * @param script a selection script to execute.
+     * @param targetType must be either NODE_URL, NODESOURCE_NAME or HOSTNAME
+     * @param targets are names of particular resources
+     *
      * @return the {@link ScriptResult} corresponding to the script execution.
      */
     public <T> List<ScriptResult<T>> executeScript(Script<T> script, String targetType, Set<String> targets);
+
+    /**
+     * Executes the script on the specified targets depending on the target type {@link TargetType}.
+     *
+     * @param a script to execute 
+     * @param a script engine name 
+     * @param script a selection script to execute.
+     * @param targetType must be either NODE_URL, NODESOURCE_NAME or HOSTNAME
+     * @param targets are names of particular resources
+     * @return the {@link ScriptResult} corresponding to the script execution.
+     */
+    public List<ScriptResult<Object>> executeScript(String script, String scriptEngine, String targetType,
+            Set<String> targets);
 }

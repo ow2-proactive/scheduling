@@ -115,9 +115,12 @@ import org.ow2.proactive.resourcemanager.selection.statistics.ProbablisticSelect
 import org.ow2.proactive.resourcemanager.selection.topology.TopologyManager;
 import org.ow2.proactive.resourcemanager.utils.ClientPinger;
 import org.ow2.proactive.resourcemanager.utils.TargetType;
+import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.scripting.Script;
+import org.ow2.proactive.scripting.ScriptException;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.SelectionScript;
+import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
@@ -1669,6 +1672,17 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             return new BooleanWrapper(false);
         }
         return new BooleanWrapper(true);
+    }
+
+    @Override
+    public List<ScriptResult<Object>> executeScript(String script, String scriptEngine, String targetType,
+            Set<String> targets) {
+        try {
+            return this.executeScript(new SimpleScript(script, scriptEngine), targetType, targets);
+        } catch (InvalidScriptException e) {
+            logger.error(e.getMessage(), e);
+            throw new ScriptException(e);
+        }
     }
 
     /**

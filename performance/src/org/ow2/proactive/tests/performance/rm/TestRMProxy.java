@@ -223,4 +223,10 @@ public class TestRMProxy implements ResourceManager {
     public NodeSet getNodes(Criteria criteria) {
         return target.getNodes(criteria);
     }
+
+    @Override
+    public List<ScriptResult<Object>> executeScript(String script, String scriptEngine, String targetType,
+            Set<String> targets) {
+        return target.executeScript(script, scriptEngine, targetType, targets);
+    }
 }

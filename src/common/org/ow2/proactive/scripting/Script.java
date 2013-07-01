@@ -67,8 +67,8 @@ import org.ow2.proactive.utils.BoundedStringWriter;
 @PublicAPI
 public abstract class Script<E> implements Serializable {
 
-    // default output size in chars based on the notorious JL's statistics :)
-    public static final int DEFAULT_OUTPUT_MAX_SIZE = 125;
+    // default output size in chars
+    public static final int DEFAULT_OUTPUT_MAX_SIZE = 1 * 1024 * 1024 * 1024; // 1 million characters ~ 2 Mb
 
     /** Loggers */
     public static final Logger logger = Logger.getLogger(Script.class);
@@ -281,30 +281,21 @@ public abstract class Script<E> implements Serializable {
 
             return result;
         } catch (Throwable e) {
+            // cannot send exception directly to the client as they may be 
+            // non serializable
             Throwable cause = e.getCause();
-            if (cause instanceof RaiseException) {
-                // fix for SCHEDULING-1742 if it's a jruby exception we capture the real ruby stack
-                RaiseException re = (RaiseException) cause;
-                RubyException rbe = re.getException();
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                PrintStream ps = new PrintStream(baos);
-                rbe.printBacktrace(ps);
-                ps.flush();
-                String stack = baos.toString();
-                // The initial Throwable "e" must NOT be put as the cause of the final exception as "e" can unfortunately
-                // contain a reference to a org.jruby.runtime.CallType object which is NOT SERIALIZABLE
-                Exception finale = new Exception(rbe.message + System.getProperty("line.separator") + stack);
-                logger.error("", finale);
-                return new ScriptResult<E>(new Exception("An exception occurred while executing the script ",
-                    finale));
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            PrintStream ps = new PrintStream(baos);
+            cause.printStackTrace(ps);
+            ps.flush();
+            String stack = baos.toString();
+            if (cause.getMessage() != null) {
+                stack = cause.getMessage() + System.getProperty("line.separator") + stack;
             }
-            ScriptException se = new ScriptException("An exception occurred while executing the script " +
-                this.getClass().getSimpleName() +
-                (parameters != null ? " with parameters=" + Arrays.asList(parameters) : "") +
-                ", and content:\n" + script, e);
-            logger.error("", se);
-            return new ScriptResult<E>(se);
-
+            Exception finale = new Exception(stack);
+            logger.error("", finale);
+            return new ScriptResult<E>(new Exception("An exception occurred while executing the script ",
+                finale));
         }
     }
 

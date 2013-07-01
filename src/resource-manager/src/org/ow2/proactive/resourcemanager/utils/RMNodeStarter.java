@@ -55,6 +55,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import javax.script.ScriptEngineFactory;
+import javax.script.ScriptEngineManager;
 import javax.security.auth.login.LoginException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -328,6 +330,8 @@ public class RMNodeStarter {
         this.readAndSetTheRank();
         this.node = this.createLocalNode(nodeName);
 
+        logAvailableScriptEngines();
+
         this.nodeURL = node.getNodeInformation().getURL();
         logger.info("URL of this node " + this.nodeURL);
 
@@ -373,6 +377,29 @@ public class RMNodeStarter {
                 logger.error(ExitStatus.RMNODE_EXIT_FORCED.description);
                 System.exit(ExitStatus.RMNODE_EXIT_FORCED.exitCode);
             }
+        }
+    }
+
+    private void logAvailableScriptEngines() {
+        ScriptEngineManager mgr = new ScriptEngineManager();
+        List<ScriptEngineFactory> factories = mgr.getEngineFactories();
+        for (ScriptEngineFactory factory : factories) {
+
+            logger.info("ScriptEngineFactory Info");
+
+            String engName = factory.getEngineName();
+            String engVersion = factory.getEngineVersion();
+            String langName = factory.getLanguageName();
+            String langVersion = factory.getLanguageVersion();
+
+            logger.info(String.format("\tScript Engine: %s (%s)\n", engName, engVersion));
+
+            List<String> engNames = factory.getNames();
+            for (String name : engNames) {
+                logger.info(String.format("\tEngine Alias: %s\n", name));
+            }
+
+            logger.info(String.format("\tLanguage: %s (%s)\n", langName, langVersion));
         }
     }
 
@@ -955,8 +982,10 @@ public class RMNodeStarter {
         private String paPropString;
         private List<String> paPropList;
         private int addAttempts = -1, addAttemptsDelay = -1;
-        private final String[] requiredJARs = { "jruby-engine.jar", "sigar/sigar.jar",
+        private final String[] requiredJARs = { "jruby-engine.jar",
+                "sigar/sigar.jar",
                 "jython-engine.jar",
+                "groovy-all-2.1.5.jar",
                 "commons-logging-1.1.1.jar",
                 "ProActive_Scheduler-core.jar",// SCHEDULING-1338 and SCHEDULING-1307 : core required for forked java task
                 "ProActive_SRM-common.jar", "ProActive_ResourceManager.jar",
