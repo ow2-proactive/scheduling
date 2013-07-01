@@ -87,9 +87,10 @@ public class NativeExecutable extends Executable {
 
     public static final Logger logger = Logger.getLogger(NativeExecutable.class);
 
-    private static String GENERATION_SCRIPT_ERR = "\nNo command eligible was found by generation script.\n"
-        + "A generation script must define a variable named 'command' which contains "
-        + "the native command to launch. \n" + "Script details :\n";
+    private static String GENERATION_SCRIPT_ERR = "\nNo command eligible was found by generation script.\n" +
+        "A generation script must define a variable named '" + GenerationScript.RESULT_VARIABLE +
+        "' or a variable named '" + GenerationScript.RESULTLIST_VARIABLE + "' which contains " +
+        "the native command to launch. \n" + "Script details :\n";
 
     /**
      * Environment variable exported to the the process
@@ -162,7 +163,7 @@ public class NativeExecutable extends Executable {
         command = execInitializer.getCommand();
         GenerationScript gs = execInitializer.getGenerationScript();
         if (gs != null) {
-            String generationScriptDefinedCommand = this.executeGenerationScript(gs);
+            List<String> generationScriptDefinedCommand = this.executeGenerationScript(gs);
 
             //no command has been returned by generation script
             if ((generationScriptDefinedCommand == null) ||
@@ -173,7 +174,13 @@ public class NativeExecutable extends Executable {
                 throw new UserException(GENERATION_SCRIPT_ERR + gs.getId());
             } else {
                 //generation script has defined a command, so set the command to launch
-                command = Tools.parseCommandLine(generationScriptDefinedCommand);
+                String commandLine = null;
+                if (generationScriptDefinedCommand.size() == 1) {
+                    commandLine = generationScriptDefinedCommand.get(0);
+                    command = Tools.parseCommandLine(commandLine);
+                } else {
+                    command = generationScriptDefinedCommand.toArray(new String[0]);
+                }
             }
         }
 
@@ -200,10 +207,10 @@ public class NativeExecutable extends Executable {
      * @return the value of the variable GenerationScript.COMMAND_NAME after the script evaluation.
      */
     @SuppressWarnings("unchecked")
-    private String executeGenerationScript(GenerationScript script) throws ActiveObjectCreationException,
-            NodeException, UserException {
+    private List<String> executeGenerationScript(GenerationScript script)
+            throws ActiveObjectCreationException, NodeException, UserException {
         ScriptHandler handler = ScriptLoader.createHandler(PAActiveObject.getNode());
-        ScriptResult<String> res = handler.handle(script);
+        ScriptResult<List<String>> res = handler.handle(script);
 
         if (res.errorOccured()) {
             res.getException().printStackTrace();

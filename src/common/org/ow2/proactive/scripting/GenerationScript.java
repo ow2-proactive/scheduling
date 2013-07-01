@@ -40,6 +40,9 @@ import java.io.File;
 import java.io.Reader;
 import java.io.StringReader;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import javax.script.Bindings;
 import javax.script.ScriptEngine;
@@ -60,7 +63,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
  */
 @PublicAPI
 @XmlAccessorType(XmlAccessType.FIELD)
-public class GenerationScript extends Script<String> {
+public class GenerationScript extends Script<List<String>> {
     /** Loggers */
     public static final Logger logger = Logger.getLogger(GenerationScript.class);
 
@@ -71,9 +74,15 @@ public class GenerationScript extends Script<String> {
     public static final String RESULT_VARIABLE = "command";
 
     /**
+     * The variable name which must be set after the evaluation
+     * of a verifying script.
+     */
+    public static final String RESULTLIST_VARIABLE = "commandList";
+
+    /**
      * Default value for GenerationScript return value
      */
-    public static final String DEFAULT_COMMAND_VALUE = "NO COMMAND";
+    public static final List<String> DEFAULT_COMMAND_VALUE = new ArrayList<String>();
 
     /** ProActive needed constructor */
     public GenerationScript() {
@@ -149,21 +158,32 @@ public class GenerationScript extends Script<String> {
      * @see org.ow2.proactive.scripting.Script#getResult(javax.script.Bindings)
      */
     @Override
-    protected ScriptResult<String> getResult(Bindings bindings) {
+    protected ScriptResult<List<String>> getResult(Bindings bindings) {
         if (bindings.containsKey(RESULT_VARIABLE)) {
             Object result = bindings.get(RESULT_VARIABLE);
 
             if (result instanceof String) {
-                return new ScriptResult<String>((String) result);
+                List<String> resultArray = Collections.singletonList((String) result);
+                return new ScriptResult<List<String>>(resultArray);
             } else {
                 String msg = "Bad result format : awaited String, found " + result.getClass().getName();
                 logger.warn(msg);
-                return new ScriptResult<String>(new Exception(msg));
+                return new ScriptResult<List<String>>(new Exception(msg));
+            }
+        } else if (bindings.containsKey(RESULTLIST_VARIABLE)) {
+            Object resultList = bindings.get(RESULTLIST_VARIABLE);
+
+            if (resultList instanceof List) {
+                return new ScriptResult<List<String>>((List<String>) resultList);
+            } else {
+                String msg = "Bad result format : awaited String[], found " + resultList.getClass().getName();
+                logger.warn(msg);
+                return new ScriptResult<List<String>>(new Exception(msg));
             }
         } else {
             String msg = "No binding for key " + RESULT_VARIABLE;
             logger.warn(msg);
-            return new ScriptResult<String>(new Exception(msg));
+            return new ScriptResult<List<String>>(new Exception(msg));
         }
     }
 
@@ -174,6 +194,6 @@ public class GenerationScript extends Script<String> {
      */
     @Override
     protected void prepareSpecialBindings(Bindings bindings) {
-        bindings.put(RESULT_VARIABLE, DEFAULT_COMMAND_VALUE);
+        bindings.put(RESULTLIST_VARIABLE, DEFAULT_COMMAND_VALUE);
     }
 }
