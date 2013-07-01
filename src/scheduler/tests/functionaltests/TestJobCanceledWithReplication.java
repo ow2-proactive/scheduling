@@ -76,6 +76,9 @@ public class TestJobCanceledWithReplication extends SchedulerConsecutive {
      */
     @org.junit.Test
     public void run() throws Throwable {
+        SchedulerTHelper.getSchedulerAuth();
+        RMTHelper rmHelper = RMTHelper.getDefaultInstance();
+        rmHelper.createNodeSource("extra", 3);
 
         String faultyTaskName = "task2*1";
         String abortedTaskName = "task2*2";
