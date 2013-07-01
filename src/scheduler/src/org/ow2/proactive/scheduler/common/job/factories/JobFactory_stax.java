@@ -434,7 +434,7 @@ public class JobFactory_stax extends JobFactory {
                         } else if (XMLTags.DS_GLOBALSPACE.matches(current)) {
                             jtmp.setGlobalSpace(getIOSpace(cursorJob));
                         } else if (XMLTags.DS_USERSPACE.matches(current)) {
-                            jtmp.setGlobalSpace(getIOSpace(cursorJob));
+                            jtmp.setUserSpace(getIOSpace(cursorJob));
                         } else if (XMLTags.TASKFLOW.matches(current)) {
                             job = new TaskFlowJob();
                             continu = false;

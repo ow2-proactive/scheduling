@@ -87,6 +87,10 @@ public class JobDataSpaceApplication implements Serializable {
 
                 // create INPUT space
                 if (inputURL != null) {
+                    if (inputURL.indexOf(':') < 2) {
+                        // assume this is a file path
+                        inputURL = ((new File(inputURL)).toURI().toURL()).toString();
+                    }
                     DataSpaceServiceStarter.createSpace(applicationId, PADataSpaces.DEFAULT_IN_OUT_NAME,
                             inputURL, null, null, true, false);
                 } else {
@@ -101,6 +105,10 @@ public class JobDataSpaceApplication implements Serializable {
                 }
                 // create OUTPUT space
                 if (outputURL != null) {
+                    if (outputURL.indexOf(':') < 2) {
+                        // assume this is a file path
+                        outputURL = ((new File(outputURL)).toURI().toURL()).toString();
+                    }
                     DataSpaceServiceStarter.createSpace(applicationId, PADataSpaces.DEFAULT_IN_OUT_NAME,
                             outputURL, null, null, false, false);
                 } else {
@@ -115,6 +123,10 @@ public class JobDataSpaceApplication implements Serializable {
                 }
                 // create GLOBAL shared space
                 if (globalURL != null) {
+                    if (globalURL.indexOf(':') < 2) {
+                        // assume this is a file path
+                        globalURL = ((new File(globalURL)).toURI().toURL()).toString();
+                    }
                     DataSpaceServiceStarter.createSpace(applicationId, SchedulerConstants.GLOBALSPACE_NAME,
                             globalURL, null, null, false, false);
                 } else {
@@ -130,6 +142,10 @@ public class JobDataSpaceApplication implements Serializable {
 
                 // create USER space for this job, the application ID of this user space will be the AppId of the job
                 if (userURL != null) {
+                    if (userURL.indexOf(':') < 2) {
+                        // assume this is a file path
+                        userURL = ((new File(userURL)).toURI().toURL()).toString();
+                    }
                     DataSpaceServiceStarter.createSpace(applicationId, SchedulerConstants.USERSPACE_NAME,
                             userURL, null, null, false, false);
                 } else {
