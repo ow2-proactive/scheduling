@@ -121,7 +121,9 @@ public class LocalInfrastructure extends InfrastructureManager {
             sb.append(rmHome);
             paPropList.add(sb.toString());
         }
-        Collections.addAll(paPropList, this.paProperties.split(" "));
+        if (!paProperties.isEmpty()) {
+            Collections.addAll(paPropList, this.paProperties.split(" "));
+        }
         clb.setPaProperties(paPropList);
         clb.setNodeName(nodeName);
         try {
