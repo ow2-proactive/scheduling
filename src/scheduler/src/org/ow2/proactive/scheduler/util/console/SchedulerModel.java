@@ -66,6 +66,7 @@ import org.ow2.proactive.scheduler.common.exception.AlreadyConnectedException;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
+import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
@@ -561,10 +562,18 @@ public class SchedulerModel extends ConsoleModel {
                 Collections.sort(tasks);
 
                 for (TaskState ts : tasks) {
-                    TaskResult tRes = result.getResult(ts.getName());
+                    TaskResult tRes = null;
                     try {
-                        print(ts.getName() + " : " + newline + tRes.getOutput().getAllLogs(false));
-                    } catch (Throwable e1) {
+                        tRes = result.getResult(ts.getName());
+                        print(ts.getName() + " : " + newline
+                                + tRes.getOutput().getAllLogs(false));
+                    } catch (UnknownTaskException e) {
+                        print(ts.getName() + " : " + newline
+                                + "No output available !");
+                    } catch (Exception e1) {
+                        if (tRes == null) {
+                            throw e1;
+                        }
                         error(tRes.getException().toString());
                     }
                 }
