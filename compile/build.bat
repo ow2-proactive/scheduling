@@ -8,7 +8,7 @@ SETLOCAL
 set CLASSPATH=compile\lib\ant-launcher.jar;%CLASSPATH%
 echo %CLASSPATH%
 cd ..
-"ant" "-Dant.home=compile" -lib compile\lib\AntelopeTasks_3.2.19.jar -buildfile compile/build.xml %1 %2 %3 %4 %5 %WHEN_NO_ARGS%
+"ant" "-Dant.home=compile" -buildfile compile/build.xml %1 %2 %3 %4 %5 %WHEN_NO_ARGS%
 ENDLOCAL
 goto end
 

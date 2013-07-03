@@ -1,6 +1,6 @@
 <!DOCTYPE project>
 
-<project name="proactive_grid_cloud_portal" default="compile" basedir=".">
+<project name="proactive_grid_cloud_portal" default="compile" basedir="." xmlns:antelope="antlib:ise.antelope.tasks">
 
 	<property name="project-name" value="ProActive Grid Cloud Portal" />
 
@@ -8,13 +8,18 @@
 		Available properties are:
 			-Dtest='**/RestSchedulerPushPullFileTest.java'	Override the default testsuite for "junit" target
 	-->
+
+    <property file="${user.home}/.proactive/build.properties" />
+	<property file="${basedir}/build.properties" />
+	
 	<!-- ************
 		Taskdefs
 	-->
-	<taskdef name="if" classname="ise.antelope.tasks.IfTask" />
-	
-    <property file="${user.home}/.proactive/build.properties" />
-	<property file="${basedir}/build.properties" />
+
+	<taskdef uri="antlib:ise.antelope.tasks" 
+		resource="ise/antelope/tasks/antlib.xml"
+		classpath="${basedir}/lib/AntelopeTasks_3.2.19.jar"
+	/>
 
 	<!-- to generate a release uncomment the variable rest_api.version -->
 	<!-- in the build.properties file, then launch the generation of the war file -->
@@ -54,7 +59,7 @@
 	</path>
 
 
-	<if name="test">
+	<antelope:if name="test">
 		<fileset dir="${src.tests.dir}" id="toBeTested">
 			<include name="${test}" />
 		</fileset>
@@ -69,7 +74,7 @@
                 <include name="**/RestSchedulerPushPullFileTest.java" />
 			</fileset>
 		</else>
-	</if>
+	</antelope:if>
 	
 	<!-- 
 		 Compile all

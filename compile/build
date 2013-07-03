@@ -9,4 +9,4 @@ else
 fi
 # Go inside the ProActive directory
 cd "$compileDir/.."
-ant -buildfile  "$compileDir"/build.xml $args -lib  "$compileDir"/lib/AntelopeTasks_3.2.19.jar
+ant -buildfile  "$compileDir"/build.xml $args
