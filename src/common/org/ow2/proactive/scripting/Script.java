@@ -36,9 +36,17 @@
  */
 package org.ow2.proactive.scripting;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.io.Reader;
+import java.io.Serializable;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -49,8 +57,6 @@ import javax.script.ScriptEngineFactory;
 import javax.script.ScriptEngineManager;
 
 import org.apache.log4j.Logger;
-import org.jruby.RubyException;
-import org.jruby.exceptions.RaiseException;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.utils.BoundedStringWriter;
 
@@ -281,21 +287,16 @@ public abstract class Script<E> implements Serializable {
 
             return result;
         } catch (Throwable e) {
-            // cannot send exception directly to the client as they may be 
-            // non serializable
-            Throwable cause = e.getCause();
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             PrintStream ps = new PrintStream(baos);
-            cause.printStackTrace(ps);
+            e.printStackTrace(ps);
             ps.flush();
             String stack = baos.toString();
-            if (cause.getMessage() != null) {
-                stack = cause.getMessage() + System.getProperty("line.separator") + stack;
+            if (e.getMessage() != null) {
+                stack = e.getMessage() + System.getProperty("line.separator") + stack;
             }
-            Exception finale = new Exception(stack);
-            logger.error("", finale);
-            return new ScriptResult<E>(new Exception("An exception occurred while executing the script ",
-                finale));
+            logger.error(e.getMessage(), e);
+            return new ScriptResult<E>(new Exception(stack));
         }
     }
 
