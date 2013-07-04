@@ -58,6 +58,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
+import org.jboss.resteasy.annotations.GZIP;
+import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.node.NodeException;
 import org.ow2.proactive.resourcemanager.common.RMState;
@@ -66,9 +68,8 @@ import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.topology.Topology;
 import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
+import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
-import org.jboss.resteasy.annotations.GZIP;
-import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 
 
 @Path("/rm")
@@ -265,4 +266,34 @@ public interface RMRestInterface {
     @GET
     @Path("version")
     String getVersion();
+
+    @POST
+    @GZIP
+    @Path("node/script")
+    @Produces("application/json")
+    public ScriptResult<Object> executeNodeScript(@HeaderParam("sessionid")
+    String sessionId, @FormParam("nodeurl")
+    String nodeUrl, @FormParam("script")
+    String script, @FormParam("scriptEngine")
+    String scriptEngine) throws Throwable;
+
+    @POST
+    @GZIP
+    @Path("nodesource/script")
+    @Produces("application/json")
+    public List<ScriptResult<Object>> executeNodeSourceScript(@HeaderParam("sessionid")
+    String sessionId, @FormParam("nodesource")
+    String nodeSource, @FormParam("script")
+    String script, @FormParam("scriptEngine")
+    String scriptEngine) throws Throwable;
+
+    @POST
+    @GZIP
+    @Path("host/script")
+    @Produces("application/json")
+    public List<ScriptResult<Object>> executeHostScript(@HeaderParam("sessionid")
+    String sessionId, @FormParam("host")
+    String host, @FormParam("script")
+    String script, @FormParam("scriptEngine")
+    String scriptEngine) throws Throwable;
 }

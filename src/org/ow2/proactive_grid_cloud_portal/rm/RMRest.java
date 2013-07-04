@@ -44,6 +44,7 @@ import java.security.KeyException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -68,6 +69,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
+import org.jboss.resteasy.annotations.GZIP;
+import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
@@ -85,13 +88,13 @@ import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.frontend.topology.Topology;
 import org.ow2.proactive.resourcemanager.nodesource.common.ConfigurableField;
 import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
+import org.ow2.proactive.resourcemanager.utils.TargetType;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
+import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive_grid_cloud_portal.common.StatHistoryCaching;
 import org.ow2.proactive_grid_cloud_portal.common.StatHistoryCaching.StatHistoryCacheEntry;
 import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
 import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
-import org.jboss.resteasy.annotations.GZIP;
-import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import org.rrd4j.ConsolFun;
 import org.rrd4j.core.FetchData;
 import org.rrd4j.core.FetchRequest;
@@ -103,7 +106,7 @@ public class RMRest implements RMRestInterface {
 
     protected static final String[] dataSources = { //
     // "AverageInactivity", // redundant with AverageActivity
-            // "ToBeReleasedNodesCo", // useless info
+    // "ToBeReleasedNodesCo", // useless info
             "BusyNodesCount", //
             "FreeNodesCount", //
             "DownNodesCount", //
@@ -119,8 +122,8 @@ public class RMRest implements RMRestInterface {
             throw new NotConnectedException("you are not connected to the scheduler, you should log on first");
         }
 
-        RMSessionMapper.getInstance().getSessionsLastAccessToClient().put(sessionId,
-                System.currentTimeMillis());
+        RMSessionMapper.getInstance().getSessionsLastAccessToClient()
+                .put(sessionId, System.currentTimeMillis());
         return s;
     }
 
@@ -198,8 +201,8 @@ public class RMRest implements RMRestInterface {
             Credentials credentials = Credentials.getCredentials(multipart.getCredential());
             rm.init(url, credentials);
         } else {
-            CredData credData = new CredData(CredData.parseLogin(multipart.getUsername()), CredData
-                    .parseDomain(multipart.getUsername()), multipart.getPassword(), multipart.getSshKey());
+            CredData credData = new CredData(CredData.parseLogin(multipart.getUsername()),
+                CredData.parseDomain(multipart.getUsername()), multipart.getPassword(), multipart.getSshKey());
             rm.init(url, credData);
         }
 
@@ -368,9 +371,8 @@ public class RMRest implements RMRestInterface {
         Object[] policyParams = new Object[policyParameters.length + policyFileParameters.length];
 
         /*
-         * we need to merge both infrastructureParameters and
-         * infrastructureFileParameters into one to do so we need the
-         * infrastructure parameter order from the RM
+         * we need to merge both infrastructureParameters and infrastructureFileParameters into one
+         * to do so we need the infrastructure parameter order from the RM
          */
         for (PluginDescriptor infra : rm.getSupportedNodeSourceInfrastructures()) {
             if (infra.getPluginName().equals(infrastructureType)) {
@@ -861,4 +863,60 @@ public class RMRest implements RMRestInterface {
             "\"rest\" : \"" + RMRest.class.getPackage().getImplementationVersion() + "\"" + "}";
     }
 
+    @Override
+    @POST
+    @GZIP
+    @Path("node/script")
+    @Produces("application/json")
+    public ScriptResult<Object> executeNodeScript(@HeaderParam("sessionid")
+    String sessionId, @FormParam("nodeurl")
+    String nodeUrl, @FormParam("script")
+    String script, @FormParam("scriptEngine")
+    String scriptEngine) throws Throwable {
+
+        RMCachingProxyUserInterface rm = checkAccess(sessionId);
+
+        List<ScriptResult<Object>> results = rm.executeScript(script, scriptEngine,
+                TargetType.NODE_URL.name(), Collections.singleton(nodeUrl));
+
+        if (results.isEmpty()) {
+            throw new IllegalStateException("Empty results from script execution");
+        }
+
+        return results.get(0);
+    }
+
+    @Override
+    @POST
+    @GZIP
+    @Path("nodesource/script")
+    @Produces("application/json")
+    public List<ScriptResult<Object>> executeNodeSourceScript(@HeaderParam("sessionid")
+    String sessionId, @FormParam("nodesource")
+    String nodeSource, @FormParam("script")
+    String script, @FormParam("scriptEngine")
+    String scriptEngine) throws Throwable {
+
+        RMCachingProxyUserInterface rm = checkAccess(sessionId);
+
+        return rm.executeScript(script, scriptEngine,
+                TargetType.NODESOURCE_NAME.name(), Collections.singleton(nodeSource));
+    }
+
+    @Override
+    @POST
+    @GZIP
+    @Path("host/script")
+    @Produces("application/json")
+    public List<ScriptResult<Object>> executeHostScript(@HeaderParam("sessionid")
+    String sessionId, @FormParam("host")
+    String host, @FormParam("script")
+    String script, @FormParam("scriptEngine")
+    String scriptEngine) throws Throwable {
+
+        RMCachingProxyUserInterface rm = checkAccess(sessionId);
+
+        return rm.executeScript(script, scriptEngine,
+                TargetType.HOSTNAME.name(), Collections.singleton(host));
+    }
 }
