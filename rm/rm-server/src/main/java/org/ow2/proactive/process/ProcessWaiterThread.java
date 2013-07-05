@@ -34,7 +34,7 @@
  * ################################################################
  * $ACTIVEEON_INITIAL_DEV$
  */
-package org.ow2.proactive.tests.performance.deployment.process;
+package org.ow2.proactive.process;
 
 public class ProcessWaiterThread extends Thread {
 

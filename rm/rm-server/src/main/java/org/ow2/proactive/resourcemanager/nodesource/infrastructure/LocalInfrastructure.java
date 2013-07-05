@@ -15,6 +15,7 @@ import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.ProActiveCounter;
 import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.process.ProcessExecutor;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
@@ -36,7 +37,7 @@ public class LocalInfrastructure extends InfrastructureManager {
     private String paProperties = "";
 
     /** To link a nodeName with its process */
-    private Hashtable<String, Process> nodeNameToProcess;
+    private Hashtable<String, ProcessExecutor> nodeNameToProcess;
     /** To link a deploying node url with a boolean, used to notify deploying node removal */
     private Hashtable<String, Boolean> isDeployingNodeLost;
     /** Notifies the acquisition loop that the node has been acquired and that it can exit the loop */
@@ -151,7 +152,7 @@ public class LocalInfrastructure extends InfrastructureManager {
         final String obfuscatedCmd = Tools.join(cmd, " ");
 
         String depNodeURL = null;
-        Process proc = null;
+        ProcessExecutor processExecutor = null;
         try {
             this.isNodeAcquired.put(nodeName, false);
             if (os == OperatingSystem.UNIX && containsSpace) {
@@ -174,9 +175,10 @@ public class LocalInfrastructure extends InfrastructureManager {
             Collections.replaceAll(cmd, CommandLineBuilder.OBFUSC, clb.getCredentialsValue());
 
             this.isDeployingNodeLost.put(depNodeURL, false);
-            proc = (new ProcessBuilder(cmd)).start();
+            processExecutor = new ProcessExecutor(nodeName, cmd, false, true);
+            processExecutor.start();
 
-            this.nodeNameToProcess.put(nodeName, proc);
+            this.nodeNameToProcess.put(nodeName, processExecutor);
         } catch (IOException e) {
             String lf = System.getProperty("line.separator");
             String mess = "Cannot launch rm node " + nodeName + lf + Utils.getStacktrace(e);
@@ -184,46 +186,24 @@ public class LocalInfrastructure extends InfrastructureManager {
             return;
         }
 
-        // listening output & error of forked process in separated threads
-        // otherwise the process may hang
-
-        final Process process = proc;
-        Thread outReader = new Thread(new Runnable() {
-            public void run() {
-                Utils.consumeProcessStream(process.getInputStream());
-            }
-        });
-        outReader.setName("Node " + nodeName + " output listener ");
-        outReader.setDaemon(true);
-        outReader.start();
-
-        Thread errReader = new Thread(new Runnable() {
-            public void run() {
-                Utils.consumeProcessStream(process.getErrorStream());
-            }
-        });
-        errReader.setName("Node " + nodeName + " error listener ");
-        errReader.setDaemon(true);
-        errReader.start();
-
         //watching process
         int threshold = 5;
         Boolean isLost = false, isAcquired = false;
         while (((isLost = this.isDeployingNodeLost.get(depNodeURL)) != null) && !isLost &&
             ((isAcquired = this.isNodeAcquired.get(nodeName)) != null) && !isAcquired) {
-            try {
-                int exit = proc.exitValue();
+            if (processExecutor.isProcessFinished()) {
+                int exit = processExecutor.getExitCode();
                 if (exit != 0) {
                     String lf = System.getProperty("line.separator");
                     String message = "RMNode exit code == " + exit + lf;
                     message += "Command: " + obfuscatedCmd + lf;
-                    String out = Utils.extractProcessOutput(proc);
-                    String err = Utils.extractProcessErrput(proc);
+                    String out = Tools.join(processExecutor.getOutput(), "\n");
+                    String err = Tools.join(processExecutor.getErrorOutput(), "\n");
                     message += "output: " + out + lf + "errput: " + err;
                     this.declareDeployingNodeLost(depNodeURL, message);
                 }
                 //nodeNameToProcess will be clean up when exiting the loop
-            } catch (IllegalThreadStateException e) {
+            } else {
                 logger.debug("Waiting for node " + nodeName + " acquisition");
             }
             try {
@@ -239,7 +219,7 @@ public class LocalInfrastructure extends InfrastructureManager {
         logger.debug("Local Infrastructure manager exits watching loop for node " + nodeName);
         if (isLost) {
             //clean up the process
-            proc.destroy();
+            processExecutor.killProcess();
             this.nodeNameToProcess.remove(nodeName);
         }
         this.isDeployingNodeLost.remove(depNodeURL);
@@ -269,7 +249,7 @@ public class LocalInfrastructure extends InfrastructureManager {
     @Override
     protected void configure(Object... args) {
         this.isDeployingNodeLost = new Hashtable<String, Boolean>();
-        this.nodeNameToProcess = new Hashtable<String, Process>();
+        this.nodeNameToProcess = new Hashtable<String, ProcessExecutor>();
         this.isNodeAcquired = new Hashtable<String, Boolean>();
         int index = 0;
         try {
@@ -312,10 +292,10 @@ public class LocalInfrastructure extends InfrastructureManager {
     @Override
     public void removeNode(Node arg0) throws RMException {
         String nodeName = arg0.getNodeInformation().getName();
-        Process proc = this.nodeNameToProcess.remove(nodeName);
+        ProcessExecutor proc = this.nodeNameToProcess.remove(nodeName);
         if (proc != null) {
             try {
-                proc.destroy();
+                proc.killProcess();
                 logger.info("Process associated to node " + nodeName + " destroyed");
             } finally {
                 this.atomicMaxNodes.incrementAndGet();

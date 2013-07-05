@@ -41,8 +41,8 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.ow2.proactive.tests.performance.deployment.process.ProcessExecutor;
-import org.ow2.proactive.tests.performance.deployment.process.SSHProcessExecutor;
+import org.ow2.proactive.process.ProcessExecutor;
+import org.ow2.proactive.process.SSHProcessExecutor;
 
 
 public class HostTestEnv {

@@ -43,8 +43,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import org.ow2.proactive.tests.performance.deployment.process.ProcessExecutor;
-import org.ow2.proactive.tests.performance.deployment.process.SSHProcessExecutor;
+import org.ow2.proactive.process.ProcessExecutor;
+import org.ow2.proactive.process.SSHProcessExecutor;
 import org.ow2.proactive.tests.performance.utils.FindFreePort;
 
 

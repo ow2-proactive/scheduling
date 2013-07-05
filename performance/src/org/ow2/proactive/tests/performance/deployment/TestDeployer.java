@@ -45,7 +45,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
-import org.ow2.proactive.tests.performance.deployment.process.ProcessExecutor;
+import org.ow2.proactive.process.ProcessExecutor;
 import org.ow2.proactive.tests.performance.utils.TestFileUtils;
 import org.ow2.proactive.tests.performance.utils.TestUtils;
 

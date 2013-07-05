@@ -48,7 +48,7 @@ import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.tests.performance.deployment.DeploymentTestUtils;
 import org.ow2.proactive.tests.performance.deployment.TestDeployer;
 import org.ow2.proactive.tests.performance.deployment.TestExecutionException;
-import org.ow2.proactive.tests.performance.deployment.process.ProcessExecutor;
+import org.ow2.proactive.process.ProcessExecutor;
 import org.ow2.proactive.utils.NodeSet;
 
 
