@@ -565,11 +565,9 @@ public class SchedulerModel extends ConsoleModel {
                     TaskResult tRes = null;
                     try {
                         tRes = result.getResult(ts.getName());
-                        print(ts.getName() + " : " + newline
-                                + tRes.getOutput().getAllLogs(false));
+                        print(ts.getName() + " : " + newline + tRes.getOutput().getAllLogs(false));
                     } catch (UnknownTaskException e) {
-                        print(ts.getName() + " : " + newline
-                                + "No output available !");
+                        print(ts.getName() + " : " + newline + "No output available !");
                     } catch (Exception e1) {
                         if (tRes == null) {
                             throw e1;
