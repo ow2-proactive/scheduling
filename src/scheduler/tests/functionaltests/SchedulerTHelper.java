@@ -753,7 +753,7 @@ public class SchedulerTHelper {
         JobInfo jInfo = SchedulerTHelper.waitForEventJobRunning(id);
 
         Assert.assertEquals(jInfo.getJobId(), id);
-        Assert.assertEquals(JobStatus.RUNNING, jInfo.getStatus());
+        Assert.assertEquals("Job " + jInfo.getJobId(), JobStatus.RUNNING, jInfo.getStatus());
 
         if (jobToSubmit instanceof TaskFlowJob) {
 
@@ -761,21 +761,21 @@ public class SchedulerTHelper {
                 log("Waiting for task running : " + t.getName());
                 TaskInfo ti = waitForEventTaskRunning(id, t.getName());
                 Assert.assertEquals(t.getName(), ti.getTaskId().getReadableName());
-                Assert.assertEquals(TaskStatus.RUNNING, ti.getStatus());
+                Assert.assertEquals("Task " + t.getName(), TaskStatus.RUNNING, ti.getStatus());
             }
 
             for (Task t : ((TaskFlowJob) jobToSubmit).getTasks()) {
                 log("Waiting for task finished : " + t.getName());
                 TaskInfo ti = waitForEventTaskFinished(id, t.getName());
                 Assert.assertEquals(t.getName(), ti.getTaskId().getReadableName());
-                Assert.assertEquals(TaskStatus.FINISHED, ti.getStatus());
+                Assert.assertEquals("Task " + t.getName(), TaskStatus.FINISHED, ti.getStatus());
             }
 
         }
 
         log("Waiting for job finished");
         jInfo = SchedulerTHelper.waitForEventJobFinished(id);
-        Assert.assertEquals(JobStatus.FINISHED, jInfo.getStatus());
+        Assert.assertEquals("Job " + jInfo.getJobId(), JobStatus.FINISHED, jInfo.getStatus());
 
         log("Job finished");
         return id;
