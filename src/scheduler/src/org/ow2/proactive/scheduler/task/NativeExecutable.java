@@ -163,7 +163,7 @@ public class NativeExecutable extends Executable {
         command = execInitializer.getCommand();
         GenerationScript gs = execInitializer.getGenerationScript();
         if (gs != null) {
-            List<String> generationScriptDefinedCommand = this.executeGenerationScript(gs);
+            Object generationScriptDefinedCommand = this.executeGenerationScript(gs);
 
             //no command has been returned by generation script
             if ((generationScriptDefinedCommand == null) ||
@@ -175,11 +175,10 @@ public class NativeExecutable extends Executable {
             } else {
                 //generation script has defined a command, so set the command to launch
                 String commandLine = null;
-                if (generationScriptDefinedCommand.size() == 1) {
-                    commandLine = generationScriptDefinedCommand.get(0);
-                    command = Tools.parseCommandLine(commandLine);
+                if (generationScriptDefinedCommand instanceof String) {
+                    command = Tools.parseCommandLine((String) generationScriptDefinedCommand);
                 } else {
-                    command = generationScriptDefinedCommand.toArray(new String[0]);
+                    command = ((List<String>) generationScriptDefinedCommand).toArray(new String[0]);
                 }
             }
         }
@@ -207,10 +206,10 @@ public class NativeExecutable extends Executable {
      * @return the value of the variable GenerationScript.COMMAND_NAME after the script evaluation.
      */
     @SuppressWarnings("unchecked")
-    private List<String> executeGenerationScript(GenerationScript script)
-            throws ActiveObjectCreationException, NodeException, UserException {
+    private Object executeGenerationScript(GenerationScript script) throws ActiveObjectCreationException,
+            NodeException, UserException {
         ScriptHandler handler = ScriptLoader.createHandler(PAActiveObject.getNode());
-        ScriptResult<List<String>> res = handler.handle(script);
+        ScriptResult<Object> res = handler.handle(script);
 
         if (res.errorOccured()) {
             res.getException().printStackTrace();

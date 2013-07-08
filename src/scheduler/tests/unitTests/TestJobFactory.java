@@ -316,9 +316,9 @@ public class TestJobFactory {
                 "command=args[0]+\" 12\";\n");
         Assert.assertEquals(((NativeTask) tfJob.getTask("task4")).getGenerationScript().getParameters()[0],
                 URLbegin + "samples/jobs_descriptors/job_native_linux/nativTask");
-        Assert.assertEquals(
-                ((NativeTask) tfJob.getTask("task4")).getGenerationScript().execute().getResult(), URLbegin +
-                    "samples/jobs_descriptors/job_native_linux/nativTask 12");
+        Assert.assertEquals(((NativeTask) tfJob.getTask("task4")).getGenerationScript().execute().getResult()
+                .toArray(new String[0]), new String[] { URLbegin +
+            "samples/jobs_descriptors/job_native_linux/nativTask 12" });
 
         log("Test Job MULTI_NODES");
         TaskFlowJob mnJob = (TaskFlowJob) JobFactory.getFactory().createJob(
