@@ -324,6 +324,11 @@ public abstract class TaskLauncher {
             this.unsetEnv();
         }
 
+        // close executor
+        if (!executor.isShutdown()) {
+            executor.shutdownNow();
+        }
+
         //terminate the task
         // if currentExecutable has been killed, no call back
         if (!hasBeenKilled && core != null) {
@@ -835,6 +840,7 @@ public abstract class TaskLauncher {
 
             // unset env
             this.unsetEnv();
+
             // reset stdout/err    
             try {
                 this.finalizeLoggers();
@@ -844,6 +850,12 @@ public abstract class TaskLauncher {
                 logger.warn("Loggers are not shutdown !", e);
             }
         }
+
+        // close executor
+        if (!executor.isShutdown()) {
+            executor.shutdownNow();
+        }
+
         PAActiveObject.terminateActiveObject(!normalTermination);
     }
 
