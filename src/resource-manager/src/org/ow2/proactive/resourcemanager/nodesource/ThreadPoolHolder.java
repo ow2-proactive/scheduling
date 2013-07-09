@@ -127,12 +127,14 @@ public class ThreadPoolHolder {
      */
     public synchronized void shutdown() throws InterruptedException {
 
-        for (ExecutorService es : pools) {
-            es.shutdown();
+        if (pools != null) {
+            for (ExecutorService es : pools) {
+                es.shutdown();
+            }
+            for (ExecutorService es : pools) {
+                es.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
+            }
+            pools = null;
         }
-        for (ExecutorService es : pools) {
-            es.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
-        }
-        pools = null;
     }
 }
