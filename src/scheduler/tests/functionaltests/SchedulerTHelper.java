@@ -75,6 +75,7 @@ import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
+import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.utils.FileUtils;
@@ -768,6 +769,15 @@ public class SchedulerTHelper {
                 log("Waiting for task finished : " + t.getName());
                 TaskInfo ti = waitForEventTaskFinished(id, t.getName());
                 Assert.assertEquals(t.getName(), ti.getTaskId().getReadableName());
+                if (ti.getStatus() == TaskStatus.FAULTY) {
+                    TaskResult tres = userInt.getTaskResult(jInfo.getJobId(), t.getName());
+                    Assert.assertNotNull("Task result of " + t.getName(), tres);
+                    if (tres.getOutput() != null) {
+                        System.err.println("Output of failing task (" + t.getName() + ") :");
+                        System.err.println(tres.getOutput().getAllLogs(true));
+                    }
+
+                }
                 Assert.assertEquals("Task " + t.getName(), TaskStatus.FINISHED, ti.getStatus());
             }
 
