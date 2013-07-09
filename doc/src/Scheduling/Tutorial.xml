@@ -685,7 +685,7 @@ public class HelloTask extends JavaExecutable{
 	So, you first have to start a new node. Type the following command to start a node called 'MyNode':
 	</para>
 	<para>
-		<code>rm-start-node MyNode</code>
+		<code>rm-start-node -n MyNode</code>
 	</para>
 	<para>
 		You can see that your node has well been created and started when the line hereafter has been displayed:
