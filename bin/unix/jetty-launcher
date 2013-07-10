@@ -30,6 +30,22 @@ print_help () {
 	echo -e "                                                                             "
 }
 
+mktemp_jruby() {
+	PREFIX="proactive"
+	SUFFIX=".tmp"
+	export CLASSPATH=$DIR/../../dist/lib/jruby.jar
+	export CMD="f=Java::java.io.File.createTempFile(Java::java.lang.String.new(\"$PREFIX\"),Java::java.lang.String.new(\"$SUFFIX\"));Java::java.lang.System.out.println(f)"
+	$JAVA_HOME/bin/java -cp $CLASSPATH org.jruby.Main -e $CMD
+}
+
+mktemp_dir_jruby() {
+	PREFIX="proactive"
+	SUFFIX=".tmp"
+	export CLASSPATH=$DIR/../../dist/lib/jruby.jar
+	export CMD="f=Java::java.io.File.createTempFile(Java::java.lang.String.new(\"$PREFIX\"),Java::java.lang.String.new(\"$SUFFIX\"));f.delete();f.mkdir();Java::java.lang.System.out.println(f)"
+	$JAVA_HOME/bin/java -cp $CLASSPATH org.jruby.Main -e $CMD
+}
+
 VERBOSE=true
 VERBOSE_JETTY=false
 PORT=8080
@@ -85,7 +101,7 @@ done
 
 REST_URL="http://localhost:${PORT}/rest/rest"
 
-REST_DIR=$(mktemp -d)/rest/
+REST_DIR=$(mktemp_dir_jruby)/rest/
 [ $VERBOSE = true ] && echo "Deploying REST Server in $REST_DIR"
 if [ "$(file $REST |grep -i "Zip archive")" ]; then
 	unzip -q $REST -d $REST_DIR
@@ -121,7 +137,7 @@ fi
 APPS=$REST_DIR
 
 if [ $RM ]; then
-	RM_DIR=$(mktemp -d)/rm/
+	RM_DIR=$(mktemp_dir_jruby)/rm/
 	[ $VERBOSE = true ] && echo "Deploying RM UI in $RM_DIR"
 
 	if [ "$(file $RM |grep -i "Zip archive")" ]; then
@@ -143,7 +159,7 @@ if [ $RM ]; then
 fi
 
 if [ $SCHED ]; then
-	SCHED_DIR=$(mktemp -d)/sched/
+	SCHED_DIR=$(mktemp_dir_jruby)/sched/
 	[ $VERBOSE = true ] && echo "Deploying Scheduling UI in $SCHED_DIR"
 
 	if [ "$(file $SCHED| grep -i "Zip archive")" ]; then
@@ -176,7 +192,7 @@ CLASS=org.ow2.proactive.utils.JettyLauncher
 
 
 if [ $VERBOSE_JETTY = false ]; then
-	LOGFILE=$(mktemp --tmpdir)
+	LOGFILE=$(mktemp_jruby)
 	[ $VERBOSE = true ] && echo "Jetty Launcher logs to $LOGFILE"
 	LOG="-l $LOGFILE"
 fi
@@ -188,7 +204,7 @@ interrupt () {
 }
 trap interrupt INT
 
-POL=$(mktemp)
+POL=$(mktemp_jruby)
 cat <<EOF >$POL
 grant {
 permission java.security.AllPermission;

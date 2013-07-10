@@ -57,6 +57,15 @@ cleanup () {
 	/bin/kill -- -$$
 }
 
+mktemp_jruby() {
+	PREFIX="proactive"
+	SUFFIX=".tmp"
+	export CLASSPATH=$PA_SCHEDULER/dist/lib/jruby.jar
+	export CMD="f=Java::java.io.File.createTempFile(Java::java.lang.String.new(\"$PREFIX\"),Java::java.lang.String.new(\"$SUFFIX\"));Java::java.lang.System.out.println(f)"
+	$JAVA_HOME/bin/java -cp $CLASSPATH org.jruby.Main -e $CMD
+}
+ 
+
 trap cleanup 2
 
 
@@ -124,7 +133,7 @@ while [ $# -gt 0 ]; do
 done
 
 
-SCHED_OUT=$(mktemp --tmpdir)
+SCHED_OUT=$(mktemp_jruby)
 
 "${JAVACMD[@]}" \
 	-Dderby.stream.error.file="$PA_SCHEDULER/.logs/derby.log" \
