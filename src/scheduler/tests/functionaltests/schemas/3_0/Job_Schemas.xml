@@ -10,7 +10,7 @@
     </variables>
     <description>Tests various descriptor syntax. </description>
     <jobClasspath>
-        <pathElement path="${HOME}/TestJobClassPath.jar"/>
+        <pathElement path="${HOME}/TestJobClasspath.jar"/>
     </jobClasspath>
     <genericInformation>
         <info name="myinfo" value="myvalue"/>
