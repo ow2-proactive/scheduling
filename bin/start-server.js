@@ -1,4 +1,5 @@
-// Run with: jrunscript start-all.js
+// To run, please use jrunscript (jdk tool)
+// example: jrunscript start-server.js
 
 importPackage(java.lang);
 importPackage(java.io);
@@ -51,13 +52,13 @@ function startEverything() {
 	});
 	java.lang.Runtime.getRuntime().addShutdownHook(cleaner);
 
-	println("--------------------");
-	println("    Starting all     ");
-	println("--------------------");
-	
-	var executor = Executors.newFixedThreadPool(3);			
+	println("---------------------------------");
+	println("    Starting server processes    ");
+	println("---------------------------------");
+
+	var executor = Executors.newFixedThreadPool(3);
 	var service = new ExecutorCompletionService(executor);
-	
+
 	println("");
 	println("Running Resource Manager process ...");
 	rmProcess = startRM();
@@ -69,11 +70,11 @@ function startEverything() {
 		      return exitValue;
 	    }});
 	    service.submit(rmWaiter);
-	}	
+	}
 
 	println("");
 	println("Running Scheduler process ...");
-	schedulerProcess = startScheduler();	
+	schedulerProcess = startScheduler();
 	if (schedulerProcess != null) {
 		var schedulerWaiter = new Callable({ 
 			call: function () {
@@ -83,28 +84,28 @@ function startEverything() {
 		}});
 		service.submit(schedulerWaiter);
 	}
-		
+
 	println("");
 	println("Running Jetty process ...");
 	jettyProcess = startJetty();
 	if (jettyProcess != null) {
-		var jettyWaiter = new Callable({ 
+		var jettyWaiter = new Callable({
 			call: function () {
 				var exitValue = jettyProcess.waitFor();
 				println("!! JETTY HAS EXITED !! Please consult " + jettyOutputFile);
-				return exitValue;			
-		}});	
+				return exitValue;
+		}});
 		service.submit(jettyWaiter);
 	}
-	
+
 	// For each process a waiter thread is used
-	println("Preparing to wait for processes to exit ...")	
-	// no more tasks are going to be submitted, this will let the executor clean up its threads	
+	println("Preparing to wait for processes to exit ...")
+	// no more tasks are going to be submitted, this will let the executor clean up its threads
 	executor.shutdown();
-	
+
 	while (!executor.isTerminated()) {
-	    println("Waiting ...");
-		var finishedFuture = service.take();		
+	    println("Hit CTRL+C to terminate all server processes and exit");
+		var finishedFuture = service.take();
 		println("Finishing process returned " + finishedFuture.get());
 		stopEverything();
 		// Exit current process ... if under agent it will restart it
@@ -113,26 +114,26 @@ function startEverything() {
 	}
 }
 
-function startRM() {   
+function startRM() {
 	var cmd = initCmd();
 	cmd.push("-Dproactive."+PROTOCOL+".port="+RM_PORT);
-	cmd.push("-Dlog4j.configuration=file:"+configDir+fs+"log4j" + fs+"rm-log4j-server");		
+	cmd.push("-Dlog4j.configuration=file:"+configDir+fs+"log4j" + fs+"rm-log4j-server");
 	cmd.push("org.ow2.proactive.resourcemanager.utils.RMStarter");
 	cmd.push("-ln"); // with default 4 local nodes
-	var env = Collections.singletonMap("CLASSPATH", fillClasspath(scriptJars, vfsJars, coreJars));	
-	var proc = execCmdAsync(cmd, homeDir, rmOutputFile, "created on", env);	
+	var env = Collections.singletonMap("CLASSPATH", fillClasspath(scriptJars, vfsJars, coreJars));
+	var proc = execCmdAsync(cmd, homeDir, rmOutputFile, "created on", env);
 	println("Resource Manager stdout/stderr redirected into " + rmOutputFile);
 	return proc;
 }
 
-function startScheduler() {    
+function startScheduler() {
 	var cmd = initCmd();
 	cmd.push("-Dproactive."+PROTOCOL+".port="+SCHEDULER_PORT);
 	cmd.push("-Dlog4j.configuration=file:"+configDir+fs+"log4j" + fs+"scheduler-log4j-server");	
 	cmd.push("org.ow2.proactive.scheduler.util.SchedulerStarter");
-	cmd.push("-u", PROTOCOL+"://localhost:"+RM_PORT); // always on localhost	
+	cmd.push("-u", PROTOCOL+"://localhost:"+RM_PORT); // always on localhost
 	var env = Collections.singletonMap("CLASSPATH", fillClasspath(scriptJars, vfsJars, coreJars));	
-	var proc = execCmdAsync(cmd, homeDir, schedulerOutputFile, "created on", env);	
+	var proc = execCmdAsync(cmd, homeDir, schedulerOutputFile, "created on", env);
 	println("Scheduler stdout/stderr redirected into " + schedulerOutputFile);
 	return proc;
 }
@@ -151,7 +152,7 @@ function startJetty() {
 	      println("Unable to locate " + restWar);
 		  return null;
 	   }
-	   extractFolder(restWar,restDir);	   	   
+	   extractFolder(restWar,restDir);
 	}
 
 	var rmDir = new File(warsDir, "rm");
@@ -164,7 +165,7 @@ function startJetty() {
 	   }
 	   extractFolder(rmWar,rmDir);
 	}
-		
+
 	var schedulerDir = new File(warsDir, "scheduler");
 	println("Checking for " + schedulerDir);
 	if (!schedulerDir.exists()) {
@@ -175,29 +176,50 @@ function startJetty() {
 	   }
 	   extractFolder(schedulerWar,schedulerDir);
 	}
-		
-	var propsFile = new File(restDir, "WEB-INF"+fs+"portal.properties");  
+
+	var propsFile = new File(restDir, "WEB-INF"+fs+"portal.properties");
 	println("Injecting the Resource Manager and Scheduler urls into  " + propsFile);
 	var props = new Properties();
 	var inputStream = new FileInputStream(propsFile);
 	props.load(inputStream);
 	inputStream.close()
 	props.setProperty("rm.url", PROTOCOL+"://localhost:"+RM_PORT);
-	props.setProperty("scheduler.url", PROTOCOL+"://localhost:"+SCHEDULER_PORT);	   
+	props.setProperty("scheduler.url", PROTOCOL+"://localhost:"+SCHEDULER_PORT);
 	var outputStream = new FileOutputStream(propsFile);
 	props.store(outputStream, "");
 	outputStream.close();
-	
+
 	var cmd = [ javaExe ];
 	cmd.push("-Djava.security.manager");
-	cmd.push("-Djava.security.policy=file:"+configDir+fs+"security.java.policy-client");	
+	cmd.push("-Djava.security.policy=file:"+configDir+fs+"security.java.policy-client");
 	cmd.push("org.ow2.proactive.utils.JettyLauncher");
 	cmd.push("-p", JETTY_PORT);
-	cmd.push(restDir, rmDir, schedulerDir);	
-	var env = Collections.singletonMap("CLASSPATH", fillClasspath(jettyJars));	
+	cmd.push(restDir, rmDir, schedulerDir);
+	var env = Collections.singletonMap("CLASSPATH", fillClasspath(jettyJars));
 	var proc = execCmdAsync(cmd, homeDir, jettyOutputFile, null, env);
-	// Todo optinally here we can wait while the jetty port is free
 	println("Jetty stdout/stderr redirected into " + jettyOutputFile);
+
+	println("Waiting for jetty to start ...");
+	while (isPortAvailable(JETTY_PORT)) {
+		java.lang.Thread.sleep(1000);
+	}
+	var restHttpUrl = "http://localhost:"+JETTY_PORT+"/rest";
+	var rmHttpUrl = "http://localhost:"+JETTY_PORT+"/rm";
+	var schedulerHttpUrl = "http://localhost:"+JETTY_PORT+"/scheduler";
+	
+	println("Rest Server webapp deployed at      " + restHttpUrl);
+	println("Resource Manager webapp deployed at " + rmHttpUrl);
+	println("Scheduler webapp deployed at        " + schedulerHttpUrl);
+	println("");
+	println("Opening browser ...");
+	println("Please use demo/demo as login/password to connect");
+    try {
+       java.awt.Desktop.getDesktop().browse(java.net.URI.create(restHttpUrl));
+	   java.awt.Desktop.getDesktop().browse(java.net.URI.create(rmHttpUrl));
+	   java.awt.Desktop.getDesktop().browse(java.net.URI.create(schedulerHttpUrl));
+    } catch (e) {
+       println(e);
+    }
 	return proc;
 }
 
@@ -207,26 +229,26 @@ function initCmd() {
 	cmd.push("-Dpa.rm.home="+homeDir);
 	cmd.push("-Dpa.scheduler.home="+homeDir);
 	cmd.push("-Djava.security.manager");
-	cmd.push("-Djava.security.policy=file:"+configDir+fs+"security.java.policy-server");	
-	cmd.push("-Dproactive.configuration=file:"+configDir+fs+"proactive"+fs+"ProActiveConfiguration.xml");	
+	cmd.push("-Djava.security.policy=file:"+configDir+fs+"security.java.policy-server");
+	cmd.push("-Dproactive.configuration=file:"+configDir+fs+"proactive"+fs+"ProActiveConfiguration.xml");
 	cmd.push("-Dderby.stream.error.file="+logsDir+fs+"derby.log");
 	cmd.push("-Xms128m","-Xmx1048m");
 	cmd.push("-Dproactive.communication.protocol="+PROTOCOL);
 	return cmd;
 }
 
-function fillClasspath() {	
-	var libDir = new File(distDir, "lib");	
+function fillClasspath() {
+	var libDir = new File(distDir, "lib");
 	var allJars = [];
-	for (var i = 0; i < arguments.length; i++){		
-		var array = arguments[i];		
-		for (x in array) {			
+	for (var i = 0; i < arguments.length; i++){
+		var array = arguments[i];
+		for (x in array) {
 			allJars.push(new File(libDir, array[x]));
 		}
-	}	
+	}
 	// Add jars in addons directory	
-	new File(homeDir, "addons").listFiles(new FileFilter({ 
-		accept: function (file) {			
+	new File(homeDir, "addons").listFiles(new FileFilter({
+		accept: function (file) {
 			if (file.getName().endsWith(".jar")) {
 				allJars.push(file);
 			}
@@ -243,16 +265,16 @@ function fillClasspath() {
 
 function execCmdAsync(cmdarray, wdir, outputFile, stringToWait, env) {
 	// Convert command from javascript to java array, start the process and redirect output to a file
-	var jarray = toJavaArray(cmdarray);			
-	//println("---> command " + Arrays.toString(jarray));	
+	var jarray = toJavaArray(cmdarray);
+	//println("---> command " + Arrays.toString(jarray));
 	var pb = new ProcessBuilder(jarray);
-	pb.redirectErrorStream(true);	
+	pb.redirectErrorStream(true);
 	pb.directory(wdir);
-	pb.environment().putAll(env);	
-		
+	pb.environment().putAll(env);
+
 	var fos = new FileOutputStream(outputFile);
 	var pw = new PrintWriter(fos);
-	
+
 	// Start the process and wait until it prints successfully
 	var process = pb.start();
 	var reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
@@ -261,14 +283,14 @@ function execCmdAsync(cmdarray, wdir, outputFile, stringToWait, env) {
 		while ((line = reader.readLine()) != null) {
 			println("> " +line);
 			pw.println(line);
-			pw.flush();			
+			pw.flush();
 			if (line.contains(stringToWait)) {
 				break;
 			}
 		}
-	}	
+	}
 	// Create the stream gobbler 
-	var obj = { run: function() {		
+	var obj = { run: function() {
 		try {	        
 	        while ( (line = reader.readLine()) != null) {
 	            if (pw != null) {
@@ -277,11 +299,11 @@ function execCmdAsync(cmdarray, wdir, outputFile, stringToWait, env) {
 	            }
 	        }
 	    } catch (e) {
-	        println("Unable to gobble the stream: " + e + "e.javaException");      
-		}	
+	        println("Unable to gobble the stream: " + e + "e.javaException");
+		}
 	}};
 	
-	// Start the gobbler as in a separate thread	
+	// Start the gobbler as in a separate thread
 	var r = new Runnable(obj);
 	var th = new Thread(r);
 	th.setDaemon(true);	
@@ -296,7 +318,7 @@ function stopEverything() {
 	if ( schedulerProcess != null )
 		schedulerProcess.destroy();	
 	if ( rmProcess != null )
-		rmProcess.destroy();	
+		rmProcess.destroy();
 }
 
 function toJavaArray(cmdarray) {
@@ -319,23 +341,23 @@ function getHomeDir(){
   return currentDir.getParent();
 }
 
-function extractFolder(zipFile, destDirFile){ // throws ZipException, IOException    
+function extractFolder(zipFile, destDirFile){ // throws ZipException, IOException
     var BUFFER = 2048;
-    var zip = new ZipFile(zipFile);    
+    var zip = new ZipFile(zipFile);
     // Extract the name
-    var filenameWithExt = zipFile.getName();   
-    var filenameWithoutExtension = filenameWithExt.substring(0,filenameWithExt.length() - 4);    
-    var zipFileEntries = zip.entries();    
+    var filenameWithExt = zipFile.getName();
+    var filenameWithoutExtension = filenameWithExt.substring(0,filenameWithExt.length() - 4);
+    var zipFileEntries = zip.entries();
     // Process each entry
-    while (zipFileEntries.hasMoreElements()) {    		
+    while (zipFileEntries.hasMoreElements()) {
         // grab a zip file entry
         var entry = zipFileEntries.nextElement();
-        var currentEntry = entry.getName();        
+        var currentEntry = entry.getName();
         
         // The destination create the parent directory structure if needed
         var destFile = new File(destDirFile, currentEntry);
         var destinationParent = destFile.getParentFile();
-        destinationParent.mkdirs();               
+        destinationParent.mkdirs();
 
         if (!entry.isDirectory()) {
             var is = new BufferedInputStream(zip.getInputStream(entry));
@@ -350,10 +372,26 @@ function extractFolder(zipFile, destDirFile){ // throws ZipException, IOExceptio
             // read and write until last byte is encountered
             while ((currentByte = is.read(data, 0, BUFFER)) != -1) {
                 dest.write(data, 0, currentByte);
-            }           
+            }
             dest.flush();
             dest.close();
             is.close();
         }
-    }  
+    }
+}
+
+function isPortAvailable(port) { // throws IOException
+	var sock = null;
+	try {
+		sock = new java.net.ServerSocket(port);
+	} catch (ee) {
+		return false;
+	} finally {
+		if (sock!=null) {
+			try {
+			sock.close();
+			} catch (e){} 
+		}
+	}
+	return true;
 }
