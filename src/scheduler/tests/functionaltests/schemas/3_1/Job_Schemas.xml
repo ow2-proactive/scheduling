@@ -241,7 +241,7 @@
                             if(org.objectweb.proactive.utils.OperatingSystem.getOperatingSystem() == org.objectweb.proactive.utils.OperatingSystem.windows){
                             command="ping localhost";
                             } else {
-                            command="ping -n 3 localhost";
+                            command="ping -c 3 localhost";
                             }
                         </code>
                         </script>

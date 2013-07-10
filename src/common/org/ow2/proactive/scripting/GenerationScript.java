@@ -41,7 +41,6 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import javax.script.Bindings;
@@ -63,7 +62,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
  */
 @PublicAPI
 @XmlAccessorType(XmlAccessType.FIELD)
-public class GenerationScript extends Script<List<String>> {
+public class GenerationScript extends Script<Object> {
     /** Loggers */
     public static final Logger logger = Logger.getLogger(GenerationScript.class);
 
@@ -158,32 +157,31 @@ public class GenerationScript extends Script<List<String>> {
      * @see org.ow2.proactive.scripting.Script#getResult(javax.script.Bindings)
      */
     @Override
-    protected ScriptResult<List<String>> getResult(Bindings bindings) {
+    protected ScriptResult<Object> getResult(Bindings bindings) {
         if (bindings.containsKey(RESULT_VARIABLE)) {
             Object result = bindings.get(RESULT_VARIABLE);
 
             if (result instanceof String) {
-                List<String> resultArray = Collections.singletonList((String) result);
-                return new ScriptResult<List<String>>(resultArray);
+                return new ScriptResult<Object>(result);
             } else {
                 String msg = "Bad result format : awaited String, found " + result.getClass().getName();
                 logger.warn(msg);
-                return new ScriptResult<List<String>>(new Exception(msg));
+                return new ScriptResult<Object>(new Exception(msg));
             }
         } else if (bindings.containsKey(RESULTLIST_VARIABLE)) {
             Object resultList = bindings.get(RESULTLIST_VARIABLE);
 
             if (resultList instanceof List) {
-                return new ScriptResult<List<String>>((List<String>) resultList);
+                return new ScriptResult<Object>((List<String>) resultList);
             } else {
                 String msg = "Bad result format : awaited String[], found " + resultList.getClass().getName();
                 logger.warn(msg);
-                return new ScriptResult<List<String>>(new Exception(msg));
+                return new ScriptResult<Object>(new Exception(msg));
             }
         } else {
             String msg = "No binding for key " + RESULT_VARIABLE;
             logger.warn(msg);
-            return new ScriptResult<List<String>>(new Exception(msg));
+            return new ScriptResult<Object>(new Exception(msg));
         }
     }
 

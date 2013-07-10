@@ -54,8 +54,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.apache.log4j.Appender;
+import org.apache.log4j.FileAppender;
+import org.apache.log4j.Logger;
+import org.apache.log4j.MDC;
+import org.apache.log4j.helpers.LogLog;
+import org.apache.log4j.spi.LoggingEvent;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.annotation.ImmediateService;
 import org.objectweb.proactive.api.PAActiveObject;
@@ -67,6 +78,8 @@ import org.objectweb.proactive.extensions.dataspaces.core.DataSpacesNodes;
 import org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemException;
 import org.objectweb.proactive.extensions.dataspaces.vfs.selector.fast.FastFileSelector;
 import org.objectweb.proactive.extensions.dataspaces.vfs.selector.fast.FastSelector;
+import org.objectweb.proactive.utils.NamedThreadFactory;
+import org.objectweb.proactive.utils.StackTraceUtil;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.db.types.BigString;
@@ -102,12 +115,6 @@ import org.ow2.proactive.scripting.ScriptHandler;
 import org.ow2.proactive.scripting.ScriptLoader;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.utils.Formatter;
-import org.apache.log4j.Appender;
-import org.apache.log4j.FileAppender;
-import org.apache.log4j.Logger;
-import org.apache.log4j.MDC;
-import org.apache.log4j.helpers.LogLog;
-import org.apache.log4j.spi.LoggingEvent;
 
 
 /**
@@ -176,6 +183,9 @@ public abstract class TaskLauncher {
     private StringBuffer dataspacesStatus;
 
     protected OneShotDecrypter decrypter = null;
+
+    protected ExecutorService executor = Executors.newFixedThreadPool(5, new NamedThreadFactory(
+        "TaskLauncherThreadPool"));
 
     /**
      * Scheduler related java properties. Thoses properties are automatically
@@ -312,6 +322,11 @@ public abstract class TaskLauncher {
         if (!hasBeenKilled) {
             // unset env
             this.unsetEnv();
+        }
+
+        // close executor
+        if (!executor.isShutdown()) {
+            executor.shutdownNow();
         }
 
         //terminate the task
@@ -825,6 +840,7 @@ public abstract class TaskLauncher {
 
             // unset env
             this.unsetEnv();
+
             // reset stdout/err    
             try {
                 this.finalizeLoggers();
@@ -834,6 +850,12 @@ public abstract class TaskLauncher {
                 logger.warn("Loggers are not shutdown !", e);
             }
         }
+
+        // close executor
+        if (!executor.isShutdown()) {
+            executor.shutdownNow();
+        }
+
         PAActiveObject.terminateActiveObject(!normalTermination);
     }
 
@@ -1117,38 +1139,63 @@ public abstract class TaskLauncher {
                 results.addAll(globResults);
                 results.addAll(userResults);
 
+                ArrayList<Future> transferFutures = new ArrayList<Future>();
                 for (DataSpacesFileObject dsfo : results) {
+                    String relativePath = "";
+                    if (inResults.contains(dsfo)) {
+                        relativePath = dsfo.getVirtualURI().replaceFirst(inuri + "/?", "");
+                    } else if (outResults.contains(dsfo)) {
+                        relativePath = dsfo.getVirtualURI().replaceFirst(outuri + "/?", "");
+                    } else if (globResults.contains(dsfo)) {
+                        relativePath = dsfo.getVirtualURI().replaceFirst(globuri + "/?", "");
+                    } else if (userResults.contains(dsfo)) {
+                        relativePath = dsfo.getVirtualURI().replaceFirst(useruri + "/?", "");
+                    } else {
+                        // should never happen
+                        throw new IllegalStateException();
+                    }
+                    logger.debug("* " + relativePath);
+                    if (!relPathes.contains(relativePath)) {
+                        logger.debug("------------ resolving " + relativePath);
+                        final String finalRelativePath = relativePath;
+                        final DataSpacesFileObject finaldsfo = dsfo;
+                        transferFutures.add(executor.submit(new Callable<Boolean>() {
+                            @Override
+                            public Boolean call() throws FileSystemException {
+                                logger.info("Copying " + finaldsfo.getRealURI() + " to " +
+                                    SCRATCH.getRealURI() + "/" + finalRelativePath);
+                                SCRATCH
+                                        .resolveFile(finalRelativePath)
+                                        .copyFrom(
+                                                finaldsfo,
+                                                org.objectweb.proactive.extensions.dataspaces.api.FileSelector.SELECT_SELF);
+                                return true;
+                            }
+                        }));
+
+                    }
+                    relPathes.add(relativePath);
+                }
+
+                StringBuilder exceptionMsg = new StringBuilder();
+                String nl = System.getProperty("line.separator");
+                for (Future f : transferFutures) {
                     try {
-                        String relativePath = "";
-                        if (inResults.contains(dsfo)) {
-                            relativePath = dsfo.getVirtualURI().replaceFirst(inuri + "/?", "");
-                        } else if (outResults.contains(dsfo)) {
-                            relativePath = dsfo.getVirtualURI().replaceFirst(outuri + "/?", "");
-                        } else if (globResults.contains(dsfo)) {
-                            relativePath = dsfo.getVirtualURI().replaceFirst(globuri + "/?", "");
-                        } else if (userResults.contains(dsfo)) {
-                            relativePath = dsfo.getVirtualURI().replaceFirst(useruri + "/?", "");
-                        } else {
-                            // should never happen
-                            throw new IllegalStateException();
-                        }
-                        logger.debug("* " + relativePath);
-                        if (!relPathes.contains(relativePath)) {
-                            logger.debug("------------ resolving " + relativePath);
-                            logger.info("Copying " + dsfo.getRealURI() + " to " + SCRATCH.getRealURI() + "/" +
-                                relativePath);
-                            SCRATCH
-                                    .resolveFile(relativePath)
-                                    .copyFrom(
-                                            dsfo,
-                                            org.objectweb.proactive.extensions.dataspaces.api.FileSelector.SELECT_SELF);
-                        }
-                        relPathes.add(relativePath);
-                    } catch (FileSystemException fse) {
-                        logger.info("", fse);
-                        toBeThrown = fse;
+                        f.get();
+                    } catch (InterruptedException e) {
+                        logger.error("", e);
+                        exceptionMsg.append(StackTraceUtil.getStackTrace(e) + nl);
+                    } catch (ExecutionException e) {
+                        logger.error("", e);
+                        exceptionMsg.append(StackTraceUtil.getStackTrace(e) + nl);
                     }
                 }
+                if (exceptionMsg.length() > 0) {
+                    toBeThrown = new FileSystemException(
+                        "Exception(s) occurred when transferring input files : " + nl +
+                            exceptionMsg.toString());
+                }
+
                 if (toBeThrown != null) {
                     throw toBeThrown;
                 }
@@ -1320,17 +1367,44 @@ public abstract class TaskLauncher {
             }
         }
         String buri = SCRATCH.getVirtualURI();
+        ArrayList<Future> transferFutures = new ArrayList<Future>();
+
         for (DataSpacesFileObject dsfo : results) {
+            String relativePath = dsfo.getVirtualURI().replaceFirst(buri + "/?", "");
+            logger.debug("* " + relativePath);
+
+            final String finalRelativePath = relativePath;
+            final DataSpacesFileObject finaldsfo = dsfo;
+            final DataSpacesFileObject finalout = out;
+            transferFutures.add(executor.submit(new Callable<Boolean>() {
+                @Override
+                public Boolean call() throws FileSystemException {
+                    logger.info("Copying " + finaldsfo.getRealURI() + " to " + finalout.getRealURI() + "/" +
+                        finalRelativePath);
+
+                    finalout.resolveFile(finalRelativePath).copyFrom(finaldsfo,
+                            org.objectweb.proactive.extensions.dataspaces.api.FileSelector.SELECT_SELF);
+                    return true;
+                }
+            }));
+        }
+
+        StringBuilder exceptionMsg = new StringBuilder();
+        String nl = System.getProperty("line.separator");
+        for (Future f : transferFutures) {
             try {
-                String relativePath = dsfo.getVirtualURI().replaceFirst(buri + "/?", "");
-                logger.debug("* " + relativePath);
-                logger.info("Copying " + dsfo.getRealURI() + " to " + out.getRealURI() + "/" + relativePath);
-                out.resolveFile(relativePath).copyFrom(dsfo,
-                        org.objectweb.proactive.extensions.dataspaces.api.FileSelector.SELECT_SELF);
-            } catch (FileSystemException fse) {
-                logger.warn("", fse);
-                throw fse;
+                f.get();
+            } catch (InterruptedException e) {
+                logger.error("", e);
+                exceptionMsg.append(StackTraceUtil.getStackTrace(e) + nl);
+            } catch (ExecutionException e) {
+                logger.error("", e);
+                exceptionMsg.append(StackTraceUtil.getStackTrace(e) + nl);
             }
+        }
+        if (exceptionMsg.length() > 0) {
+            throw new FileSystemException("Exception(s) occurred when transferring input files : " + nl +
+                exceptionMsg.toString());
         }
     }
 
