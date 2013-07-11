@@ -547,7 +547,6 @@ test.example.net 5
 			      </para></listitem>
 			    </itemizedlist>
 		</section>
-		&Virtualization;
 		<section xml:id="static"><info><title>Static policy</title></info>
 				<para>
 					<emphasis>Static node source policy</emphasis> starts node acquisition when nodes are added to

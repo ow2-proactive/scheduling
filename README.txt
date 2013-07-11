@@ -6,9 +6,12 @@ You can find the documentation of ProActive Scheduler in the docs directory.
 
 Javadoc and updated documentation are available online: http://proactive.inria.fr
 
+*** Quick start 1 :
 
+To start all server processes from bin directory run (requires at least jdk 1.6):
+> jrunscript start-server.js
 
-*** Quick start :
+*** Quick start 2 :
 
 * Set JAVA_HOME environment variable to the directory where java 1.6 or
 greater is located (if you need a java 1.5 version, please contact

@@ -42,11 +42,6 @@ Description: Acquires nodes from a LSF resource manager.
 Class name: org.ow2.proactive.resourcemanager.nodesource.infrastructure.LSFInfrastructure
 Parameters: <class name> rmUrl[rmi://ubuntu.local:1099/] javaPath[/home/osmirnov/Downloads/jdk1.6.0_30/bin/java] sshOptions schedulingPath[/home/osmirnov/projects/proactive/scheduling] javaOptions maxNodes[1] nodeTimeOut[300000] serverName rmCredentialsPath submitJobOpt 
 
-Name: Virtual Infrastructure
-Description: Virtualized Infrastructure node acquisition
-Class name: org.ow2.proactive.resourcemanager.nodesource.infrastructure.VirtualInfrastructure
-Parameters: <class name> rmUrl[rmi://ubuntu.local:1099/] infrastructure VMMUrl VMMUser VMMPwd VMTemplate VMMax[0] hostCapacity[0] PAConfig RMCredentials 
-
 Name: PBS Infrastructure
 Description: Acquires nodes from a PBS resource manager.
 Class name: org.ow2.proactive.resourcemanager.nodesource.infrastructure.PBSInfrastructure
