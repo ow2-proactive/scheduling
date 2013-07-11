@@ -118,14 +118,14 @@ cp $DIR/../../config/proactive/ProActiveConfiguration.xml $REST_DIR/WEB-INF/
 
 if [ $RM_URL ]; then
 	if [ "$(grep '^[ ]*rm[.]url.*' $REST_DIR/WEB-INF/portal.properties)" ]; then
-		sed -i 's|^[ ]*rm[.]url.*|rm.url='$RM_URL'|' $REST_DIR/WEB-INF/portal.properties
+		sed -i.bkp -e 's|^[ ]*rm[.]url.*|rm.url='$RM_URL'|' $REST_DIR/WEB-INF/portal.properties
 	else
 		echo "rm.url=$RM_URL" >> $REST_DIR/WEB-INF/portal.properties
 	fi
 fi
 if [ $SCHED_URL ]; then
 	if [ "$(grep '^[ ]*scheduler[.]url.*' $REST_DIR/WEB-INF/portal.properties)" ]; then
-		sed -i 's|^[ ]*scheduler[.]url.*|scheduler.url='$SCHED_URL'|' $REST_DIR/WEB-INF/portal.properties
+		sed -i.bkp -e  's|^[ ]*scheduler[.]url.*|scheduler.url='$SCHED_URL'|' $REST_DIR/WEB-INF/portal.properties
 	else
 		echo "scheduler.url=$SCHED_URL" >> $REST_DIR/WEB-INF/portal.properties
 	fi
@@ -150,7 +150,7 @@ if [ $RM ]; then
 	fi
 
 	if [ "$(grep '^[ ]*rm[.]rest[.]url.*' $RM_DIR/rm.conf)" ]; then
-		sed -i 's|^[ ]*rm[.]rest[.]url.*|rm.rest.url='$REST_URL'|' $RM_DIR/rm.conf
+		sed -i.bkp -e  's|^[ ]*rm[.]rest[.]url.*|rm.rest.url='$REST_URL'|' $RM_DIR/rm.conf
 	else
 		echo "rm.rest.url=$REST_URL" >> $RM_DIR/rm.conf
 	fi
@@ -172,7 +172,7 @@ if [ $SCHED ]; then
 	fi
 
 	if [ "$(grep '^[ ]*sched[.]rest[.]url.*' $SCHED_DIR/scheduler.conf)" ]; then
-		sed -i 's|^[ ]*sched[.]rest[.]url.*|sched.rest.url='$REST_URL'|' $SCHED_DIR/scheduler.conf
+		sed -i.bkp -e  's|^[ ]*sched[.]rest[.]url.*|sched.rest.url='$REST_URL'|' $SCHED_DIR/scheduler.conf
 	else
 		echo "sched.rest.url=$REST_URL" >> $SCHED_DIR/scheduler.conf
 	fi
