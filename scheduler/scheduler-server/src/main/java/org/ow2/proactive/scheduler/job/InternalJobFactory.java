@@ -39,7 +39,7 @@ package org.ow2.proactive.scheduler.job;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -150,7 +150,7 @@ public class InternalJobFactory {
         }
 
         InternalJob job = new InternalTaskFlowJob();
-        Map<Task, InternalTask> tasksList = new HashMap<Task, InternalTask>();
+        Map<Task, InternalTask> tasksList = new LinkedHashMap<Task, InternalTask>();
         boolean hasPreciousResult = false;
 
         for (Task t : userJob.getTasks()) {

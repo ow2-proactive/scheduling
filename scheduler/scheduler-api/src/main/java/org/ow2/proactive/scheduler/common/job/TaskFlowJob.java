@@ -37,7 +37,7 @@
 package org.ow2.proactive.scheduler.common.job;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -64,7 +64,7 @@ public class TaskFlowJob extends Job {
     /** Task count for unset task name */
     private int taskCountForUnSetTaskName = 1;
     /** List of task for the task flow job */
-    private Map<String, Task> tasks = new HashMap<String, Task>();
+    private Map<String, Task> tasks = new LinkedHashMap<String, Task>();
 
     /** ProActive Empty Constructor */
     public TaskFlowJob() {
