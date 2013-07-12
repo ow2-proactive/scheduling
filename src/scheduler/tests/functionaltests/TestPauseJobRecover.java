@@ -122,7 +122,7 @@ public class TestPauseJobRecover extends FunctionalTest {
         Assert.assertEquals("OK", jobResult.getResult("task2").value().toString());
     }
 
-    private TaskState getTaskState(String taskName, JobState jobState) {
+    protected TaskState getTaskState(String taskName, JobState jobState) {
         for (TaskState ts : jobState.getTasks()) {
             if (ts.getName().equals(taskName)) {
                 return ts;
@@ -131,7 +131,7 @@ public class TestPauseJobRecover extends FunctionalTest {
         return null;
     }
 
-    private TaskFlowJob createJob(String communicationObjectUrl) throws Exception {
+    protected TaskFlowJob createJob(String communicationObjectUrl) throws Exception {
         TaskFlowJob job = new TaskFlowJob();
 
         JavaTask task1 = new JavaTask();

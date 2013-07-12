@@ -52,6 +52,7 @@ import javax.xml.bind.annotation.XmlTransient;
 
 import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.JobType;
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.TaskId;
@@ -530,7 +531,11 @@ public class JobDescriptorImpl implements JobDescriptor {
                             .getCount() - 1);
 
                     if (((EligibleTaskDescriptorImpl) task).getCount() == 0) {
-                        eligibleTasks.put(task.getTaskId(), (EligibleTaskDescriptor) task);
+                        if (internalJob.getStatus()==JobStatus.PAUSED) {
+                            pausedTasks.put(task.getTaskId(), (EligibleTaskDescriptor) task);
+                        } else {
+                            eligibleTasks.put(task.getTaskId(), (EligibleTaskDescriptor) task);
+                        }
                     }
                 }
 
@@ -554,7 +559,7 @@ public class JobDescriptorImpl implements JobDescriptor {
 
     public void pause(TaskId taskId) {
         if (getInternal().getType() == JobType.TASKSFLOW) {
-            TaskDescriptor lt = runningTasks.get(taskId);
+            TaskDescriptor lt = eligibleTasks.get(taskId);
 
             if (lt != null) {
                 pausedTasks.put(taskId, eligibleTasks.remove(taskId));
@@ -564,7 +569,7 @@ public class JobDescriptorImpl implements JobDescriptor {
 
     public void unpause(TaskId taskId) {
         if (getInternal().getType() == JobType.TASKSFLOW) {
-            EligibleTaskDescriptor lt = (EligibleTaskDescriptor) runningTasks.get(taskId);
+            EligibleTaskDescriptor lt = (EligibleTaskDescriptor) pausedTasks.get(taskId);
 
             if (lt != null) {
                 eligibleTasks.put(taskId, lt);
