@@ -10,9 +10,6 @@ import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
 
-import junit.framework.Assert;
-
-import org.junit.Test;
 import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
@@ -27,8 +24,9 @@ import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.core.jmx.SchedulerJMXHelper;
 import org.ow2.proactive.scheduler.core.jmx.mbean.RuntimeDataMBean;
 import org.ow2.tests.FunctionalTest;
-
 import functionaltests.SchedulerTHelper;
+import junit.framework.Assert;
+import org.junit.Test;
 
 
 /**
@@ -51,16 +49,20 @@ public class SchedulerRuntimeDataMBeanTest extends FunctionalTest {
 
     @Test
     public void test() throws Exception {
-        final SchedulerAuthenticationInterface auth = (SchedulerAuthenticationInterface) SchedulerTHelper
-                .getSchedulerAuth();
+        testAsAdmin();
+        testAsUser();
+    }
+
+    private void testAsAdmin() throws Exception {
+        final SchedulerAuthenticationInterface auth = SchedulerTHelper.getSchedulerAuth();
         final HashMap<String, Object> env = new HashMap<String, Object>(1);
         env.put(JMXConnector.CREDENTIALS,
-                new Object[] { SchedulerTHelper.username, SchedulerTHelper.password });
-        JMXConnector jmxConnector = JMXConnectorFactory.connect(new JMXServiceURL(auth
+                new Object[] { SchedulerTHelper.admin_username, SchedulerTHelper.admin_password });
+        JMXConnector adminJmxConnector = JMXConnectorFactory.connect(new JMXServiceURL(auth
                 .getJMXConnectorURL(JMXTransportProtocol.RMI)), env);
 
         try {
-            MBeanServerConnection connection = jmxConnector.getMBeanServerConnection();
+            MBeanServerConnection connection = adminJmxConnector.getMBeanServerConnection();
             final ObjectName beanName = new ObjectName(SchedulerJMXHelper.RUNTIMEDATA_MBEAN_NAME);
             RuntimeDataMBean bean = JMX.newMXBeanProxy(connection, beanName, RuntimeDataMBean.class);
             checkDataConsistent(bean);
@@ -90,9 +92,26 @@ public class SchedulerRuntimeDataMBeanTest extends FunctionalTest {
             checkDataConsistent(bean);
             checkTasksData(bean, 0, 0, 1, 2);
         } finally {
-            jmxConnector.close();
+            adminJmxConnector.close();
         }
+    }
 
+    private void testAsUser() throws Exception {
+        final SchedulerAuthenticationInterface auth = SchedulerTHelper.getSchedulerAuth();
+        final HashMap<String, Object> env = new HashMap<String, Object>(1);
+        env.put(JMXConnector.CREDENTIALS,
+                new Object[] { SchedulerTHelper.user_username, SchedulerTHelper.user_password });
+        JMXConnector userJmxConnector = JMXConnectorFactory.connect(new JMXServiceURL(auth
+                .getJMXConnectorURL(JMXTransportProtocol.RMI)), env);
+
+        try {
+            MBeanServerConnection connection = userJmxConnector.getMBeanServerConnection();
+            final ObjectName beanName = new ObjectName(SchedulerJMXHelper.RUNTIMEDATA_MBEAN_NAME);
+            RuntimeDataMBean bean = JMX.newMXBeanProxy(connection, beanName, RuntimeDataMBean.class);
+            checkDataConsistent(bean);
+        } finally {
+            userJmxConnector.close();
+        }
     }
 
     private void checkJobData(RuntimeDataMBean bean, JobId jobId) throws Exception {

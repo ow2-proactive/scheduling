@@ -87,7 +87,7 @@ public class TestGetUsers extends FunctionalTest {
         Assert.assertEquals(1, users.size());
         Assert.assertEquals(0, usersWithJobs.size());
 
-        checkUser(users.get(0), SchedulerTHelper.username, 0, null);
+        checkUser(users.get(0), SchedulerTHelper.admin_username, 0, null);
 
         Assert.assertTrue("Unexpected connect time: " + users.get(0).getConnectionTime(), users.get(0)
                 .getConnectionTime() > testStartTime);
@@ -99,8 +99,8 @@ public class TestGetUsers extends FunctionalTest {
         usersWithJobs = scheduler.getUsersWithJobs();
         Assert.assertEquals(1, users.size());
         Assert.assertEquals(1, usersWithJobs.size());
-        checkUser(users.get(0), SchedulerTHelper.username, 1, connectTime);
-        checkUser(usersWithJobs.get(0), SchedulerTHelper.username, 1, null);
+        checkUser(users.get(0), SchedulerTHelper.admin_username, 1, connectTime);
+        checkUser(usersWithJobs.get(0), SchedulerTHelper.admin_username, 1, null);
 
         scheduler.submit(createJob());
 
@@ -108,8 +108,8 @@ public class TestGetUsers extends FunctionalTest {
         usersWithJobs = scheduler.getUsersWithJobs();
         Assert.assertEquals(1, users.size());
         Assert.assertEquals(1, usersWithJobs.size());
-        checkUser(users.get(0), SchedulerTHelper.username, 2, connectTime);
-        checkUser(usersWithJobs.get(0), SchedulerTHelper.username, 2, null);
+        checkUser(users.get(0), SchedulerTHelper.admin_username, 2, connectTime);
+        checkUser(usersWithJobs.get(0), SchedulerTHelper.admin_username, 2, null);
     }
 
     private TaskFlowJob createJob() throws Exception {

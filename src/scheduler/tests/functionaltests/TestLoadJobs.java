@@ -5,9 +5,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import junit.framework.Assert;
-
-import org.junit.Test;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
@@ -29,9 +26,10 @@ import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.tests.FunctionalTest;
-
 import functionaltests.monitor.MonitorEventReceiver;
 import functionaltests.monitor.SchedulerMonitorsHandler;
+import junit.framework.Assert;
+import org.junit.Test;
 
 
 /**
@@ -107,7 +105,7 @@ public class TestLoadJobs extends FunctionalTest {
             job.getStartTime() < System.currentTimeMillis());
         Assert.assertEquals(-1, job.getFinishedTime());
         Assert.assertEquals(-1, job.getRemovedTime());
-        Assert.assertEquals(SchedulerTHelper.username, job.getJobOwner());
+        Assert.assertEquals(SchedulerTHelper.admin_username, job.getJobOwner());
         Assert.assertEquals(JobPriority.NORMAL, job.getPriority());
 
         scheduler.submit(createJob(communicationObjectUrl));
@@ -155,7 +153,7 @@ public class TestLoadJobs extends FunctionalTest {
         SchedulerMonitorsHandler monitorsHandler = new SchedulerMonitorsHandler();
 
         SchedulerAuthenticationInterface auth = SchedulerTHelper.getSchedulerAuth();
-        Credentials cred = Credentials.createCredentials(new CredData("user", "pwd"), auth.getPublicKey());
+        Credentials cred = Credentials.createCredentials(new CredData(SchedulerTHelper.user_username, SchedulerTHelper.user_password), auth.getPublicKey());
         scheduler = auth.login(cred);
 
         MonitorEventReceiver eventReceiver = new MonitorEventReceiver(monitorsHandler);

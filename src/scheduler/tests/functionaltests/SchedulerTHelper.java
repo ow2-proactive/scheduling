@@ -43,7 +43,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Assert;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
@@ -79,11 +78,11 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.utils.FileUtils;
-
 import functionaltests.common.CommonTUtils;
 import functionaltests.common.InputStreamReaderThread;
 import functionaltests.monitor.MonitorEventReceiver;
 import functionaltests.monitor.SchedulerMonitorsHandler;
+import org.junit.Assert;
 
 
 /**
@@ -150,8 +149,11 @@ public class SchedulerTHelper {
 
     protected static MonitorEventReceiver eventReceiver;
 
-    public static String username = "demo";
-    public static String password = "demo";
+    public static String admin_username = "demo";
+    public static String admin_password = "demo";
+
+    public static String user_username = "user";
+    public static String user_password = "pwd";
 
     /**
      * Start the scheduler using a forked JVM and
@@ -1148,7 +1150,7 @@ public class SchedulerTHelper {
      */
     private static void connect() throws Exception {
         SchedulerAuthenticationInterface authInt = getSchedulerAuth();
-        Credentials cred = Credentials.createCredentials(new CredData(username, password), authInt
+        Credentials cred = Credentials.createCredentials(new CredData(admin_username, admin_password), authInt
                 .getPublicKey());
         adminSchedInterface = authInt.login(cred);
         initEventReceiver(adminSchedInterface);

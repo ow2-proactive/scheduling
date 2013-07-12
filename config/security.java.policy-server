@@ -39,6 +39,7 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
 
     // AuthPermission is requires for those who would like to access any mbean
     permission javax.security.auth.AuthPermission "getSubject";
+    permission java.lang.RuntimePermission "setContextClassLoader";
     permission javax.management.MBeanPermission "-#-[-]", "queryNames";
     permission javax.management.MBeanPermission "javax.management.MBeanServerDelegate#-[JMImplementation:type=MBeanServerDelegate]", "addNotificationListener";
     permission javax.management.MBeanPermission "org.ow2.proactive.scheduler.core.jmx.mbean.MyAccountMBeanImpl#*[*:*]", "*";
@@ -106,6 +107,7 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
 
     // AuthPermission is requires for those who would like to access any mbean
     permission javax.security.auth.AuthPermission "getSubject";
+    permission java.lang.RuntimePermission "setContextClassLoader";
     permission javax.management.MBeanPermission "-#-[-]", "queryNames";
     permission javax.management.MBeanPermission "javax.management.MBeanServerDelegate#-[JMImplementation:type=MBeanServerDelegate]", "addNotificationListener";
     permission javax.management.MBeanPermission "org.ow2.proactive.scheduler.core.jmx.mbean.MyAccountMBeanImpl#*[*:*]", "*";
@@ -178,6 +180,7 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
 
     // AuthPermission is requires for those who would like to access any mbean
     permission javax.security.auth.AuthPermission "getSubject";
+    permission java.lang.RuntimePermission "setContextClassLoader";
     permission javax.management.MBeanPermission "-#-[-]", "queryNames";
     permission javax.management.MBeanPermission "javax.management.MBeanServerDelegate#-[JMImplementation:type=MBeanServerDelegate]", "addNotificationListener";
     permission javax.management.MBeanPermission "org.ow2.proactive.resourcemanager.core.jmx.mbean.MyAccountMBeanImpl#*[*:*]", "*";
@@ -228,6 +231,7 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
 
     // AuthPermission is requires for those who would like to access any mbean
     permission javax.security.auth.AuthPermission "getSubject";
+    permission java.lang.RuntimePermission "setContextClassLoader";
     permission javax.management.MBeanPermission "-#-[-]", "queryNames";
     permission javax.management.MBeanPermission "javax.management.MBeanServerDelegate#-[JMImplementation:type=MBeanServerDelegate]", "addNotificationListener";
     permission javax.management.MBeanPermission "org.ow2.proactive.resourcemanager.core.jmx.mbean.MyAccountMBeanImpl#*[*:*]", "*";

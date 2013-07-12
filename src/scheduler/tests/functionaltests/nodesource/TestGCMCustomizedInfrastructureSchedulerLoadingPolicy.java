@@ -74,8 +74,8 @@ public class TestGCMCustomizedInfrastructureSchedulerLoadingPolicy extends
     protected Object[] getPolicyParams() throws Exception {
         SchedulerAuthenticationInterface auth = SchedulerConnection
                 .join(SchedulerTHelper.schedulerDefaultURL);
-        Credentials creds = Credentials.createCredentials(new CredData(SchedulerTHelper.username,
-            SchedulerTHelper.password), auth.getPublicKey());
+        Credentials creds = Credentials.createCredentials(new CredData(SchedulerTHelper.admin_username,
+            SchedulerTHelper.admin_password), auth.getPublicKey());
         return new Object[] { "ALL", "ME", SchedulerTHelper.schedulerDefaultURL, creds.getBase64(), "2000",// policy period
                 "0", // min modes
                 "1", // max modes

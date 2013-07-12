@@ -36,14 +36,14 @@
  */
 package functionaltests;
 
-import static junit.framework.Assert.assertTrue;
-
 import java.security.PublicKey;
 
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
+
+import static junit.framework.Assert.assertTrue;
 
 
 /**
@@ -64,12 +64,6 @@ import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
  */
 public class AuthenticationTest extends SchedulerConsecutive {
 
-    private String adminName = "demo";
-    private String adminPwd = "demo";
-
-    private String userName = "user";
-    private String userPwd = "pwd";
-
     /**
      * Tests start here.
      *
@@ -85,7 +79,8 @@ public class AuthenticationTest extends SchedulerConsecutive {
         SchedulerTHelper.log("Trying to authorized as an admin with correct user name and password");
 
         try {
-            Credentials cred = Credentials.createCredentials(new CredData(adminName, adminPwd), pubKey);
+            Credentials cred = Credentials.createCredentials(new CredData(SchedulerTHelper.admin_username,
+                    SchedulerTHelper.admin_password), pubKey);
             Scheduler admin = auth.login(cred);
             admin.disconnect();
             SchedulerTHelper.log("Passed: successfull authentication");
@@ -99,7 +94,8 @@ public class AuthenticationTest extends SchedulerConsecutive {
         SchedulerTHelper.log("Trying to authorized as a user with correct user name and password");
 
         try {
-            Credentials cred = Credentials.createCredentials(new CredData(userName, userPwd), pubKey);
+            Credentials cred = Credentials.createCredentials(new CredData(SchedulerTHelper.user_username,
+                    SchedulerTHelper.user_password), pubKey);
             Scheduler user = auth.login(cred);
             user.disconnect();
             SchedulerTHelper.log("Passed: successfull authentication");
@@ -114,7 +110,7 @@ public class AuthenticationTest extends SchedulerConsecutive {
         SchedulerTHelper.log("Trying to authorized as an admin with incorrect user name and password");
 
         try {
-            Credentials cred = Credentials.createCredentials(new CredData(adminName, "b"), pubKey);
+            Credentials cred = Credentials.createCredentials(new CredData(SchedulerTHelper.admin_username, "b"), pubKey);
             auth.login(cred);
             SchedulerTHelper.log("Error: successfull authentication");
             assertTrue(false);
@@ -126,7 +122,7 @@ public class AuthenticationTest extends SchedulerConsecutive {
         SchedulerTHelper.log("Trying to authorized as a user with incorrect user name and password");
 
         try {
-            Credentials cred = Credentials.createCredentials(new CredData(userName, "b"), pubKey);
+            Credentials cred = Credentials.createCredentials(new CredData(SchedulerTHelper.user_username, "b"), pubKey);
             auth.login(cred);
             SchedulerTHelper.log("Error: successfull authentication");
             assertTrue(false);

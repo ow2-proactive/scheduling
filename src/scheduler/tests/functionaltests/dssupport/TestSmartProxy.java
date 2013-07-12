@@ -111,7 +111,7 @@ public class TestSmartProxy extends SchedulerConsecutive {
         }
         schedProxy.setSessionName(TEST_SESSION_NAME);
 
-        schedProxy.init(schedulerUrl, SchedulerTHelper.username, SchedulerTHelper.password);
+        schedProxy.init(schedulerUrl, SchedulerTHelper.admin_username, SchedulerTHelper.admin_password);
 
         eventListener = new MyEventListener();
         MyEventListener myListenerRemoteReference = PAActiveObject.turnActive(eventListener);
