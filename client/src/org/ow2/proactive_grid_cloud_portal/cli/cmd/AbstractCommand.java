@@ -37,13 +37,9 @@
 
 package org.ow2.proactive_grid_cloud_portal.cli.cmd;
 
-import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
-import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
-import org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus;
-import org.ow2.proactive_grid_cloud_portal.cli.json.ErrorView;
-import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
-import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpUtility;
-import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
+import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_IO_ERROR;
+import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_UNAUTHORIZED_ACCESS;
+import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.FORBIDDEN;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -54,26 +50,16 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.conn.ClientConnectionManager;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.conn.PoolingClientConnectionManager;
-import org.apache.http.params.HttpParams;
 import org.codehaus.jackson.type.TypeReference;
-
-import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_IO_ERROR;
-import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_UNAUTHORIZED_ACCESS;
-import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.FORBIDDEN;
+import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
+import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
+import org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus;
+import org.ow2.proactive_grid_cloud_portal.cli.json.ErrorView;
+import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
+import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpUtility;
+import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
 
 public abstract class AbstractCommand implements Command {
-
-    protected static HttpClient threadSafeClient() {
-        DefaultHttpClient client = new DefaultHttpClient();
-        ClientConnectionManager mgr = client.getConnectionManager();
-        HttpParams params = client.getParams();
-        client = new DefaultHttpClient(new PoolingClientConnectionManager(
-                mgr.getSchemeRegistry()), params);
-        return client;
-    }
 
     protected int statusCode(HttpResponseStatus status) {
         return status.statusCode();
@@ -139,7 +125,7 @@ public abstract class AbstractCommand implements Command {
         if (sessionId != null) {
             request.setHeader("sessionid", sessionId);
         }
-        HttpClient client = threadSafeClient();
+        HttpClient client = HttpUtility.threadSafeClient();
         try {
             if ("https".equals(request.getURI().getScheme())
                     && currentContext.canInsecureAccess()) {

@@ -48,9 +48,13 @@ import java.security.cert.X509Certificate;
 
 import org.apache.commons.codec.net.URLCodec;
 import org.apache.http.client.HttpClient;
+import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.conn.ssl.TrustStrategy;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.conn.PoolingClientConnectionManager;
+import org.apache.http.params.HttpParams;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 
 public class HttpUtility {
@@ -84,6 +88,15 @@ public class HttpUtility {
         } catch (UnsupportedEncodingException e) {
            throw new CLIException(CLIException.REASON_OTHER, e);
         }
+    }
+    
+    public static HttpClient threadSafeClient() {
+        DefaultHttpClient client = new DefaultHttpClient();
+        ClientConnectionManager mgr = client.getConnectionManager();
+        HttpParams params = client.getParams();
+        client = new DefaultHttpClient(new PoolingClientConnectionManager(
+                mgr.getSchemeRegistry()), params);
+        return client;
     }
 
     private static class RelaxedTrustStrategy implements TrustStrategy {

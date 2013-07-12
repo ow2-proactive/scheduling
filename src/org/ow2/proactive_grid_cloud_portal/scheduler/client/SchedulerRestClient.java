@@ -41,38 +41,46 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.util.Collections;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
 
-import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
-import org.ow2.proactive_grid_cloud_portal.common.exceptionmapper.ExceptionToJson;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.jboss.resteasy.client.ClientExecutor;
 import org.jboss.resteasy.client.ClientRequest;
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.client.ClientResponseFailure;
 import org.jboss.resteasy.client.ProxyFactory;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataOutput;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
+import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
+import org.ow2.proactive_grid_cloud_portal.common.exceptionmapper.ExceptionToJson;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
 
 
 public class SchedulerRestClient {
 
     private SchedulerRestInterface scheduler;
     private String restEndpointURL;
+    private ClientExecutor executor;
 
+    
     public SchedulerRestClient(String restEndpointURL) {
-        this.restEndpointURL = restEndpointURL;
-
-        ResteasyProviderFactory provider = ResteasyProviderFactory.getInstance();
-        provider.registerProvider(JacksonContextResolver.class);
-        scheduler = createRestProxy(provider, restEndpointURL);
+        this(restEndpointURL, null);
     }
 
+    public SchedulerRestClient(String restEndpointURL, ClientExecutor executor) {
+        this.restEndpointURL = restEndpointURL;
+        this.executor = executor;
+        ResteasyProviderFactory provider = ResteasyProviderFactory.getInstance();
+        provider.registerProvider(JacksonContextResolver.class);
+        scheduler = createRestProxy(provider, restEndpointURL, executor);
+    }
+    
     public JobIdData submitXml(String sessionId, InputStream jobXml) throws Exception {
         return submit(sessionId, jobXml, MediaType.APPLICATION_XML_TYPE);
     }
@@ -82,8 +90,10 @@ public class SchedulerRestClient {
     }
 
     private JobIdData submit(String sessionId, InputStream job, MediaType mediaType) throws Exception {
-        ClientRequest request = new ClientRequest(restEndpointURL + addSlashIfMissing(restEndpointURL) +
-            "scheduler/submit");
+        String uriTmpl = restEndpointURL + addSlashIfMissing(restEndpointURL) +
+            "scheduler/submit";
+        ClientRequest request = (executor == null) ? new ClientRequest(uriTmpl)
+                : new ClientRequest(uriTmpl, executor);
         request.header("sessionid", sessionId);
         MultipartFormDataOutput formData = new MultipartFormDataOutput();
         formData.addFormData("file", job, mediaType);
@@ -103,10 +113,14 @@ public class SchedulerRestClient {
         return scheduler;
     }
 
-    private static SchedulerRestInterface createRestProxy(ResteasyProviderFactory provider,
-            String restEndpointURL) {
-        final SchedulerRestInterface schedulerRestClient = ProxyFactory.create(SchedulerRestInterface.class,
-                restEndpointURL, provider, Collections.<String, Object> emptyMap());
+    private static SchedulerRestInterface createRestProxy(
+            ResteasyProviderFactory provider, String restEndpointURL,
+            ClientExecutor executor) {
+        final SchedulerRestInterface schedulerRestClient = (executor == null) ? ProxyFactory
+                .create(SchedulerRestInterface.class, restEndpointURL,
+                        provider, Collections.<String, Object> emptyMap())
+                : ProxyFactory.create(SchedulerRestInterface.class,
+                        URI.create(restEndpointURL), executor, provider);
         return createExceptionProxy(schedulerRestClient);
     }
 

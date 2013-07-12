@@ -1,9 +1,15 @@
 package org.ow2.proactive_grid_cloud_portal.cli;
 
+import org.jboss.resteasy.client.core.executors.ApacheHttpClient4Executor;
 import org.ow2.proactive_grid_cloud_portal.cli.console.AbstractDevice;
 import org.ow2.proactive_grid_cloud_portal.cli.json.PluginView;
+import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpUtility;
 import org.ow2.proactive_grid_cloud_portal.scheduler.client.SchedulerRestClient;
 
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
@@ -11,6 +17,7 @@ import java.util.Stack;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
+import org.apache.http.client.HttpClient;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_OTHER;
@@ -55,13 +62,23 @@ public class ApplicationContextImpl implements ApplicationContext {
     @Override
     public void setRestServerUrl(String restServerUrl) {
         this.restServerUrl = restServerUrl;
-        this.restClient = new SchedulerRestClient(restServerUrl);
     }
 
-    @Override
-    public SchedulerRestClient getRestClient() {
-        return restClient;
-    }
+	@Override
+	public SchedulerRestClient getRestClient() {
+		HttpClient client = HttpUtility.threadSafeClient();
+		if (canInsecureAccess()) {
+			try {
+				HttpUtility.setInsecureAccess(client);
+			} catch (Exception e) {
+				throw new CLIException(REASON_OTHER,
+						"Cannot disable SSL verification.", e);
+			}
+		}
+		restClient = new SchedulerRestClient(restServerUrl,
+				new ApacheHttpClient4Executor(client));
+		return restClient;
+	}
 
     @Override
     public String getResourceUrl(String resource) {
