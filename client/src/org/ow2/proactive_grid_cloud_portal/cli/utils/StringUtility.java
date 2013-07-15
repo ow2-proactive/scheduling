@@ -210,8 +210,12 @@ public class StringUtility {
     public static String jobOutputAsString(String id, Map<String, String> output) {
         StringBuilder buffer = new StringBuilder();
         buffer.append(String.format("%s output:\n", id));
-        for (String key : output.keySet()) {
-            buffer.append(String.format("%s : %s\n", key, output.get(key)));
+        if (output != null) {
+            for (String key : output.keySet()) {
+                buffer.append(String.format("%s : %s\n", key, output.get(key)));
+            }
+        } else {
+            buffer.append("Not available.");
         }
         return buffer.toString();
     }
