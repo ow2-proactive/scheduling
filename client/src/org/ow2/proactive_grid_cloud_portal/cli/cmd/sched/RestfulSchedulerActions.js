@@ -5,6 +5,7 @@ importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractLoginCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.LoginCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.LoginWithCredentialsCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.EvalScriptCommand);
+importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.PrintSessionCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractIModeCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.SchedJsHelpCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.StartCommand);
@@ -176,6 +177,10 @@ function printWelcomeMsg() {
     if (getUser() == null && getCredFile() == null) {
         print('Warning: You are not currently logged in.\r\n');
     }
+}
+
+function prints() {
+	execute(new PrintSessionCommand());
 }
 
 function execute(cmd) {
