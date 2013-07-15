@@ -103,7 +103,7 @@ REST_URL="http://localhost:${PORT}/rest/rest"
 
 REST_DIR=$(mktemp_dir_jruby)/rest/
 [ $VERBOSE = true ] && echo "Deploying REST Server in $REST_DIR"
-if [ "$(file $REST |grep -i "Zip archive")" ]; then
+if [ "$(file $REST |grep -i "zip")" ]; then
 	unzip -q $REST -d $REST_DIR
 elif [ -d $REST ]; then
  	mkdir $REST_DIR
@@ -140,7 +140,7 @@ if [ $RM ]; then
 	RM_DIR=$(mktemp_dir_jruby)/rm/
 	[ $VERBOSE = true ] && echo "Deploying RM UI in $RM_DIR"
 
-	if [ "$(file $RM |grep -i "Zip archive")" ]; then
+	if [ "$(file $RM |grep -i "zip")" ]; then
 		unzip -q $RM -d $RM_DIR
 	elif [ -d $RM ]; then
 		mkdir $RM_DIR
@@ -162,7 +162,7 @@ if [ $SCHED ]; then
 	SCHED_DIR=$(mktemp_dir_jruby)/sched/
 	[ $VERBOSE = true ] && echo "Deploying Scheduling UI in $SCHED_DIR"
 
-	if [ "$(file $SCHED| grep -i "Zip archive")" ]; then
+	if [ "$(file $SCHED| grep -i "zip")" ]; then
 		unzip -q $SCHED -d $SCHED_DIR
 	elif [ -d $SCHED ]; then
 		mkdir $SCHED_DIR
