@@ -75,8 +75,7 @@ public class SchedulerClassServers {
             remoteClassServers.put(jid, remoteExposer);// stored to be unregistered later
         } catch (Exception e) {
             logger.error("", e);
-            throw new ClassServerException("Unable to create class server for job " + jid + " because " +
-                e.getMessage());
+            throw new ClassServerException("Unable to create class server for job " + jid, e);
         }
     }
 
@@ -126,7 +125,7 @@ public class SchedulerClassServers {
                 jlogger.info(jid, "unregistering remote TaskClassServer");
                 roe.unregisterAll();
             } catch (ProActiveException e) {
-                jlogger.error(jid, "unable to unregister remote taskClassServer because : " + e.getMessage());
+                jlogger.error(jid, "unable to unregister remote taskClassServer", e);
                 logger.error("", e);
             }
         }
