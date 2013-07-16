@@ -36,140 +36,140 @@ var currentContext = ApplicationContextImpl.currentContext();
 printWelcomeMsg();
 
 function help() {
-	execute(new SchedJsHelpCommand());
+    execute(new SchedJsHelpCommand());
 }
 
 function url(url) {
-	execute(new SetUrlCommand('' + url));
+    execute(new SetUrlCommand('' + url));
 }
 
 function login(user) {
     currentContext.setSessionId(null);
-	execute(new LoginCommand('' + user));
+    execute(new LoginCommand('' + user));
 }
 
 function loginwithcredentials(pathname) {
-	currentContext.setSessionId(null);
-	execute(new LoginWithCredentialsCommand('' + pathname));
+    currentContext.setSessionId(null);
+    execute(new LoginWithCredentialsCommand('' + pathname));
 }
 
 function submit(pathname) {
-	execute(new SubmitJobCommand('' + pathname));
+    execute(new SubmitJobCommand('' + pathname));
 }
 
 function submitarchive(pathname) {
-	execute(new SubmitJobCommand('' + pathname));
+    execute(new SubmitJobCommand('' + pathname));
 }
 
 function jobpriority(jobId, priority) {
-	execute(new ChangeJobPriorityCommand('' + jobId, '' + priority));
+    execute(new ChangeJobPriorityCommand('' + jobId, '' + priority));
 }
 
 function pausejob(jobId) {
-	execute(new PauseJobCommand('' + jobId));
+    execute(new PauseJobCommand('' + jobId));
 }
 
 function resumejob(jobId) {
-	execute(new ResumeJobCommand('' + jobId));
+    execute(new ResumeJobCommand('' + jobId));
 }
 
 function killjob(jobId) {
-	execute(new KillJobCommand('' + jobId));
+    execute(new KillJobCommand('' + jobId));
 }
 
 function removejob(jobId) {
-	execute(new RemoveJobCommand('' + jobId));
+    execute(new RemoveJobCommand('' + jobId));
 }
 
 function jobstate(jobId) {
-	execute(new GetJobStateCommand('' + jobId));
+    execute(new GetJobStateCommand('' + jobId));
 }
 
 function listjobs() {
-	execute(new ListJobCommand());
+    execute(new ListJobCommand());
 }
 
 function stats() {
-	execute(new SchedStatsCommand());
+    execute(new SchedStatsCommand());
 }
 
 function jobresult(jobId) {
-	execute(new GetJobResultCommand('' + jobId));
+    execute(new GetJobResultCommand('' + jobId));
 }
 
 function joboutput(jobId) {
-	execute(new GetJobOutputCommand('' + jobId));
+    execute(new GetJobOutputCommand('' + jobId));
 }
 
 function taskresult(jobId, taskId) {
-	execute(new GetTaskResultCommand('' + jobId, '' + taskId));
+    execute(new GetTaskResultCommand('' + jobId, '' + taskId));
 }
 
 function taskoutput(jobId, taskId) {
-	execute(new GetTaskOutputCommand('' + jobId, '' + taskId));
+    execute(new GetTaskOutputCommand('' + jobId, '' + taskId));
 }
 
 function preempttask(jobId, taskId) {
-	execute(new PreemptTaskCommand('' + jobId, '' + taskId));
+    execute(new PreemptTaskCommand('' + jobId, '' + taskId));
 }
 
 function restarttask(jobId, taskId) {
-	execute(new RestartTaskCommand('' + jobId, '' + taskId));
+    execute(new RestartTaskCommand('' + jobId, '' + taskId));
 }
 
 function start() {
-	execute(new StartCommand());
+    execute(new StartCommand());
 }
 
 function stop() {
-	execute(new StopCommand());
+    execute(new StopCommand());
 }
 
 function pause() {
-	execute(new PauseCommand());
+    execute(new PauseCommand());
 }
 
 function resume() {
-	execute(new ResumeCommand());
+    execute(new ResumeCommand());
 }
 
 function freeze() {
-	execute(new FreezeCommand());
+    execute(new FreezeCommand());
 }
 
 function kill() {
-	execute(new KillCommand());
+    execute(new KillCommand());
 }
 
 function script(path, args) {
-	execute(new EvalScriptCommand('' + path, '' + args));
+    execute(new EvalScriptCommand('' + path, '' + args));
 }
 
 function linkrm(rmUrl) {
-	execute(new LinkRmCommand('' + rmUrl));
+    execute(new LinkRmCommand('' + rmUrl));
 }
 
 function reconnect() {
-	if (getCredFile(currentContext) != null) {
-		loginwithcredentials(getCredFile(currentContext));
-	} else if (getUser(currentContext) != null) {
-		login(getUser(currentContext));
-	} else {
-		print('use either login(username) or loginwithcredentials(cred-file) function\n')
+    if (getCredFile(currentContext) != null) {
+        loginwithcredentials(getCredFile(currentContext));
+    } else if (getUser(currentContext) != null) {
+        login(getUser(currentContext));
+    } else {
+        print('use either login(username) or loginwithcredentials(cred-file) function\n')
 
-	}
+    }
 }
 
 function exit() {
-	currentContext.setProperty(AbstractIModeCommand.TERMINATE, true);	
+    currentContext.setProperty(AbstractIModeCommand.TERMINATE, true);    
 }
 
 function getUser() {
-	return currentContext.getProperty(LoginCommand.USERNAME, java.lang.String.prototype);
+    return currentContext.getProperty(LoginCommand.USERNAME, java.lang.String.prototype);
 }
 
 function getCredFile() {
-	return currentContext.getProperty(LoginWithCredentialsCommand.CRED_FILE, java.lang.String.prototype);
+    return currentContext.getProperty(LoginWithCredentialsCommand.CRED_FILE, java.lang.String.prototype);
 }
 
 function printWelcomeMsg() {
@@ -180,7 +180,7 @@ function printWelcomeMsg() {
 }
 
 function prints() {
-	execute(new PrintSessionCommand());
+    execute(new PrintSessionCommand());
 }
 
 function execute(cmd) {
@@ -192,9 +192,9 @@ function execute(cmd) {
                 && currentContext.getProperty(AbstractLoginCommand.PROP_PERSISTED_SESSION, java.lang.Boolean.TYPE, false)) {
             currentContext.setProperty(AbstractLoginCommand.PROP_RENEW_SESSION, true);
             if (getCredFile() != null) {
-            	execute(new LoginWithCredentialsCommand(getCredFile()));
+                execute(new LoginWithCredentialsCommand(getCredFile()));
             } else if (getUser() != null) {
-            	execute(new LoginCommand(getUser()));
+                execute(new LoginCommand(getUser()));
             } else {
                 throw e;
             }
