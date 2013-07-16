@@ -45,7 +45,7 @@ import java.security.PublicKey;
 
 import javax.security.auth.login.LoginException;
 
-import jline.ConsoleReader;
+import jline.console.ConsoleReader;
 
 import org.apache.commons.cli.AlreadySelectedException;
 import org.apache.commons.cli.CommandLine;
@@ -211,7 +211,7 @@ public class SchedulerController {
                         throw e;
                     }
                 } else {
-                    ConsoleReader console = new ConsoleReader(System.in, new PrintWriter(System.out));
+                    ConsoleReader console = new ConsoleReader(System.in, System.out);
                     if (cmd.hasOption("login")) {
                         pwdMsg = user + "'s password: ";
                     } else {
@@ -221,7 +221,7 @@ public class SchedulerController {
 
                     //ask password to User
                     try {
-                        console.setDefaultPrompt(pwdMsg);
+                        console.setPrompt(pwdMsg);
                         pwd = console.readLine('*');
                     } catch (IOException ioe) {
                         logger.error("" + ioe);

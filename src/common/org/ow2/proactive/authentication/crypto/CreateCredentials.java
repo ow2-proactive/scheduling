@@ -43,7 +43,7 @@ import java.io.PrintWriter;
 import java.security.KeyException;
 import java.security.PublicKey;
 
-import jline.ConsoleReader;
+import jline.console.ConsoleReader;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.GnuParser;
@@ -82,7 +82,7 @@ public class CreateCredentials {
      *
      */
     public static void main(String[] args) throws IOException, ParseException {
-        ConsoleReader console = new ConsoleReader(System.in, new PrintWriter(System.out));
+        ConsoleReader console = new ConsoleReader(System.in, System.out);
         /**
          * default values
          */

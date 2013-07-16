@@ -36,26 +36,23 @@
  */
 package org.ow2.proactive.utils.console;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.Reader;
-import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
-import jline.ArgumentCompletor;
-import jline.ClassNameCompletor;
-import jline.Completor;
-import jline.ConsoleReader;
-import jline.FileNameCompletor;
-import jline.History;
-import jline.MultiCompletor;
-import jline.SimpleCompletor;
+import jline.console.ConsoleReader;
+import jline.console.completer.AggregateCompleter;
+import jline.console.completer.ArgumentCompleter;
+import jline.console.completer.ArgumentCompleter.WhitespaceArgumentDelimiter;
+import jline.console.completer.Completer;
+import jline.console.history.FileHistory;
+import org.ow2.proactive.utils.console.jline1.ClassNameCompletor;
+import org.ow2.proactive.utils.console.jline1.FileNameCompletor;
+import org.ow2.proactive.utils.console.jline1.SimpleCompletor;
 
 
 /**
@@ -84,6 +81,7 @@ public class JlineConsole implements Console {
     private File historyFile = new File(System.getProperty("user.home") + File.separator + ".proactive" +
         File.separator + "console.hist");
     private int historySize = 20;
+    private FileHistory history;
 
     /**
      * Create a new instance of SimpleConsole.
@@ -107,36 +105,11 @@ public class JlineConsole implements Console {
      */
     public Console start(String prompt) {
         try {
-            console = new ConsoleReader(System.in, new PrintWriter(System.out, true));
-            completor = new SimpleCompletor(new String[] {});
-            ArgumentCompletor comp = new ArgumentCompletor(new MultiCompletor(new Completor[] {
-                    new ClassNameCompletor(), completor, new FileNameCompletor() }),
-                new ArgumentCompletor.WhitespaceArgumentDelimiter() {
-                    @Override
-                    public boolean isDelimiterChar(String buffer, int pos) {
-                        return super.isDelimiterChar(buffer, pos) || buffer.charAt(pos) == '\'' ||
-                            buffer.charAt(pos) == '"' || buffer.charAt(pos) == '{' ||
-                            buffer.charAt(pos) == '}' || buffer.charAt(pos) == ',' ||
-                            buffer.charAt(pos) == ';';
-                    }
-                });
-            comp.setStrict(false);
-            console.addCompletor(comp);
-            //Load history
-            if (!historyFile.exists()) {
-                historyFile.createNewFile();
-            } else {
-                History history = new History();
-                FileReader fr = new FileReader(historyFile);
-                BufferedReader br = new BufferedReader(fr);
-                String line;
-                while ((line = br.readLine()) != null) {
-                    history.addToHistory(line);
-                }
-                fr.close();
-                br.close();
-                console.setHistory(history);
-            }
+            console = new ConsoleReader(System.in, System.out);
+            console.addCompleter(createCompleter());
+            history = new FileHistory(historyFile);
+            console.setHistory(history);
+
             Runtime.getRuntime().addShutdownHook(new Thread() {
                 @Override
                 public void run() {
@@ -151,24 +124,27 @@ public class JlineConsole implements Console {
         return this;
     }
 
-    boolean dumped = false;
+    private ArgumentCompleter createCompleter() throws IOException {
+        completor = new SimpleCompletor(new String[] {});
+        Completer aggregateCompleter = new AggregateCompleter(new ClassNameCompletor(), completor,
+            new FileNameCompletor());
+        WhitespaceArgumentDelimiter delimiter = new WhitespaceArgumentDelimiter() {
+            @Override
+            public boolean isDelimiterChar(CharSequence buffer, int pos) {
+                return super.isDelimiterChar(buffer, pos) || buffer.charAt(pos) == '\'' ||
+                    buffer.charAt(pos) == '"' || buffer.charAt(pos) == '{' || buffer.charAt(pos) == '}' ||
+                    buffer.charAt(pos) == ',' || buffer.charAt(pos) == ';';
+            }
+        };
+        ArgumentCompleter argumentCompleter = new ArgumentCompleter(delimiter, aggregateCompleter);
+        argumentCompleter.setStrict(false);
+        return argumentCompleter;
+    }
 
     private synchronized void dumpHistory() {
-        if (!dumped) {
-            dumped = true;
-            try {
-                if (historyFile.exists()) {
-                    historyFile.delete();
-                }
-                historyFile.createNewFile();
-                PrintStream ps = new PrintStream(historyFile);
-                List h = console.getHistory().getHistoryList();
-                for (int i = h.size() - historySize > 0 ? h.size() - historySize : 0; i < h.size(); i++) {
-                    ps.println(h.get(i));
-                }
-                ps.close();
-            } catch (IOException e) {
-            }
+        try {
+            history.flush();
+        } catch (IOException e) {
         }
     }
 
@@ -188,7 +164,7 @@ public class JlineConsole implements Console {
     public void flush() {
         if (this.started && console != null) {
             try {
-                console.flushConsole();
+                console.flush();
             } catch (IOException e) {
             }
         }
@@ -203,25 +179,25 @@ public class JlineConsole implements Console {
                 FilterResult fr = filter(new StringBuffer(msg));
                 StringBuffer sb = fr.content;
                 if (msg.length() == 0) {
-                    console.printNewline();
+                    console.println();
                     return this;
                 }
                 if (!paginationActivated) {
-                    console.printString(sb.toString());
-                    console.printNewline();
+                    console.print(sb.toString());
+                    console.println();
                 } else {
                     while (sb.length() > 0) {
-                        console.printString(nFirstLine(sb, console.getTermheight() - 3) + newLineChar);
+                        console.print(nFirstLine(sb, console.getTerminal().getHeight() - 3) + newLineChar);
                         if (sb.length() > 0) {
-                            console.printString("- more - (" + ABORT + " : abort | " + ALL +
+                            console.print("- more - (" + ABORT + " : abort | " + ALL +
                                 " : display all | any : next page)" + newLineChar);
-                            console.flushConsole();
-                            int c = console.readVirtualKey();
+                            console.flush();
+                            int c = console.readCharacter();
                             if (c == ABORT) {
                                 break;
                             } else if (c == ALL) {
-                                console.printString(sb.toString());
-                                console.printNewline();
+                                console.print(sb.toString());
+                                console.println();
                                 break;
                             }
                         } else {
@@ -230,11 +206,11 @@ public class JlineConsole implements Console {
                     }
                 }
                 if (filters.size() > 0) {
-                    console.printString("- Output filtered - (" + fr.nbFiltered + "/" + fr.nbLines +
-                        " lines by " + filters.size() + " filter" + (filters.size() == 1 ? "" : "s") + ") " +
-                        filters + newLineChar);
+                    console.print("- Output filtered - (" + fr.nbFiltered + "/" + fr.nbLines + " lines by " +
+                        filters.size() + " filter" + (filters.size() == 1 ? "" : "s") + ") " + filters +
+                        newLineChar);
                 }
-                console.flushConsole();
+                console.flush();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -277,7 +253,7 @@ public class JlineConsole implements Console {
             }
         } catch (Throwable t) {
             try {
-                console.printString("ERROR : " + t.getMessage() + newLineChar);
+                console.print("ERROR : " + t.getMessage() + newLineChar);
             } catch (IOException e) {
             }
         }
@@ -395,7 +371,7 @@ public class JlineConsole implements Console {
     public void addCompletion(String... candidates) {
         if (completor == null) {
             completor = new SimpleCompletor(candidates);
-            console.addCompletor(completor);
+            console.addCompleter(completor);
         }
         for (String s : candidates) {
             if (s != null && !"".equals(s)) {
