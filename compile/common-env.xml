@@ -82,6 +82,7 @@
 
 	<fileset id="jar.index.fileset" dir="${lib.dir}">
 		<include name="common/**/*.jar" />
+		<exclude name="common/script/*.jar"/>
 		<include name="nodesource/**/*.jar" />
 		<include name="mapreduce/**/*.jar" />
 	</fileset>
