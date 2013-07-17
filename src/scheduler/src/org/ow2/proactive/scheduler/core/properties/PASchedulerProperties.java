@@ -488,6 +488,17 @@ public enum PASchedulerProperties {
     }
 
     /**
+     * unsets this property
+     *
+     */
+    public void unSet() {
+        getProperties(null);
+        if (fileLoaded) {
+            prop.remove(key);
+        }
+    }
+
+    /**
      * Returns the string to be passed on the command line
      *
      * The property surrounded by '-D' and '='

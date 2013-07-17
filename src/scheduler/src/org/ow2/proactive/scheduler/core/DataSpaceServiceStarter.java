@@ -156,6 +156,10 @@ public class DataSpaceServiceStarter implements Serializable {
         for (int i = 0; i < confs.length; i++) {
             //variable used to precise exception
             String spaceDir = null;
+            if (confs[i][0].isSet() && confs[i][0].getValueAsString().trim().isEmpty()) {
+                logger.info("Unsetting property : " + confs[i][0].getKey());
+                confs[i][0].unSet();
+            }
 
             if (!confs[i][0].isSet()) {
                 // if URL is set, if not we start a server ourselves
