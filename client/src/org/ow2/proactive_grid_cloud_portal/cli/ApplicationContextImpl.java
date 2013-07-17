@@ -33,7 +33,7 @@ public class ApplicationContextImpl implements ApplicationContext {
 
     private static final ApplicationContextHolder threadLocalContext = new ApplicationContextHolder();
 
-    private String sessionId;
+    private String sessionId = "";
     private String restServerUrl;
     private SchedulerRestClient restClient;
     private boolean insecureAccess;

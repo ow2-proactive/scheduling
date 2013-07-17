@@ -37,16 +37,13 @@
 
 package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
 
-import javax.security.auth.login.LoginException;
+import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_OTHER;
 
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractLoginCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SchedulerRestException;
-
-import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_OTHER;
 
 public class LoginSchedCommand extends AbstractLoginCommand implements Command {
 
@@ -70,13 +67,10 @@ public class LoginSchedCommand extends AbstractLoginCommand implements Command {
         SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
         try {
             return scheduler.login(username, password);
-        } catch (LoginException e) {
-            handleError("An error occurred while logging:", e, currentContext);
-            throw new CLIException(REASON_OTHER, "An error occurred while logging.");
-        } catch (SchedulerRestException e) {
-            handleError("An error occurred while logging:", e, currentContext);
-            throw new CLIException(REASON_OTHER, "An error occurred while logging.");
-        }
+        } catch (Exception e) {
+            throw new CLIException(REASON_OTHER, "An error occurred while logging.", e);
+        } 
+
     }
 
     @Override

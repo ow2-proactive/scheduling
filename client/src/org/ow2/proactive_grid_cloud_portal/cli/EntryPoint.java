@@ -58,9 +58,11 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractLoginCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.cli.console.AbstractDevice;
 import org.ow2.proactive_grid_cloud_portal.cli.console.JLineDevice;
+import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
 
 public abstract class EntryPoint {
 
@@ -115,19 +117,20 @@ public abstract class EntryPoint {
             System.exit(1);
         }
 
-        boolean authorizationError = false;
+        boolean retryLogin = false;
 
         try {
             executeCommandList(commands, currentContext);
         } catch (CLIException error) {
-            if (REASON_UNAUTHORIZED_ACCESS == error.reason()) {
-                authorizationError = true;
+            if (REASON_UNAUTHORIZED_ACCESS == error.reason()
+                    && hasLoginCommand(commands)) {
+                retryLogin = true;
             } else {
-                writeError(writer(currentContext), "An error occurred:", error);
+                writeError(writer(currentContext), "An error occurred.", error);
             }
         } catch (Throwable e) {
             e.printStackTrace();
-            writeError(writer(currentContext), "An error occurred:", e);
+            writeError(writer(currentContext), "An error occurred.", e);
         }
 
         /*
@@ -139,7 +142,7 @@ public abstract class EntryPoint {
          * This will effectively re-execute the user command with a new
          * session-id from server.
          */
-        if (authorizationError
+        if (retryLogin
                 && currentContext.getProperty(PROP_PERSISTED_SESSION,
                         Boolean.TYPE, false)) {
             try {
@@ -148,7 +151,7 @@ public abstract class EntryPoint {
             } catch (Throwable error) {
                 writeError(writer(currentContext),
                         "An error occurred while execution:", error);
-            }
+            }  
         }
     }
 
@@ -163,11 +166,11 @@ public abstract class EntryPoint {
         writer.printf("%n%s", errorMsg);
         if (cause != null) {
             if (cause.getMessage() != null) {
-                writer.printf("%nError Message: %s", cause.getMessage());
+                writer.printf("%n%nError Message: %s", cause.getMessage());
             }
             if (cause.getStackTrace() != null) {
-                writer.printf("%n%s", "StackTrace:");
-                cause.printStackTrace(writer);
+                writer.printf("%n%nStackTrace: %s",
+                        StringUtility.stackTraceAsString(cause));
             }
         }
     }
@@ -186,5 +189,13 @@ public abstract class EntryPoint {
                     "Unknown resource-type('%s')", resourceType));
         }
     }
-
+    
+    private boolean hasLoginCommand(List<Command> commandList) {
+        for (Command c : commandList) {
+            if (c instanceof AbstractLoginCommand) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

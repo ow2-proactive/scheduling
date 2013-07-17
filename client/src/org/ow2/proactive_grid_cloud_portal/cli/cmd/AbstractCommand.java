@@ -58,6 +58,7 @@ import org.ow2.proactive_grid_cloud_portal.cli.json.ErrorView;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpUtility;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
 
 public abstract class AbstractCommand implements Command {
 
@@ -166,11 +167,24 @@ public abstract class AbstractCommand implements Command {
 
     @SuppressWarnings("unchecked")
     protected void handleError(String errorMessage,
-                               Exception cause, ApplicationContext currentContext) {
-        String causeMessage = cause.getMessage();
+                               Exception error, ApplicationContext currentContext) {
         Stack resultStack = resultStack(currentContext);
-        resultStack.push(causeMessage);
-        writeError(errorMessage, causeMessage, currentContext);
+        resultStack.push(error);
+        
+        if (error instanceof NotConnectedRestException) {
+            throw new CLIException(REASON_UNAUTHORIZED_ACCESS, errorMessage,
+                    error);
+        }
+
+        writeLine(currentContext, errorMessage);
+        Throwable cause = error.getCause();
+        
+        writeLine(currentContext, "%nError Message: %s",
+                (cause == null) ? error.getMessage() : cause.getMessage());
+
+        writeLine(currentContext, "%nStack Track: %s",
+                StringUtility.stackTraceAsString((cause == null) ? error
+                        : cause));
     }
 
     private void writeError(String errorMsg, String responseContent,

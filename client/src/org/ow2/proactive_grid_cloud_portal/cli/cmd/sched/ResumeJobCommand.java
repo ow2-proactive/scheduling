@@ -54,16 +54,17 @@ public class ResumeJobCommand extends AbstractJobCommand implements Command {
 
         SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
         try {
-            boolean success = scheduler.resumeJob(currentContext.getSessionId(), jobId);
+            boolean success = scheduler.resumeJob(
+                    currentContext.getSessionId(), jobId);
             resultStack(currentContext).push(success);
             if (success) {
-                writeLine(currentContext, "%s resumed successfully.");
+                writeLine(currentContext, "%s resumed successfully.", jobId);
             } else {
-                writeLine(currentContext, "Cannot resume %s.");
+                writeLine(currentContext, "Cannot resume %s.", jobId);
             }
         } catch (Exception e) {
             handleError(String.format(
-                    "An error occurred while attempting to resume %s:", job()),
+                    "An error occurred while attempting to resume: %s", job()),
                     e, currentContext);
         }
     }

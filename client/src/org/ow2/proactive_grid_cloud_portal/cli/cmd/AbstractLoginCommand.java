@@ -42,6 +42,7 @@ import java.io.File;
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.FileUtility;
+import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
 
 import static org.ow2.proactive_grid_cloud_portal.cli.RestConstants.DFLT_SESSION_DIR;
 import static org.ow2.proactive_grid_cloud_portal.cli.RestConstants.DFLT_SESSION_FILE_EXT;
@@ -49,7 +50,7 @@ import static org.ow2.proactive_grid_cloud_portal.cli.RestConstants.DFLT_SESSION
 public abstract class AbstractLoginCommand extends AbstractCommand implements
         Command {
 
-    public static final boolean RENEW_SESSION_BY_DEFAULT = true;
+    public static final boolean RENEW_SESSION_BY_DEFAULT = false;
     public static final boolean PERSIST_SESSION_BY_DEFAULT = true;
 
     public static final String PROP_PERSISTED_SESSION = "org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractLoginCommand.persistedSession";
@@ -65,7 +66,7 @@ public abstract class AbstractLoginCommand extends AbstractCommand implements
                 PROP_ENABLE_PERSISTENCE, Boolean.TYPE, PERSIST_SESSION_BY_DEFAULT);
         String sessionId = currentContext.getSessionId();
 
-        if (sessionId != null && !renewSession) {
+        if (!StringUtility.isEmpty(sessionId) && !renewSession) {
             // session id is set explicitly and no update request. But in case
             // of a failure we can always retry.
             currentContext.setProperty(PROP_PERSISTED_SESSION, true);
@@ -74,7 +75,7 @@ public abstract class AbstractLoginCommand extends AbstractCommand implements
         }
 
         if (renewSession) {
-            System.out.println("renewing .. ");
+            writeLine(currentContext, "renewing session ...");
             sessionId = getSessionIdFromServer(currentContext);
             writeLine(currentContext, "Session id successfully renewed.");
 
