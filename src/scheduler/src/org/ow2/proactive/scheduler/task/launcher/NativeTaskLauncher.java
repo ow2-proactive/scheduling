@@ -377,7 +377,12 @@ public class NativeTaskLauncher extends TaskLauncher {
             throws Exception {
         if (commandElem.contains(tag)) {
             if (fo != null) {
-                String fullPath = new File(new URI(fo.getRealURI())).getAbsolutePath();
+                String fullPath = null;
+                if (fo.getRealURI().startsWith("file:")) {
+                    fullPath = new File(new URI(fo.getRealURI())).getAbsolutePath();
+                } else {
+                    fullPath = fo.getRealURI();
+                }
                 commandElem = commandElem.replace(tag, fullPath);
             } else {
                 throw new DataSpacesException(tag +
