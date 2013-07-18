@@ -42,6 +42,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.script.ScriptEngineFactory;
+import javax.script.ScriptEngineManager;
+
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.PublicAPI;
 
 
@@ -363,5 +367,32 @@ public class Tools {
             sb.append(list.get(i).toString());
         }
         return sb.toString();
+    }
+
+    /**
+     * List all available script engines
+     * @param logger to log the engines to
+     */
+    public static void logAvailableScriptEngines(Logger logger) {
+        ScriptEngineManager mgr = new ScriptEngineManager();
+        List<ScriptEngineFactory> factories = mgr.getEngineFactories();
+        for (ScriptEngineFactory factory : factories) {
+
+            logger.info("ScriptEngineFactory Info");
+
+            String engName = factory.getEngineName();
+            String engVersion = factory.getEngineVersion();
+            String langName = factory.getLanguageName();
+            String langVersion = factory.getLanguageVersion();
+
+            logger.info(String.format("\tScript Engine: %s (%s)\n", engName, engVersion));
+
+            List<String> engNames = factory.getNames();
+            for (String name : engNames) {
+                logger.info(String.format("\tEngine Alias: %s\n", name));
+            }
+
+            logger.info(String.format("\tLanguage: %s (%s)\n", langName, langVersion));
+        }
     }
 }

@@ -330,7 +330,7 @@ public class RMNodeStarter {
         this.readAndSetTheRank();
         this.node = this.createLocalNode(nodeName);
 
-        logAvailableScriptEngines();
+        Tools.logAvailableScriptEngines(logger);
 
         this.nodeURL = node.getNodeInformation().getURL();
         logger.info("URL of this node " + this.nodeURL);
@@ -377,29 +377,6 @@ public class RMNodeStarter {
                 logger.error(ExitStatus.RMNODE_EXIT_FORCED.description);
                 System.exit(ExitStatus.RMNODE_EXIT_FORCED.exitCode);
             }
-        }
-    }
-
-    private void logAvailableScriptEngines() {
-        ScriptEngineManager mgr = new ScriptEngineManager();
-        List<ScriptEngineFactory> factories = mgr.getEngineFactories();
-        for (ScriptEngineFactory factory : factories) {
-
-            logger.info("ScriptEngineFactory Info");
-
-            String engName = factory.getEngineName();
-            String engVersion = factory.getEngineVersion();
-            String langName = factory.getLanguageName();
-            String langVersion = factory.getLanguageVersion();
-
-            logger.info(String.format("\tScript Engine: %s (%s)\n", engName, engVersion));
-
-            List<String> engNames = factory.getNames();
-            for (String name : engNames) {
-                logger.info(String.format("\tEngine Alias: %s\n", name));
-            }
-
-            logger.info(String.format("\tLanguage: %s (%s)\n", langName, langVersion));
         }
     }
 

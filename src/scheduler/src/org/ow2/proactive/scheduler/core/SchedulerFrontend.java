@@ -46,9 +46,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
-import javax.script.ScriptEngineFactory;
-import javax.script.ScriptEngineManager;
-
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
@@ -289,14 +286,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
                 logger.error("", e);
             }
 
-            logger.info("Available Script Engines :");
-            // Check available Script engines.
-            ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
-            for (ScriptEngineFactory factory : scriptEngineManager.getEngineFactories()) {
-                for (String name : factory.getNames()) {
-                    logger.info(name);
-                }
-            }
+            Tools.logAvailableScriptEngines(logger);
 
             // run !!
         } catch (Exception e) {
