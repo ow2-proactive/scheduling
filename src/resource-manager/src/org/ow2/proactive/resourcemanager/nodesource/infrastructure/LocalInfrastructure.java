@@ -1,6 +1,8 @@
 package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.security.KeyException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -104,9 +106,14 @@ public class LocalInfrastructure extends InfrastructureManager {
         }
         if (!this.paProperties.contains(CentralPAPropertyRepository.LOG4J.getName())) {
             StringBuilder sb = new StringBuilder(CentralPAPropertyRepository.LOG4J.getCmdLine());
-            sb.append("file:"); // log4j only understands urls
-            sb.append(rmHome).append("config").append(os.fs).append("log4j").append(os.fs).append(
-                    "log4j-defaultNode");
+
+            // log4j only understands urls
+            try {
+                sb.append((new File(rmHome)).toURI().toURL().toString()).append("config").append("/").append(
+                        "log4j").append("/").append("log4j-defaultNode");
+            } catch (MalformedURLException e) {
+                throw new IllegalStateException(e);
+            }
             paPropList.add(sb.toString());
         }
         if (!this.paProperties.contains(CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getName())) {

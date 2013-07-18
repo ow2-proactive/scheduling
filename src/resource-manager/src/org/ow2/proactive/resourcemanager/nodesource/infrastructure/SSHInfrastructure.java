@@ -176,12 +176,16 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
             }
             // log4j only understands urls
             sb.append("file:");
-            sb.append(schedulingPath);
-            sb.append(fs);
+            if (!schedulingPath.startsWith("/")) {
+                sb.append("/" + schedulingPath.replace("\\", "/"));
+            } else {
+                sb.append(schedulingPath.replace("\\", "/"));
+            }
+            sb.append("/");
             sb.append("config");
-            sb.append(fs);
+            sb.append("/");
             sb.append("log4j");
-            sb.append(fs);
+            sb.append("/");
             sb.append("log4j-defaultNode");
             if (containsSpace) {
                 sb.append("\"");

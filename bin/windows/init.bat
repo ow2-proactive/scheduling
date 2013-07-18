@@ -64,9 +64,9 @@ SET CLASSPATH=%CLASSPATH%;%JARS%;%PA_SCHEDULER%\addons
 
 rem log4j file
 IF "%1"=="" (
-	set LOG4J_FILE=file:%PA_SCHEDULER%/config/log4j/log4j-client
+	set LOG4J_FILE=file:/%PA_SCHEDULER:\=/%/config/log4j/log4j-client
 ) ELSE (
-	set LOG4J_FILE=file:%PA_SCHEDULER%/config/log4j/%1
+	set LOG4J_FILE=file:/%PA_SCHEDULER:\=/%/config/log4j/%1
 )
 
 rem if log4j file is server, use server security manager
