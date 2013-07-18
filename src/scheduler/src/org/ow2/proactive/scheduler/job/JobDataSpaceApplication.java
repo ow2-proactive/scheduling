@@ -37,6 +37,7 @@
 package org.ow2.proactive.scheduler.job;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 
 import org.apache.log4j.Logger;
@@ -96,12 +97,13 @@ public class JobDataSpaceApplication implements Serializable {
                 } else {
                     String localpath = PASchedulerProperties.DATASPACE_DEFAULTINPUT_LOCALPATH
                             .getValueAsStringOrNull();
+                    String localPathWithUserDir = handleLocalFolder(localpath, true, username);
+
                     String hostname = PASchedulerProperties.DATASPACE_DEFAULTINPUT_HOSTNAME
                             .getValueAsStringOrNull();
                     DataSpaceServiceStarter.createSpace(applicationId, PADataSpaces.DEFAULT_IN_OUT_NAME,
                             PASchedulerProperties.DATASPACE_DEFAULTINPUT_URL.getValueAsString() + username,
-                            localpath != null ? localpath + File.separator + username : null, hostname, true,
-                            false);
+                            localPathWithUserDir, hostname, true, false);
                 }
                 // create OUTPUT space
                 if (outputURL != null) {
@@ -114,12 +116,13 @@ public class JobDataSpaceApplication implements Serializable {
                 } else {
                     String localpath = PASchedulerProperties.DATASPACE_DEFAULTOUTPUT_LOCALPATH
                             .getValueAsStringOrNull();
+                    String localPathWithUserDir = handleLocalFolder(localpath, true, username);
+
                     String hostname = PASchedulerProperties.DATASPACE_DEFAULTOUTPUT_HOSTNAME
                             .getValueAsStringOrNull();
                     DataSpaceServiceStarter.createSpace(applicationId, PADataSpaces.DEFAULT_IN_OUT_NAME,
                             PASchedulerProperties.DATASPACE_DEFAULTOUTPUT_URL.getValueAsString() + username,
-                            localpath != null ? localpath + File.separator + username : null, hostname,
-                            false, false);
+                            localPathWithUserDir, hostname, false, false);
                 }
                 // create GLOBAL shared space
                 if (globalURL != null) {
@@ -130,13 +133,15 @@ public class JobDataSpaceApplication implements Serializable {
                     DataSpaceServiceStarter.createSpace(applicationId, SchedulerConstants.GLOBALSPACE_NAME,
                             globalURL, null, null, false, false);
                 } else {
-                    String localpath = PASchedulerProperties.DATASPACE_DEFAULTGLOBAL_LOCALPATH
+                    String localPath = PASchedulerProperties.DATASPACE_DEFAULTGLOBAL_LOCALPATH
                             .getValueAsStringOrNull();
+                    localPath = handleLocalFolder(localPath, false, username);
+
                     String hostname = PASchedulerProperties.DATASPACE_DEFAULTGLOBAL_HOSTNAME
                             .getValueAsStringOrNull();
 
                     DataSpaceServiceStarter.createSpace(applicationId, SchedulerConstants.GLOBALSPACE_NAME,
-                            PASchedulerProperties.DATASPACE_DEFAULTGLOBAL_URL.getValueAsString(), localpath,
+                            PASchedulerProperties.DATASPACE_DEFAULTGLOBAL_URL.getValueAsString(), localPath,
                             hostname, false, false);
                 }
 
@@ -151,6 +156,8 @@ public class JobDataSpaceApplication implements Serializable {
                 } else {
                     String localpath = PASchedulerProperties.DATASPACE_DEFAULTUSER_LOCALPATH
                             .getValueAsStringOrNull();
+                    String localPathWithUserDir = handleLocalFolder(localpath, true, username);
+
                     String hostname = PASchedulerProperties.DATASPACE_DEFAULTUSER_HOSTNAME
                             .getValueAsStringOrNull();
                     if (localpath != null) {
@@ -162,13 +169,31 @@ public class JobDataSpaceApplication implements Serializable {
                     }
                     DataSpaceServiceStarter.createSpace(applicationId, SchedulerConstants.USERSPACE_NAME,
                             PASchedulerProperties.DATASPACE_DEFAULTUSER_URL.getValueAsString() + username,
-                            localpath, hostname, false, false);
+                            localPathWithUserDir, hostname, false, false);
                 }
                 alreadyRegistered = true;
             } catch (Exception e) {
                 logger.warn("", e);
             }
         }
+    }
+
+    private String handleLocalFolder(String localpath, boolean createUserDir, String username)
+            throws IOException {
+        String localPathModified = null;
+        if (localpath != null) {
+            File localFile;
+            if (createUserDir) {
+                localFile = new File(localpath, username);
+            } else {
+                localFile = new File(localpath);
+            }
+            if (!localFile.exists()) {
+                localFile.mkdirs();
+            }
+            localPathModified = localFile.getCanonicalPath();
+        }
+        return localPathModified;
     }
 
     public void terminateDataSpaceApplication() {
