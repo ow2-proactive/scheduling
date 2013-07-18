@@ -83,7 +83,7 @@ IF "%1"=="rm-log4j-server" (
 )
 :sjps_
 
-set JAVA_CMD="%JAVA_HOME%\bin\java.exe" -Dproactive.home="%PA_SCHEDULER%" -Dproactive.configuration="file:%PA_SCHEDULER%\config\proactive\ProActiveConfiguration.xml" -Dpa.scheduler.home="%PA_SCHEDULER%" -Dpa.rm.home="%PA_SCHEDULER%" -Djava.security.manager -Djava.security.policy="%JAVA_POLICY%" -Dlog4j.configuration="%LOG4J_FILE%"
+set JAVA_CMD="%JAVA_HOME%\bin\java.exe" -Dproactive.home="%PA_SCHEDULER%" -Dproactive.configuration="%PA_SCHEDULER%\config\proactive\ProActiveConfiguration.xml" -Dpa.scheduler.home="%PA_SCHEDULER%" -Dpa.rm.home="%PA_SCHEDULER%" -Djava.security.manager -Djava.security.policy="%JAVA_POLICY%" -Dlog4j.configuration="%LOG4J_FILE%"
 
 rem Adding java tools to the path
 SET OK=1
