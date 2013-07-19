@@ -142,25 +142,36 @@ function printWelcomeMsg() {
 }
 
 function execute(cmd) {
+    var tryAfterReLogin = false;
     try {
         cmd.execute(currentContext);
     } catch (e) {
         if (e.javaException instanceof CLIException 
                 && (e.javaException.reason() == CLIException.REASON_UNAUTHORIZED_ACCESS)
                 && currentContext.getProperty(AbstractLoginCommand.PROP_PERSISTED_SESSION, java.lang.Boolean.TYPE, false)) {
-            currentContext.setProperty(AbstractLoginCommand.PROP_RENEW_SESSION, true);
-            if (getCredFile(currentContext) != null) {
-            	execute(new LoginWithCredentialsCommand(getCredFile(currentContext)));
-            } else if (getUser(currentContext) != null) {
-            	execute(new LoginCommand(getUser(currentContext)));
-            } else {
-                throw e;
-            }
-            cmd.execute(currentContext);
+            tryAfterReLogin = true;
         } else {
-            throw e;
+            printError(e);
         }
     }
+    if (tryAfterReLogin) {
+        try {
+            currentContext.setProperty(AbstractLoginCommand.PROP_RENEW_SESSION, true);
+            if (getCredFile() != null) {
+                execute(new LoginWithCredentialsCommand(getCredFile()));
+            } else if (getUser() != null) {
+                execute(new LoginCommand(getUser()));
+            }
+            cmd.execute(currentContext);
+        } catch (e) {
+            printError(e);
+        }
+    }
+}
+
+function printError(error) {
+    print("An error occurred while executing the command:\r\n");
+    error.javaException.printStackTrace();
 }
 
 

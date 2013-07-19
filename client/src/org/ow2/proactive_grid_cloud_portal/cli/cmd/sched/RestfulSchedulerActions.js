@@ -2,11 +2,11 @@ importClass(org.ow2.proactive_grid_cloud_portal.cli.ApplicationContextImpl);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.CLIException);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.SetUrlCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractLoginCommand);
-importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.LoginCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.LoginWithCredentialsCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.EvalScriptCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.PrintSessionCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractIModeCommand);
+importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.LoginSchedCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.SchedJsHelpCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.StartCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.StopCommand);
@@ -44,12 +44,12 @@ function url(url) {
 }
 
 function login(user) {
-    currentContext.setSessionId(null);
-    execute(new LoginCommand('' + user));
+    currentContext.setSessionId('');
+    execute(new LoginSchedCommand('' + user));
 }
 
 function loginwithcredentials(pathname) {
-    currentContext.setSessionId(null);
+    currentContext.setSessionId('');
     execute(new LoginWithCredentialsCommand('' + pathname));
 }
 
@@ -155,7 +155,7 @@ function reconnect() {
     } else if (getUser(currentContext) != null) {
         login(getUser(currentContext));
     } else {
-        print('use either login(username) or loginwithcredentials(cred-file) function\n')
+        print('use either login(username) or loginwithcredentials(cred-file) function\r\n')
 
     }
 }
@@ -165,7 +165,7 @@ function exit() {
 }
 
 function getUser() {
-    return currentContext.getProperty(LoginCommand.USERNAME, java.lang.String.prototype);
+    return currentContext.getProperty(LoginSchedCommand.USERNAME, java.lang.String.prototype);
 }
 
 function getCredFile() {
@@ -184,23 +184,34 @@ function prints() {
 }
 
 function execute(cmd) {
+    var tryAfterReLogin = false;
     try {
         cmd.execute(currentContext);
     } catch (e) {
         if (e.javaException instanceof CLIException 
                 && (e.javaException.reason() == CLIException.REASON_UNAUTHORIZED_ACCESS)
                 && currentContext.getProperty(AbstractLoginCommand.PROP_PERSISTED_SESSION, java.lang.Boolean.TYPE, false)) {
+            tryAfterReLogin = true;
+        } else {
+            printError(e);
+        }
+    }
+    if (tryAfterReLogin) {
+        try {
             currentContext.setProperty(AbstractLoginCommand.PROP_RENEW_SESSION, true);
             if (getCredFile() != null) {
                 execute(new LoginWithCredentialsCommand(getCredFile()));
             } else if (getUser() != null) {
-                execute(new LoginCommand(getUser()));
-            } else {
-                throw e;
+                execute(new LoginSchedCommand(getUser()));
             }
             cmd.execute(currentContext);
-        } else {
-            throw e;
+        } catch (e) {
+            printError(e);
         }
     }
+}
+
+function printError(error) {
+    print("An error occurred while executing the command:\r\n");
+    error.javaException.printStackTrace();
 }
