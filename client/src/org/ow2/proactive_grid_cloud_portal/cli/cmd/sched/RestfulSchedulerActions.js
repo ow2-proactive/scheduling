@@ -6,6 +6,7 @@ importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.LoginWithCredentialsComm
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.EvalScriptCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.PrintSessionCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractIModeCommand);
+importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.SetSilentCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.LoginSchedCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.SchedJsHelpCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.StartCommand);
@@ -158,6 +159,10 @@ function reconnect() {
         print('use either login(username) or loginwithcredentials(cred-file) function\r\n')
 
     }
+}
+
+function silent() {
+    execute(new SetSilentCommand());
 }
 
 function exit() {
