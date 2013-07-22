@@ -77,7 +77,7 @@ public class RmStatsCommand extends AbstractCommand implements Command {
             List<MBeanInfoView> infoList = readValue(response,
                     new TypeReference<List<MBeanInfoView>>() {
                     }, currentContext);
-            MBeanInfoView[] stats = new MBeanInfoView[infoList.size()];
+            MBeanInfoView[] stats =infoList.toArray(new MBeanInfoView[infoList.size()]);
             resultStack(currentContext).push(stats);
             if (!currentContext.isSilent()) {
                 writeLine(currentContext, "%s",
