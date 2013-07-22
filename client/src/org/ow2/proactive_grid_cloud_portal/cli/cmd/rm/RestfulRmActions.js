@@ -38,12 +38,12 @@ function url(url) {
 }
 
 function login(user) {
-    currentContext.setSessionId(null);
+    currentContext.setProperty('org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractLoginCommand.renewSession', true);
     execute(new LoginCommand('' + user));
 }
 
 function loginwithcredentials(pathname) {
-    currentContext.setSessionId(null);
+    currentContext.setProperty('org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractLoginCommand.renewSession', true);
     execute(new LoginWithCredentialsCommand('' + pathname));
 }
 
@@ -73,7 +73,7 @@ function locknodes(nodeUrl) {
     execute(new LockNodeCommand(nodeUrl));
 }
 
-function unlocknode(nodeUrl) {
+function unlocknodes(nodeUrl) {
     execute(new UnlockNodeCommand(nodeUrl));
 }
 
