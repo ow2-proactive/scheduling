@@ -778,6 +778,10 @@ public class SchedulerTHelper {
                         System.err.println("Output of failing task (" + t.getName() + ") :");
                         System.err.println(tres.getOutput().getAllLogs(true));
                     }
+                    if (tres.hadException()) {
+                        System.err.println("Exception occurred in task (" + t.getName() + ") :");
+                        tres.getException().printStackTrace(System.err);
+                    }
 
                 }
                 Assert.assertEquals("Task " + t.getName(), TaskStatus.FINISHED, ti.getStatus());
@@ -1150,8 +1154,8 @@ public class SchedulerTHelper {
      */
     private static void connect() throws Exception {
         SchedulerAuthenticationInterface authInt = getSchedulerAuth();
-        Credentials cred = Credentials.createCredentials(new CredData(admin_username, admin_password), authInt
-                .getPublicKey());
+        Credentials cred = Credentials.createCredentials(new CredData(admin_username, admin_password),
+                authInt.getPublicKey());
         adminSchedInterface = authInt.login(cred);
         initEventReceiver(adminSchedInterface);
     }

@@ -153,7 +153,8 @@ public class TestLoadJobs extends FunctionalTest {
         SchedulerMonitorsHandler monitorsHandler = new SchedulerMonitorsHandler();
 
         SchedulerAuthenticationInterface auth = SchedulerTHelper.getSchedulerAuth();
-        Credentials cred = Credentials.createCredentials(new CredData(SchedulerTHelper.user_username, SchedulerTHelper.user_password), auth.getPublicKey());
+        Credentials cred = Credentials.createCredentials(new CredData(SchedulerTHelper.user_username,
+            SchedulerTHelper.user_password), auth.getPublicKey());
         scheduler = auth.login(cred);
 
         MonitorEventReceiver eventReceiver = new MonitorEventReceiver(monitorsHandler);

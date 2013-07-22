@@ -531,7 +531,7 @@ public class JobDescriptorImpl implements JobDescriptor {
                             .getCount() - 1);
 
                     if (((EligibleTaskDescriptorImpl) task).getCount() == 0) {
-                        if (internalJob.getStatus()==JobStatus.PAUSED) {
+                        if (internalJob.getStatus() == JobStatus.PAUSED) {
                             pausedTasks.put(task.getTaskId(), (EligibleTaskDescriptor) task);
                         } else {
                             eligibleTasks.put(task.getTaskId(), (EligibleTaskDescriptor) task);

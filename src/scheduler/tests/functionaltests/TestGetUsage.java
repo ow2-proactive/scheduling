@@ -54,7 +54,8 @@ public class TestGetUsage extends FunctionalTest {
 
         // another user
         SchedulerAuthenticationInterface auth = SchedulerTHelper.getSchedulerAuth();
-        Credentials cred = Credentials.createCredentials(new CredData(SchedulerTHelper.user_username, SchedulerTHelper.user_password), auth.getPublicKey());
+        Credentials cred = Credentials.createCredentials(new CredData(SchedulerTHelper.user_username,
+            SchedulerTHelper.user_password), auth.getPublicKey());
         Scheduler otherUser = auth.login(cred);
 
         // This user has not ran any job

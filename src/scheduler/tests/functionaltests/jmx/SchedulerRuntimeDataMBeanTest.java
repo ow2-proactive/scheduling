@@ -56,8 +56,8 @@ public class SchedulerRuntimeDataMBeanTest extends FunctionalTest {
     private void testAsAdmin() throws Exception {
         final SchedulerAuthenticationInterface auth = SchedulerTHelper.getSchedulerAuth();
         final HashMap<String, Object> env = new HashMap<String, Object>(1);
-        env.put(JMXConnector.CREDENTIALS,
-                new Object[] { SchedulerTHelper.admin_username, SchedulerTHelper.admin_password });
+        env.put(JMXConnector.CREDENTIALS, new Object[] { SchedulerTHelper.admin_username,
+                SchedulerTHelper.admin_password });
         JMXConnector adminJmxConnector = JMXConnectorFactory.connect(new JMXServiceURL(auth
                 .getJMXConnectorURL(JMXTransportProtocol.RMI)), env);
 
@@ -99,8 +99,8 @@ public class SchedulerRuntimeDataMBeanTest extends FunctionalTest {
     private void testAsUser() throws Exception {
         final SchedulerAuthenticationInterface auth = SchedulerTHelper.getSchedulerAuth();
         final HashMap<String, Object> env = new HashMap<String, Object>(1);
-        env.put(JMXConnector.CREDENTIALS,
-                new Object[] { SchedulerTHelper.user_username, SchedulerTHelper.user_password });
+        env.put(JMXConnector.CREDENTIALS, new Object[] { SchedulerTHelper.user_username,
+                SchedulerTHelper.user_password });
         JMXConnector userJmxConnector = JMXConnectorFactory.connect(new JMXServiceURL(auth
                 .getJMXConnectorURL(JMXTransportProtocol.RMI)), env);
 

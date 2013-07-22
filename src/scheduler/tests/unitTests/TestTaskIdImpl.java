@@ -7,13 +7,14 @@ import org.junit.Test;
 
 import static junit.framework.Assert.assertEquals;
 
+
 public class TestTaskIdImpl {
 
     @Test
     public void testGetIterationIndex() throws Exception {
         TaskId taskNoIterationIndex = TaskIdImpl.createTaskId(new JobIdImpl(1L, "job"), "task", 1, false);
-        TaskId taskIterationIndexSmallerThan9 = TaskIdImpl.createTaskId(new JobIdImpl(1L, "job"), "task#1", 1,
-                false);
+        TaskId taskIterationIndexSmallerThan9 = TaskIdImpl.createTaskId(new JobIdImpl(1L, "job"), "task#1",
+                1, false);
         TaskId taskIterationIndexGreaterThan9 = TaskIdImpl.createTaskId(new JobIdImpl(1L, "job"), "task#10",
                 1, false);
         TaskId taskReplicatedAndIterated = TaskIdImpl.createTaskId(new JobIdImpl(1L, "job"), "task#10*10", 1,
@@ -30,8 +31,8 @@ public class TestTaskIdImpl {
         TaskId taskNoReplicationIndex = TaskIdImpl.createTaskId(new JobIdImpl(1L, "job"), "task", 1, false);
         TaskId taskReplicationIndexSmallerThan9 = TaskIdImpl.createTaskId(new JobIdImpl(1L, "job"), "task*1",
                 1, false);
-        TaskId taskReplicationIndexGreaterThan9 = TaskIdImpl.createTaskId(new JobIdImpl(1L, "job"), "task*10",
-                1, false);
+        TaskId taskReplicationIndexGreaterThan9 = TaskIdImpl.createTaskId(new JobIdImpl(1L, "job"),
+                "task*10", 1, false);
         TaskId taskReplicatedAndIterated = TaskIdImpl.createTaskId(new JobIdImpl(1L, "job"), "task#10*10", 1,
                 false);
 

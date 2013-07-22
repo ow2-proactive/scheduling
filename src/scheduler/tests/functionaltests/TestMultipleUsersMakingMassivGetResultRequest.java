@@ -96,7 +96,8 @@ public class TestMultipleUsersMakingMassivGetResultRequest extends SchedulerCons
                         SchedulerTHelper.log(Thread.currentThread().getName() +
                             " -> Connecting the scheduler");
                         Credentials cred = Credentials.createCredentials(new CredData(
-                            SchedulerTHelper.admin_username, SchedulerTHelper.admin_password), auth.getPublicKey());
+                            SchedulerTHelper.admin_username, SchedulerTHelper.admin_password), auth
+                                .getPublicKey());
                         Scheduler user = auth.login(cred);
                         SchedulerTHelper.log(Thread.currentThread().getName() + " -> Connected");
                         long start = System.currentTimeMillis();

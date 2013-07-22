@@ -80,7 +80,7 @@ public class AuthenticationTest extends SchedulerConsecutive {
 
         try {
             Credentials cred = Credentials.createCredentials(new CredData(SchedulerTHelper.admin_username,
-                    SchedulerTHelper.admin_password), pubKey);
+                SchedulerTHelper.admin_password), pubKey);
             Scheduler admin = auth.login(cred);
             admin.disconnect();
             SchedulerTHelper.log("Passed: successfull authentication");
@@ -95,7 +95,7 @@ public class AuthenticationTest extends SchedulerConsecutive {
 
         try {
             Credentials cred = Credentials.createCredentials(new CredData(SchedulerTHelper.user_username,
-                    SchedulerTHelper.user_password), pubKey);
+                SchedulerTHelper.user_password), pubKey);
             Scheduler user = auth.login(cred);
             user.disconnect();
             SchedulerTHelper.log("Passed: successfull authentication");
@@ -110,7 +110,8 @@ public class AuthenticationTest extends SchedulerConsecutive {
         SchedulerTHelper.log("Trying to authorized as an admin with incorrect user name and password");
 
         try {
-            Credentials cred = Credentials.createCredentials(new CredData(SchedulerTHelper.admin_username, "b"), pubKey);
+            Credentials cred = Credentials.createCredentials(new CredData(SchedulerTHelper.admin_username,
+                "b"), pubKey);
             auth.login(cred);
             SchedulerTHelper.log("Error: successfull authentication");
             assertTrue(false);
@@ -122,7 +123,8 @@ public class AuthenticationTest extends SchedulerConsecutive {
         SchedulerTHelper.log("Trying to authorized as a user with incorrect user name and password");
 
         try {
-            Credentials cred = Credentials.createCredentials(new CredData(SchedulerTHelper.user_username, "b"), pubKey);
+            Credentials cred = Credentials.createCredentials(
+                    new CredData(SchedulerTHelper.user_username, "b"), pubKey);
             auth.login(cred);
             SchedulerTHelper.log("Error: successfull authentication");
             assertTrue(false);
