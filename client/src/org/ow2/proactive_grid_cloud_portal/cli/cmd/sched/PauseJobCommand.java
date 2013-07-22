@@ -61,8 +61,9 @@ public class PauseJobCommand extends AbstractJobCommand implements Command {
                 writeLine(currentContext, "Cannot pause %s.", job());
             }
         } catch (Exception e) {
-            handleError("An error occurred while attempting to pause %s:"
-                    + job(), e, currentContext);
+            handleError(String.format(
+                    "An error occurred while attempting to pause %s:", job()),
+                    e, currentContext);
         }
 
     }

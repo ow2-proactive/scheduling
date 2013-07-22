@@ -58,9 +58,9 @@ public class ResumeJobCommand extends AbstractJobCommand implements Command {
                     currentContext.getSessionId(), jobId);
             resultStack(currentContext).push(success);
             if (success) {
-                writeLine(currentContext, "%s resumed successfully.", jobId);
+                writeLine(currentContext, "%s resumed successfully.", job());
             } else {
-                writeLine(currentContext, "Cannot resume %s.", jobId);
+                writeLine(currentContext, "Cannot resume %s.", job());
             }
         } catch (Exception e) {
             handleError(String.format(
