@@ -38,7 +38,9 @@ package org.ow2.proactive_grid_cloud_portal.rm;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 
@@ -50,8 +52,12 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.resourcemanager.common.util.RMCachingProxyUserInterface;
 import org.ow2.proactive_grid_cloud_portal.RestTestServer;
 import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
 import org.jboss.resteasy.client.ProxyFactory;
 import org.jrobin.core.RrdException;
 import org.json.simple.JSONArray;
@@ -67,7 +73,9 @@ import org.rrd4j.core.RrdDef;
 import org.rrd4j.core.Sample;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -137,7 +145,7 @@ public class RMRestTest extends RestTestServer {
         when(rm.shutdown(false)).thenReturn(new BooleanWrapper(true));
 
         String sessionId = RMSessionMapper.getInstance().add(rm);
-        HttpResponse response = callHttpMethod("shutdown", sessionId);
+        HttpResponse response = callHttpGetMethod("shutdown", sessionId);
 
         assertEquals(HttpURLConnection.HTTP_OK, response.getStatusLine().getStatusCode());
         verify(rm).shutdown(false);
@@ -149,16 +157,47 @@ public class RMRestTest extends RestTestServer {
         when(rm.shutdown(true)).thenReturn(new BooleanWrapper(true));
 
         String sessionId = RMSessionMapper.getInstance().add(rm);
-        HttpResponse response = callHttpMethod("shutdown?preempt=true", sessionId);
+        HttpResponse response = callHttpGetMethod("shutdown?preempt=true", sessionId);
 
         assertEquals(HttpURLConnection.HTTP_OK, response.getStatusLine().getStatusCode());
         verify(rm).shutdown(true);
     }
 
-    private HttpResponse callHttpMethod(String httpMethod, String sessionId) throws IOException {
+    // PORTAL-326
+    @Test
+    public void testAddNodeOverloading() throws Exception {
+        RMCachingProxyUserInterface rm = mock(RMCachingProxyUserInterface.class);
+        String sessionId = RMSessionMapper.getInstance().add(rm);
+        when(rm.addNode(anyString())).thenReturn(new BooleanWrapper(true));
+
+        List<NameValuePair> firstCall = Collections.<NameValuePair>singletonList(new BasicNameValuePair("nodeurl", "url"));
+        callHttpPostMethod("node", sessionId, firstCall);
+
+        verify(rm).addNode("url");
+
+        reset(rm);
+        when(rm.addNode(anyString(), anyString())).thenReturn(new BooleanWrapper(true));
+
+        List<NameValuePair> secondCall = new ArrayList<NameValuePair>();
+        secondCall.add(new BasicNameValuePair("nodeurl", "urlwithnsname"));
+        secondCall.add(new BasicNameValuePair("nodesource", "ns"));
+        callHttpPostMethod("node", sessionId, secondCall);
+
+        verify(rm).addNode("urlwithnsname", "ns");
+    }
+
+    private HttpResponse callHttpGetMethod(String httpMethod, String sessionId) throws IOException {
         HttpGet httpGet = new HttpGet("http://localhost:" + port + "/rm/" + httpMethod);
         httpGet.setHeader("sessionid", sessionId);
         return new DefaultHttpClient().execute(httpGet);
+    }
+
+    private HttpResponse callHttpPostMethod(String httpMethod, String sessionId,
+            List<NameValuePair> postParameters) throws IOException {
+        HttpPost httpPost = new HttpPost("http://localhost:" + port + "/rm/" + httpMethod);
+        httpPost.setHeader("sessionid", sessionId);
+        httpPost.setEntity(new UrlEncodedFormEntity(postParameters));
+        return new DefaultHttpClient().execute(httpPost);
     }
 
 }

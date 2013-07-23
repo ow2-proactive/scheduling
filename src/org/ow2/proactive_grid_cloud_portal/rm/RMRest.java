@@ -69,8 +69,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
-import org.jboss.resteasy.annotations.GZIP;
-import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
@@ -95,6 +93,8 @@ import org.ow2.proactive_grid_cloud_portal.common.StatHistoryCaching;
 import org.ow2.proactive_grid_cloud_portal.common.StatHistoryCaching.StatHistoryCacheEntry;
 import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
 import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
+import org.jboss.resteasy.annotations.GZIP;
+import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import org.rrd4j.ConsolFun;
 import org.rrd4j.core.FetchData;
 import org.rrd4j.core.FetchRequest;
@@ -261,26 +261,6 @@ public class RMRest implements RMRestInterface {
     }
 
     /**
-     * Adds an existing node to the default node source of the resource manager.
-     *
-     * @param sessionId a valid session id
-     * @param nodeUrl
-     *            the url of the node
-     * @return true if new node is added successfully
-     * @throws NotConnectedException 
-     */
-    @Override
-    @POST
-    @Produces("application/json")
-    @Path("node")
-    public boolean addNode(@HeaderParam("sessionid")
-    String sessionId, @FormParam("nodeurl")
-    String nodeUrl) throws NotConnectedException {
-        ResourceManager rm = checkAccess(sessionId);
-        return rm.addNode(nodeUrl).getBooleanValue();
-    }
-
-    /**
      * Adds an existing node to the particular node source.
      *
      * @param sessionId
@@ -288,21 +268,24 @@ public class RMRest implements RMRestInterface {
      * @param url
      *            the url of the node
      * @param nodesource
-     *            the node source
+     *            the node source, can be null
      * @return true if new node is added successfully, runtime exception
      *         otherwise
-     * @throws NotConnectedException 
+     * @throws NotConnectedException
      */
     @Override
     @POST
     @Path("node")
     @Produces("application/json")
-    public boolean addNode(@HeaderParam("sessionid")
-    String sessionId, @FormParam("nodeurl")
-    String url, @FormParam("nodesource")
-    String nodesource) throws NotConnectedException {
+    public boolean addNode(@HeaderParam("sessionid") String sessionId,
+            @FormParam("nodeurl") String url,
+            @FormParam("nodesource") String nodesource) throws NotConnectedException {
         ResourceManager rm = checkAccess(sessionId);
-        return rm.addNode(url, nodesource).getBooleanValue();
+        if (nodesource == null) {
+            return rm.addNode(url).getBooleanValue();
+        } else {
+            return rm.addNode(url, nodesource).getBooleanValue();
+        }
     }
 
     /**

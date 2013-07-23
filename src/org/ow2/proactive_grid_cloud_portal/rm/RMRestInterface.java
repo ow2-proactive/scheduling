@@ -58,8 +58,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
-import org.jboss.resteasy.annotations.GZIP;
-import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.node.NodeException;
 import org.ow2.proactive.resourcemanager.common.RMState;
@@ -70,6 +68,8 @@ import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
+import org.jboss.resteasy.annotations.GZIP;
+import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 
 
 @Path("/rm")
@@ -116,19 +116,11 @@ public interface RMRestInterface {
     String sessionId) throws NotConnectedException;
 
     @POST
-    @Produces("application/json")
-    @Path("node")
-    boolean addNode(@HeaderParam("sessionid")
-    String sessionId, @FormParam("nodeurl")
-    String nodeUrl) throws NotConnectedException;
-
-    @POST
     @Path("node")
     @Produces("application/json")
-    boolean addNode(@HeaderParam("sessionid")
-    String sessionId, @FormParam("nodeurl")
-    String url, @FormParam("nodesource")
-    String nodesource) throws NotConnectedException;
+    boolean addNode(@HeaderParam("sessionid") String sessionId,
+            @FormParam("nodeurl") String url,
+            @FormParam("nodesource") String nodesource) throws NotConnectedException;
 
     @GET
     @Path("node/isavailable")
