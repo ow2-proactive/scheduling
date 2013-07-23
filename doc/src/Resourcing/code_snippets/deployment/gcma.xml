@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <GCMApplication xmlns="urn:gcm:application:1.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="urn:gcm:application:1.0 http://proactive.inria.fr/schemas/gcm/1.0/ApplicationDescriptorSchema.xsd">
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="urn:gcm:application:1.0 http://proactive.inria.fr/schemas/gcm/1.0/ApplicationDescriptorSchema.xsd">
 
 	<environment>
-		<javaPropertyVariable name="proactive.home" />
+		<javaPropertyVariable name="proactive.home"/>
 		<!-- this variable will be replaced by a path of a GCMD to deploy, by RMAdmin -->
-		<javaPropertyVariable name="gcmd.file" />
-		<programVariable name="jvmargDefinedByIM" />
+		<javaPropertyVariable name="gcmd.file"/>
+		<programVariable name="jvmargDefinedByIM"/>
 	</environment>
 	<application>
 		<proactive base="root" relpath="${proactive.home}">
@@ -17,9 +17,9 @@
 					<pathElement base="proactive" relpath="/dist/lib/ProActive_ResourceManager.jar"/>
 					<pathElement base="proactive" relpath="/dist/lib/ProActive_Scheduler-worker.jar"/>
 					<pathElement base="proactive" relpath="/dist/lib/ProActive_SRM-common.jar"/>
-					<pathElement base="proactive" relpath="/dist/lib/jruby-engine.jar"/>
 					<pathElement base="proactive" relpath="/dist/lib/jruby.jar"/>
-					<pathElement base="proactive" relpath="/dist/lib/jython-engine.jar"/>
+					<pathElement base="proactive" relpath="/dist/lib/jython-2.5.4-rc1.jar"/>
+					<pathElement base="proactive" relpath="/dist/lib/groovy-all-2.1.5.jar"/>
 					<pathElement base="proactive" relpath="/dist/lib/jython.jar"/>
 					<pathElement base="proactive" relpath="/dist/lib/common-net-1.4.1.jar"/>
 					<pathElement base="proactive" relpath="/dist/lib/common-vfs-1.0.jar"/>
@@ -29,7 +29,7 @@
 				<log4jProperties base="proactive" relpath="/config/log4j/log4j-defaultNode"/>
 			</configuration>
 			<virtualNode id="Workers">
-				<nodeProvider refid="workers" />
+				<nodeProvider refid="workers"/>
 			</virtualNode>
 		</proactive>
 	</application>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job xmlns="urn:proactive:jobdescriptor:3.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="urn:proactive:jobdescriptor:3.2 ../../src/scheduler/src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/3.2/schedulerjob.xsd"
+		name="JobScriptEngines" cancelJobOnError="true">
+	<description>2 tasks with variable durations</description>
+	<taskFlow>
+		<task name="javascripttask">
+			<description>ruby task</description>
+			<scriptExecutable>
+				<script>
+					<code language="javascript">
+						print("Hello World")
+						result = true
+					</code>
+				</script>
+			</scriptExecutable>
+		</task>
+		<task name="jythontask">
+			<description>python task</description>
+			<scriptExecutable>
+				<script>
+					<!-- For python code it is mandatory to strictly control indentation as it has a meaning in the language -->
+					<code language="python"><![CDATA[
+print("Hello World");
+result = True;
+                 ]]></code>
+				</script>
+			</scriptExecutable>
+		</task>
+		<task name="jrubytask">
+			<description>ruby task</description>
+			<scriptExecutable>
+				<script>
+					<code language="ruby">
+						puts "Hello World"
+						$result = true
+					</code>
+				</script>
+			</scriptExecutable>
+		</task>
+		<task name="groovytask">
+			<description>groovy task</description>
+			<scriptExecutable>
+				<script>
+					<code language="groovy">
+						print("Hello World")
+						result = true
+					</code>
+				</script>
+			</scriptExecutable>
+		</task>
+	</taskFlow>
+</job>

@@ -345,7 +345,8 @@ public class RMTHelper {
         String distLib = home + File.separator + "dist" + File.separator + "lib" + File.separator;
         StringBuilder classpath = new StringBuilder();
         for (String name : new String[] { "ProActive_tests.jar", "ProActive_SRM-common.jar",
-                "ProActive_ResourceManager.jar", "ProActive.jar", "jruby-engine.jar", "jython-engine.jar" }) {
+                "ProActive_ResourceManager.jar", "ProActive.jar", "jruby.jar", "jython-2.5.3",
+                "groovy-all-2.1.5.jar" }) {
             classpath.append(distLib).append(name).append(File.pathSeparator);
         }
         classpath.append(home + File.separator + "classes" + File.separator + "schedulerTests");

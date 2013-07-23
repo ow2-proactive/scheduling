@@ -55,8 +55,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import javax.script.ScriptEngineFactory;
-import javax.script.ScriptEngineManager;
 import javax.security.auth.login.LoginException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -959,7 +957,7 @@ public class RMNodeStarter {
         private String paPropString;
         private List<String> paPropList;
         private int addAttempts = -1, addAttemptsDelay = -1;
-        private final String[] requiredJARs = { "jruby-engine.jar", "sigar/sigar.jar", "jython-engine.jar",
+        private final String[] requiredJARs = { "jruby.jar", "sigar/sigar.jar", "jython-2.5.4-rc1.jar",
                 "groovy-all-2.1.5.jar",
                 "commons-logging-1.1.1.jar",
                 "ProActive_Scheduler-core.jar",// SCHEDULING-1338 and SCHEDULING-1307 : core required for forked java task

@@ -15,8 +15,9 @@ set JAVA_OPTS_NODE=-Djava.security.policy=%RM_HOME_NODE%\config\security.java.po
 set CREDENTIALS="UPDATE_ME"
 
 set CLASSPATH=%CLASSPATH%;
-set CLASSPATH=%CLASSPATH%;%RM_HOME_NODE%\dist\lib\jruby-engine.jar
-set CLASSPATH=%CLASSPATH%;%RM_HOME_NODE%\dist\lib\jython-engine.jar
+set CLASSPATH=%CLASSPATH%;%RM_HOME_NODE%\dist\lib\jruby.jar
+set CLASSPATH=%CLASSPATH%;%RM_HOME_NODE%\dist\lib\jython-2.5.4-rc1.jar
+set CLASSPATH=%CLASSPATH%;%RM_HOME_NODE%\dist\lib\groovy-all-2.1.5.jar
 set CLASSPATH=%CLASSPATH%;%RM_HOME_NODE%\dist\lib\commons-logging-1.1.1.jar
 set CLASSPATH=%CLASSPATH%;%RM_HOME_NODE%\dist\lib\ProActive_SRM-common.jar
 set CLASSPATH=%CLASSPATH%;%RM_HOME_NODE%\dist\lib\ProActive_ResourceManager.jar

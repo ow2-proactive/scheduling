@@ -803,9 +803,22 @@ task2.setGenerationScript(gscript);
 				<para>
 					Take a look at the following example to understand the syntax of a task:
 				</para>
-				<programlisting language="xml"><textobject><textdata fileref="code_snippets/job_descriptors/script_task_simple.xml"/></textobject></programlisting>
+				<programlisting language="xml">
+					<textobject>
+						<textdata fileref="code_snippets/job_descriptors/script_task_simple.xml"/>
+					</textobject>
+				</programlisting>
 				<para>
-					<emphasis>Note</emphasis> : The syntax of a script task is very similar to pre and post scripts (see <xref linkend="pre_post"/>).
+					<emphasis>Note</emphasis>
+					: The syntax of a script task is very similar to pre and post scripts (see<xref linkend="pre_post"/>
+					).
+				</para>
+				<para>
+					<emphasis>Warning</emphasis>
+					: When writing python code between &lt;code&gt; tags, keep in mind that indentation has a semantic
+					meaning in python.
+					Accordingly, the python code should not follow the indentation of the &lt;code&gt; tags and start
+					from the leftmost column instead.
 				</para>
 				<para>
 					It is also possible to reference an external script file as shown below:

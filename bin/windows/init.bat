@@ -43,9 +43,8 @@ IF EXIST "%PA_SCHEDULER%\classes\scheduler" (
 	rem Script engines must be added to classpath to be found
 	rem it must also placed before jars containing jar-index
 	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\jruby.jar
-	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\jruby-engine.jar
 	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\sigar\sigar.jar
-	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\jython-engine.jar
+	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\jython-2.5.4-rc1.jar
 	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\groovy-all-2.1.5.jar
 	rem  Needed explicitly by VFS (file transfer in pre/post script
 	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\commons-logging-1.1.1.jar

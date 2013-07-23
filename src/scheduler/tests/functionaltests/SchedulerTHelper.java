@@ -241,9 +241,9 @@ public class SchedulerTHelper {
         String home = PAResourceManagerProperties.RM_HOME.getValueAsString();
         StringBuilder classpath = new StringBuilder();
         String distLib = home + File.separator + "dist" + File.separator + "lib" + File.separator;
-        for (String name : new String[] { "ProActive_tests.jar", "ProActive_SRM-common.jar",
-                "ProActive_Scheduler-core.jar", "ProActive_Scheduler-mapreduce.jar",
-                "ProActive_ResourceManager.jar", "ProActive.jar", "jruby-engine.jar", "jython-engine.jar" }) {
+        for (String name : new String[] { "ProActive_tests.jar", "jruby.jar", "jython-2.5.4-rc1.jar",
+                "groovy-all-2.1.5.jar", "ProActive_SRM-common.jar", "ProActive_Scheduler-core.jar",
+                "ProActive_Scheduler-mapreduce.jar", "ProActive_ResourceManager.jar", "ProActive.jar" }) {
             classpath.append(distLib).append(name).append(File.pathSeparator);
         }
         classpath.append(home + File.separator + "classes" + File.separator + "schedulerTests");

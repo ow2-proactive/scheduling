@@ -31,7 +31,7 @@ var schedulerOutputFile = new File(logsDir, "Scheduler-stdout.log")
 var jettyOutputFile = new File(logsDir, "Jetty-stdout.log")
 
 /** Jars relative to lib */
-var scriptJars = ["jruby-engine.jar", "jython-engine.jar", "groovy-all-2.1.5.jar"];
+var scriptJars = ["jruby.jar", "jython-2.5.4-rc1.jar", "groovy-all-2.1.5.jar"];
 var vfsJars = ["commons-logging-1.1.1.jar","commons-httpclient-3.1.jar"];
 var coreJars = ["ProActive.jar", "ProActive_SRM-common.jar", "ProActive_ResourceManager.jar", "ProActive_Scheduler-core.jar", "ProActive_Scheduler-mapreduce.jar"];
 var jettyJars = ["jetty-6.1.18.jar", "jetty-util-6.1.18.jar", "servlet-api-2.5-6.1.11.jar","ProActive_SRM-common.jar"];

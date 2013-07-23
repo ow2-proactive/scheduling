@@ -17,8 +17,9 @@ JAVA_OPTS_NODE="-Djava.security.policy=$RM_HOME_NODE/config/security.java.policy
 CREDENTIALS="UPDATE_ME"
 
 CLASSPATH="-cp .:"
-CLASSPATH=$CLASSPATH:$RM_HOME_NODE/dist/lib/jruby-engine.jar
-CLASSPATH=$CLASSPATH:$RM_HOME_NODE/dist/lib/jython-engine.jar
+CLASSPATH=$CLASSPATH:$RM_HOME_NODE/dist/lib/jruby.jar
+CLASSPATH=$CLASSPATH:$RM_HOME_NODE/dist/lib/jython-2.5.4-rc1.jar
+CLASSPATH=$CLASSPATH:$RM_HOME_NODE/dist/lib/groovy-all-2.1.5.jar
 CLASSPATH=$CLASSPATH:$RM_HOME_NODE/dist/lib/sigar/sigar.jar
 CLASSPATH=$CLASSPATH:$RM_HOME_NODE/dist/lib/commons-logging-1.1.1.jar
 CLASSPATH=$CLASSPATH:$RM_HOME_NODE/dist/lib/ProActive_SRM-common.jar
