@@ -47,6 +47,7 @@ import java.net.UnknownHostException;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
+import org.objectweb.proactive.core.exceptions.NotBoundException;
 import org.objectweb.proactive.core.remoteobject.AbstractRemoteObjectFactory;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectFactory;
 import org.objectweb.proactive.core.util.ProActiveInet;
@@ -156,13 +157,13 @@ public abstract class Connection<T extends Authentication> implements Loggable, 
                     }
                     // success
                     break;
+                } catch (NotBoundException e) {
+                    // expected NotBoundException is not printed in the log
+                    leftTime = sleepOrThrow(startTime, leftTime, e);
                 } catch (Exception e) {
-                    logger.debug("", e);
-                    Thread.sleep(Math.min(PERIOD, leftTime));
-                    leftTime -= (System.currentTimeMillis() - startTime);
-                    if (leftTime <= 0) {
-                        throw e;
-                    }
+                    // unexpected Exception
+                    logger.error("", e);
+                    leftTime = sleepOrThrow(startTime, leftTime, e);
                 }
             }
 
@@ -174,11 +175,7 @@ public abstract class Connection<T extends Authentication> implements Loggable, 
                     // success
                     break;
                 } else {
-                    Thread.sleep(Math.min(PERIOD, leftTime));
-                    leftTime -= (System.currentTimeMillis() - startTime);
-                    if (leftTime <= 0) {
-                        throw new Exception(ERROR_NOT_ACTIVATED);
-                    }
+                    leftTime = sleepOrThrow(startTime, leftTime, new Exception(ERROR_NOT_ACTIVATED));
                 }
             }
 
@@ -188,6 +185,24 @@ public abstract class Connection<T extends Authentication> implements Loggable, 
 
         // TODO two cycles has the same pattern => the code can be unified
         return authentication;
+    }
+
+    /**
+     * Waits for the configured period or throw an exception if not time is left
+     * @param startTime original starting time
+     * @param leftTime time still available
+     * @param toThrow exception to throw if time is consumed
+     * @return new available time
+     * @throws Exception
+     */
+    private long sleepOrThrow(final long startTime, long leftTime, final Exception toThrow) throws Exception {
+        Thread.sleep(Math.min(PERIOD, leftTime));
+        leftTime -= (System.currentTimeMillis() - startTime);
+        if (leftTime <= 0) {
+            logger.error(toThrow);
+            throw toThrow;
+        }
+        return leftTime;
     }
 
     /**
