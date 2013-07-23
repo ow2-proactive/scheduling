@@ -28,6 +28,8 @@ IF EXIST "%PA_SCHEDULER%\classes\scheduler" (
 	SET JARS=
 	rem ProActive.jar : Use jar index to avoid 'command too long'
 	SET JARS=!JARS!;%PA_SCHEDULER%\lib\ProActive\ProActive.jar
+	rem jruby.jar is put in front because jline internal package is used in the command-line interpreters
+	SET JARS=!JARS!;%PA_SCHEDULER%\lib\common\script\jruby.jar
 	rem Scheduler libraries
 	FOR %%j IN ("%PA_SCHEDULER%\lib\common\*.jar") DO SET JARS=!JARS!;%%j
 	FOR %%j IN ("%PA_SCHEDULER%\lib\common\script\*.jar") DO SET JARS=!JARS!;%%j

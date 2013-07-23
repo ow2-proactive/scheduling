@@ -24,9 +24,13 @@ fi
 PA_SCHEDULER=$(cd $workingDir/../.././ || (echo "Broken Scheduler/Resource Manager installation" ; exit 1) && echo $PWD)
 
 print_jars() {
-        find "$1" -name "*.jar" | while read jar; do
-            printf "%s:" "$jar"
-        done
+    # jruby.jar is put in front because jline internal package is used in the command-line interpreters
+    (
+        find "$1" -name "jruby.jar"
+        find "$1" -name "*.jar" | grep -v jruby.jar
+    ) | while read jar; do
+        printf "%s:" "$jar"
+    done
 }
 
 # ----
