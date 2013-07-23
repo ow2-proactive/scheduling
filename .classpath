@@ -67,8 +67,9 @@
 	<classpathentry kind="lib" path="lib/scheduling/jetty-util-6.1.18.jar"/>
 	<classpathentry kind="lib" path="lib/scheduling/jfreechart-1.0.2.jar"/>
 	<classpathentry kind="lib" path="lib/scheduling/jna.jar"/>
-	<classpathentry kind="lib" path="lib/scheduling/jruby-engine.jar"/>
 	<classpathentry kind="lib" path="lib/scheduling/jruby.jar"/>
+	<classpathentry kind="lib" path="lib/scheduling/jython-2.5.4-rc1.jar"/>
+	<classpathentry kind="lib" path="lib/scheduling/groovy-all-2.1.5.jar"/>
 	<classpathentry kind="lib" path="lib/scheduling/jsch-0.1.31.jar"/>
 	<classpathentry kind="lib" path="lib/scheduling/jsch-0.1.38.jar"/>
 	<classpathentry kind="lib" path="lib/scheduling/julia-asm-2.5.3-SNAPSHOT.jar"/>

@@ -97,8 +97,8 @@ public class RestFuncTHelper {
     private static URL forkedTaskLog4JConfig = RestFuncTHelper.class
             .getResource("config/forkedTaskLog4JConfig.properties");
 
-    private static final String[] requiredJARs = { "script-js.jar", "gson-2.1.jar", "jruby-engine.jar",
-            "jython-engine.jar", "commons-logging-1.1.1.jar", "ProActive_Scheduler-core.jar",
+    private static final String[] requiredJARs = { "script-js.jar", "gson-2.1.jar", "jruby.jar",
+            "jython-2.5.4-rc1.jar","groovy-all-2.1.5.jar", "commons-logging-1.1.1.jar", "ProActive_Scheduler-core.jar",
             "ProActive_SRM-common.jar", "ProActive_ResourceManager.jar", "ProActive_Scheduler-worker.jar",
             "ProActive_Scheduler-mapreduce.jar", "commons-httpclient-3.1.jar", "commons-codec-1.3.jar",
             "ProActive.jar" };
