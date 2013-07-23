@@ -196,7 +196,7 @@ set RM_URL_STR=
         GOTO :WaitLoop
 :EndWaitLoop
 
-set CMD=-A %REST_WAR% -p %PORT%
+set CMD=-A "%REST_WAR%" -p %PORT%
 
 IF %DO_SCHED% == true (
     IF NOT ["%SCHED_URL%"]==[] (
@@ -205,7 +205,7 @@ IF %DO_SCHED% == true (
         echo Error: Could not determine Scheduler URL
         goto :eof
     )
-    set CMD=%CMD% -S %SCHED_WAR% -s %SCHED_URL%
+    set CMD=%CMD% -S "%SCHED_WAR%" -s %SCHED_URL%
 )
 IF %DO_RM% == true (
     IF NOT ["%RM_URL%"]==[] (
@@ -214,7 +214,7 @@ IF %DO_RM% == true (
         echo Error: Could not determine RM URL
         goto :eof
     )
-    set CMD=%CMD% -R %RM_WAR% -r %RM_URL%
+    set CMD=%CMD% -R "%RM_WAR%" -r %RM_URL%
 )
 IF %VERBOSE% == false (
     set CMD=%CMD% -q

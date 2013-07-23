@@ -1,5 +1,5 @@
 @echo off
-SETLOCAL
+SETLOCAL EnableDelayedExpansion
 
 set VERBOSE=true
 set VERBOSE_JETTY=false
@@ -10,6 +10,7 @@ set SCHED=
 set JVM_OPTS=
 set RM_URL=
 set SCHED_URL=
+set TMPV=
 
 :ParamParseLoop
 IF [%1]==[] goto :ParamParseEndLoop
@@ -30,7 +31,9 @@ IF [%1]==[] goto :ParamParseEndLoop
             echo -A must point to a Web App folder or .war file
             goto :eof
         )
-        set REST=%2
+        set TMPV=%2
+	set REST=!TMPV:"=!
+
         SHIFT
         goto :ParamParseShift
     ) 
@@ -39,7 +42,8 @@ IF [%1]==[] goto :ParamParseEndLoop
             echo -R must point to a Web App folder or .war file
             goto :eof
         )
-        set RM=%2
+        set TMPV=%2
+        set RM=!TMPV:"=!
         SHIFT
         goto :ParamParseShift
     ) 
@@ -48,7 +52,8 @@ IF [%1]==[] goto :ParamParseEndLoop
             echo -S must point to a Web App folder or .war file
             goto :eof
         )
-        set SCHED=%2
+        set TMPV=%2
+        set SCHED=!TMPV:"=!
         SHIFT
         goto :ParamParseShift
     ) 
@@ -94,7 +99,7 @@ IF [%1]==[] goto :ParamParseEndLoop
 goto :ParamParseLoop
 :ParamParseEndLoop
 
-IF [%REST%]==[] (
+IF ["%REST%"]==[""] (
     echo REST Server argument is mandatory
     goto :eof
 )
@@ -102,15 +107,15 @@ IF [%REST%]==[] (
 set REST_URL=http://localhost:%PORT%/rest/rest
 
 call :createTempDir scheduler_start_gui
-set BASE_TEMP_DIR=%_result%
-set REST_DIR="%BASE_TEMP_DIR%\rest"
-set RM_DIR="%BASE_TEMP_DIR%\rm"
-set LOGFILE="%BASE_TEMP_DIR%\jetty.log"
-set POL="%BASE_TEMP_DIR%\java.security.policy"
+set BASE_TEMP_DIR=%_result:"=%
+set REST_DIR=%BASE_TEMP_DIR%\rest
+set RM_DIR=%BASE_TEMP_DIR%\rm
+set LOGFILE=%BASE_TEMP_DIR%\jetty.log
+set POL=%BASE_TEMP_DIR%\java.security.policy
 
-set SCHED_DIR="%BASE_TEMP_DIR%\sched"
+set SCHED_DIR=%BASE_TEMP_DIR%\sched
 
-set JAVA="%JAVA_HOME%\bin\java"
+set JAVA=%JAVA_HOME%\bin\java
 
 set LIB_DIR=%CD%\..\..\dist\lib
 set CP=%LIB_DIR%\jetty-6.1.18.jar
@@ -122,14 +127,13 @@ mkdir %REST_DIR%
 IF %VERBOSE% == true (
     echo Deploying REST Server in %REST_DIR% 
 )
-
-IF /I %REST:~-4% == .war (
-    call :unzip %REST% %REST_DIR%
+IF /I "%REST:~-4%" == ".war" (   
+    call :unzip "%REST%" "%REST_DIR%"
 ) ELSE (
-    xcopy /E %REST%\* %REST_DIR%  
+    xcopy /E "%REST%\*" "%REST_DIR%"
 )
 
-COPY ..\..\config\proactive\ProActiveConfiguration.xml %REST_DIR%\WEB-INF\
+COPY ..\..\config\proactive\ProActiveConfiguration.xml "%REST_DIR%\WEB-INF\"
 
 IF NOT [%RM_URL%]==[] (
     call :set_property "%REST_DIR%\WEB-INF\portal.properties" rm.url %RM_URL%
@@ -140,30 +144,30 @@ IF NOT [%SCHED_URL%]==[] (
 
 set APPS=%REST_DIR%
 
-IF NOT [%RM%]==[] (
+IF NOT ["%RM%"]==[""] (
     mkdir "%RM_DIR%"
     IF %VERBOSE% == true (
         echo Deploying RM UI in %RM_DIR% 
     )
-    IF /I %RM:~-4% == .war (
-        call :unzip %RM% %RM_DIR%
+    IF /I "%RM:~-4%" == ".war" (
+        call :unzip "%RM%" "%RM_DIR%"
     ) ELSE (
-        xcopy /E %RM%\* %RM_DIR%  
+        xcopy /E "%RM%\*" "%RM_DIR%"
     )
     call :set_property "%RM_DIR%\rm.conf" rm.rest.url %REST_URL%
 
     set APPS=%APPS% %RM_DIR% 
 )
 
-IF NOT [%SCHED%]==[] (
+IF NOT ["%SCHED%"]==[""] (
     mkdir "%SCHED_DIR%"
     IF %VERBOSE% == true (
         echo Deploying Scheduling UI in %RM_DIR% 
     )
-    IF /I %SCHED:~-4% == .war (
-        call :unzip %SCHED% %SCHED_DIR%
+    IF /I "%SCHED:~-4%" == ".war" (
+        call :unzip "%SCHED%" "%SCHED_DIR%"
     ) ELSE (
-        xcopy /E %SCHED%\* %SCHED_DIR%  
+        xcopy /E "%SCHED%\*" "%SCHED_DIR%"
     )
     call :set_property "%SCHED_DIR%\scheduler.conf" sched.rest.url %REST_URL%
 
@@ -177,23 +181,27 @@ IF %VERBOSE_JETTY% == false (
     IF %VERBOSE% == true (
         echo Jetty Launcher logs to %LOGFILE%
     )
-    set LOG=-l %LOGFILE%
+    set LOG=-l "%LOGFILE%"
 )
 
 echo grant { permission java.security.AllPermission; }; > %POL%
 set JVM_OPTS=%JVM_OPTS% -Djava.security.manager -Djava.security.policy=%POL%
 
 set CLASSPATH=%CP%
-%JAVA% %JVM_OPTS% %CLASS% -p %PORT% %LOG% %APPS%
+"%JAVA%" %JVM_OPTS% %CLASS% -p %PORT% %LOG% %APPS%
 
 goto :eof
 
 :unzip
     REM Using jruby interpreter to unzip since Windows doesn't have a built-in ZIP command
+    SET ZIPFILE=%1
+    SET ZIPFILE=%ZIPFILE:"=%
+    SET DESTDIR=%2
+    SET DESTDIR=%DESTDIR:"=%
 
     SETLOCAL
     SET CLASSPATH=%LIB_DIR%\jruby.jar;%LIB_DIR%\ProActive_Scheduler-client.jar;%LIB_DIR%\ProActive_SRM-common.jar;%CLASSPATH%
-    SET CMD="Java::org.ow2.proactive.scheduler.common.util.ZipUtils.unzip(Java::java.util.zip.ZipFile.new('%1'),Java::java.io.File.new('%2'))"
+    SET CMD="Java::org.ow2.proactive.scheduler.common.util.ZipUtils.unzip(Java::java.util.zip.ZipFile.new('%ZIPFILE%'),Java::java.io.File.new('%DESTDIR%'))"
     "%JAVA_HOME%\bin\java" org.jruby.Main -e %CMD%     
     ENDLOCAL
 
