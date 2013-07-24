@@ -161,6 +161,7 @@ public class TestMapReduce extends SchedulerConsecutive {
         // generate input
         helper.writeFile("in/part1", INPUT1);
         helper.writeFile("in/part2", INPUT2);
+        helper.mkdirs("out");
 
         // create and configure Hadoop job
         Configuration conf = new Configuration();

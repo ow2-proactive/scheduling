@@ -132,6 +132,7 @@ public class TestFaultTolerance extends SchedulerConsecutive {
 
         // generate input
         helper.writeFile("in/input", INPUT);
+        helper.mkdirs("out");
 
         // create and configure Hadoop job
         Configuration conf = new Configuration();

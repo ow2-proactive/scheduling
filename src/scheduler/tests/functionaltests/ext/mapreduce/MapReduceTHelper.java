@@ -196,4 +196,9 @@ public class MapReduceTHelper {
         f.close();
     }
 
+    public void mkdirs(String relativePath) throws IOException {
+        Path path = new Path(testRootDir + File.separator + relativePath);
+        localFs.mkdirs(path);
+    }
+
 }
