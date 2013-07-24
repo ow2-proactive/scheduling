@@ -65,8 +65,8 @@ public class SelectionUtilsTest {
 
         log("Test python evaluation");
         scriptPath = new File(getClass().getResource("scripts/checkProperties.py").toURI()).getAbsolutePath();
-        Assert.assertEquals("selected=1", EngineScript.EvalScript(scriptPath, EngineScript.Language.python,
-                propertyPath));
+        Assert.assertEquals("selected=true", EngineScript.EvalScript(scriptPath,
+                EngineScript.Language.python, propertyPath));
 
         log("Test ruby evaluation");
         scriptPath = new File(getClass().getResource("scripts/checkProperties.rb").toURI()).getAbsolutePath();
