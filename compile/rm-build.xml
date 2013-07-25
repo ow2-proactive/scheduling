@@ -100,6 +100,12 @@
 		</jar>
 	</target>
 
+	<target name="deploy.rm.tests" depends="-deployCopy, deploy.common, deploy.rm" description="Creates rm tests jar">
+		<jar destfile="${deploy.lib.dir}/${rm.tests.jar}" manifest="${basedir}/scheduler-Manifest-base.mf" index="false">
+			<fileset dir="${cl.rm.tests.dir}" includes="**" />
+		</jar>
+	</target>
+
 	<!-- ************
 		Junit tests
 	-->

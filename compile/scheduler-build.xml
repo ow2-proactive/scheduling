@@ -121,6 +121,11 @@
 		</jar>
 	</target>
 
+	<target name="deploy.scheduler.tests" depends="-deployCopy, deploy.scheduler, deploy.common, deploy.rm" description="Creates scheduler tests jar">
+		<jar destfile="${deploy.lib.dir}/${scheduler.tests.jar}" manifest="${basedir}/scheduler-Manifest-base.mf" index="false">
+			<fileset dir="${cl.scheduler.tests.dir}" includes="**" />
+		</jar>
+	</target>
 
 
 	<!-- start of the ant target to create the ProActive_Scheduler-mapreduce.jar -->

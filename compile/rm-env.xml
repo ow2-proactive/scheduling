@@ -20,6 +20,7 @@
 
 	<property name="rm.jar"            value="ProActive_ResourceManager.jar" />
 	<property name="rm.client.jar"     value="ProActive_ResourceManager-client.jar" />
+	<property name="rm.tests.jar"        value="ProActive_ResourceManager-tests.jar" />
 
 
 	<!-- ================================================================ -->

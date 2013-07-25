@@ -34,6 +34,7 @@
 	<property name="scheduler.worker.jar"        value="ProActive_Scheduler-worker.jar" />
 	<property name="scheduler.mapreduce.jar"     value="ProActive_Scheduler-mapreduce.jar" />
 	<property name="scheduler.fsm.jar"    		 value="ProActive_Scheduler-fsm.jar" />
+	<property name="scheduler.tests.jar"        value="ProActive_Scheduler-tests.jar" />
 
 
 	<!-- ================================================================ -->
