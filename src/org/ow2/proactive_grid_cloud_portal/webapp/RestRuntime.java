@@ -62,6 +62,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.resourcemanager.common.util.RMCachingProxyUserInterface;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
+import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
 import org.ow2.proactive_grid_cloud_portal.common.exceptionmapper.ExceptionToJson;
 import org.ow2.proactive_grid_cloud_portal.rm.RMSessionMapper;
@@ -98,7 +99,8 @@ public class RestRuntime {
         EXCEPTION_MAPPINGS.put(KeyException.class, HttpURLConnection.HTTP_NOT_FOUND);
         EXCEPTION_MAPPINGS.put(LoginException.class, HttpURLConnection.HTTP_NOT_FOUND);
         EXCEPTION_MAPPINGS.put(NotConnectedRestException.class, HttpURLConnection.HTTP_UNAUTHORIZED);
-        EXCEPTION_MAPPINGS.put(PermissionRestException.class, HttpURLConnection.HTTP_NOT_FOUND);
+        EXCEPTION_MAPPINGS.put(NotConnectedException.class, HttpURLConnection.HTTP_UNAUTHORIZED);
+        EXCEPTION_MAPPINGS.put(PermissionRestException.class, HttpURLConnection.HTTP_FORBIDDEN);
         EXCEPTION_MAPPINGS.put(SchedulerRestException.class, HttpURLConnection.HTTP_NOT_FOUND);
         EXCEPTION_MAPPINGS.put(SubmissionClosedRestException.class, HttpURLConnection.HTTP_NOT_FOUND);
         EXCEPTION_MAPPINGS.put(UnknownJobRestException.class, HttpURLConnection.HTTP_NOT_FOUND);
