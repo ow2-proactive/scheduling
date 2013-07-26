@@ -56,7 +56,6 @@ import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
 import javax.security.auth.login.LoginException;
 
-import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
@@ -72,7 +71,7 @@ import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.resourcemanager.frontend.RMEventListener;
-import org.ow2.proactive.resourcemanager.frontend.RMMonitoringImpl;
+import org.apache.log4j.Logger;
 
 
 /**
@@ -80,7 +79,7 @@ import org.ow2.proactive.resourcemanager.frontend.RMMonitoringImpl;
  * to the Resource Manager (a proxy to the Resource Manager).
  * This class adds a cache mechanism that maintains the {@link RMInitialState} state of the
  * remote resource manager.
- * You must init the proxy by calling the {@link #init(String, String, String)} method 
+ * You must init the proxy by calling the {@link #init(String, Credentials)} method
  * after having created it
  */
 @ActiveObject
@@ -89,7 +88,6 @@ public class RMCachingProxyUserInterface extends RMProxyUserInterface implements
     private Logger logger = ProActiveLogger.getLogger(RMCachingProxyUserInterface.class);
 
     protected RMAuthentication rmAuth;
-    protected RMMonitoringImpl rmMonitoring;
     protected RMInitialState rmInitialState;
     protected RMEventType RMstate;
     protected Credentials credentials;
@@ -210,9 +208,8 @@ public class RMCachingProxyUserInterface extends RMProxyUserInterface implements
     /**
      * Retrieves attributes of the specified mbean.
      * 
-     * @param sessionId current session
-     * @param name of mbean
      * @param nodeJmxUrl mbean server url
+     * @param objectName name of mbean
      * @param attrs set of mbean attributes
      * 
      * @return mbean attributes values
@@ -231,7 +228,7 @@ public class RMCachingProxyUserInterface extends RMProxyUserInterface implements
 
             List<Object> result = new LinkedList<Object>();
             AttributeList attributes = nodeConnector.getMBeanServerConnection().getAttributes(
-                    new ObjectName(objectName), attrs.toArray(new String[] {}));
+                    new ObjectName(objectName), attrs.toArray(new String[attrs.size()]));
 
             for (Object attrObj : attributes) {
                 if (attrObj instanceof Attribute) {
@@ -275,7 +272,6 @@ public class RMCachingProxyUserInterface extends RMProxyUserInterface implements
     /**
      * Retrieves attributes of the specified mbeans.
      * 
-     * @param sessionId current session
      * @param objectNames mbean names (@see ObjectName format)
      * @param nodeJmxUrl mbean server url
      * @param attrs set of mbean attributes
@@ -307,8 +303,7 @@ public class RMCachingProxyUserInterface extends RMProxyUserInterface implements
      * connection. 
      * 
      * @param url mbean server url
-     * @return mbean server connection
-     * @throws IOException 
+     * @throws IOException
      */
     private void initNodeConnector(String url) throws IOException {
 
@@ -322,7 +317,13 @@ public class RMCachingProxyUserInterface extends RMProxyUserInterface implements
         }
 
         if (nodeConnector != null) {
-            nodeConnector.close();
+            try {
+                nodeConnector.close();
+            } catch (IOException e) {
+                logger.warn(
+                        "Could not properly close the previous mbean server connection (node might have been deleted",
+                        e);
+            }
             nodeConnector = null;
         }
 
