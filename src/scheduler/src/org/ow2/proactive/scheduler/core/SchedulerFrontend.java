@@ -349,7 +349,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
                 // create the User Space for the given user
                 DataSpaceServiceStarter.createSpace(SchedulerConstants.SCHEDULER_DATASPACE_APPLICATION_ID,
                         userSpaceName, PASchedulerProperties.DATASPACE_DEFAULTUSER_URL.getValueAsString() +
-                            File.separator + identification.getUsername(), localpath, hostname, false, true);
+                            "/" + identification.getUsername(), localpath, hostname, false, true);
 
                 // immediately retrieve the User Space
                 userSpace = PADataSpaces.resolveOutput(userSpaceName);
