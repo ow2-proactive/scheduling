@@ -250,14 +250,13 @@ public class DataSpaceServiceStarter implements Serializable {
         ArrayList<String> urls = new ArrayList<String>();
         if (path != null) {
             urls.add((new File(path)).toURI().toURL().toExternalForm());
-            //urls.add("file://" + (path.startsWith("/") ? "" : "/") + path.replace("\\", "/"));
         }
         urls.add(url);
         if (inputConfiguration) {
-            spaceConf = InputOutputSpaceConfiguration.createInputSpaceConfiguration(urls.get(0), path,
+            spaceConf = InputOutputSpaceConfiguration.createInputSpaceConfiguration(urls, path,
                     hostname != null ? hostname : localhostname, name);
         } else {
-            spaceConf = InputOutputSpaceConfiguration.createOutputSpaceConfiguration(urls.get(0), path,
+            spaceConf = InputOutputSpaceConfiguration.createOutputSpaceConfiguration(urls, path,
                     hostname != null ? hostname : localhostname, name);
         }
 
