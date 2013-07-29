@@ -87,7 +87,6 @@ public class RMCachingProxyUserInterfaceTest extends RMConsecutive {
 
         // cleanup
         helper.getResourceManager().removeNodeSource("NodeSource2", true);
-        PAActiveObject.terminateActiveObject(proxyUserInterface, true);
     }
 
     private RMCachingProxyUserInterface createRMCachingProxyUserInterface() throws Exception {

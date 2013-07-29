@@ -321,7 +321,7 @@ public class RMCachingProxyUserInterface extends RMProxyUserInterface implements
                 nodeConnector.close();
             } catch (IOException e) {
                 logger.warn(
-                        "Could not properly close the previous mbean server connection (node might have been deleted",
+                        "Could not properly close the previous mbean server connection (node might have been deleted)",
                         e);
             }
             nodeConnector = null;
