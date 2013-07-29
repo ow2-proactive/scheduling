@@ -36,7 +36,11 @@ package functionaltests.schemas;
 
 import java.io.Serializable;
 
+import org.apache.commons.vfs.FileObject;
+import org.apache.commons.vfs.FileSelectInfo;
+import org.apache.commons.vfs.Selectors;
 import org.objectweb.proactive.extensions.dataspaces.api.FileSelector;
+import org.objectweb.proactive.extensions.dataspaces.vfs.adapter.VFSFileObjectAdapter;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 
@@ -53,7 +57,30 @@ public class CopyFiles extends JavaExecutable {
 
     @Override
     public Serializable execute(TaskResult... results) throws Throwable {
-        super.getOutputFile(outputFile).copyFrom(super.getInputFile(inputFile), FileSelector.SELECT_SELF);
+        if (inputFile.contains("*")) {
+            inputFile = inputFile.replace("*", ".*").replace("?", ".");
+            FileObject space = ((VFSFileObjectAdapter) getLocalSpace()).getAdaptee();
+
+            FileObject[] lfo = space.findFiles(new org.apache.commons.vfs.FileSelector(){
+                @Override
+                public boolean includeFile(FileSelectInfo fileSelectInfo) throws Exception {
+                    String name = fileSelectInfo.getFile().getName().getBaseName();
+                    boolean answer =  name.matches(inputFile);
+                    return answer;
+                }
+
+                @Override
+                public boolean traverseDescendents(FileSelectInfo fileSelectInfo) throws Exception {
+                    return true;
+                }
+            });
+            if (lfo.length != 1) {
+                throw new IllegalStateException("Unexpected number of files found : "+lfo.length);
+            }
+            ((VFSFileObjectAdapter)  super.getOutputFile(outputFile)).getAdaptee().copyFrom(lfo[0], Selectors.SELECT_SELF);
+        } else {
+            super.getOutputFile(outputFile).copyFrom(super.getInputFile(inputFile), FileSelector.SELECT_SELF);
+        }
         return true;
     }
 }

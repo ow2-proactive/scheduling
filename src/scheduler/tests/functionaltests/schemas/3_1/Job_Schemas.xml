@@ -31,11 +31,11 @@
                 <task ref="JobClassPath"/>
             </depends>
             <inputFiles>
-                <files includes="TaskLogs-2-JobClassPath.log" accessMode="transferFromInputSpace"/>
+                <files includes="TaskLogs-*-JobClassPath.log" accessMode="transferFromInputSpace"/>
             </inputFiles>
             <javaExecutable class="functionaltests.schemas.CopyFiles">
                 <parameters>
-                    <parameter name="inputFile" value="TaskLogs-2-JobClassPath.log"/>
+                    <parameter name="inputFile" value="TaskLogs-*-JobClassPath.log"/>
                     <parameter name="outputFile" value="CheckPreciousLogOut"/>
                 </parameters>
             </javaExecutable>
