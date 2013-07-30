@@ -55,6 +55,7 @@ import javax.security.auth.login.LoginException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 
+import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.config.xml.ProActiveConfigurationParser;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
@@ -63,6 +64,7 @@ import org.ow2.proactive.resourcemanager.common.util.RMCachingProxyUserInterface
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
+import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
 import org.ow2.proactive_grid_cloud_portal.common.exceptionmapper.ExceptionToJson;
 import org.ow2.proactive_grid_cloud_portal.rm.RMSessionMapper;
@@ -105,6 +107,10 @@ public class RestRuntime {
         EXCEPTION_MAPPINGS.put(SubmissionClosedRestException.class, HttpURLConnection.HTTP_NOT_FOUND);
         EXCEPTION_MAPPINGS.put(UnknownJobRestException.class, HttpURLConnection.HTTP_NOT_FOUND);
         EXCEPTION_MAPPINGS.put(UnknownTaskException.class, HttpURLConnection.HTTP_NOT_FOUND);
+        EXCEPTION_MAPPINGS.put(PermissionException.class, HttpURLConnection.HTTP_FORBIDDEN);
+        EXCEPTION_MAPPINGS.put(ProActiveRuntimeException.class, HttpURLConnection.HTTP_NOT_FOUND);
+        EXCEPTION_MAPPINGS.put(RuntimeException.class, HttpURLConnection.HTTP_INTERNAL_ERROR);
+        EXCEPTION_MAPPINGS.put(Throwable.class, HttpURLConnection.HTTP_INTERNAL_ERROR);
     }
 
     public void start(ResteasyProviderFactory dispatcher, File configurationFile, File log4jConfig,
