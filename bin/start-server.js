@@ -13,6 +13,12 @@ var RM_PORT = 64738;
 var SCHEDULER_PORT = 52845;
 var JETTY_PORT = 8080;
 
+var CHECK_PORTS_NUMBER = [RM_PORT, SCHEDULER_PORT, JETTY_PORT];
+var CHECK_PORTS_SNAME = ["RM", "SCHEDULER", "JETTY"];
+
+/** Check that given ports are free */
+checkPorts(CHECK_PORTS_NUMBER, CHECK_PORTS_SNAME);
+
 /** OS switch and independent absolute path to Java executable */
 var fs = File.separator;
 var isWindows = System.getProperty("os.name").startsWith("Windows");
@@ -203,6 +209,7 @@ function startJetty() {
 	while (isPortAvailable(JETTY_PORT)) {
 		java.lang.Thread.sleep(1000);
 	}
+
 	var restHttpUrl = "http://localhost:"+JETTY_PORT+"/rest";
 	var rmHttpUrl = "http://localhost:"+JETTY_PORT+"/rm";
 	var schedulerHttpUrl = "http://localhost:"+JETTY_PORT+"/scheduler";
@@ -380,7 +387,7 @@ function extractFolder(zipFile, destDirFile){ // throws ZipException, IOExceptio
     }
 }
 
-function isPortAvailable(port) { // throws IOException
+function isTcpPortAvailable(port) { // throws IOException
 	var sock = null;
 	try {
 		sock = new java.net.ServerSocket(port);
@@ -394,4 +401,18 @@ function isPortAvailable(port) { // throws IOException
 		}
 	}
 	return true;
+}
+
+function checkPorts(pnumbers, pnames){
+	for ( var i = 0; i < pnumbers.length; i++) {
+		var port = pnumbers[i];
+		var serv = pnames[i];
+
+		var avail = isTcpPortAvailable(pnumbers[i]);
+		if (!avail) {
+			println("TCP port " + port + " (used by " + serv + ") is busy...");
+			println("This program will exit...");
+			System.exit(-1);
+		}
+	}
 }
