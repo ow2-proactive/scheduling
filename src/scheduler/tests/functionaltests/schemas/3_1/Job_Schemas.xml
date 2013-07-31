@@ -33,7 +33,7 @@
             <inputFiles>
                 <files includes="TaskLogs-*-JobClassPath.log" accessMode="transferFromInputSpace"/>
             </inputFiles>
-            <javaExecutable class="functionaltests.schemas.CopyFiles">
+            <javaExecutable class="org.ow2.proactive.scheduler.examples.CopyFile">
                 <parameters>
                     <parameter name="inputFile" value="TaskLogs-*-JobClassPath.log"/>
                     <parameter name="outputFile" value="CheckPreciousLogOut"/>
@@ -86,7 +86,7 @@
             <inputFiles>
                 <files includes="myfilein1" accessMode="transferFromInputSpace"/>
             </inputFiles>
-            <javaExecutable class="functionaltests.schemas.CopyFiles">
+            <javaExecutable class="org.ow2.proactive.scheduler.examples.CopyFile">
                 <parameters>
                     <parameter name="inputFile" value="myfilein1"/>
                     <parameter name="outputFile" value="myfileout1"/>
@@ -104,7 +104,7 @@
             <inputFiles>
                 <files includes="myfileout1" accessMode="transferFromOutputSpace"/>
             </inputFiles>
-            <javaExecutable class="functionaltests.schemas.CopyFiles">
+            <javaExecutable class="org.ow2.proactive.scheduler.examples.CopyFile">
                 <parameters>
                     <parameter name="inputFile" value="myfileout1"/>
                     <parameter name="outputFile" value="myfileout2"/>
