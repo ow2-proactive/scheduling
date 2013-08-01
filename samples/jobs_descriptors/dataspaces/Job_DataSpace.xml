@@ -2,10 +2,6 @@
 <job xmlns="urn:proactive:jobdescriptor:dev" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 		xsi:schemaLocation="urn:proactive:jobdescriptor:dev ../../src/scheduler/src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.xsd"
 		name="Job DataSpaces" cancelJobOnError="true">
-	<variables>
-		<!-- pa.rm.home is known as java property - ie : start with -Dpa.scheduler.home=value -->
-		<variable name="HOME" value="${pa.rm.home}/samples/jobs_descriptors/schemas"/>
-	</variables>
 	<description>Example of DataSpace use.</description>
 
 	<!-- 1) Start the DataSpace graphical tool :

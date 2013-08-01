@@ -49,11 +49,11 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @PublicAPI
 public enum OutputAccessMode {
     /** Transfer files from LOCAL space to OUTPUT space */
-    TransferToOutputSpace("TransferToOutputSpace"),
+    TransferToOutputSpace("transferToOutputSpace"),
     /** LOCAL to GLOBAL */
-    TransferToGlobalSpace("TransferToGlobalSpace"),
+    TransferToGlobalSpace("transferToGlobalSpace"),
     /** LOCAL to GLOBAL */
-    TransferToUserSpace("TransferToUserSpace"),
+    TransferToUserSpace("transferToUserSpace"),
     /** Do nothing */
     none("none");
 
