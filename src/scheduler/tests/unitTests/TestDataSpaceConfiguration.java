@@ -92,6 +92,7 @@ public class TestDataSpaceConfiguration {
         File spFile = new File(IOSPACE);
         File spFileWithUserDir = new File(IOSPACE, username);
         spFile.mkdirs();
+        spFileWithUserDir.mkdirs();
 
         filesServerIn = new FileSystemServerDeployer("space", IOSPACE, true, true);
         String spaceurl = filesServerIn.getVFSRootURL();

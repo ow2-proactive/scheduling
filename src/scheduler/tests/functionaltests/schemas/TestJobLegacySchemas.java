@@ -84,7 +84,8 @@ public class TestJobLegacySchemas extends SchedulerConsecutive {
         for (URL jobDescriptor : jobDescriptors) {
             logger.info("Testing submission of job descriptor : " + jobDescriptor);
             // clean dataspace
-            File ds = new File(PAResourceManagerProperties.RM_HOME.getValueAsString(),"/src/scheduler/tests/functionaltests/schemas");
+            File ds = new File(PAResourceManagerProperties.RM_HOME.getValueAsString(),
+                "/src/scheduler/tests/functionaltests/schemas");
 
             File[] todelete = ds.listFiles(new FilenameFilter() {
                 @Override
@@ -118,7 +119,6 @@ public class TestJobLegacySchemas extends SchedulerConsecutive {
 
             SchedulerTHelper.removeJob(id);
             SchedulerTHelper.waitForEventJobRemoved(id);
-
 
         }
     }
