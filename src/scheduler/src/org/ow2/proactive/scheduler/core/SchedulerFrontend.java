@@ -337,24 +337,17 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
 
             String localpath = PASchedulerProperties.DATASPACE_DEFAULTUSER_LOCALPATH.getValueAsStringOrNull();
             String hostname = PASchedulerProperties.DATASPACE_DEFAULTUSER_HOSTNAME.getValueAsStringOrNull();
-            if (localpath != null) {
-                localpath = localpath + File.separator + identification.getUsername();
-                File localPathFile = new File(localpath);
-                if (!localPathFile.exists()) {
-                    localPathFile.mkdirs();
-                }
-            }
 
             try {
-                // create the User Space for the given user
-                DataSpaceServiceStarter.createSpace(SchedulerConstants.SCHEDULER_DATASPACE_APPLICATION_ID,
-                        userSpaceName, PASchedulerProperties.DATASPACE_DEFAULTUSER_URL.getValueAsString() +
-                            "/" + identification.getUsername(), localpath, hostname, false, true);
+                DataSpaceServiceStarter.createSpaceWithUserNameSubfolder(identification.getUsername(),
+                        SchedulerConstants.SCHEDULER_DATASPACE_APPLICATION_ID, userSpaceName,
+                        PASchedulerProperties.DATASPACE_DEFAULTUSER_URL.getValueAsString(), localpath,
+                        hostname, false, true);
 
                 // immediately retrieve the User Space
                 userSpace = PADataSpaces.resolveOutput(userSpaceName);
                 logger.info("USER space for user " + identification.getUsername() + " is at " +
-                    userSpace.getRealURI());
+                    userSpace.getAllRealURIs());
             } catch (Exception e) {
                 logger.error("", e);
             }

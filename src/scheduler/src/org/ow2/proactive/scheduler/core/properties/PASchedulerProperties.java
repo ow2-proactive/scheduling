@@ -39,7 +39,10 @@ package org.ow2.proactive.scheduler.core.properties;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
+import java.util.regex.Pattern;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 
@@ -208,7 +211,8 @@ public enum PASchedulerProperties {
     /* ***************************************************************** */
 
     /** Default INPUT space URL. Used to define INPUT space of each job that does not define an INPUT space. */
-    DATASPACE_DEFAULTINPUT_URL("pa.scheduler.dataspace.defaultinput.url", PropertyType.STRING),
+    /** Several URLs can be specified (which should all point to the same physical space, in that case, urls must be separated by spaces. */
+    DATASPACE_DEFAULTINPUT_URL("pa.scheduler.dataspace.defaultinput.url", PropertyType.LIST),
 
     /** Default INPUT space path. Used to define the same INPUT space but with a local (faster) access (if possible). */
     DATASPACE_DEFAULTINPUT_LOCALPATH("pa.scheduler.dataspace.defaultinput.localpath", PropertyType.STRING),
@@ -217,7 +221,8 @@ public enum PASchedulerProperties {
     DATASPACE_DEFAULTINPUT_HOSTNAME("pa.scheduler.dataspace.defaultinput.hostname", PropertyType.STRING),
 
     /** The same for the OUPUT */
-    DATASPACE_DEFAULTOUTPUT_URL("pa.scheduler.dataspace.defaultoutput.url", PropertyType.STRING),
+    /** Several URLs can be specified, separated by space */
+    DATASPACE_DEFAULTOUTPUT_URL("pa.scheduler.dataspace.defaultoutput.url", PropertyType.LIST),
     /** */
     DATASPACE_DEFAULTOUTPUT_LOCALPATH("pa.scheduler.dataspace.defaultoutput.localpath", PropertyType.STRING),
     /** */
@@ -226,6 +231,7 @@ public enum PASchedulerProperties {
     /** Default Global space URL for all user. This space is supposed public to all users.
      * Used to define a Global space of each job that does not define a Global space
      **/
+    /** Several URLs can be specified, separated by space */
     DATASPACE_DEFAULTGLOBAL_URL("pa.scheduler.dataspace.defaultglobal.url", PropertyType.STRING),
     /** */
     DATASPACE_DEFAULTGLOBAL_LOCALPATH("pa.scheduler.dataspace.defaultglobal.localpath", PropertyType.STRING),
@@ -235,6 +241,8 @@ public enum PASchedulerProperties {
     /** Default User Space URL
      * Used to define a User space of each job which doesn't define one, the actual User Space will be inferred
      * from this space by appending the username in the path */
+
+    /** Several URLs can be specified, separated by space */
     DATASPACE_DEFAULTUSER_URL("pa.scheduler.dataspace.defaultuser.url", PropertyType.STRING),
     /** */
     DATASPACE_DEFAULTUSER_LOCALPATH("pa.scheduler.dataspace.defaultuser.localpath", PropertyType.STRING),
@@ -547,6 +555,28 @@ public enum PASchedulerProperties {
     }
 
     /**
+     * Returns the value of this property as a List of strings.
+     *
+     * @param separator the separator to use
+     *
+     * @return the list of values of this property.
+     */
+    public List<String> getValueAsList(String separator) {
+        Properties prop = getProperties(null);
+        ArrayList<String> valueList = new ArrayList<String>();
+        if (fileLoaded) {
+            String value = prop.getProperty(key);
+            for (String val : value.split(Pattern.quote(separator))) {
+                val = val.trim();
+                if (val.length() > 0) {
+                    valueList.add(val);
+                }
+            }
+        }
+        return valueList;
+    }
+
+    /**
      * Returns the value of this property as a string.
      * If the property is not defined, then null is returned
      *
@@ -618,6 +648,6 @@ public enum PASchedulerProperties {
      * Supported types for PASchedulerProperties
      */
     public enum PropertyType {
-        STRING, BOOLEAN, INTEGER;
+        STRING, BOOLEAN, INTEGER, LIST;
     }
 }
