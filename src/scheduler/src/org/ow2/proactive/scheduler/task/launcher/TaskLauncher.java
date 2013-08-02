@@ -920,7 +920,9 @@ public abstract class TaskLauncher {
                 OUTPUT = PADataSpaces.resolveDefaultOutput();
                 logger.info("SCRATCH space is " + SCRATCH.getRealURI());
                 logger.info("INPUT space is " + INPUT.getRealURI());
+                logger.info("(other available urls for INPUT space are " + INPUT.getAllRealURIs() + " )");
                 logger.info("OUTPUT space is " + OUTPUT.getRealURI());
+                logger.info("(other available urls for OUTPUT space are " + OUTPUT.getAllRealURIs() + " )");
                 String realURI = OUTPUT.getRealURI();
                 // Look for the [TASKID] pattern at the end of the dataspace URI
                 if (realURI.contains(SchedulerConstants.TASKID_DIR_DEFAULT_NAME)) {
@@ -936,6 +938,8 @@ public abstract class TaskLauncher {
                 try {
                     GLOBAL = PADataSpaces.resolveOutput(SchedulerConstants.GLOBALSPACE_NAME);
                     logger.info("GLOBAL space is " + GLOBAL.getRealURI());
+                    logger.info("(other available urls for GLOBAL space are " + GLOBAL.getAllRealURIs() +
+                        " )");
                 } catch (Throwable t) {
                     logger.info("GLOBAL space is disabled");
                     logger.debug("", t);
@@ -943,6 +947,7 @@ public abstract class TaskLauncher {
                 try {
                     USER = PADataSpaces.resolveOutput(SchedulerConstants.USERSPACE_NAME);
                     logger.info("USER space is " + USER.getRealURI());
+                    logger.info("(other available urls for USER space are " + USER.getAllRealURIs() + " )");
                 } catch (Throwable t) {
                     logger.info("USER space is disabled");
                     logger.debug("", t);
