@@ -31,11 +31,11 @@
                 <task ref="JobClassPath"/>
             </depends>
             <inputFiles>
-                <files includes="TaskLogs-*-JobClassPath.log" accessMode="transferFromInputSpace"/>
+                <files includes="TaskLogs-*.log" accessMode="transferFromInputSpace"/>
             </inputFiles>
             <javaExecutable class="org.ow2.proactive.scheduler.examples.CopyFile">
                 <parameters>
-                    <parameter name="inputFile" value="TaskLogs-*-JobClassPath.log"/>
+                    <parameter name="inputFile" value="TaskLogs-*.log"/>
                     <parameter name="outputFile" value="CheckPreciousLogOut"/>
                 </parameters>
             </javaExecutable>
