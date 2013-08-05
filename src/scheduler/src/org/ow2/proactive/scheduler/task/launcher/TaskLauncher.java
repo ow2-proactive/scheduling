@@ -36,9 +36,12 @@
  */
 package org.ow2.proactive.scheduler.task.launcher;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.reflect.Method;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.security.KeyException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -430,13 +433,22 @@ public abstract class TaskLauncher {
      */
     private void initLocalLogsFile() throws IOException {
         logFileName = TaskLauncher.LOG_FILE_PREFIX + "-" + this.taskId.getJobId() + "-" +
-            this.taskId.getReadableName() + ".log";
+            this.taskId.value() + ".log";
         DataSpacesFileObject outlog = SCRATCH.resolveFile(TaskLauncher.LOG_FILE_PREFIX + "-" +
-            this.taskId.getJobId() + "-" + this.taskId.getReadableName() + ".log");
+            this.taskId.getJobId() + "-" + this.taskId.value() + ".log");
         outlog.createFile();
+        String outPath;
+        if (outlog.getRealURI().startsWith("file:")) {
+            try {
+                outPath = (new File((new URI(outlog.getRealURI())))).getAbsolutePath();
+            } catch (URISyntaxException e) {
+                throw new IOException(e);
+            }
+        } else {
+            throw new IllegalStateException("Wrong protocol in Local logs file uri :" + outlog.getRealURI());
+        }
         // fileAppender constructor needs a path and not a URI.
-        FileAppender fap = new FileAppender(Log4JTaskLogs.getTaskLogLayout(), outlog.getRealURI().substring(
-                "file://".length()), false);
+        FileAppender fap = new FileAppender(Log4JTaskLogs.getTaskLogLayout(), outPath, false);
         this.logAppender.addAppender(fap);
     }
 
