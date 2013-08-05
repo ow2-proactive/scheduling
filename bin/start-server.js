@@ -206,7 +206,7 @@ function startJetty() {
 	println("Jetty stdout/stderr redirected into " + jettyOutputFile);
 
 	println("Waiting for jetty to start ...");
-	while (isPortAvailable(JETTY_PORT)) {
+	while (isTcpPortAvailable(JETTY_PORT)) {
 		java.lang.Thread.sleep(1000);
 	}
 
