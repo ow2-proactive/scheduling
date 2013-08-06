@@ -152,6 +152,9 @@
 			<indexjars>
 				<fileset refid="jar.index.fileset" />
 			</indexjars>
+			<manifest>
+				<attribute name="Implementation-Version" value="${version}" />
+			</manifest>
         </jar>
 	</target>
 
@@ -176,6 +179,9 @@
 				<indexjars>
 					<fileset refid="jar.index.fileset" />
 				</indexjars>
+				<manifest>
+					<attribute name="Implementation-Version" value="${version}" />
+				</manifest>
 	        </jar>
 		</target>
 
