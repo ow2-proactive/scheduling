@@ -992,19 +992,6 @@ public abstract class TaskLauncher {
                     logger.debug("Input selector is empty, no file to copy");
                     return;
                 }
-                //check first the OUTPUT and then the INPUT, take care if not set
-                if (INPUT == null && OUTPUT == null) {
-                    logger.error("Job inputspace and outputspace are not defined or not properly"
-                        + " configured while intput files are specified : ");
-
-                    this.logDataspacesStatus("Job inputspace and outputspace are not defined or not properly"
-                        + " configured while intput files are specified : ", DataspacesStatusLevel.ERROR);
-                    for (InputSelector is : inputFiles) {
-                        logger.error("--> " + is);
-                        this.logDataspacesStatus("--> " + is, DataspacesStatusLevel.ERROR);
-                    }
-                    return;
-                }
 
                 // will contain all files coming from input space
                 ArrayList<DataSpacesFileObject> inResults = new ArrayList<DataSpacesFileObject>();
@@ -1024,6 +1011,9 @@ public abstract class TaskLauncher {
                     fast.setCaseSensitive(is.getInputFiles().isCaseSensitive());
                     switch (is.getMode()) {
                         case TransferFromInputSpace:
+                            if (!checkInputSpaceConfigured(INPUT, "INPUT", is))
+                                continue;
+
                             //search in INPUT
                             try {
                                 int s = inResults.size();
@@ -1051,6 +1041,8 @@ public abstract class TaskLauncher {
                             }
                             break;
                         case TransferFromOutputSpace:
+                            if (!checkInputSpaceConfigured(OUTPUT, "OUTPUT", is))
+                                continue;
                             //search in OUTPUT
                             try {
                                 int s = outResults.size();
@@ -1077,6 +1069,8 @@ public abstract class TaskLauncher {
                             }
                             break;
                         case TransferFromGlobalSpace:
+                            if (!checkInputSpaceConfigured(GLOBAL, "GLOBAL", is))
+                                continue;
                             try {
                                 int s = globResults.size();
                                 FastSelector.findFiles(GLOBAL, fast, true, globResults);
@@ -1106,6 +1100,8 @@ public abstract class TaskLauncher {
                             }
                             break;
                         case TransferFromUserSpace:
+                            if (!checkInputSpaceConfigured(USER, "USER", is))
+                                continue;
                             try {
                                 int s = userResults.size();
                                 FastSelector.findFiles(USER, fast, true, userResults);
@@ -1223,6 +1219,36 @@ public abstract class TaskLauncher {
         }
     }
 
+    private boolean checkInputSpaceConfigured(DataSpacesFileObject space, String spaceName, InputSelector is) {
+        if (space == null) {
+            logger.error("Job " + spaceName +
+                " space is not defined or not properly configured while input files are specified : ");
+
+            this.logDataspacesStatus("Job " + spaceName +
+                " space is not defined or not properly configured while input files are specified : ",
+                    DataspacesStatusLevel.ERROR);
+
+            logger.error("--> " + is);
+            this.logDataspacesStatus("--> " + is, DataspacesStatusLevel.ERROR);
+
+            return false;
+        }
+        return true;
+    }
+
+    private boolean checkOuputSpaceConfigured(DataSpacesFileObject space, String spaceName, OutputSelector os) {
+        if (space == null) {
+            logger.debug("Job " + spaceName +
+                " space is not defined or not properly configured, while output files are specified :");
+            this.logDataspacesStatus("Job " + spaceName +
+                " space is not defined or not properly configured, while output files are specified :",
+                    DataspacesStatusLevel.ERROR);
+            this.logDataspacesStatus("--> " + os, DataspacesStatusLevel.ERROR);
+            return false;
+        }
+        return true;
+    }
+
     protected void copyScratchDataToOutput(List<OutputSelector> outputFiles) throws FileSystemException {
         if (isDataspaceAware()) {
             try {
@@ -1231,15 +1257,19 @@ public abstract class TaskLauncher {
                     return;
                 }
 
-                //check first the OUTPUT and then the INPUT, take care if not set
-                if (OUTPUT == null) {
-                    logger.debug("Job OUTPUT space is not defined, cannot copy file.");
-                    this.logDataspacesStatus("Job OUTPUT space is not defined or not properly"
-                        + " configured while output files are specified : ", DataspacesStatusLevel.ERROR);
-                    for (OutputSelector os : outputFiles) {
-                        this.logDataspacesStatus("--> " + os, DataspacesStatusLevel.ERROR);
+                // We check that the spaces used are properly configured, we show a message in the log output to the user if not
+                for (OutputSelector os1 : outputFiles) {
+                    switch (os1.getMode()) {
+                        case TransferToOutputSpace:
+                            checkOuputSpaceConfigured(OUTPUT, "OUTPUT", os1);
+                            break;
+                        case TransferToGlobalSpace:
+                            checkOuputSpaceConfigured(GLOBAL, "GLOBAL", os1);
+                            break;
+                        case TransferToUserSpace:
+                            checkOuputSpaceConfigured(USER, "USER", os1);
+                            break;
                     }
-                    return;
                 }
 
                 // flush and close stdout/err
@@ -1262,68 +1292,79 @@ public abstract class TaskLauncher {
                     fast.setCaseSensitive(os.getOutputFiles().isCaseSensitive());
                     switch (os.getMode()) {
                         case TransferToOutputSpace:
-                            try {
-                                int s = results.size();
-                                handleOutput(OUTPUT, fast, results);
-                                if (results.size() == s) {
-                                    this.logDataspacesStatus("No file is transferred to OUTPUT space at " +
+                            if (OUTPUT != null) {
+                                try {
+                                    int s = results.size();
+                                    handleOutput(OUTPUT, fast, results);
+                                    if (results.size() == s) {
+                                        this.logDataspacesStatus(
+                                                "No file is transferred to OUTPUT space at " +
+                                                    OUTPUT.getRealURI() + " for selector " + os,
+                                                DataspacesStatusLevel.WARNING);
+                                        logger.warn("No file is transferred to OUTPUT space at " +
+                                            OUTPUT.getRealURI() + " for selector " + os);
+                                    }
+                                } catch (FileSystemException fse) {
+                                    toBeThrown = fse;
+                                    this.logDataspacesStatus("Error while transferring to OUTPUT space at " +
                                         OUTPUT.getRealURI() + " for selector " + os,
-                                            DataspacesStatusLevel.WARNING);
-                                    logger.warn("No file is transferred to OUTPUT space at " +
-                                        OUTPUT.getRealURI() + " for selector " + os);
+                                            DataspacesStatusLevel.ERROR);
+                                    this.logDataspacesStatus(Formatter.stackTraceToString(fse),
+                                            DataspacesStatusLevel.ERROR);
+                                    logger.error("Error while transferring to OUTPUT space at " +
+                                        OUTPUT.getRealURI() + " for selector " + os, fse);
                                 }
-                            } catch (FileSystemException fse) {
-                                toBeThrown = fse;
-                                this.logDataspacesStatus("Error while transferring to OUTPUT space at " +
-                                    OUTPUT.getRealURI() + " for selector " + os, DataspacesStatusLevel.ERROR);
-                                this.logDataspacesStatus(Formatter.stackTraceToString(fse),
-                                        DataspacesStatusLevel.ERROR);
-                                logger.error("Error while transferring to OUTPUT space at " +
-                                    OUTPUT.getRealURI() + " for selector " + os, fse);
                             }
                             break;
                         case TransferToGlobalSpace:
-                            try {
-                                int s = results.size();
-                                handleOutput(GLOBAL, fast, results);
-                                if (results.size() == s) {
-                                    this.logDataspacesStatus("No file is transferred to GLOBAL space at " +
+                            if (GLOBAL != null) {
+                                try {
+                                    int s = results.size();
+                                    handleOutput(GLOBAL, fast, results);
+                                    if (results.size() == s) {
+                                        this.logDataspacesStatus(
+                                                "No file is transferred to GLOBAL space at " +
+                                                    GLOBAL.getRealURI() + " for selector " + os,
+                                                DataspacesStatusLevel.WARNING);
+                                        logger.warn("No file is transferred to GLOBAL space at " +
+                                            GLOBAL.getRealURI() + " for selector " + os);
+                                    }
+                                } catch (FileSystemException fse) {
+                                    toBeThrown = fse;
+                                    this.logDataspacesStatus("Error while transferring to GLOBAL space at " +
                                         GLOBAL.getRealURI() + " for selector " + os,
-                                            DataspacesStatusLevel.WARNING);
-                                    logger.warn("No file is transferred to GLOBAL space at " +
-                                        GLOBAL.getRealURI() + " for selector " + os);
+                                            DataspacesStatusLevel.ERROR);
+                                    this.logDataspacesStatus(Formatter.stackTraceToString(fse),
+                                            DataspacesStatusLevel.ERROR);
+                                    logger.error("Error while transferring to GLOBAL space at " +
+                                        GLOBAL.getRealURI() + " for selector " + os, fse);
                                 }
-                            } catch (FileSystemException fse) {
-                                toBeThrown = fse;
-                                this.logDataspacesStatus("Error while transferring to GLOBAL space at " +
-                                    GLOBAL.getRealURI() + " for selector " + os, DataspacesStatusLevel.ERROR);
-                                this.logDataspacesStatus(Formatter.stackTraceToString(fse),
-                                        DataspacesStatusLevel.ERROR);
-                                logger.error("Error while transferring to GLOBAL space at " +
-                                    GLOBAL.getRealURI() + " for selector " + os, fse);
                             }
                             break;
                         case TransferToUserSpace:
-                            try {
-                                int s = results.size();
-                                handleOutput(USER, fast, results);
-                                if (results.size() == s) {
-                                    this.logDataspacesStatus("No file is transferred to USER space at " +
+                            if (USER != null) {
+                                try {
+                                    int s = results.size();
+                                    handleOutput(USER, fast, results);
+                                    if (results.size() == s) {
+                                        this.logDataspacesStatus("No file is transferred to USER space at " +
+                                            USER.getRealURI() + " for selector " + os,
+                                                DataspacesStatusLevel.WARNING);
+                                        logger.warn("No file is transferred to USER space at " +
+                                            USER.getRealURI() + " for selector " + os);
+                                    }
+                                } catch (FileSystemException fse) {
+                                    toBeThrown = fse;
+                                    this.logDataspacesStatus("Error while transferring to USER space at " +
                                         USER.getRealURI() + " for selector " + os,
-                                            DataspacesStatusLevel.WARNING);
-                                    logger.warn("No file is transferred to USER space at " +
-                                        USER.getRealURI() + " for selector " + os);
+                                            DataspacesStatusLevel.ERROR);
+                                    this.logDataspacesStatus(Formatter.stackTraceToString(fse),
+                                            DataspacesStatusLevel.ERROR);
+                                    logger.error("Error while transferring to USER space at " +
+                                        USER.getRealURI() + " for selector " + os, fse);
                                 }
-                            } catch (FileSystemException fse) {
-                                toBeThrown = fse;
-                                this.logDataspacesStatus("Error while transferring to USER space at " +
-                                    USER.getRealURI() + " for selector " + os, DataspacesStatusLevel.ERROR);
-                                this.logDataspacesStatus(Formatter.stackTraceToString(fse),
-                                        DataspacesStatusLevel.ERROR);
-                                logger.error("Error while transferring to USER space at " +
-                                    USER.getRealURI() + " for selector " + os, fse);
+                                break;
                             }
-                            break;
                         case none:
                             break;
                     }

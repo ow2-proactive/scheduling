@@ -211,16 +211,21 @@ public class DataSpaceServiceStarter implements Serializable {
         namingService.registerApplication(SchedulerConstants.SCHEDULER_DATASPACE_APPLICATION_ID,
                 predefinedSpaces);
 
-        // register the Global space
-        createSpace(SchedulerConstants.SCHEDULER_DATASPACE_APPLICATION_ID,
-                SchedulerConstants.GLOBALSPACE_NAME, PASchedulerProperties.DATASPACE_DEFAULTGLOBAL_URL
-                        .getValueAsString(), PASchedulerProperties.DATASPACE_DEFAULTGLOBAL_LOCALPATH
-                        .getValueAsString(), localhostname, false, true);
+        try {
+            // register the Global space
+            createSpace(SchedulerConstants.SCHEDULER_DATASPACE_APPLICATION_ID,
+                    SchedulerConstants.GLOBALSPACE_NAME, PASchedulerProperties.DATASPACE_DEFAULTGLOBAL_URL
+                            .getValueAsString(), PASchedulerProperties.DATASPACE_DEFAULTGLOBAL_LOCALPATH
+                            .getValueAsString(), localhostname, false, true);
+        } catch (Exception e) {
+            logger.error("", e);
+        }
     }
 
-    private  FileSystemServerDeployer startServer(String spaceName, String readableName, String spaceDir, String protocol, StringBuilder buildedUrl) throws IOException {
-        FileSystemServerDeployer server = new FileSystemServerDeployer(spaceName,
-                spaceDir, true, true, protocol);
+    private FileSystemServerDeployer startServer(String spaceName, String readableName, String spaceDir,
+            String protocol, StringBuilder buildedUrl) throws IOException {
+        FileSystemServerDeployer server = new FileSystemServerDeployer(spaceName, spaceDir, true, true,
+            protocol);
         String url = server.getVFSRootURL();
         if (!url.endsWith("/")) {
             //let URL terminate by /
