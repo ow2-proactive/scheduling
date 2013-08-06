@@ -81,6 +81,7 @@ import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.dataspaces.vfs.VFSFactory;
+import org.objectweb.proactive.utils.StackTraceUtil;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.db.SortOrder;
@@ -551,22 +552,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             Map<String, String> res = new HashMap<String, String>(allResults.size());
             for (final Entry<String, TaskResult> entry : allResults.entrySet()) {
                 TaskResult taskResult = entry.getValue();
-                String value = null;
-                // No entry if the task had exception
-                if (taskResult.hadException()) {
-                    value = taskResult.getException().getMessage();
-                } else {
-                    try {
-                        Serializable instanciatedValue = taskResult.value();
-                        if (instanciatedValue != null) {
-                            value = instanciatedValue.toString();
-                        }
-                    } catch (InternalSchedulerException e) {
-                        value = UNKNOWN_VALUE_TYPE;
-                    } catch (Throwable t) {
-                        value = "Unable to get the value due to " + t.getMessage();
-                    }
-                }
+                String value = getTaskResultValueAsStringOrExceptionStackTrace(taskResult);
                 res.put(entry.getKey(), value);
             }
             return res;
@@ -950,8 +936,11 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     String jobId, @PathParam("taskname")
     String taskname) throws Throwable {
         Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/tasks/" + taskname + "/result/value");
-        // TaskResult taskResult = s.getTaskResult(jobId, taskname);
         TaskResult taskResult = s.getTaskResult(jobId, taskname);
+        return getTaskResultValueAsStringOrExceptionStackTrace(taskResult);
+    }
+
+    private String getTaskResultValueAsStringOrExceptionStackTrace(TaskResult taskResult) {
         if (taskResult == null) {
             // task is not finished yet
             return null;
@@ -959,7 +948,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         String value = null;
         // No entry if the task had exception
         if (taskResult.hadException()) {
-            value = taskResult.getException().getMessage();
+            value = StackTraceUtil.getStackTrace(taskResult.getException());
         } else {
             try {
                 Serializable instanciatedValue = taskResult.value();
