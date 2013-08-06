@@ -331,8 +331,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
             String userSpaceName = SchedulerConstants.USERSPACE_NAME + "_" + identification.getUsername();
 
             if (!PASchedulerProperties.DATASPACE_DEFAULTUSER_URL.isSet()) {
-                logger.error("URL of the default USER space is not set");
-                throw new IllegalStateException("The URL of the default USER space is not set");
+                logger.warn("URL of the root USER space is not set, cannot create a USER space for " +
+                    identification.getUsername());
+                return;
             }
 
             String localpath = PASchedulerProperties.DATASPACE_DEFAULTUSER_LOCALPATH.getValueAsStringOrNull();
@@ -349,7 +350,8 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
                 logger.info("USER space for user " + identification.getUsername() + " is at " +
                     userSpace.getAllRealURIs());
             } catch (Exception e) {
-                logger.error("", e);
+                logger.warn("", e);
+                return;
             }
             // register the user GlobalSpace to the frontend state
             frontendState.registerGlobalUserSpace(identification, userSpace);
