@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job xmlns="urn:proactive:jobdescriptor:dev" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="urn:proactive:jobdescriptor:dev ../../src/scheduler/src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.xsd"
+		name="Job DataSpaces Unaccessible" cancelJobOnError="true">
+
+
+	<taskFlow>
+
+		<task name="TestSubmitJobWithUnaccessibleDataSpaces">
+			<description>Copies a file to output</description>
+			<inputFiles>
+				<files includes="afile1" accessMode="transferFromInputSpace"/>
+				<files includes="afile2" accessMode="transferFromOutputSpace"/>
+				<files includes="afile3" accessMode="transferFromGlobalSpace"/>
+				<files includes="afile4" accessMode="transferFromUserSpace"/>
+			</inputFiles>
+			<javaExecutable class="org.ow2.proactive.scheduler.examples.EmptyTask">
+			</javaExecutable>
+			<outputFiles>
+				<files includes="anotherfile1" accessMode="transferToOutputSpace"/>
+				<files includes="anotherfile2" accessMode="transferToGlobalSpace"/>
+				<files includes="anotherfile3" accessMode="transferToUserSpace"/>
+			</outputFiles>
+		</task>
+	</taskFlow>
+</job>
