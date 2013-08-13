@@ -36,15 +36,10 @@ package functionaltests.dataspaces;
 
 import java.io.File;
 import java.net.URL;
-import java.util.Map;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobResult;
-import org.ow2.proactive.scheduler.common.task.TaskResult;
 
 import functionaltests.SchedulerConsecutive;
 import functionaltests.SchedulerTHelper;
@@ -88,25 +83,8 @@ public class TestSubmitJobWithUnaccessibleDataSpaces extends SchedulerConsecutiv
 
     @Test
     public void run() throws Throwable {
-
-        JobId id = SchedulerTHelper.testJobSubmission(new File(jobDescriptor.toURI()).getAbsolutePath());
-
-        // check result are not null
-        JobResult res = SchedulerTHelper.getJobResult(id);
-        Assert.assertFalse("Had Exception : " + jobDescriptor.toString(), SchedulerTHelper.getJobResult(id)
-                .hadException());
-
-        for (Map.Entry<String, TaskResult> entry : res.getAllResults().entrySet()) {
-
-            Assert.assertFalse("Had Exception (" + jobDescriptor.toString() + ") : " + entry.getKey(), entry
-                    .getValue().hadException());
-
-            Assert.assertNotNull("Result not null (" + jobDescriptor.toString() + ") : " + entry.getKey(),
-                    entry.getValue().value());
-        }
-
-        SchedulerTHelper.removeJob(id);
-        SchedulerTHelper.waitForEventJobRemoved(id);
+        SchedulerTHelper.testJobSubmissionAndVerifyAllResults(new File(jobDescriptor.toURI())
+                .getAbsolutePath());
     }
 
     @After

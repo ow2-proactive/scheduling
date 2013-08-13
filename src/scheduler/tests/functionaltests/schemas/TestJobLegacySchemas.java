@@ -39,13 +39,8 @@ package functionaltests.schemas;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.net.URL;
-import java.util.Map.Entry;
 
-import org.junit.Assert;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
-import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobResult;
-import org.ow2.proactive.scheduler.common.task.TaskResult;
 
 import functionaltests.SchedulerConsecutive;
 import functionaltests.SchedulerTHelper;
@@ -100,26 +95,8 @@ public class TestJobLegacySchemas extends SchedulerConsecutive {
                 f.delete();
             }
 
-            JobId id = SchedulerTHelper.testJobSubmission(new File(jobDescriptor.toURI()).getAbsolutePath());
-
-            // check result are not null
-            JobResult res = SchedulerTHelper.getJobResult(id);
-            Assert.assertFalse("Had Exception : " + jobDescriptor.toString(), SchedulerTHelper.getJobResult(
-                    id).hadException());
-
-            for (Entry<String, TaskResult> entry : res.getAllResults().entrySet()) {
-
-                Assert.assertFalse("Had Exception (" + jobDescriptor.toString() + ") : " + entry.getKey(),
-                        entry.getValue().hadException());
-
-                Assert.assertNotNull(
-                        "Result not null (" + jobDescriptor.toString() + ") : " + entry.getKey(), entry
-                                .getValue().value());
-            }
-
-            SchedulerTHelper.removeJob(id);
-            SchedulerTHelper.waitForEventJobRemoved(id);
-
+            SchedulerTHelper.testJobSubmissionAndVerifyAllResults(new File(jobDescriptor.toURI())
+                    .getAbsolutePath());
         }
     }
 }

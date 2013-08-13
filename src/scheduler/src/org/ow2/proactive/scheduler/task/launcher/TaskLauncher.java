@@ -909,49 +909,18 @@ public abstract class TaskLauncher {
 
     protected void initDataSpaces() {
         if (isDataspaceAware()) {
+
+            // configure node for application
+            long id = taskId.getJobId().hashCode();
+
+            //prepare scratch, input, output
             try {
-                // configure node for application
-                long id = taskId.getJobId().hashCode();
                 DataSpacesNodes.configureApplication(PAActiveObject.getActiveObjectNode(PAActiveObject
                         .getStubOnThis()), id, namingServiceUrl);
-                //prepare scratch, input, output
+
                 SCRATCH = PADataSpaces.resolveScratchForAO();
-                INPUT = PADataSpaces.resolveDefaultInput();
-                OUTPUT = PADataSpaces.resolveDefaultOutput();
                 logger.info("SCRATCH space is " + SCRATCH.getRealURI());
-                logger.info("INPUT space is " + INPUT.getRealURI());
-                logger.info("(other available urls for INPUT space are " + INPUT.getAllRealURIs() + " )");
-                logger.info("OUTPUT space is " + OUTPUT.getRealURI());
-                logger.info("(other available urls for OUTPUT space are " + OUTPUT.getAllRealURIs() + " )");
-                String realURI = OUTPUT.getRealURI();
-                // Look for the [TASKID] pattern at the end of the dataspace URI
-                if (realURI.contains(SchedulerConstants.TASKID_DIR_DEFAULT_NAME)) {
-                    // resolve the taskid subfolder
-                    DataSpacesFileObject tidOutput = OUTPUT.resolveFile(taskId.toString());
-                    // create this subfolder
-                    tidOutput.createFolder();
-                    // assign it to the output space
-                    OUTPUT = tidOutput;
-                    logger.debug(SchedulerConstants.TASKID_DIR_DEFAULT_NAME +
-                        " pattern found, changed OUTPUT space to : " + OUTPUT.getRealURI());
-                }
-                try {
-                    GLOBAL = PADataSpaces.resolveOutput(SchedulerConstants.GLOBALSPACE_NAME);
-                    logger.info("GLOBAL space is " + GLOBAL.getRealURI());
-                    logger.info("(other available urls for GLOBAL space are " + GLOBAL.getAllRealURIs() +
-                        " )");
-                } catch (Throwable t) {
-                    logger.info("GLOBAL space is disabled");
-                    logger.debug("", t);
-                }
-                try {
-                    USER = PADataSpaces.resolveOutput(SchedulerConstants.USERSPACE_NAME);
-                    logger.info("USER space is " + USER.getRealURI());
-                    logger.info("(other available urls for USER space are " + USER.getAllRealURIs() + " )");
-                } catch (Throwable t) {
-                    logger.info("USER space is disabled");
-                    logger.debug("", t);
-                }
+
                 // create a log file in local space if the node is configured
                 if (this.storeLogs) {
                     logger.info("logfile is enabled for task " + taskId);
@@ -964,8 +933,92 @@ public abstract class TaskLauncher {
                         "There was a problem while initializing dataSpaces, they are not activated",
                         DataspacesStatusLevel.ERROR);
                 this.logDataspacesStatus(Formatter.stackTraceToString(t), DataspacesStatusLevel.ERROR);
+                return;
+            }
+
+            try {
+                INPUT = PADataSpaces.resolveDefaultInput();
+                INPUT = resolveToExisting(INPUT, "INPUT");
+                INPUT = createTaskIdFolder(INPUT, "INPUT");
+            } catch (Throwable t) {
+                logger.info("INPUT space is disabled");
+                logger.debug("", t);
+            }
+            try {
+                OUTPUT = PADataSpaces.resolveDefaultOutput();
+                OUTPUT = resolveToExisting(OUTPUT, "OUTPUT");
+                OUTPUT = createTaskIdFolder(OUTPUT, "OUTPUT");
+            } catch (Throwable t) {
+                logger.info("OUTPUT space is disabled");
+                logger.debug("", t);
+            }
+
+            try {
+                GLOBAL = PADataSpaces.resolveOutput(SchedulerConstants.GLOBALSPACE_NAME);
+                GLOBAL = resolveToExisting(GLOBAL, "GLOBAL");
+                GLOBAL = createTaskIdFolder(GLOBAL, "GLOBAL");
+            } catch (Throwable t) {
+                logger.info("GLOBAL space is disabled");
+                logger.debug("", t);
+            }
+            try {
+                USER = PADataSpaces.resolveOutput(SchedulerConstants.USERSPACE_NAME);
+                USER = resolveToExisting(USER, "USER");
+                USER = createTaskIdFolder(USER, "USER");
+            } catch (Throwable t) {
+                logger.info("USER space is disabled");
+                logger.debug("", t);
             }
         }
+    }
+
+    protected DataSpacesFileObject resolveToExisting(DataSpacesFileObject space, String spaceName) {
+        if (space == null) {
+            logger.info(spaceName + " space is disabled");
+            return null;
+        }
+        // ensure that the remote folder exists (in case we didn't replace any pattern)
+        try {
+            space = space.ensureExistingOrSwitch();
+        } catch (Exception e) {
+            logger.info("Error occurred when switching to alternate space root", e);
+            logger.info(spaceName + " space is disabled");
+            return null;
+        }
+        if (space == null) {
+            logger.info("No existing " + spaceName + " space found with uris " + space.getAllSpaceRootURIs());
+            logger.info(spaceName + " space is disabled");
+        } else {
+            logger.info(spaceName + " space is " + space.getRealURI());
+            logger.info("(other available urls for " + spaceName + " space are " + space.getAllRealURIs() +
+                " )");
+        }
+        return space;
+    }
+
+    protected DataSpacesFileObject createTaskIdFolder(DataSpacesFileObject space, String spaceName) {
+        if (space != null) {
+            String realURI = space.getRealURI();
+            // Look for the TASKID pattern at the end of the dataspace URI
+            if (realURI.contains(SchedulerConstants.TASKID_DIR_DEFAULT_NAME)) {
+                // resolve the taskid subfolder
+                DataSpacesFileObject tidOutput = null;
+                try {
+                    tidOutput = space.resolveFile(taskId.toString());
+                    // create this subfolder
+                    tidOutput.createFolder();
+                } catch (FileSystemException e) {
+                    logger.info("Error when creating the TASKID folder in " + realURI, e);
+                    logger.info(spaceName + " space is disabled");
+                    return null;
+                }
+                // assign it to the space
+                space = tidOutput;
+                logger.info(SchedulerConstants.TASKID_DIR_DEFAULT_NAME + " pattern found, changed " +
+                    spaceName + " space to : " + space.getRealURI());
+            }
+        }
+        return space;
     }
 
     protected void terminateDataSpace() {
