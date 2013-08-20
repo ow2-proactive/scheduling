@@ -5,6 +5,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import junit.framework.Assert;
 
@@ -60,6 +63,67 @@ public class TestJobRemove extends BaseSchedulerDBTest {
         Assert.assertEquals("OK2", dbManager.loadTaskResult(job.getTask("forkedJavaTask-0").getId(), 0)
                 .value());
         Assert.assertEquals("OK3", dbManager.loadTaskResult(job.getTask("nativeTask-0").getId(), 0).value());
+    }
+
+    @Test
+    public void testRuntimeDataRemoveAfterFinishParallel() throws Throwable {
+        int THREAD_COUNT = 4;
+        ExecutorService executorService = Executors.newCachedThreadPool();
+
+        List<InternalJob> jobs = new ArrayList<InternalJob>();
+        TaskFlowJob jobDef;
+        for (int i = 0; i < THREAD_COUNT; i++) {
+            jobDef = createJob(2);
+            jobs.add(defaultSubmitJobAndLoadInternal(false, jobDef));
+        }
+
+        for (int i = 0; i < THREAD_COUNT; i++) {
+            final InternalJob job = jobs.get(i);
+            executorService.submit(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        dbManager.updateAfterTaskFinished(job, job.getTask("javaTask-0"), new TaskResultImpl(
+                            null, "OK1", null, 0, null));
+                        dbManager.updateAfterTaskFinished(job, job.getTask("forkedJavaTask-0"),
+                                new TaskResultImpl(null, "OK2", null, 0, null));
+                        dbManager.updateAfterTaskFinished(job, job.getTask("nativeTask-0"),
+                                new TaskResultImpl(null, "OK3", null, 0, null));
+
+                        job.setStatus(JobStatus.FINISHED);
+
+                        dbManager.updateAfterTaskFinished(job, null, null);
+
+                    } catch (Throwable throwable) {
+                        throwable.printStackTrace();
+                    }
+                }
+            });
+        }
+
+        executorService.shutdown();
+        executorService.awaitTermination(30, TimeUnit.SECONDS);
+
+        for (int i = 0; i < THREAD_COUNT; i++) {
+            final InternalJob job = jobs.get(i);
+
+            List<InternalJob> jobsNotFinished = dbManager.loadNotFinishedJobs(true);
+            Assert.assertEquals("All jobs should be finished", 0, jobsNotFinished.size());
+
+            checkAllEntitiesDeleted(JobData.class.getName(), TaskData.class.getName(), TaskResultData.class
+                    .getName());
+
+            // check can still load task results
+
+            Assert
+                    .assertEquals("OK1", dbManager.loadTaskResult(job.getTask("javaTask-0").getId(), 0)
+                            .value());
+            Assert.assertEquals("OK2", dbManager.loadTaskResult(job.getTask("forkedJavaTask-0").getId(), 0)
+                    .value());
+            Assert.assertEquals("OK3", dbManager.loadTaskResult(job.getTask("nativeTask-0").getId(), 0)
+                    .value());
+        }
+
     }
 
     @Test
