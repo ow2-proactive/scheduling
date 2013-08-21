@@ -43,6 +43,7 @@ import org.junit.Test;
 
 import functionaltests.SchedulerConsecutive;
 import functionaltests.SchedulerTHelper;
+import functionalTests.TestDisabler;
 
 
 /**
@@ -78,6 +79,9 @@ public class TestSubmitJobWithUnaccessibleDataSpaces extends SchedulerConsecutiv
 
     @Before
     public void before() throws Throwable {
+        if (consecutiveMode) {
+            TestDisabler.waitingTestFix();
+        }
         SchedulerTHelper.startScheduler(true, (new File(configFile.toURI())).getAbsolutePath());
     }
 
