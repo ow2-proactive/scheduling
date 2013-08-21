@@ -49,6 +49,7 @@ import org.objectweb.proactive.extensions.vfsprovider.FileSystemServerDeployer;
 
 import functionaltests.SchedulerConsecutive;
 import functionaltests.SchedulerTHelper;
+import functionalTests.TestDisabler;
 
 
 /**
@@ -78,6 +79,9 @@ public class TestSubmitJobWithPartiallyUnaccessibleDataSpaces extends SchedulerC
 
     @Before
     public void before() throws Throwable {
+        if (consecutiveMode) {
+            TestDisabler.waitingTestFix();
+        }
         spaceRoot = folder.newFolder("space");
         spaceRootUser = new File(spaceRoot, "demo");
         spaceRootUser.mkdirs();
@@ -90,6 +94,7 @@ public class TestSubmitJobWithPartiallyUnaccessibleDataSpaces extends SchedulerC
         FileUtils.writeStringToFile(propertiesfile, newContent);
 
         SchedulerTHelper.startScheduler(true, propertiesfile.getAbsolutePath());
+
     }
 
     @Test
