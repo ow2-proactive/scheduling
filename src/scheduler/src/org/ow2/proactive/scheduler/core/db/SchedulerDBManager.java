@@ -664,22 +664,15 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
     }
 
     private void removeJobScripts(Session session, long jobId) {
-        session
-                .createQuery(
-                        "delete from ScriptData where id in (select td.envScript from ForkedJavaTaskData td where td.taskData.id.jobId = :jobId)")
-                .setParameter("jobId", jobId).executeUpdate();
-        session
-                .createQuery(
-                        "delete from ScriptData where id in (select td.generationScript from NativeTaskData td where td.taskData.id.jobId = :jobId)")
-                .setParameter("jobId", jobId).executeUpdate();
-        session
-                .createQuery(
-                        "delete from ScriptData where id in (select preScript from TaskData where id.jobId = :jobId)"
-                            + "or id in (select postScript from TaskData where id.jobId = :jobId) or id in (select cleanScript from TaskData where id.jobId = :jobId) or id in (select flowScript from TaskData where id.jobId = :jobId)")
-                .setParameter("jobId", jobId).executeUpdate();
-        session
-                .createQuery(
-                        "delete from ScriptData where id in (select td.script from ScriptTaskData td where td.taskData.id.jobId = :jobId)")
+        session.createQuery(
+                "delete from ScriptData where"
+                    + " id in (select td.envScript from ForkedJavaTaskData td where td.taskData.id.jobId = :jobId)"
+                    + " or id in (select td.generationScript from NativeTaskData td where td.taskData.id.jobId = :jobId)"
+                    + " or id in (select preScript from TaskData where id.jobId = :jobId)"
+                    + " or id in (select postScript from TaskData where id.jobId = :jobId)"
+                    + " or id in (select cleanScript from TaskData where id.jobId = :jobId)"
+                    + " or id in (select flowScript from TaskData where id.jobId = :jobId)"
+                    + " or id in (select td.script from ScriptTaskData td where td.taskData.id.jobId = :jobId)")
                 .setParameter("jobId", jobId).executeUpdate();
     }
 
