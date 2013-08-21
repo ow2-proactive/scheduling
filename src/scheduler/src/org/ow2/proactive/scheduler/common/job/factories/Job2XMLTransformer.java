@@ -205,8 +205,22 @@ public class Job2XMLTransformer {
         // <ref name="outputSpace"/>
         if (job.getOutputSpace() != null) {
             Element outputSpace = createElement(doc, XMLTags.DS_OUTPUTSPACE.getXMLName(), null,
-                    new Attribute(XMLAttributes.DS_URL.getXMLName(), job.getInputSpace()));
+                    new Attribute(XMLAttributes.DS_URL.getXMLName(), job.getOutputSpace()));
             rootJob.appendChild(outputSpace);
+        }
+
+        // <ref name="globalSpace"/>
+        if (job.getGlobalSpace() != null) {
+            Element globalSpace = createElement(doc, XMLTags.DS_GLOBALSPACE.getXMLName(), null,
+                    new Attribute(XMLAttributes.DS_URL.getXMLName(), job.getGlobalSpace()));
+            rootJob.appendChild(globalSpace);
+        }
+
+        // <ref name="userSpace"/>
+        if (job.getUserSpace() != null) {
+            Element userSpace = createElement(doc, XMLTags.DS_USERSPACE.getXMLName(), null, new Attribute(
+                XMLAttributes.DS_URL.getXMLName(), job.getUserSpace()));
+            rootJob.appendChild(userSpace);
         }
 
         // <ref name="taskFlow"/>
@@ -402,8 +416,10 @@ public class Job2XMLTransformer {
                     setAttribute(filesE, XMLAttributes.DS_INCLUDES, fs.getIncludes()[0]);
                 if (fs.getExcludes() != null)
                     setAttribute(filesE, XMLAttributes.DS_EXCLUDES, fs.getExcludes()[0]);
-
-                setAttribute(filesE, XMLAttributes.DS_ACCESSMODE, inputSelector.getMode().toString());
+                if (inputSelector.getMode() != null) {
+                    setAttribute(filesE, XMLAttributes.DS_ACCESSMODE, inputSelector.getMode().toString(),
+                            true);
+                }
                 inputFilesE.appendChild(filesE);
             }
             taskE.appendChild(inputFilesE);
@@ -481,8 +497,10 @@ public class Job2XMLTransformer {
                     setAttribute(filesE, XMLAttributes.DS_INCLUDES, fs.getIncludes()[0]);
                 if (fs.getExcludes() != null)
                     setAttribute(filesE, XMLAttributes.DS_EXCLUDES, fs.getExcludes()[0]);
-
-                setAttribute(filesE, XMLAttributes.DS_ACCESSMODE, outputSelector.getMode().toString());
+                if (outputSelector.getMode() != null) {
+                    setAttribute(filesE, XMLAttributes.DS_ACCESSMODE, outputSelector.getMode().toString(),
+                            true);
+                }
                 outputFilesE.appendChild(filesE);
             }
             taskE.appendChild(outputFilesE);

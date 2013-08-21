@@ -71,6 +71,9 @@
 			<indexjars>
 				<fileset refid="jar.index.fileset" />
 			</indexjars>
+			<manifest>
+				<attribute name="Implementation-Version" value="${version}" />
+			</manifest>
 		</jar>
 	</target>
 
@@ -97,12 +100,18 @@
 			<indexjars>
 				<fileset refid="jar.index.fileset" />
 			</indexjars>
+			<manifest>
+				<attribute name="Implementation-Version" value="${version}" />
+			</manifest>
 		</jar>
 	</target>
 
 	<target name="deploy.rm.tests" depends="-deployCopy, deploy.common, deploy.rm" description="Creates rm tests jar">
 		<jar destfile="${deploy.lib.dir}/${rm.tests.jar}" manifest="${basedir}/scheduler-Manifest-base.mf" index="false">
 			<fileset dir="${cl.rm.tests.dir}" includes="**" />
+			<manifest>
+				<attribute name="Implementation-Version" value="${version}" />
+			</manifest>
 		</jar>
 	</target>
 

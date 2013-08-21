@@ -35,11 +35,11 @@
                 <task ref="JobClassPath"/>
             </depends>
             <inputFiles>
-                <files includes="TaskLogs-3-JobClassPath.log" accessMode="transferFromInputSpace"/>
+                <files includes="TaskLogs-*.log" accessMode="transferFromInputSpace"/>
             </inputFiles>
-            <javaExecutable class="functionaltests.schemas.CopyFiles">
+            <javaExecutable class="org.ow2.proactive.scheduler.examples.CopyFile">
                 <parameters>
-                    <parameter name="inputFile" value="TaskLogs-3-JobClassPath.log"/>
+                    <parameter name="inputFile" value="TaskLogs-*.log"/>
                     <parameter name="outputFile" value="CheckPreciousLogOut"/>
                 </parameters>
             </javaExecutable>
@@ -90,7 +90,7 @@
             <inputFiles>
                 <files includes="myfilein1" accessMode="transferFromInputSpace"/>
             </inputFiles>
-            <javaExecutable class="functionaltests.schemas.CopyFiles">
+            <javaExecutable class="org.ow2.proactive.scheduler.examples.CopyFile">
                 <parameters>
                     <parameter name="inputFile" value="myfilein1"/>
                     <parameter name="outputFile" value="myfileout1"/>
@@ -108,7 +108,7 @@
             <inputFiles>
                 <files includes="myfileout1" accessMode="transferFromOutputSpace"/>
             </inputFiles>
-            <javaExecutable class="functionaltests.schemas.CopyFiles">
+            <javaExecutable class="org.ow2.proactive.scheduler.examples.CopyFile">
                 <parameters>
                     <parameter name="inputFile" value="myfileout1"/>
                     <parameter name="outputFile" value="myfileout2"/>
@@ -126,7 +126,7 @@
             <inputFiles>
                 <files includes="myfileout2" accessMode="transferFromGlobalSpace"/>
             </inputFiles>
-            <javaExecutable class="functionaltests.schemas.CopyFiles">
+            <javaExecutable class="org.ow2.proactive.scheduler.examples.CopyFile">
                 <parameters>
                     <parameter name="inputFile" value="myfileout2"/>
                     <parameter name="outputFile" value="myfileout3"/>
@@ -144,7 +144,7 @@
             <inputFiles>
                 <files includes="myfileout3" accessMode="transferFromUserSpace"/>
             </inputFiles>
-            <javaExecutable class="functionaltests.schemas.CopyFiles">
+            <javaExecutable class="org.ow2.proactive.scheduler.examples.CopyFile">
                 <parameters>
                     <parameter name="inputFile" value="myfileout3"/>
                     <parameter name="outputFile" value="myfileout4"/>

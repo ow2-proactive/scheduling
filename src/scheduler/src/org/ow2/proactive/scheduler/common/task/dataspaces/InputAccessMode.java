@@ -49,13 +49,13 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @PublicAPI
 public enum InputAccessMode {
     /** Transfer files from INPUT space to LOCAL space */
-    TransferFromInputSpace("TransferFromInputSpace"),
+    TransferFromInputSpace("transferFromInputSpace"),
     /** Transfer files from OUTPUT space to LOCAL space */
-    TransferFromOutputSpace("TransferFromOutputSpace"),
+    TransferFromOutputSpace("transferFromOutputSpace"),
     /** GLOBAL to LOCAL */
-    TransferFromGlobalSpace("TransferFromGlobalSpace"),
+    TransferFromGlobalSpace("transferFromGlobalSpace"),
     /** USER to LOCAL */
-    TransferFromUserSpace("TransferFromUserSpace"),
+    TransferFromUserSpace("transferFromUserSpace"),
     /** Do nothing */
     none("none");
 

@@ -118,6 +118,7 @@ public class TestXMLTransformer extends FunctionalTest {
             try {
                 transformAndCompare(file);
             } catch (Exception e) {
+                e.printStackTrace();
                 throw new Exception("An exception occured while treating the file " + file.getAbsolutePath(),
                     e);
             }
@@ -158,6 +159,7 @@ public class TestXMLTransformer extends FunctionalTest {
         try {
             job2 = (TaskFlowJob) (JobFactory.getFactory().createJob(xmlFile2.getAbsolutePath()));
         } catch (Exception e) {
+            e.printStackTrace();
             String message = "Could not create Job object from generated xml. \n";
             message += "Generated xml content was : \n ****** " + xmlFile2.getAbsolutePath() +
                 " ***********\n ";

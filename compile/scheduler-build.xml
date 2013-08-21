@@ -104,6 +104,9 @@
 			<indexjars>
 				<fileset refid="jar.index.fileset" />
 			</indexjars>
+			<manifest>
+				<attribute name="Implementation-Version" value="${version}" />
+			</manifest>
 		</jar>
 	</target>
 
@@ -118,12 +121,18 @@
 			<indexjars>
 				<fileset refid="jar.index.fileset" />
 			</indexjars>
+			<manifest>
+				<attribute name="Implementation-Version" value="${version}" />
+			</manifest>
 		</jar>
 	</target>
 
 	<target name="deploy.scheduler.tests" depends="-deployCopy, deploy.scheduler, deploy.common, deploy.rm" description="Creates scheduler tests jar">
 		<jar destfile="${deploy.lib.dir}/${scheduler.tests.jar}" manifest="${basedir}/scheduler-Manifest-base.mf" index="false">
 			<fileset dir="${cl.scheduler.tests.dir}" includes="**" />
+			<manifest>
+				<attribute name="Implementation-Version" value="${version}" />
+			</manifest>
 		</jar>
 	</target>
 
@@ -135,6 +144,9 @@
 			<indexjars>
 				<fileset refid="jar.index.fileset" />
 			</indexjars>
+			<manifest>
+				<attribute name="Implementation-Version" value="${version}" />
+			</manifest>
 		</jar>
 	</target>
 	<!-- end of the ant target to create the ProActive_Scheduler-mapreduce.jar -->
@@ -147,6 +159,9 @@
 			<indexjars>
 				<fileset refid="jar.index.fileset" />
 			</indexjars>
+			<manifest>
+				<attribute name="Implementation-Version" value="${version}" />
+			</manifest>
 		</jar>
 	</target>
 
@@ -402,6 +417,9 @@
 			<indexjars>
 				<fileset refid="jar.index.fileset" />
 			</indexjars>
+			<manifest>
+				<attribute name="Implementation-Version" value="${version}" />
+			</manifest>
 		</jar>
 
 		<delete dir="${worker.dir.tmp}" />

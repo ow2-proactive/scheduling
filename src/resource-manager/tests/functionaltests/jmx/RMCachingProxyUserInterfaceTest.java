@@ -50,6 +50,7 @@ import org.junit.Test;
 
 import static junit.framework.Assert.assertNotNull;
 
+
 public class RMCachingProxyUserInterfaceTest extends RMConsecutive {
 
     private static final String EXISTING_OBJECT_NAME = "java.lang:type=Runtime";
@@ -66,8 +67,7 @@ public class RMCachingProxyUserInterfaceTest extends RMConsecutive {
         String nodeSource1_NodeJmxUrl = state.getNodesEvents().get(0).getDefaultJMXUrl();
 
         Object mBeanFromNodeSource1 = proxyUserInterface.getNodeMBeanInfo(nodeSource1_NodeJmxUrl,
-                EXISTING_OBJECT_NAME,
-                Collections.<String>emptyList());
+                EXISTING_OBJECT_NAME, Collections.<String> emptyList());
 
         assertNotNull(mBeanFromNodeSource1);
 
@@ -80,8 +80,7 @@ public class RMCachingProxyUserInterfaceTest extends RMConsecutive {
         String nodeSource2_NodeJmxUrl = state.getNodesEvents().get(0).getDefaultJMXUrl();
 
         Object mBeanFromNodeSource2 = proxyUserInterface.getNodeMBeanInfo(nodeSource2_NodeJmxUrl,
-                EXISTING_OBJECT_NAME,
-                Collections.<String>emptyList());
+                EXISTING_OBJECT_NAME, Collections.<String> emptyList());
 
         assertNotNull(mBeanFromNodeSource2);
 
@@ -91,15 +90,13 @@ public class RMCachingProxyUserInterfaceTest extends RMConsecutive {
 
     private RMCachingProxyUserInterface createRMCachingProxyUserInterface() throws Exception {
         RMCachingProxyUserInterface proxyUserInterface = PAActiveObject.newActive(
-                RMCachingProxyUserInterface.class,
-                new Object[] { });
+                RMCachingProxyUserInterface.class, new Object[] {});
         final RMAuthentication auth = RMTHelper.getDefaultInstance().getRMAuth();
         final PublicKey pubKey = auth.getPublicKey();
-        final Credentials adminCreds = Credentials.createCredentials(
-                new CredData(RMTHelper.defaultUserName, RMTHelper.defaultUserPassword),
-                pubKey);
-        proxyUserInterface.init("rmi://localhost:" + CentralPAPropertyRepository.PA_RMI_PORT.getValue() + "/",
-                adminCreds);
+        final Credentials adminCreds = Credentials.createCredentials(new CredData(RMTHelper.defaultUserName,
+            RMTHelper.defaultUserPassword), pubKey);
+        proxyUserInterface.init(
+                "rmi://localhost:" + CentralPAPropertyRepository.PA_RMI_PORT.getValue() + "/", adminCreds);
         return proxyUserInterface;
     }
 }

@@ -37,13 +37,10 @@
 package functionaltests.schemas;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.net.URL;
-import java.util.Map.Entry;
 
-import org.junit.Assert;
-import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobResult;
-import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 
 import functionaltests.SchedulerConsecutive;
 import functionaltests.SchedulerTHelper;
@@ -81,25 +78,25 @@ public class TestJobLegacySchemas extends SchedulerConsecutive {
     public void run() throws Throwable {
         for (URL jobDescriptor : jobDescriptors) {
             logger.info("Testing submission of job descriptor : " + jobDescriptor);
-            JobId id = SchedulerTHelper.testJobSubmission(new File(jobDescriptor.toURI()).getAbsolutePath());
+            // clean dataspace
+            File ds = new File(PAResourceManagerProperties.RM_HOME.getValueAsString(),
+                "/src/scheduler/tests/functionaltests/schemas");
 
-            // check result are not null
-            JobResult res = SchedulerTHelper.getJobResult(id);
-            Assert.assertFalse("Had Exception : " + jobDescriptor.toString(), SchedulerTHelper.getJobResult(
-                    id).hadException());
-
-            for (Entry<String, TaskResult> entry : res.getAllResults().entrySet()) {
-
-                Assert.assertFalse("Had Exception (" + jobDescriptor.toString() + ") : " + entry.getKey(),
-                        entry.getValue().hadException());
-
-                Assert.assertNotNull(
-                        "Result not null (" + jobDescriptor.toString() + ") : " + entry.getKey(), entry
-                                .getValue().value());
+            File[] todelete = ds.listFiles(new FilenameFilter() {
+                @Override
+                public boolean accept(File dir, String name) {
+                    if (name.startsWith("myfileout") || name.endsWith(".log")) {
+                        return true;
+                    }
+                    return false;
+                }
+            });
+            for (File f : todelete) {
+                f.delete();
             }
 
-            SchedulerTHelper.removeJob(id);
-            SchedulerTHelper.waitForEventJobRemoved(id);
+            SchedulerTHelper.testJobSubmissionAndVerifyAllResults(new File(jobDescriptor.toURI())
+                    .getAbsolutePath());
         }
     }
 }
