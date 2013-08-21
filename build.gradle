@@ -1,0 +1,142 @@
+subprojects {
+    apply plugin: 'java'
+
+    repositories {
+        mavenLocal()
+        mavenCentral()
+    }
+
+    dependencies {
+        compile 'log4j:log4j:1.2.14'
+        testCompile 'junit:junit:4.11'
+    }
+
+}
+
+
+project(':scheduler:scheduler-job') {
+    dependencies {
+        compile 'org.objectweb.proactive:programming-annotation:5.5.0-SNAPSHOT'
+        compile 'org.objectweb.proactive:programming-core:5.5.0-SNAPSHOT'
+        compile 'org.objectweb.proactive:programming-extension-annotation:5.5.0-SNAPSHOT'
+
+        compile 'org.hibernate.javax.persistence:hibernate-jpa-2.0-api:1.0.1.Final'
+        compile 'it.sauronsoftware.cron4j:cron4j:2.2.5'
+        compile 'isorelax:isorelax:20030108'
+        compile 'commons-collections:commons-collections:3.2'
+        compile 'msv:msv:20050913'
+
+        compile project(':scheduler-utils')
+        compile project(':common-api')
+    }
+}
+
+
+project('scheduler-utils') {
+    dependencies {
+        compile 'org.objectweb.proactive:programming-annotation:5.5.0-SNAPSHOT'
+    }
+}
+
+
+project(':scheduler:scheduler-api') {
+    dependencies {
+        compile 'org.objectweb.proactive:programming-annotation:5.5.0-SNAPSHOT'
+
+        compile project(':scheduler:scheduler-job')
+        compile project(':common-api')
+    }
+}
+
+
+
+project('common-api') {
+    dependencies {
+        compile 'commons-codec:commons-codec:1.6'
+        compile 'org.rrd4j:rrd4j:2.0.7'
+
+        compile 'org.objectweb.proactive:programming-core:5.5.0-SNAPSHOT'
+        compile 'org.objectweb.proactive:programming-extension-annotation:5.5.0-SNAPSHOT'
+
+    }
+}
+
+project('rm:rm-api') {
+    dependencies {
+        compile 'org.objectweb.proactive:programming-annotation:5.5.0-SNAPSHOT'
+        compile 'org.objectweb.proactive:programming-core:5.5.0-SNAPSHOT'
+        compile 'org.objectweb.proactive:programming-extension-annotation:5.5.0-SNAPSHOT'
+
+        compile 'org.hibernate.javax.persistence:hibernate-jpa-2.0-api:1.0.1.Final'
+        compile 'org.hibernate:hibernate-core:4.1.3.Final'
+
+
+        compile project(':common-api')
+    }
+}
+
+project(':rm:rm-node') {
+    dependencies {
+        compile 'commons-cli:commons-cli:1.1'
+
+        compile 'org.objectweb.proactive:programming-extension-dataspaces:5.5.0-SNAPSHOT'
+
+        compile project(':common-api')
+        compile project(':rm:rm-api')
+        compile project(':scheduler-utils')
+        compile files("${rootDir}/lib/node/sigar/sigar.jar")
+    }
+}
+
+project(':rm:rm-cli') {
+    dependencies {
+        compile 'org.objectweb.proactive:programming-core:5.5.0-SNAPSHOT'
+        compile project(':common-api')
+        compile project(':rm:rm-api')
+        compile project(':scheduler-utils')
+        compile project(':client-utils')
+    }
+}
+
+project(':scheduler:scheduler-cli') {
+    dependencies {
+        compile 'org.objectweb.proactive:programming-core:5.5.0-SNAPSHOT'
+        compile project(':common-api')
+        compile project(':scheduler:scheduler-api')
+        compile project(':scheduler-utils') // TODO rename used in both ?
+        compile project(':client-utils')
+    }
+}
+
+project('client-utils') {
+    dependencies {
+        compile 'jline:jline:2.11'
+    }
+}
+
+
+project('rm:rm-core') {
+    dependencies {
+        compile 'commons-cli:commons-cli:1.1'
+        compile 'it.sauronsoftware.cron4j:cron4j:2.2.5'
+
+        compile 'org.objectweb.proactive:programming-core:5.5.0-SNAPSHOT'
+
+        compile project(':common-api')
+        compile project(':rm:rm-api')
+        compile project(':rm:rm-node')
+        compile project(':scheduler-utils')
+
+
+        runtime 'org.hibernate:hibernate-c3p0:4.1.3.Final'
+        runtime 'org.apache.derby:derby:10.8.2.2'
+    }
+}
+
+
+task ProActiveLibs(type: Copy) {
+    subprojects.each {
+        from it.configurations.runtime.files //{ it instanceof ExternalDependency }
+    }
+    into "dist/lib"
+}
