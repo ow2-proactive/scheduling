@@ -182,6 +182,13 @@ project('rm:rm-infrastructure:rm-infrastructure-winhpc') {
     }
 }
 
+project('rm:rm-policy:rm-policy-scheduler') {
+    dependencies {
+        compile project(':scheduler:scheduler-client')
+        compile project(':rm:rm-server')
+    }
+}
+
 task ProActiveLibs(type: Copy) {
     subprojects.each {
         from it.configurations.runtime.files //{ it instanceof ExternalDependency }
