@@ -14,11 +14,9 @@ subprojects {
 }
 
 
-project(':scheduler:scheduler-job') {
+project(':scheduler:scheduler-api') {
     dependencies {
         compile 'org.objectweb.proactive:programming-annotation:5.5.0-SNAPSHOT'
-        compile 'org.objectweb.proactive:programming-core:5.5.0-SNAPSHOT'
-        compile 'org.objectweb.proactive:programming-extension-annotation:5.5.0-SNAPSHOT'
 
         compile 'org.hibernate.javax.persistence:hibernate-jpa-2.0-api:1.0.1.Final'
         compile 'it.sauronsoftware.cron4j:cron4j:2.2.5'
@@ -38,19 +36,25 @@ project('scheduler-utils') {
     }
 }
 
+project('common-api') {
+    dependencies {
+        compile 'org.objectweb.proactive:programming-annotation:5.5.0-SNAPSHOT'
+    }
+}
 
-project(':scheduler:scheduler-api') {
+
+project(':scheduler:scheduler-client') {
     dependencies {
         compile 'org.objectweb.proactive:programming-annotation:5.5.0-SNAPSHOT'
 
-        compile project(':scheduler:scheduler-job')
-        compile project(':common-api')
+        compile project(':scheduler:scheduler-api')
+        compile project(':common-client')
     }
 }
 
 
 
-project('common-api') {
+project('common-client') {
     dependencies {
         compile 'commons-codec:commons-codec:1.6'
         compile 'org.rrd4j:rrd4j:2.0.7'
@@ -58,10 +62,12 @@ project('common-api') {
         compile 'org.objectweb.proactive:programming-core:5.5.0-SNAPSHOT'
         compile 'org.objectweb.proactive:programming-extension-annotation:5.5.0-SNAPSHOT'
 
+        compile project(':common-api')
+
     }
 }
 
-project('rm:rm-api') {
+project('rm:rm-client') {
     dependencies {
         compile 'org.objectweb.proactive:programming-annotation:5.5.0-SNAPSHOT'
         compile 'org.objectweb.proactive:programming-core:5.5.0-SNAPSHOT'
@@ -70,8 +76,7 @@ project('rm:rm-api') {
         compile 'org.hibernate.javax.persistence:hibernate-jpa-2.0-api:1.0.1.Final'
         compile 'org.hibernate:hibernate-core:4.1.3.Final'
 
-
-        compile project(':common-api')
+        compile project(':common-client')
     }
 }
 
@@ -81,8 +86,8 @@ project(':rm:rm-node') {
 
         compile 'org.objectweb.proactive:programming-extension-dataspaces:5.5.0-SNAPSHOT'
 
-        compile project(':common-api')
-        compile project(':rm:rm-api')
+        compile project(':common-client')
+        compile project(':rm:rm-client')
         compile project(':scheduler-utils')
         compile files("${rootDir}/lib/node/sigar/sigar.jar")
     }
@@ -91,8 +96,8 @@ project(':rm:rm-node') {
 project(':rm:rm-cli') {
     dependencies {
         compile 'org.objectweb.proactive:programming-core:5.5.0-SNAPSHOT'
-        compile project(':common-api')
-        compile project(':rm:rm-api')
+        compile project(':common-client')
+        compile project(':rm:rm-client')
         compile project(':scheduler-utils')
         compile project(':cli-utils')
     }
@@ -101,15 +106,15 @@ project(':rm:rm-cli') {
 project(':scheduler:scheduler-cli') {
     dependencies {
         compile 'org.objectweb.proactive:programming-core:5.5.0-SNAPSHOT'
-        compile project(':common-api')
-        compile project(':scheduler:scheduler-api')
+        compile project(':common-client')
+        compile project(':scheduler:scheduler-client')
         compile project(':scheduler-utils') // TODO rename used in both ?
         compile project(':cli-utils')
     }
 }
 
 
-project('scheduler:scheduler-core') {
+project('scheduler:scheduler-server') {
     dependencies {
         compile(
                 'commons-cli:commons-cli:1.1',
@@ -122,9 +127,9 @@ project('scheduler:scheduler-core') {
                 'org.objectweb.proactive:programming-extension-pamr:5.5.0-SNAPSHOT',
                 'org.objectweb.proactive:programming-extension-processbuilder:5.5.0-SNAPSHOT',
 
-                project(':common-api'),
-                project(':scheduler:scheduler-api'),
-                project(':rm:rm-core')
+                project(':common-client'),
+                project(':scheduler:scheduler-client'),
+                project(':rm:rm-server')
         )
         runtime 'org.hibernate:hibernate-c3p0:4.1.3.Final'
         runtime 'org.apache.derby:derby:10.8.2.2'
@@ -138,7 +143,7 @@ project('cli-utils') {
 }
 
 
-project('rm:rm-core') {
+project('rm:rm-server') {
     dependencies {
         compile(
                 'commons-cli:commons-cli:1.1',
@@ -146,8 +151,8 @@ project('rm:rm-core') {
 
                 'org.objectweb.proactive:programming-core:5.5.0-SNAPSHOT',
 
-                project(':common-api'),
-                project(':rm:rm-api'),
+                project(':common-client'),
+                project(':rm:rm-client'),
                 project(':rm:rm-node'),
                 project(':scheduler-utils')
         )
@@ -159,13 +164,13 @@ project('rm:rm-core') {
 project('rm:rm-infrastructure:rm-infrastructure-ec2') {
     dependencies {
         compile files("${rootDir}/lib/nodesource/ec2/typica.jar")
-        compile project(':rm:rm-core')
+        compile project(':rm:rm-server')
     }
 }
 project('rm:rm-infrastructure:rm-infrastructure-gcm') {
     dependencies {
         compile 'org.objectweb.proactive:programming-extension-gcmdeployment:5.5.0-SNAPSHOT'
-        compile project(':rm:rm-core')
+        compile project(':rm:rm-server')
     }
 }
 project('rm:rm-infrastructure:rm-infrastructure-winhpc') {
@@ -173,7 +178,7 @@ project('rm:rm-infrastructure:rm-infrastructure-winhpc') {
         compile 'org.apache.axis2:axis2:1.4'
         compile 'org.apache.ws.commons.axiom:axiom-api:1.2.7'
         compile files("${rootDir}/lib/nodesource/winhpc/WinHPCWebserviceStubs.jar")
-        compile project(':rm:rm-core')
+        compile project(':rm:rm-server')
     }
 }
 

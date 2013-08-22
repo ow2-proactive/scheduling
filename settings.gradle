@@ -2,16 +2,17 @@ include 'scheduler-utils'
 include 'cli-utils'
 
 include 'common-api'
+include 'common-client'
 
 include 'scheduler:scheduler-api'
-include 'scheduler:scheduler-job'
+include 'scheduler:scheduler-client'
 include 'scheduler:scheduler-cli'
-include 'scheduler:scheduler-core'
+include 'scheduler:scheduler-server'
 
-include 'rm:rm-api'
+include 'rm:rm-client'
 include 'rm:rm-node'
 include 'rm:rm-cli'
-include 'rm:rm-core'
+include 'rm:rm-server'
 
 include 'rm:rm-infrastructure:rm-infrastructure-ec2'
 include 'rm:rm-infrastructure:rm-infrastructure-gcm'
