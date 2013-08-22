@@ -49,8 +49,8 @@ import javax.script.ScriptEngineManager;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 
-import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.apache.log4j.Logger;
 
 
 /**
@@ -172,7 +172,7 @@ public class GenerationScript extends Script<Object> {
             Object resultList = bindings.get(RESULTLIST_VARIABLE);
 
             if (resultList instanceof List) {
-                return new ScriptResult<Object>((List<String>) resultList);
+                return new ScriptResult<Object>(resultList);
             } else {
                 String msg = "Bad result format : awaited String[], found " + resultList.getClass().getName();
                 logger.warn(msg);

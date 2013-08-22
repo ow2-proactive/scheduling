@@ -74,6 +74,7 @@ public final class LogForwardingService {
         try {
             if (!initialized) {
                 // load the provider
+                @SuppressWarnings("unchecked")
                 Class<? extends LogForwardingProvider> providerClass = (Class<? extends LogForwardingProvider>) Class
                         .forName(providerClassname);
                 this.provider = providerClass.newInstance();

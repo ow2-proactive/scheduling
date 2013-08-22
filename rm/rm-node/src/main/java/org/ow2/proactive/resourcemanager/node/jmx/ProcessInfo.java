@@ -58,7 +58,7 @@ public class ProcessInfo {
     }
 
     public ProcessInfo(List process) {
-        Iterator<Object> it = process.iterator();
+        Iterator it = process.iterator();
         pid = Integer.parseInt(it.next().toString());
         owner = it.next().toString();
         startTime = it.next().toString();

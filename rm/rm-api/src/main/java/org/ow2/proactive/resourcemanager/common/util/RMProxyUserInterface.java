@@ -152,6 +152,7 @@ public class RMProxyUserInterface implements ResourceManager {
     /**
      * @see org.ow2.proactive.resourcemanager.frontend.ResourceManager#getAtMostNodes(int, org.ow2.proactive.scripting.SelectionScript)
      */
+    @SuppressWarnings("deprecation")
     public NodeSet getAtMostNodes(int arg0, SelectionScript arg1) {
         return target.getAtMostNodes(arg0, arg1);
     }
@@ -159,6 +160,7 @@ public class RMProxyUserInterface implements ResourceManager {
     /**
      * @see org.ow2.proactive.resourcemanager.frontend.ResourceManager#getAtMostNodes(int, org.ow2.proactive.scripting.SelectionScript, org.ow2.proactive.utils.NodeSet)
      */
+    @SuppressWarnings("deprecation")
     public NodeSet getAtMostNodes(int arg0, SelectionScript arg1, NodeSet arg2) {
         return target.getAtMostNodes(arg0, arg1, arg2);
     }
@@ -166,6 +168,7 @@ public class RMProxyUserInterface implements ResourceManager {
     /**
      * @see org.ow2.proactive.resourcemanager.frontend.ResourceManager#getAtMostNodes(int, java.util.List, org.ow2.proactive.utils.NodeSet)
      */
+    @SuppressWarnings("deprecation")
     public NodeSet getAtMostNodes(int arg0, List<SelectionScript> arg1, NodeSet arg2) {
         return target.getAtMostNodes(arg0, arg1, arg2);
     }
@@ -264,6 +267,7 @@ public class RMProxyUserInterface implements ResourceManager {
     /**
      * @see org.ow2.proactive.resourcemanager.frontend.ResourceManager#getAtMostNodes(int, org.ow2.proactive.topology.descriptor.TopologyDescriptor, java.util.List, org.ow2.proactive.utils.NodeSet)
      */
+    @SuppressWarnings("deprecation")
     public NodeSet getAtMostNodes(int number, TopologyDescriptor descriptor,
             List<SelectionScript> selectionScriptsList, NodeSet exclusion) {
         return target.getAtMostNodes(number, descriptor, selectionScriptsList, exclusion);
