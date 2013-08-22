@@ -133,6 +133,26 @@ project('rm:rm-core') {
     }
 }
 
+project('rm:rm-infrastructure:rm-infrastructure-ec2') {
+    dependencies {
+        compile files("${rootDir}/lib/nodesource/ec2/typica.jar")
+        compile project(':rm:rm-core')
+    }
+}
+project('rm:rm-infrastructure:rm-infrastructure-gcm') {
+    dependencies {
+        compile 'org.objectweb.proactive:programming-extension-gcmdeployment:5.5.0-SNAPSHOT'
+        compile project(':rm:rm-core')
+    }
+}
+project('rm:rm-infrastructure:rm-infrastructure-winhpc') {
+    dependencies {
+        compile 'org.apache.axis2:axis2:1.4'
+        compile 'org.apache.ws.commons.axiom:axiom-api:1.2.7'
+        compile files("${rootDir}/lib/nodesource/winhpc/WinHPCWebserviceStubs.jar")
+        compile project(':rm:rm-core')
+    }
+}
 
 task ProActiveLibs(type: Copy) {
     subprojects.each {

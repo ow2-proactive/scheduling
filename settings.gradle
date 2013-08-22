@@ -12,3 +12,7 @@ include 'rm:rm-node'
 include 'rm:rm-cli'
 include 'rm:rm-core'
 
+include 'rm:rm-infrastructure:rm-infrastructure-ec2'
+include 'rm:rm-infrastructure:rm-infrastructure-gcm'
+include 'rm:rm-infrastructure:rm-infrastructure-winhpc'
+

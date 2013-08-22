@@ -1,4 +1,4 @@
-/*
+package org.ow2.proactive.resourcemanager.nodesource.infrastructure;/*
  * ################################################################
  *
  * ProActive Parallel Suite(TM): The Java(TM) library for
@@ -34,7 +34,6 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -44,7 +43,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
 import com.xerox.amazonws.ec2.EC2Exception;
 import com.xerox.amazonws.ec2.ImageDescription;
@@ -52,6 +50,7 @@ import com.xerox.amazonws.ec2.InstanceType;
 import com.xerox.amazonws.ec2.Jec2;
 import com.xerox.amazonws.ec2.ReservationDescription;
 import com.xerox.amazonws.ec2.ReservationDescription.Instance;
+import org.apache.log4j.Logger;
 
 
 /**

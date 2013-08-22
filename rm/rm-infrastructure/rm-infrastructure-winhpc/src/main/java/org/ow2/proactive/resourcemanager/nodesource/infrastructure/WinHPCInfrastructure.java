@@ -43,11 +43,6 @@ import java.util.Hashtable;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.axiom.om.OMElement;
-import org.ggf.schemas.bes._2006._08.bes_factory.HPCBPServiceStub.ActivityStateEnumeration;
-import org.ggf.schemas.bes._2006._08.bes_factory.HPCBPServiceStub.EndpointReferenceType;
-import org.ggf.schemas.bes._2006._08.bes_factory.HPCBPServiceStub.GetActivityStatusResponseType;
-import org.ggf.schemas.bes._2006._08.bes_factory.HPCBPServiceStub.ReferenceParametersType;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.ProActiveCounter;
@@ -58,6 +53,11 @@ import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 import org.ow2.proactive.resourcemanager.utils.RMNodeStarter.CommandLineBuilder;
 import org.ow2.proactive.resourcemanager.utils.RMNodeStarter.OperatingSystem;
 import org.ow2.proactive.utils.FileToBytesConverter;
+import org.apache.axiom.om.OMElement;
+import org.ggf.schemas.bes._2006._08.bes_factory.HPCBPServiceStub.ActivityStateEnumeration;
+import org.ggf.schemas.bes._2006._08.bes_factory.HPCBPServiceStub.EndpointReferenceType;
+import org.ggf.schemas.bes._2006._08.bes_factory.HPCBPServiceStub.GetActivityStatusResponseType;
+import org.ggf.schemas.bes._2006._08.bes_factory.HPCBPServiceStub.ReferenceParametersType;
 
 
 public class WinHPCInfrastructure extends DefaultInfrastructureManager {
@@ -131,7 +131,7 @@ public class WinHPCInfrastructure extends DefaultInfrastructureManager {
     /** to retrieve job's data from deploying node's url */
     private Map<String, EndpointReferenceType[]> deployingNodeToEndpoint = new Hashtable<String, EndpointReferenceType[]>();
     /** the deployer instance */
-    private transient WinHPCDeployer deployer;
+    private transient org.ow2.proactive.resourcemanager.nodesource.infrastructure.WinHPCDeployer deployer;
     /** the refresh rate of the job's state in ms */
     private static final int JOB_STATE_REFRESH_RATE = 1000;
 
@@ -211,7 +211,9 @@ public class WinHPCInfrastructure extends DefaultInfrastructureManager {
 
         logger.debug("Executing: " + fullCommand);
         try {
-            eprs[0] = this.getDeployer().createActivity(WinHPCDeployer.createJSDLDocument(fullCommand));
+            eprs[0] = this.getDeployer().createActivity(
+                    org.ow2.proactive.resourcemanager.nodesource.infrastructure.WinHPCDeployer.createJSDLDocument(
+                            fullCommand));
         } catch (Exception e) {
             this.handleFailedDeployment(dNode, clb, e);
         }
@@ -466,6 +468,7 @@ public class WinHPCInfrastructure extends DefaultInfrastructureManager {
      * startup
      * @return The appropriate command line builder
      */
+    @SuppressWarnings("deprecation")
     private CommandLineBuilder getCommandLineBuilder() {
         CommandLineBuilder result = super.getEmptyCommandLineBuilder();
         result.setTargetOS(OperatingSystem.WINDOWS);
@@ -497,10 +500,10 @@ public class WinHPCInfrastructure extends DefaultInfrastructureManager {
      * @return the win hpc deployer instance
      * @throws RMException
      */
-    private synchronized WinHPCDeployer getDeployer() throws RMException {
+    private synchronized org.ow2.proactive.resourcemanager.nodesource.infrastructure.WinHPCDeployer getDeployer() throws RMException {
         if (this.deployer == null) {
             try {
-                this.deployer = new WinHPCDeployer(new File(PAResourceManagerProperties.RM_HOME
+                this.deployer = new org.ow2.proactive.resourcemanager.nodesource.infrastructure.WinHPCDeployer(new File(PAResourceManagerProperties.RM_HOME
                         .getValueAsString(), "config" + File.separator + "rm" + File.separator +
                     "deployment" + File.separator + "winhpc" + File.separator).getAbsolutePath(), serviceUrl,
                     userName, password);
