@@ -6,7 +6,6 @@ import java.net.UnknownHostException;
 import javax.mail.MessagingException;
 import javax.mail.internet.AddressException;
 
-import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.common.Main;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
@@ -15,6 +14,7 @@ import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.SendMail;
+import org.apache.log4j.Logger;
 
 
 public class JobEmailNotification {

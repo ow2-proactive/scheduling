@@ -6,6 +6,7 @@ include 'common-api'
 include 'scheduler:scheduler-api'
 include 'scheduler:scheduler-job'
 include 'scheduler:scheduler-cli'
+include 'scheduler:scheduler-core'
 
 include 'rm:rm-api'
 include 'rm:rm-node'

@@ -108,6 +108,27 @@ project(':scheduler:scheduler-cli') {
     }
 }
 
+
+project('scheduler:scheduler-core') {
+    dependencies {
+        compile(
+                'commons-cli:commons-cli:1.1',
+                'net.java.dev.jna:jna:3.4.0',
+                'javax.mail:mail:1.4.7',
+                files("${rootDir}/lib/winp-1.17-patched.jar"),
+
+                'org.objectweb.proactive:programming-core:5.5.0-SNAPSHOT',
+                'org.objectweb.proactive:programming-extension-amqp:5.5.0-SNAPSHOT',
+                'org.objectweb.proactive:programming-extension-pamr:5.5.0-SNAPSHOT',
+                'org.objectweb.proactive:programming-extension-processbuilder:5.5.0-SNAPSHOT',
+
+                project(':common-api'),
+                project(':scheduler:scheduler-api'),
+                project(':rm:rm-core')
+        )
+    }
+}
+
 project('client-utils') {
     dependencies {
         compile 'jline:jline:2.11'
@@ -117,17 +138,17 @@ project('client-utils') {
 
 project('rm:rm-core') {
     dependencies {
-        compile 'commons-cli:commons-cli:1.1'
-        compile 'it.sauronsoftware.cron4j:cron4j:2.2.5'
+        compile(
+                'commons-cli:commons-cli:1.1',
+                'it.sauronsoftware.cron4j:cron4j:2.2.5',
 
-        compile 'org.objectweb.proactive:programming-core:5.5.0-SNAPSHOT'
+                'org.objectweb.proactive:programming-core:5.5.0-SNAPSHOT',
 
-        compile project(':common-api')
-        compile project(':rm:rm-api')
-        compile project(':rm:rm-node')
-        compile project(':scheduler-utils')
-
-
+                project(':common-api'),
+                project(':rm:rm-api'),
+                project(':rm:rm-node'),
+                project(':scheduler-utils')
+        )
         runtime 'org.hibernate:hibernate-c3p0:4.1.3.Final'
         runtime 'org.apache.derby:derby:10.8.2.2'
     }

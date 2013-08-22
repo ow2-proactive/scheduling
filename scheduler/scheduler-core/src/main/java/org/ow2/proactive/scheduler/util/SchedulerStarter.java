@@ -40,18 +40,6 @@ import java.io.File;
 import java.net.URI;
 import java.rmi.AlreadyBoundException;
 
-import org.apache.commons.cli.AlreadySelectedException;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.GnuParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.MissingArgumentException;
-import org.apache.commons.cli.MissingOptionException;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.Parser;
-import org.apache.commons.cli.UnrecognizedOptionException;
-import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.remoteobject.AbstractRemoteObjectFactory;
@@ -72,6 +60,18 @@ import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.exception.AdminSchedulerException;
 import org.ow2.proactive.utils.FileToBytesConverter;
 import org.ow2.proactive.utils.Tools;
+import org.apache.commons.cli.AlreadySelectedException;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.GnuParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.MissingArgumentException;
+import org.apache.commons.cli.MissingOptionException;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.Parser;
+import org.apache.commons.cli.UnrecognizedOptionException;
+import org.apache.log4j.Logger;
 
 
 /**
