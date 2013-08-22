@@ -94,7 +94,7 @@ project(':rm:rm-cli') {
         compile project(':common-api')
         compile project(':rm:rm-api')
         compile project(':scheduler-utils')
-        compile project(':client-utils')
+        compile project(':cli-utils')
     }
 }
 
@@ -104,7 +104,7 @@ project(':scheduler:scheduler-cli') {
         compile project(':common-api')
         compile project(':scheduler:scheduler-api')
         compile project(':scheduler-utils') // TODO rename used in both ?
-        compile project(':client-utils')
+        compile project(':cli-utils')
     }
 }
 
@@ -126,10 +126,12 @@ project('scheduler:scheduler-core') {
                 project(':scheduler:scheduler-api'),
                 project(':rm:rm-core')
         )
+        runtime 'org.hibernate:hibernate-c3p0:4.1.3.Final'
+        runtime 'org.apache.derby:derby:10.8.2.2'
     }
 }
 
-project('client-utils') {
+project('cli-utils') {
     dependencies {
         compile 'jline:jline:2.11'
     }
