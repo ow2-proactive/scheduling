@@ -367,7 +367,7 @@ public class DataSpaceServiceStarter implements Serializable {
         } catch (Throwable t) {
         }
         for (int i = 0; i < servers.size(); i++) {
-            for (int j = 0; j < servers.get(i).size(); i++) {
+            for (int j = 0; j < servers.get(i).size(); j++) {
                 try {
                     servers.get(i).get(j).terminate();
                 } catch (Throwable t) {
