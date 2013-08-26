@@ -46,6 +46,8 @@ import org.objectweb.proactive.core.node.NodeInformation;
 import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.common.NodeState;
+import org.ow2.proactive.resourcemanager.common.event.RMEventType;
+import org.ow2.proactive.resourcemanager.common.event.RMNodeDescriptor;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.InfrastructureManager;
@@ -453,6 +455,43 @@ public final class RMDeployingNode implements RMNode, Serializable {
         return false;
     }
 
+    @Override
+    public RMNodeEvent createNodeEvent(RMEventType eventType, NodeState previousNodeState,
+            String initiator) {
+        RMNodeEvent rmNodeEvent = new RMNodeEvent(toNodeDescriptor(), eventType, previousNodeState,
+                initiator);
+        // The rm node always keeps track on its last event, this is needed for rm node events logic
+        if (eventType != null) {
+            switch (eventType) {
+                case NODE_ADDED:
+                    this.setAddEvent(rmNodeEvent);
+                    break;
+            }
+            this.setLastEvent(rmNodeEvent);
+        }
+        return rmNodeEvent;
+    }
+
+    private RMNodeDescriptor toNodeDescriptor() {
+        RMNodeDescriptor rmNodeDescriptor = new RMNodeDescriptor();
+        rmNodeDescriptor.setNodeURL(this.getNodeURL());
+        rmNodeDescriptor.setNodeSourceName(this.getNodeSourceName());
+        rmNodeDescriptor.setVNodeName(this.getVNodeName());
+        rmNodeDescriptor.setHostName(this.getHostName());
+        rmNodeDescriptor.setState(this.getState());
+        rmNodeDescriptor.setDefaultJMXUrl(getJMXUrl(JMXTransportProtocol.RMI));
+        rmNodeDescriptor.setProactiveJMXUrl(getJMXUrl(JMXTransportProtocol.RO));
+        rmNodeDescriptor.setDescriptorVMName(this.getDescriptorVMName());
+        rmNodeDescriptor.setStateChangeTime(this.getStateChangeTime());
+        rmNodeDescriptor.setProviderName(getProvider() == null ? null : getProvider().getName());
+        rmNodeDescriptor.setOwnerName(getOwner() == null ? null : getOwner().getName());
+        return rmNodeDescriptor;
+    }
+
+    @Override
+    public RMNodeEvent createNodeEvent() {
+        return createNodeEvent(null, null, null);
+    }
 }
 
 /**

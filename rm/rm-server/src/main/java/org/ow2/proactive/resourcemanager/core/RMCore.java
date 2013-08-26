@@ -456,7 +456,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             rmNode.setFree();
             this.freeNodes.add(rmNode);
             // create the event
-            this.registerAndEmitNodeEvent(new RMNodeEvent(rmNode, RMEventType.NODE_STATE_CHANGED,
+            this.registerAndEmitNodeEvent(rmNode.createNodeEvent(RMEventType.NODE_STATE_CHANGED,
                 previousNodeState, client.getName()));
         } catch (NodeException e) {
             // the node is down
@@ -502,7 +502,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         try {
             rmNode.setToRemove();
             // create the event
-            this.registerAndEmitNodeEvent(new RMNodeEvent(rmNode, RMEventType.NODE_STATE_CHANGED,
+            this.registerAndEmitNodeEvent(rmNode.createNodeEvent(RMEventType.NODE_STATE_CHANGED,
                 previousNodeState, initiator.getName()));
         } catch (NodeException e1) {
             // A down node shouldn't be busied...
@@ -523,7 +523,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             logger.info("Removing node " + rmnode.getNodeURL());
         }
         removeNodeFromCore(rmnode, initiator);
-        // FIXME youri rmnode.getNodeSource().removeNode(rmnode.getNodeURL(), initiator);
+        rmnode.getNodeSource().removeNode(rmnode.getNodeURL(), initiator);
     }
 
     /**
@@ -542,7 +542,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         }
         this.allNodes.remove(rmnode.getNodeURL());
         // create the event
-        this.registerAndEmitNodeEvent(new RMNodeEvent(rmnode, RMEventType.NODE_REMOVED, rmnode.getState(),
+        this.registerAndEmitNodeEvent(rmnode.createNodeEvent(RMEventType.NODE_REMOVED, rmnode.getState(),
             initiator.getName()));
     }
 
@@ -600,7 +600,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     public void internalRegisterConfiguringNode(RMNode rmnode) {
         if (toShutDown) {
             logger.warn("The RM core is shutting down, cannot configure the node");
-            // FIXME youri rmnode.getNodeSource().removeNode(rmnode.getNodeURL(), rmnode.getProvider());
+            rmnode.getNodeSource().removeNode(rmnode.getNodeURL(), rmnode.getProvider());
             return;
         }
 
@@ -609,7 +609,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         this.allNodes.put(rmnode.getNodeURL(), rmnode);
 
         // create the event
-        this.registerAndEmitNodeEvent(new RMNodeEvent(rmnode, RMEventType.NODE_ADDED, null, rmnode
+        this.registerAndEmitNodeEvent(rmnode.createNodeEvent(RMEventType.NODE_ADDED, null, rmnode
                 .getProvider().getName()));
         if (logger.isDebugEnabled()) {
             logger.debug("Configuring node " + rmnode.getNodeURL());
@@ -743,7 +743,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                 break;
             }
 
-            if (node.getNodeSourceName().equals(nodeSourceName)) { // FIXME youri
+            if (node.getNodeSource().getName().equals(nodeSourceName)) {
                 removeNode(node.getNodeURL(), preemptive);
                 numberOfRemovedNodes++;
             }
@@ -759,7 +759,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                     break;
                 }
 
-                if (node.isBusy() && node.getNodeSourceName().equals(nodeSourceName)) { // FIXME youri
+                if (node.isBusy() && node.getNodeSource().getName().equals(nodeSourceName)) {
                     removeNode(node.getNodeURL(), preemptive);
                     numberOfRemovedNodes++;
                 }
@@ -893,8 +893,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         this.nodeSources.put(data.getName(), nodeSource);
 
         // generate the event of node source creation
-        this.monitoring.nodeSourceEvent(new RMNodeSourceEvent( RMEventType.NODESOURCE_CREATED,
-            provider.getName())); // FIXME youri
+        this.monitoring.nodeSourceEvent(new RMNodeSourceEvent(RMEventType.NODESOURCE_CREATED,
+            provider.getName(), nodeSource.getName(), nodeSource.getDescription(), nodeSource.getAdministrator().getName()));
 
         logger.info("Node source " + data.getName() + " has been successfully created by " + provider);
 
@@ -1101,14 +1101,14 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
         ArrayList<RMNodeEvent> nodesList = new ArrayList<RMNodeEvent>();
         for (RMNode rmnode : this.allNodes.values()) {
-            nodesList.add(new RMNodeEvent(rmnode));
+            nodesList.add(rmnode.createNodeEvent());
         }
 
         ArrayList<RMNodeSourceEvent> nodeSourcesList = new ArrayList<RMNodeSourceEvent>();
         for (NodeSource s : this.nodeSources.values()) {
-            nodeSourcesList.add(new RMNodeSourceEvent(s.getName()));// FIXME youri
+            nodeSourcesList.add(new RMNodeSourceEvent(s.getName(), s.getDescription(), s.getAdministrator().getName()));
             for (RMDeployingNode pn : s.getDeployingNodes()) {
-                nodesList.add(new RMNodeEvent(pn));
+                nodesList.add(pn.createNodeEvent());
             }
         }
 
@@ -1213,7 +1213,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         }
         this.freeNodes.remove(rmNode);
         // create the event
-        this.registerAndEmitNodeEvent(new RMNodeEvent(rmNode, RMEventType.NODE_STATE_CHANGED,
+        this.registerAndEmitNodeEvent(rmNode.createNodeEvent(RMEventType.NODE_STATE_CHANGED,
             previousNodeState, owner.getName()));
     }
 
@@ -1237,7 +1237,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             }
             rmNode.setDown();
             // create the event
-            this.registerAndEmitNodeEvent(new RMNodeEvent(rmNode, RMEventType.NODE_STATE_CHANGED,
+            this.registerAndEmitNodeEvent(rmNode.createNodeEvent(RMEventType.NODE_STATE_CHANGED,
                 previousNodeState, rmNode.getProvider().getName()));
         } else {
             // the nodes has been removed from core asynchronously
@@ -1533,7 +1533,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * @return true if the client is an admin, SecurityException otherwise
      */
     private boolean checkNodeAdminPermission(RMNode rmnode, Client client) {
-        NodeSource nodeSource = null;//rmnode.getNodeSource(); // FIXME youri
+        NodeSource nodeSource = rmnode.getNodeSource();
         // in order to be the node administrator a client has to be either
         // an administrator of the RM (with AllPermissions) or
         // an administrator of the node source (creator) or
@@ -1586,7 +1586,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             logger.warn("", ex);
             return false;
         }
-        this.registerAndEmitNodeEvent(new RMNodeEvent(rmnode, RMEventType.NODE_STATE_CHANGED, NodeState.FREE,
+        this.registerAndEmitNodeEvent(rmnode.createNodeEvent(RMEventType.NODE_STATE_CHANGED, NodeState.FREE,
             this.caller.getName()));
         return true;
     }
@@ -1625,7 +1625,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             logger.warn("", ex);
             return false;
         }
-        this.registerAndEmitNodeEvent(new RMNodeEvent(rmnode, RMEventType.NODE_STATE_CHANGED,
+        this.registerAndEmitNodeEvent(rmnode.createNodeEvent(RMEventType.NODE_STATE_CHANGED,
             NodeState.LOCKED, caller.getName()));
         return true;
     }
@@ -1643,7 +1643,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         try {
             caller.checkPermission(rmnode.getAdminPermission(), caller +
                 " is not authorized to administrate the node " + rmnode.getNodeURL() + " from " +
-                rmnode.getNodeSourceName()); // FIXME youri
+                rmnode.getNodeSource().getName());
         } catch (SecurityException e) {
             // client does not have an access to this node
             logger.debug(e.getMessage());
@@ -1665,7 +1665,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         try {
             caller.checkPermission(rmnode.getUserPermission(), caller +
                 " is not authorized to run computations on the node " + rmnode.getNodeURL() + " from " +
-                rmnode.getNodeSourceName()); // FIXME youri
+                rmnode.getNodeSource().getName());
         } catch (SecurityException e) {
             // client does not have an access to this node
             logger.debug(e.getMessage());
@@ -1699,7 +1699,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                     NodeSource nodeSource = this.nodeSources.get(target);
                     if (nodeSource != null) {
                         for (RMNode candidateNode : this.allNodes.values()) {
-                            if (candidateNode.equals(nodeSource)) { // FIXME youri
+                            if (candidateNode.getNodeSource().equals(nodeSource)) {
                                 this.selectCandidateNode(selectedRMNodes, candidateNode);
                             }
                         }

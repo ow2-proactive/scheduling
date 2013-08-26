@@ -39,10 +39,8 @@ package org.ow2.proactive.resourcemanager.common.event;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
-import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
-import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 
 
 /**
@@ -128,7 +126,7 @@ public final class RMNodeEvent extends RMEvent {
      * Used to represent the resource manager state @see RMInitialState.
      * @param rmNode the node concerned by this event
      */
-    public RMNodeEvent(final RMNode rmNode) {
+    public RMNodeEvent(final RMNodeDescriptor rmNode) {
         this(rmNode, null, null, null);
     }
 
@@ -139,7 +137,7 @@ public final class RMNodeEvent extends RMEvent {
      * @param previousNodeState the previous state of the node concerned by this event
      * @param initiator the client which initiates the event
      */
-    public RMNodeEvent(final RMNode rmNode, final RMEventType eventType, final NodeState previousNodeState,
+    public RMNodeEvent(final RMNodeDescriptor rmNode, final RMEventType eventType, final NodeState previousNodeState,
             final String initiator) {
         super(eventType);
 
@@ -152,8 +150,8 @@ public final class RMNodeEvent extends RMEvent {
         this.VMName = rmNode.getDescriptorVMName();
         this.nodeState = rmNode.getState();
         this.description = rmNode.toString();
-        this.defaultJMXUrl = rmNode.getJMXUrl(JMXTransportProtocol.RMI);
-        this.proactiveJMXUrl = rmNode.getJMXUrl(JMXTransportProtocol.RO);
+        this.defaultJMXUrl = rmNode.getDefaultJMXUrl();
+        this.proactiveJMXUrl = rmNode.getProactiveJMXUrl();
 
         // when node is requested to be removed
         // there is no state change in the node itself
@@ -162,17 +160,8 @@ public final class RMNodeEvent extends RMEvent {
             this.timeStamp = rmNode.getStateChangeTime();
         }
         this.previousNodeState = previousNodeState;
-        this.nodeProvider = rmNode.getProvider() == null ? null : rmNode.getProvider().getName();
-        this.nodeOwner = rmNode.getOwner() == null ? null : rmNode.getOwner().getName();
-        // The rm node always keeps track on its last event, this is needed for rm node events logic
-        if (eventType != null) {
-            switch (eventType) {
-                case NODE_ADDED:
-                    rmNode.setAddEvent(this);
-                    break;
-            }
-            rmNode.setLastEvent(this);
-        }
+        this.nodeProvider = rmNode.getProviderName();
+        this.nodeOwner = rmNode.getOwnerName();
     }
 
     /**

@@ -1380,6 +1380,7 @@ public class RMNodeStarter {
             // add the content of addons dir on the classpath
             classpath.append(os.ps + rmHome + this.addonsDir);
             classpath.append(os.ps).append(libRoot).append("*");
+            classpath.append(os.ps).append(libRoot).append("/node/sigar/*");
 
             // add jars inside the addons directory
             File addonsAbsolute = new File(rmHome + this.addonsDir);

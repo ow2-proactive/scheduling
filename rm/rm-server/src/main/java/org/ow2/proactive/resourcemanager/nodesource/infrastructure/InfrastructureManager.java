@@ -163,7 +163,7 @@ public abstract class InfrastructureManager implements Serializable {
         //if such a deploying or lost node exists
         if (pn != null) {
             String url = pn.getNodeURL();
-            RMNodeEvent event = new RMNodeEvent(pn, RMEventType.NODE_REMOVED, pn.getState(), pn.getProvider()
+            RMNodeEvent event = pn.createNodeEvent(RMEventType.NODE_REMOVED, pn.getState(), pn.getProvider()
                     .getName());
             emitEvent(event);
             logger.trace("DeployingNode " + url + " removed from IM");
@@ -218,7 +218,7 @@ public abstract class InfrastructureManager implements Serializable {
             pn = this.deployingNodes.remove(deployingNodeURL);
             //if a deploying node with this name exists, one runs the implementation callback
             if (pn != null) {
-                RMNodeEvent event = new RMNodeEvent(pn, RMEventType.NODE_REMOVED, pn.getState(), pn
+                RMNodeEvent event = pn.createNodeEvent(RMEventType.NODE_REMOVED, pn.getState(), pn
                         .getProvider().getName());
                 emitEvent(event);
                 this.notifyAcquiredNode(node);
@@ -436,7 +436,7 @@ public abstract class InfrastructureManager implements Serializable {
         final String resultURL = result.getNodeURL();
         this.deployingNodes.put(result.getNodeURL(), result);
         logger.trace("New DeployingNode " + name + " instanciated in IM");
-        RMNodeEvent event = new RMNodeEvent(result, RMEventType.NODE_ADDED, null, result.getProvider()
+        RMNodeEvent event = result.createNodeEvent(RMEventType.NODE_ADDED, null, result.getProvider()
                 .getName());
         emitEvent(event);
         this.sched(new TimerTask() {
@@ -459,7 +459,7 @@ public abstract class InfrastructureManager implements Serializable {
         if (pn != null) {
             NodeState previousState = pn.getState();
             RMDeployingNodeAccessor.getDefault().setDescription(pn, newDescription);
-            RMNodeEvent event = new RMNodeEvent(pn, RMEventType.NODE_STATE_CHANGED, previousState, pn
+            RMNodeEvent event = pn.createNodeEvent(RMEventType.NODE_STATE_CHANGED, previousState, pn
                     .getProvider().getName());
             emitEvent(event);
             logger.trace("DeployingNode " + toUpdateURL + " updated in IM");
@@ -493,7 +493,7 @@ public abstract class InfrastructureManager implements Serializable {
             if (description != null) {
                 RMDeployingNodeAccessor.getDefault().setDescription(pn, description);
             }
-            RMNodeEvent event = new RMNodeEvent(pn, RMEventType.NODE_STATE_CHANGED, previousState, pn
+            RMNodeEvent event = pn.createNodeEvent(RMEventType.NODE_STATE_CHANGED, previousState, pn
                     .getProvider().getName());
             emitEvent(event);
             if (logger.isTraceEnabled()) {

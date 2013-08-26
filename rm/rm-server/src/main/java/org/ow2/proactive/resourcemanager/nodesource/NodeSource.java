@@ -47,7 +47,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.RunActive;
@@ -81,6 +80,7 @@ import org.ow2.proactive.resourcemanager.rmnode.RMDeployingNode;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 import org.ow2.proactive.resourcemanager.rmnode.RMNodeImpl;
 import org.ow2.proactive.resourcemanager.utils.RMNodeStarter;
+import org.apache.log4j.Logger;
 
 
 /**
@@ -399,7 +399,7 @@ public class NodeSource implements InitActive, RunActive {
 
         PrincipalPermission nodeAccessPermission = new PrincipalPermission(
             node.getNodeInformation().getURL(), principals);
-        RMNodeImpl rmnode = new RMNodeImpl(node, provider, nodeAccessPermission); // FIXME youri
+        RMNodeImpl rmnode = new RMNodeImpl(node, stub, provider, nodeAccessPermission);
 
         rmnode.setProtectedByToken(tokenInNode || tokenInNodeSource);
         return rmnode;
@@ -617,7 +617,8 @@ public class NodeSource implements InitActive, RunActive {
      */
     public void finishNodeSourceShutdown(Client initiator) {
         PAFuture.waitFor(rmcore.nodeSourceUnregister(name, new RMNodeSourceEvent(
-            RMEventType.NODESOURCE_REMOVED, initiator.getName())));// FIXME youri
+            RMEventType.NODESOURCE_REMOVED, initiator.getName(),
+                this.getName(), this.getDescription(), this.getAdministrator().getName())));
 
         PAActiveObject.terminateActiveObject(false);
 

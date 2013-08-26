@@ -80,21 +80,21 @@ public class RMNodeSourceEvent extends RMEvent {
      * Creates an RMNodesourceEvent object.
      * Used to represent the resource manager state @see RMInitialState.
      */
-    public RMNodeSourceEvent(String name) {
-//        this.nodeSourceName = source.getName();
-//        this.nodeSourceDescription = new BigString(source.getDescription());
-//        this.nodeSourceAdmin = source.getAdministrator().getName();
+    public RMNodeSourceEvent(String nodeSourceName, String nodeSourceDescription, String nodeSourceAdmin) {
+        this.nodeSourceName = nodeSourceName;
+        this.nodeSourceDescription = new BigString(nodeSourceDescription);
+        this.nodeSourceAdmin = nodeSourceAdmin;
     }
 
     /**
      * Creates an RMNodesourceEvent object.
      */
-    public RMNodeSourceEvent(RMEventType type, String initiator) {
+    public RMNodeSourceEvent(RMEventType type, String initiator, String nodeSourceName, String nodeSourceDescription, String nodeSourceAdmin) {
         super(type);
         this.initiator = initiator;
-//        this.nodeSourceName = source.getName();
-//        this.nodeSourceDescription = new BigString(source.getDescription());
-//        this.nodeSourceAdmin = source.getAdministrator().getName();
+        this.nodeSourceName = nodeSourceName;
+        this.nodeSourceDescription = new BigString(nodeSourceDescription);
+        this.nodeSourceAdmin = nodeSourceAdmin;
     }
 
     /**

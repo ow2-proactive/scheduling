@@ -52,8 +52,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.Logger;
-import org.apache.log4j.MDC;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.Node;
@@ -75,6 +73,8 @@ import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
 import org.ow2.proactive.utils.appenders.MultipleFileAppender;
+import org.apache.log4j.Logger;
+import org.apache.log4j.MDC;
 
 
 /**
@@ -461,7 +461,7 @@ public abstract class SelectionManager {
             try {
                 client.checkPermission(node.getUserPermission(), client +
                     " is not authorized to get the node " + node.getNodeURL() + " from " +
-                    node.getNodeSourceName()); // FIXME youri
+                    node.getNodeSource().getName());
             } catch (SecurityException e) {
                 // client does not have an access to this node
                 logger.debug(e.getMessage());
@@ -481,7 +481,7 @@ public abstract class SelectionManager {
                 // checking explicitly that node has this token identity
                 if (!perm.hasPrincipal(tokenPrincipal)) {
                     logger.debug(client + " does not have required token to get the node " +
-                        node.getNodeURL() + " from " + node.getNodeSourceName()); // FIXME youri
+                        node.getNodeURL() + " from " + node.getNodeSource().getName());
                     continue;
                 }
             }

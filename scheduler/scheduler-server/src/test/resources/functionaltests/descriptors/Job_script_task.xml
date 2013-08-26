@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="urn:proactive:jobdescriptor:3.2"
+	 xsi:schemaLocation="urn:proactive:jobdescriptor:3.2 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.2/schedulerjob.xsd"
+	 name="ScriptTask" projectName="">
+	<taskFlow>
+		<!--Used for TestXMLTransformer and TestScriptTask -->
+		<task name="simple">
+			<scriptExecutable>
+				<script>
+					<code language="javascript">
+						print('hello')
+					</code>
+				</script>
+			</scriptExecutable>
+		</task>
+		<task name="return">
+			<scriptExecutable>
+				<script>
+					<code language="javascript">
+						result = '42'
+					</code>
+				</script>
+			</scriptExecutable>
+		</task>
+		<task name="results_from_dependent_task">
+			<depends>
+				<task ref="return"/>
+			</depends>
+			<scriptExecutable>
+				<script>
+					<code language="javascript">
+						result = results[0]
+					</code>
+				</script>
+			</scriptExecutable>
+		</task>
+		<task name="properties">
+			<scriptExecutable>
+				<script>
+					<code language="javascript">
+						print('pas.job.id=' + java.lang.System.getProperty("pas.job.id"));
+						print('pas.job.name=' + java.lang.System.getProperty("pas.job.name"));
+						print('pas.task.id=' + java.lang.System.getProperty("pas.task.id"));
+						print('pas.task.name=' + java.lang.System.getProperty("pas.task.name"));
+						print('pas.task.iteration=' + java.lang.System.getProperty("pas.task.iteration"));
+						print('pas.task.replication=' + java.lang.System.getProperty("pas.task.replication"));
+					</code>
+				</script>
+			</scriptExecutable>
+		</task>
+		<task name="file">
+			<scriptExecutable>
+				<script>
+					<file path="${pa.scheduler.home}/samples/scripts/misc/clean.js"/>
+				</script>
+			</scriptExecutable>
+		</task>
+		<task name="file_and_args">
+			<scriptExecutable>
+				<script>
+					<file path="${pa.scheduler.home}/scheduler/scheduler-server/src/test/resources/functionaltests/descriptors/print_arg.js">
+					<arguments>
+						<argument value="My_Magic_Arg"/>
+					</arguments>
+					</file>
+				</script>
+			</scriptExecutable>
+		</task>
+		<task name="dataspaces">
+			<scriptExecutable>
+				<script>
+					<code language="javascript">
+						<![CDATA[
+						print('user=' + user.getVirtualURI())
+						print('global=' + global.getVirtualURI())
+						print('input=' + input.getVirtualURI())
+						print('output=' + output.getVirtualURI())
+						print('localspace=' + localspace.getVirtualURI())
+						]]>
+					</code>
+				</script>
+			</scriptExecutable>
+		</task>
+		<!-- Should probably be the last one to run -->
+		<task name="killJVM">
+			<depends>
+				<task ref="simple"/>
+				<task ref="return"/>
+				<task ref="results_from_dependent_task"/>
+				<task ref="properties"/>
+				<task ref="file"/>
+				<task ref="file_and_args"/>
+				<task ref="dataspaces"/>
+			</depends>
+			<scriptExecutable>
+				<script>
+					<code language="javascript">
+						java.lang.System.exit(0);
+					</code>
+				</script>
+			</scriptExecutable>
+		</task>
+	</taskFlow>
+</job>

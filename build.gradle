@@ -1,3 +1,16 @@
+buildscript {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath 'org.objectweb.proactive:programming-build-utils:5.5.0-SNAPSHOT'
+        // needed at runtime by AntStubGenerator...
+        classpath 'org.objectweb.proactive:programming-core:5.5.0-SNAPSHOT'
+    }
+}
+
 subprojects {
     apply plugin: 'java'
 
@@ -8,11 +21,10 @@ subprojects {
 
     dependencies {
         compile 'log4j:log4j:1.2.14'
+        runtime 'org.slf4j:slf4j-log4j12:1.5.3'
         testCompile 'junit:junit:4.11'
     }
-
 }
-
 
 project(':scheduler:scheduler-api') {
     dependencies {
@@ -24,21 +36,20 @@ project(':scheduler:scheduler-api') {
         compile 'commons-collections:commons-collections:3.2'
         compile 'msv:msv:20050913'
 
-        compile project(':scheduler-utils')
         compile project(':common-api')
-    }
-}
 
-
-project('scheduler-utils') {
-    dependencies {
-        compile 'org.objectweb.proactive:programming-annotation:5.5.0-SNAPSHOT'
+        runtime 'org.codehaus.woodstox:woodstox-core-lgpl:4.1.2'
+        runtime 'msv:xsdlib:20050913'
     }
 }
 
 project('common-api') {
     dependencies {
         compile 'org.objectweb.proactive:programming-annotation:5.5.0-SNAPSHOT'
+    }
+
+    task stub(type: StubTask) {
+        classes = ['org.ow2.proactive.scripting.ScriptResult']
     }
 }
 
@@ -52,8 +63,6 @@ project(':scheduler:scheduler-client') {
     }
 }
 
-
-
 project('common-client') {
     dependencies {
         compile 'commons-codec:commons-codec:1.6'
@@ -63,7 +72,12 @@ project('common-client') {
         compile 'org.objectweb.proactive:programming-extension-annotation:5.5.0-SNAPSHOT'
 
         compile project(':common-api')
+    }
 
+    task stub(type: StubTask) {
+        classes = ['org.ow2.proactive.scripting.ScriptHandler',
+                'org.ow2.proactive.jmx.provider.ro.ROServerImpl',
+                'org.ow2.proactive.jmx.provider.ro.ROConnection']
     }
 }
 
@@ -78,28 +92,34 @@ project('rm:rm-client') {
 
         compile project(':common-client')
     }
+    task stub(type: StubTask) {
+        classes = ['org.ow2.proactive.utils.NodeSet']
+    }
 }
 
 project(':rm:rm-node') {
     dependencies {
         compile 'commons-cli:commons-cli:1.1'
+        compile fileTree("${rootDir}/lib/node/sigar/") // TODO separate jar and the rest
 
         compile 'org.objectweb.proactive:programming-extension-dataspaces:5.5.0-SNAPSHOT'
 
         compile project(':common-client')
         compile project(':rm:rm-client')
-        compile project(':scheduler-utils')
-        compile files("${rootDir}/lib/node/sigar/sigar.jar")
+
+        runtime 'org.jruby:jruby:1.7.4'
+        runtime 'org.python:jython:2.5.4-rc1'
+        runtime 'org.codehaus.groovy:groovy-all:2.1.6'
     }
 }
 
 project(':rm:rm-cli') {
     dependencies {
         compile 'org.objectweb.proactive:programming-core:5.5.0-SNAPSHOT'
+
         compile project(':common-client')
         compile project(':rm:rm-client')
-        compile project(':scheduler-utils')
-        compile project(':cli-utils')
+        compile project(':common-cli')
     }
 }
 
@@ -108,40 +128,102 @@ project(':scheduler:scheduler-cli') {
         compile 'org.objectweb.proactive:programming-core:5.5.0-SNAPSHOT'
         compile project(':common-client')
         compile project(':scheduler:scheduler-client')
-        compile project(':scheduler-utils') // TODO rename used in both ?
-        compile project(':cli-utils')
+        compile project(':common-cli')
     }
 }
-
 
 project('scheduler:scheduler-server') {
     dependencies {
-        compile(
-                'commons-cli:commons-cli:1.1',
-                'net.java.dev.jna:jna:3.4.0',
-                'javax.mail:mail:1.4.7',
-                files("${rootDir}/lib/winp-1.17-patched.jar"),
+        compile 'commons-cli:commons-cli:1.1'
+        compile 'javax.mail:mail:1.4.7'
 
-                'org.objectweb.proactive:programming-core:5.5.0-SNAPSHOT',
-                'org.objectweb.proactive:programming-extension-amqp:5.5.0-SNAPSHOT',
-                'org.objectweb.proactive:programming-extension-pamr:5.5.0-SNAPSHOT',
-                'org.objectweb.proactive:programming-extension-processbuilder:5.5.0-SNAPSHOT',
+        compile 'org.objectweb.proactive:programming-core:5.5.0-SNAPSHOT'
 
-                project(':common-client'),
-                project(':scheduler:scheduler-client'),
-                project(':rm:rm-server')
-        )
+        compile project(':common-client')
+        compile project(':scheduler:scheduler-client')
+        compile project(':scheduler:scheduler-node')
+        compile project(':rm:rm-server')
+
+        testCompile 'org.mockito:mockito-core:1.9.5'
+        testCompile 'org.hamcrest:hamcrest-all:1.3'
+        testCompile 'commons-io:commons-io:2.4'
+        testCompile 'com.h2database:h2:1.3.167'
+        testCompile 'org.codehaus.groovy:groovy-all:2.1.6'
+        testCompile files("${System.properties['java.home']}/../lib/tools.jar")
+
+        testCompile project(':rm:rm-server').sourceSets.test.output // to get shared test classes
+        testCompile project(':rm:rm-infrastructure:rm-infrastructure-gcm')
+        testCompile project(':rm:rm-policy:rm-policy-scheduler')
+
         runtime 'org.hibernate:hibernate-c3p0:4.1.3.Final'
         runtime 'org.apache.derby:derby:10.8.2.2'
     }
+
+    test {
+        forkEvery 1
+
+        include '**/functionaltests/workflow/*'
+
+        systemProperties << ['pa.rm.home': rootDir.absolutePath]
+        systemProperties << ['pa.scheduler.home': rootDir.absolutePath]
+        systemProperties << ['proactive.home': rootDir.absolutePath]
+        systemProperties << ['log4j.configuration': file("$rootDir/config/log4j/log4j-junit").toURL()]
+        systemProperties << ['proactive.configuration': file("$rootDir/config/proactive/ProActiveConfiguration.xml")]
+        systemProperties << ['java.security.policy': file("$rootDir/config/security.java.policy-server").absolutePath]
+        systemProperties << ['proactive.runtime.ping': false]
+    }
 }
 
-project('cli-utils') {
+project('scheduler:scheduler-node') {
+    dependencies {
+        compile(
+                files("${rootDir}/lib/winp-1.17-patched.jar"),
+                'net.java.dev.jna:jna:3.4.0',
+
+                'org.objectweb.proactive:programming-extension-amqp:5.5.0-SNAPSHOT',
+                'org.objectweb.proactive:programming-extension-pamr:5.5.0-SNAPSHOT',
+                'org.objectweb.proactive:programming-extension-processbuilder:5.5.0-SNAPSHOT',
+                'org.objectweb.proactive:programming-extension-dataspaces:5.5.0-SNAPSHOT',
+
+                project(':scheduler:scheduler-client'),
+                project(':rm:rm-node'),
+        )
+        // required by ForkedJavaExecutable
+        runtime 'org.objectweb.proactive:programming-extension-pnp:5.5.0-SNAPSHOT'
+    }
+
+    task WorkerJar(type: Jar) {
+        from jar.outputs.files.collect {
+            zipTree(it)
+        }
+        from { configurations.runtime.collect { it.isDirectory() ? it : zipTree(it) } }
+        archiveName 'SchedulerWorker.jar'
+        manifest {
+            attributes("Main-Class": "org.objectweb.proactive.Main",
+                    "Implementation-Title": "ProActive",
+                    "Implementation-Version": rootProject.version,
+                    "Implementation-Vendor": "OASIS - INRIA Sophia Antipolis",
+                    "Implementation-URL": "http://proactive.inria.fr")
+        }
+//        doLast {
+//            // generate INDEX.list
+//            ant.jar(update: true, index: true, destfile: file('dist/lib/ProActive.jar')) {
+//                indexjars {
+//                    fileset(dir: 'dist/lib/') {
+//                        include(name: '*.jar')
+//                        exclude(name: 'ProActive.jar')
+//                    }
+//                }
+//            }
+//        }
+    }
+}
+
+project('common-cli') {
     dependencies {
         compile 'jline:jline:2.11'
     }
 }
-
 
 project('rm:rm-server') {
     dependencies {
@@ -154,10 +236,53 @@ project('rm:rm-server') {
                 project(':common-client'),
                 project(':rm:rm-client'),
                 project(':rm:rm-node'),
-                project(':scheduler-utils')
         )
+
+        testCompile 'org.objectweb.proactive:programming-extension-pamr:5.5.0-SNAPSHOT'
+
+        testCompile project(':rm:rm-infrastructure:rm-infrastructure-gcm')
+
+        testCompile 'org.jruby:jruby:1.7.4'
+        testCompile 'org.python:jython:2.5.4-rc1'
+
         runtime 'org.hibernate:hibernate-c3p0:4.1.3.Final'
         runtime 'org.apache.derby:derby:10.8.2.2'
+    }
+
+    test {
+        forkEvery 1
+
+        systemProperties << ['pa.rm.home': rootDir.absolutePath]
+        systemProperties << ['pa.scheduler.home': rootDir.absolutePath]
+        systemProperties << ['proactive.home': rootDir.absolutePath]
+        systemProperties << ['log4j.configuration': file("$rootDir/config/log4j/log4j-junit").toURL()]
+        systemProperties << ['proactive.configuration': file("$rootDir/config/proactive/ProActiveConfiguration.xml")]
+        systemProperties << ['java.security.policy': file("$rootDir/config/security.java.policy-server").absolutePath]
+        systemProperties << ['proactive.runtime.ping': false]
+    }
+
+    task stub(type: StubTask) {
+        classes = [
+                'org.ow2.proactive.resourcemanager.common.event.RMInitialState',
+                'org.ow2.proactive.resourcemanager.authentication.RMAuthentication',
+                'org.ow2.proactive.resourcemanager.authentication.RMAuthenticationImpl',
+                'org.ow2.proactive.resourcemanager.frontend.RMMonitoring',
+                'org.ow2.proactive.resourcemanager.frontend.RMMonitoringImpl',
+                'org.ow2.proactive.resourcemanager.selection.statistics.ProbablisticSelectionManager',
+                'org.ow2.proactive.resourcemanager.nodesource.NodeSource',
+                'org.ow2.proactive.resourcemanager.nodesource.dataspace.DataSpaceNodeConfigurationAgent',
+                'org.ow2.proactive.resourcemanager.core.RMCore',
+                'org.ow2.proactive.resourcemanager.common.RMState',
+                'org.ow2.proactive.resourcemanager.nodesource.policy.NodeSourcePolicy',
+                'org.ow2.proactive.resourcemanager.common.util.RMProxyUserInterface',
+                'org.ow2.proactive.resourcemanager.common.util.RMCachingProxyUserInterface',
+                'org.ow2.proactive.resourcemanager.nodesource.RMNodeConfigurator',
+                'org.ow2.proactive.resourcemanager.utils.ClientPinger',
+                'org.ow2.proactive.resourcemanager.cleaning.NodesCleaner',
+                'org.ow2.proactive.resourcemanager.frontend.topology.pinging.HostsPinger',
+                'org.ow2.proactive.resourcemanager.frontend.topology.pinging.NodesPinger',
+                'org.ow2.proactive.resourcemanager.frontend.topology.pinging.Pinger'
+        ]
     }
 }
 
@@ -192,6 +317,7 @@ project('rm:rm-policy:rm-policy-scheduler') {
 task ProActiveLibs(type: Copy) {
     subprojects.each {
         from it.configurations.runtime.files //{ it instanceof ExternalDependency }
+        from it.jar.outputs
     }
     into "dist/lib"
 }
