@@ -50,7 +50,7 @@ else
     # Script engines must be added to classpath to be found
     # it must also placed before jars containing jar-index
     CLASSPATH=$CLASSPATH:"$PA_SCHEDULER/dist/lib/sigar/sigar.jar"
-    CLASSPATH=$CLASSPATH:"$PA_SCHEDULER/dist/lib/jruby.jar"
+    CLASSPATH=$CLASSPATH:"$PA_SCHEDULER/dist/lib/jruby-1.7.4.jar"
     CLASSPATH=$CLASSPATH:"$PA_SCHEDULER/dist/lib/jython-2.5.4-rc1.jar"
     CLASSPATH=$CLASSPATH:"$PA_SCHEDULER/dist/lib/groovy-all-2.1.5.jar"
     #  Needed explicitly by VFS (file transfer in pre/post script
@@ -63,6 +63,7 @@ else
     CLASSPATH=$CLASSPATH:"$PA_SCHEDULER/dist/lib/ProActive_ResourceManager.jar"
     CLASSPATH=$CLASSPATH:"$PA_SCHEDULER/dist/lib/ProActive_Scheduler-core.jar"
     CLASSPATH=$CLASSPATH:"$PA_SCHEDULER/dist/lib/ProActive_Scheduler-mapreduce.jar"
+    CLASSPATH=$CLASSPATH:"$PA_SCHEDULER/dist/lib/*"
     CP=`print_jars "$PA_SCHEDULER/addons/"`
     CLASSPATH=$CLASSPATH:$PA_SCHEDULER/addons/:$CP
 fi

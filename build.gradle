@@ -14,6 +14,9 @@ buildscript {
 subprojects {
     apply plugin: 'java'
 
+    group = 'org.ow2.proactive'
+    version = '3.5.0-SNAPSHOT'
+
     repositories {
         mavenLocal()
         mavenCentral()
@@ -114,6 +117,8 @@ project(':rm:rm-node') {
 }
 
 project(':rm:rm-cli') {
+    apply plugin: 'java-library-distribution'
+
     dependencies {
         compile 'org.objectweb.proactive:programming-core:5.5.0-SNAPSHOT'
 
@@ -124,6 +129,7 @@ project(':rm:rm-cli') {
 }
 
 project(':scheduler:scheduler-cli') {
+    apply plugin: 'java-library-distribution'
     dependencies {
         compile 'org.objectweb.proactive:programming-core:5.5.0-SNAPSHOT'
         compile project(':common-client')
@@ -133,6 +139,7 @@ project(':scheduler:scheduler-cli') {
 }
 
 project('scheduler:scheduler-server') {
+    apply plugin: 'java-library-distribution'
     dependencies {
         compile 'commons-cli:commons-cli:1.1'
         compile 'javax.mail:mail:1.4.7'
@@ -157,6 +164,12 @@ project('scheduler:scheduler-server') {
 
         runtime 'org.hibernate:hibernate-c3p0:4.1.3.Final'
         runtime 'org.apache.derby:derby:10.8.2.2'
+        runtime 'mysql:mysql-connector-java:5.1.16'
+        runtime 'org.objectweb.proactive:programming-extension-rmissl:5.5.0-SNAPSHOT'
+        runtime 'org.objectweb.proactive:programming-extension-pnp:5.5.0-SNAPSHOT'
+        runtime 'org.objectweb.proactive:programming-extension-pnpssl:5.5.0-SNAPSHOT'
+        runtime 'org.objectweb.proactive:programming-extension-amqp:5.5.0-SNAPSHOT'
+        runtime 'org.objectweb.proactive:programming-extension-pamr:5.5.0-SNAPSHOT'
     }
 
     test {
@@ -175,6 +188,7 @@ project('scheduler:scheduler-server') {
 }
 
 project('scheduler:scheduler-node') {
+    apply plugin: 'java-library-distribution'
     dependencies {
         compile(
                 files("${rootDir}/lib/winp-1.17-patched.jar"),
@@ -190,14 +204,15 @@ project('scheduler:scheduler-node') {
         )
         // required by ForkedJavaExecutable
         runtime 'org.objectweb.proactive:programming-extension-pnp:5.5.0-SNAPSHOT'
+        // TODO add all protocols
     }
 
     task WorkerJar(type: Jar) {
         from jar.outputs.files.collect {
             zipTree(it)
         }
-        from { configurations.runtime.collect { it.isDirectory() ? it : zipTree(it) } }
-        archiveName 'SchedulerWorker.jar'
+        from { configurations.runtime.collect { !it.name.contains('.jar') ? it : zipTree(it) } }
+        archiveName 'ProActive_Scheduler-worker.jar'
         manifest {
             attributes("Main-Class": "org.objectweb.proactive.Main",
                     "Implementation-Title": "ProActive",
@@ -205,27 +220,18 @@ project('scheduler:scheduler-node') {
                     "Implementation-Vendor": "OASIS - INRIA Sophia Antipolis",
                     "Implementation-URL": "http://proactive.inria.fr")
         }
-//        doLast {
-//            // generate INDEX.list
-//            ant.jar(update: true, index: true, destfile: file('dist/lib/ProActive.jar')) {
-//                indexjars {
-//                    fileset(dir: 'dist/lib/') {
-//                        include(name: '*.jar')
-//                        exclude(name: 'ProActive.jar')
-//                    }
-//                }
-//            }
-//        }
     }
 }
 
 project('common-cli') {
     dependencies {
         compile 'jline:jline:2.11'
+        compile project(':common-client')
     }
 }
 
 project('rm:rm-server') {
+    apply plugin: 'java-library-distribution'
     dependencies {
         compile(
                 'commons-cli:commons-cli:1.1',
@@ -247,6 +253,12 @@ project('rm:rm-server') {
 
         runtime 'org.hibernate:hibernate-c3p0:4.1.3.Final'
         runtime 'org.apache.derby:derby:10.8.2.2'
+        runtime 'mysql:mysql-connector-java:5.1.16'
+        runtime 'org.objectweb.proactive:programming-extension-rmissl:5.5.0-SNAPSHOT'
+        runtime 'org.objectweb.proactive:programming-extension-pnp:5.5.0-SNAPSHOT'
+        runtime 'org.objectweb.proactive:programming-extension-pnpssl:5.5.0-SNAPSHOT'
+        runtime 'org.objectweb.proactive:programming-extension-amqp:5.5.0-SNAPSHOT'
+        runtime 'org.objectweb.proactive:programming-extension-pamr:5.5.0-SNAPSHOT'
     }
 
     test {
@@ -321,3 +333,19 @@ task ProActiveLibs(type: Copy) {
     }
     into "dist/lib"
 }
+
+def distributedProjects = [project(':rm:rm-cli'),
+        project(':scheduler:scheduler-cli'),
+        project(':scheduler:scheduler-node'),
+        project(':scheduler:scheduler-server'),
+        project(':rm:rm-server')
+]
+
+task ProActiveDist(type: Copy) {
+    distributedProjects.distZip.outputs.files.each {
+        from zipTree(it.singleFile)
+    }
+    into "dist/"
+}
+ProActiveDist.dependsOn distributedProjects.distZip
+
