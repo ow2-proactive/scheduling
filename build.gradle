@@ -7,8 +7,19 @@ buildscript {
     dependencies {
         classpath 'org.objectweb.proactive:programming-build-utils:5.5.0-SNAPSHOT'
         // needed at runtime by AntStubGenerator...
-        classpath 'org.objectweb.proactive:programming-core:5.5.0-SNAPSHOT'
+        classpath('org.objectweb.proactive:programming-core:5.5.0-SNAPSHOT') {
+            exclude module: 'xercesImpl' // messing with documentation plugin
+        }
+        classpath 'com.activeeon:documentation:1.0.0-SNAPSHOT'
     }
+}
+
+project(':doc').subprojects {
+    apply plugin: 'documentation'
+    documentation.outputName = project.name
+    documentation.docDir = 'src'
+    documentation.sharedDir = '../shared'
+    documentation.snippetsStart = rootProject.projectDir
 }
 
 subprojects {
@@ -175,7 +186,7 @@ project('scheduler:scheduler-server') {
     test {
         forkEvery 1
 
-        include '**/functionaltests/workflow/*'
+//        include '**/functionaltests/workflow/*'
 
         systemProperties << ['pa.rm.home': rootDir.absolutePath]
         systemProperties << ['pa.scheduler.home': rootDir.absolutePath]
