@@ -43,7 +43,7 @@ import org.junit.Test;
 
 import functionaltests.SchedulerConsecutive;
 import functionaltests.SchedulerTHelper;
-import functionalTests.TestDisabler;
+import org.ow2.tests.FunctionalTest;
 
 
 /**
@@ -55,7 +55,7 @@ import functionalTests.TestDisabler;
  *
  * @author The ProActive Team
  */
-public class TestSubmitJobWithUnaccessibleDataSpaces extends SchedulerConsecutive {
+public class TestSubmitJobWithUnaccessibleDataSpaces extends FunctionalTest {
 
     static URL jobDescriptor = TestSubmitJobWithUnaccessibleDataSpaces.class
             .getResource("/functionaltests/dataspaces/Job_DataSpaceUnacc.xml");
@@ -79,9 +79,6 @@ public class TestSubmitJobWithUnaccessibleDataSpaces extends SchedulerConsecutiv
 
     @Before
     public void before() throws Throwable {
-        if (consecutiveMode) {
-            TestDisabler.waitingTestFix();
-        }
         SchedulerTHelper.startScheduler(true, (new File(configFile.toURI())).getAbsolutePath());
     }
 

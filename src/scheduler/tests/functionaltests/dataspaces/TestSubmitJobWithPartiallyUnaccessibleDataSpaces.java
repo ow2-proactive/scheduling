@@ -49,7 +49,7 @@ import org.objectweb.proactive.extensions.vfsprovider.FileSystemServerDeployer;
 
 import functionaltests.SchedulerConsecutive;
 import functionaltests.SchedulerTHelper;
-import functionalTests.TestDisabler;
+import org.ow2.tests.FunctionalTest;
 
 
 /**
@@ -62,7 +62,7 @@ import functionalTests.TestDisabler;
  *
  * @author The ProActive Team
  */
-public class TestSubmitJobWithPartiallyUnaccessibleDataSpaces extends SchedulerConsecutive {
+public class TestSubmitJobWithPartiallyUnaccessibleDataSpaces extends FunctionalTest {
 
     static URL jobDescriptor = TestSubmitJobWithPartiallyUnaccessibleDataSpaces.class
             .getResource("/functionaltests/dataspaces/Job_DataSpacePartiallyUnacc.xml");
@@ -79,9 +79,6 @@ public class TestSubmitJobWithPartiallyUnaccessibleDataSpaces extends SchedulerC
 
     @Before
     public void before() throws Throwable {
-        if (consecutiveMode) {
-            TestDisabler.waitingTestFix();
-        }
         spaceRoot = folder.newFolder("space");
         spaceRootUser = new File(spaceRoot, "demo");
         spaceRootUser.mkdirs();
