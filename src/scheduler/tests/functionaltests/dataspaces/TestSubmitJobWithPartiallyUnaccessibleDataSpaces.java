@@ -107,7 +107,9 @@ public class TestSubmitJobWithPartiallyUnaccessibleDataSpaces extends Functional
     @After
     public void after() throws Throwable {
         SchedulerTHelper.killScheduler();
-        deployer.terminate();
+        if (deployer != null) {
+            deployer.terminate();
+        }
     }
 
 }
