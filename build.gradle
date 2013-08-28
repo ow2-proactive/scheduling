@@ -2,6 +2,8 @@ buildscript {
     repositories {
         mavenLocal()
         mavenCentral()
+        maven { url 'http://138.96.245.1.com/content/repositories/snapshots/' }
+        maven { url 'http://138.96.245.1.com/content/repositories/releases/' }
     }
 
     dependencies {
@@ -10,7 +12,7 @@ buildscript {
         classpath('org.objectweb.proactive:programming-core:5.5.0-SNAPSHOT') {
             exclude module: 'xercesImpl' // messing with documentation plugin
         }
-        classpath 'com.activeeon:documentation:1.0.0-SNAPSHOT'
+        classpath 'org.ow2.proactive:documentation:1.0.0-SNAPSHOT'
     }
 }
 
@@ -149,7 +151,9 @@ project('scheduler:scheduler-server') {
 
         compile 'org.objectweb.proactive:programming-core:5.5.0-SNAPSHOT'
 
+        compile project(':common-api')
         compile project(':common-client')
+        compile project(':scheduler:scheduler-api')
         compile project(':scheduler:scheduler-client')
         compile project(':scheduler:scheduler-node')
         compile project(':rm:rm-server')
@@ -186,6 +190,12 @@ project('scheduler:scheduler-server') {
         systemProperties << ['java.security.policy': file("$rootDir/config/security.java.policy-server").absolutePath]
         systemProperties << ['proactive.runtime.ping': false]
     }
+
+    task testJar(type: Jar) {
+        classifier = 'tests'
+        from sourceSets.test.output
+    }
+
 }
 
 project('scheduler:scheduler-node') {
@@ -240,6 +250,7 @@ project('rm:rm-server') {
 
                 'org.objectweb.proactive:programming-core:5.5.0-SNAPSHOT',
 
+                project(':common-api'),
                 project(':common-client'),
                 project(':rm:rm-client'),
                 project(':rm:rm-node'),
@@ -297,6 +308,11 @@ project('rm:rm-server') {
                 'org.ow2.proactive.resourcemanager.frontend.topology.pinging.Pinger'
         ]
     }
+
+    task testJar(type: Jar) {
+        classifier = 'tests'
+        from sourceSets.test.output
+    }
 }
 
 project('rm:rm-infrastructure:rm-infrastructure-ec2') {
@@ -317,7 +333,6 @@ project('rm:rm-infrastructure:rm-infrastructure-winhpc') {
         compile 'org.apache.ws.commons.axiom:axiom-api:1.2.7'
         compile files("${rootDir}/lib/nodesource/winhpc/WinHPCWebserviceStubs.jar")
         compile project(':rm:rm-server')
-        runtime 'org.apache.rampart:rampart:1.3'
     }
 }
 
@@ -338,7 +353,8 @@ project(':scheduler:dataspace-smartproxy') {
     dependencies {
         compile 'org.fusesource.jdbm:jdbm:2.0.1'
         compile project(':scheduler:scheduler-server')
-        testCompile project(':scheduler:scheduler-server').sourceSets.test.output // to get shared test classes
+        testCompile project(':scheduler:scheduler-server').sourceSets.test.output
+        // to get shared test classes
         testCompile project(':rm:rm-server').sourceSets.test.output // to get shared test classes
     }
 }
@@ -347,7 +363,8 @@ project(':scheduler:mapreduce') {
     dependencies {
         compile 'org.apache.hadoop:hadoop-core:0.20.2'
         compile project(':scheduler:scheduler-node')
-        testCompile project(':scheduler:scheduler-server').sourceSets.test.output // to get shared test classes
+        testCompile project(':scheduler:scheduler-server').sourceSets.test.output
+        // to get shared test classes
         testCompile project(':rm:rm-server').sourceSets.test.output // to get shared test classes
     }
 }
@@ -368,9 +385,13 @@ project(':doc:Resourcing') {
 
 task ProActiveLibs(type: Copy) {
     subprojects.each {
-        from it.configurations.runtime.files //{ it instanceof ExternalDependency }
+        from it.configurations.runtime.files
         from it.jar.outputs
+        if (it.tasks.findByName('testJar')) from it.testJar.outputs
     }
+    from file(project.rootProject.buildscript.configurations.classpath.find {
+        it.name.contains("build-utils")
+    })
     into "dist/lib"
 }
 
@@ -389,3 +410,21 @@ task ProActiveDist(type: Copy) {
 }
 ProActiveDist.dependsOn distributedProjects.distZip
 
+
+task ResourceManagerJar(type: Jar) {
+    project(':rm:rm-server').configurations.runtime.allDependencies.withType(ProjectDependency).each {
+        from zipTree(it.dependencyProject.jar.outputs.files.singleFile)
+    }
+    from zipTree(project(':rm:rm-server').jar.outputs.files.singleFile)
+    destinationDir file('dist/lib')
+    archiveName 'ProActive_ResourceManager.jar'
+}
+
+task SchedulerJar(type: Jar) {
+    project(':scheduler:scheduler-server').configurations.runtime.allDependencies.withType(ProjectDependency).each {
+        from zipTree(it.dependencyProject.jar.outputs.files.singleFile)
+    }
+    from zipTree(project(':scheduler:scheduler-server').jar.outputs.files.singleFile)
+    destinationDir file('dist/lib')
+    archiveName 'ProActive_Scheduler-core.jar'
+}
