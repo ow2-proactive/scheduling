@@ -42,13 +42,13 @@ import java.io.Serializable;
 import java.net.URL;
 import java.util.Map;
 
-import org.apache.log4j.Level;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.util.process.OperatingSystem;
 import org.ow2.proactive.scheduler.util.process.OperatingSystemFamily;
 import org.ow2.proactive.scheduler.util.process.ProcessTreeKiller;
 import org.ow2.proactive.scheduler.util.process.ThreadReader;
+import org.apache.log4j.Level;
 
 
 /**
@@ -58,7 +58,7 @@ import org.ow2.proactive.scheduler.util.process.ThreadReader;
  */
 public class JavaSpawnExecutable extends JavaExecutable {
 
-    public static URL launchersDir = TestProcessTreeKiller.class.getResource("/functionaltests/executables");
+    public static URL launchersDir = TestProcessTreeKiller.class.getResource("/functionaltests/executables/TestSleep.exe");
 
     public static URL nativeLinuxExecLauncher = JavaSpawnExecutable.class
             .getResource("/functionaltests/executables/PTK_launcher.sh");
@@ -97,7 +97,7 @@ public class JavaSpawnExecutable extends JavaExecutable {
         Process process = null;
 
         process = Runtime.getRuntime().exec(getNativeExecLauncher(false), null,
-                new File(launchersDir.toURI()).getCanonicalFile());
+                new File(launchersDir.toURI()).getParentFile().getCanonicalFile());
 
         // redirect streams
         BufferedReader sout = new BufferedReader(new InputStreamReader(process.getInputStream()));

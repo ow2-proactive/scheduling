@@ -75,7 +75,7 @@ import org.apache.log4j.Level;
  */
 public class TestProcessTreeKiller extends SchedulerConsecutive {
 
-    public static URL launchersDir = TestProcessTreeKiller.class.getResource("/functionaltests/executables");
+    public static URL launchersDir = TestProcessTreeKiller.class.getResource("/functionaltests/executables/TestSleep.exe");
 
     private final static int wait_time = 15000;
 
@@ -121,7 +121,8 @@ public class TestProcessTreeKiller extends SchedulerConsecutive {
             String task1Name = "TestPTK1";
             task1.setName(task1Name);
 
-            task1.setWorkingDir(new File(TestProcessTreeKiller.launchersDir.toURI()).getCanonicalPath());
+            String workingDir = new File(TestProcessTreeKiller.launchersDir.toURI()).getParentFile().getCanonicalPath();
+            task1.setWorkingDir(workingDir);
             task1.setCommandLine(JavaSpawnExecutable.getNativeExecLauncher(false));
             job1.addTask(task1);
 
@@ -226,7 +227,7 @@ public class TestProcessTreeKiller extends SchedulerConsecutive {
             String task4Name = "TestPTK4";
             task4.setName(task4Name);
 
-            task4.setWorkingDir(new File(TestProcessTreeKiller.launchersDir.toURI()).getCanonicalPath());
+            task4.setWorkingDir(workingDir);
             task4.setCommandLine(JavaSpawnExecutable.getNativeExecLauncher(true));
             job4.addTask(task4);
 

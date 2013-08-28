@@ -7,22 +7,17 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
-import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
-import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.utils.FileToBytesConverter;
 import org.ow2.proactive.utils.FileUtils;
 import org.ow2.tests.FunctionalTest;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
 
 
 public class MultipleRMTBase extends FunctionalTest {
@@ -54,7 +49,7 @@ public class MultipleRMTBase extends FunctionalTest {
 
         String hibernateConfig = new String(FileToBytesConverter.convertFileToByteArray(new File(
             hibernateConfigFile)));
-        String defaultDB = "jdbc:derby:RM_DB;create=true";
+        String defaultDB = "jdbc:derby:TEST_RM_DB;create=true";
         if (!hibernateConfig.contains(defaultDB)) {
             Assert.fail("Hibernate config doesn't contain expected string");
         }
