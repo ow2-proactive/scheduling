@@ -1,0 +1,90 @@
+buildscript {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        maven { url 'http://repo.activeeon.com/content/repositories/snapshots/' }
+        maven { url 'http://repo.activeeon.com/content/repositories/releases/' }
+    }
+
+    dependencies {
+        classpath 'org.objectweb.proactive:programming-build-utils:5.5.0-SNAPSHOT'
+        // needed at runtime by AntStubGenerator...
+        classpath 'org.objectweb.proactive:programming-core:5.5.0-SNAPSHOT'
+    }
+}
+
+subprojects {
+    apply plugin: 'java'
+
+
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        maven { url 'http://repo.activeeon.com/content/repositories/snapshots/' }
+        maven { url 'http://repo.activeeon.com/content/repositories/releases/' }
+    }
+}
+
+project(':rest-api') {
+    dependencies {
+        compile 'org.jboss.resteasy:jaxrs-api:2.3.3.FinSal'
+        compile 'org.jboss.resteasy:resteasy-jackson-provider:2.3.3.Final'
+        compile 'org.jboss.resteasy:resteasy-multipart-provider:2.3.3.Final'
+    }
+}
+
+project(':rest-server') {
+    dependencies {
+        compile 'org.jboss.resteasy:jaxrs-api:2.3.3.Final'
+        compile 'org.jboss.resteasy:resteasy-jackson-provider:2.3.3.Final'
+        compile 'org.jboss.resteasy:resteasy-multipart-provider:2.3.3.Final'
+
+        compile 'org.rrd4j:rrd4j:2.0.7'
+        compile 'net.sf.dozer:dozer:5.4.0'
+        compile 'commons-io:commons-io:2.4'
+        compile 'commons-codec:commons-codec:1.6'
+
+        compile files("${rootDir}/lib/misc/websockify-1.6-SNAPSHOT.jar")
+        compile 'io.netty:netty:3.3.0.Final'
+
+        compile 'org.ow2.proactive:scheduler-client:3.5.0-SNAPSHOT'
+        compile 'org.ow2.proactive:rm-client:3.5.0-SNAPSHOT'
+        compile 'org.ow2.proactive:rm-client:3.5.0-SNAPSHOT'
+        compile 'org.objectweb.proactive:programming-extension-dataspaces:5.5.0-SNAPSHOT'
+
+        compile project(':rest-api')
+
+        testCompile 'junit:junit:4.11'
+        testCompile 'org.mockito:mockito-core:1.9.5'
+        testCompile 'com.googlecode.json-simple:json-simple:1.1'
+        testCompile 'org.ow2.proactive:rm-server:3.5.0-SNAPSHOT'
+        testCompile 'org.ow2.proactive:scheduler-server:3.5.0-SNAPSHOT'
+        testCompile 'org.apache.httpcomponents:httpmime:4.2.1'
+        testCompile 'org.jboss.resteasy:tjws:2.3.3.Final'
+
+        runtime 'net.bull.javamelody:javamelody-core:1.46.0'
+    }
+
+    task stub(type: StubTask){
+        classes = ['org.ow2.proactive_grid_cloud_portal.scheduler.EventListener']
+    }
+
+    test {
+        forkEvery 1
+
+    }
+}
+
+project(':rest-cli') {
+    dependencies {
+        compile 'commons-cli:commons-cli:1.2'
+        compile 'commons-io:commons-io:2.4'
+        compile 'jline:jline:1.0'
+
+        compile 'org.apache.httpcomponents:httpclient:4.2.1'
+        compile 'org.apache.httpcomponents:httpmime:4.2.1'
+
+        compile 'org.ow2.proactive:common-api:3.5.0-SNAPSHOT'
+        compile project(':rest-api')
+    }
+}
