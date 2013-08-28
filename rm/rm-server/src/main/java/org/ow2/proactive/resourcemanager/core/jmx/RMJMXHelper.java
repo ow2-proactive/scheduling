@@ -43,7 +43,6 @@ import javax.management.MBeanServerFactory;
 import javax.management.ObjectName;
 import javax.management.StandardMBean;
 
-import org.apache.log4j.Logger;
 import org.ow2.proactive.jmx.AbstractJMXHelper;
 import org.ow2.proactive.jmx.RRDDataStore;
 import org.ow2.proactive.resourcemanager.core.account.RMAccountsManager;
@@ -54,6 +53,7 @@ import org.ow2.proactive.resourcemanager.core.jmx.mbean.RuntimeDataMBean;
 import org.ow2.proactive.resourcemanager.core.jmx.mbean.RuntimeDataMBeanImpl;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoringImpl;
+import org.apache.log4j.Logger;
 
 
 /**
@@ -66,12 +66,6 @@ import org.ow2.proactive.resourcemanager.frontend.RMMonitoringImpl;
 public final class RMJMXHelper extends AbstractJMXHelper {
 
     private static final Logger LOGGER = Logger.getLogger(RMJMXHelper.class);
-
-    /** The name of the Resource Manager bean */
-    public static final String RUNTIMEDATA_MBEAN_NAME = "ProActiveResourceManager:name=RuntimeData";
-    public static final String MYACCOUNT_MBEAN_NAME = "ProActiveResourceManager:name=MyAccount";
-    public static final String ALLACCOUNTS_MBEAN_NAME = "ProActiveResourceManager:name=AllAccounts";
-    public static final String MANAGEMENT_MBEAN_NAME = "ProActiveResourceManager:name=Management";
 
     /** The single instance of this class */
     private static RMJMXHelper instance;
@@ -110,7 +104,7 @@ public final class RMJMXHelper extends AbstractJMXHelper {
         try {
             final RuntimeDataMBean anonymMBean = new RuntimeDataMBeanImpl(RMMonitoringImpl.rmStatistics);
             // Uniquely identify the MBean and register it to the MBeanServer
-            final ObjectName name = new ObjectName(RUNTIMEDATA_MBEAN_NAME);
+            final ObjectName name = new ObjectName(RMJMXBeans.RUNTIMEDATA_MBEAN_NAME);
             mbs.registerMBean(anonymMBean, name);
 
             String dataBaseName = PAResourceManagerProperties.RM_HOME.getValueAsString() +
@@ -126,7 +120,7 @@ public final class RMJMXHelper extends AbstractJMXHelper {
         // Register the MyAccount MBean into the MBean server
         try {
             final MyAccountMBeanImpl myAccountMBean = new MyAccountMBeanImpl(this.accountsManager);
-            final ObjectName name = new ObjectName(MYACCOUNT_MBEAN_NAME);
+            final ObjectName name = new ObjectName(RMJMXBeans.MYACCOUNT_MBEAN_NAME);
             mbs.registerMBean(myAccountMBean, name);
         } catch (Exception e) {
             LOGGER.error("Unable to register the MyAccountMBean", e);
@@ -135,7 +129,7 @@ public final class RMJMXHelper extends AbstractJMXHelper {
         // Register the ViewAccount MBean into the MBean server
         try {
             final AllAccountsMBeanImpl viewAccountMBean = new AllAccountsMBeanImpl(this.accountsManager);
-            final ObjectName name = new ObjectName(ALLACCOUNTS_MBEAN_NAME);
+            final ObjectName name = new ObjectName(RMJMXBeans.ALLACCOUNTS_MBEAN_NAME);
             mbs.registerMBean(viewAccountMBean, name);
         } catch (Exception e) {
             LOGGER.error("Unable to register the AllAccountsMBean", e);
@@ -144,7 +138,7 @@ public final class RMJMXHelper extends AbstractJMXHelper {
         // Register the Management MBean into the MBean server
         try {
             final ManagementMBeanImpl managementMBean = new ManagementMBeanImpl(this.accountsManager);
-            final ObjectName name = new ObjectName(MANAGEMENT_MBEAN_NAME);
+            final ObjectName name = new ObjectName(RMJMXBeans.MANAGEMENT_MBEAN_NAME);
             mbs.registerMBean(managementMBean, name);
         } catch (Exception e) {
             LOGGER.error("Unable to register the ManagementMBean", e);

@@ -57,7 +57,7 @@ import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
 import org.ow2.proactive.jmx.provider.JMXProviderUtils;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
-import org.ow2.proactive.resourcemanager.core.jmx.RMJMXHelper;
+import org.ow2.proactive.resourcemanager.core.jmx.RMJMXBeans;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import functionaltests.RMConsecutive;
 import functionaltests.RMTHelper;
@@ -100,10 +100,10 @@ public final class ResourceManagerJMXTest extends RMConsecutive {
                 .getJMXConnectorURL(JMXTransportProtocol.RMI));
         final JMXServiceURL jmxRoServiceURL = new JMXServiceURL(auth
                 .getJMXConnectorURL(JMXTransportProtocol.RO));
-        final ObjectName allAccountsMBeanName = new ObjectName(RMJMXHelper.ALLACCOUNTS_MBEAN_NAME);
-        final ObjectName myAccountMBeanName = new ObjectName(RMJMXHelper.MYACCOUNT_MBEAN_NAME);
-        final ObjectName runtimeDataMBeanName = new ObjectName(RMJMXHelper.RUNTIMEDATA_MBEAN_NAME);
-        final ObjectName managementMBeanName = new ObjectName(RMJMXHelper.MANAGEMENT_MBEAN_NAME);
+        final ObjectName allAccountsMBeanName = new ObjectName(RMJMXBeans.ALLACCOUNTS_MBEAN_NAME);
+        final ObjectName myAccountMBeanName = new ObjectName(RMJMXBeans.MYACCOUNT_MBEAN_NAME);
+        final ObjectName runtimeDataMBeanName = new ObjectName(RMJMXBeans.RUNTIMEDATA_MBEAN_NAME);
+        final ObjectName managementMBeanName = new ObjectName(RMJMXBeans.MANAGEMENT_MBEAN_NAME);
         final String suffix = "/" + PAResourceManagerProperties.RM_JMX_CONNECTOR_NAME.getValueAsString();
 
         {

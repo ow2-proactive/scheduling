@@ -54,7 +54,7 @@ import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.core.account.RMAccountsManager;
-import org.ow2.proactive.resourcemanager.core.jmx.RMJMXHelper;
+import org.ow2.proactive.resourcemanager.core.jmx.RMJMXBeans;
 import org.ow2.proactive.resourcemanager.core.jmx.mbean.ManagementMBean;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
@@ -107,8 +107,8 @@ public final class AddGetTest extends RMConsecutive {
         env.put(JMXConnector.CREDENTIALS, new Object[] { adminLogin, adminCreds });
 
         // Connect to the JMX RMI Connector Server
-        final ObjectName myAccountMBeanName = new ObjectName(RMJMXHelper.MYACCOUNT_MBEAN_NAME);
-        final ObjectName managementMBeanName = new ObjectName(RMJMXHelper.MANAGEMENT_MBEAN_NAME);
+        final ObjectName myAccountMBeanName = new ObjectName(RMJMXBeans.MYACCOUNT_MBEAN_NAME);
+        final ObjectName managementMBeanName = new ObjectName(RMJMXBeans.MANAGEMENT_MBEAN_NAME);
         final JMXConnector jmxConnector = JMXConnectorFactory.connect(jmxRmiServiceURL, env);
         final MBeanServerConnection conn = jmxConnector.getMBeanServerConnection();
 
