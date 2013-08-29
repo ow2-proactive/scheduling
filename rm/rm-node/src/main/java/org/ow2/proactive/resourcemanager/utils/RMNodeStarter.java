@@ -391,6 +391,8 @@ public class RMNodeStarter {
             try {
                 proActiveHome = ProActiveRuntimeImpl.getProActiveRuntime().getProActiveHome();
             } catch (ProActiveException e) {
+                logger.debug("Cannot find proactive home using ProActiveRuntime, will use RM home as ProActive home.");
+                proActiveHome = PAResourceManagerProperties.RM_HOME.getValueAsString();
                 throw new RuntimeException("Cannot find ProActive home", e);
             }
             System.setProperty(CentralPAPropertyRepository.PA_HOME.getName(), proActiveHome);
@@ -957,7 +959,7 @@ public class RMNodeStarter {
         private String paPropString;
         private List<String> paPropList;
         private int addAttempts = -1, addAttemptsDelay = -1;
-        private final String[] requiredJARs = { "jruby.jar", "sigar/sigar.jar", "jython-2.5.4-rc1.jar",
+        private final String[] requiredJARs = { "jruby-1.7.4.jar", "sigar.jar", "jython-2.5.4-rc1.jar",
                 "groovy-all-2.1.5.jar",
                 "commons-logging-1.1.1.jar",
                 "ProActive_Scheduler-core.jar",// SCHEDULING-1338 and SCHEDULING-1307 : core required for forked java task
@@ -1380,7 +1382,6 @@ public class RMNodeStarter {
             // add the content of addons dir on the classpath
             classpath.append(os.ps + rmHome + this.addonsDir);
             classpath.append(os.ps).append(libRoot).append("*");
-            classpath.append(os.ps).append(libRoot).append("/node/sigar/*");
 
             // add jars inside the addons directory
             File addonsAbsolute = new File(rmHome + this.addonsDir);

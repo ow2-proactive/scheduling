@@ -34,6 +34,8 @@ import java.io.OutputStreamWriter;
 import java.util.Iterator;
 import java.util.Random;
 
+import org.ow2.proactive.scheduler.ext.mapreduce.PAMapReduceJobConfiguration;
+import functionaltests.SchedulerConsecutive;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
@@ -50,9 +52,6 @@ import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 import org.junit.Assert;
-import org.ow2.proactive.scheduler.ext.mapreduce.PAMapReduceJobConfiguration;
-
-import functionaltests.SchedulerConsecutive;
 
 
 /**********************************************************
@@ -503,16 +502,18 @@ public class TestMapReduce3Jobs extends SchedulerConsecutive {
     private static void printFiles(Path dir, Configuration conf) throws IOException {
         FileSystem fs = dir.getFileSystem(conf);
         for (FileStatus f : fs.listStatus(dir)) {
-            System.out.println("Reading " + f.getPath() + ": ");
-            if (f.isDir()) {
-                System.out.println("  it is a map file.");
-                printSequenceFile(fs, new Path(f.getPath(), "data"), conf);
-            } else if (isSequenceFile(fs, f.getPath())) {
-                System.out.println("  it is a sequence file.");
-                printSequenceFile(fs, f.getPath(), conf);
-            } else {
-                System.out.println("  it is a text file.");
-                printTextFile(fs, f.getPath());
+            if (!f.getPath().getName().contains("_temporary")) {
+                System.out.println("Reading " + f.getPath() + ": ");
+                if (f.isDir()) {
+                    System.out.println("  it is a map file.");
+                    printSequenceFile(fs, new Path(f.getPath(), "data"), conf);
+                } else if (isSequenceFile(fs, f.getPath())) {
+                    System.out.println("  it is a sequence file.");
+                    printSequenceFile(fs, f.getPath(), conf);
+                } else {
+                    System.out.println("  it is a text file.");
+                    printTextFile(fs, f.getPath());
+                }
             }
         }
     }

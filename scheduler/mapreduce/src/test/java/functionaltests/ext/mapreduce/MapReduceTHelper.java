@@ -48,10 +48,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.mapreduce.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
@@ -59,8 +55,11 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.ext.mapreduce.PAMapReduceJob;
 import org.ow2.proactive.scheduler.ext.mapreduce.PAMapReduceJobConfiguration;
 import org.ow2.proactive.scheduler.ext.mapreduce.exception.PAJobConfigurationException;
-
 import functionaltests.SchedulerTHelper;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.mapreduce.Job;
 
 
 public class MapReduceTHelper {
@@ -160,13 +159,15 @@ public class MapReduceTHelper {
         List<String> lines = new ArrayList<String>();
         for (String filename : children) {
             File f = new File(testRootDir + File.separator + dirname + File.separator + filename);
-            BufferedReader b = new BufferedReader(new InputStreamReader(new FileInputStream(f)));
-            String line = b.readLine();
-            while (line != null) {
-                lines.add(line);
-                line = b.readLine();
+            if (f.isFile()) {
+                BufferedReader b = new BufferedReader(new InputStreamReader(new FileInputStream(f)));
+                String line = b.readLine();
+                while (line != null) {
+                    lines.add(line);
+                    line = b.readLine();
+                }
+                b.close();
             }
-            b.close();
         }
         if (sort && lines.size() > 1) {
             Collections.sort(lines);

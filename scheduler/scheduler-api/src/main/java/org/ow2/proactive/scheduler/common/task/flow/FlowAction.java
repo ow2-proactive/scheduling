@@ -38,7 +38,6 @@ package org.ow2.proactive.scheduler.common.task.flow;
 
 import java.io.Serializable;
 
-import javax.persistence.Entity;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 
@@ -54,7 +53,6 @@ import javax.xml.bind.annotation.XmlAccessorType;
  * @see FlowActionType
  *
  */
-@Entity
 @XmlAccessorType(XmlAccessType.FIELD)
 public class FlowAction implements Serializable {
 

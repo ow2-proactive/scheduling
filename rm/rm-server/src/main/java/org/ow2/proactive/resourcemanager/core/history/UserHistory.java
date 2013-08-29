@@ -42,9 +42,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.apache.log4j.Logger;
 import org.hibernate.annotations.Index;
-import org.ow2.proactive.resourcemanager.authentication.Client;
 
 
 /**

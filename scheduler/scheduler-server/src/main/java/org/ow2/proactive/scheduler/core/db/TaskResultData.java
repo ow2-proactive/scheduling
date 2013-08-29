@@ -7,22 +7,24 @@ import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinColumns;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import org.ow2.proactive.scheduler.common.task.TaskId;
+import org.ow2.proactive.scheduler.common.task.TaskLogs;
+import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
+import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
 import org.hibernate.type.SerializableToBlobType;
-import org.ow2.proactive.scheduler.common.task.TaskId;
-import org.ow2.proactive.scheduler.common.task.TaskLogs;
-import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
-import org.ow2.proactive.scheduler.task.TaskResultImpl;
 
 
 @Entity
@@ -92,7 +94,8 @@ public class TaskResultData {
     }
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "TASK_RESULT_DATA_ID_SEQUENCE")
+    @SequenceGenerator(name = "TASK_RESULT_DATA_ID_SEQUENCE", sequenceName = "TASK_RESULT_DATA_ID_SEQUENCE")
     public long getId() {
         return id;
     }

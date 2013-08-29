@@ -23,6 +23,8 @@ subprojects {
     group = 'org.ow2.proactive'
     version = '3.5.0-SNAPSHOT'
 
+    sourceCompatibility = 1.6
+
     repositories {
         mavenLocal()
         mavenCentral()
@@ -30,10 +32,52 @@ subprojects {
         maven { url 'http://repo.activeeon.com/content/repositories/releases/' }
     }
 
+    uploadArchives {
+        repositories {
+            mavenDeployer {
+                repository(url: "http://repo.activeeon.com/content/repositories/snapshots/") {
+                    authentication(userName: "${project.hasProperty('nexusUsername') ? nexusUsername : ""}",
+                            password: "${project.hasProperty('nexusPassword') ? nexusPassword : ""}")
+                }
+            }
+        }
+    }
+
     dependencies {
         compile 'log4j:log4j:1.2.14'
         runtime 'org.slf4j:slf4j-log4j12:1.5.3'
         testCompile 'junit:junit:4.11'
+    }
+
+    configurations.all {
+        resolutionStrategy {
+            cacheDynamicVersionsFor 0, 'seconds'
+            cacheChangingModulesFor 0, 'seconds'
+        }
+    }
+
+    test {
+        exclude 'functionaltests/**'
+        exclude 'unittests/**'
+    }
+}
+
+def functionalTestConfiguration = {
+    forkEvery 1
+    include 'functionaltests/**'
+    include 'unittests/**'
+    systemProperties << ['pa.rm.home': rootDir.absolutePath]
+    systemProperties << ['pa.scheduler.home': rootDir.absolutePath]
+    systemProperties << ['proactive.home': rootDir.absolutePath]
+    systemProperties << ['log4j.configuration': file("$rootDir/config/log4j/log4j-junit").toURL()]
+    systemProperties << ['proactive.configuration': file("$rootDir/config/proactive/ProActiveConfiguration.xml")]
+    systemProperties << ['java.security.policy': file("$rootDir/config/security.java.policy-server").absolutePath]
+    systemProperties << ['proactive.runtime.ping': false]
+    testLogging {
+        exceptionFormat = 'full'
+    }
+    beforeTest { descriptor ->
+        logger.lifecycle("Running: " + descriptor)
     }
 }
 
@@ -41,7 +85,6 @@ project(':scheduler:scheduler-api') {
     dependencies {
         compile 'org.objectweb.proactive:programming-annotation:5.5.0-SNAPSHOT'
 
-        compile 'org.hibernate.javax.persistence:hibernate-jpa-2.0-api:1.0.1.Final'
         compile 'it.sauronsoftware.cron4j:cron4j:2.2.5'
         compile 'isorelax:isorelax:20030108'
         compile 'commons-collections:commons-collections:3.2'
@@ -98,9 +141,6 @@ project('rm:rm-client') {
         compile 'org.objectweb.proactive:programming-core:5.5.0-SNAPSHOT'
         compile 'org.objectweb.proactive:programming-extension-annotation:5.5.0-SNAPSHOT'
 
-        compile 'org.hibernate.javax.persistence:hibernate-jpa-2.0-api:1.0.1.Final'
-        compile 'org.hibernate:hibernate-core:4.1.3.Final'
-
         compile project(':common-client')
     }
     task stub(type: StubTask) {
@@ -151,6 +191,8 @@ project('scheduler:scheduler-server') {
     dependencies {
         compile 'commons-cli:commons-cli:1.1'
         compile 'javax.mail:mail:1.4.7'
+        compile 'org.hibernate.javax.persistence:hibernate-jpa-2.0-api:1.0.1.Final'
+        compile 'org.hibernate:hibernate-core:4.1.3.Final'
 
         compile 'org.objectweb.proactive:programming-core:5.5.0-SNAPSHOT'
 
@@ -182,17 +224,7 @@ project('scheduler:scheduler-server') {
         runtime 'org.objectweb.proactive:programming-extension-pamr:5.5.0-SNAPSHOT'
     }
 
-    test {
-        forkEvery 1
-
-        systemProperties << ['pa.rm.home': rootDir.absolutePath]
-        systemProperties << ['pa.scheduler.home': rootDir.absolutePath]
-        systemProperties << ['proactive.home': rootDir.absolutePath]
-        systemProperties << ['log4j.configuration': file("$rootDir/config/log4j/log4j-junit").toURL()]
-        systemProperties << ['proactive.configuration': file("$rootDir/config/proactive/ProActiveConfiguration.xml")]
-        systemProperties << ['java.security.policy': file("$rootDir/config/security.java.policy-server").absolutePath]
-        systemProperties << ['proactive.runtime.ping': false]
-    }
+    task('functionalTest', type:Test).configure functionalTestConfiguration
 
     task testJar(type: Jar) {
         classifier = 'tests'
@@ -250,6 +282,8 @@ project('rm:rm-server') {
         compile(
                 'commons-cli:commons-cli:1.1',
                 'it.sauronsoftware.cron4j:cron4j:2.2.5',
+                'org.hibernate:hibernate-core:4.1.3.Final',
+                'org.hibernate.javax.persistence:hibernate-jpa-2.0-api:1.0.1.Final',
 
                 'org.objectweb.proactive:programming-core:5.5.0-SNAPSHOT',
 
@@ -276,17 +310,7 @@ project('rm:rm-server') {
         runtime 'org.objectweb.proactive:programming-extension-pamr:5.5.0-SNAPSHOT'
     }
 
-    test {
-        forkEvery 1
-
-        systemProperties << ['pa.rm.home': rootDir.absolutePath]
-        systemProperties << ['pa.scheduler.home': rootDir.absolutePath]
-        systemProperties << ['proactive.home': rootDir.absolutePath]
-        systemProperties << ['log4j.configuration': file("$rootDir/config/log4j/log4j-junit").toURL()]
-        systemProperties << ['proactive.configuration': file("$rootDir/config/proactive/ProActiveConfiguration.xml")]
-        systemProperties << ['java.security.policy': file("$rootDir/config/security.java.policy-server").absolutePath]
-        systemProperties << ['proactive.runtime.ping': false]
-    }
+    task('functionalTest', type:Test).configure functionalTestConfiguration
 
     task stub(type: StubTask) {
         classes = [
@@ -360,16 +384,21 @@ project(':scheduler:dataspace-smartproxy') {
         // to get shared test classes
         testCompile project(':rm:rm-server').sourceSets.test.output // to get shared test classes
     }
+
+    task('functionalTest', type:Test).configure functionalTestConfiguration
 }
 
 project(':scheduler:mapreduce') {
     dependencies {
         compile 'org.apache.hadoop:hadoop-core:0.20.2'
-        compile project(':scheduler:scheduler-node')
+        compile project(':scheduler:scheduler-server')
+        testCompile project(':scheduler:scheduler-server')
         testCompile project(':scheduler:scheduler-server').sourceSets.test.output
         // to get shared test classes
         testCompile project(':rm:rm-server').sourceSets.test.output // to get shared test classes
     }
+
+    task('functionalTest', type:Test).configure functionalTestConfiguration
 }
 
 project(':doc').subprojects {
