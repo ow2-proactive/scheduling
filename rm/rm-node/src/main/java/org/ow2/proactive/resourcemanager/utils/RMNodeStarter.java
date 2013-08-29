@@ -393,7 +393,6 @@ public class RMNodeStarter {
             } catch (ProActiveException e) {
                 logger.debug("Cannot find proactive home using ProActiveRuntime, will use RM home as ProActive home.");
                 proActiveHome = PAResourceManagerProperties.RM_HOME.getValueAsString();
-                throw new RuntimeException("Cannot find ProActive home", e);
             }
             System.setProperty(CentralPAPropertyRepository.PA_HOME.getName(), proActiveHome);
         }
