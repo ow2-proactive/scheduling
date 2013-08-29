@@ -26,6 +26,8 @@ subprojects {
     repositories {
         mavenLocal()
         mavenCentral()
+        maven { url 'http://repo.activeeon.com/content/repositories/snapshots/' }
+        maven { url 'http://repo.activeeon.com/content/repositories/releases/' }
     }
 
     dependencies {
