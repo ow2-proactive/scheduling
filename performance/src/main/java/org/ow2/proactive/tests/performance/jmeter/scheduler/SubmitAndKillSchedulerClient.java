@@ -178,7 +178,7 @@ public class SubmitAndKillSchedulerClient extends BaseJMeterSchedulerClient {
     static Task createNativeSleepingTask(String testsSourcePath) {
         NativeTask task = new NativeTask();
         task.setCommandLine(new String[] { testsSourcePath +
-            "/org/ow2/proactive/tests/performance/jmeter/scheduler/sleep_forever_nativeTask.sh" });
+                "/org/ow2/proactive/tests/performance/jmeter/scheduler/sleep_forever_nativeTask.sh"});
         task.setDescription("Test native task, sleeps forever");
         return task;
     }

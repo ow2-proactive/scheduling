@@ -192,7 +192,7 @@ public class SubmitFailingTaskSchedulerClient extends BaseJobSubmitClient {
     static Task createNativeTask(String testsSourcePath) {
         NativeTask task = new NativeTask();
         task.setCommandLine(new String[] { testsSourcePath +
-            "/org/ow2/proactive/tests/performance/jmeter/scheduler/failing_nativeTask.sh" });
+                "/org/ow2/proactive/tests/performance/jmeter/scheduler/failing_nativeTask.sh"});
         task.setDescription("Test native task, exits with code 1");
         return task;
     }
