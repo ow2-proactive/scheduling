@@ -15,7 +15,10 @@ buildscript {
 
 subprojects {
     apply plugin: 'java'
+    apply plugin: 'maven'
 
+    group = 'org.ow2.proactive'
+    version = '1.5.0-SNAPSHOT'
 
     repositories {
         mavenLocal()
@@ -27,13 +30,17 @@ subprojects {
 
 project(':rest-api') {
     dependencies {
-        compile 'org.jboss.resteasy:jaxrs-api:2.3.3.FinSal'
+        compile 'org.jboss.resteasy:jaxrs-api:2.3.3.Final'
         compile 'org.jboss.resteasy:resteasy-jackson-provider:2.3.3.Final'
         compile 'org.jboss.resteasy:resteasy-multipart-provider:2.3.3.Final'
     }
 }
 
 project(':rest-server') {
+    apply plugin: 'war'
+    apply plugin: 'jetty'
+
+    configurations { jaxDoclet }
     dependencies {
         compile 'org.jboss.resteasy:jaxrs-api:2.3.3.Final'
         compile 'org.jboss.resteasy:resteasy-jackson-provider:2.3.3.Final'
@@ -63,16 +70,65 @@ project(':rest-server') {
         testCompile 'org.jboss.resteasy:tjws:2.3.3.Final'
 
         runtime 'net.bull.javamelody:javamelody-core:1.46.0'
+
+        jaxDoclet files("$rootDir/lib/doc/doclets-0.10.1-SNAPSHOT.jar")
     }
 
-    task stub(type: StubTask){
+    task stub(type: StubTask) {
         classes = ['org.ow2.proactive_grid_cloud_portal.scheduler.EventListener']
     }
 
-    test {
-        forkEvery 1
-
+    task jaxbDoc(type: Javadoc) {
+        source([project, project(':rest-api')].collect { project -> project.sourceSets.main.allJava })
+        destinationDir = file("$webAppDirName/doc/jaxbdocs")
+        options.docletpath = configurations.jaxDoclet.files.asType(List) + configurations.compile.files.asType(List)
+        options.classpath = options.docletpath
+        options.doclet = "com.lunatech.doclets.jax.jaxb.JAXBDoclet"
+        options.footer = 'Copyright 1997-2013 ActiveEon/INRIA/University of Nice-Sophia Antipolis'
+        options.header = file('doc_header.html').text.replaceAll("[\r\n]+", " ")
     }
+
+    task jaxrsDoc(type: Javadoc, dependsOn: jaxbDoc) {
+        source = sourceSets.main.allJava
+        destinationDir = file("$webAppDirName/doc/jaxrsdocs")
+        options.links << '../jaxbdocs/'
+        options.footer = 'Copyright 1997-2013 ActiveEon/INRIA/University of Nice-Sophia Antipolis'
+        options.header = file('doc_header.html').text.replaceAll("[\r\n]+", " ")
+        options.docletpath = configurations.jaxDoclet.files.asType(List) + configurations.compile.files.asType(List)
+        options.classpath = options.docletpath
+        options.doclet = "com.lunatech.doclets.jax.jaxrs.JAXRSDoclet"
+    }
+    war.dependsOn jaxrsDoc
+
+    war {
+        filesMatching('**/*.html') {
+            it.filter(org.apache.tools.ant.filters.ReplaceTokens, tokens: ['rest_api.version': project.version])
+        }
+    }
+
+    def functionalTestConfiguration = {
+        forkEvery 1
+        include 'functionaltests/**'
+        systemProperties << ['pa.rm.home': rootDir.absolutePath]
+        systemProperties << ['pa.scheduler.home': rootDir.absolutePath]
+        systemProperties << ['proactive.home': rootDir.absolutePath]
+        systemProperties << ['log4j.configuration': file("$rootDir/config/log4j/log4j-junit").toURL()]
+        systemProperties << ['proactive.configuration': file("$rootDir/config/proactive/ProActiveConfiguration.xml")]
+        systemProperties << ['java.security.policy': file("$rootDir/config/security.java.policy-server").absolutePath]
+        systemProperties << ['proactive.runtime.ping': false]
+        testLogging {
+            exceptionFormat = 'full'
+        }
+        beforeTest { descriptor ->
+            logger.lifecycle("Running: " + descriptor)
+        }
+    }
+
+    test {
+        exclude 'functionaltests/**'
+    }
+
+    task('functionalTest', type: Test).configure functionalTestConfiguration
 }
 
 project(':rest-cli') {
