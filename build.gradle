@@ -59,6 +59,7 @@ subprojects {
     test {
         exclude 'functionaltests/**'
         exclude 'unittests/**'
+        exclude 'unitTests/**'
     }
 }
 
@@ -66,6 +67,7 @@ def functionalTestConfiguration = {
     forkEvery 1
     include 'functionaltests/**'
     include 'unittests/**'
+    include 'unitTests/**'
     systemProperties << ['pa.rm.home': rootDir.absolutePath]
     systemProperties << ['pa.scheduler.home': rootDir.absolutePath]
     systemProperties << ['proactive.home': rootDir.absolutePath]
