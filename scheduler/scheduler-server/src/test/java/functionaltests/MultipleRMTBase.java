@@ -49,7 +49,7 @@ public class MultipleRMTBase extends FunctionalTest {
 
         String hibernateConfig = new String(FileToBytesConverter.convertFileToByteArray(new File(
             hibernateConfigFile)));
-        String defaultDB = "jdbc:derby:TEST_RM_DB;create=true";
+        String defaultDB = "jdbc:derby:build/TEST_RM_DB;create=true";
         if (!hibernateConfig.contains(defaultDB)) {
             Assert.fail("Hibernate config doesn't contain expected string");
         }
