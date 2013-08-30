@@ -46,8 +46,6 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
-import org.jboss.resteasy.core.Dispatcher;
-import org.jboss.resteasy.plugins.server.tjws.TJWSEmbeddedJaxrsServer;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
@@ -68,9 +66,10 @@ import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.util.SchedulerStarter;
 import org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest;
 import org.ow2.proactive_grid_cloud_portal.webapp.RestRuntime;
-
 import functionaltests.utils.ProcessStreamReader;
 import functionaltests.utils.RestFuncTUtils;
+import org.jboss.resteasy.core.Dispatcher;
+import org.jboss.resteasy.plugins.server.tjws.TJWSEmbeddedJaxrsServer;
 
 
 public class RestFuncTHelper {
@@ -97,7 +96,7 @@ public class RestFuncTHelper {
     private static URL forkedTaskLog4JConfig = RestFuncTHelper.class
             .getResource("config/forkedTaskLog4JConfig.properties");
 
-    private static final String[] requiredJARs = { "script-js.jar", "gson-2.1.jar", "jruby.jar",
+    private static final String[] requiredJARs = { "script-js.jar", "gson-2.1.jar", "jruby-1.7.4.jar",
             "jython-2.5.4-rc1.jar","groovy-all-2.1.5.jar", "commons-logging-1.1.1.jar", "ProActive_Scheduler-core.jar",
             "ProActive_SRM-common.jar", "ProActive_ResourceManager.jar", "ProActive_Scheduler-worker.jar",
             "ProActive_Scheduler-mapreduce.jar", "commons-httpclient-3.1.jar", "commons-codec-1.3.jar",
@@ -403,6 +402,7 @@ public class RestFuncTHelper {
             classpath.append(libPath).append(File.separator).append(jar).append(File.pathSeparatorChar);
         }
 
+        classpath.append(System.getProperty("java.class.path"));
         return classpath.toString();
     }
 

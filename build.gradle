@@ -68,6 +68,7 @@ project(':rest-server') {
         testCompile 'org.ow2.proactive:scheduler-server:3.5.0-SNAPSHOT'
         testCompile 'org.apache.httpcomponents:httpmime:4.2.1'
         testCompile 'org.jboss.resteasy:tjws:2.3.3.Final'
+        testCompile 'org.fusesource:sigar:1.6.4'
 
         runtime 'net.bull.javamelody:javamelody-core:1.46.0'
 
@@ -109,8 +110,8 @@ project(':rest-server') {
     def functionalTestConfiguration = {
         forkEvery 1
         include 'functionaltests/**'
-        systemProperties << ['pa.rm.home': rootDir.absolutePath]
-        systemProperties << ['pa.scheduler.home': rootDir.absolutePath]
+        systemProperties << ['restapi.test.scheduler.home': rootDir.absolutePath]
+        systemProperties << ['restapi.test.rm.home': rootDir.absolutePath]
         systemProperties << ['proactive.home': rootDir.absolutePath]
         systemProperties << ['log4j.configuration': file("$rootDir/config/log4j/log4j-junit").toURL()]
         systemProperties << ['proactive.configuration': file("$rootDir/config/proactive/ProActiveConfiguration.xml")]
@@ -129,6 +130,13 @@ project(':rest-server') {
     }
 
     task('functionalTest', type: Test).configure functionalTestConfiguration
+
+    task proActiveLibs(type: Copy) { // to launch a Scheduler node
+        from configurations.testCompile
+        into file("$rootDir/dist/lib")
+    }
+    functionalTest.dependsOn proActiveLibs
+    clean.dependsOn cleanProActiveLibs
 }
 
 project(':rest-cli') {
