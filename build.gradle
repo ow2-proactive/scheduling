@@ -1,3 +1,5 @@
+apply plugin:'base'
+
 buildscript {
     repositories {
         mavenLocal()
@@ -75,6 +77,7 @@ def functionalTestConfiguration = {
     systemProperties << ['proactive.configuration': file("$rootDir/config/proactive/ProActiveConfiguration.xml")]
     systemProperties << ['java.security.policy': file("$rootDir/config/security.java.policy-server").absolutePath]
     systemProperties << ['proactive.runtime.ping': false]
+    systemProperties << ['proactive.test.timeout': 600000]
     testLogging {
         exceptionFormat = 'full'
     }
@@ -416,8 +419,7 @@ project(':doc:Resourcing') {
         compile project(':rm:rm-server')
     }
 }
-
-task ProActiveLibs(type: Copy) {
+task proActiveLibs(type: Copy) {
     subprojects.each {
         from it.configurations.runtime.files
         from it.jar.outputs
@@ -426,7 +428,10 @@ task ProActiveLibs(type: Copy) {
     from file(project.rootProject.buildscript.configurations.classpath.find {
         it.name.contains("build-utils")
     })
-    into "dist/lib"
+    into file("dist/lib")
+}
+subprojects {
+    tasks.withType(Test).matching { it.name == 'functionalTest' }*.dependsOn proActiveLibs
 }
 
 def distributedProjects = [project(':rm:rm-cli'),
@@ -436,16 +441,15 @@ def distributedProjects = [project(':rm:rm-cli'),
         project(':rm:rm-server')
 ]
 
-task ProActiveDist(type: Copy) {
+task proActiveDist(type: Copy) {
     distributedProjects.distZip.outputs.files.each {
         from zipTree(it.singleFile)
     }
     into "dist/"
 }
-ProActiveDist.dependsOn distributedProjects.distZip
+proActiveDist.dependsOn distributedProjects.distZip
 
-
-task ResourceManagerJar(type: Jar) {
+task resourceManagerJar(type: Jar) {
     project(':rm:rm-server').configurations.runtime.allDependencies.withType(ProjectDependency).each {
         from zipTree(it.dependencyProject.jar.outputs.files.singleFile)
     }
@@ -454,7 +458,7 @@ task ResourceManagerJar(type: Jar) {
     archiveName 'ProActive_ResourceManager.jar'
 }
 
-task SchedulerJar(type: Jar) {
+task schedulerJar(type: Jar) {
     project(':scheduler:scheduler-server').configurations.runtime.allDependencies.withType(ProjectDependency).each {
         from zipTree(it.dependencyProject.jar.outputs.files.singleFile)
     }
