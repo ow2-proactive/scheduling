@@ -80,7 +80,7 @@ import junit.framework.Assert;
 public class SelectionTest extends FunctionalTest {
 
     private String vmPropSelectionScriptpath = this.getClass().getResource(
-            "../../functionaltests/selectionscript/vmPropertySelectionScript.js").getPath();
+            "/functionaltests/selectionscript/vmPropertySelectionScript.js").getPath();
 
     private String vmPropKey1 = "myProperty1";
     private String vmPropValue1 = "myValue1";
