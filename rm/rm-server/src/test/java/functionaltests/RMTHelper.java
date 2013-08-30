@@ -98,7 +98,7 @@ public class RMTHelper {
     /**
      * Timeout for local infrastructure
      */
-    public static final int defaultNodesTimeout = 20 * 1000; //20s
+    public static final int defaultNodesTimeout = 60 * 1000; //60s
 
     public static final URL functionalTestRMProperties = RMTHelper.class
             .getResource("/functionaltests/config/functionalTRMProperties.ini");
