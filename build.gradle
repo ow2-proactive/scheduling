@@ -99,6 +99,7 @@ project(':scheduler:scheduler-api') {
 
         runtime 'org.codehaus.woodstox:woodstox-core-lgpl:4.1.2'
         runtime 'msv:xsdlib:20050913'
+        runtime 'msv:relaxngDatatype:20030807'
     }
 }
 
