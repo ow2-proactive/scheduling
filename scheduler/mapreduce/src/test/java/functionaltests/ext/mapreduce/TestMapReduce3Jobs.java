@@ -409,6 +409,9 @@ public class TestMapReduce3Jobs extends SchedulerConsecutive {
             System.out.println(finalOuts.toString());
             System.out.println(dir);
             String filename = dir.list()[0];
+            if (filename.contains("_temporary")) {
+                filename = dir.list()[1];
+            }
             Path recomputedkey = new Path(finalOuts, filename);
             System.out.println("++++++++++++++++ Path to recomputed key: " + recomputedkey);
             SequenceFile.Reader in = new SequenceFile.Reader(fs, recomputedkey, conf);

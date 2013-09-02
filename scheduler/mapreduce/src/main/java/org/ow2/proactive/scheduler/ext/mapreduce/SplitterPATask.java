@@ -5,6 +5,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
+import org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemException;
+import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
+import org.ow2.proactive.scheduler.ext.mapreduce.fs.PADataSpacesFileSystem;
+import org.ow2.proactive.scheduler.ext.mapreduce.logging.DefaultLogger;
+import org.ow2.proactive.scheduler.ext.mapreduce.logging.Logger;
+import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
@@ -17,14 +25,6 @@ import org.apache.hadoop.mapreduce.JobContext;
 import org.apache.hadoop.mapreduce.JobID;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.util.StringUtils;
-import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
-import org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemException;
-import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
-import org.ow2.proactive.scheduler.ext.mapreduce.fs.PADataSpacesFileSystem;
-import org.ow2.proactive.scheduler.ext.mapreduce.logging.DefaultLogger;
-import org.ow2.proactive.scheduler.ext.mapreduce.logging.Logger;
-import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
 
 
 /**
@@ -193,7 +193,7 @@ public class SplitterPATask extends JavaExecutable {
                         // sub-directories, maybe we must navigate recursively
                         // them
                         if (!currentFileStatusArray[j].isDir()) {
-                            if (j == 0) {
+                            if (newInputPathStringList.isEmpty()) {
                                 newInputPathStringList += currentFileStatusArray[j].getPath().toUri()
                                         .toString();
                             } else {
@@ -203,7 +203,7 @@ public class SplitterPATask extends JavaExecutable {
                         }
                     }
                 } else {
-                    if (i == 0) {
+                    if (newInputPathStringList.isEmpty()) {
                         newInputPathStringList += inputPathStringListElments[i];
                     } else {
                         newInputPathStringList += StringUtils.COMMA_STR + inputPathStringListElments[i];
