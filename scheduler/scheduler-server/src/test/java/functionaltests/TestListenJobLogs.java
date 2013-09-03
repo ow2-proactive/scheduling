@@ -78,7 +78,7 @@ import org.junit.Test;
  */
 public class TestListenJobLogs extends SchedulerConsecutive {
 
-    static final long LOG_EVENT_TIMEOUT = 10000;
+    static final long LOG_EVENT_TIMEOUT = 30000;
 
     static final String TASK_NAME1 = "TestTask1";
 
