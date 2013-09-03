@@ -17,7 +17,7 @@ subprojects {
     apply plugin: 'java'
     apply plugin: 'maven'
 
-    group = 'org.ow2.proactive'
+    group = 'org.ow2.proactive_grid_cloud_portal'
     version = '1.5.0-SNAPSHOT'
 
     repositories {
@@ -25,6 +25,17 @@ subprojects {
         mavenCentral()
         maven { url 'http://repo.activeeon.com/content/repositories/snapshots/' }
         maven { url 'http://repo.activeeon.com/content/repositories/releases/' }
+    }
+
+    uploadArchives {
+        repositories {
+            mavenDeployer {
+                repository(url: "http://repo.activeeon.com/content/repositories/snapshots/") {
+                    authentication(userName: "${project.hasProperty('nexusUsername') ? nexusUsername : ""}",
+                            password: "${project.hasProperty('nexusPassword') ? nexusPassword : ""}")
+                }
+            }
+        }
     }
 }
 
