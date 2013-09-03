@@ -12,6 +12,7 @@ var PROTOCOL = "pnp";
 var RM_PORT = 64738;
 var SCHEDULER_PORT = 52845;
 var JETTY_PORT = 8080;
+var SCRIPT_NAME = "start-server.js";
 
 var CHECK_PORTS_NUMBER = [RM_PORT, SCHEDULER_PORT, JETTY_PORT];
 var CHECK_PORTS_SNAME = ["RM", "SCHEDULER", "JETTY"];
@@ -24,8 +25,11 @@ var fs = File.separator;
 var isWindows = System.getProperty("os.name").startsWith("Windows");
 var javaExe = System.getProperty("java.home") + fs + "bin" + fs + (isWindows ? "java.exe" : "java");
 
+/** Get current directory (must be SCHEDULER_HOME/bin) */
+var currDir = new File(getCheckedCurrDir());
+
 /** Dirs */
-var homeDir = new File(getHomeDir());
+var homeDir = new File(currDir.getParent());
 var logsDir = new File(homeDir, ".logs");
 var configDir = new File(homeDir, "config");
 var distDir = new File(homeDir, "dist");
@@ -336,16 +340,24 @@ function toJavaArray(cmdarray) {
 	return jarray;
 }
 
-function endsWith(str, suffix) {
-    return str.indexOf(suffix, str.length - suffix.length) !== -1;
+function getCheckedCurrDir() { 
+	var currentDir = new File(System.getProperty("user.dir"));
+	try { 
+		var errmsg = "Please run this script from SCHEDULER_HOME"+fs+"bin";
+		assertExists(currentDir + fs + SCRIPT_NAME, errmsg);
+		return currentDir;
+	} catch (e) {
+		println("Problem found: " + e);
+		System.exit(-1);
+	}
 }
 
-function getHomeDir(){
-  var currentDir = new File(System.getProperty("user.dir"));
-  if (!currentDir.getName().endsWith("bin")) {
-     throw IllegalStateException("Please run this script from SCHEDULER_HOME"+fs+"bin"+directory);
-  }
-  return currentDir.getParent();
+function assertExists(file, err) { // throws IllegalStateException
+	var f = new File(file);
+	if (!f.exists()) {
+		throw IllegalStateException("File '" + file + "' not found. " + err);
+	}
+	return;
 }
 
 function extractFolder(zipFile, destDirFile){ // throws ZipException, IOException

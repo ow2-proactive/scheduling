@@ -12,7 +12,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
+import org.hibernate.exception.LockAcquisitionException;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.ow2.proactive.db.DatabaseManagerException;
 import org.ow2.proactive.db.DatabaseManagerExceptionHandler;
@@ -66,15 +68,15 @@ import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.exception.ConstraintViolationException;
 import org.hibernate.transform.DistinctRootEntityResultTransformer;
+import org.ow2.proactive.scheduler.core.db.TransactionHelper.SessionWork;
 
 
-public class SchedulerDBManager implements FilteredExceptionCallback {
+public class SchedulerDBManager {
 
     private static final String JAVA_PROPERTYNAME_NODB = "scheduler.database.nodb";
 
@@ -118,13 +120,7 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
 
     private final SessionFactory sessionFactory;
 
-    private final DatabaseManagerExceptionHandler exceptionHandler;
-
-    private static abstract class SessionWork<T> {
-
-        abstract T executeWork(Session session);
-
-    }
+    private final TransactionHelper transactionHelper;
 
     public static SchedulerDBManager createUsingProperties() {
         if (System.getProperty(JAVA_PROPERTYNAME_NODB) != null) {
@@ -183,10 +179,8 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
             debugLogger.error("Initial SessionFactory creation failed", ex);
             throw new DatabaseManagerException("Initial SessionFactory creation failed", ex);
         }
+        transactionHelper = new TransactionHelper(sessionFactory);
 
-        this.exceptionHandler = new DatabaseManagerExceptionHandler(
-            new Class[] { org.hibernate.exception.JDBCConnectionException.class }, DBMEHandler.FILTER_ALL,
-            this);
     }
 
     public List<JobInfo> getJobs(final int offset, final int limit, final String user, final boolean pending,
@@ -203,7 +197,7 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
         return runWithoutTransaction(new SessionWork<List<JobInfo>>() {
             @Override
             @SuppressWarnings("unchecked")
-            List<JobInfo> executeWork(Session session) {
+            public List<JobInfo> executeWork(Session session) {
                 Criteria criteria = session.createCriteria(JobData.class);
                 if (limit > 0) {
                     criteria.setMaxResults(limit);
@@ -279,7 +273,7 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
         return runWithoutTransaction(new SessionWork<List<JobUsage>>() {
             @Override
             @SuppressWarnings("unchecked")
-            List<JobUsage> executeWork(Session session) {
+            public List<JobUsage> executeWork(Session session) {
                 if (startDate == null || endDate == null) {
                     throw new DatabaseManagerException("Start and end dates can't be null.");
                 }
@@ -305,18 +299,8 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
         });
     }
 
-    @Override
-    public void notify(DatabaseManagerException dme) {
-        if (this.callback != null) {
-            this.callback.notify(dme);
-        }
-        throw dme;
-    }
-
-    private FilteredExceptionCallback callback;
-
     public void setCallback(FilteredExceptionCallback callback) {
-        this.callback = callback;
+        this.transactionHelper.setCallback(callback);
     }
 
     public SessionFactory getSessionFactory() {
@@ -350,7 +334,7 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
         return runWithoutTransaction(new SessionWork<Long>() {
 
             @Override
-            Long executeWork(Session session) {
+            public Long executeWork(Session session) {
                 Query query = session.createQuery("select count(*) from JobData where removedTime = -1");
                 Long count = (Long) query.uniqueResult();
                 return count;
@@ -363,7 +347,7 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
         return runWithoutTransaction(new SessionWork<Long>() {
 
             @Override
-            Long executeWork(Session session) {
+            public Long executeWork(Session session) {
                 Query query = session.createQuery(
                         "select count(*) from JobData where status in (:status) and removedTime = -1")
                         .setParameterList("status", status);
@@ -379,7 +363,7 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
         return runWithoutTransaction(new SessionWork<Long>() {
 
             @Override
-            Long executeWork(Session session) {
+            public Long executeWork(Session session) {
                 Query query = session
                         .createQuery(
                                 "select count(*) from TaskData task where taskStatus in (:taskStatus) and task.jobData.removedTime = -1")
@@ -396,7 +380,7 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
         return runWithoutTransaction(new SessionWork<Long>() {
 
             @Override
-            Long executeWork(Session session) {
+            public Long executeWork(Session session) {
                 Collection<TaskStatus> taskStatus = Arrays.asList(TaskStatus.SUBMITTED, TaskStatus.PAUSED,
                         TaskStatus.PENDING, TaskStatus.WAITING_ON_ERROR, TaskStatus.WAITING_ON_FAILURE);
                 Query query = session
@@ -416,7 +400,7 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
         return runWithoutTransaction(new SessionWork<Long>() {
 
             @Override
-            Long executeWork(Session session) {
+            public Long executeWork(Session session) {
                 Query query = session.createQuery(
                         "select count(*) from TaskData task where taskStatus in (:taskStatus) "
                             + "and task.jobData.status in (:jobStatus) and task.jobData.removedTime = -1")
@@ -434,7 +418,7 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
         return runWithoutTransaction(new SessionWork<Long>() {
 
             @Override
-            Long executeWork(Session session) {
+            public Long executeWork(Session session) {
                 Query query = session
                         .createQuery("select count(*) from TaskData task where task.jobData.removedTime = -1");
                 Long count = (Long) query.uniqueResult();
@@ -447,7 +431,7 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
     public double getMeanJobPendingTime() {
         return runWithoutTransaction(new SessionWork<Double>() {
             @Override
-            Double executeWork(Session session) {
+            public Double executeWork(Session session) {
                 Query query = session
                         .createQuery("select avg(startTime - submittedTime) from JobData where startTime > 0 and submittedTime > 0");
                 Double result = (Double) query.uniqueResult();
@@ -460,7 +444,7 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
     public double getMeanJobExecutionTime() {
         return runWithoutTransaction(new SessionWork<Double>() {
             @Override
-            Double executeWork(Session session) {
+            public Double executeWork(Session session) {
                 Query query = session
                         .createQuery("select avg(finishedTime - startTime) from JobData where startTime > 0 and finishedTime > 0");
                 Double result = (Double) query.uniqueResult();
@@ -473,7 +457,7 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
     public double getMeanJobSubmittingPeriod() {
         return runWithoutTransaction(new SessionWork<Double>() {
             @Override
-            Double executeWork(Session session) {
+            public Double executeWork(Session session) {
                 Query query = session
                         .createQuery("select count(*), min(submittedTime), max(submittedTime) from JobData");
                 Object[] result = (Object[]) query.uniqueResult();
@@ -494,7 +478,7 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
         final long id = Long.parseLong(jobId);
         Long result = runWithoutTransaction(new SessionWork<Long>() {
             @Override
-            Long executeWork(Session session) {
+            public Long executeWork(Session session) {
                 JobData jobData = (JobData) session.get(JobData.class, id);
                 if (jobData == null) {
                     return null;
@@ -517,7 +501,7 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
         final long id = Long.parseLong(jobId);
         Long result = runWithoutTransaction(new SessionWork<Long>() {
             @Override
-            Long executeWork(Session session) {
+            public Long executeWork(Session session) {
                 JobData jobData = (JobData) session.get(JobData.class, id);
                 if (jobData == null) {
                     return null;
@@ -540,7 +524,7 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
         final long id = Long.parseLong(jobId);
         Double result = runWithoutTransaction(new SessionWork<Double>() {
             @Override
-            Double executeWork(Session session) {
+            public Double executeWork(Session session) {
                 Query jobSubmittedTimeQuery = session.createQuery(
                         "select submittedTime from JobData where id = :id").setParameter("id", id);
                 Long jobSubmittedTime = (Long) jobSubmittedTimeQuery.uniqueResult();
@@ -568,7 +552,7 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
         final long id = Long.parseLong(jobId);
         Double result = runWithoutTransaction(new SessionWork<Double>() {
             @Override
-            Double executeWork(Session session) {
+            public Double executeWork(Session session) {
                 Query jobQuery = session.createQuery("select id from JobData where id = :id").setParameter(
                         "id", id);
                 if (jobQuery.uniqueResult() == null) {
@@ -596,7 +580,7 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
         final long id = Long.parseLong(jobId);
         Long result = runWithoutTransaction(new SessionWork<Long>() {
             @Override
-            Long executeWork(Session session) {
+            public Long executeWork(Session session) {
                 Query jobQuery = session.createQuery("select id from JobData where id = :id").setParameter(
                         "id", id);
                 if (jobQuery.uniqueResult() == null) {
@@ -624,7 +608,7 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
         return runWithoutTransaction(new SessionWork<SchedulerAccount>() {
 
             @Override
-            SchedulerAccount executeWork(Session session) {
+            public SchedulerAccount executeWork(Session session) {
                 Query tasksQuery = session.createQuery(
                         "select count(*), sum(task.finishedTime) - sum(task.startTime) from TaskData task "
                             + "where task.finishedTime > 0 and task.jobData.owner = :username").setParameter(
@@ -664,30 +648,22 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
     }
 
     private void removeJobScripts(Session session, long jobId) {
-        session
-                .createQuery(
-                        "delete from ScriptData where id in (select td.envScript from ForkedJavaTaskData td where td.taskData.id.jobId = :jobId)")
-                .setParameter("jobId", jobId).executeUpdate();
-        session
-                .createQuery(
-                        "delete from ScriptData where id in (select td.generationScript from NativeTaskData td where td.taskData.id.jobId = :jobId)")
-                .setParameter("jobId", jobId).executeUpdate();
-        session
-                .createQuery(
-                        "delete from ScriptData where id in (select preScript from TaskData where id.jobId = :jobId)"
-                            + "or id in (select postScript from TaskData where id.jobId = :jobId) or id in (select cleanScript from TaskData where id.jobId = :jobId) or id in (select flowScript from TaskData where id.jobId = :jobId)")
-                .setParameter("jobId", jobId).executeUpdate();
-        session
-                .createQuery(
-                        "delete from ScriptData where id in (select td.script from ScriptTaskData td where td.taskData.id.jobId = :jobId)")
+        session.createQuery(
+                "delete from ScriptData where"
+                    + " id in (select td.envScript from ForkedJavaTaskData td where td.taskData.id.jobId = :jobId)"
+                    + " or id in (select td.generationScript from NativeTaskData td where td.taskData.id.jobId = :jobId)"
+                    + " or id in (select preScript from TaskData where id.jobId = :jobId)"
+                    + " or id in (select postScript from TaskData where id.jobId = :jobId)"
+                    + " or id in (select cleanScript from TaskData where id.jobId = :jobId)"
+                    + " or id in (select flowScript from TaskData where id.jobId = :jobId)"
+                    + " or id in (select td.script from ScriptTaskData td where td.taskData.id.jobId = :jobId)"
+                    + " or taskData.id.jobId = :jobId")
                 .setParameter("jobId", jobId).executeUpdate();
     }
 
     private void removeJobRuntimeData(Session session, long jobId) {
         removeJobScripts(session, jobId);
 
-        session.createQuery("delete from ScriptData where taskData.id.jobId = :jobId").setParameter("jobId",
-                jobId).executeUpdate();
         session.createQuery("delete from JavaTaskData where taskData.id.jobId = :jobId").setParameter(
                 "jobId", jobId).executeUpdate();
         session.createQuery("delete from ForkedJavaTaskData where taskData.id.jobId = :jobId").setParameter(
@@ -704,7 +680,7 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
     public void removeJob(final JobId jobId, final long removedTime, final boolean removeData) {
         runWithTransaction(new SessionWork<Void>() {
             @Override
-            Void executeWork(Session session) {
+            public Void executeWork(Session session) {
                 long id = jobId(jobId);
 
                 if (removeData) {
@@ -742,7 +718,7 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
         return runWithoutTransaction(new SessionWork<List<InternalJob>>() {
             @Override
             @SuppressWarnings("unchecked")
-            List<InternalJob> executeWork(Session session) {
+            public List<InternalJob> executeWork(Session session) {
                 Query query;
                 if (period > 0) {
                     long minSubmittedTime = System.currentTimeMillis() - period;
@@ -768,7 +744,7 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
     public InternalJob loadJobWithoutTasks(final JobId id) {
         return runWithoutTransaction(new SessionWork<InternalJob>() {
             @Override
-            InternalJob executeWork(Session session) {
+            public InternalJob executeWork(Session session) {
                 Query jobQuery = session.createQuery("from JobData where id = :id and removedTime = -1")
                         .setParameter("id", jobId(id));
                 JobData jobData = (JobData) jobQuery.uniqueResult();
@@ -785,7 +761,7 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
     public List<InternalJob> loadJobs(final boolean fullState, final JobId... jobIds) {
         return runWithoutTransaction(new SessionWork<List<InternalJob>>() {
             @Override
-            List<InternalJob> executeWork(Session session) {
+            public List<InternalJob> executeWork(Session session) {
                 List<Long> ids = new ArrayList<Long>(jobIds.length);
                 for (JobId jobId : jobIds) {
                     ids.add(jobId(jobId));
@@ -932,7 +908,7 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
     public void changeJobPriority(final JobId jobId, final JobPriority priority) {
         runWithTransaction(new SessionWork<Void>() {
             @Override
-            Void executeWork(Session session) {
+            public Void executeWork(Session session) {
                 long id = jobId(jobId);
                 String jobUpdate = "update JobData set priority = :priority where id = :jobId";
                 session.createQuery(jobUpdate).setParameter("priority", priority).setParameter("jobId", id)
@@ -946,7 +922,7 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
             final boolean taskStatusToPending) {
         runWithTransaction(new SessionWork<Void>() {
             @Override
-            Void executeWork(Session session) {
+            public Void executeWork(Session session) {
                 long jobId = jobId(job);
 
                 String jobUpdate = "update JobData set status = :status, "
@@ -991,7 +967,7 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
     public void taskRestarted(final InternalJob job, final InternalTask task, final TaskResultImpl result) {
         runWithTransaction(new SessionWork<Void>() {
             @Override
-            Void executeWork(Session session) {
+            public Void executeWork(Session session) {
                 long jobId = jobId(job);
 
                 String jobUpdate = "update JobData set status = :status, "
@@ -1035,7 +1011,7 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
             final TaskResultImpl result) {
         runWithTransaction(new SessionWork<Void>() {
             @Override
-            Void executeWork(Session session) {
+            public Void executeWork(Session session) {
                 String jobUpdate = "update JobData set status = :status, "
                     + "finishedTime = :finishedTime, numberOfPendingTasks = :numberOfPendingTasks, "
                     + "numberOfFinishedTasks = :numberOfFinishedTasks, "
@@ -1126,7 +1102,7 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
     public void updateJobAndTasksState(final InternalJob job) {
         runWithTransaction(new SessionWork<Void>() {
             @Override
-            Void executeWork(Session session) {
+            public Void executeWork(Session session) {
                 String taskUpdate = "update TaskData task set task.taskStatus = :taskStatus where task.id = :taskId";
 
                 Query taskUpdateQuery = session.createQuery(taskUpdate);
@@ -1158,7 +1134,7 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
             final TaskResultImpl result, final Set<TaskId> tasksToUpdate) {
         runWithTransaction(new SessionWork<Void>() {
             @Override
-            Void executeWork(Session session) {
+            public Void executeWork(Session session) {
                 long jobId = jobId(job);
 
                 String jobUpdate = "update JobData set status = :status, "
@@ -1225,7 +1201,7 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
     public void jobSetToBeRemoved(final JobId jobId) {
         runWithTransaction(new SessionWork<Void>() {
             @Override
-            Void executeWork(Session session) {
+            public Void executeWork(Session session) {
                 long id = jobId(jobId);
 
                 String jobUpdate = "update JobData set toBeRemoved = :toBeRemoved where id = :jobId";
@@ -1246,7 +1222,7 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
         return runWithoutTransaction(new SessionWork<Map<TaskId, TaskResult>>() {
 
             @Override
-            Map<TaskId, TaskResult> executeWork(Session session) {
+            public Map<TaskId, TaskResult> executeWork(Session session) {
                 JobData job = (JobData) session.get(JobData.class, jobId(jobId));
 
                 if (job == null) {
@@ -1306,7 +1282,7 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
         return runWithoutTransaction(new SessionWork<JobResult>() {
 
             @Override
-            JobResult executeWork(Session session) {
+            public JobResult executeWork(Session session) {
                 long id = jobId(jobId);
 
                 JobData job = (JobData) session.get(JobData.class, id);
@@ -1375,7 +1351,7 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
         return runWithoutTransaction(new SessionWork<TaskResult>() {
 
             @Override
-            TaskResult executeWork(Session session) {
+            public TaskResult executeWork(Session session) {
                 long id = jobId(jobId);
 
                 Object[] taskSearchResult = (Object[]) session.createQuery(
@@ -1401,7 +1377,7 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
     public TaskResult loadTaskResult(final TaskId taskId, final int index) {
         return runWithoutTransaction(new SessionWork<TaskResult>() {
             @Override
-            TaskResult executeWork(Session session) {
+            public TaskResult executeWork(Session session) {
                 return loadTaskResult(session, taskId, index);
             }
 
@@ -1456,7 +1432,7 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
         runWithTransaction(new SessionWork<JobData>() {
 
             @Override
-            JobData executeWork(Session session) {
+            public JobData executeWork(Session session) {
                 JobEnvironment jobEnv = job.getEnvironment();
                 saveClasspathContentIfNeeded(session, jobEnv);
 
@@ -1563,7 +1539,7 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
     public JobClasspathContent loadJobClasspathContent(final long crc) {
         return runWithoutTransaction(new SessionWork<JobClasspathContent>() {
             @Override
-            JobClasspathContent executeWork(Session session) {
+            public JobClasspathContent executeWork(Session session) {
                 return (JobClasspathContent) session.get(JobClasspathContent.class, crc);
             }
 
@@ -1632,7 +1608,7 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
     public ExecutableContainer loadExecutableContainer(final InternalTask task) {
         return runWithoutTransaction(new SessionWork<ExecutableContainer>() {
             @Override
-            ExecutableContainer executeWork(Session session) {
+            public ExecutableContainer executeWork(Session session) {
                 return loadExecutableContainer(session, task);
             }
 
@@ -1642,7 +1618,7 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
     public List<SchedulerUserInfo> loadUsersWithJobs() {
         return runWithoutTransaction(new SessionWork<List<SchedulerUserInfo>>() {
             @Override
-            List<SchedulerUserInfo> executeWork(Session session) {
+            public List<SchedulerUserInfo> executeWork(Session session) {
                 List<SchedulerUserInfo> users = new ArrayList<SchedulerUserInfo>();
                 Query query = session
                         .createQuery("select owner, count(owner), max(submittedTime) from JobData group by owner");
@@ -1659,55 +1635,16 @@ public class SchedulerDBManager implements FilteredExceptionCallback {
     }
 
     private <T> T runWithTransaction(SessionWork<T> sessionWork) {
-        return runWithTransaction(sessionWork, true);
+        return transactionHelper.runWithTransaction(sessionWork);
     }
 
     private <T> T runWithTransaction(SessionWork<T> sessionWork, boolean readonly) {
-        Session session = sessionFactory.openSession();
-        Transaction tx = null;
-        try {
-            session.setDefaultReadOnly(readonly);
-            tx = session.beginTransaction();
-            T result = sessionWork.executeWork(session);
-            tx.commit();
-            return result;
-        } catch (Throwable e) {
-            if (tx != null) {
-                try {
-                    tx.rollback();
-                } catch (Throwable rollbackError) {
-                    debugLogger.warn("Failed to rollback transaction", rollbackError);
-                }
-            }
-            debugLogger.warn("DB operation failed", e);
-            exceptionHandler.handle("DB operation failed", e);
-            return null;
-        } finally {
-            try {
-                session.close();
-            } catch (Throwable e) {
-                debugLogger.warn("Failed to close session", e);
-            }
-        }
+
+        return transactionHelper.runWithTransaction(sessionWork, readonly);
     }
 
     private <T> T runWithoutTransaction(SessionWork<T> sessionWork) {
-        Session session = sessionFactory.openSession();
-        try {
-            session.setDefaultReadOnly(true);
-            T result = sessionWork.executeWork(session);
-            return result;
-        } catch (Throwable e) {
-            debugLogger.warn("DB operation failed", e);
-            exceptionHandler.handle("DB operation failed", e);
-            return null;
-        } finally {
-            try {
-                session.close();
-            } catch (Throwable e) {
-                debugLogger.warn("Failed to close session", e);
-            }
-        }
+        return transactionHelper.runWithoutTransaction(sessionWork);
     }
 
     private static TaskData.DBTaskId taskId(InternalTask task) {

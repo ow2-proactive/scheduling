@@ -159,7 +159,8 @@ public class TestPreciousLogs extends SchedulerConsecutive {
 
         Scheduler scheduler = SchedulerTHelper.getSchedulerInterface();
         JobResult jobResult = scheduler.getJobResult(jobId);
-        for (TaskResult taskResult : jobResult.getAllResults().values()) {
+        Map<String, TaskResult> results = jobResult.getAllResults();
+        for (TaskResult taskResult : results.values()) {
             if (taskResult.getException() != null) {
                 taskResult.getException().printStackTrace();
                 Assert.fail("Task failed with exception " + taskResult.getException());
@@ -169,7 +170,9 @@ public class TestPreciousLogs extends SchedulerConsecutive {
         }
 
         for (String taskName : expectedOutput.keySet()) {
-            File taskLog = new File(output, String.format("TaskLogs-%s-%s.log", jobId.value(), taskName));
+
+            File taskLog = new File(output, String.format("TaskLogs-%s-%s.log", jobId.value(), results.get(
+                    taskName).getTaskId().value()));
             if (!taskLog.exists()) {
                 Assert.fail("Task log file " + taskLog.getAbsolutePath() + " doesn't exist");
             }

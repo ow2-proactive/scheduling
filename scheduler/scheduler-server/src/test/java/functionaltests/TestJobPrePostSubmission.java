@@ -38,12 +38,6 @@ package functionaltests;
 
 import java.io.File;
 import java.net.URL;
-import java.util.Map.Entry;
-
-import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobResult;
-import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.junit.Assert;
 
 
 /**
@@ -78,19 +72,7 @@ public class TestJobPrePostSubmission extends SchedulerConsecutive {
      */
     @org.junit.Test
     public void run() throws Throwable {
-        JobId id = SchedulerTHelper.testJobSubmission(new File(jobDescriptor.toURI()).getAbsolutePath());
-        Assert.assertFalse(SchedulerTHelper.getJobResult(id).hadException());
-
-        // check result are not null
-        JobResult res = SchedulerTHelper.getJobResult(id);
-        Assert.assertFalse(SchedulerTHelper.getJobResult(id).hadException());
-
-        for (Entry<String, TaskResult> entry : res.getAllResults().entrySet()) {
-            Assert.assertNotNull(entry.getValue().value());
-        }
-        //remove job
-        SchedulerTHelper.removeJob(id);
-        SchedulerTHelper.waitForEventJobRemoved(id);
-
+        SchedulerTHelper.testJobSubmissionAndVerifyAllResults(new File(jobDescriptor.toURI())
+                .getAbsolutePath());
     }
 }

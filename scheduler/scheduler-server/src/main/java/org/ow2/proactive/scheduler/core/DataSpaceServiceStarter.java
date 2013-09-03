@@ -37,17 +37,21 @@
 package org.ow2.proactive.scheduler.core;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.extensions.dataspaces.api.PADataSpaces;
@@ -111,7 +115,8 @@ public class DataSpaceServiceStarter implements Serializable {
     /**
      * Dataspace servers
      */
-    private FileSystemServerDeployer[] servers = new FileSystemServerDeployer[4];
+    private ArrayList<ArrayList<FileSystemServerDeployer>> servers = new ArrayList<ArrayList<FileSystemServerDeployer>>(
+        4);
 
     public DataSpaceServiceStarter() {
     }
@@ -178,24 +183,27 @@ public class DataSpaceServiceStarter implements Serializable {
                     if (!dir.exists()) {
                         dir.mkdirs();
                     }
-                    servers[i] = new FileSystemServerDeployer(spacesNames[i], spaceDir, true, true);
-                    String url = servers[i].getVFSRootURL();
-                    confs[i][0].updateProperty(url);
+
+                    StringBuilder buildedUrl = new StringBuilder();
+                    ArrayList<FileSystemServerDeployer> serverPerProtocol = new ArrayList<FileSystemServerDeployer>();
+                    for (String protocol : getProtocols()) {
+                        FileSystemServerDeployer server = startServer(spacesNames[i], humanReadableNames[i],
+                                spaceDir, protocol, buildedUrl);
+                        serverPerProtocol.add(server);
+                    }
+                    buildedUrl.deleteCharAt(buildedUrl.length() - 1);
+                    servers.add(serverPerProtocol);
+                    confs[i][0].updateProperty(buildedUrl.toString());
                     // use the hostname property if it is set, otherwise, use the local hostname
                     if (!confs[i][2].isSet()) {
                         confs[i][2].updateProperty(localhostname);
                     }
-                    logger.info("Started " + humanReadableNames[i] + " server at " + url);
+
                     logger.info(humanReadableNames[i] + " server local path is " + spaceDir);
                 } catch (IllegalArgumentException iae) {
                     throw new IllegalArgumentException("Directory '" + spaceDir +
                         "' cannot be accessed. Check if directory exists or if you have read/write rights.");
                 }
-            }
-            //let URL terminate by /
-            String url = confs[i][0].getValueAsString();
-            if (!url.endsWith("/")) {
-                confs[i][0].updateProperty(url + "/");
             }
         }
 
@@ -203,11 +211,44 @@ public class DataSpaceServiceStarter implements Serializable {
         namingService.registerApplication(SchedulerConstants.SCHEDULER_DATASPACE_APPLICATION_ID,
                 predefinedSpaces);
 
-        // register the Global space
-        createSpace(SchedulerConstants.SCHEDULER_DATASPACE_APPLICATION_ID,
-                SchedulerConstants.GLOBALSPACE_NAME, PASchedulerProperties.DATASPACE_DEFAULTGLOBAL_URL
-                        .getValueAsString(), PASchedulerProperties.DATASPACE_DEFAULTGLOBAL_LOCALPATH
-                        .getValueAsString(), localhostname, false, true);
+        try {
+            // register the Global space
+            createSpace(SchedulerConstants.SCHEDULER_DATASPACE_APPLICATION_ID,
+                    SchedulerConstants.GLOBALSPACE_NAME, PASchedulerProperties.DATASPACE_DEFAULTGLOBAL_URL
+                            .getValueAsString(), PASchedulerProperties.DATASPACE_DEFAULTGLOBAL_LOCALPATH
+                            .getValueAsString(), localhostname, false, true);
+        } catch (Exception e) {
+            logger.error("", e);
+        }
+    }
+
+    private FileSystemServerDeployer startServer(String spaceName, String readableName, String spaceDir,
+            String protocol, StringBuilder buildedUrl) throws IOException {
+        FileSystemServerDeployer server = new FileSystemServerDeployer(spaceName, spaceDir, true, true,
+            protocol);
+        String url = server.getVFSRootURL();
+        if (!url.endsWith("/")) {
+            //let URL terminate by /
+            buildedUrl.append(url);
+            buildedUrl.append("/ ");
+        } else {
+            buildedUrl.append(url);
+            buildedUrl.append(" ");
+        }
+        logger.info("Started " + readableName + " server at " + url);
+        return server;
+    }
+
+    private List<String> getProtocols() {
+        ArrayList<String> protocols = new ArrayList<String>();
+        protocols.add(CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getValue());
+        if (CentralPAPropertyRepository.PA_COMMUNICATION_ADDITIONAL_PROTOCOLS.isSet()) {
+            if (CentralPAPropertyRepository.PA_COMMUNICATION_ADDITIONAL_PROTOCOLS.getValue() != null) {
+                protocols
+                        .addAll(CentralPAPropertyRepository.PA_COMMUNICATION_ADDITIONAL_PROTOCOLS.getValue());
+            }
+        }
+        return protocols;
     }
 
     /**
@@ -216,13 +257,13 @@ public class DataSpaceServiceStarter implements Serializable {
      * It will only register the dataspace in the naming service otherwise
      * @param appID the Application ID
      * @param name the name of the dataspace
-     * @param url the url of the dataspace
+     * @param urls the url list of the Virtual File Systems (for different protocols)
      * @param path the path to the dataspace in the localfilesystem
      * @param hostname the host where the file server is deployed
      * @param inputConfiguration if the configuration is an InputSpace configuration (read-only)
      * @param localConfiguration if the local node needs to be configured for the provided application
      */
-    public static void createSpace(long appID, String name, String url, String path, String hostname,
+    public static void createSpace(long appID, String name, String urls, String path, String hostname,
             boolean inputConfiguration, boolean localConfiguration) throws FileSystemException,
             URISyntaxException, ProActiveException, MalformedURLException {
         if (!spacesConfigurations.containsKey(new Long(appID))) {
@@ -247,23 +288,72 @@ public class DataSpaceServiceStarter implements Serializable {
         }
         InputOutputSpaceConfiguration spaceConf = null;
         // We add the deployed path to a url list, this way the dataspace will always be accessed preferably by the file system
-        ArrayList<String> urls = new ArrayList<String>();
+        ArrayList<String> finalurls = new ArrayList<String>();
         if (path != null) {
-            urls.add((new File(path)).toURI().toURL().toExternalForm());
+            finalurls.add((new File(path)).toURI().toURL().toExternalForm());
         }
-        urls.add(url);
+        for (String url : urls.split(" ")) {
+            finalurls.add(url);
+        }
+
         if (inputConfiguration) {
-            spaceConf = InputOutputSpaceConfiguration.createInputSpaceConfiguration(urls, path,
+            spaceConf = InputOutputSpaceConfiguration.createInputSpaceConfiguration(finalurls, path,
                     hostname != null ? hostname : localhostname, name);
         } else {
-            spaceConf = InputOutputSpaceConfiguration.createOutputSpaceConfiguration(urls, path,
+            spaceConf = InputOutputSpaceConfiguration.createOutputSpaceConfiguration(finalurls, path,
                     hostname != null ? hostname : localhostname, name);
         }
 
         namingService.register(new SpaceInstanceInfo(appID, spaceConf));
 
         spacesConfigurations.get(appID).add(spaceConf.getName());
-        logger.info("Space " + name + " for appid = " + appID + " with urls = " + urls + " registered");
+        logger.info("Space " + name + " for appid = " + appID + " with urls = " + finalurls + " registered");
+
+    }
+
+    /**
+     * Similar to createSpace, but in addition it will use a provided username to append it to the given urls
+     * If the localpath is provided, it will also create sub folders to the dataspace root with this username
+     *
+     * @param username username used to update urls and create folders
+     * @param appID the Application ID
+     * @param spaceName the name of the dataspace
+     * @param urls the url list of the Virtual File Systems (for different protocols)
+     * @param localpath the path to the dataspace in the localfilesystem
+     * @param hostname the host where the file server is deployed
+     * @param inputConfiguration if the configuration is an InputSpace configuration (read-only)
+     * @param localConfiguration if the local node needs to be configured for the provided application
+     * @throws URISyntaxException
+     * @throws MalformedURLException
+     * @throws ProActiveException
+     * @throws FileSystemException
+     */
+    public static void createSpaceWithUserNameSubfolder(String username, long appID, String spaceName,
+            String urls, String localpath, String hostname, boolean inputConfiguration,
+            boolean localConfiguration) throws URISyntaxException, IOException, ProActiveException {
+        // create a local folder with the username
+
+        if (localpath != null) {
+            localpath = localpath + File.separator + username;
+            File localPathFile = new File(localpath);
+            if (!localPathFile.exists()) {
+                FileUtils.forceMkdir(localPathFile);
+            }
+        }
+
+        // updates the urls with the username
+        StringBuilder updatedUrls = new StringBuilder();
+        String[] urlarray = urls.split(" ");
+        for (String url : urlarray) {
+            updatedUrls.append(url);
+            if (!url.endsWith("/"))
+                updatedUrls.append("/");
+            updatedUrls.append(username);
+            updatedUrls.append(" ");
+        }
+        // create the User Space for the given user
+        DataSpaceServiceStarter.createSpace(appID, spaceName, updatedUrls.toString(), localpath, hostname,
+                inputConfiguration, localConfiguration);
 
     }
 
@@ -276,10 +366,12 @@ public class DataSpaceServiceStarter implements Serializable {
             namingServiceDeployer.terminate();
         } catch (Throwable t) {
         }
-        for (int i = 0; i < servers.length; i++) {
-            try {
-                servers[i].terminate();
-            } catch (Throwable t) {
+        for (int i = 0; i < servers.size(); i++) {
+            for (int j = 0; j < servers.get(i).size(); j++) {
+                try {
+                    servers.get(i).get(j).terminate();
+                } catch (Throwable t) {
+                }
             }
         }
     }

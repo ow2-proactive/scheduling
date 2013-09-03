@@ -42,7 +42,9 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import org.junit.Assert;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
@@ -78,11 +80,11 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.utils.FileUtils;
+
 import functionaltests.common.CommonTUtils;
 import functionaltests.common.InputStreamReaderThread;
 import functionaltests.monitor.MonitorEventReceiver;
 import functionaltests.monitor.SchedulerMonitorsHandler;
-import org.junit.Assert;
 
 
 /**
@@ -545,6 +547,27 @@ public class SchedulerTHelper {
     public static void removeJob(JobId id) throws Exception {
         Scheduler userInt = getSchedulerInterface();
         userInt.removeJob(id);
+    }
+
+    public static void testJobSubmissionAndVerifyAllResults(String jobDescPath) throws Throwable {
+        JobId id = testJobSubmission(jobDescPath, UserType.USER);
+        // check result are not null
+        JobResult res = SchedulerTHelper.getJobResult(id);
+        Assert
+                .assertFalse("Had Exception : " + jobDescPath, SchedulerTHelper.getJobResult(id)
+                        .hadException());
+
+        for (Map.Entry<String, TaskResult> entry : res.getAllResults().entrySet()) {
+
+            Assert.assertFalse("Had Exception (" + jobDescPath + ") : " + entry.getKey(), entry.getValue()
+                    .hadException());
+
+            Assert.assertNotNull("Result not null (" + jobDescPath + ") : " + entry.getKey(), entry
+                    .getValue().value());
+        }
+
+        SchedulerTHelper.removeJob(id);
+        SchedulerTHelper.waitForEventJobRemoved(id);
     }
 
     /**
