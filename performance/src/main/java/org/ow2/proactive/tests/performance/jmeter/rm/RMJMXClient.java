@@ -7,7 +7,7 @@ import javax.management.remote.JMXConnector;
 
 import org.apache.jmeter.protocol.java.sampler.JavaSamplerContext;
 import org.apache.jmeter.samplers.SampleResult;
-import org.ow2.proactive.resourcemanager.core.jmx.RMJMXHelper;
+import org.ow2.proactive.resourcemanager.core.jmx.RMJMXBeans;
 import org.ow2.proactive.resourcemanager.core.jmx.mbean.AllAccountsMBean;
 import org.ow2.proactive.resourcemanager.core.jmx.mbean.ManagementMBean;
 import org.ow2.proactive.resourcemanager.core.jmx.mbean.MyAccountMBean;
@@ -72,7 +72,7 @@ public class RMJMXClient extends BaseJMeterRMClient {
     }
 
     private void checkManagementMBean(MBeanServerConnection connection, SampleResult result) throws Exception {
-        final ObjectName beanName = new ObjectName(RMJMXHelper.MANAGEMENT_MBEAN_NAME);
+        final ObjectName beanName = new ObjectName(RMJMXBeans.MANAGEMENT_MBEAN_NAME);
         ManagementMBean bean = JMX.newMXBeanProxy(connection, beanName, ManagementMBean.class);
         bean.getAccountingCacheValidityTimeInSeconds();
         bean.getLastRefreshDurationInMilliseconds();
@@ -80,7 +80,7 @@ public class RMJMXClient extends BaseJMeterRMClient {
 
     private void checkRuntimeDataMBean(MBeanServerConnection connection, SampleResult result)
             throws Exception {
-        final ObjectName beanName = new ObjectName(RMJMXHelper.RUNTIMEDATA_MBEAN_NAME);
+        final ObjectName beanName = new ObjectName(RMJMXBeans.RUNTIMEDATA_MBEAN_NAME);
         RuntimeDataMBean bean = JMX.newMXBeanProxy(connection, beanName, RuntimeDataMBean.class);
 
         assertTrue(bean.getAvailableNodesCount() > 0, "Unexpected AvailableNodesCount: " +
@@ -103,14 +103,14 @@ public class RMJMXClient extends BaseJMeterRMClient {
 
     private void checkAllAccountsMBean(MBeanServerConnection connection, String username, SampleResult result)
             throws Exception {
-        final ObjectName beanName = new ObjectName(RMJMXHelper.ALLACCOUNTS_MBEAN_NAME);
+        final ObjectName beanName = new ObjectName(RMJMXBeans.ALLACCOUNTS_MBEAN_NAME);
         AllAccountsMBean bean = JMX.newMXBeanProxy(connection, beanName, AllAccountsMBean.class);
         bean.setUsername(username);
         assertAccountBean(bean, result);
     }
 
     private void checkMyAccountsMBean(MBeanServerConnection connection, SampleResult result) throws Exception {
-        final ObjectName beanName = new ObjectName(RMJMXHelper.MYACCOUNT_MBEAN_NAME);
+        final ObjectName beanName = new ObjectName(RMJMXBeans.MYACCOUNT_MBEAN_NAME);
         MyAccountMBean bean = JMX.newMXBeanProxy(connection, beanName, MyAccountMBean.class);
         assertAccountBean(bean, result);
     }
