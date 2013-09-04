@@ -31,8 +31,8 @@ subprojects {
         repositories {
             mavenDeployer {
                 repository(url: "http://repo.activeeon.com/content/repositories/snapshots/") {
-                    authentication(userName: "${project.hasProperty('nexusUsername') ? nexusUsername : ""}",
-                            password: "${project.hasProperty('nexusPassword') ? nexusPassword : ""}")
+                    authentication(userName: "${System.getProperty('nexusUsername')}",
+                            password: "${System.getProperty('nexusPassword')}")
                 }
             }
         }
