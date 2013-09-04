@@ -62,7 +62,7 @@ project(':rest-server') {
         compile 'commons-io:commons-io:2.4'
         compile 'commons-codec:commons-codec:1.6'
 
-        compile files("${rootDir}/lib/misc/websockify-1.6-SNAPSHOT.jar")
+        compile files("${rootDir}/lib/websockify-1.6-SNAPSHOT.jar")
         compile 'io.netty:netty:3.3.0.Final'
 
         compile 'org.ow2.proactive:scheduler-client:3.5.0-SNAPSHOT'
@@ -83,7 +83,7 @@ project(':rest-server') {
 
         runtime 'net.bull.javamelody:javamelody-core:1.46.0'
 
-        jaxDoclet files("$rootDir/lib/doc/doclets-0.10.1-SNAPSHOT.jar")
+        jaxDoclet files("$rootDir/lib/doclets-0.10.1-SNAPSHOT.jar")
     }
 
     task stub(type: StubTask) {
