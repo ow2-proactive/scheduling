@@ -36,6 +36,8 @@
  */
 package org.ow2.tests;
 
+import java.io.PrintStream;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicReference;
@@ -164,14 +166,28 @@ public class FunctionalTest {
         @Override
         public void safeRun() {
             System.err.println("Timeout reached. Killing remaining processes");
+            System.err.println("Dumping thread states before killing processes");
+            printAllThreadsStackTraces(System.err);
             if (!consecutiveMode) {
                 try {
                     cleaner.killAliveProcesses();
+                    System.err.println("Killing current JVM");
+                    System.exit(-42);
                 } catch (Exception e) {
                     logger.error("Failed to kill remaining proccesses", e);
                 }
             } else {
                 System.exit(0);
+            }
+        }
+
+        private static void printAllThreadsStackTraces(PrintStream stream) {
+            for (Map.Entry<Thread, StackTraceElement[]> threadEntry : Thread.getAllStackTraces().entrySet()) {
+                stream.println(threadEntry.getKey());
+                for (StackTraceElement stackTraceElement : threadEntry.getValue()) {
+                    stream.println("\t" + stackTraceElement);
+                }
+
             }
         }
     }
