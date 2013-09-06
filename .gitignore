@@ -1,19 +1,16 @@
 build/
-.idea
+.gradle/
+.idea/
+*.iml
 
 # /
 /.classpath
 /.project
 /.settings
-/classes
 /dist
 /docs
 /doc-files
-/junitReports
 /log
-/.machinefile_*
-/output
-/timitOutputDirectory
 /.classpath*
 /generated
 
