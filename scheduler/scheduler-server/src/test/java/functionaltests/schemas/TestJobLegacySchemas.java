@@ -38,11 +38,13 @@ package functionaltests.schemas;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.io.IOException;
 import java.net.URL;
 
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import functionaltests.SchedulerConsecutive;
 import functionaltests.SchedulerTHelper;
+import org.apache.commons.io.FileUtils;
 
 
 /**
@@ -77,25 +79,28 @@ public class TestJobLegacySchemas extends SchedulerConsecutive {
     public void run() throws Throwable {
         for (URL jobDescriptor : jobDescriptors) {
             logger.info("Testing submission of job descriptor : " + jobDescriptor);
-            // clean dataspace
-            File ds = new File(PAResourceManagerProperties.RM_HOME.getValueAsString(),
-                "/scheduler/scheduler-server/src/test/resources/functionaltests/schemas");
-
-            File[] todelete = ds.listFiles(new FilenameFilter() {
-                @Override
-                public boolean accept(File dir, String name) {
-                    if (name.startsWith("myfileout") || name.endsWith(".log")) {
-                        return true;
-                    }
-                    return false;
-                }
-            });
-            for (File f : todelete) {
-                f.delete();
-            }
-
+            prepareDataspaceFolder();
             SchedulerTHelper.testJobSubmissionAndVerifyAllResults(new File(jobDescriptor.toURI())
                     .getAbsolutePath());
+        }
+    }
+
+    private void prepareDataspaceFolder() throws IOException {
+        File ds = new File(PAResourceManagerProperties.RM_HOME.getValueAsString(),
+                "/scheduler/scheduler-server/build/JobLegacySchemas_dataspace");
+
+        if (ds.exists()) {
+            File[] filesToDelete = ds.listFiles(new FilenameFilter() {
+                @Override
+                public boolean accept(File dir, String name) {
+                    return name.startsWith("myfileout") || name.endsWith(".log");
+                }
+            });
+            for (File f : filesToDelete) {
+                FileUtils.forceDelete(f);
+            }
+        } else {
+            FileUtils.forceMkdir(ds);
         }
     }
 }
