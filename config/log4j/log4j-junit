@@ -1,5 +1,8 @@
 log4j.rootLogger=INFO, CONSOLE
 
+# If INFO is enabled Jetty is too verbose at startup
+log4j.logger.org.mortbay = WARN
+
 log4j.logger.proactive.configuration=ERROR
 
 log4j.logger.org.ow2.proactive.scheduler=INFO
