@@ -159,7 +159,8 @@ public class TestNodeSourcesActions extends RMConsecutive {
 
         String nodeSourceName2 = "TestNodeSourcesActions2";
         //first im parameter is default rm url
-        int expectedNodeNumber = helper.createNodeSource(nodeSourceName2);
+        int expectedNodeNumber = 3;
+        helper.createNodeSource(nodeSourceName2, expectedNodeNumber);
         resourceManager.setNodeSourcePingFrequency(pingFrequency, nodeSourceName2);
 
         Assert.assertEquals(expectedNodeNumber, resourceManager.getState().getTotalNodesNumber());

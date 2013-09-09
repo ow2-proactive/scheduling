@@ -78,7 +78,8 @@ public class TestNodesStates extends RMConsecutive {
         RMTHelper helper = RMTHelper.getDefaultInstance();
 
         ResourceManager resourceManager = helper.getResourceManager();
-        int totalNodeNumber = helper.createNodeSource("TestNodesStates");
+        int totalNodeNumber = 5;
+        helper.createNodeSource("TestNodesStates", totalNodeNumber);
         //----------------------------------------------------------
         // Book all nodes deployed by descriptor (user action)
         // verify that there are no free nodes left,

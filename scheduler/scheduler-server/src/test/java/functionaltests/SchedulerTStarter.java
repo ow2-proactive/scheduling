@@ -36,6 +36,7 @@
  */
 package functionaltests;
 
+import java.io.File;
 import java.io.Serializable;
 import java.net.URI;
 import java.util.HashMap;
@@ -64,7 +65,8 @@ public class SchedulerTStarter implements Serializable {
 
     protected String rmUsername = "demo";
     protected String rmPassword = "demo";
-    public static final int RM_NODE_NUMBER = 5;
+    public static final int RM_NODE_NUMBER = 2;
+    public static final int RM_NODE_DEPLOYMENT_TIMEOUT = 100000;
 
     protected static String schedulerDefaultURL = "//Localhost/";
 
@@ -121,16 +123,10 @@ public class SchedulerTStarter implements Serializable {
             if (System.getProperty("proactive.test.runAsMe") != null) {
                 params.put("proactive.test.runAsMe", "true");
             }
-            params.put(CentralPAPropertyRepository.PA_HOME.getName(), CentralPAPropertyRepository.PA_HOME.getValue());
-            Node[] nodes = new Node[RM_NODE_NUMBER];
-            for (int i = 0; i < RM_NODE_NUMBER; i++) {
-                String nodeName = "default_nodemyao_" + System.currentTimeMillis();
-                Node node = RMTHelper.getDefaultInstance().createNode(nodeName, params).getNode();
-                nodes[i] = node;
-            }
-            for (int i = 0; i < RM_NODE_NUMBER; i++) {
-                rmAdmin.addNode(nodes[i].getNodeInformation().getURL());
-            }
+
+            rmAdmin.createNodeSource("TEST", LocalInfrastructure.class.getName(), new Object[] { "",
+                    creds.getBase64(), RM_NODE_NUMBER, RM_NODE_DEPLOYMENT_TIMEOUT, "-Dproactive.test=true" },
+                    StaticPolicy.class.getName(), new Object[] { "ALL", "ALL" });
         }
     }
 

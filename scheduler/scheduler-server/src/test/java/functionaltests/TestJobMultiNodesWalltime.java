@@ -64,7 +64,8 @@ public class TestJobMultiNodesWalltime extends SchedulerConsecutive {
         //submit job
         JobId id = SchedulerTHelper.submitJob(new File(jobDescriptor.toURI()).getAbsolutePath());
         //connect to RM
-        ResourceManager rmAdmin = RMTHelper.getDefaultInstance().getResourceManager();
+        RMTHelper rmHelper = RMTHelper.getDefaultInstance();
+        rmHelper.createNodeSource("extra", 3);
 
         //wait job is running
         SchedulerTHelper.waitForEventJobRunning(id);

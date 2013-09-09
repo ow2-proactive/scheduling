@@ -122,6 +122,8 @@ public class TestMultipleHostsRequest extends SchedulerConsecutive {
         }
 
         JobId id = SchedulerTHelper.submitJob(job);
+        RMTHelper rmHelper = RMTHelper.getDefaultInstance();
+        rmHelper.createNodeSource("extra", 3);
 
         SchedulerTHelper.log("Job submitted, id " + id.toString());
 
