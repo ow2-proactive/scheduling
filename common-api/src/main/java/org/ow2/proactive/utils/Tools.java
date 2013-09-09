@@ -39,14 +39,15 @@ package org.ow2.proactive.utils;
 import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
 import javax.script.ScriptEngineFactory;
 import javax.script.ScriptEngineManager;
 
-import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.apache.log4j.Logger;
 
 
 /**
@@ -377,22 +378,16 @@ public class Tools {
         ScriptEngineManager mgr = new ScriptEngineManager();
         List<ScriptEngineFactory> factories = mgr.getEngineFactories();
         for (ScriptEngineFactory factory : factories) {
-
-            logger.info("ScriptEngineFactory Info");
-
             String engName = factory.getEngineName();
             String engVersion = factory.getEngineVersion();
             String langName = factory.getLanguageName();
             String langVersion = factory.getLanguageVersion();
 
-            logger.info(String.format("\tScript Engine: %s (%s)\n", engName, engVersion));
+            String scriptEngineInfo = String.format("%s (%s), aliases: %s, language: %s (%s)",
+                    engName, engVersion, Arrays.toString(factory.getNames().toArray()),
+                    langName, langVersion);
 
-            List<String> engNames = factory.getNames();
-            for (String name : engNames) {
-                logger.info(String.format("\tEngine Alias: %s\n", name));
-            }
-
-            logger.info(String.format("\tLanguage: %s (%s)\n", langName, langVersion));
+            logger.info("Available script engine: " + scriptEngineInfo);
         }
     }
 }
