@@ -53,7 +53,8 @@ import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.scheduler.SchedulerFactory;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
-
+import org.ow2.proactive.resourcemanager.nodesource.infrastructure.LocalInfrastructure;
+import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 
 /**
  * Starts Scheduler and Resource Manager.
@@ -114,8 +115,9 @@ public class SchedulerTStarter implements Serializable {
 
         SchedulerConnection.waitAndJoin(schedulerDefaultURL);
         if (localnodes) {
-            ResourceManager rmAdmin = rmAuth.login(Credentials.getCredentials(PAResourceManagerProperties
-                    .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
+            Credentials creds = Credentials.getCredentials(PAResourceManagerProperties
+                    .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString()));
+            ResourceManager rmAdmin = rmAuth.login(creds);
             Map<String, String> params = new HashMap<String, String>();
             if (System.getProperty("pas.launcher.forkas.method") != null) {
                 params.put("pas.launcher.forkas.method", System.getProperty("pas.launcher.forkas.method"));
@@ -125,7 +127,7 @@ public class SchedulerTStarter implements Serializable {
             }
 
             rmAdmin.createNodeSource("TEST", LocalInfrastructure.class.getName(), new Object[] { "",
-                    creds.getBase64(), RM_NODE_NUMBER, RM_NODE_DEPLOYMENT_TIMEOUT, "-Dproactive.test=true" },
+                    creds.getBase64(), RM_NODE_NUMBER, RM_NODE_DEPLOYMENT_TIMEOUT, "-Dproactive.test=true "+CentralPAPropertyRepository.PA_HOME.getCmdLine() + CentralPAPropertyRepository.PA_HOME.getValue() },
                     StaticPolicy.class.getName(), new Object[] { "ALL", "ALL" });
         }
     }
