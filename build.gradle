@@ -4,6 +4,7 @@ buildscript {
         mavenCentral()
         maven { url 'http://repo.activeeon.com/content/repositories/snapshots/' }
         maven { url 'http://repo.activeeon.com/content/repositories/releases/' }
+        maven { url 'http://repo.activeeon.com/content/repositories/thirdparty/' }
     }
 
     dependencies {
@@ -62,7 +63,7 @@ project(':rest-server') {
         compile 'commons-io:commons-io:2.4'
         compile 'commons-codec:commons-codec:1.6'
 
-        compile files("${rootDir}/lib/websockify-1.6-SNAPSHOT.jar")
+        compile 'com.netiq:websockify:1.6-proactive'
         compile 'io.netty:netty:3.3.0.Final'
 
         compile 'org.ow2.proactive:scheduler-client:3.5.0-SNAPSHOT'
@@ -83,7 +84,7 @@ project(':rest-server') {
 
         runtime 'net.bull.javamelody:javamelody-core:1.46.0'
 
-        jaxDoclet files("$rootDir/lib/doclets-0.10.1-SNAPSHOT.jar")
+        jaxDoclet 'com.lunatech.jax-doclets:doclets:0.10.1-proactive'
     }
 
     task stub(type: StubTask) {
