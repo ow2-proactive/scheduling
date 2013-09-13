@@ -27,3 +27,5 @@ include 'doc:MapReduce'
 include 'doc:Resourcing'
 include 'doc:Scheduling'
 
+include 'performance'
+

@@ -452,6 +452,24 @@ project(':doc:Resourcing') {
         compile project(':rm:rm-server')
     }
 }
+
+project('performance') {
+    dependencies {
+        compile 'logkit:logkit:2.0'
+        compile 'org.apache.jmeter:ApacheJMeter_java:2.9'
+        compile project(':common-client')
+        compile project(':scheduler:scheduler-api')
+        compile project(':scheduler:scheduler-client')
+        compile project(':scheduler:scheduler-node')
+        compile project(':scheduler:scheduler-server')
+        compile project(':rm:rm-client')
+        compile 'org.objectweb.proactive:programming-extension-pamr:5.5.0-SNAPSHOT'
+        compile 'org.objectweb.proactive:programming-extension-amqp:5.5.0-SNAPSHOT'
+        compile 'org.objectweb.proactive:programming-extension-pnp:5.5.0-SNAPSHOT'
+    }
+}
+
+
 task proActiveLibs(type: Copy) {
     // only copy once each runtime dependency (faster)
     def runtimeDeps = subprojects.collect { it.configurations.runtime.files }.flatten() as Set
