@@ -460,10 +460,22 @@ task resourceManagerJar(type: Jar) {
 }
 
 task schedulerJar(type: Jar) {
-    project(':scheduler:scheduler-server').configurations.runtime.allDependencies.withType(ProjectDependency).each {
-        from zipTree(it.dependencyProject.jar.outputs.files.singleFile)
+    subprojects.each {
+        from zipTree(it.jar.outputs.files.singleFile)
     }
-    from zipTree(project(':scheduler:scheduler-server').jar.outputs.files.singleFile)
+
     destinationDir file('dist/lib')
     archiveName 'ProActive_Scheduler-core.jar'
+
+    doLast {
+        // generate INDEX.list
+        ant.jar(update: true, index: true, destfile: file('dist/lib/ProActive_Scheduler-core.jar')) {
+            indexjars {
+                fileset(dir: 'dist/lib/') {
+                    include(name: '*.jar')
+                    exclude(name: 'ProActive_Scheduler-core.jar')
+                }
+            }
+        }
+    }
 }
