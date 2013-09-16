@@ -94,7 +94,7 @@ public class RMTHelper {
     /**
      * Number of nodes deployed with default deployment descriptor
      */
-    private static final int defaultNodesNumber = 5;
+    private static final int defaultNodesNumber = 2;
     /**
      * Timeout for local infrastructure
      */
@@ -372,7 +372,7 @@ public class RMTHelper {
             "[RM VM output]: ");
         outputReader.start();
 
-        String url = "rmi://localhost:" + rmiPort + "/";
+        String url = getLocalUrl(rmiPort);
 
         System.out.println("Waiting for the RM using URL: " + url);
         auth = RMConnection.waitAndJoin(url);
@@ -606,8 +606,16 @@ public class RMTHelper {
                 }
             } else {
                 if (auth == null) {
-                    // creating a new RM and default node source
-                    startRM(propertyFile, CentralPAPropertyRepository.PA_RMI_PORT.getValue());
+                    try {
+                        // trying to connect to the existing RM first
+                        auth = RMConnection.waitAndJoin(getLocalUrl(CentralPAPropertyRepository.PA_RMI_PORT
+                                .getValue()), 1);
+                        System.out.println("Connected to the RM on " +
+                            getLocalUrl(CentralPAPropertyRepository.PA_RMI_PORT.getValue()));
+                    } catch (Exception e) {
+                        // creating a new RM and default node source
+                        startRM(propertyFile, CentralPAPropertyRepository.PA_RMI_PORT.getValue());
+                    }
                 }
                 authentificate(user, pass);
                 initEventReceiver();
@@ -615,6 +623,10 @@ public class RMTHelper {
             System.out.println("RMTHelper is connected");
         }
         return resourceManager;
+    }
+
+    private String getLocalUrl(int rmiPort) {
+        return "rmi://localhost:" + rmiPort + "/";
     }
 
     private void authentificate(String user, String pass) throws Exception {

@@ -53,6 +53,8 @@ public class SchedulerConsecutive extends FunctionalTest {
     @After
     public void afterClass() throws Exception {
         if (consecutiveMode) {
+
+            RMTHelper.getDefaultInstance().getResourceManager().removeNodeSource("extra", true).getBooleanValue();
             RMInitialState state = RMTHelper.getDefaultInstance().getResourceManager().getMonitoring()
                     .getState();
             System.out.println("RMState after the test execution");

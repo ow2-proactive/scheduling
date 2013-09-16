@@ -44,7 +44,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Assert;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
@@ -80,11 +79,11 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.utils.FileUtils;
-
 import functionaltests.common.CommonTUtils;
 import functionaltests.common.InputStreamReaderThread;
 import functionaltests.monitor.MonitorEventReceiver;
 import functionaltests.monitor.SchedulerMonitorsHandler;
+import org.junit.Assert;
 
 
 /**
@@ -322,6 +321,10 @@ public class SchedulerTHelper {
 
             // sometimes RM_NODE object isn't removed from the RMI registry after JVM with RM is killed (SCHEDULING-1498)
             CommonTUtils.cleanupRMActiveObjectRegistry();
+            for (int nodeNumber = 0; nodeNumber < SchedulerTStarter.RM_NODE_NUMBER; nodeNumber++) {
+                CommonTUtils.cleanupActiveObjectRegistry(
+                        SchedulerTStarter.RM_NODE_NAME + "-" + nodeNumber); // clean nodes
+            }
             CommonTUtils.cleanupActiveObjectRegistry(SchedulerConstants.SCHEDULER_DEFAULT_NAME);
         }
         schedulerAuth = null;

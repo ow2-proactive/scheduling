@@ -39,6 +39,8 @@ package functionaltests;
 import java.io.File;
 import java.net.URL;
 
+import org.junit.Assert;
+import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.scheduler.common.exception.TaskAbortedException;
 import org.ow2.proactive.scheduler.common.exception.TaskPreemptedException;
 import org.ow2.proactive.scheduler.common.exception.TaskRestartedException;
@@ -88,6 +90,11 @@ public class TestPreemptRestartKillTask extends SchedulerConsecutive {
     public void run() throws Throwable {
 
         SchedulerTHelper.log("Submitting job");
+
+        SchedulerTHelper.getSchedulerAuth();
+        RMTHelper rmHelper = RMTHelper.getDefaultInstance();
+        rmHelper.createNodeSource("extra", 3);
+
         JobId id = SchedulerTHelper.submitJob(new File(jobDescriptor.toURI()).getAbsolutePath(),
                 UserType.ADMIN);
         SchedulerTHelper.log("Wait for event job submitted");
@@ -169,7 +176,7 @@ public class TestPreemptRestartKillTask extends SchedulerConsecutive {
         Assert.assertEquals(TaskStatus.FAULTY, getTask(j4, "t4").getStatus());
         //check result tr5
         Assert.assertTrue(tr5.getException() instanceof Exception);//
-    }
+   }
 
     private TaskState getTask(JobState job, String taskName) {
         for (TaskState ts : job.getTasks()) {

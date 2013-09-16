@@ -63,7 +63,7 @@ import org.junit.Test;
 
 public class TestRMProxy extends FunctionalTest {
 
-    static final int NODES_NUMBER = 5;
+    static final int NODES_NUMBER = 3;
 
     private RMTHelper helper = RMTHelper.getDefaultInstance();
 
@@ -83,7 +83,7 @@ public class TestRMProxy extends FunctionalTest {
     @Test
     public void testProxiesManager() throws Exception {
         helper.getResourceManager();
-        helper.createNodeSource();
+        helper.createNodeSource("test", NODES_NUMBER);
 
         System.out.println("\n Test with per-user connection \n");
         testRMProxies(false);

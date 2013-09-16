@@ -112,7 +112,7 @@ public class JavaSpawnExecutable extends JavaExecutable {
 
         process.waitFor();
 
-        Thread.sleep(sleep * 10000); // we sleep 2 sec
+        Thread.sleep(sleep * 1000); // we sleep 2 sec
 
         return true;
     }

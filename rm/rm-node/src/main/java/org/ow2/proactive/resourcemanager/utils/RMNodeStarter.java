@@ -1378,6 +1378,9 @@ public class RMNodeStarter {
             for (String jar : this.requiredJARs) {
                 classpath.append(os.ps).append(libRoot).append(jar);
             }
+            
+            classpath.append(os.ps).append(System.getProperty("java.class.path"));
+
             // add the content of addons dir on the classpath
             classpath.append(os.ps + rmHome + this.addonsDir);
             classpath.append(os.ps).append(libRoot).append("*");

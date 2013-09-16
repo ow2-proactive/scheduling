@@ -87,13 +87,13 @@ public class ProcessCleaner {
         // We need a fall back in case jps does not exist.
         try {
             getJps();
-            return getAliveWithJps();
+            return getAliveWithJps(false);
         } catch (FileNotFoundException e) {
             return getAliveWithNative();
         }
     }
 
-    private int[] getAliveWithJps() throws IOException {
+    private int[] getAliveWithJps(boolean printProcesses) throws IOException {
         ProcessBuilder pb = new ProcessBuilder(getJps().getAbsolutePath(), "-mlv");
         pb.redirectErrorStream(true);
         Process p = pb.start();
@@ -103,8 +103,10 @@ public class ProcessCleaner {
         Reader r = new InputStreamReader(p.getInputStream());
         BufferedReader br = new BufferedReader(r);
 
+        if (printProcesses) System.out.println("Running java processes:");
         String line = null;
         while ((line = br.readLine()) != null) {
+            if (printProcesses) System.out.println(line);
             Matcher m = this.pattern.matcher(line);
             if (m.matches()) {
                 String pid = line.substring(0, line.indexOf(" "));
@@ -181,6 +183,8 @@ public class ProcessCleaner {
                 Thread.currentThread().interrupt();
             }
         }
+
+        getAliveWithJps(true);
     }
 
     /**
