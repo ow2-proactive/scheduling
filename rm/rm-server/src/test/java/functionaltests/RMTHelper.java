@@ -340,6 +340,8 @@ public class RMTHelper {
             CentralPAPropertyRepository.LOG4J.getValue());
         commandLine.add(PAResourceManagerProperties.RM_HOME.getCmdLine() +
             PAResourceManagerProperties.RM_HOME.getValueAsString());
+        commandLine.add(CentralPAPropertyRepository.PA_RUNTIME_PING.getCmdLine() +
+                false);
 
         String home = PAResourceManagerProperties.RM_HOME.getValueAsString();
         String distLib = home + File.separator + "dist" + File.separator + "lib" + File.separator;
