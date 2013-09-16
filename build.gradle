@@ -21,11 +21,8 @@ subprojects {
     group = 'org.ow2.proactive_grid_cloud_portal'
     version = '1.5.0-SNAPSHOT'
 
-    repositories {
-        mavenLocal()
-        mavenCentral()
-        maven { url 'http://repo.activeeon.com/content/repositories/snapshots/' }
-        maven { url 'http://repo.activeeon.com/content/repositories/releases/' }
+    rootProject.buildscript.repositories.each {
+        repositories.add(it)
     }
 
     uploadArchives {
