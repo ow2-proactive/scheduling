@@ -129,6 +129,7 @@ public class SchedulerTStarter implements Serializable {
                     creds.getBase64(), RM_NODE_NUMBER, RM_NODE_DEPLOYMENT_TIMEOUT,
                     "-Dproactive.test=true " +
                             CentralPAPropertyRepository.PA_HOME.getCmdLine() + CentralPAPropertyRepository.PA_HOME.getValue() +
+                            " " +
                             CentralPAPropertyRepository.PA_RUNTIME_PING.getCmdLine() + false },
                     StaticPolicy.class.getName(), new Object[] { "ALL", "ALL" });
         }
