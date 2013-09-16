@@ -36,25 +36,23 @@
  */
 package functionaltests;
 
-import java.io.File;
 import java.io.Serializable;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
-import org.objectweb.proactive.core.node.Node;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.RMFactory;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
+import org.ow2.proactive.resourcemanager.nodesource.infrastructure.LocalInfrastructure;
+import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.scheduler.SchedulerFactory;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
-import org.ow2.proactive.resourcemanager.nodesource.infrastructure.LocalInfrastructure;
-import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 
 /**
  * Starts Scheduler and Resource Manager.
@@ -67,6 +65,7 @@ public class SchedulerTStarter implements Serializable {
     protected String rmUsername = "demo";
     protected String rmPassword = "demo";
     public static final int RM_NODE_NUMBER = 2;
+    public static final String RM_NODE_NAME = "TEST";
     public static final int RM_NODE_DEPLOYMENT_TIMEOUT = 100000;
 
     protected static String schedulerDefaultURL = "//Localhost/";
@@ -126,8 +125,11 @@ public class SchedulerTStarter implements Serializable {
                 params.put("proactive.test.runAsMe", "true");
             }
 
-            rmAdmin.createNodeSource("TEST", LocalInfrastructure.class.getName(), new Object[] { "",
-                    creds.getBase64(), RM_NODE_NUMBER, RM_NODE_DEPLOYMENT_TIMEOUT, "-Dproactive.test=true "+CentralPAPropertyRepository.PA_HOME.getCmdLine() + CentralPAPropertyRepository.PA_HOME.getValue() },
+            rmAdmin.createNodeSource(RM_NODE_NAME, LocalInfrastructure.class.getName(), new Object[] { "",
+                    creds.getBase64(), RM_NODE_NUMBER, RM_NODE_DEPLOYMENT_TIMEOUT,
+                    "-Dproactive.test=true " +
+                            CentralPAPropertyRepository.PA_HOME.getCmdLine() + CentralPAPropertyRepository.PA_HOME.getValue() +
+                            CentralPAPropertyRepository.PA_RUNTIME_PING.getCmdLine() + false },
                     StaticPolicy.class.getName(), new Object[] { "ALL", "ALL" });
         }
     }
