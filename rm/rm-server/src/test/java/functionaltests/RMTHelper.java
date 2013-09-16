@@ -356,7 +356,7 @@ public class RMTHelper {
         classpath.append(home + File.separator + "classes" + File.separator + "resource-managerTests");
 
         commandLine.add("-cp");
-        commandLine.add(System.getProperty("java.class.path")); // FIXME youri a better classpath?
+        commandLine.add(System.getProperty("java.class.path"));
         commandLine.add(CentralPAPropertyRepository.PA_TEST.getCmdLine() + "true");
         commandLine.add(CentralPAPropertyRepository.PA_RMI_PORT.getCmdLine() + rmiPort);
         for (String jvmArg : jvmArgs) {
