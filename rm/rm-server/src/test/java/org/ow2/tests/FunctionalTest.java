@@ -85,7 +85,7 @@ public class FunctionalTest {
         CentralPAPropertyRepository.PA_TEST.setValue(true);
 
         String urlProperty = System.getProperty("url");
-        consecutiveMode = urlProperty != null && !urlProperty.equals("${url}");
+        consecutiveMode = urlProperty != null && !urlProperty.isEmpty() && !urlProperty.equals("${url}");
         if (!consecutiveMode) {
             // Ensure that the host is clean
             System.err.println("Running test in 'clean environment' mode");
