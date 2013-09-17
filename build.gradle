@@ -29,11 +29,8 @@ subprojects {
 
     sourceCompatibility = 1.6
 
-    repositories {
-        mavenLocal()
-        mavenCentral()
-        maven { url 'http://repo.activeeon.com/content/repositories/snapshots/' }
-        maven { url 'http://repo.activeeon.com/content/repositories/releases/' }
+    rootProject.buildscript.repositories.each {
+        repositories.add(it)
     }
 
     uploadArchives {
@@ -308,17 +305,14 @@ project('rm:rm-server') {
                 'org.hibernate.javax.persistence:hibernate-jpa-2.0-api:1.0.1.Final',
 
                 'org.objectweb.proactive:programming-core:5.5.0-SNAPSHOT',
+                'org.objectweb.proactive:programming-extension-pamr:5.5.0-SNAPSHOT',
 
                 project(':common-api'),
                 project(':common-client'),
                 project(':rm:rm-client'),
                 project(':rm:rm-node'),
         )
-
-        testCompile 'org.objectweb.proactive:programming-extension-pamr:5.5.0-SNAPSHOT'
-
         testCompile project(':rm:rm-infrastructure:rm-infrastructure-gcm')
-
         testCompile 'org.jruby:jruby:1.7.4'
         testCompile 'org.python:jython:2.5.4-rc1'
 
@@ -329,7 +323,6 @@ project('rm:rm-server') {
         runtime 'org.objectweb.proactive:programming-extension-pnp:5.5.0-SNAPSHOT'
         runtime 'org.objectweb.proactive:programming-extension-pnpssl:5.5.0-SNAPSHOT'
         runtime 'org.objectweb.proactive:programming-extension-amqp:5.5.0-SNAPSHOT'
-        runtime 'org.objectweb.proactive:programming-extension-pamr:5.5.0-SNAPSHOT'
     }
 
     task('functionalTest', type:Test).configure functionalTestConfiguration
