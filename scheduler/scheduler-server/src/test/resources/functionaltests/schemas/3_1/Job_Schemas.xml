@@ -32,7 +32,7 @@
                 <task ref="JobClassPath"/>
             </depends>
             <inputFiles>
-                <files includes="TaskLogs-*.log" accessMode="transferFromInputSpace"/>
+                <files includes="TaskLogs-*.log" accessMode="transferFromOutputSpace"/>
             </inputFiles>
             <javaExecutable class="org.ow2.proactive.scheduler.examples.CopyFile">
                 <parameters>
