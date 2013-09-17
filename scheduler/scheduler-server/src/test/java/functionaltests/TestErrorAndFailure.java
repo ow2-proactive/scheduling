@@ -88,7 +88,7 @@ public class TestErrorAndFailure extends SchedulerConsecutive {
         finalTask.setName("TestMerge");
         finalTask.setCommandLine(new String[] { javaCmd, "-cp", System.getProperty("java.class.path"),
                 "org.ow2.proactive.scheduler.examples.NativeTestWithRandomDefault", "final" });
-        for (int i = 1; i < 12; i++) {
+        for (int i = 1; i < 6; i++) {
             NativeTask task = new NativeTask();
             task.setName("Test" + i);
             task.setCommandLine(new String[] { javaCmd, "-cp", System.getProperty("java.class.path"),

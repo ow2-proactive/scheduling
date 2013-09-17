@@ -48,27 +48,12 @@ import java.util.Random;
 public class NativeTestWithRandomDefault {
 
     /**
-     * Task that will wait randomly from 5 to 1 minute
+     * Task that will wait randomly from 1 to 30 milliseconds
      * And will then return an error code 3 times on 5.
      *
      * @param args
      */
     public static void main(String[] args) {
-        int maxSleepTime = 30;
-        if (args.length > 0) {
-            if (args[0].equals("final")) {
-                System.out.println("Final Task started !");
-            } else {
-                maxSleepTime = 1;
-            }
-        }
-        Random time = new Random(System.currentTimeMillis());
-        int sleepTime = time.nextInt(maxSleepTime) + 1;
-        try {
-            Thread.sleep(sleepTime * 1000);
-        } catch (InterruptedException e) {
-        }
-        System.out.println("Slept for " + sleepTime + " seconds");
         Random exit = new Random(System.currentTimeMillis());
         int exitStatus = exit.nextInt(5);
         if (exitStatus >= 3) {
