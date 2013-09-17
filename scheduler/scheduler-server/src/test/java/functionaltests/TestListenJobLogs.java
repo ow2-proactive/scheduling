@@ -296,10 +296,11 @@ public class TestListenJobLogs extends SchedulerConsecutive {
             System.out.println("Waiting for logging event (" + name + ")");
 
             long endTime = System.currentTimeMillis() + timeout;
-            while (!expectedMessagesList.equals(actualMessages)) {
+            while (!CollectionUtils.isEqualCollection(expectedMessagesList,
+                    actualMessages)) {
                 long waitTime = endTime - System.currentTimeMillis();
                 if (waitTime > 0) {
-                    wait(waitTime);
+                    wait(100);
                 } else {
                     break;
                 }
@@ -309,10 +310,6 @@ public class TestListenJobLogs extends SchedulerConsecutive {
                 ", actual: " + actualMessages, CollectionUtils.isEqualCollection(expectedMessagesList,
                     actualMessages));
             actualMessages.clear();
-        }
-
-        List<String> getActualMessages() {
-            return actualMessages;
         }
 
         @Override
