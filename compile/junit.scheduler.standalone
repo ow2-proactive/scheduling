@@ -79,7 +79,7 @@ echo "Running SCHEDULER functional tests"
 for (( c=1; c<=$ITERATIONS; c++ ))
 do
 	echo "Iteration $c"
-	$compileDir/../gradlew -i :scheduler:scheduler-server:functionalTest -Durl="$SCHEDULER_URL" -DfunctionalTest.single='**/functionaltests/**/*TestProcessTreeKiller*'
+	$compileDir/../gradlew -i :scheduler:scheduler-server:functionalTest -Durl="$SCHEDULER_URL" -DfunctionalTest.single='**/functionaltests/**/*Test*'
 done
 
 cleanup
