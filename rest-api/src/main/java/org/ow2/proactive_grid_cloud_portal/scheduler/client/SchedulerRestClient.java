@@ -44,6 +44,7 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.util.Collections;
 
+import javax.wbem.client.adapter.http.transport.HttpConnection;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
@@ -60,6 +61,7 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 import org.ow2.proactive_grid_cloud_portal.common.exceptionmapper.ExceptionToJson;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
 
 
 public class SchedulerRestClient {
@@ -100,7 +102,13 @@ public class SchedulerRestClient {
         request.body(MediaType.MULTIPART_FORM_DATA, formData);
         ClientResponse<JobIdData> response = request.post(JobIdData.class);
         if (response.getStatus() != HttpURLConnection.HTTP_OK) {
-            throw new Exception("Job submission failed status code:" + response.getStatus());
+            if (response.getStatus() == HttpURLConnection.HTTP_UNAUTHORIZED) {
+                throw new NotConnectedRestException(
+                        "User not authenticated or session timeout.");
+            } else {
+                throw new Exception("Job submission failed status code:"
+                        + response.getStatus());
+            }
         }
         return response.getEntity();
     }
