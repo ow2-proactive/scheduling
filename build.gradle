@@ -6,6 +6,7 @@ buildscript {
         mavenCentral()
         maven { url 'http://repo.activeeon.com/content/repositories/snapshots/' }
         maven { url 'http://repo.activeeon.com/content/repositories/releases/' }
+        maven { url 'http://repo.activeeon.com/content/repositories/thirdparty/' }
     }
 
     dependencies {
@@ -15,6 +16,7 @@ buildscript {
             exclude module: 'xercesImpl' // messing with documentation plugin
         }
         classpath 'org.ow2.proactive:documentation:1.0.0-SNAPSHOT'
+        classpath 'org.hsudbrock:gradle-trang:0.1-proactive'
     }
 }
 
@@ -101,6 +103,19 @@ project(':scheduler:scheduler-api') {
         runtime 'org.codehaus.woodstox:woodstox-core-lgpl:4.1.2'
         runtime 'msv:xsdlib:20050913'
         runtime 'msv:relaxngDatatype:20030807'
+    }
+
+    apply plugin: 'trang'
+    task convertSchemas
+    ['3.0', '3.1', '3.2', 'dev'].each { schemaVersion ->
+        task("convertSchemas-$schemaVersion", type: org.hsudbrock.tranggradleplugin.TrangTask) {
+            sourceDirectory = new File("src/main/resources/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/${schemaVersion}")
+            targetDirectory = sourceDirectory
+            doLast {
+                project.delete new File("src/main/resources/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/${schemaVersion}/xsi.xsd")
+            }
+        }
+        convertSchemas.dependsOn << "convertSchemas-$schemaVersion"
     }
 }
 
