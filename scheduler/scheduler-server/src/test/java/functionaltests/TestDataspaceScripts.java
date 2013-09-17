@@ -44,13 +44,13 @@ import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 
 import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
 import org.ow2.proactive.scripting.SimpleScript;
+import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 
 
@@ -68,6 +68,7 @@ public class TestDataspaceScripts extends SchedulerConsecutive {
     private static final String fileName = "test";
 
     private static final String typeMacro = "!TYPE";
+    private static final String folderMacro = "!FOLDER";
 
     private static final String scriptContent = ""
         + "importPackage(org.objectweb.proactive.extensions.dataspaces.api); \n" //
@@ -90,7 +91,7 @@ public class TestDataspaceScripts extends SchedulerConsecutive {
         +
         "  var br = new BufferedReader(new InputStreamReader(f.getContent().getInputStream())); \n" //
         +
-        "  var out = new PrintWriter(new BufferedWriter(new FileWriter(new File(\"out_" +
+        "  var out = new PrintWriter(new BufferedWriter(new FileWriter(new File(new File(\""+folderMacro+"\"),\"out_" +
         typeMacro +
         "_\"+spaces[i])))); \n" //
         + "  var line; \n" //
@@ -111,18 +112,10 @@ public class TestDataspaceScripts extends SchedulerConsecutive {
         /**
          * creates input and output spaces in temporary dirs
          */
-        File input = File.createTempFile("test", ".input");
-        input.delete();
-        input.mkdir();
-        File output = File.createTempFile("test", ".output");
-        output.delete();
-        output.mkdir();
-        File global = File.createTempFile("test", ".global");
-        global.delete();
-        global.mkdir();
-        File user = File.createTempFile("test", ".user");
-        user.delete();
-        user.mkdir();
+        File input = org.ow2.proactive.utils.FileUtils.createTempDirectory("test", ".input", null);
+        File output = org.ow2.proactive.utils.FileUtils.createTempDirectory("test", ".output", null);
+        File global = org.ow2.proactive.utils.FileUtils.createTempDirectory("test", ".global", null);
+        File user = org.ow2.proactive.utils.FileUtils.createTempDirectory("test", ".user", null);
 
         /**
          * creates the testfile in both input and output spaces
@@ -155,13 +148,9 @@ public class TestDataspaceScripts extends SchedulerConsecutive {
          */
         TaskFlowJob job = new TaskFlowJob();
         job.setInputSpace(input.toURI().toString());
-        System.out.println("INPUT space : " + input.toURI().toString());
         job.setOutputSpace(output.toURI().toString());
-        System.out.println("OUTPUT space : " + output.toURI().toString());
         job.setGlobalSpace(global.toURI().toString());
-        System.out.println("GLOBAL space : " + global.toURI().toString());
         job.setUserSpace(user.toURI().toString());
-        System.out.println("USER space : " + user.toURI().toString());
 
         JavaTask t = new JavaTask();
         job.addTask(t);
@@ -169,37 +158,38 @@ public class TestDataspaceScripts extends SchedulerConsecutive {
         t.setExecutableClassName("org.ow2.proactive.scheduler.examples.EmptyTask");
         t.setName("T");
         t.addInputFiles(fileName, InputAccessMode.TransferFromInputSpace);
-        t.setPreScript(new SimpleScript(scriptContent.replaceAll(typeMacro, "pre"), "javascript"));
-        t.setPostScript(new SimpleScript(scriptContent.replaceAll(typeMacro, "post"), "javascript"));
-        t.setFlowScript(FlowScript.createLoopFlowScript(scriptContent.replaceAll(typeMacro, "flow"), "T"));
+
+        File results = org.ow2.proactive.utils.FileUtils.createTempDirectory("test", ".results", null);
+        String scriptContentFiltered = scriptContent.replaceAll(folderMacro, results.getAbsolutePath());
+
+        t.setPreScript(new SimpleScript(scriptContentFiltered.replaceAll(typeMacro, "pre"), "javascript"));
+        t.setPostScript(new SimpleScript(scriptContentFiltered.replaceAll(typeMacro, "post"), "javascript"));
+        t.setFlowScript(FlowScript.createLoopFlowScript(scriptContentFiltered.replaceAll(typeMacro, "flow"), "T"));
 
         /**
          * job submission, wait on result, removal
          */
         JobId id = SchedulerTHelper.testJobSubmission(job);
-        JobResult res = SchedulerTHelper.getJobResult(id);
         Assert.assertFalse(SchedulerTHelper.getJobResult(id).hadException());
-        // SchedulerTHelper.removeJob(id);
-        // SchedulerTHelper.waitForEventJobRemoved(id);
 
         /**
          * check content of the files created by the script
          */
-        File preinFile = new File("out_pre_" + TaskLauncher.DS_INPUT_BINDING_NAME);
-        File prescratchFile = new File("out_pre_" + TaskLauncher.DS_SCRATCH_BINDING_NAME);
-        File preoutFile = new File("out_pre_" + TaskLauncher.DS_OUTPUT_BINDING_NAME);
-        File preglobFile = new File("out_pre_" + TaskLauncher.DS_GLOBAL_BINDING_NAME);
-        File preuserFile = new File("out_pre_" + TaskLauncher.DS_USER_BINDING_NAME);
-        File postinFile = new File("out_post_" + TaskLauncher.DS_INPUT_BINDING_NAME);
-        File postscratchFile = new File("out_post_" + TaskLauncher.DS_SCRATCH_BINDING_NAME);
-        File postoutFile = new File("out_post_" + TaskLauncher.DS_OUTPUT_BINDING_NAME);
-        File postglobFile = new File("out_post_" + TaskLauncher.DS_GLOBAL_BINDING_NAME);
-        File postuserFile = new File("out_post_" + TaskLauncher.DS_USER_BINDING_NAME);
-        File flowinFile = new File("out_flow_" + TaskLauncher.DS_INPUT_BINDING_NAME);
-        File flowscratchFile = new File("out_flow_" + TaskLauncher.DS_SCRATCH_BINDING_NAME);
-        File flowoutFile = new File("out_flow_" + TaskLauncher.DS_OUTPUT_BINDING_NAME);
-        File flowglobFile = new File("out_flow_" + TaskLauncher.DS_GLOBAL_BINDING_NAME);
-        File flowuserFile = new File("out_flow_" + TaskLauncher.DS_USER_BINDING_NAME);
+        File preinFile = new File(results, "out_pre_" + TaskLauncher.DS_INPUT_BINDING_NAME);
+        File prescratchFile = new File(results, "out_pre_" + TaskLauncher.DS_SCRATCH_BINDING_NAME);
+        File preoutFile = new File(results, "out_pre_" + TaskLauncher.DS_OUTPUT_BINDING_NAME);
+        File preglobFile = new File(results, "out_pre_" + TaskLauncher.DS_GLOBAL_BINDING_NAME);
+        File preuserFile = new File(results, "out_pre_" + TaskLauncher.DS_USER_BINDING_NAME);
+        File postinFile = new File(results, "out_post_" + TaskLauncher.DS_INPUT_BINDING_NAME);
+        File postscratchFile = new File(results, "out_post_" + TaskLauncher.DS_SCRATCH_BINDING_NAME);
+        File postoutFile = new File(results, "out_post_" + TaskLauncher.DS_OUTPUT_BINDING_NAME);
+        File postglobFile = new File(results, "out_post_" + TaskLauncher.DS_GLOBAL_BINDING_NAME);
+        File postuserFile = new File(results, "out_post_" + TaskLauncher.DS_USER_BINDING_NAME);
+        File flowinFile = new File(results, "out_flow_" + TaskLauncher.DS_INPUT_BINDING_NAME);
+        File flowscratchFile = new File(results, "out_flow_" + TaskLauncher.DS_SCRATCH_BINDING_NAME);
+        File flowoutFile = new File(results, "out_flow_" + TaskLauncher.DS_OUTPUT_BINDING_NAME);
+        File flowglobFile = new File(results, "out_flow_" + TaskLauncher.DS_GLOBAL_BINDING_NAME);
+        File flowuserFile = new File(results, "out_flow_" + TaskLauncher.DS_USER_BINDING_NAME);
 
         checkFile(preinFile);
         checkFile(prescratchFile);
@@ -228,6 +218,6 @@ public class TestDataspaceScripts extends SchedulerConsecutive {
             i++;
         }
         in.close();
-        f.delete();
+        FileUtils.deleteQuietly(f);
     }
 }

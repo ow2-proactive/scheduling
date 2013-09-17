@@ -70,6 +70,7 @@ def functionalTestConfiguration = {
     include 'functionaltests/**'
     include 'unittests/**'
     include 'unitTests/**'
+    systemProperties << ['url': System.getProperty("url") ]
     systemProperties << ['pa.rm.home': rootDir.absolutePath]
     systemProperties << ['pa.scheduler.home': rootDir.absolutePath]
     systemProperties << ['proactive.home': rootDir.absolutePath]

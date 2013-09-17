@@ -21,7 +21,7 @@ cleanup () {
 mktemp_jruby() {
 		PREFIX="proactive"
 		SUFFIX=".tmp"
-		export CLASSPATH=$PA_SCHEDULER/lib/common/script/jruby.jar
+		export CLASSPATH=$PA_SCHEDULER/dist/lib/jruby-1.7.4.jar
 		export CMD="f=Java::java.io.File.createTempFile(Java::java.lang.String.new(\"$PREFIX\"),Java::java.lang.String.new(\"$SUFFIX\"));Java::java.lang.System.out.println(f)"
 		$JAVA_HOME/bin/java org.jruby.Main -e $CMD
 }
@@ -32,7 +32,7 @@ compileDir=$(cd `dirname $0` && /bin/pwd)
 workingDir=$compileDir/../bin/unix
 
 echo "Compiling the resource manager"
-$compileDir/build deploy.rm
+$compileDir/../gradlew -i build proActiveLibs resourceManagerJar
 
 CLASSPATH=.
 . $workingDir/env rm-log4j-server
@@ -77,13 +77,7 @@ echo "Running RM functional tests"
 for (( c=1; c<=$ITERATIONS; c++ ))
 do
 	echo "Iteration $c"
-	$compileDir/build -Durl="$RM_URL" -Dtest="**functionaltests/**/**Test*" junit.rm
-	ERRORS=`grep -e failures $compileDir/../junitReports/TESTS-TestSuites.xml | grep -v "errors=\"0\" failures=\"0\""`
-	if [ -n "$ERRORS" ]; then
-		echo "Some tests failed:"
-		echo $ERRORS
-		break;
-	fi
+	$compileDir/../gradlew -i :rm:rm-server:functionalTest -Durl="$RM_URL" -DfunctionalTest.single='**/functionaltests/**/*Test*'
 done
 
 cleanup

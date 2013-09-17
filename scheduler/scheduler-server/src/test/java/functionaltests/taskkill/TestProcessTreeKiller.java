@@ -50,13 +50,17 @@ import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
 import org.ow2.proactive.scheduler.util.process.ProcessTreeKiller;
 import functionaltests.RMTHelper;
 import functionaltests.SchedulerConsecutive;
 import functionaltests.SchedulerTHelper;
-import junit.framework.Assert;
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Level;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 
 /**
@@ -80,12 +84,12 @@ public class TestProcessTreeKiller extends SchedulerConsecutive {
 
     private final static int wait_kill_time = 60000;
 
-    private static int detachedProcNumber = 4;
+    private static final int detachedProcNumber = 4;
 
-    private static int NB_ITERATIONS = 4;
+    private static final int NB_ITERATIONS = 4;
 
-    private static String unixSleepName = "sleep";
-    private static String windowsSleepName = "TestSleep.exe";
+    private static final String unixSleepName = "sleep";
+    private static final String windowsSleepName = "TestSleep.exe";
 
     String tmpDir = System.getProperty("java.io.tmpdir");
 
@@ -125,7 +129,9 @@ public class TestProcessTreeKiller extends SchedulerConsecutive {
 
             String workingDir = new File(TestProcessTreeKiller.launchersDir.toURI()).getParentFile().getCanonicalPath();
             task1.setWorkingDir(workingDir);
-            task1.setCommandLine(JavaSpawnExecutable.getNativeExecLauncher(false));
+            JavaSpawnExecutable executable = new JavaSpawnExecutable();
+            executable.home = PASchedulerProperties.SCHEDULER_HOME.getValueAsString();
+            task1.setCommandLine(executable.getNativeExecLauncher(false));
             job1.addTask(task1);
 
             // create job 2 simple Java Executable
@@ -138,6 +144,7 @@ public class TestProcessTreeKiller extends SchedulerConsecutive {
             task2.setName(task2Name);
             task2.addArgument("sleep", 2);
             task2.addArgument("tname", task2Name);
+            task2.addArgument("home", PASchedulerProperties.SCHEDULER_HOME.getValueAsString());
             task2.setExecutableClassName(JavaSpawnExecutable.class.getName());
             job2.addTask(task2);
 
@@ -151,6 +158,7 @@ public class TestProcessTreeKiller extends SchedulerConsecutive {
             String task3Name = "TestTK3";
             task3.addArgument("sleep", 3);
             task3.addArgument("tname", task3Name);
+            task3.addArgument("home", PASchedulerProperties.SCHEDULER_HOME.getValueAsString());
             task3.setName(task3Name);
             task3.setExecutableClassName(JavaSpawnExecutable.class.getName());
             job3.addTask(task3);
@@ -197,21 +205,21 @@ public class TestProcessTreeKiller extends SchedulerConsecutive {
 
             // We make sure that the kill method for job 2 and job 3 have been killed
             File killFileTask2 = new File(tmpDir, task2Name + ".tmp");
-            Assert.assertTrue(killFileTask2 + " exists", killFileTask2.exists());
-            killFileTask2.delete();
+            assertTrue(killFileTask2 + " exists", killFileTask2.exists());
+            FileUtils.deleteQuietly(killFileTask2);
 
             File killFileTask3 = new File(tmpDir, task3Name + ".tmp");
-            Assert.assertTrue(killFileTask3 + " exists", killFileTask3.exists());
-            killFileTask3.delete();
+            assertTrue(killFileTask3 + " exists", killFileTask3.exists());
+            FileUtils.deleteQuietly(killFileTask3);
 
             JobResult res = SchedulerTHelper.getJobResult(id1);
-            Assert.assertEquals(JobStatus.KILLED, res.getJobInfo().getStatus());
+            assertEquals(JobStatus.KILLED, res.getJobInfo().getStatus());
 
             res = SchedulerTHelper.getJobResult(id2);
-            Assert.assertEquals(JobStatus.KILLED, res.getJobInfo().getStatus());
+            assertEquals(JobStatus.KILLED, res.getJobInfo().getStatus());
 
             res = SchedulerTHelper.getJobResult(id3);
-            Assert.assertEquals(JobStatus.KILLED, res.getJobInfo().getStatus());
+            assertEquals(JobStatus.KILLED, res.getJobInfo().getStatus());
 
             SchedulerTHelper.log("************** Test with Normal Job termination *************");
 
@@ -230,7 +238,7 @@ public class TestProcessTreeKiller extends SchedulerConsecutive {
             task4.setName(task4Name);
 
             task4.setWorkingDir(workingDir);
-            task4.setCommandLine(JavaSpawnExecutable.getNativeExecLauncher(true));
+            task4.setCommandLine(executable.getNativeExecLauncher(true));
             job4.addTask(task4);
 
             //submit three jobs
@@ -258,7 +266,7 @@ public class TestProcessTreeKiller extends SchedulerConsecutive {
 
             int runningDetachedProcNumber = countProcesses();
             SchedulerTHelper.log("************** number of processes : " + runningDetachedProcNumber);
-            Assert.assertEquals(detachedProcNumber * 2, runningDetachedProcNumber);
+            assertEquals(detachedProcNumber * 2, runningDetachedProcNumber);
 
             SchedulerTHelper
                     .log("************** Waiting for second job (JavaExecutable) to finish *************");
@@ -268,7 +276,7 @@ public class TestProcessTreeKiller extends SchedulerConsecutive {
 
             runningDetachedProcNumber = countProcesses();
             SchedulerTHelper.log("************** number of processes : " + runningDetachedProcNumber);
-            Assert.assertEquals(detachedProcNumber, runningDetachedProcNumber);
+            assertEquals(detachedProcNumber, runningDetachedProcNumber);
 
             SchedulerTHelper
                     .log("************** Waiting for third job (ForkedJavaExecutable) to finish *************");
@@ -279,16 +287,16 @@ public class TestProcessTreeKiller extends SchedulerConsecutive {
 
             runningDetachedProcNumber = countProcesses();
             SchedulerTHelper.log("************** number of processes : " + runningDetachedProcNumber);
-            Assert.assertEquals(0, runningDetachedProcNumber);
+            assertEquals(0, runningDetachedProcNumber);
 
             res = SchedulerTHelper.getJobResult(id1);
-            Assert.assertEquals(JobStatus.FINISHED, res.getJobInfo().getStatus());
+            assertEquals(JobStatus.FINISHED, res.getJobInfo().getStatus());
 
             res = SchedulerTHelper.getJobResult(id2);
-            Assert.assertEquals(JobStatus.FINISHED, res.getJobInfo().getStatus());
+            assertEquals(JobStatus.FINISHED, res.getJobInfo().getStatus());
 
             res = SchedulerTHelper.getJobResult(id3);
-            Assert.assertEquals(JobStatus.FINISHED, res.getJobInfo().getStatus());
+            assertEquals(JobStatus.FINISHED, res.getJobInfo().getStatus());
         }
     }
 
@@ -309,7 +317,7 @@ public class TestProcessTreeKiller extends SchedulerConsecutive {
                 Thread.sleep(2000);
             }
         }
-        Assert.assertEquals(expectedNumber, runningDetachedProcNumber);
+        assertEquals(expectedNumber, runningDetachedProcNumber);
         SchedulerTHelper.log("************** " + expectedNumber + " processes are now running *************");
     }
 
@@ -317,43 +325,11 @@ public class TestProcessTreeKiller extends SchedulerConsecutive {
      * Process are killed asynchronously, need wait some time
      */
     public static int countProcesses() throws Exception {
-        int runningDetachedProcNumber = 0;
-
         switch (OperatingSystem.getOperatingSystem()) {
             case windows:
-                runningDetachedProcNumber = getProcessNumberWindows(windowsSleepName);
-                break;
+                return getProcessNumberWindows(windowsSleepName);
             case unix:
-                runningDetachedProcNumber = getProcessNumber(unixSleepName);
-                break;
-            default:
-                throw new IllegalStateException("Unsupported operating system");
-        }
-
-        return runningDetachedProcNumber;
-    }
-
-    public static void killAll(String processName) throws Throwable {
-        byte[] out = new byte[1024];
-
-        switch (OperatingSystem.getOperatingSystem()) {
-            case windows:
-                Runtime.getRuntime().exec("TASKKILL /F /IM TestSleep.exe");
-                break;
-            case unix:
-                //get PIDs of processName
-                Process p = Runtime.getRuntime().exec("pidof " + processName);
-
-                int n = p.getInputStream().read(out);
-                //contains PIDs separated with spaces
-                if (n > 0) {
-                    String pids = new String(out, 0, n);
-                    if (pids != null && pids.length() > 1) {
-                        //kill this processes
-                        Runtime.getRuntime().exec("kill " + pids);
-                    }
-                }
-                break;
+                return getProcessNumber(unixSleepName);
             default:
                 throw new IllegalStateException("Unsupported operating system");
         }

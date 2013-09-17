@@ -21,7 +21,7 @@ cleanup () {
 mktemp_jruby() {
 		PREFIX="proactive"
 		SUFFIX=".tmp"
-		export CLASSPATH=$PA_SCHEDULER/lib/common/script/jruby.jar
+		export CLASSPATH=$PA_SCHEDULER/dist/lib/jruby-1.7.4.jar
 		export CMD="f=Java::java.io.File.createTempFile(Java::java.lang.String.new(\"$PREFIX\"),Java::java.lang.String.new(\"$SUFFIX\"));Java::java.lang.System.out.println(f)"
 		$JAVA_HOME/bin/java org.jruby.Main -e $CMD
 }
@@ -32,14 +32,15 @@ compileDir=$(cd `dirname $0` && /bin/pwd)
 workingDir=$compileDir/../bin/unix
 
 echo "Compiling the scheduler"
-$compileDir/build deploy.scheduler deploy.scheduler.worker
+$compileDir/../gradlew -i build testJar proActiveLibs cleanSchedulerJar cleanResourceManagerJar
 
 CLASSPATH=.
 . $workingDir/env scheduler-log4j-server
 
 echo "Copying test classes to addons folder"
 rm -rf $compileDir/../addons/functionaltests
-cp -r $compileDir/../classes/schedulerTests/functionaltests/ $compileDir/../addons/
+cp -r $compileDir/../scheduler/scheduler-server/build/classes/test/functionaltests $compileDir/../addons/
+cp -r $compileDir/../scheduler/scheduler-server/build/resources/test/functionaltests $compileDir/../addons/
 
 echo "Erasing previous tests results"
 rm -rf $compileDir/../junitReports/
@@ -78,13 +79,7 @@ echo "Running SCHEDULER functional tests"
 for (( c=1; c<=$ITERATIONS; c++ ))
 do
 	echo "Iteration $c"
-	$compileDir/build -Durl="$SCHEDULER_URL" -Dtest="**functionaltests/**/**Test*" junit.scheduler
-	ERRORS=`grep -e failures $compileDir/../junitReports/TESTS-TestSuites.xml | grep -v "errors=\"0\" failures=\"0\""`
-	if [ -n "$ERRORS" ]; then
-		echo "Some tests failed:"
-		echo $ERRORS
-		break;
-	fi
+	$compileDir/../gradlew -i :scheduler:scheduler-server:functionalTest -Durl="$SCHEDULER_URL" -DfunctionalTest.single='**/functionaltests/**/*TestProcessTreeKiller*'
 done
 
 cleanup

@@ -42,6 +42,7 @@ import java.rmi.AlreadyBoundException;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.remoteobject.AbstractRemoteObjectFactory;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectFactory;
 import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
@@ -186,9 +187,11 @@ public class SchedulerStarter {
                                                 .getValueAsString())));
                             rman.createNodeSource(NodeSource.LOCAL_INFRASTRUCTURE_NAME,
                                     LocalInfrastructure.class.getName(), new Object[] { "", creds,
-                                            defaulNodesNumber, defaultNodesTimemout, "" },
+                                    defaulNodesNumber, defaultNodesTimemout,
+                                    CentralPAPropertyRepository.PA_HOME.getCmdLine() + CentralPAPropertyRepository.PA_HOME.getValue()
+                            },
                                     RestartDownNodesPolicy.class.getName(), new Object[] { "ALL", "ALL",
-                                            "10000" });
+                                    "10000" });
 
                             logger.info("The resource manager with " + defaulNodesNumber +
                                 " local nodes created on " + rmAuth.getHostURL());

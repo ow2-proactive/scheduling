@@ -39,7 +39,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Serializable;
-import java.net.URL;
+import java.net.URISyntaxException;
 import java.util.Map;
 
 import org.ow2.proactive.scheduler.common.task.TaskResult;
@@ -58,19 +58,12 @@ import org.apache.log4j.Level;
  */
 public class JavaSpawnExecutable extends JavaExecutable {
 
-    public static URL launchersDir = TestProcessTreeKiller.class.getResource("/functionaltests/executables/TestSleep.exe");
+    public static String launchersDir = "/functionaltests/executables/TestSleep.exe";
 
-    public static URL nativeLinuxExecLauncher = JavaSpawnExecutable.class
-            .getResource("/functionaltests/executables/PTK_launcher.sh");
-
-    public static URL nativeWindowsExecLauncher = JavaSpawnExecutable.class
-            .getResource("/functionaltests/executables/PTK_launcher.bat");
-
-    public static URL nativeLinuxExecLauncher2 = JavaSpawnExecutable.class
-            .getResource("/functionaltests/executables/PTK_launcher2.sh");
-
-    public static URL nativeWindowsExecLauncher2 = JavaSpawnExecutable.class
-            .getResource("/functionaltests/executables/PTK_launcher2.bat");
+    public static String nativeLinuxExecLauncher = "/functionaltests/executables/PTK_launcher.sh";
+    public static String nativeWindowsExecLauncher = "/functionaltests/executables/PTK_launcher.bat";
+    public static String nativeLinuxExecLauncher2 = "/functionaltests/executables/PTK_launcher2.sh";
+    public static String nativeWindowsExecLauncher2 = "/functionaltests/executables/PTK_launcher2.bat";
 
     Integer sleep;
 
@@ -79,6 +72,8 @@ public class JavaSpawnExecutable extends JavaExecutable {
     String tmpdir = System.getProperty("java.io.tmpdir");
 
     File killFile;
+
+    String home;
 
     @Override
     public void init(Map<String, Serializable> args) throws Exception {
@@ -97,7 +92,7 @@ public class JavaSpawnExecutable extends JavaExecutable {
         Process process = null;
 
         process = Runtime.getRuntime().exec(getNativeExecLauncher(false), null,
-                new File(launchersDir.toURI()).getParentFile().getCanonicalFile());
+                getExecutablePath(launchersDir).getParentFile().getCanonicalFile());
 
         // redirect streams
         BufferedReader sout = new BufferedReader(new InputStreamReader(process.getInputStream()));
@@ -134,10 +129,8 @@ public class JavaSpawnExecutable extends JavaExecutable {
      * detached executable
      *
      * @param alternate to use alternate scripts
-     * @return
-     * @throws Exception
      */
-    public static String[] getNativeExecLauncher(boolean alternate) throws Exception {
+    public String[] getNativeExecLauncher(boolean alternate) throws Exception {
         String osName = System.getProperty("os.name");
         OperatingSystem operatingSystem = OperatingSystem.resolveOrError(osName);
         OperatingSystemFamily family = operatingSystem.getFamily();
@@ -148,9 +141,9 @@ public class JavaSpawnExecutable extends JavaExecutable {
             case MAC:
                 String executable = null;
                 if (alternate) {
-                    executable = new File(nativeLinuxExecLauncher2.toURI()).getName();
+                    executable = getExecutablePath(nativeLinuxExecLauncher2).getName();
                 } else {
-                    executable = new File(nativeLinuxExecLauncher.toURI()).getName();
+                    executable = getExecutablePath(nativeLinuxExecLauncher).getName();
                 }
                 // TODO runAsMe mode for this Test
                 nativeExecLauncher = new String[] { "/bin/sh", executable };
@@ -159,15 +152,24 @@ public class JavaSpawnExecutable extends JavaExecutable {
             case WINDOWS:
                 if (alternate) {
                     nativeExecLauncher = new String[] { "cmd.exe", "/C",
-                            new File(nativeWindowsExecLauncher2.toURI()).getName() };
+                            getExecutablePath(nativeWindowsExecLauncher2).getName() };
                 } else {
                     nativeExecLauncher = new String[] { "cmd.exe", "/C",
-                            new File(nativeWindowsExecLauncher.toURI()).getName() };
+                            getExecutablePath(nativeWindowsExecLauncher).getName() };
 
                 }
 
         }
         return nativeExecLauncher;
+    }
+
+    private File getExecutablePath(String launcherPath) throws URISyntaxException {
+        try {
+            return new File(JavaSpawnExecutable.class.getResource(launcherPath).toURI());
+        } catch (Exception e) {
+            File addonsFolder = new File(home, "addons");
+            return new File(addonsFolder, launcherPath);
+        }
     }
 
     public static void main(String[] args) throws Throwable {
