@@ -103,12 +103,12 @@ public class ProcessCleaner {
         Reader r = new InputStreamReader(p.getInputStream());
         BufferedReader br = new BufferedReader(r);
 
-        if (printProcesses) System.out.println("Running java processes:");
-        String line = null;
+        if (printProcesses) System.out.println("Running java processes matching regex:");
+        String line;
         while ((line = br.readLine()) != null) {
-            if (printProcesses) System.out.println(line);
             Matcher m = this.pattern.matcher(line);
             if (m.matches()) {
+                if (printProcesses) System.out.println(line);
                 String pid = line.substring(0, line.indexOf(" "));
                 pids.add(pid);
             }
