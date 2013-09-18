@@ -32,7 +32,7 @@ compileDir=$(cd `dirname $0` && /bin/pwd)
 workingDir=$compileDir/../bin/unix
 
 echo "Compiling the resource manager"
-$compileDir/../gradlew -i build proActiveLibs resourceManagerJar
+$compileDir/../gradlew -i --refresh-dependencies build proActiveLibs resourceManagerJar
 
 CLASSPATH=.
 . $workingDir/env rm-log4j-server
@@ -77,7 +77,7 @@ echo "Running RM functional tests"
 for (( c=1; c<=$ITERATIONS; c++ ))
 do
 	echo "Iteration $c"
-	$compileDir/../gradlew -i :rm:rm-server:functionalTest -Durl="$RM_URL" -DfunctionalTest.single='**/functionaltests/**/*Test*'
+	$compileDir/../gradlew -i --rerun-tasks :rm:rm-server:functionalTest -Durl="$RM_URL" -DfunctionalTest.single='**/functionaltests/**/*Test*'
 done
 
 cleanup

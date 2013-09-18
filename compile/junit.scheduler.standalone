@@ -32,7 +32,7 @@ compileDir=$(cd `dirname $0` && /bin/pwd)
 workingDir=$compileDir/../bin/unix
 
 echo "Compiling the scheduler"
-$compileDir/../gradlew -i build testJar proActiveLibs cleanSchedulerJar cleanResourceManagerJar
+$compileDir/../gradlew -i --refresh-dependencies build testJar proActiveLibs cleanSchedulerJar cleanResourceManagerJar
 
 CLASSPATH=.
 . $workingDir/env scheduler-log4j-server
@@ -52,6 +52,7 @@ trap cleanup TERM INT
 
 SCHEDULER_CONFIG="-Dpa.scheduler.db.hibernate.dropdb=true"
 SCHEDULER_CONFIG=$SCHEDULER_CONFIG" -Dpa.scheduler.dataspace.globalurl=\"/tmp/\""
+SCHEDULER_CONFIG=$SCHEDULER_CONFIG" -Dpa.scheduler.core.timeout=300"
 
 "${JAVACMD[@]}" $SCHEDULER_CONFIG -Dderby.stream.error.file="$PA_SCHEDULER/.logs/derby.log" $opt org.ow2.proactive.scheduler.util.SchedulerStarter | tee $SCHEDULER_OUT 2>&1 &
 
@@ -79,7 +80,7 @@ echo "Running SCHEDULER functional tests"
 for (( c=1; c<=$ITERATIONS; c++ ))
 do
 	echo "Iteration $c"
-	$compileDir/../gradlew -i :scheduler:scheduler-server:functionalTest -Durl="$SCHEDULER_URL" -DfunctionalTest.single='**/functionaltests/**/*Test*'
+	$compileDir/../gradlew -i --rerun-tasks :scheduler:scheduler-server:functionalTest -Durl="$SCHEDULER_URL" -DfunctionalTest.single='**/functionaltests/**/*Test*'
 done
 
 cleanup
