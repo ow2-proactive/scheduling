@@ -79,6 +79,7 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.utils.FileUtils;
+import org.ow2.tests.ConsecutiveMode;
 import functionaltests.common.CommonTUtils;
 import functionaltests.common.InputStreamReaderThread;
 import functionaltests.monitor.MonitorEventReceiver;
@@ -378,10 +379,9 @@ public class SchedulerTHelper {
      */
     public static SchedulerAuthenticationInterface getSchedulerAuth() throws Exception {
         if (schedulerAuth == null) {
-            String schedulerUrl = System.getProperty("url");
-            if (schedulerUrl != null && !schedulerUrl.equals("${url}")) {
+            if (ConsecutiveMode.isConsecutiveMode()) {
                 // connecting to the existing scheduler
-                schedulerAuth = SchedulerConnection.join(schedulerUrl);
+                schedulerAuth = SchedulerConnection.join(ConsecutiveMode.getAlreadyExistingUrl());
             } else {
                 startScheduler(null);
             }

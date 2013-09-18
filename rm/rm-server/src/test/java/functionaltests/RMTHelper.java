@@ -71,6 +71,7 @@ import org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfras
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.LocalInfrastructure;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.utils.FileToBytesConverter;
+import org.ow2.tests.ConsecutiveMode;
 import org.ow2.tests.ProActiveSetup;
 
 import functionaltests.common.CommonTUtils;
@@ -592,10 +593,10 @@ public class RMTHelper {
                 }
             }
 
-            String rmUrl = System.getProperty("url");
 
-            if (rmUrl != null && !rmUrl.equals("${url}")) {
+            if (ConsecutiveMode.isConsecutiveMode()) {
                 // joining the existing RM
+                String rmUrl = ConsecutiveMode.getAlreadyExistingUrl();
                 try {
                     System.out.println("Checking if there is existing RM on " + rmUrl);
                     auth = RMConnection.join(rmUrl);

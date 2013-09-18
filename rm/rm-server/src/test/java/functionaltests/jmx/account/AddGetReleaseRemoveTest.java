@@ -58,7 +58,7 @@ import org.ow2.proactive.resourcemanager.core.jmx.RMJMXBeans;
 import org.ow2.proactive.resourcemanager.core.jmx.mbean.ManagementMBean;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
-import org.ow2.tests.FunctionalTest;
+import org.ow2.tests.ConsecutiveMode;
 import functionaltests.RMConsecutive;
 import functionaltests.RMTHelper;
 import org.junit.Assert;
@@ -161,7 +161,7 @@ public final class AddGetReleaseRemoveTest extends RMConsecutive {
                 (usedNodeTime <= getReleaseMaxDuration));
         Assert.assertTrue("Invalid value of the providedNodeTime attribute",
                 (providedNodeTime >= usedNodeTime) && (providedNodeTime <= addRemoveMaxDuration));
-        if (!FunctionalTest.consecutiveMode) {
+        if (!ConsecutiveMode.isConsecutiveMode()) {
             // in consecutive mode if user already provided this node before this value does not change
             Assert.assertEquals("Invalid value of the providedNodesCount attribute", 1, providedNodesCount);
         }

@@ -6,9 +6,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 
-import org.apache.log4j.Level;
-import org.junit.Assert;
-import org.junit.Before;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -23,10 +20,13 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
 import org.ow2.proactive.scheduler.common.util.dsclient.SmartProxy;
-
+import org.ow2.tests.ConsecutiveMode;
 import functionaltests.SchedulerConsecutive;
 import functionaltests.SchedulerTHelper;
 import functionaltests.monitor.EventMonitor;
+import org.apache.log4j.Level;
+import org.junit.Assert;
+import org.junit.Before;
 
 
 /**
@@ -105,8 +105,8 @@ public class TestSmartProxy extends SchedulerConsecutive {
 
         schedProxy.cleanDatabase();
 
-        String schedulerUrl = System.getProperty("url");
-        if (schedulerUrl == null || schedulerUrl.equals("${url}")) {
+        String schedulerUrl = ConsecutiveMode.getAlreadyExistingUrl();
+        if (!ConsecutiveMode.isConsecutiveMode()) {
             schedulerUrl = Connection.normalize(null);
         }
         schedProxy.setSessionName(TEST_SESSION_NAME);

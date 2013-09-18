@@ -30,6 +30,7 @@ import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.InternalJobFactory;
 import org.ow2.proactive.scheduler.task.internal.ExecuterInformations;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
+import org.ow2.tests.ConsecutiveMode;
 import junit.framework.Assert;
 import org.hamcrest.Description;
 import org.hamcrest.TypeSafeMatcher;
@@ -343,9 +344,7 @@ public class BaseSchedulerDBTest {
 
     @Before
     public void initTest() throws Exception {
-        String urlProperty = System.getProperty("url");
-        boolean consecutiveMode = urlProperty != null && !urlProperty.equals("${url}");
-        if (consecutiveMode) {
+        if (ConsecutiveMode.isConsecutiveMode()) {
             System.err.println("Test does not support the 'consecutive' mode execution");
             Assume.assumeTrue(false);
             return;

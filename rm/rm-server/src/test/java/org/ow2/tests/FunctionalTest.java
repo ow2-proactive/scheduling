@@ -70,7 +70,6 @@ public class FunctionalTest {
     /** ProActive related stuff */
     static volatile private ProActiveSetup paSetup;
     static final private ProcessCleaner cleaner = new ProcessCleaner(".*proactive.test=true.*");
-    protected static boolean consecutiveMode = false;
 
     protected VariableContractImpl getVariableContract() {
         return paSetup.getVariableContract();
@@ -84,9 +83,7 @@ public class FunctionalTest {
     public void prepareForTest() throws Exception {
         CentralPAPropertyRepository.PA_TEST.setValue(true);
 
-        String urlProperty = System.getProperty("url");
-        consecutiveMode = urlProperty != null && !urlProperty.isEmpty() && !urlProperty.equals("${url}");
-        if (!consecutiveMode) {
+        if (!ConsecutiveMode.isConsecutiveMode()) {
             // Ensure that the host is clean
             System.err.println("Running test in 'clean environment' mode");
             cleaner.killAliveProcesses();
@@ -136,7 +133,7 @@ public class FunctionalTest {
         }
         Runtime.getRuntime().removeShutdownHook(shutdownHook);
 
-        if (!consecutiveMode) {
+        if (!ConsecutiveMode.isConsecutiveMode()) {
             // Cleanup proactive
             if (paSetup != null) {
                 paSetup.shutdown();
@@ -152,7 +149,7 @@ public class FunctionalTest {
             System.err.println("Shutdown hook. Killing remaining processes");
             try {
                 timer.cancel();
-                if (!consecutiveMode) {
+                if (!ConsecutiveMode.isConsecutiveMode()) {
                     paSetup.shutdown();
                     cleaner.killAliveProcesses();
                 }
@@ -168,7 +165,7 @@ public class FunctionalTest {
             System.err.println("Timeout reached. Killing remaining processes");
             System.err.println("Dumping thread states before killing processes");
             printAllThreadsStackTraces(System.err);
-            if (!consecutiveMode) {
+            if (!ConsecutiveMode.isConsecutiveMode()) {
                 try {
                     cleaner.killAliveProcesses();
                     System.err.println("Killing current JVM");
