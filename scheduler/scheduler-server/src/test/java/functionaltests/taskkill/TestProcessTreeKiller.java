@@ -86,7 +86,7 @@ public class TestProcessTreeKiller extends SchedulerConsecutive {
 
     private static final int detachedProcNumber = 4;
 
-    private static final int NB_ITERATIONS = 4;
+    private static final int NB_ITERATIONS = 1;
 
     private static final String unixSleepName = "sleep";
     private static final String windowsSleepName = "TestSleep.exe";

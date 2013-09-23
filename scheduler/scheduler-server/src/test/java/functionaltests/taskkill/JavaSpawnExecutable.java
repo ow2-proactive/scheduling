@@ -107,7 +107,7 @@ public class JavaSpawnExecutable extends JavaExecutable {
 
         process.waitFor();
 
-        Thread.sleep(sleep * 1000); // we sleep 2 sec
+        Thread.sleep(sleep * 10000); // we sleep 2 sec
 
         return true;
     }
@@ -165,7 +165,7 @@ public class JavaSpawnExecutable extends JavaExecutable {
 
     private File getExecutablePath(String launcherPath) throws URISyntaxException {
         try {
-            return new File(JavaSpawnExecutable.class.getResource(launcherPath).toURI());
+            return new File(TestProcessTreeKiller.class.getResource(launcherPath).toURI());
         } catch (Exception e) {
             File addonsFolder = new File(home, "addons");
             return new File(addonsFolder, launcherPath);
