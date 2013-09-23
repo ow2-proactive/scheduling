@@ -98,7 +98,7 @@ public class TestJobMultiNodesSubmission extends SchedulerConsecutive {
 
         //check RM has 4 busy nodes
         RMState rms = rmAdmin.getState();
-        Assert.assertEquals(4, rms.getTotalNodesNumber() - rms.getFreeNodesNumber());
+        Assert.assertEquals(4, rms.getTotalAliveNodesNumber() - rms.getFreeNodesNumber());
 
         JobState js = SchedulerTHelper.getSchedulerInterface().getJobState(id);
         List<TaskState> tasks = js.getTasks();
