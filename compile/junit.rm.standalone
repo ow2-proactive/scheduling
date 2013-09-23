@@ -78,6 +78,11 @@ for (( c=1; c<=$ITERATIONS; c++ ))
 do
 	echo "Iteration $c"
 	$compileDir/../gradlew -i --rerun-tasks :rm:rm-server:functionalTest -Durl="$RM_URL" -DfunctionalTest.single='**/functionaltests/**/*Test*'
+	if [ $? -ne 0 ]; then
+        echo "Some tests failed:"
+        cleanup
+        exit 1
+    fi
 done
 
 cleanup
