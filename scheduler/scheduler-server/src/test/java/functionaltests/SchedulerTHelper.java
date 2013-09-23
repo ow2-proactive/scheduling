@@ -289,7 +289,6 @@ public class SchedulerTHelper {
             // It leads to test execution hang up on windows due to running processes.
 
             RMTHelper rmHelper = RMTHelper.getDefaultInstance();
-            System.setProperty("url", url);
             ResourceManager rm = rmHelper.getResourceManager();
             while (rm.getState().getTotalAliveNodesNumber() < SchedulerTStarter.RM_NODE_NUMBER) {
                 System.out.println("Waiting for nodes deployment");
