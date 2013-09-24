@@ -959,7 +959,7 @@ public class RMNodeStarter {
         private List<String> paPropList;
         private int addAttempts = -1, addAttemptsDelay = -1;
         private final String[] requiredJARs = { "jruby-1.7.4.jar", "sigar.jar", "jython-2.5.4-rc1.jar",
-                "groovy-all-2.1.5.jar",
+                "groovy-all-2.1.6.jar",
                 "commons-logging-1.1.1.jar",
                 "ProActive_Scheduler-core.jar",// SCHEDULING-1338 and SCHEDULING-1307 : core required for forked java task
                 "ProActive_SRM-common.jar", "ProActive_ResourceManager.jar",

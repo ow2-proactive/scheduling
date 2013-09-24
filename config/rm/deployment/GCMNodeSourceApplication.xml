@@ -17,9 +17,9 @@
 				<applicationClasspath>
 					<!-- Commented dependencies are referenced through the Jar-Index of Scheduler jars -->
 					<!-- Script engines must be explicitly in application classpath -->
-					<pathElement base="proactive" relpath="/dist/lib/jruby.jar"/>
+					<pathElement base="proactive" relpath="/dist/lib/jruby-1.7.4.jar"/>
 					<pathElement base="proactive" relpath="/dist/lib/jython-2.5.4-rc1.jar"/>
-					<pathElement base="proactive" relpath="/dist/lib/groovy-all-2.1.5.jar"/>
+					<pathElement base="proactive" relpath="/dist/lib/groovy-all-2.1.6.jar"/>
 					<pathElement base="proactive" relpath="/dist/lib/commons-logging-1.1.1.jar"/>
 					<!-- Scheduler libs -->
 					<pathElement base="proactive" relpath="/dist/lib/ProActive_SRM-common.jar"/>
