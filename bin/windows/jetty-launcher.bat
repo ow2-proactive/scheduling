@@ -118,10 +118,7 @@ set SCHED_DIR=%BASE_TEMP_DIR%\sched
 set JAVA=%JAVA_HOME%\bin\java
 
 set LIB_DIR=%CD%\..\..\dist\lib
-set CP=%LIB_DIR%\jetty-6.1.18.jar
-set CP=%CP%;%LIB_DIR%\jetty-util-6.1.18.jar
-set CP=%CP%;%LIB_DIR%\servlet-api-2.5-6.1.11.jar
-set CP=%CP%;%LIB_DIR%\ProActive_SRM-common.jar
+set CP=%LIB_DIR%\*
 
 mkdir %REST_DIR%
 IF %VERBOSE% == true (
@@ -200,7 +197,7 @@ goto :eof
     SET DESTDIR=%DESTDIR:"=%
 
     SETLOCAL
-    SET CLASSPATH=%LIB_DIR%\jruby.jar;%LIB_DIR%\ProActive_Scheduler-client.jar;%LIB_DIR%\ProActive_SRM-common.jar;%CLASSPATH%
+    SET CLASSPATH=%LIB_DIR%\*;%CLASSPATH%
     SET CMD="Java::org.ow2.proactive.scheduler.common.util.ZipUtils.unzip(Java::java.util.zip.ZipFile.new('%ZIPFILE%'),Java::java.io.File.new('%DESTDIR%'))"
     "%JAVA_HOME%\bin\java" org.jruby.Main -e %CMD%     
     ENDLOCAL
@@ -219,7 +216,7 @@ goto :eof
     REM escape quotes in path
     Set path=!path:"=!
 
-    set CLASSPATH=%LIB_DIR%\jruby.jar
+    set CLASSPATH=%LIB_DIR%\*
     set CMD="f=Java::java.io.File.new('%path%');prop=Java::java.util.Properties.new();prop.load(Java::java.io.FileInputStream.new(f));prop.setProperty('%2','%3');prop.store(Java::java.io.FileOutputStream.new(f),'')"
     "%JAVA_HOME%\bin\java" org.jruby.Main -e %CMD%
     ENDLOCAL

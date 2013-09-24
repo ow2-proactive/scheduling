@@ -33,7 +33,7 @@ print_help () {
 mktemp_jruby() {
 	PREFIX="proactive"
 	SUFFIX=".tmp"
-	export CLASSPATH=$DIR/../../dist/lib/jruby.jar
+	export CLASSPATH=$DIR/../../dist/lib/jruby-1.7.4.jar
 	export CMD="f=Java::java.io.File.createTempFile(Java::java.lang.String.new(\"$PREFIX\"),Java::java.lang.String.new(\"$SUFFIX\"));Java::java.lang.System.out.println(f)"
 	$JAVA_HOME/bin/java -cp $CLASSPATH org.jruby.Main -e $CMD
 }
@@ -41,7 +41,7 @@ mktemp_jruby() {
 mktemp_dir_jruby() {
 	PREFIX="proactive"
 	SUFFIX=".tmp"
-	export CLASSPATH=$DIR/../../dist/lib/jruby.jar
+	export CLASSPATH=$DIR/../../dist/lib/jruby-1.7.4.jar
 	export CMD="f=Java::java.io.File.createTempFile(Java::java.lang.String.new(\"$PREFIX\"),Java::java.lang.String.new(\"$SUFFIX\"));f.delete();f.mkdir();Java::java.lang.System.out.println(f)"
 	$JAVA_HOME/bin/java -cp $CLASSPATH org.jruby.Main -e $CMD
 }
@@ -183,10 +183,7 @@ fi
 
 JAVA=$JAVA_HOME/bin/java
 
-CP=$DIR/../../dist/lib/jetty-6.1.18.jar
-CP=$CP:$DIR/../../dist/lib/jetty-util-6.1.18.jar
-CP=$CP:$DIR/../../dist/lib/servlet-api-2.5-6.1.11.jar
-CP=$CP:$DIR/../../dist/lib/ProActive_SRM-common.jar
+CP=$DIR/../../dist/lib/*
 
 CLASS=org.ow2.proactive.utils.JettyLauncher
 
