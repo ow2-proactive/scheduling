@@ -114,6 +114,10 @@ project(':scheduler:scheduler-api') {
         }
         convertSchemas.dependsOn << "convertSchemas-$schemaVersion"
     }
+
+    task stub(type: StubTask) {
+        classes = ['org.ow2.proactive.scheduler.common.Scheduler']
+    }
 }
 
 project('common-api') {
@@ -163,7 +167,11 @@ project('rm:rm-client') {
         compile project(':common-client')
     }
     task stub(type: StubTask) {
-        classes = ['org.ow2.proactive.utils.NodeSet']
+        classes = ['org.ow2.proactive.utils.NodeSet',
+                'org.ow2.proactive.resourcemanager.frontend.ResourceManager',
+                'org.ow2.proactive.resourcemanager.common.util.RMProxyUserInterface',
+                'org.ow2.proactive.resourcemanager.common.util.RMCachingProxyUserInterface',
+                'org.ow2.proactive.resourcemanager.frontend.RMMonitoring']
     }
 }
 

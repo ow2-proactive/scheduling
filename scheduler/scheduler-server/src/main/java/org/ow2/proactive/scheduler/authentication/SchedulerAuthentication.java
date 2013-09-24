@@ -36,11 +36,13 @@
  */
 package org.ow2.proactive.scheduler.authentication;
 
+import java.io.IOException;
+
 import javax.management.JMException;
 import javax.security.auth.Subject;
 import javax.security.auth.login.LoginException;
 
-import org.apache.log4j.Logger;
+import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.authentication.AuthenticationImpl;
@@ -55,6 +57,7 @@ import org.ow2.proactive.scheduler.core.jmx.SchedulerJMXHelper;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.UserIdentificationImpl;
 import org.ow2.proactive.utils.Tools;
+import org.apache.log4j.Logger;
 
 
 /**
@@ -113,8 +116,20 @@ public class SchedulerAuthentication extends AuthenticationImpl implements Sched
 
         this.frontend.connect(PAActiveObject.getContext().getCurrentRequest().getSourceBodyID(), ident, cred);
 
-        // return the created interface
-        return this.frontend;
+        try {
+            // return the stub on Scheduler interface to keep avoid using server class on client side
+            return PAActiveObject.lookupActive(Scheduler.class, PAActiveObject.getUrl(frontend));
+        } catch (ActiveObjectCreationException e) {
+            rethrowSchedulerStubException(e);
+        } catch (IOException e) {
+            rethrowSchedulerStubException(e);
+        }
+        return null;
+    }
+
+    private void rethrowSchedulerStubException(Exception e) throws LoginException {
+        logger.error("Could not lookup stub for Scheduler interface", e);
+        throw new LoginException("Could not lookup stub for Scheduler interface : " + e.getMessage());
     }
 
     /**

@@ -1119,7 +1119,13 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * Gets RM monitoring stub
      */
     public RMMonitoring getMonitoring() {
-        return this.monitoring;
+        try {
+            // return the stub on RMMonitoring interface to keep avoid using server class on client side
+            return PAActiveObject.lookupActive(RMMonitoring.class, PAActiveObject.getUrl(monitoring));
+        } catch (Exception e) {
+            logger.error("Could not lookup stub for RMMonitoring interface", e);
+            return null;
+        }
     }
 
     /**

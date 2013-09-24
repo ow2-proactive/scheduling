@@ -48,7 +48,6 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.ow2.proactive.scheduler.task.internal.InternalTask;
 
 
 /**
@@ -78,20 +77,6 @@ public class JobResultImpl implements JobResult {
     public JobResultImpl() {
         allResults = new HashMap<String, TaskResult>();
         preciousResults = new HashMap<String, TaskResult>();
-    }
-
-    /**
-     * Instantiate a new JobResult with a jobId and a result
-     *
-     * @param id the jobId associated with this result
-     */
-    public JobResultImpl(InternalJob job) {
-        this.jobInfo = job.getJobInfo();
-        this.allResults = new HashMap<String, TaskResult>(job.getTasks().size());
-        this.preciousResults = new HashMap<String, TaskResult>();
-        for (InternalTask it : job.getIHMTasks().values()) {
-            this.allResults.put(it.getName(), null);
-        }
     }
 
     /**

@@ -5,7 +5,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.ow2.proactive.scheduler.common.task.TaskId;
-import org.ow2.proactive.scheduler.task.internal.InternalTask;
+import org.ow2.proactive.scheduler.common.task.TaskState;
 
 
 public class ChangedTasksInfo {
@@ -16,19 +16,19 @@ public class ChangedTasksInfo {
 
     private final Set<TaskId> newTasks = new TreeSet<TaskId>();
 
-    public void newTasksAdded(Collection<InternalTask> tasks) {
-        for (InternalTask task : tasks) {
+    public void newTasksAdded(Collection<? extends TaskState> tasks) {
+        for (TaskState task : tasks) {
             newTasks.add(task.getId());
         }
     }
 
-    public void taskUpdated(InternalTask task) {
+    public void taskUpdated(TaskState task) {
         if (!newTasks.contains(task.getId())) {
             updatedTasks.add(task.getId());
         }
     }
 
-    public void taskSkipped(InternalTask task) {
+    public void taskSkipped(TaskState task) {
         if (!newTasks.contains(task.getId())) {
             skippedTasks.add(task.getId());
         }

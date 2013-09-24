@@ -37,10 +37,8 @@
 package org.ow2.proactive.scheduler.job;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -50,9 +48,9 @@ import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
+import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.task.TaskId;
-import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.task.ClientTaskState;
 
 
@@ -351,14 +349,14 @@ public class JobInfoImpl implements JobInfo {
         return getClass().getSimpleName() + "[" + jobId + "]";
     }
 
-    public void setTasksChanges(ChangedTasksInfo changesInfo, InternalJob job) {
+    public void setTasksChanges(ChangedTasksInfo changesInfo, JobState job) {
         this.modifiedTasks = new ArrayList<ClientTaskState>(changesInfo.getNewTasks().size() +
             changesInfo.getUpdatedTasks().size());
         for (TaskId id : changesInfo.getNewTasks()) {
-            modifiedTasks.add(new ClientTaskState(job.getIHMTasks().get(id)));
+            modifiedTasks.add(new ClientTaskState(job.getHMTasks().get(id)));
         }
         for (TaskId id : changesInfo.getUpdatedTasks()) {
-            modifiedTasks.add(new ClientTaskState(job.getIHMTasks().get(id)));
+            modifiedTasks.add(new ClientTaskState(job.getHMTasks().get(id)));
         }
         this.tasksSkipped = new HashSet<TaskId>(changesInfo.getSkippedTasks());
     }

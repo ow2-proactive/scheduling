@@ -36,11 +36,13 @@
  */
 package org.ow2.proactive.resourcemanager.authentication;
 
+import java.io.IOException;
 import java.net.URI;
 
 import javax.management.JMException;
 import javax.security.auth.login.LoginException;
 
+import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.PAActiveObject;
@@ -104,8 +106,22 @@ public class RMAuthenticationImpl extends AuthenticationImpl implements RMAuthen
         client.setHistory(history);
 
         logger.info(client + " connected from " + client.getId().shortString());
-        return rmcore;
+        try {
+            // return the stub on ResourceManager interface to keep avoid using server class on client side
+            return PAActiveObject.lookupActive(ResourceManager.class, PAActiveObject.getUrl(rmcore));
+        } catch (ActiveObjectCreationException e) {
+            rethrowStubException(e);
+        } catch (IOException e) {
+            rethrowStubException(e);
+        }
+        return null;
     }
+
+    private void rethrowStubException(Exception e) throws LoginException {
+        logger.error("Could not lookup stub for ResourceManager interface", e);
+        throw new LoginException("Could not lookup stub for ResourceManager interface : " + e.getMessage());
+    }
+
 
     /**
      * Initializes the active object and register it in ProActive runtime
