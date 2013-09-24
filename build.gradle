@@ -433,8 +433,10 @@ project(':doc:Resourcing') {
     }
 }
 task proActiveLibs(type: Copy) {
+    // only copy once each runtime dependency (faster)
+    def runtimeDeps = subprojects.collect { it.configurations.runtime.files }.flatten() as Set
     subprojects.each {
-        from it.configurations.runtime.files
+        from runtimeDeps
         from it.jar.outputs
         if (it.tasks.findByName('testJar')) from it.testJar.outputs
     }
@@ -443,6 +445,7 @@ task proActiveLibs(type: Copy) {
     })
     into file("dist/lib")
 }
+defaultTasks 'proActiveLibs'
 subprojects {
     tasks.withType(Test).matching { it.name == 'functionalTest' }*.dependsOn proActiveLibs
 }
