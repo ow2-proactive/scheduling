@@ -486,6 +486,7 @@ task schedulerJar(type: Jar) {
                 fileset(dir: 'dist/lib/') {
                     include(name: '*.jar')
                     exclude(name: 'ProActive_Scheduler-core.jar')
+                    exclude(name: '*-tests.jar')
                 }
             }
         }
