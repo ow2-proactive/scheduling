@@ -250,6 +250,9 @@ project('scheduler:scheduler-server') {
         from sourceSets.test.output
     }
 
+    task stub(type: StubTask) {
+        classes = ['org.ow2.proactive.scheduler.core.SchedulerFrontend']
+    }
 }
 
 project('scheduler:scheduler-node') {
