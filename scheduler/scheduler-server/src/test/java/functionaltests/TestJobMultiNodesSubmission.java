@@ -83,18 +83,17 @@ public class TestJobMultiNodesSubmission extends SchedulerConsecutive {
      */
     @org.junit.Test
     public void run() throws Throwable {
-        //submit job
-        JobId id = SchedulerTHelper.submitJob(new File(jobDescriptor.toURI()).getAbsolutePath());
-
+        SchedulerTHelper.getSchedulerAuth();
         //connect to RM
         RMTHelper rmHelper = RMTHelper.getDefaultInstance();
         ResourceManager rmAdmin = rmHelper.getResourceManager();
         rmHelper.createNodeSource("extra", 3);
 
+        //submit job
+        JobId id = SchedulerTHelper.submitJob(new File(jobDescriptor.toURI()).getAbsolutePath());
+
         //wait job is running
         SchedulerTHelper.waitForEventJobRunning(id);
-
-        Thread.sleep(500);
 
         //check RM has 4 busy nodes
         RMState rms = rmAdmin.getState();
