@@ -72,7 +72,7 @@ public class TestLocalInfrastructureStaticPolicy extends RMConsecutive {
                 new Object[] { "", creds, 0, RMTHelper.defaultNodesTimeout, "" },
                 StaticPolicy.class.getName(), null);
 
-        helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, sourceName);
+        helper.waitForNodeSourceCreation(sourceName);
     }
 
     protected void createNodeSourceWithNodes(String sourceName) throws Exception {
@@ -86,14 +86,7 @@ public class TestLocalInfrastructureStaticPolicy extends RMConsecutive {
                 new Object[] { "", creds, defaultDescriptorNodesNb, RMTHelper.defaultNodesTimeout, "" },
                 StaticPolicy.class.getName(), null);
 
-        helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, sourceName);
-        for (int i = 0; i < defaultDescriptorNodesNb; i++) {
-            helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-        }
-        // once added, wait for nodes to be configured
-        for (int i = 0; i < defaultDescriptorNodesNb; i++) {
-            helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        }
+        helper.waitForNodeSourceCreation(sourceName, defaultDescriptorNodesNb);
     }
 
     protected void removeNodeSource(String sourceName) throws Exception {

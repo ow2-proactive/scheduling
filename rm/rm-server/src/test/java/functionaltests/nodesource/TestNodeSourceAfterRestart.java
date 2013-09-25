@@ -62,9 +62,7 @@ public class TestNodeSourceAfterRestart extends FunctionalTest {
                 new Object[] { "", creds, 1, RMTHelper.defaultNodesTimeout, "" },
                 //first parameter is empty rm url
                 StaticPolicy.class.getName(), new Object[] { "ME", "ALL" });
-        helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, sourceName);
-        helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-        helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        helper.waitForNodeSourceCreation(sourceName, 1);
     }
 
     private void startRMPreservingDB() throws Exception {

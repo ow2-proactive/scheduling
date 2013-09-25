@@ -67,13 +67,11 @@ import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
-import org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.LocalInfrastructure;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.utils.FileToBytesConverter;
 import org.ow2.tests.ConsecutiveMode;
 import org.ow2.tests.ProActiveSetup;
-
 import functionaltests.common.CommonTUtils;
 import functionaltests.common.InputStreamReaderThread;
 import functionaltests.monitor.RMMonitorEventReceiver;
@@ -173,8 +171,6 @@ public class RMTHelper {
 
     /**
      * Creates a Local node source with specified name
-     * @throws Exception
-     * @returns expected number of nodes
      */
     public void createNodeSource(String name, int nodeNumber) throws Exception {
         RMFactory.setOsJavaProperty();
@@ -189,27 +185,20 @@ public class RMTHelper {
                         StaticPolicy.class.getName(), null);
         rm.setNodeSourcePingFrequency(5000, name);
 
+        waitForNodeSourceCreation(name, nodeNumber);
+    }
+
+    /** Wait for the node source to be created when the node source is empty */
+    public void waitForNodeSourceCreation(String name) {
+        waitForNodeSourceCreation(name, 0);
+    }
+
+    /** Wait for the node source to be created and the nodes to be connected */
+    public void waitForNodeSourceCreation(String name, int nodeNumber) {
         waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, name);
         for (int i = 0; i < nodeNumber; i++) {
             waitForAnyNodeEvent(RMEventType.NODE_ADDED);
             waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
-            waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-            waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        }
-    }
-
-    public void createNodeSourceWithTestClassPath(String name) throws Exception {
-        RMFactory.setOsJavaProperty();
-        ResourceManager rm = getResourceManager();
-        System.out.println("Creating a node source " + name);
-        rm.createNodeSource(name, DefaultInfrastructureManager.class.getName(), null, StaticPolicy.class
-                .getName(), null);
-        rm.setNodeSourcePingFrequency(5000, name);
-        waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, name);
-
-        for (int i = 0; i < RMTHelper.defaultNodesNumber; i++) {
-            String nodeUrl = createNode(name + "-" + i).getNode().getNodeInformation().getURL();
-            resourceManager.addNode(nodeUrl, name);
             waitForAnyNodeEvent(RMEventType.NODE_ADDED);
             waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         }

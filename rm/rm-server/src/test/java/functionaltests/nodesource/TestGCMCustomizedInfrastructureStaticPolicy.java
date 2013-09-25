@@ -107,16 +107,6 @@ public class TestGCMCustomizedInfrastructureStaticPolicy extends TestLocalInfras
                 new Object[] { "", GCMDeploymentData, hostsListData, TIMEOUT }, StaticPolicy.class.getName(),
                 null);
 
-        helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, sourceName);
-        for (int i = 0; i < defaultDescriptorNodesNb; i++) {
-            //rmdeploying node added
-            helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-            //rmdeploying node removed
-            helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
-            //node added
-            helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-            //configuring to free
-            helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        }
+        helper.waitForNodeSourceCreation(sourceName, defaultDescriptorNodesNb);
     }
 }

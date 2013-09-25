@@ -40,11 +40,9 @@ import java.io.File;
 import java.net.InetAddress;
 import java.net.URL;
 
-import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.GCMCustomisedInfrastructure;
 import org.ow2.proactive.resourcemanager.nodesource.policy.TimeSlotPolicy;
 import org.ow2.proactive.utils.FileToBytesConverter;
-
 import functionaltests.RMTHelper;
 
 
@@ -93,7 +91,7 @@ public class TestGCMCustomizedInfrastructureTimeSlotPolicy extends TestLocalInfr
                 GCMCustomisedInfrastructure.class.getName(),
                 new Object[] { "", emptyGCMD, hostsListData, TIMEOUT }, TimeSlotPolicy.class.getName(),
                 getPolicyParams());
-        helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, sourceName);
+        helper.waitForNodeSourceCreation(sourceName);
     }
 
     @Override
@@ -104,17 +102,6 @@ public class TestGCMCustomizedInfrastructureTimeSlotPolicy extends TestLocalInfr
                 new Object[] { "", GCMDeploymentData, hostsListData, TIMEOUT },
                 TimeSlotPolicy.class.getName(), getPolicyParams());
 
-        helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, sourceName);
-
-        for (int i = 0; i < descriptorNodeNumber; i++) {
-            //deploying node added
-            helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-            //deploying node removed
-            helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
-            //node added
-            helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-            //we eat the configuring to free event
-            helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        }
+        helper.waitForNodeSourceCreation(sourceName, descriptorNodeNumber);
     }
 }

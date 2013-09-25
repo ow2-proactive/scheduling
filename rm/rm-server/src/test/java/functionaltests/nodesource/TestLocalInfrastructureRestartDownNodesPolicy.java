@@ -38,8 +38,6 @@ package functionaltests.nodesource;
 
 import java.io.File;
 
-import junit.framework.Assert;
-
 import org.objectweb.proactive.core.node.Node;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.RMState;
@@ -52,9 +50,9 @@ import org.ow2.proactive.resourcemanager.nodesource.policy.RestartDownNodesPolic
 import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.FileToBytesConverter;
 import org.ow2.proactive.utils.NodeSet;
-
 import functionaltests.RMConsecutive;
 import functionaltests.RMTHelper;
+import junit.framework.Assert;
 
 
 /**
@@ -78,14 +76,7 @@ public class TestLocalInfrastructureRestartDownNodesPolicy extends RMConsecutive
                 new Object[] { "", creds, defaultDescriptorNodesNb, RMTHelper.defaultNodesTimeout, "" },
                 RestartDownNodesPolicy.class.getName(), policyParameters);
 
-        helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, sourceName);
-        for (int i = 0; i < defaultDescriptorNodesNb; i++) {
-            helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-        }
-        // once added, wait for nodes to be configured
-        for (int i = 0; i < defaultDescriptorNodesNb; i++) {
-            helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        }
+        helper.waitForNodeSourceCreation(sourceName, defaultDescriptorNodesNb);
     }
 
     protected void init() throws Exception {

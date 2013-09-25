@@ -75,7 +75,7 @@ public class TestLocalInfrastructureTimeSlotPolicy extends RMConsecutive {
                 new Object[] { "", creds, 0, RMTHelper.defaultNodesTimeout, "" },
                 TimeSlotPolicy.class.getName(), getPolicyParams());
 
-        helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, sourceName);
+        helper.waitForNodeSourceCreation(sourceName);
     }
 
     protected void createDefaultNodeSource(String sourceName) throws Exception {
