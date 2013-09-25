@@ -41,7 +41,6 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
-import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
@@ -112,9 +111,6 @@ public class TestBrokenNodeSourceRemoval extends FunctionalTest {
         GCMDeploymentData = FileToBytesConverter.convertFileToByteArray((new File(getDescriptor())));
         SchedulerTHelper.startSchedulerWithEmptyResourceManager();
         SchedulerTHelper.log("Phase 1 - created RM & Scheduler");
-
-        String url = "//" + ProActiveInet.getInstance().getHostname();
-        System.setProperty("url", url);
     }
 
     @org.junit.Test
