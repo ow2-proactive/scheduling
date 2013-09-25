@@ -385,6 +385,7 @@ public abstract class SelectionManager {
         }
 
         ScriptException scriptException = null;
+        int resultsCount = 0;
         try {
             // launching
             Collection<Future<Node>> matchedNodes = scriptExecutorThreadPool.invokeAll(scriptExecutors,
@@ -401,6 +402,7 @@ public abstract class SelectionManager {
                         if (node != null) {
                             matched.add(node);
                         }
+                        resultsCount++;
                     } catch (InterruptedException e) {
                         logger.warn("Interrupting the selection manager");
                         return matched;
@@ -423,8 +425,8 @@ public abstract class SelectionManager {
             logger.warn("Interrupting the selection manager");
         }
 
-        // if the script passes on some nodes ignore the exception
-        if (scriptException != null && matched.size() == 0) {
+        // if the script produces a result on at least 1 node, ignore the exception
+        if (scriptException != null && resultsCount == 0) {
             throw scriptException;
         }
 
