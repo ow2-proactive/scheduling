@@ -57,6 +57,7 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.process.JVMProcessImpl;
 import org.objectweb.proactive.core.util.ProActiveInet;
+import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.RMFactory;
@@ -360,7 +361,12 @@ public class RMTHelper {
 
     public static String testClasspath() {
         String home = PAResourceManagerProperties.RM_HOME.getValueAsString();
-        return home + File.separator + "dist" + File.separator + "lib" + File.separator + "*";
+        String classpathToLibFolderWithWildcard = home + File.separator + "dist" + File.separator + "lib" + File.separator + "*";
+        if (OperatingSystem.getOperatingSystem().equals(OperatingSystem.windows)) {
+            // required by windows otherwise wildcard is expanded
+            classpathToLibFolderWithWildcard = "\"" + classpathToLibFolderWithWildcard + "\"";
+        }
+        return classpathToLibFolderWithWildcard;
     }
 
     /**
