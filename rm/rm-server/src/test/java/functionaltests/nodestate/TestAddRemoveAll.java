@@ -38,11 +38,9 @@ package functionaltests.nodestate;
 
 import org.objectweb.proactive.core.node.Node;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
-import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
-
 import functionaltests.RMConsecutive;
 import functionaltests.RMTHelper;
 
@@ -70,8 +68,7 @@ public class TestAddRemoveAll extends RMConsecutive {
         resourceManager.addNode(nodeToAdd.getNodeInformation().getURL(), nsName).getBooleanValue();
         //at this time, nodes maybe fully added in the nodesource but not in the core
         //the next removal may fail for some nodes that are not known by the core...
-        RMCore resourceManagerIMPL = (RMCore) resourceManager;
-        resourceManagerIMPL.removeAllNodes(nsName, true);
+        resourceManager.removeNodeSource(nsName, true);
         if (resourceManager.getState().getTotalNodesNumber() != 0) {
             RMTHelper.log("The removeAll method in RMCore didn't removed all nodes");
         } else {
