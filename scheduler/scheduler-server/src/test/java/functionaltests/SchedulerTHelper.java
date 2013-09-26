@@ -244,20 +244,8 @@ public class SchedulerTHelper {
         }
         //commandLine.add("-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8765");
 
-        String home = PAResourceManagerProperties.RM_HOME.getValueAsString();
-        StringBuilder classpath = new StringBuilder();
-        String distLib = home + File.separator + "dist" + File.separator + "lib" + File.separator;
-        for (String name : new String[] { "ProActive_tests.jar", "jruby.jar", "jython-2.5.4-rc1.jar",
-                "groovy-all-2.1.5.jar", "ProActive_SRM-common.jar", "ProActive_Scheduler-core.jar",
-                "ProActive_Scheduler-mapreduce.jar", "ProActive_ResourceManager.jar", "ProActive.jar" }) {
-            classpath.append(distLib).append(name).append(File.pathSeparator);
-        }
-        classpath.append(home + File.separator + "classes" + File.separator + "schedulerTests");
-        classpath.append(File.pathSeparator);
-        classpath.append(home + File.separator + "classes" + File.separator + "resource-managerTests");
-
         commandLine.add("-cp");
-        commandLine.add(System.getProperty("java.class.path"));
+        commandLine.add(testClasspath());
         commandLine.add(CentralPAPropertyRepository.PA_TEST.getCmdLine() + "true");
         commandLine.add(SchedulerTStarter.class.getName());
         commandLine.add(String.valueOf(localnodes));
@@ -296,6 +284,11 @@ public class SchedulerTHelper {
             }
             System.out.println("Nodes are deployed");
         }
+    }
+
+    public static String testClasspath() {
+        String home = PASchedulerProperties.SCHEDULER_HOME.getValueAsString();
+        return home + File.separator + "dist" + File.separator + "lib" + File.separator + "*";
     }
 
     /* convenience method to clean TMP from dataspace when executing test */

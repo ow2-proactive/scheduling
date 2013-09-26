@@ -484,11 +484,6 @@ public class WinHPCInfrastructure extends DefaultInfrastructureManager {
         sb.append("security.java.policy-client ");
         sb.append(this.javaOptions);
         result.setPaProperties(sb.toString());
-        //HACK, if extra classpath is provided, append it
-        if (this.extraClassPath != null && this.extraClassPath.length() > 0) {
-            String[] jars = result.getRequiredJARs();
-            jars[jars.length - 1] = jars[jars.length - 1] + OperatingSystem.WINDOWS.ps + this.extraClassPath;
-        }
         result.setCredentialsValueAndNullOthers(this.credBase64);
         result.setRmURL(super.rmUrl);
         result.setSourceName(this.nodeSource.getName());

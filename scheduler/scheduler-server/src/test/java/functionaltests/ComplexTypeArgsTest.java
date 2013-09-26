@@ -60,7 +60,7 @@ public class ComplexTypeArgsTest extends SchedulerConsecutive {
         submittedJob.addTask(task);
 
         JobEnvironment env = new JobEnvironment();
-        env.setJobClasspath(new String[] { System.getProperty("java.class.path") });
+        env.setJobClasspath(new String[] { SchedulerTHelper.testClasspath() });
         submittedJob.setEnvironment(env);
 
         //test submission and event reception

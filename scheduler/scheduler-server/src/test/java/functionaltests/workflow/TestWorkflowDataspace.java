@@ -92,7 +92,7 @@ public class TestWorkflowDataspace extends SchedulerConsecutive {
         job.setInputSpace(inputSpace.toURI().toURL().toString());
         job.setOutputSpace(outputSpace.toURI().toURL().toString());
         JobEnvironment env = new JobEnvironment();
-        env.setJobClasspath(new String[] { System.getProperty("java.class.path") });
+        env.setJobClasspath(new String[] { SchedulerTHelper.testClasspath() });
         job.setEnvironment(env);
 
         JavaTask t = new JavaTask();

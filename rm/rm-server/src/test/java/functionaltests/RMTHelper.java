@@ -41,6 +41,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -333,25 +334,11 @@ public class RMTHelper {
         commandLine.add(CentralPAPropertyRepository.PA_RUNTIME_PING.getCmdLine() +
                 false);
 
-        String home = PAResourceManagerProperties.RM_HOME.getValueAsString();
-        String distLib = home + File.separator + "dist" + File.separator + "lib" + File.separator;
-        StringBuilder classpath = new StringBuilder();
-        for (String name : new String[] { "ProActive_tests.jar", "ProActive_SRM-common.jar",
-                "ProActive_ResourceManager.jar", "ProActive.jar", "jruby.jar", "jython-2.5.3",
-                "groovy-all-2.1.5.jar" }) {
-            classpath.append(distLib).append(name).append(File.pathSeparator);
-        }
-        classpath.append(home + File.separator + "classes" + File.separator + "schedulerTests");
-        classpath.append(File.pathSeparator);
-        classpath.append(home + File.separator + "classes" + File.separator + "resource-managerTests");
-
         commandLine.add("-cp");
-        commandLine.add(System.getProperty("java.class.path"));
+        commandLine.add(testClasspath());
         commandLine.add(CentralPAPropertyRepository.PA_TEST.getCmdLine() + "true");
         commandLine.add(CentralPAPropertyRepository.PA_RMI_PORT.getCmdLine() + rmiPort);
-        for (String jvmArg : jvmArgs) {
-            commandLine.add(jvmArg);
-        }
+        Collections.addAll(commandLine, jvmArgs);
         commandLine.add(RMTStarter.class.getName());
         commandLine.add(configurationFile);
         System.out.println("Starting RM process: " + commandLine);
@@ -369,6 +356,11 @@ public class RMTHelper {
         System.out.println("Waiting for the RM using URL: " + url);
         auth = RMConnection.waitAndJoin(url);
         return url;
+    }
+
+    public static String testClasspath() {
+        String home = PAResourceManagerProperties.RM_HOME.getValueAsString();
+        return home + File.separator + "dist" + File.separator + "lib" + File.separator + "*";
     }
 
     /**

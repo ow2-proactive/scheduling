@@ -958,24 +958,9 @@ public class RMNodeStarter {
         private String paPropString;
         private List<String> paPropList;
         private int addAttempts = -1, addAttemptsDelay = -1;
-        private final String[] requiredJARs = { "jruby-1.7.4.jar", "sigar.jar", "jython-2.5.4-rc1.jar",
-                "groovy-all-2.1.6.jar",
-                "commons-logging-1.1.1.jar",
-                "ProActive_Scheduler-core.jar",// SCHEDULING-1338 and SCHEDULING-1307 : core required for forked java task
-                "ProActive_SRM-common.jar", "ProActive_ResourceManager.jar",
-                "ProActive_Scheduler-worker.jar", "ProActive_Scheduler-mapreduce.jar",
-                "commons-httpclient-3.1.jar", "commons-codec-1.3.jar", "ProActive.jar" };
         private final String addonsDir = "addons";
 
         private OperatingSystem targetOS = OperatingSystem.UNIX;
-
-        /**
-         * Returns the jars required by RMNodeStarter in the right order.
-         * @return Returns the jars required by RMNodeStarter in the right order.
-         */
-        public String[] getRequiredJARs() {
-            return requiredJARs;
-        }
 
         /**
          * To get the RMHome from a previous call to the method {@link #setRmHome(String)}. If such a call has not been made,
@@ -1375,11 +1360,6 @@ public class RMNodeStarter {
             //building classpath
             command.add("-cp");
             final StringBuilder classpath = new StringBuilder('.');
-            for (String jar : this.requiredJARs) {
-                classpath.append(os.ps).append(libRoot).append(jar);
-            }
-            
-            classpath.append(os.ps).append(System.getProperty("java.class.path"));
 
             // add the content of addons dir on the classpath
             classpath.append(os.ps + rmHome + this.addonsDir);

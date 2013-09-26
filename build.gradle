@@ -425,6 +425,11 @@ project(':scheduler:mapreduce') {
     }
 
     task('functionalTest', type:Test).configure functionalTestConfiguration
+
+    task testJar(type: Jar) {
+        classifier = 'tests'
+        from sourceSets.test.output
+    }
 }
 
 project(':doc').subprojects {
