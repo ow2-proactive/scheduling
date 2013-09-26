@@ -475,7 +475,7 @@ public class RMNodeStarter {
                     try {
                         credentials = Credentials.getCredentials(cl.getOptionValue(OPTION_CREDENTIAL_FILE));
                     } catch (KeyException ke) {
-                        logger.error(ExitStatus.CRED_UNREADABLE.description);
+                        logger.error(ExitStatus.CRED_UNREADABLE.description, ke);
                         System.exit(ExitStatus.CRED_UNREADABLE.exitCode);
                     }
                     // The name of the env variable that contains
@@ -489,7 +489,7 @@ public class RMNodeStarter {
                     try {
                         credentials = Credentials.getCredentialsBase64(value.getBytes());
                     } catch (KeyException ke) {
-                        ke.printStackTrace();
+                        logger.error(ExitStatus.CRED_DECODE.description, ke);
                         System.exit(ExitStatus.CRED_DECODE.exitCode);
                     }
                     // Read the credentials directly from the command-line argument
@@ -498,15 +498,22 @@ public class RMNodeStarter {
                     try {
                         credentials = Credentials.getCredentialsBase64(str.getBytes());
                     } catch (KeyException ke) {
-                        ke.printStackTrace();
+                        logger.error(ExitStatus.CRED_DECODE.description, ke);
                         System.exit(ExitStatus.CRED_DECODE.exitCode);
                     }
                 } else {
                     try {
                         credentials = Credentials.getCredentials();
                     } catch (KeyException ke) {
-                        ke.printStackTrace();
-                        System.exit(ExitStatus.CRED_UNREADABLE.exitCode);
+                        try {
+                            logger.info("Using default credentials from ProActive, authenticating as user rm");
+                            credentials = Credentials.getCredentials(new File(
+                                    PAResourceManagerProperties.RM_HOME.getValueAsStringOrNull(),
+                                    "config/authentication/rm.cred").getAbsolutePath());
+                        } catch (KeyException e) {
+                            logger.error("Failed to read credentials, from location obtained using system property or from default location", ke);
+                            System.exit(ExitStatus.CRED_UNREADABLE.exitCode);
+                        }
                     }
                 }
             }
@@ -913,7 +920,7 @@ public class RMNodeStarter {
         JVM_ERROR(1, "Problem with the Java process itself ( classpath, main method... )."), RM_NO_PING(100,
                 "Cannot ping the Resource Manager because of a Throwable."), RM_IS_SHUTDOWN(101,
                 "The Resource Manager has been shutdown."), CRED_UNREADABLE(200,
-                "Cannot read the submited credential's key."), CRED_DECODE(201,
+                "Cannot read the submitted credential's key."), CRED_DECODE(201,
                 "Cannot decode credential's key from base64."), CRED_ENVIRONMENT(202,
                 "Environment variable not set for credential but it should be."), RMNODE_NULL(300,
                 "NodeFactory returned null as RMNode."), RMAUTHENTICATION_NULL(301,

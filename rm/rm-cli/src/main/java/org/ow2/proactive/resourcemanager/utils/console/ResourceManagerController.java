@@ -36,6 +36,7 @@
  */
 package org.ow2.proactive.resourcemanager.utils.console;
 
+import java.io.File;
 import java.io.IOException;
 import java.security.KeyException;
 import java.security.PublicKey;
@@ -50,6 +51,7 @@ import org.objectweb.proactive.utils.JVMPropertiesPreloader;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
+import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.utils.console.Console;
@@ -99,8 +101,6 @@ public class ResourceManagerController {
     protected RMAuthentication auth = null;
     protected ResourceManagerModel model;
 
-    protected String jsEnv = null;
-
     /**
      * Start the RM controller
      *
@@ -108,14 +108,8 @@ public class ResourceManagerController {
      */
     public static void main(String[] args) {
         args = JVMPropertiesPreloader.overrideJVMProperties(args);
-        shell = new ResourceManagerController(null);
+        shell = new ResourceManagerController();
         shell.load(args);
-    }
-
-    /**
-     * Create a new instance of ResourceManagerController
-     */
-    protected ResourceManagerController() {
     }
 
     /**
@@ -123,7 +117,7 @@ public class ResourceManagerController {
      *
      * Convenience constructor to let the default one do nothing
      */
-    protected ResourceManagerController(Object o) {
+    protected ResourceManagerController() {
         model = ResourceManagerModel.getModel(true);
     }
 
@@ -156,7 +150,7 @@ public class ResourceManagerController {
         boolean displayHelp = false;
 
         try {
-            String pwdMsg = null;
+            String pwdMsg;
 
             Parser parser = new GnuParser();
             cmd = parser.parse(options, args);
@@ -191,6 +185,11 @@ public class ResourceManagerController {
                 if (cmd.hasOption("l")) {
                     user = cmd.getOptionValue("l");
                 }
+
+                File defaultCredentialFile = new File(
+                        PAResourceManagerProperties.RM_HOME.getValueAsStringOrNull(),
+                        "config/authentication/rm.cred");
+
                 if (cmd.hasOption("credentials")) {
                     if (cmd.getOptionValues("credentials").length == 1) {
                         System.setProperty(Credentials.credentialsPathProperty, cmd
@@ -203,6 +202,9 @@ public class ResourceManagerController {
                             Credentials.credentialsPathProperty);
                         throw e;
                     }
+                } else if (useDefaultCredentials(defaultCredentialFile)) {
+                    this.credentials = Credentials.getCredentials(defaultCredentialFile.getAbsolutePath());
+                    this.user = "rm";
                 } else {
                     ConsoleReader console = new ConsoleReader(System.in, System.out);
                     if (cmd.hasOption("l")) {
@@ -304,6 +306,10 @@ public class ResourceManagerController {
 
         // if execution reaches this point this means it must exit
         System.exit(0);
+    }
+
+    private boolean useDefaultCredentials(File defaultCredentialFile) {
+        return defaultCredentialFile.exists() && !cmd.hasOption("credentials") && user == null;
     }
 
     protected void connect() throws LoginException {

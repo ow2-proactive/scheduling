@@ -56,6 +56,7 @@ import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.factories.FlatJobFactory;
 import org.ow2.proactive.scheduler.common.task.TaskState;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.utils.FileToBytesConverter;
 import org.ow2.proactive.utils.Tools;
 import org.ow2.proactive.utils.console.Console;
@@ -100,8 +101,6 @@ public class SchedulerController {
     protected SchedulerAuthenticationInterface auth = null;
     protected SchedulerModel model;
 
-    protected String jsEnv = null;
-
     /**
      * Start the Scheduler controller
      *
@@ -109,14 +108,8 @@ public class SchedulerController {
      */
     public static void main(String[] args) throws Throwable {
         args = JVMPropertiesPreloader.overrideJVMProperties(args);
-        shell = new SchedulerController(null);
+        shell = new SchedulerController();
         shell.load(args);
-    }
-
-    /**
-     * Create a new instance of SchedulerController
-     */
-    protected SchedulerController() {
     }
 
     /**
@@ -124,7 +117,7 @@ public class SchedulerController {
      *
      * Convenience constructor to let the default one do nothing
      */
-    protected SchedulerController(Object o) {
+    protected SchedulerController() {
         model = SchedulerModel.getModel(true);
     }
 
@@ -157,7 +150,7 @@ public class SchedulerController {
         boolean displayHelp = false;
 
         try {
-            String pwdMsg = null;
+            String pwdMsg;
 
             Parser parser = new GnuParser();
             cmd = parser.parse(options, args);
@@ -196,6 +189,10 @@ public class SchedulerController {
                     user = cmd.getOptionValue("login");
                 }
 
+                File defaultCredentialFile = new File(
+                        PASchedulerProperties.SCHEDULER_HOME.getValueAsStringOrNull(),
+                        "config/authentication/scheduler.cred");
+
                 if (cmd.hasOption("credentials")) {
                     if (cmd.getOptionValue("credentials") != null) {
                         System.setProperty(Credentials.credentialsPathProperty, cmd
@@ -204,10 +201,13 @@ public class SchedulerController {
                     try {
                         this.credentials = Credentials.getCredentials();
                     } catch (KeyException e) {
-                        logger.error("Could not retreive credentials... Try to adjust the System property: " +
+                        logger.error("Could not retrieve credentials... Try to adjust the System property: " +
                             Credentials.credentialsPathProperty + " or use the -c option.");
                         throw e;
                     }
+                } else if (useDefaultCredentials(defaultCredentialFile)) {
+                    this.credentials = Credentials.getCredentials(defaultCredentialFile.getAbsolutePath());
+                    this.user = "rm";
                 } else {
                     ConsoleReader console = new ConsoleReader(System.in, System.out);
                     if (cmd.hasOption("login")) {
@@ -319,11 +319,15 @@ public class SchedulerController {
         System.exit(0);
     }
 
+    private boolean useDefaultCredentials(File defaultCredentialFile) {
+        return defaultCredentialFile.exists() && !cmd.hasOption("credentials") && user == null;
+    }
+
     private String getMessages(Throwable t) {
         StringBuilder ret = new StringBuilder();
         String prefix = "";
         while (t != null) {
-            ret.append(prefix + t.getClass().getSimpleName() + ": ");
+            ret.append(prefix).append(t.getClass().getSimpleName()).append(": ");
             prefix = " caused by ";
             String msg = t.getMessage();
             if (msg != null && !msg.isEmpty()) {
