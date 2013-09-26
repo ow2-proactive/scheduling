@@ -60,9 +60,9 @@ cleanup () {
 mktemp_jruby() {
 	PREFIX="proactive"
 	SUFFIX=".tmp"
-	export CLASSPATH=$PA_SCHEDULER/dist/lib/jruby.jar
+	export CLASSPATH=$PA_SCHEDULER/dist/lib/jruby-1.7.4.jar
 	export CMD="f=Java::java.io.File.createTempFile(Java::java.lang.String.new(\"$PREFIX\"),Java::java.lang.String.new(\"$SUFFIX\"));Java::java.lang.System.out.println(f)"
-	$JAVA_HOME/bin/java -cp $CLASSPATH org.jruby.Main -e $CMD
+	$JAVA -cp $CLASSPATH org.jruby.Main -e $CMD
 }
  
 

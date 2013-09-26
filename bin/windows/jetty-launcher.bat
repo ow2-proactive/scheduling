@@ -115,7 +115,16 @@ set POL=%BASE_TEMP_DIR%\java.security.policy
 
 set SCHED_DIR=%BASE_TEMP_DIR%\sched
 
-set JAVA=%JAVA_HOME%\bin\java
+set JAVA=%JAVA_HOME%\bin\java.exe
+if NOT DEFINED JAVA_HOME set JAVA=java.exe
+if "%JAVA_HOME%" == "" set JAVA=java.exe
+
+set ERRORLEVEL=0
+"%JAVA%" -version 2>NUL
+IF "%ERRORLEVEL%" NEQ "0" (
+    echo Java could not be found in your system, configure your PATH to find java executable or define JAVA_HOME environment variable
+    goto :eof
+)
 
 set LIB_DIR=%CD%\..\..\dist\lib
 set CP=%LIB_DIR%\*
@@ -199,7 +208,7 @@ goto :eof
     SETLOCAL
     SET CLASSPATH=%LIB_DIR%\*;%CLASSPATH%
     SET CMD="Java::org.ow2.proactive.scheduler.common.util.ZipUtils.unzip(Java::java.util.zip.ZipFile.new('%ZIPFILE%'),Java::java.io.File.new('%DESTDIR%'))"
-    "%JAVA_HOME%\bin\java" org.jruby.Main -e %CMD%     
+    "%JAVA%" org.jruby.Main -e %CMD%
     ENDLOCAL
 
     goto :eof
@@ -218,7 +227,7 @@ goto :eof
 
     set CLASSPATH=%LIB_DIR%\*
     set CMD="f=Java::java.io.File.new('%path%');prop=Java::java.util.Properties.new();prop.load(Java::java.io.FileInputStream.new(f));prop.setProperty('%2','%3');prop.store(Java::java.io.FileOutputStream.new(f),'')"
-    "%JAVA_HOME%\bin\java" org.jruby.Main -e %CMD%
+    "%JAVA%a" org.jruby.Main -e %CMD%
     ENDLOCAL
 
     goto :eof

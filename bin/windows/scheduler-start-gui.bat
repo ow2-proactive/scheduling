@@ -6,8 +6,13 @@ call init.bat scheduler-log4j-server
 
 set JPS="%JAVA_HOME%\bin\jps.exe"
 IF not exist %JPS% (
-        echo Error: can't find jps tool: %JPS%
-        goto :eof
+        set JPS="jps.exe"
+        set ERRORLEVEL=0
+        "%JPS%" 2>NUL
+        IF "%ERRORLEVEL%" NEQ "0" (
+            echo jps could not be found in your system, configure your PATH to find java executable or define JAVA_HOME environment variable
+            goto eof
+        )
 )
 
 call :find_process_by_cmd SchedulerStarter

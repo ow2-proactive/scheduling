@@ -9,8 +9,16 @@ IF NOT DEFINED PA_SCHEDULER set PA_SCHEDULER=%CD%\..\..
 rem ----------------------------------------------------------------------------
 
 
-if NOT DEFINED JAVA_HOME goto javahome
-if "%JAVA_HOME%" == "" goto javahome
+set JAVA=%JAVA_HOME%\bin\java.exe
+if NOT DEFINED JAVA_HOME set JAVA=java.exe
+if "%JAVA_HOME%" == "" set JAVA=java.exe
+
+set ERRORLEVEL=0
+"%JAVA%" -version 2>NUL
+IF "%ERRORLEVEL%" NEQ "0" (
+    echo Java could not be found in your system, configure your PATH to find java executable or define JAVA_HOME environment variable
+    goto end
+)
 
 rem ----
 rem Set up the classpath using classes dir or jar files
@@ -29,7 +37,7 @@ IF EXIST "%PA_SCHEDULER%\classes\scheduler" (
 	rem ProActive.jar : Use jar index to avoid 'command too long'
 	SET JARS=!JARS!;%PA_SCHEDULER%\lib\ProActive\ProActive.jar
 	rem jruby.jar is put in front because jline internal package is used in the command-line interpreters
-	SET JARS=!JARS!;%PA_SCHEDULER%\lib\common\script\jruby.jar
+	SET JARS=!JARS!;%PA_SCHEDULER%\lib\common\script\jruby-1.7.4.jar
 	rem Scheduler libraries
 	FOR %%j IN ("%PA_SCHEDULER%\lib\common\*.jar") DO SET JARS=!JARS!;%%j
 	FOR %%j IN ("%PA_SCHEDULER%\lib\common\script\*.jar") DO SET JARS=!JARS!;%%j
@@ -44,20 +52,14 @@ IF EXIST "%PA_SCHEDULER%\classes\scheduler" (
 ) ELSE (
 	rem Script engines must be added to classpath to be found
 	rem it must also placed before jars containing jar-index
-	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\jruby.jar
+	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\jruby-1.7.4.jar
 	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\sigar\sigar.jar
 	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\jython-2.5.4-rc1.jar
 	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\groovy-all-2.1.6.jar
 	rem  Needed explicitly by VFS (file transfer in pre/post script
 	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\commons-logging-1.1.1.jar
 	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\commons-httpclient-3.1.jar
-	rem fill with ProActive.jar : use jar index for proActive dependencies
-	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\ProActive.jar
-	rem fill with Scheduler jars : use jar index for Scheduler dependencies
-	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\ProActive_SRM-common.jar
-	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\ProActive_ResourceManager.jar
-	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\ProActive_Scheduler-core.jar
-	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\ProActive_Scheduler-mapreduce.jar
+	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\*
 	FOR %%j IN ("%PA_SCHEDULER%\addons\*.jar") DO SET JARS=!JARS!;%%j
 )
 
@@ -84,7 +86,7 @@ IF "%1"=="rm-log4j-server" (
 )
 :sjps_
 
-set JAVA_CMD="%JAVA_HOME%\bin\java.exe" -Dproactive.home="%PA_SCHEDULER%" -Dproactive.configuration="%PA_SCHEDULER%\config\proactive\ProActiveConfiguration.xml" -Dpa.scheduler.home="%PA_SCHEDULER%" -Dpa.rm.home="%PA_SCHEDULER%" -Djava.security.manager -Djava.security.policy="%JAVA_POLICY%" -Dlog4j.configuration="%LOG4J_FILE%"
+set JAVA_CMD="%JAVA%" -Dproactive.home="%PA_SCHEDULER%" -Dproactive.configuration="%PA_SCHEDULER%\config\proactive\ProActiveConfiguration.xml" -Dpa.scheduler.home="%PA_SCHEDULER%" -Dpa.rm.home="%PA_SCHEDULER%" -Djava.security.manager -Djava.security.policy="%JAVA_POLICY%" -Dlog4j.configuration="%LOG4J_FILE%"
 
 rem Adding java tools to the path
 SET OK=1
@@ -96,13 +98,5 @@ IF /I %OK%==1 SET PATH=%JAVA_HOME%\bin;%PATH%
 goto end
 
 
-:javahome
-echo.
-echo The environment variable JAVA_HOME must be set the current jdk distribution
-echo installed on your computer. 
-echo Use 
-echo    set JAVA_HOME=<the directory where is the JDK>
-goto end
 
- 
 :end

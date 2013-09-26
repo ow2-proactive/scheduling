@@ -2,6 +2,16 @@
 
 DIR=$(dirname $0)
 
+if [[ -z "$JAVA_HOME" ]]
+then
+    JAVA=java
+else
+    JAVA=$JAVA_HOME/bin/java
+fi
+
+# Check Java available
+$JAVA -version 2> /dev/null || echo "Java could not be found in your system, configure your PATH to find java executable or define JAVA_HOME environment variable"
+
 stop () {
 	echo "Error: $1";
 	echo "Use -h to print help";
@@ -35,7 +45,7 @@ mktemp_jruby() {
 	SUFFIX=".tmp"
 	export CLASSPATH=$DIR/../../dist/lib/jruby-1.7.4.jar
 	export CMD="f=Java::java.io.File.createTempFile(Java::java.lang.String.new(\"$PREFIX\"),Java::java.lang.String.new(\"$SUFFIX\"));Java::java.lang.System.out.println(f)"
-	$JAVA_HOME/bin/java -cp $CLASSPATH org.jruby.Main -e $CMD
+	$JAVA -cp $CLASSPATH org.jruby.Main -e $CMD
 }
 
 mktemp_dir_jruby() {
@@ -43,7 +53,7 @@ mktemp_dir_jruby() {
 	SUFFIX=".tmp"
 	export CLASSPATH=$DIR/../../dist/lib/jruby-1.7.4.jar
 	export CMD="f=Java::java.io.File.createTempFile(Java::java.lang.String.new(\"$PREFIX\"),Java::java.lang.String.new(\"$SUFFIX\"));f.delete();f.mkdir();Java::java.lang.System.out.println(f)"
-	$JAVA_HOME/bin/java -cp $CLASSPATH org.jruby.Main -e $CMD
+	$JAVA -cp $CLASSPATH org.jruby.Main -e $CMD
 }
 
 VERBOSE=true
@@ -180,8 +190,6 @@ if [ $SCHED ]; then
 	APPS="$APPS $SCHED_DIR"
 fi
 
-
-JAVA=$JAVA_HOME/bin/java
 
 CP=$DIR/../../dist/lib/*
 

@@ -8,16 +8,15 @@ CLASSPATH=.
 
 # ----------------------------------------------------------------------------
 
-JAVA_HOME=${JAVA_HOME-NULL};
-if [ "$JAVA_HOME" = "NULL" ]
+if [ -z "$JAVA_HOME"" ]
 then
-echo
-echo "The environment variable JAVA_HOME must be set the current jdk distribution"
-echo "installed on your computer."
-echo "Use "
-echo "    export JAVA_HOME=<the directory where is the JDK>"
-exit 127
+    JAVA=java
+else
+    JAVA=$JAVA_HOME/bin/java
 fi
+
+# Check Java available
+$JAVA -version 2> /dev/null || echo "Java could not be found in your system, configure your PATH to find java executable or define JAVA_HOME environment variable"
 
 #set Scheduler install directory env var
 
@@ -26,8 +25,8 @@ PA_SCHEDULER=$(cd $workingDir/../.././ || (echo "Broken Scheduler/Resource Manag
 print_jars() {
     # jruby.jar is put in front because jline internal package is used in the command-line interpreters
     (
-        find "$1" -name "jruby.jar"
-        find "$1" -name "*.jar" | grep -v jruby.jar
+        find "$1" -name "jruby-1.7.4.jar"
+        find "$1" -name "*.jar" | grep -v jruby-1.7.4.jar
     ) | while read jar; do
         printf "%s:" "$jar"
     done
@@ -95,7 +94,7 @@ fi
 #Enabling custom clients policy security debug (normally is enough to debug client's permissions)
 #POLICY_DEBUG="-Djava.security.debug=clients"
 
-JAVACMD=($JAVA_HOME/bin/java -Djava.security.manager -Dproactive.configuration="$PA_SCHEDULER/config/proactive/ProActiveConfiguration.xml" -Djava.security.policy="$JAVA_POLICY" $POLICY_DEBUG -Dlog4j.configuration="$LOG4J_FILE" -Dproactive.home="$PA_SCHEDULER" -Dpa.scheduler.home="$PA_SCHEDULER" -Dpa.rm.home="$PA_SCHEDULER")
+JAVACMD=($JAVA -Djava.security.manager -Dproactive.configuration="$PA_SCHEDULER/config/proactive/ProActiveConfiguration.xml" -Djava.security.policy="$JAVA_POLICY" $POLICY_DEBUG -Dlog4j.configuration="$LOG4J_FILE" -Dproactive.home="$PA_SCHEDULER" -Dpa.scheduler.home="$PA_SCHEDULER" -Dpa.rm.home="$PA_SCHEDULER")
 
 export PA_SCHEDULER
 export JAVACMD
