@@ -160,7 +160,8 @@ public class TestDataspaceScripts extends SchedulerConsecutive {
         t.addInputFiles(fileName, InputAccessMode.TransferFromInputSpace);
 
         File results = org.ow2.proactive.utils.FileUtils.createTempDirectory("test", ".results", null);
-        String scriptContentFiltered = scriptContent.replaceAll(folderMacro, results.getAbsolutePath());
+        String windowsReadyResultsPath = results.getAbsolutePath().replace("\\", "\\\\");
+        String scriptContentFiltered = scriptContent.replaceAll(folderMacro, windowsReadyResultsPath);
 
         t.setPreScript(new SimpleScript(scriptContentFiltered.replaceAll(typeMacro, "pre"), "javascript"));
         t.setPostScript(new SimpleScript(scriptContentFiltered.replaceAll(typeMacro, "post"), "javascript"));
