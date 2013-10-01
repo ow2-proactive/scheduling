@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="urn:proactive:jobdescriptor:3.0" xmlns:jd="urn:proactive:jobdescriptor:3.0">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="urn:proactive:jobdescriptor:3.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jd="urn:proactive:jobdescriptor:3.0">
+  <xs:import namespace="http://www.w3.org/2001/XMLSchema-instance" schemaLocation="xsi.xsd"/>
   <xs:element name="job">
     <xs:annotation>
       <xs:documentation>Definition of a job for the scheduler</xs:documentation>
@@ -60,6 +61,7 @@
           <xs:union memberTypes="xs:anyURI jd:variableRefType"/>
         </xs:simpleType>
       </xs:attribute>
+      <xs:attribute ref="xsi:schemaLocation"/>
     </xs:complexType>
   </xs:element>
   <xs:attributeGroup name="jobName">

@@ -51,7 +51,12 @@
           <data type="anyURI"/>
         </attribute>
       </optional>
-      <ref name="taskFlow"/>
+      <choice>
+        <ref name="taskFlow"/>
+        <oneOrMore>
+          <ref name="task"/>
+        </oneOrMore>
+      </choice>
     </element>
   </define>
   <define name="jobName">

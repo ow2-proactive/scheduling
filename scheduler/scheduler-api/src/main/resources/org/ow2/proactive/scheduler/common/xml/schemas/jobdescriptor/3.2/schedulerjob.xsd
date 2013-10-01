@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="urn:proactive:jobdescriptor:3.2" xmlns:jd="urn:proactive:jobdescriptor:3.2">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="urn:proactive:jobdescriptor:3.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jd="urn:proactive:jobdescriptor:3.2">
+  <xs:import namespace="http://www.w3.org/2001/XMLSchema-instance" schemaLocation="xsi.xsd"/>
   <xs:element name="job">
     <xs:annotation>
       <xs:documentation>Definition of a job for the scheduler </xs:documentation>
@@ -14,7 +15,10 @@
         <xs:element minOccurs="0" ref="jd:outputSpace"/>
         <xs:element minOccurs="0" ref="jd:globalSpace"/>
         <xs:element minOccurs="0" ref="jd:userSpace"/>
-        <xs:element ref="jd:taskFlow"/>
+        <xs:choice>
+          <xs:element ref="jd:taskFlow"/>
+          <xs:group maxOccurs="unbounded" ref="jd:task"/>
+        </xs:choice>
       </xs:sequence>
       <xs:attributeGroup ref="jd:jobName"/>
       <xs:attribute name="priority">
@@ -54,6 +58,7 @@
           <xs:documentation>Name of the project related to this job. It is also used in the policy to group some jobs together</xs:documentation>
         </xs:annotation>
       </xs:attribute>
+      <xs:attribute ref="xsi:schemaLocation"/>
     </xs:complexType>
   </xs:element>
   <xs:attributeGroup name="jobName">
