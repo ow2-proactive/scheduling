@@ -37,7 +37,9 @@
 package functionaltests.common;
 
 import java.net.URI;
+import java.util.Arrays;
 
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.remoteobject.AbstractRemoteObjectFactory;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectFactory;
 import org.objectweb.proactive.core.util.ProActiveInet;
@@ -55,17 +57,22 @@ public class CommonTUtils {
     }
 
     public static void cleanupActiveObjectRegistry(String... namesToRemove) throws Exception {
-        String url = "//" + ProActiveInet.getInstance().getHostname();
+        try {
+            String url = "//" + ProActiveInet.getInstance().getHostname();
 
-        RemoteObjectFactory factory = AbstractRemoteObjectFactory.getDefaultRemoteObjectFactory();
-        for (URI uri : factory.list(new URI(url))) {
-            for (String name : namesToRemove) {
-                if (uri.getPath().endsWith(name)) {
-                    System.out.println("Unregistering object with URI: " + uri);
-                    factory.unregister(uri);
-                    break;
+            RemoteObjectFactory factory = AbstractRemoteObjectFactory.getDefaultRemoteObjectFactory();
+            for (URI uri : factory.list(new URI(url))) {
+                for (String name : namesToRemove) {
+                    if (uri.getPath().endsWith(name)) {
+                        System.out.println("Unregistering object with URI: " + uri);
+                        factory.unregister(uri);
+                        break;
+                    }
                 }
             }
+        } catch (ProActiveException e) {
+            System.err.println(
+                    "Failed to cleanup active object registry for " + Arrays.toString(namesToRemove));
         }
     }
 
