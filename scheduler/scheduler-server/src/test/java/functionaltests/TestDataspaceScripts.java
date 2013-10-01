@@ -91,7 +91,7 @@ public class TestDataspaceScripts extends SchedulerConsecutive {
         +
         "  var br = new BufferedReader(new InputStreamReader(f.getContent().getInputStream())); \n" //
         +
-        "  var out = new PrintWriter(new BufferedWriter(new FileWriter(new File(new File(\""+folderMacro+"\"),\"out_" +
+        "  var out = new PrintWriter(new BufferedWriter(new FileWriter(new File(new File('"+folderMacro+"'),\"out_" +
         typeMacro +
         "_\"+spaces[i])))); \n" //
         + "  var line; \n" //
@@ -160,7 +160,7 @@ public class TestDataspaceScripts extends SchedulerConsecutive {
         t.addInputFiles(fileName, InputAccessMode.TransferFromInputSpace);
 
         File results = org.ow2.proactive.utils.FileUtils.createTempDirectory("test", ".results", null);
-        String windowsReadyResultsPath = results.getAbsolutePath().replace("\\", "\\\\");
+        String windowsReadyResultsPath = results.getAbsolutePath().replace("\\", "/"); // for the JS engine on Windows
         String scriptContentFiltered = scriptContent.replaceAll(folderMacro, windowsReadyResultsPath);
 
         t.setPreScript(new SimpleScript(scriptContentFiltered.replaceAll(typeMacro, "pre"), "javascript"));
