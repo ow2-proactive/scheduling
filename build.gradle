@@ -179,8 +179,14 @@ project('rm:rm-client') {
     task stub(type: StubTask) {
         classes = ['org.ow2.proactive.utils.NodeSet',
                 'org.ow2.proactive.resourcemanager.frontend.ResourceManager',
+                'org.ow2.proactive.resourcemanager.authentication.RMAuthentication',
+                'org.ow2.proactive.resourcemanager.common.event.RMInitialState',
+                'org.ow2.proactive.resourcemanager.common.RMState',
                 'org.ow2.proactive.resourcemanager.common.util.RMProxyUserInterface',
                 'org.ow2.proactive.resourcemanager.common.util.RMCachingProxyUserInterface',
+                'org.ow2.proactive.resourcemanager.frontend.topology.pinging.HostsPinger',
+                'org.ow2.proactive.resourcemanager.frontend.topology.pinging.NodesPinger',
+                'org.ow2.proactive.resourcemanager.frontend.topology.pinging.Pinger',
                 'org.ow2.proactive.resourcemanager.frontend.RMMonitoring']
     }
 }
@@ -350,25 +356,16 @@ project('rm:rm-server') {
 
     task stub(type: StubTask) {
         classes = [
-                'org.ow2.proactive.resourcemanager.common.event.RMInitialState',
-                'org.ow2.proactive.resourcemanager.authentication.RMAuthentication',
                 'org.ow2.proactive.resourcemanager.authentication.RMAuthenticationImpl',
-                'org.ow2.proactive.resourcemanager.frontend.RMMonitoring',
                 'org.ow2.proactive.resourcemanager.frontend.RMMonitoringImpl',
                 'org.ow2.proactive.resourcemanager.selection.statistics.ProbablisticSelectionManager',
                 'org.ow2.proactive.resourcemanager.nodesource.NodeSource',
                 'org.ow2.proactive.resourcemanager.nodesource.dataspace.DataSpaceNodeConfigurationAgent',
                 'org.ow2.proactive.resourcemanager.core.RMCore',
-                'org.ow2.proactive.resourcemanager.common.RMState',
                 'org.ow2.proactive.resourcemanager.nodesource.policy.NodeSourcePolicy',
-                'org.ow2.proactive.resourcemanager.common.util.RMProxyUserInterface',
-                'org.ow2.proactive.resourcemanager.common.util.RMCachingProxyUserInterface',
                 'org.ow2.proactive.resourcemanager.nodesource.RMNodeConfigurator',
                 'org.ow2.proactive.resourcemanager.utils.ClientPinger',
-                'org.ow2.proactive.resourcemanager.cleaning.NodesCleaner',
-                'org.ow2.proactive.resourcemanager.frontend.topology.pinging.HostsPinger',
-                'org.ow2.proactive.resourcemanager.frontend.topology.pinging.NodesPinger',
-                'org.ow2.proactive.resourcemanager.frontend.topology.pinging.Pinger'
+                'org.ow2.proactive.resourcemanager.cleaning.NodesCleaner'
         ]
     }
 
