@@ -46,6 +46,11 @@
       <optional>
         <ref name="projectName"/>
       </optional>
+      <optional>
+        <attribute name="xsi:schemaLocation">
+          <data type="anyURI"/>
+        </attribute>
+      </optional>
       <ref name="taskFlow"/>
     </element>
   </define>

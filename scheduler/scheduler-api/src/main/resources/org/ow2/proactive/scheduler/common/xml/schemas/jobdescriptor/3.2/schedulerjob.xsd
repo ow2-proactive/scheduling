@@ -15,10 +15,7 @@
         <xs:element minOccurs="0" ref="jd:outputSpace"/>
         <xs:element minOccurs="0" ref="jd:globalSpace"/>
         <xs:element minOccurs="0" ref="jd:userSpace"/>
-        <xs:choice>
-          <xs:element ref="jd:taskFlow"/>
-          <xs:group maxOccurs="unbounded" ref="jd:task"/>
-        </xs:choice>
+        <xs:element ref="jd:taskFlow"/>
       </xs:sequence>
       <xs:attributeGroup ref="jd:jobName"/>
       <xs:attribute name="priority">
@@ -58,6 +55,7 @@
           <xs:documentation>Name of the project related to this job. It is also used in the policy to group some jobs together</xs:documentation>
         </xs:annotation>
       </xs:attribute>
+      <xs:attribute ref="xsi:schemaLocation"/>
       <xs:attribute ref="xsi:schemaLocation"/>
     </xs:complexType>
   </xs:element>

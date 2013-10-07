@@ -6,7 +6,7 @@ start = job
 
 
 job = ## Definition of a job for the scheduler 
-    element job { variables?, jobDescription?, jobClasspath?, jobName , priority?, cancelJobOnError_j?, restartTaskOnError_j?, numberOfExecution_j?, genericInformation?, inputSpace?, outputSpace? ,globalSpace?, userSpace?, projectName?, attribute xsi:schemaLocation {xsd:anyURI}?, ( taskFlow | task+ ) }
+    element job { variables?, jobDescription?, jobClasspath?, jobName , priority?, cancelJobOnError_j?, restartTaskOnError_j?, numberOfExecution_j?, genericInformation?, inputSpace?, outputSpace? ,globalSpace?, userSpace?, projectName?, attribute xsi:schemaLocation {xsd:anyURI}?,( taskFlow ) }
 
 jobName = ## Identification of this job
     attribute name { xsd:string }

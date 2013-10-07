@@ -106,18 +106,18 @@ project(':scheduler:scheduler-api') {
     task convertSchemas
     ['3.0', '3.1', '3.2', 'dev'].each { schemaVersion ->
         task("convertSchemasXsd-$schemaVersion", type: org.hsudbrock.tranggradleplugin.TrangTask) {
-            sourceDirectory = new File("src/main/resources/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/${schemaVersion}")
+            sourceDirectory = project.file("src/main/resources/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/${schemaVersion}")
             targetDirectory = sourceDirectory
             doLast {
-                project.delete new File("src/main/resources/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/${schemaVersion}/xsi.xsd")
+                project.delete project.file("src/main/resources/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/${schemaVersion}/xsi.xsd")
             }
         }
         task("convertSchemasRng-$schemaVersion", type: org.hsudbrock.tranggradleplugin.TrangTask) {
-            sourceDirectory = new File("src/main/resources/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/${schemaVersion}")
+            sourceDirectory = project.file("src/main/resources/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/${schemaVersion}")
             targetDirectory = sourceDirectory
             targetExtension ='rng'
             doLast {
-                project.delete new File("src/main/resources/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/${schemaVersion}/xsi.xsd")
+                project.delete project.file("src/main/resources/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/${schemaVersion}/xsi.xsd")
             }
         }
         task("convertSchemas-$schemaVersion").dependsOn << ["convertSchemasXsd-$schemaVersion", "convertSchemasRng-$schemaVersion"]
