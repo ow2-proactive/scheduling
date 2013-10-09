@@ -36,6 +36,8 @@
  */
 package org.ow2.proactive.scheduler.common.job.factories;
 
+import static org.ow2.proactive.scheduler.common.util.VariablesUtil.filterAndUpdate;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -51,6 +53,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.zip.ZipFile;
 
@@ -59,6 +62,11 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.events.XMLEvent;
 
+import org.apache.log4j.Logger;
+import org.iso_relax.verifier.Schema;
+import org.iso_relax.verifier.Verifier;
+import org.iso_relax.verifier.VerifierConfigurationException;
+import org.iso_relax.verifier.VerifierFactory;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -79,7 +87,6 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
 import org.ow2.proactive.scheduler.common.task.flow.FlowBlock;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
-import org.ow2.proactive.scheduler.common.util.RegexpMatcher;
 import org.ow2.proactive.scheduler.common.util.ZipUtils;
 import org.ow2.proactive.scripting.GenerationScript;
 import org.ow2.proactive.scripting.Script;
@@ -89,11 +96,6 @@ import org.ow2.proactive.scripting.TaskScript;
 import org.ow2.proactive.topology.descriptor.ThresholdProximityDescriptor;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.Tools;
-import org.apache.log4j.Logger;
-import org.iso_relax.verifier.Schema;
-import org.iso_relax.verifier.Verifier;
-import org.iso_relax.verifier.VerifierConfigurationException;
-import org.iso_relax.verifier.VerifierFactory;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
@@ -110,10 +112,6 @@ import org.xml.sax.SAXParseException;
 public class JobFactory_stax extends JobFactory {
 
     public static Logger logger = Logger.getLogger(JobFactory_stax.class);
-
-    /** Variables pattern definition */
-    //private static final Pattern variablesPattern = Pattern.compile(".*\\$\\{[^\\}]+\\}.*", Pattern.DOTALL);
-    private static final String variablesPattern = "\\$\\{[^\\}]+\\}";
 
     /** XML input factory */
     private XMLInputFactory xmlif = null;
@@ -359,6 +357,7 @@ public class JobFactory_stax extends JobFactory {
             //replace variables in this attributes after job creation (after variables evaluation)
             job.setName(replace(job.getName()));
             job.setProjectName(replace(job.getProjectName()));
+            resolveCleaningScripts((TaskFlowJob) job, job.getVariables());
         } catch (JobCreationException jce) {
             if (XMLTags.TASK.matches(current)) {
                 jce.pushTag(XMLTags.TASKFLOW.getXMLName());
@@ -456,6 +455,7 @@ public class JobFactory_stax extends JobFactory {
             job.setOutputSpace(jtmp.getOutputSpace());
             job.setGlobalSpace(jtmp.getGlobalSpace());
             job.setUserSpace(jtmp.getUserSpace());
+            job.setVariables(this.variables);
         } catch (JobCreationException jce) {
             jce.pushTag(cursorJob.getLocalName());
             throw jce;
@@ -1160,7 +1160,7 @@ public class JobFactory_stax extends JobFactory {
                             }
                             //goto script content
                             if (cursorScript.next() == XMLEvent.CHARACTERS) {
-                                content = replace(cursorScript.getText());
+                                content = replace(cursorScript.getText(), true);
                             }
                             toReturn = new SimpleScript(content, language);
                         } else if (XMLTags.SCRIPT_FILE.matches(current)) {
@@ -1293,7 +1293,7 @@ public class JobFactory_stax extends JobFactory {
                     switch (eventType) {
                         case XMLEvent.START_ELEMENT:
                             if (XMLTags.SCRIPT_ARGUMENT.matches(cursorArgs.getLocalName())) {
-                                args.add(replace(cursorArgs.getAttributeValue(0)));
+                                args.add(replace(cursorArgs.getAttributeValue(0), true));
                             }
                             break;
                         case XMLEvent.END_ELEMENT:
@@ -1595,40 +1595,11 @@ public class JobFactory_stax extends JobFactory {
      * @throws JobCreationException if a Variable has not been found
      */
     private String replace(String str) throws JobCreationException {
-        if (str == null || "".equals(str)) {
-            return str;
-        }
-        str = str.trim();
-        //impl1 - do not search in System properties
-        //        if (!variables.isEmpty() && variablesPattern.matcher(str).matches()) {
-        //            for (Entry<String, String> e : variables.entrySet()) {
-        //                str = str.replaceAll("\\$\\{" + (String) e.getKey() + "\\}", (String) e.getValue());
-        //            }
-        //        }
-        //        return str;
-        //impl2 - also search in System properties
-        String[] strs = RegexpMatcher.matches(variablesPattern, str);
-        String replacement;
-        if (strs.length != 0) {
-            //for each entry
-            for (String s : strs) {
-                //remove ${ and }
-                s = s.substring(2, s.length() - 1);
-                //search the key (first in variables)
-                replacement = variables.get(s);
-                if (replacement == null) {
-                    //if not found in System properties
-                    replacement = System.getProperty(s);
-                }
-                if (replacement == null) {
-                    throw new IllegalArgumentException("Variable '" + s +
-                        "' not found in the definition (${" + s + "})");
-                }
-                replacement = replacement.replaceAll("\\\\", "\\\\\\\\");
-                str = str.replaceFirst("\\$\\{" + s + "\\}", replacement);
-            }
-        }
-        return str;
+        return replace(str, false);
+    }
+    
+    private String replace(String str, boolean dryRun) throws JobCreationException {
+        return filterAndUpdate(str, dryRun, this.variables);
     }
 
     /**
@@ -1813,5 +1784,13 @@ public class JobFactory_stax extends JobFactory {
             }
         }
     }
-
+    
+    private static void resolveCleaningScripts(TaskFlowJob job, Map<String,String> variables) {
+        for (Task task : job.getTasks()) {
+            Script<?> cScript = task.getCleaningScript();
+            if (cScript != null) {
+                filterAndUpdate(cScript, variables);
+            }
+        }
+    }
 }

@@ -37,6 +37,7 @@
 package org.ow2.proactive.scheduler.common.task.executable;
 
 import java.io.Serializable;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.objectweb.proactive.annotation.PublicAPI;
@@ -64,6 +65,8 @@ public abstract class Executable {
 
     /** execution progress value (between 0 and 100) */
     private final AtomicInteger progress = new AtomicInteger(0);
+    
+    private Map<String, Serializable> propagatedVariables;
 
     /**
      * The content of this method will be executed once after being scheduled.<br>
@@ -75,7 +78,8 @@ public abstract class Executable {
      * @return any serializable object from the user.
      */
     public abstract Serializable execute(TaskResult... results) throws Throwable;
-
+    
+    
     /**
      * Kill executable, terminate preemptively its execution.
      * Should be overridden to kill subprocesses if any. 
@@ -120,6 +124,16 @@ public abstract class Executable {
      */
     public int getProgress() {
         return this.progress.get();
+    }
+    
+    
+    public Map<String, Serializable> getVariables() {
+        return this.propagatedVariables;
+    }
+
+    public void setVariables(
+            Map<String, Serializable> propagatedVariables) {
+        this.propagatedVariables = propagatedVariables;
     }
 
 }

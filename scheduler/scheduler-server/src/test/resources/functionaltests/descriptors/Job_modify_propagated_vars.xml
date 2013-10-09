@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job xmlns="urn:proactive:jobdescriptor:dev" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="urn:proactive:jobdescriptor:dev ../../../src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.xsd"
+    name="job_propagate_vars" cancelJobOnError="false" priority="normal">
+    <variables>
+        <variable name="var" value="var-value" />
+    </variables>
+    <description>PropagateVariables</description>
+    <taskFlow>
+        <task name="task1" preciousResult="true">
+            <pre>
+                <script>
+                    <code language="javascript">
+                        if ('var-value' != '${var}') {
+                            throw 'Incorrect variable value (\'var\'): \'${var}\', expected \'var-value\'.';
+                        }
+                        if ('var-value' != variables.get('var')) {
+                            throw 'Incorrect variable value (\'var\') in variables map: \'' + variables.get('var') + '\', expected \'var-value\'.'; 
+                        }
+                        variables.put('var','pre-script-1');
+                    </code>
+                </script>
+            </pre>
+            <javaExecutable class="functionaltests.executables.ModifyPropagatedVariablesExec">
+                <parameters>
+                    <parameter name="var" value="${var}" />
+                </parameters>
+            </javaExecutable>
+            <post>
+                <script>
+                    <code language="javascript">
+                        if ('propagate-var-exec2' != '${var}') {
+                            throw 'Incorrect variable value (\'var\'): \'${var}\', expected \'propagate-var-exec2\'';
+                        }
+                        if ('propagate-var-exec2' != variables.get('var')) {
+                            throw 'Incorrect variable value (\'var\') in variables map: \'' + variables.get('var') + '\', expected \'propagate-var-exec2\''; 
+                        }
+                        variables.put('var','post-script-1');
+                    </code>
+                </script>
+            </post>
+        </task>
+        <task name="task2" preciousResult="true">
+            <depends>
+                <task ref="task1" />
+            </depends>
+            <scriptExecutable>
+                <script>
+                    <code language="javascript">
+                        if ('post-script-1' != '${var}') {
+                            throw 'Incorrect variable value (\'var\'): \'${var}\', expected \'post-script-1\'.';
+                        }
+                        if ('post-script-1' != variables.get('var')) {
+                            throw 'Incorrect variable value (\'var\') in variables map: ' + variables.get('var') + '\', expected \'post-script-1\'.'; 
+                        }
+                    </code>
+                </script>
+            </scriptExecutable>
+        </task>
+    </taskFlow>
+</job>

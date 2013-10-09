@@ -45,8 +45,11 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.exception.ForkedJavaTaskException;
+import org.ow2.proactive.scheduler.common.task.JavaExecutableInitializer;
 import org.ow2.proactive.scheduler.common.task.SimpleTaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
+import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
 import org.ow2.proactive.scheduler.exception.ForkedJVMProcessException;
 import org.ow2.proactive.scheduler.exception.IllegalProgressException;
 import org.ow2.proactive.scheduler.exception.ProgressPingerException;
@@ -107,9 +110,13 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher implements ForkerSt
             // create the executable (will set the context class loader to the taskclassserver)
             currentExecutable = executableContainer.getExecutable();
 
+            updatePropagatedVariables(results);
+            
             //init task
             ForkedJavaExecutableInitializer fjei = (ForkedJavaExecutableInitializer) executableContainer
                     .createExecutableInitializer();
+            setPropagatedVariables((JavaExecutableInitializer) fjei,
+                    getPropagatedVariables());
             replaceIterationTags(fjei);
             fjei.setJavaTaskLauncherInitializer(initializer);
             //decrypt credentials if needed
@@ -149,6 +156,10 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher implements ForkerSt
             Serializable userResult;
             try {
                 userResult = currentExecutable.execute(results);
+                // update propagated variables map after task execution, but
+                // before post script execution
+                setPropagatedVariables(((JavaExecutable) currentExecutable)
+                        .getVariables());
             } catch (Throwable t) {
                 throw t;
             } finally {

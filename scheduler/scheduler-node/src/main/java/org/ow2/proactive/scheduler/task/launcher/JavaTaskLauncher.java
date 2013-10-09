@@ -60,6 +60,7 @@ import org.ow2.proactive.scheduler.common.task.JavaExecutableInitializer;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
+import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 
@@ -118,6 +119,8 @@ public class JavaTaskLauncher extends TaskLauncher {
             initDataSpaces();
             replaceTagsInDataspaces();
 
+            updatePropagatedVariables(results);            
+
             sample = System.nanoTime();
             //copy datas from OUTPUT or INPUT to local scratch
             copyInputDataToScratch();
@@ -142,7 +145,10 @@ public class JavaTaskLauncher extends TaskLauncher {
             if (!hasBeenKilled) {
                 //init task
                 ExecutableInitializer initializer = executableContainer.createExecutableInitializer();
+                setPropagatedVariables((JavaExecutableInitializer) initializer,
+                        getPropagatedVariables());
                 replaceIterationTags(initializer);
+
                 // if an exception occurs in init method, unwrapp the InvocationTargetException
                 // the result of the execution is the user level exception
                 try {
@@ -154,6 +160,11 @@ public class JavaTaskLauncher extends TaskLauncher {
                 try {
                     //launch task
                     userResult = currentExecutable.execute(results);
+                    // update propagated variables map after task execution so
+                    // that any updates that occur during task execution will be
+                    // visible in post script execution.
+                    setPropagatedVariables(((JavaExecutable) currentExecutable)
+                            .getVariables());
                 } catch (Throwable t) {
                     exception = t;
                 }
@@ -203,6 +214,7 @@ public class JavaTaskLauncher extends TaskLauncher {
                     res.setAction(FlowAction.getDefaultAction(this.flow));
                 }
                 res.setPropagatedProperties(retreivePropagatedProperties());
+                attachPropagatedVariables(res);
                 res.setLogs(this.getLogs());
             } else {
                 res = null;
@@ -222,6 +234,12 @@ public class JavaTaskLauncher extends TaskLauncher {
         return res;
     }
 
+    protected void setPropagatedVariables(JavaExecutableInitializer init,
+            Map<String, Serializable> variables) {
+        init.setPropagatedVariables(SerializationUtil
+                .serializeVariableMap(variables));
+    }
+    
     /**
      * Replaces iteration and replication index syntactic macros
      * in various string locations across the task descriptor

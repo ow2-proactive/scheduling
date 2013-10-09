@@ -56,6 +56,7 @@ import org.ow2.proactive.resourcemanager.frontend.topology.TopologyDisabledExcep
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.util.VariablesUtil;
 import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.core.rmproxies.RMProxiesManager;
@@ -73,6 +74,7 @@ import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
 import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.TaskLogger;
 import org.ow2.proactive.scripting.ScriptException;
+import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.threading.TimeoutThreadPoolExecutor;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.Criteria;
@@ -369,7 +371,11 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
             try {
                 Criteria criteria = new Criteria(neededResourcesNumber);
                 criteria.setTopology(descriptor);
-                criteria.setScripts(internalTask.getSelectionScripts());
+                // resolve script variables (if any) in the list of selection
+                // scripts and then set it as the selection criteria.
+                criteria.setScripts(resolveScriptVariables(
+                        internalTask.getSelectionScripts(),
+                        currentJob.getVariables()));
                 criteria.setBlackList(internalTask.getNodeExclusion());
                 criteria.setBestEffort(bestEffort);
 
@@ -519,5 +525,20 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
     private SchedulerDBManager getDBManager() {
         return schedulingService.getInfrastructure().getDBManager();
+    }
+    
+    /*
+     * Replace selection script variables with values specified in the map.
+     */
+    private List<SelectionScript> resolveScriptVariables(
+            List<SelectionScript> selectionScripts,
+            Map<String, String> variables) {
+        if (selectionScripts == null) {
+            return null;
+        }
+        for (SelectionScript script : selectionScripts) {
+            VariablesUtil.filterAndUpdate(script, variables);
+        }
+        return selectionScripts;
     }
 }

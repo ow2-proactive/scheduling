@@ -132,6 +132,10 @@ public interface TaskResult extends Serializable {
      * @see org.ow2.proactive.scripting.PropertyUtils
      * @return a map containing all the java properties that has been propagated by this task,
      * null if no property has been propagated
+     * @deprecated Use {@link #getPropagatedVariables()} instead.
      */
     public Map<String, String> getPropagatedProperties();
+    
+    
+    public Map<String, byte[]> getPropagatedVariables();
 }

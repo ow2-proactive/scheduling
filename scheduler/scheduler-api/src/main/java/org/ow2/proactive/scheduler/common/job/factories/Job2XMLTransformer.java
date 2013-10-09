@@ -175,6 +175,12 @@ public class Job2XMLTransformer {
         setAttribute(rootJob, XMLAttributes.COMMON_RESTARTTASKONERROR, job.getRestartTaskOnError().toString());
 
         // *** elements ***
+        
+        // <ref name="variables"/>
+        if (job.getVariables() != null && !job.getVariables().isEmpty()) {
+            Element variablesE = createVariablesElement(doc, job.getVariables());
+            rootJob.appendChild(variablesE);
+        }
 
         // <ref name="jobDescription"/>
         if (job.getDescription() != null) {
@@ -269,6 +275,23 @@ public class Job2XMLTransformer {
             el.appendChild(pathEntry);
         }
         return el;
+    }
+    
+    /*
+     * Creates the variables element
+     */
+    private Element createVariablesElement(Document doc, Map<String, String> variables) {
+        if (variables == null) {
+            return null;
+        }
+        Element variablesE = doc.createElement(XMLTags.VARIABLES.getXMLName());
+        for (String name : variables.keySet()) {
+            Element variableE = createElement(doc, XMLTags.VARIABLE.getXMLName(), null, new Attribute(
+                XMLAttributes.COMMON_NAME.getXMLName(), name), new Attribute(XMLAttributes.COMMON_VALUE
+                    .getXMLName(), variables.get(name)));
+            variablesE.appendChild(variableE);
+        }
+        return variablesE;
     }
 
     /**

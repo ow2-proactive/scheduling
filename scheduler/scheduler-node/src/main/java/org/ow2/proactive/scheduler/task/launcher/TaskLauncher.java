@@ -36,9 +36,14 @@
  */
 package org.ow2.proactive.scheduler.task.launcher;
 
+import static org.ow2.proactive.scheduler.common.task.util.SerializationUtil.deserializeVariableMap;
+import static org.ow2.proactive.scheduler.common.task.util.SerializationUtil.serializeVariableMap;
+import static org.ow2.proactive.scheduler.common.util.VariablesUtil.filterAndUpdate;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -157,6 +162,9 @@ public abstract class TaskLauncher {
     public static final String DS_OUTPUT_BINDING_NAME = "output";
     public static final String DS_GLOBAL_BINDING_NAME = "global";
     public static final String DS_USER_BINDING_NAME = "user";
+    
+    /** The name used to access propagated variables map */
+    public static final String VARIABLES_BINDING_NAME = "variables";
 
     private static final int KEY_SIZE = 1024;
 
@@ -269,6 +277,9 @@ public abstract class TaskLauncher {
 
     /** Will be replaced in file paths by the job id */
     protected static final String JOBID_INDEX_TAG = "$JID";
+    
+    /** Propagated variables map */
+    private Map<String, Serializable> propagatedVariables = new HashMap<String, Serializable>();
 
     /**
      * ProActive empty constructor.
@@ -298,6 +309,11 @@ public abstract class TaskLauncher {
         this.iterationIndex = initializer.getIterationIndex();
         this.storeLogs = initializer.isPreciousLogs();
         this.dataspacesStatus = new StringBuffer();
+        
+        // add job descriptor variables
+        if (initializer.getVariables() != null) {
+            this.propagatedVariables.putAll(initializer.getVariables());
+        }
         this.init();
     }
 
@@ -567,6 +583,16 @@ public abstract class TaskLauncher {
         }
     }
 
+    Map<String, byte[]> getPropagatedVariables(TaskResult[] incomingResults) {
+        Map<String, byte[]> variableMap = new HashMap<String, byte[]>();
+        for (TaskResult result : incomingResults) {
+            if (result.getPropagatedVariables() != null) {
+                variableMap.putAll(result.getPropagatedVariables());
+            }
+        }
+        return variableMap;
+    }
+
     /**
      * Extract name and value of all the properties that have been propagated during the execution
      * of this task launcher (on scripts and executable).
@@ -742,10 +768,14 @@ public abstract class TaskLauncher {
      * @throws UserException if an error occurred during the execution of the script
      */
     @SuppressWarnings("unchecked")
-    protected void executePreScript() throws ActiveObjectCreationException, NodeException, UserException {
+    protected void executePreScript()
+            throws ActiveObjectCreationException, NodeException, UserException {
+        // update script variables with updated values
+        filterAndUpdate(this.pre, this.propagatedVariables);
         replaceTagsInScript(pre);
         logger.info("Executing pre-script");
         ScriptHandler handler = ScriptLoader.createLocalHandler();
+        setPropagatedVariableBinding(this.propagatedVariables, handler);
         this.addDataspaceBinding(handler);
         ScriptResult<String> res = handler.handle((Script<String>) pre);
 
@@ -769,9 +799,12 @@ public abstract class TaskLauncher {
     @SuppressWarnings("unchecked")
     protected void executePostScript(boolean executionSucceed) throws ActiveObjectCreationException,
             NodeException, UserException {
+        // replace script variables with updated values
+        filterAndUpdate(this.post, this.propagatedVariables);
         replaceTagsInScript(post);
         logger.info("Executing post-script");
         ScriptHandler handler = ScriptLoader.createLocalHandler();
+        setPropagatedVariableBinding(this.propagatedVariables, handler);
         this.addDataspaceBinding(handler);
         handler.addBinding(EXECUTION_SUCCEED_BINDING_NAME, executionSucceed);
         ScriptResult<String> res = handler.handle((Script<String>) post);
@@ -793,9 +826,12 @@ public abstract class TaskLauncher {
      *      TaskResult#setAction(FlowAction) will NOT be called on res 
      */
     protected void executeFlowScript(TaskResult res) throws Throwable {
+        // replace script variables with updated values
+        filterAndUpdate(this.flow, this.propagatedVariables);
         replaceTagsInScript(flow);
         logger.info("Executing flow-script");
         ScriptHandler handler = ScriptLoader.createLocalHandler();
+        setPropagatedVariableBinding(this.propagatedVariables, handler);
         this.addDataspaceBinding(handler);
         handler.addBinding(FlowScript.resultVariable, res.value());
         ScriptResult<FlowAction> sRes = handler.handle(flow);
@@ -826,6 +862,15 @@ public abstract class TaskLauncher {
         script.addBinding(DS_OUTPUT_BINDING_NAME, this.OUTPUT);
         script.addBinding(DS_GLOBAL_BINDING_NAME, this.GLOBAL);
         script.addBinding(DS_USER_BINDING_NAME, this.USER);
+    }
+    
+    /*
+     * Sets the propagated variables map as a script binding called 'variables'.
+     */
+    private void setPropagatedVariableBinding(
+            Map<String, Serializable> propagatedVariables,
+            ScriptHandler scriptHandler) {
+        scriptHandler.addBinding(VARIABLES_BINDING_NAME, propagatedVariables);
     }
 
     /**
@@ -1732,4 +1777,31 @@ public abstract class TaskLauncher {
         // return URIBuilder.getHostNameorIP(ProActiveInet.getInstance().getInetAddress());
     }
 
+    /*
+     * Retrieve propagated variables from previous tasks (hooked in the task
+     * result object).
+     */
+    protected void updatePropagatedVariables(TaskResult... results)
+            throws Exception {
+        if (results != null && results.length > 0) {
+            Map<String, byte[]> variables = getPropagatedVariables(results);
+            this.propagatedVariables = deserializeVariableMap(variables);
+        }
+    }
+
+    protected void attachPropagatedVariables(TaskResultImpl resultImpl) {
+        if (this.propagatedVariables != null) {
+            resultImpl
+                    .setPropagatedVariables(serializeVariableMap(this.propagatedVariables));
+        }
+    }
+
+    protected Map<String, Serializable> getPropagatedVariables() {
+        return this.propagatedVariables;
+    }
+
+    protected void setPropagatedVariables(
+            Map<String, Serializable> propagatedVariables) {
+        this.propagatedVariables = propagatedVariables;
+    }
 }

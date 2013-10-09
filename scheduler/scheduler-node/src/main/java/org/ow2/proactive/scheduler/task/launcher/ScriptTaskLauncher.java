@@ -102,6 +102,8 @@ public class ScriptTaskLauncher extends TaskLauncher {
             //init dataspace
             initDataSpaces();
             replaceTagsInDataspaces();
+            
+            updatePropagatedVariables(results);
 
             sample = System.nanoTime();
             //copy datas from OUTPUT or INPUT to local scratch
@@ -183,6 +185,7 @@ public class ScriptTaskLauncher extends TaskLauncher {
                     res.setAction(FlowAction.getDefaultAction(this.flow));
                 }
                 res.setPropagatedProperties(retreivePropagatedProperties());
+                attachPropagatedVariables(res);
                 res.setLogs(this.getLogs());
             } else {
                 res = null;

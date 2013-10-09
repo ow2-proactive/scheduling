@@ -42,8 +42,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.objectweb.proactive.core.util.converter.ByteToObjectConverter;
 import org.objectweb.proactive.core.util.converter.ObjectToByteConverter;
+import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
 import org.ow2.proactive.scheduler.common.util.Object2ByteConverter;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher.OneShotDecrypter;
 import org.ow2.proactive.utils.NodeSet;
@@ -62,6 +62,9 @@ public class JavaExecutableInitializer implements ExecutableInitializer {
 
     /** Arguments of the java task */
     protected Map<String, byte[]> serializedArguments;
+    
+    /** Propagated variables from parent tasks */
+    private Map<String, byte[]> propagatedVariables;
 
     /**
      * Get the nodes list
@@ -88,14 +91,10 @@ public class JavaExecutableInitializer implements ExecutableInitializer {
      * @throws IOException if the deserialization of the value cannot be performed.
      * @throws ClassNotFoundException if the value's class cannot be loaded.
      */
-    public Map<String, Serializable> getArguments(ClassLoader cl) throws IOException, ClassNotFoundException {
-        final Map<String, Serializable> deserialized = new HashMap<String, Serializable>(
-            this.serializedArguments.size());
-        for (Entry<String, byte[]> e : this.serializedArguments.entrySet()) {
-            deserialized.put(e.getKey(), (Serializable) Object2ByteConverter.convertByte2Object(e.getValue(),
-                    cl));
-        }
-        return deserialized;
+    public Map<String, Serializable> getArguments(ClassLoader cl)
+            throws IOException, ClassNotFoundException {
+        return SerializationUtil.deserializeVariableMap(
+                this.serializedArguments, cl);
     }
 
     /**
@@ -114,18 +113,8 @@ public class JavaExecutableInitializer implements ExecutableInitializer {
      * @param arg de-serialized version of the argument
      */
     public void setArgument(String key, Serializable arg) {
-        if (key != null && key.length() > 255) {
-            throw new IllegalArgumentException("Key is too long, it must have 255 chars length max : " + key);
-        } else {
-            byte[] serialized = null;
-            try {
-                serialized = ObjectToByteConverter.ObjectStream.convert(arg);
-                this.serializedArguments.put(key, serialized);
-            } catch (IOException e) {
-                throw new IllegalArgumentException("Cannot add argument " + key, e);
-            }
-            this.serializedArguments.put(key, serialized);
-        }
+        SerializationUtil.serializeAndSetVariable(key, arg,
+                this.serializedArguments);
     }
 
     /**
@@ -150,5 +139,23 @@ public class JavaExecutableInitializer implements ExecutableInitializer {
     public void setDecrypter(OneShotDecrypter decrypter) {
         throw new RuntimeException("Should not be called in this context");
     }
+    
+    /**
+     * Sets the propagated variable map for the current Java task.
+     * 
+     * @param propagatedVariables
+     *            a map of propagated variables
+     */
+    public void setPropagatedVariables(Map<String, byte[]> propagatedVariables) {
+        this.propagatedVariables = propagatedVariables;
+    }
 
+    /**
+     * Returns the propagated variables map of the current Java task.
+     * 
+     * @return a map of variables
+     */
+    public Map<String, byte[]> getPropagatedVaraibles() {
+        return propagatedVariables;
+    }
 }

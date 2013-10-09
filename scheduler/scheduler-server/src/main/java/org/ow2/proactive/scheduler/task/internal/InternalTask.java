@@ -1026,6 +1026,7 @@ public abstract class InternalTask extends TaskState {
             tli.setWalltime(wallTime);
         }
         tli.setPreciousLogs(isPreciousLogs());
+        tli.setVariables(job.getVariables());
         return tli;
     }
 

@@ -36,6 +36,8 @@
  */
 package org.ow2.proactive.scheduler.task.launcher;
 
+import static org.ow2.proactive.scheduler.common.util.VariablesUtil.filterAndUpdate;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
@@ -43,7 +45,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
@@ -59,7 +63,7 @@ import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.NativeExecutable;
 import org.ow2.proactive.scheduler.task.NativeExecutableInitializer;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
-import org.apache.log4j.Logger;
+import org.ow2.proactive.scripting.GenerationScript;
 
 
 /**
@@ -88,6 +92,9 @@ public class NativeTaskLauncher extends TaskLauncher {
     private static final String PROACTIVE_HOME_TAG = "$" + PROACTIVE_HOME_VAR;
     private static String PROACTIVE_HOME = null;
     private static String JAVA_CMD = null;
+    
+    private static final String PROPAGATED_VARIABLE_PREFIX = "var_";
+
 
     static {
         JAVA_CMD = System.getProperty("java.home") + File.separator + "bin" + File.separator + "java" +
@@ -140,6 +147,8 @@ public class NativeTaskLauncher extends TaskLauncher {
             //init dataspace
             initDataSpaces();
             replaceTagsInDataspaces();
+            
+            updatePropagatedVariables(results);
 
             sample = System.nanoTime();
             //copy datas from OUTPUT or INPUT to local scratch
@@ -171,7 +180,14 @@ public class NativeTaskLauncher extends TaskLauncher {
                 ExecutableInitializer execInit = executableContainer.createExecutableInitializer();
                 replaceWorkingDirPathsTags(execInit);
                 replaceWorkingDirDSAllTags(execInit);
-                replaceTagsInScript(((NativeExecutableInitializer) execInit).getGenerationScript());
+                GenerationScript generationScript = ((NativeExecutableInitializer) execInit)
+                        .getGenerationScript();
+                if (generationScript != null) {
+                    replaceTagsInScript(generationScript);
+                    // replace script variables with updated values
+                    filterAndUpdate(generationScript, getPropagatedVariables());
+                }
+                
                 //decrypt credentials if needed
                 if (executableContainer.isRunAsUser()) {
                     decrypter.setCredentials(executableContainer.getCredentials());
@@ -201,6 +217,10 @@ public class NativeTaskLauncher extends TaskLauncher {
                         .getProperty("java.home"));
                 ((NativeExecutable) currentExecutable).addToEnvironmentVariables(PROACTIVE_HOME_VAR,
                         PROACTIVE_HOME);
+                
+                this.setPropagatedVariablesAsEnvironmentVariables(
+                        getPropagatedVariables(),
+                        (NativeExecutable) currentExecutable);
 
                 sample = System.nanoTime();
                 try {
@@ -450,5 +470,16 @@ public class NativeTaskLauncher extends TaskLauncher {
             }
         }
     }
-
+    
+    private void setPropagatedVariablesAsEnvironmentVariables(
+            Map<String, Serializable> propagatedVariables,
+            NativeExecutable executable) throws IOException,
+            ClassNotFoundException {
+        for (String key : propagatedVariables.keySet()) {
+            Serializable serializable = propagatedVariables.get(key);
+            executable.addToEnvironmentVariables(PROPAGATED_VARIABLE_PREFIX
+                    + key,
+                    ((serializable == null) ? "" : serializable.toString()));
+        }
+    }
 }

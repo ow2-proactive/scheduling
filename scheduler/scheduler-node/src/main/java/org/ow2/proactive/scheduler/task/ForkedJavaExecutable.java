@@ -36,6 +36,8 @@
  */
 package org.ow2.proactive.scheduler.task;
 
+import static org.ow2.proactive.scheduler.common.util.VariablesUtil.filterAndUpdate;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -71,6 +73,8 @@ import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
+import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
+import org.ow2.proactive.scheduler.common.util.VariablesUtil;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
 import org.ow2.proactive.scheduler.exception.StartForkedProcessException;
@@ -135,7 +139,7 @@ public class ForkedJavaExecutable extends JavaExecutable implements ForkerStarte
     private Process process = null;
     private Node forkedNode = null;
     private Boolean processStarted = false;
-
+    
     /** Hibernate default constructor */
     public ForkedJavaExecutable() {
     }
@@ -340,6 +344,10 @@ public class ForkedJavaExecutable extends JavaExecutable implements ForkerStarte
         ForkEnvironment fe = this.execInitializer.getForkEnvironment();
         if (fe != null && fe.getEnvScript() != null) {
             logger.info("Executing env-script");
+            Script<String> envScript = (Script<String>) fe.getEnvScript();
+            // resolve any variables in the environment setup script
+            filterAndUpdate(envScript, getVariables());
+
             ScriptHandler handler = ScriptLoader.createLocalHandler();
             handler.addBinding(FORKENV_BINDING_NAME, fe);
 
@@ -349,7 +357,7 @@ public class ForkedJavaExecutable extends JavaExecutable implements ForkerStarte
             handler.addBinding(TaskLauncher.DS_OUTPUT_BINDING_NAME, this.execInitializer.getOutput());
             handler.addBinding(TaskLauncher.DS_GLOBAL_BINDING_NAME, this.execInitializer.getGlobal());
 
-            ScriptResult<String> res = handler.handle((Script<String>) fe.getEnvScript());
+            ScriptResult<String> res = handler.handle(envScript);
             //result
             if (res.errorOccured()) {
                 res.getException().printStackTrace();
@@ -374,10 +382,14 @@ public class ForkedJavaExecutable extends JavaExecutable implements ForkerStarte
      * We need to set deployment ID. The new JVM will register itself in the current JVM.
      * The current JVM will recognize it by this deployment ID.
      */
-    private void init() {
+    private void init() throws Exception {
         Random random = new Random((new Date()).getTime());
         long deploymentID = random.nextInt(1000000);
         forkedNodeName = "f" + deploymentID;
+        Map<String, Serializable> propagatedVariables = SerializationUtil
+                .deserializeVariableMap(this.execInitializer
+                        .getPropagatedVaraibles());
+        setVariables(propagatedVariables);
     }
 
     /**
@@ -846,7 +858,5 @@ public class ForkedJavaExecutable extends JavaExecutable implements ForkerStarte
                 }
             };
         }
-
     }
-
 }

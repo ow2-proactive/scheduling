@@ -520,5 +520,4 @@ public class NativeExecutable extends Executable {
         //in any case, return the up-to-date progress
         return super.getProgress();
     }
-
 }

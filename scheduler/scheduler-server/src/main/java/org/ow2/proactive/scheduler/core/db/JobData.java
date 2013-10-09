@@ -45,6 +45,8 @@ public class JobData {
     private Credentials credentials;
 
     private Map<String, String> genericInformation;
+    
+    private Map<String, String> variables;
 
     private String[] classpath;
 
@@ -128,6 +130,7 @@ public class JobData {
         internalJob.setCredentials(getCredentials());
         internalJob.setJobInfo(jobInfo);
         internalJob.setGenericInformations(getGenericInformation());
+        internalJob.setVariables(getVariables());
         internalJob.setProjectName(getProjectName());
         internalJob.setOwner(getOwner());
         internalJob.setDescription(getDescription());
@@ -158,6 +161,7 @@ public class JobData {
         jobRuntimeData.setGlobalSpace(job.getGlobalSpace());
         jobRuntimeData.setUserSpace(job.getUserSpace());
         jobRuntimeData.setGenericInformation(job.getGenericInformations(false));
+        jobRuntimeData.setVariables(job.getVariables());
         jobRuntimeData.setStatus(job.getStatus());
         jobRuntimeData.setOwner(job.getOwner());
         jobRuntimeData.setCredentials(job.getCredentials());
@@ -195,6 +199,17 @@ public class JobData {
     public void setGenericInformation(Map<String, String> genericInformation) {
         this.genericInformation = genericInformation;
     }
+    
+    @Column(name = "VARIABLES")
+    @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object"))
+    public Map<String, String> getVariables() {
+        return variables;
+    }
+
+    public void setVariables(Map<String, String> variables) {
+        this.variables = variables;
+    }
+
 
     @Column(updatable = false, name = "CLASSPATH_CRC")
     public long getClasspathCrc() {

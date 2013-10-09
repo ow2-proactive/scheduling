@@ -51,6 +51,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlTransient;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.converter.ByteToObjectConverter;
 import org.objectweb.proactive.core.util.converter.ObjectToByteConverter;
 import org.ow2.proactive.db.types.BigString;
@@ -63,7 +64,6 @@ import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
 import org.ow2.proactive.scheduler.common.task.util.ResultPreviewTool.SimpleTextPanel;
 import org.ow2.proactive.scheduler.util.classloading.TaskClassLoader;
 import org.ow2.proactive.utils.Formatter;
-import org.apache.log4j.Logger;
 
 
 /**
@@ -112,6 +112,20 @@ public class TaskResultImpl implements TaskResult {
 
     /** All the properties propagated through Exporter.propagateProperty() */
     private Map<String, BigString> propagatedProperties;
+    
+    /**
+     * A map which contains the propagated variables of the previous (dependent)
+     * tasks.
+     */
+    private Map<String, byte[]> propagatedVariables;
+    
+    public TaskResultImpl(TaskId id, byte[] serializedValue,
+            byte[] serializedException, TaskLogs output,
+            Map<String, String> propergatedProperties,
+            Map<String, byte[]> propagatedVariables) {
+        this(id, serializedValue, serializedException, output, propergatedProperties);
+        this.propagatedVariables = propagatedVariables;
+    }
 
     public TaskResultImpl(TaskId id, byte[] serializedValue, byte[] serializedException, TaskLogs output,
             Map<String, String> propagatedProperties) {
@@ -590,4 +604,21 @@ public class TaskResultImpl implements TaskResult {
             return convertedProperties;
         }
     }
+
+    /**
+     * Sets the propagated variables.
+     * 
+     * @param propagatedVariables a map of propagated variables
+     */
+    public void setPropagatedVariables(Map<String, byte[]> propagatedVariables) {
+        this.propagatedVariables =  propagatedVariables;
+    }
+    
+    /**
+     * Returns a map of propagated variables.
+     */
+    @Override
+    public Map<String, byte[]> getPropagatedVariables() {
+        return propagatedVariables;
+    }    
 }

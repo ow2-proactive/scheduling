@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job xmlns="urn:proactive:jobdescriptor:dev" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="urn:proactive:jobdescriptor:dev ../../../src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.xsd"
+    name="job_propagate_vars_on_unix" cancelJobOnError="false" priority="normal">
+    <variables>
+        <variable name="var" value="var-value" />
+    </variables>
+    <description>PropagateVariablesOnUnix</description>
+    <taskFlow>
+        <task name="task1" preciousResult="true">
+            <pre>
+                <script>
+                    <code language="javascript">
+                        if ('var-value' != '${var}') {
+                            throw 'Incorrect variable value (\'var\'): \'${var}\', expected \'var-value\'.';
+                        }
+                        if ('var-value' != variables.get('var')) {
+                            throw 'Incorrect variable value (\'var\') in variables map: \'' + variables.get('var') + '\', expected \'var-value\'.'; 
+                        }
+                        variables.put('var','pre-script-1');
+                    </code>
+                </script>
+            </pre>
+            <nativeExecutable>
+                <staticCommand value="${pa.scheduler.home}/scheduler/scheduler-server/build/resources/test/functionaltests/vars/test-vars.sh" />
+            </nativeExecutable>
+        </task>
+    </taskFlow>
+</job>

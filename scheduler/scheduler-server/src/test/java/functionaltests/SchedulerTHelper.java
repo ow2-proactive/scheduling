@@ -549,22 +549,31 @@ public class SchedulerTHelper {
         Scheduler userInt = getSchedulerInterface();
         userInt.removeJob(id);
     }
-
-    public static void testJobSubmissionAndVerifyAllResults(String jobDescPath) throws Throwable {
-        JobId id = testJobSubmission(jobDescPath, UserType.USER);
+    
+    public static void testJobSubmissionAndVerifyAllResults(String jobDescPath)
+            throws Throwable {
+        Job testJob = JobFactory.getFactory().createJob(jobDescPath);
+        testJobSubmissionAndVerifyAllResults(testJob, jobDescPath);
+    }
+    
+    public static void testJobSubmissionAndVerifyAllResults(Job testJob,
+            String jobDesc) throws Throwable {
+        JobId id = testJobSubmission(testJob, UserType.USER);
         // check result are not null
         JobResult res = SchedulerTHelper.getJobResult(id);
-        Assert
-                .assertFalse("Had Exception : " + jobDescPath, SchedulerTHelper.getJobResult(id)
-                        .hadException());
+        Assert.assertFalse("Had Exception : " + jobDesc, SchedulerTHelper
+                .getJobResult(id).hadException());
 
-        for (Map.Entry<String, TaskResult> entry : res.getAllResults().entrySet()) {
+        for (Map.Entry<String, TaskResult> entry : res.getAllResults()
+                .entrySet()) {
 
-            Assert.assertFalse("Had Exception (" + jobDescPath + ") : " + entry.getKey(), entry.getValue()
-                    .hadException());
+            Assert.assertFalse(
+                    "Had Exception (" + jobDesc + ") : " + entry.getKey(),
+                    entry.getValue().hadException());
 
-            Assert.assertNotNull("Result not null (" + jobDescPath + ") : " + entry.getKey(), entry
-                    .getValue().value());
+            Assert.assertNotNull(
+                    "Result not null (" + jobDesc + ") : " + entry.getKey(),
+                    entry.getValue().value());
         }
 
         SchedulerTHelper.removeJob(id);

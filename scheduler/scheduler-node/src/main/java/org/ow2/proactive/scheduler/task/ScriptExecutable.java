@@ -37,11 +37,13 @@
 package org.ow2.proactive.scheduler.task;
 
 import java.io.Serializable;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.ow2.proactive.scheduler.common.exception.UserException;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
+import org.ow2.proactive.scheduler.common.util.VariablesUtil;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
 import org.ow2.proactive.scripting.ScriptHandler;
 import org.ow2.proactive.scripting.ScriptLoader;
@@ -78,6 +80,13 @@ public class ScriptExecutable extends JavaExecutable {
 
         handler.addBinding(TaskScript.RESULTS_VARIABLE, results);
         handler.addBinding(TaskScript.PROGRESS_VARIABLE, progress);
+        
+        Map<String, Serializable> variables = getVariables();
+        handler.addBinding(TaskLauncher.VARIABLES_BINDING_NAME, variables);
+        String oldScript = script.getScript();
+        String resolvedScript = VariablesUtil.filterAndUpdate(oldScript, variables);
+        script.setScript(resolvedScript);
+        
         ScriptResult<Serializable> scriptResult = handler.handle(script);
 
         if (scriptResult.errorOccured()) {

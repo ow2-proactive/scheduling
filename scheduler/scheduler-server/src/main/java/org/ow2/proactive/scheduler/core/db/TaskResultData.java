@@ -44,6 +44,8 @@ public class TaskResultData {
     private String previewerClassName;
 
     private Map<String, String> propagatedProperties;
+    
+    private Map<String, byte[]> propagatedVariables;
 
     private FlowActionData flowAction;
 
@@ -52,7 +54,7 @@ public class TaskResultData {
     TaskResultImpl toTaskResult(TaskId taskId, String[] jobClasspath) {
 
         TaskResultImpl result = new TaskResultImpl(taskId, getSerializedValue(), getSerializedException(),
-            getLogs(), getPropagatedProperties());
+            getLogs(), getPropagatedProperties(), getPropagatedVariables());
 
         result.setPreviewerClassName(getPreviewerClassName());
         result.setJobClasspath(jobClasspath);
@@ -75,6 +77,7 @@ public class TaskResultData {
         resultData.setLogs(result.getOutput());
         resultData.setPreviewerClassName(result.getPreviewerClassName());
         resultData.setPropagatedProperties(result.getPropagatedProperties());
+        resultData.setPropagatedVariables(result.getPropagatedVariables());
         resultData.setSerializedException(result.getSerializedException());
         resultData.setSerializedValue(result.getSerializedValue());
         resultData.setResultTime(System.currentTimeMillis());
@@ -183,4 +186,13 @@ public class TaskResultData {
         this.propagatedProperties = propagatedProperties;
     }
 
+    @Column(name = "PROPAGATED_VARIABLES")
+    @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object"))
+    public Map<String, byte[]> getPropagatedVariables() {
+        return propagatedVariables;
+    }
+
+    public void setPropagatedVariables(Map<String, byte[]> executionVariables) {
+        this.propagatedVariables = executionVariables;
+    }
 }

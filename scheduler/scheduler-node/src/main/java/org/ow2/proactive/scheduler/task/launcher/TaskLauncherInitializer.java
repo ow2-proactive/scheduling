@@ -38,6 +38,7 @@ package org.ow2.proactive.scheduler.task.launcher;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
 import org.ow2.proactive.scheduler.common.task.TaskId;
@@ -85,6 +86,8 @@ public class TaskLauncherInitializer implements Serializable {
     private NamingService namingService;
     private String owner;
     private boolean preciousLogs;
+    
+    private Map<String, String> variables;
 
     /**
      * Get the taskId
@@ -342,5 +345,14 @@ public class TaskLauncherInitializer implements Serializable {
      */
     public void setPreciousLogs(boolean preciousLogs) {
         this.preciousLogs = preciousLogs;
+    }
+    
+    
+    public void setVariables(Map<String, String> variables) {
+        this.variables = variables;
+    }
+
+    public Map<String, String> getVariables() {
+        return this.variables;
     }
 }

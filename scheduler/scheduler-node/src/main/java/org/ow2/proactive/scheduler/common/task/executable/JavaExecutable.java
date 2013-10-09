@@ -37,6 +37,7 @@
 package org.ow2.proactive.scheduler.common.task.executable;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.Map;
@@ -52,6 +53,7 @@ import org.objectweb.proactive.extensions.dataspaces.exceptions.SpaceNotFoundExc
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.task.JavaExecutableInitializer;
 import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
+import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
 import org.ow2.proactive.utils.NodeSet;
 
@@ -71,7 +73,7 @@ public abstract class JavaExecutable extends Executable {
     // this value is set only on worker node side !!
     // see JavaTaskLauncher
     private JavaExecutableInitializer execInitializer;
-
+    
     /**
      * Initialize the executable using the given executable Initializer.
      *
@@ -84,7 +86,16 @@ public abstract class JavaExecutable extends Executable {
         this.execInitializer = execInitializer;
         // at this point, the context class loader is the TaskClassLoader
         // see JavaExecutableContainer.getExecutable()
-        init(execInitializer.getArguments(Thread.currentThread().getContextClassLoader()));
+        Map<String, Serializable> arguments = this.execInitializer.getArguments(Thread.currentThread()
+                .getContextClassLoader());
+        Map<String, Serializable> propagatedVariables = SerializationUtil
+                .deserializeVariableMap(execInitializer
+                        .getPropagatedVaraibles());
+        setVariables(propagatedVariables);
+        // update arguments
+        updateVariables(arguments, getVariables());
+        init(arguments);
+        
     }
 
     /**
@@ -394,5 +405,14 @@ public abstract class JavaExecutable extends Executable {
     public final int getReplicationIndex() {
         return Integer.parseInt(System.getProperty(TaskLauncher.SchedulerVars.JAVAENV_TASK_REPLICATION
                 .toString(), "0"));
+    }
+    
+    private void updateVariables(Map<String, Serializable> old,
+            Map<String, Serializable> updated) {
+        for (String k : old.keySet()) {
+            if (updated.containsKey(k)) {
+                old.put(k, updated.get(k));
+            }
+        }
     }
 }

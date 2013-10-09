@@ -37,11 +37,13 @@
 package unitTests;
 
 import java.io.File;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
+import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobType;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
@@ -54,6 +56,8 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 import org.junit.Assert;
 import org.junit.Test;
+
+import functionaltests.ScriptUpdateUtil;
 
 
 /**
@@ -81,8 +85,7 @@ public class TestJobFactory {
         String URLbegin = System.getProperty("pa.scheduler.home") + "/";
         System.setProperty("jobName", "Job_TaskFlow");
         log("Test Job TASKFLOW");
-        TaskFlowJob tfJob = (TaskFlowJob) JobFactory.getFactory(impl).createJob(
-                new File(jobTaskFlowDescriptor.toURI()).getAbsolutePath());
+        TaskFlowJob tfJob = getJob(jobTaskFlowDescriptor, impl);
         //Check job properties
         Assert.assertEquals(tfJob.getDescription(), "No paquit in its HostName.");
         Assert.assertEquals(tfJob.getName(), "Job_TaskFlow");
@@ -312,7 +315,7 @@ public class TestJobFactory {
         Assert.assertEquals(((NativeTask) tfJob.getTask("task4")).getWorkingDir(), "task4workingDir");
         Assert.assertEquals(((NativeTask) tfJob.getTask("task4")).getNumberOfNodesNeeded(), 10);
         Assert.assertEquals(((NativeTask) tfJob.getTask("task4")).getGenerationScript().getScript(),
-                "command=args[0]+\" 12\";\n");
+                "command=args[0]+\" 12\";");
         Assert.assertEquals(((NativeTask) tfJob.getTask("task4")).getGenerationScript().getParameters()[0],
                 URLbegin + "samples/jobs_descriptors/job_native_linux/nativTask");
         Assert.assertEquals(
@@ -320,8 +323,7 @@ public class TestJobFactory {
                     "samples/jobs_descriptors/job_native_linux/nativTask 12");
 
         log("Test Job MULTI_NODES");
-        TaskFlowJob mnJob = (TaskFlowJob) JobFactory.getFactory().createJob(
-                new File(jobMultiNodesDescriptor.toURI()).getAbsolutePath());
+        TaskFlowJob mnJob = getJob(jobMultiNodesDescriptor, impl);
         //Check job properties
         Assert.assertEquals(mnJob.getDescription(), "No description");
         Assert.assertEquals(mnJob.getName(), "job_multiNodes");
@@ -382,6 +384,13 @@ public class TestJobFactory {
 
     private void log(String s) {
         System.out.println("------------------------------ " + s);
+    }
+    
+    private TaskFlowJob getJob(URL jobDesc, String jobFacImpl)
+            throws JobCreationException, URISyntaxException {
+        return ScriptUpdateUtil.resolveScripts((TaskFlowJob) JobFactory
+                .getFactory(jobFacImpl).createJob(
+                        new File(jobDesc.toURI()).getAbsolutePath()));
     }
 
 }

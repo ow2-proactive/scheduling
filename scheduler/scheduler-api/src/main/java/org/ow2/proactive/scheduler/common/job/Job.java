@@ -37,6 +37,8 @@
 package org.ow2.proactive.scheduler.common.job;
 
 import java.net.MalformedURLException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
@@ -82,6 +84,9 @@ public abstract class Job extends CommonAttribute {
     protected String outputSpace = null;
     protected String globalSpace = null;
     protected String userSpace = null;
+    
+    /** A map to holds job descriptor variables */
+    protected Map<String, String> variables = new HashMap<String, String>();
 
     /** ProActive Empty Constructor */
     public Job() {
@@ -252,6 +257,24 @@ public abstract class Job extends CommonAttribute {
      */
     public void setUserSpace(String userSpace) {
         this.userSpace = userSpace;
+    }
+    
+    /**
+     * Sets the variable map for this job.
+     * 
+     * @param variables the variables map
+     */
+    public void setVariables(Map<String, String> variables) {
+        this.variables = variables;
+    }
+
+    /**
+     * Returns the variable map of this job.
+     * 
+     * @return a variable map
+     */
+    public Map<String, String> getVariables() {
+        return this.variables;
     }
 
 }
