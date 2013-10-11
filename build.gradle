@@ -484,6 +484,7 @@ task proActiveLibs(type: Copy) {
     into file("dist/lib")
 }
 defaultTasks 'proActiveLibs'
+task('build').dependsOn 'proActiveLibs'
 subprojects {
     tasks.withType(Test).matching { it.name == 'functionalTest' }*.dependsOn proActiveLibs
 }
