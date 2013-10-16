@@ -108,7 +108,7 @@ project(':rest-server') {
         options.classpath = options.docletpath
         options.doclet = "com.lunatech.doclets.jax.jaxrs.JAXRSDoclet"
     }
-    war.dependsOn jaxrsDoc
+    war.dependsOn jaxrsDoc, stub
 
     war {
         filesMatching('**/*.html') {
