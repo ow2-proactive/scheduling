@@ -64,6 +64,7 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobResultData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobStateData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobUsageData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobValidationData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.SchedulerStatusData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.SchedulerUserData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskResultData;
@@ -933,4 +934,17 @@ public interface SchedulerRestInterface {
     String jobid, @PathParam("taskname")
     String taskname) throws NotConnectedRestException, UnknownJobRestException, UnknownTaskRestException,
             PermissionRestException;
+    
+    
+    /**
+     * Validates a job.
+     * @param multipart a HTTP multipart form which contains the job-descriptor or the job archive file
+     * @return the result of job validation 
+     * 
+     */
+    @POST
+    @Path("validate")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces("application/json")
+    public abstract JobValidationData validate(MultipartFormDataInput multipart);
 }

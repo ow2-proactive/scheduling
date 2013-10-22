@@ -36,6 +36,8 @@
  */
 package org.ow2.proactive_grid_cloud_portal.scheduler;
 
+import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
@@ -75,6 +77,22 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.FileSystemException;
+import org.apache.commons.vfs2.FileSystemManager;
+import org.apache.commons.vfs2.FileType;
+import org.apache.commons.vfs2.Selectors;
+import org.apache.log4j.Logger;
+import org.dozer.DozerBeanMapper;
+import org.dozer.Mapper;
+import org.jboss.resteasy.annotations.GZIP;
+import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
+import org.jboss.resteasy.plugins.providers.multipart.InputPart;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
+import org.jboss.resteasy.util.GenericType;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
@@ -121,6 +139,7 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobInfoData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobResultData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobStateData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobUsageData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobValidationData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.SchedulerStatusData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.SchedulerUserData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskResultData;
@@ -137,22 +156,6 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestExc
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestException;
 import org.ow2.proactive_grid_cloud_portal.webapp.DateFormatter;
 import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.vfs2.FileObject;
-import org.apache.commons.vfs2.FileSystemException;
-import org.apache.commons.vfs2.FileSystemManager;
-import org.apache.commons.vfs2.FileType;
-import org.apache.commons.vfs2.Selectors;
-import org.apache.log4j.Logger;
-import org.dozer.DozerBeanMapper;
-import org.dozer.Mapper;
-import org.jboss.resteasy.annotations.GZIP;
-import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
-import org.jboss.resteasy.plugins.providers.multipart.InputPart;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
-import org.jboss.resteasy.util.GenericType;
 
 
 /**
@@ -2202,4 +2205,44 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             throw new NotConnectedRestException(e);
         }
     }
+
+	@Override
+	public JobValidationData validate(MultipartFormDataInput multipart) {
+		Exception error = null;
+		File tmpFile = null;
+		try {
+			Map<String, List<InputPart>> formDataMap = multipart
+					.getFormDataMap();
+			String name = formDataMap.keySet().iterator().next();
+			InputPart part1 = formDataMap.get(name).get(0);
+			InputStream is = part1.getBody(new GenericType<InputStream>() {
+			});
+			
+			tmpFile = File.createTempFile("valid-job", "d");
+			IOUtils.copy(is, new FileOutputStream(tmpFile));
+			
+			if (part1.getMediaType().toString().toLowerCase()
+					.contains(MediaType.APPLICATION_XML.toLowerCase())) {
+				JobFactory.getFactory().createJob(tmpFile.getAbsolutePath());
+			} else {
+				JobFactory.getFactory().createJobFromArchive(
+						tmpFile.getAbsolutePath());
+			}
+		} catch (Exception e) {
+			error = e;
+		} finally {
+			if (tmpFile != null) {
+				tmpFile.delete();
+			}
+		}
+		JobValidationData validation = new JobValidationData();
+		if (error == null) {
+			validation.setValid(true);
+		} else {
+			validation.setValid(false);
+			validation.setMessage(getStackTrace(error));
+		}
+		return validation;
+	}
+	
 }
