@@ -81,6 +81,12 @@ project(':rest-server') {
 
         runtime 'net.bull.javamelody:javamelody-core:1.46.0'
 
+        runtime 'org.objectweb.proactive:programming-extension-rmissl:5.5.0-SNAPSHOT'
+        runtime 'org.objectweb.proactive:programming-extension-pnp:5.5.0-SNAPSHOT'
+        runtime 'org.objectweb.proactive:programming-extension-pnpssl:5.5.0-SNAPSHOT'
+        runtime 'org.objectweb.proactive:programming-extension-amqp:5.5.0-SNAPSHOT'
+        runtime 'org.objectweb.proactive:programming-extension-pamr:5.5.0-SNAPSHOT'
+
         jaxDoclet 'com.lunatech.jax-doclets:doclets:0.10.1-proactive'
     }
 
