@@ -97,13 +97,12 @@ public class JobDataSpaceApplication implements Serializable {
                 } else {
                     String localpath = PASchedulerProperties.DATASPACE_DEFAULTINPUT_LOCALPATH
                             .getValueAsStringOrNull();
-                    String localPathWithUserDir = handleLocalFolder(localpath, true, username);
 
                     String hostname = PASchedulerProperties.DATASPACE_DEFAULTINPUT_HOSTNAME
                             .getValueAsStringOrNull();
-                    DataSpaceServiceStarter.createSpace(applicationId, PADataSpaces.DEFAULT_IN_OUT_NAME,
-                            PASchedulerProperties.DATASPACE_DEFAULTINPUT_URL.getValueAsString() + username,
-                            localPathWithUserDir, hostname, true, false);
+                    DataSpaceServiceStarter.createSpaceWithUserNameSubfolder(username, applicationId, PADataSpaces.DEFAULT_IN_OUT_NAME,
+                            PASchedulerProperties.DATASPACE_DEFAULTINPUT_URL.getValueAsString(),
+                            localpath, hostname, true, false);
                 }
                 // create OUTPUT space
                 if (outputURL != null) {
@@ -116,13 +115,12 @@ public class JobDataSpaceApplication implements Serializable {
                 } else {
                     String localpath = PASchedulerProperties.DATASPACE_DEFAULTOUTPUT_LOCALPATH
                             .getValueAsStringOrNull();
-                    String localPathWithUserDir = handleLocalFolder(localpath, true, username);
 
                     String hostname = PASchedulerProperties.DATASPACE_DEFAULTOUTPUT_HOSTNAME
                             .getValueAsStringOrNull();
-                    DataSpaceServiceStarter.createSpace(applicationId, PADataSpaces.DEFAULT_IN_OUT_NAME,
-                            PASchedulerProperties.DATASPACE_DEFAULTOUTPUT_URL.getValueAsString() + username,
-                            localPathWithUserDir, hostname, false, false);
+                    DataSpaceServiceStarter.createSpaceWithUserNameSubfolder(username, applicationId, PADataSpaces.DEFAULT_IN_OUT_NAME,
+                            PASchedulerProperties.DATASPACE_DEFAULTOUTPUT_URL.getValueAsString(),
+                            localpath, hostname, false, false);
                 }
                 // create GLOBAL shared space
                 if (globalURL != null) {
@@ -156,20 +154,12 @@ public class JobDataSpaceApplication implements Serializable {
                 } else {
                     String localpath = PASchedulerProperties.DATASPACE_DEFAULTUSER_LOCALPATH
                             .getValueAsStringOrNull();
-                    String localPathWithUserDir = handleLocalFolder(localpath, true, username);
 
                     String hostname = PASchedulerProperties.DATASPACE_DEFAULTUSER_HOSTNAME
                             .getValueAsStringOrNull();
-                    if (localpath != null) {
-                        localpath = localpath + File.separator + username;
-                        File localPathFile = new File(localpath);
-                        if (!localPathFile.exists()) {
-                            localPathFile.mkdirs();
-                        }
-                    }
-                    DataSpaceServiceStarter.createSpace(applicationId, SchedulerConstants.USERSPACE_NAME,
-                            PASchedulerProperties.DATASPACE_DEFAULTUSER_URL.getValueAsString() + username,
-                            localPathWithUserDir, hostname, false, false);
+
+                    DataSpaceServiceStarter.createSpaceWithUserNameSubfolder(username, applicationId, SchedulerConstants.USERSPACE_NAME,
+                            PASchedulerProperties.DATASPACE_DEFAULTUSER_URL.getValueAsString(), localpath, hostname, false, false);
                 }
                 alreadyRegistered = true;
             } catch (Exception e) {
