@@ -31,37 +31,19 @@ IF DEFINED CLASSPATHEXT (
 )
 
 rem Check if classes exists and is not empty
-IF EXIST "%PA_SCHEDULER%\classes\scheduler" ( 
-	SET CLASSPATH=%CLASSPATH%;%PA_SCHEDULER%\classes\common;%PA_SCHEDULER%\classes\resource-manager;%PA_SCHEDULER%\classes\scheduler
-	SET JARS=
-	rem ProActive.jar : Use jar index to avoid 'command too long'
-	SET JARS=!JARS!;%PA_SCHEDULER%\lib\ProActive\ProActive.jar
-	rem jruby.jar is put in front because jline internal package is used in the command-line interpreters
-	SET JARS=!JARS!;%PA_SCHEDULER%\lib\common\script\jruby-1.7.4.jar
-	rem Scheduler libraries
-	FOR %%j IN ("%PA_SCHEDULER%\lib\common\*.jar") DO SET JARS=!JARS!;%%j
-	FOR %%j IN ("%PA_SCHEDULER%\lib\common\script\*.jar") DO SET JARS=!JARS!;%%j
-	FOR %%j IN ("%PA_SCHEDULER%\lib\node\sigar\*.jar") DO SET JARS=!JARS!;%%j
-	FOR %%j IN ("%PA_SCHEDULER%\lib\nodesource\cron\*.jar") DO SET JARS=!JARS!;%%j
-	FOR %%j IN ("%PA_SCHEDULER%\lib\nodesource\ec2\*.jar") DO SET JARS=!JARS!;%%j
-	FOR %%j IN ("%PA_SCHEDULER%\lib\nodesource\winhpc\*.jar") DO SET JARS=!JARS!;%%j
-	rem hibernate libs
-	FOR %%j IN ("%PA_SCHEDULER%\lib\common\hibernate\annotation\*.jar") DO SET JARS=!JARS!;%%j
-	FOR %%j IN ("%PA_SCHEDULER%\lib\common\hibernate\core\*.jar") DO SET JARS=!JARS!;%%j
-	FOR %%j IN ("%PA_SCHEDULER%\addons\*.jar") DO SET JARS=!JARS!;%%j
-) ELSE (
-	rem Script engines must be added to classpath to be found
-	rem it must also placed before jars containing jar-index
-	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\jruby-1.7.4.jar
-	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\sigar\sigar.jar
-	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\jython-2.5.4-rc1.jar
-	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\groovy-all-2.1.6.jar
-	rem  Needed explicitly by VFS (file transfer in pre/post script
-	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\commons-logging-1.1.1.jar
-	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\commons-httpclient-3.1.jar
-	SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\*
-	FOR %%j IN ("%PA_SCHEDULER%\addons\*.jar") DO SET JARS=!JARS!;%%j
-)
+
+rem Script engines must be added to classpath to be found
+rem it must also placed before jars containing jar-index
+SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\jruby-1.7.4.jar
+SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\sigar\sigar.jar
+SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\jython-2.5.4-rc1.jar
+SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\groovy-all-2.1.6.jar
+rem  Needed explicitly by VFS (file transfer in pre/post script
+SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\commons-logging-1.1.1.jar
+SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\commons-httpclient-3.1.jar
+SET JARS=!JARS!;%PA_SCHEDULER%\dist\lib\*
+FOR %%j IN ("%PA_SCHEDULER%\addons\*.jar") DO SET JARS=!JARS!;%%j
+
 
 SET CLASSPATH=%CLASSPATH%;%JARS%;%PA_SCHEDULER%\addons
 

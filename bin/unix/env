@@ -36,36 +36,26 @@ print_jars() {
 # Set up the classpath using classes dir or jar files
 #
 # Check if classes exists and is not empty
-if [ -d "$PA_SCHEDULER/classes/scheduler" ]
-then
-    CLASSPATH=$CLASSPATH:"$PA_SCHEDULER/classes/common"
-    CLASSPATH=$CLASSPATH:"$PA_SCHEDULER/classes/resource-manager"
-    CLASSPATH=$CLASSPATH:"$PA_SCHEDULER/classes/scheduler"
-    CP=`print_jars "$PA_SCHEDULER/lib/"`
-    CLASSPATH=$CLASSPATH:$CP
-    CP=`print_jars "$PA_SCHEDULER/addons/"`
-    CLASSPATH=${CLASSPATH}${PA_SCHEDULER}/addons/:$CP
-else
-    # Script engines must be added to classpath to be found
-    # it must also placed before jars containing jar-index
-    CLASSPATH=$CLASSPATH:"$PA_SCHEDULER/dist/lib/sigar/sigar.jar"
-    CLASSPATH=$CLASSPATH:"$PA_SCHEDULER/dist/lib/jruby-1.7.4.jar"
-    CLASSPATH=$CLASSPATH:"$PA_SCHEDULER/dist/lib/jython-2.5.4-rc1.jar"
-    CLASSPATH=$CLASSPATH:"$PA_SCHEDULER/dist/lib/groovy-all-2.1.6.jar"
-    #  Needed explicitly by VFS (file transfer in pre/post script
-    CLASSPATH=$CLASSPATH:"$PA_SCHEDULER/dist/lib/commons-logging-1.1.1.jar"
-    CLASSPATH=$CLASSPATH:"$PA_SCHEDULER/dist/lib/commons-httpclient-3.1.jar"
-    # fill with ProActive.jar : use jar index for ProActive dependencies
-    CLASSPATH=$CLASSPATH:"$PA_SCHEDULER/dist/lib/ProActive.jar"
-    # fill with Scheduler jars : use jar index for Scheduler dependencies
-    CLASSPATH=$CLASSPATH:"$PA_SCHEDULER/dist/lib/ProActive_SRM-common.jar"
-    CLASSPATH=$CLASSPATH:"$PA_SCHEDULER/dist/lib/ProActive_ResourceManager.jar"
-    CLASSPATH=$CLASSPATH:"$PA_SCHEDULER/dist/lib/ProActive_Scheduler-core.jar"
-    CLASSPATH=$CLASSPATH:"$PA_SCHEDULER/dist/lib/ProActive_Scheduler-mapreduce.jar"
-    CLASSPATH=$CLASSPATH:"$PA_SCHEDULER/dist/lib/*"
-    CP=`print_jars "$PA_SCHEDULER/addons/"`
-    CLASSPATH=$CLASSPATH:$PA_SCHEDULER/addons/:$CP
-fi
+
+# Script engines must be added to classpath to be found
+# it must also placed before jars containing jar-index
+CLASSPATH=$CLASSPATH:"$PA_SCHEDULER/dist/lib/sigar/sigar.jar"
+CLASSPATH=$CLASSPATH:"$PA_SCHEDULER/dist/lib/jruby-1.7.4.jar"
+CLASSPATH=$CLASSPATH:"$PA_SCHEDULER/dist/lib/jython-2.5.4-rc1.jar"
+CLASSPATH=$CLASSPATH:"$PA_SCHEDULER/dist/lib/groovy-all-2.1.6.jar"
+#  Needed explicitly by VFS (file transfer in pre/post script
+CLASSPATH=$CLASSPATH:"$PA_SCHEDULER/dist/lib/commons-logging-1.1.1.jar"
+CLASSPATH=$CLASSPATH:"$PA_SCHEDULER/dist/lib/commons-httpclient-3.1.jar"
+# fill with ProActive.jar : use jar index for ProActive dependencies
+CLASSPATH=$CLASSPATH:"$PA_SCHEDULER/dist/lib/ProActive.jar"
+# fill with Scheduler jars : use jar index for Scheduler dependencies
+CLASSPATH=$CLASSPATH:"$PA_SCHEDULER/dist/lib/ProActive_SRM-common.jar"
+CLASSPATH=$CLASSPATH:"$PA_SCHEDULER/dist/lib/ProActive_ResourceManager.jar"
+CLASSPATH=$CLASSPATH:"$PA_SCHEDULER/dist/lib/ProActive_Scheduler-core.jar"
+CLASSPATH=$CLASSPATH:"$PA_SCHEDULER/dist/lib/ProActive_Scheduler-mapreduce.jar"
+CLASSPATH=$CLASSPATH:"$PA_SCHEDULER/dist/lib/*"
+CP=`print_jars "$PA_SCHEDULER/addons/"`
+CLASSPATH=$CLASSPATH:$PA_SCHEDULER/addons/:$CP
 
 export CLASSPATH
 
