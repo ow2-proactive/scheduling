@@ -41,7 +41,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 public class JobValidationData {
 	private boolean valid;
-	private String message;
+	private String taskName;
+	private String errorMessage;
 	
 	public JobValidationData() {
 	}
@@ -53,12 +54,20 @@ public class JobValidationData {
 	public void setValid(boolean valid) {
 		this.valid = valid;
 	}
-
-	public String getMessage() {
-		return message;
+	
+	public void setTaskName(String taskName) {
+		this.taskName = taskName;
+	}
+	
+	public String getTaskName() {
+		return taskName;
 	}
 
-	public void setMessage(String message) {
-		this.message = message;
+	public String getErrorMessage() {
+		return errorMessage;
+	}
+
+	public void setErrorMessage(String message) {
+		this.errorMessage = message;
 	}
 }

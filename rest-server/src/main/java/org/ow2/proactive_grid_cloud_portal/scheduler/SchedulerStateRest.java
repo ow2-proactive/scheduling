@@ -36,7 +36,9 @@
  */
 package org.ow2.proactive_grid_cloud_portal.scheduler;
 
+import static javax.ws.rs.core.MediaType.APPLICATION_XML_TYPE;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
+import static org.ow2.proactive_grid_cloud_portal.scheduler.ValidationUtil.validateJobDescriptor;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -2208,7 +2210,6 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
 	@Override
 	public JobValidationData validate(MultipartFormDataInput multipart) {
-		Exception error = null;
 		File tmpFile = null;
 		try {
 			Map<String, List<InputPart>> formDataMap = multipart
@@ -2217,32 +2218,23 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 			InputPart part1 = formDataMap.get(name).get(0);
 			InputStream is = part1.getBody(new GenericType<InputStream>() {
 			});
-			
+
 			tmpFile = File.createTempFile("valid-job", "d");
 			IOUtils.copy(is, new FileOutputStream(tmpFile));
-			
-			if (part1.getMediaType().toString().toLowerCase()
-					.contains(MediaType.APPLICATION_XML.toLowerCase())) {
-				JobFactory.getFactory().createJob(tmpFile.getAbsolutePath());
-			} else {
-				JobFactory.getFactory().createJobFromArchive(
-						tmpFile.getAbsolutePath());
-			}
+
+			return (APPLICATION_XML_TYPE.equals(part1.getMediaType())) ? validateJobDescriptor(tmpFile)
+					: ValidationUtil.validateJobArchive(tmpFile);
+
 		} catch (Exception e) {
-			error = e;
+			JobValidationData validation = new JobValidationData();
+			validation.setErrorMessage(getStackTrace(e));
+			return validation;
+
 		} finally {
 			if (tmpFile != null) {
 				tmpFile.delete();
 			}
 		}
-		JobValidationData validation = new JobValidationData();
-		if (error == null) {
-			validation.setValid(true);
-		} else {
-			validation.setValid(false);
-			validation.setMessage(getStackTrace(error));
-		}
-		return validation;
 	}
 	
 }
