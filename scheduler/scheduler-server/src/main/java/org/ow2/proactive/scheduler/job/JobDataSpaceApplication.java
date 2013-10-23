@@ -54,7 +54,6 @@ public class JobDataSpaceApplication implements Serializable {
     public static final Logger logger = Logger.getLogger(JobDataSpaceApplication.class);
 
     private long applicationId;
-    private String namingServiceURL;
     private NamingService namingService;
 
     private boolean alreadyRegistered = false;
@@ -64,10 +63,9 @@ public class JobDataSpaceApplication implements Serializable {
      *
      * @param applicationId the application Id associated to this job
      */
-    public JobDataSpaceApplication(long applicationId, NamingService namingService, String namingServiceURL) {
+    public JobDataSpaceApplication(long applicationId, NamingService namingService) {
         this.applicationId = applicationId;
         this.namingService = namingService;
-        this.namingServiceURL = namingServiceURL;
     }
 
     /**
@@ -198,7 +196,7 @@ public class JobDataSpaceApplication implements Serializable {
      *
      * @return the namingServiceURL
      */
-    public String getNamingServiceURL() {
-        return namingServiceURL;
+    public NamingService getNamingServiceStub() {
+        return namingService;
     }
 }

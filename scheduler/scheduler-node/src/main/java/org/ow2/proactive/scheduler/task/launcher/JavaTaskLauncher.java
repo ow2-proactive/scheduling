@@ -46,6 +46,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.ImmediateService;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.mop.StubObject;
@@ -61,7 +62,6 @@ import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
-import org.apache.log4j.Logger;
 
 
 /**
@@ -264,7 +264,7 @@ public class JavaTaskLauncher extends TaskLauncher {
                 //else use the property
                 scratchDir = System.getProperty(NODE_DATASPACE_SCRATCHDIR);
             }
-            final BaseScratchSpaceConfiguration scratchConf = new BaseScratchSpaceConfiguration(null,
+            final BaseScratchSpaceConfiguration scratchConf = new BaseScratchSpaceConfiguration((String) null,
                 scratchDir);
             DataSpacesNodes.configureNode(PAActiveObject.getActiveObjectNode(PAActiveObject.getStubOnThis()),
                     scratchConf);

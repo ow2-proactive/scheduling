@@ -130,7 +130,7 @@ public class TestDataSpaceConfiguration {
         NamingService namingService = dsServiceStarter.getNamingService();
 
         JobDataSpaceApplication jdsa = new JobDataSpaceApplication(appid,
-            dsServiceStarter.getNamingService(), dsServiceStarter.getNamingServiceURL());
+            dsServiceStarter.getNamingService());
         jdsa.startDataSpaceApplication(null, null, null, null, username, null);
 
         DataSpacesNodes.configureApplication(PAActiveObject.getNode(), appid, dsServiceStarter

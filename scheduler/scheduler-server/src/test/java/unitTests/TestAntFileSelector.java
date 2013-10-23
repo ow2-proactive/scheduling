@@ -185,7 +185,7 @@ public class TestAntFileSelector {
 
     public void configure() throws Exception {
         String scratchDir = System.getProperty("java.io.tmpdir");
-        final BaseScratchSpaceConfiguration scratchConf = new BaseScratchSpaceConfiguration(null, scratchDir);
+        final BaseScratchSpaceConfiguration scratchConf = new BaseScratchSpaceConfiguration((String) null, scratchDir);
         DataSpacesNodes.configureNode(PAActiveObject.getActiveObjectNode(PAActiveObject.getStubOnThis()),
                 scratchConf);
     }

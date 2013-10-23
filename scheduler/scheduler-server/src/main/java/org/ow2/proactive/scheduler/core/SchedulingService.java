@@ -746,8 +746,7 @@ public class SchedulingService {
                 case STALLED:
                 case RUNNING:
                     //start dataspace app for this job
-                    job.startDataSpaceApplication(dsStarter.getNamingService(), dsStarter
-                            .getNamingServiceURL());
+                    job.startDataSpaceApplication(dsStarter.getNamingService());
                     // restart classServer if needed
                     classServers.createTaskClassServer(job, false);
                     break;

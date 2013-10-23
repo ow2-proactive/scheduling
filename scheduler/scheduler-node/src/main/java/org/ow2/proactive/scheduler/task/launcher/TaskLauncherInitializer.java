@@ -39,6 +39,7 @@ package org.ow2.proactive.scheduler.task.launcher;
 import java.io.Serializable;
 import java.util.List;
 
+import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
@@ -81,7 +82,7 @@ public class TaskLauncherInitializer implements Serializable {
     /** DataSpaces needed parameter */
     private List<InputSelector> taskInputFiles = null;
     private List<OutputSelector> taskOutputFiles = null;
-    private String namingServiceUrl;
+    private NamingService namingService;
     private String owner;
     private boolean preciousLogs;
 
@@ -223,7 +224,7 @@ public class TaskLauncherInitializer implements Serializable {
     /**
      * Set the paConfiguration content value to the given paConfigContent value
      *
-     * @param paConfiguration content the paConfigContent to set
+     * @param paConfigContent content the paConfigContent to set
      */
     public void setPaConfigContent(String paConfigContent) {
         this.paConfigContent = paConfigContent;
@@ -248,21 +249,21 @@ public class TaskLauncherInitializer implements Serializable {
     }
 
     /**
-     * Get the namingServiceUrl
+     * Get the namingService Stub
      *
-     * @return the namingServiceUrl
+     * @return the namingService
      */
-    public String getNamingServiceUrl() {
-        return namingServiceUrl;
+    public NamingService getNamingService() {
+        return namingService;
     }
 
     /**
-     * Set the namingServiceUrl value to the given namingServiceUrl value
+     * Set the namingService Stub to the given namingService value
      *
-     * @param namingServiceUrl the namingServiceUrl to set
+     * @param namingService the namingService to set
      */
-    public void setNamingServiceUrl(String namingServiceUrl) {
-        this.namingServiceUrl = namingServiceUrl;
+    public void setNamingService(NamingService namingService) {
+        this.namingService = namingService;
     }
 
     /**

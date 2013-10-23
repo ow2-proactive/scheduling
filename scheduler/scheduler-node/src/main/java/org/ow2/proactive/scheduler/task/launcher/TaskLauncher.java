@@ -78,6 +78,7 @@ import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
 import org.objectweb.proactive.extensions.dataspaces.api.PADataSpaces;
 import org.objectweb.proactive.extensions.dataspaces.core.DataSpacesNodes;
+import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
 import org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemException;
 import org.objectweb.proactive.extensions.dataspaces.vfs.selector.fast.FastFileSelector;
 import org.objectweb.proactive.extensions.dataspaces.vfs.selector.fast.FastSelector;
@@ -178,7 +179,7 @@ public abstract class TaskLauncher {
     protected DataSpacesFileObject GLOBAL = null;
     protected DataSpacesFileObject USER = null;
 
-    protected String namingServiceUrl = null;
+    protected NamingService namingService = null;
     protected List<InputSelector> inputFiles;
     protected List<OutputSelector> outputFiles;
 
@@ -292,7 +293,7 @@ public abstract class TaskLauncher {
         //keep input/output files descriptor in memory for further copy
         this.inputFiles = initializer.getTaskInputFiles();
         this.outputFiles = initializer.getTaskOutputFiles();
-        this.namingServiceUrl = initializer.getNamingServiceUrl();
+        this.namingService = initializer.getNamingService();
         this.replicationIndex = initializer.getReplicationIndex();
         this.iterationIndex = initializer.getIterationIndex();
         this.storeLogs = initializer.isPreciousLogs();
@@ -916,7 +917,7 @@ public abstract class TaskLauncher {
             //prepare scratch, input, output
             try {
                 DataSpacesNodes.configureApplication(PAActiveObject.getActiveObjectNode(PAActiveObject
-                        .getStubOnThis()), id, namingServiceUrl);
+                        .getStubOnThis()), id, namingService);
 
                 SCRATCH = PADataSpaces.resolveScratchForAO();
                 logger.info("SCRATCH space is " + SCRATCH.getRealURI());
@@ -941,16 +942,20 @@ public abstract class TaskLauncher {
                 INPUT = resolveToExisting(INPUT, "INPUT");
                 INPUT = createTaskIdFolder(INPUT, "INPUT");
             } catch (Throwable t) {
-                logger.info("INPUT space is disabled");
-                logger.debug("", t);
+                logger.warn("INPUT space is disabled");
+                logger.warn("", t);
+                this.logDataspacesStatus("INPUT space is disabled", DataspacesStatusLevel.WARNING);
+                this.logDataspacesStatus(Formatter.stackTraceToString(t), DataspacesStatusLevel.WARNING);
             }
             try {
                 OUTPUT = PADataSpaces.resolveDefaultOutput();
                 OUTPUT = resolveToExisting(OUTPUT, "OUTPUT");
                 OUTPUT = createTaskIdFolder(OUTPUT, "OUTPUT");
             } catch (Throwable t) {
-                logger.info("OUTPUT space is disabled");
-                logger.debug("", t);
+                logger.warn("OUTPUT space is disabled");
+                logger.warn("", t);
+                this.logDataspacesStatus("OUTPUT space is disabled", DataspacesStatusLevel.WARNING);
+                this.logDataspacesStatus(Formatter.stackTraceToString(t), DataspacesStatusLevel.WARNING);
             }
 
             try {
@@ -958,16 +963,20 @@ public abstract class TaskLauncher {
                 GLOBAL = resolveToExisting(GLOBAL, "GLOBAL");
                 GLOBAL = createTaskIdFolder(GLOBAL, "GLOBAL");
             } catch (Throwable t) {
-                logger.info("GLOBAL space is disabled");
-                logger.debug("", t);
+                logger.warn("GLOBAL space is disabled");
+                logger.warn("", t);
+                this.logDataspacesStatus("GLOBAL space is disabled", DataspacesStatusLevel.WARNING);
+                this.logDataspacesStatus(Formatter.stackTraceToString(t), DataspacesStatusLevel.WARNING);
             }
             try {
                 USER = PADataSpaces.resolveOutput(SchedulerConstants.USERSPACE_NAME);
                 USER = resolveToExisting(USER, "USER");
                 USER = createTaskIdFolder(USER, "USER");
             } catch (Throwable t) {
-                logger.info("USER space is disabled");
-                logger.debug("", t);
+                logger.warn("USER space is disabled");
+                logger.warn("", t);
+                this.logDataspacesStatus("USER space is disabled", DataspacesStatusLevel.WARNING);
+                this.logDataspacesStatus(Formatter.stackTraceToString(t), DataspacesStatusLevel.WARNING);
             }
         }
     }

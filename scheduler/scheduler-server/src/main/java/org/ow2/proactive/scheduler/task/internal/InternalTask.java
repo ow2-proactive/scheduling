@@ -1019,7 +1019,7 @@ public abstract class InternalTask extends TaskState {
         tli.setControlFlowScript(getFlowScript());
         tli.setTaskInputFiles(getInputFilesList());
         tli.setTaskOutputFiles(getOutputFilesList());
-        tli.setNamingServiceUrl(job.getJobDataSpaceApplication().getNamingServiceURL());
+        tli.setNamingService(job.getJobDataSpaceApplication().getNamingServiceStub());
         tli.setIterationIndex(getIterationIndex());
         tli.setReplicationIndex(getReplicationIndex());
         if (isWallTimeSet()) {

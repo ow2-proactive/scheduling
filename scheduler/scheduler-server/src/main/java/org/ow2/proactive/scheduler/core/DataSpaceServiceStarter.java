@@ -42,16 +42,15 @@ import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.extensions.dataspaces.api.PADataSpaces;
@@ -115,7 +114,7 @@ public class DataSpaceServiceStarter implements Serializable {
     /**
      * Dataspace servers
      */
-    private ArrayList<ArrayList<FileSystemServerDeployer>> servers = new ArrayList<ArrayList<FileSystemServerDeployer>>(
+    private ArrayList<FileSystemServerDeployer> servers = new ArrayList<FileSystemServerDeployer>(
         4);
 
     public DataSpaceServiceStarter() {
@@ -133,7 +132,7 @@ public class DataSpaceServiceStarter implements Serializable {
         namingService = NamingService.createNamingServiceStub(namingServiceURL);
 
         // configure node for Data Spaces
-        final BaseScratchSpaceConfiguration scratchConf = new BaseScratchSpaceConfiguration(null,
+        final BaseScratchSpaceConfiguration scratchConf = new BaseScratchSpaceConfiguration((String) null,
             DEFAULT_LOCAL_SCRATCH);
         DataSpacesNodes.configureNode(schedulerNode, scratchConf);
 
@@ -184,16 +183,14 @@ public class DataSpaceServiceStarter implements Serializable {
                         dir.mkdirs();
                     }
 
-                    StringBuilder buildedUrl = new StringBuilder();
-                    ArrayList<FileSystemServerDeployer> serverPerProtocol = new ArrayList<FileSystemServerDeployer>();
-                    for (String protocol : getProtocols()) {
-                        FileSystemServerDeployer server = startServer(spacesNames[i], humanReadableNames[i],
-                                spaceDir, protocol, buildedUrl);
-                        serverPerProtocol.add(server);
-                    }
-                    buildedUrl.deleteCharAt(buildedUrl.length() - 1);
-                    servers.add(serverPerProtocol);
-                    confs[i][0].updateProperty(buildedUrl.toString());
+                    FileSystemServerDeployer server = startServer(spacesNames[i], humanReadableNames[i],
+                                spaceDir);
+
+
+
+                    servers.add(server);
+
+                    confs[i][0].updateProperty(buildServerUrlList(server.getVFSRootURLs()));
                     // use the hostname property if it is set, otherwise, use the local hostname
                     if (!confs[i][2].isSet()) {
                         confs[i][2].updateProperty(localhostname);
@@ -222,33 +219,24 @@ public class DataSpaceServiceStarter implements Serializable {
         }
     }
 
-    private FileSystemServerDeployer startServer(String spaceName, String readableName, String spaceDir,
-            String protocol, StringBuilder buildedUrl) throws IOException {
-        FileSystemServerDeployer server = new FileSystemServerDeployer(spaceName, spaceDir, true, true,
-            protocol);
-        String url = server.getVFSRootURL();
-        if (!url.endsWith("/")) {
-            //let URL terminate by /
-            buildedUrl.append(url);
-            buildedUrl.append("/ ");
-        } else {
-            buildedUrl.append(url);
-            buildedUrl.append(" ");
-        }
-        logger.info("Started " + readableName + " server at " + url);
-        return server;
-    }
-
-    private List<String> getProtocols() {
-        ArrayList<String> protocols = new ArrayList<String>();
-        protocols.add(CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getValue());
-        if (CentralPAPropertyRepository.PA_COMMUNICATION_ADDITIONAL_PROTOCOLS.isSet()) {
-            if (CentralPAPropertyRepository.PA_COMMUNICATION_ADDITIONAL_PROTOCOLS.getValue() != null) {
-                protocols
-                        .addAll(CentralPAPropertyRepository.PA_COMMUNICATION_ADDITIONAL_PROTOCOLS.getValue());
+    private String buildServerUrlList(String[] urls) {
+        StringBuilder builder = new StringBuilder();
+        for (String url : urls) {
+            if (!url.endsWith("/")) {
+                builder.append(url+"/ ");
+            } else {
+                builder.append(url+" ");
             }
         }
-        return protocols;
+        builder.deleteCharAt(builder.length()-1);
+        return builder.toString();
+    }
+
+    private FileSystemServerDeployer startServer(String spaceName, String readableName, String spaceDir) throws IOException {
+        FileSystemServerDeployer server = new FileSystemServerDeployer(spaceName, spaceDir, true, true);
+        String[] urls = server.getVFSRootURLs();
+        logger.info("Started " + readableName + " server at " + Arrays.toString(urls));
+        return server;
     }
 
     /**
@@ -272,7 +260,7 @@ public class DataSpaceServiceStarter implements Serializable {
                     logger.warn("Node " + schedulerNode.getNodeInformation().getURL() +
                         " was configured for appid = " + appidConfigured + ", reconfiguring...");
                 }
-                DataSpacesNodes.configureApplication(schedulerNode, appID, namingServiceURL);
+                DataSpacesNodes.configureApplication(schedulerNode, appID, namingService);
                 logger.info("Node " + schedulerNode.getNodeInformation().getURL() +
                     " configured for appid = " + appID);
 
@@ -289,9 +277,7 @@ public class DataSpaceServiceStarter implements Serializable {
         InputOutputSpaceConfiguration spaceConf = null;
         // We add the deployed path to a url list, this way the dataspace will always be accessed preferably by the file system
         ArrayList<String> finalurls = new ArrayList<String>();
-        if (path != null) {
-            finalurls.add((new File(path)).toURI().toURL().toExternalForm());
-        }
+
         for (String url : urls.split(" ")) {
             finalurls.add(url);
         }
@@ -344,6 +330,7 @@ public class DataSpaceServiceStarter implements Serializable {
         // updates the urls with the username
         StringBuilder updatedUrls = new StringBuilder();
         String[] urlarray = urls.split(" ");
+
         for (String url : urlarray) {
             updatedUrls.append(url);
             if (!url.endsWith("/"))
@@ -367,12 +354,10 @@ public class DataSpaceServiceStarter implements Serializable {
         } catch (Throwable t) {
         }
         for (int i = 0; i < servers.size(); i++) {
-            for (int j = 0; j < servers.get(i).size(); j++) {
                 try {
-                    servers.get(i).get(j).terminate();
+                    servers.get(i).terminate();
                 } catch (Throwable t) {
                 }
-            }
         }
     }
 

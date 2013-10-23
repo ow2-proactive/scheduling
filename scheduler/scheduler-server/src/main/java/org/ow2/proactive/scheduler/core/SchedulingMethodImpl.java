@@ -458,7 +458,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
             //start dataspace app for this job
             DataSpaceServiceStarter dsStarter = schedulingService.getInfrastructure()
                     .getDataSpaceServiceStarter();
-            job.startDataSpaceApplication(dsStarter.getNamingService(), dsStarter.getNamingServiceURL());
+            job.startDataSpaceApplication(dsStarter.getNamingService());
 
             //create launcher
             launcher = task.createLauncher(job, node);

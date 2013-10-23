@@ -81,7 +81,7 @@ public class DataSpaceNodeConfigurationAgent implements Serializable {
                 //else use the property
                 scratchDir = System.getProperty(NODE_DATASPACE_SCRATCHDIR);
             }
-            final BaseScratchSpaceConfiguration scratchConf = new BaseScratchSpaceConfiguration(null,
+            final BaseScratchSpaceConfiguration scratchConf = new BaseScratchSpaceConfiguration((String) null,
                 scratchDir);
             DataSpacesNodes.configureNode(PAActiveObject.getActiveObjectNode(PAActiveObject.getStubOnThis()),
                     scratchConf);

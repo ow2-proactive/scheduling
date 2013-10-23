@@ -36,9 +36,6 @@
  */
 package org.ow2.proactive.scheduler.job;
 
-import it.sauronsoftware.cron4j.InvalidPatternException;
-import it.sauronsoftware.cron4j.Predictor;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -52,6 +49,8 @@ import java.util.Set;
 
 import javax.xml.bind.annotation.XmlTransient;
 
+import it.sauronsoftware.cron4j.InvalidPatternException;
+import it.sauronsoftware.cron4j.Predictor;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
 import org.ow2.proactive.authentication.crypto.Credentials;
@@ -243,10 +242,10 @@ public abstract class InternalJob extends JobState {
     /**
      * Start dataspace configuration and application
      */
-    public void startDataSpaceApplication(NamingService namingService, String namingServiceURL) {
+    public void startDataSpaceApplication(NamingService namingService) {
         if (jobDataSpaceApplication == null) {
             long appId = getJobInfo().getJobId().hashCode();
-            jobDataSpaceApplication = new JobDataSpaceApplication(appId, namingService, namingServiceURL);
+            jobDataSpaceApplication = new JobDataSpaceApplication(appId, namingService);
         }
         jobDataSpaceApplication.startDataSpaceApplication(getInputSpace(), getOutputSpace(),
                 getGlobalSpace(), getUserSpace(), getOwner(), getId());
