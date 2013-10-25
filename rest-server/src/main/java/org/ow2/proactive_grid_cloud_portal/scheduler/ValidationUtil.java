@@ -37,6 +37,8 @@ package org.ow2.proactive_grid_cloud_portal.scheduler;
  * $$ACTIVEEON_INITIAL_DEV$$
  */
 
+import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
+
 import java.io.File;
 import java.util.ArrayList;
 
@@ -48,7 +50,6 @@ import org.ow2.proactive.scheduler.common.job.factories.FlowChecker;
 import org.ow2.proactive.scheduler.common.job.factories.FlowError;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
 import org.ow2.proactive.scheduler.common.task.Task;
-import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobValidationData;
 
 public class ValidationUtil {
@@ -81,7 +82,10 @@ public class ValidationUtil {
 				data.setValid(true);
 			}
 		} catch (JobCreationException e) {
-			data.setErrorMessage(ExceptionUtils.getStackTrace(e));
+			e.printStackTrace();
+			data.setTaskName(e.getTaskName());
+			data.setErrorMessage(e.getMessage());
+			data.setStackTrace(getStackTrace(e));
 		}
 		return data;
 

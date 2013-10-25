@@ -43,6 +43,7 @@ public class JobValidationData {
 	private boolean valid;
 	private String taskName;
 	private String errorMessage;
+	private String stackTrace;
 	
 	public JobValidationData() {
 	}
@@ -69,5 +70,13 @@ public class JobValidationData {
 
 	public void setErrorMessage(String message) {
 		this.errorMessage = message;
+	}
+
+	public String getStackTrace() {
+		return stackTrace;
+	}
+
+	public void setStackTrace(String stackTrace) {
+		this.stackTrace = stackTrace;
 	}
 }

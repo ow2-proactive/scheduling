@@ -2224,12 +2224,12 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
 			return (APPLICATION_XML_TYPE.equals(part1.getMediaType())) ? validateJobDescriptor(tmpFile)
 					: ValidationUtil.validateJobArchive(tmpFile);
-
-		} catch (Exception e) {
+		} catch (IOException e) {
 			JobValidationData validation = new JobValidationData();
-			validation.setErrorMessage(getStackTrace(e));
+			validation
+					.setErrorMessage("Cannot read from the job validation request.");
+			validation.setStackTrace(getStackTrace(e));
 			return validation;
-
 		} finally {
 			if (tmpFile != null) {
 				tmpFile.delete();
