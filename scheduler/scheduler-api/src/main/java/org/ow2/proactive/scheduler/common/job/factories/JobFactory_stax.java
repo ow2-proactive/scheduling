@@ -47,7 +47,6 @@ import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -63,10 +62,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.events.XMLEvent;
 
 import org.apache.log4j.Logger;
-import org.iso_relax.verifier.Schema;
-import org.iso_relax.verifier.Verifier;
 import org.iso_relax.verifier.VerifierConfigurationException;
-import org.iso_relax.verifier.VerifierFactory;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -281,28 +277,15 @@ public class JobFactory_stax extends JobFactory {
         this.dependences = null;
     }
 
-    /**
-     * Validate the given job descriptor using the internal RELAX_NG Schema.
-     *
-     * @param file the file to validate
+    /*
+     * Validate the given job descriptor
      */
-    private void validate(File file) throws URISyntaxException, VerifierConfigurationException, SAXException,
-            IOException, XMLStreamException {
-        // We use sun multi validator (msv)
-        VerifierFactory vfactory = new com.sun.msv.verifier.jarv.TheFactoryImpl();
-        InputStream schemaStream = this.getClass().getResourceAsStream(findSchemaByNamespaceUsed(file));
-        Schema schema = vfactory.compileSchema(schemaStream);
-        Verifier verifier = schema.newVerifier();
-        ValidatingErrorHandler veh = new ValidatingErrorHandler();
-        verifier.setErrorHandler(veh);
-        try {
-            verifier.verify(file);
-        } catch (SAXException e) {
-            //nothing to do, check after
-        }
-        if (veh.mistakes > 0) {
-            throw new SAXException(veh.mistakesStack.toString());
-        }
+    private void validate(File file) throws XMLStreamException,
+            JobCreationException, VerifierConfigurationException, SAXException,
+            IOException {
+        InputStream schemaStream = this.getClass().getResourceAsStream(
+                findSchemaByNamespaceUsed(file));
+        ValidationUtil.validate(file, schemaStream);
     }
 
     private String findSchemaByNamespaceUsed(File file) throws FileNotFoundException, XMLStreamException {
@@ -1622,54 +1605,6 @@ public class JobFactory_stax extends JobFactory {
             return path;
         } else {
             return relativePathRoot + File.separator + path;
-        }
-    }
-
-    /**
-     * ValidatingErrorHandler...
-     *
-     * @author The ProActive Team
-     * @since ProActive Scheduling 0.9.1
-     */
-    private class ValidatingErrorHandler implements ErrorHandler {
-        private int mistakes = 0;
-        private StringBuilder mistakesStack = null;
-
-        /**
-         * Create a new instance of ValidatingErrorHandler.
-         *
-         */
-        public ValidatingErrorHandler() {
-            mistakesStack = new StringBuilder();
-        }
-
-        /**
-         * @see org.xml.sax.ErrorHandler#error(org.xml.sax.SAXParseException)
-         */
-        public void error(SAXParseException exception) throws SAXException {
-            appendAndPrintMessage("ERROR:" + exception.getMessage() + " at line " +
-                exception.getLineNumber() + ", column " + exception.getColumnNumber());
-        }
-
-        /**
-         * @see org.xml.sax.ErrorHandler#fatalError(org.xml.sax.SAXParseException)
-         */
-        public void fatalError(SAXParseException exception) throws SAXException {
-            appendAndPrintMessage("ERROR:" + exception.getMessage() + " at line " +
-                exception.getLineNumber() + ", column " + exception.getColumnNumber());
-        }
-
-        /**
-         * @see org.xml.sax.ErrorHandler#warning(org.xml.sax.SAXParseException)
-         */
-        public void warning(SAXParseException exception) throws SAXException {
-            appendAndPrintMessage("WARNING:" + exception.getMessage() + " at line " +
-                exception.getLineNumber() + ", column " + exception.getColumnNumber());
-        }
-
-        private void appendAndPrintMessage(String msg) {
-            mistakesStack.append(msg).append("\n");
-            mistakes++;
         }
     }
 
