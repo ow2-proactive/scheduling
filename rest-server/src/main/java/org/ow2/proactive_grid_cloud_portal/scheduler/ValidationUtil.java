@@ -82,7 +82,6 @@ public class ValidationUtil {
 				data.setValid(true);
 			}
 		} catch (JobCreationException e) {
-			e.printStackTrace();
 			data.setTaskName(e.getTaskName());
 			data.setErrorMessage(e.getMessage());
 			data.setStackTrace(getStackTrace(e));
