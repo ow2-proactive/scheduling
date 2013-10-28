@@ -297,6 +297,11 @@ project('scheduler:scheduler-node') {
         // required by ForkedJavaExecutable
         runtime 'org.objectweb.proactive:programming-extension-pnp:5.5.0-SNAPSHOT'
         // TODO add all protocols
+
+        task stub(type: StubTask) {
+            classes = ['org.ow2.proactive.scheduler.common.TaskTerminateNotification']
+        }
+
     }
 
     task WorkerJar(type: Jar) {

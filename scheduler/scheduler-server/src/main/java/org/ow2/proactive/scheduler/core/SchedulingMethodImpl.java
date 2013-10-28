@@ -117,7 +117,8 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
         this.schedulingService = schedulingService;
 
         terminateNotification = new TerminateNotification(schedulingService);
-        terminateNotification = PAActiveObject.turnActive(terminateNotification);
+        terminateNotification = PAActiveObject.turnActive(terminateNotification,
+                TaskTerminateNotification.class.getName(), null);
 
         this.threadPool = TimeoutThreadPoolExecutor.newFixedThreadPool(
                 PASchedulerProperties.SCHEDULER_STARTTASK_THREADNUMBER.getValueAsInt(),
