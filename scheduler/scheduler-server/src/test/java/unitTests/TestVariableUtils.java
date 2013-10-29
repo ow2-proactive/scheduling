@@ -54,7 +54,6 @@ public class TestVariableUtils {
     @Test
     public void testFilterAndUpdateWithVariableMap() {
         Map<String, String> variables = singletonMap("foo", "B");
-        variables.put("foo", "B");
         String updated = filterAndUpdate(testString, variables);
         Assert.assertEquals("ABC", updated);
     }
