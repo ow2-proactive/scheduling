@@ -36,6 +36,7 @@ package unitTests;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -65,12 +66,12 @@ import org.ow2.proactive.scheduler.job.JobDataSpaceApplication;
  */
 public class TestDataSpaceConfiguration {
 
-    static String IOSPACE = System.getProperty("java.io.tmpdir") + File.separator + "scheduler_test" +
-        File.separator + "space";
+    static String IOSPACE = System.getProperty("java.io.tmpdir") + File.separator + "scheduler test" +
+            File.separator + "my space"; // evil spaces provided
 
     FileSystemServerDeployer filesServerIn;
 
-    String username = "demo";
+    String username = "de mo"; // another evil space
 
     static String HOSTNAME = null;
 
@@ -95,31 +96,29 @@ public class TestDataSpaceConfiguration {
         spFileWithUserDir.mkdirs();
 
         filesServerIn = new FileSystemServerDeployer("space", IOSPACE, true, true);
-        String spaceurl = filesServerIn.getVFSRootURL();
+        String[] spaceurls = filesServerIn.getVFSRootURLs();
 
-        String spaceurlWithUserDir = spaceurl + username;
+        String[] userdirUrls = DataSpaceServiceStarter.urlsWithUserDir(spaceurls, username);
 
         ArrayList<String> expected = new ArrayList<String>();
-        expected.add(spFile.toURI().toURL().toExternalForm());
-        expected.add(spaceurl);
+        expected.addAll(Arrays.asList(spaceurls));
 
         ArrayList<String> expectedWithUserDir = new ArrayList<String>();
-        expectedWithUserDir.add(spFileWithUserDir.toURI().toURL().toExternalForm());
-        expectedWithUserDir.add(spaceurlWithUserDir);
+        expectedWithUserDir.addAll(Arrays.asList(userdirUrls));
 
-        PASchedulerProperties.DATASPACE_DEFAULTINPUT_URL.updateProperty(spaceurl);
+        PASchedulerProperties.DATASPACE_DEFAULTINPUT_URL.updateProperty(DataSpaceServiceStarter.urlsToDSConfigProperty(spaceurls));
         PASchedulerProperties.DATASPACE_DEFAULTINPUT_LOCALPATH.updateProperty(IOSPACE);
         PASchedulerProperties.DATASPACE_DEFAULTINPUT_HOSTNAME.updateProperty(HOSTNAME);
 
-        PASchedulerProperties.DATASPACE_DEFAULTOUTPUT_URL.updateProperty(spaceurl);
+        PASchedulerProperties.DATASPACE_DEFAULTOUTPUT_URL.updateProperty(DataSpaceServiceStarter.urlsToDSConfigProperty(spaceurls));
         PASchedulerProperties.DATASPACE_DEFAULTOUTPUT_LOCALPATH.updateProperty(IOSPACE);
         PASchedulerProperties.DATASPACE_DEFAULTOUTPUT_HOSTNAME.updateProperty(HOSTNAME);
 
-        PASchedulerProperties.DATASPACE_DEFAULTGLOBAL_URL.updateProperty(spaceurl);
+        PASchedulerProperties.DATASPACE_DEFAULTGLOBAL_URL.updateProperty(DataSpaceServiceStarter.urlsToDSConfigProperty(spaceurls));
         PASchedulerProperties.DATASPACE_DEFAULTGLOBAL_LOCALPATH.updateProperty(IOSPACE);
         PASchedulerProperties.DATASPACE_DEFAULTGLOBAL_HOSTNAME.updateProperty(HOSTNAME);
 
-        PASchedulerProperties.DATASPACE_DEFAULTUSER_URL.updateProperty(spaceurl);
+        PASchedulerProperties.DATASPACE_DEFAULTUSER_URL.updateProperty(DataSpaceServiceStarter.urlsToDSConfigProperty(spaceurls));
         PASchedulerProperties.DATASPACE_DEFAULTUSER_LOCALPATH.updateProperty(IOSPACE);
         PASchedulerProperties.DATASPACE_DEFAULTUSER_HOSTNAME.updateProperty(HOSTNAME);
 
@@ -130,7 +129,7 @@ public class TestDataSpaceConfiguration {
         NamingService namingService = dsServiceStarter.getNamingService();
 
         JobDataSpaceApplication jdsa = new JobDataSpaceApplication(appid,
-            dsServiceStarter.getNamingService());
+                dsServiceStarter.getNamingService());
         jdsa.startDataSpaceApplication(null, null, null, null, username, null);
 
         DataSpacesNodes.configureApplication(PAActiveObject.getNode(), appid, dsServiceStarter
@@ -151,11 +150,27 @@ public class TestDataSpaceConfiguration {
     }
 
     @Test
-    public void run() throws Throwable {
+    public void testDataSpaceConfiguration() throws Throwable {
 
         TestDataSpaceConfiguration callee = PAActiveObject.turnActive(new TestDataSpaceConfiguration());
 
         callee.runStarter();
+    }
+
+    @Test
+    public void testPropertyParsing() throws Throwable {
+        Assert.assertArrayEquals(new String[0], DataSpaceServiceStarter.dsConfigPropertyToUrls("  \"\"  "));
+        Assert.assertArrayEquals(new String[0], DataSpaceServiceStarter.dsConfigPropertyToUrls("  "));
+        Assert.assertArrayEquals(new String[] { "a" }, DataSpaceServiceStarter.dsConfigPropertyToUrls(" \"a\"  "));
+        Assert.assertArrayEquals(new String[] { "a" }, DataSpaceServiceStarter.dsConfigPropertyToUrls("a"));
+        Assert.assertArrayEquals(new String[] { "a" }, DataSpaceServiceStarter.dsConfigPropertyToUrls(" a  "));
+        Assert.assertArrayEquals(new String[] { "a b" }, DataSpaceServiceStarter.dsConfigPropertyToUrls(" \"a b\"  "));
+        Assert.assertArrayEquals(new String[] { "a", "b" }, DataSpaceServiceStarter.dsConfigPropertyToUrls(" a b  "));
+        Assert.assertArrayEquals(new String[] { "a b c" }, DataSpaceServiceStarter.dsConfigPropertyToUrls(" \"a b c\"  "));
+        Assert.assertArrayEquals(new String[] { "a", "b", "c" }, DataSpaceServiceStarter.dsConfigPropertyToUrls("  a b c  "));
+        Assert.assertArrayEquals(new String[] { "a b c", "d e f" }, DataSpaceServiceStarter.dsConfigPropertyToUrls(" \"a b c\"    \"d e f\"   "));
+        Assert.assertArrayEquals(new String[] { "a b c d e f" }, DataSpaceServiceStarter.dsConfigPropertyToUrls("   \"a b c d e f\"   "));
+        Assert.assertArrayEquals(new String[] { "a", "b", "c", "d", "e", "f" }, DataSpaceServiceStarter.dsConfigPropertyToUrls("   a b c   d e    f "));
     }
 
     @After
