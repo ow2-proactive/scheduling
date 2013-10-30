@@ -474,12 +474,12 @@ project('performance') {
     }
 }
 
-
 task proActiveLibs(type: Copy) {
+    def projectsToCopy = subprojects - project('performance')
     // only copy once each runtime dependency (faster)
-    def runtimeDeps = subprojects.collect { it.configurations.runtime.files }.flatten() as Set
-    subprojects.each {
-        from runtimeDeps
+    def runtimeDeps = projectsToCopy.collect { it.configurations.runtime.files }.flatten() as Set
+    from runtimeDeps
+    projectsToCopy.each {
         from it.jar.outputs
         if (it.tasks.findByName('testJar')) from it.testJar.outputs
     }
