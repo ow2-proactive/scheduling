@@ -32,7 +32,7 @@
  *
  *  * $$PROACTIVE_INITIAL_DEV$$
  */
-package unitTests;
+package functionaltests.dataspaces;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -122,7 +122,7 @@ public class TestDataSpaceConfiguration {
         PASchedulerProperties.DATASPACE_DEFAULTUSER_LOCALPATH.updateProperty(IOSPACE);
         PASchedulerProperties.DATASPACE_DEFAULTUSER_HOSTNAME.updateProperty(HOSTNAME);
 
-        DataSpaceServiceStarter dsServiceStarter = new DataSpaceServiceStarter();
+        DataSpaceServiceStarter dsServiceStarter = DataSpaceServiceStarter.getDataSpaceServiceStarter();
         dsServiceStarter.startNamingService();
 
         Set<SpaceInstanceInfo> predefinedSpaces = new HashSet<SpaceInstanceInfo>();
