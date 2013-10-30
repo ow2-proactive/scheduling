@@ -38,8 +38,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.rmi.RemoteException;
-
 import org.junit.Test;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.ow2.proactive.scheduler.core.DataSpaceServiceStarter;
@@ -63,7 +61,7 @@ public class TestDataSpaceServiceStarter {
             dataSpaceServiceStarter.getNamingService().getRegisteredApplications();
             fail("Naming service should not be accessible anymore");
         } catch (Exception expected) {
-            assertTrue(expected instanceof RemoteException);
+            assertTrue(expected instanceof IllegalStateException);
         }
     }
 
