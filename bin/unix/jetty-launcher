@@ -30,6 +30,7 @@ print_help () {
 	echo -e "Options:                                                                     "
 	echo -e "-R PATH   RM Web UI                                                          "
 	echo -e "-S PATH   Scheduler Web UI                                                   "
+	echo -e "-W PATH   Workflow Studio UI                                                 "
 	echo -e "-r URL    RM Server URL                                                      "
 	echo -e "-s URL    Scheduler Server URL                                               "
 	echo -e "-p PORT   HTTP server port                                                   "
@@ -84,6 +85,12 @@ while [ $# -gt 0 ]; do
 			SCHED=$2;
 			if [ ! -f $SCHED ] && [ ! -d $SCHED ]; then
 				stop "-S must point to a Web App folder or .war file"
+			fi
+			shift 2;;
+		-W) [ $# -eq 1 ] && stop "-W requires an argument"
+			STUDIO=$2;
+			if [ ! -f $STUDIO ] && [ ! -d $STUDIO ]; then
+				stop "-W must point to a Web App folder"
 			fi
 			shift 2;;
 		-r) [ $# -eq 1 ] && stop "-r requires an argument"
@@ -188,6 +195,10 @@ if [ $SCHED ]; then
 	fi
 
 	APPS="$APPS $SCHED_DIR"
+fi
+
+if [ $STUDIO ]; then
+	APPS="$APPS $STUDIO"
 fi
 
 

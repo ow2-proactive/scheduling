@@ -32,6 +32,7 @@ print_help () {
 	echo -e "-r,--rm-only                Start only the RM Web App, not the Scheduler's"
 	echo -e "-a,--api-only               Start the REST API Server only, not the GUI Web Apps"
 	echo -e "-S,--sched-war PATH         Path to the Scheduler Web Application folder or .war file"
+	echo -e "-W,--studio PATH            Path to the Workflow Studio WEB"
 	echo -e "                            default: $SCHED_WAR"
 	echo -e "-R,--rm-war PATH            Path to the RM Web Application folder or .war file"
 	echo -e "                            default: $RM_WAR"
@@ -109,6 +110,10 @@ while [ $# -gt 0 ]; do
 			[ $# -eq 1 ] && stop "$1 requires an argument"
 			SCHED_WAR=$2
 			shift 2;;
+		-W | --studio)
+			[ $# -eq 1 ] && stop "$1 requires an argument"
+			STUDIO=$2
+			shift 2;;
 		-R | --rm-war)
 			[ $# -eq 1 ] && stop "$1 requires an argument"
 			RM_WAR=$2
@@ -180,6 +185,9 @@ if [ $DO_SCHED = true ]; then
 	[ ! -f $SCHED_WAR ] && nojetty "Missing file $SCHED_WAR"
 	[ ! $SCHED_URL ] && nojetty "Could not determine Scheduler URL"
 	CMD=$CMD" -S $SCHED_WAR -s $SCHED_URL"
+fi
+if [ -f $STUDIO ]; then
+	CMD=$CMD" -W $STUDIO"
 fi
 if [ $DO_RM = true ]; then
 	[ ! -f $RM_WAR ] && nojetty "Missing file $RM_WAR"
