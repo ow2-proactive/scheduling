@@ -90,7 +90,7 @@ public class JobDataSpaceApplication implements Serializable {
                         // assume this is a file path
                         inputURL = ((new File(inputURL)).toURI().toURL()).toString();
                     }
-                    DataSpaceServiceStarter.createSpace(applicationId, PADataSpaces.DEFAULT_IN_OUT_NAME,
+                    DataSpaceServiceStarter.getDataSpaceServiceStarter().createSpace(applicationId, PADataSpaces.DEFAULT_IN_OUT_NAME,
                             inputURL, null, null, true, false);
                 } else {
                     String localpath = PASchedulerProperties.DATASPACE_DEFAULTINPUT_LOCALPATH
@@ -98,7 +98,7 @@ public class JobDataSpaceApplication implements Serializable {
 
                     String hostname = PASchedulerProperties.DATASPACE_DEFAULTINPUT_HOSTNAME
                             .getValueAsStringOrNull();
-                    DataSpaceServiceStarter.createSpaceWithUserNameSubfolder(username, applicationId, PADataSpaces.DEFAULT_IN_OUT_NAME,
+                    DataSpaceServiceStarter.getDataSpaceServiceStarter().createSpaceWithUserNameSubfolder(username, applicationId, PADataSpaces.DEFAULT_IN_OUT_NAME,
                             PASchedulerProperties.DATASPACE_DEFAULTINPUT_URL.getValueAsString(),
                             localpath, hostname, true, false);
                 }
@@ -108,7 +108,7 @@ public class JobDataSpaceApplication implements Serializable {
                         // assume this is a file path
                         outputURL = ((new File(outputURL)).toURI().toURL()).toString();
                     }
-                    DataSpaceServiceStarter.createSpace(applicationId, PADataSpaces.DEFAULT_IN_OUT_NAME,
+                    DataSpaceServiceStarter.getDataSpaceServiceStarter().createSpace(applicationId, PADataSpaces.DEFAULT_IN_OUT_NAME,
                             outputURL, null, null, false, false);
                 } else {
                     String localpath = PASchedulerProperties.DATASPACE_DEFAULTOUTPUT_LOCALPATH
@@ -116,7 +116,7 @@ public class JobDataSpaceApplication implements Serializable {
 
                     String hostname = PASchedulerProperties.DATASPACE_DEFAULTOUTPUT_HOSTNAME
                             .getValueAsStringOrNull();
-                    DataSpaceServiceStarter.createSpaceWithUserNameSubfolder(username, applicationId, PADataSpaces.DEFAULT_IN_OUT_NAME,
+                    DataSpaceServiceStarter.getDataSpaceServiceStarter().createSpaceWithUserNameSubfolder(username, applicationId, PADataSpaces.DEFAULT_IN_OUT_NAME,
                             PASchedulerProperties.DATASPACE_DEFAULTOUTPUT_URL.getValueAsString(),
                             localpath, hostname, false, false);
                 }
@@ -126,7 +126,7 @@ public class JobDataSpaceApplication implements Serializable {
                         // assume this is a file path
                         globalURL = ((new File(globalURL)).toURI().toURL()).toString();
                     }
-                    DataSpaceServiceStarter.createSpace(applicationId, SchedulerConstants.GLOBALSPACE_NAME,
+                    DataSpaceServiceStarter.getDataSpaceServiceStarter().createSpace(applicationId, SchedulerConstants.GLOBALSPACE_NAME,
                             globalURL, null, null, false, false);
                 } else {
                     String localPath = PASchedulerProperties.DATASPACE_DEFAULTGLOBAL_LOCALPATH
@@ -136,7 +136,7 @@ public class JobDataSpaceApplication implements Serializable {
                     String hostname = PASchedulerProperties.DATASPACE_DEFAULTGLOBAL_HOSTNAME
                             .getValueAsStringOrNull();
 
-                    DataSpaceServiceStarter.createSpace(applicationId, SchedulerConstants.GLOBALSPACE_NAME,
+                    DataSpaceServiceStarter.getDataSpaceServiceStarter().createSpace(applicationId, SchedulerConstants.GLOBALSPACE_NAME,
                             PASchedulerProperties.DATASPACE_DEFAULTGLOBAL_URL.getValueAsString(), localPath,
                             hostname, false, false);
                 }
@@ -147,7 +147,7 @@ public class JobDataSpaceApplication implements Serializable {
                         // assume this is a file path
                         userURL = ((new File(userURL)).toURI().toURL()).toString();
                     }
-                    DataSpaceServiceStarter.createSpace(applicationId, SchedulerConstants.USERSPACE_NAME,
+                    DataSpaceServiceStarter.getDataSpaceServiceStarter().createSpace(applicationId, SchedulerConstants.USERSPACE_NAME,
                             userURL, null, null, false, false);
                 } else {
                     String localpath = PASchedulerProperties.DATASPACE_DEFAULTUSER_LOCALPATH
@@ -156,7 +156,7 @@ public class JobDataSpaceApplication implements Serializable {
                     String hostname = PASchedulerProperties.DATASPACE_DEFAULTUSER_HOSTNAME
                             .getValueAsStringOrNull();
 
-                    DataSpaceServiceStarter.createSpaceWithUserNameSubfolder(username, applicationId, SchedulerConstants.USERSPACE_NAME,
+                    DataSpaceServiceStarter.getDataSpaceServiceStarter().createSpaceWithUserNameSubfolder(username, applicationId, SchedulerConstants.USERSPACE_NAME,
                             PASchedulerProperties.DATASPACE_DEFAULTUSER_URL.getValueAsString(), localpath, hostname, false, false);
                 }
                 alreadyRegistered = true;

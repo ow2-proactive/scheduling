@@ -96,18 +96,16 @@ public class DataSpaceServiceStarter implements Serializable {
     private static String localhostname = null;
 
     /**
+     * static instance
+     */
+    private static DataSpaceServiceStarter instance = null;
+
+    /**
      * Local node (should be the one of the scheduler)
      */
-    private static Node schedulerNode = null;
+    private Node schedulerNode = null;
 
-    static {
-        try {
-            schedulerNode = PAActiveObject.getNode();
-            localhostname = NodeFactory.getDefaultNode().getVMInformation().getHostName();
-        } catch (Exception e) {
-
-        }
-    }
+    private boolean serviceStarted = false;
 
     /**
      * Application ID last used to configure the local node, null if none
@@ -120,7 +118,14 @@ public class DataSpaceServiceStarter implements Serializable {
     private ArrayList<FileSystemServerDeployer> servers = new ArrayList<FileSystemServerDeployer>(
             4);
 
-    public DataSpaceServiceStarter() {
+    private DataSpaceServiceStarter() {
+    }
+
+    public static DataSpaceServiceStarter getDataSpaceServiceStarter() {
+        if (instance == null) {
+            instance = new DataSpaceServiceStarter();
+        }
+        return instance;
     }
 
     /**
@@ -129,6 +134,10 @@ public class DataSpaceServiceStarter implements Serializable {
      * @throws Exception
      */
     public void startNamingService() throws Exception {
+
+        schedulerNode = PAActiveObject.getNode();
+
+        localhostname = java.net.InetAddress.getLocalHost().getHostName();
 
         namingServiceDeployer = new NamingServiceDeployer(true);
         namingServiceURL = namingServiceDeployer.getNamingServiceURL();
@@ -209,6 +218,8 @@ public class DataSpaceServiceStarter implements Serializable {
         namingService.registerApplication(SchedulerConstants.SCHEDULER_DATASPACE_APPLICATION_ID,
                 predefinedSpaces);
 
+        serviceStarted = true;
+
         try {
             // register the Global space
             createSpace(SchedulerConstants.SCHEDULER_DATASPACE_APPLICATION_ID,
@@ -252,9 +263,13 @@ public class DataSpaceServiceStarter implements Serializable {
      * @param inputConfiguration if the configuration is an InputSpace configuration (read-only)
      * @param localConfiguration if the local node needs to be configured for the provided application
      */
-    public static void createSpace(long appID, String name, String urlsproperty, String path, String hostname,
+    public void createSpace(long appID, String name, String urlsproperty, String path, String hostname,
             boolean inputConfiguration, boolean localConfiguration) throws FileSystemException,
             URISyntaxException, ProActiveException, MalformedURLException {
+        if (!serviceStarted) {
+            throw new IllegalStateException("DataSpace service is not started");
+        }
+
         if (!spacesConfigurations.containsKey(new Long(appID))) {
             if (localConfiguration) {
                 if (appidConfigured != null) {
@@ -312,7 +327,7 @@ public class DataSpaceServiceStarter implements Serializable {
      * @throws ProActiveException
      * @throws FileSystemException
      */
-    public static void createSpaceWithUserNameSubfolder(String username, long appID, String spaceName,
+    public void createSpaceWithUserNameSubfolder(String username, long appID, String spaceName,
             String urls, String localpath, String hostname, boolean inputConfiguration,
             boolean localConfiguration) throws URISyntaxException, IOException, ProActiveException {
         // create a local folder with the username
@@ -333,7 +348,7 @@ public class DataSpaceServiceStarter implements Serializable {
         String newPropertyValue = urlsToDSConfigProperty(updatedArray);
 
         // create the User Space for the given user
-        DataSpaceServiceStarter.createSpace(appID, spaceName, newPropertyValue, localpath, hostname,
+        createSpace(appID, spaceName, newPropertyValue, localpath, hostname,
                 inputConfiguration, localConfiguration);
 
     }
@@ -418,6 +433,9 @@ public class DataSpaceServiceStarter implements Serializable {
      * Terminate naming service and file system server if needed
      */
     public void terminateNamingService() {
+        if (!serviceStarted) {
+            throw new IllegalStateException("DataSpace service is not started");
+        }
         try {
             DataSpacesNodes.closeNodeConfig(NodeFactory.getDefaultNode());
             namingServiceDeployer.terminate();
@@ -429,6 +447,7 @@ public class DataSpaceServiceStarter implements Serializable {
             } catch (Throwable t) {
             }
         }
+        serviceStarted = false;
     }
 
     /**
@@ -437,6 +456,10 @@ public class DataSpaceServiceStarter implements Serializable {
      * @return the namingServiceURL
      */
     public String getNamingServiceURL() {
+        if (!serviceStarted) {
+            throw new IllegalStateException("DataSpace service is not started");
+        }
+
         return namingServiceURL;
     }
 
@@ -446,6 +469,10 @@ public class DataSpaceServiceStarter implements Serializable {
      * @return the namingService
      */
     public NamingService getNamingService() {
+        if (!serviceStarted) {
+            throw new IllegalStateException("DataSpace service is not started");
+        }
+
         return namingService;
     }
 }

@@ -34,15 +34,13 @@
  */
 package unitTests;
 
-import java.rmi.RemoteException;
-
-import org.objectweb.proactive.api.PAActiveObject;
-import org.ow2.proactive.scheduler.core.DataSpaceServiceStarter;
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
+import org.junit.Test;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.ow2.proactive.scheduler.core.DataSpaceServiceStarter;
 
 public class TestDataSpaceServiceStarter {
 
@@ -53,7 +51,7 @@ public class TestDataSpaceServiceStarter {
     }
 
     public void doTestTerminateNamingService() throws Exception {
-        DataSpaceServiceStarter dataSpaceServiceStarter = new DataSpaceServiceStarter();
+        DataSpaceServiceStarter dataSpaceServiceStarter =  DataSpaceServiceStarter.getDataSpaceServiceStarter();
 
         dataSpaceServiceStarter.startNamingService();
         assertEquals(1, dataSpaceServiceStarter.getNamingService().getRegisteredApplications().size());
@@ -63,7 +61,7 @@ public class TestDataSpaceServiceStarter {
             dataSpaceServiceStarter.getNamingService().getRegisteredApplications();
             fail("Naming service should not be accessible anymore");
         } catch (Exception expected) {
-            assertTrue(expected instanceof RemoteException);
+            assertTrue(expected instanceof IllegalStateException);
         }
     }
 

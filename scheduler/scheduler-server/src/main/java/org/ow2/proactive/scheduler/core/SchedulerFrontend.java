@@ -229,7 +229,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
             RMProxiesManager rmProxiesManager = RMProxiesManager.createRMProxiesManager(rmURL);
             rmProxiesManager.getSchedulerRMProxy();
 
-            DataSpaceServiceStarter dsServiceStarter = new DataSpaceServiceStarter();
+            DataSpaceServiceStarter dsServiceStarter = DataSpaceServiceStarter.getDataSpaceServiceStarter();
             dsServiceStarter.startNamingService();
 
             ExecutorService clientThreadPool = Executors.newFixedThreadPool(
@@ -340,7 +340,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
             String hostname = PASchedulerProperties.DATASPACE_DEFAULTUSER_HOSTNAME.getValueAsStringOrNull();
 
             try {
-                DataSpaceServiceStarter.createSpaceWithUserNameSubfolder(identification.getUsername(),
+                DataSpaceServiceStarter.getDataSpaceServiceStarter().createSpaceWithUserNameSubfolder(identification.getUsername(),
                         SchedulerConstants.SCHEDULER_DATASPACE_APPLICATION_ID, userSpaceName,
                         PASchedulerProperties.DATASPACE_DEFAULTUSER_URL.getValueAsString(), localpath,
                         hostname, false, true);
