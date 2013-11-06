@@ -98,4 +98,22 @@ public interface StudioInterface {
     boolean deleteWorkflow(@HeaderParam("sessionid") String sessionId,
                        @PathParam("id") String workflowId) throws NotConnectedException, IOException;
 
+    @GET
+    @Path("scripts")
+    @Produces("application/json")
+    ArrayList<Script> getScripts(@HeaderParam("sessionid") String sessionId) throws NotConnectedException;
+
+    @POST
+    @Path("scripts")
+    @Produces("application/json")
+    boolean createScript(@HeaderParam("sessionid") String sessionId,
+                        @FormParam("name") String name, @FormParam("content") String content) throws NotConnectedException;
+
+    @POST
+    @Path("scripts/{name}")
+    @Produces("application/json")
+    boolean updateWorkflow(@HeaderParam("sessionid") String sessionId,
+                           @PathParam("name") String name,
+                           @FormParam("content") String content) throws NotConnectedException;
+
 }

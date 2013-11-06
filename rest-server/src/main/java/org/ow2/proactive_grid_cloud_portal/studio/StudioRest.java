@@ -284,4 +284,68 @@ public class StudioRest implements StudioInterface {
         }
         return false;
     }
+
+    @Override
+    @GET
+    @Path("scripts")
+    @Produces("application/json")
+    public ArrayList<Script> getScripts(@HeaderParam("sessionid") String sessionId) throws NotConnectedException {
+        String userName = getUserName(sessionId);
+        File folder = new File(getProjectsDir()+"/"+userName);
+        System.out.println("Getting workflows as " + userName);
+
+        if (!folder.exists()) {
+            System.out.println("Creating dir " + folder.getAbsolutePath());
+            folder.mkdirs();
+        }
+
+        File scriptDir = new File(folder.getAbsolutePath());
+
+        if (!scriptDir.exists()) {
+            System.out.println("Creating dir " + scriptDir.getAbsolutePath());
+            scriptDir.mkdirs();
+        }
+
+        ArrayList<Script> scripts = new ArrayList<Script>();
+        for (File f: scriptDir.listFiles()) {
+
+            Script script = new Script();
+
+            script.setName(f.getName());
+            script.setAbsolutePath(f.getAbsolutePath());
+            script.setContent(getFileContent(f.getAbsolutePath()));
+            scripts.add(script);
+        }
+
+        System.out.println(scripts.size() + " scripts found");
+        return scripts;
+
+    }
+
+    @Override
+    @POST
+    @Path("scripts")
+    @Produces("application/json")
+    public boolean createScript(@HeaderParam("sessionid") String sessionId,
+                      @FormParam("name") String name, @FormParam("content") String content) throws NotConnectedException {
+
+        String userName = getUserName(sessionId);
+        System.out.println("Creating script " + name + " as " + userName);
+        File folder = new File(getProjectsDir()+"/"+userName);
+        File scriptDir = new File(folder.getAbsolutePath());
+        writeFileContent(name, content);
+        return true;
+    }
+
+    @Override
+    @POST
+    @Path("scripts/{name}")
+    @Produces("application/json")
+    public boolean updateWorkflow(@HeaderParam("sessionid") String sessionId,
+                           @PathParam("name") String name,
+                           @FormParam("content") String content) throws NotConnectedException {
+
+        return createScript(sessionId, name, content);
+    }
+
 }
