@@ -341,9 +341,9 @@ public class StudioRest implements StudioInterface {
     @POST
     @Path("scripts/{name}")
     @Produces("application/json")
-    public boolean updateWorkflow(@HeaderParam("sessionid") String sessionId,
-                           @PathParam("name") String name,
-                           @FormParam("content") String content) throws NotConnectedException {
+    public boolean updateScript(@HeaderParam("sessionid") String sessionId,
+                                @PathParam("name") String name,
+                                @FormParam("content") String content) throws NotConnectedException {
 
         return createScript(sessionId, name, content);
     }

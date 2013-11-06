@@ -112,8 +112,8 @@ public interface StudioInterface {
     @POST
     @Path("scripts/{name}")
     @Produces("application/json")
-    boolean updateWorkflow(@HeaderParam("sessionid") String sessionId,
-                           @PathParam("name") String name,
-                           @FormParam("content") String content) throws NotConnectedException;
+    boolean updateScript(@HeaderParam("sessionid") String sessionId,
+                         @PathParam("name") String name,
+                         @FormParam("content") String content) throws NotConnectedException;
 
 }
