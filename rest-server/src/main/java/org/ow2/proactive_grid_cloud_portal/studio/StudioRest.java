@@ -53,7 +53,6 @@ import javax.ws.rs.*;
 import java.io.*;
 import java.security.KeyException;
 import java.util.ArrayList;
-import java.util.Scanner;
 
 
 @Path("/studio")
@@ -70,11 +69,12 @@ public class StudioRest implements StudioInterface {
         return schedulerRest;
     }
 
-    private String getProjectsDir() {
+    private String getProjectsDirName() {
         String projectDir = System.getProperty(PROJECT_NAME_PROPERTY);
         if (projectDir==null) {
             projectDir = System.getProperty("java.io.tmpdir");
         }
+
         return projectDir;
     }
 
@@ -164,16 +164,16 @@ public class StudioRest implements StudioInterface {
     @Produces("application/json")
     public ArrayList<Workflow> getWorkflows(@HeaderParam("sessionid") String sessionId) throws NotConnectedException {
         String userName = getUserName(sessionId);
-        File folder = new File(getProjectsDir()+"/"+userName);
-        System.out.println("Getting workflows as " + userName);
+        File workflowsDir = new File(getProjectsDirName()+"/"+userName+"/workflows");
 
-        if (!folder.exists()) {
-            System.out.println("Creating dir " + folder.getAbsolutePath());
-            folder.mkdirs();
+        if (!workflowsDir.exists()) {
+            System.out.println("Creating dir " + workflowsDir.getAbsolutePath());
+            workflowsDir.mkdirs();
         }
 
+        System.out.println("Getting workflows as " + userName);
         ArrayList<Workflow> projects = new ArrayList<Workflow>();
-        for (File f: folder.listFiles()) {
+        for (File f: workflowsDir.listFiles()) {
             if (f.isDirectory()) {
                 File nameFile = new File(f.getAbsolutePath() + "/name");
 
@@ -210,20 +210,19 @@ public class StudioRest implements StudioInterface {
         String userName = getUserName(sessionId);
 
         System.out.println("Creating workflow as " + userName);
-        String projectsFolder = getProjectsDir()+"/"+userName + "/";
-        File projectsFolderFile = new File(projectsFolder);
+        File workflowsDir = new File(getProjectsDirName()+"/"+userName+"/workflows");
 
-        if (!projectsFolderFile.exists()) {
-            System.out.println("Creating dir " + projectsFolderFile.getAbsolutePath());
-            projectsFolderFile.mkdirs();
+        if (!workflowsDir.exists()) {
+            System.out.println("Creating dir " + workflowsDir.getAbsolutePath());
+            workflowsDir.mkdirs();
         }
 
         int projectId = 1;
-        while (new File(projectsFolder + projectId).exists()) {
+        while (new File(workflowsDir.getAbsolutePath() + "/" + projectId).exists()) {
             projectId ++;
         }
 
-        File newWorkflowFile = new File(projectsFolder + projectId);
+        File newWorkflowFile = new File(workflowsDir.getAbsolutePath() + "/" + projectId);
         System.out.println("Creating dir " + newWorkflowFile.getAbsolutePath());
         newWorkflowFile.mkdirs();
 
@@ -246,23 +245,22 @@ public class StudioRest implements StudioInterface {
         String userName = getUserName(sessionId);
 
         System.out.println("Updating workflow " + workflowId + " as " + userName);
-        String projectsFolder = getProjectsDir()+"/"+userName + "/";
-        File workflowFile = new File(projectsFolder + workflowId);
+        File workflowsDir = new File(getProjectsDirName()+"/"+userName+"/workflows/"+workflowId);
 
-        String oldJobName = getFileContent(workflowFile.getAbsolutePath() + "/name");
+        String oldJobName = getFileContent(workflowsDir.getAbsolutePath() + "/name");
         if (name != null && !name.equals(oldJobName)) {
             // new job name
             System.out.println("Updating job name from " + oldJobName + " to " + name);
-            System.out.println("Writing file " + workflowFile.getAbsolutePath()+"/name");
-            writeFileContent(workflowFile.getAbsolutePath()+"/name", name);
-            System.out.println("Deleting file " + workflowFile.getAbsolutePath()+"/"+oldJobName+".xml");
-            new File(workflowFile.getAbsolutePath()+"/"+oldJobName+".xml").delete();
+            System.out.println("Writing file " + workflowsDir.getAbsolutePath()+"/name");
+            writeFileContent(workflowsDir.getAbsolutePath()+"/name", name);
+            System.out.println("Deleting file " + workflowsDir.getAbsolutePath()+"/"+oldJobName+".xml");
+            new File(workflowsDir.getAbsolutePath()+"/"+oldJobName+".xml").delete();
         }
 
-        System.out.println("Writing file " + workflowFile.getAbsolutePath()+"/metadata");
-        writeFileContent(workflowFile.getAbsolutePath()+"/metadata", metadata);
-        System.out.println("Writing file " + workflowFile.getAbsolutePath()+"/"+name+".xml");
-        writeFileContent(workflowFile.getAbsolutePath()+"/"+name+".xml", xml);
+        System.out.println("Writing file " + workflowsDir.getAbsolutePath()+"/metadata");
+        writeFileContent(workflowsDir.getAbsolutePath()+"/metadata", metadata);
+        System.out.println("Writing file " + workflowsDir.getAbsolutePath()+"/"+name+".xml");
+        writeFileContent(workflowsDir.getAbsolutePath()+"/"+name+".xml", xml);
 
         return true;
     }
@@ -275,11 +273,11 @@ public class StudioRest implements StudioInterface {
         String userName = getUserName(sessionId);
 
         System.out.println("Deleting workflow " + workflowId + " as " + userName);
-        File workflowFolder = new File(getProjectsDir()+"/"+userName + "/" + workflowId);
+        File workflowsDir = new File(getProjectsDirName()+"/"+userName+"/workflows/"+workflowId);
 
-        if (workflowFolder.exists()) {
-            System.out.println("Removing dir " + workflowFolder.getAbsolutePath());
-            delete(workflowFolder);
+        if (workflowsDir.exists()) {
+            System.out.println("Removing dir " + workflowsDir.getAbsolutePath());
+            delete(workflowsDir);
             return true;
         }
         return false;
@@ -291,15 +289,7 @@ public class StudioRest implements StudioInterface {
     @Produces("application/json")
     public ArrayList<Script> getScripts(@HeaderParam("sessionid") String sessionId) throws NotConnectedException {
         String userName = getUserName(sessionId);
-        File folder = new File(getProjectsDir()+"/"+userName);
-        System.out.println("Getting scripts as " + userName);
-
-        if (!folder.exists()) {
-            System.out.println("Creating dir " + folder.getAbsolutePath());
-            folder.mkdirs();
-        }
-
-        File scriptDir = new File(folder.getAbsolutePath() + "/scripts");
+        File scriptDir = new File(getProjectsDirName()+"/"+userName + "/scripts");
 
         if (!scriptDir.exists()) {
             System.out.println("Creating dir " + scriptDir.getAbsolutePath());
@@ -328,12 +318,10 @@ public class StudioRest implements StudioInterface {
     @Produces("application/json")
     public boolean createScript(@HeaderParam("sessionid") String sessionId,
                       @FormParam("name") String name, @FormParam("content") String content) throws NotConnectedException {
-
         String userName = getUserName(sessionId);
         System.out.println("Creating script " + name + " as " + userName);
-        File folder = new File(getProjectsDir()+"/"+userName);
-        File scriptDir = new File(folder.getAbsolutePath()+"/scripts");
-        writeFileContent(name, content);
+        File scriptDir = new File(getProjectsDirName()+"/"+userName+"/scripts");
+        writeFileContent(scriptDir.getAbsolutePath()+"/"+name, content);
         return true;
     }
 
