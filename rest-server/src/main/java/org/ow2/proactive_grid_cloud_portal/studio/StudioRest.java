@@ -187,7 +187,7 @@ public class StudioRest implements StudioInterface {
                     if (xmlFile.exists()) {
                         wf.setXml(getFileContent(xmlFile.getAbsolutePath()));
                     }
-                    File metadataFile = new File(f.getAbsolutePath() + "/" + wf.getName() + "metadata");
+                    File metadataFile = new File(f.getAbsolutePath() + "/metadata");
                     if (metadataFile.exists()) {
                         wf.setMetadata(getFileContent(metadataFile.getAbsolutePath()));
                     }
@@ -292,14 +292,14 @@ public class StudioRest implements StudioInterface {
     public ArrayList<Script> getScripts(@HeaderParam("sessionid") String sessionId) throws NotConnectedException {
         String userName = getUserName(sessionId);
         File folder = new File(getProjectsDir()+"/"+userName);
-        System.out.println("Getting workflows as " + userName);
+        System.out.println("Getting scripts as " + userName);
 
         if (!folder.exists()) {
             System.out.println("Creating dir " + folder.getAbsolutePath());
             folder.mkdirs();
         }
 
-        File scriptDir = new File(folder.getAbsolutePath());
+        File scriptDir = new File(folder.getAbsolutePath() + "/scripts");
 
         if (!scriptDir.exists()) {
             System.out.println("Creating dir " + scriptDir.getAbsolutePath());
@@ -332,7 +332,7 @@ public class StudioRest implements StudioInterface {
         String userName = getUserName(sessionId);
         System.out.println("Creating script " + name + " as " + userName);
         File folder = new File(getProjectsDir()+"/"+userName);
-        File scriptDir = new File(folder.getAbsolutePath());
+        File scriptDir = new File(folder.getAbsolutePath()+"/scripts");
         writeFileContent(name, content);
         return true;
     }
