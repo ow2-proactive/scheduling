@@ -36,7 +36,11 @@
  */
 package org.ow2.proactive_grid_cloud_portal.studio;
 
+import org.apache.commons.io.IOUtils;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
+import org.jboss.resteasy.plugins.providers.multipart.InputPart;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
+import org.jboss.resteasy.util.GenericType;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.node.NodeException;
 import org.ow2.proactive.resourcemanager.exception.RMException;
@@ -46,13 +50,19 @@ import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
 import org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerSession;
 import org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerSessionMapper;
 import org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SchedulerRestException;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobValidationData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.*;
 
 import javax.security.auth.login.LoginException;
 import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import java.io.*;
 import java.security.KeyException;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 
 @Path("/studio")
@@ -316,24 +326,98 @@ public class StudioRest implements StudioInterface {
     @POST
     @Path("scripts")
     @Produces("application/json")
-    public boolean createScript(@HeaderParam("sessionid") String sessionId,
+    public String createScript(@HeaderParam("sessionid") String sessionId,
                       @FormParam("name") String name, @FormParam("content") String content) throws NotConnectedException {
         String userName = getUserName(sessionId);
         System.out.println("Creating script " + name + " as " + userName);
         File scriptDir = new File(getProjectsDirName()+"/"+userName+"/scripts");
-        writeFileContent(scriptDir.getAbsolutePath()+"/"+name, content);
-        return true;
+        String fileName = scriptDir.getAbsolutePath()+"/"+name;
+        writeFileContent(fileName, content);
+        return fileName;
     }
 
     @Override
     @POST
     @Path("scripts/{name}")
     @Produces("application/json")
-    public boolean updateScript(@HeaderParam("sessionid") String sessionId,
+    public String updateScript(@HeaderParam("sessionid") String sessionId,
                                 @PathParam("name") String name,
                                 @FormParam("content") String content) throws NotConnectedException {
 
         return createScript(sessionId, name, content);
     }
 
+    @POST
+    @Path("classes")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces("application/json")
+    public String createClass(@HeaderParam("sessionid")
+                               String sessionId, MultipartFormDataInput input) throws NotConnectedException, IOException {
+
+        String userName = getUserName(sessionId);
+        File classesDir = new File(getProjectsDirName()+"/"+userName + "/classes");
+
+        if (!classesDir.exists()) {
+            System.out.println("Creating dir " + classesDir.getAbsolutePath());
+            classesDir.mkdirs();
+        }
+
+        String fileName = "";
+
+        Map<String, List<InputPart>> uploadForm = input.getFormDataMap();
+        String name = uploadForm.keySet().iterator().next();
+        List<InputPart> inputParts = uploadForm.get(name);
+
+        for (InputPart inputPart : inputParts) {
+
+            try {
+
+                MultivaluedMap<String, String> header = inputPart.getHeaders();
+                //convert the uploaded file to inputstream
+                InputStream inputStream = inputPart.getBody(InputStream.class,null);
+                byte[] bytes = IOUtils.toByteArray(inputStream);
+
+                //constructs upload file path
+                fileName = classesDir.getAbsolutePath() + "/" + name;
+
+                writeFile(bytes,fileName);
+            } catch (IOException e) {
+                e.printStackTrace();
+                throw e;
+            }
+
+        }
+
+        return fileName;
+    }
+
+    private void writeFile(byte[] content, String filename) throws IOException {
+
+        File file = new File(filename);
+
+        if (!file.exists()) {
+            file.createNewFile();
+        }
+
+        FileOutputStream fop = new FileOutputStream(file);
+
+        try {
+            fop.write(content);
+        } finally {
+            fop.flush();
+            fop.close();
+        }
+    }
+
+    @Override
+    public JobValidationData validate(MultipartFormDataInput multipart) {
+        return scheduler().validate(multipart);
+    }
+
+    @Override
+    public JobIdData submit(@HeaderParam("sessionid") String sessionId, MultipartFormDataInput multipart)
+            throws IOException, JobCreationRestException,
+            NotConnectedRestException, PermissionRestException, SubmissionClosedRestException {
+        return scheduler().submit(sessionId, multipart);
+    }
 }

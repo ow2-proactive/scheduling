@@ -35,12 +35,15 @@
 package org.ow2.proactive_grid_cloud_portal.studio;
 
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.node.NodeException;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SchedulerRestException;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobValidationData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.*;
 
 import javax.security.auth.login.LoginException;
 import javax.ws.rs.*;
@@ -106,14 +109,48 @@ public interface StudioInterface {
     @POST
     @Path("scripts")
     @Produces("application/json")
-    boolean createScript(@HeaderParam("sessionid") String sessionId,
+    String createScript(@HeaderParam("sessionid") String sessionId,
                         @FormParam("name") String name, @FormParam("content") String content) throws NotConnectedException;
 
     @POST
     @Path("scripts/{name}")
     @Produces("application/json")
-    boolean updateScript(@HeaderParam("sessionid") String sessionId,
+    String updateScript(@HeaderParam("sessionid") String sessionId,
                          @PathParam("name") String name,
                          @FormParam("content") String content) throws NotConnectedException;
+
+    @POST
+    @Path("classes")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces("application/json")
+    public String createClass(@HeaderParam("sessionid")
+                            String sessionId, MultipartFormDataInput multipart) throws NotConnectedException, IOException;
+
+
+    /**
+     * Validates a job.
+     * @param multipart a HTTP multipart form which contains the job-descriptor or the job archive file
+     * @return the result of job validation
+     *
+     */
+    @POST
+    @Path("validate")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces("application/json")
+    public abstract JobValidationData validate(MultipartFormDataInput multipart);
+
+    /**
+     * Submits a job to the scheduler
+     * @param sessionId a valid session id
+     * @param multipart a form with the job file as form data
+     * @return the <code>jobid</code> of the newly created job
+     */
+    @POST
+    @Path("submit")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces("application/json")
+    public abstract JobIdData submit(@HeaderParam("sessionid")
+                                     String sessionId, MultipartFormDataInput multipart) throws IOException, JobCreationRestException,
+            NotConnectedRestException, PermissionRestException, SubmissionClosedRestException;
 
 }
