@@ -61,8 +61,11 @@ import javax.ws.rs.core.MultivaluedMap;
 import java.io.*;
 import java.security.KeyException;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 
 @Path("/studio")
@@ -319,7 +322,6 @@ public class StudioRest implements StudioInterface {
 
         System.out.println(scripts.size() + " scripts found");
         return scripts;
-
     }
 
     @Override
@@ -345,6 +347,47 @@ public class StudioRest implements StudioInterface {
                                 @FormParam("content") String content) throws NotConnectedException {
 
         return createScript(sessionId, name, content);
+    }
+
+
+    @Override
+    @GET
+    @Path("classes")
+    @Produces("application/json")
+    public ArrayList<String> getClasses(@HeaderParam("sessionid") String sessionId) throws NotConnectedException {
+        String userName = getUserName(sessionId);
+        File classesDir = new File(getProjectsDirName()+"/"+userName + "/classes");
+
+        ArrayList<String> classes = new ArrayList<String>();
+        if (classesDir.exists()) {
+            File[] jars = classesDir.listFiles(new FilenameFilter() {
+                public boolean accept(File dir, String name) {
+                    return name.toLowerCase().endsWith(".jar");
+                }
+            });
+
+            for (File jar :jars) {
+                JarFile jarFile = null;
+                try {
+                    jarFile = new JarFile(jar.getAbsolutePath());
+                    Enumeration allEntries = jarFile.entries();
+                    while (allEntries.hasMoreElements()) {
+                        JarEntry entry = (JarEntry) allEntries.nextElement();
+                        String name = entry.getName();
+                        if (name.endsWith(".class")) {
+                            String noExt = name.substring(0, name.length() - ".class".length());
+                            classes.add(noExt.replaceAll("/", "."));
+                        }
+                    }
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        return classes;
+
     }
 
     @POST

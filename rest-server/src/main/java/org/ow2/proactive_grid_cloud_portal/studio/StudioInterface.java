@@ -119,6 +119,11 @@ public interface StudioInterface {
                          @PathParam("name") String name,
                          @FormParam("content") String content) throws NotConnectedException;
 
+    @GET
+    @Path("classes")
+    @Produces("application/json")
+    ArrayList<String> getClasses(@HeaderParam("sessionid") String sessionId) throws NotConnectedException;
+
     @POST
     @Path("classes")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
