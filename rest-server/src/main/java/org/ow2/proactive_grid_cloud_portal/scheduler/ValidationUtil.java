@@ -42,7 +42,6 @@ import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 import java.io.File;
 import java.util.ArrayList;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;

@@ -167,3 +167,21 @@ project(':rest-cli') {
         compile project(':rest-api')
     }
 }
+
+project(':rest-client') {
+    dependencies {
+	compile 'commons-cli:commons-cli:1.2'
+        compile 'commons-io:commons-io:2.4'
+        compile 'jline:jline:1.0'
+
+        compile 'org.apache.httpcomponents:httpclient:4.2.1'
+        compile 'org.apache.httpcomponents:httpmime:4.2.1'
+
+        compile 'org.ow2.proactive:common-api:3.5.0-SNAPSHOT'
+
+        compile 'org.ow2.proactive:scheduler-client:3.5.0-SNAPSHOT'
+
+	
+        compile project(':rest-cli')
+    }
+}

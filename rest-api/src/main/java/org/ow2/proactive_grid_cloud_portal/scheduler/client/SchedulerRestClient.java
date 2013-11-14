@@ -42,16 +42,13 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.net.HttpURLConnection;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.util.Collections;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
 
-import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
-import org.ow2.proactive_grid_cloud_portal.common.exceptionmapper.ExceptionToJson;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.jboss.resteasy.client.ClientExecutor;
@@ -61,6 +58,10 @@ import org.jboss.resteasy.client.ClientResponseFailure;
 import org.jboss.resteasy.client.ProxyFactory;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataOutput;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
+import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
+import org.ow2.proactive_grid_cloud_portal.common.exceptionmapper.ExceptionToJson;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
 
 
 public class SchedulerRestClient {
@@ -88,6 +89,37 @@ public class SchedulerRestClient {
 
     public JobIdData submitJobArchive(String sessionId, InputStream jobArchive) throws Exception {
         return submit(sessionId, jobArchive, MediaType.APPLICATION_OCTET_STREAM_TYPE);
+    }
+    
+    public boolean pushFile(String sessionId, String space, String path,
+            String fileName, InputStream fileContent) throws Exception {
+        String uriTmpl = (new StringBuilder(restEndpointURL))
+                .append(addSlashIfMissing(restEndpointURL))
+                .append("scheduler/dataspace/").append(space)
+                .append(URLEncoder.encode(path, "UTF-8")).toString();
+
+        ClientRequest request = (executor == null) ? new ClientRequest(uriTmpl)
+                : new ClientRequest(uriTmpl, executor);
+        request.header("sessionid", sessionId);
+
+        MultipartFormDataOutput formData = new MultipartFormDataOutput();
+        formData.addFormData("fileName", fileName, MediaType.TEXT_PLAIN_TYPE);
+        formData.addFormData("fileContent", fileContent,
+                MediaType.APPLICATION_OCTET_STREAM_TYPE);
+        request.body(MediaType.MULTIPART_FORM_DATA, formData);
+
+        ClientResponse<Boolean> response = request.post(Boolean.class);
+        if (response.getStatus() != HttpURLConnection.HTTP_OK) {
+            if (response.getStatus() == HttpURLConnection.HTTP_UNAUTHORIZED) {
+                throw new NotConnectedRestException(
+                        "User not authenticated or session timeout.");
+            } else {
+                throw new Exception(String.format(
+                        "File upload failed. Status code: %s",
+                        response.getStatus()));
+            }
+        }
+        return response.getEntity();
     }
 
     private JobIdData submit(String sessionId, InputStream job, MediaType mediaType) throws Exception {
