@@ -1323,6 +1323,119 @@ task2.setGenerationScript(gscript);
 				</para>
 			</section>
 		</section>
+		<section xml:id="job_variables">
+			<info><title>PA Job variables</title></info>
+			<para>PA Job variables provides an effective mechanism to propagate data down the execution chain. It provides mulitple ways to define varaibles and update them at different points in the execution chain.
+			</para>
+			<section xml:id="define_job_varaibles">
+			<info><title>Define variables</title></info>
+			<para>
+				There are two ways to create a variable.
+			</para>
+			<itemizedlist>
+				<listitem><para>Using the <emphasis>&lt;variable&gt;</emphasis> tag in the XML descriptor.</para>
+					<programlisting language="xml"><![CDATA[
+<job>
+	<variables>
+		<variable name="foo" value="bar"/>
+	</variables>
+</job>]]>
+					</programlisting>	
+				</listitem>
+				<listitem>
+					<para>
+						Using the PA Job API.
+					</para>
+					<programlisting language="java">
+Job job = ...;
+Map &lt;String,String&gt; map = job.getVariables();
+map.put("foo","bar");
+					</programlisting>								
+					
+				</listitem>
+			</itemizedlist>
+			</section>
+			<section xml:id="modify_variables">
+				<info><title>Modify variables</title></info>
+				<para>
+					The variables can be modified in few places depending on user requirements. For instance in pre-scripts, Java task, post-scripts.The updated values will be visible down the execution chain. For instance, if a pre-scripts modifies the value of a variable to the task it belongs, to post scripts, following dependant tasks .etc.The updated values will not be visible to any independent tasks.
+				</para>
+				<itemizedlist>
+					<listitem>
+						<para>In pre-scripts, post-scripts:</para>
+						<para>
+							All variables will be visible to pre-scripts as script variables. Those values can be modified using the variable map which can be referenced as ‘variables’.
+						</para>
+						<para>
+							Example:
+						</para>
+						<programlisting language="java">
+// access variable 'foo' directly
+print('${foo}');
+// access variable 'foo' via variable map
+print(variables.get('foo');
+// modify variable 'foo'
+variables.put('foo','modified-value');
+						</programlisting>
+					</listitem>
+					<listitem>
+						<para>In Java tasks:</para>
+						<para>
+							If the implementation of Java Executable contains any field with the same name as of a variable, they will get initialized with updated values. The implementation class can obtain a reference to the variable map by using getVariables() method.  It can change the variable values by updating the map and those changes will get propagated down the execution chain.
+						</para>
+						<para>Example:</para>
+						<programlisting language="java">
+public class VariablesExec extends JavaExecutable {
+
+    // this variable 'foo' will be initialized
+    // with the updated value by default.
+    private String foo;
+
+    @Override
+    public Serializable execute(TaskResult... results) throws Throwable {
+	// access variable 'foo'
+	System.out.println(foo);
+
+	// modify variable 'foo'
+        getVariables().put("var", "modified-value");
+    }
+
+}						</programlisting>
+					</listitem>
+					<listitem>
+						<para>In Native tasks:</para>
+						<para>
+							Native Tasks can not modify the values of variables. It is only supported in Java tasks. It can read a value of variable as the environment variable using the variable name with “var_” prefix. 
+						</para>
+						<para>Example:</para>
+						<programlisting language="sh">
+# access variable foo
+echo "$var_foo"
+						</programlisting>
+					</listitem>
+				</itemizedlist>
+			</section>
+			<section>
+				<info><title>Limitations</title></info>
+				<itemizedlist>
+					<listitem>
+						<para>
+							If the a task depends of several tasks and each task modifies the same variable, the final value of the variable which is propagated down the execution chain, depends on the order of task execution. Therefore the users need to take appropriate measure to prevent any mal-effects of such raise conditions.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							You can set any Java serializable object as a variable value. They will be converted into strings using toString() method when required. (For instance to make those values available as environment variables in Native tasks). However this requires that both the PA Scheduler and Worker Nodes can find those class files in their classpaths. 
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							Only the inital value of variables will be visible to genration scripts.
+						</para>
+					</listitem>
+				</itemizedlist>
+			</section>
+		</section>
 		<section xml:id="Dataspace"><info><title>Handling data and files using Data Spaces</title></info>
 			<para>
 				The Scheduler infrastructure allows user to handle files during the scheduling process.
