@@ -39,11 +39,11 @@ package org.ow2.proactive.scheduler.common.util.logforwarder.providers;
 import java.io.IOException;
 import java.net.URI;
 
-import org.apache.log4j.Appender;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
 import org.ow2.proactive.scheduler.common.util.logforwarder.appenders.SocketAppenderWithSSHTunneling;
+import org.apache.log4j.Appender;
 
 
 /**

@@ -38,13 +38,13 @@ package org.ow2.proactive.scheduler.common.util.logforwarder.providers;
 
 import java.net.URI;
 
-import org.apache.log4j.Appender;
-import org.apache.log4j.net.SocketAppender;
 import org.objectweb.proactive.core.util.ProActiveInet;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingProvider;
 import org.ow2.proactive.scheduler.common.util.logforwarder.util.SimpleLoggerServer;
+import org.apache.log4j.Appender;
+import org.apache.log4j.net.SocketAppender;
 
 
 /**
