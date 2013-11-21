@@ -40,15 +40,7 @@ import static javax.ws.rs.core.MediaType.APPLICATION_XML_TYPE;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 import static org.ow2.proactive_grid_cloud_portal.scheduler.ValidationUtil.validateJobDescriptor;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.io.Serializable;
+import java.io.*;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.KeyException;
@@ -844,6 +836,26 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
         return map;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @GET
+    @Path("jobs/{jobid}/html")
+    @Produces("text/html")
+    public String getJobHtml(@HeaderParam("sessionid")
+                              String sessionId, @PathParam("jobid")
+                              String jobId) throws IOException, NotConnectedRestException {
+        checkAccess(sessionId);
+
+        File jobHtml = new File(PortalConfiguration.jobIdToPath(jobId)+".html");
+        if (!jobHtml.exists()) {
+            throw new IOException("the file "+jobHtml.getAbsolutePath()+" was not found on the server");
+        }
+        InputStream ips = new BufferedInputStream(new FileInputStream(jobHtml));
+        return new String(IOUtils.toByteArray(ips));
+    }
+
 
     /**
      * Returns a list of taskState

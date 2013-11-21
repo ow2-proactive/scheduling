@@ -158,4 +158,15 @@ public interface StudioInterface {
                                      String sessionId, MultipartFormDataInput multipart) throws IOException, JobCreationRestException,
             NotConnectedRestException, PermissionRestException, SubmissionClosedRestException;
 
+    @GET
+    @Path("visualizations/{id}")
+    @Produces("application/json")
+    String getVisualization(@HeaderParam("sessionid") String sessionId, @PathParam("id") String jobId) throws NotConnectedException;
+
+    @POST
+    @Path("visualizations/{id}")
+    @Produces("application/json")
+    boolean updateVisualization(@HeaderParam("sessionid") String sessionId,
+                        @PathParam("id") String jobId, @FormParam("visualization") String visualization) throws NotConnectedException;
+
 }

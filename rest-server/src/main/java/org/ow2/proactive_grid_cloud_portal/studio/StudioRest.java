@@ -53,6 +53,7 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobValidationData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.*;
+import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
 
 import javax.security.auth.login.LoginException;
 import javax.ws.rs.*;
@@ -462,5 +463,30 @@ public class StudioRest implements StudioInterface {
             throws IOException, JobCreationRestException,
             NotConnectedRestException, PermissionRestException, SubmissionClosedRestException {
         return scheduler().submit(sessionId, multipart);
+    }
+
+
+    @GET
+    @Path("visualizations/{id}")
+    @Produces("application/json")
+    public String getVisualization(@HeaderParam("sessionid") String sessionId, @PathParam("id") String jobId) throws NotConnectedException {
+        File visualizationFile = new File(PortalConfiguration.jobIdToPath(jobId)+".html");
+        if (visualizationFile.exists()) {
+            return getFileContent(visualizationFile.getAbsolutePath());
+        }
+        return "";
+    }
+
+    @POST
+    @Path("visualizations/{id}")
+    @Produces("application/json")
+    public boolean updateVisualization(@HeaderParam("sessionid") String sessionId,
+                                @PathParam("id") String jobId, @FormParam("visualization") String visualization) throws NotConnectedException {
+        File visualizationFile = new File(PortalConfiguration.jobIdToPath(jobId)+".html");
+        if (visualizationFile.exists()) {
+            visualizationFile.delete();
+        }
+        writeFileContent(visualizationFile.getAbsolutePath(), visualization);
+        return true;
     }
 }

@@ -309,6 +309,25 @@ public interface SchedulerRestInterface {
     String jobId) throws IOException, NotConnectedRestException;
 
     /**
+     * Returns a base64 utf-8 encoded html visualization corresponding to the jobid.
+     * This visualization exists when job is created in the web studio
+     *
+     * @param sessionId
+     *            a valid session id
+     * @param jobId
+     *            the job id
+     * @return Returns a base64 encoded png image corresponding to the jobid
+     * @throws IOException
+     *             when it is not possible to access to the archive
+     */
+    @GET
+    @Path("jobs/{jobid}/html")
+    @Produces("application/json;charset=" + ENCODING)
+    public String getJobHtml(@HeaderParam("sessionid")
+                              String sessionId, @PathParam("jobid")
+                              String jobId) throws IOException, NotConnectedRestException;
+
+    /**
      * Returns a list of taskState 
      * @param sessionId a valid session id
      * @param jobId the job id
