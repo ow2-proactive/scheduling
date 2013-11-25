@@ -51,6 +51,7 @@ import java.util.Map.Entry;
 
 import javax.security.auth.login.LoginException;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.db.SortOrder;
@@ -82,7 +83,6 @@ import org.ow2.proactive.utils.Tools;
 import org.ow2.proactive.utils.console.Command;
 import org.ow2.proactive.utils.console.ConsoleModel;
 import org.ow2.proactive.utils.console.MBeanInfoViewer;
-import org.apache.log4j.Logger;
 
 
 /**
@@ -113,7 +113,7 @@ public class SchedulerModel extends ConsoleModel {
     @SuppressWarnings("unchecked")
     private static final List<SortParameter<JobSortParameter>> JOB_SORT_PARAMS = Arrays.asList(
             new SortParameter<JobSortParameter>(JobSortParameter.STATE, SortOrder.ASC),
-            new SortParameter<JobSortParameter>(JobSortParameter.ID, SortOrder.ASC));
+            new SortParameter<JobSortParameter>(JobSortParameter.ID, SortOrder.DESC));
 
     /**
      * Get this model. Also specify if the exit command should do something or not
@@ -720,13 +720,13 @@ public class SchedulerModel extends ConsoleModel {
             list.add("DURATION");
             oaf.setTitle(list);
 
-            JobStatus status = null;
+            JobStatus lastStatus = null;
             for (JobInfo jobInfo : jobs) {
-                if (!jobInfo.getStatus().equals(status)) {
+                if (changedOfStateGroup(lastStatus, jobInfo.getStatus())) {
                     oaf.addEmptyLine();
                 }
                 oaf.addLine(makeList(jobInfo));
-                status = jobInfo.getStatus();
+                lastStatus = jobInfo.getStatus();
             }
 
             //print formatter
@@ -734,6 +734,32 @@ public class SchedulerModel extends ConsoleModel {
         } catch (Exception e) {
             handleExceptionDisplay("Error while getting list of jobs", e);
         }
+    }
+
+    // jobs are grouped in 3 groups (by state)
+    private boolean changedOfStateGroup(JobStatus lastStatus, JobStatus newStatus) {
+        if (isFirstGroup(lastStatus) && !isFirstGroup(newStatus)) {
+            return true;
+        } else if (isSecondGroup(lastStatus) && !isSecondGroup(newStatus)) {
+            return true;
+        } else if (isFirstGroup(lastStatus) && isThirdGroup(newStatus)) {
+            return true;
+        }
+        return false;
+    }
+
+    private boolean isFirstGroup(JobStatus status) {
+        return JobStatus.PENDING.equals(status);
+    }
+
+    private boolean isSecondGroup(JobStatus status) {
+        return JobStatus.RUNNING.equals(status)
+          || JobStatus.STALLED.equals(status)
+          || JobStatus.PAUSED.equals(status);
+    }
+
+    private boolean isThirdGroup(JobStatus status) {
+        return !isFirstGroup(status) && !isSecondGroup(status);
     }
 
     private List<String> makeList(JobInfo jobInfo) {
