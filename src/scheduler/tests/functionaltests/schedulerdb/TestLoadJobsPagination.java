@@ -56,10 +56,13 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
         // change status for some jobs 
         job1.failed(null, JobStatus.KILLED);
         dbManager.updateAfterJobKilled(job1, Collections.<TaskId> emptySet());
-        job3.failed(null, JobStatus.KILLED);
-        dbManager.updateAfterJobKilled(job3, Collections.<TaskId> emptySet());
-        job5.failed(null, JobStatus.KILLED);
-        dbManager.updateAfterJobKilled(job5, Collections.<TaskId> emptySet());
+
+        job3.setPaused();
+        dbManager.updateJobAndTasksState(job3);
+
+        job5.start();
+        InternalTask taskJob5 = startTask(job5, job5.getITasks().get(0));
+        dbManager.jobTaskStarted(job5, taskJob5, true);
 
         List<JobInfo> jobs;
 
@@ -102,7 +105,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
         jobs = dbManager.getJobs(0, 10, null, true, true, true, sortParameters(
                 new SortParameter<JobSortParameter>(JobSortParameter.STATE, SortOrder.ASC),
                 new SortParameter<JobSortParameter>(JobSortParameter.ID, SortOrder.ASC)));
-        checkJobs(jobs, 2, 4, 6, 1, 3, 5);
+        checkJobs(jobs, 2, 4, 6, 3, 5, 1);
 
         jobs = dbManager.getJobs(0, 10, null, true, true, true, sortParameters(
                 new SortParameter<JobSortParameter>(JobSortParameter.STATE, SortOrder.DESC),
