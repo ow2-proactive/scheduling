@@ -55,7 +55,6 @@ import org.ow2.proactive.scheduler.job.JobInfoImpl;
 import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskInfoImpl;
-import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobInfoData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobPriorityData;
@@ -73,111 +72,111 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.dto.UserJobData;
 
 public class DataUtility {
 
-	private DataUtility() {
-	}
+    private DataUtility() {
+    }
 
-	public static JobId jobId(JobIdData jobIdData) {
-		return new JobIdImpl(jobIdData.getId(), jobIdData.getReadableName());
-	}
+    public static JobId jobId(JobIdData jobIdData) {
+        return new JobIdImpl(jobIdData.getId(), jobIdData.getReadableName());
+    }
 
-	public static JobPriority jobPriority(JobPriorityData d) {
-		return JobPriority.valueOf(d.name());
-	}
+    public static JobPriority jobPriority(JobPriorityData d) {
+        return JobPriority.valueOf(d.name());
+    }
 
-	public static JobStatus jobStatus(JobStatusData d) {
-		return JobStatus.valueOf(d.name());
-	}
+    public static JobStatus jobStatus(JobStatusData d) {
+        return JobStatus.valueOf(d.name());
+    }
 
-	public static JobInfo toJobInfo(JobInfoData d) {
-		JobInfoImpl impl = new JobInfoImpl();
-		impl.setJobId(jobId(d.getJobId()));
-		impl.setFinishedTime(d.getFinishedTime());
-		impl.setJobOwner(d.getJobOwner());
-		impl.setNumberOfFinishedTasks(d.getNumberOfFinishedTasks());
-		impl.setNumberOfPendingTasks(d.getNumberOfPendingTasks());
-		impl.setNumberOfRunningTasks(d.getNumberOfRunningTasks());
-		impl.setPriority(jobPriority(d.getPriority()));
-		impl.setRemovedTime(d.getRemovedTime());
-		impl.setStartTime(d.getStartTime());
-		impl.setStatus(jobStatus(d.getStatus()));
-		impl.setSubmittedTime(d.getSubmittedTime());
-		impl.setTotalNumberOfTasks(d.getTotalNumberOfTasks());
-		return impl;
-	}
+    public static JobInfo toJobInfo(JobInfoData d) {
+        JobInfoImpl impl = new JobInfoImpl();
+        impl.setJobId(jobId(d.getJobId()));
+        impl.setFinishedTime(d.getFinishedTime());
+        impl.setJobOwner(d.getJobOwner());
+        impl.setNumberOfFinishedTasks(d.getNumberOfFinishedTasks());
+        impl.setNumberOfPendingTasks(d.getNumberOfPendingTasks());
+        impl.setNumberOfRunningTasks(d.getNumberOfRunningTasks());
+        impl.setPriority(jobPriority(d.getPriority()));
+        impl.setRemovedTime(d.getRemovedTime());
+        impl.setStartTime(d.getStartTime());
+        impl.setStatus(jobStatus(d.getStatus()));
+        impl.setSubmittedTime(d.getSubmittedTime());
+        impl.setTotalNumberOfTasks(d.getTotalNumberOfTasks());
+        return impl;
+    }
 
-	public static TaskInfo taskInfo(TaskInfoData d) {
-		TaskInfoImpl impl = new TaskInfoImpl();
-		impl.setExecutionDuration(d.getExecutionDuration());
-		impl.setExecutionHostName(d.getExecutionHostName());
-		impl.setFinishedTime(d.getFinishedTime());
-		impl.setNumberOfExecutionLeft(d.getNumberOfExecutionLeft());
-		impl.setNumberOfExecutionOnFailureLeft(d
-				.getNumberOfExecutionOnFailureLeft());
-		impl.setStartTime(d.getStartTime());
-		impl.setStatus(TaskStatus.valueOf(d.getTaskStatus().name()));
-		return impl;
-	}
+    public static TaskInfo taskInfo(TaskInfoData d) {
+        TaskInfoImpl impl = new TaskInfoImpl();
+        impl.setExecutionDuration(d.getExecutionDuration());
+        impl.setExecutionHostName(d.getExecutionHostName());
+        impl.setFinishedTime(d.getFinishedTime());
+        impl.setNumberOfExecutionLeft(d.getNumberOfExecutionLeft());
+        impl.setNumberOfExecutionOnFailureLeft(d
+                .getNumberOfExecutionOnFailureLeft());
+        impl.setStartTime(d.getStartTime());
+        impl.setStatus(TaskStatus.valueOf(d.getTaskStatus().name()));
+        return impl;
+    }
 
-	public static TaskState taskState(TaskStateData d) {
-		return new TaskStateImpl(d);
-	}
+    public static TaskState taskState(TaskStateData d) {
+        return new TaskStateImpl(d);
+    }
 
-	public static TaskResult toTaskResult(JobId jobId, TaskResultData d) {
-		TaskIdData id = d.getId();
-		TaskId taskId = TaskIdImpl.createTaskId(jobId, id.getReadableName(),
-				id.getId(), false);
-		return new TaskResultImpl(taskId, d.getSerializedValue(), null, 0);
-	}
+    public static TaskResult toTaskResult(JobId jobId, TaskResultData d) {
+        TaskIdData id = d.getId();
+        TaskId taskId = TaskIdImpl.createTaskId(jobId, id.getReadableName(),
+                id.getId(), false);
+        return new TaskResultImpl(taskId, d);
+    }
 
-	public static JobState toJobState(JobStateData d) {
-		return new JobStateImpl(d);
-	}
+    public static JobState toJobState(JobStateData d) {
+        return new JobStateImpl(d);
+    }
 
-	public static JobResult toJobResult(JobResultData d) {
-		return new JobResultImpl(d);
-	}
+    public static JobResult toJobResult(JobResultData d) {
+        return new JobResultImpl(d);
+    }
 
-	public static List<JobUsage> toJobUsages(List<JobUsageData> dataList) {
-		List<JobUsage> jobUsages = new ArrayList<JobUsage>();
-		for (JobUsageData d : dataList) {
-			jobUsages.add(jobUsage(d));
-		}
-		return jobUsages;
-	}
+    public static List<JobUsage> toJobUsages(List<JobUsageData> dataList) {
+        List<JobUsage> jobUsages = new ArrayList<JobUsage>();
+        for (JobUsageData d : dataList) {
+            jobUsages.add(jobUsage(d));
+        }
+        return jobUsages;
+    }
 
-	public static JobUsage jobUsage(JobUsageData d) {
-		JobUsage impl = new JobUsage(d.getJobId(), d.getJobName(),
-				d.getJobDuration());
-		List<TaskUsageData> taskUsageDataList = d.getTaskUsages();
-		for (TaskUsageData taskUsageData : taskUsageDataList) {
-			impl.add(taskUsage(taskUsageData));
-		}
-		return impl;
-	}
+    public static JobUsage jobUsage(JobUsageData d) {
+        JobUsage impl = new JobUsage(d.getJobId(), d.getJobName(),
+                d.getJobDuration());
+        List<TaskUsageData> taskUsageDataList = d.getTaskUsages();
+        for (TaskUsageData taskUsageData : taskUsageDataList) {
+            impl.add(taskUsage(taskUsageData));
+        }
+        return impl;
+    }
 
-	public static TaskUsage taskUsage(TaskUsageData d) {
-		return new TaskUsage(d.getTaskId(), d.getTaskName(),
-				d.getTaskStartTime(), d.getTaskFinishedTime(),
-				d.getTaskExecutionDuration(), d.getTaskNodeNumber());
-	}
+    public static TaskUsage taskUsage(TaskUsageData d) {
+        return new TaskUsage(d.getTaskId(), d.getTaskName(),
+                d.getTaskStartTime(), d.getTaskFinishedTime(),
+                d.getTaskExecutionDuration(), d.getTaskNodeNumber());
+    }
 
-	public static List<JobInfo> toJobInfos(List<UserJobData> dataList) {
-		List<JobInfo> jobInfos = new ArrayList<JobInfo>();
-		for (UserJobData ujd : dataList) {
-			jobInfos.add(toJobInfo(ujd.getJobInfo()));
-		}
-		return jobInfos;
-	}
+    public static List<JobInfo> toJobInfos(List<UserJobData> dataList) {
+        List<JobInfo> jobInfos = new ArrayList<JobInfo>();
+        for (UserJobData ujd : dataList) {
+            jobInfos.add(toJobInfo(ujd.getJobInfo()));
+        }
+        return jobInfos;
+    }
 
-	public static List<SchedulerUserInfo> toSchedulerUserInfos(
-			List<SchedulerUserData> dataList) {
-		List<SchedulerUserInfo> schedulerUserInfos = new ArrayList<SchedulerUserInfo>();
-		for (SchedulerUserData sud : dataList) {
-			schedulerUserInfos.add(new SchedulerUserInfo(sud.getHostName(), sud
-					.getUsername(), sud.getConnectionTime(), sud
-					.getLastSubmitTime(), sud.getSubmitNumber()));
-		}
-		return schedulerUserInfos;
-	}
+    public static List<SchedulerUserInfo> toSchedulerUserInfos(
+            List<SchedulerUserData> dataList) {
+        List<SchedulerUserInfo> schedulerUserInfos = new ArrayList<SchedulerUserInfo>();
+        for (SchedulerUserData sud : dataList) {
+            schedulerUserInfos.add(new SchedulerUserInfo(sud.getHostName(), sud
+                    .getUsername(), sud.getConnectionTime(), sud
+                    .getLastSubmitTime(), sud.getSubmitNumber()));
+        }
+        return schedulerUserInfos;
+    }
 
 }
