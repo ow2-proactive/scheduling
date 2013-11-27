@@ -44,15 +44,14 @@ public final class PerUserConnectionRMProxiesManager extends RMProxiesManager {
     @Override
     public void rebindRMProxiesManager(URI rmURI) throws RMException, RMProxyCreationException {
         synchronized (connectionStateLock) {
+            terminateAllProxies();
+
             String rmUrl = rmURI.toString();
             RMAuthentication auth = RMConnection.join(rmUrl);
             rmAuthentifications.put(rmURI, auth);
             currentRMConnection = new Connection(rmURI, auth);
-
-            if (rmProxyActiveObject != null) {
-                rmProxyActiveObject.terminateProxy();
-            }
             rmProxyActiveObject = RMProxyActiveObject.createAOProxy(auth, schedulerProxyCredentials);
+
             this.rmURI = rmURI;
         }
     }

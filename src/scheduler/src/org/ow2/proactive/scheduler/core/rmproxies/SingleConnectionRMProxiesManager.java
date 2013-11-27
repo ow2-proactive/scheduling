@@ -36,10 +36,13 @@ public final class SingleConnectionRMProxiesManager extends RMProxiesManager {
 
     @Override
     synchronized public void rebindRMProxiesManager(URI rmURI) throws RMException, RMProxyCreationException {
+        terminateAllProxies();
+
         String rmUrl = rmURI.toString();
         RMAuthentication auth = RMConnection.join(rmUrl);
         currentRMConnection = new Connection(rmURI, auth);
         currentRMProxy = RMProxyActiveObject.createAOProxy(auth, schedulerProxyCredentials);
+
         this.rmURI = rmURI;
     }
 
