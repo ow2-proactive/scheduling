@@ -83,7 +83,7 @@ function startEverything() {
 		procs.map(function(x){if(x!=null){x.destroy()}})
 	}))
 
-	var executor = Executors.newFixedThreadPool(4)
+	var executor = Executors.newFixedThreadPool(5)
 	var service = new ExecutorCompletionService(executor)
 
 	if (!logsDir.exists()) {
