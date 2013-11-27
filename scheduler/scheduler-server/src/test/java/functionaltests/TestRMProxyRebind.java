@@ -94,7 +94,7 @@ public class TestRMProxyRebind extends MultipleRMTBase {
         checkFreeNodes(helper2.getResourceManager(), NODES_NUMBER);
 
         System.out.println("\n Test with per-user connection \n");
-        testRebing(new URI(rmUrl1), new URI(rmUrl2), helper1, helper2, false);
+        testRebind(new URI(rmUrl1), new URI(rmUrl2), helper1, helper2, false);
 
         System.out.println("\n Test with single connection \n");
 
@@ -109,11 +109,11 @@ public class TestRMProxyRebind extends MultipleRMTBase {
         checkFreeNodes(helper1.getResourceManager(), NODES_NUMBER);
         checkFreeNodes(helper2.getResourceManager(), NODES_NUMBER);
 
-        testRebing(new URI(rmUrl1), new URI(rmUrl2), helper1, helper2, true);
+        testRebind(new URI(rmUrl1), new URI(rmUrl2), helper1, helper2, true);
     }
 
-    private void testRebing(URI rmUri1, URI rmUri2, RMTHelper helper1, RMTHelper helper2,
-            boolean singleConnection) throws Exception {
+    private void testRebind(URI rmUri1, URI rmUri2, RMTHelper helper1, RMTHelper helper2,
+                            boolean singleConnection) throws Exception {
         ResourceManager rm1 = helper1.getResourceManager();
         ResourceManager rm2 = helper2.getResourceManager();
 
@@ -154,10 +154,12 @@ public class TestRMProxyRebind extends MultipleRMTBase {
                 .getFreeNodesNumber());
         Assert.assertTrue(proxiesManager.getSchedulerRMProxy().isActive().getBooleanValue());
 
+        waitWhenNodeSetReleased(2, helper1);
+
         System.out.println("Get one node with RM2");
         NodeSet rm2NodeSet1 = proxy1.getNodes(new Criteria(1));
         waitWhenNodeSetAcquired(rm2NodeSet1, 1, helper2);
-        checkFreeNodes(rm1, NODES_NUMBER - 2);
+        checkFreeNodes(rm1, NODES_NUMBER);
         checkFreeNodes(rm2, NODES_NUMBER - 1);
 
         Assert.assertEquals(NODES_NUMBER - 1, proxiesManager.getSchedulerRMProxy().getState()
@@ -166,16 +168,7 @@ public class TestRMProxyRebind extends MultipleRMTBase {
         System.out.println("Get two nodes with RM2");
         NodeSet rm2NodeSet2 = proxy1.getNodes(new Criteria(2));
         waitWhenNodeSetAcquired(rm2NodeSet2, 2, helper2);
-        checkFreeNodes(rm1, NODES_NUMBER - 2);
-        checkFreeNodes(rm2, NODES_NUMBER - 3);
-
-        Assert.assertEquals(NODES_NUMBER - 3, proxiesManager.getSchedulerRMProxy().getState()
-                .getFreeNodesNumber());
-
-        System.out.println("Release one node with RM1");
-        proxy1.releaseNodes(rm1NodeSet1);
-        waitWhenNodeSetReleased(1, helper1);
-        checkFreeNodes(rm1, NODES_NUMBER - 1);
+        checkFreeNodes(rm1, NODES_NUMBER);
         checkFreeNodes(rm2, NODES_NUMBER - 3);
 
         Assert.assertEquals(NODES_NUMBER - 3, proxiesManager.getSchedulerRMProxy().getState()
@@ -184,7 +177,7 @@ public class TestRMProxyRebind extends MultipleRMTBase {
         System.out.println("Release one node with RM2");
         proxy1.releaseNodes(rm2NodeSet1);
         waitWhenNodeSetReleased(1, helper2);
-        checkFreeNodes(rm1, NODES_NUMBER - 1);
+        checkFreeNodes(rm1, NODES_NUMBER);
         checkFreeNodes(rm2, NODES_NUMBER - 2);
 
         Assert.assertEquals(NODES_NUMBER - 2, proxiesManager.getSchedulerRMProxy().getState()
