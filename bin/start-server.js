@@ -9,6 +9,8 @@ importPackage(java.util.zip);
 
 /** Ports */
 var PROTOCOL = "pnp";
+var START_ROUTER = false;
+var IS_PORT_PROPERTY = (PROTOCOL.toLowerCase() != "pamr") && (PROTOCOL.toLowerCase() != "amqp");
 var RM_PORT = 64738;
 var SCHEDULER_PORT = 52845;
 var JETTY_PORT = 8080;
@@ -36,6 +38,7 @@ var distDir = new File(homeDir, "dist");
 var warsDir = new File(distDir, "war");
 
 /** Logs locations */
+var routerOutputFile = new File(logsDir,"Router-stdout.log");
 var rmOutputFile = new File(logsDir,"RM-stdout.log");
 var schedulerOutputFile = new File(logsDir, "Scheduler-stdout.log")
 var jettyOutputFile = new File(logsDir, "Jetty-stdout.log")
@@ -47,7 +50,7 @@ var coreJars = ["*"];
 var jettyJars = ["*"];
 
 /** Processes */
-var rmProcess, schedulerProcess, jettyProcess;
+var routerProcess, rmProcess, schedulerProcess, jettyProcess;
 
 startEverything();
 
@@ -68,6 +71,22 @@ function startEverything() {
 
 	var executor = Executors.newFixedThreadPool(4);
 	var service = new ExecutorCompletionService(executor);
+
+    if (START_ROUTER) {
+	println("");
+	println("Running PAMR Router process ...");
+	routerProcess = startRouter();
+	
+	if (routerProcess != null) {
+	    var routerWaiter = new Callable({ 
+		   call: function () {
+		      var exitValue = routerProcess.waitFor();
+			  println("!! Router HAS EXITED !! Please consult " + routerOutputFile);
+		      return exitValue;
+	    }});
+	    service.submit(routerWaiter);
+	}
+    }
 
 	println("");
 	println("Running Resource Manager process ...");
@@ -136,10 +155,41 @@ function startEverything() {
 	}
 }
 
+function startRouter() {
+	var cmd = initCmd();
+	cmd.push("-server");
+	cmd.push("-XX:+UseParNewGC");
+	cmd.push("-XX:+UseConcMarkSweepGC");
+	cmd.push("-XX:CMSInitiatingOccupancyFraction=50");
+	cmd.push("-XX:NewRatio=2");
+	cmd.push("-Xms512m");
+	cmd.push("-Xmx512m");
+	//cmd.push("-Dproactive."+PROTOCOL+".port="+RM_PORT);	
+	cmd.push("-Dlog4j.configuration=file:"+configDir+fs+"log4j" + fs+"log4j-router");
+	cmd.push("org.objectweb.proactive.extensions.pamr.router.Main");
+	cmd.push("--configFile");
+	cmd.push(configDir+fs+"router" + fs+"router.ini");
+	cmd.push("-v");
+	cmd.push("-t");
+	cmd.push("180000");
+	cmd.push("-e");
+	cmd.push("86400000");
+	cmd.push("-i");
+	cmd.push("0.0.0.0");	
+	var env = Collections.singletonMap("CLASSPATH", fillClasspath(scriptJars, vfsJars, coreJars));
+	var proc = execCmdAsync(cmd, homeDir, routerOutputFile, "router listening on", env);
+	println("PAMR Router stdout/stderr redirected into " + routerOutputFile);
+	return proc;
+}
+
 function startRM() {
 	var cmd = initCmd();
-	cmd.push("-Dproactive."+PROTOCOL+".port="+RM_PORT);
+    if (IS_PORT_PROPERTY) {
+	    cmd.push("-Dproactive."+PROTOCOL+".port="+RM_PORT);
+    }
 	cmd.push("-Dlog4j.configuration=file:"+configDir+fs+"log4j" + fs+"rm-log4j-server");
+    cmd.push("-Dproactive.pamr.agent.id=0");
+    cmd.push("-Dproactive.pamr.agent.magic_cookie=rm");
 	cmd.push("org.ow2.proactive.resourcemanager.utils.RMStarter");
 	cmd.push("-ln"); // with default 4 local nodes
 	var env = Collections.singletonMap("CLASSPATH", fillClasspath(scriptJars, vfsJars, coreJars));
@@ -150,10 +200,19 @@ function startRM() {
 
 function startScheduler() {
 	var cmd = initCmd();
-	cmd.push("-Dproactive."+PROTOCOL+".port="+SCHEDULER_PORT);
+    if (IS_PORT_PROPERTY) {
+	    cmd.push("-Dproactive."+PROTOCOL+".port="+SCHEDULER_PORT);
+    }
 	cmd.push("-Dlog4j.configuration=file:"+configDir+fs+"log4j" + fs+"scheduler-log4j-server");	
 	cmd.push("org.ow2.proactive.scheduler.util.SchedulerStarter");
-	cmd.push("-u", PROTOCOL+"://localhost:"+RM_PORT); // always on localhost
+	cmd.push("-Dproactive.pamr.agent.id=1");
+	cmd.push("-Dproactive.pamr.agent.magic_cookie=scheduler");
+	cmd.push("-u");
+    if (PROTOCOL.toLowerCase() == "pamr") {
+	    cmd.push("pamr://0/");
+    } else {
+        cmd.push("-u", PROTOCOL+"://localhost:"+RM_PORT); // always on localhost
+    }
 	var env = Collections.singletonMap("CLASSPATH", fillClasspath(scriptJars, vfsJars, coreJars));	
 	var proc = execCmdAsync(cmd, homeDir, schedulerOutputFile, "created on", env);
 	println("Scheduler stdout/stderr redirected into " + schedulerOutputFile);
@@ -199,17 +258,24 @@ function startJetty() {
     var rmDir = extractWar(warsDir, "rm", "rm.war")
     var schedulerDir = extractWar(warsDir, "scheduler", "scheduler.war")
 
-    var restProperties = { "rm.url": PROTOCOL + "://localhost:" + RM_PORT,
-        "scheduler.url": PROTOCOL + "://localhost:" + SCHEDULER_PORT};
-    injectProperties(new File(restDir, "WEB-INF" + fs + "portal.properties"), restProperties);
-
+    var restProperties;
+    if (PROTOCOL.toLowerCase() == "pamr") {
+        restProperties = { "rm.url": "pamr://0",
+            "scheduler.url": "pamr://1"};
+        injectProperties(new File(restDir, "WEB-INF" + fs + "portal.properties"), restProperties);
+    } else {
+        restProperties = { "rm.url": PROTOCOL + "://localhost:" + RM_PORT,
+            "scheduler.url": PROTOCOL + "://localhost:" + SCHEDULER_PORT};
+        injectProperties(new File(restDir, "WEB-INF" + fs + "portal.properties"), restProperties);
+    }
     var rmProperties = { "rm.rest.url": "http://localhost:" + JETTY_PORT + "/rest/rest"};
     injectProperties(new File(rmDir, "rm.conf"), rmProperties);
 
     var schedulerProperties = { "sched.rest.url": "http://localhost:" + JETTY_PORT + "/rest/rest"};
     injectProperties(new File(schedulerDir, "scheduler.conf"), schedulerProperties);
 
-	var cmd = [ javaExe ];
+
+    var cmd = [ javaExe ];
 	cmd.push("-Djava.security.manager");
 	cmd.push("-Djava.security.policy=file:"+configDir+fs+"security.java.policy-client");
 	cmd.push("org.ow2.proactive.utils.JettyLauncher");
@@ -339,6 +405,8 @@ function stopEverything() {
 		schedulerProcess.destroy();	
 	if ( rmProcess != null )
 		rmProcess.destroy();
+	if ( routerProcess != null )
+		routerProcess.destroy();
 }
 
 function toJavaArray(cmdarray) {
@@ -349,9 +417,9 @@ function toJavaArray(cmdarray) {
 	return jarray;
 }
 
-function getCheckedCurrDir() { 
+function getCheckedCurrDir() {
 	var currentDir = new File(System.getProperty("user.dir"));
-	try { 
+	try {
 		var errmsg = "Please run this script from SCHEDULER_HOME"+fs+"bin";
 		assertExists(currentDir + fs + SCRIPT_NAME, errmsg);
 		return currentDir;
@@ -406,6 +474,10 @@ function extractFolder(zipFile, destDirFile){ // throws ZipException, IOExceptio
             is.close();
         }
     }
+}
+
+function getHostNameOrIpAddress() {
+
 }
 
 function isTcpPortAvailable(port) { // throws IOException

@@ -5,6 +5,6 @@ workingDir=`dirname $0`
 . $workingDir/env rm-log4j-server
 
 opt="-Xms128m -Xmx2048m"
-JAVACMD+=(-Dderby.stream.error.file="$PA_SCHEDULER/.logs/derby.log" $opt org.ow2.proactive.resourcemanager.utils.RMStarter "$@")
+JAVACMD+=(-Dderby.stream.error.file="$PA_SCHEDULER/.logs/derby.log"  -Dproactive.pamr.agent.id=0 -Dproactive.pamr.agent.magic_cookie=rm $opt org.ow2.proactive.resourcemanager.utils.RMStarter "$@")
 exec "${JAVACMD[@]}"
 

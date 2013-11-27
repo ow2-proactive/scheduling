@@ -10,7 +10,7 @@ workingDir=`dirname $0`
 # 4- It's better to have more slower young gc than a long one
 VM_ARGS="-server -XX:+UseParNewGC -XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction=50 -XX:NewRatio=2 -Xms512m -Xmx512m"
 
-JAVACMD+=($VM_ARGS org.objectweb.proactive.extensions.pamr.router.Main "$@")
+JAVACMD+=($VM_ARGS org.objectweb.proactive.extensions.pamr.router.Main --configFile "$PA_SCHEDULER/config/router/router.ini" "$@")
 
 exec "${JAVACMD[@]}"
 
