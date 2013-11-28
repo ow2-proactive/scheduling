@@ -51,11 +51,14 @@ public class TaskResultImpl implements TaskResult {
     private static final long serialVersionUID = 1L;
 
     private TaskId id;
-    private TaskResultData d;
+    private byte[] serializedValue;
+    private Serializable value;
+    private boolean hadException;
+    private TaskLogs taskLogs;
 
     public TaskResultImpl(TaskId id, TaskResultData d) {
         this.id = id;
-        this.d = d;
+        this.serializedValue = d.getSerializedValue();
     }
 
     @Override
@@ -73,9 +76,13 @@ public class TaskResultImpl implements TaskResult {
         throw new UnsupportedOperationException();
     }
 
+    public void setOutput(TaskLogs taskLogs) {
+        this.taskLogs = taskLogs;
+    }
+    
     @Override
     public TaskLogs getOutput() {
-        throw new UnsupportedOperationException();
+        return taskLogs;
     }
 
     @Override
@@ -90,7 +97,7 @@ public class TaskResultImpl implements TaskResult {
 
     @Override
     public byte[] getSerializedValue() {
-        return d.getSerializedValue();
+        return serializedValue;
     }
 
     @Override
@@ -103,15 +110,23 @@ public class TaskResultImpl implements TaskResult {
         throw new UnsupportedOperationException();
     }
 
+    public void setHadException(boolean hadException) {
+        this.hadException = hadException;
+    }
+    
     @Override
     public boolean hadException() {
-        throw new UnsupportedOperationException();
+        return hadException;
+    }
+
+    public void setValue(Serializable value) {
+        this.value = value;
     }
 
     @Override
     public Serializable value() throws Throwable {
-        return (null == d.getSerializedValue()) ? null
-                : (Serializable) object(d.getSerializedValue());
+        return (null == value) ? ((null == serializedValue) ? null
+                : (Serializable) object(serializedValue)) : value;
 
     }
 

@@ -38,6 +38,7 @@ import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
 import static org.apache.commons.io.IOUtils.copy;
 import static org.ow2.proactive.scheduler.job.JobIdImpl.makeJobId;
+import static org.ow2.proactive.scheduler.rest.ExceptionUtility.exception;
 import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwJAFEOrUJEOrNCEOrPE;
 import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwNCEOrPE;
 import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwNCEOrPEOrSCEOrJCE;
@@ -58,6 +59,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.nio.charset.Charset;
@@ -73,6 +75,7 @@ import java.util.concurrent.TimeoutException;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.client.HttpClient;
 import org.jboss.resteasy.client.core.executors.ApacheHttpClient4Executor;
+import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.ow2.proactive.db.SortParameter;
 import org.ow2.proactive.scheduler.common.JobFilterCriteria;
 import org.ow2.proactive.scheduler.common.JobSortParameter;
@@ -93,14 +96,13 @@ import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.job.factories.Job2XMLTransformer;
-import org.ow2.proactive.scheduler.common.task.ScriptTask;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.usage.JobUsage;
 import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
-import org.ow2.proactive.scripting.SimpleScript;
-import org.ow2.proactive.scripting.TaskScript;
+import org.ow2.proactive.scheduler.rest.data.DataUtility;
+import org.ow2.proactive.scheduler.rest.data.TaskResultImpl;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpUtility;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 import org.ow2.proactive_grid_cloud_portal.scheduler.client.SchedulerRestClient;
@@ -129,6 +131,8 @@ public class SchedulerClient extends ClientBase implements Scheduler {
         HttpClient client = HttpUtility.threadSafeClient();
         SchedulerRestClient restApiClient = new SchedulerRestClient(url,
                 new ApacheHttpClient4Executor(client));
+        ResteasyProviderFactory.getInstance().addMessageBodyReader(
+                new WildCardTypeReader());
         setApiClient(restApiClient);
         try {
             String sessionId = restApi().login(login, pwd);
@@ -303,14 +307,29 @@ public class SchedulerClient extends ClientBase implements Scheduler {
     public TaskResult getTaskResult(String jobId, String taskName)
             throws NotConnectedException, UnknownJobException,
             UnknownTaskException, PermissionException {
-        TaskResult taskResult = null;
+        TaskResultImpl taskResult = null;
         try {
             TaskResultData taskResultData = restApi().taskresult(session(),
                     jobId, taskName);
+            taskResult = (TaskResultImpl) toTaskResult(makeJobId(jobId),
+                    taskResultData);
+            if (taskResult.value() == null) {
+                Serializable value = restApi().valueOftaskresult(session(),
+                        jobId, taskName);
+                if (value != null) {
+                    taskResult.setHadException(true);
+                    taskResult.setValue(value);
+                }
+            }
 
-            taskResult = toTaskResult(makeJobId(jobId), taskResultData);
-        } catch (Exception e) {
-            throwUJEOrNCEOrPEOrUTE(e);
+            String all = restApi().tasklog(session(), jobId, taskName);
+            String out = restApi().tasklogout(session(), jobId, taskName);
+            String err = restApi().tasklogErr(session(), jobId, taskName);
+
+            taskResult.setOutput(DataUtility.toTaskLogs(all, out, err));
+
+        } catch (Throwable t) {
+            throwUJEOrNCEOrPEOrUTE(exception(t));
         }
         return taskResult;
     }
@@ -589,10 +608,10 @@ public class SchedulerClient extends ClientBase implements Scheduler {
         return getJobState(jobId).isFinished();
     }
 
-    public void waitForJob(JobId jobId, long timeout)
+    public JobResult waitForJob(JobId jobId, long timeout)
             throws NotConnectedException, UnknownJobException,
             PermissionException, TimeoutException {
-        waitForJob(jobId.value(), timeout);
+        return waitForJob(jobId.value(), timeout);
     }
 
     public JobResult waitForJob(String jobId, long timeout)
@@ -621,7 +640,7 @@ public class SchedulerClient extends ClientBase implements Scheduler {
             TaskStateData taskStateData = restApi().jobtasks(session(), jobId,
                     taskName);
             TaskState taskState = taskState(taskStateData);
-            finished = TaskStatus.FINISHED == taskState.getStatus();
+            finished = ! taskState.getStatus().isTaskAlive();
         } catch (Exception e) {
             throwUJEOrNCEOrPEOrUTE(e);
         }

@@ -128,6 +128,10 @@ public class DataUtility {
         return new TaskResultImpl(taskId, d);
     }
 
+    public static TaskLogsImpl toTaskLogs(String all, String out, String err) {
+        return new TaskLogsImpl(out, err, all);
+    }
+
     public static JobState toJobState(JobStateData d) {
         return new JobStateImpl(d);
     }

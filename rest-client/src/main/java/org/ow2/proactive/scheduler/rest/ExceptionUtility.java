@@ -123,4 +123,9 @@ public class ExceptionUtility {
         return sw.getBuffer().toString();
     }
 
+    public static Exception exception(Throwable t) {
+        return (t instanceof Exception) ? (Exception) t : new RuntimeException(
+                t);
+    }
+
 }
