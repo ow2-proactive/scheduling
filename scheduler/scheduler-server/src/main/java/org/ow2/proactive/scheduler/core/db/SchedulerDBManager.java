@@ -12,13 +12,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
-import org.hibernate.exception.LockAcquisitionException;
+import org.hibernate.criterion.Order;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.ow2.proactive.db.DatabaseManagerException;
-import org.ow2.proactive.db.DatabaseManagerExceptionHandler;
-import org.ow2.proactive.db.DatabaseManagerExceptionHandler.DBMEHandler;
 import org.ow2.proactive.db.FilteredExceptionCallback;
 import org.ow2.proactive.db.SortParameter;
 import org.ow2.proactive.scheduler.common.JobSortParameter;
@@ -226,33 +223,29 @@ public class SchedulerDBManager {
                 criteria.add(Restrictions.eq("removedTime", -1L));
 
                 if (sortParameters != null) {
-                    Property property;
+                    Order sortOrder;
                     for (SortParameter<JobSortParameter> param : sortParameters) {
                         switch (param.getParameter()) {
                             case ID:
-                                property = Property.forName("id");
+                                sortOrder = configureSortOrder(param, Property.forName("id"));
                                 break;
                             case NAME:
-                                property = Property.forName("jobName");
+                                sortOrder = configureSortOrder(param, Property.forName("jobName"));
                                 break;
                             case OWNER:
-                                property = Property.forName("owner");
+                                sortOrder = configureSortOrder(param, Property.forName("owner"));
                                 break;
                             case PRIORITY:
-                                property = Property.forName("priority");
+                                sortOrder = configureSortOrder(param, Property.forName("priority"));
                                 break;
                             case STATE:
-                                property = Property.forName("status");
+                                sortOrder = new GroupByStatusSortOrder(param.getSortOrder(), "status");
                                 break;
                             default:
                                 throw new IllegalArgumentException("Unsupported sort paramter: " +
-                                    param.getParameter());
+                                  param.getParameter());
                         }
-                        if (param.getSortOrder().isAscending()) {
-                            criteria.addOrder(property.asc());
-                        } else {
-                            criteria.addOrder(property.desc());
-                        }
+                        criteria.addOrder(sortOrder);
                     }
                 }
 
@@ -267,6 +260,14 @@ public class SchedulerDBManager {
             }
 
         });
+    }
+
+    private Order configureSortOrder(SortParameter<JobSortParameter> param, Property property) {
+        if (param.getSortOrder().isAscending()) {
+            return property.asc();
+        } else {
+            return property.desc();
+        }
     }
 
     public List<JobUsage> getUsage(final String userName, final Date startDate, final Date endDate) {
