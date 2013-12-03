@@ -36,8 +36,8 @@
  */
 package functionaltests.nodestate;
 
-import junit.framework.Assert;
-
+import org.hamcrest.CoreMatchers;
+import org.junit.Assert;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.node.Node;
@@ -95,6 +95,7 @@ public class TestNodesStates extends RMConsecutive {
         for (int i = 0; i < totalNodeNumber; i++) {
             RMNodeEvent evt = helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
             Assert.assertEquals(evt.getNodeState(), NodeState.BUSY);
+            checkEvent(evt, nodes.get(i));
         }
 
         //for next test
@@ -104,6 +105,7 @@ public class TestNodesStates extends RMConsecutive {
         for (int i = 0; i < totalNodeNumber; i++) {
             RMNodeEvent evt = helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
             Assert.assertEquals(evt.getNodeState(), NodeState.FREE);
+            checkEvent(evt, nodes.get(i));
         }
 
         //----------------------------------------------------------
@@ -177,6 +179,7 @@ public class TestNodesStates extends RMConsecutive {
 
         evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, n.getNodeInformation().getURL());
         Assert.assertEquals(evt.getNodeState(), NodeState.DOWN);
+        checkEvent(evt, n);
 
         resourceManager.releaseNodes(nodes);
 
@@ -291,4 +294,10 @@ public class TestNodesStates extends RMConsecutive {
 
     }
 
+    private void checkEvent(RMNodeEvent event, Node node) {
+        Assert.assertEquals(node.getNodeInformation().getURL(), event.getNodeUrl());
+        Assert.assertThat(event.getNodeInfo(), CoreMatchers.containsString(event.getNodeUrl()));
+        Assert.assertThat(event.getNodeInfo(), CoreMatchers.containsString(event.getNodeProvider()));
+        Assert.assertThat(event.getNodeInfo(), CoreMatchers.containsString(event.getHostName()));
+    }
 }

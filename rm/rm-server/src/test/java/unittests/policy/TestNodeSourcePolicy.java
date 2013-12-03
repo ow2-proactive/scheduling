@@ -93,6 +93,11 @@ public class TestNodeSourcePolicy extends FunctionalTest {
         public void clean() throws NodeException {
         }
 
+        @Override
+        public String getNodeInfo() {
+            return null;
+        }
+
         public String getNodeName() {
             return name;
         }

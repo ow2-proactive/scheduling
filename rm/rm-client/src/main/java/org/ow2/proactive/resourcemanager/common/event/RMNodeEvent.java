@@ -149,7 +149,7 @@ public final class RMNodeEvent extends RMEvent {
         this.hostName = rmNode.getHostName();
         this.VMName = rmNode.getDescriptorVMName();
         this.nodeState = rmNode.getState();
-        this.description = rmNode.toString();
+        this.description = rmNode.getNodeInfo();
         this.defaultJMXUrl = rmNode.getDefaultJMXUrl();
         this.proactiveJMXUrl = rmNode.getProactiveJMXUrl();
 

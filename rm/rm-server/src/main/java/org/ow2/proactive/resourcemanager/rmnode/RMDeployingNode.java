@@ -422,23 +422,16 @@ public final class RMDeployingNode implements RMNode, Serializable {
     }
 
     @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        String lf = System.getProperty("line.separator");
-        sb.append("Node " + this.getNodeName());
-        sb.append(lf);
-        sb.append("URL : " + this.getNodeURL());
-        sb.append(lf);
-        sb.append("Node source : " + this.getNodeSourceName());
-        sb.append(lf);
-        sb.append("Provider : " + this.getProvider().getName());
-        sb.append(lf);
-        sb.append("State : " + this.getState());
-        sb.append(lf);
-        sb.append("Description : " + this.getDescription());
-        sb.append(lf);
-        sb.append("Command : " + this.getCommandLine());
-        return sb.toString();
+    public String getNodeInfo() {
+        String newLine = System.getProperty("line.separator");
+        String nodeInfo = "Node " + this.getNodeName() + newLine;
+        nodeInfo += "URL : " + this.getNodeURL() + newLine;
+        nodeInfo += "Node source : " + this.getNodeSourceName() + newLine;
+        nodeInfo += "Provider : " + this.getProvider().getName() + newLine;
+        nodeInfo += "State : " + this.getState() + newLine;
+        nodeInfo += "Description : " + this.getDescription() + newLine;
+        nodeInfo += "Command : " + this.getCommandLine() + newLine;
+        return nodeInfo;
     }
 
     @Override
@@ -485,6 +478,7 @@ public final class RMDeployingNode implements RMNode, Serializable {
         rmNodeDescriptor.setStateChangeTime(this.getStateChangeTime());
         rmNodeDescriptor.setProviderName(getProvider() == null ? null : getProvider().getName());
         rmNodeDescriptor.setOwnerName(getOwner() == null ? null : getOwner().getName());
+        rmNodeDescriptor.setNodeInfo(getNodeInfo());
         return rmNodeDescriptor;
     }
 

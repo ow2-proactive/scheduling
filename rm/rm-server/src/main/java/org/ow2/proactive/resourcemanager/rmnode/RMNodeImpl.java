@@ -331,26 +331,17 @@ public class RMNodeImpl implements RMNode, Serializable {
     /**
      * @return a String showing informations about the node.
      */
-    @Override
-    public String toString() {
-        String lf = System.getProperty("line.separator");
-        StringBuilder sb = new StringBuilder();
-        sb.append("Node " + nodeName);
-        sb.append(lf);
-        sb.append("URL : " + nodeURL);
-        sb.append(lf);
-        sb.append("Node source : " + nodeSourceName);
-        sb.append(lf);
-        sb.append("Provider : " + provider.getName());
-        sb.append(lf);
-        sb.append("Used by : " + (owner == null ? "nobody" : owner.getName()));
-        sb.append(lf);
-        sb.append("State : " + state);
-        sb.append(lf);
-        sb.append("JMX RMI: " + getJMXUrl(JMXTransportProtocol.RMI));
-        sb.append(lf);
-        sb.append("JMX RO: " + getJMXUrl(JMXTransportProtocol.RO));
-        return sb.toString();
+    public String getNodeInfo() {
+        String newLine = System.getProperty("line.separator");
+        String nodeInfo = "Node " + nodeName + newLine;
+        nodeInfo += "URL : " + nodeURL + newLine;
+        nodeInfo += "Node source : " + nodeSourceName + newLine;
+        nodeInfo += "Provider : " + provider.getName() + newLine;
+        nodeInfo += "Used by : " + (owner == null ? "nobody" : owner.getName()) + newLine;
+        nodeInfo += "State : " + state + newLine;
+        nodeInfo += "JMX RMI: " + getJMXUrl(JMXTransportProtocol.RMI) + newLine;
+        nodeInfo += "JMX RO: " + getJMXUrl(JMXTransportProtocol.RO) + newLine;
+        return nodeInfo;
     }
 
     private void initHandler() throws NodeException {
@@ -586,6 +577,8 @@ public class RMNodeImpl implements RMNode, Serializable {
         rmNodeDescriptor.setStateChangeTime(this.getStateChangeTime());
         rmNodeDescriptor.setProviderName(getProvider() == null ? null : getProvider().getName());
         rmNodeDescriptor.setOwnerName(getOwner() == null ? null : getOwner().getName());
+        rmNodeDescriptor.setNodeInfo(getNodeInfo());
+
         return rmNodeDescriptor;
     }
 

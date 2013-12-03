@@ -98,7 +98,7 @@ public interface RMNode extends Comparable<RMNode> {
     /**
      * @return a string describing the RMNode (status, vnode, host, pad, ...)
      */
-    public String toString();
+    public String getNodeInfo();
 
     // ---------------------------------------------------------------------//
     // GET

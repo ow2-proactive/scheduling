@@ -48,6 +48,7 @@ public class RMNodeDescriptor {
     private long stateChangeTime;
     private String providerName;
     private String ownerName;
+    private String nodeInfo;
 
     public String getNodeURL() {
         return nodeURL;
@@ -136,4 +137,8 @@ public class RMNodeDescriptor {
     public void setOwnerName(String ownerName) {
         this.ownerName = ownerName;
     }
+
+    public String getNodeInfo() { return nodeInfo; }
+
+    public void setNodeInfo(String nodeInfo) { this.nodeInfo = nodeInfo; }
 }
