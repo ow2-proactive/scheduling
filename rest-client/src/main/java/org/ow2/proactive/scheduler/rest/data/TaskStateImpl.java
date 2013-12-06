@@ -38,54 +38,64 @@ import static org.ow2.proactive.scheduler.rest.data.DataUtility.taskInfo;
 
 import java.util.List;
 
+import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskState;
+import org.ow2.proactive.scheduler.task.TaskIdImpl;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskIdData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskStateData;
 
 public class TaskStateImpl extends TaskState {
-	private static final long serialVersionUID = 1L;
-	
-	private TaskStateData d;
-	
-	public TaskStateImpl(TaskStateData d) {
-		this.d = d;
-	}
+    private static final long serialVersionUID = 1L;
 
-	@Override
-	public List<TaskState> getDependences() {
-		throw new UnsupportedOperationException();
-	}
+    private TaskStateData d;
 
-	@Override
-	public int getIterationIndex() {
-	    return d.getIterationIndex();
-	}
+    public TaskStateImpl(TaskStateData d) {
+        this.d = d;
+    }
 
-	@Override
-	public int getMaxNumberOfExecutionOnFailure() {
-		return d.getMaxNumberOfExecutionOnFailure();
-	}
+    @Override
+    public TaskId getId() {
+        TaskIdData idData = d.getTaskInfo().getTaskId();
+        return TaskIdImpl.createTaskId(null, idData.getReadableName(),
+                idData.getId(), false);
+    }
 
-	@Override
-	public int getReplicationIndex() {
-		return d.getReplicationIndex();
-	}
+    @Override
+    public List<TaskState> getDependences() {
+        throw new UnsupportedOperationException();
+    }
 
-	@Override
-	public TaskInfo getTaskInfo() {
-		return taskInfo(d.getTaskInfo());
-	}
+    @Override
+    public int getIterationIndex() {
+        return d.getIterationIndex();
+    }
 
-	@Override
-	public TaskState replicate() throws Exception {
-		throw new UnsupportedOperationException();
-	}
+    @Override
+    public int getMaxNumberOfExecutionOnFailure() {
+        return d.getMaxNumberOfExecutionOnFailure();
+    }
 
-	@Override
-	public void update(TaskInfo arg0) {
-		throw new UnsupportedOperationException();
+    @Override
+    public int getReplicationIndex() {
+        return d.getReplicationIndex();
+    }
 
-	}
+    @Override
+    public TaskInfo getTaskInfo() {
+        return taskInfo(d.getTaskInfo());
+    }
+
+    @Override
+    public TaskState replicate() throws Exception {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void update(TaskInfo arg0) {
+        throw new UnsupportedOperationException();
+
+    }
 
     @Override
     public String getName() {
