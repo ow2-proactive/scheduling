@@ -101,4 +101,11 @@ public class TaskStateImpl extends TaskState {
     public String getName() {
         return d.getName();
     }
+
+    @Override
+    public String getDescription() {
+        return d.getDescription();
+    }
+    
+    
 }
