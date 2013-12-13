@@ -32,10 +32,9 @@
  *
  *  * $$PROACTIVE_INITIAL_DEV$$
  */
+package org.ow2.proactive.scheduler.rest.readers;
 
-package org.ow2.proactive.scheduler.rest;
-
-import static javax.ws.rs.core.MediaType.WILDCARD_TYPE;
+import static javax.ws.rs.core.MediaType.APPLICATION_OCTET_STREAM_TYPE;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -47,23 +46,26 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
 
-import org.apache.commons.io.IOUtils;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.ow2.proactive_grid_cloud_portal.common.exceptionmapper.ExceptionToJson;
 
-public class WildCardTypeReader implements MessageBodyReader<String> {
+public class OctetStreamReader implements MessageBodyReader<ExceptionToJson> {
+
+    private ObjectMapper mapper = new ObjectMapper();
 
     @Override
     public boolean isReadable(Class<?> type, Type genericType,
             Annotation[] annotations, MediaType mediaType) {
-        boolean equals = WILDCARD_TYPE.equals(mediaType);
-        return equals;
+        return ExceptionToJson.class.isAssignableFrom(type)
+                && APPLICATION_OCTET_STREAM_TYPE.equals(mediaType);
     }
 
     @Override
-    public String readFrom(Class<String> type, Type genericType,
-            Annotation[] annotations, MediaType mediaType,
+    public ExceptionToJson readFrom(Class<ExceptionToJson> type,
+            Type genericType, Annotation[] annotations, MediaType mediaType,
             MultivaluedMap<String, String> httpHeaders, InputStream entityStream)
             throws IOException, WebApplicationException {
-        return IOUtils.toString(entityStream);
+        return mapper.readValue(entityStream, ExceptionToJson.class);
     }
 
 }

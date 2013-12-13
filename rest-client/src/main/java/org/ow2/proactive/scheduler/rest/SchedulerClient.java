@@ -98,11 +98,12 @@ import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.job.factories.Job2XMLTransformer;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
-import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.usage.JobUsage;
 import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
 import org.ow2.proactive.scheduler.rest.data.DataUtility;
 import org.ow2.proactive.scheduler.rest.data.TaskResultImpl;
+import org.ow2.proactive.scheduler.rest.readers.OctetStreamReader;
+import org.ow2.proactive.scheduler.rest.readers.WildCardTypeReader;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpUtility;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 import org.ow2.proactive_grid_cloud_portal.scheduler.client.SchedulerRestClient;
@@ -131,8 +132,11 @@ public class SchedulerClient extends ClientBase implements Scheduler {
         HttpClient client = HttpUtility.threadSafeClient();
         SchedulerRestClient restApiClient = new SchedulerRestClient(url,
                 new ApacheHttpClient4Executor(client));
-        ResteasyProviderFactory.getInstance().addMessageBodyReader(
-                new WildCardTypeReader());
+        
+        ResteasyProviderFactory factory = ResteasyProviderFactory.getInstance();
+        factory.addMessageBodyReader(new WildCardTypeReader());
+        factory.addMessageBodyReader(new OctetStreamReader());
+
         setApiClient(restApiClient);
         try {
             String sessionId = restApi().login(login, pwd);
@@ -640,7 +644,7 @@ public class SchedulerClient extends ClientBase implements Scheduler {
             TaskStateData taskStateData = restApi().jobtasks(session(), jobId,
                     taskName);
             TaskState taskState = taskState(taskStateData);
-            finished = ! taskState.getStatus().isTaskAlive();
+            finished = !taskState.getStatus().isTaskAlive();
         } catch (Exception e) {
             throwUJEOrNCEOrPEOrUTE(e);
         }
