@@ -132,7 +132,7 @@ public class SchedulerClient extends ClientBase implements Scheduler {
         HttpClient client = HttpUtility.threadSafeClient();
         SchedulerRestClient restApiClient = new SchedulerRestClient(url,
                 new ApacheHttpClient4Executor(client));
-        
+
         ResteasyProviderFactory factory = ResteasyProviderFactory.getInstance();
         factory.addMessageBodyReader(new WildCardTypeReader());
         factory.addMessageBodyReader(new OctetStreamReader());
@@ -805,6 +805,11 @@ public class SchedulerClient extends ClientBase implements Scheduler {
             }
         }
         File parentFile = outputFile.getParentFile();
+        if (parentFile == null) {
+            throw new RuntimeException(
+                    "Invalid pathname, cannot determine the parent directory: "
+                            + pathname);
+        }
         if (!parentFile.exists()) {
             if (!parentFile.mkdirs()) {
                 throw new RuntimeException(
@@ -812,7 +817,6 @@ public class SchedulerClient extends ClientBase implements Scheduler {
                                 + pathname);
             }
         }
-
     }
 
     private SchedulerRestInterface restApi() {
