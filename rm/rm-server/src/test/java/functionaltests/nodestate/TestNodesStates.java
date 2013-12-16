@@ -103,7 +103,7 @@ public class TestNodesStates extends RMConsecutive {
         resourceManager.releaseNodes(nodes);
 
         for (int i = 0; i < totalNodeNumber; i++) {
-            RMNodeEvent evt = helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+            RMNodeEvent evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, nodes.get(i).getNodeInformation().getURL());
             Assert.assertEquals(evt.getNodeState(), NodeState.FREE);
             checkEvent(evt, nodes.get(i));
         }
