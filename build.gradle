@@ -514,7 +514,7 @@ task resourceManagerJar(type: Jar) {
         from zipTree(it.dependencyProject.jar.outputs.files.singleFile)
     }
     from zipTree(project(':rm:rm-server').jar.outputs.files.singleFile)
-    destinationDir file('dist/lib')
+    destinationDir file('dist/old_jars')
     archiveName 'ProActive_ResourceManager.jar'
 }
 
@@ -523,7 +523,7 @@ task schedulerJar(type: Jar) {
         from zipTree(it.jar.outputs.files.singleFile)
     }
 
-    destinationDir file('dist/lib')
+    destinationDir file('dist/old_jars')
     archiveName 'ProActive_Scheduler-core.jar'
 
     doLast {
