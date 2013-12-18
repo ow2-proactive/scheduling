@@ -1,0 +1,96 @@
+subprojects {
+    apply plugin: 'documentation'
+    documentation.outputName = project.name
+    documentation.docDir = 'src'
+    documentation.sharedDir = '../shared'
+    documentation.snippetsStart = rootProject.projectDir
+
+    def commonJavaDocOptions = {
+        options.breakIterator = true
+        options.author = true
+        options.version = true
+        options.links 'http://docs.oracle.com/javase/6/docs/api/'
+        options.bottom = '<i>Copyright 1997-2013 INRIA All Rights Reserved.</i>'
+        logging.captureStandardOutput LogLevel.INFO
+        logging.captureStandardError LogLevel.INFO
+    }
+
+    task javaDocComplete(type: Javadoc) {
+        source = rootProject.subprojects.sourceSets.main.allJava
+        classpath = files(rootProject.subprojects.sourceSets.main.compileClasspath)
+        destinationDir = file("${project.buildDir}/doc//built/api_complete")
+
+        configure commonJavaDocOptions
+    }
+
+    task javaDocPublished(type: Javadoc) {
+        // filter source files with annotation @PublicApi
+        source = rootProject.subprojects.sourceSets.main.allJava*.filter { it.text.contains('@PublicAPI') }
+        classpath = files(rootProject.subprojects.sourceSets.main.compileClasspath)
+        destinationDir = file("${project.buildDir}/doc//built/api_published")
+
+        configure commonJavaDocOptions
+    }
+
+    task javaDoc(dependsOn: [javaDocPublished, javaDocComplete])
+    docJavadocPublishedZip.dependsOn javaDocPublished
+    docJavadocCompleteZip.dependsOn javaDocComplete
+
+    task docAll.dependsOn(docJavadocPublishedZip, docJavadocCompleteZip)
+}
+
+project('MapReduce') {
+    javaDocComplete {
+        options.windowTitle = 'Scheduler, Resource Manager and MapReduce Complete API'
+        title = "MapReduce ${version}<br><a href=\"../multiple_html/index.html\">(documentation is here)</a><br>"
+
+        options.group 'Scheduler', 'org.ow2.proactive.scheduler*'
+        options.group 'Resource Manager', 'org.ow2.proactive.resourcemanager*'
+        options.group 'MapReduce', 'org.ow2.proactive.scheduler.ext.mapreduce*'
+    }
+
+    javaDocPublished {
+        options.windowTitle = 'MapReduce and Resource Manager User API'
+        title = "MapReduce ${version}<br><a href=\"../multiple_html/index.html\">(documentation is here)</a><br>"
+
+        options.group 'Scheduler', 'org.ow2.proactive.scheduler*'
+        options.group 'Resource Manager', 'org.ow2.proactive.resourcemanager*'
+        options.group 'MapReduce', 'org.ow2.proactive.scheduler.ext.mapreduce*'
+    }
+}
+
+project('Scheduling') {
+    javaDocComplete {
+        options.windowTitle = 'Scheduler and Resource Manager Complete API'
+        title = "Scheduler ${version}<br><a href=\"../multiple_html/index.html\">(documentation is here)</a><br>"
+
+        options.group 'Scheduler', 'org.ow2.proactive.scheduler*'
+        options.group 'Resource Manager', 'org.ow2.proactive.resourcemanager*'
+    }
+
+    javaDocPublished {
+        options.windowTitle = 'Scheduler and Resource Manager User API'
+        title = "Scheduler ${version}<br><a href=\"../multiple_html/index.html\">(documentation is here)</a><br>"
+
+        options.group 'Scheduler', 'org.ow2.proactive.scheduler*'
+        options.group 'Resource Manager', 'org.ow2.proactive.resourcemanager*'
+    }
+}
+
+project('Scheduling') {
+    javaDocComplete {
+        options.windowTitle = 'Scheduler and Resource Manager Complete API'
+        title = "Resource Manager ${version}<br><a href=\"../multiple_html/index.html\">(documentation is here)</a><br>"
+
+        options.group 'Scheduler', 'org.ow2.proactive.scheduler*'
+        options.group 'Resource Manager', 'org.ow2.proactive.resourcemanager*'
+    }
+
+    javaDocPublished {
+        options.windowTitle = 'Scheduler and Resource Manager User API'
+        title = "Resource Manager ${version}<br><a href=\"../multiple_html/index.html\">(documentation is here)</a><br>"
+
+        options.group 'Scheduler', 'org.ow2.proactive.scheduler*'
+        options.group 'Resource Manager', 'org.ow2.proactive.resourcemanager*'
+    }
+}

@@ -444,14 +444,6 @@ project(':scheduler:mapreduce') {
     }
 }
 
-project(':doc').subprojects {
-    apply plugin: 'documentation'
-    documentation.outputName = project.name
-    documentation.docDir = 'src'
-    documentation.sharedDir = '../shared'
-    documentation.snippetsStart = rootProject.projectDir
-}
-
 project(':doc:Resourcing') {
     dependencies {
         compile project(':rm:rm-server')
