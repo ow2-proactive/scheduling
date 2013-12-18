@@ -79,7 +79,7 @@ project('Scheduling') {
     }
 }
 
-project('Scheduling') {
+project('Resourcing') {
     documentation.outputName = 'ProActiveResourceManagerManual'
     javaDocComplete {
         options.windowTitle = 'Scheduler and Resource Manager Complete API'
