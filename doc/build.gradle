@@ -1,6 +1,6 @@
 subprojects {
     apply plugin: 'documentation'
-    documentation.outputName = project.name
+
     documentation.docDir = 'src'
     documentation.sharedDir = '../shared'
     documentation.snippetsStart = rootProject.projectDir
@@ -40,6 +40,7 @@ subprojects {
 }
 
 project('MapReduce') {
+    documentation.outputName = 'ProActiveMapReduceManual'
     javaDocComplete {
         options.windowTitle = 'Scheduler, Resource Manager and MapReduce Complete API'
         title = "MapReduce ${version}<br><a href=\"../multiple_html/index.html\">(documentation is here)</a><br>"
@@ -60,6 +61,7 @@ project('MapReduce') {
 }
 
 project('Scheduling') {
+    documentation.outputName = 'ProActiveSchedulerManual'
     javaDocComplete {
         options.windowTitle = 'Scheduler and Resource Manager Complete API'
         title = "Scheduler ${version}<br><a href=\"../multiple_html/index.html\">(documentation is here)</a><br>"
@@ -78,6 +80,7 @@ project('Scheduling') {
 }
 
 project('Scheduling') {
+    documentation.outputName = 'ProActiveResourceManagerManual'
     javaDocComplete {
         options.windowTitle = 'Scheduler and Resource Manager Complete API'
         title = "Resource Manager ${version}<br><a href=\"../multiple_html/index.html\">(documentation is here)</a><br>"
