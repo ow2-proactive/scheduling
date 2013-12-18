@@ -141,7 +141,7 @@ public class PAMapReduceJob {
                  * classpath of the forkEnvironment
                  */
                 String envScript = "home = org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl.getProActiveRuntime().getProActiveHome();\n"
-                    + "forkEnvironment.addAdditionalClasspath(home + \"/dist/lib/ProActive_Scheduler-core.jar\");";
+                    + "forkEnvironment.addAdditionalClasspath(home + \"/dist/lib/*\");";
                 logger.debug("Setting envScript");
                 try {
                     forkEnvironment.setEnvScript(new SimpleScript(envScript, "javascript"));
