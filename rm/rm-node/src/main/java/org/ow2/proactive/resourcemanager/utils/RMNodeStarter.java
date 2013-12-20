@@ -54,11 +54,29 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.security.auth.login.LoginException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.GnuParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.Parser;
+import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.ConsoleAppender;
+import org.apache.log4j.Level;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PatternLayout;
+import org.apache.log4j.PropertyConfigurator;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
@@ -80,19 +98,6 @@ import org.ow2.proactive.resourcemanager.node.jmx.SigarExposer;
 import org.ow2.proactive.resourcemanager.nodesource.dataspace.DataSpaceNodeConfigurationAgent;
 import org.ow2.proactive.utils.Formatter;
 import org.ow2.proactive.utils.Tools;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.GnuParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.Parser;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 
 /**
@@ -105,11 +110,16 @@ public class RMNodeStarter {
 
     protected Credentials credentials = null;
     protected String rmURL = null;
-    protected String nodeName = RMNodeStarter.PAAGENT_DEFAULT_NODE_NAME;
+    protected String nodeName = UUID.randomUUID().toString();
     protected String nodeSourceName = null;
     protected Node node;
 
     /** Class' logger */
+    static {
+        BasicConfigurator.configure(
+          new ConsoleAppender(new PatternLayout("[%d{ISO8601} %-5p] [NODE.%C{1}.%M] %m%n")));
+        Logger.getRootLogger().setLevel(Level.INFO);
+    }
     protected static final Logger logger = Logger.getLogger(RMNodeStarter.class);
 
     /** The default name of the node */
@@ -300,6 +310,20 @@ public class RMNodeStarter {
      * @param args The arguments needed to join the Resource Manager
      */
     public static void main(String[] args) {
+
+//        System.setProperty("org.hyperic.sigar.path", "-");
+
+//        try {
+//            if (System.getProperty("os.arch").equals("amd64")) {
+//                System.loadLibrary("sigar-amd64-linux");
+//            } else {
+//                System.loadLibrary("sigar-x86-linux");
+//            }
+//        } catch (Throwable e) {
+//            e.printStackTrace();
+//        }
+
+        System.setProperty("java.security.policy","/home/ybonnaffe/src/build/dist/scheduling/config/security.java.policy-server");
         try {
             //this call takes JVM properties into account
             args = JVMPropertiesPreloader.overrideJVMProperties(args);
@@ -324,6 +348,15 @@ public class RMNodeStarter {
         this.parseCommandLine(args);
 
         configureLogging(nodeName);
+
+        try {
+            logger.info("Detecting a network interface to bind the node");
+            String networkInterface = RMConnection.getNetworkInterfaceFor(rmURL);
+            logger.info("Node will be bounded to the following network interface " + networkInterface);
+            CentralPAPropertyRepository.PA_NET_INTERFACE.setValue(networkInterface);
+        } catch (Exception e) {
+            logger.warn("Unable to detect the network interface", e);
+        }
 
         this.readAndSetTheRank();
         this.node = this.createLocalNode(nodeName);
@@ -391,8 +424,13 @@ public class RMNodeStarter {
             try {
                 proActiveHome = ProActiveRuntimeImpl.getProActiveRuntime().getProActiveHome();
             } catch (ProActiveException e) {
-                logger.debug("Cannot find proactive home using ProActiveRuntime, will use RM home as ProActive home.");
-                proActiveHome = PAResourceManagerProperties.RM_HOME.getValueAsString();
+                logger.debug(
+                  "Cannot find proactive home using ProActiveRuntime, will use RM home as ProActive home.");
+                if (PAResourceManagerProperties.RM_HOME.isSet()) {
+                    proActiveHome = PAResourceManagerProperties.RM_HOME.getValueAsString();
+                } else {
+                    proActiveHome = ".";
+                }
             }
             System.setProperty(CentralPAPropertyRepository.PA_HOME.getName(), proActiveHome);
         }
@@ -421,7 +459,7 @@ public class RMNodeStarter {
                 File.separator + "log4j-defaultNode";
             // set log4j.configuration to stop ProActiveLogger#load from reconfiguring log4j once again
             System.setProperty(CentralPAPropertyRepository.LOG4J.getName(), "file:" + log4jConfig);
-            PropertyConfigurator.configure(log4jConfig);
+            PropertyConfigurator.configure(RMNodeStarter.class.getResource("/log4j-defaultNode"));
             logger.info("Configured log4j using " + log4jConfig);
         }
 
@@ -457,15 +495,6 @@ public class RMNodeStarter {
             // Optional rmURL option
             if (cl.hasOption(OPTION_RM_URL)) {
                 rmURL = cl.getOptionValue(OPTION_RM_URL);
-            }
-
-            try {
-                logger.info("Detecting a network interface to bind the node");
-                String networkInterface = RMConnection.getNetworkInterfaceFor(rmURL);
-                logger.info("Node will be bounded to the following network interface " + networkInterface);
-                CentralPAPropertyRepository.PA_NET_INTERFACE.setValue(networkInterface);
-            } catch (Exception e) {
-                logger.warn("Unable to detect the network interface", e);
             }
 
             // if the user doesn't provide a rm URL, we don't care about the credentials
@@ -511,8 +540,11 @@ public class RMNodeStarter {
                                     PAResourceManagerProperties.RM_HOME.getValueAsStringOrNull(),
                                     "config/authentication/rm.cred").getAbsolutePath());
                         } catch (KeyException e) {
-                            logger.error("Failed to read credentials, from location obtained using system property or from default location", ke);
-                            System.exit(ExitStatus.CRED_UNREADABLE.exitCode);
+                            try {
+                                credentials = Credentials.getCredentials(RMNodeStarter.class.getResourceAsStream("/rm.cred"));
+                            } catch (KeyException kee) {
+                                System.exit(ExitStatus.CRED_UNREADABLE.exitCode);
+                            }
                         }
                     }
                 }
@@ -843,8 +875,8 @@ public class RMNodeStarter {
         try {
             localNode = NodeFactory.createLocalNode(nodeName, false, null, null);
             if (localNode == null) {
-                logger.error(RMNodeStarter.ExitStatus.RMNODE_NULL.description);
-                System.exit(RMNodeStarter.ExitStatus.RMNODE_NULL.exitCode);
+                logger.error(ExitStatus.RMNODE_NULL.description);
+                System.exit(ExitStatus.RMNODE_NULL.exitCode);
             }
             // setting system properties to node (they will be accessible remotely) 
             for (Object key : System.getProperties().keySet()) {
@@ -852,7 +884,7 @@ public class RMNodeStarter {
             }
         } catch (Throwable t) {
             logger.error("Unable to create the local node " + nodeName, t);
-            System.exit(RMNodeStarter.ExitStatus.RMNODE_ADD_ERROR.exitCode);
+            System.exit(ExitStatus.RMNODE_ADD_ERROR.exitCode);
         }
         return localNode;
     }
@@ -1155,7 +1187,7 @@ public class RMNodeStarter {
                     if (paPropProperties != null && paPropProperties.getProperty(paRMKey) != null &&
                         !paPropProperties.getProperty(paRMKey).equals("")) {
                         logger.trace(paRMKey + " property retrieved from PA properties supplied by " +
-                            RMNodeStarter.CommandLineBuilder.class.getName());
+                            CommandLineBuilder.class.getName());
                         return paPropProperties.getProperty(paRMKey);
                     } else {
                         if (PAResourceManagerProperties.RM_CREDS.isSet()) {
@@ -1438,7 +1470,7 @@ public class RMNodeStarter {
             try {
                 return buildCommandLine(false);
             } catch (IOException e) {
-                return RMNodeStarter.CommandLineBuilder.class.getName() + " with invalid configuration";
+                return CommandLineBuilder.class.getName() + " with invalid configuration";
             }
         }
     }

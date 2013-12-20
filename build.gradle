@@ -192,6 +192,9 @@ project('rm:rm-client') {
 }
 
 project(':rm:rm-node') {
+    apply plugin:'application'
+    mainClassName = "org.ow2.proactive.resourcemanager.utils.RMNodeStarter"
+
     dependencies {
         compile 'commons-cli:commons-cli:1.1'
         compile fileTree("${rootDir}/lib/node/sigar/") // TODO separate jar and the rest
