@@ -520,11 +520,11 @@ task schedulerJar(type: Jar) {
 
     doLast {
         // generate INDEX.list
-        ant.jar(update: true, index: true, destfile: file('dist/lib/ProActive_Scheduler-core.jar')) {
+        ant.jar(update: true, index: true, destfile: file("$destinationDir/$archiveName")) {
             indexjars {
-                fileset(dir: 'dist/lib/') {
+                fileset(dir: destinationDir) {
                     include(name: '*.jar')
-                    exclude(name: 'ProActive_Scheduler-core.jar')
+                    exclude(name: archiveName)
                     exclude(name: '*-tests.jar')
                 }
             }
