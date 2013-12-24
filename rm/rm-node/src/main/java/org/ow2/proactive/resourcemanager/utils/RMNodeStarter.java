@@ -322,8 +322,8 @@ public class RMNodeStarter {
 //        } catch (Throwable e) {
 //            e.printStackTrace();
 //        }
-
-        System.setProperty("java.security.policy","/home/ybonnaffe/src/build/dist/scheduling/config/security.java.policy-server");
+        URL policyURL = RMNodeStarter.class.getResource("/config/security.java.policy-client");
+        System.setProperty("java.security.policy", policyURL.toExternalForm());
         try {
             //this call takes JVM properties into account
             args = JVMPropertiesPreloader.overrideJVMProperties(args);
