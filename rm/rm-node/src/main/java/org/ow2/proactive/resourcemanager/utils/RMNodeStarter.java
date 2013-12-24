@@ -457,10 +457,15 @@ public class RMNodeStarter {
             // log4j.configuration property is not set, use default log4j configuration for node
             String log4jConfig = proActiveHome + File.separator + "config" + File.separator + "log4j" +
                 File.separator + "log4j-defaultNode";
-            // set log4j.configuration to stop ProActiveLogger#load from reconfiguring log4j once again
-            System.setProperty(CentralPAPropertyRepository.LOG4J.getName(), "file:" + log4jConfig);
-            PropertyConfigurator.configure(RMNodeStarter.class.getResource("/log4j-defaultNode"));
-            logger.info("Configured log4j using " + log4jConfig);
+            if (new File(log4jConfig).exists()) {
+                // set log4j.configuration to stop ProActiveLogger#load from reconfiguring log4j once again
+                System.setProperty(CentralPAPropertyRepository.LOG4J.getName(), "file:" + log4jConfig);
+                PropertyConfigurator.configure(log4jConfig);
+                logger.info("Configured log4j using " + log4jConfig);
+            } else {
+                PropertyConfigurator.configure(RMNodeStarter.class.getResource("/log4j-defaultNode"));
+                logger.info("Configured log4j using default config");
+            }
         }
 
     }
