@@ -62,7 +62,7 @@ function startEverything() {
 	println("    Starting server processes    ");
 	println("---------------------------------");
 
-	var executor = Executors.newFixedThreadPool(3);
+	var executor = Executors.newFixedThreadPool(4);
 	var service = new ExecutorCompletionService(executor);
 
 	println("");
@@ -104,19 +104,31 @@ function startEverything() {
 		service.submit(jettyWaiter);
 	}
 
+	var exitListener = new Callable({
+    call: function () {
+            try {
+                var stream = new InputStreamReader(System["in"]);
+                var reader = new BufferedReader(stream);
+                while (!(reader.readLine().equals('exit')));
+            } catch (e) {
+                println("Unable to get input due to " + e);
+            }
+            return "exit by user";
+    }});
+    service.submit(exitListener);
+
 	// For each process a waiter thread is used
 	println("Preparing to wait for processes to exit ...")
 	// no more tasks are going to be submitted, this will let the executor clean up its threads
 	executor.shutdown();
 
-	while (!executor.isTerminated()) {
-	    println("Hit CTRL+C to terminate all server processes and exit");
+	if (!executor.isTerminated()) {
+	    println("Hit CTRL+C or enter 'exit' to terminate all server processes and exit");
 		var finishedFuture = service.take();
 		println("Finishing process returned " + finishedFuture.get());
 		stopEverything();
 		// Exit current process ... if under agent it will restart it
 		System.exit(-1);
-		break;
 	}
 }
 
