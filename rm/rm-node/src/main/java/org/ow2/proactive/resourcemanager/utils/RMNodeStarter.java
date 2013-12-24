@@ -373,6 +373,7 @@ public class RMNodeStarter {
         }
 
         if (rmURL != null) {
+            logger.info("Connecting to the Resource Manager at " + rmURL);
             ResourceManager rm = this.registerInRM(credentials, rmURL, nodeName, nodeSourceName);
 
             if (rm != null) {
@@ -408,6 +409,8 @@ public class RMNodeStarter {
                 logger.error(ExitStatus.RMNODE_EXIT_FORCED.description);
                 System.exit(ExitStatus.RMNODE_EXIT_FORCED.exitCode);
             }
+        } else {
+            logger.info("Do not connect to the Resource Manager - no url specified");
         }
     }
 
