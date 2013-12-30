@@ -502,19 +502,7 @@ public class RMNodeStarter {
                         System.exit(ExitStatus.CRED_DECODE.exitCode);
                     }
                 } else {
-                    try {
-                        credentials = Credentials.getCredentials();
-                    } catch (KeyException ke) {
-                        try {
-                            logger.info("Using default credentials from ProActive, authenticating as user rm");
-                            credentials = Credentials.getCredentials(new File(
-                                    PAResourceManagerProperties.RM_HOME.getValueAsStringOrNull(),
-                                    "config/authentication/rm.cred").getAbsolutePath());
-                        } catch (KeyException e) {
-                            logger.error("Failed to read credentials, from location obtained using system property or from default location", ke);
-                            System.exit(ExitStatus.CRED_UNREADABLE.exitCode);
-                        }
-                    }
+                    credentials = getDefaultCredentials();
                 }
             }
 
@@ -567,6 +555,31 @@ public class RMNodeStarter {
                 System.exit(ExitStatus.OK.exitCode);
             }
         }
+    }
+
+    private Credentials getDefaultCredentials() {
+        try {
+            return Credentials.getCredentials();
+        } catch (KeyException fromDiskKeyException) {
+            try {
+                Credentials credentialsFromRMHome = Credentials.getCredentials(new File(
+                  PAResourceManagerProperties.RM_HOME.getValueAsStringOrNull(),
+                  "config/authentication/rm.cred").getAbsolutePath());
+                logger.info("Using default credentials from ProActive home, authenticating as user rm");
+                return credentialsFromRMHome;
+            } catch (KeyException fromRMHomeKeyException) {
+                try {
+                    Credentials credentialsFromJar = Credentials.getCredentials(
+                      RMNodeStarter.class.getResourceAsStream("/config/authentication/rm.cred"));
+                    logger.info("Using default credentials from ProActive jars, authenticating as user rm");
+                    return credentialsFromJar;
+                } catch (Exception fromJarKeyException) {
+                    logger.error("Failed to read credentials, from location obtained using system property, RM home or ProActive jars", fromJarKeyException);
+                    System.exit(ExitStatus.CRED_UNREADABLE.exitCode);
+                }
+            }
+        }
+        return null;
     }
 
     protected void parseCommandLine(String[] args) {
