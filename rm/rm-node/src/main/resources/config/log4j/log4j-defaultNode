@@ -1,0 +1,22 @@
+log4j.rootLogger=INFO, NODE, CONSOLE
+
+log4j.logger.org.ow2.proactive.resourcemanager=DEBUG
+
+log4j.logger.org.ow2.proactive.resourcemanager.core.jmx=INFO
+log4j.logger.org.ow2.proactive.resourcemanager.db=INFO
+
+node.name=UNSET
+
+# File appender
+log4j.appender.NODE=org.apache.log4j.RollingFileAppender
+log4j.appender.NODE.File=.logs/Node-${node.name}.log
+log4j.appender.NODE.MaxFileSize=10MB
+log4j.appender.NODE.MaxBackupIndex=10
+log4j.appender.NODE.layout=org.apache.log4j.PatternLayout
+log4j.appender.NODE.layout.ConversionPattern=[%d{ISO8601} %-5p] [NODE.%C{1}.%M] %m%n
+
+# CONSOLE appender
+log4j.appender.CONSOLE=org.apache.log4j.ConsoleAppender
+log4j.appender.CONSOLE.layout=org.apache.log4j.PatternLayout
+log4j.appender.CONSOLE.layout.ConversionPattern=[%d{ISO8601} %-5p] [NODE.%C{1}.%M] %m%n
+

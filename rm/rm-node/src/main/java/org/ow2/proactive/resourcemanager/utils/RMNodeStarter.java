@@ -87,8 +87,12 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.Parser;
+import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.ConsoleAppender;
+import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.apache.log4j.PatternLayout;
 import org.apache.log4j.PropertyConfigurator;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -109,6 +113,14 @@ public class RMNodeStarter {
     protected String nodeSourceName = null;
     protected Node node;
 
+    // While logger is not configured and it not set with sys properties, use Console logger
+    static {
+        if (System.getProperty(CentralPAPropertyRepository.LOG4J.getName()) == null) {
+            BasicConfigurator.configure(
+              new ConsoleAppender(new PatternLayout("[%d{ISO8601} %-5p] [NODE.%C{1}.%M] %m%n")));
+            Logger.getRootLogger().setLevel(Level.INFO);
+        }
+    }
     /** Class' logger */
     protected static final Logger logger = Logger.getLogger(RMNodeStarter.class);
 
@@ -420,11 +432,19 @@ public class RMNodeStarter {
             String log4jConfig = proActiveHome + File.separator + "config" + File.separator + "log4j" +
                 File.separator + "log4j-defaultNode";
             // set log4j.configuration to stop ProActiveLogger#load from reconfiguring log4j once again
-            System.setProperty(CentralPAPropertyRepository.LOG4J.getName(), "file:" + log4jConfig);
-            PropertyConfigurator.configure(log4jConfig);
-            logger.info("Configured log4j using " + log4jConfig);
+            if (new File(log4jConfig).exists()) {
+                System.setProperty(CentralPAPropertyRepository.LOG4J.getName(), "file:" + log4jConfig);
+                PropertyConfigurator.configure(log4jConfig);
+                logger.info("Configured log4j using " + log4jConfig);
+            } else {
+                // use log4j config from JAR
+                URL log4jConfigFromJar = RMNodeStarter.class.getResource("/config/log4j/log4j-defaultNode");
+                System.setProperty(CentralPAPropertyRepository.LOG4J.getName(),
+                  log4jConfigFromJar.toString());
+                PropertyConfigurator.configure(log4jConfigFromJar);
+                logger.info("Configured log4j using " + log4jConfigFromJar.toString());
+            }
         }
-
     }
 
     /**
