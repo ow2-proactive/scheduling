@@ -332,6 +332,7 @@ public class RMNodeStarter {
     }
 
     protected void doMain(final String args[]) {
+        configureSecurityManager();
 
         this.parseCommandLine(args);
 
@@ -387,6 +388,13 @@ public class RMNodeStarter {
                 logger.error(ExitStatus.RMNODE_EXIT_FORCED.description);
                 System.exit(ExitStatus.RMNODE_EXIT_FORCED.exitCode);
             }
+        }
+    }
+
+    private void configureSecurityManager() {
+        if (System.getProperty("java.security.policy") == null) {
+            System.setProperty("java.security.policy",
+              RMNodeStarter.class.getResource("/config/security.java.policy-client").toString());
         }
     }
 
@@ -851,7 +859,7 @@ public class RMNodeStarter {
     protected void readAndSetTheRank() {
         String rankAsString = System.getProperty(RANK_PROP_NAME);
         if (rankAsString == null) {
-            logger.warn("Rank is not set. Previous URLs will not be stored");
+            logger.info("Rank is not set. Previous URLs will not be stored");
             this.removePrevious = false;
         } else {
             try {
