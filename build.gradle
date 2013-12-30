@@ -155,6 +155,8 @@ project(':rest-server') {
 }
 
 project(':rest-cli') {
+    apply plugin: 'application'
+
     dependencies {
         compile 'commons-cli:commons-cli:1.2'
         compile 'commons-io:commons-io:2.4'
@@ -166,6 +168,19 @@ project(':rest-cli') {
         compile 'org.ow2.proactive:common-api:3.5.0-SNAPSHOT'
         compile project(':rest-api')
     }
+
+    // generate scripts from Scheduler CLI
+    mainClassName = "org.ow2.proactive_grid_cloud_portal.cli.SchedulerEntryPoint"
+    startScripts.applicationName = "scheduler-client"
+
+    // generate scripts for RM CLI too
+    task rmStartScripts(type:CreateStartScripts, dependsOn: [startScripts, jar]) {
+        mainClassName  'org.ow2.proactive_grid_cloud_portal.cli.RmEntryPoint'
+        applicationName  'rm-client'
+        outputDir startScripts.outputDir
+        classpath =  startScripts.classpath
+    }
+    applicationDistribution.from(rmStartScripts) { into 'bin' }
 }
 
 project(':rest-client') {
