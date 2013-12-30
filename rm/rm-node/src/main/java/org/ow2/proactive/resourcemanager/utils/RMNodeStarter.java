@@ -208,14 +208,6 @@ public class RMNodeStarter {
     }
 
     /**
-     * Returns the rank of this node
-     * @return the rank of this node
-     */
-    public int getRank() {
-        return rank;
-    }
-
-    /**
      * Returns the URL of the node handled by this starter.
      * @return the URL of the node handled by this starter.
      */
@@ -229,43 +221,43 @@ public class RMNodeStarter {
      */
     protected void fillOptions(final Options options) {
         // The path to the file that contains the credential
-        final Option credentialFile = new Option(new Character(OPTION_CREDENTIAL_FILE).toString(),
+        final Option credentialFile = new Option(Character.toString(OPTION_CREDENTIAL_FILE),
             "credentialFile", true, "path to file that contains the credential");
         credentialFile.setRequired(false);
         credentialFile.setArgName("path");
         options.addOption(credentialFile);
         // The credential passed as environment variable
-        final Option credentialEnv = new Option(new Character(OPTION_CREDENTIAL_ENV).toString(),
+        final Option credentialEnv = new Option(Character.toString(OPTION_CREDENTIAL_ENV),
             "credentialEnv", true, "name of the environment variable that contains the credential");
         credentialEnv.setRequired(false);
         credentialEnv.setArgName("name");
         options.addOption(credentialEnv);
         // The credential passed as value
-        final Option credVal = new Option(new Character(OPTION_CREDENTIAL_VAL).toString(), "credentialVal",
+        final Option credVal = new Option(Character.toString(OPTION_CREDENTIAL_VAL), "credentialVal",
             true, "explicit value of the credential");
         credVal.setRequired(false);
         credVal.setArgName("credential");
         options.addOption(credVal);
         // The url of the resource manager
-        final Option rmURL = new Option(new Character(OPTION_RM_URL).toString(), "rmURL", true,
+        final Option rmURL = new Option(Character.toString(OPTION_RM_URL), "rmURL", true,
             "URL of the resource manager. If no URL is provided, the node won't register.");
         rmURL.setRequired(false);
         rmURL.setArgName("url");
         options.addOption(rmURL);
         // The node name
-        final Option nodeName = new Option(new Character(OPTION_NODE_NAME).toString(), "nodeName", true,
+        final Option nodeName = new Option(Character.toString(OPTION_NODE_NAME), "nodeName", true,
             "node name (default is hostname_pid)");
         nodeName.setRequired(false);
         nodeName.setArgName("name");
         options.addOption(nodeName);
         // The node source name
-        final Option sourceName = new Option(new Character(OPTION_SOURCE_NAME).toString(), "sourceName",
+        final Option sourceName = new Option(Character.toString(OPTION_SOURCE_NAME), "sourceName",
             true, "node source name");
         sourceName.setRequired(false);
         sourceName.setArgName("name");
         options.addOption(sourceName);
         // The wait on join timeout in millis
-        final Option waitOnJoinTimeout = new Option(new Character(OPTION_WAIT_AND_JOIN_TIMEOUT).toString(),
+        final Option waitOnJoinTimeout = new Option(Character.toString(OPTION_WAIT_AND_JOIN_TIMEOUT),
             "waitOnJoinTimeout", true, "wait on join the resource manager timeout in millis (default is " +
                 WAIT_ON_JOIN_TIMEOUT_IN_MS + ")");
         waitOnJoinTimeout.setRequired(false);
@@ -273,7 +265,7 @@ public class RMNodeStarter {
         options.addOption(waitOnJoinTimeout);
         // The ping delay in millis
         final Option pingDelay = new Option(
-            new Character(OPTION_PING_DELAY).toString(),
+          Character.toString(OPTION_PING_DELAY),
             "pingDelay",
             true,
             "ping delay in millis used by RMPinger thread that calls System.exit(1) if the resource manager is down (default is " +
@@ -282,7 +274,7 @@ public class RMNodeStarter {
         pingDelay.setArgName("millis");
         options.addOption(pingDelay);
         // The number of attempts option
-        final Option addNodeAttempts = new Option(new Character(OPTION_ADD_NODE_ATTEMPTS).toString(),
+        final Option addNodeAttempts = new Option(Character.toString(OPTION_ADD_NODE_ATTEMPTS),
             "addNodeAttempts", true,
             "number of attempts to add the local node to the resource manager. Default is " +
                 NB_OF_ADD_NODE_ATTEMPTS + "). When 0 is specified node remains alive without " +
@@ -292,15 +284,14 @@ public class RMNodeStarter {
         addNodeAttempts.setArgName("number");
         options.addOption(addNodeAttempts);
         // The delay between attempts option
-        final Option addNodeAttemptsDelay = new Option(new Character(OPTION_ADD_NODE_ATTEMPTS_DELAY)
-                .toString(), "addNodeAttemptsDelay", true,
+        final Option addNodeAttemptsDelay = new Option(Character.toString(OPTION_ADD_NODE_ATTEMPTS_DELAY), "addNodeAttemptsDelay", true,
             "delay in millis between attempts to add the local node to the resource manager (default is " +
                 ADD_NODE_ATTEMPTS_DELAY_IN_MS + ")");
         addNodeAttemptsDelay.setRequired(false);
         addNodeAttemptsDelay.setArgName("millis");
         options.addOption(addNodeAttemptsDelay);
         // Displays the help
-        final Option help = new Option(new Character(OPTION_HELP).toString(), "help", false,
+        final Option help = new Option(Character.toString(OPTION_HELP), "help", false,
             "to display this help");
         help.setRequired(false);
         options.addOption(help);
@@ -352,7 +343,7 @@ public class RMNodeStarter {
         }
 
         if (rmURL != null) {
-            ResourceManager rm = this.registerInRM(credentials, rmURL, nodeName, nodeSourceName);
+            ResourceManager rm = this.registerInRM(credentials, rmURL, nodeName);
 
             if (rm != null) {
                 logger.info("Connected to the Resource Manager at " + rmURL +
@@ -744,7 +735,7 @@ public class RMNodeStarter {
      * the Resource Manager. Handles all errors/exceptions.
      */
     protected ResourceManager registerInRM(final Credentials credentials, final String rmURL,
-            final String nodeName, final String nodeSourceName) {
+      final String nodeName) {
 
         // Create the full url to contact the Resource Manager
         final String fullUrl = rmURL.endsWith("/") ? rmURL + RMConstants.NAME_ACTIVE_OBJECT_RMAUTHENTICATION
@@ -790,7 +781,7 @@ public class RMNodeStarter {
                     if (!isAdmin) {
                         throw new SecurityException("Permission denied");
                     }
-                    return isAdmin;
+                    return true;
                 } catch (LoginException e) {
                     throw new SecurityException(e);
                 } finally {
@@ -958,9 +949,8 @@ public class RMNodeStarter {
      */
     private String getNodeURLFilename(String nodeName, int rank) {
         final String tmpDir = System.getProperty("java.io.tmpdir");
-        final String tmpFile = new File(tmpDir, URL_TMPFILE_PREFIX + "_" + nodeName + "-" + rank)
+        return new File(tmpDir, URL_TMPFILE_PREFIX + "_" + nodeName + "-" + rank)
                 .getAbsolutePath();
-        return tmpFile;
     }
 
     /**
@@ -995,9 +985,6 @@ public class RMNodeStarter {
             return this.description;
         }
 
-        public int getExitCode() {
-            return this.exitCode;
-        }
     }
 
     /**
@@ -1005,7 +992,7 @@ public class RMNodeStarter {
      * the RMNodeStarter command line building. We encourage Infrastructure Manager providers to
      * use this class as it is used as central point for applying changes to the RMNodeStarter
      * properties, for instance, if the classpath needs to bu updated, a call to
-     * {@link #getRequiredJARs()} will reflect the change.
+     *  will reflect the change.
      *
      */
     public static final class CommandLineBuilder implements Cloneable {
@@ -1014,7 +1001,6 @@ public class RMNodeStarter {
                 credentialsEnv, rmHome;
         private long pingDelay = 30000;
         private Properties paPropProperties;
-        private String paPropString;
         private List<String> paPropList;
         private int addAttempts = -1, addAttemptsDelay = -1;
         private final String addonsDir = "addons";
@@ -1031,7 +1017,7 @@ public class RMNodeStarter {
                 return rmHome;
             } else {
                 if (paPropProperties != null) {
-                    String rmHome = null;
+                    String rmHome;
                     if (paPropProperties.getProperty(PAResourceManagerProperties.RM_HOME.getKey()) != null &&
                         !paPropProperties.getProperty(PAResourceManagerProperties.RM_HOME.getKey())
                                 .equals("")) {
@@ -1054,7 +1040,7 @@ public class RMNodeStarter {
                     return rmHome;
                 }
             }
-            return rmHome;
+            return null;
         }
 
         /**
@@ -1112,7 +1098,6 @@ public class RMNodeStarter {
         /**
          * To set a list of String standing for the ProActive Properties, appended to the built command line without any modification.
          * If a call to {@link #setPaProperties(byte[])} or {@link #setPaProperties(File)} of {@link #setPaProperties(Map)} has already been made, the PAProperties structure will be cleaned up...
-         * @param paProp A list of String standing for the PAProperties ( for instance -Dlog4j.configuration=... or -Dproactive.net.netmask=... )
          */
         public void setPaProperties(List<String> paPropList) {
             if (this.paPropProperties != null) {
@@ -1224,7 +1209,6 @@ public class RMNodeStarter {
         /**
          * Sets the credentials file field to the supplied parameter and set
          * the other field related to credentials setup to null;
-         * @param credentialsEnv
          */
         public void setCredentialsFileAndNullOthers(String credentialsFile) {
             this.credentialsFile = credentialsFile;
@@ -1242,7 +1226,6 @@ public class RMNodeStarter {
         /**
          * Sets the credentials value field to the supplied parameter and set
          * the other field related to credentials setup to null;
-         * @param credentialsEnv
          */
         public void setCredentialsValueAndNullOthers(String credentialsValue) {
             this.credentialsValue = credentialsValue;
@@ -1258,28 +1241,10 @@ public class RMNodeStarter {
         }
 
         /**
-         * Sets the credentials environment field to the supplied parameter and set
-         * the other field related to credentials setup to null;
-         * @param credentialsEnv
-         */
-        public void setCredentialsEnvAndNullOthers(String credentialsEnv) {
-            this.credentialsEnv = credentialsEnv;
-            this.credentialsFile = null;
-            this.credentialsValue = null;
-        }
-
-        /**
          * @return the ping delay used to maintain connectivity with the RM. -1 means no ping
          */
         public long getPingDelay() {
             return pingDelay;
-        }
-
-        /**
-         * @param pingDelay the ping delay used to detect rm shutdown. -1 means no ping
-         */
-        public void setPingDelay(long pingDelay) {
-            this.pingDelay = pingDelay;
         }
 
         /**
@@ -1290,25 +1255,10 @@ public class RMNodeStarter {
         }
 
         /**
-         * @param addAttempts the number of attempts made to add the node to the core
-         */
-        public void setAddAttempts(int addAttempts) {
-            this.addAttempts = addAttempts;
-        }
-
-        /**
          * @return the delay between two add attempts
          */
         public int getAddAttemptsDelay() {
             return addAttemptsDelay;
-        }
-
-        /**
-         *
-         * @param addAttemptsDelay the delay between two add attempts
-         */
-        public void setAddAttemptsDelay(int addAttemptsDelay) {
-            this.addAttemptsDelay = addAttemptsDelay;
         }
 
         /**
@@ -1348,18 +1298,9 @@ public class RMNodeStarter {
 
         /**
          * To retrieve the PaProperties set thanks to a call to {@link #setPaProperties(byte[])} or {@link #setPaProperties(File)} of {@link #setPaProperties(Map)}
-         * @return
          */
         public Properties getPaProperties() {
             return paPropProperties;
-        }
-
-        /**
-         * To retrieved the PAProperties set thanks to the method {@link #setPaProperties(String)};
-         * @return
-         */
-        public String getPaPropertiesString() {
-            return paPropString;
         }
 
         /**
@@ -1418,10 +1359,10 @@ public class RMNodeStarter {
             }
             //building classpath
             command.add("-cp");
-            final StringBuilder classpath = new StringBuilder('.');
+            final StringBuilder classpath = new StringBuilder(".");
 
             // add the content of addons dir on the classpath
-            classpath.append(os.ps + rmHome + this.addonsDir);
+            classpath.append(os.ps).append(rmHome).append(this.addonsDir);
             classpath.append(os.ps).append(libRoot).append("*");
 
             // add jars inside the addons directory
@@ -1429,7 +1370,7 @@ public class RMNodeStarter {
             addonsAbsolute.listFiles(new FileFilter() {
                 public boolean accept(File pathname) {
                     if (pathname.getName().matches(".*[.]jar")) {
-                        classpath.append(os.ps + pathname.getAbsolutePath());
+                        classpath.append(os.ps).append(pathname.getAbsolutePath());
                     }
                     return false;
                 }
