@@ -45,6 +45,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.KeyException;
@@ -94,6 +95,7 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import org.apache.log4j.PropertyConfigurator;
+import org.hyperic.sigar.Sigar;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -101,7 +103,7 @@ import org.w3c.dom.NodeList;
 
 /**
  * This class is responsible for creating a local node. You can define different settings to
- * register the node to an apropriate Resource Manager, ping it...
+ * register the node to an appropriate Resource Manager, ping it...
  *
  * @author ProActive team
  */
@@ -109,7 +111,7 @@ public class RMNodeStarter {
 
     protected Credentials credentials = null;
     protected String rmURL = null;
-    protected String nodeName = RMNodeStarter.PAAGENT_DEFAULT_NODE_NAME;
+    protected String nodeName;
     protected String nodeSourceName = null;
     protected Node node;
 
@@ -123,9 +125,6 @@ public class RMNodeStarter {
     }
     /** Class' logger */
     protected static final Logger logger = Logger.getLogger(RMNodeStarter.class);
-
-    /** The default name of the node */
-    protected static final String PAAGENT_DEFAULT_NODE_NAME = "PA-AGENT_NODE";
 
     /** Prefix for temp files that store nodes URL */
     protected static final String URL_TMPFILE_PREFIX = "PA-AGENT_URL";
@@ -255,7 +254,7 @@ public class RMNodeStarter {
         options.addOption(rmURL);
         // The node name
         final Option nodeName = new Option(new Character(OPTION_NODE_NAME).toString(), "nodeName", true,
-            "node name (default is " + PAAGENT_DEFAULT_NODE_NAME + ")");
+            "node name (default is hostname_pid)");
         nodeName.setRequired(false);
         nodeName.setArgName("name");
         options.addOption(nodeName);
@@ -537,6 +536,8 @@ public class RMNodeStarter {
             // Optional node name
             if (cl.hasOption(OPTION_NODE_NAME)) {
                 nodeName = cl.getOptionValue(OPTION_NODE_NAME);
+            } else {
+                nodeName = getDefaultNodeName();
             }
             // Optional node source name
             if (cl.hasOption(OPTION_SOURCE_NAME)) {
@@ -582,6 +583,16 @@ public class RMNodeStarter {
                 formatter.printHelp("java " + RMNodeStarter.class.getName(), options);
                 System.exit(ExitStatus.OK.exitCode);
             }
+        }
+    }
+
+    private String getDefaultNodeName() {
+        try {
+            return InetAddress.getLocalHost().getHostName() + "_" + new Sigar().getPid();
+        } catch (Throwable error) {
+            logger.warn(
+              "Failed to retrieve hostname or pid to compute node name, will fallback to default value", error);
+            return "PA-AGENT_NODE";
         }
     }
 
