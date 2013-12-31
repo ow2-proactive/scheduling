@@ -45,7 +45,6 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.remoteobject.AbstractRemoteObjectFactory;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectFactory;
-import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
 import org.objectweb.proactive.utils.JVMPropertiesPreloader;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.RMFactory;
@@ -73,6 +72,7 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.Parser;
 import org.apache.commons.cli.UnrecognizedOptionException;
 import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 
 
 /**
@@ -89,17 +89,16 @@ public class SchedulerStarter {
     //shows how to run the scheduler
     private static Logger logger = Logger.getLogger(SchedulerStarter.class);
 
-    public static final String defaultPolicy = PASchedulerProperties.SCHEDULER_DEFAULT_POLICY
-            .getValueAsString();
     public static final int defaulNodesNumber = 4;
     public static final int defaultNodesTimemout = 30 * 1000;
 
     /**
      * Start the scheduler creation process.
-     *
-     * @param args
      */
     public static void main(String[] args) {
+        configureSchedulerAndRMHomes();
+        configureSecurityManager();
+        configureLogging();
 
         args = JVMPropertiesPreloader.overrideJVMProperties(args);
 
@@ -127,11 +126,11 @@ public class SchedulerStarter {
         boolean displayHelp = false;
 
         try {
-            RMAuthentication rmAuth = null;
+            RMAuthentication rmAuth;
             //get the path of the file
 
             String rm = null;
-            String policyFullName = defaultPolicy;
+            String policyFullName = PASchedulerProperties.SCHEDULER_DEFAULT_POLICY.getValueAsString();
 
             Parser parser = new GnuParser();
             CommandLine cmd = parser.parse(options, args);
@@ -244,8 +243,37 @@ public class SchedulerStarter {
 
     }
 
-    private static String getLocalAdress() throws ProActiveException, UnknownProtocolException {
+    private static String getLocalAdress() throws ProActiveException {
         RemoteObjectFactory rof = AbstractRemoteObjectFactory.getDefaultRemoteObjectFactory();
         return rof.getBaseURI().toString();
+    }
+
+    private static void configureSchedulerAndRMHomes() {
+        if (System.getProperty(PASchedulerProperties.SCHEDULER_HOME.getKey()) == null) {
+            System.setProperty(PASchedulerProperties.SCHEDULER_HOME.getKey(), ".");
+        }
+        if (System.getProperty(PAResourceManagerProperties.RM_HOME.getKey()) == null) {
+            System.setProperty(PAResourceManagerProperties.RM_HOME.getKey(), ".");
+        }
+        if (System.getProperty(CentralPAPropertyRepository.PA_HOME.getName()) == null) {
+            System.setProperty(CentralPAPropertyRepository.PA_HOME.getName(), ".");
+        }
+    }
+
+    private static void configureSecurityManager() {
+        if (System.getProperty("java.security.policy") == null) {
+            System.setProperty("java.security.policy", System.getProperty(
+              PASchedulerProperties.SCHEDULER_HOME.getKey()) + "/config/security.java.policy-server");
+        }
+    }
+
+    private static void configureLogging() {
+        if (System.getProperty(CentralPAPropertyRepository.LOG4J.getName()) == null) {
+            String defaultLog4jConfig = System.getProperty(
+              PASchedulerProperties.SCHEDULER_HOME.getKey()) + "/config/log4j/scheduler-log4j-server";
+            System.setProperty(CentralPAPropertyRepository.LOG4J.getName(),
+              defaultLog4jConfig);
+            PropertyConfigurator.configure(defaultLog4jConfig);
+        }
     }
 }

@@ -60,8 +60,8 @@ public class PAResourceManagerPropertiesTest {
     }
 
     @Test
-    public void testLoadProperties_NoFile_UseJar() throws Exception {
-        assertEquals("nodeName", PAResourceManagerProperties.RM_NODE_NAME.getValueAsString());
+    public void testLoadProperties_NoFile_EmptyProperties() throws Exception {
+        assertEquals("", PAResourceManagerProperties.RM_NODE_NAME.getValueAsString());
     }
 
     @Test

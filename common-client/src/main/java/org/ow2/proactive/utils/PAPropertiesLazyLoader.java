@@ -52,61 +52,62 @@ public class PAPropertiesLazyLoader {
 
     private String propertiesFileName;
 
-    /** if properties file is relative, will use this folder as base folder */
-    private String propertiesRelativeFolder;
+    /** if properties file is relative, will use this system property value as base folder */
+    private String systemPropertyForRelativeFolder;
 
     /** if properties filename is not defined, will search this system property for a filename */
     private String systemPropertyForFileName;
 
     /** if properties filename and systemPropertyForFileName are not defined, will use this default file name
-     * and search in propertiesRelativeFolder and then JARs */
+     * and search in systemPropertyForRelativeFolder */
     private String pathToRelativePropertiesFile;
 
-    public PAPropertiesLazyLoader(String propertiesRelativeFolder,
+    public PAPropertiesLazyLoader(String systemPropertyForRelativeFolder,
       String systemPropertyForFileName,
       String pathToRelativePropertiesFile) {
-        this.propertiesRelativeFolder = propertiesRelativeFolder;
+        this.systemPropertyForRelativeFolder = systemPropertyForRelativeFolder;
         this.pathToRelativePropertiesFile = pathToRelativePropertiesFile;
         this.systemPropertyForFileName = systemPropertyForFileName;
     }
 
-    public PAPropertiesLazyLoader(String propertiesRelativeFolder,
+    public PAPropertiesLazyLoader(String systemPropertyForRelativeFolder,
       String systemPropertyForFileName,
       String pathToRelativePropertiesFile,
       String propertiesFileName) {
-        this.propertiesRelativeFolder = propertiesRelativeFolder;
+        this.systemPropertyForRelativeFolder = systemPropertyForRelativeFolder;
         this.pathToRelativePropertiesFile = pathToRelativePropertiesFile;
         this.propertiesFileName = propertiesFileName;
         this.systemPropertyForFileName = systemPropertyForFileName;
     }
 
-    private InputStream init(String filename) throws FileNotFoundException {
+    private InputStream resolvePropertiesFile() throws FileNotFoundException {
         String propertiesPath;
-        boolean jPropSet = false;
-        if (filename == null) {
+        boolean systemPropertyForFileNameSet = false;
+
+        if (propertiesFileName == null) {
             if (System.getProperty(systemPropertyForFileName) != null) {
                 propertiesPath = System.getProperty(systemPropertyForFileName);
-                jPropSet = true;
+                systemPropertyForFileNameSet = true;
             } else {
                 propertiesPath = pathToRelativePropertiesFile;
             }
         } else {
-            propertiesPath = filename;
+            propertiesPath = propertiesFileName;
         }
+
         if (!new File(propertiesPath).isAbsolute()) {
-            propertiesPath = propertiesRelativeFolder + File.separator + propertiesPath;
+            propertiesPath = System.getProperty(systemPropertyForRelativeFolder) + File.separator + propertiesPath;
         }
 
         if (new File(propertiesPath).exists()) {
             logger.info("Loading properties from file " + propertiesPath);
             return new FileInputStream(propertiesPath);
         } else {
-            if (jPropSet) {
+            if (systemPropertyForFileNameSet) {
                 throw new RuntimeException("RM properties file not found : '" + propertiesPath + "'");
             }
-            String propertiesFromJar = "/" + pathToRelativePropertiesFile;
-            logger.info("Loading properties from JAR " + propertiesFromJar);
-            return PAPropertiesLazyLoader.class.getResourceAsStream(propertiesFromJar);
+            logger.info("Loading empty properties");
+            return null;
         }
     }
 
@@ -119,7 +120,7 @@ public class PAPropertiesLazyLoader {
         if (properties == null) {
             properties = new Properties();
             try {
-                InputStream stream = init(propertiesFileName);
+                InputStream stream = resolvePropertiesFile();
                 if (stream == null) {
                     return properties;
                 }

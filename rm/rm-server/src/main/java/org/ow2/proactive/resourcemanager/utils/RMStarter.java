@@ -38,6 +38,7 @@ package org.ow2.proactive.resourcemanager.utils;
 
 import java.io.File;
 
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.utils.JVMPropertiesPreloader;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.RMFactory;
@@ -56,6 +57,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.Parser;
 import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 
 
 /**
@@ -65,9 +67,7 @@ import org.apache.log4j.Logger;
  * @since ProActive Scheduling 0.9
  */
 public class RMStarter {
-    /**
-     * Log4j logger name.
-     */
+
     private static Logger logger = Logger.getLogger(RMStarter.class);
 
     private static Options options = new Options();
@@ -105,12 +105,10 @@ public class RMStarter {
         System.exit(1);
     }
 
-    /**
-     * main function
-     * @param args
-     * @throws Exception
-     */
     public static void main(String[] args) {
+        configureRMHome();
+        configureSecurityManager();
+        configureLogging();
 
         args = JVMPropertiesPreloader.overrideJVMProperties(args);
 
@@ -171,6 +169,29 @@ public class RMStarter {
             System.exit(3);
         }
 
+    }
+
+    private static void configureRMHome() {
+        if (System.getProperty(PAResourceManagerProperties.RM_HOME.getKey()) == null) {
+            System.setProperty(PAResourceManagerProperties.RM_HOME.getKey(), ".");
+        }
+    }
+
+    private static void configureSecurityManager() {
+        if (System.getProperty("java.security.policy") == null) {
+            System.setProperty("java.security.policy", System.getProperty(
+              PAResourceManagerProperties.RM_HOME.getKey()) + "/config/security.java.policy-server");
+        }
+    }
+
+    private static void configureLogging() {
+        if (System.getProperty(CentralPAPropertyRepository.LOG4J.getName()) == null) {
+            String defaultLog4jConfig = System.getProperty(
+              PAResourceManagerProperties.RM_HOME.getKey()) + "/config/log4j/rm-log4j-server";
+            System.setProperty(CentralPAPropertyRepository.LOG4J.getName(),
+              defaultLog4jConfig);
+            PropertyConfigurator.configure(defaultLog4jConfig);
+        }
     }
 
 }

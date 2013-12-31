@@ -214,7 +214,7 @@ public enum PAResourceManagerProperties {
 
     /** memory entity of the properties file. */
     private static PAPropertiesLazyLoader propertiesLoader = new PAPropertiesLazyLoader(
-      System.getProperty(RM_HOME.key),
+      RM_HOME.key,
       PA_RM_PROPERTIES_FILEPATH,
       PA_RM_PROPERTIES_RELATIVE_FILEPATH);
 
@@ -259,7 +259,7 @@ public enum PAResourceManagerProperties {
      * @param filename the file containing the properties to be loaded.
      */
     protected static void loadProperties(String filename) {
-        propertiesLoader = new PAPropertiesLazyLoader(System.getProperty(RM_HOME.key),
+        propertiesLoader = new PAPropertiesLazyLoader(RM_HOME.key,
           PA_RM_PROPERTIES_FILEPATH,
           PA_RM_PROPERTIES_RELATIVE_FILEPATH,
           filename);

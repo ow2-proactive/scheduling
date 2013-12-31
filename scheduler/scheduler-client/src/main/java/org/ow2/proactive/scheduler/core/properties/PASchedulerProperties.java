@@ -45,6 +45,7 @@ import java.util.Properties;
 import java.util.regex.Pattern;
 
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.ow2.proactive.utils.PAPropertiesLazyLoader;
 
 
 /**
@@ -327,12 +328,13 @@ public enum PASchedulerProperties {
     /* ***************************************************************************** */
     /* ***************************************************************************** */
     public static final String PA_SCHEDULER_PROPERTIES_FILEPATH = "pa.scheduler.properties.filepath";
-    /** Default properties file for the scheduler configuration */
-    private static String DEFAULT_PROPERTIES_FILE = null;
-    /** to know if the file has been loaded or not */
-    private static boolean fileLoaded;
+    public static final String  PA_SCHEDULER_PROPERTIES_RELATIVE_FILEPATH = "config/scheduler/settings.ini";
+
     /** memory entity of the properties file. */
-    private static Properties prop = null;
+    private static PAPropertiesLazyLoader propertiesLoader = new PAPropertiesLazyLoader(
+      SCHEDULER_HOME.key,
+      PA_SCHEDULER_PROPERTIES_FILEPATH,
+      PA_SCHEDULER_PROPERTIES_RELATIVE_FILEPATH);
 
     /** Key of the specific instance. */
     private String key;
@@ -365,85 +367,7 @@ public enum PASchedulerProperties {
      * @param value the new value to set.
      */
     public void updateProperty(String value) {
-        getProperties(null);
-        prop.setProperty(key, value);
-    }
-
-    /**
-     * Set the user java properties to the PASchedulerProperties.<br/>
-     * User properties are defined using the -Dname=value in the java command.
-     */
-    private static void setUserJavaProperties() {
-        if (prop != null) {
-            for (PASchedulerProperties p : PASchedulerProperties.values()) {
-                String s = System.getProperty(p.getKey());
-                if (s != null) {
-                    prop.setProperty(p.getKey(), s);
-                }
-            }
-        }
-    }
-
-    /**
-     * Initialize the file to be loaded by this properties.
-     * It first check the filename argument :<br>
-     * - if null  : default config file is used (first check if java property file exist)<br>
-     * - if exist : use the filename argument to read configuration.<br>
-     *
-     * Finally, if the selected file is a relative path, the file will be relative to the SCHEDULER_HOME property.
-     *
-     * @param filename the file to load or null to use the default one or the one set in java property.
-     */
-    private static void init(String filename) {
-        String propertiesPath;
-        boolean jPropSet = false;
-        if (filename == null) {
-            if (System.getProperty(PA_SCHEDULER_PROPERTIES_FILEPATH) != null) {
-                propertiesPath = System.getProperty(PA_SCHEDULER_PROPERTIES_FILEPATH);
-                jPropSet = true;
-            } else {
-                propertiesPath = "config/scheduler/settings.ini";
-            }
-        } else {
-            propertiesPath = filename;
-        }
-        if (!new File(propertiesPath).isAbsolute()) {
-            propertiesPath = System.getProperty(SCHEDULER_HOME.key) + File.separator + propertiesPath;
-        }
-        DEFAULT_PROPERTIES_FILE = propertiesPath;
-        fileLoaded = new File(propertiesPath).exists();
-        if (jPropSet && !fileLoaded) {
-            throw new RuntimeException("Scheduler properties file not found : '" + propertiesPath + "'");
-        }
-    }
-
-    /**
-     * Get the properties map or load it if needed.
-     * 
-     * @param filename the new file to be loaded.
-     * @return the properties map corresponding to the default property file.
-     */
-    private static Properties getProperties(String filename) {
-        if (prop == null) {
-            prop = new Properties();
-            init(filename);
-            if (filename == null && fileLoaded == false) {
-                return prop;
-            }
-            try {
-                if (filename == null) {
-                    filename = DEFAULT_PROPERTIES_FILE;
-                }
-                FileInputStream stream = new FileInputStream(filename);
-                prop.load(stream);
-                stream.close();
-                setUserJavaProperties();
-
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        return prop;
+        propertiesLoader.getProperties().setProperty(key, value);
     }
 
     /**
@@ -453,10 +377,10 @@ public enum PASchedulerProperties {
      * @param filename the file containing the properties to be loaded.
      */
     public static void loadProperties(String filename) {
-        DEFAULT_PROPERTIES_FILE = null;
-        fileLoaded = false;
-        prop = null;
-        getProperties(filename);
+        propertiesLoader = new PAPropertiesLazyLoader(SCHEDULER_HOME.key,
+          PA_SCHEDULER_PROPERTIES_FILEPATH,
+          PA_SCHEDULER_PROPERTIES_RELATIVE_FILEPATH,
+          filename);
     }
 
     /**
@@ -466,7 +390,7 @@ public enum PASchedulerProperties {
      * @param filename path of file containing some properties to override
      */
     public static void updateProperties(String filename) {
-        getProperties(null);
+        Properties prop = propertiesLoader.getProperties();
         Properties ptmp = new Properties();
         try {
             FileInputStream stream = new FileInputStream(filename);
@@ -475,7 +399,7 @@ public enum PASchedulerProperties {
             for (Object o : ptmp.keySet()) {
                 prop.setProperty((String) o, (String) ptmp.get(o));
             }
-            setUserJavaProperties();
+            PAPropertiesLazyLoader.updateWithSystemProperties(prop);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -487,12 +411,7 @@ public enum PASchedulerProperties {
      * @return true if this property is set, false otherwise.
      */
     public boolean isSet() {
-        getProperties(null);
-        if (fileLoaded) {
-            return prop.containsKey(key);
-        } else {
-            return false;
-        }
+        return propertiesLoader.getProperties().containsKey(key);
     }
 
     /**
@@ -500,10 +419,7 @@ public enum PASchedulerProperties {
      *
      */
     public void unSet() {
-        getProperties(null);
-        if (fileLoaded) {
-            prop.remove(key);
-        }
+        propertiesLoader.getProperties().remove(key);
     }
 
     /**
@@ -524,16 +440,13 @@ public enum PASchedulerProperties {
      * @return the value of this property.
      */
     public int getValueAsInt() {
-        getProperties(null);
-        if (fileLoaded) {
+        if (propertiesLoader.getProperties().containsKey(key)) {
             String valueS = getValueAsString();
             try {
-                int value = Integer.parseInt(valueS);
-                return value;
+                return Integer.parseInt(valueS);
             } catch (NumberFormatException e) {
-                RuntimeException re = new IllegalArgumentException(key +
+                throw new IllegalArgumentException(key +
                     " is not an integer property. getValueAsInt cannot be called on this property");
-                throw re;
             }
         } else {
             return 0;
@@ -546,8 +459,8 @@ public enum PASchedulerProperties {
      * @return the value of this property.
      */
     public String getValueAsString() {
-        Properties prop = getProperties(null);
-        if (fileLoaded) {
+        Properties prop = propertiesLoader.getProperties();
+        if (prop.containsKey(key)) {
             return prop.getProperty(key);
         } else {
             return "";
@@ -562,9 +475,9 @@ public enum PASchedulerProperties {
      * @return the list of values of this property.
      */
     public List<String> getValueAsList(String separator) {
-        Properties prop = getProperties(null);
+        Properties prop = propertiesLoader.getProperties();
         ArrayList<String> valueList = new ArrayList<String>();
-        if (fileLoaded) {
+        if (prop.containsKey(key)) {
             String value = prop.getProperty(key);
             for (String val : value.split(Pattern.quote(separator))) {
                 val = val.trim();
@@ -583,8 +496,8 @@ public enum PASchedulerProperties {
      * @return the value of this property.
      */
     public String getValueAsStringOrNull() {
-        Properties prop = getProperties(null);
-        if (fileLoaded) {
+        Properties prop = propertiesLoader.getProperties();
+        if (prop.containsKey(key)) {
             String ret = prop.getProperty(key);
             if ("".equals(ret)) {
                 return null;
@@ -603,8 +516,7 @@ public enum PASchedulerProperties {
      * @return the value of this property.
      */
     public boolean getValueAsBoolean() {
-        getProperties(null);
-        if (fileLoaded) {
+        if (propertiesLoader.getProperties().containsKey(key)) {
             return Boolean.parseBoolean(getValueAsString());
         } else {
             return false;
@@ -648,6 +560,6 @@ public enum PASchedulerProperties {
      * Supported types for PASchedulerProperties
      */
     public enum PropertyType {
-        STRING, BOOLEAN, INTEGER, LIST;
+        STRING, BOOLEAN, INTEGER, LIST
     }
 }
