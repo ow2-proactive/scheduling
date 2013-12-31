@@ -311,17 +311,19 @@ public class RMNodeStarter {
      */
     public static void main(String[] args) {
 
-//        System.setProperty("org.hyperic.sigar.path", "-");
+        System.setProperty("org.hyperic.sigar.path", "-");
 
-//        try {
-//            if (System.getProperty("os.arch").equals("amd64")) {
-//                System.loadLibrary("sigar-amd64-linux");
-//            } else {
-//                System.loadLibrary("sigar-x86-linux");
-//            }
-//        } catch (Throwable e) {
-//            e.printStackTrace();
-//        }
+        try {
+            if (System.getProperty("os.arch").equals("amd64")) {
+                System.out.println("Loading 64 bits sigar library");
+                System.loadLibrary("sigar-amd64-linux");
+            } else {
+                System.out.println("Loading 32 bits sigar library");
+                System.loadLibrary("sigar-x86-linux");
+            }
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
         URL policyURL = RMNodeStarter.class.getResource("/config/security.java.policy-client");
         System.setProperty("java.security.policy", policyURL.toExternalForm());
         try {
@@ -763,37 +765,37 @@ public class RMNodeStarter {
             System.exit(ExitStatus.RMNODE_ADD_ERROR.exitCode);
         }
 
-        // initializing JMX server with Sigar beans
-        sigarExposer = new SigarExposer();
-        final RMAuthentication rmAuth = auth;
-        sigarExposer.boot(auth, false, new PermissionChecker() {
-            public boolean checkPermission(Credentials cred) {
-                ResourceManager rm = null;
-                try {
-                    rm = rmAuth.login(cred);
-                    if (NB_OF_ADD_NODE_ATTEMPTS == 0)
-                        return true;
+        try {
+            // initializing JMX server with Sigar beans
+            sigarExposer = new SigarExposer();
+            final RMAuthentication rmAuth = auth;
+            sigarExposer.boot(auth, false, new PermissionChecker() {
+                public boolean checkPermission(Credentials cred) {
+                    ResourceManager rm = null;
+                    try {
+                        rm = rmAuth.login(cred);
+                        if (NB_OF_ADD_NODE_ATTEMPTS == 0)
+                            return true;
 
-                    boolean isAdmin = rm.isNodeAdmin(node.getNodeInformation().getURL()).getBooleanValue();
-                    if (!isAdmin) {
-                        throw new SecurityException("Permission denied");
-                    }
-                    return isAdmin;
-                } catch (LoginException e) {
-                    throw new SecurityException(e);
-                } finally {
-                    if (rm != null) {
-                        rm.disconnect();
+                        boolean isAdmin = rm.isNodeAdmin(node.getNodeInformation().getURL()).getBooleanValue();
+                        if (!isAdmin) {
+                            throw new SecurityException("Permission denied");
+                        }
+                        return isAdmin;
+                    } catch (LoginException e) {
+                        throw new SecurityException(e);
+                    } finally {
+                        if (rm != null) {
+                            rm.disconnect();
+                        }
                     }
                 }
-            }
-        });
-        try {
+            });
             node.setProperty(JMX_URL + JMXTransportProtocol.RMI, sigarExposer.getAddress(
                     JMXTransportProtocol.RMI).toString());
             node.setProperty(JMX_URL + JMXTransportProtocol.RO, sigarExposer.getAddress(
                     JMXTransportProtocol.RO).toString());
-        } catch (Exception e) {
+        } catch (Throwable e) {
             logger.error("", e);
         }
 

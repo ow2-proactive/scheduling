@@ -197,12 +197,12 @@ project(':rm:rm-node') {
 
     dependencies {
         compile 'commons-cli:commons-cli:1.1'
-        compile fileTree("${rootDir}/lib/node/sigar/") // TODO separate jar and the rest
 
         compile 'org.objectweb.proactive:programming-extension-dataspaces:5.5.0-SNAPSHOT'
 
         compile project(':common-client')
         compile project(':rm:rm-client')
+        compile 'sigar:sigar:1.7.0.0-proactive'
 
         runtime 'org.jruby:jruby:1.7.4'
         runtime 'org.python:jython:2.5.4-rc1'

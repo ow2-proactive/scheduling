@@ -116,7 +116,7 @@ done
 
 [ ! $REST ] && stop "REST Server argument is mandatory"
 
-REST_URL="http://localhost:${PORT}/rest/rest"
+REST_URL="http://192.168.1.195:${PORT}/rest/rest"
 
 REST_DIR=$(mktemp_dir_jruby)/rest/
 [ $VERBOSE = true ] && echo "Deploying REST Server in $REST_DIR"

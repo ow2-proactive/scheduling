@@ -59,6 +59,7 @@ import javax.security.auth.login.LoginException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
+import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.jmx.JMXClientHelper;
 import org.ow2.proactive.jmx.provider.JMXProviderUtils;
@@ -96,6 +97,14 @@ public class RMCachingProxyUserInterface extends RMProxyUserInterface implements
     protected String nodeConnectorUrl;
 
     protected long counter = 0;
+
+    public boolean init(String url, CredData credData) throws RMException, KeyException, LoginException {
+
+        this.rmAuth = RMConnection.join(url);
+        this.credentials = Credentials.createCredentials(credData, rmAuth.getPublicKey());
+
+        return init(url, this.credentials);
+    }
 
     public boolean init(String url, Credentials credentials) throws RMException, KeyException, LoginException {
 
@@ -343,5 +352,9 @@ public class RMCachingProxyUserInterface extends RMProxyUserInterface implements
                 throw ex;
             }
         }
+    }
+
+    public Credentials getCredentials() {
+        return this.credentials;
     }
 }
