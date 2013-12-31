@@ -45,9 +45,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import junit.framework.Assert;
-
-import org.junit.Test;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
@@ -62,9 +59,12 @@ import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingServiceDe
 import org.objectweb.proactive.extensions.dataspaces.vfs.selector.Selector;
 import org.objectweb.proactive.extensions.dataspaces.vfs.selector.fast.FastFileSelector;
 import org.objectweb.proactive.extensions.vfsprovider.FileSystemServerDeployer;
+import org.ow2.tests.ProActiveTest;
+import junit.framework.Assert;
+import org.junit.Test;
 
 
-public class TestAntFileSelector {
+public class TestAntFileSelector extends ProActiveTest {
 
     private static URL DSroot = TestAntFileSelector.class.getResource("/unitTests/" +
         TestAntFileSelector.class.getSimpleName() + ".class");

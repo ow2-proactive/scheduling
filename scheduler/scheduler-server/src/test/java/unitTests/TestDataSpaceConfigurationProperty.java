@@ -34,9 +34,10 @@
  */
 package unitTests;
 
+import org.ow2.proactive.scheduler.core.DataSpaceServiceStarter;
+import org.ow2.tests.ProActiveTest;
 import org.junit.Assert;
 import org.junit.Test;
-import org.ow2.proactive.scheduler.core.DataSpaceServiceStarter;
 
 
 /**
@@ -44,7 +45,7 @@ import org.ow2.proactive.scheduler.core.DataSpaceServiceStarter;
  *
  * @author The ProActive Team
  **/
-public class TestDataSpaceConfigurationProperty {
+public class TestDataSpaceConfigurationProperty extends ProActiveTest {
 
     @Test
     public void testPropertyParsing() throws Throwable {

@@ -324,12 +324,28 @@ public class RMTHelper {
         List<String> commandLine = new ArrayList<String>();
         commandLine.add(System.getProperty("java.home") + File.separator + "bin" + File.separator + "java");
         commandLine.add("-Djava.security.manager");
+
+        String proactiveHome = CentralPAPropertyRepository.PA_HOME.getValue();
+        if (!CentralPAPropertyRepository.PA_HOME.isSet()) {
+            proactiveHome = PAResourceManagerProperties.RM_HOME.getValueAsString();
+        }
         commandLine.add(CentralPAPropertyRepository.PA_HOME.getCmdLine() +
-            CentralPAPropertyRepository.PA_HOME.getValue());
+          proactiveHome);
+
+        String securityPolicy = CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getValue();
+        if (!CentralPAPropertyRepository.JAVA_SECURITY_POLICY.isSet()) {
+            securityPolicy = PAResourceManagerProperties.RM_HOME.getValueAsString() + "/config/security.java.policy-server";
+        }
         commandLine.add(CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getCmdLine() +
-            CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getValue());
+          securityPolicy);
+
+        String log4jConfiguration = CentralPAPropertyRepository.LOG4J.getValue();
+        if (!CentralPAPropertyRepository.LOG4J.isSet()) {
+            log4jConfiguration = "file:" + PAResourceManagerProperties.RM_HOME.getValueAsString() + "/config/log4j/log4j-junit";
+        }
         commandLine.add(CentralPAPropertyRepository.LOG4J.getCmdLine() +
-            CentralPAPropertyRepository.LOG4J.getValue());
+          log4jConfiguration);
+
         commandLine.add(PAResourceManagerProperties.RM_HOME.getCmdLine() +
             PAResourceManagerProperties.RM_HOME.getValueAsString());
         commandLine.add(CentralPAPropertyRepository.PA_RUNTIME_PING.getCmdLine() +

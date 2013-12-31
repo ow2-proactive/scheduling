@@ -81,11 +81,12 @@ import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.utils.FileUtils;
 import org.ow2.tests.ConsecutiveMode;
+import org.junit.Assert;
+
 import functionaltests.common.CommonTUtils;
 import functionaltests.common.InputStreamReaderThread;
 import functionaltests.monitor.MonitorEventReceiver;
 import functionaltests.monitor.SchedulerMonitorsHandler;
-import org.junit.Assert;
 
 
 /**
@@ -226,12 +227,28 @@ public class SchedulerTHelper {
         commandLine.add(System.getProperty("java.home") + File.separator + "bin" + File.separator + "java");
         commandLine.add("-Djava.security.manager");
         //commandLine.add("-agentlib:jdwp=transport=dt_socket,server=y,address=9009,suspend=y");
+        String proactiveHome = CentralPAPropertyRepository.PA_HOME.getValue();
+        if (!CentralPAPropertyRepository.PA_HOME.isSet()) {
+            proactiveHome = PAResourceManagerProperties.RM_HOME.getValueAsString();
+            CentralPAPropertyRepository.PA_HOME.setValue(PAResourceManagerProperties.RM_HOME.getValueAsString());
+        }
         commandLine.add(CentralPAPropertyRepository.PA_HOME.getCmdLine() +
-            CentralPAPropertyRepository.PA_HOME.getValue());
+          proactiveHome);
+
+        String securityPolicy = CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getValue();
+        if (!CentralPAPropertyRepository.JAVA_SECURITY_POLICY.isSet()) {
+            securityPolicy = PASchedulerProperties.SCHEDULER_HOME.getValueAsString() + "/config/security.java.policy-server";
+        }
         commandLine.add(CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getCmdLine() +
-            CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getValue());
+          securityPolicy);
+
+        String log4jConfiguration = CentralPAPropertyRepository.LOG4J.getValue();
+        if (!CentralPAPropertyRepository.LOG4J.isSet()) {
+            log4jConfiguration = "file:" + PASchedulerProperties.SCHEDULER_HOME.getValueAsString() + "/config/log4j/log4j-junit";
+        }
         commandLine.add(CentralPAPropertyRepository.LOG4J.getCmdLine() +
-            CentralPAPropertyRepository.LOG4J.getValue());
+          log4jConfiguration);
+
         commandLine.add(PASchedulerProperties.SCHEDULER_HOME.getCmdLine() +
             PASchedulerProperties.SCHEDULER_HOME.getValueAsString());
         commandLine.add(PAResourceManagerProperties.RM_HOME.getCmdLine() +

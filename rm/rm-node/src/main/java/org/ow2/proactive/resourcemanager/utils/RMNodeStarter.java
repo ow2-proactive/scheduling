@@ -49,6 +49,7 @@ import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.KeyException;
+import java.security.Policy;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -385,6 +386,7 @@ public class RMNodeStarter {
         if (System.getProperty("java.security.policy") == null) {
             System.setProperty("java.security.policy",
               RMNodeStarter.class.getResource("/config/security.java.policy-client").toString());
+            Policy.getPolicy().refresh();
         }
     }
 

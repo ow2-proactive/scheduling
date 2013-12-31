@@ -37,6 +37,7 @@
 package org.ow2.proactive.resourcemanager.utils;
 
 import java.io.File;
+import java.security.Policy;
 
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.utils.JVMPropertiesPreloader;
@@ -185,6 +186,7 @@ public class RMStarter {
         if (System.getProperty("java.security.policy") == null) {
             System.setProperty("java.security.policy", System.getProperty(
               PAResourceManagerProperties.RM_HOME.getKey()) + "/config/security.java.policy-server");
+            Policy.getPolicy().refresh();
         }
     }
 

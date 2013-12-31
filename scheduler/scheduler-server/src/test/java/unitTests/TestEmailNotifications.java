@@ -1,20 +1,7 @@
 package unitTests;
 
-import static org.hamcrest.Matchers.containsString;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.contains;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-
 import java.io.Serializable;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
@@ -32,11 +19,25 @@ import org.ow2.proactive.scheduler.job.InternalJobFactory;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.job.JobInfoImpl;
 import org.ow2.proactive.scheduler.util.SendMail;
+import org.ow2.tests.ProActiveTest;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 import functionaltests.schedulerdb.BaseSchedulerDBTest;
 
+import static org.hamcrest.Matchers.containsString;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.contains;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 
-public class TestEmailNotifications {
+
+public class TestEmailNotifications extends ProActiveTest {
 
     public static class TestJavaTask extends JavaExecutable {
         @Override

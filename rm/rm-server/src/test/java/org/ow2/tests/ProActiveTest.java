@@ -32,39 +32,27 @@
  *
  *  * $$PROACTIVE_INITIAL_DEV$$
  */
-package unitTests;
+package org.ow2.tests;
 
-import org.objectweb.proactive.api.PAActiveObject;
-import org.ow2.proactive.scheduler.core.DataSpaceServiceStarter;
-import org.ow2.tests.ProActiveTest;
-import org.junit.Test;
+import java.security.Policy;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 
 
-public class TestDataSpaceServiceStarter extends ProActiveTest {
-
-    @Test // For SCHEDULING-1902, minimal test
-    public void testTerminateNamingService() throws Exception {
-        TestDataSpaceServiceStarter activeObject = PAActiveObject.turnActive(new TestDataSpaceServiceStarter());
-        activeObject.doTestTerminateNamingService();
+/**
+ * Just to set the security manager without a system property in the command line.
+ */
+public class ProActiveTest {
+    static {
+        configureSecurityManager();
     }
 
-    public void doTestTerminateNamingService() throws Exception {
-        DataSpaceServiceStarter dataSpaceServiceStarter =  DataSpaceServiceStarter.getDataSpaceServiceStarter();
+    private static void configureSecurityManager() {
+        if (System.getProperty("java.security.policy") == null) {
+            System.setProperty("java.security.policy", System.getProperty(
+              PAResourceManagerProperties.RM_HOME.getKey()) + "/config/security.java.policy-server");
 
-        dataSpaceServiceStarter.startNamingService();
-        assertEquals(1, dataSpaceServiceStarter.getNamingService().getRegisteredApplications().size());
-
-        dataSpaceServiceStarter.terminateNamingService();
-        try {
-            dataSpaceServiceStarter.getNamingService().getRegisteredApplications();
-            fail("Naming service should not be accessible anymore");
-        } catch (Exception expected) {
-            assertTrue(expected instanceof IllegalStateException);
+            Policy.getPolicy().refresh();
         }
     }
-
 }

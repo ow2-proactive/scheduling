@@ -72,11 +72,6 @@ def functionalTestConfiguration = {
     systemProperties << ['url': System.getProperty("url") ]
     systemProperties << ['pa.rm.home': rootDir.absolutePath]
     systemProperties << ['pa.scheduler.home': rootDir.absolutePath]
-    systemProperties << ['proactive.home': rootDir.absolutePath]
-    systemProperties << ['log4j.configuration': file("$rootDir/config/log4j/log4j-junit").toURL()]
-    systemProperties << ['proactive.configuration': file("$rootDir/config/proactive/ProActiveConfiguration.xml")]
-    systemProperties << ['java.security.policy': file("$rootDir/config/security.java.policy-server").absolutePath]
-    systemProperties << ['proactive.runtime.ping': false]
     systemProperties << ['proactive.test.timeout': 600000]
     testLogging {
         exceptionFormat = 'full'

@@ -37,6 +37,7 @@
 package org.ow2.tests;
 
 import java.io.PrintStream;
+import java.security.Policy;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -46,7 +47,9 @@ import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.xml.VariableContractImpl;
 import org.objectweb.proactive.utils.SafeTimerTask;
+import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 import org.junit.After;
 import org.junit.Assume;
 import org.junit.Before;
@@ -54,8 +57,10 @@ import org.junit.Ignore;
 
 
 @Ignore
-public class FunctionalTest {
+public class FunctionalTest extends ProActiveTest {
     static {
+        configureLogging();
+        configurePAHome();
         ProActiveConfiguration.load();
     }
 
@@ -81,7 +86,9 @@ public class FunctionalTest {
 
     @Before
     public void prepareForTest() throws Exception {
+
         CentralPAPropertyRepository.PA_TEST.setValue(true);
+        CentralPAPropertyRepository.PA_RUNTIME_PING.setValue(false);
 
         if (!ConsecutiveMode.isConsecutiveMode()) {
             // Ensure that the host is clean
@@ -113,6 +120,23 @@ public class FunctionalTest {
         // calling ProActiveSetup.ctor()
         paSetup = new ProActiveSetup();
         paSetup.start();
+    }
+
+    private static void configurePAHome() {
+        if (System.getProperty(CentralPAPropertyRepository.PA_HOME.getName()) == null) {
+            System.setProperty(CentralPAPropertyRepository.PA_HOME.getName(), System.getProperty(
+              PAResourceManagerProperties.RM_HOME.getKey()));
+        }
+    }
+
+    private static void configureLogging() {
+        if (System.getProperty(CentralPAPropertyRepository.LOG4J.getName()) == null) {
+            String defaultLog4jConfig = System.getProperty(
+              PAResourceManagerProperties.RM_HOME.getKey()) + "/config/log4j/log4j-junit";
+            System.setProperty(CentralPAPropertyRepository.LOG4J.getName(),
+              defaultLog4jConfig);
+            PropertyConfigurator.configure(defaultLog4jConfig);
+        }
     }
 
     private boolean canBeExecutedInConsecutiveMode(Class<?> cls) {

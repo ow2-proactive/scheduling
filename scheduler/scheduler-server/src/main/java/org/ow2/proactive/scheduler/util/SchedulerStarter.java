@@ -39,6 +39,7 @@ package org.ow2.proactive.scheduler.util;
 import java.io.File;
 import java.net.URI;
 import java.rmi.AlreadyBoundException;
+import java.security.Policy;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.ProActiveException;
@@ -266,6 +267,7 @@ public class SchedulerStarter {
         if (System.getProperty("java.security.policy") == null) {
             System.setProperty("java.security.policy", System.getProperty(
               PASchedulerProperties.SCHEDULER_HOME.getKey()) + "/config/security.java.policy-server");
+            Policy.getPolicy().refresh();
         }
     }
 

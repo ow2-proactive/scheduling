@@ -62,8 +62,6 @@ import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
  */
 public class SchedulerTStarter implements Serializable {
 
-    protected String rmUsername = "demo";
-    protected String rmPassword = "demo";
     public static final int RM_NODE_NUMBER = 2;
     public static final String RM_NODE_NAME = "TEST";
     public static final int RM_NODE_DEPLOYMENT_TIMEOUT = 100000;
