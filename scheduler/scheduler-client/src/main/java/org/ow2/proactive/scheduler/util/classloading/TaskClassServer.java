@@ -65,7 +65,7 @@ public class TaskClassServer {
 
     // temp directory for unjaring classpath : if not defined, java.io.tmpdir is used.
     private static final String tmpTmpJarFilesDir = PASchedulerProperties.SCHEDULER_CLASSSERVER_TMPDIR
-            .getValueAsString();
+            .getValueAsStringOrNull();
     private static final String tmpJarFilesDir = tmpTmpJarFilesDir != null ? tmpTmpJarFilesDir +
         (tmpTmpJarFilesDir.endsWith(File.separator) ? "" : File.separator) : System
             .getProperty("java.io.tmpdir") +
