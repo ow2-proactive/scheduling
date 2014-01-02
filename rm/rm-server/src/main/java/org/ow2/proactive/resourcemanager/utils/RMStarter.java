@@ -175,6 +175,10 @@ public class RMStarter {
         if (System.getProperty(PAResourceManagerProperties.RM_HOME.getKey()) == null) {
             System.setProperty(PAResourceManagerProperties.RM_HOME.getKey(), ".");
         }
+        if (System.getProperty(CentralPAPropertyRepository.PA_HOME.getName()) == null) {
+            System.setProperty(CentralPAPropertyRepository.PA_HOME.getName(),
+              System.getProperty(PAResourceManagerProperties.RM_HOME.getKey()));
+        }
     }
 
     private static void configureSecurityManager() {

@@ -96,7 +96,7 @@ public class SchedulerStarter {
      * Start the scheduler creation process.
      */
     public static void main(String[] args) {
-        configureSchedulerAndRMHomes();
+        configureSchedulerAndRMAndPAHomes();
         configureSecurityManager();
         configureLogging();
 
@@ -248,15 +248,17 @@ public class SchedulerStarter {
         return rof.getBaseURI().toString();
     }
 
-    private static void configureSchedulerAndRMHomes() {
+    private static void configureSchedulerAndRMAndPAHomes() {
         if (System.getProperty(PASchedulerProperties.SCHEDULER_HOME.getKey()) == null) {
             System.setProperty(PASchedulerProperties.SCHEDULER_HOME.getKey(), ".");
         }
         if (System.getProperty(PAResourceManagerProperties.RM_HOME.getKey()) == null) {
-            System.setProperty(PAResourceManagerProperties.RM_HOME.getKey(), ".");
+            System.setProperty(PAResourceManagerProperties.RM_HOME.getKey(),
+              System.getProperty(PASchedulerProperties.SCHEDULER_HOME.getKey()));
         }
         if (System.getProperty(CentralPAPropertyRepository.PA_HOME.getName()) == null) {
-            System.setProperty(CentralPAPropertyRepository.PA_HOME.getName(), ".");
+            System.setProperty(CentralPAPropertyRepository.PA_HOME.getName(),
+              System.getProperty(PASchedulerProperties.SCHEDULER_HOME.getKey()));
         }
     }
 
