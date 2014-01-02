@@ -186,7 +186,7 @@ if [ $DO_SCHED = true ]; then
 	[ ! $SCHED_URL ] && nojetty "Could not determine Scheduler URL"
 	CMD=$CMD" -S $SCHED_WAR -s $SCHED_URL"
 fi
-if [ -f $STUDIO ]; then
+if [ -f "$STUDIO" ]; then
 	CMD=$CMD" -W $STUDIO"
 fi
 if [ $DO_RM = true ]; then
