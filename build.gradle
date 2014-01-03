@@ -17,6 +17,7 @@ buildscript {
         }
         classpath 'org.ow2.proactive:documentation:1.0.0-SNAPSHOT'
         classpath 'org.hsudbrock:gradle-trang:0.1-proactive'
+        classpath 'com.github.rholder:gradle-one-jar:1.0.3'
     }
 }
 
@@ -189,7 +190,7 @@ project('rm:rm-client') {
 project(':rm:rm-node') {
     dependencies {
         compile 'commons-cli:commons-cli:1.1'
-        compile fileTree("${rootDir}/lib/node/sigar/") // TODO separate jar and the rest
+        compile fileTree("${rootDir}/lib/node/sigar/sigar.jar") // TODO separate jar and the rest
 
         compile 'org.objectweb.proactive:programming-extension-dataspaces:5.5.0-SNAPSHOT'
 
@@ -200,6 +201,7 @@ project(':rm:rm-node') {
         runtime 'org.python:jython:2.5.4-rc1'
         runtime 'org.codehaus.groovy:groovy-all:2.1.6'
     }
+
 }
 
 project(':rm:rm-cli') {
@@ -276,6 +278,7 @@ project('scheduler:scheduler-server') {
 
 project('scheduler:scheduler-node') {
     apply plugin: 'java-library-distribution'
+    apply plugin: 'gradle-one-jar'
     dependencies {
         compile(
                 fileTree("${rootDir}/lib/node/winp/"),
@@ -293,10 +296,10 @@ project('scheduler:scheduler-node') {
         runtime 'org.objectweb.proactive:programming-extension-pnp:5.5.0-SNAPSHOT'
         // TODO add all protocols
 
+        runtime fileTree(dir: "${rootDir}/lib/node/sigar/", exclude: "*.jar")
         task stub(type: StubTask) {
             classes = ['org.ow2.proactive.scheduler.common.TaskTerminateNotification']
         }
-
     }
 
     task WorkerJar(type: Jar) {
@@ -312,6 +315,17 @@ project('scheduler:scheduler-node') {
                     "Implementation-Vendor": "OASIS - INRIA Sophia Antipolis",
                     "Implementation-URL": "http://proactive.inria.fr")
         }
+    }
+    task oneJar(type: OneJar) {
+        mainClass = 'org.ow2.proactive.resourcemanager.utils.RMNodeStarter'
+        binLib = fileTree(dir: "${rootDir}/lib/node/sigar/", exclude: "*.jar")
+        additionalDir = file('src/main/resources')
+        manifest {
+            attributes 'One-Jar-URL-Factory': 'com.simontuffs.onejar.JarClassLoader$OneJarURLFactory'
+        }
+    }
+    artifacts {
+        archives oneJar
     }
 }
 
