@@ -49,7 +49,10 @@ project(':rest-server') {
     apply plugin: 'war'
     apply plugin: 'jetty'
 
-    configurations { jaxDoclet }
+    configurations {
+        jaxDoclet
+        schedulerNode
+    }
     dependencies {
         compile 'org.jboss.resteasy:jaxrs-api:2.3.3.Final'
         compile 'org.jboss.resteasy:resteasy-jackson-provider:2.3.3.Final'
@@ -88,6 +91,7 @@ project(':rest-server') {
         runtime 'org.objectweb.proactive:programming-extension-pamr:5.5.0-SNAPSHOT'
 
         jaxDoclet 'com.lunatech.jax-doclets:doclets:0.10.1-proactive'
+        schedulerNode 'org.ow2.proactive:scheduler-node:3.5.0-SNAPSHOT:standalone'
     }
 
     task stub(type: StubTask) {
@@ -117,6 +121,10 @@ project(':rest-server') {
     war.dependsOn jaxrsDoc, stub
 
     war {
+        def schedulerNodeJar = configurations.schedulerNode.resolvedConfiguration.firstLevelModuleDependencies.moduleArtifacts.file
+        from schedulerNodeJar
+        rename(schedulerNodeJar.name[0][0], 'node.jar')
+
         filesMatching('**/*.html') {
             it.filter(org.apache.tools.ant.filters.ReplaceTokens, tokens: ['rest_api.version': project.version])
         }
