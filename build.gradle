@@ -316,6 +316,7 @@ project('scheduler:scheduler-node') {
                     "Implementation-URL": "http://proactive.inria.fr")
         }
     }
+
     task oneJar(type: OneJar) {
         mainClass = 'org.ow2.proactive.resourcemanager.utils.RMNodeStarter'
         binLib = fileTree(dir: "${rootDir}/lib/node/sigar/", exclude: "*.jar")
