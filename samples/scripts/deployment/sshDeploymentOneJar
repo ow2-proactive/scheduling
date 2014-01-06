@@ -1,0 +1,27 @@
+#!/bin/bash
+#
+# Start a ProActive Runtime through ssh to the host and register it in the Resource Manager.
+# Script will be killed when the node is registered.
+#
+
+# Script parameters
+HOST_NAME=$1
+NODE_NAME=$2
+NODE_SOURCE_NAME=$3
+RM_URL=$4
+
+# Script constants
+JAVA_HOME_NODE="UPDATE_ME"
+
+# e.g http://localhost:8080/rest/node.jar
+NODE_JAR_URL="UPDATE_ME"
+
+CREDENTIALS="UPDATE_ME"
+
+cd /tmp/
+ssh $HOST_NAME "wget -O $NODE_NAME.jar $NODE_JAR_URL && $JAVA_HOME_NODE/bin/java $JAVA_OPTS_NODE -jar $NODE_NAME.jar -v $CREDENTIALS -n $NODE_NAME -s $NODE_SOURCE_NAME -p 30000 -r $RM_URL 1>>/tmp/node 2>&1"
+SSH_PID=$!
+trap "kill $SSH_PID" TERM
+
+# waiting until the process is killed
+wait $SSH_PID
