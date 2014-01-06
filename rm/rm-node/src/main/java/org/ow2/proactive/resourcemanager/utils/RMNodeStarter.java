@@ -325,6 +325,7 @@ public class RMNodeStarter {
 
     protected void doMain(final String args[]) {
         configureSecurityManager();
+        configureRMAndProActiveHomes();
         loadSigarIfRunningWithOneJar();
 
         this.parseCommandLine(args);
@@ -381,6 +382,16 @@ public class RMNodeStarter {
                 logger.error(ExitStatus.RMNODE_EXIT_FORCED.description);
                 System.exit(ExitStatus.RMNODE_EXIT_FORCED.exitCode);
             }
+        }
+    }
+
+    private void configureRMAndProActiveHomes() {
+        if (System.getProperty(PAResourceManagerProperties.RM_HOME.getKey()) == null) {
+            System.setProperty(PAResourceManagerProperties.RM_HOME.getKey(), ".");
+        }
+        if (System.getProperty(CentralPAPropertyRepository.PA_HOME.getName()) == null) {
+            System.setProperty(CentralPAPropertyRepository.PA_HOME.getName(),
+              System.getProperty(PAResourceManagerProperties.RM_HOME.getKey()));
         }
     }
 
