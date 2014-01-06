@@ -97,6 +97,7 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import org.apache.log4j.PropertyConfigurator;
 import org.hyperic.sigar.Sigar;
+import org.hyperic.sigar.SigarLoader;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -324,6 +325,7 @@ public class RMNodeStarter {
 
     protected void doMain(final String args[]) {
         configureSecurityManager();
+        loadSigarIfRunningWithOneJar();
 
         this.parseCommandLine(args);
 
@@ -361,7 +363,7 @@ public class RMNodeStarter {
                         while (rm.nodeIsAvailable(this.getNodeURL()).getBooleanValue()) {
                             try {
                                 Thread.sleep(PING_DELAY_IN_MS);
-                            } catch (InterruptedException e) {
+                            } catch (InterruptedException ignored) {
                             }
                         }// while connected
                     } catch (Throwable e) {
@@ -379,6 +381,15 @@ public class RMNodeStarter {
                 logger.error(ExitStatus.RMNODE_EXIT_FORCED.description);
                 System.exit(ExitStatus.RMNODE_EXIT_FORCED.exitCode);
             }
+        }
+    }
+
+    private void loadSigarIfRunningWithOneJar() {
+        if (System.getProperty("one-jar.expand.dir") != null) {
+            String nativeLibraryName = SigarLoader.getNativeLibraryName();
+            String nativeLibraryNameToLoad = nativeLibraryName.replace(SigarLoader.getLibraryExtension(), "")
+              .replace(SigarLoader.getLibraryPrefix(), "");
+            System.loadLibrary(nativeLibraryNameToLoad);
         }
     }
 
