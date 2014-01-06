@@ -190,12 +190,14 @@ project('rm:rm-client') {
 project(':rm:rm-node') {
     dependencies {
         compile 'commons-cli:commons-cli:1.1'
-        compile fileTree("${rootDir}/lib/node/sigar/sigar.jar") // TODO separate jar and the rest
+        compile files("${rootDir}/lib/node/sigar/sigar.jar")
 
         compile 'org.objectweb.proactive:programming-extension-dataspaces:5.5.0-SNAPSHOT'
 
         compile project(':common-client')
         compile project(':rm:rm-client')
+
+        runtime fileTree(dir: "${rootDir}/lib/node/sigar/", exclude: "*.jar")
 
         runtime 'org.jruby:jruby:1.7.4'
         runtime 'org.python:jython:2.5.4-rc1'
@@ -281,7 +283,7 @@ project('scheduler:scheduler-node') {
     apply plugin: 'gradle-one-jar'
     dependencies {
         compile(
-                fileTree("${rootDir}/lib/node/winp/"),
+                files("${rootDir}/lib/node/winp/winp-1.17-patched.jar"),
                 'net.java.dev.jna:jna:3.4.0',
 
                 'org.objectweb.proactive:programming-extension-amqp:5.5.0-SNAPSHOT',
@@ -296,35 +298,23 @@ project('scheduler:scheduler-node') {
         runtime 'org.objectweb.proactive:programming-extension-pnp:5.5.0-SNAPSHOT'
         // TODO add all protocols
 
-        runtime fileTree(dir: "${rootDir}/lib/node/sigar/", exclude: "*.jar")
+        runtime fileTree(dir: "${rootDir}/lib/node/winp/", exclude: "*.jar")
+
         task stub(type: StubTask) {
             classes = ['org.ow2.proactive.scheduler.common.TaskTerminateNotification']
         }
     }
 
-    task WorkerJar(type: Jar) {
-        from jar.outputs.files.collect {
-            zipTree(it)
-        }
-        from { configurations.runtime.collect { !it.name.contains('.jar') ? it : zipTree(it) } }
-        archiveName 'ProActive_Scheduler-worker.jar'
-        manifest {
-            attributes("Main-Class": "org.objectweb.proactive.Main",
-                    "Implementation-Title": "ProActive",
-                    "Implementation-Version": rootProject.version,
-                    "Implementation-Vendor": "OASIS - INRIA Sophia Antipolis",
-                    "Implementation-URL": "http://proactive.inria.fr")
-        }
-    }
 
     task oneJar(type: OneJar) {
         mainClass = 'org.ow2.proactive.resourcemanager.utils.RMNodeStarter'
-        binLib = fileTree(dir: "${rootDir}/lib/node/sigar/", exclude: "*.jar")
+        binLib = fileTree(dir: "${rootDir}/lib/node/", exclude: "**/*.jar")
         additionalDir = file('src/main/resources')
         manifest {
             attributes 'One-Jar-URL-Factory': 'com.simontuffs.onejar.JarClassLoader$OneJarURLFactory'
         }
     }
+    build.dependsOn oneJar
     artifacts {
         archives oneJar
     }
