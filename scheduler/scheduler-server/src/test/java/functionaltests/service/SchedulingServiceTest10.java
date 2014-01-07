@@ -6,11 +6,6 @@ import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Mockito;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
@@ -20,13 +15,19 @@ import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
 import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
 import org.ow2.proactive.scheduler.policy.DefaultPolicy;
+import org.ow2.tests.ProActiveTest;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.Mockito;
 
 
 /**
  * Test trying to catch SCHEDULING-1775.
  *
  */
-public class SchedulingServiceTest10 {
+public class SchedulingServiceTest10 extends ProActiveTest {
 
     private TaskFlowJob createTestJob() throws Exception {
         TaskFlowJob job = new TaskFlowJob();
