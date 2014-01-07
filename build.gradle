@@ -312,6 +312,7 @@ project('scheduler:scheduler-node') {
         additionalDir = file('src/main/resources')
         manifest {
             attributes 'One-Jar-URL-Factory': 'com.simontuffs.onejar.JarClassLoader$OneJarURLFactory'
+            attributes 'One-Jar-Expand': 'lib,binlib,main' // expand jars for subprocesses (forked tasks)
         }
     }
     build.dependsOn oneJar

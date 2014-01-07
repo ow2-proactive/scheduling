@@ -396,7 +396,7 @@ public class RMNodeStarter {
     }
 
     private void loadSigarIfRunningWithOneJar() {
-        if (System.getProperty("one-jar.expand.dir") != null) {
+        if (OneJar.isRunningWithOneJar()) {
             String nativeLibraryName = SigarLoader.getNativeLibraryName();
             String nativeLibraryNameToLoad = nativeLibraryName.replace(SigarLoader.getLibraryExtension(), "")
               .replace(SigarLoader.getLibraryPrefix(), "");

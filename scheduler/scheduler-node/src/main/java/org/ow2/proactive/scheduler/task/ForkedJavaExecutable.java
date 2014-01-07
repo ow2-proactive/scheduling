@@ -36,8 +36,6 @@
  */
 package org.ow2.proactive.scheduler.task;
 
-import static org.ow2.proactive.scheduler.common.util.VariablesUtil.filterAndUpdate;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -66,6 +64,7 @@ import org.objectweb.proactive.extensions.amqp.federation.AMQPFederationConfig;
 import org.objectweb.proactive.extensions.pamr.PAMRConfig;
 import org.objectweb.proactive.extensions.processbuilder.OSProcessBuilder;
 import org.objectweb.proactive.extensions.processbuilder.exception.NotImplementedException;
+import org.ow2.proactive.resourcemanager.utils.OneJar;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.exception.UserException;
 import org.ow2.proactive.scheduler.common.exception.WalltimeExceededException;
@@ -74,7 +73,6 @@ import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
-import org.ow2.proactive.scheduler.common.util.VariablesUtil;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
 import org.ow2.proactive.scheduler.exception.StartForkedProcessException;
@@ -94,6 +92,7 @@ import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
 
+import static org.ow2.proactive.scheduler.common.util.VariablesUtil.filterAndUpdate;
 
 /**
  * This Executable is responsible for executing another executable in a separate JVM. 
@@ -543,10 +542,14 @@ public class ForkedJavaExecutable extends JavaExecutable implements ForkerStarte
     private void addClasspath(List<String> command) {
         StringBuilder classPath = new StringBuilder("." + File.pathSeparatorChar);
         classPath.append(System.getProperty("java.class.path", ""));
+
+        for (String classpathElement : OneJar.getClasspath()) {
+            classPath.append(File.pathSeparatorChar).append(classpathElement);
+        }
         ForkEnvironment forkEnvironment = execInitializer.getForkEnvironment();
         if (forkEnvironment != null) {
             for (String s : forkEnvironment.getAdditionalClasspath()) {
-                classPath.append(File.pathSeparatorChar + s);
+                classPath.append(File.pathSeparatorChar).append(s);
             }
         }
         command.add("-cp");
