@@ -18,15 +18,14 @@ import org.ow2.proactive.scheduler.policy.DefaultPolicy;
 import org.ow2.proactive.scheduler.task.internal.ExecuterInformations;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
+import org.ow2.tests.ProActiveTest;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.mockito.Mockito;
 
 
-@Ignore
-public class BaseServiceTest {
+public class BaseServiceTest extends ProActiveTest {
 
     protected SchedulerDBManager dbManager;
     protected MockSchedulingInfrastructure infrastructure;
