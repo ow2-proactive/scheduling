@@ -40,9 +40,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Test;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
@@ -55,6 +52,10 @@ import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.core.DataSpaceServiceStarter;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.JobDataSpaceApplication;
+import org.ow2.tests.ProActiveTest;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Test;
 
 
 /**
@@ -64,7 +65,7 @@ import org.ow2.proactive.scheduler.job.JobDataSpaceApplication;
  *
  * @author The ProActive Team
  */
-public class TestDataSpaceConfiguration {
+public class TestDataSpaceConfiguration extends ProActiveTest {
 
     static String IOSPACE = System.getProperty("java.io.tmpdir") + File.separator + "scheduler test" +
             File.separator + "my space"; // evil spaces provided

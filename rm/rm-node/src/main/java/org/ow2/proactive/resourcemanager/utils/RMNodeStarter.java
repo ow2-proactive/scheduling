@@ -347,11 +347,33 @@ public class RMNodeStarter {
         }
 
         if (rmURL != null) {
-            ResourceManager rm = this.registerInRM(credentials, rmURL, nodeName);
+            final ResourceManager rm = this.registerInRM(credentials, rmURL, nodeName);
 
             if (rm != null) {
                 logger.info("Connected to the Resource Manager at " + rmURL +
                     System.getProperty("line.separator"));
+
+//                boolean booleanValue = rm.disconnect().getBooleanValue();
+//                System.out.println(booleanValue);
+//                System.exit(ExitStatus.RMNODE_EXIT_FORCED.exitCode);
+                Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        logger.info("Disconnecting");
+                        for (Map.Entry<Thread, StackTraceElement[]> threadEntry : Thread.getAllStackTraces().entrySet()) {
+                            System.out.println(threadEntry.getKey());
+                            for (StackTraceElement stackTraceElement : threadEntry.getValue()) {
+                                System.out.println("\t" + stackTraceElement);
+                            }
+                        }
+                        rm.disconnect().getBooleanValue();
+                        try {
+                            Thread.sleep(2000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }));
                 // start pinging...
                 // ping the im to see if we are still connected
                 // if not connected just exit

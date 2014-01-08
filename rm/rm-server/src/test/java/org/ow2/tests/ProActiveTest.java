@@ -37,6 +37,9 @@ package org.ow2.tests;
 import java.security.Policy;
 
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
+import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
 
 /**
@@ -45,6 +48,12 @@ import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProper
 public class ProActiveTest {
     static {
         configureSecurityManager();
+        configureLog4j();
+    }
+
+    private static void configureLog4j() {
+        BasicConfigurator.configure();
+        Logger.getRootLogger().setLevel(Level.INFO);
     }
 
     private static void configureSecurityManager() {

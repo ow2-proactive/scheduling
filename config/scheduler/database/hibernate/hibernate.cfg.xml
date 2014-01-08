@@ -36,7 +36,7 @@
         <property name="connection.provider_class">org.hibernate.connection.C3P0ConnectionProvider</property>
         <property name="c3p0.max_size">5</property>
         <property name="c3p0.min_size">5</property>
-        <property name="c3p0.timeout">60</property> <!-- seconds -->
+        <property name="c3p0.timeout">300</property> <!-- seconds -->
 
         <property name="show_sql">false</property>
         <property name="format_sql">true</property>

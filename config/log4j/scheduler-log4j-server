@@ -1,5 +1,5 @@
 # Default: INFO level, SCHEDULER file appender
-log4j.rootLogger=INFO, SCHEDULER
+log4j.rootLogger=INFO, SCHEDULER, CONSOLE
 
 # Everything from Scheduler and RM has level DEBUG...
 log4j.logger.org.ow2.proactive.scheduler=DEBUG
@@ -12,8 +12,8 @@ log4j.logger.org.ow2.proactive.resourcemanager.core.jmx=INFO
 log4j.logger.org.ow2.proactive.resourcemanager.db=INFO
 
 # ... and console. It additionally goes to the CONSOLE appender
-log4j.logger.org.ow2.proactive.scheduler.util.console=INFO, CONSOLE
-log4j.logger.org.ow2.proactive.scheduler.util.SchedulerStarter=INFO, CONSOLE
+log4j.logger.org.ow2.proactive.scheduler.util.console=INFO
+log4j.logger.org.ow2.proactive.scheduler.util.SchedulerStarter=INFO
 
 # silence c3p0
 log4j.logger.com.mchange=WARN
@@ -29,3 +29,5 @@ log4j.appender.SCHEDULER.layout.ConversionPattern=[%d{ISO8601} %-5p] %m%n
 # CONSOLE appender
 log4j.appender.CONSOLE=org.apache.log4j.ConsoleAppender
 log4j.appender.CONSOLE.layout=org.apache.log4j.PatternLayout
+log4j.appender.CONSOLE.layout.ConversionPattern=[%d{ISO8601} %-5p] %m%n
+

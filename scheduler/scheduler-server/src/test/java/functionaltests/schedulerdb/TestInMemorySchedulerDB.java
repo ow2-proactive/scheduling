@@ -5,11 +5,12 @@ import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.InternalJobFactory;
+import org.ow2.tests.ProActiveTest;
 import junit.framework.Assert;
 import org.junit.Test;
 
 
-public class TestInMemorySchedulerDB {
+public class TestInMemorySchedulerDB extends ProActiveTest {
 
     @Test
     public void sanityTest() throws Exception {
