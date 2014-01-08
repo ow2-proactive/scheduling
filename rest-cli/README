@@ -7,15 +7,9 @@ does not depends on any internal data objects of the Scheduler or data objects t
 its native Client API. Therefore it can be compiled and run without any ProActive Programming or 
 Scheduler jars. 
 
-However, REST CLI requires the classes of return type of JobResult and TaskResult 
-to be available in runtime classpath in order to properly de-serialize and print the result values.
-For instance, in order to retrieve the Job result whose value is a IntWrapper type, it is necessary 
-to have the IntWrapper class available in runtime classpath (e.g. by copying ProActive.jar into 
-/lib folder).
 
 Prerequisites: 
-- Ant build tool (1.7 or later)
-- JDK 6 or higher 
+- JDK 6 or higher
 
 Dependencies :
 - httpcomponents-client-4.3.1
@@ -31,12 +25,7 @@ Dependencies :
 
 Build:
 
-You can locate the Ant build file in <project-home>/compile folder. The default ant task will build
- a fresh rest-cli.jar file which can be located in <project-home>/dist.
-
-Available Ant targets:
-- clean ,remove compiled classes and build folder.
-- compile, compile and create rest-cli.jar
+gradle distZip to generate a standalone ZIP with native scripts to run CLI.
 
 Run:
 

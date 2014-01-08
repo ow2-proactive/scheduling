@@ -49,7 +49,10 @@ project(':rest-server') {
     apply plugin: 'war'
     apply plugin: 'jetty'
 
-    configurations { jaxDoclet }
+    configurations {
+        jaxDoclet
+        schedulerNode
+    }
     dependencies {
         compile 'org.jboss.resteasy:jaxrs-api:2.3.3.Final'
         compile 'org.jboss.resteasy:resteasy-jackson-provider:2.3.3.Final'
@@ -88,6 +91,7 @@ project(':rest-server') {
         runtime 'org.objectweb.proactive:programming-extension-pamr:5.5.0-SNAPSHOT'
 
         jaxDoclet 'com.lunatech.jax-doclets:doclets:0.10.1-proactive'
+        schedulerNode 'org.ow2.proactive:scheduler-node:3.5.0-SNAPSHOT:standalone'
     }
 
     task stub(type: StubTask) {
@@ -117,6 +121,10 @@ project(':rest-server') {
     war.dependsOn jaxrsDoc, stub
 
     war {
+        def schedulerNodeJar = configurations.schedulerNode.resolvedConfiguration.firstLevelModuleDependencies.moduleArtifacts.file
+        from schedulerNodeJar
+        rename(schedulerNodeJar.name[0][0], 'node.jar')
+
         filesMatching('**/*.html') {
             it.filter(org.apache.tools.ant.filters.ReplaceTokens, tokens: ['rest_api.version': project.version])
         }
@@ -155,6 +163,8 @@ project(':rest-server') {
 }
 
 project(':rest-cli') {
+    apply plugin: 'application'
+
     dependencies {
         compile 'commons-cli:commons-cli:1.2'
         compile 'commons-io:commons-io:2.4'
@@ -166,6 +176,19 @@ project(':rest-cli') {
         compile 'org.ow2.proactive:common-api:3.5.0-SNAPSHOT'
         compile project(':rest-api')
     }
+
+    // generate scripts from Scheduler CLI
+    mainClassName = "org.ow2.proactive_grid_cloud_portal.cli.SchedulerEntryPoint"
+    startScripts.applicationName = "scheduler-client"
+
+    // generate scripts for RM CLI too
+    task rmStartScripts(type:CreateStartScripts, dependsOn: [startScripts, jar]) {
+        mainClassName  'org.ow2.proactive_grid_cloud_portal.cli.RmEntryPoint'
+        applicationName  'rm-client'
+        outputDir startScripts.outputDir
+        classpath =  startScripts.classpath
+    }
+    applicationDistribution.from(rmStartScripts) { into 'bin' }
 }
 
 project(':rest-client') {
