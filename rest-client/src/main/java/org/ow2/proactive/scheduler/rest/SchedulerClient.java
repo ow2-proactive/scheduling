@@ -60,8 +60,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.UndeclaredThrowableException;
+import java.lang.reflect.Proxy;
 import java.nio.charset.Charset;
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -79,7 +78,6 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.ow2.proactive.db.SortParameter;
 import org.ow2.proactive.scheduler.common.JobFilterCriteria;
 import org.ow2.proactive.scheduler.common.JobSortParameter;
-import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
@@ -118,17 +116,37 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskStateData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.UserJobData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
 
-public class SchedulerClient extends ClientBase implements Scheduler {
+public class SchedulerClient extends ClientBase implements ISchedulerClient {
 
     private static final long retry_interval = TimeUnit.SECONDS.toMillis(1);
 
     private SchedulerRestClient schedulerRestClient;
-    private String sid;
 
-    public SchedulerClient() {
+    private String sid;
+    private String login;
+    private String password;
+
+    private SchedulerClient() {
     }
 
-    public void init(String url, String login, String pwd) throws Exception {
+    /**
+     * Creates an ISchedulerClient instance.
+     * 
+     * @return an ISchedulerClient instance
+     */
+    public static ISchedulerClient createInstance() {
+        SchedulerClient client = new SchedulerClient();
+        return (ISchedulerClient) Proxy.newProxyInstance(
+                ISchedulerClient.class.getClassLoader(), new Class[] {
+                        ISchedulerClient.class},
+                new SessionHandler(client));
+    }
+
+    /**
+     * Initialize this instance. Retrieves a new session from the server.
+     */
+    public void init(String url, String login, String password)
+            throws Exception {
         HttpClient client = HttpUtility.threadSafeClient();
         SchedulerRestClient restApiClient = new SchedulerRestClient(url,
                 new ApacheHttpClient4Executor(client));
@@ -138,26 +156,11 @@ public class SchedulerClient extends ClientBase implements Scheduler {
         factory.addMessageBodyReader(new OctetStreamReader());
 
         setApiClient(restApiClient);
-        try {
-            String sessionId = restApi().login(login, pwd);
-            setSession(sessionId);
-        } catch (Exception e) {
-            // unwrap
-            if (!(e instanceof UndeclaredThrowableException)) {
-                throw e;
-            }
-            Throwable undeclared = ((UndeclaredThrowableException) e)
-                    .getUndeclaredThrowable();
-            if (!(undeclared instanceof InvocationTargetException)) {
-                throw e;
-            }
-            Throwable target = ((InvocationTargetException) undeclared)
-                    .getTargetException();
-            if (!(target instanceof Exception)) {
-                throw e;
-            }
-            throw ((Exception) target);
-        }
+
+        this.login = login;
+        this.password = password;
+
+        renewSession();
     }
 
     @Override
@@ -166,7 +169,7 @@ public class SchedulerClient extends ClientBase implements Scheduler {
         List<JobUsage> jobUsages = null;
         try {
             List<JobUsageData> jobUsageDataList = restApi().getUsageOnAccount(
-                    session(), user, start, end);
+                    sid, user, start, end);
             jobUsages = toJobUsages(jobUsageDataList);
         } catch (Exception e) {
             throwNCEOrPE(e);
@@ -180,7 +183,7 @@ public class SchedulerClient extends ClientBase implements Scheduler {
         List<JobUsage> jobUsages = null;
         try {
             List<JobUsageData> jobUsageDataList = restApi()
-                    .getUsageOnMyAccount(session(), startDate, endDate);
+                    .getUsageOnMyAccount(sid, startDate, endDate);
             jobUsages = toJobUsages(jobUsageDataList);
         } catch (Exception e) {
             throwNCEOrPE(e);
@@ -200,7 +203,7 @@ public class SchedulerClient extends ClientBase implements Scheduler {
             throws NotConnectedException, UnknownJobException,
             PermissionException, JobAlreadyFinishedException {
         try {
-            restApi().schedulerChangeJobPriorityByName(session(), jobId,
+            restApi().schedulerChangeJobPriorityByName(sid, jobId,
                     priority.name());
         } catch (Exception e) {
             throwJAFEOrUJEOrNCEOrPE(e);
@@ -210,7 +213,7 @@ public class SchedulerClient extends ClientBase implements Scheduler {
     @Override
     public void disconnect() throws NotConnectedException, PermissionException {
         try {
-            restApi().disconnect(session());
+            restApi().disconnect(sid);
         } catch (Exception e) {
             throwNCEOrPE(e);
         }
@@ -220,7 +223,7 @@ public class SchedulerClient extends ClientBase implements Scheduler {
     public boolean freeze() throws NotConnectedException, PermissionException {
         boolean success = false;
         try {
-            success = restApi().freezeScheduler(session());
+            success = restApi().freezeScheduler(sid);
         } catch (Exception e) {
             throwNCEOrPE(e);
         }
@@ -238,7 +241,7 @@ public class SchedulerClient extends ClientBase implements Scheduler {
             PermissionException, UnknownJobException {
         JobResult jobResult = null;
         try {
-            JobResultData jobResultData = restApi().jobResult(session(), jobId);
+            JobResultData jobResultData = restApi().jobResult(sid, jobId);
             jobResult = toJobResult(jobResultData);
         } catch (Exception e) {
             throwUJEOrNCEOrPE(e);
@@ -251,7 +254,7 @@ public class SchedulerClient extends ClientBase implements Scheduler {
             UnknownJobException, PermissionException {
         JobState jobState = null;
         try {
-            JobStateData jobStateData = restApi().listJobs(session(), jobId);
+            JobStateData jobStateData = restApi().listJobs(sid, jobId);
             jobState = toJobState(jobStateData);
         } catch (Exception e) {
             throwUJEOrNCEOrPE(e);
@@ -272,7 +275,7 @@ public class SchedulerClient extends ClientBase implements Scheduler {
             throws NotConnectedException, PermissionException {
         List<JobInfo> jobInfos = null;
         try {
-            List<UserJobData> userJobDataList = restApi().jobsinfo(session(),
+            List<UserJobData> userJobDataList = restApi().jobsinfo(sid,
                     index, range);
             jobInfos = toJobInfos(userJobDataList);
         } catch (Exception e) {
@@ -286,7 +289,7 @@ public class SchedulerClient extends ClientBase implements Scheduler {
             NotConnectedException, PermissionException {
         String jobServerLog = "";
         try {
-            jobServerLog = restApi().jobServerLog(session(), jobId);
+            jobServerLog = restApi().jobServerLog(sid, jobId);
         } catch (Exception e) {
             throwUJEOrNCEOrPE(e);
         }
@@ -299,7 +302,7 @@ public class SchedulerClient extends ClientBase implements Scheduler {
         SchedulerStatus status = null;
         try {
             SchedulerStatusData schedulerStatus = restApi().getSchedulerStatus(
-                    session());
+                    sid);
             status = SchedulerStatus.valueOf(schedulerStatus.name());
         } catch (Exception e) {
             throwNCEOrPE(e);
@@ -313,12 +316,12 @@ public class SchedulerClient extends ClientBase implements Scheduler {
             UnknownTaskException, PermissionException {
         TaskResultImpl taskResult = null;
         try {
-            TaskResultData taskResultData = restApi().taskresult(session(),
+            TaskResultData taskResultData = restApi().taskresult(sid,
                     jobId, taskName);
             taskResult = (TaskResultImpl) toTaskResult(makeJobId(jobId),
                     taskResultData);
             if (taskResult.value() == null) {
-                Serializable value = restApi().valueOftaskresult(session(),
+                Serializable value = restApi().valueOftaskresult(sid,
                         jobId, taskName);
                 if (value != null) {
                     taskResult.setHadException(true);
@@ -326,9 +329,9 @@ public class SchedulerClient extends ClientBase implements Scheduler {
                 }
             }
 
-            String all = restApi().tasklog(session(), jobId, taskName);
-            String out = restApi().tasklogout(session(), jobId, taskName);
-            String err = restApi().tasklogErr(session(), jobId, taskName);
+            String all = restApi().tasklog(sid, jobId, taskName);
+            String out = restApi().tasklogout(sid, jobId, taskName);
+            String err = restApi().tasklogErr(sid, jobId, taskName);
 
             taskResult.setOutput(DataUtility.toTaskLogs(all, out, err));
 
@@ -351,7 +354,7 @@ public class SchedulerClient extends ClientBase implements Scheduler {
             NotConnectedException, PermissionException {
         String taskLogs = "";
         try {
-            taskLogs = restApi().tasklog(session(), arg0, arg1);
+            taskLogs = restApi().tasklog(sid, arg0, arg1);
         } catch (Exception e) {
             throwUJEOrNCEOrPEOrUTE(e);
         }
@@ -363,7 +366,7 @@ public class SchedulerClient extends ClientBase implements Scheduler {
             PermissionException {
         List<SchedulerUserInfo> schedulerUserInfos = null;
         try {
-            List<SchedulerUserData> users = restApi().getUsers(session());
+            List<SchedulerUserData> users = restApi().getUsers(sid);
             schedulerUserInfos = toSchedulerUserInfos(users);
         } catch (Exception e) {
             throwNCEOrPE(e);
@@ -377,7 +380,7 @@ public class SchedulerClient extends ClientBase implements Scheduler {
         List<SchedulerUserInfo> schedulerUserInfos = null;
         try {
             List<SchedulerUserData> usersWithJobs = restApi().getUsersWithJobs(
-                    session());
+                    sid);
             schedulerUserInfos = toSchedulerUserInfos(usersWithJobs);
         } catch (Exception e) {
             throwNCEOrPE(e);
@@ -389,7 +392,7 @@ public class SchedulerClient extends ClientBase implements Scheduler {
     public boolean isConnected() {
         boolean isConnected = false;
         try {
-            isConnected = restApi().isConnected(session());
+            isConnected = restApi().isConnected(sid);
         } catch (NotConnectedRestException e) {
             // ignore
         }
@@ -400,7 +403,7 @@ public class SchedulerClient extends ClientBase implements Scheduler {
     public boolean kill() throws NotConnectedException, PermissionException {
         boolean isKilled = false;
         try {
-            isKilled = restApi().killScheduler(session());
+            isKilled = restApi().killScheduler(sid);
         } catch (Exception e) {
             throwNCEOrPE(e);
         }
@@ -418,7 +421,7 @@ public class SchedulerClient extends ClientBase implements Scheduler {
             UnknownJobException, PermissionException {
         boolean isJobKilled = false;
         try {
-            isJobKilled = restApi().killJob(session(), jobId);
+            isJobKilled = restApi().killJob(sid, jobId);
         } catch (Exception e) {
             throwNCEOrPE(e);
         }
@@ -430,7 +433,7 @@ public class SchedulerClient extends ClientBase implements Scheduler {
             throws NotConnectedException, PermissionException {
         boolean isLinked = false;
         try {
-            isLinked = restApi().linkRm(session(), rmUrl);
+            isLinked = restApi().linkRm(sid, rmUrl);
         } catch (Exception e) {
             throwNCEOrPE(e);
         }
@@ -441,7 +444,7 @@ public class SchedulerClient extends ClientBase implements Scheduler {
     public boolean pause() throws NotConnectedException, PermissionException {
         boolean isSchedulerPaused = false;
         try {
-            isSchedulerPaused = restApi().pauseScheduler(session());
+            isSchedulerPaused = restApi().pauseScheduler(sid);
         } catch (Exception e) {
             throwNCEOrPE(e);
         }
@@ -459,7 +462,7 @@ public class SchedulerClient extends ClientBase implements Scheduler {
             UnknownJobException, PermissionException {
         boolean isJobPaused = false;
         try {
-            isJobPaused = restApi().pauseJob(session(), jobId);
+            isJobPaused = restApi().pauseJob(sid, jobId);
         } catch (Exception e) {
             throwUJEOrNCEOrPE(e);
         }
@@ -479,7 +482,7 @@ public class SchedulerClient extends ClientBase implements Scheduler {
             UnknownTaskException, PermissionException {
         boolean isTaskPreempted = false;
         try {
-            isTaskPreempted = restApi().preemptTask(session(), jobId, taskName);
+            isTaskPreempted = restApi().preemptTask(sid, jobId, taskName);
         } catch (Exception e) {
             throwUJEOrNCEOrPEOrUTE(e);
         }
@@ -497,7 +500,7 @@ public class SchedulerClient extends ClientBase implements Scheduler {
             UnknownJobException, PermissionException {
         boolean isJobRemoved = false;
         try {
-            isJobRemoved = restApi().removeJob(session(), jobId);
+            isJobRemoved = restApi().removeJob(sid, jobId);
         } catch (Exception e) {
             throwNCEOrPE(e);
         }
@@ -517,7 +520,7 @@ public class SchedulerClient extends ClientBase implements Scheduler {
             UnknownTaskException, PermissionException {
         boolean isTaskRestarted = false;
         try {
-            isTaskRestarted = restApi().restartTask(session(), jobId, taskName);
+            isTaskRestarted = restApi().restartTask(sid, jobId, taskName);
         } catch (Exception e) {
             throwUJEOrNCEOrPEOrUTE(e);
         }
@@ -528,7 +531,7 @@ public class SchedulerClient extends ClientBase implements Scheduler {
     public boolean resume() throws NotConnectedException, PermissionException {
         boolean isResumed = false;
         try {
-            isResumed = restApi().resumeScheduler(session());
+            isResumed = restApi().resumeScheduler(sid);
         } catch (Exception e) {
             throwNCEOrPE(e);
         }
@@ -546,7 +549,7 @@ public class SchedulerClient extends ClientBase implements Scheduler {
             UnknownJobException, PermissionException {
         boolean isJobResumed = false;
         try {
-            isJobResumed = restApi().resumeJob(session(), jobId);
+            isJobResumed = restApi().resumeJob(sid, jobId);
         } catch (Exception e) {
             throwUJEOrNCEOrPE(e);
         }
@@ -557,7 +560,7 @@ public class SchedulerClient extends ClientBase implements Scheduler {
     public boolean shutdown() throws NotConnectedException, PermissionException {
         boolean isShutdown = false;
         try {
-            isShutdown = restApi().killScheduler(session());
+            isShutdown = restApi().killScheduler(sid);
         } catch (Exception e) {
             throwNCEOrPE(e);
         }
@@ -568,7 +571,7 @@ public class SchedulerClient extends ClientBase implements Scheduler {
     public boolean start() throws NotConnectedException, PermissionException {
         boolean success = false;
         try {
-            success = restApi().startScheduler(session());
+            success = restApi().startScheduler(sid);
         } catch (Exception e) {
             throwNCEOrPE(e);
         }
@@ -579,7 +582,7 @@ public class SchedulerClient extends ClientBase implements Scheduler {
     public boolean stop() throws NotConnectedException, PermissionException {
         boolean isStopped = false;
         try {
-            isStopped = restApi().stopScheduler(session());
+            isStopped = restApi().stopScheduler(sid);
         } catch (Exception e) {
             throwNCEOrPE(e);
         }
@@ -594,7 +597,7 @@ public class SchedulerClient extends ClientBase implements Scheduler {
         try {
             String jobXml = (new Job2XMLTransformer())
                     .jobToxml((TaskFlowJob) job);
-            jobIdData = restApiClient().submitXml(session(),
+            jobIdData = restApiClient().submitXml(sid,
                     IOUtils.toInputStream(jobXml, Charset.defaultCharset()));
         } catch (Exception e) {
             throwNCEOrPEOrSCEOrJCE(e);
@@ -641,7 +644,7 @@ public class SchedulerClient extends ClientBase implements Scheduler {
             PermissionException, UnknownTaskException {
         boolean finished = false;
         try {
-            TaskStateData taskStateData = restApi().jobtasks(session(), jobId,
+            TaskStateData taskStateData = restApi().jobtasks(sid, jobId,
                     taskName);
             TaskState taskState = taskState(taskStateData);
             finished = !taskState.getStatus().isTaskAlive();
@@ -755,7 +758,7 @@ public class SchedulerClient extends ClientBase implements Scheduler {
         boolean uploaded = false;
         try {
             FileInputStream is = new FileInputStream(file);
-            uploaded = restApiClient().pushFile(session(), spacename, pathname,
+            uploaded = restApiClient().pushFile(sid, spacename, pathname,
                     filename, is);
         } catch (Exception e) {
             throwNCEOrPE(e);
@@ -769,7 +772,7 @@ public class SchedulerClient extends ClientBase implements Scheduler {
         try {
             prepareToWrite(outputFile);
             os = new FileOutputStream(outputFile);
-            InputStream is = restApi().pullFile(session(), space, pathname);
+            InputStream is = restApi().pullFile(sid, space, pathname);
             copy(is, os);
         } catch (Exception e) {
             throwNCEOrPE(e);
@@ -788,11 +791,20 @@ public class SchedulerClient extends ClientBase implements Scheduler {
             throws NotConnectedException, PermissionException {
         boolean deleted = false;
         try {
-            deleted = restApi().deleteFile(session(), space, pathname);
+            deleted = restApi().deleteFile(sid, space, pathname);
         } catch (Exception e) {
             throwNCEOrPE(e);
         }
         return deleted;
+    }
+
+    @Override
+    public void renewSession() throws NotConnectedException {
+        try {
+            sid = restApi().login(login, password);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private static void prepareToWrite(String pathname) {
@@ -821,14 +833,6 @@ public class SchedulerClient extends ClientBase implements Scheduler {
 
     private SchedulerRestInterface restApi() {
         return schedulerRestClient.getScheduler();
-    }
-
-    private void setSession(String sid) {
-        this.sid = sid;
-    }
-
-    private String session() {
-        return sid;
     }
 
     private void setApiClient(SchedulerRestClient schedulerRestClient) {

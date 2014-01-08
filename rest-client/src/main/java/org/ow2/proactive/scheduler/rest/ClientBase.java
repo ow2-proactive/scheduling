@@ -36,7 +36,6 @@ package org.ow2.proactive.scheduler.rest;
 
 import java.util.List;
 
-import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
 import org.ow2.proactive.scheduler.common.SchedulerState;
@@ -48,7 +47,7 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 
-public abstract class ClientBase implements Scheduler {
+public abstract class ClientBase implements ISchedulerClient {
     private static final int calling_method_stack_index = 3;
 
     @Override
@@ -148,11 +147,6 @@ public abstract class ClientBase implements Scheduler {
     @Override
     public void removeEventListener() throws NotConnectedException,
             PermissionException {
-        throw new UnsupportedOperationException();
-    }
-    
-    @Override
-    public void renewSession() throws NotConnectedException {
         throw new UnsupportedOperationException();
     }
 
