@@ -31,6 +31,7 @@ import org.ow2.proactive.scheduler.job.InternalJobFactory;
 import org.ow2.proactive.scheduler.task.internal.ExecuterInformations;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.tests.ConsecutiveMode;
+import org.ow2.tests.ProActiveTest;
 import junit.framework.Assert;
 import org.hamcrest.Description;
 import org.hamcrest.TypeSafeMatcher;
@@ -47,7 +48,7 @@ import static org.hamcrest.Matchers.is;
 
 
 @Ignore
-public class BaseSchedulerDBTest {
+public class BaseSchedulerDBTest extends ProActiveTest {
 
     protected SchedulerDBManager dbManager;
 
