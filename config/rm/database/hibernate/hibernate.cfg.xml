@@ -33,7 +33,7 @@
         <property name="connection.provider_class">org.hibernate.service.jdbc.connections.internal.C3P0ConnectionProvider</property>
         <property name="c3p0.max_size">10</property>
         <property name="c3p0.min_size">10</property>
-        <property name="c3p0.timeout">300</property> <!-- seconds -->
+        <property name="c3p0.timeout">60</property> <!-- seconds -->
 
         <!-- JDBC connection pool (use the built-in) -->
         <property name="connection.pool_size">10</property>

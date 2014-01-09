@@ -90,7 +90,7 @@ public class SchedulerStarter {
     //shows how to run the scheduler
     private static Logger logger = Logger.getLogger(SchedulerStarter.class);
 
-    public static final int defaulNodesNumber = 0;
+    public static final int defaulNodesNumber = 4;
     public static final int defaultNodesTimemout = 30 * 1000;
 
     /**

@@ -2,7 +2,6 @@
 <ProActiveUserProperties>
     <properties>
 		<prop key="proactive.net.nolocal" value="true"/>
-		<prop key="proactive.net.interface" value="eth0"/>
 		<!--<prop key="proactive.rmi.port" value="1234"/>-->
     </properties>
     <javaProperties>
