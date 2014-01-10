@@ -28,8 +28,6 @@ subprojects {
     group = 'org.ow2.proactive'
     version = '3.5.0-SNAPSHOT'
 
-    sourceCompatibility = 1.6
-
     rootProject.buildscript.repositories.each {
         repositories.add(it)
     }
