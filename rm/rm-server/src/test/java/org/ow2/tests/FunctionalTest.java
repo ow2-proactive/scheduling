@@ -37,7 +37,6 @@
 package org.ow2.tests;
 
 import java.io.PrintStream;
-import java.security.Policy;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -134,7 +133,7 @@ public class FunctionalTest extends ProActiveTest {
             String defaultLog4jConfig = System.getProperty(
               PAResourceManagerProperties.RM_HOME.getKey()) + "/config/log4j/log4j-junit";
             System.setProperty(CentralPAPropertyRepository.LOG4J.getName(),
-              defaultLog4jConfig);
+              "file:" + defaultLog4jConfig);
             PropertyConfigurator.configure(defaultLog4jConfig);
         }
     }
