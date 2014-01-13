@@ -64,12 +64,14 @@ import org.ow2.proactive.scheduler.common.task.ParallelEnvironment;
 import org.ow2.proactive.scheduler.common.task.PropertyModifier;
 import org.ow2.proactive.scheduler.common.task.ScriptTask;
 import org.ow2.proactive.scheduler.common.task.Task;
+import org.ow2.proactive.scheduler.common.task.UpdatableProperties;
 import org.ow2.proactive.scheduler.common.task.dataspaces.FileSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
 import org.ow2.proactive.scheduler.common.task.flow.FlowBlock;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
+import org.ow2.proactive.scheduler.common.task.util.BooleanWrapper;
 import org.ow2.proactive.scripting.GenerationScript;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.SelectionScript;
@@ -374,8 +376,14 @@ public class Job2XMLTransformer {
 
         // **** attributes *****
         // **** common attributes ***
-        setAttribute(taskE, XMLAttributes.COMMON_CANCELJOBONERROR, Boolean.toString(task
-                .getCancelJobOnErrorProperty().getValue().getBooleanValue()));
+        
+        UpdatableProperties<BooleanWrapper> cancelJobOnErrorProperty = task
+                .getCancelJobOnErrorProperty();
+        if (cancelJobOnErrorProperty.isSet()) {
+            setAttribute(taskE, XMLAttributes.COMMON_CANCELJOBONERROR,
+                    Boolean.toString(cancelJobOnErrorProperty.getValue()
+                            .getBooleanValue()));
+        }
         setAttribute(taskE, XMLAttributes.COMMON_MAXNUMBEROFEXECUTION, Integer.toString(task
                 .getMaxNumberOfExecution()));
         setAttribute(taskE, XMLAttributes.COMMON_NAME, task.getName());
@@ -572,10 +580,10 @@ public class Job2XMLTransformer {
                 long threshold = ((ThresholdProximityDescriptor) topologyDescr).getThreshold();
                 topologyDescrE.setAttribute(XMLAttributes.TOPOLOGY_THRESHOLD.getXMLName(), Long
                         .toString(threshold));
-            } else if (topologyDescr instanceof SingleHostDescriptor) {
-                topologyDescrE = doc.createElement(XMLTags.TOPOLOGY_SINGLE_HOST.getXMLName());
             } else if (topologyDescr instanceof SingleHostExclusiveDescriptor) {
                 topologyDescrE = doc.createElement(XMLTags.TOPOLOGY_SINGLE_HOST_EXCLUSIVE.getXMLName());
+            } else if (topologyDescr instanceof SingleHostDescriptor) {
+                topologyDescrE = doc.createElement(XMLTags.TOPOLOGY_SINGLE_HOST.getXMLName());
             } else if (topologyDescr instanceof MultipleHostsExclusiveDescriptor) {
                 topologyDescrE = doc.createElement(XMLTags.TOPOLOGY_MULTIPLE_HOSTS_EXCLUSIVE.getXMLName());
             }
