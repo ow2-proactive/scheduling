@@ -605,22 +605,26 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         return jobId(jobIdData);
     }
 
+    @Override
     public boolean isJobFinished(JobId jobId) throws NotConnectedException,
             UnknownJobException, PermissionException {
         return isJobFinished(jobId.toString());
     }
 
+    @Override
     public boolean isJobFinished(String jobId) throws NotConnectedException,
             UnknownJobException, PermissionException {
-        return getJobState(jobId).isFinished();
+        return !getJobState(jobId).getStatus().isJobAlive();
     }
 
+    @Override
     public JobResult waitForJob(JobId jobId, long timeout)
             throws NotConnectedException, UnknownJobException,
             PermissionException, TimeoutException {
         return waitForJob(jobId.value(), timeout);
     }
 
+    @Override
     public JobResult waitForJob(String jobId, long timeout)
             throws NotConnectedException, UnknownJobException,
             PermissionException, TimeoutException {
@@ -639,6 +643,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
                 "Timeout waiting for the job: job-id=%s", jobId));
     }
 
+    @Override
     public boolean isTaskFinished(String jobId, String taskName)
             throws UnknownJobException, NotConnectedException,
             PermissionException, UnknownTaskException {
@@ -654,6 +659,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         return finished;
     }
 
+    @Override
     public TaskResult waitForTask(String jobId, String taskName, long timeout)
             throws UnknownJobException, NotConnectedException,
             PermissionException, UnknownTaskException, TimeoutException {
@@ -672,15 +678,8 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
                 "Timeout waiting for the task: job-id=%s, task-id=%s", jobId,
                 taskName));
     }
-
-    private void sleep(long millis) {
-        try {
-            Thread.sleep(millis);
-        } catch (InterruptedException ie) {
-            // ignore
-        }
-    }
-
+    
+    @Override
     public List<JobResult> waitForAllJobs(List<String> jobIds, long timeout)
             throws NotConnectedException, UnknownJobException,
             PermissionException, TimeoutException {
@@ -694,6 +693,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         return results;
     }
 
+    @Override
     public Map.Entry<String, JobResult> waitForAnyJob(List<String> jobIds,
             long timeout) throws NotConnectedException, UnknownJobException,
             PermissionException, TimeoutException {
@@ -715,6 +715,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
                 String.valueOf(jobIds)));
     }
 
+    @Override
     public Entry<String, TaskResult> waitForAnyTask(String jobId,
             List<String> taskNames, long timeout) throws UnknownJobException,
             NotConnectedException, PermissionException, UnknownTaskException,
@@ -737,6 +738,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
                 String.valueOf(taskNames)));
     }
 
+    @Override
     public List<Entry<String, TaskResult>> waitForAllTasks(String jobId,
             List<String> taskNames, long timeout) throws UnknownJobException,
             NotConnectedException, PermissionException, UnknownTaskException,
@@ -753,6 +755,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         return taskResults;
     }
 
+    @Override
     public boolean pushFile(String spacename, String pathname, String filename,
             String file) throws NotConnectedException, PermissionException {
         boolean uploaded = false;
@@ -766,6 +769,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         return uploaded;
     }
 
+    @Override
     public void pullFile(String space, String pathname, String outputFile)
             throws NotConnectedException, PermissionException {
         OutputStream os = null;
@@ -787,6 +791,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         }
     }
 
+    @Override
     public boolean deleteFile(String space, String pathname)
             throws NotConnectedException, PermissionException {
         boolean deleted = false;
@@ -804,6 +809,14 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
             sid = restApi().login(login, password);
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private void sleep(long millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException ie) {
+            // ignore
         }
     }
 
