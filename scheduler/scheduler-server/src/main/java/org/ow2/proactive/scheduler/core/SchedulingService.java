@@ -1,5 +1,13 @@
 package org.ow2.proactive.scheduler.core;
 
+import java.net.URI;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+
 import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
@@ -17,6 +25,7 @@ import org.ow2.proactive.scheduler.core.db.SchedulerStateRecoverHelper;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
 import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
+import org.ow2.proactive.scheduler.exception.ForkedJVMProcessException;
 import org.ow2.proactive.scheduler.exception.ProgressPingerException;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.policy.Policy;
@@ -27,14 +36,6 @@ import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
 import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.TaskLogger;
 import org.ow2.proactive.utils.NodeSet;
-
-import java.net.URI;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 
 
 public class SchedulingService {
@@ -786,13 +787,17 @@ public class SchedulingService {
             if (tlogger.isDebugEnabled()) {
                 tlogger.debug(task.getId(), "getProgress failed", e);
             }
-        } catch (ProgressPingerException e) {
-            //thrown by (2) in one of this two cases :
-            // * when user has overridden getProgress method and the method throws an exception
+        } catch (ForkedJVMProcessException e) {
+            //thrown by when user has overridden getProgress method and the method throws an exception
             // * if forked JVM process is dead
             //nothing to do in any case
-            if (tlogger.isDebugEnabled()) {
-                tlogger.debug(task.getId(), "getProgress failed", e);
+            if (tlogger.isTraceEnabled()) {
+                tlogger.trace(task.getId(), "getProgress failed", e);
+            }
+        } catch (ProgressPingerException e) {
+            //thrown by when forked JVM process is dead, which is a normal scenario at the end of the task
+            if (tlogger.isTraceEnabled()) {
+               tlogger.trace(task.getId(), "getProgress failed", e);
             }
         } catch (Throwable t) {
             tlogger.info(task.getId(), "node failed", t);
