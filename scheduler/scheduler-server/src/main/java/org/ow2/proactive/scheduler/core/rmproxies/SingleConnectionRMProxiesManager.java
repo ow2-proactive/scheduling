@@ -1,32 +1,24 @@
 package org.ow2.proactive.scheduler.core.rmproxies;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 
 import org.ow2.proactive.authentication.crypto.Credentials;
-import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.exception.RMException;
-import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 
 
 public final class SingleConnectionRMProxiesManager extends RMProxiesManager {
 
-    private final SchedulerRMProxy schedulerRMProxy;
-
-    private final UserRMProxy userRMProxy;
-
-    private Connection currentRMConnection;
-
-    private RMProxyActiveObject currentRMProxy;
+    private final RMProxy rmProxy;
 
     private URI rmURI;
 
     public SingleConnectionRMProxiesManager(URI rmURI, Credentials schedulerProxyCredentials)
-            throws RMException, RMProxyCreationException {
+            throws RMException, RMProxyCreationException, URISyntaxException {
         super(schedulerProxyCredentials);
-        rebindRMProxiesManager(rmURI);
+        this.rmURI = rmURI;
 
-        schedulerRMProxy = new SchedulerRMProxy(this);
-        userRMProxy = new UserRMProxy(this, schedulerProxyCredentials);
+        rmProxy = new RMProxy(rmURI, schedulerProxyCredentials);
     }
 
     @Override
@@ -36,52 +28,28 @@ public final class SingleConnectionRMProxiesManager extends RMProxiesManager {
 
     @Override
     synchronized public void rebindRMProxiesManager(URI rmURI) throws RMException, RMProxyCreationException {
-        terminateAllProxies();
-
-        String rmUrl = rmURI.toString();
-        RMAuthentication auth = RMConnection.join(rmUrl);
-        currentRMConnection = new Connection(rmURI, auth);
-        currentRMProxy = RMProxyActiveObject.createAOProxy(auth, schedulerProxyCredentials);
-
         this.rmURI = rmURI;
+        rmProxy.rebind(rmURI);
     }
 
     @Override
-    public void terminateUserRMProxy(String user) {
-        // ignore
+    public RMProxy getUserRMProxy(String user, Credentials credentials) {
+        return rmProxy;
     }
 
     @Override
-    public synchronized void terminateAllProxies() {
-        if (currentRMConnection != null) {
-            userRMProxy.terminate();
-            currentRMProxy.terminateProxy();
-            currentRMConnection = null;
-            currentRMProxy = null;
-        }
+    public void terminateRMProxy(String user) {
+        // nothing to do
     }
 
     @Override
-    public UserRMProxy getUserRMProxy(String user, Credentials credentials) {
-        return userRMProxy;
+    public void terminateAllProxies() {
+        rmProxy.terminate();
     }
 
     @Override
-    public SchedulerRMProxy getSchedulerRMProxy() {
-        return schedulerRMProxy;
-    }
-
-    @Override
-    synchronized Connection getCurrentRMConnection() {
-        return currentRMConnection;
-    }
-
-    @Override
-    synchronized RMProxyActiveObject getSchedulerProxyActiveObjectForCurrentRM() {
-        if (currentRMProxy == null) {
-            throw new IllegalStateException("Not connected to the RM");
-        }
-        return currentRMProxy;
+    public RMProxy getRmProxy() {
+        return rmProxy;
     }
 
 }

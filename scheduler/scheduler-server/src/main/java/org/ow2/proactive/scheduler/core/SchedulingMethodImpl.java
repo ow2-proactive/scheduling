@@ -181,7 +181,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
             while (!taskRetrivedFromPolicy.isEmpty()) {
                 //get rmState and update it in scheduling policy
-                RMState rmState = getRMProxiesManager().getSchedulerRMProxy().getState();
+                RMState rmState = getRMProxiesManager().getRmProxy().getState();
                 currentPolicy.setRMState(rmState);
                 internalPolicy.RMState = rmState;
                 int freeResourcesNb = rmState.getFreeNodesNumber();

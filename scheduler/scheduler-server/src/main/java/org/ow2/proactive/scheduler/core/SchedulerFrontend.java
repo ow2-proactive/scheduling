@@ -227,7 +227,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
             //creating scheduler core
 
             RMProxiesManager rmProxiesManager = RMProxiesManager.createRMProxiesManager(rmURL);
-            rmProxiesManager.getSchedulerRMProxy();
+            rmProxiesManager.getRmProxy();
 
             DataSpaceServiceStarter dsServiceStarter = DataSpaceServiceStarter.getDataSpaceServiceStarter();
             dsServiceStarter.startNamingService();

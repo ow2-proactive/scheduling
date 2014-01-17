@@ -1,15 +1,6 @@
 package org.ow2.proactive.scheduler.core;
 
-import java.net.URI;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.api.PAFuture;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
@@ -36,6 +27,14 @@ import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
 import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.TaskLogger;
 import org.ow2.proactive.utils.NodeSet;
+
+import java.net.URI;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 
 
 public class SchedulingService {
@@ -559,12 +558,13 @@ public class SchedulingService {
     }
 
     void handleException(Throwable t) {
-        logger.error("Unexpected exception", t);
+        logger.error("Unexpected exception in the scheduling thread - checking the connection to resource manager", t);
         try {
-            PAFuture.waitFor(infrastructure.getRMProxiesManager().getSchedulerRMProxy().isActive(), true);
-        } catch (Exception rme) {
-            // Check and tries to reconnect the RM proxies else Freeze the scheduler.
+            // check if the connection to RM is still active
+            // if not reactivate it for all the proxies
             checkAndReconnectRM();
+        } catch (Exception rme) {
+            logger.error("Error while reconnecting to the resource manager", rme);
         }
     }
 
@@ -607,16 +607,13 @@ public class SchedulingService {
         String rmURL = this.lastRmUrl.toString();
         int nbAttempts = 1;
 
-        logger.info("Trying to retrieve RM connection at url " + rmURL + "...");
+        logger.info("Automatically reconnecting to RM at url " + rmURL + "...");
 
         while (!alive && nbAttempts <= maxAttempts) {
             try {
-
-                // Call isActive and wait recursively on the two futures (this -> proxy -> RM)
-                PAFuture.waitFor(infrastructure.getRMProxiesManager().getSchedulerRMProxy().isActive(), true);
+                infrastructure.getRMProxiesManager().rebindRMProxiesManager(new URI(rmURL));
+                logger.info("Successfully reconnected to Resource Manager at " + rmURL);
                 alive = true;
-                logger.info("Resource Manager successfully retrieved on " + rmURL);
-
             } catch (Exception rme) {
                 alive = false;
 
