@@ -46,6 +46,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.ow2.proactive.scheduler.common.job.JobEnvironment;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.CommonAttribute;
@@ -55,38 +56,36 @@ import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.common.task.ParallelEnvironment;
 import org.ow2.proactive.scheduler.common.task.ScriptTask;
 import org.ow2.proactive.scheduler.common.task.Task;
+import org.ow2.proactive.scheduler.common.task.UpdatableProperties;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.topology.descriptor.ThresholdProximityDescriptor;
-import org.apache.commons.collections.CollectionUtils;
-
+import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 
 public class JobComparator {
 
-    //stack used to create a message in case of differences found between jobs
+    // stack used to create a message in case of differences found between jobs
     private Stack<String> stack;
 
     /**
      * if the last 2 jobs compared are not equal, a message will be returned
      * explaining the first difference encountered. Returns an empty string if
      * the
-     *
+     * 
      */
     public String getDifferenceMessage() {
         return stack.toString();
     }
 
     /**
-     *
-     * We state that:
-     * 		For any jobs (TaskFlowJob) job1 and job2 such that
-     * 			   job1 serialized to xml produces job1.xml
-     * 			   job1.xml loaded in java produces job2
-     * 		then isEqual(job1,job2) == true
-     *
+     * 
+     * We state that: For any jobs (TaskFlowJob) job1 and job2 such that job1
+     * serialized to xml produces job1.xml job1.xml loaded in java produces job2
+     * then isEqual(job1,job2) == true
+     * 
      * @throws ClassNotFoundException
      * @throws IOException
      */
@@ -145,16 +144,18 @@ public class JobComparator {
     }
 
     private boolean isEqualCommonAttribute(CommonAttribute attrib1, CommonAttribute attrib2) {
-
-        if (attrib1.isCancelJobOnError() != attrib2.isCancelJobOnError()) {
+        if (!isEqualUpdatableProperty(attrib1.getCancelJobOnErrorProperty(), attrib2.getCancelJobOnErrorProperty())) {
             stack.push(" CancelJobOnErrorProperty ");
             return false;
         }
-        if (attrib1.getMaxNumberOfExecution() != attrib2.getMaxNumberOfExecution()) {
+
+        if (!isEqualUpdatableProperty(attrib1.getMaxNumberOfExecutionProperty(),
+                attrib2.getMaxNumberOfExecutionProperty())) {
             stack.push(" maxNumberOfExecution ");
             return false;
         }
-        if (!attrib1.getRestartTaskOnError().equals(attrib2.getRestartTaskOnError())) {
+
+        if (!isEqualUpdatableProperty(attrib1.getRestartTaskOnErrorProperty(), attrib2.getRestartTaskOnErrorProperty())) {
             stack.push(" RestartTaskOnError ");
             return false;
         }
@@ -162,18 +163,16 @@ public class JobComparator {
         stack.push(" genericInformations ");
         if (!isEqualMap(attrib1.getGenericInformations(), attrib2.getGenericInformations())) {
 
-            stack.push("generic info 1= " + attrib1.getGenericInformations() + " ----- generic info 2 = " +
-                attrib2.getGenericInformations());
+            stack.push("generic info 1= " + attrib1.getGenericInformations() + " ----- generic info 2 = "
+                    + attrib2.getGenericInformations());
 
             return false;
-
         }
         stack.pop(); // generic informations
         return true;
     }
 
-    private boolean isTaskFlowEqual(TaskFlowJob job1, TaskFlowJob job2) throws IOException,
-            ClassNotFoundException {
+    private boolean isTaskFlowEqual(TaskFlowJob job1, TaskFlowJob job2) throws IOException, ClassNotFoundException {
         ArrayList<Task> tasks1 = job1.getTasks();
         ArrayList<Task> tasks2 = job2.getTasks();
 
@@ -193,7 +192,7 @@ public class JobComparator {
 
         for (String name : map1.keySet()) {
             stack.push("Task " + map1.get(name));
-            if (isTaskEqual(map1.get(name), map2.get(name)))
+            if (!isTaskEqual(map1.get(name), map2.get(name)))
                 return false;
             stack.pop();
         }
@@ -213,7 +212,7 @@ public class JobComparator {
         if (!isEqualCommonAttribute(t1, t2))
             return false;
 
-        if (t1.getName().equals(t2.getName())) {
+        if (!t1.getName().equals(t2.getName())) {
             stack.push("name");
             return false;
         }
@@ -235,21 +234,30 @@ public class JobComparator {
         List<Task> dep1 = t1.getDependencesList();
         List<Task> dep2 = t2.getDependencesList();
 
-        if (dep1.size() != dep2.size()) {
-            stack.push("sizes don't match");
+        if (dep1 == null ^ dep2 == null) {
+            stack.push("one dependency list is empty");
             return false;
-        }
-        // we only compare the names in the 2 dependencies lists
-        Set<String> names1 = new HashSet<String>();
-        Set<String> names2 = new HashSet<String>();
-        for (int k = 0; k < dep1.size(); k++) {
-            names1.add(dep1.get(k).getName());
-            names2.add(dep2.get(k).getName());
         }
 
-        if (!CollectionUtils.isEqualCollection(names1, names2)) {
-            return false;
+        if (dep1 != null) {
+            if (dep1.size() != dep2.size()) {
+                stack.push("sizes don't match");
+                return false;
+            }
+
+            // we only compare the names in the 2 dependencies lists
+            Set<String> names1 = new HashSet<String>();
+            Set<String> names2 = new HashSet<String>();
+            for (int k = 0; k < dep1.size(); k++) {
+                names1.add(dep1.get(k).getName());
+                names2.add(dep2.get(k).getName());
+            }
+
+            if (!CollectionUtils.isEqualCollection(names1, names2)) {
+                return false;
+            }
         }
+
         stack.pop(); // task dependencies
 
         // **** parallel environment ****
@@ -271,23 +279,23 @@ public class JobComparator {
 
         // scripts
         stack.push("pre script");
-        if (isEqualScript(t1.getPreScript(), t2.getPreScript()))
+        if (!isEqualScript(t1.getPreScript(), t2.getPreScript()))
             return false;
         stack.pop();
 
         stack.push("post script");
-        if (isEqualScript(t1.getPostScript(), t2.getPostScript()))
+        if (!isEqualScript(t1.getPostScript(), t2.getPostScript()))
             return false;
         stack.pop();
 
         stack.push("cleaning script");
-        if (isEqualScript(t1.getCleaningScript(), t2.getCleaningScript()))
+        if (!isEqualScript(t1.getCleaningScript(), t2.getCleaningScript()))
             return false;
         stack.pop();
 
         stack.push("selection scripts");
         List<SelectionScript> ss1 = t1.getSelectionScripts();
-        List<SelectionScript> ss2 = t1.getSelectionScripts();
+        List<SelectionScript> ss2 = t2.getSelectionScripts();
 
         if ((ss1 == null) ^ (ss2 == null)) {
             stack.push("One of two lists of selection scripts is null");
@@ -320,7 +328,7 @@ public class JobComparator {
         stack.pop();
 
         // ***** task executable *****
-        if (!(t1.getClass().equals(t2.getClass()))) {
+        if (!isEqualClass(t1.getClass(), t2.getClass())) {
             stack.push("Executable types don't match");
             return false;
         }
@@ -334,12 +342,12 @@ public class JobComparator {
             stack.pop();
 
             stack.push("executable class");
-            if (isEqualString(jt1.getExecutableClassName(), jt2.getExecutableClassName()))
+            if (!isEqualString(jt1.getExecutableClassName(), jt2.getExecutableClassName()))
                 return false;
             stack.pop();
 
             stack.push("forked environemnt");
-            if (isEqualForkedEnvironment(jt1.getForkEnvironment(), jt2.getForkEnvironment()))
+            if (!isEqualForkedEnvironment(jt1.getForkEnvironment(), jt2.getForkEnvironment()))
                 return false;
             stack.pop();
         } // insttanceof JavaTask
@@ -347,12 +355,22 @@ public class JobComparator {
         if (t1 instanceof NativeTask) {
             NativeTask nt1 = (NativeTask) t1;
             NativeTask nt2 = (NativeTask) t2;
-            if (!CollectionUtils.isEqualCollection(Arrays.asList(nt1.getCommandLine()), Arrays.asList(nt2
-                    .getCommandLine())))
+            String[] cl1 = nt1.getCommandLine();
+            String[] cl2 = nt2.getCommandLine();
+
+            if (cl1 == null ^ cl2 == null) {
                 return false;
 
-            if (!isEqualScript(nt1.getGenerationScript(), nt2.getGenerationScript()))
+            } else if (cl1 != null) {
+                boolean equals = Arrays.equals(cl1, cl2);
+                if (!CollectionUtils.isEqualCollection(Arrays.asList(cl1), Arrays.asList(cl2))) {
+                    return false;
+                }
+            }
+
+            if (!isEqualScript(nt1.getGenerationScript(), nt2.getGenerationScript())) {
                 return false;
+            }
         }
 
         if (t1 instanceof ScriptTask) {
@@ -466,13 +484,13 @@ public class JobComparator {
     }
 
     /**
-     *
+     * 
      * Rather than comparing the scripts and the parameters, we will inline the
      * parameters in the script code and then just compare the script text. This
      * is because the Job2XMLTransformer inlines the script parameters
-     *
+     * 
      */
-    private boolean isEqualScript(Script s1, Script s2) {
+    private boolean isEqualScript(Script<?> s1, Script<?> s2) {
         if ((s1 == null) && (s2 == null))
             return true;
 
@@ -485,8 +503,15 @@ public class JobComparator {
             stack.push("engine name");
             return false;
         }
-        String text1 = Job2XMLTransformer.inlineScriptParametersInText(s1.getScript(), s1.getParameters());
-        String text2 = Job2XMLTransformer.inlineScriptParametersInText(s2.getScript(), s2.getParameters());
+
+        String text1 = s1.getScript().trim();
+        if (s1.getParameters() != null) {
+            text1 = Job2XMLTransformer.inlineScriptParametersInText(text1, s1.getParameters());
+        }
+        String text2 = s2.getScript().trim();
+        if (s2.getParameters() != null) {
+            text2 = Job2XMLTransformer.inlineScriptParametersInText(text2, s2.getParameters());
+        }
 
         return text1.equals(text2);
     }
@@ -494,7 +519,7 @@ public class JobComparator {
     /**
      * Compares the element in the 2 lists in the exact order they appear in the
      * lists
-     *
+     * 
      */
     private boolean isEqualInputFiles(List<InputSelector> l1, List<InputSelector> l2) {
         if ((l1 == null) && (l2 == null))
@@ -510,22 +535,32 @@ public class JobComparator {
         }
 
         for (InputSelector is1 : l1) {
-            InputSelector is2 = l2.get(2);
-            if (is1.getMode().equals(is2.getMode()))
-                return false;
-
-            if (CollectionUtils.isEqualCollection(Arrays.asList(is1.getInputFiles().getIncludes()), Arrays
-                    .asList(is2.getInputFiles().getIncludes()))) {
-                stack.push("includes");
+            boolean found = false;
+            for (int i = 0; i < l2.size(); i++) {
+                InputSelector is2 = l2.get(i);
+                if (!is1.getMode().equals(is2.getMode())) {
+                    continue;
+                }
+                List<String> i1 = Arrays.asList(is1.getInputFiles().getIncludes());
+                List<String> i2 = Arrays.asList(is2.getInputFiles().getIncludes());
+                if (i1 == null ^ i2 == null) {
+                    continue;
+                } else if (i1 != null && !CollectionUtils.isEqualCollection(i1, i2)) {
+                    continue;
+                }
+                String[] e1 = is1.getInputFiles().getExcludes();
+                String[] e2 = is2.getInputFiles().getExcludes();
+                if (e1 == null ^ e2 == null) {
+                    continue;
+                } else if (e1 != null && !CollectionUtils.isEqualCollection(Arrays.asList(e1), Arrays.asList(e2))) {
+                    continue;
+                }
+                found = true;
+                break;
+            }
+            if (!found) {
                 return false;
             }
-
-            if (CollectionUtils.isEqualCollection(Arrays.asList(is1.getInputFiles().getExcludes()), Arrays
-                    .asList(is2.getInputFiles().getExcludes()))) {
-                stack.push("excludes");
-                return false;
-            }
-
         }
         return true;
     }
@@ -534,7 +569,7 @@ public class JobComparator {
      * Compares the element in the 2 lists in the exact order they appear in the
      * lists FIXME: bad object design in the data space layer provides us to
      * unify the similar code in this method and isEqualInputFiles
-     *
+     * 
      */
     private boolean isEqualOutputFiles(List<OutputSelector> l1, List<OutputSelector> l2) {
         if ((l1 == null) && (l2 == null))
@@ -549,22 +584,33 @@ public class JobComparator {
             return false;
 
         for (OutputSelector os1 : l1) {
-            OutputSelector os2 = l2.get(2);
-            if (os1.getMode().equals(os2.getMode()))
-                return false;
-
-            if (CollectionUtils.isEqualCollection(Arrays.asList(os1.getOutputFiles().getIncludes()), Arrays
-                    .asList(os2.getOutputFiles().getIncludes()))) {
-                stack.push("includes");
-                return false;
+            boolean found = false;
+            for (int i = 0; i < l2.size(); i++) {
+                OutputSelector os2 = l2.get(i);
+                if (!os1.getMode().equals(os2.getMode())) {
+                    continue;
+                }
+                String[] i1 = os1.getOutputFiles().getIncludes();
+                String[] i2 = os2.getOutputFiles().getIncludes();
+                if (i1 == null ^ i2 == null) {
+                    continue;
+                } else if (i1 != null && !CollectionUtils.isEqualCollection(Arrays.asList(i1), Arrays.asList(i2))) {
+                    continue;
+                }
+                String[] e1 = os1.getOutputFiles().getExcludes();
+                String[] e2 = os2.getOutputFiles().getExcludes();
+                if (e1 == null ^ e2 == null) {
+                    continue;
+                } else if (e1 != null && !CollectionUtils.isEqualCollection(Arrays.asList(e1), Arrays.asList(e2))) {
+                    continue;
+                }
+                found = true;
+                break;
             }
 
-            if (CollectionUtils.isEqualCollection(Arrays.asList(os1.getOutputFiles().getExcludes()), Arrays
-                    .asList(os2.getOutputFiles().getExcludes()))) {
-                stack.push("excludes");
+            if (!found) {
                 return false;
             }
-
         }
         return true;
     }
@@ -582,20 +628,35 @@ public class JobComparator {
             return false;
         }
         // check same instance of topology decsriptor
-        if (e1.getTopologyDescriptor().getClass().equals(e2.getTopologyDescriptor().getClass())) {
+        TopologyDescriptor topologyDescriptor1 = e1.getTopologyDescriptor();
+        TopologyDescriptor topologyDescriptor2 = e2.getTopologyDescriptor();
+
+        if (topologyDescriptor1 == null && topologyDescriptor2 == null) {
+            return true;
+        }
+
+        if (topologyDescriptor1 == null ^ topologyDescriptor2 == null) {
+            return isEqualClass(TopologyDescriptor.ARBITRARY.getClass(),
+                    (topologyDescriptor1 == null ? topologyDescriptor2.getClass() : topologyDescriptor1.getClass()));
+        }
+
+        if (!isEqualClass(topologyDescriptor1.getClass(), topologyDescriptor2.getClass())) {
             stack.push("topology descriptor type");
             return false;
         }
 
-        if (e1.getTopologyDescriptor() instanceof ThresholdProximityDescriptor) {
-            ThresholdProximityDescriptor d1 = (ThresholdProximityDescriptor) e1.getTopologyDescriptor();
-            ThresholdProximityDescriptor d2 = (ThresholdProximityDescriptor) e2.getTopologyDescriptor();
-            if (d1.getThreshold() != d2.getThreshold()) {
+        if (topologyDescriptor1 instanceof ThresholdProximityDescriptor) {
+            if (!(topologyDescriptor2 instanceof ThresholdProximityDescriptor)) {
+                stack.push("Only one is ThresholdProximityDescriptor type.");
+                return false;
+            }
+
+            if (((ThresholdProximityDescriptor) topologyDescriptor1).getThreshold() != ((ThresholdProximityDescriptor) topologyDescriptor2)
+                    .getThreshold()) {
                 stack.push("ThresholdProximityDescriptor.threshold");
                 return false;
             }
         }
-
         return true;
     }
 
@@ -620,15 +681,15 @@ public class JobComparator {
         }
 
         if (!CollectionUtils.isEqualCollection(Arrays.asList(cp1), Arrays.asList(cp2))) {
-            stack.push("classpath1 = " + Arrays.asList(e1.getJobClasspath()) + " ---- " + "classpath 2 = " +
-                Arrays.asList(e2.getJobClasspath()));
+            stack.push("classpath1 = " + Arrays.asList(e1.getJobClasspath()) + " ---- " + "classpath 2 = "
+                    + Arrays.asList(e2.getJobClasspath()));
             return false;
         } else
             return true;
 
     }
 
-    private boolean isEqualMap(Map m1, Map m2) {
+    private boolean isEqualMap(Map<?, ?> m1, Map<?, ?> m2) {
         if ((m1 == null) && (m2 == null))
             return true;
 
@@ -636,5 +697,16 @@ public class JobComparator {
             return false;
 
         return m1.equals(m2);
+    }
+
+    private static <T> boolean isEqualUpdatableProperty(UpdatableProperties<T> property1,
+            UpdatableProperties<T> property2) {
+        return (property1.isSet() ^ property2.isSet()) ? false : ((property1.isSet()) ? property1.getValue().equals(
+                property2.getValue()) : true);
+    }
+
+    private boolean isEqualClass(Class<?> clazz1, Class<?> clazz2) {
+        return clazz1.getName().equals(clazz2.getName());
+
     }
 }

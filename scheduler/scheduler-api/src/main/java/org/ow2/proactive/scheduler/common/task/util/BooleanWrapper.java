@@ -77,4 +77,12 @@ public class BooleanWrapper implements Serializable {
         return this.booleanValue;
     }
 
+	@Override
+	public boolean equals(Object obj) {
+		return (obj instanceof BooleanWrapper) ? booleanValue == ((BooleanWrapper) obj).booleanValue
+				: false;
+	}
+    
+    
+
 }
