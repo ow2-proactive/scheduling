@@ -689,7 +689,7 @@ public class Job2XMLTransformer {
     private Element createScriptElement(Document doc, Script script) {
         Element scriptElement = doc.createElement(XMLTags.SCRIPT_SCRIPT.getXMLName());
         Element codeE = doc.createElement(XMLTags.SCRIPT_CODE.getXMLName());
-        setAttribute(codeE, XMLAttributes.LANGUAGE, script.getEngineName());
+        setAttribute(codeE, XMLAttributes.LANGUAGE, script.getEngineName(), true);
         String scriptText = script.getScript();
         String[] params = script.getParameters();
         if (params != null) {
