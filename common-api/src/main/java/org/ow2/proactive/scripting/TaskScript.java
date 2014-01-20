@@ -100,11 +100,6 @@ public class TaskScript extends Script<Serializable> {
     }
 
     @Override
-    protected ScriptEngine getEngine() {
-        return new ScriptEngineManager().getEngineByName(scriptEngine);
-    }
-
-    @Override
     protected void prepareSpecialBindings(Bindings bindings) {
 
     }

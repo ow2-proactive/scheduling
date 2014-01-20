@@ -45,11 +45,9 @@ import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 import javax.script.Bindings;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
 
-import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.apache.log4j.Logger;
 
 
 /**
@@ -139,17 +137,6 @@ public class SelectionScript extends Script<Boolean> {
     }
 
     /** Create a selection script from a file.
-     * @param file a file containing the script
-     * @param engineName String a script execution engine.
-     * @param parameters script execution arguments.
-     * @throws InvalidScriptException if the creation fails.
-     */
-    public SelectionScript(File file, String engineName, String[] parameters) throws InvalidScriptException {
-        super(file, engineName, parameters);
-        buildSelectionScriptId();
-    }
-
-    /** Create a selection script from a file.
      * @param file a file containing script code
      * @param parameters script execution arguments.
      * @param dynamic tell if script is dynamic or static
@@ -226,12 +213,7 @@ public class SelectionScript extends Script<Boolean> {
      */
     @Override
     public String getId() {
-        return this.id.toString();
-    }
-
-    @Override
-    protected ScriptEngine getEngine() {
-        return new ScriptEngineManager().getEngineByName(scriptEngine);
+        return this.id;
     }
 
     @Override

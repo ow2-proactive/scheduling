@@ -44,8 +44,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.script.Bindings;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 
@@ -125,14 +123,6 @@ public class GenerationScript extends Script<Object> {
      */
     public GenerationScript(URL url, String[] parameters) throws InvalidScriptException {
         super(url, parameters);
-    }
-
-    /** Return the engine that can execute this script.
-     * @see org.ow2.proactive.scripting.Script#getEngine()
-     */
-    @Override
-    protected ScriptEngine getEngine() {
-        return new ScriptEngineManager().getEngineByName(scriptEngine);
     }
 
     /**

@@ -42,8 +42,6 @@ import java.io.StringReader;
 import java.net.URL;
 
 import javax.script.Bindings;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 
@@ -113,11 +111,6 @@ public class SimpleScript extends Script<Object> {
     @Override
     public String getId() {
         return this.id;
-    }
-
-    @Override
-    protected ScriptEngine getEngine() {
-        return new ScriptEngineManager().getEngineByName(scriptEngine);
     }
 
     @Override

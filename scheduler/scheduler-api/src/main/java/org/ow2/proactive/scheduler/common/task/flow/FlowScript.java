@@ -36,9 +36,6 @@
  */
 package org.ow2.proactive.scheduler.common.task.flow;
 
-import it.sauronsoftware.cron4j.InvalidPatternException;
-import it.sauronsoftware.cron4j.Predictor;
-
 import java.io.Reader;
 import java.io.StringReader;
 
@@ -54,6 +51,8 @@ import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.SimpleScript;
+import it.sauronsoftware.cron4j.InvalidPatternException;
+import it.sauronsoftware.cron4j.Predictor;
 
 
 /**
@@ -467,13 +466,8 @@ public class FlowScript extends Script<FlowAction> {
     }
 
     @Override
-    protected ScriptEngine getEngine() {
-        return new ScriptEngineManager().getEngineByName(scriptEngine);
-    }
-
-    @Override
     public String getId() {
-        return this.id.toString();
+        return this.id;
     }
 
     @Override

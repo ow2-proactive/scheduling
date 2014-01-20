@@ -82,8 +82,8 @@ public abstract class Script<E> implements Serializable {
     /** Variable name for script arguments */
     public static final String ARGUMENTS_NAME = "args";
 
-    /** Name of the script engine */
-    protected String scriptEngine;
+    /** Name of the script engine or file path to script file (extension will be used to lookup) */
+    protected String scriptEngineLookup;
 
     /** The script to evaluate */
     protected String script;
@@ -93,8 +93,6 @@ public abstract class Script<E> implements Serializable {
 
     /** The parameters of the script */
     protected String[] parameters;
-
-    private static final ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
 
     /** ProActive needed constructor */
     public Script() {
@@ -107,18 +105,7 @@ public abstract class Script<E> implements Serializable {
      * @throws InvalidScriptException if the creation fails.
      */
     public Script(String script, String engineName, String[] parameters) throws InvalidScriptException {
-        for (ScriptEngineFactory factory : scriptEngineManager.getEngineFactories()) {
-            for (String name : factory.getNames()) {
-                if (name.equals(engineName)) {
-                    scriptEngine = engineName;
-                    break;
-                }
-            }
-        }
-        if (scriptEngine == null) {
-            throw new InvalidScriptException("The engine '" + engineName + "' is not valid");
-        }
-
+        this.scriptEngineLookup = engineName;
         this.script = script;
         this.id = script;
         this.parameters = parameters;
@@ -134,15 +121,13 @@ public abstract class Script<E> implements Serializable {
     }
 
     /** Create a script from a file.
+     *
      * @param file a file containing the script's source code.
-     * @param engineName String representing the execution engine
      * @param parameters script's execution arguments.
      * @throws InvalidScriptException if the creation fails.
      */
-    public Script(File file, String engineName, String[] parameters) throws InvalidScriptException {
-        if (engineName == null) {
-            getEngineName(file.getPath());
-        }
+    public Script(File file, String[] parameters) throws InvalidScriptException {
+        this.scriptEngineLookup = file.getPath();
 
         try {
             script = readFile(file);
@@ -151,15 +136,6 @@ public abstract class Script<E> implements Serializable {
         }
         this.id = file.getPath();
         this.parameters = parameters;
-    }
-
-    /** Create a script from a file.
-     * @param file a file containing the script's source code.
-     * @param parameters script's execution arguments.
-     * @throws InvalidScriptException if the creation fails.
-     */
-    public Script(File file, String[] parameters) throws InvalidScriptException {
-        this(file, null, parameters);
     }
 
     /** Create a script from a file.
@@ -176,7 +152,7 @@ public abstract class Script<E> implements Serializable {
      * @throws InvalidScriptException if the creation fails.
      */
     public Script(URL url, String[] parameters) throws InvalidScriptException {
-        getEngineName(url.getFile());
+        this.scriptEngineLookup = url.getFile();
 
         try {
             storeScript(url);
@@ -201,7 +177,7 @@ public abstract class Script<E> implements Serializable {
      * @throws InvalidScriptException if the creation fails.
      */
     public Script(Script<?> script2) throws InvalidScriptException {
-        this(script2.script, script2.scriptEngine, script2.parameters);
+        this(script2.script, script2.scriptEngineLookup, script2.parameters);
     }
 
     /**
@@ -258,10 +234,10 @@ public abstract class Script<E> implements Serializable {
      * @return a ScriptResult object.
      */
     public ScriptResult<E> execute(Map<String, Object> aBindings) {
-        ScriptEngine engine = getEngine();
+        ScriptEngine engine = createScriptEngine();
 
         if (engine == null) {
-            return new ScriptResult<E>(new Exception("No Script Engine Found"));
+            return new ScriptResult<E>(new Exception("No Script Engine Found for name or extension " + scriptEngineLookup));
         }
 
         // SCHEDULING-1532: redirect script output to a buffer (keep the latest DEFAULT_OUTPUT_MAX_SIZE)
@@ -309,7 +285,22 @@ public abstract class Script<E> implements Serializable {
     protected abstract Reader getReader();
 
     /** The Script Engine used to evaluate the script. */
-    protected abstract ScriptEngine getEngine();
+    protected ScriptEngine createScriptEngine() {
+        for (ScriptEngineFactory factory : new ScriptEngineManager().getEngineFactories()) {
+            for (String name : factory.getNames()) {
+                if (name.equalsIgnoreCase(scriptEngineLookup)) {
+                    return factory.getScriptEngine();
+                }
+            }
+            for (String ext : factory.getExtensions()) {
+                String scriptEngineLookupLowercase = scriptEngineLookup.toLowerCase();
+                if (scriptEngineLookupLowercase.endsWith(ext.toLowerCase())) {
+                    return factory.getScriptEngine();
+                }
+            }
+        }
+        return null;
+    }
 
     /** Specify the variable awaited from the script execution */
     protected abstract void prepareSpecialBindings(Bindings bindings);
@@ -332,10 +323,10 @@ public abstract class Script<E> implements Serializable {
     protected void storeScript(URL url) throws IOException {
         BufferedReader buf = new BufferedReader(new InputStreamReader(url.openStream()));
         StringBuilder builder = new StringBuilder();
-        String tmp = null;
+        String tmp;
 
         while ((tmp = buf.readLine()) != null) {
-            builder.append(tmp + "\n");
+            builder.append(tmp).append("\n");
         }
 
         script = builder.toString();
@@ -345,34 +336,17 @@ public abstract class Script<E> implements Serializable {
     public static String readFile(File file) throws IOException {
         BufferedReader buf = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
         StringBuilder builder = new StringBuilder();
-        String tmp = null;
+        String tmp;
 
         while ((tmp = buf.readLine()) != null) {
-            builder.append(tmp + "\n");
+            builder.append(tmp).append("\n");
         }
 
         return builder.toString();
     }
 
     public String getEngineName() {
-        return scriptEngine;
-    }
-
-    /** Set the scriptEngine from filepath */
-    protected void getEngineName(String filepath) throws InvalidScriptException {
-        ScriptEngineManager manager = new ScriptEngineManager();
-
-        for (ScriptEngineFactory sef : manager.getEngineFactories())
-            for (String ext : sef.getExtensions())
-                if (filepath.endsWith(ext)) {
-                    scriptEngine = sef.getNames().get(0);
-
-                    break;
-                }
-
-        if (scriptEngine == null) {
-            throw new InvalidScriptException("No script engine corresponding for file : " + filepath);
-        }
+        return scriptEngineLookup;
     }
 
     /**
