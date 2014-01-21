@@ -1,22 +1,22 @@
 package org.ow2.proactive.scheduler.core.rmproxies;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.exception.RMException;
-import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 
 
 public final class PerUserConnectionRMProxiesManager extends RMProxiesManager {
 
     private final Map<URI, RMAuthentication> rmAuthentifications = new HashMap<URI, RMAuthentication>(2);
 
-    private final Map<String, UserRMProxy> userProxiesMap = new HashMap<String, UserRMProxy>();
+    private final Map<String, RMProxy> userProxiesMap = new HashMap<String, RMProxy>();
 
-    private final SchedulerRMProxy schedulerRMProxy;
+    private final RMProxy schedulerRMProxy;
 
     private Connection currentRMConnection;
 
@@ -27,11 +27,10 @@ public final class PerUserConnectionRMProxiesManager extends RMProxiesManager {
     private URI rmURI;
 
     public PerUserConnectionRMProxiesManager(URI rmURI, Credentials schedulerProxyCredentials)
-            throws RMException, RMProxyCreationException {
+            throws RMException, RMProxyCreationException, URISyntaxException {
         super(schedulerProxyCredentials);
-        rebindRMProxiesManager(rmURI);
-
-        schedulerRMProxy = new SchedulerRMProxy(this);
+        this.rmURI = rmURI;
+        schedulerRMProxy = new RMProxy(rmURI, schedulerProxyCredentials);
     }
 
     @Override
@@ -44,39 +43,40 @@ public final class PerUserConnectionRMProxiesManager extends RMProxiesManager {
     @Override
     public void rebindRMProxiesManager(URI rmURI) throws RMException, RMProxyCreationException {
         synchronized (connectionStateLock) {
-            terminateAllProxies();
-
-            String rmUrl = rmURI.toString();
-            RMAuthentication auth = RMConnection.join(rmUrl);
-            rmAuthentifications.put(rmURI, auth);
-            currentRMConnection = new Connection(rmURI, auth);
-            rmProxyActiveObject = RMProxyActiveObject.createAOProxy(auth, schedulerProxyCredentials);
-
-            this.rmURI = rmURI;
+            synchronized (userProxiesMap) {
+                for (RMProxy userProxy : userProxiesMap.values()) {
+                    userProxy.rebind(rmURI);
+                }
+            }
+            schedulerRMProxy.rebind(rmURI);
         }
     }
 
     @Override
-    public UserRMProxy getUserRMProxy(String user, Credentials credentials) {
+    public RMProxy getUserRMProxy(String user, Credentials credentials) throws RMProxyCreationException {
         synchronized (userProxiesMap) {
-            UserRMProxy proxy = userProxiesMap.get(user);
+            RMProxy proxy = userProxiesMap.get(user);
             if (proxy == null) {
-                proxy = new UserRMProxy(this, credentials);
-                userProxiesMap.put(user, proxy);
+                try {
+                    proxy = new RMProxy(rmURI, credentials);
+                    userProxiesMap.put(user, proxy);
+                } catch (RMException e) {
+                    throw new RMProxyCreationException(e);
+                }
             }
             return proxy;
         }
     }
 
     @Override
-    public SchedulerRMProxy getSchedulerRMProxy() {
+    public RMProxy getRmProxy() {
         return schedulerRMProxy;
     }
 
     @Override
-    public void terminateUserRMProxy(String user) {
+    public void terminateRMProxy(String user) {
         synchronized (userProxiesMap) {
-            UserRMProxy proxy = userProxiesMap.remove(user);
+            RMProxy proxy = userProxiesMap.remove(user);
             if (proxy != null) {
                 proxy.terminate();
             }
@@ -85,34 +85,15 @@ public final class PerUserConnectionRMProxiesManager extends RMProxiesManager {
 
     @Override
     public void terminateAllProxies() {
+        schedulerRMProxy.terminate();
         synchronized (connectionStateLock) {
             synchronized (userProxiesMap) {
-                for (UserRMProxy userProxy : userProxiesMap.values()) {
+                for (RMProxy userProxy : userProxiesMap.values()) {
                     userProxy.terminate();
                 }
                 userProxiesMap.clear();
             }
-            if (rmProxyActiveObject != null) {
-                rmProxyActiveObject.terminateProxy();
-                rmProxyActiveObject = null;
-                currentRMConnection = null;
-            }
         }
-    }
 
-    @Override
-    synchronized Connection getCurrentRMConnection() {
-        return currentRMConnection;
     }
-
-    @Override
-    RMProxyActiveObject getSchedulerProxyActiveObjectForCurrentRM() {
-        synchronized (connectionStateLock) {
-            if (rmProxyActiveObject == null) {
-                throw new IllegalStateException("Not connected to the RM");
-            }
-            return rmProxyActiveObject;
-        }
-    }
-
 }

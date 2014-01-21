@@ -26,7 +26,7 @@ import org.ow2.proactive.scheduler.core.SchedulerClassServers;
 import org.ow2.proactive.scheduler.core.SchedulingInfrastructure;
 import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
 import org.ow2.proactive.scheduler.core.rmproxies.RMProxiesManager;
-import org.ow2.proactive.scheduler.core.rmproxies.UserRMProxy;
+import org.ow2.proactive.scheduler.core.rmproxies.RMProxy;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.utils.NodeSet;
 
@@ -93,7 +93,7 @@ public class MockSchedulingInfrastructure implements SchedulingInfrastructure {
             this.executorService = executorService;
         }
 
-        UserRMProxy userProxy = mock(UserRMProxy.class);
+        RMProxy userProxy = mock(RMProxy.class);
         doAnswer(new Answer<Void>() {
             @Override
             public Void answer(InvocationOnMock invocation) throws Throwable {

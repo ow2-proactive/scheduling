@@ -53,9 +53,8 @@ import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.core.rmproxies.PerUserConnectionRMProxiesManager;
 import org.ow2.proactive.scheduler.core.rmproxies.RMProxiesManager;
-import org.ow2.proactive.scheduler.core.rmproxies.SchedulerRMProxy;
+import org.ow2.proactive.scheduler.core.rmproxies.RMProxy;
 import org.ow2.proactive.scheduler.core.rmproxies.SingleConnectionRMProxiesManager;
-import org.ow2.proactive.scheduler.core.rmproxies.UserRMProxy;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
@@ -111,11 +110,11 @@ public class TestRMProxy extends FunctionalTest {
             proxiesManager = new PerUserConnectionRMProxiesManager(rmUri, schedulerProxyCredentials);
         }
 
-        UserRMProxy user1RMProxy = proxiesManager.getUserRMProxy("admin", user1Credentials);
+        RMProxy user1RMProxy = proxiesManager.getUserRMProxy("admin", user1Credentials);
         Assert.assertSame("Proxy manager should return cached proxy instance", user1RMProxy, proxiesManager
                 .getUserRMProxy("admin", user1Credentials));
 
-        UserRMProxy user2RMProxy = proxiesManager.getUserRMProxy("demo", user2Credentials);
+        RMProxy user2RMProxy = proxiesManager.getUserRMProxy("demo", user2Credentials);
         Assert.assertSame("Proxy manager should return cached proxy instance", user2RMProxy, proxiesManager
                 .getUserRMProxy("demo", user2Credentials));
 
@@ -142,12 +141,12 @@ public class TestRMProxy extends FunctionalTest {
         checkSchedulerProxy(proxiesManager);
 
         System.out.println("Terminate user proxy1");
-        proxiesManager.terminateUserRMProxy("admin");
+        proxiesManager.terminateRMProxy("admin");
         user1RMProxy = proxiesManager.getUserRMProxy("admin", user1Credentials);
         requestReleaseAllNodes(user1RMProxy, rm);
 
         System.out.println("Terminate user proxy2");
-        proxiesManager.terminateUserRMProxy("demo");
+        proxiesManager.terminateRMProxy("demo");
         user2RMProxy = proxiesManager.getUserRMProxy("demo", user2Credentials);
         requestReleaseAllNodes(user2RMProxy, rm);
 
@@ -155,7 +154,7 @@ public class TestRMProxy extends FunctionalTest {
         proxiesManager.terminateAllProxies();
     }
 
-    private void requestWithTwoUsers(UserRMProxy proxy1, UserRMProxy proxy2, ResourceManager rm)
+    private void requestWithTwoUsers(RMProxy proxy1, RMProxy proxy2, ResourceManager rm)
             throws Exception {
         System.out.println("Request nodes for two users");
 
@@ -177,12 +176,12 @@ public class TestRMProxy extends FunctionalTest {
     private void checkSchedulerProxy(RMProxiesManager proxiesManager) {
         System.out.println("Check scheduler proxy");
 
-        SchedulerRMProxy proxy = proxiesManager.getSchedulerRMProxy();
+        RMProxy proxy = proxiesManager.getRmProxy();
         Assert.assertEquals(proxy.getState().getFreeNodesNumber(), NODES_NUMBER);
         Assert.assertTrue(proxy.isActive().getBooleanValue());
     }
 
-    private void requestTooManyNodes(UserRMProxy proxy, ResourceManager rm) throws Exception {
+    private void requestTooManyNodes(RMProxy proxy, ResourceManager rm) throws Exception {
         System.out.println("Request more nodes than RM has");
 
         Criteria criteria = new Criteria(NODES_NUMBER + 1);
@@ -193,7 +192,7 @@ public class TestRMProxy extends FunctionalTest {
         Assert.assertEquals(NODES_NUMBER, rm.getState().getFreeNodesNumber());
     }
 
-    private void requestWithExtraNodes(UserRMProxy proxy, ResourceManager rm) throws Exception {
+    private void requestWithExtraNodes(RMProxy proxy, ResourceManager rm) throws Exception {
         System.out.println("Request NodeSet with extra nodes");
 
         TopologyDescriptor topology = TopologyDescriptor.SINGLE_HOST_EXCLUSIVE;
@@ -211,7 +210,7 @@ public class TestRMProxy extends FunctionalTest {
         Assert.assertEquals(NODES_NUMBER, rm.getState().getFreeNodesNumber());
     }
 
-    private void requestReleaseAllNodes(UserRMProxy proxy, ResourceManager rm) throws Exception {
+    private void requestReleaseAllNodes(RMProxy proxy, ResourceManager rm) throws Exception {
         System.out.println("Request and release all nodes");
 
         List<NodeSet> nodeSets = new ArrayList<NodeSet>();
@@ -229,7 +228,7 @@ public class TestRMProxy extends FunctionalTest {
         Assert.assertEquals(NODES_NUMBER, rm.getState().getFreeNodesNumber());
     }
 
-    private void requestReleaseOneNode(UserRMProxy proxy, ResourceManager rm) throws Exception {
+    private void requestReleaseOneNode(RMProxy proxy, ResourceManager rm) throws Exception {
         System.out.println("Request and release single node");
 
         NodeSet nodeSet = proxy.getNodes(new Criteria(1));
@@ -241,7 +240,7 @@ public class TestRMProxy extends FunctionalTest {
         Assert.assertEquals(NODES_NUMBER, rm.getState().getFreeNodesNumber());
     }
 
-    private void testSplitNodeSet(UserRMProxy proxy, ResourceManager rm) throws Exception {
+    private void testSplitNodeSet(RMProxy proxy, ResourceManager rm) throws Exception {
         System.out.println("Request as single NodeSet, release it as two NodeSets");
 
         NodeSet nodeSet = proxy.getNodes(new Criteria(3));

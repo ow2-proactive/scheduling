@@ -37,6 +37,7 @@
 package org.ow2.proactive.scheduler.core.rmproxies;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
@@ -46,7 +47,7 @@ import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
 /**
  * RMProxiesManager is in charge to manage objects communicating with RM.
- * It can contains either SchedulerRMProxy or UserRMProxy interface to RM.
+ * It can contains either RMProxy or RMProxy interface to RM.
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 2.2
@@ -81,7 +82,7 @@ public abstract class RMProxiesManager {
      * @return an instance of RMProxiesManager joined to the Resource Manager at the given URI
      */
     public static RMProxiesManager createRMProxiesManager(final URI rmURI) throws RMException,
-            RMProxyCreationException {
+            RMProxyCreationException, URISyntaxException {
         Credentials schedulerProxyCredentials;
         try {
             schedulerProxyCredentials = Credentials.getCredentials(PASchedulerProperties
@@ -124,7 +125,7 @@ public abstract class RMProxiesManager {
      *
      * @return the Scheduler RM proxy.
      */
-    public abstract SchedulerRMProxy getSchedulerRMProxy();
+    public abstract RMProxy getRmProxy();
 
     /**
      * Return the user RM proxy associated with the given owner.
@@ -132,7 +133,7 @@ public abstract class RMProxiesManager {
      *
      * @return the user RM proxy associated with the given owner.
      */
-    public abstract UserRMProxy getUserRMProxy(String user, Credentials credentials)
+    public abstract RMProxy getUserRMProxy(String user, Credentials credentials)
             throws RMProxyCreationException;
 
     /**
@@ -140,15 +141,8 @@ public abstract class RMProxiesManager {
      *
      * @param user the owner of the proxy to be terminated
      */
-    public abstract void terminateUserRMProxy(final String user);
+    public abstract void terminateRMProxy(final String user);
 
-    /**
-     * Terminate all proxies
-     */
     public abstract void terminateAllProxies();
-
-    abstract RMProxyActiveObject getSchedulerProxyActiveObjectForCurrentRM();
-
-    abstract Connection getCurrentRMConnection();
 
 }

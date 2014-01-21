@@ -204,8 +204,9 @@ public interface ResourceManager {
     public BooleanWrapper nodeIsAvailable(String nodeUrl);
 
     /**
-     * Returns true if the resource manager is operational.
+     * Returns true if the resource manager is operational and a client is connected.
      *
+     * Throws SecurityException if client is not connected.
      * @return true if the resource manager is operational, false otherwise
      */
     public BooleanWrapper isActive();
