@@ -13,7 +13,7 @@ log4j.appender.NODE.File=${proactive.home}/.logs/Node-${node.name}.log
 log4j.appender.NODE.MaxFileSize=10MB
 log4j.appender.NODE.MaxBackupIndex=10
 log4j.appender.NODE.layout=org.apache.log4j.PatternLayout
-log4j.appender.NODE.layout.ConversionPattern=[%d{ISO8601} %-5p] [NODE.%C{1}.%M] %m%n
+log4j.appender.NODE.layout.ConversionPattern=[%d{ISO8601} %-5p] [%X{task.id}] [NODE.%C{1}.%M] %m%n
 
 # CONSOLE appender
 log4j.appender.CONSOLE=org.apache.log4j.ConsoleAppender
