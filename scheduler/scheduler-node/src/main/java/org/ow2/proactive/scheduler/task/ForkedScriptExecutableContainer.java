@@ -66,7 +66,7 @@ public class ForkedScriptExecutableContainer extends ForkedJavaExecutableContain
     private TaskScript script;
 
     public ForkedScriptExecutableContainer(TaskScript script) {
-        super(ForkedJavaExecutable.class.getName(), Collections.<String, byte[]> emptyMap());
+        super(JavaExecutableForker.class.getName(), Collections.<String, byte[]> emptyMap());
         this.script = script;
     }
 
@@ -77,7 +77,7 @@ public class ForkedScriptExecutableContainer extends ForkedJavaExecutableContain
      */
     public ForkedScriptExecutableContainer(ForkedScriptExecutableContainer cont)
             throws ExecutableCreationException {
-        super(ForkedJavaExecutable.class.getName(), Collections.<String, byte[]> emptyMap());
+        super(JavaExecutableForker.class.getName(), Collections.<String, byte[]> emptyMap());
         try {
             this.script = new TaskScript(cont.getScript());
         } catch (InvalidScriptException e) {

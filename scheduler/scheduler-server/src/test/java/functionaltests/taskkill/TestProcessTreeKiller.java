@@ -175,7 +175,7 @@ public class TestProcessTreeKiller extends SchedulerConsecutive {
 
             //kill the third job
             SchedulerTHelper
-                    .log("************** Waiting for the third job (ForkedJavaExecutable) to be killed *************");
+                    .log("************** Waiting for the third job (JavaExecutableForker) to be killed *************");
             SchedulerTHelper.getSchedulerInterface().killJob(id3);
             SchedulerTHelper.waitForEventJobFinished(id3);
             SchedulerTHelper.log("************** Third job killed *************");
@@ -258,7 +258,7 @@ public class TestProcessTreeKiller extends SchedulerConsecutive {
             assertEquals(detachedProcNumber, runningDetachedProcNumber);
 
             SchedulerTHelper
-                    .log("************** Waiting for third job (ForkedJavaExecutable) to finish *************");
+                    .log("************** Waiting for third job (JavaExecutableForker) to finish *************");
             //wait for the last job to finish normally
             // SchedulerTHelper.getSchedulerInterface().killJob(id3);
             SchedulerTHelper.waitForEventJobFinished(id3);

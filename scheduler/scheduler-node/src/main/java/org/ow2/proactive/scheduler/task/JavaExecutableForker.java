@@ -36,6 +36,8 @@
  */
 package org.ow2.proactive.scheduler.task;
 
+import static org.ow2.proactive.scheduler.common.util.VariablesUtil.filterAndUpdate;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -48,7 +50,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
+import java.util.concurrent.Callable;
 
+import org.apache.log4j.Appender;
+import org.apache.log4j.AppenderSkeleton;
+import org.apache.log4j.Logger;
+import org.apache.log4j.spi.LoggingEvent;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.ProActiveException;
@@ -75,9 +82,11 @@ import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
+import org.ow2.proactive.scheduler.exception.ForkedJVMProcessException;
+import org.ow2.proactive.scheduler.exception.ProgressPingerException;
 import org.ow2.proactive.scheduler.exception.StartForkedProcessException;
 import org.ow2.proactive.scheduler.task.launcher.InternalForkEnvironment;
-import org.ow2.proactive.scheduler.task.launcher.JavaTaskLauncher;
+import org.ow2.proactive.scheduler.task.launcher.JavaTaskLauncherForked;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncherInitializer;
 import org.ow2.proactive.scheduler.task.launcher.utils.ForkerUtils;
@@ -87,12 +96,6 @@ import org.ow2.proactive.scripting.ScriptHandler;
 import org.ow2.proactive.scripting.ScriptLoader;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.utils.FileToBytesConverter;
-import org.apache.log4j.Appender;
-import org.apache.log4j.AppenderSkeleton;
-import org.apache.log4j.Logger;
-import org.apache.log4j.spi.LoggingEvent;
-
-import static org.ow2.proactive.scheduler.common.util.VariablesUtil.filterAndUpdate;
 
 /**
  * This Executable is responsible for executing another executable in a separate JVM. 
@@ -101,9 +104,9 @@ import static org.ow2.proactive.scheduler.common.util.VariablesUtil.filterAndUpd
  * @author The ProActive Team
  *
  */
-public class ForkedJavaExecutable extends JavaExecutable implements ForkerStarterCallback {
+public class JavaExecutableForker extends JavaExecutable implements ForkerStarterCallback {
 
-    public static final Logger logger = Logger.getLogger(ForkedJavaExecutable.class);
+    public static final Logger logger = Logger.getLogger(JavaExecutableForker.class);
 
     /** Fork environment script binding name */
     public static final String FORKENV_BINDING_NAME = "forkEnvironment";
@@ -126,8 +129,6 @@ public class ForkedJavaExecutable extends JavaExecutable implements ForkerStarte
     /** Forked execution time out checking interval */
     private static final int TIMEOUT = 1000;
 
-    /** Java task launcher reference kept to activate logs on it if necessary */
-    private JavaTaskLauncher newJavaTaskLauncher;
 
     /** Thread for listening out/err of the forked JVM */
     private transient Thread tsout, tserr;
@@ -141,9 +142,14 @@ public class ForkedJavaExecutable extends JavaExecutable implements ForkerStarte
     private Process process = null;
     private Node forkedNode = null;
     private Boolean processStarted = false;
+
+    protected LauncherGuard launcherGuard = new LauncherGuard();
+
+    final private TaskLauncher taskLauncherStub;
     
     /** Hibernate default constructor */
-    public ForkedJavaExecutable() {
+    public JavaExecutableForker(TaskLauncher launcherStub) {
+        this.taskLauncherStub = launcherStub;
     }
 
     /**
@@ -166,6 +172,9 @@ public class ForkedJavaExecutable extends JavaExecutable implements ForkerStarte
     @Override
     public Serializable execute(TaskResult... results) throws Throwable {
         try {
+
+            launcherGuard.setNode(PAActiveObject.getNode());
+
             // building command for executing java and start process
             OSProcessBuilder ospb = createProcessAndPrepareCommand();
             process = startProcess(ospb);
@@ -174,24 +183,24 @@ public class ForkedJavaExecutable extends JavaExecutable implements ForkerStarte
 
             //create task launcher on new JVM node
             logger.debug("Create remote task launcher");
-            newJavaTaskLauncher = createForkedTaskLauncher();
+
+            launcherGuard.initialize(createForkedTaskLauncher());
 
             // redirect tasks logs to local stdout/err
-            newJavaTaskLauncher.activateLogs(new StdAppenderProvider());
+            launcherGuard.use().activateLogs(new StdAppenderProvider());
 
             execInitializer.getJavaExecutableContainer().setNodes(execInitializer.getNodes());
             //do task must not pass schedulerCore object,
             //the deployed java task must not notify the core from termination
             //the forked java task launcher will do that in place
             logger.debug("Starting java task");
-            newJavaTaskLauncher.configureNode();
-            TaskResult result = newJavaTaskLauncher.doTaskAndGetResult(null, execInitializer
-                    .getJavaExecutableContainer(), results);
+            launcherGuard.configureNode();
+            TaskResult result = launcherGuard.doTaskAndGetResult(results);
 
             //waiting for task result futur
             //as it is forked, wait until futur has arrive or someone kill the task (core OR tasktimer)
             logger.debug("Java task started, waiting for result or kill...");
-            while (!isKilled()) {
+            while (!launcherGuard.wasKilled()) {
                 try {
                     /* the below method throws an exception if timeout expires */
                     PAFuture.waitFor(result, TIMEOUT);
@@ -208,26 +217,12 @@ public class ForkedJavaExecutable extends JavaExecutable implements ForkerStarte
                 //process not terminated
             }
 
-            if (!isKilled()) {
-                // if killed, the dataspace clean has been performed while calling kill()
-                try {
-                    newJavaTaskLauncher.killChildrenProcesses();
-                } catch (Throwable e) {
-                    logger.warn("Unable to kill children processes of remote task launcher.", e);
-                }
-                try {
-                    newJavaTaskLauncher.closeNodeConfiguration();
-                } catch (Throwable e) {
-                    logger.warn("Unable to close dataspaces while terminating forked JVM.", e);
-                }
-            } else {
-                logger.debug("Task has been killed");
-                FutureMonitoring.removeFuture(((FutureProxy) ((StubObject) result).getProxy()));
+            if (launcherGuard.wasKilled()) {
                 throw new WalltimeExceededException("Task killed or walltime exceeded");
             }
-            return result;
+            return PAFuture.getFutureValue(result);
         } finally {
-            clean();
+            launcherGuard.clean(TaskLauncher.CLEAN_TIMEOUT);
         }
     }
 
@@ -277,14 +272,14 @@ public class ForkedJavaExecutable extends JavaExecutable implements ForkerStarte
      * @return the created OS process builder
      * @throws Exception if a problem occurs while creating the process
      */
-    private OSProcessBuilder createProcessAndPrepareCommand() throws Exception {
+    private OSProcessBuilder createProcessAndPrepareCommand() throws Throwable {
         logger.debug("Preparing new java process");
         //create process builder
         OSProcessBuilder ospb = createProcess();
         //update fork env with forked system env
         createInternalForkEnvironment(ospb);
         //execute environment script
-        executeEnvScript(ospb);
+        launcherGuard.executeEnvScript(ospb);
         //create command and set it to process builder
         List<String> command = createJavaCommand();
         addJVMArguments(command);
@@ -373,11 +368,7 @@ public class ForkedJavaExecutable extends JavaExecutable implements ForkerStarte
      * Return the progress value of the executable that runs in the forked JVM.
      */
     public int getProgress() {
-        if (this.newJavaTaskLauncher == null) {
-            return 0;
-        } else {
-            return this.newJavaTaskLauncher.getProgress();
-        }
+        return launcherGuard.getProgress();
     }
 
     /**
@@ -573,7 +564,7 @@ public class ForkedJavaExecutable extends JavaExecutable implements ForkerStarte
      */
     private void addRuntime(List<String> command) throws ProActiveException {
         command.add(ForkerStarter.class.getName());
-        String url = PAActiveObject.registerByName(PAActiveObject.getStubOnThis(), forkedNodeName, "pnp");
+        String url = PAActiveObject.registerByName(taskLauncherStub, forkedNodeName, "pnp");
         command.add(url);
         command.add(forkedNodeName);
     }
@@ -746,42 +737,17 @@ public class ForkedJavaExecutable extends JavaExecutable implements ForkerStarte
      * @return the created java task launcher
      * @throws Exception
      */
-    private JavaTaskLauncher createForkedTaskLauncher() throws Exception {
+    private JavaTaskLauncherForked createForkedTaskLauncher() throws Exception {
         /* JavaTaskLauncher will be an active object created on a newly created ProActive node */
         logger.info("Create java task launcher");
         TaskLauncherInitializer tli = execInitializer.getJavaTaskLauncherInitializer();
-        // for the forked java task precious log is is handled by the ForkedJavaTaskLauncher
+        // for the forked java task precious log is is handled by the JavaTaskLauncherForker
         tli.setPreciousLogs(false);
-        JavaTaskLauncher newLauncher = (JavaTaskLauncher) PAActiveObject.newActive(JavaTaskLauncher.class
+        JavaTaskLauncherForked newLauncher = (JavaTaskLauncherForked) PAActiveObject.newActive(JavaTaskLauncherForked.class
                 .getName(), new Object[] { tli }, forkedNode);
         return newLauncher;
     }
 
-    /**
-     * Cleaning method kills all nodes on the dedicated JVM, destroys java process, and closes threads responsible for process output
-     */
-    private void clean() {
-        try {
-            logger.info("Cleaning forked java executable");
-            //if tmp file have been set, destroy it.
-            if (fpolicy != null) {
-                fpolicy.delete();
-            }
-            if (flog4j != null) {
-                flog4j.delete();
-            }
-            if (fpaconfig != null) {
-                fpaconfig.delete();
-            }
-            if (process != null) {
-                process.destroy();
-                process = null;
-            }
-            terminateStreamReaders();
-        } catch (Exception e) {
-            logger.error("", e);
-        }
-    }
 
     /**
      * Create temp file in java.io.tmpdir if SCRATCHDIR is not set, 
@@ -818,17 +784,11 @@ public class ForkedJavaExecutable extends JavaExecutable implements ForkerStarte
     @Override
     public void kill() {
 
-        // close dataspaces before killing
-        // so that we try to clean sctatch dir
-        if (newJavaTaskLauncher != null) {
-            // we call the killing process on the forked jvm, this will kill as well its children processes
-            // we do that before closing the node configuration to avoir handles kept by subprocesses
-            try {
-                newJavaTaskLauncher.killForkedJavaTaskLauncher();
-            } catch (Throwable e) {
-                logger.debug("Exception when killing Forked Java Task Launcher, this may be normal.", e);
-            }
-        }
+        // send a kill message to the forked jvm
+        launcherGuard.kill();
+
+        launcherGuard.clean(TaskLauncher.CLEAN_TIMEOUT);
+
         // set the task status to killed
         super.kill();
     }
@@ -870,6 +830,113 @@ public class ForkedJavaExecutable extends JavaExecutable implements ForkerStarte
 
                 }
             };
+        }
+    }
+
+
+    protected class LauncherGuard extends Guard<JavaTaskLauncherForked> {
+
+        TaskResult result;
+
+        int lastProgress = 0;
+
+        String forkedJVMDataspace;
+
+
+        public TaskResult doTaskAndGetResult(TaskResult... results) {
+            // asynchronous ProActive call
+            result = launcherGuard.use().doTaskAndGetResult(null, execInitializer
+                    .getJavaExecutableContainer(), results);
+            return result;
+
+        }
+
+        public synchronized void configureNode() {
+            forkedJVMDataspace = launcherGuard.use().configureNode();
+        }
+
+        private void executeEnvScript(final OSProcessBuilder ospb) throws Throwable {
+            submitACallable(new Callable<Boolean>() {
+
+                @Override
+                public Boolean call() throws Exception {
+                    try {
+                        JavaExecutableForker.this.executeEnvScript(ospb);
+                        return true;
+                    } catch (Throwable throwable) {
+                        throw new ToUnwrapException(throwable);
+                    }
+                }
+            }, false);
+            waitCallable();
+        }
+
+        @Override
+        public void internalKill() {
+            if (targetInitialized) {
+                try {
+                    target.killForkedJavaTaskLauncher();
+                } catch (Throwable e) {
+                    logger.debug("Exception when killing Forked Java Task Launcher, this may be normal.", e);
+                }
+            }
+
+            // if the result is being waited inside the main loop
+            if (result != null) {
+                FutureMonitoring.removeFuture(((FutureProxy) ((StubObject) result).getProxy()));
+            }
+        }
+
+        @Override
+        protected void internalClean() {
+            try {
+                logger.info("Cleaning forked java executable");
+                if (!killMessageReceived && targetInitialized) {
+                    // killing remote processes
+                    try {
+                        target.cleanForkedJavaTaskLauncher();
+                    } catch (Throwable e) {
+                        logger.warn("Exception when Cleaning Forked Java Task Launcher.", e);
+                    }
+                }
+
+                //if tmp file have been set, destroy it.
+                if (fpolicy != null) {
+                    fpolicy.delete();
+                }
+                if (flog4j != null) {
+                    flog4j.delete();
+                }
+                if (fpaconfig != null) {
+                    fpaconfig.delete();
+                }
+                if (process != null) {
+                    process.destroy();
+                }
+                terminateStreamReaders();
+            } catch (Exception e) {
+                logger.error("", e);
+            }
+        }
+
+
+        public synchronized int getProgress() {
+            if (this.state == GuardState.NOT_INITIALIZED) {
+                return 0;
+            } else if (this.state == GuardState.KILLED || this.state == GuardState.CLEANED) {
+                return lastProgress;
+            } else {
+                try {
+                    lastProgress = this.target.getProgress();
+                    return lastProgress;
+                } catch (ProgressPingerException e) {
+                    // in that case it is an exception produced by the getProgress method
+                    throw e;
+                } catch (Throwable e) {
+                    // in that case it is another kind of exception most likely related to communication
+                    throw new ForkedJVMProcessException("Forked JVM seems to be dead", e);
+                }
+            }
         }
     }
 }

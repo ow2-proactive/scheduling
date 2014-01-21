@@ -38,6 +38,7 @@ package org.ow2.proactive.scheduler.task.launcher;
 
 import java.io.Serializable;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
@@ -45,7 +46,6 @@ import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.ScriptExecutableInitializer;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
-import org.apache.log4j.Logger;
 
 
 /**
@@ -100,70 +100,65 @@ public class ScriptTaskLauncher extends TaskLauncher {
         TaskResultImpl res;
         try {
             //init dataspace
-            initDataSpaces();
+            executableGuard.initDataSpaces();
             replaceTagsInDataspaces();
-            
+
             updatePropagatedVariables(results);
+
+            // create the executable (will set the context class loader to the taskclassserver)
+            executableGuard.initialize(executableContainer.getExecutable());
 
             sample = System.nanoTime();
             //copy datas from OUTPUT or INPUT to local scratch
-            copyInputDataToScratch();
+            executableGuard.copyInputDataToScratch();
             intervalms = Math.round(Math.ceil((System.nanoTime() - sample) / 1000));
             logger.info("Time spent copying INPUT datas to SCRATCH : " + intervalms + " ms");
 
-            if (!hasBeenKilled) {
-                // set exported vars
-                this.setPropagatedProperties(results);
-
-                // create the executable (will set the context class loader to the taskclassserver)
-                currentExecutable = executableContainer.getExecutable();
-            }
+            // set exported vars
+            this.setPropagatedProperties(results);
 
             //launch pre script
-            if (!hasBeenKilled && pre != null) {
+            if (pre != null) {
                 sample = System.nanoTime();
-                this.executePreScript();
+                executableGuard.executePreScript();
                 duration += System.nanoTime() - sample;
             }
 
-            if (!hasBeenKilled) {
-                //init task
-                ScriptExecutableInitializer initializer = (ScriptExecutableInitializer) executableContainer
-                        .createExecutableInitializer();
+            //init task
+            ScriptExecutableInitializer initializer = (ScriptExecutableInitializer) executableContainer
+                    .createExecutableInitializer();
 
-                sample = System.nanoTime();
-                try {
-                    userResult = currentExecutable.execute(results);
-                    this.flushStreams();
+            sample = System.nanoTime();
+            try {
+                userResult = executableGuard.execute(results);
+                this.flushStreams();
 
-                } catch (Throwable t) {
-                    exception = t;
-                }
-                duration += System.nanoTime() - sample;
+            } catch (Throwable t) {
+                exception = t;
             }
+            duration += System.nanoTime() - sample;
 
             //for the next two steps, task could be killed anywhere
 
-            if (!hasBeenKilled && post != null) {
+            if (post != null) {
                 sample = System.nanoTime();
                 //launch post script
-                this.executePostScript(exception == null);
+                executableGuard.executePostScript(exception == null);
                 duration += System.nanoTime() - sample;
             }
 
-            if (!hasBeenKilled) {
-                sample = System.nanoTime();
-                //copy output file
-                copyScratchDataToOutput();
-                intervalms = Math.round(Math.ceil((System.nanoTime() - sample) / 1000));
-                logger.info("Time spent copying SCRATCH datas to OUTPUT : " + intervalms + " ms");
-            }
+            sample = System.nanoTime();
+            //copy output file
+            executableGuard.copyScratchDataToOutput();
+            intervalms = Math.round(Math.ceil((System.nanoTime() - sample) / 1000));
+            logger.info("Time spent copying SCRATCH datas to OUTPUT : " + intervalms + " ms");
+            logger.info("Task terminated without error");
         } catch (Throwable ex) {
-            logger.debug("Exception occured while running task " + this.taskId + ": ", ex);
+            logger.info("Exception occured while running task " + this.taskId + ": ", ex);
             exception = ex;
             userResult = null;
         } finally {
-            if (!hasBeenKilled) {
+            if (!executableGuard.wasKilled()) {
                 // set the result
                 if (exception != null) {
                     res = new TaskResultImpl(taskId, exception, null, duration / 1000000, null);
@@ -186,17 +181,11 @@ public class ScriptTaskLauncher extends TaskLauncher {
                 }
                 res.setPropagatedProperties(retreivePropagatedProperties());
                 attachPropagatedVariables(res);
-                res.setLogs(this.getLogs());
             } else {
-                res = null;
+                res = new TaskResultImpl(taskId, new RuntimeException("Task " + taskId + " has been killed"), null, duration / 1000000, null);
             }
+            res.setLogs(this.getLogs());
 
-            // kill all children processes
-
-            killChildrenProcesses();
-
-            // finalize doTask
-            terminateDataSpace();
             // This call is conditioned by the isKilled ...
             // An example when we don't want to finalize task is when using
             // forked java task, then only finalizing loggers is enough.

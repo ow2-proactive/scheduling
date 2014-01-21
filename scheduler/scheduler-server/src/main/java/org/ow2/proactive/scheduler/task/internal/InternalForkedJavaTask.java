@@ -50,7 +50,7 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.ForkedJavaExecutableContainer;
-import org.ow2.proactive.scheduler.task.launcher.ForkedJavaTaskLauncher;
+import org.ow2.proactive.scheduler.task.launcher.JavaTaskLauncherForker;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncherInitializer;
 
@@ -102,7 +102,7 @@ public class InternalForkedJavaTask extends InternalJavaTask {
         tli.setLog4JContent(getLog4J());
         tli.setPaConfigContent(getPAConfiguration());
         logger.info("Create forked java task launcher");
-        TaskLauncher launcher = (TaskLauncher) PAActiveObject.newActive(ForkedJavaTaskLauncher.class
+        TaskLauncher launcher = (TaskLauncher) PAActiveObject.newActive(JavaTaskLauncherForker.class
                 .getName(), new Object[] { tli }, node);
         setExecuterInformations(new ExecuterInformations(launcher, node));
 

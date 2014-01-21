@@ -163,6 +163,17 @@ public class SchedulerTHelper {
      * Start the scheduler using a forked JVM and
      * deploys, with its associated Resource manager, 5 local ProActive nodes.
      *
+     * @throws Exception if an error occurs.
+     */
+    public static void startScheduler() throws Exception {
+        startScheduler(true, null);
+    }
+
+
+    /**
+     * Start the scheduler using a forked JVM and
+     * deploys, with its associated Resource manager, 5 local ProActive nodes.
+     *
      * @param configuration the Scheduler configuration file to use (default is functionalTSchedulerProperties.ini)
      * 			null to use the default one.
      * @throws Exception if an error occurs.
@@ -531,6 +542,18 @@ public class SchedulerTHelper {
         }
         return userInt.submit(jobToSubmit);
     }
+
+    /**
+     * Kills a job
+     * @param jobId
+     * @return success or failure at killing the job
+     * @throws Exception
+     */
+    public static boolean killJob(String jobId) throws Exception {
+        Scheduler userInt = getSchedulerInterface();
+        return userInt.killJob(jobId);
+    }
+
 
     /**
      * Remove a job from Scheduler database.

@@ -134,6 +134,9 @@ public class NativeTaskLauncher extends TaskLauncher {
     @Override
     public void doTask(TaskTerminateNotification core, ExecutableContainer executableContainer,
             TaskResult... results) {
+
+        logger.debug("Starting Task " + taskId.getReadableName());
+
         long duration = -1;
         long sample = 0;
         long intervalms = 0;
@@ -145,121 +148,116 @@ public class NativeTaskLauncher extends TaskLauncher {
         try {
             initProActiveHome();
             //init dataspace
-            initDataSpaces();
+            executableGuard.initDataSpaces();
             replaceTagsInDataspaces();
 
             updatePropagatedVariables(results);
 
+            //get Executable before schedule timer
+            executableGuard.initialize(executableContainer.getExecutable());
+
             sample = System.nanoTime();
             //copy datas from OUTPUT or INPUT to local scratch
-            copyInputDataToScratch();
+            executableGuard.copyInputDataToScratch();
             intervalms = Math.round(Math.ceil((System.nanoTime() - sample) / 1000));
             logger.info("Time spent copying INPUT datas to SCRATCH : " + intervalms + " ms");
 
-            if (!hasBeenKilled) {
-                // set exported vars
-                this.setPropagatedProperties(results);
+            // set exported vars
+            this.setPropagatedProperties(results);
 
-                //get Executable before schedule timer
-                currentExecutable = executableContainer.getExecutable();
-                //start walltime if needed
-                if (isWallTime()) {
-                    scheduleTimer();
-                }
+            //start walltime if needed
+            if (isWallTime()) {
+                scheduleTimer();
             }
 
             //execute pre-script
-            if (!hasBeenKilled && pre != null) {
+            if (pre != null) {
                 sample = System.nanoTime();
-                this.executePreScript();
+                executableGuard.executePreScript();
                 duration = System.nanoTime() - sample;
             }
 
-            if (!hasBeenKilled) {
-                //init task
-                ExecutableInitializer execInit = executableContainer.createExecutableInitializer();
-                replaceWorkingDirIfNecessary(execInit);
-                replaceWorkingDirPathsTags(execInit);
-                replaceWorkingDirDSAllTags(execInit);
-                GenerationScript generationScript = ((NativeExecutableInitializer) execInit)
-                        .getGenerationScript();
-                if (generationScript != null) {
-                    replaceTagsInScript(generationScript);
-                    // replace script variables with updated values
-                    filterAndUpdate(generationScript, getPropagatedVariables());
-                }
-
-                //decrypt credentials if needed
-                if (executableContainer.isRunAsUser()) {
-                    decrypter.setCredentials(executableContainer.getCredentials());
-                    execInit.setDecrypter(decrypter);
-                }
-                // if an exception occurs in init method, unwrapp the InvocationTargetException
-                // the result of the execution is the user level exception
-                try {
-                    callInternalInit(NativeExecutable.class, NativeExecutableInitializer.class, execInit);
-                } catch (InvocationTargetException e) {
-                    throw e.getCause() != null ? e.getCause() : e;
-                }
-
-                replaceIterationTags(execInit);
-                // replace the JAVA tags in command
-                replaceCommandPathsTags(execInit);
-                //replace dataspace tags in command (if needed) by local scratch directory
-                replaceCommandDSTags();
-                // pass the nodesfile as parameter if needed...
-                replaceCommandNodesInfosTags();
-
-                addsDataSpaceEnvVar();
-
-                // The JAVA env variable
-                ((NativeExecutable) currentExecutable).addToEnvironmentVariables(JAVA_CMD_VAR, JAVA_CMD);
-                ((NativeExecutable) currentExecutable).addToEnvironmentVariables(JAVA_HOME_VAR, System
-                        .getProperty("java.home"));
-                ((NativeExecutable) currentExecutable).addToEnvironmentVariables(PROACTIVE_HOME_VAR,
-                        PROACTIVE_HOME);
-
-                this.setPropagatedVariablesAsEnvironmentVariables(
-                        getPropagatedVariables(),
-                        (NativeExecutable) currentExecutable);
-
-                sample = System.nanoTime();
-                try {
-                    //launch task
-                    logger.debug("Starting execution of task '" + taskId + "'");
-                    userResult = currentExecutable.execute(results);
-                } catch (Throwable t) {
-                    exception = t;
-                }
-                duration += System.nanoTime() - sample;
-
+            //init task
+            ExecutableInitializer execInit = executableContainer.createExecutableInitializer();
+            replaceWorkingDirIfNecessary(execInit);
+            replaceWorkingDirPathsTags(execInit);
+            replaceWorkingDirDSAllTags(execInit);
+            GenerationScript generationScript = ((NativeExecutableInitializer) execInit)
+                    .getGenerationScript();
+            if (generationScript != null) {
+                replaceTagsInScript(generationScript);
+                // replace script variables with updated values
+                filterAndUpdate(generationScript, getPropagatedVariables());
             }
 
+            //decrypt credentials if needed
+            if (executableContainer.isRunAsUser()) {
+                decrypter.setCredentials(executableContainer.getCredentials());
+                execInit.setDecrypter(decrypter);
+            }
+            // if an exception occurs in init method, unwrapp the InvocationTargetException
+            // the result of the execution is the user level exception
+            try {
+                callInternalInit(NativeExecutable.class, NativeExecutableInitializer.class, execInit);
+            } catch (InvocationTargetException e) {
+                throw e.getCause() != null ? e.getCause() : e;
+            }
+
+            replaceIterationTags(execInit);
+            // replace the JAVA tags in command
+            replaceCommandPathsTags(execInit);
+            //replace dataspace tags in command (if needed) by local scratch directory
+            replaceCommandDSTags();
+            // pass the nodesfile as parameter if needed...
+            replaceCommandNodesInfosTags();
+
+            addsDataSpaceEnvVar();
+
+            // The JAVA env variable
+            ((NativeExecutable) executableGuard.use()).addToEnvironmentVariables(JAVA_CMD_VAR, JAVA_CMD);
+            ((NativeExecutable) executableGuard.use()).addToEnvironmentVariables(JAVA_HOME_VAR, System
+                    .getProperty("java.home"));
+            ((NativeExecutable) executableGuard.use()).addToEnvironmentVariables(PROACTIVE_HOME_VAR,
+                    PROACTIVE_HOME);
+
+            this.setPropagatedVariablesAsEnvironmentVariables(
+                    getPropagatedVariables(),
+                    (NativeExecutable) executableGuard.use());
+
+            sample = System.nanoTime();
+            try {
+                //launch task
+                logger.debug("Starting execution of task '" + taskId + "'");
+                userResult = executableGuard.execute(results);
+            } catch (Throwable t) {
+                exception = t;
+            }
+            duration += System.nanoTime() - sample;
+
             //for the next two steps, task could be killed anywhere
-            if (!hasBeenKilled && post != null) {
+            if (post != null) {
                 sample = System.nanoTime();
                 int retCode = -1;//< 0 means exception in the command itself (ie. command not found)
                 if (userResult != null) {
                     retCode = Integer.parseInt(userResult.toString());
                 }
                 //launch post script
-                this.executePostScript(retCode == 0 && exception == null);
+                executableGuard.executePostScript(retCode == 0 && exception == null);
                 duration += System.nanoTime() - sample;
             }
 
-            if (!hasBeenKilled) {
-                sample = System.nanoTime();
-                //copy output file
-                copyScratchDataToOutput();
-                intervalms = Math.round(Math.ceil((System.nanoTime() - sample) / 1000));
-                logger.info("Time spent copying SCRATCH data to OUTPUT : " + intervalms + " ms");
-            }
+            sample = System.nanoTime();
+            //copy output file
+            executableGuard.copyScratchDataToOutput();
+            intervalms = Math.round(Math.ceil((System.nanoTime() - sample) / 1000));
+            logger.info("Time spent copying SCRATCH data to OUTPUT : " + intervalms + " ms");
+            logger.info("Task terminated without error");
         } catch (Throwable ex) {
             logger.debug("Exception occured while running task " + this.taskId + ": ", ex);
             exception = ex;
             userResult = null;
         } finally {
-            if (!hasBeenKilled) {
+            if (!executableGuard.wasKilled()) {
                 // set the result
                 if (exception != null) {
                     res = new TaskResultImpl(taskId, exception, null, duration / 1000000, null);
@@ -281,20 +279,11 @@ public class NativeTaskLauncher extends TaskLauncher {
                     res.setAction(FlowAction.getDefaultAction(this.flow));
                 }
                 res.setPropagatedProperties(retreivePropagatedProperties());
-                res.setLogs(this.getLogs());
             } else {
-                res = null;
+                res = new TaskResultImpl(taskId, new RuntimeException("Task " + taskId + " has been killed"), null, duration / 1000000, null);
             }
 
-            // kill all children processes
-
-            killChildrenProcesses();
-
-            // finalize task in any cases (killed or not)
-            terminateDataSpace();
-            if (isWallTime()) {
-                cancelTimer();
-            }
+            res.setLogs(this.getLogs());
             this.finalizeTask(core, res);
         }
     }
@@ -342,9 +331,9 @@ public class NativeTaskLauncher extends TaskLauncher {
     private void addDataSpaceEnvVar(DataSpacesFileObject fo, String varName) throws URISyntaxException, DataSpacesException {
         if (fo != null) {
             String foUri = convertDataSpaceToFileIfPossible(fo, false);
-            ((NativeExecutable) currentExecutable).addToEnvironmentVariables(varName, foUri);
+            ((NativeExecutable) executableGuard.use()).addToEnvironmentVariables(varName, foUri);
         }
-    }
+    }    
 
     private void replaceWorkingDirIfNecessary(ExecutableInitializer execInit) throws Exception {
         if (((NativeExecutableInitializer) execInit).getWorkingDir() == null) {
@@ -395,7 +384,7 @@ public class NativeTaskLauncher extends TaskLauncher {
     }
 
     private void replaceCommandDSTags() throws Exception {
-        String[] cmdElements = ((NativeExecutable) currentExecutable).getCommand();
+        String[] cmdElements = ((NativeExecutable) executableGuard.use()).getCommand();
 
         for (int i = 0; i < cmdElements.length; i++) {
             cmdElements[i] = replaceCommandDSTag(cmdElements[i], SCRATCH_DATASPACE_TAG, SCRATCH);
@@ -424,7 +413,7 @@ public class NativeTaskLauncher extends TaskLauncher {
     }
 
     private void replaceCommandPathsTags(ExecutableInitializer execInit) throws Exception {
-        String[] cmdElements = ((NativeExecutable) currentExecutable).getCommand();
+        String[] cmdElements = ((NativeExecutable) executableGuard.use()).getCommand();
 
         for (int i = 0; i < cmdElements.length; i++) {
             cmdElements[i] = cmdElements[i].replace(JAVA_HOME_TAG, System.getProperty("java.home"));
@@ -435,7 +424,7 @@ public class NativeTaskLauncher extends TaskLauncher {
 
     // SCHEDULING-988 : only way to pass nodes to a runAsMe mutlinodes native task.
     private void replaceCommandNodesInfosTags() throws Exception {
-        NativeExecutable ne = ((NativeExecutable) currentExecutable);
+        NativeExecutable ne = ((NativeExecutable) executableGuard.use());
         String[] cmdElements = ne.getCommand();
 
         // check if this replacement is actually needed
@@ -472,7 +461,7 @@ public class NativeTaskLauncher extends TaskLauncher {
      * @param init the executable initializer containing the native command
      */
     protected void replaceIterationTags(ExecutableInitializer init) {
-        NativeExecutable ne = (NativeExecutable) currentExecutable;
+        NativeExecutable ne = (NativeExecutable) executableGuard.use();
         String[] cmd = ne.getCommand();
         if (cmd != null) {
             for (int i = 0; i < cmd.length; i++) {

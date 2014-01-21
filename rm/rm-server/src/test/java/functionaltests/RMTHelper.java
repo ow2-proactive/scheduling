@@ -466,9 +466,9 @@ public class RMTHelper {
      * Returns the alive Nodes accessible by the RM
      * @return list of ProActive Nodes
      */
-    public List<Node> listAliveNodes() throws NodeException {
+    public List<Node> listAliveNodes() throws Exception {
         ArrayList<Node> nodes = new ArrayList<Node>();
-        Set<String> urls = resourceManager.listAliveNodeUrls();
+        Set<String> urls = getResourceManager().listAliveNodeUrls();
         for (String url : urls) {
             nodes.add(NodeFactory.getNode(url));
         }
@@ -480,9 +480,9 @@ public class RMTHelper {
      * @param  nodeSourceNames
      * @return list of ProActive Nodes
      */
-    public List<Node> listAliveNodes(Set<String> nodeSourceNames) throws NodeException {
+    public List<Node> listAliveNodes(Set<String> nodeSourceNames) throws Exception {
         ArrayList<Node> nodes = new ArrayList<Node>();
-        Set<String> urls = resourceManager.listAliveNodeUrls(nodeSourceNames);
+        Set<String> urls = getResourceManager().listAliveNodeUrls(nodeSourceNames);
         for (String url : urls) {
             nodes.add(NodeFactory.getNode(url));
         }
@@ -493,8 +493,8 @@ public class RMTHelper {
      * Returns the list of alive  Nodes
      * @return list of ProActive Nodes urls
      */
-    public Set<String> listAliveNodesUrls() throws NodeException {
-        return resourceManager.listAliveNodeUrls();
+    public Set<String> listAliveNodesUrls() throws Exception {
+        return getResourceManager().listAliveNodeUrls();
     }
 
     /**
@@ -502,8 +502,8 @@ public class RMTHelper {
      * @param nodeSourceNames
      * @return list of ProActive Nodes urls
      */
-    public Set<String> listAliveNodesUrls(Set<String> nodeSourceNames) throws NodeException {
-        return resourceManager.listAliveNodeUrls(nodeSourceNames);
+    public Set<String> listAliveNodesUrls(Set<String> nodeSourceNames) throws Exception {
+        return getResourceManager().listAliveNodeUrls(nodeSourceNames);
     }
 
     /**

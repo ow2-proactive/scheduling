@@ -39,8 +39,9 @@ package org.ow2.proactive.scheduler.task.launcher;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.ImmediateService;
-import org.objectweb.proactive.api.PAFuture;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
@@ -49,40 +50,38 @@ import org.ow2.proactive.scheduler.common.task.JavaExecutableInitializer;
 import org.ow2.proactive.scheduler.common.task.SimpleTaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
-import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
 import org.ow2.proactive.scheduler.exception.ForkedJVMProcessException;
 import org.ow2.proactive.scheduler.exception.IllegalProgressException;
 import org.ow2.proactive.scheduler.exception.ProgressPingerException;
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.ExecutableContainerInitializer;
-import org.ow2.proactive.scheduler.task.ForkedJavaExecutable;
 import org.ow2.proactive.scheduler.task.ForkedJavaExecutableContainer;
 import org.ow2.proactive.scheduler.task.ForkedJavaExecutableInitializer;
+import org.ow2.proactive.scheduler.task.JavaExecutableForker;
 import org.ow2.proactive.scheduler.task.ForkerStarterCallback;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
-import org.apache.log4j.Logger;
 
 
 /**
- * ForkedJavaTaskLauncher is a task launcher which will create a dedicated JVM for task execution.
+ * JavaTaskLauncherForker is a task launcher which will create a dedicated JVM for task execution.
  * It creates a JVM, creates a ProActive Node on that JVM, and in the end creates a JavaTaskLauncher active object
  * on that node. This JavaTaskLauncher will be responsible for task execution. 
  * 
  * @author The ProActive Team
  */
 @ActiveObject
-public class ForkedJavaTaskLauncher extends JavaTaskLauncher implements ForkerStarterCallback {
+public class JavaTaskLauncherForker extends JavaTaskLauncher implements ForkerStarterCallback {
 
-    public static final Logger logger = Logger.getLogger(ForkedJavaTaskLauncher.class);
+    public static final Logger logger = Logger.getLogger(JavaTaskLauncherForker.class);
 
     private TaskLauncherInitializer initializer;
 
     /**
-     * Create a new instance of ForkedJavaTaskLauncher.<br/>
+     * Create a new instance of JavaTaskLauncherForker.<br/>
      * Used by ProActive active object creation process.
      *
      */
-    public ForkedJavaTaskLauncher() {
+    public JavaTaskLauncherForker() {
     }
 
     /**
@@ -91,7 +90,8 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher implements ForkerSt
      *
      * @param initializer represents the class that contains information to initialize this task launcher.
      */
-    public ForkedJavaTaskLauncher(TaskLauncherInitializer initializer) {
+    public JavaTaskLauncherForker(TaskLauncherInitializer initializer)
+    {
         super(initializer);
         this.initializer = initializer;
     }
@@ -108,10 +108,10 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher implements ForkerSt
         try {
 
             // create the executable (will set the context class loader to the taskclassserver)
-            currentExecutable = executableContainer.getExecutable();
+            executableGuard.initialize(executableContainer.getExecutable());
 
             updatePropagatedVariables(results);
-            
+
             //init task
             ForkedJavaExecutableInitializer fjei = (ForkedJavaExecutableInitializer) executableContainer
                     .createExecutableInitializer();
@@ -130,9 +130,9 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher implements ForkerSt
              * 
              * Log of the JavaTaskLauncher starts after envScript was executed, so it doesn't
              * contain envScript output, to have complete log file it is specially handled by the
-             * ForkedJavaTaskLauncher.
+             * JavaTaskLauncherForker.
              */
-            this.initDataSpaces();
+            executableGuard.initDataSpaces();
             fjei.setDataspaces(SCRATCH, INPUT, OUTPUT, GLOBAL);
 
             //create initializer
@@ -142,7 +142,7 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher implements ForkerSt
             // if an exception occurs in init method, unwrapp the InvocationTargetException
             // the result of the execution is the user level exception
             try {
-                callInternalInit(ForkedJavaExecutable.class, ForkedJavaExecutableInitializer.class, fjei);
+                callInternalInit(JavaExecutableForker.class, ForkedJavaExecutableInitializer.class, fjei);
             } catch (InvocationTargetException e) {
                 throw e.getCause() != null ? e.getCause() : e;
             }
@@ -155,10 +155,10 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher implements ForkerSt
             //result is an integer if forkedJVM has exited abnormally (integer contains the error code)
             Serializable userResult;
             try {
-                userResult = currentExecutable.execute(results);
+                userResult = executableGuard.execute(results);
                 // update propagated variables map after task execution, but
                 // before post script execution
-                setPropagatedVariables(((JavaExecutable) currentExecutable)
+                setPropagatedVariables(((JavaExecutable) executableGuard.use())
                         .getVariables());
             } catch (Throwable t) {
                 throw t;
@@ -178,12 +178,12 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher implements ForkerSt
                     // the result has been computed and must be returned !
                     logger.warn("Loggers are not shutdown !", e);
                 }
-                copyScratchDataToOutput(getTaskOutputSelectors());
+                executableGuard.copyScratchDataToOutput(getTaskOutputSelectors());
             }
 
             if (userResult instanceof TaskResult) {
-                taskResult = (TaskResultImpl) PAFuture.getFutureValue(userResult);
                 // Override the logs since they are stored on forker side
+                taskResult = (TaskResultImpl) userResult;
                 taskResult.setLogs(getLogs());
             } else {
                 Integer ec = (Integer) userResult;
@@ -191,7 +191,7 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher implements ForkerSt
                     taskResult = new TaskResultImpl(taskId, ec, getLogs(), duration / 1000000);
                 } else {
                     Throwable t = new ForkedJavaTaskException(
-                        "Forked JVM process has been terminated with exit code " + ec, ec);
+                            "Forked JVM process has been terminated with exit code " + ec, ec);
                     taskResult = new TaskResultImpl(taskId, t, getLogs(), duration / 1000000);
                 }
             }
@@ -199,17 +199,11 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher implements ForkerSt
             logger.info("", ex);
             if (this.getLogs() == null) {
                 taskResult = new TaskResultImpl(taskId, ex, new SimpleTaskLogs("", ex.toString()),
-                    duration / 1000000, null);
+                        duration / 1000000, null);
             } else {
                 taskResult = new TaskResultImpl(taskId, ex, this.getLogs(), duration / 1000000, null);
             }
         } finally {
-            // kill all children processes
-            killChildrenProcesses();
-
-            // finalize doTask
-            terminateDataSpace();
-            cancelTimer();
             finalizeTask(core, taskResult);
         }
     }
@@ -241,31 +235,7 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher implements ForkerSt
     @Override
     @ImmediateService
     public int getProgress() throws ProgressPingerException {
-        if (this.currentExecutable == null) {
-            //not yet started
-            return 0;
-        } else {
-            try {
-                int progress = currentExecutable.getProgress();//(1)
-                if (progress < 0) {
-                    logger.warn("Returned progress (" + progress + ") is negative, return 0 instead.");
-                    return 0;
-                } else if (progress > 100) {
-                    logger.warn("Returned progress (" + progress +
-                        ") is greater than 100, return 100 instead.");
-                    return 100;
-                } else {
-                    return progress;
-                }
-            } catch (IllegalProgressException ipe) {
-                //can be thrown by (1) if userExecutable.getProgress() method threw an exception
-                //exception comes from javaTaskLauncher.getProgress()
-                throw ipe;
-            } catch (Throwable t) {
-                //communication error with the forked JVM (probably dead VM)
-                throw new ForkedJVMProcessException("Forked JVM seems to be dead", t);
-            }
-        }
+        return executableGuard.getProgress();
     }
 
     /**
@@ -275,7 +245,7 @@ public class ForkedJavaTaskLauncher extends JavaTaskLauncher implements ForkerSt
      */
     @ImmediateService
     public void callback(Node n) {
-        ((ForkerStarterCallback) currentExecutable).callback(n);
+        ((ForkerStarterCallback) executableGuard.use()).callback(n);
     }
 
 }

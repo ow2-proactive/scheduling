@@ -40,20 +40,9 @@ import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.annotation.ImmediateService;
-import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
-import org.objectweb.proactive.extensions.dataspaces.core.BaseScratchSpaceConfiguration;
-import org.objectweb.proactive.extensions.dataspaces.core.DataSpacesNodes;
-import org.ow2.proactive.resourcemanager.nodesource.dataspace.DataSpaceNodeConfigurationAgent;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.task.ExecutableInitializer;
 import org.ow2.proactive.scheduler.common.task.JavaExecutableInitializer;
@@ -74,6 +63,8 @@ import org.ow2.proactive.scheduler.task.TaskResultImpl;
 public class JavaTaskLauncher extends TaskLauncher {
 
     public static final Logger logger = Logger.getLogger(JavaTaskLauncher.class);
+
+    protected boolean nodeConfigured = false;
 
     /**
      * ProActive Empty Constructor
@@ -106,6 +97,7 @@ public class JavaTaskLauncher extends TaskLauncher {
 
     public TaskResult doTaskAndGetResult(TaskTerminateNotification core,
             ExecutableContainer executableContainer, TaskResult... results) {
+        logger.info("Starting Task "+taskId.getReadableName());
         long duration = -1;
         long sample = 0;
         long intervalms = 0;
@@ -116,83 +108,78 @@ public class JavaTaskLauncher extends TaskLauncher {
         TaskResultImpl res;
         try {
             //init dataspace
-            initDataSpaces();
+            executableGuard.initDataSpaces();
             replaceTagsInDataspaces();
 
-            updatePropagatedVariables(results);            
+            updatePropagatedVariables(results);
+
+            // create the executable (will set the context class loader to the taskclassserver)
+            executableGuard.initialize(executableContainer.getExecutable());
 
             sample = System.nanoTime();
             //copy datas from OUTPUT or INPUT to local scratch
-            copyInputDataToScratch();
+            executableGuard.copyInputDataToScratch();
             intervalms = Math.round(Math.ceil((System.nanoTime() - sample) / 1000));
             logger.info("Time spent copying INPUT datas to SCRATCH : " + intervalms + " ms");
 
-            if (!hasBeenKilled) {
-                // set exported vars
-                this.setPropagatedProperties(results);
-
-                // create the executable (will set the context class loader to the taskclassserver)
-                currentExecutable = executableContainer.getExecutable();
-            }
+            // set exported vars
+            this.setPropagatedProperties(results);
 
             //launch pre script
-            if (!hasBeenKilled && pre != null) {
+            if (pre != null) {
                 sample = System.nanoTime();
-                this.executePreScript();
+                executableGuard.executePreScript();
                 duration += System.nanoTime() - sample;
             }
 
-            if (!hasBeenKilled) {
-                //init task
-                ExecutableInitializer initializer = executableContainer.createExecutableInitializer();
-                setPropagatedVariables((JavaExecutableInitializer) initializer,
-                        getPropagatedVariables());
-                replaceIterationTags(initializer);
+            //init task
+            ExecutableInitializer initializer = executableContainer.createExecutableInitializer();
+            setPropagatedVariables((JavaExecutableInitializer) initializer,
+                    getPropagatedVariables());
+            replaceIterationTags(initializer);
 
-                // if an exception occurs in init method, unwrapp the InvocationTargetException
-                // the result of the execution is the user level exception
-                try {
-                    callInternalInit(JavaExecutable.class, JavaExecutableInitializer.class, initializer);
-                } catch (InvocationTargetException e) {
-                    throw e.getCause() != null ? e.getCause() : e;
-                }
-                sample = System.nanoTime();
-                try {
-                    //launch task
-                    userResult = currentExecutable.execute(results);
-                    // update propagated variables map after task execution so
-                    // that any updates that occur during task execution will be
-                    // visible in post script execution.
-                    setPropagatedVariables(((JavaExecutable) currentExecutable)
-                            .getVariables());
-                } catch (Throwable t) {
-                    exception = t;
-                }
-                duration += System.nanoTime() - sample;
+            // if an exception occurs in init method, unwrapp the InvocationTargetException
+            // the result of the execution is the user level exception
+            try {
+                executableGuard.callInternalInit(JavaExecutable.class, JavaExecutableInitializer.class, initializer);
+            } catch (InvocationTargetException e) {
+                throw e.getCause() != null ? e.getCause() : e;
             }
+            sample = System.nanoTime();
+            try {
+                //launch task
+                userResult = executableGuard.execute(results);
+                // update propagated variables map after task execution so
+                // that any updates that occur during task execution will be
+                // visible in post script execution.
+                setPropagatedVariables(((JavaExecutable) executableGuard.use())
+                        .getVariables());
+            } catch (Throwable t) {
+                exception = t;
+            }
+            duration += System.nanoTime() - sample;
 
             //for the next two steps, task could be killed anywhere
 
-            if (!hasBeenKilled && post != null) {
+            if (post != null) {
                 sample = System.nanoTime();
                 //launch post script
-                this.executePostScript(exception == null);
+                executableGuard.executePostScript(exception == null);
                 duration += System.nanoTime() - sample;
             }
 
-            if (!hasBeenKilled) {
-                sample = System.nanoTime();
-                //copy output file
-                copyScratchDataToOutput();
-                intervalms = Math.round(Math.ceil((System.nanoTime() - sample) / 1000));
-                logger.info("Time spent copying SCRATCH datas to OUTPUT : " + intervalms + " ms");
-            }
+            sample = System.nanoTime();
+            //copy output file
+            executableGuard.copyScratchDataToOutput();
+            intervalms = Math.round(Math.ceil((System.nanoTime() - sample) / 1000));
+            logger.info("Time spent copying SCRATCH datas to OUTPUT : " + intervalms + " ms");
+            logger.info("Task "+taskId.getReadableName()+" terminated without error");
         } catch (Throwable ex) {
-            logger.debug("Exception occured while running task " + this.taskId + ": ", ex);
+            logger.debug("Exception occured while running task " + this.taskId.getReadableName() + ": ", ex);
             exception = ex;
             userResult = null;
         } finally {
-            if (!hasBeenKilled) {
+            if (!executableGuard.wasKilled()) {
                 // set the result
                 if (exception != null) {
                     res = new TaskResultImpl(taskId, exception, null, duration / 1000000, null);
@@ -204,7 +191,7 @@ public class JavaTaskLauncher extends TaskLauncher {
                     if (flow != null) {
                         // *WARNING* : flow action is set in res UNLESS an exception is thrown !
                         // see FlowAction.getDefaultAction()
-                        this.executeFlowScript(res);
+                        executableGuard.executeFlowScript(res);
                     }
                 } catch (Throwable e) {
                     // task result is now the exception thrown by flowscript
@@ -215,24 +202,19 @@ public class JavaTaskLauncher extends TaskLauncher {
                 }
                 res.setPropagatedProperties(retreivePropagatedProperties());
                 attachPropagatedVariables(res);
-                res.setLogs(this.getLogs());
+
             } else {
-                res = null;
+                res = new TaskResultImpl(taskId, new RuntimeException("Task " + taskId.getReadableName() + " has been killed"), null, duration / 1000000, null);
             }
+            // logs are set even if the task is killed
+            res.setLogs(this.getLogs());
 
-            // kill all children processes
+            finalizeTask(core, res);
 
-            killChildrenProcesses();
-
-            // finalize doTask
-            terminateDataSpace();
-            // This call is conditioned by the isKilled ...
-            // An example when we don't want to finalize task is when using
-            // forked java task, then only finalizing loggers is enough.
-            this.finalizeTask(core, res);
         }
         return res;
     }
+
 
     protected void setPropagatedVariables(JavaExecutableInitializer init,
             Map<String, Serializable> variables) {
@@ -265,104 +247,5 @@ public class JavaTaskLauncher extends TaskLauncher {
         }
     }
 
-    /**
-     * Configure node to use dataspace !
-     * MUST ONLY BE USED BY FORKED EXECUTABLE
-     * 
-     * @return true if configuration went right
-     */
-    public boolean configureNode() {
-        try {
-            // configure node for Data Spaces
-            String scratchDir;
-            if (System.getProperty(NODE_DATASPACE_SCRATCHDIR) == null) {
-                //if scratch dir java property is not set, set to default
-                scratchDir = System.getProperty("java.io.tmpdir");
-            } else {
-                //else use the property
-                scratchDir = System.getProperty(NODE_DATASPACE_SCRATCHDIR);
-            }
-            final BaseScratchSpaceConfiguration scratchConf = new BaseScratchSpaceConfiguration((String) null,
-                scratchDir);
-            DataSpacesNodes.configureNode(PAActiveObject.getActiveObjectNode(PAActiveObject.getStubOnThis()),
-                    scratchConf);
-        } catch (Throwable t) {
-            logger.error("Cannot configure dataSpace", t);
-            return false;
-        }
-        return true;
-    }
 
-    @ImmediateService
-    public void killForkedJavaTaskLauncher() {
-        this.hasBeenKilled = true;
-        if (this.currentExecutable != null) {
-            try {
-                this.currentExecutable.kill();
-
-            } catch (Throwable e) {
-                logger.warn("Exception occurred while executing kill on task " + taskId.value(), e);
-            } finally {
-                this.currentExecutable = null;
-                // kill Children Processes and unsets the cookie
-                // kill all children processes
-                try {
-                    killChildrenProcesses();
-                } catch (Throwable t) {
-                    logger.warn("Exception when killing children processes", t);
-                }
-            }
-        }
-        try {
-            closeNodeConfiguration();
-        } catch (Throwable t) {
-            logger.warn("Exception when closing node configuration", t);
-        }
-        try {
-            // unset env
-            this.unsetEnv();
-        } catch (Throwable t) {
-            logger.warn("Exception when unsetEnv", t);
-        }
-        // reset stdout/err
-        try {
-            this.finalizeLoggers();
-        } catch (Throwable e) {
-            logger.warn("Loggers are not shutdown", e);
-        }
-
-        PAActiveObject.terminateActiveObject(true);
-    }
-
-    /**
-     * Close node dataspace configuration !
-     * MUST ONLY BE USED BY FORKED EXECUTABLE
-     * 
-     * @return true if configuration went right
-     */
-    @ImmediateService
-    public boolean closeNodeConfiguration() {
-
-        // using an executor service to timeout the data spaces deactivation
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        final StubObject stub = PAActiveObject.getStubOnThis();
-        Callable<Boolean> task = new Callable<Boolean>() {
-            public Boolean call() throws Exception {
-                DataSpacesNodes.closeNodeConfig(PAActiveObject.getActiveObjectNode(stub));
-                return true;
-            }
-        };
-        Future<Boolean> future = executor.submit(task);
-        try {
-            future.get(DataSpaceNodeConfigurationAgent.DATASPACE_CLOSE_TIMEOUT, TimeUnit.MILLISECONDS);
-        } catch (Throwable t) {
-            logger.error("Cannot close properly DataSpaces.", t);
-            return false;
-        } finally {
-            future.cancel(true);
-            executor.shutdown();
-        }
-
-        return true;
-    }
 }

@@ -44,6 +44,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -76,8 +77,11 @@ import org.apache.log4j.MDC;
 import org.apache.log4j.helpers.LogLog;
 import org.apache.log4j.spi.LoggingEvent;
 import org.objectweb.proactive.ActiveObjectCreationException;
+import org.objectweb.proactive.Body;
+import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.annotation.ImmediateService;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
@@ -116,6 +120,7 @@ import org.ow2.proactive.scheduler.common.util.logforwarder.util.LoggingOutputSt
 import org.ow2.proactive.scheduler.exception.IllegalProgressException;
 import org.ow2.proactive.scheduler.exception.ProgressPingerException;
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
+import org.ow2.proactive.scheduler.task.Guard;
 import org.ow2.proactive.scheduler.task.KillTask;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scripting.PropertyUtils;
@@ -136,7 +141,7 @@ import org.ow2.proactive.utils.Formatter;
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */
-public abstract class TaskLauncher {
+public abstract class TaskLauncher implements InitActive {
 
     public static final Logger logger = Logger.getLogger(TaskLauncher.class);
 
@@ -144,10 +149,14 @@ public abstract class TaskLauncher {
     //we should not depend from RM package in this class.
     public static final String NODE_DATASPACE_SCRATCHDIR = "node.dataspace.scratchdir";
 
+    public static final long CLEAN_TIMEOUT = 21 * 1000; // timeout used to control max time for the cleaning operation
+
     // Standard out/err are stored to be restored after execution
     public static final PrintStream SYSTEM_OUT = System.out;
     public static final PrintStream SYSTEM_ERR = System.err;
 
+    private boolean dataspaceInitialized = false;
+    
     public static final String EXECUTION_SUCCEED_BINDING_NAME = "success";
     public static final String DS_SCRATCH_BINDING_NAME = "localspace";
     public static final String DS_INPUT_BINDING_NAME = "input";
@@ -183,13 +192,16 @@ public abstract class TaskLauncher {
     protected List<InputSelector> inputFiles;
     protected List<OutputSelector> outputFiles;
 
-    // buffered string to store datapspaces error/warn messages
-    private StringBuffer dataspacesStatus;
+    // buffered string to store logs destined to the client (for e.g. datapspaces error/warn messages)
+    private StringBuffer clientLogs;
 
     protected OneShotDecrypter decrypter = null;
 
-    protected ExecutorService executor = Executors.newFixedThreadPool(5, new NamedThreadFactory(
-        "TaskLauncherThreadPool"));
+    /**
+     * Thread pool used for input/output files parallel transfer
+     */
+    protected ExecutorService executorTransfer = Executors.newFixedThreadPool(5, new NamedThreadFactory(
+        "FileTransferThreadPool"));
 
     /**
      * Scheduler related java properties. Thoses properties are automatically
@@ -246,10 +258,10 @@ public abstract class TaskLauncher {
 
     protected String logFileName;
 
-    // not null if an executable is currently executed
-    protected Executable currentExecutable;
-    // true if the executable has been stopped before its normal termination
-    protected volatile boolean hasBeenKilled;
+    protected ExecutableGuard executableGuard = new ExecutableGuard();
+
+    protected volatile TaskLauncher stubOnThis;
+
     // true if finalizeLoggers has been called
     private final AtomicBoolean loggersFinalized = new AtomicBoolean(false);
     // true if loggers are currently activated
@@ -300,12 +312,14 @@ public abstract class TaskLauncher {
         this.replicationIndex = initializer.getReplicationIndex();
         this.iterationIndex = initializer.getIterationIndex();
         this.storeLogs = initializer.isPreciousLogs();
-        this.dataspacesStatus = new StringBuffer();
+        this.clientLogs = new StringBuffer();
         
         // add job descriptor variables
         if (initializer.getVariables() != null) {
             this.propagatedVariables.putAll(initializer.getVariables());
         }
+
+
         this.init();
     }
 
@@ -319,34 +333,20 @@ public abstract class TaskLauncher {
         this.setEnvironmentCookie();
         // set scheduler defined env variables
         this.initEnv();
-        logger.debug("TaskLauncher initialized");
+
+        logger.debug("TaskLauncher initialized for task " + taskId + " (" + taskId.getReadableName() + ")");
     }
 
-    /**
-     * Common final behavior for any type of task launcher.
-     * @param core reference to the scheduler.
-     */
-    protected void finalizeTask(TaskTerminateNotification core, TaskResult taskResult) {
-        /*
-         * if task was killed then unsetEnv and finalizeLoggers were already called, don't call it
-         * again, otherwise it can affect others tasks (SCHEDULING-1526)
-         */
-        if (!hasBeenKilled) {
-            // unset env
-            this.unsetEnv();
-        }
+    public void initActivity(Body body) {
+        Node node = null;
+        try {
+            node = PAActiveObject.getNode();
+            stubOnThis = (TaskLauncher) PAActiveObject.getStubOnThis();
+            executableGuard.setNode(node);
+        } catch (Exception e) {
+            throw new IllegalStateException("Could not retrieve ProActive Node");
 
-        // close executor
-        if (!executor.isShutdown()) {
-            executor.shutdownNow();
         }
-
-        //terminate the task
-        // if currentExecutable has been killed, no call back
-        if (!hasBeenKilled && core != null) {
-            core.terminate(taskId, taskResult);
-        }
-        this.currentExecutable = null;
     }
 
     /**
@@ -362,10 +362,11 @@ public abstract class TaskLauncher {
      * @throws Exception reported if something wrong occurs.
      */
     protected void callInternalInit(Class<?> targetedClass, Class<?> parameterType,
-            ExecutableInitializer argument) throws Exception {
+            ExecutableInitializer argument) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
         Method m = targetedClass.getDeclaredMethod("internalInit", parameterType);
         m.setAccessible(true);
-        m.invoke(currentExecutable, argument);
+
+        m.invoke(executableGuard.use(), argument);
     }
 
     /**
@@ -596,7 +597,7 @@ public abstract class TaskLauncher {
     @ImmediateService
     public void activateLogs(AppenderProvider logSink) {
         synchronized (this.loggersFinalized) {
-            logger.info("Activating logs for task " + this.taskId);
+            logger.info("Activating logs for task " + this.taskId +" ("+taskId.getReadableName()+")");
             if (this.loggersActivated.get()) {
                 logger.info("Logs for task " + this.taskId + " are already activated");
                 return;
@@ -605,6 +606,7 @@ public abstract class TaskLauncher {
             // should reset taskId because calling thread is not active thread (immediate service)
             MDC.getContext().put(Log4JTaskLogs.MDC_TASK_ID, this.taskId.value());
             MDC.getContext().put(Log4JTaskLogs.MDC_TASK_NAME, this.taskId.getReadableName());
+
             try {
                 MDC.getContext().put(Log4JTaskLogs.MDC_HOST,
                         PAActiveObject.getNode().getNodeInformation().getVMInformation().getHostName());
@@ -636,24 +638,6 @@ public abstract class TaskLauncher {
         }
     }
 
-    /**
-     * Close scheduler task logger and reset stdout/err
-     */
-    protected void finalizeLoggers() {
-        synchronized (this.loggersFinalized) {
-            logger.debug("Terminating loggers for task " + this.taskId + "...");
-            this.loggersFinalized.set(true);
-            this.loggersActivated.set(false);
-            //Unhandle loggers
-            this.flushStreams();
-            if (this.logAppender != null) {
-                this.logAppender.close();
-            }
-            System.setOut(TaskLauncher.SYSTEM_OUT);
-            System.setErr(TaskLauncher.SYSTEM_ERR);
-            logger.debug("Terminated loggers for task " + this.taskId);
-        }
-    }
 
     /**
      * Flush out and err streams.
@@ -688,28 +672,7 @@ public abstract class TaskLauncher {
      */
     @ImmediateService
     public int getProgress() throws ProgressPingerException {
-        if (this.currentExecutable == null) {
-            //not yet started
-            return 0;
-        } else {
-            try {
-                int progress = currentExecutable.getProgress();
-                if (progress < 0) {
-                    logger.warn("Returned progress (" + progress + ") is negative, return 0 instead.");
-                    return 0;
-                } else if (progress > 100) {
-                    logger.warn("Returned progress (" + progress +
-                        ") is greater than 100, return 100 instead.");
-                    return 100;
-                } else {
-                    return progress;
-                }
-            } catch (Throwable t) {
-                //protect call to user getProgress() if overridden
-                throw new IllegalProgressException("executable.getProgress() method has thrown an exception",
-                    t);
-            }
-        }
+        return executableGuard.getProgress();
     }
 
     /**
@@ -734,6 +697,7 @@ public abstract class TaskLauncher {
         if (res.errorOccured()) {
             res.getException().printStackTrace();
             logger.error("Error on pre-script occured : ", res.getException());
+            this.flushStreams();
             throw new UserException("Pre-script has failed on the current node", res.getException());
         }
         // flush prescript output
@@ -841,47 +805,72 @@ public abstract class TaskLauncher {
     }
 
     /**
-     * This method will terminate the task that has been launched.
-     * In fact it will terminate the launcher.
+     * Close scheduler task logger and reset stdout/err
+     */
+    protected void finalizeLoggers() {
+        synchronized (this.loggersFinalized) {
+            if (!loggersFinalized.get()) {
+                logger.info("Terminating loggers for task " + this.taskId + " (" + taskId.getReadableName() + ")" + "...");
+                this.flushStreams();
+
+                this.loggersFinalized.set(true);
+                this.loggersActivated.set(false);
+                //Unhandle loggers
+                if (this.logAppender != null) {
+                    this.logAppender.close();
+                }
+                System.setOut(TaskLauncher.SYSTEM_OUT);
+                System.setErr(TaskLauncher.SYSTEM_ERR);
+                logger.info("Terminated loggers for task " + this.taskId);
+            }
+        }
+    }
+
+    /**
+     * Common final behavior for any type of task launcher.
+     * @param core reference to the scheduler.
+     */
+    protected void finalizeTask(TaskTerminateNotification core, TaskResult taskResult) {
+        logger.info("Finalizing task " + taskId);
+
+        // clean the task launcher unless it's been done already by the kill mechanism
+        executableGuard.clean(TaskLauncher.CLEAN_TIMEOUT);
+
+        /*
+         * if task was not killed send back the result (if the task was killed the core is not accessible)
+         */
+        if (!executableGuard.wasKilled()) {
+            if (core != null) {
+                // callback to scheduler core sending the result
+                core.terminate(taskId, taskResult);
+            }
+        }
+    }
+
+    /**
+     * This method is called by the scheduler server to terminate the task launcher active object,
+     * either via a kill message or a normal termination.
      */
     @ImmediateService
     public void terminate(boolean normalTermination) {
+        if (normalTermination) {
+            logger.info("Terminate message received for task " + taskId);
+        } else {
+            logger.info("Kill message received for task " + taskId);
+        }
         if (!normalTermination) {
-            this.hasBeenKilled = true;
-            if (this.currentExecutable != null) {
-                try {
-                    this.currentExecutable.kill();
-
-                } catch (Throwable e) {
-                    logger.warn("Exception occurred while executing kill on task " + taskId.value(), e);
-                } finally {
-                    this.currentExecutable = null;
-                    // kill Children Processes and unsets the cookie
-                    // kill all children processes
-
-                    killChildrenProcesses();
-                }
-            }
-
-            // unset env
-            this.unsetEnv();
-
-            // reset stdout/err    
+            // If this is a kill message, perfom all cleaning normally done by the finalize method
             try {
-                this.finalizeLoggers();
-            } catch (RuntimeException e) {
-                // exception should not be thrown to the scheduler core
-                // the result has been computed and must be returned !
-                logger.warn("Loggers are not shutdown !", e);
+                executableGuard.kill();
+
+            } catch (Throwable e) {
+                logger.warn("Exception occurred while executing kill on task " + taskId.value(), e);
             }
+
+            executableGuard.clean(TaskLauncher.CLEAN_TIMEOUT);
         }
 
-        // close executor
-        if (!executor.isShutdown()) {
-            executor.shutdownNow();
-        }
-
-        PAActiveObject.terminateActiveObject(!normalTermination);
+        PAActiveObject.terminateActiveObject(stubOnThis, !normalTermination);
     }
 
     /**
@@ -889,7 +878,7 @@ public abstract class TaskLauncher {
      * if it does not finish before the walltime. If it does finish before the walltime then the timer will be canceled
      */
     protected void scheduleTimer() {
-        scheduleTimer(currentExecutable);
+        scheduleTimer(executableGuard.use());
     }
 
     /**
@@ -990,6 +979,7 @@ public abstract class TaskLauncher {
                 this.logDataspacesStatus("USER space is disabled", DataspacesStatusLevel.WARNING);
                 this.logDataspacesStatus(Formatter.stackTraceToString(t), DataspacesStatusLevel.WARNING);
             }
+            dataspaceInitialized = true;
         }
     }
 
@@ -1043,9 +1033,9 @@ public abstract class TaskLauncher {
     }
 
     protected void terminateDataSpace() {
-        if (isDataspaceAware()) {
+        if (isDataspaceAware() && dataspaceInitialized) {
             try {
-                //in dataspace debug mode, scratch directory are not cleaned after task execution
+                // in dataspace debug mode, scratch directory are not cleaned after task execution
                 if (!logger.isDebugEnabled()) {
                     DataSpacesNodes.tryCloseNodeApplicationConfig(PAActiveObject
                             .getActiveObjectNode(PAActiveObject.getStubOnThis()));
@@ -1246,11 +1236,11 @@ public abstract class TaskLauncher {
                         logger.debug("------------ resolving " + relativePath);
                         final String finalRelativePath = relativePath;
                         final DataSpacesFileObject finaldsfo = dsfo;
-                        transferFutures.add(executor.submit(new Callable<Boolean>() {
+                        transferFutures.add(executorTransfer.submit(new Callable<Boolean>() {
                             @Override
                             public Boolean call() throws FileSystemException {
                                 logger.info("Copying " + finaldsfo.getRealURI() + " to " +
-                                    SCRATCH.getRealURI() + "/" + finalRelativePath);
+                                        SCRATCH.getRealURI() + "/" + finalRelativePath);
                                 SCRATCH
                                         .resolveFile(finalRelativePath)
                                         .copyFrom(
@@ -1296,7 +1286,7 @@ public abstract class TaskLauncher {
     private boolean checkInputSpaceConfigured(DataSpacesFileObject space, String spaceName, InputSelector is) {
         if (space == null) {
             logger.error("Job " + spaceName +
-                " space is not defined or not properly configured while input files are specified : ");
+                    " space is not defined or not properly configured while input files are specified : ");
 
             this.logDataspacesStatus("Job " + spaceName +
                 " space is not defined or not properly configured while input files are specified : ",
@@ -1313,7 +1303,7 @@ public abstract class TaskLauncher {
     private boolean checkOuputSpaceConfigured(DataSpacesFileObject space, String spaceName, OutputSelector os) {
         if (space == null) {
             logger.debug("Job " + spaceName +
-                " space is not defined or not properly configured, while output files are specified :");
+                    " space is not defined or not properly configured, while output files are specified :");
             this.logDataspacesStatus("Job " + spaceName +
                 " space is not defined or not properly configured, while output files are specified :",
                     DataspacesStatusLevel.ERROR);
@@ -1508,11 +1498,11 @@ public abstract class TaskLauncher {
             final String finalRelativePath = relativePath;
             final DataSpacesFileObject finaldsfo = dsfo;
             final DataSpacesFileObject finalout = out;
-            transferFutures.add(executor.submit(new Callable<Boolean>() {
+            transferFutures.add(executorTransfer.submit(new Callable<Boolean>() {
                 @Override
                 public Boolean call() throws FileSystemException {
                     logger.info("Copying " + finaldsfo.getRealURI() + " to " + finalout.getRealURI() + "/" +
-                        finalRelativePath);
+                            finalRelativePath);
 
                     finalout.resolveFile(finalRelativePath).copyFrom(finaldsfo,
                             org.objectweb.proactive.extensions.dataspaces.api.FileSelector.SELECT_SELF);
@@ -1703,11 +1693,11 @@ public abstract class TaskLauncher {
         final String eol = System.getProperty("line.separator");
         final boolean hasEol = message.endsWith(eol);
         if (level == DataspacesStatusLevel.ERROR) {
-            this.dataspacesStatus.append("[DATASPACES-ERROR] " + message + (hasEol ? "" : eol));
+            this.clientLogs.append("[DATASPACES-ERROR] " + message + (hasEol ? "" : eol));
         } else if (level == DataspacesStatusLevel.WARNING) {
-            this.dataspacesStatus.append("[DATASPACES-WARNING] " + message + (hasEol ? "" : eol));
+            this.clientLogs.append("[DATASPACES-WARNING] " + message + (hasEol ? "" : eol));
         } else if (level == DataspacesStatusLevel.INFO) {
-            this.dataspacesStatus.append("[DATASPACES-INFO] " + message + (hasEol ? "" : eol));
+            this.clientLogs.append("[DATASPACES-INFO] " + message + (hasEol ? "" : eol));
         }
     }
 
@@ -1722,11 +1712,11 @@ public abstract class TaskLauncher {
      * Display the content of the dataspaces status buffer on stderr if non empty.
      */
     protected void displayDataspacesStatus() {
-        if (this.dataspacesStatus.length() != 0) {
+        if (this.clientLogs.length() != 0) {
             System.err.println("");
-            System.err.println(this.dataspacesStatus);
+            System.err.println(this.clientLogs);
             System.err.flush();
-            this.dataspacesStatus = new StringBuffer();
+            this.clientLogs = new StringBuffer();
         }
     }
 
@@ -1739,9 +1729,8 @@ public abstract class TaskLauncher {
      * @return the hostname of the local JVM
      */
     private String getHostname() {
-        //return PAActiveObject.getNode().getNodeInformation().getVMInformation().getHostName();
+
         return ProActiveInet.getInstance().getInetAddress().getHostName();
-        // return URIBuilder.getHostNameorIP(ProActiveInet.getInstance().getInetAddress());
     }
 
     /*
@@ -1771,4 +1760,263 @@ public abstract class TaskLauncher {
             Map<String, Serializable> propagatedVariables) {
         this.propagatedVariables = propagatedVariables;
     }
+
+
+
+
+
+    /**
+     * This class acts as a proxy/guard to the executable usage
+     * The proxy can be called concurrently by :
+     * - TaskLaunchers main doTask method
+     * - terminate (kill) calls
+     * - getProgress calls
+     */
+    protected class ExecutableGuard extends Guard<Executable> {
+
+        int lastProgress = 0;
+
+        @Override
+        protected void internalKill() {
+            if (targetInitialized) {
+                target.kill();
+            }
+        }
+
+        @Override
+        protected void internalClean() {
+            // kill all children processes
+            killChildrenProcesses();
+
+            // finalize task in any cases (killed or not)
+            terminateDataSpace();
+
+            if (isWallTime()) {
+                cancelTimer();
+            }
+
+            unsetEnv();
+
+            try {
+                finalizeLoggers();
+            } catch (RuntimeException e) {
+                // exception should not be thrown to the scheduler core
+                // the result has been computed and must be returned !
+                logger.warn("Loggers are not shutdown !", e);
+            }
+
+            // close executors
+            if (!executorTransfer.isShutdown()) {
+                executorTransfer.shutdownNow();
+            }
+        }
+
+        /**
+         * Executes a preScript in a cancellable separated thread
+         * @throws Exception
+         */
+        public void initDataSpaces() throws Throwable {
+            submitACallable(new Callable<Boolean>() {
+
+                @Override
+                public Boolean call() throws Exception {
+                    try {
+                        TaskLauncher.this.initDataSpaces();
+                        return true;
+                    } catch (Throwable throwable) {
+                        throw new ToUnwrapException(throwable);
+                    }
+                }
+            }, false);
+            waitCallable();
+        }
+
+        /**
+         * Executes a preScript in a cancellable separated thread
+         * @throws Exception
+         */
+        public void executePreScript() throws Throwable {
+            submitACallable(new Callable<Boolean>() {
+
+                    @Override
+                    public Boolean call() throws Exception {
+                        try {
+                            TaskLauncher.this.executePreScript();
+                            return true;
+                        } catch (Throwable throwable) {
+                            throw new ToUnwrapException(throwable);
+                        }
+                    }
+                }, true);
+            waitCallable();
+        }
+
+
+
+        /**
+         * Executes a postScript in a cancellable separated thread
+         * @throws Exception
+         */
+        public void executePostScript(final boolean executionSucceed) throws Throwable {
+            submitACallable(new Callable<Boolean>() {
+
+                    @Override
+                    public Boolean call() throws Exception {
+                        try {
+                            TaskLauncher.this.executePostScript(executionSucceed);
+                            return true;
+                        } catch (Throwable throwable) {
+                            throw new ToUnwrapException(throwable);
+                        }
+                    }
+                }, true);
+            waitCallable();
+        }
+
+        /**
+         * Executes a flowScript in a cancellable separated thread
+         * @throws Exception
+         */
+        public void executeFlowScript(final TaskResult res) throws Throwable {
+            submitACallable(new Callable<Boolean>() {
+
+                    @Override
+                    public Boolean call() throws Exception {
+                        try {
+                            TaskLauncher.this.executeFlowScript(res);
+                            return true;
+                        } catch (Throwable throwable) {
+                            throw new ToUnwrapException(throwable);
+                        }
+                    }
+                }, true);
+            waitCallable();
+        }
+
+        /**
+         * copy input files to scratch in a cancellable separated thread
+         * @throws Exception
+         */
+        protected void copyInputDataToScratch() throws Throwable {
+            submitACallable(new Callable<Boolean>() {
+                    @Override
+                    public Boolean call() throws Exception {
+                        try {
+                            TaskLauncher.this.copyInputDataToScratch();
+                            return true;
+                        } catch (Throwable throwable) {
+                            throw new ToUnwrapException(throwable);
+                        }
+                    }
+                }, true);
+            waitCallable();
+        }
+
+        /**
+         * copy local files to output in a cancellable separated thread
+         * @throws Exception
+         */
+        protected void copyScratchDataToOutput() throws Throwable {
+            submitACallable(new Callable<Boolean>() {
+                    @Override
+                    public Boolean call() throws Exception {
+                        try {
+                            TaskLauncher.this.copyScratchDataToOutput();
+                            return true;
+                        } catch (Throwable throwable) {
+                            throw new ToUnwrapException(throwable);
+                        }
+                    }
+                }, true);
+            waitCallable();
+        }
+
+        /**
+         * copy local files to output in a cancellable separated thread
+         * @throws Exception
+         */
+        protected void copyScratchDataToOutput(final List<OutputSelector> outputFiles) throws Throwable {
+            submitACallable(new Callable<Boolean>() {
+                @Override
+                public Boolean call() throws Exception {
+                    try {
+                        TaskLauncher.this.copyScratchDataToOutput(outputFiles);
+                        return true;
+                    } catch (Throwable throwable) {
+                        throw new ToUnwrapException(throwable);
+                    }
+                }
+            }, true);
+            waitCallable();
+        }
+
+        protected void callInternalInit(final Class<?> targetedClass, final Class<?> parameterType,
+                final ExecutableInitializer argument) throws Throwable {
+            submitACallable(new Callable<Boolean>() {
+                @Override
+                public Boolean call() throws Exception {
+                    try {
+                        TaskLauncher.this.callInternalInit(targetedClass, parameterType, argument);
+                        return true;
+                    } catch (Throwable throwable) {
+                        throw new ToUnwrapException(throwable);
+                    }
+                }
+            }, true);
+            waitCallable();
+        }
+
+
+        /**
+         * execute the task in a cancellable separated thread
+         * @throws Exception
+         */
+        public Serializable execute(final TaskResult... results) throws Throwable {
+
+            submitACallable(new Callable<Serializable>() {
+
+                    @Override
+                    public Serializable call() throws Exception {
+                        try {
+                            return target.execute(results);
+                        } catch (Throwable throwable) {
+                            throw new ToUnwrapException(throwable);
+                        }
+                    }
+                }, true);
+            return waitCallable();
+        }
+
+        /**
+         * return current progress of the executable
+         * @return
+         */
+        public synchronized int getProgress() {
+            if (state == GuardState.NOT_INITIALIZED) {
+                //not yet started
+                return 0;
+            } else if (state == GuardState.KILLED || state == GuardState.CLEANED) {
+                // return last value computed before the kill
+                return lastProgress;
+            } else {
+                try {
+                    lastProgress = target.getProgress();
+                    if (lastProgress < 0) {
+                        logger.warn("Returned progress (" + lastProgress + ") is negative, return 0 instead.");
+                        lastProgress = 0;
+                    } else if (lastProgress > 100) {
+                        logger.warn("Returned progress (" + lastProgress +
+                                ") is greater than 100, return 100 instead.");
+                        lastProgress = 100;
+                    }
+                    return lastProgress;
+                } catch (Throwable t) {
+                    //protect call to user getProgress() if overridden
+                    throw new IllegalProgressException("executable.getProgress() method has thrown an exception",
+                            t);
+                }
+            }
+        }
+    }
+
 }

@@ -37,7 +37,6 @@
 package org.ow2.proactive.scheduler.common.task.executable;
 
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.Map;
@@ -193,11 +192,11 @@ public abstract class JavaExecutable extends Executable {
         try {
             return PADataSpaces.resolveDefaultInput();
         } catch (NotConfiguredException e) {
-            throw new FileSystemException("Node is not configured for INPUT space");
+            throw new FileSystemException("Node is not configured for INPUT space",e);
         } catch (ConfigurationException e) {
-            throw new FileSystemException("Configuration problems for INPUT space");
+            throw new FileSystemException("Configuration problems for INPUT space",e);
         } catch (SpaceNotFoundException e) {
-            throw new FileSystemException("INPUT space not found");
+            throw new FileSystemException("INPUT space not found",e);
         }
     }
 
@@ -218,11 +217,11 @@ public abstract class JavaExecutable extends Executable {
         try {
             return PADataSpaces.resolveDefaultOutput();
         } catch (NotConfiguredException e) {
-            throw new FileSystemException("Node is not configured for OUTPUT space");
+            throw new FileSystemException("Node is not configured for OUTPUT space",e);
         } catch (ConfigurationException e) {
-            throw new FileSystemException("Configuration problems for OUTPUT space");
+            throw new FileSystemException("Configuration problems for OUTPUT space",e);
         } catch (SpaceNotFoundException e) {
-            throw new FileSystemException("OUTPUT space not found");
+            throw new FileSystemException("OUTPUT space not found",e);
         }
     }
 
@@ -243,11 +242,11 @@ public abstract class JavaExecutable extends Executable {
         try {
             return PADataSpaces.resolveOutput(SchedulerConstants.GLOBALSPACE_NAME);
         } catch (NotConfiguredException e) {
-            throw new FileSystemException("Node is not configured for GLOBAL space");
+            throw new FileSystemException("Node is not configured for GLOBAL space",e);
         } catch (SpaceNotFoundException e) {
-            throw new FileSystemException("Configuration problems for GLOBAL space");
+            throw new FileSystemException("Configuration problems for GLOBAL space",e);
         } catch (ConfigurationException e) {
-            throw new FileSystemException("GLOBAL space not found");
+            throw new FileSystemException("GLOBAL space not found",e);
         }
     }
 
@@ -268,11 +267,11 @@ public abstract class JavaExecutable extends Executable {
         try {
             return PADataSpaces.resolveOutput(SchedulerConstants.USERSPACE_NAME);
         } catch (NotConfiguredException e) {
-            throw new FileSystemException("Node is not configured for USER space");
+            throw new FileSystemException("Node is not configured for USER space",e);
         } catch (SpaceNotFoundException e) {
-            throw new FileSystemException("Configuration problems for USER space");
+            throw new FileSystemException("Configuration problems for USER space",e);
         } catch (ConfigurationException e) {
-            throw new FileSystemException("USER space not found");
+            throw new FileSystemException("USER space not found",e);
         }
     }
 
@@ -291,9 +290,9 @@ public abstract class JavaExecutable extends Executable {
         try {
             return PADataSpaces.resolveScratchForAO();
         } catch (NotConfiguredException e) {
-            throw new FileSystemException("Node is not configured for LOCAL space");
+            throw new FileSystemException("Node is not configured for LOCAL space",e);
         } catch (ConfigurationException e) {
-            throw new FileSystemException("Configuration problems for LOCAL space");
+            throw new FileSystemException("Configuration problems for LOCAL space",e);
         }
     }
 
