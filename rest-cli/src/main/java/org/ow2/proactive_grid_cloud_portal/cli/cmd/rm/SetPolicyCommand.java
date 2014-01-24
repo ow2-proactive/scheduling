@@ -41,13 +41,13 @@ import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_INVALI
 import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_OTHER;
 import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
 import static org.ow2.proactive_grid_cloud_portal.cli.json.FieldMataDataView.Type.FILE;
+import static org.ow2.proactive_grid_cloud_portal.cli.json.FieldMataDataView.Type.CREDENTIAL;
 
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.codehaus.jackson.type.TypeReference;
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
@@ -55,6 +55,7 @@ import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.cli.json.ConfigurableFieldView;
+import org.ow2.proactive_grid_cloud_portal.cli.json.FieldMataDataView.Type;
 import org.ow2.proactive_grid_cloud_portal.cli.json.PluginView;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.FileUtility;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
@@ -66,8 +67,7 @@ public class SetPolicyCommand extends AbstractCommand implements Command {
 
     public SetPolicyCommand(String... args) {
         if (!(args.length > 0)) {
-            throw new CLIException(REASON_INVALID_ARGUMENTS,
-                    "At least one argument required.");
+            throw new CLIException(REASON_INVALID_ARGUMENTS, "At least one argument required.");
         }
         this.policyType = args[0];
 
@@ -115,13 +115,14 @@ public class SetPolicyCommand extends AbstractCommand implements Command {
 
         StringBuilder buffer = new StringBuilder();
         buffer.append("policyType=" + policyType);
-        for (ConfigurableFieldView field : configurableFields) {
-            if (!FILE.equals(field.getMeta().type())) {
-                buffer.append("&policyParameters=").append(field.getValue());
-            } else {
-                String contents = FileUtility.readFileToString(new File(field
-                        .getValue()));
+        for (int index = 0; index < configurableFields.length; index++) {
+            ConfigurableFieldView cf = configurableFields[index];
+            Type ft = cf.getMeta().type();
+            if (FILE.equals(ft) || CREDENTIAL.equals(ft)) {
+                String contents = FileUtility.readFileToString(new File(cf.getValue()));
                 buffer.append("&policyFileParameters=").append(contents);
+            } else {
+                buffer.append("&policyParameters=").append(cf.getValue());
             }
         }
         currentContext.setProperty(SET_POLICY, buffer.toString());

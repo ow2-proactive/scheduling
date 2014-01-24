@@ -41,13 +41,14 @@ import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_INVALI
 import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_OTHER;
 import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
 import static org.ow2.proactive_grid_cloud_portal.cli.json.FieldMataDataView.Type.FILE;
+import static org.ow2.proactive_grid_cloud_portal.cli.json.FieldMataDataView.Type.CREDENTIAL;
+
 
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.codehaus.jackson.type.TypeReference;
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
@@ -55,6 +56,7 @@ import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.cli.json.ConfigurableFieldView;
+import org.ow2.proactive_grid_cloud_portal.cli.json.FieldMataDataView.Type;
 import org.ow2.proactive_grid_cloud_portal.cli.json.PluginView;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.FileUtility;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
@@ -121,15 +123,18 @@ public class SetInfrastructureCommand extends AbstractCommand implements
 
         StringBuilder buffer = new StringBuilder();
         buffer.append("infrastructureType=" + infrastructureType);
-        for (ConfigurableFieldView field : configurableFields) {
-            if (!FILE.equals(field.getMeta().type())) {
-                buffer.append("&infrastructureParameters=").append(
-                        field.getValue());
-            } else {
-                String contents = FileUtility.readFileToString(new File(field
-                        .getValue()));
+        for (int index = 0; index < configurableFields.length; index++) {
+            ConfigurableFieldView cf = configurableFields[index];
+            Type ft = cf.getMeta().type();
+            if (FILE.equals(ft) || CREDENTIAL.equals(ft)) {
+                String contents = FileUtility.readFileToString(new File(
+                        infrastructureArgs[index]));
                 buffer.append("&infrastructureFileParameters=")
                         .append(contents);
+
+            } else {
+                buffer.append("&infrastructureParameters=").append(
+                        infrastructureArgs[index]);
             }
         }
 

@@ -42,7 +42,7 @@ public class FieldMataDataView {
     public enum Type {
         FILE("fileBrowser"),
 
-        CREDENTIALS("credential"),
+        CREDENTIAL("credential"),
 
         NONE("none"),
 
