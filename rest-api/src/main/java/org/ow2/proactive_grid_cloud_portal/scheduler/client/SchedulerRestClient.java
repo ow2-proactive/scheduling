@@ -60,9 +60,9 @@ import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataOutput;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 import org.ow2.proactive_grid_cloud_portal.common.exceptionmapper.ExceptionToJson;
+import org.ow2.proactive_grid_cloud_portal.scheduler.client.utils.ReflectionUtils;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
-
 
 public class SchedulerRestClient {
 
@@ -70,7 +70,6 @@ public class SchedulerRestClient {
     private String restEndpointURL;
     private ClientExecutor executor;
 
-    
     public SchedulerRestClient(String restEndpointURL) {
         this(restEndpointURL, null);
     }
@@ -78,19 +77,23 @@ public class SchedulerRestClient {
     public SchedulerRestClient(String restEndpointURL, ClientExecutor executor) {
         this.restEndpointURL = restEndpointURL;
         this.executor = executor;
-        ResteasyProviderFactory provider = ResteasyProviderFactory.getInstance();
+        ResteasyProviderFactory provider = ResteasyProviderFactory
+                .getInstance();
         provider.registerProvider(JacksonContextResolver.class);
         scheduler = createRestProxy(provider, restEndpointURL, executor);
     }
-    
-    public JobIdData submitXml(String sessionId, InputStream jobXml) throws Exception {
+
+    public JobIdData submitXml(String sessionId, InputStream jobXml)
+            throws Exception {
         return submit(sessionId, jobXml, MediaType.APPLICATION_XML_TYPE);
     }
 
-    public JobIdData submitJobArchive(String sessionId, InputStream jobArchive) throws Exception {
-        return submit(sessionId, jobArchive, MediaType.APPLICATION_OCTET_STREAM_TYPE);
+    public JobIdData submitJobArchive(String sessionId, InputStream jobArchive)
+            throws Exception {
+        return submit(sessionId, jobArchive,
+                MediaType.APPLICATION_OCTET_STREAM_TYPE);
     }
-    
+
     public boolean pushFile(String sessionId, String space, String path,
             String fileName, InputStream fileContent) throws Exception {
         String uriTmpl = (new StringBuilder(restEndpointURL))
@@ -122,9 +125,10 @@ public class SchedulerRestClient {
         return response.getEntity();
     }
 
-    private JobIdData submit(String sessionId, InputStream job, MediaType mediaType) throws Exception {
-        String uriTmpl = restEndpointURL + addSlashIfMissing(restEndpointURL) +
-            "scheduler/submit";
+    private JobIdData submit(String sessionId, InputStream job,
+            MediaType mediaType) throws Exception {
+        String uriTmpl = restEndpointURL + addSlashIfMissing(restEndpointURL)
+                + "scheduler/submit";
         ClientRequest request = (executor == null) ? new ClientRequest(uriTmpl)
                 : new ClientRequest(uriTmpl, executor);
         request.header("sessionid", sessionId);
@@ -163,12 +167,16 @@ public class SchedulerRestClient {
         return createExceptionProxy(schedulerRestClient);
     }
 
-    private static SchedulerRestInterface createExceptionProxy(final SchedulerRestInterface scheduler) {
-        return (SchedulerRestInterface) Proxy.newProxyInstance(SchedulerRestInterface.class.getClassLoader(),
-                new Class[] { SchedulerRestInterface.class }, new RestClientExceptionHandler(scheduler));
+    private static SchedulerRestInterface createExceptionProxy(
+            final SchedulerRestInterface scheduler) {
+        return (SchedulerRestInterface) Proxy.newProxyInstance(
+                SchedulerRestInterface.class.getClassLoader(),
+                new Class[] { SchedulerRestInterface.class },
+                new RestClientExceptionHandler(scheduler));
     }
 
-    private static class RestClientExceptionHandler implements InvocationHandler {
+    private static class RestClientExceptionHandler implements
+            InvocationHandler {
 
         private final SchedulerRestInterface scheduler;
 
@@ -177,13 +185,15 @@ public class SchedulerRestClient {
         }
 
         @Override
-        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        public Object invoke(Object proxy, Method method, Object[] args)
+                throws Throwable {
             try {
                 return method.invoke(scheduler, args);
             } catch (InvocationTargetException targetException) {
                 if (targetException.getTargetException() instanceof ClientResponseFailure) {
                     ExceptionToJson json = (ExceptionToJson) ((ClientResponseFailure) targetException
-                            .getTargetException()).getResponse().getEntity(ExceptionToJson.class);
+                            .getTargetException()).getResponse().getEntity(
+                            ExceptionToJson.class);
 
                     throw rebuildException(json);
                 }
@@ -191,35 +201,62 @@ public class SchedulerRestClient {
             }
         }
 
-        private Exception rebuildException(ExceptionToJson json) throws ClassNotFoundException,
-                NoSuchMethodException, InstantiationException, IllegalAccessException,
-                InvocationTargetException {
+        private Exception rebuildException(ExceptionToJson json)
+                throws IllegalArgumentException, InstantiationException,
+                IllegalAccessException, InvocationTargetException {
             Throwable serverException = json.getException();
             String exceptionClassName = json.getExceptionClass();
-
-            // instantiate a new exception with the original server exception class
-            Class<?> exception = Class.forName(exceptionClassName);
-            Constructor<?> constructor;
-            try {
-                // wrap the exception serialized in JSON inside an instance of the server exception class
-                constructor = exception.getConstructor(Throwable.class);
-                return (Exception) constructor.newInstance(serverException);
-            } catch (NoSuchMethodException e) {
-                // another kind of exception rebuild it without wrapping
-                constructor = exception.getConstructor(String.class);
-                Exception rebuiltException = (Exception) constructor.newInstance(json.getErrorMessage());
-                rebuiltException.setStackTrace(json.getException().getStackTrace());
-                return rebuiltException;
+            String errMsg = json.getErrorMessage();
+            if (errMsg == null) {
+                errMsg = "An error has occurred.";
             }
+
+            if (exceptionClassName != null) {
+                try {
+                    Class<?> exceptionClass = Class.forName(exceptionClassName);
+                    Constructor<?> constructor = null;
+                    if (serverException != null) {
+                        // wrap the exception serialized in JSON inside an
+                        // instance of
+                        // the server exception class
+                        constructor = ReflectionUtils.getConstructor(
+                                exceptionClass, Throwable.class);
+                        if (constructor != null) {
+                            return (Exception) constructor
+                                    .newInstance(serverException);
+                        }
+                        constructor = ReflectionUtils.getConstructor(
+                                exceptionClass, String.class);
+                        if (constructor != null) {
+                            Exception built = (Exception) constructor
+                                    .newInstance(errMsg);
+                            built.setStackTrace(serverException.getStackTrace());
+                            return built;
+                        }
+                    }
+                } catch (ClassNotFoundException cnfe) {
+                    // throw java.lang.Exception type Exception
+                }
+            }
+
+            Exception built = new Exception(errMsg);
+            if (serverException != null) {
+                built.setStackTrace(serverException.getStackTrace());
+            }
+            return built;
         }
     }
 
+    
     @Provider
-    public static class JacksonContextResolver implements ContextResolver<ObjectMapper> {
+    public static class JacksonContextResolver implements
+            ContextResolver<ObjectMapper> {
 
         public ObjectMapper getContext(Class<?> objectType) {
             ObjectMapper objectMapper = new ObjectMapper();
-            objectMapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+            objectMapper.configure(
+                    DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES,
+                    false);
             return objectMapper;
         }
 
