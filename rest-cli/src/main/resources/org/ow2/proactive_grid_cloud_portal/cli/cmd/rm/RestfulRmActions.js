@@ -165,12 +165,12 @@ function execute(cmd) {
         }
     }
     if (tryAfterReLogin) {
+	currentContext.setProperty(AbstractLoginCommand.PROP_RENEW_SESSION, java.lang.Boolean.TRUE);
         try {
-            currentContext.setProperty(AbstractLoginCommand.PROP_RENEW_SESSION, true);
-            if (getCredFile() != null) {
-                execute(new LoginWithCredentialsCommand(getCredFile()));
-            } else if (getUser() != null) {
-                execute(new LoginCommand(getUser()));
+            if (getCredFile(currentContext) != null) {
+                execute(new LoginWithCredentialsCommand(getCredFile(currentContext)));
+            } else if (getUser(currentContext) != null) {
+                execute(new LoginCommand(getUser(currentContext)));
             }
             cmd.execute(currentContext);
         } catch (e) {
@@ -181,7 +181,9 @@ function execute(cmd) {
 
 function printError(error) {
     print("An error occurred while executing the command:\r\n");
-    error.javaException.printStackTrace();
+    if (error.javaException != null) {
+        error.javaException.printStackTrace();
+    }
 }
 
 
