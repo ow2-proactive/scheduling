@@ -67,6 +67,7 @@ public class PortalConfiguration {
     public static void load(InputStream f) throws IOException {
         properties = new Properties();
         properties.load(f);
+        properties.putAll(System.getProperties());
     }
 
     public static Properties getProperties() {
