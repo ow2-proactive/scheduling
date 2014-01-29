@@ -54,8 +54,7 @@ stop () {
 
 
 cleanup () {
-	# do not use the bash builtin, which does not know the negative-pid syntax
-	/bin/kill -- -$$
+	kill -- -$$
 }
 
 mktemp_jruby() {
