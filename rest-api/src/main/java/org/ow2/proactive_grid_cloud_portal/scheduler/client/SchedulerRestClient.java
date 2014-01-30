@@ -60,7 +60,6 @@ import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataOutput;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 import org.ow2.proactive_grid_cloud_portal.common.exceptionmapper.ExceptionToJson;
-import org.ow2.proactive_grid_cloud_portal.scheduler.client.utils.ReflectionUtils;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
 
