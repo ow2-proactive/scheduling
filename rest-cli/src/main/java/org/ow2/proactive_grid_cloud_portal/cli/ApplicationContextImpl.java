@@ -1,15 +1,7 @@
 package org.ow2.proactive_grid_cloud_portal.cli;
 
-import org.jboss.resteasy.client.core.executors.ApacheHttpClient4Executor;
-import org.ow2.proactive_grid_cloud_portal.cli.console.AbstractDevice;
-import org.ow2.proactive_grid_cloud_portal.cli.json.PluginView;
-import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpUtility;
-import org.ow2.proactive_grid_cloud_portal.scheduler.client.SchedulerRestClient;
+import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_OTHER;
 
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
@@ -19,8 +11,11 @@ import javax.script.ScriptEngineManager;
 
 import org.apache.http.client.HttpClient;
 import org.codehaus.jackson.map.ObjectMapper;
-
-import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_OTHER;
+import org.jboss.resteasy.client.core.executors.ApacheHttpClient4Executor;
+import org.ow2.proactive_grid_cloud_portal.cli.console.AbstractDevice;
+import org.ow2.proactive_grid_cloud_portal.cli.json.PluginView;
+import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpUtility;
+import org.ow2.proactive_grid_cloud_portal.scheduler.client.SchedulerRestClient;
 
 public class ApplicationContextImpl implements ApplicationContext {
 
