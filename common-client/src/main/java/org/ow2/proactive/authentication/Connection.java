@@ -58,7 +58,7 @@ import org.objectweb.proactive.core.util.ProActiveInet;
  * active object and checks that system is up and running (in another words authentication object is activated).
  * Provides an ability to connect in blocking and non blocking manner.
  *
- * @param T the real type of authentication
+ * @param <T> the real type of authentication
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9.1
  */
@@ -72,7 +72,7 @@ public abstract class Connection<T extends Authentication> implements Loggable, 
     private static final String ERROR_CONNECTION_INTERRUPTED = "Connection is interrupted.";
 
     /** Time to wait inside connecting loop retries */
-    private static final int PERIOD = 5000; // 5 sec	
+    private static final int PERIOD_IN_MS = 100;
 
     /** loggers */
     private Logger logger = getLogger();
@@ -96,9 +96,7 @@ public abstract class Connection<T extends Authentication> implements Loggable, 
      */
     @SuppressWarnings("unchecked")
     private T lookupAuthentication(String url) throws Exception {
-
-        logger.debug("Looking up authentication interface '" + url + "'");
-
+        logger.trace("Looking up authentication interface '" + url + "'");
         return (T) (PAActiveObject.lookupActive(clazz.getName(), url));
     }
 
@@ -196,7 +194,7 @@ public abstract class Connection<T extends Authentication> implements Loggable, 
      * @throws Exception
      */
     private long sleepOrThrow(final long startTime, long leftTime, final Exception toThrow) throws Exception {
-        Thread.sleep(Math.min(PERIOD, leftTime));
+        Thread.sleep(Math.min(PERIOD_IN_MS, leftTime));
         leftTime -= (System.currentTimeMillis() - startTime);
         if (leftTime <= 0) {
             logger.error(toThrow);
@@ -245,7 +243,7 @@ public abstract class Connection<T extends Authentication> implements Loggable, 
      * @throws UnknownHostException if the IP address of the host could not be determined.
      * @throws URISyntaxException if the given string violates RFC&nbsp;2396,
      */
-    public static String getNetworkInterfaceFor(String url) throws UnknownHostException, IOException,
+    public static String getNetworkInterfaceFor(String url) throws IOException,
             URISyntaxException {
 
         if (url != null && CentralPAPropertyRepository.PA_NET_INTERFACE.getValue() == null &&
