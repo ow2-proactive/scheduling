@@ -234,17 +234,20 @@ public class NodeSource implements InitActive, RunActive {
         // recalculating nodes number only once per policy period
         while (body.isActive()) {
 
-            service.blockingServeOldest(pingFrequency);
+            try {
+                service.blockingServeOldest(pingFrequency);
+                delta += System.currentTimeMillis() - timeStamp;
+                timeStamp = System.currentTimeMillis();
 
-            delta += System.currentTimeMillis() - timeStamp;
-            timeStamp = System.currentTimeMillis();
-
-            if (delta > pingFrequency) {
-                logger.info("[" + name + "] Pinging alive nodes");
-                for (Node node : getAliveNodes()) {
-                    pingNode(node);
+                if (delta > pingFrequency) {
+                    logger.info("[" + name + "] Pinging alive nodes");
+                    for (Node node : getAliveNodes()) {
+                        pingNode(node);
+                    }
+                    delta = 0;
                 }
-                delta = 0;
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         }
     }

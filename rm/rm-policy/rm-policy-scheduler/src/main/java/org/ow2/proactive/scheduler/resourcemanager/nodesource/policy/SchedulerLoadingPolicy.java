@@ -135,19 +135,22 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
         // recalculating nodes number only once per policy period
         while (body.isActive()) {
 
-            service.blockingServeOldest(refreshTime);
+            try {
+                service.blockingServeOldest(refreshTime);
+                delta += System.currentTimeMillis() - timeStamp;
+                timeStamp = System.currentTimeMillis();
 
-            delta += System.currentTimeMillis() - timeStamp;
-            timeStamp = System.currentTimeMillis();
-
-            if (delta > refreshTime) {
-                if (active && nodeSource != null) {
-                    try {
-                        updateNumberOfNodes();
-                    } catch (BodyTerminatedRequestException e) {
+                if (delta > refreshTime) {
+                    if (active && nodeSource != null) {
+                        try {
+                            updateNumberOfNodes();
+                        } catch (BodyTerminatedRequestException e) {
+                        }
                     }
+                    delta = 0;
                 }
-                delta = 0;
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         }
     }

@@ -139,13 +139,18 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
     public void runActivity(Body body) {
         Service service = new Service(body);
         while (body.isActive()) {
-            Request request = service.blockingRemoveOldest();
-            if (request != null) {
-                try {
-                    service.serve(request);
-                } catch (Throwable e) {
-                    logger.error("Cannot serve request: " + request, e);
+            Request request = null;
+            try {
+                request = service.blockingRemoveOldest();
+                if (request != null) {
+                    try {
+                        service.serve(request);
+                    } catch (Throwable e) {
+                        logger.error("Cannot serve request: " + request, e);
+                    }
                 }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         }
     }

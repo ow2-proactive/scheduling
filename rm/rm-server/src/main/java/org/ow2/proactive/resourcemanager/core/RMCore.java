@@ -400,21 +400,27 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         // recalculating nodes number only once per policy period
         while (body.isActive()) {
 
-            Request request = service
-                    .blockingRemoveOldest(PAResourceManagerProperties.RM_ALIVE_EVENT_FREQUENCY
-                            .getValueAsInt());
-            if (request != null) {
-                try {
+            Request request = null;
+            try {
+                request = service
+                        .blockingRemoveOldest(PAResourceManagerProperties.RM_ALIVE_EVENT_FREQUENCY
+                                .getValueAsInt());
+
+                if (request != null) {
                     try {
-                        caller = checkMethodCallPermission(request.getMethodName(), request.getSourceBodyID());
-                        service.serve(request);
-                    } catch (SecurityException ex) {
-                        logger.warn("Cannot serve request: " + request, ex);
-                        service.serve(new ThrowExceptionRequest(request, ex));
+                        try {
+                            caller = checkMethodCallPermission(request.getMethodName(), request.getSourceBodyID());
+                            service.serve(request);
+                        } catch (SecurityException ex) {
+                            logger.warn("Cannot serve request: " + request, ex);
+                            service.serve(new ThrowExceptionRequest(request, ex));
+                        }
+                    } catch (Throwable e) {
+                        logger.error("Cannot serve request: " + request, e);
                     }
-                } catch (Throwable e) {
-                    logger.error("Cannot serve request: " + request, e);
                 }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         }
     }
