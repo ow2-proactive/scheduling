@@ -93,7 +93,7 @@ public interface StudioInterface {
     @Produces("application/json")
     boolean updateWorkflow(@HeaderParam("sessionid") String sessionId,
                            @PathParam("id") String workflowId,
-                           @FormParam("name") String name, @FormParam("xml") String xml, @FormParam("metadata") String metadata) throws NotConnectedException;
+                           @FormParam("name") String name, @FormParam("xml") String xml, @FormParam("metadata") String metadata) throws NotConnectedException, IOException;
 
     @DELETE
     @Path("workflows/{id}")

@@ -37,10 +37,10 @@
 package org.ow2.proactive_grid_cloud_portal.studio;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Logger;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
-import org.jboss.resteasy.util.GenericType;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.node.NodeException;
 import org.ow2.proactive.resourcemanager.exception.RMException;
@@ -58,7 +58,6 @@ import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
 import javax.security.auth.login.LoginException;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
 import java.io.*;
 import java.security.KeyException;
 import java.util.ArrayList;
@@ -73,6 +72,7 @@ import java.util.jar.JarFile;
 public class StudioRest implements StudioInterface {
 
     private static String PROJECT_NAME_PROPERTY = "proactive.projects.dir";
+    private final static Logger logger = Logger.getLogger(StudioRest.class);
     private SchedulerStateRest schedulerRest = null;
 
     private SchedulerRestInterface scheduler() {
@@ -106,56 +106,48 @@ public class StudioRest implements StudioInterface {
 
     private void delete(File f) throws IOException {
         if (f.isDirectory()) {
-            for (File c : f.listFiles())
+            for (File c : f.listFiles()) {
+                logger.info("Deleting file " + c.getAbsolutePath());
                 delete(c);
+            }
         }
-        if (!f.delete())
+
+        logger.info("Deleting file " + f.getAbsolutePath());
+        if (!f.delete()) {
             throw new FileNotFoundException("Failed to delete file: " + f);
+        }
     }
 
     private void writeFileContent(String fileName, String content) {
-        PrintWriter writer = null;
         try {
-            writer = new PrintWriter(fileName);
-            writer.println(content);
-        } catch (FileNotFoundException e) {
+            logger.info("Writing file " + fileName);
+            FileOutputStream output = new FileOutputStream(new File(fileName));
+            IOUtils.write(content, output);
+        } catch (IOException e) {
             e.printStackTrace();
-        } finally {
-            writer.close();
         }
     }
 
     private String getFileContent(String fileName) {
-        StringBuffer fileData = new StringBuffer();
-        BufferedReader reader = null;
         try {
-            reader = new BufferedReader(
-                    new FileReader(fileName));
-            char[] buf = new char[1024];
-            int numRead=0;
-            while((numRead=reader.read(buf)) != -1){
-                String readData = String.valueOf(buf, 0, numRead);
-                fileData.append(readData);
-            }
+            FileInputStream inputStream = new FileInputStream(fileName);
+            return IOUtils.toString(inputStream);
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            try {
-                reader.close();
-            } catch (IOException e) {}
         }
-        return fileData.toString().trim();
+
+        return "";
     }
 
     @Override
     public String login(@FormParam("username") String username, @FormParam("password") String password) throws KeyException, LoginException, RMException, ActiveObjectCreationException, NodeException, SchedulerRestException {
-        System.out.println("Logging as " + username);
+        logger.info("Logging as " + username);
         return scheduler().login(username, password);
     }
 
     @Override
     public String loginWithCredential(@MultipartForm LoginForm multipart) throws ActiveObjectCreationException, NodeException, KeyException, IOException, LoginException, RMException, SchedulerRestException {
-        System.out.println("Logging using credential file");
+        logger.info("Logging using credential file");
         return scheduler().loginWithCredential(multipart);
     }
 
@@ -181,11 +173,11 @@ public class StudioRest implements StudioInterface {
         File workflowsDir = new File(getProjectsDirName()+"/"+userName+"/workflows");
 
         if (!workflowsDir.exists()) {
-            System.out.println("Creating dir " + workflowsDir.getAbsolutePath());
+            logger.info("Creating dir " + workflowsDir.getAbsolutePath());
             workflowsDir.mkdirs();
         }
 
-        System.out.println("Getting workflows as " + userName);
+        logger.info("Getting workflows as " + userName);
         ArrayList<Workflow> projects = new ArrayList<Workflow>();
         for (File f: workflowsDir.listFiles()) {
             if (f.isDirectory()) {
@@ -211,7 +203,7 @@ public class StudioRest implements StudioInterface {
             }
         }
 
-        System.out.println(projects.size() + " workflows found");
+        logger.info(projects.size() + " workflows found");
         return projects;
     }
 
@@ -223,11 +215,11 @@ public class StudioRest implements StudioInterface {
                                @FormParam("name") String name, @FormParam("xml") String xml, @FormParam("metadata") String metadata) throws NotConnectedException {
         String userName = getUserName(sessionId);
 
-        System.out.println("Creating workflow as " + userName);
+        logger.info("Creating workflow as " + userName);
         File workflowsDir = new File(getProjectsDirName()+"/"+userName+"/workflows");
 
         if (!workflowsDir.exists()) {
-            System.out.println("Creating dir " + workflowsDir.getAbsolutePath());
+            logger.info("Creating dir " + workflowsDir.getAbsolutePath());
             workflowsDir.mkdirs();
         }
 
@@ -237,14 +229,11 @@ public class StudioRest implements StudioInterface {
         }
 
         File newWorkflowFile = new File(workflowsDir.getAbsolutePath() + "/" + projectId);
-        System.out.println("Creating dir " + newWorkflowFile.getAbsolutePath());
+        logger.info("Creating dir " + newWorkflowFile.getAbsolutePath());
         newWorkflowFile.mkdirs();
 
-        System.out.println("Writing file " + newWorkflowFile.getAbsolutePath() + "/name");
         writeFileContent(newWorkflowFile.getAbsolutePath() + "/name", name);
-        System.out.println("Writing file " + newWorkflowFile.getAbsolutePath() + "/metadata");
         writeFileContent(newWorkflowFile.getAbsolutePath() + "/metadata", metadata);
-        System.out.println("Writing file " + newWorkflowFile.getAbsolutePath() + "/" + name + ".xml");
         writeFileContent(newWorkflowFile.getAbsolutePath() + "/" + name + ".xml", xml);
 
         return projectId;
@@ -255,25 +244,21 @@ public class StudioRest implements StudioInterface {
     @Path("workflows/{id}")
     @Produces("application/json")
     public boolean updateWorkflow(@HeaderParam("sessionid") String sessionId, @PathParam("id") String workflowId,
-                                  @FormParam("name") String name, @FormParam("xml") String xml, @FormParam("metadata") String metadata) throws NotConnectedException {
+                                  @FormParam("name") String name, @FormParam("xml") String xml, @FormParam("metadata") String metadata) throws NotConnectedException, IOException {
         String userName = getUserName(sessionId);
 
-        System.out.println("Updating workflow " + workflowId + " as " + userName);
+        logger.info("Updating workflow " + workflowId + " as " + userName);
         File workflowsDir = new File(getProjectsDirName()+"/"+userName+"/workflows/"+workflowId);
 
         String oldJobName = getFileContent(workflowsDir.getAbsolutePath() + "/name");
         if (name != null && !name.equals(oldJobName)) {
             // new job name
-            System.out.println("Updating job name from " + oldJobName + " to " + name);
-            System.out.println("Writing file " + workflowsDir.getAbsolutePath()+"/name");
+            logger.info("Updating job name from " + oldJobName + " to " + name);
             writeFileContent(workflowsDir.getAbsolutePath()+"/name", name);
-            System.out.println("Deleting file " + workflowsDir.getAbsolutePath()+"/"+oldJobName+".xml");
-            new File(workflowsDir.getAbsolutePath()+"/"+oldJobName+".xml").delete();
+            delete(new File(workflowsDir.getAbsolutePath()+"/"+oldJobName+".xml"));
         }
 
-        System.out.println("Writing file " + workflowsDir.getAbsolutePath()+"/metadata");
         writeFileContent(workflowsDir.getAbsolutePath()+"/metadata", metadata);
-        System.out.println("Writing file " + workflowsDir.getAbsolutePath()+"/"+name+".xml");
         writeFileContent(workflowsDir.getAbsolutePath()+"/"+name+".xml", xml);
 
         return true;
@@ -286,11 +271,10 @@ public class StudioRest implements StudioInterface {
     public boolean deleteWorkflow(@HeaderParam("sessionid") String sessionId, @PathParam("id") String workflowId) throws NotConnectedException, IOException {
         String userName = getUserName(sessionId);
 
-        System.out.println("Deleting workflow " + workflowId + " as " + userName);
+        logger.info("Deleting workflow " + workflowId + " as " + userName);
         File workflowsDir = new File(getProjectsDirName()+"/"+userName+"/workflows/"+workflowId);
 
         if (workflowsDir.exists()) {
-            System.out.println("Removing dir " + workflowsDir.getAbsolutePath());
             delete(workflowsDir);
             return true;
         }
@@ -306,7 +290,7 @@ public class StudioRest implements StudioInterface {
         File scriptDir = new File(getProjectsDirName()+"/"+userName + "/scripts");
 
         if (!scriptDir.exists()) {
-            System.out.println("Creating dir " + scriptDir.getAbsolutePath());
+            logger.info("Creating dir " + scriptDir.getAbsolutePath());
             scriptDir.mkdirs();
         }
 
@@ -321,7 +305,7 @@ public class StudioRest implements StudioInterface {
             scripts.add(script);
         }
 
-        System.out.println(scripts.size() + " scripts found");
+        logger.info(scripts.size() + " scripts found");
         return scripts;
     }
 
@@ -332,7 +316,7 @@ public class StudioRest implements StudioInterface {
     public String createScript(@HeaderParam("sessionid") String sessionId,
                       @FormParam("name") String name, @FormParam("content") String content) throws NotConnectedException {
         String userName = getUserName(sessionId);
-        System.out.println("Creating script " + name + " as " + userName);
+        logger.info("Creating script " + name + " as " + userName);
         File scriptDir = new File(getProjectsDirName()+"/"+userName+"/scripts");
         String fileName = scriptDir.getAbsolutePath()+"/"+name;
         writeFileContent(fileName, content);
@@ -368,9 +352,8 @@ public class StudioRest implements StudioInterface {
             });
 
             for (File jar :jars) {
-                JarFile jarFile = null;
                 try {
-                    jarFile = new JarFile(jar.getAbsolutePath());
+                    JarFile jarFile = new JarFile(jar.getAbsolutePath());
                     Enumeration allEntries = jarFile.entries();
                     while (allEntries.hasMoreElements()) {
                         JarEntry entry = (JarEntry) allEntries.nextElement();
@@ -402,7 +385,7 @@ public class StudioRest implements StudioInterface {
         File classesDir = new File(getProjectsDirName()+"/"+userName + "/classes");
 
         if (!classesDir.exists()) {
-            System.out.println("Creating dir " + classesDir.getAbsolutePath());
+            logger.info("Creating dir " + classesDir.getAbsolutePath());
             classesDir.mkdirs();
         }
 
@@ -415,8 +398,6 @@ public class StudioRest implements StudioInterface {
         for (InputPart inputPart : inputParts) {
 
             try {
-
-                MultivaluedMap<String, String> header = inputPart.getHeaders();
                 //convert the uploaded file to inputstream
                 InputStream inputStream = inputPart.getBody(InputStream.class,null);
                 byte[] bytes = IOUtils.toByteArray(inputStream);
