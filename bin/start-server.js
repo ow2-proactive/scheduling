@@ -160,56 +160,54 @@ function startScheduler() {
 	return proc;
 }
 
-function startJetty() {    
+function injectProperties(propsFile, properties) {
+    println("Injecting the Resource Manager and Scheduler urls into  " + propsFile);
+    var props = new Properties();
+    var inputStream = new FileInputStream(propsFile);
+    props.load(inputStream);
+    inputStream.close()
+    for (var prop in properties) {
+        props.setProperty(prop, properties[prop]);
+    }
+
+    var outputStream = new FileOutputStream(propsFile);
+    props.store(outputStream, "");
+    outputStream.close();
+}
+
+function extractWar(warsDir, path, warName) {
+    var extractDir = new File(warsDir, path);
+    println("Checking for " + extractDir);
+    if (!extractDir.exists()) {
+        var restWar = new File(warsDir, warName);
+        if (!restWar.exists()) {
+            println("Unable to locate " + restWar);
+            return null;
+        }
+        extractFolder(restWar, extractDir);
+    }
+    return extractDir;
+}
+
+function startJetty() {
 	if (!warsDir.exists()) {
 	   println("Unable to locate " + warsDir + " directory, jetty will not be started");
 	   return null;
 	}
 
-	var restDir = new File(warsDir, "rest");
-	println("Checking for " + restDir);
-	if (!restDir.exists()) {
-	   var restWar = new File(warsDir, "rest.war");
-	   if (!restWar.exists()) {
-	      println("Unable to locate " + restWar);
-		  return null;
-	   }
-	   extractFolder(restWar,restDir);
-	}
+    var restDir = extractWar(warsDir, "rest", "rest.war")
+    var rmDir = extractWar(warsDir, "rm", "rm.war")
+    var schedulerDir = extractWar(warsDir, "scheduler", "scheduler.war")
 
-	var rmDir = new File(warsDir, "rm");
-	println("Checking for " + rmDir) ;
-	if (!rmDir.exists()) {
-	   var rmWar = new File(warsDir, "rm.war");
-	   if (!rmWar.exists()) {
-	      println("Unable to locate " + rmWar);
-		  return null;
-	   }
-	   extractFolder(rmWar,rmDir);
-	}
+    var restProperties = { "rm.url": PROTOCOL + "://localhost:" + RM_PORT,
+        "scheduler.url": PROTOCOL + "://localhost:" + SCHEDULER_PORT};
+    injectProperties(new File(restDir, "WEB-INF" + fs + "portal.properties"), restProperties);
 
-	var schedulerDir = new File(warsDir, "scheduler");
-	println("Checking for " + schedulerDir);
-	if (!schedulerDir.exists()) {
-	   var schedulerWar = new File(warsDir, "scheduler.war");
-	   if (!schedulerWar.exists()) {
-	      println("Unable to locate " + schedulerWar);
-		  return null;
-	   }
-	   extractFolder(schedulerWar,schedulerDir);
-	}
+    var rmProperties = { "rm.rest.url": "http://localhost:" + JETTY_PORT + "/rest/rest"};
+    injectProperties(new File(rmDir, "rm.conf"), rmProperties);
 
-	var propsFile = new File(restDir, "WEB-INF"+fs+"portal.properties");
-	println("Injecting the Resource Manager and Scheduler urls into  " + propsFile);
-	var props = new Properties();
-	var inputStream = new FileInputStream(propsFile);
-	props.load(inputStream);
-	inputStream.close()
-	props.setProperty("rm.url", PROTOCOL+"://localhost:"+RM_PORT);
-	props.setProperty("scheduler.url", PROTOCOL+"://localhost:"+SCHEDULER_PORT);
-	var outputStream = new FileOutputStream(propsFile);
-	props.store(outputStream, "");
-	outputStream.close();
+    var schedulerProperties = { "sched.rest.url": "http://localhost:" + JETTY_PORT + "/rest/rest"};
+    injectProperties(new File(schedulerDir, "scheduler.conf"), schedulerProperties);
 
 	var cmd = [ javaExe ];
 	cmd.push("-Djava.security.manager");
@@ -282,7 +280,6 @@ function fillClasspath() {
 	for (x in allJars) {
 		classpath.append(File.pathSeparator).append(allJars[x]);
 	}	
-	println("CLASSPATH=" + classpath.toString());
 	return classpath.toString();
 }
 
