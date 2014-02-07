@@ -68,7 +68,8 @@ public class Log4JTaskLogs implements TaskLogs {
     public static final String JOB_APPENDER_NAME = "JobLoggerAppender";
 
     /** Log4j context variable name for task ids */
-    public static final String MDC_TASK_ID = "taskid";
+    public static final String MDC_TASK_ID = "task.id";
+    public static final String MDC_TASK_NAME = "task.name";
 
     /** Log4j context variable name for task ids */
     public static final String MDC_HOST = "host";
