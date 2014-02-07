@@ -99,6 +99,9 @@ public class ForkedJavaExecutable extends JavaExecutable implements ForkerStarte
     /** Forked JVM logs directory property name */
     public static final String FORKED_LOGS_HOME = "pa.logs.home";
 
+    /** Forked JVM logs directory property name */
+    public static final String FORKED_PARENT_NODE = "pa.forker.node";
+
     /** Check start timeout : timeout to check if the process has failed */
     private static final long CHECKSTART_TIMEOUT = 2000;
 
@@ -412,17 +415,24 @@ public class ForkedJavaExecutable extends JavaExecutable implements ForkerStarte
         }
         //set logHome than can be used in log4j file
         String logHome;
+        String nodeName;
         try {
-            logHome = ProActiveRuntimeImpl.getProActiveRuntime().getProActiveHome() + File.separator +
-                ".logs";
+            ProActiveRuntimeImpl runtime = ProActiveRuntimeImpl.getProActiveRuntime();
+            nodeName = PAActiveObject.getNode().getNodeInformation().getName();
+            logHome = runtime.getProActiveHome() + File.separator +
+                    ".logs";
             File tmp = new File(logHome);
             if (!tmp.exists()) {
                 tmp.mkdir();
             }
         } catch (ProActiveException pae) {
             logHome = System.getProperty("java.io.tmpdir");
+            nodeName = "DefaultNode";
         }
         command.add("-D" + FORKED_LOGS_HOME + "=" + logHome);
+
+        command.add("-D" + FORKED_PARENT_NODE+ "=" + nodeName);
+
         //set mandatory log4j file
         if (forkEnvironment == null || !contains("log4j.configuration", forkEnvironment.getJVMArguments())) {
             try {
