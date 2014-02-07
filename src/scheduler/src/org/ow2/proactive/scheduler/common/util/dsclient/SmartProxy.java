@@ -367,10 +367,7 @@ public class SmartProxy extends SchedulerProxyUserInterface implements InitActiv
         // now we can can check if we need to transfer any data
         jobDB.loadJobs();
 
-        super.addEventListener(stubOnThis, true, SchedulerEvent.JOB_RUNNING_TO_FINISHED,
-                SchedulerEvent.JOB_PENDING_TO_FINISHED, SchedulerEvent.KILLED, SchedulerEvent.SHUTDOWN,
-                SchedulerEvent.SHUTTING_DOWN, SchedulerEvent.STOPPED, SchedulerEvent.RESUMED,
-                SchedulerEvent.TASK_RUNNING_TO_FINISHED);
+        registerAsListener();
         syncAwaitedJobs();
     }
 
@@ -389,11 +386,16 @@ public class SmartProxy extends SchedulerProxyUserInterface implements InitActiv
         this.lastCredData = credData;
         // now we can can check if we need to transfer any data
         jobDB.loadJobs();
-        super.addEventListener(stubOnThis, true, SchedulerEvent.JOB_RUNNING_TO_FINISHED,
-                SchedulerEvent.JOB_PENDING_TO_FINISHED, SchedulerEvent.KILLED, SchedulerEvent.SHUTDOWN,
+        registerAsListener();
+        syncAwaitedJobs();
+    }
+
+    private void registerAsListener() throws NotConnectedException, PermissionException {
+        super.addEventListener(stubOnThis, true, SchedulerEvent.JOB_RUNNING_TO_FINISHED, SchedulerEvent.JOB_PENDING_TO_RUNNING,
+                SchedulerEvent.JOB_PENDING_TO_FINISHED, SchedulerEvent.JOB_PAUSED, SchedulerEvent.JOB_RESUMED,
+                SchedulerEvent.TASK_PENDING_TO_RUNNING, SchedulerEvent.KILLED, SchedulerEvent.SHUTDOWN,
                 SchedulerEvent.SHUTTING_DOWN, SchedulerEvent.STOPPED, SchedulerEvent.RESUMED,
                 SchedulerEvent.TASK_RUNNING_TO_FINISHED);
-        syncAwaitedJobs();
     }
 
     @Override
@@ -421,10 +423,7 @@ public class SmartProxy extends SchedulerProxyUserInterface implements InitActiv
         } else {
             super.init(lastSchedUrl, lastCredentials);
         }
-        super.addEventListener(stubOnThis, true, SchedulerEvent.JOB_RUNNING_TO_FINISHED,
-                SchedulerEvent.JOB_PENDING_TO_FINISHED, SchedulerEvent.KILLED, SchedulerEvent.SHUTDOWN,
-                SchedulerEvent.SHUTTING_DOWN, SchedulerEvent.STOPPED, SchedulerEvent.RESUMED,
-                SchedulerEvent.TASK_RUNNING_TO_FINISHED);
+        registerAsListener();
         jobDB.loadJobs();
         syncAwaitedJobs();
     }

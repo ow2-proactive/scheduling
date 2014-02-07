@@ -324,7 +324,6 @@ public class JobDB {
         } catch (FileSystemException e) {
             logger.warn("Data in folders " + pullUrl + " and " + pushUrl +
                 " cannot be deleted due to an unexpected error ", e);
-            e.printStackTrace();
         }
 
         String url = "NOT YET DEFINED";
@@ -338,7 +337,7 @@ public class JobDB {
                     fo.delete();
                 }
             } catch (FileSystemException e) {
-                logger.warn("Could not delete temporary files at location " + url + " .");
+                logger.warn("Could not delete temporary files at location " + url + " .",e);
             }
         }
 
