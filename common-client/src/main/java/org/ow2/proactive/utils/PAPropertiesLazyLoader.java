@@ -100,13 +100,13 @@ public class PAPropertiesLazyLoader {
         }
 
         if (new File(propertiesPath).exists()) {
-            logger.info("Loading properties from file " + propertiesPath);
+            logger.debug("Loading properties from file " + propertiesPath);
             return new FileInputStream(propertiesPath);
         } else {
             if (systemPropertyForFileNameSet) {
                 throw new RuntimeException("RM properties file not found : '" + propertiesPath + "'");
             }
-            logger.info("Loading empty properties");
+            logger.debug("Loading empty properties");
             return null;
         }
     }
