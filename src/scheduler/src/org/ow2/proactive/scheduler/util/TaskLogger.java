@@ -82,6 +82,18 @@ public class TaskLogger {
         MDC.getContext().remove(FileAppender.FILE_NAME);
     }
 
+    public void trace(TaskId id, String message) {
+        MDC.getContext().put(FileAppender.FILE_NAME, id);
+        logger.trace(PREFIX + id + " " + message);
+        MDC.getContext().remove(FileAppender.FILE_NAME);
+    }
+
+    public void trace(TaskId id, String message, Throwable th) {
+        MDC.getContext().put(FileAppender.FILE_NAME, id);
+        logger.trace(PREFIX + id + " " + message, th);
+        MDC.getContext().remove(FileAppender.FILE_NAME);
+    }
+
     public void error(TaskId id, String message, Throwable th) {
         MDC.getContext().put(FileAppender.FILE_NAME, id);
         logger.error(PREFIX + id + " " + message, th);
@@ -90,5 +102,9 @@ public class TaskLogger {
 
     public boolean isDebugEnabled() {
         return logger.isDebugEnabled();
+    }
+
+    public boolean isTraceEnabled() {
+        return logger.isTraceEnabled();
     }
 }

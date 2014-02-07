@@ -17,6 +17,7 @@ import org.ow2.proactive.scheduler.core.db.SchedulerStateRecoverHelper;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
 import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
+import org.ow2.proactive.scheduler.exception.ForkedJVMProcessException;
 import org.ow2.proactive.scheduler.exception.ProgressPingerException;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.policy.Policy;
@@ -787,13 +788,17 @@ public class SchedulingService {
             if (tlogger.isDebugEnabled()) {
                 tlogger.debug(task.getId(), "getProgress failed", e);
             }
-        } catch (ProgressPingerException e) {
-            //thrown by (2) in one of this two cases :
-            // * when user has overridden getProgress method and the method throws an exception
+        } catch (ForkedJVMProcessException e) {
+            //thrown by when user has overridden getProgress method and the method throws an exception
             // * if forked JVM process is dead
             //nothing to do in any case
-            if (tlogger.isDebugEnabled()) {
-                tlogger.debug(task.getId(), "getProgress failed", e);
+            if (tlogger.isTraceEnabled()) {
+                tlogger.trace(task.getId(), "getProgress failed", e);
+            }
+        } catch (ProgressPingerException e) {
+            //thrown by when forked JVM process is dead, which is a normal scenario at the end of the task
+            if (tlogger.isTraceEnabled()) {
+                tlogger.trace(task.getId(), "getProgress failed", e);
             }
         } catch (Throwable t) {
             tlogger.info(task.getId(), "node failed", t);
