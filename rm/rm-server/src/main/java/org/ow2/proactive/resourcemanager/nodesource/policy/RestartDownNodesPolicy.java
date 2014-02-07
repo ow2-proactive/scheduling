@@ -39,13 +39,13 @@ package org.ow2.proactive.resourcemanager.nodesource.policy;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 import org.ow2.proactive.resourcemanager.rmnode.RMDeployingNode;
+import org.apache.log4j.Logger;
 
 
 /**
@@ -99,7 +99,6 @@ public class RestartDownNodesPolicy extends NodeSourcePolicy {
                     }
                 }
 
-                logger.info("Number of deploying nodes " + nodeSource.getDownNodes().size());
                 for (RMDeployingNode lostNode : nodeSource.getDeployingNodes()) {
                     if (!lostNode.isLost()) {
                         continue;
