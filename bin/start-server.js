@@ -7,20 +7,36 @@ importPackage(java.util);
 importPackage(java.util.concurrent);
 importPackage(java.util.zip);
 
-/** Ports */
-var PROTOCOL = "pnp";
-var START_ROUTER = false;
-var IS_PORT_PROPERTY = (PROTOCOL.toLowerCase() != "pamr") && (PROTOCOL.toLowerCase() != "amqp");
-var RM_PORT = 64738;
-var SCHEDULER_PORT = 52845;
-var JETTY_PORT = 8080;
+/** This script support the following configurations :
+    PNP_PAMR : main protocol : PNP , additional protocol : PAMR (default)
+    PNP : PNP protocol only
+    PAMR : PAMR protocol only
+ **/
+
+var CONFIGS = {
+    PNP_PAMR : 1,
+    PNP : 2,
+    PAMR : 3
+};
+
+var config = CONFIGS.PNP_PAMR
+// change the above variable in order to switch configurations
+
+
+var ROUTER_PORT = 64737; // port used by the PAMR router
+var RM_PORT = 64738; // port used by the RM in case of PNP
+var SCHEDULER_PORT = 64739; // port used by the Scheduler in case of PNP
+var JETTY_PORT = 8080;  // port used by the Web Server
+// change the above ports if required
+
+var MAIN_PROTOCOL;
+var ADDITIONAL_PROTOCOL;
+var PORT_PROTOCOL;
+
 var SCRIPT_NAME = "start-server.js";
 
-var CHECK_PORTS_NUMBER = [RM_PORT, SCHEDULER_PORT, JETTY_PORT];
-var CHECK_PORTS_SNAME = ["RM", "SCHEDULER", "JETTY"];
-
-/** Check that given ports are free */
-checkPorts(CHECK_PORTS_NUMBER, CHECK_PORTS_SNAME);
+var RM_URL
+var SCHEDULER_URL
 
 /** OS switch and independent absolute path to Java executable */
 var fs = File.separator;
@@ -49,15 +65,81 @@ var vfsJars = ["commons-logging-1.1.1.jar","commons-httpclient-3.1.jar"];
 var coreJars = ["*"];
 var jettyJars = ["*"];
 
+var proActiveConfiguration;
+
 /** Processes */
 var routerProcess, rmProcess, schedulerProcess, jettyProcess;
 
 startEverything();
 
+/** Configure protocol and heck that given ports are free */
+
+function setupConfigAndCheckPorts() {
+    switch (config) {
+        case CONFIGS.PNP_PAMR:
+            MAIN_PROTOCOL = "pnp";
+            ADDITIONAL_PROTOCOL = "pamr";
+            PORT_PROTOCOL = "pnp";
+            CHECK_PORTS = {
+                "ROUTER":ROUTER_PORT,
+                "RM":RM_PORT,
+                "SCHEDULER":SCHEDULER_PORT,
+                "JETTY":JETTY_PORT
+            }
+            break;
+        case CONFIGS.PNP:
+            MAIN_PROTOCOL = "pnp";
+            ADDITIONAL_PROTOCOL = null;
+            PORT_PROTOCOL = "pnp";
+            CHECK_PORTS = {
+                "RM":RM_PORT,
+                "SCHEDULER":SCHEDULER_PORT,
+                "JETTY":JETTY_PORT
+            }
+            break;
+        case CONFIGS.PAMR:
+            MAIN_PROTOCOL = "pamr";
+            ADDITIONAL_PROTOCOL = null;
+            PORT_PROTOCOL = null;
+            CHECK_PORTS = {
+                "ROUTER":ROUTER_PORT,
+                "JETTY":JETTY_PORT
+            }
+            break;
+        default:
+            MAIN_PROTOCOL = "pnp";
+            ADDITIONAL_PROTOCOL = "pamr";
+            PORT_PROTOCOL = "pnp";
+            CHECK_PORTS = {
+                "ROUTER":ROUTER_PORT,
+                "RM":RM_PORT,
+                "SCHEDULER":SCHEDULER_PORT,
+                "JETTY":JETTY_PORT
+            }
+    }
+    checkPorts(CHECK_PORTS);
+}
+
+function setupURLs() {
+    if (config == CONFIGS.PAMR) {
+        RM_URL = "pamr://0";
+        SCHEDULER_URL = "pamr://1";
+    } else {
+        RM_URL = PORT_PROTOCOL+"://localhost:"+RM_PORT;
+        SCHEDULER_URL = PORT_PROTOCOL+"://localhost:"+SCHEDULER_PORT;
+    }
+}
+
 function startEverything() {
 	if (!logsDir.exists()) {
 		logsDir.mkdir();
 	}
+
+    setupConfigAndCheckPorts();
+
+    setupURLs();
+
+    proActiveConfiguration = buildProActiveConfiguration();
 
 	// Add shutdownhook to terminate all processes if the current process is killed 
 	var cleaner = new java.lang.Thread(function () {
@@ -72,21 +154,25 @@ function startEverything() {
 	var executor = Executors.newFixedThreadPool(4);
 	var service = new ExecutorCompletionService(executor);
 
-    if (START_ROUTER) {
-	println("");
-	println("Running PAMR Router process ...");
-	routerProcess = startRouter();
-	
-	if (routerProcess != null) {
-	    var routerWaiter = new Callable({ 
-		   call: function () {
-		      var exitValue = routerProcess.waitFor();
-			  println("!! Router HAS EXITED !! Please consult " + routerOutputFile);
-		      return exitValue;
-	    }});
-	    service.submit(routerWaiter);
-	}
+    if (config == CONFIGS.PNP_PAMR || config == CONFIGS.PAMR) {
+        println("");
+        println("Running PAMR Router process ...");
+        routerProcess = startRouter();
+
+        if (routerProcess != null) {
+            var routerWaiter = new Callable({
+                call: function () {
+                    var exitValue = routerProcess.waitFor();
+                    println("!! Router HAS EXITED !! Please consult " + routerOutputFile);
+                    return exitValue;
+                }});
+            service.submit(routerWaiter);
+        }
     }
+
+    println("");
+    println("Writing ProActive Configuration file...")
+    writeXMLtoFile(configDir+fs+"proactive"+fs+"ProActiveConfiguration.xml",proActiveConfiguration);
 
 	println("");
 	println("Running Resource Manager process ...");
@@ -164,12 +250,13 @@ function startRouter() {
 	cmd.push("-XX:NewRatio=2");
 	cmd.push("-Xms512m");
 	cmd.push("-Xmx512m");
-	//cmd.push("-Dproactive."+PROTOCOL+".port="+RM_PORT);	
 	cmd.push("-Dlog4j.configuration=file:"+configDir+fs+"log4j" + fs+"log4j-router");
 	cmd.push("org.objectweb.proactive.extensions.pamr.router.Main");
 	cmd.push("--configFile");
 	cmd.push(configDir+fs+"router" + fs+"router.ini");
 	cmd.push("-v");
+    cmd.push("-p");
+    cmd.push(ROUTER_PORT);
 	cmd.push("-t");
 	cmd.push("180000");
 	cmd.push("-e");
@@ -184,12 +271,14 @@ function startRouter() {
 
 function startRM() {
 	var cmd = initCmd();
-    if (IS_PORT_PROPERTY) {
-	    cmd.push("-Dproactive."+PROTOCOL+".port="+RM_PORT);
+    if (PORT_PROTOCOL != null) {
+        cmd.push("-Dproactive."+PORT_PROTOCOL+".port="+RM_PORT);
     }
 	cmd.push("-Dlog4j.configuration=file:"+configDir+fs+"log4j" + fs+"rm-log4j-server");
-    cmd.push("-Dproactive.pamr.agent.id=0");
-    cmd.push("-Dproactive.pamr.agent.magic_cookie=rm");
+    if (config == CONFIGS.PNP_PAMR || config == CONFIGS.PAMR) {
+        cmd.push("-Dproactive.pamr.agent.id=0");
+        cmd.push("-Dproactive.pamr.agent.magic_cookie=rm");
+    }
 	cmd.push("org.ow2.proactive.resourcemanager.utils.RMStarter");
 	cmd.push("-ln"); // with default 4 local nodes
 	var env = Collections.singletonMap("CLASSPATH", fillClasspath(scriptJars, vfsJars, coreJars));
@@ -200,19 +289,17 @@ function startRM() {
 
 function startScheduler() {
 	var cmd = initCmd();
-    if (IS_PORT_PROPERTY) {
-	    cmd.push("-Dproactive."+PROTOCOL+".port="+SCHEDULER_PORT);
+    if (PORT_PROTOCOL != null) {
+	    cmd.push("-Dproactive."+PORT_PROTOCOL+".port="+SCHEDULER_PORT);
     }
-	cmd.push("-Dlog4j.configuration=file:"+configDir+fs+"log4j" + fs+"scheduler-log4j-server");	
-	cmd.push("org.ow2.proactive.scheduler.util.SchedulerStarter");
-	cmd.push("-Dproactive.pamr.agent.id=1");
-	cmd.push("-Dproactive.pamr.agent.magic_cookie=scheduler");
-	cmd.push("-u");
-    if (PROTOCOL.toLowerCase() == "pamr") {
-	    cmd.push("pamr://0/");
-    } else {
-        cmd.push("-u", PROTOCOL+"://localhost:"+RM_PORT); // always on localhost
+	cmd.push("-Dlog4j.configuration=file:"+configDir+fs+"log4j" + fs+"scheduler-log4j-server");
+    if (config == CONFIGS.PNP_PAMR || config == CONFIGS.PAMR) {
+	    cmd.push("-Dproactive.pamr.agent.id=1");
+	    cmd.push("-Dproactive.pamr.agent.magic_cookie=scheduler");
     }
+    cmd.push("org.ow2.proactive.scheduler.util.SchedulerStarter");
+    cmd.push("-u", RM_URL); // always on localhost
+
 	var env = Collections.singletonMap("CLASSPATH", fillClasspath(scriptJars, vfsJars, coreJars));	
 	var proc = execCmdAsync(cmd, homeDir, schedulerOutputFile, "created on", env);
 	println("Scheduler stdout/stderr redirected into " + schedulerOutputFile);
@@ -232,6 +319,12 @@ function injectProperties(propsFile, properties) {
     var outputStream = new FileOutputStream(propsFile);
     props.store(outputStream, "");
     outputStream.close();
+}
+
+function writeXMLtoFile(xmlFile, xmlString) {
+    var out = new PrintWriter(xmlFile);
+    out.println(xmlString);
+    out.close();
 }
 
 function extractWar(warsDir, path, warName) {
@@ -258,16 +351,12 @@ function startJetty() {
     var rmDir = extractWar(warsDir, "rm", "rm.war")
     var schedulerDir = extractWar(warsDir, "scheduler", "scheduler.war")
 
-    var restProperties;
-    if (PROTOCOL.toLowerCase() == "pamr") {
-        restProperties = { "rm.url": "pamr://0",
-            "scheduler.url": "pamr://1"};
-        injectProperties(new File(restDir, "WEB-INF" + fs + "portal.properties"), restProperties);
-    } else {
-        restProperties = { "rm.url": PROTOCOL + "://localhost:" + RM_PORT,
-            "scheduler.url": PROTOCOL + "://localhost:" + SCHEDULER_PORT};
-        injectProperties(new File(restDir, "WEB-INF" + fs + "portal.properties"), restProperties);
-    }
+    writeXMLtoFile(restDir+fs+"WEB-INF" +fs+"ProActiveConfiguration.xml",proActiveConfiguration);
+
+    var restProperties = { "rm.url": RM_URL,
+        "scheduler.url": SCHEDULER_URL};
+    injectProperties(new File(restDir, "WEB-INF" + fs + "portal.properties"), restProperties);
+
     var rmProperties = { "rm.rest.url": "http://localhost:" + JETTY_PORT + "/rest/rest"};
     injectProperties(new File(rmDir, "rm.conf"), rmProperties);
 
@@ -320,8 +409,38 @@ function initCmd() {
 	cmd.push("-Dproactive.configuration="+configDir+fs+"proactive"+fs+"ProActiveConfiguration.xml");
 	cmd.push("-Dderby.stream.error.file="+logsDir+fs+"derby.log");
 	cmd.push("-Xms128m","-Xmx1048m");
-	cmd.push("-Dproactive.communication.protocol="+PROTOCOL);
+	cmd.push("-Dproactive.communication.protocol="+MAIN_PROTOCOL);
+    if (ADDITIONAL_PROTOCOL != null) {
+        cmd.push("-Dproactive.communication.additional_protocols="+ADDITIONAL_PROTOCOL);
+    }
 	return cmd;
+}
+
+function buildProActiveConfiguration() {
+    var sw = new StringWriter();
+    var pconf = new PrintWriter(sw);
+    pconf.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")
+    pconf.println("<ProActiveUserProperties>");
+    pconf.println(" <properties>");
+    pconf.println("     <prop key=\"proactive.communication.protocol\" value=\""+MAIN_PROTOCOL+"\"/>");
+    // normally we don't put additional protocols in standard proactive configuration
+    if (config == CONFIGS.PNP_PAMR || config == CONFIGS.PAMR) {
+        pconf.println("     <prop key=\"proactive.pamr.router.address\" value=\""+java.net.InetAddress.getLocalHost().getHostName()+"\"/>");
+        pconf.println("     <prop key=\"proactive.pamr.router.port\" value=\""+ROUTER_PORT+"\"/>");
+    }
+    // the following properties are often used, uncomment them if you need :
+    // pconf.println("     <prop key=\"proactive.net.nolocal\" value=\"true\"/>");
+    // pconf.println("     <prop key=\"proactive.useIPaddress\" value=\"true\"/>");
+
+    pconf.println("  </properties>");
+    pconf.println("  <javaProperties>");
+    pconf.println("  </javaProperties>");
+    pconf.println("</ProActiveUserProperties>");
+
+
+    pconf.flush();
+    pconf.close();
+    return sw.toString();
 }
 
 function fillClasspath() {
@@ -496,14 +615,11 @@ function isTcpPortAvailable(port) { // throws IOException
 	return true;
 }
 
-function checkPorts(pnumbers, pnames){
-	for ( var i = 0; i < pnumbers.length; i++) {
-		var port = pnumbers[i];
-		var serv = pnames[i];
-
-		var avail = isTcpPortAvailable(pnumbers[i]);
+function checkPorts(portmap){
+	for (var serv in portmap) {
+		var avail = isTcpPortAvailable(portmap[serv]);
 		if (!avail) {
-			println("TCP port " + port + " (used by " + serv + ") is busy...");
+			println("TCP port " + portmap[serv] + " (used by " + serv + ") is busy...");
 			println("This program will exit...");
 			System.exit(-1);
 		}
