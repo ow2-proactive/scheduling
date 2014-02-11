@@ -317,7 +317,7 @@ function initCmd() {
 	cmd.push("-Dpa.scheduler.home="+homeDir);
 	cmd.push("-Djava.security.manager");
 	cmd.push("-Djava.security.policy=file:"+configDir+fs+"security.java.policy-server");
-	cmd.push("-Dproactive.configuration=file:"+configDir+fs+"proactive"+fs+"ProActiveConfiguration.xml");
+	cmd.push("-Dproactive.configuration="+configDir+fs+"proactive"+fs+"ProActiveConfiguration.xml");
 	cmd.push("-Dderby.stream.error.file="+logsDir+fs+"derby.log");
 	cmd.push("-Xms128m","-Xmx1048m");
 	cmd.push("-Dproactive.communication.protocol="+PROTOCOL);
