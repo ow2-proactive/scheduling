@@ -95,7 +95,7 @@
 			<scriptExecutable>
 				<script>
 					<code language="javascript">
-						java.lang.System.exit(0);
+						java.lang.System.exit(42);
 					</code>
 				</script>
 			</scriptExecutable>

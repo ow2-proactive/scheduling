@@ -39,17 +39,15 @@ package functionaltests;
 import java.io.File;
 import java.net.URL;
 
-import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobResult;
+import org.ow2.proactive.resourcemanager.common.NodeState;
+import org.ow2.proactive.resourcemanager.common.event.RMEventType;
+import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory_stax;
-import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.tests.FunctionalTest;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 
 public class TestNonForkedScriptTask extends FunctionalTest {
 
@@ -57,21 +55,25 @@ public class TestNonForkedScriptTask extends FunctionalTest {
             .getResource("/functionaltests/descriptors/Job_non_forked_script_task.xml");
 
     @Test
-    public void nonForkedTasks() throws Throwable {
+    public void nonForkedTasks_SystemExitScript_KillsANode() throws Throwable {
         SchedulerTHelper.startScheduler(new File(SchedulerTHelper.class.getResource(
                 "config/scheduler-nonforkedscripttasks.ini").toURI()).getAbsolutePath());
+
+        // wait nodes to be free
+        RMTHelper.getDefaultInstance().waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        RMTHelper.getDefaultInstance().waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
         TaskFlowJob job = (TaskFlowJob) JobFactory_stax.getFactory().createJob(
                 new File(nonForked_jobDescriptor.toURI()).getAbsolutePath());
 
-        JobId id = SchedulerTHelper.submitJob(job);
-        SchedulerTHelper.waitForEventJobFinished(id);
-        JobResult jobResult = SchedulerTHelper.getJobResult(id);
+        SchedulerTHelper.submitJob(job);
 
-        // thread name script task
-        TaskResult simpleTaskResult = jobResult.getResult("notforked");
-        assertEquals(true, simpleTaskResult.value());
-        assertTrue(simpleTaskResult.getOutput().getAllLogs(false).contains("ScriptTaskLauncher"));
+        // busy event when task is scheduler
+        RMTHelper.getDefaultInstance().waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
+        // down event when node is killed
+        RMNodeEvent nodeKilledEvent = RMTHelper.getDefaultInstance().waitForAnyNodeEvent(
+          RMEventType.NODE_STATE_CHANGED);
+        assertEquals(NodeState.DOWN, nodeKilledEvent.getNodeState());
     }
 }

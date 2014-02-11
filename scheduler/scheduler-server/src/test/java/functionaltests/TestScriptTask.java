@@ -39,6 +39,7 @@ package functionaltests;
 import java.io.File;
 import java.net.URL;
 
+import org.ow2.proactive.scheduler.common.exception.ForkedJavaTaskException;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
@@ -46,6 +47,7 @@ import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory_stax;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
+import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -105,12 +107,13 @@ public class TestScriptTask extends SchedulerConsecutive {
         assertTrue(dataspacesLogs.contains("input=vfs://"));
         assertTrue(dataspacesLogs.contains("output=vfs://"));
 
-        // script task should be forked by default
+        // script task should be forked by default, ie it will not kill the scheduler on system.exit
         JobState jobState = SchedulerTHelper.getSchedulerInterface().getJobState(id);
         TaskResult killJVMTaskResult = jobResult.getResult("killJVM");
-        TaskState killJVMTaskState = jobState.getHMTasks().get(killJVMTaskResult.getTaskId());
-        System.out.println(killJVMTaskState.getStatus());
+        assertEquals(42, ((ForkedJavaTaskException) killJVMTaskResult.getException()).getExitCode());
 
+        TaskState killJVMTaskState = jobState.getHMTasks().get(killJVMTaskResult.getTaskId());
+        assertEquals(TaskStatus.FAULTY, killJVMTaskState.getStatus());
     }
 
 }
