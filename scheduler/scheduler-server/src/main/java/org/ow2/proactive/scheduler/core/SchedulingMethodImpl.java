@@ -404,18 +404,6 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
             PAFuture.waitFor(nodeSet, true);
             logger.debug("provided nodes " + nodeSet.size());
             return nodeSet;
-        } catch (ScriptException e) {
-            Throwable t = e;
-            while (t.getCause() != null) {
-                t = t.getCause();
-            }
-            logger.info("Selection script throws an exception : " + t);
-            logger.debug("", t);
-            //simulate jobs starts and cancel it
-            schedulingService.simulateJobStartAndCancelIt(tasksToSchedule, "Selection script has failed : " +
-                Formatter.stackTraceToString(t));
-            //leave the method by ss failure
-            return null;
         } catch (RMProxyCreationException e) {
             logger.info("Failed to create User RM Proxy : " + e.getMessage());
             logger.debug("", e);

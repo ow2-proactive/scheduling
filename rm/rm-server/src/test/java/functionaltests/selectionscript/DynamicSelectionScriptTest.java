@@ -222,11 +222,9 @@ public class DynamicSelectionScriptTest extends RMConsecutive {
         nodes = resourceManager.getAtMostNodes(3, badScript);
 
         //wait node selection
-        try {
-            PAFuture.waitFor(nodes);
-            fail("Number of found nodes " + nodes.size());
-        } catch (RuntimeException e) {
-        }
+        PAFuture.waitFor(nodes);
+
+        assertTrue(nodes.size() == 0);
         assertTrue(resourceManager.getState().getFreeNodesNumber() == nsSize);
 
         RMTHelper.log("Test 6");
@@ -238,11 +236,9 @@ public class DynamicSelectionScriptTest extends RMConsecutive {
         nodes = resourceManager.getAtMostNodes(3, noSelectedScript);
 
         //wait node selection
-        try {
-            PAFuture.waitFor(nodes);
-            fail("Number of found nodes " + nodes.size());
-        } catch (RuntimeException expected) {
-        }
+        PAFuture.waitFor(nodes);
+
+        assertTrue(nodes.size() == 0);
         assertTrue(resourceManager.getState().getFreeNodesNumber() == nsSize);
 
         RMTHelper.log("Test 7");
