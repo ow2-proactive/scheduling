@@ -68,6 +68,7 @@ import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.db.DatabaseManagerException;
 import org.ow2.proactive.db.SortParameter;
 import org.ow2.proactive.policy.ClientsPolicy;
+import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.scheduler.authentication.SchedulerAuthentication;
 import org.ow2.proactive.scheduler.common.JobFilterCriteria;
 import org.ow2.proactive.scheduler.common.JobSortParameter;
@@ -226,9 +227,6 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
                     new Object[] { PAActiveObject.getStubOnThis() });
             //creating scheduler core
 
-            RMProxiesManager rmProxiesManager = RMProxiesManager.createRMProxiesManager(rmURL);
-            rmProxiesManager.getRmProxy();
-
             DataSpaceServiceStarter dsServiceStarter = DataSpaceServiceStarter.getDataSpaceServiceStarter();
             dsServiceStarter.startNamingService();
 
@@ -239,6 +237,11 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
             ExecutorService internalThreadPool = Executors.newFixedThreadPool(
                     PASchedulerProperties.SCHEDULER_INTERNAL_POOL_NBTHREAD.getValueAsInt(),
                     new NamedThreadFactory("InternalOperationsThreadPool"));
+
+            // at this point we must wait the resource manager
+            RMConnection.waitAndJoin(rmURL.toString());
+            RMProxiesManager rmProxiesManager = RMProxiesManager.createRMProxiesManager(rmURL);
+            rmProxiesManager.getRmProxy();
 
             SchedulingInfrastructure infrastructure = new SchedulingInfrastructureImpl(dbManager,
                 rmProxiesManager, dsServiceStarter, clientThreadPool, internalThreadPool,

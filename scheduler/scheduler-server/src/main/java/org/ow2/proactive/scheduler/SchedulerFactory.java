@@ -152,7 +152,6 @@ public class SchedulerFactory {
                 throw new IllegalArgumentException("RM url is null !");
             }
             try {
-                tryJoinRM(rmURL);
                 String policy = initializer.getPolicyFullClassName();
                 //start scheduler
                 createScheduler(rmURL, policy);

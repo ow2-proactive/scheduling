@@ -127,7 +127,7 @@ public class SchedulerStarter {
         boolean displayHelp = false;
 
         try {
-            RMAuthentication rmAuth;
+            RMAuthentication rmAuth = null;
             //get the path of the file
 
             String rm = null;
@@ -149,6 +149,7 @@ public class SchedulerStarter {
                     logger.info("RM URL : " + rm);
                 }
 
+                long timeStamp = System.currentTimeMillis();
                 logger.info("Starting the scheduler...");
 
                 if (rm != null) {
@@ -169,46 +170,15 @@ public class SchedulerStarter {
                         SchedulerFactory.tryJoinRM(uri);
                         logger.info("Connected to the existing resource manager at " + uri);
                     } catch (Exception e) {
-                        try {
-                            //Starting a local RM using default deployment descriptor
-                            RMFactory.setOsJavaProperty();
-                            logger.info("Starting the resource manager...");
-                            rmAuth = RMFactory.startLocal();
-
-                            //creating default node source
-                            ResourceManager rman = rmAuth.login(Credentials
-                                    .getCredentials(PAResourceManagerProperties
-                                            .getAbsolutePath(PAResourceManagerProperties.RM_CREDS
-                                                    .getValueAsString())));
-                            //first im parameter is default rm url
-                            byte[] creds = FileToBytesConverter.convertFileToByteArray(new File(
-                                PAResourceManagerProperties
-                                        .getAbsolutePath(PAResourceManagerProperties.RM_CREDS
-                                                .getValueAsString())));
-                            rman.createNodeSource(NodeSource.LOCAL_INFRASTRUCTURE_NAME,
-                                    LocalInfrastructure.class.getName(), new Object[] { "", creds,
-                                    defaulNodesNumber, defaultNodesTimemout,
-                                    CentralPAPropertyRepository.PA_HOME.getCmdLine() + CentralPAPropertyRepository.PA_HOME.getValue()
-                            },
-                                    RestartDownNodesPolicy.class.getName(), new Object[] { "ALL", "ALL",
-                                    "10000" });
-
-                            logger.info("The resource manager with " + defaulNodesNumber +
-                                " local nodes created on " + rmAuth.getHostURL());
-                        } catch (AlreadyBoundException abe) {
-                            logger.error("The resource manager already exists on local host", abe);
-                            System.exit(4);
-                        } catch (ActiveObjectCreationException aoce) {
-                            logger.error("Unable to create local resource manager", aoce);
-                            System.exit(5);
-                        }
+                        startResourceManager();
                     }
                 }
 
                 try {
                     SchedulerAuthenticationInterface sai = SchedulerFactory.startLocal(new URI(rm),
                             policyFullName);
-                    logger.info("The scheduler created on " + sai.getHostURL());
+
+                    logger.info("The scheduler created on " + sai.getHostURL() + " in " + (System.currentTimeMillis() - timeStamp) + " ms");
                 } catch (AdminSchedulerException e) {
                     logger.warn("", e);
                 }
@@ -242,6 +212,48 @@ public class SchedulerStarter {
             System.exit(10);
         }
 
+    }
+
+    private static void startResourceManager() {
+        Thread rmStarter = new Thread() {
+            public void run() {
+                try {
+                    //Starting a local RM using default deployment descriptor
+                    RMFactory.setOsJavaProperty();
+                    logger.info("Starting the resource manager...");
+                    RMAuthentication rmAuth = RMFactory.startLocal();
+
+                    //creating default node source
+                    ResourceManager rman = rmAuth.login(Credentials
+                            .getCredentials(PAResourceManagerProperties
+                                    .getAbsolutePath(PAResourceManagerProperties.RM_CREDS
+                                            .getValueAsString())));
+                    //first im parameter is default rm url
+                    byte[] creds = FileToBytesConverter.convertFileToByteArray(new File(
+                            PAResourceManagerProperties
+                                    .getAbsolutePath(PAResourceManagerProperties.RM_CREDS
+                                            .getValueAsString())));
+                    rman.createNodeSource(NodeSource.LOCAL_INFRASTRUCTURE_NAME,
+                            LocalInfrastructure.class.getName(), new Object[] { "", creds,
+                            defaulNodesNumber, defaultNodesTimemout,
+                            CentralPAPropertyRepository.PA_HOME.getCmdLine() + CentralPAPropertyRepository.PA_HOME.getValue()
+                    },
+                            RestartDownNodesPolicy.class.getName(), new Object[] { "ALL", "ALL",
+                            "10000" });
+
+                    logger.info("The resource manager with " + defaulNodesNumber +
+                            " local nodes created on " + rmAuth.getHostURL());
+                } catch (AlreadyBoundException abe) {
+                    logger.error("The resource manager already exists on local host", abe);
+                    System.exit(4);
+                } catch (Exception aoce) {
+                    logger.error("Unable to create local resource manager", aoce);
+                    System.exit(5);
+                }
+            }
+        };
+
+        rmStarter.start();
     }
 
     private static String getLocalAdress() throws ProActiveException {
