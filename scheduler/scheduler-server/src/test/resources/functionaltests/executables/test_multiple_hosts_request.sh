@@ -50,7 +50,7 @@ then
 	echo "Error cannot read 'PAS_NODEFILE'"
 	TEST_RES=1
 else
-	NBS_LINES=`wc -l $PAS_NODEFILE | cut -f1 -d ' '`
+	NBS_LINES=`wc -l < $PAS_NODEFILE | tr -d ' '`
 	if [ "$NBS_LINES" != "$1" ]
 	then
 		echo "Error 'PAS_NODEFILE' must have $1 lines, it has $NBS_LINES"

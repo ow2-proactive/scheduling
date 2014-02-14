@@ -59,17 +59,10 @@ import org.objectweb.proactive.utils.OperatingSystem;
 public class ProcessCleaner {
     final private Pattern pattern;
 
-    /**
-     *
-     * @param regex
-     */
     public ProcessCleaner(String regex) {
         this(Pattern.compile(regex));
     }
 
-    /**
-     *
-     */
     public ProcessCleaner(Pattern pattern) {
         this.pattern = pattern;
     }
@@ -126,20 +119,20 @@ public class ProcessCleaner {
         switch (os) {
             case unix:
 
-                ProcessBuilder pb = null;
+                ProcessBuilder pb;
 
                 // Mac Os
                 String osName = System.getProperty("os.name").toLowerCase();
 
-                if (osName.indexOf("mac") >= 0) {
+                if (osName.contains("mac")) {
                     // Mac OS / Mac Os X
                     pb = new ProcessBuilder("/bin/sh", "-c",
-                        "for PID in $(pidof java) ; do ps $PID | grep -q -- '" + this.pattern.toString() +
-                            "' && echo $PID ; done");
+                      "for PID in $(ps axc|awk \"{if (\\$5==\\\"java\\\") print \\$1}\") ; do ps $PID | grep -q -- '" + this.pattern.toString() +
+                        "' && echo $PID ; done");
                 } else {
                     // Linux / Unix
                     pb = new ProcessBuilder("/bin/sh", "-c", "for PID in $(pidof java) ; do grep -q -- '" +
-                        this.pattern.toString() + "' /proc/$PID/cmdline && echo $PID ; done");
+                      this.pattern.toString() + "' /proc/$PID/cmdline && echo $PID ; done");
                 }
 
                 pb.redirectErrorStream(true);
@@ -150,7 +143,7 @@ public class ProcessCleaner {
                 Reader r = new InputStreamReader(p.getInputStream());
                 BufferedReader br = new BufferedReader(r);
 
-                String line = null;
+                String line;
                 while ((line = br.readLine()) != null) {
                     pids.add(line);
                 }
@@ -188,50 +181,6 @@ public class ProcessCleaner {
     }
 
     /**
-     * Get the thread dump of all alive Java processes matching the pattern.
-     *
-     * @return
-     *    All the thread dumps
-     * @throws IOException
-     *    If a thread dump cannot be retrieved
-     */
-    final public String[] getThreadDumps() throws IOException {
-        int[] pids = this.getAliveProcesses();
-
-        String[] dumps = new String[pids.length];
-        for (int i = 0; i < dumps.length; i++) {
-            dumps[i] = this.getThreadDump(pids[i]);
-        }
-        return dumps;
-    }
-
-    /**
-     * Get the thread dump of a given Java processs.
-     *
-     * @param pid
-     *    PID of the Java process
-     * @return
-     *    Its thread dumps
-     * @throws IOException
-     *    If the thread dump cannot be fetched
-     */
-    final public String getThreadDump(int pid) throws IOException {
-        ProcessBuilder pb = new ProcessBuilder(getJstack().getAbsolutePath(), Integer.toString(pid));
-        pb.redirectErrorStream(true);
-        Process p = pb.start();
-
-        Reader r = new InputStreamReader(p.getInputStream());
-        BufferedReader br = new BufferedReader(r);
-
-        StringBuilder sb = new StringBuilder();
-        for (String line = br.readLine(); line != null; line = br.readLine()) {
-            sb.append(line);
-        }
-
-        return sb.toString();
-    }
-
-    /**
      * Returns the command to start the jps util
      *
      * @return command to start jps
@@ -258,41 +207,12 @@ public class ProcessCleaner {
     }
 
     /**
-     * Returns the command to start the jstack util
-     *
-     * @return command to start jstack
-     */
-    static private File getJstack() {
-        final String jstackName;
-        switch (OperatingSystem.getOperatingSystem()) {
-            case unix:
-                jstackName = "jps";
-                break;
-            case windows:
-                jstackName = "jps.exe";
-                break;
-            default:
-                throw new IllegalStateException("Unsupported operating system");
-        }
-
-        return new File(getJavaBinDir(), jstackName);
-    }
-
-    /**
      * Returns the Java bin dir
      *
      * @return Java bin/ dir
      */
     static private File getJavaBinDir() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(System.getProperty("java.home"));
-        sb.append(File.separatorChar);
-        sb.append("..");
-        sb.append(File.separatorChar);
-        sb.append("bin");
-        sb.append(File.separatorChar);
-        sb.toString();
-
-        return new File(sb.toString());
+        return new File(System.getProperty(
+          "java.home") + File.separatorChar + ".." + File.separatorChar + "bin" + File.separatorChar);
     }
 }
