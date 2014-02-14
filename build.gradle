@@ -481,7 +481,7 @@ task proActiveLibs(type: Sync) {
     into file("dist/lib")
 }
 defaultTasks 'proActiveLibs'
-task('build').dependsOn 'proActiveLibs'
+build.dependsOn 'proActiveLibs'
 subprojects {
     tasks.withType(Test).matching { it.name == 'functionalTest' }*.dependsOn proActiveLibs
 }
