@@ -90,8 +90,6 @@ import functionaltests.monitor.RMMonitorsHandler;
  */
 public class RMTHelper {
 
-    protected static final String VAR_OS = "os";
-
     /**
      * Number of nodes deployed with default deployment descriptor
      */
@@ -164,7 +162,7 @@ public class RMTHelper {
     /**
      * Creates a Local node source with specified name
      * @throws Exception
-     * @returns expected number of nodes
+     * @return expected number of nodes
      */
     public int createNodeSource(String name) throws Exception {
         createNodeSource(name, RMTHelper.defaultNodesNumber);
@@ -229,7 +227,7 @@ public class RMTHelper {
     }
 
     public void createNodeSource(int rmiPort, int nodesNumber, List<String> vmOptions) throws Exception {
-        Map<String, String> map = new HashMap<String, String>(1);
+        Map<String, String> map = new HashMap<String, String>();
         map.put(CentralPAPropertyRepository.PA_RMI_PORT.getName(), String.valueOf(rmiPort));
         map
                 .put(CentralPAPropertyRepository.PA_HOME.getName(), CentralPAPropertyRepository.PA_HOME
@@ -354,6 +352,7 @@ public class RMTHelper {
         commandLine.add("-cp");
         commandLine.add(testClasspath());
         commandLine.add(CentralPAPropertyRepository.PA_TEST.getCmdLine() + "true");
+        commandLine.add("-Djava.awt.headless=true"); // For Mac builds
         commandLine.add(CentralPAPropertyRepository.PA_RMI_PORT.getCmdLine() + rmiPort);
         Collections.addAll(commandLine, jvmArgs);
         commandLine.add(RMTStarter.class.getName());
@@ -527,7 +526,7 @@ public class RMTHelper {
         Node node = NodeFactory.getNode(url);
         try {
             node.getProActiveRuntime().killRT(false);
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
     }
 

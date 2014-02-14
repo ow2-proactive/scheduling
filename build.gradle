@@ -72,6 +72,7 @@ def functionalTestConfiguration = {
     systemProperties << ['pa.rm.home': rootDir.absolutePath]
     systemProperties << ['pa.scheduler.home': rootDir.absolutePath]
     systemProperties << ['proactive.test.timeout': 600000]
+    systemProperties << ['java.awt.headless': 'true']
     testLogging {
         exceptionFormat = 'full'
     }

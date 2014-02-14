@@ -77,18 +77,18 @@ public class ProcessCleaner {
      *    If PIDs cannot be retrieved
      */
     final public int[] getAliveProcesses() throws IOException {
+        return getAliveProcesses(false);
+    }
+
+    final public int[] getAliveProcesses(boolean printProcesses) throws IOException {
         // JPS is only available on some JDK
         // We need a fall back in case jps does not exist.
         try {
             getJps();
-            return getAliveWithJps(false);
+            return getAliveWithJps(printProcesses);
         } catch (FileNotFoundException e) {
             return getAliveWithNative();
         }
-    }
-
-    final public int[] getAliveProcesses(boolean printProcesses) throws IOException {
-        return getAliveWithJps(printProcesses);
     }
 
     private int[] getAliveWithJps(boolean printProcesses) throws IOException {
