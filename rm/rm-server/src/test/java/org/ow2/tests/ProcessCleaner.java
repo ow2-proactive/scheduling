@@ -43,6 +43,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -84,6 +85,10 @@ public class ProcessCleaner {
         } catch (FileNotFoundException e) {
             return getAliveWithNative();
         }
+    }
+
+    final public int[] getAliveProcesses(boolean printProcesses) throws IOException {
+        return getAliveWithJps(printProcesses);
     }
 
     private int[] getAliveWithJps(boolean printProcesses) throws IOException {
@@ -177,7 +182,10 @@ public class ProcessCleaner {
             }
         }
 
-        getAliveWithJps(true);
+        int[] pidsLeft = getAliveWithJps(true);
+        if (pidsLeft.length > 0) {
+            System.err.println("Processes left running: " + Arrays.toString(pidsLeft));
+        }
     }
 
     /**
