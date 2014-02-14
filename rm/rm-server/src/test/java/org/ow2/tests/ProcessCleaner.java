@@ -182,7 +182,7 @@ public class ProcessCleaner {
             }
         }
 
-        int[] pidsLeft = getAliveWithJps(true);
+        int[] pidsLeft = getAliveProcesses(true);
         if (pidsLeft.length > 0) {
             System.err.println("Processes left running: " + Arrays.toString(pidsLeft));
         }
