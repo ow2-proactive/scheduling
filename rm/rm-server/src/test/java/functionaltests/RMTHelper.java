@@ -46,6 +46,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.*;
 
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
@@ -222,6 +223,33 @@ public class RMTHelper {
         return createNode(nodeName, null, vmParameters, null);
     }
 
+    public List<TNode> createNodes(final String nodeName, int number) throws IOException, NodeException, ExecutionException, InterruptedException {
+
+        ExecutorService executorService = Executors.newFixedThreadPool(number);
+        ArrayList<Future<TNode>> futureNodes = new ArrayList<Future<TNode>>(number);
+        for (int i=0; i< number; i++) {
+            final int index = i;
+            futureNodes.add(executorService.submit(new Callable<TNode>() {
+                @Override
+                public TNode call() {
+                    try {
+                        return createNode(nodeName+index, null);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                }
+            }));
+        }
+
+        ArrayList nodes = new ArrayList(number);
+        for (int i=0; i< number; i++) {
+            nodes.add(futureNodes.get(i).get());
+        }
+
+        return nodes;
+    }
+
     public void createNodeSource(int rmiPort, int nodesNumber) throws Exception {
         createNodeSource(rmiPort, nodesNumber, null);
     }
@@ -284,9 +312,12 @@ public class RMTHelper {
         nodeProcess.startProcess();
         try {
             Node newNode = null;
-            Thread.sleep(2000);
+
+            final long NODE_START_TIMEOUT_IN_MS = 60000;
+            long startTimeStamp = System.currentTimeMillis();
+
             NodeException toThrow = null;
-            for (int i = 0; i < 12; i++) {
+            while ((System.currentTimeMillis()-startTimeStamp) < NODE_START_TIMEOUT_IN_MS) {
                 try {
                     newNode = NodeFactory.getNode(expectedUrl);
                 } catch (NodeException e) {
@@ -296,7 +327,7 @@ public class RMTHelper {
                 if (newNode != null) {
                     return new TNode(nodeProcess, newNode);
                 } else {
-                    Thread.sleep(1000);
+                    Thread.sleep(100);
                 }
             }
             throw toThrow == null ? new NodeException("unable to create the node " + nodeName) : toThrow;

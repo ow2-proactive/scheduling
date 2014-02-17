@@ -36,8 +36,8 @@
  */
 package functionaltests.permissions;
 
-import junit.framework.Assert;
-
+import functionaltests.TNode;
+import org.junit.Assert;
 import org.objectweb.proactive.core.node.Node;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
@@ -46,6 +46,8 @@ import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 
 import functionaltests.RMConsecutive;
 import functionaltests.RMTHelper;
+
+import java.util.List;
 
 
 /**
@@ -80,10 +82,13 @@ public class TestNSProviderPermissions extends RMConsecutive {
         ResourceManager nsadmin = helper.getResourceManager(null, "nsadmin", "pwd");
         nsadmin.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null,
                 StaticPolicy.class.getName(), new Object[] { "ALL", "ME" });
+
+        List<TNode> nodePool =  helper.createNodes("node", 17);
+
         helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
 
-        Node node = helper.createNode("node1").getNode();
-        Node node2 = helper.createNode("node2").getNode();
+        Node node = nodePool.remove(0).getNode();
+        Node node2 = nodePool.remove(0).getNode();
         try {
             nsadmin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
         } catch (Exception e) {
@@ -141,8 +146,8 @@ public class TestNSProviderPermissions extends RMConsecutive {
                 .getName(), new Object[] { "ALL", "MY_GROUPS" });
         helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
 
-        node = helper.createNode("node1").getNode();
-        node2 = helper.createNode("node2").getNode();
+        node = nodePool.remove(0).getNode();
+        node2 = nodePool.remove(0).getNode();
         Node node3 = helper.createNode("node3").getNode();
         try {
             admin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
@@ -212,8 +217,8 @@ public class TestNSProviderPermissions extends RMConsecutive {
                 StaticPolicy.class.getName(), new Object[] { "ALL", "ALL" });
         helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
 
-        node = helper.createNode("node1").getNode();
-        node2 = helper.createNode("node2").getNode();
+        node = nodePool.remove(0).getNode();
+        node2 = nodePool.remove(0).getNode();
         node3 = helper.createNode("node3").getNode();
         try {
             nsadmin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
@@ -277,8 +282,8 @@ public class TestNSProviderPermissions extends RMConsecutive {
                 .getName(), new Object[] { "ALL", "users=nsadmin" });
         helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
 
-        node = helper.createNode("node1").getNode();
-        node2 = helper.createNode("node2").getNode();
+        node = nodePool.remove(0).getNode();
+        node2 = nodePool.remove(0).getNode();
         node3 = helper.createNode("node3").getNode();
         try {
             admin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
@@ -332,8 +337,8 @@ public class TestNSProviderPermissions extends RMConsecutive {
                 StaticPolicy.class.getName(), new Object[] { "ALL", "groups=nsadmins" }).getBooleanValue();
         helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
 
-        node = helper.createNode("node1").getNode();
-        node2 = helper.createNode("node2").getNode();
+        node = nodePool.remove(0).getNode();
+        node2 = nodePool.remove(0).getNode();
         node3 = helper.createNode("node3").getNode();
         try {
             admin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
@@ -387,8 +392,8 @@ public class TestNSProviderPermissions extends RMConsecutive {
                 .getName(), new Object[] { "ALL", "users=radmin;groups=nsadmins" });
         helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
 
-        node = helper.createNode("node1").getNode();
-        node2 = helper.createNode("node2").getNode();
+        node = nodePool.remove(0).getNode();
+        node2 = nodePool.remove(0).getNode();
         node3 = helper.createNode("node3").getNode();
         try {
             admin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();

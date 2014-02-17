@@ -36,8 +36,8 @@
  */
 package functionaltests.permissions;
 
-import junit.framework.Assert;
-
+import functionaltests.TNode;
+import org.junit.Assert;
 import org.objectweb.proactive.core.node.Node;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
@@ -48,6 +48,9 @@ import org.ow2.proactive.utils.NodeSet;
 
 import functionaltests.RMConsecutive;
 import functionaltests.RMTHelper;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -71,8 +74,10 @@ public class TestNSNodesPermissions extends RMConsecutive {
         nsadmin.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null,
                 StaticPolicy.class.getName(), new Object[] { "ME", "ALL" }).getBooleanValue();
 
-        Node node = helper.createNode("node1").getNode();
-        Node node2 = helper.createNode("node2").getNode();
+        List<TNode> nodePool =  helper.createNodes("node", 17);
+
+        Node node = nodePool.remove(0).getNode();
+        Node node2 = nodePool.remove(0).getNode();
         nsadmin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
         helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         //we eat the configuring to free nodeevent
@@ -116,8 +121,9 @@ public class TestNSNodesPermissions extends RMConsecutive {
         admin.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null,
                 StaticPolicy.class.getName(), new Object[] { "MY_GROUPS", "ALL" }).getBooleanValue();
 
-        node = helper.createNode("node1").getNode();
-        node2 = helper.createNode("node2").getNode();
+        node = nodePool.remove(0).getNode();
+        node2 = nodePool.remove(0).getNode();
+        System.out.println(System.currentTimeMillis());
         admin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
         helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         //we eat the configuring to free nodeevent
@@ -155,8 +161,8 @@ public class TestNSNodesPermissions extends RMConsecutive {
         user.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null,
                 StaticPolicy.class.getName(), new Object[] { "PROVIDER", "ALL" }).getBooleanValue();
 
-        node = helper.createNode("node1").getNode();
-        node2 = helper.createNode("node2").getNode();
+        node = nodePool.remove(0).getNode();
+        node2 = nodePool.remove(0).getNode();
 
         user.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
         helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
@@ -206,8 +212,8 @@ public class TestNSNodesPermissions extends RMConsecutive {
         user.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null,
                 StaticPolicy.class.getName(), new Object[] { "PROVIDER_GROUPS", "ALL" }).getBooleanValue();
 
-        node = helper.createNode("node1").getNode();
-        node2 = helper.createNode("node2").getNode();
+        node = nodePool.remove(0).getNode();
+        node2 = nodePool.remove(0).getNode();
 
         user.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
         helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
@@ -234,7 +240,8 @@ public class TestNSNodesPermissions extends RMConsecutive {
         user = helper.getResourceManager(null, "radmin", "pwd");
         nodes = admin.getNodes(new Criteria(2));
         Assert.assertEquals(1, nodes.size());
-        Assert.assertTrue(nodes.get(0).getNodeInformation().getURL().contains("node1"));
+
+        Assert.assertTrue(nodes.get(0).getNodeInformation().getURL().contains("node6"));
         //we eat free -> busy
         helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         user.releaseNodes(nodes);
@@ -244,7 +251,7 @@ public class TestNSNodesPermissions extends RMConsecutive {
         nsadmin = helper.getResourceManager(null, "nsadmin", "pwd");
         nodes = nsadmin.getNodes(new Criteria(2));
         Assert.assertEquals("Have not get an admin node", 1, nodes.size());
-        Assert.assertTrue(nodes.get(0).getNodeInformation().getURL().contains("node2"));
+        Assert.assertTrue(nodes.get(0).getNodeInformation().getURL().contains("node7"));
         //we eat free -> busy
         helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         nsadmin.releaseNodes(nodes);
@@ -263,7 +270,7 @@ public class TestNSNodesPermissions extends RMConsecutive {
         user.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null,
                 StaticPolicy.class.getName(), new Object[] { "ALL", "ALL" }).getBooleanValue();
 
-        node = helper.createNode("node1").getNode();
+        node = nodePool.remove(0).getNode();
         user.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
         helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         //we eat the configuring to free nodeevent
@@ -294,8 +301,8 @@ public class TestNSNodesPermissions extends RMConsecutive {
         admin.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null,
                 StaticPolicy.class.getName(), new Object[] { "users=nsadmin", "ALL" }).getBooleanValue();
 
-        node = helper.createNode("node1").getNode();
-        node2 = helper.createNode("node2").getNode();
+        node = nodePool.remove(0).getNode();
+        node2 = nodePool.remove(0).getNode();
         admin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
         helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         //we eat the configuring to free nodeevent
@@ -335,8 +342,8 @@ public class TestNSNodesPermissions extends RMConsecutive {
         admin.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null,
                 StaticPolicy.class.getName(), new Object[] { "groups=nsadmins", "ALL" }).getBooleanValue();
 
-        node = helper.createNode("node1").getNode();
-        node2 = helper.createNode("node2").getNode();
+        node = nodePool.remove(0).getNode();
+        node2 = nodePool.remove(0).getNode();
         admin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
         helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         //we eat the configuring to free nodeevent
@@ -387,7 +394,7 @@ public class TestNSNodesPermissions extends RMConsecutive {
                 StaticPolicy.class.getName(), new Object[] { "tokens=token1,token2", "ALL" })
                 .getBooleanValue();
 
-        node = helper.createNode("node1").getNode();
+        node = nodePool.remove(0).getNode();
         admin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
         helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         //we eat the configuring to free nodeevent
@@ -436,8 +443,8 @@ public class TestNSNodesPermissions extends RMConsecutive {
                 StaticPolicy.class.getName(), new Object[] { "users=radmin;groups=nsadmins", "ALL" })
                 .getBooleanValue();
 
-        node = helper.createNode("node1").getNode();
-        node2 = helper.createNode("node2").getNode();
+        node = nodePool.remove(0).getNode();
+        node2 = nodePool.remove(0).getNode();
         admin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
         helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         //we eat the configuring to free nodeevent
@@ -486,7 +493,7 @@ public class TestNSNodesPermissions extends RMConsecutive {
                 StaticPolicy.class.getName(), new Object[] { "users=radmin;tokens=token1", "ALL" })
                 .getBooleanValue();
 
-        node = helper.createNode("node1").getNode();
+        node = nodePool.remove(0).getNode();
         admin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
         helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         //we eat the configuring to free nodeevent
