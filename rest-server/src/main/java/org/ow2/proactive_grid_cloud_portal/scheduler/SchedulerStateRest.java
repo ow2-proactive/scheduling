@@ -1437,6 +1437,17 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
     }
 
+    /**
+     * Pushes a file from the local file system into the given DataSpace
+     * @param sessionId a valid session id
+     * @param spaceName the name of the DataSpace
+     * @param filePath the path inside the DataSpace  where to put the file e.g. "/myfolder"
+     * @param multipart the form data containing :
+     *   - fileName the name of the file that will be created on the DataSpace
+     *   - fileContent the content of the file
+     * @return true if the transfer succeeded
+     * @see org.ow2.proactive.scheduler.common.SchedulerConstants for spaces names
+     **/
     @Override
     public boolean pushFile(@HeaderParam("sessionid")
     String sessionId, @PathParam("spaceName")
@@ -1524,6 +1535,16 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     }
 
+    /**
+     * Either Pulls a file from the given DataSpace to the local file system
+     * or list the content of a directory if the path refers to a directory
+     * In the case the path to a file is given, the content of this file will be returns as an input stream
+     * In the case the path to a directory is given, the input stream returned will be a text stream containing at each line
+     * the content of the directory
+     * @param sessionId a valid session id
+     * @param spaceName the name of the data space involved (GLOBAL or USER)
+     * @param filePath the path to the file or directory whose content must be received
+     **/
     @Override
     public InputStream pullFile(@HeaderParam("sessionid")
     String sessionId, @PathParam("spaceName")
@@ -1571,6 +1592,12 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     }
 
+    /**
+     * Deletes a file or recursively delete a directory from the given DataSpace
+     * @param sessionId a valid session id
+     * @param spaceName the name of the data space involved (GLOBAL or USER)
+     * @param filePath the path to the file or directory which must be deleted
+     **/
     @Override
     public boolean deleteFile(@HeaderParam("sessionid")
     String sessionId, @PathParam("spaceName")
