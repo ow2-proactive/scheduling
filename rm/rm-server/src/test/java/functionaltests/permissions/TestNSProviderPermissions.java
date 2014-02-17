@@ -92,6 +92,7 @@ public class TestNSProviderPermissions extends RMConsecutive {
         try {
             nsadmin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             Assert.assertTrue(false);
         }
 
@@ -121,6 +122,7 @@ public class TestNSProviderPermissions extends RMConsecutive {
             admin.addNode(node2.getNodeInformation().getURL(), nsName).getBooleanValue();
             helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             Assert.assertTrue(false);
         }
 
@@ -129,6 +131,7 @@ public class TestNSProviderPermissions extends RMConsecutive {
             admin.removeNode(node.getNodeInformation().getURL(), true).getBooleanValue();
             helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             Assert.assertTrue(false);
         }
 
@@ -138,6 +141,7 @@ public class TestNSProviderPermissions extends RMConsecutive {
             helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
             helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             Assert.assertTrue(false);
         }
 
@@ -153,6 +157,7 @@ public class TestNSProviderPermissions extends RMConsecutive {
             admin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
             helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             Assert.assertTrue(false);
         }
 
@@ -162,6 +167,7 @@ public class TestNSProviderPermissions extends RMConsecutive {
             nsadmin.addNode(node2.getNodeInformation().getURL(), nsName).getBooleanValue();
             helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             Assert.assertTrue(false);
         }
 
@@ -197,6 +203,7 @@ public class TestNSProviderPermissions extends RMConsecutive {
             nsadmin.addNode(node3.getNodeInformation().getURL(), nsName).getBooleanValue();
             helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             Assert.assertTrue(false);
         }
 
@@ -208,6 +215,7 @@ public class TestNSProviderPermissions extends RMConsecutive {
             admin.removeNodeSource(nsName, true).getBooleanValue();
             helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             Assert.assertTrue(false);
         }
 
@@ -224,6 +232,7 @@ public class TestNSProviderPermissions extends RMConsecutive {
             nsadmin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
             helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             Assert.assertTrue(false);
         }
 
@@ -233,6 +242,7 @@ public class TestNSProviderPermissions extends RMConsecutive {
             user.addNode(node2.getNodeInformation().getURL(), nsName).getBooleanValue();
             helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             Assert.assertTrue(false);
         }
         try {
@@ -246,6 +256,7 @@ public class TestNSProviderPermissions extends RMConsecutive {
             // user can remove his own node
             user.removeNode(node2.getNodeInformation().getURL(), true).getBooleanValue();
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             Assert.assertTrue(false);
         }
         try {
@@ -253,6 +264,7 @@ public class TestNSProviderPermissions extends RMConsecutive {
             user.addNode(node3.getNodeInformation().getURL(), nsName).getBooleanValue();
             helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             Assert.assertTrue(false);
         }
 
@@ -262,6 +274,7 @@ public class TestNSProviderPermissions extends RMConsecutive {
             nsadmin.removeNode(node3.getNodeInformation().getURL(), true).getBooleanValue();
             helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             Assert.assertTrue(false);
         }
 
@@ -274,6 +287,7 @@ public class TestNSProviderPermissions extends RMConsecutive {
             admin.removeNodeSource(nsName, false);
             helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             Assert.assertTrue(false);
         }
 
@@ -289,6 +303,7 @@ public class TestNSProviderPermissions extends RMConsecutive {
             admin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
             helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             Assert.assertTrue(false);
         }
         nsadmin = helper.getResourceManager(null, "nsadmin", "pwd");
@@ -303,6 +318,7 @@ public class TestNSProviderPermissions extends RMConsecutive {
             nsadmin.addNode(node2.getNodeInformation().getURL(), nsName).getBooleanValue();
             helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             Assert.assertTrue(false);
         }
         user = helper.getResourceManager(null, "radmin", "pwd");
