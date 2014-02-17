@@ -312,15 +312,6 @@ public enum PASchedulerProperties {
      */
     SCHEDULER_DB_LOAD_JOB_PERIOD("pa.scheduler.db.load.job.period", PropertyType.STRING),
 
-    /* ***************************************************************** */
-    /* ********************** MATLAB/SCILAB PROPERTIES ***************** */
-    /* ***************************************************************** */
-    /* SCHEDULING-1610 removed Matlab/Scilab from Scheduling, but there is still work for SCHEDULING-1612 , current configuration scheme needs those properties
-    /** Tells where to find matlab worker configuration file */
-    MATLAB_WORKER_CONFIGURATION_FILE("pa.scheduler.ext.matlab.config.worker", PropertyType.STRING),
-    /** Tells where to find scilab worker configuration file */
-    SCILAB_WORKER_CONFIGURATION_FILE("pa.scheduler.ext.scilab.config.worker", PropertyType.STRING),
-
     EMAIL_NOTIFICATIONS_ENABLED("pa.scheduler.notifications.email.enabled", PropertyType.BOOLEAN),
 
     EMAIL_NOTIFICATIONS_SENDER_ADDRESS("pa.scheduler.notifications.email.from", PropertyType.STRING);
