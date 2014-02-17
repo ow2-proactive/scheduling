@@ -7,73 +7,173 @@ importPackage(java.util)
 importPackage(java.util.concurrent)
 importPackage(java.util.zip)
 
-/** This script support the following configurations :
-    PNP_PAMR : main protocol : PNP , additional protocol : PAMR (default)
-    PNP : PNP protocol only
-    PAMR : PAMR protocol only
- **/
-
+// This script support the following configurations :
+// PNP_PAMR : main protocol : PNP , additional protocol : PAMR (default)
+// PNP : PNP protocol only
+// PAMR : PAMR protocol only
 var CONFIGS = {
     PNP_PAMR : 1,
     PNP : 2,
     PAMR : 3
 }
 
+// Change this variable in order to switch configurations
 var config = CONFIGS.PNP_PAMR
-// change the above variable in order to switch configurations
 
-
+// Change these ports if required
 var ROUTER_PORT = 64737 // port used by the PAMR router
 var RM_PORT = 64738 // port used by the RM in case of PNP
 var SCHEDULER_PORT = 64739 // port used by the Scheduler in case of PNP
 var JETTY_PORT = 8080  // port used by the Web Server
-// change the above ports if required
 
 var MAIN_PROTOCOL
 var ADDITIONAL_PROTOCOL
 var PORT_PROTOCOL
 
-var SCRIPT_NAME = 'start-server.js'
-
 var RM_URL
 var SCHEDULER_URL
 
-/** OS switch and independent absolute path to Java executable */
-var fs = File.separator
-var isWindows = System.getProperty('os.name').startsWith('Windows')
-var javaExe = System.getProperty('java.home') + fs + 'bin' + fs + (isWindows ? 'java.exe' : 'java')
+// Please always use this variale instead of os-dependant separator
+var fs = File.separator;
 
-/** Get current directory (must be SCHEDULER_HOME/bin) */
+// The name of the current script used for checking current location
+var SCRIPT_NAME = 'start-server.js'
+
+// Get current directory (must be SCHEDULER_HOME/bin)
 var currDir = new File(getCheckedCurrDir())
-
-/** Dirs */
 var homeDir = new File(currDir.getParent())
 var logsDir = new File(homeDir, '.logs')
 var configDir = new File(homeDir, 'config')
 var distDir = new File(homeDir, 'dist')
 var warsDir = new File(distDir, 'war')
+var paConfigFile = new File(configDir, 'proactive'+fs+'ProActiveConfiguration.xml')
 
-/** Logs locations */
+// OS switch and independent absolute path to Java executable
+var isWindows = System.getProperty('os.name').startsWith('Windows')
+var javaExe = System.getProperty('java.home') + fs + 'bin' + fs + (isWindows ? 'java.exe' : 'java')
+
+// Logs locations
 var routerOutputFile = new File(logsDir,'Router-stdout.log')
 var rmOutputFile = new File(logsDir,'RM-stdout.log')
 var schedulerOutputFile = new File(logsDir, 'Scheduler-stdout.log')
 var jettyOutputFile = new File(logsDir, 'Jetty-stdout.log')
 
-/** Jars relative to lib */
+// Jars relative to lib
 var scriptJars = ['jruby-1.7.4.jar', 'jython-2.5.4-rc1.jar', 'groovy-all-2.1.6.jar']
 var vfsJars = ['commons-logging-1.1.1.jar','commons-httpclient-3.1.jar']
 var coreJars = ['*']
 var jettyJars = ['*']
 
-var proActiveConfiguration
-
-/** Processes */
+// Processes
 var routerProcess, rmProcess, schedulerProcess, jettyProcess
 
 startEverything()
 
-/** Configure protocol and heck that given ports are free */
+function startEverything() {
+	println('---------------------------------')
+	println('    Starting server processes    ')
+	println('---------------------------------')
 
+	if (!logsDir.exists()) {
+		logsDir.mkdir()
+	}
+
+	println('\nSetting up config and checking ports ...')
+    setupConfigAndCheckPorts()
+    setupURLs()	
+
+    println('\nDumping configuration into ' + paConfigFile)
+    dumpProActiveConfiguration()
+
+	// Add shutdownhook to terminate all processes if the current process is killed 
+	var cleaner = new java.lang.Thread(function () {
+		stopEverything()
+	})
+	java.lang.Runtime.getRuntime().addShutdownHook(cleaner)
+
+	var executor = Executors.newFixedThreadPool(4)
+	var service = new ExecutorCompletionService(executor)
+
+    if (config == CONFIGS.PNP_PAMR || config == CONFIGS.PAMR) {
+        println('\nRunning PAMR Router process ...')
+        routerProcess = startRouter()
+
+        if (routerProcess != null) {
+            var routerWaiter = new Callable({
+                call: function () {
+                    var exitValue = routerProcess.waitFor()
+                    println('!! Router HAS EXITED !! Please consult ' + routerOutputFile)
+                    return exitValue
+                }})
+            service.submit(routerWaiter)
+        }
+    }
+
+	println('\nRunning Resource Manager process ...')
+	rmProcess = startRM()
+	if (rmProcess != null) {
+	    var rmWaiter = new Callable({ 
+		   call: function () {
+		      var exitValue = rmProcess.waitFor()
+			  println('!! RM HAS EXITED !! Please consult ' + rmOutputFile)
+		      return exitValue
+	    }})
+	    service.submit(rmWaiter)
+	}
+
+	println('\nRunning Scheduler process ...')
+	schedulerProcess = startScheduler()
+	if (schedulerProcess != null) {
+		var schedulerWaiter = new Callable({ 
+			call: function () {
+				var exitValue = schedulerProcess.waitFor()
+				println('!! Scheduler HAS EXITED !! Please consult ' + schedulerOutputFile)
+				return exitValue
+		}})
+		service.submit(schedulerWaiter)
+	}
+
+	println('Running Jetty process ...')
+	jettyProcess = startJetty()
+	if (jettyProcess != null) {
+		var jettyWaiter = new Callable({
+			call: function () {
+				var exitValue = jettyProcess.waitFor()
+				println('!! JETTY HAS EXITED !! Please consult ' + jettyOutputFile)
+				return exitValue
+		}})
+		service.submit(jettyWaiter)
+	}
+
+	var exitListener = new Callable({
+    call: function () {
+            try {
+                var stream = new InputStreamReader(System['in'])
+                var reader = new BufferedReader(stream)
+                while (!(reader.readLine().equals('exit')));
+            } catch (e) {
+                println('Unable to get input due to ' + e)
+            }
+            return 'exit by user'
+    }})
+    service.submit(exitListener)
+
+	// For each process a waiter thread is used
+	println('Preparing to wait for processes to exit ...')
+	// no more tasks are going to be submitted, this will let the executor clean up its threads
+	executor.shutdown()
+
+	if (!executor.isTerminated()) {
+	    println('Hit CTRL+C or enter \'exit\' to terminate all server processes and exit')
+		var finishedFuture = service.take()
+		println('Finishing process returned ' + finishedFuture.get())
+		stopEverything()
+		// Exit current process ... if under agent it will restart it
+		System.exit(-1)
+	}
+}
+
+// Configure protocol and heck that given ports are free
 function setupConfigAndCheckPorts() {
     switch (config) {
         case CONFIGS.PNP_PAMR:
@@ -128,117 +228,6 @@ function setupURLs() {
         RM_URL = PORT_PROTOCOL+'://localhost:'+RM_PORT
         SCHEDULER_URL = PORT_PROTOCOL+'://localhost:'+SCHEDULER_PORT
     }
-}
-
-function startEverything() {
-	if (!logsDir.exists()) {
-		logsDir.mkdir()
-	}
-
-    setupConfigAndCheckPorts()
-
-    setupURLs()
-
-    proActiveConfiguration = buildProActiveConfiguration()
-
-	// Add shutdownhook to terminate all processes if the current process is killed 
-	var cleaner = new java.lang.Thread(function () {
-		stopEverything()
-	})
-	java.lang.Runtime.getRuntime().addShutdownHook(cleaner)
-
-	println('---------------------------------')
-	println('    Starting server processes    ')
-	println('---------------------------------')
-
-	var executor = Executors.newFixedThreadPool(4)
-	var service = new ExecutorCompletionService(executor)
-
-    if (config == CONFIGS.PNP_PAMR || config == CONFIGS.PAMR) {
-        println('')
-        println('Running PAMR Router process ...')
-        routerProcess = startRouter()
-
-        if (routerProcess != null) {
-            var routerWaiter = new Callable({
-                call: function () {
-                    var exitValue = routerProcess.waitFor()
-                    println('!! Router HAS EXITED !! Please consult ' + routerOutputFile)
-                    return exitValue
-                }})
-            service.submit(routerWaiter)
-        }
-    }
-
-    println('')
-    println('Writing ProActive Configuration file...')
-    writeXMLtoFile(configDir+fs+'proactive'+fs+'ProActiveConfiguration.xml',proActiveConfiguration)
-
-	println('')
-	println('Running Resource Manager process ...')
-	rmProcess = startRM()
-	if (rmProcess != null) {
-	    var rmWaiter = new Callable({ 
-		   call: function () {
-		      var exitValue = rmProcess.waitFor()
-			  println('!! RM HAS EXITED !! Please consult ' + rmOutputFile)
-		      return exitValue
-	    }})
-	    service.submit(rmWaiter)
-	}
-
-	println('')
-	println('Running Scheduler process ...')
-	schedulerProcess = startScheduler()
-	if (schedulerProcess != null) {
-		var schedulerWaiter = new Callable({ 
-			call: function () {
-				var exitValue = schedulerProcess.waitFor()
-				println('!! Scheduler HAS EXITED !! Please consult ' + schedulerOutputFile)
-				return exitValue
-		}})
-		service.submit(schedulerWaiter)
-	}
-
-	println('')
-	println('Running Jetty process ...')
-	jettyProcess = startJetty()
-	if (jettyProcess != null) {
-		var jettyWaiter = new Callable({
-			call: function () {
-				var exitValue = jettyProcess.waitFor()
-				println('!! JETTY HAS EXITED !! Please consult ' + jettyOutputFile)
-				return exitValue
-		}})
-		service.submit(jettyWaiter)
-	}
-
-	var exitListener = new Callable({
-    call: function () {
-            try {
-                var stream = new InputStreamReader(System['in'])
-                var reader = new BufferedReader(stream)
-                while (!(reader.readLine().equals('exit')));
-            } catch (e) {
-                println('Unable to get input due to ' + e)
-            }
-            return 'exit by user'
-    }})
-    service.submit(exitListener)
-
-	// For each process a waiter thread is used
-	println('Preparing to wait for processes to exit ...')
-	// no more tasks are going to be submitted, this will let the executor clean up its threads
-	executor.shutdown()
-
-	if (!executor.isTerminated()) {
-	    println('Hit CTRL+C or enter \'exit\' to terminate all server processes and exit')
-		var finishedFuture = service.take()
-		println('Finishing process returned ' + finishedFuture.get())
-		stopEverything()
-		// Exit current process ... if under agent it will restart it
-		System.exit(-1)
-	}
 }
 
 function startRouter() {
@@ -315,16 +304,9 @@ function injectProperties(propsFile, properties) {
     for (var prop in properties) {
         props.setProperty(prop, properties[prop])
     }
-
     var outputStream = new FileOutputStream(propsFile)
     props.store(outputStream, '')
     outputStream.close()
-}
-
-function writeXMLtoFile(xmlFile, xmlString) {
-    var out = new PrintWriter(xmlFile)
-    out.println(xmlString)
-    out.close()
 }
 
 function extractWar(warsDir, path, warName) {
@@ -351,16 +333,15 @@ function startJetty() {
     var rmDir = extractWar(warsDir, 'rm', 'rm.war')
     var schedulerDir = extractWar(warsDir, 'scheduler', 'scheduler.war')
 
-    writeXMLtoFile(restDir+fs+'WEB-INF' +fs+'ProActiveConfiguration.xml',proActiveConfiguration)
+	java.nio.file.Files.copy(paConfigFile.toPath(), new File(restDir, 'WEB-INF'+fs+'ProActiveConfiguration.xml').toPath());    
 
-    var restProperties = { 'rm.url': RM_URL,
-        'scheduler.url': SCHEDULER_URL}
-    injectProperties(new File(restDir, 'WEB-INF' + fs + 'portal.properties'), restProperties)
+    var restProperties = { 'rm.url': RM_URL, 'scheduler.url': SCHEDULER_URL}
+    injectProperties(new File(restDir, 'WEB-INF'+fs+'portal.properties'), restProperties)
 
-    var rmProperties = { 'rm.rest.url': 'http://localhost:' + JETTY_PORT + '/rest/rest'}
+    var rmProperties = { 'rm.rest.url': 'http://localhost:'+JETTY_PORT+'/rest/rest'}
     injectProperties(new File(rmDir, 'rm.conf'), rmProperties)
 
-    var schedulerProperties = { 'sched.rest.url': 'http://localhost:' + JETTY_PORT + '/rest/rest'}
+    var schedulerProperties = { 'sched.rest.url': 'http://localhost:'+JETTY_PORT+'/rest/rest' }
     injectProperties(new File(schedulerDir, 'scheduler.conf'), schedulerProperties)
 
 
@@ -416,9 +397,8 @@ function initCmd() {
 	return cmd
 }
 
-function buildProActiveConfiguration() {
-    var sw = new StringWriter()
-    var pconf = new PrintWriter(sw)
+function dumpProActiveConfiguration() {
+    var pconf = new PrintWriter(paConfigFile)
     pconf.println('<?xml version=\'1.0\' encoding=\'UTF-8\'?>')
     pconf.println('<ProActiveUserProperties>')
     pconf.println(' <properties>')
@@ -436,11 +416,8 @@ function buildProActiveConfiguration() {
     pconf.println('  <javaProperties>')
     pconf.println('  </javaProperties>')
     pconf.println('</ProActiveUserProperties>')
-
-
     pconf.flush()
     pconf.close()
-    return sw.toString()
 }
 
 function fillClasspath() {
@@ -593,10 +570,6 @@ function extractFolder(zipFile, destDirFile){ // throws ZipException, IOExceptio
             is.close()
         }
     }
-}
-
-function getHostNameOrIpAddress() {
-
 }
 
 function isTcpPortAvailable(port) { // throws IOException
