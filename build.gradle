@@ -21,16 +21,12 @@ buildscript {
     }
 }
 
-subprojects {
-    apply plugin: 'java'
+allprojects {
     apply plugin: 'maven'
+    apply plugin: 'java'
 
     group = 'org.ow2.proactive'
     version = '3.5.0-SNAPSHOT'
-
-    rootProject.buildscript.repositories.each {
-        repositories.add(it)
-    }
 
     uploadArchives {
         repositories {
@@ -42,18 +38,18 @@ subprojects {
             }
         }
     }
+}
+subprojects {
+    apply plugin: 'java'
+
+    rootProject.buildscript.repositories.each {
+        repositories.add(it)
+    }
 
     dependencies {
         compile 'log4j:log4j:1.2.14'
         runtime 'org.slf4j:slf4j-log4j12:1.5.3'
         testCompile 'junit:junit:4.11'
-    }
-
-    configurations.all {
-        resolutionStrategy {
-            cacheDynamicVersionsFor 0, 'seconds'
-            cacheChangingModulesFor 0, 'seconds'
-        }
     }
 
     test {
