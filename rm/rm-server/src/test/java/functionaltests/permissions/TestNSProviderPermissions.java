@@ -152,7 +152,7 @@ public class TestNSProviderPermissions extends RMConsecutive {
 
         node = nodePool.remove(0).getNode();
         node2 = nodePool.remove(0).getNode();
-        Node node3 = helper.createNode("node3").getNode();
+        Node node3 = nodePool.remove(0).getNode();
         try {
             admin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
             helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
@@ -227,7 +227,7 @@ public class TestNSProviderPermissions extends RMConsecutive {
 
         node = nodePool.remove(0).getNode();
         node2 = nodePool.remove(0).getNode();
-        node3 = helper.createNode("node3").getNode();
+        node3 = nodePool.remove(0).getNode();
         try {
             nsadmin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
             helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
@@ -298,7 +298,7 @@ public class TestNSProviderPermissions extends RMConsecutive {
 
         node = nodePool.remove(0).getNode();
         node2 = nodePool.remove(0).getNode();
-        node3 = helper.createNode("node3").getNode();
+        node3 = nodePool.remove(0).getNode();
         try {
             admin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
             helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
@@ -355,7 +355,7 @@ public class TestNSProviderPermissions extends RMConsecutive {
 
         node = nodePool.remove(0).getNode();
         node2 = nodePool.remove(0).getNode();
-        node3 = helper.createNode("node3").getNode();
+        node3 = nodePool.remove(0).getNode();
         try {
             admin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
             helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
@@ -410,7 +410,7 @@ public class TestNSProviderPermissions extends RMConsecutive {
 
         node = nodePool.remove(0).getNode();
         node2 = nodePool.remove(0).getNode();
-        node3 = helper.createNode("node3").getNode();
+        node3 = nodePool.remove(0).getNode();
         try {
             admin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
             helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
