@@ -58,12 +58,6 @@ var rmOutputFile = new File(logsDir,'RM-stdout.log')
 var schedulerOutputFile = new File(logsDir, 'Scheduler-stdout.log')
 var jettyOutputFile = new File(logsDir, 'Jetty-stdout.log')
 
-// Jars relative to lib
-var scriptJars = ['jruby-1.7.4.jar', 'jython-2.5.4-rc1.jar', 'groovy-all-2.1.6.jar']
-var vfsJars = ['commons-logging-1.1.1.jar','commons-httpclient-3.1.jar']
-var coreJars = ['*']
-var jettyJars = ['*']
-
 // Processes
 var routerProcess, rmProcess, schedulerProcess, jettyProcess
 
@@ -133,7 +127,7 @@ function startEverything() {
 		service.submit(schedulerWaiter)
 	}
 
-	println('Running Jetty process ...')
+	println('\nRunning Jetty process ...')
 	jettyProcess = startJetty()
 	if (jettyProcess != null) {
 		var jettyWaiter = new Callable({
@@ -242,18 +236,13 @@ function startRouter() {
 	cmd.push('-Dlog4j.configuration=file:'+configDir+fs+'log4j' + fs+'log4j-router')
 	cmd.push('org.objectweb.proactive.extensions.pamr.router.Main')
 	cmd.push('--configFile')
-	cmd.push(configDir+fs+'router' + fs+'router.ini')
+	cmd.push(configDir+fs+'router'+fs+'router.ini')
 	cmd.push('-v')
-    cmd.push('-p')
-    cmd.push(ROUTER_PORT)
-	cmd.push('-t')
-	cmd.push('180000')
-	cmd.push('-e')
-	cmd.push('86400000')
-	cmd.push('-i')
-	cmd.push('0.0.0.0')	
-	var env = Collections.singletonMap('CLASSPATH', fillClasspath(scriptJars, vfsJars, coreJars))
-	var proc = execCmdAsync(cmd, homeDir, routerOutputFile, 'router listening on', env)
+    cmd.push('-i', '0.0.0.0')   // ip to bind
+    cmd.push('-p', ROUTER_PORT) // port to listen
+	cmd.push('-t', '180000')    // heartbeat timeout
+	cmd.push('-e', '86400000')  // disconnected clients timeout
+	var proc = execCmdAsync(cmd, homeDir, routerOutputFile, 'router listening on')
 	println('PAMR Router stdout/stderr redirected into ' + routerOutputFile)
 	return proc
 }
@@ -263,15 +252,14 @@ function startRM() {
     if (PORT_PROTOCOL != null) {
         cmd.push('-Dproactive.'+PORT_PROTOCOL+'.port='+RM_PORT)
     }
-	cmd.push('-Dlog4j.configuration=file:'+configDir+fs+'log4j' + fs+'rm-log4j-server')
+	cmd.push('-Dlog4j.configuration=file:'+configDir+fs+'log4j'+fs+'rm-log4j-server')
     if (config == CONFIGS.PNP_PAMR || config == CONFIGS.PAMR) {
         cmd.push('-Dproactive.pamr.agent.id=0')
         cmd.push('-Dproactive.pamr.agent.magic_cookie=rm')
     }
 	cmd.push('org.ow2.proactive.resourcemanager.utils.RMStarter')
 	cmd.push('-ln') // with default 4 local nodes
-	var env = Collections.singletonMap('CLASSPATH', fillClasspath(scriptJars, vfsJars, coreJars))
-	var proc = execCmdAsync(cmd, homeDir, rmOutputFile, 'created on', env)
+	var proc = execCmdAsync(cmd, homeDir, rmOutputFile, 'created on')
 	println('Resource Manager stdout/stderr redirected into ' + rmOutputFile)
 	return proc
 }
@@ -288,9 +276,8 @@ function startScheduler() {
     }
     cmd.push('org.ow2.proactive.scheduler.util.SchedulerStarter')
     cmd.push('-u', RM_URL) // always on localhost
-
-	var env = Collections.singletonMap('CLASSPATH', fillClasspath(scriptJars, vfsJars, coreJars))	
-	var proc = execCmdAsync(cmd, homeDir, schedulerOutputFile, 'created on', env)
+	
+	var proc = execCmdAsync(cmd, homeDir, schedulerOutputFile, 'created on')
 	println('Scheduler stdout/stderr redirected into ' + schedulerOutputFile)
 	return proc
 }
@@ -351,8 +338,7 @@ function startJetty() {
 	cmd.push('org.ow2.proactive.utils.JettyLauncher')
 	cmd.push('-p', JETTY_PORT)
 	cmd.push(restDir, rmDir, schedulerDir)
-	var env = Collections.singletonMap('CLASSPATH', fillClasspath(jettyJars))
-	var proc = execCmdAsync(cmd, homeDir, jettyOutputFile, null, env)
+	var proc = execCmdAsync(cmd, homeDir, jettyOutputFile, null)
 	println('Jetty stdout/stderr redirected into ' + jettyOutputFile)
 
 	println('Waiting for jetty to start ...')
@@ -438,18 +424,20 @@ function fillClasspath() {
 			return false
 	}}))
 	
-	var classpath = new StringBuilder('.')	
+	var classpath = new StringBuilder('.')
 	for (x in allJars) {
 		classpath.append(File.pathSeparator).append(allJars[x])
 	}	
 	return classpath.toString()
 }
 
-function execCmdAsync(cmdarray, wdir, outputFile, stringToWait, env) {
-	// Convert command from javascript to java array, start the process and redirect output to a file
-	var jarray = toJavaArray(cmdarray)
-	//println('---> command ' + Arrays.toString(jarray))
-	var pb = new ProcessBuilder(jarray)
+function execCmdAsync(cmdarray, wdir, outputFile, stringToWait) {
+	// The classpath should be built from addons/* and dist/lib/*
+	var env = Collections.singletonMap('CLASSPATH', fillClasspath(['*']))
+
+	// Force to string an all elements of the cmdarray, start the process and redirect output to a file
+	cmdarray = Arrays.asList(cmdarray.map(function(x){return x.toString()}))
+	var pb = new ProcessBuilder(cmdarray)
 	pb.redirectErrorStream(true)
 	pb.directory(wdir)
 	pb.environment().putAll(env)
@@ -503,14 +491,6 @@ function stopEverything() {
 		rmProcess.destroy()
 	if ( routerProcess != null )
 		routerProcess.destroy()
-}
-
-function toJavaArray(cmdarray) {
-	var jarray = java.lang.reflect.Array.newInstance(java.lang.String, cmdarray.length)
-	for ( var i = 0; i < cmdarray.length; i++) {
-		jarray[i] = cmdarray[i]
-	}
-	return jarray
 }
 
 function getCheckedCurrDir() {
