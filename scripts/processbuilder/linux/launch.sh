@@ -1,4 +1,4 @@
-#! /bin/sh
+#! /bin/bash
 # OSProcessBuilder - main launcher script for linux - it is
 # responsible for basic environment validation, and for
 # starting the next level of the launching, which based on
