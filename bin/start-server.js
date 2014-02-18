@@ -48,9 +48,11 @@ var distDir = new File(homeDir, 'dist')
 var warsDir = new File(distDir, 'war')
 var paConfigFile = new File(configDir, 'proactive'+fs+'ProActiveConfiguration.xml')
 
+// Load all jars from dist/lib
+loadClasspath();
+
 // OS switch and independent absolute path to Java executable
-var isWindows = System.getProperty('os.name').startsWith('Windows')
-var javaExe = System.getProperty('java.home') + fs + 'bin' + fs + (isWindows ? 'java.exe' : 'java')
+var javaExe = System.getProperty('java.home')+fs+'bin'+fs+(org.apache.commons.lang.SystemUtils.IS_OS_WINDOWS ? 'java.exe' : 'java')
 
 // Logs locations
 var routerOutputFile = new File(logsDir,'Router-stdout.log')
@@ -68,25 +70,25 @@ function startEverything() {
 	println('    Starting server processes    ')
 	println('---------------------------------')
 
-	if (!logsDir.exists()) {
-		logsDir.mkdir()
-	}
-
 	println('\nSetting up config and checking ports ...')
     setupConfigAndCheckPorts()
     setupURLs()	
 
     println('\nDumping configuration into ' + paConfigFile)
-    dumpProActiveConfiguration()
+    dumpProActiveConfiguration(paConfigFile)
 
-	// Add shutdownhook to terminate all processes if the current process is killed 
-	var cleaner = new java.lang.Thread(function () {
-		stopEverything()
-	})
-	java.lang.Runtime.getRuntime().addShutdownHook(cleaner)
+	// Add shutdownhook to terminate all processes if the current process is killed
+	Runtime.getRuntime().addShutdownHook(new Thread(function () {
+		var procs = [jettyProcess, schedulerProcess, rmProcess, routerProcess]
+		procs.map(function(x){if(x!=null){x.destroy()}})
+	}))
 
 	var executor = Executors.newFixedThreadPool(4)
 	var service = new ExecutorCompletionService(executor)
+
+	if (!logsDir.exists()) {
+		logsDir.mkdir()
+	}
 
     if (config == CONFIGS.PNP_PAMR || config == CONFIGS.PAMR) {
         println('\nRunning PAMR Router process ...')
@@ -161,7 +163,6 @@ function startEverything() {
 	    println('Hit CTRL+C or enter \'exit\' to terminate all server processes and exit')
 		var finishedFuture = service.take()
 		println('Finishing process returned ' + finishedFuture.get())
-		stopEverything()
 		// Exit current process ... if under agent it will restart it
 		System.exit(-1)
 	}
@@ -284,6 +285,9 @@ function startScheduler() {
 
 function injectProperties(propsFile, properties) {
     println('Injecting the Resource Manager and Scheduler urls into  ' + propsFile)
+    if (!propsFile.exists()) {
+		propsFile.createNewFile()
+    }
     var props = new Properties()
     var inputStream = new FileInputStream(propsFile)
     props.load(inputStream)
@@ -300,12 +304,14 @@ function extractWar(warsDir, path, warName) {
     var extractDir = new File(warsDir, path)
     println('Checking for ' + extractDir)
     if (!extractDir.exists()) {
-        var restWar = new File(warsDir, warName)
-        if (!restWar.exists()) {
-            println('Unable to locate ' + restWar)
+        var warFile = new File(warsDir, warName)
+        if (!warFile.exists()) {
+            println('Unable to locate ' + warFile)
             return null
         }
-        extractFolder(restWar, extractDir)
+        var zip = new ZipFile(warFile)
+        extractDir.mkdir()
+        org.ow2.proactive.scheduler.common.util.ZipUtils.unzip(zip, extractDir)
     }
     return extractDir
 }
@@ -320,7 +326,7 @@ function startJetty() {
     var rmDir = extractWar(warsDir, 'rm', 'rm.war')
     var schedulerDir = extractWar(warsDir, 'scheduler', 'scheduler.war')
 
-	java.nio.file.Files.copy(paConfigFile.toPath(), new File(restDir, 'WEB-INF'+fs+'ProActiveConfiguration.xml').toPath());    
+    dumpProActiveConfiguration(new File(restDir, 'WEB-INF'+fs+'ProActiveConfiguration.xml'))
 
     var restProperties = { 'rm.url': RM_URL, 'scheduler.url': SCHEDULER_URL}
     injectProperties(new File(restDir, 'WEB-INF'+fs+'portal.properties'), restProperties)
@@ -330,7 +336,6 @@ function startJetty() {
 
     var schedulerProperties = { 'sched.rest.url': 'http://localhost:'+JETTY_PORT+'/rest/rest' }
     injectProperties(new File(schedulerDir, 'scheduler.conf'), schedulerProperties)
-
 
     var cmd = [ javaExe ]
 	cmd.push('-Djava.security.manager')
@@ -360,9 +365,7 @@ function startJetty() {
        java.awt.Desktop.getDesktop().browse(java.net.URI.create(restHttpUrl))
 	   java.awt.Desktop.getDesktop().browse(java.net.URI.create(rmHttpUrl))
 	   java.awt.Desktop.getDesktop().browse(java.net.URI.create(schedulerHttpUrl))
-    } catch (e) {
-       println(e)
-    }
+    } catch (e) { println('Could not open browser ...')}
 	return proc
 }
 
@@ -383,8 +386,8 @@ function initCmd() {
 	return cmd
 }
 
-function dumpProActiveConfiguration() {
-    var pconf = new PrintWriter(paConfigFile)
+function dumpProActiveConfiguration(/*File*/ targetFile) {
+    var pconf = new PrintWriter(targetFile)
     pconf.println('<?xml version=\'1.0\' encoding=\'UTF-8\'?>')
     pconf.println('<ProActiveUserProperties>')
     pconf.println(' <properties>')
@@ -476,21 +479,9 @@ function execCmdAsync(cmdarray, wdir, outputFile, stringToWait) {
 	// Start the gobbler as in a separate thread
 	var r = new Runnable(obj)
 	var th = new Thread(r)
-	th.setDaemon(true)	
-	th.start()	
+	th.setDaemon(true)
+	th.start()
 	return process
-}
-
-function stopEverything() {
-	println('Stopping everything ...')
-	if ( jettyProcess != null) 
-		jettyProcess.destroy()	
-	if ( schedulerProcess != null )
-		schedulerProcess.destroy()	
-	if ( rmProcess != null )
-		rmProcess.destroy()
-	if ( routerProcess != null )
-		routerProcess.destroy()
 }
 
 function getCheckedCurrDir() {
@@ -511,45 +502,6 @@ function assertExists(file, err) { // throws IllegalStateException
 		throw IllegalStateException('File ' + file + ' not found. ' + err)
 	}
 	return
-}
-
-function extractFolder(zipFile, destDirFile){ // throws ZipException, IOException
-    var BUFFER = 2048
-    var zip = new ZipFile(zipFile)
-    // Extract the name
-    var filenameWithExt = zipFile.getName()
-    var filenameWithoutExtension = filenameWithExt.substring(0,filenameWithExt.length() - 4)
-    var zipFileEntries = zip.entries()
-    // Process each entry
-    while (zipFileEntries.hasMoreElements()) {
-        // grab a zip file entry
-        var entry = zipFileEntries.nextElement()
-        var currentEntry = entry.getName()
-        
-        // The destination create the parent directory structure if needed
-        var destFile = new File(destDirFile, currentEntry)
-        var destinationParent = destFile.getParentFile()
-        destinationParent.mkdirs()
-
-        if (!entry.isDirectory()) {
-            var is = new BufferedInputStream(zip.getInputStream(entry))
-            var currentByte
-            // establish buffer for writing file
-            var data = java.lang.reflect.Array.newInstance(java.lang.Byte.TYPE, BUFFER)
-
-            // write the current file to disk
-            var fos = new FileOutputStream(destFile)
-            var dest = new BufferedOutputStream(fos, BUFFER)
-
-            // read and write until last byte is encountered
-            while ((currentByte = is.read(data, 0, BUFFER)) != -1) {
-                dest.write(data, 0, currentByte)
-            }
-            dest.flush()
-            dest.close()
-            is.close()
-        }
-    }
 }
 
 function isTcpPortAvailable(port) { // throws IOException
@@ -576,5 +528,24 @@ function checkPorts(portmap){
 			println('This program will exit...')
 			System.exit(-1)
 		}
+	}
+}
+
+// Add all jars from dist/lib to current classpath
+function loadClasspath() {
+	var libDir = new File(distDir, 'lib')
+	var filesInLib = libDir.listFiles()
+	for (x in filesInLib) {
+		var params = [java.net.URL]
+		var args = [filesInLib[x].toURL()]
+	    try {
+    		var sysloader = java.lang.ClassLoader.getSystemClassLoader()
+    		var sysLoaderClass = sysloader.loadClass('java.net.URLClassLoader')
+        	var method = sysLoaderClass.getDeclaredMethod('addURL', params)
+        	method.setAccessible(true)
+        	method.invoke(sysloader, args)
+    	} catch (t) {
+        	throw java.io.IOException('Error, could not add URL to system classloader', t)
+    	}
 	}
 }
