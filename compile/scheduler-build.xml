@@ -46,8 +46,7 @@
 			<class name="org.ow2.proactive.scheduler.authentication.SchedulerAuthentication" />
 			<class name="org.ow2.proactive.scheduler.examples.Worker" />
 			<class name="org.ow2.proactive.scheduler.ext.masterworker.AOSchedulerWorker" />
-			<class name="org.ow2.proactive.scheduler.core.rmproxies.SchedulerRMProxy" />
-			<class name="org.ow2.proactive.scheduler.core.rmproxies.UserRMProxy" />
+			<class name="org.ow2.proactive.scheduler.core.rmproxies.RMProxy" />
 			<class name="org.ow2.proactive.scheduler.task.launcher.ForkedJavaTaskLauncher" />
 			<class name="org.ow2.proactive.scheduler.task.launcher.JavaTaskLauncher" />
 			<class name="org.ow2.proactive.scheduler.task.launcher.NativeTaskLauncher" />

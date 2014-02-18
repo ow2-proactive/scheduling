@@ -100,6 +100,7 @@ import org.ow2.proactive.scheduler.core.account.SchedulerAccountsManager;
 import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
 import org.ow2.proactive.scheduler.core.jmx.SchedulerJMXHelper;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.proactive.scheduler.core.rmproxies.RMProxiesManager;
 import org.ow2.proactive.scheduler.job.ClientJobState;
 import org.ow2.proactive.scheduler.job.IdentifiedJob;
 import org.ow2.proactive.scheduler.job.InternalJob;
@@ -248,6 +249,7 @@ public class SchedulerFrontend implements InitActive, SchedulerStateUpdate, Sche
             logger.info("Creating scheduler authentication interface...");
             authentication = PAActiveObject.newActive(SchedulerAuthentication.class,
                     new Object[] { PAActiveObject.getStubOnThis() });
+
             //creating scheduler core
             logger.info("Creating scheduler core...");
             SchedulerCore scheduler_local = new SchedulerCore(rmURL, (SchedulerFrontend) PAActiveObject

@@ -65,8 +65,9 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.proactive.scheduler.core.rmproxies.RMProxiesManager;
+import org.ow2.proactive.scheduler.core.rmproxies.RMProxy;
 import org.ow2.proactive.scheduler.core.rmproxies.RMProxyCreationException;
-import org.ow2.proactive.scheduler.core.rmproxies.UserRMProxy;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptorImpl;
 import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
@@ -131,6 +132,10 @@ final class SchedulingMethodImpl implements SchedulingMethod {
         }
     }
 
+    RMProxiesManager getRMProxiesManager() {
+        return core.rmProxiesManager;
+    }
+
     /**
      * Scheduling process. For this implementation, steps are :<br>
      * <ul>
@@ -171,7 +176,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
 
         while (!taskRetrivedFromPolicy.isEmpty()) {
             //get rmState and update it in scheduling policy
-            RMState rmState = core.rmProxiesManager.getSchedulerRMProxy().getState();
+            RMState rmState = getRMProxiesManager().getRmProxy().getState();
             core.policy.setRMState(rmState);
             internalPolicy.RMState = rmState;
             int freeResourcesNb = rmState.getFreeNodesNumber();
@@ -395,7 +400,7 @@ final class SchedulingMethodImpl implements SchedulingMethod {
 
                 criteria.setComputationDescriptors(computationDescriptors);
 
-                UserRMProxy rmProxy = core.rmProxiesManager.getUserRMProxy(currentJob.getOwner(), currentJob
+                RMProxy rmProxy = getRMProxiesManager().getUserRMProxy(currentJob.getOwner(), currentJob
                         .getCredentials());
 
                 nodeSet = rmProxy.getNodes(criteria);
