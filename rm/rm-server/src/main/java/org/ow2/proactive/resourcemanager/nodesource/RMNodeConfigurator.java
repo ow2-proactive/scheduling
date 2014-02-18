@@ -48,6 +48,7 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
 import org.ow2.proactive.resourcemanager.core.RMCore;
+import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.nodesource.dataspace.DataSpaceNodeConfigurationAgent;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 import org.ow2.proactive.resourcemanager.utils.RMNodeStarter;
@@ -102,7 +103,9 @@ public class RMNodeConfigurator implements RunActive {
                 JMXTransportProtocol.RO));
 
             // blocking call involving running ping process on the node
-            RMCore.topologyManager.addNode(nodeToAdd);
+            if (PAResourceManagerProperties.RM_TOPOLOGY_ENABLED.getValueAsBoolean()) {
+                RMCore.topologyManager.addNode(nodeToAdd);
+            }
             rmcore.internalAddNodeToCore(rmnodeToAdd);
         } catch (Exception e) {
             logger.warn("Cannot properly configure the node " + nodeURL +
