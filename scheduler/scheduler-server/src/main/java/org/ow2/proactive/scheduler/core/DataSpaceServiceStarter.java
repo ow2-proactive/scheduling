@@ -180,14 +180,14 @@ public class DataSpaceServiceStarter implements Serializable {
             if (!confs[i][0].isSet()) {
                 // if URL is set, if not we start a server ourselves
                 try {
-                    logger.info("Starting " + humanReadableNames[i] + " server...");
+                    logger.debug("Starting " + humanReadableNames[i] + " server...");
                     if (!confs[i][1].isSet()) {
                         // check if the localpath is set, if not we use the default path
                         spaceDir = default_paths[i];
                         confs[i][1].updateProperty(spaceDir);
                     } else {
                         // otherwise, we build a FileServer on the provided path
-                        logger.info("Using property-defined path at " + confs[i][1].getValueAsString());
+                        logger.debug("Using property-defined path at " + confs[i][1].getValueAsString());
                         spaceDir = confs[i][1].getValueAsString();
                     }
                     File dir = new File(spaceDir);
@@ -206,7 +206,7 @@ public class DataSpaceServiceStarter implements Serializable {
                         confs[i][2].updateProperty(localhostname);
                     }
 
-                    logger.info(humanReadableNames[i] + " server local path is " + spaceDir);
+                    logger.debug(humanReadableNames[i] + " server local path is " + spaceDir);
                 } catch (IllegalArgumentException iae) {
                     throw new IllegalArgumentException("Directory '" + spaceDir +
                             "' cannot be accessed. Check if directory exists or if you have read/write rights.");
@@ -277,7 +277,7 @@ public class DataSpaceServiceStarter implements Serializable {
                             " was configured for appid = " + appidConfigured + ", reconfiguring...");
                 }
                 DataSpacesNodes.configureApplication(schedulerNode, appID, namingService);
-                logger.info("Node " + schedulerNode.getNodeInformation().getURL() +
+                logger.debug("Node " + schedulerNode.getNodeInformation().getURL() +
                         " configured for appid = " + appID);
 
                 appidConfigured = appID;

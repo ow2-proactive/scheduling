@@ -84,7 +84,7 @@ public class SchedulingService {
         if (!this.policy.reloadConfig()) {
             throw new RuntimeException("Scheduling policy cannot be started, see log file for details.");
         }
-        logger.info("Instantiated policy : " + policyClassName);
+        logger.debug("Instantiated policy : " + policyClassName);
 
         lastRmUrl = infrastructure.getRMProxiesManager().getRmUrl();
 
@@ -707,7 +707,7 @@ public class SchedulingService {
         jobsRecovered(recoveredState.getRunningJobs());
 
         if (SCHEDULER_REMOVED_JOB_DELAY > 0 || SCHEDULER_AUTO_REMOVED_JOB_DELAY > 0) {
-            logger.info("Removing non-managed jobs");
+            logger.debug("Removing non-managed jobs");
             Iterator<InternalJob> iterJob = recoveredState.getFinishedJobs().iterator();
 
             while (iterJob.hasNext()) {

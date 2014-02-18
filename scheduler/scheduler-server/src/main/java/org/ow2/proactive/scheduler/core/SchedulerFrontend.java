@@ -205,7 +205,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
         this.accountsManager = new SchedulerAccountsManager(dbManager);
         this.jmxHelper = new SchedulerJMXHelper(accountsManager, dbManager);
 
-        logger.info("Creating scheduler Front-end...");
+        logger.debug("Creating scheduler Front-end...");
         this.rmURL = rmURL;
         this.policyFullName = policyFullClassName;
         logger.debug("Policy used is " + policyFullClassName);
@@ -217,12 +217,12 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     public void initActivity(Body body) {
         try {
             // setting up the policy
-            logger.info("Setting up scheduler security policy");
+            logger.debug("Setting up scheduler security policy");
             ClientsPolicy.init();
 
             // creating the scheduler authentication interface.
             // if this fails then it will not continue.
-            logger.info("Creating scheduler authentication interface...");
+            logger.debug("Creating scheduler authentication interface...");
             authentication = PAActiveObject.newActive(SchedulerAuthentication.class,
                     new Object[] { PAActiveObject.getStubOnThis() });
             //creating scheduler core
@@ -261,7 +261,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
             }
 
             // Boot the JMX helper
-            logger.info("Booting jmx...");
+            logger.debug("Booting jmx...");
             this.jmxHelper.boot(authentication);
 
             SchedulerStateRecoverHelper.RecoveredSchedulerState recoveredState = new SchedulerStateRecoverHelper(
@@ -272,7 +272,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
             this.schedulingService = new SchedulingService(infrastructure, frontendState, recoveredState,
                 policyFullName, null);
 
-            logger.info("Registering scheduler...");
+            logger.debug("Registering scheduler...");
             PAActiveObject.registerByName(authentication, SchedulerConstants.SCHEDULER_DEFAULT_NAME);
             authentication.setActivated(true);
 

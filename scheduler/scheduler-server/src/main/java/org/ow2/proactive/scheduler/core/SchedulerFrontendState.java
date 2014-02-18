@@ -166,10 +166,11 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     private void recover(SchedulerStateImpl sState) {
         //default state = started
         Set<JobState> jobStates = new HashSet<JobState>();
-        logger.info("#Pending jobs list : " + sState.getPendingJobs().size());
-        logger.info("#Running jobs list : " + sState.getRunningJobs().size());
-        logger.info("#Finished jobs list : " + sState.getFinishedJobs().size());
-
+        if (logger.isInfoEnabled()) {
+            logger.info("#Pending jobs: " + sState.getPendingJobs().size() +
+            " #Running jobs: " + sState.getRunningJobs().size() +
+            " #Finished jobs: " + sState.getFinishedJobs().size());
+        }
         for (JobState js : sState.getPendingJobs()) {
             prepare(jobStates, js, false);
         }

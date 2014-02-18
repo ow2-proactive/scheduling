@@ -65,7 +65,7 @@ public class LocalInfrastructure extends InfrastructureManager {
         }
         //one decremented once too many
         this.atomicMaxNodes.getAndIncrement();
-        logger.info("Cannot acquire more nodes");
+        logger.debug("Cannot acquire more nodes");
     }
 
     @Override

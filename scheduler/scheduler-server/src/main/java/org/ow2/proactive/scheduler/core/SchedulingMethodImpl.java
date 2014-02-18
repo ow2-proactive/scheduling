@@ -177,7 +177,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                 return numberOfTaskStarted;
             }
 
-            logger.info("eligible tasks : " + taskRetrivedFromPolicy.size());
+            logger.debug("eligible tasks : " + taskRetrivedFromPolicy.size());
 
             while (!taskRetrivedFromPolicy.isEmpty()) {
                 //get rmState and update it in scheduling policy
@@ -185,7 +185,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                 currentPolicy.setRMState(rmState);
                 internalPolicy.RMState = rmState;
                 int freeResourcesNb = rmState.getFreeNodesNumber();
-                logger.info("eligible nodes : " + freeResourcesNb);
+                logger.debug("eligible nodes : " + freeResourcesNb);
                 //if there is no free resources, stop it right now
                 if (freeResourcesNb == 0) {
                     break;

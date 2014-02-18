@@ -126,8 +126,6 @@ public class SchedulerDBManager {
             File configFile = new File(PASchedulerProperties
                     .getAbsolutePath(PASchedulerProperties.SCHEDULER_DB_HIBERNATE_CONFIG.getValueAsString()));
 
-            logger.info("Initializing Scheduler DB using Hibernate config " + configFile.getAbsolutePath());
-
             Map<String, String> propertiesToReplace = new HashMap<String, String>(2);
             propertiesToReplace.put("${proactive.home}", CentralPAPropertyRepository.PA_HOME.getValue());
             propertiesToReplace.put("${pa.scheduler.home}", PASchedulerProperties.SCHEDULER_HOME
@@ -136,6 +134,13 @@ public class SchedulerDBManager {
             Configuration configuration = createConfiguration(configFile, propertiesToReplace);
 
             boolean drop = PASchedulerProperties.SCHEDULER_DB_HIBERNATE_DROPDB.getValueAsBoolean();
+
+            if (logger.isInfoEnabled()) {
+                logger.info("Starting Scheduler DB Manager " +
+                  "with drop DB = " + drop +
+                  " and configuration file = " + configFile.getAbsolutePath());
+            }
+
             return new SchedulerDBManager(configuration, drop);
         }
     }
@@ -149,8 +154,6 @@ public class SchedulerDBManager {
     }
 
     public SchedulerDBManager(Configuration configuration, boolean drop) {
-        logger.info("Starting Hibernate...");
-        logger.info("Drop DB : " + drop);
         try {
             configuration.addAnnotatedClass(JobData.class);
             configuration.addAnnotatedClass(TaskData.class);

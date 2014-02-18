@@ -286,7 +286,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         }
         try {
             // setting up the policy
-            logger.info("Setting up the resource manager security policy");
+            logger.debug("Setting up the resource manager security policy");
             ClientsPolicy.init();
 
             PAActiveObject.registerByName(PAActiveObject.getStubOnThis(),

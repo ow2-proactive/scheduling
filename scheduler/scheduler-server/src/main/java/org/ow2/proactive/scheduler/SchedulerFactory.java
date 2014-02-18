@@ -256,7 +256,7 @@ public class SchedulerFactory {
      * @throws AdminSchedulerException If an error occurred during creation process
      */
     public static void createScheduler(URI rmURL, String policyFullClassName) throws AdminSchedulerException {
-        logger.info("Starting new Scheduler");
+        logger.debug("Starting new Scheduler");
 
         //check arguments...
         if (rmURL == null) {
@@ -268,12 +268,12 @@ public class SchedulerFactory {
         try {
             // creating the scheduler
             // if this fails then it will not continue.
-            logger.info("Creating scheduler frontend...");
+            logger.debug("Creating scheduler frontend...");
             PAActiveObject.newActive(SchedulerFrontend.class.getName(), new Object[] { rmURL,
                     policyFullClassName });
 
             //ready
-            logger.info("Scheduler is now ready to be started !");
+            logger.debug("Scheduler is now ready to be started !");
             configureLog4j();
         } catch (Exception e) {
             logger.error(e);

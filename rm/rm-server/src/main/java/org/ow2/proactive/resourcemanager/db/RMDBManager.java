@@ -95,8 +95,11 @@ public class RMDBManager {
             boolean dropNS = PAResourceManagerProperties.RM_DB_HIBERNATE_DROPDB_NODESOURCES
                     .getValueAsBoolean();
 
-            logger.info("Initializing RM DB using Hibernate config " + configFile.getAbsolutePath());
-
+            if (logger.isInfoEnabled()) {
+                logger.info("Starting RM DB Manager " +
+                  "with drop DB = " + drop + " and drop nodesources = " + dropNS +
+                  " and configuration file = " + configFile.getAbsolutePath());
+            }
             return new RMDBManager(new Configuration().configure(configFile), drop, dropNS);
         }
     }
@@ -114,9 +117,6 @@ public class RMDBManager {
      * RMDBManager.getInstance() should be used in most of cases.
      */
     public RMDBManager(Configuration configuration, boolean drop, boolean dropNS) {
-        logger.info("Starting Hibernate...");
-        logger.info("Drop DB : " + drop);
-        logger.info("Drop Nodesources : " + dropNS);
         try {
             configuration.addAnnotatedClass(NodeSourceData.class);
             configuration.addAnnotatedClass(NodeHistory.class);

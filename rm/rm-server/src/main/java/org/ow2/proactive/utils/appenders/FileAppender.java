@@ -73,7 +73,7 @@ public class FileAppender extends WriterAppender {
         if (en != null && en.hasMoreElements()) {
             Appender app = (Appender) en.nextElement();
             if (app != null && app.getLayout() != null) {
-                Logger.getRootLogger().info("Retrieved layout from log4j configuration");
+                Logger.getRootLogger().debug("Retrieved layout from log4j configuration");
                 setLayout(app.getLayout());
             }
         }
