@@ -39,6 +39,7 @@ package functionaltests;
 import java.io.File;
 import java.net.URL;
 
+import junit.framework.Assert;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobResult;
@@ -50,7 +51,6 @@ import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.tests.FunctionalTest;
-import junit.framework.Assert;
 
 
 /**
@@ -104,6 +104,13 @@ public class TestJobCoverage extends FunctionalTest {
         JobState jstate;
         TaskInfo tinfo;
         JobInfo jinfo;
+
+        // removing temp file if existing
+        File w3File = new File(System.getProperty("java.io.tmpdir"),"WorkingAt3rdT2_13031984.tmp");
+        if (w3File.exists()) {
+            w3File.delete();
+        }
+
         //job submission
         SchedulerTHelper.log("Submitting job...");
         TaskFlowJob job = (TaskFlowJob) JobFactory_stax.getFactory().createJob(
