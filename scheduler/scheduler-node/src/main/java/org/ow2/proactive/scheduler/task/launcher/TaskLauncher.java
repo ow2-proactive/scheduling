@@ -93,6 +93,7 @@ import org.objectweb.proactive.utils.StackTraceUtil;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.db.types.BigString;
+import org.ow2.proactive.rm.util.process.EnvironmentCookieBasedChildProcessKiller;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.exception.UserException;
@@ -117,8 +118,6 @@ import org.ow2.proactive.scheduler.exception.ProgressPingerException;
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.KillTask;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
-import org.ow2.proactive.scheduler.util.process.Environment;
-import org.ow2.proactive.scheduler.util.process.ProcessTreeKiller;
 import org.ow2.proactive.scripting.PropertyUtils;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptHandler;
@@ -148,14 +147,6 @@ public abstract class TaskLauncher {
     // Standard out/err are stored to be restored after execution
     public static final PrintStream SYSTEM_OUT = System.out;
     public static final PrintStream SYSTEM_ERR = System.err;
-
-    private static String COOKIE_ENV = "TL_COOKIE";
-
-    private String last_cookie_value;
-
-    private boolean isCookieSet = false;
-
-    private Map<String, String> modelEnvVar = null;
 
     public static final String EXECUTION_SUCCEED_BINDING_NAME = "success";
     public static final String DS_SCRATCH_BINDING_NAME = "localspace";
@@ -325,7 +316,7 @@ public abstract class TaskLauncher {
         // plug stdout/err into a socketAppender
         this.initLoggers();
         // set the cookie used to mark children processes
-        this.setPTKCookie();
+        this.setEnvironmentCookie();
         // set scheduler defined env variables
         this.initEnv();
         logger.debug("TaskLauncher initialized");
@@ -493,41 +484,12 @@ public abstract class TaskLauncher {
      * This method sets a cookie among the system environment variables of this JVM.
      * This cookie will be used later during the task termination to kill all children processes
      */
-    protected void setPTKCookie() {
-        // the node name is added to the cookie to be sure that there can be no overlapping
-        // between the different nodes of the same machine
+    protected void setEnvironmentCookie() {
+        String prefix = "";
         if (taskId.value() != null) {
-            last_cookie_value = taskId.value() + "_" + ProcessTreeKiller.createCookie();
-        } else {
-            last_cookie_value = ProcessTreeKiller.createCookie();
+            prefix = taskId.value() + "_";
         }
-        Environment.setenv(COOKIE_ENV, last_cookie_value, true);
-        modelEnvVar = new HashMap<String, String>();
-        modelEnvVar.put(COOKIE_ENV, last_cookie_value);
-        isCookieSet = true;
-    }
-
-    /**
-     * This method unsets the cookie previously set by setPTKCookie.
-     */
-    protected void unsetPTKCookie() {
-        try {
-            Environment.unsetenv(COOKIE_ENV);
-        } catch (Exception e) {
-            logger.error("Exception when unsetting the cookie", e);
-        }
-        isCookieSet = false;
-    }
-
-    /**
-     * This methods reset the same cookie which was previously used
-     */
-    protected void resetPTKCookie() {
-        Environment.setenv(COOKIE_ENV, last_cookie_value, true);
-    }
-
-    protected boolean isPTKCookieSet() {
-        return isCookieSet;
+        EnvironmentCookieBasedChildProcessKiller.setCookie(prefix);
     }
 
     /**
@@ -536,20 +498,7 @@ public abstract class TaskLauncher {
      */
     @ImmediateService
     public boolean killChildrenProcesses() {
-        // We first start a dummy process which will inherit the cookie env variable.
-        if (isPTKCookieSet()) {
-            logger.debug("Killing children process of task");
-            // unsets the cookie for the current Java process
-            unsetPTKCookie();
-
-            try {
-                // kills all processes tagged by the env cookie
-                ProcessTreeKiller.get().kill(modelEnvVar);
-            } catch (Throwable e) {
-                logger.warn("Unable to kill children processes", e);
-            }
-
-        }
+        EnvironmentCookieBasedChildProcessKiller.killChildProcesses();
         return true;
     }
 

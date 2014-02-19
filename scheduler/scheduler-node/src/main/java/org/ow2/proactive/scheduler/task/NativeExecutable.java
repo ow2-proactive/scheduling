@@ -65,7 +65,7 @@ import org.ow2.proactive.scheduler.exception.StartProcessException;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher.OneShotDecrypter;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher.SchedulerVars;
 import org.ow2.proactive.scheduler.task.launcher.utils.ForkerUtils;
-import org.ow2.proactive.scheduler.util.process.ProcessTreeKiller;
+import org.ow2.proactive.rm.util.process.ProcessTreeKiller;
 import org.ow2.proactive.scheduler.util.process.ThreadReader;
 import org.ow2.proactive.scripting.GenerationScript;
 import org.ow2.proactive.scripting.PropertyUtils;

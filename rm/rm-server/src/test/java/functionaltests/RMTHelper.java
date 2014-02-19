@@ -48,6 +48,8 @@ import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
+import org.objectweb.proactive.core.node.StartNode;
+import org.objectweb.proactive.core.process.JVMProcess;
 import org.objectweb.proactive.core.process.JVMProcessImpl;
 import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.utils.OperatingSystem;
@@ -64,6 +66,7 @@ import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.LocalInfrastructure;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
+import org.ow2.proactive.resourcemanager.utils.RMNodeStarter;
 import org.ow2.proactive.utils.FileToBytesConverter;
 import org.ow2.tests.ProActiveSetup;
 
@@ -289,41 +292,25 @@ public class RMTHelper {
     public TNode createNode(String nodeName, String expectedUrl, Map<String, String> vmParameters,
             List<String> vmOptions) throws IOException, NodeException {
 
+        JVMProcessImpl nodeProcess = createJvmProcess(StartNode.class.getName(), Arrays.asList(nodeName),
+                vmParameters, vmOptions);
+        return createNode(nodeName, expectedUrl, nodeProcess);
+
+    }
+
+    public static TNode createRMNodeStarterNode(String nodeName) throws IOException, NodeException {
+
+        JVMProcessImpl nodeProcess = createJvmProcess(RMNodeStarter.class.getName(), Arrays.asList("-n", nodeName),
+                null, null);
+        return createNode(nodeName, null, nodeProcess);
+
+    }
+
+    private static TNode createNode(String nodeName, String expectedUrl, JVMProcess nodeProcess) throws IOException, NodeException {
+
         if (expectedUrl == null) {
             expectedUrl = "rmi://" + ProActiveInet.getInstance().getHostname() + ":" + PA_RMI_PORT + "/" + nodeName;
         }
-
-        JVMProcessImpl nodeProcess = new JVMProcessImpl(
-            new org.objectweb.proactive.core.process.AbstractExternalProcess.StandardOutputMessageLogger());
-        nodeProcess.setClassname("org.objectweb.proactive.core.node.StartNode");
-
-        ArrayList<String> jvmParameters = new ArrayList<String>();
-
-        if (vmParameters == null) {
-            vmParameters = new HashMap<String, String>();
-        }
-
-        if (!vmParameters.containsKey(CentralPAPropertyRepository.PA_RMI_PORT.getName())) {
-            vmParameters.put(CentralPAPropertyRepository.PA_RMI_PORT.getName(), String.valueOf(PA_RMI_PORT));
-        }
-        if (!vmParameters.containsKey(CentralPAPropertyRepository.PA_HOME.getName())) {
-            vmParameters.put(CentralPAPropertyRepository.PA_HOME.getName(), CentralPAPropertyRepository.PA_HOME
-                    .getValue());
-        }
-
-        for (Entry<String, String> entry : vmParameters.entrySet()) {
-            if (!entry.getKey().equals("") && !entry.getValue().equals("")) {
-                jvmParameters.add("-D" + entry.getKey() + "=" + entry.getValue());
-            }
-        }
-
-        if (vmOptions != null) {
-            jvmParameters.addAll(vmOptions);
-        }
-        jvmParameters.addAll(setup.getJvmParametersAsList());
-        nodeProcess.setJvmOptions(jvmParameters);
-        nodeProcess.setParameters(Arrays.asList(nodeName));
-        nodeProcess.startProcess();
 
         try {
             Node newNode = null;
@@ -350,6 +337,41 @@ public class RMTHelper {
             e.printStackTrace();
             return null;
         }
+    }
+
+    private static JVMProcessImpl createJvmProcess(String className, List<String> parameters, Map<String, String> vmParameters, List<String> vmOptions) throws IOException {
+        JVMProcessImpl nodeProcess = new JVMProcessImpl(
+            new org.objectweb.proactive.core.process.AbstractExternalProcess.StandardOutputMessageLogger());
+        nodeProcess.setClassname(className);
+
+        ArrayList<String> jvmParameters = new ArrayList<String>();
+
+        if (vmParameters == null) {
+            vmParameters = new HashMap<String, String>();
+        }
+
+        if (!vmParameters.containsKey(CentralPAPropertyRepository.PA_RMI_PORT.getName())) {
+            vmParameters.put(CentralPAPropertyRepository.PA_RMI_PORT.getName(), String.valueOf(PA_RMI_PORT));
+        }
+        if (!vmParameters.containsKey(CentralPAPropertyRepository.PA_HOME.getName())) {
+            vmParameters.put(CentralPAPropertyRepository.PA_HOME.getName(), CentralPAPropertyRepository.PA_HOME
+                    .getValue());
+        }
+
+        for (Entry<String, String> entry : vmParameters.entrySet()) {
+            if (!entry.getKey().equals("") && !entry.getValue().equals("")) {
+                jvmParameters.add("-D" + entry.getKey() + "=" + entry.getValue());
+            }
+        }
+
+        if (vmOptions != null) {
+            jvmParameters.addAll(vmOptions);
+        }
+        jvmParameters.addAll(setup.getJvmParametersAsList());
+        nodeProcess.setJvmOptions(jvmParameters);
+        nodeProcess.setParameters(parameters);
+        nodeProcess.startProcess();
+        return nodeProcess;
     }
 
     /**

@@ -34,7 +34,7 @@
  * ################################################################
  * $$ACTIVEEON_CONTRIBUTOR$$
  */
-package org.ow2.proactive.scheduler.util.process;
+package org.ow2.proactive.rm.util.process;
 
 import java.io.Serializable;
 import java.util.Comparator;

@@ -42,6 +42,7 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
+import org.ow2.proactive.rm.util.process.EnvironmentCookieBasedChildProcessKiller;
 
 
 /**
@@ -60,6 +61,7 @@ public class ForkerStarter {
             System.err.println("Arguments must be : callbackURL nodeName");
             System.exit(2);
         }
+        EnvironmentCookieBasedChildProcessKiller.registerKillChildProcessesOnShutdown();
         ForkerStarter fs = new ForkerStarter();
         Node n = fs.createLocalNode(args[1]);
         fs.callBack(args[0], n);

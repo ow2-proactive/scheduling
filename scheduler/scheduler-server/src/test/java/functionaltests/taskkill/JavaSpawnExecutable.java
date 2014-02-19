@@ -44,9 +44,9 @@ import java.util.Map;
 
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
-import org.ow2.proactive.scheduler.util.process.OperatingSystem;
-import org.ow2.proactive.scheduler.util.process.OperatingSystemFamily;
-import org.ow2.proactive.scheduler.util.process.ProcessTreeKiller;
+import org.ow2.proactive.rm.util.process.OperatingSystem;
+import org.ow2.proactive.rm.util.process.OperatingSystemFamily;
+import org.ow2.proactive.rm.util.process.ProcessTreeKiller;
 import org.ow2.proactive.scheduler.util.process.ThreadReader;
 import org.apache.log4j.Level;
 

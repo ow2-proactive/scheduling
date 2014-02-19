@@ -43,6 +43,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 
 import org.objectweb.proactive.utils.OperatingSystem;
+import org.ow2.proactive.scheduler.common.exception.UserException;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
@@ -52,7 +53,7 @@ import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
-import org.ow2.proactive.scheduler.util.process.ProcessTreeKiller;
+import org.ow2.proactive.rm.util.process.ProcessTreeKiller;
 import functionaltests.RMTHelper;
 import functionaltests.SchedulerConsecutive;
 import functionaltests.SchedulerTHelper;
@@ -84,7 +85,7 @@ public class TestProcessTreeKiller extends SchedulerConsecutive {
 
     private final static int wait_kill_time = 60000;
 
-    private static final int detachedProcNumber = 4;
+    public static final int detachedProcNumber = 4;
 
     private static final int NB_ITERATIONS = 1;
 
@@ -134,34 +135,12 @@ public class TestProcessTreeKiller extends SchedulerConsecutive {
             task1.setCommandLine(executable.getNativeExecLauncher(false));
             job1.addTask(task1);
 
-            // create job 2 simple Java Executable
-            TaskFlowJob job2 = new TaskFlowJob();
-            job2.setName(this.getClass().getSimpleName() + "_2");
-            job2.setDescription("a command that spawn processes");
-
-            JavaTask task2 = new JavaTask();
             String task2Name = "TestTK2";
-            task2.setName(task2Name);
-            task2.addArgument("sleep", 2);
-            task2.addArgument("tname", task2Name);
-            task2.addArgument("home", PASchedulerProperties.SCHEDULER_HOME.getValueAsString());
-            task2.setExecutableClassName(JavaSpawnExecutable.class.getName());
-            job2.addTask(task2);
+            TaskFlowJob job2 = createJavaExecutableJob(task2Name, false);
 
-            // create job 3 forked Java Executable
-            TaskFlowJob job3 = new TaskFlowJob();
-            job3.setName(this.getClass().getSimpleName() + "_3");
-            job3.setDescription("a command that spawn processes");
-
-            JavaTask task3 = new JavaTask();
-            task3.setForkEnvironment(new ForkEnvironment());
             String task3Name = "TestTK3";
-            task3.addArgument("sleep", 3);
-            task3.addArgument("tname", task3Name);
-            task3.addArgument("home", PASchedulerProperties.SCHEDULER_HOME.getValueAsString());
-            task3.setName(task3Name);
-            task3.setExecutableClassName(JavaSpawnExecutable.class.getName());
-            job3.addTask(task3);
+            TaskFlowJob job3 = createJavaExecutableJob(task3Name, true);
+
 
             SchedulerTHelper.log("************** Test with Job Killing *************");
             //submit three jobs
@@ -173,7 +152,7 @@ public class TestProcessTreeKiller extends SchedulerConsecutive {
             SchedulerTHelper.waitForEventTaskRunning(id3, task3Name);
 
             SchedulerTHelper.log("************** All 3 tasks running *************");
-            TestProcessTreeKiller.waitUntilKProcesses(detachedProcNumber * 3);
+            TestProcessTreeKiller.waitUntilForkedProcessesAreRunning(detachedProcNumber * 3);
             //we should have 3 times (3 jobs) number of detached processes
 
             //kill the first job
@@ -183,7 +162,7 @@ public class TestProcessTreeKiller extends SchedulerConsecutive {
             SchedulerTHelper.waitForEventJobFinished(id1);
             SchedulerTHelper.log("************** First job killed *************");
 
-            TestProcessTreeKiller.waitUntilKProcesses(detachedProcNumber * 2);
+            TestProcessTreeKiller.waitUntilForkedProcessesAreRunning(detachedProcNumber * 2);
 
             //kill the second job
             SchedulerTHelper
@@ -192,7 +171,7 @@ public class TestProcessTreeKiller extends SchedulerConsecutive {
             SchedulerTHelper.waitForEventJobFinished(id2);
             SchedulerTHelper.log("************** Second job killed *************");
 
-            TestProcessTreeKiller.waitUntilKProcesses(detachedProcNumber);
+            TestProcessTreeKiller.waitUntilForkedProcessesAreRunning(detachedProcNumber);
 
             //kill the third job
             SchedulerTHelper
@@ -201,7 +180,7 @@ public class TestProcessTreeKiller extends SchedulerConsecutive {
             SchedulerTHelper.waitForEventJobFinished(id3);
             SchedulerTHelper.log("************** Third job killed *************");
 
-            TestProcessTreeKiller.waitUntilKProcesses(0);
+            TestProcessTreeKiller.waitUntilForkedProcessesAreRunning(0);
 
             // We make sure that the kill method for job 2 and job 3 have been killed
             File killFileTask2 = new File(tmpDir, task2Name + ".tmp");
@@ -251,7 +230,7 @@ public class TestProcessTreeKiller extends SchedulerConsecutive {
 
             SchedulerTHelper.log("************** All 3 tasks running *************");
 
-            TestProcessTreeKiller.waitUntilKProcesses(detachedProcNumber * 2);
+            TestProcessTreeKiller.waitUntilForkedProcessesAreRunning(detachedProcNumber * 2);
 
             //we should have 2 times (3 jobs) number of detached processes as the first job won't spawn any process
 
@@ -300,10 +279,28 @@ public class TestProcessTreeKiller extends SchedulerConsecutive {
         }
     }
 
+    public static TaskFlowJob createJavaExecutableJob(String name, boolean forked) throws UserException {
+        TaskFlowJob job = new TaskFlowJob();
+        job.setName(name);
+        job.setDescription("A command that spawns processes");
+
+        JavaTask task = new JavaTask();
+        if (forked) {
+            task.setForkEnvironment(new ForkEnvironment());
+        }
+        task.addArgument("sleep", 3);
+        task.addArgument("tname", name);
+        task.addArgument("home", PASchedulerProperties.SCHEDULER_HOME.getValueAsString());
+        task.setName(name);
+        task.setExecutableClassName(JavaSpawnExecutable.class.getName());
+        job.addTask(task);
+        return job;
+    }
+
     /*
      * Process are killed asynchronously, need wait some time
      */
-    public static void waitUntilKProcesses(int expectedNumber) throws Exception {
+    public static void waitUntilForkedProcessesAreRunning(int expectedNumber) throws Exception {
         SchedulerTHelper.log("************** Waiting until " + expectedNumber +
             " processes are left *************");
         int runningDetachedProcNumber = 0;
@@ -314,11 +311,15 @@ public class TestProcessTreeKiller extends SchedulerConsecutive {
             if (runningDetachedProcNumber == expectedNumber) {
                 break;
             } else {
-                Thread.sleep(2000);
+                Thread.sleep(500);
             }
         }
         assertEquals(expectedNumber, runningDetachedProcNumber);
         SchedulerTHelper.log("************** " + expectedNumber + " processes are now running *************");
+    }
+
+    public static void waitUntilAllForkedProcessesAreKilled() throws Exception {
+        waitUntilForkedProcessesAreRunning(0);
     }
 
     /*

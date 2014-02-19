@@ -32,7 +32,7 @@
  *
  *  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.util.process;
+package org.ow2.proactive.rm.util.process;
 
 import com.sun.jna.Library;
 import com.sun.jna.Native;

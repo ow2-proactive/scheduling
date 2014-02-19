@@ -34,7 +34,7 @@
  * ################################################################
  * $$ACTIVEEON_CONTRIBUTOR$$
  */
-package org.ow2.proactive.scheduler.util.process;
+package org.ow2.proactive.rm.util.process;
 
 import org.jvnet.winp.WinProcess;
 import org.jvnet.winp.WinpException;
@@ -174,7 +174,7 @@ public abstract class ProcessTreeKiller {
      */
     private static final class Windows extends ProcessTreeKiller {
         /**
-         * @see org.ow2.proactive.scheduler.util.process.ProcessTreeKiller#kill(java.lang.Process)
+         * @see ProcessTreeKiller#kill(java.lang.Process)
          */
         @Override
         public void kill(Process proc) {
@@ -182,7 +182,7 @@ public abstract class ProcessTreeKiller {
         }
 
         /**
-         * @see org.ow2.proactive.scheduler.util.process.ProcessTreeKiller#kill(java.lang.Process, java.util.Map)
+         * @see ProcessTreeKiller#kill(java.lang.Process, java.util.Map)
          */
         @Override
         public void kill(Process proc, Map<String, String> modelEnvVars) {
@@ -231,7 +231,7 @@ public abstract class ProcessTreeKiller {
      */
     private static abstract class Unix<S extends Unix.UnixSystem<?>> extends ProcessTreeKiller {
         /**
-         * @see org.ow2.proactive.scheduler.util.process.ProcessTreeKiller#kill(java.lang.Process)
+         * @see ProcessTreeKiller#kill(java.lang.Process)
          */
         @Override
         public void kill(Process proc) {
@@ -241,7 +241,7 @@ public abstract class ProcessTreeKiller {
         protected abstract S createSystem();
 
         /**
-         * @see org.ow2.proactive.scheduler.util.process.ProcessTreeKiller#kill(java.lang.Process, java.util.Map)
+         * @see ProcessTreeKiller#kill(java.lang.Process, java.util.Map)
          */
         @Override
         public void kill(Process proc, Map<String, String> modelEnvVars) {
