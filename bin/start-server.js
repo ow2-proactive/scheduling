@@ -52,7 +52,7 @@ var paConfigFile = new File(configDir, 'proactive'+fs+'ProActiveConfiguration.xm
 loadClasspath();
 
 // OS switch and independent absolute path to Java executable
-var javaExe = System.getProperty('java.home')+fs+'bin'+fs+(org.apache.commons.lang.SystemUtils.IS_OS_WINDOWS ? 'java.exe' : 'java')
+var javaExe = System.getProperty('java.home')+fs+'bin'+fs+(com.sun.jna.Platform.isWindows() ? 'java.exe' : 'java')
 
 // Logs locations
 var routerOutputFile = new File(logsDir,'Router-stdout.log')
