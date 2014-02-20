@@ -147,7 +147,7 @@ public class NativeTaskLauncher extends TaskLauncher {
             //init dataspace
             initDataSpaces();
             replaceTagsInDataspaces();
-            
+
             updatePropagatedVariables(results);
 
             sample = System.nanoTime();
@@ -178,6 +178,7 @@ public class NativeTaskLauncher extends TaskLauncher {
             if (!hasBeenKilled) {
                 //init task
                 ExecutableInitializer execInit = executableContainer.createExecutableInitializer();
+                replaceWorkingDirIfNecessary(execInit);
                 replaceWorkingDirPathsTags(execInit);
                 replaceWorkingDirDSAllTags(execInit);
                 GenerationScript generationScript = ((NativeExecutableInitializer) execInit)
@@ -187,7 +188,7 @@ public class NativeTaskLauncher extends TaskLauncher {
                     // replace script variables with updated values
                     filterAndUpdate(generationScript, getPropagatedVariables());
                 }
-                
+
                 //decrypt credentials if needed
                 if (executableContainer.isRunAsUser()) {
                     decrypter.setCredentials(executableContainer.getCredentials());
@@ -217,7 +218,7 @@ public class NativeTaskLauncher extends TaskLauncher {
                         .getProperty("java.home"));
                 ((NativeExecutable) currentExecutable).addToEnvironmentVariables(PROACTIVE_HOME_VAR,
                         PROACTIVE_HOME);
-                
+
                 this.setPropagatedVariablesAsEnvironmentVariables(
                         getPropagatedVariables(),
                         (NativeExecutable) currentExecutable);
@@ -338,13 +339,17 @@ public class NativeTaskLauncher extends TaskLauncher {
 
     }
 
-    private void addDataSpaceEnvVar(DataSpacesFileObject fo, String varName) throws URISyntaxException {
+    private void addDataSpaceEnvVar(DataSpacesFileObject fo, String varName) throws URISyntaxException, DataSpacesException {
         if (fo != null) {
-            String foUri = (new URI(fo.getRealURI())).toString();
-            if (foUri.startsWith("file:")) {
-                foUri = (new File(new URI(foUri))).getAbsolutePath();
-            }
+            String foUri = convertDataSpaceToFileIfPossible(fo, false);
             ((NativeExecutable) currentExecutable).addToEnvironmentVariables(varName, foUri);
+        }
+    }
+
+    private void replaceWorkingDirIfNecessary(ExecutableInitializer execInit) throws Exception {
+        if (((NativeExecutableInitializer) execInit).getWorkingDir() == null) {
+            String localPath = convertDataSpaceToFileIfPossible(SCRATCH, true);
+            ((NativeExecutableInitializer) execInit).setWorkingDir(localPath);
         }
     }
 
@@ -354,16 +359,22 @@ public class NativeTaskLauncher extends TaskLauncher {
         replaceWorkingDirDSTag(execInit, USER_DATASPACE_TAG, USER);
     }
 
+    /**
+     * This method replace a dataspace pattern found in the working dir definition
+     * For example :
+     * workingDir = $USER/myfolder
+     */
     private void replaceWorkingDirDSTag(ExecutableInitializer execInit, String tag, DataSpacesFileObject fo)
             throws URISyntaxException, DataSpacesException {
         String wd = ((NativeExecutableInitializer) execInit).getWorkingDir();
         if (wd != null && wd.contains(tag)) {
             if (fo != null) {
-                if (!fo.getRealURI().startsWith("file://")) {
-                    throw new DataSpacesException(tag + " in workingDir cannot be replaced, Space " +
-                        fo.getRealURI() + " is not accessible via the file system.");
+                String fullPath;
+                try {
+                    fullPath = convertDataSpaceToFileIfPossible(fo, true);
+                } catch (DataSpacesException e ) {
+                    throw new DataSpacesException(tag + " in workingDir cannot be replaced.",e);
                 }
-                String fullPath = new File(new URI(fo.getRealURI())).getAbsolutePath();
                 wd = wd.replace(tag, fullPath);
                 ((NativeExecutableInitializer) execInit).setWorkingDir(wd);
             } else {
