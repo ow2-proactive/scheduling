@@ -41,7 +41,6 @@ import java.net.URI;
 import java.rmi.AlreadyBoundException;
 import java.security.Policy;
 
-import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.remoteobject.AbstractRemoteObjectFactory;
@@ -127,7 +126,6 @@ public class SchedulerStarter {
         boolean displayHelp = false;
 
         try {
-            RMAuthentication rmAuth = null;
             //get the path of the file
 
             String rm = null;
@@ -149,7 +147,6 @@ public class SchedulerStarter {
                     logger.info("RM URL : " + rm);
                 }
 
-                long timeStamp = System.currentTimeMillis();
                 logger.info("Starting the scheduler...");
 
                 if (rm != null) {
@@ -178,7 +175,7 @@ public class SchedulerStarter {
                     SchedulerAuthenticationInterface sai = SchedulerFactory.startLocal(new URI(rm),
                             policyFullName);
 
-                    logger.info("The scheduler created on " + sai.getHostURL() + " in " + (System.currentTimeMillis() - timeStamp) + " ms");
+                    logger.info("The scheduler created on " + sai.getHostURL());
                 } catch (AdminSchedulerException e) {
                     logger.warn("", e);
                 }
