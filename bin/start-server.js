@@ -397,8 +397,11 @@ function dumpProActiveConfiguration(/*File*/ targetFile) {
         pconf.println('     <prop key=\'proactive.pamr.router.address\' value=\''+java.net.InetAddress.getLocalHost().getHostName()+'\'/>')
         pconf.println('     <prop key=\'proactive.pamr.router.port\' value=\''+ROUTER_PORT+'\'/>')
     }
+
+    // prevent proactive from binding on loopback adresses
+    pconf.println('     <prop key=\'proactive.net.nolocal\' value=\'true\'/>')
+
     // the following properties are often used, uncomment them if you need :
-    // pconf.println('     <prop key=\'proactive.net.nolocal\' value=\'true\'/>')
     // pconf.println('     <prop key=\'proactive.useIPaddress\' value=\'true\'/>')
 
     pconf.println('  </properties>')
