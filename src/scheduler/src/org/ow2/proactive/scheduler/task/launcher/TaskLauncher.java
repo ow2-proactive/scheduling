@@ -78,6 +78,7 @@ import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
 import org.objectweb.proactive.extensions.dataspaces.api.PADataSpaces;
 import org.objectweb.proactive.extensions.dataspaces.core.DataSpacesNodes;
+import org.objectweb.proactive.extensions.dataspaces.exceptions.DataSpacesException;
 import org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemException;
 import org.objectweb.proactive.extensions.dataspaces.vfs.selector.fast.FastFileSelector;
 import org.objectweb.proactive.extensions.dataspaces.vfs.selector.fast.FastSelector;
@@ -827,6 +828,21 @@ public abstract class TaskLauncher {
         script.addBinding(DS_OUTPUT_BINDING_NAME, this.OUTPUT);
         script.addBinding(DS_GLOBAL_BINDING_NAME, this.GLOBAL);
         script.addBinding(DS_USER_BINDING_NAME, this.USER);
+    }
+
+    public static String convertDataSpaceToFileIfPossible(DataSpacesFileObject fo, boolean errorIfNotFile) throws URISyntaxException, DataSpacesException {
+        URI foUri =  new URI(fo.getRealURI());
+        String answer;
+        if (foUri.getScheme() == null || foUri.getScheme().equals("file")) {
+            answer = (new File(foUri)).getAbsolutePath();
+        } else {
+            if (errorIfNotFile) {
+                throw new DataSpacesException("Space " +
+                        fo.getRealURI() + " is not accessible via the file system.");
+            }
+            answer = foUri.toString();
+        }
+        return answer;
     }
 
     /**

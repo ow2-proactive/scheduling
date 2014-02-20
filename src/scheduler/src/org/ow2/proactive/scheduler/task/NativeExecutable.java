@@ -400,6 +400,7 @@ public class NativeExecutable extends Executable {
             buildEnvironmentVariables(false);
         }
         logger.info("Running command : " + Arrays.asList(this.command));
+        logger.info("in directory : " + this.wDirFile);
         //and start process
         return ospb.start();
     }
