@@ -97,7 +97,7 @@ public class TestRMProxy extends FunctionalTest {
 
         Assert.assertEquals(NODES_NUMBER, rm.getState().getFreeNodesNumber());
 
-        URI rmUri = new URI("rmi://localhost:" + CentralPAPropertyRepository.PA_RMI_PORT.getValue() + "/");
+        URI rmUri = new URI(helper.getLocalUrl());
         Credentials schedulerProxyCredentials = Credentials.getCredentials(PASchedulerProperties
                 .getAbsolutePath(PASchedulerProperties.RESOURCE_MANAGER_CREDS.getValueAsString()));
 

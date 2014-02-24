@@ -64,7 +64,7 @@ public class ConnectionTest2 extends FunctionalTest {
         RMTHelper.log("Test 1");
         RMTHelper.log("Connecting to non existing resource manager with join");
         try {
-            RMConnection.join(null);
+            RMConnection.join(RMTHelper.getLocalUrl());
             RMTHelper.log("Failed: exception should be thrown");
             assertTrue(false);
         } catch (Exception e) {
@@ -74,7 +74,7 @@ public class ConnectionTest2 extends FunctionalTest {
         RMTHelper.log("Test 2");
         RMTHelper.log("Connecting to non existing resource manager with waitAndJoin and timeout");
         try {
-            RMConnection.waitAndJoin(null, 1000);
+            RMConnection.waitAndJoin(RMTHelper.getLocalUrl(), 1000);
             RMTHelper.log("Failed: exception should be thrown");
             assertTrue(false);
         } catch (Exception e) {
@@ -91,7 +91,7 @@ public class ConnectionTest2 extends FunctionalTest {
                     try {
                         Thread.sleep(1000);
                         RMTHelper.log("Running resource manager");
-                        RMFactory.startLocal();
+                        RMTHelper.getDefaultInstance().getRMAuth();
                     } catch (Exception e) {
                         assertTrue(false);
                         RMTHelper.log("Failed: unexpected error " + e.getMessage());
@@ -100,7 +100,7 @@ public class ConnectionTest2 extends FunctionalTest {
             };
             t.start();
 
-            RMConnection.waitAndJoin(null, 60000);
+            RMConnection.waitAndJoin(RMTHelper.getLocalUrl(), 60000);
             RMTHelper.log("Passed");
         } catch (Exception e) {
             RMTHelper.log("Failed: unexpected error " + e.getMessage());

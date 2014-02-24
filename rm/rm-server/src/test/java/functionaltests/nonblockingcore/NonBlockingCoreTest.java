@@ -95,7 +95,7 @@ public class NonBlockingCoreTest extends RMConsecutive {
             new String[] { Integer.toString(scriptSleepingTime) }, false);
 
         //mandatory to use RMUser AO, otherwise, getAtMostNode we be send in RMAdmin request queue
-        final RMAuthentication auth = RMConnection.waitAndJoin(null);
+        final RMAuthentication auth = RMTHelper.getDefaultInstance().getRMAuth();
 
         final Credentials cred = Credentials.createCredentials(new CredData(RMTHelper.defaultUserName,
             RMTHelper.defaultUserPassword), auth.getPublicKey());
@@ -114,15 +114,13 @@ public class NonBlockingCoreTest extends RMConsecutive {
         };
         t.start();
 
-        String hostName = ProActiveInet.getInstance().getHostname();
-        String node1Name = "node1";
-        String node1URL = "//" + hostName + "/" + node1Name;
-        helper.createNode(node1Name);
+        String nodeName = "node_non_blocking_test";
+        String nodeUrl = helper.createNode(nodeName).getNode().getNodeInformation().getURL();
 
-        RMTHelper.log("Adding node " + node1URL);
-        resourceManager.addNode(node1URL);
+        RMTHelper.log("Adding node " + nodeUrl);
+        resourceManager.addNode(nodeUrl);
 
-        helper.waitForNodeEvent(RMEventType.NODE_ADDED, node1URL);
+        helper.waitForNodeEvent(RMEventType.NODE_ADDED, nodeUrl);
         //waiting for node to be in free state, it is in configuring state when added...
         helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
@@ -130,10 +128,10 @@ public class NonBlockingCoreTest extends RMConsecutive {
         assertTrue(resourceManager.getState().getFreeNodesNumber() == initialNodeNumber + 1);
 
         //preemptive removal is useless for this case, because node is free
-        RMTHelper.log("Removing node " + node1URL);
-        resourceManager.removeNode(node1URL, false);
+        RMTHelper.log("Removing node " + nodeUrl);
+        resourceManager.removeNode(nodeUrl, false);
 
-        helper.waitForNodeEvent(RMEventType.NODE_REMOVED, node1URL);
+        helper.waitForNodeEvent(RMEventType.NODE_REMOVED, nodeUrl);
 
         assertTrue(resourceManager.getState().getTotalNodesNumber() == initialNodeNumber);
         assertTrue(resourceManager.getState().getFreeNodesNumber() == initialNodeNumber);

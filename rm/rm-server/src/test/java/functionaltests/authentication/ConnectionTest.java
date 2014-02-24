@@ -64,9 +64,9 @@ public class ConnectionTest extends RMConsecutive {
         RMTHelper.log("Test 1");
         RMTHelper.log("Connecting to existing resource manager");
         try {
-            RMConnection.join(null);
-            RMConnection.waitAndJoin(null);
-            RMConnection.waitAndJoin(null, 10);
+            RMConnection.join(RMTHelper.getLocalUrl());
+            RMConnection.waitAndJoin(RMTHelper.getLocalUrl());
+            RMConnection.waitAndJoin(RMTHelper.getLocalUrl(), 10);
 
             RMTHelper.log("Passed");
         } catch (Exception e) {

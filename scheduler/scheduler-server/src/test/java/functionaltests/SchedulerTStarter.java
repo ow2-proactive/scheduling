@@ -66,7 +66,7 @@ public class SchedulerTStarter implements Serializable {
     public static final String RM_NODE_NAME = "TEST";
     public static final int RM_NODE_DEPLOYMENT_TIMEOUT = 100000;
 
-    protected static String schedulerDefaultURL = "//Localhost/";
+    protected static String schedulerUrl;
 
     /**
      * Start a Scheduler and Resource Manager. Must be called with following
@@ -103,14 +103,15 @@ public class SchedulerTStarter implements Serializable {
         RMFactory.setOsJavaProperty();
         RMFactory.startLocal();
 
-        // waiting the initialization
-        RMAuthentication rmAuth = RMConnection.waitAndJoin(null);
+        schedulerUrl = "rmi://localhost:" + CentralPAPropertyRepository.PA_RMI_PORT.getValue() + "/";
 
-        SchedulerFactory.createScheduler(new URI("rmi://localhost:" +
-            CentralPAPropertyRepository.PA_RMI_PORT.getValue() + "/"),
+        // waiting the initialization
+        RMAuthentication rmAuth = RMConnection.waitAndJoin(schedulerUrl);
+
+        SchedulerFactory.createScheduler(new URI(schedulerUrl),
                 PASchedulerProperties.SCHEDULER_DEFAULT_POLICY.getValueAsString());
 
-        SchedulerConnection.waitAndJoin(schedulerDefaultURL);
+        SchedulerConnection.waitAndJoin(schedulerUrl);
         if (localnodes) {
             Credentials creds = Credentials.getCredentials(PAResourceManagerProperties
                     .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString()));
@@ -126,10 +127,13 @@ public class SchedulerTStarter implements Serializable {
             rmAdmin.createNodeSource(RM_NODE_NAME, LocalInfrastructure.class.getName(), new Object[] { "",
                     creds.getBase64(), RM_NODE_NUMBER, RM_NODE_DEPLOYMENT_TIMEOUT,
                     "-Dproactive.test=true " +
-                            CentralPAPropertyRepository.PA_HOME.getCmdLine() + CentralPAPropertyRepository.PA_HOME.getValue() +
-                            " " +
-                            CentralPAPropertyRepository.PA_RUNTIME_PING.getCmdLine() + false },
-                    StaticPolicy.class.getName(), new Object[] { "ALL", "ALL" });
+                    CentralPAPropertyRepository.PA_HOME.getCmdLine() + CentralPAPropertyRepository.PA_HOME.getValue() +
+                    " " +
+                    CentralPAPropertyRepository.PA_RMI_PORT.getCmdLine() + CentralPAPropertyRepository.PA_RMI_PORT.getValue() +
+                    " " +
+                    CentralPAPropertyRepository.PA_RUNTIME_PING.getCmdLine() + false },
+
+            StaticPolicy.class.getName(), new Object[] { "ALL", "ALL" });
         }
     }
 
@@ -144,7 +148,7 @@ public class SchedulerTStarter implements Serializable {
         SchedulerFactory.createScheduler(new URI(rmUrl), PASchedulerProperties.SCHEDULER_DEFAULT_POLICY
                 .getValueAsString());
 
-        SchedulerConnection.waitAndJoin(schedulerDefaultURL);
+        SchedulerConnection.waitAndJoin(schedulerUrl);
 
     }
 }

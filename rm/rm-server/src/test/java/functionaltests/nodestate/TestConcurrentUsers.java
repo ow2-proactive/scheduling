@@ -75,10 +75,8 @@ public class TestConcurrentUsers extends RMConsecutive {
 
         ResourceManager resourceManager = helper.getResourceManager();
         String nsName = "TestConcurrentUsers";
-        String hostName = ProActiveInet.getInstance().getHostname();
         String node1Name = "node1";
-        String node1URL = "//" + hostName + "/" + node1Name;
-        helper.createNode(node1Name);
+        String node1URL = helper.createNode(node1Name).getNode().getNodeInformation().getURL();
         resourceManager.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null,
                 StaticPolicy.class.getName(), null);
         helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
@@ -181,7 +179,7 @@ public class TestConcurrentUsers extends RMConsecutive {
         t = new Thread() {
             public void run() {
                 try {
-                    RMAuthentication auth = RMConnection.join(null);
+                    RMAuthentication auth = RMTHelper.getDefaultInstance().getRMAuth();
                     Credentials cred = Credentials.createCredentials(new CredData(RMTHelper.defaultUserName,
                         RMTHelper.defaultUserPassword), auth.getPublicKey());
                     ResourceManager rm = auth.login(cred);

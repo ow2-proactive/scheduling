@@ -50,7 +50,6 @@ import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProper
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.junit.After;
-import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Ignore;
 
@@ -64,14 +63,23 @@ public class FunctionalTest extends ProActiveTest {
     }
 
     static final protected Logger logger = Logger.getLogger("testsuite");
-    /** Timeout before the test gets killed. */
+    /**
+     * Timeout before the test gets killed.
+     */
     protected long timeout = CentralPAPropertyRepository.PA_TEST_TIMEOUT.getValue();
-    /** Timer to kill the test after the timeout. */
+
+    /**
+     * Timer to kill the test after the timeout.
+     */
     static final private Timer timer = new Timer("functional test timer", true);
     static final private AtomicReference<TimerTask> timerTask = new AtomicReference<TimerTask>();
-    /** Shutdown hook to ensure that process are killed even if afterClass is not run. */
-    static final private MyShutdownHook shutdownHook = new MyShutdownHook();
-    /** ProActive related stuff */
+    /**
+     * Shutdown hook to ensure that process are killed even if afterClass is not run.
+     */
+    static private MyShutdownHook shutdownHook;
+    /**
+     * ProActive related stuff
+     */
     static volatile private ProActiveSetup paSetup;
     static final private ProcessCleaner cleaner = new ProcessCleaner(".*proactive.test=true.*");
 
@@ -89,29 +97,27 @@ public class FunctionalTest extends ProActiveTest {
         CentralPAPropertyRepository.PA_TEST.setValue(true);
         CentralPAPropertyRepository.PA_RUNTIME_PING.setValue(false);
 
-        if (!ConsecutiveMode.isConsecutiveMode()) {
-            // Ensure that the host is clean
+        boolean isConsecutive = shouldBeExecutedInConsecutiveMode(this.getClass());
+
+        if (isConsecutive) {
+            System.err.println("Running test in 'consecutive' mode");
+        } else {
+            // skipping this test execution
+            System.err.println("Test does not support the 'consecutive' mode execution");
             System.err.println("Running test in 'clean environment' mode");
             cleaner.killAliveProcesses();
-        } else {
-            if (canBeExecutedInConsecutiveMode(this.getClass())) {
-                System.err.println("Running test in 'consecutive' mode");
-            } else {
-                // skipping this test execution
-                System.err.println("Test does not support the 'consecutive' mode execution");
-                Assume.assumeTrue(false);
-                return;
-            }
         }
 
         // Ensure that the host will eventually be cleaned
         System.err.println("Arming timer " + timeout);
-        TimerTask tt = new MyTimerTask();
+        TimerTask tt = new MyTimerTask(isConsecutive);
         if (timerTask.compareAndSet(null, tt)) {
-            timer.schedule(new MyTimerTask(), timeout);
+            timer.schedule(new MyTimerTask(isConsecutive), timeout);
         } else {
             throw new IllegalStateException("timer task should be null");
         }
+
+        shutdownHook = new MyShutdownHook(isConsecutive);
         Runtime.getRuntime().addShutdownHook(shutdownHook);
 
         // Should be final and initialized in a static block but we can't since
@@ -124,25 +130,34 @@ public class FunctionalTest extends ProActiveTest {
     private static void configurePAHome() {
         if (System.getProperty(CentralPAPropertyRepository.PA_HOME.getName()) == null) {
             System.setProperty(CentralPAPropertyRepository.PA_HOME.getName(), System.getProperty(
-              PAResourceManagerProperties.RM_HOME.getKey()));
+                    PAResourceManagerProperties.RM_HOME.getKey()));
         }
     }
 
     private static void configureLogging() {
         if (System.getProperty(CentralPAPropertyRepository.LOG4J.getName()) == null) {
             String defaultLog4jConfig = System.getProperty(
-              PAResourceManagerProperties.RM_HOME.getKey()) + "/config/log4j/log4j-junit";
+                    PAResourceManagerProperties.RM_HOME.getKey()) + "/config/log4j/log4j-junit";
             System.setProperty(CentralPAPropertyRepository.LOG4J.getName(),
-              "file:" + defaultLog4jConfig);
+                    "file:" + defaultLog4jConfig);
             PropertyConfigurator.configure(defaultLog4jConfig);
         }
     }
 
-    private boolean canBeExecutedInConsecutiveMode(Class<?> cls) {
+    protected boolean shouldBeExecutedInConsecutiveMode(Class<?> cls) {
+        // it should be explicitly allowed by the property
+        String consecutiveProperty = System.getProperty("pa.tests.consecutive");
+        boolean allowConsecutive = consecutiveProperty != null && Boolean.parseBoolean(consecutiveProperty);
+
+        if (!allowConsecutive) {
+            return false;
+        }
+
+        // second class must have an annotation Consecutive
         if (cls.isAnnotationPresent(Consecutive.class)) {
             return true;
         } else if (cls.getSuperclass() != null) {
-            return canBeExecutedInConsecutiveMode(cls.getSuperclass());
+            return shouldBeExecutedInConsecutiveMode(cls.getSuperclass());
         }
         return false;
     }
@@ -156,23 +171,33 @@ public class FunctionalTest extends ProActiveTest {
         }
         Runtime.getRuntime().removeShutdownHook(shutdownHook);
 
-        if (!ConsecutiveMode.isConsecutiveMode()) {
-            // Cleanup proactive
+        if (!shouldBeExecutedInConsecutiveMode(this.getClass())) {
+            System.err.println("Killing all alive proactive processes");
+            // not a consecutive test - cleaning after it
             if (paSetup != null) {
                 paSetup.shutdown();
             }
             // Kill everything
             cleaner.killAliveProcesses();
+        } else {
+            System.err.println("Keep the scheduler & rm running after the test");
         }
     }
 
     static private class MyShutdownHook extends Thread {
+
+        private boolean cleanAfterTest = true;
+
+        public MyShutdownHook(boolean cleanAfterTest) {
+            this.cleanAfterTest = cleanAfterTest;
+        }
+
         @Override
         public void run() {
             System.err.println("Shutdown hook. Killing remaining processes");
             try {
                 timer.cancel();
-                if (!ConsecutiveMode.isConsecutiveMode()) {
+                if (cleanAfterTest) {
                     paSetup.shutdown();
                     cleaner.killAliveProcesses();
                 }
@@ -183,12 +208,18 @@ public class FunctionalTest extends ProActiveTest {
     }
 
     static private class MyTimerTask extends SafeTimerTask {
+        private boolean cleanAfterTest = true;
+
+        public MyTimerTask(boolean cleanAfterTest) {
+            this.cleanAfterTest = cleanAfterTest;
+        }
+
         @Override
         public void safeRun() {
             System.err.println("Timeout reached. Killing remaining processes");
             System.err.println("Dumping thread states before killing processes");
             printAllThreadsStackTraces(System.err);
-            if (!ConsecutiveMode.isConsecutiveMode()) {
+            if (cleanAfterTest) {
                 try {
                     cleaner.killAliveProcesses();
                     System.err.println("Killing current JVM");

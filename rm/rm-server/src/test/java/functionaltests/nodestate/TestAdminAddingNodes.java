@@ -95,7 +95,7 @@ public class TestAdminAddingNodes extends RMConsecutive {
 
         RMTHelper.log("Test 1");
         String node1Name = "node1";
-        String node1URL = "//" + hostName + "/" + node1Name;
+        String node1URL = RMTHelper.getLocalUrl() + node1Name;
         helper.createNode(node1Name);
 
         resourceManager.addNode(node1URL, NS_NAME);
@@ -121,7 +121,7 @@ public class TestAdminAddingNodes extends RMConsecutive {
 
         RMTHelper.log("Test 3");
         String node2Name = "node2";
-        String node2URL = "//" + hostName + "/" + node2Name;
+        String node2URL = RMTHelper.getLocalUrl() + node2Name;
         helper.createNode(node2Name);
 
         resourceManager.addNode(node2URL, NS_NAME);

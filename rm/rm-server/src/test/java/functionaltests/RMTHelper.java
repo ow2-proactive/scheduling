@@ -36,18 +36,10 @@
  */
 package functionaltests;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.concurrent.*;
-
+import functionaltests.common.CommonTUtils;
+import functionaltests.common.InputStreamReaderThread;
+import functionaltests.monitor.RMMonitorEventReceiver;
+import functionaltests.monitor.RMMonitorsHandler;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.ProActiveException;
@@ -73,12 +65,14 @@ import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.LocalInfrastructure;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.utils.FileToBytesConverter;
-import org.ow2.tests.ConsecutiveMode;
 import org.ow2.tests.ProActiveSetup;
-import functionaltests.common.CommonTUtils;
-import functionaltests.common.InputStreamReaderThread;
-import functionaltests.monitor.RMMonitorEventReceiver;
-import functionaltests.monitor.RMMonitorsHandler;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.concurrent.*;
 
 
 /**
@@ -95,6 +89,12 @@ public class RMTHelper {
      * Number of nodes deployed with default deployment descriptor
      */
     private static final int defaultNodesNumber = 2;
+
+    // default RMI port
+    // do not use the one from proactive config to be able to
+    // keep the RM running after the test with rmi registry is killed
+    public static final int PA_RMI_PORT = 1199;
+
     /**
      * Timeout for local infrastructure
      */
@@ -250,10 +250,12 @@ public class RMTHelper {
         return nodes;
     }
 
+    // TODO REMOVE THIS METHOD
     public void createNodeSource(int rmiPort, int nodesNumber) throws Exception {
         createNodeSource(rmiPort, nodesNumber, null);
     }
 
+    // TODO REMOVE THIS METHOD
     public void createNodeSource(int rmiPort, int nodesNumber, List<String> vmOptions) throws Exception {
         Map<String, String> map = new HashMap<String, String>();
         map.put(CentralPAPropertyRepository.PA_RMI_PORT.getName(), String.valueOf(rmiPort));
@@ -288,7 +290,7 @@ public class RMTHelper {
             List<String> vmOptions) throws IOException, NodeException {
 
         if (expectedUrl == null) {
-            expectedUrl = "//" + ProActiveInet.getInstance().getHostname() + "/" + nodeName;
+            expectedUrl = "rmi://" + ProActiveInet.getInstance().getHostname() + ":" + PA_RMI_PORT + "/" + nodeName;
         }
 
         JVMProcessImpl nodeProcess = new JVMProcessImpl(
@@ -296,13 +298,25 @@ public class RMTHelper {
         nodeProcess.setClassname("org.objectweb.proactive.core.node.StartNode");
 
         ArrayList<String> jvmParameters = new ArrayList<String>();
-        if (vmParameters != null) {
-            for (Entry<String, String> entry : vmParameters.entrySet()) {
-                if (!entry.getKey().equals("") && !entry.getValue().equals("")) {
-                    jvmParameters.add("-D" + entry.getKey() + "=" + entry.getValue());
-                }
+
+        if (vmParameters == null) {
+            vmParameters = new HashMap<String, String>();
+        }
+
+        if (!vmParameters.containsKey(CentralPAPropertyRepository.PA_RMI_PORT.getName())) {
+            vmParameters.put(CentralPAPropertyRepository.PA_RMI_PORT.getName(), String.valueOf(PA_RMI_PORT));
+        }
+        if (!vmParameters.containsKey(CentralPAPropertyRepository.PA_HOME.getName())) {
+            vmParameters.put(CentralPAPropertyRepository.PA_HOME.getName(), CentralPAPropertyRepository.PA_HOME
+                    .getValue());
+        }
+
+        for (Entry<String, String> entry : vmParameters.entrySet()) {
+            if (!entry.getKey().equals("") && !entry.getValue().equals("")) {
+                jvmParameters.add("-D" + entry.getKey() + "=" + entry.getValue());
             }
         }
+
         if (vmOptions != null) {
             jvmParameters.addAll(vmOptions);
         }
@@ -310,6 +324,7 @@ public class RMTHelper {
         nodeProcess.setJvmOptions(jvmParameters);
         nodeProcess.setParameters(Arrays.asList(nodeName));
         nodeProcess.startProcess();
+
         try {
             Node newNode = null;
 
@@ -626,43 +641,29 @@ public class RMTHelper {
                 }
             }
 
-
-            if (ConsecutiveMode.isConsecutiveMode()) {
-                // joining the existing RM
-                String rmUrl = ConsecutiveMode.getAlreadyExistingUrl();
+            if (auth == null) {
                 try {
-                    System.out.println("Checking if there is existing RM on " + rmUrl);
-                    auth = RMConnection.join(rmUrl);
-                    System.out.println("Connected to the existing RM on " + rmUrl);
-                    authentificate(user, pass);
-                    initEventReceiver();
-                } catch (RMException ex) {
-                    System.out.println("Cannot connect to the RM on " + rmUrl + ": " + ex.getMessage());
-                    throw ex;
+                    // trying to connect to the existing RM first
+                    auth = RMConnection.waitAndJoin(getLocalUrl(PA_RMI_PORT), 1);
+                    System.out.println("Connected to the RM on " + getLocalUrl(PA_RMI_PORT));
+                } catch (Exception e) {
+                    // creating a new RM and default node source
+                    startRM(propertyFile, PA_RMI_PORT);
                 }
-            } else {
-                if (auth == null) {
-                    try {
-                        // trying to connect to the existing RM first
-                        auth = RMConnection.waitAndJoin(getLocalUrl(CentralPAPropertyRepository.PA_RMI_PORT
-                                .getValue()), 1);
-                        System.out.println("Connected to the RM on " +
-                            getLocalUrl(CentralPAPropertyRepository.PA_RMI_PORT.getValue()));
-                    } catch (Exception e) {
-                        // creating a new RM and default node source
-                        startRM(propertyFile, CentralPAPropertyRepository.PA_RMI_PORT.getValue());
-                    }
-                }
-                authentificate(user, pass);
-                initEventReceiver();
             }
+            authentificate(user, pass);
+            initEventReceiver();
             System.out.println("RMTHelper is connected");
         }
         return resourceManager;
     }
 
-    private String getLocalUrl(int rmiPort) {
+    public static String getLocalUrl(int rmiPort) {
         return "rmi://localhost:" + rmiPort + "/";
+    }
+
+    public static String getLocalUrl() {
+        return getLocalUrl(PA_RMI_PORT);
     }
 
     private void authentificate(String user, String pass) throws Exception {

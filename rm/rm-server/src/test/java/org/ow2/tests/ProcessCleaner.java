@@ -223,4 +223,9 @@ public class ProcessCleaner {
         return new File(System.getProperty(
           "java.home") + File.separatorChar + ".." + File.separatorChar + "bin" + File.separatorChar);
     }
+
+    public static void main(String[] args) throws IOException {
+        System.out.println("Killing all processes related to the test execution");
+        new ProcessCleaner(".*proactive.test=true.*").killAliveProcesses();
+    }
 }

@@ -36,17 +36,9 @@
  */
 package functionaltests.jmx.account;
 
-import java.security.PublicKey;
-import java.util.HashMap;
-
-import javax.management.Attribute;
-import javax.management.AttributeList;
-import javax.management.MBeanServerConnection;
-import javax.management.ObjectName;
-import javax.management.remote.JMXConnector;
-import javax.management.remote.JMXConnectorFactory;
-import javax.management.remote.JMXServiceURL;
-
+import functionaltests.RMConsecutive;
+import functionaltests.RMTHelper;
+import org.junit.Assert;
 import org.objectweb.proactive.core.node.Node;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
@@ -58,10 +50,16 @@ import org.ow2.proactive.resourcemanager.core.jmx.RMJMXBeans;
 import org.ow2.proactive.resourcemanager.core.jmx.mbean.ManagementMBean;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
-import org.ow2.tests.ConsecutiveMode;
-import functionaltests.RMConsecutive;
-import functionaltests.RMTHelper;
-import org.junit.Assert;
+
+import javax.management.Attribute;
+import javax.management.AttributeList;
+import javax.management.MBeanServerConnection;
+import javax.management.ObjectName;
+import javax.management.remote.JMXConnector;
+import javax.management.remote.JMXConnectorFactory;
+import javax.management.remote.JMXServiceURL;
+import java.security.PublicKey;
+import java.util.HashMap;
 
 
 /**
@@ -161,7 +159,7 @@ public final class AddGetReleaseRemoveTest extends RMConsecutive {
                 (usedNodeTime <= getReleaseMaxDuration));
         Assert.assertTrue("Invalid value of the providedNodeTime attribute",
                 (providedNodeTime >= usedNodeTime) && (providedNodeTime <= addRemoveMaxDuration));
-        if (!ConsecutiveMode.isConsecutiveMode()) {
+        if (!shouldBeExecutedInConsecutiveMode(this.getClass())) {
             // in consecutive mode if user already provided this node before this value does not change
             Assert.assertEquals("Invalid value of the providedNodesCount attribute", 1, providedNodesCount);
         }

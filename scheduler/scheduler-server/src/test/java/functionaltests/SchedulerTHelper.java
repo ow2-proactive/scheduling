@@ -36,14 +36,11 @@
  */
 package functionaltests;
 
-import java.io.File;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
+import functionaltests.common.CommonTUtils;
+import functionaltests.common.InputStreamReaderThread;
+import functionaltests.monitor.MonitorEventReceiver;
+import functionaltests.monitor.SchedulerMonitorsHandler;
+import org.junit.Assert;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
@@ -55,38 +52,21 @@ import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
-import org.ow2.proactive.scheduler.common.Scheduler;
-import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
-import org.ow2.proactive.scheduler.common.SchedulerConnection;
-import org.ow2.proactive.scheduler.common.SchedulerConstants;
-import org.ow2.proactive.scheduler.common.SchedulerEvent;
-import org.ow2.proactive.scheduler.common.SchedulerEventListener;
-import org.ow2.proactive.scheduler.common.SchedulerState;
+import org.ow2.proactive.scheduler.common.*;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
-import org.ow2.proactive.scheduler.common.job.Job;
-import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobInfo;
-import org.ow2.proactive.scheduler.common.job.JobResult;
-import org.ow2.proactive.scheduler.common.job.JobState;
-import org.ow2.proactive.scheduler.common.job.JobStatus;
-import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.job.*;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
-import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
-import org.ow2.proactive.scheduler.common.task.JavaTask;
-import org.ow2.proactive.scheduler.common.task.NativeTask;
-import org.ow2.proactive.scheduler.common.task.Task;
-import org.ow2.proactive.scheduler.common.task.TaskInfo;
-import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.ow2.proactive.scheduler.common.task.TaskStatus;
+import org.ow2.proactive.scheduler.common.task.*;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.utils.FileUtils;
-import org.ow2.tests.ConsecutiveMode;
-import org.junit.Assert;
 
-import functionaltests.common.CommonTUtils;
-import functionaltests.common.InputStreamReaderThread;
-import functionaltests.monitor.MonitorEventReceiver;
-import functionaltests.monitor.SchedulerMonitorsHandler;
+import java.io.File;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -139,7 +119,10 @@ public class SchedulerTHelper {
     protected static URL functionalTestSchedulerProperties = SchedulerTHelper.class
             .getResource("config/functionalTSchedulerProperties.ini");
 
-    public static String schedulerDefaultURL = "//Localhost/" + SchedulerConstants.SCHEDULER_DEFAULT_NAME;
+    public static final int RMI_PORT = 1199;
+    public static String schedulerUrl =
+            "rmi://"+ProActiveInet.getInstance().getHostname() +
+            ":" + RMI_PORT + "/" + SchedulerConstants.SCHEDULER_DEFAULT_NAME;
 
     private static Process schedulerProcess;
 
@@ -175,8 +158,6 @@ public class SchedulerTHelper {
      * Start the scheduler using a forked JVM and
      * deploys, with its associated empty Resource manager.
      *
-     * @param configuration the Scheduler configuration file to use (default is functionalTSchedulerProperties.ini)
-     * 			null to use the default one.
      * @throws Exception if an error occurs.
      */
     public static void startSchedulerWithEmptyResourceManager() throws Exception {
@@ -195,7 +176,7 @@ public class SchedulerTHelper {
     /**
      * Starts Scheduler with scheduler properties file,
      * @param localnodes true if the RM has to start some nodes
-     * @param configuration the Scheduler configuration file to use (default is functionalTSchedulerProperties.ini)
+     * @param schedPropertiesFilePath the Scheduler configuration file to use (default is functionalTSchedulerProperties.ini)
      * 			null to use the default one.
      * @throws Exception
      */
@@ -232,8 +213,11 @@ public class SchedulerTHelper {
             proactiveHome = PAResourceManagerProperties.RM_HOME.getValueAsString();
             CentralPAPropertyRepository.PA_HOME.setValue(PAResourceManagerProperties.RM_HOME.getValueAsString());
         }
+
         commandLine.add(CentralPAPropertyRepository.PA_HOME.getCmdLine() +
           proactiveHome);
+
+        commandLine.add(CentralPAPropertyRepository.PA_RMI_PORT.getCmdLine() + RMI_PORT);
 
         String securityPolicy = CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getValue();
         if (!CentralPAPropertyRepository.JAVA_SECURITY_POLICY.isSet()) {
@@ -283,10 +267,8 @@ public class SchedulerTHelper {
             "[Scheduler VM output]: ");
         outputReader.start();
 
-        String url = "//" + ProActiveInet.getInstance().getHostname();
-
-        System.out.println("Waiting for the Scheduler using URL: " + url);
-        schedulerAuth = SchedulerConnection.waitAndJoin(url);
+        System.out.println("Waiting for the Scheduler using URL: " + schedulerUrl);
+        schedulerAuth = SchedulerConnection.waitAndJoin(schedulerUrl);
         System.out.println("The Scheduler is up and running");
 
         if (localnodes) {
@@ -394,10 +376,11 @@ public class SchedulerTHelper {
      */
     public static SchedulerAuthenticationInterface getSchedulerAuth() throws Exception {
         if (schedulerAuth == null) {
-            if (ConsecutiveMode.isConsecutiveMode()) {
-                // connecting to the existing scheduler
-                schedulerAuth = SchedulerConnection.join(ConsecutiveMode.getAlreadyExistingUrl());
-            } else {
+            try {
+                // trying to connect to the existing Scheduler
+                schedulerAuth = SchedulerConnection.join(schedulerUrl);
+            } catch (Exception e) {
+                // creating a new Scheduler
                 startScheduler(null);
             }
         }
@@ -479,7 +462,7 @@ public class SchedulerTHelper {
      * Creates a job from an XML job descriptor, submit it, and return immediately.
      * connect as user if needed (if not yet connected as user).
      * @param jobDescPath
-     * @param forkedMode true if forked mode 
+     * @param mode true if forked mode
      * @return JobId the job's identifier corresponding to submission.
      * @throws Exception if an error occurs at job creation/submission.
      */
@@ -491,7 +474,7 @@ public class SchedulerTHelper {
      * Creates a job from an XML job descriptor, submit it, and return immediately.
      * connect as user if needed (if not yet connected as user).
      * @param jobDescPath
-     * @param forkedMode true if forked mode 
+     * @param mode true if forked mode
      * @param user Type of user
      * @return JobId the job's identifier corresponding to submission.
      * @throws Exception if an error occurs at job creation/submission.
@@ -529,7 +512,7 @@ public class SchedulerTHelper {
      * Submit a job, and return immediately.
      * Connect as user if needed (if not yet connected as user).
      * @param jobToSubmit job object to schedule.
-     * @param forkedMode true if the mode is forked, false if normal mode
+     * @param mode true if the mode is forked, false if normal mode
      * @return JobId the job's identifier corresponding to submission.
      * @throws Exception if an error occurs at job submission.
      */
@@ -541,7 +524,7 @@ public class SchedulerTHelper {
      * Submit a job, and return immediately.
      * Connect as user if needed (if not yet connected as user).
      * @param jobToSubmit job object to schedule.
-     * @param forkedMode true if the mode is forked, false if normal mode
+     * @param mode true if the mode is forked, false if normal mode
      * @param user Type of user
      * @return JobId the job's identifier corresponding to submission.
      * @throws Exception if an error occurs at job submission.
@@ -660,7 +643,7 @@ public class SchedulerTHelper {
      * helper and check events sequence with waitForEvent**() functions.
      *
      * @param jobDescPath path to an XML job descriptor to submit
-     * @param forkedMode true if forked mode 
+     * @param mode true if forked mode
      * @return JobId, the job's identifier.
      * @throws Exception if an error occurs at job creation/submission, or during
      * verification of events sequence.
@@ -684,7 +667,7 @@ public class SchedulerTHelper {
      * helper and check events sequence with waitForEvent**() functions.
      *
      * @param jobDescPath path to an XML job descriptor to submit
-     * @param forkedMode true if forked mode 
+     * @param mode true if forked mode
      * @param user Type of user
      * @return JobId, the job's identifier.
      * @throws Exception if an error occurs at job creation/submission, or during
@@ -759,7 +742,7 @@ public class SchedulerTHelper {
      * helper and check events sequence with waitForEvent**() functions.
      *
      * @param jobToSubmit job object to schedule.
-     * @param forkedMode true if the mode is forked, false if normal mode
+     * @param mode true if the mode is forked, false if normal mode
      * @return JobId, the job's identifier.
      * @throws Exception if an error occurs at job submission, or during
      * verification of events sequence.
@@ -783,7 +766,7 @@ public class SchedulerTHelper {
      * helper and check events sequence with waitForEvent**() functions.
      *
      * @param jobToSubmit job object to schedule.
-     * @param forkedMode true if the mode is forked, false if normal mode
+     * @param mode true if the mode is forked, false if normal mode
      * @return JobId, the job's identifier.
      * @throws Exception if an error occurs at job submission, or during
      * verification of events sequence.
@@ -1153,9 +1136,6 @@ public class SchedulerTHelper {
      * first if the job is already finished, if yes, returns immediately.
      * Otherwise method performs a wait for job finished event.
      *
-     * So this method is not dedicated to check reception of job finished event,
-     * for testing event reception you should use -{@link #SchedulerTHelper.waitForEventJobFinished()}
-     *
      * @param id JobId representing the job awaited to be finished.
      */
     public static void waitForFinishedJob(JobId id) {
@@ -1172,8 +1152,7 @@ public class SchedulerTHelper {
      * This method doesn't wait strictly 'job finished event', it looks
      * first if the job is already finished, if yes, returns immediately.
      * Otherwise method performs a wait for job finished event.
-     * So this method is not dedicated to check reception of job finished event
-     * for testing event reception you should use -{@link #SchedulerMinitorsHandler.waitForEventJobFinished()}
+     *
      * @param id JobId representing the job awaited to be finished.
      * @param timeout in milliseconds
      * @throws ProActiveTimeoutException if timeout is reached

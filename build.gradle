@@ -67,6 +67,7 @@ def functionalTestConfiguration = {
     systemProperties << ['url': System.getProperty("url") ]
     systemProperties << ['pa.rm.home': rootDir.absolutePath]
     systemProperties << ['pa.scheduler.home': rootDir.absolutePath]
+    systemProperties << ['pa.tests.consecutive': 'true']
     systemProperties << ['proactive.test.timeout': 600000]
     systemProperties << ['java.awt.headless': 'true']
     testLogging {
@@ -74,6 +75,13 @@ def functionalTestConfiguration = {
     }
     beforeTest { descriptor ->
         logger.lifecycle("Running: " + descriptor)
+    }
+    doLast { descriptor ->
+        logger.lifecycle("Test suite finished: " + descriptor)
+        project.javaexec{
+            main = "org.ow2.tests.ProcessCleaner"
+            classpath = project.sourceSets.test.runtimeClasspath
+        }
     }
 }
 

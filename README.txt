@@ -72,23 +72,22 @@ see build/build.properties for all available options).
 
 If you want to recompile all sources and generate all jar files:
 
-	o Under Linux:
-	  cd compile
-	  ./build deploy.all  (check that the build script has executable permission)
+	$ gradle
 
-	o Under Windows:
-	  cd compile
-	  build.bat deploy.all
+To execute all functional tests
 
-If you want only to compile all sources (and not the jar files):
+    $ gradle functionalTest -i -DfunctionalTest.ignoreFailures=true
 
-	o Under Linux:
-	  cd compile
-	  ./build compile.all  (check that the build script has executable permission)
 
-	o Under Windows:
-	  cd compile
-	  build.bat compile.all
+To execute functional tests for one module (e.g. scheduler-server)
+
+    $ cd scheduler/scheduler-server
+    $ gradle functionalTest -i -DfunctionalTest.ignoreFailures=true
+
+To execute one particular test
+
+    $ cd scheduler/scheduler-server
+    $ gradle functionalTest -i -DfunctionalTest.single="**/TestWorkflowComplexJobs4*"
 
 If you have any problems or questions when using ProActive Scheduling,
 feel free to contact us at proactive@ow2.org

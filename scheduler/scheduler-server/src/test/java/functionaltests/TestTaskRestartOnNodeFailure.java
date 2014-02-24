@@ -115,7 +115,7 @@ public class TestTaskRestartOnNodeFailure extends FunctionalTest {
         TNode node1 = startNode(rmHelper);
 
         System.out.println("Start scheduler");
-        String rmUrl = "rmi://localhost:" + CentralPAPropertyRepository.PA_RMI_PORT.getValue() + "/";
+        String rmUrl = rmHelper.getLocalUrl();
         SchedulerTHelper.startScheduler(false, null, null, rmUrl);
 
         CommunicationObject communicationObject = PAActiveObject.newActive(CommunicationObject.class,

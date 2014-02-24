@@ -66,8 +66,7 @@ public class SubmitJob implements SchedulerEventListener {
         try {
             //connect the Scheduler
             //get the authentication interface using the SchedulerConnection
-            SchedulerAuthenticationInterface auth = SchedulerConnection.waitAndJoin("rmi://localhost:" +
-                CentralPAPropertyRepository.PA_RMI_PORT.getValue() + "/");
+            SchedulerAuthenticationInterface auth = SchedulerConnection.waitAndJoin(SchedulerTHelper.schedulerUrl);
             //get the user interface using the retrieved SchedulerAuthenticationInterface
             user = auth.login(Credentials.createCredentials(new CredData(SchedulerTHelper.admin_username,
                 SchedulerTHelper.admin_password), auth.getPublicKey()));

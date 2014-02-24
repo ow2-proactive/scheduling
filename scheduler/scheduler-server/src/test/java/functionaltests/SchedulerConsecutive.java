@@ -36,12 +36,11 @@
  */
 package functionaltests;
 
+import org.junit.After;
 import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.tests.Consecutive;
-import org.ow2.tests.ConsecutiveMode;
 import org.ow2.tests.FunctionalTest;
-import org.junit.After;
 
 
 /**
@@ -53,7 +52,7 @@ import org.junit.After;
 public class SchedulerConsecutive extends FunctionalTest {
     @After
     public void afterClass() throws Exception {
-        if (ConsecutiveMode.isConsecutiveMode()) {
+        if (shouldBeExecutedInConsecutiveMode(this.getClass())) {
 
             try {
                 RMTHelper.getDefaultInstance().getResourceManager().removeNodeSource("extra", true).getBooleanValue();

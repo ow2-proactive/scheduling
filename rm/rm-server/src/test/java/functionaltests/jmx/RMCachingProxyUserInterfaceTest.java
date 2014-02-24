@@ -95,8 +95,7 @@ public class RMCachingProxyUserInterfaceTest extends RMConsecutive {
         final PublicKey pubKey = auth.getPublicKey();
         final Credentials adminCreds = Credentials.createCredentials(new CredData(RMTHelper.defaultUserName,
             RMTHelper.defaultUserPassword), pubKey);
-        proxyUserInterface.init(
-                "rmi://localhost:" + CentralPAPropertyRepository.PA_RMI_PORT.getValue() + "/", adminCreds);
+        proxyUserInterface.init(RMTHelper.getLocalUrl(), adminCreds);
         return proxyUserInterface;
     }
 }

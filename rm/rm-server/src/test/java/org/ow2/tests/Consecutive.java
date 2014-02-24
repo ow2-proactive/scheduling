@@ -42,7 +42,8 @@ import java.lang.annotation.RetentionPolicy;
 
 /**
  * 
- * An annotation indicates that test consecutively after another test in the same JVM. 
+ * An annotation indicates that test can be executed using
+ * the same instance of the resource manager or scheduler.
  *
  */
 @Retention(RetentionPolicy.RUNTIME)

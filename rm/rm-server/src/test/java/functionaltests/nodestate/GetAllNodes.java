@@ -36,6 +36,7 @@
  */
 package functionaltests.nodestate;
 
+import functionaltests.RMTHelper;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
@@ -49,7 +50,7 @@ public class GetAllNodes {
     public static void main(String[] args) {
         RMAuthentication auth;
         try {
-            auth = RMConnection.join(null);
+            auth = RMConnection.join(RMTHelper.getLocalUrl());
             Credentials cred = Credentials.createCredentials(new CredData("demo", "demo"), auth
                     .getPublicKey());
             ResourceManager rm = auth.login(cred);

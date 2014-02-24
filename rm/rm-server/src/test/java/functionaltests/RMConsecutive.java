@@ -8,9 +8,8 @@ import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
-import org.ow2.tests.Consecutive;
-import org.ow2.tests.ConsecutiveMode;
 import org.ow2.tests.FunctionalTest;
+import org.ow2.tests.Consecutive;
 import org.junit.After;
 import org.junit.Before;
 
@@ -22,7 +21,7 @@ public class RMConsecutive extends FunctionalTest {
 
     @Before
     public void prepareForTest() throws Exception {
-        if (ConsecutiveMode.isConsecutiveMode()) {
+        if (shouldBeExecutedInConsecutiveMode(this.getClass())) {
             System.out.println("Cleaning the RM before the test execution");
             // clean the state of the RM
             RMTHelper helper = RMTHelper.getDefaultInstance();
@@ -50,7 +49,7 @@ public class RMConsecutive extends FunctionalTest {
 
     @After
     public void afterClass() throws Exception {
-        if (ConsecutiveMode.isConsecutiveMode()) {
+        if (shouldBeExecutedInConsecutiveMode(this.getClass())) {
             // show RM state after the test execution (for debugging purposes)
 
             System.out.println("Events that were not expected by the test");
