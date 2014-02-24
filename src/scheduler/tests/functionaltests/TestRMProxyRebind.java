@@ -158,8 +158,6 @@ public class TestRMProxyRebind extends MultipleRMTBase {
 
         waitWhenNodeSetReleased(2, helper1);
 
-        waitWhenNodeSetReleased(2, helper1);
-
         System.out.println("Get one node with RM2");
         NodeSet rm2NodeSet1 = proxy1.getNodes(new Criteria(1));
         waitWhenNodeSetAcquired(rm2NodeSet1, 1, helper2);
