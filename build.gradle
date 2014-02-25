@@ -192,6 +192,9 @@ project('rm:rm-client') {
 
 project(':rm:rm-node') {
     dependencies {
+        compile files("${rootDir}/lib/node/winp/winp-1.17-patched.jar")
+        compile 'net.java.dev.jna:jna:3.4.0'
+
         compile 'commons-cli:commons-cli:1.1'
         compile files("${rootDir}/lib/node/sigar/sigar.jar")
 
@@ -286,9 +289,6 @@ project('scheduler:scheduler-node') {
     apply plugin: 'gradle-one-jar'
     dependencies {
         compile(
-                files("${rootDir}/lib/node/winp/winp-1.17-patched.jar"),
-                'net.java.dev.jna:jna:3.4.0',
-
                 'org.objectweb.proactive:programming-extension-amqp:5.5.0-SNAPSHOT',
                 'org.objectweb.proactive:programming-extension-pamr:5.5.0-SNAPSHOT',
                 'org.objectweb.proactive:programming-extension-processbuilder:5.5.0-SNAPSHOT',
