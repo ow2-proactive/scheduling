@@ -52,6 +52,8 @@ import java.util.Properties;
 import java.util.Set;
 
 import javax.security.auth.login.LoginException;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 
@@ -83,6 +85,7 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SubmissionClosedR
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+import org.jboss.resteasy.spi.NotFoundException;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
 
@@ -104,6 +107,7 @@ public class RestRuntime {
         EXCEPTION_MAPPINGS.put(NotConnectedException.class, HttpURLConnection.HTTP_UNAUTHORIZED);
         EXCEPTION_MAPPINGS.put(PermissionRestException.class, HttpURLConnection.HTTP_FORBIDDEN);
         EXCEPTION_MAPPINGS.put(SchedulerRestException.class, HttpURLConnection.HTTP_NOT_FOUND);
+        EXCEPTION_MAPPINGS.put(NotFoundException.class, HttpURLConnection.HTTP_NOT_FOUND);
         EXCEPTION_MAPPINGS.put(SubmissionClosedRestException.class, HttpURLConnection.HTTP_NOT_FOUND);
         EXCEPTION_MAPPINGS.put(UnknownJobRestException.class, HttpURLConnection.HTTP_NOT_FOUND);
         EXCEPTION_MAPPINGS.put(UnknownTaskException.class, HttpURLConnection.HTTP_NOT_FOUND);
@@ -185,7 +189,7 @@ public class RestRuntime {
         }
     }
 
-    private void addExceptionMappers(ResteasyProviderFactory dispatcher) {
+    void addExceptionMappers(ResteasyProviderFactory dispatcher) {
         for (final Entry<Class, Integer> exceptionMapping : EXCEPTION_MAPPINGS.entrySet()) {
             dispatcher.addExceptionMapper(new ExceptionMapper<Throwable>() {
                 @Override
@@ -196,7 +200,9 @@ public class RestRuntime {
                     js.setStackTrace(ProActiveLogger.getStackTraceAsString(throwable));
                     js.setException(throwable);
                     js.setExceptionClass(throwable.getClass().getName());
-                    return Response.status(exceptionMapping.getValue()).entity(js).build();
+                    return Response.status(exceptionMapping.getValue())
+                      .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+                      .entity(js).build();
                 }
             }, (Type) exceptionMapping.getKey());
         }
