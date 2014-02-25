@@ -49,6 +49,10 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
 
+import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
+import org.ow2.proactive_grid_cloud_portal.common.exceptionmapper.ExceptionToJson;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.jboss.resteasy.client.ClientExecutor;
@@ -58,10 +62,6 @@ import org.jboss.resteasy.client.ClientResponseFailure;
 import org.jboss.resteasy.client.ProxyFactory;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataOutput;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
-import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
-import org.ow2.proactive_grid_cloud_portal.common.exceptionmapper.ExceptionToJson;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
 
 public class SchedulerRestClient {
 
@@ -166,10 +166,15 @@ public class SchedulerRestClient {
                 return method.invoke(scheduler, args);
             } catch (InvocationTargetException targetException) {
                 if (targetException.getTargetException() instanceof ClientResponseFailure) {
-                    ExceptionToJson json = (ExceptionToJson) ((ClientResponseFailure) targetException
-                            .getTargetException()).getResponse().getEntity(ExceptionToJson.class);
-
-                    throw rebuildException(json);
+                    ClientResponseFailure clientException = (ClientResponseFailure) targetException
+                      .getTargetException();
+                    try {
+                        ExceptionToJson json = (ExceptionToJson) clientException.getResponse().getEntity(
+                          ExceptionToJson.class);
+                        throw rebuildException(json);
+                    } catch (Exception couldNotReadJsonException) {
+                        throw new RuntimeException(clientException.getMessage());
+                    }
                 }
                 throw targetException;
             }
@@ -223,22 +228,18 @@ public class SchedulerRestClient {
     }
     
     private static Class<?> toClass(String className) {
-        Class<?> clazz = null;
         try {
-            clazz = Class.forName(className);
+            return Class.forName(className);
         } catch (ClassNotFoundException e) {
-            // returns NULL
+            return null;
         }
-        return clazz;
     }
 
     private static Constructor<?> getConstructor(Class<?> clazz, Class<?>... paramTypes) {
-        Constructor<?> ctor = null;
         try {
-            ctor = clazz.getConstructor(paramTypes);
+            return clazz.getConstructor(paramTypes);
         } catch (NoSuchMethodException e) {
-            // returns NULL
+            return null;
         }
-        return ctor;
     }
 }
