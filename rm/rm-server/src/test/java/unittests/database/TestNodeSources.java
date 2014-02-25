@@ -12,6 +12,7 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.ow2.tests.ProcessCleaner;
 
 
 public class TestNodeSources {
@@ -20,6 +21,8 @@ public class TestNodeSources {
 
     @Before
     public void initDB() throws Exception {
+        // cleaning all other processes that can access the database
+        new ProcessCleaner(".*proactive.test=true.*").killAliveProcesses();
         Configuration config = new Configuration().configure("/functionaltests/config/hibernate.cfg.xml");
         dbManager = new RMDBManager(config, true, true);
     }
