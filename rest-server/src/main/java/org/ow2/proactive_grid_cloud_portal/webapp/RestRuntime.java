@@ -40,35 +40,18 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Type;
-import java.net.HttpURLConnection;
-import java.security.KeyException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 
-import javax.security.auth.login.LoginException;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.ExceptionMapper;
-
-import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.config.xml.ProActiveConfigurationParser;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.resourcemanager.common.util.RMProxyUserInterface;
 import org.ow2.proactive.scheduler.common.Scheduler;
-import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
-import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
-import org.ow2.proactive.scheduler.common.exception.PermissionException;
-import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
-import org.ow2.proactive_grid_cloud_portal.common.exceptionmapper.ExceptionToJson;
 import org.ow2.proactive_grid_cloud_portal.rm.RMSessionMapper;
 import org.ow2.proactive_grid_cloud_portal.rm.RMSessionsCleaner;
 import org.ow2.proactive_grid_cloud_portal.rm.RMStateCaching;
@@ -77,15 +60,8 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.RestartModeConverter;
 import org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerSessionMapper;
 import org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerSessionsCleaner;
 import org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateListener;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.JobCreationRestException;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SchedulerRestException;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SubmissionClosedRestException;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
-import org.jboss.resteasy.spi.NotFoundException;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
 
@@ -97,34 +73,13 @@ public class RestRuntime {
     private SchedulerSessionsCleaner schedulerSessionCleaner;
     private RMSessionsCleaner rmSessionCleaner;
 
-    private static Map<Class, Integer> EXCEPTION_MAPPINGS = new HashMap<Class, Integer>();
-    static {
-        EXCEPTION_MAPPINGS.put(IOException.class, HttpURLConnection.HTTP_NOT_FOUND);
-        EXCEPTION_MAPPINGS.put(JobAlreadyFinishedException.class, HttpURLConnection.HTTP_NOT_FOUND);
-        EXCEPTION_MAPPINGS.put(JobCreationRestException.class, HttpURLConnection.HTTP_NOT_FOUND);
-        EXCEPTION_MAPPINGS.put(KeyException.class, HttpURLConnection.HTTP_NOT_FOUND);
-        EXCEPTION_MAPPINGS.put(LoginException.class, HttpURLConnection.HTTP_NOT_FOUND);
-        EXCEPTION_MAPPINGS.put(NotConnectedRestException.class, HttpURLConnection.HTTP_UNAUTHORIZED);
-        EXCEPTION_MAPPINGS.put(NotConnectedException.class, HttpURLConnection.HTTP_UNAUTHORIZED);
-        EXCEPTION_MAPPINGS.put(PermissionRestException.class, HttpURLConnection.HTTP_FORBIDDEN);
-        EXCEPTION_MAPPINGS.put(SchedulerRestException.class, HttpURLConnection.HTTP_NOT_FOUND);
-        EXCEPTION_MAPPINGS.put(NotFoundException.class, HttpURLConnection.HTTP_NOT_FOUND);
-        EXCEPTION_MAPPINGS.put(SubmissionClosedRestException.class, HttpURLConnection.HTTP_NOT_FOUND);
-        EXCEPTION_MAPPINGS.put(UnknownJobRestException.class, HttpURLConnection.HTTP_NOT_FOUND);
-        EXCEPTION_MAPPINGS.put(UnknownTaskException.class, HttpURLConnection.HTTP_NOT_FOUND);
-        EXCEPTION_MAPPINGS.put(PermissionException.class, HttpURLConnection.HTTP_FORBIDDEN);
-        EXCEPTION_MAPPINGS.put(ProActiveRuntimeException.class, HttpURLConnection.HTTP_NOT_FOUND);
-        EXCEPTION_MAPPINGS.put(RuntimeException.class, HttpURLConnection.HTTP_INTERNAL_ERROR);
-        EXCEPTION_MAPPINGS.put(Throwable.class, HttpURLConnection.HTTP_INTERNAL_ERROR);
-    }
-
     public void start(ResteasyProviderFactory dispatcher, File configurationFile, File log4jConfig,
             File paConfig) {
 
         addExceptionMappers(dispatcher);
 
-        dispatcher.addStringConverter(RestartModeConverter.class);
-        dispatcher.addStringConverter(IntWrapperConverter.class);
+        dispatcher.registerProvider(RestartModeConverter.class);
+        dispatcher.registerProvider(IntWrapperConverter.class);
         dispatcher.registerProvider(JacksonProvider.class);
 
         loadProperties(configurationFile);
@@ -191,22 +146,23 @@ public class RestRuntime {
     }
 
     void addExceptionMappers(ResteasyProviderFactory dispatcher) {
-        for (final Entry<Class, Integer> exceptionMapping : EXCEPTION_MAPPINGS.entrySet()) {
-            dispatcher.addExceptionMapper(new ExceptionMapper<Throwable>() {
-                @Override
-                public Response toResponse(Throwable throwable) {
-                    ExceptionToJson js = new ExceptionToJson();
-                    js.setErrorMessage(throwable.getMessage());
-                    js.setHttpErrorCode(exceptionMapping.getValue());
-                    js.setStackTrace(ProActiveLogger.getStackTraceAsString(throwable));
-                    js.setException(throwable);
-                    js.setExceptionClass(throwable.getClass().getName());
-                    return Response.status(exceptionMapping.getValue())
-                      .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
-                      .entity(js).build();
-                }
-            }, (Type) exceptionMapping.getKey());
-        }
+        dispatcher.registerProvider(ExceptionMappers.IOExceptionMapper.class);
+        dispatcher.registerProvider(ExceptionMappers.JobAlreadyFinishedExceptionExceptionMapper.class);
+        dispatcher.registerProvider(ExceptionMappers.JobCreationRestExceptionExceptionMapper.class);
+        dispatcher.registerProvider(ExceptionMappers.KeyExceptionExceptionMapper.class);
+        dispatcher.registerProvider(ExceptionMappers.LoginExceptionExceptionMapper.class);
+        dispatcher.registerProvider(ExceptionMappers.NotConnectedRestExceptionExceptionMapper.class);
+        dispatcher.registerProvider(ExceptionMappers.NotConnectedExceptionExceptionMapper.class);
+        dispatcher.registerProvider(ExceptionMappers.PermissionRestExceptionExceptionMapper.class);
+        dispatcher.registerProvider(ExceptionMappers.SchedulerRestExceptionExceptionMapper.class);
+        dispatcher.registerProvider(ExceptionMappers.NotFoundExceptionMapper.class);
+        dispatcher.registerProvider(ExceptionMappers.SubmissionClosedRestExceptionExceptionMapper.class);
+        dispatcher.registerProvider(ExceptionMappers.UnknownJobRestExceptionExceptionMapper.class);
+        dispatcher.registerProvider(ExceptionMappers.UnknownTaskExceptionExceptionMapper.class);
+        dispatcher.registerProvider(ExceptionMappers.PermissionExceptionExceptionMapper.class);
+        dispatcher.registerProvider(ExceptionMappers.ProActiveRuntimeExceptionExceptionMapper.class);
+        dispatcher.registerProvider(ExceptionMappers.RuntimeExceptionExceptionMapper.class);
+        dispatcher.registerProvider(ExceptionMappers.ThrowableExceptionMapper.class);
     }
 
     public void stop() {

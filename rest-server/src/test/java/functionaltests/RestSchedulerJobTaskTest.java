@@ -106,10 +106,8 @@ public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
         RestFuncTestConfig config = RestFuncTestConfig.getInstance();
         String url = getResourceUrl("login");
         HttpPost httpPost = new HttpPost(url);
-        StringBuilder buffer = new StringBuilder();
-        buffer.append("username=").append(config.getLogin()).append("&password=")
-                .append(config.getPassword());
-        StringEntity entity = new StringEntity(buffer.toString());
+        StringEntity entity = new StringEntity(
+          "username=" + config.getLogin() + "&password=" + config.getPassword());
         entity.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         httpPost.setEntity(entity);
         HttpResponse response = executeUriRequest(httpPost);
@@ -151,14 +149,13 @@ public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
     @Test
     public void testListJobs() throws Exception {
         String jobId = submitDefaultJob().value();
-        String resource = jobId;
-        String schedulerUrl = getResourceUrl("jobs/" + resource);
+        String schedulerUrl = getResourceUrl("jobs/" + jobId);
         HttpGet httpGet = new HttpGet(schedulerUrl);
         setSessionHeader(httpGet);
         HttpResponse response = executeUriRequest(httpGet);
         assertHttpStatusOK(response);
         JSONObject jsonObject = toJsonObject(response);
-        assertJobId(resource, jsonObject);
+        assertJobId(jobId, jsonObject);
     }
 
     @Test
@@ -245,13 +242,6 @@ public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
         JSONObject jobId = (JSONObject) jobInfo.get("jobId");
         String actual = jobId.get("id").toString();
         assertEquals(expected, actual);
-    }
-
-    private void assertJobOwner(JSONArray jobs, String owner) {
-        for (int i = 0; i < jobs.size(); i++) {
-            JSONObject job = (JSONObject) jobs.get(i);
-            assertEquals(owner, job.get("owner"));
-        }
     }
 
     private String getTaskResult(JSONObject job, String taskName) {

@@ -41,11 +41,14 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.net.HttpURLConnection;
-import java.net.URI;
 import java.net.URLEncoder;
-import java.util.Collections;
 
+import javax.ws.rs.ProcessingException;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
 
@@ -55,11 +58,10 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.jboss.resteasy.client.ClientExecutor;
-import org.jboss.resteasy.client.ClientRequest;
-import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.client.ClientResponseFailure;
-import org.jboss.resteasy.client.ProxyFactory;
+import org.jboss.resteasy.client.jaxrs.ClientHttpEngine;
+import org.jboss.resteasy.client.jaxrs.ResteasyClient;
+import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
+import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataOutput;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
@@ -67,18 +69,18 @@ public class SchedulerRestClient {
 
     private SchedulerRestInterface scheduler;
     private String restEndpointURL;
-    private ClientExecutor executor;
+    private ClientHttpEngine httpEngine;
 
     public SchedulerRestClient(String restEndpointURL) {
         this(restEndpointURL, null);
     }
 
-    public SchedulerRestClient(String restEndpointURL, ClientExecutor executor) {
+    public SchedulerRestClient(String restEndpointURL, ClientHttpEngine httpEngine) {
         this.restEndpointURL = restEndpointURL;
-        this.executor = executor;
+        this.httpEngine = httpEngine;
         ResteasyProviderFactory provider = ResteasyProviderFactory.getInstance();
         provider.registerProvider(JacksonContextResolver.class);
-        scheduler = createRestProxy(provider, restEndpointURL, executor);
+        scheduler = createRestProxy(provider, restEndpointURL, httpEngine);
     }
 
     public JobIdData submitXml(String sessionId, InputStream jobXml) throws Exception {
@@ -89,38 +91,52 @@ public class SchedulerRestClient {
         return submit(sessionId, jobArchive, MediaType.APPLICATION_OCTET_STREAM_TYPE);
     }
 
-    public boolean pushFile(String sessionId, String space, String path, String fileName, InputStream fileContent)
-            throws Exception {
+    public boolean pushFile(String sessionId, String space, String path, String fileName,
+      InputStream fileContent)
+      throws Exception {
         String uriTmpl = (new StringBuilder(restEndpointURL)).append(addSlashIfMissing(restEndpointURL))
-                .append("scheduler/dataspace/").append(space).append(URLEncoder.encode(path, "UTF-8")).toString();
+          .append("scheduler/dataspace/").append(space).append(URLEncoder.encode(path, "UTF-8")).toString();
 
-        ClientRequest request = (executor == null) ? new ClientRequest(uriTmpl) : new ClientRequest(uriTmpl, executor);
-        request.header("sessionid", sessionId);
+        ResteasyClient client = new ResteasyClientBuilder().httpEngine(httpEngine).build();
+        ResteasyWebTarget target = client.target(uriTmpl);
 
         MultipartFormDataOutput formData = new MultipartFormDataOutput();
         formData.addFormData("fileName", fileName, MediaType.TEXT_PLAIN_TYPE);
         formData.addFormData("fileContent", fileContent, MediaType.APPLICATION_OCTET_STREAM_TYPE);
-        request.body(MediaType.MULTIPART_FORM_DATA, formData);
 
-        ClientResponse<Boolean> response = request.post(Boolean.class);
+        GenericEntity<MultipartFormDataOutput> entity = new GenericEntity<MultipartFormDataOutput>(
+          formData) {
+        };
+
+        Response response = target.request().header("sessionid", sessionId).post(
+          Entity.entity(entity, MediaType.MULTIPART_FORM_DATA_TYPE));
+
         if (response.getStatus() != HttpURLConnection.HTTP_OK) {
             if (response.getStatus() == HttpURLConnection.HTTP_UNAUTHORIZED) {
                 throw new NotConnectedRestException("User not authenticated or session timeout.");
             } else {
-                throw new Exception(String.format("File upload failed. Status code: %s", response.getStatus()));
+                throw new Exception(
+                  String.format("File upload failed. Status code: %s", response.getStatus()));
             }
         }
-        return response.getEntity();
+        return response.readEntity(Boolean.class);
     }
 
     private JobIdData submit(String sessionId, InputStream job, MediaType mediaType) throws Exception {
         String uriTmpl = restEndpointURL + addSlashIfMissing(restEndpointURL) + "scheduler/submit";
-        ClientRequest request = (executor == null) ? new ClientRequest(uriTmpl) : new ClientRequest(uriTmpl, executor);
-        request.header("sessionid", sessionId);
+
+        ResteasyClient client = new ResteasyClientBuilder().httpEngine(httpEngine).build();
+        ResteasyWebTarget target = client.target(uriTmpl);
+
         MultipartFormDataOutput formData = new MultipartFormDataOutput();
         formData.addFormData("file", job, mediaType);
-        request.body(MediaType.MULTIPART_FORM_DATA, formData);
-        ClientResponse<JobIdData> response = request.post(JobIdData.class);
+        GenericEntity<MultipartFormDataOutput> entity = new GenericEntity<MultipartFormDataOutput>(
+          formData) {
+        };
+
+        Response response = target.request().header("sessionid", sessionId).post(
+          Entity.entity(entity, MediaType.MULTIPART_FORM_DATA_TYPE));
+
         if (response.getStatus() != HttpURLConnection.HTTP_OK) {
             if (response.getStatus() == HttpURLConnection.HTTP_UNAUTHORIZED) {
                 throw new NotConnectedRestException("User not authenticated or session timeout.");
@@ -128,7 +144,7 @@ public class SchedulerRestClient {
                 throw new Exception("Job submission failed status code:" + response.getStatus());
             }
         }
-        return response.getEntity();
+        return response.readEntity(JobIdData.class);
     }
 
     private String addSlashIfMissing(String url) {
@@ -140,10 +156,10 @@ public class SchedulerRestClient {
     }
 
     private static SchedulerRestInterface createRestProxy(ResteasyProviderFactory provider, String restEndpointURL,
-            ClientExecutor executor) {
-        final SchedulerRestInterface schedulerRestClient = (executor == null) ? ProxyFactory.create(
-                SchedulerRestInterface.class, restEndpointURL, provider, Collections.<String, Object> emptyMap())
-                : ProxyFactory.create(SchedulerRestInterface.class, URI.create(restEndpointURL), executor, provider);
+      ClientHttpEngine httpEngine) {
+        ResteasyClient client = new ResteasyClientBuilder().providerFactory(provider).httpEngine(httpEngine).build();
+        ResteasyWebTarget target = client.target(restEndpointURL);
+        SchedulerRestInterface schedulerRestClient = target.proxy(SchedulerRestInterface.class);
         return createExceptionProxy(schedulerRestClient);
     }
 
@@ -165,22 +181,28 @@ public class SchedulerRestClient {
             try {
                 return method.invoke(scheduler, args);
             } catch (InvocationTargetException targetException) {
-                if (targetException.getTargetException() instanceof ClientResponseFailure) {
-                    ClientResponseFailure clientException = (ClientResponseFailure) targetException
+                if (targetException.getTargetException() instanceof WebApplicationException) {
+                    WebApplicationException clientException = (WebApplicationException) targetException
                       .getTargetException();
                     try {
-                        ExceptionToJson json = (ExceptionToJson) clientException.getResponse().getEntity(
+                        ExceptionToJson json = clientException.getResponse().readEntity(
                           ExceptionToJson.class);
-                        throw rebuildException(json);
-                    } catch (Exception couldNotReadJsonException) {
-                        throw new RuntimeException(clientException.getMessage());
+                        // here we take the server side exception and recreate it on the client side
+                        throw rebuildServerSideException(json);
+                    } catch (ProcessingException couldNotReadJsonException) {
+                        // rethrow server side exception as runtime exception but do not transform it
+                        throw clientException;
+                    } catch (IllegalStateException couldNotReadJsonException) {
+                        // rethrow server side exception as runtime exception but do not transform it
+                        throw clientException;
                     }
                 }
-                throw targetException;
+                // rethrow real exception as runtime (client side exception)
+                throw new RuntimeException(targetException.getTargetException());
             }
         }
 
-        private Exception rebuildException(ExceptionToJson json) throws IllegalArgumentException,
+        private Exception rebuildServerSideException(ExceptionToJson json) throws IllegalArgumentException,
                 InstantiationException, IllegalAccessException, InvocationTargetException {
             Throwable serverException = json.getException();
             String exceptionClassName = json.getExceptionClass();

@@ -39,13 +39,14 @@ package org.ow2.proactive_grid_cloud_portal.webapp;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.ws.rs.NotFoundException;
+
 import org.ow2.proactive_grid_cloud_portal.RestTestServer;
 import org.ow2.proactive_grid_cloud_portal.common.exceptionmapper.ExceptionToJson;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.jboss.resteasy.spi.NotFoundException;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;

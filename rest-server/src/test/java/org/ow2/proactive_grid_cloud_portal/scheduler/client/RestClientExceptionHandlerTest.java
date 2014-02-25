@@ -34,14 +34,26 @@
  */
 package org.ow2.proactive_grid_cloud_portal.scheduler.client;
 
+import javax.ws.rs.InternalServerErrorException;
+import javax.ws.rs.NotFoundException;
+import javax.ws.rs.WebApplicationException;
+
 import org.ow2.proactive_grid_cloud_portal.RestTestServer;
+import org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 
 public class RestClientExceptionHandlerTest extends RestTestServer {
+
+    @BeforeClass
+    public static void setUpRest() throws Exception {
+        addResource(new SchedulerStateRest());
+    }
 
     @Test
     public void client_handles_jetty_errors_404() throws Exception {
@@ -51,9 +63,37 @@ public class RestClientExceptionHandlerTest extends RestTestServer {
 
             client.getScheduler().login("demo", "demo");
             fail("Should have throw an exception");
-        } catch (Exception e) {
-            assertTrue(e instanceof RuntimeException);
-            assertTrue(e.getMessage().contains("404"));
+        } catch (WebApplicationException e) {
+            assertTrue(e instanceof NotFoundException);
+            assertEquals(404, e.getResponse().getStatus());
+        }
+    }
+
+    @Test
+    public void client_handles_jetty_errors_500() throws Exception {
+        try {
+            SchedulerRestClient client = new SchedulerRestClient(
+              "http://localhost:" + port + "/");
+
+            client.getScheduler().login("demo", "demo");
+            fail("Should have throw an exception");
+        } catch (WebApplicationException e) {
+            assertTrue(e instanceof InternalServerErrorException);
+            assertEquals(500, e.getResponse().getStatus());
+        }
+    }
+
+    @Test
+    public void client_handles_unknown_session_id() throws Exception {
+        try {
+            SchedulerRestClient client = new SchedulerRestClient(
+              "http://localhost:" + port + "/");
+
+            client.getScheduler().listJobs("nonExisting", "42");
+            fail("Should have throw an exception");
+        } catch (WebApplicationException e) {
+            assertTrue(e instanceof InternalServerErrorException);
+            assertEquals(500, e.getResponse().getStatus());
         }
     }
 }

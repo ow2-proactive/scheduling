@@ -34,11 +34,10 @@
  */
 package org.ow2.proactive_grid_cloud_portal;
 
-import org.ow2.proactive_grid_cloud_portal.rm.RMRest;
-
 import java.io.IOException;
 import java.net.ServerSocket;
 
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.jboss.resteasy.plugins.server.tjws.TJWSEmbeddedJaxrsServer;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -50,11 +49,16 @@ public class RestTestServer {
 
     @BeforeClass
     public static void startServer() throws IOException {
+        preventProActiveToChangeSecurityManager();
         server = new TJWSEmbeddedJaxrsServer();
         port = findFreePort();
         server.setPort(port);
         server.setRootResourcePath("/");
         server.start();
+    }
+
+    private static void preventProActiveToChangeSecurityManager() {
+        CentralPAPropertyRepository.PA_CLASSLOADING_USEHTTP.setValue(false);
     }
 
     protected static void addResource(Object restResource) {

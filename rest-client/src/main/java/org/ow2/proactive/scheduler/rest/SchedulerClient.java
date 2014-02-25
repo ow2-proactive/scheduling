@@ -34,25 +34,6 @@
  */
 package org.ow2.proactive.scheduler.rest;
 
-import static java.lang.String.format;
-import static java.lang.System.currentTimeMillis;
-import static org.apache.commons.io.IOUtils.copy;
-import static org.ow2.proactive.scheduler.job.JobIdImpl.makeJobId;
-import static org.ow2.proactive.scheduler.rest.ExceptionUtility.exception;
-import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwJAFEOrUJEOrNCEOrPE;
-import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwNCEOrPE;
-import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwNCEOrPEOrSCEOrJCE;
-import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwUJEOrNCEOrPE;
-import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwUJEOrNCEOrPEOrUTE;
-import static org.ow2.proactive.scheduler.rest.data.DataUtility.jobId;
-import static org.ow2.proactive.scheduler.rest.data.DataUtility.taskState;
-import static org.ow2.proactive.scheduler.rest.data.DataUtility.toJobInfos;
-import static org.ow2.proactive.scheduler.rest.data.DataUtility.toJobResult;
-import static org.ow2.proactive.scheduler.rest.data.DataUtility.toJobState;
-import static org.ow2.proactive.scheduler.rest.data.DataUtility.toJobUsages;
-import static org.ow2.proactive.scheduler.rest.data.DataUtility.toSchedulerUserInfos;
-import static org.ow2.proactive.scheduler.rest.data.DataUtility.toTaskResult;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -71,10 +52,6 @@ import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.http.client.HttpClient;
-import org.jboss.resteasy.client.core.executors.ApacheHttpClient4Executor;
-import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.ow2.proactive.db.SortParameter;
 import org.ow2.proactive.scheduler.common.JobFilterCriteria;
 import org.ow2.proactive.scheduler.common.JobSortParameter;
@@ -115,6 +92,29 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskResultData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskStateData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.UserJobData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
+import org.apache.commons.io.IOUtils;
+import org.apache.http.client.HttpClient;
+import org.jboss.resteasy.client.jaxrs.engines.ApacheHttpClient4Engine;
+import org.jboss.resteasy.spi.ResteasyProviderFactory;
+
+import static java.lang.String.format;
+import static java.lang.System.currentTimeMillis;
+import static org.apache.commons.io.IOUtils.copy;
+import static org.ow2.proactive.scheduler.job.JobIdImpl.makeJobId;
+import static org.ow2.proactive.scheduler.rest.ExceptionUtility.exception;
+import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwJAFEOrUJEOrNCEOrPE;
+import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwNCEOrPE;
+import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwNCEOrPEOrSCEOrJCE;
+import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwUJEOrNCEOrPE;
+import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwUJEOrNCEOrPEOrUTE;
+import static org.ow2.proactive.scheduler.rest.data.DataUtility.jobId;
+import static org.ow2.proactive.scheduler.rest.data.DataUtility.taskState;
+import static org.ow2.proactive.scheduler.rest.data.DataUtility.toJobInfos;
+import static org.ow2.proactive.scheduler.rest.data.DataUtility.toJobResult;
+import static org.ow2.proactive.scheduler.rest.data.DataUtility.toJobState;
+import static org.ow2.proactive.scheduler.rest.data.DataUtility.toJobUsages;
+import static org.ow2.proactive.scheduler.rest.data.DataUtility.toSchedulerUserInfos;
+import static org.ow2.proactive.scheduler.rest.data.DataUtility.toTaskResult;
 
 public class SchedulerClient extends ClientBase implements ISchedulerClient {
 
@@ -145,11 +145,11 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
      */
     public void init(String url, String login, String password) throws Exception {
         HttpClient client = HttpUtility.threadSafeClient();
-        SchedulerRestClient restApiClient = new SchedulerRestClient(url, new ApacheHttpClient4Executor(client));
+        SchedulerRestClient restApiClient = new SchedulerRestClient(url, new ApacheHttpClient4Engine(client));
 
         ResteasyProviderFactory factory = ResteasyProviderFactory.getInstance();
-        factory.addMessageBodyReader(new WildCardTypeReader());
-        factory.addMessageBodyReader(new OctetStreamReader());
+        factory.register(new WildCardTypeReader());
+        factory.register(new OctetStreamReader());
 
         setApiClient(restApiClient);
 
@@ -554,7 +554,8 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         JobIdData jobIdData = null;
         try {
             String jobXml = (new Job2XMLTransformer()).jobToxml((TaskFlowJob) job);
-            jobIdData = restApiClient().submitXml(sid, IOUtils.toInputStream(jobXml, Charset.defaultCharset()));
+            jobIdData = restApiClient().submitXml(sid, IOUtils.toInputStream(jobXml,
+              String.valueOf(Charset.defaultCharset())));
         } catch (Exception e) {
             throwNCEOrPEOrSCEOrJCE(e);
         }

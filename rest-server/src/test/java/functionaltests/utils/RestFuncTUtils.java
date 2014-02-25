@@ -65,6 +65,7 @@ public class RestFuncTUtils {
         close(process.getOutputStream());
         close(process.getInputStream());
         close(process.getErrorStream());
+        process.waitFor();
         System.out.println(String.format("Process ended with exit code %d. ", process.exitValue()));
     }
 

@@ -591,6 +591,7 @@ public interface SchedulerRestInterface {
      **/
     @DELETE
     @Path("dataspace/{spaceName:[a-zA-Z][a-zA-Z_0-9]*}{filePath:.*}")
+    @Produces("application/json")
     public abstract boolean deleteFile(@HeaderParam("sessionid")
     String sessionId, @PathParam("spaceName")
     String spaceName, @PathParam("filePath")

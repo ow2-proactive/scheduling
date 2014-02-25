@@ -1,7 +1,5 @@
 package org.ow2.proactive_grid_cloud_portal.cli;
 
-import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_OTHER;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
@@ -9,13 +7,15 @@ import java.util.Stack;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
-import org.apache.http.client.HttpClient;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.jboss.resteasy.client.core.executors.ApacheHttpClient4Executor;
 import org.ow2.proactive_grid_cloud_portal.cli.console.AbstractDevice;
 import org.ow2.proactive_grid_cloud_portal.cli.json.PluginView;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpUtility;
 import org.ow2.proactive_grid_cloud_portal.scheduler.client.SchedulerRestClient;
+import org.apache.http.client.HttpClient;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.jboss.resteasy.client.jaxrs.engines.ApacheHttpClient4Engine;
+
+import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_OTHER;
 
 public class ApplicationContextImpl implements ApplicationContext {
 
@@ -30,7 +30,6 @@ public class ApplicationContextImpl implements ApplicationContext {
 
     private String sessionId = "";
     private String restServerUrl;
-    private SchedulerRestClient restClient;
     private boolean insecureAccess;
     private String resourceType;
     private boolean forced;
@@ -59,21 +58,20 @@ public class ApplicationContextImpl implements ApplicationContext {
         this.restServerUrl = restServerUrl;
     }
 
-	@Override
-	public SchedulerRestClient getRestClient() {
-		HttpClient client = HttpUtility.threadSafeClient();
-		if (canInsecureAccess()) {
-			try {
-				HttpUtility.setInsecureAccess(client);
-			} catch (Exception e) {
-				throw new CLIException(REASON_OTHER,
-						"Cannot disable SSL verification.", e);
-			}
-		}
-		restClient = new SchedulerRestClient(restServerUrl,
-				new ApacheHttpClient4Executor(client));
-		return restClient;
-	}
+    @Override
+    public SchedulerRestClient getRestClient() {
+        HttpClient client = HttpUtility.threadSafeClient();
+        if (canInsecureAccess()) {
+            try {
+                HttpUtility.setInsecureAccess(client);
+            } catch (Exception e) {
+                throw new CLIException(REASON_OTHER,
+                  "Cannot disable SSL verification.", e);
+            }
+        }
+        return new SchedulerRestClient(restServerUrl,
+          new ApacheHttpClient4Engine(client));
+    }
 
     @Override
     public String getResourceUrl(String resource) {

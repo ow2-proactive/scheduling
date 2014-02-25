@@ -7,11 +7,10 @@
 	<mapping>
 		<class-a>org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobStateData</class-a>
 		<class-b>org.ow2.proactive.scheduler.common.job.JobState</class-b>
-		<field>
+		<field custom-converter=
+					   "org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskStateDataCustomConverter">
 			<a>tasks</a>
 			<b>hMTasks</b>
-			<a-hint>org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskStateData</a-hint>
-			<b-hint>org.ow2.proactive.scheduler.common.task.TaskState</b-hint>
 		</field>
 	</mapping>
 

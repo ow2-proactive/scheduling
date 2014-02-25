@@ -50,7 +50,7 @@ import javax.ws.rs.ext.Provider;
 
 import org.jboss.resteasy.annotations.interception.SecurityPrecedence;
 import org.jboss.resteasy.annotations.interception.ServerInterceptor;
-import org.jboss.resteasy.core.ResourceMethod;
+import org.jboss.resteasy.core.ResourceMethodInvoker;
 import org.jboss.resteasy.core.ServerResponse;
 import org.jboss.resteasy.spi.Failure;
 import org.jboss.resteasy.spi.HttpRequest;
@@ -77,8 +77,8 @@ public class LoggingInterceptor implements PreProcessInterceptor, PostProcessInt
 
     private static final Logger logger = LoggerFactory.getLogger(LoggingInterceptor.class);
 
-    public ServerResponse preProcess(HttpRequest request, ResourceMethod method) throws Failure,
-            WebApplicationException {
+    public ServerResponse preProcess(HttpRequest request, ResourceMethodInvoker method)
+      throws Failure, WebApplicationException {
         if (logger.isDebugEnabled()) {
 
             String httpMethod = request.getHttpMethod();

@@ -39,9 +39,9 @@ subprojects {
 
 project(':rest-api') {
     dependencies {
-        compile 'org.jboss.resteasy:jaxrs-api:2.3.3.Final'
-        compile 'org.jboss.resteasy:resteasy-jackson-provider:2.3.3.Final'
-        compile 'org.jboss.resteasy:resteasy-multipart-provider:2.3.3.Final'
+        compile 'org.jboss.resteasy:jaxrs-api:3.0.6.Final'
+        compile 'org.jboss.resteasy:resteasy-jackson-provider:3.0.6.Final'
+        compile 'org.jboss.resteasy:resteasy-multipart-provider:3.0.6.Final'
     }
 }
 
@@ -54,9 +54,9 @@ project(':rest-server') {
         schedulerNode
     }
     dependencies {
-        compile 'org.jboss.resteasy:jaxrs-api:2.3.3.Final'
-        compile 'org.jboss.resteasy:resteasy-jackson-provider:2.3.3.Final'
-        compile 'org.jboss.resteasy:resteasy-multipart-provider:2.3.3.Final'
+        compile 'org.jboss.resteasy:jaxrs-api:3.0.6.Final'
+        compile 'org.jboss.resteasy:resteasy-jackson-provider:3.0.6.Final'
+        compile 'org.jboss.resteasy:resteasy-multipart-provider:3.0.6.Final'
 
         compile 'org.rrd4j:rrd4j:2.0.7'
         compile 'net.sf.dozer:dozer:5.4.0'
@@ -79,7 +79,7 @@ project(':rest-server') {
         testCompile 'org.ow2.proactive:rm-server:3.5.0-SNAPSHOT'
         testCompile 'org.ow2.proactive:scheduler-server:3.5.0-SNAPSHOT'
         testCompile 'org.apache.httpcomponents:httpmime:4.2.1'
-        testCompile 'org.jboss.resteasy:tjws:2.3.3.Final'
+        testCompile 'org.jboss.resteasy:tjws:3.0.6.Final'
         testCompile 'org.fusesource:sigar:1.6.4'
 
         runtime 'net.bull.javamelody:javamelody-core:1.46.0'
