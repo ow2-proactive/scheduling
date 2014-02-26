@@ -36,22 +36,22 @@
  */
 package org.ow2.proactive_grid_cloud_portal.rm;
 
+import org.objectweb.proactive.api.PAActiveObject;
+import org.ow2.proactive.resourcemanager.common.util.RMProxyUserInterface;
+import org.ow2.proactive_grid_cloud_portal.common.SessionIdGenerator;
+
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
-import org.objectweb.proactive.api.PAActiveObject;
-import org.ow2.proactive.resourcemanager.common.util.RMCachingProxyUserInterface;
-import org.ow2.proactive_grid_cloud_portal.common.SessionIdGenerator;
 
 
 public class RMSessionMapper {
 
-    private Map<String, RMCachingProxyUserInterface> sessions;
+    private Map<String, RMProxyUserInterface> sessions;
     private static RMSessionMapper sessionMapper;
     private Map<String, Long> sessionsLastAccessToClient;
 
     private RMSessionMapper() {
-        sessions = new ConcurrentHashMap<String, RMCachingProxyUserInterface>();
+        sessions = new ConcurrentHashMap<String, RMProxyUserInterface>();
         sessionsLastAccessToClient = new ConcurrentHashMap<String, Long>();
     }
 
@@ -62,14 +62,14 @@ public class RMSessionMapper {
         return sessionMapper;
     }
 
-    public String add(RMCachingProxyUserInterface rm) {
+    public String add(RMProxyUserInterface rm) {
         String id = SessionIdGenerator.newSessionId();
         sessions.put(id, rm);
         sessionsLastAccessToClient.put(id, System.currentTimeMillis());
         return id;
     }
 
-    public Map<String, RMCachingProxyUserInterface> getSessionsMap() {
+    public Map<String, RMProxyUserInterface> getSessionsMap() {
         return sessions;
     }
 
@@ -83,7 +83,7 @@ public class RMSessionMapper {
      * @param key the session id
      */
     public void remove(String key) {
-        RMCachingProxyUserInterface proxy = sessions.remove(key);
+        RMProxyUserInterface proxy = sessions.remove(key);
         try {
             PAActiveObject.terminateActiveObject(proxy, true);
         } catch (Throwable e) {

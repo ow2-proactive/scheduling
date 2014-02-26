@@ -62,7 +62,7 @@ import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.config.xml.ProActiveConfigurationParser;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.ow2.proactive.resourcemanager.common.util.RMCachingProxyUserInterface;
+import org.ow2.proactive.resourcemanager.common.util.RMProxyUserInterface;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
@@ -87,6 +87,7 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.jboss.resteasy.spi.NotFoundException;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
+
 
 
 public class RestRuntime {
@@ -227,7 +228,7 @@ public class RestRuntime {
         Set<String> schedulerSessionIds = RMSessionMapper.getInstance().getSessionsMap().keySet();
         List<String> sessionids = new ArrayList<String>(schedulerSessionIds);
         for (String sessionid : sessionids) {
-            RMCachingProxyUserInterface s = RMSessionMapper.getInstance().getSessionsMap().get(sessionid);
+            RMProxyUserInterface s = RMSessionMapper.getInstance().getSessionsMap().get(sessionid);
             try {
                 s.disconnect();
             } catch (Throwable e) {

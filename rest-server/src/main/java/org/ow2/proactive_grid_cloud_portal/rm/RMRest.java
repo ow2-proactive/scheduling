@@ -36,39 +36,8 @@
  */
 package org.ow2.proactive_grid_cloud_portal.rm;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.security.KeyException;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
-
-import javax.management.Attribute;
-import javax.management.AttributeList;
-import javax.management.InstanceNotFoundException;
-import javax.management.IntrospectionException;
-import javax.management.MalformedObjectNameException;
-import javax.management.ObjectName;
-import javax.management.ReflectionException;
-import javax.security.auth.login.LoginException;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.FormParam;
-import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
-
+import org.jboss.resteasy.annotations.GZIP;
+import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
@@ -79,7 +48,7 @@ import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
-import org.ow2.proactive.resourcemanager.common.util.RMCachingProxyUserInterface;
+import org.ow2.proactive.resourcemanager.common.util.RMProxyUserInterface;
 import org.ow2.proactive.resourcemanager.core.jmx.RMJMXBeans;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
@@ -93,12 +62,23 @@ import org.ow2.proactive_grid_cloud_portal.common.StatHistoryCaching;
 import org.ow2.proactive_grid_cloud_portal.common.StatHistoryCaching.StatHistoryCacheEntry;
 import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
 import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
-import org.jboss.resteasy.annotations.GZIP;
-import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import org.rrd4j.ConsolFun;
 import org.rrd4j.core.FetchData;
 import org.rrd4j.core.FetchRequest;
 import org.rrd4j.core.RrdDb;
+
+import javax.management.*;
+import javax.security.auth.login.LoginException;
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.security.KeyException;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.*;
 
 
 @Path("/rm")
@@ -115,8 +95,8 @@ public class RMRest implements RMRestInterface {
     // "MaxFreeNodes" // redundant with AvailableNodesCount
     };
 
-    public RMCachingProxyUserInterface checkAccess(String sessionId) throws NotConnectedException {
-        RMCachingProxyUserInterface s = RMSessionMapper.getInstance().getSessionsMap().get(sessionId);
+    public RMProxyUserInterface checkAccess(String sessionId) throws NotConnectedException {
+        RMProxyUserInterface s = RMSessionMapper.getInstance().getSessionsMap().get(sessionId);
 
         if (s == null) {
             throw new NotConnectedException("you are not connected to the scheduler, you should log on first");
@@ -145,8 +125,8 @@ public class RMRest implements RMRestInterface {
     String password) throws KeyException, LoginException, RMException, ActiveObjectCreationException,
             NodeException {
 
-        RMCachingProxyUserInterface rm;
-        rm = PAActiveObject.newActive(RMCachingProxyUserInterface.class, new Object[] {});
+        RMProxyUserInterface rm;
+        rm = PAActiveObject.newActive(RMProxyUserInterface.class, new Object[] {});
 
         CredData credData = new CredData(CredData.parseLogin(username), CredData.parseDomain(username),
             password);
@@ -171,7 +151,7 @@ public class RMRest implements RMRestInterface {
     @Produces("application/json")
     public void rmDisconnect(@HeaderParam("sessionid")
     String sessionId) throws NotConnectedException {
-        RMCachingProxyUserInterface rm = checkAccess(sessionId);
+        RMProxyUserInterface rm = checkAccess(sessionId);
         rm.disconnect();
         PAActiveObject.terminateActiveObject(rm, true);
         RMSessionMapper.getInstance().remove(sessionId);
@@ -192,7 +172,7 @@ public class RMRest implements RMRestInterface {
     LoginForm multipart) throws ActiveObjectCreationException, NodeException, KeyException, IOException,
             LoginException, RMException {
 
-        RMCachingProxyUserInterface rm = PAActiveObject.newActive(RMCachingProxyUserInterface.class,
+        RMProxyUserInterface rm = PAActiveObject.newActive(RMProxyUserInterface.class,
                 new Object[] {});
 
         String url = PortalConfiguration.getProperties().getProperty(PortalConfiguration.rm_url);
@@ -546,7 +526,7 @@ public class RMRest implements RMRestInterface {
             IOException, NotConnectedException, MalformedObjectNameException, NullPointerException {
 
         // checking that still connected to the RM
-        RMCachingProxyUserInterface rmProxy = checkAccess(sessionId);
+        RMProxyUserInterface rmProxy = checkAccess(sessionId);
         return rmProxy.getNodeMBeanInfo(nodeJmxUrl, objectName, attrs);
     }
 
@@ -573,7 +553,7 @@ public class RMRest implements RMRestInterface {
             IOException, NotConnectedException, MalformedObjectNameException, NullPointerException {
 
         // checking that still connected to the RM
-        RMCachingProxyUserInterface rmProxy = checkAccess(sessionId);
+        RMProxyUserInterface rmProxy = checkAccess(sessionId);
         return rmProxy.getNodeMBeansInfo(nodeJmxUrl, objectNames, attrs);
     }
 
@@ -668,7 +648,7 @@ public class RMRest implements RMRestInterface {
     ObjectName name, @QueryParam("attr")
     List<String> attrs) throws InstanceNotFoundException, IntrospectionException, ReflectionException,
             IOException, NotConnectedException {
-        RMCachingProxyUserInterface rm = checkAccess(sessionId);
+        RMProxyUserInterface rm = checkAccess(sessionId);
 
         if ((attrs == null) || (attrs.size() == 0)) {
             // no attribute is requested, we return
@@ -723,7 +703,7 @@ public class RMRest implements RMRestInterface {
     String range) throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException,
             MalformedObjectNameException, NullPointerException, InterruptedException, NotConnectedException {
 
-        RMCachingProxyUserInterface rm = checkAccess(sessionId);
+        RMProxyUserInterface rm = checkAccess(sessionId);
 
         // if range String is too large, shorten it
         // to make it recognizable by StatHistoryCaching
@@ -857,7 +837,7 @@ public class RMRest implements RMRestInterface {
     String script, @FormParam("scriptEngine")
     String scriptEngine) throws Throwable {
 
-        RMCachingProxyUserInterface rm = checkAccess(sessionId);
+        RMProxyUserInterface rm = checkAccess(sessionId);
 
         List<ScriptResult<Object>> results = rm.executeScript(script, scriptEngine,
                 TargetType.NODE_URL.name(), Collections.singleton(nodeUrl));
@@ -880,7 +860,7 @@ public class RMRest implements RMRestInterface {
     String script, @FormParam("scriptEngine")
     String scriptEngine) throws Throwable {
 
-        RMCachingProxyUserInterface rm = checkAccess(sessionId);
+        RMProxyUserInterface rm = checkAccess(sessionId);
 
         return rm.executeScript(script, scriptEngine,
                 TargetType.NODESOURCE_NAME.name(), Collections.singleton(nodeSource));
@@ -897,7 +877,7 @@ public class RMRest implements RMRestInterface {
     String script, @FormParam("scriptEngine")
     String scriptEngine) throws Throwable {
 
-        RMCachingProxyUserInterface rm = checkAccess(sessionId);
+        RMProxyUserInterface rm = checkAccess(sessionId);
 
         return rm.executeScript(script, scriptEngine,
                 TargetType.HOSTNAME.name(), Collections.singleton(host));

@@ -36,8 +36,6 @@
  */
 package org.ow2.proactive_grid_cloud_portal.rm;
 
-import java.io.File;
-
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
@@ -46,8 +44,10 @@ import org.objectweb.proactive.utils.Sleeper;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
-import org.ow2.proactive.resourcemanager.common.util.RMCachingProxyUserInterface;
+import org.ow2.proactive.resourcemanager.common.util.RMProxyUserInterface;
 import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
+
+import java.io.File;
 
 
 /**
@@ -68,7 +68,7 @@ public class RMStateCaching {
 
     private static Logger logger = ProActiveLogger.getLogger(RMStateCaching.class);
 
-    private static RMCachingProxyUserInterface rm;
+    private static RMProxyUserInterface rm;
     private static RMInitialState state;
 
     private static Thread rmUpdater;
@@ -108,7 +108,7 @@ public class RMStateCaching {
 
             try {
                 if (rm == null) {
-                    rm = PAActiveObject.newActive(RMCachingProxyUserInterface.class, new Object[] {});
+                    rm = PAActiveObject.newActive(RMProxyUserInterface.class, new Object[] {});
                     if (cred_path != null && new File(cred_path).exists()) {
                         Credentials cred = Credentials.getCredentials(cred_path);
                         rm.init(url, cred);

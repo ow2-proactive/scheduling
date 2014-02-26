@@ -36,18 +36,13 @@
  */
 package org.ow2.proactive_grid_cloud_portal.rm;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.utils.Sleeper;
-import org.ow2.proactive.resourcemanager.common.util.RMCachingProxyUserInterface;
 import org.ow2.proactive.resourcemanager.common.util.RMProxyUserInterface;
+
+import java.util.*;
+import java.util.Map.Entry;
 
 
 /**
@@ -77,19 +72,19 @@ public class RMSessionsCleaner implements Runnable {
 
     public void run() {
         while (!stop) {
-            Map<String, RMCachingProxyUserInterface> sessionMap = rmsm.getSessionsMap();
+            Map<String, RMProxyUserInterface> sessionMap = rmsm.getSessionsMap();
             Map<String, Long> timestamps = rmsm.getSessionsLastAccessToClient();
             logger.info("cleaning session started, " + sessionMap.size() + " existing session(s) ");
             int removedSession = 0;
-            List<Entry<String, RMCachingProxyUserInterface>> scheduledforRemoval = new ArrayList<Entry<String, RMCachingProxyUserInterface>>();
+            List<Entry<String, RMProxyUserInterface>> scheduledforRemoval = new ArrayList<Entry<String, RMProxyUserInterface>>();
             synchronized (sessionMap) {
-                Set<Entry<String, RMCachingProxyUserInterface>> entrySet = sessionMap.entrySet();
-                Iterator<Entry<String, RMCachingProxyUserInterface>> it = entrySet.iterator();
+                Set<Entry<String, RMProxyUserInterface>> entrySet = sessionMap.entrySet();
+                Iterator<Entry<String, RMProxyUserInterface>> it = entrySet.iterator();
 
                 long currentTimeStamp = System.currentTimeMillis();
 
                 while (it.hasNext()) {
-                    Entry<String, RMCachingProxyUserInterface> entry = it.next();
+                    Entry<String, RMProxyUserInterface> entry = it.next();
                     RMProxyUserInterface rmproxy = entry.getValue();
                     try {
 
@@ -122,7 +117,7 @@ public class RMSessionsCleaner implements Runnable {
                 }
 
                 // effective deletion
-                for (Entry<String, RMCachingProxyUserInterface> entry : scheduledforRemoval) {
+                for (Entry<String, RMProxyUserInterface> entry : scheduledforRemoval) {
                     rmsm.remove(entry.getKey());
                 }
 
