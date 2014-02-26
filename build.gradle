@@ -104,7 +104,7 @@ project(':rest-server') {
         options.docletpath = configurations.jaxDoclet.files.asType(List) + configurations.compile.files.asType(List)
         options.classpath = options.docletpath
         options.doclet = "com.lunatech.doclets.jax.jaxb.JAXBDoclet"
-        options.footer = 'Copyright 1997-2013 ActiveEon/INRIA/University of Nice-Sophia Antipolis'
+        options.footer = 'Copyright 1997-2014 ActiveEon/INRIA/University of Nice-Sophia Antipolis'
         options.header = file('doc_header.html').text.replaceAll("[\r\n]+", " ")
     }
 
@@ -112,7 +112,7 @@ project(':rest-server') {
         source([project, project(':rest-api')].collect { project -> project.sourceSets.main.allJava })
         destinationDir = file("$webAppDirName/doc/jaxrsdocs")
         options.links << '../jaxbdocs/'
-        options.footer = 'Copyright 1997-2013 ActiveEon/INRIA/University of Nice-Sophia Antipolis'
+        options.footer = 'Copyright 1997-2014 ActiveEon/INRIA/University of Nice-Sophia Antipolis'
         options.header = file('doc_header.html').text.replaceAll("[\r\n]+", " ")
         options.docletpath = configurations.jaxDoclet.files.asType(List) + configurations.compile.files.asType(List)
         options.classpath = options.docletpath
