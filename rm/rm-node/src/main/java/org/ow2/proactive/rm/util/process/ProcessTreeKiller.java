@@ -36,9 +36,14 @@
  */
 package org.ow2.proactive.rm.util.process;
 
+import com.sun.jna.Memory;
+import com.sun.jna.Native;
+import com.sun.jna.ptr.IntByReference;
+import static com.sun.jna.Pointer.NULL;
 import org.jvnet.winp.WinProcess;
 import org.jvnet.winp.WinpException;
 import org.ow2.proactive.utils.FileToBytesConverter;
+import static org.ow2.proactive.rm.util.process.GNUCLibrary.LIBC;
 
 import java.io.*;
 import java.lang.reflect.Field;
@@ -48,8 +53,6 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-
 /**
  * Kills a process tree to clean up the mess left by a build.
  *
@@ -58,7 +61,7 @@ import java.util.logging.Logger;
  */
 public abstract class ProcessTreeKiller {
 
-    protected org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ProcessTreeKiller.class);
+    protected static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ProcessTreeKiller.class);
 
     /**
      * Kills the given process (like {@link Process#destroy()}
@@ -124,6 +127,8 @@ public abstract class ProcessTreeKiller {
             return new Linux();
         if (os.equals("SunOS"))
             return new Solaris();
+        if (os.equals("Mac OS X"))
+            return new Darwin();
         return DEFAULT;
     }
 
@@ -313,16 +318,33 @@ public abstract class ProcessTreeKiller {
          * The object represents a snapshot of the system state.
          */
         static abstract class UnixSystem<P extends UnixProcess<P>> implements Iterable<P> {
-            private final Map<Integer/*pid*/, P> processes = new HashMap<Integer, P>();
+            /**
+             * To be filled in the constructor of the derived type.
+             */
+            protected final Map<Integer/*pid*/, P> processes = new HashMap<Integer, P>();
 
-            UnixSystem() {
+            public P get(int pid) {
+                return processes.get(pid);
+            }
+
+
+            public Iterator<P> iterator() {
+                    return processes.values().iterator();
+                }
+            }
+
+        /**
+         * {@link UnixSystem} that has /proc.
+         */
+        static abstract class ProcfsUnixSystem<P extends UnixProcess<P>> extends UnixSystem<P> {
+            ProcfsUnixSystem() {
                 File[] processes = new File("/proc").listFiles(new FileFilter() {
                     public boolean accept(File f) {
                         return f.isDirectory();
                     }
                 });
                 if (processes == null) {
-                    LOGGER.info("No /proc");
+                    logger.info("No /proc");
                     return;
                 }
 
@@ -344,13 +366,6 @@ public abstract class ProcessTreeKiller {
 
             protected abstract P createProcess(int pid) throws IOException;
 
-            public P get(int pid) {
-                return processes.get(pid);
-            }
-
-            public Iterator<P> iterator() {
-                return processes.values().iterator();
-            }
         }
 
         /**
@@ -403,7 +418,7 @@ public abstract class ProcessTreeKiller {
                     if (e.getTargetException() instanceof Error)
                         throw (Error) e.getTargetException();
                     // otherwise log and let go. I need to see when this happens
-                    LOGGER.log(Level.INFO, "Failed to terminate pid=" + getPid(), e);
+                    logger.info("Failed to terminate pid=" + getPid(), e);
                 }
 
             }
@@ -434,7 +449,7 @@ public abstract class ProcessTreeKiller {
             return new LinuxSystem();
         }
 
-        static class LinuxSystem extends Unix.UnixSystem<LinuxProcess> {
+        static class LinuxSystem extends Unix.ProcfsUnixSystem<LinuxProcess> {
             @Override
             protected LinuxProcess createProcess(int pid) throws IOException {
                 return new LinuxProcess(this, pid);
@@ -512,7 +527,7 @@ public abstract class ProcessTreeKiller {
             return new SolarisSystem();
         }
 
-        static class SolarisSystem extends Unix.UnixSystem<SolarisProcess> {
+        static class SolarisSystem extends Unix.ProcfsUnixSystem<SolarisProcess> {
             @Override
             protected SolarisProcess createProcess(int pid) throws IOException {
                 return new SolarisProcess(this, pid);
@@ -647,21 +662,238 @@ public abstract class ProcessTreeKiller {
         }
     }
 
-    /*
-        On MacOS X, there's no procfs <http://www.osxbook.com/book/bonus/chapter11/procfs/>
-        instead you'd do it with the sysctl <http://search.cpan.org/src/DURIST/Proc-ProcessTable-0.42/os/darwin.c>
-        <http://developer.apple.com/documentation/Darwin/Reference/ManPages/man3/sysctl.3.html>
-
-        There's CLI but that doesn't seem to offer the access to per-process info
-        <http://developer.apple.com/documentation/Darwin/Reference/ManPages/man8/sysctl.8.html>
-
-
-
-        On HP-UX, pstat_getcommandline get you command line, but I'm not seeing any environment variables.
+    /**
+     * Implementation for Mac OS X based on sysctl(3).
      */
+    private static final class Darwin extends Unix<Darwin.DarwinSystem> {
+        protected DarwinSystem createSystem() {
+            return new DarwinSystem();
+        }
+
+        static class DarwinSystem extends Unix.UnixSystem<DarwinProcess> {
+            DarwinSystem() {
+                String arch = System.getProperty("sun.arch.data.model");
+                if ("64".equals(arch)) {
+                    sizeOf_kinfo_proc = sizeOf_kinfo_proc_64;
+                    kinfo_proc_pid_offset = kinfo_proc_pid_offset_64;
+                    kinfo_proc_ppid_offset = kinfo_proc_ppid_offset_64;
+                } else {
+                    sizeOf_kinfo_proc = sizeOf_kinfo_proc_32;
+                    kinfo_proc_pid_offset = kinfo_proc_pid_offset_32;
+                    kinfo_proc_ppid_offset = kinfo_proc_ppid_offset_32;
+                }
+                try {
+                    IntByReference _ = new IntByReference(sizeOfInt);
+                    IntByReference size = new IntByReference(sizeOfInt);
+                    Memory m;
+                    int nRetry = 0;
+                    while (true) {
+                        // find out how much memory we need to do this
+                        if (LIBC.sysctl(MIB_PROC_ALL, 3, NULL, size, NULL, _) != 0)
+                            throw new IOException("Failed to obtain memory requirement: " + LIBC.strerror(Native.getLastError()));
+
+                        // now try the real call
+                        m = new Memory(size.getValue());
+                        if (LIBC.sysctl(MIB_PROC_ALL, 3, m, size, NULL, _) != 0) {
+                            if (Native.getLastError() == ENOMEM && nRetry++ < 16)
+                                continue; // retry
+                            throw new IOException("Failed to call kern.proc.all: " + LIBC.strerror(Native.getLastError()));
+                        }
+                        break;
+                    }
+
+                    int count = size.getValue() / sizeOf_kinfo_proc;
+                    logger.debug("Found " + count + " processes");
+
+                    for (int base = 0; base < size.getValue(); base += sizeOf_kinfo_proc) {
+                        int pid = m.getInt(base + kinfo_proc_pid_offset);
+                        int ppid = m.getInt(base + kinfo_proc_ppid_offset);
+
+                        super.processes.put(pid, new DarwinProcess(this, pid, ppid));
+                    }
+                } catch (IOException e) {
+                    logger.warn("Failed to obtain process list", e);
+                }
+            }
+
+            private final int sizeOf_kinfo_proc;
+            private final int kinfo_proc_pid_offset;
+            private final int kinfo_proc_ppid_offset;
+
+        }
+
+        static class DarwinProcess extends Unix.UnixProcess<DarwinProcess> {
+            private final int pid;
+            private final int ppid;
+            private EnvVars envVars;
+            private List<String> arguments;
+
+            DarwinProcess(DarwinSystem system, int pid, int ppid) {
+                super(system);
+                this.pid = pid;
+                this.ppid = ppid;
+            }
+
+            public int getPid() {
+                return pid;
+            }
+
+            public DarwinProcess getParent() {
+                return system.get(ppid);
+            }
+
+            public synchronized EnvVars getEnvVars() {
+                if (envVars != null)
+                    return envVars;
+                parse();
+                return envVars;
+            }
+
+            public List<String> getArguments() {
+                if (arguments != null)
+                    return arguments;
+                parse();
+                return arguments;
+            }
+
+            private void parse() {
+                try {
+                    // allocate them first, so that the parse error wil result in empty data
+                    // and avoid retry.
+                    arguments = new ArrayList<String>();
+                    envVars = new EnvVars();
+
+                    IntByReference _ = new IntByReference();
+
+                    IntByReference argmaxRef = new IntByReference(0);
+                    IntByReference size = new IntByReference(sizeOfInt);
+
+                    // for some reason, I was never able to get sysctlbyname work.
+                    // if(LIBC.sysctlbyname("kern.argmax", argmaxRef.getPointer(), size, NULL, _)!=0)
+                    if (LIBC.sysctl(new int[]{CTL_KERN, KERN_ARGMAX}, 2, argmaxRef.getPointer(), size, NULL, _) != 0)
+                        throw new IOException("Failed to get kernl.argmax: " + LIBC.strerror(Native.getLastError()));
+
+                    int argmax = argmaxRef.getValue();
+
+                    class StringArrayMemory extends Memory {
+                        private long offset = 0;
+
+                        StringArrayMemory(long l) {
+                            super(l);
+                        }
+
+                        int readInt() {
+                            int r = getInt(offset);
+                            offset += sizeOfInt;
+                            return r;
+                        }
+
+                        byte peek() {
+                            return getByte(offset);
+                        }
+
+                        String readString() {
+                            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                            byte ch;
+                            while ((ch = getByte(offset++)) != '\0')
+                                baos.write(ch);
+                            return baos.toString();
+                        }
+
+                        void skip0() {
+                            // skip padding '\0's
+                            while (getByte(offset) == '\0')
+                                offset++;
+                        }
+                    }
+                    StringArrayMemory m = new StringArrayMemory(argmax);
+                    size.setValue(argmax);
+                    if (LIBC.sysctl(new int[]{CTL_KERN, KERN_PROCARGS2, pid}, 3, m, size, NULL, _) != 0)
+                        throw new IOException("Failed to obtain ken.procargs2: " + LIBC.strerror(Native.getLastError()));
+
+
+                    /*
+                    * Make a sysctl() call to get the raw argument space of the
+                        * process.  The layout is documented in start.s, which is part
+                        * of the Csu project.  In summary, it looks like:
+                        *
+                        * /---------------\ 0x00000000
+                        * :               :
+                        * :               :
+                        * |---------------|
+                        * | argc          |
+                        * |---------------|
+                        * | arg[0]        |
+                        * |---------------|
+                        * :               :
+                        * :               :
+                        * |---------------|
+                        * | arg[argc - 1] |
+                        * |---------------|
+                        * | 0             |
+                        * |---------------|
+                        * | env[0]        |
+                        * |---------------|
+                        * :               :
+                        * :               :
+                        * |---------------|
+                        * | env[n]        |
+                        * |---------------|
+                        * | 0             |
+                        * |---------------| <-- Beginning of data returned by sysctl()
+                        * | exec_path     |     is here.
+                        * |:::::::::::::::|
+                        * |               |
+                        * | String area.  |
+                        * |               |
+                        * |---------------| <-- Top of stack.
+                        * :               :
+                        * :               :
+                        * \---------------/ 0xffffffff
+                        */
+
+                    // I find the Darwin source code of the 'ps' command helpful in understanding how it does this:
+                    // see http://www.opensource.apple.com/source/adv_cmds/adv_cmds-147/ps/print.c
+                    int argc = m.readInt();
+                    String args0 = m.readString(); // exec path
+                    m.skip0();
+                    try {
+                        for (int i = 0; i < argc; i++) {
+                            arguments.add(m.readString());
+                        }
+                    } catch (IndexOutOfBoundsException e) {
+                        throw new IllegalStateException("Failed to parse arguments: pid=" + pid + ", arg0=" + args0 + ", arguments=" + arguments + ", nargs=" + argc + ". Please run 'ps e " + pid + "' and report this to https://issues.jenkins-ci.org/browse/JENKINS-9634", e);
+                    }
+
+                    // read env vars that follow
+                    while (m.peek() != 0)
+                        envVars.addLine(m.readString());
+                } catch (IOException e) {
+                    // this happens with insufficient permissions, so just ignore the problem.
+                }
+            }
+        }
+
+        // local constants
+        private static final int sizeOf_kinfo_proc_32 = 492; // on 32bit Mac OS X.
+        private static final int sizeOf_kinfo_proc_64 = 648; // on 64bit Mac OS X.
+        private static final int kinfo_proc_pid_offset_32 = 24;
+        private static final int kinfo_proc_pid_offset_64 = 40;
+        private static final int kinfo_proc_ppid_offset_32 = 416;
+        private static final int kinfo_proc_ppid_offset_64 = 560;
+        private static final int sizeOfInt = Native.getNativeSize(int.class);
+        private static final int CTL_KERN = 1;
+        private static final int KERN_PROC = 14;
+        private static final int KERN_PROC_ALL = 0;
+        private static final int ENOMEM = 12;
+        private static int[] MIB_PROC_ALL = {CTL_KERN, KERN_PROC, KERN_PROC_ALL};
+        private static final int KERN_ARGMAX = 8;
+        private static final int KERN_PROCARGS2 = 49;
+
+    }
+
 
     private static final boolean IS_LITTLE_ENDIAN = "little".equals(System.getProperty("sun.cpu.endian"));
-    private static final Logger LOGGER = Logger.getLogger(ProcessTreeKiller.class.getName());
 
     /**
      * Convert null to "".

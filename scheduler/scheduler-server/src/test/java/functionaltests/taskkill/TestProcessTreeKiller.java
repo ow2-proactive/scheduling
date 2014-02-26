@@ -339,7 +339,9 @@ public class TestProcessTreeKiller extends SchedulerConsecutive {
     public static int getProcessNumber(String executableName) throws IOException {
         int toReturn = 0;
         String line;
-        Process p = Runtime.getRuntime().exec("ps -N -U root -u root u");
+        ProcessBuilder processBuilder = new ProcessBuilder("/bin/sh", "-c", "ps -f -u $(whoami)");
+        processBuilder.redirectErrorStream();
+        Process p = processBuilder.start();
         BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
         while ((line = input.readLine()) != null) {
             if (line.contains(executableName)) {
