@@ -83,19 +83,7 @@ public class RestRuntime {
         dispatcher.registerProvider(JacksonProvider.class);
 
         loadProperties(configurationFile);
-
-        // configure the loggers
-        if (log4jConfig != null) {
-            try {
-                InputStream in = new FileInputStream(log4jConfig);
-                Properties p = new Properties();
-                p.load(in);
-                in.close();
-                PropertyConfigurator.configure(p);
-            } catch (Exception e1) {
-                LOGGER.error("Failed to read the portal's log4j file: " + log4jConfig.getAbsolutePath(), e1);
-            }
-        }
+        configureLogger(log4jConfig);
 
         if (paConfig != null && paConfig.exists()) {
             Properties p = new Properties();
@@ -125,6 +113,21 @@ public class RestRuntime {
         Thread rm = new Thread(this.rmSessionCleaner, "RM Sessions Cleaner Thread");
         rm.setDaemon(true);
         rm.start();
+    }
+
+    private void configureLogger(File log4jConfig) {
+        if (log4jConfig != null) {
+            try {
+                InputStream in = new FileInputStream(log4jConfig);
+                Properties p = new Properties();
+                p.load(in);
+                in.close();
+                System.setProperty("log4j.configuration", log4jConfig.getAbsolutePath()); // avoid reset by ProActiveLogger
+                PropertyConfigurator.configure(p);
+            } catch (Exception e1) {
+                LOGGER.error("Failed to read the portal's log4j file: " + log4jConfig.getAbsolutePath(), e1);
+            }
+        }
     }
 
     private void loadProperties(File configurationFile) {
