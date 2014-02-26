@@ -38,12 +38,11 @@ import java.security.PublicKey;
 import java.util.Collections;
 
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
-import org.ow2.proactive.resourcemanager.common.util.RMCachingProxyUserInterface;
+import org.ow2.proactive.resourcemanager.common.util.RMListenerProxy;
 import functionaltests.RMConsecutive;
 import functionaltests.RMTHelper;
 import org.junit.Test;
@@ -51,7 +50,7 @@ import org.junit.Test;
 import static junit.framework.Assert.assertNotNull;
 
 
-public class RMCachingProxyUserInterfaceTest extends RMConsecutive {
+public class RMProxyUserInterfaceTest extends RMConsecutive {
 
     private static final String EXISTING_OBJECT_NAME = "java.lang:type=Runtime";
 
@@ -59,7 +58,7 @@ public class RMCachingProxyUserInterfaceTest extends RMConsecutive {
     @Test
     public void testGetNodeMBeanInfo_DisconnectionOfRemovedNodeSource() throws Exception {
         RMTHelper helper = RMTHelper.getDefaultInstance();
-        RMCachingProxyUserInterface proxyUserInterface = createRMCachingProxyUserInterface();
+        RMListenerProxy proxyUserInterface = createRMCachingProxyUserInterface();
 
         helper.createNodeSource("NodeSource1", 1);
 
@@ -88,9 +87,9 @@ public class RMCachingProxyUserInterfaceTest extends RMConsecutive {
         helper.getResourceManager().removeNodeSource("NodeSource2", true);
     }
 
-    private RMCachingProxyUserInterface createRMCachingProxyUserInterface() throws Exception {
-        RMCachingProxyUserInterface proxyUserInterface = PAActiveObject.newActive(
-                RMCachingProxyUserInterface.class, new Object[] {});
+    private RMListenerProxy createRMCachingProxyUserInterface() throws Exception {
+        RMListenerProxy proxyUserInterface = PAActiveObject.newActive(
+                RMListenerProxy.class, new Object[] {});
         final RMAuthentication auth = RMTHelper.getDefaultInstance().getRMAuth();
         final PublicKey pubKey = auth.getPublicKey();
         final Credentials adminCreds = Credentials.createCredentials(new CredData(RMTHelper.defaultUserName,

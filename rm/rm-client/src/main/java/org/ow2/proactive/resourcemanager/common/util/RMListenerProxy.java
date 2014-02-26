@@ -59,6 +59,7 @@ import javax.security.auth.login.LoginException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
+import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.jmx.JMXClientHelper;
 import org.ow2.proactive.jmx.provider.JMXProviderUtils;
@@ -72,30 +73,39 @@ import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.resourcemanager.frontend.RMEventListener;
 import org.apache.log4j.Logger;
+import org.ow2.proactive.resourcemanager.frontend.RMGroupEventListener;
+import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 
 
 /**
- * As  {@link RMProxyUserInterface}, this class implements an active object managing a connection 
- * to the Resource Manager (a proxy to the Resource Manager).
  * This class adds a cache mechanism that maintains the {@link RMInitialState} state of the
  * remote resource manager.
  * You must init the proxy by calling the {@link #init(String, Credentials)} method
  * after having created it
  */
 @ActiveObject
-public class RMCachingProxyUserInterface extends RMProxyUserInterface implements RMEventListener {
+public class RMListenerProxy extends RMGroupEventListener {
 
-    private Logger logger = ProActiveLogger.getLogger(RMCachingProxyUserInterface.class);
+    private Logger logger = ProActiveLogger.getLogger(RMListenerProxy.class);
 
     protected RMAuthentication rmAuth;
     protected RMInitialState rmInitialState;
     protected RMEventType RMstate;
     protected Credentials credentials;
 
+    protected ResourceManager target;
+    protected JMXClientHelper jmxClient;
+
     protected JMXConnector nodeConnector;
     protected String nodeConnectorUrl;
 
     protected long counter = 0;
+
+    public boolean init(String url, CredData credData) throws RMException, KeyException, LoginException {
+        this.rmAuth = RMConnection.join(url);
+        Credentials cred = Credentials.createCredentials(credData, rmAuth.getPublicKey());
+        return init(url, cred);
+    }
 
     public boolean init(String url, Credentials credentials) throws RMException, KeyException, LoginException {
 
@@ -116,7 +126,7 @@ public class RMCachingProxyUserInterface extends RMProxyUserInterface implements
     private void checkCounter(RMEvent event) {
 
         if (counter > 0 && counter != event.getCounter() - 1) {
-            logger.warn("Missing events detected - reseting the rm state");
+            logger.warn("Missing events detected - resetting the rm state");
             logger.warn("Local event counter is " + counter + " vs. rm event counter " + event.getCounter());
             try {
                 this.target.getMonitoring().removeRMEventListener();

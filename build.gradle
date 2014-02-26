@@ -182,7 +182,7 @@ project('rm:rm-client') {
                 'org.ow2.proactive.resourcemanager.common.event.RMInitialState',
                 'org.ow2.proactive.resourcemanager.common.RMState',
                 'org.ow2.proactive.resourcemanager.common.util.RMProxyUserInterface',
-                'org.ow2.proactive.resourcemanager.common.util.RMCachingProxyUserInterface',
+                'org.ow2.proactive.resourcemanager.common.util.RMListenerProxy',
                 'org.ow2.proactive.resourcemanager.frontend.topology.pinging.HostsPinger',
                 'org.ow2.proactive.resourcemanager.frontend.topology.pinging.NodesPinger',
                 'org.ow2.proactive.resourcemanager.frontend.topology.pinging.Pinger',
