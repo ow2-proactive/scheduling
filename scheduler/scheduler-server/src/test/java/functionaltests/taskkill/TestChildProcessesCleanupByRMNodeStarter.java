@@ -2,14 +2,14 @@ package functionaltests.taskkill;
 
 
 import functionaltests.RMTHelper;
-import functionaltests.SchedulerConsecutive;
 import functionaltests.SchedulerTHelper;
 import functionaltests.TNode;
 import org.objectweb.proactive.core.process.JVMProcess;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.tests.FunctionalTest;
 
-public class TestChildProcessesCleanupByRMNodeStarter extends SchedulerConsecutive {
+public class TestChildProcessesCleanupByRMNodeStarter extends FunctionalTest {
 
     @org.junit.Test
     public void childProcessesForkedByTaskAreCleanedUpWhenRMNodeStarterIsKilled() throws Throwable {
