@@ -64,9 +64,8 @@ public class ProcessStreamReader extends Thread {
             while ((line = buffered.readLine()) != null) {
                 out.println(outputPrefix + line);
             }
-        } catch (IOException ioe) {
-            System.err.println("An error occurred while reading from stream:");
-            ioe.printStackTrace();
+        } catch (IOException ignored) {
+            // end Of Stream When Process Killed
         }
     }
 

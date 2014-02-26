@@ -133,8 +133,8 @@ project(':rest-server') {
     def functionalTestConfiguration = {
         forkEvery 1
         include 'functionaltests/**'
-        systemProperties << ['restapi.test.scheduler.home': rootDir.absolutePath]
-        systemProperties << ['restapi.test.rm.home': rootDir.absolutePath]
+        systemProperties << ['pa.scheduler.home': rootDir.absolutePath]
+        systemProperties << ['pa.rm.home': rootDir.absolutePath]
         systemProperties << ['proactive.home': rootDir.absolutePath]
         systemProperties << ['log4j.configuration': file("$rootDir/config/log4j/log4j-junit").toURL()]
         systemProperties << ['proactive.configuration': file("$rootDir/config/proactive/ProActiveConfiguration.xml")]

@@ -41,13 +41,16 @@ import java.io.FileInputStream;
 import java.net.URL;
 import java.util.Properties;
 
+import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+
 
 public class RestFuncTestConfig {
 
     public static final String RESTAPI_TEST_LOGIN = "restapi.test.login";
     public static final String RESTAPI_TEST_PASSWORD = "restapi.test.password";
-    public static final String RESTAPI_TEST_SCHEDULER_HOME = "restapi.test.scheduler.home";
-    public static final String RESTAPI_TEST_RM_HOME = "restapi.test.rm.home";
+    public static final String RESTAPI_TEST_SCHEDULER_HOME = PASchedulerProperties.SCHEDULER_HOME.getKey();
+    public static final String RESTAPI_TEST_RM_HOME = PAResourceManagerProperties.RM_HOME.getKey();
     public static final String RESTAPI_TEST_PORT = "restapi.test.port";
 
     private static final RestFuncTestConfig instance = new RestFuncTestConfig();
