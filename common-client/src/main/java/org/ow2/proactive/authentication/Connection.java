@@ -158,6 +158,8 @@ public abstract class Connection<T extends Authentication> implements Loggable, 
                 } catch (NotBoundException e) {
                     // expected NotBoundException is not printed in the log
                     leftTime = sleepOrThrow(startTime, leftTime, e);
+                } catch (IOException e) {
+                    leftTime = sleepOrThrow(startTime, leftTime, e);
                 } catch (Exception e) {
                     // unexpected Exception
                     logger.error("", e);
