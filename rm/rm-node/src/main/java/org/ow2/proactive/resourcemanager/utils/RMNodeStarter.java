@@ -36,31 +36,10 @@
  */
 package org.ow2.proactive.resourcemanager.utils;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.InetAddress;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.security.KeyException;
-import java.security.Policy;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-
-import javax.security.auth.login.LoginException;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
+import org.apache.commons.cli.*;
+import org.apache.log4j.*;
+import org.hyperic.sigar.Sigar;
+import org.hyperic.sigar.SigarLoader;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
@@ -83,25 +62,20 @@ import org.ow2.proactive.resourcemanager.nodesource.dataspace.DataSpaceNodeConfi
 import org.ow2.proactive.rm.util.process.EnvironmentCookieBasedChildProcessKiller;
 import org.ow2.proactive.utils.Formatter;
 import org.ow2.proactive.utils.Tools;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.GnuParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.Parser;
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.ConsoleAppender;
-import org.apache.log4j.Level;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PatternLayout;
-import org.apache.log4j.PropertyConfigurator;
-import org.hyperic.sigar.Sigar;
-import org.hyperic.sigar.SigarLoader;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+
+import javax.security.auth.login.LoginException;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.*;
+import java.net.InetAddress;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.security.KeyException;
+import java.security.Policy;
+import java.util.*;
 
 
 /**
@@ -172,6 +146,11 @@ public class RMNodeStarter {
     protected static boolean NB_OF_ADD_NODE_ATTEMPTS_USER_SUPPLIED = false;
     /** Name of the java property to set the number of attempts performed to add a node to the resource manager */
     protected final static String NB_OF_ADD_NODE_ATTEMPTS_PROP_NAME = "proactive.node.add.attempts";
+
+    /** The number of attempts to add the local node to the RM before quitting */
+    protected static int NB_OF_RECONNECTION_ATTEMPTS = 10;
+    /** Name of the java property to set the number of attempts performed to add a node to the resource manager */
+    protected final static String NB_OF_RECONNECTION_ATTEMPTS_PROP_NAME = "proactive.node.reconnection.attempts";
 
     /** The delay, in millis, between two attempts to add a node */
     protected static int ADD_NODE_ATTEMPTS_DELAY_IN_MS = 5000;
@@ -354,25 +333,34 @@ public class RMNodeStarter {
             if (rm != null) {
                 logger.info("Connected to the Resource Manager at " + rmURL +
                     System.getProperty("line.separator"));
-                // start pinging...
-                // ping the im to see if we are still connected
-                // if not connected just exit
-                // isActive throws an exception is not connected
-                // ping is optional, that allows other implementation
-                // of RMNodeStarter to be cached for futur use by the
-                // infrastructure manager
+
+                // NB_OF_ADD_NODE_ATTEMPTS is used here to disable pinging
                 if (PING_DELAY_IN_MS > 0 && NB_OF_ADD_NODE_ATTEMPTS > 0) {
-                    try {
-                        while (rm.nodeIsAvailable(this.getNodeURL()).getBooleanValue()) {
+                    int numberOfAttemptsLeft = NB_OF_RECONNECTION_ATTEMPTS;
+
+                    while (numberOfAttemptsLeft >= 0) {
+                        try {
+                            while (rm.nodeIsAvailable(this.getNodeURL()).getBooleanValue()) {
+                                try {
+                                    numberOfAttemptsLeft = NB_OF_RECONNECTION_ATTEMPTS;
+                                    Thread.sleep(PING_DELAY_IN_MS);
+                                } catch (InterruptedException ignored) {
+                                }
+                            }
+
+                        } catch (Throwable e) {
+                            logger.error(ExitStatus.RM_NO_PING.description, e);
+                        } finally {
                             try {
+                                logger.warn("Disconnected from the resource manager");
+                                logger.warn("Node will try to reconnect in " + PING_DELAY_IN_MS + " ms");
+                                logger.warn("Number of attempts left " + numberOfAttemptsLeft);
+
+                                numberOfAttemptsLeft--;
                                 Thread.sleep(PING_DELAY_IN_MS);
                             } catch (InterruptedException ignored) {
                             }
-                        }// while connected
-                    } catch (Throwable e) {
-                        // no more connected to the RM
-                        logger.error(ExitStatus.RM_NO_PING.description, e);
-                        System.exit(ExitStatus.RM_NO_PING.exitCode);
+                        }
                     }
 
                     // if we are here it means we lost the connection. just exit..
@@ -687,6 +675,22 @@ public class RMNodeStarter {
         } else {
             logger.debug("Using value supplied by user for the number of add node attempts: " +
                 RMNodeStarter.NB_OF_ADD_NODE_ATTEMPTS);
+        }
+
+        String numberOfReconnection = System.getProperty(RMNodeStarter.NB_OF_RECONNECTION_ATTEMPTS_PROP_NAME);
+        if (numberOfReconnection != null) {
+            try {
+                RMNodeStarter.NB_OF_RECONNECTION_ATTEMPTS = Integer.parseInt(numberOfReconnection);
+                logger.debug("Number of attempts to reconnect a node to the resource manager when connection is lost: " +
+                        RMNodeStarter.NB_OF_RECONNECTION_ATTEMPTS);
+            } catch (Exception e) {
+                logger.warn("Cannot use the value supplied by java property " +
+                        RMNodeStarter.NB_OF_RECONNECTION_ATTEMPTS_PROP_NAME + " : " + numberOfReconnection +
+                        ". Using default " + RMNodeStarter.NB_OF_RECONNECTION_ATTEMPTS);
+            }
+        } else {
+            logger.debug("Using default value for the number of reconnection attempts: " +
+                    RMNodeStarter.NB_OF_RECONNECTION_ATTEMPTS);
         }
 
         //the delay between two add node attempts
