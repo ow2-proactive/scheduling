@@ -1,19 +1,17 @@
 package functionaltests;
 
-import java.io.File;
-import java.io.Serializable;
-
+import org.junit.Assert;
+import org.junit.Test;
 import org.ow2.proactive.scheduler.common.Scheduler;
-import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobResult;
-import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.job.*;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.tests.FunctionalTest;
-import org.junit.Assert;
-import org.junit.Test;
+
+import java.io.File;
+import java.io.Serializable;
 
 
 public class TestIfTaskRestore extends FunctionalTest {
@@ -64,7 +62,13 @@ public class TestIfTaskRestore extends FunctionalTest {
                 "config/functionalTSchedulerProperties-updateDB.ini").toURI()).getAbsolutePath());
 
         Scheduler scheduler = SchedulerTHelper.getSchedulerInterface();
-        SchedulerTHelper.waitForEventJobFinished(jobId);
+
+        // after the scheduler restart job can be finished before we subscribe a listener
+        // so checking the state first
+        JobState jobState = scheduler.getJobState(jobId);
+        if (!jobState.getStatus().equals(JobStatus.FINISHED)) {
+            SchedulerTHelper.waitForEventJobFinished(jobId);
+        }
 
         JobResult jobResult = scheduler.getJobResult(jobId);
         printResultAndCheckNoErrors(jobResult);
