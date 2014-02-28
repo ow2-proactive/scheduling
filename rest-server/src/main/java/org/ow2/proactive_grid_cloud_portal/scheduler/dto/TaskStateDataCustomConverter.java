@@ -42,7 +42,6 @@ import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.dozer.DozerConverter;
 import org.dozer.Mapper;
 import org.dozer.MapperAware;
-import org.dozer.MappingException;
 
 
 public class TaskStateDataCustomConverter extends DozerConverter<Map, Map> implements MapperAware {
@@ -58,22 +57,17 @@ public class TaskStateDataCustomConverter extends DozerConverter<Map, Map> imple
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Map convertFrom(Map source, Map destination) {
         if (source == null) {
             return null;
         }
 
-        if (source instanceof Map) {
-            Map<String, TaskStateData> dest = new HashMap<String, TaskStateData>();
-            for (Map.Entry<TaskId, TaskState> entry : ((Map<TaskId, TaskState>) source).entrySet()) {
-                dest.put(entry.getKey().value(), mapper.map(entry.getValue(), TaskStateData.class));
-            }
-            return dest;
-        } else {
-            throw new MappingException("Converter TaskStateDataCustomConverter "
-              + "used incorrectly. Arguments passed in were:"
-              + destination + " and " + source);
+        Map<String, TaskStateData> converted = new HashMap<String, TaskStateData>();
+        for (Map.Entry<TaskId, TaskState> entry : ((Map<TaskId, TaskState>) source).entrySet()) {
+            converted.put(entry.getKey().value(), mapper.map(entry.getValue(), TaskStateData.class));
         }
+        return converted;
     }
 
     @Override
