@@ -49,7 +49,7 @@ import javax.management.AttributeList;
 import javax.management.ObjectName;
 
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
-import org.ow2.proactive.resourcemanager.common.util.RMCachingProxyUserInterface;
+import org.ow2.proactive.resourcemanager.common.util.RMProxyUserInterface;
 import org.ow2.proactive_grid_cloud_portal.RestTestServer;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -101,7 +101,7 @@ public class RMRestTest extends RestTestServer {
     }
 
     private JSONObject callGetStatHistory() throws Exception {
-        RMCachingProxyUserInterface rmMock = mock(RMCachingProxyUserInterface.class);
+        RMProxyUserInterface rmMock = mock(RMProxyUserInterface.class);
         String sessionId = RMSessionMapper.getInstance().add(rmMock);
 
         AttributeList value = new AttributeList(Collections.singletonList(new Attribute("test", createRrdDb()
@@ -140,7 +140,7 @@ public class RMRestTest extends RestTestServer {
 
     @Test
     public void testShutdown_NoPreemptParameter() throws Exception {
-        RMCachingProxyUserInterface rm = mock(RMCachingProxyUserInterface.class);
+        RMProxyUserInterface rm = mock(RMProxyUserInterface.class);
         when(rm.shutdown(false)).thenReturn(new BooleanWrapper(true));
 
         String sessionId = RMSessionMapper.getInstance().add(rm);
@@ -152,7 +152,7 @@ public class RMRestTest extends RestTestServer {
 
     @Test
     public void testShutdown_PreemptParameter() throws Exception {
-        RMCachingProxyUserInterface rm = mock(RMCachingProxyUserInterface.class);
+        RMProxyUserInterface rm = mock(RMProxyUserInterface.class);
         when(rm.shutdown(true)).thenReturn(new BooleanWrapper(true));
 
         String sessionId = RMSessionMapper.getInstance().add(rm);
@@ -165,7 +165,7 @@ public class RMRestTest extends RestTestServer {
     // PORTAL-326
     @Test
     public void testAddNodeOverloading() throws Exception {
-        RMCachingProxyUserInterface rm = mock(RMCachingProxyUserInterface.class);
+        RMProxyUserInterface rm = mock(RMProxyUserInterface.class);
         String sessionId = RMSessionMapper.getInstance().add(rm);
         when(rm.addNode(anyString())).thenReturn(new BooleanWrapper(true));
 

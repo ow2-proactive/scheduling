@@ -36,12 +36,12 @@
  */
 package org.ow2.proactive_grid_cloud_portal.rm;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.objectweb.proactive.api.PAActiveObject;
 import org.ow2.proactive.resourcemanager.common.util.RMProxyUserInterface;
 import org.ow2.proactive_grid_cloud_portal.common.SessionIdGenerator;
-
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 
 public class RMSessionMapper {
