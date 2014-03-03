@@ -44,6 +44,7 @@ import java.util.Map.Entry;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
+import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
@@ -126,9 +127,12 @@ public class TestWorkflowRecoveryInterrupted extends FunctionalTest {
                 "config/functionalTSchedulerProperties-updateDB.ini").toURI()).getAbsolutePath());
         SchedulerTHelper.getSchedulerInterface();
 
-        SchedulerTHelper.getSchedulerInterface().getJobState(id);
-
-        SchedulerTHelper.waitForEventJobFinished(id);
+        // after the scheduler restart job can be finished before we subscribe a listener
+        // so checking the state first
+        JobState jobState = SchedulerTHelper.getSchedulerInterface().getJobState(id);
+        if (!jobState.getStatus().equals(JobStatus.FINISHED)) {
+            SchedulerTHelper.waitForEventJobFinished(id);
+        }
         SchedulerTHelper.log("Job finished: " + path);
 
         expectedResults = new HashMap<String, Long>();

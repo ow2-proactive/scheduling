@@ -4,9 +4,7 @@ import java.io.File;
 import java.io.Serializable;
 
 import org.ow2.proactive.scheduler.common.Scheduler;
-import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobResult;
-import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.job.*;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
@@ -52,7 +50,12 @@ public class TestReplicateTaskRestore2 extends FunctionalTest {
 
         Scheduler scheduler = SchedulerTHelper.getSchedulerInterface();
 
-        SchedulerTHelper.waitForEventJobFinished(jobId);
+        // after the scheduler restart job can be finished before we subscribe a listener
+        // so checking the state first
+        JobState jobState = scheduler.getJobState(jobId);
+        if (!jobState.getStatus().equals(JobStatus.FINISHED)) {
+            SchedulerTHelper.waitForEventJobFinished(jobId);
+        }
 
         System.out.println("Job finished");
 
