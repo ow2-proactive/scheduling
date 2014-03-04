@@ -309,7 +309,7 @@ project('scheduler:scheduler-node') {
     }
 
 
-    task oneJar(type: OneJar) {
+    task standaloneJar(type: OneJar) {
         mainClass = 'org.ow2.proactive.resourcemanager.utils.RMNodeStarter'
         binLib = fileTree(dir: "${rootDir}/lib/node/", exclude: "**/*.jar")
         additionalDir = file('src/main/resources')
@@ -318,9 +318,9 @@ project('scheduler:scheduler-node') {
             attributes 'One-Jar-Expand': 'lib,binlib,main' // expand jars for subprocesses (forked tasks)
         }
     }
-    build.dependsOn oneJar
+    build.dependsOn standaloneJar
     artifacts {
-        archives oneJar
+        archives standaloneJar
     }
 }
 
