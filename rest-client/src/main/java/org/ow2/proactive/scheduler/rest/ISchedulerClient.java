@@ -64,6 +64,22 @@ public interface ISchedulerClient extends Scheduler {
      */
     public void init(String url, String login, String password)
             throws Exception;
+    
+    /**
+     * Sets the session identifier explicitly.
+     * 
+     * @param sid session identifier
+     */
+    public void setSession(String sid);
+    
+    
+    /**
+     * Retrieves the current session identifier.
+     * 
+     * @return the current session identifier
+     */
+    public String getSession();
+        
 
     /**
      * Returns <tt>true</tt>, if the scheduler has finished the execution of the

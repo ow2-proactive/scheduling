@@ -1,3 +1,21 @@
+def functionalTestConfiguration = {
+    forkEvery 1
+    include 'functionaltests/**'
+    systemProperties << ['pa.scheduler.home': rootDir.absolutePath]
+    systemProperties << ['pa.rm.home': rootDir.absolutePath]
+    systemProperties << ['proactive.home': rootDir.absolutePath]
+    systemProperties << ['log4j.configuration': file("$rootDir/config/log4j/log4j-junit").toURL()]
+    systemProperties << ['proactive.configuration': file("$rootDir/config/proactive/ProActiveConfiguration.xml")]
+    systemProperties << ['java.security.policy': file("$rootDir/config/security.java.policy-server").absolutePath]
+    systemProperties << ['proactive.runtime.ping': false]
+    testLogging {
+        exceptionFormat = 'full'
+    }
+    beforeTest { descriptor ->
+        logger.lifecycle("Running: " + descriptor)
+    }
+}
+
 buildscript {
     repositories {
         mavenLocal()
@@ -17,6 +35,7 @@ buildscript {
 subprojects {
     apply plugin: 'java'
     apply plugin: 'maven'
+    apply plugin: 'eclipse'
 
     group = 'org.ow2.proactive_grid_cloud_portal'
     version = '1.5.0-SNAPSHOT'
@@ -35,6 +54,12 @@ subprojects {
             }
         }
     }
+
+    task dependencies(type: Copy) {
+	from configurations.testCompile
+        into file("$buildDir/dependencies")
+    }
+    
 }
 
 project(':rest-api') {
@@ -130,24 +155,6 @@ project(':rest-server') {
         }
     }
 
-    def functionalTestConfiguration = {
-        forkEvery 1
-        include 'functionaltests/**'
-        systemProperties << ['pa.scheduler.home': rootDir.absolutePath]
-        systemProperties << ['pa.rm.home': rootDir.absolutePath]
-        systemProperties << ['proactive.home': rootDir.absolutePath]
-        systemProperties << ['log4j.configuration': file("$rootDir/config/log4j/log4j-junit").toURL()]
-        systemProperties << ['proactive.configuration': file("$rootDir/config/proactive/ProActiveConfiguration.xml")]
-        systemProperties << ['java.security.policy': file("$rootDir/config/security.java.policy-server").absolutePath]
-        systemProperties << ['proactive.runtime.ping': false]
-        testLogging {
-            exceptionFormat = 'full'
-        }
-        beforeTest { descriptor ->
-            logger.lifecycle("Running: " + descriptor)
-        }
-    }
-
     test {
         exclude 'functionaltests/**'
     }
@@ -158,6 +165,7 @@ project(':rest-server') {
         from configurations.testCompile
         into file("$rootDir/dist/lib")
     }
+
     functionalTest.dependsOn proActiveLibs
     clean.dependsOn cleanProActiveLibs
 }
@@ -206,5 +214,26 @@ project(':rest-client') {
 
 	
         compile project(':rest-cli')
+
+        testCompile 'junit:junit:4.11'
+        testCompile 'org.mockito:mockito-core:1.9.5'
+        testCompile 'com.googlecode.json-simple:json-simple:1.1'
+        testCompile 'org.ow2.proactive:rm-server:3.5.0-SNAPSHOT'
+        testCompile 'org.ow2.proactive:scheduler-server:3.5.0-SNAPSHOT'
+        testCompile 'org.apache.httpcomponents:httpmime:4.2.1'
+        testCompile 'org.jboss.resteasy:tjws:2.3.3.Final'
+        testCompile 'org.fusesource:sigar:1.6.4'
+
+        testCompile project(':rest-server')
+        testCompile project(':rest-server').sourceSets.test.output
     }
+
+    test {
+        exclude 'functionaltests/**'
+    }
+
+    task('functionalTest', type:Test).configure functionalTestConfiguration
+
+    functionalTest.dependsOn project(':rest-server').proActiveLibs
+    clean.dependsOn project(':rest-server').cleanProActiveLibs
 }

@@ -43,7 +43,9 @@ import java.lang.reflect.Proxy;
 import java.net.HttpURLConnection;
 import java.net.URLEncoder;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.ProcessingException;
+import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.GenericEntity;
@@ -52,10 +54,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
 
-import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
-import org.ow2.proactive_grid_cloud_portal.common.exceptionmapper.ExceptionToJson;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.jboss.resteasy.client.jaxrs.ClientHttpEngine;
@@ -64,6 +62,10 @@ import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataOutput;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
+import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
+import org.ow2.proactive_grid_cloud_portal.common.exceptionmapper.ExceptionToJson;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
 
 public class SchedulerRestClient {
 
@@ -240,8 +242,9 @@ public class SchedulerRestClient {
     
 
     @Provider
+    @Consumes({MediaType.APPLICATION_JSON, "text/json"})
+    @Produces({MediaType.APPLICATION_JSON, "text/json"})
     public static class JacksonContextResolver implements ContextResolver<ObjectMapper> {
-
         public ObjectMapper getContext(Class<?> objectType) {
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);

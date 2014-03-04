@@ -759,7 +759,7 @@ public interface SchedulerRestInterface {
      * @return true if the user connected to a Scheduler, false otherwise.
      * @throws NotConnectedRestException
      */
-    @PUT
+    @GET
     @Path("isconnected")
     @Produces("application/json")
     public abstract boolean isConnected(@HeaderParam("sessionid")

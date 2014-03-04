@@ -55,7 +55,6 @@ public abstract class ClientBase implements ISchedulerClient {
             SchedulerEvent... arg2) throws NotConnectedException,
             PermissionException {
         throw newUnsupportedOperationException();
-
     }
 
     @Override

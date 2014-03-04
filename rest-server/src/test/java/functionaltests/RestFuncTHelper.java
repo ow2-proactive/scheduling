@@ -109,6 +109,8 @@ public class RestFuncTHelper {
     private static final long defaultNodeTimeout = 20 * 1000;
 
     private static int port = -1;
+    
+    private static String restServerUrl;
 
     private static String restfulSchedulerUrl;
 
@@ -311,7 +313,8 @@ public class RestFuncTHelper {
         restRuntime.start(dispatcher.getProviderFactory(), getdefaultPortalPropertiesPathname(), null, null);
         dispatcher.getRegistry().addPerRequestResource(SchedulerStateRest.class);
 
-        restfulSchedulerUrl = String.format("http://localhost:%d/scheduler/", serverPort);
+        restServerUrl = String.format("http://localhost:%d", serverPort);
+        restfulSchedulerUrl = String.format("%s/scheduler/", restServerUrl);
     }
 
     public static void stopEmbeddedServer() {
@@ -330,12 +333,14 @@ public class RestFuncTHelper {
 
     public static int getPort() throws Exception {
         if (port == -1) {
-            String portProperty = RestFuncTestConfig.getInstance().getProperty(
+            RestFuncTestConfig config = RestFuncTestConfig.getInstance();
+            String portProperty = config.getProperty(
                     RestFuncTestConfig.RESTAPI_TEST_PORT);
             if (portProperty != null && portProperty.length() != 0) {
                 port = Integer.parseInt(portProperty);
             } else {
                 port = RestFuncTUtils.findFreePort();
+                config.setProperty(RestFuncTestConfig.RESTAPI_TEST_PORT, Integer.toString(port));
             }
         }
         return port;
@@ -406,6 +411,10 @@ public class RestFuncTHelper {
         return classpath.toString();
     }
 
+    public static String getRestServerUrl() {
+        return restServerUrl;
+    }
+    
     public static String getRestfulSchedulerUrl() {
         return restfulSchedulerUrl;
     }

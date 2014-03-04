@@ -62,7 +62,7 @@ public class SessionHandler implements InvocationHandler {
                 client.renewSession();
                 return method.invoke(client, args);
             } else {
-                throw e;
+                throw error;
             }
         }
     }

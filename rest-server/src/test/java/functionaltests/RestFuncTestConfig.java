@@ -85,6 +85,10 @@ public class RestFuncTestConfig {
         return props.getProperty(RESTAPI_TEST_PASSWORD);
     }
 
+    public String setProperty(String key, String value) {
+        return (String) props.setProperty(key, value);
+    }
+    
     public String getProperty(String key) {
         return props.getProperty(key);
     }

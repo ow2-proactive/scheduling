@@ -235,7 +235,7 @@ public abstract class AbstractRestFuncTestCase {
         return jobId.value();
     }
 
-    private Job defaultJob() throws Exception {
+    protected Job defaultJob() throws Exception {
         TaskFlowJob job = new TaskFlowJob();
         job.setName("Test-Job");
         job.setPriority(JobPriority.NORMAL);
@@ -258,7 +258,7 @@ public abstract class AbstractRestFuncTestCase {
         return job;
     }
 
-    private Job pendingJob() throws Exception {
+    protected Job pendingJob() throws Exception {
         TaskFlowJob job = new TaskFlowJob();
         job.setName("Nonterminating-Job");
         job.setPriority(JobPriority.NORMAL);
