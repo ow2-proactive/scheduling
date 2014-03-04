@@ -540,3 +540,19 @@ task schedulerJar(type: Jar) {
         }
     }
 }
+
+task staticFiles(type: Zip) {
+    from "."
+    include "config/**", "bin/**", "samples/**", "addons/**", "LICENSE*", "README*"
+    classifier "static"
+}
+
+task customLibs(type: Zip) {
+    from "lib/node/winp", "lib/node/sigar"
+    classifier "libs"
+}
+
+artifacts {
+    archives staticFiles, customLibs
+}
+
