@@ -34,8 +34,10 @@
  */
 package org.ow2.proactive.scheduler.rest;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -698,9 +700,10 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     public boolean pushFile(String spacename, String pathname, String filename, String file)
             throws NotConnectedException, PermissionException {
         boolean uploaded = false;
+        FileInputStream inputStream = null;
         try {
-            FileInputStream is = new FileInputStream(file);
-            uploaded = restApiClient().pushFile(sid, spacename, pathname, filename, is);
+            inputStream = new FileInputStream(file);
+            uploaded = restApiClient().pushFile(sid, spacename, pathname, filename, inputStream);
         } catch (Exception e) {
             throwNCEOrPE(e);
         }
@@ -710,22 +713,17 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     @Override
     public void pullFile(String space, String pathname, String outputFile) throws NotConnectedException,
             PermissionException {
-        OutputStream os = null;
+        InputStream inputStream = null;
+        OutputStream outputStream = null;
         try {
-            prepareToWrite(outputFile);
-            os = new FileOutputStream(outputFile);
-            InputStream is = restApi().pullFile(sid, space, pathname);
-            copy(is, os);
+            outputStream = prepareToWrite(outputFile);
+            inputStream = restApi().pullFile(sid, space, pathname);
+            copy(inputStream, outputStream);
         } catch (Exception e) {
             throwNCEOrPE(e);
         } finally {
-            if (os != null) {
-                try {
-                    os.close();
-                } catch (IOException ioe) {
-                    // ignore
-                }
-            }
+            closeIfPossible(outputStream);
+            closeIfPossible(inputStream);
         }
     }
 
@@ -745,8 +743,19 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         try {
             sid = restApi().login(login, password);
         } catch (Exception e) {
+            e.printStackTrace(System.out);
             throw new RuntimeException(e);
         }
+    }
+    
+    @Override
+    public void setSession(String sid) {
+        this.sid = sid;        
+    }
+
+    @Override
+    public String getSession() {
+        return sid;
     }
 
     private void sleep(long millis) {
@@ -757,7 +766,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         }
     }
 
-    private static void prepareToWrite(String pathname) {
+    private OutputStream prepareToWrite(String pathname) throws FileNotFoundException {
         File outputFile = new File(pathname);
         if (outputFile.exists()) {
             if (!outputFile.delete()) {
@@ -772,6 +781,17 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
             if (!parentFile.mkdirs()) {
                 throw new RuntimeException("Cannot create non-existent paraent directories of the output file: "
                         + pathname);
+            }
+        }
+        return new FileOutputStream(outputFile);
+    }
+    
+    private void closeIfPossible(Closeable closeable) {
+        if (closeable != null) {
+            try {
+                closeable.close();
+            } catch (IOException ioe) {
+                // ignore
             }
         }
     }
