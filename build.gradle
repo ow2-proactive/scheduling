@@ -473,7 +473,9 @@ project('performance') {
 }
 
 task proActiveLibs(type: Sync) {
-    def projectsToCopy = subprojects - project('performance')
+    def docProjects = ['Resourcing', 'Scheduling', 'MapReduce']
+    def excludedProjects = docProjects + ['performance', 'scheduling']
+    def projectsToCopy = javaSubprojects.findAll { !(it.name in excludedProjects) }
     // only copy once each runtime dependency (faster)
     def runtimeDeps = projectsToCopy.collect { it.configurations.runtime.files }.flatten() as Set
     from runtimeDeps
