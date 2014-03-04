@@ -23,7 +23,6 @@ buildscript {
 
 allprojects {
     apply plugin: 'maven'
-    apply plugin: 'java'
 
     group = 'org.ow2.proactive'
     version = '3.5.0-SNAPSHOT'
@@ -39,7 +38,10 @@ allprojects {
         }
     }
 }
-subprojects {
+
+ext.javaSubprojects = subprojects.findAll { new File(it.projectDir, "src").exists() }
+
+configure(javaSubprojects) {
     apply plugin: 'java'
 
     rootProject.buildscript.repositories.each {
@@ -485,6 +487,7 @@ task proActiveLibs(type: Sync) {
     into file("dist/lib")
 }
 defaultTasks 'proActiveLibs'
+task build
 build.dependsOn 'proActiveLibs'
 subprojects {
     tasks.withType(Test).matching { it.name == 'functionalTest' }*.dependsOn proActiveLibs
@@ -515,7 +518,7 @@ task resourceManagerJar(type: Jar) {
 }
 
 task schedulerJar(type: Jar) {
-    subprojects.each {
+    javaSubprojects.each {
         from zipTree(it.jar.outputs.files.singleFile)
     }
 

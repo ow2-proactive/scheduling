@@ -16,8 +16,8 @@ subprojects {
     }
 
     task javaDocComplete(type: Javadoc) {
-        source = rootProject.subprojects.sourceSets.main.allJava
-        classpath = files(rootProject.subprojects.sourceSets.main.compileClasspath)
+        source = rootProject.javaSubprojects.sourceSets.main.allJava
+        classpath = files(rootProject.javaSubprojects.sourceSets.main.compileClasspath)
         destinationDir = file("${project.buildDir}/doc//built/api_complete")
 
         configure commonJavaDocOptions
@@ -25,8 +25,8 @@ subprojects {
 
     task javaDocPublished(type: Javadoc) {
         // filter source files with annotation @PublicApi
-        source = rootProject.subprojects.sourceSets.main.allJava*.filter { it.text.contains('@PublicAPI') }
-        classpath = files(rootProject.subprojects.sourceSets.main.compileClasspath)
+        source = rootProject.javaSubprojects.sourceSets.main.allJava*.filter { it.text.contains('@PublicAPI') }
+        classpath = files(rootProject.javaSubprojects.sourceSets.main.compileClasspath)
         destinationDir = file("${project.buildDir}/doc//built/api_published")
 
         configure commonJavaDocOptions
