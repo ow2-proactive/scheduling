@@ -93,8 +93,13 @@ public class TestWorkflowRecoveryInterrupted extends FunctionalTest {
 
         SchedulerTHelper.getSchedulerInterface().getJobState(id);
 
-        SchedulerTHelper.waitForEventJobFinished(id);
-        SchedulerTHelper.log("Job finished: " + path);
+        // after the scheduler restart job can be finished before we subscribe a listener
+        // so checking the state first
+        JobState jobState = SchedulerTHelper.getSchedulerInterface().getJobState(id);
+        if (!jobState.getStatus().equals(JobStatus.FINISHED)) {
+            SchedulerTHelper.waitForEventJobFinished(id);
+        }
+        SchedulerTHelper.log("Job finished: " + id);
 
         Map<String, Long> expectedResults = new HashMap<String, Long>();
         for (int j = 0; j < job_1.length; j++) {
@@ -129,7 +134,7 @@ public class TestWorkflowRecoveryInterrupted extends FunctionalTest {
 
         // after the scheduler restart job can be finished before we subscribe a listener
         // so checking the state first
-        JobState jobState = SchedulerTHelper.getSchedulerInterface().getJobState(id);
+        jobState = SchedulerTHelper.getSchedulerInterface().getJobState(id);
         if (!jobState.getStatus().equals(JobStatus.FINISHED)) {
             SchedulerTHelper.waitForEventJobFinished(id);
         }
