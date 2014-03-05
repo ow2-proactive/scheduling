@@ -304,12 +304,11 @@ project('scheduler:scheduler-node') {
         // TODO add all protocols
 
         runtime fileTree(dir: "${rootDir}/lib/node/winp/", exclude: "*.jar")
-
-        task stub(type: StubTask) {
-            classes = ['org.ow2.proactive.scheduler.common.TaskTerminateNotification']
-        }
     }
 
+    task stub(type: StubTask) {
+        classes = ['org.ow2.proactive.scheduler.common.TaskTerminateNotification']
+    }
 
     task standaloneJar(type: OneJar) {
         mainClass = 'org.ow2.proactive.resourcemanager.utils.RMNodeStarter'
