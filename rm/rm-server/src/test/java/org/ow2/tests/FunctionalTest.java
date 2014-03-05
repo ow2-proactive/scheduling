@@ -110,14 +110,14 @@ public class FunctionalTest extends ProActiveTest {
 
         // Ensure that the host will eventually be cleaned
         System.err.println("Arming timer " + timeout);
-        TimerTask tt = new MyTimerTask(isConsecutive);
+        TimerTask tt = new MyTimerTask();
         if (timerTask.compareAndSet(null, tt)) {
-            timer.schedule(new MyTimerTask(isConsecutive), timeout);
+            timer.schedule(new MyTimerTask(), timeout);
         } else {
             throw new IllegalStateException("timer task should be null");
         }
 
-        shutdownHook = new MyShutdownHook(isConsecutive);
+        shutdownHook = new MyShutdownHook();
         Runtime.getRuntime().addShutdownHook(shutdownHook);
 
         // Should be final and initialized in a static block but we can't since
@@ -186,21 +186,13 @@ public class FunctionalTest extends ProActiveTest {
 
     static private class MyShutdownHook extends Thread {
 
-        private boolean cleanAfterTest = true;
-
-        public MyShutdownHook(boolean cleanAfterTest) {
-            this.cleanAfterTest = cleanAfterTest;
-        }
-
         @Override
         public void run() {
             System.err.println("Shutdown hook. Killing remaining processes");
             try {
                 timer.cancel();
-                if (cleanAfterTest) {
-                    paSetup.shutdown();
-                    cleaner.killAliveProcesses();
-                }
+                paSetup.shutdown();
+                cleaner.killAliveProcesses();
             } catch (Exception e) {
                 logger.error("Failed to kill remaining proccesses", e);
             }
@@ -208,27 +200,17 @@ public class FunctionalTest extends ProActiveTest {
     }
 
     static private class MyTimerTask extends SafeTimerTask {
-        private boolean cleanAfterTest = true;
-
-        public MyTimerTask(boolean cleanAfterTest) {
-            this.cleanAfterTest = cleanAfterTest;
-        }
-
         @Override
         public void safeRun() {
             System.err.println("Timeout reached. Killing remaining processes");
             System.err.println("Dumping thread states before killing processes");
             printAllThreadsStackTraces(System.err);
-            if (cleanAfterTest) {
-                try {
-                    cleaner.killAliveProcesses();
-                    System.err.println("Killing current JVM");
-                    System.exit(-42);
-                } catch (Exception e) {
-                    logger.error("Failed to kill remaining proccesses", e);
-                }
-            } else {
-                System.exit(0);
+            try {
+                cleaner.killAliveProcesses();
+                System.err.println("Killing current JVM");
+                System.exit(-42);
+            } catch (Exception e) {
+                logger.error("Failed to kill remaining proccesses", e);
             }
         }
 
