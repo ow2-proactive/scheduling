@@ -39,11 +39,8 @@ package functionaltests;
 import java.io.File;
 import java.net.URL;
 
-import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
-import org.ow2.proactive.scheduler.common.job.JobState;
-import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.tests.FunctionalTest;
 import junit.framework.Assert;
 
@@ -90,21 +87,11 @@ public class TestJobRecover extends FunctionalTest {
         SchedulerTHelper.killAndRestartScheduler(new File(SchedulerTHelper.class.getResource(
                 "config/functionalTSchedulerProperties-updateDB.ini").toURI()).getAbsolutePath());
 
-        Scheduler scheduler = SchedulerTHelper.getSchedulerInterface();
+        SchedulerTHelper.log("Waiting for job 2 to finish");
+        SchedulerTHelper.waitForEventJobFinished(idJ2);
 
-        // after the scheduler restart job can be finished before we subscribe a listener
-        // so checking the state first
-        JobState jobState = scheduler.getJobState(idJ2);
-        if (!jobState.getStatus().equals(JobStatus.FINISHED)) {
-            SchedulerTHelper.log("Waiting for job 2 to finish");
-            SchedulerTHelper.waitForEventJobFinished(idJ2);
-        }
-
-        jobState = scheduler.getJobState(idJ3);
-        if (!jobState.getStatus().equals(JobStatus.FINISHED)) {
-            SchedulerTHelper.log("Waiting for job 3 to finish");
-            SchedulerTHelper.waitForFinishedJob(idJ3);
-        }
+        SchedulerTHelper.log("Waiting for job 3 to finish");
+        SchedulerTHelper.waitForFinishedJob(idJ3);
 
         SchedulerTHelper.log("check result job 1");
         JobResult result = SchedulerTHelper.getJobResult(idJ1);

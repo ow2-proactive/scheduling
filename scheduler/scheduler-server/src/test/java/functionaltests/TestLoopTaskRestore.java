@@ -54,12 +54,7 @@ public class TestLoopTaskRestore extends FunctionalTest {
 
         Scheduler scheduler = SchedulerTHelper.getSchedulerInterface();
 
-        // after the scheduler restart job can be finished before we subscribe a listener
-        // so checking the state first
-        JobState jobState = scheduler.getJobState(jobId);
-        if (!jobState.getStatus().equals(JobStatus.FINISHED)) {
-            SchedulerTHelper.waitForEventJobFinished(jobId);
-        }
+        SchedulerTHelper.waitForEventJobFinished(jobId);
 
         System.out.println("Job finished");
 

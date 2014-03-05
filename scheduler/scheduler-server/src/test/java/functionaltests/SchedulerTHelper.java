@@ -36,11 +36,14 @@
  */
 package functionaltests;
 
-import functionaltests.common.CommonTUtils;
-import functionaltests.common.InputStreamReaderThread;
-import functionaltests.monitor.MonitorEventReceiver;
-import functionaltests.monitor.SchedulerMonitorsHandler;
-import org.junit.Assert;
+import java.io.File;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
@@ -52,21 +55,36 @@ import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
-import org.ow2.proactive.scheduler.common.*;
+import org.ow2.proactive.scheduler.common.Scheduler;
+import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
+import org.ow2.proactive.scheduler.common.SchedulerConnection;
+import org.ow2.proactive.scheduler.common.SchedulerConstants;
+import org.ow2.proactive.scheduler.common.SchedulerEvent;
+import org.ow2.proactive.scheduler.common.SchedulerState;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
-import org.ow2.proactive.scheduler.common.job.*;
+import org.ow2.proactive.scheduler.common.job.Job;
+import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobInfo;
+import org.ow2.proactive.scheduler.common.job.JobResult;
+import org.ow2.proactive.scheduler.common.job.JobState;
+import org.ow2.proactive.scheduler.common.job.JobStatus;
+import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
-import org.ow2.proactive.scheduler.common.task.*;
+import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
+import org.ow2.proactive.scheduler.common.task.JavaTask;
+import org.ow2.proactive.scheduler.common.task.NativeTask;
+import org.ow2.proactive.scheduler.common.task.Task;
+import org.ow2.proactive.scheduler.common.task.TaskInfo;
+import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.utils.FileUtils;
+import org.junit.Assert;
 
-import java.io.File;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import functionaltests.common.CommonTUtils;
+import functionaltests.common.InputStreamReaderThread;
+import functionaltests.monitor.MonitorEventReceiver;
+import functionaltests.monitor.SchedulerMonitorsHandler;
 
 
 /**
@@ -126,8 +144,6 @@ public class SchedulerTHelper {
 
     private static Process schedulerProcess;
 
-    protected static final String VAR_OS = "os";
-
     protected static SchedulerAuthenticationInterface schedulerAuth;
 
     protected static Scheduler adminSchedInterface;
@@ -186,11 +202,6 @@ public class SchedulerTHelper {
 
     /**
      * Same as startScheduler but allows to specify a file holding rm properties
-     * @param localnodes
-     * @param schedPropertiesFilePath
-     *
-     *
-     *
      *
      * @throws Exception
      */
@@ -331,19 +342,6 @@ public class SchedulerTHelper {
     }
 
     /**
-     * Kill and restart the scheduler using a forked JVM.
-     * Scheduler is restarted with not test configuration properties file
-     * and 5 local ProActive nodes.
-     *
-     * WARNING : User or administrator interface is not reconnected automatically.
-     *
-     * @throws Exception if an error occurs
-     */
-    public static void killAndRestartScheduler() throws Exception {
-        killAndRestartScheduler(null);
-    }
-
-    /**
      * Restart the scheduler using a forked JVM.
      * User or administrator interface is not reconnected automatically.
      *
@@ -358,7 +356,6 @@ public class SchedulerTHelper {
 
     /**
      * Log a String on console.
-     * @param s
      */
     public static void log(String s) {
         System.out.println("------------------------------ " + s);
@@ -371,7 +368,6 @@ public class SchedulerTHelper {
     /**
      * Return Scheduler authentication interface. Start Scheduler with test
      * configuration file, if scheduler is not yet started.
-     * @return
      * @throws Exception
      */
     public static SchedulerAuthenticationInterface getSchedulerAuth() throws Exception {
@@ -437,7 +433,6 @@ public class SchedulerTHelper {
     /**
      * Creates a job from an XML job descriptor, submit it, and return immediately.
      * connect as user if needed (if not yet connected as user).
-     * @param jobDescPath
      * @return JobId the job's identifier corresponding to submission.
      * @throws Exception if an error occurs at job creation/submission.
      */
@@ -448,7 +443,6 @@ public class SchedulerTHelper {
     /**
      * Creates a job from an XML job descriptor, submit it, and return immediately.
      * connect as user if needed (if not yet connected as user).
-     * @param jobDescPath
      * @param user Type of user
      * @return JobId the job's identifier corresponding to submission.
      * @throws Exception if an error occurs at job creation/submission.
@@ -461,7 +455,6 @@ public class SchedulerTHelper {
     /**
      * Creates a job from an XML job descriptor, submit it, and return immediately.
      * connect as user if needed (if not yet connected as user).
-     * @param jobDescPath
      * @param mode true if forked mode
      * @return JobId the job's identifier corresponding to submission.
      * @throws Exception if an error occurs at job creation/submission.
@@ -473,7 +466,6 @@ public class SchedulerTHelper {
     /**
      * Creates a job from an XML job descriptor, submit it, and return immediately.
      * connect as user if needed (if not yet connected as user).
-     * @param jobDescPath
      * @param mode true if forked mode
      * @param user Type of user
      * @return JobId the job's identifier corresponding to submission.
@@ -918,12 +910,13 @@ public class SchedulerTHelper {
      * If corresponding event has been already thrown by scheduler, returns immediately
      * with jobInfo object associated to event, otherwise wait for reception
      * of the corresponding event.
+     * If job is already finished, return immediately.
      * @param id job identifier, for which event is waited for.
      * @return JobInfo event's associated object.
      */
-    public static JobInfo waitForEventJobFinished(JobId id) {
+    public static JobInfo waitForEventJobFinished(JobId id) throws Exception {
         try {
-            return waitForEventJobFinished(id, 0);
+            return waitForJobEvent(id, 0, JobStatus.FINISHED, SchedulerEvent.JOB_RUNNING_TO_FINISHED);
         } catch (ProActiveTimeoutException e) {
             //unreachable block, 0 means infinite, no timeout
             //log sthing ?
@@ -942,8 +935,25 @@ public class SchedulerTHelper {
      * @return JobInfo event's associated object.
      * @throws ProActiveTimeoutException if timeout is reached.
      */
-    public static JobInfo waitForEventJobFinished(JobId id, long timeout) throws ProActiveTimeoutException {
-        return getMonitorsHandler().waitForEventJob(SchedulerEvent.JOB_RUNNING_TO_FINISHED, id, timeout);
+    public static JobInfo waitForEventJobFinished(JobId id, long timeout) throws Exception {
+        return waitForJobEvent(id, timeout, JobStatus.FINISHED, SchedulerEvent.JOB_RUNNING_TO_FINISHED);
+    }
+
+    private static JobInfo waitForJobEvent(JobId id, long timeout,
+      JobStatus jobStatusAfterEvent, SchedulerEvent jobEvent) throws Exception {
+        JobState jobState = getSchedulerInterface().getJobState(id);
+        if (jobState.getStatus().equals(jobStatusAfterEvent)) {
+            return jobState.getJobInfo();
+        } else {
+            try {
+                return getMonitorsHandler().waitForEventJob(jobEvent, id,
+                  timeout);
+            } catch (ProActiveTimeoutException e) {
+                //unreachable block, 0 means infinite, no timeout
+                //log something ?
+                return null;
+            }
+        }
     }
 
     public static JobInfo waitForEventPendingJobFinished(JobId id, long timeout)
@@ -1174,10 +1184,10 @@ public class SchedulerTHelper {
              * 	(shared instance between event receiver and static helpers).
             */
             MonitorEventReceiver passiveEventReceiver = new MonitorEventReceiver(mHandler);
-            eventReceiver = (MonitorEventReceiver) PAActiveObject.turnActive(passiveEventReceiver);
+            eventReceiver = PAActiveObject.turnActive(passiveEventReceiver);
 
         }
-        SchedulerState state = schedInt.addEventListener((SchedulerEventListener) eventReceiver, true, true);
+        SchedulerState state = schedInt.addEventListener(eventReceiver, true, true);
         mHandler.init(state);
     }
 
@@ -1240,12 +1250,12 @@ public class SchedulerTHelper {
         if (TaskFlowJob.class.isAssignableFrom(job.getClass())) {
             for (Task task : ((TaskFlowJob) job).getTasks()) {
                 if (JavaTask.class.isAssignableFrom(task.getClass())) {
-                    if (!((JavaTask) task).isRunAsMe()) {
-                        ((JavaTask) task).setRunAsMe(true);
+                    if (!task.isRunAsMe()) {
+                        task.setRunAsMe(true);
                     }
                 } else if (NativeTask.class.isAssignableFrom(task.getClass())) {
-                    if (!((NativeTask) task).isRunAsMe()) {
-                        ((NativeTask) task).setRunAsMe(true);
+                    if (!task.isRunAsMe()) {
+                        task.setRunAsMe(true);
                     }
                 }
             }

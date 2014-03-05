@@ -44,13 +44,13 @@ import java.util.Map.Entry;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
-import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.tests.FunctionalTest;
-import functionaltests.SchedulerTHelper;
 import org.junit.Assert;
+
+import functionaltests.SchedulerTHelper;
 
 
 /**
@@ -93,12 +93,7 @@ public class TestWorkflowRecoveryInterrupted extends FunctionalTest {
 
         SchedulerTHelper.getSchedulerInterface().getJobState(id);
 
-        // after the scheduler restart job can be finished before we subscribe a listener
-        // so checking the state first
-        JobState jobState = SchedulerTHelper.getSchedulerInterface().getJobState(id);
-        if (!jobState.getStatus().equals(JobStatus.FINISHED)) {
-            SchedulerTHelper.waitForEventJobFinished(id);
-        }
+        SchedulerTHelper.waitForEventJobFinished(id);
         SchedulerTHelper.log("Job finished: " + id);
 
         Map<String, Long> expectedResults = new HashMap<String, Long>();
@@ -132,12 +127,7 @@ public class TestWorkflowRecoveryInterrupted extends FunctionalTest {
                 "config/functionalTSchedulerProperties-updateDB.ini").toURI()).getAbsolutePath());
         SchedulerTHelper.getSchedulerInterface();
 
-        // after the scheduler restart job can be finished before we subscribe a listener
-        // so checking the state first
-        jobState = SchedulerTHelper.getSchedulerInterface().getJobState(id);
-        if (!jobState.getStatus().equals(JobStatus.FINISHED)) {
-            SchedulerTHelper.waitForEventJobFinished(id);
-        }
+        SchedulerTHelper.waitForEventJobFinished(id);
         SchedulerTHelper.log("Job finished: " + path);
 
         expectedResults = new HashMap<String, Long>();

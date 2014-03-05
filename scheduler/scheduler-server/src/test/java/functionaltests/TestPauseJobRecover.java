@@ -113,13 +113,8 @@ public class TestPauseJobRecover extends FunctionalTest {
         System.out.println("Resume the job " + jobId);
         SchedulerTHelper.getSchedulerInterface().resumeJob(jobId);
 
-        // after the scheduler restart job can be finished before we subscribe a listener
-        // so checking the state first
-        JobState jobState = SchedulerTHelper.getSchedulerInterface().getJobState(jobId);
-        if (!jobState.getStatus().equals(JobStatus.FINISHED)) {
-            System.out.println("Waiting for job " + jobId + " to finish");
-            SchedulerTHelper.waitForEventJobFinished(jobId);
-        }
+        System.out.println("Waiting for job " + jobId + " to finish");
+        SchedulerTHelper.waitForEventJobFinished(jobId);
 
         JobResult jobResult = SchedulerTHelper.getSchedulerInterface().getJobResult(jobId);
         Assert.assertEquals(2, jobResult.getAllResults().size());
