@@ -706,6 +706,8 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
             uploaded = restApiClient().pushFile(sid, spacename, pathname, filename, inputStream);
         } catch (Exception e) {
             throwNCEOrPE(e);
+        } finally {
+            closeIfPossible(inputStream);
         }
         return uploaded;
     }
@@ -743,7 +745,6 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         try {
             sid = restApi().login(login, password);
         } catch (Exception e) {
-            e.printStackTrace(System.out);
             throw new RuntimeException(e);
         }
     }

@@ -52,6 +52,7 @@ import org.ow2.proactive.scheduler.rest.ISchedulerClient;
 import org.ow2.proactive.scheduler.rest.SchedulerClient;
 
 public class SchedulerClientTest extends AbstractRestFuncTestCase {
+    
     /** Maximum wait time of 5 minutes */
     private static final long max_wait_time = 5 * 60 * 1000;
 
