@@ -36,19 +36,17 @@
  */
 package functionaltests.monitor;
 
-import java.util.HashSet;
 import java.util.Set;
 
+import junit.framework.Assert;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
-import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
-import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.utils.NodeSet;
+
 import functionaltests.RMConsecutive;
 import functionaltests.RMTHelper;
-import junit.framework.Assert;
 
 
 /**
@@ -68,11 +66,7 @@ public class TestRMMonitoring extends RMConsecutive {
         ResourceManager resourceManager = helper.getResourceManager();
         helper.createNodeSource("TestRMMonitoring");
 
-        Set<String> nodesUrls = new HashSet<String>();
-        RMInitialState state = RMTHelper.getDefaultInstance().getResourceManager().getMonitoring().getState();
-        for (RMNodeEvent ne : state.getNodesEvents()) {
-            nodesUrls.add(ne.getNodeUrl());
-        }
+        Set<String> nodesUrls = RMTHelper.getDefaultInstance().listAliveNodesUrls();
 
         // we received all event as we are here
         RMTHelper.log("Test 1 - subscribing only to 'node remove' event");

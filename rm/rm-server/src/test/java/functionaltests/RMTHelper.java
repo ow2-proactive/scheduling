@@ -36,10 +36,23 @@
  */
 package functionaltests;
 
-import functionaltests.common.CommonTUtils;
-import functionaltests.common.InputStreamReaderThread;
-import functionaltests.monitor.RMMonitorEventReceiver;
-import functionaltests.monitor.RMMonitorsHandler;
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.ProActiveException;
@@ -60,7 +73,6 @@ import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
-import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
@@ -70,12 +82,10 @@ import org.ow2.proactive.resourcemanager.utils.RMNodeStarter;
 import org.ow2.proactive.utils.FileToBytesConverter;
 import org.ow2.tests.ProActiveSetup;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.concurrent.*;
+import functionaltests.common.CommonTUtils;
+import functionaltests.common.InputStreamReaderThread;
+import functionaltests.monitor.RMMonitorEventReceiver;
+import functionaltests.monitor.RMMonitorsHandler;
 
 
 /**
@@ -450,6 +460,50 @@ public class RMTHelper {
             classpathToLibFolderWithWildcard = "\"" + classpathToLibFolderWithWildcard + "\"";
         }
         return classpathToLibFolderWithWildcard;
+    }
+
+    /**
+     * Returns the alive Nodes accessible by the RM
+     * @return list of ProActive Nodes
+     */
+    public List<Node> listAliveNodes() throws NodeException {
+        ArrayList<Node> nodes = new ArrayList<Node>();
+        Set<String> urls = resourceManager.listAliveNodeUrls();
+        for (String url : urls) {
+            nodes.add(NodeFactory.getNode(url));
+        }
+        return nodes;
+    }
+
+    /**
+     * Returns the alive Nodes accessible by the RM in the given node sources
+     * @param  nodeSourceNames
+     * @return list of ProActive Nodes
+     */
+    public List<Node> listAliveNodes(Set<String> nodeSourceNames) throws NodeException {
+        ArrayList<Node> nodes = new ArrayList<Node>();
+        Set<String> urls = resourceManager.listAliveNodeUrls(nodeSourceNames);
+        for (String url : urls) {
+            nodes.add(NodeFactory.getNode(url));
+        }
+        return nodes;
+    }
+
+    /**
+     * Returns the list of alive  Nodes
+     * @return list of ProActive Nodes urls
+     */
+    public Set<String> listAliveNodesUrls() throws NodeException {
+        return resourceManager.listAliveNodeUrls();
+    }
+
+    /**
+     * Returns the list of alive Nodes in the given nodeSources
+     * @param nodeSourceNames
+     * @return list of ProActive Nodes urls
+     */
+    public Set<String> listAliveNodesUrls(Set<String> nodeSourceNames) throws NodeException {
+        return resourceManager.listAliveNodeUrls(nodeSourceNames);
     }
 
     /**

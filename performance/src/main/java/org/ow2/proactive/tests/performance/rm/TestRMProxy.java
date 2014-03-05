@@ -136,6 +136,14 @@ public class TestRMProxy implements ResourceManager {
         return target.getMonitoring();
     }
 
+    public Set<String> listAliveNodeUrls() {
+        return target.listAliveNodeUrls();
+    }
+
+    public Set<String> listAliveNodeUrls(Set<String> nodeSourceNames) {
+        return target.listAliveNodeUrls(nodeSourceNames);
+    }
+
     public IntWrapper getNodeSourcePingFrequency(String arg0) {
         return target.getNodeSourcePingFrequency(arg0);
     }

@@ -86,9 +86,9 @@ public interface ResourceManager {
      * corresponding {@link PluginDescriptor}.
      *
      * @param nodeSourceName the name of the node source
-     * @param infrastructureType type of the underlying infrastructure {@link InfrastructureType}
+     * @param infrastructureType type of the underlying infrastructure
      * @param infrastructureParameters parameters for infrastructure creation
-     * @param policyType name of the policy type. It passed as a string due to pluggable approach {@link NodeSourcePolicyFactory}
+     * @param policyType name of the policy type. It passed as a string due to plug-able approach
      * @param policyParameters parameters for policy creation
      * @return true if a new node source was created successfully, runtime exception otherwise
      */
@@ -225,6 +225,19 @@ public interface ResourceManager {
     public RMMonitoring getMonitoring();
 
     /**
+     * Returns a list of all alive Nodes Urls. Alive means neither down nor currently deploying.
+     * @return list of node urls
+     */
+    public Set<String> listAliveNodeUrls();
+
+    /**
+     * Returns a list of all alive Nodes Urls associated with the given node sources.
+     * @param nodeSourceNames set of node sources containing the nodes.
+     * @return list of node urls
+     */
+    public Set<String> listAliveNodeUrls(Set<String> nodeSourceNames);
+
+    /**
      * Finds "number" nodes for computations according to the selection script.
      * All nodes which are returned to the client as marked internally as busy and cannot
      * be used by others until the client frees them.
@@ -265,7 +278,7 @@ public interface ResourceManager {
      * has, but only those which correspond the to selection criteria.
      *
      * @param number the number of nodes
-     * @param selectionScriptList criteria to be verified by the returned nodes
+     * @param selectionScriptsList criteria to be verified by the returned nodes
      * @param exclusion a list of node which should not be in the result set
      * @return a list of nodes
      */
@@ -284,7 +297,7 @@ public interface ResourceManager {
      * @param number the number of nodes
      * @param descriptor the topology descriptor of nodes 
      * @see {@link TopologyDescriptor}
-     * @param selectionScriptList criteria to be verified by the returned nodes
+     * @param selectionScriptsList criteria to be verified by the returned nodes
      * @param exclusion a list of node which should not be in the result set
      * @return a list of nodes
      */
@@ -307,7 +320,7 @@ public interface ResourceManager {
      * @param number the number of nodes
      * @param descriptor the topology descriptor of nodes 
      * @see {@link TopologyDescriptor}
-     * @param selectionScriptList criteria to be verified by the returned nodes
+     * @param selectionScriptsList criteria to be verified by the returned nodes
      * @param exclusion a list of node which should not be in the result set
      * @param bestEffort the mode of node aggregation
      *  
@@ -321,7 +334,7 @@ public interface ResourceManager {
      * Finds and books nodes for computations.
      * Nodes should satisfy specified criteria. 
      * 
-     * @param nodes criteria 
+     * @param criteria criteria to select nodes
      * @see {@link Criteria}
      * @return a list of nodes according to the criteria
      */
@@ -331,7 +344,7 @@ public interface ResourceManager {
      * Releases the node after computations. The specified node is marked as free and become
      * available to other users.
      *
-     * @param the set of nodes to be released
+     * @param node the node to be released
      * @return true if the node has been released successfully, runtime exception otherwise.
      * {@link SecurityException} may be thrown if the user does not have right to release the node or it tries to release
      * a foreign node.
@@ -342,7 +355,7 @@ public interface ResourceManager {
      * Releases nodes after computations. The specified node is marked as free and become
      * available to other users.
      *
-     * @param the set of nodes to be released
+     * @param nodes the set of nodes to be released
      * @return true if nodes have been released successfully, runtime exception otherwise.
      * {@link SecurityException} may be thrown if the user does not have right to release one of nodes or it tries to release
      * a foreign node.
@@ -385,9 +398,8 @@ public interface ResourceManager {
     public BooleanWrapper isNodeUser(String nodeUrl);
 
     /**
-     * Executes the script on the specified targets depending on the target type {@link TargetType}.
-     * 
-     * @param a script to execute 
+     * Executes the script on the specified targets depending on the target type.
+     *
      * @param script a selection script to execute.
      * @param targetType must be either NODE_URL, NODESOURCE_NAME or HOSTNAME
      * @param targets are names of particular resources
@@ -397,11 +409,10 @@ public interface ResourceManager {
     public <T> List<ScriptResult<T>> executeScript(Script<T> script, String targetType, Set<String> targets);
 
     /**
-     * Executes the script on the specified targets depending on the target type {@link TargetType}.
+     * Executes the script on the specified targets depending on the target type.
      *
-     * @param a script to execute 
-     * @param a script engine name 
      * @param script a selection script to execute.
+     * @param scriptEngine script engine name
      * @param targetType must be either NODE_URL, NODESOURCE_NAME or HOSTNAME
      * @param targets are names of particular resources
      * @return the {@link ScriptResult} corresponding to the script execution.

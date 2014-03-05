@@ -1134,6 +1134,29 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         }
     }
 
+    @Override
+    public Set<String> listAliveNodeUrls() {
+        HashSet<String> aliveNodes = new HashSet<String>();
+        for(String nodeurl : allNodes.keySet()) {
+            RMNode node = allNodes.get(nodeurl);
+            if (!node.isDown()) {
+                aliveNodes.add(nodeurl);
+            }
+        }
+        return aliveNodes;
+    }
+
+    @Override
+    public Set<String> listAliveNodeUrls(Set<String> nodeSourceNames) {
+        HashSet<String> aliveNodes = new HashSet<String>();
+        for (String nodeSource : nodeSourceNames) {
+            for (Node node : nodeSources.get(nodeSource).getAliveNodes()) {
+                aliveNodes.add(node.getNodeInformation().getURL());
+            }
+        }
+        return aliveNodes;
+    }
+
     /**
      * Unregisters node source from the resource manager core.
      */

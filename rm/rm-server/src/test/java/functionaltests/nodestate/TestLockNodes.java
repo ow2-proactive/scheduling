@@ -36,21 +36,21 @@
  */
 package functionaltests.nodestate;
 
-import java.util.HashSet;
+import static junit.framework.Assert.assertTrue;
 
+import java.util.Set;
+
+import junit.framework.Assert;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
-import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.utils.NodeSet;
+
 import functionaltests.RMConsecutive;
 import functionaltests.RMTHelper;
-import junit.framework.Assert;
-
-import static junit.framework.Assert.assertTrue;
 
 
 /**
@@ -76,11 +76,7 @@ public class TestLockNodes extends RMConsecutive {
         ResourceManager resourceManager = helper.getResourceManager();
         int nodesNumber = helper.createNodeSource("TestLockNodes");
 
-        HashSet<String> nodesUrls = new HashSet<String>();
-        RMInitialState state = RMTHelper.getDefaultInstance().getResourceManager().getMonitoring().getState();
-        for (RMNodeEvent ne : state.getNodesEvents()) {
-            nodesUrls.add(ne.getNodeUrl());
-        }
+        Set<String> nodesUrls = RMTHelper.getDefaultInstance().listAliveNodesUrls();
 
         RMTHelper.log("Test 1 - locking");
 

@@ -139,6 +139,16 @@ public class RMProxyUserInterface extends RMListenerProxy implements ResourceMan
         return target.getMonitoring();
     }
 
+    @Override
+    public Set<String> listAliveNodeUrls() {
+        return target.listAliveNodeUrls();
+    }
+
+    @Override
+    public Set<String> listAliveNodeUrls(Set<String> nodeSourceNames) {
+        return target.listAliveNodeUrls(nodeSourceNames);
+    }
+
     /**
      * @see org.ow2.proactive.resourcemanager.frontend.ResourceManager#getNodeSourcePingFrequency(java.lang.String)
      */
