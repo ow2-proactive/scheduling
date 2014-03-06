@@ -296,8 +296,7 @@ public class TestListenJobLogs extends SchedulerConsecutive {
             System.out.println("Waiting for logging event (" + name + ")");
 
             long endTime = System.currentTimeMillis() + timeout;
-            while (!CollectionUtils.isEqualCollection(expectedMessagesList,
-                    actualMessages)) {
+            while (!CollectionUtils.removeAll(expectedMessagesList, actualMessages).isEmpty()) {
                 long waitTime = endTime - System.currentTimeMillis();
                 if (waitTime > 0) {
                     wait(100);
@@ -307,8 +306,7 @@ public class TestListenJobLogs extends SchedulerConsecutive {
             }
 
             Assert.assertTrue("Didn't receive expected events, expected: " + expectedMessagesList +
-                ", actual: " + actualMessages, CollectionUtils.isEqualCollection(expectedMessagesList,
-                    actualMessages));
+                ", actual: " + actualMessages, CollectionUtils.removeAll(expectedMessagesList, actualMessages).isEmpty());
             actualMessages.clear();
         }
 

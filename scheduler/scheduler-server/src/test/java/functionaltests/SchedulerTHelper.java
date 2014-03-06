@@ -62,6 +62,7 @@ import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerState;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
+import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
@@ -941,8 +942,12 @@ public class SchedulerTHelper {
 
     private static JobInfo waitForJobEvent(JobId id, long timeout,
       JobStatus jobStatusAfterEvent, SchedulerEvent jobEvent) throws Exception {
-        JobState jobState = getSchedulerInterface().getJobState(id);
-        if (jobState.getStatus().equals(jobStatusAfterEvent)) {
+        JobState jobState = null;
+        try {
+            jobState = getSchedulerInterface().getJobState(id);
+        } catch (UnknownJobException ignored) {
+        }
+        if (jobState != null && jobState.getStatus().equals(jobStatusAfterEvent)) {
             return jobState.getJobInfo();
         } else {
             try {
