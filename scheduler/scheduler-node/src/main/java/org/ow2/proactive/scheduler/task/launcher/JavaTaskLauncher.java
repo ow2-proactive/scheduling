@@ -44,6 +44,8 @@ import java.util.Map.Entry;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
+import org.ow2.proactive.scheduler.common.exception.TaskAbortedException;
+import org.ow2.proactive.scheduler.common.exception.WalltimeExceededException;
 import org.ow2.proactive.scheduler.common.task.ExecutableInitializer;
 import org.ow2.proactive.scheduler.common.task.JavaExecutableInitializer;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
@@ -125,6 +127,11 @@ public class JavaTaskLauncher extends TaskLauncher {
             // set exported vars
             this.setPropagatedProperties(results);
 
+            //start walltime if needed
+            if (isWallTime()) {
+                scheduleTimer();
+            }
+
             //launch pre script
             if (pre != null) {
                 sample = System.nanoTime();
@@ -179,7 +186,13 @@ public class JavaTaskLauncher extends TaskLauncher {
             exception = ex;
             userResult = null;
         } finally {
-            if (!executableGuard.wasKilled()) {
+            if (executableGuard.wasWalltimed()) {
+                // killed by a walltime
+                res = new TaskResultImpl(taskId, new WalltimeExceededException("Walltime of " + wallTime + " ms reached on task " + taskId.getReadableName()), null, duration / 1000000, null);
+            } else if (executableGuard.wasKilled()) {
+                // standard kill
+                res = new TaskResultImpl(taskId, new TaskAbortedException("Task " + taskId.getReadableName() + " has been killed"), null, duration / 1000000, null);
+            } else {
                 // set the result
                 if (exception != null) {
                     res = new TaskResultImpl(taskId, exception, null, duration / 1000000, null);
@@ -202,10 +215,8 @@ public class JavaTaskLauncher extends TaskLauncher {
                 }
                 res.setPropagatedProperties(retreivePropagatedProperties());
                 attachPropagatedVariables(res);
-
-            } else {
-                res = new TaskResultImpl(taskId, new RuntimeException("Task " + taskId.getReadableName() + " has been killed"), null, duration / 1000000, null);
             }
+
             // logs are set even if the task is killed
             res.setLogs(this.getLogs());
 

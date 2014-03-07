@@ -41,11 +41,12 @@ import java.lang.reflect.InvocationTargetException;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.ImmediateService;
-import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.exception.ForkedJavaTaskException;
+import org.ow2.proactive.scheduler.common.exception.TaskAbortedException;
+import org.ow2.proactive.scheduler.common.exception.WalltimeExceededException;
 import org.ow2.proactive.scheduler.common.task.JavaExecutableInitializer;
 import org.ow2.proactive.scheduler.common.task.SimpleTaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
@@ -57,8 +58,8 @@ import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.ExecutableContainerInitializer;
 import org.ow2.proactive.scheduler.task.ForkedJavaExecutableContainer;
 import org.ow2.proactive.scheduler.task.ForkedJavaExecutableInitializer;
-import org.ow2.proactive.scheduler.task.JavaExecutableForker;
 import org.ow2.proactive.scheduler.task.ForkerStarterCallback;
+import org.ow2.proactive.scheduler.task.JavaExecutableForker;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 
 
@@ -111,6 +112,11 @@ public class JavaTaskLauncherForker extends JavaTaskLauncher implements ForkerSt
             executableGuard.initialize(executableContainer.getExecutable());
 
             updatePropagatedVariables(results);
+
+            //start walltime if needed
+            if (isWallTime()) {
+                scheduleTimer();
+            }
 
             //init task
             ForkedJavaExecutableInitializer fjei = (ForkedJavaExecutableInitializer) executableContainer
@@ -184,7 +190,6 @@ public class JavaTaskLauncherForker extends JavaTaskLauncher implements ForkerSt
             if (userResult instanceof TaskResult) {
                 // Override the logs since they are stored on forker side
                 taskResult = (TaskResultImpl) userResult;
-                taskResult.setLogs(getLogs());
             } else {
                 Integer ec = (Integer) userResult;
                 if (ec == 0) {
@@ -204,6 +209,14 @@ public class JavaTaskLauncherForker extends JavaTaskLauncher implements ForkerSt
                 taskResult = new TaskResultImpl(taskId, ex, this.getLogs(), duration / 1000000, null);
             }
         } finally {
+
+            if (executableGuard.wasWalltimed()) {
+                taskResult = new TaskResultImpl(taskId, new WalltimeExceededException("Walltime of " + wallTime + " ms reached on task " + taskId.getReadableName()), null, duration / 1000000, null);
+            } else if (executableGuard.wasKilled()) {
+                taskResult = new TaskResultImpl(taskId, new TaskAbortedException("Task " + taskId.getReadableName()+" has been killed"), null, duration / 1000000, null);
+            }
+
+            taskResult.setLogs(getLogs());
             finalizeTask(core, taskResult);
         }
     }

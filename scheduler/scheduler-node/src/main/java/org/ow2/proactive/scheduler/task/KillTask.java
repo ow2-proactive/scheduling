@@ -39,7 +39,8 @@ package org.ow2.proactive.scheduler.task;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import org.ow2.proactive.scheduler.common.task.executable.Executable;
+import org.apache.log4j.Logger;
+import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
 
 
 /**
@@ -51,18 +52,21 @@ import org.ow2.proactive.scheduler.common.task.executable.Executable;
  */
 public class KillTask {
 
-    private Executable executable;
+    public static final Logger logger = Logger.getLogger(TaskLauncher.class);
+
+    private Guard guard;
     private Timer timer;
     private long walltime;
+    private volatile boolean walltimeReached = false;
 
     /**
      * Create a new instance of KillTask.
      *
-     * @param executable the executable that may be killed.
+     * @param guard the guard that may be killed.
      * @param walltime the walltime not to be exceeded.
      */
-    public KillTask(Executable executable, long walltime) {
-        this.executable = executable;
+    public KillTask(Guard guard, long walltime) {
+        this.guard = guard;
         this.walltime = walltime;
     }
 
@@ -72,6 +76,10 @@ public class KillTask {
     public void schedule() {
         timer = new Timer("KillTask");
         timer.schedule(new KillProcess(), walltime);
+    }
+
+    public boolean walltimeReached() {
+       return walltimeReached;
     }
 
     /**
@@ -87,7 +95,9 @@ public class KillTask {
          */
         @Override
         public void run() {
-            executable.kill();
+            logger.info("Walltime of "+walltime+" ms exceeded.");
+            guard.kill(true);
+            walltimeReached = true;
         }
     }
 }

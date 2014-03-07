@@ -79,6 +79,9 @@ public abstract class Guard<T> {
     // true if the guard received a kill message (controls how the cleaning is performed)
     protected boolean killMessageReceived = false;
 
+    // true if the guard received a walltime message (controls how the cleaning is performed)
+    protected boolean walltimeMessageReceived = false;
+
     // target of the guard, i.e. the non thread-safe object to protect
     protected T target = null;
 
@@ -215,6 +218,16 @@ public abstract class Guard<T> {
     }
 
     /**
+     * Return true if the guard was walltimed
+     * @return
+     */
+    public synchronized boolean wasWalltimed() {
+        return walltimeMessageReceived;
+    }
+
+
+
+    /**
      * abstract kill method to be overridden by implementations, for example when the target is an Executable,
      * it will call the genereic or user-defined kill method of the Executable class
      */
@@ -230,7 +243,7 @@ public abstract class Guard<T> {
      * Kill the executable, this will interrupt current tasks.
      * Normally, clean should be called right afterwards
      */
-    public synchronized void kill() {
+    public synchronized void kill(boolean isWalltime) {
         checkNotKilledOrCleaned();
         logger.info("Kill message received...");
 
@@ -253,6 +266,7 @@ public abstract class Guard<T> {
 
         this.state = GuardState.KILLED;
         killMessageReceived = true;
+        walltimeMessageReceived = isWalltime;
     }
 
     /**

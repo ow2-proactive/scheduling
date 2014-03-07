@@ -109,7 +109,7 @@ public class JavaTaskLauncherForked extends JavaTaskLauncher {
     public void killForkedJavaTaskLauncher() {
 
         try {
-            executableGuard.kill();
+            executableGuard.kill(false);
 
         } catch (Throwable e) {
             logger.warn("Exception occurred while executing kill on task " + taskId.value(), e);

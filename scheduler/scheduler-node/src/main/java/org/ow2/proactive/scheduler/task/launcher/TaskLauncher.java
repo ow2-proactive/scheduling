@@ -837,13 +837,11 @@ public abstract class TaskLauncher implements InitActive {
         executableGuard.clean(TaskLauncher.CLEAN_TIMEOUT);
 
         /*
-         * if task was not killed send back the result (if the task was killed the core is not accessible)
+         * send back the result (even if the task was killed)
          */
-        if (!executableGuard.wasKilled()) {
-            if (core != null) {
-                // callback to scheduler core sending the result
-                core.terminate(taskId, taskResult);
-            }
+        if (core != null) {
+            // callback to scheduler core sending the result
+            core.terminate(taskId, taskResult);
         }
     }
 
@@ -861,7 +859,7 @@ public abstract class TaskLauncher implements InitActive {
         if (!normalTermination) {
             // If this is a kill message, perfom all cleaning normally done by the finalize method
             try {
-                executableGuard.kill();
+                executableGuard.kill(false);
 
             } catch (Throwable e) {
                 logger.warn("Exception occurred while executing kill on task " + taskId.value(), e);
@@ -878,17 +876,9 @@ public abstract class TaskLauncher implements InitActive {
      * if it does not finish before the walltime. If it does finish before the walltime then the timer will be canceled
      */
     protected void scheduleTimer() {
-        scheduleTimer(executableGuard.use());
-    }
-
-    /**
-     * If user specified walltime for the particular task, the timer will be scheduled to kill the task
-     * if it does not finish before the walltime. If it does finish before the walltime then the timer will be canceled
-     */
-    protected void scheduleTimer(Executable executable) {
         if (isWallTime()) {
-            logger.info("Execute timer because task '" + taskId + "' is walltimed");
-            killTaskTimer = new KillTask(executable, wallTime);
+            logger.info("Execute timer because task '" + taskId + "' is walltimed ("+wallTime+" ms)");
+            killTaskTimer = new KillTask(executableGuard, wallTime);
             killTaskTimer.schedule();
         }
     }
@@ -900,6 +890,10 @@ public abstract class TaskLauncher implements InitActive {
         if (isWallTime() && killTaskTimer != null) {
             killTaskTimer.cancel();
         }
+    }
+
+    protected boolean walltimeReached() {
+       return killTaskTimer.walltimeReached();
     }
 
     /**
@@ -1772,7 +1766,7 @@ public abstract class TaskLauncher implements InitActive {
      * - terminate (kill) calls
      * - getProgress calls
      */
-    protected class ExecutableGuard extends Guard<Executable> {
+    public class ExecutableGuard extends Guard<Executable> {
 
         int lastProgress = 0;
 

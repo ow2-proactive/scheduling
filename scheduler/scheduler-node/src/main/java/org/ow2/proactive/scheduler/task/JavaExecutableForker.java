@@ -73,8 +73,8 @@ import org.objectweb.proactive.extensions.processbuilder.OSProcessBuilder;
 import org.objectweb.proactive.extensions.processbuilder.exception.NotImplementedException;
 import org.ow2.proactive.resourcemanager.utils.OneJar;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
+import org.ow2.proactive.scheduler.common.exception.TaskAbortedException;
 import org.ow2.proactive.scheduler.common.exception.UserException;
-import org.ow2.proactive.scheduler.common.exception.WalltimeExceededException;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
@@ -218,7 +218,7 @@ public class JavaExecutableForker extends JavaExecutable implements ForkerStarte
             }
 
             if (launcherGuard.wasKilled()) {
-                throw new WalltimeExceededException("Task killed or walltime exceeded");
+                throw new TaskAbortedException("Task killed or walltime exceeded");
             }
             return PAFuture.getFutureValue(result);
         } finally {
@@ -785,7 +785,7 @@ public class JavaExecutableForker extends JavaExecutable implements ForkerStarte
     public void kill() {
 
         // send a kill message to the forked jvm
-        launcherGuard.kill();
+        launcherGuard.kill(false);
 
         launcherGuard.clean(TaskLauncher.CLEAN_TIMEOUT);
 
