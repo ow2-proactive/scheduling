@@ -7,6 +7,7 @@ buildscript {
         maven { url 'http://repo.activeeon.com/content/repositories/snapshots/' }
         maven { url 'http://repo.activeeon.com/content/repositories/releases/' }
         maven { url 'http://repo.activeeon.com/content/repositories/thirdparty/' }
+        maven { url 'http://spoon.gforge.inria.fr/repositories/releases/' }
     }
 
     dependencies {
@@ -18,6 +19,7 @@ buildscript {
         classpath 'org.ow2.proactive:documentation:1.0.0-SNAPSHOT'
         classpath 'org.hsudbrock:gradle-trang:0.1-proactive'
         classpath 'com.github.rholder:gradle-one-jar:1.0.3'
+        classpath 'org.ow2.proactive:serialver-gradle:1.0-SNAPSHOT'
     }
 }
 
@@ -40,6 +42,7 @@ allprojects {
 }
 
 ext.javaSubprojects = subprojects.findAll { new File(it.projectDir, "src").exists() }
+ext.serialver = "35L"
 
 configure(javaSubprojects) {
     apply plugin: 'java'
@@ -58,6 +61,10 @@ configure(javaSubprojects) {
         exclude 'functionaltests/**'
         exclude 'unittests/**'
         exclude 'unitTests/**'
+    }
+
+    task serialver(type: InsertSerialVersionUIDTask) {
+        serialver = rootProject.serialver
     }
 }
 
