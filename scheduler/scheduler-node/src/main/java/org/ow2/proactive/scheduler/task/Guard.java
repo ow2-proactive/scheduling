@@ -260,27 +260,29 @@ public abstract class Guard<T> {
      */
     public synchronized void clean(long timeout) {
         if (this.state != GuardState.CLEANED) {
+            if (activeExecutor != null) {
 
-            activeExecutor.setCallable(new Callable() {
-                @Override
-                public Object call() throws Exception {
-                    try {
-                        internalClean();
-                    } catch (Exception e) {
-                        logger.warn(e);
+                activeExecutor.setCallable(new Callable() {
+                    @Override
+                    public Object call() throws Exception {
+                        try {
+                            internalClean();
+                        } catch (Exception e) {
+                            logger.warn(e);
+                        }
+                        return null;
                     }
-                    return null;
-                }
-            });
-            taskExecutionFuture = stubActiveExecutor.call();
+                });
+                taskExecutionFuture = stubActiveExecutor.call();
 
-            try {
-                waitCallable(timeout);
-            } catch (Throwable e) {
-                logger.warn(e);
+                try {
+                    waitCallable(timeout);
+                } catch (Throwable e) {
+                    logger.warn(e);
+                }
+                shutdown(true);
             }
 
-            shutdown(true);
             this.state = GuardState.CLEANED;
         }
     }

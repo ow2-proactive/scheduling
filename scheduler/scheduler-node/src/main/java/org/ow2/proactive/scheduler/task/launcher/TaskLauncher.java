@@ -870,7 +870,7 @@ public abstract class TaskLauncher implements InitActive {
             executableGuard.clean(TaskLauncher.CLEAN_TIMEOUT);
         }
 
-        PAActiveObject.terminateActiveObject(stubOnThis, !normalTermination);
+        PAActiveObject.getBodyOnThis().terminate(!normalTermination);
     }
 
     /**
