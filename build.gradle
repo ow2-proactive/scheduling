@@ -62,6 +62,7 @@ configure(javaSubprojects) {
 }
 
 def functionalTestConfiguration = {
+
     forkEvery 1
     include 'functionaltests/**'
     include 'unittests/**'
@@ -78,13 +79,17 @@ def functionalTestConfiguration = {
     beforeTest { descriptor ->
         logger.lifecycle("Running: " + descriptor)
     }
-    doLast { descriptor ->
-        logger.lifecycle("Test suite finished: " + descriptor)
-        project.javaexec{
+
+    def clean = {
+        logger.lifecycle("Killing all proactive processes")
+        project.javaexec {
             main = "org.ow2.tests.ProcessCleaner"
             classpath = project.sourceSets.test.runtimeClasspath
         }
     }
+
+    finalizedBy project.task (project.name+'-clean', {doLast clean})
+    doFirst clean
 }
 
 project(':scheduler:scheduler-api') {
