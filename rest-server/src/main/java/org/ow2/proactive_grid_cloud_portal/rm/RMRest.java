@@ -36,10 +36,40 @@
  */
 package org.ow2.proactive_grid_cloud_portal.rm;
 
-import org.jboss.resteasy.annotations.GZIP;
-import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.security.KeyException;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+
+import javax.management.Attribute;
+import javax.management.AttributeList;
+import javax.management.InstanceNotFoundException;
+import javax.management.IntrospectionException;
+import javax.management.MalformedObjectNameException;
+import javax.management.ObjectName;
+import javax.management.ReflectionException;
+import javax.security.auth.login.LoginException;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.FormParam;
+import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
+
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
@@ -58,27 +88,18 @@ import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
 import org.ow2.proactive.resourcemanager.utils.TargetType;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scripting.ScriptResult;
+import org.ow2.proactive_grid_cloud_portal.common.Session;
+import org.ow2.proactive_grid_cloud_portal.common.SessionStore;
+import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStore;
 import org.ow2.proactive_grid_cloud_portal.common.StatHistoryCaching;
 import org.ow2.proactive_grid_cloud_portal.common.StatHistoryCaching.StatHistoryCacheEntry;
 import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
-import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
+import org.jboss.resteasy.annotations.GZIP;
+import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import org.rrd4j.ConsolFun;
 import org.rrd4j.core.FetchData;
 import org.rrd4j.core.FetchRequest;
 import org.rrd4j.core.RrdDb;
-
-import javax.management.*;
-import javax.security.auth.login.LoginException;
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.security.KeyException;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.util.*;
 
 
 @Path("/rm")
@@ -95,16 +116,22 @@ public class RMRest implements RMRestInterface {
     // "MaxFreeNodes" // redundant with AvailableNodesCount
     };
 
-    public RMProxyUserInterface checkAccess(String sessionId) throws NotConnectedException {
-        RMProxyUserInterface s = RMSessionMapper.getInstance().getSessionsMap().get(sessionId);
+    private SessionStore sessionStore = SharedSessionStore.getInstance();
+
+    private RMProxyUserInterface checkAccess(String sessionId) throws NotConnectedException {
+        Session session = sessionStore.get(sessionId);
+        if (session == null) {
+            throw new NotConnectedException(
+              "you are not connected to the scheduler, you should log on first");
+        }
+        RMProxyUserInterface s = session.getRM();
 
         if (s == null) {
-            throw new NotConnectedException("you are not connected to the scheduler, you should log on first");
+            throw new NotConnectedException(
+              "you are not connected to the scheduler, you should log on first");
         }
 
-        RMSessionMapper.getInstance().getSessionsLastAccessToClient()
-                .put(sessionId, System.currentTimeMillis());
-        return s;
+        return session.getRM();
     }
 
     /**
@@ -125,15 +152,10 @@ public class RMRest implements RMRestInterface {
     String password) throws KeyException, LoginException, RMException, ActiveObjectCreationException,
             NodeException {
 
-        RMProxyUserInterface rm;
-        rm = PAActiveObject.newActive(RMProxyUserInterface.class, new Object[] {});
-
-        CredData credData = new CredData(CredData.parseLogin(username), CredData.parseDomain(username),
-            password);
-
-        rm.init(PortalConfiguration.getProperties().getProperty(PortalConfiguration.rm_url), credData);
-
-        return RMSessionMapper.getInstance().add(rm);
+        Session session = sessionStore.create();
+        session.connectToRM(new CredData(CredData.parseLogin(username), CredData.parseDomain(username),
+          password));
+        return session.getSessionId();
 
     }
 
@@ -153,8 +175,7 @@ public class RMRest implements RMRestInterface {
     String sessionId) throws NotConnectedException {
         RMProxyUserInterface rm = checkAccess(sessionId);
         rm.disconnect();
-        PAActiveObject.terminateActiveObject(rm, true);
-        RMSessionMapper.getInstance().remove(sessionId);
+        sessionStore.terminate(sessionId);
     }
 
     /*
@@ -172,21 +193,18 @@ public class RMRest implements RMRestInterface {
     LoginForm multipart) throws ActiveObjectCreationException, NodeException, KeyException, IOException,
             LoginException, RMException {
 
-        RMProxyUserInterface rm = PAActiveObject.newActive(RMProxyUserInterface.class,
-                new Object[] {});
-
-        String url = PortalConfiguration.getProperties().getProperty(PortalConfiguration.rm_url);
+        Session session = sessionStore.create();
 
         if (multipart.getCredential() != null) {
             Credentials credentials = Credentials.getCredentials(multipart.getCredential());
-            rm.init(url, credentials);
+            session.connectToRM(credentials);
         } else {
             CredData credData = new CredData(CredData.parseLogin(multipart.getUsername()),
                 CredData.parseDomain(multipart.getUsername()), multipart.getPassword(), multipart.getSshKey());
-            rm.init(url, credData);
+            session.connectToRM(credData);
         }
 
-        return RMSessionMapper.getInstance().add(rm);
+        return session.getSessionId();
     }
 
     /**

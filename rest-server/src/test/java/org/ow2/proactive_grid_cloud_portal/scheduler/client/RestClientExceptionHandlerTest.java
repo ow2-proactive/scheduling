@@ -34,18 +34,25 @@
  */
 package org.ow2.proactive_grid_cloud_portal.scheduler.client;
 
+import javax.security.auth.login.LoginException;
 import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.WebApplicationException;
 
+import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive_grid_cloud_portal.RestTestServer;
+import org.ow2.proactive_grid_cloud_portal.common.SchedulerRMProxyFactory;
+import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStore;
 import org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.mockito.Matchers;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 
 public class RestClientExceptionHandlerTest extends RestTestServer {
@@ -72,6 +79,10 @@ public class RestClientExceptionHandlerTest extends RestTestServer {
     @Test
     public void client_handles_jetty_errors_500() throws Exception {
         try {
+            SchedulerRMProxyFactory schedulerFactory = mock(SchedulerRMProxyFactory.class);
+            when(schedulerFactory.connectToScheduler(Matchers.<CredData>any())).thenThrow(new LoginException());
+            SharedSessionStore.getInstance().setSchedulerRMProxyFactory(schedulerFactory);
+
             SchedulerRestClient client = new SchedulerRestClient(
               "http://localhost:" + port + "/");
 

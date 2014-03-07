@@ -36,29 +36,13 @@
  */
 package org.ow2.proactive_grid_cloud_portal.studio;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
-import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
-import org.jboss.resteasy.plugins.providers.multipart.InputPart;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
-import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.core.node.NodeException;
-import org.ow2.proactive.resourcemanager.exception.RMException;
-import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
-import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
-import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
-import org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerSession;
-import org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerSessionMapper;
-import org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobValidationData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.*;
-import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
-
-import javax.security.auth.login.LoginException;
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.InputStream;
 import java.security.KeyException;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -66,6 +50,41 @@ import java.util.List;
 import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+
+import javax.security.auth.login.LoginException;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.FormParam;
+import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+
+import org.objectweb.proactive.ActiveObjectCreationException;
+import org.objectweb.proactive.core.node.NodeException;
+import org.ow2.proactive.resourcemanager.exception.RMException;
+import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
+import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
+import org.ow2.proactive_grid_cloud_portal.common.Session;
+import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStore;
+import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
+import org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobValidationData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.JobCreationRestException;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SchedulerRestException;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SubmissionClosedRestException;
+import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
+import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Logger;
+import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
+import org.jboss.resteasy.plugins.providers.multipart.InputPart;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 
 
 @Path("/studio")
@@ -93,7 +112,7 @@ public class StudioRest implements StudioInterface {
     }
 
     private String getUserName(String sessionId) throws NotConnectedException {
-        SchedulerSession ss = SchedulerSessionMapper.getInstance().getSchedulerSession(sessionId);
+        Session ss = SharedSessionStore.getInstance().get(sessionId);
         if (ss == null) {
             // logger.trace("not found a scheduler frontend for sessionId " +
             // sessionId);

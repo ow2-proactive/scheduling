@@ -45,6 +45,7 @@ import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive_grid_cloud_portal.RestTestServer;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
+import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStoreTestUtils;
 import org.junit.Test;
 
 import static org.junit.Assert.assertNotNull;
@@ -59,7 +60,7 @@ public class SchedulerStateRestJobTaskResultTest extends RestTestServer {
         SchedulerRestInterface restInterface = new SchedulerStateRest();
 
         SchedulerProxyUserInterface mockOfScheduler = mock(SchedulerProxyUserInterface.class);
-        String sessionId = SchedulerSessionMapper.getInstance().add(mockOfScheduler, "bob");
+        String sessionId = SharedSessionStoreTestUtils.createValidSession(mockOfScheduler);
 
         TaskResultImpl taskResultWithException = new TaskResultImpl(
                 TaskIdImpl.createTaskId(JobIdImpl.makeJobId("42"), "mytask", 1, false), null, new byte[0],
@@ -76,7 +77,7 @@ public class SchedulerStateRestJobTaskResultTest extends RestTestServer {
         SchedulerRestInterface restInterface = new SchedulerStateRest();
 
         SchedulerProxyUserInterface mockOfScheduler = mock(SchedulerProxyUserInterface.class);
-        String sessionId = SchedulerSessionMapper.getInstance().add(mockOfScheduler, "bob");
+        String sessionId = SharedSessionStoreTestUtils.createValidSession(mockOfScheduler);
 
         TaskResultImpl taskResultWithException = new TaskResultImpl(
                 TaskIdImpl.createTaskId(JobIdImpl.makeJobId("42"), "mytask", 1, false), null, new byte[0],

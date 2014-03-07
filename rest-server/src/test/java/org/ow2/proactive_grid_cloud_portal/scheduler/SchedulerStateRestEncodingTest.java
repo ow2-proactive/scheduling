@@ -49,7 +49,7 @@ import java.util.zip.ZipOutputStream;
 
 import org.ow2.proactive_grid_cloud_portal.RestTestServer;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
+import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStoreTestUtils;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 import org.jboss.resteasy.client.ProxyFactory;
@@ -113,7 +113,7 @@ public class SchedulerStateRestEncodingTest extends RestTestServer {
         return IOUtils.toByteArray(zipFile.getInputStream(entry));
     }
 
-    private void callGetJobImageAndVerifyOutput() throws IOException, NotConnectedRestException {
+    private void callGetJobImageAndVerifyOutput() throws Exception {
         String pngIn = "ê";
         String jobId = createJobArchive(pngIn);
         String pngAsBase64String = getJobImageAsBase64String(jobId);
@@ -123,9 +123,9 @@ public class SchedulerStateRestEncodingTest extends RestTestServer {
         assertEquals(pngIn, pngOut);
     }
 
-    private String getJobImageAsBase64String(String jobId) throws IOException, NotConnectedRestException {
-        String sessionId = SchedulerSessionMapper.getInstance().add(
-                new SchedulerProxyUserInterfaceForTests(), "bob");
+    private String getJobImageAsBase64String(String jobId) throws Exception {
+        String sessionId = SharedSessionStoreTestUtils.createValidSession(
+          new SchedulerProxyUserInterfaceForTests());
 
         SchedulerRestInterface client = ProxyFactory.create(SchedulerRestInterface.class,
                 "http://localhost:" + port + "/");

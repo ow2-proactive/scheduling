@@ -41,6 +41,7 @@ import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
 import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
+import org.ow2.proactive_grid_cloud_portal.common.Session;
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -51,7 +52,7 @@ public class JobOutputAppender extends AppenderSkeleton {
     private JobOutput jobOutput = null;
     private String jobId;
 
-    public JobOutputAppender(SchedulerSession ss, String jobId, AppenderProvider ap, JobOutput jobOutput)
+    public JobOutputAppender(Session ss, String jobId, AppenderProvider ap, JobOutput jobOutput)
             throws NotConnectedException, UnknownJobException, PermissionException {
         this.name = "Appender for job output";
         this.jobOutput = jobOutput;

@@ -36,11 +36,16 @@
  */
 package org.ow2.proactive_grid_cloud_portal.scheduler;
 
-import static javax.ws.rs.core.MediaType.APPLICATION_XML_TYPE;
-import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
-import static org.ow2.proactive_grid_cloud_portal.scheduler.ValidationUtil.validateJobDescriptor;
-
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.io.Serializable;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.KeyException;
@@ -71,24 +76,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.vfs2.FileObject;
-import org.apache.commons.vfs2.FileSystemException;
-import org.apache.commons.vfs2.FileSystemManager;
-import org.apache.commons.vfs2.FileType;
-import org.apache.commons.vfs2.Selectors;
-import org.apache.log4j.Logger;
-import org.dozer.DozerBeanMapper;
-import org.dozer.Mapper;
-import org.jboss.resteasy.annotations.GZIP;
-import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
-import org.jboss.resteasy.plugins.providers.multipart.InputPart;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
-import org.jboss.resteasy.util.GenericType;
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -127,6 +115,9 @@ import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
+import org.ow2.proactive_grid_cloud_portal.common.Session;
+import org.ow2.proactive_grid_cloud_portal.common.SessionStore;
+import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStore;
 import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobInfoData;
@@ -150,6 +141,26 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestExc
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestException;
 import org.ow2.proactive_grid_cloud_portal.webapp.DateFormatter;
 import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.FileSystemException;
+import org.apache.commons.vfs2.FileSystemManager;
+import org.apache.commons.vfs2.FileType;
+import org.apache.commons.vfs2.Selectors;
+import org.apache.log4j.Logger;
+import org.dozer.DozerBeanMapper;
+import org.dozer.Mapper;
+import org.jboss.resteasy.annotations.GZIP;
+import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
+import org.jboss.resteasy.plugins.providers.multipart.InputPart;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
+import org.jboss.resteasy.util.GenericType;
+
+import static javax.ws.rs.core.MediaType.APPLICATION_XML_TYPE;
+import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
+import static org.ow2.proactive_grid_cloud_portal.scheduler.ValidationUtil.validateJobDescriptor;
 
 
 /**
@@ -165,6 +176,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     public static final String UNKNOWN_VALUE_TYPE = "Unknown value type";
 
     private static final Logger logger = ProActiveLogger.getLogger(SchedulerStateRest.class);
+
+    private SessionStore sessionStore = SharedSessionStore.getInstance();
 
     private static FileSystemManager fsManager = null;
 
@@ -325,7 +338,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     boolean finished) throws PermissionRestException, NotConnectedRestException {
         try {
             Scheduler s = checkAccess(sessionId, "revisionjobsinfo?index=" + index + "&range=" + range);
-            String user = SchedulerSessionMapper.getInstance().getSchedulerSession(sessionId).getUserName();
+            String user = sessionStore.get(sessionId).getUserName();
 
             boolean onlyUserJobs = (myJobs && user != null && user.trim().length() > 0);
 
@@ -416,7 +429,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             LogForwardingRestException, IOException {
         try {
             checkAccess(sessionId, "/scheduler/jobs/" + jobId + "/livelog");
-            SchedulerSession ss = SchedulerSessionMapper.getInstance().getSchedulerSession(sessionId);
+            Session ss = sessionStore.get(sessionId);
 
             JobOutput jo;
             JobOutputAppender jobOutputAppender = ss.getJobOutputAppender(jobId);
@@ -459,7 +472,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     String sessionId, @PathParam("jobid")
     String jobId) throws NotConnectedRestException {
         checkAccess(sessionId, "/scheduler/jobs/" + jobId + "/livelog/available");
-        SchedulerSession ss = SchedulerSessionMapper.getInstance().getSchedulerSession(sessionId);
+        Session ss = sessionStore.get(sessionId);
 
         JobOutputAppender joa = ss.getJobOutputAppender(jobId);
         if (joa != null) {
@@ -486,7 +499,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     String sessionId, @PathParam("jobid")
     String jobId) throws NotConnectedRestException {
         checkAccess(sessionId, "delete /scheduler/jobs/livelog" + jobId);
-        SchedulerSession ss = SchedulerSessionMapper.getInstance().getSchedulerSession(sessionId);
+        Session ss = sessionStore.get(sessionId);
         ss.removeJobOutAppender(jobId);
         return true;
 
@@ -1206,10 +1219,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      */
     private SchedulerProxyUserInterface checkAccess(String sessionId, String path)
             throws NotConnectedRestException {
-        SchedulerSession ss = SchedulerSessionMapper.getInstance().getSchedulerSession(sessionId);
+        Session ss = sessionStore.get(sessionId);
         if (ss == null) {
-            // logger.trace("not found a scheduler frontend for sessionId " +
-            // sessionId);
             throw new NotConnectedRestException(
                 "you are not connected to the scheduler, you should log on first");
         }
@@ -1217,13 +1228,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         SchedulerProxyUserInterface s = ss.getScheduler();
 
         if (s == null) {
-            // logger.trace("not found a scheduler frontend for sessionId " +
-            // sessionId);
             throw new NotConnectedRestException(
                 "you are not connected to the scheduler, you should log on first");
         }
-        // logger.trace("found a scheduler frontend for sessionId " + sessionId
-        // + ", path =" + path);
         return s;
     }
 
@@ -1679,7 +1686,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         } catch (NotConnectedException e) {
             throw new NotConnectedRestException(e);
         } finally {
-            SchedulerSessionMapper.getInstance().remove(sessionId);
+            sessionStore.terminate(sessionId);
             logger.debug("sessionid " + sessionId + " terminated");
         }
     }
@@ -1989,20 +1996,14 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     String username, @FormParam("password")
     String password) throws LoginException, SchedulerRestException {
         try {
-            SchedulerProxyUserInterface scheduler = PAActiveObject.newActive(
-                    SchedulerProxyUserInterface.class, new Object[] {});
-
-            String url = PortalConfiguration.getProperties().getProperty(PortalConfiguration.scheduler_url);
-
             if ((username == null) || (password == null)) {
                 throw new LoginException("empty login/password");
             }
-
-            scheduler.init(url, username, password);
-
-            String sessionId = SchedulerSessionMapper.getInstance().add(scheduler, username);
-            logger.info("binding user " + username + " to session " + sessionId);
-            return sessionId;
+            Session session = sessionStore.create();
+            session.setUserName(username);
+            session.connectToScheduler(new CredData(username, password));
+            logger.info("binding user " + username + " to session " + session.getSessionId());
+            return session.getSessionId();
         } catch (ActiveObjectCreationException e) {
             throw new SchedulerRestException(e);
         } catch (SchedulerException e) {
@@ -2029,16 +2030,13 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     public String loginWithCredential(@MultipartForm
     LoginForm multipart) throws LoginException, KeyException, SchedulerRestException {
         try {
-            SchedulerProxyUserInterface scheduler = PAActiveObject.newActive(
-                    SchedulerProxyUserInterface.class, new Object[] {});
-            String username = null;
-            String url = PortalConfiguration.getProperties().getProperty(PortalConfiguration.scheduler_url);
+            Session session = sessionStore.create();
 
             if (multipart.getCredential() != null) {
                 Credentials credentials;
                 try {
                     credentials = Credentials.getCredentials(multipart.getCredential());
-                    scheduler.init(url, credentials);
+                    session.connectToScheduler(credentials);
                 } catch (IOException e) {
                     throw new LoginException(e.getMessage());
                 }
@@ -2047,13 +2045,13 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                     throw new LoginException("empty login/password");
                 }
 
-                username = multipart.getUsername();
+                session.setUserName(multipart.getUsername());
                 CredData credData = new CredData(CredData.parseLogin(multipart.getUsername()), CredData
                         .parseDomain(multipart.getUsername()), multipart.getPassword(), multipart.getSshKey());
-                scheduler.init(url, credData);
+                session.connectToScheduler(credData);
             }
 
-            return SchedulerSessionMapper.getInstance().add(scheduler, username);
+            return session.getSessionId();
 
         } catch (PermissionException e) {
             throw new SchedulerRestException(e);

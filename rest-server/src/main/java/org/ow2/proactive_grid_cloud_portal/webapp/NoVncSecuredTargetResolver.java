@@ -50,8 +50,8 @@ import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
-import org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerSession;
-import org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerSessionMapper;
+import org.ow2.proactive_grid_cloud_portal.common.Session;
+import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStore;
 import com.netiq.websockify.IProxyTargetResolver;
 import org.apache.log4j.Logger;
 import org.jboss.netty.channel.MessageEvent;
@@ -94,7 +94,7 @@ public class NoVncSecuredTargetResolver implements IProxyTargetResolver {
             return null;
         }
 
-        SchedulerSession session = SchedulerSessionMapper.getInstance().getSchedulerSession(sessionId);
+        Session session = SharedSessionStore.getInstance().get(sessionId);
         if (session == null) {
             LOGGER.warn("Unknown sessionId.");
             return null;
@@ -160,7 +160,7 @@ public class NoVncSecuredTargetResolver implements IProxyTargetResolver {
         return null;
     }
 
-    private List<String> retrievePaRemoteConnectionLines(SchedulerSession session, String jobId,
+    private List<String> retrievePaRemoteConnectionLines(Session session, String jobId,
             TaskResult taskResult) {
         List<String> paRemoteConnectionLines = Collections.emptyList();
         String liveLogs = getJobLiveLogs(session, jobId);
@@ -176,7 +176,7 @@ public class NoVncSecuredTargetResolver implements IProxyTargetResolver {
         return paRemoteConnectionLines;
     }
 
-    private String getJobLiveLogs(SchedulerSession session, String jobId) {
+    private String getJobLiveLogs(Session session, String jobId) {
         try {
             return session.getJobOutputAppender(jobId).getJobOutput().fetchAllLogs();
         } catch (Exception e) {

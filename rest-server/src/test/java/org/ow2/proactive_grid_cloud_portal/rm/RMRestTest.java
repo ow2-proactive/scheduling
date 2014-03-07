@@ -51,6 +51,7 @@ import javax.management.ObjectName;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.resourcemanager.common.util.RMProxyUserInterface;
 import org.ow2.proactive_grid_cloud_portal.RestTestServer;
+import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStoreTestUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -102,7 +103,7 @@ public class RMRestTest extends RestTestServer {
 
     private JSONObject callGetStatHistory() throws Exception {
         RMProxyUserInterface rmMock = mock(RMProxyUserInterface.class);
-        String sessionId = RMSessionMapper.getInstance().add(rmMock);
+        String sessionId = SharedSessionStoreTestUtils.createValidSession(rmMock);
 
         AttributeList value = new AttributeList(Collections.singletonList(new Attribute("test", createRrdDb()
                 .getBytes())));
@@ -143,7 +144,7 @@ public class RMRestTest extends RestTestServer {
         RMProxyUserInterface rm = mock(RMProxyUserInterface.class);
         when(rm.shutdown(false)).thenReturn(new BooleanWrapper(true));
 
-        String sessionId = RMSessionMapper.getInstance().add(rm);
+        String sessionId = SharedSessionStoreTestUtils.createValidSession(rm);
         HttpResponse response = callHttpGetMethod("shutdown", sessionId);
 
         assertEquals(HttpURLConnection.HTTP_OK, response.getStatusLine().getStatusCode());
@@ -155,7 +156,8 @@ public class RMRestTest extends RestTestServer {
         RMProxyUserInterface rm = mock(RMProxyUserInterface.class);
         when(rm.shutdown(true)).thenReturn(new BooleanWrapper(true));
 
-        String sessionId = RMSessionMapper.getInstance().add(rm);
+        String sessionId = SharedSessionStoreTestUtils.createValidSession(rm);
+
         HttpResponse response = callHttpGetMethod("shutdown?preempt=true", sessionId);
 
         assertEquals(HttpURLConnection.HTTP_OK, response.getStatusLine().getStatusCode());
@@ -166,7 +168,7 @@ public class RMRestTest extends RestTestServer {
     @Test
     public void testAddNodeOverloading() throws Exception {
         RMProxyUserInterface rm = mock(RMProxyUserInterface.class);
-        String sessionId = RMSessionMapper.getInstance().add(rm);
+        String sessionId = SharedSessionStoreTestUtils.createValidSession(rm);
         when(rm.addNode(anyString())).thenReturn(new BooleanWrapper(true));
 
         List<NameValuePair> firstCall = Collections.<NameValuePair>singletonList(new BasicNameValuePair("nodeurl", "url"));

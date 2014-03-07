@@ -46,6 +46,7 @@ import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingExcepti
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingProvider;
 import org.ow2.proactive_grid_cloud_portal.RestTestServer;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
+import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStoreTestUtils;
 import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
 import org.apache.log4j.Logger;
 import org.jboss.resteasy.client.ProxyFactory;
@@ -79,8 +80,8 @@ public class SchedulerStateRestLiveLogsTest extends RestTestServer {
 
     @Test
     public void testLiveLogs_OutputRemovedAtEachCall() throws Exception {
-        String sessionId = SchedulerSessionMapper.getInstance().add(
-                mock(SchedulerProxyUserInterface.class), "bob");
+        String sessionId = SharedSessionStoreTestUtils.createValidSession(
+          mock(SchedulerProxyUserInterface.class));
 
         String firstJobId = "42";
 
@@ -107,8 +108,8 @@ public class SchedulerStateRestLiveLogsTest extends RestTestServer {
 
     @Test
     public void testLiveLogs_TwoJobsAtTheSameTime() throws Exception {
-        String sessionId = SchedulerSessionMapper.getInstance().add(
-                mock(SchedulerProxyUserInterface.class), "bob");
+        String sessionId = SharedSessionStoreTestUtils.createValidSession(
+          mock(SchedulerProxyUserInterface.class));
 
         String firstJobId = "42";
         String secondJobId = "43";

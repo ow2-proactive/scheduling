@@ -40,25 +40,18 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map.Entry;
 import java.util.Properties;
-import java.util.Set;
 
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.config.xml.ProActiveConfigurationParser;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.ow2.proactive.resourcemanager.common.util.RMProxyUserInterface;
-import org.ow2.proactive.scheduler.common.Scheduler;
-import org.ow2.proactive_grid_cloud_portal.rm.RMSessionMapper;
-import org.ow2.proactive_grid_cloud_portal.rm.RMSessionsCleaner;
+import org.ow2.proactive_grid_cloud_portal.common.SessionsCleaner;
+import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStore;
 import org.ow2.proactive_grid_cloud_portal.rm.RMStateCaching;
 import org.ow2.proactive_grid_cloud_portal.scheduler.IntWrapperConverter;
 import org.ow2.proactive_grid_cloud_portal.scheduler.RestartModeConverter;
-import org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerSessionMapper;
-import org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerSessionsCleaner;
 import org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateListener;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
@@ -70,8 +63,7 @@ public class RestRuntime {
 
     private static final Logger LOGGER = ProActiveLogger.getLogger(RestRuntime.class);
 
-    private SchedulerSessionsCleaner schedulerSessionCleaner;
-    private RMSessionsCleaner rmSessionCleaner;
+    private SessionsCleaner sessionCleaner;
 
     public void start(ResteasyProviderFactory dispatcher, File configurationFile, File log4jConfig,
             File paConfig) {
@@ -103,16 +95,10 @@ public class RestRuntime {
         RMStateCaching.init();
 
         // start the scheduler session cleaner
-        schedulerSessionCleaner = new SchedulerSessionsCleaner(SchedulerSessionMapper.getInstance());
-        Thread scheduler = new Thread(this.schedulerSessionCleaner, "Scheduler Sessions Cleaner Thread");
-        scheduler.setDaemon(true);
-        scheduler.start();
-
-        // start the rm session cleaner thread
-        rmSessionCleaner = new RMSessionsCleaner(RMSessionMapper.getInstance());
-        Thread rm = new Thread(this.rmSessionCleaner, "RM Sessions Cleaner Thread");
-        rm.setDaemon(true);
-        rm.start();
+        sessionCleaner = new SessionsCleaner(SharedSessionStore.getInstance());
+        Thread sessionCleanerThread = new Thread(this.sessionCleaner, "Sessions Cleaner Thread");
+        sessionCleanerThread.setDaemon(true);
+        sessionCleanerThread.start();
     }
 
     private void configureLogger(File log4jConfig) {
@@ -170,49 +156,15 @@ public class RestRuntime {
 
     public void stop() {
         // happily terminate sessions
-        terminateSchedulerSessions();
-        terminateRmSessions();
+        SharedSessionStore.getInstance().terminateAll();
 
-        schedulerSessionCleaner.stop();
-        rmSessionCleaner.stop();
+        sessionCleaner.stop();
 
         SchedulerStateListener.getInstance().kill();
         RMStateCaching.kill();
 
         // force the shutdown of the runtime
         ProActiveRuntimeImpl.getProActiveRuntime().cleanJvmFromPA();
-    }
-
-    private void terminateRmSessions() {
-        Set<String> schedulerSessionIds = RMSessionMapper.getInstance().getSessionsMap().keySet();
-        List<String> sessionids = new ArrayList<String>(schedulerSessionIds);
-        for (String sessionid : sessionids) {
-            RMProxyUserInterface s = RMSessionMapper.getInstance().getSessionsMap().get(sessionid);
-            try {
-                s.disconnect();
-            } catch (Throwable e) {
-                LOGGER.warn(e);
-            } finally {
-                RMSessionMapper.getInstance().remove(sessionid);
-                LOGGER.debug("RM session id " + sessionid + "terminated");
-            }
-        }
-    }
-
-    private void terminateSchedulerSessions() {
-        Set<String> schedulerSessionIds = SchedulerSessionMapper.getInstance().getSessionsMap().keySet();
-        List<String> sessionids = new ArrayList<String>(schedulerSessionIds);
-        for (String sessionid : sessionids) {
-            Scheduler s = SchedulerSessionMapper.getInstance().getSessionsMap().get(sessionid).getScheduler();
-            try {
-                s.disconnect();
-            } catch (Throwable e) {
-                LOGGER.warn(e);
-            } finally {
-                SchedulerSessionMapper.getInstance().remove(sessionid);
-                LOGGER.debug("Scheduler session id " + sessionid + "terminated");
-            }
-        }
     }
 
 }

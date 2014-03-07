@@ -48,9 +48,10 @@ import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
+import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStore;
+import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStoreTestUtils;
 import org.ow2.proactive_grid_cloud_portal.scheduler.JobOutput;
 import org.ow2.proactive_grid_cloud_portal.scheduler.JobOutputAppender;
-import org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerSessionMapper;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -85,7 +86,7 @@ public class NoVncSecuredTargetResolverTest {
 
     @Test
     public void testMagicStringFoundInLogs() throws Exception {
-        String sessionId = SchedulerSessionMapper.getInstance().add(schedulerMock, "bob");
+        String sessionId = SharedSessionStoreTestUtils.createValidSession(schedulerMock);
         when(schedulerMock.getTaskResult("42", "remoteVisuTask")).thenReturn(
                 new TaskResultImpl(TaskIdImpl.createTaskId(new JobIdImpl(42, "job"), "remoteVisuTask", 1,
                         false), new byte[0], new byte[0], new SimpleTaskLogs(
@@ -101,7 +102,7 @@ public class NoVncSecuredTargetResolverTest {
 
     @Test
     public void testMagicStringFoundInLogs_MagicStringOnSeveralLines() throws Exception {
-        String sessionId = SchedulerSessionMapper.getInstance().add(schedulerMock, "bob");
+        String sessionId = SharedSessionStoreTestUtils.createValidSession(schedulerMock);
         when(schedulerMock.getTaskResult("42", "remoteVisuTask")).thenReturn(
                 new TaskResultImpl(TaskIdImpl.createTaskId(new JobIdImpl(42, "job"), "remoteVisuTask", 1,
                         false), new byte[0], new byte[0], new SimpleTaskLogs(
@@ -117,8 +118,8 @@ public class NoVncSecuredTargetResolverTest {
 
     @Test
     public void testMagicStringFoundInLiveLogs_TaskNotFinished() throws Exception {
-        String sessionId = SchedulerSessionMapper.getInstance().add(schedulerMock, "bob");
-        SchedulerSessionMapper.getInstance().getSchedulerSession(sessionId).addJobOutputAppender("42",
+        String sessionId = SharedSessionStoreTestUtils.createValidSession(schedulerMock);
+        SharedSessionStore.getInstance().get(sessionId).addJobOutputAppender("42",
                 createLiveLogs("PA_REMOTE_CONNECTION;1;vnc;node.grid.com:5900"));
         when(schedulerMock.getTaskResult("42", "remoteVisuTask")).thenReturn(null);
 
@@ -131,10 +132,8 @@ public class NoVncSecuredTargetResolverTest {
 
     @Test
     public void testMagicStringFoundInLiveLogs() throws Exception {
-        String sessionId = SchedulerSessionMapper.getInstance().add(schedulerMock, "bob");
-        SchedulerSessionMapper
-                .getInstance()
-                .getSchedulerSession(sessionId)
+        String sessionId = SharedSessionStoreTestUtils.createValidSession(schedulerMock);
+        SharedSessionStore.getInstance().get(sessionId)
                 .addJobOutputAppender("42",
                         createLiveLogs("[Visualization_task@node2;10:38:06]PA_REMOTE_CONNECTION;1;vnc;node.grid.com:5900"));
         when(schedulerMock.getTaskResult("42", "remoteVisuTask")).thenReturn(
@@ -151,8 +150,8 @@ public class NoVncSecuredTargetResolverTest {
 
     @Test
     public void testMagicStringFoundInLiveLogs_MagicStringOnSeveralLines() throws Exception {
-        String sessionId = SchedulerSessionMapper.getInstance().add(schedulerMock, "bob");
-        SchedulerSessionMapper.getInstance().getSchedulerSession(sessionId).addJobOutputAppender("42",
+        String sessionId = SharedSessionStoreTestUtils.createValidSession(schedulerMock);
+        SharedSessionStore.getInstance().get(sessionId).addJobOutputAppender("42",
                 createLiveLogs("PA_REMOTE_CONNECTION\nPA_REMOTE_CONNECTION;1;vnc;node.grid.com:5900 "));
         when(schedulerMock.getTaskResult("42", "remoteVisuTask")).thenReturn(
                 new TaskResultImpl(TaskIdImpl.createTaskId(new JobIdImpl(42, "job"), "remoteVisuTask", 1,
