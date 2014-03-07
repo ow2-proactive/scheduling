@@ -93,7 +93,6 @@ project(':rest-server') {
 
         compile 'org.ow2.proactive:scheduler-client:3.5.0-SNAPSHOT'
         compile 'org.ow2.proactive:rm-client:3.5.0-SNAPSHOT'
-        compile 'org.ow2.proactive:rm-client:3.5.0-SNAPSHOT'
         compile 'org.objectweb.proactive:programming-extension-dataspaces:5.5.0-SNAPSHOT'
 
         compile project(':rest-api')
