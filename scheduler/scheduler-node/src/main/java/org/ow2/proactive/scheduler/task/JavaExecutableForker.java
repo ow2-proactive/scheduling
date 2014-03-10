@@ -62,6 +62,7 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.body.future.FutureMonitoring;
 import org.objectweb.proactive.core.body.future.FutureProxy;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.config.PAProperty;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.node.Node;
@@ -82,6 +83,7 @@ import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.exception.ForkedJVMProcessException;
 import org.ow2.proactive.scheduler.exception.ProgressPingerException;
 import org.ow2.proactive.scheduler.exception.StartForkedProcessException;
@@ -97,10 +99,11 @@ import org.ow2.proactive.scripting.ScriptLoader;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.utils.FileToBytesConverter;
 
+
 /**
  * This Executable is responsible for executing another executable in a separate JVM. 
  * It receives a reference to a remote taskLauncher object, and delegates execution to this object.
- * 
+ *
  * @author The ProActive Team
  *
  */
@@ -146,7 +149,7 @@ public class JavaExecutableForker extends JavaExecutable implements ForkerStarte
     protected LauncherGuard launcherGuard = new LauncherGuard();
 
     final private TaskLauncher taskLauncherStub;
-    
+
     /** Hibernate default constructor */
     public JavaExecutableForker(TaskLauncher launcherStub) {
         this.taskLauncherStub = launcherStub;
@@ -320,7 +323,7 @@ public class JavaExecutableForker extends JavaExecutable implements ForkerStarte
                 ife = new InternalForkEnvironment(fe, null, true);
             } else {
                 throw new IllegalStateException(
-                    "System property was set and fork process environment could not be obtained", e);
+                        "System property was set and fork process environment could not be obtained", e);
             }
         }
         //change reference of forkEnv to the internal one
@@ -394,7 +397,7 @@ public class JavaExecutableForker extends JavaExecutable implements ForkerStarte
         ForkEnvironment forkEnvironment = this.execInitializer.getForkEnvironment();
         String java_home;
         if (forkEnvironment != null && forkEnvironment.getJavaHome() != null &&
-            !"".equals(forkEnvironment.getJavaHome())) {
+                !"".equals(forkEnvironment.getJavaHome())) {
             java_home = forkEnvironment.getJavaHome();
         } else {
             java_home = System.getProperty("java.home");
@@ -402,6 +405,23 @@ public class JavaExecutableForker extends JavaExecutable implements ForkerStarte
         List<String> command = new ArrayList<String>();
         command.add(java_home + File.separatorChar + "bin" + File.separatorChar + "java");
         return command;
+    }
+
+    private String getLogsHome() {
+        String logHome = System.getProperty(PASchedulerProperties.SCHEDULER_HOME.getKey());
+        if (logHome == null) {
+            logHome = System.getProperty(CentralPAPropertyRepository.PA_HOME.getName());
+        }
+        try {
+            if (logHome == null) {
+                ProActiveRuntimeImpl runtime = ProActiveRuntimeImpl.getProActiveRuntime();
+                logHome = runtime.getProActiveHome();
+            }
+        } catch (ProActiveException pae) {
+            logHome = System.getProperty("java.io.tmpdir");
+        }
+        return logHome + File.separator +
+                ".logs";
     }
 
     /**
@@ -425,24 +445,21 @@ public class JavaExecutableForker extends JavaExecutable implements ForkerStarte
             }
         }
         //set logHome than can be used in log4j file
-        String logHome;
+        String logHome = getLogsHome();
+        File tmp = new File(logHome);
+        if (!tmp.exists()) {
+            tmp.mkdir();
+        }
+
         String nodeName;
         try {
-            ProActiveRuntimeImpl runtime = ProActiveRuntimeImpl.getProActiveRuntime();
             nodeName = PAActiveObject.getNode().getNodeInformation().getName();
-            logHome = runtime.getProActiveHome() + File.separator +
-                ".logs";
-            File tmp = new File(logHome);
-            if (!tmp.exists()) {
-                tmp.mkdir();
-            }
         } catch (ProActiveException pae) {
-            logHome = System.getProperty("java.io.tmpdir");
             nodeName = "DefaultNode";
         }
         command.add("-D" + FORKED_LOGS_HOME + "=" + logHome);
 
-        command.add("-D" + FORKED_PARENT_NODE+ "=" + nodeName);
+        command.add("-D" + FORKED_PARENT_NODE + "=" + nodeName);
 
         //set mandatory log4j file
         if (forkEnvironment == null || !contains("log4j.configuration", forkEnvironment.getJVMArguments())) {
@@ -459,7 +476,7 @@ public class JavaExecutableForker extends JavaExecutable implements ForkerStarte
         }
         //set default PAConfiguration
         if (forkEnvironment == null ||
-            !contains("proactive.configuration", forkEnvironment.getJVMArguments())) {
+                !contains("proactive.configuration", forkEnvironment.getJVMArguments())) {
             try {
                 fpaconfig = createTempFile("forked_jtp");
                 PrintStream out = new PrintStream(fpaconfig);
@@ -473,7 +490,7 @@ public class JavaExecutableForker extends JavaExecutable implements ForkerStarte
         }
         // set log size to minimum value as log are handled on forker side
         if (forkEnvironment == null ||
-            !contains(TaskLauncher.MAX_LOG_SIZE_PROPERTY, forkEnvironment.getJVMArguments())) {
+                !contains(TaskLauncher.MAX_LOG_SIZE_PROPERTY, forkEnvironment.getJVMArguments())) {
             command.add("-D" + TaskLauncher.MAX_LOG_SIZE_PROPERTY + "=" + FORKED_LOG_BUFFER_SIZE);
         }
         //set scratchdir
@@ -596,7 +613,7 @@ public class JavaExecutableForker extends JavaExecutable implements ForkerStarte
             } catch (IllegalThreadStateException e) {
                 //thrown by process.exitValue() if process is not finished
                 logger.debug("Process not terminated, continue launching Forked VM (try number " +
-                    numberOfTrials + ")");
+                        numberOfTrials + ")");
             }
         }
         throw startProcessException(String.format("Separate java process didn't start after %dms.",
@@ -752,7 +769,7 @@ public class JavaExecutableForker extends JavaExecutable implements ForkerStarte
     /**
      * Create temp file in java.io.tmpdir if SCRATCHDIR is not set, 
      * otherwise, create temp file in SCRATCHDIR
-     * 
+     *
      * @param prefix the prefix for the temp file
      * @return the newly created file
      * @throws IOException if the temp file could not be created,
@@ -803,7 +820,7 @@ public class JavaExecutableForker extends JavaExecutable implements ForkerStarte
 
         /**
          * Returns an appender that redirect all logs on stdout/stderr depending on the level.
-         * @return  an appender that redirect all logs on stdout/stderr depending on the level.
+         * @return an appender that redirect all logs on stdout/stderr depending on the level.
          */
         public Appender getAppender() throws LogForwardingException {
             return new AppenderSkeleton() {
