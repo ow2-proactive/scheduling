@@ -261,6 +261,7 @@ public abstract class TaskLauncher implements InitActive {
     protected ExecutableGuard executableGuard = new ExecutableGuard();
 
     protected volatile TaskLauncher stubOnThis;
+    protected volatile Body taskLauncherBody;
 
     // true if finalizeLoggers has been called
     private final AtomicBoolean loggersFinalized = new AtomicBoolean(false);
@@ -342,6 +343,7 @@ public abstract class TaskLauncher implements InitActive {
         try {
             node = PAActiveObject.getNode();
             stubOnThis = (TaskLauncher) PAActiveObject.getStubOnThis();
+            taskLauncherBody = PAActiveObject.getBodyOnThis();
             executableGuard.setNode(node);
         } catch (Exception e) {
             throw new IllegalStateException("Could not retrieve ProActive Node");
@@ -837,11 +839,14 @@ public abstract class TaskLauncher implements InitActive {
         executableGuard.clean(TaskLauncher.CLEAN_TIMEOUT);
 
         /*
-         * send back the result (even if the task was killed)
+         * send back the result (if the task was killed, the core is not accessible, but it is accessible
+         * if the task was walltimed)
          */
-        if (core != null) {
-            // callback to scheduler core sending the result
-            core.terminate(taskId, taskResult);
+        if (core != null ) {
+            if (!executableGuard.wasKilled() || executableGuard.wasWalltimed()) {
+                // callback to scheduler core sending the result
+                core.terminate(taskId, taskResult);
+            }
         }
     }
 
@@ -867,8 +872,14 @@ public abstract class TaskLauncher implements InitActive {
 
             executableGuard.clean(TaskLauncher.CLEAN_TIMEOUT);
         }
-
-        PAActiveObject.getBodyOnThis().terminate(!normalTermination);
+        try {
+            if (taskLauncherBody != null) {
+                taskLauncherBody.terminate(!normalTermination);
+            }
+        } catch (Exception e) {
+            logger.info("Exception when terminating task launcher active object",e);
+        }
+        logger.info("TaskLauncher terminated");
     }
 
     /**

@@ -60,6 +60,7 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
+import org.ow2.tests.FunctionalTest;
 
 import functionaltests.executables.EndlessExecutable;
 
@@ -67,7 +68,7 @@ import functionaltests.executables.EndlessExecutable;
 /**
  * Test checks that walltime parameter is correctly taken into account for various tasks
  */
-public class TestJobWalltime extends SchedulerConsecutive {
+public class TestJobWalltime extends FunctionalTest {
 
     static Script endlessScript;
 
@@ -76,16 +77,12 @@ public class TestJobWalltime extends SchedulerConsecutive {
     @Before
     public void init() throws Throwable {
         endlessScript = new SimpleScript("file = new java.io.File(java.lang.System.getProperty(\"java.io.tmpdir\"),\"started.ok\");file.createNewFile();while(true){java.lang.Thread.sleep(500);}","javascript");
-        if (!shouldBeExecutedInConsecutiveMode(this.getClass())) {
-            SchedulerTHelper.startScheduler();
-        }
+        SchedulerTHelper.startScheduler();
     }
 
     @After
     public void clean() throws Throwable {
-        if (!shouldBeExecutedInConsecutiveMode(this.getClass())) {
-            SchedulerTHelper.killScheduler();
-        }
+        SchedulerTHelper.killScheduler();
     }
 
     @Test
@@ -206,12 +203,15 @@ public class TestJobWalltime extends SchedulerConsecutive {
         // If AO remains the test will fail with a timeout.
         boolean remainingAO = true;
 
-        while(remainingAO) {
+        long wait = 0;
+        while(remainingAO && wait < 5000) {
             Thread.sleep(50);
+            wait += 50;
             remainingAO = false;
             for (Node node : nodes) {
                 remainingAO = remainingAO || (node.getNumberOfActiveObjects() > 0);
             }
         }
+        Assert.assertFalse("No Active Objects should remain",remainingAO);
     }
 }
