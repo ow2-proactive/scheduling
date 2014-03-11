@@ -316,7 +316,7 @@ public class RMTHelper {
 
     }
 
-    private static TNode createNode(String nodeName, String expectedUrl, JVMProcess nodeProcess) throws IOException, NodeException {
+    public static TNode createNode(String nodeName, String expectedUrl, JVMProcess nodeProcess) throws IOException, NodeException {
 
         if (expectedUrl == null) {
             expectedUrl = "rmi://" + ProActiveInet.getInstance().getHostname() + ":" + PA_RMI_PORT + "/" + nodeName;
@@ -349,7 +349,7 @@ public class RMTHelper {
         }
     }
 
-    private static JVMProcessImpl createJvmProcess(String className, List<String> parameters, Map<String, String> vmParameters, List<String> vmOptions) throws IOException {
+    public static JVMProcessImpl createJvmProcess(String className, List<String> parameters, Map<String, String> vmParameters, List<String> vmOptions) throws IOException {
         JVMProcessImpl nodeProcess = new JVMProcessImpl(
             new org.objectweb.proactive.core.process.AbstractExternalProcess.StandardOutputMessageLogger());
         nodeProcess.setClassname(className);

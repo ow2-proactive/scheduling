@@ -120,6 +120,16 @@ class LiveJobs {
         return result;
     }
 
+    RunningTaskData getRunningTask(TaskId taskId) {
+        List<RunningTaskData> result = new ArrayList<RunningTaskData>();
+        for (RunningTaskData taskData : runningTasksData.values()) {
+            if (taskData.getTask().getId().equals(taskId)) {
+                return taskData;
+            }
+        }
+        return null;
+    }
+
     boolean hasJobOwnedByUser(String user) {
         for (JobData jobData : jobs.values()) {
             if (jobData.job.getOwner().equals(user)) {

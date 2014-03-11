@@ -33,7 +33,7 @@ public class LocalInfrastructure extends InfrastructureManager {
     private AtomicInteger atomicMaxNodes;
     @Configurable(description = "in ms. After this timeout expired\nthe node is considered to be lost")
     private int nodeTimeout = 5000;
-    @Configurable(description = "Aditionnal ProActive properties")
+    @Configurable(description = "Additional ProActive properties")
     private String paProperties = "";
 
     /** To link a nodeName with its process */
@@ -290,16 +290,14 @@ public class LocalInfrastructure extends InfrastructureManager {
     }
 
     @Override
-    public void removeNode(Node arg0) throws RMException {
-        String nodeName = arg0.getNodeInformation().getName();
+    public void removeNode(Node node) throws RMException {
+        String nodeName = node.getNodeInformation().getName();
+        logger.debug("Removing node "+node.getNodeInformation().getURL() + " from infrastructure");
+        this.atomicMaxNodes.incrementAndGet();
         ProcessExecutor proc = this.nodeNameToProcess.remove(nodeName);
         if (proc != null) {
-            try {
-                proc.killProcess();
-                logger.info("Process associated to node " + nodeName + " destroyed");
-            } finally {
-                this.atomicMaxNodes.incrementAndGet();
-            }
+            proc.killProcess();
+            logger.info("Process associated to node " + nodeName + " destroyed");
         } else {
             logger.warn("No process associated to node " + nodeName);
         }

@@ -36,14 +36,6 @@
  */
 package org.ow2.proactive.scheduler.core;
 
-import java.security.PrivateKey;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
@@ -53,8 +45,11 @@ import org.objectweb.proactive.utils.NamedThreadFactory;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.frontend.topology.TopologyDisabledException;
+import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
+import org.ow2.proactive.scheduler.common.SchedulerConnection;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
+import org.ow2.proactive.scheduler.common.exception.ConnectionException;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.util.VariablesUtil;
 import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
@@ -80,6 +75,10 @@ import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.Formatter;
 import org.ow2.proactive.utils.NodeSet;
+
+import java.security.PrivateKey;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -112,6 +111,8 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
     private InternalPolicy internalPolicy;
 
     private TaskTerminateNotification terminateNotification;
+
+    private String schedulerUrl = null;
 
     public SchedulingMethodImpl(SchedulingService schedulingService) throws Exception {
         this.schedulingService = schedulingService;
@@ -431,7 +432,6 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
     /**
      * Load and initialize the task to be started
      *
-     * @param job the job owning the task to be initialized
      * @param task the task to be initialized
      */
     protected void loadAndInit(InternalTask task) {
@@ -467,8 +467,9 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                     .getDataSpaceServiceStarter();
             job.startDataSpaceApplication(dsStarter.getNamingService());
 
-            //create launcher
+            // create launcher
             launcher = task.createLauncher(job, node);
+
             activeObjectCreationRetryTimeNumber = ACTIVEOBJECT_CREATION_RETRY_TIME_NUMBER;
 
             nodeSet.remove(0);
@@ -541,5 +542,17 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
             VariablesUtil.filterAndUpdate(script, variables);
         }
         return selectionScripts;
+    }
+
+    private String getSchedulerUrl() {
+        if (schedulerUrl == null) {
+            try {
+                SchedulerAuthenticationInterface sai = SchedulerConnection.waitAndJoin(null);
+                schedulerUrl = sai.getHostURL();
+            } catch (ConnectionException e) {
+                logger.error("Cannot determine the scheduler url", e);
+            }
+        }
+        return schedulerUrl;
     }
 }

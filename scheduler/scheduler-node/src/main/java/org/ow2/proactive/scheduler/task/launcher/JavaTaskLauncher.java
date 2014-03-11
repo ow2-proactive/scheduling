@@ -36,11 +36,6 @@
  */
 package org.ow2.proactive.scheduler.task.launcher;
 
-import java.io.Serializable;
-import java.lang.reflect.InvocationTargetException;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
@@ -54,6 +49,11 @@ import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
 import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
+
+import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Map;
+import java.util.Map.Entry;
 
 
 /**
@@ -97,12 +97,13 @@ public class JavaTaskLauncher extends TaskLauncher {
         doTaskAndGetResult(core, executableContainer, results);
     }
 
-    public TaskResult doTaskAndGetResult(TaskTerminateNotification core,
+    public void doTaskAndGetResult(final TaskTerminateNotification terminateNotificationStub,
             ExecutableContainer executableContainer, TaskResult... results) {
         logger.info("Starting Task "+taskId.getReadableName());
         long duration = -1;
         long sample = 0;
         long intervalms = 0;
+
         // Executable result (res or ex)
         Throwable exception = null;
         Serializable userResult = null;
@@ -220,10 +221,9 @@ public class JavaTaskLauncher extends TaskLauncher {
             // logs are set even if the task is killed
             res.setLogs(this.getLogs());
 
-            finalizeTask(core, res);
+            finalizeTask(terminateNotificationStub, res);
 
         }
-        return res;
     }
 
 

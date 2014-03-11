@@ -22,5 +22,4 @@ public class TerminateNotification implements TaskTerminateNotification {
     public void terminate(TaskId taskId, TaskResult taskResult) {
         schedulingService.taskTerminatedWithResult(taskId, taskResult);
     }
-
 }

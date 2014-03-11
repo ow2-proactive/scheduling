@@ -168,6 +168,11 @@ public class TestRMProxy implements ResourceManager {
         return target.nodeIsAvailable(arg0);
     }
 
+    @Override
+    public BooleanWrapper setNodeAvailable(String nodeUrl) {
+        return target.setNodeAvailable(nodeUrl);
+    }
+
     public BooleanWrapper releaseNode(Node arg0) {
         return target.releaseNode(arg0);
     }

@@ -110,6 +110,7 @@ final class TerminationData {
             }
 
             try {
+                logger.debug("Releasing nodes for task '" + taskData.getTask().getId() + "'");
                 RMProxiesManager proxiesManager = service.getInfrastructure().getRMProxiesManager();
                 proxiesManager.getUserRMProxy(taskData.getUser(), taskData.getCredendtials()).releaseNodes(
                         taskData.getTask().getExecuterInformations().getNodes(),

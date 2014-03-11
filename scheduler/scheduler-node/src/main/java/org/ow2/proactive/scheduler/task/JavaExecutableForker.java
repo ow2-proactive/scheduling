@@ -36,36 +36,18 @@
  */
 package org.ow2.proactive.scheduler.task;
 
-import static org.ow2.proactive.scheduler.common.util.VariablesUtil.filterAndUpdate;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintStream;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Random;
-import java.util.concurrent.Callable;
-
 import org.apache.log4j.Appender;
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
+import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
-import org.objectweb.proactive.core.body.future.FutureMonitoring;
-import org.objectweb.proactive.core.body.future.FutureProxy;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.config.PAProperty;
-import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.extensions.amqp.AMQPConfig;
 import org.objectweb.proactive.extensions.amqp.federation.AMQPFederationConfig;
@@ -73,11 +55,13 @@ import org.objectweb.proactive.extensions.pamr.PAMRConfig;
 import org.objectweb.proactive.extensions.processbuilder.OSProcessBuilder;
 import org.objectweb.proactive.extensions.processbuilder.exception.NotImplementedException;
 import org.ow2.proactive.resourcemanager.utils.OneJar;
+import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.exception.TaskAbortedException;
 import org.ow2.proactive.scheduler.common.exception.UserException;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
+import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
@@ -92,12 +76,20 @@ import org.ow2.proactive.scheduler.task.launcher.JavaTaskLauncherForked;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
 import org.ow2.proactive.scheduler.task.launcher.TaskLauncherInitializer;
 import org.ow2.proactive.scheduler.task.launcher.utils.ForkerUtils;
+import org.ow2.proactive.scheduler.task.launcher.utils.TaskResultCallback;
 import org.ow2.proactive.scheduler.util.process.ThreadReader;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptHandler;
 import org.ow2.proactive.scripting.ScriptLoader;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.utils.FileToBytesConverter;
+
+import java.io.*;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.concurrent.Callable;
+
+import static org.ow2.proactive.scheduler.common.util.VariablesUtil.filterAndUpdate;
 
 
 /**
@@ -198,16 +190,14 @@ public class JavaExecutableForker extends JavaExecutable implements ForkerStarte
             //the forked java task launcher will do that in place
             logger.debug("Starting java task");
             launcherGuard.configureNode();
-            TaskResult result = launcherGuard.doTaskAndGetResult(results);
+            launcherGuard.doTaskAndGetResult(results);
 
             //waiting for task result futur
             //as it is forked, wait until futur has arrive or someone kill the task (core OR tasktimer)
             logger.debug("Java task started, waiting for result or kill...");
-            while (!launcherGuard.wasKilled()) {
+            while (!launcherGuard.wasKilled() && !launcherGuard.resultAvailable()) {
                 try {
-                    /* the below method throws an exception if timeout expires */
-                    PAFuture.waitFor(result, TIMEOUT);
-                    break;
+                    launcherGuard.waitForResult(TIMEOUT);
                 } catch (ProActiveTimeoutException e) {
                 }
             }
@@ -223,7 +213,7 @@ public class JavaExecutableForker extends JavaExecutable implements ForkerStarte
             if (launcherGuard.wasKilled()) {
                 throw new TaskAbortedException("Task killed or walltime exceeded");
             }
-            return PAFuture.getFutureValue(result);
+            return launcherGuard.getResult();
         } finally {
             launcherGuard.clean(TaskLauncher.CLEAN_TIMEOUT);
         }
@@ -850,22 +840,51 @@ public class JavaExecutableForker extends JavaExecutable implements ForkerStarte
         }
     }
 
-
-    protected class LauncherGuard extends Guard<JavaTaskLauncherForked> {
+    public class LauncherGuard extends Guard<JavaTaskLauncherForked> {
 
         TaskResult result;
+        boolean resultAvailable = false;
+        Object syncResultAccess = new Object();
+
+        TaskResultCallback taskResultHandlerStub = null;
 
         int lastProgress = 0;
 
         String forkedJVMDataspace;
 
+        public void doTaskAndGetResult(TaskResult... results) throws ActiveObjectCreationException, NodeException {
+            TaskResultCallback taskResultHandler = new TaskResultCallback(this);
+            TaskResultCallback taskResultHandlerStub = PAActiveObject.turnActive(taskResultHandler);
 
-        public TaskResult doTaskAndGetResult(TaskResult... results) {
-            // asynchronous ProActive call
-            result = launcherGuard.use().doTaskAndGetResult(null, execInitializer
+            launcherGuard.use().doTaskAndGetResult(taskResultHandlerStub, execInitializer
                     .getJavaExecutableContainer(), results);
-            return result;
+        }
 
+        public void setResult(TaskResult taskResult) {
+            synchronized (syncResultAccess) {
+                logger.debug("Setting the result of task");
+                result = taskResult;
+                resultAvailable = true;
+                syncResultAccess.notifyAll();
+            }
+        }
+
+        public TaskResult getResult() {
+            synchronized (syncResultAccess) {
+                return result;
+            }
+        }
+
+        public void waitForResult(int timeout) throws InterruptedException {
+            synchronized (syncResultAccess) {
+                syncResultAccess.wait(timeout);
+            }
+        }
+
+        public boolean resultAvailable() {
+            synchronized (syncResultAccess) {
+                return resultAvailable;
+            }
         }
 
         public synchronized void configureNode() {
@@ -896,11 +915,6 @@ public class JavaExecutableForker extends JavaExecutable implements ForkerStarte
                 } catch (Throwable e) {
                     logger.debug("Exception when killing Forked Java Task Launcher, this may be normal.", e);
                 }
-            }
-
-            // if the result is being waited inside the main loop
-            if (result != null) {
-                FutureMonitoring.removeFuture(((FutureProxy) ((StubObject) result).getProxy()));
             }
         }
 
@@ -955,5 +969,6 @@ public class JavaExecutableForker extends JavaExecutable implements ForkerStarte
                 }
             }
         }
+
     }
 }

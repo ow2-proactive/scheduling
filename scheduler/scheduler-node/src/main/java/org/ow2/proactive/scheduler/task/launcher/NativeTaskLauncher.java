@@ -128,13 +128,13 @@ public class NativeTaskLauncher extends TaskLauncher {
     /**
      * Execute the user task as an active object.
      *
-     * @param core The scheduler core to be notify
+     * @param terminateNotificationStub The scheduler core to be notify
      * @param executableContainer contains the task to execute
      * @param results the possible results from parent tasks.(if task flow)
      * @return a task result representing the result of this task execution.
      */
     @Override
-    public void doTask(TaskTerminateNotification core, ExecutableContainer executableContainer,
+    public void doTask(TaskTerminateNotification terminateNotificationStub, ExecutableContainer executableContainer,
             TaskResult... results) {
 
         logger.debug("Starting Task " + taskId.getReadableName());
@@ -289,7 +289,7 @@ public class NativeTaskLauncher extends TaskLauncher {
             }
 
             res.setLogs(this.getLogs());
-            this.finalizeTask(core, res);
+            this.finalizeTask(terminateNotificationStub, res);
         }
     }
 

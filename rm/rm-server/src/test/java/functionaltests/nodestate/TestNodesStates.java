@@ -184,10 +184,15 @@ public class TestNodesStates extends RMConsecutive {
         resourceManager.releaseNodes(nodes);
 
         // check Nodes freed Event has been thrown
-        for (int i = 0; i < totalNodeNumber - 2; i++) {
+        for (int i = 0; i < totalNodeNumber - 1; i++) {
             evt = helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
             Assert.assertEquals(evt.getNodeState(), NodeState.FREE);
         }
+
+        // the down node became free
+        // wait while rm detects again that it's down
+        evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, n.getNodeInformation().getURL());
+        Assert.assertEquals(evt.getNodeState(), NodeState.DOWN);
 
         //two nodes killed, but the detected down is in RM down nodes list
         //( down nodes are in total nodes count)

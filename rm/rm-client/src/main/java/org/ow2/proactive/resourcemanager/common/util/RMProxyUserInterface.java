@@ -191,6 +191,11 @@ public class RMProxyUserInterface extends RMListenerProxy implements ResourceMan
         return target.nodeIsAvailable(arg0);
     }
 
+    @Override
+    public BooleanWrapper setNodeAvailable(String nodeUrl) {
+        return target.setNodeAvailable(nodeUrl);
+    }
+
     /**
      * @see org.ow2.proactive.resourcemanager.frontend.ResourceManager#releaseNode(org.objectweb.proactive.core.node.Node)
      */

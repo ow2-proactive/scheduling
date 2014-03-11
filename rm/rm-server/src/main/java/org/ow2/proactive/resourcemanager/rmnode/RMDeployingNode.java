@@ -36,10 +36,6 @@
  */
 package org.ow2.proactive.resourcemanager.rmnode;
 
-import java.io.Serializable;
-import java.security.Permission;
-import java.util.HashMap;
-
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeInformation;
@@ -54,6 +50,10 @@ import org.ow2.proactive.resourcemanager.nodesource.infrastructure.Infrastructur
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.SelectionScript;
+
+import java.io.Serializable;
+import java.security.Permission;
+import java.util.HashMap;
 
 
 /**
@@ -202,7 +202,7 @@ public final class RMDeployingNode implements RMNode, Serializable {
     /**
      * @throws UnsupportedOperationException
      */
-    public Node getNode() throws NodeException {
+    public Node getNode() {
         throw new UnsupportedOperationException();
     }
 
@@ -336,7 +336,7 @@ public final class RMDeployingNode implements RMNode, Serializable {
     /**
      * @throws UnsupportedOperationException
      */
-    public void setBusy(Client owner) throws NodeException {
+    public void setBusy(Client owner) {
         throw new UnsupportedOperationException();
     }
 
@@ -350,7 +350,7 @@ public final class RMDeployingNode implements RMNode, Serializable {
     /**
      * @throws UnsupportedOperationException
      */
-    public void setFree() throws NodeException {
+    public void setFree() {
         throw new UnsupportedOperationException();
     }
 
@@ -371,7 +371,7 @@ public final class RMDeployingNode implements RMNode, Serializable {
     /**
      * @throws UnsupportedOperationException
      */
-    public void setToRemove() throws NodeException {
+    public void setToRemove() {
         throw new UnsupportedOperationException();
     }
 

@@ -36,15 +36,7 @@
  */
 package unittests.policy;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.security.Permission;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-
+import org.junit.Assert;
 import org.objectweb.proactive.core.node.NodeException;
 import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
 import org.ow2.proactive.resourcemanager.authentication.Client;
@@ -58,7 +50,15 @@ import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.tests.FunctionalTest;
-import org.junit.Assert;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.security.Permission;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 
 /**
@@ -102,7 +102,7 @@ public class TestNodeSourcePolicy extends FunctionalTest {
             return name;
         }
 
-        public org.objectweb.proactive.core.node.Node getNode() throws NodeException {
+        public org.objectweb.proactive.core.node.Node getNode() {
             return null;
         }
 
@@ -186,13 +186,13 @@ public class TestNodeSourcePolicy extends FunctionalTest {
             return false;
         }
 
-        public void setFree() throws NodeException {
+        public void setFree() {
         }
 
-        public void setBusy(Client owner) throws NodeException {
+        public void setBusy(Client owner) {
         }
 
-        public void setToRemove() throws NodeException {
+        public void setToRemove() {
         }
 
         public void setDown() {

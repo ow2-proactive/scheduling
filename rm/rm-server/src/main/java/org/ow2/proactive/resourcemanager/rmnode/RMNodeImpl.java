@@ -36,11 +36,7 @@
  */
 package org.ow2.proactive.resourcemanager.rmnode;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.security.Permission;
-import java.util.HashMap;
-
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
@@ -53,12 +49,12 @@ import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeDescriptor;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
-import org.ow2.proactive.scripting.Script;
-import org.ow2.proactive.scripting.ScriptHandler;
-import org.ow2.proactive.scripting.ScriptLoader;
-import org.ow2.proactive.scripting.ScriptResult;
-import org.ow2.proactive.scripting.SelectionScript;
-import org.apache.log4j.Logger;
+import org.ow2.proactive.scripting.*;
+
+import java.io.IOException;
+import java.io.Serializable;
+import java.security.Permission;
+import java.util.HashMap;
 
 
 /**
@@ -177,10 +173,7 @@ public class RMNodeImpl implements RMNode, Serializable {
     /**
      * @see org.ow2.proactive.resourcemanager.rmnode.RMNode#getNode()
      */
-    public Node getNode() throws NodeException {
-        if (this.isDown()) {
-            throw new NodeException("The node is down");
-        }
+    public Node getNode() {
         return this.node;
     }
 
@@ -228,10 +221,7 @@ public class RMNodeImpl implements RMNode, Serializable {
      * Changes the state of this node to {@link NodeState#BUSY}.
      * @throws NodeException if the node is down.
      */
-    public void setBusy(Client owner) throws NodeException {
-        if (this.isDown()) {
-            throw new NodeException("The node is down");
-        }
+    public void setBusy(Client owner) {
         this.state = NodeState.BUSY;
         this.stateChangeTime = System.currentTimeMillis();
         this.owner = owner;
@@ -241,10 +231,7 @@ public class RMNodeImpl implements RMNode, Serializable {
      * Changes the state of this node to {@link NodeState#FREE}.
      * @throws NodeException if the node is down.
      */
-    public void setFree() throws NodeException {
-        if (this.isDown()) {
-            throw new NodeException("The node is down");
-        }
+    public void setFree() {
         this.state = NodeState.FREE;
         this.stateChangeTime = System.currentTimeMillis();
         this.owner = null;
@@ -272,10 +259,7 @@ public class RMNodeImpl implements RMNode, Serializable {
      * Changes the state of this node to {@link NodeState#TO_BE_RELEASED}.
      * @throws NodeException if the node is down.
      */
-    public void setToRemove() throws NodeException {
-        if (this.isDown()) {
-            throw new NodeException("The node is down");
-        }
+    public void setToRemove() {
         this.state = NodeState.TO_BE_REMOVED;
         this.stateChangeTime = System.currentTimeMillis();
     }

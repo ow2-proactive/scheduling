@@ -800,8 +800,16 @@ public class SchedulingService {
                tlogger.trace(task.getId(), "getProgress failed", e);
             }
         } catch (Throwable t) {
-            tlogger.info(task.getId(), "node failed", t);
-            restartTaskOnNodeFailure(task);
+            RunningTaskData runningTask = jobs.getRunningTask(task.getId());
+            if (runningTask!=null) {
+                int attempts = runningTask.increaseAndGetPingAttempts();
+                if (attempts > PASchedulerProperties.SCHEDULER_NODE_PING_ATTEMPTS.getValueAsInt()) {
+                    tlogger.info(task.getId(), "node failed", t);
+                    restartTaskOnNodeFailure(task);
+                } else {
+                    tlogger.debug(task.getId(), "node failed - waiting while it comes back");
+                }
+            }
         }
     }
 

@@ -113,7 +113,7 @@ public interface RMNode extends Comparable<RMNode> {
      * @return a node Object.
      * @throws NodeException if the node is down.
      */
-    public Node getNode() throws NodeException;
+    public Node getNode();
 
     /**
      * @return the name of the virtual node
@@ -240,22 +240,19 @@ public interface RMNode extends Comparable<RMNode> {
 
     /**
      * change the node's status to free
-     * @throws NodeException
      */
-    public void setFree() throws NodeException;
+    public void setFree();
 
     /**
      * change the node's status to busy.
      * @param owner
-     * @throws NodeException
      */
-    public void setBusy(Client owner) throws NodeException;
+    public void setBusy(Client owner);
 
     /**
      *  * change the node's status to 'to release'.
-     * @throws NodeException if the node is down
      */
-    public void setToRemove() throws NodeException;
+    public void setToRemove();
 
     /**
      * change the node's status to down.

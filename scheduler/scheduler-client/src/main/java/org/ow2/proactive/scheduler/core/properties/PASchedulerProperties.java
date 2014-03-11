@@ -95,6 +95,9 @@ public enum PASchedulerProperties {
     /** Scheduler node ping frequency in s. */
     SCHEDULER_NODE_PING_FREQUENCY("pa.scheduler.core.nodepingfrequency", PropertyType.INTEGER),
 
+    /** Scheduler node ping number before restarting the task. */
+    SCHEDULER_NODE_PING_ATTEMPTS("pa.scheduler.core.node.ping.attempts", PropertyType.INTEGER),
+
     /** Number of threads used to execute client requests  */
     SCHEDULER_CLIENT_POOL_NBTHREAD("pa.scheduler.core.clientpoolnbthreads", PropertyType.INTEGER),
 

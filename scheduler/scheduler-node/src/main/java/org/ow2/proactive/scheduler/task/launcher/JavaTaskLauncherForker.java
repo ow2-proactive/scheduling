@@ -102,7 +102,7 @@ public class JavaTaskLauncherForker extends JavaTaskLauncher implements ForkerSt
      * @see org.ow2.proactive.scheduler.task.launcher.JavaTaskLauncher#doTask(org.ow2.proactive.scheduler.common.TaskTerminateNotification, org.ow2.proactive.scheduler.task.ExecutableContainer, org.ow2.proactive.scheduler.common.task.TaskResult[])
      */
     @Override
-    public void doTask(TaskTerminateNotification core, ExecutableContainer executableContainer,
+    public void doTask(TaskTerminateNotification taskTerminateNotification, ExecutableContainer executableContainer,
             TaskResult... results) {
         long duration = -1;
         TaskResultImpl taskResult = null;
@@ -209,7 +209,6 @@ public class JavaTaskLauncherForker extends JavaTaskLauncher implements ForkerSt
                 taskResult = new TaskResultImpl(taskId, ex, this.getLogs(), duration / 1000000, null);
             }
         } finally {
-
             if (executableGuard.wasWalltimed()) {
                 taskResult = new TaskResultImpl(taskId, new WalltimeExceededException("Walltime of " + wallTime + " ms reached on task " + taskId.getReadableName()), null, duration / 1000000, null);
             } else if (executableGuard.wasKilled()) {
@@ -217,7 +216,7 @@ public class JavaTaskLauncherForker extends JavaTaskLauncher implements ForkerSt
             }
 
             taskResult.setLogs(getLogs());
-            finalizeTask(core, taskResult);
+            finalizeTask(taskTerminateNotification, taskResult);
         }
     }
 

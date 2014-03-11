@@ -136,7 +136,8 @@ public final class AddGetDownRemoveTest extends RMConsecutive {
         } catch (Exception e) {
         }
         while (r.nodeIsAvailable(nodeURL).getBooleanValue()) {
-            Thread.sleep(500);
+            System.out.println("Node is available " + nodeURL);
+            Thread.sleep(100);
         }
 
         final long getDownMaxDuration = System.currentTimeMillis() - beforeGetTime;

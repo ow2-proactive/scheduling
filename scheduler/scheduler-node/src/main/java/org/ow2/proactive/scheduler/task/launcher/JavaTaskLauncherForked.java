@@ -172,10 +172,10 @@ public class JavaTaskLauncherForked extends JavaTaskLauncher {
     }
 
     @Override
-    protected void finalizeTask(TaskTerminateNotification core, TaskResult res) {
+    protected void finalizeTask(TaskTerminateNotification terminateNotificationStub, TaskResult res) {
         // if the task was killed, cleaning was performed by the killForkedJavaTaskLauncher call
          if (!executableGuard.wasKilled()) {
-             super.finalizeTask(core, res);
+             super.finalizeTask(terminateNotificationStub, res);
          }
     }
 }

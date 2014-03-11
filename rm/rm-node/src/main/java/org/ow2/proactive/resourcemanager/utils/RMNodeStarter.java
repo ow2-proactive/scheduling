@@ -55,6 +55,7 @@ import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.AddingNodesException;
+import org.ow2.proactive.resourcemanager.exception.NotConnectedException;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.node.jmx.SigarExposer;
@@ -147,8 +148,9 @@ public class RMNodeStarter {
     /** Name of the java property to set the number of attempts performed to add a node to the resource manager */
     protected final static String NB_OF_ADD_NODE_ATTEMPTS_PROP_NAME = "proactive.node.add.attempts";
 
-    /** The number of attempts to add the local node to the RM before quitting */
-    protected static int NB_OF_RECONNECTION_ATTEMPTS = 10;
+    /** The number of attempts to reconnect the node to the RM before quitting */
+    protected static int NB_OF_RECONNECTION_ATTEMPTS = 2*60*24; // to make it 24 hours by default
+
     /** Name of the java property to set the number of attempts performed to add a node to the resource manager */
     protected final static String NB_OF_RECONNECTION_ATTEMPTS_PROP_NAME = "proactive.node.reconnection.attempts";
 
@@ -170,6 +172,8 @@ public class RMNodeStarter {
     protected int rank;
     // if true, previous nodes with different URLs are removed from the RM
     protected boolean removePrevious;
+
+    protected int numberOfReconnectionAttemptsLeft = NB_OF_RECONNECTION_ATTEMPTS;;
 
     // Sigar JMX beans
     protected SigarExposer sigarExposer;
@@ -331,32 +335,25 @@ public class RMNodeStarter {
             ResourceManager rm = this.registerInRM(credentials, rmURL, nodeName);
 
             if (rm != null) {
-                logger.info("Connected to the Resource Manager at " + rmURL +
-                    System.getProperty("line.separator"));
+                logger.info("Connected to the resource manager at " + rmURL);
 
                 // NB_OF_ADD_NODE_ATTEMPTS is used here to disable pinging
                 if (PING_DELAY_IN_MS > 0 && NB_OF_ADD_NODE_ATTEMPTS > 0) {
-                    int numberOfAttemptsLeft = NB_OF_RECONNECTION_ATTEMPTS;
 
-                    while (numberOfAttemptsLeft >= 0) {
+                    while (numberOfReconnectionAttemptsLeft >= 0) {
                         try {
-                            while (rm.nodeIsAvailable(this.getNodeURL()).getBooleanValue()) {
-                                try {
-                                    numberOfAttemptsLeft = NB_OF_RECONNECTION_ATTEMPTS;
-                                    Thread.sleep(PING_DELAY_IN_MS);
-                                } catch (InterruptedException ignored) {
-                                }
-                            }
-
+                            pingNodeIndefinitely(rm);
+                        } catch (NotConnectedException e) {
+                            rm = reconnectToResourceManager();
                         } catch (Throwable e) {
                             logger.error(ExitStatus.RM_NO_PING.description, e);
                         } finally {
                             try {
                                 logger.warn("Disconnected from the resource manager");
                                 logger.warn("Node will try to reconnect in " + PING_DELAY_IN_MS + " ms");
-                                logger.warn("Number of attempts left " + numberOfAttemptsLeft);
+                                logger.warn("Number of attempts left " + numberOfReconnectionAttemptsLeft);
 
-                                numberOfAttemptsLeft--;
+                                numberOfReconnectionAttemptsLeft--;
                                 Thread.sleep(PING_DELAY_IN_MS);
                             } catch (InterruptedException ignored) {
                             }
@@ -371,6 +368,31 @@ public class RMNodeStarter {
                 // Force system exit to bypass daemon threads
                 logger.error(ExitStatus.RMNODE_EXIT_FORCED.description);
                 System.exit(ExitStatus.RMNODE_EXIT_FORCED.exitCode);
+            }
+        }
+    }
+
+    private ResourceManager reconnectToResourceManager() {
+        try {
+            // trying to reconnect to the resource manager
+            RMAuthentication auth = RMConnection.waitAndJoin(rmURL);
+            return auth.login(credentials);
+        } catch (Exception ex) {
+            logger.error(ex.getMessage(), ex);
+        }
+        return null;
+    }
+
+    private void pingNodeIndefinitely(ResourceManager rm) {
+        while (rm!=null && rm.setNodeAvailable(this.getNodeURL()).getBooleanValue()) {
+            try {
+                if (numberOfReconnectionAttemptsLeft < NB_OF_RECONNECTION_ATTEMPTS) {
+                    logger.info("Node successfully reconnected to the resource manager");
+                    numberOfReconnectionAttemptsLeft = NB_OF_RECONNECTION_ATTEMPTS;
+                }
+                Thread.sleep(PING_DELAY_IN_MS);
+            } catch (InterruptedException e) {
+                logger.warn("Node ping activity is interrupted", e);
             }
         }
     }

@@ -36,22 +36,7 @@
  */
 package org.ow2.proactive.resourcemanager.core;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.security.Permission;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
@@ -123,7 +108,22 @@ import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
-import org.apache.log4j.Logger;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.security.Permission;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 /**
@@ -447,28 +447,24 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      */
     private BooleanWrapper internalSetFree(final RMNode rmNode) {
         // If the node is already free no need to go further
+        logger.debug("Current node state " + rmNode.getState() + " " + rmNode.getNodeURL());
+        logger.debug("Setting node state to free " + rmNode.getNodeURL());
         if (rmNode.isFree()) {
             return new BooleanWrapper(true);
         }
         // Get the previous state of the node needed for the event
         final NodeState previousNodeState = rmNode.getState();
-        try {
-            Client client = rmNode.getOwner();
-            if (client == null) {
-                // node has been just configured, so the user initiated this action is the node provider
-                client = rmNode.getProvider();
-            }
-            // reseting owner here
-            rmNode.setFree();
-            this.freeNodes.add(rmNode);
-            // create the event
-            this.registerAndEmitNodeEvent(rmNode.createNodeEvent(RMEventType.NODE_STATE_CHANGED,
-                previousNodeState, client.getName()));
-        } catch (NodeException e) {
-            // the node is down
-            logger.debug("", e);
-            return new BooleanWrapper(false);
+        Client client = rmNode.getOwner();
+        if (client == null) {
+            // node has been just configured, so the user initiated this action is the node provider
+            client = rmNode.getProvider();
         }
+        // reseting owner here
+        rmNode.setFree();
+        this.freeNodes.add(rmNode);
+        // create the event
+        this.registerAndEmitNodeEvent(rmNode.createNodeEvent(RMEventType.NODE_STATE_CHANGED,
+            previousNodeState, client.getName()));
         return new BooleanWrapper(true);
     }
 
@@ -505,15 +501,10 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         }
         // Get the previous state of the node needed for the event
         final NodeState previousNodeState = rmNode.getState();
-        try {
-            rmNode.setToRemove();
-            // create the event
-            this.registerAndEmitNodeEvent(rmNode.createNodeEvent(RMEventType.NODE_STATE_CHANGED,
-                previousNodeState, initiator.getName()));
-        } catch (NodeException e1) {
-            // A down node shouldn't be busied...
-            logger.debug("", e1);
-        }
+        rmNode.setToRemove();
+        // create the event
+        this.registerAndEmitNodeEvent(rmNode.createNodeEvent(RMEventType.NODE_STATE_CHANGED,
+            previousNodeState, initiator.getName()));
     }
 
     /**
@@ -804,8 +795,24 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * @return true if the node nodeUrl is registered.
      */
     public BooleanWrapper nodeIsAvailable(String nodeUrl) {
-        final RMNode checked = this.allNodes.get(nodeUrl);
-        return new BooleanWrapper(checked != null && !checked.isDown());
+        final RMNode node = this.allNodes.get(nodeUrl);
+        return new BooleanWrapper(node != null && !node.isDown());
+    }
+
+    @Override
+    public BooleanWrapper setNodeAvailable(String nodeUrl) {
+        final RMNode node = this.allNodes.get(nodeUrl);
+
+        if (node.isDown()) {
+            // down node came back, restore it's status
+            NodeState previousNodeState = node.getLastEvent().getPreviousNodeState();
+            if (previousNodeState == NodeState.BUSY) {
+                setBusyNode(nodeUrl, node.getOwner());
+            } else {
+                internalSetFree(node);
+            }
+        }
+        return new BooleanWrapper(node != null && !node.isDown());
     }
 
     public NodeState getNodeState(String nodeUrl) {
@@ -974,6 +981,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             String nodeURL = null;
             try {
                 nodeURL = node.getNodeInformation().getURL();
+                logger.debug("Releasing node " + nodeURL);
             } catch (RuntimeException e) {
                 logger.debug("A Runtime exception occured while obtaining information on the node,"
                     + "the node must be down (it will be detected later)", e);
@@ -990,27 +998,28 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                 if (rmnode.isFree()) {
                     logger.warn("Client " + caller + " tries to release the already free node " + nodeURL);
                 } else {
-                    // verify that scheduler don't try to render a node detected down
-                    if (!rmnode.isDown()) {
-                        Set<? extends IdentityPrincipal> userPrincipal = rmnode.getOwner().getSubject()
-                                .getPrincipals(UserNamePrincipal.class);
-                        Permission ownerPermission = new PrincipalPermission(rmnode.getOwner().getName(),
-                            userPrincipal);
-                        try {
-                            caller.checkPermission(ownerPermission, caller +
-                                " is not authorized to free node " + node.getNodeInformation().getURL());
+                    boolean wasDown = rmnode.isDown();
 
-                            if (rmnode.isToRemove()) {
-                                removeNodeFromCoreAndSource(rmnode, caller);
-                            } else {
-                                internalSetFree(rmnode);
-                            }
-                        } catch (SecurityException ex) {
-                            exception = ex;
+                    Set<? extends IdentityPrincipal> userPrincipal = rmnode.getOwner().getSubject()
+                            .getPrincipals(UserNamePrincipal.class);
+                    Permission ownerPermission = new PrincipalPermission(rmnode.getOwner().getName(),
+                        userPrincipal);
+                    try {
+                        caller.checkPermission(ownerPermission, caller +
+                            " is not authorized to free node " + node.getNodeInformation().getURL());
+
+                        if (rmnode.isToRemove()) {
+                            removeNodeFromCoreAndSource(rmnode, caller);
+                        } else {
+                            internalSetFree(rmnode);
                         }
-                    } else {
-                        // down node, just ignore
-                        logger.warn("Down node " + rmnode.getNodeURL() + " will not be released");
+                    } catch (SecurityException ex) {
+                        logger.error(ex.getMessage(), ex);
+                        exception = ex;
+                    }
+
+                    if (wasDown) {
+                        rmnode.getNodeSource().pingNode(rmnode.getNode());
                     }
                 }
             } else {
@@ -1217,9 +1226,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      *
      * @param rmnode
      *            node to set
-     * @throws NodeException if the node can't be set busy
      */
-    public void setBusyNode(final String nodeUrl, Client owner) throws NodeException, NotConnectedException {
+    public void setBusyNode(final String nodeUrl, Client owner) throws NotConnectedException {
         final RMNode rmNode = this.allNodes.get(nodeUrl);
         if (rmNode == null) {
             logger.error("Unknown node " + nodeUrl);
@@ -1238,14 +1246,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         }
         // Get the previous state of the node needed for the event
         final NodeState previousNodeState = rmNode.getState();
-        try {
-            rmNode.setBusy(owner);
-        } catch (NodeException e) {
-            // A down node shouldn't be busied...
-            logger.error("Unable to set the node " + rmNode.getNodeURL() + " busy", e);
-            // Since this method throws a NodeException re-throw e to inform the caller 
-            throw e;
-        }
+        rmNode.setBusy(owner);
         this.freeNodes.remove(rmNode);
         // create the event
         this.registerAndEmitNodeEvent(rmNode.createNodeEvent(RMEventType.NODE_STATE_CHANGED,

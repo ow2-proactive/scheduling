@@ -196,10 +196,18 @@ public interface ResourceManager {
     /**
      * Returns true if the node nodeUrl is registered (i.e. known by the RM) and not down.
      *
-     * @param nodeUrl the tested node.
+     * @param nodeUrl of node to ping.
      * @return true if the node nodeUrl is registered and not down.
      */
     public BooleanWrapper nodeIsAvailable(String nodeUrl);
+
+    /**
+     * Mark node as available is the resource manager.
+     *
+     * @param nodeUrl of a node.
+     * @return true successfully set as available.
+     */
+    public BooleanWrapper setNodeAvailable(String nodeUrl);
 
     /**
      * Returns true if the resource manager is operational and a client is connected.

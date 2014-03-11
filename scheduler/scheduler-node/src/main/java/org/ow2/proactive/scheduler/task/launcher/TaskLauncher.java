@@ -98,8 +98,7 @@ import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.db.types.BigString;
 import org.ow2.proactive.rm.util.process.EnvironmentCookieBasedChildProcessKiller;
-import org.ow2.proactive.scheduler.common.SchedulerConstants;
-import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
+import org.ow2.proactive.scheduler.common.*;
 import org.ow2.proactive.scheduler.common.exception.UserException;
 import org.ow2.proactive.scheduler.common.task.ExecutableInitializer;
 import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
@@ -202,6 +201,9 @@ public abstract class TaskLauncher implements InitActive {
      */
     protected ExecutorService executorTransfer = Executors.newFixedThreadPool(5, new NamedThreadFactory(
         "FileTransferThreadPool"));
+
+    private int pingPeriodMs = 20000; // ms
+    private int pingAttempts = 4320; // ping for 24 hours
 
     /**
      * Scheduler related java properties. Thoses properties are automatically
@@ -320,6 +322,8 @@ public abstract class TaskLauncher implements InitActive {
             this.propagatedVariables.putAll(initializer.getVariables());
         }
 
+        this.pingAttempts = initializer.getPingAttempts();
+        this.pingPeriodMs = initializer.getPingPeriod();
 
         this.init();
     }
@@ -830,9 +834,9 @@ public abstract class TaskLauncher implements InitActive {
 
     /**
      * Common final behavior for any type of task launcher.
-     * @param core reference to the scheduler.
+     * @param terminateNotificationStub reference to the scheduler.
      */
-    protected void finalizeTask(TaskTerminateNotification core, TaskResult taskResult) {
+    protected void finalizeTask(TaskTerminateNotification terminateNotificationStub, TaskResult taskResult) {
         logger.info("Finalizing task " + taskId);
 
         // clean the task launcher unless it's been done already by the kill mechanism
@@ -842,10 +846,23 @@ public abstract class TaskLauncher implements InitActive {
          * send back the result (if the task was killed, the core is not accessible, but it is accessible
          * if the task was walltimed)
          */
-        if (core != null ) {
-            if (!executableGuard.wasKilled() || executableGuard.wasWalltimed()) {
+        if (!executableGuard.wasKilled() || executableGuard.wasWalltimed()) {
+            if (terminateNotificationStub != null) {
                 // callback to scheduler core sending the result
-                core.terminate(taskId, taskResult);
+                for (int i=0; i<pingAttempts; i++) {
+                    try {
+                        terminateNotificationStub.terminate(taskId, taskResult);
+                        logger.debug("Successfully set results of task " + taskId);
+                        break;
+                    } catch (Throwable th) {
+                        logger.error("Cannot set results of task " + taskId, th);
+                        try {
+                            Thread.sleep(pingPeriodMs);
+                        } catch (InterruptedException e) {
+                            logger.error(e.getMessage(), e);
+                        }
+                    }
+                }
             }
         }
     }
@@ -2023,5 +2040,4 @@ public abstract class TaskLauncher implements InitActive {
             }
         }
     }
-
 }
