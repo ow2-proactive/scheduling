@@ -26,9 +26,9 @@ buildscript {
     }
 
     dependencies {
-        classpath 'org.objectweb.proactive:programming-build-utils:5.5.0-SNAPSHOT'
+        classpath "org.objectweb.proactive:programming-build-utils:${programmingVersion}"
         // needed at runtime by AntStubGenerator...
-        classpath 'org.objectweb.proactive:programming-core:5.5.0-SNAPSHOT'
+        classpath "org.objectweb.proactive:programming-core:${programmingVersion}"
     }
 }
 
@@ -38,7 +38,7 @@ subprojects {
     apply plugin: 'eclipse'
 
     group = 'org.ow2.proactive_grid_cloud_portal'
-    version = '1.5.0-SNAPSHOT'
+    version = schedulingRestVersion
 
     rootProject.buildscript.repositories.each {
         repositories.add(it)
@@ -91,31 +91,31 @@ project(':rest-server') {
         compile 'com.netiq:websockify:1.6-proactive'
         compile 'io.netty:netty:3.3.0.Final'
 
-        compile 'org.ow2.proactive:scheduler-client:3.5.0-SNAPSHOT'
-        compile 'org.ow2.proactive:rm-client:3.5.0-SNAPSHOT'
-        compile 'org.objectweb.proactive:programming-extension-dataspaces:5.5.0-SNAPSHOT'
+        compile "org.ow2.proactive:scheduler-client:${schedulingVersion}"
+        compile "org.ow2.proactive:rm-client:${schedulingVersion}"
+        compile "org.objectweb.proactive:programming-extension-dataspaces:${programmingVersion}"
 
         compile project(':rest-api')
 
         testCompile 'junit:junit:4.11'
         testCompile 'org.mockito:mockito-core:1.9.5'
         testCompile 'com.googlecode.json-simple:json-simple:1.1'
-        testCompile 'org.ow2.proactive:rm-server:3.5.0-SNAPSHOT'
-        testCompile 'org.ow2.proactive:scheduler-server:3.5.0-SNAPSHOT'
+        testCompile "org.ow2.proactive:rm-server:${schedulingVersion}"
+        testCompile "org.ow2.proactive:scheduler-server:${schedulingVersion}"
         testCompile 'org.apache.httpcomponents:httpmime:4.2.1'
         testCompile 'org.jboss.resteasy:tjws:3.0.6.Final'
         testCompile 'org.fusesource:sigar:1.6.4'
 
         runtime 'net.bull.javamelody:javamelody-core:1.46.0'
 
-        runtime 'org.objectweb.proactive:programming-extension-rmissl:5.5.0-SNAPSHOT'
-        runtime 'org.objectweb.proactive:programming-extension-pnp:5.5.0-SNAPSHOT'
-        runtime 'org.objectweb.proactive:programming-extension-pnpssl:5.5.0-SNAPSHOT'
-        runtime 'org.objectweb.proactive:programming-extension-amqp:5.5.0-SNAPSHOT'
-        runtime 'org.objectweb.proactive:programming-extension-pamr:5.5.0-SNAPSHOT'
+        runtime "org.objectweb.proactive:programming-extension-rmissl:${programmingVersion}"
+        runtime "org.objectweb.proactive:programming-extension-pnp:${programmingVersion}"
+        runtime "org.objectweb.proactive:programming-extension-pnpssl:${programmingVersion}"
+        runtime "org.objectweb.proactive:programming-extension-amqp:${programmingVersion}"
+        runtime "org.objectweb.proactive:programming-extension-pamr:${programmingVersion}"
 
         jaxDoclet 'com.lunatech.jax-doclets:doclets:0.10.1-proactive'
-        schedulerNode 'org.ow2.proactive:scheduler-node:3.5.0-SNAPSHOT:standalone'
+        schedulerNode "org.ow2.proactive:scheduler-node:${schedulingVersion}:standalone"
     }
 
     task stub(type: StubTask) {
@@ -180,7 +180,7 @@ project(':rest-cli') {
         compile 'org.apache.httpcomponents:httpclient:4.2.1'
         compile 'org.apache.httpcomponents:httpmime:4.2.1'
 
-        compile 'org.ow2.proactive:common-api:3.5.0-SNAPSHOT'
+        compile "org.ow2.proactive:common-api:${schedulingVersion}"
         compile project(':rest-api')
     }
 
@@ -207,9 +207,9 @@ project(':rest-client') {
         compile 'org.apache.httpcomponents:httpclient:4.2.1'
         compile 'org.apache.httpcomponents:httpmime:4.2.1'
 
-        compile 'org.ow2.proactive:common-api:3.5.0-SNAPSHOT'
+        compile "org.ow2.proactive:common-api:${schedulingVersion}"
 
-        compile 'org.ow2.proactive:scheduler-client:3.5.0-SNAPSHOT'
+        compile "org.ow2.proactive:scheduler-client:${schedulingVersion}"
 
 	
         compile project(':rest-cli')
@@ -217,8 +217,8 @@ project(':rest-client') {
         testCompile 'junit:junit:4.11'
         testCompile 'org.mockito:mockito-core:1.9.5'
         testCompile 'com.googlecode.json-simple:json-simple:1.1'
-        testCompile 'org.ow2.proactive:rm-server:3.5.0-SNAPSHOT'
-        testCompile 'org.ow2.proactive:scheduler-server:3.5.0-SNAPSHOT'
+        testCompile "org.ow2.proactive:rm-server:${schedulingVersion}"
+        testCompile "org.ow2.proactive:scheduler-server:${schedulingVersion}"
         testCompile 'org.apache.httpcomponents:httpmime:4.2.1'
         testCompile 'org.jboss.resteasy:tjws:2.3.3.Final'
         testCompile 'org.fusesource:sigar:1.6.4'
