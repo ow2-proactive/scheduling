@@ -148,8 +148,8 @@ public class TestJobFork extends SchedulerConsecutive {
         Assert.assertFalse(res.getResult(task2Name).hadException());
         Assert.assertNull(res.getResult(task2Name).getException());
 
-        Assert.assertFalse(res.getResult(taskForked1Name).hadException());
-        Assert.assertNull(res.getResult(taskForked1Name).getException());
+        Assert.assertTrue(res.getResult(taskForked1Name).hadException());
+        Assert.assertNotNull(res.getResult(taskForked1Name).getException());
 
         Assert.assertTrue(res.getResult(taskForked2Name).hadException());
         Assert.assertNotNull(res.getResult(taskForked2Name).getException());
