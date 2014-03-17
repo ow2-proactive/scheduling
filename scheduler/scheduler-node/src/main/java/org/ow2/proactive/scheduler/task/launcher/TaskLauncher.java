@@ -492,9 +492,9 @@ public abstract class TaskLauncher implements InitActive {
      * This cookie will be used later during the task termination to kill all children processes
      */
     protected void setEnvironmentCookie() {
-        String prefix = "";
+        String prefix = null;
         if (taskId.value() != null) {
-            prefix = taskId.value() + "_";
+            prefix = taskId.value()+"_";
         }
         EnvironmentCookieBasedChildProcessKiller.setCookie(prefix);
     }

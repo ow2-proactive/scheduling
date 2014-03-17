@@ -87,7 +87,7 @@ public class TestWorkflowRecoveryInterrupted extends FunctionalTest {
         SchedulerTHelper.waitForEventTaskFinished(id, "T1#1");
 
         SchedulerTHelper.log("Task T1#1 finished, crashing scheduler...");
-        SchedulerTHelper.killAndRestartScheduler(new File(SchedulerTHelper.class.getResource(
+        SchedulerTHelper.killSchedulerAndNodesAndRestart(new File(SchedulerTHelper.class.getResource(
                 "config/functionalTSchedulerProperties-updateDB.ini").toURI()).getAbsolutePath());
         SchedulerTHelper.getSchedulerInterface();
 
@@ -123,7 +123,7 @@ public class TestWorkflowRecoveryInterrupted extends FunctionalTest {
         SchedulerTHelper.waitForEventTaskFinished(id, "T1#1");
 
         SchedulerTHelper.log("Task T1#1 finished, crashing scheduler...");
-        SchedulerTHelper.killAndRestartScheduler(new File(SchedulerTHelper.class.getResource(
+        SchedulerTHelper.killSchedulerAndNodesAndRestart(new File(SchedulerTHelper.class.getResource(
                 "config/functionalTSchedulerProperties-updateDB.ini").toURI()).getAbsolutePath());
         SchedulerTHelper.getSchedulerInterface();
 
@@ -157,7 +157,7 @@ public class TestWorkflowRecoveryInterrupted extends FunctionalTest {
         SchedulerTHelper.waitForEventTaskFinished(id, "A");
 
         SchedulerTHelper.log("Task A finished, crashing scheduler...");
-        SchedulerTHelper.killAndRestartScheduler(new File(SchedulerTHelper.class.getResource(
+        SchedulerTHelper.killSchedulerAndNodesAndRestart(new File(SchedulerTHelper.class.getResource(
                 "config/functionalTSchedulerProperties-updateDB.ini").toURI()).getAbsolutePath());
         SchedulerTHelper.getSchedulerInterface();
 

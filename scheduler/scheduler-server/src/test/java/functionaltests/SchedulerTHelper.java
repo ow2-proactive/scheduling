@@ -44,6 +44,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Level;
+import org.junit.Assert;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
@@ -55,6 +57,8 @@ import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
+import org.ow2.proactive.rm.util.process.EnvironmentCookieBasedChildProcessKiller;
+import org.ow2.proactive.rm.util.process.ProcessTreeKiller;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
@@ -80,7 +84,6 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.utils.FileUtils;
-import org.junit.Assert;
 
 import functionaltests.common.CommonTUtils;
 import functionaltests.common.InputStreamReaderThread;
@@ -144,6 +147,8 @@ public class SchedulerTHelper {
             ":" + RMI_PORT + "/" + SchedulerConstants.SCHEDULER_DEFAULT_NAME;
 
     private static Process schedulerProcess;
+
+    public static String TEST_COOKIE = "TEST_";
 
     protected static SchedulerAuthenticationInterface schedulerAuth;
 
@@ -226,6 +231,8 @@ public class SchedulerTHelper {
             rmPropertiesFilePath = new File(functionalTestRMProperties.toURI()).getAbsolutePath();
         }
         cleanTMP();
+
+        EnvironmentCookieBasedChildProcessKiller.setCookie(TEST_COOKIE,TEST_COOKIE);
 
         List<String> commandLine = new ArrayList<String>();
         commandLine.add(System.getProperty("java.home") + File.separator + "bin" + File.separator + "java");
@@ -353,6 +360,16 @@ public class SchedulerTHelper {
         RMTHelper.getDefaultInstance().reset();
     }
 
+
+    /**
+     * Kill the forked Scheduler and all nodes.
+     */
+    public static void killSchedulerAndNodes() throws Exception {
+        org.apache.log4j.Logger.getLogger(ProcessTreeKiller.class).setLevel(Level.DEBUG);
+        EnvironmentCookieBasedChildProcessKiller.killChildProcesses();
+        killScheduler();
+    }
+
     /**
      * Restart the scheduler using a forked JVM.
      * User or administrator interface is not reconnected automatically.
@@ -363,6 +380,19 @@ public class SchedulerTHelper {
      */
     public static void killAndRestartScheduler(String configuration) throws Exception {
         killScheduler();
+        startScheduler(configuration);
+    }
+
+    /**
+     * Restart the scheduler using a forked JVM and all children Nodes.
+     * User or administrator interface is not reconnected automatically.
+     *
+     * @param configuration the Scheduler configuration file to use (default is functionalTSchedulerProperties.ini)
+     * 			null to use the default one.
+     * @throws Exception
+     */
+    public static void killSchedulerAndNodesAndRestart(String configuration) throws Exception {
+        killSchedulerAndNodes();
         startScheduler(configuration);
     }
 
