@@ -36,8 +36,6 @@
  */
 package functionaltests;
 
-import java.io.File;
-import java.net.URL;
 import java.util.List;
 
 import org.junit.After;
@@ -146,11 +144,10 @@ public class TestJobWalltime extends FunctionalTest {
         task1.setWallTime(5000);
 
         if (OperatingSystem.getOperatingSystem() == OperatingSystem.windows) {
-            URL batchscript = TestJobWalltime.class.getResource("/functionaltests/executables/very_long_sleep.bat");
-            task1.setCommandLine("cmd.exe","/c",new File(batchscript.toURI()).getAbsolutePath());
+            // $JAVA_HOME resolve to System.getProperty("java.home") which points to a JRE
+            task1.setCommandLine("$JAVA_HOME\\..\\bin\\jrunscript.exe","-e","java.lang.Thread.sleep(300000)");
         } else {
-            URL batchscript = TestJobWalltime.class.getResource("/functionaltests/executables/very_long_sleep.sh");
-            task1.setCommandLine("bash","-c",new File(batchscript.toURI()).getAbsolutePath());
+            task1.setCommandLine("$JAVA_HOME/../bin/jrunscript","-e","java.lang.Thread.sleep(300000)");
         }
 
         job.addTask(task1);
@@ -185,14 +182,12 @@ public class TestJobWalltime extends FunctionalTest {
         // The task result should receive the walltime exceeded exception
         TaskResult tres = res.getResult(tname);
 
+        System.out.println(tres.getOutput().getAllLogs(false));
+
         Assert.assertTrue(tres.hadException());
 
         tres.getException().printStackTrace();
         Assert.assertTrue(tres.getException() instanceof WalltimeExceededException);
-
-        //remove job
-        SchedulerTHelper.removeJob(id);
-        SchedulerTHelper.waitForEventJobRemoved(id);
 
         // Make sure that the task has been properly killed
 
