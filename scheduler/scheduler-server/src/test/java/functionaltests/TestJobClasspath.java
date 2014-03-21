@@ -38,23 +38,30 @@ package functionaltests;
 
 import java.io.File;
 import java.net.URL;
-
+import java.util.Map;
+import org.ow2.proactive.scheduler.common.task.executable.Executable;
+import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
+import javassist.ClassPool;
+import javassist.CtClass;
+import javassist.CtField;
+import javassist.CtMethod;
+import javassist.CtNewMethod;
+import javassist.Modifier;
+import org.junit.Assert;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobEnvironment;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
+import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
+import org.ow2.proactive.scheduler.common.task.ScriptTask;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
+import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
-import org.ow2.proactive.scheduler.common.task.executable.Executable;
-import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
-import javassist.ClassPool;
-import javassist.CtClass;
-import javassist.CtMethod;
-import javassist.CtNewMethod;
-import junit.framework.Assert;
+import org.ow2.proactive.scripting.SimpleScript;
+import org.ow2.proactive.scripting.TaskScript;
 
 
 /**
@@ -74,8 +81,8 @@ public class TestJobClasspath extends SchedulerConsecutive {
 
     private static URL jobDescriptor = TestJobClasspath.class
             .getResource("/functionaltests/descriptors/Job_Test_CP.xml");
-    private static Integer firstValueToTest = 1;
-    private static Integer SecondValueToTest = 2;
+    private static final Integer firstValueToTest = 1;
+    private static final Integer SecondValueToTest = 2;
 
     /**
      * Tests start here.
@@ -144,6 +151,34 @@ public class TestJobClasspath extends SchedulerConsecutive {
             Assert.assertEquals(1, jr.getAllResults().size());
             Assert.assertEquals(SecondValueToTest, (Integer) jr.getResult(taskName).value());
         }
+
+        {
+            SchedulerTHelper.log("Test 4 : Script task with jobclassapth...");
+            //job creation
+            TaskFlowJob job = new TaskFlowJob();
+
+            JobEnvironment env = new JobEnvironment();
+            env.setJobClasspath(new String[] { classPathes[0] });
+            job.setEnvironment(env);
+
+            ScriptTask scriptTask = new ScriptTask();
+            scriptTask.setName(taskName);
+            String code = "result=ObjectStreamClass.lookup(test.Worker).getSerialVersionUID()";
+            SimpleScript ss = new SimpleScript(code, "groovy");
+            scriptTask.setScript(new TaskScript(ss));
+            job.addTask(scriptTask);
+
+            //job submission
+            JobId id = SchedulerTHelper.testJobSubmission(job);
+
+            //check results
+            JobResult jr = SchedulerTHelper.getJobResult(id);
+            Assert.assertFalse(jr.hadException());
+            Map<String, TaskResult> results = jr.getAllResults();
+            Assert.assertEquals(1, results.size());
+            Long value = (Long)results.get(taskName).value();
+            Assert.assertEquals(firstValueToTest, (Integer)value.intValue());
+        }
     }
 
     /**
@@ -161,6 +196,7 @@ public class TestJobClasspath extends SchedulerConsecutive {
         //create new classes
         CtClass cc1 = pool.makeClass(className);
         CtClass cc2 = pool.makeClass(className);
+        CtClass serializableClass = pool.get("java.io.Serializable");
 
         //get super-type and super-super-type
         CtClass upper = pool.get(JavaExecutable.class.getName());
@@ -172,27 +208,41 @@ public class TestJobClasspath extends SchedulerConsecutive {
 
         //set superclass of new classes
         cc1.setSuperclass(upper);
+        cc1.addInterface(serializableClass);
         cc2.setSuperclass(upper);
+        cc2.addInterface(serializableClass);
 
         //get a directory in the temp directory
         File tmpdir = new File(System.getProperty("java.io.tmpdir") + File.separator + "SchedTestJob_CP");
 
-        // create first class
-        CtMethod exec1 = CtNewMethod.make(pool.makeClass("java.io.Serializable"), absExec.getName(), absExec
+        //add uid to first class
+        CtField uidField1 = new CtField( CtClass.longType, "serialVersionUID", cc1 );
+        uidField1.setModifiers( Modifier.PUBLIC | Modifier.STATIC | Modifier.FINAL );
+        cc1.addField( uidField1, CtField.Initializer.constant((long)firstValueToTest));
+        
+        //create method for first class
+        CtMethod exec1 = CtNewMethod.make(serializableClass, absExec.getName(), absExec
                 .getParameterTypes(), absExec.getExceptionTypes(), "return new java.lang.Integer(" +
             firstValueToTest + ");", cc1);
         cc1.addMethod(exec1);
+
         //create first classPath
         File f1 = new File(tmpdir.getAbsolutePath() + File.separator + firstValueToTest);
         f1.mkdirs();
         classPathes[0] = f1.getAbsolutePath();
         cc1.writeFile(classPathes[0]);
 
-        // create second class
-        CtMethod exec2 = CtNewMethod.make(pool.makeClass("java.io.Serializable"), absExec.getName(), absExec
+        //add uid 
+        CtField uidField2 = new CtField( CtClass.longType, "serialVersionUID", cc2 );
+        uidField2.setModifiers( Modifier.PUBLIC | Modifier.STATIC | Modifier.FINAL );
+        cc2.addField( uidField2, CtField.Initializer.constant((long)SecondValueToTest));
+        
+        //create method for second class
+        CtMethod exec2 = CtNewMethod.make(serializableClass, absExec.getName(), absExec
                 .getParameterTypes(), absExec.getExceptionTypes(), "return new java.lang.Integer(" +
             SecondValueToTest + ");", cc2);
         cc2.addMethod(exec2);
+
         //create second classPath
         File f2 = new File(tmpdir.getAbsolutePath() + File.separator + SecondValueToTest);
         f2.mkdirs();
