@@ -133,6 +133,9 @@ public abstract class Guard<T> {
         checkNodeInitialized();
         this.state = GuardState.TARGET_INITIALIZED;
         this.target = target;
+        // set the context class loader of the ActiveObjectExecutor with the context class loader of the current thread.
+        // (used for jobclasspath)
+        activeExecutor.setContextClassLoader(Thread.currentThread().getContextClassLoader());
         this.targetInitialized = true;
     }
 
@@ -350,9 +353,32 @@ public abstract class Guard<T> {
 
         private AbstractBody bodyOnThis;
 
+        private ActiveObjectExecutor stubOnThis;
+
+        private ClassLoader classLoader;
+
         @Override
         public void initActivity(Body body) {
             bodyOnThis = ((AbstractBody) PAActiveObject.getBodyOnThis());
+            stubOnThis = (ActiveObjectExecutor) PAActiveObject.getStubOnThis();
+        }
+
+        /**
+         * Used to set the Context class loader of this Active Object
+         * as a ClassLoader is not serializable, this method must not be called via the stub
+         * @param cl
+         */
+        void setContextClassLoader(ClassLoader cl) {
+            classLoader = cl;
+            stubOnThis.updateContextClassLoader();
+        }
+
+        /**
+         * Update the Context class loader using the instance variable "ClassLoader".
+         * This request is automatically called when calling setContextClassLoader
+         */
+        public void updateContextClassLoader() {
+             Thread.currentThread().setContextClassLoader(classLoader);
         }
 
         /**
