@@ -203,7 +203,7 @@ public abstract class TaskLauncher implements InitActive {
         "FileTransferThreadPool"));
 
     private int pingPeriodMs = 20000; // ms
-    private int pingAttempts = 4320; // ping for 24 hours
+    private int pingAttempts = 1;
 
     /**
      * Scheduler related java properties. Thoses properties are automatically

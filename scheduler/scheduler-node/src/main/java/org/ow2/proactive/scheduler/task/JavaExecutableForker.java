@@ -843,6 +843,8 @@ public class JavaExecutableForker extends JavaExecutable implements ForkerStarte
     public class LauncherGuard extends Guard<JavaTaskLauncherForked> {
 
         TaskResult result;
+        ForkedJVMProcessException resultException = null;
+
         boolean resultAvailable = false;
         Object syncResultAccess = new Object();
 
@@ -878,6 +880,9 @@ public class JavaExecutableForker extends JavaExecutable implements ForkerStarte
         public void waitForResult(int timeout) throws InterruptedException {
             synchronized (syncResultAccess) {
                 syncResultAccess.wait(timeout);
+                if (resultException!=null) {
+                    throw resultException;
+                }
             }
         }
 
@@ -964,8 +969,14 @@ public class JavaExecutableForker extends JavaExecutable implements ForkerStarte
                     // in that case it is an exception produced by the getProgress method
                     throw e;
                 } catch (Throwable e) {
+                    ForkedJVMProcessException exception = new ForkedJVMProcessException("Forked JVM seems to be dead", e);
+                    // Forked JVM could be to be dead
+                    synchronized (syncResultAccess) {
+                        resultException = exception;
+                        syncResultAccess.notifyAll();
+                    }
                     // in that case it is another kind of exception most likely related to communication
-                    throw new ForkedJVMProcessException("Forked JVM seems to be dead", e);
+                    throw exception;
                 }
             }
         }
