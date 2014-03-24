@@ -851,6 +851,7 @@ public class JavaExecutableForker extends JavaExecutable implements ForkerStarte
         TaskResultCallback taskResultHandlerStub = null;
 
         int lastProgress = 0;
+        int pingAttempt = 0;
 
         String forkedJVMDataspace;
 
@@ -964,17 +965,24 @@ public class JavaExecutableForker extends JavaExecutable implements ForkerStarte
             } else {
                 try {
                     lastProgress = this.target.getProgress();
+                    pingAttempt=0;
                     return lastProgress;
                 } catch (ProgressPingerException e) {
                     // in that case it is an exception produced by the getProgress method
                     throw e;
                 } catch (Throwable e) {
+                    pingAttempt++;
+
                     ForkedJVMProcessException exception = new ForkedJVMProcessException("Forked JVM seems to be dead", e);
-                    // Forked JVM could be to be dead
-                    synchronized (syncResultAccess) {
-                        resultException = exception;
-                        syncResultAccess.notifyAll();
+
+                    if (pingAttempt >= execInitializer.getJavaTaskLauncherInitializer().getPingAttempts()) {
+                        // Forked JVM seems be to be dead - unblocking task launcher
+                        synchronized (syncResultAccess) {
+                            resultException = exception;
+                            syncResultAccess.notifyAll();
+                        }
                     }
+
                     // in that case it is another kind of exception most likely related to communication
                     throw exception;
                 }

@@ -323,7 +323,7 @@ public abstract class TaskLauncher implements InitActive {
         }
 
         this.pingAttempts = initializer.getPingAttempts();
-        this.pingPeriodMs = initializer.getPingPeriod();
+        this.pingPeriodMs = initializer.getPingPeriod() * 1000;
 
         this.init();
     }
