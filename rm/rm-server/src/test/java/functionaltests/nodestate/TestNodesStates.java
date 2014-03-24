@@ -94,7 +94,7 @@ public class TestNodesStates extends RMConsecutive {
 
         for (int i = 0; i < totalNodeNumber; i++) {
             RMNodeEvent evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, nodes.get(i).getNodeInformation().getURL());
-            Assert.assertEquals(evt.getNodeState(), NodeState.BUSY);
+            Assert.assertEquals(NodeState.BUSY, evt.getNodeState());
             checkEvent(evt, nodes.get(i));
         }
 
@@ -104,7 +104,7 @@ public class TestNodesStates extends RMConsecutive {
 
         for (int i = 0; i < totalNodeNumber; i++) {
             RMNodeEvent evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, nodes.get(i).getNodeInformation().getURL());
-            Assert.assertEquals(evt.getNodeState(), NodeState.FREE);
+            Assert.assertEquals(NodeState.FREE, evt.getNodeState());
             checkEvent(evt, nodes.get(i));
         }
 
@@ -138,7 +138,7 @@ public class TestNodesStates extends RMConsecutive {
 
         for (int i = 0; i < totalNodeNumber; i++) {
             RMNodeEvent evt = helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-            Assert.assertEquals(evt.getNodeState(), NodeState.BUSY);
+            Assert.assertEquals(NodeState.BUSY, evt.getNodeState());
         }
 
         n = nodes.remove(0);
@@ -149,7 +149,7 @@ public class TestNodesStates extends RMConsecutive {
         //check that node toRelease event has been thrown
         RMNodeEvent evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, n.getNodeInformation()
                 .getURL());
-        Assert.assertEquals(evt.getNodeState(), NodeState.TO_BE_REMOVED);
+        Assert.assertEquals(NodeState.TO_BE_REMOVED, evt.getNodeState());
 
         //node is in "ToRelease" state, so always handled by RM
         Assert.assertEquals(totalNodeNumber, resourceManager.getState().getTotalNodesNumber());
@@ -178,21 +178,26 @@ public class TestNodesStates extends RMConsecutive {
         }
 
         evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, n.getNodeInformation().getURL());
-        Assert.assertEquals(evt.getNodeState(), NodeState.DOWN);
+        Assert.assertEquals(NodeState.DOWN, evt.getNodeState());
         checkEvent(evt, n);
 
         resourceManager.releaseNodes(nodes);
 
-        // check Nodes freed Event has been thrown
-        for (int i = 0; i < totalNodeNumber - 1; i++) {
-            evt = helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-            Assert.assertEquals(evt.getNodeState(), NodeState.FREE);
-        }
 
-        // the down node became free
-        // wait while rm detects again that it's down
-        evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, n.getNodeInformation().getURL());
-        Assert.assertEquals(evt.getNodeState(), NodeState.DOWN);
+        // we should get 5 FREE events + 1 down event for node that was down
+
+        for (int i = 0; i < totalNodeNumber-1; i++) {
+            evt = helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+            if (evt.getNodeUrl().equals(n.getNodeInformation().getURL())) {
+                // the down node became free
+                // wait while rm detects again that it's down
+                evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, n.getNodeInformation().getURL());
+                Assert.assertEquals(NodeState.DOWN, evt.getNodeState());
+
+            } else {
+                Assert.assertEquals(NodeState.FREE, evt.getNodeState());
+            }
+        }
 
         //two nodes killed, but the detected down is in RM down nodes list
         //( down nodes are in total nodes count)
@@ -211,7 +216,7 @@ public class TestNodesStates extends RMConsecutive {
         }
 
         evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, n2.getNodeInformation().getURL());
-        Assert.assertEquals(evt.getNodeState(), NodeState.DOWN);
+        Assert.assertEquals(NodeState.DOWN, evt.getNodeState());
 
         Assert.assertEquals(totalNodeNumber - 1, resourceManager.getState().getTotalNodesNumber());
         Assert.assertEquals(totalNodeNumber - 3, resourceManager.getState().getFreeNodesNumber());
@@ -227,7 +232,7 @@ public class TestNodesStates extends RMConsecutive {
 
         for (int i = 0; i < totalNodeNumber - 3; i++) {
             evt = helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-            Assert.assertEquals(evt.getNodeState(), NodeState.BUSY);
+            Assert.assertEquals(NodeState.BUSY, evt.getNodeState());
         }
 
         n = nodes.get(0);
@@ -237,7 +242,7 @@ public class TestNodesStates extends RMConsecutive {
         resourceManager.removeNode(n.getNodeInformation().getURL(), false);
 
         evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, n.getNodeInformation().getURL());
-        Assert.assertEquals(evt.getNodeState(), NodeState.TO_BE_REMOVED);
+        Assert.assertEquals(NodeState.TO_BE_REMOVED, evt.getNodeState());
 
         RMTHelper.log("Test 6 Bis");
 
@@ -249,25 +254,25 @@ public class TestNodesStates extends RMConsecutive {
         }
 
         evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, n.getNodeInformation().getURL());
-        Assert.assertEquals(evt.getNodeState(), NodeState.DOWN);
+        Assert.assertEquals(NodeState.DOWN, evt.getNodeState());
 
         Assert.assertEquals(totalNodeNumber - 1, resourceManager.getState().getTotalNodesNumber());
         Assert.assertEquals(0, resourceManager.getState().getFreeNodesNumber());
-        // at this phase we have
-        // initial nodes in free state
-        // in created ns:
-        //  1 node removed
-        //  1 to be removed
-        //  3 down
-        // 
 
-        //user tries to give back a down node, no bad effect
+        for (Node node: nodes) {
+            RMTHelper.log("Taken node: " + node.getNodeInformation().getURL());
+        }
+
+        // we have 2 nodes: 11 busy and one down
         resourceManager.releaseNodes(nodes);
 
-        for (int i = 0; i < totalNodeNumber - 1 /*tbr*/- 1 /*removed*/- 3/*down*/; i++) {
+        for (int i = 0; i < 2; i++) {
             evt = helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-            Assert.assertEquals(evt.getNodeState(), NodeState.FREE);
+            Assert.assertEquals(NodeState.FREE, evt.getNodeState());
         }
+
+        evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, n.getNodeInformation().getURL());
+        Assert.assertEquals(NodeState.DOWN, evt.getNodeState());
 
         Assert.assertEquals(totalNodeNumber - 1, resourceManager.getState().getTotalNodesNumber());
         Assert.assertEquals(totalNodeNumber - 4, resourceManager.getState().getFreeNodesNumber());
