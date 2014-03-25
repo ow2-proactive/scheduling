@@ -107,7 +107,7 @@ public abstract class Guard<T> {
         this.node = node;
         this.activeExecutor = new ActiveObjectExecutor();
         this.stubActiveExecutor =  PAActiveObject.turnActive(activeExecutor, node);
-
+        stubActiveExecutor.ping(); // make sure the AO is started
         this.nodeInitialized = true;
     }
 
@@ -361,6 +361,10 @@ public abstract class Guard<T> {
         public void initActivity(Body body) {
             bodyOnThis = ((AbstractBody) PAActiveObject.getBodyOnThis());
             stubOnThis = (ActiveObjectExecutor) PAActiveObject.getStubOnThis();
+        }
+
+        public boolean ping() {
+            return true;
         }
 
         /**
