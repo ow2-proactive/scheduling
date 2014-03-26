@@ -86,6 +86,7 @@ import functionaltests.common.CommonTUtils;
 import functionaltests.common.InputStreamReaderThread;
 import functionaltests.monitor.RMMonitorEventReceiver;
 import functionaltests.monitor.RMMonitorsHandler;
+import org.ow2.tests.ProcessCleaner;
 
 
 /**
@@ -516,6 +517,10 @@ public class RMTHelper {
             rmProcess.destroy();
             rmProcess.waitFor();
             rmProcess = null;
+
+            // killing all rm nodes
+            ProcessCleaner cleaner = new ProcessCleaner(".*RMNodeStarter.*");
+            cleaner.killAliveProcesses();
 
             // sometimes RM_NODE object isn't removed from the RMI registry after JVM with RM is killed (SCHEDULING-1498)
             CommonTUtils.cleanupRMActiveObjectRegistry();
