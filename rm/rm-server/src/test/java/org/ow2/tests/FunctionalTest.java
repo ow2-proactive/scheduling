@@ -81,7 +81,7 @@ public class FunctionalTest extends ProActiveTest {
      * ProActive related stuff
      */
     static volatile private ProActiveSetup paSetup;
-    static final private ProcessCleaner cleaner = new ProcessCleaner(".*proactive.test=true.*");
+    static final private ProcessCleaner cleaner = new ProcessCleaner(".*proactive.test=true.*|.*RMNodeStarter.*");
 
     protected VariableContractImpl getVariableContract() {
         return paSetup.getVariableContract();
