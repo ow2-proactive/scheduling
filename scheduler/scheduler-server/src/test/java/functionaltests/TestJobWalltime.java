@@ -144,10 +144,9 @@ public class TestJobWalltime extends FunctionalTest {
         task1.setWallTime(5000);
 
         if (OperatingSystem.getOperatingSystem() == OperatingSystem.windows) {
-            // $JAVA_HOME resolve to System.getProperty("java.home") which points to a JRE
-            task1.setCommandLine("$JAVA_HOME\\..\\bin\\jrunscript.exe","-e","java.lang.Thread.sleep(300000)");
+            task1.setCommandLine("timeout", "300000");
         } else {
-            task1.setCommandLine("$JAVA_HOME/../bin/jrunscript","-e","java.lang.Thread.sleep(300000)");
+            task1.setCommandLine("sleep","300000");
         }
 
         job.addTask(task1);
