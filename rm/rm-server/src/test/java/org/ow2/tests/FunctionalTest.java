@@ -36,6 +36,7 @@
  */
 package org.ow2.tests;
 
+import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Map;
 import java.util.Timer;
@@ -81,7 +82,6 @@ public class FunctionalTest extends ProActiveTest {
      * ProActive related stuff
      */
     static volatile private ProActiveSetup paSetup;
-    static final private ProcessCleaner cleaner = new ProcessCleaner(".*proactive.test=true.*|.*RMNodeStarter.*");
 
     protected VariableContractImpl getVariableContract() {
         return paSetup.getVariableContract();
@@ -105,7 +105,7 @@ public class FunctionalTest extends ProActiveTest {
             // skipping this test execution
             System.err.println("Test does not support the 'consecutive' mode execution");
             System.err.println("Running test in 'clean environment' mode");
-            cleaner.killAliveProcesses();
+            killAliveProcesses();
         }
 
         // Ensure that the host will eventually be cleaned
@@ -178,10 +178,17 @@ public class FunctionalTest extends ProActiveTest {
                 paSetup.shutdown();
             }
             // Kill everything
-            cleaner.killAliveProcesses();
+            killAliveProcesses();
         } else {
             System.err.println("Keep the scheduler & rm running after the test");
         }
+    }
+
+    private static void killAliveProcesses() throws IOException {
+        new ProcessCleaner(".*proactive.test=true.*").killAliveProcesses();
+        new ProcessCleaner(".*RMNodeStarter.*").killAliveProcesses();
+        new ProcessCleaner(".*SchedulerTStarter.*").killAliveProcesses();
+        new ProcessCleaner(".*RMTStarter.*").killAliveProcesses();
     }
 
     static private class MyShutdownHook extends Thread {
@@ -192,7 +199,7 @@ public class FunctionalTest extends ProActiveTest {
             try {
                 timer.cancel();
                 paSetup.shutdown();
-                cleaner.killAliveProcesses();
+                killAliveProcesses();
             } catch (Exception e) {
                 logger.error("Failed to kill remaining proccesses", e);
             }
@@ -206,7 +213,7 @@ public class FunctionalTest extends ProActiveTest {
             System.err.println("Dumping thread states before killing processes");
             printAllThreadsStackTraces(System.err);
             try {
-                cleaner.killAliveProcesses();
+                killAliveProcesses();
                 System.err.println("Killing current JVM");
                 System.exit(-42);
             } catch (Exception e) {
