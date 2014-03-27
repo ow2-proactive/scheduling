@@ -371,19 +371,6 @@ public class SchedulerTHelper {
     }
 
     /**
-     * Restart the scheduler using a forked JVM.
-     * User or administrator interface is not reconnected automatically.
-     *
-     * @param configuration the Scheduler configuration file to use (default is functionalTSchedulerProperties.ini)
-     * 			null to use the default one.
-     * @throws Exception
-     */
-    public static void killAndRestartScheduler(String configuration) throws Exception {
-        killScheduler();
-        startScheduler(configuration);
-    }
-
-    /**
      * Restart the scheduler using a forked JVM and all children Nodes.
      * User or administrator interface is not reconnected automatically.
      *

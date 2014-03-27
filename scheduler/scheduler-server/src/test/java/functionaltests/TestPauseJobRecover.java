@@ -107,7 +107,7 @@ public class TestPauseJobRecover extends FunctionalTest {
 
         System.out.println("Kill&Restart the scheduler");
 
-        SchedulerTHelper.killAndRestartScheduler(new File(SchedulerTHelper.class.getResource(
+        SchedulerTHelper.killSchedulerAndNodesAndRestart(new File(SchedulerTHelper.class.getResource(
                 "config/functionalTSchedulerProperties-updateDB.ini").toURI()).getAbsolutePath());
 
         System.out.println("Resume the job " + jobId);

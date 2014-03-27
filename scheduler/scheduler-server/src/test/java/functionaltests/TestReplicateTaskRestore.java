@@ -105,7 +105,7 @@ public class TestReplicateTaskRestore extends FunctionalTest {
 
         System.out.println("Killing scheduler");
 
-        SchedulerTHelper.killAndRestartScheduler(new File(SchedulerTHelper.class.getResource(
+        SchedulerTHelper.killSchedulerAndNodesAndRestart(new File(SchedulerTHelper.class.getResource(
                 "config/functionalTSchedulerProperties-updateDB.ini").toURI()).getAbsolutePath());
 
         Scheduler scheduler = SchedulerTHelper.getSchedulerInterface();

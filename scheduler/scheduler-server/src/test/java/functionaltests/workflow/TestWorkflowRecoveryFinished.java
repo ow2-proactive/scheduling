@@ -90,7 +90,7 @@ public class TestWorkflowRecoveryFinished extends FunctionalTest {
         }
 
         SchedulerTHelper.log("Crashing Scheduler...");
-        SchedulerTHelper.killAndRestartScheduler(new File(SchedulerTHelper.class.getResource(
+        SchedulerTHelper.killSchedulerAndNodesAndRestart(new File(SchedulerTHelper.class.getResource(
                 "config/functionalTSchedulerProperties-updateDB.ini").toURI()).getAbsolutePath());
         SchedulerTHelper.getSchedulerInterface();
 

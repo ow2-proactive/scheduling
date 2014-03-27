@@ -84,7 +84,7 @@ public class TestJobRecover extends FunctionalTest {
         SchedulerTHelper.waitForFinishedJob(idJ1);
 
         SchedulerTHelper.log("Kill Scheduler");
-        SchedulerTHelper.killAndRestartScheduler(new File(SchedulerTHelper.class.getResource(
+        SchedulerTHelper.killSchedulerAndNodesAndRestart(new File(SchedulerTHelper.class.getResource(
                 "config/functionalTSchedulerProperties-updateDB.ini").toURI()).getAbsolutePath());
 
         SchedulerTHelper.log("Waiting for job 2 to finish");
