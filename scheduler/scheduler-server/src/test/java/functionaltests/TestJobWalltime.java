@@ -144,9 +144,9 @@ public class TestJobWalltime extends FunctionalTest {
         task1.setWallTime(5000);
 
         if (OperatingSystem.getOperatingSystem() == OperatingSystem.windows) {
-            task1.setCommandLine("timeout", "300000");
+            task1.setCommandLine("timeout", "10000");
         } else {
-            task1.setCommandLine("sleep","300000");
+            task1.setCommandLine("sleep","10000");
         }
 
         job.addTask(task1);
