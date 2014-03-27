@@ -297,6 +297,10 @@ project('scheduler:scheduler-server') {
     task stub(type: StubTask) {
         classes = ['org.ow2.proactive.scheduler.core.SchedulerFrontend']
     }
+
+    artifacts {
+        archives testJar
+    }
 }
 
 project('scheduler:scheduler-node') {
@@ -395,6 +399,10 @@ project('rm:rm-server') {
     task testJar(type: Jar) {
         classifier = 'tests'
         from sourceSets.test.output
+    }
+
+    artifacts {
+        archives testJar
     }
 }
 
