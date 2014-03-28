@@ -185,11 +185,27 @@ public abstract class SelectionManager {
 
     public NodeSet selectNodes(Criteria criteria, Client client) {
 
+        maybeSetLoggingContext(criteria);
+        try {
+            return doSelectNodes(criteria, client);
+        } finally {
+            unsetLoggingContext();
+        }
+
+    }
+
+    static void maybeSetLoggingContext(Criteria criteria) {
         if (criteria.getComputationDescriptors() != null) {
             // logging selection script execution into tasks logs
             MDC.getContext().put(MultipleFileAppender.FILE_NAMES, criteria.getComputationDescriptors());
         }
+    }
 
+    static void unsetLoggingContext() {
+        MDC.getContext().remove(MultipleFileAppender.FILE_NAMES);
+    }
+
+    private NodeSet doSelectNodes(Criteria criteria, Client client) {
         boolean hasScripts = criteria.getScripts() != null && criteria.getScripts().size() > 0;
         logger.info(client + " requested " + criteria.getSize() + " nodes with " + criteria.getTopology());
         if (logger.isDebugEnabled()) {
@@ -235,7 +251,7 @@ public abstract class SelectionManager {
         List<Node> matchedNodes = null;
         if (criteria.getTopology().isTopologyBased()) {
             // run scripts on all available nodes
-            matchedNodes = runScripts(arrangedNodes, criteria.getScripts());
+            matchedNodes = runScripts(arrangedNodes, criteria);
         } else {
             // run scripts not on all nodes, but always on missing number of nodes
             // until required node set is found
@@ -256,7 +272,7 @@ public abstract class SelectionManager {
 
                 List<RMNode> subset = arrangedNodes.subList(0, Math.min(numberOfNodesForScriptExecution,
                         arrangedNodes.size()));
-                matchedNodes.addAll(runScripts(subset, criteria.getScripts()));
+                matchedNodes.addAll(runScripts(subset, criteria));
                 // removing subset of arrangedNodes
                 subset.clear();
 
@@ -322,7 +338,6 @@ public abstract class SelectionManager {
             }
         }
 
-        MDC.getContext().remove(MultipleFileAppender.FILE_NAMES);
         return selectedNodes;
     }
 
@@ -346,10 +361,10 @@ public abstract class SelectionManager {
      * It blocks until all results are obtained.
      *
      * @param candidates nodes to execute scripts on
-     * @param scripts set of scripts to execute on each node
+     * @param criteria contains a set of scripts to execute on each node
      * @return nodes matched to all scripts
      */
-    private List<Node> runScripts(List<RMNode> candidates, List<SelectionScript> scripts) {
+    private List<Node> runScripts(List<RMNode> candidates, Criteria criteria) {
         List<Node> matched = new LinkedList<Node>();
 
         if (candidates.size() == 0) {
@@ -370,7 +385,7 @@ public abstract class SelectionManager {
             for (RMNode node : candidates) {
                 if (!inProgress.contains(node.getNodeURL())) {
                     inProgress.add(node.getNodeURL());
-                    scriptExecutors.add(new ScriptExecutor(node, scripts, this));
+                    scriptExecutors.add(new ScriptExecutor(node, criteria, this));
                 }
             }
         }
