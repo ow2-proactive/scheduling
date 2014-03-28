@@ -144,7 +144,8 @@ public class TestJobWalltime extends FunctionalTest {
         task1.setWallTime(5000);
 
         if (OperatingSystem.getOperatingSystem() == OperatingSystem.windows) {
-            task1.setCommandLine("timeout", "10000");
+            task1.setCommandLine("$JAVA_HOME\\..\\bin\\jrunscript.exe","-e","java.lang.Thread.sleep(300000)");
+            // task1.setCommandLine("timeout", "10000"); // if we launch it on windows it give an error that redirection is not supported
         } else {
             task1.setCommandLine("sleep","10000");
         }
