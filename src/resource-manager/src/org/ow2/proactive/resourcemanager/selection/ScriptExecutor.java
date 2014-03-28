@@ -49,27 +49,38 @@ import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 import org.ow2.proactive.scripting.ScriptException;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.SelectionScript;
+import org.ow2.proactive.utils.Criteria;
 
 
 public class ScriptExecutor implements Callable<Node> {
 
     private final static Logger logger = Logger.getLogger(ScriptExecutor.class);
+    private final Criteria criteria;
     private RMNode rmnode;
     private SelectionManager manager;
     private List<SelectionScript> selectionScriptList;
 
-    public ScriptExecutor(RMNode rmnode, List<SelectionScript> selectionScriptList, SelectionManager manager) {
+    public ScriptExecutor(RMNode rmnode, Criteria criteria, SelectionManager manager) {
         this.rmnode = rmnode;
         this.manager = manager;
-        this.selectionScriptList = selectionScriptList;
+        this.criteria = criteria;
+        this.selectionScriptList = criteria.getScripts();
+    }
+
+    public Node call() throws Exception {
+        SelectionManager.maybeSetLoggingContext(criteria);
+        try {
+            return executeScripts();
+        } finally {
+            SelectionManager.unsetLoggingContext();
+        }
     }
 
     /**
      * Runs selection scripts and process the results
      * returns node if it matches, null otherwise
      */
-    public Node call() throws Exception {
-
+    private Node executeScripts() throws Exception {
         //LinkedList<ScriptResult<Boolean>> scriptExecitionResults = new LinkedList<ScriptResult<Boolean>>();
         boolean selectionScriptSpecified = selectionScriptList != null && selectionScriptList.size() > 0;
         boolean nodeMatch = true;
