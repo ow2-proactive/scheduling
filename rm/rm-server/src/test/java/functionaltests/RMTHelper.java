@@ -196,7 +196,9 @@ public class RMTHelper {
                 .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
         rm
                 .createNodeSource(name, LocalInfrastructure.class.getName(), new Object[] { "", creds,
-                        nodeNumber, RMTHelper.defaultNodesTimeout, setup.getJvmParameters() },
+                        nodeNumber, RMTHelper.defaultNodesTimeout, setup.getJvmParameters() + " " +
+                        CentralPAPropertyRepository.PA_RMI_PORT.getCmdLine()+RMTHelper.PA_RMI_PORT
+                },
                         StaticPolicy.class.getName(), null);
         rm.setNodeSourcePingFrequency(5000, name);
 
