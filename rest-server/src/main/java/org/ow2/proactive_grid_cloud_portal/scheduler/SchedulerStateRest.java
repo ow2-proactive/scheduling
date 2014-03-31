@@ -1680,6 +1680,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     final String sessionId) throws NotConnectedRestException, PermissionRestException {
         try {
             final Scheduler s = checkAccess(sessionId, "disconnect");
+            logger.info("disconnection user " + sessionStore.get(sessionId) + " to session " + sessionId);
             s.disconnect();
         } catch (PermissionException e) {
             throw new PermissionRestException(e);
