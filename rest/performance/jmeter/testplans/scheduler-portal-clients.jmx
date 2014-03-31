@@ -1,0 +1,484 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jmeterTestPlan version="1.2" properties="2.1">
+  <hashTree>
+    <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Scheduler Portal Clients Simulation" enabled="true">
+      <stringProp name="TestPlan.comments"></stringProp>
+      <boolProp name="TestPlan.functional_mode">false</boolProp>
+      <boolProp name="TestPlan.serialize_threadgroups">false</boolProp>
+      <elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+        <collectionProp name="Arguments.arguments">
+          <elementProp name="restSchedulerUrl" elementType="Argument">
+            <stringProp name="Argument.name">restSchedulerUrl</stringProp>
+            <stringProp name="Argument.value">${__P(restSchedulerUrl, http://localhost:8080/SchedulingRest/rest/scheduler)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="restSchedulerLogin" elementType="Argument">
+            <stringProp name="Argument.name">restSchedulerLogin</stringProp>
+            <stringProp name="Argument.value">${__P(restSchedulerLogin,admin)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="restSchedulerPassword" elementType="Argument">
+            <stringProp name="Argument.name">restSchedulerPassword</stringProp>
+            <stringProp name="Argument.value">${__P(restSchedulerPassword,admin)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="stopOnError" elementType="Argument">
+            <stringProp name="Argument.name">stopOnError</stringProp>
+            <stringProp name="Argument.value">${__P(stopOnError,true)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="testTime" elementType="Argument">
+            <stringProp name="Argument.name">testTime</stringProp>
+            <stringProp name="Argument.value">${__P(testTime,30)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="clientRefreshTime" elementType="Argument">
+            <stringProp name="Argument.name">clientRefreshTime</stringProp>
+            <stringProp name="Argument.value">${__P(clientRefreshTime,3)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="schedStateMonitoringUserNumber" elementType="Argument">
+            <stringProp name="Argument.name">schedStateMonitoringUserNumber</stringProp>
+            <stringProp name="Argument.value">${__P(schedStateMonitoringUserNumber,3)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="schedJobMonitoringUserNumber" elementType="Argument">
+            <stringProp name="Argument.name">schedJobMonitoringUserNumber</stringProp>
+            <stringProp name="Argument.value">${__P(schedJobMonitoringUserNumber,3)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="schedulerPortalUserNumber" elementType="Argument">
+            <stringProp name="Argument.name">schedulerPortalUserNumber</stringProp>
+            <stringProp name="Argument.value">${__P(schedulerPortalUserNumber,3)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="statClientRefreshTime" elementType="Argument">
+            <stringProp name="Argument.name">statClientRefreshTime</stringProp>
+            <stringProp name="Argument.value">${__P(statClientRefreshTime,3)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="jobClientRefreshTime" elementType="Argument">
+            <stringProp name="Argument.name">jobClientRefreshTime</stringProp>
+            <stringProp name="Argument.value">${__P(jobClientRefreshTime,3)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="logClientRefreshTime" elementType="Argument">
+            <stringProp name="Argument.name">logClientRefreshTime</stringProp>
+            <stringProp name="Argument.value">${__P(logClientRefreshTime,3)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="myAcClientRefreshTime" elementType="Argument">
+            <stringProp name="Argument.name">myAcClientRefreshTime</stringProp>
+            <stringProp name="Argument.value">${__P(myAcClientRefreshTime,3)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="stateClientRefreshTime" elementType="Argument">
+            <stringProp name="Argument.name">stateClientRefreshTime</stringProp>
+            <stringProp name="Argument.value">${__P(stateClientRefreshTime,3)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="userClientRefreshTime" elementType="Argument">
+            <stringProp name="Argument.name">userClientRefreshTime</stringProp>
+            <stringProp name="Argument.value">${__P(userClientRefreshTime,3)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="jobClientRefreshTime" elementType="Argument">
+            <stringProp name="Argument.name">jobClientRefreshTime</stringProp>
+            <stringProp name="Argument.value">${__P(jobClientRefreshTime,3)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+        </collectionProp>
+      </elementProp>
+      <stringProp name="TestPlan.user_define_classpath"></stringProp>
+    </TestPlan>
+    <hashTree>
+      <SetupThreadGroup guiclass="SetupThreadGroupGui" testclass="SetupThreadGroup" testname="RESTful Scheduler Setup Clients" enabled="true">
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <stringProp name="LoopController.loops">1</stringProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.num_threads">${schedulerPortalUserNumber}</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">1</stringProp>
+        <longProp name="ThreadGroup.start_time">1347543653000</longProp>
+        <longProp name="ThreadGroup.end_time">1347543653000</longProp>
+        <boolProp name="ThreadGroup.scheduler">false</boolProp>
+        <stringProp name="ThreadGroup.duration"></stringProp>
+        <stringProp name="ThreadGroup.delay"></stringProp>
+      </SetupThreadGroup>
+      <hashTree>
+        <JavaSampler guiclass="JavaTestSamplerGui" testclass="JavaSampler" testname="RESTfulSchedSetupClient" enabled="true">
+          <elementProp name="arguments" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" enabled="true">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="stopOnError" elementType="Argument">
+                <stringProp name="Argument.name">stopOnError</stringProp>
+                <stringProp name="Argument.value">${stopOnError}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="restSchedulerUrl" elementType="Argument">
+                <stringProp name="Argument.name">restSchedulerUrl</stringProp>
+                <stringProp name="Argument.value">${restSchedulerUrl}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="restSchedulerLogin" elementType="Argument">
+                <stringProp name="Argument.name">restSchedulerLogin</stringProp>
+                <stringProp name="Argument.value">${restSchedulerLogin}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="restSchedulerPassword" elementType="Argument">
+                <stringProp name="Argument.name">restSchedulerPassword</stringProp>
+                <stringProp name="Argument.value">${restSchedulerPassword}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+          <stringProp name="classname">org.ow2.proactive.perftests.rest.jmeter.sched.RESTfulSchedSetupClient</stringProp>
+        </JavaSampler>
+        <hashTree/>
+      </hashTree>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="RESTful Scheduler Job Update Clients" enabled="true">
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <intProp name="LoopController.loops">-1</intProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.num_threads">${schedulerPortalUserNumber}</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">1</stringProp>
+        <longProp name="ThreadGroup.start_time">1349352905000</longProp>
+        <longProp name="ThreadGroup.end_time">1349352905000</longProp>
+        <boolProp name="ThreadGroup.scheduler">true</boolProp>
+        <stringProp name="ThreadGroup.duration">${testTime}</stringProp>
+        <stringProp name="ThreadGroup.delay">1</stringProp>
+      </ThreadGroup>
+      <hashTree>
+        <JavaSampler guiclass="JavaTestSamplerGui" testclass="JavaSampler" testname="RESTfulSchedJobUdateClient" enabled="true">
+          <elementProp name="arguments" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" enabled="true">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="stopOnError" elementType="Argument">
+                <stringProp name="Argument.name">stopOnError</stringProp>
+                <stringProp name="Argument.value">${stopOnError}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="restSchedulerUrl" elementType="Argument">
+                <stringProp name="Argument.name">restSchedulerUrl</stringProp>
+                <stringProp name="Argument.value">${restSchedulerUrl}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="restSchedulerLogin" elementType="Argument">
+                <stringProp name="Argument.name">restSchedulerLogin</stringProp>
+                <stringProp name="Argument.value">${restSchedulerLogin}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="restSchedulerPassword" elementType="Argument">
+                <stringProp name="Argument.name">restSchedulerPassword</stringProp>
+                <stringProp name="Argument.value">${restSchedulerPassword}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="jobClientRefreshTime" elementType="Argument">
+                <stringProp name="Argument.name">jobClientRefreshTime</stringProp>
+                <stringProp name="Argument.value">${jobClientRefreshTime}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+          <stringProp name="classname">org.ow2.proactive.perftests.rest.jmeter.sched.RESTfulSchedJobUpdateClient</stringProp>
+        </JavaSampler>
+        <hashTree/>
+      </hashTree>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="RESTful Scheduler Statistics Clients" enabled="true">
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <intProp name="LoopController.loops">-1</intProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.num_threads">${schedulerPortalUserNumber}</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">1</stringProp>
+        <longProp name="ThreadGroup.start_time">1347542141000</longProp>
+        <longProp name="ThreadGroup.end_time">1347542141000</longProp>
+        <boolProp name="ThreadGroup.scheduler">true</boolProp>
+        <stringProp name="ThreadGroup.duration">${testTime}</stringProp>
+        <stringProp name="ThreadGroup.delay">1</stringProp>
+      </ThreadGroup>
+      <hashTree>
+        <JavaSampler guiclass="JavaTestSamplerGui" testclass="JavaSampler" testname="RESTfulSchedStatClient" enabled="true">
+          <elementProp name="arguments" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" enabled="true">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="stopOnError" elementType="Argument">
+                <stringProp name="Argument.name">stopOnError</stringProp>
+                <stringProp name="Argument.value">${stopOnError}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="restSchedulerUrl" elementType="Argument">
+                <stringProp name="Argument.name">restSchedulerUrl</stringProp>
+                <stringProp name="Argument.value">${restSchedulerUrl}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="restSchedulerLogin" elementType="Argument">
+                <stringProp name="Argument.name">restSchedulerLogin</stringProp>
+                <stringProp name="Argument.value">${restSchedulerLogin}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="restSchedulerPassword" elementType="Argument">
+                <stringProp name="Argument.name">restSchedulerPassword</stringProp>
+                <stringProp name="Argument.value">${restSchedulerPassword}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="statClientRefreshTime" elementType="Argument">
+                <stringProp name="Argument.name">statClientRefreshTime</stringProp>
+                <stringProp name="Argument.value">${statClientRefreshTime}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+          <stringProp name="classname">org.ow2.proactive.perftests.rest.jmeter.sched.RESTfulSchedStatClient</stringProp>
+        </JavaSampler>
+        <hashTree/>
+      </hashTree>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="RESTFul Scheduler Job Client" enabled="true">
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <intProp name="LoopController.loops">-1</intProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.num_threads">${schedulerPortalUserNumber}</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">1</stringProp>
+        <longProp name="ThreadGroup.start_time">1347546520000</longProp>
+        <longProp name="ThreadGroup.end_time">1347546520000</longProp>
+        <boolProp name="ThreadGroup.scheduler">true</boolProp>
+        <stringProp name="ThreadGroup.duration">${testTime}</stringProp>
+        <stringProp name="ThreadGroup.delay">1</stringProp>
+      </ThreadGroup>
+      <hashTree>
+        <JavaSampler guiclass="JavaTestSamplerGui" testclass="JavaSampler" testname="RESTfulSchedJobClient" enabled="true">
+          <elementProp name="arguments" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" enabled="true">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="stopOnError" elementType="Argument">
+                <stringProp name="Argument.name">stopOnError</stringProp>
+                <stringProp name="Argument.value">${stopOnError}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="restSchedulerUrl" elementType="Argument">
+                <stringProp name="Argument.name">restSchedulerUrl</stringProp>
+                <stringProp name="Argument.value">${restSchedulerUrl}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="restSchedulerLogin" elementType="Argument">
+                <stringProp name="Argument.name">restSchedulerLogin</stringProp>
+                <stringProp name="Argument.value">${restSchedulerLogin}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="restSchedulerPassword" elementType="Argument">
+                <stringProp name="Argument.name">restSchedulerPassword</stringProp>
+                <stringProp name="Argument.value">${restSchedulerPassword}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="jobClientRefreshTime" elementType="Argument">
+                <stringProp name="Argument.name">jobClientRefreshTime</stringProp>
+                <stringProp name="Argument.value">${jobClientRefreshTime}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+          <stringProp name="classname">org.ow2.proactive.perftests.rest.jmeter.sched.RESTfulSchedJobClient</stringProp>
+        </JavaSampler>
+        <hashTree/>
+      </hashTree>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="RESTFul Scheduler Log Client" enabled="true">
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <intProp name="LoopController.loops">-1</intProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.num_threads">${schedulerPortalUserNumber}</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">1</stringProp>
+        <longProp name="ThreadGroup.start_time">1347546520000</longProp>
+        <longProp name="ThreadGroup.end_time">1347546520000</longProp>
+        <boolProp name="ThreadGroup.scheduler">true</boolProp>
+        <stringProp name="ThreadGroup.duration">${testTime}</stringProp>
+        <stringProp name="ThreadGroup.delay">1</stringProp>
+      </ThreadGroup>
+      <hashTree>
+        <JavaSampler guiclass="JavaTestSamplerGui" testclass="JavaSampler" testname="RESTfulSchedLogClient" enabled="true">
+          <elementProp name="arguments" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" enabled="true">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="stopOnError" elementType="Argument">
+                <stringProp name="Argument.name">stopOnError</stringProp>
+                <stringProp name="Argument.value">${stopOnError}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="restSchedulerUrl" elementType="Argument">
+                <stringProp name="Argument.name">restSchedulerUrl</stringProp>
+                <stringProp name="Argument.value">${restSchedulerUrl}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="restSchedulerLogin" elementType="Argument">
+                <stringProp name="Argument.name">restSchedulerLogin</stringProp>
+                <stringProp name="Argument.value">${restSchedulerLogin}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="restSchedulerPassword" elementType="Argument">
+                <stringProp name="Argument.name">restSchedulerPassword</stringProp>
+                <stringProp name="Argument.value">${restSchedulerPassword}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="logClientRefreshTime" elementType="Argument">
+                <stringProp name="Argument.name">logClientRefreshTime</stringProp>
+                <stringProp name="Argument.value">${logClientRefreshTime}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+          <stringProp name="classname">org.ow2.proactive.perftests.rest.jmeter.sched.RESTfulSchedLogClient</stringProp>
+        </JavaSampler>
+        <hashTree/>
+      </hashTree>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="RESTFul Scheduler My Account Client" enabled="true">
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <intProp name="LoopController.loops">-1</intProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.num_threads">${schedulerPortalUserNumber}</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">1</stringProp>
+        <longProp name="ThreadGroup.start_time">1347546520000</longProp>
+        <longProp name="ThreadGroup.end_time">1347546520000</longProp>
+        <boolProp name="ThreadGroup.scheduler">true</boolProp>
+        <stringProp name="ThreadGroup.duration">${testTime}</stringProp>
+        <stringProp name="ThreadGroup.delay">1</stringProp>
+      </ThreadGroup>
+      <hashTree>
+        <JavaSampler guiclass="JavaTestSamplerGui" testclass="JavaSampler" testname="RESTfulSchedMyAccountClient" enabled="true">
+          <elementProp name="arguments" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" enabled="true">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="stopOnError" elementType="Argument">
+                <stringProp name="Argument.name">stopOnError</stringProp>
+                <stringProp name="Argument.value">${stopOnError}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="restSchedulerUrl" elementType="Argument">
+                <stringProp name="Argument.name">restSchedulerUrl</stringProp>
+                <stringProp name="Argument.value">${restSchedulerUrl}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="restSchedulerLogin" elementType="Argument">
+                <stringProp name="Argument.name">restSchedulerLogin</stringProp>
+                <stringProp name="Argument.value">${restSchedulerLogin}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="restSchedulerPassword" elementType="Argument">
+                <stringProp name="Argument.name">restSchedulerPassword</stringProp>
+                <stringProp name="Argument.value">${restSchedulerPassword}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="myAcClientRefershTime" elementType="Argument">
+                <stringProp name="Argument.name">myAcClientRefershTime</stringProp>
+                <stringProp name="Argument.value">${myAcClientRefreshTime}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+          <stringProp name="classname">org.ow2.proactive.perftests.rest.jmeter.sched.RESTfulSchedMyAccountClient</stringProp>
+        </JavaSampler>
+        <hashTree/>
+      </hashTree>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="RESTFul Scheduler State Client" enabled="true">
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <intProp name="LoopController.loops">-1</intProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.num_threads">${schedulerPortalUserNumber}</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">1</stringProp>
+        <longProp name="ThreadGroup.start_time">1347546520000</longProp>
+        <longProp name="ThreadGroup.end_time">1347546520000</longProp>
+        <boolProp name="ThreadGroup.scheduler">true</boolProp>
+        <stringProp name="ThreadGroup.duration">${testTime}</stringProp>
+        <stringProp name="ThreadGroup.delay">1</stringProp>
+      </ThreadGroup>
+      <hashTree>
+        <JavaSampler guiclass="JavaTestSamplerGui" testclass="JavaSampler" testname="RESTfulSchedStateClient" enabled="true">
+          <elementProp name="arguments" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" enabled="true">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="stopOnError" elementType="Argument">
+                <stringProp name="Argument.name">stopOnError</stringProp>
+                <stringProp name="Argument.value">${stopOnError}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="restSchedulerUrl" elementType="Argument">
+                <stringProp name="Argument.name">restSchedulerUrl</stringProp>
+                <stringProp name="Argument.value">${restSchedulerUrl}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="restSchedulerLogin" elementType="Argument">
+                <stringProp name="Argument.name">restSchedulerLogin</stringProp>
+                <stringProp name="Argument.value">${restSchedulerLogin}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="restSchedulerPassword" elementType="Argument">
+                <stringProp name="Argument.name">restSchedulerPassword</stringProp>
+                <stringProp name="Argument.value">${restSchedulerPassword}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="stateClientRefreshTime" elementType="Argument">
+                <stringProp name="Argument.name">stateClientRefreshTime</stringProp>
+                <stringProp name="Argument.value">${stateClientRefreshTime}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+          <stringProp name="classname">org.ow2.proactive.perftests.rest.jmeter.sched.RESTfulSchedStateClient</stringProp>
+        </JavaSampler>
+        <hashTree/>
+      </hashTree>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="RESTFul Scheduler User Client" enabled="true">
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <intProp name="LoopController.loops">-1</intProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.num_threads">${schedulerPortalUserNumber}</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">1</stringProp>
+        <longProp name="ThreadGroup.start_time">1347546520000</longProp>
+        <longProp name="ThreadGroup.end_time">1347546520000</longProp>
+        <boolProp name="ThreadGroup.scheduler">true</boolProp>
+        <stringProp name="ThreadGroup.duration">${testTime}</stringProp>
+        <stringProp name="ThreadGroup.delay">1</stringProp>
+      </ThreadGroup>
+      <hashTree>
+        <JavaSampler guiclass="JavaTestSamplerGui" testclass="JavaSampler" testname="RESTfulSchedUserClient" enabled="true">
+          <elementProp name="arguments" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" enabled="true">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="stopOnError" elementType="Argument">
+                <stringProp name="Argument.name">stopOnError</stringProp>
+                <stringProp name="Argument.value">${stopOnError}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="restSchedulerUrl" elementType="Argument">
+                <stringProp name="Argument.name">restSchedulerUrl</stringProp>
+                <stringProp name="Argument.value">${restSchedulerUrl}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="restSchedulerLogin" elementType="Argument">
+                <stringProp name="Argument.name">restSchedulerLogin</stringProp>
+                <stringProp name="Argument.value">${restSchedulerLogin}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="restSchedulerPassword" elementType="Argument">
+                <stringProp name="Argument.name">restSchedulerPassword</stringProp>
+                <stringProp name="Argument.value">${restSchedulerPassword}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="userClientRefreshTime" elementType="Argument">
+                <stringProp name="Argument.name">userClientRefreshTime</stringProp>
+                <stringProp name="Argument.value">${userClientRefreshTime}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+          <stringProp name="classname">org.ow2.proactive.perftests.rest.jmeter.sched.RESTfulSchedUserClient</stringProp>
+        </JavaSampler>
+        <hashTree/>
+      </hashTree>
+    </hashTree>
+  </hashTree>
+</jmeterTestPlan>

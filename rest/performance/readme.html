@@ -1,0 +1,116 @@
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<title>Scheduler and RM load tests</title>
+	</head>
+
+	<body>
+		<h1>Load tests for ProActice Resource Manager and Scheduler REST APIs:
+		</h1>
+		<h2>Overview:</h2>
+		<p>
+			The performance directory in the Scheduling-Rest project contains
+			load tests for the REST API server for ProActive Scheduling and
+			Resourcing. It is based on load test package of ProActive Scheduling
+			project and makes use of its features in order to launch and
+			configure ProActive Resource Manager and ProActive Scheduler. The
+			users are strongly advised to read the load tests documentation of
+			Proactive Scheduler project which can be locate at:
+			http://gitorious.ow2.org/ow2-proactive/scheduling/blobs/master/performance/readme.html
+		</p>
+		<p>
+			All these tests are written as Apache JMeter test scripts where
+			each script performs some meaningful test scenario. For instance
+			rm-portal-clients.jmx simulates the usage of ProActive RM Portal by
+			an end user for monitoring purposes. Apache Ant build system is used
+			to compile, execute (via JMeter) these tests and generates reports.
+		</p>
+		<h2>Deployment Configuration:</h2>
+
+		<p>The following is the list of configuration parameters:</p>
+		<ul>
+			<li>test.scenario - the test scenario name</li>
+			<li>appserver.deploy.hostname - host where application server is
+				deployed
+			</li>
+			<li>test.deploy.env.appserver - host environment identifier</li>
+			<li>populate.scheduler - whether the scheduler should be populated
+				with some test jobs before running the load tests.
+			</li>
+		</ul>
+
+		<p>Configuration parameters related to application server host:</p>
+
+		<ul>
+			<li>appserver.deploy.javaPath - path to Java executable</li>
+			<li>appserver.deploy.schedulingPath - path to the scheduling project
+				directory
+			</li>
+			<li>appserver.deploy.schedulingRestPath - path to the scheduling-rest
+				project directory
+			</li>
+			<li>appserver.deploy.tomcathome - path to tomcat installation
+				directory
+			</li>
+			<li>appserver.deploy.warfile - path to Scheduling-Rest-*.war file
+			</li>
+			<li>appserver.deploy.catalina_opts : (optional) additional jvm
+				parameters for the tomcat server
+			</li>
+		</ul>
+		<p>Example configuration:</p>
+		<ul>
+			<li>jmeterhome=/home/user/tools/jakarta-jmeter-2.5.1</li>
+			<li>javaPath=/home/user/tools/jdk1.6.0_33/bin/java </li>
+			<li>schedulingPath=/home/user/source/scheduling/ </li>
+			<li>test.deploy.protocol=pamr </li>
+			<li>target.test.scenario=scheduler-portal-clients</li>
+			<li>populate.scheduler=true</li>
+			<li>appserver.deploy.hostname=localhost </li>
+			<li>test.deploy.env.appserver=appenv </li>
+			<li>appserver.deploy.javaPath=/home/user/tools/jdk1.6.0_33/bin/java
+			</li>
+			<li>appserver.deploy.schedulingPath=/home/user/source/rest_perf/
+			</li>
+			<li>appserver.deploy.schedulingRestPath=/home/user/source/rest_perf/
+			</li>
+			<li>appserver.deploy.tomcathome=/home/user/tools/apache-tomcat-6.0.35
+			</li>
+			<li>appserver.deploy.warfile=/home/user/tools/apache-tomcat-6.0.35/webapps/SchedulingRest.war
+			</li>
+			<li>appserver.deploy.catalina_opts="-Xms1024m -Xmx1024m" </li>
+			<li>rm.deploy.rmHost=localhost </li>
+			<li>rm.deploy.rmNodesHosts=localhost</li>
+			<li>rm.deploy.rmNodesPerHosts=4 </li>
+			<li>scheduler.deploy.schedulerHost=localhost </li>
+			<li>scheduler.project.dir=/home/user/source/scheduling</li>
+		</ul>
+		<h2>Test Scenarios:</h2>
+		<p>
+			rm-portal-clients.jmx simulates the usage of ProActive RM Portal
+			for monitoring purposes
+			by an end-user.
+		</p>
+		<p>
+			Scheduler-portal-clients.jmx simulates the usage of ProActive RM
+			Portal for monitoring purposes by an end-user.
+		</p>
+
+		<h2>Test Execution:</h2>
+		<p> The tests are launched using Apache Ant build system and build
+			script is located at 'scheduling-rest'/perfromance/build.xml
+		</p>
+		<p>ant deploy-all</p>
+		<p>
+			Deploy ProActive Resource Manager, ProActive Scheduler and Tomcat
+			Application Server (with SchedulingRest-{version} web application)
+		</p>
+		<p>ant execute-test</p>
+		<p>Execute the test scenario against already deployed servers.</p>
+		<p> ant deploy-and-execute-test</p>
+		<p>Deploy all the servers first and then execute the test scenario.
+		</p>
+		<p>Example:</p>
+		<p>ant clean deploy-and-execute-test</p>
+	</body>
+</html>

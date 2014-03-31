@@ -1,0 +1,5 @@
+build/
+.gradle/
+rest-server/src/main/webapp/doc/
+rest-server/tmp
+rest-server/log

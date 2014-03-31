@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<ProActiveUserProperties>
+  <properties>
+    <!-- PAMR properties -->
+    <prop key="proactive.communication.protocol" value="rmi"/>
+    <prop key="proactive.net.router.address" value="node0.cloud.sophia.inria.fr"/>
+    <prop key="proactive.net.router.port" value="8090"/>
+    <!-- PAMR with SSH extension config -->
+    <prop key="proactive.communication.pamr.socketfactory" value="ssh"/>
+    <!-- Replace "[ssh key directory]" by "/my/ssh/directory" -->
+    <prop key="proactive.communication.pamrssh.key_directory" value=""/>
+    <!-- Replace "[login]" by "yourlogin" -->
+    <prop key="proactive.communication.pamrssh.username" value=""/>
+    <prop key="proactive.communication.pamrssh.port" value="22"/>
+  </properties>
+</ProActiveUserProperties>
