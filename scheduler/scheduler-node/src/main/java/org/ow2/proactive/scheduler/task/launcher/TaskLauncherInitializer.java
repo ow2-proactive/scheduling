@@ -339,6 +339,7 @@ public class TaskLauncherInitializer implements Serializable {
     /**
      * @return the preciousLogs
      */
+    @Deprecated
     public boolean isPreciousLogs() {
         return preciousLogs;
     }
@@ -346,6 +347,7 @@ public class TaskLauncherInitializer implements Serializable {
     /**
      * @param preciousLogs the preciousLogs to set
      */
+    @Deprecated
     public void setPreciousLogs(boolean preciousLogs) {
         this.preciousLogs = preciousLogs;
     }

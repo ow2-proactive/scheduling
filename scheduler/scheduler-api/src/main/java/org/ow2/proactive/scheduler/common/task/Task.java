@@ -138,6 +138,7 @@ public abstract class Task extends CommonAttribute {
     protected boolean preciousResult;
 
     /** If true, the stdout/err of this tasks are stored in a file in LOCALSPACE */
+    @Deprecated
     protected boolean preciousLogs;
 
     protected boolean runAsMe;
@@ -242,6 +243,7 @@ public abstract class Task extends CommonAttribute {
      *
      * @return true if the logs are precious, false if not.
      */
+    @Deprecated
     public boolean isPreciousLogs() {
         return preciousLogs;
     }
@@ -251,6 +253,7 @@ public abstract class Task extends CommonAttribute {
      *
      * @param preciousLogs true if the logs of this task are precious, false if not.
      */
+    @Deprecated
     public void setPreciousLogs(boolean preciousLogs) {
         this.preciousLogs = preciousLogs;
     }

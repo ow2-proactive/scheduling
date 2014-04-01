@@ -50,6 +50,7 @@ import org.ow2.proactive.scheduler.common.exception.WalltimeExceededException;
 import org.ow2.proactive.scheduler.common.task.JavaExecutableInitializer;
 import org.ow2.proactive.scheduler.common.task.SimpleTaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.exception.ForkedJVMProcessException;
 import org.ow2.proactive.scheduler.exception.IllegalProgressException;
@@ -184,8 +185,9 @@ public class JavaTaskLauncherForker extends JavaTaskLauncher implements ForkerSt
                     // the result has been computed and must be returned !
                     logger.warn("Loggers are not shutdown !", e);
                 }
-                executableGuard.copyScratchDataToOutput(getTaskOutputSelectors());
+                executableGuard.copyScratchDataToOutput(getTaskLogsSelectors(OutputAccessMode.TransferToOutputSpace));
             }
+            executableGuard.copyScratchDataToOutput(getTaskLogsSelectors(OutputAccessMode.TransferToUserSpace));
 
             if (userResult instanceof TaskResult) {
                 // Override the logs since they are stored on forker side
