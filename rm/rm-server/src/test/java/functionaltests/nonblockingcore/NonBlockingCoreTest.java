@@ -80,6 +80,9 @@ public class NonBlockingCoreTest extends RMConsecutive {
      */
     @org.junit.Test
     public void action() throws Exception {
+        String rmconf = new File(RMTHelper.class.getResource(
+                "/functionaltests/config/rm-default-script-timeout.ini").toURI()).getAbsolutePath();
+        RMTHelper.getDefaultInstance().startRM(rmconf, RMTHelper.PA_RMI_PORT);
         RMTHelper helper = RMTHelper.getDefaultInstance();
 
         ResourceManager resourceManager = helper.getResourceManager();
