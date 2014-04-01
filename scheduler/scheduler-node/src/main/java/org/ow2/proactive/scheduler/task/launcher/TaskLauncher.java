@@ -166,6 +166,7 @@ public abstract class TaskLauncher implements InitActive {
     /** The name used to access propagated variables map */
     public static final String VARIABLES_BINDING_NAME = "variables";
 
+    // keep last 1024 lines ot job output by default
     private static final int KEY_SIZE = 1024;
 
     // to define the max line number of a task logs
@@ -175,8 +176,7 @@ public abstract class TaskLauncher implements InitActive {
     public static final String MAX_LOG_SIZE_PROPERTY = "pas.launcher.logs.maxsize";
 
     // default log size, counted in number of log events
-    // 125 based on JL's statistics :)
-    public static final int DEFAULT_LOG_MAX_SIZE = 125;
+    public static final int DEFAULT_LOG_MAX_SIZE = 1024;
 
     // the prefix for log file produced in localspace
     public static final String LOG_FILE_PREFIX = "TaskLogs";
@@ -256,6 +256,7 @@ public abstract class TaskLauncher implements InitActive {
     // default appender for log storage
     protected transient AsyncAppenderWithStorage logAppender;
     // if true, store logs in a file in LOCALSPACE
+    @Deprecated
     protected boolean storeLogs;
 
     protected String logFileName;
@@ -946,10 +947,8 @@ public abstract class TaskLauncher implements InitActive {
                 logger.info("SCRATCH space is " + SCRATCH.getRealURI());
 
                 // create a log file in local space if the node is configured
-                if (this.storeLogs) {
-                    logger.info("logfile is enabled for task " + taskId);
-                    initLocalLogsFile();
-                }
+                logger.info("logfile is enabled for task " + taskId);
+                initLocalLogsFile();
 
             } catch (Throwable t) {
                 logger.error("There was a problem while initializing dataSpaces, they are not activated", t);
@@ -1487,15 +1486,16 @@ public abstract class TaskLauncher implements InitActive {
         // Handling logFile separately
         if (isDataspaceAware()) {
             if (this.storeLogs) {
-                copyScratchDataToOutput(getTaskOutputSelectors());
+                copyScratchDataToOutput(getTaskLogsSelectors(OutputAccessMode.TransferToOutputSpace));
             }
+            copyScratchDataToOutput(getTaskLogsSelectors(OutputAccessMode.TransferToUserSpace));
         }
     }
 
-    protected List<OutputSelector> getTaskOutputSelectors() {
+    protected List<OutputSelector> getTaskLogsSelectors(OutputAccessMode transferTo) {
         List<OutputSelector> result = new ArrayList<OutputSelector>(1);
         OutputSelector logFiles = new OutputSelector(new FileSelector(TaskLauncher.LOG_FILE_PREFIX + "*"),
-            OutputAccessMode.TransferToOutputSpace);
+            transferTo);
         result.add(logFiles);
         return result;
     }
