@@ -343,7 +343,9 @@ public class TestProcessTreeKiller extends SchedulerConsecutive {
         processBuilder.redirectErrorStream();
         Process p = processBuilder.start();
         BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
+        SchedulerTHelper.log("Scanning processes");
         while ((line = input.readLine()) != null) {
+            SchedulerTHelper.log("Process: " + line);
             if (line.contains(executableName)) {
                 toReturn++;
             }
