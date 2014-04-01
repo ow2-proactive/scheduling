@@ -3,8 +3,8 @@ package org.ow2.proactive_grid_cloud_portal.scheduler;
 import java.io.File;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.mop.MOPClassLoader;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
@@ -12,6 +12,7 @@ import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
 import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
+import org.apache.log4j.Logger;
 
 
 public class SchedulerStateListener {
@@ -107,7 +108,10 @@ public class SchedulerStateListener {
                 }
 
                 eventListener = new EventListener(state);
-                eventListener = PAActiveObject.turnActive(eventListener);
+                // for PROACTIVE-1027 PROACTIVE-1233
+                synchronized (MOPClassLoader.getMOPClassLoader()) {
+                    eventListener = PAActiveObject.turnActive(eventListener);
+                }
                 scheduler.addEventListener(eventListener, false, false);
             } catch (Exception e) {
                 logger.warn("no scheduler found on " + url + " retrying in 8 seconds", e);

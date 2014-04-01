@@ -14,6 +14,11 @@ log4j.logger.org.ow2.proactive.resourcemanager.db=INFO
 # ... and console. It additionally goes to the CONSOLE appender
 log4j.logger.org.ow2.proactive.scheduler.util.console=INFO, CONSOLE
 log4j.logger.org.ow2.proactive.scheduler.util.SchedulerStarter=INFO, CONSOLE
+log4j.logger.org.ow2.proactive.utils.JettyStarter=INFO, CONSOLE
+
+# Logs from REST server
+log4j.logger.org.ow2.proactive_grid_cloud_portal=INFO
+log4j.logger.org.ow2.proactive_grid_cloud_portal.webapp.NoVncSecuredTargetResolver=DEBUG
 
 log4j.logger.proactive=WARN
 

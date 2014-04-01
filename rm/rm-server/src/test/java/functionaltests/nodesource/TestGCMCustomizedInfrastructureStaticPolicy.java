@@ -42,6 +42,7 @@ import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.GCMCustomisedInfrastructure;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.utils.FileToBytesConverter;
+import org.junit.Ignore;
 
 import functionaltests.RMTHelper;
 
@@ -55,6 +56,7 @@ import functionaltests.RMTHelper;
  * to deploy several nodes so it wont be able to remove them correctly one by one. But for the scenario
  * in this test it's not required.
  */
+@Ignore
 public class TestGCMCustomizedInfrastructureStaticPolicy extends TestLocalInfrastructureStaticPolicy {
 
     protected byte[] emptyGCMD;

@@ -22,7 +22,6 @@ var config = CONFIGS.PNP_PAMR
 
 // Change these ports if required
 var ROUTER_PORT = 64737 // port used by the PAMR router
-var RM_PORT = 64738 // port used by the RM in case of PNP
 var SCHEDULER_PORT = 64739 // port used by the Scheduler in case of PNP
 var JETTY_PORT = 8080  // port used by the Web Server
 
@@ -30,7 +29,6 @@ var MAIN_PROTOCOL
 var ADDITIONAL_PROTOCOL
 var PORT_PROTOCOL
 
-var RM_URL
 var SCHEDULER_URL
 
 // Please always use this variale instead of os-dependant separator
@@ -45,7 +43,6 @@ var homeDir = new File(currDir.getParent())
 var logsDir = new File(homeDir, '.logs')
 var configDir = new File(homeDir, 'config')
 var distDir = new File(homeDir, 'dist')
-var warsDir = new File(distDir, 'war')
 var paConfigFile = new File(configDir, 'proactive'+fs+'ProActiveConfiguration.xml')
 
 // Load all jars from dist/lib
@@ -56,12 +53,10 @@ var javaExe = System.getProperty('java.home')+fs+'bin'+fs+(com.sun.jna.Platform.
 
 // Logs locations
 var routerOutputFile = new File(logsDir,'Router-stdout.log')
-var rmOutputFile = new File(logsDir,'RM-stdout.log')
 var schedulerOutputFile = new File(logsDir, 'Scheduler-stdout.log')
-var jettyOutputFile = new File(logsDir, 'Jetty-stdout.log')
 
 // Processes
-var routerProcess, rmProcess, schedulerProcess, jettyProcess
+var routerProcess, schedulerProcess
 
 startEverything()
 
@@ -79,7 +74,7 @@ function startEverything() {
 
 	// Add shutdownhook to terminate all processes if the current process is killed
 	Runtime.getRuntime().addShutdownHook(new Thread(function () {
-		var procs = [jettyProcess, schedulerProcess, rmProcess, routerProcess]
+		var procs = [schedulerProcess, routerProcess]
 		procs.map(function(x){if(x!=null){x.destroy()}})
 	}))
 
@@ -105,18 +100,6 @@ function startEverything() {
         }
     }
 
-	println('\nRunning Resource Manager process ...')
-	rmProcess = startRM()
-	if (rmProcess != null) {
-	    var rmWaiter = new Callable({ 
-		   call: function () {
-		      var exitValue = rmProcess.waitFor()
-			  println('!! RM HAS EXITED !! Please consult ' + rmOutputFile)
-		      return exitValue
-	    }})
-	    service.submit(rmWaiter)
-	}
-
 	println('\nRunning Scheduler process ...')
 	schedulerProcess = startScheduler()
 	if (schedulerProcess != null) {
@@ -127,18 +110,6 @@ function startEverything() {
 				return exitValue
 		}})
 		service.submit(schedulerWaiter)
-	}
-
-	println('\nRunning Jetty process ...')
-	jettyProcess = startJetty()
-	if (jettyProcess != null) {
-		var jettyWaiter = new Callable({
-			call: function () {
-				var exitValue = jettyProcess.waitFor()
-				println('!! JETTY HAS EXITED !! Please consult ' + jettyOutputFile)
-				return exitValue
-		}})
-		service.submit(jettyWaiter)
 	}
 
 	var exitListener = new Callable({
@@ -177,7 +148,6 @@ function setupConfigAndCheckPorts() {
             PORT_PROTOCOL = 'pnp'
             CHECK_PORTS = {
                 'ROUTER':ROUTER_PORT,
-                'RM':RM_PORT,
                 'SCHEDULER':SCHEDULER_PORT,
                 'JETTY':JETTY_PORT
             }
@@ -187,7 +157,6 @@ function setupConfigAndCheckPorts() {
             ADDITIONAL_PROTOCOL = null
             PORT_PROTOCOL = 'pnp'
             CHECK_PORTS = {
-                'RM':RM_PORT,
                 'SCHEDULER':SCHEDULER_PORT,
                 'JETTY':JETTY_PORT
             }
@@ -207,7 +176,6 @@ function setupConfigAndCheckPorts() {
             PORT_PROTOCOL = 'pnp'
             CHECK_PORTS = {
                 'ROUTER':ROUTER_PORT,
-                'RM':RM_PORT,
                 'SCHEDULER':SCHEDULER_PORT,
                 'JETTY':JETTY_PORT
             }
@@ -217,10 +185,8 @@ function setupConfigAndCheckPorts() {
 
 function setupURLs() {
     if (config == CONFIGS.PAMR) {
-        RM_URL = 'pamr://0'
-        SCHEDULER_URL = 'pamr://1'
+        SCHEDULER_URL = 'pamr://0'
     } else {
-        RM_URL = PORT_PROTOCOL+'://localhost:'+RM_PORT
         SCHEDULER_URL = PORT_PROTOCOL+'://localhost:'+SCHEDULER_PORT
     }
 }
@@ -248,23 +214,6 @@ function startRouter() {
 	return proc
 }
 
-function startRM() {
-	var cmd = initCmd()
-    if (PORT_PROTOCOL != null) {
-        cmd.push('-Dproactive.'+PORT_PROTOCOL+'.port='+RM_PORT)
-    }
-	cmd.push('-Dlog4j.configuration=file:'+configDir+fs+'log4j'+fs+'rm-log4j-server')
-    if (config == CONFIGS.PNP_PAMR || config == CONFIGS.PAMR) {
-        cmd.push('-Dproactive.pamr.agent.id=0')
-        cmd.push('-Dproactive.pamr.agent.magic_cookie=rm')
-    }
-	cmd.push('org.ow2.proactive.resourcemanager.utils.RMStarter')
-	cmd.push('-ln') // with default 4 local nodes
-	var proc = execCmdAsync(cmd, homeDir, rmOutputFile, 'created on')
-	println('Resource Manager stdout/stderr redirected into ' + rmOutputFile)
-	return proc
-}
-
 function startScheduler() {
 	var cmd = initCmd()
     if (PORT_PROTOCOL != null) {
@@ -272,100 +221,13 @@ function startScheduler() {
     }
 	cmd.push('-Dlog4j.configuration=file:'+configDir+fs+'log4j' + fs+'scheduler-log4j-server')
     if (config == CONFIGS.PNP_PAMR || config == CONFIGS.PAMR) {
-	    cmd.push('-Dproactive.pamr.agent.id=1')
+	    cmd.push('-Dproactive.pamr.agent.id=0')
 	    cmd.push('-Dproactive.pamr.agent.magic_cookie=scheduler')
     }
     cmd.push('org.ow2.proactive.scheduler.util.SchedulerStarter')
-    cmd.push('-u', RM_URL) // always on localhost
-	
-	var proc = execCmdAsync(cmd, homeDir, schedulerOutputFile, 'created on')
+
+	var proc = execCmdAsync(cmd, homeDir, schedulerOutputFile, 'The scheduler created on')
 	println('Scheduler stdout/stderr redirected into ' + schedulerOutputFile)
-	return proc
-}
-
-function injectProperties(propsFile, properties) {
-    println('Injecting the Resource Manager and Scheduler urls into  ' + propsFile)
-    if (!propsFile.exists()) {
-		propsFile.createNewFile()
-    }
-    var props = new Properties()
-    var inputStream = new FileInputStream(propsFile)
-    props.load(inputStream)
-    inputStream.close()
-    for (var prop in properties) {
-        props.setProperty(prop, properties[prop])
-    }
-    var outputStream = new FileOutputStream(propsFile)
-    props.store(outputStream, '')
-    outputStream.close()
-}
-
-function extractWar(warsDir, path, warName) {
-    var extractDir = new File(warsDir, path)
-    println('Checking for ' + extractDir)
-    if (!extractDir.exists()) {
-        var warFile = new File(warsDir, warName)
-        if (!warFile.exists()) {
-            println('Unable to locate ' + warFile)
-            return null
-        }
-        var zip = new ZipFile(warFile)
-        extractDir.mkdir()
-        org.ow2.proactive.scheduler.common.util.ZipUtils.unzip(zip, extractDir)
-    }
-    return extractDir
-}
-
-function startJetty() {
-	if (!warsDir.exists()) {
-	   println('Unable to locate ' + warsDir + ' directory, jetty will not be started')
-	   return null
-	}
-
-    var restDir = extractWar(warsDir, 'rest', 'rest.war')
-    var rmDir = extractWar(warsDir, 'rm', 'rm.war')
-    var schedulerDir = extractWar(warsDir, 'scheduler', 'scheduler.war')
-
-    dumpProActiveConfiguration(new File(restDir, 'WEB-INF'+fs+'ProActiveConfiguration.xml'))
-
-    var restProperties = { 'rm.url': RM_URL, 'scheduler.url': SCHEDULER_URL}
-    injectProperties(new File(restDir, 'WEB-INF'+fs+'portal.properties'), restProperties)
-
-    var rmProperties = { 'rm.rest.url': 'http://localhost:'+JETTY_PORT+'/rest/rest'}
-    injectProperties(new File(rmDir, 'rm.conf'), rmProperties)
-
-    var schedulerProperties = { 'sched.rest.url': 'http://localhost:'+JETTY_PORT+'/rest/rest' }
-    injectProperties(new File(schedulerDir, 'scheduler.conf'), schedulerProperties)
-
-    var cmd = [ javaExe ]
-	cmd.push('-Djava.security.manager')
-	cmd.push('-Djava.security.policy=file:'+configDir+fs+'security.java.policy-client')
-	cmd.push('org.ow2.proactive.utils.JettyLauncher')
-	cmd.push('-p', JETTY_PORT)
-	cmd.push(restDir, rmDir, schedulerDir)
-	var proc = execCmdAsync(cmd, homeDir, jettyOutputFile, null)
-	println('Jetty stdout/stderr redirected into ' + jettyOutputFile)
-
-	println('Waiting for jetty to start ...')
-	while (isTcpPortAvailable(JETTY_PORT)) {
-		java.lang.Thread.sleep(1000)
-	}
-
-	var restHttpUrl = 'http://localhost:'+JETTY_PORT+'/rest'
-	var rmHttpUrl = 'http://localhost:'+JETTY_PORT+'/rm'
-	var schedulerHttpUrl = 'http://localhost:'+JETTY_PORT+'/scheduler'
-	
-	println('Rest Server webapp deployed at      ' + restHttpUrl)
-	println('Resource Manager webapp deployed at ' + rmHttpUrl)
-	println('Scheduler webapp deployed at        ' + schedulerHttpUrl)
-	println('')
-	println('Opening browser ...')
-	println('Please use demo/demo as login/password to connect')
-    try {
-       java.awt.Desktop.getDesktop().browse(java.net.URI.create(restHttpUrl))
-	   java.awt.Desktop.getDesktop().browse(java.net.URI.create(rmHttpUrl))
-	   java.awt.Desktop.getDesktop().browse(java.net.URI.create(schedulerHttpUrl))
-    } catch (e) { println('Could not open browser ...')}
 	return proc
 }
 

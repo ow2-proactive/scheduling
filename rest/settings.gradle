@@ -1,4 +1,0 @@
-include 'rest-api'
-include 'rest-cli'
-include 'rest-server'
-include 'rest-client'

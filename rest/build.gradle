@@ -1,6 +1,7 @@
 def functionalTestConfiguration = {
     forkEvery 1
     include 'functionaltests/**'
+    systemProperties << ['rest.deploy': 'false']
     systemProperties << ['pa.scheduler.home': rootDir.absolutePath]
     systemProperties << ['pa.rm.home': rootDir.absolutePath]
     systemProperties << ['proactive.home': rootDir.absolutePath]
@@ -16,53 +17,16 @@ def functionalTestConfiguration = {
     }
 }
 
-buildscript {
-    repositories {
-        if (project.hasProperty('local')) mavenLocal()
-        mavenCentral()
-        maven { url 'http://repo.activeeon.com/content/repositories/snapshots/' }
-        maven { url 'http://repo.activeeon.com/content/repositories/releases/' }
-        maven { url 'http://repo.activeeon.com/content/repositories/thirdparty/' }
-    }
-
-    dependencies {
-        classpath "org.objectweb.proactive:programming-build-utils:${programmingVersion}"
-        // needed at runtime by AntStubGenerator...
-        classpath "org.objectweb.proactive:programming-core:${programmingVersion}"
-    }
-}
-
 subprojects {
     apply plugin: 'java'
     apply plugin: 'maven'
     apply plugin: 'eclipse'
 
     group = 'org.ow2.proactive_grid_cloud_portal'
-    version = schedulingRestVersion
 
-    rootProject.buildscript.repositories.each {
-        repositories.add(it)
-    }
-
-    uploadArchives {
-        repositories {
-            mavenDeployer {
-                repository(url: "http://repo.activeeon.com/content/repositories/snapshots/") {
-                    authentication(userName: "${System.getProperty('nexusUsername')}",
-                            password: "${System.getProperty('nexusPassword')}")
-                }
-            }
-        }
-    }
-
-    task dependencies(type: Copy) {
-	from configurations.testCompile
-        into file("$buildDir/dependencies")
-    }
-    
 }
 
-project(':rest-api') {
+project(':rest:rest-api') {
     dependencies {
         compile 'org.jboss.resteasy:jaxrs-api:3.0.6.Final'
         compile 'org.jboss.resteasy:resteasy-jackson-provider:3.0.6.Final'
@@ -70,7 +34,7 @@ project(':rest-api') {
     }
 }
 
-project(':rest-server') {
+project(':rest:rest-server') {
     apply plugin: 'war'
     apply plugin: 'jetty'
 
@@ -91,17 +55,17 @@ project(':rest-server') {
         compile 'com.netiq:websockify:1.6-proactive'
         compile 'io.netty:netty:3.3.0.Final'
 
-        compile "org.ow2.proactive:scheduler-client:${schedulingVersion}"
-        compile "org.ow2.proactive:rm-client:${schedulingVersion}"
+        compile project(":scheduler:scheduler-client")
+        compile project(":rm:rm-client")
         compile "org.objectweb.proactive:programming-extension-dataspaces:${programmingVersion}"
 
-        compile project(':rest-api')
+        compile project(':rest:rest-api')
 
         testCompile 'junit:junit:4.11'
         testCompile 'org.mockito:mockito-core:1.9.5'
         testCompile 'com.googlecode.json-simple:json-simple:1.1'
-        testCompile "org.ow2.proactive:rm-server:${schedulingVersion}"
-        testCompile "org.ow2.proactive:scheduler-server:${schedulingVersion}"
+        testCompile project(":rm:rm-server")
+        testCompile project(":scheduler:scheduler-server")
         testCompile 'org.apache.httpcomponents:httpmime:4.2.1'
         testCompile 'org.jboss.resteasy:tjws:3.0.6.Final'
         testCompile 'org.fusesource:sigar:1.6.4'
@@ -115,7 +79,6 @@ project(':rest-server') {
         runtime "org.objectweb.proactive:programming-extension-pamr:${programmingVersion}"
 
         jaxDoclet 'com.lunatech.jax-doclets:doclets:0.10.1-proactive'
-        schedulerNode "org.ow2.proactive:scheduler-node:${schedulingVersion}:standalone"
     }
 
     task stub(type: StubTask) {
@@ -123,7 +86,7 @@ project(':rest-server') {
     }
 
     task jaxbDoc(type: Javadoc) {
-        source([project, project(':rest-api')].collect { project -> project.sourceSets.main.allJava })
+        source([project, project(':rest:rest-api')].collect { project -> project.sourceSets.main.allJava })
         destinationDir = file("$webAppDirName/doc/jaxbdocs")
         options.docletpath = configurations.jaxDoclet.files.asType(List) + configurations.compile.files.asType(List)
         options.classpath = options.docletpath
@@ -133,7 +96,7 @@ project(':rest-server') {
     }
 
     task jaxrsDoc(type: Javadoc, dependsOn: jaxbDoc) {
-        source([project, project(':rest-api')].collect { project -> project.sourceSets.main.allJava })
+        source([project, project(':rest:rest-api')].collect { project -> project.sourceSets.main.allJava })
         destinationDir = file("$webAppDirName/doc/jaxrsdocs")
         options.links << '../jaxbdocs/'
         options.footer = 'Copyright 1997-2014 ActiveEon/INRIA/University of Nice-Sophia Antipolis'
@@ -145,9 +108,9 @@ project(':rest-server') {
     war.dependsOn jaxrsDoc, stub
 
     war {
-        def schedulerNodeJar = configurations.schedulerNode.resolvedConfiguration.firstLevelModuleDependencies.moduleArtifacts.file
+        def schedulerNodeJar = project(":scheduler:scheduler-node").standaloneJar
         from schedulerNodeJar
-        rename(schedulerNodeJar.name[0][0], 'node.jar')
+        rename(schedulerNodeJar.outputs.files.singleFile.name, 'node.jar')
 
         filesMatching('**/*.html') {
             it.filter(org.apache.tools.ant.filters.ReplaceTokens, tokens: ['rest_api.version': project.version])
@@ -160,16 +123,32 @@ project(':rest-server') {
 
     task('functionalTest', type: Test).configure functionalTestConfiguration
 
-    task proActiveLibs(type: Copy) { // to launch a Scheduler node
-        from configurations.testCompile
-        into file("$rootDir/dist/lib")
+    functionalTest.dependsOn rootProject.proActiveLibs
+    clean.dependsOn rootProject.cleanProActiveLibs
+
+    task proActiveWar(type: Sync, dependsOn: war) {
+        from "$webAppDirName"
+
+        def schedulerNodeJar = project(":scheduler:scheduler-node").standaloneJar
+        from schedulerNodeJar
+
+        into file("$rootDir/dist/war/rest")
+
+        rename(schedulerNodeJar.outputs.files.singleFile.name, 'node.jar')
+
+        filesMatching('**/*.html') {
+            it.filter(org.apache.tools.ant.filters.ReplaceTokens, tokens: ['rest_api.version': project.version])
+        }
     }
 
-    functionalTest.dependsOn proActiveLibs
-    clean.dependsOn cleanProActiveLibs
+    task rootProject.proActiveLibs.dependsOn project.proActiveWar
+
+    artifacts {
+        jar
+    }
 }
 
-project(':rest-cli') {
+project(':rest:rest-cli') {
     apply plugin: 'application'
 
     dependencies {
@@ -180,8 +159,8 @@ project(':rest-cli') {
         compile 'org.apache.httpcomponents:httpclient:4.2.1'
         compile 'org.apache.httpcomponents:httpmime:4.2.1'
 
-        compile "org.ow2.proactive:common-api:${schedulingVersion}"
-        compile project(':rest-api')
+        compile project(":common-api")
+        compile project(':rest:rest-api')
     }
 
     // generate scripts from Scheduler CLI
@@ -198,7 +177,7 @@ project(':rest-cli') {
     applicationDistribution.from(rmStartScripts) { into 'bin' }
 }
 
-project(':rest-client') {
+project(':rest:rest-client') {
     dependencies {
 	compile 'commons-cli:commons-cli:1.2'
         compile 'commons-io:commons-io:2.4'
@@ -207,24 +186,24 @@ project(':rest-client') {
         compile 'org.apache.httpcomponents:httpclient:4.2.1'
         compile 'org.apache.httpcomponents:httpmime:4.2.1'
 
-        compile "org.ow2.proactive:common-api:${schedulingVersion}"
+        compile project(":common-api")
 
-        compile "org.ow2.proactive:scheduler-client:${schedulingVersion}"
+        compile project(":scheduler:scheduler-client")
 
 	
-        compile project(':rest-cli')
+        compile project(':rest:rest-cli')
 
         testCompile 'junit:junit:4.11'
         testCompile 'org.mockito:mockito-core:1.9.5'
         testCompile 'com.googlecode.json-simple:json-simple:1.1'
-        testCompile "org.ow2.proactive:rm-server:${schedulingVersion}"
-        testCompile "org.ow2.proactive:scheduler-server:${schedulingVersion}"
+        testCompile project(":rm:rm-server")
+        testCompile project(":scheduler:scheduler-server")
         testCompile 'org.apache.httpcomponents:httpmime:4.2.1'
         testCompile 'org.jboss.resteasy:tjws:2.3.3.Final'
         testCompile 'org.fusesource:sigar:1.6.4'
 
-        testCompile project(':rest-server')
-        testCompile project(':rest-server').sourceSets.test.output
+        testCompile project(':rest:rest-server')
+        testCompile project(':rest:rest-server').sourceSets.test.output
     }
 
     test {
@@ -233,6 +212,6 @@ project(':rest-client') {
 
     task('functionalTest', type:Test).configure functionalTestConfiguration
 
-    functionalTest.dependsOn project(':rest-server').proActiveLibs
-    clean.dependsOn project(':rest-server').cleanProActiveLibs
+    functionalTest.dependsOn rootProject.proActiveLibs
+    clean.dependsOn rootProject.cleanProActiveLibs
 }

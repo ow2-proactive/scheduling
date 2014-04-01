@@ -29,6 +29,10 @@ allprojects {
     group = 'org.ow2.proactive'
     version = schedulingVersion
 
+    rootProject.buildscript.repositories.each {
+        repositories.add(it)
+    }
+
     uploadArchives {
         repositories {
             mavenDeployer {
@@ -47,13 +51,9 @@ ext.serialver = schedulingSerialver
 configure(javaSubprojects) {
     apply plugin: 'java'
 
-    rootProject.buildscript.repositories.each {
-        repositories.add(it)
-    }
-
     dependencies {
         compile 'log4j:log4j:1.2.14'
-        runtime 'org.slf4j:slf4j-log4j12:1.5.3'
+        runtime 'org.slf4j:slf4j-log4j12:1.6.6'
         testCompile 'junit:junit:4.11'
     }
 
@@ -288,6 +288,8 @@ project('scheduler:scheduler-server') {
         runtime "org.objectweb.proactive:programming-extension-pnpssl:${programmingVersion}"
         runtime "org.objectweb.proactive:programming-extension-amqp:${programmingVersion}"
         runtime "org.objectweb.proactive:programming-extension-pamr:${programmingVersion}"
+
+        runtime project(':rest:rest-server')
     }
 
     task('functionalTest', type:Test).configure functionalTestConfiguration
@@ -495,74 +497,44 @@ project('performance') {
     }
 }
 
-task proActiveLibs(type: Sync) {
-    def docProjects = ['Resourcing', 'Scheduling', 'MapReduce']
-    def excludedProjects = docProjects + ['performance', 'scheduling']
-    def projectsToCopy = javaSubprojects.findAll { !(it.name in excludedProjects) }
-    // only copy once each runtime dependency (faster)
-    def runtimeDeps = projectsToCopy.collect { it.configurations.runtime.files }.flatten() as Set
-    from runtimeDeps
-    projectsToCopy.each {
-        from it.configurations.archives.artifacts.files
-        if (it.tasks.findByName('testJar')) from it.testJar.outputs
-    }
-    from file(project.rootProject.buildscript.configurations.classpath.find {
-        it.name.contains("build-utils")
-    })
-    into file("dist/lib")
+configurations {
+    distLib
 }
+
+dependencies {
+    distLib(project(':scheduler:scheduler-server')) {
+        exclude group: 'javassist', module: 'javassist' // to avoid duplicate (artifact named differently)
+    }
+    distLib project('rm:rm-policy:rm-policy-scheduler')
+    distLib project(':scheduler:scheduler-cli')
+    distLib project(':scheduler:scheduler-node')
+    distLib project(':rm:rm-server')
+    distLib project(':rm:rm-cli')
+    distLib(project(':rest:rest-server')) {
+        exclude group: 'javassist', module: 'javassist' // to avoid duplicate (artifact named differently)
+    }
+}
+
+task proActiveLibs(type: Sync) {
+    from configurations.distLib
+
+    [project(':rm:rm-server'), project(':scheduler:scheduler-server')].each {
+        from it.configurations.archives.artifacts.files.files
+        if (it.tasks.findByName('testJar'))
+            from it.testJar.outputs
+    }
+//            from file(project.rootProject.buildscript.configurations.classpath.find {
+//                it.name.contains("build-utils")
+//            })
+    into file("$rootDir/dist/lib")
+}
+
 defaultTasks 'proActiveLibs'
-apply plugin: 'java'
-//task build
+task build
 build.dependsOn 'proActiveLibs'
+
 subprojects {
     tasks.withType(Test).matching { it.name == 'functionalTest' }*.dependsOn proActiveLibs
-}
-
-def distributedProjects = [project(':rm:rm-cli'),
-        project(':scheduler:scheduler-cli'),
-        project(':scheduler:scheduler-node'),
-        project(':scheduler:scheduler-server'),
-        project(':rm:rm-server')
-]
-
-task proActiveDist(type: Copy) {
-    distributedProjects.distZip.outputs.files.each {
-        from zipTree(it.singleFile)
-    }
-    into "dist/"
-}
-proActiveDist.dependsOn distributedProjects.distZip
-
-task resourceManagerJar(type: Jar) {
-    project(':rm:rm-server').configurations.runtime.allDependencies.withType(ProjectDependency).each {
-        from zipTree(it.dependencyProject.jar.outputs.files.singleFile)
-    }
-    from zipTree(project(':rm:rm-server').jar.outputs.files.singleFile)
-    destinationDir file('dist/old_jars')
-    archiveName 'ProActive_ResourceManager.jar'
-}
-
-task schedulerJar(type: Jar) {
-    javaSubprojects.each {
-        from zipTree(it.jar.outputs.files.singleFile)
-    }
-
-    destinationDir file('dist/old_jars')
-    archiveName 'ProActive_Scheduler-core.jar'
-
-    doLast {
-        // generate INDEX.list
-        ant.jar(update: true, index: true, destfile: file("$destinationDir/$archiveName")) {
-            indexjars {
-                fileset(dir: destinationDir) {
-                    include(name: '*.jar')
-                    exclude(name: archiveName)
-                    exclude(name: '*-tests.jar')
-                }
-            }
-        }
-    }
 }
 
 task staticFiles(type: Zip) {

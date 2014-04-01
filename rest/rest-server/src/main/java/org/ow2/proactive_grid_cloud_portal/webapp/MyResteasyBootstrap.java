@@ -38,9 +38,11 @@ package org.ow2.proactive_grid_cloud_portal.webapp;
 
 import java.io.File;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.apache.log4j.Logger;
 import org.jboss.resteasy.plugins.server.servlet.ResteasyBootstrap;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
@@ -56,20 +58,32 @@ public class MyResteasyBootstrap extends ResteasyBootstrap {
         super.contextInitialized(event);
 
         ResteasyProviderFactory dispatcher = ResteasyProviderFactory.getInstance();
-        
+
         dispatcher.registerProvider(OctetStreamWriter.class, false);
 
         restRuntime = new RestRuntime();
 
-        restRuntime.start(dispatcher, new File(event.getServletContext().getRealPath(
-                "WEB-INF/portal.properties")), new File(event.getServletContext().getRealPath(
-                "WEB-INF/log4j.properties")), new File(event.getServletContext().getRealPath(
-                "WEB-INF/ProActiveConfiguration.xml")));
+        restRuntime.start(dispatcher,
+          findConfigurationFile(event.getServletContext(), "/config/rest/settings.ini"),
+          findConfigurationFile(event.getServletContext(), "log4j.properties"),
+          findConfigurationFile(event.getServletContext(), "/config/proactive/ProActiveConfiguration.xml"));
+    }
+
+    private File findConfigurationFile(ServletContext servletContext, String configurationFileName) {
+        File configurationFile = findConfigurationFileInWebInf(servletContext, configurationFileName);
+        if (configurationFile == null || !configurationFile.exists()) {
+            return new File(PASchedulerProperties.SCHEDULER_HOME.getValueAsString() + configurationFileName);
+        }
+        return configurationFile;
+    }
+
+    private File findConfigurationFileInWebInf(ServletContext servletContext, String configurationFileName) {
+        return new File(servletContext.getRealPath("WEB-INF/" + configurationFileName));
     }
 
     @Override
     public void contextDestroyed(ServletContextEvent event) {
-        LOGGER.info("shutting down ProActive Rest API at " + event.getServletContext().getContextPath());
+        LOGGER.info("Shutting down ProActive Rest API at " + event.getServletContext().getContextPath());
 
         restRuntime.stop();
 

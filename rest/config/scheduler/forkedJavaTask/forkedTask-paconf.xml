@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<ProActiveUserProperties>
-    <properties>
-    	<prop key="proactive.communication.protocol" value="pnp"/>
-    </properties>
-    <javaProperties>
-    </javaProperties>
-</ProActiveUserProperties>

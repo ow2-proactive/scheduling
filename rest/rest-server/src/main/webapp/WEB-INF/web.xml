@@ -11,12 +11,16 @@
 		</context-param> -->
 
 	<context-param>
-		<param-name> resteasy.scan.providers</param-name>
+		<param-name>resteasy.scan.providers</param-name>
 		<param-value>false</param-value>
 	</context-param>
 	<context-param>
-		<param-name> resteasy.scan.resources</param-name>
-		<param-value>true</param-value>
+		<param-name>resteasy.scan.resources</param-name>
+		<param-value>false</param-value>
+	</context-param>
+	<context-param>
+		<param-name>resteasy.resources</param-name>
+		<param-value>org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest,org.ow2.proactive_grid_cloud_portal.studio.StudioRest,org.ow2.proactive_grid_cloud_portal.rm.RMRest</param-value>
 	</context-param>
 
 	<!-- set this if you map the Resteasy servlet to something other than -->

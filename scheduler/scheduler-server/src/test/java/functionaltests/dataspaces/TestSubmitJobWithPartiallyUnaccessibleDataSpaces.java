@@ -38,6 +38,8 @@ import java.io.File;
 import java.net.URL;
 import java.nio.charset.Charset;
 
+import org.objectweb.proactive.extensions.vfsprovider.FileSystemServerDeployer;
+import org.ow2.tests.FunctionalTest;
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Assert;
@@ -45,11 +47,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.objectweb.proactive.extensions.vfsprovider.FileSystemServerDeployer;
 
-import functionaltests.SchedulerConsecutive;
 import functionaltests.SchedulerTHelper;
-import org.ow2.tests.FunctionalTest;
 
 
 /**
@@ -86,7 +85,7 @@ public class TestSubmitJobWithPartiallyUnaccessibleDataSpaces extends Functional
         File inputFile = new File(spaceRootUser, "myfilein1");
         inputFile.createNewFile();
         File propertiesfile = new File(configFile.toURI());
-        String propContent = FileUtils.readFileToString(propertiesfile, Charset.defaultCharset());
+        String propContent = FileUtils.readFileToString(propertiesfile, Charset.defaultCharset().toString());
         String newContent = propContent.replace("$$TOREPLACE$$", deployer.getVFSRootURL());
         FileUtils.writeStringToFile(propertiesfile, newContent);
 

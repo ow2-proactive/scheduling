@@ -43,6 +43,7 @@ import java.io.InputStream;
 import java.util.Map.Entry;
 import java.util.Properties;
 
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.config.xml.ProActiveConfigurationParser;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
@@ -102,18 +103,26 @@ public class RestRuntime {
     }
 
     private void configureLogger(File log4jConfig) {
-        if (log4jConfig != null) {
-            try {
-                InputStream in = new FileInputStream(log4jConfig);
-                Properties p = new Properties();
-                p.load(in);
-                in.close();
-                System.setProperty("log4j.configuration", log4jConfig.getAbsolutePath()); // avoid reset by ProActiveLogger
-                PropertyConfigurator.configure(p);
-            } catch (Exception e1) {
-                LOGGER.error("Failed to read the portal's log4j file: " + log4jConfig.getAbsolutePath(), e1);
+        if (loggerNotConfigured()) {
+            if (log4jConfig != null) {
+                try {
+                    InputStream in = new FileInputStream(log4jConfig);
+                    Properties p = new Properties();
+                    p.load(in);
+                    in.close();
+                    System.setProperty("log4j.configuration",
+                      log4jConfig.getAbsolutePath()); // avoid reset by ProActiveLogger
+                    PropertyConfigurator.configure(p);
+                } catch (Exception e1) {
+                    LOGGER.warn("Failed to read the portal's log4j file: " + log4jConfig.getAbsolutePath(),
+                      e1);
+                }
             }
         }
+    }
+
+    private boolean loggerNotConfigured() {
+        return System.getProperty(CentralPAPropertyRepository.LOG4J.getName()) == null;
     }
 
     private void loadProperties(File configurationFile) {
@@ -122,7 +131,7 @@ public class RestRuntime {
             propertyFile = new FileInputStream(configurationFile);
             PortalConfiguration.load(propertyFile);
         } catch (Exception e) {
-            throw new IllegalStateException("Invalid configuration file", e);
+            throw new IllegalStateException("Invalid configuration file " + configurationFile, e);
         } finally {
             if (propertyFile != null) {
                 try {
