@@ -42,9 +42,11 @@ import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_OTHER;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
@@ -111,6 +113,28 @@ public class FileUtility {
                     // ignore
                 }
             }
+        }
+    }
+    
+    public static OutputStream buildOutputStream(File file) throws IllegalArgumentException {
+        if (file.exists() && !file.delete()) {
+            throw new RuntimeException("Cannot delete the existing output file. " + file.getAbsolutePath());
+        } else {
+            File parentFile = file.getParentFile();
+            if (parentFile == null) {
+                throw new IllegalArgumentException(
+                        "Invalid pathname. Cannot determine the parent directory. " + file.getAbsolutePath());
+            }
+            if (!(parentFile.exists() || parentFile.mkdirs())) {
+                throw new RuntimeException(
+                        "Cannot create the non-existing parent directory of the file. "
+                                + file.getAbsolutePath());
+            }
+        }
+        try {
+            return new FileOutputStream(file, true);
+        } catch (FileNotFoundException e) {
+            throw new IllegalArgumentException(e);
         }
     }
 

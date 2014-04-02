@@ -304,6 +304,19 @@ public class CommandSet {
             .hasArgs(true).numOfArgs(2).argNames("job-id task-name")
             .jsCommand("restarttask(job-id,task-name)")
             .commandClass(RestartTaskCommand.class).entry();
+    
+    public static final CommandSet.Entry UPLOAD_FILE = CommandSetEntryBuilder.newInstance().opt("uf")
+            .longOpt("uploadfile").description("Upload a file to the specified location of the server")
+            .hasArgs(true).numOfArgs(4).argNames("space-name file-path file-name local-file")
+            .jsCommand("uploadfile(space-name,file-path,file-name,local-file)")
+            .commandClass(UploadFileCommand.class).entry();
+
+    public static final CommandSet.Entry DOWNLOAD_FILE = CommandSetEntryBuilder.newInstance().opt("df")
+            .longOpt("downloadfile")
+            .description("Download the specified file from the server and stores it locally.").hasArgs(true)
+            .numOfArgs(3).argNames("space-name path-name local-file")
+            .jsCommand("downloadfile(space-name,path-name,local-file)").commandClass(DownloadFileCommand.class)
+            .entry();
 
     public static final CommandSet.Entry EVAL = CommandSetEntryBuilder
             .newInstance().opt("sf").longOpt("script")
@@ -466,7 +479,8 @@ public class CommandSet {
             SCHED_KILL, LINK_RM, SCHED_STATS, JOB_LIST, SUBMIT_DESC, LOGIN_SCHED,
             SUBMIT_ARCH, JOB_STATE, JOB_OUTPUT, JOB_RESULT, JOB_PRIORITY,
             JOB_PAUSE, JOB_RESUME, JOB_KILL, JOB_REMOVE, TASK_RESTART,
-            TASK_PREEMPT, TASK_OUTPUT, TASK_RESULT, SCHED_IMODE, SCHED_HELP };
+            TASK_PREEMPT, TASK_OUTPUT, TASK_RESULT, UPLOAD_FILE, DOWNLOAD_FILE, 
+            SCHED_IMODE, SCHED_HELP };
 
     /** CommandSet.Entry objects which are specific to Resource Manager CLI */
     public static final CommandSet.Entry[] RM_ONLY = new CommandSet.Entry[] {

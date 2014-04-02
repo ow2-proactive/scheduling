@@ -31,6 +31,8 @@ importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.PreemptTaskCommand
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.RestartTaskCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.GetTaskOutputCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.GetTaskResultCommand);
+importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.UploadFileCommand);
+importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.DownloadFileCommand);
 
 var currentContext = ApplicationContextImpl.currentContext();
 
@@ -116,6 +118,14 @@ function preempttask(jobId, taskId) {
 
 function restarttask(jobId, taskId) {
     execute(new RestartTaskCommand('' + jobId, '' + taskId));
+}
+
+function uploadfile(spaceName, filePath, fileName, localFile) {
+	execute(new UploadFileCommand(string(spaceName), string(filePath),string(fileName), string(localFile)));
+}
+
+function downloadfile(spaceName, pathName, localFile) {
+	execute(new DownloadFileCommand(string(spaceName), string(pathName), string(localFile))) ;
 }
 
 function start() {
@@ -219,4 +229,8 @@ function execute(cmd) {
 function printError(error) {
     print("An error occurred while executing the command:\r\n");
     error.javaException.printStackTrace();
+}
+
+function string(obj) {
+	return '' + obj; 
 }
