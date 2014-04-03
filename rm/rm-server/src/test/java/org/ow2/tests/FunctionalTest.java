@@ -43,6 +43,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.junit.Assume;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.xml.VariableContractImpl;
@@ -91,8 +92,47 @@ public class FunctionalTest extends ProActiveTest {
         return paSetup.getJvmParameters();
     }
 
+    private static int getTestSlice(String testName, int maxValue) {
+        return Math.abs(testName.hashCode() % maxValue);
+    }
+
+
+    protected boolean shouldBeExecuted() {
+        String testName = this.getClass().getName();
+        return shouldBeExecuted(testName);
+    }
+
+    public static boolean shouldBeExecuted(String testName) {
+
+        String sliceProperty = System.getProperty("test_slice");
+        String maxSliceProperty = System.getProperty("max_test_slice");
+
+        if (sliceProperty!=null && maxSliceProperty != null) {
+            try {
+
+                int targetSlice = Integer.parseInt(sliceProperty);
+                int maxSlice = Integer.parseInt(maxSliceProperty);
+
+                int currentTestSlice = getTestSlice(testName, maxSlice);
+
+                System.err.println("Test slice: "+ currentTestSlice);
+
+                if (currentTestSlice != targetSlice) {
+                    return false;
+                }
+
+                return true;
+            } catch (NumberFormatException ex) {}
+        }
+        return true;
+    }
+
     @Before
     public void prepareForTest() throws Exception {
+
+        if (!shouldBeExecuted()) {
+            Assume.assumeTrue(false);
+        }
 
         CentralPAPropertyRepository.PA_TEST.setValue(true);
         CentralPAPropertyRepository.PA_RUNTIME_PING.setValue(false);
@@ -164,6 +204,11 @@ public class FunctionalTest extends ProActiveTest {
 
     @After
     public void afterClass() throws Exception {
+
+        if (!shouldBeExecuted()) {
+            return;
+        }
+
         // Disable timer and shutdown hook
         TimerTask tt = timerTask.getAndSet(null);
         if (tt != null) {

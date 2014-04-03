@@ -52,6 +52,11 @@ import org.ow2.tests.FunctionalTest;
 public class SchedulerConsecutive extends FunctionalTest {
     @After
     public void afterClass() throws Exception {
+
+        if (!shouldBeExecuted()) {
+            return;
+        }
+
         if (shouldBeExecutedInConsecutiveMode(this.getClass())) {
 
             try {

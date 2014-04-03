@@ -3,6 +3,7 @@ package functionaltests;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Assume;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
@@ -21,6 +22,11 @@ public class RMConsecutive extends FunctionalTest {
 
     @Before
     public void prepareForTest() throws Exception {
+
+        if (!shouldBeExecuted()) {
+            Assume.assumeTrue(false);
+        }
+
         if (shouldBeExecutedInConsecutiveMode(this.getClass())) {
             System.out.println("Cleaning the RM before the test execution");
             // clean the state of the RM
@@ -49,6 +55,11 @@ public class RMConsecutive extends FunctionalTest {
 
     @After
     public void afterClass() throws Exception {
+
+        if (!shouldBeExecuted()) {
+            return;
+        }
+
         if (shouldBeExecutedInConsecutiveMode(this.getClass())) {
             // show RM state after the test execution (for debugging purposes)
 

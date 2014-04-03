@@ -75,6 +75,8 @@ def functionalTestConfiguration = {
     include 'unittests/**'
     include 'unitTests/**'
     systemProperties << ['url': System.getProperty("url") ]
+    systemProperties << ['test_slice': System.getProperty("test_slice") ]
+    systemProperties << ['max_test_slice': System.getProperty("max_test_slice") ]
     systemProperties << ['pa.rm.home': rootDir.absolutePath]
     systemProperties << ['pa.scheduler.home': rootDir.absolutePath]
     systemProperties << ['pa.tests.consecutive': System.getProperty("os.name").toLowerCase().indexOf('win')!=-1?'false':'true']
