@@ -40,7 +40,6 @@ project(':rest:rest-server') {
 
     configurations {
         jaxDoclet
-        schedulerNode
     }
     dependencies {
         compile 'org.jboss.resteasy:jaxrs-api:3.0.6.Final'
@@ -141,7 +140,7 @@ project(':rest:rest-server') {
         }
     }
 
-    task rootProject.proActiveLibs.dependsOn project.proActiveWar
+    rootProject.proActiveLibs.dependsOn project.proActiveWar
 
     artifacts {
         jar
