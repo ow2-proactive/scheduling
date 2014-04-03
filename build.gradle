@@ -271,6 +271,7 @@ project('scheduler:scheduler-server') {
         testCompile 'org.hamcrest:hamcrest-all:1.3'
         testCompile 'com.h2database:h2:1.3.167'
         testCompile 'org.codehaus.groovy:groovy-all:2.1.6'
+        testCompile 'winp:winp:1.17-patched'
         testCompile files("${System.properties['java.home']}/../lib/tools.jar")
 
         testCompile project(':rm:rm-server').sourceSets.test.output // to get shared test classes
