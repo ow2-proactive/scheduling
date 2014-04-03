@@ -25,6 +25,7 @@ import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.InternalJobFactory;
 import org.ow2.proactive.scheduler.task.internal.ExecuterInformations;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
+import org.ow2.tests.FunctionalTest;
 import org.ow2.tests.ProActiveTest;
 import org.ow2.tests.ProcessCleaner;
 
@@ -336,6 +337,11 @@ public class BaseSchedulerDBTest extends ProActiveTest {
 
     @Before
     public void initTest() throws Exception {
+
+        if (!FunctionalTest.shouldBeExecuted(this.getClass().getName())) {
+            Assume.assumeTrue(false);
+        }
+
         cleaner.killAliveProcesses();
 
         Configuration config = new Configuration().configure(new File(PASchedulerProperties
@@ -345,6 +351,11 @@ public class BaseSchedulerDBTest extends ProActiveTest {
 
     @After
     public void cleanup() {
+
+        if (!FunctionalTest.shouldBeExecuted(this.getClass().getName())) {
+            return;
+        }
+
         if (dbManager != null) {
             dbManager.close();
         }

@@ -84,12 +84,16 @@ public class TestKillTaskWhileExecutingScripts extends FunctionalTest {
 
     @Before
     public void init() throws Throwable {
+        if (!shouldBeExecuted()) return;
+
         endlessScript = new SimpleScript("file = new java.io.File(java.lang.System.getProperty(\"java.io.tmpdir\"),\"started.ok\");file.createNewFile();while(true){java.lang.Thread.sleep(500);}","javascript");
         SchedulerTHelper.startScheduler();
     }
 
     @After
     public void clean() throws Throwable {
+        if (!shouldBeExecuted()) return;
+
         SchedulerTHelper.killScheduler();
     }
 
