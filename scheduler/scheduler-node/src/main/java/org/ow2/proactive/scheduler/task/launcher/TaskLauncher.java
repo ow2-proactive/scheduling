@@ -1488,7 +1488,13 @@ public abstract class TaskLauncher implements InitActive {
             if (this.storeLogs) {
                 copyScratchDataToOutput(getTaskLogsSelectors(OutputAccessMode.TransferToOutputSpace));
             }
-            copyScratchDataToOutput(getTaskLogsSelectors(OutputAccessMode.TransferToUserSpace));
+
+            try {
+                copyScratchDataToOutput(getTaskLogsSelectors(OutputAccessMode.TransferToUserSpace));
+            } catch (FileSystemException th) {
+                // ignore the exception if cannot copy logs to user data space
+                logger.warn("Cannot copy logs of task to user data spaces", th);
+            }
         }
     }
 
