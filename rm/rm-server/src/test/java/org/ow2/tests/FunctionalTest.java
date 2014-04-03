@@ -93,7 +93,7 @@ public class FunctionalTest extends ProActiveTest {
     }
 
     private static int getTestSlice(String testName, int maxValue) {
-        return Math.abs(testName.hashCode() % maxValue);
+        return Math.abs(testName.hashCode() % maxValue) + 1;
     }
 
 
