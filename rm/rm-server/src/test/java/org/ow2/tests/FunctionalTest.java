@@ -98,7 +98,7 @@ public class FunctionalTest extends ProActiveTest {
 
 
     protected boolean shouldBeExecuted() {
-        String testName = this.getClass().getName();
+        String testName = this.getClass().getSimpleName();
         return shouldBeExecuted(testName);
     }
 

@@ -338,7 +338,7 @@ public class BaseSchedulerDBTest extends ProActiveTest {
     @Before
     public void initTest() throws Exception {
 
-        if (!FunctionalTest.shouldBeExecuted(this.getClass().getName())) {
+        if (!FunctionalTest.shouldBeExecuted(this.getClass().getSimpleName())) {
             Assume.assumeTrue(false);
         }
 
@@ -352,7 +352,7 @@ public class BaseSchedulerDBTest extends ProActiveTest {
     @After
     public void cleanup() {
 
-        if (!FunctionalTest.shouldBeExecuted(this.getClass().getName())) {
+        if (!FunctionalTest.shouldBeExecuted(this.getClass().getSimpleName())) {
             return;
         }
 
