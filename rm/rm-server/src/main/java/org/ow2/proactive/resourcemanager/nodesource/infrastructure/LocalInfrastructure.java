@@ -216,7 +216,13 @@ public class LocalInfrastructure extends InfrastructureManager {
                 }
             }
         }
+
         logger.debug("Local Infrastructure manager exits watching loop for node " + nodeName);
+        String out = Tools.join(processExecutor.getOutput(), "\n");
+        String err = Tools.join(processExecutor.getErrorOutput(), "\n");
+        String lf = System.getProperty("line.separator");
+        logger.debug(nodeName + " output: " + out + lf + "errput: " + err);
+
         if (isLost) {
             //clean up the process
             processExecutor.killProcess();
