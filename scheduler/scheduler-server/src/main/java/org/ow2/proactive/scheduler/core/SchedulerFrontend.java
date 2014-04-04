@@ -424,6 +424,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
 
         if (!ij.isFinished()) {
             jlogger.info(jobId, "is not finished");
+            jlogger.info(jobId, "Job state: " + frontendState.getJobState(jobId));
             return null;
         }
 
