@@ -84,7 +84,7 @@ public class ProcessCleaner {
         // JPS is only available on some JDK
         // We need a fall back in case jps does not exist.
         try {
-            getJps();
+            getJavaTool("jps");
             return getAliveWithJps(printProcesses);
         } catch (FileNotFoundException e) {
             return getAliveWithNative();
@@ -92,7 +92,7 @@ public class ProcessCleaner {
     }
 
     private int[] getAliveWithJps(boolean printProcesses) throws IOException {
-        ProcessBuilder pb = new ProcessBuilder(getJps().getAbsolutePath(), "-mlv");
+        ProcessBuilder pb = new ProcessBuilder(getJavaTool("jps").getAbsolutePath(), "-mlv");
         pb.redirectErrorStream(true);
         Process p = pb.start();
 
@@ -172,9 +172,11 @@ public class ProcessCleaner {
     final public void killAliveProcesses() throws IOException {
         ProcessKiller pk = ProcessKiller.get();
 
+
         int[] pids = this.getAliveProcesses();
         for (int pid : pids) {
             try {
+                printStackTrace(pid);
                 pk.kill(pid);
                 System.err.println("Killed process " + pid);
             } catch (InterruptedException e) {
@@ -188,27 +190,50 @@ public class ProcessCleaner {
         }
     }
 
+    private void printStackTrace(int pid) {
+        try {
+            ProcessBuilder pb = new ProcessBuilder(getJavaTool("jstack").getAbsolutePath(), "" + pid);
+            pb.redirectErrorStream(true);
+            Process p = pb.start();
+
+            ArrayList<String> pids = new ArrayList<String>(10);
+
+            Reader r = new InputStreamReader(p.getInputStream());
+            BufferedReader br = new BufferedReader(r);
+
+            String line;
+            while ((line = br.readLine()) != null) {
+                System.err.println(line);
+            }
+
+            br.close();
+            r.close();
+        } catch (Exception e) {
+            System.err.println("Cannot print stack trace of the process with pid " + pid);
+        }
+    }
+
     /**
      * Returns the command to start the jps util
      *
      * @return command to start jps
      */
-    static private File getJps() throws FileNotFoundException {
-        final String jpsName;
+    static private File getJavaTool(String name) throws FileNotFoundException {
+        final String osSpecificName;
         switch (OperatingSystem.getOperatingSystem()) {
             case unix:
-                jpsName = "jps";
+                osSpecificName = name;
                 break;
             case windows:
-                jpsName = "jps.exe";
+                osSpecificName = name+".exe";
                 break;
             default:
                 throw new IllegalStateException("Unsupported operating system");
         }
 
-        File ret = new File(getJavaBinDir(), jpsName);
+        File ret = new File(getJavaBinDir(), osSpecificName);
         if (!ret.exists()) {
-            throw new FileNotFoundException("JPS not found: " + ret + " does not exist");
+            throw new FileNotFoundException(name + " not found: " + ret + " does not exist");
         }
 
         return ret;
