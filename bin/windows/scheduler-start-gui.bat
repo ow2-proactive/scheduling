@@ -26,14 +26,9 @@ set SCHED_JVM_D_OPTS=
 set DROP_DB=
 set SCHED_PARAMS=
 
-set SCHED_WAR=%PA_SCHEDULER%\dist\war\scheduler.war
-set RM_WAR=%PA_SCHEDULER%\dist\war\rm.war
-set REST_WAR=%PA_SCHEDULER%\dist\war\rest.war
-set PORT=8080
 set VERBOSE=false
 
 set DO_RM=true
-set DO_REST=true
 set DO_SCHED=true
 
 :ParamParseLoop
@@ -69,51 +64,6 @@ IF [%1]==[] goto :ParamParseEndLoop
         set DROP_DB=-Dpa.scheduler.db.hibernate.dropdb=true -Dpa.rm.db.hibernate.dropdb=true
         goto :ParamParseShift
     ) 
-    IF %1 == -s (
-        set DO_SCHED=true
-        set DO_RM=false
-        set DO_REST=true
-        goto :ParamParseShift
-    ) 
-    IF %1 == -r (
-        set DO_SCHED=false
-        set DO_RM=true
-        set DO_REST=true
-        goto :ParamParseShift
-    ) 
-    IF %1 == -a (
-        set DO_SCHED=false
-        set DO_RM=false
-        set DO_REST=true
-        goto :ParamParseShift
-    ) 
-    IF %1 == -S (
-        IF [%2]==[] (
-            echo -S requires an argument
-            goto :eof
-        )
-        set SCHED_WAR=%2
-        SHIFT
-        goto :ParamParseShift
-    ) 
-    IF %1 == -R (
-        IF [%2]==[] (
-            echo -R requires an argument
-            goto :eof
-        )
-        set RM_WAR=%2
-        SHIFT
-        goto :ParamParseShift
-    ) 
-    IF %1 == -A (
-        IF [%2]==[] (
-            echo -A requires an argument
-            goto :eof
-        )
-        set REST_WAR=%2
-        SHIFT
-        goto :ParamParseShift
-    ) 
     IF %1 == -P (
         IF [%2]==[] (
             echo -P requires an argument
@@ -137,24 +87,6 @@ IF [%1]==[] goto :ParamParseEndLoop
     SHIFT
 goto :ParamParseLoop
 :ParamParseEndLoop
-
-IF NOT exist "%REST_WAR%" (
-    echo Error: invalid REST API war: %REST_WAR%
-    goto :eof
-)
-
-IF %DO_SCHED% == true (
-    IF NOT exist "%SCHED_WAR%" (
-        echo Error: invalid scheduling war: %SCHED_WAR%
-        goto :eof
-    )
-)
-IF %DO_RM% == true (
-    IF NOT exist "%RM_WAR%" (
-        echo Error: invalid RM war: %RM_WAR%
-        goto :eof
-    )
-)
 
 set SCHED_OUT=SchedulerStarter.output
 
@@ -201,32 +133,6 @@ set RM_URL_STR=
         GOTO :WaitLoop
 :EndWaitLoop
 
-set CMD=-A "%REST_WAR%" -p %PORT%
-
-IF %DO_SCHED% == true (
-    IF NOT ["%SCHED_URL%"]==[] (
-        echo Scheduler URL: %SCHED_URL%
-    ) ELSE (
-        echo Error: Could not determine Scheduler URL
-        goto :eof
-    )
-    set CMD=%CMD% -S "%SCHED_WAR%" -s %SCHED_URL%
-)
-IF %DO_RM% == true (
-    IF NOT ["%RM_URL%"]==[] (
-        echo RM URL: %RM_URL%
-    ) ELSE (
-        echo Error: Could not determine RM URL
-        goto :eof
-    )
-    set CMD=%CMD% -R "%RM_WAR%" -r %RM_URL%
-)
-IF %VERBOSE% == false (
-    set CMD=%CMD% -q
-)
-echo jetty-launcher.bat %CMD% %SCHED_JVM_D_OPTS%
-call jetty-launcher.bat %CMD% %SCHED_JVM_D_OPTS%
-
 goto :eof
 
 :find_process_by_pid 
@@ -268,13 +174,6 @@ goto :eof
     echo -u            Connect to an existing RM instead of starting a new one
     echo -p POLICY     Complete name of the Scheduling policy to use
     echo -c            Start the Scheduler server with a clean Database
-    echo -s            Start only the Scheduler Web App, not the RM's
-    echo -r            Start only the RM Web App, not the Scheduler's
-    echo -a            Start the REST API Server only, not the GUI Web Apps
-    echo -S PATH       Path to the Scheduler Web Application folder or .war file, default: %SCHED_WAR%
-    echo -R PATH       Path to the RM Web Application folder or .war file, default: %RM_WAR%
-    echo -A            Path to the REST Server API Web Application folder or .war file, default: %REST_WAR%
-    echo -P PORT       HTTP server port for the Web UI. default: %PORT%
     echo -v            Verbose output
     echo -h            Print this message and exit
     echo -Dxxx         JVM option for the RM, Scheduler and HTTP servers, 

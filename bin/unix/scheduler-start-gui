@@ -9,10 +9,6 @@ SCHED_JVM_D_OPTS=""
 DROP_DB=""
 SCHED_PARAMS=""
 
-SCHED_WAR=$PA_SCHEDULER/dist/war/scheduler.war
-RM_WAR=$PA_SCHEDULER/dist/war/rm.war
-REST_WAR=$PA_SCHEDULER/dist/war/rest.war
-PORT=8080
 VERBOSE=false
 
 DO_RM=true
@@ -28,17 +24,7 @@ print_help () {
 	echo -e "-u,--rmURL URL              Connect to an existing RM instead of starting a new one"
 	echo -e "-p,--policy POLICY          Complete name of the Scheduling policy to use"
 	echo -e "-c,--clean                  Start the Scheduler server with a clean Database"
-	echo -e "-s,--sched-only             Start only the Scheduler Web App, not the RM's"
-	echo -e "-r,--rm-only                Start only the RM Web App, not the Scheduler's"
-	echo -e "-a,--api-only               Start the REST API Server only, not the GUI Web Apps"
-	echo -e "-S,--sched-war PATH         Path to the Scheduler Web Application folder or .war file"
 	echo -e "-W,--studio PATH            Path to the Workflow Studio WEB"
-	echo -e "                            default: $SCHED_WAR"
-	echo -e "-R,--rm-war PATH            Path to the RM Web Application folder or .war file"
-	echo -e "                            default: $RM_WAR"
-	echo -e "-A,--api-war PATH           Path to the REST Server API Web Application folder or .war file"
-	echo -e "                            default: $REST_WAR"
-	echo -e "-P,--port PORT              HTTP server port for the Web UI. default: $PORT"
 	echo -e "-v,--verbose                Verbose output"
 	echo -e "-h,--help                   Print this message and exit"
 	echo -e "-Dxxx                       JVM option for the RM, Scheduler and HTTP servers."
@@ -105,25 +91,9 @@ while [ $# -gt 0 ]; do
 			DO_RM=false
 			DO_REST=true
 			shift;;
-		-S | --sched-war)
-			[ $# -eq 1 ] && stop "$1 requires an argument"
-			SCHED_WAR=$2
-			shift 2;;
 		-W | --studio)
 			[ $# -eq 1 ] && stop "$1 requires an argument"
 			STUDIO=$2
-			shift 2;;
-		-R | --rm-war)
-			[ $# -eq 1 ] && stop "$1 requires an argument"
-			RM_WAR=$2
-			shift 2;;
-		-A | --api-war)
-			[ $# -eq 1 ] && stop "$1 requires an argument"
-			REST_WAR=$2
-			shift 2;;
-		-P | --port)
-			[ $# -eq 1 ] && stop "$1 requires an argument"
-			PORT=$2
 			shift 2;;
 		*)
 			if [ $(echo $1 | grep '^-D.*$') ]; then
@@ -169,37 +139,6 @@ while true; do
 	fi
 	sleep 1s
 done
-
-CMD="-A $REST_WAR -p $PORT"
-NOJETTY=false
-
-nojetty () {
-	echo "Not deploying Web Interface: $1"
-	NOJETTY=true
-}
-
-[ ! -f $REST_WAR ] && nojetty "Missing file $REST_WAR"
-
-if [ $DO_SCHED = true ]; then
-	[ ! -f $SCHED_WAR ] && nojetty "Missing file $SCHED_WAR"
-	[ ! $SCHED_URL ] && nojetty "Could not determine Scheduler URL"
-	CMD=$CMD" -S $SCHED_WAR -s $SCHED_URL"
-fi
-if [ -f "$STUDIO" ]; then
-	CMD=$CMD" -W $STUDIO"
-fi
-if [ $DO_RM = true ]; then
-	[ ! -f $RM_WAR ] && nojetty "Missing file $RM_WAR"
-	[ ! $RM_URL ] && nojetty "Could not determine RM URL"
-	CMD=$CMD" -R $RM_WAR -r $RM_URL"
-fi
-if [ $VERBOSE = false ]; then
-	CMD=$CMD" -q"
-fi
-
-if [ $NOJETTY = false ]; then
-	. $(dirname $0)/jetty-launcher $CMD $SCHED_JVM_D_OPTS &
-fi
 
 
 wait

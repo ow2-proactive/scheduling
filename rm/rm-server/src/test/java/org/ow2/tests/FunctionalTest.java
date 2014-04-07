@@ -204,11 +204,6 @@ public class FunctionalTest extends ProActiveTest {
 
     @After
     public void afterClass() throws Exception {
-
-        if (!shouldBeExecuted()) {
-            return;
-        }
-
         // Disable timer and shutdown hook
         TimerTask tt = timerTask.getAndSet(null);
         if (tt != null) {

@@ -48,7 +48,7 @@ import org.mortbay.jetty.webapp.WebAppContext;
 /**
  * Deploy one or more Web Applications in a Jetty Web Server
  *
- * 
+ * @deprecated Replaced by JettyStarter
  * @author mschnoor
  *
  */

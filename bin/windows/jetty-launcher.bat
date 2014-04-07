@@ -99,11 +99,6 @@ IF [%1]==[] goto :ParamParseEndLoop
 goto :ParamParseLoop
 :ParamParseEndLoop
 
-IF ["%REST%"]==[""] (
-    echo REST Server argument is mandatory
-    goto :eof
-)
-
 set REST_URL=http://localhost:%PORT%/rest/rest
 
 call :createTempDir scheduler_start_gui
@@ -129,26 +124,29 @@ IF "%ERRORLEVEL%" NEQ "0" (
 set LIB_DIR=%CD%\..\..\dist\lib
 set CP=%LIB_DIR%\*
 
-mkdir %REST_DIR%
-IF %VERBOSE% == true (
-    echo Deploying REST Server in %REST_DIR% 
-)
-IF /I "%REST:~-4%" == ".war" (   
-    call :unzip "%REST%" "%REST_DIR%"
-) ELSE (
-    xcopy /E "%REST%\*" "%REST_DIR%"
-)
+IF NOT ["%REST%"]==[""] (
 
-COPY ..\..\config\proactive\ProActiveConfiguration.xml "%REST_DIR%\WEB-INF\"
+    mkdir %REST_DIR%
+    IF %VERBOSE% == true (
+        echo Deploying REST Server in %REST_DIR%
+    )
+    IF /I "%REST:~-4%" == ".war" (
+        call :unzip "%REST%" "%REST_DIR%"
+    ) ELSE (
+        xcopy /E "%REST%\*" "%REST_DIR%"
+    )
 
-IF NOT [%RM_URL%]==[] (
-    call :set_property "%REST_DIR%\WEB-INF\portal.properties" rm.url %RM_URL%
-)
-IF NOT [%SCHED_URL%]==[] (
-    call :set_property "%REST_DIR%\WEB-INF\portal.properties" scheduler.url %SCHED_URL%
-)
+    COPY ..\..\config\proactive\ProActiveConfiguration.xml "%REST_DIR%\WEB-INF\"
 
-set APPS=%REST_DIR%
+    IF NOT [%RM_URL%]==[] (
+        call :set_property "%REST_DIR%\WEB-INF\portal.properties" rm.url %RM_URL%
+    )
+    IF NOT [%SCHED_URL%]==[] (
+        call :set_property "%REST_DIR%\WEB-INF\portal.properties" scheduler.url %SCHED_URL%
+    )
+
+    set APPS=%REST_DIR%
+)
 
 IF NOT ["%RM%"]==[""] (
     mkdir "%RM_DIR%"

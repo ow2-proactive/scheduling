@@ -43,6 +43,8 @@ import java.net.URL;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.GCMCustomisedInfrastructure;
 import org.ow2.proactive.resourcemanager.nodesource.policy.TimeSlotPolicy;
 import org.ow2.proactive.utils.FileToBytesConverter;
+import org.junit.Ignore;
+
 import functionaltests.RMTHelper;
 
 
@@ -58,6 +60,7 @@ import functionaltests.RMTHelper;
  * in this test it's not required.
  *
  */
+@Ignore
 public class TestGCMCustomizedInfrastructureTimeSlotPolicy extends TestLocalInfrastructureTimeSlotPolicy {
 
     protected byte[] emptyGCMD;

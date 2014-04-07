@@ -59,6 +59,7 @@ import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.exception.AdminSchedulerException;
 import org.ow2.proactive.utils.FileToBytesConverter;
+import org.ow2.proactive.utils.JettyStarter;
 import org.ow2.proactive.utils.Tools;
 import org.apache.commons.cli.AlreadySelectedException;
 import org.apache.commons.cli.CommandLine;
@@ -175,7 +176,9 @@ public class SchedulerStarter {
                     SchedulerAuthenticationInterface sai = SchedulerFactory.startLocal(new URI(rm),
                             policyFullName);
 
+                    JettyStarter.runWars(rm, sai.getHostURL());
                     logger.info("The scheduler created on " + sai.getHostURL());
+
                 } catch (AdminSchedulerException e) {
                     logger.warn("", e);
                 }

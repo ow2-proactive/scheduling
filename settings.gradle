@@ -29,3 +29,8 @@ include 'doc:Scheduling'
 
 include 'performance'
 
+include 'rest'
+include 'rest:rest-api'
+include 'rest:rest-cli'
+include 'rest:rest-server'
+include 'rest:rest-client'
