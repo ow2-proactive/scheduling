@@ -40,7 +40,7 @@ var SCRIPT_NAME = 'start-server.js'
 // Get current directory (must be SCHEDULER_HOME/bin)
 var currDir = new File(getCheckedCurrDir())
 var homeDir = new File(currDir.getParent())
-var logsDir = new File(homeDir, '.logs')
+var logsDir = new File(homeDir, 'logs')
 var configDir = new File(homeDir, 'config')
 var distDir = new File(homeDir, 'dist')
 var paConfigFile = new File(configDir, 'proactive'+fs+'ProActiveConfiguration.xml')

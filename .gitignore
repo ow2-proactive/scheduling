@@ -7,38 +7,11 @@ build/
 /.classpath
 /.project
 /.settings
-/dist
-/docs
-/doc-files
-/log
 /.classpath*
-/generated
 
-.logs/
-RM_DB/
-SCHEDULER_DB/
-rm_statistics.rrd
-scheduler_statistics.rrd
-
-
-# /bin/unix/
-/bin/unix/.machinefile*
-/bin/unix/SCHEDULER_DB
-/bin/unix/startP2PService.sh
-
-# /compile/
-/compile/eclipse_formatter_config.properties
-/compile/Manifest.mf
-
-# /dev/lib/
-
-# /lib/
-/lib/script-js.jar
-/lib/script-api.jar
-/lib/js.jar
-
-# /lib/ProActive/
-/lib/ProActive/*
+/dist
+/data
+/logs
 
 # /performance/results/
 /performance/results/*

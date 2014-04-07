@@ -895,11 +895,11 @@ scheduler.changePolicy(org.ow2.proactive.scheduler.policy.DefaultPolicy.class);
 		<section xml:id="scheduler_dataspaces_admin"><info><title>Configuring DataSpaces</title></info>
 			<para>
 				The only things to configure in the DataSpace are the default INPUT and OUTPUT spaces.
-				If not configured, it will use the default temporary directory of the system.
-				To the default tmp dir, "scheduling/" will first be appended and then the 'defaultinput' and 'defaultoutput' directories.
+				If not configured, it will use the SCHEDULER_HOME folder.
+				To the SCHEDULER_HOME dir, "data/" will first be appended and then the 'defaultinput' and 'defaultoutput' directories.
 				Finally, the username of the job owner will be also added to the previous path.
 				For instance, if "defaultinput" is set to "myInput" and my username is "myUserName", then my INPUT data space will be
-				<emphasis>/tmp/scheduling/myInput/myUserName</emphasis> (if the temporary directory is /tmp).
+				<emphasis>SCHEDULER_HOME/data/myInput/myUserName</emphasis>.
 			</para>
 			<para>
 				For example, to set the default INPUT space of the scheduler, just set the 3 following properties:
@@ -1178,7 +1178,7 @@ scheduler.changePolicy(org.ow2.proactive.scheduler.policy.DefaultPolicy.class);
 		</para>
 		<para>
 			The JMX url on which to connect can obtained from the Authentication API of the Scheduler or by reading the log file
-			located in <literal>$SCHEDULER_HOME/.logs/SchedulerDev.log</literal>. In the log file, the address you have to retrieve is the one where
+			located in <literal>$SCHEDULER_HOME/logs/SchedulerDev.log</literal>. In the log file, the address you have to retrieve is the one where
 			the JMX RMI connector server has been started.
 			Once connected, you'll get an access to Scheduler statistics and accounting.
 		</para>

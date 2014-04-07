@@ -29,7 +29,7 @@ log4j.logger.org.hibernate=WARN
 
 # SCHEDULER file appender
 log4j.appender.SCHEDULER=org.apache.log4j.RollingFileAppender
-log4j.appender.SCHEDULER.File=${pa.scheduler.home}/.logs/Scheduler.log
+log4j.appender.SCHEDULER.File=${pa.scheduler.home}/logs/Scheduler.log
 log4j.appender.SCHEDULER.MaxFileSize=100MB
 log4j.appender.SCHEDULER.MaxBackupIndex=10
 log4j.appender.SCHEDULER.layout=org.apache.log4j.PatternLayout

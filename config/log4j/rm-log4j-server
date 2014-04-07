@@ -21,7 +21,7 @@ log4j.logger.org.hibernate=WARN
 
 # RM file appender
 log4j.appender.RM=org.apache.log4j.RollingFileAppender
-log4j.appender.RM.File=${pa.rm.home}/.logs/RM.log
+log4j.appender.RM.File=${pa.rm.home}/logs/RM.log
 log4j.appender.RM.MaxFileSize=100MB
 log4j.appender.RM.MaxBackupIndex=10
 log4j.appender.RM.layout=org.apache.log4j.PatternLayout

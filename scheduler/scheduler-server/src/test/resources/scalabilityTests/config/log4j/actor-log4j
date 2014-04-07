@@ -12,13 +12,13 @@ log4j.additivity.proactive=false
 log4j.logger.proactive=DEBUG,PROACTIVE
 
 log4j.appender.FILE=org.apache.log4j.FileAppender
-log4j.appender.FILE.File=${pa.scheduler.home}/.logs/actors/actor.log
+log4j.appender.FILE.File=${pa.scheduler.home}/logs/actors/actor.log
 log4j.appender.FILE.Append=false
 log4j.appender.FILE.layout=org.apache.log4j.PatternLayout
 log4j.appender.FILE.layout.ConversionPattern=[%-1p %d{ISO8601}] [%C{1}.%M] %m%n
 
 log4j.appender.PROACTIVE=org.apache.log4j.RollingFileAppender
-log4j.appender.PROACTIVE.File=${pa.scheduler.home}/.logs/actors/proactive.log
+log4j.appender.PROACTIVE.File=${pa.scheduler.home}/logs/actors/proactive.log
 log4j.appender.PROACTIVE.MaxFileSize=20MB
 log4j.appender.PROACTIVE.MaxBackupIndex=5
 log4j.appender.PROACTIVE.Append=false

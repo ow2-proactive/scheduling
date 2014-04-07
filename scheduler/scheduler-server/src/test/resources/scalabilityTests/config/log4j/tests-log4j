@@ -31,7 +31,7 @@ log4j.appender.CONSOLE.layout=org.apache.log4j.PatternLayout
 log4j.appender.CONSOLE.layout.ConversionPattern=[%p %20.20c{2}] %m%n
 
 log4j.appender.FILE=org.apache.log4j.FileAppender
-log4j.appender.FILE.File=${pa.scheduler.home}/.logs/proactive_scalabilityTests.log
+log4j.appender.FILE.File=${pa.scheduler.home}/logs/proactive_scalabilityTests.log
 log4j.appender.FILE.Append=false
 log4j.appender.FILE.layout=org.apache.log4j.PatternLayout
 log4j.appender.FILE.layout.ConversionPattern=[%-1p %d{ISO8601}] [%C{1}.%M] %m%n

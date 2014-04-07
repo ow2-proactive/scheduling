@@ -170,7 +170,7 @@
 		The JMX url on which to connect can be obtained from the
 		Authentication API of the RM or by reading the log file
 		located in
-		<literal>$RM_HOME/.logs/RM.log</literal>
+		<literal>$RM_HOME/logs/RM.log</literal>
 		. In that log file, the address you have to retrieve is the one where
 		the JMX RMI connector server has been started:
 		<screen>[INFO 2010-06-17 10:23:27,813] [RM.AbstractJMXHelper.boot] Started JMX RMI connector server at service:jmx:rmi:///jndi/rmi://kisscool.inria.fr:5822/JMXRMAgent </screen>

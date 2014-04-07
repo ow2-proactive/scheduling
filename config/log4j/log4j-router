@@ -5,7 +5,7 @@ log4j.logger.org.ow2.proactive.resourcemanager=INFO
 
 # ROUTER file appender
 log4j.appender.ROUTER=org.apache.log4j.RollingFileAppender
-log4j.appender.ROUTER.File=${proactive.home}/.logs/Router.log
+log4j.appender.ROUTER.File=${proactive.home}/logs/Router.log
 log4j.appender.ROUTER.MaxFileSize=100MB
 log4j.appender.ROUTER.MaxBackupIndex=10
 log4j.appender.ROUTER.layout=org.apache.log4j.PatternLayout

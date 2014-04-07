@@ -394,7 +394,7 @@
             <arg value="${project.root}/performance/results/remoteResults" />
         </exec>
         <exec executable="scp" failonerror="true">
-            <arg value="${get.hosts.from.scheduler.copySchedulingHost}:${get.hosts.from.scheduler.copySchedulingPath}/.logs/*" />
+            <arg value="${get.hosts.from.scheduler.copySchedulingHost}:${get.hosts.from.scheduler.copySchedulingPath}/logs/*" />
             <arg value="${project.root}/performance/results/remoteResults" />
         </exec>
     </target>

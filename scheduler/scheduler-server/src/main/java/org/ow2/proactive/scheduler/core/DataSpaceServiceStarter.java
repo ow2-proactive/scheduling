@@ -76,8 +76,8 @@ public class DataSpaceServiceStarter implements Serializable {
     /**
      * Default Local Paths
      */
-    private static final String DEFAULT_LOCAL = System.getProperty("java.io.tmpdir") + File.separator +
-            "scheduling";
+    private static final String DEFAULT_LOCAL = PASchedulerProperties.SCHEDULER_HOME.getValueAsString()
+      + File.separator + "data";
     private static final String DEFAULT_LOCAL_INPUT = DEFAULT_LOCAL + File.separator + "defaultinput";
     private static final String DEFAULT_LOCAL_OUTPUT = DEFAULT_LOCAL + File.separator + "defaultoutput";
     private static final String DEFAULT_LOCAL_GLOBAL = DEFAULT_LOCAL + File.separator + "defaultglobal";
