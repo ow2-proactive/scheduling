@@ -43,6 +43,7 @@ import java.io.InputStream;
 import java.util.Map.Entry;
 import java.util.Properties;
 
+import org.objectweb.proactive.api.PALifeCycle;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.config.xml.ProActiveConfigurationParser;
@@ -65,9 +66,12 @@ public class RestRuntime {
     private static final Logger LOGGER = ProActiveLogger.getLogger(RestRuntime.class);
 
     private SessionsCleaner sessionCleaner;
+    private boolean needToKillProActiveRuntime;
 
     public void start(ResteasyProviderFactory dispatcher, File configurationFile, File log4jConfig,
             File paConfig) {
+
+        needToKillProActiveRuntime = !PALifeCycle.IsProActiveStarted();
 
         addExceptionMappers(dispatcher);
 
@@ -172,8 +176,10 @@ public class RestRuntime {
         SchedulerStateListener.getInstance().kill();
         RMStateCaching.kill();
 
-        // force the shutdown of the runtime
-        ProActiveRuntimeImpl.getProActiveRuntime().cleanJvmFromPA();
+        if (needToKillProActiveRuntime) {
+            // force the shutdown of the runtime
+            ProActiveRuntimeImpl.getProActiveRuntime().cleanJvmFromPA();
+        }
     }
 
 }
