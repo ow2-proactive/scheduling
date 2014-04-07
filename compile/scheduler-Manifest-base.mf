@@ -1,4 +1,0 @@
-Main-Class: org.ow2.proactive.scheduler.common.Main
-Implementation-Title: Scheduling
-Implementation-Vendor: OASIS - INRIA Sophia Antipolis
-Implementation-URL: http://proactive.inria.fr
