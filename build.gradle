@@ -470,6 +470,7 @@ project(':scheduler:mapreduce') {
     }
 
     task('functionalTest', type:Test).configure functionalTestConfiguration
+    functionalTest.enabled = false
 
     task testJar(type: Jar) {
         classifier = 'tests'

@@ -53,6 +53,8 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.resourcemanager.nodesource.policy.ReleaseResourcesWhenSchedulerIdle;
 import org.ow2.proactive.utils.FileToBytesConverter;
 import org.ow2.tests.FunctionalTest;
+import org.junit.Ignore;
+
 import functionaltests.RMTHelper;
 import functionaltests.SchedulerTHelper;
 
@@ -65,6 +67,7 @@ import static junit.framework.Assert.assertTrue;
  * and ReleaseResourcesWhenSchedulerIdle acquisition policy.
  *
  */
+@Ignore
 public class TestGCMInfrastructureReleaseWhenIdlePolicy extends FunctionalTest {
 
     protected byte[] GCMDeploymentData;

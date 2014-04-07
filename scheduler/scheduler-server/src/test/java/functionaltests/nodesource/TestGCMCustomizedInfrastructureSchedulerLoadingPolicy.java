@@ -52,6 +52,8 @@ import org.ow2.proactive.scheduler.common.SchedulerConnection;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.resourcemanager.nodesource.policy.SchedulerLoadingPolicy;
 import org.ow2.proactive.utils.FileToBytesConverter;
+import org.junit.Ignore;
+
 import functionaltests.RMTHelper;
 import functionaltests.SchedulerTHelper;
 
@@ -64,6 +66,7 @@ import static junit.framework.Assert.assertTrue;
  * and SchedulerLoadingPolicy acquisition policy.
  *
  */
+@Ignore
 public class TestGCMCustomizedInfrastructureSchedulerLoadingPolicy extends
         TestGCMCustomizedInfrastructureReleaseWhenIdlePolicy {
 

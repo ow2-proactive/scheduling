@@ -44,6 +44,8 @@ import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.GCMCustomisedInfrastructure;
 import org.ow2.proactive.scheduler.resourcemanager.nodesource.policy.ReleaseResourcesWhenSchedulerIdle;
 import org.ow2.proactive.utils.FileToBytesConverter;
+import org.junit.Ignore;
+
 import functionaltests.RMTHelper;
 import functionaltests.SchedulerTHelper;
 
@@ -59,6 +61,7 @@ import functionaltests.SchedulerTHelper;
  *
  */
 @SuppressWarnings("deprecation")
+@Ignore
 public class TestGCMCustomizedInfrastructureReleaseWhenIdlePolicy extends
         TestGCMInfrastructureReleaseWhenIdlePolicy {
 
