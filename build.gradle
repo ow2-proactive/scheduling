@@ -226,7 +226,7 @@ project(':rm:rm-node') {
         runtime 'org.jruby:jruby:1.7.4'
         runtime 'org.python:jython:2.5.4-rc1'
         runtime 'org.codehaus.groovy:groovy-all:2.1.6'
-        runtime 'jsr223:jsr223-nativeshell:0.1'
+        runtime 'jsr223:jsr223-nativeshell:0.2'
     }
 
 }
