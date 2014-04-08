@@ -43,7 +43,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.junit.Assume;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.xml.VariableContractImpl;
@@ -52,6 +51,7 @@ import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProper
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.junit.After;
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Ignore;
 
@@ -204,6 +204,10 @@ public class FunctionalTest extends ProActiveTest {
 
     @After
     public void afterClass() throws Exception {
+        if (!shouldBeExecuted()) {
+            return;
+        }
+
         // Disable timer and shutdown hook
         TimerTask tt = timerTask.getAndSet(null);
         if (tt != null) {
