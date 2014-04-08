@@ -90,7 +90,7 @@ public class RMStarter {
         options.addOption(noDeploy);
 
         Option nodeTimeout = new Option("t", "timeout", true,
-            "Timeout used to start the nodes (only usefull with local nodes, defaul: " +
+            "Timeout used to start the nodes (only useful with local nodes, default: " +
                 DEFAULT_NODE_TIMEOUT + "ms)");
         nodeTimeout.setArgName("timeout");
         nodeTimeout.setRequired(false);

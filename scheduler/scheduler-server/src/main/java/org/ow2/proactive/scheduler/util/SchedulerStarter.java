@@ -37,9 +37,13 @@
 package org.ow2.proactive.scheduler.util;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.rmi.AlreadyBoundException;
+import java.security.KeyException;
 import java.security.Policy;
+
+import javax.security.auth.login.LoginException;
 
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
@@ -90,8 +94,8 @@ public class SchedulerStarter {
     //shows how to run the scheduler
     private static Logger logger = Logger.getLogger(SchedulerStarter.class);
 
-    public static final int defaulNodesNumber = 4;
-    public static final int defaultNodesTimemout = 30 * 1000;
+    public static final int DEFAULT_NODES_NUMBER = 4;
+    public static final int DEFAULT_NODES_TIMEOUT = 30 * 1000;
 
     /**
      * Start the scheduler creation process.
@@ -123,6 +127,19 @@ public class SchedulerStarter {
         policy.setArgName("policy");
         policy.setRequired(false);
         options.addOption(policy);
+
+        Option noDeploy = new Option("ln", "localNodes", true,
+          "the number of local nodes to start (can be 0), default value is " + DEFAULT_NODES_NUMBER);
+        noDeploy.setArgName("localNodes");
+        noDeploy.setRequired(false);
+        options.addOption(noDeploy);
+
+        Option nodeTimeout = new Option("t", "timeout", true,
+          "Timeout used to start the nodes (only useful with local nodes, default: " +
+            DEFAULT_NODES_TIMEOUT + "ms)");
+        nodeTimeout.setArgName("timeout");
+        nodeTimeout.setRequired(false);
+        options.addOption(nodeTimeout);
 
         boolean displayHelp = false;
 
@@ -168,7 +185,9 @@ public class SchedulerStarter {
                         SchedulerFactory.tryJoinRM(uri);
                         logger.info("Connected to the existing resource manager at " + uri);
                     } catch (Exception e) {
-                        startResourceManager();
+                        int numberLocalNodes = readIntOption(cmd, "localNodes", DEFAULT_NODES_NUMBER);
+                        int nodeTimeoutValue = readIntOption(cmd, "timeout", DEFAULT_NODES_TIMEOUT);
+                        startResourceManager(numberLocalNodes, nodeTimeoutValue);
                     }
                 }
 
@@ -214,8 +233,22 @@ public class SchedulerStarter {
 
     }
 
-    private static void startResourceManager() {
-        Thread rmStarter = new Thread() {
+    private static int readIntOption(CommandLine cmd, String optionName,
+      int defaultValue) throws ParseException {
+        int value = defaultValue;
+        if (cmd.hasOption(optionName)) {
+            try {
+                value = Integer.parseInt(cmd.getOptionValue(optionName));
+            } catch (Exception nfe) {
+                throw new ParseException(
+                  "Wrong value for " + optionName + " option: " + cmd.getOptionValue("t"));
+            }
+        }
+        return value;
+    }
+
+    private static void startResourceManager(final int numberLocalNodes, final int nodeTimeoutValue) {
+        final Thread rmStarter = new Thread() {
             public void run() {
                 try {
                     //Starting a local RM using default deployment descriptor
@@ -223,26 +256,12 @@ public class SchedulerStarter {
                     logger.info("Starting the resource manager...");
                     RMAuthentication rmAuth = RMFactory.startLocal();
 
-                    //creating default node source
-                    ResourceManager rman = rmAuth.login(Credentials
-                            .getCredentials(PAResourceManagerProperties
-                                    .getAbsolutePath(PAResourceManagerProperties.RM_CREDS
-                                            .getValueAsString())));
-                    //first im parameter is default rm url
-                    byte[] creds = FileToBytesConverter.convertFileToByteArray(new File(
-                            PAResourceManagerProperties
-                                    .getAbsolutePath(PAResourceManagerProperties.RM_CREDS
-                                            .getValueAsString())));
-                    rman.createNodeSource(NodeSource.LOCAL_INFRASTRUCTURE_NAME,
-                            LocalInfrastructure.class.getName(), new Object[] { "", creds,
-                            defaulNodesNumber, defaultNodesTimemout,
-                            CentralPAPropertyRepository.PA_HOME.getCmdLine() + CentralPAPropertyRepository.PA_HOME.getValue()
-                    },
-                            RestartDownNodesPolicy.class.getName(), new Object[] { "ALL", "ALL",
-                            "10000" });
+                    if (numberLocalNodes > 0) {
+                        addLocalNodes(rmAuth, numberLocalNodes, nodeTimeoutValue);
+                    }
 
-                    logger.info("The resource manager with " + defaulNodesNumber +
-                            " local nodes created on " + rmAuth.getHostURL());
+                    logger.info("The resource manager with " + numberLocalNodes +
+                      " local nodes created on " + rmAuth.getHostURL());
                 } catch (AlreadyBoundException abe) {
                     logger.error("The resource manager already exists on local host", abe);
                     System.exit(4);
@@ -254,6 +273,29 @@ public class SchedulerStarter {
         };
 
         rmStarter.start();
+    }
+
+    private static void addLocalNodes(RMAuthentication rmAuth, int numberLocalNodes,
+      int nodeTimeoutValue) throws LoginException, KeyException, IOException {
+        //creating default node source
+        ResourceManager rman = rmAuth.login(Credentials
+          .getCredentials(PAResourceManagerProperties
+            .getAbsolutePath(PAResourceManagerProperties.RM_CREDS
+              .getValueAsString())));
+        //first im parameter is default rm url
+        byte[] creds = FileToBytesConverter.convertFileToByteArray(new File(
+          PAResourceManagerProperties
+            .getAbsolutePath(PAResourceManagerProperties.RM_CREDS
+              .getValueAsString())
+        ));
+        rman.createNodeSource(NodeSource.LOCAL_INFRASTRUCTURE_NAME,
+          LocalInfrastructure.class.getName(), new Object[] { "", creds,
+            numberLocalNodes, nodeTimeoutValue,
+            CentralPAPropertyRepository.PA_HOME.getCmdLine() + CentralPAPropertyRepository.PA_HOME.getValue()
+          },
+          RestartDownNodesPolicy.class.getName(), new Object[] { "ALL", "ALL",
+            "10000" }
+        );
     }
 
     private static String getLocalAdress() throws ProActiveException {
