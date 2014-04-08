@@ -1,6 +1,14 @@
 // To run, please use jrunscript (jdk tool)
 // example: jrunscript start-server.js
 
+withNashorn = true
+try {
+    load("nashorn:mozilla_compat.js");
+    this.println = print;
+} catch (e) {
+    withNashorn = false
+}
+
 importPackage(java.lang)
 importPackage(java.io)
 importPackage(java.util)
@@ -18,7 +26,7 @@ var CONFIGS = {
 }
 
 // Change this variable in order to switch configurations
-var config = CONFIGS.PNP_PAMR
+var config = CONFIGS.PNP
 
 // Change these ports if required
 var ROUTER_PORT = 64737 // port used by the PAMR router
@@ -406,15 +414,20 @@ function loadClasspath() {
 	} else {
 		return;
 	}
-	
-	var urlsList = new ArrayList()
-	var jars = new File(distDir, 'lib').listFiles()
-	for (x in jars) {
-		urlsList.add(jars[x].toURL())
-	}
-	var urls = urlsList.toArray(java.lang.reflect.Array.newInstance(java.net.URL, urlsList.size()))
+
+    var urlsList = new ArrayList()
+    var jars = new File(distDir, 'lib').listFiles()
+    for (x in jars) {
+        urlsList.add(jars[x].toURL())
+    }
+    if (withNashorn) {
+        urlClass = Java.type("java.net.URL")['class']
+    } else {
+        urlClass = java.net.URL
+    }
+	var urls = urlsList.toArray(java.lang.reflect.Array.newInstance(urlClass, urlsList.size()))
 	var currentThreadClassLoader = Thread.currentThread().getContextClassLoader()
-	var urlClassLoader = new URLClassLoader(urls, currentThreadClassLoader)
+	var urlClassLoader = new java.net.URLClassLoader(urls, currentThreadClassLoader)
 	Thread.currentThread().setContextClassLoader(urlClassLoader)
 	var seManager = new javax.script.ScriptEngineManager(urlClassLoader);
     var engine = seManager.getEngineByName('javascript');
