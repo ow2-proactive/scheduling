@@ -47,13 +47,14 @@ import junit.framework.Assert;
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
+import org.ow2.tests.FunctionalTest;
 
 
 /**
  * @author cdelbe
  *
  */
-public class TestLoggers extends SchedulerConsecutive {
+public class TestLoggers extends FunctionalTest {
 
     private static URL jobDescriptor = TestLoggers.class
             .getResource("/functionaltests/descriptors/Job_Test_Loggers.xml");
