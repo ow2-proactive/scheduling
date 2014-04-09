@@ -36,21 +36,9 @@
  */
 package functionaltests;
 
-import java.security.Policy;
-import java.util.concurrent.TimeUnit;
-
-import javax.ws.rs.core.MediaType;
-
-import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
-import org.ow2.proactive.scheduler.common.Scheduler;
-import org.ow2.proactive.scheduler.common.job.Job;
-import org.ow2.proactive.scheduler.common.job.JobEnvironment;
-import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobPriority;
-import org.ow2.proactive.scheduler.common.job.JobState;
-import org.ow2.proactive.scheduler.common.job.JobStatus;
-import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
-import org.ow2.proactive.scheduler.common.task.JavaTask;
+import functionaltests.jobs.NonTerminatingJob;
+import functionaltests.jobs.SimpleJob;
+import functionaltests.utils.RestFuncTUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
@@ -63,11 +51,24 @@ import org.apache.log4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.Assume;
+import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
+import org.ow2.proactive.scheduler.common.Scheduler;
+import org.ow2.proactive.scheduler.common.job.Job;
+import org.ow2.proactive.scheduler.common.job.JobEnvironment;
+import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobPriority;
+import org.ow2.proactive.scheduler.common.job.JobState;
+import org.ow2.proactive.scheduler.common.job.JobStatus;
+import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.task.JavaTask;
+import org.ow2.tests.FunctionalTest;
 
-import functionaltests.jobs.NonTerminatingJob;
-import functionaltests.jobs.SimpleJob;
-import functionaltests.utils.RestFuncTUtils;
+import javax.ws.rs.core.MediaType;
+import java.security.Policy;
+import java.util.concurrent.TimeUnit;
 
 
 public abstract class AbstractRestFuncTestCase {
@@ -92,7 +93,6 @@ public abstract class AbstractRestFuncTestCase {
     }
 
     private static final int STATUS_OK = 200;
-
     private volatile String session;
 
     protected void setSessionHeader(HttpUriRequest request) throws Exception {
@@ -298,4 +298,25 @@ public abstract class AbstractRestFuncTestCase {
         }
     }
 
+    public static void init(String name) throws Exception {
+
+        if (!FunctionalTest.shouldBeExecuted(name)) {
+            Assume.assumeTrue(false);
+            return;
+        }
+
+        try {
+            System.out.println("Starting the app");
+            RestFuncTHelper.startRestfulSchedulerWebapp();
+        } catch (Exception e) {
+            e.printStackTrace();
+            RestFuncTHelper.stopRestfulSchedulerWebapp();
+            throw e;
+        }
+    }
+
+    @AfterClass
+    public static void afterClass() {
+        RestFuncTHelper.stopRestfulSchedulerWebapp();
+    }
 }

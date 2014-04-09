@@ -37,12 +37,6 @@ package functionaltests;
  * $PROACTIVE_INITIAL_DEV$
  */
 
-import static functionaltests.RestFuncTHelper.getRestServerUrl;
-
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
@@ -51,6 +45,11 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.rest.ISchedulerClient;
 import org.ow2.proactive.scheduler.rest.SchedulerClient;
 
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
+import static functionaltests.RestFuncTHelper.getRestServerUrl;
+
 public class SchedulerClientTest extends AbstractRestFuncTestCase {
     
     /** Maximum wait time of 5 minutes */
@@ -58,17 +57,7 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        try {
-            RestFuncTHelper.startRestfulSchedulerWebapp();
-        } catch (Exception e) {
-            RestFuncTHelper.stopRestfulSchedulerWebapp();
-            throw e;
-        }
-    }
-
-    @AfterClass
-    public static void afterClass() {
-        RestFuncTHelper.stopRestfulSchedulerWebapp();
+        init(SchedulerClientTest.class.getSimpleName());
     }
 
     @Test(timeout = max_wait_time)

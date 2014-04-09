@@ -8,6 +8,8 @@ def functionalTestConfiguration = {
     systemProperties << ['log4j.configuration': file("$rootDir/config/log4j/log4j-junit").toURL()]
     systemProperties << ['proactive.configuration': file("$rootDir/config/proactive/ProActiveConfiguration.xml")]
     systemProperties << ['java.security.policy': file("$rootDir/config/security.java.policy-server").absolutePath]
+    systemProperties << ['test_slice': System.getProperty("test_slice") ]
+    systemProperties << ['max_test_slice': System.getProperty("max_test_slice") ]
     systemProperties << ['proactive.runtime.ping': false]
     testLogging {
         exceptionFormat = 'full'
@@ -65,6 +67,7 @@ project(':rest:rest-server') {
         testCompile 'com.googlecode.json-simple:json-simple:1.1'
         testCompile project(":rm:rm-server")
         testCompile project(":scheduler:scheduler-server")
+        testCompile project(':rm:rm-server').sourceSets.test.output // to get shared test classes
         testCompile 'org.apache.httpcomponents:httpmime:4.2.1'
         testCompile 'org.jboss.resteasy:tjws:3.0.6.Final'
         testCompile 'org.fusesource:sigar:1.6.4'
@@ -197,6 +200,7 @@ project(':rest:rest-client') {
         testCompile 'com.googlecode.json-simple:json-simple:1.1'
         testCompile project(":rm:rm-server")
         testCompile project(":scheduler:scheduler-server")
+        testCompile project(':rm:rm-server').sourceSets.test.output // to get shared test classes
         testCompile 'org.apache.httpcomponents:httpmime:4.2.1'
         testCompile 'org.jboss.resteasy:tjws:2.3.3.Final'
         testCompile 'org.fusesource:sigar:1.6.4'

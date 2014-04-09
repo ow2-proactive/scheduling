@@ -40,7 +40,6 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPut;
 import org.json.simple.JSONObject;
-import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -52,18 +51,7 @@ public class RestSchedulerTest extends AbstractRestFuncTestCase {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        try {
-            RestFuncTHelper.startRestfulSchedulerWebapp();
-        } catch (Exception e) {
-            e.printStackTrace();
-            RestFuncTHelper.stopRestfulSchedulerWebapp();
-            throw e;
-        }
-    }
-
-    @AfterClass
-    public static void afterClass() {
-        RestFuncTHelper.stopRestfulSchedulerWebapp();
+        init(RestSchedulerTest.class.getSimpleName());
     }
 
     @Before

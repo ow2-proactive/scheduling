@@ -36,12 +36,7 @@
  */
 package functionaltests;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.ws.rs.core.MediaType;
-
+import functionaltests.utils.RestFuncTUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
@@ -53,7 +48,6 @@ import org.apache.http.entity.mime.content.ByteArrayBody;
 import org.apache.http.entity.mime.content.FileBody;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -65,24 +59,17 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 
-import functionaltests.utils.RestFuncTUtils;
+import javax.ws.rs.core.MediaType;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        try {
-            RestFuncTHelper.startRestfulSchedulerWebapp();
-        } catch (Exception e) {
-            RestFuncTHelper.stopRestfulSchedulerWebapp();
-            throw e;
-        }
-    }
-
-    @AfterClass
-    public static void afterClass() {
-        RestFuncTHelper.stopRestfulSchedulerWebapp();
+        init(RestSchedulerJobTaskTest.class.getSimpleName());
     }
 
     @Before

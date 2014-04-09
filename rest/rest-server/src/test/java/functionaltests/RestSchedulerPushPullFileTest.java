@@ -77,21 +77,10 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest;
  * @author The ProActive Team
  */
 public class RestSchedulerPushPullFileTest extends AbstractRestFuncTestCase {
+
     @BeforeClass
     public static void beforeClass() throws Exception {
-        ProActiveLogger.getLogger(SchedulerStateRest.class).setLevel(Level.DEBUG);
-        try {
-            RestFuncTHelper.startRestfulSchedulerWebapp();
-        } catch (Exception e) {
-            e.printStackTrace();
-            RestFuncTHelper.stopRestfulSchedulerWebapp();
-            throw e;
-        }
-    }
-
-    @AfterClass
-    public static void afterClass() {
-        RestFuncTHelper.stopRestfulSchedulerWebapp();
+        init(RestSchedulerPushPullFileTest.class.getSimpleName());
     }
 
     @Before

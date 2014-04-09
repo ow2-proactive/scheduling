@@ -38,7 +38,6 @@ package functionaltests;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPut;
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -49,18 +48,7 @@ public class RestSchedulerKillTest extends AbstractRestFuncTestCase {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        try {
-            RestFuncTHelper.startRestfulSchedulerWebapp();
-        } catch (Exception e) {
-            e.printStackTrace();
-            RestFuncTHelper.stopRestfulSchedulerWebapp();
-            throw e;
-        }
-    }
-
-    @AfterClass
-    public static void afterClass() {
-        RestFuncTHelper.stopRestfulSchedulerWebapp();
+        init(RestSchedulerKillTest.class.getSimpleName());
     }
 
     @Test

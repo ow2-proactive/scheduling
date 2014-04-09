@@ -48,18 +48,7 @@ import org.ow2.proactive.scheduler.common.SchedulerStatus;
 public class RestfulSchedulerFreezeTest extends AbstractRestFuncTestCase {
     @BeforeClass
     public static void beforeClass() throws Exception {
-        try {
-            RestFuncTHelper.startRestfulSchedulerWebapp();
-        } catch (Exception e) {
-            e.printStackTrace();
-            RestFuncTHelper.stopRestfulSchedulerWebapp();
-            throw e;
-        }
-    }
-
-    @AfterClass
-    public static void afterClass() {
-        RestFuncTHelper.stopRestfulSchedulerWebapp();
+        init(RestfulSchedulerFreezeTest.class.getSimpleName());
     }
 
     @Test
