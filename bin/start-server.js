@@ -80,7 +80,11 @@ function startEverything() {
 	// Add shutdownhook to terminate all processes if the current process is killed
 	Runtime.getRuntime().addShutdownHook(new Thread(function () {
 		var procs = [jettyProcess, schedulerProcess, rmProcess, routerProcess]
-		procs.map(function(x){if(x!=null){x.destroy()}})
+		for (x in procs) {
+			if (procs[x] != null){
+				procs[x].destroy()
+			}
+		}
 	}))
 
 	var executor = Executors.newFixedThreadPool(5)
@@ -442,8 +446,11 @@ function execCmdAsync(cmdarray, wdir, outputFile, stringToWait) {
 	var env = Collections.singletonMap('CLASSPATH', fillClasspath(['*']))
 
 	// Force to string an all elements of the cmdarray, start the process and redirect output to a file
-	cmdarray = Arrays.asList(cmdarray.map(function(x){return x.toString()}))
-	var pb = new ProcessBuilder(cmdarray)
+	var cmd = new ArrayList(cmdarray.length)
+	for (x in cmdarray) {
+		cmd.add(cmdarray[x].toString())
+	}
+	var pb = new ProcessBuilder(cmd)
 	pb.redirectErrorStream(true)
 	pb.directory(wdir)
 	pb.environment().putAll(env)
@@ -536,19 +543,22 @@ function checkPorts(portmap){
 
 // Add all jars from dist/lib to current classpath
 function loadClasspath() {
-	var libDir = new File(distDir, 'lib')
-	var filesInLib = libDir.listFiles()
-	for (x in filesInLib) {
-		var params = [java.net.URL]
-		var args = [filesInLib[x].toURL()]
-	    try {
-    		var sysloader = java.lang.ClassLoader.getSystemClassLoader()
-    		var sysLoaderClass = sysloader.loadClass('java.net.URLClassLoader')
-        	var method = sysLoaderClass.getDeclaredMethod('addURL', params)
-        	method.setAccessible(true)
-        	method.invoke(sysloader, args)
-    	} catch (t) {
-        	throw java.io.IOException('Error, could not add URL to system classloader', t)
-    	}
+	if (System.getProperty('un') == null) {
+		System.setProperty('un','un')
+	} else {
+		return;
 	}
+	
+	var urlsList = new ArrayList()
+	var jars = new File(distDir, 'lib').listFiles()
+	for (x in jars) {
+		urlsList.add(jars[x].toURL())
+	}
+	var urls = urlsList.toArray(java.lang.reflect.Array.newInstance(java.net.URL, urlsList.size()))
+	var currentThreadClassLoader = Thread.currentThread().getContextClassLoader()
+	var urlClassLoader = new URLClassLoader(urls, currentThreadClassLoader)
+	Thread.currentThread().setContextClassLoader(urlClassLoader)
+	var seManager = new javax.script.ScriptEngineManager(urlClassLoader)
+	var engine = seManager.getEngineByName('javascript')
+	engine.eval(new java.io.FileReader(new File(currDir,SCRIPT_NAME)))
 }
