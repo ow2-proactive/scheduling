@@ -153,7 +153,7 @@ public class JettyStarter {
     }
 
     private static void deployStaticFolder(Server server, File file) {
-        String contextPath = file.getName();
+        String contextPath = "/" + file.getName();
         WebAppContext webApp = createWebAppContext(contextPath);
         webApp.setWar(file.getAbsolutePath());
         server.addHandler(webApp);
