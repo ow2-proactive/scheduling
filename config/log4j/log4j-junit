@@ -1,4 +1,4 @@
-log4j.rootLogger=INFO, CONSOLE
+log4j.rootLogger=INFO, CONSOLE, FILE
 
 # If INFO is enabled Jetty is too verbose at startup
 log4j.logger.org.mortbay = WARN
@@ -21,3 +21,9 @@ log4j.appender.CONSOLE=org.apache.log4j.ConsoleAppender
 log4j.appender.CONSOLE.layout=org.apache.log4j.PatternLayout
 log4j.appender.CONSOLE.layout.ConversionPattern=[%d{ISO8601} %-5p] [%C{1}.%M] %m%n
 
+log4j.appender.FILE=org.apache.log4j.RollingFileAppender
+log4j.appender.FILE.File=${pa.rm.home}/logs/servers.log
+log4j.appender.FILE.MaxFileSize=100MB
+log4j.appender.FILE.MaxBackupIndex=10
+log4j.appender.FILE.layout=org.apache.log4j.PatternLayout
+log4j.appender.FILE.layout.ConversionPattern=[%d{ISO8601} %-5p] %m%n
