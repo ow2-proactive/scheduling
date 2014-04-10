@@ -36,23 +36,35 @@
  */
 package org.ow2.proactive.rm.util.process;
 
-import com.sun.jna.Memory;
-import com.sun.jna.Native;
-import com.sun.jna.ptr.IntByReference;
-import static com.sun.jna.Pointer.NULL;
-import org.jvnet.winp.WinProcess;
-import org.jvnet.winp.WinpException;
-import org.ow2.proactive.utils.FileToBytesConverter;
-import static org.ow2.proactive.rm.util.process.GNUCLibrary.LIBC;
-
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Map.Entry;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.UUID;
+
+import org.ow2.proactive.utils.FileToBytesConverter;
+import com.sun.jna.Memory;
+import com.sun.jna.Native;
+import com.sun.jna.ptr.IntByReference;
+import org.jvnet.winp.WinProcess;
+import org.jvnet.winp.WinpException;
+
+import static com.sun.jna.Pointer.NULL;
+import static org.ow2.proactive.rm.util.process.GNUCLibrary.LIBC;
 /**
  * Kills a process tree to clean up the mess left by a build.
  *
@@ -294,7 +306,13 @@ public abstract class ProcessTreeKiller {
                 PID_FIELD = clazz.getDeclaredField("pid");
                 PID_FIELD.setAccessible(true);
 
-                DESTROY_PROCESS = clazz.getDeclaredMethod("destroyProcess", int.class);
+                Method destroy;
+                try {
+                    destroy = clazz.getDeclaredMethod("destroyProcess", int.class);
+                } catch (NoSuchMethodException ex) {
+                    destroy = clazz.getDeclaredMethod("destroyProcess", int.class, boolean.class);
+                }
+                DESTROY_PROCESS = destroy;
                 DESTROY_PROCESS.setAccessible(true);
             } catch (ClassNotFoundException e) {
                 LinkageError x = new LinkageError();
@@ -407,7 +425,11 @@ public abstract class ProcessTreeKiller {
              */
             public void kill() {
                 try {
-                    DESTROY_PROCESS.invoke(null, getPid());
+                    if (DESTROY_PROCESS.getParameterTypes().length > 1) {
+                        DESTROY_PROCESS.invoke(null,getPid(),false);
+                    } else {
+                        DESTROY_PROCESS.invoke(null,getPid());
+                    }
                 } catch (IllegalAccessException e) {
                     // this is impossible
                     IllegalAccessError x = new IllegalAccessError();
