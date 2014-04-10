@@ -263,7 +263,7 @@ public class SchedulerStarter {
 
     private static void configureSchedulerAndRMAndPAHomes() {
         if (System.getProperty(PASchedulerProperties.SCHEDULER_HOME.getKey()) == null) {
-            System.setProperty(PASchedulerProperties.SCHEDULER_HOME.getKey(), ".");
+            System.setProperty(PASchedulerProperties.SCHEDULER_HOME.getKey(), System.getProperty("user.dir"));
         }
         if (System.getProperty(PAResourceManagerProperties.RM_HOME.getKey()) == null) {
             System.setProperty(PAResourceManagerProperties.RM_HOME.getKey(),
