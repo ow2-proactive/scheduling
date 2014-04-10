@@ -142,7 +142,7 @@ public abstract class TWorkflowJobs extends SchedulerConsecutive {
                         String deps = val[2].substring(1, val[2].length() - 1);
                         dependences.put(val[0], new HashSet<String>(Arrays.asList(deps.split(" "))));
                     } catch (Throwable t) {
-                        throw new RuntimeException("Error parsing dependences for entry: " + jobs[i][j], t);
+                        throw new RuntimeException("Error parsing dependencies for entry: " + jobs[i][j], t);
                     }
                 }
             }

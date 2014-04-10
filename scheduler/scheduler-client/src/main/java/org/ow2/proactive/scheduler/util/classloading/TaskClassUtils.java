@@ -142,6 +142,12 @@ public class TaskClassUtils {
     public static void deleteDirectory(File path) {
         if (path.exists()) {
             File[] files = path.listFiles();
+
+            if (files == null) {
+                logger.warn("Cannot list files in " + path);
+                return;
+            }
+
             for (int i = 0; i < files.length; i++) {
                 if (files[i].isDirectory()) {
                     deleteDirectory(files[i]);
