@@ -88,6 +88,7 @@ project(':rest:rest-server') {
     }
 
     task jaxbDoc(type: Javadoc) {
+        enabled = System.getProperty("java.specification.version") != "1.8"
         source([project, project(':rest:rest-api')].collect { project -> project.sourceSets.main.allJava })
         destinationDir = file("$webAppDirName/doc/jaxbdocs")
         options.docletpath = configurations.jaxDoclet.files.asType(List) + configurations.compile.files.asType(List)
@@ -98,6 +99,7 @@ project(':rest:rest-server') {
     }
 
     task jaxrsDoc(type: Javadoc, dependsOn: jaxbDoc) {
+        enabled = System.getProperty("java.specification.version") != "1.8"
         source([project, project(':rest:rest-api')].collect { project -> project.sourceSets.main.allJava })
         destinationDir = file("$webAppDirName/doc/jaxrsdocs")
         options.links << '../jaxbdocs/'
