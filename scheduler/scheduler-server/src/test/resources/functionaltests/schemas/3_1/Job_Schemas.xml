@@ -216,18 +216,18 @@
             </selection>
             <pre>
                 <script>
-                    <file path="${HOME}/set.js"/>
+                    <file path="${HOME}/set.groovy"/>
                 </script>
             </pre>
             <javaExecutable class="org.ow2.proactive.scheduler.examples.PropertyTask"/>
             <post>
                 <script>
-                    <file path="${HOME}/unset.js"/>
+                    <file path="${HOME}/unset.groovy"/>
                 </script>
             </post>
             <cleaning>
                 <script>
-                    <file path="${HOME}/clean.js"/>
+                    <file path="${HOME}/clean.groovy"/>
                 </script>
             </cleaning>
         </task>
@@ -238,7 +238,7 @@
             <nativeExecutable>
                 <dynamicCommand workingDir="$PROACTIVE_HOME">
                     <generation>
-                        <script> <code language="javascript">
+                        <script> <code language="groovy">
                             if(org.objectweb.proactive.utils.OperatingSystem.getOperatingSystem() == org.objectweb.proactive.utils.OperatingSystem.windows){
                             command="ping localhost";
                             } else {

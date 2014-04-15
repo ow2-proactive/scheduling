@@ -12,13 +12,13 @@
 			<description>Testing the pre and post scripts.</description>
 			<pre>
 				<script>
-					<file path="${WORK_DIR}/set.js"/>
+					<file path="${WORK_DIR}/set.groovy"/>
 				</script>
 			</pre>
 			<javaExecutable class="org.ow2.proactive.scheduler.examples.PropertyTask"/>
 			<post>
 				<script>
-					<file path="${WORK_DIR}/unset.js"/>
+					<file path="${WORK_DIR}/unset.groovy"/>
 				</script>
 			</post>
 			<cleaning>

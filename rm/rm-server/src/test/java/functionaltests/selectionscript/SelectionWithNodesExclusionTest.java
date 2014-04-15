@@ -36,14 +36,10 @@
  */
 package functionaltests.selectionscript;
 
-import static org.junit.Assert.assertTrue;
-
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
-
-import junit.framework.Assert;
 
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.Node;
@@ -54,9 +50,12 @@ import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.utils.NodeSet;
+import junit.framework.Assert;
 
 import functionaltests.RMConsecutive;
 import functionaltests.RMTHelper;
+
+import static org.junit.Assert.*;
 
 
 /**
@@ -85,7 +84,7 @@ import functionaltests.RMTHelper;
  */
 public class SelectionWithNodesExclusionTest extends RMConsecutive {
 
-    private URL vmPropSelectionScriptpath = this.getClass().getResource("vmPropertySelectionScript.js");
+    private URL vmPropSelectionScriptpath = this.getClass().getResource("vmPropertySelectionScript.groovy");
 
     private URL dummySelectionScriptPath = this.getClass().getResource("dummySelectionScript.js");
 

@@ -7,7 +7,7 @@
 		<task name="notforked">
 			<scriptExecutable>
 				<script>
-					<code language="javascript">
+					<code language="groovy">
 						java.lang.System.exit(42);
 					</code>
 				</script>

@@ -1,38 +1,38 @@
 // Executes a native command
-var pb = new java.lang.ProcessBuilder(args);
+def pb = new ProcessBuilder(args);
 
 // Merge stdout, stderr of process
 pb.redirectErrorStream(true);
 
-var process = null;
+def process = null;
 try {	
 	try {
 		process = pb.start();
 	} catch (e) {
-		throw "Unable to start native process: " + e;
+		throw new Exception("Unable to start native process: " , e);
 	}
 	
-	var isr = new InputStreamReader(process.getInputStream());
-	var br = new BufferedReader(isr);
+	def isr = new InputStreamReader(process.getInputStream());
+	def br = new BufferedReader(isr);
 	
-	var lineRead;
+	def lineRead;
 	try {
 		while ((lineRead = br.readLine()) != null) {
 			println(lineRead);
 		}
 	} catch (e) {
-		throw "Unable to read native process output: " + e;
+		throw new Exception("Unable to read native process output: " ,e);
 	}
 	
-	var exitValue = -1;
+	def exitValue = -1;
 	try {
 		rc = process.waitFor();
 	} catch (e) {		
 		// Can be an InterruptedException
-		if (e.javaException instanceof InterruptedException){
+		if (e instanceof InterruptedException){
 			Thread.currentThread().interrupt();
 		} else {
-                  throw "Unable to wait for the end of native process: " +  e;
+                  throw new Exception("Unable to wait for the end of native process: " ,  e);
             } 		
 	}	
 } finally {

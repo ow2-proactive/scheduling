@@ -9,22 +9,22 @@
 	<task name="split">
 	  <pre>
 		<script>
-		  <code language="javascript"><![CDATA[
+		  <code language="groovy"><![CDATA[
 if ($IT == 0) {
-	var dir = new java.io.File(new String(output.getRealURI() + "/").substring(7));
-	var files = dir.listFiles();
-	for (var i=0; i < files.length; i++) {
-		files[i]['delete']();
+	def dir = new java.io.File(new String(output.getRealURI() + "/").substring(7));
+	def files = dir.listFiles();
+	for (def i=0; i < files.length; i++) {
+		files[i]delete();
 	}
 	
-	var tmp = java.lang.System.getProperty('java.io.tmpdir');
-	var name = new String(tmp + "/sched_wf_test_toNOTclean");
-	var f = new java.io.File(name);
-	f['delete']();
+	def tmp = java.lang.System.getProperty('java.io.tmpdir');
+	def name = new String(tmp + "/sched_wf_test_toNOTclean");
+	def f = new java.io.File(name);
+	fdelete();
 	
-		var name = new String(tmp + "/sched_wf_test_toclean");
-	var f = new java.io.File(name);
-	f['delete']();
+		def name = new String(tmp + "/sched_wf_test_toclean");
+	def f = new java.io.File(name);
+	fdelete();
 }
 		  ]]></code>
 		</script>
@@ -41,17 +41,15 @@ runs = 2;
 	  </controlFlow>
 	  <post>
 		<script>
-		  <code language="javascript"><![CDATA[
-importPackage(org.objectweb.proactive.extensions.dataspaces.api);
-importPackage(java.io);
+		  <code language="groovy"><![CDATA[
 
 files = ["foo_$IT_0.in", "foo_$IT_1.in", "bar_$IT_0.in", "bar_$IT_1.in"];
-for (var i=0; i < files.length; i++) {
-  var name = new String(output.getRealURI() + "/" + files[i]).substring(7);
-  var f = new java.io.File(name);
-  f['delete']();
+for (def i=0; i < files.length; i++) {
+  def name = new String(output.getRealURI() + "/" + files[i]).substring(7);
+  def f = new java.io.File(name);
+  f.delete();
   f.createNewFile();
-  var pw = new PrintWriter(new FileOutputStream(f));
+  def pw = new PrintWriter(new FileOutputStream(f));
   pw.write("Content of " + name);
   pw.close();
 }
@@ -96,20 +94,20 @@ selected = true;
 	  </selection>
 	  <pre>
 		<script>
-		  <code language="javascript"><![CDATA[
+		  <code language="groovy"><![CDATA[
 print("Pre script $IT $REP");
 
-var tmp = java.lang.System.getProperty('java.io.tmpdir');
-var name = new String(tmp + "/sched_wf_test_toclean");
-var f = new java.io.File(name);
-f['delete']();
+def tmp = java.lang.System.getProperty('java.io.tmpdir');
+def name = new String(tmp + "/sched_wf_test_toclean");
+def f = new java.io.File(name);
+fdelete();
 print("create " + f);
 f.createNewFile();
 
-var name = new String(tmp + "/sched_wf_test_toNOTclean");
-var f = new java.io.File(name);
+def name = new String(tmp + "/sched_wf_test_toNOTclean");
+def f = new java.io.File(name);
 print("create " + f);
-f['delete']();
+fdelete();
 f.createNewFile();
 		  ]]></code>
 		</script>
@@ -145,12 +143,12 @@ print("Post script $IT $REP");
 	  </post>
 	  <cleaning>
 		<script>
-		  <code language="javascript"><![CDATA[
-var tmp = java.lang.System.getProperty('java.io.tmpdir');
-var name = new String(tmp + "/sched_wf_test_toclean");
-var f = new java.io.File(name);
+		  <code language="groovy"><![CDATA[
+def tmp = java.lang.System.getProperty('java.io.tmpdir');
+def name = new String(tmp + "/sched_wf_test_toclean");
+def f = new java.io.File(name);
 print("delete " + f);
-f['delete']();
+fdelete();
 		  ]]></code>
 		</script>
 	  </cleaning>
@@ -168,8 +166,8 @@ f['delete']();
 		<dynamicCommand>
 		  <generation>
 			<script>
-			  <code language="javascript"><![CDATA[
-var it = java.lang.System.getProperty("pas.task.iteration");
+			  <code language="groovy"><![CDATA[
+def it = java.lang.System.getProperty("pas.task.iteration");
 command = "echo generated hello " + it;
 			  ]]></code>
 			</script>

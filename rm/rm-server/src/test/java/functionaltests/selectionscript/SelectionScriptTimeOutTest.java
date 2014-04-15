@@ -45,9 +45,10 @@ import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.utils.NodeSet;
+import org.junit.Assert;
+
 import functionaltests.RMConsecutive;
 import functionaltests.RMTHelper;
-import org.junit.Assert;
 
 
 /**
@@ -65,7 +66,7 @@ import org.junit.Assert;
  */
 public class SelectionScriptTimeOutTest extends RMConsecutive {
 
-    private URL selectionScriptWithtimeOutPath = this.getClass().getResource("selectionScriptWithtimeOut.js");
+    private URL selectionScriptWithtimeOutPath = this.getClass().getResource("selectionScriptWithtimeOut.groovy");
 
     /** Actions to be Perform by this test.
      * The method is called automatically by Junit framework.

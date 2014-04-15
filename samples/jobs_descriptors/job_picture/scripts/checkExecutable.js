@@ -1,9 +1,6 @@
-importPackage(java.lang);
-importPackage(java.io);
-
 selected=false;
 print("checking executable \n");
-if(System.getProperty("os.name").contains("Windows"))
+if(java.lang.System.getProperty("os.name").contains("Windows"))
 {
 	//windows verification
         for(i=0; i<args.length; i++) {
@@ -18,7 +15,7 @@ else
 	//unix verification
 	for(i=0; i<args.length; i++) {
 	print("checking : "+ args[i] +"\n");
-		if( (args[i].startsWith("/") ||args[i].startsWith("./") || args[i].startsWith("../")) &&  java.io.File(args[i]).exists()) {
+		if( (args[i].startsWith("/") ||args[i].startsWith("./") || args[i].startsWith("../")) &&  (new java.io.File(args[i])).exists()) {
 		        cmds= new Array;
 			cmds[0]="/bin/sh";
 		        cmds[1]="-c";

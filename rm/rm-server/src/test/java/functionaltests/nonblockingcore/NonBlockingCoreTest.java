@@ -70,7 +70,7 @@ import static junit.framework.Assert.assertTrue;
 public class NonBlockingCoreTest extends RMConsecutive {
 
     private URL selectionScriptWithtimeOutPath = SelectionScriptTimeOutTest.class
-            .getResource("selectionScriptWithtimeOut.js");
+            .getResource("selectionScriptWithtimeOut.groovy");
 
     private NodeSet nodes;
 

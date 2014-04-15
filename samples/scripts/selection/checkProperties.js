@@ -3,26 +3,22 @@
  * - Check 2 conditions with "Logical AND"
  *****************************************************/
 
-importClass(org.ow2.proactive.scripting.helper.selection.Condition);
-importClass(org.ow2.proactive.scripting.helper.selection.Conditions);
-importClass(org.ow2.proactive.scripting.helper.selection.SelectionUtils);
-
 /* We set our 2 conditions by creating "Condition" objects */
-var condition1 = new Condition("ram",SelectionUtils.GREATER_THAN,"1024");
-var condition2 = new Condition("architecture",SelectionUtils.CONTAINS, "6");
+var condition1 = new org.ow2.proactive.scripting.helper.selection.Condition("ram",org.ow2.proactive.scripting.helper.selection.SelectionUtils.GREATER_THAN,"1024");
+var condition2 = new org.ow2.proactive.scripting.helper.selection.Condition("architecture",org.ow2.proactive.scripting.helper.selection.SelectionUtils.CONTAINS, "6");
 
 /* We set a table of "Condition" objects */
-var conditions = new Conditions();
+var conditions = new org.ow2.proactive.scripting.helper.selection.Conditions();
 
 /* and put our 2 objects */
 conditions.add(condition1);
 conditions.add(condition2);
 
 /* Evaluation by calling CheckConfig method */
-if(SelectionUtils.checkProperties("samplePropertiesFile.txt",conditions)) {
-    println("JS>selected = true");
+if(org.ow2.proactive.scripting.helper.selection.SelectionUtils.checkProperties("samplePropertiesFile.txt",conditions)) {
+    print("JS>selected = true");
     selected = true;
 } else {
-    println("JS>selected = false");
+    print("JS>selected = false");
     selected = false;
 }

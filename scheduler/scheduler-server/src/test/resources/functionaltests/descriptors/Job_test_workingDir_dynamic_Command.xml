@@ -9,7 +9,7 @@
 			<nativeExecutable>
 				<dynamicCommand workingDir="${WDIR}">
 					<generation>
-						<script> <code language="javascript">
+						<script> <code language="groovy">
                         commandList = new java.util.ArrayList();
 						if(org.objectweb.proactive.utils.OperatingSystem.getOperatingSystem() == org.objectweb.proactive.utils.OperatingSystem.windows){
 							commandList.add("cmd.exe");

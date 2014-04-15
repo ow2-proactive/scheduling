@@ -11,22 +11,20 @@
 
 			<pre>
 				<script>
-					<code language="javascript">
-						importClass(org.ow2.proactive.scripting.PropertyUtils);
+					<code language="groovy">
 						java.lang.System.setProperty("key1", "value1");
 						print("Setting system property key1 = " + java.lang.System.getProperty("key1") + "\n");
 						java.lang.System.setProperty("key2", "value2");
 						print("Setting system property key2 = " + java.lang.System.getProperty("key2") + "\n");
-						PropertyUtils.propagateProperty("key1");
+						org.ow2.proactive.scripting.PropertyUtils.propagateProperty("key1");
 					</code>
 				</script>
 			</pre>
 				<javaExecutable class="org.ow2.proactive.scheduler.examples.EmptyTask"/>
 			<post>
 				<script>
-					<code language="javascript">
-						importClass(org.ow2.proactive.scripting.PropertyUtils);
-						PropertyUtils.propagateProperty("key2");
+					<code language="groovy">
+						org.ow2.proactive.scripting.PropertyUtils.propagateProperty("key2");
 					</code>
 				</script>
 			</post>
@@ -38,11 +36,11 @@
 			</depends>
 			<pre>
 				<script>
-					<code language="javascript">
+					<code language="groovy">
 						print("Get system property key1 = " + java.lang.System.getProperty("key1") + "\n");
 						print("Get system property key2 = " + java.lang.System.getProperty("key2") + "\n");
-						var v1 = java.lang.System.getProperty("key1");
-						var v2 = java.lang.System.getProperty("key2");
+						def v1 = java.lang.System.getProperty("key1");
+						def v2 = java.lang.System.getProperty("key2");
 						if (v1!="value1"){thrrrrow.me.An.exception();}
 						if (v2!="value2"){thrrrrow.me.An.exception();}
 					</code>
@@ -58,9 +56,8 @@
 		<task name="task3ex" preciousResult="true">
 			<pre>
 				<script>
-					<code language="javascript">
-						importClass(org.ow2.proactive.scripting.PropertyUtils);
-						PropertyUtils.propagateProperty("prohibited%name");
+					<code language="groovy">
+						org.ow2.proactive.scripting.PropertyUtils.propagateProperty("prohibited%name");
 					</code>
 				</script>
 			</pre>
@@ -71,10 +68,9 @@
 		<task name="task4" preciousResult="true">
 			<pre>
 				<script>
-					<code language="javascript">
-						importClass(org.ow2.proactive.scripting.PropertyUtils);
+					<code language="groovy">
 						java.lang.System.setProperty("user.var.1", ".User Value 1.");
-						PropertyUtils.propagateProperty("user.var.1");
+						org.ow2.proactive.scripting.PropertyUtils.propagateProperty("user.var.1");
 					</code>
 				</script>
 			</pre>
@@ -88,11 +84,10 @@
 			</depends>
 			<pre>
 				<script>
-					<code language="javascript">
-						importClass(org.ow2.proactive.scripting.PropertyUtils);
+					<code language="groovy">
 						java.lang.System.setProperty("user.var.2", ".User Value 2.");
-						PropertyUtils.exportProperty("user.var.2");
-						PropertyUtils.exportProperty("user.var.1");
+						org.ow2.proactive.scripting.PropertyUtils.exportProperty("user.var.2");
+						org.ow2.proactive.scripting.PropertyUtils.exportProperty("user.var.1");
 					</code>
 				</script>
 			</pre>

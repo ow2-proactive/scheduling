@@ -1,3 +1,8 @@
+try {
+    load("nashorn:mozilla_compat.js");
+} catch (e) {
+}
+
 importPackage(java.lang);
 importPackage(java.io);
 importPackage(java.util);
@@ -20,7 +25,7 @@ var logsFile = "task_"+task_id+".log";
 	 log("logs file at "+System.getProperty("java.io.tmpdir")+File.separator+logsFile);
 
 
-  //-------------- Script ARGS --------------------------
+  //-------------- Script args --------------------------
 
 
 

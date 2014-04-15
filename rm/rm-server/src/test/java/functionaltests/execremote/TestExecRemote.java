@@ -55,9 +55,10 @@ import org.ow2.proactive.resourcemanager.utils.TargetType;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.scripting.SimpleScript;
+import org.junit.Assert;
+
 import functionaltests.RMConsecutive;
 import functionaltests.RMTHelper;
-import org.junit.Assert;
 
 
 public final class TestExecRemote extends RMConsecutive {
@@ -126,7 +127,7 @@ public final class TestExecRemote extends RMConsecutive {
             }
         }
         {
-            File sFile = new File(miscDir + "processBuilder.js");
+            File sFile = new File(miscDir + "processBuilder.groovy");
             RMTHelper.log("Test 4 - Test " + sFile);
 
             String[] cmd = (isLinux) ? new String[] { "/bin/bash", "-c", "echo " + valueToEcho }
@@ -143,7 +144,7 @@ public final class TestExecRemote extends RMConsecutive {
             }
         }
         {
-            File sFile = new File(miscDir + "processBuilderWithDS.js");
+            File sFile = new File(miscDir + "processBuilderWithDS.groovy");
             RMTHelper.log("Test 5 - Test " + sFile);
             // Create test temporary file
             String testFilename = "test.txt";

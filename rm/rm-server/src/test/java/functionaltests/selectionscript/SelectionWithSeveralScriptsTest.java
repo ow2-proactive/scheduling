@@ -82,7 +82,7 @@ import static junit.framework.Assert.assertTrue;
  */
 public class SelectionWithSeveralScriptsTest extends RMConsecutive {
 
-    private URL vmPropSelectionScriptpath = this.getClass().getResource("vmPropertySelectionScript.js");
+    private URL vmPropSelectionScriptpath = this.getClass().getResource("vmPropertySelectionScript.groovy");
 
     private String vmPropKey1 = "myProperty1";
     private String vmPropValue1 = "myValue1";

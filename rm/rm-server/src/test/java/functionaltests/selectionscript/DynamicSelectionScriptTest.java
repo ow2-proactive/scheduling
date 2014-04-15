@@ -36,13 +36,10 @@
  */
 package functionaltests.selectionscript;
 
-import static junit.framework.Assert.assertTrue;
-
 import java.io.File;
 import java.net.URL;
 import java.util.HashMap;
 
-import org.junit.Assert;
 import org.objectweb.proactive.api.PAFuture;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
@@ -50,9 +47,12 @@ import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.utils.NodeSet;
+import org.junit.Assert;
 
 import functionaltests.RMConsecutive;
 import functionaltests.RMTHelper;
+
+import static junit.framework.Assert.assertTrue;
 
 
 /**
@@ -80,13 +80,13 @@ import functionaltests.RMTHelper;
  */
 public class DynamicSelectionScriptTest extends RMConsecutive {
 
-    private URL vmPropSelectionScriptpath = this.getClass().getResource("vmPropertySelectionScript.js");
+    private URL vmPropSelectionScriptpath = this.getClass().getResource("vmPropertySelectionScript.groovy");
 
     private URL badSelectionScriptpath = this.getClass().getResource("badSelectionScript.js");
 
     private URL withoutSelectedSelectionScriptpath = this.getClass().getResource("withoutSelectedSScript.js");
 
-    private URL fileCheckScriptPath = this.getClass().getResource("fileCheck.js");
+    private URL fileCheckScriptPath = this.getClass().getResource("fileCheck.groovy");
 
     private String vmPropKey = "myProperty";
     private String vmPropValue = "myValue";

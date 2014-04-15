@@ -1,10 +1,7 @@
-importPackage(java.io);
-
-
-var f = new File(args[0] + "/line");
+var f = new java.io.File(args[0] + "/line");
 
 if (f.exists()) {
-	var input = new BufferedReader(new FileReader(f));
+	var input = new java.io.BufferedReader(new FileReader(f));
 	var len = input.readLine().length();
 	input.close();
 

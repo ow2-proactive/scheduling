@@ -7,8 +7,8 @@ var selected = false;
 
 var osb = java.lang.management.ManagementFactory.getOperatingSystemMXBean();
 var mem = osb.getFreePhysicalMemorySize()/1024;
-println(mem+" Kb available");
+print(mem+" Kb available");
 //var swap = osb.getFreeSwapSpaceSize()/1024;
 //print(swap+" Kb");
 selected=java.lang.Integer.parseInt(mem)>java.lang.Integer.parseInt(args[0]);
-println("FreeMem check : "+selected);
+print("FreeMem check : "+selected);

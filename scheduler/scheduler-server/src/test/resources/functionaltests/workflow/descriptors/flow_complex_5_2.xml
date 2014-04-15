@@ -24,24 +24,24 @@
       <controlFlow block="end" >
         <loop target="T">
           <script>
-            <code language="javascript">
+            <code language="groovy">
 // <![CDATA[
-importPackage(java.io);
-var ID   = 1 + "_" + $REP;
-var RUNS = 3;
-var f = new File(java.lang.System.getProperty("java.io.tmpdir"), "fc_5_2_1" + ID);
-var it = 0;
+
+def ID   = 1 + "_" + $REP;
+def RUNS = 3;
+def f = new File(java.lang.System.getProperty("java.io.tmpdir"), "fc_5_2_1" + ID);
+def it = 0;
 if (f.exists()) {
-var input = new BufferedReader(new FileReader(f));
+def input = new BufferedReader(new FileReader(f));
 it = java.lang.Integer.parseInt(input.readLine());
 input.close();
-f["delete"]();
+f.delete();
 }
 it++;
 if (it < RUNS) {
 loop = true;
 f.createNewFile();
-var output = new BufferedWriter(new FileWriter(f));
+def output = new BufferedWriter(new FileWriter(f));
 output.write("" + it);
 output.close();
 } else {
@@ -91,25 +91,25 @@ runs = 3;
       <controlFlow block="end" >
         <loop target="T4">
           <script>
-            <code language="javascript">
+            <code language="groovy">
 // <![CDATA[
 
-importPackage(java.io);
-var ID   = 2 + "_" + $REP;
-var RUNS = 3;
-var f = new File(java.lang.System.getProperty("java.io.tmpdir"), "fc_5_2_2" + ID);
-var it = 0;
+
+def ID   = 2 + "_" + $REP;
+def RUNS = 3;
+def f = new File(java.lang.System.getProperty("java.io.tmpdir"), "fc_5_2_2" + ID);
+def it = 0;
 if (f.exists()) {
-var input = new BufferedReader(new FileReader(f));
+def input = new BufferedReader(new FileReader(f));
 it = java.lang.Integer.parseInt(input.readLine());
 input.close();
-f["delete"]();
+f.delete();
 }
 it++;
 if (it < RUNS) {
 loop = true;
 f.createNewFile();
-var output = new BufferedWriter(new FileWriter(f));
+def output = new BufferedWriter(new FileWriter(f));
 output.write("" + it);
 output.close();
 } else {

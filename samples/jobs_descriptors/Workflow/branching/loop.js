@@ -1,12 +1,9 @@
-importPackage(java.io);
-
-
-var inFile = new File(args[0] + "/input");
-var outFile = new File(args[0] + "/output");
+var inFile = new java.io.File(args[0] + "/input");
+var outFile = new java.io.File(args[0] + "/output");
 
 if (inFile.exists() && outFile.exists()) {
-	var input = new BufferedReader(new FileReader(inFile));
-	var output = new BufferedReader(new FileReader(outFile));
+	var input = new java.io.BufferedReader(new FileReader(inFile));
+	var output = new java.io.BufferedReader(new FileReader(outFile));
 
 	var inLines = 0;
 	var outLines = 0;

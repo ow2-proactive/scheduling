@@ -1,3 +1,8 @@
+try {
+    load("nashorn:mozilla_compat.js");
+} catch (e) {
+}
+
 importPackage(java.lang);
 importPackage(java.io);
 importPackage(java.util);

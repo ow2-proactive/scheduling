@@ -38,10 +38,6 @@ package functionaltests.taskkill;
 
 import java.util.List;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 import org.objectweb.proactive.core.node.Node;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -55,6 +51,10 @@ import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
 import org.ow2.tests.FunctionalTest;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 import functionaltests.RMTHelper;
 import functionaltests.SchedulerTHelper;
@@ -86,7 +86,7 @@ public class TestKillTaskWhileExecutingScripts extends FunctionalTest {
     public void init() throws Throwable {
         if (!shouldBeExecuted()) return;
 
-        endlessScript = new SimpleScript("file = new java.io.File(java.lang.System.getProperty(\"java.io.tmpdir\"),\"started.ok\");file.createNewFile();while(true){java.lang.Thread.sleep(500);}","javascript");
+        endlessScript = new SimpleScript("file = new java.io.File(java.lang.System.getProperty(\"java.io.tmpdir\"),\"started.ok\");file.createNewFile();while(true){java.lang.Thread.sleep(500);}","groovy");
         SchedulerTHelper.startScheduler();
     }
 

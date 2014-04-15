@@ -1,7 +1,6 @@
 /* Add all jars passed as parameters to the classpath of the forked JVM */
 /* Those jars must be available in the global space */
 
-importPackage(java.lang);
 for(i=0;i<args.length;i++) {
 	try{
 		myjar = globalspace.resolveFile(args[i]);
@@ -11,7 +10,7 @@ for(i=0;i<args.length;i++) {
         }
 		forkEnvironment.addAdditionalClasspath(path);
 	} catch(e) {
-		e.printStackTrace();
+		println(e)
 		throw e;
 	}
 }

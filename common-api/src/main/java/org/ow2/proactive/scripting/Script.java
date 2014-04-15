@@ -58,6 +58,7 @@ import javax.script.ScriptEngineManager;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.utils.BoundedStringWriter;
+import org.ow2.proactive.utils.FileUtils;
 import org.apache.log4j.Logger;
 
 
@@ -127,7 +128,7 @@ public abstract class Script<E> implements Serializable {
      * @throws InvalidScriptException if the creation fails.
      */
     public Script(File file, String[] parameters) throws InvalidScriptException {
-        this.scriptEngineLookup = file.getPath();
+        this.scriptEngineLookup = FileUtils.getExtension(file.getPath());
 
         try {
             script = readFile(file);
@@ -152,7 +153,7 @@ public abstract class Script<E> implements Serializable {
      * @throws InvalidScriptException if the creation fails.
      */
     public Script(URL url, String[] parameters) throws InvalidScriptException {
-        this.scriptEngineLookup = url.getFile();
+        this.scriptEngineLookup = FileUtils.getExtension(url.getFile());
 
         try {
             storeScript(url);

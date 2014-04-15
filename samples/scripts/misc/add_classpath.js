@@ -7,7 +7,7 @@ for(i=0;i<args.length;i++) {
 		myjar.copyFrom(input.resolveFile(args[i]), org.objectweb.proactive.extensions.dataspaces.api.FileSelector.SELECT_SELF);
 		forkEnvironment.addAdditionalClasspath(new java.net.URI(myjar.getRealURI()).getPath());
 	} catch(e) {
-		e.printStackTrace();
+		println(e)
 		throw e;
 	}
 }

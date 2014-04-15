@@ -77,7 +77,7 @@ import functionaltests.RMTHelper;
  */
 public class SelectionWithSeveralScriptsTest2 extends RMConsecutive {
 
-    private URL vmPropSelectionScriptpath = this.getClass().getResource("vmPropertySelectionScript.js");
+    private URL vmPropSelectionScriptpath = this.getClass().getResource("vmPropertySelectionScript.groovy");
 
     private String vmPropKey1 = "myProperty1";
     private String vmPropValue1 = "myValue1";

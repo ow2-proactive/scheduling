@@ -79,7 +79,7 @@ import static junit.framework.Assert.assertTrue;
  */
 public class StaticSelectionScriptTest extends RMConsecutive {
 
-    private URL vmPropSelectionScriptpath = this.getClass().getResource("vmPropertySelectionScript.js");
+    private URL vmPropSelectionScriptpath = this.getClass().getResource("vmPropertySelectionScript.groovy");
 
     private URL badSelectionScriptpath = this.getClass().getResource("badSelectionScript.js");
 

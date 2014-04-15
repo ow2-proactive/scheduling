@@ -71,35 +71,23 @@ public class TestDataspaceScripts extends SchedulerConsecutive {
     private static final String folderMacro = "!FOLDER";
 
     private static final String scriptContent = ""
-        + "importPackage(org.objectweb.proactive.extensions.dataspaces.api); \n" //
-        + "importPackage(java.io); \n" //
-        + "var spaces = [\"" +
-        TaskLauncher.DS_INPUT_BINDING_NAME +
-        "\",\"" +
-        TaskLauncher.DS_OUTPUT_BINDING_NAME +
-        "\",\"" +
-        TaskLauncher.DS_SCRATCH_BINDING_NAME +
-        "\",\"" +
-        TaskLauncher.DS_GLOBAL_BINDING_NAME +
-        "\",\"" +
-        TaskLauncher.DS_USER_BINDING_NAME +
-        "\"];" +
-        "for(i=0; i < spaces.length; i++) { " +
-        "  var f = eval(spaces[i]).resolveFile(\"" +
+        + "def spaces = [input:input, localspace:localspace, output:output, user:user, global:global]; \n" +
+        "spaces.each { " +
+        "  def f = it.value.resolveFile(\"" +
         fileName +
         "\"); \n" //
         +
-        "  var br = new BufferedReader(new InputStreamReader(f.getContent().getInputStream())); \n" //
+        "  def br = new BufferedReader(new InputStreamReader(f.getContent().getInputStream())); \n" //
         +
-        "  var out = new PrintWriter(new BufferedWriter(new FileWriter(new File(new File('"+folderMacro+"'),\"out_" +
+        "  def out = new PrintWriter(new BufferedWriter(new FileWriter(new File(new File('"+folderMacro+"'),\"out_" +
         typeMacro +
-        "_\"+spaces[i])))); \n" //
-        + "  var line; \n" //
+        "_\"+it.key)))); \n" //
+        + "  def line; \n" //
         + "  while ((line = br.readLine()) != null) { \n" //
         + "    out.println(line); \n" //
         + "   } \n" //
         + "  out.close(); \n" //
-        + "}" //
+        + "} \n" //
         + "loop=false;"; //
 
     /**
@@ -163,9 +151,9 @@ public class TestDataspaceScripts extends SchedulerConsecutive {
         String windowsReadyResultsPath = results.getAbsolutePath().replace("\\", "/"); // for the JS engine on Windows
         String scriptContentFiltered = scriptContent.replaceAll(folderMacro, windowsReadyResultsPath);
 
-        t.setPreScript(new SimpleScript(scriptContentFiltered.replaceAll(typeMacro, "pre"), "javascript"));
-        t.setPostScript(new SimpleScript(scriptContentFiltered.replaceAll(typeMacro, "post"), "javascript"));
-        t.setFlowScript(FlowScript.createLoopFlowScript(scriptContentFiltered.replaceAll(typeMacro, "flow"), "T"));
+        t.setPreScript(new SimpleScript(scriptContentFiltered.replaceAll(typeMacro, "pre"), "groovy"));
+        t.setPostScript(new SimpleScript(scriptContentFiltered.replaceAll(typeMacro, "post"), "groovy"));
+        t.setFlowScript(FlowScript.createLoopFlowScript(scriptContentFiltered.replaceAll(typeMacro, "flow"), "groovy", "T"));
 
         /**
          * job submission, wait on result, removal

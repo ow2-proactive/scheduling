@@ -1,3 +1,8 @@
+try {
+    load("nashorn:mozilla_compat.js");
+} catch (e) {
+}
+
 importClass(org.ow2.proactive.scripting.helper.selection.Condition);
 importClass(org.ow2.proactive.scripting.helper.selection.Conditions);
 importClass(org.ow2.proactive.scripting.helper.selection.SelectionUtils);

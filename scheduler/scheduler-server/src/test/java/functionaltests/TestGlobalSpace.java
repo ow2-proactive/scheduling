@@ -98,18 +98,17 @@ public class TestGlobalSpace extends FunctionalTest {
     }
 
     private static final String scriptA = "" + //
-        "importPackage(java.io);                               \n" + //
-        "var out;                                              \n" + //
-        "var arr = " + inFileArr + ";                          \n" + //
-        "for (var i=0; i < arr.length; i++) {                  \n" + //
-        "  var input = localspace.resolveFile(arr[i]);         \n" + //
+        "def out;                                              \n" + //
+        "def arr = " + inFileArr + ";                          \n" + //
+        "for (def i=0; i < arr.size(); i++) {                  \n" + //
+        "  def input = localspace.resolveFile(arr[i]);         \n" + //
         "  if (! input) continue;                              \n" + //
-        "  var br = input.getContent().getInputStream();       \n" + //
-        "  var ff = localspace.resolveFile(                    \n" + //
+        "  def br = input.getContent().getInputStream();       \n" + //
+        "  def ff = localspace.resolveFile(                    \n" + //
         "     arr[i] + \".glob.A\");\n                         \n" + //
         "  ff.createFile();                                    \n" + //
         "  out = ff.getContent().getOutputStream();            \n" + //
-        "  var c;                                              \n" + //
+        "  def c;                                              \n" + //
         "  while ((c = br.read()) > 0) {                       \n" + //
         "    out.write(c);                                     \n" + //
         "  }                                                   \n" + //
@@ -119,21 +118,20 @@ public class TestGlobalSpace extends FunctionalTest {
         "";
 
     private static final String scriptB = "" + //
-        "importPackage(java.io);                               \n" + //
-        "var out;                                              \n" + //
-        "var arr = " + inFileArr + ";                          \n" + //
-        "for (var i=0; i < arr.length; i++) {                  \n" + //
-        "  var input = localspace.resolveFile(                 \n" + //
+        "def out;                                              \n" + //
+        "def arr = " + inFileArr + ";                          \n" + //
+        "for (def i=0; i < arr.size(); i++) {                  \n" + //
+        "  def input = localspace.resolveFile(                 \n" + //
         "      arr[i] + \".glob.A\");                          \n" + //
         "  if (! input.exists()) {                             \n" + //
         "    continue;                                         \n" + //
         "  }                                                   \n" + //
-        "  var br = input.getContent().getInputStream();       \n" + //
-        "  var ff = localspace.resolveFile(                    \n" + //
+        "  def br = input.getContent().getInputStream();       \n" + //
+        "  def ff = localspace.resolveFile(                    \n" + //
         "     arr[i] + \".out\");\n                            \n" + //
         "  ff.createFile();                                    \n" + //
         "  out = ff.getContent().getOutputStream();            \n" + //
-        "  var c;                                              \n" + //
+        "  def c;                                              \n" + //
         "  while ((c = br.read()) > 0) {                       \n" + //
         "    out.write(c);                                     \n" + //
         "  }                                                   \n" + //
@@ -172,7 +170,7 @@ public class TestGlobalSpace extends FunctionalTest {
             A.addInputFiles(file[0], InputAccessMode.TransferFromInputSpace);
             A.addOutputFiles(file[0] + ".glob.A", OutputAccessMode.TransferToGlobalSpace);
         }
-        A.setPreScript(new SimpleScript(scriptA, "javascript"));
+        A.setPreScript(new SimpleScript(scriptA, "groovy"));
         job.addTask(A);
 
         JavaTask B = new JavaTask();
@@ -183,7 +181,7 @@ public class TestGlobalSpace extends FunctionalTest {
             B.addInputFiles(file[0] + ".glob.A", InputAccessMode.TransferFromGlobalSpace);
             B.addOutputFiles(file[0] + ".out", OutputAccessMode.TransferToOutputSpace);
         }
-        B.setPreScript(new SimpleScript(scriptB, "javascript"));
+        B.setPreScript(new SimpleScript(scriptB, "groovy"));
         job.addTask(B);
 
         Scheduler sched = SchedulerTHelper.getSchedulerInterface();

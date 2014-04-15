@@ -42,7 +42,6 @@ import java.io.FileReader;
 import java.net.URL;
 import java.util.Map.Entry;
 
-import org.junit.Assert;
 import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
@@ -52,6 +51,7 @@ import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scripting.SimpleScript;
+import org.junit.Assert;
 
 import functionaltests.SchedulerConsecutive;
 import functionaltests.SchedulerTHelper;
@@ -75,42 +75,33 @@ public class TestWorkflowIterationAwareness extends SchedulerConsecutive {
             .getResource("/functionaltests/workflow/descriptors/flow_it_2.xml");
 
     private static final String preScript = //
-    "importPackage(java.io); \n" //
-        +
-        "var f = new File(\"" + System.getProperty("java.io.tmpdir") + "/PRE_$IT_$REP\"); \n" + //
+        "def f = new File(\"" + System.getProperty("java.io.tmpdir") + "/PRE_$IT_$REP\"); \n" + //
         "f.createNewFile(); \n";
 
     private static final String preScriptWindows = //
-    "importPackage(java.io); \n" //
-        +
-        "var f = new File(\"" + tmp_dir_Windows.replace("\\", "\\\\") + "PRE_$IT_$REP\"); \n" + //
+        "def f = new File(\"" + tmp_dir_Windows.replace("\\", "\\\\") + "PRE_$IT_$REP\"); \n" + //
 
         "f.createNewFile(); \n";
 
     private static final String postScript = //
-    "importPackage(java.io); \n" //
-        +
-        "var f = new File(\"" //
+        "def f = new File(\"" //
         + System.getProperty("java.io.tmpdir") + "/POST_$IT_$REP\"); \n" //
         + "f.createNewFile(); \n";
 
     private static final String postScriptWindows = //
-    "importPackage(java.io); \n" //
-        +
-        "var f = new File(\"" //
+        "def f = new File(\"" //
         + tmp_dir_Windows.replace("\\", "\\\\") + "POST_$IT_$REP\"); \n" //
         + "f.createNewFile(); \n";
 
     private static final String dupScript = "enabled = true; \n" + "runs = 2; \n";
 
     private static final String loopScript = //
-    "importPackage(java.io); \n" //
-        + "var ID   = 3; \n" //
-        + "var RUNS = 2; \n" //
-        + "var f = new File(java.lang.System.getProperty(\"java.io.tmpdir\"), \"test_flow_lock_\" + ID); \n" //
-        + "var it = 0; \n" //
+         "defID   = 3; \n" //
+        + "defRUNS = 2; \n" //
+        + "def f = new File(java.lang.System.getProperty(\"java.io.tmpdir\"), \"test_flow_lock_\" + ID); \n" //
+        + "defit = 0; \n" //
         + "if (f.exists()) { \n" //
-        + "var input = new BufferedReader(new FileReader(f)); \n" //
+        + "definput = new BufferedReader(new FileReader(f)); \n" //
         + "it = java.lang.Integer.parseInt(input.readLine()); \n" + "input.close(); \n" //
         + "f[\"delete\"](); \n" //
         + "} \n" //
@@ -118,7 +109,7 @@ public class TestWorkflowIterationAwareness extends SchedulerConsecutive {
         + "if (it < RUNS) { \n" //
         + "loop = true; \n" //
         + "f.createNewFile(); \n" //
-        + "var output = new BufferedWriter(new FileWriter(f)); \n" //
+        + "defoutput = new BufferedWriter(new FileWriter(f)); \n" //
         + "output.write(\"\" + it); \n" //
         + "output.close(); \n" //
         + "} else { \n" //
@@ -153,12 +144,12 @@ public class TestWorkflowIterationAwareness extends SchedulerConsecutive {
                 new File(java_job.toURI()).getAbsolutePath());
         switch (OperatingSystem.getOperatingSystem()) {
             case windows:
-                ((JavaTask) job.getTask("T1")).setPreScript(new SimpleScript(preScriptWindows, "js"));
-                ((JavaTask) job.getTask("T1")).setPostScript(new SimpleScript(postScriptWindows, "js"));
+                ((JavaTask) job.getTask("T1")).setPreScript(new SimpleScript(preScriptWindows, "groovy"));
+                ((JavaTask) job.getTask("T1")).setPostScript(new SimpleScript(postScriptWindows, "groovy"));
                 break;
             case unix:
-                ((JavaTask) job.getTask("T1")).setPreScript(new SimpleScript(preScript, "js"));
-                ((JavaTask) job.getTask("T1")).setPostScript(new SimpleScript(postScript, "js"));
+                ((JavaTask) job.getTask("T1")).setPreScript(new SimpleScript(preScript, "groovy"));
+                ((JavaTask) job.getTask("T1")).setPostScript(new SimpleScript(postScript, "groovy"));
                 break;
             default:
                 throw new IllegalStateException("Unsupported operating system");
@@ -197,16 +188,16 @@ public class TestWorkflowIterationAwareness extends SchedulerConsecutive {
                 new File(native_job.toURI()).getAbsolutePath());
         switch (OperatingSystem.getOperatingSystem()) {
             case windows:
-                ((NativeTask) job.getTask("T1")).setPreScript(new SimpleScript(preScriptWindows, "js"));
-                ((NativeTask) job.getTask("T1")).setPostScript(new SimpleScript(postScriptWindows, "js"));
+                ((NativeTask) job.getTask("T1")).setPreScript(new SimpleScript(preScriptWindows, "groovy"));
+                ((NativeTask) job.getTask("T1")).setPostScript(new SimpleScript(postScriptWindows, "groovy"));
                 String[] tab = ((NativeTask) job.getTask("T1")).getCommandLine();
                 tab[0] = "\"" + tab[0].replace("it.sh", "it.bat") + "\"";
                 tab[1] = tmp_dir_Windows;
                 ((NativeTask) job.getTask("T1")).setCommandLine(tab);
                 break;
             case unix:
-                ((NativeTask) job.getTask("T1")).setPreScript(new SimpleScript(preScript, "js"));
-                ((NativeTask) job.getTask("T1")).setPostScript(new SimpleScript(postScript, "js"));
+                ((NativeTask) job.getTask("T1")).setPreScript(new SimpleScript(preScript, "groovy"));
+                ((NativeTask) job.getTask("T1")).setPostScript(new SimpleScript(postScript, "groovy"));
                 break;
             default:
                 throw new IllegalStateException("Unsupported operating system");

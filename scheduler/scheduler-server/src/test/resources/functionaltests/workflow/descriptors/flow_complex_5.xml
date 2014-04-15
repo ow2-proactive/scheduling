@@ -77,25 +77,25 @@ runs = 2;
       <controlFlow block="end" >
         <loop target="T5">
           <script>
-            <code language="javascript">
+            <code language="groovy">
 // <![CDATA[
 
-importPackage(java.io);
-var ID   = 9 + "_" + $REP;
-var RUNS = 2;
-var f = new File(java.lang.System.getProperty("java.io.tmpdir"), "fc5_1" + ID);
-var it = 0;
+
+def ID   = 9 + "_" + $REP;
+def RUNS = 2;
+def f = new File(java.lang.System.getProperty("java.io.tmpdir"), "fc5_1" + ID);
+def it = 0;
 if (f.exists()) {
-var input = new BufferedReader(new FileReader(f));
+def input = new BufferedReader(new FileReader(f));
 it = java.lang.Integer.parseInt(input.readLine());
 input.close();
-f["delete"]();
+f.delete();
 }
 it++;
 if (it < RUNS) {
 loop = true;
 f.createNewFile();
-var output = new BufferedWriter(new FileWriter(f));
+def output = new BufferedWriter(new FileWriter(f));
 output.write("" + it);
 output.close();
 } else {
@@ -119,25 +119,25 @@ loop = false;
       <controlFlow block="end" >
         <loop target="T1">
           <script>
-            <code language="javascript">
+            <code language="groovy">
 // <![CDATA[
 
-importPackage(java.io);
-var ID   = 4 + "_" + $REP;
-var RUNS = 2;
-var f = new File(java.lang.System.getProperty("java.io.tmpdir"), "fc5_2" + ID);
-var it = 0;
+
+def ID   = 4 + "_" + $REP;
+def RUNS = 2;
+def f = new File(java.lang.System.getProperty("java.io.tmpdir"), "fc5_2" + ID);
+def it = 0;
 if (f.exists()) {
-var input = new BufferedReader(new FileReader(f));
+def input = new BufferedReader(new FileReader(f));
 it = java.lang.Integer.parseInt(input.readLine());
 input.close();
-f["delete"]();
+f.delete();
 }
 it++;
 if (it < RUNS) {
 loop = true;
 f.createNewFile();
-var output = new BufferedWriter(new FileWriter(f));
+def output = new BufferedWriter(new FileWriter(f));
 output.write("" + it);
 output.close();
 } else {

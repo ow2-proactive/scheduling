@@ -57,8 +57,9 @@ import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.FileToBytesConverter;
 import org.ow2.proactive.utils.NodeSet;
 import org.ow2.tests.FunctionalTest;
-import functionaltests.RMTHelper;
 import junit.framework.Assert;
+
+import functionaltests.RMTHelper;
 
 
 /**
@@ -80,7 +81,7 @@ import junit.framework.Assert;
 public class SelectionTest extends FunctionalTest {
 
     private String vmPropSelectionScriptpath = this.getClass().getResource(
-            "/functionaltests/selectionscript/vmPropertySelectionScript.js").getPath();
+      "/functionaltests/selectionscript/vmPropertySelectionScript.groovy").getPath();
 
     private String vmPropKey1 = "myProperty1";
     private String vmPropValue1 = "myValue1";

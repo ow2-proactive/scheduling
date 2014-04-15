@@ -1,8 +1,4 @@
-importPackage(java.lang);
-importPackage(java.io);
-importPackage(java.util);
-
-if(System.getProperty("os.name").contains("Windows"))
+if(java.lang.System.getProperty("os.name").contains("Windows"))
 {
 	//windows verification
         for(i=0; i<args.length; i++) {
@@ -19,7 +15,7 @@ else
 	print("unix node \n");
 	for(i=0; i<args.length; i++) {
 		print("testing : "+args[i]+"\n");
-		commandToken= new StringTokenizer(args[i]).nextToken();
+		commandToken= new java.util.StringTokenizer(args[i]).nextToken();
 		if( (commandToken.startsWith("/") ||commandToken.startsWith("./") || commandToken.startsWith("../"))) {
 			cmds= new Array;
                         cmds[0]="/bin/sh";

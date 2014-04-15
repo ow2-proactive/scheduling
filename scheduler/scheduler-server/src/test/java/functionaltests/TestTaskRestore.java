@@ -253,15 +253,15 @@ public class TestTaskRestore extends FunctionalTest {
         return new SimpleScript(String.format("print('%s')", scriptOutput), "js");
     }
 
-    static final String CREATE_FILE_SCRIPT_CONTENT = "if (!new java.io.File(args[0]).exists()) { print('Going to create file ' + args[0]); if (!new java.io.File(args[0]).createNewFile()) { throw new java.lang.Exception(); } } selected=true;";
+    static final String CREATE_FILE_SCRIPT_CONTENT = "if (!new java.io.File(args[0]).exists()) { print('Going to create file ' + args[0]); if (!new java.io.File(args[0]).createNewFile()) { throw new java.lang.Exception(); } } ; selected=true;";
 
     static SimpleScript createFileCreatingScript(String fileName) throws Exception {
-        SimpleScript script = new SimpleScript(CREATE_FILE_SCRIPT_CONTENT, "js", new String[] { fileName });
+        SimpleScript script = new SimpleScript(CREATE_FILE_SCRIPT_CONTENT, "groovy", new String[] { fileName });
         return script;
     }
 
     static SelectionScript createFileCreatingSelectionScript(String fileName) throws Exception {
-        SelectionScript script = new SelectionScript(CREATE_FILE_SCRIPT_CONTENT, "js",
+        SelectionScript script = new SelectionScript(CREATE_FILE_SCRIPT_CONTENT, "groovy",
             new String[] { fileName }, true);
         return script;
     }

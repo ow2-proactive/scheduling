@@ -1,18 +1,13 @@
-importPackage(java.lang);
-importPackage(java.io);
-importPackage(java.util);
-importPackage(org.objectweb.proactive.api);
-importPackage(org.objectweb.proactive.core.node);
-importPackage(org.objectweb.proactive.extensions.dataspaces.core);
-importPackage(org.objectweb.proactive.extensions.dataspaces.api);
-importPackage(org.objectweb.proactive.extensions.dataspaces.vfs.selector.fast);
 
-// Awaited arguments:
+// Awaited args:
 // args[0] = url of the naming service
 // args[1..n] = command
 
 var url = args[0];
-var cmd = Arrays.copyOfRange(args, 1, args.length);
+var cmd = [];
+for(i=1;i<args.length;i++) {
+    cmd[i-1] = args[i]
+}
 
 var localNode = null;
 var process = null;
@@ -23,29 +18,29 @@ try {
 	// Init dataspaces
 	try {
 
-		localNode = PAActiveObject.getActiveObjectNode(PAActiveObject.getStubOnThis());
-	        DataSpacesNodes.configureApplication(localNode, 0xcafe, url);
-		var localSpaceRoot = PADataSpaces.resolveScratchForAO();
-		var remoteSpaceRoot = PADataSpaces.resolveOutput(PADataSpaces.DEFAULT_IN_OUT_NAME);
+		localNode = org.objectweb.proactive.api.PAActiveObject.getActiveObjectNode(org.objectweb.proactive.api.PAActiveObject.getStubOnThis());
+        org.objectweb.proactive.extensions.dataspaces.core.DataSpacesNodes.configureApplication(localNode, 0xcafe, url);
+		var localSpaceRoot = org.objectweb.proactive.extensions.dataspaces.api.PADataSpaces.resolveScratchForAO();
+		var remoteSpaceRoot = org.objectweb.proactive.extensions.dataspaces.api.PADataSpaces.resolveOutput(org.objectweb.proactive.extensions.dataspaces.api.PADataSpaces.DEFAULT_IN_OUT_NAME);
 		var inputDsfo = remoteSpaceRoot.findFiles(org.objectweb.proactive.extensions.dataspaces.api.FileSelector.SELECT_SELF).get(0);
-		localSpaceRoot.copyFrom(inputDsfo, FileSelector.SELECT_ALL);
+		localSpaceRoot.copyFrom(inputDsfo, org.objectweb.proactive.extensions.dataspaces.api.FileSelector.SELECT_ALL);
 		localSpaceDir = localSpaceRoot.getRealURI().replace("file://", "");
 	} catch (e) {
-	   	throw "Unable to copy files from remote dataspace: " + e.javaException;
+	   	throw "Unable to copy files from remote dataspace: " + e;
 	}
 
-	var pb = new ProcessBuilder(cmd);
+	var pb = new java.lang.ProcessBuilder(cmd);
 	pb.redirectErrorStream(true);
 	pb.directory(new File(localSpaceDir));
 
 	try {
 		process = pb.start();
 	} catch (e) {
-		throw "Unable to start native process: " + e.javaException;
+		throw "Unable to start native process: " + e;
 	}
 
-	var isr = new InputStreamReader(process.getInputStream());
-	var br = new BufferedReader(isr);
+	var isr = new java.io.InputStreamReader(process.getInputStream());
+	var br = new java.io.BufferedReader(isr);
 
 	var lineRead;
 	try {
@@ -53,7 +48,7 @@ try {
 			println(lineRead);
 		}
 	} catch (e) {
-		throw "Unable to read native process output: " + e.javaException;
+		throw "Unable to read native process output: " + e;
 	}
 
 	var exitValue = -1;
@@ -61,7 +56,7 @@ try {
 		rc = process.waitFor();
 	} catch (e) {
 		// Can be an InterruptedException
-		if (e.javaException instanceof InterruptedException){
+		if (e.javaException instanceof java.lang.InterruptedException){
 			Thread.currentThread().interrupt();
 		} else {
 			throw "Unable to wait for the end of native process: " +  e;
@@ -75,8 +70,8 @@ try {
 
 	// Close dataspaces
 	try {
-		DataSpacesNodes.tryCloseNodeApplicationConfig(localNode);
+        org.objectweb.proactive.extensions.dataspaces.core.DataSpacesNodes.tryCloseNodeApplicationConfig(localNode);
 	} catch (e) {
-		println("Unable to close dataspaces: " + e.javaException);
+		println("Unable to close dataspaces: " + e);
 	}
 }
