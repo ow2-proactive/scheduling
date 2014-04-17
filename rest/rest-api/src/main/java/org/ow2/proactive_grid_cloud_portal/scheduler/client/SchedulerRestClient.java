@@ -34,6 +34,9 @@
  */
 package org.ow2.proactive_grid_cloud_portal.scheduler.client;
 
+import static org.apache.commons.io.FileUtils.copyInputStreamToFile;
+
+import java.io.File;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
@@ -123,7 +126,42 @@ public class SchedulerRestClient {
         }
         return response.readEntity(Boolean.class);
     }
-
+    
+    public void pullFile(String sessionId, String space, String path, String outputPath) throws Exception {
+        String uriTmpl = (new StringBuilder(restEndpointURL)).append(addSlashIfMissing(restEndpointURL))
+                .append("scheduler/dataspace/").append(space).append(URLEncoder.encode(path, "UTF-8"))
+                .toString();
+        ResteasyClient client = new ResteasyClientBuilder().httpEngine(httpEngine).build();
+        ResteasyWebTarget target = client.target(uriTmpl);
+        Response response = target.request().header("sessionid", sessionId).get();
+        if (response.getStatus() != HttpURLConnection.HTTP_OK) {
+            if (response.getStatus() == HttpURLConnection.HTTP_UNAUTHORIZED) {
+                throw new NotConnectedRestException("User not authenticated or session timeout.");
+            } else {
+                throw new Exception(String.format("Cannot retrieve the file. Status code: %s",
+                        response.getStatus()));
+            }
+        }
+        try {
+            File file = new File(outputPath);
+            if (response.hasEntity()) {
+                copyInputStreamToFile(response.readEntity(InputStream.class), file);
+            } else {
+                // creates an empty file
+                file.createNewFile();
+            }
+        } catch (Exception e) {
+            throw e;
+        } finally {
+            if (response != null) {
+                response.close();
+            }
+            if (!client.isClosed()) {
+                client.close();
+            }
+        }
+    }
+    
     private JobIdData submit(String sessionId, InputStream job, MediaType mediaType) throws Exception {
         String uriTmpl = restEndpointURL + addSlashIfMissing(restEndpointURL) + "scheduler/submit";
 

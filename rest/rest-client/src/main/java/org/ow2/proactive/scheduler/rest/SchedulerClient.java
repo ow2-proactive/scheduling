@@ -715,17 +715,10 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     @Override
     public void pullFile(String space, String pathname, String outputFile) throws NotConnectedException,
             PermissionException {
-        InputStream inputStream = null;
-        OutputStream outputStream = null;
         try {
-            outputStream = prepareToWrite(outputFile);
-            inputStream = restApi().pullFile(sid, space, pathname);
-            copy(inputStream, outputStream);
+            restApiClient().pullFile(sid, space, pathname, outputFile);
         } catch (Exception e) {
             throwNCEOrPE(e);
-        } finally {
-            closeIfPossible(outputStream);
-            closeIfPossible(inputStream);
         }
     }
 
