@@ -42,6 +42,7 @@ import java.util.Set;
 
 import javax.management.InstanceNotFoundException;
 import javax.management.IntrospectionException;
+import javax.management.MBeanException;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
@@ -200,6 +201,18 @@ public interface RMRestInterface {
     @GET
     @GZIP
     @Produces("application/json")
+    @Path("node/mbean/history")
+    Object getNodeMBeanHistory(@HeaderParam("sessionid")
+                            String sessionId, @QueryParam("nodejmxurl")
+                            String nodeJmxUrl, @QueryParam("objectname")
+                            String objectName, @QueryParam("attrs")
+                            List<String> attrs, @QueryParam("range")
+                            String range) throws InstanceNotFoundException, IntrospectionException, ReflectionException,
+            IOException, NotConnectedException, MalformedObjectNameException, NullPointerException, MBeanException;
+
+    @GET
+    @GZIP
+    @Produces("application/json")
     @Path("node/mbeans")
     Object getNodeMBeansInfo(@HeaderParam("sessionid")
     String sessionId, @QueryParam("nodejmxurl")
@@ -207,6 +220,18 @@ public interface RMRestInterface {
     String objectNames, @QueryParam("attrs")
     List<String> attrs) throws InstanceNotFoundException, IntrospectionException, ReflectionException,
             IOException, NotConnectedException, MalformedObjectNameException, NullPointerException;
+
+    @GET
+    @GZIP
+    @Produces("application/json")
+    @Path("node/mbeans/history")
+    Object getNodeMBeansHistory(@HeaderParam("sessionid")
+                               String sessionId, @QueryParam("nodejmxurl")
+                               String nodeJmxUrl, @QueryParam("objectname")
+                               String objectNames, @QueryParam("attrs")
+                               List<String> attrs, @QueryParam("range")
+                               String range) throws InstanceNotFoundException, IntrospectionException, ReflectionException,
+            IOException, NotConnectedException, MalformedObjectNameException, NullPointerException, MBeanException;
 
     @GET
     @Path("shutdown")

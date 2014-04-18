@@ -37,21 +37,30 @@
 package org.ow2.proactive.resourcemanager.node.jmx;
 
 import java.net.ServerSocket;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
+import javax.management.StandardMBean;
 
 import org.apache.log4j.Logger;
+import org.hyperic.sigar.jmx.AbstractMBean;
 import org.hyperic.sigar.jmx.SigarRegistry;
 import org.ow2.proactive.jmx.AbstractJMXHelper;
+import org.ow2.proactive.jmx.RRDDataStore;
+import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
+import org.ow2.proactive.resourcemanager.utils.RRDSigarDataStore;
 
 
 public class SigarExposer extends AbstractJMXHelper {
 
     private static final Logger LOGGER = Logger.getLogger(SigarExposer.class);
+    private String nodeName;
 
-    public SigarExposer() {
+    public SigarExposer(String nodeName) {
         super(LOGGER);
+        this.nodeName = nodeName;
     }
 
     public void registerMBeans(MBeanServer mbs) {
@@ -64,11 +73,18 @@ public class SigarExposer extends AbstractJMXHelper {
                 mbs.registerMBean(registry, name);
             }
 
+            String dataBaseName = PAResourceManagerProperties.RM_HOME.getValueAsString() +
+                    System.getProperty("file.separator") + "data/" + nodeName + "_statistics.rrd";
+
+            setDataStore(new RRDSigarDataStore(mbs, dataBaseName,
+                    PAResourceManagerProperties.RM_RRD_STEP.getValueAsInt(), Logger.getLogger(SigarExposer.class)));
+
             name = new ObjectName("sigar:Type=Processes");
-            SigarProcessesMXBean processes = new SigarProcesses();
+            SigarProcessesMXBean processes = new SigarProcesses(dataBaseName);
             if (!mbs.isRegistered(name)) {
                 mbs.registerMBean(processes, name);
             }
+
         } catch (Exception e) {
             LOGGER.error("Unable to register SigarRegistry mbean", e);
         }

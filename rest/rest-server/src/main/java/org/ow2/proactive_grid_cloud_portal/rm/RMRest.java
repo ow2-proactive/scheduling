@@ -53,6 +53,7 @@ import javax.management.Attribute;
 import javax.management.AttributeList;
 import javax.management.InstanceNotFoundException;
 import javax.management.IntrospectionException;
+import javax.management.MBeanException;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
@@ -549,6 +550,46 @@ public class RMRest implements RMRestInterface {
     }
 
     /**
+     * Return the statistic history contained in the node RRD database,
+     * without redundancy, in a friendly JSON format.
+     *
+     * @param sessionId a valid session
+     * @param range a String of 5 chars, one for each stat history source, indicating the time range to fetch
+     *      for each source. Each char can be:<ul>
+     *            <li>'a' 1 minute
+     *            <li>'m' 10 minutes
+     *            <li>'h' 1 hour
+     *            <li>'H' 8 hours
+     *            <li>'d' 1 day
+     *            <li>'w' 1 week
+     *            <li>'M' 1 month
+     *            <li>'y' 1 year</ul>
+     * @return a JSON object containing a key for each source
+     * @throws InstanceNotFoundException
+     * @throws IntrospectionException
+     * @throws ReflectionException
+     * @throws IOException
+     * @throws MalformedObjectNameException
+     * @throws NullPointerException
+     * @throws InterruptedException
+     * @throws NotConnectedException
+     */
+    @Override
+    @GET
+    @GZIP
+    @Produces("application/json")
+    @Path("node/mbean/history")
+    public String getNodeMBeanHistory(@HeaderParam("sessionid") String sessionId, @QueryParam("nodejmxurl") String nodeJmxUrl,
+                                      @QueryParam("objectname") String objectName, @QueryParam("attrs") List<String> attrs,
+                                      @QueryParam("range") String range) throws InstanceNotFoundException, IntrospectionException,
+            ReflectionException, IOException, NotConnectedException, MalformedObjectNameException, NullPointerException, MBeanException {
+
+        // checking that still connected to the RM
+        RMProxyUserInterface rmProxy = checkAccess(sessionId);
+        return rmProxy.getNodeMBeanHistory(nodeJmxUrl, objectName, attrs, range);
+    }
+
+    /**
      * Retrieves attributes of the specified mbeans.
      * 
      * @param sessionId current session
@@ -573,6 +614,21 @@ public class RMRest implements RMRestInterface {
         // checking that still connected to the RM
         RMProxyUserInterface rmProxy = checkAccess(sessionId);
         return rmProxy.getNodeMBeansInfo(nodeJmxUrl, objectNames, attrs);
+    }
+
+    @Override
+    @GET
+    @GZIP
+    @Produces("application/json")
+    @Path("node/mbeans/history")
+    public Object getNodeMBeansHistory(@HeaderParam("sessionid") String sessionId, @QueryParam("nodejmxurl") String nodeJmxUrl,
+                                      @QueryParam("objectname") String objectNames, @QueryParam("attrs") List<String> attrs,
+                                      @QueryParam("range") String range) throws InstanceNotFoundException, IntrospectionException,
+            ReflectionException, IOException, NotConnectedException, MalformedObjectNameException, NullPointerException, MBeanException {
+
+        // checking that still connected to the RM
+        RMProxyUserInterface rmProxy = checkAccess(sessionId);
+        return rmProxy.getNodeMBeansHistory(nodeJmxUrl, objectNames, attrs, range);
     }
 
     /**

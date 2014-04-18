@@ -40,7 +40,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 
+import javax.management.AttributeNotFoundException;
 import javax.management.MBeanAttributeInfo;
+import javax.management.MBeanException;
+import javax.management.ReflectionException;
 import javax.management.StandardMBean;
 
 import org.apache.log4j.Logger;
@@ -58,11 +61,18 @@ import org.rrd4j.core.Sample;
 public class RRDDataStore extends Thread {
 
     private StandardMBean mbean;
-    private int step = 4; //secs
-    private String dataBaseFile;
-    private HashMap<String, String> dataSources = new HashMap<String, String>();
-    private volatile boolean terminate = false;
-    private Logger logger;
+    protected int step = 4; //secs
+    protected String dataBaseFile;
+    protected HashMap<String, String> dataSources = new HashMap<String, String>();
+    protected volatile boolean terminate = false;
+    protected Logger logger;
+
+
+    protected RRDDataStore(String dataBaseFilePath, int step, Logger logger) {
+        this.step = step;
+        this.dataBaseFile = dataBaseFilePath;
+        this.logger = logger;
+    }
 
     /**
      * Initializes a new RRD data base if it's not exist.
@@ -75,10 +85,8 @@ public class RRDDataStore extends Thread {
     public RRDDataStore(StandardMBean mbean, String dataBaseFilePath, int step, Logger logger)
             throws IOException {
 
+        this(dataBaseFilePath, step, logger);
         this.mbean = mbean;
-        this.step = step;
-        this.dataBaseFile = dataBaseFilePath;
-        this.logger = logger;
 
         for (MBeanAttributeInfo attrInfo : mbean.getMBeanInfo().getAttributes()) {
             try {
@@ -97,10 +105,18 @@ public class RRDDataStore extends Thread {
             }
         }
 
-        if (!new File(dataBaseFilePath).exists()) {
-            logger.info("Creating a new RRD data base: " + dataBaseFilePath);
+        initDatabase();
 
-            RrdDef rrdDef = new RrdDef(dataBaseFilePath, System.currentTimeMillis() / 1000, step);
+        setName("RRD4J Data Store " + new File(dataBaseFilePath).getName());
+        setDaemon(true);
+        start();
+    }
+
+    protected void initDatabase() throws IOException {
+        if (!new File(dataBaseFile).exists()) {
+            logger.info("Creating a new RRD data base: " + dataBaseFile);
+
+            RrdDef rrdDef = new RrdDef(dataBaseFile, System.currentTimeMillis() / 1000, step);
 
             for (String dataSource : dataSources.keySet()) {
                 rrdDef.addDatasource(dataSource, DsType.GAUGE, 600, 0, Double.NaN);
@@ -134,12 +150,8 @@ public class RRDDataStore extends Thread {
             RrdDb dataBase = new RrdDb(rrdDef);
             dataBase.close();
         } else {
-            logger.info("Using existing RRD database: " + new File(dataBaseFilePath).getAbsolutePath());
+            logger.info("Using existing RRD database: " + new File(dataBaseFile).getAbsolutePath());
         }
-
-        setName("RRD4J Data Store " + new File(dataBaseFilePath).getName());
-        setDaemon(true);
-        start();
     }
 
     /**

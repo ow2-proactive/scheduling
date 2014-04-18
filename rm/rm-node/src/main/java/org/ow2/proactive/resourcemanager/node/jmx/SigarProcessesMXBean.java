@@ -38,7 +38,10 @@ package org.ow2.proactive.resourcemanager.node.jmx;
 
 import org.hyperic.sigar.SigarException;
 
+import java.io.IOException;
+import java.util.List;
 
 public interface SigarProcessesMXBean {
     ProcessInfo[] getProcesses() throws SigarException;
+    String getAttributesHistory(String objectName, String[] attrs, String range) throws IOException;
 }

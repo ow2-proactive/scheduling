@@ -819,7 +819,7 @@ public class RMNodeStarter {
         }
 
         // initializing JMX server with Sigar beans
-        sigarExposer = new SigarExposer();
+        sigarExposer = new SigarExposer(nodeName);
         final RMAuthentication rmAuth = auth;
         sigarExposer.boot(auth, false, new PermissionChecker() {
             public boolean checkPermission(Credentials cred) {

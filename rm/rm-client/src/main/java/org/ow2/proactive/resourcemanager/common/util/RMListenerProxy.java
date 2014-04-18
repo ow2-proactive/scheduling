@@ -47,6 +47,8 @@ import javax.management.Attribute;
 import javax.management.AttributeList;
 import javax.management.InstanceNotFoundException;
 import javax.management.IntrospectionException;
+import javax.management.MBeanException;
+import javax.management.MBeanInfo;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
@@ -268,6 +270,19 @@ public class RMListenerProxy extends RMGroupEventListener {
         }
     }
 
+    public String getNodeMBeanHistory(String nodeJmxUrl, String objectName, List<String> attrs, String range)
+            throws IOException, MalformedObjectNameException, IntrospectionException, InstanceNotFoundException, ReflectionException, MBeanException {
+
+        initNodeConnector(nodeJmxUrl);
+
+        String[] signature = {String.class.getName(), String[].class.getName(), String.class.getName()};
+        Object[] params = new Object[] {objectName, attrs.toArray(new String[] {}), range};
+
+        // use Processes mbean as the entry point
+        return nodeConnector.getMBeanServerConnection().invoke(
+                new ObjectName("sigar:Type=Processes"), "getAttributesHistory", params, signature).toString();
+    }
+
     /**
      * Converts MXBean composite data to json serializable values 
      */
@@ -307,6 +322,23 @@ public class RMListenerProxy extends RMGroupEventListener {
         return results;
     }
 
+    public Object getNodeMBeansHistory(String nodeJmxUrl, String objectNames, List<String> attrs, String range)
+            throws IOException, MalformedObjectNameException, IntrospectionException, InstanceNotFoundException, ReflectionException, MBeanException {
+
+        initNodeConnector(nodeJmxUrl);
+
+        Set<ObjectName> beans = nodeConnector.getMBeanServerConnection().queryNames(
+                new ObjectName(objectNames), null);
+
+        HashMap<String, Object> results = new HashMap<String, Object>();
+        for (ObjectName bean : beans) {
+            results
+                    .put(bean.getCanonicalName(),
+                            getNodeMBeanHistory(nodeJmxUrl, bean.getCanonicalName(), attrs, range));
+        }
+
+        return results;
+    }
     /**
      * Initializes mbean server connection to specified url.
      * If the connection is already established returns existing
@@ -354,4 +386,5 @@ public class RMListenerProxy extends RMGroupEventListener {
             }
         }
     }
+
 }
