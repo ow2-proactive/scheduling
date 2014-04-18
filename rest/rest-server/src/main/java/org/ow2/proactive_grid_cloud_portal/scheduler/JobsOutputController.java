@@ -42,6 +42,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
+import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingService;
 import org.ow2.proactive_grid_cloud_portal.common.Session;
@@ -102,9 +103,14 @@ public class JobsOutputController {
      * @throws NotConnectedException 
      * @throws IOException 
      */
-    public JobOutputAppender createJobOutput(Session ss, String jobId) throws NotConnectedException,
+    public JobOutputAppender createJobOutputAppender(Session ss, String jobId) throws NotConnectedException,
             UnknownJobException, PermissionException, LogForwardingException, IOException {
-        return new JobOutputAppender(ss, jobId, lfs.getAppenderProvider(), new JobOutput());
+
+        JobOutputAppender jobOutputAppender = new JobOutputAppender();
+        lfs.addAppender(Log4JTaskLogs.JOB_LOGGER_PREFIX + jobId, jobOutputAppender);
+        ss.addJobOutputAppender(jobId, jobOutputAppender);
+        ss.getScheduler().listenJobLogs(jobId, lfs.getAppenderProvider());
+        return jobOutputAppender;
     }
 
 }

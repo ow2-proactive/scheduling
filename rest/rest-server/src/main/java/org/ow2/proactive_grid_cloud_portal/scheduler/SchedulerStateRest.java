@@ -55,10 +55,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -439,10 +437,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             JobOutput jo;
             JobOutputAppender jobOutputAppender = ss.getJobOutputAppender(jobId);
             if (jobOutputAppender == null) {
-                jo = JobsOutputController.getInstance().createJobOutput(ss, jobId).getJobOutput();
-            } else {
-                jo = jobOutputAppender.getJobOutput();
+                jobOutputAppender = JobsOutputController.getInstance().createJobOutputAppender(ss, jobId);
             }
+            jo = jobOutputAppender.getJobOutput();
 
             if (jo != null) {
                 return jo.fetchNewLogs();

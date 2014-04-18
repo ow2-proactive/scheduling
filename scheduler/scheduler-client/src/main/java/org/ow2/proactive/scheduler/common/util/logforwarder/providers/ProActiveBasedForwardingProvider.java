@@ -51,6 +51,7 @@ import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingProvider;
 import org.apache.log4j.Appender;
+import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingService;
 
 
 /**
@@ -80,9 +81,14 @@ public class ProActiveBasedForwardingProvider implements LogForwardingProvider {
         }
     }
 
+    @Override
+    public URI createServer(LogForwardingService.LoggingEventProcessor eventProcessor) throws LogForwardingException {
+        return null;
+    }
+
     /* (non-Javadoc)
-     * @see LogForwardingProvider#createServer()
-     */
+         * @see LogForwardingProvider#createServer()
+         */
     public URI createServer() throws LogForwardingException {
         try {
             collectorDeployer = new ProActiveLogCollectorDeployer(ProActiveRuntimeImpl.getProActiveRuntime()

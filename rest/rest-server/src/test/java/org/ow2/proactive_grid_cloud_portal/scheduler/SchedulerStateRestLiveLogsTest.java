@@ -36,23 +36,24 @@
  */
 package org.ow2.proactive_grid_cloud_portal.scheduler;
 
-import java.io.ByteArrayInputStream;
-import java.net.URI;
-
-import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
-import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
-import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
-import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
-import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingProvider;
-import org.ow2.proactive_grid_cloud_portal.RestTestServer;
-import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
-import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStoreTestUtils;
-import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
 import org.apache.log4j.Logger;
 import org.jboss.resteasy.client.ProxyFactory;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
+import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
+import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
+import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
+import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingProvider;
+import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingService;
+import org.ow2.proactive_grid_cloud_portal.RestTestServer;
+import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
+import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStoreTestUtils;
+import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
+
+import java.io.ByteArrayInputStream;
+import java.net.URI;
 
 import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.StringContains.containsString;
@@ -142,6 +143,11 @@ public class SchedulerStateRestLiveLogsTest extends RestTestServer {
 
         @Override
         public URI createServer() throws LogForwardingException {
+            return null;
+        }
+
+        @Override
+        public URI createServer(LogForwardingService.LoggingEventProcessor eventProcessor) throws LogForwardingException {
             return null;
         }
 

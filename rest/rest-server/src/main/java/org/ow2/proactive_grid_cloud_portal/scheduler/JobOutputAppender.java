@@ -49,22 +49,13 @@ import org.apache.log4j.spi.LoggingEvent;
 
 public class JobOutputAppender extends AppenderSkeleton {
 
-    private JobOutput jobOutput = null;
-    private String jobId;
+    private JobOutput jobOutput = new JobOutput();
 
-    public JobOutputAppender(Session ss, String jobId, AppenderProvider ap, JobOutput jobOutput)
+    public JobOutputAppender()
             throws NotConnectedException, UnknownJobException, PermissionException {
         this.name = "Appender for job output";
-        this.jobOutput = jobOutput;
-        this.jobId = jobId;
 
         this.setLayout(Log4JTaskLogs.getTaskLogLayout());
-        Logger log = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + this.jobId);
-        log.setAdditivity(false);
-        log.setLevel(Level.ALL);
-        log.addAppender(this);
-        ss.addJobOutputAppender(jobId, this);
-        ss.getScheduler().listenJobLogs(jobId, ap);
     }
 
     public JobOutput getJobOutput() {
@@ -73,8 +64,6 @@ public class JobOutputAppender extends AppenderSkeleton {
 
     public void terminate() {
         close();
-        Logger log = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + jobId);
-        log.removeAppender(this);
     }
 
     @Override

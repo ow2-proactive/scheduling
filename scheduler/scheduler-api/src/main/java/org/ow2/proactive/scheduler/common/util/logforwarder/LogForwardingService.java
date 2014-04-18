@@ -36,7 +36,12 @@
  */
 package org.ow2.proactive.scheduler.common.util.logforwarder;
 
+import org.apache.log4j.Appender;
+import org.apache.log4j.AsyncAppender;
+import org.apache.log4j.spi.LoggingEvent;
+
 import java.net.URI;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 /**
@@ -46,6 +51,8 @@ import java.net.URI;
  */
 public final class LogForwardingService {
 
+    private final LoggingEventProcessor loggingEventProcessor;
+    private String prefix = "";
     // connection to the server created by initialize()
     private URI serverConnection = null;
     // can be initialized only once
@@ -61,7 +68,40 @@ public final class LogForwardingService {
      */
     public LogForwardingService(String providerClassname) {
         this.providerClassname = providerClassname;
+        loggingEventProcessor = new LoggingEventProcessor();
     }
+
+    public static class LoggingEventProcessor {
+        private ConcurrentHashMap<String, AsyncAppender> appenders = new ConcurrentHashMap<String, AsyncAppender>();
+
+        public void addAppender(String loggerName, Appender appender) {
+            appenders.putIfAbsent(loggerName, new AsyncAppender());
+            AsyncAppender sink = appenders.get(loggerName);
+            if (sink != null) {
+                sink.addAppender(appender);
+            }
+        }
+
+        public void removeAppender(String loggerName, Appender appender) {
+            AsyncAppender sink = appenders.get(loggerName);
+            if (sink != null) {
+                sink.removeAppender(appender);
+            }
+        }
+
+        public void processEvent(LoggingEvent event) {
+            String loggerName = event.getLoggerName();
+            AsyncAppender sink = appenders.get(loggerName);
+            if (sink != null) {
+                sink.append(event);
+            }
+        }
+    }
+
+    public void addAppender(String loggerName, Appender appender) {
+        loggingEventProcessor.addAppender(loggerName, appender);
+    }
+
 
     /**
      * Instantiate the LogForwardingProvider specified by providerClassname value,
@@ -78,7 +118,7 @@ public final class LogForwardingService {
                 Class<? extends LogForwardingProvider> providerClass = (Class<? extends LogForwardingProvider>) Class
                         .forName(providerClassname);
                 this.provider = providerClass.newInstance();
-                this.serverConnection = provider.createServer();
+                this.serverConnection = provider.createServer(loggingEventProcessor);
                 this.initialized = true;
             } else {
                 throw new IllegalStateException("The service has already been initialized.");

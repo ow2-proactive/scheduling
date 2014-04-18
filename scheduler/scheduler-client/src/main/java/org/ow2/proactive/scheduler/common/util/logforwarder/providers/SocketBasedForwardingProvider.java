@@ -36,15 +36,16 @@
  */
 package org.ow2.proactive.scheduler.common.util.logforwarder.providers;
 
-import java.net.URI;
-
+import org.apache.log4j.Appender;
+import org.apache.log4j.net.SocketAppender;
 import org.objectweb.proactive.core.util.ProActiveInet;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingProvider;
+import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingService;
 import org.ow2.proactive.scheduler.common.util.logforwarder.util.SimpleLoggerServer;
-import org.apache.log4j.Appender;
-import org.apache.log4j.net.SocketAppender;
+
+import java.net.URI;
 
 
 /**
@@ -65,7 +66,7 @@ public class SocketBasedForwardingProvider implements LogForwardingProvider {
      */
     public URI createServer() throws LogForwardingException {
         try {
-            this.sls = SimpleLoggerServer.createLoggerServer();
+            this.sls = SimpleLoggerServer.createLoggerServer(null);
             return new URI(RAW_PROTOCOL_PREFIX, "//" +
                 ProActiveInet.getInstance().getInetAddress().getHostName() + ":" + sls.getPort(), "");
         } catch (Exception e) {
@@ -73,9 +74,20 @@ public class SocketBasedForwardingProvider implements LogForwardingProvider {
         }
     }
 
+    @Override
+    public URI createServer(LogForwardingService.LoggingEventProcessor eventProcessor) throws LogForwardingException {
+        try {
+            this.sls = SimpleLoggerServer.createLoggerServer(eventProcessor);
+            return new URI(RAW_PROTOCOL_PREFIX, "//" +
+                    ProActiveInet.getInstance().getInetAddress().getHostName() + ":" + sls.getPort(), "");
+        } catch (Exception e) {
+            throw new LogForwardingException("Cannot create log server.", e);
+        }
+    }
+
     /* (non-Javadoc)
-     * @see LogForwardingProvider#destroyServer()
-     */
+         * @see LogForwardingProvider#destroyServer()
+         */
     public void terminateServer() {
         this.sls.stop();
     }
