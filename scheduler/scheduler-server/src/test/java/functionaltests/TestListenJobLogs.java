@@ -195,17 +195,14 @@ public class TestListenJobLogs extends SchedulerConsecutive {
         Job job = createJob(communicationObjectUrl1, communicationObjectUrl2, forkJavaTask);
         JobId jobId = scheduler.submit(job);
 
-        Logger logger = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + jobId);
-        logger.removeAllAppenders();
-        logger.setAdditivity(false);
-
         SchedulerTHelper.waitForEventTaskRunning(jobId, TASK_NAME1);
 
         communicationObject1.setCommand("output1");
 
         // listenJobLogs for running task
         TestAppender appender1 = new TestAppender("appender1");
-        logger.addAppender(appender1);
+        String loggerName = Log4JTaskLogs.JOB_LOGGER_PREFIX + jobId;
+        logForwardingService.addAppender(loggerName, appender1);
         scheduler.listenJobLogs(jobId, logForwardingService.getAppenderProvider());
         appender1.waitForLoggingEvent(LOG_EVENT_TIMEOUT, "output1");
 
@@ -214,8 +211,8 @@ public class TestListenJobLogs extends SchedulerConsecutive {
          * was called)
          */
         TestAppender appender2 = new TestAppender("appender2");
-        logger.removeAppender(appender1);
-        logger.addAppender(appender2);
+        logForwardingService.removeAppender(loggerName, appender1);
+        logForwardingService.addAppender(loggerName, appender2);
 
         scheduler.listenJobLogs(jobId, logForwardingService.getAppenderProvider());
         appender2.waitForLoggingEvent(LOG_EVENT_TIMEOUT, "output1");
@@ -246,8 +243,8 @@ public class TestListenJobLogs extends SchedulerConsecutive {
 
         // add appender after first task had finished, appender should receive its output
         TestAppender appender3 = new TestAppender("appender3");
-        logger.removeAllAppenders();
-        logger.addAppender(appender3);
+        logForwardingService.removeAllAppenders(loggerName);
+        logForwardingService.addAppender(loggerName, appender3);
         scheduler.listenJobLogs(jobId, logForwardingService.getAppenderProvider());
         appender3.waitForLoggingEvent(LOG_EVENT_TIMEOUT, "output1", "output2", "output3");
 
@@ -258,8 +255,8 @@ public class TestListenJobLogs extends SchedulerConsecutive {
 
         // add appender after job had finished, appender should receive output of all tasks
         TestAppender appender4 = new TestAppender("appender4");
-        logger.removeAllAppenders();
-        logger.addAppender(appender4);
+        logForwardingService.removeAllAppenders(loggerName);
+        logForwardingService.addAppender(loggerName, appender4);
         scheduler.listenJobLogs(jobId, logForwardingService.getAppenderProvider());
         appender4.waitForLoggingEvent(LOG_EVENT_TIMEOUT, "output1", "output2", "output3");
 
@@ -293,7 +290,7 @@ public class TestListenJobLogs extends SchedulerConsecutive {
             for (String message : expectedMessages) {
                 expectedMessagesList.add(message);
             }
-            System.out.println("Waiting for logging event (" + name + ")");
+            System.out.println("Waiting for logging events with messages: " + expectedMessagesList + " (" + name + ")");
 
             long endTime = System.currentTimeMillis() + timeout;
             while (!ListUtils.removeAll(expectedMessagesList, actualMessages).isEmpty()) {

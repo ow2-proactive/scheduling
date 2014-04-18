@@ -36,34 +36,45 @@
  */
 package org.ow2.proactive_grid_cloud_portal.scheduler;
 
-import java.io.ByteArrayInputStream;
-import java.net.URI;
-
-import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
-import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
-import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
-import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
-import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingProvider;
-import org.ow2.proactive_grid_cloud_portal.RestTestServer;
-import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
-import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStoreTestUtils;
-import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
+import org.apache.log4j.Appender;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.apache.log4j.spi.LoggingEvent;
 import org.jboss.resteasy.client.ProxyFactory;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
+import org.ow2.proactive.scheduler.common.exception.PermissionException;
+import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
+import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
+import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
+import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
+import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
+import org.ow2.proactive.scheduler.common.util.logforwarder.providers.SocketBasedForwardingProvider;
+import org.ow2.proactive_grid_cloud_portal.RestTestServer;
+import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
+import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStoreTestUtils;
+import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
+
+import java.io.ByteArrayInputStream;
 
 import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 
 public class SchedulerStateRestLiveLogsTest extends RestTestServer {
 
     private SchedulerRestInterface client;
+    private SchedulerProxyUserInterface scheduler;
+    private String sessionId;
 
     @BeforeClass
     public static void setUpRest() throws Exception {
@@ -74,57 +85,65 @@ public class SchedulerStateRestLiveLogsTest extends RestTestServer {
     public void setUp() throws Exception {
         client = ProxyFactory.create(SchedulerRestInterface.class, "http://localhost:" + port + "/");
         PortalConfiguration.load(new ByteArrayInputStream(
-            (PortalConfiguration.scheduler_logforwardingservice_provider + "=" + LogService.class.getName())
-                    .getBytes()));
+                (PortalConfiguration.scheduler_logforwardingservice_provider + "=" + SocketBasedForwardingProvider.class.getName()).getBytes()));
+        scheduler = mock(SchedulerProxyUserInterface.class);
+        sessionId = SharedSessionStoreTestUtils.createValidSession(
+                scheduler);
     }
 
     @Test
     public void testLiveLogs_OutputRemovedAtEachCall() throws Exception {
-        String sessionId = SharedSessionStoreTestUtils
-                .createValidSession(mock(SchedulerProxyUserInterface.class));
 
         String firstJobId = "42";
 
         String firstJobLogs = client.getLiveLogJob(sessionId, firstJobId);
 
-        assertEquals("", firstJobLogs);
+        Appender appender = verifyListenAndGetAppender("42");
 
-        Logger firstJobLogger = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + firstJobId);
+        assertTrue(firstJobLogs.isEmpty());
 
-        firstJobLogger.debug("first log");
+        appender.doAppend(createLoggingEvent(firstJobId, "first log"));
 
         firstJobLogs = client.getLiveLogJob(sessionId, firstJobId);
         assertThat(firstJobLogs, containsString("first log"));
 
-        firstJobLogger.debug("other log");
+        appender.doAppend(createLoggingEvent(firstJobId, "other log"));
 
         firstJobLogs = client.getLiveLogJob(sessionId, firstJobId);
         assertThat(firstJobLogs, not(containsString("first log")));
         assertThat(firstJobLogs, containsString("other log"));
 
         firstJobLogs = client.getLiveLogJob(sessionId, firstJobId);
-        assertEquals("", firstJobLogs);
+        assertTrue(firstJobLogs.isEmpty());
+    }
+
+    private Appender verifyListenAndGetAppender(String jobId) throws NotConnectedException, UnknownJobException, PermissionException, LogForwardingException {
+        ArgumentCaptor<AppenderProvider> appenderProviderArgumentCaptor = ArgumentCaptor.forClass(AppenderProvider.class);
+        verify(scheduler).listenJobLogs(eq(jobId), appenderProviderArgumentCaptor.capture());
+        AppenderProvider appenderProvider = appenderProviderArgumentCaptor.getValue();
+        return appenderProvider.getAppender();
+    }
+
+    private LoggingEvent createLoggingEvent(String firstJobId, String message) {
+        return new LoggingEvent(null, Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + firstJobId), Level.DEBUG, message, null);
     }
 
     @Test
     public void testLiveLogs_TwoJobsAtTheSameTime() throws Exception {
-        String sessionId = SharedSessionStoreTestUtils
-                .createValidSession(mock(SchedulerProxyUserInterface.class));
 
         String firstJobId = "42";
         String secondJobId = "43";
 
         String firstJobLogs = client.getLiveLogJob(sessionId, firstJobId);
+        Appender firstAppender = verifyListenAndGetAppender(firstJobId);
         String secondJobLogs = client.getLiveLogJob(sessionId, secondJobId);
+        Appender secondAppender = verifyListenAndGetAppender(secondJobId);
 
-        assertEquals("", firstJobLogs);
-        assertEquals("", secondJobLogs);
+        assertTrue(firstJobLogs.isEmpty());
+        assertTrue(secondJobLogs.isEmpty());
 
-        Logger firstJobLogger = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + firstJobId);
-        Logger secondJobLogger = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + secondJobId);
-
-        firstJobLogger.debug("first job");
-        secondJobLogger.debug("second job");
+        firstAppender.doAppend(createLoggingEvent(firstJobId, "first job"));
+        secondAppender.doAppend(createLoggingEvent(secondJobId, "second job"));
 
         firstJobLogs = client.getLiveLogJob(sessionId, firstJobId);
         assertThat(firstJobLogs, containsString("first job"));
@@ -133,20 +152,45 @@ public class SchedulerStateRestLiveLogsTest extends RestTestServer {
         assertThat(secondJobLogs, containsString("second job"));
     }
 
-    public static class LogService implements LogForwardingProvider {
+    @Test
+    public void testLiveLogs_AvailableAndDelete() throws Exception {
 
-        @Override
-        public AppenderProvider createAppenderProvider(URI serverURI) throws LogForwardingException {
-            return null;
-        }
+        String firstJobId = "42";
 
-        @Override
-        public URI createServer() throws LogForwardingException {
-            return null;
-        }
+        assertEquals(-1, client.getLiveLogJobAvailable(sessionId, "42"));
 
-        @Override
-        public void terminateServer() throws LogForwardingException {
-        }
+        String logs = client.getLiveLogJob(sessionId, firstJobId);
+
+        Appender appender = verifyListenAndGetAppender("42");
+
+        assertEquals(0, client.getLiveLogJobAvailable(sessionId, "42"));
+        assertTrue(logs.isEmpty());
+
+        appender.doAppend(createLoggingEvent(firstJobId, "first log"));
+
+        assertEquals(1, client.getLiveLogJobAvailable(sessionId, "42"));
+
+        assertTrue(client.deleteLiveLogJob(sessionId, "42"));
+        assertEquals(-1, client.getLiveLogJobAvailable(sessionId, "42"));
+
+        // will be lost
+        appender.doAppend(createLoggingEvent(firstJobId, "second log"));
+
+        logs = client.getLiveLogJob(sessionId, firstJobId);
+        assertTrue(logs.isEmpty());
+
+        appender.doAppend(createLoggingEvent(firstJobId, "other log"));
+        appender.doAppend(createLoggingEvent(firstJobId, "more log"));
+
+        assertEquals(2, client.getLiveLogJobAvailable(sessionId, "42"));
+        logs = client.getLiveLogJob(sessionId, firstJobId);
+        assertThat(logs, not(containsString("first log")));
+        assertThat(logs, containsString("other log"));
+        assertThat(logs, containsString("more log"));
+
+        assertEquals(0, client.getLiveLogJobAvailable(sessionId, "42"));
+        logs = client.getLiveLogJob(sessionId, firstJobId);
+        assertTrue(logs.isEmpty());
     }
+
 }

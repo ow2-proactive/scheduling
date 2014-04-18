@@ -37,11 +37,10 @@
 package org.ow2.proactive_grid_cloud_portal.common;
 
 import java.security.KeyException;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.security.auth.login.LoginException;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
@@ -52,8 +51,7 @@ import org.ow2.proactive.resourcemanager.common.util.RMProxyUserInterface;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
-import org.ow2.proactive_grid_cloud_portal.scheduler.JobOutputAppender;
-import org.apache.log4j.Logger;
+import org.ow2.proactive_grid_cloud_portal.scheduler.JobsOutputController;
 
 
 public class Session {
@@ -71,7 +69,6 @@ public class Session {
     private RMProxyUserInterface rm;
 
     private String userName;
-    private Map<String, JobOutputAppender> jobOutputAppenders = new HashMap<String, JobOutputAppender>();
 
     private CredData credData;
     private Credentials credentials;
@@ -153,18 +150,10 @@ public class Session {
         this.userName = userName;
     }
 
-    public JobOutputAppender getJobOutputAppender(String jobId) {
-        return jobOutputAppenders.get(jobId);
-    }
+    private final JobsOutputController jobsOutputController = new JobsOutputController(this);
 
-    public void addJobOutputAppender(String jobId, JobOutputAppender joa) {
-        jobOutputAppenders.put(jobId, joa);
-    }
-
-    public void removeJobOutAppender(String jobId) {
-        if (jobOutputAppenders.containsKey(jobId)) {
-            jobOutputAppenders.remove(jobId).terminate();
-        }
+    public JobsOutputController getJobsOutputController() {
+        return jobsOutputController;
     }
 
     public String getSessionId() {
@@ -174,9 +163,7 @@ public class Session {
     public void terminate() {
         terminateActiveObject(rm);
         terminateActiveObject(scheduler);
-        for (JobOutputAppender jobOutputAppender : jobOutputAppenders.values()) {
-            jobOutputAppender.terminate();
-        }
+        jobsOutputController.terminate();
     }
 
     private void terminateActiveObject(Object activeObject) {

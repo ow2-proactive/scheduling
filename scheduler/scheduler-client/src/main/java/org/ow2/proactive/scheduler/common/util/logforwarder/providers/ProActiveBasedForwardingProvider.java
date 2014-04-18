@@ -38,36 +38,38 @@ package org.ow2.proactive.scheduler.common.util.logforwarder.providers;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.log4j.Logger;
+import org.apache.log4j.spi.LoggingEvent;
 import org.objectweb.proactive.api.PARemoteObject;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.remoteobject.RemoteObjectExposer;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.util.log.remote.ProActiveAppender;
 import org.objectweb.proactive.core.util.log.remote.ProActiveLogCollector;
-import org.objectweb.proactive.core.util.log.remote.ProActiveLogCollectorDeployer;
 import org.objectweb.proactive.core.util.log.remote.ThrottlingProvider;
-import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
-import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
-import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingProvider;
+import org.ow2.proactive.scheduler.common.util.logforwarder.*;
 import org.apache.log4j.Appender;
 
 
 /**
  * ProActive communication based log forwarding service.
  * @see ProActiveAppender
- * @see ProActiveLogCollector
  */
 public class ProActiveBasedForwardingProvider implements LogForwardingProvider {
 
     // log collector deployer
-    private ProActiveLogCollectorDeployer collectorDeployer;
+    private LogCollectorDeployer collectorDeployer;
 
     // used for unique collector name
     private static final AtomicInteger collectorCounter = new AtomicInteger(0);
 
     // bind name
     public static final String COLLECTOR_BIND_NAME = "proactive_lfs_collector";
+    private LoggingEventProcessor eventProcessor;
 
     /* (non-Javadoc)
      * @see LogForwardingProvider#createAppenderProvider(java.net.URI)
@@ -80,14 +82,12 @@ public class ProActiveBasedForwardingProvider implements LogForwardingProvider {
         }
     }
 
-    /* (non-Javadoc)
-     * @see LogForwardingProvider#createServer()
-     */
-    public URI createServer() throws LogForwardingException {
+    @Override
+    public URI createServer(LoggingEventProcessor eventProcessor) throws LogForwardingException {
         try {
-            collectorDeployer = new ProActiveLogCollectorDeployer(ProActiveRuntimeImpl.getProActiveRuntime()
+            collectorDeployer = new LogCollectorDeployer(ProActiveRuntimeImpl.getProActiveRuntime()
                     .getVMInformation().getName() +
-                COLLECTOR_BIND_NAME + collectorCounter.addAndGet(1));
+                COLLECTOR_BIND_NAME + collectorCounter.addAndGet(1), eventProcessor);
             return new URI(collectorDeployer.getCollectorURL());
         } catch (URISyntaxException e) {
             throw new LogForwardingException("Cannot create ProActive log collector.", e);
@@ -124,7 +124,7 @@ public class ProActiveBasedForwardingProvider implements LogForwardingProvider {
 
         public Appender getAppender() throws LogForwardingException {
             try {
-                ProActiveLogCollector remoteCollector = (ProActiveLogCollector) PARemoteObject
+                LogCollector remoteCollector = (LogCollector) PARemoteObject
                         .lookup(remoteCollectorURI);
                 return new ProActiveAppender(new ThrottlingProvider(FLUSH_PERIOD, 50, 10000, true),
                     remoteCollector);
@@ -134,6 +134,46 @@ public class ProActiveBasedForwardingProvider implements LogForwardingProvider {
             }
         }
 
+    }
+
+    public static class LogCollectorDeployer {
+        final private String url;
+
+        final private LogCollector collector;
+
+        final RemoteObjectExposer<LogCollector> roe;
+
+        public LogCollectorDeployer(String name, LoggingEventProcessor eventProcessor) throws ProActiveException {
+            this.collector = new LogCollector(eventProcessor);
+            this.roe = PARemoteObject.newRemoteObject(LogCollector.class.getName(), this.collector);
+            this.roe.createRemoteObject(name, false);
+            this.url = roe.getURL();
+        }
+
+        public String getCollectorURL() {
+            return this.url;
+        }
+
+        public void terminate() throws ProActiveException {
+            roe.unexportAll();
+        }
+    }
+
+    public static class LogCollector extends ProActiveLogCollector {
+        private LoggingEventProcessor eventProcessor;
+
+        public LogCollector() {
+        }
+
+        public LogCollector(LoggingEventProcessor eventProcessor) {
+            this.eventProcessor = eventProcessor;
+        }
+
+        public void sendEvent(List<LoggingEvent> events) {
+            for (LoggingEvent event : events) {
+                eventProcessor.processEvent(event);
+            }
+        }
     }
 
 }

@@ -177,7 +177,7 @@ public class NoVncSecuredTargetResolver implements IProxyTargetResolver {
 
     private String getJobLiveLogs(Session session, String jobId) {
         try {
-            return session.getJobOutputAppender(jobId).getJobOutput().fetchAllLogs();
+            return session.getJobsOutputController().getAllLogs(jobId);
         } catch (Exception e) {
             LOGGER.warn("Could not retrieve live logs", e);
             return null;

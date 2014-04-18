@@ -1,12 +1,6 @@
 package org.ow2.proactive.scheduler.core;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.apache.log4j.Appender;
-import org.apache.log4j.AsyncAppender;
-import org.apache.log4j.Logger;
+import org.apache.log4j.*;
 import org.apache.log4j.spi.LoggingEvent;
 import org.ow2.proactive.scheduler.common.exception.InternalException;
 import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
@@ -23,12 +17,16 @@ import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.TaskLogger;
 
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
 
 class EnabledListenJobLogsSupport extends ListenJobLogsSupport {
 
     private static final JobLogger jlogger = JobLogger.getInstance();
     private static final TaskLogger tlogger = TaskLogger.getInstance();
-    private final Map<JobId, AsyncAppender> jobsToBeLogged = new HashMap<JobId, AsyncAppender>();
+    private final Set<JobId> jobsToBeLogged = new HashSet<JobId>();
 
     private final SchedulerDBManager dbManager;
 
@@ -59,13 +57,12 @@ class EnabledListenJobLogsSupport extends ListenJobLogsSupport {
     synchronized void cleanLoggers(JobId jobId) {
         jobsToBeLogged.remove(jobId);
         jlogger.info(jobId, "cleaning loggers");
-        Logger logger = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + jobId);
-        logger.removeAllAppenders();
+        lfs.removeAllAppenders(Log4JTaskLogs.getLoggerName(jobId));
     }
 
     @Override
     synchronized void activeLogsIfNeeded(JobId jobId, TaskLauncher launcher) throws LogForwardingException {
-        if (jobsToBeLogged.containsKey(jobId)) {
+        if (jobsToBeLogged.contains(jobId)) {
             launcher.activateLogs(lfs.getAppenderProvider());
         }
     }
@@ -74,7 +71,6 @@ class EnabledListenJobLogsSupport extends ListenJobLogsSupport {
     synchronized void listenJobLogs(JobId jobId, AppenderProvider appenderProvider)
             throws UnknownJobException {
         jlogger.info(jobId, "listening logs");
-        Logger jobLogger = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + jobId);
 
         // create the appender to the remote listener
         Appender clientAppender = null;
@@ -85,8 +81,8 @@ class EnabledListenJobLogsSupport extends ListenJobLogsSupport {
             throw new InternalException("Cannot create an appender for job " + jobId, e);
         }
 
-        boolean logIsAlreadyInitialized = jobsToBeLogged.containsKey(jobId);
-        initJobLogging(jobId, jobLogger, clientAppender);
+        boolean logIsAlreadyInitialized = jobsToBeLogged.contains(jobId);
+        initJobLogging(jobId, clientAppender);
 
         JobResult result = dbManager.loadJobResult(jobId);
         if (result == null) {
@@ -96,7 +92,7 @@ class EnabledListenJobLogsSupport extends ListenJobLogsSupport {
         // for finished tasks, add logs events "manually"
         Collection<TaskResult> allRes = result.getAllResults().values();
         for (TaskResult tr : allRes) {
-            this.flushTaskLogs(tr, jobLogger, clientAppender);
+            this.flushTaskLogs(tr, clientAppender, jobId);
         }
 
         for (RunningTaskData taskData : liveJobs.getRunningTasks(jobId)) {
@@ -118,22 +114,12 @@ class EnabledListenJobLogsSupport extends ListenJobLogsSupport {
         }
     }
 
-    private void initJobLogging(JobId jobId, Logger jobLogger, Appender clientAppender) {
-        // get or create appender for the targeted job
-        AsyncAppender jobAppender = this.jobsToBeLogged.get(jobId);
-        if (jobAppender == null) {
-            jobAppender = new AsyncAppender();
-            jobAppender.setName(Log4JTaskLogs.JOB_APPENDER_NAME);
-            this.jobsToBeLogged.put(jobId, jobAppender);
-            jobLogger.setAdditivity(false);
-            jobLogger.addAppender(jobAppender);
-        }
-
-        // should add the appender before activating logs on running tasks !
-        jobAppender.addAppender(clientAppender);
+    private void initJobLogging(JobId jobId, Appender clientAppender) {
+        jobsToBeLogged.add(jobId);
+        lfs.addAppender(Log4JTaskLogs.getLoggerName(jobId), clientAppender);
     }
 
-    private void flushTaskLogs(TaskResult tr, Logger l, Appender a) {
+    private void flushTaskLogs(TaskResult tr, Appender a, JobId jobId) {
         // if taskResult is not awaited, task is terminated
         TaskLogs logs = tr.getOutput();
         if (logs instanceof Log4JTaskLogs) {
@@ -142,9 +128,13 @@ class EnabledListenJobLogsSupport extends ListenJobLogsSupport {
                 a.doAppend(le);
             }
         } else {
-            l.info(logs.getStdoutLogs(false));
-            l.error(logs.getStderrLogs(false));
+            a.doAppend(createLoggingEvent(jobId, logs.getStdoutLogs(false), Level.INFO));
+            a.doAppend(createLoggingEvent(jobId, logs.getStderrLogs(false), Level.DEBUG));
         }
+    }
+
+    private LoggingEvent createLoggingEvent(JobId jobId, String logs, Priority level) {
+        return new LoggingEvent(null, Logger.getLogger(Log4JTaskLogs.getLoggerName(jobId)), level, logs, null);
     }
 
 }

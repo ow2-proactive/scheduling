@@ -36,6 +36,8 @@
  */
 package org.ow2.proactive.scheduler.common.util.logforwarder;
 
+import org.apache.log4j.Appender;
+
 import java.net.URI;
 
 
@@ -46,6 +48,7 @@ import java.net.URI;
  */
 public final class LogForwardingService {
 
+    private final LoggingEventProcessor loggingEventProcessor;
     // connection to the server created by initialize()
     private URI serverConnection = null;
     // can be initialized only once
@@ -61,7 +64,21 @@ public final class LogForwardingService {
      */
     public LogForwardingService(String providerClassname) {
         this.providerClassname = providerClassname;
+        loggingEventProcessor = new LoggingEventProcessor();
     }
+
+    public void addAppender(String loggerName, Appender appender) {
+        loggingEventProcessor.addAppender(loggerName, appender);
+    }
+
+    public void removeAppender(String loggerName, Appender appender) {
+        loggingEventProcessor.removeAppender(loggerName, appender);
+    }
+
+    public void removeAllAppenders(String loggerName) {
+        loggingEventProcessor.removeAllAppenders(loggerName);
+    }
+
 
     /**
      * Instantiate the LogForwardingProvider specified by providerClassname value,
@@ -78,7 +95,7 @@ public final class LogForwardingService {
                 Class<? extends LogForwardingProvider> providerClass = (Class<? extends LogForwardingProvider>) Class
                         .forName(providerClassname);
                 this.provider = providerClass.newInstance();
-                this.serverConnection = provider.createServer();
+                this.serverConnection = provider.createServer(loggingEventProcessor);
                 this.initialized = true;
             } else {
                 throw new IllegalStateException("The service has already been initialized.");

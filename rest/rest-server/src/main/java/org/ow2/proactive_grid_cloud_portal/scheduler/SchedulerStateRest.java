@@ -450,21 +450,10 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             LogForwardingRestException, IOException {
         try {
             checkAccess(sessionId, "/scheduler/jobs/" + jobId + "/livelog");
-            Session ss = sessionStore.get(sessionId);
+            Session session = sessionStore.get(sessionId);
 
-            JobOutput jo;
-            JobOutputAppender jobOutputAppender = ss.getJobOutputAppender(jobId);
-            if (jobOutputAppender == null) {
-                jo = JobsOutputController.getInstance().createJobOutput(ss, jobId).getJobOutput();
-            } else {
-                jo = jobOutputAppender.getJobOutput();
-            }
+            return session.getJobsOutputController().getNewLogs(jobId);
 
-            if (jo != null) {
-                return jo.fetchNewLogs();
-            }
-
-            return "";
         } catch (PermissionException e) {
             throw new PermissionRestException(e);
         } catch (NotConnectedException e) {
@@ -495,12 +484,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         checkAccess(sessionId, "/scheduler/jobs/" + jobId + "/livelog/available");
         Session ss = sessionStore.get(sessionId);
 
-        JobOutputAppender joa = ss.getJobOutputAppender(jobId);
-        if (joa != null) {
-            return joa.getJobOutput().size();
-        }
-
-        return -1;
+        return ss.getJobsOutputController().availableLinesCount(jobId);
     }
 
     /**
@@ -521,7 +505,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     String jobId) throws NotConnectedRestException {
         checkAccess(sessionId, "delete /scheduler/jobs/livelog" + jobId);
         Session ss = sessionStore.get(sessionId);
-        ss.removeJobOutAppender(jobId);
+        ss.getJobsOutputController().removeAppender(jobId);
         return true;
 
     }

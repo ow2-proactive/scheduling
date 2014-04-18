@@ -34,6 +34,7 @@
  */
 package org.ow2.proactive_grid_cloud_portal.webapp;
 
+import java.io.ByteArrayInputStream;
 import java.net.InetSocketAddress;
 import java.util.Collections;
 
@@ -45,12 +46,12 @@ import org.ow2.proactive.scheduler.common.task.SimpleTaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
+import org.ow2.proactive.scheduler.common.util.logforwarder.providers.SocketBasedForwardingProvider;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStore;
 import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStoreTestUtils;
-import org.ow2.proactive_grid_cloud_portal.scheduler.JobOutput;
 import org.ow2.proactive_grid_cloud_portal.scheduler.JobOutputAppender;
 import org.junit.Before;
 import org.junit.Test;
@@ -64,6 +65,12 @@ import static org.mockito.Mockito.when;
 public class NoVncSecuredTargetResolverTest {
 
     private final SchedulerProxyUserInterface schedulerMock = mock(SchedulerProxyUserInterface.class);
+
+    @Before
+    public void loadPortalConfiguration() throws Exception {
+        PortalConfiguration.load(new ByteArrayInputStream(
+                (PortalConfiguration.scheduler_logforwardingservice_provider + "=" + SocketBasedForwardingProvider.class.getName()).getBytes()));
+    }
 
     @Before
     public void mockSchedulerState() throws NotConnectedException, UnknownJobException, PermissionException {
@@ -119,7 +126,7 @@ public class NoVncSecuredTargetResolverTest {
     @Test
     public void testMagicStringFoundInLiveLogs_TaskNotFinished() throws Exception {
         String sessionId = SharedSessionStoreTestUtils.createValidSession(schedulerMock);
-        SharedSessionStore.getInstance().get(sessionId).addJobOutputAppender("42",
+        SharedSessionStore.getInstance().get(sessionId).getJobsOutputController().addJobOutputAppender("42",
                 createLiveLogs("PA_REMOTE_CONNECTION;1;vnc;node.grid.com:5900"));
         when(schedulerMock.getTaskResult("42", "remoteVisuTask")).thenReturn(null);
 
@@ -136,6 +143,7 @@ public class NoVncSecuredTargetResolverTest {
         SharedSessionStore
                 .getInstance()
                 .get(sessionId)
+                .getJobsOutputController()
                 .addJobOutputAppender(
                         "42",
                         createLiveLogs("[Visualization_task@node2;10:38:06]PA_REMOTE_CONNECTION;1;vnc;node.grid.com:5900"));
@@ -154,7 +162,7 @@ public class NoVncSecuredTargetResolverTest {
     @Test
     public void testMagicStringFoundInLiveLogs_MagicStringOnSeveralLines() throws Exception {
         String sessionId = SharedSessionStoreTestUtils.createValidSession(schedulerMock);
-        SharedSessionStore.getInstance().get(sessionId).addJobOutputAppender("42",
+        SharedSessionStore.getInstance().get(sessionId).getJobsOutputController().addJobOutputAppender("42",
                 createLiveLogs("PA_REMOTE_CONNECTION\nPA_REMOTE_CONNECTION;1;vnc;node.grid.com:5900 "));
         when(schedulerMock.getTaskResult("42", "remoteVisuTask")).thenReturn(
                 new TaskResultImpl(TaskIdImpl.createTaskId(new JobIdImpl(42, "job"), "remoteVisuTask", 1,
@@ -170,9 +178,7 @@ public class NoVncSecuredTargetResolverTest {
 
     private JobOutputAppender createLiveLogs(String logs) throws Exception {
         JobOutputAppender jobOutputAppender = mock(JobOutputAppender.class);
-        JobOutput jobOutput = new JobOutput();
-        jobOutput.log(logs);
-        when(jobOutputAppender.getJobOutput()).thenReturn(jobOutput);
+        when(jobOutputAppender.fetchAllLogs()).thenReturn(logs);
         return jobOutputAppender;
     }
 }

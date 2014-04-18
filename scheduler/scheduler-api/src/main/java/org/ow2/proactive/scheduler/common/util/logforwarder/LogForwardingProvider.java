@@ -60,7 +60,7 @@ public interface LogForwardingProvider {
      * @return the URI to reach this server.
      * @throws LogForwardingException if the server cannot be created.
      */
-    public URI createServer() throws LogForwardingException;
+    public URI createServer(LoggingEventProcessor eventProcessor) throws LogForwardingException;
 
     /**
      * Terminate the server created by createServer().

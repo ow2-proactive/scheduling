@@ -36,59 +36,35 @@
  */
 package org.ow2.proactive_grid_cloud_portal.scheduler;
 
+import org.apache.log4j.AppenderSkeleton;
+import org.apache.log4j.spi.LoggingEvent;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
 import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
-import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
-import org.ow2.proactive_grid_cloud_portal.common.Session;
-import org.apache.log4j.AppenderSkeleton;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.log4j.spi.LoggingEvent;
 
 
 public class JobOutputAppender extends AppenderSkeleton {
 
-    private JobOutput jobOutput = null;
-    private String jobId;
+    private JobOutput jobOutput = new JobOutput();
 
-    public JobOutputAppender(Session ss, String jobId, AppenderProvider ap, JobOutput jobOutput)
+    public JobOutputAppender()
             throws NotConnectedException, UnknownJobException, PermissionException {
         this.name = "Appender for job output";
-        this.jobOutput = jobOutput;
-        this.jobId = jobId;
 
         this.setLayout(Log4JTaskLogs.getTaskLogLayout());
-        Logger log = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + this.jobId);
-        log.setAdditivity(false);
-        log.setLevel(Level.ALL);
-        log.addAppender(this);
-        ss.addJobOutputAppender(jobId, this);
-        ss.getScheduler().listenJobLogs(jobId, ap);
-    }
-
-    public JobOutput getJobOutput() {
-        return jobOutput;
-    }
-
-    public void terminate() {
-        close();
-        Logger log = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + jobId);
-        log.removeAppender(this);
     }
 
     @Override
     protected void append(LoggingEvent event) {
         if (!super.closed) {
-            jobOutput.log(this.layout != null ? this.layout.format(event) : event.getRenderedMessage());
+            jobOutput.log(this.layout.format(event));
         }
     }
 
     @Override
     public void close() {
         super.closed = true;
-        jobOutput = null;
     }
 
     @Override
@@ -96,4 +72,16 @@ public class JobOutputAppender extends AppenderSkeleton {
         return false;
     }
 
+
+    public String fetchNewLogs() {
+        return jobOutput.fetchNewLogs();
+    }
+
+    public String fetchAllLogs() {
+        return jobOutput.fetchAllLogs();
+    }
+
+    public int size() {
+        return jobOutput.size();
+    }
 }

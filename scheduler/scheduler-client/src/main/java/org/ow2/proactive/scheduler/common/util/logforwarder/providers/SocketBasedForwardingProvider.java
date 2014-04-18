@@ -36,15 +36,13 @@
  */
 package org.ow2.proactive.scheduler.common.util.logforwarder.providers;
 
-import java.net.URI;
-
-import org.objectweb.proactive.core.util.ProActiveInet;
-import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
-import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
-import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingProvider;
-import org.ow2.proactive.scheduler.common.util.logforwarder.util.SimpleLoggerServer;
 import org.apache.log4j.Appender;
 import org.apache.log4j.net.SocketAppender;
+import org.objectweb.proactive.core.util.ProActiveInet;
+import org.ow2.proactive.scheduler.common.util.logforwarder.*;
+import org.ow2.proactive.scheduler.common.util.logforwarder.util.SimpleLoggerServer;
+
+import java.net.URI;
 
 
 /**
@@ -60,22 +58,20 @@ public class SocketBasedForwardingProvider implements LogForwardingProvider {
     // remote server
     private SimpleLoggerServer sls;
 
-    /* (non-Javadoc)
-     * @see LogForwardingProvider#createServer()
-     */
-    public URI createServer() throws LogForwardingException {
+    @Override
+    public URI createServer(LoggingEventProcessor eventProcessor) throws LogForwardingException {
         try {
-            this.sls = SimpleLoggerServer.createLoggerServer();
+            this.sls = SimpleLoggerServer.createLoggerServer(eventProcessor);
             return new URI(RAW_PROTOCOL_PREFIX, "//" +
-                ProActiveInet.getInstance().getInetAddress().getHostName() + ":" + sls.getPort(), "");
+                    ProActiveInet.getInstance().getInetAddress().getHostName() + ":" + sls.getPort(), "");
         } catch (Exception e) {
             throw new LogForwardingException("Cannot create log server.", e);
         }
     }
 
     /* (non-Javadoc)
-     * @see LogForwardingProvider#destroyServer()
-     */
+         * @see LogForwardingProvider#destroyServer()
+         */
     public void terminateServer() {
         this.sls.stop();
     }
