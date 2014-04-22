@@ -1,3 +1,9 @@
+try {
+    load("nashorn:mozilla_compat.js");
+    this.println = print
+} catch (e) {
+}
+
 importClass(org.ow2.proactive.scheduler.util.console.SchedulerModel);
 
 var s_ = SchedulerModel.getModel(false);

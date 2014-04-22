@@ -1,3 +1,9 @@
+try {
+    load("nashorn:mozilla_compat.js");
+    this.println = print
+} catch (e) {
+}
+
 importClass(org.ow2.proactive.resourcemanager.utils.console.ResourceManagerModel);
 
 var rm_ = ResourceManagerModel.getModel(false);

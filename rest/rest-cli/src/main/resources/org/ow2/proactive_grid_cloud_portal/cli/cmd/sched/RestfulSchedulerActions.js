@@ -1,3 +1,11 @@
+try {
+    load("nashorn:mozilla_compat.js");
+    this.println = print
+    stringClass = Java.type("java.lang.String")['class']
+} catch (e) {
+    stringClass = java.lang.String.prototype
+}
+
 importClass(org.ow2.proactive_grid_cloud_portal.cli.ApplicationContextImpl);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.CLIException);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.SetUrlCommand);
@@ -180,11 +188,11 @@ function exit() {
 }
 
 function getUser() {
-    return currentContext.getProperty(LoginSchedCommand.USERNAME, java.lang.String.prototype);
+    return currentContext.getProperty(LoginSchedCommand.USERNAME, stringClass);
 }
 
 function getCredFile() {
-    return currentContext.getProperty(LoginWithCredentialsCommand.CRED_FILE, java.lang.String.prototype);
+    return currentContext.getProperty(LoginWithCredentialsCommand.CRED_FILE, stringClass);
 }
 
 function printWelcomeMsg() {
@@ -228,7 +236,11 @@ function execute(cmd) {
 
 function printError(error) {
     print("An error occurred while executing the command:\r\n");
-    error.javaException.printStackTrace();
+    if (error.javaException != null) {
+        error.javaException.printStackTrace();
+    } else {
+        error.printStackTrace(); // if executed with JDK8
+    }
 }
 
 function string(obj) {
