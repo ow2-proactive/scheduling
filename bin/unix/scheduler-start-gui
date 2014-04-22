@@ -24,7 +24,6 @@ print_help () {
 	echo -e "-u,--rmURL URL              Connect to an existing RM instead of starting a new one"
 	echo -e "-p,--policy POLICY          Complete name of the Scheduling policy to use"
 	echo -e "-c,--clean                  Start the Scheduler server with a clean Database"
-	echo -e "-W,--studio PATH            Path to the Workflow Studio WEB"
 	echo -e "-v,--verbose                Verbose output"
 	echo -e "-h,--help                   Print this message and exit"
 	echo -e "-Dxxx                       JVM option for the RM, Scheduler and HTTP servers."
@@ -76,25 +75,6 @@ while [ $# -gt 0 ]; do
 		-c | --clean)
 			DROP_DB="-Dpa.scheduler.db.hibernate.dropdb=true -Dpa.rm.db.hibernate.dropdb=true"
 			shift 1;;
-		-s | --sched-only)
-			DO_SCHED=true
-			DO_RM=false
-			DO_REST=true
-			shift;;
-		-r | --rm-only)
-			DO_SCHED=false
-			DO_RM=true
-			DO_REST=true
-			shift;;
-		-a | --api-only)
-			DO_SCHED=false
-			DO_RM=false
-			DO_REST=true
-			shift;;
-		-W | --studio)
-			[ $# -eq 1 ] && stop "$1 requires an argument"
-			STUDIO=$2
-			shift 2;;
 		*)
 			if [ $(echo $1 | grep '^-D.*$') ]; then
 				SCHED_JVM_D_OPTS="$SCHED_JVM_D_OPTS $1"
