@@ -102,6 +102,10 @@ public final class LogForwardingService {
         loggingEventProcessor.addAppender(loggerName, appender);
     }
 
+    public void removeAppender(String loggerName, Appender appender) {
+        loggingEventProcessor.removeAppender(loggerName, appender);
+    }
+
 
     /**
      * Instantiate the LogForwardingProvider specified by providerClassname value,

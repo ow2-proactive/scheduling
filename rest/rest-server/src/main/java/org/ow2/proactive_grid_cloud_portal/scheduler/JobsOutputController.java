@@ -38,14 +38,15 @@ package org.ow2.proactive_grid_cloud_portal.scheduler;
 
 import java.io.IOException;
 
+import org.apache.log4j.Appender;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
 import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingService;
-import org.ow2.proactive_grid_cloud_portal.common.Session;
 import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
 import org.apache.log4j.Logger;
 
@@ -59,14 +60,10 @@ import org.apache.log4j.Logger;
 public class JobsOutputController {
     private static final Logger LOGGER = ProActiveLogger.getLogger(JobsOutputController.class);
 
-    protected LogForwardingService lfs;
+    private LogForwardingService lfs;
 
-    // The shared instance
-    private static JobsOutputController instance = null;
+    private static JobsOutputController instance;
 
-    // -------------------------------------------------------------------- //
-    // --------------------------- constructor ---------------------------- //
-    // -------------------------------------------------------------------- //
     private JobsOutputController() {
         lfs = new LogForwardingService(PortalConfiguration.getProperties().getProperty(
                 PortalConfiguration.scheduler_logforwardingservice_provider));
@@ -77,14 +74,6 @@ public class JobsOutputController {
         }
     }
 
-    // -------------------------------------------------------------------- //
-    // ------------------------------ public ------------------------------ //
-    // -------------------------------------------------------------------- //
-    /**
-     * Returns the shared instance
-     *
-     * @return the shared instance
-     */
     public synchronized static JobsOutputController getInstance() {
         if (instance == null) {
             instance = new JobsOutputController();
@@ -92,25 +81,17 @@ public class JobsOutputController {
         return instance;
     }
 
-    /**
-     * Create an output for a job identified by the given jobId
-     *
-     * @param jobId
-     *            the jobId
-     * @throws LogForwardingException
-     * @throws PermissionException 
-     * @throws UnknownJobException 
-     * @throws NotConnectedException 
-     * @throws IOException 
-     */
-    public JobOutputAppender createJobOutputAppender(Session ss, String jobId) throws NotConnectedException,
+    public JobOutputAppender createJobOutputAppender(Scheduler scheduler, String jobId) throws NotConnectedException,
             UnknownJobException, PermissionException, LogForwardingException, IOException {
 
         JobOutputAppender jobOutputAppender = new JobOutputAppender();
-        lfs.addAppender(Log4JTaskLogs.JOB_LOGGER_PREFIX + jobId, jobOutputAppender);
-        ss.addJobOutputAppender(jobId, jobOutputAppender);
-        ss.getScheduler().listenJobLogs(jobId, lfs.getAppenderProvider());
+        lfs.addAppender(Log4JTaskLogs.getLoggerName(jobId), jobOutputAppender);
+        scheduler.listenJobLogs(jobId, lfs.getAppenderProvider());
         return jobOutputAppender;
     }
 
+
+    public void destroyJobOutputAppender(String jobId, Appender appender) {
+        lfs.removeAppender(Log4JTaskLogs.getLoggerName(jobId), appender);
+    }
 }

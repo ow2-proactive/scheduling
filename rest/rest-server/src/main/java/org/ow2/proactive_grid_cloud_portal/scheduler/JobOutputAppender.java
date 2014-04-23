@@ -62,10 +62,6 @@ public class JobOutputAppender extends AppenderSkeleton {
         return jobOutput;
     }
 
-    public void terminate() {
-        close();
-    }
-
     @Override
     protected void append(LoggingEvent event) {
         if (!super.closed) {
@@ -76,7 +72,6 @@ public class JobOutputAppender extends AppenderSkeleton {
     @Override
     public void close() {
         super.closed = true;
-        jobOutput = null;
     }
 
     @Override
@@ -84,4 +79,16 @@ public class JobOutputAppender extends AppenderSkeleton {
         return false;
     }
 
+
+    public String fetchNewLogs() {
+        return jobOutput.fetchNewLogs();
+    }
+
+    public String fetchAllLogs() {
+        return jobOutput.fetchAllLogs();
+    }
+
+    public int size() {
+        return jobOutput.size();
+    }
 }

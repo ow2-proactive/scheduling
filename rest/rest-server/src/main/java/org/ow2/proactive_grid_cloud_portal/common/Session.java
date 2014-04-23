@@ -36,6 +36,7 @@
  */
 package org.ow2.proactive_grid_cloud_portal.common;
 
+import java.io.IOException;
 import java.security.KeyException;
 import java.util.HashMap;
 import java.util.Map;
@@ -50,10 +51,15 @@ import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.common.util.RMProxyUserInterface;
 import org.ow2.proactive.resourcemanager.exception.RMException;
+import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
+import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
+import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
+import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.JobOutputAppender;
 import org.apache.log4j.Logger;
+import org.ow2.proactive_grid_cloud_portal.scheduler.JobsOutputController;
 
 
 public class Session {
@@ -157,14 +163,27 @@ public class Session {
         return jobOutputAppenders.get(jobId);
     }
 
+    public JobOutputAppender getOrCreateJobOutputAppender(String jobId) throws UnknownJobException, LogForwardingException, NotConnectedException, PermissionException, IOException {
+        JobOutputAppender jobOutputAppender = jobOutputAppenders.get(jobId);
+        if (jobOutputAppender == null) {
+            jobOutputAppender = JobsOutputController.getInstance().createJobOutputAppender(getScheduler(), jobId);
+            addJobOutputAppender(jobId, jobOutputAppender);
+        }
+        return jobOutputAppender;
+    }
+
     public void addJobOutputAppender(String jobId, JobOutputAppender joa) {
         jobOutputAppenders.put(jobId, joa);
     }
 
-    public void removeJobOutAppender(String jobId) {
+    public JobOutputAppender removeJobOutAppender(String jobId) {
+        JobOutputAppender appender = null;
         if (jobOutputAppenders.containsKey(jobId)) {
-            jobOutputAppenders.remove(jobId).terminate();
+            appender = jobOutputAppenders.remove(jobId);
+            appender.close();
+            JobsOutputController.getInstance().destroyJobOutputAppender(jobId, appender);
         }
+        return appender;
     }
 
     public String getSessionId() {
@@ -175,7 +194,7 @@ public class Session {
         terminateActiveObject(rm);
         terminateActiveObject(scheduler);
         for (JobOutputAppender jobOutputAppender : jobOutputAppenders.values()) {
-            jobOutputAppender.terminate();
+            jobOutputAppender.close();
         }
     }
 

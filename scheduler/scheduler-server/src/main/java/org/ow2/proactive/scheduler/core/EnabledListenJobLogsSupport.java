@@ -59,16 +59,6 @@ class EnabledListenJobLogsSupport extends ListenJobLogsSupport {
     synchronized void cleanLoggers(JobId jobId) {
         jobsToBeLogged.remove(jobId);
         jlogger.info(jobId, "cleaning loggers");
-        Logger logger = getLogger(jobId);
-        logger.removeAllAppenders();
-    }
-
-    private static Logger getLogger(JobId jobId) {
-        return Logger.getLogger(getLoggerName(jobId));
-    }
-
-    private static String getLoggerName(JobId jobId) {
-        return Log4JTaskLogs.JOB_LOGGER_PREFIX + jobId;
     }
 
     @Override
@@ -126,7 +116,7 @@ class EnabledListenJobLogsSupport extends ListenJobLogsSupport {
     }
 
     private void initJobLogging(JobId jobId, Appender clientAppender) {
-        lfs.addAppender(getLoggerName(jobId), clientAppender);
+        lfs.addAppender(Log4JTaskLogs.getLoggerName(jobId), clientAppender);
     }
 
     private void flushTaskLogs(TaskResult tr, Appender a) {

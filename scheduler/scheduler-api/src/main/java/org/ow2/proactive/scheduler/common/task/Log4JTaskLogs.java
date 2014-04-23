@@ -43,6 +43,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.utils.Formatter;
 import org.ow2.proactive.utils.ObjectByteConverter;
 import org.apache.log4j.Layout;
@@ -78,6 +79,14 @@ public class Log4JTaskLogs implements TaskLogs {
     public static Layout getTaskLogLayout() {
         return new PatternLayout("[%X{" + Log4JTaskLogs.MDC_TASK_ID + "}@%X{" + Log4JTaskLogs.MDC_HOST +
             "};%d{HH:mm:ss}]" + " %m %n");
+    }
+
+    public static String getLoggerName(String jobId) {
+        return JOB_LOGGER_PREFIX + jobId;
+    }
+
+    public static String getLoggerName(JobId jobId) {
+        return getLoggerName(jobId.toString());
     }
 
     /** Logger level in which stdout must be redirected */

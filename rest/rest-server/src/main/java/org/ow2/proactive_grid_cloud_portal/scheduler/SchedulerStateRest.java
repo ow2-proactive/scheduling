@@ -432,20 +432,11 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             LogForwardingRestException, IOException {
         try {
             checkAccess(sessionId, "/scheduler/jobs/" + jobId + "/livelog");
-            Session ss = sessionStore.get(sessionId);
+            Session session = sessionStore.get(sessionId);
 
-            JobOutput jo;
-            JobOutputAppender jobOutputAppender = ss.getJobOutputAppender(jobId);
-            if (jobOutputAppender == null) {
-                jobOutputAppender = JobsOutputController.getInstance().createJobOutputAppender(ss, jobId);
-            }
-            jo = jobOutputAppender.getJobOutput();
+            JobOutputAppender jobOutputAppender = session.getOrCreateJobOutputAppender(jobId);
+            return jobOutputAppender.fetchNewLogs();
 
-            if (jo != null) {
-                return jo.fetchNewLogs();
-            }
-
-            return "";
         } catch (PermissionException e) {
             throw new PermissionRestException(e);
         } catch (NotConnectedException e) {
