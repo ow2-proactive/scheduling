@@ -55,6 +55,11 @@ class CharacterDevice extends AbstractDevice {
     }
 
     @Override
+    public int read() throws IOException {
+        return in.read();
+    }
+
+    @Override
     public String readLine(String fmt, Object... args) throws IOException {
         out.printf(fmt, args);
         return in.readLine();
@@ -74,4 +79,9 @@ class CharacterDevice extends AbstractDevice {
     public void writeLine(String format, Object... args) {
         out.println(String.format(format, args));
     }
+
+	@Override
+	public boolean canRead() throws IOException {
+		return in.ready();
+	}
 }

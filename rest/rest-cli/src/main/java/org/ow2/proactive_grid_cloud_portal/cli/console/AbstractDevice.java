@@ -45,6 +45,10 @@ public abstract class AbstractDevice {
     public static final short STARDARD = 1;
     public static final short JLINE = 2;
 
+    public abstract boolean canRead() throws IOException;
+
+    public abstract int read() throws IOException;
+
     public abstract String readLine(String fmt, Object... args)
             throws IOException;
 

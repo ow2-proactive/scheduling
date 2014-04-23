@@ -68,4 +68,13 @@ class ConsoleDevice extends AbstractDevice {
         console.printf(format, args);
     }
 
+	@Override
+	public boolean canRead() throws IOException {
+		return console.reader().ready();
+	}
+
+    @Override
+    public int read() throws IOException {
+        return console.reader().read();
+    }
 }

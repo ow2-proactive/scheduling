@@ -41,6 +41,7 @@ importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.GetTaskOutputComma
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.GetTaskResultCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.UploadFileCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.DownloadFileCommand);
+importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.LiveLogCommand);
 
 var currentContext = ApplicationContextImpl.currentContext();
 
@@ -134,6 +135,10 @@ function uploadfile(spaceName, filePath, fileName, localFile) {
 
 function downloadfile(spaceName, pathName, localFile) {
 	execute(new DownloadFileCommand(string(spaceName), string(pathName), string(localFile))) ;
+}
+
+function livelog(jobId) {
+	execute(new LiveLogCommand(string(jobId)));
 }
 
 function start() {
