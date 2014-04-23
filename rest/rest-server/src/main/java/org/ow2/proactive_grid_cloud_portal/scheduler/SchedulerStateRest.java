@@ -439,7 +439,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
         } catch (PermissionException e) {
             throw new PermissionRestException(e);
-        } catch (NotConnectedException e) {
+        } catch (NotConnectedExceoeption e) {
             throw new NotConnectedRestException(e);
         } catch (UnknownJobException e) {
             throw new UnknownJobRestException(e);

@@ -318,6 +318,12 @@ public class CommandSet {
             .jsCommand("downloadfile(space-name,path-name,local-file)").commandClass(DownloadFileCommand.class)
             .entry();
 
+    public static final CommandSet.Entry LIVE_LOGS = CommandSetEntryBuilder
+            .newInstance().opt("ll").longOpt("livelog")
+            .description("Retrieve the output of specified job").hasArgs(true)
+            .numOfArgs(1).argNames("job-id").jsCommand("livelogs(job-id)")
+            .commandClass(LiveLogsCommand.class).entry();
+
     public static final CommandSet.Entry EVAL = CommandSetEntryBuilder
             .newInstance().opt("sf").longOpt("script")
             .description("Evaluate the specified JavaScript file")
@@ -480,7 +486,7 @@ public class CommandSet {
             SUBMIT_ARCH, JOB_STATE, JOB_OUTPUT, JOB_RESULT, JOB_PRIORITY,
             JOB_PAUSE, JOB_RESUME, JOB_KILL, JOB_REMOVE, TASK_RESTART,
             TASK_PREEMPT, TASK_OUTPUT, TASK_RESULT, UPLOAD_FILE, DOWNLOAD_FILE, 
-            SCHED_IMODE, SCHED_HELP };
+            SCHED_IMODE, SCHED_HELP, LIVE_LOGS };
 
     /** CommandSet.Entry objects which are specific to Resource Manager CLI */
     public static final CommandSet.Entry[] RM_ONLY = new CommandSet.Entry[] {

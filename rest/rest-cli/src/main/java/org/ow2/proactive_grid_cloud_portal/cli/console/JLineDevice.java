@@ -168,4 +168,14 @@ public class JLineDevice extends AbstractDevice {
         reader.printNewline();
     }
 
+    @Override
+    public int read() throws IOException {
+        return reader.getInput().read();
+    }
+
+    @Override
+	public boolean canRead() throws IOException {
+		return reader.getInput().available() > 0;
+	}
+
 }
