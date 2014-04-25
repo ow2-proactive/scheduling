@@ -80,11 +80,7 @@ function startEverything() {
     println('\nDumping configuration into ' + paConfigFile)
     dumpProActiveConfiguration(paConfigFile)
 
-	// Add shutdownhook to terminate all processes if the current process is killed
-	Runtime.getRuntime().addShutdownHook(new Thread(function () {
-		if (schedulerProcess != null) schedulerProcess.destroy() 
-		if (routerProcess != null) routerProcess.destroy()
-	}))
+    killChildrenOnShutdown()
 
 	var executor = Executors.newFixedThreadPool(3)
 	var service = new ExecutorCompletionService(executor)
@@ -432,4 +428,16 @@ function loadClasspath() {
 	var seManager = new javax.script.ScriptEngineManager(urlClassLoader);
     var engine = seManager.getEngineByName('javascript');
 	engine.eval(new java.io.FileReader(new File(currDir,SCRIPT_NAME)));	
+}
+
+function killChildrenOnShutdown() {
+	// Add shutdownhook to terminate all processes if the current process is killed
+	Runtime.getRuntime().addShutdownHook(new Thread(function () {
+		if (schedulerProcess != null) schedulerProcess.destroy()
+		if (routerProcess != null) routerProcess.destroy()
+	}))
+	// Kill all children processes on exit
+	org.apache.log4j.BasicConfigurator.configure(new org.apache.log4j.varia.NullAppender())
+	org.ow2.proactive.rm.util.process.EnvironmentCookieBasedChildProcessKiller.setCookie('killme')
+    org.ow2.proactive.rm.util.process.EnvironmentCookieBasedChildProcessKiller.registerKillChildProcessesOnShutdown()
 }
