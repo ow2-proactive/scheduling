@@ -73,7 +73,7 @@ public class TestExecutionTask extends JavaExecutable {
     @Override
     public Serializable execute(TaskResult... results) throws Throwable {
         try {
-            NodeSet nodes = getNodes();
+            NodeSet nodes = new NodeSet(getNodes());
             System.out.println("Task received following hosts:");
             Set<String> hosts = new LinkedHashSet<String>();
             for (int i = 0; i < nodes.size(); i++) {

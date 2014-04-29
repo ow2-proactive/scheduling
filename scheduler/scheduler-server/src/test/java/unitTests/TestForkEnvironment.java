@@ -43,7 +43,7 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
-import org.ow2.proactive.scheduler.task.launcher.InternalForkEnvironment;
+import org.ow2.proactive.scheduler.task.utils.InternalForkEnvironment;
 import org.ow2.proactive.scripting.SimpleScript;
 
 

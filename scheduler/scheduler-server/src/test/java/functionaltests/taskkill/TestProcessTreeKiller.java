@@ -52,7 +52,7 @@ import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
-import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
+import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.rm.util.process.ProcessTreeKiller;
 import functionaltests.RMTHelper;
 import functionaltests.SchedulerConsecutive;

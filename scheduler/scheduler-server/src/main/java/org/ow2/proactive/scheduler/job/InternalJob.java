@@ -75,11 +75,11 @@ import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
 import org.ow2.proactive.scheduler.descriptor.JobDescriptorImpl;
 import org.ow2.proactive.scheduler.descriptor.TaskDescriptor;
+import org.ow2.proactive.scheduler.task.SchedulerVars;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskInfoImpl;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
-import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
 import org.ow2.proactive.scheduler.util.policy.ISO8601DateUtil;
 
 
@@ -1310,8 +1310,8 @@ public abstract class InternalJob extends JobState {
         Map<String, String> replacements = new HashMap<String, String>();
         JobId jobId = jobInfo.getJobId();
         if (jobId != null) {
-            replacements.put(TaskLauncher.SchedulerVars.JAVAENV_JOB_ID_VARNAME.toString(), jobId.toString());
-            replacements.put(TaskLauncher.SchedulerVars.JAVAENV_JOB_NAME_VARNAME.toString(), jobId
+            replacements.put(SchedulerVars.JAVAENV_JOB_ID_VARNAME.toString(), jobId.toString());
+            replacements.put(SchedulerVars.JAVAENV_JOB_NAME_VARNAME.toString(), jobId
                     .getReadableName());
         }
         return applyReplacementsOnGenericInformation(replacements);

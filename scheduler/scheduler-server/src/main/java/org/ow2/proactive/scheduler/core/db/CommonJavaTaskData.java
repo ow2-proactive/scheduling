@@ -21,7 +21,7 @@ import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
 import org.hibernate.type.SerializableToBlobType;
 import org.ow2.proactive.scheduler.common.task.util.ByteArrayWrapper;
-import org.ow2.proactive.scheduler.task.JavaExecutableContainer;
+import org.ow2.proactive.scheduler.task.java.JavaExecutableContainer;
 
 
 @MappedSuperclass

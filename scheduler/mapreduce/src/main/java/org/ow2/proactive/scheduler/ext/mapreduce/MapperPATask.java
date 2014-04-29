@@ -26,8 +26,7 @@ import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.ext.mapreduce.logging.DefaultLogger;
 import org.ow2.proactive.scheduler.ext.mapreduce.logging.Logger;
 import org.ow2.proactive.scheduler.ext.mapreduce.util.StreamUtils;
-import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
-import org.ow2.proactive.scheduler.task.launcher.TaskLauncher.SchedulerVars;
+import org.ow2.proactive.scheduler.task.SchedulerVars;
 
 
 /**
@@ -252,7 +251,7 @@ public class MapperPATask extends JavaExecutable {
         // org.apache.hadoop.mapreduce.TaskAttemptID
         int taskId = 0;
         int jobId = 0;
-        String taskIdString = System.getProperty(TaskLauncher.SchedulerVars.JAVAENV_TASK_ID_VARNAME
+        String taskIdString = System.getProperty(SchedulerVars.JAVAENV_TASK_ID_VARNAME
                 .toString());
         if ((taskIdString != null) && (!(taskIdString.equalsIgnoreCase("")))) {
             taskId = Integer.parseInt(taskIdString);
@@ -260,7 +259,7 @@ public class MapperPATask extends JavaExecutable {
         } else {
             logger.debug("The taskId string is null or empty");
         }
-        String jobIdString = System.getProperty(TaskLauncher.SchedulerVars.JAVAENV_JOB_ID_VARNAME.toString());
+        String jobIdString = System.getProperty(SchedulerVars.JAVAENV_JOB_ID_VARNAME.toString());
         if ((jobIdString != null) && (!(jobIdString.equalsIgnoreCase("")))) {
             jobId = Integer.parseInt(jobIdString);
             logger.debug("The jobId of the MapperPATask is: " + jobId);

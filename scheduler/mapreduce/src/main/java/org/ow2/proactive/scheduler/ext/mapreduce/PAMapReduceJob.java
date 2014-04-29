@@ -45,7 +45,7 @@ import org.ow2.proactive.scheduler.ext.mapreduce.exception.PAJobConfigurationExc
 import org.ow2.proactive.scheduler.ext.mapreduce.fs.PADataSpacesFileSystem;
 import org.ow2.proactive.scheduler.ext.mapreduce.logging.DefaultLogger;
 import org.ow2.proactive.scheduler.ext.mapreduce.logging.Logger;
-import org.ow2.proactive.scheduler.task.launcher.TaskLauncher.SchedulerVars;
+import org.ow2.proactive.scheduler.task.SchedulerVars;
 import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.SimpleScript;

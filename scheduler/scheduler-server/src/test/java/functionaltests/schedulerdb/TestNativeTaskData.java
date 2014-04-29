@@ -5,7 +5,7 @@ import org.junit.Test;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.job.InternalJob;
-import org.ow2.proactive.scheduler.task.NativeExecutableContainer;
+import org.ow2.proactive.scheduler.task.nativ.NativeExecutableContainer;
 import org.ow2.proactive.scripting.GenerationScript;
 
 

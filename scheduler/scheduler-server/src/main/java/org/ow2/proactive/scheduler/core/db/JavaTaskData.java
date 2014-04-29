@@ -4,7 +4,7 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
-import org.ow2.proactive.scheduler.task.JavaExecutableContainer;
+import org.ow2.proactive.scheduler.task.java.JavaExecutableContainer;
 
 
 @Entity

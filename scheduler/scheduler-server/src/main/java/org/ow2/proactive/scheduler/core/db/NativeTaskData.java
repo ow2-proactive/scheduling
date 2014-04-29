@@ -20,7 +20,7 @@ import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
 import org.hibernate.type.SerializableToBlobType;
-import org.ow2.proactive.scheduler.task.NativeExecutableContainer;
+import org.ow2.proactive.scheduler.task.nativ.NativeExecutableContainer;
 import org.ow2.proactive.scripting.GenerationScript;
 import org.ow2.proactive.scripting.InvalidScriptException;
 

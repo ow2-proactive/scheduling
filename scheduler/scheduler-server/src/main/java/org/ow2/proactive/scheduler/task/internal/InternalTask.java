@@ -66,10 +66,11 @@ import org.ow2.proactive.scheduler.common.task.flow.FlowBlock;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
+import org.ow2.proactive.scheduler.task.SchedulerVars;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskInfoImpl;
-import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
-import org.ow2.proactive.scheduler.task.launcher.TaskLauncherInitializer;
+import org.ow2.proactive.scheduler.task.TaskLauncher;
+import org.ow2.proactive.scheduler.task.TaskLauncherInitializer;
 import org.ow2.proactive.utils.NodeSet;
 
 
@@ -170,7 +171,7 @@ public abstract class InternalTask extends TaskState {
         // while replicating it "only" loses tasks args in db...
         //ExecutableContainer replicatedContainer = null;
         try {
-            // Deep copy of the InternalTask using serialization
+            // Deep copy of the InternalTask using proactive serialization
             replicatedTask = (InternalTask) ProActiveMakeDeepCopy.WithProActiveObjectStream.makeDeepCopy(this);
         } catch (Throwable t) {
             throw new ExecutableCreationException("Failed to serialize task", t);
@@ -1065,20 +1066,20 @@ public abstract class InternalTask extends TaskState {
         Map<String, String> replacements = new HashMap<String, String>();
         JobId jobId = taskInfo.getJobId();
         if (jobId != null) {
-            replacements.put(TaskLauncher.SchedulerVars.JAVAENV_JOB_ID_VARNAME.toString(), jobId.toString());
-            replacements.put(TaskLauncher.SchedulerVars.JAVAENV_JOB_NAME_VARNAME.toString(), jobId
+            replacements.put(SchedulerVars.JAVAENV_JOB_ID_VARNAME.toString(), jobId.toString());
+            replacements.put(SchedulerVars.JAVAENV_JOB_NAME_VARNAME.toString(), jobId
                     .getReadableName());
         }
         TaskId taskId = taskInfo.getTaskId();
         if (taskId != null) {
             replacements
-                    .put(TaskLauncher.SchedulerVars.JAVAENV_TASK_ID_VARNAME.toString(), taskId.toString());
-            replacements.put(TaskLauncher.SchedulerVars.JAVAENV_TASK_NAME_VARNAME.toString(), taskId
+                    .put(SchedulerVars.JAVAENV_TASK_ID_VARNAME.toString(), taskId.toString());
+            replacements.put(SchedulerVars.JAVAENV_TASK_NAME_VARNAME.toString(), taskId
                     .getReadableName());
         }
-        replacements.put(TaskLauncher.SchedulerVars.JAVAENV_TASK_ITERATION.toString(), String
+        replacements.put(SchedulerVars.JAVAENV_TASK_ITERATION.toString(), String
                 .valueOf(iteration));
-        replacements.put(TaskLauncher.SchedulerVars.JAVAENV_TASK_REPLICATION.toString(), String
+        replacements.put(SchedulerVars.JAVAENV_TASK_REPLICATION.toString(), String
                 .valueOf(replication));
 
         return applyReplacementsOnGenericInformation(replacements);

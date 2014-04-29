@@ -40,7 +40,7 @@ import java.io.Serializable;
 
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.exception.ExecutableCreationException;
-import org.ow2.proactive.scheduler.common.task.ExecutableInitializer;
+import org.ow2.proactive.scheduler.common.task.executable.internal.ExecutableInitializer;
 import org.ow2.proactive.scheduler.common.task.executable.Executable;
 import org.ow2.proactive.utils.NodeSet;
 

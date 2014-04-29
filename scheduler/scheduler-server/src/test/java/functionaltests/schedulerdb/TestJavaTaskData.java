@@ -12,7 +12,7 @@ import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.job.InternalJob;
-import org.ow2.proactive.scheduler.task.JavaExecutableContainer;
+import org.ow2.proactive.scheduler.task.java.JavaExecutableContainer;
 
 
 public class TestJavaTaskData extends BaseSchedulerDBTest {

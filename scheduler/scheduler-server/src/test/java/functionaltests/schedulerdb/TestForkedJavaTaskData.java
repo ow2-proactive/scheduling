@@ -10,8 +10,8 @@ import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.job.InternalJob;
-import org.ow2.proactive.scheduler.task.ForkedJavaExecutableContainer;
-import org.ow2.proactive.scheduler.task.launcher.InternalForkEnvironment;
+import org.ow2.proactive.scheduler.task.forked.ForkedJavaExecutableContainer;
+import org.ow2.proactive.scheduler.task.utils.InternalForkEnvironment;
 import org.ow2.proactive.scripting.SimpleScript;
 
 

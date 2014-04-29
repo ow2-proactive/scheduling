@@ -12,7 +12,7 @@ import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.ext.mapreduce.fs.PADataSpacesFileSystem;
 import org.ow2.proactive.scheduler.ext.mapreduce.logging.DefaultLogger;
 import org.ow2.proactive.scheduler.ext.mapreduce.logging.Logger;
-import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
+import org.ow2.proactive.scheduler.task.SchedulerVars;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
@@ -268,7 +268,7 @@ public class SplitterPATask extends JavaExecutable {
              * applied and to create splits for that file
              */
             int jobId = 0;
-            String jobIdString = System.getProperty(TaskLauncher.SchedulerVars.JAVAENV_JOB_ID_VARNAME
+            String jobIdString = System.getProperty(SchedulerVars.JAVAENV_JOB_ID_VARNAME
                     .toString());
             if ((jobIdString != null) && (!(jobIdString.equalsIgnoreCase("")))) {
                 jobId = Integer.parseInt(jobIdString);

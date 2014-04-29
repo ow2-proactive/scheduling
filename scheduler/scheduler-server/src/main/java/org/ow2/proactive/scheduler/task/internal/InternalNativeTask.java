@@ -45,10 +45,10 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.ow2.proactive.scheduler.job.InternalJob;
-import org.ow2.proactive.scheduler.task.NativeExecutableContainer;
-import org.ow2.proactive.scheduler.task.launcher.NativeTaskLauncher;
-import org.ow2.proactive.scheduler.task.launcher.TaskLauncher;
-import org.ow2.proactive.scheduler.task.launcher.TaskLauncherInitializer;
+import org.ow2.proactive.scheduler.task.nativ.NativeExecutableContainer;
+import org.ow2.proactive.scheduler.task.nativ.NativeTaskLauncher;
+import org.ow2.proactive.scheduler.task.TaskLauncher;
+import org.ow2.proactive.scheduler.task.TaskLauncherInitializer;
 import org.ow2.proactive.scheduler.util.TaskLogger;
 
 

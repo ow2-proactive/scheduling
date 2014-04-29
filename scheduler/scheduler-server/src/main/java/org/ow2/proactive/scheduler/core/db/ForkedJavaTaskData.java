@@ -21,7 +21,7 @@ import org.hibernate.type.SerializableToBlobType;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.PropertyModifier;
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
-import org.ow2.proactive.scheduler.task.ForkedJavaExecutableContainer;
+import org.ow2.proactive.scheduler.task.forked.ForkedJavaExecutableContainer;
 
 
 @Entity
