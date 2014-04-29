@@ -51,7 +51,7 @@ import javax.xml.bind.annotation.XmlTransient;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.util.converter.MakeDeepCopy;
+import org.objectweb.proactive.core.util.converter.ProActiveMakeDeepCopy;
 import org.ow2.proactive.scheduler.common.exception.ExecutableCreationException;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
@@ -171,7 +171,7 @@ public abstract class InternalTask extends TaskState {
         //ExecutableContainer replicatedContainer = null;
         try {
             // Deep copy of the InternalTask using serialization
-            replicatedTask = (InternalTask) MakeDeepCopy.WithProActiveObjectStream.makeDeepCopy(this);
+            replicatedTask = (InternalTask) ProActiveMakeDeepCopy.WithProActiveObjectStream.makeDeepCopy(this);
         } catch (Throwable t) {
             throw new ExecutableCreationException("Failed to serialize task", t);
         }
