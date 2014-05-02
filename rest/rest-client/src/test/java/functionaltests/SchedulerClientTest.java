@@ -46,26 +46,28 @@ import org.ow2.proactive.scheduler.rest.ISchedulerClient;
 import org.ow2.proactive.scheduler.rest.SchedulerClient;
 
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import static functionaltests.RestFuncTHelper.getRestServerUrl;
+import java.io.File;
+import java.util.concurrent.TimeoutException;
+import org.junit.Assert;
 
 public class SchedulerClientTest extends AbstractRestFuncTestCase {
-    
+
     /** Maximum wait time of 5 minutes */
-    private static final long max_wait_time = 5 * 60 * 1000;
+    private static final long MAX_WAIT_TIME = 5 * 60 * 1000;
 
     @BeforeClass
     public static void beforeClass() throws Exception {
         init(SchedulerClientTest.class.getSimpleName());
     }
 
-    @Test(timeout = max_wait_time)
+    @Test(timeout = MAX_WAIT_TIME)
     public void testLogin() throws Exception {
         clientInstance();
     }
 
-    @Test(timeout = max_wait_time)
+    @Test(timeout = MAX_WAIT_TIME)
     public void testRenewSession() throws Exception {
         ISchedulerClient client = clientInstance();
         SchedulerStatus status = client.getStatus();
@@ -77,7 +79,7 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         assertNotNull(status);
     }
 
-    @Test(timeout = max_wait_time)
+    @Test(timeout = MAX_WAIT_TIME)
     public void testWaitForTerminatingJob() throws Exception {
         ISchedulerClient client = clientInstance();
         Job job = defaultJob();
@@ -86,12 +88,35 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         client.waitForJob(jobId, TimeUnit.SECONDS.toMillis(10));
     }
 
-    @Test(timeout = max_wait_time, expected = TimeoutException.class)
+    @Test(timeout = MAX_WAIT_TIME, expected = TimeoutException.class)
     public void testWaitForNonTerminatingJob() throws Exception {
         ISchedulerClient client = clientInstance();
         Job job = pendingJob();
         JobId jobId = submitJob(job, client);
         client.waitForJob(jobId, TimeUnit.SECONDS.toMillis(10));
+    }
+
+    @Test(timeout = MAX_WAIT_TIME )
+    public void testPushPullDeleteEmptyFile() throws Exception {
+        File emptyFile = File.createTempFile("emptyFile",".tmp");
+        ISchedulerClient client = clientInstance();
+        // Push the empty file into the userspace
+        client.pushFile("USERSPACE", "", emptyFile.getName(), emptyFile.getCanonicalPath());
+
+        // Delete the local file
+        Assert.assertTrue("Unable to delete the local file after push, maybe there are still some open streams ?", emptyFile.delete());
+
+        // Pull it from the userspace to be sure that it was pushed
+        client.pullFile("USERSPACE", "", emptyFile.getCanonicalPath());
+
+        // Check the file was pulled
+        Assert.assertTrue("Unable to pull the empty file, maybe the pull mechanism is broken ?", emptyFile.exists());
+
+        // Delete the local file
+        Assert.assertTrue("Unable to delete the local file after pull, maybe there are still some open streams ?", emptyFile.delete());
+
+        // Delete the file in the user space
+        //client.deleteFile("USERSPACE", emptyFile.getName()); TODO: TEST THIS LATER
     }
 
     private ISchedulerClient clientInstance() throws Exception {
