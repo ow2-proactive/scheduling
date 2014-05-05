@@ -40,6 +40,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.collections.ListUtils;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.job.Job;
@@ -53,7 +54,6 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingService;
 import org.ow2.proactive.scheduler.common.util.logforwarder.providers.SocketBasedForwardingProvider;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
@@ -296,7 +296,7 @@ public class TestListenJobLogs extends SchedulerConsecutive {
             System.out.println("Waiting for logging event (" + name + ")");
 
             long endTime = System.currentTimeMillis() + timeout;
-            while (!CollectionUtils.removeAll(expectedMessagesList, actualMessages).isEmpty()) {
+            while (!ListUtils.removeAll(expectedMessagesList, actualMessages).isEmpty()) {
                 long waitTime = endTime - System.currentTimeMillis();
                 if (waitTime > 0) {
                     wait(100);
@@ -306,7 +306,7 @@ public class TestListenJobLogs extends SchedulerConsecutive {
             }
 
             Assert.assertTrue("Didn't receive expected events, expected: " + expectedMessagesList +
-                ", actual: " + actualMessages, CollectionUtils.removeAll(expectedMessagesList, actualMessages).isEmpty());
+                ", actual: " + actualMessages, ListUtils.removeAll(expectedMessagesList, actualMessages).isEmpty());
             actualMessages.clear();
         }
 
