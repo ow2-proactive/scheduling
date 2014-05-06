@@ -140,6 +140,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
 
     /**
      * Scheduler logger
+     * Scheduler logger
      */
     public static final Logger logger = Logger.getLogger(SchedulingService.class);
     public static final TaskLogger tlogger = TaskLogger.getInstance();
@@ -424,7 +425,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
 
         if (!ij.isFinished()) {
             jlogger.info(jobId, "is not finished");
-            jlogger.info(jobId, "Job state: " + frontendState.getJobState(jobId));
+            jlogger.info(jobId, "Job state: " + frontendState.getJobState(jobId).getStatus());
             return null;
         }
 
