@@ -150,6 +150,7 @@ public class TestJobCoverage extends FunctionalTest {
         SchedulerTHelper.log("Checking task1 process...");
         tinfo = SchedulerTHelper.waitForEventTaskRunning(id, "task1");
         jstate.update(tinfo);
+        jstate.update(tinfo.getJobInfo());
         Assert.assertEquals(TaskStatus.RUNNING, tinfo.getStatus());
         Assert.assertEquals(JobStatus.RUNNING, jstate.getStatus());
 
