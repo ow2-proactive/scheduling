@@ -370,6 +370,10 @@ public class RMTHelper {
             vmParameters.put(CentralPAPropertyRepository.PA_HOME.getName(), CentralPAPropertyRepository.PA_HOME
                     .getValue());
         }
+        if (!vmParameters.containsKey(PAResourceManagerProperties.RM_HOME.getKey())) {
+            vmParameters.put(PAResourceManagerProperties.RM_HOME.getKey(), PAResourceManagerProperties.RM_HOME
+              .getValueAsString());
+        }
 
         for (Entry<String, String> entry : vmParameters.entrySet()) {
             if (!entry.getKey().equals("") && !entry.getValue().equals("")) {
