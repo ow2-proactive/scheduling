@@ -34,11 +34,16 @@
  */
 package org.ow2.proactive_grid_cloud_portal;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
+import java.lang.reflect.Field;
 import java.net.ServerSocket;
 
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
+import Acme.Serve.Serve;
 import org.jboss.resteasy.plugins.server.tjws.TJWSEmbeddedJaxrsServer;
+import org.jboss.resteasy.plugins.server.tjws.TJWSServletServer;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
@@ -47,18 +52,41 @@ public class RestTestServer {
     protected static int port;
     private static TJWSEmbeddedJaxrsServer server;
 
+    protected static ByteArrayOutputStream serverLogs = new ByteArrayOutputStream();
+
     @BeforeClass
-    public static void startServer() throws IOException {
+    public static void startServer() throws IOException, NoSuchFieldException, IllegalAccessException {
+        bypassProActiveLogger();
         preventProActiveToChangeSecurityManager();
         server = new TJWSEmbeddedJaxrsServer();
+        silentServerError();
+
         port = findFreePort();
         server.setPort(port);
         server.setRootResourcePath("/");
         server.start();
     }
 
+    private static void bypassProActiveLogger() {
+        System.setProperty("log4j.configuration", "log4j.properties");
+    }
+
     private static void preventProActiveToChangeSecurityManager() {
         CentralPAPropertyRepository.PA_CLASSLOADING_USEHTTP.setValue(false);
+    }
+
+    /**
+     * Use reflection to access private fields of the underlying server.
+     */
+    private static void silentServerError() throws NoSuchFieldException, IllegalAccessException {
+        Field f = TJWSServletServer.class.getDeclaredField("server");
+        f.setAccessible(true);
+        TJWSServletServer.FileMappingServe serve = (TJWSServletServer.FileMappingServe) f.get(server);
+
+        Field streamField = Serve.class.getDeclaredField("logStream");
+        streamField.setAccessible(true);
+
+        streamField.set(serve, new PrintStream(serverLogs));
     }
 
     protected static void addResource(Object restResource) {
@@ -76,4 +104,5 @@ public class RestTestServer {
         server.close();
         return port;
     }
+
 }
