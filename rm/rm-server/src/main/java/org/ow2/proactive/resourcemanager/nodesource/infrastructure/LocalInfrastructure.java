@@ -100,10 +100,8 @@ public class LocalInfrastructure extends InfrastructureManager {
         boolean containsSpace = rmHome.contains(" ");
         ArrayList<String> paPropList = new ArrayList<String>();
         if (!this.paProperties.contains(CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getName())) {
-            StringBuilder sb = new StringBuilder(CentralPAPropertyRepository.JAVA_SECURITY_POLICY
-                    .getCmdLine());
-            sb.append(rmHome).append("config").append(os.fs).append("security.java.policy-client");
-            paPropList.add(sb.toString());
+            paPropList.add(CentralPAPropertyRepository.JAVA_SECURITY_POLICY
+              .getCmdLine() + rmHome + "config" + os.fs + "security.java.policy-client");
         }
         if (!this.paProperties.contains(CentralPAPropertyRepository.LOG4J.getName())) {
             StringBuilder sb = new StringBuilder(CentralPAPropertyRepository.LOG4J.getCmdLine());
@@ -111,23 +109,18 @@ public class LocalInfrastructure extends InfrastructureManager {
             // log4j only understands urls
             try {
                 sb.append((new File(rmHome)).toURI().toURL().toString()).append("config").append("/").append(
-                        "log4j").append("/").append("log4j-defaultNode");
+                  "log4j").append("/").append("log4j-defaultNode");
             } catch (MalformedURLException e) {
                 throw new IllegalStateException(e);
             }
             paPropList.add(sb.toString());
         }
         if (!this.paProperties.contains(CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getName())) {
-            StringBuilder sb = new StringBuilder(CentralPAPropertyRepository.PA_CONFIGURATION_FILE
-                    .getCmdLine());
-            sb.append(rmHome).append("config").append(os.fs).append("proactive").append(os.fs).append(
-                    "ProActiveConfiguration.xml");
-            paPropList.add(sb.toString());
+            paPropList.add(CentralPAPropertyRepository.PA_CONFIGURATION_FILE
+              .getCmdLine() + rmHome + "config" + os.fs + "proactive" + os.fs + "ProActiveConfiguration.xml");
         }
         if (!this.paProperties.contains(PAResourceManagerProperties.RM_HOME.getKey())) {
-            StringBuilder sb = new StringBuilder(PAResourceManagerProperties.RM_HOME.getCmdLine());
-            sb.append(rmHome);
-            paPropList.add(sb.toString());
+            paPropList.add(PAResourceManagerProperties.RM_HOME.getCmdLine() + rmHome);
         }
         if (!paProperties.isEmpty()) {
             Collections.addAll(paPropList, this.paProperties.split(" "));
@@ -140,7 +133,7 @@ public class LocalInfrastructure extends InfrastructureManager {
             createLostNode(nodeName, "Cannot decrypt credentials value", e);
             return;
         }
-        List<String> cmd = null;
+        List<String> cmd;
         try {
             cmd = clb.buildCommandLineAsList(false);
         } catch (IOException e) {
@@ -152,23 +145,24 @@ public class LocalInfrastructure extends InfrastructureManager {
         final String obfuscatedCmd = Tools.join(cmd, " ");
 
         String depNodeURL = null;
-        ProcessExecutor processExecutor = null;
+        ProcessExecutor processExecutor;
         try {
             this.isNodeAcquired.put(nodeName, false);
             if (os == OperatingSystem.UNIX && containsSpace) {
                 depNodeURL = this.addDeployingNode(nodeName, SHELL_INTERPRET + " " + SHELL_COMMAND_OPTION +
-                    " " + obfuscatedCmd, "Node launched locally", this.nodeTimeout);
+                  " " + obfuscatedCmd, "Node launched locally", this.nodeTimeout);
 
                 logger
-                        .debug("LocalIM detected the libRoot variable contains whitespaces. Running the escaped command prepended with \"" +
-                            SHELL_INTERPRET + " " + SHELL_COMMAND_OPTION + "\".");
+                  .debug(
+                    "LocalIM detected the libRoot variable contains whitespaces. Running the escaped command prepended with \"" +
+                      SHELL_INTERPRET + " " + SHELL_COMMAND_OPTION + "\".");
 
                 List<String> newCmd = Arrays.asList(SHELL_INTERPRET, SHELL_COMMAND_OPTION);
                 newCmd.addAll(cmd);
                 cmd = newCmd;
             } else {
                 depNodeURL = this.addDeployingNode(nodeName, obfuscatedCmd, "Node launched locally",
-                        this.nodeTimeout);
+                  this.nodeTimeout);
             }
 
             // Deobfuscate the cred value
@@ -188,9 +182,9 @@ public class LocalInfrastructure extends InfrastructureManager {
 
         //watching process
         int threshold = 5;
-        Boolean isLost = false, isAcquired = false;
+        Boolean isLost, isAcquired;
         while (((isLost = this.isDeployingNodeLost.get(depNodeURL)) != null) && !isLost &&
-            ((isAcquired = this.isNodeAcquired.get(nodeName)) != null) && !isAcquired) {
+          ((isAcquired = this.isNodeAcquired.get(nodeName)) != null) && !isAcquired) {
             if (processExecutor.isProcessFinished()) {
                 int exit = processExecutor.getExitCode();
                 if (exit != 0) {
@@ -218,10 +212,8 @@ public class LocalInfrastructure extends InfrastructureManager {
         }
 
         logger.debug("Local Infrastructure manager exits watching loop for node " + nodeName);
-        String out = Tools.join(processExecutor.getOutput(), "\n");
-        String err = Tools.join(processExecutor.getErrorOutput(), "\n");
-        String lf = System.getProperty("line.separator");
-        logger.debug(nodeName + " output: " + out + lf + "errput: " + err);
+        logNodeOutput(nodeName + " output: ", processExecutor.getOutput());
+        logNodeOutput(nodeName + " errput: ", processExecutor.getErrorOutput());
 
         if (isLost) {
             //clean up the process
@@ -232,16 +224,24 @@ public class LocalInfrastructure extends InfrastructureManager {
         this.isNodeAcquired.remove(nodeName);
     }
 
+    private void logNodeOutput(final String prefix, List<String> nodeOutputLines) {
+        if (nodeOutputLines != null) {
+            for (String processOutputLine : nodeOutputLines) {
+                logger.debug(prefix + processOutputLine);
+            }
+        }
+    }
+
     /**
      * Creates a lost node. The deployment has failed while building the command line
-     * @param string a message
+     * @param message a message
      * @param e the cause
      */
     private void createLostNode(String name, String message, Throwable e) {
         this.isNodeAcquired.remove(name);
         String lf = System.getProperty("line.separator");
         String url = super.addDeployingNode(name, "deployed as daemon",
-                "Deploying a new windows azure insance", this.nodeTimeout);
+          "Deploying a new windows azure insance", this.nodeTimeout);
         String st = Utils.getStacktrace(e);
         super.declareDeployingNodeLost(url, message + lf + st);
     }
@@ -298,7 +298,7 @@ public class LocalInfrastructure extends InfrastructureManager {
     @Override
     public void removeNode(Node node) throws RMException {
         String nodeName = node.getNodeInformation().getName();
-        logger.debug("Removing node "+node.getNodeInformation().getURL() + " from infrastructure");
+        logger.debug("Removing node " + node.getNodeInformation().getURL() + " from infrastructure");
         this.atomicMaxNodes.incrementAndGet();
         ProcessExecutor proc = this.nodeNameToProcess.remove(nodeName);
         if (proc != null) {
