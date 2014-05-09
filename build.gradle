@@ -532,8 +532,10 @@ task proActiveLibs(type: Sync) {
     into file("$rootDir/dist/lib")
 }
 
+// enables the installation of artifacts from staticFiles, customLibs tasks into the local maven repo
+apply plugin: 'java'
+
 defaultTasks 'proActiveLibs'
-task build
 build.dependsOn 'proActiveLibs'
 
 subprojects {
