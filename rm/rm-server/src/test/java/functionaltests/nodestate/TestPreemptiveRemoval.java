@@ -36,8 +36,6 @@
  */
 package functionaltests.nodestate;
 
-import junit.framework.Assert;
-
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.node.Node;
@@ -46,6 +44,7 @@ import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.utils.NodeSet;
+import junit.framework.Assert;
 
 import functionaltests.RMConsecutive;
 import functionaltests.RMTHelper;
@@ -228,7 +227,7 @@ public class TestPreemptiveRemoval extends RMConsecutive {
         timeouted = false;
         try {
             evt = helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED, 3000);
-            System.out.println("Unexpected node event " + evt);
+            RMTHelper.log("Unexpected node event " + evt);
         } catch (ProActiveTimeoutException e) {
             timeouted = true;
         }

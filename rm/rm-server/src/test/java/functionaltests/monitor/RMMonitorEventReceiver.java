@@ -42,6 +42,8 @@ import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.frontend.RMGroupEventListener;
 
+import functionaltests.RMTHelper;
+
 
 @ActiveObject
 public class RMMonitorEventReceiver extends RMGroupEventListener {
@@ -63,17 +65,17 @@ public class RMMonitorEventReceiver extends RMGroupEventListener {
     }
 
     public void nodeEvent(RMNodeEvent event) {
-        System.out.println("Event: " + event);
+        RMTHelper.log("Event: " + event);
         monitorsHandler.handleNodeEvent(event);
     }
 
     public void nodeSourceEvent(RMNodeSourceEvent event) {
-        System.out.println("Event: " + event);
+        RMTHelper.log("Event: " + event);
         monitorsHandler.handleNodesourceEvent(event);
     }
 
     public void rmEvent(RMEvent event) {
-        System.out.println("Event: " + event);
+        RMTHelper.log("Event: " + event);
         monitorsHandler.handleSchedulerStateEvent(event.getEventType());
     }
 }

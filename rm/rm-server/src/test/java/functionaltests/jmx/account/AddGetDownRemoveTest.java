@@ -58,9 +58,10 @@ import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProper
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.utils.Criteria;
+import org.junit.Assert;
+
 import functionaltests.RMConsecutive;
 import functionaltests.RMTHelper;
-import org.junit.Assert;
 
 
 /**
@@ -136,7 +137,7 @@ public final class AddGetDownRemoveTest extends RMConsecutive {
         } catch (Exception e) {
         }
         while (r.nodeIsAvailable(nodeURL).getBooleanValue()) {
-            System.out.println("Node is available " + nodeURL);
+            RMTHelper.log("Node is available " + nodeURL);
             Thread.sleep(100);
         }
 

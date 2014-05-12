@@ -45,6 +45,8 @@ import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 
+import functionaltests.RMTHelper;
+
 
 public class RMMonitorsHandler {
 
@@ -277,9 +279,6 @@ public class RMMonitorsHandler {
      * @param monitorToNotify EventMonitor to notify.
      */
     private void notifyMonitor(RMEventMonitor monitorToNotify) {
-        //System.out.println("===========================================");
-        //System.out.println("NOTIFYING FOR EVENT : " + monitorToNotify.getWaitedEvent());
-        //System.out.println("===========================================");
         synchronized (monitorToNotify) {
             monitorToNotify.setEventOccured();
             monitorToNotify.notify();
@@ -299,10 +298,6 @@ public class RMMonitorsHandler {
                 if (monitor.eventOccured())
                     return;
                 try {
-                    //System.out.println("===========================================");
-                    //System.out.println("I AM WAITING FOR EVENT : " + monitor.getWaitedEvent() + " during " +
-                    //counter.getRemainingTimeout());
-                    //System.out.println("===========================================");
                     monitor.wait(counter.getRemainingTimeout());
                 } catch (InterruptedException e) {
                     //spurious wake-up, nothing to do
@@ -315,17 +310,17 @@ public class RMMonitorsHandler {
     }
 
     public synchronized void dumpEvents() {
-        System.out.println("RM events");
+        RMTHelper.log("RM events");
         for (RMEventType e : stateEvents) {
-            System.out.println(e);
+            RMTHelper.log(e.toString());
         }
-        System.out.println("RM node source events");
+        RMTHelper.log("RM node source events");
         for (NodeSourceEventMonitor e : nodeSourcesEvent) {
-            System.out.println(e);
+            RMTHelper.log(e.toString());
         }
-        System.out.println("RM node events");
+        RMTHelper.log("RM node events");
         for (NodeEventMonitor e : nodesEvent) {
-            System.out.println(e);
+            RMTHelper.log(e.toString());
         }
     }
 }
