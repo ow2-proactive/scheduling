@@ -39,6 +39,8 @@ package org.ow2.proactive.utils;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.fail;
+
 
 /**
  * Test the bounded linked list class.
@@ -98,12 +100,12 @@ public class TestBoundedLinkedList {
         Assert.assertEquals((Integer) 70, list.getLast());
         try {
             list.add(5, 12);//must throw the exception
-            Assert.assertTrue(false);
+            fail();
         } catch (ArrayIndexOutOfBoundsException e) {
         }
         try {
             list.addAll(5, list.toCollection());//must throw the exception
-            Assert.assertTrue(false);
+            fail();
         } catch (ArrayIndexOutOfBoundsException e) {
         }
         Assert.assertEquals(5, list.getBound());

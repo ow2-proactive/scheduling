@@ -36,8 +36,8 @@
  */
 package functionaltests.permissions;
 
-import functionaltests.TNode;
-import org.junit.Assert;
+import java.util.List;
+
 import org.objectweb.proactive.core.node.Node;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
@@ -46,8 +46,9 @@ import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 
 import functionaltests.RMConsecutive;
 import functionaltests.RMTHelper;
+import functionaltests.TNode;
 
-import java.util.List;
+import static org.junit.Assert.*;
 
 
 /**
@@ -64,7 +65,7 @@ import java.util.List;
  *  4. Users with AllPermissions do not have any restriction described above.
  *
  *  5. If set to a specific user/group only those users can add/remove (can remove only their nodes)
- *  
+ *
  *  We suppose that the resource manager is configured in the way that 3
  *  users exist: admin, nsadmin, user
  *  admin and nsadmin are in the same group ("nsadmins")
@@ -81,7 +82,7 @@ public class TestNSProviderPermissions extends RMConsecutive {
 
         ResourceManager nsadmin = helper.getResourceManager(null, "nsadmin", "pwd");
         nsadmin.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null,
-                StaticPolicy.class.getName(), new Object[] { "ALL", "ME" });
+          StaticPolicy.class.getName(), new Object[] { "ALL", "ME" });
 
         List<TNode> nodePool =  helper.createNodes("node", 17);
 
@@ -89,12 +90,7 @@ public class TestNSProviderPermissions extends RMConsecutive {
 
         Node node = nodePool.remove(0).getNode();
         Node node2 = nodePool.remove(0).getNode();
-        try {
-            nsadmin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            Assert.assertTrue(false);
-        }
+        nsadmin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
 
         helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
 
@@ -102,239 +98,156 @@ public class TestNSProviderPermissions extends RMConsecutive {
         try {
             // user does not allow to add nodes
             user.addNode(node2.getNodeInformation().getURL(), nsName).getBooleanValue();
-            Assert.assertTrue(false);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
+            fail();
+        } catch (Exception expected) {
         }
 
         try {
             // user does not allow to remove nodes
             user.removeNode(node.getNodeInformation().getURL(), true).getBooleanValue();
-            Assert.assertTrue(false);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
+            fail();
+        } catch (Exception expected) {
         }
 
         // AllPermission user
         ResourceManager admin = helper.getResourceManager(null, "admin", "admin");
-        try {
-            // user does not allow to add nodes
-            admin.addNode(node2.getNodeInformation().getURL(), nsName).getBooleanValue();
-            helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            Assert.assertTrue(false);
-        }
+        // user does not allow to add nodes
+        admin.addNode(node2.getNodeInformation().getURL(), nsName).getBooleanValue();
+        helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
 
-        try {
-            // user does not allow to remove nodes
-            admin.removeNode(node.getNodeInformation().getURL(), true).getBooleanValue();
-            helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            Assert.assertTrue(false);
-        }
+        // user does not allow to remove nodes
+        admin.removeNode(node.getNodeInformation().getURL(), true).getBooleanValue();
+        helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
 
-        try {
-            // user does not allow to remove nodes
-            admin.removeNodeSource(nsName, true).getBooleanValue();
-            helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
-            helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            Assert.assertTrue(false);
-        }
+        // user does not allow to remove nodes
+        admin.removeNodeSource(nsName, true).getBooleanValue();
+        helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+        helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
 
         RMTHelper.log("Test2 - node providers = MY_GROUPS");
         admin.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null, StaticPolicy.class
-                .getName(), new Object[] { "ALL", "MY_GROUPS" });
+          .getName(), new Object[] { "ALL", "MY_GROUPS" });
         helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
 
         node = nodePool.remove(0).getNode();
         node2 = nodePool.remove(0).getNode();
         Node node3 = nodePool.remove(0).getNode();
-        try {
-            admin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
-            helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            Assert.assertTrue(false);
-        }
+        admin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
+        helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
 
         nsadmin = helper.getResourceManager(null, "nsadmin", "pwd");
-        try {
-            // nsadmin is in the same group as admin
-            nsadmin.addNode(node2.getNodeInformation().getURL(), nsName).getBooleanValue();
-            helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            Assert.assertTrue(false);
-        }
+        // nsadmin is in the same group as admin
+        nsadmin.addNode(node2.getNodeInformation().getURL(), nsName).getBooleanValue();
+        helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
 
         user = helper.getResourceManager(null, "radmin", "pwd");
         try {
             // user does not allow to add nodes
             user.addNode(node3.getNodeInformation().getURL(), nsName).getBooleanValue();
-            Assert.assertTrue(false);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
+            fail();
+        } catch (Exception expected) {
         }
 
         try {
             // user does not allow to remove nodes
             user.removeNode(node2.getNodeInformation().getURL(), true).getBooleanValue();
-            Assert.assertTrue(false);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
+            fail();
+        } catch (Exception expected) {
         }
 
         nsadmin = helper.getResourceManager(null, "nsadmin", "pwd");
         try {
             // nsadmin cannot remove foreign node
             nsadmin.removeNode(node.getNodeInformation().getURL(), true).getBooleanValue();
-            Assert.assertTrue(false);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
+            fail();
+        } catch (Exception expected) {
         }
-        try {
-            // but it can remove its own
-            nsadmin.removeNode(node2.getNodeInformation().getURL(), true).getBooleanValue();
-            helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
-            nsadmin.addNode(node3.getNodeInformation().getURL(), nsName).getBooleanValue();
-            helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            Assert.assertTrue(false);
-        }
+        // but it can remove its own
+        nsadmin.removeNode(node2.getNodeInformation().getURL(), true).getBooleanValue();
+        helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+        nsadmin.addNode(node3.getNodeInformation().getURL(), nsName).getBooleanValue();
+        helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
 
         admin = helper.getResourceManager(null, "admin", "admin");
-        try {
-            // admin can remove foreign node
-            admin.removeNode(node3.getNodeInformation().getURL(), true).getBooleanValue();
-            helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
-            admin.removeNodeSource(nsName, true).getBooleanValue();
-            helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            Assert.assertTrue(false);
-        }
+        // admin can remove foreign node
+        admin.removeNode(node3.getNodeInformation().getURL(), true).getBooleanValue();
+        helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+        admin.removeNodeSource(nsName, true).getBooleanValue();
+        helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
 
         RMTHelper.log("Test3 - node providers = ALL");
         nsadmin = helper.getResourceManager(null, "nsadmin", "pwd");
         nsadmin.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null,
-                StaticPolicy.class.getName(), new Object[] { "ALL", "ALL" });
+          StaticPolicy.class.getName(), new Object[] { "ALL", "ALL" });
         helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
 
         node = nodePool.remove(0).getNode();
         node2 = nodePool.remove(0).getNode();
         node3 = nodePool.remove(0).getNode();
-        try {
-            nsadmin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
-            helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            Assert.assertTrue(false);
-        }
+        nsadmin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
+        helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
 
         user = helper.getResourceManager(null, "radmin", "pwd");
-        try {
-            // user can add new nodes
-            user.addNode(node2.getNodeInformation().getURL(), nsName).getBooleanValue();
-            helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            Assert.assertTrue(false);
-        }
+        // user can add new nodes
+        user.addNode(node2.getNodeInformation().getURL(), nsName).getBooleanValue();
+        helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         try {
             // but cannot remove a foreign node
             user.removeNode(node.getNodeInformation().getURL(), true).getBooleanValue();
-            Assert.assertTrue(false);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-        try {
-            // user can remove his own node
-            user.removeNode(node2.getNodeInformation().getURL(), true).getBooleanValue();
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            Assert.assertTrue(false);
-        }
-        try {
-            // adding node3
-            user.addNode(node3.getNodeInformation().getURL(), nsName).getBooleanValue();
-            helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            Assert.assertTrue(false);
+            fail();
+        } catch (Exception expected) {
         }
 
+        // user can remove his own node
+        user.removeNode(node2.getNodeInformation().getURL(), true).getBooleanValue();
+        // adding node3
+        user.addNode(node3.getNodeInformation().getURL(), nsName).getBooleanValue();
+        helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+
         nsadmin = helper.getResourceManager(null, "nsadmin", "pwd");
-        try {
-            // nsadmin can remove node3 as ns admin
-            nsadmin.removeNode(node3.getNodeInformation().getURL(), true).getBooleanValue();
-            helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            Assert.assertTrue(false);
-        }
+        // nsadmin can remove node3 as ns admin
+        nsadmin.removeNode(node3.getNodeInformation().getURL(), true).getBooleanValue();
+        helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
 
         RMTHelper.log("Test4 - admin priveleges");
         admin = helper.getResourceManager(null, "admin", "admin");
-        try {
-            // admin can remove anything
-            admin.removeNode(node.getNodeInformation().getURL(), true).getBooleanValue();
-            helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
-            admin.removeNodeSource(nsName, false);
-            helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            Assert.assertTrue(false);
-        }
+        // admin can remove anything
+        admin.removeNode(node.getNodeInformation().getURL(), true).getBooleanValue();
+        helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+        admin.removeNodeSource(nsName, false);
+        helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
 
         RMTHelper.log("Test5.1 - specific users");
         admin.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null, StaticPolicy.class
-                .getName(), new Object[] { "ALL", "users=nsadmin" });
+          .getName(), new Object[] { "ALL", "users=nsadmin" });
         helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
 
         node = nodePool.remove(0).getNode();
         node2 = nodePool.remove(0).getNode();
         node3 = nodePool.remove(0).getNode();
-        try {
-            admin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
-            helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            Assert.assertTrue(false);
-        }
+        admin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
+        helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         nsadmin = helper.getResourceManager(null, "nsadmin", "pwd");
         try {
             // nsadmin cannot remove node as he is not a node owner
             nsadmin.removeNode(node.getNodeInformation().getURL(), true).getBooleanValue();
-            Assert.assertTrue(false);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
+            fail();
+        } catch (Exception expected) {
         }
-        try {
-            nsadmin.addNode(node2.getNodeInformation().getURL(), nsName).getBooleanValue();
-            helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            Assert.assertTrue(false);
-        }
+        nsadmin.addNode(node2.getNodeInformation().getURL(), nsName).getBooleanValue();
+        helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         user = helper.getResourceManager(null, "radmin", "pwd");
         try {
             // user cannot add new nodes
             user.addNode(node3.getNodeInformation().getURL(), nsName).getBooleanValue();
-            Assert.assertTrue(false);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
+            fail();
+        } catch (Exception expected) {
         }
         try {
             // user cannot remove node as he is not a node owner
             user.removeNode(node2.getNodeInformation().getURL(), true).getBooleanValue();
-            Assert.assertTrue(false);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
+            fail();
+        } catch (Exception expected) {
         }
 
         admin = helper.getResourceManager(null, "admin", "admin");
@@ -345,119 +258,86 @@ public class TestNSProviderPermissions extends RMConsecutive {
             helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
             helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
         } catch (Exception e) {
-            Assert.assertTrue(false);
+            fail();
         }
 
         RMTHelper.log("Test5.2 - specific groups");
         admin.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null,
-                StaticPolicy.class.getName(), new Object[] { "ALL", "groups=nsadmins" }).getBooleanValue();
+          StaticPolicy.class.getName(), new Object[] { "ALL", "groups=nsadmins" }).getBooleanValue();
         helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
 
         node = nodePool.remove(0).getNode();
         node2 = nodePool.remove(0).getNode();
         node3 = nodePool.remove(0).getNode();
-        try {
-            admin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
-            helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-        } catch (Exception e) {
-            Assert.assertTrue(e.getMessage(), false);
-        }
+        admin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
+        helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         nsadmin = helper.getResourceManager(null, "nsadmin", "pwd");
         try {
             // nsadmin cannot remove node as he is not a node owner
             nsadmin.removeNode(node.getNodeInformation().getURL(), true).getBooleanValue();
-            Assert.assertTrue(false);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
+            fail();
+        } catch (Exception expected) {
         }
-        try {
-            nsadmin.addNode(node2.getNodeInformation().getURL(), nsName).getBooleanValue();
-            helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-        } catch (Exception e) {
-            Assert.assertTrue(e.getMessage(), false);
-        }
+        nsadmin.addNode(node2.getNodeInformation().getURL(), nsName).getBooleanValue();
+        helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         user = helper.getResourceManager(null, "radmin", "pwd");
         try {
             // user cannot add new nodes
             user.addNode(node3.getNodeInformation().getURL(), nsName).getBooleanValue();
-            Assert.assertTrue(false);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
+            fail();
+        } catch (Exception expected) {
         }
         try {
             // user cannot remove node as he is not a node owner
             user.removeNode(node2.getNodeInformation().getURL(), true).getBooleanValue();
-            Assert.assertTrue(false);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
+            fail();
+        } catch (Exception expected) {
         }
 
         admin = helper.getResourceManager(null, "admin", "admin");
-        try {
-            // user does not allow to remove nodes
-            admin.removeNodeSource(nsName, true).getBooleanValue();
-            helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
-            helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
-            helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
-        } catch (Exception e) {
-            Assert.assertTrue(e.getMessage(), false);
-        }
+        // user does not allow to remove nodes
+        admin.removeNodeSource(nsName, true).getBooleanValue();
+        helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+        helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+        helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
 
         RMTHelper.log("Test5.3 - specific users/groups");
         admin.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null, StaticPolicy.class
-                .getName(), new Object[] { "ALL", "users=radmin;groups=nsadmins" });
+          .getName(), new Object[] { "ALL", "users=radmin;groups=nsadmins" });
         helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
 
         node = nodePool.remove(0).getNode();
         node2 = nodePool.remove(0).getNode();
         node3 = nodePool.remove(0).getNode();
-        try {
-            admin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
-            helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-        } catch (Exception e) {
-            Assert.assertTrue(e.getMessage(), false);
-        }
+        admin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
+        helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         nsadmin = helper.getResourceManager(null, "nsadmin", "pwd");
         try {
             // nsadmin cannot remove node as he is not a node owner
             nsadmin.removeNode(node.getNodeInformation().getURL(), true).getBooleanValue();
-            Assert.assertTrue(false);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
+            fail();
+        } catch (Exception expected) {
         }
-        try {
-            nsadmin.addNode(node2.getNodeInformation().getURL(), nsName).getBooleanValue();
-            helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-        } catch (Exception e) {
-            Assert.assertTrue(e.getMessage(), false);
-        }
+        nsadmin.addNode(node2.getNodeInformation().getURL(), nsName).getBooleanValue();
+        helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         user = helper.getResourceManager(null, "radmin", "pwd");
-        try {
-            // user can add new nodes
-            user.addNode(node3.getNodeInformation().getURL(), nsName).getBooleanValue();
-            helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-        } catch (Exception e) {
-            Assert.assertTrue(e.getMessage(), false);
-        }
+        // user can add new nodes
+        user.addNode(node3.getNodeInformation().getURL(), nsName).getBooleanValue();
+        helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         try {
             // user cannot remove node as he is not a node owner
             user.removeNode(node2.getNodeInformation().getURL(), true).getBooleanValue();
-            Assert.assertTrue(false);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
+            fail();
+        } catch (Exception expected) {
         }
 
         admin = helper.getResourceManager(null, "admin", "admin");
-        try {
-            // user does not allow to remove nodes
-            admin.removeNodeSource(nsName, true).getBooleanValue();
-            helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
-            helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
-            helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
-            helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
-        } catch (Exception e) {
-            Assert.assertTrue(e.getMessage(), false);
-        }
+        // user does not allow to remove nodes
+        admin.removeNodeSource(nsName, true).getBooleanValue();
+        helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+        helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+        helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+        helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
 
         System.out.println("Success");
     }

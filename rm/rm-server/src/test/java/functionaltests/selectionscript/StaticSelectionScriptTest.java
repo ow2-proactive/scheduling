@@ -47,11 +47,13 @@ import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.utils.NodeSet;
-import functionaltests.RMConsecutive;
-import functionaltests.RMTHelper;
 import org.junit.Assert;
 
+import functionaltests.RMConsecutive;
+import functionaltests.RMTHelper;
+
 import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 
 /**
@@ -219,9 +221,8 @@ public class StaticSelectionScriptTest extends RMConsecutive {
         //wait node selection
         try {
             PAFuture.waitFor(nodes);
-            System.out.println("Number of found nodes " + nodes.size());
-            Assert.assertTrue(false);
-        } catch (RuntimeException e) {
+            fail("Number of found nodes " + nodes.size());
+        } catch (RuntimeException expected) {
         }
 
         assertTrue(resourceManager.getState().getFreeNodesNumber() == nodeNumber);
@@ -237,9 +238,8 @@ public class StaticSelectionScriptTest extends RMConsecutive {
         //wait node selection
         try {
             PAFuture.waitFor(nodes);
-            System.out.println("Number of found nodes " + nodes.size());
-            Assert.assertTrue(false);
-        } catch (RuntimeException e) {
+            fail("Number of found nodes " + nodes.size());
+        } catch (RuntimeException expected) {
         }
         assertTrue(resourceManager.getState().getFreeNodesNumber() == nodeNumber);
     }

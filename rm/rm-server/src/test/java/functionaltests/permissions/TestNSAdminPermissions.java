@@ -42,9 +42,12 @@ import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.utils.NodeSet;
+import junit.framework.Assert;
+
 import functionaltests.RMConsecutive;
 import functionaltests.RMTHelper;
-import junit.framework.Assert;
+
+import static org.junit.Assert.fail;
 
 
 /**
@@ -83,26 +86,21 @@ public class TestNSAdminPermissions extends RMConsecutive {
         ResourceManager userRMAccess = helper.getResourceManager(null, "radmin", "pwd");
         try {
             userRMAccess.removeNodeSource(nsName, true).getBooleanValue();
-            Assert.assertTrue(false);
+            fail();
         } catch (Exception e) {
-            System.out.println(e.getMessage());
         }
 
         // admin and provider are in "nsadmins" group
         ResourceManager providerRMAccess = helper.getResourceManager(null, "nsadmin", "pwd");
         try {
             providerRMAccess.removeNodeSource(nsName, true).getBooleanValue();
-            Assert.assertTrue(false);
+            fail();
         } catch (Exception e) {
-            System.out.println(e.getMessage());
         }
 
         adminRMAccess = helper.getResourceManager(null, "admin", "admin");
-        try {
-            adminRMAccess.removeNodeSource(nsName, true).getBooleanValue();
-        } catch (Exception e) {
-            Assert.assertTrue(false);
-        }
+
+        adminRMAccess.removeNodeSource(nsName, true).getBooleanValue();
 
         helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
 
@@ -114,59 +112,38 @@ public class TestNSAdminPermissions extends RMConsecutive {
 
         providerRMAccess = helper.getResourceManager(null, "nsadmin", "pwd");
         Node node = helper.createNode("node1").getNode();
-        try {
-            // adding the node as provider
-            providerRMAccess.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
-            helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-            // node becomes free
-            helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        } catch (Exception e) {
-            Assert.assertTrue(false);
-        }
+
+        // adding the node as provider
+        providerRMAccess.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
+        helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+        // node becomes free
+        helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
         userRMAccess = helper.getResourceManager(null, "radmin", "pwd");
-        try {
-            // this is an administrator of the node source, so it can remove the foreign node
-            userRMAccess.removeNode(node.getNodeInformation().getURL(), true).getBooleanValue();
-            helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
-        } catch (Exception e) {
-            Assert.assertTrue(false);
-        }
+        // this is an administrator of the node source, so it can remove the foreign node
+        userRMAccess.removeNode(node.getNodeInformation().getURL(), true).getBooleanValue();
+        helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
 
         RMTHelper.log("Test3 - ns admin cannot get the foreign node");
         providerRMAccess = helper.getResourceManager(null, "nsadmin", "pwd");
         Node node2 = helper.createNode("node2").getNode();
-        try {
-            // adding the node as provider
-            providerRMAccess.addNode(node2.getNodeInformation().getURL(), nsName).getBooleanValue();
-            helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-            // node becomes free
-            helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        } catch (Exception e) {
-            e.printStackTrace();
-            Assert.assertTrue(false);
-        }
+        // adding the node as provider
+        providerRMAccess.addNode(node2.getNodeInformation().getURL(), nsName).getBooleanValue();
+        helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+        // node becomes free
+        helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
         userRMAccess = helper.getResourceManager(null, "radmin", "pwd");
-        try {
-            // this is an administrator of the node source, so it can remove the foreign node
-            NodeSet nodes = userRMAccess.getAtMostNodes(1, null);
-            Assert.assertEquals("NS admin cannot get nodes as the get level is set to PROVIDER", 0, nodes
-                    .size());
-        } catch (Exception e) {
-            Assert.assertTrue(false);
-        }
+        // this is an administrator of the node source, so it can remove the foreign node
+        NodeSet nodes = userRMAccess.getAtMostNodes(1, null);
+        Assert.assertEquals("NS admin cannot get nodes as the get level is set to PROVIDER", 0, nodes
+          .size());
 
         RMTHelper.log("Test4 - user with AllPermisssion can remove any node sources");
 
         adminRMAccess = helper.getResourceManager(null, "admin", "admin");
-        try {
-            adminRMAccess.removeNodeSource(nsName, true).getBooleanValue();
-        } catch (Exception e) {
-            e.printStackTrace();
-            Assert.assertTrue(false);
-        }
+        adminRMAccess.removeNodeSource(nsName, true).getBooleanValue();
 
-        System.out.println("Success");
+        RMTHelper.log("Success");
     }
 }

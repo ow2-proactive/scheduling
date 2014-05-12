@@ -53,6 +53,7 @@ import functionaltests.RMConsecutive;
 import functionaltests.RMTHelper;
 
 import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 
 /**
@@ -223,8 +224,7 @@ public class DynamicSelectionScriptTest extends RMConsecutive {
         //wait node selection
         try {
             PAFuture.waitFor(nodes);
-            System.out.println("Number of found nodes " + nodes.size());
-            Assert.assertTrue(false);
+            fail("Number of found nodes " + nodes.size());
         } catch (RuntimeException e) {
         }
         assertTrue(resourceManager.getState().getFreeNodesNumber() == nsSize);
@@ -240,9 +240,8 @@ public class DynamicSelectionScriptTest extends RMConsecutive {
         //wait node selection
         try {
             PAFuture.waitFor(nodes);
-            System.out.println("Number of found nodes " + nodes.size());
-            Assert.assertTrue(false);
-        } catch (RuntimeException e) {
+            fail("Number of found nodes " + nodes.size());
+        } catch (RuntimeException expected) {
         }
         assertTrue(resourceManager.getState().getFreeNodesNumber() == nsSize);
 

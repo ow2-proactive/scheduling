@@ -48,6 +48,8 @@ import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.junit.Assert;
 
+import static org.junit.Assert.fail;
+
 
 /**
  * This class tests the behavior when giving an invalid selection script
@@ -98,8 +100,8 @@ public class TestJobWithInvalidSelectionScript extends SchedulerConsecutive {
             SchedulerTHelper.log("Waiting for task *finished : " + task2Name);
             SchedulerTHelper.waitForEventTaskFinished(id, task2Name, 2000);
             //should always go in the catch
-            Assert.assertTrue(false);
-        } catch (ProActiveTimeoutException e) {
+            fail();
+        } catch (ProActiveTimeoutException expected) {
         }
 
         SchedulerTHelper.log("Waiting for job finished");

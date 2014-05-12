@@ -89,13 +89,9 @@ public class SelectionScriptTimeOutTest extends RMConsecutive {
         NodeSet nodes = resourceManager.getAtMostNodes(2, script);
 
         //wait node selection
-        try {
-            PAFuture.waitFor(nodes);
-            System.out.println("Number of found nodes " + nodes.size());
-            Assert.assertEquals(0, nodes.size());
-        } catch (RuntimeException e) {
-            Assert.assertTrue(false);
-        }
+        PAFuture.waitFor(nodes);
+        System.out.println("Number of found nodes " + nodes.size());
+        Assert.assertEquals(0, nodes.size());
 
         Assert.assertEquals(nodesNumber, resourceManager.getState().getFreeNodesNumber());
 

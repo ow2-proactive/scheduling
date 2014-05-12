@@ -39,23 +39,23 @@ package functionaltests.nodestate;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.process.JVMProcessImpl;
-import org.objectweb.proactive.core.util.ProActiveInet;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
-import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.utils.NodeSet;
-import functionaltests.RMConsecutive;
-import functionaltests.RMTHelper;
 import junit.framework.Assert;
 
+import functionaltests.RMConsecutive;
+import functionaltests.RMTHelper;
+
 import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 
 /**
@@ -168,13 +168,9 @@ public class TestConcurrentUsers extends RMConsecutive {
         NodeSet ns2 = resourceManager.getAtMostNodes(1, null);
         RMNodeEvent event = helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED, 10000);
         Assert.assertTrue(event.getNodeState() == NodeState.BUSY);
-        try {
-            PAFuture.waitFor(ns2);
-            System.out.println("Number of found nodes " + ns2.size());
-            Assert.assertEquals(1, ns2.size());
-        } catch (RuntimeException e) {
-            Assert.assertTrue(false);
-        }
+        PAFuture.waitFor(ns2);
+        System.out.println("Number of found nodes " + ns2.size());
+        Assert.assertEquals(1, ns2.size());
 
         t = new Thread() {
             public void run() {
@@ -186,7 +182,6 @@ public class TestConcurrentUsers extends RMConsecutive {
                     rm.disconnect().getBooleanValue();
                 } catch (Exception e) {
                     e.printStackTrace();
-                    Assert.assertTrue(false);
                 }
             }
         };
@@ -195,7 +190,7 @@ public class TestConcurrentUsers extends RMConsecutive {
 
         try {
             event = helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED, 10000);
-            Assert.assertTrue(event.toString(), false);
+            fail("Unexpected event: " + event);
         } catch (ProActiveTimeoutException e) {
         }
     }
