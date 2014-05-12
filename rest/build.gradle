@@ -182,20 +182,25 @@ project(':rest:rest-cli') {
 }
 
 project(':rest:rest-client') {
+
+    configurations {
+        compile.exclude group: 'org.objectweb.proactive', module: 'programming-annotation' 
+        compile.exclude group: 'org.objectweb.proactive', module: 'programming-core' 
+        compile.exclude group: 'org.objectweb.proactive', module: 'programming-extension-annotation'
+    }
+
     dependencies {
 	compile 'commons-cli:commons-cli:1.2'
         compile 'commons-io:commons-io:2.4'
         compile 'jline:jline:1.0'
-
         compile 'org.apache.httpcomponents:httpclient:4.2.1'
         compile 'org.apache.httpcomponents:httpmime:4.2.1'
 
         compile project(":common-api")
-
-        compile project(":scheduler:scheduler-client")
-
-	
+        compile project(":scheduler:scheduler-api")
         compile project(':rest:rest-cli')
+
+	runtime 'xerces:xercesImpl:2.8.1'
 
         testCompile 'junit:junit:4.11'
         testCompile 'org.mockito:mockito-core:1.9.5'

@@ -34,10 +34,13 @@
  */
 package org.ow2.proactive.scheduler.rest.data;
 
+import static org.ow2.proactive.scheduler.task.TaskIdImpl.createTaskId;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
@@ -50,11 +53,7 @@ import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.usage.JobUsage;
 import org.ow2.proactive.scheduler.common.usage.TaskUsage;
-import org.ow2.proactive.scheduler.job.JobIdImpl;
-import org.ow2.proactive.scheduler.job.JobInfoImpl;
 import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
-import org.ow2.proactive.scheduler.task.TaskIdImpl;
-import org.ow2.proactive.scheduler.task.TaskInfoImpl;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobInfoData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobPriorityData;
@@ -95,10 +94,10 @@ public class DataUtility {
         impl.setNumberOfFinishedTasks(d.getNumberOfFinishedTasks());
         impl.setNumberOfPendingTasks(d.getNumberOfPendingTasks());
         impl.setNumberOfRunningTasks(d.getNumberOfRunningTasks());
-        impl.setPriority(jobPriority(d.getPriority()));
+        impl.setJobPriority(jobPriority(d.getPriority()));
         impl.setRemovedTime(d.getRemovedTime());
         impl.setStartTime(d.getStartTime());
-        impl.setStatus(jobStatus(d.getStatus()));
+        impl.setJobStatus(jobStatus(d.getStatus()));
         impl.setSubmittedTime(d.getSubmittedTime());
         impl.setTotalNumberOfTasks(d.getTotalNumberOfTasks());
         return impl;
@@ -123,8 +122,7 @@ public class DataUtility {
 
     public static TaskResult toTaskResult(JobId jobId, TaskResultData d) {
         TaskIdData id = d.getId();
-        TaskId taskId = TaskIdImpl.createTaskId(jobId, id.getReadableName(),
-                id.getId(), false);
+        TaskId taskId = createTaskId(jobId, id.getReadableName(), id.getId(), false);
         return new TaskResultImpl(taskId, d);
     }
 

@@ -34,6 +34,7 @@
  */
 package org.ow2.proactive.scheduler.rest.data;
 
+import static org.ow2.proactive.scheduler.task.TaskIdImpl.createTaskId;
 import static org.ow2.proactive.scheduler.rest.data.DataUtility.taskInfo;
 
 import java.util.List;
@@ -41,7 +42,6 @@ import java.util.List;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskState;
-import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskIdData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskStateData;
 
@@ -57,8 +57,7 @@ public class TaskStateImpl extends TaskState {
     @Override
     public TaskId getId() {
         TaskIdData idData = d.getTaskInfo().getTaskId();
-        return TaskIdImpl.createTaskId(null, idData.getReadableName(),
-                idData.getId(), false);
+        return createTaskId(null, idData.getReadableName(), idData.getId(), false);
     }
 
     @Override
