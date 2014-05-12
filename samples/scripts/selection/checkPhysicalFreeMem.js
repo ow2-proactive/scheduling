@@ -6,7 +6,7 @@
 var selected = false;
 
 var osb = java.lang.management.ManagementFactory.getOperatingSystemMXBean();
-var mem = osb.getFreePhysicalMemorySize()/1024;
+var mem = java.lang.Math.round(osb.getFreePhysicalMemorySize()/1024);
 print(mem+" Kb available");
 //var swap = osb.getFreeSwapSpaceSize()/1024;
 //print(swap+" Kb");
