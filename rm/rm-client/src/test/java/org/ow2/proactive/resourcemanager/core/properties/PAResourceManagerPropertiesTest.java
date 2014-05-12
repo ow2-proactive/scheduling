@@ -39,12 +39,14 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 
 public class PAResourceManagerPropertiesTest {
@@ -54,6 +56,7 @@ public class PAResourceManagerPropertiesTest {
 
     @Before
     public void clear() {
+        Logger.getRootLogger().setLevel(Level.OFF);
         System.clearProperty(PAResourceManagerProperties.PA_RM_PROPERTIES_FILEPATH);
         System.clearProperty(PAResourceManagerProperties.RM_HOME.getKey());
         PAResourceManagerProperties.loadProperties(null);
