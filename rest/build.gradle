@@ -182,13 +182,6 @@ project(':rest:rest-cli') {
 }
 
 project(':rest:rest-client') {
-
-    configurations {
-        compile.exclude group: 'org.objectweb.proactive', module: 'programming-annotation' 
-        compile.exclude group: 'org.objectweb.proactive', module: 'programming-core' 
-        compile.exclude group: 'org.objectweb.proactive', module: 'programming-extension-annotation'
-    }
-
     dependencies {
 	compile 'commons-cli:commons-cli:1.2'
         compile 'commons-io:commons-io:2.4'
