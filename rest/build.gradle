@@ -71,6 +71,7 @@ project(':rest:rest-server') {
         testCompile 'org.apache.httpcomponents:httpmime:4.2.1'
         testCompile 'org.jboss.resteasy:tjws:3.0.6.Final'
         testCompile 'org.fusesource:sigar:1.6.4'
+        testCompile 'com.jayway.awaitility:awaitility:1.6.0'
 
         runtime 'net.bull.javamelody:javamelody-core:1.46.0'
 

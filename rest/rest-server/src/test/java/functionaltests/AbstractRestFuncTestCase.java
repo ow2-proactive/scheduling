@@ -36,9 +36,22 @@
  */
 package functionaltests;
 
-import functionaltests.jobs.NonTerminatingJob;
-import functionaltests.jobs.SimpleJob;
-import functionaltests.utils.RestFuncTUtils;
+import java.security.Policy;
+import java.util.concurrent.TimeUnit;
+
+import javax.ws.rs.core.MediaType;
+
+import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
+import org.ow2.proactive.scheduler.common.Scheduler;
+import org.ow2.proactive.scheduler.common.job.Job;
+import org.ow2.proactive.scheduler.common.job.JobEnvironment;
+import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobPriority;
+import org.ow2.proactive.scheduler.common.job.JobState;
+import org.ow2.proactive.scheduler.common.job.JobStatus;
+import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.task.JavaTask;
+import org.ow2.tests.FunctionalTest;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
@@ -54,21 +67,10 @@ import org.json.simple.parser.JSONParser;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Assume;
-import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
-import org.ow2.proactive.scheduler.common.Scheduler;
-import org.ow2.proactive.scheduler.common.job.Job;
-import org.ow2.proactive.scheduler.common.job.JobEnvironment;
-import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobPriority;
-import org.ow2.proactive.scheduler.common.job.JobState;
-import org.ow2.proactive.scheduler.common.job.JobStatus;
-import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
-import org.ow2.proactive.scheduler.common.task.JavaTask;
-import org.ow2.tests.FunctionalTest;
 
-import javax.ws.rs.core.MediaType;
-import java.security.Policy;
-import java.util.concurrent.TimeUnit;
+import functionaltests.jobs.NonTerminatingJob;
+import functionaltests.jobs.SimpleJob;
+import functionaltests.utils.RestFuncTUtils;
 
 
 public abstract class AbstractRestFuncTestCase {
@@ -174,11 +176,7 @@ public abstract class AbstractRestFuncTestCase {
     }
 
     protected String getResourceUrl(String resource) {
-        String restUrl = RestFuncTHelper.getRestfulSchedulerUrl();
-        if (!restUrl.endsWith("/")) {
-            restUrl = restUrl + "/";
-        }
-        return restUrl + resource;
+        return RestFuncTHelper.getResourceUrl(resource);
     }
 
     protected String getLogin() throws Exception {

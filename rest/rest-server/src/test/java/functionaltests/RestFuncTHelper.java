@@ -38,15 +38,21 @@ package functionaltests;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.net.URL;
 import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
+import org.objectweb.proactive.api.PARemoteObject;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
+import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
@@ -58,17 +64,17 @@ import org.ow2.proactive.scheduler.common.SchedulerConnection;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.util.SchedulerStarter;
+import com.jayway.awaitility.Duration;
+import org.apache.commons.httpclient.HttpStatus;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+
 import functionaltests.utils.ProcessStreamReader;
 import functionaltests.utils.RestFuncTUtils;
-import java.net.URI;
-import java.util.Set;
-import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.api.PARemoteObject;
-import org.objectweb.proactive.core.body.UniversalBody;
-import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.node.NodeImpl;
-import org.objectweb.proactive.core.runtime.ProActiveRuntime;
-import org.ow2.proactive_grid_cloud_portal.scheduler.EventListener;
+
+import static com.jayway.awaitility.Awaitility.await;
+
 
 public class RestFuncTHelper {
 
@@ -156,10 +162,10 @@ public class RestFuncTHelper {
         Credentials rmCredentials = getRmCredentials();
         rm = rmAuth.login(rmCredentials);
 
-        waitForRestWebapp();
-
         restServerUrl = "http://localhost:8080/rest/rest/";
         restfulSchedulerUrl = restServerUrl + "scheduler";
+
+        await().atMost(Duration.ONE_MINUTE).until(restIsStarted());
     }
 
     public static void stopRestfulSchedulerWebapp() {
@@ -193,21 +199,22 @@ public class RestFuncTHelper {
         }
     }
 
-    private static void waitForRestWebapp() throws Exception {
-        Node schedulerNode = PAActiveObject.getActiveObjectNode(scheduler);
-        ProActiveRuntime r = schedulerNode.getProActiveRuntime();
-        String[] nodeNames = r.getLocalNodeNames();
-        while(true){
-            for (String nodeName : nodeNames) {
-                List<UniversalBody> lis = r.getActiveObjects(nodeName, EventListener.class.getName());
-                if(lis.size() > 0){
-                    System.out.println("... Rest web app EventListener is ready ...");
-                    return;
+    private static Callable<Boolean> restIsStarted() {
+        return new Callable<Boolean>() {
+            @Override
+            public Boolean call() throws Exception {
+                try {
+                    String resourceUrl = getResourceUrl("version");
+                    HttpResponse response = new DefaultHttpClient().execute(new HttpGet(resourceUrl));
+                    int statusCode = response.getStatusLine().getStatusCode();
+                    if (statusCode == HttpStatus.SC_OK) {
+                        return true;
+                    }
+                } catch (IOException e) {
                 }
+                return false;
             }
-            System.out.println("... waiting for the rest webapp event listener ... ");
-            Thread.sleep(500);
-        }
+        };
     }
 
     public static Scheduler getScheduler() {
@@ -259,5 +266,13 @@ public class RestFuncTHelper {
 
     public static String getRestfulSchedulerUrl() {
         return restfulSchedulerUrl;
+    }
+
+    public static String getResourceUrl(String resource) {
+        String restUrl = RestFuncTHelper.getRestfulSchedulerUrl();
+        if (!restUrl.endsWith("/")) {
+            restUrl = restUrl + "/";
+        }
+        return restUrl + resource;
     }
 }
