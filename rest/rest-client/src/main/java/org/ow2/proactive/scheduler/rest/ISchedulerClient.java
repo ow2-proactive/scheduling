@@ -40,10 +40,15 @@ import java.util.Map.Entry;
 import java.util.concurrent.TimeoutException;
 
 import org.ow2.proactive.scheduler.common.Scheduler;
+import org.ow2.proactive.scheduler.common.SchedulerEvent;
+import org.ow2.proactive.scheduler.common.SchedulerEventListener;
+import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
+import org.ow2.proactive.scheduler.common.exception.SubmissionClosedException;
 import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
 import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
+import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
@@ -388,4 +393,27 @@ public interface ISchedulerClient extends Scheduler {
      */
     public boolean deleteFile(String space, String pathname)
             throws NotConnectedException, PermissionException;
+
+    /**
+     * Creates a job archive with self contained job classpath elements and submits to the scheduler.
+     *
+     * A user can only managed their jobs.
+     * <p>
+     * It will execute the tasks of the jobs as soon as resources are available.
+     * The job will be considered as finished once every tasks have finished (error or success).
+     * </p>
+     * Thus, user could get the job result according to the precious result.
+     * <br /><br />
+     * It is possible to get a listener on the scheduler.
+     * (see {@link Scheduler#addEventListener(SchedulerEventListener, boolean, SchedulerEvent...)} for more details)
+     *
+     * @param job the new job to submit.
+     * @return the generated new job ID.
+     * @throws NotConnectedException if you are not authenticated.
+     * @throws PermissionException if you can't access to this particular method.
+     * @throws SubmissionClosedException if the submit action could not be performed.
+     * @throws JobCreationException if Their was a problem while creation the job
+     */
+    public JobId submitAsJobArchive(Job job) throws NotConnectedException, PermissionException,
+            SubmissionClosedException, JobCreationException;
 }

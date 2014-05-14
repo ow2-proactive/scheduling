@@ -1,5 +1,5 @@
 /*
- *  
+ *
  * ProActive Parallel Suite(TM): The Java(TM) library for
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
@@ -54,10 +54,7 @@ import static org.ow2.proactive.scheduler.rest.data.DataUtility.toTaskResult;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.Serializable;
 import java.lang.reflect.Proxy;
 import java.nio.charset.Charset;
@@ -116,6 +113,26 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskStateData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.UserJobData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
 
+import static java.lang.String.format;
+import static java.lang.System.currentTimeMillis;
+import org.apache.commons.io.FileUtils;
+import org.ow2.proactive.scheduler.common.job.JobEnvironment;
+import org.ow2.proactive.scheduler.common.util.JarUtils;
+import static org.ow2.proactive.scheduler.rest.ExceptionUtility.exception;
+import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwJAFEOrUJEOrNCEOrPE;
+import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwNCEOrPE;
+import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwNCEOrPEOrSCEOrJCE;
+import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwUJEOrNCEOrPE;
+import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwUJEOrNCEOrPEOrUTE;
+import static org.ow2.proactive.scheduler.rest.data.DataUtility.jobId;
+import static org.ow2.proactive.scheduler.rest.data.DataUtility.taskState;
+import static org.ow2.proactive.scheduler.rest.data.DataUtility.toJobInfos;
+import static org.ow2.proactive.scheduler.rest.data.DataUtility.toJobResult;
+import static org.ow2.proactive.scheduler.rest.data.DataUtility.toJobState;
+import static org.ow2.proactive.scheduler.rest.data.DataUtility.toJobUsages;
+import static org.ow2.proactive.scheduler.rest.data.DataUtility.toSchedulerUserInfos;
+import static org.ow2.proactive.scheduler.rest.data.DataUtility.toTaskResult;
+
 public class SchedulerClient extends ClientBase implements ISchedulerClient {
 
     private static final long retry_interval = TimeUnit.SECONDS.toMillis(1);
@@ -131,13 +148,13 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
 
     /**
      * Creates an ISchedulerClient instance.
-     * 
+     *
      * @return an ISchedulerClient instance
      */
     public static ISchedulerClient createInstance() {
         SchedulerClient client = new SchedulerClient();
         return (ISchedulerClient) Proxy.newProxyInstance(ISchedulerClient.class.getClassLoader(),
-                new Class[] { ISchedulerClient.class }, new SessionHandler(client));
+                new Class[]{ISchedulerClient.class}, new SessionHandler(client));
     }
 
     /**
@@ -555,11 +572,109 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         try {
             String jobXml = (new Job2XMLTransformer()).jobToxml((TaskFlowJob) job);
             jobIdData = restApiClient().submitXml(sid, IOUtils.toInputStream(jobXml,
-              String.valueOf(Charset.defaultCharset())));
+                    String.valueOf(Charset.defaultCharset())));
         } catch (Exception e) {
             throwNCEOrPEOrSCEOrJCE(e);
         }
         return jobId(jobIdData);
+    }
+
+    @Override
+    public JobId submitAsJobArchive(Job job) throws NotConnectedException, PermissionException, SubmissionClosedException,
+            JobCreationException {
+        String archiveName = String.valueOf(job.hashCode());
+        File archiveDir = null;
+        try {
+            try {
+                archiveDir = File.createTempFile(archiveName, "");
+                FileUtils.forceDelete(archiveDir);
+
+                if (!archiveDir.mkdir()) {
+                    throw new IOException("Unable to create the dir " + archiveDir);
+                }
+            } catch (IOException e) {
+                throw new JobCreationException("Unable to create the archive dir for " + archiveName, e);
+            }
+
+            // The xml job descriptor
+            File jobXmlFile = new File(archiveDir, "job.xml");
+
+            // The lib.jar that will contain all non jar classpath entries
+            final String libJarName = "lib.jar";
+            File libJar = new File(archiveDir, libJarName);
+
+            // The self-contained job archive
+            File jobArchive = new File(archiveDir, archiveName + ".jobarch");
+
+            // Job archive entries
+            ArrayList<String> archiveEntries = new ArrayList<String>();
+            archiveEntries.add(jobXmlFile.getAbsolutePath());
+            archiveEntries.add(libJar.getAbsolutePath());
+
+            // Jar names that will be pathElement tags in the xml job descriptor
+            ArrayList<String> jarsNames = new ArrayList<String>();
+            jarsNames.add(libJarName);
+
+            // All dirs that will go inside the lib.jar
+            ArrayList<String> dirs = new ArrayList<String>();
+
+            // Get job classpath from job environment
+            JobEnvironment originalJobEnv = job.getEnvironment();
+            for (String pathElement : originalJobEnv.getJobClasspath()) {
+                if (pathElement.endsWith(".jar")) {
+                    archiveEntries.add(pathElement);
+                    jarsNames.add(new File(pathElement).getName());
+                } else {
+                    dirs.add(pathElement);
+                }
+            }
+
+            try { // Jar all non jared dirs
+                JarUtils.jar(dirs.toArray(new String[dirs.size()]), libJar, null, null, null, null);
+            } catch (IOException e) {
+                throw new JobCreationException("Unable to jar non-jared directories " + dirs, e);
+            }
+
+            // Add all jars as relative path entries to the unified job env and
+            // specify them when packing the self contained jar
+            JobEnvironment unifiedJobEnv = new JobEnvironment();
+            try {
+                unifiedJobEnv.setJobClasspath(jarsNames.toArray(new String[jarsNames.size()]));
+            } catch (IOException e) {
+                throw new JobCreationException("Unable to set the job classpath of the unified job env", e);
+            }
+
+            // Set the unified env before dumping the job xml
+            job.setEnvironment(unifiedJobEnv);
+
+            try {// Dump the xml job descriptor
+                (new Job2XMLTransformer()).job2xmlFile((TaskFlowJob) job, jobXmlFile);
+            } catch (Exception e) {
+                throw new JobCreationException("Unable to create the xml job descriptor", e);
+            }
+            // Set back the original env to keep the job unmodified to the caller
+            job.setEnvironment(originalJobEnv);
+
+            try { // Pack all archive entries into the self-contained jobarchive
+                JarUtils.zip(archiveEntries.toArray(new String[archiveEntries.size()]), jobArchive, null);
+            } catch (IOException e) {
+                throw new JobCreationException("Unable to create the job archive", e);
+            }
+
+            FileInputStream fis = null;
+            JobIdData jobIdData = null;
+            try {
+                fis = new FileInputStream(jobArchive);
+                jobIdData = restApiClient().submitJobArchive(sid, fis);
+            } catch (Exception e) {
+                throwNCEOrPEOrSCEOrJCE(e);
+            } finally {
+                IOUtils.closeQuietly(fis);
+            }
+            return jobId(jobIdData);
+        } finally {
+            FileUtils.deleteQuietly(archiveDir);
+        }
     }
 
     @Override
@@ -739,10 +854,10 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
             throw new RuntimeException(e);
         }
     }
-    
+
     @Override
     public void setSession(String sid) {
-        this.sid = sid;        
+        this.sid = sid;
     }
 
     @Override
@@ -758,26 +873,6 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         }
     }
 
-    private OutputStream prepareToWrite(String pathname) throws FileNotFoundException {
-        File outputFile = new File(pathname);
-        if (outputFile.exists()) {
-            if (!outputFile.delete()) {
-                throw new RuntimeException("Cannot delete the already exisiting output file: " + pathname);
-            }
-        }
-        File parentFile = outputFile.getParentFile();
-        if (parentFile == null) {
-            throw new RuntimeException("Invalid pathname, cannot determine the parent directory: " + pathname);
-        }
-        if (!parentFile.exists()) {
-            if (!parentFile.mkdirs()) {
-                throw new RuntimeException("Cannot create non-existent paraent directories of the output file: "
-                        + pathname);
-            }
-        }
-        return new FileOutputStream(outputFile);
-    }
-    
     private void closeIfPossible(Closeable closeable) {
         if (closeable != null) {
             try {
