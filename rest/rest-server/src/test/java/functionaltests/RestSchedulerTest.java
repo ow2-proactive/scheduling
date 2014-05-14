@@ -36,6 +36,8 @@
  */
 package functionaltests;
 
+import org.ow2.proactive.scheduler.common.Scheduler;
+import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPut;
@@ -43,8 +45,6 @@ import org.json.simple.JSONObject;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.ow2.proactive.scheduler.common.Scheduler;
-import org.ow2.proactive.scheduler.common.SchedulerStatus;
 
 
 public class RestSchedulerTest extends AbstractRestFuncTestCase {
@@ -60,18 +60,6 @@ public class RestSchedulerTest extends AbstractRestFuncTestCase {
         if (!SchedulerStatus.STARTED.equals(scheduler.getStatus())) {
             scheduler.start();
         }
-    }
-
-    // @Test
-    public void testGetSchedulerStatus() throws Exception {
-        submitFinishedJob();
-        String resourceUrl = getResourceUrl("status");
-        HttpGet httpGet = new HttpGet(resourceUrl);
-        setSessionHeader(httpGet);
-        HttpResponse response = executeUriRequest(httpGet);
-        assertHttpStatusOK(response);
-        String status = getContent(response);
-        assertEquals(SchedulerStatus.STARTED.name(), trim(status));
     }
 
     @Test
