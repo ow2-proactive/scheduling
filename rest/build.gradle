@@ -19,13 +19,20 @@ def functionalTestConfiguration = {
     }
 }
 
+// dependencies
+ext.functionalTestDependencies = [
+        'com.googlecode.json-simple:json-simple:1.1',
+        'com.jayway.awaitility:awaitility:1.6.0',
+        project(":scheduler:scheduler-server"),
+        project(':rm:rm-server').sourceSets.test.output
+]
+
 subprojects {
     apply plugin: 'java'
     apply plugin: 'maven'
     apply plugin: 'eclipse'
 
     group = 'org.ow2.proactive_grid_cloud_portal'
-
 }
 
 project(':rest:rest-api') {
@@ -62,16 +69,10 @@ project(':rest:rest-server') {
 
         compile project(':rest:rest-api')
 
-        testCompile 'junit:junit:4.11'
-        testCompile 'org.mockito:mockito-core:1.9.5'
-        testCompile 'com.googlecode.json-simple:json-simple:1.1'
-        testCompile project(":rm:rm-server")
-        testCompile project(":scheduler:scheduler-server")
-        testCompile project(':rm:rm-server').sourceSets.test.output // to get shared test classes
+        testCompile functionalTestDependencies
         testCompile 'org.apache.httpcomponents:httpmime:4.2.1'
         testCompile 'org.jboss.resteasy:tjws:3.0.6.Final'
-        testCompile 'org.fusesource:sigar:1.6.4'
-        testCompile 'com.jayway.awaitility:awaitility:1.6.0'
+        testCompile 'org.mockito:mockito-core:1.9.5'
 
         runtime 'net.bull.javamelody:javamelody-core:1.46.0'
 
@@ -194,19 +195,9 @@ project(':rest:rest-client') {
         compile project(":scheduler:scheduler-api")
         compile project(':rest:rest-cli')
 
-	runtime 'xerces:xercesImpl:2.8.1'
+        runtime 'xerces:xercesImpl:2.8.1'
 
-        testCompile 'junit:junit:4.11'
-        testCompile 'org.mockito:mockito-core:1.9.5'
-        testCompile 'com.googlecode.json-simple:json-simple:1.1'
-        testCompile project(":rm:rm-server")
-        testCompile project(":scheduler:scheduler-server")
-        testCompile project(':rm:rm-server').sourceSets.test.output // to get shared test classes
-        testCompile 'org.apache.httpcomponents:httpmime:4.2.1'
-        testCompile 'org.jboss.resteasy:tjws:2.3.3.Final'
-        testCompile 'org.fusesource:sigar:1.6.4'
-
-        testCompile project(':rest:rest-server')
+        testCompile functionalTestDependencies
         testCompile project(':rest:rest-server').sourceSets.test.output
     }
 
