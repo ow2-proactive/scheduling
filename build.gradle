@@ -532,7 +532,7 @@ task proActiveLibs(type: Sync) {
     into file("$rootDir/dist/lib")
 }
 
-// enables the installation of artifacts from staticFiles, customLibs tasks into the local maven repo
+// enables the installation of the artifact produced by the distribution plugin into the local maven repo
 apply plugin: 'java'
 
 defaultTasks 'proActiveLibs'
@@ -542,18 +542,20 @@ subprojects {
     tasks.withType(Test).matching { it.name == 'functionalTest' }*.dependsOn proActiveLibs
 }
 
-task staticFiles(type: Zip) {
-    from "."
-    include "config/**", "bin/**", "samples/**", "addons/**", "LICENSE*", "README*"
-    classifier "static"
+apply plugin: 'distribution'
+
+distributions {
+    main {
+        contents {
+            from '.'
+            include "dist/**", "config/**", "bin/**", "samples/**", "addons/**", "LICENSE*", "README*"
+        }
+    }
 }
 
-task customLibs(type: Zip) {
-    from "lib/node/winp", "lib/node/sigar"
-    classifier "libs"
-}
+distZip.dependsOn proActiveLibs
 
 artifacts {
-    archives staticFiles, customLibs
+    archives distZip
 }
 
