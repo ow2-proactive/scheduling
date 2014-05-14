@@ -42,12 +42,16 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.objectweb.proactive.utils.OperatingSystem;
+import org.hyperic.sigar.Sigar;
+import org.hyperic.sigar.SigarException;
+import org.hyperic.sigar.ptql.ProcessFinder;
 
 
 /**
@@ -76,27 +80,45 @@ public class ProcessCleaner {
      * @throws IOException
      *    If PIDs cannot be retrieved
      */
-    final public int[] getAliveProcesses() throws IOException {
+    final public Set<Integer> getAliveProcesses() throws IOException {
         return getAliveProcesses(false);
     }
 
-    final public int[] getAliveProcesses(boolean printProcesses) throws IOException {
+    final public Set<Integer> getAliveProcesses(boolean printProcesses) throws IOException {
         // JPS is only available on some JDK
         // We need a fall back in case jps does not exist.
         try {
             getJavaTool("jps");
-            return getAliveWithJps(printProcesses);
+            Set<Integer> pids = getAliveWithJps(printProcesses);
+            pids.addAll(getAliveWithSigar(printProcesses));
+            return pids;
         } catch (FileNotFoundException e) {
             return getAliveWithNative();
         }
     }
 
-    private int[] getAliveWithJps(boolean printProcesses) throws IOException {
+    private Set<Integer> getAliveWithSigar(boolean printProcesses) {
+        Sigar sigar = new Sigar();
+        try {
+            long[] pids = new ProcessFinder(sigar).find("State.Name.eq=java,Args.*.re=" + pattern);
+            Set<Integer> setOfPids = new HashSet<Integer>();
+            for (long pid : pids) {
+                setOfPids.add((int) pid);
+                if (printProcesses)
+                    System.out.println("Running java processes matching regex:" + pid);
+            }
+            return setOfPids;
+        } catch (SigarException e) {
+            return Collections.emptySet();
+        }
+    }
+
+    private Set<Integer> getAliveWithJps(boolean printProcesses) throws IOException {
         ProcessBuilder pb = new ProcessBuilder(getJavaTool("jps").getAbsolutePath(), "-mlv");
         pb.redirectErrorStream(true);
         Process p = pb.start();
 
-        ArrayList<String> pids = new ArrayList<String>(10);
+        Set<Integer> pids= new HashSet<Integer>();
 
         Reader r = new InputStreamReader(p.getInputStream());
         BufferedReader br = new BufferedReader(r);
@@ -108,18 +130,13 @@ public class ProcessCleaner {
                 if (printProcesses)
                     System.out.println("Running java processes matching regex:" + line);
                 String pid = line.substring(0, line.indexOf(" "));
-                pids.add(pid);
+                pids.add(Integer.parseInt(pid));
             }
         }
-
-        int[] ret = new int[pids.size()];
-        for (int i = 0; i < ret.length; i++) {
-            ret[i] = Integer.parseInt(pids.get(i));
-        }
-        return ret;
+        return pids;
     }
 
-    private int[] getAliveWithNative() throws IOException {
+    private Set<Integer> getAliveWithNative() throws IOException {
         OperatingSystem os = OperatingSystem.getOperatingSystem();
         switch (os) {
             case unix:
@@ -143,21 +160,17 @@ public class ProcessCleaner {
                 pb.redirectErrorStream(true);
                 Process p = pb.start();
 
-                ArrayList<String> pids = new ArrayList<String>(10);
+                Set<Integer> pids = new HashSet<Integer>();
 
                 Reader r = new InputStreamReader(p.getInputStream());
                 BufferedReader br = new BufferedReader(r);
 
                 String line;
                 while ((line = br.readLine()) != null) {
-                    pids.add(line);
+                    pids.add(Integer.parseInt(line));
                 }
 
-                int[] ret = new int[pids.size()];
-                for (int i = 0; i < ret.length; i++) {
-                    ret[i] = Integer.parseInt(pids.get(i));
-                }
-                return ret;
+                return pids;
             default:
                 throw new IllegalStateException("Unsupported operating system");
         }
@@ -173,7 +186,7 @@ public class ProcessCleaner {
         ProcessKiller pk = ProcessKiller.get();
 
 
-        int[] pids = this.getAliveProcesses();
+        Set<Integer> pids = this.getAliveProcesses();
         for (int pid : pids) {
             try {
                 printStackTrace(pid);
@@ -184,9 +197,9 @@ public class ProcessCleaner {
             }
         }
 
-        int[] pidsLeft = getAliveProcesses(true);
-        if (pidsLeft.length > 0) {
-            System.err.println("Processes left running: " + Arrays.toString(pidsLeft));
+        Set<Integer> pidsLeft = getAliveProcesses(true);
+        if (!pidsLeft.isEmpty()) {
+            System.err.println("Processes left running: " + pidsLeft);
         }
     }
 
@@ -195,8 +208,6 @@ public class ProcessCleaner {
             ProcessBuilder pb = new ProcessBuilder(getJavaTool("jstack").getAbsolutePath(), "" + pid);
             pb.redirectErrorStream(true);
             Process p = pb.start();
-
-            ArrayList<String> pids = new ArrayList<String>(10);
 
             Reader r = new InputStreamReader(p.getInputStream());
             BufferedReader br = new BufferedReader(r);
