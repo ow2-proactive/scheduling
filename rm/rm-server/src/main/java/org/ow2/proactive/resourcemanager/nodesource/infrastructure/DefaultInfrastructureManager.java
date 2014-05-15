@@ -77,7 +77,7 @@ public class DefaultInfrastructureManager extends InfrastructureManager {
      */
     @Override
     public void acquireNode() {
-        logger.info("acquireNode() implementation is emtpy for " + this.getClass().getSimpleName());
+        logger.info("acquireNode() implementation is empty for " + this.getClass().getSimpleName());
     }
 
     /**
@@ -85,7 +85,7 @@ public class DefaultInfrastructureManager extends InfrastructureManager {
      */
     @Override
     public void acquireAllNodes() {
-        logger.info("acquireAllNodes() implementation is emtpy for " + this.getClass().getSimpleName());
+        logger.info("acquireAllNodes() implementation is empty for " + this.getClass().getSimpleName());
     }
 
     /**

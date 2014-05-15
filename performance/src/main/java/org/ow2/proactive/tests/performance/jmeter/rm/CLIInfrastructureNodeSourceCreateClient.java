@@ -133,7 +133,7 @@ public class CLIInfrastructureNodeSourceCreateClient extends BaseNodeSourceCreat
 
         ResourceManager rm = getResourceManager();
 
-        Object[] infrastructureParameters = new Object[] { rmUrl, hostsList.getBytes(), timeout, attempt,
+        Object[] infrastructureParameters = new Object[] { hostsList.getBytes(), timeout, attempt,
                 interpreter, deploymentScript, removalScript };
 
         Object[] policyParameters = new Object[] { "users=dummyUser", AccessType.ME.toString() };

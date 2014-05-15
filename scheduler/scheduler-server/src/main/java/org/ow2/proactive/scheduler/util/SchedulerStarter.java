@@ -289,7 +289,7 @@ public class SchedulerStarter {
               .getValueAsString())
         ));
         rman.createNodeSource(NodeSource.LOCAL_INFRASTRUCTURE_NAME,
-          LocalInfrastructure.class.getName(), new Object[] { "", creds,
+          LocalInfrastructure.class.getName(), new Object[] { creds,
             numberLocalNodes, nodeTimeoutValue,
             CentralPAPropertyRepository.PA_HOME.getCmdLine() + CentralPAPropertyRepository.PA_HOME.getValue()
           },

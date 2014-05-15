@@ -99,7 +99,7 @@ public class TestGCMCustomizedInfrastructureSchedulerLoadingPolicy extends
         // creating node source
         // first parameter of im is default rm url
         helper.getResourceManager().createNodeSource(sourceName, GCMCustomisedInfrastructure.class.getName(),
-                new Object[] { "", GCMDeploymentData, hosts, TIMEOUT },
+                new Object[] { GCMDeploymentData, hosts, TIMEOUT },
                 SchedulerLoadingPolicy.class.getName(), getPolicyParams());
 
         helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, sourceName);
@@ -138,7 +138,7 @@ public class TestGCMCustomizedInfrastructureSchedulerLoadingPolicy extends
             byte[] creds = FileToBytesConverter.convertFileToByteArray(new File(PAResourceManagerProperties
                     .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
             resourceManager.createNodeSource(source1, LocalInfrastructure.class.getName(),
-                    new Object[] { "", creds, defaultDescriptorNodesNb, RMTHelper.defaultNodesTimeout, "" },
+                    new Object[] { creds, defaultDescriptorNodesNb, RMTHelper.defaultNodesTimeout, "" },
                     SchedulerLoadingPolicy.class.getName(), getPolicyParams()).getBooleanValue();
             assertTrue(false);
         } catch (Exception e) {

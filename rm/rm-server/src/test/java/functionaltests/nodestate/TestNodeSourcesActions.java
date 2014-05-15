@@ -91,7 +91,7 @@ public class TestNodeSourcesActions extends RMConsecutive {
                 .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
 
         resourceManager.createNodeSource(nodeSourceName, LocalInfrastructure.class.getName(), new Object[] {
-                "", creds, nodeNumber, RMTHelper.defaultNodesTimeout, "" }, StaticPolicy.class.getName(),
+                creds, nodeNumber, RMTHelper.defaultNodesTimeout, "" }, StaticPolicy.class.getName(),
                 null);
 
         //wait for creation of GCM Node Source event, and deployment of its nodes

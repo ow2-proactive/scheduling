@@ -4,7 +4,7 @@ CLASSPATH=.
 workingDir=$(dirname $0)
 . $workingDir/env scheduler-log4j-server
 
-SCHED_JVM_X_OPTS="-Xms128m -Xmx2048m"
+SCHED_JVM_X_OPTS="-Xms128m -Xmx2048m -XX:MaxPermSize=512M"
 SCHED_JVM_D_OPTS=""
 DROP_DB=""
 SCHED_PARAMS=""

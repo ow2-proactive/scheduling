@@ -195,7 +195,7 @@ public class RMTHelper {
         byte[] creds = FileToBytesConverter.convertFileToByteArray(new File(PAResourceManagerProperties
                 .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
         rm
-                .createNodeSource(name, LocalInfrastructure.class.getName(), new Object[] { "", creds,
+                .createNodeSource(name, LocalInfrastructure.class.getName(), new Object[] { creds,
                         nodeNumber, RMTHelper.defaultNodesTimeout, setup.getJvmParameters() + " " +
                         CentralPAPropertyRepository.PA_RMI_PORT.getCmdLine()+RMTHelper.PA_RMI_PORT
                 },

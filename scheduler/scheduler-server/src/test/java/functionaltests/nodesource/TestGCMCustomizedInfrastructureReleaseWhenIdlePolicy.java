@@ -83,7 +83,7 @@ public class TestGCMCustomizedInfrastructureReleaseWhenIdlePolicy extends
         // creating node source
         // first parameter of im is empty rm url
         helper.getResourceManager().createNodeSource(sourceName, GCMCustomisedInfrastructure.class.getName(),
-                new Object[] { "", GCMDeploymentData, hosts, TIMEOUT },
+                new Object[] { GCMDeploymentData, hosts, TIMEOUT },
                 ReleaseResourcesWhenSchedulerIdle.class.getName(), getPolicyParams());
 
         helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, sourceName);

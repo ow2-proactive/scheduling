@@ -59,7 +59,7 @@ public class TestNodeSourceAfterRestart extends FunctionalTest {
         byte[] creds = FileToBytesConverter.convertFileToByteArray(new File(PAResourceManagerProperties
                 .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
         helper.getResourceManager().createNodeSource(sourceName, LocalInfrastructure.class.getName(),
-                new Object[] { "", creds, 1, RMTHelper.defaultNodesTimeout,
+                new Object[] { creds, 1, RMTHelper.defaultNodesTimeout,
                 CentralPAPropertyRepository.PA_RMI_PORT.getCmdLine()+RMTHelper.PA_RMI_PORT },
                 //first parameter is empty rm url
                 StaticPolicy.class.getName(), new Object[] { "ME", "ALL" });

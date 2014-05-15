@@ -625,6 +625,11 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * @return the url of the node where the rm core is running
      */
     private String getUrl() {
+
+        if (System.getProperty("rm.url")!= null) {
+            return System.getProperty("rm.url");
+        }
+
         try {
             String tmp = PAActiveObject.getActiveObjectNodeUrl(PAActiveObject.getStubOnThis());
             if (tmp != null) {
@@ -1456,7 +1461,6 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         Collection<PluginDescriptor> descriptors = new ArrayList<PluginDescriptor>();
         for (Class<?> cls : plugins) {
             Map<String, String> defaultValues = new HashMap<String, String>();
-            defaultValues.put(InfrastructureManager.RM_URL_FIELD_NAME, this.getUrl());
             descriptors.add(new PluginDescriptor(cls, defaultValues));
         }
         return descriptors;

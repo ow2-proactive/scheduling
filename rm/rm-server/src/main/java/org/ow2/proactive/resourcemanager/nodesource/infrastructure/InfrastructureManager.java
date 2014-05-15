@@ -102,20 +102,7 @@ public abstract class InfrastructureManager implements Serializable {
     //used to timeout the nodes
     private transient Timer timeouter = null;
 
-    /**
-     * The resource manager url. Should be provided by user.
-     */
-    // This url is populated during the call to the internalConfigure method
-    // or setNodesource depending on the valued provided by users for the call to
-    // internalConfigure.
-    // Implementations can also use getRegistrationURL once the nodesource is set.
-    @Configurable(description = "The URL of the resource manager")
     protected String rmUrl;
-    // if true, we guess the rmurl when the nodesource is set,
-    // if false, means that the user supplied a rm url.
-    private boolean rmUrlGuess = false;
-    //export of the field's name, used by the RMCore
-    public static final String RM_URL_FIELD_NAME = "rmUrl";
 
     public InfrastructureManager() {
     }
@@ -127,9 +114,7 @@ public abstract class InfrastructureManager implements Serializable {
      */
     public void setNodeSource(NodeSource nodeSource) {
         this.nodeSource = nodeSource;
-        if (rmUrlGuess) {
-            this.rmUrl = this.nodeSource.getRegistrationURL();
-        }
+        this.rmUrl = nodeSource.getRegistrationURL();
     }
 
     /**
@@ -245,25 +230,7 @@ public abstract class InfrastructureManager implements Serializable {
      * @throws IllegalArgumentException if the parameters are invalid
      */
     public final void internalConfigure(Object... parameters) {
-        Object[] shiftedParams = null;
-        if (parameters == null || parameters.length < 1) {
-            //no parameter was supplied, guess the rm url
-            this.rmUrlGuess = true;
-            //cannot call this.nodeSource.getRegistrationURL();
-            //as the nodesource is not set yet
-        } else {
-            String url = parameters[0].toString();
-            if (url.equals("")) {
-                //we guess the url
-                this.rmUrlGuess = true;
-            } else {
-                this.rmUrl = url;
-            }
-            //we get the rm's url, know shifting the array for implementations
-            shiftedParams = new Object[parameters.length - 1];
-            System.arraycopy(parameters, 1, shiftedParams, 0, parameters.length - 1);
-        }
-        this.configure(shiftedParams);
+        this.configure(parameters);
     }
 
     /**
@@ -296,7 +263,7 @@ public abstract class InfrastructureManager implements Serializable {
      * Adds information required to deploy nodes in the future.
      * Do not initiate a real nodes deployment/acquisition as it's up to the
      * policy.
-     * @param the parameters of the infrastructure manager
+     * @param parameters of the infrastructure manager
      * @throws IllegalArgumentException if the parameters are invalid
      */
     protected abstract void configure(Object... parameters);
@@ -354,7 +321,6 @@ public abstract class InfrastructureManager implements Serializable {
     /**
      * Notify this infrastructure it is going to be shut down along with
      * its nodesource. All necessary cleanup should be done here.
-     * @param initiator
      * @return mainly to be able to put a checkpoint and to be sure that
      */
     protected void shutDown() {
@@ -417,7 +383,7 @@ public abstract class InfrastructureManager implements Serializable {
      * owning NodeSource of the RMDeployingNode creation
      * @param name The RMDeployingNode's name.
      * @param description The RMDeployingNode's description
-     * @param the timeout after which one the deploying node will be declared lost. ( node acquisition after this timeout is discarded )
+     * @param timeout after which one the deploying node will be declared lost. ( node acquisition after this timeout is discarded )
      * @return The newly created RMDeployingNode's URL.
      * @throws UnsupportedOperationException if the infrastructure manager is shuting down
      */
@@ -648,7 +614,6 @@ public abstract class InfrastructureManager implements Serializable {
         /**
          * To update the lost field of the deploying node
          * @param pn The deploying node to update
-         * @param lost the value of lost
          */
         protected abstract void setLost(RMDeployingNode pn);
     }

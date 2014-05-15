@@ -83,7 +83,7 @@ public class SSHInfrastructureNodeSourceCreateClient extends BaseNodeSourceCreat
 
         ResourceManager rm = getResourceManager();
 
-        Object[] infrastructureParameters = new Object[] { rmUrl, hostsList.getBytes(), timeout, attempt,
+        Object[] infrastructureParameters = new Object[] { hostsList.getBytes(), timeout, attempt,
                 sshOptions, javaPath, schedulingPath, targetOs, javaOptions, creds };
 
         Object[] policyParameters = new Object[] { "users=dummyUser", AccessType.ME.toString() };

@@ -85,7 +85,7 @@ public class TestBrokenNodeSourceRemoval extends FunctionalTest {
         byte[] creds = FileToBytesConverter.convertFileToByteArray(new File(PAResourceManagerProperties
                 .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
         helper.getResourceManager().createNodeSource(sourceName, LocalInfrastructure.class.getName(),
-                new Object[] { "", creds, defaultDescriptorNodesNb, RMTHelper.defaultNodesTimeout, "" },
+                new Object[] { creds, defaultDescriptorNodesNb, RMTHelper.defaultNodesTimeout, "" },
                 ReleaseResourcesWhenSchedulerIdle.class.getName(), getPolicyParams());
 
         helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, sourceName);

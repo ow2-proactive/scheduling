@@ -74,7 +74,7 @@ public class TestLocalInfrastructureRestartDownNodesPolicy extends RMConsecutive
         byte[] creds = FileToBytesConverter.convertFileToByteArray(new File(PAResourceManagerProperties
                 .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
         helper.getResourceManager().createNodeSource(sourceName, LocalInfrastructure.class.getName(),
-                new Object[] { "", creds, defaultDescriptorNodesNb, RMTHelper.defaultNodesTimeout,
+                new Object[] { creds, defaultDescriptorNodesNb, RMTHelper.defaultNodesTimeout,
                     CentralPAPropertyRepository.PA_RMI_PORT.getCmdLine()+RMTHelper.PA_RMI_PORT },
                 RestartDownNodesPolicy.class.getName(), policyParameters);
 

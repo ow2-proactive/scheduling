@@ -154,7 +154,7 @@ public class RMStarter {
                     PAResourceManagerProperties.getAbsolutePath(PAResourceManagerProperties.RM_CREDS
                             .getValueAsString())));
                 resourceManager.createNodeSource(nodeSourceName, LocalInfrastructure.class.getName(),
-                        new Object[] { "", creds, DEFAULT_NUMBER_OF_NODES, nodeTimeout, "" },
+                        new Object[] { creds, DEFAULT_NUMBER_OF_NODES, nodeTimeout, "" },
                         RestartDownNodesPolicy.class.getName(), null);
                 resourceManager.disconnect();
                 logger.info("The resource manager with " + DEFAULT_NUMBER_OF_NODES +

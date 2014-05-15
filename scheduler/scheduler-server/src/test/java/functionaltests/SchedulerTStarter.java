@@ -124,7 +124,7 @@ public class SchedulerTStarter implements Serializable {
                 params.put("proactive.test.runAsMe", "true");
             }
 
-            rmAdmin.createNodeSource(RM_NODE_NAME, LocalInfrastructure.class.getName(), new Object[] { "",
+            rmAdmin.createNodeSource(RM_NODE_NAME, LocalInfrastructure.class.getName(), new Object[] {
                     creds.getBase64(), RM_NODE_NUMBER, RM_NODE_DEPLOYMENT_TIMEOUT,
                     "-Dproactive.test=true " +
                     CentralPAPropertyRepository.PA_HOME.getCmdLine() + CentralPAPropertyRepository.PA_HOME.getValue() +

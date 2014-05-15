@@ -110,7 +110,7 @@ public class SelectionTest extends FunctionalTest {
 
             // properties are defined, trying to deploy nodes to these hosts
             BooleanWrapper result = helper.getResourceManager().createNodeSource("remote",
-                    SSHInfrastructure.class.getName(), new Object[] { rmUrl, // rm url
+                    SSHInfrastructure.class.getName(), new Object[] {
                             "", // ssh options
                             javaExec, // java executable path
                             rmHome, // rm distrib path

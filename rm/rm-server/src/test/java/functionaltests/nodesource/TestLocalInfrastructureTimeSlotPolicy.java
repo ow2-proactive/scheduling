@@ -72,7 +72,7 @@ public class TestLocalInfrastructureTimeSlotPolicy extends RMConsecutive {
                 .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
         //first null parameter is the rm url
         helper.getResourceManager().createNodeSource(sourceName, LocalInfrastructure.class.getName(),
-                new Object[] { "", creds, 0, RMTHelper.defaultNodesTimeout, "" },
+                new Object[] { creds, 0, RMTHelper.defaultNodesTimeout, "" },
                 TimeSlotPolicy.class.getName(), getPolicyParams());
 
         helper.waitForNodeSourceCreation(sourceName);
@@ -83,7 +83,7 @@ public class TestLocalInfrastructureTimeSlotPolicy extends RMConsecutive {
         byte[] creds = FileToBytesConverter.convertFileToByteArray(new File(PAResourceManagerProperties
                 .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
         helper.getResourceManager().createNodeSource(sourceName, LocalInfrastructure.class.getName(),
-                new Object[] { "", creds, descriptorNodeNumber, RMTHelper.defaultNodesTimeout, "" },
+                new Object[] { creds, descriptorNodeNumber, RMTHelper.defaultNodesTimeout, "" },
                 //first parameter is empty rm url
                 TimeSlotPolicy.class.getName(), getPolicyParams());
         helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, sourceName);

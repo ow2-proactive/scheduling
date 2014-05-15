@@ -92,7 +92,7 @@ public class TestGCMCustomizedInfrastructureTimeSlotPolicy extends TestLocalInfr
                 sourceName,
                 // first parameter of im is rm url, empty means default
                 GCMCustomisedInfrastructure.class.getName(),
-                new Object[] { "", emptyGCMD, hostsListData, TIMEOUT }, TimeSlotPolicy.class.getName(),
+                new Object[] { emptyGCMD, hostsListData, TIMEOUT }, TimeSlotPolicy.class.getName(),
                 getPolicyParams());
         helper.waitForNodeSourceCreation(sourceName);
     }
@@ -102,7 +102,7 @@ public class TestGCMCustomizedInfrastructureTimeSlotPolicy extends TestLocalInfr
         // creating node source
         helper.getResourceManager().createNodeSource(sourceName, GCMCustomisedInfrastructure.class.getName(),
                 // first parameter of im is rm url, empty means default
-                new Object[] { "", GCMDeploymentData, hostsListData, TIMEOUT },
+                new Object[] { GCMDeploymentData, hostsListData, TIMEOUT },
                 TimeSlotPolicy.class.getName(), getPolicyParams());
 
         helper.waitForNodeSourceCreation(sourceName, descriptorNodeNumber);

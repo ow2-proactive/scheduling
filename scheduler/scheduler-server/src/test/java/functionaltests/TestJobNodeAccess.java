@@ -92,7 +92,7 @@ public class TestJobNodeAccess extends SchedulerConsecutive {
         byte[] creds = FileToBytesConverter.convertFileToByteArray(new File(PAResourceManagerProperties
                 .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
         String nsName = "NodeSourceWithToken";
-        rm.createNodeSource(nsName, LocalInfrastructure.class.getName(), new Object[] { "", creds, 1,
+        rm.createNodeSource(nsName, LocalInfrastructure.class.getName(), new Object[] { creds, 1,
                 RMTHelper.defaultNodesTimeout, "-D" + RMNodeStarter.NODE_ACCESS_TOKEN + "=test_token" },
                 StaticPolicy.class.getName(), null);
 

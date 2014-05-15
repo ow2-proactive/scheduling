@@ -69,12 +69,12 @@ public class JettyStarter {
 
     public static void runWars(String rmUrl, String schedulerUrl) {
         Properties properties = readRestProperties();
+
+        setSystemPropertyIfNotDefined("rm.url", rmUrl);
+        setSystemPropertyIfNotDefined("scheduler.url", schedulerUrl);
+
         if ("true".equals(properties.getProperty("rest.deploy"))) {
             int restPort = Integer.parseInt(properties.getProperty("rest.port", "8080"));
-
-            // for REST API
-            setSystemPropertyIfNotDefined("rm.url", rmUrl);
-            setSystemPropertyIfNotDefined("scheduler.url", schedulerUrl);
 
             // for web portals
             setSystemPropertyIfNotDefined("sched.rest.url", "http://localhost:" + restPort + "/rest/rest");
