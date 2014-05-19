@@ -40,16 +40,17 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.common.exception.UserException;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
+import org.ow2.proactive.scheduler.common.task.executable.internal.JavaExecutableInitializerImpl;
 import org.ow2.proactive.scheduler.common.util.VariablesUtil;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scripting.ScriptHandler;
 import org.ow2.proactive.scripting.ScriptLoader;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.TaskScript;
-import org.apache.log4j.Logger;
 
 
 /**
@@ -66,6 +67,19 @@ public class ScriptExecutable extends JavaExecutable {
     private TaskScript script;
     /** execution progress value (between 0 and 100), can be updated by the script */
     private final AtomicInteger progress = new AtomicInteger(0);
+
+
+    /**
+     * Initialize the executable using the given executable Initializer.
+     *
+     * @param execInitializer the executable Initializer used to init the executable itself
+     *
+     * @throws Exception an exception if something goes wrong during executable initialization.
+     */
+    // WARNING WHEN REMOVE OR RENAME, called by task launcher by introspection
+    protected void internalInit(JavaExecutableInitializerImpl execInitializer) throws Exception {
+        super.internalInit(execInitializer);
+    }
 
     @Override
     public Serializable execute(TaskResult... results) throws Throwable {

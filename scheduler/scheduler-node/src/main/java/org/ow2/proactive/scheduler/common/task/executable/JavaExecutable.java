@@ -37,11 +37,9 @@
 package org.ow2.proactive.scheduler.common.task.executable;
 
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
 import java.util.Map;
 
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
 import org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemException;
 import org.ow2.proactive.scheduler.common.task.executable.internal.JavaExecutableInitializerImpl;
@@ -62,7 +60,7 @@ public abstract class JavaExecutable extends AbstractJavaExecutable {
 
     // this value is set only on worker node side !!
     // see JavaTaskLauncher
-    protected JavaExecutableInitializerImpl execInitializer;
+    private JavaExecutableInitializerImpl execInitializer;
     
     /**
      * Initialize the executable using the given executable Initializer.

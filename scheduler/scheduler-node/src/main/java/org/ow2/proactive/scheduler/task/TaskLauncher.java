@@ -552,9 +552,9 @@ public abstract class TaskLauncher implements InitActive {
 
         initializer.setLocalSpaceFileObject(SCRATCH);
         initializer.setInputSpaceFileObject(INPUT);
-        initializer.setInputSpaceFileObject(OUTPUT);
-        initializer.setInputSpaceFileObject(GLOBAL);
-        initializer.setInputSpaceFileObject(USER);
+        initializer.setOutputSpaceFileObject(OUTPUT);
+        initializer.setGlobalSpaceFileObject(GLOBAL);
+        initializer.setUserSpaceFileObject(USER);
         initializer.setLocalSpace(new LocalSpaceAdapter(SCRATCH));
         initializer.setInputSpace(new RemoteSpaceAdapter(INPUT,SCRATCH));
         initializer.setOutputSpace(new RemoteSpaceAdapter(OUTPUT,SCRATCH));

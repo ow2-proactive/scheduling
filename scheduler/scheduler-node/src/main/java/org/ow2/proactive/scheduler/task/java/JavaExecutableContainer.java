@@ -163,8 +163,10 @@ public class JavaExecutableContainer extends ExecutableContainer {
         jei.setSerializedArguments(tmp);
         jei.setNodes(nodes);
         ArrayList<String> nodeUrl = new ArrayList<String>();
-        for (Node n : nodes) {
-            nodeUrl.add(n.getNodeInformation().getURL());
+        if (nodes != null) {
+            for (Node n : nodes) {
+                nodeUrl.add(n.getNodeInformation().getURL());
+            }
         }
         jei.setNodesURL(nodeUrl);
         return jei;

@@ -37,6 +37,7 @@
 package org.ow2.proactive.scheduler.task.script;
 
 import java.io.Serializable;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
@@ -44,7 +45,9 @@ import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.exception.TaskAbortedException;
 import org.ow2.proactive.scheduler.common.exception.WalltimeExceededException;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.task.executable.internal.JavaExecutableInitializerImpl;
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
+import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.task.TaskLauncherInitializer;
@@ -76,6 +79,12 @@ public class ScriptTaskLauncher extends TaskLauncher {
      */
     public ScriptTaskLauncher(TaskLauncherInitializer initializer) {
         super(initializer);
+    }
+
+    protected void setPropagatedVariables(JavaExecutableInitializerImpl init,
+            Map<String, Serializable> variables) {
+        init.setPropagatedVariables(SerializationUtil
+                .serializeVariableMap(variables));
     }
 
     /**
@@ -134,6 +143,11 @@ public class ScriptTaskLauncher extends TaskLauncher {
 
             //init task
             ScriptExecutableInitializer initializer = (ScriptExecutableInitializer) createExecutableInitializer(executableContainer);
+
+            setPropagatedVariables((JavaExecutableInitializerImpl) initializer,
+                    getPropagatedVariables());
+
+            executableGuard.callInternalInit(ScriptExecutable.class, JavaExecutableInitializerImpl.class, initializer);
 
             sample = System.nanoTime();
             try {
