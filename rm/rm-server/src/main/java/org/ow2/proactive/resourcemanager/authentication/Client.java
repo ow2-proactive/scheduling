@@ -49,6 +49,7 @@ import org.objectweb.proactive.core.body.proxy.BodyProxy;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.mop.Proxy;
 import org.objectweb.proactive.core.mop.StubObject;
+import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.authentication.principals.UserNamePrincipal;
 import org.ow2.proactive.resourcemanager.core.history.UserHistory;
 
@@ -85,6 +86,7 @@ public class Client implements Serializable {
 
     /** User connection history stored in the data base*/
     private transient UserHistory history;
+    private Credentials credentials;
 
     public Client() {
         this.subject = null;
@@ -253,4 +255,11 @@ public class Client implements Serializable {
         return history;
     }
 
+    public void setCredentials(Credentials credentials) {
+        this.credentials = credentials;
+    }
+
+    public Credentials getCredentials() {
+        return credentials;
+    }
 }

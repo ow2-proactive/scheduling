@@ -23,7 +23,7 @@ public class NodeSourceData implements Serializable {
     private Object[] infrastructureParameters;
     private String policyType;
     private Object[] policyParameters;
-    private Subject providerSubject;
+    private Client provider;
 
     public NodeSourceData() {
     }
@@ -36,7 +36,7 @@ public class NodeSourceData implements Serializable {
         this.infrastructureParameters = infrastructureParameters;
         this.policyType = policyType;
         this.policyParameters = policyParameters;
-        this.providerSubject = provider.getSubject();
+        this.provider = provider;
     }
 
     @Id
@@ -90,11 +90,11 @@ public class NodeSourceData implements Serializable {
 
     @Column
     @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object"))
-    public Subject getProviderSubject() {
-        return providerSubject;
+    public Client getProvider() {
+        return provider;
     }
 
-    public void setProviderSubject(Subject providerSubject) {
-        this.providerSubject = providerSubject;
+    public void setProvider(Client provider) {
+        this.provider = provider;
     }
 }

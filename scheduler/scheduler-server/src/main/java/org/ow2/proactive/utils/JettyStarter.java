@@ -77,6 +77,7 @@ public class JettyStarter {
             int restPort = Integer.parseInt(properties.getProperty("rest.port", "8080"));
 
             // for web portals
+            setSystemPropertyIfNotDefined("rest.url", "http://localhost:" + restPort + "/rest");
             setSystemPropertyIfNotDefined("sched.rest.url", "http://localhost:" + restPort + "/rest/rest");
             setSystemPropertyIfNotDefined("rm.rest.url", "http://localhost:" + restPort + "/rest/rest");
 

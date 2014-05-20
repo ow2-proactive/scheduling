@@ -94,6 +94,7 @@ public class RMAuthenticationImpl extends AuthenticationImpl implements RMAuthen
      */
     public ResourceManager login(Credentials cred) throws LoginException {
         Client client = new Client(authenticate(cred), true);
+        client.setCredentials(cred);
 
         if (RMCore.clients.containsKey(client.getId())) {
             throw new LoginException(ERROR_ALREADY_CONNECTED);

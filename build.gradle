@@ -213,6 +213,7 @@ project(':rm:rm-node') {
     dependencies {
         compile files("${rootDir}/lib/node/winp/winp-1.17-patched.jar")
         compile 'net.java.dev.jna:jna:3.4.0'
+        compile 'commons-io:commons-io:2.4'
 
         compile 'commons-cli:commons-cli:1.1'
         compile files("${rootDir}/lib/node/sigar/sigar.jar")

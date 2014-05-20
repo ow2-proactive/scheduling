@@ -68,6 +68,7 @@ public class RMDBManager {
 
     private Timer timer = null;
 
+
     /**
     * An internal class to encapsulate the semantic of your data base query.
     * It allows to avoid try/catch in every method. 

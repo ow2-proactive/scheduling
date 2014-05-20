@@ -631,9 +631,11 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         }
 
         try {
-            String tmp = PAActiveObject.getActiveObjectNodeUrl(PAActiveObject.getStubOnThis());
-            if (tmp != null) {
-                return tmp.replaceAll(PAResourceManagerProperties.RM_NODE_NAME.getValueAsString(), "");
+            String aoUrl = PAActiveObject.getActiveObjectNodeUrl(PAActiveObject.getStubOnThis());
+            if (aoUrl != null) {
+                String rmUrl = aoUrl.replaceAll(PAResourceManagerProperties.RM_NODE_NAME.getValueAsString(), "");
+                System.setProperty("rm.url", rmUrl);
+                return rmUrl;
             } else {
                 return "No default RM URL";
             }
@@ -875,7 +877,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                 .getInfrastructureType(), data.getPolicyParameters());
 
         NodeSource nodeSource;
-        Client provider = new Client(data.getProviderSubject(), false);
+        Client provider = data.getProvider();
+
         try {
             nodeSource = new NodeSource(this.getUrl(), data.getName(), provider, im, policy,
                 (RMCore) PAActiveObject.getStubOnThis(), this.monitoring);
