@@ -62,7 +62,6 @@ import org.ow2.proactive.scheduler.common.task.TaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
 import org.ow2.proactive.scheduler.common.task.util.ResultPreviewTool.SimpleTextPanel;
-import org.ow2.proactive.scheduler.util.classloading.TaskClassLoader;
 import org.ow2.proactive.utils.Formatter;
 
 
@@ -501,7 +500,10 @@ public class TaskResultImpl implements TaskResult {
      */
     private ClassLoader getTaskClassLoader() throws IOException {
         ClassLoader currentCCL = Thread.currentThread().getContextClassLoader();
-        if (!(currentCCL instanceof TaskClassLoader)) {
+        // Check if this code is running on the scheduler node side
+        if (currentCCL instanceof TaskClassLoader) {
+            return currentCCL;
+        } else {
             ClassLoader thisClassLoader = this.getClass().getClassLoader();
             if (this.jobClasspath != null) {
                 //we are not on a worker and jcp is set...
@@ -511,12 +513,8 @@ public class TaskResultImpl implements TaskResult {
                 }
                 return new URLClassLoader(urls, thisClassLoader);
             } else {
-                //we are not on a worker and jcp is set...
                 return thisClassLoader;
             }
-        } else {
-            //we are on a worker, use taskclassloader
-            return currentCCL;
         }
     }
 

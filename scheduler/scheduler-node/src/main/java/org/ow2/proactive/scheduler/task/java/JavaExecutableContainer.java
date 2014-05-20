@@ -51,7 +51,7 @@ import org.ow2.proactive.scheduler.common.task.executable.internal.JavaExecutabl
 import org.ow2.proactive.scheduler.common.task.util.ByteArrayWrapper;
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.ExecutableContainerInitializer;
-import org.ow2.proactive.scheduler.util.classloading.TaskClassLoader;
+import org.ow2.proactive.scheduler.util.classloading.TaskClassLoaderImpl;
 import org.ow2.proactive.scheduler.util.classloading.TaskClassServer;
 
 
@@ -109,7 +109,7 @@ public class JavaExecutableContainer extends ExecutableContainer {
         if (this.userExecutable == null) {
             // Instanciate the actual executable
             try {
-                TaskClassLoader tcl = new TaskClassLoader(this.getClass().getClassLoader(), this.classServer);
+                TaskClassLoaderImpl tcl = new TaskClassLoaderImpl(this.getClass().getClassLoader(), this.classServer);
                 // the tcl becomes the context classloader
                 Thread.currentThread().setContextClassLoader(tcl);
                 Class<?> userExecutableClass = tcl.loadClass(this.userExecutableClassName);

@@ -40,6 +40,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
+import org.ow2.proactive.scheduler.task.TaskClassLoader;
 
 
 /**
@@ -51,9 +52,9 @@ import org.apache.log4j.Logger;
  * @author The ProActive team 
  *
  */
-public class TaskClassLoader extends ClassLoader {
+public class TaskClassLoaderImpl extends ClassLoader implements TaskClassLoader  {
 
-    public static final Logger logger = Logger.getLogger(TaskClassLoader.class);
+    public static final Logger logger = Logger.getLogger(TaskClassLoaderImpl.class);
 
     /** The associated classserver on the scheduler core side */
     // Can be null if no classpath has been set for the job
@@ -70,7 +71,7 @@ public class TaskClassLoader extends ClassLoader {
      * @param parent the parent classloader.
      * @param remoteServer The associated classserver on the scheduler core side.
      */
-    public TaskClassLoader(ClassLoader parent, TaskClassServer remoteServer) {
+    public TaskClassLoaderImpl(ClassLoader parent, TaskClassServer remoteServer) {
         super(parent);
         this.remoteServer = remoteServer;
         // look for the ext classpath dir if any
