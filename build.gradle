@@ -37,7 +37,11 @@ allprojects {
     uploadArchives {
         repositories {
             mavenDeployer {
-                repository(url: "http://repo.activeeon.com/content/repositories/snapshots/") {
+                snapshotRepository(url: "http://repo.activeeon.com/content/repositories/snapshots/") {
+                    authentication(userName: "${System.getProperty('nexusUsername')}",
+                            password: "${System.getProperty('nexusPassword')}")
+                }
+                repository(url: "http://repo.activeeon.com/content/repositories/releases/") {
                     authentication(userName: "${System.getProperty('nexusUsername')}",
                             password: "${System.getProperty('nexusPassword')}")
                 }
