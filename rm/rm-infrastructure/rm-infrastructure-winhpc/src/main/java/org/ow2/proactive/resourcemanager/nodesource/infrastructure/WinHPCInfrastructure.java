@@ -212,8 +212,8 @@ public class WinHPCInfrastructure extends DefaultInfrastructureManager {
         logger.debug("Executing: " + fullCommand);
         try {
             eprs[0] = this.getDeployer().createActivity(
-                    org.ow2.proactive.resourcemanager.nodesource.infrastructure.WinHPCDeployer.createJSDLDocument(
-                            fullCommand));
+                    org.ow2.proactive.resourcemanager.nodesource.infrastructure.WinHPCDeployer
+                            .createJSDLDocument(fullCommand));
         } catch (Exception e) {
             this.handleFailedDeployment(dNode, clb, e);
         }
@@ -495,13 +495,14 @@ public class WinHPCInfrastructure extends DefaultInfrastructureManager {
      * @return the win hpc deployer instance
      * @throws RMException
      */
-    private synchronized org.ow2.proactive.resourcemanager.nodesource.infrastructure.WinHPCDeployer getDeployer() throws RMException {
+    private synchronized org.ow2.proactive.resourcemanager.nodesource.infrastructure.WinHPCDeployer getDeployer()
+            throws RMException {
         if (this.deployer == null) {
             try {
-                this.deployer = new org.ow2.proactive.resourcemanager.nodesource.infrastructure.WinHPCDeployer(new File(PAResourceManagerProperties.RM_HOME
-                        .getValueAsString(), "config" + File.separator + "rm" + File.separator +
-                    "deployment" + File.separator + "winhpc" + File.separator).getAbsolutePath(), serviceUrl,
-                    userName, password);
+                this.deployer = new org.ow2.proactive.resourcemanager.nodesource.infrastructure.WinHPCDeployer(
+                    new File(PAResourceManagerProperties.RM_HOME.getValueAsString(), "config" +
+                        File.separator + "rm" + File.separator + "deployment" + File.separator + "winhpc" +
+                        File.separator).getAbsolutePath(), serviceUrl, userName, password);
             } catch (Exception e) {
                 throw new RMException("Cannot instantiate the win hpc deployer", e);
             }

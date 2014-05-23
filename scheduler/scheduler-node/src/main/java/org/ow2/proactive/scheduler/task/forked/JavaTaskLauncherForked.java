@@ -74,10 +74,10 @@ public class JavaTaskLauncherForked extends JavaTaskLauncher {
      *
      * @param initializer represents the class that contains information to initialize this task launcher.
      */
-    public JavaTaskLauncherForked(TaskLauncherInitializer initializer) throws NodeException, ActiveObjectCreationException {
+    public JavaTaskLauncherForked(TaskLauncherInitializer initializer) throws NodeException,
+            ActiveObjectCreationException {
         super(initializer);
     }
-
 
     /**
      * Configure node to use dataspace !
@@ -97,8 +97,7 @@ public class JavaTaskLauncherForked extends JavaTaskLauncher {
                 //else use the property
                 scratchDir = System.getProperty(NODE_DATASPACE_SCRATCHDIR);
             }
-            scratchConf = new BaseScratchSpaceConfiguration((String) null,
-                    scratchDir);
+            scratchConf = new BaseScratchSpaceConfiguration((String) null, scratchDir);
             DataSpacesNodes.configureNode(PAActiveObject.getActiveObjectNode(PAActiveObject.getStubOnThis()),
                     scratchConf);
             nodeConfigured = true;
@@ -177,8 +176,8 @@ public class JavaTaskLauncherForked extends JavaTaskLauncher {
     @Override
     protected void finalizeTask(TaskTerminateNotification terminateNotificationStub, TaskResult res) {
         // if the task was killed, cleaning was performed by the killForkedJavaTaskLauncher call
-         if (!executableGuard.wasKilled()) {
-             super.finalizeTask(terminateNotificationStub, res);
-         }
+        if (!executableGuard.wasKilled()) {
+            super.finalizeTask(terminateNotificationStub, res);
+        }
     }
 }

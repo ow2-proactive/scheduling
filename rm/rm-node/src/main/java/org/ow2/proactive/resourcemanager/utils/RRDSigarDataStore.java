@@ -60,18 +60,10 @@ import java.util.Set;
  */
 public class RRDSigarDataStore extends RRDDataStore {
 
-    private final String[] objectNames = {
-            "java.lang:type=OperatingSystem",
-            "java.lang:type=Memory",
-            "java.lang:type=Threading",
-            "java.lang:type=ClassLoading",
-            "sigar:Type=CpuCoreUsage,Name=*",
-            "sigar:Type=FileSystem,Name=*",
-            "sigar:Type=CpuUsage",
-            "sigar:Type=Mem",
-            "sigar:Type=NetInterface,Name=*",
-            "sigar:Type=Swap"
-    };
+    private final String[] objectNames = { "java.lang:type=OperatingSystem", "java.lang:type=Memory",
+            "java.lang:type=Threading", "java.lang:type=ClassLoading", "sigar:Type=CpuCoreUsage,Name=*",
+            "sigar:Type=FileSystem,Name=*", "sigar:Type=CpuUsage", "sigar:Type=Mem",
+            "sigar:Type=NetInterface,Name=*", "sigar:Type=Swap" };
 
     private HashMap<String, String> compositeTypes = new HashMap<String, String>();
 
@@ -86,7 +78,8 @@ public class RRDSigarDataStore extends RRDDataStore {
      * @throws java.io.IOException is thrown when the data base exists but cannot be read
      */
     public RRDSigarDataStore(MBeanServer mbs, String dataBaseFilePath, int step, Logger logger)
-            throws IOException, MalformedObjectNameException, IntrospectionException, InstanceNotFoundException, ReflectionException {
+            throws IOException, MalformedObjectNameException, IntrospectionException,
+            InstanceNotFoundException, ReflectionException {
         super(dataBaseFilePath, step, logger);
 
         compositeTypes.put("HeapMemoryUsage-java.lang:type=Memory", "used");
@@ -137,7 +130,7 @@ public class RRDSigarDataStore extends RRDDataStore {
         res = res.replace("-sigar:Type=", "");
         res = res.replace("-sigar:", "");
 
-        if (res.length()>20) {
+        if (res.length() > 20) {
             // only 20 symbols allowed in data source name
             res = res.substring(0, 19);
         }
@@ -174,18 +167,21 @@ public class RRDSigarDataStore extends RRDDataStore {
 
                             Object attrValue = mbs.getAttribute(new ObjectName(objectName), attrName);
                             try {
-                                if (attrValue instanceof CompositeDataSupport && compositeTypes.get(fullName) != null) {
-                                    Object val = ((CompositeDataSupport)attrValue).get(compositeTypes.get(fullName));
+                                if (attrValue instanceof CompositeDataSupport &&
+                                    compositeTypes.get(fullName) != null) {
+                                    Object val = ((CompositeDataSupport) attrValue).get(compositeTypes
+                                            .get(fullName));
                                     if (val != null) {
                                         attrValue = val;
                                     }
                                 }
                                 sample.setValue(dataSource, Double.parseDouble(attrValue.toString()));
-                                logger.trace(System.currentTimeMillis() / 1000 + " sampling: " + dataSource + " / " + fullName +
-                                        " " + Double.parseDouble(attrValue.toString()));
+                                logger.trace(System.currentTimeMillis() / 1000 + " sampling: " + dataSource +
+                                    " / " + fullName + " " + Double.parseDouble(attrValue.toString()));
                             } catch (NumberFormatException ex) {
                                 // do not save non-numeric values
-                                logger.trace("Ignoring non numeric value " + attrValue.toString() + " for " + dataSource + " / " + fullName);
+                                logger.trace("Ignoring non numeric value " + attrValue.toString() + " for " +
+                                    dataSource + " / " + fullName);
                             }
                         }
 

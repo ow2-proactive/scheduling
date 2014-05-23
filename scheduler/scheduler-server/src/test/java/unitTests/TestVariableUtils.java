@@ -48,6 +48,7 @@ import junit.framework.Assert;
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.util.VariablesUtil;
 
+
 public class TestVariableUtils {
     private static final String testString = "A${foo}C";
 

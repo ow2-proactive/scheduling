@@ -72,8 +72,8 @@ public class TestLocalInfrastructureTimeSlotPolicy extends RMConsecutive {
                 .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
         //first null parameter is the rm url
         helper.getResourceManager().createNodeSource(sourceName, LocalInfrastructure.class.getName(),
-                new Object[] { creds, 0, RMTHelper.defaultNodesTimeout, "" },
-                TimeSlotPolicy.class.getName(), getPolicyParams());
+                new Object[] { creds, 0, RMTHelper.defaultNodesTimeout, "" }, TimeSlotPolicy.class.getName(),
+                getPolicyParams());
 
         helper.waitForNodeSourceCreation(sourceName);
     }

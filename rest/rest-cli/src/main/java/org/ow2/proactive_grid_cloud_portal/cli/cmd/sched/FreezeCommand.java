@@ -43,6 +43,7 @@ import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 
+
 public class FreezeCommand extends AbstractCommand implements Command {
 
     public FreezeCommand() {
@@ -60,8 +61,7 @@ public class FreezeCommand extends AbstractCommand implements Command {
                 writeLine(currentContext, "Cannot freeze scheduler.");
             }
         } catch (Exception e) {
-            handleError("Error occurred while trying to freeze the scheduler:",
-                    e, currentContext);
+            handleError("Error occurred while trying to freeze the scheduler:", e, currentContext);
         }
     }
 

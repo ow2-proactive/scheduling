@@ -50,6 +50,7 @@ import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 
+
 public class DownloadFileCommand extends AbstractCommand implements Command {
     private String spaceName;
     private String pathName;
@@ -66,8 +67,8 @@ public class DownloadFileCommand extends AbstractCommand implements Command {
         InputStream in = null;
         OutputStream out = null;
         try {
-            in = currentContext.getRestClient().getScheduler()
-                    .pullFile(currentContext.getSessionId(), spaceName, pathName);
+            in = currentContext.getRestClient().getScheduler().pullFile(currentContext.getSessionId(),
+                    spaceName, pathName);
             out = buildOutputStream(new File(localFile));
             copy(in, out);
             resultStack(currentContext).push(true);

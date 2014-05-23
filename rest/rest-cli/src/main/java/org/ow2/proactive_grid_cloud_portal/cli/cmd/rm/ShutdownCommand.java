@@ -47,6 +47,7 @@ import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
 
+
 public class ShutdownCommand extends AbstractCommand implements Command {
 
     @Override
@@ -57,15 +58,12 @@ public class ShutdownCommand extends AbstractCommand implements Command {
             boolean success = readValue(response, Boolean.TYPE, currentContext);
             resultStack(currentContext).push(success);
             if (success) {
-                writeLine(currentContext, "%s",
-                        "Resource manager shutdown successfully.");
+                writeLine(currentContext, "%s", "Resource manager shutdown successfully.");
             } else {
-                writeLine(currentContext, "%s",
-                        "Cannot shutdown resource manager.");
+                writeLine(currentContext, "%s", "Cannot shutdown resource manager.");
             }
         } else {
-            handleError("An error occurred while shutting down:", response,
-                    currentContext);
+            handleError("An error occurred while shutting down:", response, currentContext);
         }
     }
 

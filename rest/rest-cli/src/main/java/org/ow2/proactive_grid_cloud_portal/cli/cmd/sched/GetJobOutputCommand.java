@@ -46,6 +46,7 @@ import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 
 import java.util.Map;
 
+
 public class GetJobOutputCommand extends AbstractJobCommand implements Command {
 
     public GetJobOutputCommand(String jobId) {
@@ -56,17 +57,14 @@ public class GetJobOutputCommand extends AbstractJobCommand implements Command {
     public void execute(ApplicationContext currentContext) throws CLIException {
         SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
         try {
-            Map<String,String> jobOutput = scheduler.jobResultValue(currentContext.getSessionId(),
-                    jobId);
+            Map<String, String> jobOutput = scheduler.jobResultValue(currentContext.getSessionId(), jobId);
             resultStack(currentContext).push(jobOutput);
             if (!currentContext.isSilent()) {
-                writeLine(currentContext, "%s",
-                        StringUtility.jobOutputAsString(job(), jobOutput));
+                writeLine(currentContext, "%s", StringUtility.jobOutputAsString(job(), jobOutput));
             }
         } catch (Exception e) {
-            handleError(String.format(
-                    "An error occurred while retrieving %s output:", job()),
-                    e, currentContext);
+            handleError(String.format("An error occurred while retrieving %s output:", job()), e,
+                    currentContext);
         }
     }
 }

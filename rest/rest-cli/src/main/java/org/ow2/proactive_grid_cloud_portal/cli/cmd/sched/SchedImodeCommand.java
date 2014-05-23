@@ -42,6 +42,7 @@ import java.io.InputStream;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractIModeCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 
+
 public class SchedImodeCommand extends AbstractIModeCommand implements Command {
 
     @Override

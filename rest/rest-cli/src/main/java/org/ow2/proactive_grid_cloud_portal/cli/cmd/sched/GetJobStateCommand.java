@@ -45,6 +45,7 @@ import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobStateData;
 
+
 public class GetJobStateCommand extends AbstractJobCommand implements Command {
 
     public GetJobStateCommand(String jobId) {
@@ -58,13 +59,11 @@ public class GetJobStateCommand extends AbstractJobCommand implements Command {
             JobStateData jobState = scheduler.listJobs(currentContext.getSessionId(), jobId);
             resultStack(currentContext).push(jobState);
             if (!currentContext.isSilent()) {
-                writeLine(currentContext, "%s",
-                        StringUtility.jobStateAsString(job(), jobState));
+                writeLine(currentContext, "%s", StringUtility.jobStateAsString(job(), jobState));
             }
         } catch (Exception e) {
-            handleError(String.format(
-                    "An error occurred while retrieving %s state:", job()),
-                    e, currentContext);
+            handleError(String.format("An error occurred while retrieving %s state:", job()), e,
+                    currentContext);
         }
 
     }

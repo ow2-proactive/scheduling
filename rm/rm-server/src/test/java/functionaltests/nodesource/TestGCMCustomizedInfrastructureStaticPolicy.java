@@ -94,8 +94,7 @@ public class TestGCMCustomizedInfrastructureStaticPolicy extends TestLocalInfras
     protected void createEmptyNodeSource(String sourceName) throws Exception {
         // first empty parameter of im is default rm url
         helper.getResourceManager().createNodeSource(sourceName, GCMCustomisedInfrastructure.class.getName(),
-                new Object[] { emptyGCMD, emptyhostsListData, TIMEOUT }, StaticPolicy.class.getName(),
-                null);
+                new Object[] { emptyGCMD, emptyhostsListData, TIMEOUT }, StaticPolicy.class.getName(), null);
 
         helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, sourceName);
     }

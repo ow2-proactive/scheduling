@@ -1311,8 +1311,7 @@ public abstract class InternalJob extends JobState {
         JobId jobId = jobInfo.getJobId();
         if (jobId != null) {
             replacements.put(SchedulerVars.JAVAENV_JOB_ID_VARNAME.toString(), jobId.toString());
-            replacements.put(SchedulerVars.JAVAENV_JOB_NAME_VARNAME.toString(), jobId
-                    .getReadableName());
+            replacements.put(SchedulerVars.JAVAENV_JOB_NAME_VARNAME.toString(), jobId.getReadableName());
         }
         return applyReplacementsOnGenericInformation(replacements);
     }

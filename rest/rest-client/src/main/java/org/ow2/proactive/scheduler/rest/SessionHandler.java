@@ -40,21 +40,21 @@ import java.lang.reflect.Method;
 
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 
+
 /**
  * Renews the session, in case of a session timeout.
  */
 public class SessionHandler implements InvocationHandler {
-    
+
     private SchedulerClient client;
-    
+
     public SessionHandler(SchedulerClient client) {
         this.client = client;
     }
 
     @Override
-    public Object invoke(Object proxy, Method method, Object[] args)
-            throws Throwable {
-        try { 
+    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        try {
             return method.invoke(client, args);
         } catch (InvocationTargetException e) {
             Throwable error = ((InvocationTargetException) e).getTargetException();

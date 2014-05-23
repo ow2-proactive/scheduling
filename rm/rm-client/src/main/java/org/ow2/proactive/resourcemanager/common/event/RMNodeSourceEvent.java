@@ -89,7 +89,8 @@ public class RMNodeSourceEvent extends RMEvent {
     /**
      * Creates an RMNodesourceEvent object.
      */
-    public RMNodeSourceEvent(RMEventType type, String initiator, String nodeSourceName, String nodeSourceDescription, String nodeSourceAdmin) {
+    public RMNodeSourceEvent(RMEventType type, String initiator, String nodeSourceName,
+            String nodeSourceDescription, String nodeSourceAdmin) {
         super(type);
         this.initiator = initiator;
         this.nodeSourceName = nodeSourceName;

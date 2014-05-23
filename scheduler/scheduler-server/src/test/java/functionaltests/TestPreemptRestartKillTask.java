@@ -176,7 +176,7 @@ public class TestPreemptRestartKillTask extends SchedulerConsecutive {
         Assert.assertEquals(TaskStatus.FAULTY, getTask(j4, "t4").getStatus());
         //check result tr5
         Assert.assertTrue(tr5.getException() instanceof Exception);//
-   }
+    }
 
     private TaskState getTask(JobState job, String taskName) {
         for (TaskState ts : job.getTasks()) {

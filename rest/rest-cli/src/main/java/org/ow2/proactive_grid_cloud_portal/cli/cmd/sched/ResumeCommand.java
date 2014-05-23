@@ -43,6 +43,7 @@ import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 
+
 public class ResumeCommand extends AbstractCommand implements Command {
 
     public ResumeCommand() {
@@ -61,9 +62,7 @@ public class ResumeCommand extends AbstractCommand implements Command {
                 writeLine(currentContext, "Cannot resume scheduler.");
             }
         } catch (Exception e) {
-            handleError(
-                    "An error occurred while attempting to resume scheduler:",
-                    e, currentContext);
+            handleError("An error occurred while attempting to resume scheduler:", e, currentContext);
         }
     }
 

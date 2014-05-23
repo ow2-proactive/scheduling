@@ -40,6 +40,7 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 
+
 public class TaskInfoImpl implements TaskInfo {
 
     private static final String[] EMPTY_STRING_ARRAY = new String[] {};

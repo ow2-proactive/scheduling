@@ -48,10 +48,11 @@ import javax.script.ScriptEngine;
 
 import org.codehaus.jackson.map.ObjectMapper;
 
+
 public interface ApplicationContext {
 
     public void setDevice(AbstractDevice device);
-    
+
     public AbstractDevice getDevice();
 
     public void setRestServerUrl(String restServerUrl);
@@ -75,7 +76,7 @@ public interface ApplicationContext {
     public ScriptEngine getEngine();
 
     public void setResourceType(String resourceType);
-    
+
     public String getResourceType();
 
     public Map<String, PluginView> getInfrastructures();

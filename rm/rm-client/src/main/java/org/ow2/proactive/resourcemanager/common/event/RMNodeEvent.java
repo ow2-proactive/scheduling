@@ -137,8 +137,8 @@ public final class RMNodeEvent extends RMEvent {
      * @param previousNodeState the previous state of the node concerned by this event
      * @param initiator the client which initiates the event
      */
-    public RMNodeEvent(final RMNodeDescriptor rmNode, final RMEventType eventType, final NodeState previousNodeState,
-            final String initiator) {
+    public RMNodeEvent(final RMNodeDescriptor rmNode, final RMEventType eventType,
+            final NodeState previousNodeState, final String initiator) {
         super(eventType);
 
         this.initiator = initiator;

@@ -52,7 +52,7 @@ import org.ow2.proactive.scheduler.task.TaskClassLoader;
  * @author The ProActive team 
  *
  */
-public class TaskClassLoaderImpl extends ClassLoader implements TaskClassLoader  {
+public class TaskClassLoaderImpl extends ClassLoader implements TaskClassLoader {
 
     public static final Logger logger = Logger.getLogger(TaskClassLoaderImpl.class);
 

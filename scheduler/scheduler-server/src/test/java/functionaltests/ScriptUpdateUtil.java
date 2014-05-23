@@ -48,6 +48,7 @@ import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.SelectionScript;
 
+
 /**
  * Utility class which facilitates the filtering of scripts in a Job object.
  */
@@ -74,8 +75,7 @@ public class ScriptUpdateUtil {
             resolveScript(task.getPostScript(), variables);
             resolveScript(task.getCleaningScript(), variables);
             if (task instanceof NativeTask) {
-                resolveScript(((NativeTask) task).getGenerationScript(),
-                        variables);
+                resolveScript(((NativeTask) task).getGenerationScript(), variables);
             }
         }
         return job;

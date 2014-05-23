@@ -58,10 +58,11 @@ import jline.SimpleCompletor;
 
 import org.ow2.proactive_grid_cloud_portal.cli.CommandSet;
 
+
 public class JLineDevice extends AbstractDevice {
     private static final int HLENGTH = 20;
-    private static final String HFILE = System.getProperty("user.home")
-            + File.separator + ".proactive" + File.separator + "restcli.hist";
+    private static final String HFILE = System.getProperty("user.home") + File.separator + ".proactive" +
+        File.separator + "restcli.hist";
 
     private ConsoleReader reader;
     private PrintWriter writer;
@@ -78,7 +79,7 @@ public class JLineDevice extends AbstractDevice {
         writer = new PrintWriter(out, true);
         reader = new ConsoleReader(in, writer);
         reader.setHistory(new History(hfile));
-        
+
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
             public void run() {
                 writeHistory();
@@ -103,8 +104,7 @@ public class JLineDevice extends AbstractDevice {
             @SuppressWarnings("rawtypes")
             List historyList = reader.getHistory().getHistoryList();
             if (historyList.size() > HLENGTH) {
-                historyList = historyList.subList(historyList.size() - HLENGTH,
-                        historyList.size());
+                historyList = historyList.subList(historyList.size() - HLENGTH, historyList.size());
             }
             for (int index = 0; index < historyList.size(); index++) {
                 decorated.println(historyList.get(index));
@@ -112,7 +112,7 @@ public class JLineDevice extends AbstractDevice {
             decorated.flush();
         } catch (IOException fnfe) {
             // can't do much 
-            
+
         } finally {
             if (outStream != null) {
                 try {
@@ -142,11 +142,9 @@ public class JLineDevice extends AbstractDevice {
     }
 
     public void setCommands(CommandSet.Entry[] entries) throws IOException {
-        Completor[] completors = new Completor[] {
-                new SimpleCompletor(getCommandsAsArray(entries)),
+        Completor[] completors = new Completor[] { new SimpleCompletor(getCommandsAsArray(entries)),
                 new ClassNameCompletor(), new FileNameCompletor() };
-        reader.addCompletor(new ArgumentCompletor(
-                new MultiCompletor(completors)));
+        reader.addCompletor(new ArgumentCompletor(new MultiCompletor(completors)));
     }
 
     @Override
@@ -157,8 +155,7 @@ public class JLineDevice extends AbstractDevice {
     @Override
     public char[] readPassword(String fmt, Object... args) throws IOException {
         // String.format(fmt, args),
-        return reader.readLine(String.format(fmt, args), new Character('*'))
-                .toCharArray();
+        return reader.readLine(String.format(fmt, args), new Character('*')).toCharArray();
 
     }
 
@@ -174,8 +171,8 @@ public class JLineDevice extends AbstractDevice {
     }
 
     @Override
-	public boolean canRead() throws IOException {
-		return reader.getInput().available() > 0;
-	}
+    public boolean canRead() throws IOException {
+        return reader.getInput().available() > 0;
+    }
 
 }

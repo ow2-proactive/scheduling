@@ -44,7 +44,8 @@ import org.ow2.proactive.utils.NodeSet;
  *
  * @author The ProActive Team
  **/
-public class DefaultExecutableInitializer extends DefaultStandaloneExecutableInitializer implements ExecutableInitializer {
+public class DefaultExecutableInitializer extends DefaultStandaloneExecutableInitializer implements
+        ExecutableInitializer {
 
     private DataSpacesFileObject localSpaceFO;
     private DataSpacesFileObject inputSpaceFO;

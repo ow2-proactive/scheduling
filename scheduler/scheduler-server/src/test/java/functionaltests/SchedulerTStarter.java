@@ -54,6 +54,7 @@ import org.ow2.proactive.scheduler.SchedulerFactory;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
+
 /**
  * Starts Scheduler and Resource Manager.
  * It is used to start scheduler in a separate JVM than the Test itself.
@@ -125,13 +126,14 @@ public class SchedulerTStarter implements Serializable {
             }
 
             rmAdmin.createNodeSource(RM_NODE_NAME, LocalInfrastructure.class.getName(), new Object[] {
-                    creds.getBase64(), RM_NODE_NUMBER, RM_NODE_DEPLOYMENT_TIMEOUT,
-                    "-Dproactive.test=true " +
-                    CentralPAPropertyRepository.PA_HOME.getCmdLine() + CentralPAPropertyRepository.PA_HOME.getValue() +
-                    " " +
-                    CentralPAPropertyRepository.PA_RMI_PORT.getCmdLine() + CentralPAPropertyRepository.PA_RMI_PORT.getValue() +
-                    " " +
-                    CentralPAPropertyRepository.PA_RUNTIME_PING.getCmdLine() + false },
+                    creds.getBase64(),
+                    RM_NODE_NUMBER,
+                    RM_NODE_DEPLOYMENT_TIMEOUT,
+                    "-Dproactive.test=true " + CentralPAPropertyRepository.PA_HOME.getCmdLine() +
+                        CentralPAPropertyRepository.PA_HOME.getValue() + " " +
+                        CentralPAPropertyRepository.PA_RMI_PORT.getCmdLine() +
+                        CentralPAPropertyRepository.PA_RMI_PORT.getValue() + " " +
+                        CentralPAPropertyRepository.PA_RUNTIME_PING.getCmdLine() + false },
 
             StaticPolicy.class.getName(), new Object[] { "ALL", "ALL" });
         }

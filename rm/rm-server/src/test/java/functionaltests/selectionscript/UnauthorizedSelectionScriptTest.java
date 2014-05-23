@@ -60,10 +60,8 @@ public class UnauthorizedSelectionScriptTest extends FunctionalTest {
 
     @org.junit.Test
     public void action() throws Exception {
-        String rmconf = new File(
-            PAResourceManagerProperties
-                    .getAbsolutePath(getClass().getResource("/functionaltests/config/rm-authorized-selection-script.ini").getFile()))
-                .getAbsolutePath();
+        String rmconf = new File(PAResourceManagerProperties.getAbsolutePath(getClass().getResource(
+                "/functionaltests/config/rm-authorized-selection-script.ini").getFile())).getAbsolutePath();
 
         RMTHelper helper = RMTHelper.getDefaultInstance();
         helper.startRM(rmconf, CentralPAPropertyRepository.PA_RMI_PORT.getValue());

@@ -36,6 +36,7 @@ package org.ow2.proactive.scheduler.core;
 
 import org.ow2.proactive.scheduler.job.UserIdentificationImpl;
 
+
 public class ListeningUser {
 
     /** Associated listener to client */

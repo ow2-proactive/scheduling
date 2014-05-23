@@ -385,12 +385,11 @@ public class TestJobFactory {
     private void log(String s) {
         System.out.println("------------------------------ " + s);
     }
-    
-    private TaskFlowJob getJob(URL jobDesc, String jobFacImpl)
-            throws JobCreationException, URISyntaxException {
-        return ScriptUpdateUtil.resolveScripts((TaskFlowJob) JobFactory
-                .getFactory(jobFacImpl).createJob(
-                        new File(jobDesc.toURI()).getAbsolutePath()));
+
+    private TaskFlowJob getJob(URL jobDesc, String jobFacImpl) throws JobCreationException,
+            URISyntaxException {
+        return ScriptUpdateUtil.resolveScripts((TaskFlowJob) JobFactory.getFactory(jobFacImpl).createJob(
+                new File(jobDesc.toURI()).getAbsolutePath()));
     }
 
 }

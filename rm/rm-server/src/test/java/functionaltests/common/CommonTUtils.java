@@ -70,8 +70,8 @@ public class CommonTUtils {
                 }
             }
         } catch (ProActiveException e) {
-            System.err.println(
-                    "Failed to cleanup active object registry for " + Arrays.toString(namesToRemove));
+            System.err.println("Failed to cleanup active object registry for " +
+                Arrays.toString(namesToRemove));
         }
     }
 

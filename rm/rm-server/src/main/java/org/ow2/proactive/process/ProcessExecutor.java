@@ -135,7 +135,7 @@ public class ProcessExecutor {
     }
 
     public int getExitCode() {
-        return  waiterThread.getProcessExitCode();
+        return waiterThread.getProcessExitCode();
     }
 
 }

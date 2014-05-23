@@ -45,7 +45,7 @@ public class JobData {
     private Credentials credentials;
 
     private Map<String, String> genericInformation;
-    
+
     private Map<String, String> variables;
 
     private String[] classpath;
@@ -199,7 +199,7 @@ public class JobData {
     public void setGenericInformation(Map<String, String> genericInformation) {
         this.genericInformation = genericInformation;
     }
-    
+
     @Column(name = "VARIABLES")
     @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object"))
     public Map<String, String> getVariables() {
@@ -209,7 +209,6 @@ public class JobData {
     public void setVariables(Map<String, String> variables) {
         this.variables = variables;
     }
-
 
     @Column(updatable = false, name = "CLASSPATH_CRC")
     public long getClasspathCrc() {

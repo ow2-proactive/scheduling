@@ -37,8 +37,7 @@
 
 package org.ow2.proactive_grid_cloud_portal.cli.cmd;
 
-public abstract class AbstractJobCommand extends AbstractCommand implements
-        Command {
+public abstract class AbstractJobCommand extends AbstractCommand implements Command {
 
     protected String jobId;
 

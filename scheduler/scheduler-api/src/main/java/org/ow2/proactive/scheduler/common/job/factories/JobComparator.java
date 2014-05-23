@@ -65,6 +65,7 @@ import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.topology.descriptor.ThresholdProximityDescriptor;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 
+
 public class JobComparator {
 
     // stack used to create a message in case of differences found between jobs
@@ -144,18 +145,20 @@ public class JobComparator {
     }
 
     private boolean isEqualCommonAttribute(CommonAttribute attrib1, CommonAttribute attrib2) {
-        if (!isEqualUpdatableProperty(attrib1.getCancelJobOnErrorProperty(), attrib2.getCancelJobOnErrorProperty())) {
+        if (!isEqualUpdatableProperty(attrib1.getCancelJobOnErrorProperty(), attrib2
+                .getCancelJobOnErrorProperty())) {
             stack.push(" CancelJobOnErrorProperty ");
             return false;
         }
 
-        if (!isEqualUpdatableProperty(attrib1.getMaxNumberOfExecutionProperty(),
-                attrib2.getMaxNumberOfExecutionProperty())) {
+        if (!isEqualUpdatableProperty(attrib1.getMaxNumberOfExecutionProperty(), attrib2
+                .getMaxNumberOfExecutionProperty())) {
             stack.push(" maxNumberOfExecution ");
             return false;
         }
 
-        if (!isEqualUpdatableProperty(attrib1.getRestartTaskOnErrorProperty(), attrib2.getRestartTaskOnErrorProperty())) {
+        if (!isEqualUpdatableProperty(attrib1.getRestartTaskOnErrorProperty(), attrib2
+                .getRestartTaskOnErrorProperty())) {
             stack.push(" RestartTaskOnError ");
             return false;
         }
@@ -163,8 +166,8 @@ public class JobComparator {
         stack.push(" genericInformations ");
         if (!isEqualMap(attrib1.getGenericInformations(), attrib2.getGenericInformations())) {
 
-            stack.push("generic info 1= " + attrib1.getGenericInformations() + " ----- generic info 2 = "
-                    + attrib2.getGenericInformations());
+            stack.push("generic info 1= " + attrib1.getGenericInformations() + " ----- generic info 2 = " +
+                attrib2.getGenericInformations());
 
             return false;
         }
@@ -172,7 +175,8 @@ public class JobComparator {
         return true;
     }
 
-    private boolean isTaskFlowEqual(TaskFlowJob job1, TaskFlowJob job2) throws IOException, ClassNotFoundException {
+    private boolean isTaskFlowEqual(TaskFlowJob job1, TaskFlowJob job2) throws IOException,
+            ClassNotFoundException {
         ArrayList<Task> tasks1 = job1.getTasks();
         ArrayList<Task> tasks2 = job2.getTasks();
 
@@ -552,7 +556,8 @@ public class JobComparator {
                 String[] e2 = is2.getInputFiles().getExcludes();
                 if (e1 == null ^ e2 == null) {
                     continue;
-                } else if (e1 != null && !CollectionUtils.isEqualCollection(Arrays.asList(e1), Arrays.asList(e2))) {
+                } else if (e1 != null &&
+                    !CollectionUtils.isEqualCollection(Arrays.asList(e1), Arrays.asList(e2))) {
                     continue;
                 }
                 found = true;
@@ -594,14 +599,16 @@ public class JobComparator {
                 String[] i2 = os2.getOutputFiles().getIncludes();
                 if (i1 == null ^ i2 == null) {
                     continue;
-                } else if (i1 != null && !CollectionUtils.isEqualCollection(Arrays.asList(i1), Arrays.asList(i2))) {
+                } else if (i1 != null &&
+                    !CollectionUtils.isEqualCollection(Arrays.asList(i1), Arrays.asList(i2))) {
                     continue;
                 }
                 String[] e1 = os1.getOutputFiles().getExcludes();
                 String[] e2 = os2.getOutputFiles().getExcludes();
                 if (e1 == null ^ e2 == null) {
                     continue;
-                } else if (e1 != null && !CollectionUtils.isEqualCollection(Arrays.asList(e1), Arrays.asList(e2))) {
+                } else if (e1 != null &&
+                    !CollectionUtils.isEqualCollection(Arrays.asList(e1), Arrays.asList(e2))) {
                     continue;
                 }
                 found = true;
@@ -637,7 +644,8 @@ public class JobComparator {
 
         if (topologyDescriptor1 == null ^ topologyDescriptor2 == null) {
             return isEqualClass(TopologyDescriptor.ARBITRARY.getClass(),
-                    (topologyDescriptor1 == null ? topologyDescriptor2.getClass() : topologyDescriptor1.getClass()));
+                    (topologyDescriptor1 == null ? topologyDescriptor2.getClass() : topologyDescriptor1
+                            .getClass()));
         }
 
         if (!isEqualClass(topologyDescriptor1.getClass(), topologyDescriptor2.getClass())) {
@@ -681,8 +689,8 @@ public class JobComparator {
         }
 
         if (!CollectionUtils.isEqualCollection(Arrays.asList(cp1), Arrays.asList(cp2))) {
-            stack.push("classpath1 = " + Arrays.asList(e1.getJobClasspath()) + " ---- " + "classpath 2 = "
-                    + Arrays.asList(e2.getJobClasspath()));
+            stack.push("classpath1 = " + Arrays.asList(e1.getJobClasspath()) + " ---- " + "classpath 2 = " +
+                Arrays.asList(e2.getJobClasspath()));
             return false;
         } else
             return true;
@@ -701,8 +709,8 @@ public class JobComparator {
 
     private static <T> boolean isEqualUpdatableProperty(UpdatableProperties<T> property1,
             UpdatableProperties<T> property2) {
-        return (property1.isSet() ^ property2.isSet()) ? false : ((property1.isSet()) ? property1.getValue().equals(
-                property2.getValue()) : true);
+        return (property1.isSet() ^ property2.isSet()) ? false : ((property1.isSet()) ? property1.getValue()
+                .equals(property2.getValue()) : true);
     }
 
     private boolean isEqualClass(Class<?> clazz1, Class<?> clazz2) {

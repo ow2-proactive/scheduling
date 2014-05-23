@@ -50,7 +50,8 @@ import org.ow2.proactive.utils.NodeSet;
  * @author The ProActive Team
  * @since ProActive Scheduling 1.0
  */
-public class JavaExecutableInitializerImpl extends JavaStandaloneExecutableInitializer implements ExecutableInitializer {
+public class JavaExecutableInitializerImpl extends JavaStandaloneExecutableInitializer implements
+        ExecutableInitializer {
 
     private NodeSet nodes;
 
@@ -74,7 +75,7 @@ public class JavaExecutableInitializerImpl extends JavaStandaloneExecutableIniti
 
     @Override
     public void setNodes(NodeSet nodes) {
-       this.nodes = nodes;
+        this.nodes = nodes;
     }
 
     /**

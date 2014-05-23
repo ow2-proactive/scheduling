@@ -122,8 +122,9 @@ public final class TestExecRemote extends RMConsecutive {
             for (ScriptResult<Boolean> res : results) {
                 Assert.assertTrue("The selection script must return true", res.getResult());
                 String output = res.getOutput();
-                Assert.assertTrue("The script output must contain the printed value",
-                        output.contains("true"));
+                Assert
+                        .assertTrue("The script output must contain the printed value", output
+                                .contains("true"));
             }
         }
         {

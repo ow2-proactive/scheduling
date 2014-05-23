@@ -133,8 +133,11 @@ public class NoVncSecuredTargetResolverTest {
     @Test
     public void testMagicStringFoundInLiveLogs() throws Exception {
         String sessionId = SharedSessionStoreTestUtils.createValidSession(schedulerMock);
-        SharedSessionStore.getInstance().get(sessionId)
-                .addJobOutputAppender("42",
+        SharedSessionStore
+                .getInstance()
+                .get(sessionId)
+                .addJobOutputAppender(
+                        "42",
                         createLiveLogs("[Visualization_task@node2;10:38:06]PA_REMOTE_CONNECTION;1;vnc;node.grid.com:5900"));
         when(schedulerMock.getTaskResult("42", "remoteVisuTask")).thenReturn(
                 new TaskResultImpl(TaskIdImpl.createTaskId(new JobIdImpl(42, "job"), "remoteVisuTask", 1,

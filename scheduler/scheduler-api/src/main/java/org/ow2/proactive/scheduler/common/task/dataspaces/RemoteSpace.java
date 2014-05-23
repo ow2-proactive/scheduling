@@ -143,5 +143,4 @@ public interface RemoteSpace {
      */
     OutputStream getOutputStream(String remotePath) throws FileSystemException;
 
-
 }

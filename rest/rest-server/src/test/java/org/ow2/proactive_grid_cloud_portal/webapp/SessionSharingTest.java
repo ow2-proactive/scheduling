@@ -70,9 +70,9 @@ public class SessionSharingTest {
 
         SchedulerRMProxyFactory schedulerFactory = mock(SchedulerRMProxyFactory.class);
         rmMock = mock(RMProxyUserInterface.class);
-        when(schedulerFactory.connectToRM(Matchers.<CredData>any())).thenReturn(rmMock);
+        when(schedulerFactory.connectToRM(Matchers.<CredData> any())).thenReturn(rmMock);
         schedulerMock = mock(SchedulerProxyUserInterface.class);
-        when(schedulerFactory.connectToScheduler(Matchers.<CredData>any())).thenReturn(schedulerMock);
+        when(schedulerFactory.connectToScheduler(Matchers.<CredData> any())).thenReturn(schedulerMock);
 
         SharedSessionStore.getInstance().setSchedulerRMProxyFactory(schedulerFactory);
     }
@@ -88,7 +88,6 @@ public class SessionSharingTest {
         when(schedulerMock.freeze()).thenReturn(true);
         boolean frozen = schedulerRest.freezeScheduler(sessionId);
         assertTrue(frozen);
-
 
         schedulerRest.disconnect(sessionId);
 
@@ -136,4 +135,3 @@ public class SessionSharingTest {
         }
     }
 }
-

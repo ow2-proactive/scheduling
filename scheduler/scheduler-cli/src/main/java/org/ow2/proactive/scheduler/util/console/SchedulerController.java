@@ -189,9 +189,8 @@ public class SchedulerController {
                     user = cmd.getOptionValue("login");
                 }
 
-                File defaultCredentialFile = new File(
-                        PASchedulerProperties.SCHEDULER_HOME.getValueAsStringOrNull(),
-                        "config/authentication/scheduler.cred");
+                File defaultCredentialFile = new File(PASchedulerProperties.SCHEDULER_HOME
+                        .getValueAsStringOrNull(), "config/authentication/scheduler.cred");
 
                 if (cmd.hasOption("credentials")) {
                     if (cmd.getOptionValue("credentials") != null) {

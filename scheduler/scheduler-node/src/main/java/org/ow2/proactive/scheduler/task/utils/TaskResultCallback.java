@@ -11,7 +11,8 @@ import org.ow2.proactive.scheduler.task.forked.JavaForkerExecutable;
 @ActiveObject
 public class TaskResultCallback implements TaskTerminateNotification {
 
-    public TaskResultCallback() {};
+    public TaskResultCallback() {
+    };
 
     private JavaForkerExecutable.LauncherGuard launcherGuard;
 

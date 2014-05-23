@@ -41,22 +41,27 @@ public class ConfigurableFieldView {
     private String name;
     private String value;
     private FieldMataDataView meta;
-    
+
     public String getName() {
         return name;
     }
+
     public void setName(String name) {
         this.name = name;
     }
+
     public String getValue() {
         return value;
     }
+
     public void setValue(String value) {
         this.value = value;
     }
+
     public FieldMataDataView getMeta() {
         return meta;
     }
+
     public void setMeta(FieldMataDataView meta) {
         this.meta = meta;
     }

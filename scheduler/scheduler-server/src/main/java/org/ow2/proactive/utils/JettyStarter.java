@@ -103,11 +103,11 @@ public class JettyStarter {
 
                         Throwable startException = webAppContext.getUnavailableException();
                         if (startException == null) {
-                            logger.info("The web application " + webAppContext.getContextPath()
-                              + " created on http://localhost:" + restPort + webAppContext.getContextPath());
+                            logger.info("The web application " + webAppContext.getContextPath() +
+                                " created on http://localhost:" + restPort + webAppContext.getContextPath());
                         } else {
                             logger.warn("Failed to start context " + webAppContext.getContextPath(),
-                              startException);
+                                    startException);
                         }
                     }
                 } else {
@@ -128,7 +128,7 @@ public class JettyStarter {
                     deployExplodedWebApp(server, fileToDeploy);
                 } else if (isWarFile(fileToDeploy)) {
                     deployWarFile(server, fileToDeploy);
-                } else if(isStaticFolder(fileToDeploy)){
+                } else if (isStaticFolder(fileToDeploy)) {
                     deployStaticFolder(server, fileToDeploy);
                 }
             }

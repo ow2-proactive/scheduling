@@ -134,7 +134,8 @@ public class TestPreciousLogs extends SchedulerConsecutive {
             } else {
                 NativeTask nativeTask = new NativeTask();
 
-                File script = new File(getClass().getResource("/functionaltests/executables/test_echo_task.sh").getFile());
+                File script = new File(getClass().getResource(
+                        "/functionaltests/executables/test_echo_task.sh").getFile());
                 if (!script.exists()) {
                     Assert.fail("Can't find script " + script.getAbsolutePath());
                 }

@@ -44,8 +44,8 @@ import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 
-public class GetTaskOutputCommand extends AbstractTaskCommand implements
-        Command {
+
+public class GetTaskOutputCommand extends AbstractTaskCommand implements Command {
 
     public GetTaskOutputCommand(String jobId, String taskId) {
         super(jobId, taskId);
@@ -58,13 +58,11 @@ public class GetTaskOutputCommand extends AbstractTaskCommand implements
             String output = scheduler.tasklog(currentContext.getSessionId(), jobId, taskId);
             resultStack(currentContext).push(output);
             if (!currentContext.isSilent()) {
-                writeLine(currentContext, "%s",
-                        StringUtility.taskOutputAsString(task(), output));
+                writeLine(currentContext, "%s", StringUtility.taskOutputAsString(task(), output));
             }
         } catch (Exception e) {
-            handleError(String.format(
-                    "An error occurred while retrieving %s output:", task()),
-                    e, currentContext);
+            handleError(String.format("An error occurred while retrieving %s output:", task()), e,
+                    currentContext);
         }
     }
 }

@@ -81,7 +81,8 @@ import static org.junit.Assert.assertTrue;
  */
 public class TestProcessTreeKiller extends SchedulerConsecutive {
 
-    public static URL launchersDir = TestProcessTreeKiller.class.getResource("/functionaltests/executables/TestSleep.exe");
+    public static URL launchersDir = TestProcessTreeKiller.class
+            .getResource("/functionaltests/executables/TestSleep.exe");
 
     private final static int wait_kill_time = 60000;
 
@@ -128,7 +129,8 @@ public class TestProcessTreeKiller extends SchedulerConsecutive {
             String task1Name = "TestPTK1";
             task1.setName(task1Name);
 
-            String workingDir = new File(TestProcessTreeKiller.launchersDir.toURI()).getParentFile().getCanonicalPath();
+            String workingDir = new File(TestProcessTreeKiller.launchersDir.toURI()).getParentFile()
+                    .getCanonicalPath();
             task1.setWorkingDir(workingDir);
             JavaSpawnExecutable executable = new JavaSpawnExecutable();
             executable.home = PASchedulerProperties.SCHEDULER_HOME.getValueAsString();
@@ -140,7 +142,6 @@ public class TestProcessTreeKiller extends SchedulerConsecutive {
 
             String task3Name = "TestTK3";
             TaskFlowJob job3 = createJavaExecutableJob(task3Name, true);
-
 
             SchedulerTHelper.log("************** Test with Job Killing *************");
             //submit three jobs

@@ -306,7 +306,8 @@ public class TestListenJobLogs extends SchedulerConsecutive {
             }
 
             Assert.assertTrue("Didn't receive expected events, expected: " + expectedMessagesList +
-                ", actual: " + actualMessages, ListUtils.removeAll(expectedMessagesList, actualMessages).isEmpty());
+                ", actual: " + actualMessages, ListUtils.removeAll(expectedMessagesList, actualMessages)
+                    .isEmpty());
             actualMessages.clear();
         }
 

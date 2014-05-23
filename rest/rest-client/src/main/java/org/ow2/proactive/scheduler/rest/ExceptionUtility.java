@@ -52,6 +52,7 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SubmissionClosedR
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestException;
 
+
 public class ExceptionUtility {
 
     private ExceptionUtility() {
@@ -65,8 +66,7 @@ public class ExceptionUtility {
         }
     }
 
-    public static void throwNCEOrPE(Exception e) throws NotConnectedException,
-            PermissionException {
+    public static void throwNCEOrPE(Exception e) throws NotConnectedException, PermissionException {
         if (e instanceof PermissionRestException) {
             throw new PermissionException(e);
         } else {
@@ -74,8 +74,7 @@ public class ExceptionUtility {
         }
     }
 
-    public static void throwUJEOrNCEOrPE(Exception e)
-            throws UnknownJobException, NotConnectedException,
+    public static void throwUJEOrNCEOrPE(Exception e) throws UnknownJobException, NotConnectedException,
             PermissionException {
         if (e instanceof UnknownJobRestException) {
             throw new UnknownJobException(e);
@@ -84,8 +83,7 @@ public class ExceptionUtility {
         }
     }
 
-    public static void throwUJEOrNCEOrPEOrUTE(Exception e)
-            throws UnknownJobException, NotConnectedException,
+    public static void throwUJEOrNCEOrPEOrUTE(Exception e) throws UnknownJobException, NotConnectedException,
             PermissionException, UnknownTaskException {
         if (e instanceof UnknownTaskRestException) {
             throw new UnknownTaskException(e);
@@ -94,8 +92,7 @@ public class ExceptionUtility {
         }
     }
 
-    public static void throwNCEOrPEOrSCEOrJCE(Exception e)
-            throws NotConnectedException, PermissionException,
+    public static void throwNCEOrPEOrSCEOrJCE(Exception e) throws NotConnectedException, PermissionException,
             SubmissionClosedException, JobCreationException {
         if (e instanceof SubmissionClosedRestException) {
             throw new SubmissionClosedException(e);
@@ -106,9 +103,8 @@ public class ExceptionUtility {
         }
     }
 
-    public static void throwJAFEOrUJEOrNCEOrPE(Exception e)
-            throws JobAlreadyFinishedException, UnknownJobException,
-            NotConnectedException, PermissionException {
+    public static void throwJAFEOrUJEOrNCEOrPE(Exception e) throws JobAlreadyFinishedException,
+            UnknownJobException, NotConnectedException, PermissionException {
         if (e instanceof JobAlreadyFinishedRestException) {
             throw new JobAlreadyFinishedException(e);
         } else {
@@ -124,8 +120,7 @@ public class ExceptionUtility {
     }
 
     public static Exception exception(Throwable t) {
-        return (t instanceof Exception) ? (Exception) t : new RuntimeException(
-                t);
+        return (t instanceof Exception) ? (Exception) t : new RuntimeException(t);
     }
 
 }

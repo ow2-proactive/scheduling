@@ -38,7 +38,7 @@ public class SharedSessionStore {
 
     private static final SessionStore SESSION_STORE = new SessionStore();
 
-    public static SessionStore getInstance(){
+    public static SessionStore getInstance() {
         return SESSION_STORE;
     }
 }

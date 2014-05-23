@@ -375,9 +375,8 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                 criteria.setTopology(descriptor);
                 // resolve script variables (if any) in the list of selection
                 // scripts and then set it as the selection criteria.
-                criteria.setScripts(resolveScriptVariables(
-                        internalTask.getSelectionScripts(),
-                        currentJob.getVariables()));
+                criteria.setScripts(resolveScriptVariables(internalTask.getSelectionScripts(), currentJob
+                        .getVariables()));
                 criteria.setBlackList(internalTask.getNodeExclusion());
                 criteria.setBestEffort(bestEffort);
 
@@ -528,12 +527,11 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
     private SchedulerDBManager getDBManager() {
         return schedulingService.getInfrastructure().getDBManager();
     }
-    
+
     /*
      * Replace selection script variables with values specified in the map.
      */
-    private List<SelectionScript> resolveScriptVariables(
-            List<SelectionScript> selectionScripts,
+    private List<SelectionScript> resolveScriptVariables(List<SelectionScript> selectionScripts,
             Map<String, String> variables) {
         if (selectionScripts == null) {
             return null;

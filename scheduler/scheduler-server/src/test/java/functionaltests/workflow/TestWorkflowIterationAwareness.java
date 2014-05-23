@@ -75,28 +75,30 @@ public class TestWorkflowIterationAwareness extends SchedulerConsecutive {
             .getResource("/functionaltests/workflow/descriptors/flow_it_2.xml");
 
     private static final String preScript = //
-        "def f = new File(\"" + System.getProperty("java.io.tmpdir") + "/PRE_$IT_$REP\"); \n" + //
+    "def f = new File(\"" + System.getProperty("java.io.tmpdir") + "/PRE_$IT_$REP\"); \n" + //
         "f.createNewFile(); \n";
 
     private static final String preScriptWindows = //
-        "def f = new File(\"" + tmp_dir_Windows.replace("\\", "\\\\") + "PRE_$IT_$REP\"); \n" + //
+    "def f = new File(\"" + tmp_dir_Windows.replace("\\", "\\\\") + "PRE_$IT_$REP\"); \n" + //
 
         "f.createNewFile(); \n";
 
     private static final String postScript = //
-        "def f = new File(\"" //
-        + System.getProperty("java.io.tmpdir") + "/POST_$IT_$REP\"); \n" //
+    "def f = new File(\"" //
+        +
+        System.getProperty("java.io.tmpdir") + "/POST_$IT_$REP\"); \n" //
         + "f.createNewFile(); \n";
 
     private static final String postScriptWindows = //
-        "def f = new File(\"" //
-        + tmp_dir_Windows.replace("\\", "\\\\") + "POST_$IT_$REP\"); \n" //
+    "def f = new File(\"" //
+        +
+        tmp_dir_Windows.replace("\\", "\\\\") + "POST_$IT_$REP\"); \n" //
         + "f.createNewFile(); \n";
 
     private static final String dupScript = "enabled = true; \n" + "runs = 2; \n";
 
     private static final String loopScript = //
-         "defID   = 3; \n" //
+    "defID   = 3; \n" //
         + "defRUNS = 2; \n" //
         + "def f = new File(java.lang.System.getProperty(\"java.io.tmpdir\"), \"test_flow_lock_\" + ID); \n" //
         + "defit = 0; \n" //

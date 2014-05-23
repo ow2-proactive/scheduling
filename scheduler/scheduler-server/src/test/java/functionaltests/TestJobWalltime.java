@@ -74,7 +74,9 @@ public class TestJobWalltime extends FunctionalTest {
 
     @Before
     public void init() throws Throwable {
-        endlessScript = new SimpleScript("file = new java.io.File(java.lang.System.getProperty(\"java.io.tmpdir\"),\"started.ok\");file.createNewFile();while(true){java.lang.Thread.sleep(500);}","javascript");
+        endlessScript = new SimpleScript(
+            "file = new java.io.File(java.lang.System.getProperty(\"java.io.tmpdir\"),\"started.ok\");file.createNewFile();while(true){java.lang.Thread.sleep(500);}",
+            "javascript");
         SchedulerTHelper.startScheduler();
     }
 
@@ -89,14 +91,14 @@ public class TestJobWalltime extends FunctionalTest {
         String tname = "walltimeJavaTask";
         // pre script interruption
         TaskFlowJob job = new TaskFlowJob();
-        job.setName(this.getClass().getSimpleName()+"_"+tname);
+        job.setName(this.getClass().getSimpleName() + "_" + tname);
         JavaTask task1 = new JavaTask();
         task1.setName(tname);
         task1.setWallTime(5000);
         task1.setExecutableClassName(EndlessExecutable.class.getName());
         job.addTask(task1);
 
-        submitAndCheckJob(job,tname);
+        submitAndCheckJob(job, tname);
     }
 
     @Test
@@ -122,14 +124,14 @@ public class TestJobWalltime extends FunctionalTest {
         String tname = "walltimeScriptTask";
         // pre script interruption
         TaskFlowJob job = new TaskFlowJob();
-        job.setName(this.getClass().getSimpleName()+"_"+tname);
+        job.setName(this.getClass().getSimpleName() + "_" + tname);
         ScriptTask task1 = new ScriptTask();
         task1.setName(tname);
         task1.setWallTime(5000);
         task1.setScript(new TaskScript(endlessScript));
         job.addTask(task1);
 
-        submitAndCheckJob(job,tname);
+        submitAndCheckJob(job, tname);
     }
 
     @Test
@@ -138,21 +140,22 @@ public class TestJobWalltime extends FunctionalTest {
         String tname = "walltimeNativeTask";
         // pre script interruption
         TaskFlowJob job = new TaskFlowJob();
-        job.setName(this.getClass().getSimpleName()+"_"+tname);
+        job.setName(this.getClass().getSimpleName() + "_" + tname);
         NativeTask task1 = new NativeTask();
         task1.setName(tname);
         task1.setWallTime(5000);
 
         if (OperatingSystem.getOperatingSystem() == OperatingSystem.windows) {
-            task1.setCommandLine("$JAVA_HOME\\..\\bin\\jrunscript.exe","-e","java.lang.Thread.sleep(300000)");
+            task1.setCommandLine("$JAVA_HOME\\..\\bin\\jrunscript.exe", "-e",
+                    "java.lang.Thread.sleep(300000)");
             // task1.setCommandLine("timeout", "10000"); // if we launch it on windows it give an error that redirection is not supported
         } else {
-            task1.setCommandLine("sleep","10000");
+            task1.setCommandLine("sleep", "10000");
         }
 
         job.addTask(task1);
 
-        submitAndCheckJob(job,tname);
+        submitAndCheckJob(job, tname);
     }
 
     private void submitAndCheckJob(Job job, String tname) throws Exception {
@@ -170,7 +173,6 @@ public class TestJobWalltime extends FunctionalTest {
         SchedulerTHelper.log("Waiting for task " + tname + " running");
         SchedulerTHelper.waitForEventTaskRunning(id, tname);
         Assert.assertEquals(jInfo.getJobId(), id);
-
 
         SchedulerTHelper.log("Waiting until the walltime is reached");
         JobInfo info = SchedulerTHelper.waitForEventJobFinished(id, TIMEOUT);
@@ -193,13 +195,13 @@ public class TestJobWalltime extends FunctionalTest {
 
         RMTHelper rm = RMTHelper.getDefaultInstance();
 
-        List<Node> nodes =  rm.listAliveNodes();
+        List<Node> nodes = rm.listAliveNodes();
         // We wait until no active object remain on the nodes.
         // If AO remains the test will fail with a timeout.
         boolean remainingAO = true;
 
         long wait = 0;
-        while(remainingAO && wait < 5000) {
+        while (remainingAO && wait < 5000) {
             Thread.sleep(50);
             wait += 50;
             remainingAO = false;
@@ -207,6 +209,6 @@ public class TestJobWalltime extends FunctionalTest {
                 remainingAO = remainingAO || (node.getNumberOfActiveObjects() > 0);
             }
         }
-        Assert.assertFalse("No Active Objects should remain",remainingAO);
+        Assert.assertFalse("No Active Objects should remain", remainingAO);
     }
 }

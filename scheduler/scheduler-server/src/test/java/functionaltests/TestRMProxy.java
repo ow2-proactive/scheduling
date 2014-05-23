@@ -153,8 +153,7 @@ public class TestRMProxy extends FunctionalTest {
         proxiesManager.terminateAllProxies();
     }
 
-    private void requestWithTwoUsers(RMProxy proxy1, RMProxy proxy2, ResourceManager rm)
-            throws Exception {
+    private void requestWithTwoUsers(RMProxy proxy1, RMProxy proxy2, ResourceManager rm) throws Exception {
         System.out.println("Request nodes for two users");
 
         NodeSet nodeSet1 = proxy1.getNodes(new Criteria(1));

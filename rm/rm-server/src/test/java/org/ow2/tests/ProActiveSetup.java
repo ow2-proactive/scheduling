@@ -126,8 +126,8 @@ public class ProActiveSetup {
         jvmParameters.add(CentralPAPropertyRepository.PA_TEST.getCmdLine() + "true");
         jvmParameters.add("-Djava.awt.headless=true"); // for Mac builds
         jvmParameters.add(CentralPAPropertyRepository.PA_RUNTIME_PING.getCmdLine() + false);
-        jvmParameters.add(
-                CentralPAPropertyRepository.PA_HOME.getCmdLine() + CentralPAPropertyRepository.PA_HOME.getValue());
+        jvmParameters.add(CentralPAPropertyRepository.PA_HOME.getCmdLine() +
+            CentralPAPropertyRepository.PA_HOME.getValue());
         jvmParameters.add(CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getCmdLine() +
             CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getValue());
 

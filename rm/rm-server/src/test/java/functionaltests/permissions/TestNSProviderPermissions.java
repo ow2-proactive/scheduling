@@ -82,9 +82,9 @@ public class TestNSProviderPermissions extends RMConsecutive {
 
         ResourceManager nsadmin = helper.getResourceManager(null, "nsadmin", "pwd");
         nsadmin.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null,
-          StaticPolicy.class.getName(), new Object[] { "ALL", "ME" });
+                StaticPolicy.class.getName(), new Object[] { "ALL", "ME" });
 
-        List<TNode> nodePool =  helper.createNodes("node", 17);
+        List<TNode> nodePool = helper.createNodes("node", 17);
 
         helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
 
@@ -126,7 +126,7 @@ public class TestNSProviderPermissions extends RMConsecutive {
 
         RMTHelper.log("Test2 - node providers = MY_GROUPS");
         admin.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null, StaticPolicy.class
-          .getName(), new Object[] { "ALL", "MY_GROUPS" });
+                .getName(), new Object[] { "ALL", "MY_GROUPS" });
         helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
 
         node = nodePool.remove(0).getNode();
@@ -178,7 +178,7 @@ public class TestNSProviderPermissions extends RMConsecutive {
         RMTHelper.log("Test3 - node providers = ALL");
         nsadmin = helper.getResourceManager(null, "nsadmin", "pwd");
         nsadmin.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null,
-          StaticPolicy.class.getName(), new Object[] { "ALL", "ALL" });
+                StaticPolicy.class.getName(), new Object[] { "ALL", "ALL" });
         helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
 
         node = nodePool.remove(0).getNode();
@@ -219,7 +219,7 @@ public class TestNSProviderPermissions extends RMConsecutive {
 
         RMTHelper.log("Test5.1 - specific users");
         admin.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null, StaticPolicy.class
-          .getName(), new Object[] { "ALL", "users=nsadmin" });
+                .getName(), new Object[] { "ALL", "users=nsadmin" });
         helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
 
         node = nodePool.remove(0).getNode();
@@ -263,7 +263,7 @@ public class TestNSProviderPermissions extends RMConsecutive {
 
         RMTHelper.log("Test5.2 - specific groups");
         admin.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null,
-          StaticPolicy.class.getName(), new Object[] { "ALL", "groups=nsadmins" }).getBooleanValue();
+                StaticPolicy.class.getName(), new Object[] { "ALL", "groups=nsadmins" }).getBooleanValue();
         helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
 
         node = nodePool.remove(0).getNode();
@@ -303,7 +303,7 @@ public class TestNSProviderPermissions extends RMConsecutive {
 
         RMTHelper.log("Test5.3 - specific users/groups");
         admin.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null, StaticPolicy.class
-          .getName(), new Object[] { "ALL", "users=radmin;groups=nsadmins" });
+                .getName(), new Object[] { "ALL", "users=radmin;groups=nsadmins" });
         helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
 
         node = nodePool.remove(0).getNode();

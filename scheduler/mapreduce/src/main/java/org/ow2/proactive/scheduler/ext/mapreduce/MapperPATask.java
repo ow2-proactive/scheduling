@@ -251,8 +251,7 @@ public class MapperPATask extends JavaExecutable {
         // org.apache.hadoop.mapreduce.TaskAttemptID
         int taskId = 0;
         int jobId = 0;
-        String taskIdString = System.getProperty(SchedulerVars.JAVAENV_TASK_ID_VARNAME
-                .toString());
+        String taskIdString = System.getProperty(SchedulerVars.JAVAENV_TASK_ID_VARNAME.toString());
         if ((taskIdString != null) && (!(taskIdString.equalsIgnoreCase("")))) {
             taskId = Integer.parseInt(taskIdString);
             logger.debug("The taskId of the MapperPATask is: " + taskId);

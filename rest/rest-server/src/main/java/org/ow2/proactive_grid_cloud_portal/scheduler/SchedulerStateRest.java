@@ -862,18 +862,17 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @Path("jobs/{jobid}/html")
     @Produces("text/html")
     public String getJobHtml(@HeaderParam("sessionid")
-                              String sessionId, @PathParam("jobid")
-                              String jobId) throws IOException, NotConnectedRestException {
+    String sessionId, @PathParam("jobid")
+    String jobId) throws IOException, NotConnectedRestException {
         checkAccess(sessionId);
 
-        File jobHtml = new File(PortalConfiguration.jobIdToPath(jobId)+".html");
+        File jobHtml = new File(PortalConfiguration.jobIdToPath(jobId) + ".html");
         if (!jobHtml.exists()) {
-            throw new IOException("the file "+jobHtml.getAbsolutePath()+" was not found on the server");
+            throw new IOException("the file " + jobHtml.getAbsolutePath() + " was not found on the server");
         }
         InputStream ips = new BufferedInputStream(new FileInputStream(jobHtml));
         return new String(IOUtils.toByteArray(ips));
     }
-
 
     /**
      * Returns a list of taskState
@@ -916,9 +915,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @Path("jobs/{jobid}/log/full")
     @Produces("application/json")
     public InputStream jobFullLogs(@HeaderParam("sessionid")
-                                     String sessionId, @PathParam("jobid")
-                                     String jobId, @QueryParam("sessionid")
-                                     String session) throws NotConnectedRestException, UnknownJobRestException, UnknownTaskRestException,
+    String sessionId, @PathParam("jobid")
+    String jobId, @QueryParam("sessionid")
+    String session) throws NotConnectedRestException, UnknownJobRestException, UnknownTaskRestException,
             PermissionRestException, IOException {
 
         if (sessionId == null) {
@@ -1245,11 +1244,10 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @Path("jobs/{jobid}/tasks/{taskname}/result/log/full")
     @Produces("application/json")
     public InputStream taskFullLogs(@HeaderParam("sessionid")
-                                    String sessionId, @PathParam("jobid")
-                                    String jobId, @PathParam("taskname")
-                                    String taskname, @QueryParam("sessionid")
-                                    String session)
-            throws NotConnectedRestException, UnknownJobRestException, UnknownTaskRestException,
+    String sessionId, @PathParam("jobid")
+    String jobId, @PathParam("taskname")
+    String taskname, @QueryParam("sessionid")
+    String session) throws NotConnectedRestException, UnknownJobRestException, UnknownTaskRestException,
             PermissionRestException, IOException {
         try {
 
@@ -2345,33 +2343,31 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
     }
 
-	@Override
-	public JobValidationData validate(MultipartFormDataInput multipart) {
-		File tmpFile = null;
-		try {
-			Map<String, List<InputPart>> formDataMap = multipart
-					.getFormDataMap();
-			String name = formDataMap.keySet().iterator().next();
-			InputPart part1 = formDataMap.get(name).get(0);
-			InputStream is = part1.getBody(new GenericType<InputStream>() {
-			});
+    @Override
+    public JobValidationData validate(MultipartFormDataInput multipart) {
+        File tmpFile = null;
+        try {
+            Map<String, List<InputPart>> formDataMap = multipart.getFormDataMap();
+            String name = formDataMap.keySet().iterator().next();
+            InputPart part1 = formDataMap.get(name).get(0);
+            InputStream is = part1.getBody(new GenericType<InputStream>() {
+            });
 
-			tmpFile = File.createTempFile("valid-job", "d");
-			IOUtils.copy(is, new FileOutputStream(tmpFile));
+            tmpFile = File.createTempFile("valid-job", "d");
+            IOUtils.copy(is, new FileOutputStream(tmpFile));
 
-			return (APPLICATION_XML_TYPE.equals(part1.getMediaType())) ? validateJobDescriptor(tmpFile)
-					: ValidationUtil.validateJobArchive(tmpFile);
-		} catch (IOException e) {
-			JobValidationData validation = new JobValidationData();
-			validation
-					.setErrorMessage("Cannot read from the job validation request.");
-			validation.setStackTrace(getStackTrace(e));
-			return validation;
-		} finally {
-			if (tmpFile != null) {
-				tmpFile.delete();
-			}
-		}
-	}
-	
+            return (APPLICATION_XML_TYPE.equals(part1.getMediaType())) ? validateJobDescriptor(tmpFile)
+                    : ValidationUtil.validateJobArchive(tmpFile);
+        } catch (IOException e) {
+            JobValidationData validation = new JobValidationData();
+            validation.setErrorMessage("Cannot read from the job validation request.");
+            validation.setStackTrace(getStackTrace(e));
+            return validation;
+        } finally {
+            if (tmpFile != null) {
+                tmpFile.delete();
+            }
+        }
+    }
+
 }

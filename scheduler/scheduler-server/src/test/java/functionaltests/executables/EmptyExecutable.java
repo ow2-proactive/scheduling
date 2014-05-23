@@ -49,7 +49,7 @@ public class EmptyExecutable extends JavaExecutable {
 
     @Override
     public Serializable execute(TaskResult... results) throws Throwable {
-       return true;
+        return true;
     }
 
 }

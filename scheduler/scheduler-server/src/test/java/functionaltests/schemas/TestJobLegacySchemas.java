@@ -87,7 +87,7 @@ public class TestJobLegacySchemas extends SchedulerConsecutive {
 
     private void prepareDataspaceFolder() throws IOException {
         File ds = new File(PAResourceManagerProperties.RM_HOME.getValueAsString(),
-                "/scheduler/scheduler-server/build/JobLegacySchemas_dataspace");
+            "/scheduler/scheduler-server/build/JobLegacySchemas_dataspace");
 
         if (ds.exists()) {
             File[] filesToDelete = ds.listFiles(new FilenameFilter() {

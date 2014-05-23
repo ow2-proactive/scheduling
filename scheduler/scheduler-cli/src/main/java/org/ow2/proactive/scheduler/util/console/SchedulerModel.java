@@ -753,9 +753,8 @@ public class SchedulerModel extends ConsoleModel {
     }
 
     private boolean isSecondGroup(JobStatus status) {
-        return JobStatus.RUNNING.equals(status)
-          || JobStatus.STALLED.equals(status)
-          || JobStatus.PAUSED.equals(status);
+        return JobStatus.RUNNING.equals(status) || JobStatus.STALLED.equals(status) ||
+            JobStatus.PAUSED.equals(status);
     }
 
     private boolean isThirdGroup(JobStatus status) {

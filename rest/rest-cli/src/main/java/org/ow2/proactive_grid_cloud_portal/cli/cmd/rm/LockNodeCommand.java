@@ -52,36 +52,32 @@ import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpUtility;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
 
+
 public class LockNodeCommand extends AbstractCommand implements Command {
 
     private String[] nodeUrls;
 
     public LockNodeCommand(String... nodeUrls) {
         if (StringUtility.isEmpty(nodeUrls)) {
-            throw new CLIException(REASON_INVALID_ARGUMENTS,
-                    "No value specified for node-urls.");
+            throw new CLIException(REASON_INVALID_ARGUMENTS, "No value specified for node-urls.");
         }
         this.nodeUrls = nodeUrls;
     }
 
     @Override
     public void execute(ApplicationContext currentContext) throws CLIException {
-        HttpPost request = new HttpPost(
-                currentContext.getResourceUrl("node/lock"));
+        HttpPost request = new HttpPost(currentContext.getResourceUrl("node/lock"));
         StringBuilder buffer = new StringBuilder();
         buffer.append("nodeurls=").append(nodeUrls[0]);
         if (nodeUrls.length > 1) {
             for (int index = 1; index < nodeUrls.length; index++) {
-                buffer.append("&nodeurls=").append(
-                        HttpUtility.encodeUrl(nodeUrls[index]));
+                buffer.append("&nodeurls=").append(HttpUtility.encodeUrl(nodeUrls[index]));
             }
         }
-        request.setEntity(new StringEntity(buffer.toString(),
-                APPLICATION_FORM_URLENCODED));
+        request.setEntity(new StringEntity(buffer.toString(), APPLICATION_FORM_URLENCODED));
         HttpResponseWrapper response = execute(request, currentContext);
         if (statusCode(OK) == statusCode(response)) {
-            boolean successful = readValue(response, Boolean.TYPE,
-                    currentContext);
+            boolean successful = readValue(response, Boolean.TYPE, currentContext);
             resultStack(currentContext).push(successful);
             if (successful) {
                 writeLine(currentContext, "Node(s) locked successfully.");
@@ -89,8 +85,7 @@ public class LockNodeCommand extends AbstractCommand implements Command {
                 writeLine(currentContext, "Cannot lock node(s).");
             }
         } else {
-            handleError("An error occurred while locking nodes:", response,
-                    currentContext);
+            handleError("An error occurred while locking nodes:", response, currentContext);
         }
 
     }

@@ -51,15 +51,25 @@ public class TestDataSpaceConfigurationProperty extends ProActiveTest {
     public void testPropertyParsing() throws Throwable {
         Assert.assertArrayEquals(new String[0], DataSpaceServiceStarter.dsConfigPropertyToUrls("  \"\"  "));
         Assert.assertArrayEquals(new String[0], DataSpaceServiceStarter.dsConfigPropertyToUrls("  "));
-        Assert.assertArrayEquals(new String[] { "a" }, DataSpaceServiceStarter.dsConfigPropertyToUrls(" \"a\"  "));
+        Assert.assertArrayEquals(new String[] { "a" }, DataSpaceServiceStarter
+                .dsConfigPropertyToUrls(" \"a\"  "));
         Assert.assertArrayEquals(new String[] { "a" }, DataSpaceServiceStarter.dsConfigPropertyToUrls("a"));
-        Assert.assertArrayEquals(new String[] { "a" }, DataSpaceServiceStarter.dsConfigPropertyToUrls(" a  "));
-        Assert.assertArrayEquals(new String[] { "a b" }, DataSpaceServiceStarter.dsConfigPropertyToUrls(" \"a b\"  "));
-        Assert.assertArrayEquals(new String[] { "a", "b" }, DataSpaceServiceStarter.dsConfigPropertyToUrls(" a b  "));
-        Assert.assertArrayEquals(new String[] { "a b c" }, DataSpaceServiceStarter.dsConfigPropertyToUrls(" \"a b c\"  "));
-        Assert.assertArrayEquals(new String[] { "a", "b", "c" }, DataSpaceServiceStarter.dsConfigPropertyToUrls("  a b c  "));
-        Assert.assertArrayEquals(new String[] { "a b c", "d e f" }, DataSpaceServiceStarter.dsConfigPropertyToUrls(" \"a b c\"    \"d e f\"   "));
-        Assert.assertArrayEquals(new String[] { "a b c d e f" }, DataSpaceServiceStarter.dsConfigPropertyToUrls("   \"a b c d e f\"   "));
-        Assert.assertArrayEquals(new String[] { "a", "b", "c", "d", "e", "f" }, DataSpaceServiceStarter.dsConfigPropertyToUrls("   a b c   d e    f "));
+        Assert
+                .assertArrayEquals(new String[] { "a" }, DataSpaceServiceStarter
+                        .dsConfigPropertyToUrls(" a  "));
+        Assert.assertArrayEquals(new String[] { "a b" }, DataSpaceServiceStarter
+                .dsConfigPropertyToUrls(" \"a b\"  "));
+        Assert.assertArrayEquals(new String[] { "a", "b" }, DataSpaceServiceStarter
+                .dsConfigPropertyToUrls(" a b  "));
+        Assert.assertArrayEquals(new String[] { "a b c" }, DataSpaceServiceStarter
+                .dsConfigPropertyToUrls(" \"a b c\"  "));
+        Assert.assertArrayEquals(new String[] { "a", "b", "c" }, DataSpaceServiceStarter
+                .dsConfigPropertyToUrls("  a b c  "));
+        Assert.assertArrayEquals(new String[] { "a b c", "d e f" }, DataSpaceServiceStarter
+                .dsConfigPropertyToUrls(" \"a b c\"    \"d e f\"   "));
+        Assert.assertArrayEquals(new String[] { "a b c d e f" }, DataSpaceServiceStarter
+                .dsConfigPropertyToUrls("   \"a b c d e f\"   "));
+        Assert.assertArrayEquals(new String[] { "a", "b", "c", "d", "e", "f" }, DataSpaceServiceStarter
+                .dsConfigPropertyToUrls("   a b c   d e    f "));
     }
 }

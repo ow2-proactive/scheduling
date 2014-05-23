@@ -124,8 +124,8 @@ public class SchedulerStateRestEncodingTest extends RestTestServer {
     }
 
     private String getJobImageAsBase64String(String jobId) throws Exception {
-        String sessionId = SharedSessionStoreTestUtils.createValidSession(
-          new SchedulerProxyUserInterfaceForTests());
+        String sessionId = SharedSessionStoreTestUtils
+                .createValidSession(new SchedulerProxyUserInterfaceForTests());
 
         SchedulerRestInterface client = ProxyFactory.create(SchedulerRestInterface.class,
                 "http://localhost:" + port + "/");

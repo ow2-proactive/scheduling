@@ -171,7 +171,8 @@ public class RMRestTest extends RestTestServer {
         String sessionId = SharedSessionStoreTestUtils.createValidSession(rm);
         when(rm.addNode(anyString())).thenReturn(new BooleanWrapper(true));
 
-        List<NameValuePair> firstCall = Collections.<NameValuePair>singletonList(new BasicNameValuePair("nodeurl", "url"));
+        List<NameValuePair> firstCall = Collections.<NameValuePair> singletonList(new BasicNameValuePair(
+            "nodeurl", "url"));
         callHttpPostMethod("node", sessionId, firstCall);
 
         verify(rm).addNode("url");

@@ -43,6 +43,7 @@ import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 
+
 public class StartCommand extends AbstractCommand implements Command {
 
     public StartCommand() {

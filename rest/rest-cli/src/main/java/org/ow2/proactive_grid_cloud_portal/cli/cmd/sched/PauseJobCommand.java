@@ -43,6 +43,7 @@ import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractJobCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 
+
 public class PauseJobCommand extends AbstractJobCommand implements Command {
 
     public PauseJobCommand(String jobId) {
@@ -61,9 +62,8 @@ public class PauseJobCommand extends AbstractJobCommand implements Command {
                 writeLine(currentContext, "Cannot pause %s.", job());
             }
         } catch (Exception e) {
-            handleError(String.format(
-                    "An error occurred while attempting to pause %s:", job()),
-                    e, currentContext);
+            handleError(String.format("An error occurred while attempting to pause %s:", job()), e,
+                    currentContext);
         }
 
     }

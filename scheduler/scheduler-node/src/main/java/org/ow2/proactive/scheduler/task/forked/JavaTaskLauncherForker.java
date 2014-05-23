@@ -90,8 +90,7 @@ public class JavaTaskLauncherForker extends JavaTaskLauncher implements ForkerSt
      *
      * @param initializer represents the class that contains information to initialize this task launcher.
      */
-    public JavaTaskLauncherForker(TaskLauncherInitializer initializer)
-    {
+    public JavaTaskLauncherForker(TaskLauncherInitializer initializer) {
         super(initializer);
         this.initializer = initializer;
     }
@@ -101,8 +100,8 @@ public class JavaTaskLauncherForker extends JavaTaskLauncher implements ForkerSt
      * @see org.ow2.proactive.scheduler.task.java.JavaTaskLauncher#doTask(org.ow2.proactive.scheduler.common.TaskTerminateNotification, org.ow2.proactive.scheduler.task.ExecutableContainer, org.ow2.proactive.scheduler.common.task.TaskResult[])
      */
     @Override
-    public void doTask(TaskTerminateNotification taskTerminateNotification, ExecutableContainer executableContainer,
-            TaskResult... results) {
+    public void doTask(TaskTerminateNotification taskTerminateNotification,
+            ExecutableContainer executableContainer, TaskResult... results) {
         long duration = -1;
         TaskResultImpl taskResult = null;
         try {
@@ -119,8 +118,7 @@ public class JavaTaskLauncherForker extends JavaTaskLauncher implements ForkerSt
 
             //init task
             ForkedJavaExecutableInitializer fjei = (ForkedJavaExecutableInitializer) createExecutableInitializer(executableContainer);
-            setPropagatedVariables((JavaExecutableInitializerImpl) fjei,
-                    getPropagatedVariables());
+            setPropagatedVariables((JavaExecutableInitializerImpl) fjei, getPropagatedVariables());
             replaceIterationTags(fjei);
             fjei.setJavaTaskLauncherInitializer(initializer);
             //decrypt credentials if needed
@@ -162,8 +160,7 @@ public class JavaTaskLauncherForker extends JavaTaskLauncher implements ForkerSt
                 userResult = executableGuard.execute(results);
                 // update propagated variables map after task execution, but
                 // before post script execution
-                setPropagatedVariables(((AbstractJavaExecutable) executableGuard.use())
-                        .getVariables());
+                setPropagatedVariables(((AbstractJavaExecutable) executableGuard.use()).getVariables());
             } catch (Throwable t) {
                 throw t;
             } finally {
@@ -182,9 +179,11 @@ public class JavaTaskLauncherForker extends JavaTaskLauncher implements ForkerSt
                     // the result has been computed and must be returned !
                     logger.warn("Loggers are not shutdown !", e);
                 }
-                executableGuard.copyScratchDataToOutput(getTaskLogsSelectors(OutputAccessMode.TransferToOutputSpace));
+                executableGuard
+                        .copyScratchDataToOutput(getTaskLogsSelectors(OutputAccessMode.TransferToOutputSpace));
             }
-            executableGuard.copyScratchDataToOutput(getTaskLogsSelectors(OutputAccessMode.TransferToUserSpace));
+            executableGuard
+                    .copyScratchDataToOutput(getTaskLogsSelectors(OutputAccessMode.TransferToUserSpace));
 
             if (userResult instanceof TaskResult) {
                 // Override the logs since they are stored on forker side
@@ -195,7 +194,7 @@ public class JavaTaskLauncherForker extends JavaTaskLauncher implements ForkerSt
                     taskResult = new TaskResultImpl(taskId, ec, getLogs(), duration / 1000000);
                 } else {
                     Throwable t = new ForkedJavaTaskException(
-                            "Forked JVM process has been terminated with exit code " + ec, ec);
+                        "Forked JVM process has been terminated with exit code " + ec, ec);
                     taskResult = new TaskResultImpl(taskId, t, getLogs(), duration / 1000000);
                 }
             }
@@ -203,15 +202,18 @@ public class JavaTaskLauncherForker extends JavaTaskLauncher implements ForkerSt
             logger.info("", ex);
             if (this.getLogs() == null) {
                 taskResult = new TaskResultImpl(taskId, ex, new SimpleTaskLogs("", ex.toString()),
-                        duration / 1000000, null);
+                    duration / 1000000, null);
             } else {
                 taskResult = new TaskResultImpl(taskId, ex, this.getLogs(), duration / 1000000, null);
             }
         } finally {
             if (executableGuard.wasWalltimed()) {
-                taskResult = new TaskResultImpl(taskId, new WalltimeExceededException("Walltime of " + wallTime + " ms reached on task " + taskId.getReadableName()), null, duration / 1000000, null);
+                taskResult = new TaskResultImpl(taskId, new WalltimeExceededException("Walltime of " +
+                    wallTime + " ms reached on task " + taskId.getReadableName()), null, duration / 1000000,
+                    null);
             } else if (executableGuard.wasKilled()) {
-                taskResult = new TaskResultImpl(taskId, new TaskAbortedException("Task " + taskId.getReadableName()+" has been killed"), null, duration / 1000000, null);
+                taskResult = new TaskResultImpl(taskId, new TaskAbortedException("Task " +
+                    taskId.getReadableName() + " has been killed"), null, duration / 1000000, null);
             }
 
             taskResult.setLogs(getLogs());

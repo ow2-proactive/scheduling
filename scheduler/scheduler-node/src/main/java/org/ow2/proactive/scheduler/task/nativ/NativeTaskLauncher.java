@@ -94,9 +94,8 @@ public class NativeTaskLauncher extends TaskLauncher {
     private static final String PROACTIVE_HOME_TAG = "$" + PROACTIVE_HOME_VAR;
     private static String PROACTIVE_HOME = null;
     private static String JAVA_CMD = null;
-    
-    private static final String PROPAGATED_VARIABLE_PREFIX = "var_";
 
+    private static final String PROPAGATED_VARIABLE_PREFIX = "var_";
 
     static {
         JAVA_CMD = System.getProperty("java.home") + File.separator + "bin" + File.separator + "java" +
@@ -134,8 +133,8 @@ public class NativeTaskLauncher extends TaskLauncher {
      * @return a task result representing the result of this task execution.
      */
     @Override
-    public void doTask(TaskTerminateNotification terminateNotificationStub, ExecutableContainer executableContainer,
-            TaskResult... results) {
+    public void doTask(TaskTerminateNotification terminateNotificationStub,
+            ExecutableContainer executableContainer, TaskResult... results) {
 
         logger.debug("Starting Task " + taskId.getReadableName());
 
@@ -222,8 +221,7 @@ public class NativeTaskLauncher extends TaskLauncher {
             ((NativeExecutable) executableGuard.use()).addToEnvironmentVariables(PROACTIVE_HOME_VAR,
                     PROACTIVE_HOME);
 
-            this.setPropagatedVariablesAsEnvironmentVariables(
-                    getPropagatedVariables(),
+            this.setPropagatedVariablesAsEnvironmentVariables(getPropagatedVariables(),
                     (NativeExecutable) executableGuard.use());
 
             sample = System.nanoTime();
@@ -261,9 +259,11 @@ public class NativeTaskLauncher extends TaskLauncher {
         } finally {
             if (executableGuard.wasWalltimed()) {
                 // killed by a walltime
-                res = new TaskResultImpl(taskId, new WalltimeExceededException("Walltime of " + wallTime + " ms reached on task " + taskId.getReadableName()), null, duration / 1000000, null);
+                res = new TaskResultImpl(taskId, new WalltimeExceededException("Walltime of " + wallTime +
+                    " ms reached on task " + taskId.getReadableName()), null, duration / 1000000, null);
             } else if (executableGuard.wasKilled()) {
-                res = new TaskResultImpl(taskId, new TaskAbortedException("Task " + taskId + " has been killed"), null, duration / 1000000, null);
+                res = new TaskResultImpl(taskId, new TaskAbortedException("Task " + taskId +
+                    " has been killed"), null, duration / 1000000, null);
             } else {
                 // set the result
                 if (exception != null) {
@@ -333,12 +333,13 @@ public class NativeTaskLauncher extends TaskLauncher {
 
     }
 
-    private void addDataSpaceEnvVar(DataSpacesFileObject fo, String varName) throws URISyntaxException, DataSpacesException {
+    private void addDataSpaceEnvVar(DataSpacesFileObject fo, String varName) throws URISyntaxException,
+            DataSpacesException {
         if (fo != null) {
             String foUri = convertDataSpaceToFileIfPossible(fo, false);
             ((NativeExecutable) executableGuard.use()).addToEnvironmentVariables(varName, foUri);
         }
-    }    
+    }
 
     private void replaceWorkingDirIfNecessary(ExecutableInitializer execInit) throws Exception {
         if (((NativeExecutableInitializer) execInit).getWorkingDir() == null) {
@@ -366,8 +367,8 @@ public class NativeTaskLauncher extends TaskLauncher {
                 String fullPath;
                 try {
                     fullPath = convertDataSpaceToFileIfPossible(fo, true);
-                } catch (DataSpacesException e ) {
-                    throw new DataSpacesException(tag + " in workingDir cannot be replaced.",e);
+                } catch (DataSpacesException e) {
+                    throw new DataSpacesException(tag + " in workingDir cannot be replaced.", e);
                 }
                 wd = wd.replace(tag, fullPath);
                 ((NativeExecutableInitializer) execInit).setWorkingDir(wd);
@@ -475,15 +476,12 @@ public class NativeTaskLauncher extends TaskLauncher {
             }
         }
     }
-    
-    private void setPropagatedVariablesAsEnvironmentVariables(
-            Map<String, Serializable> propagatedVariables,
-            NativeExecutable executable) throws IOException,
-            ClassNotFoundException {
+
+    private void setPropagatedVariablesAsEnvironmentVariables(Map<String, Serializable> propagatedVariables,
+            NativeExecutable executable) throws IOException, ClassNotFoundException {
         for (String key : propagatedVariables.keySet()) {
             Serializable serializable = propagatedVariables.get(key);
-            executable.addToEnvironmentVariables(PROPAGATED_VARIABLE_PREFIX
-                    + key,
+            executable.addToEnvironmentVariables(PROPAGATED_VARIABLE_PREFIX + key,
                     ((serializable == null) ? "" : serializable.toString()));
         }
     }

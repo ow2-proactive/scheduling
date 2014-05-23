@@ -106,8 +106,7 @@ public class RestSchedulerPushPullFileTest extends AbstractRestFuncTestCase {
 
         String[] spacesNames = { SchedulerConstants.GLOBALSPACE_NAME, SchedulerConstants.USERSPACE_NAME };
 
-        String[] spacesUris = { scheduler.getGlobalSpaceURIs().get(0),
-                scheduler.getUserSpaceURIs().get(0) };
+        String[] spacesUris = { scheduler.getGlobalSpaceURIs().get(0), scheduler.getUserSpaceURIs().get(0) };
         for (File destPath : destPaths) {
             for (int i = 0; i < spacesNames.length; i++) {
                 String spaceName = spacesNames[i];

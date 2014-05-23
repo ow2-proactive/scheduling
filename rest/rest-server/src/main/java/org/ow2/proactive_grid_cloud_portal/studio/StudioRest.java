@@ -95,7 +95,7 @@ public class StudioRest implements StudioInterface {
     private SchedulerStateRest schedulerRest = null;
 
     private SchedulerRestInterface scheduler() {
-        if (schedulerRest==null) {
+        if (schedulerRest == null) {
             schedulerRest = new SchedulerStateRest();
         }
 
@@ -104,7 +104,7 @@ public class StudioRest implements StudioInterface {
 
     private String getProjectsDirName() {
         String projectDir = System.getProperty(PROJECT_NAME_PROPERTY);
-        if (projectDir==null) {
+        if (projectDir == null) {
             projectDir = System.getProperty("java.io.tmpdir");
         }
 
@@ -116,12 +116,10 @@ public class StudioRest implements StudioInterface {
         if (ss == null) {
             // logger.trace("not found a scheduler frontend for sessionId " +
             // sessionId);
-            throw new NotConnectedException(
-                    "you are not connected to the scheduler, you should log on first");
+            throw new NotConnectedException("you are not connected to the scheduler, you should log on first");
         }
         return ss.getUserName();
     }
-
 
     private void delete(File f) throws IOException {
         if (f.isDirectory()) {
@@ -159,13 +157,18 @@ public class StudioRest implements StudioInterface {
     }
 
     @Override
-    public String login(@FormParam("username") String username, @FormParam("password") String password) throws KeyException, LoginException, RMException, ActiveObjectCreationException, NodeException, SchedulerRestException {
+    public String login(@FormParam("username")
+    String username, @FormParam("password")
+    String password) throws KeyException, LoginException, RMException, ActiveObjectCreationException,
+            NodeException, SchedulerRestException {
         logger.info("Logging as " + username);
         return scheduler().login(username, password);
     }
 
     @Override
-    public String loginWithCredential(@MultipartForm LoginForm multipart) throws ActiveObjectCreationException, NodeException, KeyException, IOException, LoginException, RMException, SchedulerRestException {
+    public String loginWithCredential(@MultipartForm
+    LoginForm multipart) throws ActiveObjectCreationException, NodeException, KeyException, IOException,
+            LoginException, RMException, SchedulerRestException {
         logger.info("Logging using credential file");
         return scheduler().loginWithCredential(multipart);
     }
@@ -174,7 +177,8 @@ public class StudioRest implements StudioInterface {
     @GET
     @Path("connected")
     @Produces("application/json")
-    public boolean isConnected(@HeaderParam("sessionid") String sessionId) {
+    public boolean isConnected(@HeaderParam("sessionid")
+    String sessionId) {
         try {
             getUserName(sessionId);
             return true;
@@ -187,9 +191,10 @@ public class StudioRest implements StudioInterface {
     @GET
     @Path("workflows")
     @Produces("application/json")
-    public ArrayList<Workflow> getWorkflows(@HeaderParam("sessionid") String sessionId) throws NotConnectedException {
+    public ArrayList<Workflow> getWorkflows(@HeaderParam("sessionid")
+    String sessionId) throws NotConnectedException {
         String userName = getUserName(sessionId);
-        File workflowsDir = new File(getProjectsDirName()+"/"+userName+"/workflows");
+        File workflowsDir = new File(getProjectsDirName() + "/" + userName + "/workflows");
 
         if (!workflowsDir.exists()) {
             logger.info("Creating dir " + workflowsDir.getAbsolutePath());
@@ -198,7 +203,7 @@ public class StudioRest implements StudioInterface {
 
         logger.info("Getting workflows as " + userName);
         ArrayList<Workflow> projects = new ArrayList<Workflow>();
-        for (File f: workflowsDir.listFiles()) {
+        for (File f : workflowsDir.listFiles()) {
             if (f.isDirectory()) {
                 File nameFile = new File(f.getAbsolutePath() + "/name");
 
@@ -230,12 +235,15 @@ public class StudioRest implements StudioInterface {
     @POST
     @Path("workflows")
     @Produces("application/json")
-    public long createWorkflow(@HeaderParam("sessionid") String sessionId,
-                               @FormParam("name") String name, @FormParam("xml") String xml, @FormParam("metadata") String metadata) throws NotConnectedException {
+    public long createWorkflow(@HeaderParam("sessionid")
+    String sessionId, @FormParam("name")
+    String name, @FormParam("xml")
+    String xml, @FormParam("metadata")
+    String metadata) throws NotConnectedException {
         String userName = getUserName(sessionId);
 
         logger.info("Creating workflow as " + userName);
-        File workflowsDir = new File(getProjectsDirName()+"/"+userName+"/workflows");
+        File workflowsDir = new File(getProjectsDirName() + "/" + userName + "/workflows");
 
         if (!workflowsDir.exists()) {
             logger.info("Creating dir " + workflowsDir.getAbsolutePath());
@@ -244,7 +252,7 @@ public class StudioRest implements StudioInterface {
 
         int projectId = 1;
         while (new File(workflowsDir.getAbsolutePath() + "/" + projectId).exists()) {
-            projectId ++;
+            projectId++;
         }
 
         File newWorkflowFile = new File(workflowsDir.getAbsolutePath() + "/" + projectId);
@@ -262,23 +270,27 @@ public class StudioRest implements StudioInterface {
     @POST
     @Path("workflows/{id}")
     @Produces("application/json")
-    public boolean updateWorkflow(@HeaderParam("sessionid") String sessionId, @PathParam("id") String workflowId,
-                                  @FormParam("name") String name, @FormParam("xml") String xml, @FormParam("metadata") String metadata) throws NotConnectedException, IOException {
+    public boolean updateWorkflow(@HeaderParam("sessionid")
+    String sessionId, @PathParam("id")
+    String workflowId, @FormParam("name")
+    String name, @FormParam("xml")
+    String xml, @FormParam("metadata")
+    String metadata) throws NotConnectedException, IOException {
         String userName = getUserName(sessionId);
 
         logger.info("Updating workflow " + workflowId + " as " + userName);
-        File workflowsDir = new File(getProjectsDirName()+"/"+userName+"/workflows/"+workflowId);
+        File workflowsDir = new File(getProjectsDirName() + "/" + userName + "/workflows/" + workflowId);
 
         String oldJobName = getFileContent(workflowsDir.getAbsolutePath() + "/name");
         if (name != null && !name.equals(oldJobName)) {
             // new job name
             logger.info("Updating job name from " + oldJobName + " to " + name);
-            writeFileContent(workflowsDir.getAbsolutePath()+"/name", name);
-            delete(new File(workflowsDir.getAbsolutePath()+"/"+oldJobName+".xml"));
+            writeFileContent(workflowsDir.getAbsolutePath() + "/name", name);
+            delete(new File(workflowsDir.getAbsolutePath() + "/" + oldJobName + ".xml"));
         }
 
-        writeFileContent(workflowsDir.getAbsolutePath()+"/metadata", metadata);
-        writeFileContent(workflowsDir.getAbsolutePath()+"/"+name+".xml", xml);
+        writeFileContent(workflowsDir.getAbsolutePath() + "/metadata", metadata);
+        writeFileContent(workflowsDir.getAbsolutePath() + "/" + name + ".xml", xml);
 
         return true;
     }
@@ -287,11 +299,13 @@ public class StudioRest implements StudioInterface {
     @DELETE
     @Path("workflows/{id}")
     @Produces("application/json")
-    public boolean deleteWorkflow(@HeaderParam("sessionid") String sessionId, @PathParam("id") String workflowId) throws NotConnectedException, IOException {
+    public boolean deleteWorkflow(@HeaderParam("sessionid")
+    String sessionId, @PathParam("id")
+    String workflowId) throws NotConnectedException, IOException {
         String userName = getUserName(sessionId);
 
         logger.info("Deleting workflow " + workflowId + " as " + userName);
-        File workflowsDir = new File(getProjectsDirName()+"/"+userName+"/workflows/"+workflowId);
+        File workflowsDir = new File(getProjectsDirName() + "/" + userName + "/workflows/" + workflowId);
 
         if (workflowsDir.exists()) {
             delete(workflowsDir);
@@ -304,9 +318,10 @@ public class StudioRest implements StudioInterface {
     @GET
     @Path("scripts")
     @Produces("application/json")
-    public ArrayList<Script> getScripts(@HeaderParam("sessionid") String sessionId) throws NotConnectedException {
+    public ArrayList<Script> getScripts(@HeaderParam("sessionid")
+    String sessionId) throws NotConnectedException {
         String userName = getUserName(sessionId);
-        File scriptDir = new File(getProjectsDirName()+"/"+userName + "/scripts");
+        File scriptDir = new File(getProjectsDirName() + "/" + userName + "/scripts");
 
         if (!scriptDir.exists()) {
             logger.info("Creating dir " + scriptDir.getAbsolutePath());
@@ -314,7 +329,7 @@ public class StudioRest implements StudioInterface {
         }
 
         ArrayList<Script> scripts = new ArrayList<Script>();
-        for (File f: scriptDir.listFiles()) {
+        for (File f : scriptDir.listFiles()) {
 
             Script script = new Script();
 
@@ -332,12 +347,14 @@ public class StudioRest implements StudioInterface {
     @POST
     @Path("scripts")
     @Produces("application/json")
-    public String createScript(@HeaderParam("sessionid") String sessionId,
-                      @FormParam("name") String name, @FormParam("content") String content) throws NotConnectedException {
+    public String createScript(@HeaderParam("sessionid")
+    String sessionId, @FormParam("name")
+    String name, @FormParam("content")
+    String content) throws NotConnectedException {
         String userName = getUserName(sessionId);
         logger.info("Creating script " + name + " as " + userName);
-        File scriptDir = new File(getProjectsDirName()+"/"+userName+"/scripts");
-        String fileName = scriptDir.getAbsolutePath()+"/"+name;
+        File scriptDir = new File(getProjectsDirName() + "/" + userName + "/scripts");
+        String fileName = scriptDir.getAbsolutePath() + "/" + name;
         writeFileContent(fileName, content);
         return fileName;
     }
@@ -346,21 +363,22 @@ public class StudioRest implements StudioInterface {
     @POST
     @Path("scripts/{name}")
     @Produces("application/json")
-    public String updateScript(@HeaderParam("sessionid") String sessionId,
-                                @PathParam("name") String name,
-                                @FormParam("content") String content) throws NotConnectedException {
+    public String updateScript(@HeaderParam("sessionid")
+    String sessionId, @PathParam("name")
+    String name, @FormParam("content")
+    String content) throws NotConnectedException {
 
         return createScript(sessionId, name, content);
     }
-
 
     @Override
     @GET
     @Path("classes")
     @Produces("application/json")
-    public ArrayList<String> getClasses(@HeaderParam("sessionid") String sessionId) throws NotConnectedException {
+    public ArrayList<String> getClasses(@HeaderParam("sessionid")
+    String sessionId) throws NotConnectedException {
         String userName = getUserName(sessionId);
-        File classesDir = new File(getProjectsDirName()+"/"+userName + "/classes");
+        File classesDir = new File(getProjectsDirName() + "/" + userName + "/classes");
 
         ArrayList<String> classes = new ArrayList<String>();
         if (classesDir.exists()) {
@@ -370,7 +388,7 @@ public class StudioRest implements StudioInterface {
                 }
             });
 
-            for (File jar :jars) {
+            for (File jar : jars) {
                 try {
                     JarFile jarFile = new JarFile(jar.getAbsolutePath());
                     Enumeration allEntries = jarFile.entries();
@@ -398,10 +416,10 @@ public class StudioRest implements StudioInterface {
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces("application/json")
     public String createClass(@HeaderParam("sessionid")
-                               String sessionId, MultipartFormDataInput input) throws NotConnectedException, IOException {
+    String sessionId, MultipartFormDataInput input) throws NotConnectedException, IOException {
 
         String userName = getUserName(sessionId);
-        File classesDir = new File(getProjectsDirName()+"/"+userName + "/classes");
+        File classesDir = new File(getProjectsDirName() + "/" + userName + "/classes");
 
         if (!classesDir.exists()) {
             logger.info("Creating dir " + classesDir.getAbsolutePath());
@@ -418,13 +436,13 @@ public class StudioRest implements StudioInterface {
 
             try {
                 //convert the uploaded file to inputstream
-                InputStream inputStream = inputPart.getBody(InputStream.class,null);
+                InputStream inputStream = inputPart.getBody(InputStream.class, null);
                 byte[] bytes = IOUtils.toByteArray(inputStream);
 
                 //constructs upload file path
                 fileName = classesDir.getAbsolutePath() + "/" + name;
 
-                writeFile(bytes,fileName);
+                writeFile(bytes, fileName);
             } catch (IOException e) {
                 e.printStackTrace();
                 throw e;
@@ -459,18 +477,19 @@ public class StudioRest implements StudioInterface {
     }
 
     @Override
-    public JobIdData submit(@HeaderParam("sessionid") String sessionId, MultipartFormDataInput multipart)
-            throws IOException, JobCreationRestException,
+    public JobIdData submit(@HeaderParam("sessionid")
+    String sessionId, MultipartFormDataInput multipart) throws IOException, JobCreationRestException,
             NotConnectedRestException, PermissionRestException, SubmissionClosedRestException {
         return scheduler().submit(sessionId, multipart);
     }
 
-
     @GET
     @Path("visualizations/{id}")
     @Produces("application/json")
-    public String getVisualization(@HeaderParam("sessionid") String sessionId, @PathParam("id") String jobId) throws NotConnectedException {
-        File visualizationFile = new File(PortalConfiguration.jobIdToPath(jobId)+".html");
+    public String getVisualization(@HeaderParam("sessionid")
+    String sessionId, @PathParam("id")
+    String jobId) throws NotConnectedException {
+        File visualizationFile = new File(PortalConfiguration.jobIdToPath(jobId) + ".html");
         if (visualizationFile.exists()) {
             return getFileContent(visualizationFile.getAbsolutePath());
         }
@@ -480,9 +499,11 @@ public class StudioRest implements StudioInterface {
     @POST
     @Path("visualizations/{id}")
     @Produces("application/json")
-    public boolean updateVisualization(@HeaderParam("sessionid") String sessionId,
-                                @PathParam("id") String jobId, @FormParam("visualization") String visualization) throws NotConnectedException {
-        File visualizationFile = new File(PortalConfiguration.jobIdToPath(jobId)+".html");
+    public boolean updateVisualization(@HeaderParam("sessionid")
+    String sessionId, @PathParam("id")
+    String jobId, @FormParam("visualization")
+    String visualization) throws NotConnectedException {
+        File visualizationFile = new File(PortalConfiguration.jobIdToPath(jobId) + ".html");
         if (visualizationFile.exists()) {
             visualizationFile.delete();
         }

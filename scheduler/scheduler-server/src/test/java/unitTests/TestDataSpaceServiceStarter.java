@@ -46,14 +46,17 @@ import static org.junit.Assert.fail;
 
 public class TestDataSpaceServiceStarter extends ProActiveTest {
 
-    @Test // For SCHEDULING-1902, minimal test
+    @Test
+    // For SCHEDULING-1902, minimal test
     public void testTerminateNamingService() throws Exception {
-        TestDataSpaceServiceStarter activeObject = PAActiveObject.turnActive(new TestDataSpaceServiceStarter());
+        TestDataSpaceServiceStarter activeObject = PAActiveObject
+                .turnActive(new TestDataSpaceServiceStarter());
         activeObject.doTestTerminateNamingService();
     }
 
     public void doTestTerminateNamingService() throws Exception {
-        DataSpaceServiceStarter dataSpaceServiceStarter =  DataSpaceServiceStarter.getDataSpaceServiceStarter();
+        DataSpaceServiceStarter dataSpaceServiceStarter = DataSpaceServiceStarter
+                .getDataSpaceServiceStarter();
 
         dataSpaceServiceStarter.startNamingService();
         assertEquals(1, dataSpaceServiceStarter.getNamingService().getRegisteredApplications().size());

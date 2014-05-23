@@ -51,58 +51,57 @@ import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobValidationData;
 
+
 public class ValidationUtil {
 
-	private ValidationUtil() {
-	}
+    private ValidationUtil() {
+    }
 
-	public static JobValidationData validateJobArchive(File archiveFile) {
-		return validateJob(archiveFile.getAbsolutePath(), false);
-	}
+    public static JobValidationData validateJobArchive(File archiveFile) {
+        return validateJob(archiveFile.getAbsolutePath(), false);
+    }
 
-	public static JobValidationData validateJobDescriptor(File jobDescFile) {
-		return validateJob(jobDescFile.getAbsolutePath(), true);
-	}
+    public static JobValidationData validateJobDescriptor(File jobDescFile) {
+        return validateJob(jobDescFile.getAbsolutePath(), true);
+    }
 
-	private static JobValidationData validateJob(String jobFilePath,
-			boolean isXml) {
-		JobValidationData data = new JobValidationData();
-		try {
-			JobFactory factory = JobFactory.getFactory();
-			Job job = null;
-			if (isXml) {
-				job = factory.createJob(jobFilePath);
-			} else {
-				job = factory.createJobFromArchive(jobFilePath);
-			}
-			if (job instanceof TaskFlowJob) {
-				validateJob((TaskFlowJob) job, data);
-			} else {
-				data.setValid(true);
-			}
-		} catch (JobCreationException e) {
-			data.setTaskName(e.getTaskName());
-			data.setErrorMessage(e.getMessage());
-			data.setStackTrace(getStackTrace(e));
-		}
-		return data;
+    private static JobValidationData validateJob(String jobFilePath, boolean isXml) {
+        JobValidationData data = new JobValidationData();
+        try {
+            JobFactory factory = JobFactory.getFactory();
+            Job job = null;
+            if (isXml) {
+                job = factory.createJob(jobFilePath);
+            } else {
+                job = factory.createJobFromArchive(jobFilePath);
+            }
+            if (job instanceof TaskFlowJob) {
+                validateJob((TaskFlowJob) job, data);
+            } else {
+                data.setValid(true);
+            }
+        } catch (JobCreationException e) {
+            data.setTaskName(e.getTaskName());
+            data.setErrorMessage(e.getMessage());
+            data.setStackTrace(getStackTrace(e));
+        }
+        return data;
 
-	}
+    }
 
-	private static void validateJob(TaskFlowJob job, JobValidationData data) {
-		ArrayList<Task> tasks = job.getTasks();
-		if (tasks.isEmpty()) {
-			data.setErrorMessage(String.format(
-					"%s must contain at least one task.", job.getName()));
-			return;
-		}
-		FlowError error = FlowChecker.validate(job);
-		if (error != null) {
-			data.setTaskName(error.getTask());
-			data.setErrorMessage(error.getMessage());
-			return;
-		}
-		data.setValid(true);
-	}
+    private static void validateJob(TaskFlowJob job, JobValidationData data) {
+        ArrayList<Task> tasks = job.getTasks();
+        if (tasks.isEmpty()) {
+            data.setErrorMessage(String.format("%s must contain at least one task.", job.getName()));
+            return;
+        }
+        FlowError error = FlowChecker.validate(job);
+        if (error != null) {
+            data.setTaskName(error.getTask());
+            data.setErrorMessage(error.getMessage());
+            return;
+        }
+        data.setValid(true);
+    }
 
 }

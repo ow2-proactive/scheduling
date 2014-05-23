@@ -45,6 +45,7 @@ import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskIdData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskStateData;
 
+
 public class TaskStateImpl extends TaskState {
     private static final long serialVersionUID = 1L;
 
@@ -105,6 +106,5 @@ public class TaskStateImpl extends TaskState {
     public String getDescription() {
         return d.getDescription();
     }
-    
-    
+
 }

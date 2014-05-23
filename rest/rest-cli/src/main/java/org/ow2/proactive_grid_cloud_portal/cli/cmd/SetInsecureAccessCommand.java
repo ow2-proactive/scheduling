@@ -40,8 +40,8 @@ package org.ow2.proactive_grid_cloud_portal.cli.cmd;
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 
-public class SetInsecureAccessCommand extends AbstractCommand implements
-        Command {
+
+public class SetInsecureAccessCommand extends AbstractCommand implements Command {
 
     public SetInsecureAccessCommand() {
     }

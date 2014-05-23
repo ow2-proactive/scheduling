@@ -160,8 +160,7 @@ public class NoVncSecuredTargetResolver implements IProxyTargetResolver {
         return null;
     }
 
-    private List<String> retrievePaRemoteConnectionLines(Session session, String jobId,
-            TaskResult taskResult) {
+    private List<String> retrievePaRemoteConnectionLines(Session session, String jobId, TaskResult taskResult) {
         List<String> paRemoteConnectionLines = Collections.emptyList();
         String liveLogs = getJobLiveLogs(session, jobId);
         if (liveLogs != null) {

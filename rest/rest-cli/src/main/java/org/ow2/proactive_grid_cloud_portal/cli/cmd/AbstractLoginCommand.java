@@ -47,8 +47,8 @@ import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
 import static org.ow2.proactive_grid_cloud_portal.cli.RestConstants.DFLT_SESSION_DIR;
 import static org.ow2.proactive_grid_cloud_portal.cli.RestConstants.DFLT_SESSION_FILE_EXT;
 
-public abstract class AbstractLoginCommand extends AbstractCommand implements
-        Command {
+
+public abstract class AbstractLoginCommand extends AbstractCommand implements Command {
 
     public static final boolean RENEW_SESSION_BY_DEFAULT = false;
     public static final boolean PERSIST_SESSION_BY_DEFAULT = true;
@@ -60,10 +60,10 @@ public abstract class AbstractLoginCommand extends AbstractCommand implements
     @Override
     public void execute(ApplicationContext currentContext) throws CLIException {
         setAlias(currentContext);
-        boolean renewSession = currentContext.getProperty(PROP_RENEW_SESSION,
-                Boolean.TYPE, RENEW_SESSION_BY_DEFAULT);
-        boolean persistSession = currentContext.getProperty(
-                PROP_ENABLE_PERSISTENCE, Boolean.TYPE, PERSIST_SESSION_BY_DEFAULT);
+        boolean renewSession = currentContext.getProperty(PROP_RENEW_SESSION, Boolean.TYPE,
+                RENEW_SESSION_BY_DEFAULT);
+        boolean persistSession = currentContext.getProperty(PROP_ENABLE_PERSISTENCE, Boolean.TYPE,
+                PERSIST_SESSION_BY_DEFAULT);
         String sessionId = currentContext.getSessionId();
 
         if (!StringUtility.isEmpty(sessionId) && !renewSession) {
@@ -93,8 +93,7 @@ public abstract class AbstractLoginCommand extends AbstractCommand implements
         resultStack(currentContext).push(sessionId);
     }
 
-    protected abstract String login(ApplicationContext currentContext)
-            throws CLIException;
+    protected abstract String login(ApplicationContext currentContext) throws CLIException;
 
     protected abstract String getAlias(ApplicationContext currentContext);
 
@@ -112,16 +111,13 @@ public abstract class AbstractLoginCommand extends AbstractCommand implements
     private String getSessionIdFromServer(ApplicationContext currentContext) {
         currentContext.setProperty(PROP_PERSISTED_SESSION, false);
         String sessionId = login(currentContext);
-        if (currentContext
-                .getProperty(PROP_ENABLE_PERSISTENCE, Boolean.TYPE, true)) {
-            writeToSessionFile(sessionFile(currentContext), sessionId,
-                    currentContext);
+        if (currentContext.getProperty(PROP_ENABLE_PERSISTENCE, Boolean.TYPE, true)) {
+            writeToSessionFile(sessionFile(currentContext), sessionId, currentContext);
         }
         return sessionId;
     }
 
-    private void writeToSessionFile(File sessionFile, String sessionId,
-            ApplicationContext currentContext) {
+    private void writeToSessionFile(File sessionFile, String sessionId, ApplicationContext currentContext) {
         if (sessionFile.exists()) {
             sessionFile.delete();
         } else {
@@ -132,8 +128,7 @@ public abstract class AbstractLoginCommand extends AbstractCommand implements
         }
         FileUtility.writeStringToFile(sessionFile, sessionId);
         if (!setOwnerOnly(sessionFile)) {
-            writeLine(
-                    currentContext,
+            writeLine(currentContext,
                     "Warning! Possible security risk: unable to limit access rights of session-id file '%s'",
                     sessionFile.getAbsoluteFile());
         }
@@ -141,18 +136,15 @@ public abstract class AbstractLoginCommand extends AbstractCommand implements
     }
 
     private File sessionFile(ApplicationContext currentContext) {
-        String filename = (new StringBuilder())
-                .append(getAlias(currentContext)).append('-')
-                .append(currentContext.getResourceType())
-                .append(DFLT_SESSION_FILE_EXT).toString();
+        String filename = (new StringBuilder()).append(getAlias(currentContext)).append('-').append(
+                currentContext.getResourceType()).append(DFLT_SESSION_FILE_EXT).toString();
         return new File(DFLT_SESSION_DIR, filename);
     }
 
     private boolean setOwnerOnly(File file) {
         // effectively set file permission to 600
-        return file.setReadable(false, false) && file.setReadable(true, true)
-                && file.setWritable(false, false)
-                && file.setWritable(true, true) && file.setExecutable(false);
+        return file.setReadable(false, false) && file.setReadable(true, true) &&
+            file.setWritable(false, false) && file.setWritable(true, true) && file.setExecutable(false);
     }
 
 }

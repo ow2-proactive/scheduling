@@ -46,6 +46,7 @@ import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 
+
 public class UploadFileCommand extends AbstractCommand implements Command {
     private String spaceName;
     private String filePath;

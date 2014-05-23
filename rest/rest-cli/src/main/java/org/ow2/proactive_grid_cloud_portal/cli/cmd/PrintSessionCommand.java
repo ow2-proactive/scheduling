@@ -43,6 +43,7 @@ import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
 
+
 public class PrintSessionCommand extends AbstractCommand implements Command {
 
     public PrintSessionCommand() {

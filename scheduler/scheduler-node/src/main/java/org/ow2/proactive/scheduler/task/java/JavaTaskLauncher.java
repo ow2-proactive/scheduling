@@ -105,7 +105,7 @@ public class JavaTaskLauncher extends TaskLauncher {
 
     public void doTaskAndGetResult(final TaskTerminateNotification terminateNotificationStub,
             ExecutableContainer executableContainer, TaskResult... results) {
-        logger.info("Starting Task "+taskId.getReadableName());
+        logger.info("Starting Task " + taskId.getReadableName());
         long duration = -1;
         long sample = 0;
         long intervalms = 0;
@@ -149,8 +149,7 @@ public class JavaTaskLauncher extends TaskLauncher {
             //init task
             ExecutableInitializer initializer = createExecutableInitializer(executableContainer);
 
-            setPropagatedVariables((JavaExecutableInitializerImpl) initializer,
-                    getPropagatedVariables());
+            setPropagatedVariables((JavaExecutableInitializerImpl) initializer, getPropagatedVariables());
             replaceIterationTags(initializer);
 
             // if an exception occurs in init method, unwrapp the InvocationTargetException
@@ -158,11 +157,14 @@ public class JavaTaskLauncher extends TaskLauncher {
             try {
                 Executable executable = executableContainer.getExecutable();
                 if (executable instanceof JavaExecutable) {
-                    executableGuard.callInternalInit(JavaExecutable.class, JavaExecutableInitializerImpl.class, initializer);
+                    executableGuard.callInternalInit(JavaExecutable.class,
+                            JavaExecutableInitializerImpl.class, initializer);
                 } else if (executable instanceof JavaStandaloneExecutable) {
-                    executableGuard.callInternalInit(JavaStandaloneExecutable.class, JavaStandaloneExecutableInitializer.class, initializer);
+                    executableGuard.callInternalInit(JavaStandaloneExecutable.class,
+                            JavaStandaloneExecutableInitializer.class, initializer);
                 } else {
-                    throw new IllegalArgumentException("Unsupported Java Executable class : " + executable.getClass());
+                    throw new IllegalArgumentException("Unsupported Java Executable class : " +
+                        executable.getClass());
                 }
 
             } catch (InvocationTargetException e) {
@@ -175,8 +177,7 @@ public class JavaTaskLauncher extends TaskLauncher {
                 // update propagated variables map after task execution so
                 // that any updates that occur during task execution will be
                 // visible in post script execution.
-                setPropagatedVariables(((AbstractJavaExecutable) executableGuard.use())
-                        .getVariables());
+                setPropagatedVariables(((AbstractJavaExecutable) executableGuard.use()).getVariables());
             } catch (Throwable t) {
                 exception = t;
             }
@@ -196,7 +197,7 @@ public class JavaTaskLauncher extends TaskLauncher {
             executableGuard.copyScratchDataToOutput();
             intervalms = Math.round(Math.ceil((System.nanoTime() - sample) / 1000));
             logger.info("Time spent copying SCRATCH datas to OUTPUT : " + intervalms + " ms");
-            logger.info("Task "+taskId.getReadableName()+" terminated without error");
+            logger.info("Task " + taskId.getReadableName() + " terminated without error");
         } catch (Throwable ex) {
             logger.debug("Exception occured while running task " + this.taskId.getReadableName() + ": ", ex);
             exception = ex;
@@ -204,10 +205,12 @@ public class JavaTaskLauncher extends TaskLauncher {
         } finally {
             if (executableGuard.wasWalltimed()) {
                 // killed by a walltime
-                res = new TaskResultImpl(taskId, new WalltimeExceededException("Walltime of " + wallTime + " ms reached on task " + taskId.getReadableName()), null, duration / 1000000, null);
+                res = new TaskResultImpl(taskId, new WalltimeExceededException("Walltime of " + wallTime +
+                    " ms reached on task " + taskId.getReadableName()), null, duration / 1000000, null);
             } else if (executableGuard.wasKilled()) {
                 // standard kill
-                res = new TaskResultImpl(taskId, new TaskAbortedException("Task " + taskId.getReadableName() + " has been killed"), null, duration / 1000000, null);
+                res = new TaskResultImpl(taskId, new TaskAbortedException("Task " + taskId.getReadableName() +
+                    " has been killed"), null, duration / 1000000, null);
             } else {
                 // set the result
                 if (exception != null) {
@@ -241,13 +244,11 @@ public class JavaTaskLauncher extends TaskLauncher {
         }
     }
 
-
     protected void setPropagatedVariables(JavaExecutableInitializerImpl init,
             Map<String, Serializable> variables) {
-        init.setPropagatedVariables(SerializationUtil
-                .serializeVariableMap(variables));
+        init.setPropagatedVariables(SerializationUtil.serializeVariableMap(variables));
     }
-    
+
     /**
      * Replaces iteration and replication index syntactic macros
      * in various string locations across the task descriptor
@@ -272,6 +273,5 @@ public class JavaTaskLauncher extends TaskLauncher {
             // see SCHEDULING-1288
         }
     }
-
 
 }

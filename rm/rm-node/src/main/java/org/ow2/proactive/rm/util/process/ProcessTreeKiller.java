@@ -65,6 +65,8 @@ import org.jvnet.winp.WinpException;
 
 import static com.sun.jna.Pointer.NULL;
 import static org.ow2.proactive.rm.util.process.GNUCLibrary.LIBC;
+
+
 /**
  * Kills a process tree to clean up the mess left by a build.
  *
@@ -73,7 +75,8 @@ import static org.ow2.proactive.rm.util.process.GNUCLibrary.LIBC;
  */
 public abstract class ProcessTreeKiller {
 
-    protected static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ProcessTreeKiller.class);
+    protected static org.apache.log4j.Logger logger = org.apache.log4j.Logger
+            .getLogger(ProcessTreeKiller.class);
 
     /**
      * Kills the given process (like {@link Process#destroy()}
@@ -345,11 +348,10 @@ public abstract class ProcessTreeKiller {
                 return processes.get(pid);
             }
 
-
             public Iterator<P> iterator() {
-                    return processes.values().iterator();
-                }
+                return processes.values().iterator();
             }
+        }
 
         /**
          * {@link UnixSystem} that has /proc.
@@ -426,9 +428,9 @@ public abstract class ProcessTreeKiller {
             public void kill() {
                 try {
                     if (DESTROY_PROCESS.getParameterTypes().length > 1) {
-                        DESTROY_PROCESS.invoke(null,getPid(),false);
+                        DESTROY_PROCESS.invoke(null, getPid(), false);
                     } else {
-                        DESTROY_PROCESS.invoke(null,getPid());
+                        DESTROY_PROCESS.invoke(null, getPid());
                     }
                 } catch (IllegalAccessException e) {
                     // this is impossible
@@ -712,14 +714,16 @@ public abstract class ProcessTreeKiller {
                     while (true) {
                         // find out how much memory we need to do this
                         if (LIBC.sysctl(MIB_PROC_ALL, 3, NULL, size, NULL, _) != 0)
-                            throw new IOException("Failed to obtain memory requirement: " + LIBC.strerror(Native.getLastError()));
+                            throw new IOException("Failed to obtain memory requirement: " +
+                                LIBC.strerror(Native.getLastError()));
 
                         // now try the real call
                         m = new Memory(size.getValue());
                         if (LIBC.sysctl(MIB_PROC_ALL, 3, m, size, NULL, _) != 0) {
                             if (Native.getLastError() == ENOMEM && nRetry++ < 16)
                                 continue; // retry
-                            throw new IOException("Failed to call kern.proc.all: " + LIBC.strerror(Native.getLastError()));
+                            throw new IOException("Failed to call kern.proc.all: " +
+                                LIBC.strerror(Native.getLastError()));
                         }
                         break;
                     }
@@ -792,8 +796,10 @@ public abstract class ProcessTreeKiller {
 
                     // for some reason, I was never able to get sysctlbyname work.
                     // if(LIBC.sysctlbyname("kern.argmax", argmaxRef.getPointer(), size, NULL, _)!=0)
-                    if (LIBC.sysctl(new int[]{CTL_KERN, KERN_ARGMAX}, 2, argmaxRef.getPointer(), size, NULL, _) != 0)
-                        throw new IOException("Failed to get kernl.argmax: " + LIBC.strerror(Native.getLastError()));
+                    if (LIBC.sysctl(new int[] { CTL_KERN, KERN_ARGMAX }, 2, argmaxRef.getPointer(), size,
+                            NULL, _) != 0)
+                        throw new IOException("Failed to get kernl.argmax: " +
+                            LIBC.strerror(Native.getLastError()));
 
                     int argmax = argmaxRef.getValue();
 
@@ -830,49 +836,49 @@ public abstract class ProcessTreeKiller {
                     }
                     StringArrayMemory m = new StringArrayMemory(argmax);
                     size.setValue(argmax);
-                    if (LIBC.sysctl(new int[]{CTL_KERN, KERN_PROCARGS2, pid}, 3, m, size, NULL, _) != 0)
-                        throw new IOException("Failed to obtain ken.procargs2: " + LIBC.strerror(Native.getLastError()));
-
+                    if (LIBC.sysctl(new int[] { CTL_KERN, KERN_PROCARGS2, pid }, 3, m, size, NULL, _) != 0)
+                        throw new IOException("Failed to obtain ken.procargs2: " +
+                            LIBC.strerror(Native.getLastError()));
 
                     /*
-                    * Make a sysctl() call to get the raw argument space of the
-                        * process.  The layout is documented in start.s, which is part
-                        * of the Csu project.  In summary, it looks like:
-                        *
-                        * /---------------\ 0x00000000
-                        * :               :
-                        * :               :
-                        * |---------------|
-                        * | argc          |
-                        * |---------------|
-                        * | arg[0]        |
-                        * |---------------|
-                        * :               :
-                        * :               :
-                        * |---------------|
-                        * | arg[argc - 1] |
-                        * |---------------|
-                        * | 0             |
-                        * |---------------|
-                        * | env[0]        |
-                        * |---------------|
-                        * :               :
-                        * :               :
-                        * |---------------|
-                        * | env[n]        |
-                        * |---------------|
-                        * | 0             |
-                        * |---------------| <-- Beginning of data returned by sysctl()
-                        * | exec_path     |     is here.
-                        * |:::::::::::::::|
-                        * |               |
-                        * | String area.  |
-                        * |               |
-                        * |---------------| <-- Top of stack.
-                        * :               :
-                        * :               :
-                        * \---------------/ 0xffffffff
-                        */
+                     * Make a sysctl() call to get the raw argument space of the
+                     * process.  The layout is documented in start.s, which is part
+                     * of the Csu project.  In summary, it looks like:
+                     *
+                     * /---------------\ 0x00000000
+                     * :               :
+                     * :               :
+                     * |---------------|
+                     * | argc          |
+                     * |---------------|
+                     * | arg[0]        |
+                     * |---------------|
+                     * :               :
+                     * :               :
+                     * |---------------|
+                     * | arg[argc - 1] |
+                     * |---------------|
+                     * | 0             |
+                     * |---------------|
+                     * | env[0]        |
+                     * |---------------|
+                     * :               :
+                     * :               :
+                     * |---------------|
+                     * | env[n]        |
+                     * |---------------|
+                     * | 0             |
+                     * |---------------| <-- Beginning of data returned by sysctl()
+                     * | exec_path     |     is here.
+                     * |:::::::::::::::|
+                     * |               |
+                     * | String area.  |
+                     * |               |
+                     * |---------------| <-- Top of stack.
+                     * :               :
+                     * :               :
+                     * \---------------/ 0xffffffff
+                     */
 
                     // I find the Darwin source code of the 'ps' command helpful in understanding how it does this:
                     // see http://www.opensource.apple.com/source/adv_cmds/adv_cmds-147/ps/print.c
@@ -884,7 +890,9 @@ public abstract class ProcessTreeKiller {
                             arguments.add(m.readString());
                         }
                     } catch (IndexOutOfBoundsException e) {
-                        throw new IllegalStateException("Failed to parse arguments: pid=" + pid + ", arg0=" + args0 + ", arguments=" + arguments + ", nargs=" + argc + ". Please run 'ps e " + pid + "' and report this to https://issues.jenkins-ci.org/browse/JENKINS-9634", e);
+                        throw new IllegalStateException("Failed to parse arguments: pid=" + pid + ", arg0=" +
+                            args0 + ", arguments=" + arguments + ", nargs=" + argc + ". Please run 'ps e " +
+                            pid + "' and report this to https://issues.jenkins-ci.org/browse/JENKINS-9634", e);
                     }
 
                     // read env vars that follow
@@ -908,12 +916,11 @@ public abstract class ProcessTreeKiller {
         private static final int KERN_PROC = 14;
         private static final int KERN_PROC_ALL = 0;
         private static final int ENOMEM = 12;
-        private static int[] MIB_PROC_ALL = {CTL_KERN, KERN_PROC, KERN_PROC_ALL};
+        private static int[] MIB_PROC_ALL = { CTL_KERN, KERN_PROC, KERN_PROC_ALL };
         private static final int KERN_ARGMAX = 8;
         private static final int KERN_PROCARGS2 = 49;
 
     }
-
 
     private static final boolean IS_LITTLE_ENDIAN = "little".equals(System.getProperty("sun.cpu.endian"));
 

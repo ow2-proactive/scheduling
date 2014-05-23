@@ -45,6 +45,7 @@ import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.FileUtility;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskResultData;
 
+
 public class OutputCommand extends AbstractCommand implements Command {
     private String pathname;
 
@@ -64,10 +65,7 @@ public class OutputCommand extends AbstractCommand implements Command {
             if (result instanceof String) {
                 FileUtility.writeStringToFile(outFile, (String) result);
             } else if (result instanceof TaskResultData) {
-                FileUtility
-                        .writeByteArrayToFile(
-                                ((TaskResultData) result).getSerializedValue(),
-                                outFile);
+                FileUtility.writeByteArrayToFile(((TaskResultData) result).getSerializedValue(), outFile);
             } else {
                 FileUtility.writeObjectToFile(result, outFile);
             }

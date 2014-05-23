@@ -77,8 +77,8 @@ public class LoggingInterceptor implements PreProcessInterceptor, PostProcessInt
 
     private static final Logger logger = LoggerFactory.getLogger(LoggingInterceptor.class);
 
-    public ServerResponse preProcess(HttpRequest request, ResourceMethodInvoker method)
-      throws Failure, WebApplicationException {
+    public ServerResponse preProcess(HttpRequest request, ResourceMethodInvoker method) throws Failure,
+            WebApplicationException {
         if (logger.isDebugEnabled()) {
 
             String httpMethod = request.getHttpMethod();

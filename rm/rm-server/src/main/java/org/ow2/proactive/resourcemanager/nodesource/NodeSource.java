@@ -620,8 +620,8 @@ public class NodeSource implements InitActive, RunActive {
      */
     public void finishNodeSourceShutdown(Client initiator) {
         PAFuture.waitFor(rmcore.nodeSourceUnregister(name, new RMNodeSourceEvent(
-            RMEventType.NODESOURCE_REMOVED, initiator.getName(),
-                this.getName(), this.getDescription(), this.getAdministrator().getName())));
+            RMEventType.NODESOURCE_REMOVED, initiator.getName(), this.getName(), this.getDescription(), this
+                    .getAdministrator().getName())));
 
         PAActiveObject.terminateActiveObject(false);
 

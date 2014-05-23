@@ -72,16 +72,16 @@ public class SchedulerStateRestLiveLogsTest extends RestTestServer {
 
     @Before
     public void setUp() throws Exception {
-        client = ProxyFactory.create(SchedulerRestInterface.class,
-                "http://localhost:" + port + "/");
+        client = ProxyFactory.create(SchedulerRestInterface.class, "http://localhost:" + port + "/");
         PortalConfiguration.load(new ByteArrayInputStream(
-                (PortalConfiguration.scheduler_logforwardingservice_provider + "=" + LogService.class.getName()).getBytes()));
+            (PortalConfiguration.scheduler_logforwardingservice_provider + "=" + LogService.class.getName())
+                    .getBytes()));
     }
 
     @Test
     public void testLiveLogs_OutputRemovedAtEachCall() throws Exception {
-        String sessionId = SharedSessionStoreTestUtils.createValidSession(
-          mock(SchedulerProxyUserInterface.class));
+        String sessionId = SharedSessionStoreTestUtils
+                .createValidSession(mock(SchedulerProxyUserInterface.class));
 
         String firstJobId = "42";
 
@@ -108,8 +108,8 @@ public class SchedulerStateRestLiveLogsTest extends RestTestServer {
 
     @Test
     public void testLiveLogs_TwoJobsAtTheSameTime() throws Exception {
-        String sessionId = SharedSessionStoreTestUtils.createValidSession(
-          mock(SchedulerProxyUserInterface.class));
+        String sessionId = SharedSessionStoreTestUtils
+                .createValidSession(mock(SchedulerProxyUserInterface.class));
 
         String firstJobId = "42";
         String secondJobId = "43";

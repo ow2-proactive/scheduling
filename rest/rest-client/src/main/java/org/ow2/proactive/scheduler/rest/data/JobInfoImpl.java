@@ -39,6 +39,7 @@ import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 
+
 public class JobInfoImpl implements JobInfo {
 
     private long submittedTime = -1;

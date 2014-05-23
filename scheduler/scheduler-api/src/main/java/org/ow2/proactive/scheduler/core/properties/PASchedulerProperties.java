@@ -322,13 +322,11 @@ public enum PASchedulerProperties {
     /* ***************************************************************************** */
     /* ***************************************************************************** */
     public static final String PA_SCHEDULER_PROPERTIES_FILEPATH = "pa.scheduler.properties.filepath";
-    public static final String  PA_SCHEDULER_PROPERTIES_RELATIVE_FILEPATH = "config/scheduler/settings.ini";
+    public static final String PA_SCHEDULER_PROPERTIES_RELATIVE_FILEPATH = "config/scheduler/settings.ini";
 
     /** memory entity of the properties file. */
-    private static PAPropertiesLazyLoader propertiesLoader = new PAPropertiesLazyLoader(
-      SCHEDULER_HOME.key,
-      PA_SCHEDULER_PROPERTIES_FILEPATH,
-      PA_SCHEDULER_PROPERTIES_RELATIVE_FILEPATH);
+    private static PAPropertiesLazyLoader propertiesLoader = new PAPropertiesLazyLoader(SCHEDULER_HOME.key,
+        PA_SCHEDULER_PROPERTIES_FILEPATH, PA_SCHEDULER_PROPERTIES_RELATIVE_FILEPATH);
 
     /** Key of the specific instance. */
     private String key;
@@ -371,10 +369,8 @@ public enum PASchedulerProperties {
      * @param filename the file containing the properties to be loaded.
      */
     public static void loadProperties(String filename) {
-        propertiesLoader = new PAPropertiesLazyLoader(SCHEDULER_HOME.key,
-          PA_SCHEDULER_PROPERTIES_FILEPATH,
-          PA_SCHEDULER_PROPERTIES_RELATIVE_FILEPATH,
-          filename);
+        propertiesLoader = new PAPropertiesLazyLoader(SCHEDULER_HOME.key, PA_SCHEDULER_PROPERTIES_FILEPATH,
+            PA_SCHEDULER_PROPERTIES_RELATIVE_FILEPATH, filename);
     }
 
     /**

@@ -41,6 +41,7 @@ import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
 
+
 public class SetNodeSourceCommand extends AbstractCommand {
     public static final String SET_NODE_SOURCE = "org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.SetNodeSourceCommand.setNodeSource";
 

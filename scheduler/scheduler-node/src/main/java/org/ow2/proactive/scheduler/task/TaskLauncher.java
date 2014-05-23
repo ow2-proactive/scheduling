@@ -152,14 +152,14 @@ public abstract class TaskLauncher implements InitActive {
     public static final PrintStream SYSTEM_ERR = System.err;
 
     private boolean dataspaceInitialized = false;
-    
+
     public static final String EXECUTION_SUCCEED_BINDING_NAME = "success";
     public static final String DS_SCRATCH_BINDING_NAME = "localspace";
     public static final String DS_INPUT_BINDING_NAME = "input";
     public static final String DS_OUTPUT_BINDING_NAME = "output";
     public static final String DS_GLOBAL_BINDING_NAME = "global";
     public static final String DS_USER_BINDING_NAME = "user";
-    
+
     /** The name used to access propagated variables map */
     public static final String VARIABLES_BINDING_NAME = "variables";
 
@@ -248,7 +248,7 @@ public abstract class TaskLauncher implements InitActive {
 
     /** Will be replaced in file paths by the job id */
     protected static final String JOBID_INDEX_TAG = "$JID";
-    
+
     /** Propagated variables map */
     private Map<String, Serializable> propagatedVariables = new HashMap<String, Serializable>();
 
@@ -280,7 +280,7 @@ public abstract class TaskLauncher implements InitActive {
         this.iterationIndex = initializer.getIterationIndex();
         this.storeLogs = initializer.isPreciousLogs();
         this.clientLogs = new StringBuffer();
-        
+
         // add job descriptor variables
         if (initializer.getVariables() != null) {
             this.propagatedVariables.putAll(initializer.getVariables());
@@ -332,7 +332,8 @@ public abstract class TaskLauncher implements InitActive {
      * @throws Exception reported if something wrong occurs.
      */
     protected void callInternalInit(Class<?> targetedClass, Class<?> parameterType,
-            ExecutableInitializer argument) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+            ExecutableInitializer argument) throws InvocationTargetException, NoSuchMethodException,
+            IllegalAccessException {
         Method m = targetedClass.getDeclaredMethod("internalInit", parameterType);
         m.setAccessible(true);
 
@@ -458,7 +459,7 @@ public abstract class TaskLauncher implements InitActive {
     protected void setEnvironmentCookie() {
         String prefix = null;
         if (taskId.value() != null) {
-            prefix = taskId.value()+"_";
+            prefix = taskId.value() + "_";
         }
         EnvironmentCookieBasedChildProcessKiller.setCookie(prefix);
     }
@@ -556,10 +557,10 @@ public abstract class TaskLauncher implements InitActive {
         initializer.setGlobalSpaceFileObject(GLOBAL);
         initializer.setUserSpaceFileObject(USER);
         initializer.setLocalSpace(new LocalSpaceAdapter(SCRATCH));
-        initializer.setInputSpace(new RemoteSpaceAdapter(INPUT,SCRATCH));
-        initializer.setOutputSpace(new RemoteSpaceAdapter(OUTPUT,SCRATCH));
-        initializer.setGlobalSpace(new RemoteSpaceAdapter(GLOBAL,SCRATCH));
-        initializer.setUserSpace(new RemoteSpaceAdapter(USER,SCRATCH));
+        initializer.setInputSpace(new RemoteSpaceAdapter(INPUT, SCRATCH));
+        initializer.setOutputSpace(new RemoteSpaceAdapter(OUTPUT, SCRATCH));
+        initializer.setGlobalSpace(new RemoteSpaceAdapter(GLOBAL, SCRATCH));
+        initializer.setUserSpace(new RemoteSpaceAdapter(USER, SCRATCH));
 
         return initializer;
     }
@@ -584,7 +585,7 @@ public abstract class TaskLauncher implements InitActive {
     @ImmediateService
     public void activateLogs(AppenderProvider logSink) {
         synchronized (this.loggersFinalized) {
-            logger.info("Activating logs for task " + this.taskId +" ("+taskId.getReadableName()+")");
+            logger.info("Activating logs for task " + this.taskId + " (" + taskId.getReadableName() + ")");
             if (this.loggersActivated.get()) {
                 logger.info("Logs for task " + this.taskId + " are already activated");
                 return;
@@ -624,7 +625,6 @@ public abstract class TaskLauncher implements InitActive {
             logger.info("Activated logs for task " + this.taskId);
         }
     }
-
 
     /**
      * Flush out and err streams.
@@ -670,8 +670,7 @@ public abstract class TaskLauncher implements InitActive {
      * @throws UserException if an error occurred during the execution of the script
      */
     @SuppressWarnings("unchecked")
-    protected void executePreScript()
-            throws ActiveObjectCreationException, NodeException, UserException {
+    protected void executePreScript() throws ActiveObjectCreationException, NodeException, UserException {
         // update script variables with updated values
         filterAndUpdate(this.pre, this.propagatedVariables);
         replaceTagsInScript(pre);
@@ -767,26 +766,26 @@ public abstract class TaskLauncher implements InitActive {
         script.addBinding(DS_USER_BINDING_NAME, this.USER);
     }
 
-    public static String convertDataSpaceToFileIfPossible(DataSpacesFileObject fo, boolean errorIfNotFile) throws URISyntaxException, DataSpacesException {
-        URI foUri =  new URI(fo.getRealURI());
+    public static String convertDataSpaceToFileIfPossible(DataSpacesFileObject fo, boolean errorIfNotFile)
+            throws URISyntaxException, DataSpacesException {
+        URI foUri = new URI(fo.getRealURI());
         String answer;
         if (foUri.getScheme() == null || foUri.getScheme().equals("file")) {
             answer = (new File(foUri)).getAbsolutePath();
         } else {
             if (errorIfNotFile) {
-                throw new DataSpacesException("Space " +
-                        fo.getRealURI() + " is not accessible via the file system.");
+                throw new DataSpacesException("Space " + fo.getRealURI() +
+                    " is not accessible via the file system.");
             }
             answer = foUri.toString();
         }
         return answer;
     }
-    
+
     /*
      * Sets the propagated variables map as a script binding called 'variables'.
      */
-    private void setPropagatedVariableBinding(
-            Map<String, Serializable> propagatedVariables,
+    private void setPropagatedVariableBinding(Map<String, Serializable> propagatedVariables,
             ScriptHandler scriptHandler) {
         scriptHandler.addBinding(VARIABLES_BINDING_NAME, propagatedVariables);
     }
@@ -797,7 +796,8 @@ public abstract class TaskLauncher implements InitActive {
     protected void finalizeLoggers() {
         synchronized (this.loggersFinalized) {
             if (!loggersFinalized.get()) {
-                logger.info("Terminating loggers for task " + this.taskId + " (" + taskId.getReadableName() + ")" + "...");
+                logger.info("Terminating loggers for task " + this.taskId + " (" + taskId.getReadableName() +
+                    ")" + "...");
                 this.flushStreams();
 
                 this.loggersFinalized.set(true);
@@ -830,7 +830,7 @@ public abstract class TaskLauncher implements InitActive {
         if (!executableGuard.wasKilled() || executableGuard.wasWalltimed()) {
             if (terminateNotificationStub != null) {
                 // callback to scheduler core sending the result
-                for (int i=0; i<pingAttempts; i++) {
+                for (int i = 0; i < pingAttempts; i++) {
                     try {
                         terminateNotificationStub.terminate(taskId, taskResult);
                         logger.debug("Successfully set results of task " + taskId);
@@ -846,7 +846,7 @@ public abstract class TaskLauncher implements InitActive {
                 }
             }
         }
-        logger.info("Task " + taskId +  " finalized");
+        logger.info("Task " + taskId + " finalized");
     }
 
     /**
@@ -876,7 +876,7 @@ public abstract class TaskLauncher implements InitActive {
                 taskLauncherBody.terminate(!normalTermination);
             }
         } catch (Exception e) {
-            logger.info("Exception when terminating task launcher active object",e);
+            logger.info("Exception when terminating task launcher active object", e);
         }
         logger.info("TaskLauncher terminated");
     }
@@ -887,7 +887,7 @@ public abstract class TaskLauncher implements InitActive {
      */
     protected void scheduleTimer() {
         if (isWallTime()) {
-            logger.info("Execute timer because task '" + taskId + "' is walltimed ("+wallTime+" ms)");
+            logger.info("Execute timer because task '" + taskId + "' is walltimed (" + wallTime + " ms)");
             killTaskTimer = new KillTask(executableGuard, wallTime);
             killTaskTimer.schedule();
         }
@@ -903,7 +903,7 @@ public abstract class TaskLauncher implements InitActive {
     }
 
     protected boolean walltimeReached() {
-       return killTaskTimer.walltimeReached();
+        return killTaskTimer.walltimeReached();
     }
 
     /**
@@ -1242,7 +1242,7 @@ public abstract class TaskLauncher implements InitActive {
                             @Override
                             public Boolean call() throws FileSystemException {
                                 logger.info("Copying " + finaldsfo.getRealURI() + " to " +
-                                        SCRATCH.getRealURI() + "/" + finalRelativePath);
+                                    SCRATCH.getRealURI() + "/" + finalRelativePath);
                                 SCRATCH
                                         .resolveFile(finalRelativePath)
                                         .copyFrom(
@@ -1288,7 +1288,7 @@ public abstract class TaskLauncher implements InitActive {
     private boolean checkInputSpaceConfigured(DataSpacesFileObject space, String spaceName, InputSelector is) {
         if (space == null) {
             logger.error("Job " + spaceName +
-                    " space is not defined or not properly configured while input files are specified : ");
+                " space is not defined or not properly configured while input files are specified : ");
 
             this.logDataspacesStatus("Job " + spaceName +
                 " space is not defined or not properly configured while input files are specified : ",
@@ -1305,7 +1305,7 @@ public abstract class TaskLauncher implements InitActive {
     private boolean checkOuputSpaceConfigured(DataSpacesFileObject space, String spaceName, OutputSelector os) {
         if (space == null) {
             logger.debug("Job " + spaceName +
-                    " space is not defined or not properly configured, while output files are specified :");
+                " space is not defined or not properly configured, while output files are specified :");
             this.logDataspacesStatus("Job " + spaceName +
                 " space is not defined or not properly configured, while output files are specified :",
                     DataspacesStatusLevel.ERROR);
@@ -1511,7 +1511,7 @@ public abstract class TaskLauncher implements InitActive {
                 @Override
                 public Boolean call() throws FileSystemException {
                     logger.info("Copying " + finaldsfo.getRealURI() + " to " + finalout.getRealURI() + "/" +
-                            finalRelativePath);
+                        finalRelativePath);
 
                     finalout.resolveFile(finalRelativePath).copyFrom(finaldsfo,
                             org.objectweb.proactive.extensions.dataspaces.api.FileSelector.SELECT_SELF);
@@ -1678,8 +1678,7 @@ public abstract class TaskLauncher implements InitActive {
      * Retrieve propagated variables from previous tasks (hooked in the task
      * result object).
      */
-    protected void updatePropagatedVariables(TaskResult... results)
-            throws Exception {
+    protected void updatePropagatedVariables(TaskResult... results) throws Exception {
         if (results != null && results.length > 0) {
             Map<String, byte[]> variables = getPropagatedVariables(results);
             this.propagatedVariables = deserializeVariableMap(variables);
@@ -1688,8 +1687,7 @@ public abstract class TaskLauncher implements InitActive {
 
     protected void attachPropagatedVariables(TaskResultImpl resultImpl) {
         if (this.propagatedVariables != null) {
-            resultImpl
-                    .setPropagatedVariables(serializeVariableMap(this.propagatedVariables));
+            resultImpl.setPropagatedVariables(serializeVariableMap(this.propagatedVariables));
         }
     }
 
@@ -1697,14 +1695,9 @@ public abstract class TaskLauncher implements InitActive {
         return this.propagatedVariables;
     }
 
-    protected void setPropagatedVariables(
-            Map<String, Serializable> propagatedVariables) {
+    protected void setPropagatedVariables(Map<String, Serializable> propagatedVariables) {
         this.propagatedVariables = propagatedVariables;
     }
-
-
-
-
 
     /**
      * This class acts as a proxy/guard to the executable usage
@@ -1779,20 +1772,18 @@ public abstract class TaskLauncher implements InitActive {
         public void executePreScript() throws Throwable {
             submitACallable(new Callable<Boolean>() {
 
-                    @Override
-                    public Boolean call() throws Exception {
-                        try {
-                            TaskLauncher.this.executePreScript();
-                            return true;
-                        } catch (Throwable throwable) {
-                            throw new ToUnwrapException(throwable);
-                        }
+                @Override
+                public Boolean call() throws Exception {
+                    try {
+                        TaskLauncher.this.executePreScript();
+                        return true;
+                    } catch (Throwable throwable) {
+                        throw new ToUnwrapException(throwable);
                     }
-                }, true);
+                }
+            }, true);
             waitCallable();
         }
-
-
 
         /**
          * Executes a postScript in a cancellable separated thread
@@ -1801,16 +1792,16 @@ public abstract class TaskLauncher implements InitActive {
         public void executePostScript(final boolean executionSucceed) throws Throwable {
             submitACallable(new Callable<Boolean>() {
 
-                    @Override
-                    public Boolean call() throws Exception {
-                        try {
-                            TaskLauncher.this.executePostScript(executionSucceed);
-                            return true;
-                        } catch (Throwable throwable) {
-                            throw new ToUnwrapException(throwable);
-                        }
+                @Override
+                public Boolean call() throws Exception {
+                    try {
+                        TaskLauncher.this.executePostScript(executionSucceed);
+                        return true;
+                    } catch (Throwable throwable) {
+                        throw new ToUnwrapException(throwable);
                     }
-                }, true);
+                }
+            }, true);
             waitCallable();
         }
 
@@ -1821,16 +1812,16 @@ public abstract class TaskLauncher implements InitActive {
         public void executeFlowScript(final TaskResult res) throws Throwable {
             submitACallable(new Callable<Boolean>() {
 
-                    @Override
-                    public Boolean call() throws Exception {
-                        try {
-                            TaskLauncher.this.executeFlowScript(res);
-                            return true;
-                        } catch (Throwable throwable) {
-                            throw new ToUnwrapException(throwable);
-                        }
+                @Override
+                public Boolean call() throws Exception {
+                    try {
+                        TaskLauncher.this.executeFlowScript(res);
+                        return true;
+                    } catch (Throwable throwable) {
+                        throw new ToUnwrapException(throwable);
                     }
-                }, true);
+                }
+            }, true);
             waitCallable();
         }
 
@@ -1840,16 +1831,16 @@ public abstract class TaskLauncher implements InitActive {
          */
         public void copyInputDataToScratch() throws Throwable {
             submitACallable(new Callable<Boolean>() {
-                    @Override
-                    public Boolean call() throws Exception {
-                        try {
-                            TaskLauncher.this.copyInputDataToScratch();
-                            return true;
-                        } catch (Throwable throwable) {
-                            throw new ToUnwrapException(throwable);
-                        }
+                @Override
+                public Boolean call() throws Exception {
+                    try {
+                        TaskLauncher.this.copyInputDataToScratch();
+                        return true;
+                    } catch (Throwable throwable) {
+                        throw new ToUnwrapException(throwable);
                     }
-                }, true);
+                }
+            }, true);
             waitCallable();
         }
 
@@ -1859,16 +1850,16 @@ public abstract class TaskLauncher implements InitActive {
          */
         public void copyScratchDataToOutput() throws Throwable {
             submitACallable(new Callable<Boolean>() {
-                    @Override
-                    public Boolean call() throws Exception {
-                        try {
-                            TaskLauncher.this.copyScratchDataToOutput();
-                            return true;
-                        } catch (Throwable throwable) {
-                            throw new ToUnwrapException(throwable);
-                        }
+                @Override
+                public Boolean call() throws Exception {
+                    try {
+                        TaskLauncher.this.copyScratchDataToOutput();
+                        return true;
+                    } catch (Throwable throwable) {
+                        throw new ToUnwrapException(throwable);
                     }
-                }, true);
+                }
+            }, true);
             waitCallable();
         }
 
@@ -1907,7 +1898,6 @@ public abstract class TaskLauncher implements InitActive {
             waitCallable();
         }
 
-
         /**
          * execute the task in a cancellable separated thread
          * @throws Exception
@@ -1916,15 +1906,15 @@ public abstract class TaskLauncher implements InitActive {
 
             submitACallable(new Callable<Serializable>() {
 
-                    @Override
-                    public Serializable call() throws Exception {
-                        try {
-                            return target.execute(results);
-                        } catch (Throwable throwable) {
-                            throw new ToUnwrapException(throwable);
-                        }
+                @Override
+                public Serializable call() throws Exception {
+                    try {
+                        return target.execute(results);
+                    } catch (Throwable throwable) {
+                        throw new ToUnwrapException(throwable);
                     }
-                }, true);
+                }
+            }, true);
             return waitCallable();
         }
 
@@ -1943,18 +1933,20 @@ public abstract class TaskLauncher implements InitActive {
                 try {
                     lastProgress = target.getProgress();
                     if (lastProgress < 0) {
-                        logger.warn("Returned progress (" + lastProgress + ") is negative, return 0 instead.");
+                        logger
+                                .warn("Returned progress (" + lastProgress +
+                                    ") is negative, return 0 instead.");
                         lastProgress = 0;
                     } else if (lastProgress > 100) {
                         logger.warn("Returned progress (" + lastProgress +
-                                ") is greater than 100, return 100 instead.");
+                            ") is greater than 100, return 100 instead.");
                         lastProgress = 100;
                     }
                     return lastProgress;
                 } catch (Throwable t) {
                     //protect call to user getProgress() if overridden
-                    throw new IllegalProgressException("executable.getProgress() method has thrown an exception",
-                            t);
+                    throw new IllegalProgressException(
+                        "executable.getProgress() method has thrown an exception", t);
                 }
             }
         }

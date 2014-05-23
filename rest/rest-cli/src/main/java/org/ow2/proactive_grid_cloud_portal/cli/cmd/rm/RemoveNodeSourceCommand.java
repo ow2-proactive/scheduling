@@ -49,6 +49,7 @@ import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
 
+
 public class RemoveNodeSourceCommand extends AbstractCommand implements Command {
     private String nodeSource;
     private boolean preempt;
@@ -66,30 +67,24 @@ public class RemoveNodeSourceCommand extends AbstractCommand implements Command 
         if (currentContext.isForced()) {
             preempt = true;
         }
-        HttpPost request = new HttpPost(
-                currentContext.getResourceUrl("nodesource/remove"));
+        HttpPost request = new HttpPost(currentContext.getResourceUrl("nodesource/remove"));
         StringBuilder requestContent = new StringBuilder();
-        requestContent.append("name=").append(nodeSource).append("&preempt=")
-                .append(preempt);
-        StringEntity entity = new StringEntity(requestContent.toString(),
-                APPLICATION_FORM_URLENCODED);
+        requestContent.append("name=").append(nodeSource).append("&preempt=").append(preempt);
+        StringEntity entity = new StringEntity(requestContent.toString(), APPLICATION_FORM_URLENCODED);
         request.setEntity(entity);
         HttpResponseWrapper response = execute(request, currentContext);
         if (statusCode(response) == statusCode(OK)) {
             boolean success = readValue(response, Boolean.TYPE, currentContext);
             resultStack(currentContext).push(success);
             if (success) {
-                writeLine(currentContext,
-                        "Node source '%s' deleted successfully.", nodeSource);
+                writeLine(currentContext, "Node source '%s' deleted successfully.", nodeSource);
             } else {
-                writeLine(currentContext, "Cannot delete node source: %s.",
-                        nodeSource);
+                writeLine(currentContext, "Cannot delete node source: %s.", nodeSource);
 
             }
         } else {
-            handleError(String.format(
-                    "An error occurred while deleting node source: %s",
-                    nodeSource), response, currentContext);
+            handleError(String.format("An error occurred while deleting node source: %s", nodeSource),
+                    response, currentContext);
         }
 
     }

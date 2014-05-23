@@ -47,6 +47,7 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskResultData;
 
+
 public class TaskResultImpl implements TaskResult {
     private static final long serialVersionUID = 1L;
 
@@ -79,7 +80,7 @@ public class TaskResultImpl implements TaskResult {
     public void setOutput(TaskLogs taskLogs) {
         this.taskLogs = taskLogs;
     }
-    
+
     @Override
     public TaskLogs getOutput() {
         return taskLogs;
@@ -113,7 +114,7 @@ public class TaskResultImpl implements TaskResult {
     public void setHadException(boolean hadException) {
         this.hadException = hadException;
     }
-    
+
     @Override
     public boolean hadException() {
         return hadException;
@@ -125,8 +126,8 @@ public class TaskResultImpl implements TaskResult {
 
     @Override
     public Serializable value() throws Throwable {
-        return (null == value) ? ((null == serializedValue) ? null
-                : (Serializable) object(serializedValue)) : value;
+        return (null == value) ? ((null == serializedValue) ? null : (Serializable) object(serializedValue))
+                : value;
 
     }
 

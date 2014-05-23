@@ -68,7 +68,7 @@ import org.junit.Test;
 public class TestDataSpaceConfiguration extends ProActiveTest {
 
     static String IOSPACE = System.getProperty("java.io.tmpdir") + File.separator + "scheduler test" +
-            File.separator + "my space"; // evil spaces provided
+        File.separator + "my space"; // evil spaces provided
 
     FileSystemServerDeployer filesServerIn;
 
@@ -107,19 +107,23 @@ public class TestDataSpaceConfiguration extends ProActiveTest {
         ArrayList<String> expectedWithUserDir = new ArrayList<String>();
         expectedWithUserDir.addAll(Arrays.asList(userdirUrls));
 
-        PASchedulerProperties.DATASPACE_DEFAULTINPUT_URL.updateProperty(DataSpaceServiceStarter.urlsToDSConfigProperty(spaceurls));
+        PASchedulerProperties.DATASPACE_DEFAULTINPUT_URL.updateProperty(DataSpaceServiceStarter
+                .urlsToDSConfigProperty(spaceurls));
         PASchedulerProperties.DATASPACE_DEFAULTINPUT_LOCALPATH.updateProperty(IOSPACE);
         PASchedulerProperties.DATASPACE_DEFAULTINPUT_HOSTNAME.updateProperty(HOSTNAME);
 
-        PASchedulerProperties.DATASPACE_DEFAULTOUTPUT_URL.updateProperty(DataSpaceServiceStarter.urlsToDSConfigProperty(spaceurls));
+        PASchedulerProperties.DATASPACE_DEFAULTOUTPUT_URL.updateProperty(DataSpaceServiceStarter
+                .urlsToDSConfigProperty(spaceurls));
         PASchedulerProperties.DATASPACE_DEFAULTOUTPUT_LOCALPATH.updateProperty(IOSPACE);
         PASchedulerProperties.DATASPACE_DEFAULTOUTPUT_HOSTNAME.updateProperty(HOSTNAME);
 
-        PASchedulerProperties.DATASPACE_DEFAULTGLOBAL_URL.updateProperty(DataSpaceServiceStarter.urlsToDSConfigProperty(spaceurls));
+        PASchedulerProperties.DATASPACE_DEFAULTGLOBAL_URL.updateProperty(DataSpaceServiceStarter
+                .urlsToDSConfigProperty(spaceurls));
         PASchedulerProperties.DATASPACE_DEFAULTGLOBAL_LOCALPATH.updateProperty(IOSPACE);
         PASchedulerProperties.DATASPACE_DEFAULTGLOBAL_HOSTNAME.updateProperty(HOSTNAME);
 
-        PASchedulerProperties.DATASPACE_DEFAULTUSER_URL.updateProperty(DataSpaceServiceStarter.urlsToDSConfigProperty(spaceurls));
+        PASchedulerProperties.DATASPACE_DEFAULTUSER_URL.updateProperty(DataSpaceServiceStarter
+                .urlsToDSConfigProperty(spaceurls));
         PASchedulerProperties.DATASPACE_DEFAULTUSER_LOCALPATH.updateProperty(IOSPACE);
         PASchedulerProperties.DATASPACE_DEFAULTUSER_HOSTNAME.updateProperty(HOSTNAME);
 
@@ -129,8 +133,7 @@ public class TestDataSpaceConfiguration extends ProActiveTest {
         Set<SpaceInstanceInfo> predefinedSpaces = new HashSet<SpaceInstanceInfo>();
         NamingService namingService = dsServiceStarter.getNamingService();
 
-        JobDataSpaceApplication jdsa = new JobDataSpaceApplication(appid,
-                dsServiceStarter.getNamingService());
+        JobDataSpaceApplication jdsa = new JobDataSpaceApplication(appid, dsServiceStarter.getNamingService());
         jdsa.startDataSpaceApplication(null, null, null, null, username, null);
 
         DataSpacesNodes.configureApplication(PAActiveObject.getNode(), appid, dsServiceStarter
@@ -162,16 +165,26 @@ public class TestDataSpaceConfiguration extends ProActiveTest {
     public void testPropertyParsing() throws Throwable {
         Assert.assertArrayEquals(new String[0], DataSpaceServiceStarter.dsConfigPropertyToUrls("  \"\"  "));
         Assert.assertArrayEquals(new String[0], DataSpaceServiceStarter.dsConfigPropertyToUrls("  "));
-        Assert.assertArrayEquals(new String[] { "a" }, DataSpaceServiceStarter.dsConfigPropertyToUrls(" \"a\"  "));
+        Assert.assertArrayEquals(new String[] { "a" }, DataSpaceServiceStarter
+                .dsConfigPropertyToUrls(" \"a\"  "));
         Assert.assertArrayEquals(new String[] { "a" }, DataSpaceServiceStarter.dsConfigPropertyToUrls("a"));
-        Assert.assertArrayEquals(new String[] { "a" }, DataSpaceServiceStarter.dsConfigPropertyToUrls(" a  "));
-        Assert.assertArrayEquals(new String[] { "a b" }, DataSpaceServiceStarter.dsConfigPropertyToUrls(" \"a b\"  "));
-        Assert.assertArrayEquals(new String[] { "a", "b" }, DataSpaceServiceStarter.dsConfigPropertyToUrls(" a b  "));
-        Assert.assertArrayEquals(new String[] { "a b c" }, DataSpaceServiceStarter.dsConfigPropertyToUrls(" \"a b c\"  "));
-        Assert.assertArrayEquals(new String[] { "a", "b", "c" }, DataSpaceServiceStarter.dsConfigPropertyToUrls("  a b c  "));
-        Assert.assertArrayEquals(new String[] { "a b c", "d e f" }, DataSpaceServiceStarter.dsConfigPropertyToUrls(" \"a b c\"    \"d e f\"   "));
-        Assert.assertArrayEquals(new String[] { "a b c d e f" }, DataSpaceServiceStarter.dsConfigPropertyToUrls("   \"a b c d e f\"   "));
-        Assert.assertArrayEquals(new String[] { "a", "b", "c", "d", "e", "f" }, DataSpaceServiceStarter.dsConfigPropertyToUrls("   a b c   d e    f "));
+        Assert
+                .assertArrayEquals(new String[] { "a" }, DataSpaceServiceStarter
+                        .dsConfigPropertyToUrls(" a  "));
+        Assert.assertArrayEquals(new String[] { "a b" }, DataSpaceServiceStarter
+                .dsConfigPropertyToUrls(" \"a b\"  "));
+        Assert.assertArrayEquals(new String[] { "a", "b" }, DataSpaceServiceStarter
+                .dsConfigPropertyToUrls(" a b  "));
+        Assert.assertArrayEquals(new String[] { "a b c" }, DataSpaceServiceStarter
+                .dsConfigPropertyToUrls(" \"a b c\"  "));
+        Assert.assertArrayEquals(new String[] { "a", "b", "c" }, DataSpaceServiceStarter
+                .dsConfigPropertyToUrls("  a b c  "));
+        Assert.assertArrayEquals(new String[] { "a b c", "d e f" }, DataSpaceServiceStarter
+                .dsConfigPropertyToUrls(" \"a b c\"    \"d e f\"   "));
+        Assert.assertArrayEquals(new String[] { "a b c d e f" }, DataSpaceServiceStarter
+                .dsConfigPropertyToUrls("   \"a b c d e f\"   "));
+        Assert.assertArrayEquals(new String[] { "a", "b", "c", "d", "e", "f" }, DataSpaceServiceStarter
+                .dsConfigPropertyToUrls("   a b c   d e    f "));
     }
 
     @After

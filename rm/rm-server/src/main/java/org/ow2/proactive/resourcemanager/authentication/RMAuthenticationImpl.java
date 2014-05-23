@@ -123,7 +123,6 @@ public class RMAuthenticationImpl extends AuthenticationImpl implements RMAuthen
         throw new LoginException("Could not lookup stub for ResourceManager interface : " + e.getMessage());
     }
 
-
     /**
      * Initializes the active object and register it in ProActive runtime
      */

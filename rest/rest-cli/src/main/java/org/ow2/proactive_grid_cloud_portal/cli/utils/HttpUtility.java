@@ -57,6 +57,7 @@ import org.apache.http.impl.conn.PoolingClientConnectionManager;
 import org.apache.http.params.HttpParams;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 
+
 public class HttpUtility {
     private static final String DFLT_CHARSET = "ISO-8859-1";
 
@@ -71,38 +72,34 @@ public class HttpUtility {
         }
     }
 
-    public static void setInsecureAccess(HttpClient client)
-            throws KeyManagementException, UnrecoverableKeyException,
-            NoSuchAlgorithmException, KeyStoreException {
+    public static void setInsecureAccess(HttpClient client) throws KeyManagementException,
+            UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException {
 
-        SSLSocketFactory socketFactory = new SSLSocketFactory(
-                new RelaxedTrustStrategy(),
-                SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+        SSLSocketFactory socketFactory = new SSLSocketFactory(new RelaxedTrustStrategy(),
+            SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
         Scheme https = new Scheme("https", 443, socketFactory);
         client.getConnectionManager().getSchemeRegistry().register(https);
     }
-    
+
     public static String encode(String unescaped) {
         try {
             return URLEncoder.encode(unescaped, DFLT_CHARSET);
         } catch (UnsupportedEncodingException e) {
-           throw new CLIException(CLIException.REASON_OTHER, e);
+            throw new CLIException(CLIException.REASON_OTHER, e);
         }
     }
-    
+
     public static HttpClient threadSafeClient() {
         DefaultHttpClient client = new DefaultHttpClient();
         ClientConnectionManager mgr = client.getConnectionManager();
         HttpParams params = client.getParams();
-        client = new DefaultHttpClient(new PoolingClientConnectionManager(
-                mgr.getSchemeRegistry()), params);
+        client = new DefaultHttpClient(new PoolingClientConnectionManager(mgr.getSchemeRegistry()), params);
         return client;
     }
 
     private static class RelaxedTrustStrategy implements TrustStrategy {
         @Override
-        public boolean isTrusted(X509Certificate[] arg0, String arg1)
-                throws CertificateException {
+        public boolean isTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
             return true;
         }
     }

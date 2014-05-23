@@ -60,7 +60,6 @@ import org.apache.log4j.PropertyConfigurator;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
 
-
 public class RestRuntime {
 
     private static final Logger LOGGER = ProActiveLogger.getLogger(RestRuntime.class);
@@ -114,12 +113,11 @@ public class RestRuntime {
                     Properties p = new Properties();
                     p.load(in);
                     in.close();
-                    System.setProperty("log4j.configuration",
-                      log4jConfig.getAbsolutePath()); // avoid reset by ProActiveLogger
+                    System.setProperty("log4j.configuration", log4jConfig.getAbsolutePath()); // avoid reset by ProActiveLogger
                     PropertyConfigurator.configure(p);
                 } catch (Exception e1) {
                     LOGGER.warn("Failed to read the portal's log4j file: " + log4jConfig.getAbsolutePath(),
-                      e1);
+                            e1);
                 }
             }
         }

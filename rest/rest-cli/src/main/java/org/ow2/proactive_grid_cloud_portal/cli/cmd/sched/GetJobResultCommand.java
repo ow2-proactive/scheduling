@@ -45,6 +45,7 @@ import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobResultData;
 
+
 public class GetJobResultCommand extends AbstractJobCommand implements Command {
 
     public GetJobResultCommand(String jobId) {
@@ -58,13 +59,11 @@ public class GetJobResultCommand extends AbstractJobCommand implements Command {
             JobResultData jobResult = scheduler.jobResult(currentContext.getSessionId(), jobId);
             resultStack(currentContext).push(jobResult);
             if (!currentContext.isForced()) {
-                writeLine(currentContext, "%s",
-                        StringUtility.jobResultAsString(job(), jobResult));
+                writeLine(currentContext, "%s", StringUtility.jobResultAsString(job(), jobResult));
             }
         } catch (Exception e) {
-            handleError(String.format(
-                    "An error occurred while retrieving %s result:", job()),
-                    e, currentContext);
+            handleError(String.format("An error occurred while retrieving %s result:", job()), e,
+                    currentContext);
         }
     }
 

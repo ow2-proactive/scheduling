@@ -41,6 +41,7 @@ import java.io.Console;
 import java.io.IOException;
 import java.io.Writer;
 
+
 class ConsoleDevice extends AbstractDevice {
     private Console console;
 
@@ -68,10 +69,10 @@ class ConsoleDevice extends AbstractDevice {
         console.printf(format, args);
     }
 
-	@Override
-	public boolean canRead() throws IOException {
-		return console.reader().ready();
-	}
+    @Override
+    public boolean canRead() throws IOException {
+        return console.reader().ready();
+    }
 
     @Override
     public int read() throws IOException {

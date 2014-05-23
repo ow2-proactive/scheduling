@@ -50,6 +50,7 @@ import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpUtility;
 
+
 public class AddNodeCommand extends AbstractCommand implements Command {
     private String nodeUrl;
     private String nodeSource;
@@ -74,12 +75,11 @@ public class AddNodeCommand extends AbstractCommand implements Command {
         if (nodeSource != null) {
             buffer.append("&nodesource=").append(nodeSource);
         }
-        StringEntity entity = new StringEntity(buffer.toString(),
-                APPLICATION_FORM_URLENCODED);
+        StringEntity entity = new StringEntity(buffer.toString(), APPLICATION_FORM_URLENCODED);
         request.setEntity(entity);
         HttpResponseWrapper response = execute(request, currentContext);
         if (statusCode(OK) == statusCode(response)) {
-            boolean successful =  readValue(response, Boolean.TYPE, currentContext);
+            boolean successful = readValue(response, Boolean.TYPE, currentContext);
             currentContext.resultStack().push(successful);
             if (successful) {
                 writeLine(currentContext, "Node('%s') added successfully.", nodeUrl);

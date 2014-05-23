@@ -43,6 +43,7 @@ import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractTaskCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 
+
 public class PreemptTaskCommand extends AbstractTaskCommand implements Command {
 
     public PreemptTaskCommand(String jobId, String taskId) {
@@ -60,21 +61,14 @@ public class PreemptTaskCommand extends AbstractTaskCommand implements Command {
             boolean success = scheduler.preemptTask(currentContext.getSessionId(), jobId, taskId);
             resultStack(currentContext).push(success);
             if (success) {
-                writeLine(
-                        currentContext,
-                        "%s has been stopped and will be rescheduled after 5 seconds.",
+                writeLine(currentContext, "%s has been stopped and will be rescheduled after 5 seconds.",
                         task());
             } else {
-                writeLine(
-                        currentContext,
-                        "%s cannot be stopped and most likely it is not running.",
-                        task());
+                writeLine(currentContext, "%s cannot be stopped and most likely it is not running.", task());
             }
         } catch (Exception e) {
-            handleError(
-                    String.format(
-                            "An error occurred while attempting to preemt %s:",
-                            task()), e, currentContext);
+            handleError(String.format("An error occurred while attempting to preemt %s:", task()), e,
+                    currentContext);
         }
     }
 

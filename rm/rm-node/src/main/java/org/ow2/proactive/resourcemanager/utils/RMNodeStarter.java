@@ -96,8 +96,8 @@ public class RMNodeStarter {
     // While logger is not configured and it not set with sys properties, use Console logger
     static {
         if (System.getProperty(CentralPAPropertyRepository.LOG4J.getName()) == null) {
-            BasicConfigurator.configure(
-              new ConsoleAppender(new PatternLayout("[%d{ISO8601} %-5p] [NODE.%C{1}.%M] %m%n")));
+            BasicConfigurator.configure(new ConsoleAppender(new PatternLayout(
+                "[%d{ISO8601} %-5p] [NODE.%C{1}.%M] %m%n")));
             Logger.getRootLogger().setLevel(Level.INFO);
         }
     }
@@ -149,7 +149,7 @@ public class RMNodeStarter {
     protected final static String NB_OF_ADD_NODE_ATTEMPTS_PROP_NAME = "proactive.node.add.attempts";
 
     /** The number of attempts to reconnect the node to the RM before quitting */
-    protected static int NB_OF_RECONNECTION_ATTEMPTS = 2*60*24; // to make it 24 hours by default
+    protected static int NB_OF_RECONNECTION_ATTEMPTS = 2 * 60 * 24; // to make it 24 hours by default
 
     /** Name of the java property to set the number of attempts performed to add a node to the resource manager */
     protected final static String NB_OF_RECONNECTION_ATTEMPTS_PROP_NAME = "proactive.node.reconnection.attempts";
@@ -213,14 +213,14 @@ public class RMNodeStarter {
         credentialFile.setArgName("path");
         options.addOption(credentialFile);
         // The credential passed as environment variable
-        final Option credentialEnv = new Option(Character.toString(OPTION_CREDENTIAL_ENV),
-            "credentialEnv", true, "name of the environment variable that contains the credential");
+        final Option credentialEnv = new Option(Character.toString(OPTION_CREDENTIAL_ENV), "credentialEnv",
+            true, "name of the environment variable that contains the credential");
         credentialEnv.setRequired(false);
         credentialEnv.setArgName("name");
         options.addOption(credentialEnv);
         // The credential passed as value
-        final Option credVal = new Option(Character.toString(OPTION_CREDENTIAL_VAL), "credentialVal",
-            true, "explicit value of the credential");
+        final Option credVal = new Option(Character.toString(OPTION_CREDENTIAL_VAL), "credentialVal", true,
+            "explicit value of the credential");
         credVal.setRequired(false);
         credVal.setArgName("credential");
         options.addOption(credVal);
@@ -237,8 +237,8 @@ public class RMNodeStarter {
         nodeName.setArgName("name");
         options.addOption(nodeName);
         // The node source name
-        final Option sourceName = new Option(Character.toString(OPTION_SOURCE_NAME), "sourceName",
-            true, "node source name");
+        final Option sourceName = new Option(Character.toString(OPTION_SOURCE_NAME), "sourceName", true,
+            "node source name");
         sourceName.setRequired(false);
         sourceName.setArgName("name");
         options.addOption(sourceName);
@@ -251,7 +251,7 @@ public class RMNodeStarter {
         options.addOption(waitOnJoinTimeout);
         // The ping delay in millis
         final Option pingDelay = new Option(
-          Character.toString(OPTION_PING_DELAY),
+            Character.toString(OPTION_PING_DELAY),
             "pingDelay",
             true,
             "ping delay in millis used by RMPinger thread that calls System.exit(1) if the resource manager is down (default is " +
@@ -270,15 +270,15 @@ public class RMNodeStarter {
         addNodeAttempts.setArgName("number");
         options.addOption(addNodeAttempts);
         // The delay between attempts option
-        final Option addNodeAttemptsDelay = new Option(Character.toString(OPTION_ADD_NODE_ATTEMPTS_DELAY), "addNodeAttemptsDelay", true,
+        final Option addNodeAttemptsDelay = new Option(Character.toString(OPTION_ADD_NODE_ATTEMPTS_DELAY),
+            "addNodeAttemptsDelay", true,
             "delay in millis between attempts to add the local node to the resource manager (default is " +
                 ADD_NODE_ATTEMPTS_DELAY_IN_MS + ")");
         addNodeAttemptsDelay.setRequired(false);
         addNodeAttemptsDelay.setArgName("millis");
         options.addOption(addNodeAttemptsDelay);
         // Displays the help
-        final Option help = new Option(Character.toString(OPTION_HELP), "help", false,
-            "to display this help");
+        final Option help = new Option(Character.toString(OPTION_HELP), "help", false, "to display this help");
         help.setRequired(false);
         options.addOption(help);
     }
@@ -384,7 +384,7 @@ public class RMNodeStarter {
     }
 
     private void pingNodeIndefinitely(ResourceManager rm) {
-        while (rm!=null && rm.setNodeAvailable(this.getNodeURL()).getBooleanValue()) {
+        while (rm != null && rm.setNodeAvailable(this.getNodeURL()).getBooleanValue()) {
             try {
                 if (numberOfReconnectionAttemptsLeft < NB_OF_RECONNECTION_ATTEMPTS) {
                     logger.info("Node successfully reconnected to the resource manager");
@@ -402,8 +402,8 @@ public class RMNodeStarter {
             System.setProperty(PAResourceManagerProperties.RM_HOME.getKey(), ".");
         }
         if (System.getProperty(CentralPAPropertyRepository.PA_HOME.getName()) == null) {
-            System.setProperty(CentralPAPropertyRepository.PA_HOME.getName(),
-              System.getProperty(PAResourceManagerProperties.RM_HOME.getKey()));
+            System.setProperty(CentralPAPropertyRepository.PA_HOME.getName(), System
+                    .getProperty(PAResourceManagerProperties.RM_HOME.getKey()));
         }
     }
 
@@ -411,15 +411,15 @@ public class RMNodeStarter {
         if (OneJar.isRunningWithOneJar()) {
             String nativeLibraryName = SigarLoader.getNativeLibraryName();
             String nativeLibraryNameToLoad = nativeLibraryName.replace(SigarLoader.getLibraryExtension(), "")
-              .replace(SigarLoader.getLibraryPrefix(), "");
+                    .replace(SigarLoader.getLibraryPrefix(), "");
             System.loadLibrary(nativeLibraryNameToLoad);
         }
     }
 
     private void configureSecurityManager() {
         if (System.getProperty("java.security.policy") == null) {
-            System.setProperty("java.security.policy",
-              RMNodeStarter.class.getResource("/config/security.java.policy-client").toString());
+            System.setProperty("java.security.policy", RMNodeStarter.class.getResource(
+                    "/config/security.java.policy-client").toString());
             Policy.getPolicy().refresh();
         }
     }
@@ -437,7 +437,8 @@ public class RMNodeStarter {
             try {
                 proActiveHome = ProActiveRuntimeImpl.getProActiveRuntime().getProActiveHome();
             } catch (ProActiveException e) {
-                logger.debug("Cannot find proactive home using ProActiveRuntime, will use RM home as ProActive home.");
+                logger
+                        .debug("Cannot find proactive home using ProActiveRuntime, will use RM home as ProActive home.");
                 proActiveHome = PAResourceManagerProperties.RM_HOME.getValueAsString();
             }
             System.setProperty(CentralPAPropertyRepository.PA_HOME.getName(), proActiveHome);
@@ -473,8 +474,9 @@ public class RMNodeStarter {
             } else {
                 // use log4j config from JAR
                 URL log4jConfigFromJar = RMNodeStarter.class.getResource("/config/log4j/log4j-defaultNode");
-                System.setProperty(CentralPAPropertyRepository.LOG4J.getName(),
-                  log4jConfigFromJar.toString());
+                System
+                        .setProperty(CentralPAPropertyRepository.LOG4J.getName(), log4jConfigFromJar
+                                .toString());
                 PropertyConfigurator.configure(log4jConfigFromJar);
                 logger.info("Configured log4j using " + log4jConfigFromJar.toString());
             }
@@ -617,8 +619,10 @@ public class RMNodeStarter {
         try {
             return InetAddress.getLocalHost().getHostName() + "_" + new Sigar().getPid();
         } catch (Throwable error) {
-            logger.warn(
-              "Failed to retrieve hostname or pid to compute node name, will fallback to default value", error);
+            logger
+                    .warn(
+                            "Failed to retrieve hostname or pid to compute node name, will fallback to default value",
+                            error);
             return "PA-AGENT_NODE";
         }
     }
@@ -629,18 +633,21 @@ public class RMNodeStarter {
         } catch (KeyException fromDiskKeyException) {
             try {
                 Credentials credentialsFromRMHome = Credentials.getCredentials(new File(
-                  PAResourceManagerProperties.RM_HOME.getValueAsStringOrNull(),
-                  "config/authentication/rm.cred").getAbsolutePath());
+                    PAResourceManagerProperties.RM_HOME.getValueAsStringOrNull(),
+                    "config/authentication/rm.cred").getAbsolutePath());
                 logger.info("Using default credentials from ProActive home, authenticating as user rm");
                 return credentialsFromRMHome;
             } catch (KeyException fromRMHomeKeyException) {
                 try {
-                    Credentials credentialsFromJar = Credentials.getCredentials(
-                      RMNodeStarter.class.getResourceAsStream("/config/authentication/rm.cred"));
+                    Credentials credentialsFromJar = Credentials.getCredentials(RMNodeStarter.class
+                            .getResourceAsStream("/config/authentication/rm.cred"));
                     logger.info("Using default credentials from ProActive jars, authenticating as user rm");
                     return credentialsFromJar;
                 } catch (Exception fromJarKeyException) {
-                    logger.error("Failed to read credentials, from location obtained using system property, RM home or ProActive jars", fromJarKeyException);
+                    logger
+                            .error(
+                                    "Failed to read credentials, from location obtained using system property, RM home or ProActive jars",
+                                    fromJarKeyException);
                     System.exit(ExitStatus.CRED_UNREADABLE.exitCode);
                 }
             }
@@ -703,16 +710,17 @@ public class RMNodeStarter {
         if (numberOfReconnection != null) {
             try {
                 RMNodeStarter.NB_OF_RECONNECTION_ATTEMPTS = Integer.parseInt(numberOfReconnection);
-                logger.debug("Number of attempts to reconnect a node to the resource manager when connection is lost: " +
-                        RMNodeStarter.NB_OF_RECONNECTION_ATTEMPTS);
+                logger
+                        .debug("Number of attempts to reconnect a node to the resource manager when connection is lost: " +
+                            RMNodeStarter.NB_OF_RECONNECTION_ATTEMPTS);
             } catch (Exception e) {
                 logger.warn("Cannot use the value supplied by java property " +
-                        RMNodeStarter.NB_OF_RECONNECTION_ATTEMPTS_PROP_NAME + " : " + numberOfReconnection +
-                        ". Using default " + RMNodeStarter.NB_OF_RECONNECTION_ATTEMPTS);
+                    RMNodeStarter.NB_OF_RECONNECTION_ATTEMPTS_PROP_NAME + " : " + numberOfReconnection +
+                    ". Using default " + RMNodeStarter.NB_OF_RECONNECTION_ATTEMPTS);
             }
         } else {
             logger.debug("Using default value for the number of reconnection attempts: " +
-                    RMNodeStarter.NB_OF_RECONNECTION_ATTEMPTS);
+                RMNodeStarter.NB_OF_RECONNECTION_ATTEMPTS);
         }
 
         //the delay between two add node attempts
@@ -787,7 +795,7 @@ public class RMNodeStarter {
      * the Resource Manager. Handles all errors/exceptions.
      */
     protected ResourceManager registerInRM(final Credentials credentials, final String rmURL,
-      final String nodeName) {
+            final String nodeName) {
 
         // Create the full url to contact the Resource Manager
         final String fullUrl = rmURL.endsWith("/") ? rmURL + RMConstants.NAME_ACTIVE_OBJECT_RMAUTHENTICATION
@@ -1001,8 +1009,7 @@ public class RMNodeStarter {
      */
     private String getNodeURLFilename(String nodeName, int rank) {
         final String tmpDir = System.getProperty("java.io.tmpdir");
-        return new File(tmpDir, URL_TMPFILE_PREFIX + "_" + nodeName + "-" + rank)
-                .getAbsolutePath();
+        return new File(tmpDir, URL_TMPFILE_PREFIX + "_" + nodeName + "-" + rank).getAbsolutePath();
     }
 
     /**

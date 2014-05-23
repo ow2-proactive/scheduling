@@ -20,6 +20,7 @@ buildscript {
         classpath 'org.hsudbrock:gradle-trang:0.1-proactive'
         classpath 'com.github.rholder:gradle-one-jar:1.0.3'
         classpath 'org.ow2.proactive:serialver-gradle:1.0-SNAPSHOT'
+        classpath 'org.gradle.api.plugins:gradle-format-plugin:1.1'
     }
 }
 
@@ -50,6 +51,7 @@ ext.serialver = schedulingSerialver
 
 configure(javaSubprojects) {
     apply plugin: 'java'
+    apply plugin: 'format'
 
     sourceCompatibility = 1.6
 
@@ -68,6 +70,11 @@ configure(javaSubprojects) {
     task serialver(type: InsertSerialVersionUIDTask) {
         serialver = rootProject.serialver
     }
+
+    format {
+        configurationFile = file("$rootDir/eclipse_formatter_config.xml")
+    }
+    build.dependsOn format
 }
 
 def functionalTestConfiguration = {

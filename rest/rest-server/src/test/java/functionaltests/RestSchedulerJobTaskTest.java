@@ -92,8 +92,8 @@ public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
         RestFuncTestConfig config = RestFuncTestConfig.getInstance();
         String url = getResourceUrl("login");
         HttpPost httpPost = new HttpPost(url);
-        StringEntity entity = new StringEntity(
-          "username=" + config.getLogin() + "&password=" + config.getPassword());
+        StringEntity entity = new StringEntity("username=" + config.getLogin() + "&password=" +
+            config.getPassword());
         entity.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         httpPost.setEntity(entity);
         HttpResponse response = executeUriRequest(httpPost);

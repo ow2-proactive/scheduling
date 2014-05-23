@@ -10,6 +10,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 
+
 public class HttpResponseWrapper {
     private byte[] buffer = null;
     private int statusCode = -1;

@@ -135,7 +135,6 @@ public interface TaskResult extends Serializable {
      * @deprecated Use {@link #getPropagatedVariables()} instead.
      */
     public Map<String, String> getPropagatedProperties();
-    
-    
+
     public Map<String, byte[]> getPropagatedVariables();
 }

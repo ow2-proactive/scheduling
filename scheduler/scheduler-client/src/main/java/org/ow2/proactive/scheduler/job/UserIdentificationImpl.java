@@ -124,7 +124,6 @@ public class UserIdentificationImpl extends UserIdentification {
         return username;
     }
 
-
     /**
      * Add one to the submit number
      */

@@ -402,14 +402,14 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
             Request request = null;
             try {
-                request = service
-                        .blockingRemoveOldest(PAResourceManagerProperties.RM_ALIVE_EVENT_FREQUENCY
-                                .getValueAsInt());
+                request = service.blockingRemoveOldest(PAResourceManagerProperties.RM_ALIVE_EVENT_FREQUENCY
+                        .getValueAsInt());
 
                 if (request != null) {
                     try {
                         try {
-                            caller = checkMethodCallPermission(request.getMethodName(), request.getSourceBodyID());
+                            caller = checkMethodCallPermission(request.getMethodName(), request
+                                    .getSourceBodyID());
                             service.serve(request);
                         } catch (SecurityException ex) {
                             logger.warn("Cannot serve request: " + request, ex);
@@ -464,7 +464,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         this.freeNodes.add(rmNode);
         // create the event
         this.registerAndEmitNodeEvent(rmNode.createNodeEvent(RMEventType.NODE_STATE_CHANGED,
-            previousNodeState, client.getName()));
+                previousNodeState, client.getName()));
         return new BooleanWrapper(true);
     }
 
@@ -504,7 +504,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         rmNode.setToRemove();
         // create the event
         this.registerAndEmitNodeEvent(rmNode.createNodeEvent(RMEventType.NODE_STATE_CHANGED,
-            previousNodeState, initiator.getName()));
+                previousNodeState, initiator.getName()));
     }
 
     /**
@@ -540,7 +540,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         this.allNodes.remove(rmnode.getNodeURL());
         // create the event
         this.registerAndEmitNodeEvent(rmnode.createNodeEvent(RMEventType.NODE_REMOVED, rmnode.getState(),
-            initiator.getName()));
+                initiator.getName()));
     }
 
     /**
@@ -626,14 +626,15 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      */
     private String getUrl() {
 
-        if (System.getProperty("rm.url")!= null) {
+        if (System.getProperty("rm.url") != null) {
             return System.getProperty("rm.url");
         }
 
         try {
             String aoUrl = PAActiveObject.getActiveObjectNodeUrl(PAActiveObject.getStubOnThis());
             if (aoUrl != null) {
-                String rmUrl = aoUrl.replaceAll(PAResourceManagerProperties.RM_NODE_NAME.getValueAsString(), "");
+                String rmUrl = aoUrl.replaceAll(PAResourceManagerProperties.RM_NODE_NAME.getValueAsString(),
+                        "");
                 System.setProperty("rm.url", rmUrl);
                 return rmUrl;
             } else {
@@ -914,8 +915,9 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         this.nodeSources.put(data.getName(), nodeSource);
 
         // generate the event of node source creation
-        this.monitoring.nodeSourceEvent(new RMNodeSourceEvent(RMEventType.NODESOURCE_CREATED,
-            provider.getName(), nodeSource.getName(), nodeSource.getDescription(), nodeSource.getAdministrator().getName()));
+        this.monitoring.nodeSourceEvent(new RMNodeSourceEvent(RMEventType.NODESOURCE_CREATED, provider
+                .getName(), nodeSource.getName(), nodeSource.getDescription(), nodeSource.getAdministrator()
+                .getName()));
 
         logger.info("Node source " + data.getName() + " has been successfully created by " + provider);
 
@@ -1013,8 +1015,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                     Permission ownerPermission = new PrincipalPermission(rmnode.getOwner().getName(),
                         userPrincipal);
                     try {
-                        caller.checkPermission(ownerPermission, caller +
-                            " is not authorized to free node " + node.getNodeInformation().getURL());
+                        caller.checkPermission(ownerPermission, caller + " is not authorized to free node " +
+                            node.getNodeInformation().getURL());
 
                         if (rmnode.isToRemove()) {
                             removeNodeFromCoreAndSource(rmnode, caller);
@@ -1129,7 +1131,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
         ArrayList<RMNodeSourceEvent> nodeSourcesList = new ArrayList<RMNodeSourceEvent>();
         for (NodeSource s : this.nodeSources.values()) {
-            nodeSourcesList.add(new RMNodeSourceEvent(s.getName(), s.getDescription(), s.getAdministrator().getName()));
+            nodeSourcesList.add(new RMNodeSourceEvent(s.getName(), s.getDescription(), s.getAdministrator()
+                    .getName()));
             for (RMDeployingNode pn : s.getDeployingNodes()) {
                 nodesList.add(pn.createNodeEvent());
             }
@@ -1154,7 +1157,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     @Override
     public Set<String> listAliveNodeUrls() {
         HashSet<String> aliveNodes = new HashSet<String>();
-        for(String nodeurl : allNodes.keySet()) {
+        for (String nodeurl : allNodes.keySet()) {
             RMNode node = allNodes.get(nodeurl);
             if (!node.isDown()) {
                 aliveNodes.add(nodeurl);
@@ -1258,7 +1261,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         this.freeNodes.remove(rmNode);
         // create the event
         this.registerAndEmitNodeEvent(rmNode.createNodeEvent(RMEventType.NODE_STATE_CHANGED,
-            previousNodeState, owner.getName()));
+                previousNodeState, owner.getName()));
     }
 
     /**
@@ -1282,7 +1285,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             rmNode.setDown();
             // create the event
             this.registerAndEmitNodeEvent(rmNode.createNodeEvent(RMEventType.NODE_STATE_CHANGED,
-                previousNodeState, rmNode.getProvider().getName()));
+                    previousNodeState, rmNode.getProvider().getName()));
         } else {
             // the nodes has been removed from core asynchronously
             // when pinger of selection manager tried to access it
@@ -1633,7 +1636,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             return false;
         }
         this.registerAndEmitNodeEvent(rmnode.createNodeEvent(RMEventType.NODE_STATE_CHANGED, NodeState.FREE,
-            this.caller.getName()));
+                this.caller.getName()));
         return true;
     }
 
@@ -1672,7 +1675,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             return false;
         }
         this.registerAndEmitNodeEvent(rmnode.createNodeEvent(RMEventType.NODE_STATE_CHANGED,
-            NodeState.LOCKED, caller.getName()));
+                NodeState.LOCKED, caller.getName()));
         return true;
     }
 

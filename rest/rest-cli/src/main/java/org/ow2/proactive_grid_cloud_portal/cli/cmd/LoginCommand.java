@@ -48,6 +48,7 @@ import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
 
+
 public class LoginCommand extends AbstractLoginCommand implements Command {
 
     public static final String USERNAME = "org.ow2.proactive_grid_cloud_portal.cli.cmd.LoginCommand.username";
@@ -60,24 +61,21 @@ public class LoginCommand extends AbstractLoginCommand implements Command {
     }
 
     @Override
-    protected String login(ApplicationContext currentContext)
-            throws CLIException {
+    protected String login(ApplicationContext currentContext) throws CLIException {
         String password = currentContext.getProperty(PASSWORD, String.class);
         if (password == null) {
             password = new String(readPassword(currentContext, "password:"));
         }
         HttpPost request = new HttpPost(currentContext.getResourceUrl("login"));
-        StringEntity entity = new StringEntity("username=" + username
-                + "&password=" + password, APPLICATION_FORM_URLENCODED);
+        StringEntity entity = new StringEntity("username=" + username + "&password=" + password,
+            APPLICATION_FORM_URLENCODED);
         request.setEntity(entity);
         HttpResponseWrapper response = execute(request, currentContext);
         if (statusCode(OK) == statusCode(response)) {
             return StringUtility.responseAsString(response).trim();
         } else {
-            handleError("An error occurred while logging:", response,
-                    currentContext);
-            throw new CLIException(REASON_OTHER,
-                    "An error occurred while logging.");
+            handleError("An error occurred while logging:", response, currentContext);
+            throw new CLIException(REASON_OTHER, "An error occurred while logging.");
         }
     }
 

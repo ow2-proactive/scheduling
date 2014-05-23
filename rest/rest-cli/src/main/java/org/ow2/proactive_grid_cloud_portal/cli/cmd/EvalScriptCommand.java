@@ -51,6 +51,7 @@ import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.FileUtility;
 
+
 public class EvalScriptCommand extends AbstractCommand implements Command {
 
     private String scriptPathname;
@@ -66,8 +67,7 @@ public class EvalScriptCommand extends AbstractCommand implements Command {
         ScriptEngine engine = currentContext.getEngine();
         Writer writer = currentContext.getDevice().getWriter();
         if (scriptArgs != null) {
-            engine.getContext().getBindings(ScriptContext.ENGINE_SCOPE)
-                    .putAll(bindings(scriptArgs));
+            engine.getContext().getBindings(ScriptContext.ENGINE_SCOPE).putAll(bindings(scriptArgs));
         }
         String script = FileUtility.readFileToString(new File(scriptPathname));
         try {

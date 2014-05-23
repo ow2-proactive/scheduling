@@ -532,10 +532,8 @@ public class RMNodeImpl implements RMNode, Serializable {
     }
 
     @Override
-    public RMNodeEvent createNodeEvent(RMEventType eventType, NodeState previousNodeState,
-            String initiator) {
-        RMNodeEvent rmNodeEvent = new RMNodeEvent(toNodeDescriptor(), eventType, previousNodeState,
-                initiator);
+    public RMNodeEvent createNodeEvent(RMEventType eventType, NodeState previousNodeState, String initiator) {
+        RMNodeEvent rmNodeEvent = new RMNodeEvent(toNodeDescriptor(), eventType, previousNodeState, initiator);
         // The rm node always keeps track on its last event, this is needed for rm node events logic
         if (eventType != null) {
             switch (eventType) {

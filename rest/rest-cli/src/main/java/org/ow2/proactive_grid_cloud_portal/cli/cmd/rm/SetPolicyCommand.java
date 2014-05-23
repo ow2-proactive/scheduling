@@ -60,6 +60,7 @@ import org.ow2.proactive_grid_cloud_portal.cli.json.PluginView;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.FileUtility;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
 
+
 public class SetPolicyCommand extends AbstractCommand implements Command {
     public static final String SET_POLICY = "org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.SetPolicyCommand.setPolicy";
     private String policyType;
@@ -81,36 +82,31 @@ public class SetPolicyCommand extends AbstractCommand implements Command {
     public void execute(ApplicationContext currentContext) throws CLIException {
         Map<String, PluginView> knownPolicies = currentContext.getPolicies();
         if (knownPolicies == null) {
-            HttpGet request = new HttpGet(
-                    currentContext.getResourceUrl("policies"));
+            HttpGet request = new HttpGet(currentContext.getResourceUrl("policies"));
             HttpResponseWrapper response = execute(request, currentContext);
             if (statusCode(OK) == statusCode(response)) {
                 knownPolicies = new HashMap<String, PluginView>();
-                List<PluginView> pluginViewList = readValue(response,
-                        new TypeReference<List<PluginView>>() {
-                        }, currentContext);
+                List<PluginView> pluginViewList = readValue(response, new TypeReference<List<PluginView>>() {
+                }, currentContext);
                 for (PluginView pluginView : pluginViewList) {
                     knownPolicies.put(pluginView.getPluginName(), pluginView);
                 }
                 currentContext.setPolicies(knownPolicies);
             } else {
-                throw new CLIException(REASON_OTHER,
-                        "Unable to retrieve known policy types.");
+                throw new CLIException(REASON_OTHER, "Unable to retrieve known policy types.");
             }
         }
 
         PluginView pluginView = knownPolicies.get(policyType);
 
         if (pluginView == null) {
-            throw new CLIException(REASON_INVALID_ARGUMENTS, String.format(
-                    "Unknown policy type: %s", policyType));
+            throw new CLIException(REASON_INVALID_ARGUMENTS, String.format("Unknown policy type: %s",
+                    policyType));
         }
-        ConfigurableFieldView[] configurableFields = pluginView
-                .getConfigurableFields();
+        ConfigurableFieldView[] configurableFields = pluginView.getConfigurableFields();
         if (configurableFields.length != policyArgs.length) {
             throw new CLIException(REASON_INVALID_ARGUMENTS, String.format(
-                    "Invalid number of arguments specified for '%s' type.",
-                    policyType));
+                    "Invalid number of arguments specified for '%s' type.", policyType));
         }
 
         StringBuilder buffer = new StringBuilder();

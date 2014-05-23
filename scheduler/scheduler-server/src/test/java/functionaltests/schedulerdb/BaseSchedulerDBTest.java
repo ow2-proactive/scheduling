@@ -344,8 +344,10 @@ public class BaseSchedulerDBTest extends ProActiveTest {
 
         cleaner.killAliveProcesses();
 
-        Configuration config = new Configuration().configure(new File(PASchedulerProperties
-                .getAbsolutePath("scheduler/scheduler-server/src/test/resources/functionaltests/config/hibernate.cfg.xml")));
+        Configuration config = new Configuration()
+                .configure(new File(
+                    PASchedulerProperties
+                            .getAbsolutePath("scheduler/scheduler-server/src/test/resources/functionaltests/config/hibernate.cfg.xml")));
         dbManager = new SchedulerDBManager(config, true);
     }
 

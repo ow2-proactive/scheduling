@@ -43,6 +43,7 @@ import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.FileUtility;
 
+
 public class SetSessionFileCommand extends AbstractCommand implements Command {
     private String sessionFile;
 
@@ -57,8 +58,8 @@ public class SetSessionFileCommand extends AbstractCommand implements Command {
             currentContext.setSessionId(FileUtility.readFileToString(file));
 
         } else {
-            throw new CLIException(CLIException.REASON_INVALID_ARGUMENTS,
-                    String.format("File does not exist: %s", sessionFile));
+            throw new CLIException(CLIException.REASON_INVALID_ARGUMENTS, String.format(
+                    "File does not exist: %s", sessionFile));
         }
     }
 }

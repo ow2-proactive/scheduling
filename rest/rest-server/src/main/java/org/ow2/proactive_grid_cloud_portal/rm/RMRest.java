@@ -108,7 +108,7 @@ public class RMRest implements RMRestInterface {
 
     protected static final String[] dataSources = { //
     // "AverageInactivity", // redundant with AverageActivity
-    // "ToBeReleasedNodesCo", // useless info
+            // "ToBeReleasedNodesCo", // useless info
             "BusyNodesCount", //
             "FreeNodesCount", //
             "DownNodesCount", //
@@ -122,14 +122,12 @@ public class RMRest implements RMRestInterface {
     private RMProxyUserInterface checkAccess(String sessionId) throws NotConnectedException {
         Session session = sessionStore.get(sessionId);
         if (session == null) {
-            throw new NotConnectedException(
-              "you are not connected to the scheduler, you should log on first");
+            throw new NotConnectedException("you are not connected to the scheduler, you should log on first");
         }
         RMProxyUserInterface s = session.getRM();
 
         if (s == null) {
-            throw new NotConnectedException(
-              "you are not connected to the scheduler, you should log on first");
+            throw new NotConnectedException("you are not connected to the scheduler, you should log on first");
         }
 
         return session.getRM();
@@ -155,7 +153,7 @@ public class RMRest implements RMRestInterface {
 
         Session session = sessionStore.create();
         session.connectToRM(new CredData(CredData.parseLogin(username), CredData.parseDomain(username),
-          password));
+            password));
         return session.getSessionId();
 
     }
@@ -200,8 +198,8 @@ public class RMRest implements RMRestInterface {
             Credentials credentials = Credentials.getCredentials(multipart.getCredential());
             session.connectToRM(credentials);
         } else {
-            CredData credData = new CredData(CredData.parseLogin(multipart.getUsername()),
-                CredData.parseDomain(multipart.getUsername()), multipart.getPassword(), multipart.getSshKey());
+            CredData credData = new CredData(CredData.parseLogin(multipart.getUsername()), CredData
+                    .parseDomain(multipart.getUsername()), multipart.getPassword(), multipart.getSshKey());
             session.connectToRM(credData);
         }
 
@@ -276,9 +274,10 @@ public class RMRest implements RMRestInterface {
     @POST
     @Path("node")
     @Produces("application/json")
-    public boolean addNode(@HeaderParam("sessionid") String sessionId,
-            @FormParam("nodeurl") String url,
-            @FormParam("nodesource") String nodesource) throws NotConnectedException {
+    public boolean addNode(@HeaderParam("sessionid")
+    String sessionId, @FormParam("nodeurl")
+    String url, @FormParam("nodesource")
+    String nodesource) throws NotConnectedException {
         ResourceManager rm = checkAccess(sessionId);
         if (nodesource == null) {
             return rm.addNode(url).getBooleanValue();
@@ -579,10 +578,13 @@ public class RMRest implements RMRestInterface {
     @GZIP
     @Produces("application/json")
     @Path("node/mbean/history")
-    public String getNodeMBeanHistory(@HeaderParam("sessionid") String sessionId, @QueryParam("nodejmxurl") String nodeJmxUrl,
-                                      @QueryParam("objectname") String objectName, @QueryParam("attrs") List<String> attrs,
-                                      @QueryParam("range") String range) throws InstanceNotFoundException, IntrospectionException,
-            ReflectionException, IOException, NotConnectedException, MalformedObjectNameException, NullPointerException, MBeanException {
+    public String getNodeMBeanHistory(@HeaderParam("sessionid")
+    String sessionId, @QueryParam("nodejmxurl")
+    String nodeJmxUrl, @QueryParam("objectname")
+    String objectName, @QueryParam("attrs")
+    List<String> attrs, @QueryParam("range")
+    String range) throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException,
+            NotConnectedException, MalformedObjectNameException, NullPointerException, MBeanException {
 
         // checking that still connected to the RM
         RMProxyUserInterface rmProxy = checkAccess(sessionId);
@@ -621,10 +623,13 @@ public class RMRest implements RMRestInterface {
     @GZIP
     @Produces("application/json")
     @Path("node/mbeans/history")
-    public Object getNodeMBeansHistory(@HeaderParam("sessionid") String sessionId, @QueryParam("nodejmxurl") String nodeJmxUrl,
-                                      @QueryParam("objectname") String objectNames, @QueryParam("attrs") List<String> attrs,
-                                      @QueryParam("range") String range) throws InstanceNotFoundException, IntrospectionException,
-            ReflectionException, IOException, NotConnectedException, MalformedObjectNameException, NullPointerException, MBeanException {
+    public Object getNodeMBeansHistory(@HeaderParam("sessionid")
+    String sessionId, @QueryParam("nodejmxurl")
+    String nodeJmxUrl, @QueryParam("objectname")
+    String objectNames, @QueryParam("attrs")
+    List<String> attrs, @QueryParam("range")
+    String range) throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException,
+            NotConnectedException, MalformedObjectNameException, NullPointerException, MBeanException {
 
         // checking that still connected to the RM
         RMProxyUserInterface rmProxy = checkAccess(sessionId);
@@ -913,8 +918,8 @@ public class RMRest implements RMRestInterface {
 
         RMProxyUserInterface rm = checkAccess(sessionId);
 
-        List<ScriptResult<Object>> results = rm.executeScript(script, scriptEngine,
-                TargetType.NODE_URL.name(), Collections.singleton(nodeUrl));
+        List<ScriptResult<Object>> results = rm.executeScript(script, scriptEngine, TargetType.NODE_URL
+                .name(), Collections.singleton(nodeUrl));
 
         if (results.isEmpty()) {
             throw new IllegalStateException("Empty results from script execution");
@@ -936,8 +941,8 @@ public class RMRest implements RMRestInterface {
 
         RMProxyUserInterface rm = checkAccess(sessionId);
 
-        return rm.executeScript(script, scriptEngine,
-                TargetType.NODESOURCE_NAME.name(), Collections.singleton(nodeSource));
+        return rm.executeScript(script, scriptEngine, TargetType.NODESOURCE_NAME.name(), Collections
+                .singleton(nodeSource));
     }
 
     @Override
@@ -953,7 +958,7 @@ public class RMRest implements RMRestInterface {
 
         RMProxyUserInterface rm = checkAccess(sessionId);
 
-        return rm.executeScript(script, scriptEngine,
-                TargetType.HOSTNAME.name(), Collections.singleton(host));
+        return rm
+                .executeScript(script, scriptEngine, TargetType.HOSTNAME.name(), Collections.singleton(host));
     }
 }

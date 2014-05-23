@@ -559,7 +559,10 @@ public class SchedulingService {
     }
 
     void handleException(Throwable t) {
-        logger.error("Unexpected exception in the scheduling thread - checking the connection to resource manager", t);
+        logger
+                .error(
+                        "Unexpected exception in the scheduling thread - checking the connection to resource manager",
+                        t);
         try {
             // check if the connection to RM is still active
             // if not reactivate it for all the proxies
@@ -797,11 +800,11 @@ public class SchedulingService {
         } catch (ProgressPingerException e) {
             //thrown by when forked JVM process is dead, which is a normal scenario at the end of the task
             if (tlogger.isTraceEnabled()) {
-               tlogger.trace(task.getId(), "getProgress failed", e);
+                tlogger.trace(task.getId(), "getProgress failed", e);
             }
         } catch (Throwable t) {
             RunningTaskData runningTask = jobs.getRunningTask(task.getId());
-            if (runningTask!=null) {
+            if (runningTask != null) {
                 int attempts = runningTask.increaseAndGetPingAttempts();
                 if (attempts > PASchedulerProperties.SCHEDULER_NODE_PING_ATTEMPTS.getValueAsInt()) {
                     tlogger.info(task.getId(), "node failed", t);

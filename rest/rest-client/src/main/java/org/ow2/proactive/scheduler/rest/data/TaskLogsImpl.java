@@ -36,13 +36,14 @@ package org.ow2.proactive.scheduler.rest.data;
 
 import org.ow2.proactive.scheduler.common.task.TaskLogs;
 
+
 public class TaskLogsImpl implements TaskLogs {
     private static final long serialVersionUID = 1L;
 
     private String stdOutLogs;
     private String stdErrLogs;
     private String allLogs;
-    
+
     public TaskLogsImpl(String stdOutLogs, String stdErrLogs, String allLogs) {
         this.stdOutLogs = stdOutLogs;
         this.allLogs = allLogs;

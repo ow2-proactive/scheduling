@@ -59,8 +59,9 @@ import org.ow2.proactive.scheduler.common.usage.SchedulerUsage;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingService;
 import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
-//import org.ow2.proactive.scheduler.policy.Policy;
 
+
+//import org.ow2.proactive.scheduler.policy.Policy;
 
 /**
  * Scheduler interface for someone connected to the scheduler. This is suitable for every role in the Scheduler<br>

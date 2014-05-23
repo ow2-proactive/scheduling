@@ -154,9 +154,8 @@ public final class AddGetReleaseRemoveTest extends RMConsecutive {
 
         Assert.assertTrue("Invalid value of the usedNodeTime attribute (usedNodeTime=" + usedNodeTime + ")",
                 (usedNodeTime >= GR_DURATION));
-        Assert.assertTrue(
-                "Invalid value of the usedNodeTime attribute (getReleaseMaxDuration=" + getReleaseMaxDuration + ")",
-                (usedNodeTime <= getReleaseMaxDuration));
+        Assert.assertTrue("Invalid value of the usedNodeTime attribute (getReleaseMaxDuration=" +
+            getReleaseMaxDuration + ")", (usedNodeTime <= getReleaseMaxDuration));
         Assert.assertTrue("Invalid value of the providedNodeTime attribute",
                 (providedNodeTime >= usedNodeTime) && (providedNodeTime <= addRemoveMaxDuration));
         if (!shouldBeExecutedInConsecutiveMode(this.getClass())) {

@@ -77,12 +77,9 @@ public class IntegerWrapper implements Serializable {
         return value;
     }
 
-	@Override
-	public boolean equals(Object obj) {
-		return (obj instanceof IntegerWrapper) ? value == ((IntegerWrapper) obj).value
-				: false;
-	}
-    
-    
+    @Override
+    public boolean equals(Object obj) {
+        return (obj instanceof IntegerWrapper) ? value == ((IntegerWrapper) obj).value : false;
+    }
 
 }

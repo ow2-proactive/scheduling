@@ -34,11 +34,10 @@ public class AutoUpdateInfrastructure extends HostsFileBasedInfrastructureManage
     public static final String NODESOURCE_CREDENTIALS = "nodesource.credentials";
 
     @Configurable(description = "Command that will be launched for every host")
-    protected String command =
-            "scp -o StrictHostKeyChecking=no ${pa.rm.home}/dist/war/rest/node.jar ${host.name}:/tmp/${node.name}.jar && " +
-            "ssh -o StrictHostKeyChecking=no ${host.name} " +
-            "\"${java.home}/bin/java -jar /tmp/${node.name}.jar -v ${nodesource.credentials} -n ${node.name} -s ${nodesource.name} -p 30000 -r ${rm.url} " +
-            "1>>/tmp/${node.name}.log 2>&1\"";
+    protected String command = "scp -o StrictHostKeyChecking=no ${pa.rm.home}/dist/war/rest/node.jar ${host.name}:/tmp/${node.name}.jar && "
+        + "ssh -o StrictHostKeyChecking=no ${host.name} "
+        + "\"${java.home}/bin/java -jar /tmp/${node.name}.jar -v ${nodesource.credentials} -n ${node.name} -s ${nodesource.name} -p 30000 -r ${rm.url} "
+        + "1>>/tmp/${node.name}.log 2>&1\"";
 
     @Override
     public void configure(Object... parameters) {
@@ -78,15 +77,15 @@ public class AutoUpdateInfrastructure extends HostsFileBasedInfrastructureManage
         String filledCommand = replaceProperties(command, localProperties);
         filledCommand = replaceProperties(filledCommand, System.getProperties());
 
-        final String pnURL = super.addDeployingNode(nodeName, filledCommand, "Deploying node on host " + host,
-                this.nodeTimeOut);
+        final String pnURL = super.addDeployingNode(nodeName, filledCommand,
+                "Deploying node on host " + host, this.nodeTimeOut);
         this.pnTimeout.put(pnURL, new Boolean(false));
 
         Process p;
         try {
             logger.debug("Deploying node: " + nodeName);
             logger.debug("Launching the command: " + filledCommand);
-            p = Runtime.getRuntime().exec(new String[] {"bash", "-c", filledCommand});
+            p = Runtime.getRuntime().exec(new String[] { "bash", "-c", filledCommand });
         } catch (IOException e1) {
             super.declareDeployingNodeLost(pnURL, "Cannot run command: " + filledCommand +
                 " - \n The following exception occurred: " + Formatter.stackTraceToString(e1));
@@ -157,10 +156,10 @@ public class AutoUpdateInfrastructure extends HostsFileBasedInfrastructureManage
 
     private String replaceProperties(String commandLine, Properties properties) {
 
-        for(Object prop: properties.keySet()) {
+        for (Object prop : properties.keySet()) {
             String propName = "${" + prop + "}";
             String propValue = properties.getProperty(prop.toString());
-            if (propValue!=null) {
+            if (propValue != null) {
                 commandLine = commandLine.replace(propName, propValue);
             }
         }

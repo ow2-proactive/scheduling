@@ -48,18 +48,17 @@ import javax.ws.rs.ext.MessageBodyReader;
 
 import org.apache.commons.io.IOUtils;
 
+
 public class WildCardTypeReader implements MessageBodyReader<String> {
 
     @Override
-    public boolean isReadable(Class<?> type, Type genericType,
-            Annotation[] annotations, MediaType mediaType) {
+    public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
         return WILDCARD_TYPE.equals(mediaType);
     }
 
     @Override
-    public String readFrom(Class<String> type, Type genericType,
-            Annotation[] annotations, MediaType mediaType,
-            MultivaluedMap<String, String> httpHeaders, InputStream entityStream)
+    public String readFrom(Class<String> type, Type genericType, Annotation[] annotations,
+            MediaType mediaType, MultivaluedMap<String, String> httpHeaders, InputStream entityStream)
             throws IOException, WebApplicationException {
         return IOUtils.toString(entityStream);
     }

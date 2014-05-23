@@ -47,111 +47,97 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 
+
 public abstract class ClientBase implements ISchedulerClient {
     private static final int calling_method_stack_index = 3;
 
     @Override
-    public void addEventListener(SchedulerEventListener arg0, boolean arg1,
-            SchedulerEvent... arg2) throws NotConnectedException,
-            PermissionException {
-        throw newUnsupportedOperationException();
-    }
-
-    @Override
-    public SchedulerState addEventListener(SchedulerEventListener arg0,
-            boolean arg1, boolean arg2, SchedulerEvent... arg3)
+    public void addEventListener(SchedulerEventListener arg0, boolean arg1, SchedulerEvent... arg2)
             throws NotConnectedException, PermissionException {
         throw newUnsupportedOperationException();
+    }
+
+    @Override
+    public SchedulerState addEventListener(SchedulerEventListener arg0, boolean arg1, boolean arg2,
+            SchedulerEvent... arg3) throws NotConnectedException, PermissionException {
+        throw newUnsupportedOperationException();
 
     }
 
     @Override
-    public boolean changePolicy(String arg0) throws NotConnectedException,
-            PermissionException {
+    public boolean changePolicy(String arg0) throws NotConnectedException, PermissionException {
         throw newUnsupportedOperationException();
     }
 
     @Override
-    public List<String> getGlobalSpaceURIs() throws NotConnectedException,
-            PermissionException {
+    public List<String> getGlobalSpaceURIs() throws NotConnectedException, PermissionException {
         throw newUnsupportedOperationException();
     }
 
     @Override
-    public SchedulerState getState() throws NotConnectedException,
-            PermissionException {
+    public SchedulerState getState() throws NotConnectedException, PermissionException {
         throw newUnsupportedOperationException();
     }
 
     @Override
-    public SchedulerState getState(boolean arg0) throws NotConnectedException,
-            PermissionException {
+    public SchedulerState getState(boolean arg0) throws NotConnectedException, PermissionException {
         throw newUnsupportedOperationException();
     }
 
     @Override
-    public TaskResult getTaskResultFromIncarnation(JobId arg0, String arg1,
-            int arg2) throws NotConnectedException, UnknownJobException,
-            UnknownTaskException, PermissionException {
+    public TaskResult getTaskResultFromIncarnation(JobId arg0, String arg1, int arg2)
+            throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         throw newUnsupportedOperationException();
     }
 
     @Override
-    public TaskResult getTaskResultFromIncarnation(String arg0, String arg1,
-            int arg2) throws NotConnectedException, UnknownJobException,
-            UnknownTaskException, PermissionException {
+    public TaskResult getTaskResultFromIncarnation(String arg0, String arg1, int arg2)
+            throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         throw newUnsupportedOperationException();
     }
 
     @Override
-    public List<String> getUserSpaceURIs() throws NotConnectedException,
-            PermissionException {
+    public List<String> getUserSpaceURIs() throws NotConnectedException, PermissionException {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public boolean killTask(JobId arg0, String arg1)
-            throws NotConnectedException, UnknownJobException,
+    public boolean killTask(JobId arg0, String arg1) throws NotConnectedException, UnknownJobException,
             UnknownTaskException, PermissionException {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public boolean killTask(String arg0, String arg1)
-            throws NotConnectedException, UnknownJobException,
+    public boolean killTask(String arg0, String arg1) throws NotConnectedException, UnknownJobException,
             UnknownTaskException, PermissionException {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void listenJobLogs(JobId arg0, AppenderProvider arg1)
-            throws NotConnectedException, UnknownJobException,
-            PermissionException {
+    public void listenJobLogs(JobId arg0, AppenderProvider arg1) throws NotConnectedException,
+            UnknownJobException, PermissionException {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void listenJobLogs(String arg0, AppenderProvider arg1)
-            throws NotConnectedException, UnknownJobException,
-            PermissionException {
+    public void listenJobLogs(String arg0, AppenderProvider arg1) throws NotConnectedException,
+            UnknownJobException, PermissionException {
         throw new UnsupportedOperationException();
     }
-    
+
     @Override
-    public boolean reloadPolicyConfiguration() throws NotConnectedException,
-            PermissionException {
+    public boolean reloadPolicyConfiguration() throws NotConnectedException, PermissionException {
         throw new UnsupportedOperationException();
     }
-    
+
     @Override
-    public void removeEventListener() throws NotConnectedException,
-            PermissionException {
+    public void removeEventListener() throws NotConnectedException, PermissionException {
         throw new UnsupportedOperationException();
     }
 
     private UnsupportedOperationException newUnsupportedOperationException() {
-        return new UnsupportedOperationException(String.format(
-                "%s does not implements %s(...).", className(), methodName()));
+        return new UnsupportedOperationException(String.format("%s does not implements %s(...).",
+                className(), methodName()));
     }
 
     private String className() {
@@ -159,8 +145,7 @@ public abstract class ClientBase implements ISchedulerClient {
     }
 
     private String methodName() {
-        return Thread.currentThread().getStackTrace()[calling_method_stack_index]
-                .getMethodName();
+        return Thread.currentThread().getStackTrace()[calling_method_stack_index].getMethodName();
     }
 
 }

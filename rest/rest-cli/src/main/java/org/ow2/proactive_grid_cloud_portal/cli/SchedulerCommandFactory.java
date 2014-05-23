@@ -52,9 +52,10 @@ import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.SchedImodeCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.HierarchicalMap;
 
+
 class SchedulerCommandFactory extends CommandFactory {
     private static final Map<String, Entry> schedSupportedCmdMap = new HierarchicalMap<String, Entry>(
-            CommandFactory.supportedCommandMap());
+        CommandFactory.supportedCommandMap());
 
     static {
         for (CommandSet.Entry entry : CommandSet.SCHED_ONLY) {
@@ -63,12 +64,9 @@ class SchedulerCommandFactory extends CommandFactory {
     }
 
     @Override
-    public List<Command> getCommandList(CommandLine cli,
-            ApplicationContext currentContext) {
-        Map<String, Command> commands = commandMapInstance(cli,
-                schedSupportedCmdMap);
-        List<Command> commandList = super.getCommandList(cli, commands,
-                currentContext);
+    public List<Command> getCommandList(CommandLine cli, ApplicationContext currentContext) {
+        Map<String, Command> commands = commandMapInstance(cli, schedSupportedCmdMap);
+        List<Command> commandList = super.getCommandList(cli, commands, currentContext);
         if (cli.hasOption(opt(SCHED_HELP))) {
             return commandList;
         }

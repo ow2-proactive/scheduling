@@ -281,11 +281,9 @@ public class JobFactory_stax extends JobFactory {
     /*
      * Validate the given job descriptor
      */
-    private void validate(File file) throws XMLStreamException,
-            JobCreationException, VerifierConfigurationException, SAXException,
-            IOException {
-        InputStream schemaStream = this.getClass().getResourceAsStream(
-                findSchemaByNamespaceUsed(file));
+    private void validate(File file) throws XMLStreamException, JobCreationException,
+            VerifierConfigurationException, SAXException, IOException {
+        InputStream schemaStream = this.getClass().getResourceAsStream(findSchemaByNamespaceUsed(file));
         ValidationUtil.validate(file, schemaStream);
     }
 
@@ -1581,7 +1579,7 @@ public class JobFactory_stax extends JobFactory {
     private String replace(String str) throws JobCreationException {
         return replace(str, false);
     }
-    
+
     private String replace(String str, boolean dryRun) throws JobCreationException {
         return filterAndUpdate(str, dryRun, this.variables);
     }
@@ -1720,8 +1718,8 @@ public class JobFactory_stax extends JobFactory {
             }
         }
     }
-    
-    private static void resolveCleaningScripts(TaskFlowJob job, Map<String,String> variables) {
+
+    private static void resolveCleaningScripts(TaskFlowJob job, Map<String, String> variables) {
         for (Task task : job.getTasks()) {
             Script<?> cScript = task.getCleaningScript();
             if (cScript != null) {

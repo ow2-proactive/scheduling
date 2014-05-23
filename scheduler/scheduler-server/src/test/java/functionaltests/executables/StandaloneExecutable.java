@@ -57,7 +57,7 @@ public class StandaloneExecutable extends JavaStandaloneExecutable {
 
     private void assertFileExists(File file) {
         if (!file.exists()) {
-            throw new RuntimeException("File does not exist : "+file);
+            throw new RuntimeException("File does not exist : " + file);
         }
     }
 
@@ -75,7 +75,7 @@ public class StandaloneExecutable extends JavaStandaloneExecutable {
         // verifying node url access
         List<String> nodesUrl = getNodesURL();
 
-        if (nodesUrl == null || nodesUrl.size() ==  0) {
+        if (nodesUrl == null || nodesUrl.size() == 0) {
             throw new RuntimeException("Unexpected empty list of urls");
         }
 
@@ -83,7 +83,6 @@ public class StandaloneExecutable extends JavaStandaloneExecutable {
 
         // simply to verify that it does not throw exceptions
         int index = getIterationIndex();
-
 
         // verifying data space access
         Logger.getLogger(RemoteSpaceAdapter.class).setLevel(Level.DEBUG);
@@ -103,10 +102,11 @@ public class StandaloneExecutable extends JavaStandaloneExecutable {
         String line1 = "Hello World";
         pw.println(line1);
         pw.close();
-        BufferedReader br =  new BufferedReader(new InputStreamReader(getUserSpace().getInputStream("/tutu.txt")));
+        BufferedReader br = new BufferedReader(new InputStreamReader(getUserSpace().getInputStream(
+                "/tutu.txt")));
         String line2 = br.readLine();
         if (!line1.equals(line2)) {
-            throw new RuntimeException("Wrong line received : "+line2);
+            throw new RuntimeException("Wrong line received : " + line2);
         }
         br.close();
 

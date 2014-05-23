@@ -79,7 +79,8 @@ public class SessionStore {
 
     public void terminateAll() {
         synchronized (sessions) {
-            for (Iterator<Map.Entry<String, Session>> iterator = sessions.entrySet().iterator(); iterator.hasNext(); ) {
+            for (Iterator<Map.Entry<String, Session>> iterator = sessions.entrySet().iterator(); iterator
+                    .hasNext();) {
                 Map.Entry<String, Session> sessionEntry = iterator.next();
                 Session session = sessionEntry.getValue();
                 iterator.remove();
@@ -91,7 +92,8 @@ public class SessionStore {
     public int terminateExpiredSessions(long timeoutDelay) {
         synchronized (sessions) {
             int terminatedSessionCounter = 0;
-            for (Iterator<Map.Entry<String, Session>> iterator = sessions.entrySet().iterator(); iterator.hasNext(); ) {
+            for (Iterator<Map.Entry<String, Session>> iterator = sessions.entrySet().iterator(); iterator
+                    .hasNext();) {
                 Map.Entry<String, Session> sessionEntry = iterator.next();
                 Session session = sessionEntry.getValue();
                 if (session.isExpired(timeoutDelay)) {

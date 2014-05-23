@@ -43,6 +43,7 @@ import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractJobCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 
+
 public class ResumeJobCommand extends AbstractJobCommand implements Command {
 
     public ResumeJobCommand(String jobId) {
@@ -54,8 +55,7 @@ public class ResumeJobCommand extends AbstractJobCommand implements Command {
 
         SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
         try {
-            boolean success = scheduler.resumeJob(
-                    currentContext.getSessionId(), jobId);
+            boolean success = scheduler.resumeJob(currentContext.getSessionId(), jobId);
             resultStack(currentContext).push(success);
             if (success) {
                 writeLine(currentContext, "%s resumed successfully.", job());
@@ -63,9 +63,8 @@ public class ResumeJobCommand extends AbstractJobCommand implements Command {
                 writeLine(currentContext, "Cannot resume %s.", job());
             }
         } catch (Exception e) {
-            handleError(String.format(
-                    "An error occurred while attempting to resume: %s", job()),
-                    e, currentContext);
+            handleError(String.format("An error occurred while attempting to resume: %s", job()), e,
+                    currentContext);
         }
     }
 

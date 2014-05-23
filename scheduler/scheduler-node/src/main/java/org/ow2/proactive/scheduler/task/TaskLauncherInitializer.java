@@ -87,7 +87,7 @@ public class TaskLauncherInitializer implements Serializable {
     private NamingService namingService;
     private String owner;
     private boolean preciousLogs;
-    
+
     private Map<String, String> variables;
     private int pingPeriod;
     private int pingAttempts;
@@ -351,8 +351,7 @@ public class TaskLauncherInitializer implements Serializable {
     public void setPreciousLogs(boolean preciousLogs) {
         this.preciousLogs = preciousLogs;
     }
-    
-    
+
     public void setVariables(Map<String, String> variables) {
         this.variables = variables;
     }

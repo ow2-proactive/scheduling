@@ -111,17 +111,15 @@ public class TaskResultImpl implements TaskResult {
 
     /** All the properties propagated through Exporter.propagateProperty() */
     private Map<String, BigString> propagatedProperties;
-    
+
     /**
      * A map which contains the propagated variables of the previous (dependent)
      * tasks.
      */
     private Map<String, byte[]> propagatedVariables;
-    
-    public TaskResultImpl(TaskId id, byte[] serializedValue,
-            byte[] serializedException, TaskLogs output,
-            Map<String, String> propergatedProperties,
-            Map<String, byte[]> propagatedVariables) {
+
+    public TaskResultImpl(TaskId id, byte[] serializedValue, byte[] serializedException, TaskLogs output,
+            Map<String, String> propergatedProperties, Map<String, byte[]> propagatedVariables) {
         this(id, serializedValue, serializedException, output, propergatedProperties);
         this.propagatedVariables = propagatedVariables;
     }
@@ -609,14 +607,14 @@ public class TaskResultImpl implements TaskResult {
      * @param propagatedVariables a map of propagated variables
      */
     public void setPropagatedVariables(Map<String, byte[]> propagatedVariables) {
-        this.propagatedVariables =  propagatedVariables;
+        this.propagatedVariables = propagatedVariables;
     }
-    
+
     /**
      * Returns a map of propagated variables.
      */
     @Override
     public Map<String, byte[]> getPropagatedVariables() {
         return propagatedVariables;
-    }    
+    }
 }

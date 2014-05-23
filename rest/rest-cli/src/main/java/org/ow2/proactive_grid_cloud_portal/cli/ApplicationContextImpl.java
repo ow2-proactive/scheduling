@@ -17,6 +17,7 @@ import org.jboss.resteasy.client.jaxrs.engines.ApacheHttpClient4Engine;
 
 import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_OTHER;
 
+
 public class ApplicationContextImpl implements ApplicationContext {
 
     private static final String DEVICE = "org.ow2.proactive_grid_cloud_portal.cli.ApplicationContextImpl.deviceImpl";
@@ -65,19 +66,16 @@ public class ApplicationContextImpl implements ApplicationContext {
             try {
                 HttpUtility.setInsecureAccess(client);
             } catch (Exception e) {
-                throw new CLIException(REASON_OTHER,
-                  "Cannot disable SSL verification.", e);
+                throw new CLIException(REASON_OTHER, "Cannot disable SSL verification.", e);
             }
         }
-        return new SchedulerRestClient(restServerUrl,
-          new ApacheHttpClient4Engine(client));
+        return new SchedulerRestClient(restServerUrl, new ApacheHttpClient4Engine(client));
     }
 
     @Override
     public String getResourceUrl(String resource) {
-        return (new StringBuilder()).append(getRestServerUrl()).append('/')
-                .append(getResourceType()).append('/').append(resource)
-                .toString();
+        return (new StringBuilder()).append(getRestServerUrl()).append('/').append(getResourceType()).append(
+                '/').append(resource).toString();
     }
 
     @Override
@@ -122,8 +120,7 @@ public class ApplicationContextImpl implements ApplicationContext {
             ScriptEngineManager mgr = new ScriptEngineManager();
             engine = mgr.getEngineByExtension("js");
             if (engine == null) {
-                throw new CLIException(REASON_OTHER,
-                        "Cannot obtain JavaScript engine instance.");
+                throw new CLIException(REASON_OTHER, "Cannot obtain JavaScript engine instance.");
             }
             engine.getContext().setWriter(getDevice().getWriter());
             setProperty(SCRIPT_ENGINE, engine);
@@ -210,8 +207,7 @@ public class ApplicationContextImpl implements ApplicationContext {
         return resultStack;
     }
 
-    private static class ApplicationContextHolder extends
-            ThreadLocal<ApplicationContextImpl> {
+    private static class ApplicationContextHolder extends ThreadLocal<ApplicationContextImpl> {
         @Override
         protected ApplicationContextImpl initialValue() {
             return new ApplicationContextImpl();

@@ -87,11 +87,11 @@ public class SessionStoreTest {
         verifyZeroInteractions(schedulerProxyFactory);
         assertNull(session.getScheduler());
 
-        when(schedulerProxyFactory.connectToScheduler(Matchers.<CredData>any())).thenReturn(
-          mock(SchedulerProxyUserInterface.class));
-        when(schedulerProxyFactory.connectToRM(Matchers.<CredData>any())).thenReturn(
-          mock(RMProxyUserInterface.class));
-        session.connectToScheduler(new CredData("login","password"));
+        when(schedulerProxyFactory.connectToScheduler(Matchers.<CredData> any())).thenReturn(
+                mock(SchedulerProxyUserInterface.class));
+        when(schedulerProxyFactory.connectToRM(Matchers.<CredData> any())).thenReturn(
+                mock(RMProxyUserInterface.class));
+        session.connectToScheduler(new CredData("login", "password"));
 
         assertNotNull(session.getScheduler());
         assertNotNull(session.getRM());
@@ -106,11 +106,11 @@ public class SessionStoreTest {
         verifyZeroInteractions(schedulerProxyFactory);
         assertNull(session.getScheduler());
 
-        when(schedulerProxyFactory.connectToScheduler(Matchers.<CredData>any())).thenReturn(
-          mock(SchedulerProxyUserInterface.class));
-        when(schedulerProxyFactory.connectToRM(Matchers.<CredData>any())).thenReturn(
-          mock(RMProxyUserInterface.class));
-        session.connectToRM(new CredData("login","password"));
+        when(schedulerProxyFactory.connectToScheduler(Matchers.<CredData> any())).thenReturn(
+                mock(SchedulerProxyUserInterface.class));
+        when(schedulerProxyFactory.connectToRM(Matchers.<CredData> any())).thenReturn(
+                mock(RMProxyUserInterface.class));
+        session.connectToRM(new CredData("login", "password"));
 
         assertNotNull(session.getRM());
         assertNotNull(session.getScheduler());

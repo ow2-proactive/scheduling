@@ -50,6 +50,7 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
 import static org.apache.http.entity.ContentType.APPLICATION_XML;
 import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_INVALID_ARGUMENTS;
 
+
 public class SubmitJobCommand extends AbstractCommand implements Command {
     private String pathname;
 
@@ -61,28 +62,23 @@ public class SubmitJobCommand extends AbstractCommand implements Command {
     public void execute(ApplicationContext currentContext) throws CLIException {
         File jobFile = new File(pathname);
         if (!jobFile.exists()) {
-            throw new CLIException(REASON_INVALID_ARGUMENTS, String.format(
-                    "'%s' does not exist.", pathname));
+            throw new CLIException(REASON_INVALID_ARGUMENTS, String.format("'%s' does not exist.", pathname));
         }
         try {
-            String contentType = URLConnection.getFileNameMap().getContentTypeFor(
-                    pathname);
+            String contentType = URLConnection.getFileNameMap().getContentTypeFor(pathname);
             JobIdData jobId;
             if (APPLICATION_XML.getMimeType().equals(contentType)) {
-                jobId = currentContext.getRestClient().submitXml(
-                        currentContext.getSessionId(), new FileInputStream(jobFile));
+                jobId = currentContext.getRestClient().submitXml(currentContext.getSessionId(),
+                        new FileInputStream(jobFile));
             } else {
-                jobId = currentContext.getRestClient().submitJobArchive(
-                        currentContext.getSessionId(), new FileInputStream(jobFile));
+                jobId = currentContext.getRestClient().submitJobArchive(currentContext.getSessionId(),
+                        new FileInputStream(jobFile));
             }
-            writeLine(currentContext,
-                    "Job('%s') successfully submitted: job('%d')", pathname,
-                    jobId.getId());
+            writeLine(currentContext, "Job('%s') successfully submitted: job('%d')", pathname, jobId.getId());
             resultStack(currentContext).push(jobId);
         } catch (Exception e) {
-            handleError(String.format(
-                    "An error occurred while attempting to submit job('%s'):",
-                    pathname), e, currentContext);
+            handleError(String.format("An error occurred while attempting to submit job('%s'):", pathname),
+                    e, currentContext);
         }
     }
 }

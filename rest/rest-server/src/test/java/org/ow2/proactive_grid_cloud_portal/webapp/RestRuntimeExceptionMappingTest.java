@@ -64,7 +64,8 @@ public class RestRuntimeExceptionMappingTest extends RestTestServer {
 
     @Test
     public void unknown_path_404_exception() throws Exception {
-        GetMethod unknownPath = new GetMethod("http://localhost:" + port + "/" + "rest/a_path_that_does_not_exist");
+        GetMethod unknownPath = new GetMethod("http://localhost:" + port + "/" +
+            "rest/a_path_that_does_not_exist");
 
         new HttpClient().executeMethod(unknownPath);
         ExceptionToJson exception = readResponse(unknownPath);

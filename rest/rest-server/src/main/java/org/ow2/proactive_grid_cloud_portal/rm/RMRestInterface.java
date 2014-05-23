@@ -119,9 +119,10 @@ public interface RMRestInterface {
     @POST
     @Path("node")
     @Produces("application/json")
-    boolean addNode(@HeaderParam("sessionid") String sessionId,
-            @FormParam("nodeurl") String url,
-            @FormParam("nodesource") String nodesource) throws NotConnectedException;
+    boolean addNode(@HeaderParam("sessionid")
+    String sessionId, @FormParam("nodeurl")
+    String url, @FormParam("nodesource")
+    String nodesource) throws NotConnectedException;
 
     @GET
     @Path("node/isavailable")
@@ -203,12 +204,12 @@ public interface RMRestInterface {
     @Produces("application/json")
     @Path("node/mbean/history")
     Object getNodeMBeanHistory(@HeaderParam("sessionid")
-                            String sessionId, @QueryParam("nodejmxurl")
-                            String nodeJmxUrl, @QueryParam("objectname")
-                            String objectName, @QueryParam("attrs")
-                            List<String> attrs, @QueryParam("range")
-                            String range) throws InstanceNotFoundException, IntrospectionException, ReflectionException,
-            IOException, NotConnectedException, MalformedObjectNameException, NullPointerException, MBeanException;
+    String sessionId, @QueryParam("nodejmxurl")
+    String nodeJmxUrl, @QueryParam("objectname")
+    String objectName, @QueryParam("attrs")
+    List<String> attrs, @QueryParam("range")
+    String range) throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException,
+            NotConnectedException, MalformedObjectNameException, NullPointerException, MBeanException;
 
     @GET
     @GZIP
@@ -226,12 +227,12 @@ public interface RMRestInterface {
     @Produces("application/json")
     @Path("node/mbeans/history")
     Object getNodeMBeansHistory(@HeaderParam("sessionid")
-                               String sessionId, @QueryParam("nodejmxurl")
-                               String nodeJmxUrl, @QueryParam("objectname")
-                               String objectNames, @QueryParam("attrs")
-                               List<String> attrs, @QueryParam("range")
-                               String range) throws InstanceNotFoundException, IntrospectionException, ReflectionException,
-            IOException, NotConnectedException, MalformedObjectNameException, NullPointerException, MBeanException;
+    String sessionId, @QueryParam("nodejmxurl")
+    String nodeJmxUrl, @QueryParam("objectname")
+    String objectNames, @QueryParam("attrs")
+    List<String> attrs, @QueryParam("range")
+    String range) throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException,
+            NotConnectedException, MalformedObjectNameException, NullPointerException, MBeanException;
 
     @GET
     @Path("shutdown")

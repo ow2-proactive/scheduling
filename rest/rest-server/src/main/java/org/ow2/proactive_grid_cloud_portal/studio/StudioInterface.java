@@ -59,8 +59,8 @@ public interface StudioInterface {
     @Path("login")
     @Produces("application/json")
     String login(@FormParam("username")
-                 String username, @FormParam("password")
-                 String password) throws KeyException, LoginException, RMException, ActiveObjectCreationException,
+    String username, @FormParam("password")
+    String password) throws KeyException, LoginException, RMException, ActiveObjectCreationException,
             NodeException, SchedulerRestException;
 
     @POST
@@ -68,69 +68,81 @@ public interface StudioInterface {
     @Path("login")
     @Produces("application/json")
     String loginWithCredential(@MultipartForm
-                               LoginForm multipart) throws ActiveObjectCreationException, NodeException, KeyException, IOException,
+    LoginForm multipart) throws ActiveObjectCreationException, NodeException, KeyException, IOException,
             LoginException, RMException, SchedulerRestException;
-
 
     @GET
     @Path("connected")
     @Produces("application/json")
-    boolean isConnected(@HeaderParam("sessionid") String sessionId);
+    boolean isConnected(@HeaderParam("sessionid")
+    String sessionId);
 
     @GET
     @Path("workflows")
     @Produces("application/json")
-    ArrayList<Workflow> getWorkflows(@HeaderParam("sessionid") String sessionId) throws NotConnectedException;
+    ArrayList<Workflow> getWorkflows(@HeaderParam("sessionid")
+    String sessionId) throws NotConnectedException;
 
     @POST
     @Path("workflows")
     @Produces("application/json")
-    long createWorkflow(@HeaderParam("sessionid") String sessionId,
-                           @FormParam("name") String name, @FormParam("xml") String xml, @FormParam("metadata") String metadata) throws NotConnectedException;
+    long createWorkflow(@HeaderParam("sessionid")
+    String sessionId, @FormParam("name")
+    String name, @FormParam("xml")
+    String xml, @FormParam("metadata")
+    String metadata) throws NotConnectedException;
 
     @POST
     @Path("workflows/{id}")
     @Produces("application/json")
-    boolean updateWorkflow(@HeaderParam("sessionid") String sessionId,
-                           @PathParam("id") String workflowId,
-                           @FormParam("name") String name, @FormParam("xml") String xml, @FormParam("metadata") String metadata) throws NotConnectedException, IOException;
+    boolean updateWorkflow(@HeaderParam("sessionid")
+    String sessionId, @PathParam("id")
+    String workflowId, @FormParam("name")
+    String name, @FormParam("xml")
+    String xml, @FormParam("metadata")
+    String metadata) throws NotConnectedException, IOException;
 
     @DELETE
     @Path("workflows/{id}")
     @Produces("application/json")
-    boolean deleteWorkflow(@HeaderParam("sessionid") String sessionId,
-                       @PathParam("id") String workflowId) throws NotConnectedException, IOException;
+    boolean deleteWorkflow(@HeaderParam("sessionid")
+    String sessionId, @PathParam("id")
+    String workflowId) throws NotConnectedException, IOException;
 
     @GET
     @Path("scripts")
     @Produces("application/json")
-    ArrayList<Script> getScripts(@HeaderParam("sessionid") String sessionId) throws NotConnectedException;
+    ArrayList<Script> getScripts(@HeaderParam("sessionid")
+    String sessionId) throws NotConnectedException;
 
     @POST
     @Path("scripts")
     @Produces("application/json")
-    String createScript(@HeaderParam("sessionid") String sessionId,
-                        @FormParam("name") String name, @FormParam("content") String content) throws NotConnectedException;
+    String createScript(@HeaderParam("sessionid")
+    String sessionId, @FormParam("name")
+    String name, @FormParam("content")
+    String content) throws NotConnectedException;
 
     @POST
     @Path("scripts/{name}")
     @Produces("application/json")
-    String updateScript(@HeaderParam("sessionid") String sessionId,
-                         @PathParam("name") String name,
-                         @FormParam("content") String content) throws NotConnectedException;
+    String updateScript(@HeaderParam("sessionid")
+    String sessionId, @PathParam("name")
+    String name, @FormParam("content")
+    String content) throws NotConnectedException;
 
     @GET
     @Path("classes")
     @Produces("application/json")
-    ArrayList<String> getClasses(@HeaderParam("sessionid") String sessionId) throws NotConnectedException;
+    ArrayList<String> getClasses(@HeaderParam("sessionid")
+    String sessionId) throws NotConnectedException;
 
     @POST
     @Path("classes")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces("application/json")
     public String createClass(@HeaderParam("sessionid")
-                            String sessionId, MultipartFormDataInput multipart) throws NotConnectedException, IOException;
-
+    String sessionId, MultipartFormDataInput multipart) throws NotConnectedException, IOException;
 
     /**
      * Validates a job.
@@ -155,18 +167,22 @@ public interface StudioInterface {
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces("application/json")
     public abstract JobIdData submit(@HeaderParam("sessionid")
-                                     String sessionId, MultipartFormDataInput multipart) throws IOException, JobCreationRestException,
+    String sessionId, MultipartFormDataInput multipart) throws IOException, JobCreationRestException,
             NotConnectedRestException, PermissionRestException, SubmissionClosedRestException;
 
     @GET
     @Path("visualizations/{id}")
     @Produces("application/json")
-    String getVisualization(@HeaderParam("sessionid") String sessionId, @PathParam("id") String jobId) throws NotConnectedException;
+    String getVisualization(@HeaderParam("sessionid")
+    String sessionId, @PathParam("id")
+    String jobId) throws NotConnectedException;
 
     @POST
     @Path("visualizations/{id}")
     @Produces("application/json")
-    boolean updateVisualization(@HeaderParam("sessionid") String sessionId,
-                        @PathParam("id") String jobId, @FormParam("visualization") String visualization) throws NotConnectedException;
+    boolean updateVisualization(@HeaderParam("sessionid")
+    String sessionId, @PathParam("id")
+    String jobId, @FormParam("visualization")
+    String visualization) throws NotConnectedException;
 
 }

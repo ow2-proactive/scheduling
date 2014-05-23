@@ -48,6 +48,7 @@ import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.UserJobData;
 
+
 public class ListJobCommand extends AbstractCommand implements Command {
 
     public ListJobCommand() {
@@ -58,13 +59,12 @@ public class ListJobCommand extends AbstractCommand implements Command {
 
         SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
         try {
-            Map<Long, List<UserJobData>> stateMap = scheduler.revisionAndjobsinfo(
-                    currentContext.getSessionId(), -1, -1, false, true, true, true);
+            Map<Long, List<UserJobData>> stateMap = scheduler.revisionAndjobsinfo(currentContext
+                    .getSessionId(), -1, -1, false, true, true, true);
             List<UserJobData> jobs = stateMap.entrySet().iterator().next().getValue();
             resultStack(currentContext).push(jobs);
             if (!currentContext.isSilent()) {
-                writeLine(currentContext, "%s",
-                        StringUtility.jobsAsString(jobs));
+                writeLine(currentContext, "%s", StringUtility.jobsAsString(jobs));
             }
         } catch (Exception e) {
             handleError("An error occurred while retriving job list:", e, currentContext);

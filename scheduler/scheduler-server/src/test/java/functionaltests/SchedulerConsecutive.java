@@ -60,7 +60,8 @@ public class SchedulerConsecutive extends FunctionalTest {
         if (shouldBeExecutedInConsecutiveMode(this.getClass())) {
 
             try {
-                RMTHelper.getDefaultInstance().getResourceManager().removeNodeSource("extra", true).getBooleanValue();
+                RMTHelper.getDefaultInstance().getResourceManager().removeNodeSource("extra", true)
+                        .getBooleanValue();
             } catch (IllegalArgumentException e) {
                 // ns extra not found
             }

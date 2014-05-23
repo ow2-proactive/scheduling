@@ -183,7 +183,7 @@ public class TestLinkAnotherRM extends MultipleRMTBase {
         SchedulerTHelper.waitForEventJobFinished(jobId1);
         helper1.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         helper1.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        checkFreeNodes(helper1.getResourceManager(), NODES_NUMBER );
+        checkFreeNodes(helper1.getResourceManager(), NODES_NUMBER);
 
         System.out.println("Let first task of job2 finish");
         communicationObject2.setCommand("stop");

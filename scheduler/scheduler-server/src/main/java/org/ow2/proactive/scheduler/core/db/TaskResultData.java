@@ -44,7 +44,7 @@ public class TaskResultData {
     private String previewerClassName;
 
     private Map<String, String> propagatedProperties;
-    
+
     private Map<String, byte[]> propagatedVariables;
 
     private FlowActionData flowAction;

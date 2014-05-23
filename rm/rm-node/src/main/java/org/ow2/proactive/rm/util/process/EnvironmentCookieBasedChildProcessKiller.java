@@ -22,7 +22,7 @@ public class EnvironmentCookieBasedChildProcessKiller {
      * @param valuePrefix prefix to prepend to the cookie value only
      */
     public static void setCookie(String valuePrefix) {
-        setCookie("",valuePrefix);
+        setCookie("", valuePrefix);
     }
 
     /**
@@ -32,7 +32,7 @@ public class EnvironmentCookieBasedChildProcessKiller {
      * @param valuePrefix prefix to prepend to the  value
      */
     public static void setCookie(String namePrefix, String valuePrefix) {
-        cookieName =  namePrefix + COOKIE_DEFAULT_NAME;
+        cookieName = namePrefix + COOKIE_DEFAULT_NAME;
         String cookieValue = valuePrefix + ProcessTreeKiller.createCookie();
 
         logger.debug("Setting environment cookie " + cookieName + " to: " + cookieValue);

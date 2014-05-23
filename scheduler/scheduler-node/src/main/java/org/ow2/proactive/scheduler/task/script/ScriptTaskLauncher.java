@@ -83,8 +83,7 @@ public class ScriptTaskLauncher extends TaskLauncher {
 
     protected void setPropagatedVariables(JavaExecutableInitializerImpl init,
             Map<String, Serializable> variables) {
-        init.setPropagatedVariables(SerializationUtil
-                .serializeVariableMap(variables));
+        init.setPropagatedVariables(SerializationUtil.serializeVariableMap(variables));
     }
 
     /**
@@ -144,10 +143,10 @@ public class ScriptTaskLauncher extends TaskLauncher {
             //init task
             ScriptExecutableInitializer initializer = (ScriptExecutableInitializer) createExecutableInitializer(executableContainer);
 
-            setPropagatedVariables((JavaExecutableInitializerImpl) initializer,
-                    getPropagatedVariables());
+            setPropagatedVariables((JavaExecutableInitializerImpl) initializer, getPropagatedVariables());
 
-            executableGuard.callInternalInit(ScriptExecutable.class, JavaExecutableInitializerImpl.class, initializer);
+            executableGuard.callInternalInit(ScriptExecutable.class, JavaExecutableInitializerImpl.class,
+                    initializer);
 
             sample = System.nanoTime();
             try {
@@ -181,9 +180,11 @@ public class ScriptTaskLauncher extends TaskLauncher {
         } finally {
             if (executableGuard.wasWalltimed()) {
                 // killed by a walltime
-                res = new TaskResultImpl(taskId, new WalltimeExceededException("Walltime of " + wallTime + " ms reached on task " + taskId.getReadableName()), null, duration / 1000000, null);
+                res = new TaskResultImpl(taskId, new WalltimeExceededException("Walltime of " + wallTime +
+                    " ms reached on task " + taskId.getReadableName()), null, duration / 1000000, null);
             } else if (executableGuard.wasKilled()) {
-                res = new TaskResultImpl(taskId, new TaskAbortedException("Task " + taskId + " has been killed"), null, duration / 1000000, null);
+                res = new TaskResultImpl(taskId, new TaskAbortedException("Task " + taskId +
+                    " has been killed"), null, duration / 1000000, null);
             } else {
                 // set the result
                 if (exception != null) {

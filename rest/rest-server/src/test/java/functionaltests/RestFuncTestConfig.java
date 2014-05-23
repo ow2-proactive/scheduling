@@ -88,7 +88,7 @@ public class RestFuncTestConfig {
     public String setProperty(String key, String value) {
         return (String) props.setProperty(key, value);
     }
-    
+
     public String getProperty(String key) {
         return props.getProperty(key);
     }

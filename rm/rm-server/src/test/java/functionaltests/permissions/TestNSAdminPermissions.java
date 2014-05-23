@@ -136,8 +136,7 @@ public class TestNSAdminPermissions extends RMConsecutive {
         userRMAccess = helper.getResourceManager(null, "radmin", "pwd");
         // this is an administrator of the node source, so it can remove the foreign node
         NodeSet nodes = userRMAccess.getAtMostNodes(1, null);
-        Assert.assertEquals("NS admin cannot get nodes as the get level is set to PROVIDER", 0, nodes
-          .size());
+        Assert.assertEquals("NS admin cannot get nodes as the get level is set to PROVIDER", 0, nodes.size());
 
         RMTHelper.log("Test4 - user with AllPermisssion can remove any node sources");
 

@@ -71,9 +71,8 @@ public class ExceptionMappers {
             js.setStackTrace(ProActiveLogger.getStackTraceAsString(throwable));
             js.setException(throwable);
             js.setExceptionClass(throwable.getClass().getName());
-            return Response.status(getErrorCode())
-              .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
-              .entity(js).build();
+            return Response.status(getErrorCode()).header(HttpHeaders.CONTENT_TYPE,
+                    MediaType.APPLICATION_JSON).entity(js).build();
         }
 
         protected int getErrorCode() {
@@ -95,14 +94,16 @@ public class ExceptionMappers {
         }
     }
 
-    public static class JobAlreadyFinishedExceptionExceptionMapper extends BaseExceptionMapper<JobAlreadyFinishedException> {
+    public static class JobAlreadyFinishedExceptionExceptionMapper extends
+            BaseExceptionMapper<JobAlreadyFinishedException> {
         @Override
         protected int getErrorCode() {
             return HttpURLConnection.HTTP_NOT_FOUND;
         }
     }
 
-    public static class JobCreationRestExceptionExceptionMapper extends BaseExceptionMapper<JobCreationRestException> {
+    public static class JobCreationRestExceptionExceptionMapper extends
+            BaseExceptionMapper<JobCreationRestException> {
         @Override
         protected int getErrorCode() {
             return HttpURLConnection.HTTP_NOT_FOUND;
@@ -123,42 +124,48 @@ public class ExceptionMappers {
         }
     }
 
-    public static class NotConnectedRestExceptionExceptionMapper extends BaseExceptionMapper<NotConnectedRestException> {
+    public static class NotConnectedRestExceptionExceptionMapper extends
+            BaseExceptionMapper<NotConnectedRestException> {
         @Override
         protected int getErrorCode() {
             return HttpURLConnection.HTTP_UNAUTHORIZED;
         }
     }
 
-    public static class NotConnectedExceptionExceptionMapper extends BaseExceptionMapper<NotConnectedException> {
+    public static class NotConnectedExceptionExceptionMapper extends
+            BaseExceptionMapper<NotConnectedException> {
         @Override
         protected int getErrorCode() {
             return HttpURLConnection.HTTP_UNAUTHORIZED;
         }
     }
 
-    public static class PermissionRestExceptionExceptionMapper extends BaseExceptionMapper<PermissionRestException> {
+    public static class PermissionRestExceptionExceptionMapper extends
+            BaseExceptionMapper<PermissionRestException> {
         @Override
         protected int getErrorCode() {
             return HttpURLConnection.HTTP_FORBIDDEN;
         }
     }
 
-    public static class SchedulerRestExceptionExceptionMapper extends BaseExceptionMapper<SchedulerRestException> {
+    public static class SchedulerRestExceptionExceptionMapper extends
+            BaseExceptionMapper<SchedulerRestException> {
         @Override
         protected int getErrorCode() {
             return HttpURLConnection.HTTP_NOT_FOUND;
         }
     }
 
-    public static class SubmissionClosedRestExceptionExceptionMapper extends BaseExceptionMapper<SubmissionClosedRestException> {
+    public static class SubmissionClosedRestExceptionExceptionMapper extends
+            BaseExceptionMapper<SubmissionClosedRestException> {
         @Override
         protected int getErrorCode() {
             return HttpURLConnection.HTTP_NOT_FOUND;
         }
     }
 
-    public static class UnknownJobRestExceptionExceptionMapper extends BaseExceptionMapper<UnknownJobRestException> {
+    public static class UnknownJobRestExceptionExceptionMapper extends
+            BaseExceptionMapper<UnknownJobRestException> {
         @Override
         protected int getErrorCode() {
             return HttpURLConnection.HTTP_NOT_FOUND;
@@ -179,7 +186,8 @@ public class ExceptionMappers {
         }
     }
 
-    public static class ProActiveRuntimeExceptionExceptionMapper extends BaseExceptionMapper<ProActiveRuntimeException> {
+    public static class ProActiveRuntimeExceptionExceptionMapper extends
+            BaseExceptionMapper<ProActiveRuntimeException> {
         @Override
         protected int getErrorCode() {
             return HttpURLConnection.HTTP_NOT_FOUND;

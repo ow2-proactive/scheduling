@@ -67,7 +67,6 @@ public class RRDDataStore extends Thread {
     protected volatile boolean terminate = false;
     protected Logger logger;
 
-
     protected RRDDataStore(String dataBaseFilePath, int step, Logger logger) {
         this.step = step;
         this.dataBaseFile = dataBaseFilePath;

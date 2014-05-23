@@ -186,9 +186,8 @@ public class ResourceManagerController {
                     user = cmd.getOptionValue("l");
                 }
 
-                File defaultCredentialFile = new File(
-                        PAResourceManagerProperties.RM_HOME.getValueAsStringOrNull(),
-                        "config/authentication/rm.cred");
+                File defaultCredentialFile = new File(PAResourceManagerProperties.RM_HOME
+                        .getValueAsStringOrNull(), "config/authentication/rm.cred");
 
                 if (cmd.hasOption("credentials")) {
                     if (cmd.getOptionValues("credentials").length == 1) {

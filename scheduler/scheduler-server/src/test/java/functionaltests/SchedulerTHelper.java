@@ -142,9 +142,8 @@ public class SchedulerTHelper {
             .getResource("config/functionalTSchedulerProperties.ini");
 
     public static final int RMI_PORT = 1199;
-    public static String schedulerUrl =
-            "rmi://"+ProActiveInet.getInstance().getHostname() +
-            ":" + RMI_PORT + "/" + SchedulerConstants.SCHEDULER_DEFAULT_NAME;
+    public static String schedulerUrl = "rmi://" + ProActiveInet.getInstance().getHostname() + ":" +
+        RMI_PORT + "/" + SchedulerConstants.SCHEDULER_DEFAULT_NAME;
 
     private static Process schedulerProcess;
 
@@ -173,7 +172,6 @@ public class SchedulerTHelper {
     public static void startScheduler() throws Exception {
         startScheduler(true, null);
     }
-
 
     /**
      * Start the scheduler using a forked JVM and
@@ -232,7 +230,7 @@ public class SchedulerTHelper {
         }
         cleanTMP();
 
-        EnvironmentCookieBasedChildProcessKiller.setCookie(TEST_COOKIE,TEST_COOKIE);
+        EnvironmentCookieBasedChildProcessKiller.setCookie(TEST_COOKIE, TEST_COOKIE);
 
         List<String> commandLine = new ArrayList<String>();
         commandLine.add(System.getProperty("java.home") + File.separator + "bin" + File.separator + "java");
@@ -241,27 +239,27 @@ public class SchedulerTHelper {
         String proactiveHome = CentralPAPropertyRepository.PA_HOME.getValue();
         if (!CentralPAPropertyRepository.PA_HOME.isSet()) {
             proactiveHome = PAResourceManagerProperties.RM_HOME.getValueAsString();
-            CentralPAPropertyRepository.PA_HOME.setValue(PAResourceManagerProperties.RM_HOME.getValueAsString());
+            CentralPAPropertyRepository.PA_HOME.setValue(PAResourceManagerProperties.RM_HOME
+                    .getValueAsString());
         }
 
-        commandLine.add(CentralPAPropertyRepository.PA_HOME.getCmdLine() +
-          proactiveHome);
+        commandLine.add(CentralPAPropertyRepository.PA_HOME.getCmdLine() + proactiveHome);
 
         commandLine.add(CentralPAPropertyRepository.PA_RMI_PORT.getCmdLine() + RMI_PORT);
 
         String securityPolicy = CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getValue();
         if (!CentralPAPropertyRepository.JAVA_SECURITY_POLICY.isSet()) {
-            securityPolicy = PASchedulerProperties.SCHEDULER_HOME.getValueAsString() + "/config/security.java.policy-server";
+            securityPolicy = PASchedulerProperties.SCHEDULER_HOME.getValueAsString() +
+                "/config/security.java.policy-server";
         }
-        commandLine.add(CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getCmdLine() +
-          securityPolicy);
+        commandLine.add(CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getCmdLine() + securityPolicy);
 
         String log4jConfiguration = CentralPAPropertyRepository.LOG4J.getValue();
         if (!CentralPAPropertyRepository.LOG4J.isSet()) {
-            log4jConfiguration = "file:" + PASchedulerProperties.SCHEDULER_HOME.getValueAsString() + "/config/log4j/log4j-junit";
+            log4jConfiguration = "file:" + PASchedulerProperties.SCHEDULER_HOME.getValueAsString() +
+                "/config/log4j/log4j-junit";
         }
-        commandLine.add(CentralPAPropertyRepository.LOG4J.getCmdLine() +
-          log4jConfiguration);
+        commandLine.add(CentralPAPropertyRepository.LOG4J.getCmdLine() + log4jConfiguration);
 
         commandLine.add(PASchedulerProperties.SCHEDULER_HOME.getCmdLine() +
             PASchedulerProperties.SCHEDULER_HOME.getValueAsString());
@@ -318,7 +316,8 @@ public class SchedulerTHelper {
 
     public static String testClasspath() {
         String home = PASchedulerProperties.SCHEDULER_HOME.getValueAsString();
-        String classpathToLibFolderWithWildcard = home + File.separator + "dist" + File.separator + "lib" + File.separator + "*";
+        String classpathToLibFolderWithWildcard = home + File.separator + "dist" + File.separator + "lib" +
+            File.separator + "*";
         if (OperatingSystem.getOperatingSystem().equals(OperatingSystem.windows)) {
             // required by windows otherwise wildcard is expanded
             classpathToLibFolderWithWildcard = "\"" + classpathToLibFolderWithWildcard + "\"";
@@ -350,8 +349,7 @@ public class SchedulerTHelper {
             // sometimes RM_NODE object isn't removed from the RMI registry after JVM with RM is killed (SCHEDULING-1498)
             CommonTUtils.cleanupRMActiveObjectRegistry();
             for (int nodeNumber = 0; nodeNumber < SchedulerTStarter.RM_NODE_NUMBER; nodeNumber++) {
-                CommonTUtils.cleanupActiveObjectRegistry(
-                        SchedulerTStarter.RM_NODE_NAME + "-" + nodeNumber); // clean nodes
+                CommonTUtils.cleanupActiveObjectRegistry(SchedulerTStarter.RM_NODE_NAME + "-" + nodeNumber); // clean nodes
             }
             CommonTUtils.cleanupActiveObjectRegistry(SchedulerConstants.SCHEDULER_DEFAULT_NAME);
         }
@@ -359,7 +357,6 @@ public class SchedulerTHelper {
         adminSchedInterface = null;
         RMTHelper.getDefaultInstance().reset();
     }
-
 
     /**
      * Kill the forked Scheduler and all nodes.
@@ -571,7 +568,6 @@ public class SchedulerTHelper {
         return userInt.killJob(jobId);
     }
 
-
     /**
      * Remove a job from Scheduler database.
      * connect as user if needed (if not yet connected as user).
@@ -582,31 +578,25 @@ public class SchedulerTHelper {
         Scheduler userInt = getSchedulerInterface();
         userInt.removeJob(id);
     }
-    
-    public static void testJobSubmissionAndVerifyAllResults(String jobDescPath)
-            throws Throwable {
+
+    public static void testJobSubmissionAndVerifyAllResults(String jobDescPath) throws Throwable {
         Job testJob = JobFactory.getFactory().createJob(jobDescPath);
         testJobSubmissionAndVerifyAllResults(testJob, jobDescPath);
     }
-    
-    public static void testJobSubmissionAndVerifyAllResults(Job testJob,
-            String jobDesc) throws Throwable {
+
+    public static void testJobSubmissionAndVerifyAllResults(Job testJob, String jobDesc) throws Throwable {
         JobId id = testJobSubmission(testJob, UserType.USER);
         // check result are not null
         JobResult res = SchedulerTHelper.getJobResult(id);
-        Assert.assertFalse("Had Exception : " + jobDesc, SchedulerTHelper
-                .getJobResult(id).hadException());
+        Assert.assertFalse("Had Exception : " + jobDesc, SchedulerTHelper.getJobResult(id).hadException());
 
-        for (Map.Entry<String, TaskResult> entry : res.getAllResults()
-                .entrySet()) {
+        for (Map.Entry<String, TaskResult> entry : res.getAllResults().entrySet()) {
 
-            Assert.assertFalse(
-                    "Had Exception (" + jobDesc + ") : " + entry.getKey(),
-                    entry.getValue().hadException());
+            Assert.assertFalse("Had Exception (" + jobDesc + ") : " + entry.getKey(), entry.getValue()
+                    .hadException());
 
-            Assert.assertNotNull(
-                    "Result not null (" + jobDesc + ") : " + entry.getKey(),
-                    entry.getValue().value());
+            Assert.assertNotNull("Result not null (" + jobDesc + ") : " + entry.getKey(), entry.getValue()
+                    .value());
         }
 
         SchedulerTHelper.removeJob(id);
@@ -980,8 +970,8 @@ public class SchedulerTHelper {
         return waitForJobEvent(id, timeout, JobStatus.FINISHED, SchedulerEvent.JOB_RUNNING_TO_FINISHED);
     }
 
-    private static JobInfo waitForJobEvent(JobId id, long timeout,
-      JobStatus jobStatusAfterEvent, SchedulerEvent jobEvent) throws Exception {
+    private static JobInfo waitForJobEvent(JobId id, long timeout, JobStatus jobStatusAfterEvent,
+            SchedulerEvent jobEvent) throws Exception {
         JobState jobState = null;
         try {
             jobState = getSchedulerInterface().getJobState(id);
@@ -993,8 +983,7 @@ public class SchedulerTHelper {
         } else {
             try {
                 System.err.println("Waiting for the job finished event");
-                return getMonitorsHandler().waitForEventJob(jobEvent, id,
-                  timeout);
+                return getMonitorsHandler().waitForEventJob(jobEvent, id, timeout);
             } catch (ProActiveTimeoutException e) {
                 //unreachable block, 0 means infinite, no timeout
                 //log something ?

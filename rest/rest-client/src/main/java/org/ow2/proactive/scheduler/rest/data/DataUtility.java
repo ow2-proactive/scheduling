@@ -69,6 +69,7 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskStateData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskUsageData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.UserJobData;
 
+
 public class DataUtility {
 
     private DataUtility() {
@@ -109,8 +110,7 @@ public class DataUtility {
         impl.setExecutionHostName(d.getExecutionHostName());
         impl.setFinishedTime(d.getFinishedTime());
         impl.setNumberOfExecutionLeft(d.getNumberOfExecutionLeft());
-        impl.setNumberOfExecutionOnFailureLeft(d
-                .getNumberOfExecutionOnFailureLeft());
+        impl.setNumberOfExecutionOnFailureLeft(d.getNumberOfExecutionOnFailureLeft());
         impl.setStartTime(d.getStartTime());
         impl.setStatus(TaskStatus.valueOf(d.getTaskStatus().name()));
         return impl;
@@ -147,8 +147,7 @@ public class DataUtility {
     }
 
     public static JobUsage jobUsage(JobUsageData d) {
-        JobUsage impl = new JobUsage(d.getJobId(), d.getJobName(),
-                d.getJobDuration());
+        JobUsage impl = new JobUsage(d.getJobId(), d.getJobName(), d.getJobDuration());
         List<TaskUsageData> taskUsageDataList = d.getTaskUsages();
         for (TaskUsageData taskUsageData : taskUsageDataList) {
             impl.add(taskUsage(taskUsageData));
@@ -157,9 +156,8 @@ public class DataUtility {
     }
 
     public static TaskUsage taskUsage(TaskUsageData d) {
-        return new TaskUsage(d.getTaskId(), d.getTaskName(),
-                d.getTaskStartTime(), d.getTaskFinishedTime(),
-                d.getTaskExecutionDuration(), d.getTaskNodeNumber());
+        return new TaskUsage(d.getTaskId(), d.getTaskName(), d.getTaskStartTime(), d.getTaskFinishedTime(), d
+                .getTaskExecutionDuration(), d.getTaskNodeNumber());
     }
 
     public static List<JobInfo> toJobInfos(List<UserJobData> dataList) {
@@ -170,13 +168,11 @@ public class DataUtility {
         return jobInfos;
     }
 
-    public static List<SchedulerUserInfo> toSchedulerUserInfos(
-            List<SchedulerUserData> dataList) {
+    public static List<SchedulerUserInfo> toSchedulerUserInfos(List<SchedulerUserData> dataList) {
         List<SchedulerUserInfo> schedulerUserInfos = new ArrayList<SchedulerUserInfo>();
         for (SchedulerUserData sud : dataList) {
-            schedulerUserInfos.add(new SchedulerUserInfo(sud.getHostName(), sud
-                    .getUsername(), sud.getConnectionTime(), sud
-                    .getLastSubmitTime(), sud.getSubmitNumber()));
+            schedulerUserInfos.add(new SchedulerUserInfo(sud.getHostName(), sud.getUsername(), sud
+                    .getConnectionTime(), sud.getLastSubmitTime(), sud.getSubmitNumber()));
         }
         return schedulerUserInfos;
     }

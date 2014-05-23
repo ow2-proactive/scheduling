@@ -167,9 +167,8 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         //default state = started
         Set<JobState> jobStates = new HashSet<JobState>();
         if (logger.isInfoEnabled()) {
-            logger.info("#Pending jobs: " + sState.getPendingJobs().size() +
-            " #Running jobs: " + sState.getRunningJobs().size() +
-            " #Finished jobs: " + sState.getFinishedJobs().size());
+            logger.info("#Pending jobs: " + sState.getPendingJobs().size() + " #Running jobs: " +
+                sState.getRunningJobs().size() + " #Finished jobs: " + sState.getFinishedJobs().size());
         }
         for (JobState js : sState.getPendingJobs()) {
             prepare(jobStates, js, false);
@@ -306,9 +305,8 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
      */
     synchronized void checkOwnStatePermission(boolean myOnly, UserIdentificationImpl ui)
             throws PermissionException {
-        ui.checkPermission(new GetOwnStateOnlyPermission(myOnly),
-                ui.getUsername() +
-                        " does not have permissions to retrieve full state");
+        ui.checkPermission(new GetOwnStateOnlyPermission(myOnly), ui.getUsername() +
+            " does not have permissions to retrieve full state");
     }
 
     synchronized void addEventListener(SchedulerEventListener sel, boolean myEventsOnly,
@@ -481,8 +479,8 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
             //log and send events
             String user = ident.getUser().getUsername();
             logger.info("User '" + user + "' has disconnect the scheduler !");
-            dispatchUsersUpdated(
-                    new NotificationData<UserIdentification>(SchedulerEvent.USERS_UPDATE, ident.getUser()), false);
+            dispatchUsersUpdated(new NotificationData<UserIdentification>(SchedulerEvent.USERS_UPDATE, ident
+                    .getUser()), false);
         }
     }
 
@@ -527,8 +525,8 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         checkJobOwner("changeJobPriority", jobId,
                 "You do not have permission to change the priority of this job !");
 
-        UserIdentificationImpl ui = identifications.get(PAActiveObject.getContext().getCurrentRequest()
-                .getSourceBodyID()).getUser();
+        UserIdentificationImpl ui = identifications.get(
+                PAActiveObject.getContext().getCurrentRequest().getSourceBodyID()).getUser();
 
         try {
             ui.checkPermission(new ChangePriorityPermission(priority.getPriority()), ui.getUsername() +
@@ -698,8 +696,8 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                 //if this user has a listener
                 if (userId.isListening()) {
                     //if there is no specified event OR if the specified event is allowed
-                    if ((userId.getUser().getUserEvents() == null)
-                            || userId.getUser().getUserEvents().contains(eventType)) {
+                    if ((userId.getUser().getUserEvents() == null) ||
+                        userId.getUser().getUserEvents().contains(eventType)) {
                         userId.getListener().addEvent(eventMethods.get("schedulerStateUpdatedEvent"),
                                 eventType);
                     }
@@ -732,7 +730,8 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                             //if this userId have the myEventOnly=false or (myEventOnly=true and it is its event)
                             if (!userId.isMyEventsOnly() ||
                                 (userId.isMyEventsOnly() && userId.getUsername().equals(job.getOwner()))) {
-                                listeningUserId.getListener().addEvent(eventMethods.get("jobSubmittedEvent"), job);
+                                listeningUserId.getListener().addEvent(eventMethods.get("jobSubmittedEvent"),
+                                        job);
                             }
                         }
                     } catch (NullPointerException e) {
@@ -844,8 +843,8 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                         if (!userId.isMyEventsOnly() ||
                             (userId.isMyEventsOnly() && userId.getUsername().equals(
                                     notification.getData().getUsername()))) {
-                            listeningUserId.getListener()
-                                    .addEvent(eventMethods.get("usersUpdatedEvent"), notification);
+                            listeningUserId.getListener().addEvent(eventMethods.get("usersUpdatedEvent"),
+                                    notification);
                         }
                     }
                 }

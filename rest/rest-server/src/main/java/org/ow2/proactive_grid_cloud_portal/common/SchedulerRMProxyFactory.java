@@ -52,28 +52,32 @@ import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
 
 public class SchedulerRMProxyFactory {
 
-    public RMProxyUserInterface connectToRM(CredData credData) throws ActiveObjectCreationException, NodeException, RMException, KeyException, LoginException {
-        RMProxyUserInterface rm = PAActiveObject.newActive(RMProxyUserInterface.class, new Object[] { });
+    public RMProxyUserInterface connectToRM(CredData credData) throws ActiveObjectCreationException,
+            NodeException, RMException, KeyException, LoginException {
+        RMProxyUserInterface rm = PAActiveObject.newActive(RMProxyUserInterface.class, new Object[] {});
         rm.init(getUrl(PortalConfiguration.rm_url), credData);
         return rm;
     }
 
-    public RMProxyUserInterface connectToRM(Credentials credentials) throws ActiveObjectCreationException, NodeException, RMException, KeyException, LoginException {
-        RMProxyUserInterface rm = PAActiveObject.newActive(RMProxyUserInterface.class, new Object[] { });
+    public RMProxyUserInterface connectToRM(Credentials credentials) throws ActiveObjectCreationException,
+            NodeException, RMException, KeyException, LoginException {
+        RMProxyUserInterface rm = PAActiveObject.newActive(RMProxyUserInterface.class, new Object[] {});
         rm.init(getUrl(PortalConfiguration.rm_url), credentials);
         return rm;
     }
 
-    public SchedulerProxyUserInterface connectToScheduler(Credentials credentials) throws LoginException, SchedulerException, ActiveObjectCreationException, NodeException {
+    public SchedulerProxyUserInterface connectToScheduler(Credentials credentials) throws LoginException,
+            SchedulerException, ActiveObjectCreationException, NodeException {
         SchedulerProxyUserInterface scheduler = PAActiveObject.newActive(SchedulerProxyUserInterface.class,
-          new Object[] { });
+                new Object[] {});
         scheduler.init(getUrl(PortalConfiguration.scheduler_url), credentials);
         return scheduler;
     }
 
-    public SchedulerProxyUserInterface connectToScheduler(CredData credData) throws ActiveObjectCreationException, NodeException, LoginException, SchedulerException {
+    public SchedulerProxyUserInterface connectToScheduler(CredData credData)
+            throws ActiveObjectCreationException, NodeException, LoginException, SchedulerException {
         SchedulerProxyUserInterface scheduler = PAActiveObject.newActive(SchedulerProxyUserInterface.class,
-          new Object[] { });
+                new Object[] {});
         scheduler.init(getUrl(PortalConfiguration.scheduler_url), credData);
         return scheduler;
     }

@@ -43,7 +43,6 @@ import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
 import static org.ow2.proactive_grid_cloud_portal.cli.json.FieldMataDataView.Type.FILE;
 import static org.ow2.proactive_grid_cloud_portal.cli.json.FieldMataDataView.Type.CREDENTIAL;
 
-
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
@@ -61,8 +60,8 @@ import org.ow2.proactive_grid_cloud_portal.cli.json.PluginView;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.FileUtility;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
 
-public class SetInfrastructureCommand extends AbstractCommand implements
-        Command {
+
+public class SetInfrastructureCommand extends AbstractCommand implements Command {
 
     public static final String SET_INFRASTRUCTURE = "org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.SetInfrastructureCommand.setInfrastructure";
 
@@ -71,8 +70,7 @@ public class SetInfrastructureCommand extends AbstractCommand implements
 
     public SetInfrastructureCommand(String[] args) {
         if (!(args.length > 0)) {
-            throw new CLIException(REASON_INVALID_ARGUMENTS,
-                    "At least one argument required.");
+            throw new CLIException(REASON_INVALID_ARGUMENTS, "At least one argument required.");
         }
         this.infrastructureType = args[0];
 
@@ -86,39 +84,33 @@ public class SetInfrastructureCommand extends AbstractCommand implements
 
     @Override
     public void execute(ApplicationContext currentContext) throws CLIException {
-        Map<String, PluginView> infrastructures = currentContext
-                .getInfrastructures();
+        Map<String, PluginView> infrastructures = currentContext.getInfrastructures();
         if (infrastructures == null) {
-            HttpGet request = new HttpGet(
-                    currentContext.getResourceUrl("infrastructures"));
+            HttpGet request = new HttpGet(currentContext.getResourceUrl("infrastructures"));
             HttpResponseWrapper response = execute(request, currentContext);
             if (statusCode(OK) == statusCode(response)) {
                 infrastructures = new HashMap<String, PluginView>();
-                List<PluginView> pluginViewList = readValue(response,
-                        new TypeReference<List<PluginView>>() {
-                        }, currentContext);
+                List<PluginView> pluginViewList = readValue(response, new TypeReference<List<PluginView>>() {
+                }, currentContext);
                 for (PluginView pluginView : pluginViewList) {
                     infrastructures.put(pluginView.getPluginName(), pluginView);
                 }
                 currentContext.setInfrastructures(infrastructures);
             } else {
-                throw new CLIException(REASON_OTHER,
-                        "Unable to retrieve known infrastructure types.");
+                throw new CLIException(REASON_OTHER, "Unable to retrieve known infrastructure types.");
             }
         }
 
         PluginView pluginView = infrastructures.get(infrastructureType);
 
         if (pluginView == null) {
-            throw new CLIException(REASON_INVALID_ARGUMENTS, String.format(
-                    "Unknown infrastructure type: %s", infrastructureType));
+            throw new CLIException(REASON_INVALID_ARGUMENTS, String.format("Unknown infrastructure type: %s",
+                    infrastructureType));
         }
-        ConfigurableFieldView[] configurableFields = pluginView
-                .getConfigurableFields();
+        ConfigurableFieldView[] configurableFields = pluginView.getConfigurableFields();
         if (configurableFields.length != infrastructureArgs.length) {
             throw new CLIException(REASON_INVALID_ARGUMENTS, String.format(
-                    "Invalid number of arguments specified for '%s' type.",
-                    infrastructureType));
+                    "Invalid number of arguments specified for '%s' type.", infrastructureType));
         }
 
         StringBuilder buffer = new StringBuilder();
@@ -127,14 +119,11 @@ public class SetInfrastructureCommand extends AbstractCommand implements
             ConfigurableFieldView cf = configurableFields[index];
             Type ft = cf.getMeta().type();
             if (FILE.equals(ft) || CREDENTIAL.equals(ft)) {
-                String contents = FileUtility.readFileToString(new File(
-                        infrastructureArgs[index]));
-                buffer.append("&infrastructureFileParameters=")
-                        .append(contents);
+                String contents = FileUtility.readFileToString(new File(infrastructureArgs[index]));
+                buffer.append("&infrastructureFileParameters=").append(contents);
 
             } else {
-                buffer.append("&infrastructureParameters=").append(
-                        infrastructureArgs[index]);
+                buffer.append("&infrastructureParameters=").append(infrastructureArgs[index]);
             }
         }
 

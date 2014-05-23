@@ -84,7 +84,7 @@ public abstract class Job extends CommonAttribute {
     protected String outputSpace = null;
     protected String globalSpace = null;
     protected String userSpace = null;
-    
+
     /** A map to holds job descriptor variables */
     protected Map<String, String> variables = new HashMap<String, String>();
 
@@ -258,7 +258,7 @@ public abstract class Job extends CommonAttribute {
     public void setUserSpace(String userSpace) {
         this.userSpace = userSpace;
     }
-    
+
     /**
      * Sets the variable map for this job.
      * 

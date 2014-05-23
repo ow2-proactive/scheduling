@@ -118,7 +118,7 @@ public class ProcessCleaner {
         pb.redirectErrorStream(true);
         Process p = pb.start();
 
-        Set<Integer> pids= new HashSet<Integer>();
+        Set<Integer> pids = new HashSet<Integer>();
 
         Reader r = new InputStreamReader(p.getInputStream());
         BufferedReader br = new BufferedReader(r);
@@ -148,13 +148,15 @@ public class ProcessCleaner {
 
                 if (osName.contains("mac")) {
                     // Mac OS / Mac Os X
-                    pb = new ProcessBuilder("/bin/sh", "-c",
-                      "for PID in $(ps axc|awk \"{if (\\$5==\\\"java\\\") print \\$1}\") ; do ps $PID | grep -q -- '" + this.pattern.toString() +
-                        "' && echo $PID ; done");
+                    pb = new ProcessBuilder(
+                        "/bin/sh",
+                        "-c",
+                        "for PID in $(ps axc|awk \"{if (\\$5==\\\"java\\\") print \\$1}\") ; do ps $PID | grep -q -- '" +
+                            this.pattern.toString() + "' && echo $PID ; done");
                 } else {
                     // Linux / Unix
                     pb = new ProcessBuilder("/bin/sh", "-c", "for PID in $(pidof java) ; do grep -q -- '" +
-                      this.pattern.toString() + "' /proc/$PID/cmdline && echo $PID ; done");
+                        this.pattern.toString() + "' /proc/$PID/cmdline && echo $PID ; done");
                 }
 
                 pb.redirectErrorStream(true);
@@ -184,7 +186,6 @@ public class ProcessCleaner {
      */
     final public void killAliveProcesses() throws IOException {
         ProcessKiller pk = ProcessKiller.get();
-
 
         Set<Integer> pids = this.getAliveProcesses();
         for (int pid : pids) {
@@ -236,7 +237,7 @@ public class ProcessCleaner {
                 osSpecificName = name;
                 break;
             case windows:
-                osSpecificName = name+".exe";
+                osSpecificName = name + ".exe";
                 break;
             default:
                 throw new IllegalStateException("Unsupported operating system");
@@ -256,8 +257,8 @@ public class ProcessCleaner {
      * @return Java bin/ dir
      */
     static private File getJavaBinDir() {
-        return new File(System.getProperty(
-          "java.home") + File.separatorChar + ".." + File.separatorChar + "bin" + File.separatorChar);
+        return new File(System.getProperty("java.home") + File.separatorChar + ".." + File.separatorChar +
+            "bin" + File.separatorChar);
     }
 
     public static void main(String[] args) throws IOException {

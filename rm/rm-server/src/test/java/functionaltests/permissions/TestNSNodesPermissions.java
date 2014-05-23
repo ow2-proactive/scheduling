@@ -74,7 +74,7 @@ public class TestNSNodesPermissions extends RMConsecutive {
         nsadmin.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null,
                 StaticPolicy.class.getName(), new Object[] { "ME", "ALL" }).getBooleanValue();
 
-        List<TNode> nodePool =  helper.createNodes("node", 17);
+        List<TNode> nodePool = helper.createNodes("node", 17);
 
         Node node = nodePool.remove(0).getNode();
         Node node2 = nodePool.remove(0).getNode();

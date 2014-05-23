@@ -47,6 +47,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
 
+
 public class JobOutputAppender extends AppenderSkeleton {
 
     private JobOutput jobOutput = null;

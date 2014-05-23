@@ -63,7 +63,7 @@ import static org.junit.Assert.assertFalse;
 public class DozerMappingTest {
 
     private final Mapper mapper = new DozerBeanMapper(Collections
-      .singletonList("org/ow2/proactive_grid_cloud_portal/scheduler/dozer-mappings.xml"));
+            .singletonList("org/ow2/proactive_grid_cloud_portal/scheduler/dozer-mappings.xml"));
 
     @Test
     public void jobStateTasks_Key_AreMappedToString() throws Exception {
@@ -79,82 +79,80 @@ public class DozerMappingTest {
 
     private JobState createJobState() {
         return new ClientJobState(new JobState() {
-                @Override
-                public void update(TaskInfo taskInfo) {
+            @Override
+            public void update(TaskInfo taskInfo) {
 
-                }
+            }
 
-                @Override
-                public void update(JobInfo jobInfo) {
+            @Override
+            public void update(JobInfo jobInfo) {
 
-                }
+            }
 
-                @Override
-                public JobInfo getJobInfo() {
-                    return new JobInfoImpl();
-                }
+            @Override
+            public JobInfo getJobInfo() {
+                return new JobInfoImpl();
+            }
 
-                @Override
-                public ArrayList<TaskState> getTasks() {
-                    return new ArrayList<TaskState>(getHMTasks().values());
-                }
+            @Override
+            public ArrayList<TaskState> getTasks() {
+                return new ArrayList<TaskState>(getHMTasks().values());
+            }
 
-                @Override
-                public Map<TaskId, TaskState> getHMTasks() {
-                    TaskId taskId = TaskIdImpl.createTaskId(new JobIdImpl(42, "job"), "remoteVisuTask", 1,
-                      false);
-                    TaskState value = new ClientTaskState(new TaskState() {
-                        @Override
-                        public void update(TaskInfo taskInfo) {
+            @Override
+            public Map<TaskId, TaskState> getHMTasks() {
+                TaskId taskId = TaskIdImpl.createTaskId(new JobIdImpl(42, "job"), "remoteVisuTask", 1, false);
+                TaskState value = new ClientTaskState(new TaskState() {
+                    @Override
+                    public void update(TaskInfo taskInfo) {
 
-                        }
+                    }
 
-                        @Override
-                        public List<TaskState> getDependences() {
-                            return null;
-                        }
+                    @Override
+                    public List<TaskState> getDependences() {
+                        return null;
+                    }
 
-                        @Override
-                        public TaskInfo getTaskInfo() {
-                            TaskInfoImpl taskInfo = new TaskInfoImpl();
-                            taskInfo.setTaskId(
-                              TaskIdImpl.createTaskId(new JobIdImpl(42, "job"), "remoteVisuTask", 1,
-                                false));
-                            return taskInfo;
-                        }
+                    @Override
+                    public TaskInfo getTaskInfo() {
+                        TaskInfoImpl taskInfo = new TaskInfoImpl();
+                        taskInfo.setTaskId(TaskIdImpl.createTaskId(new JobIdImpl(42, "job"),
+                                "remoteVisuTask", 1, false));
+                        return taskInfo;
+                    }
 
-                        @Override
-                        public int getMaxNumberOfExecutionOnFailure() {
-                            return 0;
-                        }
+                    @Override
+                    public int getMaxNumberOfExecutionOnFailure() {
+                        return 0;
+                    }
 
-                        @Override
-                        public TaskState replicate() throws Exception {
-                            return null;
-                        }
+                    @Override
+                    public TaskState replicate() throws Exception {
+                        return null;
+                    }
 
-                        @Override
-                        public int getIterationIndex() {
-                            return 0;
-                        }
+                    @Override
+                    public int getIterationIndex() {
+                        return 0;
+                    }
 
-                        @Override
-                        public int getReplicationIndex() {
-                            return 0;
-                        }
-                    });
-                    return Collections.singletonMap(taskId, value);
-                }
+                    @Override
+                    public int getReplicationIndex() {
+                        return 0;
+                    }
+                });
+                return Collections.singletonMap(taskId, value);
+            }
 
-                @Override
-                public String getOwner() {
-                    return null;
-                }
+            @Override
+            public String getOwner() {
+                return null;
+            }
 
-                @Override
-                public JobType getType() {
-                    return null;
-                }
-            });
+            @Override
+            public JobType getType() {
+                return null;
+            }
+        });
     }
 }

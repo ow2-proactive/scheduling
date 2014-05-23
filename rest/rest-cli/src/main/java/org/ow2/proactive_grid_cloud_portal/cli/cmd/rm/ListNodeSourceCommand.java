@@ -50,25 +50,22 @@ import org.ow2.proactive_grid_cloud_portal.cli.json.RmStateView;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
 
+
 public class ListNodeSourceCommand extends AbstractCommand implements Command {
 
     @Override
     public void execute(ApplicationContext currentContext) throws CLIException {
-        HttpGet request = new HttpGet(
-                currentContext.getResourceUrl("monitoring"));
+        HttpGet request = new HttpGet(currentContext.getResourceUrl("monitoring"));
         HttpResponseWrapper response = execute(request, currentContext);
         if (statusCode(OK) == statusCode(response)) {
-            RmStateView state = readValue(response, RmStateView.class,
-                    currentContext);
+            RmStateView state = readValue(response, RmStateView.class, currentContext);
             NodeSourceView[] nodeSources = state.getNodeSource();
             resultStack(currentContext).push(nodeSources);
             if (!currentContext.isSilent()) {
-                writeLine(currentContext, "%s",
-                        StringUtility.string(nodeSources));
+                writeLine(currentContext, "%s", StringUtility.string(nodeSources));
             }
         } else {
-            handleError("An error occurred while retrieving node sources:",
-                    response, currentContext);
+            handleError("An error occurred while retrieving node sources:", response, currentContext);
         }
     }
 

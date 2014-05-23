@@ -42,6 +42,7 @@ import java.util.Map;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 
+
 public class PropagateVariablesExec extends JavaExecutable {
 
     private Map<String, String> check;
@@ -61,10 +62,9 @@ public class PropagateVariablesExec extends JavaExecutable {
                 if (expected != null) {
                     String actual = (String) getVariable(key);
                     if (actual == null || !actual.equals(expected)) {
-                        throw new RuntimeException(
-                                String.format(
-                                        "Propagated variable error: %s, expected=%s, actual=%s",
-                                        key, expected, actual));
+                        throw new RuntimeException(String.format(
+                                "Propagated variable error: %s, expected=%s, actual=%s", key, expected,
+                                actual));
                     }
                 }
 

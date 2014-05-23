@@ -70,6 +70,7 @@ import org.ow2.proactive_grid_cloud_portal.common.exceptionmapper.ExceptionToJso
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
 
+
 public class SchedulerRestClient {
 
     private SchedulerRestInterface scheduler;
@@ -97,10 +98,10 @@ public class SchedulerRestClient {
     }
 
     public boolean pushFile(String sessionId, String space, String path, String fileName,
-      InputStream fileContent)
-      throws Exception {
+            InputStream fileContent) throws Exception {
         String uriTmpl = (new StringBuilder(restEndpointURL)).append(addSlashIfMissing(restEndpointURL))
-          .append("scheduler/dataspace/").append(space).append(URLEncoder.encode(path, "UTF-8")).toString();
+                .append("scheduler/dataspace/").append(space).append(URLEncoder.encode(path, "UTF-8"))
+                .toString();
 
         ResteasyClient client = new ResteasyClientBuilder().httpEngine(httpEngine).build();
         ResteasyWebTarget target = client.target(uriTmpl);
@@ -109,24 +110,23 @@ public class SchedulerRestClient {
         formData.addFormData("fileName", fileName, MediaType.TEXT_PLAIN_TYPE);
         formData.addFormData("fileContent", fileContent, MediaType.APPLICATION_OCTET_STREAM_TYPE);
 
-        GenericEntity<MultipartFormDataOutput> entity = new GenericEntity<MultipartFormDataOutput>(
-          formData) {
+        GenericEntity<MultipartFormDataOutput> entity = new GenericEntity<MultipartFormDataOutput>(formData) {
         };
 
         Response response = target.request().header("sessionid", sessionId).post(
-          Entity.entity(entity, MediaType.MULTIPART_FORM_DATA_TYPE));
+                Entity.entity(entity, MediaType.MULTIPART_FORM_DATA_TYPE));
 
         if (response.getStatus() != HttpURLConnection.HTTP_OK) {
             if (response.getStatus() == HttpURLConnection.HTTP_UNAUTHORIZED) {
                 throw new NotConnectedRestException("User not authenticated or session timeout.");
             } else {
-                throw new Exception(
-                  String.format("File upload failed. Status code: %s", response.getStatus()));
+                throw new Exception(String
+                        .format("File upload failed. Status code: %s", response.getStatus()));
             }
         }
         return response.readEntity(Boolean.class);
     }
-    
+
     public void pullFile(String sessionId, String space, String path, String outputPath) throws Exception {
         String uriTmpl = (new StringBuilder(restEndpointURL)).append(addSlashIfMissing(restEndpointURL))
                 .append("scheduler/dataspace/").append(space).append(URLEncoder.encode(path, "UTF-8"))
@@ -138,8 +138,8 @@ public class SchedulerRestClient {
             if (response.getStatus() == HttpURLConnection.HTTP_UNAUTHORIZED) {
                 throw new NotConnectedRestException("User not authenticated or session timeout.");
             } else {
-                throw new Exception(String.format("Cannot retrieve the file. Status code: %s",
-                        response.getStatus()));
+                throw new Exception(String.format("Cannot retrieve the file. Status code: %s", response
+                        .getStatus()));
             }
         }
         try {
@@ -161,7 +161,7 @@ public class SchedulerRestClient {
             }
         }
     }
-    
+
     private JobIdData submit(String sessionId, InputStream job, MediaType mediaType) throws Exception {
         String uriTmpl = restEndpointURL + addSlashIfMissing(restEndpointURL) + "scheduler/submit";
 
@@ -170,12 +170,11 @@ public class SchedulerRestClient {
 
         MultipartFormDataOutput formData = new MultipartFormDataOutput();
         formData.addFormData("file", job, mediaType);
-        GenericEntity<MultipartFormDataOutput> entity = new GenericEntity<MultipartFormDataOutput>(
-          formData) {
+        GenericEntity<MultipartFormDataOutput> entity = new GenericEntity<MultipartFormDataOutput>(formData) {
         };
 
         Response response = target.request().header("sessionid", sessionId).post(
-          Entity.entity(entity, MediaType.MULTIPART_FORM_DATA_TYPE));
+                Entity.entity(entity, MediaType.MULTIPART_FORM_DATA_TYPE));
 
         if (response.getStatus() != HttpURLConnection.HTTP_OK) {
             if (response.getStatus() == HttpURLConnection.HTTP_UNAUTHORIZED) {
@@ -195,9 +194,10 @@ public class SchedulerRestClient {
         return scheduler;
     }
 
-    private static SchedulerRestInterface createRestProxy(ResteasyProviderFactory provider, String restEndpointURL,
-      ClientHttpEngine httpEngine) {
-        ResteasyClient client = new ResteasyClientBuilder().providerFactory(provider).httpEngine(httpEngine).build();
+    private static SchedulerRestInterface createRestProxy(ResteasyProviderFactory provider,
+            String restEndpointURL, ClientHttpEngine httpEngine) {
+        ResteasyClient client = new ResteasyClientBuilder().providerFactory(provider).httpEngine(httpEngine)
+                .build();
         ResteasyWebTarget target = client.target(restEndpointURL);
         SchedulerRestInterface schedulerRestClient = target.proxy(SchedulerRestInterface.class);
         return createExceptionProxy(schedulerRestClient);
@@ -223,10 +223,10 @@ public class SchedulerRestClient {
             } catch (InvocationTargetException targetException) {
                 if (targetException.getTargetException() instanceof WebApplicationException) {
                     WebApplicationException clientException = (WebApplicationException) targetException
-                      .getTargetException();
+                            .getTargetException();
                     try {
-                        ExceptionToJson json = clientException.getResponse().readEntity(
-                          ExceptionToJson.class);
+                        ExceptionToJson json = clientException.getResponse()
+                                .readEntity(ExceptionToJson.class);
                         // here we take the server side exception and recreate it on the client side
                         throw rebuildServerSideException(json);
                     } catch (ProcessingException couldNotReadJsonException) {
@@ -277,11 +277,10 @@ public class SchedulerRestClient {
             return built;
         }
     }
-    
 
     @Provider
-    @Consumes({MediaType.APPLICATION_JSON, "text/json"})
-    @Produces({MediaType.APPLICATION_JSON, "text/json"})
+    @Consumes( { MediaType.APPLICATION_JSON, "text/json" })
+    @Produces( { MediaType.APPLICATION_JSON, "text/json" })
     public static class JacksonContextResolver implements ContextResolver<ObjectMapper> {
         public ObjectMapper getContext(Class<?> objectType) {
             ObjectMapper objectMapper = new ObjectMapper();
@@ -289,7 +288,7 @@ public class SchedulerRestClient {
             return objectMapper;
         }
     }
-    
+
     private static Class<?> toClass(String className) {
         try {
             return Class.forName(className);

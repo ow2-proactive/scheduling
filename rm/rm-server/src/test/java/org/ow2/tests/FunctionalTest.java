@@ -96,7 +96,6 @@ public class FunctionalTest extends ProActiveTest {
         return Math.abs(testName.hashCode() % maxValue) + 1;
     }
 
-
     protected boolean shouldBeExecuted() {
         String testName = this.getClass().getSimpleName();
         return shouldBeExecuted(testName);
@@ -107,7 +106,7 @@ public class FunctionalTest extends ProActiveTest {
         String sliceProperty = System.getProperty("test_slice");
         String maxSliceProperty = System.getProperty("max_test_slice");
 
-        if (sliceProperty!=null && maxSliceProperty != null) {
+        if (sliceProperty != null && maxSliceProperty != null) {
             try {
 
                 int targetSlice = Integer.parseInt(sliceProperty);
@@ -115,14 +114,15 @@ public class FunctionalTest extends ProActiveTest {
 
                 int currentTestSlice = getTestSlice(testName, maxSlice);
 
-                System.err.println("Test slice: "+ currentTestSlice);
+                System.err.println("Test slice: " + currentTestSlice);
 
                 if (currentTestSlice != targetSlice) {
                     return false;
                 }
 
                 return true;
-            } catch (NumberFormatException ex) {}
+            } catch (NumberFormatException ex) {
+            }
         }
         return true;
     }
@@ -169,17 +169,16 @@ public class FunctionalTest extends ProActiveTest {
 
     private static void configurePAHome() {
         if (System.getProperty(CentralPAPropertyRepository.PA_HOME.getName()) == null) {
-            System.setProperty(CentralPAPropertyRepository.PA_HOME.getName(), System.getProperty(
-                    PAResourceManagerProperties.RM_HOME.getKey()));
+            System.setProperty(CentralPAPropertyRepository.PA_HOME.getName(), System
+                    .getProperty(PAResourceManagerProperties.RM_HOME.getKey()));
         }
     }
 
     private static void configureLogging() {
         if (System.getProperty(CentralPAPropertyRepository.LOG4J.getName()) == null) {
-            String defaultLog4jConfig = System.getProperty(
-                    PAResourceManagerProperties.RM_HOME.getKey()) + "/config/log4j/log4j-junit";
-            System.setProperty(CentralPAPropertyRepository.LOG4J.getName(),
-                    "file:" + defaultLog4jConfig);
+            String defaultLog4jConfig = System.getProperty(PAResourceManagerProperties.RM_HOME.getKey()) +
+                "/config/log4j/log4j-junit";
+            System.setProperty(CentralPAPropertyRepository.LOG4J.getName(), "file:" + defaultLog4jConfig);
             PropertyConfigurator.configure(defaultLog4jConfig);
         }
     }

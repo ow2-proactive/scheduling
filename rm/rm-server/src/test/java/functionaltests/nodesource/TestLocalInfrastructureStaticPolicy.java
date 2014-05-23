@@ -69,8 +69,8 @@ public class TestLocalInfrastructureStaticPolicy extends RMConsecutive {
         byte[] creds = FileToBytesConverter.convertFileToByteArray(new File(PAResourceManagerProperties
                 .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
         helper.getResourceManager().createNodeSource(sourceName, LocalInfrastructure.class.getName(),
-                new Object[] { creds, 0, RMTHelper.defaultNodesTimeout, "" },
-                StaticPolicy.class.getName(), null);
+                new Object[] { creds, 0, RMTHelper.defaultNodesTimeout, "" }, StaticPolicy.class.getName(),
+                null);
 
         helper.waitForNodeSourceCreation(sourceName);
     }

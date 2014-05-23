@@ -7,6 +7,7 @@ import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 
 import java.util.concurrent.TimeUnit;
 
+
 public class LiveLogCommand extends AbstractJobCommand {
     public LiveLogCommand(String jobId) {
         super(jobId);

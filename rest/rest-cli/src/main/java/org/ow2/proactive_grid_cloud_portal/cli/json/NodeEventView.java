@@ -73,7 +73,7 @@ public class NodeEventView {
     public void setNodeState(String nodeState) {
         this.nodeState = nodeState;
     }
-    
+
     public String getNodeInfo() {
         return nodeInfo;
     }

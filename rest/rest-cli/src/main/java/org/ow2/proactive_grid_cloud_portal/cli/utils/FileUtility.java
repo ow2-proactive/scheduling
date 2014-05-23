@@ -52,6 +52,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 
+
 public class FileUtility {
 
     public static String md5Checksum(File file) {
@@ -115,7 +116,7 @@ public class FileUtility {
             }
         }
     }
-    
+
     public static OutputStream buildOutputStream(File file) throws IllegalArgumentException {
         if (file.exists() && !file.delete()) {
             throw new RuntimeException("Cannot delete the existing output file. " + file.getAbsolutePath());
@@ -123,12 +124,11 @@ public class FileUtility {
             File parentFile = file.getParentFile();
             if (parentFile == null) {
                 throw new IllegalArgumentException(
-                        "Invalid pathname. Cannot determine the parent directory. " + file.getAbsolutePath());
+                    "Invalid pathname. Cannot determine the parent directory. " + file.getAbsolutePath());
             }
             if (!(parentFile.exists() || parentFile.mkdirs())) {
-                throw new RuntimeException(
-                        "Cannot create the non-existing parent directory of the file. "
-                                + file.getAbsolutePath());
+                throw new RuntimeException("Cannot create the non-existing parent directory of the file. " +
+                    file.getAbsolutePath());
             }
         }
         try {

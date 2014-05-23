@@ -41,5 +41,6 @@ public class RMJMXBeans {
     public static final String ALLACCOUNTS_MBEAN_NAME = "ProActiveResourceManager:name=AllAccounts";
     public static final String MANAGEMENT_MBEAN_NAME = "ProActiveResourceManager:name=Management";
 
-    private RMJMXBeans() {}
+    private RMJMXBeans() {
+    }
 }

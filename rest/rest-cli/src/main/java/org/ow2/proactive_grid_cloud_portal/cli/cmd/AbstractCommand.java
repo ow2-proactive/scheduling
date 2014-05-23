@@ -60,6 +60,7 @@ import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpUtility;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
 
+
 public abstract class AbstractCommand implements Command {
 
     protected int statusCode(HttpResponseStatus status) {
@@ -73,26 +74,23 @@ public abstract class AbstractCommand implements Command {
     protected <T> T readValue(HttpResponseWrapper response, Class<T> valueType,
             ApplicationContext currentContext) {
         try {
-            return currentContext.getObjectMapper().readValue(
-                    response.getContent(), valueType);
+            return currentContext.getObjectMapper().readValue(response.getContent(), valueType);
         } catch (IOException ioe) {
             throw new CLIException(REASON_IO_ERROR, ioe);
         }
     }
 
-    protected <T> T readValue(HttpResponseWrapper response,
-            TypeReference<T> valueType, ApplicationContext currentContext) {
+    protected <T> T readValue(HttpResponseWrapper response, TypeReference<T> valueType,
+            ApplicationContext currentContext) {
         try {
-            return currentContext.getObjectMapper().readValue(
-                    response.getContent(), valueType);
+            return currentContext.getObjectMapper().readValue(response.getContent(), valueType);
         } catch (IOException ioe) {
             throw new CLIException(REASON_IO_ERROR, ioe);
         }
 
     }
 
-    protected void writeLine(ApplicationContext currentContext, String format,
-            Object... args) {
+    protected void writeLine(ApplicationContext currentContext, String format, Object... args) {
         if (!currentContext.isSilent()) {
             try {
                 currentContext.getDevice().writeLine(format, args);
@@ -102,8 +100,7 @@ public abstract class AbstractCommand implements Command {
         }
     }
 
-    protected String readLine(ApplicationContext currentContext, String format,
-            Object... args) {
+    protected String readLine(ApplicationContext currentContext, String format, Object... args) {
         try {
             return currentContext.getDevice().readLine(format, args);
         } catch (IOException ioe) {
@@ -111,8 +108,7 @@ public abstract class AbstractCommand implements Command {
         }
     }
 
-    protected char[] readPassword(ApplicationContext currentContext,
-            String format, Object... args) {
+    protected char[] readPassword(ApplicationContext currentContext, String format, Object... args) {
         try {
             return currentContext.getDevice().readPassword(format, args);
         } catch (IOException ioe) {
@@ -120,16 +116,14 @@ public abstract class AbstractCommand implements Command {
         }
     }
 
-    protected HttpResponseWrapper execute(HttpUriRequest request,
-            ApplicationContext currentContext) {
+    protected HttpResponseWrapper execute(HttpUriRequest request, ApplicationContext currentContext) {
         String sessionId = currentContext.getSessionId();
         if (sessionId != null) {
             request.setHeader("sessionid", sessionId);
         }
         HttpClient client = HttpUtility.threadSafeClient();
         try {
-            if ("https".equals(request.getURI().getScheme())
-                    && currentContext.canInsecureAccess()) {
+            if ("https".equals(request.getURI().getScheme()) && currentContext.canInsecureAccess()) {
                 HttpUtility.setInsecureAccess(client);
             }
             HttpResponse response = client.execute(request);
@@ -143,14 +137,14 @@ public abstract class AbstractCommand implements Command {
     }
 
     @SuppressWarnings("unchecked")
-    protected void handleError(String errorMessage,
-            HttpResponseWrapper response, ApplicationContext currentContext) {
+    protected void handleError(String errorMessage, HttpResponseWrapper response,
+            ApplicationContext currentContext) {
         String responseContent = StringUtility.responseAsString(response);
         Stack resultStack = resultStack(currentContext);
         ErrorView errorView = null;
         try {
-            errorView = currentContext.getObjectMapper().readValue(
-                    responseContent.getBytes(), ErrorView.class);
+            errorView = currentContext.getObjectMapper().readValue(responseContent.getBytes(),
+                    ErrorView.class);
             resultStack.push(errorView);
 
         } catch (Throwable error) {
@@ -166,34 +160,29 @@ public abstract class AbstractCommand implements Command {
     }
 
     @SuppressWarnings("unchecked")
-    protected void handleError(String errorMessage,
-                               Exception error, ApplicationContext currentContext) {
+    protected void handleError(String errorMessage, Exception error, ApplicationContext currentContext) {
         Stack resultStack = resultStack(currentContext);
         resultStack.push(error);
-        
+
         if (error instanceof NotConnectedRestException) {
-            throw new CLIException(REASON_UNAUTHORIZED_ACCESS, errorMessage,
-                    error);
+            throw new CLIException(REASON_UNAUTHORIZED_ACCESS, errorMessage, error);
         }
 
         writeLine(currentContext, errorMessage);
         Throwable cause = error.getCause();
-        
-        writeLine(currentContext, "%nError Message: %s",
-                (cause == null) ? error.getMessage() : cause.getMessage());
 
-        writeLine(currentContext, "%nStack Track: %s",
-                StringUtility.stackTraceAsString((cause == null) ? error
-                        : cause));
+        writeLine(currentContext, "%nError Message: %s", (cause == null) ? error.getMessage() : cause
+                .getMessage());
+
+        writeLine(currentContext, "%nStack Track: %s", StringUtility
+                .stackTraceAsString((cause == null) ? error : cause));
     }
 
-    private void writeError(String errorMsg, String responseContent,
-            ApplicationContext currentContext) {
+    private void writeError(String errorMsg, String responseContent, ApplicationContext currentContext) {
         writeLine(currentContext, errorMsg);
 
         String errorMessage = null, errorCode = null;
-        BufferedReader reader = new BufferedReader(new StringReader(
-                responseContent));
+        BufferedReader reader = new BufferedReader(new StringReader(responseContent));
 
         String line = null;
         try {
@@ -236,8 +225,7 @@ public abstract class AbstractCommand implements Command {
         }
 
         if (errorCode == null && errorMessage == null) {
-            writeLine(currentContext, "%s%n%s", "Error Message:",
-                    responseContent);
+            writeLine(currentContext, "%s%n%s", "Error Message:", responseContent);
         }
     }
 
@@ -245,19 +233,14 @@ public abstract class AbstractCommand implements Command {
         return currentContext.resultStack();
     }
 
-    private void writeError(String errorMessage, ErrorView error,
-            ApplicationContext currentContext) {
+    private void writeError(String errorMessage, ErrorView error, ApplicationContext currentContext) {
         if (statusCode(FORBIDDEN) == error.getHttpErrorCode()) {
             // this exception would be handled at an upper level ..
-            throw new CLIException(REASON_UNAUTHORIZED_ACCESS,
-                    error.getErrorMessage());
+            throw new CLIException(REASON_UNAUTHORIZED_ACCESS, error.getErrorMessage());
         }
         writeLine(currentContext, errorMessage);
-        writeLine(currentContext, "%s %s", "HTTP Error Code:",
-                error.getHttpErrorCode());
-        writeLine(currentContext, "%s %s", "Error Message:",
-                error.getErrorMessage());
-        writeLine(currentContext, "%s%n%s", "Stack Trace:",
-                error.getStackTrace());
+        writeLine(currentContext, "%s %s", "HTTP Error Code:", error.getHttpErrorCode());
+        writeLine(currentContext, "%s %s", "Error Message:", error.getErrorMessage());
+        writeLine(currentContext, "%s%n%s", "Stack Trace:", error.getStackTrace());
     }
 }

@@ -68,7 +68,6 @@ public class RMDBManager {
 
     private Timer timer = null;
 
-
     /**
     * An internal class to encapsulate the semantic of your data base query.
     * It allows to avoid try/catch in every method. 
@@ -97,9 +96,9 @@ public class RMDBManager {
                     .getValueAsBoolean();
 
             if (logger.isInfoEnabled()) {
-                logger.info("Starting RM DB Manager " +
-                  "with drop DB = " + drop + " and drop nodesources = " + dropNS +
-                  " and configuration file = " + configFile.getAbsolutePath());
+                logger.info("Starting RM DB Manager " + "with drop DB = " + drop +
+                    " and drop nodesources = " + dropNS + " and configuration file = " +
+                    configFile.getAbsolutePath());
             }
             return new RMDBManager(new Configuration().configure(configFile), drop, dropNS);
         }

@@ -111,7 +111,7 @@ public class SigarProcesses implements SigarProcessesMXBean {
         StringBuilder result = new StringBuilder();
         result.append("{");
 
-        for (int i=0; i< attrs.length; i++) {
+        for (int i = 0; i < attrs.length; i++) {
 
             String dataSource = RRDSigarDataStore.toDataStoreName(attrs[i] + "-" + objectName);
 

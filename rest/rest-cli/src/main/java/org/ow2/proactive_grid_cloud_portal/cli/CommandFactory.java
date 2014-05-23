@@ -64,6 +64,7 @@ import org.apache.commons.cli.Options;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.LoginWithCredentialsCommand;
 
+
 /**
  * {@link CommandFactory} builds an ordered {@link Command} list for a given
  * user argument set.
@@ -84,13 +85,13 @@ public abstract class CommandFactory {
 
     public static CommandFactory getCommandFactory(int type) {
         switch (type) {
-        case SCHEDULER:
-            return new SchedulerCommandFactory();
-        case RM:
-            return new RmCommandFactory();
-        default:
-            throw new CLIException(REASON_INVALID_ARGUMENTS, String.format(
-                    "Unknow AbstractCommandFactory type['%d']", type));
+            case SCHEDULER:
+                return new SchedulerCommandFactory();
+            case RM:
+                return new RmCommandFactory();
+            default:
+                throw new CLIException(REASON_INVALID_ARGUMENTS, String.format(
+                        "Unknow AbstractCommandFactory type['%d']", type));
         }
     }
 
@@ -123,8 +124,8 @@ public abstract class CommandFactory {
      *            the command-line arguments
      * @return an ordered {@link Command} list.
      */
-    protected List<Command> getCommandList(CommandLine cli,
-            Map<String, Command> map, ApplicationContext currentContext) {
+    protected List<Command> getCommandList(CommandLine cli, Map<String, Command> map,
+            ApplicationContext currentContext) {
         LinkedList<Command> list = new LinkedList<Command>();
 
         if (map.containsKey(opt(SCHED_HELP))) {
@@ -174,8 +175,7 @@ public abstract class CommandFactory {
             String filename = resourceType + ".cc";
             File credFile = new File(DFLT_SESSION_DIR, filename);
             if (credFile.exists()) {
-                list.add(new LoginWithCredentialsCommand(credFile
-                        .getAbsolutePath()));
+                list.add(new LoginWithCredentialsCommand(credFile.getAbsolutePath()));
             }
         }
 
@@ -186,22 +186,19 @@ public abstract class CommandFactory {
             final Map<String, CommandSet.Entry> supportedCommandEntryMap) {
         Map<String, Command> cliCommands = new HashMap<String, Command>();
         for (Option o : cli.getOptions()) {
-            cliCommands.put(o.getOpt(),
-                    getCommandForOption(o, supportedCommandEntryMap));
+            cliCommands.put(o.getOpt(), getCommandForOption(o, supportedCommandEntryMap));
         }
         return cliCommands;
     }
 
-    protected Command getCommandForOption(Option opt,
-            final Map<String, CommandSet.Entry> commandMap) {
+    protected Command getCommandForOption(Option opt, final Map<String, CommandSet.Entry> commandMap) {
         return commandMap.get(opt.getOpt()).commandObject(opt);
     }
 
     protected Options createOptions(Collection<CommandSet.Entry> entries) {
         Options options = new Options();
         for (CommandSet.Entry entry : entries) {
-            Option option = new Option(entry.opt(), entry.longOpt(),
-                    entry.hasArgs(), entry.description());
+            Option option = new Option(entry.opt(), entry.longOpt(), entry.hasArgs(), entry.description());
             if (entry.numOfArgs() > 0) {
                 option.setArgs(entry.numOfArgs());
             } else if (entry.hasArgs() && entry.numOfArgs() == -1) {

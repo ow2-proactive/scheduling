@@ -43,6 +43,7 @@ import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractTaskCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 
+
 public class RestartTaskCommand extends AbstractTaskCommand implements Command {
 
     public RestartTaskCommand(String jobId, String taskId) {
@@ -62,10 +63,8 @@ public class RestartTaskCommand extends AbstractTaskCommand implements Command {
                 writeLine(currentContext, "Cannot restart %s.", task());
             }
         } catch (Exception e) {
-            handleError(
-                    String.format(
-                            "An error occurred while attempting to restart %s:",
-                            task()), e, currentContext);
+            handleError(String.format("An error occurred while attempting to restart %s:", task()), e,
+                    currentContext);
         }
     }
 

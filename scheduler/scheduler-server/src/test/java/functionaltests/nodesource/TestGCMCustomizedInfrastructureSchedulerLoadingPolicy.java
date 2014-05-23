@@ -74,8 +74,7 @@ public class TestGCMCustomizedInfrastructureSchedulerLoadingPolicy extends
 
     @Override
     protected Object[] getPolicyParams() throws Exception {
-        SchedulerAuthenticationInterface auth = SchedulerConnection
-                .join(SchedulerTHelper.schedulerUrl);
+        SchedulerAuthenticationInterface auth = SchedulerConnection.join(SchedulerTHelper.schedulerUrl);
         Credentials creds = Credentials.createCredentials(new CredData(SchedulerTHelper.admin_username,
             SchedulerTHelper.admin_password), auth.getPublicKey());
         return new Object[] { "ALL", "ME", SchedulerTHelper.schedulerUrl, creds.getBase64(), "2000",// policy period
@@ -99,8 +98,8 @@ public class TestGCMCustomizedInfrastructureSchedulerLoadingPolicy extends
         // creating node source
         // first parameter of im is default rm url
         helper.getResourceManager().createNodeSource(sourceName, GCMCustomisedInfrastructure.class.getName(),
-                new Object[] { GCMDeploymentData, hosts, TIMEOUT },
-                SchedulerLoadingPolicy.class.getName(), getPolicyParams());
+                new Object[] { GCMDeploymentData, hosts, TIMEOUT }, SchedulerLoadingPolicy.class.getName(),
+                getPolicyParams());
 
         helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, sourceName);
     }

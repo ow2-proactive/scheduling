@@ -250,8 +250,7 @@ public class ReducerPATask extends org.ow2.proactive.scheduler.common.task.execu
          */
         int taskId = 0;
         int jobId = 0;
-        String taskIdString = System.getProperty(SchedulerVars.JAVAENV_TASK_ID_VARNAME
-                .toString());
+        String taskIdString = System.getProperty(SchedulerVars.JAVAENV_TASK_ID_VARNAME.toString());
         if ((taskIdString != null) && (!(taskIdString.equalsIgnoreCase("")))) {
             taskId = Integer.parseInt(taskIdString);
             logger.debug("The taskId of the ReducerPATask is: " + taskId);
@@ -535,8 +534,7 @@ public class ReducerPATask extends org.ow2.proactive.scheduler.common.task.execu
                      */
                     currentIndexRecord = new SpillRecord(currentIndexFilePath, localFileSystem)
                             .getIndex(Integer.parseInt(System
-                                    .getProperty(SchedulerVars.JAVAENV_TASK_REPLICATION
-                                            .toString())));
+                                    .getProperty(SchedulerVars.JAVAENV_TASK_REPLICATION.toString())));
 
                     logger.debug("Iteration '" + i + "' currentIndexRecord.startOffset=" +
                         currentIndexRecord.startOffset + ", currentIndexRecord.rawLength=" +
@@ -650,8 +648,7 @@ public class ReducerPATask extends org.ow2.proactive.scheduler.common.task.execu
 
                     currentIndexRecord = new SpillRecord(currentIndexFilePath, localFileSystem)
                             .getIndex(Integer.parseInt(System
-                                    .getProperty(SchedulerVars.JAVAENV_TASK_REPLICATION
-                                            .toString())));
+                                    .getProperty(SchedulerVars.JAVAENV_TASK_REPLICATION.toString())));
 
                     logger.debug("Iteration '" + i + "' currentIndexRecord.startOffset=" +
                         currentIndexRecord.startOffset + ", currentIndexRecord.rawLength=" +

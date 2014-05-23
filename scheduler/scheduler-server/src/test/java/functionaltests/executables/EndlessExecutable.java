@@ -48,12 +48,12 @@ import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
  **/
 public class EndlessExecutable extends JavaExecutable {
 
-    public static File STARTED_FILE = new File(java.lang.System.getProperty("java.io.tmpdir"),"started.ok");
+    public static File STARTED_FILE = new File(java.lang.System.getProperty("java.io.tmpdir"), "started.ok");
 
     @Override
     public Serializable execute(TaskResult... results) throws Throwable {
         STARTED_FILE.createNewFile();
-        while(true) {
+        while (true) {
             Thread.sleep(500);
         }
     }

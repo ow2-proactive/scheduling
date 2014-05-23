@@ -65,8 +65,8 @@ public class RestClientExceptionHandlerTest extends RestTestServer {
     @Test
     public void client_handles_jetty_errors_404() throws Exception {
         try {
-            SchedulerRestClient client = new SchedulerRestClient(
-              "http://localhost:" + port + "/" + "rest/a_path_that_does_not_exist");
+            SchedulerRestClient client = new SchedulerRestClient("http://localhost:" + port + "/" +
+                "rest/a_path_that_does_not_exist");
 
             client.getScheduler().login("demo", "demo");
             fail("Should have throw an exception");
@@ -80,11 +80,11 @@ public class RestClientExceptionHandlerTest extends RestTestServer {
     public void client_handles_jetty_errors_500() throws Exception {
         try {
             SchedulerRMProxyFactory schedulerFactory = mock(SchedulerRMProxyFactory.class);
-            when(schedulerFactory.connectToScheduler(Matchers.<CredData>any())).thenThrow(new LoginException());
+            when(schedulerFactory.connectToScheduler(Matchers.<CredData> any())).thenThrow(
+                    new LoginException());
             SharedSessionStore.getInstance().setSchedulerRMProxyFactory(schedulerFactory);
 
-            SchedulerRestClient client = new SchedulerRestClient(
-              "http://localhost:" + port + "/");
+            SchedulerRestClient client = new SchedulerRestClient("http://localhost:" + port + "/");
 
             client.getScheduler().login("demo", "demo");
             fail("Should have throw an exception");
@@ -97,8 +97,7 @@ public class RestClientExceptionHandlerTest extends RestTestServer {
     @Test
     public void client_handles_unknown_session_id() throws Exception {
         try {
-            SchedulerRestClient client = new SchedulerRestClient(
-              "http://localhost:" + port + "/");
+            SchedulerRestClient client = new SchedulerRestClient("http://localhost:" + port + "/");
 
             client.getScheduler().listJobs("nonExisting", "42");
             fail("Should have throw an exception");

@@ -88,8 +88,7 @@ public class RMProxyUserInterfaceTest extends RMConsecutive {
     }
 
     private RMListenerProxy createRMCachingProxyUserInterface() throws Exception {
-        RMListenerProxy proxyUserInterface = PAActiveObject.newActive(
-                RMListenerProxy.class, new Object[] {});
+        RMListenerProxy proxyUserInterface = PAActiveObject.newActive(RMListenerProxy.class, new Object[] {});
         final RMAuthentication auth = RMTHelper.getDefaultInstance().getRMAuth();
         final PublicKey pubKey = auth.getPublicKey();
         final Credentials adminCreds = Credentials.createCredentials(new CredData(RMTHelper.defaultUserName,

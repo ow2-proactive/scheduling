@@ -63,7 +63,7 @@ public class SimpleNativeJobSubmitClient extends BaseJobSubmitClient {
 
         NativeTask task = new NativeTask();
         task.setCommandLine(new String[] { testsSourcePath +
-                "/org/ow2/proactive/tests/performance/jmeter/scheduler/nativeTask.sh"});
+            "/org/ow2/proactive/tests/performance/jmeter/scheduler/nativeTask.sh" });
         task.setName("Simple native task");
         task.setDescription("Test native task, exits immediately");
         task.setMaxNumberOfExecution(1);

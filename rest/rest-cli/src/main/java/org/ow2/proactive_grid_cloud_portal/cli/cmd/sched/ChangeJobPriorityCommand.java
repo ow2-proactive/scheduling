@@ -43,8 +43,8 @@ import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractJobCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 
-public class ChangeJobPriorityCommand extends AbstractJobCommand implements
-        Command {
+
+public class ChangeJobPriorityCommand extends AbstractJobCommand implements Command {
     private String priorityValue;
 
     public ChangeJobPriorityCommand(String jobId, String priorityValue) {
@@ -58,12 +58,10 @@ public class ChangeJobPriorityCommand extends AbstractJobCommand implements
         try {
             scheduler.schedulerChangeJobPriorityByValue(currentContext.getSessionId(), jobId, priorityValue);
             resultStack(currentContext).push(Boolean.TRUE);
-            writeLine(currentContext, "%s priority changed successfully.",
-                    job());
+            writeLine(currentContext, "%s priority changed successfully.", job());
         } catch (Exception e) {
-            handleError(String.format(
-                    "An error occurred while changing %s priority:", job()),
-                    e, currentContext);
+            handleError(String.format("An error occurred while changing %s priority:", job()), e,
+                    currentContext);
         }
     }
 }

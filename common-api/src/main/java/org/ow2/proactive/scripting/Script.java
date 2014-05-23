@@ -238,7 +238,8 @@ public abstract class Script<E> implements Serializable {
         ScriptEngine engine = createScriptEngine();
 
         if (engine == null) {
-            return new ScriptResult<E>(new Exception("No Script Engine Found for name or extension " + scriptEngineLookup));
+            return new ScriptResult<E>(new Exception("No Script Engine Found for name or extension " +
+                scriptEngineLookup));
         }
 
         // SCHEDULING-1532: redirect script output to a buffer (keep the latest DEFAULT_OUTPUT_MAX_SIZE)

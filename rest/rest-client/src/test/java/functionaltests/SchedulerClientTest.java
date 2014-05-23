@@ -69,8 +69,9 @@ import org.ow2.proactive.scheduler.common.util.JarUtils;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
 
+
 public class SchedulerClientTest extends AbstractRestFuncTestCase {
-    
+
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
 
@@ -126,16 +127,21 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         client.pushFile("USERSPACE", "", emptyFile.getName(), emptyFile.getCanonicalPath());
 
         // Delete the local file
-        Assert.assertTrue("Unable to delete the local file after push, maybe there are still some open streams ?", emptyFile.delete());
+        Assert.assertTrue(
+                "Unable to delete the local file after push, maybe there are still some open streams ?",
+                emptyFile.delete());
 
         // Pull it from the userspace to be sure that it was pushed
         client.pullFile("USERSPACE", "", emptyFile.getCanonicalPath());
 
         // Check the file was pulled
-        Assert.assertTrue("Unable to pull the empty file, maybe the pull mechanism is broken ?", emptyFile.exists());
+        Assert.assertTrue("Unable to pull the empty file, maybe the pull mechanism is broken ?", emptyFile
+                .exists());
 
         // Delete the local file
-        Assert.assertTrue("Unable to delete the local file after pull, maybe there are still some open streams ?", emptyFile.delete());
+        Assert.assertTrue(
+                "Unable to delete the local file after pull, maybe there are still some open streams ?",
+                emptyFile.delete());
 
         // Delete the file in the user space
         //client.deleteFile("USERSPACE", emptyFile.getName()); TODO: TEST THIS LATER
@@ -164,12 +170,10 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
 
         // Create a jar and specify it as a jobclasspath
         File jarFile = testFolder.newFile("testSubmitAsJobArchive.jar");
-        JarUtils.jar(new String[]{destDir2.getAbsolutePath()}, jarFile, null, null, null, null);
+        JarUtils.jar(new String[] { destDir2.getAbsolutePath() }, jarFile, null, null, null, null);
 
         JobEnvironment jobEnv = new JobEnvironment();
-        jobEnv.setJobClasspath(new String[]{
-            destDir1.getAbsolutePath(),
-            jarFile.getAbsolutePath()});
+        jobEnv.setJobClasspath(new String[] { destDir1.getAbsolutePath(), jarFile.getAbsolutePath() });
         job.setEnvironment(jobEnv);
 
         // The java task will use the first class as executable
@@ -197,9 +201,11 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         TaskResult javaTaskResult = allResults.get(javaTask.getName());
         Serializable ser1 = javaTaskResult.value();
 
-        Assert.assertEquals("The value returned by the " + className1 + "#execute() method is incorrect, maybe "
-                + "the SchedulerClient#submitAsJobArchive() method incorrectly packs the class into the job archive",
-                value1, (Integer) ser1);
+        Assert
+                .assertEquals(
+                        "The value returned by the " + className1 + "#execute() method is incorrect, maybe " +
+                            "the SchedulerClient#submitAsJobArchive() method incorrectly packs the class into the job archive",
+                        value1, (Integer) ser1);
 
         // Check that script task returned the correct value
         TaskResult scriptTaskResult = allResults.get(scriptTask.getName());
@@ -209,9 +215,13 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         } catch (Throwable ex) {
             throw new RuntimeException(ex);
         }
-        Assert.assertEquals("The value returned by the " + className2 + "#execute() method is incorrect, maybe "
-                + "the SchedulerClient#submitAsJobArchive() method incorrectly packs the jar containing the class into the job archive",
-                value2, (Integer) ser2);
+        Assert
+                .assertEquals(
+                        "The value returned by the " +
+                            className2 +
+                            "#execute() method is incorrect, maybe " +
+                            "the SchedulerClient#submitAsJobArchive() method incorrectly packs the jar containing the class into the job archive",
+                        value2, (Integer) ser2);
     }
 
     private ISchedulerClient clientInstance() throws Exception {
@@ -252,9 +262,8 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         cc1.addInterface(serializableClass);
 
         //create method for first class
-        CtMethod exec1 = CtNewMethod.make(serializableClass, absExec.getName(), absExec
-                .getParameterTypes(), absExec.getExceptionTypes(), "return new java.lang.Integer("
-                + valueToReturn + ");", cc1);
+        CtMethod exec1 = CtNewMethod.make(serializableClass, absExec.getName(), absExec.getParameterTypes(),
+                absExec.getExceptionTypes(), "return new java.lang.Integer(" + valueToReturn + ");", cc1);
         cc1.addMethod(exec1);
 
         cc1.writeFile(insideDir.getAbsolutePath());

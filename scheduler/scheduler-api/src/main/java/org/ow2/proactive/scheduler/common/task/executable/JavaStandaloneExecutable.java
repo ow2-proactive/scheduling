@@ -54,7 +54,6 @@ import org.ow2.proactive.scheduler.common.task.executable.internal.JavaStandalon
  **/
 public abstract class JavaStandaloneExecutable extends AbstractJavaExecutable {
 
-
     protected void internalInit(JavaStandaloneExecutableInitializer execInitializer) throws Exception {
         super.internalInit(execInitializer);
     }

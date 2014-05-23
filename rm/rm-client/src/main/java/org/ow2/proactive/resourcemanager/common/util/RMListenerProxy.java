@@ -271,16 +271,17 @@ public class RMListenerProxy extends RMGroupEventListener {
     }
 
     public String getNodeMBeanHistory(String nodeJmxUrl, String objectName, List<String> attrs, String range)
-            throws IOException, MalformedObjectNameException, IntrospectionException, InstanceNotFoundException, ReflectionException, MBeanException {
+            throws IOException, MalformedObjectNameException, IntrospectionException,
+            InstanceNotFoundException, ReflectionException, MBeanException {
 
         initNodeConnector(nodeJmxUrl);
 
-        String[] signature = {String.class.getName(), String[].class.getName(), String.class.getName()};
-        Object[] params = new Object[] {objectName, attrs.toArray(new String[] {}), range};
+        String[] signature = { String.class.getName(), String[].class.getName(), String.class.getName() };
+        Object[] params = new Object[] { objectName, attrs.toArray(new String[] {}), range };
 
         // use Processes mbean as the entry point
-        return nodeConnector.getMBeanServerConnection().invoke(
-                new ObjectName("sigar:Type=Processes"), "getAttributesHistory", params, signature).toString();
+        return nodeConnector.getMBeanServerConnection().invoke(new ObjectName("sigar:Type=Processes"),
+                "getAttributesHistory", params, signature).toString();
     }
 
     /**
@@ -323,7 +324,8 @@ public class RMListenerProxy extends RMGroupEventListener {
     }
 
     public Object getNodeMBeansHistory(String nodeJmxUrl, String objectNames, List<String> attrs, String range)
-            throws IOException, MalformedObjectNameException, IntrospectionException, InstanceNotFoundException, ReflectionException, MBeanException {
+            throws IOException, MalformedObjectNameException, IntrospectionException,
+            InstanceNotFoundException, ReflectionException, MBeanException {
 
         initNodeConnector(nodeJmxUrl);
 
@@ -332,13 +334,13 @@ public class RMListenerProxy extends RMGroupEventListener {
 
         HashMap<String, Object> results = new HashMap<String, Object>();
         for (ObjectName bean : beans) {
-            results
-                    .put(bean.getCanonicalName(),
-                            getNodeMBeanHistory(nodeJmxUrl, bean.getCanonicalName(), attrs, range));
+            results.put(bean.getCanonicalName(), getNodeMBeanHistory(nodeJmxUrl, bean.getCanonicalName(),
+                    attrs, range));
         }
 
         return results;
     }
+
     /**
      * Initializes mbean server connection to specified url.
      * If the connection is already established returns existing

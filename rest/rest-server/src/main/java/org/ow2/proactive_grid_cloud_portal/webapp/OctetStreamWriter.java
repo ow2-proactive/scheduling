@@ -52,30 +52,28 @@ import javax.ws.rs.ext.Provider;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.ow2.proactive_grid_cloud_portal.common.exceptionmapper.ExceptionToJson;
 
+
 @Provider
 @Produces(APPLICATION_OCTET_STREAM)
 public class OctetStreamWriter implements MessageBodyWriter<ExceptionToJson> {
     private ObjectMapper mapper = new ObjectMapper();
 
     @Override
-    public boolean isWriteable(Class<?> type, Type genericType,
-            Annotation[] annotations, MediaType mediaType) {
-        return ExceptionToJson.class.isAssignableFrom(type)
-                && APPLICATION_OCTET_STREAM_TYPE.equals(mediaType);
+    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
+        return ExceptionToJson.class.isAssignableFrom(type) &&
+            APPLICATION_OCTET_STREAM_TYPE.equals(mediaType);
     }
 
     @Override
-    public long getSize(ExceptionToJson t, Class<?> type, Type genericType,
-            Annotation[] annotations, MediaType mediaType) {
+    public long getSize(ExceptionToJson t, Class<?> type, Type genericType, Annotation[] annotations,
+            MediaType mediaType) {
         return -1;
     }
 
     @Override
-    public void writeTo(ExceptionToJson t, Class<?> type, Type genericType,
-            Annotation[] annotations, MediaType mediaType,
-            MultivaluedMap<String, Object> httpHeaders,
-            OutputStream entityStream) throws IOException,
-            WebApplicationException {
+    public void writeTo(ExceptionToJson t, Class<?> type, Type genericType, Annotation[] annotations,
+            MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream)
+            throws IOException, WebApplicationException {
         mapper.writeValue(entityStream, t);
     }
 }

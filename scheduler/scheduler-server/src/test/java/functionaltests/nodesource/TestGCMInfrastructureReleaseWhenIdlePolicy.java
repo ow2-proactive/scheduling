@@ -79,8 +79,7 @@ public class TestGCMInfrastructureReleaseWhenIdlePolicy extends FunctionalTest {
     private RMTHelper helper = RMTHelper.getDefaultInstance();
 
     protected Object[] getPolicyParams() throws Exception {
-        SchedulerAuthenticationInterface auth = SchedulerConnection
-                .join(SchedulerTHelper.schedulerUrl);
+        SchedulerAuthenticationInterface auth = SchedulerConnection.join(SchedulerTHelper.schedulerUrl);
         Credentials creds = Credentials.createCredentials(new CredData(SchedulerTHelper.admin_username,
             SchedulerTHelper.admin_password), auth.getPublicKey());
         return new Object[] { "ALL", "ME", SchedulerTHelper.schedulerUrl, creds.getBase64(), "30000" };

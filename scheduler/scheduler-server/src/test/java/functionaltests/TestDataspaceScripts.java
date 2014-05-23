@@ -70,18 +70,14 @@ public class TestDataspaceScripts extends SchedulerConsecutive {
     private static final String typeMacro = "!TYPE";
     private static final String folderMacro = "!FOLDER";
 
-    private static final String scriptContent = ""
-        + "def spaces = [input:input, localspace:localspace, output:output, user:user, global:global]; \n" +
-        "spaces.each { " +
-        "  def f = it.value.resolveFile(\"" +
-        fileName +
+    private static final String scriptContent = "" +
+        "def spaces = [input:input, localspace:localspace, output:output, user:user, global:global]; \n" +
+        "spaces.each { " + "  def f = it.value.resolveFile(\"" + fileName +
         "\"); \n" //
         +
         "  def br = new BufferedReader(new InputStreamReader(f.getContent().getInputStream())); \n" //
-        +
-        "  def out = new PrintWriter(new BufferedWriter(new FileWriter(new File(new File('"+folderMacro+"'),\"out_" +
-        typeMacro +
-        "_\"+it.key)))); \n" //
+        + "  def out = new PrintWriter(new BufferedWriter(new FileWriter(new File(new File('" + folderMacro +
+        "'),\"out_" + typeMacro + "_\"+it.key)))); \n" //
         + "  def line; \n" //
         + "  while ((line = br.readLine()) != null) { \n" //
         + "    out.println(line); \n" //
@@ -153,7 +149,8 @@ public class TestDataspaceScripts extends SchedulerConsecutive {
 
         t.setPreScript(new SimpleScript(scriptContentFiltered.replaceAll(typeMacro, "pre"), "groovy"));
         t.setPostScript(new SimpleScript(scriptContentFiltered.replaceAll(typeMacro, "post"), "groovy"));
-        t.setFlowScript(FlowScript.createLoopFlowScript(scriptContentFiltered.replaceAll(typeMacro, "flow"), "groovy", "T"));
+        t.setFlowScript(FlowScript.createLoopFlowScript(scriptContentFiltered.replaceAll(typeMacro, "flow"),
+                "groovy", "T"));
 
         /**
          * job submission, wait on result, removal

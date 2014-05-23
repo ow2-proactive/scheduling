@@ -209,14 +209,12 @@ public enum PAResourceManagerProperties {
 
     /* ***************************************************************************** */
     /* ***************************************************************************** */
-    public static final String  PA_RM_PROPERTIES_FILEPATH = "pa.rm.properties.filepath";
-    public static final String  PA_RM_PROPERTIES_RELATIVE_FILEPATH = "config/rm/settings.ini";
+    public static final String PA_RM_PROPERTIES_FILEPATH = "pa.rm.properties.filepath";
+    public static final String PA_RM_PROPERTIES_RELATIVE_FILEPATH = "config/rm/settings.ini";
 
     /** memory entity of the properties file. */
-    private static PAPropertiesLazyLoader propertiesLoader = new PAPropertiesLazyLoader(
-      RM_HOME.key,
-      PA_RM_PROPERTIES_FILEPATH,
-      PA_RM_PROPERTIES_RELATIVE_FILEPATH);
+    private static PAPropertiesLazyLoader propertiesLoader = new PAPropertiesLazyLoader(RM_HOME.key,
+        PA_RM_PROPERTIES_FILEPATH, PA_RM_PROPERTIES_RELATIVE_FILEPATH);
 
     /** Key of the specific instance. */
     private String key;
@@ -259,10 +257,8 @@ public enum PAResourceManagerProperties {
      * @param filename the file containing the properties to be loaded.
      */
     protected static void loadProperties(String filename) {
-        propertiesLoader = new PAPropertiesLazyLoader(RM_HOME.key,
-          PA_RM_PROPERTIES_FILEPATH,
-          PA_RM_PROPERTIES_RELATIVE_FILEPATH,
-          filename);
+        propertiesLoader = new PAPropertiesLazyLoader(RM_HOME.key, PA_RM_PROPERTIES_FILEPATH,
+            PA_RM_PROPERTIES_RELATIVE_FILEPATH, filename);
     }
 
     /**

@@ -48,8 +48,9 @@ import org.objectweb.proactive.utils.OperatingSystem;
 
 import functionaltests.SchedulerConsecutive;
 
+
 public class TestModifyPropagatedVariables extends SchedulerConsecutive {
-    
+
     private static URL job_desc = TestModifyPropagatedVariables.class
             .getResource("/functionaltests/descriptors/Job_modify_propagated_vars.xml");
     private static URL job_desc_unix = TestModifyPropagatedVariables.class

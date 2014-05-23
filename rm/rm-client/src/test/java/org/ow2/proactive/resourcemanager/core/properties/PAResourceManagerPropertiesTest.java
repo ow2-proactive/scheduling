@@ -71,8 +71,8 @@ public class PAResourceManagerPropertiesTest {
     public void testLoadProperties_RelativeFileManuallySet() throws Exception {
         File propertiesFile = writePropertyToFile(PAResourceManagerProperties.RM_NODE_NAME, "nodeName");
 
-        System.setProperty(PAResourceManagerProperties.RM_HOME.getKey(),
-          tempFolder.getRoot().getAbsolutePath());
+        System.setProperty(PAResourceManagerProperties.RM_HOME.getKey(), tempFolder.getRoot()
+                .getAbsolutePath());
 
         PAResourceManagerProperties.loadProperties(propertiesFile.getName());
 
@@ -82,7 +82,7 @@ public class PAResourceManagerPropertiesTest {
     @Test
     public void testLoadProperties_RMHomeSet_NoFile() throws Exception {
         File configFolder = writePropertyToFileInConfigFolder(PAResourceManagerProperties.RM_NODE_NAME,
-          "nodeName");
+                "nodeName");
 
         System.setProperty(PAResourceManagerProperties.RM_HOME.getKey(), configFolder.getAbsolutePath());
 
@@ -104,8 +104,8 @@ public class PAResourceManagerPropertiesTest {
     public void testLoadProperties_FileSetWithSystemProperty() throws Exception {
         File propertiesFile = writePropertyToFile(PAResourceManagerProperties.RM_NODE_NAME, "nodeName");
 
-        System.setProperty(PAResourceManagerProperties.PA_RM_PROPERTIES_FILEPATH,
-          propertiesFile.getAbsolutePath());
+        System.setProperty(PAResourceManagerProperties.PA_RM_PROPERTIES_FILEPATH, propertiesFile
+                .getAbsolutePath());
 
         PAResourceManagerProperties.loadProperties(null);
 
@@ -114,8 +114,7 @@ public class PAResourceManagerPropertiesTest {
 
     @Test(expected = RuntimeException.class)
     public void testLoadProperties_FileSetWithSystemProperty_NonExistingFile() throws Exception {
-        System.setProperty(PAResourceManagerProperties.PA_RM_PROPERTIES_FILEPATH,
-          "fakefilenotexisting");
+        System.setProperty(PAResourceManagerProperties.PA_RM_PROPERTIES_FILEPATH, "fakefilenotexisting");
 
         PAResourceManagerProperties.loadProperties(null);
 
@@ -123,8 +122,8 @@ public class PAResourceManagerPropertiesTest {
         PAResourceManagerProperties.RM_NODE_NAME.isSet();
     }
 
-    private File writePropertyToFile(PAResourceManagerProperties propertyKey,
-      String propertyValue) throws IOException {
+    private File writePropertyToFile(PAResourceManagerProperties propertyKey, String propertyValue)
+            throws IOException {
         Properties props = new Properties();
         props.setProperty(propertyKey.getKey(), propertyValue);
         File propertiesFile = tempFolder.newFile();
@@ -133,7 +132,7 @@ public class PAResourceManagerPropertiesTest {
     }
 
     private File writePropertyToFileInConfigFolder(PAResourceManagerProperties propertyKey,
-      String propertyValue) throws IOException {
+            String propertyValue) throws IOException {
         Properties props = new Properties();
         props.setProperty(propertyKey.getKey(), propertyValue);
         File configFolder = tempFolder.newFolder();

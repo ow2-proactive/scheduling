@@ -62,11 +62,12 @@ public class LocalSpaceAdapter implements LocalSpace {
     private DataSpacesFileObject localDataSpace;
 
     public LocalSpaceAdapter(DataSpacesFileObject localDataSpace) {
-       this.localDataSpace = localDataSpace;
+        this.localDataSpace = localDataSpace;
     }
 
     private File convertToRelative(File absolutePath) throws URISyntaxException, DataSpacesException {
-        String relPath = absolutePath.getPath().replace(TaskLauncher.convertDataSpaceToFileIfPossible(localDataSpace, true),"");
+        String relPath = absolutePath.getPath().replace(
+                TaskLauncher.convertDataSpaceToFileIfPossible(localDataSpace, true), "");
         if (relPath.startsWith(File.separator)) {
             relPath = relPath.substring(1);
         }
@@ -105,10 +106,11 @@ public class LocalSpaceAdapter implements LocalSpace {
     @Override
     public void deleteFiles(String pattern) throws FileSystemException {
         try {
-            ArrayList<DataSpacesFileObject> todelete = RemoteSpaceAdapter.getFilesFromPattern(localDataSpace, pattern);
+            ArrayList<DataSpacesFileObject> todelete = RemoteSpaceAdapter.getFilesFromPattern(localDataSpace,
+                    pattern);
             for (DataSpacesFileObject dest : todelete) {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("Deleting "+dest.getRealURI());
+                    logger.debug("Deleting " + dest.getRealURI());
                 }
                 dest.delete();
             }
@@ -123,7 +125,8 @@ public class LocalSpaceAdapter implements LocalSpace {
             if (file.isAbsolute()) {
                 file = convertToRelative(file);
             }
-            DataSpacesFileObject todelete = localDataSpace.resolveFile(RemoteSpaceAdapter.stripLeadingSlash(file.getPath()));
+            DataSpacesFileObject todelete = localDataSpace.resolveFile(RemoteSpaceAdapter
+                    .stripLeadingSlash(file.getPath()));
             int nb_del = todelete.delete(FileSelector.SELECT_ALL);
         } catch (Exception e) {
             throw new FileSystemException(StackTraceUtil.getStackTrace(e));

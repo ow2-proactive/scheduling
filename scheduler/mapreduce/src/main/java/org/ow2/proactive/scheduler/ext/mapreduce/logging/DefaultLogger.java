@@ -2,6 +2,7 @@ package org.ow2.proactive.scheduler.ext.mapreduce.logging;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 
+
 @PublicAPI
 public class DefaultLogger implements Logger {
 

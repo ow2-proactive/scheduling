@@ -51,6 +51,7 @@ import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpUtility;
 
+
 public class RemoveNodeCommand extends AbstractCommand implements Command {
     private String nodeUrl;
     private boolean preempt = false;
@@ -66,8 +67,7 @@ public class RemoveNodeCommand extends AbstractCommand implements Command {
 
     @Override
     public void execute(ApplicationContext currentContext) throws CLIException {
-        HttpPost request = new HttpPost(
-                currentContext.getResourceUrl("node/remove"));
+        HttpPost request = new HttpPost(currentContext.getResourceUrl("node/remove"));
         StringBuilder buffer = new StringBuilder();
         buffer.append("url=").append(HttpUtility.encodeUrl(nodeUrl));
         if (currentContext.isForced()) {
@@ -76,23 +76,19 @@ public class RemoveNodeCommand extends AbstractCommand implements Command {
         if (preempt) {
             buffer.append("&preempt=").append(TRUE);
         }
-        StringEntity entity = new StringEntity(buffer.toString(),
-                APPLICATION_FORM_URLENCODED);
+        StringEntity entity = new StringEntity(buffer.toString(), APPLICATION_FORM_URLENCODED);
         request.setEntity(entity);
         HttpResponseWrapper response = execute(request, currentContext);
         if (statusCode(OK) == statusCode(response)) {
-            boolean successful = readValue(response, Boolean.TYPE,
-                    currentContext);
+            boolean successful = readValue(response, Boolean.TYPE, currentContext);
             resultStack(currentContext).push(successful);
             if (successful) {
-                writeLine(currentContext, "Node('%s') successfully removed.",
-                        nodeUrl);
+                writeLine(currentContext, "Node('%s') successfully removed.", nodeUrl);
             } else {
                 writeLine(currentContext, "Cannot remove node: '%s'", nodeUrl);
             }
         } else {
-            handleError("An error occurred while removing node:", response,
-                    currentContext);
+            handleError("An error occurred while removing node:", response, currentContext);
         }
     }
 

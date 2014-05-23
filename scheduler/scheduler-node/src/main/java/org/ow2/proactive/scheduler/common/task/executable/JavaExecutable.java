@@ -61,7 +61,7 @@ public abstract class JavaExecutable extends AbstractJavaExecutable {
     // this value is set only on worker node side !!
     // see JavaTaskLauncher
     private JavaExecutableInitializerImpl execInitializer;
-    
+
     /**
      * Initialize the executable using the given executable Initializer.
      *

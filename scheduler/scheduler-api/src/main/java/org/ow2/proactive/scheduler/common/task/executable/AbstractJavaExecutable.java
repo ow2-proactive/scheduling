@@ -76,8 +76,7 @@ public abstract class AbstractJavaExecutable extends Executable {
         Map<String, Serializable> arguments = this.execInitializer.getArguments(Thread.currentThread()
                 .getContextClassLoader());
         Map<String, Serializable> propagatedVariables = SerializationUtil
-                .deserializeVariableMap(execInitializer
-                        .getPropagatedVariables());
+                .deserializeVariableMap(execInitializer.getPropagatedVariables());
         setVariables(propagatedVariables);
         // update arguments
         updateVariables(arguments, getVariables());
@@ -174,8 +173,7 @@ public abstract class AbstractJavaExecutable extends Executable {
      * @return the Iteration Index of this Task
      */
     public final int getIterationIndex() {
-        return Integer.parseInt(System.getProperty(SchedulerVars.JAVAENV_TASK_ITERATION
-                .toString(), "0"));
+        return Integer.parseInt(System.getProperty(SchedulerVars.JAVAENV_TASK_ITERATION.toString(), "0"));
     }
 
     /**
@@ -189,12 +187,10 @@ public abstract class AbstractJavaExecutable extends Executable {
      * @return the Replication Index of this Task
      */
     public final int getReplicationIndex() {
-        return Integer.parseInt(System.getProperty(SchedulerVars.JAVAENV_TASK_REPLICATION
-                .toString(), "0"));
+        return Integer.parseInt(System.getProperty(SchedulerVars.JAVAENV_TASK_REPLICATION.toString(), "0"));
     }
-    
-    private void updateVariables(Map<String, Serializable> old,
-            Map<String, Serializable> updated) {
+
+    private void updateVariables(Map<String, Serializable> old, Map<String, Serializable> updated) {
         for (String k : old.keySet()) {
             if (updated.containsKey(k)) {
                 old.put(k, updated.get(k));

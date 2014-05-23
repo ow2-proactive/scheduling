@@ -180,7 +180,7 @@ public class ScriptExecutor implements Callable<Node> {
             logger.warn(rmnode.getNodeURL() + " : pinging the node");
             try {
                 // 'pingNode' call can fail with exception if NodeSource was destroyed
-               rmnode.getNodeSource().pingNode(rmnode.getNode());
+                rmnode.getNodeSource().pingNode(rmnode.getNode());
             } catch (Throwable pingError) {
                 logger.warn(rmnode.getNodeURL() + " : nodeSource " + rmnode.getNodeSourceName() +
                     " seems to be removed ", pingError);

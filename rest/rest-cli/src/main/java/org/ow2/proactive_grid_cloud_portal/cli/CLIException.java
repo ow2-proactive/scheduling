@@ -38,7 +38,7 @@
 package org.ow2.proactive_grid_cloud_portal.cli;
 
 public class CLIException extends RuntimeException {
-    
+
     public static final int REASON_UNAUTHORIZED_ACCESS = 1;
     public static final int REASON_IO_ERROR = 2;
     public static final int REASON_INVALID_ARGUMENTS = 3;

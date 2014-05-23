@@ -69,7 +69,6 @@ public class RemoteSpaceAdapter implements RemoteSpace {
 
     protected DataSpacesFileObject localDataSpace;
 
-
     public RemoteSpaceAdapter(DataSpacesFileObject remoteDataSpace, DataSpacesFileObject localDataSpace) {
         this.remoteDataSpace = remoteDataSpace;
         this.localDataSpace = localDataSpace;
@@ -84,14 +83,16 @@ public class RemoteSpaceAdapter implements RemoteSpace {
 
     public static String addTrailingSlash(String path) {
         if (path.length() > 0 && !path.endsWith("/")) {
-            return path+"/";
+            return path + "/";
         }
         return path;
     }
 
-    public static ArrayList<DataSpacesFileObject> getFilesFromPattern(DataSpacesFileObject root, String pattern) throws org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemException {
+    public static ArrayList<DataSpacesFileObject> getFilesFromPattern(DataSpacesFileObject root,
+            String pattern)
+            throws org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemException {
         FastFileSelector fast = new FastFileSelector();
-        fast.setIncludes(new String[]{pattern});
+        fast.setIncludes(new String[] { pattern });
         if (OperatingSystem.getOperatingSystem() == OperatingSystem.unix) {
             fast.setCaseSensitive(true);
         } else {
@@ -102,7 +103,8 @@ public class RemoteSpaceAdapter implements RemoteSpace {
         return results;
     }
 
-    private String copyFileToFile(DataSpacesFileObject source, DataSpacesFileObject destination) throws FileSystemException {
+    private String copyFileToFile(DataSpacesFileObject source, DataSpacesFileObject destination)
+            throws FileSystemException {
         try {
             if (logger.isDebugEnabled()) {
                 logger.debug("Copying " + source.getRealURI() + " to " + destination.getRealURI());
@@ -116,7 +118,8 @@ public class RemoteSpaceAdapter implements RemoteSpace {
         }
     }
 
-    private String copyFileToFolder(DataSpacesFileObject source, DataSpacesFileObject destination) throws FileSystemException {
+    private String copyFileToFolder(DataSpacesFileObject source, DataSpacesFileObject destination)
+            throws FileSystemException {
         try {
             destination = destination.resolveFile(source.getBaseName());
             if (logger.isDebugEnabled()) {
@@ -130,17 +133,18 @@ public class RemoteSpaceAdapter implements RemoteSpace {
         }
     }
 
-    private String copyFolderToFolder(DataSpacesFileObject source, DataSpacesFileObject destination) throws FileSystemException {
+    private String copyFolderToFolder(DataSpacesFileObject source, DataSpacesFileObject destination)
+            throws FileSystemException {
         try {
-                if (!destination.getBaseName().equals(source.getBaseName())) {
-                    destination = destination.resolveFile(source.getBaseName());
-                }
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Copying " + source.getRealURI() + " to " + destination.getRealURI());
-                }
-                destination.copyFrom(source, FileSelector.SELECT_ALL);
+            if (!destination.getBaseName().equals(source.getBaseName())) {
+                destination = destination.resolveFile(source.getBaseName());
+            }
+            if (logger.isDebugEnabled()) {
+                logger.debug("Copying " + source.getRealURI() + " to " + destination.getRealURI());
+            }
+            destination.copyFrom(source, FileSelector.SELECT_ALL);
 
-                return TaskLauncher.convertDataSpaceToFileIfPossible(destination, false);
+            return TaskLauncher.convertDataSpaceToFileIfPossible(destination, false);
 
         } catch (Exception e) {
             throw new FileSystemException(StackTraceUtil.getStackTrace(e));
@@ -148,14 +152,13 @@ public class RemoteSpaceAdapter implements RemoteSpace {
     }
 
     private File convertToRelative(File absolutePath) throws URISyntaxException, DataSpacesException {
-        String relPath = absolutePath.getPath().replace(TaskLauncher.convertDataSpaceToFileIfPossible(localDataSpace, true),"");
+        String relPath = absolutePath.getPath().replace(
+                TaskLauncher.convertDataSpaceToFileIfPossible(localDataSpace, true), "");
         if (relPath.startsWith(File.separator)) {
             relPath = relPath.substring(1);
         }
         return new File(relPath);
     }
-
-
 
     @Override
     public void pushFile(File localFile, String remotePath) throws FileSystemException {
@@ -180,9 +183,10 @@ public class RemoteSpaceAdapter implements RemoteSpace {
             DataSpacesFileObject destinationRoot = remoteDataSpace.resolveFile(remotePath);
 
             for (DataSpacesFileObject source : sources) {
-                DataSpacesFileObject destination = destinationRoot.resolveFile(stripLeadingSlash(source.getPath()));
+                DataSpacesFileObject destination = destinationRoot.resolveFile(stripLeadingSlash(source
+                        .getPath()));
                 if (logger.isDebugEnabled()) {
-                    logger.debug("Copying "+source.getRealURI()+ " to "+destination.getRealURI());
+                    logger.debug("Copying " + source.getRealURI() + " to " + destination.getRealURI());
                 }
                 destination.copyFrom(source, FileSelector.SELECT_SELF);
             }
@@ -191,36 +195,41 @@ public class RemoteSpaceAdapter implements RemoteSpace {
         }
     }
 
-    private String handleCopy(DataSpacesFileObject source, DataSpacesFileObject destination) throws org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemException, FileSystemException {
+    private String handleCopy(DataSpacesFileObject source, DataSpacesFileObject destination)
+            throws org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemException,
+            FileSystemException {
         switch (source.getType()) {
             case FILE:
                 switch (destination.getType()) {
                     case FILE:
-                        return copyFileToFile(source,destination);
+                        return copyFileToFile(source, destination);
                     case FOLDER:
                         return copyFileToFolder(source, destination);
                     case ABSTRACT:
                         if (destination.getPath().endsWith("/")) {
-                            return copyFileToFolder(source,destination);
+                            return copyFileToFolder(source, destination);
                         } else {
-                            return copyFileToFile(source,destination);
+                            return copyFileToFile(source, destination);
                         }
                     default:
-                        throw new IllegalArgumentException("Illegal destination type : "+destination.getType());
+                        throw new IllegalArgumentException("Illegal destination type : " +
+                            destination.getType());
                 }
             case FOLDER:
                 switch (destination.getType()) {
                     case FILE:
-                        throw new IllegalArgumentException("Illegal copy of Folder "+source.getRealURI()+" to File"+destination.getRealURI());
+                        throw new IllegalArgumentException("Illegal copy of Folder " + source.getRealURI() +
+                            " to File" + destination.getRealURI());
                     case FOLDER:
                         return copyFolderToFolder(source, destination);
                     case ABSTRACT:
                         return copyFolderToFolder(source, destination);
                     default:
-                        throw new IllegalArgumentException("Illegal destination type : "+destination.getType());
+                        throw new IllegalArgumentException("Illegal destination type : " +
+                            destination.getType());
                 }
             default:
-                throw new IllegalArgumentException("Illegal source type : "+source.getType());
+                throw new IllegalArgumentException("Illegal source type : " + source.getType());
         }
     }
 
@@ -248,9 +257,10 @@ public class RemoteSpaceAdapter implements RemoteSpace {
             DataSpacesFileObject destinationRoot = localDataSpace.resolveFile(localPath);
 
             for (DataSpacesFileObject source : sources) {
-                DataSpacesFileObject destination = destinationRoot.resolveFile(stripLeadingSlash(source.getPath()));
+                DataSpacesFileObject destination = destinationRoot.resolveFile(stripLeadingSlash(source
+                        .getPath()));
                 if (logger.isDebugEnabled()) {
-                    logger.debug("Copying "+source.getRealURI()+ " to "+destination.getRealURI());
+                    logger.debug("Copying " + source.getRealURI() + " to " + destination.getRealURI());
                 }
                 destination.copyFrom(source, FileSelector.SELECT_SELF);
                 filePulled.add(new File(TaskLauncher.convertDataSpaceToFileIfPossible(destination, false)));
@@ -262,7 +272,7 @@ public class RemoteSpaceAdapter implements RemoteSpace {
     }
 
     @Override
-    public void deleteFile(String remotePath)  throws FileSystemException {
+    public void deleteFile(String remotePath) throws FileSystemException {
         try {
             DataSpacesFileObject todelete = remoteDataSpace.resolveFile(stripLeadingSlash(remotePath));
             todelete.delete(FileSelector.SELECT_ALL);
@@ -277,7 +287,7 @@ public class RemoteSpaceAdapter implements RemoteSpace {
             ArrayList<DataSpacesFileObject> todelete = getFilesFromPattern(remoteDataSpace, pattern);
             for (DataSpacesFileObject dest : todelete) {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("Deleting "+dest.getRealURI());
+                    logger.debug("Deleting " + dest.getRealURI());
                 }
                 dest.delete();
             }
@@ -296,10 +306,11 @@ public class RemoteSpaceAdapter implements RemoteSpace {
         try {
             DataSpacesFileObject tostream = remoteDataSpace.resolveFile(stripLeadingSlash(remotePath));
             if (!tostream.exists()) {
-                throw new FileSystemException("File "+tostream.getRealURI() + " does not exist");
+                throw new FileSystemException("File " + tostream.getRealURI() + " does not exist");
             }
             if (!(tostream.getType() == FileType.FILE)) {
-                throw new FileSystemException("File "+tostream.getRealURI() + " is not a file ("+tostream.getType()+")");
+                throw new FileSystemException("File " + tostream.getRealURI() + " is not a file (" +
+                    tostream.getType() + ")");
             }
             return tostream.getContent().getInputStream();
 
@@ -317,10 +328,11 @@ public class RemoteSpaceAdapter implements RemoteSpace {
                 tostream = remoteDataSpace.resolveFile(stripLeadingSlash(remotePath));
             }
             if (!(tostream.getType() == FileType.FILE)) {
-                throw new FileSystemException("File "+tostream.getRealURI() + " is not a file ("+tostream.getType()+")");
+                throw new FileSystemException("File " + tostream.getRealURI() + " is not a file (" +
+                    tostream.getType() + ")");
             }
             if (!tostream.isWritable()) {
-                throw new FileSystemException("File "+tostream.getRealURI() + " is read-only.");
+                throw new FileSystemException("File " + tostream.getRealURI() + " is read-only.");
             }
             return tostream.getContent().getOutputStream();
 

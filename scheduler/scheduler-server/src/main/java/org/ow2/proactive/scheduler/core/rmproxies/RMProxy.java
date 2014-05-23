@@ -50,6 +50,7 @@ import org.ow2.proactive.utils.NodeSet;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+
 /**
  *
  * This class represents the proxy to the resource manager limiting the
@@ -106,7 +107,8 @@ public class RMProxy {
 
     public void rebind(URI rmURI) throws RMException, RMProxyCreationException {
 
-        if (rmURI.equals(this.rmURL) && proxyActiveObject != null && proxyActiveObject.isActive().getBooleanValue()) {
+        if (rmURI.equals(this.rmURL) && proxyActiveObject != null &&
+            proxyActiveObject.isActive().getBooleanValue()) {
             // nothing to do
             logger.info("Do not reconnect to the RM as connection is active for " + rmURL);
             return;

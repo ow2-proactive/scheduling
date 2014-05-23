@@ -53,36 +53,31 @@ import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.cli.json.PluginView;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
 
-public class ListInfrastructureCommand extends AbstractCommand implements
-        Command {
+
+public class ListInfrastructureCommand extends AbstractCommand implements Command {
     @Override
     public void execute(ApplicationContext currentContext) throws CLIException {
-        Map<String, PluginView> infrastructures = currentContext
-                .getInfrastructures();
+        Map<String, PluginView> infrastructures = currentContext.getInfrastructures();
         if (infrastructures == null) {
-            HttpGet request = new HttpGet(
-                    currentContext.getResourceUrl("infrastructures"));
+            HttpGet request = new HttpGet(currentContext.getResourceUrl("infrastructures"));
             HttpResponseWrapper response = execute(request, currentContext);
             if (statusCode(OK) == statusCode(response)) {
                 infrastructures = new HashMap<String, PluginView>();
-                List<PluginView> pluginViewList = readValue(response,
-                        new TypeReference<List<PluginView>>() {
-                        }, currentContext);
+                List<PluginView> pluginViewList = readValue(response, new TypeReference<List<PluginView>>() {
+                }, currentContext);
                 resultStack(currentContext).push(pluginViewList);
                 for (PluginView pluginView : pluginViewList) {
                     infrastructures.put(pluginView.getPluginName(), pluginView);
                 }
                 currentContext.setInfrastructures(infrastructures);
             } else {
-                handleError(
-                        "An error occurred while retrieving supported infrastructure types:",
-                        response, currentContext);
+                handleError("An error occurred while retrieving supported infrastructure types:", response,
+                        currentContext);
             }
         }
 
         if (infrastructures != null) {
-            writeLine(currentContext, "%n%s:%n",
-                    "Supported infrastructure types");
+            writeLine(currentContext, "%n%s:%n", "Supported infrastructure types");
             for (PluginView pluginView : infrastructures.values()) {
                 writeLine(currentContext, "%s%n", pluginView.toString());
             }

@@ -53,6 +53,7 @@ import org.ow2.proactive_grid_cloud_portal.cli.json.RmStateView;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
 
+
 public class ListNodeCommand extends AbstractCommand implements Command {
     private String nodeSource = null;
 
@@ -65,12 +66,10 @@ public class ListNodeCommand extends AbstractCommand implements Command {
 
     @Override
     public void execute(ApplicationContext currentContext) throws CLIException {
-        HttpGet request = new HttpGet(
-                currentContext.getResourceUrl("monitoring"));
+        HttpGet request = new HttpGet(currentContext.getResourceUrl("monitoring"));
         HttpResponseWrapper response = execute(request, currentContext);
         if (statusCode(OK) == statusCode(response)) {
-            RmStateView state = readValue(response, RmStateView.class,
-                    currentContext);
+            RmStateView state = readValue(response, RmStateView.class, currentContext);
             NodeEventView[] nodeEvents = state.getNodesEvents();
             NodeEventView[] selectedNodeEvents = null;
             if (nodeEvents != null) {
@@ -86,17 +85,14 @@ public class ListNodeCommand extends AbstractCommand implements Command {
                             selectedList.add(nodeEvent);
                         }
                     }
-                    selectedNodeEvents = selectedList
-                            .toArray(new NodeEventView[selectedList.size()]);
+                    selectedNodeEvents = selectedList.toArray(new NodeEventView[selectedList.size()]);
                 }
             }
             resultStack(currentContext).push(selectedNodeEvents);
-            writeLine(currentContext, "%s",
-                    StringUtility.string(selectedNodeEvents));
+            writeLine(currentContext, "%s", StringUtility.string(selectedNodeEvents));
 
         } else {
-            handleError("An error occurred while retrieving nodes:", response,
-                    currentContext);
+            handleError("An error occurred while retrieving nodes:", response, currentContext);
         }
     }
 

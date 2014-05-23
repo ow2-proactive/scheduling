@@ -51,25 +51,19 @@ import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
  */
 public class JavaStandaloneExecutableInitializer extends DefaultStandaloneExecutableInitializer {
 
-
-
     /** Arguments of the java task */
     protected Map<String, byte[]> serializedArguments;
 
     /** Propagated variables from parent tasks */
     protected Map<String, byte[]> propagatedVariables;
 
-
     /**
      * @throws java.io.IOException if the deserialization of the value cannot be performed.
      * @throws ClassNotFoundException if the value's class cannot be loaded.
      */
-    public Map<String, Serializable> getArguments(ClassLoader cl)
-            throws IOException, ClassNotFoundException {
-        return SerializationUtil.deserializeVariableMap(
-                this.serializedArguments, cl);
+    public Map<String, Serializable> getArguments(ClassLoader cl) throws IOException, ClassNotFoundException {
+        return SerializationUtil.deserializeVariableMap(this.serializedArguments, cl);
     }
-
 
     /**
      * Return a map containing all the task arguments serialized as byte[].
@@ -87,8 +81,7 @@ public class JavaStandaloneExecutableInitializer extends DefaultStandaloneExecut
      * @param arg de-serialized version of the argument
      */
     public void setArgument(String key, Serializable arg) {
-        SerializationUtil.serializeAndSetVariable(key, arg,
-                this.serializedArguments);
+        SerializationUtil.serializeAndSetVariable(key, arg, this.serializedArguments);
     }
 
     /**
@@ -99,8 +92,6 @@ public class JavaStandaloneExecutableInitializer extends DefaultStandaloneExecut
     public void setSerializedArguments(Map<String, byte[]> serializedArguments) {
         this.serializedArguments = serializedArguments;
     }
-
-
 
     /**
      * Sets the propagated variable map for the current Java task.

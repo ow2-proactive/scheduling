@@ -194,12 +194,12 @@ public class RMTHelper {
         //first emtpy im parameter is default rm url
         byte[] creds = FileToBytesConverter.convertFileToByteArray(new File(PAResourceManagerProperties
                 .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
-        rm
-                .createNodeSource(name, LocalInfrastructure.class.getName(), new Object[] { creds,
-                        nodeNumber, RMTHelper.defaultNodesTimeout, setup.getJvmParameters() + " " +
-                        CentralPAPropertyRepository.PA_RMI_PORT.getCmdLine()+RMTHelper.PA_RMI_PORT
-                },
-                        StaticPolicy.class.getName(), null);
+        rm.createNodeSource(name, LocalInfrastructure.class.getName(), new Object[] {
+                creds,
+                nodeNumber,
+                RMTHelper.defaultNodesTimeout,
+                setup.getJvmParameters() + " " + CentralPAPropertyRepository.PA_RMI_PORT.getCmdLine() +
+                    RMTHelper.PA_RMI_PORT }, StaticPolicy.class.getName(), null);
         rm.setNodeSourcePingFrequency(5000, name);
 
         waitForNodeSourceCreation(name, nodeNumber);
@@ -239,17 +239,18 @@ public class RMTHelper {
         return createNode(nodeName, null, vmParameters, null);
     }
 
-    public List<TNode> createNodes(final String nodeName, int number) throws IOException, NodeException, ExecutionException, InterruptedException {
+    public List<TNode> createNodes(final String nodeName, int number) throws IOException, NodeException,
+            ExecutionException, InterruptedException {
 
         ExecutorService executorService = Executors.newFixedThreadPool(number);
         ArrayList<Future<TNode>> futureNodes = new ArrayList<Future<TNode>>(number);
-        for (int i=0; i< number; i++) {
+        for (int i = 0; i < number; i++) {
             final int index = i;
             futureNodes.add(executorService.submit(new Callable<TNode>() {
                 @Override
                 public TNode call() {
                     try {
-                        return createNode(nodeName+index, null);
+                        return createNode(nodeName + index, null);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -259,7 +260,7 @@ public class RMTHelper {
         }
 
         ArrayList nodes = new ArrayList(number);
-        for (int i=0; i< number; i++) {
+        for (int i = 0; i < number; i++) {
             nodes.add(futureNodes.get(i).get());
         }
 
@@ -313,16 +314,18 @@ public class RMTHelper {
 
     public static TNode createRMNodeStarterNode(String nodeName) throws IOException, NodeException {
 
-        JVMProcessImpl nodeProcess = createJvmProcess(RMNodeStarter.class.getName(), Arrays.asList("-n", nodeName),
-                null, null);
+        JVMProcessImpl nodeProcess = createJvmProcess(RMNodeStarter.class.getName(), Arrays.asList("-n",
+                nodeName), null, null);
         return createNode(nodeName, null, nodeProcess);
 
     }
 
-    public static TNode createNode(String nodeName, String expectedUrl, JVMProcess nodeProcess) throws IOException, NodeException {
+    public static TNode createNode(String nodeName, String expectedUrl, JVMProcess nodeProcess)
+            throws IOException, NodeException {
 
         if (expectedUrl == null) {
-            expectedUrl = "rmi://" + ProActiveInet.getInstance().getHostname() + ":" + PA_RMI_PORT + "/" + nodeName;
+            expectedUrl = "rmi://" + ProActiveInet.getInstance().getHostname() + ":" + PA_RMI_PORT + "/" +
+                nodeName;
         }
 
         try {
@@ -332,7 +335,7 @@ public class RMTHelper {
             long startTimeStamp = System.currentTimeMillis();
 
             NodeException toThrow = null;
-            while ((System.currentTimeMillis()-startTimeStamp) < NODE_START_TIMEOUT_IN_MS) {
+            while ((System.currentTimeMillis() - startTimeStamp) < NODE_START_TIMEOUT_IN_MS) {
                 try {
                     newNode = NodeFactory.getNode(expectedUrl);
                 } catch (NodeException e) {
@@ -352,7 +355,8 @@ public class RMTHelper {
         }
     }
 
-    public static JVMProcessImpl createJvmProcess(String className, List<String> parameters, Map<String, String> vmParameters, List<String> vmOptions) throws IOException {
+    public static JVMProcessImpl createJvmProcess(String className, List<String> parameters,
+            Map<String, String> vmParameters, List<String> vmOptions) throws IOException {
         JVMProcessImpl nodeProcess = new JVMProcessImpl(
             new org.objectweb.proactive.core.process.AbstractExternalProcess.StandardOutputMessageLogger());
         nodeProcess.setClassname(className);
@@ -367,12 +371,12 @@ public class RMTHelper {
             vmParameters.put(CentralPAPropertyRepository.PA_RMI_PORT.getName(), String.valueOf(PA_RMI_PORT));
         }
         if (!vmParameters.containsKey(CentralPAPropertyRepository.PA_HOME.getName())) {
-            vmParameters.put(CentralPAPropertyRepository.PA_HOME.getName(), CentralPAPropertyRepository.PA_HOME
-                    .getValue());
+            vmParameters.put(CentralPAPropertyRepository.PA_HOME.getName(),
+                    CentralPAPropertyRepository.PA_HOME.getValue());
         }
         if (!vmParameters.containsKey(PAResourceManagerProperties.RM_HOME.getKey())) {
-            vmParameters.put(PAResourceManagerProperties.RM_HOME.getKey(), PAResourceManagerProperties.RM_HOME
-              .getValueAsString());
+            vmParameters.put(PAResourceManagerProperties.RM_HOME.getKey(),
+                    PAResourceManagerProperties.RM_HOME.getValueAsString());
         }
 
         for (Entry<String, String> entry : vmParameters.entrySet()) {
@@ -412,27 +416,25 @@ public class RMTHelper {
         if (!CentralPAPropertyRepository.PA_HOME.isSet()) {
             proactiveHome = PAResourceManagerProperties.RM_HOME.getValueAsString();
         }
-        commandLine.add(CentralPAPropertyRepository.PA_HOME.getCmdLine() +
-          proactiveHome);
+        commandLine.add(CentralPAPropertyRepository.PA_HOME.getCmdLine() + proactiveHome);
 
         String securityPolicy = CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getValue();
         if (!CentralPAPropertyRepository.JAVA_SECURITY_POLICY.isSet()) {
-            securityPolicy = PAResourceManagerProperties.RM_HOME.getValueAsString() + "/config/security.java.policy-server";
+            securityPolicy = PAResourceManagerProperties.RM_HOME.getValueAsString() +
+                "/config/security.java.policy-server";
         }
-        commandLine.add(CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getCmdLine() +
-          securityPolicy);
+        commandLine.add(CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getCmdLine() + securityPolicy);
 
         String log4jConfiguration = CentralPAPropertyRepository.LOG4J.getValue();
         if (!CentralPAPropertyRepository.LOG4J.isSet()) {
-            log4jConfiguration = "file:" + PAResourceManagerProperties.RM_HOME.getValueAsString() + "/config/log4j/log4j-junit";
+            log4jConfiguration = "file:" + PAResourceManagerProperties.RM_HOME.getValueAsString() +
+                "/config/log4j/log4j-junit";
         }
-        commandLine.add(CentralPAPropertyRepository.LOG4J.getCmdLine() +
-          log4jConfiguration);
+        commandLine.add(CentralPAPropertyRepository.LOG4J.getCmdLine() + log4jConfiguration);
 
         commandLine.add(PAResourceManagerProperties.RM_HOME.getCmdLine() +
             PAResourceManagerProperties.RM_HOME.getValueAsString());
-        commandLine.add(CentralPAPropertyRepository.PA_RUNTIME_PING.getCmdLine() +
-                false);
+        commandLine.add(CentralPAPropertyRepository.PA_RUNTIME_PING.getCmdLine() + false);
 
         commandLine.add("-cp");
         commandLine.add(testClasspath());
@@ -461,7 +463,8 @@ public class RMTHelper {
 
     public static String testClasspath() {
         String home = PAResourceManagerProperties.RM_HOME.getValueAsString();
-        String classpathToLibFolderWithWildcard = home + File.separator + "dist" + File.separator + "lib" + File.separator + "*";
+        String classpathToLibFolderWithWildcard = home + File.separator + "dist" + File.separator + "lib" +
+            File.separator + "*";
         if (OperatingSystem.getOperatingSystem().equals(OperatingSystem.windows)) {
             // required by windows otherwise wildcard is expanded
             classpathToLibFolderWithWildcard = "\"" + classpathToLibFolderWithWildcard + "\"";

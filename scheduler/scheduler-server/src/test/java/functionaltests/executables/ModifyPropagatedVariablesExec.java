@@ -41,6 +41,7 @@ import java.io.Serializable;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 
+
 public class ModifyPropagatedVariablesExec extends JavaExecutable {
 
     private String var;
@@ -48,8 +49,7 @@ public class ModifyPropagatedVariablesExec extends JavaExecutable {
     @Override
     public Serializable execute(TaskResult... results) throws Throwable {
         if (!"pre-script-1".equals(var)) {
-            throw new RuntimeException(String.format(
-                    "'pre-script-1' expected, but found '%s'", var));
+            throw new RuntimeException(String.format("'pre-script-1' expected, but found '%s'", var));
         }
         getVariables().put("var", "propagate-var-exec2");
         return "task_result";

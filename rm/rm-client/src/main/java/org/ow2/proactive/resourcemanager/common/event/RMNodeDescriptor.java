@@ -36,6 +36,7 @@ package org.ow2.proactive.resourcemanager.common.event;
 
 import org.ow2.proactive.resourcemanager.common.NodeState;
 
+
 public class RMNodeDescriptor {
     private String nodeURL;
     private String nodeSourceName;
@@ -138,7 +139,11 @@ public class RMNodeDescriptor {
         this.ownerName = ownerName;
     }
 
-    public String getNodeInfo() { return nodeInfo; }
+    public String getNodeInfo() {
+        return nodeInfo;
+    }
 
-    public void setNodeInfo(String nodeInfo) { this.nodeInfo = nodeInfo; }
+    public void setNodeInfo(String nodeInfo) {
+        this.nodeInfo = nodeInfo;
+    }
 }

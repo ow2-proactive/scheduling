@@ -87,8 +87,9 @@ public abstract class AbstractRestFuncTestCase {
 
     private static void configureSecurityManager() {
         if (System.getProperty("java.security.policy") == null) {
-            System.setProperty("java.security.policy", System.getProperty(
-              PAResourceManagerProperties.RM_HOME.getKey()) + "/config/security.java.policy-server");
+            System.setProperty("java.security.policy", System.getProperty(PAResourceManagerProperties.RM_HOME
+                    .getKey()) +
+                "/config/security.java.policy-server");
 
             Policy.getPolicy().refresh();
         }

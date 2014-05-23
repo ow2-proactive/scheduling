@@ -48,6 +48,7 @@ import org.ow2.proactive_grid_cloud_portal.cli.CommandSet;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractJsHelpCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 
+
 public class SchedJsHelpCommand extends AbstractJsHelpCommand implements Command {
 
     public SchedJsHelpCommand() {
@@ -55,7 +56,6 @@ public class SchedJsHelpCommand extends AbstractJsHelpCommand implements Command
 
     @Override
     public void execute(ApplicationContext currentContext) throws CLIException {
-        printHelp(currentContext, COMMON_COMMANDS, SCHED_ONLY,
-                new CommandSet.Entry[] {EXIT, SCHED_JS_HELP });
+        printHelp(currentContext, COMMON_COMMANDS, SCHED_ONLY, new CommandSet.Entry[] { EXIT, SCHED_JS_HELP });
     }
 }

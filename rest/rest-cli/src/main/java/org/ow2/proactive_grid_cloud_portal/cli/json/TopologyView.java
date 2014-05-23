@@ -39,6 +39,7 @@ package org.ow2.proactive_grid_cloud_portal.cli.json;
 
 import java.util.Map;
 
+
 public class TopologyView {
     private Map<String, Map<String, String>> distances;
     private Map<String, String> hosts;

@@ -85,12 +85,12 @@ public class RestFuncTHelper {
 
     final static URL rmHibernateConfig = RestFuncTHelper.class.getResource("config/rmHibernateConfig.xml");
 
-    final static URL schedHibernateConfig = RestFuncTHelper.class.getResource("config/schedHibernateConfig.xml");
+    final static URL schedHibernateConfig = RestFuncTHelper.class
+            .getResource("config/schedHibernateConfig.xml");
 
     final static URL defaultPAConfigFile = RestFuncTHelper.class.getResource("config/defaultPAConfig.xml");
 
-    final static URL allLog4JConfig = RestFuncTHelper.class
-            .getResource("config/allLog4JConfig.properties");
+    final static URL allLog4JConfig = RestFuncTHelper.class.getResource("config/allLog4JConfig.properties");
 
     final static URL forkedTaskLog4JConfig = RestFuncTHelper.class
             .getResource("config/forkedTaskLog4JConfig.properties");
@@ -111,7 +111,8 @@ public class RestFuncTHelper {
         // Kill all children processes on exit
         org.apache.log4j.BasicConfigurator.configure(new org.apache.log4j.varia.NullAppender());
         org.ow2.proactive.rm.util.process.EnvironmentCookieBasedChildProcessKiller.setCookie("killme");
-        org.ow2.proactive.rm.util.process.EnvironmentCookieBasedChildProcessKiller.registerKillChildProcessesOnShutdown();
+        org.ow2.proactive.rm.util.process.EnvironmentCookieBasedChildProcessKiller
+                .registerKillChildProcessesOnShutdown();
 
         List<String> cmd = new ArrayList<String>();
         String javaPath = RestFuncTUtils.getJavaPathFromSystemProperties();
@@ -123,15 +124,19 @@ public class RestFuncTHelper {
         cmd.add(PASchedulerProperties.SCHEDULER_HOME.getCmdLine() + getSchedHome());
         cmd.add(PAResourceManagerProperties.RM_HOME.getCmdLine() + getRmHome());
 
-        cmd.add(PAResourceManagerProperties.RM_DB_HIBERNATE_DROPDB.getCmdLine() + System.getProperty("rm.deploy.dropDB", "true"));
+        cmd.add(PAResourceManagerProperties.RM_DB_HIBERNATE_DROPDB.getCmdLine() +
+            System.getProperty("rm.deploy.dropDB", "true"));
         cmd.add(PAResourceManagerProperties.RM_DB_HIBERNATE_CONFIG.getCmdLine() + toPath(rmHibernateConfig));
 
-        cmd.add(PASchedulerProperties.SCHEDULER_DB_HIBERNATE_DROPDB.getCmdLine() + System.getProperty("scheduler.deploy.dropDB", "true"));
-        cmd.add(PASchedulerProperties.SCHEDULER_DB_HIBERNATE_CONFIG.getCmdLine() + toPath(schedHibernateConfig));
+        cmd.add(PASchedulerProperties.SCHEDULER_DB_HIBERNATE_DROPDB.getCmdLine() +
+            System.getProperty("scheduler.deploy.dropDB", "true"));
+        cmd.add(PASchedulerProperties.SCHEDULER_DB_HIBERNATE_CONFIG.getCmdLine() +
+            toPath(schedHibernateConfig));
 
         cmd.add(CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getCmdLine() + toPath(defaultPAConfigFile));
         cmd.add(CentralPAPropertyRepository.LOG4J.getCmdLine() + "file:" + toPath(allLog4JConfig));
-        cmd.add(PASchedulerProperties.SCHEDULER_DEFAULT_FJT_LOG4J.getCmdLine() + "file:" + toPath(forkedTaskLog4JConfig));
+        cmd.add(PASchedulerProperties.SCHEDULER_DEFAULT_FJT_LOG4J.getCmdLine() + "file:" +
+            toPath(forkedTaskLog4JConfig));
 
         cmd.add("-cp");
         cmd.add(getClassPath());
@@ -143,7 +148,8 @@ public class RestFuncTHelper {
         processBuilder.redirectErrorStream(true);
         schedProcess = processBuilder.start();
 
-        ProcessStreamReader out = new ProcessStreamReader("scheduler-output: ", schedProcess.getInputStream(), System.out);
+        ProcessStreamReader out = new ProcessStreamReader("scheduler-output: ",
+            schedProcess.getInputStream(), System.out);
         out.start();
 
         // RM and scheduler are on the same url
@@ -174,12 +180,14 @@ public class RestFuncTHelper {
             Set<String> urls = rm.listAliveNodeUrls();
             for (String nodeUrl : urls) {
                 try {
-                    ProActiveRuntime runtime = (ProActiveRuntime)PARemoteObject.lookup(URI.create(nodeUrl));
+                    ProActiveRuntime runtime = (ProActiveRuntime) PARemoteObject.lookup(URI.create(nodeUrl));
                     runtime.killRT(false);
-                } catch (Throwable noNeed) {}
+                } catch (Throwable noNeed) {
+                }
             }
             rm.shutdown(true);
-        } catch (Throwable noNeed) {}
+        } catch (Throwable noNeed) {
+        }
 
         // Destroy the scheduler process
         System.out.println("Shutting down scheduler process.");
@@ -252,7 +260,8 @@ public class RestFuncTHelper {
 
     private static String getClassPath() throws Exception {
         StringBuilder classpath = new StringBuilder();
-        classpath.append(getRmHome() + File.separator + "dist" + File.separator + "lib" + File.separator + "*");
+        classpath.append(getRmHome() + File.separator + "dist" + File.separator + "lib" + File.separator +
+            "*");
         classpath.append(File.pathSeparatorChar);
         classpath.append(getRmHome() + File.separator + "addons" + File.separator + "*");
         classpath.append(File.pathSeparatorChar);

@@ -49,12 +49,13 @@ import functionaltests.SchedulerConsecutive;
 import functionaltests.SchedulerTHelper;
 import functionaltests.executables.PropagateVariablesExec;
 
+
 public class TestPropagatedVariables extends SchedulerConsecutive {
 
     @Test
     public void run() throws Throwable {
-        SchedulerTHelper.testJobSubmissionAndVerifyAllResults(
-                createTaskFlowJob(), "TestPropagatedVariables.TestFlowJob");
+        SchedulerTHelper.testJobSubmissionAndVerifyAllResults(createTaskFlowJob(),
+                "TestPropagatedVariables.TestFlowJob");
     }
 
     private TaskFlowJob createTaskFlowJob() throws UserException {
@@ -89,10 +90,11 @@ public class TestPropagatedVariables extends SchedulerConsecutive {
         if (OperatingSystem.unix == OperatingSystem.getOperatingSystem()) {
             NativeTask taskD = new NativeTask();
             taskD.setName("TaskD");
-            taskD.setCommandLine(
-                    "/bin/bash",
-                    "-c",
-                    "echo $propagated_var_Task_A_Var; if [ \"$propagated_var_Task_A_Var\" != \"Task_A_Val\" ]; then  exit 0; else exit 1; fi;");
+            taskD
+                    .setCommandLine(
+                            "/bin/bash",
+                            "-c",
+                            "echo $propagated_var_Task_A_Var; if [ \"$propagated_var_Task_A_Var\" != \"Task_A_Val\" ]; then  exit 0; else exit 1; fi;");
             taskD.addDependence(taskC);
             flowJob.addTask(taskD);
         }

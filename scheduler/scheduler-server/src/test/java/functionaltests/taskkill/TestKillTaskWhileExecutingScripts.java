@@ -84,15 +84,19 @@ public class TestKillTaskWhileExecutingScripts extends FunctionalTest {
 
     @Before
     public void init() throws Throwable {
-        if (!shouldBeExecuted()) return;
+        if (!shouldBeExecuted())
+            return;
 
-        endlessScript = new SimpleScript("file = new java.io.File(java.lang.System.getProperty(\"java.io.tmpdir\"),\"started.ok\");file.createNewFile();while(true){java.lang.Thread.sleep(500);}","groovy");
+        endlessScript = new SimpleScript(
+            "file = new java.io.File(java.lang.System.getProperty(\"java.io.tmpdir\"),\"started.ok\");file.createNewFile();while(true){java.lang.Thread.sleep(500);}",
+            "groovy");
         SchedulerTHelper.startScheduler();
     }
 
     @After
     public void clean() throws Throwable {
-        if (!shouldBeExecuted()) return;
+        if (!shouldBeExecuted())
+            return;
 
         SchedulerTHelper.killScheduler();
     }
@@ -104,14 +108,14 @@ public class TestKillTaskWhileExecutingScripts extends FunctionalTest {
         String tname = "javaTaskKillEndlessPreScript";
         // pre script interruption
         TaskFlowJob job = new TaskFlowJob();
-        job.setName(this.getClass().getSimpleName()+"_"+tname);
+        job.setName(this.getClass().getSimpleName() + "_" + tname);
         JavaTask task1 = new JavaTask();
         task1.setName(tname);
         task1.setExecutableClassName(EmptyExecutable.class.getName());
         task1.setPreScript(endlessScript);
         job.addTask(task1);
 
-        submitAndCheckJob(job,tname);
+        submitAndCheckJob(job, tname);
     }
 
     @Test
@@ -120,14 +124,14 @@ public class TestKillTaskWhileExecutingScripts extends FunctionalTest {
         String tname = "javaTaskKillEndlessPostScript";
         // pre script interruption
         TaskFlowJob job = new TaskFlowJob();
-        job.setName(this.getClass().getSimpleName()+"_"+tname);
+        job.setName(this.getClass().getSimpleName() + "_" + tname);
         JavaTask task1 = new JavaTask();
         task1.setName(tname);
         task1.setExecutableClassName(EmptyExecutable.class.getName());
         task1.setPostScript(endlessScript);
         job.addTask(task1);
 
-        submitAndCheckJob(job,tname);
+        submitAndCheckJob(job, tname);
     }
 
     @Test
@@ -136,14 +140,14 @@ public class TestKillTaskWhileExecutingScripts extends FunctionalTest {
         String tname = "javaTaskKillEndlessFlowScript";
         // pre script interruption
         TaskFlowJob job = new TaskFlowJob();
-        job.setName(this.getClass().getSimpleName()+"_"+tname);
+        job.setName(this.getClass().getSimpleName() + "_" + tname);
         JavaTask task1 = new JavaTask();
         task1.setName(tname);
         task1.setExecutableClassName(EmptyExecutable.class.getName());
         task1.setFlowScript(FlowScript.createLoopFlowScript(endlessScript, tname));
         job.addTask(task1);
 
-        submitAndCheckJob(job,tname);
+        submitAndCheckJob(job, tname);
     }
 
     @Test
@@ -152,13 +156,13 @@ public class TestKillTaskWhileExecutingScripts extends FunctionalTest {
         String tname = "javaTaskKillEndlessJavaExecutable";
         // pre script interruption
         TaskFlowJob job = new TaskFlowJob();
-        job.setName(this.getClass().getSimpleName()+"_"+tname);
+        job.setName(this.getClass().getSimpleName() + "_" + tname);
         JavaTask task1 = new JavaTask();
         task1.setName(tname);
         task1.setExecutableClassName(EndlessExecutable.class.getName());
         job.addTask(task1);
 
-        submitAndCheckJob(job,tname);
+        submitAndCheckJob(job, tname);
     }
 
     @Test
@@ -167,7 +171,7 @@ public class TestKillTaskWhileExecutingScripts extends FunctionalTest {
         String tname = "forkedJavaTaskKillEndlessEnvScript";
         // pre script interruption
         TaskFlowJob job = new TaskFlowJob();
-        job.setName(this.getClass().getSimpleName()+"_"+tname);
+        job.setName(this.getClass().getSimpleName() + "_" + tname);
         JavaTask task1 = new JavaTask();
         task1.setName(tname);
         task1.setExecutableClassName(EmptyExecutable.class.getName());
@@ -176,9 +180,8 @@ public class TestKillTaskWhileExecutingScripts extends FunctionalTest {
         task1.setForkEnvironment(fe);
         job.addTask(task1);
 
-        submitAndCheckJob(job,tname);
+        submitAndCheckJob(job, tname);
     }
-
 
     @Test
     public void forkedJavaTaskKillEndlessJavaExecutable() throws Throwable {
@@ -202,13 +205,13 @@ public class TestKillTaskWhileExecutingScripts extends FunctionalTest {
         String tname = "killEndlessScriptTask";
         // pre script interruption
         TaskFlowJob job = new TaskFlowJob();
-        job.setName(this.getClass().getSimpleName()+"_"+tname);
+        job.setName(this.getClass().getSimpleName() + "_" + tname);
         ScriptTask task1 = new ScriptTask();
         task1.setName(tname);
         task1.setScript(new TaskScript(endlessScript));
         job.addTask(task1);
 
-        submitAndCheckJob(job,tname);
+        submitAndCheckJob(job, tname);
     }
 
     private void submitAndCheckJob(Job job, String tname) throws Exception {
@@ -228,7 +231,7 @@ public class TestKillTaskWhileExecutingScripts extends FunctionalTest {
         Assert.assertEquals(jInfo.getJobId(), id);
 
         SchedulerTHelper.log("Waiting until file marker is created");
-        while(!EndlessExecutable.STARTED_FILE.exists()) {
+        while (!EndlessExecutable.STARTED_FILE.exists()) {
             Thread.sleep(50);
         }
 
@@ -237,13 +240,13 @@ public class TestKillTaskWhileExecutingScripts extends FunctionalTest {
 
         RMTHelper rm = RMTHelper.getDefaultInstance();
 
-        List<Node> nodes =  rm.listAliveNodes();
+        List<Node> nodes = rm.listAliveNodes();
         // We wait until no active object remain on the nodes.
         // If AO remains the test will fail with a timeout.
         boolean remainingAO = true;
 
         long wait = 0;
-        while(remainingAO && wait < 5000) {
+        while (remainingAO && wait < 5000) {
             Thread.sleep(50);
             wait += 50;
             remainingAO = false;
@@ -251,6 +254,6 @@ public class TestKillTaskWhileExecutingScripts extends FunctionalTest {
                 remainingAO = remainingAO || (node.getNumberOfActiveObjects() > 0);
             }
         }
-        Assert.assertFalse("No Active Objects should remain",remainingAO);
+        Assert.assertFalse("No Active Objects should remain", remainingAO);
     }
 }

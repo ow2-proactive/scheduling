@@ -133,6 +133,7 @@ import static org.ow2.proactive.scheduler.rest.data.DataUtility.toJobUsages;
 import static org.ow2.proactive.scheduler.rest.data.DataUtility.toSchedulerUserInfos;
 import static org.ow2.proactive.scheduler.rest.data.DataUtility.toTaskResult;
 
+
 public class SchedulerClient extends ClientBase implements ISchedulerClient {
 
     private static final long retry_interval = TimeUnit.SECONDS.toMillis(1);
@@ -154,7 +155,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     public static ISchedulerClient createInstance() {
         SchedulerClient client = new SchedulerClient();
         return (ISchedulerClient) Proxy.newProxyInstance(ISchedulerClient.class.getClassLoader(),
-                new Class[]{ISchedulerClient.class}, new SessionHandler(client));
+                new Class[] { ISchedulerClient.class }, new SessionHandler(client));
     }
 
     /**
@@ -203,8 +204,8 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
-    public void changeJobPriority(JobId jobId, JobPriority priority) throws NotConnectedException, UnknownJobException,
-            PermissionException, JobAlreadyFinishedException {
+    public void changeJobPriority(JobId jobId, JobPriority priority) throws NotConnectedException,
+            UnknownJobException, PermissionException, JobAlreadyFinishedException {
         changeJobPriority(jobId.value(), priority);
     }
 
@@ -239,12 +240,14 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
-    public JobResult getJobResult(JobId jobId) throws NotConnectedException, PermissionException, UnknownJobException {
+    public JobResult getJobResult(JobId jobId) throws NotConnectedException, PermissionException,
+            UnknownJobException {
         return getJobResult(jobId.value());
     }
 
     @Override
-    public JobResult getJobResult(String jobId) throws NotConnectedException, PermissionException, UnknownJobException {
+    public JobResult getJobResult(String jobId) throws NotConnectedException, PermissionException,
+            UnknownJobException {
         JobResult jobResult = null;
         try {
             JobResultData jobResultData = restApi().jobResult(sid, jobId);
@@ -256,7 +259,8 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
-    public JobState getJobState(String jobId) throws NotConnectedException, UnknownJobException, PermissionException {
+    public JobState getJobState(String jobId) throws NotConnectedException, UnknownJobException,
+            PermissionException {
         JobState jobState = null;
         try {
             JobStateData jobStateData = restApi().listJobs(sid, jobId);
@@ -268,7 +272,8 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
-    public JobState getJobState(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
+    public JobState getJobState(JobId jobId) throws NotConnectedException, UnknownJobException,
+            PermissionException {
         return getJobState(jobId.value());
     }
 
@@ -286,7 +291,8 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
-    public String getJobServerLogs(String jobId) throws UnknownJobException, NotConnectedException, PermissionException {
+    public String getJobServerLogs(String jobId) throws UnknownJobException, NotConnectedException,
+            PermissionException {
         String jobServerLog = "";
         try {
             jobServerLog = restApi().jobServerLog(sid, jobId);
@@ -309,8 +315,8 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
-    public TaskResult getTaskResult(String jobId, String taskName) throws NotConnectedException, UnknownJobException,
-            UnknownTaskException, PermissionException {
+    public TaskResult getTaskResult(String jobId, String taskName) throws NotConnectedException,
+            UnknownJobException, UnknownTaskException, PermissionException {
         TaskResultImpl taskResult = null;
         try {
             TaskResultData taskResultData = restApi().taskresult(sid, jobId, taskName);
@@ -336,14 +342,14 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
-    public TaskResult getTaskResult(JobId jobId, String taskName) throws NotConnectedException, UnknownJobException,
-            UnknownTaskException, PermissionException {
+    public TaskResult getTaskResult(JobId jobId, String taskName) throws NotConnectedException,
+            UnknownJobException, UnknownTaskException, PermissionException {
         return getTaskResult(jobId.value(), taskName);
     }
 
     @Override
-    public String getTaskServerLogs(String arg0, String arg1) throws UnknownJobException, UnknownTaskException,
-            NotConnectedException, PermissionException {
+    public String getTaskServerLogs(String arg0, String arg1) throws UnknownJobException,
+            UnknownTaskException, NotConnectedException, PermissionException {
         String taskLogs = "";
         try {
             taskLogs = restApi().tasklog(sid, arg0, arg1);
@@ -400,12 +406,14 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
-    public boolean killJob(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
+    public boolean killJob(JobId jobId) throws NotConnectedException, UnknownJobException,
+            PermissionException {
         return killJob(jobId.value());
     }
 
     @Override
-    public boolean killJob(String jobId) throws NotConnectedException, UnknownJobException, PermissionException {
+    public boolean killJob(String jobId) throws NotConnectedException, UnknownJobException,
+            PermissionException {
         boolean isJobKilled = false;
         try {
             isJobKilled = restApi().killJob(sid, jobId);
@@ -438,12 +446,14 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
-    public boolean pauseJob(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
+    public boolean pauseJob(JobId jobId) throws NotConnectedException, UnknownJobException,
+            PermissionException {
         return pauseJob(jobId.value());
     }
 
     @Override
-    public boolean pauseJob(String jobId) throws NotConnectedException, UnknownJobException, PermissionException {
+    public boolean pauseJob(String jobId) throws NotConnectedException, UnknownJobException,
+            PermissionException {
         boolean isJobPaused = false;
         try {
             isJobPaused = restApi().pauseJob(sid, jobId);
@@ -472,12 +482,14 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
-    public boolean removeJob(JobId arg0) throws NotConnectedException, UnknownJobException, PermissionException {
+    public boolean removeJob(JobId arg0) throws NotConnectedException, UnknownJobException,
+            PermissionException {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public boolean removeJob(String jobId) throws NotConnectedException, UnknownJobException, PermissionException {
+    public boolean removeJob(String jobId) throws NotConnectedException, UnknownJobException,
+            PermissionException {
         boolean isJobRemoved = false;
         try {
             isJobRemoved = restApi().removeJob(sid, jobId);
@@ -517,12 +529,14 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
-    public boolean resumeJob(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
+    public boolean resumeJob(JobId jobId) throws NotConnectedException, UnknownJobException,
+            PermissionException {
         return resumeJob(jobId.value());
     }
 
     @Override
-    public boolean resumeJob(String jobId) throws NotConnectedException, UnknownJobException, PermissionException {
+    public boolean resumeJob(String jobId) throws NotConnectedException, UnknownJobException,
+            PermissionException {
         boolean isJobResumed = false;
         try {
             isJobResumed = restApi().resumeJob(sid, jobId);
@@ -566,13 +580,13 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
-    public JobId submit(Job job) throws NotConnectedException, PermissionException, SubmissionClosedException,
-            JobCreationException {
+    public JobId submit(Job job) throws NotConnectedException, PermissionException,
+            SubmissionClosedException, JobCreationException {
         JobIdData jobIdData = null;
         try {
             String jobXml = (new Job2XMLTransformer()).jobToxml((TaskFlowJob) job);
-            jobIdData = restApiClient().submitXml(sid, IOUtils.toInputStream(jobXml,
-                    String.valueOf(Charset.defaultCharset())));
+            jobIdData = restApiClient().submitXml(sid,
+                    IOUtils.toInputStream(jobXml, String.valueOf(Charset.defaultCharset())));
         } catch (Exception e) {
             throwNCEOrPEOrSCEOrJCE(e);
         }
@@ -580,8 +594,8 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
-    public JobId submitAsJobArchive(Job job) throws NotConnectedException, PermissionException, SubmissionClosedException,
-            JobCreationException {
+    public JobId submitAsJobArchive(Job job) throws NotConnectedException, PermissionException,
+            SubmissionClosedException, JobCreationException {
         String archiveName = String.valueOf(job.hashCode());
         File archiveDir = null;
         try {
@@ -678,12 +692,14 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
-    public boolean isJobFinished(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
+    public boolean isJobFinished(JobId jobId) throws NotConnectedException, UnknownJobException,
+            PermissionException {
         return isJobFinished(jobId.toString());
     }
 
     @Override
-    public boolean isJobFinished(String jobId) throws NotConnectedException, UnknownJobException, PermissionException {
+    public boolean isJobFinished(String jobId) throws NotConnectedException, UnknownJobException,
+            PermissionException {
         return !getJobState(jobId).getStatus().isJobAlive();
     }
 
@@ -694,8 +710,8 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
-    public JobResult waitForJob(String jobId, long timeout) throws NotConnectedException, UnknownJobException,
-            PermissionException, TimeoutException {
+    public JobResult waitForJob(String jobId, long timeout) throws NotConnectedException,
+            UnknownJobException, PermissionException, TimeoutException {
         timeout += currentTimeMillis();
         while (currentTimeMillis() < timeout) {
             if (isJobFinished(jobId)) {
@@ -711,8 +727,8 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
-    public boolean isTaskFinished(String jobId, String taskName) throws UnknownJobException, NotConnectedException,
-            PermissionException, UnknownTaskException {
+    public boolean isTaskFinished(String jobId, String taskName) throws UnknownJobException,
+            NotConnectedException, PermissionException, UnknownTaskException {
         boolean finished = false;
         try {
             TaskStateData taskStateData = restApi().jobtasks(sid, jobId, taskName);
@@ -738,7 +754,8 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
                 break;
             }
         }
-        throw new TimeoutException(format("Timeout waiting for the task: job-id=%s, task-id=%s", jobId, taskName));
+        throw new TimeoutException(format("Timeout waiting for the task: job-id=%s, task-id=%s", jobId,
+                taskName));
     }
 
     @Override
@@ -755,8 +772,8 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
-    public Map.Entry<String, JobResult> waitForAnyJob(List<String> jobIds, long timeout) throws NotConnectedException,
-            UnknownJobException, PermissionException, TimeoutException {
+    public Map.Entry<String, JobResult> waitForAnyJob(List<String> jobIds, long timeout)
+            throws NotConnectedException, UnknownJobException, PermissionException, TimeoutException {
         timeout += currentTimeMillis();
         while (currentTimeMillis() < timeout) {
             for (String jobId : jobIds) {
@@ -802,7 +819,8 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         List<Map.Entry<String, TaskResult>> taskResults = new ArrayList<Map.Entry<String, TaskResult>>();
         for (String taskName : taskNames) {
             timestamp = currentTimeMillis();
-            Entry<String, TaskResult> taskResultEntry = toEntry(taskName, waitForTask(jobId, taskName, timeout));
+            Entry<String, TaskResult> taskResultEntry = toEntry(taskName, waitForTask(jobId, taskName,
+                    timeout));
             taskResults.add(taskResultEntry);
             timeout = timeout - (currentTimeMillis() - timestamp);
         }
@@ -836,7 +854,8 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
-    public boolean deleteFile(String space, String pathname) throws NotConnectedException, PermissionException {
+    public boolean deleteFile(String space, String pathname) throws NotConnectedException,
+            PermissionException {
         boolean deleted = false;
         try {
             deleted = restApi().deleteFile(sid, space, pathname);

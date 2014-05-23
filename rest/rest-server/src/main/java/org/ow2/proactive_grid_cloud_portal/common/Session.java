@@ -87,14 +87,14 @@ public class Session {
         this.lastAccessTimestamp = clock.now();
     }
 
-    public void connectToScheduler(
-      Credentials credentials) throws LoginException, ActiveObjectCreationException, SchedulerException, NodeException {
+    public void connectToScheduler(Credentials credentials) throws LoginException,
+            ActiveObjectCreationException, SchedulerException, NodeException {
         scheduler = schedulerRMProxyFactory.connectToScheduler(credentials);
         this.credentials = credentials;
     }
 
-    public void connectToScheduler(
-      CredData credData) throws LoginException, ActiveObjectCreationException, SchedulerException, NodeException {
+    public void connectToScheduler(CredData credData) throws LoginException, ActiveObjectCreationException,
+            SchedulerException, NodeException {
         scheduler = schedulerRMProxyFactory.connectToScheduler(credData);
         this.credData = credData;
     }
@@ -116,14 +116,14 @@ public class Session {
         return scheduler;
     }
 
-    public void connectToRM(
-      Credentials credentials) throws LoginException, ActiveObjectCreationException, KeyException, NodeException, RMException {
+    public void connectToRM(Credentials credentials) throws LoginException, ActiveObjectCreationException,
+            KeyException, NodeException, RMException {
         rm = schedulerRMProxyFactory.connectToRM(credentials);
         this.credentials = credentials;
     }
 
-    public void connectToRM(
-      CredData credData) throws LoginException, ActiveObjectCreationException, KeyException, NodeException, RMException {
+    public void connectToRM(CredData credData) throws LoginException, ActiveObjectCreationException,
+            KeyException, NodeException, RMException {
         rm = schedulerRMProxyFactory.connectToRM(credData);
         this.credData = credData;
     }

@@ -49,21 +49,20 @@ import javax.ws.rs.ext.MessageBodyReader;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.ow2.proactive_grid_cloud_portal.common.exceptionmapper.ExceptionToJson;
 
+
 public class OctetStreamReader implements MessageBodyReader<ExceptionToJson> {
 
     private ObjectMapper mapper = new ObjectMapper();
 
     @Override
-    public boolean isReadable(Class<?> type, Type genericType,
-            Annotation[] annotations, MediaType mediaType) {
-        return ExceptionToJson.class.isAssignableFrom(type)
-                && APPLICATION_OCTET_STREAM_TYPE.equals(mediaType);
+    public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
+        return ExceptionToJson.class.isAssignableFrom(type) &&
+            APPLICATION_OCTET_STREAM_TYPE.equals(mediaType);
     }
 
     @Override
-    public ExceptionToJson readFrom(Class<ExceptionToJson> type,
-            Type genericType, Annotation[] annotations, MediaType mediaType,
-            MultivaluedMap<String, String> httpHeaders, InputStream entityStream)
+    public ExceptionToJson readFrom(Class<ExceptionToJson> type, Type genericType, Annotation[] annotations,
+            MediaType mediaType, MultivaluedMap<String, String> httpHeaders, InputStream entityStream)
             throws IOException, WebApplicationException {
         return mapper.readValue(entityStream, ExceptionToJson.class);
     }

@@ -43,6 +43,7 @@ import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 
+
 public class LinkRmCommand extends AbstractCommand implements Command {
 
     private String rmUrl;
@@ -58,14 +59,12 @@ public class LinkRmCommand extends AbstractCommand implements Command {
             boolean success = scheduler.linkRm(currentContext.getSessionId(), rmUrl);
             resultStack(currentContext).push(success);
             if (success) {
-                writeLine(currentContext,
-                        "New resource manager relinked successfully.");
+                writeLine(currentContext, "New resource manager relinked successfully.");
             } else {
                 writeLine(currentContext, "Cannot relink '%s'.", rmUrl);
             }
         } catch (Exception e) {
-            handleError("An error occurred while relinking:", e,
-                    currentContext);
+            handleError("An error occurred while relinking:", e, currentContext);
         }
 
     }

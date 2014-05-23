@@ -47,8 +47,8 @@ import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.util.Object2ByteConverter;
 
-//import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 
+//import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 
 /**
  * Use this class to build a java task that will use a {@link JavaExecutable} and be integrated in a {@link TaskFlowJob}.<br>

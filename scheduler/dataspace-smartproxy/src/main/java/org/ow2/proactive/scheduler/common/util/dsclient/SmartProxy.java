@@ -391,8 +391,9 @@ public class SmartProxy extends SchedulerProxyUserInterface implements InitActiv
     }
 
     private void registerAsListener() throws NotConnectedException, PermissionException {
-        super.addEventListener(stubOnThis, true, SchedulerEvent.JOB_RUNNING_TO_FINISHED, SchedulerEvent.JOB_PENDING_TO_RUNNING,
-                SchedulerEvent.JOB_PENDING_TO_FINISHED, SchedulerEvent.JOB_PAUSED, SchedulerEvent.JOB_RESUMED,
+        super.addEventListener(stubOnThis, true, SchedulerEvent.JOB_RUNNING_TO_FINISHED,
+                SchedulerEvent.JOB_PENDING_TO_RUNNING, SchedulerEvent.JOB_PENDING_TO_FINISHED,
+                SchedulerEvent.JOB_PAUSED, SchedulerEvent.JOB_RESUMED,
                 SchedulerEvent.TASK_PENDING_TO_RUNNING, SchedulerEvent.KILLED, SchedulerEvent.SHUTDOWN,
                 SchedulerEvent.SHUTTING_DOWN, SchedulerEvent.STOPPED, SchedulerEvent.RESUMED,
                 SchedulerEvent.TASK_RUNNING_TO_FINISHED);

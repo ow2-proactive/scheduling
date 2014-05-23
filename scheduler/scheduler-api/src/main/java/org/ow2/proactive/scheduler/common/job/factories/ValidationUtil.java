@@ -63,6 +63,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
 import com.sun.msv.verifier.ErrorInfo;
 import com.sun.msv.verifier.ValidityViolation;
 
+
 /**
  * Utility class for validate job descriptor (job.xml) files.
  */
@@ -79,22 +80,19 @@ public class ValidationUtil {
      * @throws JobCreationException
      *             if the job descriptor is invalid
      */
-    public static void validate(File jobFile, InputStream schemaIs)
-            throws SAXException, IOException, JobCreationException {
+    public static void validate(File jobFile, InputStream schemaIs) throws SAXException, IOException,
+            JobCreationException {
         try {
 
-            XMLReader reader = XMLReaderFactory
-                    .createXMLReader("org.apache.xerces.parsers.SAXParser");
+            XMLReader reader = XMLReaderFactory.createXMLReader("org.apache.xerces.parsers.SAXParser");
             VerifierFactory vfactory = new com.sun.msv.verifier.jarv.TheFactoryImpl();
             Schema schema = vfactory.compileSchema(schemaIs);
 
             Verifier verifier = schema.newVerifier();
             VerifierHandler handler = verifier.getVerifierHandler();
-            ContentHandlerDecorator contentHandlerDecorator = new ContentHandlerDecorator(
-                    handler);
+            ContentHandlerDecorator contentHandlerDecorator = new ContentHandlerDecorator(handler);
             reader.setContentHandler(contentHandlerDecorator);
-            ValidationErrorHandler errHandler = new ValidationErrorHandler(
-                    contentHandlerDecorator);
+            ValidationErrorHandler errHandler = new ValidationErrorHandler(contentHandlerDecorator);
             verifier.setErrorHandler(errHandler);
 
             reader.parse(jobFile.getAbsolutePath());
@@ -140,23 +138,18 @@ public class ValidationUtil {
                 if (errorInfo instanceof ErrorInfo.IncompleteContentModel) {
                     String qName = ((ErrorInfo.IncompleteContentModel) errorInfo).qName;
                     if (TASKFLOW.getXMLName().equals(qName)) {
-                        sb.append(
-                                "Uncompleted job: At least one task must be defined.")
-                                .append('\n');
+                        sb.append("Uncompleted job: At least one task must be defined.").append('\n');
                     } else if (TASK.getXMLName().equals(qName)) {
-                        sb.append(
-                                "Uncompleted task: At least the Executable element must be define.")
+                        sb.append("Uncompleted task: At least the Executable element must be define.")
                                 .append('\n');
                     } else if (SCRIPT_EXECUTABLE.getXMLName().equals(qName)) {
                         sb.append("Uncompleted scriptExecutable.").append('\n');
                     }
                 }
             }
-            sb.append("Error: ").append(se.getMessage()).append(" at line ")
-                    .append(se.getLineNumber()).append(" , column ")
-                    .append(se.getColumnNumber()).append('.');
-            JobCreationException ne = new JobCreationException(sb.toString(),
-                    se);
+            sb.append("Error: ").append(se.getMessage()).append(" at line ").append(se.getLineNumber())
+                    .append(" , column ").append(se.getColumnNumber()).append('.');
+            JobCreationException ne = new JobCreationException(sb.toString(), se);
             String currentTask = decorator.currentTask();
             if (currentTask != null && !currentTask.isEmpty()) {
                 ne.setTaskName(currentTask);
@@ -191,8 +184,7 @@ public class ValidationUtil {
         }
 
         @Override
-        public void startPrefixMapping(String prefix, String uri)
-                throws SAXException {
+        public void startPrefixMapping(String prefix, String uri) throws SAXException {
             handler.startPrefixMapping(prefix, uri);
         }
 
@@ -202,8 +194,8 @@ public class ValidationUtil {
         }
 
         @Override
-        public void startElement(String uri, String localName, String qName,
-                Attributes atts) throws SAXException {
+        public void startElement(String uri, String localName, String qName, Attributes atts)
+                throws SAXException {
             if (TASK.getXMLName().equals(currentE.push(qName))) {
                 nameAttrValue(atts);
                 currentTask.push(nameAttrValue(atts));
@@ -212,8 +204,7 @@ public class ValidationUtil {
         }
 
         @Override
-        public void endElement(String uri, String localName, String qName)
-                throws SAXException {
+        public void endElement(String uri, String localName, String qName) throws SAXException {
             if (TASK.getXMLName().equals(currentE.pop())) {
                 currentTask.pop();
             }
@@ -221,20 +212,17 @@ public class ValidationUtil {
         }
 
         @Override
-        public void characters(char[] ch, int start, int length)
-                throws SAXException {
+        public void characters(char[] ch, int start, int length) throws SAXException {
             handler.characters(ch, start, length);
         }
 
         @Override
-        public void ignorableWhitespace(char[] ch, int start, int length)
-                throws SAXException {
+        public void ignorableWhitespace(char[] ch, int start, int length) throws SAXException {
             handler.ignorableWhitespace(ch, start, length);
         }
 
         @Override
-        public void processingInstruction(String target, String data)
-                throws SAXException {
+        public void processingInstruction(String target, String data) throws SAXException {
             handler.processingInstruction(target, data);
         }
 

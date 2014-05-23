@@ -344,10 +344,10 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
             String hostname = PASchedulerProperties.DATASPACE_DEFAULTUSER_HOSTNAME.getValueAsStringOrNull();
 
             try {
-                DataSpaceServiceStarter.getDataSpaceServiceStarter().createSpaceWithUserNameSubfolder(identification.getUsername(),
-                        SchedulerConstants.SCHEDULER_DATASPACE_APPLICATION_ID, userSpaceName,
-                        PASchedulerProperties.DATASPACE_DEFAULTUSER_URL.getValueAsString(), localpath,
-                        hostname, false, true);
+                DataSpaceServiceStarter.getDataSpaceServiceStarter().createSpaceWithUserNameSubfolder(
+                        identification.getUsername(), SchedulerConstants.SCHEDULER_DATASPACE_APPLICATION_ID,
+                        userSpaceName, PASchedulerProperties.DATASPACE_DEFAULTUSER_URL.getValueAsString(),
+                        localpath, hostname, false, true);
 
                 // immediately retrieve the User Space
                 userSpace = PADataSpaces.resolveOutput(userSpaceName);

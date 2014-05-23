@@ -47,8 +47,8 @@ import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
 
-public abstract class AbstractIModeCommand extends AbstractCommand implements
-        Command {
+
+public abstract class AbstractIModeCommand extends AbstractCommand implements Command {
 
     public static final String TERMINATE = "org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractIModeCommand.terminate";
 
@@ -73,8 +73,7 @@ public abstract class AbstractIModeCommand extends AbstractCommand implements
                 }
                 engine.eval(command);
             } catch (ScriptException se) {
-                writeLine(currentContext, "%s\n%s",
-                        "An error occurred while executing the script:",
+                writeLine(currentContext, "%s\n%s", "An error occurred while executing the script:",
                         StringUtility.stackTraceAsString(se));
             }
         }

@@ -106,7 +106,7 @@ public class TestJobCoverage extends FunctionalTest {
         JobInfo jinfo;
 
         // removing temp file if existing
-        File w3File = new File(System.getProperty("java.io.tmpdir"),"WorkingAt3rdT2_13031984.tmp");
+        File w3File = new File(System.getProperty("java.io.tmpdir"), "WorkingAt3rdT2_13031984.tmp");
         if (w3File.exists()) {
             w3File.delete();
         }

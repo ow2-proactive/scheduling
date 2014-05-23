@@ -106,7 +106,7 @@ public abstract class Guard<T> {
         checkNotKilledOrCleaned();
         this.node = node;
         this.activeExecutor = new ActiveObjectExecutor();
-        this.stubActiveExecutor =  PAActiveObject.turnActive(activeExecutor, node);
+        this.stubActiveExecutor = PAActiveObject.turnActive(activeExecutor, node);
         stubActiveExecutor.ping(); // make sure the AO is started
         this.nodeInitialized = true;
     }
@@ -119,6 +119,7 @@ public abstract class Guard<T> {
             throw new IllegalStateException("Guard has been cleaned");
         }
     }
+
     private synchronized void checkNodeInitialized() {
         if (!nodeInitialized) {
             throw new IllegalStateException("Guard Node is not initialized");
@@ -176,7 +177,7 @@ public abstract class Guard<T> {
             }
         } catch (Exception e) {
             Throwable wrappedException = e;
-            while(wrappedException != null && !(wrappedException instanceof ToUnwrapException)) {
+            while (wrappedException != null && !(wrappedException instanceof ToUnwrapException)) {
                 wrappedException = wrappedException.getCause();
             }
             if (wrappedException != null) {
@@ -228,8 +229,6 @@ public abstract class Guard<T> {
         return walltimeMessageReceived;
     }
 
-
-
     /**
      * abstract kill method to be overridden by implementations, for example when the target is an Executable,
      * it will call the genereic or user-defined kill method of the Executable class
@@ -240,7 +239,6 @@ public abstract class Guard<T> {
      * abstract clean method to be overridden by implementations
      */
     abstract protected void internalClean();
-
 
     /**
      * Kill the executable, this will interrupt current tasks.
@@ -382,7 +380,7 @@ public abstract class Guard<T> {
          * This request is automatically called when calling setContextClassLoader
          */
         public void updateContextClassLoader() {
-             Thread.currentThread().setContextClassLoader(classLoader);
+            Thread.currentThread().setContextClassLoader(classLoader);
         }
 
         /**
@@ -405,7 +403,6 @@ public abstract class Guard<T> {
             }
         }
 
-
         /**
          * Cancel the current execution
          */
@@ -415,7 +412,6 @@ public abstract class Guard<T> {
             // it will not terminate the active object
             bodyOnThis.interruptService();
         }
-
 
     }
 

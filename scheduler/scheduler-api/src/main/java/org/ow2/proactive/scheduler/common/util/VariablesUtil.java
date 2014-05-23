@@ -40,6 +40,7 @@ import java.util.Map;
 
 import org.ow2.proactive.scripting.Script;
 
+
 /**
  * Utility class which facilitates the filtering of variables defined in strings
  * and scripts by using a variable map. These variables should have ${...}
@@ -87,8 +88,7 @@ public class VariablesUtil {
      *            a map which contains variable values
      * @return the filtered string
      */
-    public static String filterAndUpdate(String string, boolean dryrun,
-            Map variables) {
+    public static String filterAndUpdate(String string, boolean dryrun, Map variables) {
         if (string == null || string.isEmpty()) {
             return string;
         }
@@ -107,9 +107,8 @@ public class VariablesUtil {
                 } else {
                     value = getValueAsString(def, variables);
                     if (value == null) {
-                        throw new IllegalArgumentException("Variable '" + def
-                                + "' not found in the definition (${" + def
-                                + "})");
+                        throw new IllegalArgumentException("Variable '" + def +
+                            "' not found in the definition (${" + def + "})");
                     }
                 }
                 if (!dryrun) {

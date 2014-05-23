@@ -45,6 +45,7 @@ import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractLoginCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 
+
 public class LoginSchedCommand extends AbstractLoginCommand implements Command {
 
     public static final String USERNAME = "org.ow2.proactive_grid_cloud_portal.cli.cmd.LoginCommand.username";
@@ -57,8 +58,7 @@ public class LoginSchedCommand extends AbstractLoginCommand implements Command {
     }
 
     @Override
-    protected String login(ApplicationContext currentContext)
-            throws CLIException {
+    protected String login(ApplicationContext currentContext) throws CLIException {
         String password = currentContext.getProperty(PASSWORD, String.class);
         if (password == null) {
             password = new String(readPassword(currentContext, "password:"));
@@ -69,7 +69,7 @@ public class LoginSchedCommand extends AbstractLoginCommand implements Command {
             return scheduler.login(username, password);
         } catch (Exception e) {
             throw new CLIException(REASON_OTHER, "An error occurred while logging.", e);
-        } 
+        }
 
     }
 

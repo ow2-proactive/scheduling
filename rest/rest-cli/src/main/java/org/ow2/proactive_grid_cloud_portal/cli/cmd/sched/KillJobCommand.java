@@ -43,6 +43,7 @@ import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractJobCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 
+
 public class KillJobCommand extends AbstractJobCommand implements Command {
 
     public KillJobCommand(String jobId) {
@@ -61,9 +62,8 @@ public class KillJobCommand extends AbstractJobCommand implements Command {
                 writeLine(currentContext, "Cannot kill %s:", job());
             }
         } catch (Exception e) {
-            handleError(String.format(
-                    "An error occurred while attempting to kill %s:", job()),
-                    e, currentContext);
+            handleError(String.format("An error occurred while attempting to kill %s:", job()), e,
+                    currentContext);
         }
     }
 

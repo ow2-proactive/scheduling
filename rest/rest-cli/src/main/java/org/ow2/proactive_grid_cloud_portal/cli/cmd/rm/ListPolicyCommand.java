@@ -53,31 +53,28 @@ import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.cli.json.PluginView;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
 
+
 public class ListPolicyCommand extends AbstractCommand implements Command {
 
     @Override
     public void execute(ApplicationContext currentContext) throws CLIException {
         Map<String, PluginView> knownPolicyMap = currentContext.getPolicies();
         if (knownPolicyMap == null) {
-            HttpGet request = new HttpGet(
-                    currentContext.getResourceUrl("policies"));
+            HttpGet request = new HttpGet(currentContext.getResourceUrl("policies"));
             HttpResponseWrapper response = execute(request, currentContext);
             if (statusCode(OK) == statusCode(response)) {
-                List<PluginView> pluginViewList = readValue(response,
-                        new TypeReference<List<PluginView>>() {
-                        }, currentContext);
+                List<PluginView> pluginViewList = readValue(response, new TypeReference<List<PluginView>>() {
+                }, currentContext);
                 resultStack(currentContext).push(
-                        pluginViewList.toArray(new PluginView[pluginViewList
-                                .size()]));
+                        pluginViewList.toArray(new PluginView[pluginViewList.size()]));
                 knownPolicyMap = new HashMap<String, PluginView>();
                 for (PluginView pluginView : pluginViewList) {
                     knownPolicyMap.put(pluginView.getPluginName(), pluginView);
                 }
                 currentContext.setPolicies(knownPolicyMap);
             } else {
-                handleError(
-                        "An error occurred while retrieving supported policy types:",
-                        response, currentContext);
+                handleError("An error occurred while retrieving supported policy types:", response,
+                        currentContext);
             }
         }
         if (!currentContext.isSilent()) {

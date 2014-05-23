@@ -176,8 +176,8 @@ public class TestJobClasspath extends SchedulerConsecutive {
             Assert.assertFalse(jr.hadException());
             Map<String, TaskResult> results = jr.getAllResults();
             Assert.assertEquals(1, results.size());
-            Long value = (Long)results.get(taskName).value();
-            Assert.assertEquals(firstValueToTest, (Integer)value.intValue());
+            Long value = (Long) results.get(taskName).value();
+            Assert.assertEquals(firstValueToTest, (Integer) value.intValue());
         }
     }
 
@@ -216,14 +216,13 @@ public class TestJobClasspath extends SchedulerConsecutive {
         File tmpdir = new File(System.getProperty("java.io.tmpdir") + File.separator + "SchedTestJob_CP");
 
         //add uid to first class
-        CtField uidField1 = new CtField( CtClass.longType, "serialVersionUID", cc1 );
-        uidField1.setModifiers( Modifier.PUBLIC | Modifier.STATIC | Modifier.FINAL );
-        cc1.addField( uidField1, CtField.Initializer.constant((long)firstValueToTest));
-        
+        CtField uidField1 = new CtField(CtClass.longType, "serialVersionUID", cc1);
+        uidField1.setModifiers(Modifier.PUBLIC | Modifier.STATIC | Modifier.FINAL);
+        cc1.addField(uidField1, CtField.Initializer.constant((long) firstValueToTest));
+
         //create method for first class
-        CtMethod exec1 = CtNewMethod.make(serializableClass, absExec.getName(), absExec
-                .getParameterTypes(), absExec.getExceptionTypes(), "return new java.lang.Integer(" +
-            firstValueToTest + ");", cc1);
+        CtMethod exec1 = CtNewMethod.make(serializableClass, absExec.getName(), absExec.getParameterTypes(),
+                absExec.getExceptionTypes(), "return new java.lang.Integer(" + firstValueToTest + ");", cc1);
         cc1.addMethod(exec1);
 
         //create first classPath
@@ -233,14 +232,13 @@ public class TestJobClasspath extends SchedulerConsecutive {
         cc1.writeFile(classPathes[0]);
 
         //add uid 
-        CtField uidField2 = new CtField( CtClass.longType, "serialVersionUID", cc2 );
-        uidField2.setModifiers( Modifier.PUBLIC | Modifier.STATIC | Modifier.FINAL );
-        cc2.addField( uidField2, CtField.Initializer.constant((long)SecondValueToTest));
-        
+        CtField uidField2 = new CtField(CtClass.longType, "serialVersionUID", cc2);
+        uidField2.setModifiers(Modifier.PUBLIC | Modifier.STATIC | Modifier.FINAL);
+        cc2.addField(uidField2, CtField.Initializer.constant((long) SecondValueToTest));
+
         //create method for second class
-        CtMethod exec2 = CtNewMethod.make(serializableClass, absExec.getName(), absExec
-                .getParameterTypes(), absExec.getExceptionTypes(), "return new java.lang.Integer(" +
-            SecondValueToTest + ");", cc2);
+        CtMethod exec2 = CtNewMethod.make(serializableClass, absExec.getName(), absExec.getParameterTypes(),
+                absExec.getExceptionTypes(), "return new java.lang.Integer(" + SecondValueToTest + ");", cc2);
         cc2.addMethod(exec2);
 
         //create second classPath

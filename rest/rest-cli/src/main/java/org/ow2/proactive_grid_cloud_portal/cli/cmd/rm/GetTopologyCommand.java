@@ -49,6 +49,7 @@ import org.ow2.proactive_grid_cloud_portal.cli.json.TopologyView;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
 
+
 public class GetTopologyCommand extends AbstractCommand implements Command {
 
     @Override
@@ -56,15 +57,13 @@ public class GetTopologyCommand extends AbstractCommand implements Command {
         HttpGet request = new HttpGet(currentContext.getResourceUrl("topology"));
         HttpResponseWrapper response = execute(request, currentContext);
         if (statusCode(OK) == statusCode(response)) {
-            TopologyView topology = readValue(response, TopologyView.class,
-                    currentContext);
+            TopologyView topology = readValue(response, TopologyView.class, currentContext);
             resultStack(currentContext).push(topology);
             if (!currentContext.isSilent()) {
                 writeLine(currentContext, "%s", StringUtility.string(topology));
             }
         } else {
-            handleError("An error occurred while retrieving the topology:",
-                    response, currentContext);
+            handleError("An error occurred while retrieving the topology:", response, currentContext);
         }
 
     }

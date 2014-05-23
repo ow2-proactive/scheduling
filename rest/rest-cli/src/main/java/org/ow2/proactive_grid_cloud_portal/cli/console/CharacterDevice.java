@@ -45,6 +45,7 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.Writer;
 
+
 class CharacterDevice extends AbstractDevice {
     private BufferedReader in;
     private PrintStream out;
@@ -80,8 +81,8 @@ class CharacterDevice extends AbstractDevice {
         out.println(String.format(format, args));
     }
 
-	@Override
-	public boolean canRead() throws IOException {
-		return in.ready();
-	}
+    @Override
+    public boolean canRead() throws IOException {
+        return in.ready();
+    }
 }

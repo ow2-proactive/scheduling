@@ -129,14 +129,14 @@ public class SchedulerStarter {
         options.addOption(policy);
 
         Option noDeploy = new Option("ln", "localNodes", true,
-          "the number of local nodes to start (can be 0), default value is " + DEFAULT_NODES_NUMBER);
+            "the number of local nodes to start (can be 0), default value is " + DEFAULT_NODES_NUMBER);
         noDeploy.setArgName("localNodes");
         noDeploy.setRequired(false);
         options.addOption(noDeploy);
 
         Option nodeTimeout = new Option("t", "timeout", true,
-          "Timeout used to start the nodes (only useful with local nodes, default: " +
-            DEFAULT_NODES_TIMEOUT + "ms)");
+            "Timeout used to start the nodes (only useful with local nodes, default: " +
+                DEFAULT_NODES_TIMEOUT + "ms)");
         nodeTimeout.setArgName("timeout");
         nodeTimeout.setRequired(false);
         options.addOption(nodeTimeout);
@@ -233,15 +233,15 @@ public class SchedulerStarter {
 
     }
 
-    private static int readIntOption(CommandLine cmd, String optionName,
-      int defaultValue) throws ParseException {
+    private static int readIntOption(CommandLine cmd, String optionName, int defaultValue)
+            throws ParseException {
         int value = defaultValue;
         if (cmd.hasOption(optionName)) {
             try {
                 value = Integer.parseInt(cmd.getOptionValue(optionName));
             } catch (Exception nfe) {
-                throw new ParseException(
-                  "Wrong value for " + optionName + " option: " + cmd.getOptionValue("t"));
+                throw new ParseException("Wrong value for " + optionName + " option: " +
+                    cmd.getOptionValue("t"));
             }
         }
         return value;
@@ -260,8 +260,8 @@ public class SchedulerStarter {
                         addLocalNodes(rmAuth, numberLocalNodes, nodeTimeoutValue);
                     }
 
-                    logger.info("The resource manager with " + numberLocalNodes +
-                      " local nodes created on " + rmAuth.getHostURL());
+                    logger.info("The resource manager with " + numberLocalNodes + " local nodes created on " +
+                        rmAuth.getHostURL());
                 } catch (AlreadyBoundException abe) {
                     logger.error("The resource manager already exists on local host", abe);
                     System.exit(4);
@@ -275,27 +275,22 @@ public class SchedulerStarter {
         rmStarter.start();
     }
 
-    private static void addLocalNodes(RMAuthentication rmAuth, int numberLocalNodes,
-      int nodeTimeoutValue) throws LoginException, KeyException, IOException {
+    private static void addLocalNodes(RMAuthentication rmAuth, int numberLocalNodes, int nodeTimeoutValue)
+            throws LoginException, KeyException, IOException {
         //creating default node source
-        ResourceManager rman = rmAuth.login(Credentials
-          .getCredentials(PAResourceManagerProperties
-            .getAbsolutePath(PAResourceManagerProperties.RM_CREDS
-              .getValueAsString())));
+        ResourceManager rman = rmAuth.login(Credentials.getCredentials(PAResourceManagerProperties
+                .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
         //first im parameter is default rm url
-        byte[] creds = FileToBytesConverter.convertFileToByteArray(new File(
-          PAResourceManagerProperties
-            .getAbsolutePath(PAResourceManagerProperties.RM_CREDS
-              .getValueAsString())
-        ));
-        rman.createNodeSource(NodeSource.LOCAL_INFRASTRUCTURE_NAME,
-          LocalInfrastructure.class.getName(), new Object[] { creds,
-            numberLocalNodes, nodeTimeoutValue,
-            CentralPAPropertyRepository.PA_HOME.getCmdLine() + CentralPAPropertyRepository.PA_HOME.getValue()
-          },
-          RestartDownNodesPolicy.class.getName(), new Object[] { "ALL", "ALL",
-            "10000" }
-        );
+        byte[] creds = FileToBytesConverter.convertFileToByteArray(new File(PAResourceManagerProperties
+                .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
+        rman.createNodeSource(NodeSource.LOCAL_INFRASTRUCTURE_NAME, LocalInfrastructure.class.getName(),
+                new Object[] {
+                        creds,
+                        numberLocalNodes,
+                        nodeTimeoutValue,
+                        CentralPAPropertyRepository.PA_HOME.getCmdLine() +
+                            CentralPAPropertyRepository.PA_HOME.getValue() }, RestartDownNodesPolicy.class
+                        .getName(), new Object[] { "ALL", "ALL", "10000" });
     }
 
     private static String getLocalAdress() throws ProActiveException {
@@ -308,35 +303,35 @@ public class SchedulerStarter {
             System.setProperty(PASchedulerProperties.SCHEDULER_HOME.getKey(), System.getProperty("user.dir"));
         }
         if (System.getProperty(PAResourceManagerProperties.RM_HOME.getKey()) == null) {
-            System.setProperty(PAResourceManagerProperties.RM_HOME.getKey(),
-              System.getProperty(PASchedulerProperties.SCHEDULER_HOME.getKey()));
+            System.setProperty(PAResourceManagerProperties.RM_HOME.getKey(), System
+                    .getProperty(PASchedulerProperties.SCHEDULER_HOME.getKey()));
         }
         if (System.getProperty(CentralPAPropertyRepository.PA_HOME.getName()) == null) {
-            System.setProperty(CentralPAPropertyRepository.PA_HOME.getName(),
-              System.getProperty(PASchedulerProperties.SCHEDULER_HOME.getKey()));
+            System.setProperty(CentralPAPropertyRepository.PA_HOME.getName(), System
+                    .getProperty(PASchedulerProperties.SCHEDULER_HOME.getKey()));
         }
 
         if (System.getProperty(CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getName()) == null) {
-            System.setProperty(CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getName(),
-              System.getProperty(PASchedulerProperties.SCHEDULER_HOME.getKey()) +
+            System.setProperty(CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getName(), System
+                    .getProperty(PASchedulerProperties.SCHEDULER_HOME.getKey()) +
                 "/config/proactive/ProActiveConfiguration.xml");
         }
     }
 
     private static void configureSecurityManager() {
         if (System.getProperty("java.security.policy") == null) {
-            System.setProperty("java.security.policy", System.getProperty(
-              PASchedulerProperties.SCHEDULER_HOME.getKey()) + "/config/security.java.policy-server");
+            System.setProperty("java.security.policy", System
+                    .getProperty(PASchedulerProperties.SCHEDULER_HOME.getKey()) +
+                "/config/security.java.policy-server");
             Policy.getPolicy().refresh();
         }
     }
 
     private static void configureLogging() {
         if (System.getProperty(CentralPAPropertyRepository.LOG4J.getName()) == null) {
-            String defaultLog4jConfig = System.getProperty(
-              PASchedulerProperties.SCHEDULER_HOME.getKey()) + "/config/log4j/scheduler-log4j-server";
-            System.setProperty(CentralPAPropertyRepository.LOG4J.getName(),
-              defaultLog4jConfig);
+            String defaultLog4jConfig = System.getProperty(PASchedulerProperties.SCHEDULER_HOME.getKey()) +
+                "/config/log4j/scheduler-log4j-server";
+            System.setProperty(CentralPAPropertyRepository.LOG4J.getName(), defaultLog4jConfig);
             PropertyConfigurator.configure(defaultLog4jConfig);
         }
     }

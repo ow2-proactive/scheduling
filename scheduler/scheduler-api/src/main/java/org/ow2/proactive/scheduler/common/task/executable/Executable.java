@@ -62,7 +62,7 @@ public abstract class Executable {
 
     /** execution progress value (between 0 and 100) */
     private final AtomicInteger progress = new AtomicInteger(0);
-    
+
     private Map<String, Serializable> propagatedVariables;
 
     /**
@@ -75,8 +75,7 @@ public abstract class Executable {
      * @return any serializable object from the user.
      */
     public abstract Serializable execute(TaskResult... results) throws Throwable;
-    
-    
+
     /**
      * Kill executable, terminate preemptively its execution.
      * Should be overridden to kill subprocesses if any. 
@@ -122,14 +121,12 @@ public abstract class Executable {
     public int getProgress() {
         return this.progress.get();
     }
-    
-    
+
     public Map<String, Serializable> getVariables() {
         return this.propagatedVariables;
     }
 
-    public void setVariables(
-            Map<String, Serializable> propagatedVariables) {
+    public void setVariables(Map<String, Serializable> propagatedVariables) {
         this.propagatedVariables = propagatedVariables;
     }
 

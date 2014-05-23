@@ -53,10 +53,10 @@ import static org.mockito.Mockito.when;
 
 public class SharedSessionStoreTestUtils {
 
-    public static String createValidSession(RMProxyUserInterface rm)
-      throws ActiveObjectCreationException, NodeException, RMException, KeyException, LoginException {
+    public static String createValidSession(RMProxyUserInterface rm) throws ActiveObjectCreationException,
+            NodeException, RMException, KeyException, LoginException {
         SchedulerRMProxyFactory schedulerFactory = mock(SchedulerRMProxyFactory.class);
-        when(schedulerFactory.connectToRM(Matchers.<CredData>any())).thenReturn(rm);
+        when(schedulerFactory.connectToRM(Matchers.<CredData> any())).thenReturn(rm);
         SharedSessionStore.getInstance().setSchedulerRMProxyFactory(schedulerFactory);
 
         // login
@@ -65,10 +65,10 @@ public class SharedSessionStoreTestUtils {
         return session.getSessionId();
     }
 
-    public static String createValidSession(
-      SchedulerProxyUserInterface scheduler) throws LoginException, ActiveObjectCreationException, SchedulerException, NodeException {
+    public static String createValidSession(SchedulerProxyUserInterface scheduler) throws LoginException,
+            ActiveObjectCreationException, SchedulerException, NodeException {
         SchedulerRMProxyFactory schedulerFactory = mock(SchedulerRMProxyFactory.class);
-        when(schedulerFactory.connectToScheduler(Matchers.<CredData>any())).thenReturn(scheduler);
+        when(schedulerFactory.connectToScheduler(Matchers.<CredData> any())).thenReturn(scheduler);
         SharedSessionStore.getInstance().setSchedulerRMProxyFactory(schedulerFactory);
 
         // login

@@ -81,7 +81,7 @@ import functionaltests.RMTHelper;
 public class SelectionTest extends FunctionalTest {
 
     private String vmPropSelectionScriptpath = this.getClass().getResource(
-      "/functionaltests/selectionscript/vmPropertySelectionScript.groovy").getPath();
+            "/functionaltests/selectionscript/vmPropertySelectionScript.groovy").getPath();
 
     private String vmPropKey1 = "myProperty1";
     private String vmPropValue1 = "myValue1";
@@ -110,8 +110,7 @@ public class SelectionTest extends FunctionalTest {
 
             // properties are defined, trying to deploy nodes to these hosts
             BooleanWrapper result = helper.getResourceManager().createNodeSource("remote",
-                    SSHInfrastructure.class.getName(), new Object[] {
-                            "", // ssh options
+                    SSHInfrastructure.class.getName(), new Object[] { "", // ssh options
                             javaExec, // java executable path
                             rmHome, // rm distrib path
                             "30000", // node lookup timeout

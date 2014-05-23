@@ -39,13 +39,14 @@ package org.ow2.proactive_grid_cloud_portal.cli;
 
 import static org.ow2.proactive_grid_cloud_portal.cli.RestConstants.RM_RESOURCE_TYPE;
 
+
 public class RmEntryPoint extends EntryPoint {
 
     @Override
     protected String resourceType() {
         return RM_RESOURCE_TYPE;
     }
-    
+
     public static void main(String[] args) {
         (new RmEntryPoint()).run(args);
     }

@@ -102,8 +102,8 @@ public class TestGCMCustomizedInfrastructureTimeSlotPolicy extends TestLocalInfr
         // creating node source
         helper.getResourceManager().createNodeSource(sourceName, GCMCustomisedInfrastructure.class.getName(),
                 // first parameter of im is rm url, empty means default
-                new Object[] { GCMDeploymentData, hostsListData, TIMEOUT },
-                TimeSlotPolicy.class.getName(), getPolicyParams());
+                new Object[] { GCMDeploymentData, hostsListData, TIMEOUT }, TimeSlotPolicy.class.getName(),
+                getPolicyParams());
 
         helper.waitForNodeSourceCreation(sourceName, descriptorNodeNumber);
     }

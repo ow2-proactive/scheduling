@@ -383,9 +383,8 @@ public class Tools {
             String langName = factory.getLanguageName();
             String langVersion = factory.getLanguageVersion();
 
-            String scriptEngineInfo = String.format("%s (%s), aliases: %s, language: %s (%s)",
-                    engName, engVersion, Arrays.toString(factory.getNames().toArray()),
-                    langName, langVersion);
+            String scriptEngineInfo = String.format("%s (%s), aliases: %s, language: %s (%s)", engName,
+                    engVersion, Arrays.toString(factory.getNames().toArray()), langName, langVersion);
 
             logger.info("Available script engine: " + scriptEngineInfo);
         }

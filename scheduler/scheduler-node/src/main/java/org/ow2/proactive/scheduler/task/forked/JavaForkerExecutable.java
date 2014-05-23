@@ -132,7 +132,6 @@ public class JavaForkerExecutable extends JavaExecutable implements ForkerStarte
     /** Forked execution time out checking interval */
     private static final int TIMEOUT = 1000;
 
-
     /** Thread for listening out/err of the forked JVM */
     private transient Thread tsout, tserr;
 
@@ -321,7 +320,7 @@ public class JavaForkerExecutable extends JavaExecutable implements ForkerStarte
                 ife = new InternalForkEnvironment(fe, null, true);
             } else {
                 throw new IllegalStateException(
-                        "System property was set and fork process environment could not be obtained", e);
+                    "System property was set and fork process environment could not be obtained", e);
             }
         }
         //change reference of forkEnv to the internal one
@@ -381,8 +380,7 @@ public class JavaForkerExecutable extends JavaExecutable implements ForkerStarte
         long deploymentID = random.nextInt(1000000);
         forkedNodeName = "f" + deploymentID;
         Map<String, Serializable> propagatedVariables = SerializationUtil
-                .deserializeVariableMap(this.execInitializer
-                        .getPropagatedVariables());
+                .deserializeVariableMap(this.execInitializer.getPropagatedVariables());
         setVariables(propagatedVariables);
     }
 
@@ -395,7 +393,7 @@ public class JavaForkerExecutable extends JavaExecutable implements ForkerStarte
         ForkEnvironment forkEnvironment = this.execInitializer.getForkEnvironment();
         String java_home;
         if (forkEnvironment != null && forkEnvironment.getJavaHome() != null &&
-                !"".equals(forkEnvironment.getJavaHome())) {
+            !"".equals(forkEnvironment.getJavaHome())) {
             java_home = forkEnvironment.getJavaHome();
         } else {
             java_home = System.getProperty("java.home");
@@ -418,8 +416,7 @@ public class JavaForkerExecutable extends JavaExecutable implements ForkerStarte
         } catch (ProActiveException pae) {
             logHome = System.getProperty("java.io.tmpdir");
         }
-        return logHome + File.separator +
-                "logs";
+        return logHome + File.separator + "logs";
     }
 
     /**
@@ -474,7 +471,7 @@ public class JavaForkerExecutable extends JavaExecutable implements ForkerStarte
         }
         //set default PAConfiguration
         if (forkEnvironment == null ||
-                !contains("proactive.configuration", forkEnvironment.getJVMArguments())) {
+            !contains("proactive.configuration", forkEnvironment.getJVMArguments())) {
             try {
                 fpaconfig = createTempFile("forked_jtp");
                 PrintStream out = new PrintStream(fpaconfig);
@@ -488,7 +485,7 @@ public class JavaForkerExecutable extends JavaExecutable implements ForkerStarte
         }
         // set log size to minimum value as log are handled on forker side
         if (forkEnvironment == null ||
-                !contains(TaskLauncher.MAX_LOG_SIZE_PROPERTY, forkEnvironment.getJVMArguments())) {
+            !contains(TaskLauncher.MAX_LOG_SIZE_PROPERTY, forkEnvironment.getJVMArguments())) {
             command.add("-D" + TaskLauncher.MAX_LOG_SIZE_PROPERTY + "=" + FORKED_LOG_BUFFER_SIZE);
         }
         //set scratchdir
@@ -611,7 +608,7 @@ public class JavaForkerExecutable extends JavaExecutable implements ForkerStarte
             } catch (IllegalThreadStateException e) {
                 //thrown by process.exitValue() if process is not finished
                 logger.debug("Process not terminated, continue launching Forked VM (try number " +
-                        numberOfTrials + ")");
+                    numberOfTrials + ")");
             }
         }
         throw startProcessException(String.format("Separate java process didn't start after %dms.",
@@ -758,11 +755,10 @@ public class JavaForkerExecutable extends JavaExecutable implements ForkerStarte
         TaskLauncherInitializer tli = execInitializer.getJavaTaskLauncherInitializer();
         // for the forked java task precious log is is handled by the JavaTaskLauncherForker
         tli.setPreciousLogs(false);
-        JavaTaskLauncherForked newLauncher = (JavaTaskLauncherForked) PAActiveObject.newActive(JavaTaskLauncherForked.class
-                .getName(), new Object[] { tli }, forkedNode);
+        JavaTaskLauncherForked newLauncher = (JavaTaskLauncherForked) PAActiveObject.newActive(
+                JavaTaskLauncherForked.class.getName(), new Object[] { tli }, forkedNode);
         return newLauncher;
     }
-
 
     /**
      * Create temp file in java.io.tmpdir if SCRATCHDIR is not set, 
@@ -863,12 +859,13 @@ public class JavaForkerExecutable extends JavaExecutable implements ForkerStarte
 
         String forkedJVMDataspace;
 
-        public void doTaskAndGetResult(TaskResult... results) throws ActiveObjectCreationException, NodeException {
+        public void doTaskAndGetResult(TaskResult... results) throws ActiveObjectCreationException,
+                NodeException {
             TaskResultCallback taskResultHandler = new TaskResultCallback(this);
             TaskResultCallback taskResultHandlerStub = PAActiveObject.turnActive(taskResultHandler);
 
-            launcherGuard.use().doTaskAndGetResult(taskResultHandlerStub, execInitializer
-                    .getJavaExecutableContainer(), results);
+            launcherGuard.use().doTaskAndGetResult(taskResultHandlerStub,
+                    execInitializer.getJavaExecutableContainer(), results);
         }
 
         public void setResult(TaskResult taskResult) {
@@ -889,7 +886,7 @@ public class JavaForkerExecutable extends JavaExecutable implements ForkerStarte
         public void waitForResult(int timeout) throws InterruptedException {
             synchronized (syncResultAccess) {
                 syncResultAccess.wait(timeout);
-                if (resultException!=null) {
+                if (resultException != null) {
                     throw resultException;
                 }
             }
@@ -964,7 +961,6 @@ public class JavaForkerExecutable extends JavaExecutable implements ForkerStarte
             }
         }
 
-
         public synchronized int getProgress() {
             if (this.state == GuardState.NOT_INITIALIZED) {
                 return 0;
@@ -973,7 +969,7 @@ public class JavaForkerExecutable extends JavaExecutable implements ForkerStarte
             } else {
                 try {
                     lastProgress = this.target.getProgress();
-                    pingAttempt=0;
+                    pingAttempt = 0;
                     return lastProgress;
                 } catch (ProgressPingerException e) {
                     // in that case it is an exception produced by the getProgress method
@@ -981,7 +977,8 @@ public class JavaForkerExecutable extends JavaExecutable implements ForkerStarte
                 } catch (Throwable e) {
                     pingAttempt++;
 
-                    ForkedJVMProcessException exception = new ForkedJVMProcessException("Forked JVM seems to be dead", e);
+                    ForkedJVMProcessException exception = new ForkedJVMProcessException(
+                        "Forked JVM seems to be dead", e);
 
                     if (pingAttempt >= execInitializer.getJavaTaskLauncherInitializer().getPingAttempts()) {
                         // Forked JVM seems be to be dead - unblocking task launcher

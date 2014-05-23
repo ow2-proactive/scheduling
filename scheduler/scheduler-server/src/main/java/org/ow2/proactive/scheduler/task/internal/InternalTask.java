@@ -172,7 +172,8 @@ public abstract class InternalTask extends TaskState {
         //ExecutableContainer replicatedContainer = null;
         try {
             // Deep copy of the InternalTask using proactive serialization
-            replicatedTask = (InternalTask) ProActiveMakeDeepCopy.WithProActiveObjectStream.makeDeepCopy(this);
+            replicatedTask = (InternalTask) ProActiveMakeDeepCopy.WithProActiveObjectStream
+                    .makeDeepCopy(this);
         } catch (Throwable t) {
             throw new ExecutableCreationException("Failed to serialize task", t);
         }
@@ -1067,20 +1068,15 @@ public abstract class InternalTask extends TaskState {
         JobId jobId = taskInfo.getJobId();
         if (jobId != null) {
             replacements.put(SchedulerVars.JAVAENV_JOB_ID_VARNAME.toString(), jobId.toString());
-            replacements.put(SchedulerVars.JAVAENV_JOB_NAME_VARNAME.toString(), jobId
-                    .getReadableName());
+            replacements.put(SchedulerVars.JAVAENV_JOB_NAME_VARNAME.toString(), jobId.getReadableName());
         }
         TaskId taskId = taskInfo.getTaskId();
         if (taskId != null) {
-            replacements
-                    .put(SchedulerVars.JAVAENV_TASK_ID_VARNAME.toString(), taskId.toString());
-            replacements.put(SchedulerVars.JAVAENV_TASK_NAME_VARNAME.toString(), taskId
-                    .getReadableName());
+            replacements.put(SchedulerVars.JAVAENV_TASK_ID_VARNAME.toString(), taskId.toString());
+            replacements.put(SchedulerVars.JAVAENV_TASK_NAME_VARNAME.toString(), taskId.getReadableName());
         }
-        replacements.put(SchedulerVars.JAVAENV_TASK_ITERATION.toString(), String
-                .valueOf(iteration));
-        replacements.put(SchedulerVars.JAVAENV_TASK_REPLICATION.toString(), String
-                .valueOf(replication));
+        replacements.put(SchedulerVars.JAVAENV_TASK_ITERATION.toString(), String.valueOf(iteration));
+        replacements.put(SchedulerVars.JAVAENV_TASK_REPLICATION.toString(), String.valueOf(replication));
 
         return applyReplacementsOnGenericInformation(replacements);
     }

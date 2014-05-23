@@ -52,32 +52,29 @@ import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpUtility;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
 
+
 public class UnlockNodeCommand extends AbstractCommand implements Command {
 
     private String[] nodeUrls;
 
     public UnlockNodeCommand(String... nodeUrls) {
         if (StringUtility.isEmpty(nodeUrls)) {
-            throw new CLIException(REASON_INVALID_ARGUMENTS,
-                    "No value specified for node-urls.");
+            throw new CLIException(REASON_INVALID_ARGUMENTS, "No value specified for node-urls.");
         }
         this.nodeUrls = nodeUrls;
     }
 
     @Override
     public void execute(ApplicationContext currentContext) throws CLIException {
-        HttpPost request = new HttpPost(
-                currentContext.getResourceUrl("node/unlock"));
+        HttpPost request = new HttpPost(currentContext.getResourceUrl("node/unlock"));
         StringBuilder buffer = new StringBuilder();
         buffer.append("nodeurls=").append(nodeUrls[0]);
         if (nodeUrls.length > 1) {
             for (int index = 1; index < nodeUrls.length; index++) {
-                buffer.append("&nodeurls=").append(
-                        HttpUtility.encodeUrl(nodeUrls[index]));
+                buffer.append("&nodeurls=").append(HttpUtility.encodeUrl(nodeUrls[index]));
             }
         }
-        request.setEntity(new StringEntity(buffer.toString(),
-                APPLICATION_FORM_URLENCODED));
+        request.setEntity(new StringEntity(buffer.toString(), APPLICATION_FORM_URLENCODED));
         HttpResponseWrapper response = execute(request, currentContext);
         if (statusCode(OK) == statusCode(response)) {
             boolean success = readValue(response, Boolean.TYPE, currentContext);
@@ -88,8 +85,7 @@ public class UnlockNodeCommand extends AbstractCommand implements Command {
                 writeLine(currentContext, "Cannot unlock node(s).");
             }
         } else {
-            handleError("An error occurred while unlocking nodes:", response,
-                    currentContext);
+            handleError("An error occurred while unlocking nodes:", response, currentContext);
         }
 
     }

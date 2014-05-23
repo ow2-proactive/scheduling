@@ -38,45 +38,46 @@ package org.ow2.proactive_grid_cloud_portal.scheduler.dto;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
+
 @XmlRootElement
 public class JobValidationData {
-	private boolean valid;
-	private String taskName;
-	private String errorMessage;
-	private String stackTrace;
-	
-	public JobValidationData() {
-	}
+    private boolean valid;
+    private String taskName;
+    private String errorMessage;
+    private String stackTrace;
 
-	public boolean isValid() {
-		return valid;
-	}
+    public JobValidationData() {
+    }
 
-	public void setValid(boolean valid) {
-		this.valid = valid;
-	}
-	
-	public void setTaskName(String taskName) {
-		this.taskName = taskName;
-	}
-	
-	public String getTaskName() {
-		return taskName;
-	}
+    public boolean isValid() {
+        return valid;
+    }
 
-	public String getErrorMessage() {
-		return errorMessage;
-	}
+    public void setValid(boolean valid) {
+        this.valid = valid;
+    }
 
-	public void setErrorMessage(String message) {
-		this.errorMessage = message;
-	}
+    public void setTaskName(String taskName) {
+        this.taskName = taskName;
+    }
 
-	public String getStackTrace() {
-		return stackTrace;
-	}
+    public String getTaskName() {
+        return taskName;
+    }
 
-	public void setStackTrace(String stackTrace) {
-		this.stackTrace = stackTrace;
-	}
+    public String getErrorMessage() {
+        return errorMessage;
+    }
+
+    public void setErrorMessage(String message) {
+        this.errorMessage = message;
+    }
+
+    public String getStackTrace() {
+        return stackTrace;
+    }
+
+    public void setStackTrace(String stackTrace) {
+        this.stackTrace = stackTrace;
+    }
 }

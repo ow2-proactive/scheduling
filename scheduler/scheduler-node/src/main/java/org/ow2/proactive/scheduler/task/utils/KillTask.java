@@ -79,7 +79,7 @@ public class KillTask {
     }
 
     public boolean walltimeReached() {
-       return walltimeReached;
+        return walltimeReached;
     }
 
     /**
@@ -95,7 +95,7 @@ public class KillTask {
          */
         @Override
         public void run() {
-            logger.info("Walltime of "+walltime+" ms exceeded.");
+            logger.info("Walltime of " + walltime + " ms exceeded.");
             guard.kill(true);
             walltimeReached = true;
         }

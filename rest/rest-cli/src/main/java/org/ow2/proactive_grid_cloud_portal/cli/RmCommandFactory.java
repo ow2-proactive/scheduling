@@ -54,10 +54,11 @@ import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.RmImodeCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.HierarchicalMap;
 
+
 class RmCommandFactory extends CommandFactory {
 
     private static final Map<String, CommandSet.Entry> rmSupportedCmdMap = new HierarchicalMap<String, CommandSet.Entry>(
-            CommandFactory.supportedCommandMap());
+        CommandFactory.supportedCommandMap());
 
     static {
         for (CommandSet.Entry entry : CommandSet.RM_ONLY) {
@@ -66,12 +67,9 @@ class RmCommandFactory extends CommandFactory {
     }
 
     @Override
-    public List<Command> getCommandList(CommandLine cli,
-            ApplicationContext currentContext) {
-        Map<String, Command> commands = commandMapInstance(cli,
-                rmSupportedCmdMap);
-        List<Command> commandList = getCommandList(cli, commands,
-                currentContext);
+    public List<Command> getCommandList(CommandLine cli, ApplicationContext currentContext) {
+        Map<String, Command> commands = commandMapInstance(cli, rmSupportedCmdMap);
+        List<Command> commandList = getCommandList(cli, commands, currentContext);
         if (cli.hasOption(opt(RM_HELP))) {
             return commandList;
         }

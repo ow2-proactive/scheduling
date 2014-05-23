@@ -49,67 +49,68 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobResultData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskResultData;
 
+
 public class JobResultImpl implements JobResult {
-	private static final long serialVersionUID = 1L;
-	
-	private JobId jobId;
-	private Map<String, TaskResult> allResults;
+    private static final long serialVersionUID = 1L;
 
-	JobResultImpl(JobResultData data) {
-		JobIdData id = data.getId();
-		jobId = new JobIdImpl(id.getId(), id.getReadableName());
-		allResults = new HashMap<String, TaskResult>();
-		Map<String, TaskResultData> allResultsData = data.getAllResults();
-		for (String taskName : allResultsData.keySet()) {
-			TaskResultData taskResultData = allResultsData.get(taskName);
-			allResults.put(taskName, toTaskResult(jobId, taskResultData));
-		}
-	}
+    private JobId jobId;
+    private Map<String, TaskResult> allResults;
 
-	@Override
-	public Map<String, TaskResult> getAllResults() {
-		return allResults;
-	}
+    JobResultImpl(JobResultData data) {
+        JobIdData id = data.getId();
+        jobId = new JobIdImpl(id.getId(), id.getReadableName());
+        allResults = new HashMap<String, TaskResult>();
+        Map<String, TaskResultData> allResultsData = data.getAllResults();
+        for (String taskName : allResultsData.keySet()) {
+            TaskResultData taskResultData = allResultsData.get(taskName);
+            allResults.put(taskName, toTaskResult(jobId, taskResultData));
+        }
+    }
 
-	@Override
-	public Map<String, TaskResult> getExceptionResults() {
-		throw new UnsupportedOperationException();
-	}
+    @Override
+    public Map<String, TaskResult> getAllResults() {
+        return allResults;
+    }
 
-	@Override
-	public JobId getJobId() {
-		return jobId;
-	}
+    @Override
+    public Map<String, TaskResult> getExceptionResults() {
+        throw new UnsupportedOperationException();
+    }
 
-	@Override
-	public JobInfo getJobInfo() {
-		throw new UnsupportedOperationException();
-	}
+    @Override
+    public JobId getJobId() {
+        return jobId;
+    }
 
-	@Override
-	public String getName() {
-		throw new UnsupportedOperationException();
-	}
+    @Override
+    public JobInfo getJobInfo() {
+        throw new UnsupportedOperationException();
+    }
 
-	@Override
-	public Map<String, TaskResult> getPreciousResults() {
-		throw new UnsupportedOperationException();
-	}
+    @Override
+    public String getName() {
+        throw new UnsupportedOperationException();
+    }
 
-	@Override
-	public TaskResult getResult(String arg0) throws UnknownTaskException {
-		throw new UnsupportedOperationException();
-	}
+    @Override
+    public Map<String, TaskResult> getPreciousResults() {
+        throw new UnsupportedOperationException();
+    }
 
-	@Override
-	public boolean hadException() {
-		throw new UnsupportedOperationException();
-	}
+    @Override
+    public TaskResult getResult(String arg0) throws UnknownTaskException {
+        throw new UnsupportedOperationException();
+    }
 
-	@Override
-	public void removeResult(String arg0) throws UnknownTaskException {
-		throw new UnsupportedOperationException();
+    @Override
+    public boolean hadException() {
+        throw new UnsupportedOperationException();
+    }
 
-	}
+    @Override
+    public void removeResult(String arg0) throws UnknownTaskException {
+        throw new UnsupportedOperationException();
+
+    }
 
 }

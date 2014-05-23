@@ -62,18 +62,15 @@ public class PAPropertiesLazyLoader {
      * and search in systemPropertyForRelativeFolder */
     private String pathToRelativePropertiesFile;
 
-    public PAPropertiesLazyLoader(String systemPropertyForRelativeFolder,
-      String systemPropertyForFileName,
-      String pathToRelativePropertiesFile) {
+    public PAPropertiesLazyLoader(String systemPropertyForRelativeFolder, String systemPropertyForFileName,
+            String pathToRelativePropertiesFile) {
         this.systemPropertyForRelativeFolder = systemPropertyForRelativeFolder;
         this.pathToRelativePropertiesFile = pathToRelativePropertiesFile;
         this.systemPropertyForFileName = systemPropertyForFileName;
     }
 
-    public PAPropertiesLazyLoader(String systemPropertyForRelativeFolder,
-      String systemPropertyForFileName,
-      String pathToRelativePropertiesFile,
-      String propertiesFileName) {
+    public PAPropertiesLazyLoader(String systemPropertyForRelativeFolder, String systemPropertyForFileName,
+            String pathToRelativePropertiesFile, String propertiesFileName) {
         this.systemPropertyForRelativeFolder = systemPropertyForRelativeFolder;
         this.pathToRelativePropertiesFile = pathToRelativePropertiesFile;
         this.propertiesFileName = propertiesFileName;
@@ -96,7 +93,8 @@ public class PAPropertiesLazyLoader {
         }
 
         if (!new File(propertiesPath).isAbsolute()) {
-            propertiesPath = System.getProperty(systemPropertyForRelativeFolder) + File.separator + propertiesPath;
+            propertiesPath = System.getProperty(systemPropertyForRelativeFolder) + File.separator +
+                propertiesPath;
         }
 
         if (new File(propertiesPath).exists()) {

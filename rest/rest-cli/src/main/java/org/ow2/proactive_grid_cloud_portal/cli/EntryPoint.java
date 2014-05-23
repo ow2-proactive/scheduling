@@ -64,6 +64,7 @@ import org.ow2.proactive_grid_cloud_portal.cli.console.AbstractDevice;
 import org.ow2.proactive_grid_cloud_portal.cli.console.JLineDevice;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
 
+
 public abstract class EntryPoint {
 
     protected abstract String resourceType();
@@ -74,14 +75,12 @@ public abstract class EntryPoint {
         CommandLine cli = null;
         AbstractDevice console = null;
 
-        ApplicationContext currentContext = ApplicationContextImpl
-                .currentContext();
+        ApplicationContext currentContext = ApplicationContextImpl.currentContext();
 
         try {
             commandFactory = getCommandFactory(resourceType());
             console = AbstractDevice.getConsole(AbstractDevice.JLINE);
-            ((JLineDevice) console).setCommands(commandFactory
-                    .supportedCommandEntries());
+            ((JLineDevice) console).setCommands(commandFactory.supportedCommandEntries());
             currentContext.setDevice(console);
 
             Options options = commandFactory.supportedOptions();
@@ -94,16 +93,14 @@ public abstract class EntryPoint {
         } catch (ParseException pe) {
             writeError((PrintWriter) console.getWriter(), pe.getMessage(), pe);
             // print usage
-            Command help = commandFactory
-                    .commandForOption(new Option("h", null));
+            Command help = commandFactory.commandForOption(new Option("h", null));
             if (help != null) {
                 help.execute(currentContext);
             }
             System.exit(1);
         }
 
-        currentContext.setObjectMapper(new ObjectMapper().configure(
-                FAIL_ON_UNKNOWN_PROPERTIES, false));
+        currentContext.setObjectMapper(new ObjectMapper().configure(FAIL_ON_UNKNOWN_PROPERTIES, false));
         currentContext.setRestServerUrl(DFLT_REST_SCHEDULER_URL);
         currentContext.setResourceType(resourceType());
 
@@ -122,8 +119,7 @@ public abstract class EntryPoint {
         try {
             executeCommandList(commands, currentContext);
         } catch (CLIException error) {
-            if (REASON_UNAUTHORIZED_ACCESS == error.reason()
-                    && hasLoginCommand(commands)) {
+            if (REASON_UNAUTHORIZED_ACCESS == error.reason() && hasLoginCommand(commands)) {
                 retryLogin = true;
             } else {
                 writeError(writer(currentContext), "An error occurred.", error);
@@ -142,21 +138,18 @@ public abstract class EntryPoint {
          * This will effectively re-execute the user command with a new
          * session-id from server.
          */
-        if (retryLogin
-                && currentContext.getProperty(PROP_PERSISTED_SESSION,
-                        Boolean.TYPE, false)) {
+        if (retryLogin && currentContext.getProperty(PROP_PERSISTED_SESSION, Boolean.TYPE, false)) {
             try {
                 currentContext.setProperty(PROP_RENEW_SESSION, true);
                 executeCommandList(commands, currentContext);
             } catch (Throwable error) {
-                writeError(writer(currentContext),
-                        "An error occurred while execution:", error);
-            }  
+                writeError(writer(currentContext), "An error occurred while execution:", error);
+            }
         }
     }
 
-    private void executeCommandList(List<Command> commandList,
-            ApplicationContext currentContext) throws CLIException {
+    private void executeCommandList(List<Command> commandList, ApplicationContext currentContext)
+            throws CLIException {
         for (Command command : commandList) {
             command.execute(currentContext);
         }
@@ -169,8 +162,7 @@ public abstract class EntryPoint {
                 writer.printf("%n%nError Message: %s", cause.getMessage());
             }
             if (cause.getStackTrace() != null) {
-                writer.printf("%n%nStackTrace: %s",
-                        StringUtility.stackTraceAsString(cause));
+                writer.printf("%n%nStackTrace: %s", StringUtility.stackTraceAsString(cause));
             }
         }
     }
@@ -185,11 +177,11 @@ public abstract class EntryPoint {
         } else if (RM_RESOURCE_TYPE.equals(resourceType)) {
             return CommandFactory.getCommandFactory(RM);
         } else {
-            throw new CLIException(REASON_INVALID_ARGUMENTS, String.format(
-                    "Unknown resource-type('%s')", resourceType));
+            throw new CLIException(REASON_INVALID_ARGUMENTS, String.format("Unknown resource-type('%s')",
+                    resourceType));
         }
     }
-    
+
     private boolean hasLoginCommand(List<Command> commandList) {
         for (Command c : commandList) {
             if (c instanceof AbstractLoginCommand) {

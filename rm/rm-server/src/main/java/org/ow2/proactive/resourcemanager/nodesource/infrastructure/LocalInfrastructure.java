@@ -100,8 +100,8 @@ public class LocalInfrastructure extends InfrastructureManager {
         boolean containsSpace = rmHome.contains(" ");
         ArrayList<String> paPropList = new ArrayList<String>();
         if (!this.paProperties.contains(CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getName())) {
-            paPropList.add(CentralPAPropertyRepository.JAVA_SECURITY_POLICY
-              .getCmdLine() + rmHome + "config" + os.fs + "security.java.policy-client");
+            paPropList.add(CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getCmdLine() + rmHome + "config" +
+                os.fs + "security.java.policy-client");
         }
         if (!this.paProperties.contains(CentralPAPropertyRepository.LOG4J.getName())) {
             StringBuilder sb = new StringBuilder(CentralPAPropertyRepository.LOG4J.getCmdLine());
@@ -109,15 +109,15 @@ public class LocalInfrastructure extends InfrastructureManager {
             // log4j only understands urls
             try {
                 sb.append((new File(rmHome)).toURI().toURL().toString()).append("config").append("/").append(
-                  "log4j").append("/").append("log4j-defaultNode");
+                        "log4j").append("/").append("log4j-defaultNode");
             } catch (MalformedURLException e) {
                 throw new IllegalStateException(e);
             }
             paPropList.add(sb.toString());
         }
         if (!this.paProperties.contains(CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getName())) {
-            paPropList.add(CentralPAPropertyRepository.PA_CONFIGURATION_FILE
-              .getCmdLine() + rmHome + "config" + os.fs + "proactive" + os.fs + "ProActiveConfiguration.xml");
+            paPropList.add(CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getCmdLine() + rmHome +
+                "config" + os.fs + "proactive" + os.fs + "ProActiveConfiguration.xml");
         }
         if (!this.paProperties.contains(PAResourceManagerProperties.RM_HOME.getKey())) {
             paPropList.add(PAResourceManagerProperties.RM_HOME.getCmdLine() + rmHome);
@@ -150,19 +150,18 @@ public class LocalInfrastructure extends InfrastructureManager {
             this.isNodeAcquired.put(nodeName, false);
             if (os == OperatingSystem.UNIX && containsSpace) {
                 depNodeURL = this.addDeployingNode(nodeName, SHELL_INTERPRET + " " + SHELL_COMMAND_OPTION +
-                  " " + obfuscatedCmd, "Node launched locally", this.nodeTimeout);
+                    " " + obfuscatedCmd, "Node launched locally", this.nodeTimeout);
 
                 logger
-                  .debug(
-                    "LocalIM detected the libRoot variable contains whitespaces. Running the escaped command prepended with \"" +
-                      SHELL_INTERPRET + " " + SHELL_COMMAND_OPTION + "\".");
+                        .debug("LocalIM detected the libRoot variable contains whitespaces. Running the escaped command prepended with \"" +
+                            SHELL_INTERPRET + " " + SHELL_COMMAND_OPTION + "\".");
 
                 List<String> newCmd = Arrays.asList(SHELL_INTERPRET, SHELL_COMMAND_OPTION);
                 newCmd.addAll(cmd);
                 cmd = newCmd;
             } else {
                 depNodeURL = this.addDeployingNode(nodeName, obfuscatedCmd, "Node launched locally",
-                  this.nodeTimeout);
+                        this.nodeTimeout);
             }
 
             // Deobfuscate the cred value
@@ -184,7 +183,7 @@ public class LocalInfrastructure extends InfrastructureManager {
         int threshold = 5;
         Boolean isLost, isAcquired;
         while (((isLost = this.isDeployingNodeLost.get(depNodeURL)) != null) && !isLost &&
-          ((isAcquired = this.isNodeAcquired.get(nodeName)) != null) && !isAcquired) {
+            ((isAcquired = this.isNodeAcquired.get(nodeName)) != null) && !isAcquired) {
             if (processExecutor.isProcessFinished()) {
                 int exit = processExecutor.getExitCode();
                 if (exit != 0) {
@@ -241,7 +240,7 @@ public class LocalInfrastructure extends InfrastructureManager {
         this.isNodeAcquired.remove(name);
         String lf = System.getProperty("line.separator");
         String url = super.addDeployingNode(name, "deployed as daemon",
-          "Deploying a new windows azure insance", this.nodeTimeout);
+                "Deploying a new windows azure insance", this.nodeTimeout);
         String st = Utils.getStacktrace(e);
         super.declareDeployingNodeLost(url, message + lf + st);
     }

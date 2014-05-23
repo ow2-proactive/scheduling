@@ -46,6 +46,7 @@ import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 
 import java.util.Map;
 
+
 public class SchedStatsCommand extends AbstractCommand implements Command {
 
     public SchedStatsCommand() {
@@ -59,8 +60,7 @@ public class SchedStatsCommand extends AbstractCommand implements Command {
             Map<String, String> stats = scheduler.getStatistics(currentContext.getSessionId());
             resultStack(currentContext).push(stats);
             if (!currentContext.isSilent()) {
-                writeLine(currentContext, "%s",
-                        StringUtility.statsAsString(stats));
+                writeLine(currentContext, "%s", StringUtility.statsAsString(stats));
             }
         } catch (Exception e) {
             handleError("An error occurred while retrieving stats:", e, currentContext);

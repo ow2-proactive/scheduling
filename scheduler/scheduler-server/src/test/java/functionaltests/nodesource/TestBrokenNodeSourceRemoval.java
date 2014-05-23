@@ -68,8 +68,7 @@ public class TestBrokenNodeSourceRemoval extends FunctionalTest {
     private RMTHelper helper = RMTHelper.getDefaultInstance();
 
     protected Object[] getPolicyParams() throws Exception {
-        SchedulerAuthenticationInterface auth = SchedulerConnection
-                .join(SchedulerTHelper.schedulerUrl);
+        SchedulerAuthenticationInterface auth = SchedulerConnection.join(SchedulerTHelper.schedulerUrl);
         Credentials creds = Credentials.createCredentials(new CredData(SchedulerTHelper.admin_username,
             SchedulerTHelper.admin_password), auth.getPublicKey());
         return new Object[] { "ALL", "ME", SchedulerTHelper.schedulerUrl, creds.getBase64(), "30000" };
@@ -93,9 +92,8 @@ public class TestBrokenNodeSourceRemoval extends FunctionalTest {
 
     private ResourceManager startRMPreservingDB() throws Exception {
         helper.reset();
-        String rmconf = new File(PAResourceManagerProperties
-                .getAbsolutePath(getClass().getResource("/functionaltests/config/rm-with-db.ini").getFile()))
-                .getAbsolutePath();
+        String rmconf = new File(PAResourceManagerProperties.getAbsolutePath(getClass().getResource(
+                "/functionaltests/config/rm-with-db.ini").getFile())).getAbsolutePath();
         helper.startRM(rmconf, CentralPAPropertyRepository.PA_RMI_PORT.getValue());
         return helper.getResourceManager();
     }

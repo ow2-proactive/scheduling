@@ -198,7 +198,7 @@ public abstract class BaseJobSubmitClient extends BaseJMeterSchedulerClient {
     protected final NativeTask createSimpleNativeTask() {
         NativeTask task = new NativeTask();
         task.setCommandLine(new String[] { testsSourcePath +
-                "/org/ow2/proactive/tests/performance/jmeter/scheduler/nativeTask.sh"});
+            "/org/ow2/proactive/tests/performance/jmeter/scheduler/nativeTask.sh" });
         task.setMaxNumberOfExecution(1);
         task.setCancelJobOnError(true);
         return task;

@@ -55,7 +55,7 @@ public class TestStandaloneExecutable extends SchedulerConsecutive {
         String tname = "standaloneExecutableJavaTask";
         // pre script interruption
         TaskFlowJob job = new TaskFlowJob();
-        job.setName(this.getClass().getSimpleName()+"_"+tname);
+        job.setName(this.getClass().getSimpleName() + "_" + tname);
         JavaTask task1 = new JavaTask();
         task1.setName(tname);
         task1.addArgument("variable", "Hello World");

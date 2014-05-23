@@ -268,8 +268,7 @@ public class SplitterPATask extends JavaExecutable {
              * applied and to create splits for that file
              */
             int jobId = 0;
-            String jobIdString = System.getProperty(SchedulerVars.JAVAENV_JOB_ID_VARNAME
-                    .toString());
+            String jobIdString = System.getProperty(SchedulerVars.JAVAENV_JOB_ID_VARNAME.toString());
             if ((jobIdString != null) && (!(jobIdString.equalsIgnoreCase("")))) {
                 jobId = Integer.parseInt(jobIdString);
                 logger.debug("The jobId of the SplitterPATask is: " + jobId);

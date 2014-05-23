@@ -49,64 +49,65 @@ import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobStateData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskStateData;
 
+
 public class JobStateImpl extends JobState {
-	private static final long serialVersionUID = 1L;
-	
-	private JobStateData d;
+    private static final long serialVersionUID = 1L;
 
-	JobStateImpl(JobStateData d) {
-		this.d = d;
-	}
+    private JobStateData d;
 
-	@Override
-	public Map<TaskId, TaskState> getHMTasks() {
-		throw new UnsupportedOperationException();
-	}
+    JobStateImpl(JobStateData d) {
+        this.d = d;
+    }
 
-	@Override
-	public JobInfo getJobInfo() {
-		return toJobInfo(d.getJobInfo());
-	}
+    @Override
+    public Map<TaskId, TaskState> getHMTasks() {
+        throw new UnsupportedOperationException();
+    }
 
-	@Override
-	public String getOwner() {
-		return d.getOwner();
-	}
+    @Override
+    public JobInfo getJobInfo() {
+        return toJobInfo(d.getJobInfo());
+    }
 
-	@Override
-	public ArrayList<TaskState> getTasks() {
-		ArrayList<TaskState> taskStateList = new ArrayList<TaskState>();
-		Map<String, TaskStateData> taskStateMap = d.getTasks();
-		for (TaskStateData ts : taskStateMap.values()) {
-			taskStateList.add(DataUtility.taskState(ts));
-		}
-		return taskStateList;
-	}
+    @Override
+    public String getOwner() {
+        return d.getOwner();
+    }
 
-	@Override
-	public void update(TaskInfo taskInfo) {
-		throw new UnsupportedOperationException();
+    @Override
+    public ArrayList<TaskState> getTasks() {
+        ArrayList<TaskState> taskStateList = new ArrayList<TaskState>();
+        Map<String, TaskStateData> taskStateMap = d.getTasks();
+        for (TaskStateData ts : taskStateMap.values()) {
+            taskStateList.add(DataUtility.taskState(ts));
+        }
+        return taskStateList;
+    }
 
-	}
+    @Override
+    public void update(TaskInfo taskInfo) {
+        throw new UnsupportedOperationException();
 
-	@Override
-	public void update(JobInfo jobInfo) {
-		throw new UnsupportedOperationException();
+    }
 
-	}
+    @Override
+    public void update(JobInfo jobInfo) {
+        throw new UnsupportedOperationException();
 
-	@Override
-	public JobType getType() {
-		throw new UnsupportedOperationException();
-	}
+    }
 
-	@Override
-	public String getName() {
-		return d.getName();
-	}
+    @Override
+    public JobType getType() {
+        throw new UnsupportedOperationException();
+    }
 
-	@Override
-	public JobPriority getPriority() {
-		return JobPriority.valueOf(d.getPriority());
-	}
+    @Override
+    public String getName() {
+        return d.getName();
+    }
+
+    @Override
+    public JobPriority getPriority() {
+        return JobPriority.valueOf(d.getPriority());
+    }
 }

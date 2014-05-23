@@ -49,6 +49,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
+
 public class TestNonForkedScriptTask extends FunctionalTest {
 
     private static URL nonForked_jobDescriptor = TestNonForkedScriptTask.class
@@ -73,7 +74,7 @@ public class TestNonForkedScriptTask extends FunctionalTest {
 
         // down event when node is killed
         RMNodeEvent nodeKilledEvent = RMTHelper.getDefaultInstance().waitForAnyNodeEvent(
-          RMEventType.NODE_STATE_CHANGED);
+                RMEventType.NODE_STATE_CHANGED);
         assertEquals(NodeState.DOWN, nodeKilledEvent.getNodeState());
     }
 }

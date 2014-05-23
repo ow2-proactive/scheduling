@@ -66,7 +66,8 @@ import functionaltests.RMTHelper;
  */
 public class SelectionScriptTimeOutTest extends RMConsecutive {
 
-    private URL selectionScriptWithtimeOutPath = this.getClass().getResource("selectionScriptWithtimeOut.groovy");
+    private URL selectionScriptWithtimeOutPath = this.getClass().getResource(
+            "selectionScriptWithtimeOut.groovy");
 
     /** Actions to be Perform by this test.
      * The method is called automatically by Junit framework.

@@ -39,6 +39,7 @@ package org.ow2.proactive_grid_cloud_portal.cli;
 
 import static org.ow2.proactive_grid_cloud_portal.cli.RestConstants.SCHEDULER_RESOURCE_TYPE;
 
+
 public class SchedulerEntryPoint extends EntryPoint {
 
     @Override

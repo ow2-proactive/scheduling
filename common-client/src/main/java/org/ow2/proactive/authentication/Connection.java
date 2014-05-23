@@ -245,8 +245,7 @@ public abstract class Connection<T extends Authentication> implements Loggable, 
      * @throws UnknownHostException if the IP address of the host could not be determined.
      * @throws URISyntaxException if the given string violates RFC&nbsp;2396,
      */
-    public static String getNetworkInterfaceFor(String url) throws IOException,
-            URISyntaxException {
+    public static String getNetworkInterfaceFor(String url) throws IOException, URISyntaxException {
 
         if (url != null && CentralPAPropertyRepository.PA_NET_INTERFACE.getValue() == null &&
             CentralPAPropertyRepository.PA_NET_NETMASK.getValue() == null) {

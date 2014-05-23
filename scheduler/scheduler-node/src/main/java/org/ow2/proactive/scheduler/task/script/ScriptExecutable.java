@@ -68,7 +68,6 @@ public class ScriptExecutable extends JavaExecutable {
     /** execution progress value (between 0 and 100), can be updated by the script */
     private final AtomicInteger progress = new AtomicInteger(0);
 
-
     /**
      * Initialize the executable using the given executable Initializer.
      *
@@ -94,13 +93,13 @@ public class ScriptExecutable extends JavaExecutable {
 
         handler.addBinding(TaskScript.RESULTS_VARIABLE, results);
         handler.addBinding(TaskScript.PROGRESS_VARIABLE, progress);
-        
+
         Map<String, Serializable> variables = getVariables();
         handler.addBinding(TaskLauncher.VARIABLES_BINDING_NAME, variables);
         String oldScript = script.getScript();
         String resolvedScript = VariablesUtil.filterAndUpdate(oldScript, variables);
         script.setScript(resolvedScript);
-        
+
         ScriptResult<Serializable> scriptResult = handler.handle(script);
 
         if (scriptResult.errorOccured()) {
