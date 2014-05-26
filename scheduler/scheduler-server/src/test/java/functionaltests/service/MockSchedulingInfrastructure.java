@@ -23,6 +23,7 @@ import org.mockito.stubbing.Answer;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.core.DataSpaceServiceStarter;
 import org.ow2.proactive.scheduler.core.SchedulerClassServers;
+import org.ow2.proactive.scheduler.core.SchedulerSpacesSupport;
 import org.ow2.proactive.scheduler.core.SchedulingInfrastructure;
 import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
 import org.ow2.proactive.scheduler.core.rmproxies.RMProxiesManager;
@@ -147,6 +148,11 @@ public class MockSchedulingInfrastructure implements SchedulingInfrastructure {
     @Override
     public ExecutorService getInternalOperationsThreadPool() {
         return executorService;
+    }
+
+    @Override
+    public SchedulerSpacesSupport getSpacesSupport() {
+        return null;
     }
 
     @Override

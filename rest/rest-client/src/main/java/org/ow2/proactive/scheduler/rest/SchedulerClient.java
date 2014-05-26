@@ -635,11 +635,16 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
             // Get job classpath from job environment
             JobEnvironment originalJobEnv = job.getEnvironment();
             for (String pathElement : originalJobEnv.getJobClasspath()) {
-                if (pathElement.endsWith(".jar")) {
-                    archiveEntries.add(pathElement);
-                    jarsNames.add(new File(pathElement).getName());
+                // Skip pathElement relative to $USERSPACE etc ..
+                if (pathElement.startsWith("$")) {
+                    jarsNames.add(pathElement);
                 } else {
-                    dirs.add(pathElement);
+                    if (pathElement.endsWith(".jar")) {
+                        archiveEntries.add(pathElement);
+                        jarsNames.add(new File(pathElement).getName());
+                    } else {
+                        dirs.add(pathElement);
+                    }   
                 }
             }
 

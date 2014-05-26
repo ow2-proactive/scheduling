@@ -27,4 +27,5 @@ public interface SchedulingInfrastructure {
 
     void shutdown();
 
+    SchedulerSpacesSupport getSpacesSupport();
 }

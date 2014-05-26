@@ -736,20 +736,21 @@ public class SchedulingService {
     private void jobsRecovered(Collection<InternalJob> jobs) {
         DataSpaceServiceStarter dsStarter = infrastructure.getDataSpaceServiceStarter();
         SchedulerClassServers classServers = infrastructure.getTaskClassServer();
+        SchedulerSpacesSupport spacesSupport = infrastructure.getSpacesSupport();
 
         for (InternalJob job : jobs) {
             this.jobs.jobRecovered(job);
             switch (job.getStatus()) {
                 case PENDING:
                     // restart classserver if needed
-                    infrastructure.getTaskClassServer().createTaskClassServer(job, false);
+                    classServers.createTaskClassServer(job, spacesSupport);
                     break;
                 case STALLED:
                 case RUNNING:
                     //start dataspace app for this job
                     job.startDataSpaceApplication(dsStarter.getNamingService());
                     // restart classServer if needed
-                    classServers.createTaskClassServer(job, false);
+                    classServers.createTaskClassServer(job, spacesSupport);
                     break;
                 case FINISHED:
                 case CANCELED:
@@ -758,7 +759,7 @@ public class SchedulingService {
                     break;
                 case PAUSED:
                     // restart classserver if needed
-                    classServers.createTaskClassServer(job, false);
+                    classServers.createTaskClassServer(job, spacesSupport);
             }
         }
     }

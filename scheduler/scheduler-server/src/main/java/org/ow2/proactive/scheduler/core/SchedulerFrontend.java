@@ -167,11 +167,6 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     private SchedulerAccountsManager accountsManager;
 
     /**
-     * Scheduler's Global Space
-     */
-    private DataSpacesFileObject globalSpace;
-
-    /**
      * JMX Helper reference
      */
     private SchedulerJMXHelper jmxHelper;
@@ -181,6 +176,8 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     private SchedulerDBManager dbManager;
 
     private SchedulerFrontendState frontendState;
+
+    private SchedulerSpacesSupport spacesSupport;
 
     /* ########################################################################################### */
     /*                                                                                             */
@@ -244,10 +241,6 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
             RMProxiesManager rmProxiesManager = RMProxiesManager.createRMProxiesManager(rmURL);
             rmProxiesManager.getRmProxy();
 
-            SchedulingInfrastructure infrastructure = new SchedulingInfrastructureImpl(dbManager,
-                rmProxiesManager, dsServiceStarter, clientThreadPool, internalThreadPool,
-                new ScheduledThreadPoolExecutor(2, new NamedThreadFactory("SchedulingServiceTimerThread")));
-
             long loadJobPeriod = -1;
             if (PASchedulerProperties.SCHEDULER_DB_LOAD_JOB_PERIOD.isSet()) {
                 String periodStr = PASchedulerProperties.SCHEDULER_DB_LOAD_JOB_PERIOD.getValueAsString();
@@ -266,9 +259,15 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
             this.jmxHelper.boot(authentication);
 
             SchedulerStateRecoverHelper.RecoveredSchedulerState recoveredState = new SchedulerStateRecoverHelper(
-                infrastructure.getDBManager()).recover(loadJobPeriod);
+                dbManager).recover(loadJobPeriod);
 
             this.frontendState = new SchedulerFrontendState(recoveredState.getSchedulerState(), jmxHelper);
+
+            SchedulingInfrastructure infrastructure = new SchedulingInfrastructureImpl(dbManager,
+                rmProxiesManager, dsServiceStarter, clientThreadPool, internalThreadPool,
+                new ScheduledThreadPoolExecutor(2, new NamedThreadFactory("SchedulingServiceTimerThread")));
+
+            this.spacesSupport = infrastructure.getSpacesSupport();
 
             this.schedulingService = new SchedulingService(infrastructure, frontendState, recoveredState,
                 policyFullName, null);
@@ -276,19 +275,6 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
             logger.debug("Registering scheduler...");
             PAActiveObject.registerByName(authentication, SchedulerConstants.SCHEDULER_DEFAULT_NAME);
             authentication.setActivated(true);
-
-            // get Global Space
-            try {
-                globalSpace = PADataSpaces.resolveOutput(SchedulerConstants.GLOBALSPACE_NAME);
-            } catch (SpaceNotFoundException e) {
-                logger.error("", e);
-            } catch (FileSystemException e) {
-                logger.error("", e);
-            } catch (NotConfiguredException e) {
-                logger.error("", e);
-            } catch (ConfigurationException e) {
-                logger.error("", e);
-            }
 
             Tools.logAvailableScriptEngines(logger);
 
@@ -312,56 +298,13 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
      *
      * @param sourceBodyID   the source ID of the connected object representing a user
      * @param identification the identification of the connected user
-     * @throws SchedulerException If an error occurred during connection with the front-end.
+     * @param cred the credentials of the user
+     * @throws AlreadyConnectedException if the user is already connected
      */
     public void connect(UniqueID sourceBodyID, UserIdentificationImpl identification, Credentials cred)
             throws AlreadyConnectedException {
-        frontendState.connect(sourceBodyID, identification, cred);
-        registerUserSpace(identification);
-    }
-
-    /**
-     * This method creates a dedicated USER space for the user which successfully connected
-     * This USER space is a subspace of the scheduler default USER space,
-     * A sub-folder named with the username is created to contain the USER space
-     *
-     * @param identification
-     */
-    private void registerUserSpace(UserIdentificationImpl identification) {
-        if (frontendState.getUserSpace(identification) == null) {
-            DataSpacesFileObject userSpace = null;
-            InputOutputSpaceConfiguration user;
-
-            String userSpaceName = SchedulerConstants.USERSPACE_NAME + "_" + identification.getUsername();
-
-            if (!PASchedulerProperties.DATASPACE_DEFAULTUSER_URL.isSet()) {
-                logger.warn("URL of the root USER space is not set, cannot create a USER space for " +
-                    identification.getUsername());
-                return;
-            }
-
-            String localpath = PASchedulerProperties.DATASPACE_DEFAULTUSER_LOCALPATH.getValueAsStringOrNull();
-            String hostname = PASchedulerProperties.DATASPACE_DEFAULTUSER_HOSTNAME.getValueAsStringOrNull();
-
-            try {
-                DataSpaceServiceStarter.getDataSpaceServiceStarter().createSpaceWithUserNameSubfolder(
-                        identification.getUsername(), SchedulerConstants.SCHEDULER_DATASPACE_APPLICATION_ID,
-                        userSpaceName, PASchedulerProperties.DATASPACE_DEFAULTUSER_URL.getValueAsString(),
-                        localpath, hostname, false, true);
-
-                // immediately retrieve the User Space
-                userSpace = PADataSpaces.resolveOutput(userSpaceName);
-                logger.info("USER space for user " + identification.getUsername() + " is at " +
-                    userSpace.getAllRealURIs());
-            } catch (Exception e) {
-                logger.warn("", e);
-                return;
-            }
-            // register the user GlobalSpace to the frontend state
-            frontendState.registerGlobalUserSpace(identification, userSpace);
-
-        }
-
+        this.frontendState.connect(sourceBodyID, identification, cred);
+        this.spacesSupport.registerUserSpace(identification.getUsername());
     }
 
     /**
@@ -397,8 +340,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     public List<String> getUserSpaceURIs() throws NotConnectedException, PermissionException {
         UserIdentificationImpl ident = frontendState.checkPermission("getUserSpaceURI",
                 "You don't have permissions to read the USER Space URI");
-
-        return frontendState.getUserSpace(ident).getAllRealURIs();
+        return this.spacesSupport.getUserSpaceURIs(ident.getUsername());
     }
 
     /**
@@ -406,10 +348,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
      */
     @Override
     public List<String> getGlobalSpaceURIs() throws NotConnectedException, PermissionException {
-        UserIdentificationImpl ident = frontendState.checkPermission("getGlobalSpaceURI",
+        frontendState.checkPermission("getGlobalSpaceURI",
                 "You don't have permissions to read the GLOBAL Space URI");
-
-        return globalSpace.getAllRealURIs();
+        return this.spacesSupport.getGlobalSpaceURIs();
     }
 
     /**

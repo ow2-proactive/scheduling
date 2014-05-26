@@ -25,6 +25,8 @@ public class SchedulingInfrastructureImpl implements SchedulingInfrastructure {
 
     private final DataSpaceServiceStarter dsStarter;
 
+    private final SchedulerSpacesSupport spacesSupport;
+
     public SchedulingInfrastructureImpl(SchedulerDBManager dbManager, RMProxiesManager rmProxiesManager,
             DataSpaceServiceStarter dsStarter, ExecutorService clientExecutorService,
             ExecutorService internalExecutorService, ScheduledExecutorService scheduledExecutorService) {
@@ -34,7 +36,8 @@ public class SchedulingInfrastructureImpl implements SchedulingInfrastructure {
         this.clientExecutorService = clientExecutorService;
         this.internalExecutorService = internalExecutorService;
         this.scheduledExecutorService = scheduledExecutorService;
-        this.classServers = new SchedulerClassServers(dbManager);
+        this.spacesSupport = new SchedulerSpacesSupport();
+        this.classServers = new SchedulerClassServers();
     }
 
     @Override
@@ -86,6 +89,11 @@ public class SchedulingInfrastructureImpl implements SchedulingInfrastructure {
     }
 
     @Override
+    public SchedulerSpacesSupport getSpacesSupport() {
+        return this.spacesSupport;
+    }
+
+    @Override
     public void shutdown() {
         clientExecutorService.shutdownNow();
         internalExecutorService.shutdownNow();
@@ -94,5 +102,4 @@ public class SchedulingInfrastructureImpl implements SchedulingInfrastructure {
         rmProxiesManager.terminateAllProxies();
         dbManager.close();
     }
-
 }

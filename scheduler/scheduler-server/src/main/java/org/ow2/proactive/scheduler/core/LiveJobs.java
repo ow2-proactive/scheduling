@@ -205,11 +205,11 @@ class LiveJobs {
         }
     }
 
-    void jobSubmitted(InternalJob job, SchedulerClassServers classServers) {
+    void jobSubmitted(InternalJob job, SchedulerClassServers classServers, SchedulerSpacesSupport spacesSupport) {
         job.prepareTasks();
         job.submitAction();
         dbManager.newJobSubmitted(job);
-        classServers.createTaskClassServer(job, false);
+        classServers.createTaskClassServer(job, spacesSupport);
         ClientJobState clientJobState = new ClientJobState(job);
         jobs.put(job.getId(), new JobData(job));
         listener.jobSubmitted(clientJobState);

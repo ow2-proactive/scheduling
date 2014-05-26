@@ -37,7 +37,8 @@
 package functionaltests;
 
 import java.io.File;
-import java.net.URL;
+import java.net.URI;
+import java.util.List;
 import java.util.Map;
 import org.ow2.proactive.scheduler.common.task.executable.Executable;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
@@ -47,6 +48,7 @@ import javassist.CtField;
 import javassist.CtMethod;
 import javassist.CtNewMethod;
 import javassist.Modifier;
+import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobEnvironment;
@@ -60,27 +62,28 @@ import org.ow2.proactive.scheduler.common.task.ScriptTask;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
+import org.ow2.proactive.scheduler.common.util.JarUtils;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
 
 
 /**
- * This class tests the job classpath feature.
- * It will first start the scheduler, then connect it and submit two different workers.
- * Also test the get[Job/Task]Result(String) methods.
+ * This class tests the job classpath feature. It will first start the
+ * scheduler, then connect it and submit two different workers. Also test the
+ * get[Job/Task]Result(String) methods.
  *
- * (test 1) submit the worker without classpath : must return a classNotFoundException
- * (test 2) submit the worker in classpath a : should return a value
- * (test 3) submit the worker in classpath b : should return a different value even if the scheduler already knows this class name.
+ * (test 1) submit the worker without classpath : must return a
+ * classNotFoundException (test 2) submit the worker in classpath a : should
+ * return a value (test 3) submit the worker in classpath b : should return a
+ * different value even if the scheduler already knows this class name.
  *
  * @author The ProActive Team
  * @date 18 Feb. 09
  * @since ProActive Scheduling 1.0
  */
 public class TestJobClasspath extends SchedulerConsecutive {
+    final static String DESCRIPTOR = absolutify("/functionaltests/descriptors/Job_Test_CP.xml");
 
-    private static URL jobDescriptor = TestJobClasspath.class
-            .getResource("/functionaltests/descriptors/Job_Test_CP.xml");
     private static final Integer firstValueToTest = 1;
     private static final Integer SecondValueToTest = 2;
 
@@ -90,15 +93,59 @@ public class TestJobClasspath extends SchedulerConsecutive {
      * @throws Throwable any exception that can be thrown during the test.
      */
     @org.junit.Test
-    public void run() throws Throwable {
+    public void testJobClasspath() throws Throwable {
 
         String taskName = "task1";
 
         String[] classPathes = createClasses();
-        {
-            SchedulerTHelper.log("Test 1 : Without classpath...");
 
-            JobId id = SchedulerTHelper.submitJob(new File(jobDescriptor.toURI()).getAbsolutePath());
+        {
+            SchedulerTHelper.log("Test 0 : Jobclasspath in USERSPACE ...");
+            // Push a jar into the userspace
+
+            List<String> uris = SchedulerTHelper.getSchedulerInterface().getUserSpaceURIs();
+
+            // Get the path to the userspace uri
+            File userspaceDir = new File(new URI(uris.get(0)));
+
+            // Create a jar in the userspace and refer to it in the jobClasspath
+            File jarFile = new File(userspaceDir, "testJobClasspathInUserspace.jar");
+            jarFile.deleteOnExit();
+            JarUtils.jar(new String[] { classPathes[0] }, jarFile, null, null, null, null);
+
+            //job creation
+            Job submittedJob = JobFactory.getFactory().createJob(DESCRIPTOR);
+            JobEnvironment env = new JobEnvironment();
+            env.setJobClasspath(new String[] { "$USERSPACE/" + jarFile.getName() });
+            submittedJob.setEnvironment(env);
+
+            //job submission
+            JobId id = SchedulerTHelper.submitJob(submittedJob);
+
+            // Wait for job finishes
+            SchedulerTHelper.waitForEventJobFinished(id);
+
+            // Get task result from job result
+            JobResult jr = SchedulerTHelper.getJobResult(id);
+            Map<String, TaskResult> results = jr.getAllResults();
+            Assert.assertEquals(1, results.size());
+
+            // Print the task exception in the assertion messag in case of failure
+            TaskResult tr = results.get(taskName);
+            String message = "";
+            if (tr.hadException()) {
+                message = tr.getException().getMessage();
+            }
+            Assert.assertFalse("The task failure reason: " + message, tr.hadException());
+            Assert.assertEquals("The executable class in " + jarFile +
+                " is not returning the correct value, the jobclasspath is broken", firstValueToTest,
+                    (Integer) tr.value());
+        }
+
+        {
+            SchedulerTHelper.log("Test 1 : Awaiting faulty task due to missing class in jobclasspath ...");
+
+            JobId id = SchedulerTHelper.submitJob(DESCRIPTOR);
 
             //this task should be faulty
             TaskInfo tInfo = SchedulerTHelper.waitForEventTaskFinished(id, taskName);
@@ -115,10 +162,9 @@ public class TestJobClasspath extends SchedulerConsecutive {
         }
 
         {
-            SchedulerTHelper.log("Test 2 : With classpath 1...");
+            SchedulerTHelper.log("Test 2 : With classpath 1 ...");
             //job creation
-            Job submittedJob = JobFactory.getFactory().createJob(
-                    new File(jobDescriptor.toURI()).getAbsolutePath());
+            Job submittedJob = JobFactory.getFactory().createJob(DESCRIPTOR);
             JobEnvironment env = new JobEnvironment();
             env.setJobClasspath(new String[] { classPathes[0] });
             submittedJob.setEnvironment(env);
@@ -134,10 +180,9 @@ public class TestJobClasspath extends SchedulerConsecutive {
         }
 
         {
-            SchedulerTHelper.log("Test 3 : With classpath 2...");
+            SchedulerTHelper.log("Test 3 : With classpath 2 ...");
             //job creation
-            Job submittedJob = JobFactory.getFactory().createJob(
-                    new File(jobDescriptor.toURI()).getAbsolutePath());
+            Job submittedJob = JobFactory.getFactory().createJob(DESCRIPTOR);
             JobEnvironment env = new JobEnvironment();
             env.setJobClasspath(new String[] { classPathes[1] });
             submittedJob.setEnvironment(env);
@@ -153,7 +198,7 @@ public class TestJobClasspath extends SchedulerConsecutive {
         }
 
         {
-            SchedulerTHelper.log("Test 4 : Script task with jobclassapth...");
+            SchedulerTHelper.log("Test 4 : Script task with jobclassapth ...");
             //job creation
             TaskFlowJob job = new TaskFlowJob();
 
@@ -179,6 +224,16 @@ public class TestJobClasspath extends SchedulerConsecutive {
             Long value = (Long) results.get(taskName).value();
             Assert.assertEquals(firstValueToTest, (Integer) value.intValue());
         }
+    }
+
+    /**
+     * Returns absolute path of a relative path to this class location
+     *
+     * @param relative the path relative to this class
+     * @return the absolute path
+     */
+    public static String absolutify(String relative) {
+        return FileUtils.toFile(TestJobClasspath.class.getResource(relative)).getAbsolutePath();
     }
 
     /**
@@ -231,7 +286,7 @@ public class TestJobClasspath extends SchedulerConsecutive {
         classPathes[0] = f1.getAbsolutePath();
         cc1.writeFile(classPathes[0]);
 
-        //add uid 
+        //add uid
         CtField uidField2 = new CtField(CtClass.longType, "serialVersionUID", cc2);
         uidField2.setModifiers(Modifier.PUBLIC | Modifier.STATIC | Modifier.FINAL);
         cc2.addField(uidField2, CtField.Initializer.constant((long) SecondValueToTest));

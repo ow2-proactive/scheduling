@@ -50,7 +50,6 @@ import java.util.TimerTask;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.mop.MOP;
-import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.permissions.MethodCallPermission;
 import org.ow2.proactive.scheduler.common.NotificationData;
@@ -124,9 +123,6 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     /** Map that link uniqueID to user credentials */
     private final Map<UniqueID, Credentials> credentials;
 
-    /** Map that link uniqueID to user global spaces */
-    private final Map<String, DataSpacesFileObject> userGlobalSpaces;
-
     /** List used to mark the user that does not respond anymore */
     private final Set<UniqueID> dirtyList;
 
@@ -152,8 +148,6 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         this.jobsMap = new HashMap<JobId, JobState>();
         this.jobs = new HashMap<JobId, IdentifiedJob>();
         this.sessionTimer = new Timer("SessionTimer");
-        this.userGlobalSpaces = new HashMap<String, DataSpacesFileObject>();
-
         this.sState = sState;
         recover(sState);
     }
@@ -275,25 +269,6 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
             logger.info(ex.getMessage());
             throw ex;
         }
-    }
-
-    /**
-     * Registers a global user space in the state
-     * @param identification
-     * @param space
-     */
-    synchronized void registerGlobalUserSpace(UserIdentificationImpl identification,
-            DataSpacesFileObject space) {
-        userGlobalSpaces.put(identification.getUsername(), space);
-    }
-
-    /**
-     * Returns the global user space associated with the provided user
-     * @return
-     * @throws NotConnectedException
-     */
-    synchronized DataSpacesFileObject getUserSpace(UserIdentificationImpl identification) {
-        return userGlobalSpaces.get(identification.getUsername());
     }
 
     /**

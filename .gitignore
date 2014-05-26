@@ -19,3 +19,4 @@ build/
 # /performance/tmp/
 /performance/tmp/*
 /TEST_SCHEDULER_DB
+/.nb-gradle/private/

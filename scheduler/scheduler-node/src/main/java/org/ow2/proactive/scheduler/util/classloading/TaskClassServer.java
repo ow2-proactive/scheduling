@@ -42,6 +42,7 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.jar.JarFile;
 import java.util.zip.CRC32;
@@ -50,13 +51,16 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.util.JarUtils;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
+import org.ow2.proactive.scheduler.common.SchedulerConstants;
+import org.ow2.proactive.scheduler.common.job.JobEnvironment;
 
 
 /**
  * This class defines a classserver based on ProActive remote objects. It creates classpath files in
  * the scheduler temporary directory (see pa.scheduler.classserver.tmpdir property), and serves classes
  * contained in these files.
- * @author The ProActive team 
+ * @author The ProActive team
  * @since ProActive Scheduling 0.9
  */
 public class TaskClassServer {
@@ -68,51 +72,70 @@ public class TaskClassServer {
             .getValueAsStringOrNull();
     private static final String tmpJarFilesDir = tmpTmpJarFilesDir != null ? tmpTmpJarFilesDir +
         (tmpTmpJarFilesDir.endsWith(File.separator) ? "" : File.separator) : System
-            .getProperty("java.io.tmpdir") +
-        File.separator;
+            .getProperty("java.io.tmpdir") + File.separator;
 
     // indicate if cache should be used
     private static final boolean useCache = PASchedulerProperties.SCHEDULER_CLASSSERVER_USECACHE
             .getValueAsBoolean();
 
     // cache for byte[] classes
-    private Hashtable<String, byte[]> cachedClasses;
-
-    // root classpath (directory *or* jar file)
-    private File classpath;
+    private final Hashtable<String, byte[]> cachedClasses;
 
     // jobid of the served job
-    private JobId servedJobId;
+    private final JobId servedJobId;
+
+    /** Local paths to spaces accepted in job classpath path elements */
+    private final DataSpacesFileObject globalSpace, userSpace;
+
+    // root classpath (directory *or* jar file)
+    private final ArrayList<File> classpathSources;
 
     /**
      * Empty constructor for remote object creation.
      */
     public TaskClassServer() {
+        this.cachedClasses = null;
+        this.servedJobId = null;
+        this.globalSpace = null;
+        this.userSpace = null;
+        this.classpathSources = null;
     }
 
     /**
-     * Create a new class server. 
-     * 
+     * Create a new class server.
+     *
      * @param jid the jobId of the job that will be served by this class server
      */
-    public TaskClassServer(JobId jid) {
+    public TaskClassServer(JobId jid, DataSpacesFileObject globalSpace, DataSpacesFileObject userSpace) {
         this.servedJobId = jid;
+        this.globalSpace = globalSpace;
+        this.userSpace = userSpace;
+        this.classpathSources = new ArrayList<File>();
         this.cachedClasses = useCache ? new Hashtable<String, byte[]>() : null;
     }
 
     /**
      * Activate this TaskClassServer. The activation creates all needed files (jar file, classes directory and crc file)
-     * in the defined temporary directory (see pa.scheduler.classserver.tmpdir property).
-     * @param userClasspathJarFile the content of the classpath
-     * @param deflateJar true if the classpath contains jar file, false otherwise
+     * in the temporary directory defined by {@link org.ow2.proactive.scheduler.core.properties.PASchedulerProperties.SCHEDULER_CLASSSERVER_TMPDIR} property.
+     * @param jobEnvironement the job environment that contains the job classpath
+     * @param jobGlobalSpace the globalspace defined in the job, if not null it overrides the default globalspace
+     * @param jobUserSpace the userspace defined in the job, if not null it overrides the default userspace
      * @throws IOException if the files cannot be created
      */
-    public void activate(byte[] userClasspathJarFile, boolean deflateJar) throws IOException {
+    public void activate(JobEnvironment jobEnvironement, String jobGlobalSpace, String jobUserSpace)
+            throws IOException {
         // check if the classpath exists already in the deflated classpathes
         // for now, only in case of recovery
         // TODO cdelbe : look for cp only with crc to avoid mutliple tcs for the same classpath
 
-        // open files 
+        // Support for dataspaces in job classpath
+        String[] pathElements = jobEnvironement.getJobClasspath();
+        this.addSourcesRelativeToSpaces(pathElements, jobGlobalSpace, jobUserSpace);
+
+        byte[] userClasspathJarFile = jobEnvironement.clearJobClasspathContent();
+        boolean deflateJar = jobEnvironement.containsJarFile();
+
+        // open files
         File jarFile = new File(this.getPathToJarFile());
         File dirClasspath = new File(this.getPathToClassDir());
         File crcFile = new File(this.getPathToCrcFile());
@@ -120,7 +143,7 @@ public class TaskClassServer {
         boolean classpathAlreadyExists = jarFile.exists() || (deflateJar && dirClasspath.exists());
         boolean reuseExistingFiles = false;
 
-        // check if an already classpath can be reused
+        // check if an already defined classpath can be reused
         if (classpathAlreadyExists) {
             try {
                 // the classpath for this job has already been deflated
@@ -147,7 +170,7 @@ public class TaskClassServer {
                 }
             } catch (Exception e) {
                 logger.warn("", e);
-                // if any exception occurs, cancel 
+                // if any exception occurs, cancel
                 reuseExistingFiles = false;
             }
         }
@@ -186,9 +209,10 @@ public class TaskClassServer {
         }
 
         // set the actual classpath
-        this.classpath = deflateJar ? dirClasspath : jarFile;
-        logger.info("Activated TaskClassServer for " + (deflateJar ? "deflated" : "") + " classpath " +
-            this.classpath.getAbsolutePath() + " for job " + this.servedJobId);
+        this.classpathSources.add(deflateJar ? dirClasspath : jarFile);
+
+        logger.info("Activated TaskClassServer for classpath sources " + this.classpathSources + " for job " +
+            this.servedJobId);
     }
 
     /**
@@ -196,8 +220,8 @@ public class TaskClassServer {
      * classfiles cache is cleared.
      */
     public void desactivate() {
-        logger.info("Desactivated TaskClassServer for classpath " + this.classpath.getAbsolutePath() +
-            " for job " + this.servedJobId);
+        logger.info("Desactivated TaskClassServer for classpaths " + this.classpathSources + " for job " +
+            this.servedJobId);
         // delete classpath files
         File jarFile = new File(this.getPathToJarFile());
         File deflatedJarFile = new File(this.getPathToClassDir());
@@ -220,24 +244,37 @@ public class TaskClassServer {
     public byte[] getClassBytes(String classname) throws ClassNotFoundException {
         logger.debug("Looking for class " + classname);
         byte[] cb = useCache ? this.cachedClasses.get(classname) : null;
-        if (cb == null) {
-            logger.debug("Class " + classname + " is not available in class cache");
-            try {
-                cb = this.classpath.isFile() ? TaskClassUtils.lookIntoJarFile(classname, new JarFile(
-                    classpath)) : TaskClassUtils.lookIntoDirectory(classname, classpath);
-                if (useCache) {
-                    logger.debug("Class " + classname + " is added in class cache");
-                    this.cachedClasses.put(classname, cb);
-                }
-            } catch (IOException e) {
-                logger.error("", e);
-                throw new ClassNotFoundException("Class " + classname + " has not been found in " +
-                    classpath.getAbsolutePath() + ". Caused by " + e);
-            }
+        if (cb != null) {
+            logger.debug("Class " + classname + " has " + (cb == null ? "not" : "") + " been found in " +
+                this.classpathSources);
+            return cb;
         }
+
+        logger.debug("Class " + classname + " is not available in class cache");
+        try {
+            for (File source : this.classpathSources) {
+                if (source.isFile()) {
+                    cb = TaskClassUtils.lookIntoJarFile(classname, new JarFile(source));
+                } else {
+                    cb = TaskClassUtils.lookIntoDirectory(classname, source);
+                }
+                if (cb != null) {
+                    if (useCache) {
+                        logger.debug("Class " + classname + " is added in class cache");
+                        this.cachedClasses.put(classname, cb);
+                    }
+                    break;
+                }
+            }
+        } catch (IOException e) {
+            logger.error("", e);
+            throw new ClassNotFoundException("Class " + classname + " has not been found in " +
+                this.classpathSources, e);
+        }
+
         // TODO cdelbe : return null or throw an exception. Should return null only...
         logger.debug("Class " + classname + " has " + (cb == null ? "not" : "") + " been found in " +
-            classpath.getAbsolutePath());
+            this.classpathSources);
         return cb;
     }
 
@@ -265,4 +302,41 @@ public class TaskClassServer {
         return tmpJarFilesDir + servedJobId.toString();
     }
 
+    private void addSourcesRelativeToSpaces(String[] pathElements, String jobGlobalSpace, String jobUserSpace) {
+        // The globalspace defined by a job will override the default
+        File globalSpaceDir = this.overrideIfNeeded(this.globalSpace, jobGlobalSpace);
+        // The userspace defined by a job will override the default
+        File userSpaceDir = this.overrideIfNeeded(this.userSpace, jobUserSpace);
+        // Add sources relative to GLOBALSPACE and USERSPACE
+        for (String pathElement : pathElements) {
+            this.addToSources(pathElement, userSpaceDir, SchedulerConstants.USERSPACE_NAME);
+            this.addToSources(pathElement, globalSpaceDir, SchedulerConstants.GLOBALSPACE_NAME);
+        }
+    }
+
+    // Overrides a local dataspace with a local path
+    private File overrideIfNeeded(DataSpacesFileObject ds, String localPath) {
+        if (localPath != null) {
+            File dir = new File(localPath);
+            if (dir.exists()) {
+                return dir;
+            }
+        }
+        String localDsPath = ds.getRealURI().replace("file://", "");
+        return new File(localDsPath);
+    }
+
+    // Adds to classpath sources '$SPACENAME' based pathElements
+    // for example: dest=c:\tmp pathElement=c:\temp\$GLOBALSPACE\lib.jar
+    // then c:\tmp\lib.jar will be added
+    private void addToSources(String pathElement, File dest, String spacename) {
+        // use split() to get string just after the spacename tag
+        String[] splitted = pathElement.split("\\$" + spacename);
+        if (splitted.length == 2) { // first element is always empty
+            File pathElementFile = new File(dest, splitted[1]);
+            if (pathElementFile.exists()) {
+                this.classpathSources.add(pathElementFile);
+            }
+        }
+    }
 }

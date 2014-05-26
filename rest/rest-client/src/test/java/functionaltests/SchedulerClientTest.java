@@ -1,5 +1,3 @@
-package functionaltests;
-
 /*
  * ################################################################
  *
@@ -36,6 +34,8 @@ package functionaltests;
  * ################################################################
  * $PROACTIVE_INITIAL_DEV$
  */
+package functionaltests;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.job.Job;
@@ -72,13 +72,11 @@ import org.ow2.proactive.scripting.TaskScript;
 
 public class SchedulerClientTest extends AbstractRestFuncTestCase {
 
+    /** Maximum wait time of 5 minutes */
+    private static final long MAX_WAIT_TIME = 5 * 60 * 1000;
+
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
-
-    /**
-     * Maximum wait time of 5 minutes
-     */
-    private static final long MAX_WAIT_TIME = 5 * 60 * 1000;
 
     @BeforeClass
     public static void beforeClass() throws Exception {
@@ -116,7 +114,13 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         ISchedulerClient client = clientInstance();
         Job job = pendingJob();
         JobId jobId = submitJob(job, client);
-        client.waitForJob(jobId, TimeUnit.SECONDS.toMillis(10));
+        try {
+            client.waitForJob(jobId, TimeUnit.SECONDS.toMillis(10));
+        } finally {
+            // Once the TimeoutException has been thrown
+            // kill the job to free the node
+            client.killJob(jobId);
+        }
     }
 
     @Test(timeout = MAX_WAIT_TIME)
@@ -135,8 +139,8 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         client.pullFile("USERSPACE", "", emptyFile.getCanonicalPath());
 
         // Check the file was pulled
-        Assert.assertTrue("Unable to pull the empty file, maybe the pull mechanism is broken ?", emptyFile
-                .exists());
+        Assert.assertTrue("Unable to pull the empty file, maybe the pull mechanism is broken ?",
+                emptyFile.exists());
 
         // Delete the local file
         Assert.assertTrue(
@@ -200,28 +204,98 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         // Check that java task returned the correct value
         TaskResult javaTaskResult = allResults.get(javaTask.getName());
         Serializable ser1 = javaTaskResult.value();
-
-        Assert
-                .assertEquals(
-                        "The value returned by the " + className1 + "#execute() method is incorrect, maybe " +
-                            "the SchedulerClient#submitAsJobArchive() method incorrectly packs the class into the job archive",
-                        value1, (Integer) ser1);
+        Assert.assertEquals(
+                "The value returned by the " + className1 + "#execute() method is incorrect, maybe " +
+                    "the SchedulerClient#submitAsJobArchive() method incorrectly packs the class into the job archive",
+                value1, (Integer) ser1);
 
         // Check that script task returned the correct value
         TaskResult scriptTaskResult = allResults.get(scriptTask.getName());
-        Serializable ser2;
-        try {
-            ser2 = scriptTaskResult.value();
-        } catch (Throwable ex) {
-            throw new RuntimeException(ex);
+        Serializable ser2 = scriptTaskResult.value();
+        Assert.assertEquals(
+                "The value returned by the " +
+                    className2 +
+                    "#execute() method is incorrect, maybe " +
+                    "the SchedulerClient#submitAsJobArchive() method incorrectly packs the jar containing the class into the job archive",
+                value2, (Integer) ser2);
+    }
+
+    /**
+     * Test for SCHEDULING-2025: Add support for $USERSPACE and $GLOBALSPACE in
+     * job classpath
+     */
+    @Test(timeout = MAX_WAIT_TIME * 2)
+    public void testJobClasspathRelativeToUserspaceOrGlobalSpace() throws Throwable {
+        ISchedulerClient client = clientInstance();
+        TaskFlowJob job = new TaskFlowJob();
+
+        // Push the jar containing a test class into the globalspace
+        Integer value1 = 1;
+        String className1 = "test1.WorkerFromGlobalSpace";
+        File jarFile1 = createClassInsideJar(value1, className1);
+        client.pushFile("GLOBALSPACE", "", jarFile1.getName(), jarFile1.getCanonicalPath());
+
+        // Push the jar containing a test class into the userspace
+        Integer value2 = 2;
+        String className2 = "test2.WorkerFromUserSpace";
+        File jarFile2 = createClassInsideJar(value2, className2);
+        client.pushFile("USERSPACE", "", jarFile2.getName(), jarFile2.getCanonicalPath());
+
+        // Push the jar containing a test class into the userspace
+        Integer value3 = 3;
+        String className3 = "test3.WorkerFromJobArchive";
+        File jarFile3 = createClassInsideJar(value3, className3);
+
+        JobEnvironment jobEnv = new JobEnvironment();
+        jobEnv.setJobClasspath(new String[] { "$GLOBALSPACE/" + jarFile1.getName(),
+                "$USERSPACE/" + jarFile2.getName(), jarFile3.getAbsolutePath() });
+        job.setEnvironment(jobEnv);
+
+        JavaTask t1 = new JavaTask();
+        t1.setName("t1");
+        t1.setExecutableClassName(className1);
+        job.addTask(t1);
+
+        JavaTask t2 = new JavaTask();
+        t2.setName("t2");
+        t2.setExecutableClassName(className2);
+        job.addTask(t2);
+
+        JavaTask t3 = new JavaTask();
+        t3.setName("t3");
+        t3.setExecutableClassName(className3);
+        job.addTask(t3);
+
+        // Submit as job archive and wait until job finished
+        JobId jobId = client.submitAsJobArchive(job);
+        client.waitForJob(jobId, TimeUnit.SECONDS.toMillis(60 * 5));
+
+        JobResult jr = client.getJobResult(jobId);
+        Map<String, TaskResult> allResults = jr.getAllResults();
+
+        // Print the task exception in the assertion messag in case of failure
+        checkForValueInResult(allResults.get(t1.getName()), value1, jarFile1);
+        checkForValueInResult(allResults.get(t2.getName()), value2, jarFile2);
+        checkForValueInResult(allResults.get(t3.getName()), value3, jarFile3);
+    }
+
+    private File createClassInsideJar(Integer testValue, String className) throws Exception {
+        File destDir = testFolder.newFolder(className);
+        SchedulerClientTest.createClass(className, testValue, destDir);
+        File jarFile = testFolder.newFile("testJar" + testValue + ".jar");
+        JarUtils.jar(new String[] { destDir.getAbsolutePath() }, jarFile, null, null, null, null);
+        return jarFile;
+    }
+
+    private void checkForValueInResult(TaskResult taskResult, Integer value, File jarFile) throws Throwable {
+        String message = "";
+        if (taskResult.hadException()) {
+            message = taskResult.getException().getMessage();
         }
-        Assert
-                .assertEquals(
-                        "The value returned by the " +
-                            className2 +
-                            "#execute() method is incorrect, maybe " +
-                            "the SchedulerClient#submitAsJobArchive() method incorrectly packs the jar containing the class into the job archive",
-                        value2, (Integer) ser2);
+        Assert.assertFalse("The task failure reason: " + message, taskResult.hadException());
+        Assert.assertEquals("The executable class in " + jarFile +
+            " is not returning the correct value, the jobclasspath is broken", value,
+                (Integer) taskResult.value());
     }
 
     private ISchedulerClient clientInstance() throws Exception {
