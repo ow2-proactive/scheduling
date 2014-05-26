@@ -152,12 +152,27 @@ public class Client implements Serializable {
     /**
      * Redefined equals method based on client's name
      */
+    @Override
     public boolean equals(Object o) {
-        if (o == null) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
             return false;
         }
+
         Client client = (Client) o;
-        return name.equals(client.getName());
+
+        if (name != null ? !name.equals(client.name) : client.name != null) {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return name != null ? name.hashCode() : 0;
     }
 
     /**

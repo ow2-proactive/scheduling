@@ -7,15 +7,16 @@ import org.ow2.proactive.resourcemanager.db.NodeSourceData;
 import org.ow2.proactive.resourcemanager.db.RMDBManager;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
+import org.ow2.tests.ProActiveTest;
+import org.ow2.tests.ProcessCleaner;
 import org.hibernate.cfg.Configuration;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.ow2.tests.ProcessCleaner;
 
 
-public class TestNodeSources {
+public class TestNodeSources extends ProActiveTest {
 
     protected RMDBManager dbManager;
 
