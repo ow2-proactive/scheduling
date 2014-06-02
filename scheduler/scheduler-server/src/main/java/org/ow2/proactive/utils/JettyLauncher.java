@@ -41,8 +41,10 @@ import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
 
-import org.mortbay.jetty.Server;
-import org.mortbay.jetty.webapp.WebAppContext;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.HandlerList;
+import org.eclipse.jetty.webapp.WebAppContext;
+
 
 
 /**
@@ -135,16 +137,17 @@ public class JettyLauncher {
             }
 
             Server server = new Server(port);
-
+            HandlerList handlerList = new HandlerList();
             for (File app : apps) {
                 String name = app.getName();
                 if (app.isFile() && app.getName().indexOf('.') >= 0) {
                     name = app.getName().substring(0, app.getName().lastIndexOf("."));
                 }
                 WebAppContext webapp = new WebAppContext(app.getAbsolutePath(), "/" + name);
-                server.addHandler(webapp);
+                handlerList.addHandler(webapp);
                 sysout.println("Deployed application: http://localhost:" + port + "/" + name);
             }
+            server.setHandler(handlerList);
 
             server.start();
             server.join();

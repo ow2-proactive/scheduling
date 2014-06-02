@@ -82,6 +82,10 @@ project(':rest:rest-server') {
         runtime "org.objectweb.proactive:programming-extension-amqp:${programmingVersion}"
         runtime "org.objectweb.proactive:programming-extension-pamr:${programmingVersion}"
 
+        runtime 'org.eclipse.jetty.aggregate:jetty-websocket:8.1.15.v20140411'
+        runtime 'org.eclipse.jetty.aggregate:jetty-webapp:8.1.15.v20140411'
+        runtime 'javax.servlet:javax.servlet-api:3.0.1'
+
         jaxDoclet 'com.lunatech.jax-doclets:doclets:0.10.1-proactive'
     }
 

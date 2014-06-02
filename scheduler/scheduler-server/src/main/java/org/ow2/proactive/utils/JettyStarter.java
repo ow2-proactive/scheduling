@@ -39,15 +39,15 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
 
-import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
-import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
-import org.mortbay.jetty.Handler;
-import org.mortbay.jetty.Server;
-import org.mortbay.jetty.handler.HandlerCollection;
-import org.mortbay.jetty.webapp.WebAppContext;
+import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.HandlerList;
+import org.eclipse.jetty.webapp.WebAppContext;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
 
 public class JettyStarter {
@@ -83,9 +83,10 @@ public class JettyStarter {
 
             Server server = new Server(restPort);
             server.setStopAtShutdown(true);
-            server.setHandler(new HandlerCollection());
-
-            deployWars(server);
+            
+            HandlerList handlerList = new HandlerList();
+            addWarsToHanlderList(handlerList);
+            server.setHandler(handlerList);
 
             startServer(server, restPort);
         }
@@ -98,9 +99,9 @@ public class JettyStarter {
             } else {
                 server.start();
                 if (server.isStarted()) {
-                    for (Handler handler : server.getHandlers()) {
+                    HandlerList handlerList = (HandlerList) server.getHandler();
+                    for (Handler handler : handlerList.getHandlers()) {
                         WebAppContext webAppContext = (WebAppContext) handler;
-
                         Throwable startException = webAppContext.getUnavailableException();
                         if (startException == null) {
                             logger.info("The web application " + webAppContext.getContextPath() +
@@ -119,45 +120,45 @@ public class JettyStarter {
         }
     }
 
-    private static void deployWars(Server server) {
+    private static void addWarsToHanlderList(HandlerList handlerList) {
         File warFolder = new File(getSchedulerHome() + FOLDER_TO_DEPLOY);
         File[] warFolderContent = warFolder.listFiles();
         if (warFolderContent != null) {
             for (File fileToDeploy : warFolderContent) {
                 if (isExplodedWebApp(fileToDeploy)) {
-                    deployExplodedWebApp(server, fileToDeploy);
+                    addExplodedWebApp(handlerList, fileToDeploy);
                 } else if (isWarFile(fileToDeploy)) {
-                    deployWarFile(server, fileToDeploy);
+                    addWarFile(handlerList, fileToDeploy);
                 } else if (isStaticFolder(fileToDeploy)) {
-                    deployStaticFolder(server, fileToDeploy);
+                    addStaticFolder(handlerList, fileToDeploy);
                 }
             }
         }
     }
 
-    private static void deployWarFile(Server server, File file) {
+    private static void addWarFile(HandlerList handlerList, File file) {
         String contextPath = "/" + FilenameUtils.getBaseName(file.getName());
         WebAppContext webApp = createWebAppContext(contextPath);
         webApp.setWar(file.getAbsolutePath());
-        server.addHandler(webApp);
+        handlerList.addHandler(webApp);
         logger.debug("Deploying " + contextPath + " using war file " + file);
     }
 
-    private static void deployExplodedWebApp(Server server, File file) {
+    private static void addExplodedWebApp(HandlerList handlerList, File file) {
         String contextPath = "/" + file.getName();
         WebAppContext webApp = createWebAppContext(contextPath);
         webApp.setDescriptor(new File(file, "/WEB-INF/web.xml").getAbsolutePath());
         webApp.setResourceBase(file.getAbsolutePath());
-        server.addHandler(webApp);
+        handlerList.addHandler(webApp);
         logger.debug("Deploying " + contextPath + " using exploded war " + file);
 
     }
 
-    private static void deployStaticFolder(Server server, File file) {
+    private static void addStaticFolder(HandlerList handlerList, File file) {
         String contextPath = "/" + file.getName();
         WebAppContext webApp = createWebAppContext(contextPath);
         webApp.setWar(file.getAbsolutePath());
-        server.addHandler(webApp);
+        handlerList.addHandler(webApp);
         logger.debug("Deploying " + contextPath + " using folder " + file);
     }
 
