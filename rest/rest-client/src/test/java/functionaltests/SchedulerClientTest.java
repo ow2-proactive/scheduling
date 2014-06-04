@@ -44,30 +44,44 @@ import org.ow2.proactive.scheduler.rest.ISchedulerClient;
 import org.ow2.proactive.scheduler.rest.SchedulerClient;
 
 import static functionaltests.RestFuncTHelper.getRestServerUrl;
+
 import java.io.File;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtMethod;
 import javassist.CtNewMethod;
+
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
+import org.ow2.proactive.scheduler.common.NotificationData;
+import org.ow2.proactive.scheduler.common.SchedulerEvent;
+import org.ow2.proactive.scheduler.common.SchedulerEventListener;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.job.JobEnvironment;
+import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobResult;
+import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.job.UserIdentification;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.ScriptTask;
+import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.Executable;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.common.util.JarUtils;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
+import org.python.modules.synchronize;
 
 
 public class SchedulerClientTest extends AbstractRestFuncTestCase {
@@ -278,6 +292,20 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         checkForValueInResult(allResults.get(t2.getName()), value2, jarFile2);
         checkForValueInResult(allResults.get(t3.getName()), value3, jarFile3);
     }
+    
+    @Test(timeout = MAX_WAIT_TIME * 2)
+    public void testJobSubmissionEventLisntener() throws Exception {
+        ISchedulerClient client = clientInstance();
+        SchedulerEventListenerImpl listener = new SchedulerEventListenerImpl();
+        client.addEventListener(listener, true, SchedulerEvent.JOB_SUBMITTED);
+        Job job = defaultJob();
+        JobId jobId = client.submit(job);
+        JobState submittedJob = listener.getSubmittedJob();
+        while (!submittedJob.getId().value().equals(jobId.value())) {
+            submittedJob = listener.getSubmittedJob();
+        }
+        client.removeEventListener();
+    }
 
     private File createClassInsideJar(Integer testValue, String className) throws Exception {
         File destDir = testFolder.newFolder(className);
@@ -341,5 +369,47 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         cc1.addMethod(exec1);
 
         cc1.writeFile(insideDir.getAbsolutePath());
+    }
+
+    private static class SchedulerEventListenerImpl implements SchedulerEventListener {
+        private Stack<JobState> jobStateStack = new Stack<JobState>();
+        
+        @Override
+        public void jobSubmittedEvent(JobState jobState) {
+            System.out.println("JobSubmittedEvent()");
+            synchronized (this) {
+                
+             jobStateStack.push(jobState);
+             notifyAll();
+            }
+        }
+        
+        public JobState getSubmittedJob() {
+            System.out.println("getSubmittedJbo");
+            synchronized (this) {
+                if (jobStateStack.isEmpty()) {
+                    System.out.println("Stack is empty");
+                    try {
+                        System.out.println("wait");
+                        wait();
+                    } catch (InterruptedException ie) {
+                    }
+                }
+                return jobStateStack.pop();
+            }
+        }
+
+        @Override
+        public void jobStateUpdatedEvent(NotificationData<JobInfo> arg0) {            
+        }
+        @Override
+        public void schedulerStateUpdatedEvent(SchedulerEvent arg0) {
+        }
+        @Override
+        public void taskStateUpdatedEvent(NotificationData<TaskInfo> arg0) {
+        }
+        @Override
+        public void usersUpdatedEvent(NotificationData<UserIdentification> arg0) {
+        }
     }
 }

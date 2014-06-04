@@ -58,8 +58,9 @@ public class MyResteasyBootstrap extends ResteasyBootstrap {
         super.contextInitialized(event);
 
         ResteasyProviderFactory dispatcher = ResteasyProviderFactory.getInstance();
-
+        
         dispatcher.registerProvider(OctetStreamWriter.class, false);
+        dispatcher.registerProvider(PlainTextReader.class, false);
 
         restRuntime = new RestRuntime();
 

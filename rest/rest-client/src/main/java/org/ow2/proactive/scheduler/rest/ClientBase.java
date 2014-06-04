@@ -50,13 +50,7 @@ import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 
 public abstract class ClientBase implements ISchedulerClient {
     private static final int calling_method_stack_index = 3;
-
-    @Override
-    public void addEventListener(SchedulerEventListener arg0, boolean arg1, SchedulerEvent... arg2)
-            throws NotConnectedException, PermissionException {
-        throw newUnsupportedOperationException();
-    }
-
+    
     @Override
     public SchedulerState addEventListener(SchedulerEventListener arg0, boolean arg1, boolean arg2,
             SchedulerEvent... arg3) throws NotConnectedException, PermissionException {
@@ -127,11 +121,6 @@ public abstract class ClientBase implements ISchedulerClient {
 
     @Override
     public boolean reloadPolicyConfiguration() throws NotConnectedException, PermissionException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void removeEventListener() throws NotConnectedException, PermissionException {
         throw new UnsupportedOperationException();
     }
 

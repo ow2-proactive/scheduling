@@ -36,6 +36,11 @@
  */
 package org.ow2.proactive_grid_cloud_portal.scheduler;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import static javax.ws.rs.core.MediaType.APPLICATION_XML_TYPE;
+import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
+import static org.ow2.proactive_grid_cloud_portal.scheduler.ValidationUtil.validateJobDescriptor;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
@@ -55,10 +60,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -67,6 +70,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import javax.security.auth.login.LoginException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
@@ -79,9 +84,32 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.FileSystemException;
+import org.apache.commons.vfs2.FileSystemManager;
+import org.apache.commons.vfs2.FileType;
+import org.apache.commons.vfs2.Selectors;
+import org.apache.log4j.Logger;
+import org.atmosphere.cpr.AtmosphereResource;
+import org.atmosphere.cpr.AtmosphereResourceFactory;
+import org.atmosphere.cpr.Broadcaster;
+import org.atmosphere.cpr.BroadcasterFactory;
+import org.atmosphere.websocket.WebSocketEventListenerAdapter;
+import org.dozer.DozerBeanMapper;
+import org.dozer.Mapper;
+import org.jboss.resteasy.annotations.GZIP;
+import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
+import org.jboss.resteasy.plugins.providers.multipart.InputPart;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
+import org.jboss.resteasy.util.GenericType;
 import org.objectweb.proactive.ActiveObjectCreationException;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -135,6 +163,8 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.dto.SchedulerUserData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskResultData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskStateData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.UserJobData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.eventing.EventNotification;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.eventing.EventSubscription;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.JobAlreadyFinishedRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.JobCreationRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.LogForwardingRestException;
@@ -144,28 +174,9 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SchedulerRestExce
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SubmissionClosedRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestException;
+import org.ow2.proactive_grid_cloud_portal.scheduler.util.EventUtil;
 import org.ow2.proactive_grid_cloud_portal.webapp.DateFormatter;
 import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.vfs2.FileObject;
-import org.apache.commons.vfs2.FileSystemException;
-import org.apache.commons.vfs2.FileSystemManager;
-import org.apache.commons.vfs2.FileType;
-import org.apache.commons.vfs2.Selectors;
-import org.apache.log4j.Logger;
-import org.dozer.DozerBeanMapper;
-import org.dozer.Mapper;
-import org.jboss.resteasy.annotations.GZIP;
-import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
-import org.jboss.resteasy.plugins.providers.multipart.InputPart;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
-import org.jboss.resteasy.util.GenericType;
-
-import static javax.ws.rs.core.MediaType.APPLICATION_XML_TYPE;
-import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
-import static org.ow2.proactive_grid_cloud_portal.scheduler.ValidationUtil.validateJobDescriptor;
 
 
 /**
@@ -181,10 +192,15 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     public static final String UNKNOWN_VALUE_TYPE = "Unknown value type";
 
     private static final Logger logger = ProActiveLogger.getLogger(SchedulerStateRest.class);
+    
+    private static final String ATM_BROADCASTER_ID = "atmosphere.broadcaster.id";
+    private static final String ATM_RESOURCE_ID = "atmosphere.resource.id";
 
     private SessionStore sessionStore = SharedSessionStore.getInstance();
 
     private static FileSystemManager fsManager = null;
+    
+     
 
     static {
         try {
@@ -2368,6 +2384,82 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                 tmpFile.delete();
             }
         }
+    }
+    
+    /*
+     * Atmosphere 2.0 framework based implementation of Scheduler Eventing mechanism for REST clients.
+     * It is configured to use WebSocket as the underneath protocol between the client and the server. 
+     */
+    /**
+     * Initialize WebScokect based communication channel between the client and the server. 
+     */
+    @GET
+    @Path("/events")
+    public String subscribe(@Context HttpServletRequest req, @HeaderParam("sessionid") String sessionId)
+            throws NotConnectedRestException {
+        checkAccess(sessionId);
+        HttpSession session = checkNotNull(req.getSession(),
+                "HTTP session object is null. HTTP session support is requried for REST Scheduler eventing.");
+        AtmosphereResource atmosphereResource = checkNotNull(
+                (AtmosphereResource) req.getAttribute(AtmosphereResource.class.getName()),
+                "No AtmosphereResource is attached with current request.");
+        // use session id as the 'topic' (or 'id') of the broadcaster
+        session.setAttribute(ATM_BROADCASTER_ID, sessionId);
+        session.setAttribute(ATM_RESOURCE_ID, atmosphereResource.uuid());
+        Broadcaster broadcaster = lookupBroadcaster(sessionId, true);
+        if (broadcaster != null) {
+            atmosphereResource.setBroadcaster(broadcaster).suspend();
+        }
+        return null;
+    }
+
+    /**
+     * Accepts an {@link EventSubscription} instance which specifies the types
+     * of SchedulerEvents which interest the client. When such Scheduler event
+     * occurs, it will be communicated to the client in the form of
+     * {@link EventNotification} utilizing the WebSocket channel initialized
+     * previously.
+     */
+    @POST
+    @Path("/events")
+    @Produces("application/json")
+    public EventNotification publish(@Context HttpServletRequest req, EventSubscription subscription)
+            throws NotConnectedRestException, PermissionRestException {
+        HttpSession session = req.getSession();
+        String broadcasterId = (String) session.getAttribute(ATM_BROADCASTER_ID);
+        final SchedulerProxyUserInterface scheduler = checkAccess(broadcasterId);
+        SchedulerEventBroadcaster eventListener = new SchedulerEventBroadcaster(broadcasterId);
+        try {
+            final SchedulerEventBroadcaster activedEventListener = PAActiveObject.turnActive(eventListener);
+            scheduler.addEventListener(activedEventListener, subscription.isMyEventsOnly(),
+                    EventUtil.toSchedulerEvents(subscription.getEvents()));
+            AtmosphereResource atmResource = AtmosphereResourceFactory.getDefault().find(
+                    (String) session.getAttribute(ATM_RESOURCE_ID));
+            atmResource.addEventListener(new WebSocketEventListenerAdapter() {
+                @Override
+                public void onDisconnect(@SuppressWarnings("rawtypes") WebSocketEvent event) {
+                    try {
+                        scheduler.removeEventListener();
+                    } catch (Exception e) {
+                        logger.error(e);
+                    }
+                    PAActiveObject.terminateActiveObject(activedEventListener, true);
+                }
+            });
+        } catch (NotConnectedException e) {
+            throw new NotConnectedRestException(e);
+        } catch (PermissionException e) {
+            throw new PermissionRestException(e);
+        } catch (ActiveObjectCreationException e) {
+            throw new RuntimeException(e);
+        } catch (NodeException e) {
+            throw new RuntimeException(e);
+        }
+        return new EventNotification(EventNotification.Action.NONE, null, null);
+    }
+
+    private Broadcaster lookupBroadcaster(String topic, boolean createNew) {
+        return BroadcasterFactory.getDefault().lookup(topic, createNew);
     }
 
 }

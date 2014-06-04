@@ -162,6 +162,7 @@ public class RestRuntime {
         dispatcher.registerProvider(ExceptionMappers.PermissionExceptionExceptionMapper.class);
         dispatcher.registerProvider(ExceptionMappers.ProActiveRuntimeExceptionExceptionMapper.class);
         dispatcher.registerProvider(ExceptionMappers.RuntimeExceptionExceptionMapper.class);
+        dispatcher.registerProvider(ExceptionMappers.IllegalArgumentExceptionMapper.class);
         dispatcher.registerProvider(ExceptionMappers.ThrowableExceptionMapper.class);
     }
 

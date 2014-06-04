@@ -74,6 +74,8 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.ow2.proactive.db.SortParameter;
 import org.ow2.proactive.scheduler.common.JobFilterCriteria;
 import org.ow2.proactive.scheduler.common.JobSortParameter;
+import org.ow2.proactive.scheduler.common.SchedulerEvent;
+import org.ow2.proactive.scheduler.common.SchedulerEventListener;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
@@ -115,9 +117,11 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestE
 
 import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
+
 import org.apache.commons.io.FileUtils;
 import org.ow2.proactive.scheduler.common.job.JobEnvironment;
 import org.ow2.proactive.scheduler.common.util.JarUtils;
+
 import static org.ow2.proactive.scheduler.rest.ExceptionUtility.exception;
 import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwJAFEOrUJEOrNCEOrPE;
 import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwNCEOrPE;
@@ -141,8 +145,11 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     private SchedulerRestClient schedulerRestClient;
 
     private String sid;
+    private String url;
     private String login;
     private String password;
+    
+    private SchedulerEventReceiver schedulerEventReceiver;
 
     private SchedulerClient() {
     }
@@ -171,6 +178,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
 
         setApiClient(restApiClient);
 
+        this.url = url;
         this.login = login;
         this.password = password;
 
@@ -887,6 +895,27 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     @Override
     public String getSession() {
         return sid;
+    }
+
+    @Override
+    public void addEventListener(SchedulerEventListener listener, boolean myEventsOnly,
+            SchedulerEvent... events) throws NotConnectedException, PermissionException {
+        try {
+            removeEventListener();
+            schedulerEventReceiver = (new SchedulerEventReceiver.Builder()).restServerUrl(url).sessionId(sid)
+                    .schedulerEventListener(listener).myEventsOnly(myEventsOnly).selectedEvents(events)
+                    .build();
+            schedulerEventReceiver.start();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void removeEventListener() throws NotConnectedException, PermissionException {
+        if (schedulerEventReceiver != null) {
+            schedulerEventReceiver.stop();
+        }
     }
 
     private void sleep(long millis) {
