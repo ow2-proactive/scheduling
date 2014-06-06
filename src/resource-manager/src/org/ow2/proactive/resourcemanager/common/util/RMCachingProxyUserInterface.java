@@ -38,6 +38,7 @@ package org.ow2.proactive.resourcemanager.common.util;
 
 import java.io.IOException;
 import java.security.KeyException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -71,6 +72,7 @@ import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.resourcemanager.frontend.RMEventListener;
+import org.ow2.proactive.resourcemanager.frontend.RMGroupEventListener2;
 import org.apache.log4j.Logger;
 
 
@@ -83,12 +85,12 @@ import org.apache.log4j.Logger;
  * after having created it
  */
 @ActiveObject
-public class RMCachingProxyUserInterface extends RMProxyUserInterface implements RMEventListener {
-
-    private Logger logger = ProActiveLogger.getLogger(RMCachingProxyUserInterface.class);
+public class RMCachingProxyUserInterface extends RMProxyUserInterface implements RMGroupEventListener2 {
+	
+	private Logger logger = ProActiveLogger.getLogger(RMCachingProxyUserInterface.class);
 
     protected RMAuthentication rmAuth;
-    protected RMInitialState rmInitialState;
+    protected RMInitialState rmInitialState;    
     protected RMEventType RMstate;
     protected Credentials credentials;
 
@@ -202,7 +204,24 @@ public class RMCachingProxyUserInterface extends RMProxyUserInterface implements
      * @return the local version of the initial state
      */
     public RMInitialState getRMInitialState() {
+    	System.out.println("RMCachingProxyUserInterface.getRMInitialState() ---> sending state : " + this.rmInitialState); 
         return rmInitialState;
+    }
+    
+    @Override
+    public void notify(Collection<RMEvent> events) {
+    	System.out.println("RMCachingProxyUserInterface.notify() ---> AHH being notified " + events);
+        for (RMEvent event : events) {
+            if (event instanceof RMNodeEvent) {
+                RMNodeEvent nodeEvent = (RMNodeEvent) event;
+                nodeEvent(nodeEvent);
+            } else if (event instanceof RMNodeSourceEvent) {
+                RMNodeSourceEvent sourceEvent = (RMNodeSourceEvent) event;
+                nodeSourceEvent(sourceEvent);
+            } else {
+                rmEvent(event);
+            }
+        }
     }
 
     /**

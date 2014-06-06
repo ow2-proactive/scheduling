@@ -36,16 +36,18 @@
  */
 package org.ow2.proactive.resourcemanager.frontend;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
@@ -93,7 +95,7 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
 
     // Attributes
     private RMCore rmcore;
-    private Map<UniqueID, EventDispatcher> dispatchers;
+    private ConcurrentHashMap<UniqueID, EventDispatcher> dispatchers;
     private transient ExecutorService eventDispatcherThreadPool;
 
     /** Resource Manager's statistics */
@@ -111,7 +113,7 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
      * @param rmcore Stub of the RMCore active object.
      */
     public RMMonitoringImpl(RMCore rmcore) {
-        this.dispatchers = new HashMap<UniqueID, EventDispatcher>();
+        this.dispatchers = new ConcurrentHashMap<UniqueID, EventDispatcher>();
         this.rmcore = rmcore;
     }
 
@@ -237,10 +239,8 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
             } catch (Exception e) {
                 // probably listener was removed or disconnected
                 logger.warn("Cannot send events to " + client, e);
-                synchronized (dispatchers) {
-                    dispatchers.remove(client.getId());
-                    logger.warn(client + " was removed from listeners");
-                }
+                dispatchers.remove(client.getId());
+                logger.warn(client + " was removed from listeners");
             }
         }
 
@@ -268,33 +268,51 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
 
     private class GroupEventDispatcher extends EventDispatcher {
 
+        AtomicLong counter = new AtomicLong(0);
+        LinkedBlockingQueue<RMEvent> queue = new LinkedBlockingQueue<RMEvent>();
+
         public GroupEventDispatcher(Client client, RMEventListener stub, RMEventType[] events) {
             super(client, stub, events);
+            System.out.println("Creating grouped dispather ");
+        }
+
+        public void queueEvent(RMEvent event) {
+            // Omit unknown events
+            if (eventTypes == null || eventTypes.contains(event.getEventType())) {
+               // Get counter value then increment
+               event.setCounter(counter.getAndIncrement());
+               // Put the event in the queue
+               try {
+                   queue.put(event);
+               } catch (InterruptedException e) {
+                   queue.remove(event);
+                   Thread.currentThread().interrupt();
+               }
+               // If not already sending something
+               if (inProcess.compareAndSet(false, true)) {
+                   eventDispatcherThreadPool.submit(this);
+                } else {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Communication to the client " + client +
+                            " is in progress in one thread of the thread pool. " +
+                            "Either events come too quick or the client is slow. " +
+                            "Do not initiate connection from another thread.");
+                    }
+                }
+            }
         }
 
         public void run() {
-
             long timeStamp = System.currentTimeMillis();
             if (logger.isDebugEnabled()) {
-                logger.debug("Initializing " + Thread.currentThread() + " for events delivery to client '" +
+                logger.debug("Initializing " + Thread.currentThread() + " for " + events.size() + " pending events delivery to client '" +
                     client + "'");
             }
 
-            LinkedList<RMEvent> toDeliver = new LinkedList<RMEvent>();
-            synchronized (events) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug(events.size() + " pending events for the client '" + client + "'");
-                }
-
-                if (events.size() > 0) {
-                    toDeliver.clear();
-                    toDeliver.addAll(events);
-                    events.clear();
-                }
-                inProcess.set(false);
-            }
-
-            if (toDeliver.size() > 0) {
+            int currentQueueSize = queue.size();
+            if (currentQueueSize > 0) {
+                ArrayList<RMEvent> toDeliver = new ArrayList<RMEvent>(currentQueueSize);
+                queue.drainTo(toDeliver);
                 if (deliverEvents(toDeliver)) {
                     if (logger.isDebugEnabled()) {
                         logger.debug("Finnishing delivery in " + Thread.currentThread() + " to client '" +
@@ -302,36 +320,36 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
                             (System.currentTimeMillis() - timeStamp) + " ms");
                     }
                 }
-
             } else {
-                logger.debug("No events to deliver to client " + client);
+               logger.debug("No events to deliver to client " + client);
             }
+            inProcess.set(false);
         }
 
         private boolean deliverEvents(Collection<RMEvent> events) {
             //dispatch event
-            long timeStamp = System.currentTimeMillis();
-
+            long timeStamp = 0;
             if (logger.isDebugEnabled()) {
-                for (RMEvent event : events) {
-                    logger.debug("Dispatching events '" + event.toString() + "' to client " + client);
-                }
+                timeStamp = System.currentTimeMillis();
+                logger.debug("Dispatching events '" + events + "' to client " + client);
             }
             try {
-                ((RMGroupEventListener) listener).notify(events);
-
-                long time = System.currentTimeMillis() - timeStamp;
+               if (listener instanceof RMGroupEventListener) {
+                    ((RMGroupEventListener) listener).notify(events);
+                } else if (listener instanceof RMGroupEventListener2) {
+                    ((RMGroupEventListener2) listener).notify(events);
+                } else {
+                    throw new IllegalStateException("Unknown group event listener: " + listener);
+                }
                 if (logger.isDebugEnabled()) {
+                    long time = System.currentTimeMillis() - timeStamp;
                     logger.debug("Events has been delivered to client " + client + " in " + time + " ms");
                 }
-
             } catch (Exception e) {
                 // probably listener was removed or disconnected
                 logger.warn("Cannot send events to " + client, e);
-                synchronized (dispatchers) {
-                    dispatchers.remove(client.getId());
-                    logger.warn(client + " was removed from listeners");
-                }
+                dispatchers.remove(client.getId());
+                logger.warn(client + " was removed from listeners");
                 return false;
             }
             return true;
@@ -350,20 +368,18 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
         UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
 
         logger.debug("Adding the RM listner for " + id.shortString());
-        synchronized (dispatchers) {
-            Client client = null;
-            synchronized (RMCore.clients) {
-                client = RMCore.clients.get(id);
-            }
-            if (client == null) {
-                throw new IllegalArgumentException("Unknown client " + id.shortString());
-            }
+        Client client = null;
+        synchronized (RMCore.clients) {
+            client = RMCore.clients.get(id);
+        }
+        if (client == null) {
+            throw new IllegalArgumentException("Unknown client " + id.shortString());
+        }
 
-            if (stub instanceof RMGroupEventListener) {
-                this.dispatchers.put(id, new GroupEventDispatcher(client, stub, events));
-            } else {
-                this.dispatchers.put(id, new EventDispatcher(client, stub, events));
-            }
+        if (stub instanceof RMGroupEventListener || stub instanceof RMGroupEventListener2) {
+            this.dispatchers.put(id, new GroupEventDispatcher(client, stub, events));
+        } else {
+            this.dispatchers.put(id, new EventDispatcher(client, stub, events));
         }
         return rmcore.getRMInitialState();
     }
@@ -394,10 +410,8 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
             logger.debug(event.toString() + " event");
         }
 
-        synchronized (dispatchers) {
-            for (EventDispatcher dispatcher : dispatchers.values()) {
-                dispatcher.queueEvent(event);
-            }
+        for (EventDispatcher dispatcher : dispatchers.values()) {
+           dispatcher.queueEvent(event);
         }
     }
 
@@ -406,8 +420,8 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
      */
     public void nodeEvent(RMNodeEvent event) {
         RMMonitoringImpl.rmStatistics.nodeEvent(event);
-        RMDBManager.getInstance().saveNodeHistory(new NodeHistory(event));
         queueEvent(event);
+        RMDBManager.getInstance().saveNodeHistory(new NodeHistory(event));
     }
 
     /**
@@ -425,7 +439,7 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
         queueEvent(event);
     }
 
-    /** 
+    /**
      * Stop and remove monitoring active object
      */
     public BooleanWrapper shutdown() {
