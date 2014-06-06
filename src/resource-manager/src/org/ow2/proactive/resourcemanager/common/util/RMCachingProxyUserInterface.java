@@ -86,11 +86,11 @@ import org.apache.log4j.Logger;
  */
 @ActiveObject
 public class RMCachingProxyUserInterface extends RMProxyUserInterface implements RMGroupEventListener2 {
-	
-	private Logger logger = ProActiveLogger.getLogger(RMCachingProxyUserInterface.class);
+
+    private Logger logger = ProActiveLogger.getLogger(RMCachingProxyUserInterface.class);
 
     protected RMAuthentication rmAuth;
-    protected RMInitialState rmInitialState;    
+    protected RMInitialState rmInitialState;
     protected RMEventType RMstate;
     protected Credentials credentials;
 
@@ -204,13 +204,11 @@ public class RMCachingProxyUserInterface extends RMProxyUserInterface implements
      * @return the local version of the initial state
      */
     public RMInitialState getRMInitialState() {
-    	System.out.println("RMCachingProxyUserInterface.getRMInitialState() ---> sending state : " + this.rmInitialState); 
         return rmInitialState;
     }
-    
+
     @Override
     public void notify(Collection<RMEvent> events) {
-    	System.out.println("RMCachingProxyUserInterface.notify() ---> AHH being notified " + events);
         for (RMEvent event : events) {
             if (event instanceof RMNodeEvent) {
                 RMNodeEvent nodeEvent = (RMNodeEvent) event;
