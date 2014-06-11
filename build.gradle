@@ -55,6 +55,7 @@ configure(javaSubprojects) {
     apply plugin: 'format'
 
     sourceCompatibility = 1.6
+    compileJava.options.compilerArgs << '-Xlint:-options' // remove warning about bootstrap class path
 
     dependencies {
         compile 'log4j:log4j:1.2.14'
