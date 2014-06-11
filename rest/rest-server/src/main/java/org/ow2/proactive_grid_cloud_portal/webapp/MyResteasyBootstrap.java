@@ -79,7 +79,11 @@ public class MyResteasyBootstrap extends ResteasyBootstrap {
     }
 
     private File findConfigurationFileInWebInf(ServletContext servletContext, String configurationFileName) {
-        return new File(servletContext.getRealPath("WEB-INF" + File.separator + configurationFileName));
+        String pathToConfigurationFile = servletContext.getRealPath("WEB-INF" + configurationFileName);
+        if (pathToConfigurationFile == null) {
+            return null;
+        }
+        return new File(pathToConfigurationFile);
     }
 
     @Override
