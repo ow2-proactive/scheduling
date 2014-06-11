@@ -79,6 +79,17 @@ configure(javaSubprojects) {
         configurationFile = file("$rootDir/eclipse_formatter_config.xml")
     }
     build.dependsOn format
+
+    jar {
+        manifest {
+            attributes("Implementation-Title": "ProActive",
+                    "Implementation-Version": version,
+                    "Specification-Version": version,
+                    "Implementation-Vendor": "Activeeon - OASIS - INRIA Sophia Antipolis",
+                    "Implementation-URL": "http://proactive.inria.fr"
+            )
+        }
+    }
 }
 
 def functionalTestConfiguration = {
