@@ -633,7 +633,7 @@ public class SchedulerModel extends ConsoleModel {
             JobInfo ji = js.getJobInfo();
 
             String state = newline + "   Job '" + ji.getJobId() + "'    name:" +
-                ji.getJobId().getReadableName() + "    owner:" + js.getOwner() + "    status:" +
+                ji.getJobId().getReadableName() + "'    project:" + js.getProjectName() + "    owner:" + js.getOwner() + "    status:" +
                 ji.getStatus() + "    #tasks:" + ji.getTotalNumberOfTasks() + newline + newline;
 
             //create formatter
