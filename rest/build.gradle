@@ -170,12 +170,13 @@ project(':rest:rest-cli') {
     dependencies {
         compile 'commons-cli:commons-cli:1.2'
         compile 'commons-io:commons-io:2.4'
-        compile 'jline:jline:1.0'
+        compile 'jline:jline:2.11'
 
         compile 'org.apache.httpcomponents:httpclient:4.2.1'
         compile 'org.apache.httpcomponents:httpmime:4.2.1'
 
         compile project(":common-api")
+        compile project(":common-cli")
         compile project(':rest:rest-api')
     }
 
@@ -197,7 +198,7 @@ project(':rest:rest-client') {
     dependencies {
 	compile 'commons-cli:commons-cli:1.2'
         compile 'commons-io:commons-io:2.4'
-        compile 'jline:jline:1.0'
+        compile 'jline:jline:2.11'
         compile 'org.apache.httpcomponents:httpclient:4.2.1'
         compile 'org.apache.httpcomponents:httpmime:4.2.1'
 	compile 'org.atmosphere:wasync:1.3.2'

@@ -38,7 +38,6 @@
 package org.ow2.proactive_grid_cloud_portal.cli.console;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
@@ -47,22 +46,21 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 
-import jline.ArgumentCompletor;
-import jline.ClassNameCompletor;
-import jline.Completor;
-import jline.ConsoleReader;
-import jline.FileNameCompletor;
-import jline.History;
-import jline.MultiCompletor;
-import jline.SimpleCompletor;
+import jline.console.ConsoleReader;
+import jline.console.completer.AggregateCompleter;
+import jline.console.completer.ArgumentCompleter;
+import jline.console.completer.FileNameCompleter;
+import jline.console.history.FileHistory;
 
+import org.ow2.proactive.utils.console.jline1.ClassNameCompletor;
+import org.ow2.proactive.utils.console.jline1.SimpleCompletor;
 import org.ow2.proactive_grid_cloud_portal.cli.CommandSet;
 
 
 public class JLineDevice extends AbstractDevice {
-    private static final int HLENGTH = 20;
     private static final String HFILE = System.getProperty("user.home") + File.separator + ".proactive" +
         File.separator + "restcli.hist";
+    private final FileHistory history;
 
     private ConsoleReader reader;
     private PrintWriter writer;
@@ -77,8 +75,9 @@ public class JLineDevice extends AbstractDevice {
             hfile.createNewFile();
         }
         writer = new PrintWriter(out, true);
-        reader = new ConsoleReader(in, writer);
-        reader.setHistory(new History(hfile));
+        reader = new ConsoleReader(in, out);
+        history = new FileHistory(hfile);
+        reader.setHistory(history);
 
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
             public void run() {
@@ -92,35 +91,9 @@ public class JLineDevice extends AbstractDevice {
     }
 
     private void writeHistory() {
-        FileOutputStream outStream = null;
         try {
-            File hfile = new File(HFILE);
-            if (hfile.exists()) {
-                hfile.delete();
-            }
-            hfile.createNewFile();
-            outStream = new FileOutputStream(hfile);
-            PrintWriter decorated = new PrintWriter(outStream);
-            @SuppressWarnings("rawtypes")
-            List historyList = reader.getHistory().getHistoryList();
-            if (historyList.size() > HLENGTH) {
-                historyList = historyList.subList(historyList.size() - HLENGTH, historyList.size());
-            }
-            for (int index = 0; index < historyList.size(); index++) {
-                decorated.println(historyList.get(index));
-            }
-            decorated.flush();
-        } catch (IOException fnfe) {
-            // can't do much 
-
-        } finally {
-            if (outStream != null) {
-                try {
-                    outStream.close();
-                } catch (IOException e) {
-                    // ignore
-                }
-            }
+            history.flush();
+        } catch (IOException ignored) {
         }
     }
 
@@ -142,9 +115,23 @@ public class JLineDevice extends AbstractDevice {
     }
 
     public void setCommands(CommandSet.Entry[] entries) throws IOException {
-        Completor[] completors = new Completor[] { new SimpleCompletor(getCommandsAsArray(entries)),
-                new ClassNameCompletor(), new FileNameCompletor() };
-        reader.addCompletor(new ArgumentCompletor(new MultiCompletor(completors)));
+        AggregateCompleter aggregateCompleter = new AggregateCompleter(new SimpleCompletor(getCommandsAsArray(entries)),
+                new ClassNameCompletor(), new FileNameCompleter());
+
+        ArgumentCompleter argumentCompleter = new ArgumentCompleter(createArgumentDelimiter(), aggregateCompleter);
+        argumentCompleter.setStrict(false);
+        reader.addCompleter(argumentCompleter);
+    }
+
+    private ArgumentCompleter.WhitespaceArgumentDelimiter createArgumentDelimiter() {
+        return new ArgumentCompleter.WhitespaceArgumentDelimiter() {
+                @Override
+                public boolean isDelimiterChar(CharSequence buffer, int pos) {
+                    return super.isDelimiterChar(buffer, pos) || buffer.charAt(pos) == '\'' ||
+                            buffer.charAt(pos) == '"' || buffer.charAt(pos) == '{' || buffer.charAt(pos) == '}' ||
+                            buffer.charAt(pos) == ',' || buffer.charAt(pos) == ';';
+                }
+            };
     }
 
     @Override
@@ -161,8 +148,7 @@ public class JLineDevice extends AbstractDevice {
 
     @Override
     public void writeLine(String format, Object... args) throws IOException {
-        reader.printString(String.format(format, args));
-        reader.printNewline();
+        reader.println(String.format(format, args));
     }
 
     @Override
