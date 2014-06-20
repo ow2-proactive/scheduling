@@ -286,6 +286,7 @@ public class NativeTaskLauncher extends TaskLauncher {
                     res.setAction(FlowAction.getDefaultAction(this.flow));
                 }
                 res.setPropagatedProperties(retreivePropagatedProperties());
+                attachPropagatedVariables(res);
             }
 
             res.setLogs(this.getLogs());

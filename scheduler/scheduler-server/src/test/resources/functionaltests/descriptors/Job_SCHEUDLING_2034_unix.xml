@@ -1,0 +1,72 @@
+<!-- 
+  ################################################################
+ 
+  ProActive Parallel Suite(TM): The Java(TM) library for
+     Parallel, Distributed, Multi-Core Computing for
+     Enterprise Grids & Clouds
+ 
+  Copyright (C) 1997-2014 INRIA/University of
+                  Nice-Sophia Antipolis/ActiveEon
+  Contact: proactive@ow2.org or contact@activeeon.com
+ 
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Affero General Public License
+  as published by the Free Software Foundation; version 3 of
+  the License.
+ 
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Affero General Public License for more details.
+ 
+  You should have received a copy of the GNU Affero General Public License
+  along with this library; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+  USA
+ 
+  If needed, contact us to obtain a release under GPL Version 2 or 3
+  or a different license than the AGPL.
+ 
+   Initial developer(s):               The ActiveEon Team
+                         http://www.activeeon.com/
+   Contributor(s):
+ 
+  ################################################################
+  $$ACTIVEEON_INITIAL_DEV$$
+ -->
+<?xml version="1.0" encoding="UTF-8"?>
+
+<job xmlns="urn:proactive:jobdescriptor:dev" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="urn:proactive:jobdescriptor:dev ../../../src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.xsd"
+    name="Job_SCHEDULING_2034" cancelJobOnError="false" priority="normal">
+    <variables>
+        <variable name="var" value="var-value" />
+    </variables>
+    <description>SCHEDULING_2034_TEST</description>
+    <taskFlow>
+        <task name="initial_task" preciousResult="true">
+            <nativeExecutable>
+                <staticCommand value="/bin/bash">
+                    <arguments>
+                        <argument value="-c" />
+                        <argument value="echo $var_var" />
+                    </arguments>
+                </staticCommand>
+            </nativeExecutable>
+        </task>
+         <task name="verify_task" preciousResult="true">
+            <depends>
+                <task ref="initial_task" />
+            </depends>
+            <scriptExecutable>
+                <script>
+                    <code language="javascript">
+                        if ('var-value' != '${var}') {
+                            throw 'Incorrect variable value (\'var\'): \'${var}\', expected \'var-value\'.';
+                        }
+                    </code>
+                </script>
+            </scriptExecutable>
+        </task>
+    </taskFlow>
+</job>
