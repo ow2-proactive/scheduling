@@ -526,7 +526,10 @@ project('performance') {
 }
 
 configurations {
-    distLib
+    restCli
+    distLib {
+        extendsFrom restCli
+    }
 }
 
 dependencies {
@@ -541,6 +544,7 @@ dependencies {
     distLib(project(':rest:rest-server')) {
         exclude group: 'javassist', module: 'javassist' // to avoid duplicate (artifact named differently)
     }
+    restCli project(':rest:rest-cli')
 }
 
 task proActiveLibs(type: Sync) {
@@ -562,6 +566,19 @@ apply plugin: 'java'
 
 defaultTasks 'proActiveLibs'
 build.dependsOn 'proActiveLibs'
+
+task clientJar(type: Jar, dependsOn: proActiveLibs)
+
+clientJar.doFirst {
+    manifest {
+        def manifestClasspath = configurations.restCli.collect { 'dist/lib/' + it.getName() }.join(' ')
+        attributes('Main-Class': 'org.ow2.proactive_grid_cloud_portal.cli.CommonEntryPoint',
+            'Class-Path' : manifestClasspath
+        )
+    }
+    destinationDir = file('.')
+    archiveName = 'client.jar'
+}
 
 subprojects {
     tasks.withType(Test).matching { it.name == 'functionalTest' }*.dependsOn proActiveLibs
