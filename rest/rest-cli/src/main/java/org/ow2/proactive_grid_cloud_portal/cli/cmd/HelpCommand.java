@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2012 INRIA/University of
+ * Copyright (C) 1997-2014 INRIA/University of
  *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -32,22 +32,33 @@
  *  Contributor(s):
  *
  * ################################################################
- * $PROACTIVE_INITIAL_DEV$
+ * $$ACTIVEEON_INITIAL_DEV$$
  */
 
-package org.ow2.proactive_grid_cloud_portal.cli;
+package org.ow2.proactive_grid_cloud_portal.cli.cmd;
 
-import static org.ow2.proactive_grid_cloud_portal.cli.RestConstants.RM_RESOURCE_TYPE;
+import java.io.PrintWriter;
+import java.io.Writer;
 
+import org.apache.commons.cli.HelpFormatter;
+import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
+import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
+import org.ow2.proactive_grid_cloud_portal.cli.CommandFactory;
 
-public class RmEntryPoint extends EntryPoint {
+public class HelpCommand extends AbstractCommand implements Command {
+
+    public static final String USAGE = "java -jar client.jar [OPTIONS]";
+
+    public HelpCommand() {
+    }
 
     @Override
-    protected String resourceType() {
-        return RM_RESOURCE_TYPE;
+    public void execute(ApplicationContext currentContext) throws CLIException {
+        HelpFormatter formatter = new HelpFormatter();
+        Writer writer = currentContext.getDevice().getWriter();
+        PrintWriter pw = new PrintWriter(writer, true);
+        formatter.printHelp(pw, 110, USAGE, "", CommandFactory.getCommandFactory(CommandFactory.Type.ALL).supportedOptions(),
+                formatter.getLeftPadding(), formatter.getDescPadding(), "", false);
     }
 
-    public static void main(String[] args) {
-        (new RmEntryPoint()).run(args);
-    }
 }

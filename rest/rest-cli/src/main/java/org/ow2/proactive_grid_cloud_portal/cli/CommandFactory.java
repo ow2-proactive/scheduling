@@ -40,10 +40,15 @@ package org.ow2.proactive_grid_cloud_portal.cli;
 import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_INVALID_ARGUMENTS;
 import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.CACERTS;
 import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.CACERTS_PASSWORD;
+import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.COMMON_HELP;
 import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.CREDENTIALS;
+import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.INFRASTRUCTURE;
 import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.INSECURE;
 import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.LOGIN;
+import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.OUTPUT;
 import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.PASSWORD;
+import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.POLICY;
+import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.RM_HELP;
 import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.SCHED_HELP;
 import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.SESSION;
 import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.SESSION_FILE;
@@ -62,7 +67,9 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.ImodeCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.LoginWithCredentialsCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.utils.HierarchicalMap;
 
 
 /**
@@ -71,8 +78,9 @@ import org.ow2.proactive_grid_cloud_portal.cli.cmd.LoginWithCredentialsCommand;
  */
 public abstract class CommandFactory {
 
-    public static final int SCHEDULER = 1;
-    public static final int RM = 2;
+    public static enum Type {
+        SCHEDULER, RM, ALL;
+    }
 
     private static final Map<String, CommandSet.Entry> commonCmdMap;
 
@@ -83,15 +91,20 @@ public abstract class CommandFactory {
         }
     }
 
-    public static CommandFactory getCommandFactory(int type) {
+    protected final Map<String, CommandSet.Entry> cmdMap = new HierarchicalMap<String, CommandSet.Entry>(
+        CommandFactory.supportedCommandMap());
+
+    public static CommandFactory getCommandFactory(Type type) {
         switch (type) {
             case SCHEDULER:
                 return new SchedulerCommandFactory();
             case RM:
                 return new RmCommandFactory();
+            case ALL:
+                return new CommonCommandFactory();
             default:
                 throw new CLIException(REASON_INVALID_ARGUMENTS, String.format(
-                        "Unknow AbstractCommandFactory type['%d']", type));
+                        "Unknown AbstractCommandFactory type['%s']", type));
         }
     }
 
@@ -107,15 +120,26 @@ public abstract class CommandFactory {
         return entry.opt();
     }
 
-    public abstract Options supportedOptions();
+    public Options supportedOptions() {
+        return createOptions(cmdMap.values());
+    }
 
-    public abstract List<Command> getCommandList(CommandLine cli, ApplicationContext currentContext);
+    public List<Command> getCommandList(CommandLine cli, ApplicationContext currentContext) {
+        throw new UnsupportedOperationException();
+    }
 
-    public abstract void addCommandEntry(CommandSet.Entry entry);
+    public void addCommandEntry(CommandSet.Entry entry) {
+        cmdMap.put(opt(entry), entry);
+    }
 
-    public abstract Command commandForOption(Option option);
+    public Command commandForOption(Option option) {
+        return getCommandForOption(option, cmdMap);
+    }
 
-    public abstract CommandSet.Entry[] supportedCommandEntries();
+    public CommandSet.Entry[] supportedCommandEntries() {
+        Collection<CommandSet.Entry> entries = cmdMap.values();
+        return entries.toArray(new CommandSet.Entry[entries.size()]);
+    }
 
     /**
      * Returns an ordered {@link Command} list for specified user arguments.
@@ -127,6 +151,16 @@ public abstract class CommandFactory {
     protected List<Command> getCommandList(CommandLine cli, Map<String, Command> map,
             ApplicationContext currentContext) {
         LinkedList<Command> list = new LinkedList<Command>();
+
+        if (map.containsKey(opt(COMMON_HELP))) {
+            list.add(map.remove(opt(COMMON_HELP)));
+            return list;
+        }
+
+        if (map.containsKey(opt(RM_HELP))) {
+            list.add(map.remove(opt(RM_HELP)));
+            return list;
+        }
 
         if (map.containsKey(opt(SCHED_HELP))) {
             list.add(map.remove(opt(SCHED_HELP)));
@@ -176,6 +210,23 @@ public abstract class CommandFactory {
             File credFile = new File(DFLT_SESSION_DIR, filename);
             if (credFile.exists()) {
                 list.add(new LoginWithCredentialsCommand(credFile.getAbsolutePath()));
+            }
+        }
+
+        if (map.containsKey(opt(INFRASTRUCTURE))) {
+            list.add(map.remove(opt(INFRASTRUCTURE)));
+        }
+        if (map.containsKey(opt(POLICY))) {
+            list.add(map.remove(opt(POLICY)));
+        }
+
+        if (map.isEmpty()) {
+            list.add(new ImodeCommand());
+        } else {
+            Command output = map.remove(opt(OUTPUT));
+            list.addAll(map.values());
+            if (output != null) {
+                list.add(output);
             }
         }
 

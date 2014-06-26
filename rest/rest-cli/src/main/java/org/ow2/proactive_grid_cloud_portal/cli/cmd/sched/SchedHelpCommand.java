@@ -37,8 +37,6 @@
 
 package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
 
-import static org.ow2.proactive_grid_cloud_portal.cli.CommandFactory.SCHEDULER;
-
 import java.io.PrintWriter;
 import java.io.Writer;
 
@@ -50,15 +48,10 @@ import org.ow2.proactive_grid_cloud_portal.cli.CommandFactory;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 
+import static org.ow2.proactive_grid_cloud_portal.cli.cmd.HelpCommand.USAGE;
 
 public class SchedHelpCommand extends AbstractCommand implements Command {
 
-    private static final String USAGE = "rest-cli [-u <server-url>] "
-        + "[-k | -ca <store-path>  [-cap <store-pass>]] "
-        + "[-l <login-name> [-p <password>] | -c <cerd-file-path>] "
-        + "[-start | -stop | -pause | -resume | -freeze | -kill | -lj | -stats "
-        + "| -s | -sa | -js | -jo | -jr | -sj | -pj | -rj | -rmj "
-        + "| -to | -tr | -pt | -rt | -h | -sf | -i]";
 
     public SchedHelpCommand() {
     }
@@ -68,7 +61,7 @@ public class SchedHelpCommand extends AbstractCommand implements Command {
         HelpFormatter formatter = new HelpFormatter();
         Writer writer = currentContext.getDevice().getWriter();
         PrintWriter pw = new PrintWriter(writer, true);
-        Options options = CommandFactory.getCommandFactory(SCHEDULER).supportedOptions();
+        Options options = CommandFactory.getCommandFactory(CommandFactory.Type.SCHEDULER).supportedOptions();
         formatter.printHelp(pw, 110, USAGE, "", options, formatter.getLeftPadding(), formatter
                 .getDescPadding(), "", false);
     }

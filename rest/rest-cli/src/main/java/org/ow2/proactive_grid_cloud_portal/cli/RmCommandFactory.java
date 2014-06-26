@@ -37,79 +37,18 @@
 
 package org.ow2.proactive_grid_cloud_portal.cli;
 
-import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.INFRASTRUCTURE;
-import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.OUTPUT;
-import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.POLICY;
-import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.RM_HELP;
-
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.Options;
-import org.ow2.proactive_grid_cloud_portal.cli.CommandSet.Entry;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.RmImodeCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.utils.HierarchicalMap;
 
 
 class RmCommandFactory extends CommandFactory {
 
-    private static final Map<String, CommandSet.Entry> rmSupportedCmdMap = new HierarchicalMap<String, CommandSet.Entry>(
-        CommandFactory.supportedCommandMap());
-
-    static {
+    {
         for (CommandSet.Entry entry : CommandSet.RM_ONLY) {
-            rmSupportedCmdMap.put(opt(entry), entry);
+            cmdMap.put(opt(entry), entry);
         }
     }
 
-    @Override
-    public List<Command> getCommandList(CommandLine cli, ApplicationContext currentContext) {
-        Map<String, Command> commands = commandMapInstance(cli, rmSupportedCmdMap);
-        List<Command> commandList = getCommandList(cli, commands, currentContext);
-        if (cli.hasOption(opt(RM_HELP))) {
-            return commandList;
-        }
-        if (commands.containsKey(opt(INFRASTRUCTURE))) {
-            commandList.add(commands.remove(opt(INFRASTRUCTURE)));
-        }
-        if (commands.containsKey(opt(POLICY))) {
-            commandList.add(commands.remove(opt(POLICY)));
-        }
-
-        if (commands.isEmpty()) {
-            commandList.add(new RmImodeCommand());
-        } else {
-            Command output = commands.remove(opt(OUTPUT));
-            commandList.addAll(commands.values());
-            if (output != null) {
-                commandList.add(output);
-            }
-        }
-        return commandList;
-    }
-
-    @Override
-    public Options supportedOptions() {
-        return createOptions(rmSupportedCmdMap.values());
-    }
-
-    @Override
-    public Command commandForOption(Option option) {
-        return getCommandForOption(option, rmSupportedCmdMap);
-    }
-
-    @Override
-    public CommandSet.Entry[] supportedCommandEntries() {
-        Collection<Entry> entries = rmSupportedCmdMap.values();
-        return entries.toArray(new CommandSet.Entry[entries.size()]);
-    }
-
-    @Override
-    public void addCommandEntry(Entry entry) {
-        rmSupportedCmdMap.put(opt(entry), entry);
-    }
 }

@@ -38,13 +38,8 @@
 package org.ow2.proactive_grid_cloud_portal.cli;
 
 import static org.codehaus.jackson.map.DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES;
-import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_INVALID_ARGUMENTS;
 import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_UNAUTHORIZED_ACCESS;
-import static org.ow2.proactive_grid_cloud_portal.cli.CommandFactory.RM;
-import static org.ow2.proactive_grid_cloud_portal.cli.CommandFactory.SCHEDULER;
 import static org.ow2.proactive_grid_cloud_portal.cli.RestConstants.DFLT_REST_SCHEDULER_URL;
-import static org.ow2.proactive_grid_cloud_portal.cli.RestConstants.RM_RESOURCE_TYPE;
-import static org.ow2.proactive_grid_cloud_portal.cli.RestConstants.SCHEDULER_RESOURCE_TYPE;
 import static org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractLoginCommand.PROP_RENEW_SESSION;
 import static org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractLoginCommand.PROP_PERSISTED_SESSION;
 
@@ -64,6 +59,8 @@ import org.ow2.proactive_grid_cloud_portal.cli.console.AbstractDevice;
 import org.ow2.proactive_grid_cloud_portal.cli.console.JLineDevice;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
 
+import com.google.common.collect.ObjectArrays;
+
 
 public abstract class EntryPoint {
 
@@ -78,9 +75,9 @@ public abstract class EntryPoint {
         ApplicationContext currentContext = ApplicationContextImpl.currentContext();
 
         try {
-            commandFactory = getCommandFactory(resourceType());
+            commandFactory = getCommandFactory();
             console = AbstractDevice.getConsole(AbstractDevice.JLINE);
-            ((JLineDevice) console).setCommands(commandFactory.supportedCommandEntries());
+            ((JLineDevice) console).setCommands(ObjectArrays.concat(commandFactory.supportedCommandEntries(), CommandSet.INTERACTIVE_COMMANDS, CommandSet.Entry.class));
             currentContext.setDevice(console);
 
             Options options = commandFactory.supportedOptions();
@@ -171,15 +168,8 @@ public abstract class EntryPoint {
         return new PrintWriter(context.getDevice().getWriter(), true);
     }
 
-    private CommandFactory getCommandFactory(String resourceType) {
-        if (SCHEDULER_RESOURCE_TYPE.equals(resourceType)) {
-            return CommandFactory.getCommandFactory(SCHEDULER);
-        } else if (RM_RESOURCE_TYPE.equals(resourceType)) {
-            return CommandFactory.getCommandFactory(RM);
-        } else {
-            throw new CLIException(REASON_INVALID_ARGUMENTS, String.format("Unknown resource-type('%s')",
-                    resourceType));
-        }
+    private CommandFactory getCommandFactory() {
+        return CommandFactory.getCommandFactory(CommandFactory.Type.ALL);
     }
 
     private boolean hasLoginCommand(List<Command> commandList) {

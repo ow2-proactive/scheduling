@@ -35,20 +35,21 @@
  * $$ACTIVEEON_INITIAL_DEV$$
  */
 
-package org.ow2.proactive_grid_cloud_portal.cli;
+package org.ow2.proactive_grid_cloud_portal.cli.cmd;
 
-import static org.ow2.proactive_grid_cloud_portal.cli.RestConstants.SCHEDULER_RESOURCE_TYPE;
+import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
+import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
+
+import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.COMMON_COMMANDS;
+import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.RM_ONLY;
+import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.INTERACTIVE_COMMANDS;
+import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.SCHED_ONLY;
 
 
-public class SchedulerEntryPoint extends EntryPoint {
+public class JsHelpCommand extends AbstractJsHelpCommand implements Command {
 
     @Override
-    protected String resourceType() {
-        return SCHEDULER_RESOURCE_TYPE;
+    public void execute(ApplicationContext currentContext) throws CLIException {
+        printHelp(currentContext, COMMON_COMMANDS, SCHED_ONLY, RM_ONLY, INTERACTIVE_COMMANDS);
     }
-
-    public static void main(String... args) {
-        (new SchedulerEntryPoint()).run(args);
-    }
-
 }

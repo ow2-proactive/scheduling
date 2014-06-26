@@ -151,8 +151,8 @@ public class CommandSet {
             .longOpt("killscheduler").description("Kill the scheduler").jsCommand("kill()").commandClass(
                     KillCommand.class).entry();
 
-    public static final CommandSet.Entry SCHED_STATS = CommandSetEntryBuilder.newInstance().opt("stats")
-            .longOpt("statistics").description("Retrieve current scheduler statistics").jsCommand("stats()")
+    public static final CommandSet.Entry SCHED_STATS = CommandSetEntryBuilder.newInstance().opt("sstats")
+            .longOpt("schedulerstats").description("Retrieve current scheduler statistics").jsCommand("schedulerstats()")
             .commandClass(SchedStatsCommand.class).entry();
 
     public static final CommandSet.Entry LINK_RM = CommandSetEntryBuilder.newInstance().opt("lrm").longOpt(
@@ -242,13 +242,9 @@ public class CommandSet {
             "script-path [param-1=value-1 param-2=value-2 ...]").jsCommand(
             "script(script-pathname,param1=value1,...)").commandClass(EvalScriptCommand.class).entry();
 
-    public static final CommandSet.Entry SCHED_HELP = CommandSetEntryBuilder.newInstance().opt("h").longOpt(
-            "help").description("Prints the usage of REST command-line client for Scheduler").commandClass(
+    public static final CommandSet.Entry SCHED_HELP = CommandSetEntryBuilder.newInstance().opt("sh").longOpt(
+            "schedulerhelp").description("Prints the usage of REST command-line client for Scheduler").commandClass(
             SchedHelpCommand.class).entry();
-
-    public static final CommandSet.Entry SCHED_IMODE = CommandSetEntryBuilder.newInstance().opt("i").longOpt(
-            "imode").description("Interactive mode of the REST CLI").commandClass(SchedImodeCommand.class)
-            .entry();
 
     public static final CommandSet.Entry NODE_ADD = CommandSetEntryBuilder.newInstance().opt("a").longOpt(
             "addnodes").description("Add the specified nodes by their URLs").hasArgs(true).argNames(
@@ -317,25 +313,29 @@ public class CommandSet {
             .longOpt("listpolicy").description("List supported policy types").jsCommand("listpolicies()")
             .commandClass(ListPolicyCommand.class).entry;
 
-    public static final CommandSet.Entry RM_IMODE = CommandSetEntryBuilder.newInstance().opt("i").longOpt(
-            "interactive").description("Interactive mode of REST CLI").commandClass(RmImodeCommand.class)
-            .entry();
-
-    public static final CommandSet.Entry RM_HELP = CommandSetEntryBuilder.newInstance().opt("h").longOpt(
-            "help").description("Prints the usage of REST command-line client for Resource Manager")
+    public static final CommandSet.Entry RM_HELP = CommandSetEntryBuilder.newInstance().opt("rh").longOpt(
+            "rmhelp").description("Prints the usage of REST command-line client for Resource Manager")
             .commandClass(RmHelpCommand.class).entry();
 
-    public static final CommandSet.Entry RM_STATS = CommandSetEntryBuilder.newInstance().opt("stats")
-            .longOpt("statistics").description("Retrieve current resource manager statistics").jsCommand(
-                    "stats()").commandClass(RmStatsCommand.class).entry();
+    public static final CommandSet.Entry RM_STATS = CommandSetEntryBuilder.newInstance().opt("rmstats")
+            .longOpt("rmstats").description("Retrieve current resource manager statistics").jsCommand(
+                    "rmstats()").commandClass(RmStatsCommand.class).entry();
 
     public static final CommandSet.Entry SCHED_JS_HELP = CommandSetEntryBuilder.newInstance().opt("")
-            .longOpt("").description("Interactive help").jsCommand("help()").commandClass(
+            .longOpt("").description("Help on Scheduler commands").jsCommand("schedulerhelp()").commandClass(
                     SchedJsHelpCommand.class).entry();
 
     public static final CommandSet.Entry RM_JS_HELP = CommandSetEntryBuilder.newInstance().opt("")
-            .longOpt("").description("Interactive help").jsCommand("help()").commandClass(
+            .longOpt("").description("Help on RM commands").jsCommand("rmhelp()").commandClass(
                     RmJsHelpCommand.class).entry();
+
+    public static final CommandSet.Entry COMMON_HELP = CommandSetEntryBuilder.newInstance().opt("h").longOpt(
+            "help").description("Prints the usage of REST command-line client for RM/Scheduler")
+            .commandClass(HelpCommand.class).entry();
+
+    public static final CommandSet.Entry COMMON_JS_HELP = CommandSetEntryBuilder.newInstance().opt("")
+            .longOpt("").description("Interactive help").jsCommand("help()").commandClass(
+                    JsHelpCommand.class).entry();
 
     /**
      * CommandSet.Entry objects which are common to both Scheduler and Resource
@@ -343,20 +343,22 @@ public class CommandSet {
      */
     public static final CommandSet.Entry[] COMMON_COMMANDS = new CommandSet.Entry[] { URL, SESSION,
             SESSION_FILE, PASSWORD, CREDENTIALS, INSECURE, CACERTS, CACERTS_PASSWORD, EVAL, SILENT, PRINT,
-            OUTPUT };
+            OUTPUT, COMMON_HELP };
 
     /** CommandSet.Entry objects which are specific to Scheduler CLI */
     public static final CommandSet.Entry[] SCHED_ONLY = new CommandSet.Entry[] { SCHED_START, SCHED_STOP,
             SCHED_PAUSE, SCHED_RESUME, SCHED_FREEZE, SCHED_KILL, LINK_RM, SCHED_STATS, JOB_LIST, SUBMIT_DESC,
             LOGIN_SCHED, SUBMIT_ARCH, JOB_STATE, JOB_OUTPUT, JOB_RESULT, JOB_PRIORITY, JOB_PAUSE, JOB_RESUME,
             JOB_KILL, JOB_REMOVE, TASK_RESTART, TASK_PREEMPT, TASK_OUTPUT, TASK_RESULT, UPLOAD_FILE,
-            DOWNLOAD_FILE, SCHED_IMODE, SCHED_HELP, LIVE_LOG };
+            DOWNLOAD_FILE, SCHED_HELP, LIVE_LOG };
 
     /** CommandSet.Entry objects which are specific to Resource Manager CLI */
     public static final CommandSet.Entry[] RM_ONLY = new CommandSet.Entry[] { LOGIN, NODE_ADD, NODE_LIST,
             NODE_INFO, NODE_LOCK, NODE_UNLOCK, NODE_REMOVE, NS_CREATE, NS_LIST, NS_REMOVE, NS,
-            INFRASTRUCTURE, INFRASTRUCTURE_LIST, POLICY, POLICY_LIST, TOPOLOGY, FORCE, RM_STATS, RM_IMODE,
+            INFRASTRUCTURE, INFRASTRUCTURE_LIST, POLICY, POLICY_LIST, TOPOLOGY, FORCE, RM_STATS,
             RM_HELP };
+
+    public static final Entry[] INTERACTIVE_COMMANDS = { EXIT, RM_JS_HELP, SCHED_JS_HELP, COMMON_JS_HELP};
 
     private CommandSet() {
     }
