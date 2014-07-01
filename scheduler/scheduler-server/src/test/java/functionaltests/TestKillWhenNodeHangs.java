@@ -15,7 +15,7 @@ import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.tests.FunctionalTest;
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.junit.Test;
 
 

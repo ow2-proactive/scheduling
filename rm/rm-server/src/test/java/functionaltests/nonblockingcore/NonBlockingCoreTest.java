@@ -57,7 +57,7 @@ import functionaltests.RMTHelper;
 import functionaltests.selectionscript.SelectionScriptTimeOutTest;
 import org.junit.Assert;
 
-import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertTrue;
 
 
 /**

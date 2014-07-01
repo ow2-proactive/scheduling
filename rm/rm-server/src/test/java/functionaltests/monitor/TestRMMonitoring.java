@@ -38,7 +38,7 @@ package functionaltests.monitor;
 
 import java.util.Set;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;

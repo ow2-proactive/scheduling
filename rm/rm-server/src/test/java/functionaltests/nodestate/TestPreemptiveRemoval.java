@@ -44,7 +44,7 @@ import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.utils.NodeSet;
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import functionaltests.RMConsecutive;
 import functionaltests.RMTHelper;

@@ -3,7 +3,7 @@ package functionaltests.schedulerdb;
 import java.util.HashMap;
 import java.util.Map;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;

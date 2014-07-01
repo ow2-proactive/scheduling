@@ -52,7 +52,7 @@ import org.junit.Assert;
 import functionaltests.RMConsecutive;
 import functionaltests.RMTHelper;
 
-import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.*;
 
 

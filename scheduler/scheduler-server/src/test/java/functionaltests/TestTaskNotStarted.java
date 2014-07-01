@@ -12,7 +12,7 @@ import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scripting.SelectionScript;
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.junit.Test;
 
 

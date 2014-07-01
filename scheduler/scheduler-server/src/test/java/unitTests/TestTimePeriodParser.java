@@ -3,7 +3,7 @@ package unitTests;
 import org.junit.Test;
 import org.ow2.proactive.utils.Tools;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 
 public class TestTimePeriodParser {

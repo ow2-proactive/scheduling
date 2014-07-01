@@ -53,7 +53,7 @@ import org.ow2.proactive.utils.FileToBytesConverter;
 import org.ow2.proactive.utils.NodeSet;
 import functionaltests.RMConsecutive;
 import functionaltests.RMTHelper;
-import junit.framework.Assert;
+import org.junit.Assert;
 
 
 /**

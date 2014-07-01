@@ -178,14 +178,14 @@ public class TestHosts {
         hosts.releaseHost(thread1, host1);
         Host host3 = hosts.getHost(thread3);
 
-        junit.framework.Assert.assertEquals(host1.getHostName(), host3.getHostName());
+        org.junit.Assert.assertEquals(host1.getHostName(), host3.getHostName());
 
-        junit.framework.Assert.assertEquals(1, host1.getThreadsNumber());
-        junit.framework.Assert.assertEquals(1, host2.getThreadsNumber());
+        org.junit.Assert.assertEquals(1, host1.getThreadsNumber());
+        org.junit.Assert.assertEquals(1, host2.getThreadsNumber());
         Host tmpHost1 = hosts.getHost(new Thread());
         Host tmpHost2 = hosts.getHost(new Thread());
-        junit.framework.Assert.assertEquals(2, tmpHost1.getThreadsNumber());
-        junit.framework.Assert.assertEquals(2, tmpHost2.getThreadsNumber());
+        org.junit.Assert.assertEquals(2, tmpHost1.getThreadsNumber());
+        org.junit.Assert.assertEquals(2, tmpHost2.getThreadsNumber());
 
         hosts.initializeHostsIfChanged("host1,host2,host3");
 
@@ -197,12 +197,12 @@ public class TestHosts {
         hosts.releaseHost(thread2, host2);
         Host host4 = hosts.getHost(thread4);
 
-        junit.framework.Assert.assertEquals(host2.getHostName(), host4.getHostName());
+        org.junit.Assert.assertEquals(host2.getHostName(), host4.getHostName());
 
         hosts.releaseHost(thread4, host4);
         host2 = hosts.getHost(thread2);
 
-        junit.framework.Assert.assertEquals(host4.getHostName(), host2.getHostName());
+        org.junit.Assert.assertEquals(host4.getHostName(), host2.getHostName());
 
         System.out.println("Test passed");
     }

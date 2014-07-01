@@ -57,7 +57,7 @@ import org.junit.Ignore;
 import functionaltests.RMTHelper;
 import functionaltests.SchedulerTHelper;
 
-import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertTrue;
 
 
 /**

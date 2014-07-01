@@ -39,7 +39,7 @@ package unittests.selectionutils;
 import java.io.File;
 
 import org.ow2.proactive.scripting.helper.selection.SelectionUtils;
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.junit.Test;
 
 

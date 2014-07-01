@@ -41,7 +41,7 @@ import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.tests.FunctionalTest;
 import functionaltests.RMTHelper;
 
-import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertTrue;
 
 
 /**

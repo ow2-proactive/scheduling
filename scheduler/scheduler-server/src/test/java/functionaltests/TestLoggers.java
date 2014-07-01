@@ -42,12 +42,14 @@ import java.net.URL;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingService;
-import functionaltests.executables.Logging;
-import junit.framework.Assert;
+import org.ow2.tests.FunctionalTest;
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
-import org.ow2.tests.FunctionalTest;
+
+import functionaltests.executables.Logging;
+
+import static org.junit.Assert.*;
 
 
 /**
@@ -110,10 +112,10 @@ public class TestLoggers extends FunctionalTest {
         // listenLog is asynchronous, i.e. "eventually" semantic
         Thread.sleep(TEST_TIMEOUT);
 
-        Assert.assertTrue(test1.receivedOnlyAwaitedEvents());
-        Assert.assertEquals(2, test1.getNumberOfAppendedLogs());
-        Assert.assertTrue(test2.receivedOnlyAwaitedEvents());
-        Assert.assertEquals(2, test2.getNumberOfAppendedLogs());
+        assertTrue(test1.receivedOnlyAwaitedEvents());
+        assertEquals(2, test1.getNumberOfAppendedLogs());
+        assertTrue(test2.receivedOnlyAwaitedEvents());
+        assertEquals(2, test2.getNumberOfAppendedLogs());
         //Assert.assertTrue(test3.receivedOnlyAwaitedEvents());
         //Assert.assertEquals(2, test3.getNumberOfAppendedLogs());
 

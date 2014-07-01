@@ -51,7 +51,7 @@ import org.ow2.proactive.topology.descriptor.BestProximityDescriptor;
 import org.ow2.proactive.topology.descriptor.DistanceFunction;
 import org.ow2.tests.FunctionalTest;
 import functionaltests.RMTHelper;
-import junit.framework.Assert;
+import org.junit.Assert;
 
 
 /**

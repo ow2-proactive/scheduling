@@ -38,7 +38,7 @@ package functionaltests.nodestate;
 
 import java.io.File;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.Node;

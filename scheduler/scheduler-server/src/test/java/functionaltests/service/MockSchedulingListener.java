@@ -11,7 +11,7 @@ import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.core.SchedulerStateUpdate;
-import junit.framework.Assert;
+import org.junit.Assert;
 
 
 public class MockSchedulingListener implements SchedulerStateUpdate {

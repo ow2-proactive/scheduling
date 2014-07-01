@@ -28,7 +28,7 @@ import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.tests.FunctionalTest;
 import functionaltests.monitor.MonitorEventReceiver;
 import functionaltests.monitor.SchedulerMonitorsHandler;
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.junit.Test;
 
 

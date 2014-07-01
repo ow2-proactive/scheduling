@@ -47,7 +47,7 @@ import org.ow2.proactive.utils.FileToBytesConverter;
 import org.ow2.tests.FunctionalTest;
 import functionaltests.RMTHelper;
 import functionaltests.common.CommonTUtils;
-import junit.framework.Assert;
+import org.junit.Assert;
 
 
 public class TestNodeSourceAfterRestart extends FunctionalTest {

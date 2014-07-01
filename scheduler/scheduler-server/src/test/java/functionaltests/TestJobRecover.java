@@ -42,7 +42,7 @@ import java.net.URL;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.tests.FunctionalTest;
-import junit.framework.Assert;
+import org.junit.Assert;
 
 
 /**

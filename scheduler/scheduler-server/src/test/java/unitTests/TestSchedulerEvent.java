@@ -36,7 +36,7 @@
  */
 package unitTests;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;

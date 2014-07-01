@@ -1,6 +1,6 @@
 package functionaltests.schedulerdb;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.hamcrest.Description;
 import org.hamcrest.TypeSafeMatcher;
 import org.hibernate.cfg.Configuration;

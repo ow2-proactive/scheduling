@@ -60,7 +60,7 @@ import org.objectweb.proactive.extensions.dataspaces.vfs.selector.Selector;
 import org.objectweb.proactive.extensions.dataspaces.vfs.selector.fast.FastFileSelector;
 import org.objectweb.proactive.extensions.vfsprovider.FileSystemServerDeployer;
 import org.ow2.tests.ProActiveTest;
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.junit.Test;
 
 

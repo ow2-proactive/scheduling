@@ -42,7 +42,7 @@ import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.utils.NodeSet;
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import functionaltests.RMConsecutive;
 import functionaltests.RMTHelper;

@@ -25,7 +25,7 @@ import org.ow2.proactive.scheduler.core.jmx.SchedulerJMXHelper;
 import org.ow2.proactive.scheduler.core.jmx.mbean.RuntimeDataMBean;
 import org.ow2.tests.FunctionalTest;
 import functionaltests.SchedulerTHelper;
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.junit.Test;
 
 

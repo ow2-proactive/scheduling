@@ -29,7 +29,7 @@ import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scripting.GenerationScript;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.scripting.SimpleScript;
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.hibernate.Session;
 import org.hibernate.metadata.ClassMetadata;
 import org.junit.Test;

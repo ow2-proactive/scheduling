@@ -40,7 +40,7 @@ import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import functionaltests.RMConsecutive;
 import functionaltests.RMTHelper;
 
-import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertTrue;
 
 
 /**
