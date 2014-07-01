@@ -37,27 +37,20 @@
 
 package functionaltests.vars;
 
-import static functionaltests.SchedulerTHelper.testJobSubmissionAndVerifyAllResults;
-
 import java.io.File;
 import java.net.URL;
-import java.util.HashMap;
 
-import org.junit.Test;
 import org.objectweb.proactive.utils.OperatingSystem;
-import org.ow2.proactive.scheduler.common.job.Job;
-import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
-import org.ow2.proactive.scheduler.common.task.JavaTask;
-import org.ow2.proactive.scheduler.common.task.NativeTask;
+import org.junit.Test;
 
 import functionaltests.SchedulerConsecutive;
 import functionaltests.SchedulerTHelper;
-import functionaltests.executables.PropagateVariablesExec;
+
 
 public class Test_SCHEDULING_2034 extends SchedulerConsecutive {
 
     private static URL job_desc_unix = TestModifyPropagatedVariables.class
-            .getResource("/functionaltests/descriptors/Job_SCHEUDLING_2034_unix.xml");
+            .getResource("/functionaltests/descriptors/Job_SCHEDULING_2034_unix.xml");
 
     @Test
     public void run() throws Throwable {
