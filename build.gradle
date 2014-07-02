@@ -525,6 +525,8 @@ project('performance') {
     }
 }
 
+apply plugin: 'java'
+
 configurations {
     restCli
     distLib {
@@ -545,6 +547,9 @@ dependencies {
         exclude group: 'javassist', module: 'javassist' // to avoid duplicate (artifact named differently)
     }
     restCli project(':rest:rest-cli')
+
+    compile 'org.codehaus.groovy:groovy-all:2.1.6'
+    compile 'commons-io:commons-io:2.4'
 }
 
 task proActiveLibs(type: Sync) {
@@ -562,7 +567,6 @@ task proActiveLibs(type: Sync) {
 }
 
 // enables the installation of the artifact produced by the distribution plugin into the local maven repo
-apply plugin: 'java'
 
 defaultTasks 'proActiveLibs'
 build.dependsOn 'proActiveLibs'
@@ -578,6 +582,21 @@ clientJar.doFirst {
     }
     destinationDir = file('.')
     archiveName = 'client.jar'
+}
+
+task serverJar(type: Jar, dependsOn: proActiveLibs) {
+    from sourceSets.main.output
+}
+
+serverJar.doFirst {
+    manifest {
+        def manifestClasspath = configurations.compile.collect { 'dist/lib/' + it.getName() }.join(' ')
+        attributes('Main-Class': 'org.ow2.proactive.scheduler.util.GroovySchedulerStarter' ,
+            'Class-Path' : manifestClasspath
+        )
+    }
+    destinationDir = file('.')
+    archiveName = 'server.jar'
 }
 
 subprojects {
