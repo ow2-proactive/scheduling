@@ -39,16 +39,19 @@ package org.ow2.proactive.scheduler.util;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.rmi.AlreadyBoundException;
 import java.security.KeyException;
 import java.security.Policy;
 
 import javax.security.auth.login.LoginException;
 
+import org.apache.commons.cli.OptionBuilder;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.remoteobject.AbstractRemoteObjectFactory;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectFactory;
+import org.objectweb.proactive.extensions.pamr.PAMRConfig;
 import org.objectweb.proactive.utils.JVMPropertiesPreloader;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.RMFactory;
@@ -61,21 +64,16 @@ import org.ow2.proactive.resourcemanager.nodesource.policy.RestartDownNodesPolic
 import org.ow2.proactive.scheduler.SchedulerFactory;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
-import org.ow2.proactive.scheduler.exception.AdminSchedulerException;
 import org.ow2.proactive.utils.FileToBytesConverter;
 import org.ow2.proactive.utils.JettyStarter;
 import org.ow2.proactive.utils.Tools;
-import org.apache.commons.cli.AlreadySelectedException;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.MissingArgumentException;
-import org.apache.commons.cli.MissingOptionException;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.Parser;
-import org.apache.commons.cli.UnrecognizedOptionException;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
@@ -104,9 +102,125 @@ public class SchedulerStarter {
         configureSchedulerAndRMAndPAHomes();
         configureSecurityManager();
         configureLogging();
+        configureSchedulerPAMRProperties();
 
         args = JVMPropertiesPreloader.overrideJVMProperties(args);
 
+        Options options = getOptions();
+
+        try {
+            CommandLine commandLine = getCommandLine(args, options);
+            if (commandLine.hasOption("h")) {
+                displayHelp(options);
+            } else {
+                start(commandLine);
+            }
+        } catch (Exception e) {
+            logger.error("Error when starting the scheduler", e);
+            displayHelp(options);
+            System.exit(6);
+        }
+    }
+
+    private static CommandLine getCommandLine(String[] args, Options options) throws ParseException {
+        Parser parser = new GnuParser();
+        return parser.parse(options, args);
+    }
+
+    private static void start(CommandLine commandLine) throws Exception {
+
+        String policyFullName = getPolicyFullName(commandLine);
+        String rmUrl = getRmUrl(commandLine);
+        setCleanDatabaseProperties(commandLine);
+
+        rmUrl = connectToOrStartResourceManager(commandLine, rmUrl);
+
+        if (commandLine.hasOption("rm-only")) {
+            return;
+        }
+
+        SchedulerAuthenticationInterface sai = startScheduler(policyFullName, rmUrl);
+
+        if (!commandLine.hasOption("no-rest")) {
+            JettyStarter.runWars(rmUrl, sai.getHostURL());
+        }
+    }
+
+    private static SchedulerAuthenticationInterface startScheduler(String policyFullName, String rmUrl) throws Exception {
+        logger.info("Starting the scheduler...");
+        SchedulerAuthenticationInterface sai = SchedulerFactory.startLocal(new URI(rmUrl),
+                policyFullName);
+        logger.info("The scheduler created on " + sai.getHostURL());
+        return sai;
+    }
+
+    private static String connectToOrStartResourceManager(CommandLine commandLine, String rmUrl) throws ProActiveException, URISyntaxException, ParseException {
+        if (rmUrl != null) {
+            try {
+                logger.info("Connecting to the resource manager on " + rmUrl);
+                int rmConnectionTimeout = PASchedulerProperties.RESOURCE_MANAGER_CONNECTION_TIMEOUT
+                        .getValueAsInt();
+                SchedulerFactory.waitAndJoinRM(new URI(rmUrl), rmConnectionTimeout);
+            } catch (Exception e) {
+                logger.error("ERROR while connecting to the RM on " + rmUrl + ", no RM found !");
+                System.exit(2);
+            }
+        } else {
+            rmUrl = getLocalAdress();
+            URI uri = new URI(rmUrl);
+            //trying to connect to a started local RM
+            try {
+                SchedulerFactory.tryJoinRM(uri);
+                logger.info("Connected to the existing resource manager at " + uri);
+            } catch (Exception e) {
+                int numberLocalNodes = readIntOption(commandLine, "localNodes", DEFAULT_NODES_NUMBER);
+                int nodeTimeoutValue = readIntOption(commandLine, "timeout", DEFAULT_NODES_TIMEOUT);
+                startResourceManager(numberLocalNodes, nodeTimeoutValue);
+            }
+        }
+        return rmUrl;
+    }
+
+    private static void setCleanDatabaseProperties(CommandLine commandLine) {
+        if (commandLine.hasOption("c")) {
+            PASchedulerProperties.SCHEDULER_DB_HIBERNATE_DROPDB.updateProperty("true");
+            PAResourceManagerProperties.RM_DB_HIBERNATE_DROPDB.updateProperty("true");
+        }
+    }
+
+    private static void setCleanNodesourcesProperty(CommandLine commandLine) {
+        if (commandLine.hasOption("clean-nodesources")) {
+            PAResourceManagerProperties.RM_DB_HIBERNATE_DROPDB_NODESOURCES.updateProperty("true");
+        }
+    }
+
+    private static String getRmUrl(CommandLine commandLine) {
+        String rmUrl = null;
+
+        if (commandLine.hasOption("u")) {
+            rmUrl = commandLine.getOptionValue("u");
+            logger.info("RM URL : " + rmUrl);
+        }
+        return rmUrl;
+    }
+
+    private static String getPolicyFullName(CommandLine commandLine) {
+        String policyFullName = PASchedulerProperties.SCHEDULER_DEFAULT_POLICY.getValueAsString();
+
+        if (commandLine.hasOption("p")) {
+            policyFullName = commandLine.getOptionValue("p");
+            logger.info("Used policy : " + policyFullName);
+        }
+        return policyFullName;
+    }
+
+    private static void displayHelp(Options options) {
+        HelpFormatter hf = new HelpFormatter();
+        hf.setWidth(120);
+        hf.printHelp("scheduler-start" + Tools.shellExtension(), options, true);
+    }
+
+    private static Options getOptions() {
         Options options = new Options();
 
         Option help = new Option("h", "help", false, "to display this help");
@@ -114,7 +228,7 @@ public class SchedulerStarter {
         help.setRequired(false);
         options.addOption(help);
 
-        Option rmURL = new Option("u", "rmURL", true, "the resource manager URL (default localhost)");
+        Option rmURL = new Option("u", "rmURL", true, "the resource manager URL (default: localhost)");
         rmURL.setArgName("rmURL");
         rmURL.setRequired(false);
         options.addOption(rmURL);
@@ -123,114 +237,42 @@ public class SchedulerStarter {
             "p",
             "policy",
             true,
-            "the complete name of the scheduling policy to use (default org.ow2.proactive.scheduler.policy.DefaultPolicy)");
+            "the complete name of the scheduling policy to use (default: org.ow2.proactive.scheduler.policy.DefaultPolicy)");
         policy.setArgName("policy");
         policy.setRequired(false);
         options.addOption(policy);
 
         Option noDeploy = new Option("ln", "localNodes", true,
-            "the number of local nodes to start (can be 0), default value is " + DEFAULT_NODES_NUMBER);
+            "the number of local nodes to start (can be 0; default: " + DEFAULT_NODES_NUMBER + ")");
         noDeploy.setArgName("localNodes");
         noDeploy.setRequired(false);
         options.addOption(noDeploy);
 
         Option nodeTimeout = new Option("t", "timeout", true,
-            "Timeout used to start the nodes (only useful with local nodes, default: " +
+            "timeout used to start the nodes (only useful with local nodes; default: " +
                 DEFAULT_NODES_TIMEOUT + "ms)");
         nodeTimeout.setArgName("timeout");
         nodeTimeout.setRequired(false);
         options.addOption(nodeTimeout);
 
-        boolean displayHelp = false;
+        options.addOption(new Option("c", "clean", false, "clean scheduler and resource manager databases (default: false)"));
 
-        try {
-            //get the path of the file
+        options.addOption(OptionBuilder
+                .withLongOpt("clean-nodesources")
+                .withDescription("drop all previously created nodesources from resource manager database (default: false)")
+                .create());
 
-            String rm = null;
-            String policyFullName = PASchedulerProperties.SCHEDULER_DEFAULT_POLICY.getValueAsString();
+        options.addOption(OptionBuilder
+                .withLongOpt("rm-only")
+                .withDescription("start only resource manager (implies --no-rest; default: false)")
+                .create());
 
-            Parser parser = new GnuParser();
-            CommandLine cmd = parser.parse(options, args);
+        options.addOption(OptionBuilder
+                .withLongOpt("no-rest")
+                .withDescription("do not deploy REST server and wars from dist/war (default: false)")
+                .create());
 
-            if (cmd.hasOption("h"))
-                displayHelp = true;
-            else {
-                if (cmd.hasOption("p")) {
-                    policyFullName = cmd.getOptionValue("p");
-                    logger.info("Used policy : " + policyFullName);
-                }
-
-                if (cmd.hasOption("u")) {
-                    rm = cmd.getOptionValue("u");
-                    logger.info("RM URL : " + rm);
-                }
-
-                logger.info("Starting the scheduler...");
-
-                if (rm != null) {
-                    try {
-                        logger.info("Connecting to the resource manager on " + rm);
-                        int rmConnectionTimeout = PASchedulerProperties.RESOURCE_MANAGER_CONNECTION_TIMEOUT
-                                .getValueAsInt();
-                        SchedulerFactory.waitAndJoinRM(new URI(rm), rmConnectionTimeout);
-                    } catch (Exception e) {
-                        logger.error("ERROR while connecting to the RM on " + rm + ", no RM found !");
-                        System.exit(2);
-                    }
-                } else {
-                    rm = getLocalAdress();
-                    URI uri = new URI(rm);
-                    //trying to connect to a started local RM
-                    try {
-                        SchedulerFactory.tryJoinRM(uri);
-                        logger.info("Connected to the existing resource manager at " + uri);
-                    } catch (Exception e) {
-                        int numberLocalNodes = readIntOption(cmd, "localNodes", DEFAULT_NODES_NUMBER);
-                        int nodeTimeoutValue = readIntOption(cmd, "timeout", DEFAULT_NODES_TIMEOUT);
-                        startResourceManager(numberLocalNodes, nodeTimeoutValue);
-                    }
-                }
-
-                try {
-                    SchedulerAuthenticationInterface sai = SchedulerFactory.startLocal(new URI(rm),
-                            policyFullName);
-
-                    JettyStarter.runWars(rm, sai.getHostURL());
-                    logger.info("The scheduler created on " + sai.getHostURL());
-
-                } catch (AdminSchedulerException e) {
-                    logger.warn("", e);
-                }
-            }
-        } catch (MissingArgumentException e) {
-            logger.error("", e);
-            displayHelp = true;
-        } catch (MissingOptionException e) {
-            logger.error("", e);
-            displayHelp = true;
-        } catch (UnrecognizedOptionException e) {
-            logger.error("", e);
-            logger.error("", e);
-            displayHelp = true;
-        } catch (AlreadySelectedException e) {
-            logger.error("", e);
-            displayHelp = true;
-        } catch (ParseException e) {
-            logger.error("", e);
-            displayHelp = true;
-        } catch (Exception e) {
-            logger.error("", e);
-            System.exit(6);
-        }
-
-        if (displayHelp) {
-            logger.info("");
-            HelpFormatter hf = new HelpFormatter();
-            hf.setWidth(120);
-            hf.printHelp("scheduler-start" + Tools.shellExtension(), options, true);
-            System.exit(10);
-        }
-
+        return options;
     }
 
     private static int readIntOption(CommandLine cmd, String optionName, int defaultValue)
@@ -333,6 +375,19 @@ public class SchedulerStarter {
                 "/config/log4j/scheduler-log4j-server";
             System.setProperty(CentralPAPropertyRepository.LOG4J.getName(), defaultLog4jConfig);
             PropertyConfigurator.configure(defaultLog4jConfig);
+        }
+        final String DERBY_LOG = "derby.stream.error.file";
+        if (System.getProperty(DERBY_LOG) == null)
+            System.setProperty(DERBY_LOG,
+                    System.getProperty(PASchedulerProperties.SCHEDULER_HOME.getKey()) + "/logs/derby.log");
+    }
+
+    private static void configureSchedulerPAMRProperties() {
+        if (!PAMRConfig.PA_PAMR_AGENT_ID.isSet()) {
+            PAMRConfig.PA_PAMR_AGENT_ID.setValue(0);
+        }
+        if (!PAMRConfig.PA_PAMR_AGENT_MAGIC_COOKIE.isSet()) {
+            PAMRConfig.PA_PAMR_AGENT_MAGIC_COOKIE.setValue("scheduler");
         }
     }
 }
