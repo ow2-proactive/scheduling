@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="urn:proactive:jobdescriptor:3.2"
+	 xsi:schemaLocation="urn:proactive:jobdescriptor:3.2 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.2/schedulerjob.xsd"
+	 name="NativeTask" cancelJobOnError="true">
+	<taskFlow>
+		<task name="native">
+			<inputFiles>
+				<files includes="inputFile_native.txt" accessMode="transferFromInputSpace"/>
+			</inputFiles>
+			<nativeExecutable>
+				<staticCommand value="cp">
+					<arguments>
+						<argument value="inputFile_native.txt"/>
+						<argument value="outputFile_native.txt"/>
+					</arguments>
+				</staticCommand>
+			</nativeExecutable>
+			<outputFiles>
+				<files includes="outputFile_native.txt" accessMode="transferToOutputSpace"/>
+			</outputFiles>
+		</task>
+	</taskFlow>
+</job>

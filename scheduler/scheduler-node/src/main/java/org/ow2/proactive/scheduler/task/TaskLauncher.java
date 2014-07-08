@@ -36,10 +36,6 @@
  */
 package org.ow2.proactive.scheduler.task;
 
-import static org.ow2.proactive.scheduler.common.task.util.SerializationUtil.deserializeVariableMap;
-import static org.ow2.proactive.scheduler.common.task.util.SerializationUtil.serializeVariableMap;
-import static org.ow2.proactive.scheduler.common.util.VariablesUtil.filterAndUpdate;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -68,12 +64,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.apache.log4j.Appender;
-import org.apache.log4j.FileAppender;
-import org.apache.log4j.Logger;
-import org.apache.log4j.MDC;
-import org.apache.log4j.helpers.LogLog;
-import org.apache.log4j.spi.LoggingEvent;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
@@ -94,9 +84,9 @@ import org.objectweb.proactive.utils.NamedThreadFactory;
 import org.objectweb.proactive.utils.StackTraceUtil;
 import org.ow2.proactive.db.types.BigString;
 import org.ow2.proactive.rm.util.process.EnvironmentCookieBasedChildProcessKiller;
-import org.ow2.proactive.scheduler.common.*;
+import org.ow2.proactive.scheduler.common.SchedulerConstants;
+import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.exception.UserException;
-import org.ow2.proactive.scheduler.common.task.executable.internal.ExecutableInitializer;
 import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
 import org.ow2.proactive.scheduler.common.task.OneShotDecrypter;
 import org.ow2.proactive.scheduler.common.task.TaskId;
@@ -107,6 +97,7 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scheduler.common.task.executable.Executable;
+import org.ow2.proactive.scheduler.common.task.executable.internal.ExecutableInitializer;
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
@@ -125,6 +116,16 @@ import org.ow2.proactive.scripting.ScriptHandler;
 import org.ow2.proactive.scripting.ScriptLoader;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.utils.Formatter;
+import org.apache.log4j.Appender;
+import org.apache.log4j.FileAppender;
+import org.apache.log4j.Logger;
+import org.apache.log4j.MDC;
+import org.apache.log4j.helpers.LogLog;
+import org.apache.log4j.spi.LoggingEvent;
+
+import static org.ow2.proactive.scheduler.common.task.util.SerializationUtil.deserializeVariableMap;
+import static org.ow2.proactive.scheduler.common.task.util.SerializationUtil.serializeVariableMap;
+import static org.ow2.proactive.scheduler.common.util.VariablesUtil.filterAndUpdate;
 
 
 /**
@@ -307,7 +308,7 @@ public abstract class TaskLauncher implements InitActive {
     }
 
     public void initActivity(Body body) {
-        Node node = null;
+        Node node;
         try {
             node = PAActiveObject.getNode();
             stubOnThis = (TaskLauncher) PAActiveObject.getStubOnThis();
@@ -347,7 +348,7 @@ public abstract class TaskLauncher implements InitActive {
      * @throws NoSuchAlgorithmException if RSA is unknown
      */
     public PublicKey generatePublicKey() throws NoSuchAlgorithmException {
-        KeyPairGenerator keyGen = null;
+        KeyPairGenerator keyGen;
         keyGen = KeyPairGenerator.getInstance("RSA");
         keyGen.initialize(KEY_SIZE, new SecureRandom());
         KeyPair keyPair = keyGen.generateKeyPair();
@@ -492,8 +493,8 @@ public abstract class TaskLauncher implements InitActive {
      * @see org.ow2.proactive.scripting.PropertyUtils
      */
     protected void setPropagatedProperties(TaskResult[] incomingResults) {
-        for (int i = 0; i < incomingResults.length; i++) {
-            Map<String, String> properties = incomingResults[i].getPropagatedProperties();
+        for (TaskResult incomingResult : incomingResults) {
+            Map<String, String> properties = incomingResult.getPropagatedProperties();
             if (properties != null) {
                 logger.info("Incoming properties for task " + this.taskId + " are " + properties);
                 for (String key : properties.keySet()) {
@@ -602,7 +603,7 @@ public abstract class TaskLauncher implements InitActive {
                 MDC.getContext().put(Log4JTaskLogs.MDC_HOST, "Unknown host");
             }
             // create appender
-            Appender appender = null;
+            Appender appender;
             try {
                 appender = logSink.getAppender();
             } catch (LogForwardingException e) {
@@ -646,8 +647,7 @@ public abstract class TaskLauncher implements InitActive {
     @ImmediateService
     public TaskLogs getLogs() {
         this.flushStreams();
-        TaskLogs logs = new Log4JTaskLogs(this.logAppender.getStorage(), this.taskId.getJobId().value());
-        return logs;
+        return new Log4JTaskLogs(this.logAppender.getStorage(), this.taskId.getJobId().value());
     }
 
     /**
@@ -902,10 +902,6 @@ public abstract class TaskLauncher implements InitActive {
         }
     }
 
-    protected boolean walltimeReached() {
-        return killTaskTimer.walltimeReached();
-    }
-
     /**
      * @return the isWallTime
      */
@@ -914,75 +910,76 @@ public abstract class TaskLauncher implements InitActive {
     }
 
     protected void initDataSpaces() {
-        if (isDataspaceAware()) {
+        // configure node for application
+        long id = getDataSpacesApplicationId();
 
-            // configure node for application
-            long id = taskId.getJobId().hashCode();
+        //prepare scratch, input, output
+        try {
+            DataSpacesNodes.configureApplication(PAActiveObject.getActiveObjectNode(PAActiveObject
+                    .getStubOnThis()), id, namingService);
 
-            //prepare scratch, input, output
-            try {
-                DataSpacesNodes.configureApplication(PAActiveObject.getActiveObjectNode(PAActiveObject
-                        .getStubOnThis()), id, namingService);
+            SCRATCH = PADataSpaces.resolveScratchForAO();
+            logger.info("SCRATCH space is " + SCRATCH.getRealURI());
 
-                SCRATCH = PADataSpaces.resolveScratchForAO();
-                logger.info("SCRATCH space is " + SCRATCH.getRealURI());
+            // create a log file in local space if the node is configured
+            logger.info("logfile is enabled for task " + taskId);
+            initLocalLogsFile();
 
-                // create a log file in local space if the node is configured
-                logger.info("logfile is enabled for task " + taskId);
-                initLocalLogsFile();
-
-            } catch (Throwable t) {
-                logger.error("There was a problem while initializing dataSpaces, they are not activated", t);
-                this.logDataspacesStatus(
-                        "There was a problem while initializing dataSpaces, they are not activated",
-                        DataspacesStatusLevel.ERROR);
-                this.logDataspacesStatus(Formatter.stackTraceToString(t), DataspacesStatusLevel.ERROR);
-                return;
-            }
-
-            try {
-                INPUT = PADataSpaces.resolveDefaultInput();
-                INPUT = resolveToExisting(INPUT, "INPUT");
-                INPUT = createTaskIdFolder(INPUT, "INPUT");
-            } catch (Throwable t) {
-                logger.warn("INPUT space is disabled");
-                logger.warn("", t);
-                this.logDataspacesStatus("INPUT space is disabled", DataspacesStatusLevel.WARNING);
-                this.logDataspacesStatus(Formatter.stackTraceToString(t), DataspacesStatusLevel.WARNING);
-            }
-            try {
-                OUTPUT = PADataSpaces.resolveDefaultOutput();
-                OUTPUT = resolveToExisting(OUTPUT, "OUTPUT");
-                OUTPUT = createTaskIdFolder(OUTPUT, "OUTPUT");
-            } catch (Throwable t) {
-                logger.warn("OUTPUT space is disabled");
-                logger.warn("", t);
-                this.logDataspacesStatus("OUTPUT space is disabled", DataspacesStatusLevel.WARNING);
-                this.logDataspacesStatus(Formatter.stackTraceToString(t), DataspacesStatusLevel.WARNING);
-            }
-
-            try {
-                GLOBAL = PADataSpaces.resolveOutput(SchedulerConstants.GLOBALSPACE_NAME);
-                GLOBAL = resolveToExisting(GLOBAL, "GLOBAL");
-                GLOBAL = createTaskIdFolder(GLOBAL, "GLOBAL");
-            } catch (Throwable t) {
-                logger.warn("GLOBAL space is disabled");
-                logger.warn("", t);
-                this.logDataspacesStatus("GLOBAL space is disabled", DataspacesStatusLevel.WARNING);
-                this.logDataspacesStatus(Formatter.stackTraceToString(t), DataspacesStatusLevel.WARNING);
-            }
-            try {
-                USER = PADataSpaces.resolveOutput(SchedulerConstants.USERSPACE_NAME);
-                USER = resolveToExisting(USER, "USER");
-                USER = createTaskIdFolder(USER, "USER");
-            } catch (Throwable t) {
-                logger.warn("USER space is disabled");
-                logger.warn("", t);
-                this.logDataspacesStatus("USER space is disabled", DataspacesStatusLevel.WARNING);
-                this.logDataspacesStatus(Formatter.stackTraceToString(t), DataspacesStatusLevel.WARNING);
-            }
-            dataspaceInitialized = true;
+        } catch (Throwable t) {
+            logger.error("There was a problem while initializing dataSpaces, they are not activated", t);
+            this.logDataspacesStatus(
+                    "There was a problem while initializing dataSpaces, they are not activated",
+                    DataspacesStatusLevel.ERROR);
+            this.logDataspacesStatus(Formatter.stackTraceToString(t), DataspacesStatusLevel.ERROR);
+            return;
         }
+
+        try {
+            INPUT = PADataSpaces.resolveDefaultInput();
+            INPUT = resolveToExisting(INPUT, "INPUT");
+            INPUT = createTaskIdFolder(INPUT, "INPUT");
+        } catch (Throwable t) {
+            logger.warn("INPUT space is disabled");
+            logger.warn("", t);
+            this.logDataspacesStatus("INPUT space is disabled", DataspacesStatusLevel.WARNING);
+            this.logDataspacesStatus(Formatter.stackTraceToString(t), DataspacesStatusLevel.WARNING);
+        }
+        try {
+            OUTPUT = PADataSpaces.resolveDefaultOutput();
+            OUTPUT = resolveToExisting(OUTPUT, "OUTPUT");
+            OUTPUT = createTaskIdFolder(OUTPUT, "OUTPUT");
+        } catch (Throwable t) {
+            logger.warn("OUTPUT space is disabled");
+            logger.warn("", t);
+            this.logDataspacesStatus("OUTPUT space is disabled", DataspacesStatusLevel.WARNING);
+            this.logDataspacesStatus(Formatter.stackTraceToString(t), DataspacesStatusLevel.WARNING);
+        }
+
+        try {
+            GLOBAL = PADataSpaces.resolveOutput(SchedulerConstants.GLOBALSPACE_NAME);
+            GLOBAL = resolveToExisting(GLOBAL, "GLOBAL");
+            GLOBAL = createTaskIdFolder(GLOBAL, "GLOBAL");
+        } catch (Throwable t) {
+            logger.warn("GLOBAL space is disabled");
+            logger.warn("", t);
+            this.logDataspacesStatus("GLOBAL space is disabled", DataspacesStatusLevel.WARNING);
+            this.logDataspacesStatus(Formatter.stackTraceToString(t), DataspacesStatusLevel.WARNING);
+        }
+        try {
+            USER = PADataSpaces.resolveOutput(SchedulerConstants.USERSPACE_NAME);
+            USER = resolveToExisting(USER, "USER");
+            USER = createTaskIdFolder(USER, "USER");
+        } catch (Throwable t) {
+            logger.warn("USER space is disabled");
+            logger.warn("", t);
+            this.logDataspacesStatus("USER space is disabled", DataspacesStatusLevel.WARNING);
+            this.logDataspacesStatus(Formatter.stackTraceToString(t), DataspacesStatusLevel.WARNING);
+        }
+        dataspaceInitialized = true;
+    }
+
+    protected int getDataSpacesApplicationId() {
+        return taskId.getJobId().hashCode();
     }
 
     protected DataSpacesFileObject resolveToExisting(DataSpacesFileObject space, String spaceName) {
@@ -999,7 +996,7 @@ public abstract class TaskLauncher implements InitActive {
             return null;
         }
         if (space == null) {
-            logger.info("No existing " + spaceName + " space found with uris " + space.getAllSpaceRootURIs());
+            logger.info("No existing " + spaceName + " space found");
             logger.info(spaceName + " space is disabled");
         } else {
             logger.info(spaceName + " space is " + space.getRealURI());
@@ -1015,7 +1012,7 @@ public abstract class TaskLauncher implements InitActive {
             // Look for the TASKID pattern at the end of the dataspace URI
             if (realURI.contains(SchedulerConstants.TASKID_DIR_DEFAULT_NAME)) {
                 // resolve the taskid subfolder
-                DataSpacesFileObject tidOutput = null;
+                DataSpacesFileObject tidOutput;
                 try {
                     tidOutput = space.resolveFile(taskId.toString());
                     // create this subfolder
@@ -1035,7 +1032,7 @@ public abstract class TaskLauncher implements InitActive {
     }
 
     protected void terminateDataSpace() {
-        if (isDataspaceAware() && dataspaceInitialized) {
+        if (dataspaceInitialized) {
             try {
                 // in dataspace debug mode, scratch directory are not cleaned after task execution
                 if (!logger.isDebugEnabled()) {
@@ -1052,236 +1049,233 @@ public abstract class TaskLauncher implements InitActive {
     }
 
     protected void copyInputDataToScratch() throws FileSystemException {
-        if (isDataspaceAware()) {
-            try {
-                if (inputFiles == null) {
-                    logger.debug("Input selector is empty, no file to copy");
-                    return;
-                }
-
-                // will contain all files coming from input space
-                ArrayList<DataSpacesFileObject> inResults = new ArrayList<DataSpacesFileObject>();
-                // will contain all files coming from output space
-                ArrayList<DataSpacesFileObject> outResults = new ArrayList<DataSpacesFileObject>();
-                // will contain all files coming from global space
-                ArrayList<DataSpacesFileObject> globResults = new ArrayList<DataSpacesFileObject>();
-                // will contain all files coming from user space
-                ArrayList<DataSpacesFileObject> userResults = new ArrayList<DataSpacesFileObject>();
-
-                FileSystemException toBeThrown = null;
-                for (InputSelector is : inputFiles) {
-                    //fill fast file selector
-                    FastFileSelector fast = new FastFileSelector();
-                    fast.setIncludes(is.getInputFiles().getIncludes());
-                    fast.setExcludes(is.getInputFiles().getExcludes());
-                    fast.setCaseSensitive(is.getInputFiles().isCaseSensitive());
-                    switch (is.getMode()) {
-                        case TransferFromInputSpace:
-                            if (!checkInputSpaceConfigured(INPUT, "INPUT", is))
-                                continue;
-
-                            //search in INPUT
-                            try {
-                                int s = inResults.size();
-                                FastSelector.findFiles(INPUT, fast, true, inResults);
-                                if (s == inResults.size()) {
-                                    // we detected that there was no new file in the list
-                                    this.logDataspacesStatus("No file is transferred from INPUT space at " +
-                                        INPUT.getRealURI() + "  for selector " + is,
-                                            DataspacesStatusLevel.WARNING);
-                                    logger.warn("No file is transferred from INPUT space at " +
-                                        INPUT.getRealURI() + " for selector " + is);
-                                }
-                            } catch (FileSystemException fse) {
-
-                                toBeThrown = new FileSystemException("Could not contact INPUT space at " +
-                                    INPUT.getRealURI() + ". An error occured while resolving selector " + is);
-                                this.logDataspacesStatus("Could not contact INPUT space at " +
-                                    INPUT.getRealURI() + " for selector " + is, DataspacesStatusLevel.ERROR);
-                                this.logDataspacesStatus(Formatter.stackTraceToString(fse),
-                                        DataspacesStatusLevel.ERROR);
-                                logger.error("Could not contact INPUT space at " + INPUT.getRealURI() +
-                                    ". An error occured while resolving selector " + is, fse);
-                            } catch (NullPointerException npe) {
-                                // nothing to do
-                            }
-                            break;
-                        case TransferFromOutputSpace:
-                            if (!checkInputSpaceConfigured(OUTPUT, "OUTPUT", is))
-                                continue;
-                            //search in OUTPUT
-                            try {
-                                int s = outResults.size();
-                                FastSelector.findFiles(OUTPUT, fast, true, outResults);
-                                if (s == outResults.size()) {
-                                    // we detected that there was no new file in the list
-                                    this.logDataspacesStatus("No file is transferred from OUPUT space at " +
-                                        OUTPUT.getRealURI() + "  for selector " + is,
-                                            DataspacesStatusLevel.WARNING);
-                                    logger.warn("No file is transferred from OUPUT space at " +
-                                        OUTPUT.getRealURI() + "  for selector " + is);
-                                }
-                            } catch (FileSystemException fse) {
-                                toBeThrown = new FileSystemException("Could not contact OUTPUT space at " +
-                                    OUTPUT.getRealURI() + ". An error occured while resolving selector " + is);
-                                this.logDataspacesStatus("Could not contact OUTPUT space at " +
-                                    OUTPUT.getRealURI() + " for selector " + is, DataspacesStatusLevel.ERROR);
-                                this.logDataspacesStatus(Formatter.stackTraceToString(fse),
-                                        DataspacesStatusLevel.ERROR);
-                                logger.error("Could not contact OUTPUT space at " + OUTPUT.getRealURI() +
-                                    ". An error occured while resolving selector " + is, fse);
-                            } catch (NullPointerException npe) {
-                                // nothing to do
-                            }
-                            break;
-                        case TransferFromGlobalSpace:
-                            if (!checkInputSpaceConfigured(GLOBAL, "GLOBAL", is))
-                                continue;
-                            try {
-                                int s = globResults.size();
-                                FastSelector.findFiles(GLOBAL, fast, true, globResults);
-                                if (s == globResults.size()) {
-                                    // we detected that there was no new file in the list
-                                    this.logDataspacesStatus("No file is transferred from GLOBAL space at " +
-                                        GLOBAL.getRealURI() + "  for selector " + is,
-                                            DataspacesStatusLevel.WARNING);
-                                    logger.warn("No file is transferred from GLOBAL space at " +
-                                        GLOBAL.getRealURI() + "  for selector " + is);
-                                }
-                            } catch (FileSystemException fse) {
-                                logger.info("", fse);
-                                toBeThrown = new FileSystemException("Could not contact GLOBAL space at " +
-                                    GLOBAL.getRealURI() + ". An error occurred while resolving selector " +
-                                    is);
-                                this.logDataspacesStatus("Could not contact GLOBAL space at " +
-                                    GLOBAL.getRealURI() + ". An error occurred while resolving selector " +
-                                    is, DataspacesStatusLevel.ERROR);
-                                this.logDataspacesStatus(Formatter.stackTraceToString(fse),
-                                        DataspacesStatusLevel.ERROR);
-                                logger.error("Could not contact GLOBAL space at " + GLOBAL.getRealURI() +
-                                    ". An error occurred while resolving selector " + is, fse);
-
-                            } catch (NullPointerException npe) {
-                                // nothing to do
-                            }
-                            break;
-                        case TransferFromUserSpace:
-                            if (!checkInputSpaceConfigured(USER, "USER", is))
-                                continue;
-                            try {
-                                int s = userResults.size();
-                                FastSelector.findFiles(USER, fast, true, userResults);
-                                if (s == userResults.size()) {
-                                    // we detected that there was no new file in the list
-                                    this.logDataspacesStatus("No file is transferred from USER space at " +
-                                        USER.getRealURI() + "  for selector " + is,
-                                            DataspacesStatusLevel.WARNING);
-                                    logger.warn("No file is transferred from USER space at " +
-                                        USER.getRealURI() + "  for selector " + is);
-                                }
-                            } catch (FileSystemException fse) {
-                                logger.info("", fse);
-                                toBeThrown = new FileSystemException("Could not contact USER space at " +
-                                    USER.getRealURI() + ". An error occurred while resolving selector " + is);
-                                this.logDataspacesStatus("Could not contact USER space at " +
-                                    USER.getRealURI() + ". An error occurred while resolving selector " + is,
-                                        DataspacesStatusLevel.ERROR);
-                                this.logDataspacesStatus(Formatter.stackTraceToString(fse),
-                                        DataspacesStatusLevel.ERROR);
-                                logger.error("Could not contact USER space at " + USER.getRealURI() +
-                                    ". An error occurred while resolving selector " + is, fse);
-
-                            } catch (NullPointerException npe) {
-                                // nothing to do
-                            }
-                            break;
-                        case none:
-                            //do nothing
-                            break;
-                    }
-                }
-
-                if (toBeThrown != null) {
-                    throw toBeThrown;
-                }
-
-                String outuri = (OUTPUT == null) ? "" : OUTPUT.getVirtualURI();
-                String globuri = (GLOBAL == null) ? "" : GLOBAL.getVirtualURI();
-                String useruri = (USER == null) ? "" : USER.getVirtualURI();
-                String inuri = (INPUT == null) ? "" : INPUT.getVirtualURI();
-
-                Set<String> relPathes = new HashSet<String>();
-
-                ArrayList<DataSpacesFileObject> results = new ArrayList<DataSpacesFileObject>();
-                results.addAll(inResults);
-                results.addAll(outResults);
-                results.addAll(globResults);
-                results.addAll(userResults);
-
-                ArrayList<Future> transferFutures = new ArrayList<Future>();
-                for (DataSpacesFileObject dsfo : results) {
-                    String relativePath = "";
-                    if (inResults.contains(dsfo)) {
-                        relativePath = dsfo.getVirtualURI().replaceFirst(inuri + "/?", "");
-                    } else if (outResults.contains(dsfo)) {
-                        relativePath = dsfo.getVirtualURI().replaceFirst(outuri + "/?", "");
-                    } else if (globResults.contains(dsfo)) {
-                        relativePath = dsfo.getVirtualURI().replaceFirst(globuri + "/?", "");
-                    } else if (userResults.contains(dsfo)) {
-                        relativePath = dsfo.getVirtualURI().replaceFirst(useruri + "/?", "");
-                    } else {
-                        // should never happen
-                        throw new IllegalStateException();
-                    }
-                    logger.debug("* " + relativePath);
-                    if (!relPathes.contains(relativePath)) {
-                        logger.debug("------------ resolving " + relativePath);
-                        final String finalRelativePath = relativePath;
-                        final DataSpacesFileObject finaldsfo = dsfo;
-                        transferFutures.add(executorTransfer.submit(new Callable<Boolean>() {
-                            @Override
-                            public Boolean call() throws FileSystemException {
-                                logger.info("Copying " + finaldsfo.getRealURI() + " to " +
-                                    SCRATCH.getRealURI() + "/" + finalRelativePath);
-                                SCRATCH
-                                        .resolveFile(finalRelativePath)
-                                        .copyFrom(
-                                                finaldsfo,
-                                                org.objectweb.proactive.extensions.dataspaces.api.FileSelector.SELECT_SELF);
-                                return true;
-                            }
-                        }));
-
-                    }
-                    relPathes.add(relativePath);
-                }
-
-                StringBuilder exceptionMsg = new StringBuilder();
-                String nl = System.getProperty("line.separator");
-                for (Future f : transferFutures) {
-                    try {
-                        f.get();
-                    } catch (InterruptedException e) {
-                        logger.error("", e);
-                        exceptionMsg.append(StackTraceUtil.getStackTrace(e) + nl);
-                    } catch (ExecutionException e) {
-                        logger.error("", e);
-                        exceptionMsg.append(StackTraceUtil.getStackTrace(e) + nl);
-                    }
-                }
-                if (exceptionMsg.length() > 0) {
-                    toBeThrown = new FileSystemException(
-                        "Exception(s) occurred when transferring input files : " + nl +
-                            exceptionMsg.toString());
-                }
-
-                if (toBeThrown != null) {
-                    throw toBeThrown;
-                }
-            } finally {
-                // display dataspaces error and warns if any
-                displayDataspacesStatus();
+        try {
+            if (inputFiles == null) {
+                logger.debug("Input selector is empty, no file to copy");
+                return;
             }
+
+            // will contain all files coming from input space
+            ArrayList<DataSpacesFileObject> inResults = new ArrayList<DataSpacesFileObject>();
+            // will contain all files coming from output space
+            ArrayList<DataSpacesFileObject> outResults = new ArrayList<DataSpacesFileObject>();
+            // will contain all files coming from global space
+            ArrayList<DataSpacesFileObject> globResults = new ArrayList<DataSpacesFileObject>();
+            // will contain all files coming from user space
+            ArrayList<DataSpacesFileObject> userResults = new ArrayList<DataSpacesFileObject>();
+
+            FileSystemException toBeThrown = null;
+            for (InputSelector is : inputFiles) {
+                //fill fast file selector
+                FastFileSelector fast = new FastFileSelector();
+                fast.setIncludes(is.getInputFiles().getIncludes());
+                fast.setExcludes(is.getInputFiles().getExcludes());
+                fast.setCaseSensitive(is.getInputFiles().isCaseSensitive());
+                switch (is.getMode()) {
+                    case TransferFromInputSpace:
+                        if (!checkInputSpaceConfigured(INPUT, "INPUT", is))
+                            continue;
+
+                        //search in INPUT
+                        try {
+                            int s = inResults.size();
+                            FastSelector.findFiles(INPUT, fast, true, inResults);
+                            if (s == inResults.size()) {
+                                // we detected that there was no new file in the list
+                                this.logDataspacesStatus("No file is transferred from INPUT space at " +
+                                    INPUT.getRealURI() + "  for selector " + is,
+                                        DataspacesStatusLevel.WARNING);
+                                logger.warn("No file is transferred from INPUT space at " +
+                                    INPUT.getRealURI() + " for selector " + is);
+                            }
+                        } catch (FileSystemException fse) {
+
+                            toBeThrown = new FileSystemException("Could not contact INPUT space at " +
+                                INPUT.getRealURI() + ". An error occured while resolving selector " + is);
+                            this.logDataspacesStatus("Could not contact INPUT space at " +
+                                INPUT.getRealURI() + " for selector " + is, DataspacesStatusLevel.ERROR);
+                            this.logDataspacesStatus(Formatter.stackTraceToString(fse),
+                                    DataspacesStatusLevel.ERROR);
+                            logger.error("Could not contact INPUT space at " + INPUT.getRealURI() +
+                                ". An error occured while resolving selector " + is, fse);
+                        } catch (NullPointerException npe) {
+                            // nothing to do
+                        }
+                        break;
+                    case TransferFromOutputSpace:
+                        if (!checkInputSpaceConfigured(OUTPUT, "OUTPUT", is))
+                            continue;
+                        //search in OUTPUT
+                        try {
+                            int s = outResults.size();
+                            FastSelector.findFiles(OUTPUT, fast, true, outResults);
+                            if (s == outResults.size()) {
+                                // we detected that there was no new file in the list
+                                this.logDataspacesStatus("No file is transferred from OUPUT space at " +
+                                    OUTPUT.getRealURI() + "  for selector " + is,
+                                        DataspacesStatusLevel.WARNING);
+                                logger.warn("No file is transferred from OUPUT space at " +
+                                    OUTPUT.getRealURI() + "  for selector " + is);
+                            }
+                        } catch (FileSystemException fse) {
+                            toBeThrown = new FileSystemException("Could not contact OUTPUT space at " +
+                                OUTPUT.getRealURI() + ". An error occured while resolving selector " + is);
+                            this.logDataspacesStatus("Could not contact OUTPUT space at " +
+                                OUTPUT.getRealURI() + " for selector " + is, DataspacesStatusLevel.ERROR);
+                            this.logDataspacesStatus(Formatter.stackTraceToString(fse),
+                                    DataspacesStatusLevel.ERROR);
+                            logger.error("Could not contact OUTPUT space at " + OUTPUT.getRealURI() +
+                                ". An error occured while resolving selector " + is, fse);
+                        } catch (NullPointerException npe) {
+                            // nothing to do
+                        }
+                        break;
+                    case TransferFromGlobalSpace:
+                        if (!checkInputSpaceConfigured(GLOBAL, "GLOBAL", is))
+                            continue;
+                        try {
+                            int s = globResults.size();
+                            FastSelector.findFiles(GLOBAL, fast, true, globResults);
+                            if (s == globResults.size()) {
+                                // we detected that there was no new file in the list
+                                this.logDataspacesStatus("No file is transferred from GLOBAL space at " +
+                                    GLOBAL.getRealURI() + "  for selector " + is,
+                                        DataspacesStatusLevel.WARNING);
+                                logger.warn("No file is transferred from GLOBAL space at " +
+                                    GLOBAL.getRealURI() + "  for selector " + is);
+                            }
+                        } catch (FileSystemException fse) {
+                            logger.info("", fse);
+                            toBeThrown = new FileSystemException("Could not contact GLOBAL space at " +
+                                GLOBAL.getRealURI() + ". An error occurred while resolving selector " + is);
+                            this.logDataspacesStatus("Could not contact GLOBAL space at " +
+                                GLOBAL.getRealURI() + ". An error occurred while resolving selector " + is,
+                                    DataspacesStatusLevel.ERROR);
+                            this.logDataspacesStatus(Formatter.stackTraceToString(fse),
+                                    DataspacesStatusLevel.ERROR);
+                            logger.error("Could not contact GLOBAL space at " + GLOBAL.getRealURI() +
+                                ". An error occurred while resolving selector " + is, fse);
+
+                        } catch (NullPointerException npe) {
+                            // nothing to do
+                        }
+                        break;
+                    case TransferFromUserSpace:
+                        if (!checkInputSpaceConfigured(USER, "USER", is))
+                            continue;
+                        try {
+                            int s = userResults.size();
+                            FastSelector.findFiles(USER, fast, true, userResults);
+                            if (s == userResults.size()) {
+                                // we detected that there was no new file in the list
+                                this
+                                        .logDataspacesStatus("No file is transferred from USER space at " +
+                                            USER.getRealURI() + "  for selector " + is,
+                                                DataspacesStatusLevel.WARNING);
+                                logger.warn("No file is transferred from USER space at " + USER.getRealURI() +
+                                    "  for selector " + is);
+                            }
+                        } catch (FileSystemException fse) {
+                            logger.info("", fse);
+                            toBeThrown = new FileSystemException("Could not contact USER space at " +
+                                USER.getRealURI() + ". An error occurred while resolving selector " + is);
+                            this.logDataspacesStatus("Could not contact USER space at " + USER.getRealURI() +
+                                ". An error occurred while resolving selector " + is,
+                                    DataspacesStatusLevel.ERROR);
+                            this.logDataspacesStatus(Formatter.stackTraceToString(fse),
+                                    DataspacesStatusLevel.ERROR);
+                            logger.error("Could not contact USER space at " + USER.getRealURI() +
+                                ". An error occurred while resolving selector " + is, fse);
+
+                        } catch (NullPointerException npe) {
+                            // nothing to do
+                        }
+                        break;
+                    case none:
+                        //do nothing
+                        break;
+                }
+            }
+
+            if (toBeThrown != null) {
+                throw toBeThrown;
+            }
+
+            String outuri = (OUTPUT == null) ? "" : OUTPUT.getVirtualURI();
+            String globuri = (GLOBAL == null) ? "" : GLOBAL.getVirtualURI();
+            String useruri = (USER == null) ? "" : USER.getVirtualURI();
+            String inuri = (INPUT == null) ? "" : INPUT.getVirtualURI();
+
+            Set<String> relPathes = new HashSet<String>();
+
+            ArrayList<DataSpacesFileObject> results = new ArrayList<DataSpacesFileObject>();
+            results.addAll(inResults);
+            results.addAll(outResults);
+            results.addAll(globResults);
+            results.addAll(userResults);
+
+            ArrayList<Future> transferFutures = new ArrayList<Future>();
+            for (DataSpacesFileObject dsfo : results) {
+                String relativePath;
+                if (inResults.contains(dsfo)) {
+                    relativePath = dsfo.getVirtualURI().replaceFirst(inuri + "/?", "");
+                } else if (outResults.contains(dsfo)) {
+                    relativePath = dsfo.getVirtualURI().replaceFirst(outuri + "/?", "");
+                } else if (globResults.contains(dsfo)) {
+                    relativePath = dsfo.getVirtualURI().replaceFirst(globuri + "/?", "");
+                } else if (userResults.contains(dsfo)) {
+                    relativePath = dsfo.getVirtualURI().replaceFirst(useruri + "/?", "");
+                } else {
+                    // should never happen
+                    throw new IllegalStateException();
+                }
+                logger.debug("* " + relativePath);
+                if (!relPathes.contains(relativePath)) {
+                    logger.debug("------------ resolving " + relativePath);
+                    final String finalRelativePath = relativePath;
+                    final DataSpacesFileObject finaldsfo = dsfo;
+                    transferFutures.add(executorTransfer.submit(new Callable<Boolean>() {
+                        @Override
+                        public Boolean call() throws FileSystemException {
+                            logger.info("Copying " + finaldsfo.getRealURI() + " to " + SCRATCH.getRealURI() +
+                                "/" + finalRelativePath);
+                            SCRATCH
+                                    .resolveFile(finalRelativePath)
+                                    .copyFrom(
+                                            finaldsfo,
+                                            org.objectweb.proactive.extensions.dataspaces.api.FileSelector.SELECT_SELF);
+                            return true;
+                        }
+                    }));
+
+                }
+                relPathes.add(relativePath);
+            }
+
+            StringBuilder exceptionMsg = new StringBuilder();
+            String nl = System.getProperty("line.separator");
+            for (Future f : transferFutures) {
+                try {
+                    f.get();
+                } catch (InterruptedException e) {
+                    logger.error("", e);
+                    exceptionMsg.append(StackTraceUtil.getStackTrace(e)).append(nl);
+                } catch (ExecutionException e) {
+                    logger.error("", e);
+                    exceptionMsg.append(StackTraceUtil.getStackTrace(e)).append(nl);
+                }
+            }
+            if (exceptionMsg.length() > 0) {
+                toBeThrown = new FileSystemException(
+                    "Exception(s) occurred when transferring input files : " + nl + exceptionMsg.toString());
+            }
+
+            if (toBeThrown != null) {
+                throw toBeThrown;
+            }
+        } finally {
+            // display dataspaces error and warns if any
+            displayDataspacesStatus();
         }
     }
 
@@ -1316,144 +1310,135 @@ public abstract class TaskLauncher implements InitActive {
     }
 
     protected void copyScratchDataToOutput(List<OutputSelector> outputFiles) throws FileSystemException {
-        if (isDataspaceAware()) {
-            try {
-                if (outputFiles == null) {
-                    logger.debug("Output selector is empty, no file to copy");
-                    return;
-                }
-
-                // We check that the spaces used are properly configured, we show a message in the log output to the user if not
-                for (OutputSelector os1 : outputFiles) {
-                    switch (os1.getMode()) {
-                        case TransferToOutputSpace:
-                            checkOuputSpaceConfigured(OUTPUT, "OUTPUT", os1);
-                            break;
-                        case TransferToGlobalSpace:
-                            checkOuputSpaceConfigured(GLOBAL, "GLOBAL", os1);
-                            break;
-                        case TransferToUserSpace:
-                            checkOuputSpaceConfigured(USER, "USER", os1);
-                            break;
-                    }
-                }
-
-                // flush and close stdout/err
-                try {
-                    this.finalizeLoggers();
-                } catch (RuntimeException e) {
-                    // exception should not be thrown to the scheduler core
-                    // the result has been computed and must be returned !
-                    logger.warn("Loggers are not shutdown !", e);
-                }
-
-                ArrayList<DataSpacesFileObject> results = new ArrayList<DataSpacesFileObject>();
-                FileSystemException toBeThrown = null;
-
-                for (OutputSelector os : outputFiles) {
-                    //fill fast file selector
-                    FastFileSelector fast = new FastFileSelector();
-                    fast.setIncludes(os.getOutputFiles().getIncludes());
-                    fast.setExcludes(os.getOutputFiles().getExcludes());
-                    fast.setCaseSensitive(os.getOutputFiles().isCaseSensitive());
-                    switch (os.getMode()) {
-                        case TransferToOutputSpace:
-                            if (OUTPUT != null) {
-                                try {
-                                    int s = results.size();
-                                    handleOutput(OUTPUT, fast, results);
-                                    if (results.size() == s) {
-                                        this.logDataspacesStatus(
-                                                "No file is transferred to OUTPUT space at " +
-                                                    OUTPUT.getRealURI() + " for selector " + os,
-                                                DataspacesStatusLevel.WARNING);
-                                        logger.warn("No file is transferred to OUTPUT space at " +
-                                            OUTPUT.getRealURI() + " for selector " + os);
-                                    }
-                                } catch (FileSystemException fse) {
-                                    toBeThrown = fse;
-                                    this.logDataspacesStatus("Error while transferring to OUTPUT space at " +
-                                        OUTPUT.getRealURI() + " for selector " + os,
-                                            DataspacesStatusLevel.ERROR);
-                                    this.logDataspacesStatus(Formatter.stackTraceToString(fse),
-                                            DataspacesStatusLevel.ERROR);
-                                    logger.error("Error while transferring to OUTPUT space at " +
-                                        OUTPUT.getRealURI() + " for selector " + os, fse);
-                                }
-                            }
-                            break;
-                        case TransferToGlobalSpace:
-                            if (GLOBAL != null) {
-                                try {
-                                    int s = results.size();
-                                    handleOutput(GLOBAL, fast, results);
-                                    if (results.size() == s) {
-                                        this.logDataspacesStatus(
-                                                "No file is transferred to GLOBAL space at " +
-                                                    GLOBAL.getRealURI() + " for selector " + os,
-                                                DataspacesStatusLevel.WARNING);
-                                        logger.warn("No file is transferred to GLOBAL space at " +
-                                            GLOBAL.getRealURI() + " for selector " + os);
-                                    }
-                                } catch (FileSystemException fse) {
-                                    toBeThrown = fse;
-                                    this.logDataspacesStatus("Error while transferring to GLOBAL space at " +
-                                        GLOBAL.getRealURI() + " for selector " + os,
-                                            DataspacesStatusLevel.ERROR);
-                                    this.logDataspacesStatus(Formatter.stackTraceToString(fse),
-                                            DataspacesStatusLevel.ERROR);
-                                    logger.error("Error while transferring to GLOBAL space at " +
-                                        GLOBAL.getRealURI() + " for selector " + os, fse);
-                                }
-                            }
-                            break;
-                        case TransferToUserSpace:
-                            if (USER != null) {
-                                try {
-                                    int s = results.size();
-                                    handleOutput(USER, fast, results);
-                                    if (results.size() == s) {
-                                        this.logDataspacesStatus("No file is transferred to USER space at " +
-                                            USER.getRealURI() + " for selector " + os,
-                                                DataspacesStatusLevel.WARNING);
-                                        logger.warn("No file is transferred to USER space at " +
-                                            USER.getRealURI() + " for selector " + os);
-                                    }
-                                } catch (FileSystemException fse) {
-                                    toBeThrown = fse;
-                                    this.logDataspacesStatus("Error while transferring to USER space at " +
-                                        USER.getRealURI() + " for selector " + os,
-                                            DataspacesStatusLevel.ERROR);
-                                    this.logDataspacesStatus(Formatter.stackTraceToString(fse),
-                                            DataspacesStatusLevel.ERROR);
-                                    logger.error("Error while transferring to USER space at " +
-                                        USER.getRealURI() + " for selector " + os, fse);
-                                }
-                                break;
-                            }
-                        case none:
-                            break;
-                    }
-                    results.clear();
-                }
-
-                if (toBeThrown != null) {
-                    throw toBeThrown;
-                }
-
-            } finally {
-                // display dataspaces error and warns if any
-                displayDataspacesStatus();
+        try {
+            if (outputFiles == null) {
+                logger.debug("Output selector is empty, no file to copy");
+                return;
             }
+
+            // We check that the spaces used are properly configured, we show a message in the log output to the user if not
+            for (OutputSelector os1 : outputFiles) {
+                switch (os1.getMode()) {
+                    case TransferToOutputSpace:
+                        checkOuputSpaceConfigured(OUTPUT, "OUTPUT", os1);
+                        break;
+                    case TransferToGlobalSpace:
+                        checkOuputSpaceConfigured(GLOBAL, "GLOBAL", os1);
+                        break;
+                    case TransferToUserSpace:
+                        checkOuputSpaceConfigured(USER, "USER", os1);
+                        break;
+                }
+            }
+
+            // flush and close stdout/err
+            try {
+                this.finalizeLoggers();
+            } catch (RuntimeException e) {
+                // exception should not be thrown to the scheduler core
+                // the result has been computed and must be returned !
+                logger.warn("Loggers are not shutdown !", e);
+            }
+
+            ArrayList<DataSpacesFileObject> results = new ArrayList<DataSpacesFileObject>();
+            FileSystemException toBeThrown = null;
+
+            for (OutputSelector os : outputFiles) {
+                //fill fast file selector
+                FastFileSelector fast = new FastFileSelector();
+                fast.setIncludes(os.getOutputFiles().getIncludes());
+                fast.setExcludes(os.getOutputFiles().getExcludes());
+                fast.setCaseSensitive(os.getOutputFiles().isCaseSensitive());
+                switch (os.getMode()) {
+                    case TransferToOutputSpace:
+                        if (OUTPUT != null) {
+                            try {
+                                int s = results.size();
+                                handleOutput(OUTPUT, fast, results);
+                                if (results.size() == s) {
+                                    this.logDataspacesStatus("No file is transferred to OUTPUT space at " +
+                                        OUTPUT.getRealURI() + " for selector " + os,
+                                            DataspacesStatusLevel.WARNING);
+                                    logger.warn("No file is transferred to OUTPUT space at " +
+                                        OUTPUT.getRealURI() + " for selector " + os);
+                                }
+                            } catch (FileSystemException fse) {
+                                toBeThrown = fse;
+                                this.logDataspacesStatus("Error while transferring to OUTPUT space at " +
+                                    OUTPUT.getRealURI() + " for selector " + os, DataspacesStatusLevel.ERROR);
+                                this.logDataspacesStatus(Formatter.stackTraceToString(fse),
+                                        DataspacesStatusLevel.ERROR);
+                                logger.error("Error while transferring to OUTPUT space at " +
+                                    OUTPUT.getRealURI() + " for selector " + os, fse);
+                            }
+                        }
+                        break;
+                    case TransferToGlobalSpace:
+                        if (GLOBAL != null) {
+                            try {
+                                int s = results.size();
+                                handleOutput(GLOBAL, fast, results);
+                                if (results.size() == s) {
+                                    this.logDataspacesStatus("No file is transferred to GLOBAL space at " +
+                                        GLOBAL.getRealURI() + " for selector " + os,
+                                            DataspacesStatusLevel.WARNING);
+                                    logger.warn("No file is transferred to GLOBAL space at " +
+                                        GLOBAL.getRealURI() + " for selector " + os);
+                                }
+                            } catch (FileSystemException fse) {
+                                toBeThrown = fse;
+                                this.logDataspacesStatus("Error while transferring to GLOBAL space at " +
+                                    GLOBAL.getRealURI() + " for selector " + os, DataspacesStatusLevel.ERROR);
+                                this.logDataspacesStatus(Formatter.stackTraceToString(fse),
+                                        DataspacesStatusLevel.ERROR);
+                                logger.error("Error while transferring to GLOBAL space at " +
+                                    GLOBAL.getRealURI() + " for selector " + os, fse);
+                            }
+                        }
+                        break;
+                    case TransferToUserSpace:
+                        if (USER != null) {
+                            try {
+                                int s = results.size();
+                                handleOutput(USER, fast, results);
+                                if (results.size() == s) {
+                                    this.logDataspacesStatus("No file is transferred to USER space at " +
+                                        USER.getRealURI() + " for selector " + os,
+                                            DataspacesStatusLevel.WARNING);
+                                    logger.warn("No file is transferred to USER space at " +
+                                        USER.getRealURI() + " for selector " + os);
+                                }
+                            } catch (FileSystemException fse) {
+                                toBeThrown = fse;
+                                this.logDataspacesStatus("Error while transferring to USER space at " +
+                                    USER.getRealURI() + " for selector " + os, DataspacesStatusLevel.ERROR);
+                                this.logDataspacesStatus(Formatter.stackTraceToString(fse),
+                                        DataspacesStatusLevel.ERROR);
+                                logger.error("Error while transferring to USER space at " +
+                                    USER.getRealURI() + " for selector " + os, fse);
+                            }
+                            break;
+                        }
+                    case none:
+                        break;
+                }
+                results.clear();
+            }
+
+            if (toBeThrown != null) {
+                throw toBeThrown;
+            }
+
+        } finally {
+            // display dataspaces error and warns if any
+            displayDataspacesStatus();
         }
     }
 
     protected void copyScratchDataToOutput() throws FileSystemException {
 
         // Handling traditional output files
-        if (isDataspaceAware()) {
-            copyScratchDataToOutput(outputFiles);
-        }
+        copyScratchDataToOutput(outputFiles);
 
         // flushing and closing stdout/err even if it's not dataspace aware task
         try {
@@ -1465,17 +1450,15 @@ public abstract class TaskLauncher implements InitActive {
         }
 
         // Handling logFile separately
-        if (isDataspaceAware()) {
-            if (this.storeLogs) {
-                copyScratchDataToOutput(getTaskLogsSelectors(OutputAccessMode.TransferToOutputSpace));
-            }
+        if (this.storeLogs) {
+            copyScratchDataToOutput(getTaskLogsSelectors(OutputAccessMode.TransferToOutputSpace));
+        }
 
-            try {
-                copyScratchDataToOutput(getTaskLogsSelectors(OutputAccessMode.TransferToUserSpace));
-            } catch (FileSystemException th) {
-                // ignore the exception if cannot copy logs to user data space
-                logger.warn("Cannot copy logs of task to user data spaces", th);
-            }
+        try {
+            copyScratchDataToOutput(getTaskLogsSelectors(OutputAccessMode.TransferToUserSpace));
+        } catch (FileSystemException th) {
+            // ignore the exception if cannot copy logs to user data space
+            logger.warn("Cannot copy logs of task to user data spaces", th);
         }
     }
 
@@ -1527,10 +1510,10 @@ public abstract class TaskLauncher implements InitActive {
                 f.get();
             } catch (InterruptedException e) {
                 logger.error("", e);
-                exceptionMsg.append(StackTraceUtil.getStackTrace(e) + nl);
+                exceptionMsg.append(StackTraceUtil.getStackTrace(e)).append(nl);
             } catch (ExecutionException e) {
                 logger.error("", e);
-                exceptionMsg.append(StackTraceUtil.getStackTrace(e) + nl);
+                exceptionMsg.append(StackTraceUtil.getStackTrace(e)).append(nl);
             }
         }
         if (exceptionMsg.length() > 0) {
@@ -1539,54 +1522,48 @@ public abstract class TaskLauncher implements InitActive {
         }
     }
 
-    private boolean isDataspaceAware() {
-        return true;
-    }
-
     /**
      * Replace iteration and replication helper tags in the dataspace's input and output descriptions
      */
     protected void replaceTagsInDataspaces() {
-        if (isDataspaceAware()) {
-            if (inputFiles != null) {
-                for (InputSelector is : inputFiles) {
-                    String[] inc = is.getInputFiles().getIncludes();
-                    String[] exc = is.getInputFiles().getExcludes();
+        if (inputFiles != null) {
+            for (InputSelector is : inputFiles) {
+                String[] inc = is.getInputFiles().getIncludes();
+                String[] exc = is.getInputFiles().getExcludes();
 
-                    if (inc != null) {
-                        for (int i = 0; i < inc.length; i++) {
-                            inc[i] = replaceAllTags(inc[i]);
-                        }
+                if (inc != null) {
+                    for (int i = 0; i < inc.length; i++) {
+                        inc[i] = replaceAllTags(inc[i]);
                     }
-                    if (exc != null) {
-                        for (int i = 0; i < exc.length; i++) {
-                            exc[i] = replaceAllTags(exc[i]);
-                        }
-                    }
-
-                    is.getInputFiles().setIncludes(inc);
-                    is.getInputFiles().setExcludes(exc);
                 }
+                if (exc != null) {
+                    for (int i = 0; i < exc.length; i++) {
+                        exc[i] = replaceAllTags(exc[i]);
+                    }
+                }
+
+                is.getInputFiles().setIncludes(inc);
+                is.getInputFiles().setExcludes(exc);
             }
-            if (outputFiles != null) {
-                for (OutputSelector os : outputFiles) {
-                    String[] inc = os.getOutputFiles().getIncludes();
-                    String[] exc = os.getOutputFiles().getExcludes();
+        }
+        if (outputFiles != null) {
+            for (OutputSelector os : outputFiles) {
+                String[] inc = os.getOutputFiles().getIncludes();
+                String[] exc = os.getOutputFiles().getExcludes();
 
-                    if (inc != null) {
-                        for (int i = 0; i < inc.length; i++) {
-                            inc[i] = replaceAllTags(inc[i]);
-                        }
+                if (inc != null) {
+                    for (int i = 0; i < inc.length; i++) {
+                        inc[i] = replaceAllTags(inc[i]);
                     }
-                    if (exc != null) {
-                        for (int i = 0; i < exc.length; i++) {
-                            exc[i] = replaceAllTags(exc[i]);
-                        }
-                    }
-
-                    os.getOutputFiles().setIncludes(inc);
-                    os.getOutputFiles().setExcludes(exc);
                 }
+                if (exc != null) {
+                    for (int i = 0; i < exc.length; i++) {
+                        exc[i] = replaceAllTags(exc[i]);
+                    }
+                }
+
+                os.getOutputFiles().setIncludes(inc);
+                os.getOutputFiles().setExcludes(exc);
             }
         }
     }
@@ -1627,18 +1604,16 @@ public abstract class TaskLauncher implements InitActive {
     /**
      * Add a message to the dataspaces status buffer. This buffer is displayed at the end 
      * of the task if non empty.
-     * @param message 
-     * @param level
      */
     protected void logDataspacesStatus(String message, DataspacesStatusLevel level) {
         final String eol = System.getProperty("line.separator");
         final boolean hasEol = message.endsWith(eol);
         if (level == DataspacesStatusLevel.ERROR) {
-            this.clientLogs.append("[DATASPACES-ERROR] " + message + (hasEol ? "" : eol));
+            this.clientLogs.append("[DATASPACES-ERROR] ").append(message).append(hasEol ? "" : eol);
         } else if (level == DataspacesStatusLevel.WARNING) {
-            this.clientLogs.append("[DATASPACES-WARNING] " + message + (hasEol ? "" : eol));
+            this.clientLogs.append("[DATASPACES-WARNING] ").append(message).append(hasEol ? "" : eol);
         } else if (level == DataspacesStatusLevel.INFO) {
-            this.clientLogs.append("[DATASPACES-INFO] " + message + (hasEol ? "" : eol));
+            this.clientLogs.append("[DATASPACES-INFO] ").append(message).append(hasEol ? "" : eol);
         }
     }
 
@@ -1646,7 +1621,7 @@ public abstract class TaskLauncher implements InitActive {
      * Log level for dataspaces messages.
      */
     protected enum DataspacesStatusLevel {
-        ERROR, WARNING, INFO;
+        ERROR, WARNING, INFO
     }
 
     /**
@@ -1919,8 +1894,7 @@ public abstract class TaskLauncher implements InitActive {
         }
 
         /**
-         * return current progress of the executable
-         * @return
+         * @return current progress of the executable
          */
         public synchronized int getProgress() {
             if (state == GuardState.NOT_INITIALIZED) {

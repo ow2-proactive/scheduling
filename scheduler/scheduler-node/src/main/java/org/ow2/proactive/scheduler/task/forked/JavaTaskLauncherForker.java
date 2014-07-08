@@ -39,27 +39,30 @@ package org.ow2.proactive.scheduler.task.forked;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 
-import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.ImmediateService;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
+import org.objectweb.proactive.extensions.dataspaces.api.PADataSpaces;
+import org.objectweb.proactive.extensions.dataspaces.core.InputOutputSpaceConfiguration;
+import org.objectweb.proactive.extensions.dataspaces.core.SpaceInstanceInfo;
+import org.objectweb.proactive.extensions.dataspaces.core.SpaceType;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.exception.ForkedJavaTaskException;
 import org.ow2.proactive.scheduler.common.exception.TaskAbortedException;
 import org.ow2.proactive.scheduler.common.exception.WalltimeExceededException;
-import org.ow2.proactive.scheduler.common.task.executable.internal.JavaExecutableInitializerImpl;
 import org.ow2.proactive.scheduler.common.task.SimpleTaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
-import org.ow2.proactive.scheduler.common.task.executable.AbstractJavaExecutable;
 import org.ow2.proactive.scheduler.exception.ForkedJVMProcessException;
 import org.ow2.proactive.scheduler.exception.IllegalProgressException;
 import org.ow2.proactive.scheduler.exception.ProgressPingerException;
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.ExecutableContainerInitializer;
+import org.ow2.proactive.scheduler.task.TaskLauncherInitializer;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.java.JavaTaskLauncher;
-import org.ow2.proactive.scheduler.task.TaskLauncherInitializer;
+import org.ow2.proactive.utils.Formatter;
+import org.apache.log4j.Logger;
 
 
 /**
@@ -118,7 +121,7 @@ public class JavaTaskLauncherForker extends JavaTaskLauncher implements ForkerSt
 
             //init task
             ForkedJavaExecutableInitializer fjei = (ForkedJavaExecutableInitializer) createExecutableInitializer(executableContainer);
-            setPropagatedVariables((JavaExecutableInitializerImpl) fjei, getPropagatedVariables());
+            setPropagatedVariables(fjei, getPropagatedVariables());
             replaceIterationTags(fjei);
             fjei.setJavaTaskLauncherInitializer(initializer);
             //decrypt credentials if needed
@@ -160,9 +163,7 @@ public class JavaTaskLauncherForker extends JavaTaskLauncher implements ForkerSt
                 userResult = executableGuard.execute(results);
                 // update propagated variables map after task execution, but
                 // before post script execution
-                setPropagatedVariables(((AbstractJavaExecutable) executableGuard.use()).getVariables());
-            } catch (Throwable t) {
-                throw t;
+                setPropagatedVariables(executableGuard.use().getVariables());
             } finally {
                 //compute duration in any cases (exception or not)
                 duration = System.nanoTime() - duration;
@@ -218,6 +219,29 @@ public class JavaTaskLauncherForker extends JavaTaskLauncher implements ForkerSt
 
             taskResult.setLogs(getLogs());
             finalizeTask(taskTerminateNotification, taskResult);
+        }
+    }
+
+    @Override
+    protected void initDataSpaces() {
+        super.initDataSpaces();
+
+        try {
+            // override scratch space to share it with forked task
+            String sharedScratchSpaceName = "shared_forker_" + taskId.value();
+            InputOutputSpaceConfiguration sharedScratchSpaceConfiguration = InputOutputSpaceConfiguration
+                    .createConfiguration(SCRATCH.getRealURI(), null, null, sharedScratchSpaceName,
+                            SpaceType.OUTPUT);
+            namingService.register(new SpaceInstanceInfo(getDataSpacesApplicationId(),
+                sharedScratchSpaceConfiguration));
+
+            // use output for RW access between multiple AOs (forked and forker)
+            SCRATCH = PADataSpaces.resolveOutput(sharedScratchSpaceName);
+        } catch (Throwable t) {
+            logger.error("There was a problem while initializing shared scratch space", t);
+            this.logDataspacesStatus("There was a problem while initializing shared scratch space",
+                    DataspacesStatusLevel.ERROR);
+            this.logDataspacesStatus(Formatter.stackTraceToString(t), DataspacesStatusLevel.ERROR);
         }
     }
 

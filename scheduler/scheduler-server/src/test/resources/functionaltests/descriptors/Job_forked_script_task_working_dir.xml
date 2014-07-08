@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="urn:proactive:jobdescriptor:3.2"
+	 xsi:schemaLocation="urn:proactive:jobdescriptor:3.2 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.2/schedulerjob.xsd"
+	 name="ScriptTask" cancelJobOnError="true">
+	<taskFlow>
+		<task name="script_forked">
+			<inputFiles>
+				<files includes="inputFile_script.txt" accessMode="transferFromInputSpace"/>
+			</inputFiles>
+			<scriptExecutable>
+				<script>
+					<code language="groovy">
+						org.apache.commons.io.FileUtils.copyFile(new File("inputFile_script.txt"), new File("outputFile_script.txt"))
+					</code>
+				</script>
+			</scriptExecutable>
+			<outputFiles>
+				<files includes="outputFile_script.txt" accessMode="transferToOutputSpace"/>
+			</outputFiles>
+		</task>
+	</taskFlow>
+</job>

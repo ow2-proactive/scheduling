@@ -36,8 +36,6 @@
  */
 package org.ow2.proactive.scheduler.task.forked;
 
-import static org.ow2.proactive.scheduler.common.util.VariablesUtil.filterAndUpdate;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -52,10 +50,6 @@ import java.util.Map.Entry;
 import java.util.Random;
 import java.util.concurrent.Callable;
 
-import org.apache.log4j.Appender;
-import org.apache.log4j.AppenderSkeleton;
-import org.apache.log4j.Logger;
-import org.apache.log4j.spi.LoggingEvent;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
@@ -67,6 +61,7 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.extensions.amqp.AMQPConfig;
 import org.objectweb.proactive.extensions.amqp.federation.AMQPFederationConfig;
+import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
 import org.objectweb.proactive.extensions.pamr.PAMRConfig;
 import org.objectweb.proactive.extensions.processbuilder.OSProcessBuilder;
 import org.objectweb.proactive.extensions.processbuilder.exception.NotImplementedException;
@@ -85,11 +80,11 @@ import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.exception.ForkedJVMProcessException;
 import org.ow2.proactive.scheduler.exception.ProgressPingerException;
 import org.ow2.proactive.scheduler.exception.StartForkedProcessException;
-import org.ow2.proactive.scheduler.task.utils.Guard;
-import org.ow2.proactive.scheduler.task.utils.InternalForkEnvironment;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.task.TaskLauncherInitializer;
 import org.ow2.proactive.scheduler.task.utils.ForkerUtils;
+import org.ow2.proactive.scheduler.task.utils.Guard;
+import org.ow2.proactive.scheduler.task.utils.InternalForkEnvironment;
 import org.ow2.proactive.scheduler.task.utils.TaskResultCallback;
 import org.ow2.proactive.scheduler.util.process.ThreadReader;
 import org.ow2.proactive.scripting.Script;
@@ -98,6 +93,12 @@ import org.ow2.proactive.scripting.ScriptLoader;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.utils.FileToBytesConverter;
 import org.ow2.proactive.utils.NodeSet;
+import org.apache.log4j.Appender;
+import org.apache.log4j.AppenderSkeleton;
+import org.apache.log4j.Logger;
+import org.apache.log4j.spi.LoggingEvent;
+
+import static org.ow2.proactive.scheduler.common.util.VariablesUtil.filterAndUpdate;
 
 
 /**
@@ -205,7 +206,7 @@ public class JavaForkerExecutable extends JavaExecutable implements ForkerStarte
             while (!launcherGuard.wasKilled() && !launcherGuard.resultAvailable()) {
                 try {
                     launcherGuard.waitForResult(TIMEOUT);
-                } catch (ProActiveTimeoutException e) {
+                } catch (ProActiveTimeoutException ignored) {
                 }
             }
 
@@ -251,7 +252,7 @@ public class JavaForkerExecutable extends JavaExecutable implements ForkerStarte
             if (tserr != null) {
                 tserr.join();
             }
-        } catch (InterruptedException e) {
+        } catch (InterruptedException ignored) {
         } finally {
             tsout = null;
             tserr = null;
@@ -279,7 +280,7 @@ public class JavaForkerExecutable extends JavaExecutable implements ForkerStarte
         //update fork env with forked system env
         createInternalForkEnvironment(ospb);
         //execute environment script
-        launcherGuard.executeEnvScript(ospb);
+        launcherGuard.executeEnvScript();
         //create command and set it to process builder
         List<String> command = createJavaCommand();
         addJVMArguments(command);
@@ -332,12 +333,11 @@ public class JavaForkerExecutable extends JavaExecutable implements ForkerStarte
      * The script will be executed only if fork environment has been set and a script is set.<br/>
      * When this method returns, the fork environment is updated with new value set in the script
      *
-     * @param ospb the process builder on which to get the system environment
      * @throws Exception if the script handler cannot be created of
      * 			if an error occurred during the execution of the script
      */
     @SuppressWarnings("unchecked")
-    private void executeEnvScript(OSProcessBuilder ospb) throws Exception {
+    private void executeEnvScript() throws Exception {
         ForkEnvironment fe = this.execInitializer.getForkEnvironment();
         if (fe != null && fe.getEnvScript() != null) {
             logger.info("Executing env-script");
@@ -349,7 +349,7 @@ public class JavaForkerExecutable extends JavaExecutable implements ForkerStarte
             handler.addBinding(FORKENV_BINDING_NAME, fe);
 
             // add dataspaces binding
-            handler.addBinding(TaskLauncher.DS_SCRATCH_BINDING_NAME, this.execInitializer.getLocal());
+            handler.addBinding(TaskLauncher.DS_SCRATCH_BINDING_NAME, getForkedTaskSharedSpace());
             handler.addBinding(TaskLauncher.DS_INPUT_BINDING_NAME, this.execInitializer.getInput());
             handler.addBinding(TaskLauncher.DS_OUTPUT_BINDING_NAME, this.execInitializer.getOutput());
             handler.addBinding(TaskLauncher.DS_GLOBAL_BINDING_NAME, this.execInitializer.getGlobal());
@@ -487,11 +487,6 @@ public class JavaForkerExecutable extends JavaExecutable implements ForkerStarte
         if (forkEnvironment == null ||
             !contains(TaskLauncher.MAX_LOG_SIZE_PROPERTY, forkEnvironment.getJVMArguments())) {
             command.add("-D" + TaskLauncher.MAX_LOG_SIZE_PROPERTY + "=" + FORKED_LOG_BUFFER_SIZE);
-        }
-        //set scratchdir
-        String sd = System.getProperty(TaskLauncher.NODE_DATASPACE_SCRATCHDIR);
-        if (sd != null && !"".equals(sd)) {
-            command.add("-D" + TaskLauncher.NODE_DATASPACE_SCRATCHDIR + "=" + sd);
         }
 
         if (forkEnvironment != null && forkEnvironment.getJVMArguments().size() > 0) {
@@ -641,7 +636,7 @@ public class JavaForkerExecutable extends JavaExecutable implements ForkerStarte
                     } catch (IOException e) {
                         content = "Failed to get file content: " + e.getMessage();
                     }
-                    result.append("Temporary file '" + file.getName() + "' ").append(
+                    result.append("Temporary file '").append(file.getName()).append("' ").append(
                             "(" + file.getAbsolutePath() + "). ");
                     result.append("Content of the temporary file:\n").append(content).append('\n');
                 }
@@ -667,7 +662,7 @@ public class JavaForkerExecutable extends JavaExecutable implements ForkerStarte
      */
     private OSProcessBuilder createProcess() throws Exception {
         //check if it must be run under user and if so, apply the proper method
-        OSProcessBuilder ospb = null;
+        OSProcessBuilder ospb;
         if (isRunAsUser()) {
             ospb = ForkerUtils.getOSProcessBuilderFactory().getBuilder(
                     ForkerUtils.checkConfigAndGetUser(this.execInitializer.getDecrypter()));
@@ -696,7 +691,12 @@ public class JavaForkerExecutable extends JavaExecutable implements ForkerStarte
         ForkEnvironment forkEnvironment = execInitializer.getForkEnvironment();
         if (forkEnvironment != null && forkEnvironment.getWorkingDir() != null) {
             ospb.directory(new File(forkEnvironment.getWorkingDir()));
+        } else {
+            // default it to use the forker shared scratch space so input files are
+            // directly accessible from the working dir
+            ospb.directory(new File(getForkedTaskSharedSpace().getPath()));
         }
+        logger.debug("Running forked task with working dir: " + ospb.directory());
     }
 
     /**
@@ -850,14 +850,10 @@ public class JavaForkerExecutable extends JavaExecutable implements ForkerStarte
         ForkedJVMProcessException resultException = null;
 
         boolean resultAvailable = false;
-        Object syncResultAccess = new Object();
-
-        TaskResultCallback taskResultHandlerStub = null;
+        final Object syncResultAccess = new Object();
 
         int lastProgress = 0;
         int pingAttempt = 0;
-
-        String forkedJVMDataspace;
 
         public void doTaskAndGetResult(TaskResult... results) throws ActiveObjectCreationException,
                 NodeException {
@@ -899,16 +895,16 @@ public class JavaForkerExecutable extends JavaExecutable implements ForkerStarte
         }
 
         public synchronized void configureNode() {
-            forkedJVMDataspace = launcherGuard.use().configureNode();
+            launcherGuard.use().configureNode(getForkedTaskSharedSpace().getVirtualURI());
         }
 
-        private void executeEnvScript(final OSProcessBuilder ospb) throws Throwable {
+        private void executeEnvScript() throws Throwable {
             submitACallable(new Callable<Boolean>() {
 
                 @Override
                 public Boolean call() throws Exception {
                     try {
-                        JavaForkerExecutable.this.executeEnvScript(ospb);
+                        JavaForkerExecutable.this.executeEnvScript();
                         return true;
                     } catch (Throwable throwable) {
                         throw new ToUnwrapException(throwable);
@@ -994,5 +990,13 @@ public class JavaForkerExecutable extends JavaExecutable implements ForkerStarte
             }
         }
 
+    }
+
+    /**
+     * @return a dataspace shared between forker and forked task launchers to be able to configure the current
+     * working dir.
+     */
+    private DataSpacesFileObject getForkedTaskSharedSpace() {
+        return execInitializer.getLocal();
     }
 }

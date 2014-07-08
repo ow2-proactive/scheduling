@@ -44,14 +44,16 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.annotation.ImmediateService;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.extensions.dataspaces.api.PADataSpaces;
 import org.objectweb.proactive.extensions.dataspaces.core.BaseScratchSpaceConfiguration;
 import org.objectweb.proactive.extensions.dataspaces.core.DataSpacesNodes;
 import org.ow2.proactive.resourcemanager.nodesource.dataspace.DataSpaceNodeConfigurationAgent;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.ow2.proactive.scheduler.task.java.JavaTaskLauncher;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.task.TaskLauncherInitializer;
+import org.ow2.proactive.scheduler.task.java.JavaTaskLauncher;
+import org.ow2.proactive.utils.Formatter;
 
 
 /**
@@ -60,6 +62,8 @@ import org.ow2.proactive.scheduler.task.TaskLauncherInitializer;
  * @author The ProActive Team
  **/
 public class JavaTaskLauncherForked extends JavaTaskLauncher {
+
+    private String sharedForkerForkedDataspaceUri;
 
     /**
      * empty no arg constructor used for ProActive
@@ -83,28 +87,34 @@ public class JavaTaskLauncherForked extends JavaTaskLauncher {
      * Configure node to use dataspace !
      * MUST ONLY BE USED BY FORKED EXECUTABLE
      *
-     * @return true if configuration went right
      */
-    public String configureNode() {
-        BaseScratchSpaceConfiguration scratchConf = null;
+    public void configureNode(String sharedForkerForkedDataspaceUri) {
         try {
-            // configure node for Data Spaces
-            String scratchDir;
-            if (System.getProperty(NODE_DATASPACE_SCRATCHDIR) == null) {
-                //if scratch dir java property is not set, set to default
-                scratchDir = System.getProperty("java.io.tmpdir");
-            } else {
-                //else use the property
-                scratchDir = System.getProperty(NODE_DATASPACE_SCRATCHDIR);
-            }
-            scratchConf = new BaseScratchSpaceConfiguration((String) null, scratchDir);
+            String scratchDir = System.getProperty("java.io.tmpdir");
+            BaseScratchSpaceConfiguration scratchConf = new BaseScratchSpaceConfiguration((String) null,
+              scratchDir);
             DataSpacesNodes.configureNode(PAActiveObject.getActiveObjectNode(PAActiveObject.getStubOnThis()),
-                    scratchConf);
-            nodeConfigured = true;
+              scratchConf);
+            this.nodeConfigured = true;
+            this.sharedForkerForkedDataspaceUri = sharedForkerForkedDataspaceUri;
         } catch (Throwable t) {
             logger.error("Cannot configure dataSpace", t);
         }
-        return scratchConf.getPath();
+    }
+
+    @Override
+    protected void initDataSpaces() {
+        super.initDataSpaces();
+
+        try {
+            SCRATCH = PADataSpaces.resolveFile(sharedForkerForkedDataspaceUri);
+            logger.debug("Override forked scratch space with forker scratch space: " + SCRATCH.getRealURI());
+        } catch (Throwable t) {
+            logger.error("There was a problem while initializing scratch space", t);
+            this.logDataspacesStatus("There was a problem while initializing scratch space",
+                    DataspacesStatusLevel.ERROR);
+            this.logDataspacesStatus(Formatter.stackTraceToString(t), DataspacesStatusLevel.ERROR);
+        }
     }
 
     @ImmediateService
