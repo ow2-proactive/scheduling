@@ -153,8 +153,8 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         client.pullFile("USERSPACE", "", emptyFile.getCanonicalPath());
 
         // Check the file was pulled
-        Assert.assertTrue("Unable to pull the empty file, maybe the pull mechanism is broken ?",
-                emptyFile.exists());
+        Assert.assertTrue("Unable to pull the empty file, maybe the pull mechanism is broken ?", emptyFile
+                .exists());
 
         // Delete the local file
         Assert.assertTrue(
@@ -218,20 +218,22 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         // Check that java task returned the correct value
         TaskResult javaTaskResult = allResults.get(javaTask.getName());
         Serializable ser1 = javaTaskResult.value();
-        Assert.assertEquals(
-                "The value returned by the " + className1 + "#execute() method is incorrect, maybe " +
-                    "the SchedulerClient#submitAsJobArchive() method incorrectly packs the class into the job archive",
-                value1, (Integer) ser1);
+        Assert
+                .assertEquals(
+                        "The value returned by the " + className1 + "#execute() method is incorrect, maybe " +
+                            "the SchedulerClient#submitAsJobArchive() method incorrectly packs the class into the job archive",
+                        value1, (Integer) ser1);
 
         // Check that script task returned the correct value
         TaskResult scriptTaskResult = allResults.get(scriptTask.getName());
         Serializable ser2 = scriptTaskResult.value();
-        Assert.assertEquals(
-                "The value returned by the " +
-                    className2 +
-                    "#execute() method is incorrect, maybe " +
-                    "the SchedulerClient#submitAsJobArchive() method incorrectly packs the jar containing the class into the job archive",
-                value2, (Integer) ser2);
+        Assert
+                .assertEquals(
+                        "The value returned by the " +
+                            className2 +
+                            "#execute() method is incorrect, maybe " +
+                            "the SchedulerClient#submitAsJobArchive() method incorrectly packs the jar containing the class into the job archive",
+                        value2, (Integer) ser2);
     }
 
     /**
@@ -292,7 +294,7 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         checkForValueInResult(allResults.get(t2.getName()), value2, jarFile2);
         checkForValueInResult(allResults.get(t3.getName()), value3, jarFile3);
     }
-    
+
     @Test(timeout = MAX_WAIT_TIME * 2)
     public void testJobSubmissionEventLisntener() throws Exception {
         ISchedulerClient client = clientInstance();
@@ -322,8 +324,8 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         }
         Assert.assertFalse("The task failure reason: " + message, taskResult.hadException());
         Assert.assertEquals("The executable class in " + jarFile +
-            " is not returning the correct value, the jobclasspath is broken", value,
-                (Integer) taskResult.value());
+            " is not returning the correct value, the jobclasspath is broken", value, (Integer) taskResult
+                .value());
     }
 
     private ISchedulerClient clientInstance() throws Exception {
@@ -373,17 +375,17 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
 
     private static class SchedulerEventListenerImpl implements SchedulerEventListener {
         private Stack<JobState> jobStateStack = new Stack<JobState>();
-        
+
         @Override
         public void jobSubmittedEvent(JobState jobState) {
             System.out.println("JobSubmittedEvent()");
             synchronized (this) {
-                
-             jobStateStack.push(jobState);
-             notifyAll();
+
+                jobStateStack.push(jobState);
+                notifyAll();
             }
         }
-        
+
         public JobState getSubmittedJob() {
             System.out.println("getSubmittedJbo");
             synchronized (this) {
@@ -400,14 +402,17 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         }
 
         @Override
-        public void jobStateUpdatedEvent(NotificationData<JobInfo> arg0) {            
+        public void jobStateUpdatedEvent(NotificationData<JobInfo> arg0) {
         }
+
         @Override
         public void schedulerStateUpdatedEvent(SchedulerEvent arg0) {
         }
+
         @Override
         public void taskStateUpdatedEvent(NotificationData<TaskInfo> arg0) {
         }
+
         @Override
         public void usersUpdatedEvent(NotificationData<UserIdentification> arg0) {
         }

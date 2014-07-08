@@ -49,6 +49,7 @@ import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 
 import static org.ow2.proactive_grid_cloud_portal.cli.cmd.HelpCommand.USAGE;
 
+
 public class RmHelpCommand extends AbstractCommand implements Command {
 
     public RmHelpCommand() {
@@ -59,8 +60,8 @@ public class RmHelpCommand extends AbstractCommand implements Command {
         HelpFormatter formatter = new HelpFormatter();
         Writer writer = currentContext.getDevice().getWriter();
         PrintWriter pw = new PrintWriter(writer, true);
-        formatter.printHelp(pw, 110, USAGE, "", CommandFactory.getCommandFactory(CommandFactory.Type.RM).supportedOptions(),
-                formatter.getLeftPadding(), formatter.getDescPadding(), "", false);
+        formatter.printHelp(pw, 110, USAGE, "", CommandFactory.getCommandFactory(CommandFactory.Type.RM)
+                .supportedOptions(), formatter.getLeftPadding(), formatter.getDescPadding(), "", false);
     }
 
 }

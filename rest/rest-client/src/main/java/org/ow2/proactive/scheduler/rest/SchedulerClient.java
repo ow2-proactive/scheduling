@@ -148,7 +148,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     private String url;
     private String login;
     private String password;
-    
+
     private SchedulerEventReceiver schedulerEventReceiver;
 
     private SchedulerClient() {
@@ -652,7 +652,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
                         jarsNames.add(new File(pathElement).getName());
                     } else {
                         dirs.add(pathElement);
-                    }   
+                    }
                 }
             }
 

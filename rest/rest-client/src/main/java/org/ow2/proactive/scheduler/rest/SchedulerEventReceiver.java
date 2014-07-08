@@ -73,6 +73,7 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.dto.eventing.EventSubscript
 
 import com.google.common.collect.Lists;
 
+
 /**
  * Utility class to subscribe and receive scheduler events from REST server. It
  * utilizes Atmosphere 2.0 framework
@@ -221,27 +222,29 @@ public class SchedulerEventReceiver {
         public void on(EventNotification eventData) {
             Action action = eventData.getAction();
             switch (action) {
-            case NONE:
-                break;
-            case SCHEDULER_STATE_UPDATED:
-                eventListener
-                        .schedulerStateUpdatedEvent(SchedulerEvent.valueOf(eventData.getSchedulerEvent()));
-                break;
-            case JOB_SUBMITTED:
-                eventListener.jobSubmittedEvent(DataUtility.toJobState((JobStateData) eventData.getData()));
-                break;
-            case JOB_STATE_UPDATED:
-                eventListener.jobStateUpdatedEvent(new NotificationData<JobInfo>(SchedulerEvent
-                        .valueOf(eventData.getSchedulerEvent()), DataUtility
-                        .toJobInfo((JobInfoData) eventData.getData())));
-            case TASK_STATE_UPDATED:
-                eventListener.taskStateUpdatedEvent(new NotificationData<TaskInfo>(SchedulerEvent
-                        .valueOf(eventData.getSchedulerEvent()), DataUtility
-                        .taskInfo((TaskInfoData) eventData.getData())));
-            case USERS_UPDATED:
-                eventListener.usersUpdatedEvent((NotificationData<UserIdentification>) eventData.getData());
-            default:
-                throw new RuntimeException(String.format("Unknown action: %s", action));
+                case NONE:
+                    break;
+                case SCHEDULER_STATE_UPDATED:
+                    eventListener.schedulerStateUpdatedEvent(SchedulerEvent.valueOf(eventData
+                            .getSchedulerEvent()));
+                    break;
+                case JOB_SUBMITTED:
+                    eventListener.jobSubmittedEvent(DataUtility
+                            .toJobState((JobStateData) eventData.getData()));
+                    break;
+                case JOB_STATE_UPDATED:
+                    eventListener.jobStateUpdatedEvent(new NotificationData<JobInfo>(SchedulerEvent
+                            .valueOf(eventData.getSchedulerEvent()), DataUtility
+                            .toJobInfo((JobInfoData) eventData.getData())));
+                case TASK_STATE_UPDATED:
+                    eventListener.taskStateUpdatedEvent(new NotificationData<TaskInfo>(SchedulerEvent
+                            .valueOf(eventData.getSchedulerEvent()), DataUtility
+                            .taskInfo((TaskInfoData) eventData.getData())));
+                case USERS_UPDATED:
+                    eventListener.usersUpdatedEvent((NotificationData<UserIdentification>) eventData
+                            .getData());
+                default:
+                    throw new RuntimeException(String.format("Unknown action: %s", action));
             }
         }
     }

@@ -94,7 +94,8 @@ public class SimpleLoggerServer implements Runnable {
      * @return the created server.
      * @throws IOException
      */
-    public static SimpleLoggerServer createLoggerServer(LoggingEventProcessor eventProcessor) throws IOException {
+    public static SimpleLoggerServer createLoggerServer(LoggingEventProcessor eventProcessor)
+            throws IOException {
         SimpleLoggerServer simpleLoggerServer = new SimpleLoggerServer(eventProcessor);
         Thread simpleLoggerServerThread = new Thread(simpleLoggerServer);
         simpleLoggerServerThread.start();

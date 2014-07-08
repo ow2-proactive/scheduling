@@ -72,7 +72,8 @@ public class TaskClassServer {
             .getValueAsStringOrNull();
     private static final String tmpJarFilesDir = tmpTmpJarFilesDir != null ? tmpTmpJarFilesDir +
         (tmpTmpJarFilesDir.endsWith(File.separator) ? "" : File.separator) : System
-            .getProperty("java.io.tmpdir") + File.separator;
+            .getProperty("java.io.tmpdir") +
+        File.separator;
 
     // indicate if cache should be used
     private static final boolean useCache = PASchedulerProperties.SCHEDULER_CLASSSERVER_USECACHE

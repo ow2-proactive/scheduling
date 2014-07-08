@@ -84,11 +84,11 @@ public class SchedulerStateRestLiveLogsTest extends RestTestServer {
     @Before
     public void setUp() throws Exception {
         client = ProxyFactory.create(SchedulerRestInterface.class, "http://localhost:" + port + "/");
-        PortalConfiguration.load(new ByteArrayInputStream(
-                (PortalConfiguration.scheduler_logforwardingservice_provider + "=" + SocketBasedForwardingProvider.class.getName()).getBytes()));
+        PortalConfiguration
+                .load(new ByteArrayInputStream((PortalConfiguration.scheduler_logforwardingservice_provider +
+                    "=" + SocketBasedForwardingProvider.class.getName()).getBytes()));
         scheduler = mock(SchedulerProxyUserInterface.class);
-        sessionId = SharedSessionStoreTestUtils.createValidSession(
-                scheduler);
+        sessionId = SharedSessionStoreTestUtils.createValidSession(scheduler);
     }
 
     @Test
@@ -117,15 +117,18 @@ public class SchedulerStateRestLiveLogsTest extends RestTestServer {
         assertTrue(firstJobLogs.isEmpty());
     }
 
-    private Appender verifyListenAndGetAppender(String jobId) throws NotConnectedException, UnknownJobException, PermissionException, LogForwardingException {
-        ArgumentCaptor<AppenderProvider> appenderProviderArgumentCaptor = ArgumentCaptor.forClass(AppenderProvider.class);
+    private Appender verifyListenAndGetAppender(String jobId) throws NotConnectedException,
+            UnknownJobException, PermissionException, LogForwardingException {
+        ArgumentCaptor<AppenderProvider> appenderProviderArgumentCaptor = ArgumentCaptor
+                .forClass(AppenderProvider.class);
         verify(scheduler).listenJobLogs(eq(jobId), appenderProviderArgumentCaptor.capture());
         AppenderProvider appenderProvider = appenderProviderArgumentCaptor.getValue();
         return appenderProvider.getAppender();
     }
 
     private LoggingEvent createLoggingEvent(String firstJobId, String message) {
-        return new LoggingEvent(null, Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + firstJobId), Level.DEBUG, message, null);
+        return new LoggingEvent(null, Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + firstJobId),
+            Level.DEBUG, message, null);
     }
 
     @Test

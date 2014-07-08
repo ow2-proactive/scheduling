@@ -124,8 +124,7 @@ public class ProActiveBasedForwardingProvider implements LogForwardingProvider {
 
         public Appender getAppender() throws LogForwardingException {
             try {
-                LogCollector remoteCollector = (LogCollector) PARemoteObject
-                        .lookup(remoteCollectorURI);
+                LogCollector remoteCollector = (LogCollector) PARemoteObject.lookup(remoteCollectorURI);
                 return new ProActiveAppender(new ThrottlingProvider(FLUSH_PERIOD, 50, 10000, true),
                     remoteCollector);
             } catch (ProActiveException e) {
@@ -143,7 +142,8 @@ public class ProActiveBasedForwardingProvider implements LogForwardingProvider {
 
         final RemoteObjectExposer<LogCollector> roe;
 
-        public LogCollectorDeployer(String name, LoggingEventProcessor eventProcessor) throws ProActiveException {
+        public LogCollectorDeployer(String name, LoggingEventProcessor eventProcessor)
+                throws ProActiveException {
             this.collector = new LogCollector(eventProcessor);
             this.roe = PARemoteObject.newRemoteObject(LogCollector.class.getName(), this.collector);
             this.roe.createRemoteObject(name, false);

@@ -205,7 +205,8 @@ class LiveJobs {
         }
     }
 
-    void jobSubmitted(InternalJob job, SchedulerClassServers classServers, SchedulerSpacesSupport spacesSupport) {
+    void jobSubmitted(InternalJob job, SchedulerClassServers classServers,
+            SchedulerSpacesSupport spacesSupport) {
         job.prepareTasks();
         job.submitAction();
         dbManager.newJobSubmitted(job);

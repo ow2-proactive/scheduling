@@ -48,8 +48,7 @@ public class JobOutputAppender extends AppenderSkeleton {
 
     private JobOutput jobOutput = new JobOutput();
 
-    public JobOutputAppender()
-            throws NotConnectedException, UnknownJobException, PermissionException {
+    public JobOutputAppender() throws NotConnectedException, UnknownJobException, PermissionException {
         this.name = "Appender for job output";
 
         this.setLayout(Log4JTaskLogs.getTaskLogLayout());
@@ -71,7 +70,6 @@ public class JobOutputAppender extends AppenderSkeleton {
     public boolean requiresLayout() {
         return false;
     }
-
 
     public String fetchNewLogs() {
         return jobOutput.fetchNewLogs();

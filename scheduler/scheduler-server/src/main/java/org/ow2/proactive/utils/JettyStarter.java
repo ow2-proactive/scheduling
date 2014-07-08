@@ -83,7 +83,7 @@ public class JettyStarter {
 
             Server server = new Server(restPort);
             server.setStopAtShutdown(true);
-            
+
             HandlerList handlerList = new HandlerList();
             addWarsToHanlderList(handlerList);
             server.setHandler(handlerList);

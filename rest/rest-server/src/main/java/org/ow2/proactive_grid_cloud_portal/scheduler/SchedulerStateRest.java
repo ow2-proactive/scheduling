@@ -192,15 +192,13 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     public static final String UNKNOWN_VALUE_TYPE = "Unknown value type";
 
     private static final Logger logger = ProActiveLogger.getLogger(SchedulerStateRest.class);
-    
+
     private static final String ATM_BROADCASTER_ID = "atmosphere.broadcaster.id";
     private static final String ATM_RESOURCE_ID = "atmosphere.resource.id";
 
     private SessionStore sessionStore = SharedSessionStore.getInstance();
 
     private static FileSystemManager fsManager = null;
-    
-     
 
     static {
         try {
@@ -2369,7 +2367,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             }
         }
     }
-    
+
     /*
      * Atmosphere 2.0 framework based implementation of Scheduler Eventing mechanism for REST clients.
      * It is configured to use WebSocket as the underneath protocol between the client and the server. 
@@ -2379,13 +2377,14 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      */
     @GET
     @Path("/events")
-    public String subscribe(@Context HttpServletRequest req, @HeaderParam("sessionid") String sessionId)
-            throws NotConnectedRestException {
+    public String subscribe(@Context
+    HttpServletRequest req, @HeaderParam("sessionid")
+    String sessionId) throws NotConnectedRestException {
         checkAccess(sessionId);
         HttpSession session = checkNotNull(req.getSession(),
                 "HTTP session object is null. HTTP session support is requried for REST Scheduler eventing.");
-        AtmosphereResource atmosphereResource = checkNotNull(
-                (AtmosphereResource) req.getAttribute(AtmosphereResource.class.getName()),
+        AtmosphereResource atmosphereResource = checkNotNull((AtmosphereResource) req
+                .getAttribute(AtmosphereResource.class.getName()),
                 "No AtmosphereResource is attached with current request.");
         // use session id as the 'topic' (or 'id') of the broadcaster
         session.setAttribute(ATM_BROADCASTER_ID, sessionId);
@@ -2407,21 +2406,23 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @POST
     @Path("/events")
     @Produces("application/json")
-    public EventNotification publish(@Context HttpServletRequest req, EventSubscription subscription)
-            throws NotConnectedRestException, PermissionRestException {
+    public EventNotification publish(@Context
+    HttpServletRequest req, EventSubscription subscription) throws NotConnectedRestException,
+            PermissionRestException {
         HttpSession session = req.getSession();
         String broadcasterId = (String) session.getAttribute(ATM_BROADCASTER_ID);
         final SchedulerProxyUserInterface scheduler = checkAccess(broadcasterId);
         SchedulerEventBroadcaster eventListener = new SchedulerEventBroadcaster(broadcasterId);
         try {
             final SchedulerEventBroadcaster activedEventListener = PAActiveObject.turnActive(eventListener);
-            scheduler.addEventListener(activedEventListener, subscription.isMyEventsOnly(),
-                    EventUtil.toSchedulerEvents(subscription.getEvents()));
+            scheduler.addEventListener(activedEventListener, subscription.isMyEventsOnly(), EventUtil
+                    .toSchedulerEvents(subscription.getEvents()));
             AtmosphereResource atmResource = AtmosphereResourceFactory.getDefault().find(
                     (String) session.getAttribute(ATM_RESOURCE_ID));
             atmResource.addEventListener(new WebSocketEventListenerAdapter() {
                 @Override
-                public void onDisconnect(@SuppressWarnings("rawtypes") WebSocketEvent event) {
+                public void onDisconnect(@SuppressWarnings("rawtypes")
+                WebSocketEvent event) {
                     try {
                         scheduler.removeEventListener();
                     } catch (Exception e) {

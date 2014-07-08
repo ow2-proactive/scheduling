@@ -50,8 +50,8 @@ import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 
 import static org.ow2.proactive_grid_cloud_portal.cli.cmd.HelpCommand.USAGE;
 
-public class SchedHelpCommand extends AbstractCommand implements Command {
 
+public class SchedHelpCommand extends AbstractCommand implements Command {
 
     public SchedHelpCommand() {
     }

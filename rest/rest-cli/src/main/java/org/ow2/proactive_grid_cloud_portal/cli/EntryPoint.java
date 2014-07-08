@@ -77,7 +77,8 @@ public abstract class EntryPoint {
         try {
             commandFactory = getCommandFactory();
             console = AbstractDevice.getConsole(AbstractDevice.JLINE);
-            ((JLineDevice) console).setCommands(ObjectArrays.concat(commandFactory.supportedCommandEntries(), CommandSet.INTERACTIVE_COMMANDS, CommandSet.Entry.class));
+            ((JLineDevice) console).setCommands(ObjectArrays.concat(commandFactory.supportedCommandEntries(),
+                    CommandSet.INTERACTIVE_COMMANDS, CommandSet.Entry.class));
             currentContext.setDevice(console);
 
             Options options = commandFactory.supportedOptions();

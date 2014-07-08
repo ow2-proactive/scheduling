@@ -52,6 +52,7 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.dto.eventing.EventNotificat
 
 import com.google.common.base.Throwables;
 
+
 /**
  * Broadcasts the scheduler events which it receives to the target REST client.
  */
@@ -77,37 +78,37 @@ public class SchedulerEventBroadcaster implements SchedulerEventListener {
     @Override
     public void jobStateUpdatedEvent(NotificationData<JobInfo> notification) {
         broadcast(new EventNotification(EventNotification.Action.JOB_STATE_UPDATED,
-                eventTypeName(notification), notification.getData()));
+            eventTypeName(notification), notification.getData()));
     }
 
     @Override
     public void jobSubmittedEvent(JobState jobState) {
-        broadcast(new EventNotification(EventNotification.Action.JOB_SUBMITTED,
-                SchedulerEvent.JOB_SUBMITTED.name(), jobState));
+        broadcast(new EventNotification(EventNotification.Action.JOB_SUBMITTED, SchedulerEvent.JOB_SUBMITTED
+                .name(), jobState));
     }
 
     @Override
     public void schedulerStateUpdatedEvent(SchedulerEvent schedulerEvent) {
-        broadcast(new EventNotification(EventNotification.Action.SCHEDULER_STATE_UPDATED,
-                schedulerEvent.name(), null));
+        broadcast(new EventNotification(EventNotification.Action.SCHEDULER_STATE_UPDATED, schedulerEvent
+                .name(), null));
     }
 
     @Override
     public void taskStateUpdatedEvent(NotificationData<TaskInfo> notification) {
         broadcast(new EventNotification(EventNotification.Action.TASK_STATE_UPDATED,
-                eventTypeName(notification), notification.getData()));
+            eventTypeName(notification), notification.getData()));
     }
 
     @Override
     public void usersUpdatedEvent(NotificationData<UserIdentification> notification) {
         broadcast(new EventNotification(EventNotification.Action.USERS_UPDATED, eventTypeName(notification),
-                notification.getData()));
+            notification.getData()));
     }
 
     private void broadcast(EventNotification eventNotification) {
         try {
-            BroadcasterFactory.getDefault().lookup(broadcasterUuid)
-                    .broadcast(mapper.writeValueAsString(eventNotification));
+            BroadcasterFactory.getDefault().lookup(broadcasterUuid).broadcast(
+                    mapper.writeValueAsString(eventNotification));
         } catch (Exception e) {
             log.error("Cannot broadcast event notification.", e);
             Throwables.propagate(e);

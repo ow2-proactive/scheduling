@@ -79,7 +79,6 @@ public final class LogForwardingService {
         loggingEventProcessor.removeAllAppenders(loggerName);
     }
 
-
     /**
      * Instantiate the LogForwardingProvider specified by providerClassname value,
      * and create and start the log server.

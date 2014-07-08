@@ -6,6 +6,7 @@ import org.apache.log4j.spi.LoggingEvent;
 
 import java.util.concurrent.ConcurrentHashMap;
 
+
 public class LoggingEventProcessor {
     private ConcurrentHashMap<String, AsyncAppender> appenders = new ConcurrentHashMap<String, AsyncAppender>();
 

@@ -73,11 +73,13 @@ public class JobsOutputController {
         this.session = session;
     }
 
-    public synchronized String getNewLogs(String jobId) throws LogForwardingException, NotConnectedException, UnknownJobException, PermissionException, IOException {
+    public synchronized String getNewLogs(String jobId) throws LogForwardingException, NotConnectedException,
+            UnknownJobException, PermissionException, IOException {
         return getJobOutputAppender(jobId).fetchNewLogs();
     }
 
-    public synchronized String getAllLogs(String jobId) throws LogForwardingException, NotConnectedException, UnknownJobException, PermissionException, IOException {
+    public synchronized String getAllLogs(String jobId) throws LogForwardingException, NotConnectedException,
+            UnknownJobException, PermissionException, IOException {
         return getJobOutputAppender(jobId).fetchAllLogs();
     }
 
@@ -107,7 +109,6 @@ public class JobsOutputController {
         }
     }
 
-
     private LogForwardingService getLogForwardingService() {
         if (logForwardingService == null) {
             logForwardingService = new LogForwardingService(PortalConfiguration.getProperties().getProperty(
@@ -121,8 +122,8 @@ public class JobsOutputController {
         return logForwardingService;
     }
 
-    private JobOutputAppender getJobOutputAppender(String jobId)
-            throws UnknownJobException, LogForwardingException, NotConnectedException, PermissionException, IOException {
+    private JobOutputAppender getJobOutputAppender(String jobId) throws UnknownJobException,
+            LogForwardingException, NotConnectedException, PermissionException, IOException {
 
         JobOutputAppender jobOutputAppender = appenders.get(jobId);
         if (jobOutputAppender == null) {
@@ -140,7 +141,8 @@ public class JobsOutputController {
     }
 
     // public for tests
-    public synchronized void addJobOutputAppender(String jobId, JobOutputAppender jobOutputAppender) throws NotConnectedException, UnknownJobException, PermissionException, LogForwardingException {
+    public synchronized void addJobOutputAppender(String jobId, JobOutputAppender jobOutputAppender)
+            throws NotConnectedException, UnknownJobException, PermissionException, LogForwardingException {
         getLogForwardingService().addAppender(Log4JTaskLogs.getLoggerName(jobId), jobOutputAppender);
         if (!listeningTo.contains(jobId)) {
             session.getScheduler().listenJobLogs(jobId, getLogForwardingService().getAppenderProvider());

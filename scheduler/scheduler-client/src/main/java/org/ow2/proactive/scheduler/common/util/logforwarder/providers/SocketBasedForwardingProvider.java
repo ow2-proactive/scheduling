@@ -63,15 +63,15 @@ public class SocketBasedForwardingProvider implements LogForwardingProvider {
         try {
             this.sls = SimpleLoggerServer.createLoggerServer(eventProcessor);
             return new URI(RAW_PROTOCOL_PREFIX, "//" +
-                    ProActiveInet.getInstance().getInetAddress().getHostName() + ":" + sls.getPort(), "");
+                ProActiveInet.getInstance().getInetAddress().getHostName() + ":" + sls.getPort(), "");
         } catch (Exception e) {
             throw new LogForwardingException("Cannot create log server.", e);
         }
     }
 
     /* (non-Javadoc)
-         * @see LogForwardingProvider#destroyServer()
-         */
+     * @see LogForwardingProvider#destroyServer()
+     */
     public void terminateServer() {
         this.sls.stop();
     }

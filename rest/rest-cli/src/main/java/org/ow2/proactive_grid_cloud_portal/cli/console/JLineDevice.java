@@ -115,23 +115,24 @@ public class JLineDevice extends AbstractDevice {
     }
 
     public void setCommands(CommandSet.Entry[] entries) throws IOException {
-        AggregateCompleter aggregateCompleter = new AggregateCompleter(new SimpleCompletor(getCommandsAsArray(entries)),
-                new ClassNameCompletor(), new FileNameCompleter());
+        AggregateCompleter aggregateCompleter = new AggregateCompleter(new SimpleCompletor(
+            getCommandsAsArray(entries)), new ClassNameCompletor(), new FileNameCompleter());
 
-        ArgumentCompleter argumentCompleter = new ArgumentCompleter(createArgumentDelimiter(), aggregateCompleter);
+        ArgumentCompleter argumentCompleter = new ArgumentCompleter(createArgumentDelimiter(),
+            aggregateCompleter);
         argumentCompleter.setStrict(false);
         reader.addCompleter(argumentCompleter);
     }
 
     private ArgumentCompleter.WhitespaceArgumentDelimiter createArgumentDelimiter() {
         return new ArgumentCompleter.WhitespaceArgumentDelimiter() {
-                @Override
-                public boolean isDelimiterChar(CharSequence buffer, int pos) {
-                    return super.isDelimiterChar(buffer, pos) || buffer.charAt(pos) == '\'' ||
-                            buffer.charAt(pos) == '"' || buffer.charAt(pos) == '{' || buffer.charAt(pos) == '}' ||
-                            buffer.charAt(pos) == ',' || buffer.charAt(pos) == ';';
-                }
-            };
+            @Override
+            public boolean isDelimiterChar(CharSequence buffer, int pos) {
+                return super.isDelimiterChar(buffer, pos) || buffer.charAt(pos) == '\'' ||
+                    buffer.charAt(pos) == '"' || buffer.charAt(pos) == '{' || buffer.charAt(pos) == '}' ||
+                    buffer.charAt(pos) == ',' || buffer.charAt(pos) == ';';
+            }
+        };
     }
 
     @Override

@@ -290,7 +290,8 @@ public class TestListenJobLogs extends SchedulerConsecutive {
             for (String message : expectedMessages) {
                 expectedMessagesList.add(message);
             }
-            System.out.println("Waiting for logging events with messages: " + expectedMessagesList + " (" + name + ")");
+            System.out.println("Waiting for logging events with messages: " + expectedMessagesList + " (" +
+                name + ")");
 
             long endTime = System.currentTimeMillis() + timeout;
             while (!ListUtils.removeAll(expectedMessagesList, actualMessages).isEmpty()) {

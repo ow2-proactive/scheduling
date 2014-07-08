@@ -55,6 +55,7 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskInfoData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.eventing.EventNotification;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.eventing.EventNotification.Action;
 
+
 public class EventCodecUtil {
     private static final ObjectMapper mapper;
 
@@ -66,26 +67,26 @@ public class EventCodecUtil {
         mapper.registerModule(module);
         mapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
-    
+
     private EventCodecUtil() {
     }
 
     public static <T> T fromJsonString(String jsonString, Class<T> valueType) {
         try {
-        return mapper.readValue(jsonString, valueType);
+            return mapper.readValue(jsonString, valueType);
         } catch (Exception e) {
             throw new RuntimeException("Parser error.", e);
         }
     }
 
-    public static String toJsonString(Object value)  {
+    public static String toJsonString(Object value) {
         try {
             return mapper.writeValueAsString(value);
         } catch (Exception e) {
             throw new RuntimeException("Parser error.", e);
         }
     }
-    
+
     private static class EventNotificationDeserializer extends StdDeserializer<EventNotification> {
 
         protected EventNotificationDeserializer() {
@@ -102,20 +103,20 @@ public class EventCodecUtil {
             notification.setAction(Action.valueOf(actionString));
             JsonNode data = root.get("data");
             switch (notification.getAction()) {
-            case JOB_SUBMITTED:
-                notification.setData(mapper.readValue(data, JobStateData.class));
-                break;
-            case JOB_STATE_UPDATED:
-                notification.setData(mapper.readValue(data, JobInfoData.class));
-                break;
-            case TASK_STATE_UPDATED:
-                notification.setData(mapper.readValue(data, TaskInfoData.class));
-                break;
-            case USERS_UPDATED:
-                notification.setData(mapper.readValue(data, UserIdentification.class));
-                break;
-            default:
-                break;
+                case JOB_SUBMITTED:
+                    notification.setData(mapper.readValue(data, JobStateData.class));
+                    break;
+                case JOB_STATE_UPDATED:
+                    notification.setData(mapper.readValue(data, JobInfoData.class));
+                    break;
+                case TASK_STATE_UPDATED:
+                    notification.setData(mapper.readValue(data, TaskInfoData.class));
+                    break;
+                case USERS_UPDATED:
+                    notification.setData(mapper.readValue(data, UserIdentification.class));
+                    break;
+                default:
+                    break;
             }
             notification.setSchedulerEvent(root.get("schedulerEvent").asText());
             return notification;

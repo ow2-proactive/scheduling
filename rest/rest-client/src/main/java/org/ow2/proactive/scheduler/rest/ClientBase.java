@@ -50,7 +50,7 @@ import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 
 public abstract class ClientBase implements ISchedulerClient {
     private static final int calling_method_stack_index = 3;
-    
+
     @Override
     public SchedulerState addEventListener(SchedulerEventListener arg0, boolean arg1, boolean arg2,
             SchedulerEvent... arg3) throws NotConnectedException, PermissionException {

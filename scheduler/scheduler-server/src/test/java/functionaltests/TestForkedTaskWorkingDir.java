@@ -64,8 +64,9 @@ public class TestForkedTaskWorkingDir extends FunctionalTest {
         FileUtils.touch(new File(input, "inputFile_script.txt"));
 
         TaskFlowJob job = (TaskFlowJob) JobFactory_stax.getFactory().createJob(
-          new File(TestForkedTaskWorkingDir.class
-            .getResource("/functionaltests/descriptors/Job_forked_script_task_working_dir.xml").toURI()).getAbsolutePath());
+                new File(TestForkedTaskWorkingDir.class.getResource(
+                        "/functionaltests/descriptors/Job_forked_script_task_working_dir.xml").toURI())
+                        .getAbsolutePath());
 
         job.setInputSpace(input.toURI().toString());
         job.setOutputSpace(output.toURI().toString());
@@ -84,9 +85,9 @@ public class TestForkedTaskWorkingDir extends FunctionalTest {
             FileUtils.touch(new File(input, "inputFile_native.txt"));
 
             TaskFlowJob job = (TaskFlowJob) JobFactory_stax.getFactory().createJob(
-              new File(TestForkedTaskWorkingDir.class
-                .getResource(
-                  "/functionaltests/descriptors/Job_forked_native_task_working_dir.xml").toURI()).getAbsolutePath());
+                    new File(TestForkedTaskWorkingDir.class.getResource(
+                            "/functionaltests/descriptors/Job_forked_native_task_working_dir.xml").toURI())
+                            .getAbsolutePath());
 
             job.setInputSpace(input.toURI().toString());
             job.setOutputSpace(output.toURI().toString());

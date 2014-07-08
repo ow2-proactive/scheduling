@@ -46,7 +46,6 @@ import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.webapp.WebAppContext;
 
 
-
 /**
  * Deploy one or more Web Applications in a Jetty Web Server
  *

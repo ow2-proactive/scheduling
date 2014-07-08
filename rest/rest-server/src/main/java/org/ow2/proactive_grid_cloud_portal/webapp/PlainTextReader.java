@@ -52,6 +52,7 @@ import javax.ws.rs.ext.Provider;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.eventing.EventSubscription;
 
+
 /**
  * Constructs EventSubscription type objects from 'text\plain' type input
  * streams. The input stream should contain a JSON string which represents an

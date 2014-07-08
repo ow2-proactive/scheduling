@@ -21,7 +21,8 @@ class SubmitHandler implements Runnable {
     public void run() {
         logger.info("Submitting a new job '" + job.getName() + "'");
 
-        service.jobs.jobSubmitted(job, service.infrastructure.getTaskClassServer(), service.infrastructure.getSpacesSupport());
+        service.jobs.jobSubmitted(job, service.infrastructure.getTaskClassServer(), service.infrastructure
+                .getSpacesSupport());
     }
 
 }

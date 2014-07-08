@@ -45,6 +45,7 @@ import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.CommandFactory;
 
+
 public class HelpCommand extends AbstractCommand implements Command {
 
     public static final String USAGE = "java -jar client.jar [OPTIONS]";
@@ -57,8 +58,8 @@ public class HelpCommand extends AbstractCommand implements Command {
         HelpFormatter formatter = new HelpFormatter();
         Writer writer = currentContext.getDevice().getWriter();
         PrintWriter pw = new PrintWriter(writer, true);
-        formatter.printHelp(pw, 110, USAGE, "", CommandFactory.getCommandFactory(CommandFactory.Type.ALL).supportedOptions(),
-                formatter.getLeftPadding(), formatter.getDescPadding(), "", false);
+        formatter.printHelp(pw, 110, USAGE, "", CommandFactory.getCommandFactory(CommandFactory.Type.ALL)
+                .supportedOptions(), formatter.getLeftPadding(), formatter.getDescPadding(), "", false);
     }
 
 }

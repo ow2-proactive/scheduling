@@ -38,6 +38,7 @@ package org.ow2.proactive_grid_cloud_portal.scheduler.dto.eventing;
 
 import java.util.List;
 
+
 public class EventSubscription {
     private boolean myEventsOnly = true;
     private List<String> events;

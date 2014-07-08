@@ -40,6 +40,7 @@ import java.util.List;
 
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 
+
 public class EventUtil {
 
     private static final SchedulerEvent[] EMPTY_SCHEDULER_EVENT_ARRAY = new SchedulerEvent[0];
@@ -57,5 +58,5 @@ public class EventUtil {
         }
         return schedulerEvents;
     }
-    
+
 }

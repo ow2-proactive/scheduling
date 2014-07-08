@@ -68,8 +68,9 @@ public class NoVncSecuredTargetResolverTest {
 
     @Before
     public void loadPortalConfiguration() throws Exception {
-        PortalConfiguration.load(new ByteArrayInputStream(
-                (PortalConfiguration.scheduler_logforwardingservice_provider + "=" + SocketBasedForwardingProvider.class.getName()).getBytes()));
+        PortalConfiguration
+                .load(new ByteArrayInputStream((PortalConfiguration.scheduler_logforwardingservice_provider +
+                    "=" + SocketBasedForwardingProvider.class.getName()).getBytes()));
     }
 
     @Before

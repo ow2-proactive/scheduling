@@ -200,7 +200,7 @@ public class ExceptionMappers {
             return HttpURLConnection.HTTP_INTERNAL_ERROR;
         }
     }
-    
+
     public static class IllegalArgumentExceptionMapper extends BaseExceptionMapper<IllegalArgumentException> {
         @Override
         protected int getErrorCode() {

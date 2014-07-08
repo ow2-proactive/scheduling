@@ -152,8 +152,8 @@ public class CommandSet {
                     KillCommand.class).entry();
 
     public static final CommandSet.Entry SCHED_STATS = CommandSetEntryBuilder.newInstance().opt("sstats")
-            .longOpt("schedulerstats").description("Retrieve current scheduler statistics").jsCommand("schedulerstats()")
-            .commandClass(SchedStatsCommand.class).entry();
+            .longOpt("schedulerstats").description("Retrieve current scheduler statistics").jsCommand(
+                    "schedulerstats()").commandClass(SchedStatsCommand.class).entry();
 
     public static final CommandSet.Entry LINK_RM = CommandSetEntryBuilder.newInstance().opt("lrm").longOpt(
             "linkrm").description("Reconnect a resource manager to the scheduler").hasArgs(true).numOfArgs(1)
@@ -243,8 +243,8 @@ public class CommandSet {
             "script(script-pathname,param1=value1,...)").commandClass(EvalScriptCommand.class).entry();
 
     public static final CommandSet.Entry SCHED_HELP = CommandSetEntryBuilder.newInstance().opt("sh").longOpt(
-            "schedulerhelp").description("Prints the usage of REST command-line client for Scheduler").commandClass(
-            SchedHelpCommand.class).entry();
+            "schedulerhelp").description("Prints the usage of REST command-line client for Scheduler")
+            .commandClass(SchedHelpCommand.class).entry();
 
     public static final CommandSet.Entry NODE_ADD = CommandSetEntryBuilder.newInstance().opt("a").longOpt(
             "addnodes").description("Add the specified nodes by their URLs").hasArgs(true).argNames(
@@ -334,8 +334,8 @@ public class CommandSet {
             .commandClass(HelpCommand.class).entry();
 
     public static final CommandSet.Entry COMMON_JS_HELP = CommandSetEntryBuilder.newInstance().opt("")
-            .longOpt("").description("Interactive help").jsCommand("help()").commandClass(
-                    JsHelpCommand.class).entry();
+            .longOpt("").description("Interactive help").jsCommand("help()")
+            .commandClass(JsHelpCommand.class).entry();
 
     /**
      * CommandSet.Entry objects which are common to both Scheduler and Resource
@@ -355,10 +355,9 @@ public class CommandSet {
     /** CommandSet.Entry objects which are specific to Resource Manager CLI */
     public static final CommandSet.Entry[] RM_ONLY = new CommandSet.Entry[] { LOGIN, NODE_ADD, NODE_LIST,
             NODE_INFO, NODE_LOCK, NODE_UNLOCK, NODE_REMOVE, NS_CREATE, NS_LIST, NS_REMOVE, NS,
-            INFRASTRUCTURE, INFRASTRUCTURE_LIST, POLICY, POLICY_LIST, TOPOLOGY, FORCE, RM_STATS,
-            RM_HELP };
+            INFRASTRUCTURE, INFRASTRUCTURE_LIST, POLICY, POLICY_LIST, TOPOLOGY, FORCE, RM_STATS, RM_HELP };
 
-    public static final Entry[] INTERACTIVE_COMMANDS = { EXIT, RM_JS_HELP, SCHED_JS_HELP, COMMON_JS_HELP};
+    public static final Entry[] INTERACTIVE_COMMANDS = { EXIT, RM_JS_HELP, SCHED_JS_HELP, COMMON_JS_HELP };
 
     private CommandSet() {
     }
