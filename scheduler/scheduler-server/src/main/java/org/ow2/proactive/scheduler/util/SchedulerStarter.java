@@ -46,7 +46,6 @@ import java.security.Policy;
 
 import javax.security.auth.login.LoginException;
 
-import org.apache.commons.cli.OptionBuilder;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.remoteobject.AbstractRemoteObjectFactory;
@@ -71,6 +70,7 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
+import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.Parser;
@@ -144,17 +144,17 @@ public class SchedulerStarter {
         if (!commandLine.hasOption("no-rest")) {
             JettyStarter.runWars(rmUrl, sai.getHostURL());
         }
-    }
-
-    private static SchedulerAuthenticationInterface startScheduler(String policyFullName, String rmUrl) throws Exception {
-        logger.info("Starting the scheduler...");
-        SchedulerAuthenticationInterface sai = SchedulerFactory.startLocal(new URI(rmUrl),
-                policyFullName);
         logger.info("The scheduler created on " + sai.getHostURL());
-        return sai;
     }
 
-    private static String connectToOrStartResourceManager(CommandLine commandLine, String rmUrl) throws ProActiveException, URISyntaxException, ParseException {
+    private static SchedulerAuthenticationInterface startScheduler(String policyFullName, String rmUrl)
+            throws Exception {
+        logger.info("Starting the scheduler...");
+        return SchedulerFactory.startLocal(new URI(rmUrl), policyFullName);
+    }
+
+    private static String connectToOrStartResourceManager(CommandLine commandLine, String rmUrl)
+            throws ProActiveException, URISyntaxException, ParseException {
         if (rmUrl != null) {
             try {
                 logger.info("Connecting to the resource manager on " + rmUrl);
@@ -255,22 +255,18 @@ public class SchedulerStarter {
         nodeTimeout.setRequired(false);
         options.addOption(nodeTimeout);
 
-        options.addOption(new Option("c", "clean", false, "clean scheduler and resource manager databases (default: false)"));
+        options.addOption(new Option("c", "clean", false,
+            "clean scheduler and resource manager databases (default: false)"));
 
-        options.addOption(OptionBuilder
-                .withLongOpt("clean-nodesources")
-                .withDescription("drop all previously created nodesources from resource manager database (default: false)")
+        options.addOption(OptionBuilder.withLongOpt("clean-nodesources").withDescription(
+                "drop all previously created nodesources from resource manager database (default: false)")
                 .create());
 
-        options.addOption(OptionBuilder
-                .withLongOpt("rm-only")
-                .withDescription("start only resource manager (implies --no-rest; default: false)")
-                .create());
+        options.addOption(OptionBuilder.withLongOpt("rm-only").withDescription(
+                "start only resource manager (implies --no-rest; default: false)").create());
 
-        options.addOption(OptionBuilder
-                .withLongOpt("no-rest")
-                .withDescription("do not deploy REST server and wars from dist/war (default: false)")
-                .create());
+        options.addOption(OptionBuilder.withLongOpt("no-rest").withDescription(
+                "do not deploy REST server and wars from dist/war (default: false)").create());
 
         return options;
     }
@@ -378,8 +374,8 @@ public class SchedulerStarter {
         }
         final String DERBY_LOG = "derby.stream.error.file";
         if (System.getProperty(DERBY_LOG) == null)
-            System.setProperty(DERBY_LOG,
-                    System.getProperty(PASchedulerProperties.SCHEDULER_HOME.getKey()) + "/logs/derby.log");
+            System.setProperty(DERBY_LOG, System.getProperty(PASchedulerProperties.SCHEDULER_HOME.getKey()) +
+                "/logs/derby.log");
     }
 
     private static void configureSchedulerPAMRProperties() {

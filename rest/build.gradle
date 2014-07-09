@@ -181,17 +181,8 @@ project(':rest:rest-cli') {
     }
 
     // generate scripts from Scheduler CLI
-    mainClassName = "org.ow2.proactive_grid_cloud_portal.cli.SchedulerEntryPoint"
-    startScripts.applicationName = "scheduler-client"
-
-    // generate scripts for RM CLI too
-    task rmStartScripts(type:CreateStartScripts, dependsOn: [startScripts, jar]) {
-        mainClassName  'org.ow2.proactive_grid_cloud_portal.cli.RmEntryPoint'
-        applicationName  'rm-client'
-        outputDir startScripts.outputDir
-        classpath =  startScripts.classpath
-    }
-    applicationDistribution.from(rmStartScripts) { into 'bin' }
+    mainClassName = "org.ow2.proactive_grid_cloud_portal.cli.CommonEntryPoint"
+    startScripts.applicationName = "client"
 }
 
 project(':rest:rest-client') {

@@ -39,21 +39,24 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
 
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.HandlerList;
+import org.eclipse.jetty.server.nio.SelectChannelConnector;
+import org.eclipse.jetty.server.ssl.SslSelectChannelConnector;
+import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.webapp.WebAppContext;
-import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
-import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
 
 public class JettyStarter {
 
     private static final String FOLDER_TO_DEPLOY = "/dist/war/";
-    private static final String REST_CONFIG_PATH = "/config/rest/settings.ini";
+    private static final String REST_CONFIG_PATH = "/config/web/settings.ini";
 
     private static Logger logger = Logger.getLogger(JettyStarter.class);
 
@@ -73,26 +76,47 @@ public class JettyStarter {
         setSystemPropertyIfNotDefined("rm.url", rmUrl);
         setSystemPropertyIfNotDefined("scheduler.url", schedulerUrl);
 
-        if ("true".equals(properties.getProperty("rest.deploy"))) {
-            int restPort = Integer.parseInt(properties.getProperty("rest.port", "8080"));
+        if ("true".equals(properties.getProperty("web.deploy", "true"))) {
+            int restPort = Integer.parseInt(properties.getProperty("web.port", "8080"));
+            boolean httpsEnabled = Boolean.parseBoolean(properties.getProperty("web.https", "false"));
+            String httpProtocol = httpsEnabled ? "https" : "http";
 
             // for web portals
-            setSystemPropertyIfNotDefined("rest.url", "http://localhost:" + restPort + "/rest");
-            setSystemPropertyIfNotDefined("sched.rest.url", "http://localhost:" + restPort + "/rest/rest");
-            setSystemPropertyIfNotDefined("rm.rest.url", "http://localhost:" + restPort + "/rest/rest");
+            String defaultRestUrl = httpProtocol + "://localhost:" + restPort + "/rest";
+            setSystemPropertyIfNotDefined("rest.url", defaultRestUrl);
+            setSystemPropertyIfNotDefined("sched.rest.url", defaultRestUrl + "/rest");
+            setSystemPropertyIfNotDefined("rm.rest.url", defaultRestUrl + "/rest");
 
-            Server server = new Server(restPort);
+            Server server = createHttpServer(properties, restPort, httpsEnabled);
             server.setStopAtShutdown(true);
 
             HandlerList handlerList = new HandlerList();
-            addWarsToHanlderList(handlerList);
+            addWarsToHandlerList(handlerList);
             server.setHandler(handlerList);
 
-            startServer(server, restPort);
+            startServer(server, restPort, httpProtocol);
         }
     }
 
-    private static void startServer(Server server, int restPort) {
+    private static Server createHttpServer(Properties properties, int restPort, boolean httpsEnabled) {
+        Server server = new Server();
+        if (httpsEnabled) {
+            SslContextFactory httpsConfiguration = new SslContextFactory();
+            httpsConfiguration.setKeyStorePath(absolutePathOrRelativeToSchedulerHome(properties
+              .getProperty("web.https.keystore")));
+            httpsConfiguration.setKeyStorePassword(properties.getProperty("web.https.keystore.password"));
+            SslSelectChannelConnector ssl = new SslSelectChannelConnector(httpsConfiguration);
+            ssl.setPort(restPort);
+            server.addConnector(ssl);
+        } else {
+            SelectChannelConnector http = new SelectChannelConnector();
+            http.setPort(restPort);
+            server.addConnector(http);
+        }
+        return server;
+    }
+
+    private static void startServer(Server server, int restPort, String httpProtocol) {
         try {
             if (server.getHandler() == null) {
                 logger.info("SCHEDULER_HOME/dist/war folder is empty, nothing is deployed");
@@ -105,7 +129,8 @@ public class JettyStarter {
                         Throwable startException = webAppContext.getUnavailableException();
                         if (startException == null) {
                             logger.info("The web application " + webAppContext.getContextPath() +
-                                " created on http://localhost:" + restPort + webAppContext.getContextPath());
+                                " created on " + httpProtocol + "://localhost:" + restPort +
+                                webAppContext.getContextPath());
                         } else {
                             logger.warn("Failed to start context " + webAppContext.getContextPath(),
                                     startException);
@@ -120,7 +145,7 @@ public class JettyStarter {
         }
     }
 
-    private static void addWarsToHanlderList(HandlerList handlerList) {
+    private static void addWarsToHandlerList(HandlerList handlerList) {
         File warFolder = new File(getSchedulerHome() + FOLDER_TO_DEPLOY);
         File[] warFolderContent = warFolder.listFiles();
         if (warFolderContent != null) {
@@ -204,6 +229,14 @@ public class JettyStarter {
     private static void setSystemPropertyIfNotDefined(String key, String value) {
         if (System.getProperty(key) == null) {
             System.setProperty(key, value);
+        }
+    }
+
+    private static String absolutePathOrRelativeToSchedulerHome(String path) {
+        if (new File(path).isAbsolute()) {
+            return path;
+        } else {
+            return new File(getSchedulerHome(), path).getPath();
         }
     }
 }

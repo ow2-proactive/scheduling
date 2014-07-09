@@ -65,10 +65,10 @@ public class MyResteasyBootstrap extends ResteasyBootstrap {
         restRuntime = new RestRuntime();
 
         restRuntime.start(dispatcher, findConfigurationFile(event.getServletContext(), File.separator +
-            "config" + File.separator + "rest" + File.separator + "settings.ini"), findConfigurationFile(
-                event.getServletContext(), "log4j.properties"), findConfigurationFile(event
-                .getServletContext(), File.separator + "config" + File.separator + "proactive" +
-            File.separator + "ProActiveConfiguration.xml"));
+            "config" + File.separator + "web" + File.separator + "settings.ini"), findConfigurationFile(event
+                .getServletContext(), "log4j.properties"), findConfigurationFile(event.getServletContext(),
+                File.separator + "config" + File.separator + "proactive" + File.separator +
+                    "ProActiveConfiguration.xml"));
     }
 
     private File findConfigurationFile(ServletContext servletContext, String configurationFileName) {

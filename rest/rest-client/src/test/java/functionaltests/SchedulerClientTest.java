@@ -36,37 +36,20 @@
  */
 package functionaltests;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.ow2.proactive.scheduler.common.job.Job;
-import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.rest.ISchedulerClient;
-import org.ow2.proactive.scheduler.rest.SchedulerClient;
-
-import static functionaltests.RestFuncTHelper.getRestServerUrl;
-
 import java.io.File;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import javassist.ClassPool;
-import javassist.CtClass;
-import javassist.CtMethod;
-import javassist.CtNewMethod;
-
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.rules.TemporaryFolder;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
+import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobEnvironment;
+import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
@@ -79,9 +62,21 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.Executable;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.common.util.JarUtils;
+import org.ow2.proactive.scheduler.rest.ISchedulerClient;
+import org.ow2.proactive.scheduler.rest.SchedulerClient;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
-import org.python.modules.synchronize;
+import javassist.ClassPool;
+import javassist.CtClass;
+import javassist.CtMethod;
+import javassist.CtNewMethod;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+
+import static functionaltests.RestFuncTHelper.getRestServerUrl;
 
 
 public class SchedulerClientTest extends AbstractRestFuncTestCase {
@@ -222,7 +217,7 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
                 .assertEquals(
                         "The value returned by the " + className1 + "#execute() method is incorrect, maybe " +
                             "the SchedulerClient#submitAsJobArchive() method incorrectly packs the class into the job archive",
-                        value1, (Integer) ser1);
+                        value1, ser1);
 
         // Check that script task returned the correct value
         TaskResult scriptTaskResult = allResults.get(scriptTask.getName());
@@ -233,7 +228,7 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
                             className2 +
                             "#execute() method is incorrect, maybe " +
                             "the SchedulerClient#submitAsJobArchive() method incorrectly packs the jar containing the class into the job archive",
-                        value2, (Integer) ser2);
+                        value2, ser2);
     }
 
     /**
@@ -324,8 +319,7 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         }
         Assert.assertFalse("The task failure reason: " + message, taskResult.hadException());
         Assert.assertEquals("The executable class in " + jarFile +
-            " is not returning the correct value, the jobclasspath is broken", value, (Integer) taskResult
-                .value());
+            " is not returning the correct value, the jobclasspath is broken", value, taskResult.value());
     }
 
     private ISchedulerClient clientInstance() throws Exception {

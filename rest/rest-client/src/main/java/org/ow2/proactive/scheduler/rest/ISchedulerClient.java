@@ -71,6 +71,21 @@ public interface ISchedulerClient extends Scheduler {
     public void init(String url, String login, String password) throws Exception;
 
     /**
+     * Initialize this instance.
+     * HTTPS certificate checking is disabled.
+     *
+     * @param url
+     *            the REST server URL
+     * @param login
+     *            the login
+     * @param password
+     *            the password
+     * @throws Exception
+     *             if an error occurs during the initialization
+     */
+    public void initInsecure(String url, String login, String password) throws Exception;
+
+    /**
      * Sets the session identifier explicitly.
      * 
      * @param sid session identifier
