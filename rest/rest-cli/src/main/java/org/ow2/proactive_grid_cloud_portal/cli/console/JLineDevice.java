@@ -149,7 +149,7 @@ public class JLineDevice extends AbstractDevice {
 
     @Override
     public void writeLine(String format, Object... args) throws IOException {
-        reader.println(String.format(format, args));
+        writer.println(String.format(format, args));
     }
 
     @Override
