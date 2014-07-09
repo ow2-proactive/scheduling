@@ -65,9 +65,13 @@ public class CreateNodeSourceCommand extends AbstractCommand implements Command 
     public void execute(ApplicationContext currentContext) throws CLIException {
         String infrastructure = currentContext.getProperty(SET_INFRASTRUCTURE, String.class);
         String policy = currentContext.getProperty(SET_POLICY, String.class);
-        if (infrastructure == null || policy == null) {
+        if (infrastructure == null) {
             throw new CLIException(REASON_INVALID_ARGUMENTS,
-                "No value is specified for one of infrastructure or policy parameters");
+                "No value is specified for one of infrastructure parameters");
+        }
+        if (policy == null) {
+            throw new CLIException(REASON_INVALID_ARGUMENTS,
+                "No value is specified for one of policy parameters");
         }
         if (currentContext.getProperty(SET_NODE_SOURCE, String.class) != null) {
             nodeSource = currentContext.getProperty(SET_NODE_SOURCE, String.class);
