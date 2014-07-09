@@ -590,12 +590,12 @@ distributions {
     main {
         contents {
             from '.'
-            include "dist/**", "config/**", "bin/**", "samples/**", "addons/**", "LICENSE*", "README*"
+            include "dist/**", "config/**", "bin/**", "samples/**", "addons/**", "LICENSE*", "README*", "client.jar"
         }
     }
 }
 
-distZip.dependsOn proActiveLibs
+distZip.dependsOn proActiveLibs, clientJar
 
 artifacts {
     archives distZip
