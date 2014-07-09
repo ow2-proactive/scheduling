@@ -40,8 +40,8 @@ package org.ow2.proactive_grid_cloud_portal.cli.cmd.rm;
 import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_INVALID_ARGUMENTS;
 import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_OTHER;
 import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
-import static org.ow2.proactive_grid_cloud_portal.cli.json.FieldMataDataView.Type.FILE;
 import static org.ow2.proactive_grid_cloud_portal.cli.json.FieldMataDataView.Type.CREDENTIAL;
+import static org.ow2.proactive_grid_cloud_portal.cli.json.FieldMataDataView.Type.FILEBROWSER;
 
 import java.io.File;
 import java.util.HashMap;
@@ -118,7 +118,7 @@ public class SetInfrastructureCommand extends AbstractCommand implements Command
         for (int index = 0; index < configurableFields.length; index++) {
             ConfigurableFieldView cf = configurableFields[index];
             Type ft = cf.getMeta().type();
-            if (FILE.equals(ft) || CREDENTIAL.equals(ft)) {
+            if (FILEBROWSER.equals(ft) || CREDENTIAL.equals(ft)) {
                 String contents = FileUtility.readFileToString(new File(infrastructureArgs[index]));
                 buffer.append("&infrastructureFileParameters=").append(contents);
 
