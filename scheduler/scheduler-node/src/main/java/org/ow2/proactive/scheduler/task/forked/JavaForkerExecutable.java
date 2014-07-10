@@ -42,6 +42,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.Serializable;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -694,7 +696,11 @@ public class JavaForkerExecutable extends JavaExecutable implements ForkerStarte
         } else {
             // default it to use the forker shared scratch space so input files are
             // directly accessible from the working dir
-            ospb.directory(new File(getForkedTaskSharedSpace().getPath()));
+            try {
+                ospb.directory(new File(new URI(getForkedTaskSharedSpace().getRealURI())));
+            } catch (URISyntaxException e) {
+                logger.warn("Could not resolve forked task shared scratch space URI", e);
+            }
         }
         logger.debug("Running forked task with working dir: " + ospb.directory());
     }
