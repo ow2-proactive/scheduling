@@ -564,9 +564,6 @@ task proActiveLibs(type: Sync) {
 // enables the installation of the artifact produced by the distribution plugin into the local maven repo
 apply plugin: 'java'
 
-defaultTasks 'proActiveLibs'
-build.dependsOn 'proActiveLibs'
-
 task clientJar(type: Jar, dependsOn: proActiveLibs)
 
 clientJar.doFirst {
@@ -601,3 +598,7 @@ artifacts {
     archives distZip
 }
 
+task('dist', dependsOn: [proActiveLibs, clientJar])
+
+defaultTasks 'dist'
+build.dependsOn dist
