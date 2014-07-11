@@ -68,7 +68,7 @@ public class MyResteasyBootstrap extends ResteasyBootstrap {
             "config" + File.separator + "rest" + File.separator + "settings.ini"), findConfigurationFile(
                 event.getServletContext(), "log4j.properties"), findConfigurationFile(event
                 .getServletContext(), File.separator + "config" + File.separator + "proactive" +
-            File.separator + "ProActiveConfiguration.xml"));
+            File.separator + "ProActiveConfiguration.ini"));
     }
 
     private File findConfigurationFile(ServletContext servletContext, String configurationFileName) {

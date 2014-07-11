@@ -46,7 +46,6 @@ import java.security.Policy;
 
 import javax.security.auth.login.LoginException;
 
-import org.apache.commons.cli.OptionBuilder;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.remoteobject.AbstractRemoteObjectFactory;
@@ -71,6 +70,7 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
+import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.Parser;
@@ -356,7 +356,7 @@ public class SchedulerStarter {
         if (System.getProperty(CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getName()) == null) {
             System.setProperty(CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getName(), System
                     .getProperty(PASchedulerProperties.SCHEDULER_HOME.getKey()) +
-                "/config/proactive/ProActiveConfiguration.xml");
+                "/config/proactive/ProActiveConfiguration.ini");
         }
     }
 

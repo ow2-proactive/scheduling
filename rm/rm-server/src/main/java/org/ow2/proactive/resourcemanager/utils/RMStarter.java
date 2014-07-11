@@ -183,7 +183,7 @@ public class RMStarter {
         if (System.getProperty(CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getName()) == null) {
             System.setProperty(CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getName(), System
                     .getProperty(PAResourceManagerProperties.RM_HOME.getKey()) +
-                "/config/proactive/ProActiveConfiguration.xml");
+                "/config/proactive/ProActiveConfiguration.ini");
         }
     }
 
