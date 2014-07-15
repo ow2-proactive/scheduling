@@ -13,13 +13,6 @@ import java.util.List;
 
 import javax.security.auth.login.LoginException;
 
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.mapred.JobConf;
-import org.apache.hadoop.mapreduce.Job;
-import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
-import org.apache.hadoop.util.StringUtils;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
@@ -49,6 +42,13 @@ import org.ow2.proactive.scheduler.task.SchedulerVars;
 import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.SimpleScript;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.mapred.JobConf;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.util.StringUtils;
 
 
 /**
@@ -141,7 +141,7 @@ public class PAMapReduceJob {
                  * classpath of the forkEnvironment
                  */
                 String envScript = "home = org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl.getProActiveRuntime().getProActiveHome();\n"
-                    + "forkEnvironment.addAdditionalClasspath(home + \"/dist/lib/*\");";
+                    + "forkEnvironment.addAdditionalClasspath(home + \"/lib/*\");";
                 logger.debug("Setting envScript");
                 try {
                     forkEnvironment.setEnvScript(new SimpleScript(envScript, "javascript"));

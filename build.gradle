@@ -100,8 +100,8 @@ def functionalTestConfiguration = {
     systemProperties << ['url': System.getProperty("url") ]
     systemProperties << ['test_slice': System.getProperty("test_slice") ]
     systemProperties << ['max_test_slice': System.getProperty("max_test_slice") ]
-    systemProperties << ['pa.rm.home': rootDir.absolutePath]
-    systemProperties << ['pa.scheduler.home': rootDir.absolutePath]
+    systemProperties << ['pa.rm.home': "${rootProject.buildDir}/install/scheduling"]
+    systemProperties << ['pa.scheduler.home': "${rootProject.buildDir}/install/scheduling"]
     systemProperties << ['pa.tests.consecutive': System.getProperty("os.name").toLowerCase().indexOf('win')!=-1?'false':'true']
     systemProperties << ['proactive.test.timeout': 600000]
     systemProperties << ['java.awt.headless': 'true']
@@ -250,6 +250,11 @@ project(':rm:rm-node') {
         runtime 'org.python:jython:2.5.4-rc1'
         runtime 'org.codehaus.groovy:groovy-all:2.1.6'
         runtime 'jsr223:jsr223-nativeshell:0.2'
+
+        runtime "org.objectweb.proactive:programming-extension-rmissl:${programmingVersion}"
+        runtime "org.objectweb.proactive:programming-extension-pnpssl:${programmingVersion}"
+        runtime "org.objectweb.proactive:programming-extension-pnp:${programmingVersion}"
+        runtime "org.objectweb.proactive:programming-extension-pamr:${programmingVersion}"
     }
 
 }
@@ -314,7 +319,8 @@ project('scheduler:scheduler-server') {
         runtime "org.objectweb.proactive:programming-extension-pnp:${programmingVersion}"
         runtime "org.objectweb.proactive:programming-extension-pnpssl:${programmingVersion}"
         runtime "org.objectweb.proactive:programming-extension-amqp:${programmingVersion}"
-        runtime "org.objectweb.proactive:programming-extension-pamr:${programmingVersion}"
+        // compile to eventually start PAMR router when starting Scheduler
+        compile "org.objectweb.proactive:programming-extension-pamr:${programmingVersion}"
 
         runtime project(':rest:rest-server')
     }
@@ -350,7 +356,6 @@ project('scheduler:scheduler-node') {
         )
         // required by ForkedJavaExecutable
         runtime "org.objectweb.proactive:programming-extension-pnp:${programmingVersion}"
-        // TODO add all protocols
 
         runtime fileTree(dir: "${rootDir}/lib/node/winp/", exclude: "*.jar")
     }
@@ -535,88 +540,53 @@ configurations {
 }
 
 dependencies {
-    distLib(project(':scheduler:scheduler-server')) {
+    runtime(project(':scheduler:scheduler-server')) {
         exclude group: 'javassist', module: 'javassist' // to avoid duplicate (artifact named differently)
     }
-    distLib project('rm:rm-policy:rm-policy-scheduler')
-    distLib project(':scheduler:scheduler-cli')
-    distLib project(':scheduler:scheduler-node')
-    distLib project(':rm:rm-server')
-    distLib project(':rm:rm-cli')
-    distLib(project(':rest:rest-server')) {
+    runtime project('rm:rm-policy:rm-policy-scheduler')
+    runtime project(':scheduler:scheduler-cli')
+    runtime project(':scheduler:scheduler-node')
+    runtime project(':rm:rm-server')
+    runtime project(':rm:rm-cli')
+    runtime(project(':rest:rest-server')) {
         exclude group: 'javassist', module: 'javassist' // to avoid duplicate (artifact named differently)
     }
-    restCli project(':rest:rest-cli')
+    runtime project(':rest:rest-cli')
 
     compile 'org.codehaus.groovy:groovy-all:2.1.6'
     compile 'commons-io:commons-io:2.4'
 }
 
-task proActiveLibs(type: Sync) {
-    from configurations.distLib
+apply plugin: 'application'
 
-    [project(':rm:rm-server'), project(':scheduler:scheduler-server')].each {
-        from it.configurations.archives.artifacts.files.files
-        if (it.tasks.findByName('testJar'))
-            from it.testJar.outputs
+mainClassName = "org.ow2.proactive.scheduler.util.SchedulerStarter"
+startScripts.applicationName = 'server'
+startScripts.classpath += files('addons')
+
+def createStartScripts(className, name) {
+    def scriptTask = project.tasks.create(name: name, type: CreateStartScripts, dependsOn: [project.startScripts]) {
+        mainClassName className
+        applicationName name
+        outputDir startScripts.outputDir
+        classpath = startScripts.classpath + files('addons')
     }
-//            from file(project.rootProject.buildscript.configurations.classpath.find {
-//                it.name.contains("build-utils")
-//            })
-    into file("$rootDir/dist/lib")
+    project.applicationDistribution.from(scriptTask) { into 'bin' }
 }
 
-// enables the installation of the artifact produced by the distribution plugin into the local maven repo
+createStartScripts('org.ow2.proactive_grid_cloud_portal.cli.CommonEntryPoint', 'client')
+createStartScripts('org.ow2.proactive.resourcemanager.utils.RMNodeStarter', 'node')
+createStartScripts('org.objectweb.proactive.extensions.vfsprovider.console.PADataserverStarter', 'dataserver')
+createStartScripts('org.objectweb.proactive.extensions.vfsprovider.gui.ServerBrowser', 'dataserver-gui')
+createStartScripts('org.ow2.proactive.authentication.crypto.CreateCredentials', 'create-cred')
+createStartScripts('org.ow2.proactive.authentication.crypto.KeyGen', 'key-gen')
+createStartScripts('org.objectweb.proactive.extensions.pamr.router.Main', 'router')
 
-defaultTasks 'proActiveLibs'
-build.dependsOn 'proActiveLibs'
-
-task clientJar(type: Jar, dependsOn: proActiveLibs)
-
-clientJar.doFirst {
-    manifest {
-        def manifestClasspath = configurations.restCli.collect { 'dist/lib/' + it.getName() }.join(' ')
-        attributes('Main-Class': 'org.ow2.proactive_grid_cloud_portal.cli.CommonEntryPoint',
-            'Class-Path' : manifestClasspath
-        )
-    }
-    destinationDir = file('.')
-    archiveName = 'client.jar'
-}
-
-task serverJar(type: Jar, dependsOn: proActiveLibs) {
-    from sourceSets.main.output
-}
-
-serverJar.doFirst {
-    manifest {
-        def manifestClasspath = configurations.compile.collect { 'dist/lib/' + it.getName() }.join(' ')
-        attributes('Main-Class': 'org.ow2.proactive.scheduler.util.GroovySchedulerStarter' ,
-            'Class-Path' : manifestClasspath
-        )
-    }
-    destinationDir = file('.')
-    archiveName = 'server.jar'
-}
+evaluationDependsOn(':rest')
+applicationDistribution.from(project(':rest:rest-server').proActiveWar, { into 'lib/war/rest' })
 
 subprojects {
-    tasks.withType(Test).matching { it.name == 'functionalTest' }*.dependsOn proActiveLibs
+    tasks.withType(Test).matching { it.name == 'functionalTest' }*.dependsOn installApp
 }
 
-apply plugin: 'distribution'
-
-distributions {
-    main {
-        contents {
-            from '.'
-            include "dist/**", "config/**", "bin/**", "samples/**", "addons/**", "LICENSE*", "README*"
-        }
-    }
-}
-
-distZip.dependsOn proActiveLibs
-
-artifacts {
-    archives distZip
-}
-
+defaultTasks 'installApp'
+build.dependsOn 'installApp'

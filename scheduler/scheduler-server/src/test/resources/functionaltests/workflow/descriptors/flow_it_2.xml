@@ -5,7 +5,7 @@
      name="Job" priority="low" projectName="myProject" cancelJobOnError="true">
 
   <variables>
-    <variable name="bin" value="${pa.scheduler.home}/scheduler/scheduler-server/src/test/resources/functionaltests/workflow" />
+    <variable name="bin" value="${pa.scheduler.home}/../../../scheduler/scheduler-server/src/test/resources/functionaltests/workflow" />
   </variables>
 
   <taskFlow>

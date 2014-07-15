@@ -109,7 +109,7 @@ public class LocalInfrastructure extends InfrastructureManager {
             // log4j only understands urls
             try {
                 sb.append((new File(rmHome)).toURI().toURL().toString()).append("config").append("/").append(
-                        "log4j").append("/").append("log4j-defaultNode");
+                        "log").append("/").append("node.properties");
             } catch (MalformedURLException e) {
                 throw new IllegalStateException(e);
             }
@@ -117,7 +117,7 @@ public class LocalInfrastructure extends InfrastructureManager {
         }
         if (!this.paProperties.contains(CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getName())) {
             paPropList.add(CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getCmdLine() + rmHome +
-                "config" + os.fs + "proactive" + os.fs + "ProActiveConfiguration.ini");
+                "config" + os.fs + "network" + os.fs + "ProActiveConfiguration.ini");
         }
         if (!this.paProperties.contains(PAResourceManagerProperties.RM_HOME.getKey())) {
             paPropList.add(PAResourceManagerProperties.RM_HOME.getCmdLine() + rmHome);

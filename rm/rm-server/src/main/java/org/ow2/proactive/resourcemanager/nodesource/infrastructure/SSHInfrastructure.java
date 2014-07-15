@@ -41,7 +41,6 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.security.KeyException;
 
-import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.ssh.SSHClient;
@@ -54,6 +53,7 @@ import org.ow2.proactive.resourcemanager.utils.RMNodeStarter;
 import org.ow2.proactive.resourcemanager.utils.RMNodeStarter.CommandLineBuilder;
 import org.ow2.proactive.resourcemanager.utils.RMNodeStarter.OperatingSystem;
 import org.ow2.proactive.utils.Formatter;
+import org.apache.log4j.Logger;
 
 
 /**
@@ -184,9 +184,9 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
             sb.append("/");
             sb.append("config");
             sb.append("/");
-            sb.append("log4j");
+            sb.append("log");
             sb.append("/");
-            sb.append("log4j-defaultNode");
+            sb.append("node.properties");
             if (containsSpace) {
                 sb.append("\"");
             }

@@ -67,7 +67,7 @@ public class MyResteasyBootstrap extends ResteasyBootstrap {
         restRuntime.start(dispatcher, findConfigurationFile(event.getServletContext(), File.separator +
             "config" + File.separator + "rest" + File.separator + "settings.ini"), findConfigurationFile(
                 event.getServletContext(), "log4j.properties"), findConfigurationFile(event
-                .getServletContext(), File.separator + "config" + File.separator + "proactive" +
+                .getServletContext(), File.separator + "config" + File.separator + "network" +
             File.separator + "ProActiveConfiguration.ini"));
     }
 

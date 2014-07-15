@@ -18,13 +18,13 @@
 				<jvmarg value='${jvmargDefinedByIM}'/>
 				<jvmarg value="-Dpas.launcher.forkas.method=pwd"/>
 				<applicationClasspath>
-					<pathElement base="proactive" relpath="/dist/lib/jruby.jar"/>
-					<pathElement base="proactive" relpath="/dist/lib/jython-2.5.4-rc1.jar"/>
-					<pathElement base="proactive" relpath="/dist/lib/groovy-all-2.1.5.jar"/>
-					<pathElement base="proactive" relpath="/dist/lib/commons-logging-1.0.4.jar"/>
-					<pathElement base="proactive" relpath="/dist/lib/ProActive_SRM-common.jar"/>
-					<pathElement base="proactive" relpath="/dist/lib/ProActive_ResourceManager.jar"/>
-					<pathElement base="proactive" relpath="/dist/lib/ProActive_Scheduler-worker.jar"/>
+					<pathElement base="proactive" relpath="lib/jruby.jar"/>
+					<pathElement base="proactive" relpath="lib/jython-2.5.4-rc1.jar"/>
+					<pathElement base="proactive" relpath="lib/groovy-all-2.1.5.jar"/>
+					<pathElement base="proactive" relpath="lib/commons-logging-1.0.4.jar"/>
+					<pathElement base="proactive" relpath="lib/ProActive_SRM-common.jar"/>
+					<pathElement base="proactive" relpath="lib/ProActive_ResourceManager.jar"/>
+					<pathElement base="proactive" relpath="lib/ProActive_Scheduler-worker.jar"/>
 				</applicationClasspath>
 			</configuration>
 			<virtualNode id="Workers">

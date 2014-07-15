@@ -81,12 +81,12 @@ import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.resourcemanager.utils.RMNodeStarter;
 import org.ow2.proactive.utils.FileToBytesConverter;
 import org.ow2.tests.ProActiveSetup;
+import org.ow2.tests.ProcessCleaner;
 
 import functionaltests.common.CommonTUtils;
 import functionaltests.common.InputStreamReaderThread;
 import functionaltests.monitor.RMMonitorEventReceiver;
 import functionaltests.monitor.RMMonitorsHandler;
-import org.ow2.tests.ProcessCleaner;
 
 
 /**
@@ -427,8 +427,7 @@ public class RMTHelper {
 
         String log4jConfiguration = CentralPAPropertyRepository.LOG4J.getValue();
         if (!CentralPAPropertyRepository.LOG4J.isSet()) {
-            log4jConfiguration = "file:" + PAResourceManagerProperties.RM_HOME.getValueAsString() +
-                "/config/log4j/log4j-junit";
+            log4jConfiguration = RMTHelper.class.getResource("/log4j-junit").toString();
         }
         commandLine.add(CentralPAPropertyRepository.LOG4J.getCmdLine() + log4jConfiguration);
 
@@ -463,13 +462,13 @@ public class RMTHelper {
 
     public static String testClasspath() {
         String home = PAResourceManagerProperties.RM_HOME.getValueAsString();
-        String classpathToLibFolderWithWildcard = home + File.separator + "dist" + File.separator + "lib" +
+        String classpathToLibFolderWithWildcard = home + File.separator + File.separator + "lib" +
             File.separator + "*";
         if (OperatingSystem.getOperatingSystem().equals(OperatingSystem.windows)) {
             // required by windows otherwise wildcard is expanded
             classpathToLibFolderWithWildcard = "\"" + classpathToLibFolderWithWildcard + "\"";
         }
-        return classpathToLibFolderWithWildcard;
+        return classpathToLibFolderWithWildcard + File.pathSeparator + System.getProperty("java.class.path");
     }
 
     /**

@@ -23,14 +23,14 @@
 				<applicationClasspath>
 					<pathElement base="root" relpath="${stress.tests.classes}"/>
 					<!-- more scheduling libs to the classpath!! -->
-					<pathElement base="proactive" relpath="/dist/lib/commons-logging-1.1.1.jar"/>
-					<pathElement base="proactive" relpath="/dist/lib/ProActive_SRM-common.jar"/>
-					<pathElement base="proactive" relpath="/dist/lib/ProActive_SRM-common-client.jar"/>
-					<pathElement base="proactive" relpath="/dist/lib/ProActive_ResourceManager.jar"/>
-					<pathElement base="proactive" relpath="/dist/lib/ProActive_Scheduler-worker.jar"/>
-					<pathElement base="proactive" relpath="/dist/lib/ProActive_Scheduler-core.jar"/>
-					<pathElement base="proactive" relpath="/dist/lib/ProActive_Scheduler-client.jar"/>
-					<pathElement base="proactive" relpath="/dist/lib/commons-httpclient-3.1.jar"/>
+					<pathElement base="proactive" relpath="/lib/commons-logging-1.1.1.jar"/>
+					<pathElement base="proactive" relpath="/lib/ProActive_SRM-common.jar"/>
+					<pathElement base="proactive" relpath="/lib/ProActive_SRM-common-client.jar"/>
+					<pathElement base="proactive" relpath="/lib/ProActive_ResourceManager.jar"/>
+					<pathElement base="proactive" relpath="/lib/ProActive_Scheduler-worker.jar"/>
+					<pathElement base="proactive" relpath="/lib/ProActive_Scheduler-core.jar"/>
+					<pathElement base="proactive" relpath="/lib/ProActive_Scheduler-client.jar"/>
+					<pathElement base="proactive" relpath="/lib/commons-httpclient-3.1.jar"/>
 				</applicationClasspath>
 				<securityPolicy base="root" relpath="${stress.tests.config}/tests.java.policy"/>
 				<log4jProperties base="root" relpath="${stress.tests.config}/log4j/actor-log4j"/>

@@ -4,7 +4,7 @@
 	name="job_native_4_hosts" priority="normal" cancelJobOnError="false">
 	<variables>
 		<!-- pa.scheduler.home is known as java property - ie : start with -Dpa.scheduler.home=value -->
-		<variable name="WORK_DIR" value="${pa.scheduler.home}/scheduler/scheduler-server/src/test/resources/functionaltests/executables"/>
+		<variable name="WORK_DIR" value="${pa.scheduler.home}/../../../scheduler/scheduler-server/src/test/resources/functionaltests/executables"/>
 		<variable name="BOOKED_HOSTS_NB" value="4"/>
 	</variables>
 	<!-- description also test that description can contain more than 255 char -->

@@ -36,9 +36,13 @@ package org.ow2.proactive.utils;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
+import java.net.BindException;
 import java.util.Properties;
 
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
@@ -46,13 +50,11 @@ import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.webapp.WebAppContext;
-import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
-import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
 
 public class JettyStarter {
 
-    private static final String FOLDER_TO_DEPLOY = "/dist/war/";
+    private static final String FOLDER_TO_DEPLOY = "/lib/war/";
     private static final String REST_CONFIG_PATH = "/config/rest/settings.ini";
 
     private static Logger logger = Logger.getLogger(JettyStarter.class);
@@ -74,6 +76,7 @@ public class JettyStarter {
         setSystemPropertyIfNotDefined("scheduler.url", schedulerUrl);
 
         if ("true".equals(properties.getProperty("rest.deploy"))) {
+            logger.info("Starting the web applications...");
             int restPort = Integer.parseInt(properties.getProperty("rest.port", "8080"));
 
             // for web portals
@@ -83,9 +86,9 @@ public class JettyStarter {
 
             Server server = new Server(restPort);
             server.setStopAtShutdown(true);
-            
+
             HandlerList handlerList = new HandlerList();
-            addWarsToHanlderList(handlerList);
+            addWarsToHandlerList(handlerList);
             server.setHandler(handlerList);
 
             startServer(server, restPort);
@@ -95,34 +98,55 @@ public class JettyStarter {
     private static void startServer(Server server, int restPort) {
         try {
             if (server.getHandler() == null) {
-                logger.info("SCHEDULER_HOME/dist/war folder is empty, nothing is deployed");
+                logger.info("SCHEDULER_HOME/lib/war folder is empty, nothing is deployed");
             } else {
                 server.start();
                 if (server.isStarted()) {
-                    HandlerList handlerList = (HandlerList) server.getHandler();
-                    for (Handler handler : handlerList.getHandlers()) {
-                        WebAppContext webAppContext = (WebAppContext) handler;
-                        Throwable startException = webAppContext.getUnavailableException();
-                        if (startException == null) {
-                            logger.info("The web application " + webAppContext.getContextPath() +
-                                " created on http://localhost:" + restPort + webAppContext.getContextPath());
-                        } else {
-                            logger.warn("Failed to start context " + webAppContext.getContextPath(),
-                                    startException);
-                        }
-                    }
+                    printDeployedApplications(server, restPort);
                 } else {
-                    logger.warn("Failed to start web modules (REST API, portals)");
+                    logger.error("Failed to start web modules (REST API, portals)");
+                    System.exit(-1);
                 }
             }
+        } catch (BindException bindException) {
+            logger.error(
+              "Failed to start web modules (REST API, portals), port " + restPort + " is already used",
+              bindException);
+            System.exit(-1);
         } catch (Exception e) {
-            logger.warn("Failed to start web modules (REST API, portals)", e);
+            logger.error("Failed to start web modules (REST API, portals)", e);
+            System.exit(-1);
         }
     }
 
-    private static void addWarsToHanlderList(HandlerList handlerList) {
+    private static void printDeployedApplications(Server server, int restPort) {
+        HandlerList handlerList = (HandlerList) server.getHandler();
+        if (handlerList.getHandlers() != null) {
+            for (Handler handler : handlerList.getHandlers()) {
+                WebAppContext webAppContext = (WebAppContext) handler;
+                Throwable startException = webAppContext.getUnavailableException();
+                if (startException == null) {
+                    if ("/".equals(webAppContext.getContextPath())) {
+                        logger.info("The web application " + webAppContext.getContextPath() +
+                          " created on http://localhost:" + restPort + webAppContext.getContextPath());
+                    }
+                } else {
+                    logger.warn("Failed to start context " + webAppContext.getContextPath(),
+                      startException);
+                }
+            }
+            logger.info("*** Get started at http://localhost:" + restPort + " ***");
+        }
+    }
+
+    private static void addWarsToHandlerList(HandlerList handlerList) {
         File warFolder = new File(getSchedulerHome() + FOLDER_TO_DEPLOY);
-        File[] warFolderContent = warFolder.listFiles();
+        File[] warFolderContent = warFolder.listFiles(new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                return !"getstarted".equals(name);
+            }
+        });
         if (warFolderContent != null) {
             for (File fileToDeploy : warFolderContent) {
                 if (isExplodedWebApp(fileToDeploy)) {
@@ -134,6 +158,14 @@ public class JettyStarter {
                 }
             }
         }
+        addGetStartedApplication(handlerList, new File(warFolder, "getstarted"));
+    }
+
+    private static void addGetStartedApplication(HandlerList handlerList, File file) {
+        String contextPath = "/";
+        WebAppContext webApp = createWebAppContext(contextPath);
+        webApp.setWar(file.getAbsolutePath());
+        handlerList.addHandler(webApp);
     }
 
     private static void addWarFile(HandlerList handlerList, File file) {

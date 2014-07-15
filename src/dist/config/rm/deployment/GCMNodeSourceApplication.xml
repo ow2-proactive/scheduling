@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GCMApplication xmlns="urn:gcm:application:1.0"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="urn:gcm:application:1.0 http://proactive.inria.fr/schemas/gcm/1.0/ApplicationDescriptorSchema.xsd">
+
+	<environment>
+		<javaPropertyVariable name="pa.rm.home"/>
+		<!-- this variable will be replaced by a path of a GCMD to deploy, by RMAdmin -->
+		<javaPropertyVariable name="gcmd.file"/>
+		<programVariable name="jvmargDefinedByIM"/>
+	</environment>
+	<application>
+		<proactive base="root" relpath="${pa.rm.home}">
+			<configuration>
+				<jvmarg value='${jvmargDefinedByIM}'/>
+				<!--  <jvmarg value='-Dproactive.scheduler.logs.maxsize=50'/>-->
+				<applicationClasspath>
+					<!-- Commented dependencies are referenced through the Jar-Index of Scheduler jars -->
+					<!-- Script engines must be explicitly in application classpath -->
+					<pathElement base="proactive" relpath="/lib/jruby-1.7.4.jar"/>
+					<pathElement base="proactive" relpath="/lib/jython-2.5.4-rc1.jar"/>
+					<pathElement base="proactive" relpath="/lib/groovy-all-2.1.6.jar"/>
+					<pathElement base="proactive" relpath="/lib/commons-logging-1.1.1.jar"/>
+					<!-- Scheduler libs -->
+					<pathElement base="proactive" relpath="/lib/ProActive_SRM-common.jar"/>
+					<pathElement base="proactive" relpath="/lib/ProActive_ResourceManager.jar"/>
+					<pathElement base="proactive" relpath="/lib/ProActive_Scheduler-worker.jar"/>
+					<!-- Needed explicitly by VFS (file transfer in pre/post script and dataspace -->
+					<pathElement base="proactive" relpath="/lib/commons-httpclient-3.1.jar"/>
+					<pathElement base="proactive" relpath="/lib/commons-codec-1.3.jar"/>
+					<!--
+					<pathElement base="proactive" relpath="/lib/jruby.jar"/>
+					<pathElement base="proactive" relpath="/lib/jython.jar"/> -->
+				</applicationClasspath>
+				<securityPolicy base="proactive" relpath="/config/security.java.policy-client"/>
+				<log4jProperties base="proactive" relpath="/config/log/node.properties"/>
+			</configuration>
+			<virtualNode id="Workers">
+				<nodeProvider refid="workers"/>
+			</virtualNode>
+		</proactive>
+	</application>
+
+	<resources>
+		<nodeProvider id="workers">
+			<file path="${gcmd.file}"/>
+		</nodeProvider>
+	</resources>
+</GCMApplication>

@@ -165,7 +165,7 @@ public class JavaSpawnExecutable extends JavaExecutable {
 
     private File getExecutablePath(String launcherPath) throws URISyntaxException {
         try {
-            return new File(new File(home, "scheduler/scheduler-server/src/test/resources"), launcherPath);
+            return new File(new File(home, "../../../scheduler/scheduler-server/src/test/resources"), launcherPath);
         } catch (Exception e) {
             File addonsFolder = new File(home, "addons");
             return new File(addonsFolder, launcherPath);

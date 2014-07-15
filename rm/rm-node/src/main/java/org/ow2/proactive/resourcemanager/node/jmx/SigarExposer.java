@@ -36,21 +36,18 @@
  */
 package org.ow2.proactive.resourcemanager.node.jmx;
 
+import java.io.File;
 import java.net.ServerSocket;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
-import javax.management.StandardMBean;
 
-import org.apache.log4j.Logger;
-import org.hyperic.sigar.jmx.AbstractMBean;
-import org.hyperic.sigar.jmx.SigarRegistry;
 import org.ow2.proactive.jmx.AbstractJMXHelper;
-import org.ow2.proactive.jmx.RRDDataStore;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.utils.RRDSigarDataStore;
+import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Logger;
+import org.hyperic.sigar.jmx.SigarRegistry;
 
 
 public class SigarExposer extends AbstractJMXHelper {
@@ -73,8 +70,10 @@ public class SigarExposer extends AbstractJMXHelper {
                 mbs.registerMBean(registry, name);
             }
 
-            String dataBaseName = PAResourceManagerProperties.RM_HOME.getValueAsString() +
-                System.getProperty("file.separator") + "data/" + nodeName + "_statistics.rrd";
+            String databaseFolder = PAResourceManagerProperties.RM_HOME.getValueAsString() +
+              System.getProperty("file.separator") + "data/";
+            FileUtils.forceMkdir(new File(databaseFolder));
+            String dataBaseName = databaseFolder + nodeName + "_statistics.rrd";
 
             setDataStore(new RRDSigarDataStore(mbs, dataBaseName, PAResourceManagerProperties.RM_RRD_STEP
                     .getValueAsInt(), Logger.getLogger(SigarExposer.class)));

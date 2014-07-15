@@ -510,7 +510,7 @@ public class WordCount {
                         Compile:
                     </para>
                     <programlisting language="sh"># for compilation, we need 3 jars: Hadoop core, ProActive core and ProActive MapReduce addon
-$ COMPILE_CLASSPATH=$SCHEDULER_HOME/dist/lib/hadoop-0.20.2-core.jar:$SCHEDULER_HOME/dist/lib/ProActive_Scheduler-core.jar:$SCHEDULER_HOME/dist/lib/ProActive_Scheduler-mapreduce.jar
+$ COMPILE_CLASSPATH=$SCHEDULER_HOME/lib/hadoop-0.20.2-core.jar:$SCHEDULER_HOME/lib/ProActive_Scheduler-core.jar:$SCHEDULER_HOME/lib/ProActive_Scheduler-mapreduce.jar
 
 $ mkdir $EXAMPLE_DIR/classes
 $ javac -cp $COMPILE_CLASSPATH -d $EXAMPLE_DIR/classes $EXAMPLE_DIR/WordCount.java</programlisting>

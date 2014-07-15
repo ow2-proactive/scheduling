@@ -22,7 +22,7 @@
                 </script>
             </pre>
             <nativeExecutable>
-                <staticCommand value="${pa.scheduler.home}/scheduler/scheduler-server/build/resources/test/functionaltests/vars/test-vars.sh" />
+                <staticCommand value="${pa.scheduler.home}/../../../scheduler/scheduler-server/src/test/resources/functionaltests/vars/test-vars.sh" />
             </nativeExecutable>
         </task>
     </taskFlow>

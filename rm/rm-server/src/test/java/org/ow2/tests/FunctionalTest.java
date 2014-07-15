@@ -38,6 +38,7 @@ package org.ow2.tests;
 
 import java.io.IOException;
 import java.io.PrintStream;
+import java.net.URL;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -176,9 +177,8 @@ public class FunctionalTest extends ProActiveTest {
 
     private static void configureLogging() {
         if (System.getProperty(CentralPAPropertyRepository.LOG4J.getName()) == null) {
-            String defaultLog4jConfig = System.getProperty(PAResourceManagerProperties.RM_HOME.getKey()) +
-                "/config/log4j/log4j-junit";
-            System.setProperty(CentralPAPropertyRepository.LOG4J.getName(), "file:" + defaultLog4jConfig);
+            URL defaultLog4jConfig = FunctionalTest.class.getResource("/log4j-junit");
+            System.setProperty(CentralPAPropertyRepository.LOG4J.getName(), defaultLog4jConfig.toString());
             PropertyConfigurator.configure(defaultLog4jConfig);
         }
     }

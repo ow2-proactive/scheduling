@@ -58,7 +58,7 @@
 		<task name="file_and_args">
 			<scriptExecutable>
 				<script>
-					<file path="${pa.scheduler.home}/scheduler/scheduler-server/src/test/resources/functionaltests/descriptors/print_arg.js">
+					<file path="${pa.scheduler.home}/../../../scheduler/scheduler-server/src/test/resources/functionaltests/descriptors/print_arg.js">
 					<arguments>
 						<argument value="My_Magic_Arg"/>
 					</arguments>

@@ -183,7 +183,7 @@ public class RMStarter {
         if (System.getProperty(CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getName()) == null) {
             System.setProperty(CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getName(), System
                     .getProperty(PAResourceManagerProperties.RM_HOME.getKey()) +
-                "/config/proactive/ProActiveConfiguration.ini");
+                "/config/network/ProActiveConfiguration.ini");
         }
     }
 
@@ -199,7 +199,7 @@ public class RMStarter {
     private static void configureLogging() {
         if (System.getProperty(CentralPAPropertyRepository.LOG4J.getName()) == null) {
             String defaultLog4jConfig = System.getProperty(PAResourceManagerProperties.RM_HOME.getKey()) +
-                "/config/log4j/rm-log4j-server";
+                "/config/log/server.properties";
             System.setProperty(CentralPAPropertyRepository.LOG4J.getName(), defaultLog4jConfig);
             PropertyConfigurator.configure(defaultLog4jConfig);
         }

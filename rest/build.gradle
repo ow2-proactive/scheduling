@@ -1,13 +1,13 @@
 def functionalTestConfiguration = {
     forkEvery 1
     include 'functionaltests/**'
+    def schedulingDir = "${rootProject.buildDir}/install/scheduling"
     systemProperties << ['rest.deploy': 'false']
-    systemProperties << ['pa.scheduler.home': rootDir.absolutePath]
-    systemProperties << ['pa.rm.home': rootDir.absolutePath]
-    systemProperties << ['proactive.home': rootDir.absolutePath]
-    systemProperties << ['log4j.configuration': file("$rootDir/config/log4j/log4j-junit").toURL()]
-    systemProperties << ['proactive.configuration': file("$rootDir/config/proactive/ProActiveConfiguration.xml")]
-    systemProperties << ['java.security.policy': file("$rootDir/config/security.java.policy-server").absolutePath]
+    systemProperties << ['pa.scheduler.home': schedulingDir]
+    systemProperties << ['pa.rm.home': schedulingDir]
+    systemProperties << ['proactive.home': schedulingDir]
+    systemProperties << ['proactive.communication.protocol': "pnp"]
+    systemProperties << ['java.security.policy': file("$schedulingDir/config/security.java.policy-server").absolutePath]
     systemProperties << ['test_slice': System.getProperty("test_slice") ]
     systemProperties << ['max_test_slice': System.getProperty("max_test_slice") ]
     systemProperties << ['proactive.runtime.ping': false]
@@ -71,6 +71,7 @@ project(':rest:rest-server') {
 
         compile project(':rest:rest-api')
 
+        testCompile "org.objectweb.proactive:programming-extension-pnp:${programmingVersion}"
         testCompile functionalTestDependencies
         testCompile 'org.apache.httpcomponents:httpmime:4.2.1'
         testCompile 'org.jboss.resteasy:tjws:3.0.6.Final'
@@ -139,8 +140,8 @@ project(':rest:rest-server') {
 
     task('functionalTest', type: Test).configure functionalTestConfiguration
 
-    functionalTest.dependsOn rootProject.proActiveLibs
-    clean.dependsOn rootProject.cleanProActiveLibs
+    functionalTest.dependsOn rootProject.installApp
+    clean.dependsOn rootProject.cleanInstallApp
 
     task proActiveWar(type: Sync, dependsOn: war) {
         from "$webAppDirName"
@@ -148,7 +149,7 @@ project(':rest:rest-server') {
         def schedulerNodeJar = project(":scheduler:scheduler-node").standaloneJar
         from schedulerNodeJar
 
-        into file("$rootDir/dist/war/rest")
+        into file("$buildDir/rest")
 
         rename(schedulerNodeJar.outputs.files.singleFile.name, 'node.jar')
 
@@ -157,7 +158,7 @@ project(':rest:rest-server') {
         }
     }
 
-    rootProject.proActiveLibs.dependsOn project.proActiveWar
+    rootProject.installApp.dependsOn project.proActiveWar
 
     artifacts {
         jar
@@ -219,6 +220,6 @@ project(':rest:rest-client') {
 
     task('functionalTest', type:Test).configure functionalTestConfiguration
 
-    functionalTest.dependsOn rootProject.proActiveLibs
-    clean.dependsOn rootProject.cleanProActiveLibs
+    functionalTest.dependsOn rootProject.installApp
+    clean.dependsOn rootProject.cleanInstallApp
 }

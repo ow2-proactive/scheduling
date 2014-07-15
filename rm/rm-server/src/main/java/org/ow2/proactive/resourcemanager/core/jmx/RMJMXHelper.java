@@ -36,6 +36,7 @@
  */
 package org.ow2.proactive.resourcemanager.core.jmx;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import javax.management.MBeanServer;
@@ -53,6 +54,7 @@ import org.ow2.proactive.resourcemanager.core.jmx.mbean.RuntimeDataMBean;
 import org.ow2.proactive.resourcemanager.core.jmx.mbean.RuntimeDataMBeanImpl;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoringImpl;
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
 
@@ -110,6 +112,7 @@ public final class RMJMXHelper extends AbstractJMXHelper {
             String dataBaseName = PAResourceManagerProperties.RM_HOME.getValueAsString() +
                 System.getProperty("file.separator") +
                 PAResourceManagerProperties.RM_RRD_DATABASE_NAME.getValueAsString();
+            FileUtils.forceMkdir(new File(dataBaseName).getParentFile());
 
             setDataStore(new RRDDataStore((StandardMBean) anonymMBean, dataBaseName,
                 PAResourceManagerProperties.RM_RRD_STEP.getValueAsInt(), Logger.getLogger(RMJMXHelper.class)));

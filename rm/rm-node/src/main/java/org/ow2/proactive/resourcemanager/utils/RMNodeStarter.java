@@ -36,10 +36,31 @@
  */
 package org.ow2.proactive.resourcemanager.utils;
 
-import org.apache.commons.cli.*;
-import org.apache.log4j.*;
-import org.hyperic.sigar.Sigar;
-import org.hyperic.sigar.SigarLoader;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.InetAddress;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.security.KeyException;
+import java.security.Policy;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+
+import javax.security.auth.login.LoginException;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
@@ -63,20 +84,25 @@ import org.ow2.proactive.resourcemanager.nodesource.dataspace.DataSpaceNodeConfi
 import org.ow2.proactive.rm.util.process.EnvironmentCookieBasedChildProcessKiller;
 import org.ow2.proactive.utils.Formatter;
 import org.ow2.proactive.utils.Tools;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.GnuParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.Parser;
+import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.ConsoleAppender;
+import org.apache.log4j.Level;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PatternLayout;
+import org.apache.log4j.PropertyConfigurator;
+import org.hyperic.sigar.Sigar;
+import org.hyperic.sigar.SigarLoader;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
-
-import javax.security.auth.login.LoginException;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import java.io.*;
-import java.net.InetAddress;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.security.KeyException;
-import java.security.Policy;
-import java.util.*;
 
 
 /**
@@ -399,11 +425,20 @@ public class RMNodeStarter {
 
     private void configureRMAndProActiveHomes() {
         if (System.getProperty(PAResourceManagerProperties.RM_HOME.getKey()) == null) {
-            System.setProperty(PAResourceManagerProperties.RM_HOME.getKey(), ".");
+            System.setProperty(PAResourceManagerProperties.RM_HOME.getKey(), findRMHomeFromJarOrCurrentFolder());
         }
         if (System.getProperty(CentralPAPropertyRepository.PA_HOME.getName()) == null) {
             System.setProperty(CentralPAPropertyRepository.PA_HOME.getName(), System
                     .getProperty(PAResourceManagerProperties.RM_HOME.getKey()));
+        }
+    }
+
+    private String findRMHomeFromJarOrCurrentFolder() {
+        String jarPath = RMNodeStarter.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+        if(new File(jarPath).getParentFile().getName().equals("lib")) {
+            return new File(jarPath).getParentFile().getParent();
+        } else {
+            return ".";
         }
     }
 
@@ -464,8 +499,8 @@ public class RMNodeStarter {
             logger.info("Reconfigured log4j using " + log4jConfigPropertyValue);
         } else {
             // log4j.configuration property is not set, use default log4j configuration for node
-            String log4jConfig = proActiveHome + File.separator + "config" + File.separator + "log4j" +
-                File.separator + "log4j-defaultNode";
+            String log4jConfig = proActiveHome + File.separator + "config" + File.separator + "log" +
+                File.separator + "node.properties";
             // set log4j.configuration to stop ProActiveLogger#load from reconfiguring log4j once again
             if (new File(log4jConfig).exists()) {
                 System.setProperty(CentralPAPropertyRepository.LOG4J.getName(), "file:" + log4jConfig);
@@ -473,7 +508,7 @@ public class RMNodeStarter {
                 logger.info("Configured log4j using " + log4jConfig);
             } else {
                 // use log4j config from JAR
-                URL log4jConfigFromJar = RMNodeStarter.class.getResource("/config/log4j/log4j-defaultNode");
+                URL log4jConfigFromJar = RMNodeStarter.class.getResource("/config/log/node.properties");
                 System
                         .setProperty(CentralPAPropertyRepository.LOG4J.getName(), log4jConfigFromJar
                                 .toString());
@@ -1396,7 +1431,7 @@ public class RMNodeStarter {
                 rmHome = "";
             }
 
-            final String libRoot = rmHome + "dist" + os.fs + "lib" + os.fs;
+            final String libRoot = rmHome + "lib" + os.fs;
             String javaPath = this.getJavaPath();
             if (javaPath != null) {
                 command.add(javaPath);
@@ -1423,6 +1458,9 @@ public class RMNodeStarter {
             // add the content of addons dir on the classpath
             classpath.append(os.ps).append(rmHome).append(this.addonsDir);
             classpath.append(os.ps).append(libRoot).append("*");
+            if ("true".equals(System.getProperty("proactive.test"))) {
+                classpath.append(os.ps).append(System.getProperty("java.class.path"));
+            }
 
             // add jars inside the addons directory
             File addonsAbsolute = new File(rmHome + this.addonsDir);

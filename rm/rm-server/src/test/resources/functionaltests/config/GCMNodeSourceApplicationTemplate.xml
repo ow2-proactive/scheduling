@@ -17,7 +17,7 @@
 				<jvmarg value="-Dproactive.test=true"/>
 				<jvmarg value='${jvmargDefinedByIM}'/>
 				<applicationClasspath>
-					<pathElement base="proactive" relpath="dist/lib/*"/>
+					<pathElement base="proactive" relpath="lib/*"/>
 				</applicationClasspath>
 			</configuration>
 			<virtualNode id="Workers">
