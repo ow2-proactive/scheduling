@@ -41,15 +41,13 @@ import static org.apache.http.entity.ContentType.APPLICATION_FORM_URLENCODED;
 import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_INVALID_ARGUMENTS;
 import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
 
-import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
-import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpUtility;
+import org.ow2.proactive_grid_cloud_portal.cli.utils.QueryStringBuilder;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
 
 
@@ -67,14 +65,11 @@ public class UnlockNodeCommand extends AbstractCommand implements Command {
     @Override
     public void execute(ApplicationContext currentContext) throws CLIException {
         HttpPost request = new HttpPost(currentContext.getResourceUrl("node/unlock"));
-        StringBuilder buffer = new StringBuilder();
-        buffer.append("nodeurls=").append(nodeUrls[0]);
-        if (nodeUrls.length > 1) {
-            for (int index = 1; index < nodeUrls.length; index++) {
-                buffer.append("&nodeurls=").append(HttpUtility.encodeUrl(nodeUrls[index]));
-            }
+        QueryStringBuilder queryStringBuilder = new QueryStringBuilder();
+        for (String nodeUrl : nodeUrls) {
+            queryStringBuilder.add("nodeurls", nodeUrl);
         }
-        request.setEntity(new StringEntity(buffer.toString(), APPLICATION_FORM_URLENCODED));
+        request.setEntity(queryStringBuilder.buildEntity(APPLICATION_FORM_URLENCODED));
         HttpResponseWrapper response = execute(request, currentContext);
         if (statusCode(OK) == statusCode(response)) {
             boolean success = readValue(response, Boolean.TYPE, currentContext);

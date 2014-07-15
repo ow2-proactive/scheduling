@@ -37,21 +37,20 @@
 
 package org.ow2.proactive_grid_cloud_portal.cli.cmd.rm;
 
+import static org.apache.http.entity.ContentType.*;
 import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_INVALID_ARGUMENTS;
 import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
 import static org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.SetInfrastructureCommand.SET_INFRASTRUCTURE;
 import static org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.SetNodeSourceCommand.SET_NODE_SOURCE;
 import static org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.SetPolicyCommand.SET_POLICY;
 
-import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
+import org.ow2.proactive_grid_cloud_portal.cli.utils.QueryStringBuilder;
 
 
 public class CreateNodeSourceCommand extends AbstractCommand implements Command {
@@ -63,23 +62,23 @@ public class CreateNodeSourceCommand extends AbstractCommand implements Command 
 
     @Override
     public void execute(ApplicationContext currentContext) throws CLIException {
-        String infrastructure = currentContext.getProperty(SET_INFRASTRUCTURE, String.class);
-        String policy = currentContext.getProperty(SET_POLICY, String.class);
+        QueryStringBuilder infrastructure = currentContext.getProperty(SET_INFRASTRUCTURE, QueryStringBuilder.class);
+        QueryStringBuilder policy = currentContext.getProperty(SET_POLICY, QueryStringBuilder.class);
         if (infrastructure == null) {
             throw new CLIException(REASON_INVALID_ARGUMENTS,
-                "No value is specified for one of infrastructure parameters");
+                "Infrastructure not specified");
         }
         if (policy == null) {
             throw new CLIException(REASON_INVALID_ARGUMENTS,
-                "No value is specified for one of policy parameters");
+                "Policy not specified");
         }
         if (currentContext.getProperty(SET_NODE_SOURCE, String.class) != null) {
             nodeSource = currentContext.getProperty(SET_NODE_SOURCE, String.class);
         }
         HttpPost request = new HttpPost(currentContext.getResourceUrl("nodesource/create"));
-        String requestContents = (new StringBuilder()).append("nodeSourceName=").append(nodeSource).append(
-                '&').append(infrastructure).append('&').append(policy).toString();
-        request.setEntity(new StringEntity(requestContents, ContentType.APPLICATION_FORM_URLENCODED));
+        QueryStringBuilder queryStringBuilder = new QueryStringBuilder();
+        queryStringBuilder.add("nodeSourceName", nodeSource).addAll(infrastructure).addAll(policy);
+        request.setEntity(queryStringBuilder.buildEntity(APPLICATION_FORM_URLENCODED));
         HttpResponseWrapper response = execute(request, currentContext);
         if (statusCode(OK) == statusCode(response)) {
             boolean success = readValue(response, Boolean.TYPE, currentContext);

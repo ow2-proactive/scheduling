@@ -42,13 +42,12 @@ import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
 import static org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.SetNodeSourceCommand.SET_NODE_SOURCE;
 
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
-import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpUtility;
+import org.ow2.proactive_grid_cloud_portal.cli.utils.QueryStringBuilder;
 
 
 public class AddNodeCommand extends AbstractCommand implements Command {
@@ -67,16 +66,15 @@ public class AddNodeCommand extends AbstractCommand implements Command {
     @Override
     public void execute(ApplicationContext currentContext) throws CLIException {
         HttpPost request = new HttpPost(currentContext.getResourceUrl("node"));
-        StringBuilder buffer = new StringBuilder();
-        buffer.append("nodeurl=" + HttpUtility.encodeUrl(nodeUrl));
+        QueryStringBuilder queryStringBuilder = new QueryStringBuilder();
+        queryStringBuilder.add("nodeurl", nodeUrl);
         if (currentContext.getProperty(SET_NODE_SOURCE, String.class) != null) {
             nodeSource = currentContext.getProperty(SET_NODE_SOURCE, String.class);
         }
         if (nodeSource != null) {
-            buffer.append("&nodesource=").append(nodeSource);
+            queryStringBuilder.add("nodesource", nodeSource);
         }
-        StringEntity entity = new StringEntity(buffer.toString(), APPLICATION_FORM_URLENCODED);
-        request.setEntity(entity);
+        request.setEntity(queryStringBuilder.buildEntity(APPLICATION_FORM_URLENCODED));
         HttpResponseWrapper response = execute(request, currentContext);
         if (statusCode(OK) == statusCode(response)) {
             boolean successful = readValue(response, Boolean.TYPE, currentContext);

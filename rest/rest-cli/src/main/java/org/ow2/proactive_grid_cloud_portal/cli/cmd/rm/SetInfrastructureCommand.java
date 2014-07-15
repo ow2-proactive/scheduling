@@ -59,6 +59,7 @@ import org.ow2.proactive_grid_cloud_portal.cli.json.FieldMetaDataView.Type;
 import org.ow2.proactive_grid_cloud_portal.cli.json.PluginView;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.FileUtility;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
+import org.ow2.proactive_grid_cloud_portal.cli.utils.QueryStringBuilder;
 
 
 public class SetInfrastructureCommand extends AbstractCommand implements Command {
@@ -113,20 +114,19 @@ public class SetInfrastructureCommand extends AbstractCommand implements Command
                     "Invalid number of arguments specified for '%s' type.", infrastructureType));
         }
 
-        StringBuilder buffer = new StringBuilder();
-        buffer.append("infrastructureType=" + infrastructureType);
+        QueryStringBuilder queryStringBuilder = new QueryStringBuilder();
+        queryStringBuilder.add("infrastructureType", infrastructureType);
         for (int index = 0; index < configurableFields.length; index++) {
             ConfigurableFieldView cf = configurableFields[index];
             Type ft = cf.getMeta().type();
             if (FILEBROWSER.equals(ft) || CREDENTIAL.equals(ft)) {
                 String contents = FileUtility.readFileToString(new File(infrastructureArgs[index]));
-                buffer.append("&infrastructureFileParameters=").append(contents);
-
+                queryStringBuilder.add("infrastructureFileParameters", contents);
             } else {
-                buffer.append("&infrastructureParameters=").append(infrastructureArgs[index]);
+                queryStringBuilder.add("infrastructureParameters", infrastructureArgs[index]);
             }
         }
-
-        currentContext.setProperty(SET_INFRASTRUCTURE, buffer.toString());
+        currentContext.setProperty(SET_INFRASTRUCTURE, queryStringBuilder);
     }
+
 }

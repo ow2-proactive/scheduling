@@ -41,7 +41,6 @@ import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
 
 import java.util.List;
 
-import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.codehaus.jackson.type.TypeReference;
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
@@ -50,6 +49,7 @@ import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.cli.json.MBeanInfoView;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
+import org.ow2.proactive_grid_cloud_portal.cli.utils.QueryStringBuilder;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
 
 
@@ -64,11 +64,11 @@ public class RmStatsCommand extends AbstractCommand implements Command {
     public void execute(ApplicationContext currentContext) throws CLIException {
         StringBuilder url = new StringBuilder();
         url.append("info/ProActiveResourceManager:name=RuntimeData?");
-        int index = 0;
-        url.append("attr=").append(RUNTIME_DATA_ATTR[index++]);
-        while (index < RUNTIME_DATA_ATTR.length) {
-            url.append("&attr=").append(RUNTIME_DATA_ATTR[index++]);
+        QueryStringBuilder builder = new QueryStringBuilder();
+        for (String attr : RUNTIME_DATA_ATTR) {
+            builder.add("attr", attr);
         }
+        url.append(builder.buildString());
         HttpGet request = new HttpGet(currentContext.getResourceUrl(url.toString()));
         HttpResponseWrapper response = execute(request, currentContext);
         if (statusCode(OK) == statusCode(response)) {

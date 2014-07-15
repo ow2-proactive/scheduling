@@ -40,14 +40,13 @@ package org.ow2.proactive_grid_cloud_portal.cli.cmd.rm;
 import static org.apache.http.entity.ContentType.APPLICATION_FORM_URLENCODED;
 import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
 
-import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
+import org.ow2.proactive_grid_cloud_portal.cli.utils.QueryStringBuilder;
 
 
 public class RemoveNodeSourceCommand extends AbstractCommand implements Command {
@@ -68,10 +67,9 @@ public class RemoveNodeSourceCommand extends AbstractCommand implements Command 
             preempt = true;
         }
         HttpPost request = new HttpPost(currentContext.getResourceUrl("nodesource/remove"));
-        StringBuilder requestContent = new StringBuilder();
-        requestContent.append("name=").append(nodeSource).append("&preempt=").append(preempt);
-        StringEntity entity = new StringEntity(requestContent.toString(), APPLICATION_FORM_URLENCODED);
-        request.setEntity(entity);
+        QueryStringBuilder queryStringBuilder = new QueryStringBuilder();
+        queryStringBuilder.add("name", nodeSource).add("preempt", Boolean.toString(preempt));
+        request.setEntity(queryStringBuilder.buildEntity(APPLICATION_FORM_URLENCODED));
         HttpResponseWrapper response = execute(request, currentContext);
         if (statusCode(response) == statusCode(OK)) {
             boolean success = readValue(response, Boolean.TYPE, currentContext);

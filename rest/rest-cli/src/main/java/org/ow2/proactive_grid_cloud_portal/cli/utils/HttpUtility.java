@@ -59,17 +59,8 @@ import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 
 
 public class HttpUtility {
-    private static final String DFLT_CHARSET = "ISO-8859-1";
 
     private HttpUtility() {
-    }
-
-    public static String encodeUrl(String url) {
-        try {
-            return (new URLCodec()).encode(url, DFLT_CHARSET);
-        } catch (UnsupportedEncodingException e) {
-            throw new CLIException(CLIException.REASON_OTHER, e);
-        }
     }
 
     public static void setInsecureAccess(HttpClient client) throws KeyManagementException,
@@ -79,14 +70,6 @@ public class HttpUtility {
             SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
         Scheme https = new Scheme("https", 443, socketFactory);
         client.getConnectionManager().getSchemeRegistry().register(https);
-    }
-
-    public static String encode(String unescaped) {
-        try {
-            return URLEncoder.encode(unescaped, DFLT_CHARSET);
-        } catch (UnsupportedEncodingException e) {
-            throw new CLIException(CLIException.REASON_OTHER, e);
-        }
     }
 
     public static HttpClient threadSafeClient() {

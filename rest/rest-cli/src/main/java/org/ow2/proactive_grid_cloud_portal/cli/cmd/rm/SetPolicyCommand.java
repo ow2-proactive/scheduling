@@ -59,6 +59,7 @@ import org.ow2.proactive_grid_cloud_portal.cli.json.FieldMetaDataView.Type;
 import org.ow2.proactive_grid_cloud_portal.cli.json.PluginView;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.FileUtility;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
+import org.ow2.proactive_grid_cloud_portal.cli.utils.QueryStringBuilder;
 
 
 public class SetPolicyCommand extends AbstractCommand implements Command {
@@ -109,18 +110,18 @@ public class SetPolicyCommand extends AbstractCommand implements Command {
                     "Invalid number of arguments specified for '%s' type.", policyType));
         }
 
-        StringBuilder buffer = new StringBuilder();
-        buffer.append("policyType=" + policyType);
+        QueryStringBuilder queryStringBuilder = new QueryStringBuilder();
+        queryStringBuilder.add("policyType", policyType);
         for (int index = 0; index < configurableFields.length; index++) {
             ConfigurableFieldView cf = configurableFields[index];
             Type ft = cf.getMeta().type();
             if (FILEBROWSER.equals(ft) || CREDENTIAL.equals(ft)) {
-                String contents = FileUtility.readFileToString(new File(cf.getValue()));
-                buffer.append("&policyFileParameters=").append(contents);
+                String contents = FileUtility.readFileToString(new File(policyArgs[index]));
+                queryStringBuilder.add("policyFileParameters", contents);
             } else {
-                buffer.append("&policyParameters=").append(cf.getValue());
+                queryStringBuilder.add("policyParameters", policyArgs[index]);
             }
         }
-        currentContext.setProperty(SET_POLICY, buffer.toString());
+        currentContext.setProperty(SET_POLICY, queryStringBuilder);
     }
 }
