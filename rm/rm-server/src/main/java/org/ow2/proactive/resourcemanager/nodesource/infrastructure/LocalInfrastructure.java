@@ -109,7 +109,7 @@ public class LocalInfrastructure extends InfrastructureManager {
             // log4j only understands urls
             try {
                 sb.append((new File(rmHome)).toURI().toURL().toString()).append("config").append("/").append(
-                        "log4j").append("/").append("log4j-defaultNode");
+                  "log").append("/").append("node.properties");
             } catch (MalformedURLException e) {
                 throw new IllegalStateException(e);
             }

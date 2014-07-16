@@ -427,8 +427,7 @@ public class RMTHelper {
 
         String log4jConfiguration = CentralPAPropertyRepository.LOG4J.getValue();
         if (!CentralPAPropertyRepository.LOG4J.isSet()) {
-            log4jConfiguration = "file:" + PAResourceManagerProperties.RM_HOME.getValueAsString() +
-                "/config/log4j/log4j-junit";
+            log4jConfiguration = RMTHelper.class.getResource("/log4j-junit").toString();
         }
         commandLine.add(CentralPAPropertyRepository.LOG4J.getCmdLine() + log4jConfiguration);
 

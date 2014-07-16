@@ -521,14 +521,14 @@ public class RMNodeStarter {
                 url = new URL(log4jConfigPropertyValue);
             } catch (MalformedURLException e) {
                 throw new RuntimeException(
-                    "Malformed log4j.configuration value: " + log4jConfigPropertyValue, e);
+                  "Malformed log4j.configuration value: " + log4jConfigPropertyValue, e);
             }
             PropertyConfigurator.configure(url);
             logger.info("Reconfigured log4j using " + log4jConfigPropertyValue);
         } else {
             // log4j.configuration property is not set, use default log4j configuration for node
-            String log4jConfig = proActiveHome + File.separator + "config" + File.separator + "log4j" +
-                File.separator + "log4j-defaultNode";
+            String log4jConfig = proActiveHome + File.separator + "config" + File.separator + "log" +
+              File.separator + "node.properties";
             // set log4j.configuration to stop ProActiveLogger#load from reconfiguring log4j once again
             if (new File(log4jConfig).exists()) {
                 System.setProperty(CentralPAPropertyRepository.LOG4J.getName(), "file:" + log4jConfig);
@@ -536,10 +536,10 @@ public class RMNodeStarter {
                 logger.info("Configured log4j using " + log4jConfig);
             } else {
                 // use log4j config from JAR
-                URL log4jConfigFromJar = RMNodeStarter.class.getResource("/config/log4j/log4j-defaultNode");
+                URL log4jConfigFromJar = RMNodeStarter.class.getResource("/config/log/node.properties");
                 System
-                        .setProperty(CentralPAPropertyRepository.LOG4J.getName(), log4jConfigFromJar
-                                .toString());
+                  .setProperty(CentralPAPropertyRepository.LOG4J.getName(), log4jConfigFromJar
+                    .toString());
                 PropertyConfigurator.configure(log4jConfigFromJar);
                 logger.info("Configured log4j using " + log4jConfigFromJar.toString());
             }

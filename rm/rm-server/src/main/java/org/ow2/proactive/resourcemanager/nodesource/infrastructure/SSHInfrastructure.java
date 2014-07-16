@@ -184,9 +184,9 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
             sb.append("/");
             sb.append("config");
             sb.append("/");
-            sb.append("log4j");
+            sb.append("log");
             sb.append("/");
-            sb.append("log4j-defaultNode");
+            sb.append("node.properties");
             if (containsSpace) {
                 sb.append("\"");
             }
