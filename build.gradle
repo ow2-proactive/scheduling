@@ -593,7 +593,7 @@ createStartScripts('org.objectweb.proactive.extensions.vfsprovider.console.PADat
 createStartScripts('org.objectweb.proactive.extensions.vfsprovider.gui.ServerBrowser', 'dataserver-gui')
 createStartScripts('org.ow2.proactive.authentication.crypto.CreateCredentials', 'create-cred')
 createStartScripts('org.ow2.proactive.authentication.crypto.KeyGen', 'key-gen')
-createStartScripts('org.objectweb.proactive.extensions.pamr.router.Main', 'router')
+createStartScripts('org.ow2.proactive.utils.PAMRRouterStarter', 'router')
 
 subprojects {
     tasks.withType(Test).matching { it.name == 'functionalTest' }*.dependsOn proActiveLibs
