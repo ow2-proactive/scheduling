@@ -40,7 +40,7 @@ package org.ow2.proactive_grid_cloud_portal.cli.json;
 public class ConfigurableFieldView {
     private String name;
     private String value;
-    private FieldMataDataView meta;
+    private FieldMetaDataView meta;
 
     public String getName() {
         return name;
@@ -58,11 +58,11 @@ public class ConfigurableFieldView {
         this.value = value;
     }
 
-    public FieldMataDataView getMeta() {
+    public FieldMetaDataView getMeta() {
         return meta;
     }
 
-    public void setMeta(FieldMataDataView meta) {
+    public void setMeta(FieldMetaDataView meta) {
         this.meta = meta;
     }
 }
