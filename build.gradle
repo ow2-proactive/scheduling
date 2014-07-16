@@ -555,27 +555,45 @@ task proActiveLibs(type: Sync) {
         if (it.tasks.findByName('testJar'))
             from it.testJar.outputs
     }
-//            from file(project.rootProject.buildscript.configurations.classpath.find {
-//                it.name.contains("build-utils")
-//            })
     into file("$rootDir/dist/lib")
 }
 
-// enables the installation of the artifact produced by the distribution plugin into the local maven repo
-apply plugin: 'java'
+task scripts
+proActiveLibs.dependsOn scripts
 
-task clientJar(type: Jar, dependsOn: proActiveLibs)
-
-clientJar.doFirst {
-    manifest {
-        def manifestClasspath = configurations.restCli.collect { 'dist/lib/' + it.getName() }.join(' ')
-        attributes('Main-Class': 'org.ow2.proactive_grid_cloud_portal.cli.CommonEntryPoint',
-            'Class-Path' : manifestClasspath
-        )
-    }
-    destinationDir = file('.')
-    archiveName = 'client.jar'
+task cleanScripts(type: Delete){
+    delete project.file('bin')
 }
+clean.dependsOn cleanScripts
+
+def createStartScripts(className, name) {
+    def scriptTask = project.tasks.create(name: name, type: CreateStartScripts) {
+        mainClassName className
+        applicationName name
+        outputDir project.file('bin')
+        classpath = project.configurations.distLib + files('addons')
+        doLast {
+            def windowsScriptFile = file getWindowsScript()
+            def unixScriptFile = file getUnixScript()
+            // hack for addons folder
+            windowsScriptFile.text = windowsScriptFile.text.replace('%APP_HOME%\\lib\\addons', '%APP_HOME%\\addons')
+            unixScriptFile.text = unixScriptFile.text.replace('$APP_HOME/lib/addons', '$APP_HOME/addons')
+            // hack to use dist/lib for jars
+            windowsScriptFile.text = windowsScriptFile.text.replace('%APP_HOME%\\lib\\', '%APP_HOME%\\dist\\lib\\')
+            unixScriptFile.text = unixScriptFile.text.replace('$APP_HOME/lib/', '$APP_HOME/dist/lib/')
+        }
+    }
+    project.scripts.dependsOn scriptTask
+}
+
+createStartScripts('org.ow2.proactive.scheduler.util.SchedulerStarter', 'server')
+createStartScripts('org.ow2.proactive_grid_cloud_portal.cli.CommonEntryPoint', 'client')
+createStartScripts('org.ow2.proactive.resourcemanager.utils.RMNodeStarter', 'node')
+createStartScripts('org.objectweb.proactive.extensions.vfsprovider.console.PADataserverStarter', 'dataserver')
+createStartScripts('org.objectweb.proactive.extensions.vfsprovider.gui.ServerBrowser', 'dataserver-gui')
+createStartScripts('org.ow2.proactive.authentication.crypto.CreateCredentials', 'create-cred')
+createStartScripts('org.ow2.proactive.authentication.crypto.KeyGen', 'key-gen')
+createStartScripts('org.objectweb.proactive.extensions.pamr.router.Main', 'router')
 
 subprojects {
     tasks.withType(Test).matching { it.name == 'functionalTest' }*.dependsOn proActiveLibs
@@ -587,18 +605,19 @@ distributions {
     main {
         contents {
             from '.'
-            include "dist/**", "config/**", "bin/**", "samples/**", "addons/**", "LICENSE*", "README*", "client.jar"
+            include "dist/**", "config/**", "bin/**", "samples/**", "addons/**", "LICENSE*", "README*"
         }
     }
 }
 
-distZip.dependsOn proActiveLibs, clientJar
+distZip.dependsOn proActiveLibs
 
 artifacts {
     archives distZip
 }
 
-task('dist', dependsOn: [proActiveLibs, clientJar])
+task('dist', dependsOn: [proActiveLibs])
 
 defaultTasks 'dist'
+task build
 build.dependsOn dist
