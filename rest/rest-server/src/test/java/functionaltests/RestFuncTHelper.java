@@ -53,6 +53,7 @@ import java.util.concurrent.TimeUnit;
 import org.objectweb.proactive.api.PARemoteObject;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
+import org.objectweb.proactive.extensions.pnp.PNPConfig;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
@@ -138,6 +139,9 @@ public class RestFuncTHelper {
         cmd.add(PASchedulerProperties.SCHEDULER_DEFAULT_FJT_LOG4J.getCmdLine() + "file:" +
             toPath(forkedTaskLog4JConfig));
 
+        cmd.add(CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getCmdLine() + "pnp");
+        cmd.add(PNPConfig.PA_PNP_PORT.getCmdLine() + "1200");
+
         cmd.add("-cp");
         cmd.add(getClassPath());
         cmd.add(SchedulerStarter.class.getName());
@@ -153,8 +157,8 @@ public class RestFuncTHelper {
         out.start();
 
         // RM and scheduler are on the same url
-        String port = CentralPAPropertyRepository.PA_RMI_PORT.getValueAsString();
-        String url = "rmi://localhost:" + port + "/";
+        String port = "1200";
+        String url = "pnp://localhost:" + port + "/";
 
         // Connect a scheduler client
         SchedulerAuthenticationInterface schedAuth = SchedulerConnection.waitAndJoin(url, TimeUnit.SECONDS
