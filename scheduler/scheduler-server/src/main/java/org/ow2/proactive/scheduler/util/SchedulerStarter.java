@@ -38,20 +38,27 @@ package org.ow2.proactive.scheduler.util;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.UnknownHostException;
 import java.rmi.AlreadyBoundException;
 import java.security.KeyException;
-import java.security.Policy;
 
 import javax.security.auth.login.LoginException;
 
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.remoteobject.AbstractRemoteObjectFactory;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectFactory;
 import org.objectweb.proactive.extensions.pamr.PAMRConfig;
+import org.objectweb.proactive.extensions.pamr.router.Router;
+import org.objectweb.proactive.extensions.pamr.router.RouterConfig;
 import org.objectweb.proactive.utils.JVMPropertiesPreloader;
+import org.objectweb.proactive.utils.SecurityManagerConfigurator;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.RMFactory;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
@@ -128,6 +135,11 @@ public class SchedulerStarter {
     }
 
     private static void start(CommandLine commandLine) throws Exception {
+        ProActiveConfiguration.load(); // force properties loading to find out if PAMR router should be started
+
+        if (!commandLine.hasOption("no-router")) {
+            startRouter();
+        }
 
         String policyFullName = getPolicyFullName(commandLine);
         String rmUrl = getRmUrl(commandLine);
@@ -144,22 +156,69 @@ public class SchedulerStarter {
         if (!commandLine.hasOption("no-rest")) {
             JettyStarter.runWars(rmUrl, sai.getHostURL());
         }
-        logger.info("The scheduler created on " + sai.getHostURL());
     }
 
-    private static SchedulerAuthenticationInterface startScheduler(String policyFullName, String rmUrl)
-            throws Exception {
+    private static void startRouter() throws Exception {
+        if (needToStartRouter()) {
+            RouterConfig config = new RouterConfig();
+            int routerPort = PAMRConfig.PA_NET_ROUTER_PORT.getValue();
+            config.setPort(routerPort);
+            config.setNbWorkerThreads(Runtime.getRuntime().availableProcessors());
+            config.setReservedAgentConfigFile(
+              new File(PASchedulerProperties.SCHEDULER_HOME.getValueAsString(), "config/router/router.ini"));
+            Router.createAndStart(config);
+            logger.info("Router started on localhost:" + routerPort);
+        }
+    }
+
+    private static boolean needToStartRouter() {
+        return isPamrProtocolUsed() && isPamrHostLocalhost();
+    }
+
+    private static boolean isPamrHostLocalhost() {
+        try {
+            return isThisMyIpAddress(InetAddress.getByName(PAMRConfig.PA_NET_ROUTER_ADDRESS.getValue()));
+        } catch (UnknownHostException e) {
+            return false;
+        }
+    }
+
+    public static boolean isThisMyIpAddress(InetAddress addr) {
+        // Check if the address is a valid special local or loop back
+        if (addr.isAnyLocalAddress() || addr.isLoopbackAddress())
+            return true;
+
+        // Check if the address is defined on any interface
+        try {
+            return NetworkInterface.getByInetAddress(addr) != null;
+        } catch (SocketException e) {
+            return false;
+        }
+    }
+
+    private static boolean isPamrProtocolUsed() {
+        return CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getValue().contains("pamr")
+          || CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getValue().contains("pamrssh")
+          || CentralPAPropertyRepository.PA_COMMUNICATION_ADDITIONAL_PROTOCOLS.getValue().contains("pamr")
+          || CentralPAPropertyRepository.PA_COMMUNICATION_ADDITIONAL_PROTOCOLS.getValue().contains("pamrssh");
+    }
+
+    private static SchedulerAuthenticationInterface startScheduler(String policyFullName,
+      String rmUrl) throws Exception {
         logger.info("Starting the scheduler...");
-        return SchedulerFactory.startLocal(new URI(rmUrl), policyFullName);
+        SchedulerAuthenticationInterface sai = SchedulerFactory.startLocal(new URI(rmUrl),
+          policyFullName);
+        logger.info("The scheduler created on " + sai.getHostURL());
+        return sai;
     }
 
-    private static String connectToOrStartResourceManager(CommandLine commandLine, String rmUrl)
-            throws ProActiveException, URISyntaxException, ParseException {
+    private static String connectToOrStartResourceManager(CommandLine commandLine,
+      String rmUrl) throws ProActiveException, URISyntaxException, ParseException {
         if (rmUrl != null) {
             try {
                 logger.info("Connecting to the resource manager on " + rmUrl);
                 int rmConnectionTimeout = PASchedulerProperties.RESOURCE_MANAGER_CONNECTION_TIMEOUT
-                        .getValueAsInt();
+                  .getValueAsInt();
                 SchedulerFactory.waitAndJoinRM(new URI(rmUrl), rmConnectionTimeout);
             } catch (Exception e) {
                 logger.error("ERROR while connecting to the RM on " + rmUrl + ", no RM found !");
@@ -234,52 +293,63 @@ public class SchedulerStarter {
         options.addOption(rmURL);
 
         Option policy = new Option(
-            "p",
-            "policy",
-            true,
-            "the complete name of the scheduling policy to use (default: org.ow2.proactive.scheduler.policy.DefaultPolicy)");
+          "p",
+          "policy",
+          true,
+          "the complete name of the scheduling policy to use (default: org.ow2.proactive.scheduler.policy.DefaultPolicy)");
         policy.setArgName("policy");
         policy.setRequired(false);
         options.addOption(policy);
 
         Option noDeploy = new Option("ln", "localNodes", true,
-            "the number of local nodes to start (can be 0; default: " + DEFAULT_NODES_NUMBER + ")");
+          "the number of local nodes to start (can be 0; default: " + DEFAULT_NODES_NUMBER + ")");
         noDeploy.setArgName("localNodes");
         noDeploy.setRequired(false);
         options.addOption(noDeploy);
 
         Option nodeTimeout = new Option("t", "timeout", true,
-            "timeout used to start the nodes (only useful with local nodes; default: " +
-                DEFAULT_NODES_TIMEOUT + "ms)");
+          "timeout used to start the nodes (only useful with local nodes; default: " +
+            DEFAULT_NODES_TIMEOUT + "ms)");
         nodeTimeout.setArgName("timeout");
         nodeTimeout.setRequired(false);
         options.addOption(nodeTimeout);
 
-        options.addOption(new Option("c", "clean", false,
-            "clean scheduler and resource manager databases (default: false)"));
+        options.addOption(
+          new Option("c", "clean", false, "clean scheduler and resource manager databases (default: false)"));
 
-        options.addOption(OptionBuilder.withLongOpt("clean-nodesources").withDescription(
-                "drop all previously created nodesources from resource manager database (default: false)")
-                .create());
+        options.addOption(OptionBuilder
+          .withLongOpt("clean-nodesources")
+          .withDescription(
+            "drop all previously created nodesources from resource manager database (default: false)")
+          .create());
 
-        options.addOption(OptionBuilder.withLongOpt("rm-only").withDescription(
-                "start only resource manager (implies --no-rest; default: false)").create());
+        options.addOption(OptionBuilder
+          .withLongOpt("rm-only")
+          .withDescription("start only resource manager (implies --no-rest; default: false)")
+          .create());
 
-        options.addOption(OptionBuilder.withLongOpt("no-rest").withDescription(
-                "do not deploy REST server and wars from dist/war (default: false)").create());
+        options.addOption(OptionBuilder
+          .withLongOpt("no-rest")
+          .withDescription("do not deploy REST server and wars from dist/war (default: false)")
+          .create());
+
+        options.addOption(OptionBuilder
+          .withLongOpt("no-router")
+          .withDescription("do not deploy PAMR Router (default: false)")
+          .create());
 
         return options;
     }
 
     private static int readIntOption(CommandLine cmd, String optionName, int defaultValue)
-            throws ParseException {
+      throws ParseException {
         int value = defaultValue;
         if (cmd.hasOption(optionName)) {
             try {
                 value = Integer.parseInt(cmd.getOptionValue(optionName));
             } catch (Exception nfe) {
                 throw new ParseException("Wrong value for " + optionName + " option: " +
-                    cmd.getOptionValue("t"));
+                  cmd.getOptionValue("t"));
             }
         }
         return value;
@@ -299,7 +369,7 @@ public class SchedulerStarter {
                     }
 
                     logger.info("The resource manager with " + numberLocalNodes + " local nodes created on " +
-                        rmAuth.getHostURL());
+                      rmAuth.getHostURL());
                 } catch (AlreadyBoundException abe) {
                     logger.error("The resource manager already exists on local host", abe);
                     System.exit(4);
@@ -314,21 +384,21 @@ public class SchedulerStarter {
     }
 
     private static void addLocalNodes(RMAuthentication rmAuth, int numberLocalNodes, int nodeTimeoutValue)
-            throws LoginException, KeyException, IOException {
+      throws LoginException, KeyException, IOException {
         //creating default node source
         ResourceManager rman = rmAuth.login(Credentials.getCredentials(PAResourceManagerProperties
-                .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
+          .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
         //first im parameter is default rm url
         byte[] creds = FileToBytesConverter.convertFileToByteArray(new File(PAResourceManagerProperties
-                .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
+          .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
         rman.createNodeSource(NodeSource.LOCAL_INFRASTRUCTURE_NAME, LocalInfrastructure.class.getName(),
-                new Object[] {
-                        creds,
-                        numberLocalNodes,
-                        nodeTimeoutValue,
-                        CentralPAPropertyRepository.PA_HOME.getCmdLine() +
-                            CentralPAPropertyRepository.PA_HOME.getValue() }, RestartDownNodesPolicy.class
-                        .getName(), new Object[] { "ALL", "ALL", "10000" });
+          new Object[] {
+            creds,
+            numberLocalNodes,
+            nodeTimeoutValue,
+            CentralPAPropertyRepository.PA_HOME.getCmdLine() +
+              CentralPAPropertyRepository.PA_HOME.getValue() }, RestartDownNodesPolicy.class
+            .getName(), new Object[] { "ALL", "ALL", "10000" });
     }
 
     private static String getLocalAdress() throws ProActiveException {
@@ -338,31 +408,41 @@ public class SchedulerStarter {
 
     private static void configureSchedulerAndRMAndPAHomes() {
         if (System.getProperty(PASchedulerProperties.SCHEDULER_HOME.getKey()) == null) {
-            System.setProperty(PASchedulerProperties.SCHEDULER_HOME.getKey(), System.getProperty("user.dir"));
+            System.setProperty(PASchedulerProperties.SCHEDULER_HOME.getKey(),
+              findSchedulerHomeFromJarOrCurrentFolder());
         }
         if (System.getProperty(PAResourceManagerProperties.RM_HOME.getKey()) == null) {
             System.setProperty(PAResourceManagerProperties.RM_HOME.getKey(), System
-                    .getProperty(PASchedulerProperties.SCHEDULER_HOME.getKey()));
+              .getProperty(PASchedulerProperties.SCHEDULER_HOME.getKey()));
         }
         if (System.getProperty(CentralPAPropertyRepository.PA_HOME.getName()) == null) {
             System.setProperty(CentralPAPropertyRepository.PA_HOME.getName(), System
-                    .getProperty(PASchedulerProperties.SCHEDULER_HOME.getKey()));
+              .getProperty(PASchedulerProperties.SCHEDULER_HOME.getKey()));
         }
 
         if (System.getProperty(CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getName()) == null) {
             System.setProperty(CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getName(), System
-                    .getProperty(PASchedulerProperties.SCHEDULER_HOME.getKey()) +
-                "/config/proactive/ProActiveConfiguration.xml");
+              .getProperty(PASchedulerProperties.SCHEDULER_HOME.getKey()) +
+              "/config/network/ProActiveConfiguration.ini");
+        }
+    }
+
+    private static String findSchedulerHomeFromJarOrCurrentFolder() {
+        try {
+            String jarPath = SchedulerStarter.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+            if (new File(jarPath).getParentFile().getParentFile().getName().equals("dist")) {
+                return new File(jarPath).getParentFile().getParentFile().getParent();
+            } else {
+                return ".";
+            }
+        } catch (Exception e) {
+            return ".";
         }
     }
 
     private static void configureSecurityManager() {
-        if (System.getProperty("java.security.policy") == null) {
-            System.setProperty("java.security.policy", System
-                    .getProperty(PASchedulerProperties.SCHEDULER_HOME.getKey()) +
-                "/config/security.java.policy-server");
-            Policy.getPolicy().refresh();
-        }
+        SecurityManagerConfigurator.configureSecurityManager(System.getProperty(
+          PASchedulerProperties.SCHEDULER_HOME.getKey()) + "/config/security.java.policy-server");
     }
 
     private static void configureLogging() {
@@ -374,8 +454,8 @@ public class SchedulerStarter {
         }
         final String DERBY_LOG = "derby.stream.error.file";
         if (System.getProperty(DERBY_LOG) == null)
-            System.setProperty(DERBY_LOG, System.getProperty(PASchedulerProperties.SCHEDULER_HOME.getKey()) +
-                "/logs/derby.log");
+            System.setProperty(DERBY_LOG,
+              System.getProperty(PASchedulerProperties.SCHEDULER_HOME.getKey()) + "/logs/Database.log");
     }
 
     private static void configureSchedulerPAMRProperties() {
