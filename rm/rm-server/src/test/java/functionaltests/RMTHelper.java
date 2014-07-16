@@ -462,7 +462,7 @@ public class RMTHelper {
 
     public static String testClasspath() {
         String home = PAResourceManagerProperties.RM_HOME.getValueAsString();
-        String classpathToLibFolderWithWildcard = home + File.separator + File.separator + "lib" +
+        String classpathToLibFolderWithWildcard = home + File.separator + "lib" +
             File.separator + "*";
         if (OperatingSystem.getOperatingSystem().equals(OperatingSystem.windows)) {
             // required by windows otherwise wildcard is expanded
