@@ -9,7 +9,9 @@ build/
 /.settings
 /.classpath*
 
-/dist
+/dist/lib
+/dist/war/rest
+/dist/war/*.war
 /data
 /logs
 
