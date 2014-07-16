@@ -40,14 +40,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 
-import javax.management.AttributeNotFoundException;
 import javax.management.MBeanAttributeInfo;
-import javax.management.MBeanException;
-import javax.management.ReflectionException;
 import javax.management.StandardMBean;
 
-import org.apache.log4j.Logger;
 import org.ow2.proactive.utils.FileToBytesConverter;
+import org.apache.log4j.Logger;
 import org.rrd4j.ConsolFun;
 import org.rrd4j.DsType;
 import org.rrd4j.core.RrdDb;
@@ -82,7 +79,7 @@ public class RRDDataStore extends Thread {
      * @throws IOException is thrown when the data base exists but cannot be read
      */
     public RRDDataStore(StandardMBean mbean, String dataBaseFilePath, int step, Logger logger)
-            throws IOException {
+      throws IOException {
 
         this(dataBaseFilePath, step, logger);
         this.mbean = mbean;
@@ -90,7 +87,7 @@ public class RRDDataStore extends Thread {
         for (MBeanAttributeInfo attrInfo : mbean.getMBeanInfo().getAttributes()) {
             try {
                 if (attrInfo.isReadable() &&
-                    mbean.getClass().getMethod("get" + attrInfo.getName()).getAnnotation(Chronological.class) != null) {
+                  mbean.getClass().getMethod("get" + attrInfo.getName()).getAnnotation(Chronological.class) != null) {
 
                     String sourceName = attrInfo.getName();
                     if (sourceName.length() > 20) {
@@ -113,7 +110,7 @@ public class RRDDataStore extends Thread {
 
     protected void initDatabase() throws IOException {
         if (!new File(dataBaseFile).exists()) {
-            logger.info("Creating a new RRD data base: " + dataBaseFile);
+            logger.info("Node's statistics are saved in " + dataBaseFile);
 
             RrdDef rrdDef = new RrdDef(dataBaseFile, System.currentTimeMillis() / 1000, step);
 
@@ -178,7 +175,7 @@ public class RRDDataStore extends Thread {
                             Object attrValue = mbean.getAttribute(dataSources.get(dataSource));
                             sample.setValue(dataSource, Double.parseDouble(attrValue.toString()));
                             logger.debug(System.currentTimeMillis() / 1000 + " sampling: " + dataSource +
-                                " " + Double.parseDouble(attrValue.toString()));
+                              " " + Double.parseDouble(attrValue.toString()));
                         }
 
                         sample.setTime(System.currentTimeMillis() / 1000);

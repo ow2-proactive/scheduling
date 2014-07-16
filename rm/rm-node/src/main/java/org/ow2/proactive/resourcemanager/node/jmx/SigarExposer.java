@@ -36,21 +36,18 @@
  */
 package org.ow2.proactive.resourcemanager.node.jmx;
 
+import java.io.File;
 import java.net.ServerSocket;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
-import javax.management.StandardMBean;
 
-import org.apache.log4j.Logger;
-import org.hyperic.sigar.jmx.AbstractMBean;
-import org.hyperic.sigar.jmx.SigarRegistry;
 import org.ow2.proactive.jmx.AbstractJMXHelper;
-import org.ow2.proactive.jmx.RRDDataStore;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.utils.RRDSigarDataStore;
+import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Logger;
+import org.hyperic.sigar.jmx.SigarRegistry;
 
 
 public class SigarExposer extends AbstractJMXHelper {

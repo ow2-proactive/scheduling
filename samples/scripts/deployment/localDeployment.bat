@@ -11,7 +11,7 @@ set RM_URL=%4
 :: Script constants
 set RM_HOME_NODE=UPDATE_ME
 set JAVA_HOME_NODE=UPDATE_ME
-set JAVA_OPTS_NODE=-Djava.security.policy=%RM_HOME_NODE%\config\security.java.policy-client -Dproactive.useIPaddress=true -Dlog4j.configuration=%RM_HOME_NODE%\config\log4j\log4j-defaultNode
+set JAVA_OPTS_NODE=-Djava.security.policy=%RM_HOME_NODE%\config\security.java.policy-client -Dproactive.useIPaddress=true -Dlog4j.configuration=%RM_HOME_NODE%\config\log\node.properties
 set CREDENTIALS="UPDATE_ME"
 
 set CLASSPATH=%CLASSPATH%;
