@@ -14,6 +14,7 @@ build/
 /dist/war/*.war
 /data
 /logs
+/bin
 
 # /performance/results/
 /performance/results/*
