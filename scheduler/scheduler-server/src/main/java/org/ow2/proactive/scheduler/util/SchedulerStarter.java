@@ -232,7 +232,8 @@ public class SchedulerStarter {
                 SchedulerFactory.tryJoinRM(uri);
                 logger.info("Connected to the existing resource manager at " + uri);
             } catch (Exception e) {
-                int numberLocalNodes = readIntOption(commandLine, "localNodes", DEFAULT_NODES_NUMBER);
+                int defaultNodesNumber = PAResourceManagerProperties.RM_NB_LOCAL_NODES.getValueAsInt();
+                int numberLocalNodes = readIntOption(commandLine, "localNodes", defaultNodesNumber);
                 int nodeTimeoutValue = readIntOption(commandLine, "timeout", DEFAULT_NODES_TIMEOUT);
                 startResourceManager(numberLocalNodes, nodeTimeoutValue);
             }

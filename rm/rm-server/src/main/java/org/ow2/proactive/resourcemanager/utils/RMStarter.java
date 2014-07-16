@@ -73,7 +73,6 @@ public class RMStarter {
 
     private static Options options = new Options();
 
-    private static final int DEFAULT_NUMBER_OF_NODES = 4;
     private static final int DEFAULT_NODE_TIMEOUT = 30 * 1000;
     private static int nodeTimeout = DEFAULT_NODE_TIMEOUT;
 
@@ -84,7 +83,7 @@ public class RMStarter {
         options.addOption(help);
 
         Option noDeploy = new Option("ln", "localNodes", false,
-            "start the resource manager deploying default " + DEFAULT_NUMBER_OF_NODES + " local nodes");
+            "start the resource manager deploying default 4 local nodes");
         noDeploy.setArgName("localNodes");
         noDeploy.setRequired(false);
         options.addOption(noDeploy);
@@ -143,7 +142,8 @@ public class RMStarter {
             // starting clean resource manager
             RMAuthentication auth = RMFactory.startLocal();
 
-            if (localNodes) {
+            int defaultNodesNumber = PAResourceManagerProperties.RM_NB_LOCAL_NODES.getValueAsInt();
+            if (localNodes && defaultNodesNumber > 0) {
                 ResourceManager resourceManager = auth.login(Credentials
                         .getCredentials(PAResourceManagerProperties
                                 .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
@@ -154,10 +154,10 @@ public class RMStarter {
                     PAResourceManagerProperties.getAbsolutePath(PAResourceManagerProperties.RM_CREDS
                             .getValueAsString())));
                 resourceManager.createNodeSource(nodeSourceName, LocalInfrastructure.class.getName(),
-                        new Object[] { creds, DEFAULT_NUMBER_OF_NODES, nodeTimeout, "" },
+                        new Object[] { creds, defaultNodesNumber, nodeTimeout, "" },
                         RestartDownNodesPolicy.class.getName(), null);
                 resourceManager.disconnect();
-                logger.info("The resource manager with " + DEFAULT_NUMBER_OF_NODES +
+                logger.info("The resource manager with " + defaultNodesNumber +
                     " local nodes created on " + auth.getHostURL());
             } else {
                 logger.info("The resource manager created on " + auth.getHostURL());
