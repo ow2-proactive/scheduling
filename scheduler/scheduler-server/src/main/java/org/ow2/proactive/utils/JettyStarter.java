@@ -36,7 +36,11 @@ package org.ow2.proactive.utils;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
+import java.net.BindException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Properties;
 
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
@@ -77,6 +81,7 @@ public class JettyStarter {
         setSystemPropertyIfNotDefined("scheduler.url", schedulerUrl);
 
         if ("true".equals(properties.getProperty("web.deploy", "true"))) {
+            logger.info("Starting the web applications...");
             int restPort = Integer.parseInt(properties.getProperty("web.port", "8080"));
             boolean httpsEnabled = Boolean.parseBoolean(properties.getProperty("web.https", "false"));
             String httpProtocol = httpsEnabled ? "https" : "http";
@@ -94,7 +99,8 @@ public class JettyStarter {
             addWarsToHandlerList(handlerList);
             server.setHandler(handlerList);
 
-            startServer(server, restPort, httpProtocol);
+            String schedulerHost = getSchedulerHost(schedulerUrl);
+            startServer(server, schedulerHost, restPort, httpProtocol);
         }
     }
 
@@ -116,38 +122,61 @@ public class JettyStarter {
         return server;
     }
 
-    private static void startServer(Server server, int restPort, String httpProtocol) {
+    private static void startServer(Server server, String schedulerHost, int restPort, String httpProtocol) {
         try {
             if (server.getHandler() == null) {
                 logger.info("SCHEDULER_HOME/dist/war folder is empty, nothing is deployed");
             } else {
                 server.start();
                 if (server.isStarted()) {
-                    HandlerList handlerList = (HandlerList) server.getHandler();
-                    for (Handler handler : handlerList.getHandlers()) {
-                        WebAppContext webAppContext = (WebAppContext) handler;
-                        Throwable startException = webAppContext.getUnavailableException();
-                        if (startException == null) {
-                            logger.info("The web application " + webAppContext.getContextPath() +
-                                " created on " + httpProtocol + "://localhost:" + restPort +
-                                webAppContext.getContextPath());
-                        } else {
-                            logger.warn("Failed to start context " + webAppContext.getContextPath(),
-                                    startException);
-                        }
-                    }
+                    printDeployedApplications(server, schedulerHost, restPort, httpProtocol);
                 } else {
-                    logger.warn("Failed to start web modules (REST API, portals)");
+                    logger.error("Failed to start web modules (REST API, portals)");
+                    System.exit(-1);
                 }
             }
+        } catch (BindException bindException) {
+            logger.error(
+              "Failed to start web modules (REST API, portals), port " + restPort + " is already used",
+              bindException);
+            System.exit(-1);
         } catch (Exception e) {
-            logger.warn("Failed to start web modules (REST API, portals)", e);
+            logger.error("Failed to start web modules (REST API, portals)", e);
+            System.exit(-1);
+        }
+    }
+
+    private static void printDeployedApplications(Server server, String schedulerHost, int restPort,
+      String httpProtocol) {
+        HandlerList handlerList = (HandlerList) server.getHandler();
+        if (handlerList.getHandlers() != null) {
+            for (Handler handler : handlerList.getHandlers()) {
+                WebAppContext webAppContext = (WebAppContext) handler;
+                Throwable startException = webAppContext.getUnavailableException();
+                if (startException == null) {
+                    if (!"/".equals(webAppContext.getContextPath())) {
+                        logger.info("The web application " + webAppContext.getContextPath() +
+                          " created on " + httpProtocol + "://" + schedulerHost + ":" + restPort +
+                          webAppContext.getContextPath());
+                    }
+                } else {
+                    logger.warn("Failed to start context " + webAppContext.getContextPath(),
+                      startException);
+                }
+            }
+            logger.info(
+              "*** Get started at " + httpProtocol + "://" + schedulerHost + ":" + restPort + " ***");
         }
     }
 
     private static void addWarsToHandlerList(HandlerList handlerList) {
         File warFolder = new File(getSchedulerHome() + FOLDER_TO_DEPLOY);
-        File[] warFolderContent = warFolder.listFiles();
+        File[] warFolderContent = warFolder.listFiles(new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                return !"getstarted".equals(name);
+            }
+        });
         if (warFolderContent != null) {
             for (File fileToDeploy : warFolderContent) {
                 if (isExplodedWebApp(fileToDeploy)) {
@@ -159,6 +188,7 @@ public class JettyStarter {
                 }
             }
         }
+        addGetStartedApplication(handlerList, new File(warFolder, "getstarted"));
     }
 
     private static void addWarFile(HandlerList handlerList, File file) {
@@ -176,7 +206,6 @@ public class JettyStarter {
         webApp.setResourceBase(file.getAbsolutePath());
         handlerList.addHandler(webApp);
         logger.debug("Deploying " + contextPath + " using exploded war " + file);
-
     }
 
     private static void addStaticFolder(HandlerList handlerList, File file) {
@@ -185,6 +214,15 @@ public class JettyStarter {
         webApp.setWar(file.getAbsolutePath());
         handlerList.addHandler(webApp);
         logger.debug("Deploying " + contextPath + " using folder " + file);
+    }
+
+    private static void addGetStartedApplication(HandlerList handlerList, File file) {
+        if (file.exists()) {
+            String contextPath = "/";
+            WebAppContext webApp = createWebAppContext(contextPath);
+            webApp.setWar(file.getAbsolutePath());
+            handlerList.addHandler(webApp);
+        }
     }
 
     private static WebAppContext createWebAppContext(String contextPath) {
@@ -237,6 +275,15 @@ public class JettyStarter {
             return path;
         } else {
             return new File(getSchedulerHome(), path).getPath();
+        }
+    }
+
+    private static String getSchedulerHost(String schedulerUrl) {
+        try {
+            return new URI(schedulerUrl).getHost();
+        } catch (URISyntaxException e) {
+            logger.warn("Could not read host from Scheduler's URL", e);
+            return "localhost";
         }
     }
 }
