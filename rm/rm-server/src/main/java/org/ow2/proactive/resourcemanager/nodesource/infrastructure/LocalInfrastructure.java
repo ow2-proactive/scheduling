@@ -117,7 +117,7 @@ public class LocalInfrastructure extends InfrastructureManager {
         }
         if (!this.paProperties.contains(CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getName())) {
             paPropList.add(CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getCmdLine() + rmHome +
-                "config" + os.fs + "proactive" + os.fs + "ProActiveConfiguration.xml");
+              "config" + os.fs + "network" + os.fs + "ProActiveConfiguration.ini");
         }
         if (!this.paProperties.contains(PAResourceManagerProperties.RM_HOME.getKey())) {
             paPropList.add(PAResourceManagerProperties.RM_HOME.getCmdLine() + rmHome);
