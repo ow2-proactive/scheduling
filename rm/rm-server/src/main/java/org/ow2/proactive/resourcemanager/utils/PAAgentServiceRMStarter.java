@@ -146,8 +146,8 @@ public final class PAAgentServiceRMStarter {
                         for (File child : childs) {
                             if ("config".equals(child.getName())) {
                                 //we have found the sched-home/config/ directory!
-                                log4jPath = child.getAbsolutePath() + File.separator + "log4j" +
-                                    File.separator + "log4j-defaultNode";
+                                log4jPath = child.getAbsolutePath() + File.separator + "log" +
+                                    File.separator + "node.properties";
                                 File log4j = new File(log4jPath);
                                 if (log4j.exists()) {
                                     URL log4jURL;

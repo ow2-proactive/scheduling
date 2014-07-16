@@ -368,7 +368,7 @@ public class SchedulerStarter {
     private static void configureLogging() {
         if (System.getProperty(CentralPAPropertyRepository.LOG4J.getName()) == null) {
             String defaultLog4jConfig = System.getProperty(PASchedulerProperties.SCHEDULER_HOME.getKey()) +
-                "/config/log4j/scheduler-log4j-server";
+              "/config/log/server.properties";
             System.setProperty(CentralPAPropertyRepository.LOG4J.getName(), defaultLog4jConfig);
             PropertyConfigurator.configure(defaultLog4jConfig);
         }
