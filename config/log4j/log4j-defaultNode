@@ -1,6 +1,6 @@
 log4j.rootLogger=INFO, NODE, CONSOLE
 
-log4j.logger.org.ow2.proactive.resourcemanager=DEBUG
+log4j.logger.org.ow2.proactive.resourcemanager=INFO
 
 log4j.logger.org.ow2.proactive.resourcemanager.core.jmx=INFO
 log4j.logger.org.ow2.proactive.resourcemanager.db=INFO
