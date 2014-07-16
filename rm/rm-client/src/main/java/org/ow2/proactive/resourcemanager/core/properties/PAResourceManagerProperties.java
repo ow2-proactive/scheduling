@@ -205,7 +205,9 @@ public enum PAResourceManagerProperties {
     RM_TOPOLOGY_PINGER("pa.rm.topology.pinger.class", PropertyType.STRING),
 
     /** Resource Manager selection process logs*/
-    RM_SELECTION_LOGS_LOCATION("pa.rm.logs.selection.location", PropertyType.STRING);
+    RM_SELECTION_LOGS_LOCATION("pa.rm.logs.selection.location", PropertyType.STRING),
+
+    RM_NB_LOCAL_NODES("pa.rm.local.nodes.number", PropertyType.INTEGER);
 
     /* ***************************************************************************** */
     /* ***************************************************************************** */
