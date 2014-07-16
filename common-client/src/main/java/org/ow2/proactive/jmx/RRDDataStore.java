@@ -40,14 +40,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 
-import javax.management.AttributeNotFoundException;
 import javax.management.MBeanAttributeInfo;
-import javax.management.MBeanException;
-import javax.management.ReflectionException;
 import javax.management.StandardMBean;
 
-import org.apache.log4j.Logger;
 import org.ow2.proactive.utils.FileToBytesConverter;
+import org.apache.log4j.Logger;
 import org.rrd4j.ConsolFun;
 import org.rrd4j.DsType;
 import org.rrd4j.core.RrdDb;
@@ -113,7 +110,7 @@ public class RRDDataStore extends Thread {
 
     protected void initDatabase() throws IOException {
         if (!new File(dataBaseFile).exists()) {
-            logger.info("Creating a new RRD data base: " + dataBaseFile);
+            logger.info("Node's statistics are saved in " + dataBaseFile);
 
             RrdDef rrdDef = new RrdDef(dataBaseFile, System.currentTimeMillis() / 1000, step);
 

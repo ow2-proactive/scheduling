@@ -39,6 +39,8 @@ import java.io.FileInputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.BindException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Properties;
 
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
@@ -91,18 +93,19 @@ public class JettyStarter {
             addWarsToHandlerList(handlerList);
             server.setHandler(handlerList);
 
-            startServer(server, restPort);
+            String schedulerHost = getSchedulerHost(schedulerUrl);
+            startServer(server, schedulerHost, restPort);
         }
     }
 
-    private static void startServer(Server server, int restPort) {
+    private static void startServer(Server server, String schedulerHost, int restPort) {
         try {
             if (server.getHandler() == null) {
                 logger.info("SCHEDULER_HOME/lib/war folder is empty, nothing is deployed");
             } else {
                 server.start();
                 if (server.isStarted()) {
-                    printDeployedApplications(server, restPort);
+                    printDeployedApplications(server, schedulerHost, restPort);
                 } else {
                     logger.error("Failed to start web modules (REST API, portals)");
                     System.exit(-1);
@@ -119,23 +122,23 @@ public class JettyStarter {
         }
     }
 
-    private static void printDeployedApplications(Server server, int restPort) {
+    private static void printDeployedApplications(Server server, String schedulerHost, int restPort) {
         HandlerList handlerList = (HandlerList) server.getHandler();
         if (handlerList.getHandlers() != null) {
             for (Handler handler : handlerList.getHandlers()) {
                 WebAppContext webAppContext = (WebAppContext) handler;
                 Throwable startException = webAppContext.getUnavailableException();
                 if (startException == null) {
-                    if ("/".equals(webAppContext.getContextPath())) {
+                    if (!"/".equals(webAppContext.getContextPath())) {
                         logger.info("The web application " + webAppContext.getContextPath() +
-                          " created on http://localhost:" + restPort + webAppContext.getContextPath());
+                          " created on http://" + schedulerHost + ":" + restPort + webAppContext.getContextPath());
                     }
                 } else {
                     logger.warn("Failed to start context " + webAppContext.getContextPath(),
                       startException);
                 }
             }
-            logger.info("*** Get started at http://localhost:" + restPort + " ***");
+            logger.info("*** Get started at http://" + schedulerHost + ":" + restPort + " ***");
         }
     }
 
@@ -161,13 +164,6 @@ public class JettyStarter {
         addGetStartedApplication(handlerList, new File(warFolder, "getstarted"));
     }
 
-    private static void addGetStartedApplication(HandlerList handlerList, File file) {
-        String contextPath = "/";
-        WebAppContext webApp = createWebAppContext(contextPath);
-        webApp.setWar(file.getAbsolutePath());
-        handlerList.addHandler(webApp);
-    }
-
     private static void addWarFile(HandlerList handlerList, File file) {
         String contextPath = "/" + FilenameUtils.getBaseName(file.getName());
         WebAppContext webApp = createWebAppContext(contextPath);
@@ -183,7 +179,6 @@ public class JettyStarter {
         webApp.setResourceBase(file.getAbsolutePath());
         handlerList.addHandler(webApp);
         logger.debug("Deploying " + contextPath + " using exploded war " + file);
-
     }
 
     private static void addStaticFolder(HandlerList handlerList, File file) {
@@ -192,6 +187,13 @@ public class JettyStarter {
         webApp.setWar(file.getAbsolutePath());
         handlerList.addHandler(webApp);
         logger.debug("Deploying " + contextPath + " using folder " + file);
+    }
+
+    private static void addGetStartedApplication(HandlerList handlerList, File file) {
+        String contextPath = "/";
+        WebAppContext webApp = createWebAppContext(contextPath);
+        webApp.setWar(file.getAbsolutePath());
+        handlerList.addHandler(webApp);
     }
 
     private static WebAppContext createWebAppContext(String contextPath) {
@@ -236,6 +238,15 @@ public class JettyStarter {
     private static void setSystemPropertyIfNotDefined(String key, String value) {
         if (System.getProperty(key) == null) {
             System.setProperty(key, value);
+        }
+    }
+
+    private static String getSchedulerHost(String schedulerUrl)  {
+        try {
+            return new URI(schedulerUrl).getHost();
+        } catch (URISyntaxException e) {
+            logger.warn("Could not read host from Scheduler's URL", e);
+            return "localhost";
         }
     }
 }

@@ -39,7 +39,6 @@ package org.ow2.proactive.utils;
 import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -47,6 +46,7 @@ import javax.script.ScriptEngineFactory;
 import javax.script.ScriptEngineManager;
 
 import org.objectweb.proactive.annotation.PublicAPI;
+import com.google.common.base.Joiner;
 import org.apache.log4j.Logger;
 
 
@@ -377,16 +377,10 @@ public class Tools {
     public static void logAvailableScriptEngines(Logger logger) {
         ScriptEngineManager mgr = new ScriptEngineManager();
         List<ScriptEngineFactory> factories = mgr.getEngineFactories();
+        List<String> engineNames = new ArrayList<String>();
         for (ScriptEngineFactory factory : factories) {
-            String engName = factory.getEngineName();
-            String engVersion = factory.getEngineVersion();
-            String langName = factory.getLanguageName();
-            String langVersion = factory.getLanguageVersion();
-
-            String scriptEngineInfo = String.format("%s (%s), aliases: %s, language: %s (%s)", engName,
-                    engVersion, Arrays.toString(factory.getNames().toArray()), langName, langVersion);
-
-            logger.info("Available script engine: " + scriptEngineInfo);
+            engineNames.add(factory.getEngineName());
         }
+        logger.info("Available script engines: " + Joiner.on(',').join(engineNames));
     }
 }
