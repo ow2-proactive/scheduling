@@ -42,7 +42,6 @@ import javax.management.MBeanServer;
 import javax.management.ObjectName;
 import javax.management.StandardMBean;
 
-import org.apache.log4j.Logger;
 import org.ow2.proactive.jmx.AbstractJMXHelper;
 import org.ow2.proactive.jmx.RRDDataStore;
 import org.ow2.proactive.scheduler.core.account.SchedulerAccountsManager;
@@ -52,6 +51,8 @@ import org.ow2.proactive.scheduler.core.jmx.mbean.ManagementMBeanImpl;
 import org.ow2.proactive.scheduler.core.jmx.mbean.MyAccountMBeanImpl;
 import org.ow2.proactive.scheduler.core.jmx.mbean.RuntimeDataMBeanImpl;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Logger;
 
 
 /**
@@ -115,19 +116,20 @@ public class SchedulerJMXHelper extends AbstractJMXHelper {
             final ObjectName name = new ObjectName(RUNTIMEDATA_MBEAN_NAME);
             mbs.registerMBean(this.schedulerRuntimeMBean, name);
 
-            String dataBasePath = PASchedulerProperties.SCHEDULER_HOME.getValueAsString() +
+            String dataBaseName = PASchedulerProperties.SCHEDULER_HOME.getValueAsString() +
                 System.getProperty("file.separator") +
                 PASchedulerProperties.SCHEDULER_RRD_DATABASE_NAME.getValueAsString();
 
+            FileUtils.forceMkdir(new File(dataBaseName).getParentFile());
             if (PASchedulerProperties.SCHEDULER_DB_HIBERNATE_DROPDB.getValueAsBoolean()) {
                 // dropping the RDD data base
-                File rrdDataBase = new File(dataBasePath);
+                File rrdDataBase = new File(dataBaseName);
                 if (rrdDataBase.exists()) {
                     rrdDataBase.delete();
                 }
             }
 
-            setDataStore(new RRDDataStore((StandardMBean) schedulerRuntimeMBean, dataBasePath,
+            setDataStore(new RRDDataStore((StandardMBean) schedulerRuntimeMBean, dataBaseName,
                 PASchedulerProperties.SCHEDULER_RRD_STEP.getValueAsInt(), Logger
                         .getLogger(SchedulerJMXHelper.class)));
 

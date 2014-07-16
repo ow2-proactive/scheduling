@@ -70,11 +70,13 @@ public class SigarExposer extends AbstractJMXHelper {
                 mbs.registerMBean(registry, name);
             }
 
-            String dataBaseName = PAResourceManagerProperties.RM_HOME.getValueAsString() +
-                System.getProperty("file.separator") + "data/" + nodeName + "_statistics.rrd";
+            String databaseFolder = PAResourceManagerProperties.RM_HOME.getValueAsString() +
+              System.getProperty("file.separator") + "data/";
+            FileUtils.forceMkdir(new File(databaseFolder));
+            String dataBaseName = databaseFolder + nodeName + "_statistics.rrd";
 
             setDataStore(new RRDSigarDataStore(mbs, dataBaseName, PAResourceManagerProperties.RM_RRD_STEP
-                    .getValueAsInt(), Logger.getLogger(SigarExposer.class)));
+              .getValueAsInt(), Logger.getLogger(SigarExposer.class)));
 
             name = new ObjectName("sigar:Type=Processes");
             SigarProcessesMXBean processes = new SigarProcesses(dataBaseName);
