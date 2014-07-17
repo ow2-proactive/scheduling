@@ -138,8 +138,8 @@ project(':rest:rest-server') {
 
     task('functionalTest', type: Test).configure functionalTestConfiguration
 
-    functionalTest.dependsOn rootProject.proActiveLibs
-    clean.dependsOn rootProject.cleanProActiveLibs
+    functionalTest.dependsOn rootProject.dist
+    clean.dependsOn rootProject.cleanDist
 
     task proActiveWar(type: Sync, dependsOn: war) {
         from "$webAppDirName"
@@ -155,8 +155,9 @@ project(':rest:rest-server') {
             it.filter(org.apache.tools.ant.filters.ReplaceTokens, tokens: ['rest_api.version': project.version])
         }
     }
+    clean.dependsOn cleanProActiveWar
 
-    rootProject.proActiveLibs.dependsOn project.proActiveWar
+    rootProject.dist.dependsOn project.proActiveWar
 
     artifacts {
         jar
@@ -209,6 +210,6 @@ project(':rest:rest-client') {
 
     task('functionalTest', type:Test).configure functionalTestConfiguration
 
-    functionalTest.dependsOn rootProject.proActiveLibs
-    clean.dependsOn rootProject.cleanProActiveLibs
+    functionalTest.dependsOn rootProject.dist
+    clean.dependsOn rootProject.cleanDist
 }
