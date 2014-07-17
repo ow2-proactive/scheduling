@@ -9,9 +9,8 @@ build/
 /.settings
 /.classpath*
 
-/dist/lib
-/dist/war/rest
-/dist/war/*.war
+/dist/
+!/dist/war/getstarted
 /data
 /logs
 /bin
