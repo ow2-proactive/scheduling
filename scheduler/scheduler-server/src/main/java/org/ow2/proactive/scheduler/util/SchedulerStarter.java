@@ -54,6 +54,7 @@ import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.remoteobject.AbstractRemoteObjectFactory;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectFactory;
+import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.extensions.pamr.PAMRConfig;
 import org.objectweb.proactive.extensions.pamr.router.Router;
 import org.objectweb.proactive.extensions.pamr.router.RouterConfig;
@@ -165,9 +166,10 @@ public class SchedulerStarter {
             config.setPort(routerPort);
             config.setNbWorkerThreads(Runtime.getRuntime().availableProcessors());
             config.setReservedAgentConfigFile(
-              new File(PASchedulerProperties.SCHEDULER_HOME.getValueAsString(), "config/router/router.ini"));
+              new File(PASchedulerProperties.SCHEDULER_HOME.getValueAsString(),
+                "config" + File.separator + "router" + File.separator + "router.ini"));
             Router.createAndStart(config);
-            logger.info("Router started on localhost:" + routerPort);
+            logger.info("The router created on " + ProActiveInet.getInstance().getHostname() + ":" + routerPort);
         }
     }
 
@@ -198,9 +200,7 @@ public class SchedulerStarter {
 
     private static boolean isPamrProtocolUsed() {
         return CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getValue().contains("pamr")
-          || CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getValue().contains("pamrssh")
-          || CentralPAPropertyRepository.PA_COMMUNICATION_ADDITIONAL_PROTOCOLS.getValue().contains("pamr")
-          || CentralPAPropertyRepository.PA_COMMUNICATION_ADDITIONAL_PROTOCOLS.getValue().contains("pamrssh");
+          || CentralPAPropertyRepository.PA_COMMUNICATION_ADDITIONAL_PROTOCOLS.getValue().contains("pamr");
     }
 
     private static SchedulerAuthenticationInterface startScheduler(String policyFullName,
