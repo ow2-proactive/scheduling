@@ -45,7 +45,7 @@ public class TransactionHelper implements FilteredExceptionCallback {
                 debugLogger.warn(String.format(
                         "DB operation failed. Will retry in %d seconds (attempt %d). %s", delay, i, exception
                                 .getMessage()));
-                new Sleeper(1000 * delay).sleep();
+                new Sleeper(1000 * delay, debugLogger).sleep();
                 delay *= DAMPING_FACTOR;
             } catch (Throwable throwable) {
                 debugLogger.warn("DB operation failed", throwable);
