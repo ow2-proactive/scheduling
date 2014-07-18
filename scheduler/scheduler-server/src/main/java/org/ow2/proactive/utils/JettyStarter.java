@@ -44,6 +44,7 @@ import java.net.URISyntaxException;
 import java.util.Properties;
 
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
+import org.objectweb.proactive.core.util.ProActiveInet;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.BasicConfigurator;
@@ -99,7 +100,7 @@ public class JettyStarter {
             addWarsToHandlerList(handlerList);
             server.setHandler(handlerList);
 
-            String schedulerHost = getSchedulerHost(schedulerUrl);
+            String schedulerHost = ProActiveInet.getInstance().getHostname();
             startServer(server, schedulerHost, restPort, httpProtocol);
         }
     }
