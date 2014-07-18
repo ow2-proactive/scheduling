@@ -434,10 +434,10 @@ public class SchedulerStarter {
             if (new File(jarPath).getParentFile().getParentFile().getName().equals("dist")) {
                 return new File(jarPath).getParentFile().getParentFile().getParent();
             } else {
-                return ".";
+                return new File(".").getAbsolutePath();
             }
         } catch (Exception e) {
-            return ".";
+            return new File(".").getAbsolutePath();
         }
     }
 
