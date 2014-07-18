@@ -14,6 +14,7 @@ include ':scheduler:dataspace-smartproxy'
 
 include 'rm:rm-client'
 include 'rm:rm-node'
+include 'rm:rm-node-updater'
 include 'rm:rm-cli'
 include 'rm:rm-server'
 

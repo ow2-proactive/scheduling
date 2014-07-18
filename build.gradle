@@ -254,6 +254,28 @@ project(':rm:rm-node') {
 
 }
 
+project(':rm:rm-node-updater') {
+    dependencies {
+        compile 'commons-io:commons-io:2.4'
+
+    }
+    jar {
+        manifest {
+            attributes("Implementation-Title": "ProActive",
+                    "Implementation-Version": version,
+                    "Specification-Version": version,
+                    "Implementation-Vendor": "Activeeon - OASIS - INRIA Sophia Antipolis",
+                    "Implementation-URL": "http://proactive.inria.fr",
+                    'Main-Class': 'org.ow2.proactive.resourcemanager.updater.RMNodeUpdater',
+                    'Class-Path' : "scheduler-node.jar"
+            )
+        }
+        from configurations.compile.collect { zipTree(it) }
+        destinationDir = file("${rootDir}")
+        archiveName = 'node.jar'
+    }
+}
+
 project(':rm:rm-cli') {
     apply plugin: 'java-library-distribution'
 
@@ -541,6 +563,7 @@ dependencies {
     distLib project(':scheduler:scheduler-node')
     distLib project(':rm:rm-server')
     distLib project(':rm:rm-cli')
+    distLib project(':rm:rm-node-updater')
     distLib(project(':rest:rest-server')) {
         exclude group: 'javassist', module: 'javassist' // to avoid duplicate (artifact named differently)
     }
@@ -587,7 +610,7 @@ distributions {
     main {
         contents {
             from '.'
-            include "dist/**", "config/**", "bin/**", "samples/**", "addons/**", "LICENSE*", "README*", "client.jar"
+            include "dist/**", "config/**", "bin/**", "samples/**", "addons/**", "LICENSE*", "README*", "client.jar", "node.jar"
         }
     }
 }

@@ -289,6 +289,8 @@ public class RMNodeStarter {
      */
     public static void main(String[] args) {
         try {
+            System.out.println("version 3");
+
             //this call takes JVM properties into account
             args = JVMPropertiesPreloader.overrideJVMProperties(args);
             EnvironmentCookieBasedChildProcessKiller.registerKillChildProcessesOnShutdown();

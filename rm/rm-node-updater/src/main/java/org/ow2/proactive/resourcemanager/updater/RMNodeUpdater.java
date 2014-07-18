@@ -34,13 +34,15 @@
  * ################################################################
  * $$ACTIVEEON_INITIAL_DEV$$
  */
-package org.ow2.proactive.resourcemanager.utils;
+package org.ow2.proactive.resourcemanager.updater;
 
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.channels.FileChannel;
@@ -51,7 +53,7 @@ import java.util.Date;
 /**
  *
  * A wrapper class to use with agents.
- * It either detects that node.jar must be updated, then downloads it and exits.
+ * It either detects that node.jar must be updated, then downloads it start a node.
  * When an agent detects it and restart the node it just proxies the request to RMNodeStarer.
  *
  */
@@ -60,6 +62,8 @@ public class RMNodeUpdater {
     private static final String NODE_URL_PROPERTY = "node.jar.url";
     private static final String NODE_JAR_PROPERTY = "node.jar.saveas";
     private static final String TMP_DIR_PROPERTY = "java.io.tmpdir";
+    public static final String ONE_JAR_JAR_PATH = "one-jar.jar.path";
+    public static final String SCHEDULER_NODE_JAR = "scheduler-node.jar";
 
     private static boolean isLocalJarUpToDate(String url, String filePath) {
 
@@ -71,9 +75,9 @@ public class RMNodeUpdater {
             System.out.println("File date=" + new Date(file.lastModified()));
 
             if (file.lastModified() < urlConnection.getLastModified()) {
-                System.out.println("Local jar is obsolete");
+                System.out.println("Local jar " + file + " is obsolete");
             } else {
-                System.out.println("Local jar is up to date");
+                System.out.println("Local jar " + file + " is up to date");
                 return true;
             }
 
@@ -88,7 +92,7 @@ public class RMNodeUpdater {
         if (System.getProperty(NODE_URL_PROPERTY) != null) {
 
             String jarUrl = System.getProperty(NODE_URL_PROPERTY);
-            String jarFile = System.getProperty(TMP_DIR_PROPERTY) + "/node.jar";
+            String jarFile = SCHEDULER_NODE_JAR;
 
             if (System.getProperty(NODE_JAR_PROPERTY) != null) {
                 jarFile = System.getProperty(NODE_JAR_PROPERTY);
@@ -146,14 +150,15 @@ public class RMNodeUpdater {
         return false;
     }
 
-    public static void main(String[] args) throws IOException, InterruptedException {
+    public static void main(String[] args) throws IOException, InterruptedException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        makeNodeUpToDate();
 
-        if (makeNodeUpToDate()) {
-            System.out.println("Exiting after node update");
-            System.exit(0);
-        } else {
-            System.out.println("Launching a computing node");
-            RMNodeStarter.main(args);
+        if (System.getProperty(ONE_JAR_JAR_PATH) == null) {
+            System.setProperty(ONE_JAR_JAR_PATH, SCHEDULER_NODE_JAR);
         }
+        System.out.println("Launching a computing node");
+        Class<?> cls = Class.forName("OneJar");
+        Method meth = cls.getMethod("main", String[].class);
+        meth.invoke(null, (Object) args);
     }
 }
