@@ -42,6 +42,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
 public class TaskInfoData {
+    private JobIdData jobId;
     private TaskIdData taskId;
     private long startTime;
     private long finishedTime;
@@ -57,6 +58,14 @@ public class TaskInfoData {
 
     public void setTaskId(TaskIdData taskId) {
         this.taskId = taskId;
+    }
+
+    public JobIdData getJobId() {
+        return jobId;
+    }
+
+    public void setJobId(JobIdData jobId) {
+        this.jobId = jobId;
     }
 
     public long getStartTime() {

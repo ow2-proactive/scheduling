@@ -48,6 +48,7 @@ import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskInfoData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.eventing.EventNotification;
 
 import com.google.common.base.Throwables;
@@ -58,6 +59,7 @@ import com.google.common.base.Throwables;
  */
 public class SchedulerEventBroadcaster implements SchedulerEventListener {
     private static final Logger log = Logger.getLogger(SchedulerEventBroadcaster.class);
+    private static final Mapper dozerMapper = DozerBeanMapperSingletonWrapper.getInstance();
     private static final ObjectMapper mapper;
 
     static {
@@ -95,8 +97,9 @@ public class SchedulerEventBroadcaster implements SchedulerEventListener {
 
     @Override
     public void taskStateUpdatedEvent(NotificationData<TaskInfo> notification) {
+        TaskInfoData taskInfoData = dozerMapper.map(notification.getData(), TaskInfoData.class);
         broadcast(new EventNotification(EventNotification.Action.TASK_STATE_UPDATED,
-            eventTypeName(notification), notification.getData()));
+                eventTypeName(notification), taskInfoData));
     }
 
     @Override
