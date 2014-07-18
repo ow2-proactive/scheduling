@@ -36,7 +36,8 @@
  */
 package org.ow2.proactive_grid_cloud_portal.rm;
 
-import org.apache.log4j.Logger;
+import java.io.File;
+
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -46,8 +47,7 @@ import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
 import org.ow2.proactive.resourcemanager.common.util.RMProxyUserInterface;
 import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
-
-import java.io.File;
+import org.apache.log4j.Logger;
 
 
 /**
@@ -125,7 +125,7 @@ public class RMStateCaching {
                     PAActiveObject.terminateActiveObject(rm, true);
                     rm = null;
                 }
-                new Sleeper(8 * 1000).sleep();
+                new Sleeper(8 * 1000, logger).sleep();
                 continue;
             }
         }
@@ -149,7 +149,7 @@ public class RMStateCaching {
                         init_();
                     }
 
-                    new Sleeper(refreshInterval).sleep();
+                    new Sleeper(refreshInterval, logger).sleep();
                 }
             }
         });

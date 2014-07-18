@@ -71,7 +71,7 @@ public class SessionsCleaner implements Runnable {
 
             // clean every 5 minutes
             logger.info("cleaning session ended, " + removedSession + " session(s) removed");
-            new Sleeper(CLEAN_PERIOD).sleep();
+            new Sleeper(CLEAN_PERIOD, logger).sleep();
         }
         logger.info(Thread.currentThread().getName() + " terminated");
     }
