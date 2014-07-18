@@ -1040,9 +1040,9 @@ public abstract class TaskLauncher implements InitActive {
                             .getActiveObjectNode(PAActiveObject.getStubOnThis()));
                 }
             } catch (Exception e) {
-                logger
-                        .warn("There was a problem while terminating dataSpaces. Dataspaces on this node might not work anymore : ");
-                logger.warn(e);
+                logger.warn(
+                  "There was a problem while terminating dataSpaces. Dataspaces on this node might not work anymore.",
+                  e);
                 // cannot add this message to dataspaces status as it is called in finally block
             }
         }
