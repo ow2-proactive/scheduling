@@ -58,6 +58,7 @@ import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -66,7 +67,9 @@ import javax.ws.rs.core.MediaType;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.node.NodeException;
 import org.ow2.proactive.resourcemanager.exception.RMException;
+import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
+import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 import org.ow2.proactive_grid_cloud_portal.common.Session;
 import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStore;
@@ -171,6 +174,15 @@ public class StudioRest implements StudioInterface {
             LoginException, RMException, SchedulerRestException {
         logger.info("Logging using credential file");
         return scheduler().loginWithCredential(multipart);
+    }
+
+    @PUT
+    @Path("logout")
+    @Produces("application/json")
+    public void logout(@HeaderParam(
+      "sessionid") final String sessionId) throws PermissionRestException, NotConnectedRestException {
+        logger.info("logout");
+        scheduler().disconnect(sessionId);
     }
 
     @Override

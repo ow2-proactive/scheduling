@@ -34,8 +34,23 @@
  */
 package org.ow2.proactive_grid_cloud_portal.studio;
 
-import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
+import java.io.IOException;
+import java.security.KeyException;
+import java.util.ArrayList;
+
+import javax.security.auth.login.LoginException;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.FormParam;
+import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.node.NodeException;
 import org.ow2.proactive.resourcemanager.exception.RMException;
@@ -43,14 +58,13 @@ import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobValidationData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.*;
-
-import javax.security.auth.login.LoginException;
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import java.io.IOException;
-import java.security.KeyException;
-import java.util.ArrayList;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.JobCreationRestException;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SchedulerRestException;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SubmissionClosedRestException;
+import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 
 
 @Path("/studio")
@@ -70,6 +84,12 @@ public interface StudioInterface {
     String loginWithCredential(@MultipartForm
     LoginForm multipart) throws ActiveObjectCreationException, NodeException, KeyException, IOException,
             LoginException, RMException, SchedulerRestException;
+
+    @PUT
+    @Path("logout")
+    @Produces("application/json")
+    public void logout(@HeaderParam(
+      "sessionid") final String sessionId) throws PermissionRestException, NotConnectedRestException;
 
     @GET
     @Path("connected")
