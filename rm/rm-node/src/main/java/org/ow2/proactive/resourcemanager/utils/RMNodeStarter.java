@@ -104,6 +104,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import static org.ow2.proactive.utils.ClasspathUtils.findBaseDirectoryFromJarLocation;
+
 
 /**
  * This class is responsible for creating a local node. You can define different settings to
@@ -437,7 +439,8 @@ public class RMNodeStarter {
 
     private void configureRMAndProActiveHomes() {
         if (System.getProperty(PAResourceManagerProperties.RM_HOME.getKey()) == null) {
-            System.setProperty(PAResourceManagerProperties.RM_HOME.getKey(), findRMHomeFromJarOrCurrentFolder());
+            System.setProperty(PAResourceManagerProperties.RM_HOME.getKey(), findBaseDirectoryFromJarLocation(
+              "dist"));
         }
         if (System.getProperty(CentralPAPropertyRepository.PA_HOME.getName()) == null) {
             System.setProperty(CentralPAPropertyRepository.PA_HOME.getName(), System
@@ -454,19 +457,6 @@ public class RMNodeStarter {
                 System.setProperty(CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getName(),
                   defaultProActiveConfiguration.getAbsolutePath());
             }
-        }
-    }
-
-    private String findRMHomeFromJarOrCurrentFolder() {
-        try {
-            String jarPath = RMNodeStarter.class.getProtectionDomain().getCodeSource().getLocation().getPath();
-            if (new File(jarPath).getParentFile().getParentFile().getName().equals("dist")) {
-                return new File(jarPath).getParentFile().getParentFile().getParent();
-            } else {
-                return new File(".").getAbsolutePath();
-            }
-        } catch (Exception e) {
-            return new File(".").getAbsolutePath();
         }
     }
 

@@ -34,30 +34,33 @@
  */
 package org.ow2.proactive.utils;
 
-import java.io.IOException;
-
-import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
-import org.objectweb.proactive.extensions.pamr.router.Main;
-import org.apache.log4j.PropertyConfigurator;
-
-import static org.ow2.proactive.utils.ClasspathUtils.findBaseDirectoryFromJarLocation;
+import java.io.File;
+import java.net.URI;
 
 
-public class PAMRRouterStarter {
+public class ClasspathUtils {
 
-    public static void main(String[] args) throws IOException {
-        configureLogging();
-        Main.main(args);
-    }
-
-    private static void configureLogging() {
-        if (System.getProperty(CentralPAPropertyRepository.LOG4J.getName()) == null) {
-            String schedulerHomeFromJarOrCurrentFolder = findBaseDirectoryFromJarLocation("dist");
-            String defaultLog4jConfig = schedulerHomeFromJarOrCurrentFolder + "/config/log/router.properties";
-            System.setProperty(CentralPAPropertyRepository.LOG4J.getName(), defaultLog4jConfig);
-            System.setProperty(CentralPAPropertyRepository.PA_HOME.getName(), schedulerHomeFromJarOrCurrentFolder);
-            PropertyConfigurator.configure(defaultLog4jConfig);
+    /**
+     * Used for instance when looking for SCHEDULER_HOME using jars location.
+     * We know that the JAR is in dist/lib so we can find SCHEDULER_HOME by using 'dist' as childDirectoryName
+     *
+     * @param childDirectoryName the name of a directory, we want to the find parent directory of it
+     * @return the path to the directory containing childDirectoryName, itself a child of the current classpath
+     * or current folder if cannot be found
+     */
+    public static String findBaseDirectoryFromJarLocation(String childDirectoryName) {
+        try {
+            URI jarPath = ClasspathUtils.class.getProtectionDomain().getCodeSource().getLocation().toURI();
+            File parentFile = new File(jarPath);
+            while (parentFile.getParentFile() != null) {
+                if (parentFile.getParentFile().getName().equals(childDirectoryName)) {
+                    return parentFile.getParentFile().getParent();
+                }
+                parentFile = parentFile.getParentFile();
+            }
+            return new File(".").getAbsolutePath();
+        } catch (Exception e) {
+            return new File(".").getAbsolutePath();
         }
     }
-
 }

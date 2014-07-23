@@ -85,6 +85,8 @@ import org.apache.commons.cli.Parser;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
+import static org.ow2.proactive.utils.ClasspathUtils.findBaseDirectoryFromJarLocation;
+
 
 /**
  * SchedulerStarter will start a new Scheduler on the local host connected to the given Resource Manager.<br>
@@ -410,7 +412,7 @@ public class SchedulerStarter {
     private static void configureSchedulerAndRMAndPAHomes() {
         if (System.getProperty(PASchedulerProperties.SCHEDULER_HOME.getKey()) == null) {
             System.setProperty(PASchedulerProperties.SCHEDULER_HOME.getKey(),
-              findSchedulerHomeFromJarOrCurrentFolder());
+              findBaseDirectoryFromJarLocation("dist"));
         }
         if (System.getProperty(PAResourceManagerProperties.RM_HOME.getKey()) == null) {
             System.setProperty(PAResourceManagerProperties.RM_HOME.getKey(), System
@@ -425,19 +427,6 @@ public class SchedulerStarter {
             System.setProperty(CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getName(), System
               .getProperty(PASchedulerProperties.SCHEDULER_HOME.getKey()) +
               "/config/network/ProActiveConfiguration.ini");
-        }
-    }
-
-    private static String findSchedulerHomeFromJarOrCurrentFolder() {
-        try {
-            String jarPath = SchedulerStarter.class.getProtectionDomain().getCodeSource().getLocation().getPath();
-            if (new File(jarPath).getParentFile().getParentFile().getName().equals("dist")) {
-                return new File(jarPath).getParentFile().getParentFile().getParent();
-            } else {
-                return new File(".").getAbsolutePath();
-            }
-        } catch (Exception e) {
-            return new File(".").getAbsolutePath();
         }
     }
 
