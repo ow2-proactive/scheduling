@@ -147,6 +147,7 @@ public class SchedulerStarter {
         String policyFullName = getPolicyFullName(commandLine);
         String rmUrl = getRmUrl(commandLine);
         setCleanDatabaseProperties(commandLine);
+        setCleanNodesourcesProperty(commandLine);
 
         rmUrl = connectToOrStartResourceManager(commandLine, rmUrl);
 
