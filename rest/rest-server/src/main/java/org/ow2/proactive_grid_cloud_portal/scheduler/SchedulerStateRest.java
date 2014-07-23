@@ -2382,6 +2382,22 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
     }
 
+    @GET
+    @Path("/userspace")
+    @Produces("application/json")
+    @Override
+    public List<String> userspaceURIs(@HeaderParam("sessionid") String sessionId) throws NotConnectedRestException,
+            PermissionRestException {
+        SchedulerProxyUserInterface proxy = checkAccess(sessionId);
+        try {
+            return proxy.getUserSpaceURIs();
+        } catch (NotConnectedException e) {
+            throw new NotConnectedRestException(e);
+        } catch (PermissionException e) {
+            throw new PermissionRestException(e);
+        }
+    }
+
     @Override
     public JobValidationData validate(MultipartFormDataInput multipart) {
         File tmpFile = null;

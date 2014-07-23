@@ -867,6 +867,12 @@ public interface SchedulerRestInterface {
     public List<SchedulerUserData> getUsers(@HeaderParam("sessionid")
     final String sessionId) throws NotConnectedRestException, PermissionRestException;
 
+    @GET
+    @Path("userspace")
+    @Produces("application/json")
+    public List<String> userspaceURIs(@HeaderParam("sessionid") String sessionId)
+            throws NotConnectedRestException, PermissionRestException;
+
     /**
      * Users having jobs in the scheduler
      * 
