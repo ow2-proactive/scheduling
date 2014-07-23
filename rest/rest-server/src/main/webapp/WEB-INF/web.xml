@@ -21,7 +21,8 @@
     <context-param>
         <param-name>resteasy.resources</param-name>
         <param-value>
-            org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest,org.ow2.proactive_grid_cloud_portal.studio.StudioRest,org.ow2.proactive_grid_cloud_portal.rm.RMRest
+            org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest,org.ow2.proactive_grid_cloud_portal.studio.StudioRest,org.ow2.proactive_grid_cloud_portal.rm.RMRest,,org.ow
+2.proactive_grid_cloud_portal.dataspace.RestDataspaceImpl
         </param-value>
     </context-param>
 

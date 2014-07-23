@@ -51,6 +51,7 @@ import org.ow2.proactive.resourcemanager.common.util.RMProxyUserInterface;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
+import org.ow2.proactive_grid_cloud_portal.dataspace.FileSystem;
 import org.ow2.proactive_grid_cloud_portal.scheduler.JobsOutputController;
 
 
@@ -72,6 +73,8 @@ public class Session {
 
     private CredData credData;
     private Credentials credentials;
+
+    private FileSystem fs;
 
     public Session(String sessionId, SchedulerRMProxyFactory schedulerRMProxyFactory, Clock clock) {
         this.sessionId = sessionId;
@@ -178,5 +181,13 @@ public class Session {
 
     public boolean isExpired(long expirationDelay) {
         return clock.now() - lastAccessTimestamp >= expirationDelay;
+    }
+
+    public void fileSystem(FileSystem fs) {
+        this.fs = fs;
+    }
+
+    public FileSystem fileSystem() {
+        return fs;
     }
 }
