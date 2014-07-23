@@ -399,9 +399,7 @@ public class SchedulerStarter {
           new Object[] {
             creds,
             numberLocalNodes,
-            nodeTimeoutValue,
-            CentralPAPropertyRepository.PA_HOME.getCmdLine() +
-              CentralPAPropertyRepository.PA_HOME.getValue() }, RestartDownNodesPolicy.class
+            nodeTimeoutValue, "" }, RestartDownNodesPolicy.class
             .getName(), new Object[] { "ALL", "ALL", "10000" });
     }
 
