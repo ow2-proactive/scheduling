@@ -169,8 +169,8 @@ public class SchedulerStarter {
             config.setPort(routerPort);
             config.setNbWorkerThreads(Runtime.getRuntime().availableProcessors());
             config.setReservedAgentConfigFile(
-              new File(PASchedulerProperties.SCHEDULER_HOME.getValueAsString(),
-                "config" + File.separator + "router" + File.separator + "router.ini"));
+              new File(System.getProperty(PASchedulerProperties.SCHEDULER_HOME.getKey()) +
+                File.separator + "config" + File.separator + "router" + File.separator + "router.ini"));
             Router.createAndStart(config);
             logger.info("The router created on " + ProActiveInet.getInstance().getHostname() + ":" + routerPort);
         }
