@@ -91,11 +91,6 @@ public abstract class ClientBase implements ISchedulerClient {
     }
 
     @Override
-    public List<String> getUserSpaceURIs() throws NotConnectedException, PermissionException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public boolean killTask(JobId arg0, String arg1) throws NotConnectedException, UnknownJobException,
             UnknownTaskException, PermissionException {
         throw new UnsupportedOperationException();

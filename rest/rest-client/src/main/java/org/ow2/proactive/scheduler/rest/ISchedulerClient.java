@@ -34,6 +34,7 @@
  */
 package org.ow2.proactive.scheduler.rest;
 
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -52,9 +53,26 @@ import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
-
+import org.ow2.proactive.scheduler.common.task.dataspaces.RemoteSpace;
+import org.ow2.proactive_grid_cloud_portal.dataspace.dto.ListFile;
 
 public interface ISchedulerClient extends Scheduler {
+
+    public enum DataSpace {
+        USER {
+            @Override
+            public String path() {
+                return "user";
+            }
+        },
+        GLOBAL {
+            @Override
+            public String path() {
+                return "global";
+            }
+        };
+        public abstract String path();
+    };
 
     /**
      * Initialize this instance.
@@ -421,4 +439,213 @@ public interface ISchedulerClient extends Scheduler {
      */
     public JobId submitAsJobArchive(Job job) throws NotConnectedException, PermissionException,
             SubmissionClosedException, JobCreationException;
+
+    /**
+     * Uploads a file (or a directory) to the specified location in the
+     * <i>dataspace</i>.
+     *
+     * @param file
+     *            the file (or the directory) to upload
+     * @param dataspace
+     *            the target dataspace
+     * @param pathname
+     *            the pathname of the file in the dataspace
+     * @return true, it the file is successfully uploaded, false otherwise
+     * @throws NotConnectedException
+     *             if the client is not logged in or the session has expired
+     * @throws PermissionException
+     *             if the user does not have permission to upload the file to
+     *             the specified location in the server
+     */
+    public boolean upload(File file, DataSpace dataspace, String pathname) throws NotConnectedException,
+            PermissionException;
+
+    /**
+     * Uploads all matching files in the directory to the specified location in
+     * the <i>dataspace</i>.
+     *
+     * @param directory
+     *            the source directory
+     * @param regex
+     *            a regular expression
+     * @param dataSpace
+     *            the target dataspace
+     * @param pathname
+     *            the pathname of the target location in the dataspace
+     * @return true if the files are successfully uploaded, false otherwise
+     * @throws NotConnectedException
+     *             if the client is not logged in or the session has expired
+     * @throws PermissionException
+     *             if the user does not have permission to upload the file to
+     *             the specified location in the server
+     */
+    public boolean upload(File directory, String regex, DataSpace dataSpace, String pathname)
+            throws NotConnectedException, PermissionException;
+
+    /**
+     * Uploads all matching files in the directory to the specified location in
+     * the <i>dataspace</i>.
+     *
+     * @param directory
+     *            the source directory
+     * @param includes
+     *            the list of file names or regular expressions where matching
+     *            files should be selected
+     * @param excludes
+     *            the list of file names or regular expressions where matching
+     *            files should be excluded
+     * @param dataSpace
+     *            the target dataspace
+     * @param pathname
+     *            the target location of the in the dataspace
+     * @return true if all matching files are uploaded, false otherwise
+     * @throws NotConnectedException
+     *             if the client is not logged in or the session has expired
+     * @throws PermissionException
+     *             if the user does not have permission to upload the file to
+     *             the specified location in the server
+     */
+    public boolean upload(File directory, List<String> includes, List<String> excludes, DataSpace dataSpace,
+            String pathname) throws NotConnectedException, PermissionException;
+
+    /**
+     * Downloads the specified file in the <i>dataspace</i> and saves it locally
+     * in the specified location.
+     *
+     * @param dataSpace
+     *            the dataspace
+     * @param pathname
+     *            the pathname of the required file in the dataspace
+     * @param localPathname
+     *            the pathname to which the retrieved file is saved
+     * @return true, if the file is downloaded successfully, false otherwise
+     * @throws NotConnectedException
+     *             if the client is not logged in or the session has expired
+     * @throws PermissionException
+     *             if the user does not have permission to upload the file to
+     *             the specified location in the server
+     */
+    public boolean download(DataSpace dataSpace, String pathname, String localPathname)
+            throws NotConnectedException, PermissionException;
+
+    /**
+     * Downloads all matching files from the specified location in the
+     * <i>dataspace</i> and saves them locally in the specified location.
+     *
+     * @param dataSpace
+     *            the dataspace
+     * @param pathname
+     *            the location in the dataspace which contains all required
+     *            files
+     * @param regex
+     *            a regular expression
+     * @param localPathname
+     *            the local pathname to which all matching files are saved
+     * @return ture if all matching files are downloaded and saved successfully,
+     *         false otherwise
+     * @throws NotConnectedException
+     *             if the client is not logged in or the session has expired
+     * @throws PermissionException
+     *             if the user does not have permission to upload the file to
+     *             the specified location in the server
+     */
+    public boolean download(DataSpace dataSpace, String pathname, String regex, String localPathname)
+            throws NotConnectedException, PermissionException;
+
+    /**
+     * Downloads all matching files from the specified location in the
+     * <i>datasapce</i> and saves them locally in the specified location.
+     *
+     * @param dataSpace
+     *            the dataspace
+     * @param pathname
+     *            the location in the dataspace which contains all required
+     *            files
+     * @param includes
+     *            the list of file names or regular expressions where all
+     *            matching files should be selected
+     * @param excludes
+     *            the list of file names or regular expressions where all
+     *            matching files should be excluded
+     * @param localPathname
+     *            the pathname to which all matching files are saved
+     * @return true if all matching files are downloaded and saved successfully,
+     *         false otherwise
+     * @throws NotConnectedException
+     *             if the client is not logged in or the session has expired
+     * @throws PermissionException
+     *             if the user does not have permission to upload the file to
+     *             the specified location in the server
+     */
+    public boolean download(DataSpace dataSpace, String pathname, List<String> includes,
+            List<String> excludes, String localPathname) throws NotConnectedException, PermissionException;
+
+    /**
+     * Returns a {@link ListType} type object which contains the names of files
+     * and directories in the specified location the <i>dataspace</i>.
+     *
+     * @param dataSpace
+     *            the dataspace
+     * @param pathname
+     *            the location in the dataspace
+     * @return an instance of {@link ListType}
+     * @throws NotConnectedException
+     *             if the client is not logged in or the session has expired
+     * @throws PermissionException
+     *             if the user does not have permission to upload the file to
+     *             the specified location in the server
+     */
+    public ListFile listFiles(DataSpace dataSpace, String pathname) throws NotConnectedException,
+            PermissionException;
+
+    /**
+     * Deletes the specified directory or the file from the <i>dataspace</i>.
+     *
+     * @param dataSpace
+     *            the dataspace
+     * @param pathname
+     *            the location of the directory or the file in the dataspace
+     * @return true if the directory or file is deleted successfully, false
+     *         otherwise
+     * @throws NotConnectedException
+     *             if the client is not logged in or the session has expired
+     * @throws PermissionException
+     *             if the user does not have permission to upload the file to
+     *             the specified location in the server
+     */
+    public boolean deleteFile(DataSpace dataSpace, String pathname) throws NotConnectedException,
+            PermissionException;
+
+    /**
+     * Returns the metadata map of the specified file in the <i>dataspace</i>.
+     *
+     * @param dataSpace
+     *            the dataspace
+     * @param pathname
+     *            the location of the target file
+     * @return an instace of {@link Map}
+     * @throws NotConnectedException
+     *             if the client is not logged in or the session has expired
+     * @throws PermissionException
+     *             if the user does not have permission to upload the file to
+     *             the specified location in the server
+     */
+    public Map<String, Object> metadata(DataSpace dataSpace, String pathname) throws NotConnectedException,
+            PermissionException;
+
+    /**
+     * Returns a {@link RemoteSpace} implementation instance which represents
+     * the <i>globalspace</i>.
+     *
+     * @return an instance of {@link RemoteSpace}
+     */
+    public RemoteSpace getGlobalSpace();
+
+    /**
+     * Returns a {@link RemoteSpace} implementation instance which represents
+     * the <i>userspace</i>
+     *
+     * @return an instance of {@link RemoteSpace}
+     */
+    public RemoteSpace getUserSpace();
 }

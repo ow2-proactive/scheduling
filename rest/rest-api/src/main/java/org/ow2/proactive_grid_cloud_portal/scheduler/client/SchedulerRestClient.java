@@ -37,7 +37,10 @@ package org.ow2.proactive_grid_cloud_portal.scheduler.client;
 import static org.apache.commons.io.FileUtils.copyInputStreamToFile;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
@@ -45,6 +48,9 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.net.HttpURLConnection;
 import java.net.URLEncoder;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.ProcessingException;
@@ -52,8 +58,12 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.GenericEntity;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.StreamingOutput;
+import javax.ws.rs.core.Variant;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
 
@@ -67,9 +77,14 @@ import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataOutput;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 import org.ow2.proactive_grid_cloud_portal.common.exceptionmapper.ExceptionToJson;
+import org.ow2.proactive_grid_cloud_portal.dataspace.dto.ListFile;
+import org.ow2.proactive_grid_cloud_portal.scheduler.client.utils.Zipper;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
 
+import com.google.common.collect.Maps;
+import com.google.common.io.Files;
+import com.google.common.net.UrlEscapers;
 
 public class SchedulerRestClient {
 
@@ -162,6 +177,178 @@ public class SchedulerRestClient {
         }
     }
 
+    public boolean upload(String sessionId, File file, List<String> includes, List<String> excludes,
+            String dataspacePath, final String path) throws Exception {
+        StringBuffer uriTmpl = (new StringBuffer()).append(restEndpointURL)
+                .append(addSlashIfMissing(restEndpointURL)).append("data/").append(dataspacePath).append('/')
+                .append(escapeUrlPathSegment(path));
+        ResteasyClient client = new ResteasyClientBuilder().httpEngine(httpEngine).build();
+        ResteasyWebTarget target = client.target(uriTmpl.toString());
+        Response response = null;
+        try {
+            response = target
+                    .request()
+                    .header("sessionid", sessionId)
+                    .put(Entity.entity(new CompressedStreamingOutput(file, includes, excludes), new Variant(
+                            MediaType.APPLICATION_OCTET_STREAM_TYPE, (Locale) null, encoding(file))));
+            if (response.getStatus() != HttpURLConnection.HTTP_CREATED) {
+                if (response.getStatus() == HttpURLConnection.HTTP_UNAUTHORIZED) {
+                    throw new NotConnectedRestException("User not authenticated or session timeout.");
+                } else {
+                    throw new Exception("File upload failed. Status code:" + response.getStatus());
+                }
+            }
+            return true;
+        } finally {
+            if (response != null) {
+                response.close();
+            }
+        }
+    }
+
+    public boolean download(String sessionId, String dataspacePath, String path, List<String> includes,
+            List<String> excludes, String outputPath) throws Exception {
+        return download(sessionId, dataspacePath, path, includes, excludes, new File(outputPath));
+    }
+
+    public boolean download(String sessionId, String dataspacePath, String path, List<String> includes,
+            List<String> excludes, File outputFile) throws Exception {
+        StringBuffer uriTmpl = (new StringBuffer()).append(restEndpointURL)
+                .append(addSlashIfMissing(restEndpointURL)).append("data/").append(dataspacePath).append('/');
+
+        ResteasyClient client = new ResteasyClientBuilder().httpEngine(httpEngine).build();
+        ResteasyWebTarget target = client.target(uriTmpl.toString()).path(path);
+
+        if (includes != null && !includes.isEmpty()) {
+            target = target.queryParam("includes", includes.toArray(new Object[includes.size()]));
+        }
+        if (excludes != null && !excludes.isEmpty()) {
+            target = target.queryParam("excludes", excludes.toArray(new Object[excludes.size()]));
+        }
+
+        Response response = null;
+        try {
+            response = target.request().header("sessionid", sessionId).acceptEncoding("*", "gzip", "zip")
+                    .get();
+            if (response.getStatus() != HttpURLConnection.HTTP_OK) {
+                if (response.getStatus() == HttpURLConnection.HTTP_UNAUTHORIZED) {
+                    throw new NotConnectedRestException("User not authenticated or session timeout.");
+                } else {
+                    throw new Exception(String.format("Cannot retrieve the file. Status code: %s",
+                            response.getStatus()));
+                }
+            }
+            if (response.hasEntity()) {
+                InputStream is = response.readEntity(InputStream.class);
+                if (isGZipEncoded(response)) {
+                    if (outputFile.exists() && outputFile.isDirectory()) {
+                        outputFile = new File(outputFile, response.getHeaderString("x-pds-pathname"));
+                    }
+                    Zipper.GZIP.unzip(is, outputFile);
+                } else if (isZipEncoded(response)) {
+                    Zipper.ZIP.unzip(is, outputFile);
+                } else {
+                    File container = outputFile.getParentFile();
+                    if (!container.exists()) {
+                        container.mkdirs();
+                    }
+                    Files.asByteSink(outputFile).writeFrom(is);
+                }
+            } else {
+                outputFile.createNewFile();
+            }
+        } finally {
+            if (response != null) {
+                response.close();
+            }
+        }
+        return true;
+    }
+
+    public boolean delete(String sessionId, String dataspacePath, String path, List<String> includes,
+            List<String> excludes) throws Exception {
+        StringBuffer uriTmpl = (new StringBuffer()).append(restEndpointURL)
+                .append(addSlashIfMissing(restEndpointURL)).append("data/").append(dataspacePath).append('/');
+        ResteasyClient client = new ResteasyClientBuilder().httpEngine(httpEngine).build();
+        ResteasyWebTarget target = client.target(uriTmpl.toString()).path(path);
+        if (includes != null && !includes.isEmpty()) {
+            target = target.queryParam("includes", includes.toArray(new Object[includes.size()]));
+        }
+        if (excludes != null && !excludes.isEmpty()) {
+            target = target.queryParam("excludes", excludes.toArray(new Object[excludes.size()]));
+        }
+        Response response = null;
+        try {
+            response = target.request().header("sessionid", sessionId).delete();
+            if (response.getStatus() != HttpURLConnection.HTTP_NO_CONTENT) {
+                if (response.getStatus() == HttpURLConnection.HTTP_UNAUTHORIZED) {
+                    throw new NotConnectedRestException("User not authenticated or session timeout.");
+                } else {
+                    throw new Exception("Cannot delete file(s). Status code:" + response.getStatus());
+                }
+            }
+            return true;
+        } finally {
+            if (response != null) {
+                response.close();
+            }
+        }
+    }
+
+    public ListFile list(String sessionId, String dataspacePath, String pathname) throws Exception {
+        StringBuffer uriTmpl = (new StringBuffer()).append(restEndpointURL)
+                .append(addSlashIfMissing(restEndpointURL)).append("data/").append(dataspacePath).append('/');
+        ResteasyClient client = new ResteasyClientBuilder().httpEngine(httpEngine).build();
+        ResteasyWebTarget target = client.target(uriTmpl.toString()).path(pathname).queryParam("comp", "list");
+        Response response = null;
+        try {
+            response = target.request().header("sessionid", sessionId).get();
+            if (response.getStatus() != HttpURLConnection.HTTP_OK) {
+                if (response.getStatus() == HttpURLConnection.HTTP_UNAUTHORIZED) {
+                    throw new NotConnectedRestException("User not authenticated or session timeout.");
+                } else {
+                    throw new Exception(String.format("Cannot list the specified location: %s", pathname));
+                }
+            }
+            return response.readEntity(ListFile.class);
+        } finally {
+            if (response != null) {
+                response.close();
+            }
+        }
+    }
+
+    public Map<String, Object> metadata(String sessionId, String dataspacePath, String pathname)
+            throws Exception {
+        StringBuffer uriTmpl = (new StringBuffer()).append(restEndpointURL)
+                .append(addSlashIfMissing(restEndpointURL)).append("data/").append(dataspacePath)
+                .append(escapeUrlPathSegment(pathname));
+        ResteasyClient client = new ResteasyClientBuilder().httpEngine(httpEngine).build();
+        ResteasyWebTarget target = client.target(uriTmpl.toString());
+        Response response = null;
+        try {
+            response = target.request().header("sessionid", sessionId).head();
+            if (response.getStatus() != HttpURLConnection.HTTP_OK) {
+                if (response.getStatus() == HttpURLConnection.HTTP_UNAUTHORIZED) {
+                    throw new NotConnectedRestException("User not authenticated or session timeout.");
+                } else {
+                    throw new Exception(String.format("Cannot get metadata from %s in %s.", pathname,
+                            dataspacePath));
+                }
+            }
+            MultivaluedMap<String, Object> headers = response.getHeaders();
+            Map<String, Object> metaMap = Maps.newHashMap();
+            if (headers.containsKey(HttpHeaders.LAST_MODIFIED)) {
+                metaMap.put(HttpHeaders.LAST_MODIFIED, headers.getFirst(HttpHeaders.LAST_MODIFIED));
+            }
+            return metaMap;
+        } finally {
+            if (response != null) {
+                response.close();
+            }
+        }
+    }
+
     private JobIdData submit(String sessionId, InputStream job, MediaType mediaType) throws Exception {
         String uriTmpl = restEndpointURL + addSlashIfMissing(restEndpointURL) + "scheduler/submit";
 
@@ -188,6 +375,18 @@ public class SchedulerRestClient {
 
     private String addSlashIfMissing(String url) {
         return url.endsWith("/") ? "" : "/";
+    }
+
+    private boolean isGZipEncoded(Response response) {
+        return "gzip".equals(response.getHeaderString(HttpHeaders.CONTENT_ENCODING));
+    }
+
+    private boolean isZipEncoded(Response response) {
+        return "zip".equals(response.getHeaderString(HttpHeaders.CONTENT_ENCODING));
+    }
+
+    private String escapeUrlPathSegment(String unescaped) {
+        return UrlEscapers.urlPathSegmentEscaper().escape(unescaped);
     }
 
     public SchedulerRestInterface getScheduler() {
@@ -303,5 +502,36 @@ public class SchedulerRestClient {
         } catch (NoSuchMethodException e) {
             return null;
         }
+    }
+
+    private static String encoding(File file) throws FileNotFoundException {
+        return file.isDirectory() ? "zip" : (Zipper.isZipFile(file)) ? null : "gzip";
+    }
+
+    private static class CompressedStreamingOutput implements StreamingOutput {
+        private File file;
+        private List<String> includes;
+        private List<String> excludes;
+
+        public CompressedStreamingOutput(File file, List<String> includes, List<String> excludes) {
+            this.file = file;
+            this.includes = includes;
+            this.excludes = excludes;
+        }
+
+        @Override
+        public void write(OutputStream outputStream) throws IOException, WebApplicationException {
+            if (file.isFile()) {
+                if (Zipper.isZipFile(file)) {
+                    Files.asByteSource(file).copyTo(outputStream);
+                } else {
+                    Zipper.GZIP.zip(file, outputStream);
+                }
+            } else {
+                Zipper.ZIP.zip(file, includes, excludes, outputStream);
+            }
+
+        }
+
     }
 }

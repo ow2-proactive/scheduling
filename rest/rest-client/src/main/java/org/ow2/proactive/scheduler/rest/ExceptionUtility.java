@@ -66,12 +66,13 @@ public class ExceptionUtility {
         }
     }
 
-    public static void throwNCEOrPE(Exception e) throws NotConnectedException, PermissionException {
+    public static RuntimeException throwNCEOrPE(Exception e) throws NotConnectedException, PermissionException {
         if (e instanceof PermissionRestException) {
             throw new PermissionException(e);
         } else {
             throwNCE(e);
         }
+        return new RuntimeException(e);
     }
 
     public static void throwUJEOrNCEOrPE(Exception e) throws UnknownJobException, NotConnectedException,
