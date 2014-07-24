@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.security.KeyException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
@@ -42,10 +41,6 @@ public class LocalInfrastructure extends InfrastructureManager {
     private Hashtable<String, Boolean> isDeployingNodeLost;
     /** Notifies the acquisition loop that the node has been acquired and that it can exit the loop */
     private Hashtable<String, Boolean> isNodeAcquired;
-
-    /** The shell interpret and its "command" argument */
-    private static final String SHELL_INTERPRET = "/bin/sh";
-    private static final String SHELL_COMMAND_OPTION = "-c";
 
     public LocalInfrastructure() {
     }
@@ -148,21 +143,8 @@ public class LocalInfrastructure extends InfrastructureManager {
         ProcessExecutor processExecutor;
         try {
             this.isNodeAcquired.put(nodeName, false);
-            if (os == OperatingSystem.UNIX && containsSpace) {
-                depNodeURL = this.addDeployingNode(nodeName, SHELL_INTERPRET + " " + SHELL_COMMAND_OPTION +
-                    " " + obfuscatedCmd, "Node launched locally", this.nodeTimeout);
-
-                logger
-                        .debug("LocalIM detected the libRoot variable contains whitespaces. Running the escaped command prepended with \"" +
-                            SHELL_INTERPRET + " " + SHELL_COMMAND_OPTION + "\".");
-
-                List<String> newCmd = Arrays.asList(SHELL_INTERPRET, SHELL_COMMAND_OPTION);
-                newCmd.addAll(cmd);
-                cmd = newCmd;
-            } else {
-                depNodeURL = this.addDeployingNode(nodeName, obfuscatedCmd, "Node launched locally",
-                        this.nodeTimeout);
-            }
+            depNodeURL = this.addDeployingNode(nodeName, obfuscatedCmd, "Node launched locally",
+              this.nodeTimeout);
 
             // Deobfuscate the cred value
             Collections.replaceAll(cmd, CommandLineBuilder.OBFUSC, clb.getCredentialsValue());
