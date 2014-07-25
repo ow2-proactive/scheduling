@@ -38,26 +38,35 @@ package functionaltests;
 
 import java.io.File;
 import java.net.URL;
+import java.util.List;
 
+import org.ow2.proactive.scheduler.common.Scheduler;
+import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
+import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.examples.WaitAndPrint;
+import org.ow2.proactive.scheduler.util.ServerJobAndTaskLogs;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 
 /**
- * 
  * Test that we can retrieve job/task server logs and the semantic
  * of logs.
- * 
+ * <p/>
  * - for finished job we have logs for all the tasks
  * - for pending jobs we have correct RM output & script output
- * 
  */
 public class TestJobServerLogs extends SchedulerConsecutive {
 
@@ -66,6 +75,7 @@ public class TestJobServerLogs extends SchedulerConsecutive {
             .getResource("/functionaltests/descriptors/Job_simple.xml");
 
     private final String SCRIPT_OUTPUT = "SCRIPT_OUTPUT_" + Math.random();
+    private String logsLocation = ServerJobAndTaskLogs.getLogsLocation();
 
     private Job createPendingJob() throws Exception {
         final TaskFlowJob job = new TaskFlowJob();
@@ -75,7 +85,7 @@ public class TestJobServerLogs extends SchedulerConsecutive {
         task.addArgument("sleepTime", "1");
 
         task.addSelectionScript(new SelectionScript("print('" + SCRIPT_OUTPUT + "'); selected = false;",
-            "javascript"));
+                "javascript"));
         job.addTask(task);
 
         return job;
@@ -113,6 +123,9 @@ public class TestJobServerLogs extends SchedulerConsecutive {
             }
         }
 
+        checkRemoval(simpleJobId);
+
+
         JobId pendingJobId = SchedulerTHelper.submitJob(createPendingJob());
         Thread.sleep(5000);
         jobLogs = SchedulerTHelper.getSchedulerInterface().getJobServerLogs(pendingJobId.toString());
@@ -127,7 +140,49 @@ public class TestJobServerLogs extends SchedulerConsecutive {
             System.out.println(jobLogs);
             Assert.fail("No script output");
         }
-        SchedulerTHelper.removeJob(pendingJobId);
-        SchedulerTHelper.waitForEventJobRemoved(pendingJobId);
+
+        checkRemoval(pendingJobId);
     }
+
+    public void checkRemoval(JobId jobId) throws Exception {
+        JobState jobState = SchedulerTHelper.getSchedulerInterface().getJobState(jobId);
+        List<TaskState> tasks = jobState.getTasks();
+
+        checkJobAndTaskLogFiles(jobId, tasks, true);
+
+        SchedulerTHelper.removeJob(jobId);
+        SchedulerTHelper.waitForEventJobRemoved(jobId);
+
+        checkNoLogsFromAPI(jobId, tasks);
+        checkJobAndTaskLogFiles(jobId, tasks, false);
+    }
+
+    private void checkNoLogsFromAPI(JobId jobId, List<TaskState> tasks) throws Exception {
+        Scheduler scheduler = SchedulerTHelper.getSchedulerInterface();
+        try {
+            scheduler.getJobServerLogs(jobId.toString());
+            fail("getJobServerLogs should throw an exception for a removed job");
+        } catch (UnknownJobException expected) {
+        }
+        for (TaskState taskState : tasks) {
+            try {
+                scheduler.getTaskServerLogs(jobId.toString(), taskState.getName());
+                fail("getTaskServerLogs should throw an exception for a removed job");
+            } catch (UnknownJobException expected) {
+            }
+        }
+    }
+
+    private void checkJobAndTaskLogFiles(JobId jobId, List<TaskState> tasks, boolean shouldExist) throws Exception {
+        checkFile(shouldExist, new File(logsLocation, jobId.toString()));
+        for (TaskState taskState : tasks) {
+            checkFile(shouldExist, new File(logsLocation, taskState.getId().toString()));
+        }
+    }
+
+    private void checkFile(boolean shouldExist, File jobLogFile) {
+        String message = String.format("Log file %s should %s", jobLogFile, shouldExist ? "exist" : "not exist");
+        assertEquals(message, shouldExist, jobLogFile.exists());
+    }
+
 }

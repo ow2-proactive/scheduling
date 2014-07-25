@@ -1,5 +1,6 @@
 package org.ow2.proactive.scheduler.core;
 
+import java.util.List;
 import java.util.concurrent.Callable;
 
 import org.apache.log4j.Logger;
@@ -36,11 +37,14 @@ class JobRemoveHandler implements Callable<Boolean> {
 
         TerminationData terminationData = service.jobs.killJob(jobId);
         service.submitTerminationDataHandler(terminationData);
-        InternalJob job = dbManager.loadJobWithoutTasks(jobId);
+        List<InternalJob> internalJobs = dbManager.loadJobs(false, jobId);
+        if (internalJobs == null || internalJobs.isEmpty()) {
+            return false;
+        }
+        InternalJob job = internalJobs.get(0);
         if (job == null) {
             return false;
         }
-
         job.setRemovedTime(System.currentTimeMillis());
         boolean removeFromDB = PASchedulerProperties.JOB_REMOVE_FROM_DB.getValueAsBoolean();
         dbManager.removeJob(jobId, job.getRemovedTime(), removeFromDB);
