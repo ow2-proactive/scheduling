@@ -56,33 +56,33 @@ public class JobLogger {
     }
 
     public void info(JobId id, String message) {
-        MDC.getContext().put(FileAppender.FILE_NAME, id);
+        MDC.put(FileAppender.FILE_NAME, id);
         logger.info(PREFIX + id + " " + message);
-        MDC.getContext().remove(FileAppender.FILE_NAME);
+        MDC.remove(FileAppender.FILE_NAME);
     }
 
     public void debug(JobId id, String message) {
-        MDC.getContext().put(FileAppender.FILE_NAME, id);
+        MDC.put(FileAppender.FILE_NAME, id);
         logger.debug(PREFIX + id + " " + message);
-        MDC.getContext().remove(FileAppender.FILE_NAME);
+        MDC.remove(FileAppender.FILE_NAME);
     }
 
     public void warn(JobId id, String message) {
-        MDC.getContext().put(FileAppender.FILE_NAME, id);
+        MDC.put(FileAppender.FILE_NAME, id);
         logger.warn(PREFIX + id + " " + message);
-        MDC.getContext().remove(FileAppender.FILE_NAME);
+        MDC.remove(FileAppender.FILE_NAME);
     }
 
     public void error(JobId id, String message) {
-        MDC.getContext().put(FileAppender.FILE_NAME, id);
+        MDC.put(FileAppender.FILE_NAME, id);
         logger.error(PREFIX + id + " " + message);
-        MDC.getContext().remove(FileAppender.FILE_NAME);
+        MDC.remove(FileAppender.FILE_NAME);
     }
 
     public void error(JobId id, String message, Throwable th) {
-        MDC.getContext().put(FileAppender.FILE_NAME, id);
+        MDC.put(FileAppender.FILE_NAME, id);
         logger.error(PREFIX + id + " " + message, th);
-        MDC.getContext().remove(FileAppender.FILE_NAME);
+        MDC.remove(FileAppender.FILE_NAME);
     }
 
 }

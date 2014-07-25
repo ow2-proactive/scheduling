@@ -197,12 +197,12 @@ public abstract class SelectionManager {
     static void maybeSetLoggingContext(Criteria criteria) {
         if (criteria.getComputationDescriptors() != null) {
             // logging selection script execution into tasks logs
-            MDC.getContext().put(MultipleFileAppender.FILE_NAMES, criteria.getComputationDescriptors());
+            MDC.put(MultipleFileAppender.FILE_NAMES, criteria.getComputationDescriptors());
         }
     }
 
     static void unsetLoggingContext() {
-        MDC.getContext().remove(MultipleFileAppender.FILE_NAMES);
+        MDC.remove(MultipleFileAppender.FILE_NAMES);
     }
 
     private NodeSet doSelectNodes(Criteria criteria, Client client) {

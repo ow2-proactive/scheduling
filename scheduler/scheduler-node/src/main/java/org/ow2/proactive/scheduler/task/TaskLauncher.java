@@ -379,9 +379,9 @@ public abstract class TaskLauncher implements InitActive {
         // create logger
         Logger l = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + this.taskId.getJobId());
         l.setAdditivity(false);
-        MDC.getContext().put(Log4JTaskLogs.MDC_TASK_ID, this.taskId.value());
-        MDC.getContext().put(Log4JTaskLogs.MDC_TASK_NAME, this.taskId.getReadableName());
-        MDC.getContext().put(Log4JTaskLogs.MDC_HOST, getHostname());
+        MDC.put(Log4JTaskLogs.MDC_TASK_ID, this.taskId.value());
+        MDC.put(Log4JTaskLogs.MDC_TASK_NAME, this.taskId.getReadableName());
+        MDC.put(Log4JTaskLogs.MDC_HOST, getHostname());
         l.removeAllAppenders();
         // create an async appender for multiplexing (storage plus redirect through socketAppender)
         String logMaxSizeProp = System.getProperty(TaskLauncher.MAX_LOG_SIZE_PROPERTY);
@@ -593,14 +593,14 @@ public abstract class TaskLauncher implements InitActive {
             }
             this.loggersActivated.set(true);
             // should reset taskId because calling thread is not active thread (immediate service)
-            MDC.getContext().put(Log4JTaskLogs.MDC_TASK_ID, this.taskId.value());
-            MDC.getContext().put(Log4JTaskLogs.MDC_TASK_NAME, this.taskId.getReadableName());
+            MDC.put(Log4JTaskLogs.MDC_TASK_ID, this.taskId.value());
+            MDC.put(Log4JTaskLogs.MDC_TASK_NAME, this.taskId.getReadableName());
 
             try {
-                MDC.getContext().put(Log4JTaskLogs.MDC_HOST,
+                MDC.put(Log4JTaskLogs.MDC_HOST,
                         PAActiveObject.getNode().getNodeInformation().getVMInformation().getHostName());
             } catch (NodeException e) {
-                MDC.getContext().put(Log4JTaskLogs.MDC_HOST, "Unknown host");
+                MDC.put(Log4JTaskLogs.MDC_HOST, "Unknown host");
             }
             // create appender
             Appender appender;

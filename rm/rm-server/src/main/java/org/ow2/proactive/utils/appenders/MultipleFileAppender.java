@@ -58,7 +58,7 @@ public class MultipleFileAppender extends FileAppender {
 
     @Override
     public void append(LoggingEvent event) {
-        Object value = MDC.getContext().get(FILE_NAMES);
+        Object value = MDC.get(FILE_NAMES);
         if (value != null) {
             Collection<String> names = (Collection<String>) value;
             for (String fileName : names) {

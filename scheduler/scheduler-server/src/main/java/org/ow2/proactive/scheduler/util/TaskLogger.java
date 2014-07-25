@@ -59,45 +59,45 @@ public class TaskLogger {
     }
 
     public void info(TaskId id, String message) {
-        MDC.getContext().put(FileAppender.FILE_NAME, id);
+        MDC.put(FileAppender.FILE_NAME, id);
         logger.info(PREFIX + id + " " + message);
-        MDC.getContext().remove(FileAppender.FILE_NAME);
+        MDC.remove(FileAppender.FILE_NAME);
     }
 
     public void info(TaskId id, String message, Throwable th) {
-        MDC.getContext().put(FileAppender.FILE_NAME, id);
+        MDC.put(FileAppender.FILE_NAME, id);
         logger.info(PREFIX + id + " " + message, th);
-        MDC.getContext().remove(FileAppender.FILE_NAME);
+        MDC.remove(FileAppender.FILE_NAME);
     }
 
     public void debug(TaskId id, String message) {
-        MDC.getContext().put(FileAppender.FILE_NAME, id);
+        MDC.put(FileAppender.FILE_NAME, id);
         logger.debug(PREFIX + id + " " + message);
-        MDC.getContext().remove(FileAppender.FILE_NAME);
+        MDC.remove(FileAppender.FILE_NAME);
     }
 
     public void debug(TaskId id, String message, Throwable th) {
-        MDC.getContext().put(FileAppender.FILE_NAME, id);
+        MDC.put(FileAppender.FILE_NAME, id);
         logger.debug(PREFIX + id + " " + message, th);
-        MDC.getContext().remove(FileAppender.FILE_NAME);
+        MDC.remove(FileAppender.FILE_NAME);
     }
 
     public void trace(TaskId id, String message) {
-        MDC.getContext().put(FileAppender.FILE_NAME, id);
+        MDC.put(FileAppender.FILE_NAME, id);
         logger.trace(PREFIX + id + " " + message);
-        MDC.getContext().remove(FileAppender.FILE_NAME);
+        MDC.remove(FileAppender.FILE_NAME);
     }
 
     public void trace(TaskId id, String message, Throwable th) {
-        MDC.getContext().put(FileAppender.FILE_NAME, id);
+        MDC.put(FileAppender.FILE_NAME, id);
         logger.trace(PREFIX + id + " " + message, th);
-        MDC.getContext().remove(FileAppender.FILE_NAME);
+        MDC.remove(FileAppender.FILE_NAME);
     }
 
     public void error(TaskId id, String message, Throwable th) {
-        MDC.getContext().put(FileAppender.FILE_NAME, id);
+        MDC.put(FileAppender.FILE_NAME, id);
         logger.error(PREFIX + id + " " + message, th);
-        MDC.getContext().remove(FileAppender.FILE_NAME);
+        MDC.remove(FileAppender.FILE_NAME);
     }
 
     public boolean isDebugEnabled() {

@@ -81,7 +81,7 @@ public class FileAppender extends WriterAppender {
 
     @Override
     public void append(LoggingEvent event) {
-        Object value = MDC.getContext().get(FILE_NAME);
+        Object value = MDC.get(FILE_NAME);
         if (value != null) {
             append(value.toString(), event);
         }
