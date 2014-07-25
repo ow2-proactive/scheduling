@@ -207,6 +207,8 @@ public enum PAResourceManagerProperties {
     /** Resource Manager selection process logs*/
     RM_SELECTION_LOGS_LOCATION("pa.rm.logs.selection.location", PropertyType.STRING),
 
+    RM_SELECTION_LOGS_MAX_SIZE("pa.rm.logs.selection.max.size", PropertyType.STRING),
+
     RM_NB_LOCAL_NODES("pa.rm.local.nodes.number", PropertyType.INTEGER);
 
     /* ***************************************************************************** */

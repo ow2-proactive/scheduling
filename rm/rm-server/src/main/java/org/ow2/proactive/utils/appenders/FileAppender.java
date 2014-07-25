@@ -36,6 +36,7 @@
  */
 package org.ow2.proactive.utils.appenders;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Enumeration;
 
@@ -43,8 +44,10 @@ import org.apache.log4j.Appender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.MDC;
 import org.apache.log4j.PatternLayout;
+import org.apache.log4j.RollingFileAppender;
 import org.apache.log4j.WriterAppender;
 import org.apache.log4j.spi.LoggingEvent;
+import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 
 
 /**
@@ -58,9 +61,8 @@ import org.apache.log4j.spi.LoggingEvent;
  */
 public class FileAppender extends WriterAppender {
 
-    // property from log4j configuration
-    public static final String FILES_LOCATION = "FilesLocation";
     public static final String FILE_NAME = "filename";
+    private String maxFileSize;
 
     protected String filesLocation;
 
@@ -89,12 +91,15 @@ public class FileAppender extends WriterAppender {
 
     public void append(String fileName, LoggingEvent event) {
         if (filesLocation != null) {
-            fileName = filesLocation + fileName;
+            fileName = filesLocation + File.separator + fileName;
         }
 
         try {
-            org.apache.log4j.FileAppender appender = new org.apache.log4j.FileAppender(getLayout(), fileName,
-                true);
+            RollingFileAppender appender = new RollingFileAppender(getLayout(), fileName, true);
+            appender.setMaxBackupIndex(1);
+            if (maxFileSize != null) {
+                appender.setMaxFileSize(maxFileSize);
+            }
             appender.append(event);
             appender.close();
         } catch (IOException e) {
@@ -120,4 +125,11 @@ public class FileAppender extends WriterAppender {
         this.filesLocation = filesLocation;
     }
 
+    public String getMaxFileSize() {
+        return maxFileSize;
+    }
+
+    public void setMaxFileSize(String maxFileSize) {
+        this.maxFileSize = maxFileSize;
+    }
 }

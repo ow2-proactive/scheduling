@@ -263,6 +263,8 @@ public enum PASchedulerProperties {
     // Put logs dedicated to jobs/tasks to this location 
     SCHEDULER_JOB_LOGS_LOCATION("pa.scheduler.job.logs.location", PropertyType.STRING),
 
+    SCHEDULER_JOB_LOGS_MAX_SIZE("pa.scheduler.job.logs.max.size", PropertyType.STRING),
+
     //    /** Log max size (in lines per tasks) */
     //    LOGS_MAX_SIZE("pa.scheduler.logs.maxsize", PropertyType.INTEGER),
 

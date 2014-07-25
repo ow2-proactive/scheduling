@@ -36,7 +36,6 @@
  */
 package org.ow2.proactive.scheduler;
 
-import java.io.File;
 import java.net.URI;
 
 import javax.security.auth.login.LoginException;
@@ -59,10 +58,7 @@ import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.core.SchedulerFrontend;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.exception.AdminSchedulerException;
-import org.ow2.proactive.scheduler.util.JobLogger;
-import org.ow2.proactive.scheduler.util.TaskLogger;
-import org.ow2.proactive.utils.FileUtils;
-import org.ow2.proactive.utils.appenders.FileAppender;
+import org.ow2.proactive.scheduler.util.ServerJobAndTaskLogs;
 
 
 /**
@@ -200,31 +196,6 @@ public class SchedulerFactory {
         }
     }
 
-    private static void configureLog4j() {
-        // Log4j configuration for jobs/tasks (if enabled)
-        if (PASchedulerProperties.SCHEDULER_JOB_LOGS_LOCATION.isSet()) {
-            String logsLocation = PASchedulerProperties
-                    .getAbsolutePath(PASchedulerProperties.SCHEDULER_JOB_LOGS_LOCATION.getValueAsString());
-
-            boolean cleanStart = PASchedulerProperties.SCHEDULER_DB_HIBERNATE_DROPDB.getValueAsBoolean();
-            if (cleanStart) {
-                // removing selection logs directory
-                logger.info("Removing logs " + logsLocation);
-                FileUtils.removeDir(new File(logsLocation));
-            }
-
-            Logger jobLogger = Logger.getLogger(JobLogger.class);
-            FileAppender appender = new FileAppender();
-            appender.setFilesLocation(logsLocation);
-            jobLogger.addAppender(appender);
-
-            Logger taskLogger = Logger.getLogger(TaskLogger.class);
-            appender = new FileAppender();
-            appender.setFilesLocation(logsLocation);
-            taskLogger.addAppender(appender);
-        }
-    }
-
     /**
      * Creates and starts a Scheduler on the local host.
      * This call considered that the JVM is correctly configured for starting Scheduler.
@@ -274,7 +245,7 @@ public class SchedulerFactory {
 
             //ready
             logger.debug("Scheduler is now ready to be started !");
-            configureLog4j();
+            ServerJobAndTaskLogs.configure();
         } catch (Exception e) {
             logger.error(e);
             e.printStackTrace();

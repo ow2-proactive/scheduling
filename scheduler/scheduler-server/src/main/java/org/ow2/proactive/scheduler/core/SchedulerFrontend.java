@@ -36,12 +36,9 @@
  */
 package org.ow2.proactive.scheduler.core;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.net.URI;
 import java.util.Date;
 import java.util.List;
-import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -56,13 +53,6 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
-import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
-import org.objectweb.proactive.extensions.dataspaces.api.PADataSpaces;
-import org.objectweb.proactive.extensions.dataspaces.core.InputOutputSpaceConfiguration;
-import org.objectweb.proactive.extensions.dataspaces.exceptions.ConfigurationException;
-import org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemException;
-import org.objectweb.proactive.extensions.dataspaces.exceptions.NotConfiguredException;
-import org.objectweb.proactive.extensions.dataspaces.exceptions.SpaceNotFoundException;
 import org.objectweb.proactive.utils.NamedThreadFactory;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.db.DatabaseManagerException;
@@ -84,7 +74,6 @@ import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
-import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.exception.SubmissionClosedException;
 import org.ow2.proactive.scheduler.common.exception.TaskCouldNotRestartException;
 import org.ow2.proactive.scheduler.common.exception.TaskCouldNotStartException;
@@ -116,6 +105,7 @@ import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
 import org.ow2.proactive.scheduler.job.UserIdentificationImpl;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.util.JobLogger;
+import org.ow2.proactive.scheduler.util.ServerJobAndTaskLogs;
 import org.ow2.proactive.scheduler.util.TaskLogger;
 import org.ow2.proactive.utils.Tools;
 
@@ -894,30 +884,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
         frontendState.checkJobOwner("getJobServerLogs", id,
                 "You do not have permissions to get the logs of this job");
 
-        String folderName = PASchedulerProperties.SCHEDULER_HOME.getValueAsString() +
-            System.getProperty("file.separator") +
-            PASchedulerProperties.SCHEDULER_JOB_LOGS_LOCATION.getValueAsString();
-
-        StringBuilder result = new StringBuilder();
-        File jobLogsFile = new File(folderName + jobId);
-        if (jobLogsFile.exists()) {
-            try {
-                result.append("================= Job " + jobId + " logs =================\n");
-                result.append(new Scanner(jobLogsFile).useDelimiter("\\Z").next());
-
-                for (TaskId taskId : frontendState.getJobTasks(id)) {
-                    result.append("\n================ Task " + taskId + " logs =================\n");
-                    result.append(getTaskServerLogs(taskId));
-                }
-
-                return result.toString();
-            } catch (FileNotFoundException e) {
-                // should be be here
-                logger.warn(e);
-            }
-        }
-
-        return "Cannot retrieve logs for job " + jobId;
+        return ServerJobAndTaskLogs.getJobLog(JobIdImpl.makeJobId(jobId), frontendState.getJobTasks(id));
     }
 
     @Override
@@ -931,7 +898,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
 
         for (TaskId taskId : frontendState.getJobTasks(id)) {
             if (taskId.getReadableName().equals(taskName)) {
-                return getTaskServerLogs(taskId);
+                return ServerJobAndTaskLogs.getTaskLog(taskId);
             }
         }
 
@@ -1019,20 +986,4 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
         return dbManager.getUsage(user, startDate, endDate);
     }
 
-    private String getTaskServerLogs(TaskId id) {
-        String folderName = PASchedulerProperties.SCHEDULER_HOME.getValueAsString() +
-            System.getProperty("file.separator") +
-            PASchedulerProperties.SCHEDULER_JOB_LOGS_LOCATION.getValueAsString();
-
-        File taskLogsFile = new File(folderName + id);
-        if (taskLogsFile.exists()) {
-            try {
-                return new Scanner(taskLogsFile).useDelimiter("\\Z").next();
-            } catch (FileNotFoundException e) {
-                // should not be here
-                logger.warn(e);
-            }
-        }
-        return "Cannot retrieve logs for task " + id;
-    }
 }
