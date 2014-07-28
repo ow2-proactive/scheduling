@@ -150,7 +150,7 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
                     delta = 0;
                 }
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                logger.warn("runActivity interrupted", e);
             }
         }
     }

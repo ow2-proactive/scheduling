@@ -150,7 +150,7 @@ public class NodesCleaner implements RunActive {
                     }
                 }
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                logger.warn("runActivity interrupted", e);
             }
         }
     }

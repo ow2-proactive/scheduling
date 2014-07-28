@@ -125,9 +125,8 @@ public class ClientPinger implements InitActive, RunActive {
     public void runActivity(Body body) {
         Service service = new Service(body);
         while (body.isActive()) {
-            Request request = null;
             try {
-                request = service.blockingRemoveOldest();
+                Request request = service.blockingRemoveOldest();
                 if (request != null) {
                     try {
                         service.serve(request);
@@ -136,7 +135,7 @@ public class ClientPinger implements InitActive, RunActive {
                     }
                 }
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                logger.warn("runActivity interrupted", e);
             }
         }
     }

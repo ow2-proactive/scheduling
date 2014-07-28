@@ -154,7 +154,7 @@ public class NodeSource implements InitActive, RunActive {
             // executor service initialization
             NodeSource.threadPoolHolder = new ThreadPoolHolder(new int[] { maxThreads / 2, maxThreads / 2 });
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Could not initialize threadPoolHolder", e);
         }
     }
 
@@ -247,7 +247,7 @@ public class NodeSource implements InitActive, RunActive {
                     delta = 0;
                 }
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                logger.warn("runActivity interrupted", e);
             }
         }
     }

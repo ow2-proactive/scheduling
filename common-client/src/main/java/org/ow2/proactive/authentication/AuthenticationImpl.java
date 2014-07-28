@@ -246,7 +246,7 @@ public abstract class AuthenticationImpl implements Authentication, RunActive {
                     }
                 }
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                getLogger().warn("runActivity interrupted", e);
             }
 
         }

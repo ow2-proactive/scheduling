@@ -349,7 +349,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                                 // wait for rmcore shutdown (5 min at most)
                                 nodeRM.wait(5 * 60 * 60 * 1000);
                             } catch (InterruptedException e) {
-                                e.printStackTrace();
+                                logger.warn("shutdown hook interrupted", e);
                             }
                         }
                     }
@@ -420,7 +420,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                     }
                 }
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                logger.warn("runActivity interrupted", e);
             }
         }
     }
