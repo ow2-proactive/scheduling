@@ -205,3 +205,24 @@ project(':rest:rest-client') {
     functionalTest.dependsOn rootProject.dist
     clean.dependsOn rootProject.cleanDist
 }
+
+project(':rest:rest-dataspace-smartproxy') {
+    dependencies {
+        compile 'org.apache.commons:commons-vfs2:2.0'
+
+        compile project(':scheduler:dataspace-smartproxy')
+        compile project(':rest:rest-client')
+        compile project(':rest:rest-server')
+
+        testCompile functionalTestDependencies
+        testCompile project(':rest:rest-server').sourceSets.test.output
+    }
+    test {
+        exclude 'functionaltests/**'
+    }
+
+    task('functionalTest', type:Test).configure functionalTestConfiguration
+
+    functionalTest.dependsOn rootProject.proActiveLibs
+    clean.dependsOn rootProject.cleanProActiveLibs
+}

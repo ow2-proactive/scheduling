@@ -117,7 +117,6 @@ public class JobDB {
     }
 
     public JobDB() {
-
     }
 
     public void close() {
@@ -246,22 +245,22 @@ public class JobDB {
         }
     }
 
-    protected Set<String> getAwaitedJobsIds() {
+    public Set<String> getAwaitedJobsIds() {
         return awaitedJobs.keySet();
     }
 
-    protected AwaitedJob getAwaitedJob(String id) {
+    public AwaitedJob getAwaitedJob(String id) {
         return awaitedJobs.get(id);
     }
 
-    protected boolean isAwaitedJob(String id) {
+    public boolean isAwaitedJob(String id) {
         if (awaitedJobs.get(id) != null)
             return true;
         else
             return false;
     }
 
-    protected void putAwaitedJob(String id, AwaitedJob aj) {
+    public void putAwaitedJob(String id, AwaitedJob aj) {
         if (!aj.getJobId().equals(id)) {
             throw new IllegalArgumentException("given id " + id + " is different from job id : " +
                 aj.getJobId());
@@ -285,7 +284,7 @@ public class JobDB {
      *
      * @param id jobID
      */
-    protected void removeAwaitedJob(String id) {
+    public void removeAwaitedJob(String id) {
 
         AwaitedJob aj = awaitedJobs.get(id);
         if (aj == null) {
@@ -357,7 +356,7 @@ public class JobDB {
      * @param tname task name
      * @param transferring
      */
-    protected void setTaskTransferring(String id, String tname, boolean transferring) {
+    public void setTaskTransferring(String id, String tname, boolean transferring) {
         AwaitedJob aj = awaitedJobs.get(id);
         if (aj == null) {
             logger.warn("Job " + id + " not in the awaited list");
@@ -385,7 +384,7 @@ public class JobDB {
      * @param id    jobID
      * @param tname task name
      */
-    protected void removeAwaitedTask(String id, String tname) {
+    public void removeAwaitedTask(String id, String tname) {
         AwaitedJob aj = awaitedJobs.get(id);
         if (aj == null) {
             logger.warn("Job " + id + " not in the awaited list");
@@ -433,7 +432,6 @@ public class JobDB {
                     .error("Could not save status file after removing task Task " + tname + " from Job" + id,
                             e);
         }
-
     }
 
 }
