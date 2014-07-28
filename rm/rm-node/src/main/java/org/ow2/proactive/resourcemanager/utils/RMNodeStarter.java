@@ -62,12 +62,14 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.config.xml.ProActiveConfigurationParser;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.utils.JVMPropertiesPreloader;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.jmx.PermissionChecker;
@@ -201,7 +203,9 @@ public class RMNodeStarter {
     // if true, previous nodes with different URLs are removed from the RM
     protected boolean removePrevious;
 
-    protected int numberOfReconnectionAttemptsLeft = NB_OF_RECONNECTION_ATTEMPTS;;
+    protected int numberOfReconnectionAttemptsLeft = NB_OF_RECONNECTION_ATTEMPTS;
+
+    private static final long DATASPACE_CLOSE_TIMEOUT = 3 * 1000; // seconds
 
     // Sigar JMX beans
     protected SigarExposer sigarExposer;
@@ -539,12 +543,13 @@ public class RMNodeStarter {
      *
      * @param node the node to be configured
      */
-    private void configureForDataSpace(Node node) {
+    private void configureForDataSpace(final Node node) {
 
         try {
             DataSpaceNodeConfigurationAgent conf = (DataSpaceNodeConfigurationAgent) PAActiveObject
               .newActive(DataSpaceNodeConfigurationAgent.class.getName(), null, node);
             conf.configureNode();
+            closeDataSpaceOnShutdown(node);
             node.setProperty(DATASPACES_STATUS_PROP_NAME, Boolean.TRUE.toString());
         } catch (Throwable t) {
             logger.error("Cannot configure dataSpace", t);
@@ -554,6 +559,27 @@ public class RMNodeStarter {
                 logger.error("Cannot contact the node", e);
             }
         }
+    }
+
+    private void closeDataSpaceOnShutdown(final Node node) {
+        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    DataSpaceNodeConfigurationAgent conf = (DataSpaceNodeConfigurationAgent) PAActiveObject
+                      .newActive(DataSpaceNodeConfigurationAgent.class.getName(), null, node);
+                    BooleanWrapper closeNodeConfiguration = conf.closeNodeConfiguration();
+                    PAFuture.waitFor(closeNodeConfiguration, DATASPACE_CLOSE_TIMEOUT);
+                    if (closeNodeConfiguration.getBooleanValue()) {
+                        logger.debug("Dataspaces are successfully closed for node " +
+                          node.getNodeInformation().getURL());
+                    }
+                } catch (Throwable t) {
+                    logger.debug("Cannot close data spaces configuration", t);
+                }
+
+            }
+        }));
     }
 
     protected void fillParameters(final CommandLine cl, final Options options) {

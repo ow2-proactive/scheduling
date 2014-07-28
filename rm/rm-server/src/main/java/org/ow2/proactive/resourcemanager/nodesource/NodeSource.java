@@ -72,7 +72,6 @@ import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProper
 import org.ow2.proactive.resourcemanager.exception.AddingNodesException;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoringImpl;
-import org.ow2.proactive.resourcemanager.nodesource.dataspace.DataSpaceNodeConfigurationAgent;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.InfrastructureManager;
 import org.ow2.proactive.resourcemanager.nodesource.policy.AccessType;
 import org.ow2.proactive.resourcemanager.nodesource.policy.NodeSourcePolicy;
@@ -409,27 +408,6 @@ public class NodeSource implements InitActive, RunActive {
     }
 
     /**
-     * Close dataSpaces node configuration
-     *
-     * @param node the node to be unconfigured
-     */
-    private void closeDataSpaceConfiguration(Node node) {
-        try {
-            DataSpaceNodeConfigurationAgent conf = (DataSpaceNodeConfigurationAgent) PAActiveObject
-                    .newActive(DataSpaceNodeConfigurationAgent.class.getName(), null, node);
-            // This call might be a blocking call when a file system is unreachable
-            BooleanWrapper result = conf.closeNodeConfiguration();
-            PAFuture.waitFor(result, DataSpaceNodeConfigurationAgent.DATASPACE_CLOSE_TIMEOUT);
-            if (result.getBooleanValue()) {
-                logger.debug("Dataspaces are successfully closed for node " +
-                    node.getNodeInformation().getURL());
-            }
-        } catch (Throwable t) {
-            logger.warn("Cannot close dataSpaces configuration", t);
-        }
-    }
-
-    /**
      * Looks up the node
      */
     private class NodeLocator implements Callable<Node> {
@@ -507,8 +485,6 @@ public class NodeSource implements InitActive, RunActive {
             Node node = nodes.remove(nodeUrl);
             RMCore.topologyManager.removeNode(node);
             try {
-                // TODO this method call breaks parallel node removal - fix it
-                closeDataSpaceConfiguration(node);
                 infrastructureManager.internalRemoveNode(node);
             } catch (RMException e) {
                 logger.error(e.getCause().getMessage(), e);

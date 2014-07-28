@@ -43,8 +43,12 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 
 public class ProcessStreamThread extends Thread {
+
+    private static final Logger logger = Logger.getLogger(ProcessStreamThread.class);
 
     private final InputStream stream;
 
@@ -84,12 +88,12 @@ public class ProcessStreamThread extends Thread {
                 }
             }
         } catch (IOException e) {
-            System.out.println("Error during stream reading: " + e);
+            logger.debug("Error during stream reading: " + e);
         } finally {
             try {
                 stream.close();
             } catch (IOException e) {
-                System.out.println("Error during stream closing: " + e);
+                logger.debug("Error during stream closing: " + e);
             }
         }
     }

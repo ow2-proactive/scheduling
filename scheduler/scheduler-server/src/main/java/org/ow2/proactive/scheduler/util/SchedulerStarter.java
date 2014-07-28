@@ -160,6 +160,8 @@ public class SchedulerStarter {
         if (!commandLine.hasOption("no-rest")) {
             JettyStarter.runWars(rmUrl, sai.getHostURL());
         }
+
+        addShutdownMessageHook();
     }
 
     private static void startRouter() throws Exception {
@@ -275,6 +277,15 @@ public class SchedulerStarter {
             logger.info("Used policy : " + policyFullName);
         }
         return policyFullName;
+    }
+
+    private static void addShutdownMessageHook() {
+        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+            @Override
+            public void run() {
+                logger.info("Shutting down...");
+            }
+        }));
     }
 
     private static void displayHelp(Options options) {

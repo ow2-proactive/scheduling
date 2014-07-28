@@ -47,7 +47,6 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extensions.dataspaces.api.PADataSpaces;
 import org.objectweb.proactive.extensions.dataspaces.core.BaseScratchSpaceConfiguration;
 import org.objectweb.proactive.extensions.dataspaces.core.DataSpacesNodes;
-import org.ow2.proactive.resourcemanager.nodesource.dataspace.DataSpaceNodeConfigurationAgent;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
@@ -62,6 +61,8 @@ import org.ow2.proactive.utils.Formatter;
  * @author The ProActive Team
  **/
 public class JavaTaskLauncherForked extends JavaTaskLauncher {
+
+    private static final long DATASPACE_CLOSE_TIMEOUT = 21 * 1000; // seconds (Christian's last wish)
 
     private String sharedForkerForkedDataspaceUri;
 
@@ -171,7 +172,7 @@ public class JavaTaskLauncherForked extends JavaTaskLauncher {
             };
             Future<Boolean> future = executor.submit(task);
             try {
-                future.get(DataSpaceNodeConfigurationAgent.DATASPACE_CLOSE_TIMEOUT, TimeUnit.MILLISECONDS);
+                future.get(DATASPACE_CLOSE_TIMEOUT, TimeUnit.MILLISECONDS);
             } catch (Throwable t) {
                 logger.error("Cannot close properly DataSpaces.", t);
                 return false;
