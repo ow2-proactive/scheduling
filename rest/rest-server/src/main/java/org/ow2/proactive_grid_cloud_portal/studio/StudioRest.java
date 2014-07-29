@@ -144,7 +144,7 @@ public class StudioRest implements StudioInterface {
             FileOutputStream output = new FileOutputStream(new File(fileName));
             IOUtils.write(content, output);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.warn("Could not write file " + fileName, e);
         }
     }
 
@@ -153,7 +153,7 @@ public class StudioRest implements StudioInterface {
             FileInputStream inputStream = new FileInputStream(fileName);
             return IOUtils.toString(inputStream);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.warn("Could not read file " + fileName, e);
         }
 
         return "";
@@ -414,7 +414,7 @@ public class StudioRest implements StudioInterface {
                     }
 
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    logger.warn("Could not read jar file " + jar, e);
                 }
             }
         }
@@ -456,7 +456,7 @@ public class StudioRest implements StudioInterface {
 
                 writeFile(bytes, fileName);
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.warn("Could not read input part", e);
                 throw e;
             }
 
