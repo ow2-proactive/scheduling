@@ -90,8 +90,8 @@ public class JettyStarter {
             // for web portals
             String defaultRestUrl = httpProtocol + "://localhost:" + restPort + "/rest";
             setSystemPropertyIfNotDefined("rest.url", defaultRestUrl);
-            setSystemPropertyIfNotDefined("sched.rest.url", defaultRestUrl + "/rest");
-            setSystemPropertyIfNotDefined("rm.rest.url", defaultRestUrl + "/rest");
+            setSystemPropertyIfNotDefined("sched.rest.url", defaultRestUrl);
+            setSystemPropertyIfNotDefined("rm.rest.url", defaultRestUrl);
 
             Server server = createHttpServer(properties, restPort, httpsEnabled);
             server.setStopAtShutdown(true);

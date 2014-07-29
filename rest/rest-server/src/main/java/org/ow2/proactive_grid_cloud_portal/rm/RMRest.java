@@ -40,6 +40,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.security.KeyException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -69,6 +71,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAFuture;
@@ -960,5 +963,11 @@ public class RMRest implements RMRestInterface {
 
         return rm
                 .executeScript(script, scriptEngine, TargetType.HOSTNAME.name(), Collections.singleton(host));
+    }
+
+    @GET
+    @Path("/")
+    public Response index() throws URISyntaxException {
+        return Response.seeOther(new URI("doc/jaxrsdocs/rm/index.html")).build();
     }
 }

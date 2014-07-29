@@ -78,7 +78,7 @@
     url = url.substring(0, (url.indexOf("?") == -1) ? url.length : url.indexOf("?"));
     url = url.substring(0, url.lastIndexOf("/") + 1);
     var restApiWebPage = url + "rest";
-    var restApiEndpoint = url + "rest/rest";
+    var restApiEndpoint = url + "rest";
     document.getElementById('restUrlCli').innerHTML = restApiEndpoint;
     document.getElementById('restUrlLink').href = restApiWebPage;
 </script>

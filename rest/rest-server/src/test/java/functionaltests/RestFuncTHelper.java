@@ -172,7 +172,7 @@ public class RestFuncTHelper {
         Credentials rmCredentials = getRmCredentials();
         rm = rmAuth.login(rmCredentials);
 
-        restServerUrl = "http://localhost:8080/rest/rest/";
+        restServerUrl = "http://localhost:8080/rest/";
         restfulSchedulerUrl = restServerUrl + "scheduler";
 
         await().atMost(Duration.ONE_MINUTE).until(restIsStarted());

@@ -36,11 +36,6 @@
  */
 package org.ow2.proactive_grid_cloud_portal.scheduler;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static javax.ws.rs.core.MediaType.APPLICATION_XML_TYPE;
-import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
-import static org.ow2.proactive_grid_cloud_portal.scheduler.ValidationUtil.validateJobDescriptor;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
@@ -52,6 +47,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.SequenceInputStream;
 import java.io.Serializable;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.KeyException;
@@ -86,28 +82,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.vfs2.FileObject;
-import org.apache.commons.vfs2.FileSystemException;
-import org.apache.commons.vfs2.FileSystemManager;
-import org.apache.commons.vfs2.FileType;
-import org.apache.commons.vfs2.Selectors;
-import org.apache.log4j.Logger;
-import org.atmosphere.cpr.AtmosphereResource;
-import org.atmosphere.cpr.AtmosphereResourceFactory;
-import org.atmosphere.cpr.Broadcaster;
-import org.atmosphere.cpr.BroadcasterFactory;
-import org.atmosphere.websocket.WebSocketEventListenerAdapter;
-import org.dozer.DozerBeanMapper;
-import org.dozer.Mapper;
-import org.jboss.resteasy.annotations.GZIP;
-import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
-import org.jboss.resteasy.plugins.providers.multipart.InputPart;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
-import org.jboss.resteasy.util.GenericType;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
@@ -177,6 +153,32 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestEx
 import org.ow2.proactive_grid_cloud_portal.scheduler.util.EventUtil;
 import org.ow2.proactive_grid_cloud_portal.webapp.DateFormatter;
 import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.FileSystemException;
+import org.apache.commons.vfs2.FileSystemManager;
+import org.apache.commons.vfs2.FileType;
+import org.apache.commons.vfs2.Selectors;
+import org.apache.log4j.Logger;
+import org.atmosphere.cpr.AtmosphereResource;
+import org.atmosphere.cpr.AtmosphereResourceFactory;
+import org.atmosphere.cpr.Broadcaster;
+import org.atmosphere.cpr.BroadcasterFactory;
+import org.atmosphere.websocket.WebSocketEventListenerAdapter;
+import org.dozer.DozerBeanMapper;
+import org.dozer.Mapper;
+import org.jboss.resteasy.annotations.GZIP;
+import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
+import org.jboss.resteasy.plugins.providers.multipart.InputPart;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
+import org.jboss.resteasy.util.GenericType;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static javax.ws.rs.core.MediaType.APPLICATION_XML_TYPE;
+import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
+import static org.ow2.proactive_grid_cloud_portal.scheduler.ValidationUtil.validateJobDescriptor;
 
 
 /**
@@ -2447,4 +2449,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         return BroadcasterFactory.getDefault().lookup(topic, createNew);
     }
 
+    @GET
+    @Path("/")
+    public Response index() throws URISyntaxException {
+        return Response.seeOther(new URI("doc/jaxrsdocs/scheduler/index.html")).build();
+    }
 }
