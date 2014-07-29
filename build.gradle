@@ -27,6 +27,12 @@ allprojects {
     group = 'org.ow2.proactive'
     version = schedulingVersion
 
+    if (project.hasProperty('ci')) {
+        configurations.all {
+            resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+        }
+    }
+
     rootProject.buildscript.repositories.each {
         repositories.add(it)
     }
