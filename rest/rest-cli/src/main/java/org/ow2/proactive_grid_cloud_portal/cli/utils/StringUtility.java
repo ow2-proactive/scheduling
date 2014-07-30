@@ -205,19 +205,6 @@ public class StringUtility {
         return Tools.getStringAsArray(formatter);
     }
 
-    public static String jobOutputAsString(String id, Map<String, String> output) {
-        StringBuilder buffer = new StringBuilder();
-        buffer.append(String.format("%s output:\n", id));
-        if (output != null) {
-            for (String key : output.keySet()) {
-                buffer.append(String.format("%s : %s\n", key, output.get(key)));
-            }
-        } else {
-            buffer.append("Not available.");
-        }
-        return buffer.toString();
-    }
-
     public static String jobResultAsString(String id,
             org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobResultData jobResult) {
         StringBuilder buffer = new StringBuilder();
@@ -338,19 +325,10 @@ public class StringUtility {
         return row;
     }
 
-    public static String taskOutputAsString(String id, String response) {
-        StringBuilder buffer = new StringBuilder();
-        buffer.append(String.format("%s output:", id));
-        buffer.append(String.format("%s", response));
-        return buffer.toString();
-    }
-
     public static String taskResultAsString(String id,
             org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskResultData taskResult) {
-        StringBuilder buffer = new StringBuilder();
-        buffer.append(String.format("%s result:", id));
-        buffer.append(ObjectUtility.object(taskResult.getSerializedValue()).toString());
-        return buffer.toString();
+        return String.format("%s result: %s", id,
+          ObjectUtility.object(taskResult.getSerializedValue()).toString());
     }
 
     public static String statsAsString(Map<String, String> stats) {

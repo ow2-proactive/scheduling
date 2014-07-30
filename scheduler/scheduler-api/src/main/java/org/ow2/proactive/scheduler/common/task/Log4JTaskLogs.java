@@ -65,9 +65,6 @@ public class Log4JTaskLogs implements TaskLogs {
     /** Prefix for job logger */
     public static final String JOB_LOGGER_PREFIX = "logger.scheduler.";
 
-    /** Appender name for jobs */
-    public static final String JOB_APPENDER_NAME = "JobLoggerAppender";
-
     /** Log4j context variable name for task ids */
     public static final String MDC_TASK_ID = "task.id";
     public static final String MDC_TASK_NAME = "task.name";
@@ -130,11 +127,20 @@ public class Log4JTaskLogs implements TaskLogs {
         StringBuffer logs = new StringBuffer(this.allEvents.size());
         Layout l = getTaskLogLayout();
         for (LoggingEvent e : this.allEvents) {
-            logs.append(timeStamp ? l.format(e) : e.getMessage());
-            logs.append(nl);
+            appendEventToLogs(e, logs, l, timeStamp);
         }
 
         return logs.toString();
+    }
+
+    private void appendEventToLogs(LoggingEvent logEvent, StringBuffer logs, Layout logFormat,
+      boolean timeStamp) {
+        if (timeStamp) {
+            logs.append(logFormat.format(logEvent));
+        } else {
+            logs.append(logEvent.getMessage());
+            logs.append(nl);
+        }
     }
 
     /**
@@ -193,8 +199,7 @@ public class Log4JTaskLogs implements TaskLogs {
         Layout l = getTaskLogLayout();
         for (LoggingEvent e : this.allEvents) {
             if (Log4JTaskLogs.STDERR_LEVEL.equals(e.getLevel())) {
-                logs.append(timeStamp ? l.format(e) : e.getMessage());
-                logs.append(nl);
+                appendEventToLogs(e, logs, l, timeStamp);
             }
         }
 
@@ -211,8 +216,7 @@ public class Log4JTaskLogs implements TaskLogs {
         Layout l = getTaskLogLayout();
         for (LoggingEvent e : this.allEvents) {
             if (Log4JTaskLogs.STDOUT_LEVEL.equals(e.getLevel())) {
-                logs.append(timeStamp ? l.format(e) : e.getMessage());
-                logs.append(nl);
+                appendEventToLogs(e, logs, l, timeStamp);
             }
         }
 
