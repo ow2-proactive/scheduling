@@ -17,7 +17,7 @@ import org.ow2.proactive.scheduler.job.JobIdImpl;
 public class TestJobOperations extends BaseSchedulerDBTest {
 
     @Test
-    public void testLoadJobWithoutTasks() throws Exception {
+    public void testLoadJobWithTasksIfNotRemoved() throws Exception {
         TaskFlowJob jobDef = new TaskFlowJob();
         jobDef.addTask(createDefaultTask("task1"));
         jobDef.addTask(createDefaultTask("task2"));
@@ -26,8 +26,8 @@ public class TestJobOperations extends BaseSchedulerDBTest {
 
         InternalJob job = defaultSubmitJob(jobDef, "user1");
 
-        job = dbManager.loadJobWithoutTasks(job.getId());
-        Assert.assertEquals(0, job.getTasks().size());
+        job = dbManager.loadJobWithTasksIfNotRemoved(job.getId());
+        Assert.assertEquals(3, job.getTasks().size());
         Assert.assertEquals("user1", job.getOwner());
         Assert.assertEquals(3, job.getJobInfo().getTotalNumberOfTasks());
         Assert.assertEquals(0, job.getJobInfo().getNumberOfFinishedTasks());
@@ -37,9 +37,9 @@ public class TestJobOperations extends BaseSchedulerDBTest {
         Assert.assertEquals(JobPriority.HIGHEST, job.getJobInfo().getPriority());
 
         dbManager.removeJob(job.getId(), System.currentTimeMillis(), false);
-        Assert.assertNull(dbManager.loadJobWithoutTasks(job.getId()));
+        Assert.assertNull(dbManager.loadJobWithTasksIfNotRemoved(job.getId()));
 
-        Assert.assertNull(dbManager.loadJobWithoutTasks(JobIdImpl.makeJobId("123456789")));
+        Assert.assertNull(dbManager.loadJobWithTasksIfNotRemoved(JobIdImpl.makeJobId("123456789")));
     }
 
     @Test

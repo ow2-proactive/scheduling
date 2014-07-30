@@ -744,17 +744,17 @@ public class SchedulerDBManager {
         });
     }
 
-    public InternalJob loadJobWithoutTasks(final JobId id) {
+    public InternalJob loadJobWithTasksIfNotRemoved(final JobId id) {
         return runWithoutTransaction(new SessionWork<InternalJob>() {
             @Override
             public InternalJob executeWork(Session session) {
-                Query jobQuery = session.createQuery("from JobData where id = :id and removedTime = -1")
-                        .setParameter("id", jobId(id));
-                JobData jobData = (JobData) jobQuery.uniqueResult();
-                if (jobData == null) {
+                Query jobQuery = session.createQuery("from JobData as job where job.id in (:ids) and job.removedTime = -1");
+                List<InternalJob> result = new ArrayList<InternalJob>(1);
+                batchLoadJobs(session, false, jobQuery, Collections.singletonList(jobId(id)), result);
+                if (result.isEmpty()) {
                     return null;
                 } else {
-                    return jobData.toInternalJob();
+                    return result.get(0);
                 }
             }
 
