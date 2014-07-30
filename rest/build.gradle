@@ -212,7 +212,6 @@ project(':rest:rest-dataspace-smartproxy') {
 
         compile project(':scheduler:dataspace-smartproxy')
         compile project(':rest:rest-client')
-        compile project(':rest:rest-server')
 
         testCompile functionalTestDependencies
         testCompile project(':rest:rest-server').sourceSets.test.output
@@ -223,6 +222,6 @@ project(':rest:rest-dataspace-smartproxy') {
 
     task('functionalTest', type:Test).configure functionalTestConfiguration
 
-    functionalTest.dependsOn rootProject.proActiveLibs
-    clean.dependsOn rootProject.cleanProActiveLibs
+    functionalTest.dependsOn rootProject.dist
+    clean.dependsOn rootProject.cleanDist
 }

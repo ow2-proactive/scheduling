@@ -1,5 +1,5 @@
 /*
- *  
+ *
  * ProActive Parallel Suite(TM): The Java(TM) library for
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
@@ -40,6 +40,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeoutException;
 
+import javax.ws.rs.core.StreamingOutput;
+
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
@@ -53,30 +55,12 @@ import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.ow2.proactive.scheduler.common.task.dataspaces.RemoteSpace;
-import org.ow2.proactive_grid_cloud_portal.dataspace.dto.ListFile;
 
 public interface ISchedulerClient extends Scheduler {
 
-    public enum DataSpace {
-        USER {
-            @Override
-            public String path() {
-                return "user";
-            }
-        },
-        GLOBAL {
-            @Override
-            public String path() {
-                return "global";
-            }
-        };
-        public abstract String path();
-    };
-
-    /**
+	/**
      * Initialize this instance.
-     * 
+     *
      * @param url
      *            the REST server URL
      * @param login
@@ -105,14 +89,14 @@ public interface ISchedulerClient extends Scheduler {
 
     /**
      * Sets the session identifier explicitly.
-     * 
+     *
      * @param sid session identifier
      */
     public void setSession(String sid);
 
     /**
      * Retrieves the current session identifier.
-     * 
+     *
      * @return the current session identifier
      */
     public String getSession();
@@ -120,7 +104,7 @@ public interface ISchedulerClient extends Scheduler {
     /**
      * Returns <tt>true</tt>, if the scheduler has finished the execution of the
      * specified job.
-     * 
+     *
      * @param jobId
      *            the job identifier object
      * @return true if the scheduler has finished the execution of the job
@@ -138,10 +122,10 @@ public interface ISchedulerClient extends Scheduler {
     /**
      * Returns <tt>true</tt>, if the scheduler has terminated the execution of
      * the specified job.
-     * 
+     *
      * @param jobId
      *            the job identifier string
-     * 
+     *
      * @see #isJobFinished(JobId)
      */
     public boolean isJobFinished(String jobId) throws NotConnectedException, UnknownJobException,
@@ -151,14 +135,14 @@ public interface ISchedulerClient extends Scheduler {
      * Causes the current thread to wait until the scheduler has finished the
      * execution of the specified job or the specified amount of time has
      * elapsed.
-     * 
+     *
      * <p>
      * If the job execution finishes before the elapse of wait time, the result
      * of the job is returned. Otherwise a timeout exception is thrown.
-     * 
+     *
      * @param jobId
      *            the job identifier object
-     * 
+     *
      * @param timeout
      *            the maximum amount of time to wait
      * @return
@@ -180,11 +164,11 @@ public interface ISchedulerClient extends Scheduler {
      * Causes the current thread to wait until the scheduler has finished the
      * execution of the specified job or the specified amount of time has
      * elapsed.
-     * 
+     *
      * <p>
      * If the job execution finishes before the elapse of wait time, the result
      * of the job is returned. Otherwise a timeout exception is thrown.
-     * 
+     *
      * @param jobId
      *            the job identifier string
      * @see #waitForJob(JobId, long)
@@ -195,7 +179,7 @@ public interface ISchedulerClient extends Scheduler {
     /**
      * Returns <tt>true</tt>, if the scheduler has finished the execution of the
      * task.
-     * 
+     *
      * @param jobId
      *            the string identifier of the job to which the task is belong
      * @param taskName
@@ -220,7 +204,7 @@ public interface ISchedulerClient extends Scheduler {
      * <p>
      * If the task execution finishes before the elapse of wait time, the result
      * of the task is returned. Otherwise a timeout exception is thrown.
-     * 
+     *
      * @param jobId
      *            the string identifier of the job to which the task is belong
      * @param taskName
@@ -249,7 +233,7 @@ public interface ISchedulerClient extends Scheduler {
      * Returns a list of job results, if the execution of all jobs specified
      * finishes before the elapse of the wait time. Otherwise a timeout
      * exception is thrown.
-     * 
+     *
      * @param jobIds
      *            the list of job identifier stings
      * @param timeout
@@ -276,7 +260,7 @@ public interface ISchedulerClient extends Scheduler {
      * Returns the string identifier and result of the finished job, if any of
      * the execution of the jobs finishes before the elapse of wait time.
      * Otherwise a timeout exception is thrown.
-     * 
+     *
      * @param jobIds
      *            the list of job identifier strings
      * @param timeout
@@ -301,7 +285,7 @@ public interface ISchedulerClient extends Scheduler {
      * <p>
      * Returns name and the result of a finished task. Otherwise a timeout
      * exception is thrown.
-     * 
+     *
      * @param jobId
      *            the job identifier of the job to which the specified tasks
      *            belong
@@ -334,7 +318,7 @@ public interface ISchedulerClient extends Scheduler {
      * Returns a list of task name and task result pairs, if all the executions
      * of specified tasks finishes before the elapse of wait time. Otherwise a
      * timeout exception is thrown.
-     * 
+     *
      * @param jobId
      *            the identifier of the job to which all the specified tasks
      *            belong
@@ -363,7 +347,7 @@ public interface ISchedulerClient extends Scheduler {
     /**
      * Transfers the specified file from the local file system to the specified
      * dataspace at the server
-     * 
+     *
      * @param spacename
      *            the dataspace name
      * @param pathname
@@ -384,7 +368,7 @@ public interface ISchedulerClient extends Scheduler {
 
     /**
      * Retrieves the specified file from the server.
-     * 
+     *
      * @param space
      *            the dataspace name
      * @param pathname
@@ -402,7 +386,7 @@ public interface ISchedulerClient extends Scheduler {
 
     /**
      * Deletes the specified file from the server.
-     * 
+     *
      * @param space
      *            the dataspace name
      * @param pathname
@@ -439,213 +423,4 @@ public interface ISchedulerClient extends Scheduler {
      */
     public JobId submitAsJobArchive(Job job) throws NotConnectedException, PermissionException,
             SubmissionClosedException, JobCreationException;
-
-    /**
-     * Uploads a file (or a directory) to the specified location in the
-     * <i>dataspace</i>.
-     *
-     * @param file
-     *            the file (or the directory) to upload
-     * @param dataspace
-     *            the target dataspace
-     * @param pathname
-     *            the pathname of the file in the dataspace
-     * @return true, it the file is successfully uploaded, false otherwise
-     * @throws NotConnectedException
-     *             if the client is not logged in or the session has expired
-     * @throws PermissionException
-     *             if the user does not have permission to upload the file to
-     *             the specified location in the server
-     */
-    public boolean upload(File file, DataSpace dataspace, String pathname) throws NotConnectedException,
-            PermissionException;
-
-    /**
-     * Uploads all matching files in the directory to the specified location in
-     * the <i>dataspace</i>.
-     *
-     * @param directory
-     *            the source directory
-     * @param regex
-     *            a regular expression
-     * @param dataSpace
-     *            the target dataspace
-     * @param pathname
-     *            the pathname of the target location in the dataspace
-     * @return true if the files are successfully uploaded, false otherwise
-     * @throws NotConnectedException
-     *             if the client is not logged in or the session has expired
-     * @throws PermissionException
-     *             if the user does not have permission to upload the file to
-     *             the specified location in the server
-     */
-    public boolean upload(File directory, String regex, DataSpace dataSpace, String pathname)
-            throws NotConnectedException, PermissionException;
-
-    /**
-     * Uploads all matching files in the directory to the specified location in
-     * the <i>dataspace</i>.
-     *
-     * @param directory
-     *            the source directory
-     * @param includes
-     *            the list of file names or regular expressions where matching
-     *            files should be selected
-     * @param excludes
-     *            the list of file names or regular expressions where matching
-     *            files should be excluded
-     * @param dataSpace
-     *            the target dataspace
-     * @param pathname
-     *            the target location of the in the dataspace
-     * @return true if all matching files are uploaded, false otherwise
-     * @throws NotConnectedException
-     *             if the client is not logged in or the session has expired
-     * @throws PermissionException
-     *             if the user does not have permission to upload the file to
-     *             the specified location in the server
-     */
-    public boolean upload(File directory, List<String> includes, List<String> excludes, DataSpace dataSpace,
-            String pathname) throws NotConnectedException, PermissionException;
-
-    /**
-     * Downloads the specified file in the <i>dataspace</i> and saves it locally
-     * in the specified location.
-     *
-     * @param dataSpace
-     *            the dataspace
-     * @param pathname
-     *            the pathname of the required file in the dataspace
-     * @param localPathname
-     *            the pathname to which the retrieved file is saved
-     * @return true, if the file is downloaded successfully, false otherwise
-     * @throws NotConnectedException
-     *             if the client is not logged in or the session has expired
-     * @throws PermissionException
-     *             if the user does not have permission to upload the file to
-     *             the specified location in the server
-     */
-    public boolean download(DataSpace dataSpace, String pathname, String localPathname)
-            throws NotConnectedException, PermissionException;
-
-    /**
-     * Downloads all matching files from the specified location in the
-     * <i>dataspace</i> and saves them locally in the specified location.
-     *
-     * @param dataSpace
-     *            the dataspace
-     * @param pathname
-     *            the location in the dataspace which contains all required
-     *            files
-     * @param regex
-     *            a regular expression
-     * @param localPathname
-     *            the local pathname to which all matching files are saved
-     * @return ture if all matching files are downloaded and saved successfully,
-     *         false otherwise
-     * @throws NotConnectedException
-     *             if the client is not logged in or the session has expired
-     * @throws PermissionException
-     *             if the user does not have permission to upload the file to
-     *             the specified location in the server
-     */
-    public boolean download(DataSpace dataSpace, String pathname, String regex, String localPathname)
-            throws NotConnectedException, PermissionException;
-
-    /**
-     * Downloads all matching files from the specified location in the
-     * <i>datasapce</i> and saves them locally in the specified location.
-     *
-     * @param dataSpace
-     *            the dataspace
-     * @param pathname
-     *            the location in the dataspace which contains all required
-     *            files
-     * @param includes
-     *            the list of file names or regular expressions where all
-     *            matching files should be selected
-     * @param excludes
-     *            the list of file names or regular expressions where all
-     *            matching files should be excluded
-     * @param localPathname
-     *            the pathname to which all matching files are saved
-     * @return true if all matching files are downloaded and saved successfully,
-     *         false otherwise
-     * @throws NotConnectedException
-     *             if the client is not logged in or the session has expired
-     * @throws PermissionException
-     *             if the user does not have permission to upload the file to
-     *             the specified location in the server
-     */
-    public boolean download(DataSpace dataSpace, String pathname, List<String> includes,
-            List<String> excludes, String localPathname) throws NotConnectedException, PermissionException;
-
-    /**
-     * Returns a {@link ListType} type object which contains the names of files
-     * and directories in the specified location the <i>dataspace</i>.
-     *
-     * @param dataSpace
-     *            the dataspace
-     * @param pathname
-     *            the location in the dataspace
-     * @return an instance of {@link ListType}
-     * @throws NotConnectedException
-     *             if the client is not logged in or the session has expired
-     * @throws PermissionException
-     *             if the user does not have permission to upload the file to
-     *             the specified location in the server
-     */
-    public ListFile listFiles(DataSpace dataSpace, String pathname) throws NotConnectedException,
-            PermissionException;
-
-    /**
-     * Deletes the specified directory or the file from the <i>dataspace</i>.
-     *
-     * @param dataSpace
-     *            the dataspace
-     * @param pathname
-     *            the location of the directory or the file in the dataspace
-     * @return true if the directory or file is deleted successfully, false
-     *         otherwise
-     * @throws NotConnectedException
-     *             if the client is not logged in or the session has expired
-     * @throws PermissionException
-     *             if the user does not have permission to upload the file to
-     *             the specified location in the server
-     */
-    public boolean deleteFile(DataSpace dataSpace, String pathname) throws NotConnectedException,
-            PermissionException;
-
-    /**
-     * Returns the metadata map of the specified file in the <i>dataspace</i>.
-     *
-     * @param dataSpace
-     *            the dataspace
-     * @param pathname
-     *            the location of the target file
-     * @return an instace of {@link Map}
-     * @throws NotConnectedException
-     *             if the client is not logged in or the session has expired
-     * @throws PermissionException
-     *             if the user does not have permission to upload the file to
-     *             the specified location in the server
-     */
-    public Map<String, Object> metadata(DataSpace dataSpace, String pathname) throws NotConnectedException,
-            PermissionException;
-
-    /**
-     * Returns a {@link RemoteSpace} implementation instance which represents
-     * the <i>globalspace</i>.
-     *
-     * @return an instance of {@link RemoteSpace}
-     */
-    public RemoteSpace getGlobalSpace();
-
-    /**
-     * Returns a {@link RemoteSpace} implementation instance which represents
-     * the <i>userspace</i>
-     *
-     * @return an instance of {@link RemoteSpace}
-     */
-    public RemoteSpace getUserSpace();
 }

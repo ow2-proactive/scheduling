@@ -34,12 +34,29 @@
  */
 package org.ow2.proactive.scheduler.rest;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static java.lang.String.format;
+import static java.lang.System.currentTimeMillis;
+import static org.ow2.proactive.scheduler.rest.ExceptionUtility.exception;
+import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwJAFEOrUJEOrNCEOrPE;
+import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwNCEOrPE;
+import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwNCEOrPEOrSCEOrJCE;
+import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwUJEOrNCEOrPE;
+import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwUJEOrNCEOrPEOrUTE;
+import static org.ow2.proactive.scheduler.rest.data.DataUtility.jobId;
+import static org.ow2.proactive.scheduler.rest.data.DataUtility.taskState;
+import static org.ow2.proactive.scheduler.rest.data.DataUtility.toJobInfos;
+import static org.ow2.proactive.scheduler.rest.data.DataUtility.toJobResult;
+import static org.ow2.proactive.scheduler.rest.data.DataUtility.toJobState;
+import static org.ow2.proactive.scheduler.rest.data.DataUtility.toJobUsages;
+import static org.ow2.proactive.scheduler.rest.data.DataUtility.toSchedulerUserInfos;
+import static org.ow2.proactive.scheduler.rest.data.DataUtility.toTaskResult;
+
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.Serializable;
 import java.lang.reflect.Proxy;
 import java.nio.charset.Charset;
@@ -49,10 +66,16 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import javax.ws.rs.core.StreamingOutput;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.http.client.HttpClient;
+import org.jboss.resteasy.client.jaxrs.engines.ApacheHttpClient4Engine;
+import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.ow2.proactive.db.SortParameter;
 import org.ow2.proactive.scheduler.common.JobFilterCriteria;
 import org.ow2.proactive.scheduler.common.JobSortParameter;
@@ -77,8 +100,6 @@ import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.job.factories.Job2XMLTransformer;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
-import org.ow2.proactive.scheduler.common.task.dataspaces.FileSystemException;
-import org.ow2.proactive.scheduler.common.task.dataspaces.RemoteSpace;
 import org.ow2.proactive.scheduler.common.usage.JobUsage;
 import org.ow2.proactive.scheduler.common.util.JarUtils;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
@@ -89,7 +110,6 @@ import org.ow2.proactive.scheduler.rest.readers.OctetStreamReader;
 import org.ow2.proactive.scheduler.rest.readers.WildCardTypeReader;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpUtility;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
-import org.ow2.proactive_grid_cloud_portal.dataspace.dto.ListFile;
 import org.ow2.proactive_grid_cloud_portal.scheduler.client.SchedulerRestClient;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobResultData;
@@ -102,34 +122,8 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskStateData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.UserJobData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.http.client.HttpClient;
-import org.jboss.resteasy.client.jaxrs.engines.ApacheHttpClient4Engine;
-import org.jboss.resteasy.spi.ResteasyProviderFactory;
-
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
-
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-import static java.lang.String.format;
-import static java.lang.System.currentTimeMillis;
-import static org.ow2.proactive.scheduler.rest.ExceptionUtility.exception;
-import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwJAFEOrUJEOrNCEOrPE;
-import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwNCEOrPE;
-import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwNCEOrPEOrSCEOrJCE;
-import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwUJEOrNCEOrPE;
-import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwUJEOrNCEOrPEOrUTE;
-import static org.ow2.proactive.scheduler.rest.data.DataUtility.jobId;
-import static org.ow2.proactive.scheduler.rest.data.DataUtility.taskState;
-import static org.ow2.proactive.scheduler.rest.data.DataUtility.toJobInfos;
-import static org.ow2.proactive.scheduler.rest.data.DataUtility.toJobResult;
-import static org.ow2.proactive.scheduler.rest.data.DataUtility.toJobState;
-import static org.ow2.proactive.scheduler.rest.data.DataUtility.toJobUsages;
-import static org.ow2.proactive.scheduler.rest.data.DataUtility.toSchedulerUserInfos;
-import static org.ow2.proactive.scheduler.rest.data.DataUtility.toTaskResult;
 
 
 public class SchedulerClient extends ClientBase implements ISchedulerClient {
@@ -936,103 +930,6 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         }
     }
 
-    @Override
-    public boolean upload(File file, DataSpace dataspace, String pathname) throws NotConnectedException,
-            PermissionException {
-        return upload(file, null, null, dataspace, pathname);
-    }
-
-    @Override
-    public boolean upload(File file, String regex, DataSpace dataSpace, String pathname)
-            throws NotConnectedException, PermissionException {
-        checkNotNull(file);
-        checkArgument(file.exists(), "Invalid file: %s", file.getAbsolutePath());
-        checkNotNull(regex);
-        checkArgument(!Strings.isNullOrEmpty(pathname), "pathname cannot be null or empty: %s", pathname);
-        try {
-            return upload(file, Lists.newArrayList(regex), null, dataSpace, pathname);
-        } catch (Exception e) {
-            throw throwNCEOrPE(e);
-        }
-    }
-
-    @Override
-    public boolean upload(File file, List<String> includes, List<String> excludes, DataSpace dataSpace,
-            String pathname) throws NotConnectedException, PermissionException {
-        try {
-            return restApiClient().upload(sid, file, includes, excludes, dataSpace.path(), pathname);
-        } catch (Exception error) {
-            throw throwNCEOrPE(error);
-        }
-    }
-
-    @Override
-    public boolean download(DataSpace dataSpace, String pathname, String localPathname)
-            throws NotConnectedException, PermissionException {
-        return download(dataSpace, pathname, null, null, localPathname);
-    }
-
-    @Override
-    public boolean download(DataSpace dataSpace, String pathname, String regex, String localPathname)
-            throws NotConnectedException, PermissionException {
-        try {
-            return download(dataSpace, pathname, Lists.newArrayList(regex), null, localPathname);
-        } catch (Exception e) {
-            throw throwNCEOrPE(e);
-        }
-    }
-
-    @Override
-    public boolean download(DataSpace dataSpace, String pathname, List<String> includes,
-            List<String> excludes, String localPathname) throws NotConnectedException, PermissionException {
-        try {
-            return restApiClient().download(sid, dataSpace.path(), pathname, includes, excludes,
-                    localPathname);
-        } catch (Exception e) {
-            throw throwNCEOrPE(e);
-        }
-    }
-
-    @Override
-    public ListFile listFiles(DataSpace dataSpace, String pathname) throws NotConnectedException,
-            PermissionException {
-        try {
-            return restApiClient().list(sid, dataSpace.path(), pathname);
-        } catch (Exception e) {
-            throw throwNCEOrPE(e);
-        }
-    }
-
-    @Override
-    public boolean deleteFile(DataSpace dataSpace, String pathname) throws NotConnectedException,
-            PermissionException {
-        try {
-            return restApiClient().delete(sid, dataSpace.path(), pathname, null, null);
-        } catch (Exception e) {
-            throw throwNCEOrPE(e);
-        }
-    }
-
-    @Override
-    public Map<String, Object> metadata(DataSpace dataSpace, String pathname) throws NotConnectedException,
-            PermissionException {
-        try {
-            return restApiClient().metadata(sid, dataSpace.path(), pathname);
-        } catch (Exception e) {
-            throw throwNCEOrPE(e);
-        }
-    }
-
-    @Override
-    public RemoteSpace getUserSpace() {
-        return new RestRemoteSpaceImpl(DataSpace.USER);
-    }
-
-    @Override
-    public RemoteSpace getGlobalSpace() {
-        return new RestRemoteSpaceImpl(DataSpace.GLOBAL);
-    }
-
     private void sleep(long millis) {
         try {
             Thread.sleep(millis);
@@ -1066,96 +963,5 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     private <K, V> Map.Entry<K, V> toEntry(final K k, final V v) {
         return new AbstractMap.SimpleEntry<K, V>(k, v);
 
-    }
-
-    private class RestRemoteSpaceImpl implements RemoteSpace {
-
-        private DataSpace dataSpace;
-
-        public RestRemoteSpaceImpl(DataSpace dataSpace) {
-            this.dataSpace = dataSpace;
-        }
-
-        @Override
-        public void deleteFile(String parthname) throws FileSystemException {
-            try {
-                restApiClient().delete(sid, dataSpace.path(), parthname, null, null);
-            } catch (Exception e) {
-                throw new FileSystemException(e);
-            }
-        }
-
-        @Override
-        public void deleteFiles(String arg0) throws FileSystemException {
-            try {
-                restApiClient().delete(sid, dataSpace.path(), arg0, Lists.newArrayList("*.*"), null);
-            } catch (Exception e) {
-                throw new FileSystemException(e);
-            }
-        }
-
-        @Override
-        public InputStream getInputStream(String pathname) throws FileSystemException {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public OutputStream getOutputStream(String arg0) throws FileSystemException {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public String getSpaceURL() {
-            return (new StringBuffer()).append(url).append(url.endsWith("/") ? "" : "/")
-                    .append("scheduler/dataspace/").append(dataSpace.path()).toString();
-        }
-
-        @Override
-        public File pullFile(String arg0, File arg1) throws FileSystemException {
-
-            try {
-                restApiClient().download(sid, dataSpace.path(), arg0, null, null, arg1);
-                return arg1;
-            } catch (Exception e) {
-                throw new FileSystemException(e);
-            }
-        }
-
-        @Override
-        public Set<File> pullFiles(String pattern, String outputPath) throws FileSystemException {
-            try {
-                restApiClient().download(sid, dataSpace.path(), "", Lists.newArrayList(pattern), null,
-                        outputPath);
-                File dest = new File(outputPath);
-                // TODO: local filtering ?
-                return Sets.newHashSet(dest.listFiles());
-            } catch (Exception e) {
-                throw new FileSystemException(e);
-            }
-        }
-
-        @Override
-        public void pushFile(File localFile, String remotePath) throws FileSystemException {
-            try {
-                restApiClient().upload(sid, localFile, null, null, dataSpace.path(), remotePath);
-            } catch (Exception e) {
-                throw new FileSystemException(e);
-            }
-        }
-
-        @Override
-        public void pushFiles(String arg0, String arg1) throws FileSystemException {
-            throw new UnsupportedOperationException();
-
-        }
-
-        public void pushFile(String pattern, String localRoot, String remotePath) throws FileSystemException {
-            try {
-                restApiClient().upload(sid, new File(localRoot), Lists.newArrayList(pattern), null,
-                        dataSpace.path(), remotePath);
-            } catch (Exception e) {
-                throw new FileSystemException(e);
-            }
-        }
     }
 }

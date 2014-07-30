@@ -69,7 +69,6 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskStateData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskUsageData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.UserJobData;
 
-
 public class DataUtility {
 
     private DataUtility() {
@@ -106,6 +105,10 @@ public class DataUtility {
 
     public static TaskInfo taskInfo(TaskInfoData d) {
         TaskInfoImpl impl = new TaskInfoImpl();
+        JobId jobId = jobId(d.getJobId());
+        impl.setJobId(jobId);
+        TaskId taskId = taskId(jobId, d.getTaskId());
+        impl.setTaskId(taskId);
         impl.setExecutionDuration(d.getExecutionDuration());
         impl.setExecutionHostName(d.getExecutionHostName());
         impl.setFinishedTime(d.getFinishedTime());
@@ -121,9 +124,7 @@ public class DataUtility {
     }
 
     public static TaskResult toTaskResult(JobId jobId, TaskResultData d) {
-        TaskIdData id = d.getId();
-        TaskId taskId = createTaskId(jobId, id.getReadableName(), id.getId(), false);
-        return new TaskResultImpl(taskId, d);
+        return new TaskResultImpl(taskId(jobId, d.getId()), d);
     }
 
     public static TaskLogsImpl toTaskLogs(String all, String out, String err) {
@@ -156,8 +157,8 @@ public class DataUtility {
     }
 
     public static TaskUsage taskUsage(TaskUsageData d) {
-        return new TaskUsage(d.getTaskId(), d.getTaskName(), d.getTaskStartTime(), d.getTaskFinishedTime(), d
-                .getTaskExecutionDuration(), d.getTaskNodeNumber());
+        return new TaskUsage(d.getTaskId(), d.getTaskName(), d.getTaskStartTime(), d.getTaskFinishedTime(),
+                d.getTaskExecutionDuration(), d.getTaskNodeNumber());
     }
 
     public static List<JobInfo> toJobInfos(List<UserJobData> dataList) {
@@ -175,6 +176,10 @@ public class DataUtility {
                     .getConnectionTime(), sud.getLastSubmitTime(), sud.getSubmitNumber()));
         }
         return schedulerUserInfos;
+    }
+
+    private static TaskId taskId(JobId jobId, TaskIdData taskIdData) {
+        return createTaskId(jobId, taskIdData.getReadableName(), taskIdData.getId(), false);
     }
 
 }

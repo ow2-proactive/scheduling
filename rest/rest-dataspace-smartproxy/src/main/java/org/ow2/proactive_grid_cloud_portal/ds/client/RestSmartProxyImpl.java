@@ -1,4 +1,8 @@
+
 package org.ow2.proactive_grid_cloud_portal.ds.client;
+
+import static org.ow2.proactive.scheduler.rest.ds.IDataSpaceClient.Dataspace.USER;
+
 import java.io.File;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -33,8 +37,13 @@ import org.ow2.proactive.scheduler.common.util.dsclient.AwaitedJob;
 import org.ow2.proactive.scheduler.common.util.dsclient.AwaitedTask;
 import org.ow2.proactive.scheduler.common.util.dsclient.ISchedulerEventListenerExtended;
 import org.ow2.proactive.scheduler.rest.ISchedulerClient;
-import org.ow2.proactive.scheduler.rest.ISchedulerClient.DataSpace;
 import org.ow2.proactive.scheduler.rest.SchedulerClient;
+import org.ow2.proactive.scheduler.rest.ds.DataSpaceClient;
+import org.ow2.proactive.scheduler.rest.ds.IDataSpaceClient;
+import org.ow2.proactive.scheduler.rest.ds.LocalDestination;
+import org.ow2.proactive.scheduler.rest.ds.LocalDirSource;
+import org.ow2.proactive.scheduler.rest.ds.RemoteDestination;
+import org.ow2.proactive.scheduler.rest.ds.RemoteSource;
 import org.python.google.common.base.Throwables;
 import org.python.google.common.collect.Lists;
 
@@ -44,16 +53,21 @@ public class RestSmartProxyImpl extends AbstractSmartProxy implements SchedulerE
     private String url, user, pwd;
 
     private ISchedulerClient restClientImpl;
+    private IDataSpaceClient restDsClient;
 
     @Override
     public void init(String url, String user, String pwd) throws SchedulerException, LoginException {
-        restClientImpl = SchedulerClient.createInstance();
         try {
             this.url = url;
             this.user = user;
             this.pwd = pwd;
+            this.restClientImpl = SchedulerClient.createInstance();
 
             restClientImpl.init(url, user, pwd);
+            DataSpaceClient restDsClient = new DataSpaceClient();
+            restDsClient.init(url, restClientImpl);
+            this.restDsClient = restDsClient;
+
             jobDB.loadJobs();
             registerAsListener();
             syncAwaitedJobs();
@@ -142,8 +156,15 @@ public class RestSmartProxyImpl extends AbstractSmartProxy implements SchedulerE
             for (InputSelector is : t.getInputFilesList()) {
                 addfileSelection(is.getInputFiles(), includes, excludes);
             }
-            restClientImpl.upload(new File(localInputFolderPath), includes, excludes, DataSpace.USER,
-                    remotePath);
+            LocalDirSource source = new LocalDirSource(localInputFolderPath);
+            if (!includes.isEmpty()) {
+                source.setIncludes(includes);
+            }
+            if (!excludes.isEmpty()) {
+                source.setExcludes(excludes);
+            }
+            RemoteDestination dest = new RemoteDestination(USER, remotePath);
+            restDsClient.upload(source, dest);
         }
         logger.debug("Finished push operation from " + localInputFolderPath + " to " + remotePath);
 
@@ -151,15 +172,15 @@ public class RestSmartProxyImpl extends AbstractSmartProxy implements SchedulerE
     }
 
     @Override
-    public void downloadTaskOutputFiles(AwaitedJob awaitedjob, String jobId, String t_name, String localFolder)
+    public void downloadTaskOutputFiles(AwaitedJob awaitedjob, String jobId, String taskName, String localFolder)
             throws FileSystemException {
-        AwaitedTask atask = awaitedjob.getAwaitedTask(t_name);
+        AwaitedTask atask = awaitedjob.getAwaitedTask(taskName);
         if (atask == null) {
-            throw new IllegalArgumentException("The task " + t_name + " does not belong to job " + jobId
+            throw new IllegalArgumentException("The task " + taskName + " does not belong to job " + jobId
                     + " or has already been removed");
         }
         if (atask.isTransferring()) {
-            logger.warn("The task " + t_name + " of job " + jobId + " is already transferring its output");
+            logger.warn("The task " + taskName + " of job " + jobId + " is already transferring its output");
             return;
         }
 
@@ -175,7 +196,6 @@ public class RestSmartProxyImpl extends AbstractSmartProxy implements SchedulerE
             throw Throwables.propagate(error);
         }
         if (awaitedjob.isIsolateTaskOutputs()) {
-            // CHECKME
             sourceFile = sourceFile.replace(SchedulerConstants.TASKID_DIR_DEFAULT_NAME,
                     SchedulerConstants.TASKID_DIR_DEFAULT_NAME + "/" + atask.getTaskId());
         }
@@ -188,18 +208,27 @@ public class RestSmartProxyImpl extends AbstractSmartProxy implements SchedulerE
         }
 
         if (awaitedjob.isAutomaticTransfer()) {
-            tpe.submit(new DownloadHandler(jobId, t_name, sourceFile, includes, excludes, localFolder));
+            tpe.submit(new DownloadHandler(jobId, taskName, sourceFile, includes, excludes, localFolder));
         } else {
             try {
-                restClientImpl.download(DataSpace.USER, sourceFile, includes, excludes, localFolder);
+                RemoteSource source = new RemoteSource(USER, sourceFile);
+                if (!includes.isEmpty()) {
+                    source.setIncludes(includes);
+                }
+                if (!excludes.isEmpty()) {
+                    source.setExcludes(excludes);
+                }
+                File localDir = new File(localFolder);
+                LocalDestination dest = new LocalDestination(localDir);
+                restDsClient.download(source, dest);
             } catch (Throwable error) {
                 logger.error(String.format(
                         "Cannot download files, jobId=%s, taskId=%s, source=%s, destination=%s", jobId,
-                        t_name, sourceFile, localFolder), error);
+                        taskName, sourceFile, localFolder), error);
             }
-            jobDB.removeAwaitedTask(jobId, t_name);
+            jobDB.removeAwaitedTask(jobId, taskName);
         }
-        jobDB.setTaskTransferring(jobId, t_name, true);
+        jobDB.setTaskTransferring(jobId, taskName, true);
 
     }
 
@@ -240,7 +269,16 @@ public class RestSmartProxyImpl extends AbstractSmartProxy implements SchedulerE
         @Override
         public void run() {
             try {
-                restClientImpl.download(DataSpace.USER, sourceFile, includes, excludes, localFolder);
+                RemoteSource source = new RemoteSource(USER, sourceFile);
+                if (!includes.isEmpty()) {
+                    source.setIncludes(includes);
+                }
+                if (!excludes.isEmpty()) {
+                    source.setExcludes(excludes);
+                }
+                File localDir = new File(localFolder);
+                LocalDestination dest = new LocalDestination(localDir);
+                restDsClient.download(source, dest);
             } catch (Throwable error) {
 
                 logger.error(String.format(

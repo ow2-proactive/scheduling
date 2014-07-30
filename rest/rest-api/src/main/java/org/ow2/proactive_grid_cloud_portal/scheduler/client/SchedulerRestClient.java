@@ -206,6 +206,34 @@ public class SchedulerRestClient {
         }
     }
 
+    public boolean upload(String sessionId, StreamingOutput output, String encoding, String dataspace,
+            String path) throws Exception {
+        StringBuffer uriTmpl = (new StringBuffer()).append(restEndpointURL)
+                .append(addSlashIfMissing(restEndpointURL)).append("data/").append(dataspace);
+        ResteasyClient client = new ResteasyClientBuilder().httpEngine(httpEngine).build();
+        ResteasyWebTarget target = client.target(uriTmpl.toString()).path(path);
+        Response response = null;
+        try {
+            response = target
+                    .request()
+                    .header("sessionid", sessionId)
+                    .put(Entity.entity(output, new Variant(MediaType.APPLICATION_OCTET_STREAM_TYPE,
+                            (Locale) null, encoding)));
+            if (response.getStatus() != HttpURLConnection.HTTP_CREATED) {
+                if (response.getStatus() == HttpURLConnection.HTTP_UNAUTHORIZED) {
+                    throw new NotConnectedRestException("User not authenticated or session timeout.");
+                } else {
+                    throw new Exception("File upload failed. Status code:" + response.getStatus());
+                }
+            }
+            return true;
+        } finally {
+            if (response != null) {
+                response.close();
+            }
+        }
+    }
+
     public boolean download(String sessionId, String dataspacePath, String path, List<String> includes,
             List<String> excludes, String outputPath) throws Exception {
         return download(sessionId, dataspacePath, path, includes, excludes, new File(outputPath));

@@ -236,13 +236,16 @@ public class SchedulerEventReceiver {
                     eventListener.jobStateUpdatedEvent(new NotificationData<JobInfo>(SchedulerEvent
                             .valueOf(eventData.getSchedulerEvent()), DataUtility
                             .toJobInfo((JobInfoData) eventData.getData())));
+                    break;
                 case TASK_STATE_UPDATED:
                     eventListener.taskStateUpdatedEvent(new NotificationData<TaskInfo>(SchedulerEvent
                             .valueOf(eventData.getSchedulerEvent()), DataUtility
                             .taskInfo((TaskInfoData) eventData.getData())));
+                    break;
                 case USERS_UPDATED:
                     eventListener.usersUpdatedEvent((NotificationData<UserIdentification>) eventData
                             .getData());
+                    break;
                 default:
                     throw new RuntimeException(String.format("Unknown action: %s", action));
             }
