@@ -277,8 +277,7 @@ project(':rm:rm-node-updater') {
             )
         }
         from configurations.compile.collect { zipTree(it) }
-        destinationDir = file("${rootDir}")
-        archiveName = 'node.jar'
+        archiveName = 'node-updater.jar'
     }
 }
 
