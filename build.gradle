@@ -252,8 +252,8 @@ project(':rm:rm-node') {
 
         runtime fileTree(dir: "${rootDir}/lib/node/sigar/", exclude: "*.jar")
 
-        runtime 'org.jruby:jruby:1.7.4'
-        runtime 'org.python:jython:2.5.4-rc1'
+        runtime 'org.jruby:jruby-jline:1.7.4'
+        runtime 'org.python:jython-jline:2.5.4-rc1'
         runtime 'org.codehaus.groovy:groovy-all:2.1.6'
         runtime 'jsr223:jsr223-nativeshell:0.2'
     }
@@ -426,8 +426,8 @@ project('rm:rm-server') {
                 project(':rm:rm-node'),
         )
         testCompile project(':rm:rm-infrastructure:rm-infrastructure-gcm')
-        testCompile 'org.jruby:jruby:1.7.4'
-        testCompile 'org.python:jython:2.5.4-rc1'
+        testCompile 'org.jruby:jruby-jline:1.7.4'
+        testCompile 'org.python:jython-jline:2.5.4-rc1'
 
         runtime 'org.hibernate:hibernate-c3p0:4.1.7.Final'
         runtime 'org.apache.derby:derby:10.8.2.2'
