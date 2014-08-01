@@ -48,7 +48,7 @@ public class PAPropertiesLazyLoader {
 
     private static Logger logger = Logger.getLogger(PAPropertiesLazyLoader.class);
 
-    private Properties properties;
+    private volatile Properties properties = null; // double checked locking with volatile
 
     private String propertiesFileName;
 
@@ -115,22 +115,30 @@ public class PAPropertiesLazyLoader {
      * @return the properties map corresponding to the default property file.
      */
     public Properties getProperties() {
-        if (properties == null) {
-            properties = new Properties();
-            try {
-                InputStream stream = resolvePropertiesFile();
-                if (stream == null) {
-                    return properties;
-                }
-                properties.load(stream);
-                stream.close();
-                updateWithSystemProperties(properties);
+        // double checked locking with volatile
+        Properties result = properties; // to avoid volatile access twice
+        if (result == null) {
+            synchronized (this) {
+                result = properties;
+                if (result == null) {
+                    properties = result = new Properties();
+                    try {
+                        InputStream stream = resolvePropertiesFile();
+                        if (stream == null) {
+                            return properties;
+                        }
 
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+                        properties.load(stream);
+                        stream.close();
+                        updateWithSystemProperties(properties);
+
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
             }
         }
-        return properties;
+        return result;
     }
 
     /**
