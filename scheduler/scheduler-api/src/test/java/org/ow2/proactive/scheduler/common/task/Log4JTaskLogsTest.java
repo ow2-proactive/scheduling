@@ -21,12 +21,12 @@ public class Log4JTaskLogsTest {
 
         Log4JTaskLogs taskLogs = new Log4JTaskLogs(logEvents, "123");
 
-        assertEquals("output\n", taskLogs.getStdoutLogs(false));
-        assertEquals("error\n", taskLogs.getStderrLogs(false));
-        assertEquals("error\noutput\n", taskLogs.getAllLogs(false));
+        assertEquals(String.format("output%n"), taskLogs.getStdoutLogs(false));
+        assertEquals(String.format("error%n"), taskLogs.getStderrLogs(false));
+        assertEquals(String.format("error%noutput%n"), taskLogs.getAllLogs(false));
 
-        assertTrue(taskLogs.getStdoutLogs(true).matches("\\[.*\\] output \n"));
-        assertTrue(taskLogs.getStderrLogs(true).matches("\\[.*\\] error \n"));
-        assertTrue(taskLogs.getAllLogs(true).matches("\\[.*\\] error \n\\[.*\\] output \n"));
+        assertTrue(taskLogs.getStdoutLogs(true).matches(String.format("\\[.*\\] output %n")));
+        assertTrue(taskLogs.getStderrLogs(true).matches(String.format("\\[.*\\] error %n")));
+        assertTrue(taskLogs.getAllLogs(true).matches(String.format("\\[.*\\] error %n\\[.*\\] output %n")));
     }
 }
