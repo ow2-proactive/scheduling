@@ -380,13 +380,18 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
     private void restoreNodeSources() {
         Collection<NodeSourceData> nodeSources = dataBaseManager.getNodeSources();
-        logger.info("Number of node sources to restore " + nodeSources.size());
         for (NodeSourceData nsd : nodeSources) {
-            try {
-                createNodeSource(nsd);
-            } catch (Throwable t) {
-                logger.error(t.getMessage(), t);
-                brokenNodeSources.add(nsd.getName());
+            if (NodeSource.DEFAULT_LOCAL_NODES_NODE_SOURCE_NAME.equals(nsd.getName())) {
+                // will be recreated by SchedulerStarter
+                dataBaseManager.removeNodeSource(nsd.getName());
+            } else {
+                try {
+                    logger.info("Restoring node source " + nsd.getName());
+                    createNodeSource(nsd);
+                } catch (Throwable t) {
+                    logger.error(t.getMessage(), t);
+                    brokenNodeSources.add(nsd.getName());
+                }
             }
         }
     }

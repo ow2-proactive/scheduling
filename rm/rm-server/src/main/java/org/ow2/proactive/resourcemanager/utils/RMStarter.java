@@ -147,7 +147,7 @@ public class RMStarter {
                 ResourceManager resourceManager = auth.login(Credentials
                         .getCredentials(PAResourceManagerProperties
                                 .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
-                String nodeSourceName = NodeSource.LOCAL_INFRASTRUCTURE_NAME;
+                String nodeSourceName = NodeSource.DEFAULT_LOCAL_NODES_NODE_SOURCE_NAME;
 
                 //first im parameter is default rm url
                 byte[] creds = FileToBytesConverter.convertFileToByteArray(new File(

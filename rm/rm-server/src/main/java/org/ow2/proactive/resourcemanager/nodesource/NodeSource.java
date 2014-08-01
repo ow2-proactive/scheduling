@@ -102,8 +102,8 @@ public class NodeSource implements InitActive, RunActive {
     private static Logger logger = Logger.getLogger(NodeSource.class);
     private int pingFrequency = PAResourceManagerProperties.RM_NODE_SOURCE_PING_FREQUENCY.getValueAsInt();
 
-    /** Default name */
-    public static final String LOCAL_INFRASTRUCTURE_NAME = "LocalNodes";
+    /** Default name for NS with local nodes started with the Scheduler by default */
+    public static final String DEFAULT_LOCAL_NODES_NODE_SOURCE_NAME = "LocalNodes";
     public static final String DEFAULT = "Default";
     public static final int INTERNAL_POOL = 0;
     public static final int EXTERNAL_POOL = 1;

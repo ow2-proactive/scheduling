@@ -406,7 +406,7 @@ public class SchedulerStarter {
         //first im parameter is default rm url
         byte[] creds = FileToBytesConverter.convertFileToByteArray(new File(PAResourceManagerProperties
           .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
-        rman.createNodeSource(NodeSource.LOCAL_INFRASTRUCTURE_NAME, LocalInfrastructure.class.getName(),
+        rman.createNodeSource(NodeSource.DEFAULT_LOCAL_NODES_NODE_SOURCE_NAME, LocalInfrastructure.class.getName(),
           new Object[] {
             creds,
             numberLocalNodes,
