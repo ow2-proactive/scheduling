@@ -92,7 +92,6 @@ public class LocalInfrastructure extends InfrastructureManager {
         CommandLineBuilder clb = this.getDefaultCommandLineBuilder(os);
         //RM_Home set in bin/unix/env script
         clb.setRmHome(rmHome);
-        boolean containsSpace = rmHome.contains(" ");
         ArrayList<String> paPropList = new ArrayList<String>();
         if (!this.paProperties.contains(CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getName())) {
             paPropList.add(CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getCmdLine() + rmHome + "config" +
@@ -288,5 +287,10 @@ public class LocalInfrastructure extends InfrastructureManager {
         } else {
             logger.warn("No process associated to node " + nodeName);
         }
+    }
+
+    @Override
+    public String toString() {
+        return "Local Infrastructure";
     }
 }
