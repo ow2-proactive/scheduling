@@ -121,10 +121,11 @@ public abstract class EntryPoint {
                 retryLogin = true;
             } else {
                 writeError(writer(currentContext), "An error occurred.", error);
+                System.exit(1);
             }
         } catch (Throwable e) {
-            e.printStackTrace();
             writeError(writer(currentContext), "An error occurred.", e);
+            System.exit(1);
         }
 
         /*
@@ -142,6 +143,7 @@ public abstract class EntryPoint {
                 executeCommandList(commands, currentContext);
             } catch (Throwable error) {
                 writeError(writer(currentContext), "An error occurred while execution:", error);
+                System.exit(1);
             }
         }
     }
