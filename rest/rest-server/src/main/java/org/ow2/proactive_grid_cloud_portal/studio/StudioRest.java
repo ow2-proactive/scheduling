@@ -63,6 +63,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.PathSegment;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.node.NodeException;
@@ -489,10 +490,11 @@ public class StudioRest implements StudioInterface {
     }
 
     @Override
-    public JobIdData submit(@HeaderParam("sessionid")
-    String sessionId, MultipartFormDataInput multipart) throws IOException, JobCreationRestException,
-            NotConnectedRestException, PermissionRestException, SubmissionClosedRestException {
-        return scheduler().submit(sessionId, multipart);
+    public JobIdData submit(@HeaderParam("sessionid") String sessionId,
+            @PathParam("path") PathSegment pathSegment, MultipartFormDataInput multipart)
+            throws JobCreationRestException, NotConnectedRestException, PermissionRestException,
+            SubmissionClosedRestException, IOException {
+        return scheduler().submit(sessionId, pathSegment, multipart);
     }
 
     @GET

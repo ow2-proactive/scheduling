@@ -36,6 +36,10 @@
  */
 package org.ow2.proactive_grid_cloud_portal.scheduler;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import static javax.ws.rs.core.MediaType.APPLICATION_XML_TYPE;
+import static org.ow2.proactive_grid_cloud_portal.scheduler.ValidationUtil.validateJobDescriptor;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
@@ -50,6 +54,7 @@ import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.FileSystemException;
 import java.security.KeyException;
 import java.security.PublicKey;
 import java.util.ArrayList;
@@ -65,9 +70,13 @@ import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import javax.print.attribute.standard.JobPriority;
+import javax.print.attribute.standard.JobState;
 import javax.security.auth.login.LoginException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import javax.swing.SortOrder;
+import javax.tools.FileObject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
@@ -82,47 +91,27 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Response;
 
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Logger;
+import org.jboss.resteasy.annotations.GZIP;
+import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
+import org.jboss.resteasy.plugins.providers.multipart.InputPart;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
+import org.jboss.resteasy.util.GenericType;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.extensions.dataspaces.vfs.VFSFactory;
 import org.objectweb.proactive.utils.StackTraceUtil;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
-import org.ow2.proactive.db.SortOrder;
-import org.ow2.proactive.db.SortParameter;
-import org.ow2.proactive.scheduler.common.JobFilterCriteria;
-import org.ow2.proactive.scheduler.common.JobSortParameter;
-import org.ow2.proactive.scheduler.common.Scheduler;
-import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
-import org.ow2.proactive.scheduler.common.SchedulerConnection;
-import org.ow2.proactive.scheduler.common.SchedulerConstants;
-import org.ow2.proactive.scheduler.common.exception.ConnectionException;
-import org.ow2.proactive.scheduler.common.exception.InternalSchedulerException;
-import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
-import org.ow2.proactive.scheduler.common.exception.JobCreationException;
-import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
-import org.ow2.proactive.scheduler.common.exception.PermissionException;
-import org.ow2.proactive.scheduler.common.exception.SchedulerException;
-import org.ow2.proactive.scheduler.common.exception.SubmissionClosedException;
-import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
-import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
-import org.ow2.proactive.scheduler.common.job.Job;
-import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobInfo;
-import org.ow2.proactive.scheduler.common.job.JobPriority;
-import org.ow2.proactive.scheduler.common.job.JobResult;
-import org.ow2.proactive.scheduler.common.job.JobState;
-import org.ow2.proactive.scheduler.common.job.factories.FlatJobFactory;
-import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
-import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.ow2.proactive.scheduler.common.task.TaskState;
-import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
-import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 import org.ow2.proactive_grid_cloud_portal.common.Session;
 import org.ow2.proactive_grid_cloud_portal.common.SessionStore;
@@ -153,32 +142,9 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestEx
 import org.ow2.proactive_grid_cloud_portal.scheduler.util.EventUtil;
 import org.ow2.proactive_grid_cloud_portal.webapp.DateFormatter;
 import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.vfs2.FileObject;
-import org.apache.commons.vfs2.FileSystemException;
-import org.apache.commons.vfs2.FileSystemManager;
-import org.apache.commons.vfs2.FileType;
-import org.apache.commons.vfs2.Selectors;
-import org.apache.log4j.Logger;
-import org.atmosphere.cpr.AtmosphereResource;
-import org.atmosphere.cpr.AtmosphereResourceFactory;
-import org.atmosphere.cpr.Broadcaster;
-import org.atmosphere.cpr.BroadcasterFactory;
-import org.atmosphere.websocket.WebSocketEventListenerAdapter;
-import org.dozer.DozerBeanMapper;
-import org.dozer.Mapper;
-import org.jboss.resteasy.annotations.GZIP;
-import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
-import org.jboss.resteasy.plugins.providers.multipart.InputPart;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
-import org.jboss.resteasy.util.GenericType;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static javax.ws.rs.core.MediaType.APPLICATION_XML_TYPE;
-import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
-import static org.ow2.proactive_grid_cloud_portal.scheduler.ValidationUtil.validateJobDescriptor;
+import com.google.common.util.concurrent.AbstractScheduledService.Scheduler;
+import com.sun.mail.iap.ConnectionException;
 
 
 /**
@@ -198,7 +164,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     private static final String ATM_BROADCASTER_ID = "atmosphere.broadcaster.id";
     private static final String ATM_RESOURCE_ID = "atmosphere.resource.id";
 
-    private SessionStore sessionStore = SharedSessionStore.getInstance();
+    private final SessionStore sessionStore = SharedSessionStore.getInstance();
 
     private static FileSystemManager fsManager = null;
 
@@ -221,7 +187,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     /**
      * Returns the ids of the current jobs under a list of string.
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @param index
@@ -232,6 +198,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      *            sublist
      * @return a list of jobs' ids under the form of a list of string
      */
+    @Override
     @GET
     @Path("jobs")
     @Produces("application/json")
@@ -262,7 +229,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     /**
      * call a method on the scheduler's frontend in order to renew the lease the
      * user has on this frontend. see PORTAL-70
-     * 
+     *
      * @throws NotConnectedRestException
      */
     private void renewLeaseForClient(Scheduler scheduler) throws NotConnectedRestException {
@@ -277,7 +244,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      * Returns a subset of the scheduler state, including pending, running,
      * finished jobs (in this particular order). each jobs is described using -
      * its id - its owner - the JobInfo class
-     * 
+     *
      * @param index
      *            optional, if a sublist has to be returned the index of the
      *            sublist
@@ -288,6 +255,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      *            a valid session id
      * @return a list of UserJobData
      */
+    @Override
     @GET
     @Path("jobsinfo")
     @Produces( { "application/json", "application/xml" })
@@ -319,7 +287,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      * Returns a map containing one entry with the revision id as key and the
      * list of UserJobData as value. each jobs is described using - its id - its
      * owner - the JobInfo class
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @param index
@@ -339,6 +307,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      * @return a map containing one entry with the revision id as key and the
      *         list of UserJobData as value.
      */
+    @Override
     @GET
     @GZIP
     @Path("revisionjobsinfo")
@@ -382,11 +351,12 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     /**
      * Returns the revision number of the scheduler state
-     * 
+     *
      * @param sessionId
      *            a valid session id.
      * @return the revision of the scheduler state
      */
+    @Override
     @GET
     @Path("state/revision")
     @Produces( { "application/json", "application/xml" })
@@ -399,12 +369,13 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     /**
      * Returns a JobState of the job identified by the id <code>jobid</code>
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @param jobId
      *            the id of the job to retrieve
      */
+    @Override
     @GET
     @Path("jobs/{jobid}")
     @Produces( { "application/json", "application/xml" })
@@ -431,7 +402,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      * Stream the output of job identified by the id <code>jobid</code> only
      * stream currently available logs, call this method several times to get
      * the complete output.
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @param jobId
@@ -468,7 +439,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     /**
      * number of available bytes in the stream or -1 if the stream does not
      * exist.
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @param jobId
@@ -489,7 +460,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     /**
      * remove the live log object.
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @param jobId
@@ -513,11 +484,12 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     /**
      * Returns the job result associated to the job referenced by the id
      * <code>jobid</code>
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @return the job result of the corresponding job
      */
+    @Override
     @GET
     @GZIP
     @Path("jobs/{jobid}/result")
@@ -544,12 +516,13 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      * string 'Unknown value type'. To get the serialized form of a given
      * result, one has to call the following restful service
      * jobs/{jobid}/tasks/{taskname}/result/serializedvalue
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @param jobId
      *            a job id
      */
+    @Override
     @GET
     @GZIP
     @Path("jobs/{jobid}/result/value")
@@ -582,15 +555,16 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     /**
      * Delete a job
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @param jobId
      *            the id of the job to delete
      * @return true if success, false if the job not yet finished (not removed,
      *         kill the job then remove it)
-     * 
+     *
      */
+    @Override
     @DELETE
     @Path("jobs/{jobid}")
     @Produces("application/json")
@@ -615,6 +589,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      * @param jobId the id of the job
      * @return job traces from the scheduler and resource manager
     */
+    @Override
     @GET
     @GZIP
     @Path("jobs/{jobid}/log/server")
@@ -636,13 +611,14 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     /**
      * Kill the job represented by jobId.<br>
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @param jobId
      *            the job to kill.
      * @return true if success, false if not.
      */
+    @Override
     @PUT
     @Path("jobs/{jobid}/kill")
     @Produces("application/json")
@@ -761,13 +737,14 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     /**
      * Returns a list of the name of the tasks belonging to job
      * <code>jobId</code>
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @param jobId
      *            jobid one wants to list the tasks' name
      * @return a list of tasks' name
      */
+    @Override
     @GET
     @Path("jobs/{jobid}/tasks")
     @Produces("application/json")
@@ -796,6 +773,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     /**
      * {@inheritDoc}
      */
+    @Override
     @GET
     @Path("jobs/{jobid}/image")
     @Produces("application/json;charset=" + ENCODING)
@@ -817,7 +795,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     /**
      * The job map is a XML file generated by the Studio describing the
      * visual representation of a workflow.
-     * 
+     *
      * @throws IOException
      *             when the job archive is not found
      * @param sessionId
@@ -826,6 +804,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      *            the job id
      * @return the map corresponding to the <code>jobId</code>
      */
+    @Override
     @GET
     @GZIP
     @Path("jobs/{jobid}/map")
@@ -858,6 +837,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     /**
      * {@inheritDoc}
      */
+    @Override
     @GET
     @Path("jobs/{jobid}/html")
     @Produces("text/html")
@@ -876,13 +856,14 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     /**
      * Returns a list of taskState
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @param jobId
      *            the job id
      * @return a list of task' states of the job <code>jobId</code>
      */
+    @Override
     @GET
     @GZIP
     @Path("jobs/{jobid}/taskstates")
@@ -910,6 +891,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      * @param jobId the id of the job
      * @return  all the logs generated by the tasks
      */
+    @Override
     @GET
     @GZIP
     @Path("jobs/{jobid}/log/full")
@@ -950,7 +932,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     /**
      * Return the task state of the task <code>taskname</code> of the job
      * <code>jobId</code>
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @param jobId
@@ -960,6 +942,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      * @return the task state of the task <code>taskname</code> of the job
      *         <code>jobId</code>
      */
+    @Override
     @GET
     @Path("jobs/{jobid}/tasks/{taskname}")
     @Produces("application/json")
@@ -996,7 +979,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      * string 'Unknown value type' </strong>. To get the serialized form of a
      * given result, one has to call the following restful service
      * jobs/{jobid}/tasks/{taskname}/result/serializedvalue
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @param jobId
@@ -1005,6 +988,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      *            the name of the task
      * @return the value of the task result
      */
+    @Override
     @GET
     @GZIP
     @Path("jobs/{jobid}/tasks/{taskname}/result/value")
@@ -1046,7 +1030,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      * Returns the value of the task result of the task <code>taskName</code> of
      * the job <code>jobId</code> This method returns the result as a byte array
      * whatever the result is.
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @param jobId
@@ -1055,6 +1039,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      *            the name of the task
      * @return the value of the task result as a byte array.
      */
+    @Override
     @GET
     @GZIP
     @Path("jobs/{jobid}/tasks/{taskname}/result/serializedvalue")
@@ -1073,7 +1058,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     /**
      * Returns the task result of the task <code>taskName</code> of the job
      * <code>jobId</code>
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @param jobId
@@ -1082,6 +1067,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      *            the name of the task
      * @return the task result of the task <code>taskName</code>
      */
+    @Override
     @GET
     @GZIP
     @Path("jobs/{jobid}/tasks/{taskname}/result")
@@ -1108,7 +1094,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     /**
      * Returns all the logs generated by the task (either stdout and stderr)
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @param jobId
@@ -1118,6 +1104,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      * @return all the logs generated by the task (either stdout and stderr) or
      *         an empty string if the result is not yet available
      */
+    @Override
     @GET
     @GZIP
     @Path("jobs/{jobid}/tasks/{taskname}/result/log/all")
@@ -1156,6 +1143,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      * @return all the logs generated by the job (either stdout and stderr) or
      *         an empty string if the result is not yet available
      */
+    @Override
     @GET
     @GZIP
     @Path("jobs/{jobid}/result/log/all")
@@ -1187,7 +1175,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     /**
      * Returns the standard error output (stderr) generated by the task
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @param jobId
@@ -1197,6 +1185,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      * @return the stderr generated by the task or an empty string if the result
      *         is not yet available
      */
+    @Override
     @GET
     @GZIP
     @Path("jobs/{jobid}/tasks/{taskname}/result/log/err")
@@ -1227,7 +1216,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     /**
      * Returns the standard output (stderr) generated by the task
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @param jobId
@@ -1237,6 +1226,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      * @return the stdout generated by the task or an empty string if the result
      *         is not yet available
      */
+    @Override
     @GET
     @GZIP
     @Path("jobs/{jobid}/tasks/{taskname}/result/log/out")
@@ -1278,6 +1268,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      * @return all the logs generated by the task (either stdout and stderr) or
      *         an empty string if the result is not yet available
      */
+    @Override
     @GET
     @GZIP
     @Path("jobs/{jobid}/tasks/{taskname}/result/log/full")
@@ -1321,6 +1312,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      * @param taskname the name of the task
      * @return task traces from the scheduler and resource manager
     */
+    @Override
     @GET
     @GZIP
     @Path("jobs/{jobid}/tasks/{taskname}/log/server")
@@ -1348,7 +1340,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      * the method check is the session id is valid i.e. a scheduler client is
      * associated to the session id in the session map. If not, a
      * NotConnectedRestException is thrown specifying the invalid access *
-     * 
+     *
      * @return the scheduler linked to the session id, an NotConnectedRestException,
      *         if no such mapping exists.
      * @throws NotConnectedRestException
@@ -1376,13 +1368,14 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     /**
      * Pauses the job represented by jobid
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @param jobId
      *            the id of the job
      * @return true if success, false if not
      */
+    @Override
     @PUT
     @Path("jobs/{jobid}/pause")
     @Produces("application/json")
@@ -1403,13 +1396,14 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     /**
      * Resumes the job represented by jobid
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @param jobId
      *            the id of the job
      * @return true if success, false if not
      */
+    @Override
     @PUT
     @Path("jobs/{jobid}/resume")
     @Produces("application/json")
@@ -1442,6 +1436,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      * @throws PermissionRestException
      * @throws SubmissionClosedRestException
      */
+    @Override
     @POST
     @Path("submitflat")
     @Produces("application/json")
@@ -1499,20 +1494,22 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     /**
      * Submits a job to the scheduler
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @return the <code>jobid</code> of the newly created job
      * @throws IOException
      *             if the job was not correctly uploaded/stored
      */
+    @Override
     @POST
     @Path("submit")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces("application/json")
-    public JobIdData submit(@HeaderParam("sessionid")
-    String sessionId, MultipartFormDataInput multipart) throws JobCreationRestException,
-            NotConnectedRestException, PermissionRestException, SubmissionClosedRestException, IOException {
+    public JobIdData submit(@HeaderParam("sessionid") String sessionId,
+            @PathParam("path") PathSegment pathSegment, MultipartFormDataInput multipart)
+            throws JobCreationRestException, NotConnectedRestException, PermissionRestException,
+            SubmissionClosedRestException, IOException {
         try {
             Scheduler s = checkAccess(sessionId, "submit");
 
@@ -1541,6 +1538,18 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                     j = JobFactory.getFactory().createJobFromArchive(tmp.getAbsolutePath());
                     isAnArchive = true;
                 }
+
+                MultivaluedMap<String, String> matrixParams = pathSegment
+                        .getMatrixParameters();
+                if (matrixParams != null && !matrixParams.isEmpty()) {
+                    Map<String, String> variables = j.getVariables();
+                    for (String key : matrixParams.keySet()) {
+                        if (variables.containsKey(key)) {
+                            variables.put(key, matrixParams.getFirst(key));
+                        }
+                    }
+                }
+
                 JobId jobid = s.submit(j);
 
                 File archiveToStore = new File(PortalConfiguration.jobIdToPath(jobid.value()));
@@ -1801,7 +1810,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     /**
      * terminates the session id <code>sessionId</code>
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @throws NotConnectedRestException
@@ -1809,6 +1818,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      * @throws PermissionRestException
      *             if you are not authorized to perform the action
      */
+    @Override
     @PUT
     @Path("disconnect")
     @Produces("application/json")
@@ -1830,13 +1840,14 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     /**
      * pauses the scheduler
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @return true if success, false otherwise
      * @throws NotConnectedRestException
      * @throws PermissionRestException
      */
+    @Override
     @PUT
     @Path("pause")
     @Produces("application/json")
@@ -1854,13 +1865,14 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     /**
      * stops the scheduler
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @return true if success, false otherwise
      * @throws NotConnectedRestException
      * @throws PermissionRestException
      */
+    @Override
     @PUT
     @Path("stop")
     @Produces("application/json")
@@ -1878,13 +1890,14 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     /**
      * resumes the scheduler
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @return true if success, false otherwise
      * @throws NotConnectedRestException
      * @throws PermissionRestException
      */
+    @Override
     @PUT
     @Path("resume")
     @Produces("application/json")
@@ -1902,7 +1915,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     /**
      * changes the priority of a job
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @param jobId
@@ -1914,6 +1927,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      * @throws PermissionRestException
      * @throws JobAlreadyFinishedRestException
      */
+    @Override
     @PUT
     @Path("jobs/{jobid}/priority/byname/{name}")
     public void schedulerChangeJobPriorityByName(@HeaderParam("sessionid")
@@ -1937,7 +1951,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     /**
      * changes the priority of a job
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @param jobId
@@ -1950,6 +1964,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      * @throws PermissionRestException
      * @throws JobAlreadyFinishedRestException
      */
+    @Override
     @PUT
     @Path("jobs/{jobid}/priority/byvalue/{value}")
     public void schedulerChangeJobPriorityByValue(@HeaderParam("sessionid")
@@ -1973,13 +1988,14 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     /**
      * freezes the scheduler
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @return true if success, false otherwise
      * @throws NotConnectedRestException
      * @throws PermissionRestException
      */
+    @Override
     @PUT
     @Path("freeze")
     @Produces("application/json")
@@ -1997,13 +2013,14 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     /**
      * returns the status of the scheduler
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @return the scheduler status
      * @throws NotConnectedRestException
      * @throws PermissionRestException
      */
+    @Override
     @GET
     @Path("status")
     @Produces("application/json")
@@ -2023,13 +2040,14 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     /**
      * starts the scheduler
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @return true if success, false otherwise
      * @throws NotConnectedRestException
      * @throws PermissionRestException
      */
+    @Override
     @PUT
     @Path("start")
     @Produces("application/json")
@@ -2047,13 +2065,14 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     /**
      * kills and shutdowns the scheduler
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @return true if success, false if not
      * @throws NotConnectedRestException
      * @throws PermissionRestException
      */
+    @Override
     @PUT
     @Path("kill")
     @Produces("application/json")
@@ -2072,7 +2091,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     /**
      * Reconnect a new Resource Manager to the scheduler. Can be used if the
      * resource manager has crashed.
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @param rmURL
@@ -2081,6 +2100,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      * @throws NotConnectedRestException
      * @throws PermissionRestException
      */
+    @Override
     @POST
     @Path("linkrm")
     @Produces("application/json")
@@ -2099,12 +2119,13 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     /**
      * Tests whether or not the user is connected to the ProActive Scheduler
-     * 
+     *
      * @param sessionId
      *            the session to test
      * @return true if the user connected to a Scheduler, false otherwise.
      * @throws NotConnectedRestException
      */
+    @Override
     @GET
     @Path("isconnected")
     @Produces("application/json")
@@ -2117,7 +2138,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     /**
      * login to the scheduler using an form containing 2 fields (username &
      * password)
-     * 
+     *
      * @param username
      *            username
      * @param password
@@ -2125,6 +2146,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      * @return the session id associated to the login
      * @throws LoginException
      */
+    @Override
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Path("login")
@@ -2154,12 +2176,13 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      * login to the scheduler using a multipart form can be used either by
      * submitting - 2 fields username & password - a credential file with field
      * name 'credential'
-     * 
+     *
      * @return the session id associated to this new connection
      * @throws KeyException
      * @throws LoginException
      * @throws SchedulerRestException
      */
+    @Override
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Path("login")
@@ -2203,13 +2226,14 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     /**
      * returns statistics about the scheduler
-     * 
+     *
      * @param sessionId
      *            the session id associated to this new connection
      * @return a string containing the statistics
      * @throws NotConnectedRestException
      * @throws PermissionRestException
      */
+    @Override
     @GET
     @Path("stats")
     @Produces("application/json")
@@ -2221,13 +2245,14 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     /**
      * returns a string containing some data regarding the user's account
-     * 
+     *
      * @param sessionId
      *            the session id associated to this new connection
      * @return a string containing some data regarding the user's account
      * @throws NotConnectedRestException
      * @throws PermissionRestException
      */
+    @Override
     @GET
     @Path("stats/myaccount")
     @Produces("application/json")
@@ -2239,13 +2264,14 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     /**
      * Users currently connected to the scheduler
-     * 
+     *
      * @param sessionId
      *            the session id associated to this new connection\
      * @return list of users
      * @throws NotConnectedRestException
      * @throws PermissionRestException
      */
+    @Override
     @GET
     @GZIP
     @Path("users")
@@ -2264,13 +2290,14 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     /**
      * Users having jobs in the scheduler
-     * 
+     *
      * @param sessionId
      *            the session id associated to this new connection\
      * @return list of users
      * @throws NotConnectedRestException
      * @throws PermissionRestException
      */
+    @Override
     @GET
     @GZIP
     @Path("userswithjobs")
@@ -2297,7 +2324,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     /**
      * returns the version of the rest api
-     * 
+     *
      * @return returns the version of the rest api
      */
     @GET
@@ -2310,11 +2337,12 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     /**
      * generates a credential file from user provided credentials
-     * 
+     *
      * @return the credential file generated by the scheduler
      * @throws LoginException
      * @throws SchedulerRestException
      */
+    @Override
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Path("createcredential")
@@ -2427,10 +2455,10 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     /*
      * Atmosphere 2.0 framework based implementation of Scheduler Eventing mechanism for REST clients.
-     * It is configured to use WebSocket as the underneath protocol between the client and the server. 
+     * It is configured to use WebSocket as the underneath protocol between the client and the server.
      */
     /**
-     * Initialize WebScokect based communication channel between the client and the server. 
+     * Initialize WebScokect based communication channel between the client and the server.
      */
     @GET
     @Path("/events")

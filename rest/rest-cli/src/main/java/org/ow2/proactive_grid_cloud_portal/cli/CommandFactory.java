@@ -143,7 +143,7 @@ public abstract class CommandFactory {
 
     /**
      * Returns an ordered {@link Command} list for specified user arguments.
-     * 
+     *
      * @param cli
      *            the command-line arguments
      * @return an ordered {@link Command} list.
@@ -216,6 +216,7 @@ public abstract class CommandFactory {
         if (map.containsKey(opt(INFRASTRUCTURE))) {
             list.add(map.remove(opt(INFRASTRUCTURE)));
         }
+
         if (map.containsKey(opt(POLICY))) {
             list.add(map.remove(opt(POLICY)));
         }

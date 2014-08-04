@@ -37,9 +37,13 @@
 
 package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
 
+import static org.apache.http.entity.ContentType.APPLICATION_XML;
+import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_INVALID_ARGUMENTS;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.net.URLConnection;
+import java.util.Map;
 
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
@@ -47,15 +51,19 @@ import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
 
-import static org.apache.http.entity.ContentType.APPLICATION_XML;
-import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_INVALID_ARGUMENTS;
+import com.google.common.collect.Maps;
 
 
 public class SubmitJobCommand extends AbstractCommand implements Command {
-    private String pathname;
+    private final String pathname;
+    private String[] variables;
 
-    public SubmitJobCommand(String pathname) {
-        this.pathname = pathname;
+    public SubmitJobCommand(String... params) {
+        this.pathname = params[0];
+        if (params.length > 1) {
+            this.variables = new String[params.length - 1];
+            System.arraycopy(params, 1, this.variables, 0, params.length - 1);
+        }
     }
 
     @Override
@@ -69,10 +77,10 @@ public class SubmitJobCommand extends AbstractCommand implements Command {
             JobIdData jobId;
             if (APPLICATION_XML.getMimeType().equals(contentType)) {
                 jobId = currentContext.getRestClient().submitXml(currentContext.getSessionId(),
-                        new FileInputStream(jobFile));
+                        new FileInputStream(jobFile), map(this.variables));
             } else {
                 jobId = currentContext.getRestClient().submitJobArchive(currentContext.getSessionId(),
-                        new FileInputStream(jobFile));
+                        new FileInputStream(jobFile), map(this.variables));
             }
             writeLine(currentContext, "Job('%s') successfully submitted: job('%d')", pathname, jobId.getId());
             resultStack(currentContext).push(jobId);
@@ -80,5 +88,18 @@ public class SubmitJobCommand extends AbstractCommand implements Command {
             handleError(String.format("An error occurred while attempting to submit job('%s'):", pathname),
                     e, currentContext);
         }
+    }
+
+    private Map<String, String> map(String[] variables) {
+        Map<String, String> map = Maps.newHashMap();
+        for (String entry : variables) {
+            if (entry.contains("=")) {
+                String[] keyValue = entry.split("=");
+                map.put(keyValue[0], keyValue[1]);
+            } else {
+                map.put(entry, String.valueOf(true));
+            }
+        }
+        return map;
     }
 }

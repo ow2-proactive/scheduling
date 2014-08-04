@@ -58,6 +58,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.PathSegment;
 
 import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
@@ -593,9 +594,10 @@ public interface SchedulerRestInterface {
     @Path("submit")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces("application/json")
-    public abstract JobIdData submit(@HeaderParam("sessionid")
-    String sessionId, MultipartFormDataInput multipart) throws IOException, JobCreationRestException,
-            NotConnectedRestException, PermissionRestException, SubmissionClosedRestException;
+    public JobIdData submit(@HeaderParam("sessionid") String sessionId,
+            @PathParam("path") PathSegment pathSegment, MultipartFormDataInput multipart)
+            throws JobCreationRestException, NotConnectedRestException, PermissionRestException,
+            SubmissionClosedRestException, IOException;
 
     /**
      * Pushes a file from the local file system into the given DataSpace

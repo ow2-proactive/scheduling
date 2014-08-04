@@ -117,14 +117,16 @@ public class CommandSet {
             .description("Exit interactive shell").jsCommand("exit()").commandClass(ExitCommand.class)
             .entry();
 
-    public static final CommandSet.Entry SUBMIT_DESC = CommandSetEntryBuilder.newInstance().opt("s").longOpt(
-            "submit").description("Submit the specified job-description (XML) file").hasArgs(true).numOfArgs(
-            1).argNames("job-descriptor").jsCommand("submit(job-descriptor)").commandClass(
-            SubmitJobCommand.class).entry();
+    public static final CommandSet.Entry SUBMIT_DESC = CommandSetEntryBuilder.newInstance().opt("s")
+            .longOpt("submit").description("Submit the specified job-description (XML) file").hasArgs(true)
+            .argNames("job-descriptor [var1=value1 var2=value2 ...]")
+            .jsCommand("submit(job-descriptor,[var1=value1,var2=value2,...]")
+            .commandClass(SubmitJobCommand.class).entry();
 
     public static final CommandSet.Entry SUBMIT_ARCH = CommandSetEntryBuilder.newInstance().opt("sa")
-            .longOpt("submitarchive").description("Submit the specified job archive (JAR|ZIP) file").hasArgs(
-                    true).numOfArgs(1).argNames("job-archive").jsCommand("submitarchive(job-archive)")
+            .longOpt("submitarchive").description("Submit the specified job archive (JAR|ZIP) file")
+            .hasArgs(true).argNames("job-archive [var1=value1 var2=value2 ...]")
+            .jsCommand("submitarchive(job-archive,[var1=value1,var2=value2,...])")
             .commandClass(SubmitJobCommand.class).entry();
 
     public static final CommandSet.Entry SCHED_START = CommandSetEntryBuilder.newInstance().opt("start")

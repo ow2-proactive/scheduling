@@ -105,11 +105,21 @@ public class SchedulerRestClient {
     }
 
     public JobIdData submitXml(String sessionId, InputStream jobXml) throws Exception {
-        return submit(sessionId, jobXml, MediaType.APPLICATION_XML_TYPE);
+        return submitXml(sessionId, jobXml, null);
+    }
+
+    public JobIdData submitXml(String sessionId, InputStream jobXml, Map<String, String> variables)
+            throws Exception {
+        return submit(sessionId, jobXml, MediaType.APPLICATION_XML_TYPE, variables);
     }
 
     public JobIdData submitJobArchive(String sessionId, InputStream jobArchive) throws Exception {
-        return submit(sessionId, jobArchive, MediaType.APPLICATION_OCTET_STREAM_TYPE);
+        return submitJobArchive(sessionId, jobArchive, null);
+    }
+
+    public JobIdData submitJobArchive(String sessionId, InputStream jobArchive, Map<String, String> variables)
+            throws Exception {
+        return submit(sessionId, jobArchive, MediaType.APPLICATION_OCTET_STREAM_TYPE, variables);
     }
 
     public boolean pushFile(String sessionId, String space, String path, String fileName,
@@ -377,11 +387,16 @@ public class SchedulerRestClient {
         }
     }
 
-    private JobIdData submit(String sessionId, InputStream job, MediaType mediaType) throws Exception {
+    private JobIdData submit(String sessionId, InputStream job, MediaType mediaType, Map<String,String> variables) throws Exception {
         String uriTmpl = restEndpointURL + addSlashIfMissing(restEndpointURL) + "scheduler/submit";
 
         ResteasyClient client = new ResteasyClientBuilder().httpEngine(httpEngine).build();
         ResteasyWebTarget target = client.target(uriTmpl);
+        if (variables != null) {
+            for (String key : variables.keySet()) {
+                target = target.matrixParam(key, variables.get(key));
+            }
+        }
 
         MultipartFormDataOutput formData = new MultipartFormDataOutput();
         formData.addFormData("file", job, mediaType);
