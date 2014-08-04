@@ -268,8 +268,10 @@ public abstract class ProcessTreeKiller {
             S system = createSystem();
             UnixProcess p;
             try {
-                p = system.get((Integer) PID_FIELD.get(proc));
-            } catch (IllegalAccessException e) { // impossible
+                Field pid = proc.getClass().getDeclaredField("pid");
+                pid.setAccessible(true);
+                p = system.get((Integer) pid.get(proc));
+            } catch (Exception e) { // impossible
                 IllegalAccessError x = new IllegalAccessError();
                 x.initCause(e);
                 throw x;
@@ -294,11 +296,6 @@ public abstract class ProcessTreeKiller {
         }
 
         /**
-         * Field to access the PID of the process.
-         */
-        private static final Field PID_FIELD;
-
-        /**
          * Method to destroy a process, given pid.
          */
         private static final Method DESTROY_PROCESS;
@@ -306,9 +303,6 @@ public abstract class ProcessTreeKiller {
         static {
             try {
                 Class<?> clazz = Class.forName("java.lang.UNIXProcess");
-                PID_FIELD = clazz.getDeclaredField("pid");
-                PID_FIELD.setAccessible(true);
-
                 Method destroy;
                 try {
                     destroy = clazz.getDeclaredMethod("destroyProcess", int.class);
@@ -318,10 +312,6 @@ public abstract class ProcessTreeKiller {
                 DESTROY_PROCESS = destroy;
                 DESTROY_PROCESS.setAccessible(true);
             } catch (ClassNotFoundException e) {
-                LinkageError x = new LinkageError();
-                x.initCause(e);
-                throw x;
-            } catch (NoSuchFieldException e) {
                 LinkageError x = new LinkageError();
                 x.initCause(e);
                 throw x;
