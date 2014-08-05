@@ -37,19 +37,11 @@
 
 package org.ow2.proactive_grid_cloud_portal.cli.cmd.rm;
 
-import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_INVALID_ARGUMENTS;
-import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_OTHER;
-import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
-import static org.ow2.proactive_grid_cloud_portal.cli.json.FieldMetaDataView.Type.CREDENTIAL;
-import static org.ow2.proactive_grid_cloud_portal.cli.json.FieldMetaDataView.Type.FILEBROWSER;
-
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.http.client.methods.HttpGet;
-import org.codehaus.jackson.type.TypeReference;
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
@@ -60,6 +52,13 @@ import org.ow2.proactive_grid_cloud_portal.cli.json.PluginView;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.FileUtility;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.QueryStringBuilder;
+import org.apache.http.client.methods.HttpGet;
+import org.codehaus.jackson.type.TypeReference;
+
+import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_INVALID_ARGUMENTS;
+import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
+import static org.ow2.proactive_grid_cloud_portal.cli.json.FieldMetaDataView.Type.CREDENTIAL;
+import static org.ow2.proactive_grid_cloud_portal.cli.json.FieldMetaDataView.Type.FILEBROWSER;
 
 
 public class SetInfrastructureCommand extends AbstractCommand implements Command {
@@ -98,35 +97,38 @@ public class SetInfrastructureCommand extends AbstractCommand implements Command
                 }
                 currentContext.setInfrastructures(infrastructures);
             } else {
-                throw new CLIException(REASON_OTHER, "Unable to retrieve known infrastructure types.");
+                handleError("Unable to retrieve known infrastructure types:", response, currentContext);
             }
         }
 
-        PluginView pluginView = infrastructures.get(infrastructureType);
+        if (infrastructures != null) {
+            PluginView pluginView = infrastructures.get(infrastructureType);
 
-        if (pluginView == null) {
-            throw new CLIException(REASON_INVALID_ARGUMENTS, String.format("Unknown infrastructure type: %s",
+            if (pluginView == null) {
+                throw new CLIException(REASON_INVALID_ARGUMENTS,
+                  String.format("Unknown infrastructure type: %s",
                     infrastructureType));
-        }
-        ConfigurableFieldView[] configurableFields = pluginView.getConfigurableFields();
-        if (configurableFields.length != infrastructureArgs.length) {
-            throw new CLIException(REASON_INVALID_ARGUMENTS, String.format(
-                    "Invalid number of arguments specified for '%s' type.", infrastructureType));
-        }
-
-        QueryStringBuilder queryStringBuilder = new QueryStringBuilder();
-        queryStringBuilder.add("infrastructureType", infrastructureType);
-        for (int index = 0; index < configurableFields.length; index++) {
-            ConfigurableFieldView cf = configurableFields[index];
-            Type ft = cf.getMeta().type();
-            if (FILEBROWSER.equals(ft) || CREDENTIAL.equals(ft)) {
-                String contents = FileUtility.readFileToString(new File(infrastructureArgs[index]));
-                queryStringBuilder.add("infrastructureFileParameters", contents);
-            } else {
-                queryStringBuilder.add("infrastructureParameters", infrastructureArgs[index]);
             }
+            ConfigurableFieldView[] configurableFields = pluginView.getConfigurableFields();
+            if (configurableFields.length != infrastructureArgs.length) {
+                throw new CLIException(REASON_INVALID_ARGUMENTS, String.format(
+                  "Invalid number of arguments specified for '%s' type.", infrastructureType));
+            }
+
+            QueryStringBuilder queryStringBuilder = new QueryStringBuilder();
+            queryStringBuilder.add("infrastructureType", infrastructureType);
+            for (int index = 0; index < configurableFields.length; index++) {
+                ConfigurableFieldView cf = configurableFields[index];
+                Type ft = cf.getMeta().type();
+                if (FILEBROWSER.equals(ft) || CREDENTIAL.equals(ft)) {
+                    String contents = FileUtility.readFileToString(new File(infrastructureArgs[index]));
+                    queryStringBuilder.add("infrastructureFileParameters", contents);
+                } else {
+                    queryStringBuilder.add("infrastructureParameters", infrastructureArgs[index]);
+                }
+            }
+            currentContext.setProperty(SET_INFRASTRUCTURE, queryStringBuilder);
         }
-        currentContext.setProperty(SET_INFRASTRUCTURE, queryStringBuilder);
     }
 
 }

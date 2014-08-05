@@ -37,19 +37,11 @@
 
 package org.ow2.proactive_grid_cloud_portal.cli.cmd.rm;
 
-import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_INVALID_ARGUMENTS;
-import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_OTHER;
-import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
-import static org.ow2.proactive_grid_cloud_portal.cli.json.FieldMetaDataView.Type.FILEBROWSER;
-import static org.ow2.proactive_grid_cloud_portal.cli.json.FieldMetaDataView.Type.CREDENTIAL;
-
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.http.client.methods.HttpGet;
-import org.codehaus.jackson.type.TypeReference;
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
@@ -60,6 +52,13 @@ import org.ow2.proactive_grid_cloud_portal.cli.json.PluginView;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.FileUtility;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.QueryStringBuilder;
+import org.apache.http.client.methods.HttpGet;
+import org.codehaus.jackson.type.TypeReference;
+
+import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_INVALID_ARGUMENTS;
+import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
+import static org.ow2.proactive_grid_cloud_portal.cli.json.FieldMetaDataView.Type.CREDENTIAL;
+import static org.ow2.proactive_grid_cloud_portal.cli.json.FieldMetaDataView.Type.FILEBROWSER;
 
 
 public class SetPolicyCommand extends AbstractCommand implements Command {
@@ -94,34 +93,36 @@ public class SetPolicyCommand extends AbstractCommand implements Command {
                 }
                 currentContext.setPolicies(knownPolicies);
             } else {
-                throw new CLIException(REASON_OTHER, "Unable to retrieve known policy types.");
+                handleError("Unable to retrieve known policy types:", response, currentContext);
             }
         }
 
-        PluginView pluginView = knownPolicies.get(policyType);
+        if (knownPolicies != null) {
+            PluginView pluginView = knownPolicies.get(policyType);
 
-        if (pluginView == null) {
-            throw new CLIException(REASON_INVALID_ARGUMENTS, String.format("Unknown policy type: %s",
-                    policyType));
-        }
-        ConfigurableFieldView[] configurableFields = pluginView.getConfigurableFields();
-        if (configurableFields.length != policyArgs.length) {
-            throw new CLIException(REASON_INVALID_ARGUMENTS, String.format(
-                    "Invalid number of arguments specified for '%s' type.", policyType));
-        }
-
-        QueryStringBuilder queryStringBuilder = new QueryStringBuilder();
-        queryStringBuilder.add("policyType", policyType);
-        for (int index = 0; index < configurableFields.length; index++) {
-            ConfigurableFieldView cf = configurableFields[index];
-            Type ft = cf.getMeta().type();
-            if (FILEBROWSER.equals(ft) || CREDENTIAL.equals(ft)) {
-                String contents = FileUtility.readFileToString(new File(policyArgs[index]));
-                queryStringBuilder.add("policyFileParameters", contents);
-            } else {
-                queryStringBuilder.add("policyParameters", policyArgs[index]);
+            if (pluginView == null) {
+                throw new CLIException(REASON_INVALID_ARGUMENTS, String.format("Unknown policy type: %s",
+                  policyType));
             }
+            ConfigurableFieldView[] configurableFields = pluginView.getConfigurableFields();
+            if (configurableFields.length != policyArgs.length) {
+                throw new CLIException(REASON_INVALID_ARGUMENTS, String.format(
+                  "Invalid number of arguments specified for '%s' type.", policyType));
+            }
+
+            QueryStringBuilder queryStringBuilder = new QueryStringBuilder();
+            queryStringBuilder.add("policyType", policyType);
+            for (int index = 0; index < configurableFields.length; index++) {
+                ConfigurableFieldView cf = configurableFields[index];
+                Type ft = cf.getMeta().type();
+                if (FILEBROWSER.equals(ft) || CREDENTIAL.equals(ft)) {
+                    String contents = FileUtility.readFileToString(new File(policyArgs[index]));
+                    queryStringBuilder.add("policyFileParameters", contents);
+                } else {
+                    queryStringBuilder.add("policyParameters", policyArgs[index]);
+                }
+            }
+            currentContext.setProperty(SET_POLICY, queryStringBuilder);
         }
-        currentContext.setProperty(SET_POLICY, queryStringBuilder);
     }
 }
