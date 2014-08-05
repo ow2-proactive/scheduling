@@ -1,5 +1,7 @@
 apply plugin: 'java'
 
+archivesBaseName = 'scheduling' // in case current folder is not named scheduling
+
 buildscript {
     repositories {
         if (project.hasProperty('local')) mavenLocal()
@@ -645,6 +647,7 @@ apply plugin: 'distribution'
 
 distributions {
     main {
+        baseName project.archivesBaseName
         contents {
             from '.'
             include "dist/**", "config/**", "bin/**", "samples/**", "addons/**", "LICENSE*", "README*", 'tools/**'
