@@ -6,9 +6,6 @@
 <web-app>
 
     <display-name>Scheduler's Rest API</display-name>
-    <!-- Set this if you want Resteasy to scan for JAX-RS classes -->
-    <!-- <context-param> <param-name>resteasy.scan</param-name> <param-value>false</param-value>
-        </context-param> -->
 
     <context-param>
         <param-name>resteasy.scan.providers</param-name>
@@ -25,21 +22,18 @@
         </param-value>
     </context-param>
 
-    <!-- to turn on security <context-param> <param-name>resteasy.role.based.security</param-name>
-        <param-value>true</param-value> </context-param> -->
-
-    <!-- JavaMelody monitoring -->
-    <filter>
-        <filter-name>monitoring</filter-name>
-        <filter-class>net.bull.javamelody.MonitoringFilter</filter-class>
-    </filter>
-    <filter-mapping>
-        <filter-name>monitoring</filter-name>
-        <url-pattern>/*</url-pattern>
-    </filter-mapping>
-    <listener>
-        <listener-class>net.bull.javamelody.SessionListener</listener-class>
-    </listener>
+    <!-- JavaMelody monitoring, disabled by default (restricted access must be configured) -->
+    <!--<filter>-->
+        <!--<filter-name>monitoring</filter-name>-->
+        <!--<filter-class>net.bull.javamelody.MonitoringFilter</filter-class>-->
+    <!--</filter>-->
+    <!--<filter-mapping>-->
+        <!--<filter-name>monitoring</filter-name>-->
+        <!--<url-pattern>/*</url-pattern>-->
+    <!--</filter-mapping>-->
+    <!--<listener>-->
+        <!--<listener-class>net.bull.javamelody.SessionListener</listener-class>-->
+    <!--</listener>-->
 
     <listener>
         <listener-class>org.ow2.proactive_grid_cloud_portal.webapp.MyResteasyBootstrap</listener-class>
