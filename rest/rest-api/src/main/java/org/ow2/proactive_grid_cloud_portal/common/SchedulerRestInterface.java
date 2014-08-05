@@ -591,7 +591,7 @@ public interface SchedulerRestInterface {
      * @return the <code>jobid</code> of the newly created job 
      */
     @POST
-    @Path("submit")
+    @Path("{path:submit}")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces("application/json")
     public JobIdData submit(@HeaderParam("sessionid") String sessionId,

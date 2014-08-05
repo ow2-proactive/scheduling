@@ -92,12 +92,14 @@ public class SubmitJobCommand extends AbstractCommand implements Command {
 
     private Map<String, String> map(String[] variables) {
         Map<String, String> map = Maps.newHashMap();
-        for (String entry : variables) {
-            if (entry.contains("=")) {
-                String[] keyValue = entry.split("=");
-                map.put(keyValue[0], keyValue[1]);
-            } else {
-                map.put(entry, String.valueOf(true));
+        if (variables != null) {
+            for (String entry : variables) {
+                if (entry.contains("=")) {
+                    String[] keyValue = entry.split("=");
+                    map.put(keyValue[0], keyValue[1]);
+                } else {
+                    map.put(entry, String.valueOf(true));
+                }
             }
         }
         return map;

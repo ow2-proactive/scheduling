@@ -173,12 +173,12 @@ function schedulerhelp() {
     execute(new SchedJsHelpCommand());
 }
 
-function submit(pathname) {
-    execute(new SubmitJobCommand('' + pathname));
+function submit(pathname, variables) {
+    execute(new SubmitJobCommand('' + pathname, variables));
 }
 
 function submitarchive(pathname) {
-    execute(new SubmitJobCommand('' + pathname));
+    execute(new SubmitJobCommand('' + pathname, variables));
 }
 
 function jobpriority(jobId, priority) {

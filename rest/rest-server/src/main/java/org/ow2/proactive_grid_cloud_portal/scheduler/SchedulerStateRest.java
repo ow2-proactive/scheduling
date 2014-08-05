@@ -1539,7 +1539,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      */
     @Override
     @POST
-    @Path("submit")
+    @Path("{path:submit}")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces("application/json")
     public JobIdData submit(@HeaderParam("sessionid") String sessionId,
