@@ -96,6 +96,6 @@ public interface JobDescriptor extends Comparable<JobDescriptor> {
      *
      * @return the list of paused tasks
      */
-    public Map<TaskId, TaskDescriptor> getPausedTasks();
+    public Map<TaskId, ? extends TaskDescriptor> getPausedTasks();
 
 }

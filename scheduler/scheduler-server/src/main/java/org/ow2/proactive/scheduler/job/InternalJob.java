@@ -49,9 +49,6 @@ import java.util.Set;
 
 import javax.xml.bind.annotation.XmlTransient;
 
-import it.sauronsoftware.cron4j.InvalidPatternException;
-import it.sauronsoftware.cron4j.Predictor;
-import org.apache.log4j.Logger;
 import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.NotificationData;
@@ -81,6 +78,9 @@ import org.ow2.proactive.scheduler.task.TaskInfoImpl;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.util.policy.ISO8601DateUtil;
+import it.sauronsoftware.cron4j.InvalidPatternException;
+import it.sauronsoftware.cron4j.Predictor;
+import org.apache.log4j.Logger;
 
 
 /**
@@ -831,9 +831,8 @@ public abstract class InternalJob extends JobState {
      *
      * @param id the id of the task to start and terminate.
      */
-    public void simulateStartAndTerminate(TaskId id) {
-        getJobDescriptor().start(id);
-        getJobDescriptor().terminate(id);
+    public void recoverTask(TaskId id) {
+        getJobDescriptor().recoverTask(id);
     }
 
     /**

@@ -93,7 +93,7 @@ public class JobDescriptorImpl implements JobDescriptor {
     private Map<TaskId, TaskDescriptor> runningTasks = new ConcurrentHashMap<TaskId, TaskDescriptor>();
 
     /** Job paused tasks */
-    private Map<TaskId, TaskDescriptor> pausedTasks = new HashMap<TaskId, TaskDescriptor>();
+    private Map<TaskId, EligibleTaskDescriptor> pausedTasks = new HashMap<TaskId, EligibleTaskDescriptor>();
 
     /**
      * Create a new instance of job descriptor using an internal job.
@@ -255,8 +255,8 @@ public class JobDescriptorImpl implements JobDescriptor {
         }
 
         EligibleTaskDescriptorImpl oldEnd = (EligibleTaskDescriptorImpl) runningTasks.get(initiator);
-        EligibleTaskDescriptorImpl newStart = (EligibleTaskDescriptorImpl) acc.get(target.getId());
-        EligibleTaskDescriptorImpl newEnd = (EligibleTaskDescriptorImpl) acc.get(newInit.getId());
+        EligibleTaskDescriptorImpl newStart = acc.get(target.getId());
+        EligibleTaskDescriptorImpl newEnd = acc.get(newInit.getId());
 
         // plug the end of the old tree (initiator) to the beginning of the new (target)
         for (TaskDescriptor ot : oldEnd.getChildren()) {
@@ -457,7 +457,7 @@ public class JobDescriptorImpl implements JobDescriptor {
         }
 
         EligibleTaskDescriptorImpl oldTask = (EligibleTaskDescriptorImpl) runningTasks.get(initiator);
-        EligibleTaskDescriptorImpl newTask = (EligibleTaskDescriptorImpl) acc.get(target.getId());
+        EligibleTaskDescriptorImpl newTask = acc.get(target.getId());
         if (oldTask == null) {
             oldTask = (EligibleTaskDescriptorImpl) eligibleTasks.get(initiator);
         }
@@ -472,7 +472,7 @@ public class JobDescriptorImpl implements JobDescriptor {
                 }
             }
         }
-        EligibleTaskDescriptorImpl end = (EligibleTaskDescriptorImpl) acc.get(newEnd);
+        EligibleTaskDescriptorImpl end = acc.get(newEnd);
 
         for (TaskDescriptor t : endTask.getChildren()) {
             end.addChild(t);
@@ -547,6 +547,15 @@ public class JobDescriptorImpl implements JobDescriptor {
         runningTasks.remove(taskId);
     }
 
+    public void recoverTask(TaskId taskId) {
+        EligibleTaskDescriptor taskToRun = eligibleTasks.remove(taskId);
+        if (taskToRun == null) {
+            taskToRun = pausedTasks.remove(taskId);
+        }
+        runningTasks.put(taskId, taskToRun);
+        terminate(taskId);
+    }
+
     /**
      * Failed this job descriptor by removing every tasks from eligible and running list.
      * This function considered that the taskIds are in eligible tasks list.
@@ -569,7 +578,7 @@ public class JobDescriptorImpl implements JobDescriptor {
 
     public void unpause(TaskId taskId) {
         if (getInternal().getType() == JobType.TASKSFLOW) {
-            EligibleTaskDescriptor lt = (EligibleTaskDescriptor) pausedTasks.get(taskId);
+            EligibleTaskDescriptor lt = pausedTasks.get(taskId);
 
             if (lt != null) {
                 eligibleTasks.put(taskId, lt);
@@ -622,7 +631,7 @@ public class JobDescriptorImpl implements JobDescriptor {
     /**
      * {@inheritDoc}
      */
-    public Map<TaskId, TaskDescriptor> getPausedTasks() {
+    public Map<TaskId, ? extends TaskDescriptor> getPausedTasks() {
         return pausedTasks;
     }
 

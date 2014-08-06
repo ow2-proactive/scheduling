@@ -102,11 +102,11 @@ public class SchedulerStateRecoverHelper {
         }
 
         for (InternalJob job : runningJobs) {
-            ArrayList<InternalTask> tasksList = copyAndSort(job.getITasks(), true);
+            ArrayList<InternalTask> tasksList = copyAndSort(job.getITasks());
 
             //simulate the running execution to recreate the tree.
             for (InternalTask task : tasksList) {
-                job.simulateStartAndTerminate(task.getId());
+                job.recoverTask(task.getId());
             }
 
             if ((job.getStatus() == JobStatus.RUNNING) || (job.getStatus() == JobStatus.PAUSED)) {
@@ -150,31 +150,25 @@ public class SchedulerStateRecoverHelper {
     }
 
     /**
-     * Make a copy of the given argument with the restriction 'onlyFinished'.
+     * Make a copy of the given argument
      * As no task could be running after recover, this method also move task from RUNNING status to PENDING one.
      * Then sort the array according to finished time order.
      *
      * @param tasks the list of internal tasks to copy.
-     * @param onlyFinished true if the copy must contains only the finished task,
-     *                                                 false to contains every tasks.
      * @return the sorted copy of the given argument.
      */
-    private ArrayList<InternalTask> copyAndSort(ArrayList<InternalTask> tasks, boolean onlyFinished) {
+    private ArrayList<InternalTask> copyAndSort(ArrayList<InternalTask> tasks) {
         ArrayList<InternalTask> tasksList = new ArrayList<InternalTask>();
 
         //copy the list with only the finished task.
         for (InternalTask task : tasks) {
-            if (onlyFinished) {
-                switch (task.getStatus()) {
-                    case ABORTED:
-                    case FAILED:
-                    case FINISHED:
-                    case FAULTY:
-                    case SKIPPED:
-                        tasksList.add(task);
-                }
-            } else {
-                tasksList.add(task);
+            switch (task.getStatus()) {
+                case ABORTED:
+                case FAILED:
+                case FINISHED:
+                case FAULTY:
+                case SKIPPED:
+                    tasksList.add(task);
             }
             //if task was running, put it in pending status
             if (task.getStatus() == TaskStatus.RUNNING) {

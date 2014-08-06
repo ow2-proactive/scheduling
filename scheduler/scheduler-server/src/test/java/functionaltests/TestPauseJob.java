@@ -42,8 +42,13 @@ import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
+import org.ow2.tests.FunctionalTest;
 import org.junit.Assert;
 import org.junit.Test;
+
+import static functionaltests.TestPauseJobRecover.CommunicationObject;
+import static functionaltests.TestPauseJobRecover.createJob;
+import static functionaltests.TestPauseJobRecover.getTaskState;
 
 
 /**
@@ -52,12 +57,13 @@ import org.junit.Test;
  * is postponed.
  *   
  */
-public class TestPauseJob extends TestPauseJobRecover {
+public class TestPauseJob extends FunctionalTest {
 
     @Test
     public void test() throws Throwable {
 
-        CommunicationObject communicationObject = PAActiveObject.newActive(CommunicationObject.class,
+        CommunicationObject communicationObject = PAActiveObject.newActive(
+          CommunicationObject.class,
                 new Object[] {});
 
         TaskFlowJob job = createJob(PAActiveObject.getUrl(communicationObject));

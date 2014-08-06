@@ -54,29 +54,34 @@ import org.ow2.tests.FunctionalTest;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static functionaltests.SchedulerTHelper.log;
 
-/**
- * Submits a job with 2 tasks, task 2 depends on task1.
- * It pauses the job while task1 is running. Kills the Scheduler after task 1 finishes.
- * Expects task 2 to be executed after restart.
- * @author esalagea
- *
- */
+
 public class TestPauseJobRecover extends FunctionalTest {
 
     @Test
-    public void test() throws Throwable {
+    public void runTest() throws Throwable {
+        pause_resume_recover();
+        recover_paused_job_with_finished_tasks();
+    }
+
+    /**
+     * Submits a job with 2 tasks, task 2 depends on task1.
+     * It pauses the job while task1 is running. Kills the Scheduler after task 1 finishes.
+     * Expects task 2 to be executed after restart.
+     */
+    public void pause_resume_recover() throws Throwable {
 
         CommunicationObject communicationObject = PAActiveObject.newActive(CommunicationObject.class,
-                new Object[] {});
+          new Object[] { });
 
         TaskFlowJob job = createJob(PAActiveObject.getUrl(communicationObject));
 
-        System.out.println("Submit job");
+        log("Submit job");
         JobId jobId = SchedulerTHelper.submitJob(job);
-        System.out.println("Submitted job " + jobId);
+        log("Submitted job " + jobId);
 
-        System.out.println("Waiting for task1 to start");
+        log("Waiting for task1 to start");
         SchedulerTHelper.waitForEventTaskRunning(jobId, "task1");
 
         JobState js = SchedulerTHelper.getSchedulerInterface().getJobState(jobId);
@@ -84,7 +89,7 @@ public class TestPauseJobRecover extends FunctionalTest {
         Assert.assertEquals(TaskStatus.RUNNING, getTaskState("task1", js).getStatus());
         Assert.assertEquals(TaskStatus.PENDING, getTaskState("task2", js).getStatus());
 
-        System.out.println("Pause the job " + jobId);
+        log("Pause the job " + jobId);
         SchedulerTHelper.getSchedulerInterface().pauseJob(jobId);
 
         js = SchedulerTHelper.getSchedulerInterface().getJobState(jobId);
@@ -102,18 +107,18 @@ public class TestPauseJobRecover extends FunctionalTest {
         //let the task1 finish
         communicationObject.setCanFinish(true);
 
-        System.out.println("Waiting for task1 to finish");
+        log("Waiting for task1 to finish");
         SchedulerTHelper.waitForEventTaskFinished(jobId, "task1");
 
-        System.out.println("Kill&Restart the scheduler");
+        log("Kill&Restart the scheduler");
 
         SchedulerTHelper.killSchedulerAndNodesAndRestart(new File(SchedulerTHelper.class.getResource(
-                "config/functionalTSchedulerProperties-updateDB.ini").toURI()).getAbsolutePath());
+          "config/functionalTSchedulerProperties-updateDB.ini").toURI()).getAbsolutePath());
 
-        System.out.println("Resume the job " + jobId);
+        log("Resume the job " + jobId);
         SchedulerTHelper.getSchedulerInterface().resumeJob(jobId);
 
-        System.out.println("Waiting for job " + jobId + " to finish");
+        log("Waiting for job " + jobId + " to finish");
         SchedulerTHelper.waitForEventJobFinished(jobId);
 
         JobResult jobResult = SchedulerTHelper.getSchedulerInterface().getJobResult(jobId);
@@ -122,7 +127,66 @@ public class TestPauseJobRecover extends FunctionalTest {
         Assert.assertEquals("OK", jobResult.getResult("task2").value().toString());
     }
 
-    protected TaskState getTaskState(String taskName, JobState jobState) {
+    // SCHEDULING-1924 SCHEDULING-2030
+    public void recover_paused_job_with_finished_tasks() throws Throwable {
+
+        CommunicationObject controlTask2 = PAActiveObject.newActive(CommunicationObject.class,
+          new Object[] { });
+        CommunicationObject controlTask3 = PAActiveObject.newActive(CommunicationObject.class,
+          new Object[] { });
+
+        TaskFlowJob job = createJob3TasksPauseTask2AndTask3(PAActiveObject.getUrl(controlTask2),
+          PAActiveObject.getUrl(controlTask3));
+
+        log("Submit job");
+        JobId jobId = SchedulerTHelper.submitJob(job);
+        log("Submitted job " + jobId);
+
+        log("Waiting for task1 to finish and task2 to start");
+        SchedulerTHelper.waitForEventTaskFinished(jobId, "task1");
+        SchedulerTHelper.waitForEventTaskRunning(jobId, "task2");
+
+        JobState js = SchedulerTHelper.getSchedulerInterface().getJobState(jobId);
+        Assert.assertEquals(JobStatus.RUNNING, js.getStatus());
+        Assert.assertEquals(TaskStatus.FINISHED, getTaskState("task1", js).getStatus());
+        Assert.assertEquals(TaskStatus.RUNNING, getTaskState("task2", js).getStatus());
+        Assert.assertEquals(TaskStatus.PENDING, getTaskState("task3", js).getStatus());
+
+        log("Pause the job " + jobId);
+        SchedulerTHelper.getSchedulerInterface().pauseJob(jobId);
+
+        js = SchedulerTHelper.getSchedulerInterface().getJobState(jobId);
+        Assert.assertEquals(JobStatus.PAUSED, js.getStatus());
+
+        controlTask2.setCanFinish(true);
+
+        log("Waiting for task2 to finish");
+        SchedulerTHelper.waitForEventTaskFinished(jobId, "task2");
+
+        log("Kill&Restart the scheduler");
+
+        SchedulerTHelper.killSchedulerAndNodesAndRestart(new File(SchedulerTHelper.class.getResource(
+          "config/functionalTSchedulerProperties-updateDB.ini").toURI()).getAbsolutePath());
+
+        log("Resume the job " + jobId);
+        SchedulerTHelper.getSchedulerInterface().resumeJob(jobId);
+
+        controlTask3.setCanFinish(true);
+
+        log("Waiting for task3 to finish");
+        SchedulerTHelper.waitForEventTaskFinished(jobId, "task3");
+
+        log("Waiting for job " + jobId + " to finish");
+        SchedulerTHelper.waitForEventJobFinished(jobId);
+
+        JobResult jobResult = SchedulerTHelper.getSchedulerInterface().getJobResult(jobId);
+        Assert.assertEquals(3, jobResult.getAllResults().size());
+        Assert.assertEquals("OK", jobResult.getResult("task1").value().toString());
+        Assert.assertEquals("OK", jobResult.getResult("task2").value().toString());
+        Assert.assertEquals("OK", jobResult.getResult("task3").value().toString());
+    }
+
+    public static TaskState getTaskState(String taskName, JobState jobState) {
         for (TaskState ts : jobState.getTasks()) {
             if (ts.getName().equals(taskName)) {
                 return ts;
@@ -131,7 +195,7 @@ public class TestPauseJobRecover extends FunctionalTest {
         return null;
     }
 
-    protected TaskFlowJob createJob(String communicationObjectUrl) throws Exception {
+    public static TaskFlowJob createJob(String communicationObjectUrl) throws Exception {
         TaskFlowJob job = new TaskFlowJob();
 
         JavaTask task1 = new JavaTask();
@@ -146,6 +210,33 @@ public class TestPauseJobRecover extends FunctionalTest {
         task2.addDependence(task1);
         job.addTask(task1);
         job.addTask(task2);
+        return job;
+    }
+
+    protected TaskFlowJob createJob3TasksPauseTask2AndTask3(String communicationObjectUrlTask2,
+      String communicationObjectUrlTask3
+    ) throws Exception {
+        TaskFlowJob job = new TaskFlowJob();
+
+        JavaTask task1 = new JavaTask();
+        task1.setName("task1");
+        task1.setExecutableClassName(SleepTask.class.getName());
+
+        JavaTask task2 = new JavaTask();
+        task2.setName("task2");
+        task2.setExecutableClassName(TestJavaTask.class.getName());
+        task2.addArgument("communicationObjectUrl", communicationObjectUrlTask2);
+
+        JavaTask task3 = new JavaTask();
+        task3.setName("task3");
+        task3.setExecutableClassName(TestJavaTask.class.getName());
+        task3.addArgument("communicationObjectUrl", communicationObjectUrlTask3);
+
+        task2.addDependence(task1);
+        task3.addDependence(task2);
+        job.addTask(task1);
+        job.addTask(task2);
+        job.addTask(task3);
         return job;
     }
 
