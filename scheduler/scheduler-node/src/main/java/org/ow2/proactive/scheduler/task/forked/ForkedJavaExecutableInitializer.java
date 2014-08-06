@@ -75,6 +75,7 @@ public class ForkedJavaExecutableInitializer extends JavaExecutableInitializerIm
     public ForkedJavaExecutableInitializer(JavaExecutableInitializerImpl execInitializer) {
         this.serializedArguments = execInitializer.getSerializedArguments();
         super.setNodes(execInitializer.getNodes());
+        super.setNodesURL(execInitializer.getNodesURL());
     }
 
     /**

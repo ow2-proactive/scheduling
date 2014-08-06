@@ -161,6 +161,9 @@ public abstract class TaskLauncher implements InitActive {
     public static final String DS_GLOBAL_BINDING_NAME = "global";
     public static final String DS_USER_BINDING_NAME = "user";
 
+    public static final String MULTI_NODE_TASK_NODESET_BINDING_NAME = "nodeset";
+    public static final String MULTI_NODE_TASK_NODESURL_BINDING_NAME = "nodesurl";
+
     /** The name used to access propagated variables map */
     public static final String VARIABLES_BINDING_NAME = "variables";
 
@@ -597,8 +600,8 @@ public abstract class TaskLauncher implements InitActive {
             MDC.put(Log4JTaskLogs.MDC_TASK_NAME, this.taskId.getReadableName());
 
             try {
-                MDC.put(Log4JTaskLogs.MDC_HOST,
-                        PAActiveObject.getNode().getNodeInformation().getVMInformation().getHostName());
+                MDC.put(Log4JTaskLogs.MDC_HOST, PAActiveObject.getNode().getNodeInformation()
+                        .getVMInformation().getHostName());
             } catch (NodeException e) {
                 MDC.put(Log4JTaskLogs.MDC_HOST, "Unknown host");
             }
@@ -1040,9 +1043,10 @@ public abstract class TaskLauncher implements InitActive {
                             .getActiveObjectNode(PAActiveObject.getStubOnThis()));
                 }
             } catch (Exception e) {
-                logger.warn(
-                  "There was a problem while terminating dataSpaces. Dataspaces on this node might not work anymore.",
-                  e);
+                logger
+                        .warn(
+                                "There was a problem while terminating dataSpaces. Dataspaces on this node might not work anymore.",
+                                e);
                 // cannot add this message to dataspaces status as it is called in finally block
             }
         }

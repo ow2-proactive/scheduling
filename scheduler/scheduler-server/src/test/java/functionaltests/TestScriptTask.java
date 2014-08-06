@@ -108,6 +108,13 @@ public class TestScriptTask extends SchedulerConsecutive {
         assertTrue(dataspacesLogs.contains("input=vfs://"));
         assertTrue(dataspacesLogs.contains("output=vfs://"));
 
+        TaskResult multiNodeTaskResult = jobResult.getResult("multi-node");
+        String mnLogs = multiNodeTaskResult.getOutput().getAllLogs(false);
+        assertTrue("Invalid binding for nodeset", mnLogs.contains("nodeset=" +
+            (SchedulerTStarter.RM_NODE_NUMBER - 1)));
+        assertTrue("Invalid binding for nodesurl", mnLogs.contains("nodesurl=" +
+            (SchedulerTStarter.RM_NODE_NUMBER - 1)));
+
         // script task should be forked by default, ie it will not kill the scheduler on system.exit
         JobState jobState = SchedulerTHelper.getSchedulerInterface().getJobState(id);
         TaskResult killJVMTaskResult = jobResult.getResult("killJVM");
@@ -116,5 +123,4 @@ public class TestScriptTask extends SchedulerConsecutive {
         TaskState killJVMTaskState = jobState.getHMTasks().get(killJVMTaskResult.getTaskId());
         assertEquals(TaskStatus.FAULTY, killJVMTaskState.getStatus());
     }
-
 }

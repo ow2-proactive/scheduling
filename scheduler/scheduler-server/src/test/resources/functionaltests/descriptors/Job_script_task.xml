@@ -81,9 +81,20 @@
 				</script>
 			</scriptExecutable>
 		</task>
+		<task name="multi-node" numberOfNodes="2">
+			<scriptExecutable>
+				<script>
+					<code language="groovy">
+						print 'nodeset='+nodeset.size()
+						print 'nodesurl='+nodesurl.size()
+					</code>
+				</script>
+			</scriptExecutable>
+		</task>
 		<!-- Should probably be the last one to run -->
 		<task name="killJVM">
 			<depends>
+				<task ref="multi-node"/>
 				<task ref="simple"/>
 				<task ref="return"/>
 				<task ref="results_from_dependent_task"/>

@@ -91,6 +91,9 @@ public class ScriptExecutable extends JavaExecutable {
         handler.addBinding(TaskLauncher.DS_SCRATCH_BINDING_NAME, getLocalSpace());
         handler.addBinding(TaskLauncher.DS_USER_BINDING_NAME, getUserSpace());
 
+        handler.addBinding(TaskLauncher.MULTI_NODE_TASK_NODESET_BINDING_NAME, getNodes());
+        handler.addBinding(TaskLauncher.MULTI_NODE_TASK_NODESURL_BINDING_NAME, getNodesURL());
+
         handler.addBinding(TaskScript.RESULTS_VARIABLE, results);
         handler.addBinding(TaskScript.PROGRESS_VARIABLE, progress);
 
