@@ -37,8 +37,6 @@
 
 package org.ow2.proactive_grid_cloud_portal.cli.utils;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -46,6 +44,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.apache.commons.codec.binary.StringUtils;
 import org.ow2.proactive.utils.ObjectArrayFormatter;
 import org.ow2.proactive.utils.Tools;
 import org.ow2.proactive_grid_cloud_portal.cli.json.MBeanInfoView;
@@ -57,7 +56,6 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskInfoData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskResultData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskStateData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.UserJobData;
-import org.apache.commons.codec.binary.StringUtils;
 
 
 public class StringUtility {
@@ -348,15 +346,6 @@ public class StringUtility {
         return Tools.getStringAsArray(formatter);
     }
 
-    public static String stackTraceAsString(Throwable error) {
-        StringWriter out = new StringWriter();
-        PrintWriter writer = new PrintWriter(out);
-        error.printStackTrace(writer);
-        writer.flush();
-        return out.toString();
-    }
-
     private StringUtility() {
     }
-
 }

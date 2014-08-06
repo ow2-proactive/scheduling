@@ -19,6 +19,7 @@ importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.PrintSessionCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.SetSilentCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.EvalScriptCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.JsHelpCommand);
+importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.SetDebugModeCommand);
 
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.RmJsHelpCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.AddNodeCommand);
@@ -66,6 +67,8 @@ importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.UploadFileCommand)
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.DownloadFileCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.LiveLogCommand);
 
+importClass(org.ow2.proactive_grid_cloud_portal.cli.utils.ExceptionUtility);
+
 
 var currentContext = ApplicationContextImpl.currentContext();
 
@@ -92,12 +95,14 @@ function prints() {
     execute(new PrintSessionCommand());
 }
 
-function printError(error) {
-    print("An error occurred while executing the command:\r\n");
-    if (error.javaException != null) {
-        error.javaException.printStackTrace();
-    } else {
-        error.printStackTrace(); // if executed with JDK8
+function printError(error, currentContext) {
+    print("An error occurred while executing the command:\r\n" + error.message + "\r\n");
+    if (ExceptionUtility.debugMode(currentContext)) {
+        if (error.javaException != null) {
+            error.javaException.printStackTrace();
+        } else {
+            error.printStackTrace(); // if executed with JDK8
+        }
     }
 }
 
@@ -110,6 +115,10 @@ function reconnect() {
         print('use either login(username) or loginwithcredentials(cred-file) function\r\n')
 
     }
+}
+
+function debug(flag) {
+    execute(new SetDebugModeCommand(string(flag)));
 }
 
 function string(obj) {
@@ -134,7 +143,7 @@ function execute(cmd) {
             && currentContext.getProperty(AbstractLoginCommand.PROP_PERSISTED_SESSION, java.lang.Boolean.TYPE, false)) {
             tryAfterReLogin = true;
         } else {
-            printError(e);
+            printError(e, currentContext);
         }
     }
     if (tryAfterReLogin) {
@@ -147,7 +156,7 @@ function execute(cmd) {
             }
             cmd.execute(currentContext);
         } catch (e) {
-            printError(e);
+            printError(e, currentContext);
         }
     }
 }

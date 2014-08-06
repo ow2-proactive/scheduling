@@ -40,6 +40,8 @@ package org.ow2.proactive_grid_cloud_portal.cli.cmd;
 import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_IO_ERROR;
 import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_UNAUTHORIZED_ACCESS;
 import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.FORBIDDEN;
+import static org.ow2.proactive_grid_cloud_portal.cli.utils.ExceptionUtility.debugMode;
+import static org.ow2.proactive_grid_cloud_portal.cli.utils.ExceptionUtility.stackTraceAsString;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -174,8 +176,10 @@ public abstract class AbstractCommand implements Command {
         writeLine(currentContext, "%nError Message: %s", (cause == null) ? error.getMessage() : cause
                 .getMessage());
 
-        writeLine(currentContext, "%nStack Track: %s", StringUtility
-                .stackTraceAsString((cause == null) ? error : cause));
+        if (debugMode(currentContext)) {
+            writeLine(currentContext, "%nStack Track: %s",
+                    stackTraceAsString((cause == null) ? error : cause));
+        }
     }
 
     private void writeError(String errorMsg, String responseContent, ApplicationContext currentContext) {

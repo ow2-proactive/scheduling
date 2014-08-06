@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2012 INRIA/University of
+ * Copyright (C) 1997-2014 INRIA/University of
  *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -27,56 +27,40 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
+ *  Initial developer(s):               The ActiveEon Team
+ *                        http://www.activeeon.com/
  *  Contributor(s):
  *
  * ################################################################
  * $$ACTIVEEON_INITIAL_DEV$$
  */
-
 package org.ow2.proactive_grid_cloud_portal.cli.cmd;
-
-import java.io.InputStream;
-import java.io.InputStreamReader;
-
-import javax.script.ScriptEngine;
-import javax.script.ScriptException;
 
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 
+public class SetDebugModeCommand extends AbstractCommand implements Command {
 
-public abstract class AbstractIModeCommand extends AbstractCommand implements Command {
+    public static final String PROP_DEBUG_MODE = "org.ow2.proactive_grid_cloud_portal.cli.cmd.DebugModeCommand.debugMode";
 
-    public static final String TERMINATE = "org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractIModeCommand.terminate";
+    private String debugOn;
 
-    public AbstractIModeCommand() {
+    public SetDebugModeCommand() {
+    }
+
+    public SetDebugModeCommand(String debugOn) {
+        this.debugOn = debugOn;
     }
 
     @Override
     public void execute(ApplicationContext currentContext) throws CLIException {
-        ScriptEngine engine = currentContext.getEngine();
-        try {
-            // load supported functions
-            engine.eval(new InputStreamReader(script()));
-        } catch (ScriptException error) {
-            throw new CLIException(CLIException.REASON_OTHER, error);
-        }
-
-        while (!currentContext.getProperty(TERMINATE, Boolean.TYPE, false)) {
-            try {
-                String command = readLine(currentContext, "> ");
-                if (command == null) {
-                    break; // EOF, exit interactive shell
-                }
-                engine.eval(command);
-            } catch (ScriptException se) {
-                handleError(String.format("An error occurred while executing the script:"), se,
-                        currentContext);
-            }
+        if (debugOn == null || "true".equals(debugOn)) {
+            currentContext.setProperty(PROP_DEBUG_MODE, Boolean.TRUE);
+        } else if ("false".equals(debugOn)) {
+            currentContext.setProperty(PROP_DEBUG_MODE, Boolean.FALSE);
+        } else {
+            writeLine(currentContext, "Warning: Invalid debug mode flag %s. Only (true|false) is allowed.",
+                    debugOn);
         }
     }
-
-    protected abstract InputStream script();
 }

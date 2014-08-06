@@ -37,17 +37,78 @@
 
 package org.ow2.proactive_grid_cloud_portal.cli;
 
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.*;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.*;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.*;
+import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_INVALID_ARGUMENTS;
+import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_OTHER;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 import org.apache.commons.cli.Option;
-
-import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_INVALID_ARGUMENTS;
-import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_OTHER;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.EvalScriptCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.ExitCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.HelpCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.JsHelpCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.LoginCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.LoginWithCredentialsCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.OutputCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.PrintSessionCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.SetCaCertsCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.SetCaCertsPassCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.SetDebugModeCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.SetInsecureAccessCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.SetPasswordCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.SetSessionCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.SetSessionFileCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.SetSilentCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.SetUrlCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.AddNodeCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.CreateNodeSourceCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.ForceCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.GetNodeInfoCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.GetTopologyCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.ListInfrastructureCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.ListNodeCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.ListNodeSourceCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.ListPolicyCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.LockNodeCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.RemoveNodeCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.RemoveNodeSourceCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.RmHelpCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.RmJsHelpCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.RmStatsCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.SetInfrastructureCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.SetNodeSourceCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.SetPolicyCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.UnlockNodeCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.ChangeJobPriorityCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.DownloadFileCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.FreezeCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.GetJobOutputCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.GetJobResultCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.GetJobStateCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.GetTaskOutputCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.GetTaskResultCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.KillCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.KillJobCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.LinkRmCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.ListJobCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.LiveLogCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.LoginSchedCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.PauseCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.PauseJobCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.PreemptTaskCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.RemoveJobCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.RestartTaskCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.ResumeCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.ResumeJobCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.SchedHelpCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.SchedJsHelpCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.SchedStatsCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.StartCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.StopCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.SubmitJobCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.UploadFileCommand;
 
 
 /**
@@ -116,6 +177,10 @@ public class CommandSet {
     public static final CommandSet.Entry EXIT = CommandSetEntryBuilder.newInstance().opt("").longOpt("")
             .description("Exit interactive shell").jsCommand("exit()").commandClass(ExitCommand.class)
             .entry();
+
+    public static final CommandSet.Entry DEBUG = CommandSetEntryBuilder.newInstance().opt("X")
+            .longOpt("debug").description("Print error messages (includes normal stack trace)")
+            .jsCommand("debug(true|false)").commandClass(SetDebugModeCommand.class).entry();
 
     public static final CommandSet.Entry SUBMIT_DESC = CommandSetEntryBuilder.newInstance().opt("s")
             .longOpt("submit").description("Submit the specified job-description (XML) file").hasArgs(true)
@@ -345,7 +410,7 @@ public class CommandSet {
      */
     public static final CommandSet.Entry[] COMMON_COMMANDS = new CommandSet.Entry[] { URL, SESSION,
             SESSION_FILE, PASSWORD, CREDENTIALS, INSECURE, CACERTS, CACERTS_PASSWORD, EVAL, SILENT, PRINT,
-            OUTPUT, COMMON_HELP };
+            OUTPUT, COMMON_HELP, DEBUG };
 
     /** CommandSet.Entry objects which are specific to Scheduler CLI */
     public static final CommandSet.Entry[] SCHED_ONLY = new CommandSet.Entry[] { SCHED_START, SCHED_STOP,
@@ -407,7 +472,7 @@ public class CommandSet {
 
         /**
          * Returns the name of this option.
-         * 
+         *
          * @return the name of this option.
          */
         public String opt() {
@@ -416,7 +481,7 @@ public class CommandSet {
 
         /**
          * Sets the name of this option.
-         * 
+         *
          */
         private void setOpt(String opt) {
             this.opt = opt;
@@ -424,7 +489,7 @@ public class CommandSet {
 
         /**
          * Returns the long name of this option.
-         * 
+         *
          * @return the long name of this option.
          */
         public String longOpt() {
@@ -433,7 +498,7 @@ public class CommandSet {
 
         /**
          * Sets the long name of this option.
-         * 
+         *
          * @param longOpt
          *            the long name of this option.
          */
@@ -443,7 +508,7 @@ public class CommandSet {
 
         /**
          * Returns the description of this option.
-         * 
+         *
          * @return the description of this option.
          */
         public String description() {
@@ -452,7 +517,7 @@ public class CommandSet {
 
         /**
          * Sets the description of this option.
-         * 
+         *
          * @param description
          *            the description of this option.
          */
@@ -462,7 +527,7 @@ public class CommandSet {
 
         /**
          * Returns the description of interactive shell command of this option.
-         * 
+         *
          * @return the interactive shell command description.
          */
         public String jsCommand() {
@@ -471,7 +536,7 @@ public class CommandSet {
 
         /**
          * Sets the description of interactive shell command of this option.
-         * 
+         *
          * @param jsCommand
          *            the interactive shell command description.
          */
@@ -481,7 +546,7 @@ public class CommandSet {
 
         /**
          * Returns <tt>ture</tt> if this option has one or more arguments.
-         * 
+         *
          * @return <tt>true</tt> if this option has one or more arguments.
          */
         public boolean hasArgs() {
@@ -490,7 +555,7 @@ public class CommandSet {
 
         /**
          * Sets whether this option has one or more arguments.
-         * 
+         *
          * @param hasArgs
          *            whether this option has one or more arguments.
          */
@@ -500,7 +565,7 @@ public class CommandSet {
 
         /**
          * Returns the argument names of this option.
-         * 
+         *
          * @return the argument names.
          */
         public String argNames() {
@@ -509,7 +574,7 @@ public class CommandSet {
 
         /**
          * Sets the argument names of this option.
-         * 
+         *
          * @param argNames
          *            the argument names.
          */
@@ -520,7 +585,7 @@ public class CommandSet {
         /**
          * Returns the number of arguments of this option. If not specified,
          * returns <tt>-1</tt>.
-         * 
+         *
          * @return the number of arguments of this option.
          */
         public int numOfArgs() {
@@ -529,7 +594,7 @@ public class CommandSet {
 
         /**
          * Sets the number of arguments of this option.
-         * 
+         *
          * @param numOfArgs
          *            the number of arguments of this option.
          */
@@ -540,7 +605,7 @@ public class CommandSet {
         /**
          * Returns an instance of Command class which is responsible for
          * processing this option along with any arguments specified.
-         * 
+         *
          * @param option
          *            a wrapper instance which contains arguments of this
          *            option.
@@ -552,7 +617,7 @@ public class CommandSet {
         /**
          * Sets the name of the Command type responsible for processing this
          * option.
-         * 
+         *
          * @param commandClass
          *            the class name of the Command type.
          */

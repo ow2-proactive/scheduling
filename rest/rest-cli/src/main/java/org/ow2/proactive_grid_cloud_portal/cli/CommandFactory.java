@@ -42,6 +42,7 @@ import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.CACERTS;
 import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.CACERTS_PASSWORD;
 import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.COMMON_HELP;
 import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.CREDENTIALS;
+import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.DEBUG;
 import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.INFRASTRUCTURE;
 import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.INSECURE;
 import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.LOGIN;
@@ -219,6 +220,10 @@ public abstract class CommandFactory {
 
         if (map.containsKey(opt(POLICY))) {
             list.add(map.remove(opt(POLICY)));
+        }
+
+        if (map.containsKey(opt(DEBUG))) {
+            list.add(map.remove(opt(DEBUG)));
         }
 
         if (map.isEmpty()) {

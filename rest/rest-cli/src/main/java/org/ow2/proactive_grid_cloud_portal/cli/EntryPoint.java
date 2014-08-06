@@ -40,8 +40,9 @@ package org.ow2.proactive_grid_cloud_portal.cli;
 import static org.codehaus.jackson.map.DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES;
 import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_UNAUTHORIZED_ACCESS;
 import static org.ow2.proactive_grid_cloud_portal.cli.RestConstants.DFLT_REST_SCHEDULER_URL;
-import static org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractLoginCommand.PROP_RENEW_SESSION;
 import static org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractLoginCommand.PROP_PERSISTED_SESSION;
+import static org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractLoginCommand.PROP_RENEW_SESSION;
+import static org.ow2.proactive_grid_cloud_portal.cli.utils.ExceptionUtility.stackTraceAsString;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -57,7 +58,6 @@ import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractLoginCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.cli.console.AbstractDevice;
 import org.ow2.proactive_grid_cloud_portal.cli.console.JLineDevice;
-import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
 
 import com.google.common.collect.ObjectArrays;
 
@@ -162,7 +162,7 @@ public abstract class EntryPoint {
                 writer.printf("%n%nError Message: %s", cause.getMessage());
             }
             if (cause.getStackTrace() != null) {
-                writer.printf("%n%nStackTrace: %s", StringUtility.stackTraceAsString(cause));
+                writer.printf("%n%nStackTrace: %s", stackTraceAsString(cause));
             }
         }
     }
