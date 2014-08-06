@@ -37,12 +37,14 @@
 package org.ow2.proactive_grid_cloud_portal.scheduler;
 
 import org.apache.log4j.Appender;
+import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
 import org.jboss.resteasy.client.ProxyFactory;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
@@ -52,13 +54,15 @@ import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
-import org.ow2.proactive.scheduler.common.util.logforwarder.providers.SocketBasedForwardingProvider;
+import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingProvider;
+import org.ow2.proactive.scheduler.common.util.logforwarder.LoggingEventProcessor;
 import org.ow2.proactive_grid_cloud_portal.RestTestServer;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStoreTestUtils;
 import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
 
 import java.io.ByteArrayInputStream;
+import java.net.URI;
 
 import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.StringContains.containsString;
@@ -68,7 +72,6 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-
 
 public class SchedulerStateRestLiveLogsTest extends RestTestServer {
 
@@ -86,7 +89,7 @@ public class SchedulerStateRestLiveLogsTest extends RestTestServer {
         client = ProxyFactory.create(SchedulerRestInterface.class, "http://localhost:" + port + "/");
         PortalConfiguration
                 .load(new ByteArrayInputStream((PortalConfiguration.scheduler_logforwardingservice_provider +
-                    "=" + SocketBasedForwardingProvider.class.getName()).getBytes()));
+                    "=" + SynchronousLocalLogForwardingProvider.class.getName()).getBytes()));
         scheduler = mock(SchedulerProxyUserInterface.class);
         sessionId = SharedSessionStoreTestUtils.createValidSession(scheduler);
     }
@@ -194,6 +197,45 @@ public class SchedulerStateRestLiveLogsTest extends RestTestServer {
         assertEquals(0, client.getLiveLogJobAvailable(sessionId, "42"));
         logs = client.getLiveLogJob(sessionId, firstJobId);
         assertTrue(logs.isEmpty());
+    }
+
+    public static class SynchronousLocalLogForwardingProvider implements LogForwardingProvider {
+
+        private LoggingEventProcessor eventProcessor;
+
+        @Override
+        public AppenderProvider createAppenderProvider(URI serverURI) throws LogForwardingException {
+            return new AppenderProvider() {
+                @Override
+                public Appender getAppender() throws LogForwardingException {
+                    return new AppenderSkeleton() {
+                        @Override
+                        protected void append(LoggingEvent event) {
+                            eventProcessor.processEvent(event);
+                        }
+
+                        @Override
+                        public boolean requiresLayout() {
+                            return false;
+                        }
+
+                        @Override
+                        public void close() {
+                        }
+                    };
+                }
+            };
+        }
+
+        @Override
+        public URI createServer(LoggingEventProcessor eventProcessor) throws LogForwardingException {
+            this.eventProcessor = eventProcessor;
+            return null;
+        }
+
+        @Override
+        public void terminateServer() throws LogForwardingException {
+        }
     }
 
 }
