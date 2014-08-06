@@ -633,15 +633,15 @@ def createStartScripts(className, name, String outputFolder) {
     project.cleanScripts.dependsOn 'cleanScript' + name
 }
 
-createStartScripts('org.ow2.proactive.scheduler.util.SchedulerStarter', 'server', 'bin')
-createStartScripts('org.ow2.proactive.scheduler.util.GroovySchedulerStarter', 'server-script', 'tools')
-createStartScripts('org.ow2.proactive_grid_cloud_portal.cli.CommonEntryPoint', 'client', 'bin')
-createStartScripts('org.ow2.proactive.resourcemanager.utils.RMNodeStarter', 'node', 'bin')
-createStartScripts('org.objectweb.proactive.extensions.vfsprovider.console.PADataserverStarter', 'dataserver', 'tools')
-createStartScripts('org.objectweb.proactive.extensions.vfsprovider.gui.ServerBrowser', 'dataserver-gui', 'tools')
-createStartScripts('org.ow2.proactive.authentication.crypto.CreateCredentials', 'create-cred', 'tools')
-createStartScripts('org.ow2.proactive.authentication.crypto.KeyGen', 'key-gen', 'tools')
-createStartScripts('org.ow2.proactive.utils.PAMRRouterStarter', 'router', 'bin')
+createStartScripts('org.ow2.proactive.scheduler.util.SchedulerStarter', 'proactive-server', 'bin')
+createStartScripts('org.ow2.proactive.scheduler.util.GroovySchedulerStarter', 'proactive-server-script', 'tools')
+createStartScripts('org.ow2.proactive_grid_cloud_portal.cli.CommonEntryPoint', 'proactive-client', 'bin')
+createStartScripts('org.ow2.proactive.resourcemanager.utils.RMNodeStarter', 'proactive-node', 'bin')
+createStartScripts('org.objectweb.proactive.extensions.vfsprovider.console.PADataserverStarter', 'proactive-dataserver', 'tools')
+createStartScripts('org.objectweb.proactive.extensions.vfsprovider.gui.ServerBrowser', 'proactive-dataserver-gui', 'tools')
+createStartScripts('org.ow2.proactive.authentication.crypto.CreateCredentials', 'proactive-create-cred', 'tools')
+createStartScripts('org.ow2.proactive.authentication.crypto.KeyGen', 'proactive-key-gen', 'tools')
+createStartScripts('org.ow2.proactive.utils.PAMRRouterStarter', 'proactive-router', 'bin')
 
 subprojects {
     tasks.withType(Test).matching { it.name == 'functionalTest' }*.dependsOn dist
