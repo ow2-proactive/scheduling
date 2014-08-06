@@ -41,24 +41,23 @@ import java.net.URI;
 import java.util.List;
 import java.util.Random;
 
-import org.apache.commons.io.FileUtils;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 import org.ow2.proactive.scheduler.rest.ds.DataSpaceClient;
 import org.ow2.proactive.scheduler.rest.ds.IDataSpaceClient;
-import org.ow2.proactive.scheduler.rest.ds.IDataSpaceClient.Dataspace;
 import org.ow2.proactive.scheduler.rest.ds.LocalDestination;
 import org.ow2.proactive.scheduler.rest.ds.LocalDirSource;
 import org.ow2.proactive.scheduler.rest.ds.LocalFileSource;
 import org.ow2.proactive.scheduler.rest.ds.RemoteDestination;
 import org.ow2.proactive.scheduler.rest.ds.RemoteSource;
 import org.ow2.proactive_grid_cloud_portal.dataspace.dto.ListFile;
-
 import com.google.common.io.Files;
+import org.apache.commons.io.FileUtils;
+import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import static functionaltests.RestFuncTHelper.getRestServerUrl;
+import static org.junit.Assert.*;
 import static org.ow2.proactive.scheduler.rest.ds.IDataSpaceClient.Dataspace.USER;
 
 public class DataTransferTest extends AbstractRestFuncTestCase {
@@ -128,7 +127,7 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
 
         String destRootUri = URI.create(getScheduler().getUserSpaceURIs().get(0)).getPath();
         File[] destRootFiles = new File(destRootUri, "test_upload_selected_files_using_regex").listFiles();
-        assertTrue(destRootFiles != null && destRootFiles.length == 1);
+        assertEquals(1, destRootFiles.length);
         assertTrue(Files.equal(tempTextFile, destRootFiles[0]));
     }
 
@@ -150,7 +149,7 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
 
         String destRootUri = URI.create(getScheduler().getUserSpaceURIs().get(0)).getPath();
         File[] destRootFiles = new File(destRootUri, "test_upload_selected_files_using_filenames").listFiles();
-        assertTrue(destRootFiles != null && destRootFiles.length == 1);
+        assertEquals(1, destRootFiles.length);
         assertTrue(Files.equal(tempFile, destRootFiles[0]));
     }
 
@@ -229,7 +228,8 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
         assertTrue(client.download(source, dest));
 
         File[] listFiles = destTempDir.listFiles();
-        assertTrue(listFiles != null && listFiles.length == 1);
+
+        assertEquals(1, listFiles.length);
         assertTrue(Files.equal(srcTextFile, listFiles[0]));
     }
 
@@ -254,17 +254,20 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
         IDataSpaceClient client = clientInstance();
 
         ListFile listFile = client.list(source);
+
         List<String> directories = listFile.getDirectories();
-        assertTrue(directories != null & directories.size() == 1
-                && "tempDir".equals(directories.get(0)));
+        assertEquals(1, directories.size());
+        assertEquals("tempDir", directories.get(0));
+
         List<String> files = listFile.getFiles();
-        assertTrue(files != null && files.size() == 1 && "tempFile.txt".equals(files.get(0)));
+        assertEquals(1, files.size());
+        assertEquals("tempFile.txt", files.get(0));
     }
 
     @Test
     public void test_delete_file() throws Exception {
-        String srcDirPath = URI.create(getScheduler().getUserSpaceURIs().get(0)).getPath();
-        File srcFile = new File(srcDirPath, "tempFile.tmp");
+        URI srcDirPath = URI.create(getScheduler().getUserSpaceURIs().get(0));
+        File srcFile = new File(new File(srcDirPath), "tempFile.tmp");
         if (srcFile.exists()) {
             assertTrue(srcFile.delete());
         }
@@ -273,7 +276,7 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
         RemoteSource source = new RemoteSource(USER, "tempFile.tmp");
         IDataSpaceClient client = clientInstance();
         assertTrue(client.delete(source));
-        assertTrue(!(new File(srcDirPath, "tempFile.tmp")).exists());
+        assertFalse((new File(new File(srcDirPath), "tempFile.tmp")).exists());
     }
 
     private byte[] randomFileContents() {
