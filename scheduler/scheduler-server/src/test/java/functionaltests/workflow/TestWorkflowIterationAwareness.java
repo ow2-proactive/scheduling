@@ -119,7 +119,7 @@ public class TestWorkflowIterationAwareness extends SchedulerConsecutive {
         + "} \n";
 
     /**
-     * Checks Java, Native and ForkedJava executables
+     * Checks Java and Native executables
      * on a loop/replicate job for propagation of iteration and replication indexes in :
      * native arguments, java arguments, pre/post scripts, native environment variables, java properties
      * 
