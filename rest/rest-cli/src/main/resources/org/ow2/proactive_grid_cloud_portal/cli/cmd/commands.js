@@ -68,6 +68,7 @@ importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.DownloadFileComman
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.LiveLogCommand);
 
 importClass(org.ow2.proactive_grid_cloud_portal.cli.utils.ExceptionUtility);
+importClass(com.google.common.collect.ObjectArrays);
 
 
 var currentContext = ApplicationContextImpl.currentContext();
@@ -183,11 +184,19 @@ function schedulerhelp() {
 }
 
 function submit(pathname, variables) {
-    execute(new SubmitJobCommand('' + pathname, variables));
+    if (typeof variables == 'undefined') {
+        execute(new SubmitJobCommand([string(pathname)]));
+    } else {
+        execute(new SubmitJobCommand(ObjectArrays.concat([string(pathname)], variables, java.lang.String)));
+    }
 }
 
-function submitarchive(pathname) {
-    execute(new SubmitJobCommand('' + pathname, variables));
+function submitarchive(pathname, variables) {
+     if (typeof variables == 'undefined') {
+        execute(new SubmitJobCommand([string(pathname)]));
+    } else {
+        execute(new SubmitJobCommand(ObjectArrays.concat([string(pathname)], variables, java.lang.String)));
+    }
 }
 
 function jobpriority(jobId, priority) {
