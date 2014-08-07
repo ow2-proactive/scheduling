@@ -63,4 +63,8 @@ public class ClasspathUtils {
             return new File(".").getAbsolutePath();
         }
     }
+
+    public static String findSchedulerHome() {
+        return findBaseDirectoryFromJarLocation("dist");
+    }
 }

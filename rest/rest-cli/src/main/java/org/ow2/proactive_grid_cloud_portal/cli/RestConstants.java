@@ -51,6 +51,8 @@ public class RestConstants {
     public static final String DFLT_SESSION_DIR = System.getProperty("user.home") + File.separator +
         ".proactive";
 
+    public static final String DEFAULT_CREDENTIALS_PATH = "config/authentication/scheduler.cred";
+
     public static final String DFLT_SESSION_FILE_EXT = "-session-id";
 
     private RestConstants() {

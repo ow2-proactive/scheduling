@@ -85,7 +85,7 @@ import org.apache.commons.cli.Parser;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
-import static org.ow2.proactive.utils.ClasspathUtils.findBaseDirectoryFromJarLocation;
+import static org.ow2.proactive.utils.ClasspathUtils.findSchedulerHome;
 
 
 /**
@@ -422,7 +422,7 @@ public class SchedulerStarter {
     private static void configureSchedulerAndRMAndPAHomes() {
         if (System.getProperty(PASchedulerProperties.SCHEDULER_HOME.getKey()) == null) {
             System.setProperty(PASchedulerProperties.SCHEDULER_HOME.getKey(),
-              findBaseDirectoryFromJarLocation("dist"));
+              findSchedulerHome());
         }
         if (System.getProperty(PAResourceManagerProperties.RM_HOME.getKey()) == null) {
             System.setProperty(PAResourceManagerProperties.RM_HOME.getKey(), System

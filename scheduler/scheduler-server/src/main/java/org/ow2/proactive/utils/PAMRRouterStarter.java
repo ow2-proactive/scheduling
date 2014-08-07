@@ -40,7 +40,7 @@ import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.extensions.pamr.router.Main;
 import org.apache.log4j.PropertyConfigurator;
 
-import static org.ow2.proactive.utils.ClasspathUtils.findBaseDirectoryFromJarLocation;
+import static org.ow2.proactive.utils.ClasspathUtils.findSchedulerHome;
 
 
 public class PAMRRouterStarter {
@@ -52,7 +52,7 @@ public class PAMRRouterStarter {
 
     private static void configureLogging() {
         if (System.getProperty(CentralPAPropertyRepository.LOG4J.getName()) == null) {
-            String schedulerHomeFromJarOrCurrentFolder = findBaseDirectoryFromJarLocation("dist");
+            String schedulerHomeFromJarOrCurrentFolder = findSchedulerHome();
             String defaultLog4jConfig = schedulerHomeFromJarOrCurrentFolder + "/config/log/router.properties";
             System.setProperty(CentralPAPropertyRepository.LOG4J.getName(), defaultLog4jConfig);
             System.setProperty(CentralPAPropertyRepository.PA_HOME.getName(), schedulerHomeFromJarOrCurrentFolder);

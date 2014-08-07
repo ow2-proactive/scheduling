@@ -106,7 +106,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import static org.ow2.proactive.utils.ClasspathUtils.findBaseDirectoryFromJarLocation;
+import static org.ow2.proactive.utils.ClasspathUtils.findSchedulerHome;
 
 
 /**
@@ -441,8 +441,7 @@ public class RMNodeStarter {
 
     private void configureRMAndProActiveHomes() {
         if (System.getProperty(PAResourceManagerProperties.RM_HOME.getKey()) == null) {
-            System.setProperty(PAResourceManagerProperties.RM_HOME.getKey(), findBaseDirectoryFromJarLocation(
-              "dist"));
+            System.setProperty(PAResourceManagerProperties.RM_HOME.getKey(), findSchedulerHome());
         }
         if (System.getProperty(CentralPAPropertyRepository.PA_HOME.getName()) == null) {
             System.setProperty(CentralPAPropertyRepository.PA_HOME.getName(), System

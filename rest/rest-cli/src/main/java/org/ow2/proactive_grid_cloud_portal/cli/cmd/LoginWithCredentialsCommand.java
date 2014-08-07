@@ -59,6 +59,12 @@ public class LoginWithCredentialsCommand extends AbstractLoginCommand implements
     public static final String CRED_FILE = "org.ow2.proactive_grid_cloud_portal.cli.cmd.LoginWithCredentials.credFile";
 
     private String pathname;
+    private boolean warn;
+
+    public LoginWithCredentialsCommand(String pathname, boolean warn) {
+        this(pathname);
+        this.warn = warn;
+    }
 
     public LoginWithCredentialsCommand(String pathname) {
         this.pathname = pathname;
@@ -70,6 +76,9 @@ public class LoginWithCredentialsCommand extends AbstractLoginCommand implements
         if (!credentials.exists()) {
             throw new CLIException(REASON_INVALID_ARGUMENTS, String.format("File does not exist: %s",
                     credentials.getAbsolutePath()));
+        }
+        if (warn) {
+            writeLine(currentContext, "Using the default credentials file: %s", credentials.getAbsolutePath());
         }
         HttpPost request = new HttpPost(currentContext.getResourceUrl("login"));
         MultipartEntity entity = new MultipartEntity();
