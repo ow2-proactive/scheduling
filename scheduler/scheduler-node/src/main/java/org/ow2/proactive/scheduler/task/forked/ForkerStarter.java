@@ -37,12 +37,15 @@
 package org.ow2.proactive.scheduler.task.forked;
 
 import java.io.IOException;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.ow2.proactive.rm.util.process.EnvironmentCookieBasedChildProcessKiller;
+import org.apache.log4j.Logger;
 
 
 /**
@@ -52,6 +55,11 @@ import org.ow2.proactive.rm.util.process.EnvironmentCookieBasedChildProcessKille
  * @since ProActive Scheduling 3.0
  */
 public class ForkerStarter {
+
+    private static final Logger logger = Logger.getLogger(ForkerStarter.class);
+
+    private static final int PING_NODE_EVERY_MINUTE = 60 * 1000;
+    private static final int NB_OF_NODE_PING_FAILURES_BEFORE_EXIT = 10;
 
     //args[0]=callbackURL,args[1]=nodeName
     public static void main(String[] args) {
@@ -73,12 +81,11 @@ public class ForkerStarter {
      * 
      * @param url the url of the runtime to join
      * @param n the node to return
-     * @throws IOException 
-     * @throws ActiveObjectCreationException 
      */
     private void callBack(String url, Node n) {
         try {
-            ForkerStarterCallback oa = PAActiveObject.lookupActive(ForkerStarterCallback.class, url);
+            final ForkerStarterCallback oa = PAActiveObject.lookupActive(ForkerStarterCallback.class, url);
+            pingNodeInCaseItDies(oa);
             oa.callback(n);
         } catch (ActiveObjectCreationException e) {
             e.printStackTrace();
@@ -87,6 +94,27 @@ public class ForkerStarter {
             e.printStackTrace();
             System.exit(4);
         }
+    }
+
+    private void pingNodeInCaseItDies(final ForkerStarterCallback oa) {
+        new Timer("PingNode").schedule(new TimerTask() {
+            private int nbOfFailedPing = 0;
+
+            @Override
+            public void run() {
+                boolean pong = PAActiveObject.pingActiveObject(oa);
+                if (pong) {
+                    nbOfFailedPing = 0;
+                } else {
+                    nbOfFailedPing++;
+                }
+
+                if (nbOfFailedPing > NB_OF_NODE_PING_FAILURES_BEFORE_EXIT) {
+                    logger.warn("Node seems dead, Forker task exiting on its own");
+                    System.exit(7);
+                }
+            }
+        }, 0, PING_NODE_EVERY_MINUTE);
     }
 
     /**
