@@ -36,11 +36,20 @@
  */
 package functionaltests;
 
+import static functionaltests.RestFuncTHelper.getRestServerUrl;
+import static org.junit.Assert.assertFalse;
+import static org.ow2.proactive.scheduler.rest.ds.IDataSpaceClient.Dataspace.USER;
+
 import java.io.File;
 import java.net.URI;
 import java.util.List;
 import java.util.Random;
 
+import org.apache.commons.io.FileUtils;
+import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.ow2.proactive.scheduler.rest.ds.DataSpaceClient;
 import org.ow2.proactive.scheduler.rest.ds.IDataSpaceClient;
 import org.ow2.proactive.scheduler.rest.ds.LocalDestination;
@@ -49,16 +58,8 @@ import org.ow2.proactive.scheduler.rest.ds.LocalFileSource;
 import org.ow2.proactive.scheduler.rest.ds.RemoteDestination;
 import org.ow2.proactive.scheduler.rest.ds.RemoteSource;
 import org.ow2.proactive_grid_cloud_portal.dataspace.dto.ListFile;
-import com.google.common.io.Files;
-import org.apache.commons.io.FileUtils;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 
-import static functionaltests.RestFuncTHelper.getRestServerUrl;
-import static org.junit.Assert.*;
-import static org.ow2.proactive.scheduler.rest.ds.IDataSpaceClient.Dataspace.USER;
+import com.google.common.io.Files;
 
 public class DataTransferTest extends AbstractRestFuncTestCase {
 
@@ -78,10 +79,10 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
         File tmpFile = tmpDir.newFile("tmpfile.tmp");
         Files.write(randomFileContents(), tmpFile);
         LocalFileSource source = new LocalFileSource(tmpFile);
-        RemoteDestination dest = new RemoteDestination(USER, "tmpfile.tmp");
+        RemoteDestination dest = new RemoteDestination(USER, "test_upload_single_file/tmpfile.tmp");
         assertTrue(client.upload(source, dest));
         String destDirPath = URI.create(getScheduler().getUserSpaceURIs().get(0)).getPath();
-        File destFile = new File(destDirPath, "tmpfile.tmp");
+        File destFile = new File(destDirPath, "test_upload_single_file/tmpfile.tmp");
         assertTrue(Files.equal(tmpFile, destFile));
     }
 

@@ -37,7 +37,7 @@
 package org.ow2.proactive_grid_cloud_portal.dataspace;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static org.apache.commons.vfs2.Selectors.SELECT_ALL;
+import static org.apache.commons.vfs2.Selectors.SELECT_SELF;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -384,7 +384,7 @@ public class RestDataspaceImpl {
             throws FileSystemException, IOException {
         try {
             if (outputFile.exists()) {
-                outputFile.delete(SELECT_ALL);
+                outputFile.delete(SELECT_SELF);
             }
             if (Strings.isNullOrEmpty(encoding)) {
                 outputFile.createFile();
@@ -401,7 +401,7 @@ public class RestDataspaceImpl {
             if (outputFile != null) {
                 try {
                     if (outputFile.exists()) {
-                        outputFile.delete(SELECT_ALL);
+                        outputFile.delete(SELECT_SELF);
                     }
                 } catch (FileSystemException e1) {
                     logger.error("Error occurred while deleting partially created file.", e1);
