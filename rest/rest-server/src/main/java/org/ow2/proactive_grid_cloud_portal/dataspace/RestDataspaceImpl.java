@@ -37,6 +37,7 @@
 package org.ow2.proactive_grid_cloud_portal.dataspace;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static org.apache.commons.vfs2.Selectors.SELECT_ALL;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -216,7 +217,7 @@ public class RestDataspaceImpl {
      * 'excludes' query parameters, in order to select which files to be deleted
      * inside the specified directory (path-name).</li>
      * </ul>
-     * 
+     *
      */
     @DELETE
     @Path("/{dataspace}/{path-name:.*}")
@@ -250,7 +251,7 @@ public class RestDataspaceImpl {
      * <p>
      * Example:
      * {@code http://localhost:8080/rest/rest/data/user/my-files/my-text-file.txt}
-     * 
+     *
      */
     @HEAD
     @Path("/{dataspace}/{path-name:.*}")
@@ -383,7 +384,7 @@ public class RestDataspaceImpl {
             throws FileSystemException, IOException {
         try {
             if (outputFile.exists()) {
-                outputFile.delete();
+                outputFile.delete(SELECT_ALL);
             }
             if (Strings.isNullOrEmpty(encoding)) {
                 outputFile.createFile();
@@ -400,11 +401,10 @@ public class RestDataspaceImpl {
             if (outputFile != null) {
                 try {
                     if (outputFile.exists()) {
-                        outputFile.delete();
+                        outputFile.delete(SELECT_ALL);
                     }
                 } catch (FileSystemException e1) {
                     logger.error("Error occurred while deleting partially created file.", e1);
-                    throw e1;
                 }
             }
             Throwables.propagateIfInstanceOf(error, FileSystemException.class);
