@@ -5,7 +5,7 @@ Thanks for your interest in ProActive Scheduling.
 *** Quick start
 
     To run ProActive Scheduler (server part):
-        $> ./bin/server
+        $> ./bin/proactive-server
 
     This will start all components, including 4 local nodes and Web portals.
     URLs to access them will be displayed in the server's output.
@@ -14,10 +14,10 @@ Thanks for your interest in ProActive Scheduling.
     XML file in samples/jobs_descriptors/Job_PI.xml
 
     To run the command line client:
-    $> ./bin/client
+    $> ./bin/proactive-client
 
     To start a node:
-    $> ./bin/node -r SCHEDULER_URL
+    $> ./bin/proactive-node -r SCHEDULER_URL
 
 *** Documentation
 
