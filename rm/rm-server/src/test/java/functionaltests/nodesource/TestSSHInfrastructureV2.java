@@ -36,12 +36,18 @@
  */
 package functionaltests.nodesource;
 
-import functionaltests.RMConsecutive;
-import functionaltests.RMTHelper;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
+import org.objectweb.proactive.utils.OperatingSystem;
+import org.ow2.proactive.resourcemanager.common.RMState;
+import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
+import org.ow2.proactive.resourcemanager.nodesource.infrastructure.SSHInfrastructureV2;
+import org.ow2.proactive.resourcemanager.nodesource.policy.AccessType;
+import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.apache.sshd.SshServer;
 import org.apache.sshd.common.NamedFactory;
 import org.apache.sshd.common.util.OsUtils;
@@ -55,13 +61,9 @@ import org.apache.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider;
 import org.apache.sshd.server.session.ServerSession;
 import org.apache.sshd.server.shell.ProcessShellFactory;
 import org.junit.Assert;
-import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
-import org.objectweb.proactive.utils.OperatingSystem;
-import org.ow2.proactive.resourcemanager.common.RMState;
-import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
-import org.ow2.proactive.resourcemanager.nodesource.infrastructure.SSHInfrastructureV2;
-import org.ow2.proactive.resourcemanager.nodesource.policy.AccessType;
-import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
+
+import functionaltests.RMConsecutive;
+import functionaltests.RMTHelper;
 
 
 public class TestSSHInfrastructureV2 extends RMConsecutive {
@@ -111,7 +113,7 @@ public class TestSSHInfrastructureV2 extends RMConsecutive {
 
         sshd = SshServer.setUpDefaultServer();
 
-        sshd.setKeyPairProvider(new SimpleGeneratorHostKeyProvider("key.ser"));
+        sshd.setKeyPairProvider(new SimpleGeneratorHostKeyProvider());
 
         if (OsUtils.isUNIX()) {
             sshd.setShellFactory(new ProcessShellFactory(new String[] { "/bin/sh", "-i", "-l" }, EnumSet
