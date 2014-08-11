@@ -1,89 +1,62 @@
-<HTML>
-<HEAD>
-    <TITLE>ProActive Scheduling : Rest API</TITLE>
-    <link rel="stylesheet" href="main.css" type="text/css">
-    <link rel="icon" type="image/vnd.microsoft.icon"
-          href="favicon.ico">
-</HEAD>
-<BODY>
-<div align="center"><img src="images/logo-ProActive.png"
-                         alt="ProActive: Programming, Composing, Deploying on the Grid"><br>
-    <h5>An Open Source Middleware For Parallel, Distributed, Multicore
-        Computing</h5>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="ProActive">
+    <link rel="shortcut icon" href="assets/image/favicon.ico">
 
-    <h1>ProActive REST API</h1>
+    <title>ProActive REST API</title>
 
-    <h3>
-        <center>version @rest_api.version@</center>
-    </h3>
-    <div class="author">
-        <h3 class="author"><span class="surname">The OASIS Research
-Team and ActiveEon Company</span></h3>
+    <link href="assets/css/bootstrap.css" rel="stylesheet">
+    <link href="assets/css/custom.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="assets/js/html5shiv.js"></script>
+    <script src="assets/js/respond.min.js"></script>
+    <![endif]-->
+</head>
+
+<body>
+<div class="container">
+    <div class="container">
+        <div class="text-center">
+            <h1><img src="assets/image/proactive-arrow-150.png"/>&nbsp;<b>ProActive Workflows & Scheduling</b>
+            </h1>
+        </div>
+
+        <hr>
+        <p class="lead">REST API version: <b>@rest_api.version@</b></p>
+
+        <hr>
+
+        <p class="lead">
+            The REST API documentation can be found <a
+                href="doc/jaxrsdocs/overview-summary.html">here</a>
+        </p>
+        <hr>
+        <p class="lead">Use the command line client via the REST API
+            (default credentials: <b>admin/admin</b>)
+        </p>
+        <pre>$> ./bin/proactive-client -u <span id="restUrlCli"></span> -l admin</pre>
+        <br>
+        <hr>
     </div>
-    <div class="author">
-        <h3 class="author"><span class="orgname"></span></h3>
-
+    <div class="modal-footer">
+        <small>&copy; 1997-2014 ActiveEon/INRIA/University of Nice-Sophia Antipolis</small>
     </div>
-    <table border="0" cellpadding="0" cellspacing="0">
-        <tbody>
-        <tr>
-            <td><a href="http://www.inria.fr"><img border="0"
-                                                   src="images/logo-INRIA.png" alt="INRIA"
-                                                   title="A CNRS-INRIA-UNSA Research team"></a></td>
-            <td style="width: 30px;"></td>
-            <td><a href="http://www.unice.fr"><img border="0"
-                                                   src="images/logo-UNSA.png" alt="UNSA"
-                                                   title="A CNRS-INRIA-UNSA Research team"></a></td>
-            <td style="width: 30px;"></td>
-            <td><a href="http://www.cnrs.fr"><img border="0"
-                                                  src="images/logo-CNRS.png" alt="CNRS-I3S"
-                                                  title="A CNRS-INRIA-UNSA Research team"></a></td>
-        </tr>
-
-        <tr>
-            <td colspan="2"><a href="http://www.ow2.org/"><img
-                    border="0" src="images/logo-OW2.png" alt="OW2"
-                    title="OW2 Consortium" height="50%"></a></td>
-            <td style="width: 30px;"></td>
-            <td colspan="2"><a href="http://www.activeeon.com/"><img
-                    border="0" src="images/logo-ActiveEon.png" alt="ActiveEon"
-                    title="ActiveEon: a Professional Open Source company, co-developing and providing support for ProActive Parallel Suite&reg;"></a>
-            </td>
-        </tr>
-        </tbody>
-    </table>
-
 </div>
-<div style="border-color:orange;border-width:thin;padding:1em; border-style:solid; margin: 2em;margin-left: 15%; margin-right: 15%">
-    You have reached the root location of the ProActive REST API.
-
-    <ul>
-        <li>To connect to the REST API, please use the following URL :
-            <b>
-                <SCRIPT
-                        language="Javascript" type="text/javascript">
-                    var url = document.location.href;
-                    url = url.substring(0, (url.indexOf("#") == -1) ? url.length : url.indexOf("#"));
-                    url = url.substring(0, (url.indexOf("?") == -1) ? url.length : url.indexOf("?"));
-                    url = url.substring(0, url.lastIndexOf("/") + 1);
-                    document.write(url + "");
-                </SCRIPT>
-            </b>
-            <br/>
-        <li>The documentation can be found <a
-                href="doc/jaxrsdocs/overview-summary.html">here</a></li>
-
-    </ul>
-</div>
-<i>
-    You can get more information on ActiveEon's products by visiting the <a href="http://www.activeeon.com">ActiveEon's
-    website</a> or the <a href="http://proactive.inria.fr">ProActive Parallel Suite community website</a>.
-</i>
-<br>
-
-<div style="float: right">
-    <p>Copyright &copy; 1997-2013 INRIA/University
-        of Nice-Sophia Antipolis/ActiveEon</p>
-</div>
-</BODY>
-</HTML>
+<script>
+    var url = document.location.href;
+    url = url.substring(0, (url.indexOf("#") == -1) ? url.length : url.indexOf("#"));
+    url = url.substring(0, (url.indexOf("?") == -1) ? url.length : url.indexOf("?"));
+    url = url.substring(0, url.lastIndexOf("/") + 1);
+    var restApiWebPage = url;
+    var restApiEndpoint = url;
+    document.getElementById('restUrlCli').innerHTML = restApiEndpoint;
+    document.getElementById('restUrlLink').href = restApiWebPage;
+</script>
+</body>
+</html>
