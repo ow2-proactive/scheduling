@@ -36,11 +36,13 @@
  */
 package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.security.KeyException;
 import java.util.ArrayList;
+import java.util.Properties;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
@@ -49,10 +51,10 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.ProActiveCounter;
+import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
@@ -60,14 +62,11 @@ import org.ow2.proactive.resourcemanager.utils.RMNodeStarter;
 import org.ow2.proactive.resourcemanager.utils.RMNodeStarter.CommandLineBuilder;
 import org.ow2.proactive.resourcemanager.utils.RMNodeStarter.OperatingSystem;
 import org.ow2.proactive.utils.Formatter;
-
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
-import java.io.ByteArrayInputStream;
-import java.util.Properties;
-import org.ow2.proactive.resourcemanager.authentication.Client;
+import org.apache.log4j.Logger;
 
 
 /**
@@ -168,7 +167,9 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
             sb.add(log4jcmd);
         }
         //we add extra java/PA configuration
-        sb.add(this.javaOptions);
+        if (this.javaOptions != null && !this.javaOptions.trim().isEmpty()) {
+            sb.add(this.javaOptions.trim());
+        }
         CommandLineBuilder clb = super.getDefaultCommandLineBuilder(this.targetOSObj);
         clb.setJavaPath(this.javaPath);
         clb.setRmHome(this.schedulingPath);
@@ -178,7 +179,7 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
         clb.setNodeName(nodeName);
         //finally, the credential's value
 
-        String credString = null;
+        String credString;
         try {
             Client currentClient = super.nodeSource.getAdministrator();
             credString = new String(currentClient.getCredentials().getBase64());
@@ -209,7 +210,7 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
         // with a simplistic message, since there is no way to override this
         // mechanism we consider only 90% of timeout to set custom description
         // in case of failure and still allow global timeout
-        final int shorterTimeout = (int) Math.round((90 * super.nodeTimeOut) / 100);
+        final int shorterTimeout = Math.round((90 * super.nodeTimeOut) / 100);
 
         JSch jsch = new JSch();
 
@@ -217,7 +218,7 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
         final String pnURL = super.addDeployingNode(nodeName, obfuscatedCmdLine, msg, super.nodeTimeOut);
         this.pnTimeout.put(pnURL, false);
 
-        Session session = null;
+        Session session;
         try { // Create ssh session to the hostname
             session = jsch.getSession(this.sshUsername, host.getHostName(), this.sshPort);
             if (this.sshPassword == null) {
