@@ -385,7 +385,8 @@ project('scheduler:scheduler-node') {
     }
 
     task stub(type: StubTask) {
-        classes = ['org.ow2.proactive.scheduler.common.TaskTerminateNotification']
+        classes = ['org.ow2.proactive.scheduler.common.TaskTerminateNotification',
+                   'org.ow2.proactive.scheduler.task.utils.TaskResultCallback']
     }
 
     task standaloneJar(type: OneJar) {
