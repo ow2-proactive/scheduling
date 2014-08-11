@@ -1,5 +1,5 @@
 /*
- *  
+ *
  * ProActive Parallel Suite(TM): The Java(TM) library for
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
@@ -105,10 +105,13 @@ public class DataUtility {
 
     public static TaskInfo taskInfo(TaskInfoData d) {
         TaskInfoImpl impl = new TaskInfoImpl();
-        JobId jobId = jobId(d.getJobId());
-        impl.setJobId(jobId);
-        TaskId taskId = taskId(jobId, d.getTaskId());
-        impl.setTaskId(taskId);
+        JobIdData jobIdData = d.getJobId();
+        if (jobIdData != null) {
+            JobId jobId = jobId(jobIdData);
+            impl.setJobId(jobId);
+            TaskId taskId = taskId(jobId, d.getTaskId());
+            impl.setTaskId(taskId);
+        }
         impl.setExecutionDuration(d.getExecutionDuration());
         impl.setExecutionHostName(d.getExecutionHostName());
         impl.setFinishedTime(d.getFinishedTime());
