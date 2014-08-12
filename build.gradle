@@ -612,9 +612,9 @@ class CustomCreateStartScripts extends CreateStartScripts {
     void generate() {
         org.gradle.api.internal.plugins.StartScriptGenerator.metaClass.'static'.getResource = {name ->
             if ("windowsStartScript.txt" == name) {
-                new File("src/main/resources/org/gradle/api/internal/plugins/windowsStartScript.txt").newInputStream()
+                new File(project.rootDir, "src/main/resources/org/gradle/api/internal/plugins/windowsStartScript.txt").newInputStream()
             } else if ("unixStartScript.txt" == name) {
-                new File("src/main/resources/org/gradle/api/internal/plugins/unixStartScript.txt").newInputStream()
+                new File(project.rootDir, "src/main/resources/org/gradle/api/internal/plugins/unixStartScript.txt").newInputStream()
             } else {
                 println "Should not be here"
             }
