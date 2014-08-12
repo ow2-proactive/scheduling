@@ -610,6 +610,16 @@ clean.dependsOn cleanScripts
 class CustomCreateStartScripts extends CreateStartScripts {
     @Override
     void generate() {
+        org.gradle.api.internal.plugins.StartScriptGenerator.metaClass.'static'.getResource = {name ->
+            if ("windowsStartScript.txt" == name) {
+                new File("src/main/resources/org/gradle/api/internal/plugins/windowsStartScript.txt").newInputStream()
+            } else if ("unixStartScript.txt" == name) {
+                new File("src/main/resources/org/gradle/api/internal/plugins/unixStartScript.txt").newInputStream()
+            } else {
+                println "Should not be here"
+            }
+        }
+
         def generator = new org.gradle.api.internal.plugins.StartScriptGenerator()
         generator.applicationName = getApplicationName()
         generator.mainClassName = getMainClassName()
@@ -620,6 +630,7 @@ class CustomCreateStartScripts extends CreateStartScripts {
         generator.scriptRelPath = "bin/${getUnixScript().name}"
         generator.generateUnixScript(getUnixScript())
         generator.generateWindowsScript(getWindowsScript())
+
     }
 }
 
