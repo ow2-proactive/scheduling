@@ -42,6 +42,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -97,13 +98,20 @@ public class RestSmartProxyTest extends AbstractRestFuncTestCase {
 
     @Before
     public void setup() throws Exception {
-        init();
+        initializeRestSmartProxyInstace();
     }
 
-    public void init() throws Exception {
+    @After
+    public void teardown() throws Exception {
+        if (schedProxy != null) {
+            schedProxy.terminate();
+        }
+    }
+
+    private void initializeRestSmartProxyInstance() throws Exception {
         schedProxy = new RestSmartProxyImpl();
-        schedProxy.cleanDatabase();
         schedProxy.setSessionName("test_session");
+        schedProxy.cleanDatabase();
         schedProxy.init(getRestServerUrl(), getLogin(), getPassword());
 
         userspace = schedProxy.getUserSpaceURIs().get(0);
