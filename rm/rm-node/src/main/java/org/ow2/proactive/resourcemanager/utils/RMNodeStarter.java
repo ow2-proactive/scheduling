@@ -351,14 +351,7 @@ public class RMNodeStarter {
 
         configureLogging(nodeName);
 
-        try {
-            logger.debug("Detecting a network interface to bind the node");
-            String networkInterface = RMConnection.getNetworkInterfaceFor(rmURL);
-            logger.info("Node will be bounded to the following network interface " + networkInterface);
-            CentralPAPropertyRepository.PA_NET_INTERFACE.setValue(networkInterface);
-        } catch (Exception e) {
-            logger.warn("Unable to detect the network interface", e);
-        }
+        selectNetworkInterface();
 
         this.readAndSetTheRank();
         this.node = this.createLocalNode(nodeName);
@@ -411,6 +404,19 @@ public class RMNodeStarter {
                 // Force system exit to bypass daemon threads
                 logger.error(ExitStatus.RMNODE_EXIT_FORCED.description);
                 System.exit(ExitStatus.RMNODE_EXIT_FORCED.exitCode);
+            }
+        }
+    }
+
+    private void selectNetworkInterface() {
+        if (rmURL != null) {
+            try {
+                logger.debug("Detecting a network interface to bind the node");
+                String networkInterface = RMConnection.getNetworkInterfaceFor(rmURL);
+                logger.info("Node will be bounded to the following network interface " + networkInterface);
+                CentralPAPropertyRepository.PA_NET_INTERFACE.setValue(networkInterface);
+            } catch (Exception e) {
+                logger.warn("Unable to detect the network interface", e);
             }
         }
     }
