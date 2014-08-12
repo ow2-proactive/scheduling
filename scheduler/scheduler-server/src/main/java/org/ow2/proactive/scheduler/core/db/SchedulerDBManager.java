@@ -832,7 +832,7 @@ public class SchedulerDBManager {
             InternalJob internalJob = jobData.toInternalJob();
             if (fullState) {
                 String[] classpath = jobData.getClasspath();
-                JobEnvironment env = new JobEnvironment(classpath, null, false, jobData.getClasspathCrc());
+                JobEnvironment env = new JobEnvironment(classpath);
                 internalJob.setEnvironment(env);
             }
             internalJob.setTasks(toInternalTasks(fullState, internalJob, tasksMap.get(jobData.getId())));

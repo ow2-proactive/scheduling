@@ -74,11 +74,14 @@ public class JobEnvironment implements Serializable {
     public JobEnvironment() {
     }
 
-    public JobEnvironment(String[] jobClasspath, byte[] jobClasspathContent, boolean containsJarFile, long crc) {
-        this.jobClasspath = jobClasspath;
-        this.jobClasspathContent = jobClasspathContent;
-        this.containsJarFile = containsJarFile;
-        this.crc = crc;
+    public JobEnvironment(String[] jobClasspath) {
+        try {
+            if (jobClasspath != null) {
+                setJobClasspath(jobClasspath);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Could not create job classpath", e);
+        }
     }
 
     /**

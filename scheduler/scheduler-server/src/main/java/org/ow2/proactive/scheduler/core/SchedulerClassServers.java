@@ -3,7 +3,6 @@ package org.ow2.proactive.scheduler.core;
 import java.net.URI;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectAdapter;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectExposer;
@@ -13,6 +12,7 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.classloading.TaskClassServer;
+import org.apache.log4j.Logger;
 
 
 public class SchedulerClassServers {
@@ -58,6 +58,7 @@ public class SchedulerClassServers {
 
         try {
             jlogger.info(jid, "creating the remote task classServer");
+            spacesSupport.registerUserSpace(job.getOwner());
             TaskClassServer localReference = new TaskClassServer(jid, spacesSupport.getGlobalSpace(),
                 spacesSupport.getUserSpace(job.getOwner()));
             RemoteObjectExposer<TaskClassServer> remoteExposer = new RemoteObjectExposer<TaskClassServer>(
