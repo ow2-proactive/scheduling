@@ -98,7 +98,7 @@ public class RestSmartProxyTest extends AbstractRestFuncTestCase {
 
     @Before
     public void setup() throws Exception {
-        initializeRestSmartProxyInstace();
+        initializeRestSmartProxyInstance();
     }
 
     @After
