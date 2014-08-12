@@ -126,6 +126,7 @@ public class RMNodeStarter {
     // While logger is not configured and it not set with sys properties, use Console logger
     static {
         if (System.getProperty(CentralPAPropertyRepository.LOG4J.getName()) == null) {
+            Logger.getRootLogger().getLoggerRepository().resetConfiguration();
             BasicConfigurator.configure(new ConsoleAppender(new PatternLayout(
               "%m%n")));
             Logger.getRootLogger().setLevel(Level.INFO);
