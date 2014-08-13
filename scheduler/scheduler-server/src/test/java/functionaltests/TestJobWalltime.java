@@ -38,10 +38,6 @@ package functionaltests;
 
 import java.util.List;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.scheduler.common.exception.WalltimeExceededException;
@@ -59,6 +55,11 @@ import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
 import org.ow2.tests.FunctionalTest;
+import org.apache.commons.io.FileUtils;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 import functionaltests.executables.EndlessExecutable;
 
@@ -86,6 +87,13 @@ public class TestJobWalltime extends FunctionalTest {
     }
 
     @Test
+    public void run() throws Throwable {
+        walltimeJavaTask();
+        walltimeForkedJavaTask();
+        walltimeNativeTask();
+        walltimeScriptTask();
+    }
+
     public void walltimeJavaTask() throws Throwable {
         SchedulerTHelper.log("Test WallTime Java Task ...");
         String tname = "walltimeJavaTask";
@@ -101,7 +109,6 @@ public class TestJobWalltime extends FunctionalTest {
         submitAndCheckJob(job, tname);
     }
 
-    @Test
     public void walltimeForkedJavaTask() throws Throwable {
         SchedulerTHelper.log("Test WallTime Forked Java Task ...");
         String tname = "walltimeForkedJavaTask";
@@ -118,7 +125,6 @@ public class TestJobWalltime extends FunctionalTest {
         submitAndCheckJob(job, tname);
     }
 
-    @Test
     public void walltimeScriptTask() throws Throwable {
         SchedulerTHelper.log("Test WallTime Script Task...");
         String tname = "walltimeScriptTask";
@@ -134,7 +140,6 @@ public class TestJobWalltime extends FunctionalTest {
         submitAndCheckJob(job, tname);
     }
 
-    @Test
     public void walltimeNativeTask() throws Throwable {
         SchedulerTHelper.log("Test WallTime Native Task ...");
         String tname = "walltimeNativeTask";
@@ -160,9 +165,8 @@ public class TestJobWalltime extends FunctionalTest {
 
     private void submitAndCheckJob(Job job, String tname) throws Exception {
         //test submission and event reception
-        if (EndlessExecutable.STARTED_FILE.exists()) {
-            EndlessExecutable.STARTED_FILE.delete();
-        }
+        FileUtils.deleteQuietly(EndlessExecutable.STARTED_FILE);
+
         JobId id = SchedulerTHelper.submitJob(job);
         SchedulerTHelper.log("Job submitted, id " + id.toString());
         SchedulerTHelper.log("Waiting for jobSubmitted Event");
@@ -188,7 +192,6 @@ public class TestJobWalltime extends FunctionalTest {
 
         Assert.assertTrue(tres.hadException());
 
-        tres.getException().printStackTrace();
         Assert.assertTrue(tres.getException() instanceof WalltimeExceededException);
 
         // Make sure that the task has been properly killed
