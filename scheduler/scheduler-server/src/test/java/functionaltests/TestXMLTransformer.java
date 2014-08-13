@@ -56,7 +56,7 @@ import org.junit.Before;
  * This class tests the coherence between the {@link Job2XMLTransformer} and the
  * {@link JobFactory_stax}. For each job descriptor in the
  * "/functionaltests/descriptors/" and
- * "$pa.scheduler.home/samples/jobs_descriptors" folders it creates a
+ * "$pa.scheduler.home/samples/workflows/" folders it creates a
  * {@link TaskFlowJob} object using the {@link JobFactory_stax}. The java job is
  * then serialized to xml using the {@link Job2XMLTransformer} and then a new
  * {@link TaskFlowJob} is created. The 2 {@link TaskFlowJob} objects are then
@@ -105,7 +105,7 @@ public class TestXMLTransformer extends FunctionalTest {
         Collection<File> testJobDescrFiles = FileUtils.listFiles(folder, new String[] { "xml" }, true);
 
         File samplesJobDescrFiles = new File(System.getProperty("pa.scheduler.home") + File.separator +
-            "samples" + File.separator + "jobs_descriptors");
+            "samples" + File.separator + "workflows");
 
         System.out.println(samplesJobDescrFiles.getAbsolutePath());
 

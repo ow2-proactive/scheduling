@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job xmlns="urn:proactive:jobdescriptor:dev"
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="urn:proactive:jobdescriptor:dev ../../src/scheduler/src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.xsd"
+     name="example" priority="low" projectName="ex" cancelJobOnError="true">
+
+  <variables>
+	<variable name="root" value="${pa.scheduler.home}/samples/workflows/more/Workflow/branching"/>
+  </variables>
+
+  <!--
+     iterates over lines of a text file,
+     for each line, if it is shorter than 40 characters,
+     transform all characters to '_',
+     else tranform all characters to '^'
+     finally, put the lines in a single output file
+	-->
+
+  <taskFlow>
+
+    <task name="A">
+	  <pre>
+		<script>
+          <!-- if at iteration 0, removes output from previous execution -->
+          <file path="${root}/clean_tmp.js">
+			<arguments>
+			  <argument value="${root}" />
+			</arguments>
+		  </file>
+		</script>
+	  </pre>
+	  <!-- extracts the line from the input file corresponding
+	       the current iteration -->
+	  <nativeExecutable>
+        <staticCommand value="${root}/getline.sh">
+		  <arguments>
+			<argument value="${root}/" />
+		  </arguments>
+		</staticCommand>
+	  </nativeExecutable>
+	  <!-- start block: LOOP target -->
+	  <controlFlow block="start">
+	    <!-- if the line is < 40 chars do B1, else do B2,
+							  but always do C afterwars-->
+			 <if target="B1" else="B2" continuation="C">
+			   <script>
+				 <file path="${root}/if.js">
+				   <arguments>
+					 <argument value="${root}" />
+				   </arguments>
+				 </file>
+			   </script>
+			 </if>
+	  </controlFlow>
+	</task>
+
+    <!-- tranform the current line's chars in '_' -->
+    <task name="B1">
+	  <nativeExecutable>
+        <staticCommand value="${root}/line1.sh">
+		  <arguments>
+			<argument value="${root}/" />
+		  </arguments>
+		</staticCommand>
+	  </nativeExecutable>
+	</task>
+
+    <!-- tranform the current line's chars in '^' -->
+    <task name="B2">
+	  <nativeExecutable>
+        <staticCommand value="${root}/line2.sh">
+		  <arguments>
+			<argument value="${root}/" />
+		  </arguments>
+		</staticCommand>
+	  </nativeExecutable>
+	</task>
+
+	<!-- append the current line to the output -->
+    <task name="C">
+	  <nativeExecutable>
+        <staticCommand value="${root}/putline.sh">
+		  <arguments>
+			<argument value="${root}/" />
+		  </arguments>
+		</staticCommand>
+	  </nativeExecutable>
+	  <!-- end block: looped block -->
+	  <controlFlow block="end">
+	    <!-- while lines are left untreated in the input file
+			 make another iteration -->
+		<loop target="A">
+          <script>
+			<file path="${root}/loop.js">
+			  <arguments>
+				<argument value="${root}" />
+			  </arguments>
+			</file>
+          </script>
+		</loop>
+	  </controlFlow>
+	</task>
+
+
+  </taskFlow>
+</job>

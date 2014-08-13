@@ -256,7 +256,7 @@ public class TestJobFactory {
         Assert.assertNull(tfJob.getTask("task3").getOutputFilesList());
         Assert.assertEquals(((NativeTask) tfJob.getTask("task3")).getCommandLine().length, 5);
         Assert.assertEquals(((NativeTask) tfJob.getTask("task3")).getCommandLine()[0], URLbegin +
-            "samples/jobs_descriptors/job_native_linux/nativTask");
+            "samples/workflows/more/job_native_linux/nativTask");
         Assert.assertEquals(((NativeTask) tfJob.getTask("task3")).getCommandLine()[1], "1");
         Assert.assertEquals(((NativeTask) tfJob.getTask("task3")).getCommandLine()[2], "2 2");
         Assert.assertEquals(((NativeTask) tfJob.getTask("task3")).getCommandLine()[3], "3");
@@ -317,10 +317,10 @@ public class TestJobFactory {
         Assert.assertEquals(((NativeTask) tfJob.getTask("task4")).getGenerationScript().getScript(),
                 "command=args[0]+\" 12\";");
         Assert.assertEquals(((NativeTask) tfJob.getTask("task4")).getGenerationScript().getParameters()[0],
-                URLbegin + "samples/jobs_descriptors/job_native_linux/nativTask");
+                URLbegin + "samples/workflows/more/job_native_linux/nativTask");
         Assert.assertEquals(
                 ((NativeTask) tfJob.getTask("task4")).getGenerationScript().execute().getResult(), URLbegin +
-                    "samples/jobs_descriptors/job_native_linux/nativTask 12");
+                    "samples/workflows/more/job_native_linux/nativTask 12");
 
         log("Test Job MULTI_NODES");
         TaskFlowJob mnJob = getJob(jobMultiNodesDescriptor, impl);

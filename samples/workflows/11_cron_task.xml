@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xmlns="urn:proactive:jobdescriptor:3.2"
+     xsi:schemaLocation="urn:proactive:jobdescriptor:3.2 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.2/schedulerjob.xsd"
+     name="11_cron_task">
+    <taskFlow>
+        <task name="cron_task">
+            <description>Will run every minutes</description>
+            <scriptExecutable>
+                <script>
+                    <code language="javascript">
+                        print(new Date());
+                    </code>
+                </script>
+            </scriptExecutable>
+            <controlFlow>
+                <loop target="CronTask">
+                    <script>
+                        <code language="javascript">
+                            // You can use a Cron Expression here
+                            // examples http://www.sauronsoftware.it/projects/cron4j/manual.php#p02
+                            loop = '* * * * *';
+                        </code>
+                    </script>
+                </loop>
+            </controlFlow>
+        </task>
+    </taskFlow>
+</job>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xmlns="urn:proactive:jobdescriptor:3.2"
+     xsi:schemaLocation="urn:proactive:jobdescriptor:3.2 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.2/schedulerjob.xsd"
+     name="12_pre_post_clean_scripts">
+    <description>
+        Extra scripts are available to decorate a task with custom behavior.
+        Pre and post scripts are executed before and after a task.
+        A Clean script is executed even if the task failed.
+    </description>
+    <taskFlow>
+        <task name="task_with_scripts">
+            <pre>
+                <script>
+                    <code language="groovy">
+println "A pre script can be used to prepare the environment"
+                    </code>
+                </script>
+            </pre>
+            <scriptExecutable>
+                <script>
+                    <code language="groovy">
+println "A task is running"
+                    </code>
+                </script>
+            </scriptExecutable>
+            <post>
+                <script>
+                    <code language="groovy">
+println "A post script could be used to process the result of a native executable without adding an extra task"
+                    </code>
+                </script>
+            </post>
+        </task>
+        <task name="failing_task">
+            <scriptExecutable>
+                <script>
+                    <code language="groovy">
+                        throw new Exception("Failing task!")
+                    </code>
+                </script>
+            </scriptExecutable>
+            <cleaning>
+                <script>
+                    <code language="groovy">
+                        println "The clean script is ran on the node whatever the task's status"
+                        // this output won't be visible in the task's logs
+                    </code>
+                </script>
+            </cleaning>
+        </task>
+    </taskFlow>
+</job>

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job xmlns="urn:proactive:jobdescriptor:dev" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:proactive:jobdescriptor:dev ../../../src/scheduler/src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.xsd"
+	name="job_nativ" priority="normal">
+	<variables>
+		<!-- pa.scheduler.home is known as java property - ie : start with -Dpa.scheduler.home=value -->
+		<variable name="WORK_DIR" value="${pa.scheduler.home}/samples/workflows/more/job_native_linux"/>
+	</variables>
+	<description>Will execute 3 native C tasks and a java task with diamond dependences</description>
+	<taskFlow>
+		<task name="task1">
+			<!-- Task human description -->
+			<description>Will display 10 dots every 1s</description>
+			<nativeExecutable>
+				<staticCommand
+					value="${WORK_DIR}/nativTask">
+					<arguments>
+						<argument value="1"/>
+					</arguments>
+				</staticCommand>
+			</nativeExecutable>
+		</task>
+		<task name="task2">
+			<!-- Task human description -->
+			<description>Will display 10 dots every 2s</description>
+			<depends>
+				<task ref="task1"/>
+			</depends>
+			<nativeExecutable>
+
+				<staticCommand
+					value="${WORK_DIR}/nativTask">
+					<arguments>
+						<argument value="2"/>
+					</arguments>
+				</staticCommand>
+			</nativeExecutable>
+		</task>
+		<task name="task3">
+			<!-- Task human description -->
+			<description>This task will sleep 10s</description>
+			<depends>
+				<task ref="task1"/>
+			</depends>
+			<javaExecutable class="org.ow2.proactive.scheduler.examples.WaitAndPrint">
+				<parameters>
+					<parameter name="sleepTime" value="15"/>
+					<parameter name="number" value="3"/>
+				</parameters>
+			</javaExecutable>
+		</task>
+		<task name="task4" preciousResult="true">
+			<!-- Task human description -->
+			<description>Will display 10 dots every 1s</description>
+			<depends>
+				<task ref="task2"/>
+				<task ref="task3"/>
+			</depends>
+			<nativeExecutable>
+				<staticCommand
+					value="${WORK_DIR}/nativTask">
+					<arguments>
+						<argument value="1"/>
+					</arguments>
+				</staticCommand>
+			</nativeExecutable>
+		</task>
+	</taskFlow>
+</job>

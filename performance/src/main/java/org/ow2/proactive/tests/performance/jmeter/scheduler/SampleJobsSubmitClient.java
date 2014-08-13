@@ -89,7 +89,7 @@ public class SampleJobsSubmitClient extends BaseJMeterSchedulerClient {
         synchronized (SampleJobsSubmitClient.class) {
             jobs = new ArrayList<Job>();
             for (String descriptor : sampleJobDescriptors) {
-                Job job = jobFactory.createJob(schedulingPath + "/samples/jobs_descriptors/" + descriptor);
+                Job job = jobFactory.createJob(schedulingPath + "/samples/workflows/more/" + descriptor);
                 job.setDescription(descriptor);
                 jobs.add(job);
             }

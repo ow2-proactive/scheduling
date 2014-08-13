@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xmlns="urn:proactive:jobdescriptor:3.2"
+     xsi:schemaLocation="urn:proactive:jobdescriptor:3.2 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.2/schedulerjob.xsd"
+     name="10_variable_propagation">
+    <variables>
+        <variable name="aVariable" value="foo"/>
+    </variables>
+    <description>
+        This workflow defines a variable and shows how it can read/written to in different script tasks.
+        Variables are useful to customize workflow's execution, for instance to define where the input data
+        are stored.
+    </description>
+    <taskFlow>
+        <task name="javascript_task">
+            <scriptExecutable>
+                <script>
+                    <code language="javascript">
+                        <![CDATA[
+print(variables)
+variables.put('aVariable', 'javascript')
+]]>
+                    </code>
+                </script>
+            </scriptExecutable>
+        </task>
+        <task name="groovy_task">
+            <depends>
+                <task ref="javascript_task"/>
+            </depends>
+            <scriptExecutable>
+                <script>
+                    <code language="groovy">
+                        <![CDATA[
+println variables
+variables['aVariable'] = 'groovy'
+]]>
+                    </code>
+                </script>
+            </scriptExecutable>
+        </task>
+        <task name="ruby_task">
+            <depends>
+                <task ref="groovy_task"/>
+            </depends>
+            <scriptExecutable>
+                <script>
+                    <code language="ruby">
+                        <![CDATA[
+puts $variables
+$variables['aVariable'] = 'ruby'
+]]>
+                    </code>
+                </script>
+            </scriptExecutable>
+        </task>
+        <task name="python_task">
+            <depends>
+                <task ref="ruby_task"/>
+            </depends>
+            <scriptExecutable>
+                <script>
+                    <code language="python">
+                        <![CDATA[
+print variables
+]]>
+                    </code>
+                </script>
+            </scriptExecutable>
+        </task>
+    </taskFlow>
+</job>

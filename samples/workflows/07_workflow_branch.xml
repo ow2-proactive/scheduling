@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xmlns="urn:proactive:jobdescriptor:3.2"
+     xsi:schemaLocation="urn:proactive:jobdescriptor:3.2 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.2/schedulerjob.xsd"
+     name="07_workflow_branch">
+    <description>
+        The Branch construct allows to run a task or a set of tasks conditionally.
+        A script is used to choose whether to run the If or the Else task.
+        Then the continuation task is ran.
+    </description>
+    <taskFlow>
+        <task name="Condition">
+            <scriptExecutable>
+                <script>
+                    <code language="javascript">
+                        <![CDATA[
+print('I will run a script to select a branch')
+]]>
+                    </code>
+                </script>
+            </scriptExecutable>
+            <controlFlow>
+                <if target="If"
+                    else="Else"
+                    continuation="Continuation">
+                    <script>
+                        <code language="javascript">
+                            <![CDATA[
+if(java.lang.System.getProperty('os.name').toLowerCase().contains("win")){
+    branch = "if";
+} else {
+    branch = "else";
+}
+]]>
+                        </code>
+                    </script>
+                </if>
+            </controlFlow>
+        </task>
+        <task name="If">
+            <scriptExecutable>
+                <script>
+                    <code language="javascript">
+                        <![CDATA[
+print('I am running on Windows in the If branch')
+]]>
+                    </code>
+                </script>
+            </scriptExecutable>
+        </task>
+        <task name="Else">
+            <scriptExecutable>
+                <script>
+                    <code language="javascript">
+                        <![CDATA[
+print('I am running on Linux in the If branch')
+]]>
+                    </code>
+                </script>
+            </scriptExecutable>
+        </task>
+        <task name="Continuation">
+            <scriptExecutable>
+                <script>
+                    <code language="javascript">
+                        <![CDATA[
+print('I am ran after the If or the Else task')
+]]>
+                    </code>
+                </script>
+            </scriptExecutable>
+        </task>
+    </taskFlow>
+</job>

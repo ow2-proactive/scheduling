@@ -815,7 +815,7 @@ public class SchedulerModel extends ConsoleModel {
 
     public void test_() {
         try {
-            String descriptorPath = System.getProperty("pa.scheduler.home") + "/samples/jobs_descriptors/";
+            String descriptorPath = System.getProperty("pa.scheduler.home") + "/samples/workflows/more/";
             submit_(descriptorPath + "Job_2_tasks.xml");
             submit_(descriptorPath + "Job_8_tasks.xml");
             submit_(descriptorPath + "Job_Aborted.xml");

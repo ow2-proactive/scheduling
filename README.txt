@@ -1,4 +1,4 @@
-ProActive Workflows & Scheduling {version}
+ProActive Workflows & Scheduling
 
 Thanks for your interest in ProActive Scheduling.
 
@@ -11,13 +11,13 @@ Thanks for your interest in ProActive Scheduling.
     URLs to access them will be displayed in the server's output.
 
     From here you can submit a job to the Scheduler, using for instance the
-    XML file in samples/jobs_descriptors/Job_PI.xml
+    XML files in samples/workflows/
 
     To run the command line client:
-    $> ./bin/proactive-client
+        $> ./bin/proactive-client
 
     To start a node:
-    $> ./bin/proactive-node -r SCHEDULER_URL
+        $> ./bin/proactive-node -r SCHEDULER_URL
 
 *** Documentation
 

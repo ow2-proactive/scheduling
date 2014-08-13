@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xmlns="urn:proactive:jobdescriptor:3.2"
+     xsi:schemaLocation="urn:proactive:jobdescriptor:3.2 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.2/schedulerjob.xsd"
+     name="02_task_dependency">
+    <description>
+        A task that has two tasks dependencies, therefore it will be executed after the two first tasks finish.
+        The two first tasks can run in parallel if enough resources are available.
+    </description>
+    <taskFlow>
+        <task name="a_task">
+            <scriptExecutable>
+                <script>
+                    <code language="javascript">
+                        <![CDATA[
+result = "Hello";
+]]>
+                    </code>
+                </script>
+            </scriptExecutable>
+        </task>
+        <task name="another_task">
+            <scriptExecutable>
+                <script>
+                    <code language="javascript">
+                        <![CDATA[
+result = "World";
+]]>
+                    </code>
+                </script>
+            </scriptExecutable>
+        </task>
+        <task name="dependant_task">
+            <depends>
+                <task ref="a_task"/>
+                <task ref="another_task"/>
+            </depends>
+            <scriptExecutable>
+                <script>
+                    <code language="javascript">
+                        <![CDATA[
+print(results[0])
+print(results[1])
+]]>
+                    </code>
+                </script>
+            </scriptExecutable>
+        </task>
+    </taskFlow>
+</job>

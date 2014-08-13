@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xmlns="urn:proactive:jobdescriptor:3.2"
+     xsi:schemaLocation="urn:proactive:jobdescriptor:3.2 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.2/schedulerjob.xsd"
+     name="13_selection_script">
+    <description>
+        A selection script allows you to programmatically select a node to execute a given task.
+        The script will be executed on nodes and should set the variable 'selected' to true to mark it as
+        eligible for the task execution.
+    </description>
+    <taskFlow>
+        <task name="run_only_on_linux">
+            <selection>
+                <script>
+                    <code language="groovy">
+                        import org.ow2.proactive.scripting.helper.selection.SelectionUtils
+
+                        selected = SelectionUtils.checkOSName("linux")
+                    </code>
+                </script>
+            </selection>
+            <nativeExecutable>
+                <staticCommand value="uname">
+                    <arguments>
+                        <argument value="-a"/>
+                    </arguments>
+                </staticCommand>
+            </nativeExecutable>
+        </task>
+        <task name="run_only_on_windows">
+            <selection>
+                <script>
+                    <code language="groovy">
+                        import org.ow2.proactive.scripting.helper.selection.SelectionUtils
+
+                        selected = SelectionUtils.checkOSName("windows")
+                    </code>
+                </script>
+            </selection>
+            <nativeExecutable>
+                <staticCommand value="cmd.exe">
+                    <arguments>
+                        <argument value="/c"/>
+                        <argument value="ver"/>
+                    </arguments>
+                </staticCommand>
+            </nativeExecutable>
+        </task>
+        <task name="run_only_on_mac">
+            <selection>
+                <script>
+                    <code language="groovy">
+                        import org.ow2.proactive.scripting.helper.selection.SelectionUtils
+
+                        selected = SelectionUtils.checkOSName("mac")
+                    </code>
+                </script>
+            </selection>
+            <nativeExecutable>
+                <staticCommand value="sw_vers">
+                </staticCommand>
+            </nativeExecutable>
+        </task>
+    </taskFlow>
+</job>

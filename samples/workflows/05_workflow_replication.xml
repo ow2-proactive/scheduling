@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xmlns="urn:proactive:jobdescriptor:3.2"
+     xsi:schemaLocation="urn:proactive:jobdescriptor:3.2 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.2/schedulerjob.xsd"
+     name="05_workflow_replication">
+    <description>
+        A sample workflow that solves an classic split/process/merge problem.
+    </description>
+    <taskFlow>
+        <task name="Split">
+            <description>
+                This task defines some input, here strings to be processed.
+            </description>
+            <scriptExecutable>
+                <script>
+                    <code language="groovy">
+                        <![CDATA[
+result = [0:"abc", 1:"def"]
+]]>
+                    </code>
+                </script>
+            </scriptExecutable>
+            <controlFlow>
+                <replicate>
+                    <script>
+                        <code language="groovy">
+                            <![CDATA[
+runs=2
+]]>
+                        </code>
+                    </script>
+                </replicate>
+            </controlFlow>
+        </task>
+        <task name="Process">
+            <description>
+                This task will be replicated according to the 'runs' value specified in the replication script.
+                The replication index is used in each task's instance to select the input.
+            </description>
+            <depends>
+                <task ref="Split"/>
+            </depends>
+            <scriptExecutable>
+                <script>
+                    <code language="groovy">
+                        <![CDATA[
+int replication = Integer.parseInt(System.getProperty('pas.task.replication'))
+input = results[0].value()[replication]
+result = input.toUpperCase()
+]]>
+                    </code>
+                </script>
+            </scriptExecutable>
+        </task>
+        <task name="Merge">
+            <description>
+                As a merge operation, we simply print the results from previous tasks.
+            </description>
+            <depends>
+                <task ref="Process"/>
+            </depends>
+            <scriptExecutable>
+                <script>
+                    <code language="groovy">
+                        <![CDATA[
+println results
+]]>
+                    </code>
+                </script>
+            </scriptExecutable>
+        </task>
+    </taskFlow>
+</job>
