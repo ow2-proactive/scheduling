@@ -500,12 +500,6 @@ project('rm:rm-policy:rm-policy-scheduler') {
     }
 }
 
-project(':scheduler:filessplitmerge') {
-    dependencies {
-        compile project(':scheduler:scheduler-server')
-    }
-}
-
 project(':scheduler:dataspace-smartproxy') {
     dependencies {
         compile 'org.fusesource.jdbm:jdbm:2.0.1'
@@ -516,25 +510,6 @@ project(':scheduler:dataspace-smartproxy') {
     }
 
     task('functionalTest', type: Test).configure functionalTestConfiguration
-}
-
-project(':scheduler:mapreduce') {
-    dependencies {
-        compile 'org.apache.hadoop:hadoop-core:0.20.2'
-        compile project(':scheduler:scheduler-server')
-        testCompile project(':scheduler:scheduler-server')
-        testCompile project(':scheduler:scheduler-server').sourceSets.test.output
-        // to get shared test classes
-        testCompile project(':rm:rm-server').sourceSets.test.output // to get shared test classes
-    }
-
-    task('functionalTest', type: Test).configure functionalTestConfiguration
-    functionalTest.enabled = false
-
-    task testJar(type: Jar) {
-        classifier = 'tests'
-        from sourceSets.test.output
-    }
 }
 
 project(':doc:Resourcing') {
