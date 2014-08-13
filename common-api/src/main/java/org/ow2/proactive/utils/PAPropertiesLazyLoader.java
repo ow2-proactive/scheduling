@@ -124,12 +124,10 @@ public class PAPropertiesLazyLoader {
                     properties = result = new Properties();
                     try {
                         InputStream stream = resolvePropertiesFile();
-                        if (stream == null) {
-                            return properties;
+                        if (stream != null) {
+                            properties.load(stream);
+                            stream.close();
                         }
-
-                        properties.load(stream);
-                        stream.close();
                         updateWithSystemProperties(properties);
 
                     } catch (IOException e) {
@@ -147,7 +145,7 @@ public class PAPropertiesLazyLoader {
      */
     public static void updateWithSystemProperties(Properties properties) {
         if (properties != null) {
-            for (Object o : properties.keySet()) {
+            for (Object o : System.getProperties().keySet()) {
                 String s = System.getProperty((String) o);
                 if (s != null) {
                     properties.setProperty((String) o, s);
