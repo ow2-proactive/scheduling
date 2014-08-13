@@ -57,8 +57,10 @@ import org.rrd4j.core.Sample;
  */
 public class RRDDataStore extends Thread {
 
+    private static final int DEFAULT_STEP_IN_SECONDS = 4;
+
     private StandardMBean mbean;
-    protected int step = 4; //secs
+    protected int step = DEFAULT_STEP_IN_SECONDS; //secs
     protected String dataBaseFile;
     protected HashMap<String, String> dataSources = new HashMap<String, String>();
     protected volatile boolean terminate = false;
@@ -110,6 +112,10 @@ public class RRDDataStore extends Thread {
 
     protected void initDatabase() throws IOException {
         if (!new File(dataBaseFile).exists()) {
+            if (step <= 0) {
+                logger.debug("Provided step is invalid, forcing it to " + DEFAULT_STEP_IN_SECONDS);
+                step = DEFAULT_STEP_IN_SECONDS;
+            }
             logger.info("Node's statistics are saved in " + dataBaseFile);
 
             RrdDef rrdDef = new RrdDef(dataBaseFile, System.currentTimeMillis() / 1000, step);
