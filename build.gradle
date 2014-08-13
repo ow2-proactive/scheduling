@@ -254,6 +254,13 @@ project(':rm:rm-node') {
 
         runtime fileTree(dir: "${rootDir}/lib/node/sigar/", exclude: "*.jar")
 
+        // protocols
+        runtime "org.objectweb.proactive:programming-extension-rmissl:${programmingVersion}"
+        runtime "org.objectweb.proactive:programming-extension-pnp:${programmingVersion}"
+        runtime "org.objectweb.proactive:programming-extension-pnpssl:${programmingVersion}"
+        runtime "org.objectweb.proactive:programming-extension-amqp:${programmingVersion}"
+
+        // script engines
         runtime 'org.jruby:jruby-jline:1.7.4'
         runtime 'org.python:jython-jline:2.5.4-rc1'
         runtime 'org.codehaus.groovy:groovy-all:2.1.6'
