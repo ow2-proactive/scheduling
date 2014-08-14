@@ -112,7 +112,6 @@ public class SchedulerStarter {
         configureSchedulerAndRMAndPAHomes();
         configureSecurityManager();
         configureLogging();
-        configureSchedulerPAMRProperties();
 
         args = JVMPropertiesPreloader.overrideJVMProperties(args);
 
@@ -436,7 +435,7 @@ public class SchedulerStarter {
         if (System.getProperty(CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getName()) == null) {
             System.setProperty(CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getName(), System
               .getProperty(PASchedulerProperties.SCHEDULER_HOME.getKey()) +
-              "/config/network/ProActiveConfiguration.ini");
+              "/config/network/server.ini");
         }
     }
 
@@ -458,12 +457,4 @@ public class SchedulerStarter {
               System.getProperty(PASchedulerProperties.SCHEDULER_HOME.getKey()) + "/logs/Database.log");
     }
 
-    private static void configureSchedulerPAMRProperties() {
-        if (!PAMRConfig.PA_PAMR_AGENT_ID.isSet()) {
-            PAMRConfig.PA_PAMR_AGENT_ID.setValue(0);
-        }
-        if (!PAMRConfig.PA_PAMR_AGENT_MAGIC_COOKIE.isSet()) {
-            PAMRConfig.PA_PAMR_AGENT_MAGIC_COOKIE.setValue("scheduler");
-        }
-    }
 }

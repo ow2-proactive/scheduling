@@ -416,7 +416,7 @@ public class RMNodeStarter {
                 logger.info("Node will be bounded to the following network interface " + networkInterface);
                 CentralPAPropertyRepository.PA_NET_INTERFACE.setValue(networkInterface);
             } catch (Exception e) {
-                logger.warn("Unable to detect the network interface", e);
+                logger.debug("Unable to detect the network interface", e);
             }
         }
     }
@@ -460,7 +460,7 @@ public class RMNodeStarter {
         if (System.getProperty(CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getName()) == null) {
             File defaultProActiveConfiguration = new File(
               System.getProperty(PAResourceManagerProperties.RM_HOME.getKey()),
-              "config/network/ProActiveConfiguration.ini");
+              "config/network/node.ini");
             if (defaultProActiveConfiguration.exists()) {
                 System.setProperty(CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getName(),
                   defaultProActiveConfiguration.getAbsolutePath());
