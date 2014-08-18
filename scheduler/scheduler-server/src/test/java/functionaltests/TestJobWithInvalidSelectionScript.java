@@ -104,9 +104,6 @@ public class TestJobWithInvalidSelectionScript extends SchedulerConsecutive {
         } catch (ProActiveTimeoutException expected) {
         }
 
-        SchedulerTHelper.log("Waiting for job finished");
-        JobInfo jobInfo = SchedulerTHelper.waitForEventJobFinished(id);
-
         //task 3 should not be started
         boolean task3Started = false;
 
@@ -119,13 +116,17 @@ public class TestJobWithInvalidSelectionScript extends SchedulerConsecutive {
 
         Assert.assertFalse(task3Started);
 
+        SchedulerTHelper.killJob(id.toString());
+        JobInfo jobInfo = SchedulerTHelper.waitForEventJobFinished(id);
+
         JobResult res = SchedulerTHelper.getJobResult(id);
         Map<String, TaskResult> results = res.getAllResults();
         //check that all tasks results are defined
         Assert.assertNotNull(results.get("task1").value());
-        Assert.assertNotNull(results.get("task2").getException());
+        Assert.assertNull(results.get("task2"));
+        Assert.assertNull(results.get("task3"));
 
-        Assert.assertEquals(JobStatus.CANCELED, jobInfo.getStatus());
+        Assert.assertEquals(JobStatus.KILLED, jobInfo.getStatus());
         Assert.assertEquals(1, jobInfo.getNumberOfFinishedTasks());
         Assert.assertEquals(0, jobInfo.getNumberOfRunningTasks());
         Assert.assertEquals(0, jobInfo.getNumberOfPendingTasks());
