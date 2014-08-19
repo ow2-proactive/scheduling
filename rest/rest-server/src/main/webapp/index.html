@@ -52,11 +52,9 @@
     var url = document.location.href;
     url = url.substring(0, (url.indexOf("#") == -1) ? url.length : url.indexOf("#"));
     url = url.substring(0, (url.indexOf("?") == -1) ? url.length : url.indexOf("?"));
-    url = url.substring(0, url.lastIndexOf("/") + 1);
-    var restApiWebPage = url;
+    url = url.substring(0, url.lastIndexOf("/"));
     var restApiEndpoint = url;
     document.getElementById('restUrlCli').innerHTML = restApiEndpoint;
-    document.getElementById('restUrlLink').href = restApiWebPage;
 </script>
 </body>
 </html>

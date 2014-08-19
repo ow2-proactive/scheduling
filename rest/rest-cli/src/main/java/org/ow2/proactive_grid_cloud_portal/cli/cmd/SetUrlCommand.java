@@ -45,6 +45,9 @@ public class SetUrlCommand extends AbstractCommand implements Command {
     private String restServerUrl;
 
     public SetUrlCommand(String schedulerUrl) {
+        if (schedulerUrl.endsWith("/")) {
+            schedulerUrl = schedulerUrl.substring(0, schedulerUrl.length() - 1);
+        }
         this.restServerUrl = schedulerUrl;
     }
 
