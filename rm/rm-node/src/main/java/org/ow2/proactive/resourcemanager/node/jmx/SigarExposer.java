@@ -51,9 +51,11 @@ import org.hyperic.sigar.jmx.SigarRegistry;
 
 
 public class SigarExposer extends AbstractJMXHelper {
+    /** A property to override the dir that contains the monitoring db file */
+    public static final String MONITORING_DB_DIR = "proactive.node.monitoring.db.dir";
 
     private static final Logger LOGGER = Logger.getLogger(SigarExposer.class);
-    private String nodeName;
+    private final String nodeName;
 
     public SigarExposer(String nodeName) {
         super(LOGGER);
@@ -70,13 +72,17 @@ public class SigarExposer extends AbstractJMXHelper {
                 mbs.registerMBean(registry, name);
             }
 
-            String databaseFolder = PAResourceManagerProperties.RM_HOME.getValueAsString() +
-              System.getProperty("file.separator") + "data/";
+            String databaseFolder = System.getProperty(MONITORING_DB_DIR);
+            if (databaseFolder == null || databaseFolder.trim().isEmpty()) {
+                String fs = System.getProperty("file.separator");
+                databaseFolder = PAResourceManagerProperties.RM_HOME.getValueAsString() + fs + "data" + fs;
+            }
+
             FileUtils.forceMkdir(new File(databaseFolder));
             String dataBaseName = databaseFolder + nodeName + "_statistics.rrd";
 
             setDataStore(new RRDSigarDataStore(mbs, dataBaseName, PAResourceManagerProperties.RM_RRD_STEP
-              .getValueAsInt(), Logger.getLogger(SigarExposer.class)));
+                    .getValueAsInt(), Logger.getLogger(SigarExposer.class)));
 
             name = new ObjectName("sigar:Type=Processes");
             SigarProcessesMXBean processes = new SigarProcesses(dataBaseName);
