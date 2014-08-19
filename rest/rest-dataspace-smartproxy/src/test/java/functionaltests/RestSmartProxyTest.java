@@ -40,6 +40,9 @@ import static functionaltests.RestFuncTHelper.getRestServerUrl;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.After;
@@ -49,23 +52,33 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.ow2.proactive.scheduler.common.NotificationData;
+import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobEnvironment;
 import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.job.UserIdentification;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
+import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.UpdatableProperties;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
+import org.ow2.proactive.scheduler.common.util.dsclient.ISchedulerEventListenerExtended;
 import org.ow2.proactive_grid_cloud_portal.ds.client.RestSmartProxyImpl;
+
+import com.google.common.base.Throwables;
+import com.google.common.collect.Lists;
+
 
 public class RestSmartProxyTest extends AbstractRestFuncTestCase {
 
-    private static final long sleep_time = TimeUnit.SECONDS.toMillis(1);
+    private static final long ONE_SECOND_IN_MILLIS = TimeUnit.SECONDS.toMillis(1);
 
-    public static long TIMEOUT = 120000;
+    private static final long TEN_MINUTES_IN_MILLS = TimeUnit.MINUTES.toMillis(10);
 
     public static int NB_TASKS = 4;
 
@@ -110,7 +123,7 @@ public class RestSmartProxyTest extends AbstractRestFuncTestCase {
 
     private void initializeRestSmartProxyInstance() throws Exception {
         schedProxy = new RestSmartProxyImpl();
-        schedProxy.setSessionName("test_session");
+        schedProxy.setSessionName(uniqueSessionId());
         schedProxy.cleanDatabase();
         schedProxy.init(getRestServerUrl(), getLogin(), getPassword());
 
@@ -122,29 +135,36 @@ public class RestSmartProxyTest extends AbstractRestFuncTestCase {
         outputLocalFolder = tempDir.newFolder("output");
     }
 
-    @Test
+    @Test(timeout = TEN_MINUTES_IN_MILLS)
     public void test_no_automatic_transfer() throws Exception {
         testJobSubmission(false, false);
     }
 
-    @Test
+    @Test(timeout = TEN_MINUTES_IN_MILLS)
     public void test_automatic_transfer() throws Exception {
-        testJobSubmission(false,  true);
+        testJobSubmission(false, true);
     }
 
     private void testJobSubmission(boolean isolateTaskOutput, boolean automaticTransfer) throws Exception {
         TaskFlowJob job = createTestJob(isolateTaskOutput);
-        JobId id = schedProxy.submit(job, inputLocalFolder.getAbsolutePath(), pushUrl,
-                outputLocalFolder.getAbsolutePath(), pullUrl, isolateTaskOutput, automaticTransfer);
 
-        Thread.sleep(sleep_time);
+        DataTransferNotifier notifier = new DataTransferNotifier();
+        if (automaticTransfer) {
+            System.out.println("Register the DataTransferNotifer instance.");
+            schedProxy.addEventListener(notifier);
+        }
+
+        JobId id = schedProxy.submit(job, inputLocalFolder.getAbsolutePath(), pushUrl, outputLocalFolder
+                .getAbsolutePath(), pullUrl, isolateTaskOutput, automaticTransfer);
+
+        Thread.sleep(ONE_SECOND_IN_MILLIS);
 
         schedProxy.disconnect();
         schedProxy.reconnect();
 
         JobState jobState = schedProxy.getJobState(id.toString());
         while (!jobState.isFinished()) {
-            Thread.sleep(sleep_time);
+            Thread.sleep(ONE_SECOND_IN_MILLIS);
             jobState = schedProxy.getJobState(id.toString());
         }
 
@@ -152,19 +172,29 @@ public class RestSmartProxyTest extends AbstractRestFuncTestCase {
 
         if (!automaticTransfer) {
             for (int i = 0; i < NB_TASKS; i++) {
-                System.out.println("storing data:" + id.toString() + "_" + TASK_NAME + i + " --> "
-                        + outputLocalFolder.getAbsolutePath());
+                System.out.println("storing data:" + id.toString() + "_" + TASK_NAME + i + " --> " +
+                    outputLocalFolder.getAbsolutePath());
                 schedProxy.pullData(id.toString(), TASK_NAME + i, outputLocalFolder.getAbsolutePath());
             }
         } else {
-            Thread.sleep(sleep_time);
+            List<String> taskNames = taskNameList();
+            System.out.println("Automated data transfer task list: " + taskNames);
+            while (!taskNames.isEmpty()) {
+                String finishedTask = notifier.finishedTask();
+                System.out.println("Data transfer has finished for " + finishedTask);
+                if (taskNames.contains(finishedTask)) {
+                    taskNames.remove(finishedTask);
+                }
+            }
+            System.out.println("Data transfer has finised for all tasks: " + taskNames);
         }
+
         // check the presence of output files
         for (int i = 0; i < NB_TASKS; i++) {
             String outputFileName = outputFileBaseName + "_" + i + outputFileExt;
             File outputFile = new File(outputLocalFolder, outputFileName);
-            Assert.assertTrue(String.format("%s does not exisit.", outputFile.getAbsolutePath()),
-                    outputFile.exists());
+            Assert.assertTrue(String.format("%s does not exisit.", outputFile.getAbsolutePath()), outputFile
+                    .exists());
         }
     }
 
@@ -213,5 +243,68 @@ public class RestSmartProxyTest extends AbstractRestFuncTestCase {
         JobEnvironment je = new JobEnvironment();
         je.setJobClasspath(new String[] { appClassPath });
         job.setEnvironment(je);
+    }
+
+    private String uniqueSessionId() {
+        return String.format("TEST_SID_%s", Long.toHexString(System.currentTimeMillis()));
+    }
+
+    private List<String> taskNameList() {
+        List<String> taskNames = Lists.newArrayList();
+        for (int i = 0; i < NB_TASKS; i++) {
+            taskNames.add(TASK_NAME + i);
+        }
+        return taskNames;
+    }
+
+    private static class DataTransferNotifier implements ISchedulerEventListenerExtended {
+
+        private final BlockingQueue<String> finishedTask = new ArrayBlockingQueue<String>(NB_TASKS);
+
+        @Override
+        public void pullDataFailed(String jobId, String taskName, String localFolderPath, Throwable error) {
+            try {
+                finishedTask.put(taskName);
+            } catch (InterruptedException e) {
+                e.printStackTrace(System.err);
+            }
+        }
+
+        @Override
+        public void pullDataFinished(String jobId, String taskName, String localFolderPath) {
+            try {
+                finishedTask.put(taskName);
+            } catch (InterruptedException e) {
+                e.printStackTrace(System.err);
+            }
+        }
+
+        public String finishedTask() {
+            try {
+                return finishedTask.take();
+            } catch (InterruptedException e) {
+                throw Throwables.propagate(e);
+            }
+        }
+
+        @Override
+        public void jobStateUpdatedEvent(NotificationData<JobInfo> arg0) {
+        }
+
+        @Override
+        public void jobSubmittedEvent(JobState arg0) {
+        }
+
+        @Override
+        public void schedulerStateUpdatedEvent(SchedulerEvent arg0) {
+        }
+
+        @Override
+        public void taskStateUpdatedEvent(NotificationData<TaskInfo> arg0) {
+        }
+
+        @Override
+        public void usersUpdatedEvent(NotificationData<UserIdentification> arg0) {
+        }
     }
 }
