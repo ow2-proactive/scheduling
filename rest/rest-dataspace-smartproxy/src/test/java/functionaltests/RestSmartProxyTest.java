@@ -78,7 +78,7 @@ public class RestSmartProxyTest extends AbstractRestFuncTestCase {
 
     private static final long ONE_SECOND_IN_MILLIS = TimeUnit.SECONDS.toMillis(1);
 
-    private static final long TEN_MINUTES_IN_MILLS = TimeUnit.MINUTES.toMillis(10);
+    private static final long TEN_MINUTES_IN_MILLS = 10 * 60 * 1000;
 
     public static int NB_TASKS = 4;
 
