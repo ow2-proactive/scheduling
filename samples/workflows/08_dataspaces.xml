@@ -6,7 +6,7 @@
     <description>
         Dataspaces are automatically started with the Scheduler.
         Here we write a file in a task and transfer it to the userspace.
-        Then in a dependant task, we transfer the file from the userspace and read it.
+        Then in a dependent task, we transfer the file from the userspace and read it.
 
         Patterns can be used to include or exclude input/output files.
     </description>

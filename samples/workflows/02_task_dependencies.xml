@@ -30,7 +30,7 @@ result = "World";
                 </script>
             </scriptExecutable>
         </task>
-        <task name="dependant_task">
+        <task name="dependent_task">
             <depends>
                 <task ref="a_task"/>
                 <task ref="another_task"/>
