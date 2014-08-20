@@ -57,6 +57,7 @@ import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus;
 import org.ow2.proactive_grid_cloud_portal.cli.json.ErrorView;
+import org.ow2.proactive_grid_cloud_portal.cli.utils.ExceptionUtility;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpUtility;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
@@ -132,27 +133,23 @@ public abstract class AbstractCommand implements Command {
             return new HttpResponseWrapper(response);
 
         } catch (Exception e) {
-            throw new CLIException(CLIException.REASON_OTHER, e);
+            throw new CLIException(CLIException.REASON_OTHER, e.getMessage(), e);
         } finally {
             ((HttpRequestBase) request).releaseConnection();
         }
     }
+
 
     @SuppressWarnings("unchecked")
     protected void handleError(String errorMessage, HttpResponseWrapper response,
             ApplicationContext currentContext) {
         String responseContent = StringUtility.responseAsString(response);
         Stack resultStack = resultStack(currentContext);
-        ErrorView errorView = null;
-        try {
-            errorView = currentContext.getObjectMapper().readValue(responseContent.getBytes(),
-                    ErrorView.class);
+        ErrorView errorView = errorView(responseContent, currentContext);
+        if (errorView != null) {
             resultStack.push(errorView);
-
-        } catch (Throwable error) {
+        } else {
             resultStack.push(responseContent);
-            // if an ErrorView object can't be built from the response. Hence
-            // process the response as a string
         }
         if (errorView != null) {
             writeError(errorMessage, errorView, currentContext);
@@ -173,68 +170,97 @@ public abstract class AbstractCommand implements Command {
         writeLine(currentContext, errorMessage);
         Throwable cause = error.getCause();
 
-        writeLine(currentContext, "%nError Message: %s", (cause == null) ? error.getMessage() : cause
+        writeLine(currentContext, "Error Message: %s", (cause == null) ? error.getMessage() : cause
                 .getMessage());
 
         if (debugMode(currentContext)) {
-            writeLine(currentContext, "%nStack Track: %s",
+            writeLine(currentContext, "Stack Track: %s",
                     stackTraceAsString((cause == null) ? error : cause));
+        }
+    }
+
+    protected CLIException buildCLIException(int reason, HttpResponseWrapper response,
+            ApplicationContext currentContext) {
+        String responseContent = StringUtility.responseAsString(response);
+        ErrorView errorView = errorView(responseContent, currentContext);
+        if (errorView != null) {
+            throw new CLIException(reason, errorView.getErrorMessage(), errorView.getStackTrace());
+        } else {
+            HttpErrorView httpErrorView = errorView(responseContent);
+            throw new CLIException(reason, httpErrorView.errorMessage, httpErrorView.stackTrace);
         }
     }
 
     private void writeError(String errorMsg, String responseContent, ApplicationContext currentContext) {
         writeLine(currentContext, errorMsg);
 
-        String errorMessage = null, errorCode = null;
-        BufferedReader reader = new BufferedReader(new StringReader(responseContent));
+        HttpErrorView errorView = errorView(responseContent);
 
-        String line = null;
+        if (errorView.errorCode != null) {
+            writeLine(currentContext, "HTTP Error Code: %s", errorView.errorCode);
+        }
+
+        if (errorView.errorMessage != null) {
+            writeLine(currentContext, "Error Message: %s", errorView.errorMessage);
+        }
+
+        if (errorView.errorCode == null && errorView.errorMessage == null) {
+            writeLine(currentContext, "Error Message:%n%s", responseContent);
+        }
+
+        if (debugMode(currentContext)) {
+            writeLine(currentContext, "Stack Trace:%s", errorView.stackTrace);
+        }
+    }
+
+    public Stack resultStack(ApplicationContext currentContext) {
+        return currentContext.resultStack();
+    }
+
+    protected ErrorView errorView(String responseContent, ApplicationContext currentContext) {
         try {
+            return currentContext.getObjectMapper().readValue(responseContent.getBytes(), ErrorView.class);
+        } catch (Exception ignore) {
+            return null;
+        }
+    }
+
+    protected HttpErrorView errorView(String responseContent) {
+        try {
+            HttpErrorView errorView = new HttpErrorView();
+            BufferedReader reader = new BufferedReader(new StringReader(responseContent));
+
+            String line = null;
             while ((line = reader.readLine()) != null) {
                 if (line.startsWith("errorMessage:")) {
-                    errorMessage = line.substring(line.indexOf(':')).trim();
+                    errorView.errorMessage = line.substring(line.indexOf(':')).trim();
                     break;
                 }
             }
 
             while ((line = reader.readLine()) != null) {
                 if (line.startsWith("httpErrorCode:")) {
-                    errorCode = line.substring(line.indexOf(':')).trim();
+                    errorView.errorCode = line.substring(line.indexOf(':')).trim();
                     break;
                 }
             }
-        } catch (IOException ioe) {
-            throw new CLIException(REASON_IO_ERROR, ioe);
-        }
 
-        if (errorCode != null) {
-            writeLine(currentContext, "%s %s", "HTTP Error Code:", errorCode);
-        }
-
-        if (errorMessage != null) {
-            writeLine(currentContext, "%s %s", "Error Message:", errorMessage);
-        }
-
-        try {
             while ((line = reader.readLine()) != null) {
                 if (line.startsWith("stackTrace:")) {
+                    StringBuilder buffer = new StringBuilder();
                     while ((line = reader.readLine()) != null) {
-                        writeLine(currentContext, line);
+                        buffer.append(line);
                     }
+                    errorView.stackTrace = buffer.toString();
                     break;
                 }
             }
+
+            return errorView;
+
         } catch (IOException ioe) {
             throw new CLIException(REASON_IO_ERROR, ioe);
         }
-
-        if (errorCode == null && errorMessage == null) {
-            writeLine(currentContext, "%s%n%s", "Error Message:", responseContent);
-        }
-    }
-
-    public Stack resultStack(ApplicationContext currentContext) {
-        return currentContext.resultStack();
     }
 
     private void writeError(String errorMessage, ErrorView error, ApplicationContext currentContext) {
@@ -245,6 +271,14 @@ public abstract class AbstractCommand implements Command {
         writeLine(currentContext, errorMessage);
         writeLine(currentContext, "%s %s", "HTTP Error Code:", error.getHttpErrorCode());
         writeLine(currentContext, "%s %s", "Error Message:", error.getErrorMessage());
-        writeLine(currentContext, "%s%n%s", "Stack Trace:", error.getStackTrace());
+        if (debugMode(currentContext)) {
+            writeLine(currentContext, "%s%n%s", "Stack Trace:", error.getStackTrace());
+        }
+    }
+
+    private class HttpErrorView {
+        private String errorCode;
+        private String errorMessage;
+        private String stackTrace;
     }
 }

@@ -42,6 +42,7 @@ import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_UNAUTH
 import static org.ow2.proactive_grid_cloud_portal.cli.RestConstants.DFLT_REST_SCHEDULER_URL;
 import static org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractLoginCommand.PROP_PERSISTED_SESSION;
 import static org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractLoginCommand.PROP_RENEW_SESSION;
+import static org.ow2.proactive_grid_cloud_portal.cli.utils.ExceptionUtility.debugMode;
 import static org.ow2.proactive_grid_cloud_portal.cli.utils.ExceptionUtility.stackTraceAsString;
 
 import java.io.IOException;
@@ -58,6 +59,7 @@ import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractLoginCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.cli.console.AbstractDevice;
 import org.ow2.proactive_grid_cloud_portal.cli.console.JLineDevice;
+import org.ow2.proactive_grid_cloud_portal.cli.utils.ExceptionUtility;
 
 import com.google.common.collect.ObjectArrays;
 
@@ -85,11 +87,12 @@ public abstract class EntryPoint {
             cli = (new GnuParser()).parse(options, args);
 
         } catch (IOException ioe) {
-            writeError(new PrintWriter(System.err, true), ioe.getMessage(), ioe);
+            System.err.println("An error occurred.");
+            ioe.printStackTrace(System.err);
             System.exit(1);
 
         } catch (ParseException pe) {
-            writeError((PrintWriter) console.getWriter(), pe.getMessage(), pe);
+            writeError(currentContext, pe.getMessage(), pe);
             // print usage
             Command help = commandFactory.commandForOption(new Option("h", null));
             if (help != null) {
@@ -108,7 +111,7 @@ public abstract class EntryPoint {
         try {
             commands = commandFactory.getCommandList(cli, currentContext);
         } catch (CLIException e) {
-            writeError(writer(currentContext), "", e);
+            writeError(currentContext, "An error occurred.", e);
             System.exit(1);
         }
 
@@ -120,11 +123,11 @@ public abstract class EntryPoint {
             if (REASON_UNAUTHORIZED_ACCESS == error.reason() && hasLoginCommand(commands)) {
                 retryLogin = true;
             } else {
-                writeError(writer(currentContext), "An error occurred.", error);
+                writeError(currentContext, "An error occurred.", error);
                 System.exit(1);
             }
         } catch (Throwable e) {
-            writeError(writer(currentContext), "An error occurred.", e);
+            writeError(currentContext, "An error occurred.", e);
             System.exit(1);
         }
 
@@ -142,7 +145,7 @@ public abstract class EntryPoint {
                 currentContext.setProperty(PROP_RENEW_SESSION, true);
                 executeCommandList(commands, currentContext);
             } catch (Throwable error) {
-                writeError(writer(currentContext), "An error occurred while execution:", error);
+                writeError(currentContext, "An error occurred while execution.", error);
                 System.exit(1);
             }
         }
@@ -155,20 +158,22 @@ public abstract class EntryPoint {
         }
     }
 
-    private void writeError(PrintWriter writer, String errorMsg, Throwable cause) {
+    private void writeError(ApplicationContext currentContext, String errorMsg, Throwable cause) {
+        PrintWriter writer = new PrintWriter(currentContext.getDevice().getWriter(), true);
         writer.printf("%n%s", errorMsg);
         if (cause != null) {
             if (cause.getMessage() != null) {
                 writer.printf("%n%nError Message: %s", cause.getMessage());
             }
-            if (cause.getStackTrace() != null) {
-                writer.printf("%n%nStackTrace: %s", stackTraceAsString(cause));
+
+            if (debugMode(currentContext)) {
+                if (cause instanceof CLIException && ((CLIException) cause).stackTrace() != null) {
+                    writer.printf("%n%nStackTrace: %s", ((CLIException) cause).stackTrace());
+                } else {
+                    writer.printf("%n%nStackTrace: %s", stackTraceAsString(cause));
+                }
             }
         }
-    }
-
-    private PrintWriter writer(ApplicationContext context) {
-        return new PrintWriter(context.getDevice().getWriter(), true);
     }
 
     private CommandFactory getCommandFactory() {

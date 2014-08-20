@@ -174,6 +174,10 @@ public abstract class CommandFactory {
             list.add(map.remove(opt(SILENT)));
         }
 
+        if (map.containsKey(opt(DEBUG))) {
+            list.add(map.remove(opt(DEBUG)));
+        }
+
         if (map.containsKey(opt(URL))) {
             list.addFirst(map.remove(opt(URL)));
         }
@@ -228,10 +232,6 @@ public abstract class CommandFactory {
 
         if (map.containsKey(opt(POLICY))) {
             list.add(map.remove(opt(POLICY)));
-        }
-
-        if (map.containsKey(opt(DEBUG))) {
-            list.add(map.remove(opt(DEBUG)));
         }
 
         if (map.isEmpty()) {

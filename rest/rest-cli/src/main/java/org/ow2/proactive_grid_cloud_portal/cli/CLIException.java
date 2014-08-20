@@ -45,10 +45,11 @@ public class CLIException extends RuntimeException {
     public static final int REASON_OTHER = 4;
 
     private static final long serialVersionUID = 1L;
-    private int reason;
+    private final int reason;
+    private String stackTrace;
 
     public CLIException(int reason, String message) {
-        this(reason, message, null);
+        this(reason, message, (Throwable) null);
     }
 
     public CLIException(int reason, Throwable cause) {
@@ -60,8 +61,17 @@ public class CLIException extends RuntimeException {
         this.reason = reason;
     }
 
+    public CLIException(int reason, String message, String stackTrace) {
+        this(reason, message);
+        this.stackTrace = stackTrace;
+    }
+
     public int reason() {
         return reason;
+    }
+
+    public String stackTrace() {
+        return stackTrace;
     }
 
 }

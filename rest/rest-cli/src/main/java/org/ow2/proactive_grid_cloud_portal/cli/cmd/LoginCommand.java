@@ -54,7 +54,7 @@ public class LoginCommand extends AbstractLoginCommand implements Command {
     public static final String USERNAME = "org.ow2.proactive_grid_cloud_portal.cli.cmd.LoginCommand.username";
     public static final String PASSWORD = "org.ow2.proactive_grid_cloud_portal.cli.cmd.LoginCommand.password";
 
-    private String username;
+    private final String username;
 
     public LoginCommand(String username) {
         this.username = username;
@@ -74,8 +74,7 @@ public class LoginCommand extends AbstractLoginCommand implements Command {
         if (statusCode(OK) == statusCode(response)) {
             return StringUtility.responseAsString(response).trim();
         } else {
-            handleError("An error occurred while logging:", response, currentContext);
-            throw new CLIException(REASON_OTHER, "An error occurred while logging.");
+            throw buildCLIException(REASON_OTHER, response, currentContext);
         }
     }
 
