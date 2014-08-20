@@ -193,6 +193,12 @@ public class RestFuncTHelper {
         } catch (Throwable noNeed) {
         }
 
+        System.out.println("Shutting down the scheduler.");
+        try {
+            scheduler.shutdown();
+        } catch (Throwable ignore) {
+        }
+
         // Destroy the scheduler process
         System.out.println("Shutting down scheduler process.");
         if (schedProcess != null) {
