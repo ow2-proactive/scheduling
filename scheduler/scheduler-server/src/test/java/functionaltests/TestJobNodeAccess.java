@@ -50,6 +50,9 @@ import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.utils.FileToBytesConverter;
 import org.junit.Assert;
+import org.junit.Rule;
+import org.junit.rules.TemporaryFolder;
+import org.ow2.proactive.scheduler.task.forked.JavaForkerExecutable;
 
 
 /**
@@ -57,6 +60,9 @@ import org.junit.Assert;
  * 
  */
 public class TestJobNodeAccess extends SchedulerConsecutive {
+    
+    @Rule
+    public TemporaryFolder tmpDir = new TemporaryFolder();
 
     private static URL simpleJob = TestJobNodeAccess.class
             .getResource("/functionaltests/descriptors/Job_simple.xml");
@@ -77,7 +83,7 @@ public class TestJobNodeAccess extends SchedulerConsecutive {
         SchedulerTHelper.waitForEventJobSubmitted(id);
 
         JobId id2 = SchedulerTHelper.submitJob(new File(simpleJobWithToken.toURI()).getAbsolutePath(),
-                ExecutionMode.normal);
+                ExecutionMode.fork);
         SchedulerTHelper.log("Job submitted, id " + id2.toString());
         SchedulerTHelper.waitForEventJobSubmitted(id2);
 
@@ -92,8 +98,14 @@ public class TestJobNodeAccess extends SchedulerConsecutive {
         byte[] creds = FileToBytesConverter.convertFileToByteArray(new File(PAResourceManagerProperties
                 .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
         String nsName = "NodeSourceWithToken";
+
+        // Testing fix for SCHEDULING-2094: Provide a way to override the forked jvm log dir via pa.logs.home property
+        File customForkedJvmLogsDir = tmpDir.newFolder("customForkedJvmLogs");
+        String nsProps = "-D" + RMNodeStarter.NODE_ACCESS_TOKEN + "=test_token " +
+                "-D" + JavaForkerExecutable.FORKED_LOGS_HOME + "="+customForkedJvmLogsDir.getAbsolutePath();
+
         rm.createNodeSource(nsName, LocalInfrastructure.class.getName(), new Object[] { creds, 1,
-                RMTHelper.defaultNodesTimeout, "-D" + RMNodeStarter.NODE_ACCESS_TOKEN + "=test_token" },
+                RMTHelper.defaultNodesTimeout, nsProps },
                 StaticPolicy.class.getName(), null);
 
         // ns created
@@ -109,6 +121,10 @@ public class TestJobNodeAccess extends SchedulerConsecutive {
 
         SchedulerTHelper.waitForEventJobFinished(id2);
 
+        Assert.assertEquals("The fix for SCHEDULING-2094 is broken, it seems the "
+                + JavaForkerExecutable.FORKED_LOGS_HOME + " property was not used by the " +nsName+ " node", 1, customForkedJvmLogsDir.list().length);
+
         rm.removeNodeSource(nsName, true);
+
     }
 }

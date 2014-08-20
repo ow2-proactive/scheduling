@@ -406,19 +406,19 @@ public class JavaForkerExecutable extends JavaExecutable implements ForkerStarte
     }
 
     private String getLogsHome() {
-        String logHome = System.getProperty(PASchedulerProperties.SCHEDULER_HOME.getKey());
-        if (logHome == null) {
-            logHome = System.getProperty(CentralPAPropertyRepository.PA_HOME.getName());
+        for (String logHome : new String[]{
+            System.getProperty(FORKED_LOGS_HOME),
+            PASchedulerProperties.SCHEDULER_HOME.getValueAsString(),
+            CentralPAPropertyRepository.PA_HOME.getValueAsString()}) {
+            if (logHome != null && !logHome.trim().isEmpty()) {
+                return logHome;
+            }
         }
         try {
-            if (logHome == null) {
-                ProActiveRuntimeImpl runtime = ProActiveRuntimeImpl.getProActiveRuntime();
-                logHome = runtime.getProActiveHome();
-            }
+            return ProActiveRuntimeImpl.getProActiveRuntime().getProActiveHome();
         } catch (ProActiveException pae) {
-            logHome = System.getProperty("java.io.tmpdir");
+            return System.getProperty("java.io.tmpdir");
         }
-        return logHome + File.separator + "logs";
     }
 
     /**

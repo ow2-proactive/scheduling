@@ -14,7 +14,7 @@ log4j.additivity.proactive.resourceManager=false
 
 # File appender for debugging
 log4j.appender.defaultFileAppender=org.apache.log4j.RollingFileAppender
-log4j.appender.defaultFileAppender.File=${pa.logs.home}/Node-${pa.forker.node}.log
+log4j.appender.defaultFileAppender.File=${pa.logs.home}/logs/Node-${pa.forker.node}.log
 log4j.appender.defaultFileAppender.MaxFileSize=1MB
 log4j.appender.SchedulerFileAppender.MaxBackupIndex=1
 log4j.appender.defaultFileAppender.layout=org.apache.log4j.PatternLayout
