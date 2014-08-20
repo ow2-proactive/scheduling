@@ -14,7 +14,7 @@
                 </script>
             </scriptExecutable>
             <controlFlow>
-                <loop target="CronTask">
+                <loop target="cron_task">
                     <script>
                         <code language="javascript">
                             // You can use a Cron Expression here
