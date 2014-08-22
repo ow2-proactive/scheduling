@@ -138,7 +138,7 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
                         }
                     }
                     String description = "Could not acquire node on host " + host.toString() +
-                        ". NS's state refreshed regarding last checked excpetion: #freeHosts:" +
+                        ". NS's state refreshed regarding last checked exception: #freeHosts:" +
                         freeHosts.size() + " #registered: " + registeredNodes.size();
                     logger.error(description, e);
                     return;
