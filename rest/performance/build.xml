@@ -45,11 +45,11 @@
     <property name="test.deploy.env.appserver" value="local" />
     <property name="scheduling.dir" value="${schedulingPath}" />
     <property name="scheduling.perf.dir" value="${scheduling.dir}/performance" />
-    <property name="scheduling.perf.classes" value="${scheduling.dir}/classes/performance" />
+    <property name="scheduling.perf.classes" value="${scheduling.dir}/rest/performance/build/classes/main" />
     <property name="scheduling.perf.buildfile" value="${scheduling.perf.dir}/build.xml" />
     <property name="scheduling_rest.client.dir" value="${basedir}/../client" />
     <property name="tmp" value="${basedir}/tmp" />
-    <property name="classes.dir" value="${basedir}/../classes/performance" />
+    <property name="classes.dir" value="${basedir}/build/classes/main" />
 
     <property name="scheduler.test.scenario" value="scheduler1" />
     <property name="target.test.scenario" value="rm-portal-clients" />
@@ -168,9 +168,9 @@
         <attribute name="targetAppServerUrl" />
         <attribute name="clientProActiveConfig" />
         <sequential>
-            <delete file="${basedir}/results/@{testplan}.jtl" />
-            <delete file="${basedir}/results/@{testplan}.html" />
-            <jmeter failureProperty="rest-@{testplan}-failed" jmeterhome="${jmeterhome}" testplan="${basedir}/jmeter/testplans/@{testplan}.jmx" resultlog="${basedir}/results/@{testplan}.jtl">
+            <delete file="${basedir}/build/results/@{testplan}.jtl" />
+            <delete file="${basedir}/build/results/@{testplan}.html" />
+            <jmeter failureProperty="rest-@{testplan}-failed" jmeterhome="${jmeterhome}" testplan="${basedir}/jmeter/testplans/@{testplan}.jmx" resultlog="${basedir}/build/results/@{testplan}.jtl">
                 <jvmarg value="-Djava.security.policy=${basedir}/config/grant.all.java.policy" />
                 <jvmarg value="-Dproactive.configuration=@{clientProactiveConfig}" />
                 <property name="search_paths" value="${classes.dir}" />
@@ -179,89 +179,14 @@
                 <property name="restSchedulerUrl" value="@{targetAppServerUrl}" />
                 <property name="testTime" value="${testTime}" />
                 <property name="stopOnError" value="${stopOnError}" />
+                <property name="schedulerPortalUserNumber" value="${schedulerPortalUserNumber}" />
+
                 <jmeterarg value="-j" />
-                <jmeterarg value="${basedir}/results/jmeter.log" />
+                <jmeterarg value="${basedir}/build/results/jmeter.log" />
             </jmeter>
-            <xslt classpathref="xslt.classpath" in="${basedir}/results/@{testplan}.jtl" out="${basedir}/results/@{testplan}.html" style="${basedir}/jmeter/config/jmeter-results-report_21.xsl" />
-            <xslt classpathref="xslt.classpath" in="${basedir}/results/@{testplan}.jtl" out="${basedir}/results/@{testplan}_detail.html" style="${basedir}/jmeter/config/jmeter-results-detail-report_21.xsl" />
+            <xslt classpathref="xslt.classpath" in="${basedir}/build/results/@{testplan}.jtl" out="${basedir}/build/results/@{testplan}.html" style="${basedir}/jmeter/config/jmeter-results-report_21.xsl" />
+            <xslt classpathref="xslt.classpath" in="${basedir}/build/results/@{testplan}.jtl" out="${basedir}/build/results/@{testplan}_detail.html" style="${basedir}/jmeter/config/jmeter-results-detail-report_21.xsl" />
         </sequential>
-    </macrodef>
-
-    <macrodef name="run-scheduler-jmeter-test">
-        <attribute name="testplan" />
-        <attribute name="targetSchedulerUrl" />
-        <attribute name="clientProactiveConfig" />
-        <sequential>
-	    <echo message="@{targetSchedulerUrl}" />
-            <delete file="${basedir}/results/@{testplan}.jtl" />
-            <delete file="${basedir}/results/@{testplan}.html" />
-            <chmod file="${scheduling.perf.dir}/src/org/ow2/proactive/tests/performance/jmeter/scheduler/nativeTask.sh" perm="ugo+rx" />
-            <chmod file="${scheduling.perf.dir}/src/org/ow2/proactive/tests/performance/jmeter/scheduler/sleep_forever_nativeTask.sh" perm="ugo+rx" />
-            <chmod file="${scheduling.perf.dir}/src/org/ow2/proactive/tests/performance/jmeter/scheduler/failing_nativeTask.sh" perm="ugo+rx" />
-
-            <jmeter failureProperty="scheduler-@{testplan}-failed" jmeterhome="${jmeterhome}" testplan="${scheduling.perf.dir}/jmeter/testplans/@{testplan}.jmx" resultlog="${basedir}/results/@{testplan}.jtl">
-                <jvmarg value="-Djava.security.policy=${basedir}/config/grant.all.java.policy" />
-                <jvmarg value="-Dproactive.configuration=@{clientProactiveConfig}" />
-
-                <property name="search_paths" value="${classes.dir}" />
-                <property name="jmeter.save.saveservice.output_format" value="xml" />
-
-                <property name="schedulerUrl" value="@{targetSchedulerUrl}" />
-                <property name="schedulingPath" value="${test.deploy.env.local.schedulingPath}" />
-                <property name="testTime" value="${testTime}" />
-                <property name="stopOnError" value="${stopOnError}" />
-
-                <property name="schedulerListenersNumber" value="${schedulerListenersNumber}" />
-
-                <property name="submitUseSelectionScript" value="${submitUseSelectionScript}" />
-                <property name="submitSelectionScriptDynamicContent" value="${submitSelectionScriptDynamicContent}" />
-                <property name="submitSelectionScriptTypeDynamic" value="${submitSelectionScriptTypeDynamic}" />
-
-                <property name="simpleJavaTaskUsersNumber" value="${simpleJavaTaskUsersNumber}" />
-                <property name="simpleNativeTaskUsersNumber" value="${simpleNativeTaskUsersNumber}" />
-
-                <property name="multiNodeSubmitUsersNumber" value="${multiNodeSubmitUsersNumber}" />
-                <property name="multiNodeSubmitTaskType" value="${multiNodeSubmitTaskType}" />
-                <property name="multiNodeSubmitNodesNumber" value="${multiNodeSubmitNodesNumber}" />
-                <property name="multiNodeSubmitTopology" value="${multiNodeSubmitTopology}" />
-
-                <property name="submitDependentTasksUsersNumber" value="${submitDependentTasksUsersNumber}" />
-                <property name="dependentTasksSubmitTaskType" value="${dependentTasksSubmitTaskType}" />
-                <property name="dependentTasksSubmitTasksNumber" value="${dependentTasksSubmitTasksNumber}" />
-
-                <property name="replicateTasksUsersNumber" value="${replicateTasksUsersNumber}" />
-                <property name="replicateTasksSubmitChildrenNumber" value="${replicateTasksSubmitChildrenNumber}" />
-                <property name="replicateTasksSubmitTaskType" value="${replicateTasksSubmitTaskType}" />
-
-                <property name="loopTasksUsersNumber" value="${loopTasksUsersNumber}" />
-                <property name="loopTasksSubmitIterationsNumber" value="${loopTasksSubmitIterationsNumber}" />
-                <property name="loopTasksSubmitTaskType" value="${loopTasksSubmitTaskType}" />
-
-                <property name="sampleJobUsersNumber" value="${sampleJobUsersNumber}" />
-
-                <property name="failingTasksUsersNumber" value="${failingTasksUsersNumber}" />
-                <property name="failingTaskSubmitTaskType" value="${failingTaskSubmitTaskType}" />
-                <property name="failingTaskSubmitRestartMode" value="${failingTaskSubmitRestartMode}" />
-
-                <property name="submitAndKillUsersNumber" value="${submitAndKillUsersNumber}" />
-                <property name="submitAndKillTasksUsersNumber" value="${submitAndKillTasksUsersNumber}" />
-                
-                <property name="schedulerConnectUsersNumber" value="${schedulerConnectUsersNumber}" />
-                
-                <property name="schedulerJmxUsageUsers" value="${schedulerJmxUsageUsers}" />
-            	
-                <property name="hugeJobTasksNumber" value="${hugeJobTasksNumber}" />
-                <property name="hugeJobCompleteTimeout" value="${hugeJobCompleteTimeout}" />
-                
-                <jmeterarg value="-j" />
-                <jmeterarg value="${basedir}/results/jmeter.log" />
-
-            </jmeter>
-
-            <xslt classpathref="xslt.classpath" in="${basedir}/results/@{testplan}.jtl" out="${basedir}/results/@{testplan}.html" style="${basedir}/jmeter/config/jmeter-results-report_21.xsl" />
-            <xslt classpathref="xslt.classpath" in="${basedir}/results/@{testplan}.jtl" out="${basedir}/results/@{testplan}_detail.html" style="${basedir}/jmeter/config/jmeter-results-detail-report_21.xsl" />
-        </sequential>
-
     </macrodef>
 
     <target name="clean">
@@ -309,13 +234,13 @@
     </target>
 
     <target name="execute-test">
-    	<loadproperties srcFile="${basedir}/tmp/test.deploy.result.properties">
-    	    <filterchain>
-    	        <linecontains>
-    	            <contains value="appserver.deploy.result.serverUrl" />
-    	        </linecontains>
-    	    </filterchain>
-    	</loadproperties>
+    	<!--<loadproperties srcFile="${basedir}/tmp/test.deploy.result.properties">-->
+    	    <!--<filterchain>-->
+    	        <!--<linecontains>-->
+    	            <!--<contains value="appserver.deploy.result.serverUrl" />-->
+    	        <!--</linecontains>-->
+    	    <!--</filterchain>-->
+    	<!--</loadproperties>-->
         <run-rest-jmeter-test testplan="${target.test.scenario}" targetappserverurl="${appserver.deploy.result.serverUrl}" clientproactiveconfig="${basedir}/config/DefaultClientProActiveConfiguration.xml" />
     </target>
 

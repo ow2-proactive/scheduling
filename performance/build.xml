@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="Scheduler and RM perofrmance">
+<project name="Scheduler and RM performance">
 
     <property file="${basedir}/common.test.properties" />
     <property file="${basedir}/rm.test.properties" />
@@ -9,7 +9,7 @@
     <basename property="project.root.path.basename" file="${basedir}/.." />
     <property name="project.root" value="${project.root.path.dirname}/${project.root.path.basename}" />
 
-    <property name="classes.dir" value="${project.root}/classes/performance" />
+    <property name="classes.dir" value="${basedir}/build/classes/main" />
 
     <property name="test.deploy.env.local.javaPath" value="${javaPath}" />
     <property name="test.deploy.env.local.schedulingPath" value="${schedulingPath}" />
@@ -67,7 +67,7 @@
             <class name="org.ow2.proactive.tests.performance.rm.RMTestListener" />
             <class name="org.ow2.proactive.tests.performance.scheduler.SchedulerTestListener" />
         </stubGenerator>
-        <copy file="${basedir}/src/org/ow2/proactive/tests/performance/jmeter/rm/defaultSSHDeployment" todir="${classes.dir}/org/ow2/proactive/tests/performance/jmeter/rm" />
+        <!--<copy file="${basedir}/src/main/resources/org/ow2/proactive/tests/performance/jmeter/rm/defaultSSHDeployment" todir="${classes.dir}/org/ow2/proactive/tests/performance/jmeter/rm" />-->
     </target>
 
     <target name="copy.libs.to.jmeter">
@@ -162,7 +162,7 @@
                 <jvmarg value="-Dscheduler.deploy.rmUrl=${scheduler.deploy.rmUrl}" />
                 <jvmarg value="-Dscheduler.deploy.javaOpts=${scheduler.deploy.javaOpts}" />
 
-                <jvmarg value="-Djava.security.policy=${basedir}/config/grant.all.java.policy" />
+                <jvmarg value="-Djava.security.policy=${basedir}/src/main/resources/config/grant.all.java.policy" />
             </java>
             <property file="${basedir}/tmp/test.deploy.result.properties" />
         </sequential>
@@ -198,22 +198,22 @@
         <attribute name="clientJavaOptions" />
         <attribute name="clientProActiveConfig" />
         <sequential>
-            <delete file="${basedir}/results/@{testplan}.jtl" />
-            <delete file="${basedir}/results/@{testplan}.html" />
+            <delete file="${basedir}/build/results/@{testplan}.jtl" />
+            <delete file="${basedir}/build/results/@{testplan}.html" />
 
-            <jmeter failureProperty="rm-@{testplan}-failed" jmeterhome="${jmeterhome}" testplan="${basedir}/jmeter/testplans/@{testplan}.jmx" resultlog="${basedir}/results/@{testplan}.jtl">
-                <jvmarg value="-Djava.security.policy=${basedir}/config/grant.all.java.policy" />
+            <jmeter failureProperty="rm-@{testplan}-failed" jmeterhome="${jmeterhome}" testplan="${basedir}/src/main/resources/jmeter/testplans/@{testplan}.jmx" resultlog="${basedir}/build/results/@{testplan}.jtl">
+                <jvmarg value="-Djava.security.policy=${basedir}/src/main/resources/config/grant.all.java.policy" />
                 <jvmarg value="-Dproactive.configuration=@{clientProActiveConfig}" />
 
-                <property name="search_paths" value="${classes.dir}" />
+                <property name="search_paths" value="${classes.dir};${basedir}/build/resources/main" />
 
                 <property name="jmeter.save.saveservice.output_format" value="xml" />
 
                 <property name="rmUrl" value="@{targetRmUrl}" />
                 <property name="testTime" value="${testTime}" />
                 <property name="stopOnError" value="${stopOnError}" />
-                <property name="rmLogin" value="nsadmin" />
-                <property name="rmPassword" value="pwd" />
+                <property name="rmLogin" value="admin" />
+                <property name="rmPassword" value="admin" />
 
                 <jvmarg value="-Dtest.deploy.env.local.javaPath=${test.deploy.env.local.javaPath}" />
                 <jvmarg value="-Dtest.deploy.env.local.schedulingPath=${test.deploy.env.local.schedulingPath}" />
@@ -243,12 +243,12 @@
                 <property name="sshNodeSourceUsers" value="${sshNodeSourceUsers}" />
 
                 <jmeterarg value="-j" />
-                <jmeterarg value="${basedir}/results/jmeter.log" />
+                <jmeterarg value="${basedir}/build/results/jmeter.log" />
             	
             </jmeter>
 
-            <xslt classpathref="xslt.classpath" in="${basedir}/results/@{testplan}.jtl" out="${basedir}/results/@{testplan}.html" style="${basedir}/jmeter/config/jmeter-results-report_21.xsl" />
-            <xslt classpathref="xslt.classpath" in="${basedir}/results/@{testplan}.jtl" out="${basedir}/results/@{testplan}_detail.html" style="${basedir}/jmeter/config/jmeter-results-detail-report_21.xsl" />
+            <xslt classpathref="xslt.classpath" in="${basedir}/build/results/@{testplan}.jtl" out="${basedir}/build/results/@{testplan}.html" style="${basedir}/src/main/resources/jmeter/config/jmeter-results-report_21.xsl" />
+            <xslt classpathref="xslt.classpath" in="${basedir}/build/results/@{testplan}.jtl" out="${basedir}/build/results/@{testplan}_detail.html" style="${basedir}/src/main/resources/jmeter/config/jmeter-results-detail-report_21.xsl" />
         </sequential>
 
     </macrodef>
@@ -258,17 +258,17 @@
         <attribute name="targetSchedulerUrl" />
         <attribute name="clientProactiveConfig" />
         <sequential>
-            <delete file="${basedir}/results/@{testplan}.jtl" />
-            <delete file="${basedir}/results/@{testplan}.html" />
-            <chmod file="${basedir}/src/org/ow2/proactive/tests/performance/jmeter/scheduler/nativeTask.sh" perm="ugo+rx" />
-            <chmod file="${basedir}/src/org/ow2/proactive/tests/performance/jmeter/scheduler/sleep_forever_nativeTask.sh" perm="ugo+rx" />
-            <chmod file="${basedir}/src/org/ow2/proactive/tests/performance/jmeter/scheduler/failing_nativeTask.sh" perm="ugo+rx" />
+            <delete file="${basedir}/build/results/@{testplan}.jtl" />
+            <delete file="${basedir}/build/results/@{testplan}.html" />
+            <chmod file="${basedir}/src/main/java/org/ow2/proactive/tests/performance/jmeter/scheduler/nativeTask.sh" perm="ugo+rx" />
+            <chmod file="${basedir}/src/main/java/org/ow2/proactive/tests/performance/jmeter/scheduler/sleep_forever_nativeTask.sh" perm="ugo+rx" />
+            <chmod file="${basedir}/src/main/java/org/ow2/proactive/tests/performance/jmeter/scheduler/failing_nativeTask.sh" perm="ugo+rx" />
 
-            <jmeter failureProperty="scheduler-@{testplan}-failed" jmeterhome="${jmeterhome}" testplan="${basedir}/jmeter/testplans/@{testplan}.jmx" resultlog="${basedir}/results/@{testplan}.jtl">
-                <jvmarg value="-Djava.security.policy=${basedir}/config/grant.all.java.policy" />
+            <jmeter failureProperty="scheduler-@{testplan}-failed" jmeterhome="${jmeterhome}" testplan="${basedir}/src/main/resources/jmeter/testplans/@{testplan}.jmx" resultlog="${basedir}/build/results/@{testplan}.jtl">
+                <jvmarg value="-Djava.security.policy=${basedir}/src/main/resources/config/grant.all.java.policy" />
                 <jvmarg value="-Dproactive.configuration=@{clientProactiveConfig}" />
 
-                <property name="search_paths" value="${classes.dir}" />
+                <property name="search_paths" value="${classes.dir};${basedir}/build/resources/main" />
                 <property name="jmeter.save.saveservice.output_format" value="xml" />
 
                 <property name="schedulerUrl" value="@{targetSchedulerUrl}" />
@@ -319,23 +319,23 @@
                 <property name="hugeJobCompleteTimeout" value="${hugeJobCompleteTimeout}" />
                 
                 <jmeterarg value="-j" />
-                <jmeterarg value="${basedir}/results/jmeter.log" />
+                <jmeterarg value="${basedir}/build/results/jmeter.log" />
 
             </jmeter>
 
-            <xslt classpathref="xslt.classpath" in="${basedir}/results/@{testplan}.jtl" out="${basedir}/results/@{testplan}.html" style="${basedir}/jmeter/config/jmeter-results-report_21.xsl" />
-            <xslt classpathref="xslt.classpath" in="${basedir}/results/@{testplan}.jtl" out="${basedir}/results/@{testplan}_detail.html" style="${basedir}/jmeter/config/jmeter-results-detail-report_21.xsl" />
+            <xslt classpathref="xslt.classpath" in="${basedir}/build/results/@{testplan}.jtl" out="${basedir}/build/results/@{testplan}.html" style="${basedir}/src/main/resources/jmeter/config/jmeter-results-report_21.xsl" />
+            <xslt classpathref="xslt.classpath" in="${basedir}/build/results/@{testplan}.jtl" out="${basedir}/build/results/@{testplan}_detail.html" style="${basedir}/src/main/resources/jmeter/config/jmeter-results-detail-report_21.xsl" />
         </sequential>
 
     </macrodef>
 	
-    <target name="run-scheduler-test" depends="compile.tests, copy.libs.to.jmeter" description="Run JMeter Scheduler test (Scheduler should be already deployed)">
+    <target name="run-scheduler-test" depends="copy.libs.to.jmeter" description="Run JMeter Scheduler test (Scheduler should be already deployed)">
         <run-scheduler-jmeter-test testplan="scheduler1" targetSchedulerUrl="${targetSchedulerUrl}" clientproactiveconfig="${basedir}/config/DefaultClientProActiveConfiguration.xml" />
         <fail if="scheduler-scheduler1-failed" message="JMeter test failed" />
     </target>
 
-    <target name="run-rm-test" depends="compile.tests, copy.libs.to.jmeter" description="Run JMeter RM (RM should be already deployed)">
-        <run-rm-jmeter-test testplan="rm1" targetRmUrl="${rmUrl}" clientproactiveconfig="${basedir}/config/DefaultClientProActiveConfiguration.xml" clientjavaoptions="-Dpa.rm.home=${project.root} -Dproactive.configuration=${basedir}/config/DefaultClientProActiveConfiguration.xml -Dorg.ow2.proactive.tests.performance=true" />
+    <target name="run-rm-test" depends="copy.libs.to.jmeter" description="Run JMeter RM (RM should be already deployed)">
+        <run-rm-jmeter-test testplan="rm_create_ns" targetRmUrl="${rmUrl}" clientproactiveconfig="${basedir}/config/DefaultClientProActiveConfiguration.xml" clientjavaoptions="-Dpa.rm.home=${project.root} -Dproactive.configuration=${basedir}/config/DefaultClientProActiveConfiguration.xml -Dorg.ow2.proactive.tests.performance=true" />
         <fail if="rm-rm1-failed" message="JMeter test failed" />
     </target>
 
@@ -411,7 +411,7 @@
             <classpath>
                 <path refid="run.with.scheduler.classpath" />
             </classpath>
-            <jvmarg value="-Djava.security.policy=${basedir}/config/grant.all.java.policy" />
+            <jvmarg value="-Djava.security.policy=${basedir}/src/main/resources/config/grant.all.java.policy" />
             <jvmarg value="-Dproactive.configuration=${get.hosts.from.scheduler.clientProActiveConfig}" />
 
             <jvmarg value="-Dget.hosts.from.scheduler.targetToRun=${get.hosts.from.scheduler.targetToRun}" />
