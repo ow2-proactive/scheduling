@@ -77,6 +77,13 @@ public class AbstractEventsMonitor<T extends AbstractWaitCondition> {
                 // System.out.println("All events:\n" + waitCondition.getEventsLog());
 
                 if (stopWait) {
+                    String message = "Done waiting, all events:\n" +
+                      waitCondition.getEventsLog();
+                    if (logger != null) {
+                        logger.error(message);
+                    } else {
+                        System.out.println(message);
+                    }
                     return true;
                 } else {
                     String message = "Waiting failed with timeout, all events:\n" +

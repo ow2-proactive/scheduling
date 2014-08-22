@@ -38,14 +38,14 @@ package org.ow2.proactive.tests.performance.jmeter.scheduler;
 
 import java.io.File;
 
-import org.apache.jmeter.config.Arguments;
-import org.apache.jmeter.protocol.java.sampler.JavaSamplerContext;
 import org.objectweb.proactive.core.UniqueID;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.tests.performance.jmeter.BaseJMeterClient;
 import org.ow2.proactive.tests.performance.scheduler.TestSchedulerProxy;
+import org.apache.jmeter.config.Arguments;
+import org.apache.jmeter.protocol.java.sampler.JavaSamplerContext;
 
 
 /**
@@ -89,7 +89,7 @@ public abstract class BaseJMeterSchedulerClient extends BaseJMeterClient {
         if (!schedulingDir.isDirectory()) {
             throw new IllegalArgumentException("Invalid scheduling path: " + schedulingPath);
         }
-        File testsClasspathDir = new File(schedulingPath, "classes/performance");
+        File testsClasspathDir = new File(schedulingPath, "performance/build/classes/main");
         if (!testsClasspathDir.isDirectory()) {
             throw new IllegalArgumentException("Can't find tests classpath: " +
                 testsClasspathDir.getAbsolutePath());

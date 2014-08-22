@@ -38,9 +38,6 @@ package org.ow2.proactive.tests.performance.jmeter.scheduler;
 
 import java.io.Serializable;
 
-import org.apache.jmeter.config.Arguments;
-import org.apache.jmeter.protocol.java.sampler.JavaSamplerContext;
-import org.apache.jmeter.samplers.SampleResult;
 import org.ow2.proactive.scheduler.common.job.JobEnvironment;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
@@ -53,6 +50,9 @@ import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.tests.performance.deployment.TestDeployer;
+import org.apache.jmeter.config.Arguments;
+import org.apache.jmeter.protocol.java.sampler.JavaSamplerContext;
+import org.apache.jmeter.samplers.SampleResult;
 
 
 /**
@@ -192,7 +192,7 @@ public class SubmitFailingTaskSchedulerClient extends BaseJobSubmitClient {
     static Task createNativeTask(String testsSourcePath) {
         NativeTask task = new NativeTask();
         task.setCommandLine(new String[] { testsSourcePath +
-            "/org/ow2/proactive/tests/performance/jmeter/scheduler/failing_nativeTask.sh" });
+            "/main/resources/org/ow2/proactive/tests/performance/jmeter/scheduler/failing_nativeTask.sh" });
         task.setDescription("Test native task, exits with code 1");
         return task;
     }

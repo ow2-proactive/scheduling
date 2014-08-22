@@ -539,6 +539,13 @@ project('performance') {
         compile "org.objectweb.proactive:programming-extension-amqp:${programmingVersion}"
         compile "org.objectweb.proactive:programming-extension-pnp:${programmingVersion}"
     }
+    
+    task stub(type: StubTask) {
+        classes = [
+                'org.ow2.proactive.tests.performance.rm.RMTestListener',
+                'org.ow2.proactive.tests.performance.scheduler.SchedulerTestListener',
+        ]
+    }
 }
 
 configurations {

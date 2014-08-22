@@ -38,8 +38,6 @@ package org.ow2.proactive.tests.performance.jmeter.scheduler;
 
 import java.io.Serializable;
 
-import org.apache.jmeter.protocol.java.sampler.JavaSamplerContext;
-import org.apache.jmeter.samplers.SampleResult;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.job.JobEnvironment;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -58,6 +56,8 @@ import org.ow2.proactive.tests.performance.scheduler.SchedulerEventsMonitor;
 import org.ow2.proactive.tests.performance.scheduler.SchedulerTestListener;
 import org.ow2.proactive.tests.performance.scheduler.SchedulerWaitCondition;
 import org.ow2.proactive.tests.performance.scheduler.StartTaskWaitContition;
+import org.apache.jmeter.protocol.java.sampler.JavaSamplerContext;
+import org.apache.jmeter.samplers.SampleResult;
 
 
 /**
@@ -177,8 +177,9 @@ public class SubmitAndKillSchedulerClient extends BaseJMeterSchedulerClient {
 
     static Task createNativeSleepingTask(String testsSourcePath) {
         NativeTask task = new NativeTask();
-        task.setCommandLine(new String[] { testsSourcePath +
-            "/org/ow2/proactive/tests/performance/jmeter/scheduler/sleep_forever_nativeTask.sh" });
+        task
+                .setCommandLine(new String[] { testsSourcePath +
+                    "/main/resources/org/ow2/proactive/tests/performance/jmeter/scheduler/sleep_forever_nativeTask.sh" });
         task.setDescription("Test native task, sleeps forever");
         return task;
     }

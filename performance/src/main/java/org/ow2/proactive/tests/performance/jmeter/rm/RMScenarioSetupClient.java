@@ -39,9 +39,6 @@ package org.ow2.proactive.tests.performance.jmeter.rm;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.jmeter.config.Arguments;
-import org.apache.jmeter.protocol.java.sampler.JavaSamplerContext;
-import org.apache.jmeter.samplers.SampleResult;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.resourcemanager.common.event.RMEvent;
@@ -53,6 +50,9 @@ import org.ow2.proactive.tests.performance.jmeter.BaseJMeterClient;
 import org.ow2.proactive.tests.performance.jmeter.JVMKillerThread;
 import org.ow2.proactive.tests.performance.rm.RMTestListener;
 import org.ow2.proactive.tests.performance.rm.TestRMProxy;
+import org.apache.jmeter.config.Arguments;
+import org.apache.jmeter.protocol.java.sampler.JavaSamplerContext;
+import org.apache.jmeter.samplers.SampleResult;
 
 
 /**
@@ -150,7 +150,7 @@ public class RMScenarioSetupClient extends BaseJMeterClient {
             logInfo("All listeners clients are disconnected");
         }
 
-        JVMKillerThread.startKillerThreadIfNonGUIMode(10000, getLogger());
+        JVMKillerThread.startKillerThreadIfNonGUIMode(1000, getLogger());
     }
 
     @Override

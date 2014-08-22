@@ -41,8 +41,6 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Set;
 
-import org.apache.jmeter.config.Arguments;
-import org.apache.jmeter.protocol.java.sampler.JavaSamplerContext;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.CLIInfrastructure;
@@ -50,6 +48,8 @@ import org.ow2.proactive.resourcemanager.nodesource.policy.AccessType;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.tests.performance.utils.TestFileUtils;
 import org.ow2.proactive.utils.FileToBytesConverter;
+import org.apache.jmeter.config.Arguments;
+import org.apache.jmeter.protocol.java.sampler.JavaSamplerContext;
 
 
 /**
@@ -77,7 +77,7 @@ public class CLIInfrastructureNodeSourceCreateClient extends BaseNodeSourceCreat
 
     private byte[] defaultDeploymentScript;
 
-    private byte[] defaultRemovalScript;
+    private String defaultRemovalScript;
 
     @Override
     public Arguments getDefaultParameters() {
@@ -98,7 +98,7 @@ public class CLIInfrastructureNodeSourceCreateClient extends BaseNodeSourceCreat
             String schedulingPath = env.getSchedulingFolder().getRootDirPath();
             String nodeJavaOptions = getNodeJavaOptions(context);
             defaultDeploymentScript = createDefaultDeploymentScript(javaPath, nodeJavaOptions, schedulingPath);
-            defaultRemovalScript = "#!/bin/bash\n".getBytes();
+            defaultRemovalScript = "#!/bin/bash\npkill -f \"NODE_SOURCE_NAME\"";
         }
     }
 
@@ -122,7 +122,7 @@ public class CLIInfrastructureNodeSourceCreateClient extends BaseNodeSourceCreat
 
         if (useDefaultScripts) {
             deploymentScript = defaultDeploymentScript;
-            removalScript = defaultRemovalScript;
+            removalScript = defaultRemovalScript.replace("NODE_SOURCE_NAME", nodeSourceName).getBytes();
         } else {
             String deploymentScriptPath = getRequiredParameter(context, PARAM_CLI_DEPLOYMENT_SCRIPT);
             deploymentScript = FileToBytesConverter.convertFileToByteArray(new File(deploymentScriptPath));

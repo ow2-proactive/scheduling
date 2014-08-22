@@ -39,9 +39,6 @@ package org.ow2.proactive.tests.performance.jmeter.scheduler;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.jmeter.config.Arguments;
-import org.apache.jmeter.protocol.java.sampler.JavaSamplerContext;
-import org.apache.jmeter.samplers.SampleResult;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
@@ -53,6 +50,9 @@ import org.ow2.proactive.tests.performance.jmeter.BaseJMeterClient;
 import org.ow2.proactive.tests.performance.jmeter.JVMKillerThread;
 import org.ow2.proactive.tests.performance.scheduler.SchedulerTestListener;
 import org.ow2.proactive.tests.performance.scheduler.TestSchedulerProxy;
+import org.apache.jmeter.config.Arguments;
+import org.apache.jmeter.protocol.java.sampler.JavaSamplerContext;
+import org.apache.jmeter.samplers.SampleResult;
 
 
 /**
@@ -164,7 +164,7 @@ public class SchedulerScenarioSetupClient extends BaseJMeterClient {
                 logInfo("All listeners clients are disconnected");
             }
         } finally {
-            JVMKillerThread.startKillerThreadIfNonGUIMode(10000, getLogger());
+            JVMKillerThread.startKillerThreadIfNonGUIMode(1000, getLogger());
         }
     }
 

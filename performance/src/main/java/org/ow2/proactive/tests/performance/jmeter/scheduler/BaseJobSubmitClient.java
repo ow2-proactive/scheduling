@@ -36,9 +36,6 @@
  */
 package org.ow2.proactive.tests.performance.jmeter.scheduler;
 
-import org.apache.jmeter.config.Arguments;
-import org.apache.jmeter.protocol.java.sampler.JavaSamplerContext;
-import org.apache.jmeter.samplers.SampleResult;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
@@ -55,6 +52,9 @@ import org.ow2.proactive.tests.performance.scheduler.SchedulerTestListener;
 import org.ow2.proactive.tests.performance.scheduler.SchedulerWaitCondition;
 import org.ow2.proactive.tests.performance.scheduler.TestSchedulerProxy;
 import org.ow2.proactive.tests.performance.utils.TestUtils;
+import org.apache.jmeter.config.Arguments;
+import org.apache.jmeter.protocol.java.sampler.JavaSamplerContext;
+import org.apache.jmeter.samplers.SampleResult;
 
 
 /**
@@ -198,7 +198,7 @@ public abstract class BaseJobSubmitClient extends BaseJMeterSchedulerClient {
     protected final NativeTask createSimpleNativeTask() {
         NativeTask task = new NativeTask();
         task.setCommandLine(new String[] { testsSourcePath +
-            "/org/ow2/proactive/tests/performance/jmeter/scheduler/nativeTask.sh" });
+            "/main/resources/org/ow2/proactive/tests/performance/jmeter/scheduler/nativeTask.sh" });
         task.setMaxNumberOfExecution(1);
         task.setCancelJobOnError(true);
         return task;

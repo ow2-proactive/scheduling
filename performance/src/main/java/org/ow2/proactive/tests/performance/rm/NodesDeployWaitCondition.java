@@ -65,6 +65,7 @@ public class NodesDeployWaitCondition extends RMWaitCondition {
         if (!sourceName.equals(event.getNodeSource())) {
             return;
         }
+        System.out.println("Event " + event.getEventType() + " " + event.getNodeState());
         addEventLog("Event " + event.getEventType() + " " + event.getNodeState());
         if (!deployedNodes.contains(event.getNodeUrl())) {
             if (event.getEventType().equals(RMEventType.NODE_STATE_CHANGED)) {

@@ -116,6 +116,7 @@ public class TestRMProxy implements ResourceManager {
 
     public BooleanWrapper disconnect() {
         BooleanWrapper r = target.disconnect();
+        PAFuture.waitFor(r);
         PAActiveObject.terminateActiveObject(true);
         return r;
     }

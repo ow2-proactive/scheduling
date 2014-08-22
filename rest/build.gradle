@@ -225,3 +225,16 @@ project(':rest:rest-dataspace-smartproxy') {
     functionalTest.dependsOn rootProject.dist
     clean.dependsOn rootProject.cleanDist
 }
+
+project(':rest:performance') {
+    task extras(type: Copy) {
+        from configurations.runtime
+        into file("$rootDir/performance/apache-jmeter/lib/")
+    }
+    dependencies {
+        compile 'logkit:logkit:2.0'
+        compile 'org.apache.jmeter:ApacheJMeter_java:2.9'
+        compile project(':performance')
+        compile project(':rm:rm-server')
+    }
+}
