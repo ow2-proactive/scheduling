@@ -43,7 +43,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
-import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.RunActive;
@@ -108,6 +107,7 @@ import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.ServerJobAndTaskLogs;
 import org.ow2.proactive.scheduler.util.TaskLogger;
 import org.ow2.proactive.utils.Tools;
+import org.apache.log4j.Logger;
 
 
 /**
@@ -428,7 +428,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
             throw new IllegalArgumentException("Incarnation must be 0 or greater.");
         }
 
-        jlogger.info(jobId, "trying to get the task result, incarnation " + inc);
+        jlogger.debug(jobId, "trying to get the task result, incarnation " + inc);
 
         if (inc < 0) {
             throw new IllegalArgumentException("Incarnation must be 0 or greater.");
