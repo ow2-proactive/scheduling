@@ -5,6 +5,10 @@ import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractJobCommand;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 
+import com.google.common.base.Strings;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 
@@ -15,26 +19,50 @@ public class LiveLogCommand extends AbstractJobCommand {
 
     @Override
     public void execute(ApplicationContext currentContext) throws CLIException {
-        SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
         writeLine(currentContext, "Displaying live log for job %s. Press 'q' to stop.", jobId);
         try {
-            while (true) {
-                String log = scheduler.getLiveLogJob(currentContext.getSessionId(), jobId);
-                writeLine(currentContext, "%s", log.trim());
-                while (currentContext.getDevice().canRead()) {
-                    int c = currentContext.getDevice().read();
-                    if (c != -1 && c == 'q') {
-                        return;
-                    }
-                }
-                try {
-                    TimeUnit.SECONDS.sleep(1);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                }
+            LogReader reader = new LogReader(currentContext);
+            ExecutorService executor = Executors.newSingleThreadExecutor();
+            executor.submit(reader);
+            String line  = readLine(currentContext, "> ");
+            while (Strings.isNullOrEmpty(line) || ! line.trim().equals("q")) {
+                line = readLine(currentContext, "> ");
             }
+            reader.terminate();
+            executor.shutdownNow();
         } catch (Exception e) {
             handleError("An error occurred while displaying live log", e, currentContext);
+        }
+    }
+
+    private class LogReader implements Runnable {
+        private final ApplicationContext currentContext;
+        private volatile boolean terminate = false;
+
+        public LogReader(ApplicationContext currentContext) {
+            this.currentContext = currentContext;
+        }
+
+        public void terminate() {
+            this.terminate =true;
+        }
+
+        @Override
+        public void run() {
+            SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
+            writeLine(currentContext, "Displaying live log for job %s. Press 'q' to stop.", jobId);
+            try {
+                while (!terminate) {
+                    String log = scheduler.getLiveLogJob(currentContext.getSessionId(), jobId);
+                    writeLine(currentContext, "%s", log.trim());
+                    try {
+                        TimeUnit.SECONDS.sleep(1);
+                    } catch (InterruptedException ignorable) {
+                    }
+                }
+            } catch (Exception e) {
+                handleError("An error occurred while displaying live log", e, currentContext);
+            }
         }
     }
 }
