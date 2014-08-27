@@ -410,7 +410,7 @@ public abstract class SelectionManager {
                         logger.warn("Interrupting the selection manager");
                         return matched;
                     } catch (ExecutionException e) {
-                        logger.warn("Ignoring exception in selection script: " +  e.getMessage());
+                        logger.warn("Ignoring exception in selection script: " + e.getMessage());
                     }
                 } else {
                     // no script result was obtained

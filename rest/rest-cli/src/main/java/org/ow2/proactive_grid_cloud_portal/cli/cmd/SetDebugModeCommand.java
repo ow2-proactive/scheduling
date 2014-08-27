@@ -39,6 +39,7 @@ package org.ow2.proactive_grid_cloud_portal.cli.cmd;
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 
+
 public class SetDebugModeCommand extends AbstractCommand implements Command {
 
     public static final String PROP_DEBUG_MODE = "org.ow2.proactive_grid_cloud_portal.cli.cmd.DebugModeCommand.debugMode";

@@ -93,9 +93,9 @@ public class SchedulerStateRestJobLogsTest {
 
     private JobResultImpl createJobResult(String taskOutput, String taskErrput) {
         JobResultImpl jobResult = new JobResultImpl();
-        jobResult.addTaskResult("OneTask",
-          new TaskResultImpl(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("123"), "OneTask", 1, false),
-            "result", new SimpleTaskLogs(taskOutput, taskErrput), 100), false);
+        jobResult.addTaskResult("OneTask", new TaskResultImpl(TaskIdImpl.createTaskId(JobIdImpl
+                .makeJobId("123"), "OneTask", 1, false), "result",
+            new SimpleTaskLogs(taskOutput, taskErrput), 100), false);
         return jobResult;
     }
 }

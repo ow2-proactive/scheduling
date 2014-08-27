@@ -73,7 +73,7 @@ public class TestPauseJobRecover extends FunctionalTest {
     public void pause_resume_recover() throws Throwable {
 
         CommunicationObject communicationObject = PAActiveObject.newActive(CommunicationObject.class,
-          new Object[] { });
+                new Object[] {});
 
         TaskFlowJob job = createJob(PAActiveObject.getUrl(communicationObject));
 
@@ -113,7 +113,7 @@ public class TestPauseJobRecover extends FunctionalTest {
         log("Kill&Restart the scheduler");
 
         SchedulerTHelper.killSchedulerAndNodesAndRestart(new File(SchedulerTHelper.class.getResource(
-          "config/functionalTSchedulerProperties-updateDB.ini").toURI()).getAbsolutePath());
+                "config/functionalTSchedulerProperties-updateDB.ini").toURI()).getAbsolutePath());
 
         log("Resume the job " + jobId);
         SchedulerTHelper.getSchedulerInterface().resumeJob(jobId);
@@ -131,12 +131,12 @@ public class TestPauseJobRecover extends FunctionalTest {
     public void recover_paused_job_with_finished_tasks() throws Throwable {
 
         CommunicationObject controlTask2 = PAActiveObject.newActive(CommunicationObject.class,
-          new Object[] { });
+                new Object[] {});
         CommunicationObject controlTask3 = PAActiveObject.newActive(CommunicationObject.class,
-          new Object[] { });
+                new Object[] {});
 
         TaskFlowJob job = createJob3TasksPauseTask2AndTask3(PAActiveObject.getUrl(controlTask2),
-          PAActiveObject.getUrl(controlTask3));
+                PAActiveObject.getUrl(controlTask3));
 
         log("Submit job");
         JobId jobId = SchedulerTHelper.submitJob(job);
@@ -166,7 +166,7 @@ public class TestPauseJobRecover extends FunctionalTest {
         log("Kill&Restart the scheduler");
 
         SchedulerTHelper.killSchedulerAndNodesAndRestart(new File(SchedulerTHelper.class.getResource(
-          "config/functionalTSchedulerProperties-updateDB.ini").toURI()).getAbsolutePath());
+                "config/functionalTSchedulerProperties-updateDB.ini").toURI()).getAbsolutePath());
 
         log("Resume the job " + jobId);
         SchedulerTHelper.getSchedulerInterface().resumeJob(jobId);
@@ -214,8 +214,7 @@ public class TestPauseJobRecover extends FunctionalTest {
     }
 
     protected TaskFlowJob createJob3TasksPauseTask2AndTask3(String communicationObjectUrlTask2,
-      String communicationObjectUrlTask3
-    ) throws Exception {
+            String communicationObjectUrlTask3) throws Exception {
         TaskFlowJob job = new TaskFlowJob();
 
         JavaTask task1 = new JavaTask();

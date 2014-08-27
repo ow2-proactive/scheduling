@@ -47,6 +47,7 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.client.utils.Zipper;
 
 import com.google.common.io.Files;
 
+
 public class LocalFileSource implements ILocalSource {
 
     private File file;
@@ -55,18 +56,20 @@ public class LocalFileSource implements ILocalSource {
         checkArgument(file.isFile());
         this.file = file;
     }
+
     public LocalFileSource(String path) {
         checkArgument(new File(path).isFile());
         this.file = new File(path);
 
     }
+
     @Override
     public void writeTo(OutputStream outputStream) throws IOException {
-            if (Zipper.isZipFile(file)) {
-                Files.asByteSource(file).copyTo(outputStream);
-            } else {
-                Zipper.GZIP.zip(file, outputStream);
-            }
+        if (Zipper.isZipFile(file)) {
+            Files.asByteSource(file).copyTo(outputStream);
+        } else {
+            Zipper.GZIP.zip(file, outputStream);
+        }
     }
 
     @Override

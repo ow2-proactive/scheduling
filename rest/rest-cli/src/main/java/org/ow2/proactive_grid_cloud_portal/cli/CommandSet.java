@@ -178,21 +178,21 @@ public class CommandSet {
             .description("Exit interactive shell").jsCommand("exit()").commandClass(ExitCommand.class)
             .entry();
 
-    public static final CommandSet.Entry DEBUG = CommandSetEntryBuilder.newInstance().opt("X")
-            .longOpt("debug").description("Print error messages (includes normal stack trace)")
-            .jsCommand("debug(true|false)").commandClass(SetDebugModeCommand.class).entry();
+    public static final CommandSet.Entry DEBUG = CommandSetEntryBuilder.newInstance().opt("X").longOpt(
+            "debug").description("Print error messages (includes normal stack trace)").jsCommand(
+            "debug(true|false)").commandClass(SetDebugModeCommand.class).entry();
 
-    public static final CommandSet.Entry SUBMIT_DESC = CommandSetEntryBuilder.newInstance().opt("s")
-            .longOpt("submit").description("Submit the specified job-description (XML) file").hasArgs(true)
-            .argNames("job-descriptor [var1=value1 var2=value2 ...]")
-            .jsCommand("submit(job-descriptor,[var1=value1,var2=value2,...]")
-            .commandClass(SubmitJobCommand.class).entry();
+    public static final CommandSet.Entry SUBMIT_DESC = CommandSetEntryBuilder.newInstance().opt("s").longOpt(
+            "submit").description("Submit the specified job-description (XML) file").hasArgs(true).argNames(
+            "job-descriptor [var1=value1 var2=value2 ...]").jsCommand(
+            "submit(job-descriptor,[var1=value1,var2=value2,...]").commandClass(SubmitJobCommand.class)
+            .entry();
 
     public static final CommandSet.Entry SUBMIT_ARCH = CommandSetEntryBuilder.newInstance().opt("sa")
-            .longOpt("submitarchive").description("Submit the specified job archive (JAR|ZIP) file")
-            .hasArgs(true).argNames("job-archive [var1=value1 var2=value2 ...]")
-            .jsCommand("submitarchive(job-archive,[var1=value1,var2=value2,...])")
-            .commandClass(SubmitJobCommand.class).entry();
+            .longOpt("submitarchive").description("Submit the specified job archive (JAR|ZIP) file").hasArgs(
+                    true).argNames("job-archive [var1=value1 var2=value2 ...]").jsCommand(
+                    "submitarchive(job-archive,[var1=value1,var2=value2,...])").commandClass(
+                    SubmitJobCommand.class).entry();
 
     public static final CommandSet.Entry SCHED_START = CommandSetEntryBuilder.newInstance().opt("start")
             .longOpt("startscheduler").description("Start the scheduler").jsCommand("start()").commandClass(

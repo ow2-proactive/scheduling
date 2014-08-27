@@ -157,8 +157,8 @@ public class RMStarter {
                         new Object[] { creds, defaultNodesNumber, nodeTimeout, "" },
                         RestartDownNodesPolicy.class.getName(), null);
                 resourceManager.disconnect();
-                logger.info("The resource manager with " + defaultNodesNumber +
-                    " local nodes created on " + auth.getHostURL());
+                logger.info("The resource manager with " + defaultNodesNumber + " local nodes created on " +
+                    auth.getHostURL());
             } else {
                 logger.info("The resource manager created on " + auth.getHostURL());
             }

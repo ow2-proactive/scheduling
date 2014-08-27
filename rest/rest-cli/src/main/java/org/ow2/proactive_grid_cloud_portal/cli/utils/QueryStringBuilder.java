@@ -48,6 +48,7 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicNameValuePair;
 
+
 public class QueryStringBuilder {
 
     private List<NameValuePair> parameters = new ArrayList<NameValuePair>();

@@ -55,7 +55,8 @@ public class PAMRRouterStarter {
             String schedulerHomeFromJarOrCurrentFolder = findSchedulerHome();
             String defaultLog4jConfig = schedulerHomeFromJarOrCurrentFolder + "/config/log/router.properties";
             System.setProperty(CentralPAPropertyRepository.LOG4J.getName(), defaultLog4jConfig);
-            System.setProperty(CentralPAPropertyRepository.PA_HOME.getName(), schedulerHomeFromJarOrCurrentFolder);
+            System.setProperty(CentralPAPropertyRepository.PA_HOME.getName(),
+                    schedulerHomeFromJarOrCurrentFolder);
             PropertyConfigurator.configure(defaultLog4jConfig);
         }
     }

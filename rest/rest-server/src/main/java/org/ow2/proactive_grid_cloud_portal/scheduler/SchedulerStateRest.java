@@ -1184,9 +1184,10 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @GZIP
     @Path("jobs/{jobid}/result/log/all")
     @Produces("application/json")
-    public String jobLogs(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId)
-      throws NotConnectedRestException, UnknownJobRestException, UnknownTaskRestException,
-      PermissionRestException {
+    public String jobLogs(@HeaderParam("sessionid")
+    String sessionId, @PathParam("jobid")
+    String jobId) throws NotConnectedRestException, UnknownJobRestException, UnknownTaskRestException,
+            PermissionRestException {
         try {
             Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/result/log/all");
             JobResult jobResult = s.getJobResult(jobId);
@@ -1542,10 +1543,10 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @Path("{path:submit}")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces("application/json")
-    public JobIdData submit(@HeaderParam("sessionid") String sessionId,
-            @PathParam("path") PathSegment pathSegment, MultipartFormDataInput multipart)
-            throws JobCreationRestException, NotConnectedRestException, PermissionRestException,
-            SubmissionClosedRestException, IOException {
+    public JobIdData submit(@HeaderParam("sessionid")
+    String sessionId, @PathParam("path")
+    PathSegment pathSegment, MultipartFormDataInput multipart) throws JobCreationRestException,
+            NotConnectedRestException, PermissionRestException, SubmissionClosedRestException, IOException {
         try {
             Scheduler s = checkAccess(sessionId, "submit");
 
@@ -1575,8 +1576,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                     isAnArchive = true;
                 }
 
-                MultivaluedMap<String, String> matrixParams = pathSegment
-                        .getMatrixParameters();
+                MultivaluedMap<String, String> matrixParams = pathSegment.getMatrixParameters();
                 if (matrixParams != null && !matrixParams.isEmpty()) {
                     Map<String, String> variables = j.getVariables();
                     for (String key : matrixParams.keySet()) {
@@ -2450,8 +2450,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @Path("/userspace")
     @Produces("application/json")
     @Override
-    public List<String> userspaceURIs(@HeaderParam("sessionid") String sessionId) throws NotConnectedRestException,
-            PermissionRestException {
+    public List<String> userspaceURIs(@HeaderParam("sessionid")
+    String sessionId) throws NotConnectedRestException, PermissionRestException {
         SchedulerProxyUserInterface proxy = checkAccess(sessionId);
         try {
             return proxy.getUserSpaceURIs();

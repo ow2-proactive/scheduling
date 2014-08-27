@@ -134,7 +134,7 @@ public class Log4JTaskLogs implements TaskLogs {
     }
 
     private void appendEventToLogs(LoggingEvent logEvent, StringBuffer logs, Layout logFormat,
-      boolean timeStamp) {
+            boolean timeStamp) {
         if (timeStamp) {
             logs.append(logFormat.format(logEvent));
         } else {

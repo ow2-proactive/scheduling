@@ -93,9 +93,9 @@ public class JavaTaskLauncherForked extends JavaTaskLauncher {
         try {
             String scratchDir = System.getProperty("java.io.tmpdir");
             BaseScratchSpaceConfiguration scratchConf = new BaseScratchSpaceConfiguration((String) null,
-              scratchDir);
+                scratchDir);
             DataSpacesNodes.configureNode(PAActiveObject.getActiveObjectNode(PAActiveObject.getStubOnThis()),
-              scratchConf);
+                    scratchConf);
             this.nodeConfigured = true;
             this.sharedForkerForkedDataspaceUri = sharedForkerForkedDataspaceUri;
         } catch (Throwable t) {

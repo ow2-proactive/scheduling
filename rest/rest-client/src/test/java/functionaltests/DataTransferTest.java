@@ -61,6 +61,7 @@ import org.ow2.proactive_grid_cloud_portal.dataspace.dto.ListFile;
 
 import com.google.common.io.Files;
 
+
 public class DataTransferTest extends AbstractRestFuncTestCase {
 
     private static final int file_size = 100;
@@ -86,7 +87,6 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
         assertTrue(Files.equal(tmpFile, destFile));
     }
 
-
     @Test
     public void test_upload_all_files_in_directory() throws Exception {
         // entire folder
@@ -105,8 +105,10 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
         assertTrue(client.upload(source, dest));
 
         String destRootUri = URI.create(getScheduler().getUserSpaceURIs().get(0)).getPath();
-        assertTrue(Files.equal(tempTextFile, new File(destRootUri, "test_upload_all_files_in_directory/tempFile.txt")));
-        assertTrue(Files.equal(tempFile, new File(destRootUri, "test_upload_all_files_in_directory/tempDir/tempFile.tmp")));
+        assertTrue(Files.equal(tempTextFile, new File(destRootUri,
+            "test_upload_all_files_in_directory/tempFile.txt")));
+        assertTrue(Files.equal(tempFile, new File(destRootUri,
+            "test_upload_all_files_in_directory/tempDir/tempFile.tmp")));
     }
 
     @Test
@@ -149,7 +151,8 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
         assertTrue(client.upload(source, dest));
 
         String destRootUri = URI.create(getScheduler().getUserSpaceURIs().get(0)).getPath();
-        File[] destRootFiles = new File(destRootUri, "test_upload_selected_files_using_filenames").listFiles();
+        File[] destRootFiles = new File(destRootUri, "test_upload_selected_files_using_filenames")
+                .listFiles();
         assertEquals(1, destRootFiles.length);
         assertTrue(Files.equal(tempFile, destRootFiles[0]));
     }

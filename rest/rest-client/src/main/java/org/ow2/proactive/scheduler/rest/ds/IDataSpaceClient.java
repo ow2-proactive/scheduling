@@ -49,11 +49,11 @@ import org.ow2.proactive_grid_cloud_portal.dataspace.dto.ListFile;
 
 import com.sun.msv.datatype.xsd.ListType;
 
+
 public interface IDataSpaceClient {
 
     public enum Dataspace {
-        USER("user"),
-        GLOBAL("global");
+        USER("user"), GLOBAL("global");
 
         private String value;
 
@@ -66,8 +66,8 @@ public interface IDataSpaceClient {
         }
     }
 
-    public boolean download(IRemoteSource source, ILocalDestination destination) throws NotConnectedException,
-            PermissionException;
+    public boolean download(IRemoteSource source, ILocalDestination destination)
+            throws NotConnectedException, PermissionException;
 
     public boolean upload(ILocalSource source, IRemoteDestination destination) throws NotConnectedException,
             PermissionException;
@@ -82,8 +82,7 @@ public interface IDataSpaceClient {
      *             if the user does not have permission to upload the file to
      *             the specified location in the server
      */
-    public ListFile list(IRemoteSource source) throws NotConnectedException,
-            PermissionException;
+    public ListFile list(IRemoteSource source) throws NotConnectedException, PermissionException;
 
     /**
      * Deletes the specified directory or the file from the <i>dataspace</i>.
@@ -94,8 +93,7 @@ public interface IDataSpaceClient {
      *             if the user does not have permission to upload the file to
      *             the specified location in the server
      */
-    public boolean delete(IRemoteSource source) throws NotConnectedException,
-            PermissionException;
+    public boolean delete(IRemoteSource source) throws NotConnectedException, PermissionException;
 
     /**
      * Returns the metadata map of the specified file in the <i>dataspace</i>.
@@ -126,11 +124,13 @@ public interface IDataSpaceClient {
      */
     public RemoteSpace getUserSpace();
 
-
     public interface IRemoteSource {
         public Dataspace getDataspace();
+
         public String getPath();
+
         public List<String> getIncludes();
+
         public List<String> getExcludes();
     }
 
@@ -140,11 +140,13 @@ public interface IDataSpaceClient {
 
     public interface ILocalSource {
         public void writeTo(OutputStream outputStream) throws IOException;
+
         public String getEncoding() throws IOException;
     }
 
     public interface IRemoteDestination {
         public Dataspace getDataspace();
+
         public String getPath();
     }
 

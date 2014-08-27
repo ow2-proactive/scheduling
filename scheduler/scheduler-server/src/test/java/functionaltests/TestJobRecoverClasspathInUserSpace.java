@@ -52,10 +52,11 @@ import static functionaltests.TestPauseJobRecover.createJob;
 
 public class TestJobRecoverClasspathInUserSpace extends FunctionalTest {
 
-    @Test // SCHEDULING-2077
+    @Test
+    // SCHEDULING-2077
     public void run() throws Throwable {
         CommunicationObject controlJobExecution = PAActiveObject.newActive(CommunicationObject.class,
-          new Object[] { });
+                new Object[] {});
 
         TaskFlowJob job = createJob(PAActiveObject.getUrl(controlJobExecution));
         JobEnvironment env = new JobEnvironment();
@@ -67,7 +68,7 @@ public class TestJobRecoverClasspathInUserSpace extends FunctionalTest {
 
         SchedulerTHelper.log("Kill Scheduler");
         SchedulerTHelper.killSchedulerAndNodesAndRestart(new File(SchedulerTHelper.class.getResource(
-          "config/functionalTSchedulerProperties-updateDB.ini").toURI()).getAbsolutePath());
+                "config/functionalTSchedulerProperties-updateDB.ini").toURI()).getAbsolutePath());
 
         SchedulerTHelper.log("Finish job 1");
         controlJobExecution.setCanFinish(true);

@@ -1,4 +1,5 @@
 package org.ow2.proactive_grid_cloud_portal.ds.client;
+
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static com.google.common.base.Throwables.propagate;
 import static com.google.common.base.Throwables.propagateIfInstanceOf;
@@ -65,6 +66,7 @@ import org.ow2.proactive.scheduler.common.util.dsclient.AwaitedJob;
 import org.ow2.proactive.scheduler.common.util.dsclient.AwaitedTask;
 import org.ow2.proactive.scheduler.common.util.dsclient.ISchedulerEventListenerExtended;
 import org.ow2.proactive.scheduler.common.util.dsclient.JobDB;
+
 
 public abstract class AbstractSmartProxy {
 
@@ -192,16 +194,16 @@ public abstract class AbstractSmartProxy {
                         if (tres != null) {
                             logger.debug("Synchonizing task " + tname + " of job " + id);
                             taskStateUpdatedEvent(new NotificationData<TaskInfo>(
-                                    SchedulerEvent.TASK_RUNNING_TO_FINISHED, ts.getTaskInfo()));
+                                SchedulerEvent.TASK_RUNNING_TO_FINISHED, ts.getTaskInfo()));
                         }
                     } catch (NotConnectedException e) {
                         e.printStackTrace();
                     } catch (UnknownJobException e) {
-                        logger.error("Could not retrieve output data for job " + id
-                                + " because this job is not known by the Scheduler. \n ", e);
+                        logger.error("Could not retrieve output data for job " + id +
+                            " because this job is not known by the Scheduler. \n ", e);
                     } catch (UnknownTaskException e) {
-                        logger.error("Could not retrieve output data for task " + tname + " of job " + id
-                                + " because this task is not known by the Scheduler. \n ", e);
+                        logger.error("Could not retrieve output data for task " + tname + " of job " + id +
+                            " because this task is not known by the Scheduler. \n ", e);
                     } catch (Exception e) {
                         // logger.error("Unexpected error while getting the output data for task "
                         // + tname
@@ -210,30 +212,33 @@ public abstract class AbstractSmartProxy {
                 }
             }
             if (js.isFinished()) {
-                jobStateUpdatedEvent(new NotificationData<JobInfo>(SchedulerEvent.JOB_RUNNING_TO_FINISHED,
-                        js.getJobInfo()));
+                jobStateUpdatedEvent(new NotificationData<JobInfo>(SchedulerEvent.JOB_RUNNING_TO_FINISHED, js
+                        .getJobInfo()));
             }
 
         } catch (NotConnectedException e) {
-            logger.error(
-                    "A connection error occured while trying to download output data of Job "
-                            + id
-                            + ". This job will remain in the list of awaited jobs. Another attempt to dowload the output data will be made next time the application is initialized. ",
-                    e);
+            logger
+                    .error(
+                            "A connection error occured while trying to download output data of Job " +
+                                id +
+                                ". This job will remain in the list of awaited jobs. Another attempt to dowload the output data will be made next time the application is initialized. ",
+                            e);
         } catch (UnknownJobException e) {
-            logger.error("Could not retrieve output data for job " + id
-                    + " because this job is not known by the Scheduler. \n ", e);
-            logger.warn("Job  "
-                    + id
-                    + " will be removed from the known job list. The system will not attempt again to retrieve data for this job. You could try to manually copy the data from the location  "
-                    + awaitedJob.getPullURL());
+            logger.error("Could not retrieve output data for job " + id +
+                " because this job is not known by the Scheduler. \n ", e);
+            logger
+                    .warn("Job  " +
+                        id +
+                        " will be removed from the known job list. The system will not attempt again to retrieve data for this job. You could try to manually copy the data from the location  " +
+                        awaitedJob.getPullURL());
             jobDB.removeAwaitedJob(id);
         } catch (PermissionException e) {
-            logger.error(
-                    "Could not retrieve output data for job "
-                            + id
-                            + " because you don't have permmission to access this job. You need to use the same connection credentials you used for submitting the job.  \n Another attempt to dowload the output data for this job will be made next time the application is initialized. ",
-                    e);
+            logger
+                    .error(
+                            "Could not retrieve output data for job " +
+                                id +
+                                " because you don't have permmission to access this job. You need to use the same connection credentials you used for submitting the job.  \n Another attempt to dowload the output data for this job will be made next time the application is initialized. ",
+                            e);
         }
 
     }
@@ -279,8 +284,8 @@ public abstract class AbstractSmartProxy {
         }
 
         AwaitedJob awaitedJob = new AwaitedJob(id.toString(), localInputFolderPath, job.getInputSpace(),
-                pushUrlUpdate, localOutputFolderPath, job.getOutputSpace(), pullUrlUpdate,
-                isolateTaskOutputs, automaticTransfer, awaitedTaskMap);
+            pushUrlUpdate, localOutputFolderPath, job.getOutputSpace(), pullUrlUpdate, isolateTaskOutputs,
+            automaticTransfer, awaitedTaskMap);
         jobDB.putAwaitedJob(id.toString(), awaitedJob);
 
         return id;
@@ -344,8 +349,8 @@ public abstract class AbstractSmartProxy {
         // url
         String outputFolder = "";
 
-        if ((localOutputFolder != null) && (outputSpace_url != null) && (!outputSpace_url.equals(""))
-                && (pull_url != null)) {
+        if ((localOutputFolder != null) && (outputSpace_url != null) && (!outputSpace_url.equals("")) &&
+            (pull_url != null)) {
             if (isolateTaskOutputs) {
                 // at the end we add the [TASKID] pattern without creating the
                 // folder
@@ -361,8 +366,8 @@ public abstract class AbstractSmartProxy {
             createFolder(pull_url_updated);
 
             job.setOutputSpace(outputSpace_url_updated);
-            job.addGenericInformation(GENERIC_INFO_OUTPUT_FOLDER_PROPERTY_NAME,
-                    new File(localOutputFolder).getAbsolutePath());
+            job.addGenericInformation(GENERIC_INFO_OUTPUT_FOLDER_PROPERTY_NAME, new File(localOutputFolder)
+                    .getAbsolutePath());
             job.addGenericInformation(GENERIC_INFO_PULL_URL_PROPERTY_NAME, pull_url_updated);
         }
 
@@ -421,15 +426,15 @@ public abstract class AbstractSmartProxy {
 
         // the input folder, on the remote input space, relative to the root url
         String inputFolder = "";
-        if ((localInputFolder != null) && (inputSpace_url != null) && (!inputSpace_url.equals(""))
-                && (push_url != null)) {
+        if ((localInputFolder != null) && (inputSpace_url != null) && (!inputSpace_url.equals("")) &&
+            (push_url != null)) {
             inputFolder = newFolderName + "/input";
             push_url_updated = push_url + "/" + inputFolder;
             String inputSpace_url_updated = inputSpace_url + "/" + inputFolder;
             createFolder(push_url_updated);
             job.setInputSpace(inputSpace_url_updated);
-            job.addGenericInformation(GENERIC_INFO_INPUT_FOLDER_PROPERTY_NAME,
-                    new File(localInputFolder).getAbsolutePath());
+            job.addGenericInformation(GENERIC_INFO_INPUT_FOLDER_PROPERTY_NAME, new File(localInputFolder)
+                    .getAbsolutePath());
 
             job.addGenericInformation(GENERIC_INFO_PUSH_URL_PROPERTY_NAME, push_url_updated);
         }
@@ -492,8 +497,8 @@ public abstract class AbstractSmartProxy {
             throw new IllegalArgumentException("The job " + jobId + " is unknown or has been removed");
         }
         if (awaitedjob.isAutomaticTransfer()) {
-            throw new UnsupportedOperationException("Transfer of input files with job " + jobId
-                    + " is handled automatically.");
+            throw new UnsupportedOperationException("Transfer of input files with job " + jobId +
+                " is handled automatically.");
         }
 
         String localOutFolderPath = null;
@@ -503,8 +508,8 @@ public abstract class AbstractSmartProxy {
             localOutFolderPath = localFolder;
         }
         if (localOutFolderPath == null) {
-            throw new IllegalArgumentException("The job " + awaitedjob.getJobId()
-                    + " does not define an output folder on local machine, please provide an outputFolder.");
+            throw new IllegalArgumentException("The job " + awaitedjob.getJobId() +
+                " does not define an output folder on local machine, please provide an outputFolder.");
         }
         downloadTaskOutputFiles(awaitedjob, jobId, t_name, localOutFolderPath);
     }
@@ -617,26 +622,26 @@ public abstract class AbstractSmartProxy {
 
         JobStatus status = ((NotificationData<JobInfo>) notification).getData().getStatus();
         switch (status) {
-        case KILLED: {
-            logger.debug("The job " + id + "has been killed.");
-            jobDB.removeAwaitedJob(id.toString());
-            break;
-        }
-        case FINISHED: {
-            logger.debug("The job " + id + " is finished.");
-            // removeAwaitedJob(id.toString());
-            break;
-        }
-        case CANCELED: {
-            logger.debug("The job " + id + " is canceled.");
-            jobDB.removeAwaitedJob(id.toString());
-            break;
-        }
-        case FAILED: {
-            logger.debug("The job " + id + " is failed.");
-            // removeAwaitedJob(id.toString());
-            break;
-        }
+            case KILLED: {
+                logger.debug("The job " + id + "has been killed.");
+                jobDB.removeAwaitedJob(id.toString());
+                break;
+            }
+            case FINISHED: {
+                logger.debug("The job " + id + " is finished.");
+                // removeAwaitedJob(id.toString());
+                break;
+            }
+            case CANCELED: {
+                logger.debug("The job " + id + " is canceled.");
+                jobDB.removeAwaitedJob(id.toString());
+                break;
+            }
+            case FAILED: {
+                logger.debug("The job " + id + " is failed.");
+                // removeAwaitedJob(id.toString());
+                break;
+            }
         }
     }
 
@@ -669,43 +674,43 @@ public abstract class AbstractSmartProxy {
         jobDB.putAwaitedJob(id.toString(), aj);
 
         switch (status) {
-        case ABORTED:
-        case NOT_RESTARTED:
-        case NOT_STARTED:
-        case SKIPPED: {
-            logger.debug("The task " + tname + " from job " + id
-                    + " couldn't start. No data will be transfered");
-            jobDB.removeAwaitedTask(id.toString(), tname);
-            break;
-        }
-        case FINISHED: {
-            logger.debug("The task " + tname + " from job " + id + " is finished.");
-            if (aj.isAutomaticTransfer()) {
-                logger.debug("Transferring data for finished task " + tname + " from job " + id);
-                try {
-                    downloadTaskOutputFiles(aj, id.toString(), tname, aj.getLocalOutputFolder());
-                } catch (FileSystemException e) {
-                    logger.error("Error while handling data for finished task " + tname + " for job " + id
-                            + ", task will be removed");
-                    jobDB.removeAwaitedTask(id.toString(), tname);
-                }
+            case ABORTED:
+            case NOT_RESTARTED:
+            case NOT_STARTED:
+            case SKIPPED: {
+                logger.debug("The task " + tname + " from job " + id +
+                    " couldn't start. No data will be transfered");
+                jobDB.removeAwaitedTask(id.toString(), tname);
+                break;
             }
-            break;
-        }
-        case FAULTY: {
-            logger.debug("The task " + tname + " from job " + id + " is faulty.");
-            if (aj.isAutomaticTransfer()) {
-                logger.debug("Transfering data for failed task " + tname + " from job " + id);
-                try {
-                    downloadTaskOutputFiles(aj, id.toString(), tname, aj.getLocalOutputFolder());
-                } catch (FileSystemException e) {
-                    logger.error("Error while handling data for finished task " + tname + " for job " + id
-                            + ", task will be removed");
-                    jobDB.removeAwaitedTask(id.toString(), tname);
+            case FINISHED: {
+                logger.debug("The task " + tname + " from job " + id + " is finished.");
+                if (aj.isAutomaticTransfer()) {
+                    logger.debug("Transferring data for finished task " + tname + " from job " + id);
+                    try {
+                        downloadTaskOutputFiles(aj, id.toString(), tname, aj.getLocalOutputFolder());
+                    } catch (FileSystemException e) {
+                        logger.error("Error while handling data for finished task " + tname + " for job " +
+                            id + ", task will be removed");
+                        jobDB.removeAwaitedTask(id.toString(), tname);
+                    }
                 }
+                break;
             }
-            break;
-        }
+            case FAULTY: {
+                logger.debug("The task " + tname + " from job " + id + " is faulty.");
+                if (aj.isAutomaticTransfer()) {
+                    logger.debug("Transfering data for failed task " + tname + " from job " + id);
+                    try {
+                        downloadTaskOutputFiles(aj, id.toString(), tname, aj.getLocalOutputFolder());
+                    } catch (FileSystemException e) {
+                        logger.error("Error while handling data for finished task " + tname + " for job " +
+                            id + ", task will be removed");
+                        jobDB.removeAwaitedTask(id.toString(), tname);
+                    }
+                }
+                break;
+            }
         }
     }
 

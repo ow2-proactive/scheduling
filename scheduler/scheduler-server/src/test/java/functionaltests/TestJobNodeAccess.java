@@ -60,7 +60,7 @@ import org.ow2.proactive.scheduler.task.forked.JavaForkerExecutable;
  * 
  */
 public class TestJobNodeAccess extends SchedulerConsecutive {
-    
+
     @Rule
     public TemporaryFolder tmpDir = new TemporaryFolder();
 
@@ -101,12 +101,11 @@ public class TestJobNodeAccess extends SchedulerConsecutive {
 
         // Testing fix for SCHEDULING-2094: Provide a way to override the forked jvm log dir via pa.logs.home property
         File customForkedJvmLogsDir = tmpDir.newFolder("customForkedJvmLogs");
-        String nsProps = "-D" + RMNodeStarter.NODE_ACCESS_TOKEN + "=test_token " +
-                "-D" + JavaForkerExecutable.FORKED_LOGS_HOME + "="+customForkedJvmLogsDir.getAbsolutePath();
+        String nsProps = "-D" + RMNodeStarter.NODE_ACCESS_TOKEN + "=test_token " + "-D" +
+            JavaForkerExecutable.FORKED_LOGS_HOME + "=" + customForkedJvmLogsDir.getAbsolutePath();
 
         rm.createNodeSource(nsName, LocalInfrastructure.class.getName(), new Object[] { creds, 1,
-                RMTHelper.defaultNodesTimeout, nsProps },
-                StaticPolicy.class.getName(), null);
+                RMTHelper.defaultNodesTimeout, nsProps }, StaticPolicy.class.getName(), null);
 
         // ns created
         RMTHelper.getDefaultInstance().waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
@@ -121,8 +120,9 @@ public class TestJobNodeAccess extends SchedulerConsecutive {
 
         SchedulerTHelper.waitForEventJobFinished(id2);
 
-        Assert.assertEquals("The fix for SCHEDULING-2094 is broken, it seems the "
-                + JavaForkerExecutable.FORKED_LOGS_HOME + " property was not used by the " +nsName+ " node", 1, customForkedJvmLogsDir.list().length);
+        Assert.assertEquals("The fix for SCHEDULING-2094 is broken, it seems the " +
+            JavaForkerExecutable.FORKED_LOGS_HOME + " property was not used by the " + nsName + " node", 1,
+                customForkedJvmLogsDir.list().length);
 
         rm.removeNodeSource(nsName, true);
 

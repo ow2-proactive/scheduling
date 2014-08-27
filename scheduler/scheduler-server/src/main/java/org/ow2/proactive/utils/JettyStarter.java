@@ -110,7 +110,7 @@ public class JettyStarter {
         if (httpsEnabled) {
             SslContextFactory httpsConfiguration = new SslContextFactory();
             httpsConfiguration.setKeyStorePath(absolutePathOrRelativeToSchedulerHome(properties
-              .getProperty("web.https.keystore")));
+                    .getProperty("web.https.keystore")));
             httpsConfiguration.setKeyStorePassword(properties.getProperty("web.https.keystore.password"));
             SslSelectChannelConnector ssl = new SslSelectChannelConnector(httpsConfiguration);
             ssl.setPort(restPort);
@@ -137,9 +137,8 @@ public class JettyStarter {
                 }
             }
         } catch (BindException bindException) {
-            logger.error(
-              "Failed to start web modules (REST API, portals), port " + restPort + " is already used",
-              bindException);
+            logger.error("Failed to start web modules (REST API, portals), port " + restPort +
+                " is already used", bindException);
             System.exit(-1);
         } catch (Exception e) {
             logger.error("Failed to start web modules (REST API, portals)", e);
@@ -148,7 +147,7 @@ public class JettyStarter {
     }
 
     private static void printDeployedApplications(Server server, String schedulerHost, int restPort,
-      String httpProtocol) {
+            String httpProtocol) {
         HandlerList handlerList = (HandlerList) server.getHandler();
         if (handlerList.getHandlers() != null) {
             for (Handler handler : handlerList.getHandlers()) {
@@ -156,17 +155,16 @@ public class JettyStarter {
                 Throwable startException = webAppContext.getUnavailableException();
                 if (startException == null) {
                     if (!"/".equals(webAppContext.getContextPath())) {
-                        logger.info("The web application " + webAppContext.getContextPath() +
-                          " created on " + httpProtocol + "://" + schedulerHost + ":" + restPort +
-                          webAppContext.getContextPath());
+                        logger.info("The web application " + webAppContext.getContextPath() + " created on " +
+                            httpProtocol + "://" + schedulerHost + ":" + restPort +
+                            webAppContext.getContextPath());
                     }
                 } else {
-                    logger.warn("Failed to start context " + webAppContext.getContextPath(),
-                      startException);
+                    logger.warn("Failed to start context " + webAppContext.getContextPath(), startException);
                 }
             }
-            logger.info(
-              "*** Get started at " + httpProtocol + "://" + schedulerHost + ":" + restPort + " ***");
+            logger.info("*** Get started at " + httpProtocol + "://" + schedulerHost + ":" + restPort +
+                " ***");
         }
     }
 

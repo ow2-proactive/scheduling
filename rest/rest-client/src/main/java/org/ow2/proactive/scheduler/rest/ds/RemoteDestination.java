@@ -38,6 +38,7 @@ package org.ow2.proactive.scheduler.rest.ds;
 
 import org.ow2.proactive.scheduler.rest.ds.IDataSpaceClient.Dataspace;
 
+
 public class RemoteDestination implements IDataSpaceClient.IRemoteDestination {
 
     private Dataspace dataspace;

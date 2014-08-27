@@ -46,6 +46,7 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.client.utils.Zipper;
 import com.google.common.base.Strings;
 import com.google.common.io.Files;
 
+
 public class LocalDestination implements ILocalDestination {
     private File dest;
 

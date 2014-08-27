@@ -77,8 +77,7 @@ public class AbstractEventsMonitor<T extends AbstractWaitCondition> {
                 // System.out.println("All events:\n" + waitCondition.getEventsLog());
 
                 if (stopWait) {
-                    String message = "Done waiting, all events:\n" +
-                      waitCondition.getEventsLog();
+                    String message = "Done waiting, all events:\n" + waitCondition.getEventsLog();
                     if (logger != null) {
                         logger.error(message);
                     } else {

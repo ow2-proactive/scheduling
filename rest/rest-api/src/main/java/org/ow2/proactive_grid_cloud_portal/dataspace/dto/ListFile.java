@@ -40,7 +40,8 @@ import java.util.List;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
-@JsonSerialize(include=JsonSerialize.Inclusion.NON_EMPTY)
+
+@JsonSerialize(include = JsonSerialize.Inclusion.NON_EMPTY)
 public class ListFile {
     private List<String> directories;
     private List<String> files;
@@ -48,12 +49,15 @@ public class ListFile {
     public List<String> getDirectories() {
         return directories;
     }
+
     public void setDirectories(List<String> directories) {
         this.directories = directories;
     }
+
     public List<String> getFiles() {
         return files;
     }
+
     public void setFiles(List<String> files) {
         this.files = files;
     }

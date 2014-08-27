@@ -373,8 +373,10 @@ public interface SchedulerRestInterface {
     @GZIP
     @Path("jobs/{jobid}/result/log/all")
     @Produces("application/json")
-    public String jobLogs(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId)
-      throws NotConnectedRestException, UnknownJobRestException, UnknownTaskRestException, PermissionRestException;
+    public String jobLogs(@HeaderParam("sessionid")
+    String sessionId, @PathParam("jobid")
+    String jobId) throws NotConnectedRestException, UnknownJobRestException, UnknownTaskRestException,
+            PermissionRestException;
 
     /**
      * Return the task state of the task <code>taskname</code> of the job <code>jobId</code> 
@@ -594,10 +596,10 @@ public interface SchedulerRestInterface {
     @Path("{path:submit}")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces("application/json")
-    public JobIdData submit(@HeaderParam("sessionid") String sessionId,
-            @PathParam("path") PathSegment pathSegment, MultipartFormDataInput multipart)
-            throws JobCreationRestException, NotConnectedRestException, PermissionRestException,
-            SubmissionClosedRestException, IOException;
+    public JobIdData submit(@HeaderParam("sessionid")
+    String sessionId, @PathParam("path")
+    PathSegment pathSegment, MultipartFormDataInput multipart) throws JobCreationRestException,
+            NotConnectedRestException, PermissionRestException, SubmissionClosedRestException, IOException;
 
     /**
      * Pushes a file from the local file system into the given DataSpace
@@ -872,8 +874,8 @@ public interface SchedulerRestInterface {
     @GET
     @Path("userspace")
     @Produces("application/json")
-    public List<String> userspaceURIs(@HeaderParam("sessionid") String sessionId)
-            throws NotConnectedRestException, PermissionRestException;
+    public List<String> userspaceURIs(@HeaderParam("sessionid")
+    String sessionId) throws NotConnectedRestException, PermissionRestException;
 
     /**
      * Users having jobs in the scheduler

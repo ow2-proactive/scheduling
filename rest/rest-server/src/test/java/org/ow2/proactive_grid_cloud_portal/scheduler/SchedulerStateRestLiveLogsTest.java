@@ -73,6 +73,7 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
+
 public class SchedulerStateRestLiveLogsTest extends RestTestServer {
 
     private SchedulerRestInterface client;

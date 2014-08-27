@@ -150,7 +150,8 @@ public class RMNodeUpdater {
         return false;
     }
 
-    public static void main(String[] args) throws IOException, InterruptedException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    public static void main(String[] args) throws IOException, InterruptedException, ClassNotFoundException,
+            NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         makeNodeUpToDate();
 
         if (System.getProperty(ONE_JAR_JAR_PATH) == null) {

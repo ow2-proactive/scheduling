@@ -325,8 +325,8 @@ public class StringUtility {
 
     public static String taskResultAsString(String id,
             org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskResultData taskResult) {
-        return String.format("%s result: %s", id,
-          ObjectUtility.object(taskResult.getSerializedValue()).toString());
+        return String.format("%s result: %s", id, ObjectUtility.object(taskResult.getSerializedValue())
+                .toString());
     }
 
     public static String statsAsString(Map<String, String> stats) {

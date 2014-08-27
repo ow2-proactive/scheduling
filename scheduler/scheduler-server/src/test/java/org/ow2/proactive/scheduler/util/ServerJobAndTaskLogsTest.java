@@ -23,6 +23,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
+
 public class ServerJobAndTaskLogsTest {
     @Rule
     public TemporaryFolder fakeSchedulerHome = new TemporaryFolder();
@@ -34,8 +35,9 @@ public class ServerJobAndTaskLogsTest {
 
     @Before
     public void setUp() {
-        PASchedulerProperties.SCHEDULER_JOB_LOGS_LOCATION.updateProperty(
-                fakeSchedulerHome.getRoot().getAbsolutePath() + File.separator + "logs");
+        PASchedulerProperties.SCHEDULER_JOB_LOGS_LOCATION.updateProperty(fakeSchedulerHome.getRoot()
+                .getAbsolutePath() +
+            File.separator + "logs");
         // set a very small limit so that only 1 line would fit
         PASchedulerProperties.SCHEDULER_JOB_LOGS_MAX_SIZE.updateProperty("10");
 
@@ -97,14 +99,18 @@ public class ServerJobAndTaskLogsTest {
     }
 
     private void checkContains(JobId jobId, TaskId taskId, String word) {
-        assertThat(ServerJobAndTaskLogs.getJobLog(jobId, Collections.singleton(taskId)), containsString(word + " job log"));
-        assertThat(ServerJobAndTaskLogs.getJobLog(jobId, Collections.singleton(taskId)), containsString(word + " task log"));
+        assertThat(ServerJobAndTaskLogs.getJobLog(jobId, Collections.singleton(taskId)), containsString(word +
+            " job log"));
+        assertThat(ServerJobAndTaskLogs.getJobLog(jobId, Collections.singleton(taskId)), containsString(word +
+            " task log"));
         assertThat(ServerJobAndTaskLogs.getTaskLog(taskId), containsString(word + " task log"));
     }
 
     private void checkDoesNotContain(JobId jobId, TaskId taskId, String word) {
-        assertThat(ServerJobAndTaskLogs.getJobLog(jobId, Collections.singleton(taskId)), not(containsString(word + " job log")));
-        assertThat(ServerJobAndTaskLogs.getJobLog(jobId, Collections.singleton(taskId)), not(containsString(word + " task log")));
+        assertThat(ServerJobAndTaskLogs.getJobLog(jobId, Collections.singleton(taskId)),
+                not(containsString(word + " job log")));
+        assertThat(ServerJobAndTaskLogs.getJobLog(jobId, Collections.singleton(taskId)),
+                not(containsString(word + " task log")));
         assertThat(ServerJobAndTaskLogs.getTaskLog(taskId), not(containsString(word + " task log")));
     }
 

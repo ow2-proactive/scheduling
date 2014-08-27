@@ -23,6 +23,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Closer;
 
+
 public class VFSZipper {
 
     private VFSZipper() {

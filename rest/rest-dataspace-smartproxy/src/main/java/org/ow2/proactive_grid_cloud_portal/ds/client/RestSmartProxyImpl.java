@@ -1,4 +1,3 @@
-
 package org.ow2.proactive_grid_cloud_portal.ds.client;
 
 import static org.ow2.proactive.scheduler.rest.ds.IDataSpaceClient.Dataspace.USER;
@@ -46,6 +45,7 @@ import org.ow2.proactive.scheduler.rest.ds.RemoteDestination;
 import org.ow2.proactive.scheduler.rest.ds.RemoteSource;
 import org.python.google.common.base.Throwables;
 import org.python.google.common.collect.Lists;
+
 
 public class RestSmartProxyImpl extends AbstractSmartProxy implements SchedulerEventListener {
 
@@ -147,7 +147,9 @@ public class RestSmartProxyImpl extends AbstractSmartProxy implements SchedulerE
         }
         String remotePath = inputSpace.substring(userSpace.length() + (userSpace.endsWith("/") ? 0 : 1));
         String jname = job.getName();
-        logger.debug("Pushing files for job " + jname + " from " + localInputFolderPath + " to " + remotePath);
+        logger
+                .debug("Pushing files for job " + jname + " from " + localInputFolderPath + " to " +
+                    remotePath);
         TaskFlowJob tfj = job;
         for (Task t : tfj.getTasks()) {
             logger.debug("Pushing files for task " + t.getName());
@@ -172,12 +174,12 @@ public class RestSmartProxyImpl extends AbstractSmartProxy implements SchedulerE
     }
 
     @Override
-    public void downloadTaskOutputFiles(AwaitedJob awaitedjob, String jobId, String taskName, String localFolder)
-            throws FileSystemException {
+    public void downloadTaskOutputFiles(AwaitedJob awaitedjob, String jobId, String taskName,
+            String localFolder) throws FileSystemException {
         AwaitedTask atask = awaitedjob.getAwaitedTask(taskName);
         if (atask == null) {
-            throw new IllegalArgumentException("The task " + taskName + " does not belong to job " + jobId
-                    + " or has already been removed");
+            throw new IllegalArgumentException("The task " + taskName + " does not belong to job " + jobId +
+                " or has already been removed");
         }
         if (atask.isTransferring()) {
             logger.warn("The task " + taskName + " of job " + jobId + " is already transferring its output");
@@ -284,9 +286,11 @@ public class RestSmartProxyImpl extends AbstractSmartProxy implements SchedulerE
                 logger.error(String.format(
                         "Cannot download output files: job_id=%s, task_name=%s, source=%s, destination=%s",
                         jobId, taskName, sourceFile, localFolder), error);
-                logger.warn(String
-                        .format("[job_id=%s, task_name=%s] will be removed from the known task list. The system will not attempt again to retrieve data for this task. You could try to manually copy the data from %s in userspace.",
-                                jobId, taskName, sourceFile));
+                logger
+                        .warn(String
+                                .format(
+                                        "[job_id=%s, task_name=%s] will be removed from the known task list. The system will not attempt again to retrieve data for this task. You could try to manually copy the data from %s in userspace.",
+                                        jobId, taskName, sourceFile));
                 Iterator<ISchedulerEventListenerExtended> it = eventListeners.iterator();
                 while (it.hasNext()) {
                     ISchedulerEventListenerExtended l = it.next();

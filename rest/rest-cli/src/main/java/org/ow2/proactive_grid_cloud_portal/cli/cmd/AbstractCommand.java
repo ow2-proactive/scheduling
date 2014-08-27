@@ -139,7 +139,6 @@ public abstract class AbstractCommand implements Command {
         }
     }
 
-
     @SuppressWarnings("unchecked")
     protected void handleError(String errorMessage, HttpResponseWrapper response,
             ApplicationContext currentContext) {
@@ -174,8 +173,7 @@ public abstract class AbstractCommand implements Command {
                 .getMessage());
 
         if (debugMode(currentContext)) {
-            writeLine(currentContext, "Stack Track: %s",
-                    stackTraceAsString((cause == null) ? error : cause));
+            writeLine(currentContext, "Stack Track: %s", stackTraceAsString((cause == null) ? error : cause));
         }
     }
 

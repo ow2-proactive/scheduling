@@ -66,7 +66,8 @@ public class ExceptionUtility {
         }
     }
 
-    public static RuntimeException throwNCEOrPE(Exception e) throws NotConnectedException, PermissionException {
+    public static RuntimeException throwNCEOrPE(Exception e) throws NotConnectedException,
+            PermissionException {
         if (e instanceof PermissionRestException) {
             throw new PermissionException(e);
         } else {

@@ -62,8 +62,7 @@ public class TestPauseJob extends FunctionalTest {
     @Test
     public void test() throws Throwable {
 
-        CommunicationObject communicationObject = PAActiveObject.newActive(
-          CommunicationObject.class,
+        CommunicationObject communicationObject = PAActiveObject.newActive(CommunicationObject.class,
                 new Object[] {});
 
         TaskFlowJob job = createJob(PAActiveObject.getUrl(communicationObject));

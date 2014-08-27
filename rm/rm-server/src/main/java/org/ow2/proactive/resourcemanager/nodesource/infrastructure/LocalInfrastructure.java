@@ -103,7 +103,7 @@ public class LocalInfrastructure extends InfrastructureManager {
             // log4j only understands urls
             try {
                 sb.append((new File(rmHome)).toURI().toURL().toString()).append("config").append("/").append(
-                  "log").append("/").append("node.properties");
+                        "log").append("/").append("node.properties");
             } catch (MalformedURLException e) {
                 throw new IllegalStateException(e);
             }
@@ -111,7 +111,7 @@ public class LocalInfrastructure extends InfrastructureManager {
         }
         if (!this.paProperties.contains(CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getName())) {
             paPropList.add(CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getCmdLine() + rmHome +
-              "config" + os.fs + "network" + os.fs + "node.ini");
+                "config" + os.fs + "network" + os.fs + "node.ini");
         }
         if (!this.paProperties.contains(PAResourceManagerProperties.RM_HOME.getKey())) {
             paPropList.add(PAResourceManagerProperties.RM_HOME.getCmdLine() + rmHome);
@@ -143,7 +143,7 @@ public class LocalInfrastructure extends InfrastructureManager {
         try {
             this.isNodeAcquired.put(nodeName, false);
             depNodeURL = this.addDeployingNode(nodeName, obfuscatedCmd, "Node launched locally",
-              this.nodeTimeout);
+                    this.nodeTimeout);
 
             // Deobfuscate the cred value
             Collections.replaceAll(cmd, CommandLineBuilder.OBFUSC, clb.getCredentialsValue());

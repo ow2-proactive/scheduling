@@ -56,9 +56,10 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 
+
 public interface ISchedulerClient extends Scheduler {
 
-	/**
+    /**
      * Initialize this instance.
      *
      * @param url

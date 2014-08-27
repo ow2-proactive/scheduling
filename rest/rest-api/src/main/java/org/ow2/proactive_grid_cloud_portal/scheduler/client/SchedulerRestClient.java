@@ -86,6 +86,7 @@ import com.google.common.collect.Maps;
 import com.google.common.io.Files;
 import com.google.common.net.UrlEscapers;
 
+
 public class SchedulerRestClient {
 
     private SchedulerRestInterface scheduler;
@@ -129,8 +130,8 @@ public class SchedulerRestClient {
                 .append("scheduler/dataspace/").append(space).append(URLEncoder.encode(path, "UTF-8"))
                 .toString();
 
-        ResteasyClient client = new ResteasyClientBuilder().httpEngine(httpEngine)
-                .providerFactory(providerFactory).build();
+        ResteasyClient client = new ResteasyClientBuilder().httpEngine(httpEngine).providerFactory(
+                providerFactory).build();
         ResteasyWebTarget target = client.target(uriTmpl);
 
         MultipartFormDataOutput formData = new MultipartFormDataOutput();
@@ -158,17 +159,16 @@ public class SchedulerRestClient {
         String uriTmpl = (new StringBuilder(restEndpointURL)).append(addSlashIfMissing(restEndpointURL))
                 .append("scheduler/dataspace/").append(space).append(URLEncoder.encode(path, "UTF-8"))
                 .toString();
-        ResteasyClient client = new ResteasyClientBuilder().httpEngine(httpEngine)
-                .providerFactory(providerFactory).build();
+        ResteasyClient client = new ResteasyClientBuilder().httpEngine(httpEngine).providerFactory(
+                providerFactory).build();
         ResteasyWebTarget target = client.target(uriTmpl);
         Response response = target.request().header("sessionid", sessionId).get();
         if (response.getStatus() != HttpURLConnection.HTTP_OK) {
             if (response.getStatus() == HttpURLConnection.HTTP_UNAUTHORIZED) {
                 throw new NotConnectedRestException("User not authenticated or session timeout.");
             } else {
-                throwException(
-                        String.format("Cannot retrieve the file. Status code: %s", response.getStatus()),
-                        response);
+                throwException(String.format("Cannot retrieve the file. Status code: %s", response
+                        .getStatus()), response);
             }
         }
         try {
@@ -193,19 +193,17 @@ public class SchedulerRestClient {
 
     public boolean upload(String sessionId, File file, List<String> includes, List<String> excludes,
             String dataspacePath, final String path) throws Exception {
-        StringBuffer uriTmpl = (new StringBuffer()).append(restEndpointURL)
-                .append(addSlashIfMissing(restEndpointURL)).append("data/").append(dataspacePath).append('/')
-                .append(escapeUrlPathSegment(path));
-        ResteasyClient client = new ResteasyClientBuilder().httpEngine(httpEngine)
-                .providerFactory(providerFactory).build();
+        StringBuffer uriTmpl = (new StringBuffer()).append(restEndpointURL).append(
+                addSlashIfMissing(restEndpointURL)).append("data/").append(dataspacePath).append('/').append(
+                escapeUrlPathSegment(path));
+        ResteasyClient client = new ResteasyClientBuilder().httpEngine(httpEngine).providerFactory(
+                providerFactory).build();
         ResteasyWebTarget target = client.target(uriTmpl.toString());
         Response response = null;
         try {
-            response = target
-                    .request()
-                    .header("sessionid", sessionId)
-                    .put(Entity.entity(new CompressedStreamingOutput(file, includes, excludes), new Variant(
-                            MediaType.APPLICATION_OCTET_STREAM_TYPE, (Locale) null, encoding(file))));
+            response = target.request().header("sessionid", sessionId).put(
+                    Entity.entity(new CompressedStreamingOutput(file, includes, excludes), new Variant(
+                        MediaType.APPLICATION_OCTET_STREAM_TYPE, (Locale) null, encoding(file))));
             if (response.getStatus() != HttpURLConnection.HTTP_CREATED) {
                 if (response.getStatus() == HttpURLConnection.HTTP_UNAUTHORIZED) {
                     throw new NotConnectedRestException("User not authenticated or session timeout.");
@@ -225,25 +223,22 @@ public class SchedulerRestClient {
 
     public boolean upload(String sessionId, StreamingOutput output, String encoding, String dataspace,
             String path) throws Exception {
-        StringBuffer uriTmpl = (new StringBuffer()).append(restEndpointURL)
-                .append(addSlashIfMissing(restEndpointURL)).append("data/").append(dataspace);
-        ResteasyClient client = new ResteasyClientBuilder().httpEngine(httpEngine)
-                .providerFactory(providerFactory).build();
+        StringBuffer uriTmpl = (new StringBuffer()).append(restEndpointURL).append(
+                addSlashIfMissing(restEndpointURL)).append("data/").append(dataspace);
+        ResteasyClient client = new ResteasyClientBuilder().httpEngine(httpEngine).providerFactory(
+                providerFactory).build();
         ResteasyWebTarget target = client.target(uriTmpl.toString()).path(path);
         Response response = null;
         try {
-            response = target
-                    .request()
-                    .header("sessionid", sessionId)
-                    .put(Entity.entity(output, new Variant(MediaType.APPLICATION_OCTET_STREAM_TYPE,
-                            (Locale) null, encoding)));
+            response = target.request().header("sessionid", sessionId).put(
+                    Entity.entity(output, new Variant(MediaType.APPLICATION_OCTET_STREAM_TYPE, (Locale) null,
+                        encoding)));
             if (response.getStatus() != HttpURLConnection.HTTP_CREATED) {
                 if (response.getStatus() == HttpURLConnection.HTTP_UNAUTHORIZED) {
                     throw new NotConnectedRestException("User not authenticated or session timeout.");
                 } else {
-                    throwException(
-                            String.format("File upload failed. Status code: %d" + response.getStatus()),
-                            response);
+                    throwException(String
+                            .format("File upload failed. Status code: %d" + response.getStatus()), response);
                 }
             }
             return true;
@@ -261,11 +256,11 @@ public class SchedulerRestClient {
 
     public boolean download(String sessionId, String dataspacePath, String path, List<String> includes,
             List<String> excludes, File outputFile) throws Exception {
-        StringBuffer uriTmpl = (new StringBuffer()).append(restEndpointURL)
-                .append(addSlashIfMissing(restEndpointURL)).append("data/").append(dataspacePath).append('/');
+        StringBuffer uriTmpl = (new StringBuffer()).append(restEndpointURL).append(
+                addSlashIfMissing(restEndpointURL)).append("data/").append(dataspacePath).append('/');
 
-        ResteasyClient client = new ResteasyClientBuilder().httpEngine(httpEngine)
-                .providerFactory(providerFactory).build();
+        ResteasyClient client = new ResteasyClientBuilder().httpEngine(httpEngine).providerFactory(
+                providerFactory).build();
         ResteasyWebTarget target = client.target(uriTmpl.toString()).path(path);
 
         if (includes != null && !includes.isEmpty()) {
@@ -283,9 +278,8 @@ public class SchedulerRestClient {
                 if (response.getStatus() == HttpURLConnection.HTTP_UNAUTHORIZED) {
                     throw new NotConnectedRestException("User not authenticated or session timeout.");
                 } else {
-                    throwException(
-                            String.format("Cannot retrieve the file. Status code: %d", response.getStatus()),
-                            response);
+                    throwException(String.format("Cannot retrieve the file. Status code: %d", response
+                            .getStatus()), response);
                 }
             }
             if (response.hasEntity()) {
@@ -317,10 +311,10 @@ public class SchedulerRestClient {
 
     public boolean delete(String sessionId, String dataspacePath, String path, List<String> includes,
             List<String> excludes) throws Exception {
-        StringBuffer uriTmpl = (new StringBuffer()).append(restEndpointURL)
-                .append(addSlashIfMissing(restEndpointURL)).append("data/").append(dataspacePath).append('/');
-        ResteasyClient client = new ResteasyClientBuilder().httpEngine(httpEngine)
-                .providerFactory(providerFactory).build();
+        StringBuffer uriTmpl = (new StringBuffer()).append(restEndpointURL).append(
+                addSlashIfMissing(restEndpointURL)).append("data/").append(dataspacePath).append('/');
+        ResteasyClient client = new ResteasyClientBuilder().httpEngine(httpEngine).providerFactory(
+                providerFactory).build();
         ResteasyWebTarget target = client.target(uriTmpl.toString()).path(path);
         if (includes != null && !includes.isEmpty()) {
             target = target.queryParam("includes", includes.toArray(new Object[includes.size()]));
@@ -335,9 +329,8 @@ public class SchedulerRestClient {
                 if (response.getStatus() == HttpURLConnection.HTTP_UNAUTHORIZED) {
                     throw new NotConnectedRestException("User not authenticated or session timeout.");
                 } else {
-                    throwException(
-                            String.format("Cannot delete file(s). Status code: %s", response.getStatus()),
-                            response);
+                    throwException(String.format("Cannot delete file(s). Status code: %s", response
+                            .getStatus()), response);
                 }
             }
             return true;
@@ -349,11 +342,12 @@ public class SchedulerRestClient {
     }
 
     public ListFile list(String sessionId, String dataspacePath, String pathname) throws Exception {
-        StringBuffer uriTmpl = (new StringBuffer()).append(restEndpointURL)
-                .append(addSlashIfMissing(restEndpointURL)).append("data/").append(dataspacePath).append('/');
-        ResteasyClient client = new ResteasyClientBuilder().httpEngine(httpEngine)
-                .providerFactory(providerFactory).build();
-        ResteasyWebTarget target = client.target(uriTmpl.toString()).path(pathname).queryParam("comp", "list");
+        StringBuffer uriTmpl = (new StringBuffer()).append(restEndpointURL).append(
+                addSlashIfMissing(restEndpointURL)).append("data/").append(dataspacePath).append('/');
+        ResteasyClient client = new ResteasyClientBuilder().httpEngine(httpEngine).providerFactory(
+                providerFactory).build();
+        ResteasyWebTarget target = client.target(uriTmpl.toString()).path(pathname)
+                .queryParam("comp", "list");
         Response response = null;
         try {
             response = target.request().header("sessionid", sessionId).get();
@@ -375,11 +369,11 @@ public class SchedulerRestClient {
 
     public Map<String, Object> metadata(String sessionId, String dataspacePath, String pathname)
             throws Exception {
-        StringBuffer uriTmpl = (new StringBuffer()).append(restEndpointURL)
-                .append(addSlashIfMissing(restEndpointURL)).append("data/").append(dataspacePath)
-                .append(escapeUrlPathSegment(pathname));
-        ResteasyClient client = new ResteasyClientBuilder().httpEngine(httpEngine)
-                .providerFactory(providerFactory).build();
+        StringBuffer uriTmpl = (new StringBuffer()).append(restEndpointURL).append(
+                addSlashIfMissing(restEndpointURL)).append("data/").append(dataspacePath).append(
+                escapeUrlPathSegment(pathname));
+        ResteasyClient client = new ResteasyClientBuilder().httpEngine(httpEngine).providerFactory(
+                providerFactory).build();
         ResteasyWebTarget target = client.target(uriTmpl.toString());
         Response response = null;
         try {
@@ -388,9 +382,8 @@ public class SchedulerRestClient {
                 if (response.getStatus() == HttpURLConnection.HTTP_UNAUTHORIZED) {
                     throw new NotConnectedRestException("User not authenticated or session timeout.");
                 } else {
-                    throwException(
-                            String.format("Cannot get metadata from %s in %s.", pathname, dataspacePath),
-                            response);
+                    throwException(String.format("Cannot get metadata from %s in %s.", pathname,
+                            dataspacePath), response);
                 }
             }
             MultivaluedMap<String, Object> headers = response.getHeaders();
@@ -406,11 +399,12 @@ public class SchedulerRestClient {
         }
     }
 
-    private JobIdData submit(String sessionId, InputStream job, MediaType mediaType, Map<String,String> variables) throws Exception {
+    private JobIdData submit(String sessionId, InputStream job, MediaType mediaType,
+            Map<String, String> variables) throws Exception {
         String uriTmpl = restEndpointURL + addSlashIfMissing(restEndpointURL) + "scheduler/submit";
 
-        ResteasyClient client = new ResteasyClientBuilder().httpEngine(httpEngine)
-                .providerFactory(providerFactory).build();
+        ResteasyClient client = new ResteasyClientBuilder().httpEngine(httpEngine).providerFactory(
+                providerFactory).build();
         ResteasyWebTarget target = client.target(uriTmpl);
         if (variables != null) {
             for (String key : variables.keySet()) {
@@ -527,8 +521,9 @@ public class SchedulerRestClient {
         }
     }
 
-    private static Exception rebuildServerSideException(ExceptionToJson json) throws IllegalArgumentException,
-            InstantiationException, IllegalAccessException, InvocationTargetException {
+    private static Exception rebuildServerSideException(ExceptionToJson json)
+            throws IllegalArgumentException, InstantiationException, IllegalAccessException,
+            InvocationTargetException {
         Throwable serverException = json.getException();
         String exceptionClassName = json.getExceptionClass();
         String errMsg = json.getErrorMessage();

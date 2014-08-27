@@ -56,20 +56,21 @@ public class TestAddRemove {
 
     public static void main(String[] args) throws Exception {
 
-        System.setProperty("java.security.policy", "/home/ybonnaffe/src/build/dist/scheduling/performance/src/main/resources/config/grant.all.java.policy");
+        System
+                .setProperty("java.security.policy",
+                        "/home/ybonnaffe/src/build/dist/scheduling/performance/src/main/resources/config/grant.all.java.policy");
         Policy.getPolicy().refresh();
 
-        TestRMProxy rmProxy = PAActiveObject.newActive(TestRMProxy.class, new Object[] { });
-        rmProxy.init("pnp://jily:64738",
-          new CredData(CredData.parseLogin("admin"), CredData.parseDomain("admin"), "admin"));
+        TestRMProxy rmProxy = PAActiveObject.newActive(TestRMProxy.class, new Object[] {});
+        rmProxy.init("pnp://jily:64738", new CredData(CredData.parseLogin("admin"), CredData
+                .parseDomain("admin"), "admin"));
 
         RMEventsMonitor eventsMonitor = new RMEventsMonitor();
         RMTestListener listener = RMTestListener.createRMTestListener(eventsMonitor);
         rmProxy.syncAddEventListener(listener);
 
-
         StringBuilder hostsListBuilder = new StringBuilder();
-        for (String hostName : new String[]{"localhost"}) {
+        for (String hostName : new String[] { "localhost" }) {
             hostsListBuilder.append(String.format("%s %d\n", hostName, 1));
         }
 
@@ -82,21 +83,22 @@ public class TestAddRemove {
         String javaOptions = " -Dproactive.home=" + schedulingPath + " -Dpa.rm.home=" + schedulingPath;
 
         byte[] creds = FileToBytesConverter.convertFileToByteArray(new File(schedulingPath +
-          "/config/authentication/rm.cred"));
+            "/config/authentication/rm.cred"));
 
         String javaPath = "/home/ybonnaffe/Downloads/ProActiveWorkflowsScheduling-6.0.0-RC1/jre/bin/java";
-        Object[] infrastructureParameters = new Object[] { hostsList.getBytes(), timeout, attempt, 22, "ybonnaffe", "i1uqzi82&", "".getBytes(), "".getBytes(),
-          javaPath, schedulingPath, targetOs, javaOptions };
+        Object[] infrastructureParameters = new Object[] { hostsList.getBytes(), timeout, attempt, 22,
+                "ybonnaffe", "i1uqzi82&", "".getBytes(), "".getBytes(), javaPath, schedulingPath, targetOs,
+                javaOptions };
 
         Object[] policyParameters = new Object[] { "users=dummyUser", AccessType.ME.toString() };
 
         BooleanWrapper result = rmProxy.createNodeSource("TestSSH", SSHInfrastructureV2.class.getName(),
-          infrastructureParameters, StaticPolicy.class.getName(), policyParameters);
+                infrastructureParameters, StaticPolicy.class.getName(), policyParameters);
 
         System.out.println("Node source created " + result);
 
         RMWaitCondition nodesDeployWaitCondition = eventsMonitor
-          .addWaitCondition(new NodesDeployWaitCondition("TestSSH", 1));
+                .addWaitCondition(new NodesDeployWaitCondition("TestSSH", 1));
 
         eventsMonitor.waitFor(nodesDeployWaitCondition, 5 * 60000, null);
 
@@ -105,7 +107,6 @@ public class TestAddRemove {
         BooleanWrapper removedRequest = rmProxy.removeNodeSource("TestSSH", true);
 
         System.out.println("Node source Removed " + removedRequest);
-
 
         boolean booleanValue = rmProxy.disconnect().getBooleanValue();
 

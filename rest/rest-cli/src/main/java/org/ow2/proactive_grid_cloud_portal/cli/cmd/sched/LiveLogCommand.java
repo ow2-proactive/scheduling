@@ -24,8 +24,8 @@ public class LiveLogCommand extends AbstractJobCommand {
             LogReader reader = new LogReader(currentContext);
             ExecutorService executor = Executors.newSingleThreadExecutor();
             executor.submit(reader);
-            String line  = readLine(currentContext, "> ");
-            while (Strings.isNullOrEmpty(line) || ! line.trim().equals("q")) {
+            String line = readLine(currentContext, "> ");
+            while (Strings.isNullOrEmpty(line) || !line.trim().equals("q")) {
                 line = readLine(currentContext, "> ");
             }
             reader.terminate();
@@ -44,7 +44,7 @@ public class LiveLogCommand extends AbstractJobCommand {
         }
 
         public void terminate() {
-            this.terminate =true;
+            this.terminate = true;
         }
 
         @Override

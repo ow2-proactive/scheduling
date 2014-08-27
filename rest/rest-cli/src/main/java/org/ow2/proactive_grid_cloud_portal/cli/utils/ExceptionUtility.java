@@ -42,6 +42,7 @@ import java.io.StringWriter;
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.SetDebugModeCommand;
 
+
 public class ExceptionUtility {
 
     private ExceptionUtility() {

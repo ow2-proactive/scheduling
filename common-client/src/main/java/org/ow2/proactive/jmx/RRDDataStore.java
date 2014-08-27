@@ -81,7 +81,7 @@ public class RRDDataStore extends Thread {
      * @throws IOException is thrown when the data base exists but cannot be read
      */
     public RRDDataStore(StandardMBean mbean, String dataBaseFilePath, int step, Logger logger)
-      throws IOException {
+            throws IOException {
 
         this(dataBaseFilePath, step, logger);
         this.mbean = mbean;
@@ -89,7 +89,7 @@ public class RRDDataStore extends Thread {
         for (MBeanAttributeInfo attrInfo : mbean.getMBeanInfo().getAttributes()) {
             try {
                 if (attrInfo.isReadable() &&
-                  mbean.getClass().getMethod("get" + attrInfo.getName()).getAnnotation(Chronological.class) != null) {
+                    mbean.getClass().getMethod("get" + attrInfo.getName()).getAnnotation(Chronological.class) != null) {
 
                     String sourceName = attrInfo.getName();
                     if (sourceName.length() > 20) {
@@ -181,7 +181,7 @@ public class RRDDataStore extends Thread {
                             Object attrValue = mbean.getAttribute(dataSources.get(dataSource));
                             sample.setValue(dataSource, Double.parseDouble(attrValue.toString()));
                             logger.debug(System.currentTimeMillis() / 1000 + " sampling: " + dataSource +
-                              " " + Double.parseDouble(attrValue.toString()));
+                                " " + Double.parseDouble(attrValue.toString()));
                         }
 
                         sample.setTime(System.currentTimeMillis() / 1000);

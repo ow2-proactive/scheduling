@@ -163,7 +163,8 @@ public class RMFactory {
             Logger selectionLogger = Logger.getLogger(SelectionManager.class.getPackage().getName());
             MultipleFileAppender appender = new MultipleFileAppender();
             if (PAResourceManagerProperties.RM_SELECTION_LOGS_MAX_SIZE.isSet()) {
-                appender.setMaxFileSize(PAResourceManagerProperties.RM_SELECTION_LOGS_MAX_SIZE.getValueAsString());
+                appender.setMaxFileSize(PAResourceManagerProperties.RM_SELECTION_LOGS_MAX_SIZE
+                        .getValueAsString());
             }
             appender.setFilesLocation(logsLocation);
             selectionLogger.addAppender(appender);

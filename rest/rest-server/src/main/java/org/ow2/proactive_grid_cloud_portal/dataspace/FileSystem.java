@@ -64,6 +64,7 @@ import com.google.common.collect.Maps;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Closer;
 
+
 public class FileSystem {
 
     private FileSystemManager fsm;
@@ -104,14 +105,14 @@ public class FileSystem {
         for (FileObject child : fo.getChildren()) {
             FileType type = child.getType();
             switch (type) {
-            case FOLDER:
-                dirList.add(baseName(child));
-                break;
-            case FILE:
-                fileList.add(baseName(child));
-                break;
-            default:
-                throw new RuntimeException("Unknow : " + type);
+                case FOLDER:
+                    dirList.add(baseName(child));
+                    break;
+                case FILE:
+                    fileList.add(baseName(child));
+                    break;
+                default:
+                    throw new RuntimeException("Unknow : " + type);
             }
         }
         list.setDirectories(dirList);
@@ -122,14 +123,14 @@ public class FileSystem {
     public static Map<String, Object> metadata(FileObject fo) throws FileSystemException {
         Map<String, Object> props = Maps.newHashMap();
         switch (fo.getType()) {
-        case FOLDER:
-            fillDirProps(fo, props);
-            break;
-        case FILE:
-            fillFileProps(fo, props);
-            break;
-        default:
-            throw new RuntimeException("Unknown location.");
+            case FOLDER:
+                fillDirProps(fo, props);
+                break;
+            case FILE:
+                fillFileProps(fo, props);
+                break;
+            default:
+                throw new RuntimeException("Unknown location.");
         }
         return props;
     }

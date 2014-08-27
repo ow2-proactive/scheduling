@@ -110,12 +110,12 @@ public final class RMJMXHelper extends AbstractJMXHelper {
             mbs.registerMBean(anonymMBean, name);
 
             String dataBaseName = PAResourceManagerProperties.RM_HOME.getValueAsString() +
-              System.getProperty("file.separator") +
-              PAResourceManagerProperties.RM_RRD_DATABASE_NAME.getValueAsString();
+                System.getProperty("file.separator") +
+                PAResourceManagerProperties.RM_RRD_DATABASE_NAME.getValueAsString();
             FileUtils.forceMkdir(new File(dataBaseName).getParentFile());
 
             setDataStore(new RRDDataStore((StandardMBean) anonymMBean, dataBaseName,
-              PAResourceManagerProperties.RM_RRD_STEP.getValueAsInt(), Logger.getLogger(RMJMXHelper.class)));
+                PAResourceManagerProperties.RM_RRD_STEP.getValueAsInt(), Logger.getLogger(RMJMXHelper.class)));
         } catch (Exception e) {
             LOGGER.error("Unable to register the ResourceManagerRuntimeMBean", e);
         }

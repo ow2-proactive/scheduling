@@ -406,10 +406,9 @@ public class JavaForkerExecutable extends JavaExecutable implements ForkerStarte
     }
 
     private String getLogsHome() {
-        for (String logHome : new String[]{
-            System.getProperty(FORKED_LOGS_HOME),
-            PASchedulerProperties.SCHEDULER_HOME.getValueAsString(),
-            CentralPAPropertyRepository.PA_HOME.getValueAsString()}) {
+        for (String logHome : new String[] { System.getProperty(FORKED_LOGS_HOME),
+                PASchedulerProperties.SCHEDULER_HOME.getValueAsString(),
+                CentralPAPropertyRepository.PA_HOME.getValueAsString() }) {
             if (logHome != null && !logHome.trim().isEmpty()) {
                 return logHome;
             }

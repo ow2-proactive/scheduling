@@ -69,6 +69,7 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskStateData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskUsageData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.UserJobData;
 
+
 public class DataUtility {
 
     private DataUtility() {
@@ -160,8 +161,8 @@ public class DataUtility {
     }
 
     public static TaskUsage taskUsage(TaskUsageData d) {
-        return new TaskUsage(d.getTaskId(), d.getTaskName(), d.getTaskStartTime(), d.getTaskFinishedTime(),
-                d.getTaskExecutionDuration(), d.getTaskNodeNumber());
+        return new TaskUsage(d.getTaskId(), d.getTaskName(), d.getTaskStartTime(), d.getTaskFinishedTime(), d
+                .getTaskExecutionDuration(), d.getTaskNodeNumber());
     }
 
     public static List<JobInfo> toJobInfos(List<UserJobData> dataList) {

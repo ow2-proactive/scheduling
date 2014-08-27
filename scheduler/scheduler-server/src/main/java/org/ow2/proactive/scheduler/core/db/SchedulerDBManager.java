@@ -748,7 +748,8 @@ public class SchedulerDBManager {
         return runWithoutTransaction(new SessionWork<InternalJob>() {
             @Override
             public InternalJob executeWork(Session session) {
-                Query jobQuery = session.createQuery("from JobData as job where job.id in (:ids) and job.removedTime = -1");
+                Query jobQuery = session
+                        .createQuery("from JobData as job where job.id in (:ids) and job.removedTime = -1");
                 List<InternalJob> result = new ArrayList<InternalJob>(1);
                 batchLoadJobs(session, false, jobQuery, Collections.singletonList(jobId(id)), result);
                 if (result.isEmpty()) {

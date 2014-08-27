@@ -62,15 +62,14 @@ public class CreateNodeSourceCommand extends AbstractCommand implements Command 
 
     @Override
     public void execute(ApplicationContext currentContext) throws CLIException {
-        QueryStringBuilder infrastructure = currentContext.getProperty(SET_INFRASTRUCTURE, QueryStringBuilder.class);
+        QueryStringBuilder infrastructure = currentContext.getProperty(SET_INFRASTRUCTURE,
+                QueryStringBuilder.class);
         QueryStringBuilder policy = currentContext.getProperty(SET_POLICY, QueryStringBuilder.class);
         if (infrastructure == null) {
-            throw new CLIException(REASON_INVALID_ARGUMENTS,
-                "Infrastructure not specified");
+            throw new CLIException(REASON_INVALID_ARGUMENTS, "Infrastructure not specified");
         }
         if (policy == null) {
-            throw new CLIException(REASON_INVALID_ARGUMENTS,
-                "Policy not specified");
+            throw new CLIException(REASON_INVALID_ARGUMENTS, "Policy not specified");
         }
         if (currentContext.getProperty(SET_NODE_SOURCE, String.class) != null) {
             nodeSource = currentContext.getProperty(SET_NODE_SOURCE, String.class);

@@ -72,6 +72,7 @@ import org.ow2.proactive_grid_cloud_portal.dataspace.dto.ListFile;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
 
+
 public class DataSpaceClient implements IDataSpaceClient {
 
     private String restDataspaceUrl;
@@ -87,6 +88,7 @@ public class DataSpaceClient implements IDataSpaceClient {
         this.sessionId = client.getSession();
         this.httpEngine = new ApacheHttpClient4Engine(HttpUtility.threadSafeClient());
     }
+
     public void init(String restServerUrl, String login, String password) throws Exception {
         ISchedulerClient client = SchedulerClient.createInstance();
         client.init(restServerUrl, login, password);
@@ -112,14 +114,15 @@ public class DataSpaceClient implements IDataSpaceClient {
         ResteasyWebTarget target = client.target(uriTmpl.toString()).path(destination.getPath());
         Response response = null;
         try {
-            response = target.request().header("sessionid", sessionId)
-                    .put(Entity.entity(new StreamingOutput() {
+            response = target.request().header("sessionid", sessionId).put(
+                    Entity.entity(new StreamingOutput() {
                         @Override
                         public void write(OutputStream outputStream) throws IOException,
                                 WebApplicationException {
                             source.writeTo(outputStream);
                         }
-                    }, new Variant(MediaType.APPLICATION_OCTET_STREAM_TYPE, (Locale) null, source.getEncoding())));
+                    }, new Variant(MediaType.APPLICATION_OCTET_STREAM_TYPE, (Locale) null, source
+                            .getEncoding())));
             if (response.getStatus() != HttpURLConnection.HTTP_CREATED) {
                 if (response.getStatus() == HttpURLConnection.HTTP_UNAUTHORIZED) {
                     throw new NotConnectedException("User not authenticated or session timeout.");
@@ -171,8 +174,8 @@ public class DataSpaceClient implements IDataSpaceClient {
                 InputStream is = response.readEntity(InputStream.class);
                 destination.readFrom(is, response.getHeaderString(HttpHeaders.CONTENT_ENCODING));
             } else {
-                throw new RuntimeException(String.format("%s in %s is empty.", source.getDataspace(),
-                        source.getPath()));
+                throw new RuntimeException(String.format("%s in %s is empty.", source.getDataspace(), source
+                        .getPath()));
             }
             return true;
         } catch (IOException ioe) {
@@ -199,8 +202,8 @@ public class DataSpaceClient implements IDataSpaceClient {
         StringBuffer uriTmpl = (new StringBuffer()).append(restDataspaceUrl).append(
                 source.getDataspace().value());
         ResteasyClient client = new ResteasyClientBuilder().httpEngine(httpEngine).build();
-        ResteasyWebTarget target = client.target(uriTmpl.toString()).path(source.getPath())
-                .queryParam("comp", "list");
+        ResteasyWebTarget target = client.target(uriTmpl.toString()).path(source.getPath()).queryParam(
+                "comp", "list");
         Response response = null;
         try {
             response = target.request().header("sessionid", sessionId).get();
@@ -208,8 +211,8 @@ public class DataSpaceClient implements IDataSpaceClient {
                 if (response.getStatus() == HttpURLConnection.HTTP_UNAUTHORIZED) {
                     throw new NotConnectedException("User not authenticated or session timeout.");
                 } else {
-                    throw new RuntimeException(String.format("Cannot list the specified location: %s",
-                            source.getPath()));
+                    throw new RuntimeException(String.format("Cannot list the specified location: %s", source
+                            .getPath()));
                 }
             }
             return response.readEntity(ListFile.class);
@@ -266,14 +269,16 @@ public class DataSpaceClient implements IDataSpaceClient {
                 if (response.getStatus() == HttpURLConnection.HTTP_UNAUTHORIZED) {
                     throw new NotConnectedException("User not authenticated or session timeout.");
                 } else {
-                    throw new RuntimeException(String.format("Cannot get metadata from %s in '%s' dataspace.", source.getPath(),
-                            source.getDataspace()));
+                    throw new RuntimeException(String.format(
+                            "Cannot get metadata from %s in '%s' dataspace.", source.getPath(), source
+                                    .getDataspace()));
                 }
             }
             MultivaluedMap<String, Object> headers = response.getHeaders();
             Map<String, String> metaMap = Maps.newHashMap();
             if (headers.containsKey(HttpHeaders.LAST_MODIFIED)) {
-                metaMap.put(HttpHeaders.LAST_MODIFIED, String.valueOf(headers.getFirst(HttpHeaders.LAST_MODIFIED)));
+                metaMap.put(HttpHeaders.LAST_MODIFIED, String.valueOf(headers
+                        .getFirst(HttpHeaders.LAST_MODIFIED)));
             }
             return metaMap;
         } finally {

@@ -180,8 +180,8 @@ public class StudioRest implements StudioInterface {
     @PUT
     @Path("logout")
     @Produces("application/json")
-    public void logout(@HeaderParam(
-      "sessionid") final String sessionId) throws PermissionRestException, NotConnectedRestException {
+    public void logout(@HeaderParam("sessionid")
+    final String sessionId) throws PermissionRestException, NotConnectedRestException {
         logger.info("logout");
         scheduler().disconnect(sessionId);
     }
@@ -490,10 +490,10 @@ public class StudioRest implements StudioInterface {
     }
 
     @Override
-    public JobIdData submit(@HeaderParam("sessionid") String sessionId,
-            @PathParam("path") PathSegment pathSegment, MultipartFormDataInput multipart)
-            throws JobCreationRestException, NotConnectedRestException, PermissionRestException,
-            SubmissionClosedRestException, IOException {
+    public JobIdData submit(@HeaderParam("sessionid")
+    String sessionId, @PathParam("path")
+    PathSegment pathSegment, MultipartFormDataInput multipart) throws JobCreationRestException,
+            NotConnectedRestException, PermissionRestException, SubmissionClosedRestException, IOException {
         return scheduler().submit(sessionId, pathSegment, multipart);
     }
 

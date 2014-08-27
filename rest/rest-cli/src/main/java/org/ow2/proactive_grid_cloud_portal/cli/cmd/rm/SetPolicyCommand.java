@@ -102,12 +102,12 @@ public class SetPolicyCommand extends AbstractCommand implements Command {
 
             if (pluginView == null) {
                 throw new CLIException(REASON_INVALID_ARGUMENTS, String.format("Unknown policy type: %s",
-                  policyType));
+                        policyType));
             }
             ConfigurableFieldView[] configurableFields = pluginView.getConfigurableFields();
             if (configurableFields.length != policyArgs.length) {
                 throw new CLIException(REASON_INVALID_ARGUMENTS, String.format(
-                  "Invalid number of arguments specified for '%s' type.", policyType));
+                        "Invalid number of arguments specified for '%s' type.", policyType));
             }
 
             QueryStringBuilder queryStringBuilder = new QueryStringBuilder();

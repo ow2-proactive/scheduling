@@ -48,6 +48,7 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.client.utils.Zipper;
 
 import com.google.common.collect.Lists;
 
+
 public class LocalDirSource implements ILocalSource {
     private File source;
     private List<String> includes;

@@ -89,8 +89,8 @@ public interface StudioInterface {
     @PUT
     @Path("logout")
     @Produces("application/json")
-    public void logout(@HeaderParam(
-      "sessionid") final String sessionId) throws PermissionRestException, NotConnectedRestException;
+    public void logout(@HeaderParam("sessionid")
+    final String sessionId) throws PermissionRestException, NotConnectedRestException;
 
     @GET
     @Path("connected")
@@ -187,10 +187,10 @@ public interface StudioInterface {
     @Path("{path:submit}")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces("application/json")
-    public JobIdData submit(@HeaderParam("sessionid") String sessionId,
-            @PathParam("path") PathSegment pathSegment, MultipartFormDataInput multipart)
-            throws JobCreationRestException, NotConnectedRestException, PermissionRestException,
-            SubmissionClosedRestException, IOException;
+    public JobIdData submit(@HeaderParam("sessionid")
+    String sessionId, @PathParam("path")
+    PathSegment pathSegment, MultipartFormDataInput multipart) throws JobCreationRestException,
+            NotConnectedRestException, PermissionRestException, SubmissionClosedRestException, IOException;
 
     @GET
     @Path("visualizations/{id}")

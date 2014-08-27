@@ -63,7 +63,7 @@ public class SSHInfrastructureNodeSourceCreateClient extends BaseNodeSourceCreat
 
     @Override
     protected boolean createNodeSource(String nodeSourceName, Set<String> hostNames, int nodesNumber,
-      String javaPath, String schedulingPath, JavaSamplerContext context) throws Exception {
+            String javaPath, String schedulingPath, JavaSamplerContext context) throws Exception {
         String rmUrl = context.getParameter(RMConnectionParameters.PARAM_RM_URL);
 
         StringBuilder hostsListBuilder = new StringBuilder();
@@ -76,29 +76,29 @@ public class SSHInfrastructureNodeSourceCreateClient extends BaseNodeSourceCreat
         int attempt = 1;
         String sshOptions = "";
         String targetOs = "UNIX";
-        String javaOptions = getNodeJavaOptions(
-          context) + " -Dproactive.home=" + schedulingPath + " -Dpa.rm.home=" + schedulingPath;
+        String javaOptions = getNodeJavaOptions(context) + " -Dproactive.home=" + schedulingPath +
+            " -Dpa.rm.home=" + schedulingPath;
 
         byte[] creds = FileToBytesConverter.convertFileToByteArray(new File(schedulingPath +
-          "/config/authentication/rm.cred"));
+            "/config/authentication/rm.cred"));
 
         ResourceManager rm = getResourceManager();
 
-        byte[] sshKey = FileToBytesConverter.convertFileToByteArray(
-          new File("/home/" + System.getProperty("user.name") + "/.ssh/id_rsa"));
+        byte[] sshKey = FileToBytesConverter.convertFileToByteArray(new File("/home/" +
+            System.getProperty("user.name") + "/.ssh/id_rsa"));
         Object[] infrastructureParameters = new Object[] { hostsList.getBytes(), timeout, attempt, 22,
-          System.getProperty("user.name"), "", sshKey, "".getBytes(),
-          javaPath, schedulingPath, targetOs, javaOptions };
+                System.getProperty("user.name"), "", sshKey, "".getBytes(), javaPath, schedulingPath,
+                targetOs, javaOptions };
 
         Object[] policyParameters = new Object[] { "users=dummyUser", AccessType.ME.toString() };
 
         String message = String.format(
-          "Creating node source, SSH infrastructure, hostsList=%s javaOpts=%s (%s)", hostsList,
-          javaOptions, Thread.currentThread().toString());
+                "Creating node source, SSH infrastructure, hostsList=%s javaOpts=%s (%s)", hostsList,
+                javaOptions, Thread.currentThread().toString());
         logInfo(message);
 
         BooleanWrapper result = rm.createNodeSource(nodeSourceName, SSHInfrastructureV2.class.getName(),
-          infrastructureParameters, StaticPolicy.class.getName(), policyParameters);
+                infrastructureParameters, StaticPolicy.class.getName(), policyParameters);
         return result.getBooleanValue();
     }
 

@@ -105,14 +105,13 @@ public class SetInfrastructureCommand extends AbstractCommand implements Command
             PluginView pluginView = infrastructures.get(infrastructureType);
 
             if (pluginView == null) {
-                throw new CLIException(REASON_INVALID_ARGUMENTS,
-                  String.format("Unknown infrastructure type: %s",
-                    infrastructureType));
+                throw new CLIException(REASON_INVALID_ARGUMENTS, String.format(
+                        "Unknown infrastructure type: %s", infrastructureType));
             }
             ConfigurableFieldView[] configurableFields = pluginView.getConfigurableFields();
             if (configurableFields.length != infrastructureArgs.length) {
                 throw new CLIException(REASON_INVALID_ARGUMENTS, String.format(
-                  "Invalid number of arguments specified for '%s' type.", infrastructureType));
+                        "Invalid number of arguments specified for '%s' type.", infrastructureType));
             }
 
             QueryStringBuilder queryStringBuilder = new QueryStringBuilder();

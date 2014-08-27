@@ -77,6 +77,7 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestExc
 import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
 
+
 @Path("/data/")
 public class RestDataspaceImpl {
     private static final Logger logger = Logger.getLogger(RestDataspaceImpl.class);
@@ -107,10 +108,11 @@ public class RestDataspaceImpl {
      */
     @PUT
     @Path("/{dataspace}/{path-name:.*}")
-    public Response store(@HeaderParam("sessionid") String sessionId,
-            @HeaderParam("Content-Encoding") String encoding, @PathParam("dataspace") String dataspace,
-            @PathParam("path-name") String pathname, InputStream is) throws NotConnectedRestException,
-            PermissionRestException {
+    public Response store(@HeaderParam("sessionid")
+    String sessionId, @HeaderParam("Content-Encoding")
+    String encoding, @PathParam("dataspace")
+    String dataspace, @PathParam("path-name")
+    String pathname, InputStream is) throws NotConnectedRestException, PermissionRestException {
         checkPathParams(dataspace, pathname);
         Session session = checkSessionValidity(sessionId);
         try {
@@ -158,11 +160,14 @@ public class RestDataspaceImpl {
      */
     @GET
     @Path("/{dataspace}/{path-name:.*}")
-    public Response retrieve(@HeaderParam("sessionid") String sessionId,
-            @HeaderParam("Accept-Encoding") String encoding, @PathParam("dataspace") String dataspace,
-            @PathParam("path-name") String pathname, @QueryParam("comp") String component,
-            @QueryParam("includes") List<String> includes, @QueryParam("excludes") List<String> excludes)
-            throws NotConnectedRestException, PermissionRestException {
+    public Response retrieve(@HeaderParam("sessionid")
+    String sessionId, @HeaderParam("Accept-Encoding")
+    String encoding, @PathParam("dataspace")
+    String dataspace, @PathParam("path-name")
+    String pathname, @QueryParam("comp")
+    String component, @QueryParam("includes")
+    List<String> includes, @QueryParam("excludes")
+    List<String> excludes) throws NotConnectedRestException, PermissionRestException {
         checkPathParams(dataspace, pathname);
         Session session = checkSessionValidity(sessionId);
         try {
@@ -176,8 +181,8 @@ public class RestDataspaceImpl {
             if (fo.getType() == FileType.FILE) {
                 if (VFSZipper.isZipFile(fo)) {
                     return fileComponentResponse(fo);
-                } else if (Strings.isNullOrEmpty(encoding) || encoding.contains("*")
-                        || encoding.contains("gzip")) {
+                } else if (Strings.isNullOrEmpty(encoding) || encoding.contains("*") ||
+                    encoding.contains("gzip")) {
                     return gzipComponentResponse(pathname, fo);
                 } else if (encoding.contains("zip")) {
                     return zipComponentResponse(fo, null, null);
@@ -221,10 +226,12 @@ public class RestDataspaceImpl {
      */
     @DELETE
     @Path("/{dataspace}/{path-name:.*}")
-    public Response delete(@HeaderParam("sessionid") String sessionId,
-            @PathParam("dataspace") String dataspace, @PathParam("path-name") String pathname,
-            @QueryParam("includes") List<String> includes, @QueryParam("excludes") List<String> excludes)
-            throws NotConnectedRestException, PermissionRestException {
+    public Response delete(@HeaderParam("sessionid")
+    String sessionId, @PathParam("dataspace")
+    String dataspace, @PathParam("path-name")
+    String pathname, @QueryParam("includes")
+    List<String> includes, @QueryParam("excludes")
+    List<String> excludes) throws NotConnectedRestException, PermissionRestException {
         checkPathParams(dataspace, pathname);
         Session session = checkSessionValidity(sessionId);
         try {
@@ -255,9 +262,10 @@ public class RestDataspaceImpl {
      */
     @HEAD
     @Path("/{dataspace}/{path-name:.*}")
-    public Response metadata(@HeaderParam("sessionid") String sessionId,
-            @PathParam("dataspace") String dataspacePath, @PathParam("path-name") String pathname)
-            throws NotConnectedRestException, PermissionRestException {
+    public Response metadata(@HeaderParam("sessionid")
+    String sessionId, @PathParam("dataspace")
+    String dataspacePath, @PathParam("path-name")
+    String pathname) throws NotConnectedRestException, PermissionRestException {
         checkPathParams(dataspacePath, pathname);
         Session session = checkSessionValidity(sessionId);
         try {
@@ -265,8 +273,8 @@ public class RestDataspaceImpl {
             if (!fo.exists()) {
                 return notFoundRes();
             }
-            MultivaluedMap<String, Object> headers = new MultivaluedHashMap<String, Object>(
-                    FileSystem.metadata(fo));
+            MultivaluedMap<String, Object> headers = new MultivaluedHashMap<String, Object>(FileSystem
+                    .metadata(fo));
             return Response.ok().replaceAll(headers).build();
         } catch (Throwable error) {
             logger.error(String.format("Cannot retrive metadata of %s in %s.", pathname, dataspacePath),
@@ -277,8 +285,8 @@ public class RestDataspaceImpl {
 
     private Response componentResponse(String type, FileObject fo) throws FileSystemException {
         return ("list".equals(type)) ? Response.ok(FileSystem.list(fo), MediaType.APPLICATION_JSON).build()
-                : Response.status(Response.Status.BAD_REQUEST)
-                        .entity(String.format("Unknown query parameter: comp=%s", type)).build();
+                : Response.status(Response.Status.BAD_REQUEST).entity(
+                        String.format("Unknown query parameter: comp=%s", type)).build();
     }
 
     private Response zipComponentResponse(final FileObject fo, final List<String> includes,
@@ -363,8 +371,8 @@ public class RestDataspaceImpl {
     }
 
     private Response serverErrorRes(String format, Object... args) {
-        return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                .entity((args == null || args.length == 0) ? format : String.format(format, args)).build();
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(
+                (args == null || args.length == 0) ? format : String.format(format, args)).build();
     }
 
     private FileObject resolveFile(Session session, String dataspace, String pathname)

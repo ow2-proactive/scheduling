@@ -46,6 +46,7 @@ import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.utils.FileUtils;
 import org.ow2.proactive.utils.appenders.FileAppender;
 
+
 public class ServerJobAndTaskLogs {
 
     private static final Logger logger = Logger.getLogger(ServerJobAndTaskLogs.class);
@@ -91,7 +92,7 @@ public class ServerJobAndTaskLogs {
     }
 
     private static void removeLog(String id) {
-        for (String suffix : new String[]{"", ".1"}) {
+        for (String suffix : new String[] { "", ".1" }) {
             removeFile(id + suffix);
         }
     }
@@ -113,8 +114,8 @@ public class ServerJobAndTaskLogs {
 
     // public for testing
     public static String getLogsLocation() {
-        return PASchedulerProperties.getAbsolutePath(
-                PASchedulerProperties.SCHEDULER_JOB_LOGS_LOCATION.getValueAsString());
+        return PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_JOB_LOGS_LOCATION
+                .getValueAsString());
     }
 
     private static boolean isCleanStart() {
@@ -123,7 +124,7 @@ public class ServerJobAndTaskLogs {
 
     private static String readLog(String id) {
         String result = null;
-        for (String suffix : new String[]{".1", ""}) {
+        for (String suffix : new String[] { ".1", "" }) {
             String contents = readFile(new File(getLogsLocation(), id + suffix));
             if (contents != null) {
                 if (result == null) {

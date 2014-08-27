@@ -85,7 +85,7 @@ public class TestJobServerLogs extends SchedulerConsecutive {
         task.addArgument("sleepTime", "1");
 
         task.addSelectionScript(new SelectionScript("print('" + SCRIPT_OUTPUT + "'); selected = false;",
-                "javascript"));
+            "javascript"));
         job.addTask(task);
 
         return job;
@@ -124,7 +124,6 @@ public class TestJobServerLogs extends SchedulerConsecutive {
         }
 
         checkRemoval(simpleJobId);
-
 
         JobId pendingJobId = SchedulerTHelper.submitJob(createPendingJob());
         Thread.sleep(5000);
@@ -173,7 +172,8 @@ public class TestJobServerLogs extends SchedulerConsecutive {
         }
     }
 
-    private void checkJobAndTaskLogFiles(JobId jobId, List<TaskState> tasks, boolean shouldExist) throws Exception {
+    private void checkJobAndTaskLogFiles(JobId jobId, List<TaskState> tasks, boolean shouldExist)
+            throws Exception {
         checkFile(shouldExist, new File(logsLocation, jobId.toString()));
         for (TaskState taskState : tasks) {
             checkFile(shouldExist, new File(logsLocation, taskState.getId().toString()));
@@ -181,7 +181,8 @@ public class TestJobServerLogs extends SchedulerConsecutive {
     }
 
     private void checkFile(boolean shouldExist, File jobLogFile) {
-        String message = String.format("Log file %s should %s", jobLogFile, shouldExist ? "exist" : "not exist");
+        String message = String.format("Log file %s should %s", jobLogFile, shouldExist ? "exist"
+                : "not exist");
         assertEquals(message, shouldExist, jobLogFile.exists());
     }
 
