@@ -54,7 +54,9 @@ public class LiveLogCommand extends AbstractJobCommand {
             try {
                 while (!terminate) {
                     String log = scheduler.getLiveLogJob(currentContext.getSessionId(), jobId);
-                    writeLine(currentContext, "%s", log.trim());
+                    if (!Strings.isNullOrEmpty(log)) {
+                        writeLine(currentContext, log.trim());
+                    }
                     try {
                         TimeUnit.SECONDS.sleep(1);
                     } catch (InterruptedException ignorable) {
