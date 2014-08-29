@@ -1,7 +1,5 @@
 ProActive Workflows & Scheduling
 
-Thanks for your interest in ProActive Scheduling.
-
 *** Quick start
 
     To run ProActive Scheduler (server part):
@@ -28,4 +26,4 @@ Thanks for your interest in ProActive Scheduling.
     http://bugs.activeeon.com/
 
 
-Enjoy ProActive Workflows & Scheduling Scheduling !
+Enjoy ProActive Workflows & Scheduling !
