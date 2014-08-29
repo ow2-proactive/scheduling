@@ -178,6 +178,9 @@ project(':rest:rest-cli') {
 }
 
 project(':rest:rest-client') {
+
+    apply plugin: 'java-library-distribution'
+
     dependencies {
         compile 'commons-cli:commons-cli:1.2'
         compile 'commons-io:commons-io:2.4'
@@ -188,7 +191,7 @@ project(':rest:rest-client') {
 
         compile project(":common-api")
         compile project(":scheduler:scheduler-api")
-        compile project(':rest:rest-cli')
+        compile project(':rest:rest-api')
 
         runtime 'xerces:xercesImpl:2.8.1'
 

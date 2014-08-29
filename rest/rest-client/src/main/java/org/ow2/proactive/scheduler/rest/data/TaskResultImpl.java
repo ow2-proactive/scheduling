@@ -34,7 +34,7 @@
  */
 package org.ow2.proactive.scheduler.rest.data;
 
-import static org.ow2.proactive_grid_cloud_portal.cli.utils.ObjectUtility.object;
+import static org.ow2.proactive_grid_cloud_portal.utils.ObjectUtility.object;
 
 import java.io.Serializable;
 import java.util.Map;

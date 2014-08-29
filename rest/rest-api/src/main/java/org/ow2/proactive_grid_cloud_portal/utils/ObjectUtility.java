@@ -35,7 +35,7 @@
  * $$ACTIVEEON_INITIAL_DEV$$
  */
 
-package org.ow2.proactive_grid_cloud_portal.cli.utils;
+package org.ow2.proactive_grid_cloud_portal.utils;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

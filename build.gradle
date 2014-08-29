@@ -569,6 +569,7 @@ dependencies {
         exclude group: 'javassist', module: 'javassist' // to avoid duplicate (artifact named differently)
     }
     restCli project(':rest:rest-cli')
+    distLib project(':rest:rest-client')
 
     compile 'org.codehaus.groovy:groovy-all:2.1.6'
     compile 'commons-io:commons-io:2.4'
