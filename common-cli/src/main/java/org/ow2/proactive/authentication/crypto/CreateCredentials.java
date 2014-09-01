@@ -39,12 +39,15 @@ package org.ow2.proactive.authentication.crypto;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.security.KeyException;
 import java.security.PublicKey;
 
+import org.objectweb.proactive.utils.SecurityManagerConfigurator;
+import org.ow2.proactive.authentication.AuthenticationImpl;
+import org.ow2.proactive.authentication.Connection;
+import org.ow2.proactive.utils.FileToBytesConverter;
+import org.ow2.proactive.utils.Tools;
 import jline.console.ConsoleReader;
-
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.HelpFormatter;
@@ -54,10 +57,6 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.Parser;
 import org.apache.log4j.Logger;
-import org.ow2.proactive.authentication.AuthenticationImpl;
-import org.ow2.proactive.authentication.Connection;
-import org.ow2.proactive.utils.FileToBytesConverter;
-import org.ow2.proactive.utils.Tools;
 
 
 /**
@@ -82,6 +81,10 @@ public class CreateCredentials {
      *
      */
     public static void main(String[] args) throws IOException, ParseException {
+
+        SecurityManagerConfigurator.configureSecurityManager(CreateCredentials.class.getResource(
+                "/all-permissions.security.policy").toString());
+
         ConsoleReader console = new ConsoleReader(System.in, System.out);
         /**
          * default values
@@ -173,7 +176,7 @@ public class CreateCredentials {
         }
 
         if (cmd.hasOption("help")) {
-            displayHelp(path, cipher, options);
+            displayHelp(options);
         }
 
         if (cmd.hasOption("file")) {
@@ -318,7 +321,7 @@ public class CreateCredentials {
         System.exit(0);
     }
 
-    private static void displayHelp(String path, String cipher, Options options) {
+    private static void displayHelp(Options options) {
         System.out.println("");
         HelpFormatter hf = new HelpFormatter();
         hf.setWidth(135);
