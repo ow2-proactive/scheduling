@@ -195,6 +195,10 @@ project(':scheduler:scheduler-client') {
         compile project(':scheduler:scheduler-api')
         compile project(':common-client')
     }
+
+    task stub(type: StubTask) {
+        classes = ['org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface']
+    }
 }
 
 project('common-client') {
@@ -331,6 +335,7 @@ project('scheduler:scheduler-server') {
         compile project(':scheduler:scheduler-client')
         compile project(':scheduler:scheduler-node')
         compile project(':rm:rm-server')
+        compile project(':rm:rm-client')
 
         testCompile 'org.mockito:mockito-core:1.9.5'
         testCompile 'org.hamcrest:hamcrest-all:1.3'
@@ -363,7 +368,10 @@ project('scheduler:scheduler-server') {
     }
 
     task stub(type: StubTask) {
-        classes = ['org.ow2.proactive.scheduler.core.SchedulerFrontend']
+        classes = ['org.ow2.proactive.scheduler.core.SchedulerFrontend',
+        'org.ow2.proactive.scheduler.authentication.SchedulerAuthentication',
+        'org.ow2.proactive.scheduler.core.rmproxies.RMProxyActiveObject',
+        'org.ow2.proactive.scheduler.core.TerminateNotification']
     }
 
     artifacts {
@@ -393,7 +401,15 @@ project('scheduler:scheduler-node') {
 
     task stub(type: StubTask) {
         classes = ['org.ow2.proactive.scheduler.common.TaskTerminateNotification',
-                   'org.ow2.proactive.scheduler.task.utils.TaskResultCallback']
+                   'org.ow2.proactive.scheduler.task.utils.TaskResultCallback',
+                   'org.ow2.proactive.scheduler.task.forked.JavaTaskLauncherForked',
+                   'org.ow2.proactive.scheduler.task.forked.JavaTaskLauncherForker',
+                   'org.ow2.proactive.scheduler.task.java.JavaTaskLauncher',
+                   'org.ow2.proactive.scheduler.task.nativ.NativeTaskLauncher',
+                   'org.ow2.proactive.scheduler.task.script.ScriptTaskLauncher',
+                   'org.ow2.proactive.scheduler.task.utils.ActiveObjectExecutor',
+                   'org.ow2.proactive.scheduler.examples.MultiNodeExample',
+                   'org.ow2.proactive.scheduler.examples.SchedulerClientEventsLogger']
     }
 
     task standaloneJar(type: OneJar) {
@@ -515,6 +531,12 @@ project(':scheduler:dataspace-smartproxy') {
         // to get shared test classes
         testCompile project(':rm:rm-server').sourceSets.test.output // to get shared test classes
     }
+
+    task stub(type: StubTask) {
+        classes = ['org.ow2.proactive.scheduler.common.util.dsclient.SmartProxy',
+        'org.ow2.proactive.scheduler.common.util.CachingSchedulerProxyUserInterface']
+    }
+
 
     task('functionalTest', type: Test).configure functionalTestConfiguration
 }
