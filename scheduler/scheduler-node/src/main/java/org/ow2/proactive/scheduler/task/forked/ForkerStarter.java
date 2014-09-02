@@ -36,16 +36,21 @@
  */
 package org.ow2.proactive.scheduler.task.forked;
 
+import static org.ow2.proactive.utils.ClasspathUtils.findSchedulerHome;
+
 import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
+import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.rm.util.process.EnvironmentCookieBasedChildProcessKiller;
-import org.apache.log4j.Logger;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
 
 /**
@@ -69,6 +74,7 @@ public class ForkerStarter {
             System.err.println("Arguments must be : callbackURL nodeName");
             System.exit(2);
         }
+        configureRMAndProActiveHomes();
         EnvironmentCookieBasedChildProcessKiller.registerKillChildProcessesOnShutdown();
         ForkerStarter fs = new ForkerStarter();
         Node n = fs.createLocalNode(args[1]);
@@ -115,6 +121,21 @@ public class ForkerStarter {
                 }
             }
         }, 0, PING_NODE_EVERY_MINUTE);
+    }
+
+    private static void configureRMAndProActiveHomes() {
+        if (System.getProperty(PAResourceManagerProperties.RM_HOME.getKey()) == null) {
+            System.setProperty(PAResourceManagerProperties.RM_HOME.getKey(), findSchedulerHome());
+        }
+        if (System.getProperty(CentralPAPropertyRepository.PA_HOME.getName()) == null) {
+            System.setProperty(CentralPAPropertyRepository.PA_HOME.getName(), System
+                    .getProperty(PAResourceManagerProperties.RM_HOME.getKey()));
+        }
+
+        if (System.getProperty(PASchedulerProperties.SCHEDULER_HOME.getKey()) == null) {
+            System.setProperty(PASchedulerProperties.SCHEDULER_HOME.getKey(), System
+                    .getProperty(PAResourceManagerProperties.RM_HOME.getKey()));
+        }
     }
 
     /**
