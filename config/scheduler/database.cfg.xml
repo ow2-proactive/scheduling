@@ -34,7 +34,7 @@
         <property name="connection.password"></property>
 
         <property name="connection.provider_class">org.hibernate.service.jdbc.connections.internal.C3P0ConnectionProvider</property>
-        <property name="c3p0.max_size">5</property>
+        <property name="c3p0.max_size">20</property>
         <property name="c3p0.min_size">5</property>
         <property name="c3p0.timeout">60</property> <!-- seconds -->
 
