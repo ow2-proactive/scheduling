@@ -140,21 +140,39 @@ public class StudioRest implements StudioInterface {
     }
 
     private void writeFileContent(String fileName, String content) {
+        FileOutputStream outputStream = null;
         try {
             logger.info("Writing file " + fileName);
-            FileOutputStream output = new FileOutputStream(new File(fileName));
-            IOUtils.write(content, output);
+            outputStream = new FileOutputStream(new File(fileName));
+            IOUtils.write(content, outputStream);
         } catch (IOException e) {
             logger.warn("Could not write file " + fileName, e);
+        } finally {
+            if (outputStream!=null) {
+                try {
+                    outputStream.close();
+                } catch (IOException e) {
+                    logger.error(e.getMessage(), e);
+                }
+            }
         }
     }
 
     private String getFileContent(String fileName) {
+        FileInputStream inputStream = null;
         try {
-            FileInputStream inputStream = new FileInputStream(fileName);
+            inputStream = new FileInputStream(fileName);
             return IOUtils.toString(inputStream);
         } catch (Exception e) {
             logger.warn("Could not read file " + fileName, e);
+        } finally {
+            if (inputStream!=null) {
+                try {
+                    inputStream.close();
+                } catch (IOException e) {
+                    logger.error(e.getMessage(), e);
+                }
+            }
         }
 
         return "";
@@ -299,7 +317,11 @@ public class StudioRest implements StudioInterface {
             // new job name
             logger.info("Updating job name from " + oldJobName + " to " + name);
             writeFileContent(workflowsDir.getAbsolutePath() + "/name", name);
-            delete(new File(workflowsDir.getAbsolutePath() + "/" + oldJobName + ".xml"));
+            try {
+                delete(new File(workflowsDir.getAbsolutePath() + "/" + oldJobName + ".xml"));
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+            }
         }
 
         writeFileContent(workflowsDir.getAbsolutePath() + "/metadata", metadata);
@@ -321,7 +343,12 @@ public class StudioRest implements StudioInterface {
         File workflowsDir = new File(getProjectsDirName() + "/" + userName + "/workflows/" + workflowId);
 
         if (workflowsDir.exists()) {
-            delete(workflowsDir);
+            try {
+                delete(workflowsDir);
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+                return false;
+            }
             return true;
         }
         return false;
