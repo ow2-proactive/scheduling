@@ -408,23 +408,12 @@ public class SchedulerStarter {
     }
 
     private static void configureSchedulerAndRMAndPAHomes() {
-        if (System.getProperty(PASchedulerProperties.SCHEDULER_HOME.getKey()) == null) {
-            System.setProperty(PASchedulerProperties.SCHEDULER_HOME.getKey(), findSchedulerHome());
-        }
-        if (System.getProperty(PAResourceManagerProperties.RM_HOME.getKey()) == null) {
-            System.setProperty(PAResourceManagerProperties.RM_HOME.getKey(), System
-                    .getProperty(PASchedulerProperties.SCHEDULER_HOME.getKey()));
-        }
-        if (System.getProperty(CentralPAPropertyRepository.PA_HOME.getName()) == null) {
-            System.setProperty(CentralPAPropertyRepository.PA_HOME.getName(), System
-                    .getProperty(PASchedulerProperties.SCHEDULER_HOME.getKey()));
-        }
-
-        if (System.getProperty(CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getName()) == null) {
-            System.setProperty(CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getName(), System
-                    .getProperty(PASchedulerProperties.SCHEDULER_HOME.getKey()) +
-                "/config/network/server.ini");
-        }
+        setPropIfNotAlreadySet(PASchedulerProperties.SCHEDULER_HOME.getKey(), findSchedulerHome());
+        String schedHome = System.getProperty(PASchedulerProperties.SCHEDULER_HOME.getKey());
+        setPropIfNotAlreadySet(PAResourceManagerProperties.RM_HOME.getKey(), schedHome);
+        setPropIfNotAlreadySet(CentralPAPropertyRepository.PA_HOME.getName(), schedHome);
+        setPropIfNotAlreadySet(CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getName(), schedHome +
+            "/config/network/server.ini");
     }
 
     private static void configureSecurityManager() {
@@ -434,16 +423,18 @@ public class SchedulerStarter {
     }
 
     private static void configureLogging() {
-        if (System.getProperty(CentralPAPropertyRepository.LOG4J.getName()) == null) {
-            String defaultLog4jConfig = System.getProperty(PASchedulerProperties.SCHEDULER_HOME.getKey()) +
-                "/config/log/server.properties";
-            System.setProperty(CentralPAPropertyRepository.LOG4J.getName(), defaultLog4jConfig);
+        String schedHome = System.getProperty(PASchedulerProperties.SCHEDULER_HOME.getKey());
+        String defaultLog4jConfig = schedHome + "/config/log/server.properties";
+        if (setPropIfNotAlreadySet(CentralPAPropertyRepository.LOG4J.getName(), defaultLog4jConfig))
             PropertyConfigurator.configure(defaultLog4jConfig);
-        }
-        final String DERBY_LOG = "derby.stream.error.file";
-        if (System.getProperty(DERBY_LOG) == null)
-            System.setProperty(DERBY_LOG, System.getProperty(PASchedulerProperties.SCHEDULER_HOME.getKey()) +
-                "/logs/Database.log");
+        setPropIfNotAlreadySet("java.util.logging.config.file", defaultLog4jConfig);
+        setPropIfNotAlreadySet("derby.stream.error.file", schedHome + "/logs/Database.log");
     }
 
+    private static boolean setPropIfNotAlreadySet(String name, Object value) {
+        boolean notSet = System.getProperty(name) == null;
+        if (notSet)
+            System.setProperty(name, value.toString());
+        return notSet;
+    }
 }
