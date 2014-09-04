@@ -943,7 +943,7 @@ public abstract class TaskLauncher implements InitActive {
 
         try {
             INPUT = PADataSpaces.resolveDefaultInput();
-            INPUT = resolveToExisting(INPUT, "INPUT");
+            INPUT = resolveToExisting(INPUT, "INPUT", true);
             INPUT = createTaskIdFolder(INPUT, "INPUT");
         } catch (Throwable t) {
             logger.warn("INPUT space is disabled");
@@ -953,7 +953,7 @@ public abstract class TaskLauncher implements InitActive {
         }
         try {
             OUTPUT = PADataSpaces.resolveDefaultOutput();
-            OUTPUT = resolveToExisting(OUTPUT, "OUTPUT");
+            OUTPUT = resolveToExisting(OUTPUT, "OUTPUT", false);
             OUTPUT = createTaskIdFolder(OUTPUT, "OUTPUT");
         } catch (Throwable t) {
             logger.warn("OUTPUT space is disabled");
@@ -964,7 +964,7 @@ public abstract class TaskLauncher implements InitActive {
 
         try {
             GLOBAL = PADataSpaces.resolveOutput(SchedulerConstants.GLOBALSPACE_NAME);
-            GLOBAL = resolveToExisting(GLOBAL, "GLOBAL");
+            GLOBAL = resolveToExisting(GLOBAL, "GLOBAL", false);
             GLOBAL = createTaskIdFolder(GLOBAL, "GLOBAL");
         } catch (Throwable t) {
             logger.warn("GLOBAL space is disabled");
@@ -974,7 +974,7 @@ public abstract class TaskLauncher implements InitActive {
         }
         try {
             USER = PADataSpaces.resolveOutput(SchedulerConstants.USERSPACE_NAME);
-            USER = resolveToExisting(USER, "USER");
+            USER = resolveToExisting(USER, "USER", false);
             USER = createTaskIdFolder(USER, "USER");
         } catch (Throwable t) {
             logger.warn("USER space is disabled");
@@ -989,14 +989,15 @@ public abstract class TaskLauncher implements InitActive {
         return taskId.getJobId().hashCode();
     }
 
-    protected DataSpacesFileObject resolveToExisting(DataSpacesFileObject space, String spaceName) {
+    protected DataSpacesFileObject resolveToExisting(DataSpacesFileObject space, String spaceName,
+            boolean input) {
         if (space == null) {
             logger.info(spaceName + " space is disabled");
             return null;
         }
         // ensure that the remote folder exists (in case we didn't replace any pattern)
         try {
-            space = space.ensureExistingOrSwitch();
+            space = space.ensureExistingOrSwitch(!input);
         } catch (Exception e) {
             logger.info("Error occurred when switching to alternate space root", e);
             logger.info(spaceName + " space is disabled");
