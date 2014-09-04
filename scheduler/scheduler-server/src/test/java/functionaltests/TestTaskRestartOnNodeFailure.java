@@ -39,7 +39,6 @@ package functionaltests;
 import java.io.Serializable;
 
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
@@ -54,6 +53,8 @@ import org.ow2.tests.FunctionalTest;
 import org.junit.Assert;
 import org.junit.Test;
 
+import functionaltests.utils.ProActiveLock;
+
 
 /**
  * Test checks that scheduler restarts task if Node executing
@@ -66,23 +67,6 @@ public class TestTaskRestartOnNodeFailure extends FunctionalTest {
 
     private static final long TIMEOUT = 60000;
 
-    public static class CommunicationObject {
-
-        private boolean canFinish;
-
-        public CommunicationObject() {
-        }
-
-        public void setCanFinish(boolean value) {
-            canFinish = value;
-        }
-
-        public boolean canFinish() {
-            return canFinish;
-        }
-
-    }
-
     public static class TestJavaTask extends JavaExecutable {
 
         private String communicationObjectUrl;
@@ -90,16 +74,10 @@ public class TestTaskRestartOnNodeFailure extends FunctionalTest {
         @Override
         public Serializable execute(TaskResult... results) throws Throwable {
             System.out.println("OK");
-            CommunicationObject communicationObject = PAActiveObject.lookupActive(CommunicationObject.class,
+            ProActiveLock communicationObject = PAActiveObject.lookupActive(ProActiveLock.class,
                     communicationObjectUrl);
 
-            while (true) {
-                if (!communicationObject.canFinish()) {
-                    Thread.sleep(5000);
-                } else {
-                    break;
-                }
-            }
+            ProActiveLock.waitUntilUnlocked(communicationObject);
             return "OK";
         }
 
@@ -118,8 +96,7 @@ public class TestTaskRestartOnNodeFailure extends FunctionalTest {
         String rmUrl = rmHelper.getLocalUrl();
         SchedulerTHelper.startScheduler(false, null, null, rmUrl);
 
-        CommunicationObject communicationObject = PAActiveObject.newActive(CommunicationObject.class,
-                new Object[] {});
+        ProActiveLock communicationObject = PAActiveObject.newActive(ProActiveLock.class, new Object[] {});
 
         node1 = testTaskKillNode(communicationObject, node1, false);
         node1 = testTaskKillNode(communicationObject, node1, true);
@@ -127,9 +104,9 @@ public class TestTaskRestartOnNodeFailure extends FunctionalTest {
         node1 = testTaskKillNode(communicationObject, node1, true);
     }
 
-    private TNode testTaskKillNode(CommunicationObject communicationObject, TNode node1,
-            boolean waitBeforeKill) throws Exception {
-        communicationObject.setCanFinish(false);
+    private TNode testTaskKillNode(ProActiveLock communicationObject, TNode node1, boolean waitBeforeKill)
+            throws Exception {
+        communicationObject.lock();
         TNode node2 = startNode(rmHelper);
 
         System.out.println("Submit job");
@@ -174,7 +151,7 @@ public class TestTaskRestartOnNodeFailure extends FunctionalTest {
         nodeToKill.getNodeProcess().stopProcess();
 
         System.out.println("Let task finish");
-        communicationObject.setCanFinish(true);
+        communicationObject.unlock();
 
         System.out.println("Wait when job finish");
         SchedulerTHelper.waitForEventJobFinished(jobId, TIMEOUT);

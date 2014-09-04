@@ -26,10 +26,12 @@ import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.tests.FunctionalTest;
-import functionaltests.monitor.MonitorEventReceiver;
-import functionaltests.monitor.SchedulerMonitorsHandler;
 import org.junit.Assert;
 import org.junit.Test;
+
+import functionaltests.monitor.MonitorEventReceiver;
+import functionaltests.monitor.SchedulerMonitorsHandler;
+import functionaltests.utils.ProActiveLock;
 
 
 /**
@@ -38,33 +40,16 @@ import org.junit.Test;
  */
 public class TestLoadJobs extends FunctionalTest {
 
-    public static class CommunicationObject {
-
-        private boolean canFinish;
-
-        public boolean isCanFinish() {
-            return canFinish;
-        }
-
-        public void setCanFinish(boolean canFinish) {
-            this.canFinish = canFinish;
-        }
-
-    }
-
     public static class TestJavaTask extends JavaExecutable {
 
         private String communicationObjectUrl;
 
         @Override
         public Serializable execute(TaskResult... results) throws Throwable {
-            CommunicationObject communicationObject = PAActiveObject.lookupActive(CommunicationObject.class,
+            ProActiveLock communicationObject = PAActiveObject.lookupActive(ProActiveLock.class,
                     communicationObjectUrl);
 
-            while (!communicationObject.isCanFinish()) {
-                Thread.sleep(1000);
-            }
-
+            ProActiveLock.waitUntilUnlocked(communicationObject);
             return "OK";
         }
 
@@ -76,8 +61,7 @@ public class TestLoadJobs extends FunctionalTest {
 
         Scheduler scheduler = SchedulerTHelper.getSchedulerInterface();
 
-        CommunicationObject communicationObject = PAActiveObject.newActive(CommunicationObject.class,
-                new Object[] {});
+        ProActiveLock communicationObject = PAActiveObject.newActive(ProActiveLock.class, new Object[] {});
         String communicationObjectUrl = PAActiveObject.getUrl(communicationObject);
 
         JobId jobId;
@@ -134,7 +118,7 @@ public class TestLoadJobs extends FunctionalTest {
         jobs = scheduler.getJobs(0, 10, criteria(true, true, true, true), sortParameters);
         checkJobs(jobs, 3, 2, 1);
 
-        communicationObject.setCanFinish(true);
+        communicationObject.unlock();
 
         for (JobInfo jobInfo : jobs) {
             SchedulerTHelper.waitForEventJobFinished(jobInfo.getJobId(), 30000);
@@ -168,7 +152,7 @@ public class TestLoadJobs extends FunctionalTest {
         jobs = scheduler.getJobs(0, 10, criteria(true, true, true, true), null);
         checkJobs(jobs);
 
-        communicationObject.setCanFinish(false);
+        communicationObject.lock();
 
         jobId = scheduler.submit(createJob(communicationObjectUrl));
         monitorsHandler.waitForEventTask(SchedulerEvent.TASK_PENDING_TO_RUNNING, jobId, "Test task", 30000);
@@ -185,7 +169,7 @@ public class TestLoadJobs extends FunctionalTest {
         jobs = scheduler.getJobs(2, 10, criteria(false, true, true, true), null);
         checkJobs(jobs, 3, 4);
 
-        communicationObject.setCanFinish(true);
+        communicationObject.unlock();
         monitorsHandler.waitForFinishedJob(jobId, 30000);
 
         jobs = scheduler.getJobs(0, 10, criteria(true, false, false, true), null);

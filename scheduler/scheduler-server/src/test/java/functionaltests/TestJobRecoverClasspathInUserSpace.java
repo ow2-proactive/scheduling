@@ -46,7 +46,8 @@ import org.ow2.tests.FunctionalTest;
 
 import org.junit.Test;
 
-import static functionaltests.TestPauseJobRecover.CommunicationObject;
+import functionaltests.utils.ProActiveLock;
+
 import static functionaltests.TestPauseJobRecover.createJob;
 
 
@@ -55,8 +56,7 @@ public class TestJobRecoverClasspathInUserSpace extends FunctionalTest {
     @Test
     // SCHEDULING-2077
     public void run() throws Throwable {
-        CommunicationObject controlJobExecution = PAActiveObject.newActive(CommunicationObject.class,
-                new Object[] {});
+        ProActiveLock controlJobExecution = PAActiveObject.newActive(ProActiveLock.class, new Object[] {});
 
         TaskFlowJob job = createJob(PAActiveObject.getUrl(controlJobExecution));
         JobEnvironment env = new JobEnvironment();
@@ -71,7 +71,7 @@ public class TestJobRecoverClasspathInUserSpace extends FunctionalTest {
                 "config/functionalTSchedulerProperties-updateDB.ini").toURI()).getAbsolutePath());
 
         SchedulerTHelper.log("Finish job 1");
-        controlJobExecution.setCanFinish(true);
+        controlJobExecution.unlock();
 
         SchedulerTHelper.log("Waiting for job 1 to finish");
         SchedulerTHelper.waitForEventJobFinished(idJ1, 30 * 1000);

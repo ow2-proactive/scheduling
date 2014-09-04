@@ -46,7 +46,8 @@ import org.ow2.tests.FunctionalTest;
 import org.junit.Assert;
 import org.junit.Test;
 
-import static functionaltests.TestPauseJobRecover.CommunicationObject;
+import functionaltests.utils.ProActiveLock;
+
 import static functionaltests.TestPauseJobRecover.createJob;
 import static functionaltests.TestPauseJobRecover.getTaskState;
 
@@ -62,8 +63,7 @@ public class TestPauseJob extends FunctionalTest {
     @Test
     public void test() throws Throwable {
 
-        CommunicationObject communicationObject = PAActiveObject.newActive(CommunicationObject.class,
-                new Object[] {});
+        ProActiveLock communicationObject = PAActiveObject.newActive(ProActiveLock.class, new Object[] {});
 
         TaskFlowJob job = createJob(PAActiveObject.getUrl(communicationObject));
 
@@ -88,7 +88,7 @@ public class TestPauseJob extends FunctionalTest {
         Assert.assertEquals(TaskStatus.PAUSED, getTaskState("task2", js).getStatus());
 
         //let the task1 finish
-        communicationObject.setCanFinish(true);
+        communicationObject.unlock();
 
         System.out.println("Checking is the status of task2 remains unchanged");
         Thread.sleep(10000);

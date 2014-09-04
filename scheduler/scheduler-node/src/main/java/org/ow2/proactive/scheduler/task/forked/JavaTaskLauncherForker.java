@@ -40,6 +40,7 @@ import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 
 import org.objectweb.proactive.annotation.ImmediateService;
+import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.objectweb.proactive.extensions.dataspaces.api.PADataSpaces;
@@ -227,8 +228,9 @@ public class JavaTaskLauncherForker extends JavaTaskLauncher implements ForkerSt
         super.initDataSpaces();
 
         try {
-            // override scratch space to share it with forked task
-            String sharedScratchSpaceName = "shared_forker_" + taskId.value();
+            // override scratch space to share it with forked task, make it unique in case of task failure
+            String sharedScratchSpaceName = "shared_forker_" + taskId.value() + "_" +
+                new UniqueID().getCanonString();
             InputOutputSpaceConfiguration sharedScratchSpaceConfiguration = InputOutputSpaceConfiguration
                     .createConfiguration(SCRATCH.getRealURI(), null, null, sharedScratchSpaceName,
                             SpaceType.OUTPUT);

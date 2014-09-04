@@ -54,6 +54,8 @@ import org.ow2.tests.FunctionalTest;
 import org.junit.Assert;
 import org.junit.Test;
 
+import functionaltests.utils.ProActiveLock;
+
 import static functionaltests.SchedulerTHelper.log;
 
 
@@ -72,8 +74,7 @@ public class TestPauseJobRecover extends FunctionalTest {
      */
     public void pause_resume_recover() throws Throwable {
 
-        CommunicationObject communicationObject = PAActiveObject.newActive(CommunicationObject.class,
-                new Object[] {});
+        ProActiveLock communicationObject = PAActiveObject.newActive(ProActiveLock.class, new Object[] {});
 
         TaskFlowJob job = createJob(PAActiveObject.getUrl(communicationObject));
 
@@ -105,7 +106,7 @@ public class TestPauseJobRecover extends FunctionalTest {
         Assert.assertEquals(TaskStatus.PENDING, getTaskState("task2", js).getStatus());
 
         //let the task1 finish
-        communicationObject.setCanFinish(true);
+        communicationObject.unlock();
 
         log("Waiting for task1 to finish");
         SchedulerTHelper.waitForEventTaskFinished(jobId, "task1");
@@ -130,10 +131,8 @@ public class TestPauseJobRecover extends FunctionalTest {
     // SCHEDULING-1924 SCHEDULING-2030
     public void recover_paused_job_with_finished_tasks() throws Throwable {
 
-        CommunicationObject controlTask2 = PAActiveObject.newActive(CommunicationObject.class,
-                new Object[] {});
-        CommunicationObject controlTask3 = PAActiveObject.newActive(CommunicationObject.class,
-                new Object[] {});
+        ProActiveLock controlTask2 = PAActiveObject.newActive(ProActiveLock.class, new Object[] {});
+        ProActiveLock controlTask3 = PAActiveObject.newActive(ProActiveLock.class, new Object[] {});
 
         TaskFlowJob job = createJob3TasksPauseTask2AndTask3(PAActiveObject.getUrl(controlTask2),
                 PAActiveObject.getUrl(controlTask3));
@@ -158,7 +157,7 @@ public class TestPauseJobRecover extends FunctionalTest {
         js = SchedulerTHelper.getSchedulerInterface().getJobState(jobId);
         Assert.assertEquals(JobStatus.PAUSED, js.getStatus());
 
-        controlTask2.setCanFinish(true);
+        controlTask2.unlock();
 
         log("Waiting for task2 to finish");
         SchedulerTHelper.waitForEventTaskFinished(jobId, "task2");
@@ -171,7 +170,7 @@ public class TestPauseJobRecover extends FunctionalTest {
         log("Resume the job " + jobId);
         SchedulerTHelper.getSchedulerInterface().resumeJob(jobId);
 
-        controlTask3.setCanFinish(true);
+        controlTask3.unlock();
 
         log("Waiting for task3 to finish");
         SchedulerTHelper.waitForEventTaskFinished(jobId, "task3");
@@ -255,35 +254,12 @@ public class TestPauseJobRecover extends FunctionalTest {
         @Override
         public Serializable execute(TaskResult... results) throws Throwable {
             System.out.println("OK");
-            CommunicationObject communicationObject = PAActiveObject.lookupActive(CommunicationObject.class,
+            ProActiveLock communicationObject = PAActiveObject.lookupActive(ProActiveLock.class,
                     communicationObjectUrl);
 
-            while (true) {
-                if (!communicationObject.canFinish()) {
-                    Thread.sleep(5000);
-                } else {
-                    break;
-                }
-            }
+            ProActiveLock.waitUntilUnlocked(communicationObject);
             return "OK";
         }
-    }
-
-    public static class CommunicationObject {
-
-        private boolean canFinish;
-
-        public CommunicationObject() {
-        }
-
-        public void setCanFinish(boolean value) {
-            canFinish = value;
-        }
-
-        public boolean canFinish() {
-            return canFinish;
-        }
-
     }
 
 }

@@ -111,9 +111,10 @@ public class JavaTaskLauncherForked extends JavaTaskLauncher {
             SCRATCH = PADataSpaces.resolveFile(sharedForkerForkedDataspaceUri);
             logger.debug("Override forked scratch space with forker scratch space: " + SCRATCH.getRealURI());
         } catch (Throwable t) {
-            logger.error("There was a problem while initializing scratch space", t);
-            this.logDataspacesStatus("There was a problem while initializing scratch space",
-                    DataspacesStatusLevel.ERROR);
+            logger.error("There was a problem while initializing scratch space with uri " +
+                sharedForkerForkedDataspaceUri, t);
+            this.logDataspacesStatus("There was a problem while initializing scratch space with uri " +
+                sharedForkerForkedDataspaceUri, DataspacesStatusLevel.ERROR);
             this.logDataspacesStatus(Formatter.stackTraceToString(t), DataspacesStatusLevel.ERROR);
         }
     }
