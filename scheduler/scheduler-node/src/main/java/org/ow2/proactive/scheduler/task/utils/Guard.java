@@ -39,12 +39,8 @@ import java.util.concurrent.Callable;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.Body;
-import org.objectweb.proactive.InitActive;
-import org.objectweb.proactive.annotation.ImmediateService;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
-import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
@@ -340,79 +336,6 @@ public abstract class Guard<T> {
          * Guard cleaned (cannot be used, nor killed)
          */
         CLEANED
-    }
-
-    /**
-     * Active Object used to execute Callable objects, similarly to a singleThreadExecutor
-     */
-    public static class ActiveObjectExecutor implements InitActive {
-
-        private Callable<Serializable> callable;
-
-        private AbstractBody bodyOnThis;
-
-        private ActiveObjectExecutor stubOnThis;
-
-        private ClassLoader classLoader;
-
-        @Override
-        public void initActivity(Body body) {
-            bodyOnThis = ((AbstractBody) PAActiveObject.getBodyOnThis());
-            stubOnThis = (ActiveObjectExecutor) PAActiveObject.getStubOnThis();
-        }
-
-        public boolean ping() {
-            return true;
-        }
-
-        /**
-         * Used to set the Context class loader of this Active Object
-         * as a ClassLoader is not serializable, this method must not be called via the stub
-         * @param cl
-         */
-        void setContextClassLoader(ClassLoader cl) {
-            classLoader = cl;
-            stubOnThis.updateContextClassLoader();
-        }
-
-        /**
-         * Update the Context class loader using the instance variable "ClassLoader".
-         * This request is automatically called when calling setContextClassLoader
-         */
-        public void updateContextClassLoader() {
-            Thread.currentThread().setContextClassLoader(classLoader);
-        }
-
-        /**
-         * Sets the callable object to execute
-         * @param callable
-         */
-        public void setCallable(Callable<Serializable> callable) {
-            this.callable = callable;
-        }
-
-        /**
-         * Call the current callable object
-         * @return
-         */
-        public Serializable call() {
-            try {
-                return callable.call();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        /**
-         * Cancel the current execution
-         */
-        @ImmediateService
-        public void cancel() {
-            // this call will send an interrupt message either if the body is waiting for a request or is serving a request
-            // it will not terminate the active object
-            bodyOnThis.interruptService();
-        }
-
     }
 
 }
