@@ -183,12 +183,12 @@ public class TestNativeTaskPaths extends FunctionalTest {
         logger.info(jr.getAllResults().get("C").getOutput().getAllLogs(true));
         String receivedc = IOUtils.toString(outc.toURI()).trim();
         logger.info("Received C : '" + receivedc + "'");
-        Assert.assertEquals(contentExpected, receivedc);
+        Assert.assertEquals(contentExpected.toLowerCase(), receivedc.toLowerCase());
 
         logger.info(jr.getAllResults().get("D").getOutput().getAllLogs(true));
         String receivedd = IOUtils.toString(outd.toURI()).trim();
         logger.info("Received D : '" + receivedd + "'");
-        Assert.assertEquals(contentExpected, receivedd);
+        Assert.assertEquals(contentExpected.toLowerCase(), receivedd.toLowerCase());
 
     }
 
