@@ -37,78 +37,16 @@
 
 package org.ow2.proactive_grid_cloud_portal.cli;
 
-import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_INVALID_ARGUMENTS;
-import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_OTHER;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.*;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.*;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.*;
 import org.apache.commons.cli.Option;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.EvalScriptCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.ExitCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.HelpCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.JsHelpCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.LoginCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.LoginWithCredentialsCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.OutputCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.PrintSessionCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.SetCaCertsCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.SetCaCertsPassCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.SetDebugModeCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.SetInsecureAccessCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.SetPasswordCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.SetSessionCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.SetSessionFileCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.SetSilentCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.SetUrlCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.AddNodeCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.CreateNodeSourceCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.ForceCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.GetNodeInfoCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.GetTopologyCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.ListInfrastructureCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.ListNodeCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.ListNodeSourceCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.ListPolicyCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.LockNodeCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.RemoveNodeCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.RemoveNodeSourceCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.RmHelpCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.RmJsHelpCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.RmStatsCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.SetInfrastructureCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.SetNodeSourceCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.SetPolicyCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.UnlockNodeCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.ChangeJobPriorityCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.DownloadFileCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.FreezeCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.GetJobOutputCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.GetJobResultCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.GetJobStateCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.GetTaskOutputCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.GetTaskResultCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.KillCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.KillJobCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.LinkRmCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.ListJobCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.LiveLogCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.LoginSchedCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.PauseCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.PauseJobCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.PreemptTaskCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.RemoveJobCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.RestartTaskCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.ResumeCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.ResumeJobCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.SchedHelpCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.SchedJsHelpCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.SchedStatsCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.StartCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.StopCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.SubmitJobCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.UploadFileCommand;
+
+import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_INVALID_ARGUMENTS;
+import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_OTHER;
 
 
 /**
@@ -195,39 +133,39 @@ public class CommandSet {
                     SubmitJobCommand.class).entry();
 
     public static final CommandSet.Entry SCHED_START = CommandSetEntryBuilder.newInstance().opt("start")
-            .longOpt("startscheduler").description("Start the scheduler").jsCommand("start()").commandClass(
+            .longOpt("startscheduler").description("Start the Scheduler").jsCommand("start()").commandClass(
                     StartCommand.class).entry();
 
     public static final CommandSet.Entry SCHED_STOP = CommandSetEntryBuilder.newInstance().opt("stop")
-            .longOpt("stopscheduler").description("Stop the scheduler").jsCommand("stop()").commandClass(
+            .longOpt("stopscheduler").description("Stop the Scheduler").jsCommand("stop()").commandClass(
                     StopCommand.class).entry();
 
     public static final CommandSet.Entry SCHED_PAUSE = CommandSetEntryBuilder.newInstance().opt("pause")
-            .longOpt("pausescheduler").description("Pause the scheduler (pause all non-running jobs)")
+            .longOpt("pausescheduler").description("Pause the Scheduler (pause all non-running jobs)")
             .jsCommand("pause()").commandClass(PauseCommand.class).entry();
 
     public static final CommandSet.Entry SCHED_RESUME = CommandSetEntryBuilder.newInstance().opt("resume")
-            .longOpt("resumescheduler").description("Resume the scheduler").jsCommand("resume()")
+            .longOpt("resumescheduler").description("Resume the Scheduler").jsCommand("resume()")
             .commandClass(ResumeCommand.class).entry();
 
     public static final CommandSet.Entry SCHED_FREEZE = CommandSetEntryBuilder.newInstance().opt("freeze")
-            .longOpt("freezescheduler").description("Freeze the scheduler (pause all non-running jobs)")
+            .longOpt("freezescheduler").description("Freeze the Scheduler (pause all non-running jobs)")
             .jsCommand("freeze()").commandClass(FreezeCommand.class).entry();
 
     public static final CommandSet.Entry SCHED_KILL = CommandSetEntryBuilder.newInstance().opt("kill")
-            .longOpt("killscheduler").description("Kill the scheduler").jsCommand("kill()").commandClass(
+            .longOpt("killscheduler").description("Kill the Scheduler").jsCommand("kill()").commandClass(
                     KillCommand.class).entry();
 
     public static final CommandSet.Entry SCHED_STATS = CommandSetEntryBuilder.newInstance().opt("sstats")
-            .longOpt("schedulerstats").description("Retrieve current scheduler statistics").jsCommand(
+            .longOpt("schedulerstats").description("Retrieve current Scheduler statistics").jsCommand(
                     "schedulerstats()").commandClass(SchedStatsCommand.class).entry();
 
     public static final CommandSet.Entry LINK_RM = CommandSetEntryBuilder.newInstance().opt("lrm").longOpt(
-            "linkrm").description("Reconnect a resource manager to the scheduler").hasArgs(true).numOfArgs(1)
+            "linkrm").description("Reconnect a Resource Manager to the Scheduler").hasArgs(true).numOfArgs(1)
             .argNames("rm-url").jsCommand("linkrm(rm_url)").commandClass(LinkRmCommand.class).entry();
 
     public static final CommandSet.Entry JOB_LIST = CommandSetEntryBuilder.newInstance().opt("lj").longOpt(
-            "listjobs").description("Retrieve a list of all jobs managed by the scheduler").jsCommand(
+            "listjobs").description("Retrieve a list of all jobs managed by the Scheduler").jsCommand(
             "listjobs()").commandClass(ListJobCommand.class).entry();
 
     public static final CommandSet.Entry JOB_OUTPUT = CommandSetEntryBuilder.newInstance().opt("jo").longOpt(
@@ -339,7 +277,7 @@ public class CommandSet {
             "param1 param2 ...").commandClass(SetPolicyCommand.class).entry();
 
     public static final CommandSet.Entry NODE_LIST = CommandSetEntryBuilder.newInstance().opt("ln").longOpt(
-            "listnodes").description("List nodes handled by the Resoruce Manager").jsCommand(
+            "listnodes").description("List nodes handled by the Resource Manager").jsCommand(
             "listnodes([node-source])").commandClass(ListNodeCommand.class).entry();
 
     public static final CommandSet.Entry NS_LIST = CommandSetEntryBuilder.newInstance().opt("lns").longOpt(
@@ -385,7 +323,7 @@ public class CommandSet {
             .commandClass(RmHelpCommand.class).entry();
 
     public static final CommandSet.Entry RM_STATS = CommandSetEntryBuilder.newInstance().opt("rmstats")
-            .longOpt("rmstats").description("Retrieve current resource manager statistics").jsCommand(
+            .longOpt("rmstats").description("Retrieve current Resource Manager statistics").jsCommand(
                     "rmstats()").commandClass(RmStatsCommand.class).entry();
 
     public static final CommandSet.Entry SCHED_JS_HELP = CommandSetEntryBuilder.newInstance().opt("")
