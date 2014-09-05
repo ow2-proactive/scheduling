@@ -95,6 +95,11 @@ public class SimpleScript extends Script<Object> {
         super(script, engine, parameters);
     }
 
+    @Override
+    protected String getDefaultScriptName() {
+        return "SimpleScript";
+    }
+
     /**
      * Copy constructor
      * 

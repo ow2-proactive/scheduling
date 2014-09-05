@@ -346,6 +346,7 @@ public abstract class Task extends CommonAttribute {
      */
     public void setPreScript(Script<?> preScript) {
         this.preScript = preScript;
+        this.preScript.overrideDefaultScriptName("PreScript");
     }
 
     /**
@@ -397,6 +398,7 @@ public abstract class Task extends CommonAttribute {
      */
     public void setPostScript(Script<?> postScript) {
         this.postScript = postScript;
+        this.postScript.overrideDefaultScriptName("PostScript");
     }
 
     /**
@@ -416,6 +418,7 @@ public abstract class Task extends CommonAttribute {
      */
     public void setCleaningScript(Script<?> cleaningScript) {
         this.cScript = cleaningScript;
+        this.cScript.overrideDefaultScriptName("CleanScript");
     }
 
     /**

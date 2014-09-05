@@ -41,11 +41,9 @@ import java.io.Serializable;
 import java.io.StringReader;
 
 import javax.script.Bindings;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
 
-import org.objectweb.proactive.annotation.PublicAPI;
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.annotation.PublicAPI;
 
 
 /**
@@ -92,6 +90,11 @@ public class TaskScript extends Script<Serializable> {
             // assuming script ran fine
             return new ScriptResult<Serializable>(true);
         }
+    }
+
+    @Override
+    protected String getDefaultScriptName() {
+        return "TaskScript";
     }
 
     @Override

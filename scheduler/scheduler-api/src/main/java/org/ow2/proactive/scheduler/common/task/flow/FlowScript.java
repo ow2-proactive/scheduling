@@ -142,10 +142,15 @@ public class FlowScript extends Script<FlowAction> {
     public FlowScript() {
     }
 
+    @Override
+    protected String getDefaultScriptName() {
+        return "FlowScript";
+    }
+
     /**
      * Copy constructor 
      * 
-     * @param scr Source script
+     * @param fl Source script
      * @throws InvalidScriptException
      */
     public FlowScript(FlowScript fl) throws InvalidScriptException {
@@ -327,7 +332,7 @@ public class FlowScript extends Script<FlowAction> {
      * but will be used after the execution to determine what Control Flow Action
      * should be performed on the TaskFlow.
      * 
-     * @param actionType the ActionType of this script,
+     * @param type the ActionType of this script,
      */
     public void setActionType(FlowActionType type) {
         this.actionType = type.toString();

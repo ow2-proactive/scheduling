@@ -90,13 +90,18 @@ public class SelectionScript extends Script<Boolean> {
     public SelectionScript() {
     }
 
+    @Override
+    protected String getDefaultScriptName() {
+        return "SelectionScript";
+    }
+
     /** Directly create a script with a String.
      * @param script String representing a script code
      * @param engineName String a script execution engine.
      * @throws InvalidScriptException if the creation fails.
      */
     public SelectionScript(String script, String engineName) throws InvalidScriptException {
-        super(script, engineName);
+        super(script, engineName, "SelectionScript");
         buildSelectionScriptId();
     }
 
@@ -107,7 +112,7 @@ public class SelectionScript extends Script<Boolean> {
      * @throws InvalidScriptException if the creation fails.
      */
     public SelectionScript(String script, String engineName, boolean dynamic) throws InvalidScriptException {
-        super(script, engineName);
+        super(script, engineName, "SelectionScript");
         this.dynamic = dynamic;
         buildSelectionScriptId();
     }
@@ -121,7 +126,7 @@ public class SelectionScript extends Script<Boolean> {
      */
     public SelectionScript(String script, String engineName, String[] parameters, boolean dynamic)
             throws InvalidScriptException {
-        super(script, engineName, parameters);
+        super(script, engineName, parameters, "SelectionScript");
         this.dynamic = dynamic;
         buildSelectionScriptId();
     }

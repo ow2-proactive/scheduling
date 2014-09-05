@@ -95,7 +95,12 @@ public class GenerationScript extends Script<Object> {
 
     public GenerationScript(String script, String engineName, String[] parameters)
             throws InvalidScriptException {
-        super(script, engineName, parameters);
+        super(script, engineName, parameters, "GenerationScript");
+    }
+
+    @Override
+    protected String getDefaultScriptName() {
+        return "GenerationScript";
     }
 
     /** Constructor. Directly create a script with a string.
@@ -104,7 +109,7 @@ public class GenerationScript extends Script<Object> {
      * @throws InvalidScriptException if the creation fails.
      */
     public GenerationScript(String script, String engineName) throws InvalidScriptException {
-        super(script, engineName);
+        super(script, engineName, "GenerationScript");
     }
 
     /** Create a script from a file.

@@ -95,6 +95,9 @@ public abstract class Script<E> implements Serializable {
     /** The parameters of the script */
     protected String[] parameters;
 
+    /** Name of the script **/
+    private String scriptName;
+
     /** ProActive needed constructor */
     public Script() {
     }
@@ -110,6 +113,25 @@ public abstract class Script<E> implements Serializable {
         this.script = script;
         this.id = script;
         this.parameters = parameters;
+        this.scriptName = getDefaultScriptName();
+    }
+
+    protected abstract String getDefaultScriptName();
+
+    /** Directly create a script with a string.
+     * @param script String representing the script's source code
+     * @param engineName String representing the execution engine
+     * @param parameters script's execution arguments.
+     * @param scriptName name of the script
+     * @throws InvalidScriptException if the creation fails.
+     */
+    public Script(String script, String engineName, String[] parameters, String scriptName)
+            throws InvalidScriptException {
+        this.scriptEngineLookup = engineName;
+        this.script = script;
+        this.id = script;
+        this.parameters = parameters;
+        this.scriptName = scriptName;
     }
 
     /** Directly create a script with a string.
@@ -118,7 +140,17 @@ public abstract class Script<E> implements Serializable {
      * @throws InvalidScriptException if the creation fails.
      */
     public Script(String script, String engineName) throws InvalidScriptException {
-        this(script, engineName, null);
+        this(script, engineName, (String[]) null);
+    }
+
+    /** Directly create a script with a string.
+     * @param script String representing the script's source code
+     * @param engineName String representing the execution engine
+     * @param scriptName name of the script
+     * @throws InvalidScriptException if the creation fails.
+     */
+    public Script(String script, String engineName, String scriptName) throws InvalidScriptException {
+        this(script, engineName, null, scriptName);
     }
 
     /** Create a script from a file.
@@ -137,6 +169,7 @@ public abstract class Script<E> implements Serializable {
         }
         this.id = file.getPath();
         this.parameters = parameters;
+        this.scriptName = file.getName();
     }
 
     /** Create a script from a file.
@@ -163,6 +196,7 @@ public abstract class Script<E> implements Serializable {
 
         this.id = url.toExternalForm();
         this.parameters = parameters;
+        this.scriptName = url.getFile();
     }
 
     /** Create a script from an URL.
@@ -178,7 +212,15 @@ public abstract class Script<E> implements Serializable {
      * @throws InvalidScriptException if the creation fails.
      */
     public Script(Script<?> script2) throws InvalidScriptException {
-        this(script2.script, script2.scriptEngineLookup, script2.parameters);
+        this(script2.script, script2.scriptEngineLookup, script2.parameters, script2.scriptName);
+    }
+
+    /** Create a script from another script object
+     * @param script2 script object source
+     * @throws InvalidScriptException if the creation fails.
+     */
+    public Script(Script<?> script2, String scriptName) throws InvalidScriptException {
+        this(script2.script, script2.scriptEngineLookup, script2.parameters, scriptName);
     }
 
     /**
@@ -188,6 +230,24 @@ public abstract class Script<E> implements Serializable {
      */
     public String getScript() {
         return script;
+    }
+
+    /**
+     * Sets the script name to the given value.
+     *
+     * @param scriptName the new script name.
+     */
+    public void setScriptName(String scriptName) {
+        this.scriptName = scriptName;
+    }
+
+    /**
+     * Get the script name.
+     *
+     * @return the script name.
+     */
+    public String getScriptName() {
+        return scriptName;
     }
 
     /**
@@ -247,6 +307,7 @@ public abstract class Script<E> implements Serializable {
         BoundedStringWriter sw = new BoundedStringWriter(DEFAULT_OUTPUT_MAX_SIZE);
         PrintWriter pw = new PrintWriter(sw);
         engine.getContext().setWriter(pw);
+        engine.getContext().setAttribute(ScriptEngine.FILENAME, scriptName, ScriptContext.ENGINE_SCOPE);
 
         try {
             Bindings bindings = engine.getBindings(ScriptContext.ENGINE_SCOPE);
@@ -364,5 +425,11 @@ public abstract class Script<E> implements Serializable {
         }
 
         return false;
+    }
+
+    public void overrideDefaultScriptName(String defaultScriptName) {
+        if (scriptName.equals(getDefaultScriptName())) {
+            scriptName = defaultScriptName;
+        }
     }
 }
