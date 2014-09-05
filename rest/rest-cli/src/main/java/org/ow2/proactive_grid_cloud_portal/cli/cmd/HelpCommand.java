@@ -40,15 +40,15 @@ package org.ow2.proactive_grid_cloud_portal.cli.cmd;
 import java.io.PrintWriter;
 import java.io.Writer;
 
-import org.apache.commons.cli.HelpFormatter;
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.CommandFactory;
+import org.apache.commons.cli.HelpFormatter;
 
 
 public class HelpCommand extends AbstractCommand implements Command {
 
-    public static final String USAGE = "java -jar client.jar [OPTIONS]";
+    public static final String USAGE = "proactive-client [OPTIONS]";
 
     public HelpCommand() {
     }
