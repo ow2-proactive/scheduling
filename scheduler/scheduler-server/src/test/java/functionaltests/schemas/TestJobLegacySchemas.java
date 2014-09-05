@@ -41,10 +41,13 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.URL;
 
+import org.apache.commons.io.FileUtils;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
+import org.ow2.proactive.scheduler.common.job.Job;
+import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
+
 import functionaltests.SchedulerConsecutive;
 import functionaltests.SchedulerTHelper;
-import org.apache.commons.io.FileUtils;
 
 
 /**
@@ -80,8 +83,11 @@ public class TestJobLegacySchemas extends SchedulerConsecutive {
         for (URL jobDescriptor : jobDescriptors) {
             logger.info("Testing submission of job descriptor : " + jobDescriptor);
             prepareDataspaceFolder();
-            SchedulerTHelper.testJobSubmissionAndVerifyAllResults(new File(jobDescriptor.toURI())
-                    .getAbsolutePath());
+            String jobDescPath = new File(jobDescriptor.toURI()).getAbsolutePath();
+            Job testJob = JobFactory.getFactory().createJob(jobDescPath);
+            // This line prints the debug information of the job, checking that no toString method produces a NPE
+            SchedulerTHelper.log(testJob.display());
+            SchedulerTHelper.testJobSubmissionAndVerifyAllResults(jobDescPath);
         }
     }
 

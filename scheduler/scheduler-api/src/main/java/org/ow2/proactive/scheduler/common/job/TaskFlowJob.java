@@ -145,4 +145,21 @@ public class TaskFlowJob extends Job {
         // Not yet assigned
         return null;
     }
+
+    @Override
+    public String display() {
+        Character nl = Character.LINE_SEPARATOR;
+        String answer = super.display();
+        return answer + nl + "\tTasks = " + displayAllTasks();
+    }
+
+    private String displayAllTasks() {
+        Character nl = Character.LINE_SEPARATOR;
+        String answer = "{" + nl;
+        for (String tid : tasks.keySet()) {
+            answer += tasks.get(tid).display() + nl + nl;
+        }
+        answer += "}";
+        return answer;
+    }
 }

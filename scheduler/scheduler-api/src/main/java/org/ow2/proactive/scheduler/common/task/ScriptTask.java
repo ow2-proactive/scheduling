@@ -59,4 +59,11 @@ public class ScriptTask extends Task {
     public TaskScript getScript() {
         return script;
     }
+
+    @Override
+    public String toString() {
+        Character nl = Character.LINE_SEPARATOR;
+        String answer = super.display();
+        return answer + nl + "\tScript = " + script;
+    }
 }

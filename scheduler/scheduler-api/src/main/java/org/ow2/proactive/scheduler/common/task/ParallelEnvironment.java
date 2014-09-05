@@ -124,4 +124,9 @@ public class ParallelEnvironment implements Serializable {
         this.topologyDescriptor = topologyDescriptor;
     }
 
+    @Override
+    public String toString() {
+        return "ParallelEnvironment { " + " nodesNumber = " + nodesNumber + ", topologyDescriptor = " +
+            topologyDescriptor + '}';
+    }
 }

@@ -663,4 +663,35 @@ public abstract class Task extends CommonAttribute {
         return outputFiles;
     }
 
+    @Override
+    public String toString() {
+        return name;
+    }
+
+    public String display() {
+        Character nl = Character.LINE_SEPARATOR;
+
+        return "Task \'" + name + "\' : " + nl + "\tFlowBlock = '" + flowBlock + "'" + nl +
+            "\tDescription = '" + description + "'" + nl + "\tResultPreview = '" + resultPreview + "'" + nl +
+            "\tInputFiles = " + inputFiles + nl + "\tOutputFiles = " + outputFiles + nl +
+            "\tParallelEnvironment = " + parallelEnvironment + nl + "\tSelectionScripts = " +
+            displaySelectionScripts() + nl + "\tPreScript = " + preScript + nl + "\tPostScript = " +
+            postScript + nl + "\tCleanScript = " + cScript + nl + "\tFlowScript = " + flowScript + nl +
+            "\tPreciousResult = " + preciousResult + nl + "\tPreciousLogs = " + preciousLogs + nl +
+            "\tRunAsMe = " + runAsMe + nl + "\tWallTime = " + wallTime + nl + "\tDependences = " +
+            dependences;
+    }
+
+    private String displaySelectionScripts() {
+        if (sScripts == null)
+            return null;
+        String answer = "{ ";
+        for (int i = 0; i < sScripts.size(); i++) {
+            SelectionScript ss = sScripts.get(i);
+            answer += ss.display() + ((i < sScripts.size() - 1) ? " , " : "");
+        }
+        answer += " }";
+        return answer;
+    }
+
 }

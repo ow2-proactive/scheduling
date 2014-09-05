@@ -36,6 +36,8 @@
  */
 package org.ow2.proactive.scheduler.common.task;
 
+import java.util.Arrays;
+
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scripting.GenerationScript;
@@ -109,5 +111,13 @@ public class NativeTask extends Task {
 
     public void setWorkingDir(String workingDir) {
         this.workingDir = workingDir;
+    }
+
+    @Override
+    public String toString() {
+        Character nl = Character.LINE_SEPARATOR;
+        String answer = super.display();
+        return answer + nl + "\tCommandLine = " + Arrays.toString(commandLine) + nl +
+            "\tGenerationScript = " + gscript + nl + "\tWorkingDir = '" + workingDir + '\'';
     }
 }

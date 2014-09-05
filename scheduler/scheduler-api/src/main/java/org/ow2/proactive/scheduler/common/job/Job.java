@@ -37,6 +37,7 @@
 package org.ow2.proactive.scheduler.common.job;
 
 import java.net.MalformedURLException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -277,4 +278,18 @@ public abstract class Job extends CommonAttribute {
         return this.variables;
     }
 
+    @Override
+    public String toString() {
+        return name;
+    }
+
+    public String display() {
+        Character nl = Character.LINE_SEPARATOR;
+
+        return "Job '" + name + "' : " + nl + "\tEnvironment = " + environment + nl + "\tDescription = '" +
+            description + '\'' + nl + "\tProjectName = '" + projectName + '\'' + nl + "\tPriority = " +
+            priority + nl + "\tInputSpace = '" + inputSpace + '\'' + nl + "\tOutputSpace = '" + outputSpace +
+            '\'' + nl + "\tGlobalSpace = '" + globalSpace + '\'' + nl + "\tUserSpace = '" + userSpace + '\'' +
+            nl + "\tVariables = " + variables;
+    }
 }

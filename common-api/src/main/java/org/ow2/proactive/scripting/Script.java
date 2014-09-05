@@ -47,6 +47,7 @@ import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.Serializable;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -95,6 +96,7 @@ public abstract class Script<E> implements Serializable {
     /** The parameters of the script */
     protected String[] parameters;
 
+    public static final String UNKNOWN_SCRIPT = "Unknown";
     /** Name of the script **/
     private String scriptName;
 
@@ -425,6 +427,13 @@ public abstract class Script<E> implements Serializable {
         }
 
         return false;
+    }
+
+    @Override
+    public String toString() {
+        return " { " + " scriptEngineLookup = '" + scriptEngineLookup + '\'' + ", script='" + script + '\'' +
+            ", id='" + id + '\'' + ", parameters = " + Arrays.toString(parameters) + ", scriptName = '" +
+            scriptName + '\'' + '}';
     }
 
     public void overrideDefaultScriptName(String defaultScriptName) {

@@ -38,6 +38,7 @@ package org.ow2.proactive.scheduler.common.job;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.zip.CRC32;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -149,5 +150,10 @@ public class JobEnvironment implements Serializable {
      */
     public boolean containsJarFile() {
         return containsJarFile;
+    }
+
+    @Override
+    public String toString() {
+        return Arrays.toString(jobClasspath);
     }
 }
