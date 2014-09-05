@@ -36,6 +36,8 @@
  */
 package org.ow2.proactive.scheduler.task.forked;
 
+import static org.ow2.proactive.scheduler.common.util.VariablesUtil.filterAndUpdate;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -52,6 +54,10 @@ import java.util.Map.Entry;
 import java.util.Random;
 import java.util.concurrent.Callable;
 
+import org.apache.log4j.Appender;
+import org.apache.log4j.AppenderSkeleton;
+import org.apache.log4j.Logger;
+import org.apache.log4j.spi.LoggingEvent;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
@@ -95,12 +101,6 @@ import org.ow2.proactive.scripting.ScriptLoader;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.utils.FileToBytesConverter;
 import org.ow2.proactive.utils.NodeSet;
-import org.apache.log4j.Appender;
-import org.apache.log4j.AppenderSkeleton;
-import org.apache.log4j.Logger;
-import org.apache.log4j.spi.LoggingEvent;
-
-import static org.ow2.proactive.scheduler.common.util.VariablesUtil.filterAndUpdate;
 
 
 /**
@@ -456,6 +456,9 @@ public class JavaForkerExecutable extends JavaExecutable implements ForkerStarte
         command.add("-D" + FORKED_LOGS_HOME + "=" + logHome);
 
         command.add("-D" + FORKED_PARENT_NODE + "=" + nodeName);
+        command.add("-D" + TaskLauncher.IS_FORKED + "=" + "true");
+        command.add("-D" + TaskLauncher.TASKLOG_FILE_PATH + "=" +
+            System.getProperty(TaskLauncher.TASKLOG_FILE_PATH));
 
         //set mandatory log4j file
         if (forkEnvironment == null || !contains("log4j.configuration", forkEnvironment.getJVMArguments())) {
