@@ -96,7 +96,6 @@ public abstract class Script<E> implements Serializable {
     /** The parameters of the script */
     protected String[] parameters;
 
-    public static final String UNKNOWN_SCRIPT = "Unknown";
     /** Name of the script **/
     private String scriptName;
 
@@ -431,9 +430,14 @@ public abstract class Script<E> implements Serializable {
 
     @Override
     public String toString() {
-        return " { " + " scriptEngineLookup = '" + scriptEngineLookup + '\'' + ", script='" + script + '\'' +
-            ", id='" + id + '\'' + ", parameters = " + Arrays.toString(parameters) + ", scriptName = '" +
-            scriptName + '\'' + '}';
+        return scriptName;
+    }
+
+    public String display() {
+        Character nl = Character.LINE_SEPARATOR;
+        return " { " + nl + "Script '" + scriptName + '\'' + nl + "\tscriptEngineLookup = '" +
+            scriptEngineLookup + '\'' + nl + "\tscript = " + nl + script + nl + "\tid = " + nl + id + nl +
+            "\tparameters = " + Arrays.toString(parameters) + nl + '}';
     }
 
     public void overrideDefaultScriptName(String defaultScriptName) {

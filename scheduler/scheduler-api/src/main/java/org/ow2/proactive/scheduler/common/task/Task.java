@@ -675,11 +675,13 @@ public abstract class Task extends CommonAttribute {
             "\tDescription = '" + description + "'" + nl + "\tResultPreview = '" + resultPreview + "'" + nl +
             "\tInputFiles = " + inputFiles + nl + "\tOutputFiles = " + outputFiles + nl +
             "\tParallelEnvironment = " + parallelEnvironment + nl + "\tSelectionScripts = " +
-            displaySelectionScripts() + nl + "\tPreScript = " + preScript + nl + "\tPostScript = " +
-            postScript + nl + "\tCleanScript = " + cScript + nl + "\tFlowScript = " + flowScript + nl +
-            "\tPreciousResult = " + preciousResult + nl + "\tPreciousLogs = " + preciousLogs + nl +
-            "\tRunAsMe = " + runAsMe + nl + "\tWallTime = " + wallTime + nl + "\tDependences = " +
-            dependences;
+            displaySelectionScripts() + nl + "\tPreScript = " +
+            ((preScript != null) ? preScript.display() : null) + nl + "\tPostScript = " +
+            ((postScript != null) ? postScript.display() : null) + nl + "\tCleanScript = " +
+            ((cScript != null) ? cScript.display() : null) + nl + "\tFlowScript = " +
+            ((flowScript != null) ? flowScript.display() : null) + nl + "\tPreciousResult = " +
+            preciousResult + nl + "\tPreciousLogs = " + preciousLogs + nl + "\tRunAsMe = " + runAsMe + nl +
+            "\tWallTime = " + wallTime + nl + "\tDependences = " + dependences;
     }
 
     private String displaySelectionScripts() {
@@ -688,7 +690,9 @@ public abstract class Task extends CommonAttribute {
         String answer = "{ ";
         for (int i = 0; i < sScripts.size(); i++) {
             SelectionScript ss = sScripts.get(i);
-            answer += ss.display() + ((i < sScripts.size() - 1) ? " , " : "");
+            if (ss != null) {
+                answer += ss.display() + ((i < sScripts.size() - 1) ? " , " : "");
+            }
         }
         answer += " }";
         return answer;

@@ -358,10 +358,4 @@ public class SelectionScript extends Script<Boolean> {
         return hashCode() + "\n" + script;
     }
 
-    /**
-     * full representation
-     */
-    public String display() {
-        return super.toString();
-    }
 }

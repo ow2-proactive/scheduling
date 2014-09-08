@@ -61,9 +61,10 @@ public class ScriptTask extends Task {
     }
 
     @Override
-    public String toString() {
+    public String display() {
         Character nl = Character.LINE_SEPARATOR;
         String answer = super.display();
-        return answer + nl + "\tScript = " + script;
+        return answer + nl + "\tScript = " + ((script != null) ? script.display() : null);
     }
+
 }

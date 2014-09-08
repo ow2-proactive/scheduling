@@ -114,10 +114,11 @@ public class NativeTask extends Task {
     }
 
     @Override
-    public String toString() {
+    public String display() {
         Character nl = Character.LINE_SEPARATOR;
         String answer = super.display();
         return answer + nl + "\tCommandLine = " + Arrays.toString(commandLine) + nl +
-            "\tGenerationScript = " + gscript + nl + "\tWorkingDir = '" + workingDir + '\'';
+            "\tGenerationScript = " + ((gscript != null) ? gscript.display() : null) + nl +
+            "\tWorkingDir = '" + workingDir + '\'';
     }
 }
