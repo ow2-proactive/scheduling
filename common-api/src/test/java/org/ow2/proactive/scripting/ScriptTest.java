@@ -34,15 +34,15 @@
  */
 package org.ow2.proactive.scripting;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 import java.io.File;
 import java.io.Reader;
 
 import javax.script.Bindings;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 
 
 public class ScriptTest {
@@ -92,6 +92,11 @@ public class ScriptTest {
     }
 
     class ScriptForTests extends Script<Object> {
+
+        @Override
+        protected String getDefaultScriptName() {
+            return "TestScript";
+        }
 
         public ScriptForTests(String script, String engineName) throws InvalidScriptException {
             super(script, engineName);
