@@ -144,7 +144,7 @@ public class RMNodeStarter {
     public final static String DATASPACES_STATUS_PROP_NAME = "proactive.dataspaces.status";
 
     /** If this property is added to node properties then this
-     *  node will be provides for 
+     *  node will be provides for
      * computations only if criteria have the same access token.
      *
      */
@@ -329,7 +329,7 @@ public class RMNodeStarter {
         } catch (Throwable t) {
             System.out
                     .println("A major problem occured when trying to start a node and register it into the Resource Manager, see the stacktrace below");
-            // Fix for SCHEDULING-1588            	
+            // Fix for SCHEDULING-1588
             if (t instanceof java.lang.NoClassDefFoundError) {
                 System.out
                         .println("Unable to load a class definition, maybe the classpath is not accessible");
@@ -362,7 +362,7 @@ public class RMNodeStarter {
 
         configureForDataSpace(node);
         if (nodeSourceName != null && nodeSourceName.length() > 0) {
-            // setting system the property with node source name 
+            // setting system the property with node source name
             System.setProperty(NODESOURCE_PROP_NAME, nodeSourceName);
         }
 
@@ -689,7 +689,7 @@ public class RMNodeStarter {
 
     private String getDefaultNodeName() {
         try {
-            return InetAddress.getLocalHost().getHostName() + "_" + new Sigar().getPid();
+            return InetAddress.getLocalHost().getHostName().replace('.', '_') + "_" + new Sigar().getPid();
         } catch (Throwable error) {
             logger
                     .warn(
@@ -902,6 +902,7 @@ public class RMNodeStarter {
         sigarExposer = new SigarExposer(nodeName);
         final RMAuthentication rmAuth = auth;
         sigarExposer.boot(auth, false, new PermissionChecker() {
+            @Override
             public boolean checkPermission(Credentials cred) {
                 ResourceManager rm = null;
                 try {
@@ -1021,7 +1022,7 @@ public class RMNodeStarter {
                 logger.error(RMNodeStarter.ExitStatus.RMNODE_NULL.description);
                 System.exit(RMNodeStarter.ExitStatus.RMNODE_NULL.exitCode);
             }
-            // setting system properties to node (they will be accessible remotely) 
+            // setting system properties to node (they will be accessible remotely)
             for (Object key : System.getProperties().keySet()) {
                 localNode.setProperty(key.toString(), System.getProperty(key.toString()));
             }
@@ -1222,6 +1223,7 @@ public class RMNodeStarter {
          * @param paProp A String standing for the PAProperties ( for instance -Dlog4j.configuration=... or -Dproactive.net.netmask=... )
          * @deprecated Please use {@link #setPaProperties(List)}
          */
+        @Deprecated
         public void setPaProperties(String paProp) {
             this.setPaProperties(Arrays.asList(paProp.split(" ")));
         }
@@ -1499,6 +1501,7 @@ public class RMNodeStarter {
             // add jars inside the addons directory
             File addonsAbsolute = new File(rmHome + this.addonsDir);
             addonsAbsolute.listFiles(new FileFilter() {
+                @Override
                 public boolean accept(File pathname) {
                     if (pathname.getName().matches(".*[.]jar")) {
                         classpath.append(os.ps).append(pathname.getAbsolutePath());
