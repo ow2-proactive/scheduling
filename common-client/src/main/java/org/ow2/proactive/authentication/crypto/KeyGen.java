@@ -140,11 +140,11 @@ public class KeyGen {
          */
         try {
             File f = new File(pubKey).getParentFile();
-            if (!f.isDirectory()) {
+            if (f != null && !f.isDirectory()) {
                 f.mkdirs();
             }
             f = new File(privKey).getParentFile();
-            if (!f.isDirectory()) {
+            if (f != null && !f.isDirectory()) {
                 f.mkdirs();
             }
         } catch (Exception e) {
