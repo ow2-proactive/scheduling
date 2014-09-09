@@ -36,6 +36,8 @@
  */
 package org.ow2.proactive.scheduler.task.internal;
 
+import java.util.Arrays;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -45,11 +47,12 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.ow2.proactive.scheduler.job.InternalJob;
-import org.ow2.proactive.scheduler.task.nativ.NativeExecutableContainer;
-import org.ow2.proactive.scheduler.task.nativ.NativeTaskLauncher;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.task.TaskLauncherInitializer;
+import org.ow2.proactive.scheduler.task.nativ.NativeExecutableContainer;
+import org.ow2.proactive.scheduler.task.nativ.NativeTaskLauncher;
 import org.ow2.proactive.scheduler.util.TaskLogger;
+import org.ow2.proactive.scripting.Script;
 
 
 /**
@@ -103,6 +106,17 @@ public class InternalNativeTask extends InternalTask {
      */
     public boolean handleResultsArguments() {
         return true; // Needed for exported properties
+    }
+
+    @Override
+    public String display() {
+        Character nl = Character.LINE_SEPARATOR;
+        String answer = super.display();
+        Script gscript = ((NativeExecutableContainer) executableContainer).getGenerationScript();
+        return answer + nl + "\tCommandLine = " +
+            Arrays.toString(((NativeExecutableContainer) executableContainer).getCommand()) + nl +
+            "\tGenerationScript = " + ((gscript != null) ? gscript.display() : null) + nl +
+            "\tWorkingDir = '" + ((NativeExecutableContainer) executableContainer).getWorkingDir() + '\'';
     }
 
 }

@@ -45,9 +45,11 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
-import org.ow2.proactive.scheduler.task.script.ScriptTaskLauncher;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
+import org.ow2.proactive.scheduler.task.script.ScriptExecutableContainer;
+import org.ow2.proactive.scheduler.task.script.ScriptTaskLauncher;
 import org.ow2.proactive.scheduler.util.TaskLogger;
+import org.ow2.proactive.scripting.Script;
 
 
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -88,6 +90,14 @@ public class InternalScriptTask extends InternalTask {
      */
     public boolean handleResultsArguments() {
         return true; // Needed for exported properties
+    }
+
+    @Override
+    public String display() {
+        Character nl = Character.LINE_SEPARATOR;
+        String answer = super.display();
+        Script tscript = ((ScriptExecutableContainer) executableContainer).getScript();
+        return answer + nl + "\tScript = " + ((tscript != null) ? tscript.display() : null);
     }
 
 }

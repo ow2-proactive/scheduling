@@ -103,4 +103,14 @@ public class InternalJavaTask extends InternalTask {
         return true;
     }
 
+    @Override
+    public String display() {
+        Character nl = Character.LINE_SEPARATOR;
+        String answer = super.display();
+        return answer + nl + "\tExecutableClassName = '" +
+            ((JavaExecutableContainer) this.executableContainer).getUserExecutableClassName() + '\'' + nl +
+            "\tArguments = " +
+            ((JavaExecutableContainer) this.executableContainer).getSerializedArguments().keySet() + nl;
+    }
+
 }

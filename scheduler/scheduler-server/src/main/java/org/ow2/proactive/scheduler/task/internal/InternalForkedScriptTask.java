@@ -40,7 +40,9 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
+import org.ow2.proactive.scheduler.task.script.ForkedScriptExecutableContainer;
 import org.ow2.proactive.scheduler.util.TaskLogger;
+import org.ow2.proactive.scripting.Script;
 
 
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -60,6 +62,14 @@ public class InternalForkedScriptTask extends InternalForkedJavaTask {
      */
     public InternalForkedScriptTask(ExecutableContainer execContainer) {
         this.executableContainer = execContainer;
+    }
+
+    @Override
+    public String display() {
+        Character nl = Character.LINE_SEPARATOR;
+        String answer = super.display();
+        Script tscript = ((ForkedScriptExecutableContainer) executableContainer).getScript();
+        return answer + nl + "\tScript = " + ((tscript != null) ? tscript.display() : null);
     }
 
 }

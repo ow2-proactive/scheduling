@@ -49,10 +49,10 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.InternalJob;
-import org.ow2.proactive.scheduler.task.forked.ForkedJavaExecutableContainer;
-import org.ow2.proactive.scheduler.task.forked.JavaTaskLauncherForker;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.task.TaskLauncherInitializer;
+import org.ow2.proactive.scheduler.task.forked.ForkedJavaExecutableContainer;
+import org.ow2.proactive.scheduler.task.forked.JavaTaskLauncherForker;
 
 
 /**
@@ -190,5 +190,13 @@ public class InternalForkedJavaTask extends InternalJavaTask {
                 brin.close();
             }
         }
+    }
+
+    @Override
+    public String display() {
+        Character nl = Character.LINE_SEPARATOR;
+        String answer = super.display();
+        return answer + nl + "\tForkEnvironment = '" +
+            ((ForkedJavaExecutableContainer) executableContainer).getForkEnvironment();
     }
 }

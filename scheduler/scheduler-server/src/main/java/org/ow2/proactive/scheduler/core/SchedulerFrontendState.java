@@ -403,6 +403,11 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         usersUpdated(new NotificationData<UserIdentification>(SchedulerEvent.USERS_UPDATE, ident));
         jlogger.info(job.getId(), "submitted: name '" + job.getName() + "', tasks '" +
             job.getTotalNumberOfTasks() + "', owner '" + job.getOwner() + "'");
+        try {
+            jlogger.info(job.getId(), job.display());
+        } catch (Exception e) {
+            jlogger.error(job.getId(), "Error while displaying the job :", e);
+        }
     }
 
     synchronized ListeningUser checkPermissionReturningListeningUser(String methodName, String permissionMsg)
