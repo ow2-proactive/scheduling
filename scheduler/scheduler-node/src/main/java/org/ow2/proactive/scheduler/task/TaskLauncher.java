@@ -36,10 +36,6 @@
  */
 package org.ow2.proactive.scheduler.task;
 
-import static org.ow2.proactive.scheduler.common.task.util.SerializationUtil.deserializeVariableMap;
-import static org.ow2.proactive.scheduler.common.task.util.SerializationUtil.serializeVariableMap;
-import static org.ow2.proactive.scheduler.common.util.VariablesUtil.filterAndUpdate;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -68,12 +64,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.apache.log4j.Appender;
-import org.apache.log4j.FileAppender;
-import org.apache.log4j.Logger;
-import org.apache.log4j.MDC;
-import org.apache.log4j.helpers.LogLog;
-import org.apache.log4j.spi.LoggingEvent;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
@@ -128,6 +118,16 @@ import org.ow2.proactive.scripting.ScriptHandler;
 import org.ow2.proactive.scripting.ScriptLoader;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.utils.Formatter;
+import org.apache.log4j.Appender;
+import org.apache.log4j.FileAppender;
+import org.apache.log4j.Logger;
+import org.apache.log4j.MDC;
+import org.apache.log4j.helpers.LogLog;
+import org.apache.log4j.spi.LoggingEvent;
+
+import static org.ow2.proactive.scheduler.common.task.util.SerializationUtil.deserializeVariableMap;
+import static org.ow2.proactive.scheduler.common.task.util.SerializationUtil.serializeVariableMap;
+import static org.ow2.proactive.scheduler.common.util.VariablesUtil.filterAndUpdate;
 
 
 /**
@@ -1826,6 +1826,7 @@ public abstract class TaskLauncher implements InitActive {
          * @throws Exception
          */
         public void copyInputDataToScratch() throws Throwable {
+            long sample = System.nanoTime();
             submitACallable(new Callable<Boolean>() {
                 @Override
                 public Boolean call() throws Exception {
@@ -1838,6 +1839,8 @@ public abstract class TaskLauncher implements InitActive {
                 }
             }, true);
             waitCallable();
+            logger.info("Time spent copying INPUT datas to SCRATCH : " +
+              timeElapsedSinceInMilliseconds(sample) + " ms");
         }
 
         /**
@@ -1845,6 +1848,7 @@ public abstract class TaskLauncher implements InitActive {
          * @throws Exception
          */
         public void copyScratchDataToOutput() throws Throwable {
+            long sample = System.nanoTime();
             submitACallable(new Callable<Boolean>() {
                 @Override
                 public Boolean call() throws Exception {
@@ -1857,6 +1861,8 @@ public abstract class TaskLauncher implements InitActive {
                 }
             }, true);
             waitCallable();
+            logger.info("Time spent copying SCRATCH datas to OUTPUT : " +
+              timeElapsedSinceInMilliseconds(sample) + " ms");
         }
 
         /**
@@ -1945,5 +1951,9 @@ public abstract class TaskLauncher implements InitActive {
                 }
             }
         }
+    }
+
+    private long timeElapsedSinceInMilliseconds(long sinceInNanoSeconds) {
+        return Math.round(Math.ceil((System.nanoTime() - sinceInNanoSeconds) / 1000000));
     }
 }

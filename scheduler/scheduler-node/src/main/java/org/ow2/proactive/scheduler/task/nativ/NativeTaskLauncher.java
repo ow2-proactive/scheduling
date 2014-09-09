@@ -36,8 +36,6 @@
  */
 package org.ow2.proactive.scheduler.task.nativ;
 
-import static org.ow2.proactive.scheduler.common.util.VariablesUtil.filterAndUpdate;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
@@ -47,7 +45,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
@@ -58,14 +55,17 @@ import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.exception.TaskAbortedException;
 import org.ow2.proactive.scheduler.common.exception.WalltimeExceededException;
-import org.ow2.proactive.scheduler.common.task.executable.internal.ExecutableInitializer;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.task.executable.internal.ExecutableInitializer;
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.task.TaskLauncherInitializer;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scripting.GenerationScript;
+import org.apache.log4j.Logger;
+
+import static org.ow2.proactive.scheduler.common.util.VariablesUtil.filterAndUpdate;
 
 
 /**
@@ -139,8 +139,7 @@ public class NativeTaskLauncher extends TaskLauncher {
         logger.debug("Starting Task " + taskId.getReadableName());
 
         long duration = -1;
-        long sample = 0;
-        long intervalms = 0;
+        long sample;
         // Executable result (res or ex)
         Throwable exception = null;
         Serializable userResult = null;
@@ -157,11 +156,7 @@ public class NativeTaskLauncher extends TaskLauncher {
             //get Executable before schedule timer
             executableGuard.initialize(executableContainer.getExecutable());
 
-            sample = System.nanoTime();
-            //copy datas from OUTPUT or INPUT to local scratch
             executableGuard.copyInputDataToScratch();
-            intervalms = Math.round(Math.ceil((System.nanoTime() - sample) / 1000));
-            logger.info("Time spent copying INPUT datas to SCRATCH : " + intervalms + " ms");
 
             // set exported vars
             this.setPropagatedProperties(results);
@@ -246,11 +241,7 @@ public class NativeTaskLauncher extends TaskLauncher {
                 duration += System.nanoTime() - sample;
             }
 
-            sample = System.nanoTime();
-            //copy output file
             executableGuard.copyScratchDataToOutput();
-            intervalms = Math.round(Math.ceil((System.nanoTime() - sample) / 1000));
-            logger.info("Time spent copying SCRATCH data to OUTPUT : " + intervalms + " ms");
             logger.info("Task terminated without error");
         } catch (Throwable ex) {
             logger.debug("Exception occured while running task " + this.taskId + ": ", ex);

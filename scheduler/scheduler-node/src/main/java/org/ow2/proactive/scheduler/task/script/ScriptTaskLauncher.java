@@ -39,7 +39,6 @@ package org.ow2.proactive.scheduler.task.script;
 import java.io.Serializable;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.exception.TaskAbortedException;
@@ -52,6 +51,7 @@ import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.task.TaskLauncherInitializer;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
+import org.apache.log4j.Logger;
 
 
 /**
@@ -102,8 +102,7 @@ public class ScriptTaskLauncher extends TaskLauncher {
     public TaskResult doTaskAndGetResult(TaskTerminateNotification core,
             ExecutableContainer executableContainer, TaskResult... results) {
         long duration = -1;
-        long sample = 0;
-        long intervalms = 0;
+        long sample;
         // Executable result (res or ex)
         Throwable exception = null;
         Serializable userResult = null;
@@ -119,11 +118,7 @@ public class ScriptTaskLauncher extends TaskLauncher {
             // create the executable (will set the context class loader to the taskclassserver)
             executableGuard.initialize(executableContainer.getExecutable());
 
-            sample = System.nanoTime();
-            //copy datas from OUTPUT or INPUT to local scratch
             executableGuard.copyInputDataToScratch();
-            intervalms = Math.round(Math.ceil((System.nanoTime() - sample) / 1000));
-            logger.info("Time spent copying INPUT datas to SCRATCH : " + intervalms + " ms");
 
             // set exported vars
             this.setPropagatedProperties(results);
@@ -143,7 +138,7 @@ public class ScriptTaskLauncher extends TaskLauncher {
             //init task
             ScriptExecutableInitializer initializer = (ScriptExecutableInitializer) createExecutableInitializer(executableContainer);
 
-            setPropagatedVariables((JavaExecutableInitializerImpl) initializer, getPropagatedVariables());
+            setPropagatedVariables(initializer, getPropagatedVariables());
 
             executableGuard.callInternalInit(ScriptExecutable.class, JavaExecutableInitializerImpl.class,
                     initializer);
@@ -167,11 +162,7 @@ public class ScriptTaskLauncher extends TaskLauncher {
                 duration += System.nanoTime() - sample;
             }
 
-            sample = System.nanoTime();
-            //copy output file
             executableGuard.copyScratchDataToOutput();
-            intervalms = Math.round(Math.ceil((System.nanoTime() - sample) / 1000));
-            logger.info("Time spent copying SCRATCH datas to OUTPUT : " + intervalms + " ms");
             logger.info("Task terminated without error");
         } catch (Throwable ex) {
             logger.info("Exception occured while running task " + this.taskId + ": ", ex);

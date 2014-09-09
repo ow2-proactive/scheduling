@@ -41,25 +41,24 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.log4j.Logger;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.exception.TaskAbortedException;
 import org.ow2.proactive.scheduler.common.exception.WalltimeExceededException;
-import org.ow2.proactive.scheduler.common.task.executable.internal.JavaExecutableInitializerImpl;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.ow2.proactive.scheduler.common.task.executable.AbstractJavaExecutable;
 import org.ow2.proactive.scheduler.common.task.executable.Executable;
-import org.ow2.proactive.scheduler.common.task.executable.internal.ExecutableInitializer;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.common.task.executable.JavaStandaloneExecutable;
+import org.ow2.proactive.scheduler.common.task.executable.internal.ExecutableInitializer;
+import org.ow2.proactive.scheduler.common.task.executable.internal.JavaExecutableInitializerImpl;
 import org.ow2.proactive.scheduler.common.task.executable.internal.JavaStandaloneExecutableInitializer;
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
 import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
-import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.task.TaskLauncherInitializer;
+import org.ow2.proactive.scheduler.task.TaskResultImpl;
+import org.apache.log4j.Logger;
 
 
 /**
@@ -107,8 +106,7 @@ public class JavaTaskLauncher extends TaskLauncher {
             ExecutableContainer executableContainer, TaskResult... results) {
         logger.info("Starting Task " + taskId.getReadableName());
         long duration = -1;
-        long sample = 0;
-        long intervalms = 0;
+        long sample;
 
         // Executable result (res or ex)
         Throwable exception = null;
@@ -125,11 +123,7 @@ public class JavaTaskLauncher extends TaskLauncher {
             // create the executable (will set the context class loader to the taskclassserver)
             executableGuard.initialize(executableContainer.getExecutable());
 
-            sample = System.nanoTime();
-            //copy datas from OUTPUT or INPUT to local scratch
             executableGuard.copyInputDataToScratch();
-            intervalms = Math.round(Math.ceil((System.nanoTime() - sample) / 1000));
-            logger.info("Time spent copying INPUT datas to SCRATCH : " + intervalms + " ms");
 
             // set exported vars
             this.setPropagatedProperties(results);
@@ -177,7 +171,7 @@ public class JavaTaskLauncher extends TaskLauncher {
                 // update propagated variables map after task execution so
                 // that any updates that occur during task execution will be
                 // visible in post script execution.
-                setPropagatedVariables(((AbstractJavaExecutable) executableGuard.use()).getVariables());
+                setPropagatedVariables(executableGuard.use().getVariables());
             } catch (Throwable t) {
                 exception = t;
             }
@@ -192,11 +186,7 @@ public class JavaTaskLauncher extends TaskLauncher {
                 duration += System.nanoTime() - sample;
             }
 
-            sample = System.nanoTime();
-            //copy output file
             executableGuard.copyScratchDataToOutput();
-            intervalms = Math.round(Math.ceil((System.nanoTime() - sample) / 1000));
-            logger.info("Time spent copying SCRATCH datas to OUTPUT : " + intervalms + " ms");
             logger.info("Task " + taskId.getReadableName() + " terminated without error");
         } catch (Throwable ex) {
             logger.debug("Exception occured while running task " + this.taskId.getReadableName() + ": ", ex);
