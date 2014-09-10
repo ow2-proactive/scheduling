@@ -153,9 +153,6 @@ public class JavaTaskLauncherForker extends JavaTaskLauncher implements ForkerSt
                 throw e.getCause() != null ? e.getCause() : e;
             }
 
-            //schedule timer at any time
-            scheduleTimer();
-
             duration = System.nanoTime();
             //launch task : here, result is a taskLauncher if everything terminated without error,
             //result is an integer if forkedJVM has exited abnormally (integer contains the error code)
