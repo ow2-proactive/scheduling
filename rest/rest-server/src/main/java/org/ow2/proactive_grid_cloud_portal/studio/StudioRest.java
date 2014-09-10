@@ -148,7 +148,7 @@ public class StudioRest implements StudioInterface {
         } catch (IOException e) {
             logger.warn("Could not write file " + fileName, e);
         } finally {
-            if (outputStream!=null) {
+            if (outputStream != null) {
                 try {
                     outputStream.close();
                 } catch (IOException e) {
@@ -166,7 +166,7 @@ public class StudioRest implements StudioInterface {
         } catch (Exception e) {
             logger.warn("Could not read file " + fileName, e);
         } finally {
-            if (inputStream!=null) {
+            if (inputStream != null) {
                 try {
                     inputStream.close();
                 } catch (IOException e) {

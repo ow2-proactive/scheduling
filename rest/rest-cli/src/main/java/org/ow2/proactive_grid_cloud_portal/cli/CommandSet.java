@@ -72,11 +72,6 @@ public class CommandSet {
             "login").description("the login name to connect to REST server").hasArgs(true).numOfArgs(1)
             .argNames("login-name").jsCommand("login(login-name)").commandClass(LoginCommand.class).entry();
 
-    public static final CommandSet.Entry LOGIN_SCHED = CommandSetEntryBuilder.newInstance().opt("l").longOpt(
-            "login").description("the login name to connect to REST server").hasArgs(true).numOfArgs(1)
-            .argNames("login-name").jsCommand("login(login-name)").commandClass(LoginSchedCommand.class)
-            .entry();
-
     public static final CommandSet.Entry PASSWORD = CommandSetEntryBuilder.newInstance().opt("p").longOpt(
             "password").description("the password to connect to REST server").hasArgs(true).numOfArgs(1)
             .argNames("password").commandClass(SetPasswordCommand.class).entry();
@@ -353,9 +348,9 @@ public class CommandSet {
     /** CommandSet.Entry objects which are specific to Scheduler CLI */
     public static final CommandSet.Entry[] SCHED_ONLY = new CommandSet.Entry[] { SCHED_START, SCHED_STOP,
             SCHED_PAUSE, SCHED_RESUME, SCHED_FREEZE, SCHED_KILL, LINK_RM, SCHED_STATS, JOB_LIST, SUBMIT_DESC,
-            LOGIN_SCHED, SUBMIT_ARCH, JOB_STATE, JOB_OUTPUT, JOB_RESULT, JOB_PRIORITY, JOB_PAUSE, JOB_RESUME,
-            JOB_KILL, JOB_REMOVE, TASK_RESTART, TASK_PREEMPT, TASK_OUTPUT, TASK_RESULT, UPLOAD_FILE,
-            DOWNLOAD_FILE, SCHED_HELP, LIVE_LOG };
+            SUBMIT_ARCH, JOB_STATE, JOB_OUTPUT, JOB_RESULT, JOB_PRIORITY, JOB_PAUSE, JOB_RESUME, JOB_KILL,
+            JOB_REMOVE, TASK_RESTART, TASK_PREEMPT, TASK_OUTPUT, TASK_RESULT, UPLOAD_FILE, DOWNLOAD_FILE,
+            SCHED_HELP, LIVE_LOG };
 
     /** CommandSet.Entry objects which are specific to Resource Manager CLI */
     public static final CommandSet.Entry[] RM_ONLY = new CommandSet.Entry[] { LOGIN, NODE_ADD, NODE_LIST,
