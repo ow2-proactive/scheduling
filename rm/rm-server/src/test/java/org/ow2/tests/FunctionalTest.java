@@ -37,17 +37,10 @@
 package org.ow2.tests;
 
 import java.io.IOException;
-import java.io.PrintStream;
 import java.net.URL;
-import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.atomic.AtomicReference;
 
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
-import org.objectweb.proactive.core.xml.VariableContractImpl;
-import org.objectweb.proactive.utils.SafeTimerTask;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
@@ -55,6 +48,8 @@ import org.junit.After;
 import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Ignore;
+import org.junit.Rule;
+import org.junit.rules.Timeout;
 
 
 @Ignore
@@ -65,33 +60,15 @@ public class FunctionalTest extends ProActiveTest {
         ProActiveConfiguration.load();
     }
 
-    static final protected Logger logger = Logger.getLogger("testsuite");
-    /**
-     * Timeout before the test gets killed.
-     */
-    protected long timeout = CentralPAPropertyRepository.PA_TEST_TIMEOUT.getValue();
+    protected static final Logger logger = Logger.getLogger("testsuite");
 
-    /**
-     * Timer to kill the test after the timeout.
-     */
-    static final private Timer timer = new Timer("functional test timer", true);
-    static final private AtomicReference<TimerTask> timerTask = new AtomicReference<TimerTask>();
+    @Rule
+    public Timeout testTimeout = new Timeout(CentralPAPropertyRepository.PA_TEST_TIMEOUT.getValue());
+
     /**
      * Shutdown hook to ensure that process are killed even if afterClass is not run.
      */
-    static private MyShutdownHook shutdownHook;
-    /**
-     * ProActive related stuff
-     */
-    static volatile private ProActiveSetup paSetup;
-
-    protected VariableContractImpl getVariableContract() {
-        return paSetup.getVariableContract();
-    }
-
-    protected String getJvmParameters() {
-        return paSetup.getJvmParameters();
-    }
+    private static KillAllProcessShutdownHook shutdownHook;
 
     private static int getTestSlice(String testName, int maxValue) {
         return Math.abs(testName.hashCode() % maxValue) + 1;
@@ -149,23 +126,9 @@ public class FunctionalTest extends ProActiveTest {
             killAliveProcesses();
         }
 
-        // Ensure that the host will eventually be cleaned
-        System.err.println("Arming timer " + timeout);
-        TimerTask tt = new MyTimerTask();
-        if (timerTask.compareAndSet(null, tt)) {
-            timer.schedule(new MyTimerTask(), timeout);
-        } else {
-            throw new IllegalStateException("timer task should be null");
-        }
-
-        shutdownHook = new MyShutdownHook();
+        shutdownHook = new KillAllProcessShutdownHook();
         Runtime.getRuntime().addShutdownHook(shutdownHook);
 
-        // Should be final and initialized in a static block but we can't since
-        // child classes must be able to configure PAProperties using static block before
-        // calling ProActiveSetup.ctor()
-        paSetup = new ProActiveSetup();
-        paSetup.start();
     }
 
     private static void configurePAHome() {
@@ -207,20 +170,10 @@ public class FunctionalTest extends ProActiveTest {
             return;
         }
 
-        // Disable timer and shutdown hook
-        TimerTask tt = timerTask.getAndSet(null);
-        if (tt != null) {
-            tt.cancel();
-        }
         Runtime.getRuntime().removeShutdownHook(shutdownHook);
 
         if (!shouldBeExecutedInConsecutiveMode(this.getClass())) {
             System.err.println("Killing all alive proactive processes");
-            // not a consecutive test - cleaning after it
-            if (paSetup != null) {
-                paSetup.shutdown();
-            }
-            // Kill everything
             killAliveProcesses();
         } else {
             System.err.println("Keep the scheduler & rm running after the test");
@@ -234,44 +187,16 @@ public class FunctionalTest extends ProActiveTest {
         new ProcessCleaner(".*RMTStarter.*").killAliveProcesses();
     }
 
-    static private class MyShutdownHook extends Thread {
-
+    private static class KillAllProcessShutdownHook extends Thread {
         @Override
         public void run() {
             System.err.println("Shutdown hook. Killing remaining processes");
             try {
-                timer.cancel();
-                paSetup.shutdown();
                 killAliveProcesses();
             } catch (Exception e) {
-                logger.error("Failed to kill remaining proccesses", e);
+                logger.error("Failed to kill remaining processes", e);
             }
         }
     }
 
-    static private class MyTimerTask extends SafeTimerTask {
-        @Override
-        public void safeRun() {
-            System.err.println("Timeout reached. Killing remaining processes");
-            System.err.println("Dumping thread states before killing processes");
-            printAllThreadsStackTraces(System.err);
-            try {
-                killAliveProcesses();
-                System.err.println("Killing current JVM");
-                System.exit(-42);
-            } catch (Exception e) {
-                logger.error("Failed to kill remaining proccesses", e);
-            }
-        }
-
-        private static void printAllThreadsStackTraces(PrintStream stream) {
-            for (Map.Entry<Thread, StackTraceElement[]> threadEntry : Thread.getAllStackTraces().entrySet()) {
-                stream.println(threadEntry.getKey());
-                for (StackTraceElement stackTraceElement : threadEntry.getValue()) {
-                    stream.println("\t" + stackTraceElement);
-                }
-
-            }
-        }
-    }
 }

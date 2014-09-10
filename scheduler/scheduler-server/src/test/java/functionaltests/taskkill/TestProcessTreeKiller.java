@@ -43,6 +43,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 
 import org.objectweb.proactive.utils.OperatingSystem;
+import org.ow2.proactive.rm.util.process.ProcessTreeKiller;
 import org.ow2.proactive.scheduler.common.exception.UserException;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
@@ -53,15 +54,16 @@ import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
-import org.ow2.proactive.rm.util.process.ProcessTreeKiller;
+import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Level;
+import org.junit.Rule;
+import org.junit.rules.Timeout;
+
 import functionaltests.RMTHelper;
 import functionaltests.SchedulerConsecutive;
 import functionaltests.SchedulerTHelper;
-import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Level;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 
 /**
@@ -95,10 +97,8 @@ public class TestProcessTreeKiller extends SchedulerConsecutive {
 
     String tmpDir = System.getProperty("java.io.tmpdir");
 
-    public TestProcessTreeKiller() {
-        // This sets the test timer to a big number
-        timeout = 600000;
-    }
+    @Rule
+    public Timeout testTimeout = new Timeout(600000);
 
     /**
      * Tests start here.
