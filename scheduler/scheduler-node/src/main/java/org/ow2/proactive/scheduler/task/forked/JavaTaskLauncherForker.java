@@ -158,6 +158,7 @@ public class JavaTaskLauncherForker extends JavaTaskLauncher implements ForkerSt
             //result is an integer if forkedJVM has exited abnormally (integer contains the error code)
             Serializable userResult;
             try {
+                flushStreams();
                 userResult = executableGuard.execute(results);
                 // update propagated variables map after task execution, but
                 // before post script execution

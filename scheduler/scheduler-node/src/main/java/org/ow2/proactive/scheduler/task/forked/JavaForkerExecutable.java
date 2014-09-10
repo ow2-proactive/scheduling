@@ -457,8 +457,6 @@ public class JavaForkerExecutable extends JavaExecutable implements ForkerStarte
 
         command.add("-D" + FORKED_PARENT_NODE + "=" + nodeName);
         command.add("-D" + TaskLauncher.IS_FORKED + "=" + "true");
-        command.add("-D" + TaskLauncher.TASKLOG_FILE_PATH + "=" +
-            System.getProperty(TaskLauncher.TASKLOG_FILE_PATH));
 
         //set mandatory log4j file
         if (forkEnvironment == null || !contains("log4j.configuration", forkEnvironment.getJVMArguments())) {

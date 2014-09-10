@@ -148,7 +148,6 @@ public abstract class TaskLauncher implements InitActive {
     //we should not depend from RM package in this class.
     public static final String NODE_DATASPACE_SCRATCHDIR = "node.dataspace.scratchdir";
     public static final String IS_FORKED = "is.forked";
-    public static final String TASKLOG_FILE_PATH = "tasklog.file.path";
 
     public static final long CLEAN_TIMEOUT = 21 * 1000; // timeout used to control max time for the cleaning operation
 
@@ -424,15 +423,12 @@ public abstract class TaskLauncher implements InitActive {
     private void initLocalLogsFile() throws IOException {
         logFileName = TaskLauncher.LOG_FILE_PREFIX + "-" + this.taskId.getJobId() + "-" +
             this.taskId.value() + ".log";
-        String outPath = null;
-        if ((System.getProperty(IS_FORKED) != null) && (System.getProperty(TASKLOG_FILE_PATH) != null)) {
-            outPath = System.getProperty(TASKLOG_FILE_PATH);
-        }
-        // if TASKLOG_FILE_PATH is set, it means that the forker task has already created a log file,
+        // if IS_FORKED is set, it means that the forker task has already created a log file,
         // and we just append to it
-        if (outPath == null) {
+        if (!"true".equals(System.getProperty(IS_FORKED))) {
             DataSpacesFileObject outlog = SCRATCH.resolveFile(TaskLauncher.LOG_FILE_PREFIX + "-" +
                 this.taskId.getJobId() + "-" + this.taskId.value() + ".log");
+            String outPath = null;
             try {
                 outPath = convertDataSpaceToFileIfPossible(outlog, true);
             } catch (Exception e) {
@@ -442,11 +438,11 @@ public abstract class TaskLauncher implements InitActive {
             File outFile = new File(outPath);
             outFile.createNewFile();
             outFile.setWritable(true, false);
-            System.setProperty(TASKLOG_FILE_PATH, outPath);
+
+            // fileAppender constructor needs a path and not a URI.
+            FileAppender fap = new FileAppender(Log4JTaskLogs.getTaskLogLayout(), outPath, false);
+            this.logAppender.addAppender(fap);
         }
-        // fileAppender constructor needs a path and not a URI.
-        FileAppender fap = new FileAppender(Log4JTaskLogs.getTaskLogLayout(), outPath, false);
-        this.logAppender.addAppender(fap);
     }
 
     /**
@@ -1482,8 +1478,8 @@ public abstract class TaskLauncher implements InitActive {
 
     protected List<OutputSelector> getTaskLogsSelectors(OutputAccessMode transferTo) {
         List<OutputSelector> result = new ArrayList<OutputSelector>(1);
-        // We Log file will be transferred by this task to the user space, only if it's not a forked task
-        if (System.getProperty(IS_FORKED) != null) {
+        // Log file will be transferred by this task to the user or output space, only if it's not a forked task
+        if (!"true".equals(System.getProperty(IS_FORKED))) {
             OutputSelector logFiles = new OutputSelector(
                 new FileSelector(TaskLauncher.LOG_FILE_PREFIX + "*"), transferTo);
             result.add(logFiles);
