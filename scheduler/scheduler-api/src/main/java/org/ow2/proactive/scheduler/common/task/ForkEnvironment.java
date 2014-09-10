@@ -379,9 +379,11 @@ public class ForkEnvironment implements Serializable {
 
     @Override
     public String toString() {
-        return "ForkEnvironment {" + " javaHome = '" + javaHome + '\'' + ", workingDir = '" + workingDir +
-            '\'' + ", baseSystemEnvironment = " + baseSystemEnvironment + ", systemEnvironment = " +
-            systemEnvironment + ", jvmArguments = " + jvmArguments + ", additionalClasspath = " +
-            additionalClasspath + ", script = \'" + script + "\'" + '}';
+        Character nl = Character.LINE_SEPARATOR;
+        return "ForkEnvironment {" + nl + "\tjavaHome = '" + javaHome + '\'' + nl + "\tworkingDir = '" +
+            workingDir + '\'' + nl + "\tbaseSystemEnvironment = " + baseSystemEnvironment + nl +
+            "\tsystemEnvironment = " + systemEnvironment + nl + "\tjvmArguments = " + jvmArguments + nl +
+            "\tadditionalClasspath = " + additionalClasspath + nl + "\tscript = " +
+            (script != null ? script.display() : null) + nl + '}';
     }
 }
