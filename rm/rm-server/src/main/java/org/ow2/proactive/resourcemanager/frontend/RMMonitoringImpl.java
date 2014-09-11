@@ -260,9 +260,7 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
                         if (inProcess.get()) {
                             if (logger.isDebugEnabled()) {
                                 logger.debug("Communication to the client " + client +
-                                    " is in progress in one thread of the thread pool. " +
-                                    "Either events come too quick or the client is slow. " +
-                                    "Do not initiate connection from another thread.");
+                                    " is in progress in one thread of the thread pool.");
                             }
                         } else {
                             inProcess.set(true);
@@ -290,30 +288,32 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
                     client + "'");
             }
 
-            LinkedList<RMEvent> toDeliver = new LinkedList<RMEvent>();
-            synchronized (events) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug(events.size() + " pending events for the client '" + client + "'");
-                }
-
-                if (events.size() > 0) {
-                    toDeliver.clear();
-                    toDeliver.addAll(events);
-                    events.clear();
-                }
-            }
-
-            if (toDeliver.size() > 0) {
-                if (deliverEvents(toDeliver)) {
+            while (true) {
+                LinkedList<RMEvent> toDeliver = new LinkedList<RMEvent>();
+                synchronized (events) {
                     if (logger.isDebugEnabled()) {
-                        logger.debug("Finishing delivery in " + Thread.currentThread() + " to client '" +
-                            client + "'. " + toDeliver.size() + " events were delivered in " +
-                            (System.currentTimeMillis() - timeStamp) + " ms");
+                        logger.debug(events.size() + " pending events for the client '" + client + "'");
+                    }
+
+                    if (events.size() > 0) {
+                        toDeliver.clear();
+                        toDeliver.addAll(events);
+                        events.clear();
                     }
                 }
 
-            } else {
-                logger.debug("No events to deliver to client " + client);
+                if (toDeliver.size() > 0) {
+                    if (deliverEvents(toDeliver)) {
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("Finishing delivery in " + Thread.currentThread() + " to client '" +
+                                client + "'. " + toDeliver.size() + " events were delivered in " +
+                                (System.currentTimeMillis() - timeStamp) + " ms");
+                        }
+                    }
+
+                } else {
+                    break;
+                }
             }
             inProcess.set(false);
         }
