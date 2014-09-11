@@ -78,6 +78,9 @@ public class NoVncSecuredTargetResolver implements IProxyTargetResolver {
 
     @Override
     public InetSocketAddress resolveTarget(MessageEvent messageEvent) {
+        if (messageEvent == null) {
+            return null; // websockify switched to direct proxy handler, not supported here
+        }
         Map<String, String> parameters = getQueryMap(((HttpRequest) messageEvent.getMessage()).getUri());
 
         String sessionId = parameters.get("sessionId");
