@@ -208,7 +208,6 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         try {
             fsManager = VFSFactory.createDefaultFileSystemManager();
         } catch (FileSystemException e) {
-            e.printStackTrace();
             logger.error("Could not create Default FileSystem Manager", e);
         }
     }
