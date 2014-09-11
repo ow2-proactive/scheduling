@@ -164,6 +164,7 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
 
         protected AtomicBoolean inProcess = new AtomicBoolean(false);
 
+
         protected long counter = 0;
 
         public EventDispatcher(Client client, RMEventListener listener, RMEventType[] eventTypes) {
@@ -193,8 +194,6 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
                     }
                     if (events.size() > 0) {
                         event = events.removeFirst();
-                    } else {
-                        inProcess.set(false);
                     }
                 }
 
@@ -207,10 +206,11 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
             }
 
             if (logger.isDebugEnabled()) {
-                logger.debug("Finnishing delivery in " + Thread.currentThread() + " to client '" + client +
+                logger.debug("Finishing delivery in " + Thread.currentThread() + " to client '" + client +
                     "'. " + numberOfEventDelivered + " events were delivered in " +
                     (System.currentTimeMillis() - timeStamp) + " ms");
             }
+            inProcess.set(false);
         }
 
         private void deliverEvent(RMEvent event) {
@@ -251,19 +251,25 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
         public void queueEvent(RMEvent event) {
             synchronized (events) {
                 if (eventTypes == null || eventTypes.contains(event.getEventType())) {
-                    event.setCounter(counter++);
-                    events.add(event);
+                    try {
+                        // clone event object to set a different counter for each client
+                        RMEvent cloneEvent = (RMEvent)event.clone();
+                        cloneEvent.setCounter(++counter);
+                        events.add(cloneEvent);
 
-                    if (inProcess.get()) {
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("Communication to the client " + client +
-                                " is in progress in one thread of the thread pool. " +
-                                "Either events come too quick or the client is slow. " +
-                                "Do not initiate connection from another thread.");
+                        if (inProcess.get()) {
+                            if (logger.isDebugEnabled()) {
+                                logger.debug("Communication to the client " + client +
+                                    " is in progress in one thread of the thread pool. " +
+                                    "Either events come too quick or the client is slow. " +
+                                    "Do not initiate connection from another thread.");
+                            }
+                        } else {
+                            inProcess.set(true);
+                            eventDispatcherThreadPool.submit(this);
                         }
-                    } else {
-                        inProcess.set(true);
-                        eventDispatcherThreadPool.submit(this);
+                    } catch (CloneNotSupportedException ex) {
+                        logger.error(ex.getMessage(), ex);
                     }
                 }
             }
@@ -295,13 +301,12 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
                     toDeliver.addAll(events);
                     events.clear();
                 }
-                inProcess.set(false);
             }
 
             if (toDeliver.size() > 0) {
                 if (deliverEvents(toDeliver)) {
                     if (logger.isDebugEnabled()) {
-                        logger.debug("Finnishing delivery in " + Thread.currentThread() + " to client '" +
+                        logger.debug("Finishing delivery in " + Thread.currentThread() + " to client '" +
                             client + "'. " + toDeliver.size() + " events were delivered in " +
                             (System.currentTimeMillis() - timeStamp) + " ms");
                     }
@@ -310,6 +315,7 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
             } else {
                 logger.debug("No events to deliver to client " + client);
             }
+            inProcess.set(false);
         }
 
         private boolean deliverEvents(Collection<RMEvent> events) {

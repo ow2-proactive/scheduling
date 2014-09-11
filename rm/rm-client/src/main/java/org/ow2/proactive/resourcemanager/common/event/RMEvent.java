@@ -50,7 +50,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * @since ProActive Scheduling 0.9
  */
 @PublicAPI
-public class RMEvent implements Serializable {
+public class RMEvent implements Serializable, Cloneable {
 
     /** Resource manager URL */
     private String RMUrl = null;
@@ -137,5 +137,10 @@ public class RMEvent implements Serializable {
     @Override
     public String toString() {
         return this.type + ((counter > 0) ? " counter: " + counter + " " : "") + "[" + this.RMUrl + "]";
+    }
+
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
     }
 }
