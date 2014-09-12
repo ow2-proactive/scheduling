@@ -51,7 +51,7 @@ import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
 import org.ow2.tests.FunctionalTest;
-import org.junit.After;
+import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -67,15 +67,14 @@ import functionaltests.executables.EndlessExecutable;
  * Connection to scheduler, with authentication
  * Register a monitor to Scheduler in order to receive events concerning
  * job submission.
- * 
+ *
  * This test will try many kind of possible errors.
  * The goal for this test is to terminate. If the Test timeout is reached, it is considered as failed.
  * Possible problems may come from many error count. If this job finish in a
  * reasonable time, it is considered that it passed the test.
  * Every events coming from the scheduler are also checked.
- * 
+ *
  * @author The ProActive Team
- * @date 2 jun 08
  * @since ProActive Scheduling 1.0
  */
 public class TestKillTaskWhileExecutingScripts extends FunctionalTest {
@@ -83,25 +82,24 @@ public class TestKillTaskWhileExecutingScripts extends FunctionalTest {
     static Script endlessScript;
 
     @Before
-    public void init() throws Throwable {
-        if (!shouldBeExecuted())
-            return;
-
+    public void createScript() throws Throwable {
         endlessScript = new SimpleScript(
-            "file = new java.io.File(java.lang.System.getProperty(\"java.io.tmpdir\"),\"started.ok\");file.createNewFile();while(true){java.lang.Thread.sleep(500);}",
-            "groovy");
-        SchedulerTHelper.startScheduler();
-    }
-
-    @After
-    public void clean() throws Throwable {
-        if (!shouldBeExecuted())
-            return;
-
-        SchedulerTHelper.killScheduler();
+          "file = new java.io.File(java.lang.System.getProperty(\"java.io.tmpdir\")," +
+            "\"started.ok\");file.createNewFile();while(true){java.lang.Thread.sleep(500);}",
+          "groovy");
     }
 
     @Test
+    public void runAllTests() throws Throwable {
+        javaTaskKillEndlessPreScript();
+        javaTaskKillEndlessPostScript();
+        javaTaskKillEndlessFlowScript();
+        javaTaskKillEndlessJavaExecutable();
+        forkedJavaTaskKillEndlessEnvScript();
+        forkedJavaTaskKillEndlessJavaExecutable();
+        killEndlessScriptTask();
+    }
+
     public void javaTaskKillEndlessPreScript() throws Throwable {
 
         SchedulerTHelper.log("Test Java Task : killing an Endless PreScript ...");
@@ -118,7 +116,6 @@ public class TestKillTaskWhileExecutingScripts extends FunctionalTest {
         submitAndCheckJob(job, tname);
     }
 
-    @Test
     public void javaTaskKillEndlessPostScript() throws Throwable {
         SchedulerTHelper.log("Test Java Task : killing an Endless PostScript ...");
         String tname = "javaTaskKillEndlessPostScript";
@@ -134,7 +131,6 @@ public class TestKillTaskWhileExecutingScripts extends FunctionalTest {
         submitAndCheckJob(job, tname);
     }
 
-    @Test
     public void javaTaskKillEndlessFlowScript() throws Throwable {
         SchedulerTHelper.log("Test Java Task : killing an Endless FlowScript ...");
         String tname = "javaTaskKillEndlessFlowScript";
@@ -150,7 +146,6 @@ public class TestKillTaskWhileExecutingScripts extends FunctionalTest {
         submitAndCheckJob(job, tname);
     }
 
-    @Test
     public void javaTaskKillEndlessJavaExecutable() throws Throwable {
         SchedulerTHelper.log("Test Java Task : killing an Endless Java Executable ...");
         String tname = "javaTaskKillEndlessJavaExecutable";
@@ -165,7 +160,6 @@ public class TestKillTaskWhileExecutingScripts extends FunctionalTest {
         submitAndCheckJob(job, tname);
     }
 
-    @Test
     public void forkedJavaTaskKillEndlessEnvScript() throws Throwable {
         SchedulerTHelper.log("Test Forked Java Task : killing an Endless Java Executable ...");
         String tname = "forkedJavaTaskKillEndlessEnvScript";
@@ -183,7 +177,6 @@ public class TestKillTaskWhileExecutingScripts extends FunctionalTest {
         submitAndCheckJob(job, tname);
     }
 
-    @Test
     public void forkedJavaTaskKillEndlessJavaExecutable() throws Throwable {
         SchedulerTHelper.log("Test : killing an Endless Java Executable ...");
         String tname = "forkedJavaTaskKillEndlessJavaExecutable";
@@ -199,7 +192,6 @@ public class TestKillTaskWhileExecutingScripts extends FunctionalTest {
         submitAndCheckJob(job, tname);
     }
 
-    @Test
     public void killEndlessScriptTask() throws Throwable {
         SchedulerTHelper.log("Test : killing an Endless Script Task...");
         String tname = "killEndlessScriptTask";
@@ -216,9 +208,7 @@ public class TestKillTaskWhileExecutingScripts extends FunctionalTest {
 
     private void submitAndCheckJob(Job job, String tname) throws Exception {
         //test submission and event reception
-        if (EndlessExecutable.STARTED_FILE.exists()) {
-            EndlessExecutable.STARTED_FILE.delete();
-        }
+        FileUtils.deleteQuietly(EndlessExecutable.STARTED_FILE);
         JobId id = SchedulerTHelper.submitJob(job);
         SchedulerTHelper.log("Job submitted, id " + id.toString());
         SchedulerTHelper.log("Waiting for jobSubmitted Event");

@@ -1,22 +1,22 @@
 package functionaltests.taskkill;
 
-import functionaltests.RMTHelper;
-import functionaltests.SchedulerTHelper;
-import functionaltests.TNode;
-import org.objectweb.proactive.core.process.JVMProcess;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.tests.FunctionalTest;
 
+import functionaltests.RMTHelper;
+import functionaltests.SchedulerTHelper;
+import functionaltests.TNode;
 
-public class TestChildProcessesCleanupByRMNodeStarter extends FunctionalTest {
+
+public class TestChildProcessOfNodeKilled extends FunctionalTest {
 
     @org.junit.Test
     public void childProcessesForkedByTaskAreCleanedUpWhenRMNodeStarterIsKilled() throws Throwable {
-        JVMProcess nodeProcess = startSchedulerAndRMWithOneNode();
+        TNode tNode = startSchedulerAndRMWithOneNode();
         startJobForkingProcesses();
 
-        nodeProcess.stopProcess();
+        RMTHelper.getDefaultInstance().killNode(tNode.getNode().getNodeInformation().getURL());
 
         TestProcessTreeKiller.waitUntilAllForkedProcessesAreKilled();
     }
@@ -27,11 +27,11 @@ public class TestChildProcessesCleanupByRMNodeStarter extends FunctionalTest {
         TestProcessTreeKiller.waitUntilForkedProcessesAreRunning(TestProcessTreeKiller.detachedProcNumber);
     }
 
-    private static JVMProcess startSchedulerAndRMWithOneNode() throws Exception {
+    private static TNode startSchedulerAndRMWithOneNode() throws Exception {
         SchedulerTHelper.startSchedulerWithEmptyResourceManager();
         ResourceManager resourceManager = RMTHelper.getDefaultInstance().getResourceManager();
         TNode tNode = RMTHelper.createRMNodeStarterNode("test1");
         resourceManager.addNode(tNode.getNode().getNodeInformation().getURL());
-        return tNode.getNodeProcess();
+        return tNode;
     }
 }
