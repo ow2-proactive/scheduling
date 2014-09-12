@@ -112,6 +112,7 @@ public class SchedulerStarter {
         configureSchedulerAndRMAndPAHomes();
         configureSecurityManager();
         configureLogging();
+        configureDerby();
 
         args = JVMPropertiesPreloader.overrideJVMProperties(args);
 
@@ -429,6 +430,10 @@ public class SchedulerStarter {
             PropertyConfigurator.configure(defaultLog4jConfig);
         setPropIfNotAlreadySet("java.util.logging.config.file", defaultLog4jConfig);
         setPropIfNotAlreadySet("derby.stream.error.file", schedHome + "/logs/Database.log");
+    }
+
+    private static void configureDerby() {
+        setPropIfNotAlreadySet("derby.locks.deadlockTimeout", "1");
     }
 
     private static boolean setPropIfNotAlreadySet(String name, Object value) {
