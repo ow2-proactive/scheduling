@@ -13,6 +13,4 @@ CONTENTS:
   * command_step.sh - step for launching the user's command
   * check_sudo.sh - verification script
   * suer32/suer64 - EXECUTABLE - version depending on the machine type (32/64bit)
-  
-  
-
+  * kill_process_tree.sh - kills the process tree of each process with specified pattern.
