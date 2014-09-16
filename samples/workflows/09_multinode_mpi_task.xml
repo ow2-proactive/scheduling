@@ -14,7 +14,7 @@
                 <staticCommand value="mpirun">
                     <arguments>
                         <argument value="-hostfile"/>
-                        <argument value="$PAS_NODESFILE"/>
+                        <argument value="$NODESFILE"/>
                         <argument value="hostname"/>
                     </arguments>
                 </staticCommand>
