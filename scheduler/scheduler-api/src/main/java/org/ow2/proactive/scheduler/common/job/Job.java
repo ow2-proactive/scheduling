@@ -284,7 +284,7 @@ public abstract class Job extends CommonAttribute {
     }
 
     public String display() {
-        Character nl = Character.LINE_SEPARATOR;
+        String nl = System.getProperty("line.separator");
 
         return "Job '" + name + "' : " + nl + "\tEnvironment = " + environment + nl + "\tDescription = '" +
             description + '\'' + nl + "\tProjectName = '" + projectName + '\'' + nl + "\tPriority = " +

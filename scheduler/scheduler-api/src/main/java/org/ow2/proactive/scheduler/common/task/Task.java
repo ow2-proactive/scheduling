@@ -669,7 +669,7 @@ public abstract class Task extends CommonAttribute {
     }
 
     public String display() {
-        Character nl = Character.LINE_SEPARATOR;
+        String nl = System.getProperty("line.separator");
 
         return "Task \'" + name + "\' : " + nl + "\tFlowBlock = '" + flowBlock + "'" + nl +
             "\tDescription = '" + description + "'" + nl + "\tResultPreview = '" + resultPreview + "'" + nl +

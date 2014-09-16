@@ -204,7 +204,7 @@ public class JavaTask extends Task {
 
     @Override
     public String display() {
-        Character nl = Character.LINE_SEPARATOR;
+        String nl = System.getProperty("line.separator");
         String answer = super.display();
         return answer + nl + "\tExecutableClassName = '" + executableClassName + '\'' + nl +
             "\tArguments = " + serializedArguments.keySet() + nl + "\tForkEnvironment = " + forkEnvironment;

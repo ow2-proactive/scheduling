@@ -148,13 +148,13 @@ public class TaskFlowJob extends Job {
 
     @Override
     public String display() {
-        Character nl = Character.LINE_SEPARATOR;
+        String nl = System.getProperty("line.separator");
         String answer = super.display();
         return answer + nl + "\tTasks = " + displayAllTasks();
     }
 
     private String displayAllTasks() {
-        Character nl = Character.LINE_SEPARATOR;
+        String nl = System.getProperty("line.separator");
         String answer = "{" + nl;
         for (String tid : tasks.keySet()) {
             answer += tasks.get(tid).display() + nl + nl;

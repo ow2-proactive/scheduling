@@ -94,7 +94,7 @@ public class InternalScriptTask extends InternalTask {
 
     @Override
     public String display() {
-        Character nl = Character.LINE_SEPARATOR;
+        String nl = System.getProperty("line.separator");
         String answer = super.display();
         Script tscript = ((ScriptExecutableContainer) executableContainer).getScript();
         return answer + nl + "\tScript = " + ((tscript != null) ? tscript.display() : null);

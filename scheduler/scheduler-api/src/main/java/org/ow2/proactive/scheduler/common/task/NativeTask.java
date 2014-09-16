@@ -115,7 +115,7 @@ public class NativeTask extends Task {
 
     @Override
     public String display() {
-        Character nl = Character.LINE_SEPARATOR;
+        String nl = System.getProperty("line.separator");
         String answer = super.display();
         return answer + nl + "\tCommandLine = " + Arrays.toString(commandLine) + nl +
             "\tGenerationScript = " + ((gscript != null) ? gscript.display() : null) + nl +

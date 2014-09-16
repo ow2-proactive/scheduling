@@ -105,7 +105,7 @@ public class InternalJavaTask extends InternalTask {
 
     @Override
     public String display() {
-        Character nl = Character.LINE_SEPARATOR;
+        String nl = System.getProperty("line.separator");
         String answer = super.display();
         return answer + nl + "\tExecutableClassName = '" +
             ((JavaExecutableContainer) this.executableContainer).getUserExecutableClassName() + '\'' + nl +

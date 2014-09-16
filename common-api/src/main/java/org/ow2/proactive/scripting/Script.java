@@ -434,7 +434,7 @@ public abstract class Script<E> implements Serializable {
     }
 
     public String display() {
-        Character nl = Character.LINE_SEPARATOR;
+        String nl = System.getProperty("line.separator");
         return " { " + nl + "Script '" + scriptName + '\'' + nl + "\tscriptEngineLookup = '" +
             scriptEngineLookup + '\'' + nl + "\tscript = " + nl + script + nl + "\tid = " + nl + id + nl +
             "\tparameters = " + Arrays.toString(parameters) + nl + '}';

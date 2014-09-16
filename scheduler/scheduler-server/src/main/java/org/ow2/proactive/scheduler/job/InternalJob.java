@@ -1331,13 +1331,13 @@ public abstract class InternalJob extends JobState {
 
     @Override
     public String display() {
-        Character nl = Character.LINE_SEPARATOR;
+        String nl = System.getProperty("line.separator");
         String answer = super.display();
         return answer + nl + "\tTasks = " + displayAllTasks();
     }
 
     private String displayAllTasks() {
-        Character nl = Character.LINE_SEPARATOR;
+        String nl = System.getProperty("line.separator");
         String answer = "{" + nl;
         for (TaskId tid : tasks.keySet()) {
             answer += tasks.get(tid).display() + nl + nl;

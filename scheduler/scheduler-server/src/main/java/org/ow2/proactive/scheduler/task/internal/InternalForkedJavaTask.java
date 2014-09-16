@@ -194,7 +194,7 @@ public class InternalForkedJavaTask extends InternalJavaTask {
 
     @Override
     public String display() {
-        Character nl = Character.LINE_SEPARATOR;
+        String nl = System.getProperty("line.separator");
         String answer = super.display();
         return answer + nl + "\tForkEnvironment = '" +
             ((ForkedJavaExecutableContainer) executableContainer).getForkEnvironment();

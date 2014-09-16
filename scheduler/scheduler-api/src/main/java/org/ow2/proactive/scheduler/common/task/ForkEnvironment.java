@@ -379,7 +379,7 @@ public class ForkEnvironment implements Serializable {
 
     @Override
     public String toString() {
-        Character nl = Character.LINE_SEPARATOR;
+        String nl = System.getProperty("line.separator");
         return "ForkEnvironment {" + nl + "\tjavaHome = '" + javaHome + '\'' + nl + "\tworkingDir = '" +
             workingDir + '\'' + nl + "\tbaseSystemEnvironment = " + baseSystemEnvironment + nl +
             "\tsystemEnvironment = " + systemEnvironment + nl + "\tjvmArguments = " + jvmArguments + nl +
