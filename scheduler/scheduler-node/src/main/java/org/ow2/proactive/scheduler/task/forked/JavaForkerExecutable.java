@@ -697,7 +697,12 @@ public class JavaForkerExecutable extends JavaExecutable implements ForkerStarte
             // default it to use the forker shared scratch space so input files are
             // directly accessible from the working dir
             try {
-                ospb.directory(new File(new URI(getForkedTaskSharedSpace().getRealURI())));
+                File sharedDir = new File(new URI(getForkedTaskSharedSpace().getRealURI()));
+
+                if (isRunAsUser()) {
+                    sharedDir.setWritable(true, false);
+                }
+                ospb.directory(sharedDir);
             } catch (URISyntaxException e) {
                 logger.warn("Could not resolve forked task shared scratch space URI", e);
             }
