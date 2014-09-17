@@ -38,12 +38,12 @@ package org.ow2.proactive.scheduler.task.utils;
 
 import java.security.KeyException;
 
-import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.extensions.processbuilder.OSUser;
 import org.objectweb.proactive.extensions.processbuilder.PAOSProcessBuilderFactory;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.scheduler.common.task.OneShotDecrypter;
+import org.apache.log4j.Logger;
 
 
 /**
@@ -67,21 +67,15 @@ public final class ForkerUtils {
     static {
         //initialize node configuration
         String forkMethod = System.getProperty(FORK_METHOD_KEY);
-        if (forkMethod == null) {
-            FORK_METHOD_VALUE = null;
-            logger.info("Java Property " + FORK_METHOD_KEY + " is not set.");
-        } else if (ForkMethod.NONE.matches(forkMethod)) {
+        if (ForkMethod.NONE.matches(forkMethod)) {
             FORK_METHOD_VALUE = ForkMethod.NONE;
         } else if (ForkMethod.PWD.matches(forkMethod)) {
             FORK_METHOD_VALUE = ForkMethod.PWD;
         } else if (ForkMethod.KEY.matches(forkMethod)) {
             FORK_METHOD_VALUE = ForkMethod.KEY;
         } else {
-            FORK_METHOD_VALUE = null;
-            logger.warn("WARNING : Java Property " + FORK_METHOD_KEY + " is not configured properly :");
-            logger.warn("\t Must be one of : [" + ForkMethod.NONE + ", " + ForkMethod.PWD + ", " +
-                ForkMethod.KEY + "]");
-            logger.warn("\t Currently set  : [" + forkMethod + "]");
+            FORK_METHOD_VALUE = ForkMethod.PWD;
+            logger.debug("Java Property " + FORK_METHOD_KEY + " is not set or uses invalid value. Fallback to method password");
         }
     }
 
