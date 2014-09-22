@@ -71,6 +71,8 @@ import org.ow2.proactive.authentication.principals.IdentityPrincipal;
  */
 public class PrincipalPermission extends ClientPermission {
 
+    private static final long serialVersionUID = 60L;
+
     private List<IdentityPrincipal> principals = new LinkedList<IdentityPrincipal>();
 
     public PrincipalPermission(IdentityPrincipal principal) {
@@ -111,6 +113,8 @@ public class PrincipalPermission extends ClientPermission {
 }
 
 final class PrincipalPermissionCollection extends PermissionCollection implements Serializable {
+
+    private static final long serialVersionUID = 60L;
 
     private transient List<Permission> permissions;
 

@@ -75,6 +75,8 @@ import org.apache.log4j.Logger;
 @PublicAPI
 public abstract class Script<E> implements Serializable {
 
+    private static final long serialVersionUID = 60L;
+
     // default output size in chars
     public static final int DEFAULT_OUTPUT_MAX_SIZE = 1 * 1024 * 1024 * 1024; // 1 million characters ~ 2 Mb
 

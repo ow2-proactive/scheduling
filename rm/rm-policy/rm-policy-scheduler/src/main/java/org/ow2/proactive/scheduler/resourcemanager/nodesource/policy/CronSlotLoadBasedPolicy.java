@@ -55,6 +55,8 @@ import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 @ActiveObject
 public class CronSlotLoadBasedPolicy extends SchedulerLoadingPolicy {
 
+    private static final long serialVersionUID = 60L;
+
     @Configurable(description = "Time when all nodes are deployed (crontab format)")
     private String deployAllAt = "* * * * *";
 

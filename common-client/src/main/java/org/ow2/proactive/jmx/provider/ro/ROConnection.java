@@ -74,6 +74,8 @@ import org.ow2.proactive.jmx.provider.JMXProviderUtils;
  * @author The ProActive Team 
  */
 public class ROConnection implements MBeanServerConnection, Serializable {
+
+    private static final long serialVersionUID = 60L;
     /** The attached MBean server */
     private final transient MBeanServer mbs;
     /** The id of this connection */

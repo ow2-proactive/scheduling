@@ -65,6 +65,8 @@ import org.ow2.proactive.scheduler.util.classloading.TaskClassServer;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class JavaExecutableContainer extends ExecutableContainer {
 
+    private static final long serialVersionUID = 60L;
+
     protected String userExecutableClassName;
 
     /** Arguments of the task as a map */

@@ -57,6 +57,8 @@ import org.ow2.proactive.scheduler.common.util.JarUtils;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class JobEnvironment implements Serializable {
 
+    private static final long serialVersionUID = 60L;
+
     // job classpath
     // used for resolving classes only on user side !
     private String[] jobClasspath;

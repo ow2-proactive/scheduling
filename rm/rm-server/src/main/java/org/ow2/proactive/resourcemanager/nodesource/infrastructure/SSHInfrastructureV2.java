@@ -82,6 +82,8 @@ import org.apache.log4j.Logger;
  */
 public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
 
+    private static final long serialVersionUID = 60L;
+
     private static final Logger logger = Logger.getLogger(SSHInfrastructureV2.class);
 
     public static final int DEFAULT_OUTPUT_BUFFER_LENGTH = 1000;

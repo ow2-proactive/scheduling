@@ -66,6 +66,8 @@ import org.apache.log4j.Logger;
  */
 public class EC2Deployer implements java.io.Serializable {
 
+    private static final long serialVersionUID = 60L;
+
     /** logger */
     protected static Logger logger = Logger.getLogger(EC2Deployer.class);
 

@@ -77,6 +77,8 @@ import org.ow2.proactive.utils.Formatter;
  */
 public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
 
+    private static final long serialVersionUID = 60L;
+
     /**
      * class' logger
      */

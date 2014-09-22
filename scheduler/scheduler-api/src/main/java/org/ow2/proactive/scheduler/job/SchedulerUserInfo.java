@@ -44,6 +44,8 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @PublicAPI
 public class SchedulerUserInfo implements Serializable {
 
+    private static final long serialVersionUID = 60L;
+
     private final String hostName;
 
     private final String username;

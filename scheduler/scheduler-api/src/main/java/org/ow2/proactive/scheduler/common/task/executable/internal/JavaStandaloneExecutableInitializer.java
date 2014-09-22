@@ -51,6 +51,8 @@ import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
  */
 public class JavaStandaloneExecutableInitializer extends DefaultStandaloneExecutableInitializer {
 
+    private static final long serialVersionUID = 60L;
+
     /** Arguments of the java task */
     protected Map<String, byte[]> serializedArguments;
 

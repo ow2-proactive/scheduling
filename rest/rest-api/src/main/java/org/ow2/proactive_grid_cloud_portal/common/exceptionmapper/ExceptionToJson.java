@@ -49,6 +49,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Produces("application/json")
 public class ExceptionToJson implements Serializable {
 
+    private static final long serialVersionUID = 60L;
+
     private int httpErrorCode;
     private String errorMessage;
     private String stackTrace;

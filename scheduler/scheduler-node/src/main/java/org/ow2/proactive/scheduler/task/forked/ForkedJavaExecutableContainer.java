@@ -62,6 +62,8 @@ import org.ow2.proactive.scheduler.task.TaskLauncher;
  */
 public class ForkedJavaExecutableContainer extends JavaExecutableContainer {
 
+    private static final long serialVersionUID = 60L;
+
     public static final Logger logger = Logger.getLogger(ForkedJavaExecutableContainer.class);
 
     /** Environment of a new dedicated JVM */

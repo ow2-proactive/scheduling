@@ -54,6 +54,8 @@ import org.objectweb.proactive.annotation.PublicAPI;
  */
 @PublicAPI
 public class TaskScript extends Script<Serializable> {
+
+    private static final long serialVersionUID = 60L;
     /** Loggers */
     public static final Logger logger = Logger.getLogger(TaskScript.class);
 

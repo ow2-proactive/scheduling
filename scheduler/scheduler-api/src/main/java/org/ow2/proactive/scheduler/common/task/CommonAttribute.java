@@ -60,6 +60,8 @@ import org.ow2.proactive.scheduler.common.task.util.IntegerWrapper;
 @XmlAccessorType(XmlAccessType.FIELD)
 public abstract class CommonAttribute implements Serializable {
 
+    private static final long serialVersionUID = 60L;
+
     /** The key for specifying start at time as generic information */
     public static final String GENERIC_INFO_START_AT_KEY = "START_AT";
 

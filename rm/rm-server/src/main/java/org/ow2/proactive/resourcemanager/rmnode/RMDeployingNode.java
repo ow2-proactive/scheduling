@@ -62,6 +62,8 @@ import java.util.HashMap;
  *
  */
 public final class RMDeployingNode implements RMNode, Serializable {
+
+    private static final long serialVersionUID = 60L;
     static {
         InfrastructureManager.RMDeployingNodeAccessor.setDefault(new RMDeployingNodeAccessorImpl());
     }
@@ -491,6 +493,8 @@ public final class RMDeployingNode implements RMNode, Serializable {
  * able to have fine tuned access rights.
  */
 class RMDeployingNodeAccessorImpl extends InfrastructureManager.RMDeployingNodeAccessor {
+
+    private static final long serialVersionUID = 60L;
 
     /** {@inheritDoc} */
     @Override

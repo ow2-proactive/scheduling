@@ -11,6 +11,8 @@ import org.ow2.proactive.scheduler.task.java.JavaExecutableContainer;
 @Table(name = "JAVA_TASK_DATA")
 public class JavaTaskData extends CommonJavaTaskData {
 
+    private static final long serialVersionUID = 60L;
+
     public JavaTaskData() {
     }
 

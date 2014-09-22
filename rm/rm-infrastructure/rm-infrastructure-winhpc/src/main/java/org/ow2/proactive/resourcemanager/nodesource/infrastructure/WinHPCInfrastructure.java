@@ -62,6 +62,8 @@ import org.ggf.schemas.bes._2006._08.bes_factory.HPCBPServiceStub.ReferenceParam
 
 public class WinHPCInfrastructure extends DefaultInfrastructureManager {
 
+    private static final long serialVersionUID = 60L;
+
     /**
      * maximum number of nodes this infrastructure can ask simultaneously to the WinHPC scheduler
      */

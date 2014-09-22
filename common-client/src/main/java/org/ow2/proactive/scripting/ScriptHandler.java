@@ -55,6 +55,8 @@ import org.objectweb.proactive.extensions.annotation.ActiveObject;
 @PublicAPI
 public class ScriptHandler implements Serializable {
 
+    private static final long serialVersionUID = 60L;
+
     Map<String, Object> additionalBindings = null;
 
     /**

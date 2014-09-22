@@ -64,6 +64,8 @@ import org.ow2.proactive.scheduler.task.forked.JavaTaskLauncherForker;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class InternalForkedJavaTask extends InternalJavaTask {
 
+    private static final long serialVersionUID = 60L;
+
     public static final Logger logger = Logger.getLogger(InternalForkedJavaTask.class);
 
     /** Policy content for the forked VM (declared as static element to be cached) */

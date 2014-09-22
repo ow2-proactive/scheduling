@@ -46,6 +46,8 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @PublicAPI
 public class TaskSkippedException extends SchedulerException {
 
+    private static final long serialVersionUID = 60L;
+
     /**
      * Create a new instance of TaskSkippedException
      *

@@ -53,6 +53,8 @@ import org.apache.log4j.Logger;
  */
 public class DataSpaceNodeConfigurationAgent implements Serializable {
 
+    private static final long serialVersionUID = 60L;
+
     private static Logger logger = Logger.getLogger(DataSpaceNodeConfigurationAgent.class);
 
     /** 

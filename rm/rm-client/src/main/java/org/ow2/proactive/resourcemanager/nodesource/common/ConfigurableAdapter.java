@@ -77,6 +77,8 @@ public class ConfigurableAdapter extends XmlAdapter<ConfigurableWrapper, Configu
      *
      */
     public static class ConfigurableWrapper implements Serializable {
+
+    private static final long serialVersionUID = 60L;
         public ConfigurableValues type;
         public String description;
 

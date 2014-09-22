@@ -54,6 +54,8 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class InputSelector implements Serializable {
 
+    private static final long serialVersionUID = 60L;
+
     private FileSelector inputFiles = null;
 
     private InputAccessMode mode;

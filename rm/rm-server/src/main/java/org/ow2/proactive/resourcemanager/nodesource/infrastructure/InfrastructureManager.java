@@ -80,6 +80,8 @@ import org.apache.log4j.Logger;
  */
 public abstract class InfrastructureManager implements Serializable {
 
+    private static final long serialVersionUID = 60L;
+
     /** class' logger */
     protected static final Logger logger = Logger.getLogger(InfrastructureManager.class);
 
@@ -574,6 +576,8 @@ public abstract class InfrastructureManager implements Serializable {
      * {@link RMDeployingNode} object.
      */
     public static abstract class RMDeployingNodeAccessor implements Serializable {
+
+    private static final long serialVersionUID = 60L;
         private static volatile RMDeployingNodeAccessor DEFAULT;
 
         public static void setDefault(RMDeployingNodeAccessor d) {

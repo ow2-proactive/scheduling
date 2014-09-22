@@ -58,6 +58,8 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class SimpleScript extends Script<Object> {
 
+    private static final long serialVersionUID = 60L;
+
     /** Directly create a script with a string.
      * @param script a String containing script code
      * @param engineName script's engine execution name.

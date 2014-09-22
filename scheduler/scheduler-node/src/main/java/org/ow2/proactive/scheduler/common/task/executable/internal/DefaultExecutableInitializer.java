@@ -47,6 +47,8 @@ import org.ow2.proactive.utils.NodeSet;
 public class DefaultExecutableInitializer extends DefaultStandaloneExecutableInitializer implements
         ExecutableInitializer {
 
+    private static final long serialVersionUID = 60L;
+
     private DataSpacesFileObject localSpaceFO;
     private DataSpacesFileObject inputSpaceFO;
     private DataSpacesFileObject outputSpaceFO;

@@ -55,6 +55,8 @@ import org.apache.log4j.Logger;
 @PublicAPI
 public class RMConnection extends Connection<RMAuthentication> {
 
+    private static final long serialVersionUID = 60L;
+
     private static RMConnection instance;
 
     private RMConnection() {

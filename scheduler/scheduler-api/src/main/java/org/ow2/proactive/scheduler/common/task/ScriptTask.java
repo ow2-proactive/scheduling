@@ -47,6 +47,8 @@ import org.ow2.proactive.scripting.TaskScript;
 @PublicAPI
 public class ScriptTask extends Task {
 
+    private static final long serialVersionUID = 60L;
+
     private TaskScript script;
 
     public ScriptTask() {

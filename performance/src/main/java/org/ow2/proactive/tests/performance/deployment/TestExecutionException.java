@@ -38,6 +38,8 @@ package org.ow2.proactive.tests.performance.deployment;
 
 public class TestExecutionException extends RuntimeException {
 
+    private static final long serialVersionUID = 60L;
+
     public TestExecutionException(String message, Throwable cause) {
         super(message, cause);
     }

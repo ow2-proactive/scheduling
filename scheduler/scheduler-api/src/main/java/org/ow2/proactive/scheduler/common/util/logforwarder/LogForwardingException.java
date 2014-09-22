@@ -41,6 +41,8 @@ package org.ow2.proactive.scheduler.common.util.logforwarder;
  */
 public class LogForwardingException extends Exception {
 
+    private static final long serialVersionUID = 60L;
+
     public LogForwardingException() {
     }
 

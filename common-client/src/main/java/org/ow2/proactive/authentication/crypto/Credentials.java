@@ -90,6 +90,8 @@ import org.apache.commons.codec.binary.Base64;
 @PublicAPI
 public class Credentials implements Serializable {
 
+    private static final long serialVersionUID = 60L;
+
     /** symmetric encryption parameters */
     // more than that breaks with default provider / config, it *is* secure nonetheless
     private static final int AES_KEYSIZE = 128;

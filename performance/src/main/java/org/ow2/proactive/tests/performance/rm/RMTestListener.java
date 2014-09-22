@@ -48,6 +48,8 @@ import org.ow2.proactive.resourcemanager.frontend.RMGroupEventListener;
 
 public class RMTestListener extends RMGroupEventListener implements Serializable {
 
+    private static final long serialVersionUID = 60L;
+
     private RMEventListener eventsMonitor;
 
     public RMTestListener() {

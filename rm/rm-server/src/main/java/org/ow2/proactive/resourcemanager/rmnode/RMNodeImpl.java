@@ -80,6 +80,8 @@ import java.util.HashMap;
  */
 public class RMNodeImpl implements RMNode, Serializable {
 
+    private static final long serialVersionUID = 60L;
+
     private final static Logger logger = Logger.getLogger(RMNodeImpl.class);
 
     /** HashMap associates a selection Script to its result on the node */

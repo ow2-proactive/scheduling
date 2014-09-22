@@ -93,6 +93,8 @@ import org.apache.log4j.Logger;
  * @since ProActive Scheduling 0.9
  */
 public abstract class InternalJob extends JobState {
+
+    private static final long serialVersionUID = 60L;
     public static final Logger logger = Logger.getLogger(InternalJob.class);
 
     /** List of every tasks in this job. */

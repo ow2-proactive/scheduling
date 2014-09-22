@@ -61,6 +61,8 @@ import org.ow2.proactive.scripting.InvalidScriptException;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class NativeExecutableContainer extends ExecutableContainer {
 
+    private static final long serialVersionUID = 60L;
+
     public static final Logger logger = Logger.getLogger(NativeExecutableContainer.class);
 
     // actual executable data

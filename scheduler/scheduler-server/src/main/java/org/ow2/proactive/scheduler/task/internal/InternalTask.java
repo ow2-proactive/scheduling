@@ -86,6 +86,8 @@ import org.ow2.proactive.utils.NodeSet;
 @XmlAccessorType(XmlAccessType.FIELD)
 public abstract class InternalTask extends TaskState {
 
+    private static final long serialVersionUID = 60L;
+
     /** Parents list : null if no dependences */
     @XmlTransient
     private transient List<InternalTask> ideps = null;

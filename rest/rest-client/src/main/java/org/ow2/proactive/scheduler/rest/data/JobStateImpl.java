@@ -51,7 +51,7 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskStateData;
 
 
 public class JobStateImpl extends JobState {
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 60L;
 
     private JobStateData d;
 

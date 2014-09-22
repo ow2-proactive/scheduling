@@ -47,4 +47,6 @@ import java.util.ArrayList;
  */
 public class Conditions extends ArrayList<Condition> {
 
+    private static final long serialVersionUID = 60L;
+
 }

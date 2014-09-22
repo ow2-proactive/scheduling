@@ -50,6 +50,8 @@ import org.ow2.proactive.scripting.TaskScript;
  * @since ProActive Scheduling 3.4
  */
 public class ScriptExecutableContainer extends JavaExecutableContainer {
+
+    private static final long serialVersionUID = 60L;
     private TaskScript script;
 
     public ScriptExecutableContainer(TaskScript script) {

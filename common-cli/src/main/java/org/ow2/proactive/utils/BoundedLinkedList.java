@@ -51,6 +51,8 @@ import java.util.LinkedList;
  */
 public class BoundedLinkedList<E> implements Serializable {
 
+    private static final long serialVersionUID = 60L;
+
     private LinkedList<E> list;
     private int size;
 

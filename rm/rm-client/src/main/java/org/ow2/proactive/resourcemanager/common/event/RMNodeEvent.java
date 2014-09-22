@@ -65,6 +65,8 @@ import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
 @PublicAPI
 public final class RMNodeEvent extends RMEvent {
 
+    private static final long serialVersionUID = 60L;
+
     /** URL of the related node */
     private final String nodeUrl;
 

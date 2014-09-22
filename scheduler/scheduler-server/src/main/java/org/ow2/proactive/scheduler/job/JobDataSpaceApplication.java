@@ -51,6 +51,8 @@ import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
 public class JobDataSpaceApplication implements Serializable {
 
+    private static final long serialVersionUID = 60L;
+
     public static final Logger logger = Logger.getLogger(JobDataSpaceApplication.class);
 
     private long applicationId;

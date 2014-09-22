@@ -91,6 +91,8 @@ import org.apache.log4j.Logger;
 @ActiveObject
 public class SchedulerProxyUserInterface implements Scheduler, Serializable {
 
+    private static final long serialVersionUID = 60L;
+
     protected Scheduler uischeduler;
     protected MBeanInfoViewer mbeaninfoviewer;
 

@@ -206,6 +206,8 @@ import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
 public class SmartProxy extends SchedulerProxyUserInterface implements InitActive, EndActive,
         SchedulerEventListener {
 
+    private static final long serialVersionUID = 60L;
+
     public static final String GENERIC_INFO_INPUT_FOLDER_PROPERTY_NAME = "client_input_data_folder";
     public static final String GENERIC_INFO_OUTPUT_FOLDER_PROPERTY_NAME = "client_output_data_folder";
 

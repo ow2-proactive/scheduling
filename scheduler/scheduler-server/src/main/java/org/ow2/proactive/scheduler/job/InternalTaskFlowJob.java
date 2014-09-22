@@ -58,6 +58,8 @@ import org.ow2.proactive.scheduler.task.internal.InternalTask;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class InternalTaskFlowJob extends InternalJob {
 
+    private static final long serialVersionUID = 60L;
+
     /**
      * ProActive empty constructor.
      */

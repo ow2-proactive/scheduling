@@ -53,6 +53,8 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @PublicAPI
 public class ScriptResult<E> implements Serializable {
 
+    private static final long serialVersionUID = 60L;
+
     /** Result of the script */
     private final E result;
     /** Exception in the result if so */
