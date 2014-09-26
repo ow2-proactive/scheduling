@@ -590,6 +590,8 @@ dependencies {
     }
     restCli project(':rest:rest-cli')
     distLib project(':rest:rest-client')
+    distLib project(':rest:rest-dataspace-smartproxy')
+    distLib project(':scheduler:dataspace-smartproxy')
 
     compile 'org.codehaus.groovy:groovy-all:2.1.6'
     compile 'commons-io:commons-io:2.4'
