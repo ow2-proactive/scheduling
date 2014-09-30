@@ -153,7 +153,7 @@ public class RestFuncTHelper {
         schedProcess = processBuilder.start();
 
         ProcessStreamReader out = new ProcessStreamReader("scheduler-output: ",
-            schedProcess.getInputStream(), System.out);
+            schedProcess.getInputStream());
         out.start();
 
         // RM and scheduler are on the same url

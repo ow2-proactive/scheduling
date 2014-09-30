@@ -43,16 +43,19 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 
+import org.apache.log4j.Logger;
+
 
 public class ProcessStreamReader extends Thread {
+
+    private static Logger logger = Logger.getLogger(ProcessStreamReader.class);
+
     private String outputPrefix;
     private InputStream in;
-    private PrintStream out;
 
-    public ProcessStreamReader(String type, InputStream is, PrintStream out) {
+    public ProcessStreamReader(String type, InputStream is) {
         this.outputPrefix = type;
         this.in = is;
-        this.out = out;
     }
 
     @Override
@@ -62,7 +65,7 @@ public class ProcessStreamReader extends Thread {
         try {
             String line;
             while ((line = buffered.readLine()) != null) {
-                out.println(outputPrefix + line);
+                logger.info(outputPrefix + line);
             }
         } catch (IOException ignored) {
             // end Of Stream When Process Killed
