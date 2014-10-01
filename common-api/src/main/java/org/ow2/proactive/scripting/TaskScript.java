@@ -42,8 +42,8 @@ import java.io.StringReader;
 
 import javax.script.Bindings;
 
-import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.apache.log4j.Logger;
 
 
 /**
@@ -70,6 +70,10 @@ public class TaskScript extends Script<Serializable> {
      * The variable name to set the progress during task execution.
      */
     public static final String PROGRESS_VARIABLE = "progress";
+    /**
+     * The variable name to access the user's third party credentials.
+     */
+    public static final String CREDENTIALS_VARIABLE = "credentials";
 
     public TaskScript(Script script) throws InvalidScriptException {
         super(script);

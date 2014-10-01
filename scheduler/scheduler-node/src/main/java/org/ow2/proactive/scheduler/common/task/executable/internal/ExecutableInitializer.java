@@ -37,7 +37,7 @@
 package org.ow2.proactive.scheduler.common.task.executable.internal;
 
 import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
-import org.ow2.proactive.scheduler.common.task.OneShotDecrypter;
+import org.ow2.proactive.scheduler.common.task.Decrypter;
 import org.ow2.proactive.utils.NodeSet;
 
 
@@ -68,14 +68,14 @@ public interface ExecutableInitializer extends StandaloneExecutableInitializer {
      *
      * @param decrypter the decrypter to set
      */
-    public void setDecrypter(OneShotDecrypter decrypter);
+    public void setDecrypter(Decrypter decrypter);
 
     /**
      * Get the decrypter from this initializer
      *
      * @return the decrypter from this initializer
      */
-    public OneShotDecrypter getDecrypter();
+    public Decrypter getDecrypter();
 
     /**
      * Returns the DataSpaceFileObject of the local space

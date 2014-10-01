@@ -44,18 +44,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.authentication.crypto.HybridEncryptionUtil;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.job.JobType;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.descriptor.TaskDescriptor;
 import org.ow2.proactive.scheduler.job.InternalJob;
-import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
+import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.threading.CallableWithTimeoutAction;
+import org.apache.log4j.Logger;
+
+import static org.ow2.proactive.authentication.crypto.HybridEncryptionUtil.HybridEncryptedData;
 
 
 /**
@@ -80,27 +83,25 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
 
     private final TaskTerminateNotification terminateNotification;
 
-    private final PrivateKey corePk;
+    private final PrivateKey corePrivateKey;
 
     private boolean taskWasRestarted;
 
     /**
      * Create a new instance of TimedDoTaskAction
      *
-     * @param task the internal task
      * @param launcher the launcher of the task
-     * @param parameters the parameters to be given to the task
      */
     public TimedDoTaskAction(InternalJob job, TaskDescriptor taskDescriptor, TaskLauncher launcher,
             SchedulingService schedulingService, TaskTerminateNotification terminateNotification,
-            PrivateKey corePk) {
+            PrivateKey corePrivateKey) {
         this.job = job;
         this.taskDescriptor = taskDescriptor;
         this.task = taskDescriptor.getInternal();
         this.launcher = launcher;
         this.schedulingService = schedulingService;
         this.terminateNotification = terminateNotification;
-        this.corePk = corePk;
+        this.corePrivateKey = corePrivateKey;
     }
 
     /**
@@ -120,7 +121,8 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
                     parentIds.add(taskDescriptor.getParents().get(i).getTaskId());
                 }
                 Map<TaskId, TaskResult> taskResults = schedulingService.getInfrastructure().getDBManager()
-                        .loadTasksResults(job.getId(), parentIds);
+                  .loadTasksResults(
+                  job.getId(), parentIds);
                 for (int i = 0; i < resultSize; i++) {
                     params[i] = taskResults.get(taskDescriptor.getParents().get(i).getTaskId());
                 }
@@ -129,7 +131,7 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
             // activate loggers for this task if needed
             schedulingService.getListenJobLogsSupport().activeLogsIfNeeded(job.getId(), launcher);
 
-            fillContainerWithEncryption();
+            fillContainer();
             // try launch the task
             launcher.doTask(terminateNotification, task.getExecutableContainer(), params);
         } catch (Throwable e) {
@@ -139,22 +141,28 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
         return null;
     }
 
-    /**
-     * If runAsMe is true, get the public key of the execution node,
-     * decrypt user credentials, and re-encrypt them using the received public key.
-     *
-     * @throws KeyException if there was a problem while moving credentials
-     * @throws NoSuchAlgorithmException if RSA is unknown
-     */
-    private void fillContainerWithEncryption() throws KeyException, NoSuchAlgorithmException {
-        //do nothing if runAsMe is false or not set
+    private void fillContainer() throws KeyException, NoSuchAlgorithmException {
         if (task.isRunAsMe()) {
-            PublicKey pubkey = launcher.generatePublicKey();
-            //decrypt user credential with core private key
-            CredData credDataFromClient = job.getCredentials().decrypt(corePk);
-            //cred becomes the credentials to be returned with new publicKey encryption
-            Credentials credForNode = Credentials.createCredentials(credDataFromClient, pubkey);
-            task.getExecutableContainer().setCredentials(credForNode);
+            task.getExecutableContainer().setRunAsUser(true);
+        }
+
+        CredData decryptedUserCredentials = job.getCredentials().decrypt(corePrivateKey);
+
+        enrichWithThirdPartyCredentials(decryptedUserCredentials);
+
+        PublicKey nodePublicKey = launcher.generatePublicKey();
+        Credentials nodeEncryptedUserCredentials = Credentials.createCredentials(decryptedUserCredentials,
+                nodePublicKey);
+        task.getExecutableContainer().setCredentials(nodeEncryptedUserCredentials);
+    }
+
+    private void enrichWithThirdPartyCredentials(CredData decryptedUserCredentials) throws KeyException {
+        Map<String, HybridEncryptedData> thirdPartyCredentials = schedulingService.getInfrastructure()
+                .getDBManager().thirdPartyCredentialsMap(job.getJobInfo().getJobOwner());
+        for (Map.Entry<String, HybridEncryptedData> thirdPartyCredential : thirdPartyCredentials.entrySet()) {
+            String decryptedValue = HybridEncryptionUtil.decryptString(thirdPartyCredential.getValue(),
+                    corePrivateKey);
+            decryptedUserCredentials.addThirdPartyCredential(thirdPartyCredential.getKey(), decryptedValue);
         }
     }
 

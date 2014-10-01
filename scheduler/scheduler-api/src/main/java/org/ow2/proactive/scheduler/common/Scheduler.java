@@ -77,7 +77,7 @@ import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
  * @since ProActive Scheduling 2.0
  */
 @PublicAPI
-public interface Scheduler extends SchedulerUsage {
+public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
 
     /**
      * Returns the USER DataSpace URIs associated with the current user

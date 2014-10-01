@@ -35,7 +35,7 @@
 package org.ow2.proactive.scheduler.common.task.executable.internal;
 
 import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
-import org.ow2.proactive.scheduler.common.task.OneShotDecrypter;
+import org.ow2.proactive.scheduler.common.task.Decrypter;
 import org.ow2.proactive.utils.NodeSet;
 
 
@@ -56,7 +56,7 @@ public class DefaultExecutableInitializer extends DefaultStandaloneExecutableIni
     private NodeSet nodes;
 
     /** Decrypter from launcher */
-    private OneShotDecrypter decrypter = null;
+    private Decrypter decrypter = null;
 
     @Override
     public NodeSet getNodes() {
@@ -69,12 +69,12 @@ public class DefaultExecutableInitializer extends DefaultStandaloneExecutableIni
     }
 
     @Override
-    public void setDecrypter(OneShotDecrypter decrypter) {
+    public void setDecrypter(Decrypter decrypter) {
         this.decrypter = decrypter;
     }
 
     @Override
-    public OneShotDecrypter getDecrypter() {
+    public Decrypter getDecrypter() {
         return decrypter;
     }
 

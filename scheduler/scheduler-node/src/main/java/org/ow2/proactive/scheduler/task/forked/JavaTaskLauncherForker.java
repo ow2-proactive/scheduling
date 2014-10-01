@@ -123,13 +123,10 @@ public class JavaTaskLauncherForker extends JavaTaskLauncher implements ForkerSt
             //init task
             ForkedJavaExecutableInitializer fjei = (ForkedJavaExecutableInitializer) createExecutableInitializer(executableContainer);
             setPropagatedVariables(fjei, getPropagatedVariables());
-            replaceIterationTags(fjei);
             fjei.setJavaTaskLauncherInitializer(initializer);
-            //decrypt credentials if needed
-            if (executableContainer.isRunAsUser()) {
-                decrypter.setCredentials(executableContainer.getCredentials());
-                fjei.setDecrypter(decrypter);
-            }
+
+            decrypter.setCredentials(executableContainer.getCredentials());
+            fjei.setDecrypter(decrypter);
 
             /*
              * Initialize dataspaces since it can be used in envScript.

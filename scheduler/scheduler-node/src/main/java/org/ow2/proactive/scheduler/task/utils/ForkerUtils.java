@@ -42,7 +42,7 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.extensions.processbuilder.OSUser;
 import org.objectweb.proactive.extensions.processbuilder.PAOSProcessBuilderFactory;
 import org.ow2.proactive.authentication.crypto.CredData;
-import org.ow2.proactive.scheduler.common.task.OneShotDecrypter;
+import org.ow2.proactive.scheduler.common.task.Decrypter;
 import org.apache.log4j.Logger;
 
 
@@ -75,7 +75,8 @@ public final class ForkerUtils {
             FORK_METHOD_VALUE = ForkMethod.KEY;
         } else {
             FORK_METHOD_VALUE = ForkMethod.PWD;
-            logger.debug("Java Property " + FORK_METHOD_KEY + " is not set or uses invalid value. Fallback to method password");
+            logger.debug("Java Property " + FORK_METHOD_KEY +
+                " is not set or uses invalid value. Fallback to method password");
         }
     }
 
@@ -126,7 +127,7 @@ public final class ForkerUtils {
      * @throws IllegalArgumentException if decrypter is null
      * @throws IllegalAccessException if node fork method is not set
      */
-    public static OSUser checkConfigAndGetUser(OneShotDecrypter decrypter) throws IllegalAccessException,
+    public static OSUser checkConfigAndGetUser(Decrypter decrypter) throws IllegalAccessException,
             KeyException {
         if (decrypter != null) {
             CredData data = decrypter.decrypt();

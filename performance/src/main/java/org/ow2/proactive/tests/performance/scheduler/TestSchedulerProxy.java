@@ -39,6 +39,7 @@ package org.ow2.proactive.tests.performance.scheduler;
 import java.security.KeyException;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import javax.management.JMException;
 import javax.security.auth.login.LoginException;
@@ -72,7 +73,6 @@ import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
-import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.usage.JobUsage;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
@@ -414,5 +414,21 @@ public class TestSchedulerProxy implements Scheduler {
     public List<JobUsage> getAccountUsage(String user, Date startDate, Date endDate)
             throws NotConnectedException, PermissionException {
         return target.getAccountUsage(user, startDate, endDate);
+    }
+
+    @Override
+    public void putThirdPartyCredential(String key, String value) throws NotConnectedException,
+            PermissionException, KeyException {
+        target.putThirdPartyCredential(key, value);
+    }
+
+    @Override
+    public Set<String> thirdPartyCredentialsKeySet() throws NotConnectedException, PermissionException {
+        return target.thirdPartyCredentialsKeySet();
+    }
+
+    @Override
+    public void removeThirdPartyCredential(String key) throws NotConnectedException, PermissionException {
+        target.removeThirdPartyCredential(key);
     }
 }

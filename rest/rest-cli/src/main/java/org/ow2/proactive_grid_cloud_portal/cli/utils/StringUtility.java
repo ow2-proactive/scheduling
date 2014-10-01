@@ -39,12 +39,12 @@ package org.ow2.proactive_grid_cloud_portal.cli.utils;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.apache.commons.codec.binary.StringUtils;
 import org.ow2.proactive.utils.ObjectArrayFormatter;
 import org.ow2.proactive.utils.Tools;
 import org.ow2.proactive_grid_cloud_portal.cli.json.MBeanInfoView;
@@ -57,6 +57,7 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskResultData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskStateData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.UserJobData;
 import org.ow2.proactive_grid_cloud_portal.utils.ObjectUtility;
+import org.apache.commons.codec.binary.StringUtils;
 
 
 public class StringUtility {
@@ -299,6 +300,22 @@ public class StringUtility {
 
         for (UserJobData job : jobs) {
             formatter.addLine(rowList(job));
+        }
+
+        return Tools.getStringAsArray(formatter);
+    }
+
+    public static String credentialsKeysAsString(Set<String> keys) {
+        ObjectArrayFormatter formatter = new ObjectArrayFormatter();
+        formatter.setMaxColumnLength(30);
+        formatter.setSpace(4);
+
+        formatter.setTitle(Collections.singletonList("KEY"));
+
+        formatter.addEmptyLine();
+
+        for (String key : keys) {
+            formatter.addLine(Collections.singletonList(key));
         }
 
         return Tools.getStringAsArray(formatter);

@@ -59,13 +59,13 @@ public class TestAddRemove {
     public static void main(String[] args) throws Exception {
 
         System.setProperty("java.security.policy",
-          "/home/ybonnaffe/src/build/dist/scheduling/performance/src/main/resources/config/grant.all.java" +
-            ".policy");
+                "/home/ybonnaffe/src/build/dist/scheduling/performance/src/main/resources/config/grant.all.java"
+                    + ".policy");
         Policy.getPolicy().refresh();
 
-        TestRMProxy rmProxy = PAActiveObject.newActive(TestRMProxy.class, new Object[] { });
-        rmProxy.init("pnp://jily:64738",
-          new CredData(CredData.parseLogin("admin"), CredData.parseDomain("admin"), "admin"));
+        TestRMProxy rmProxy = PAActiveObject.newActive(TestRMProxy.class, new Object[] {});
+        rmProxy.init("pnp://jily:64738", new CredData(CredData.parseLogin("admin"), CredData
+                .parseDomain("admin"), "admin"));
 
         RMEventsMonitor eventsMonitor = new RMEventsMonitor();
         RMTestListener listener = RMTestListener.createRMTestListener(eventsMonitor);

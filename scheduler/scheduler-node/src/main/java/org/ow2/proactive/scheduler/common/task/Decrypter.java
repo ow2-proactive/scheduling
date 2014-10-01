@@ -42,21 +42,21 @@ import org.ow2.proactive.authentication.crypto.Credentials;
 
 
 /**
- * OneShotDecrypter is used to ensure one shot usage of private key for a decryption.
+ * Decrypter is used to ensure one shot usage of private key for a decryption.
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 2.2
  */
-public final class OneShotDecrypter {
+public final class Decrypter {
     private PrivateKey key = null;
     private Credentials credentials = null;
 
     /**
-     * Create a new instance of OneShotDecrypter
+     * Create a new instance of Decrypter
      *
      * @param key the private key that will be used for decryption
      */
-    public OneShotDecrypter(PrivateKey key) {
+    public Decrypter(PrivateKey key) {
         if (key == null) {
             throw new IllegalArgumentException("Given key cannot be null");
         }
@@ -66,31 +66,12 @@ public final class OneShotDecrypter {
     /**
      * Set the credentials to be decrypted.
      * This method is not mandatory. It allows to store the credentials temporarily.
-     * A call to {@link #decrypt(Credentials)} or {@link #decrypt()} will clear the key and credentials.
+     * A call to {@link #decrypt()} will clear the key and credentials.
      *
      * @param cred the credentials to be decrypted.
      */
     public void setCredentials(Credentials cred) {
         this.credentials = cred;
-    }
-
-    /**
-     * Decrypt the given credential with this object private key.
-     *
-     * @param cred the credentials to be decrypted
-     * @return the decrypted credData
-     * @throws IllegalAccessException if the key is null or have already been used to decrypt a credential
-     * @throws java.security.KeyException decryption failure, malformed data
-     */
-    public CredData decrypt(final Credentials cred) throws IllegalAccessException, KeyException {
-        if (this.key == null) {
-            throw new IllegalAccessException("Cannot decrypt credentials !");
-        }
-        //decrypt
-        CredData data = cred.decrypt(this.key);
-        //reset key
-        this.key = null;
-        return data;
     }
 
     /**
@@ -105,6 +86,13 @@ public final class OneShotDecrypter {
         if (this.credentials == null) {
             throw new IllegalAccessException("Cannot decrypt credentials !");
         }
-        return decrypt(this.credentials);
+        if (this.key == null) {
+            throw new IllegalAccessException("Cannot decrypt credentials !");
+        }
+        return this.credentials.decrypt(this.key);
+    }
+
+    public Credentials getCredentials() {
+        return credentials;
     }
 }

@@ -242,6 +242,21 @@ public class CommandSet {
             "script-path [param-1=value-1 param-2=value-2 ...]").jsCommand(
             "script(script-pathname,param1=value1,...)").commandClass(EvalScriptCommand.class).entry();
 
+    public static final CommandSet.Entry PUT_THIRD_PARTY_CREDENTIAL = CommandSetEntryBuilder.newInstance()
+            .opt("pc").longOpt("put-credential").numOfArgs(2).argNames("key value").description(
+                    "Store a third-party credential <key-value> pair in the Scheduler").jsCommand(
+                    "putcredential(key,value)").commandClass(PutThirdPartyCredentialCommand.class).entry();
+
+    public static final CommandSet.Entry REMOVE_THIRD_PARTY_CREDENTIAL = CommandSetEntryBuilder.newInstance()
+            .opt("rc").longOpt("remove-credential").numOfArgs(1).argNames("key").description(
+                    "Remove a third-party credential corresponding to the key from the Scheduler").jsCommand(
+                    "removecredential(key)").commandClass(RemoveThirdPartyCredentialCommand.class).entry();
+
+    public static final CommandSet.Entry THIRD_PARTY_CREDENTIAL_KEY_SET = CommandSetEntryBuilder
+            .newInstance().opt("lc").longOpt("list-credentials").description(
+                    "List third-party credential keys stored in the Scheduler")
+            .jsCommand("listcredentials()").commandClass(ThirdPartyCredentialKeySetCommand.class).entry();
+
     public static final CommandSet.Entry SCHED_HELP = CommandSetEntryBuilder.newInstance().opt("sh").longOpt(
             "schedulerhelp").description("Prints the usage of REST command-line client for Scheduler")
             .commandClass(SchedHelpCommand.class).entry();
@@ -350,6 +365,7 @@ public class CommandSet {
             SCHED_PAUSE, SCHED_RESUME, SCHED_FREEZE, SCHED_KILL, LINK_RM, SCHED_STATS, JOB_LIST, SUBMIT_DESC,
             SUBMIT_ARCH, JOB_STATE, JOB_OUTPUT, JOB_RESULT, JOB_PRIORITY, JOB_PAUSE, JOB_RESUME, JOB_KILL,
             JOB_REMOVE, TASK_RESTART, TASK_PREEMPT, TASK_OUTPUT, TASK_RESULT, UPLOAD_FILE, DOWNLOAD_FILE,
+            PUT_THIRD_PARTY_CREDENTIAL, REMOVE_THIRD_PARTY_CREDENTIAL, THIRD_PARTY_CREDENTIAL_KEY_SET,
             SCHED_HELP, LIVE_LOG };
 
     /** CommandSet.Entry objects which are specific to Resource Manager CLI */

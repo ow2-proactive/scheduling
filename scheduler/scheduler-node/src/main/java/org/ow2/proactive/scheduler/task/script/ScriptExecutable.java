@@ -40,8 +40,8 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.common.exception.UserException;
+import org.ow2.proactive.scheduler.common.task.Decrypter;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.common.task.executable.internal.JavaExecutableInitializerImpl;
@@ -51,6 +51,7 @@ import org.ow2.proactive.scripting.ScriptHandler;
 import org.ow2.proactive.scripting.ScriptLoader;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.TaskScript;
+import org.apache.log4j.Logger;
 
 
 /**
@@ -68,6 +69,8 @@ public class ScriptExecutable extends JavaExecutable {
     /** execution progress value (between 0 and 100), can be updated by the script */
     private final AtomicInteger progress = new AtomicInteger(0);
 
+    private Decrypter decrypter = null;
+
     /**
      * Initialize the executable using the given executable Initializer.
      *
@@ -78,6 +81,7 @@ public class ScriptExecutable extends JavaExecutable {
     // WARNING WHEN REMOVE OR RENAME, called by task launcher by introspection
     protected void internalInit(JavaExecutableInitializerImpl execInitializer) throws Exception {
         super.internalInit(execInitializer);
+        this.decrypter = execInitializer.getDecrypter();
     }
 
     @Override
@@ -96,6 +100,9 @@ public class ScriptExecutable extends JavaExecutable {
 
         handler.addBinding(TaskScript.RESULTS_VARIABLE, results);
         handler.addBinding(TaskScript.PROGRESS_VARIABLE, progress);
+
+        Map<String, String> thirdPartyCredentials = decrypter.decrypt().getThirdPartyCredentials();
+        handler.addBinding("credentials", thirdPartyCredentials);
 
         Map<String, Serializable> variables = getVariables();
         handler.addBinding(TaskLauncher.VARIABLES_BINDING_NAME, variables);

@@ -84,9 +84,8 @@ public class TestKillTaskWhileExecutingScripts extends FunctionalTest {
     @Before
     public void createScript() throws Throwable {
         endlessScript = new SimpleScript(
-          "file = new java.io.File(java.lang.System.getProperty(\"java.io.tmpdir\")," +
-            "\"started.ok\");file.createNewFile();while(true){java.lang.Thread.sleep(500);}",
-          "groovy");
+            "file = new java.io.File(java.lang.System.getProperty(\"java.io.tmpdir\"),"
+                + "\"started.ok\");file.createNewFile();while(true){java.lang.Thread.sleep(500);}", "groovy");
     }
 
     @Test

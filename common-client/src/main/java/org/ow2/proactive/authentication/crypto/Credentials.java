@@ -56,9 +56,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 
-import javax.crypto.SecretKey;
 import javax.crypto.interfaces.DHPublicKey;
-import javax.crypto.spec.SecretKeySpec;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.util.converter.ByteToObjectConverter;
@@ -89,14 +87,6 @@ import org.apache.commons.codec.binary.Base64;
  */
 @PublicAPI
 public class Credentials implements Serializable {
-
-    /** symmetric encryption parameters */
-    // more than that breaks with default provider / config, it *is* secure nonetheless
-    private static final int AES_KEYSIZE = 128;
-    // should work fine with default providers
-    private static final String AES_ALGO = "AES";
-    // funny transformations require initial vector parameters, try to avoid them
-    private static final String AES_CIPHER = "AES";
 
     /** Default credentials location */
     private static final String DEFAULT_CREDS = System.getProperty("user.home") + File.separator +
@@ -139,7 +129,7 @@ public class Credentials implements Serializable {
      * <p>
      * Constructor is kept private, use {@link org.ow2.proactive.authentication.crypto.Credentials#getCredentials()} or
      * {@link org.ow2.proactive.authentication.crypto.Credentials#createCredentials(String, String)} to get intances
-     * 
+     *
      * @param algo Key generation algorithm
      * @param size Key size in bits
      * @param cipher Cipher parameters
@@ -169,7 +159,7 @@ public class Credentials implements Serializable {
      */
     public void writeToDisk(String path) throws KeyException {
         File f = new File(path);
-        FileOutputStream fs = null;
+        FileOutputStream fs;
         try {
             fs = new FileOutputStream(f);
             fs.write(getBase64());
@@ -188,9 +178,9 @@ public class Credentials implements Serializable {
      * @throws KeyException the key could not be retrieved or is malformed
      */
     public static PublicKey getPublicKey(String pubPath) throws KeyException {
-        byte[] bytes = null;
+        byte[] bytes;
         File f = new File(pubPath);
-        FileInputStream fin = null;
+        FileInputStream fin;
 
         String algo = "", tmp = "";
 
@@ -219,8 +209,8 @@ public class Credentials implements Serializable {
 
         // reconstruct public key
         X509EncodedKeySpec pubKeySpec = new X509EncodedKeySpec(bytes);
-        PublicKey pubKey = null;
-        KeyFactory keyFactory = null;
+        PublicKey pubKey;
+        KeyFactory keyFactory;
 
         try {
             keyFactory = KeyFactory.getInstance(algo);
@@ -283,11 +273,11 @@ public class Credentials implements Serializable {
 
         for (String algo : algorithms) {
             try {
-                KeyFactory keyFactory = null;
+                KeyFactory keyFactory;
                 keyFactory = KeyFactory.getInstance(algo);
 
                 // recover private key bytes
-                byte[] bytes = null;
+                byte[] bytes;
                 try {
                     File pkFile = new File(privPath);
                     DataInputStream pkStream = new DataInputStream(new FileInputStream(pkFile));
@@ -348,7 +338,7 @@ public class Credentials implements Serializable {
     public static Credentials getCredentials(String path) throws KeyException {
         File f = new File(path);
         byte[] bytes = new byte[(int) f.length()];
-        FileInputStream fin = null;
+        FileInputStream fin;
         try {
             fin = new FileInputStream(f);
             fin.read(bytes);
@@ -370,7 +360,7 @@ public class Credentials implements Serializable {
     public static Credentials getCredentials(InputStream is) throws KeyException, IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         byte[] buf = new byte[1024];
-        int len = 0;
+        int len;
         while (true) {
             len = is.read(buf);
             if (len > 0) {
@@ -394,10 +384,10 @@ public class Credentials implements Serializable {
      */
     public static Credentials getCredentialsBase64(byte[] base64enc) throws KeyException {
         String algo = "", cipher = "", tmp = "";
-        byte[] data = null;
-        byte[] aes = null;
-        int size = 0;
-        byte[] asciiEnc = null;
+        byte[] data;
+        byte[] aes;
+        int size;
+        byte[] asciiEnc;
 
         try {
             asciiEnc = Base64.decodeBase64(base64enc);
@@ -436,14 +426,13 @@ public class Credentials implements Serializable {
                 tot++;
             }
 
-            data = new byte[(int) asciiEnc.length - tot];
+            data = new byte[asciiEnc.length - tot];
             in.readFully(data);
         } catch (Exception e) {
             throw new KeyException("Could not decode credentials", e);
         }
 
-        Credentials cred = new Credentials(algo, size, cipher, aes, data);
-        return cred;
+        return new Credentials(algo, size, cipher, aes, data);
     }
 
     /**
@@ -458,7 +447,6 @@ public class Credentials implements Serializable {
      * <li>The encrypted AES key, which should be exactly <code>size / 8</code> bytes
      * <li>The encrypted data, which can be of arbitrary length, should occupy the rest of the file
      * </ul>
-     * @return
      * @throws KeyException
      */
     public byte[] getBase64() throws KeyException {
@@ -472,7 +460,7 @@ public class Credentials implements Serializable {
         } catch (IOException e) {
 
         }
-        byte[] ret = null;
+        byte[] ret;
         try {
             ret = Base64.encodeBase64(b.toByteArray());
         } catch (Exception e) {
@@ -552,44 +540,20 @@ public class Credentials implements Serializable {
     public static Credentials createCredentials(final CredData cc, final PublicKey pubKey, final String cipher)
             throws KeyException {
         // serialize clear credentials to byte array
-        byte[] clearCred = null;
+        byte[] clearCred;
         try {
             clearCred = ObjectToByteConverter.ObjectStream.convert(cc);
         } catch (IOException e1) {
             throw new KeyException(e1.getMessage());
         }
 
-        int size = -1;
-        if (pubKey instanceof java.security.interfaces.RSAPublicKey) {
-            size = ((RSAPublicKey) pubKey).getModulus().bitLength();
-        } else if (pubKey instanceof java.security.interfaces.DSAPublicKey) {
-            size = ((DSAPublicKey) pubKey).getParams().getP().bitLength();
-        } else if (pubKey instanceof javax.crypto.interfaces.DHPublicKey) {
-            size = ((DHPublicKey) pubKey).getParams().getP().bitLength();
-        }
+        HybridEncryptionUtil.HybridEncryptedData encryptedData = HybridEncryptionUtil.encrypt(pubKey, cipher,
+                clearCred);
+        byte[] encAes = encryptedData.getEncryptedSymmetricKey();
+        byte[] encData = encryptedData.getEncryptedData();
 
-        // generate symmetric key
-        SecretKey aesKey = KeyUtil.generateKey(AES_ALGO, AES_KEYSIZE);
-
-        byte[] encData = null;
-        byte[] encAes = null;
-
-        // encrypt AES key with public RSA key
-        try {
-            encAes = KeyPairUtil.encrypt(pubKey, size, cipher, aesKey.getEncoded());
-        } catch (KeyException e) {
-            throw new KeyException("Symmetric key encryption failed", e);
-        }
-
-        // encrypt clear credentials with AES key
-        try {
-            encData = KeyUtil.encrypt(aesKey, AES_CIPHER, clearCred);
-        } catch (KeyException e) {
-            throw new KeyException("Message encryption failed", e);
-        }
-
-        Credentials cred = new Credentials(pubKey.getAlgorithm(), size, cipher, encAes, encData);
-        return cred;
+        int size = keySize(pubKey);
+        return new Credentials(pubKey.getAlgorithm(), size, cipher, encAes, encData);
     }
 
     /**
@@ -614,26 +578,12 @@ public class Credentials implements Serializable {
      * @throws KeyException decryption failure, malformed data
      */
     public CredData decrypt(PrivateKey privKey) throws KeyException {
-        byte[] data = null;
-        byte[] aesClear = null;
-
-        // recover clear AES key using the private key
-        try {
-            aesClear = KeyPairUtil.decrypt(this.algorithm, privKey, this.cipher, this.aes);
-        } catch (KeyException e) {
-            throw new KeyException("Could not decrypt symmetric key", e);
-        }
-
-        // recover clear credentials using the AES key
-        try {
-            data = KeyUtil.decrypt(new SecretKeySpec(aesClear, AES_ALGO), AES_CIPHER, this.data);
-        } catch (KeyException e) {
-            throw new KeyException("Could not decrypt data", e);
-        }
+        byte[] decryptedData = HybridEncryptionUtil.decrypt(privKey, this.cipher,
+                new HybridEncryptionUtil.HybridEncryptedData(aes, data));
 
         // deserialize clear credentials and obtain login & password
         try {
-            return (CredData) ByteToObjectConverter.ObjectStream.convert(data);
+            return (CredData) ByteToObjectConverter.ObjectStream.convert(decryptedData);
         } catch (Exception e) {
             throw new KeyException(e.getMessage());
         }
@@ -730,44 +680,33 @@ public class Credentials implements Serializable {
         cc.setKey(datakey);
 
         // serialize clear credentials to byte array
-        byte[] clearCred = null;
+        byte[] clearCred;
         try {
             clearCred = ObjectToByteConverter.ObjectStream.convert(cc);
         } catch (IOException e1) {
             throw new KeyException(e1.getMessage());
         }
 
+        int size = keySize(pubKey);
+
+        HybridEncryptionUtil.HybridEncryptedData encryptedData = HybridEncryptionUtil.encrypt(pubKey, cipher,
+                clearCred);
+        byte[] encAes = encryptedData.getEncryptedSymmetricKey();
+        byte[] encData = encryptedData.getEncryptedData();
+
+        return new Credentials(pubKey.getAlgorithm(), size, cipher, encAes, encData);
+    }
+
+    private static int keySize(PublicKey pubKey) {
         int size = -1;
-        if (pubKey instanceof java.security.interfaces.RSAPublicKey) {
+        if (pubKey instanceof RSAPublicKey) {
             size = ((RSAPublicKey) pubKey).getModulus().bitLength();
-        } else if (pubKey instanceof java.security.interfaces.DSAPublicKey) {
+        } else if (pubKey instanceof DSAPublicKey) {
             size = ((DSAPublicKey) pubKey).getParams().getP().bitLength();
-        } else if (pubKey instanceof javax.crypto.interfaces.DHPublicKey) {
+        } else if (pubKey instanceof DHPublicKey) {
             size = ((DHPublicKey) pubKey).getParams().getP().bitLength();
         }
-
-        // generate symmetric key
-        SecretKey aesKey = KeyUtil.generateKey(AES_ALGO, AES_KEYSIZE);
-
-        byte[] encData = null;
-        byte[] encAes = null;
-
-        // encrypt AES key with public RSA key
-        try {
-            encAes = KeyPairUtil.encrypt(pubKey, size, cipher, aesKey.getEncoded());
-        } catch (KeyException e) {
-            throw new KeyException("Symmetric key encryption failed", e);
-        }
-
-        // encrypt clear credentials with AES key
-        try {
-            encData = KeyUtil.encrypt(aesKey, AES_CIPHER, clearCred);
-        } catch (KeyException e) {
-            throw new KeyException("Message encryption failed", e);
-        }
-
-        Credentials cred = new Credentials(pubKey.getAlgorithm(), size, cipher, encAes, encData);
-        return cred;
+        return size;
     }
 
 }

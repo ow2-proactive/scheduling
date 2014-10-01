@@ -43,6 +43,7 @@ import java.security.KeyException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.security.auth.login.LoginException;
 import javax.ws.rs.Consumes;
@@ -1029,4 +1030,20 @@ public interface SchedulerRestInterface {
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces("application/json")
     public abstract JobValidationData validate(MultipartFormDataInput multipart);
+
+    @POST
+    @Path("/credentials/{key}")
+    void putThirdPartyCredential(@HeaderParam("sessionid") String sessionId, @PathParam("key") String key,
+      @FormParam(
+        "value") String value) throws NotConnectedRestException, PermissionRestException,
+      SchedulerRestException;
+
+    @DELETE
+    @Path("/credentials/{key}")
+    void removeThirdPartyCredential(@HeaderParam("sessionid") String sessionId, @PathParam("key") String key) throws NotConnectedRestException, PermissionRestException;
+
+    @GET
+    @Path("/credentials/")
+    @Produces("application/json")
+    Set<String> thirdPartyCredentialsKeySet(@HeaderParam("sessionid") String sessionId) throws NotConnectedRestException, PermissionRestException;
 }

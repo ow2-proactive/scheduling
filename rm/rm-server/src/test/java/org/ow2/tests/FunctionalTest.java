@@ -41,7 +41,6 @@ import java.net.URL;
 
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
-import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.junit.After;
@@ -56,7 +55,6 @@ import org.junit.rules.Timeout;
 public class FunctionalTest extends ProActiveTest {
     static {
         configureLogging();
-        configurePAHome();
         ProActiveConfiguration.load();
     }
 
@@ -94,11 +92,8 @@ public class FunctionalTest extends ProActiveTest {
 
                 System.err.println("Test slice: " + currentTestSlice);
 
-                if (currentTestSlice != targetSlice) {
-                    return false;
-                }
+                return currentTestSlice == targetSlice;
 
-                return true;
             } catch (NumberFormatException ex) {
             }
         }
@@ -129,13 +124,6 @@ public class FunctionalTest extends ProActiveTest {
         shutdownHook = new KillAllProcessShutdownHook();
         Runtime.getRuntime().addShutdownHook(shutdownHook);
 
-    }
-
-    private static void configurePAHome() {
-        if (System.getProperty(CentralPAPropertyRepository.PA_HOME.getName()) == null) {
-            System.setProperty(CentralPAPropertyRepository.PA_HOME.getName(), System
-                    .getProperty(PAResourceManagerProperties.RM_HOME.getKey()));
-        }
     }
 
     private static void configureLogging() {

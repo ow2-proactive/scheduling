@@ -2488,12 +2488,54 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
     }
 
+    @Override
+    public void putThirdPartyCredential(String sessionId, String key, String value)
+            throws NotConnectedRestException, PermissionRestException, SchedulerRestException {
+        try {
+            Scheduler s = checkAccess(sessionId);
+            s.putThirdPartyCredential(key, value);
+        } catch (PermissionException e) {
+            throw new PermissionRestException(e);
+        } catch (NotConnectedException e) {
+            throw new NotConnectedRestException(e);
+        } catch (KeyException e) {
+            throw new SchedulerRestException(e);
+        }
+    }
+
+    @Override
+    public void removeThirdPartyCredential(String sessionId, String key) throws NotConnectedRestException,
+            PermissionRestException {
+        try {
+            Scheduler s = checkAccess(sessionId);
+            s.removeThirdPartyCredential(key);
+        } catch (PermissionException e) {
+            throw new PermissionRestException(e);
+        } catch (NotConnectedException e) {
+            throw new NotConnectedRestException(e);
+        }
+    }
+
+    @Override
+    public Set<String> thirdPartyCredentialsKeySet(String sessionId) throws NotConnectedRestException,
+            PermissionRestException {
+        try {
+            Scheduler s = checkAccess(sessionId);
+            return s.thirdPartyCredentialsKeySet();
+        } catch (PermissionException e) {
+            throw new PermissionRestException(e);
+        } catch (NotConnectedException e) {
+            throw new NotConnectedRestException(e);
+        }
+    }
+
     /*
      * Atmosphere 2.0 framework based implementation of Scheduler Eventing mechanism for REST clients.
      * It is configured to use WebSocket as the underneath protocol between the client and the server.
      */
+
     /**
-     * Initialize WebScokect based communication channel between the client and the server.
+     * Initialize WebSocket based communication channel between the client and the server.
      */
     @GET
     @Path("/events")

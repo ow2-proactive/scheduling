@@ -36,8 +36,6 @@
  */
 package org.ow2.proactive.scheduler.task.forked;
 
-import static org.ow2.proactive.scheduler.common.util.VariablesUtil.filterAndUpdate;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -46,6 +44,9 @@ import java.io.PrintStream;
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.KeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -54,10 +55,6 @@ import java.util.Map.Entry;
 import java.util.Random;
 import java.util.concurrent.Callable;
 
-import org.apache.log4j.Appender;
-import org.apache.log4j.AppenderSkeleton;
-import org.apache.log4j.Logger;
-import org.apache.log4j.spi.LoggingEvent;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
@@ -73,6 +70,8 @@ import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
 import org.objectweb.proactive.extensions.pamr.PAMRConfig;
 import org.objectweb.proactive.extensions.processbuilder.OSProcessBuilder;
 import org.objectweb.proactive.extensions.processbuilder.exception.NotImplementedException;
+import org.ow2.proactive.authentication.crypto.CredData;
+import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.utils.OneJar;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.exception.TaskAbortedException;
@@ -101,6 +100,12 @@ import org.ow2.proactive.scripting.ScriptLoader;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.utils.FileToBytesConverter;
 import org.ow2.proactive.utils.NodeSet;
+import org.apache.log4j.Appender;
+import org.apache.log4j.AppenderSkeleton;
+import org.apache.log4j.Logger;
+import org.apache.log4j.spi.LoggingEvent;
+
+import static org.ow2.proactive.scheduler.common.util.VariablesUtil.filterAndUpdate;
 
 
 /**
@@ -195,11 +200,16 @@ public class JavaForkerExecutable extends JavaExecutable implements ForkerStarte
             launcherGuard.use().activateLogs(new StdAppenderProvider());
 
             execInitializer.getJavaExecutableContainer().setNodes(new NodeSet(execInitializer.getNodes()));
+
+            reEncryptForForkedLauncher();
+
             //do task must not pass schedulerCore object,
             //the deployed java task must not notify the core from termination
             //the forked java task launcher will do that in place
             logger.debug("Starting java task");
-            launcherGuard.configureNode();
+            if (isUsingSharedSpaceAsWorkingDir(execInitializer.getForkEnvironment())) {
+                launcherGuard.configureNode();
+            }
             launcherGuard.doTaskAndGetResult(results);
 
             //waiting for task result futur
@@ -227,6 +237,14 @@ public class JavaForkerExecutable extends JavaExecutable implements ForkerStarte
         } finally {
             launcherGuard.clean(TaskLauncher.CLEAN_TIMEOUT);
         }
+    }
+
+    private void reEncryptForForkedLauncher() throws NoSuchAlgorithmException, IllegalAccessException,
+            KeyException {
+        PublicKey publicKey = launcherGuard.use().generatePublicKey();
+        CredData decrypted = execInitializer.getDecrypter().decrypt();
+        Credentials credentialsForForkedLauncher = Credentials.createCredentials(decrypted, publicKey);
+        execInitializer.getJavaExecutableContainer().setCredentials(credentialsForForkedLauncher);
     }
 
     /**
@@ -691,9 +709,7 @@ public class JavaForkerExecutable extends JavaExecutable implements ForkerStarte
      */
     private void setWorkingDir(OSProcessBuilder ospb) {
         ForkEnvironment forkEnvironment = execInitializer.getForkEnvironment();
-        if (forkEnvironment != null && forkEnvironment.getWorkingDir() != null) {
-            ospb.directory(new File(forkEnvironment.getWorkingDir()));
-        } else {
+        if (isUsingSharedSpaceAsWorkingDir(forkEnvironment)) {
             // default it to use the forker shared scratch space so input files are
             // directly accessible from the working dir
             try {
@@ -706,8 +722,14 @@ public class JavaForkerExecutable extends JavaExecutable implements ForkerStarte
             } catch (URISyntaxException e) {
                 logger.warn("Could not resolve forked task shared scratch space URI", e);
             }
+        } else {
+            ospb.directory(new File(forkEnvironment.getWorkingDir()));
         }
         logger.debug("Running forked task with working dir: " + ospb.directory());
+    }
+
+    private boolean isUsingSharedSpaceAsWorkingDir(ForkEnvironment forkEnvironment) {
+        return forkEnvironment == null || forkEnvironment.getWorkingDir() == null;
     }
 
     /**
@@ -751,7 +773,7 @@ public class JavaForkerExecutable extends JavaExecutable implements ForkerStarte
      * @return true if this task is to be ran under a user account id, false otherwise.
      */
     private boolean isRunAsUser() {
-        return this.execInitializer.getDecrypter() != null;
+        return execInitializer.getJavaExecutableContainer().isRunAsUser();
     }
 
     /**

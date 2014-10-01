@@ -42,6 +42,7 @@ import java.security.PublicKey;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.security.auth.login.LoginException;
 
@@ -604,5 +605,21 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     public List<JobUsage> getAccountUsage(String user, Date startDate, Date endDate)
             throws NotConnectedException, PermissionException {
         return uischeduler.getAccountUsage(user, startDate, endDate);
+    }
+
+    @Override
+    public void putThirdPartyCredential(String key, String value) throws NotConnectedException, KeyException,
+            PermissionException {
+        uischeduler.putThirdPartyCredential(key, value);
+    }
+
+    @Override
+    public Set<String> thirdPartyCredentialsKeySet() throws NotConnectedException, PermissionException {
+        return uischeduler.thirdPartyCredentialsKeySet();
+    }
+
+    @Override
+    public void removeThirdPartyCredential(String key) throws NotConnectedException, PermissionException {
+        uischeduler.removeThirdPartyCredential(key);
     }
 }

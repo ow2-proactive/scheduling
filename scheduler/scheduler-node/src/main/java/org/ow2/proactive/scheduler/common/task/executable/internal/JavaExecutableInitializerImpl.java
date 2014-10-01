@@ -36,11 +36,8 @@
  */
 package org.ow2.proactive.scheduler.common.task.executable.internal;
 
-import java.util.ArrayList;
-
-import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
-import org.ow2.proactive.scheduler.common.task.OneShotDecrypter;
+import org.ow2.proactive.scheduler.common.task.Decrypter;
 import org.ow2.proactive.utils.NodeSet;
 
 
@@ -60,12 +57,13 @@ public class JavaExecutableInitializerImpl extends JavaStandaloneExecutableIniti
     private DataSpacesFileObject outputSpaceFO;
     private DataSpacesFileObject globalSpaceFO;
     private DataSpacesFileObject userSpaceFO;
+    private Decrypter decrypter;
 
     /**
      * {@inheritDoc}
      */
-    public OneShotDecrypter getDecrypter() {
-        throw new RuntimeException("Should not be called in this context");
+    public Decrypter getDecrypter() {
+        return decrypter;
     }
 
     @Override
@@ -81,8 +79,8 @@ public class JavaExecutableInitializerImpl extends JavaStandaloneExecutableIniti
     /**
      * {@inheritDoc}
      */
-    public void setDecrypter(OneShotDecrypter decrypter) {
-        throw new RuntimeException("Should not be called in this context");
+    public void setDecrypter(Decrypter decrypter) {
+        this.decrypter = decrypter;
     }
 
     public DataSpacesFileObject getLocalSpaceFileObject() {

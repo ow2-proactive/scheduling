@@ -43,7 +43,10 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
@@ -107,6 +110,12 @@ public class NativeTaskLauncher extends TaskLauncher {
     private static final String NODESFILE_TAG = "$NODESFILE";
     /** Tag for identifying in command line the number of resources allocated to a multi-node task */
     private static final String NODESNUMBER_TAG = "$NODESNUMBER";
+    private static final Comparator<String> LONGEST_STRING_FIRST_COMPARATOR = new Comparator<String>() {
+        @Override
+        public int compare(String o1, String o2) {
+            return o2.length() - o1.length();
+        }
+    };
 
     /**
      * ProActive Empty Constructor
@@ -186,11 +195,9 @@ public class NativeTaskLauncher extends TaskLauncher {
                 filterAndUpdate(generationScript, getPropagatedVariables());
             }
 
-            //decrypt credentials if needed
-            if (executableContainer.isRunAsUser()) {
-                decrypter.setCredentials(executableContainer.getCredentials());
-                execInit.setDecrypter(decrypter);
-            }
+            decrypter.setCredentials(executableContainer.getCredentials());
+            execInit.setDecrypter(decrypter);
+
             // if an exception occurs in init method, unwrapp the InvocationTargetException
             // the result of the execution is the user level exception
             try {
@@ -199,7 +206,8 @@ public class NativeTaskLauncher extends TaskLauncher {
                 throw e.getCause() != null ? e.getCause() : e;
             }
 
-            replaceIterationTags(execInit);
+            replaceIterationTags();
+            replaceCredentialsTags(decrypter.decrypt().getThirdPartyCredentials());
             // replace the JAVA tags in command
             replaceCommandPathsTags(execInit);
             //replace dataspace tags in command (if needed) by local scratch directory
@@ -452,19 +460,27 @@ public class NativeTaskLauncher extends TaskLauncher {
         }
     }
 
-    /**
-     * Replaces iteration and replication index syntactic macros
-     * in various string locations across the task descriptor
-     * 
-     * @param init the executable initializer containing the native command
-     */
-    protected void replaceIterationTags(ExecutableInitializer init) {
+    protected void replaceIterationTags() {
+        Map<String, String> replacements = new HashMap<String, String>();
+        replacements.put(ITERATION_INDEX_TAG, String.valueOf(this.iterationIndex));
+        replacements.put(REPLICATION_INDEX_TAG, String.valueOf(this.replicationIndex));
+        replaceTags(replacements);
+    }
+
+    protected void replaceCredentialsTags(Map<String, String> thirdPartyCredentials) {
+        TreeMap<String, String> replacements = new TreeMap<String, String>(LONGEST_STRING_FIRST_COMPARATOR);
+        for (Map.Entry<String, String> credentialEntry : thirdPartyCredentials.entrySet()) {
+            replacements.put(CREDENTIALS_KEY_PREFIX + credentialEntry.getKey(), credentialEntry.getValue());
+        }
+        replaceTags(replacements);
+    }
+
+    private void replaceTags(Map<String, String> replacements) {
         NativeExecutable ne = (NativeExecutable) executableGuard.use();
         String[] cmd = ne.getCommand();
         if (cmd != null) {
             for (int i = 0; i < cmd.length; i++) {
-                cmd[i] = cmd[i].replace(ITERATION_INDEX_TAG, "" + this.iterationIndex);
-                cmd[i] = cmd[i].replace(REPLICATION_INDEX_TAG, "" + this.replicationIndex);
+                cmd[i] = replace(cmd[i], replacements);
             }
         }
     }

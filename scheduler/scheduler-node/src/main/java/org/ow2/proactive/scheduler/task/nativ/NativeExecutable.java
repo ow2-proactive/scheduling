@@ -51,21 +51,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
-import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extensions.processbuilder.OSProcessBuilder;
 import org.objectweb.proactive.extensions.processbuilder.exception.NotImplementedException;
+import org.ow2.proactive.rm.util.process.ProcessTreeKiller;
 import org.ow2.proactive.scheduler.common.exception.UserException;
-import org.ow2.proactive.scheduler.common.task.OneShotDecrypter;
+import org.ow2.proactive.scheduler.common.task.Decrypter;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.Executable;
 import org.ow2.proactive.scheduler.exception.RunningProcessException;
 import org.ow2.proactive.scheduler.exception.StartProcessException;
 import org.ow2.proactive.scheduler.task.SchedulerVars;
 import org.ow2.proactive.scheduler.task.utils.ForkerUtils;
-import org.ow2.proactive.rm.util.process.ProcessTreeKiller;
 import org.ow2.proactive.scheduler.util.process.ThreadReader;
 import org.ow2.proactive.scripting.GenerationScript;
 import org.ow2.proactive.scripting.PropertyUtils;
@@ -73,6 +72,7 @@ import org.ow2.proactive.scripting.ScriptHandler;
 import org.ow2.proactive.scripting.ScriptLoader;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.utils.Tools;
+import org.apache.log4j.Logger;
 
 
 /**
@@ -136,7 +136,9 @@ public class NativeExecutable extends Executable {
     private int nodesNumber = 1;
 
     /** Decrypter to start native process */
-    private OneShotDecrypter decrypter = null;
+    private Decrypter decrypter = null;
+
+    private boolean runAsUser;
 
     /**
      * Initialize the executable using the given executable container.
@@ -196,6 +198,7 @@ public class NativeExecutable extends Executable {
         nodesNumber = nodes.size();
         //set decrypter
         this.decrypter = execInitializer.getDecrypter();
+        this.runAsUser = execInitializer.isRunAsUser();
     }
 
     /**
@@ -374,9 +377,9 @@ public class NativeExecutable extends Executable {
      */
     private Process createProcessAndStart() throws Exception {
         //build process
-        OSProcessBuilder ospb = null;
+        OSProcessBuilder ospb;
         //check if it must be run under user and if so, apply the proper method
-        if (isRunAsUser()) {
+        if (runAsUser) {
             ospb = ForkerUtils.getOSProcessBuilderFactory().getBuilder(
                     ForkerUtils.checkConfigAndGetUser(this.decrypter));
         } else {
@@ -403,15 +406,6 @@ public class NativeExecutable extends Executable {
         logger.info("in directory : " + this.wDirFile);
         //and start process
         return ospb.start();
-    }
-
-    /**
-     * Return true if this task is to be ran under a user account id or not.
-     *
-     * @return true if this task is to be ran under a user account id, false otherwise.
-     */
-    private boolean isRunAsUser() {
-        return this.decrypter != null;
     }
 
     /**

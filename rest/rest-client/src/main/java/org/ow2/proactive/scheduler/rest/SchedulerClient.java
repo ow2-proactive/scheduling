@@ -34,25 +34,6 @@
  */
 package org.ow2.proactive.scheduler.rest;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-import static java.lang.String.format;
-import static java.lang.System.currentTimeMillis;
-import static org.ow2.proactive.scheduler.rest.ExceptionUtility.exception;
-import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwJAFEOrUJEOrNCEOrPE;
-import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwNCEOrPE;
-import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwNCEOrPEOrSCEOrJCE;
-import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwUJEOrNCEOrPE;
-import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwUJEOrNCEOrPEOrUTE;
-import static org.ow2.proactive.scheduler.rest.data.DataUtility.jobId;
-import static org.ow2.proactive.scheduler.rest.data.DataUtility.taskState;
-import static org.ow2.proactive.scheduler.rest.data.DataUtility.toJobInfos;
-import static org.ow2.proactive.scheduler.rest.data.DataUtility.toJobResult;
-import static org.ow2.proactive.scheduler.rest.data.DataUtility.toJobState;
-import static org.ow2.proactive.scheduler.rest.data.DataUtility.toJobUsages;
-import static org.ow2.proactive.scheduler.rest.data.DataUtility.toSchedulerUserInfos;
-import static org.ow2.proactive.scheduler.rest.data.DataUtility.toTaskResult;
-
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
@@ -60,20 +41,17 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.Proxy;
 import java.nio.charset.Charset;
+import java.security.KeyException;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.http.client.HttpClient;
-import org.jboss.resteasy.client.jaxrs.engines.ApacheHttpClient4Engine;
-import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.ow2.proactive.db.SortParameter;
 import org.ow2.proactive.scheduler.common.JobFilterCriteria;
 import org.ow2.proactive.scheduler.common.JobSortParameter;
@@ -119,6 +97,30 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskResultData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskStateData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.UserJobData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SchedulerRestException;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.http.client.HttpClient;
+import org.jboss.resteasy.client.jaxrs.engines.ApacheHttpClient4Engine;
+import org.jboss.resteasy.spi.ResteasyProviderFactory;
+
+import static java.lang.String.format;
+import static java.lang.System.currentTimeMillis;
+import static org.ow2.proactive.scheduler.rest.ExceptionUtility.exception;
+import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwJAFEOrUJEOrNCEOrPE;
+import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwNCEOrPE;
+import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwNCEOrPEOrSCEOrJCE;
+import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwUJEOrNCEOrPE;
+import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwUJEOrNCEOrPEOrUTE;
+import static org.ow2.proactive.scheduler.rest.data.DataUtility.jobId;
+import static org.ow2.proactive.scheduler.rest.data.DataUtility.taskState;
+import static org.ow2.proactive.scheduler.rest.data.DataUtility.toJobInfos;
+import static org.ow2.proactive.scheduler.rest.data.DataUtility.toJobResult;
+import static org.ow2.proactive.scheduler.rest.data.DataUtility.toJobState;
+import static org.ow2.proactive.scheduler.rest.data.DataUtility.toJobUsages;
+import static org.ow2.proactive.scheduler.rest.data.DataUtility.toSchedulerUserInfos;
+import static org.ow2.proactive.scheduler.rest.data.DataUtility.toTaskResult;
 
 
 public class SchedulerClient extends ClientBase implements ISchedulerClient {
@@ -958,5 +960,41 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     private <K, V> Map.Entry<K, V> toEntry(final K k, final V v) {
         return new AbstractMap.SimpleEntry<K, V>(k, v);
 
+    }
+
+    @Override
+    public void putThirdPartyCredential(String key, String value) throws NotConnectedException,
+            PermissionException, KeyException {
+        try {
+            restApi().putThirdPartyCredential(sid, key, value);
+        } catch (NotConnectedRestException e) {
+            throw new NotConnectedException(e);
+        } catch (PermissionRestException e) {
+            throw new PermissionException(e);
+        } catch (SchedulerRestException e) {
+            throw new KeyException(e);
+        }
+    }
+
+    @Override
+    public Set<String> thirdPartyCredentialsKeySet() throws NotConnectedException, PermissionException {
+        try {
+            return restApi().thirdPartyCredentialsKeySet(sid);
+        } catch (NotConnectedRestException e) {
+            throw new NotConnectedException(e);
+        } catch (PermissionRestException e) {
+            throw new PermissionException(e);
+        }
+    }
+
+    @Override
+    public void removeThirdPartyCredential(String key) throws NotConnectedException, PermissionException {
+        try {
+            restApi().removeThirdPartyCredential(sid, key);
+        } catch (NotConnectedRestException e) {
+            throw new NotConnectedException(e);
+        } catch (PermissionRestException e) {
+            throw new PermissionException(e);
+        }
     }
 }

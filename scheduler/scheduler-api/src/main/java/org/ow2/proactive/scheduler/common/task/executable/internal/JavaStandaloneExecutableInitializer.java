@@ -57,6 +57,8 @@ public class JavaStandaloneExecutableInitializer extends DefaultStandaloneExecut
     /** Propagated variables from parent tasks */
     protected Map<String, byte[]> propagatedVariables;
 
+    private Map<String, String> thirdPartyCredentials;
+
     /**
      * @throws java.io.IOException if the deserialization of the value cannot be performed.
      * @throws ClassNotFoundException if the value's class cannot be loaded.
@@ -105,10 +107,19 @@ public class JavaStandaloneExecutableInitializer extends DefaultStandaloneExecut
 
     /**
      * Returns the propagated variables map of the current Java task.
-     *
+     *g 
      * @return a map of variables
      */
     public Map<String, byte[]> getPropagatedVariables() {
         return propagatedVariables;
     }
+
+    public Map<String, String> getThirdPartyCredentials() {
+        return thirdPartyCredentials;
+    }
+
+    public void setThirdPartyCredentials(Map<String, String> thirdPartyCredentials) {
+        this.thirdPartyCredentials = thirdPartyCredentials;
+    }
+
 }

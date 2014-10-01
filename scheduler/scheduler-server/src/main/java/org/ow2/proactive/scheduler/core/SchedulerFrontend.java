@@ -37,8 +37,11 @@
 package org.ow2.proactive.scheduler.core;
 
 import java.net.URI;
+import java.security.KeyException;
+import java.security.PublicKey;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -54,6 +57,7 @@ import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.objectweb.proactive.utils.NamedThreadFactory;
 import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.authentication.crypto.HybridEncryptionUtil;
 import org.ow2.proactive.db.DatabaseManagerException;
 import org.ow2.proactive.db.SortParameter;
 import org.ow2.proactive.policy.ClientsPolicy;
@@ -105,7 +109,6 @@ import org.ow2.proactive.scheduler.job.UserIdentificationImpl;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.ServerJobAndTaskLogs;
-import org.ow2.proactive.scheduler.util.TaskLogger;
 import org.ow2.proactive.utils.Tools;
 import org.apache.log4j.Logger;
 
@@ -128,13 +131,8 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     private static final long SCHEDULER_REMOVED_JOB_DELAY = PASchedulerProperties.SCHEDULER_REMOVED_JOB_DELAY
             .getValueAsInt() * 1000;
 
-    /**
-     * Scheduler logger
-     * Scheduler logger
-     */
-    public static final Logger logger = Logger.getLogger(SchedulingService.class);
-    public static final TaskLogger tlogger = TaskLogger.getInstance();
-    public static final JobLogger jlogger = JobLogger.getInstance();
+    private static final Logger logger = Logger.getLogger(SchedulingService.class);
+    private static final JobLogger jlogger = JobLogger.getInstance();
 
     /**
      * Temporary rmURL at starting process
@@ -152,11 +150,6 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     private String policyFullName;
 
     /**
-     * Users Statistics Manager
-     */
-    private SchedulerAccountsManager accountsManager;
-
-    /**
      * JMX Helper reference
      */
     private SchedulerJMXHelper jmxHelper;
@@ -168,6 +161,8 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     private SchedulerFrontendState frontendState;
 
     private SchedulerSpacesSupport spacesSupport;
+
+    private PublicKey corePublicKey;
 
     /* ########################################################################################### */
     /*                                                                                             */
@@ -190,7 +185,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
      */
     public SchedulerFrontend(URI rmURL, String policyFullClassName) {
         this.dbManager = SchedulerDBManager.createUsingProperties();
-        this.accountsManager = new SchedulerAccountsManager(dbManager);
+        SchedulerAccountsManager accountsManager = new SchedulerAccountsManager(dbManager);
         this.jmxHelper = new SchedulerJMXHelper(accountsManager, dbManager);
 
         logger.debug("Creating scheduler Front-end...");
@@ -259,6 +254,8 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
 
             this.spacesSupport = infrastructure.getSpacesSupport();
 
+            this.corePublicKey = Credentials.getPublicKey(PASchedulerProperties
+                    .getAbsolutePath(PASchedulerProperties.SCHEDULER_AUTH_PUBKEY_PATH.getValueAsString()));
             this.schedulingService = new SchedulingService(infrastructure, frontendState, recoveredState,
                 policyFullName, null);
 
@@ -924,7 +921,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
             // limit it to its own jobs
             if (!myJobsOnly) {
                 myJobsOnly = true;
-                frontendState.checkOwnStatePermission(myJobsOnly, ident);
+                frontendState.checkOwnStatePermission(true, ident);
             } else {
                 throw ex;
             }
@@ -986,4 +983,28 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
         return dbManager.getUsage(user, startDate, endDate);
     }
 
+    @Override
+    public void putThirdPartyCredential(String key, String value) throws NotConnectedException,
+            PermissionException, KeyException {
+        UserIdentificationImpl ident = frontendState.checkPermission("putThirdPartyCredential",
+                "You do not have permission to put third-party credentials in the scheduler!");
+
+        HybridEncryptionUtil.HybridEncryptedData encryptedData = HybridEncryptionUtil.encryptString(value,
+                corePublicKey);
+        dbManager.putThirdPartyCredential(ident.getUsername(), key, encryptedData);
+    }
+
+    @Override
+    public Set<String> thirdPartyCredentialsKeySet() throws NotConnectedException, PermissionException {
+        UserIdentificationImpl ident = frontendState.checkPermission("thirdPartyCredentialsKeySet",
+                "You do not have permission to list third-party credentials in the scheduler!");
+        return dbManager.thirdPartyCredentialsKeySet(ident.getUsername());
+    }
+
+    @Override
+    public void removeThirdPartyCredential(String key) throws NotConnectedException, PermissionException {
+        UserIdentificationImpl ident = frontendState.checkPermission("removeThirdPartyCredential",
+                "You do not have permission to remove third-party credentials from the scheduler!");
+        dbManager.removeThirdPartyCredential(ident.getUsername(), key);
+    }
 }

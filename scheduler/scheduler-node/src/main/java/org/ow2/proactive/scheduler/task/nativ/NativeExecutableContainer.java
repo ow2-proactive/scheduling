@@ -42,7 +42,6 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 
-import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
@@ -52,6 +51,7 @@ import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.ExecutableContainerInitializer;
 import org.ow2.proactive.scripting.GenerationScript;
 import org.ow2.proactive.scripting.InvalidScriptException;
+import org.apache.log4j.Logger;
 
 
 /**
@@ -118,7 +118,7 @@ public class NativeExecutableContainer extends ExecutableContainer {
         if (cont.workingDir == null) {
             this.workingDir = null;
         } else {
-            this.workingDir = new String(cont.workingDir);
+            this.workingDir = cont.workingDir;
         }
     }
 
@@ -139,6 +139,7 @@ public class NativeExecutableContainer extends ExecutableContainer {
         nei.setCommand(command);
         nei.setGenerationScript(generated);
         nei.setWorkingDir(workingDir);
+        nei.setRunAsUser(isRunAsUser());
         List<String> nodesHost = new ArrayList<String>();
         for (Node nodeHost : nodes) {
             nodesHost.add(nodeHost.getNodeInformation().getVMInformation().getHostName());

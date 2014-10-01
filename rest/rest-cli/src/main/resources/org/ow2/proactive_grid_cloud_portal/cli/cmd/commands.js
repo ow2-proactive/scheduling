@@ -40,6 +40,9 @@ importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.GetTopologyCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.ShutdownCommand);
 
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.LoginSchedCommand);
+importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.PutThirdPartyCredentialCommand);
+importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.RemoveThirdPartyCredentialCommand);
+importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.ThirdPartyCredentialKeySetCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.SchedJsHelpCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.StartCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.StopCommand);
@@ -181,6 +184,18 @@ function loginwithcredentials(pathname) {
 
 function schedulerhelp() {
     execute(new SchedJsHelpCommand());
+}
+
+function putcredential(key, value) {
+    execute(new PutThirdPartyCredentialCommand(string(key), string(value)));
+}
+
+function removecredential(key) {
+    execute(new RemoveThirdPartyCredentialCommand(string(key)));
+}
+
+function listcredentials() {
+    execute(new ThirdPartyCredentialKeySetCommand());
 }
 
 function submit(pathname, variables) {

@@ -13,8 +13,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.hibernate.criterion.Order;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
+import org.ow2.proactive.authentication.crypto.HybridEncryptionUtil;
 import org.ow2.proactive.db.DatabaseManagerException;
 import org.ow2.proactive.db.FilteredExceptionCallback;
 import org.ow2.proactive.db.SortParameter;
@@ -36,6 +36,7 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scheduler.common.usage.JobUsage;
 import org.ow2.proactive.scheduler.core.account.SchedulerAccount;
 import org.ow2.proactive.scheduler.core.db.TaskData.DBTaskId;
+import org.ow2.proactive.scheduler.core.db.TransactionHelper.SessionWork;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.ChangedTasksInfo;
 import org.ow2.proactive.scheduler.job.InternalJob;
@@ -43,19 +44,19 @@ import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.job.JobResultImpl;
 import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
-import org.ow2.proactive.scheduler.task.forked.ForkedJavaExecutableContainer;
-import org.ow2.proactive.scheduler.task.script.ForkedScriptExecutableContainer;
-import org.ow2.proactive.scheduler.task.java.JavaExecutableContainer;
-import org.ow2.proactive.scheduler.task.nativ.NativeExecutableContainer;
-import org.ow2.proactive.scheduler.task.script.ScriptExecutableContainer;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
+import org.ow2.proactive.scheduler.task.forked.ForkedJavaExecutableContainer;
 import org.ow2.proactive.scheduler.task.internal.InternalForkedJavaTask;
 import org.ow2.proactive.scheduler.task.internal.InternalForkedScriptTask;
 import org.ow2.proactive.scheduler.task.internal.InternalJavaTask;
 import org.ow2.proactive.scheduler.task.internal.InternalNativeTask;
 import org.ow2.proactive.scheduler.task.internal.InternalScriptTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
+import org.ow2.proactive.scheduler.task.java.JavaExecutableContainer;
+import org.ow2.proactive.scheduler.task.nativ.NativeExecutableContainer;
+import org.ow2.proactive.scheduler.task.script.ForkedScriptExecutableContainer;
+import org.ow2.proactive.scheduler.task.script.ScriptExecutableContainer;
 import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.utils.FileToBytesConverter;
 import org.apache.log4j.Logger;
@@ -66,11 +67,13 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.exception.ConstraintViolationException;
 import org.hibernate.transform.DistinctRootEntityResultTransformer;
-import org.ow2.proactive.scheduler.core.db.TransactionHelper.SessionWork;
+
+import static org.ow2.proactive.authentication.crypto.HybridEncryptionUtil.HybridEncryptedData;
 
 
 public class SchedulerDBManager {
@@ -165,6 +168,7 @@ public class SchedulerDBManager {
             configuration.addAnnotatedClass(ScriptData.class);
             configuration.addAnnotatedClass(EnvironmentModifierData.class);
             configuration.addAnnotatedClass(SelectorData.class);
+            configuration.addAnnotatedClass(ThirdPartyCredentialData.class);
             if (drop) {
                 configuration.setProperty("hibernate.hbm2ddl.auto", "create");
             }
@@ -1694,4 +1698,68 @@ public class SchedulerDBManager {
         }
     }
 
+    public void putThirdPartyCredential(final String username, final String key,
+            final HybridEncryptedData encryptedCredential) {
+        runWithTransaction(new SessionWork<Void>() {
+            @Override
+            public Void executeWork(Session session) {
+                session.saveOrUpdate(new ThirdPartyCredentialData(username, key, encryptedCredential
+                        .getEncryptedSymmetricKey(), encryptedCredential.getEncryptedData()));
+                return null;
+            }
+        });
+    }
+
+    public Set<String> thirdPartyCredentialsKeySet(final String username) {
+        return runWithoutTransaction(new SessionWork<Set<String>>() {
+            @Override
+            @SuppressWarnings("unchecked")
+            public Set<String> executeWork(Session session) {
+                Query query = session.createQuery(
+                        "select key from ThirdPartyCredentialData where username = :username").setParameter(
+                        "username", username);
+                List<String> keys = query.list();
+                return new HashSet<String>(keys);
+
+            }
+        });
+    }
+
+    public void removeThirdPartyCredential(final String username, final String key) {
+        runWithTransaction(new SessionWork<Void>() {
+            @Override
+            public Void executeWork(Session session) {
+                Query query = session.createQuery(
+                        "delete from ThirdPartyCredentialData where username = :username and key = :key")
+                        .setParameter("username", username).setParameter("key", key);
+                query.executeUpdate();
+                return null;
+            }
+        });
+    }
+
+    public Map<String, HybridEncryptedData> thirdPartyCredentialsMap(final String username) {
+        return runWithoutTransaction(new SessionWork<Map<String, HybridEncryptedData>>() {
+            @Override
+            @SuppressWarnings("unchecked")
+            public Map<String, HybridEncryptedData> executeWork(Session session) {
+                Query query = session.createQuery(
+                        "select key, encryptedSymmetricKey, encryptedValue "
+                            + "from ThirdPartyCredentialData " + "where username = :username").setParameter(
+                        "username", username);
+                List<Object[]> rows = query.list();
+                Map<String, HybridEncryptedData> thirdPartyCredentialsMap = new HashMap<String, HybridEncryptedData>(
+                    rows.size());
+                for (Object[] row : rows) {
+                    String key = (String) row[0];
+                    byte[] encryptedSymmetricKey = (byte[]) row[1];
+                    byte[] encryptedValue = (byte[]) row[2];
+                    thirdPartyCredentialsMap.put(key, new HybridEncryptedData(encryptedSymmetricKey,
+                        encryptedValue));
+                }
+                return thirdPartyCredentialsMap;
+
+            }
+        });
+    }
 }

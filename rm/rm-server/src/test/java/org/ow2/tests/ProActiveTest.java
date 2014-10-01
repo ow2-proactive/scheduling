@@ -36,6 +36,7 @@ package org.ow2.tests;
 
 import java.security.Policy;
 
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
@@ -48,6 +49,7 @@ import org.apache.log4j.Logger;
 public class ProActiveTest {
     static {
         configureSecurityManager();
+        configurePAHome();
         configureLog4j();
     }
 
@@ -63,6 +65,13 @@ public class ProActiveTest {
                 "/config/security.java.policy-server");
 
             Policy.getPolicy().refresh();
+        }
+    }
+
+    private static void configurePAHome() {
+        if (System.getProperty(CentralPAPropertyRepository.PA_HOME.getName()) == null) {
+            System.setProperty(CentralPAPropertyRepository.PA_HOME.getName(), System
+              .getProperty(PAResourceManagerProperties.RM_HOME.getKey()));
         }
     }
 }

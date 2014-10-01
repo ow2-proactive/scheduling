@@ -75,17 +75,7 @@ public class KeyPairUtil {
      */
     public static void generateKeyPair(String algorithm, int size, String privPath, String pubPath)
             throws KeyException {
-        KeyPairGenerator keyGen = null;
-        try {
-            keyGen = KeyPairGenerator.getInstance(algorithm);
-        } catch (NoSuchAlgorithmException e) {
-            throw new KeyException("Cannot initialize keypair generator", e);
-        }
-
-        SecureRandom random = new SecureRandom();
-        keyGen.initialize(size, random);
-
-        KeyPair keyPair = keyGen.generateKeyPair();
+        KeyPair keyPair = generateKeyPair(algorithm, size);
 
         PrivateKey privKey = keyPair.getPrivate();
         PublicKey pubKey = keyPair.getPublic();
@@ -111,6 +101,20 @@ public class KeyPairUtil {
         }
     }
 
+    public static KeyPair generateKeyPair(String algorithm, int size) throws KeyException {
+        KeyPairGenerator keyGen = null;
+        try {
+            keyGen = KeyPairGenerator.getInstance(algorithm);
+        } catch (NoSuchAlgorithmException e) {
+            throw new KeyException("Cannot initialize keypair generator", e);
+        }
+
+        SecureRandom random = new SecureRandom();
+        keyGen.initialize(size, random);
+
+        return keyGen.generateKeyPair();
+    }
+
     /**
      * Encrypt a message using asymmetric keys
      * 
@@ -120,13 +124,7 @@ public class KeyPairUtil {
      * @return the encrypted message
      * @throws KeyException encryption failed, public key recovery failed
      */
-    public static byte[] encrypt(PublicKey pubKey, int size, String cipherParams, byte[] message)
-            throws KeyException {
-
-        if (message.length * 8 > size) {
-            throw new KeyException("Cannot encrypt " + message.length + "B with a " + size +
-                "b key... Try with a " + npot(message.length) * 8 + "b key.");
-        }
+    public static byte[] encrypt(PublicKey pubKey, String cipherParams, byte[] message) throws KeyException {
 
         Cipher ciph = null;
         try {
@@ -149,15 +147,13 @@ public class KeyPairUtil {
     /**
      * Decrypt a message using asymmetric keys
      * 
-     * @param algorithm algorithm used for key generation
      * @param privKey Private key used for decryption
      * @param cipherParams cipher parameters: transformations (ie RSA/ECB/NoPadding)
      * @param message the encrypted message
      * @return the decrypted message
      * @throws KeyException private key recovery failed, decryption failed
      */
-    public static byte[] decrypt(String algorithm, PrivateKey privKey, String cipherParams, byte[] message)
-            throws KeyException {
+    public static byte[] decrypt(PrivateKey privKey, String cipherParams, byte[] message) throws KeyException {
 
         Cipher ciph = null;
         try {
@@ -177,20 +173,4 @@ public class KeyPairUtil {
         return res;
     }
 
-    /**
-     * Next Power Of Two
-     * 
-     * @param n some integer
-     * @return the lowest power of two greater than <code>n</code>
-     */
-    private static int npot(int n) {
-        if (n <= 0)
-            return 1;
-        int pow = 2;
-        while (n > pow) {
-            pow *= 2;
-        }
-
-        return pow;
-    }
 }

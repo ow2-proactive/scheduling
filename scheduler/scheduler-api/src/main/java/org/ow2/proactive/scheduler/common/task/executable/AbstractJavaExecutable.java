@@ -190,6 +190,17 @@ public abstract class AbstractJavaExecutable extends Executable {
         return Integer.parseInt(System.getProperty(SchedulerVars.JAVAENV_TASK_REPLICATION.toString(), "0"));
     }
 
+    /**
+     * Third-party credentials are specific to each Scheduler user and stored on the server side.
+     * They consist of key-value pairs and are exposed in Java tasks via this method.
+     *
+     * @param key the credential's key whose associated value is to be returned
+     * @return the credential's value associated with the key parameter
+     */
+    protected String getThirdPartyCredential(String key) {
+        return execInitializer.getThirdPartyCredentials().get(key);
+    }
+
     private void updateVariables(Map<String, Serializable> old, Map<String, Serializable> updated) {
         for (String k : old.keySet()) {
             if (updated.containsKey(k)) {

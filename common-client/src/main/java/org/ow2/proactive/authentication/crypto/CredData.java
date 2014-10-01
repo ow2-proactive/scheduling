@@ -37,12 +37,14 @@
 package org.ow2.proactive.authentication.crypto;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 
 
 /**
- * Dummy class used to properly separate login, password and key:
+ * Used to properly separate login, password and key:
  * will be serialized and encrypted
  *
  * @author The ProActive Team
@@ -50,12 +52,20 @@ import org.objectweb.proactive.annotation.PublicAPI;
  */
 @PublicAPI
 public class CredData implements Serializable {
+
+    /**
+     * thirdPartyCredentials can contain the SSH key used for runAsMe tasks under this specific key
+     */
+    public static final String SSH_PRIVATE_KEY = "SSH_PRIVATE_KEY";
+
     private String login = null;
     private String pass = null;
-    // windows domain name, optionnal
+    // Windows domain name, optional
     private String domain = null;
-    //Optionnal ssh key
+    // Optional ssh key
     private byte[] key = null;
+
+    private Map<String, String> thirdPartyCredentials = new HashMap<String, String>();
 
     /**
      * Extract the Windows domain name from the full login
@@ -65,7 +75,7 @@ public class CredData implements Serializable {
 	 * @return the domain name, null if no domain is specified
 	 * @since Scheduling 3.0.1
 	 */
-    public static final String parseDomain(String fullLogin) {
+    public static String parseDomain(String fullLogin) {
         if (fullLogin.contains("\\")) {
             String domain = fullLogin.substring(0, fullLogin.indexOf("\\"));
             if ("".equals(domain.trim())) {
@@ -85,10 +95,9 @@ public class CredData implements Serializable {
 	 * @return the user name
 	 * @since Scheduling 3.0.1
 	 */
-    public static final String parseLogin(String fullLogin) {
+    public static String parseLogin(String fullLogin) {
         if (fullLogin.contains("\\")) {
-            String login = fullLogin.substring(fullLogin.indexOf("\\") + 1, fullLogin.length());
-            return login;
+            return fullLogin.substring(fullLogin.indexOf("\\") + 1, fullLogin.length());
         } else {
             return fullLogin;
         }
@@ -100,6 +109,11 @@ public class CredData implements Serializable {
     public CredData(String login, String pass) {
         this.login = login;
         this.pass = pass;
+    }
+
+    public CredData(String login, String password, Map<String, String> thirdPartyCredentials) {
+        this(login, password);
+        this.thirdPartyCredentials = thirdPartyCredentials;
     }
 
     /**
@@ -169,6 +183,10 @@ public class CredData implements Serializable {
      * @return the key
      */
     public byte[] getKey() {
+        if (key == null && thirdPartyCredentials != null &&
+            thirdPartyCredentials.containsKey(SSH_PRIVATE_KEY)) {
+            return thirdPartyCredentials.get(SSH_PRIVATE_KEY).getBytes();
+        }
         return key;
     }
 
@@ -209,4 +227,11 @@ public class CredData implements Serializable {
         return new String[] { login, pass };
     }
 
+    public Map<String, String> getThirdPartyCredentials() {
+        return thirdPartyCredentials;
+    }
+
+    public void addThirdPartyCredential(String key, String decryptedValue) {
+        thirdPartyCredentials.put(key, decryptedValue);
+    }
 }

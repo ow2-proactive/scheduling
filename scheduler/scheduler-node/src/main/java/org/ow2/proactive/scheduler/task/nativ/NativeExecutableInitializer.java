@@ -62,6 +62,8 @@ public class NativeExecutableInitializer extends DefaultExecutableInitializer {
     /** Store required node host name list */
     protected List<String> nodesHost;
 
+    private boolean runAsUser;
+
     /**
      * Get the command
      *
@@ -134,4 +136,11 @@ public class NativeExecutableInitializer extends DefaultExecutableInitializer {
         this.nodesHost = nodesHost;
     }
 
+    public void setRunAsUser(boolean runAsMe) {
+        this.runAsUser = runAsMe;
+    }
+
+    public boolean isRunAsUser() {
+        return runAsUser;
+    }
 }

@@ -98,6 +98,7 @@ public class ForkedScriptExecutableContainer extends ForkedJavaExecutableContain
         fjei.setScript(script);
         JavaExecutableContainer newjec = new ScriptExecutableContainer(script);
         newjec.setCredentials(this.getCredentials());
+        newjec.setRunAsUser(this.isRunAsUser());
         fjei.setJavaExecutableContainer(newjec);
         return fjei;
     }

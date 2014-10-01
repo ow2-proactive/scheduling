@@ -38,6 +38,7 @@ package org.ow2.proactive.scheduler.task.java;
 
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -144,7 +145,14 @@ public class JavaTaskLauncher extends TaskLauncher {
             ExecutableInitializer initializer = createExecutableInitializer(executableContainer);
 
             setPropagatedVariables((JavaExecutableInitializerImpl) initializer, getPropagatedVariables());
-            replaceIterationTags(initializer);
+
+            decrypter.setCredentials(executableContainer.getCredentials());
+            initializer.setDecrypter(decrypter);
+
+            Map<String, String> thirdPartyCredentials = decrypter.decrypt().getThirdPartyCredentials();
+            ((JavaExecutableInitializerImpl) initializer).setThirdPartyCredentials(thirdPartyCredentials);
+
+            replaceIterationTagsAndCredentials(initializer, thirdPartyCredentials);
 
             // if an exception occurs in init method, unwrapp the InvocationTargetException
             // the result of the execution is the user level exception
@@ -245,17 +253,25 @@ public class JavaTaskLauncher extends TaskLauncher {
      *
      * @param init the executable initializer containing the Java arguments
      */
-    protected void replaceIterationTags(ExecutableInitializer init) {
+    protected void replaceIterationTagsAndCredentials(ExecutableInitializer init,
+            Map<String, String> thirdPartyCredentials) {
         JavaExecutableInitializerImpl jinit = (JavaExecutableInitializerImpl) init;
         try {
             Map<String, Serializable> args = jinit.getArguments(Thread.currentThread()
                     .getContextClassLoader());
+
+            Map<String, String> replacements = new HashMap<String, String>();
+            replacements.put(ITERATION_INDEX_TAG, String.valueOf(this.iterationIndex));
+            replacements.put(REPLICATION_INDEX_TAG, String.valueOf(this.replicationIndex));
+            for (Entry<String, String> credentialEntry : thirdPartyCredentials.entrySet()) {
+                replacements.put(CREDENTIALS_KEY_PREFIX + credentialEntry.getKey(), credentialEntry
+                        .getValue());
+            }
+
             for (Entry<String, Serializable> arg : args.entrySet()) {
                 if (arg.getValue() instanceof String) {
-                    String str = ((String) arg.getValue()).replace(ITERATION_INDEX_TAG, "" +
-                        this.iterationIndex);
-                    str = str.replace(REPLICATION_INDEX_TAG, "" + this.replicationIndex);
-                    jinit.setArgument(arg.getKey(), str);
+                    String replaced = replace(((String) arg.getValue()), replacements);
+                    jinit.setArgument(arg.getKey(), replaced);
                 }
             }
         } catch (Throwable e) {

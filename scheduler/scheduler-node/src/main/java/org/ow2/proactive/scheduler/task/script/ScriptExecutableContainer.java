@@ -37,8 +37,8 @@ package org.ow2.proactive.scheduler.task.script;
 import java.util.Collections;
 
 import org.ow2.proactive.scheduler.common.exception.ExecutableCreationException;
-import org.ow2.proactive.scheduler.common.task.executable.internal.JavaExecutableInitializerImpl;
 import org.ow2.proactive.scheduler.common.task.executable.Executable;
+import org.ow2.proactive.scheduler.common.task.executable.internal.JavaExecutableInitializerImpl;
 import org.ow2.proactive.scheduler.task.java.JavaExecutableContainer;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.TaskScript;

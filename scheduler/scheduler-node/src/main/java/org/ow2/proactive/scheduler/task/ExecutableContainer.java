@@ -57,6 +57,7 @@ public abstract class ExecutableContainer implements Serializable {
     protected NodeSet nodes;
 
     protected Credentials credentials;
+    private boolean runAsUser;
 
     /**
      * Create and return the contained executable
@@ -123,7 +124,10 @@ public abstract class ExecutableContainer implements Serializable {
      * @return true if user want to run the task under his account id, false otherwise.
      */
     public boolean isRunAsUser() {
-        return this.credentials != null;
+        return runAsUser;
     }
 
+    public void setRunAsUser(boolean runAsUser) {
+        this.runAsUser = runAsUser;
+    }
 }
