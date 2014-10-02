@@ -47,8 +47,6 @@ import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.task.dataspaces.RemoteSpace;
 import org.ow2.proactive_grid_cloud_portal.dataspace.dto.ListFile;
 
-import com.sun.msv.datatype.xsd.ListType;
-
 
 public interface IDataSpaceClient {
 
@@ -73,7 +71,7 @@ public interface IDataSpaceClient {
             PermissionException;
 
     /**
-     * Returns a {@link ListType} type object which contains the names of files
+     * Returns a {@link ListFile} type object which contains the names of files
      * and directories in the specified location the <i>dataspace</i>.
      *
      * @throws NotConnectedException

@@ -24,7 +24,6 @@ public class RESTfulSchedJobUpdateClient extends BaseRESTfulSchedClient {
         return defaultParameters;
     }
 
-    @Override
     protected SampleResult doRunTest(JavaSamplerContext context) throws Throwable {
         setTimestamp();
         String resourceUrl = (new StringBuilder(getConnection().getUrl())).append("/jobs").toString();

@@ -237,6 +237,7 @@ project(':rest:performance') {
     dependencies {
         compile 'logkit:logkit:2.0'
         compile 'org.apache.jmeter:ApacheJMeter_java:2.9'
+        compile 'org.jboss.resteasy:resteasy-jackson-provider:3.0.6.Final'
         compile project(':performance')
         compile project(':rm:rm-server')
     }

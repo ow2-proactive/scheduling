@@ -1,7 +1,5 @@
 package org.ow2.proactive_grid_cloud_portal.ds.client;
 
-import static org.ow2.proactive.scheduler.rest.ds.IDataSpaceClient.Dataspace.USER;
-
 import java.io.File;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -9,8 +7,6 @@ import java.util.List;
 
 import javax.security.auth.login.LoginException;
 
-import org.apache.commons.vfs2.FileSystemException;
-import org.apache.log4j.Logger;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
@@ -43,8 +39,12 @@ import org.ow2.proactive.scheduler.rest.ds.LocalDestination;
 import org.ow2.proactive.scheduler.rest.ds.LocalDirSource;
 import org.ow2.proactive.scheduler.rest.ds.RemoteDestination;
 import org.ow2.proactive.scheduler.rest.ds.RemoteSource;
-import org.python.google.common.base.Throwables;
-import org.python.google.common.collect.Lists;
+import com.google.common.base.Throwables;
+import com.google.common.collect.Lists;
+import org.apache.commons.vfs2.FileSystemException;
+import org.apache.log4j.Logger;
+
+import static org.ow2.proactive.scheduler.rest.ds.IDataSpaceClient.Dataspace.USER;
 
 
 public class RestSmartProxyImpl extends AbstractSmartProxy implements SchedulerEventListener {
