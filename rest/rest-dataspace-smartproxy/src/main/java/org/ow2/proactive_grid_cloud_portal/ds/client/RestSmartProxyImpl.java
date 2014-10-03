@@ -103,6 +103,18 @@ public class RestSmartProxyImpl extends AbstractSmartProxy implements SchedulerE
     @Override
     public JobId submit(Job job) throws NotConnectedException, PermissionException,
             SubmissionClosedException, JobCreationException {
+        String inputSpace = job.getInputSpace();
+        if (inputSpace == null) {
+            throw new IllegalArgumentException(
+                    "'InputSpace' is NULL. The InputSpace must be set in order to transfer inputfiles by the"
+                            + " SmartProxy. As a default, you may use the 'UserSpace' value.");
+        }
+        String outputSpace = job.getOutputSpace();
+        if (outputSpace == null) {
+            throw new IllegalArgumentException(
+                    "'OutputSpace' is NULL. The OutputSpace must be set in order to retrieve outputfiles by"
+                            + " the SmartProxy. As a default, you may use the 'UserSpace' value.");
+        }
         return restClientImpl.submit(job);
     }
 
@@ -140,6 +152,7 @@ public class RestSmartProxyImpl extends AbstractSmartProxy implements SchedulerE
 
         String userSpace = getUserSpaceURIs().get(0);
         String inputSpace = job.getInputSpace();
+
         if (!inputSpace.startsWith(userSpace)) {
             // NOTE: only works for USERSPACE urls
             logger.warn("RestSmartProxy does not support data transfers outside USERSPACE.");
@@ -202,11 +215,13 @@ public class RestSmartProxyImpl extends AbstractSmartProxy implements SchedulerE
                     SchedulerConstants.TASKID_DIR_DEFAULT_NAME + "/" + atask.getTaskId());
         }
 
-        List<OutputSelector> ouputFileSelectors = atask.getOutputSelectors();
+        List<OutputSelector> outputFileSelectors = atask.getOutputSelectors();
         List<String> includes = Lists.newArrayList();
         List<String> excludes = Lists.newArrayList();
-        for (OutputSelector os : ouputFileSelectors) {
-            addfileSelection(os.getOutputFiles(), includes, excludes);
+        if (outputFileSelectors != null) {
+            for (OutputSelector os : outputFileSelectors) {
+                addfileSelection(os.getOutputFiles(), includes, excludes);
+            }
         }
 
         if (awaitedjob.isAutomaticTransfer()) {
