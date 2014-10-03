@@ -67,7 +67,7 @@ public class ListJobCommand extends AbstractCommand implements Command {
                 writeLine(currentContext, "%s", StringUtility.jobsAsString(jobs));
             }
         } catch (Exception e) {
-            handleError("An error occurred while retriving job list:", e, currentContext);
+            handleError("An error occurred while retrieving job list:", e, currentContext);
         }
     }
 
