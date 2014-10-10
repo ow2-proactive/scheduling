@@ -102,7 +102,7 @@ public class ScriptExecutable extends JavaExecutable {
         handler.addBinding(TaskScript.PROGRESS_VARIABLE, progress);
 
         Map<String, String> thirdPartyCredentials = decrypter.decrypt().getThirdPartyCredentials();
-        handler.addBinding("credentials", thirdPartyCredentials);
+        handler.addBinding(TaskScript.CREDENTIALS_VARIABLE, thirdPartyCredentials);
 
         Map<String, Serializable> variables = getVariables();
         handler.addBinding(TaskLauncher.VARIABLES_BINDING_NAME, variables);
