@@ -162,6 +162,8 @@ project(':rest:rest-server') {
 
 project(':rest:rest-cli') {
 
+    apply plugin: 'application'
+
     dependencies {
         compile 'commons-cli:commons-cli:1.2'
         compile 'commons-io:commons-io:2.4'
@@ -175,6 +177,11 @@ project(':rest:rest-cli') {
         compile project(':rest:rest-api')
     }
 
+    mainClassName = "org.ow2.proactive_grid_cloud_portal.cli.CommonEntryPoint"
+    startScripts.applicationName = 'proactive-client'
+    distZip.baseName = 'proactive-client'
+
+    applicationDistribution.from("$rootDir/LICENSE.txt")
 }
 
 project(':rest:rest-client') {
