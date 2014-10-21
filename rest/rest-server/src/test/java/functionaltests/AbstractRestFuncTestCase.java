@@ -184,9 +184,18 @@ public abstract class AbstractRestFuncTestCase {
         return RestFuncTestConfig.getInstance().getLogin();
     }
 
+    protected String getNonAdminLogin() throws Exception {
+        return RestFuncTestConfig.getInstance().getNonAdminLogin();
+    }
+
     protected String getPassword() throws Exception {
         return RestFuncTestConfig.getInstance().getPassword();
     }
+
+    protected String getNonAdminLoginPassword() throws Exception {
+        return RestFuncTestConfig.getInstance().getNonAdminLonginPassword();
+    }
+
 
     protected JobId submitDefaultJob() throws Exception {
         Job job = defaultJob();

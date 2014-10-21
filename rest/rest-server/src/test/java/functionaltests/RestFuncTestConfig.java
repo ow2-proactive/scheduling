@@ -48,6 +48,8 @@ import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 public class RestFuncTestConfig {
 
     public static final String RESTAPI_TEST_LOGIN = "restapi.test.login";
+    public static final String RESTAPI_TEST_NON_ADMIN_LOGIN = "restapi.test.non-admin.login";
+    public static final String RESTAPI_TEST_NON_ADMIN_LOGIN_PASSWORD = "restapi.test.non-admin.login.password";
     public static final String RESTAPI_TEST_PASSWORD = "restapi.test.password";
     public static final String RESTAPI_TEST_SCHEDULER_HOME = PASchedulerProperties.SCHEDULER_HOME.getKey();
     public static final String RESTAPI_TEST_RM_HOME = PAResourceManagerProperties.RM_HOME.getKey();
@@ -81,8 +83,16 @@ public class RestFuncTestConfig {
         return props.getProperty(RESTAPI_TEST_LOGIN);
     }
 
+    public String getNonAdminLogin() {
+        return props.getProperty(RESTAPI_TEST_NON_ADMIN_LOGIN);
+    }
+
     public String getPassword() {
         return props.getProperty(RESTAPI_TEST_PASSWORD);
+    }
+
+    public String getNonAdminLonginPassword() {
+        return props.getProperty(RESTAPI_TEST_NON_ADMIN_LOGIN_PASSWORD);
     }
 
     public String setProperty(String key, String value) {

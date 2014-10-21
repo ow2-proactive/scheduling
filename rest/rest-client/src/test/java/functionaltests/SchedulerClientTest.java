@@ -38,6 +38,7 @@ package functionaltests;
 
 import java.io.File;
 import java.io.Serializable;
+import java.net.URI;
 import java.util.Map;
 import java.util.Stack;
 import java.util.concurrent.TimeUnit;
@@ -66,18 +67,21 @@ import org.ow2.proactive.scheduler.rest.ISchedulerClient;
 import org.ow2.proactive.scheduler.rest.SchedulerClient;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
+
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtMethod;
 import javassist.CtNewMethod;
+
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import static functionaltests.RestFuncTHelper.getRestServerUrl;
+import com.google.common.io.Files;
 
+import static functionaltests.RestFuncTHelper.getRestServerUrl;
 
 public class SchedulerClientTest extends AbstractRestFuncTestCase {
 
@@ -148,8 +152,8 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         client.pullFile("USERSPACE", "", emptyFile.getCanonicalPath());
 
         // Check the file was pulled
-        Assert.assertTrue("Unable to pull the empty file, maybe the pull mechanism is broken ?", emptyFile
-                .exists());
+        Assert.assertTrue("Unable to pull the empty file, maybe the pull mechanism is broken ?",
+                emptyFile.exists());
 
         // Delete the local file
         Assert.assertTrue(
@@ -157,7 +161,8 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
                 emptyFile.delete());
 
         // Delete the file in the user space
-        //client.deleteFile("USERSPACE", emptyFile.getName()); TODO: TEST THIS LATER
+        // client.deleteFile("USERSPACE", emptyFile.getName()); TODO: TEST THIS
+        // LATER
     }
 
     /**
@@ -213,22 +218,22 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         // Check that java task returned the correct value
         TaskResult javaTaskResult = allResults.get(javaTask.getName());
         Serializable ser1 = javaTaskResult.value();
-        Assert
-                .assertEquals(
-                        "The value returned by the " + className1 + "#execute() method is incorrect, maybe " +
-                            "the SchedulerClient#submitAsJobArchive() method incorrectly packs the class into the job archive",
-                        value1, ser1);
+        Assert.assertEquals(
+                "The value returned by the "
+                        + className1
+                        + "#execute() method is incorrect, maybe "
+                        + "the SchedulerClient#submitAsJobArchive() method incorrectly packs the class into the job archive",
+                value1, ser1);
 
         // Check that script task returned the correct value
         TaskResult scriptTaskResult = allResults.get(scriptTask.getName());
         Serializable ser2 = scriptTaskResult.value();
-        Assert
-                .assertEquals(
-                        "The value returned by the " +
-                            className2 +
-                            "#execute() method is incorrect, maybe " +
-                            "the SchedulerClient#submitAsJobArchive() method incorrectly packs the jar containing the class into the job archive",
-                        value2, ser2);
+        Assert.assertEquals(
+                "The value returned by the "
+                        + className2
+                        + "#execute() method is incorrect, maybe "
+                        + "the SchedulerClient#submitAsJobArchive() method incorrectly packs the jar containing the class into the job archive",
+                value2, ser2);
     }
 
     /**
@@ -304,6 +309,20 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         client.removeEventListener();
     }
 
+    @Test(timeout = MAX_WAIT_TIME)
+    public void test_pushFile_withNonAdminUserPwd_shouldSucceed() throws Exception {
+        File tmpFile = testFolder.newFile();
+        Files.write("non_admin_user_push_file_contents".getBytes(), tmpFile);
+        ISchedulerClient client = SchedulerClient.createInstance();
+        client.init(getRestServerUrl(), getNonAdminLogin(), getNonAdminLoginPassword());
+        client.getStatus();
+        client.pushFile("USERSPACE", "/test_non_admin_user_push_file", "tmpfile.tmp",
+                tmpFile.getAbsolutePath());
+        String destDirPath = URI.create(client.getUserSpaceURIs().get(0)).getPath();
+        File destFile = new File(destDirPath, "test_non_admin_user_push_file/tmpfile.tmp");
+        assertTrue(Files.equal(tmpFile, destFile));
+    }
+
     private File createClassInsideJar(Integer testValue, String className) throws Exception {
         File destDir = testFolder.newFolder(className);
         SchedulerClientTest.createClass(className, testValue, destDir);
@@ -318,8 +337,9 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
             message = taskResult.getException().getMessage();
         }
         Assert.assertFalse("The task failure reason: " + message, taskResult.hadException());
-        Assert.assertEquals("The executable class in " + jarFile +
-            " is not returning the correct value, the jobclasspath is broken", value, taskResult.value());
+        Assert.assertEquals("The executable class in " + jarFile
+                + " is not returning the correct value, the jobclasspath is broken", value,
+                taskResult.value());
     }
 
     private ISchedulerClient clientInstance() throws Exception {
@@ -336,30 +356,34 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
      * Creates a class that inherits from JavaExecutable and implements the
      * execute method that returns the value to test.
      *
-     * @param className the className of the class to create
-     * @param valueToReturn the int value to return
-     * @param insideDir the dir that will contain the created class
-     * @throws Exception If the classes cannot be created
+     * @param className
+     *            the className of the class to create
+     * @param valueToReturn
+     *            the int value to return
+     * @param insideDir
+     *            the dir that will contain the created class
+     * @throws Exception
+     *             If the classes cannot be created
      */
     public static void createClass(String className, int valueToReturn, File insideDir) throws Exception {
         ClassPool pool = ClassPool.getDefault();
-        //create new classes
+        // create new classes
         CtClass cc1 = pool.makeClass(className);
         CtClass serializableClass = pool.get("java.io.Serializable");
 
-        //get super-type and super-super-type
+        // get super-type and super-super-type
         CtClass upper = pool.get(JavaExecutable.class.getName());
         CtClass upupper = pool.get(Executable.class.getName());
 
-        //get Executable 'execute' method
+        // get Executable 'execute' method
         CtMethod absExec = upupper.getMethod("execute",
                 "([Lorg/ow2/proactive/scheduler/common/task/TaskResult;)Ljava/io/Serializable;");
 
-        //set superclass of new classes
+        // set superclass of new classes
         cc1.setSuperclass(upper);
         cc1.addInterface(serializableClass);
 
-        //create method for first class
+        // create method for first class
         CtMethod exec1 = CtNewMethod.make(serializableClass, absExec.getName(), absExec.getParameterTypes(),
                 absExec.getExceptionTypes(), "return new java.lang.Integer(" + valueToReturn + ");", cc1);
         cc1.addMethod(exec1);

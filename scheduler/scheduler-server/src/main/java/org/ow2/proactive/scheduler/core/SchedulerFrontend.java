@@ -197,6 +197,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     /**
      * @see org.objectweb.proactive.InitActive#initActivity(org.objectweb.proactive.Body)
      */
+    @Override
     public void initActivity(Body body) {
         try {
             // setting up the policy
@@ -297,6 +298,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     /**
      * {@inheritDoc}
      */
+    @Override
     public JobId submit(Job userJob) throws NotConnectedException, PermissionException,
             SubmissionClosedException, JobCreationException {
         logger.info("New job submission requested : " + userJob.getName());
@@ -325,8 +327,8 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
      */
     @Override
     public List<String> getUserSpaceURIs() throws NotConnectedException, PermissionException {
-        UserIdentificationImpl ident = frontendState.checkPermission("getUserSpaceURI",
-                "You don't have permissions to read the USER Space URI");
+        UserIdentificationImpl ident = frontendState.checkPermission("getUserSpaceURIs",
+                "You don't have permissions to read the USER Space URIs");
         return this.spacesSupport.getUserSpaceURIs(ident.getUsername());
     }
 
@@ -343,6 +345,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     /**
      * {@inheritDoc}
      */
+    @Override
     @ImmediateService
     public JobResult getJobResult(final JobId jobId) throws NotConnectedException, PermissionException,
             UnknownJobException {
@@ -377,6 +380,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     /**
      * {@inheritDoc}
      */
+    @Override
     @ImmediateService
     public JobResult getJobResult(String jobId) throws NotConnectedException, PermissionException,
             UnknownJobException {
@@ -386,6 +390,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     /**
      * {@inheritDoc}
      */
+    @Override
     @ImmediateService
     public TaskResult getTaskResult(JobId jobId, String taskName) throws NotConnectedException,
             UnknownJobException, UnknownTaskException, PermissionException {
@@ -395,6 +400,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     /**
      * {@inheritDoc}
      */
+    @Override
     @ImmediateService
     public TaskResult getTaskResult(String jobId, String taskName) throws NotConnectedException,
             UnknownJobException, UnknownTaskException, PermissionException {
@@ -404,6 +410,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     /**
      * {@inheritDoc}
      */
+    @Override
     @ImmediateService
     public TaskResult getTaskResultFromIncarnation(String jobId, String taskName, int inc)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
@@ -413,6 +420,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     /**
      * {@inheritDoc}
      */
+    @Override
     @ImmediateService
     public TaskResult getTaskResultFromIncarnation(JobId jobId, String taskName, int inc)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
@@ -483,6 +491,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     /**
      * {@inheritDoc}
      */
+    @Override
     @ImmediateService
     public boolean killTask(JobId jobId, String taskName) throws NotConnectedException, UnknownJobException,
             UnknownTaskException, PermissionException {
@@ -494,6 +503,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     /**
      * {@inheritDoc}
      */
+    @Override
     @ImmediateService
     public boolean killTask(String jobId, String taskName) throws NotConnectedException, UnknownJobException,
             UnknownTaskException, PermissionException {
@@ -503,6 +513,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     /**
      * {@inheritDoc}
      */
+    @Override
     @ImmediateService
     public boolean restartTask(JobId jobId, String taskName, int restartDelay) throws NotConnectedException,
             UnknownJobException, UnknownTaskException, PermissionException {
@@ -515,6 +526,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     /**
      * {@inheritDoc}
      */
+    @Override
     @ImmediateService
     public boolean restartTask(String jobId, String taskName, int restartDelay) throws NotConnectedException,
             UnknownJobException, UnknownTaskException, PermissionException {
@@ -524,6 +536,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     /**
      * {@inheritDoc}
      */
+    @Override
     @ImmediateService
     public boolean preemptTask(JobId jobId, String taskName, int restartDelay) throws NotConnectedException,
             UnknownJobException, UnknownTaskException, PermissionException {
@@ -536,6 +549,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     /**
      * {@inheritDoc}
      */
+    @Override
     @ImmediateService
     public boolean preemptTask(String jobId, String taskName, int restartDelay) throws NotConnectedException,
             UnknownJobException, UnknownTaskException, PermissionException {
@@ -545,6 +559,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean removeJob(JobId jobId) throws NotConnectedException, UnknownJobException,
             PermissionException {
 
@@ -558,6 +573,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void listenJobLogs(JobId jobId, AppenderProvider appenderProvider) throws NotConnectedException,
             UnknownJobException, PermissionException {
 
@@ -575,6 +591,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void listenJobLogs(String jobId, AppenderProvider appenderProvider) throws NotConnectedException,
             UnknownJobException, PermissionException {
         this.listenJobLogs(JobIdImpl.makeJobId(jobId), appenderProvider);
@@ -583,6 +600,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     /**
      * {@inheritDoc}
      */
+    @Override
     public SchedulerStatus getStatus() throws NotConnectedException, PermissionException {
         return frontendState.getStatus();
     }
@@ -590,6 +608,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     /**
      * {@inheritDoc}
      */
+    @Override
     public SchedulerState getState() throws NotConnectedException, PermissionException {
         return getState(false);
     }
@@ -597,6 +616,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     /**
      * {@inheritDoc}
      */
+    @Override
     public SchedulerState getState(boolean myJobsOnly) throws NotConnectedException, PermissionException {
         return frontendState.getState(myJobsOnly);
     }
@@ -604,6 +624,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void addEventListener(SchedulerEventListener sel, boolean myEventsOnly, SchedulerEvent... events)
             throws NotConnectedException, PermissionException {
         addEventListener(sel, myEventsOnly, false, events);
@@ -612,6 +633,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     /**
      * {@inheritDoc}
      */
+    @Override
     public SchedulerState addEventListener(SchedulerEventListener sel, boolean myEventsOnly,
             boolean getCurrentState, SchedulerEvent... events) throws NotConnectedException,
             PermissionException {
@@ -621,6 +643,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void removeEventListener() throws NotConnectedException, PermissionException {
         frontendState.removeEventListener();
     }
@@ -634,6 +657,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean start() throws NotConnectedException, PermissionException {
         frontendState.checkPermission("start", "You do not have permission to start the scheduler !");
         return schedulingService.start();
@@ -642,6 +666,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean stop() throws NotConnectedException, PermissionException {
         frontendState.checkPermission("stop", "You do not have permission to stop the scheduler !");
         return schedulingService.stop();
@@ -650,6 +675,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean pause() throws NotConnectedException, PermissionException {
         frontendState.checkPermission("pause", "You do not have permission to pause the scheduler !");
         return schedulingService.pause();
@@ -658,6 +684,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean freeze() throws NotConnectedException, PermissionException {
         frontendState.checkPermission("freeze", "You do not have permission to freeze the scheduler !");
         return schedulingService.freeze();
@@ -666,6 +693,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean resume() throws NotConnectedException, PermissionException {
         frontendState.checkPermission("resume", "You do not have permission to resume the scheduler !");
         return schedulingService.resume();
@@ -674,6 +702,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean shutdown() throws NotConnectedException, PermissionException {
         frontendState.checkPermission("shutdown", "You do not have permission to shutdown the scheduler !");
         return schedulingService.shutdown();
@@ -682,6 +711,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean kill() throws NotConnectedException, PermissionException {
         frontendState.checkPermission("kill", "You do not have permission to kill the scheduler !");
         return schedulingService.kill();
@@ -690,6 +720,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void disconnect() throws NotConnectedException, PermissionException {
         frontendState.disconnect();
     }
@@ -697,6 +728,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     /**
      * {@inheritDoc}
      */
+    @Override
     @ImmediateService
     public boolean isConnected() {
         return frontendState.isConnected();
@@ -705,6 +737,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     /**
      * {@inheritDoc}
      */
+    @Override
     @ImmediateService
     public void renewSession() throws NotConnectedException {
         frontendState.renewSession();
@@ -713,6 +746,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean pauseJob(JobId jobId) throws NotConnectedException, UnknownJobException,
             PermissionException {
         frontendState.checkJobOwner("pauseJob", jobId, "You do not have permission to pause this job !");
@@ -722,6 +756,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean resumeJob(JobId jobId) throws NotConnectedException, UnknownJobException,
             PermissionException {
         frontendState.checkJobOwner("resumeJob", jobId, "You do not have permission to resume this job !");
@@ -731,6 +766,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean killJob(JobId jobId) throws NotConnectedException, UnknownJobException,
             PermissionException {
         frontendState.checkJobOwner("killJob", jobId, "You do not have permission to kill this job !");
@@ -740,6 +776,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void changeJobPriority(JobId jobId, JobPriority priority) throws NotConnectedException,
             UnknownJobException, PermissionException, JobAlreadyFinishedException {
         frontendState.checkChangeJobPriority(jobId, priority);
@@ -750,6 +787,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     /**
      * {@inheritDoc}
      */
+    @Override
     @ImmediateService
     public JobState getJobState(JobId jobId) throws NotConnectedException, UnknownJobException,
             PermissionException {
@@ -759,6 +797,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean killJob(String jobId) throws NotConnectedException, UnknownJobException,
             PermissionException {
         return this.killJob(JobIdImpl.makeJobId(jobId));
@@ -767,6 +806,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean pauseJob(String jobId) throws NotConnectedException, UnknownJobException,
             PermissionException {
         return this.pauseJob(JobIdImpl.makeJobId(jobId));
@@ -775,6 +815,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean removeJob(String jobId) throws NotConnectedException, UnknownJobException,
             PermissionException {
         return this.removeJob(JobIdImpl.makeJobId(jobId));
@@ -783,6 +824,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean resumeJob(String jobId) throws NotConnectedException, UnknownJobException,
             PermissionException {
         return this.resumeJob(JobIdImpl.makeJobId(jobId));
@@ -791,6 +833,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void changeJobPriority(String jobId, JobPriority priority) throws NotConnectedException,
             UnknownJobException, PermissionException, JobAlreadyFinishedException {
         this.changeJobPriority(JobIdImpl.makeJobId(jobId), priority);
@@ -799,6 +842,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     /**
      * {@inheritDoc}
      */
+    @Override
     public JobState getJobState(String jobId) throws NotConnectedException, UnknownJobException,
             PermissionException {
         return this.getJobState(JobIdImpl.makeJobId(jobId));
@@ -807,6 +851,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean changePolicy(String newPolicyClassname) throws NotConnectedException, PermissionException {
         frontendState.checkChangePolicy();
         policyFullName = newPolicyClassname;
@@ -816,6 +861,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean linkResourceManager(String rmURL) throws NotConnectedException, PermissionException {
         frontendState.checkLinkResourceManager();
         return schedulingService.linkResourceManager(rmURL);
@@ -824,6 +870,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean reloadPolicyConfiguration() throws NotConnectedException, PermissionException {
         frontendState.checkPermission("reloadPolicyConfiguration",
                 "You do not have permission to reload policy configuration !");
@@ -855,6 +902,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
      * Method controls the execution of every request.
      * Tries to keep this active object alive in case of any exception.
      */
+    @Override
     public void runActivity(Body body) {
         Service service = new Service(body);
         while (body.isActive()) {
