@@ -82,6 +82,7 @@ import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
 import org.ow2.proactive.scheduler.rest.data.DataUtility;
 import org.ow2.proactive.scheduler.rest.data.TaskResultImpl;
+import org.ow2.proactive.scheduler.rest.readers.TaskResultReader;
 import org.ow2.proactive.scheduler.rest.readers.OctetStreamReader;
 import org.ow2.proactive.scheduler.rest.readers.WildCardTypeReader;
 import org.ow2.proactive.scheduler.rest.utils.HttpUtility;
@@ -153,6 +154,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     /**
      * Initialize this instance. Retrieves a new session from the server.
      */
+    @Override
     public void init(String url, String login, String password) throws Exception {
         init(url, login, password, false);
     }
@@ -161,6 +163,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
      * Initialize this instance. Retrieves a new session from the server.
      * @param insecure true to disable HTTPS certificate checking
      */
+    @Override
     public void initInsecure(String url, String login, String password) throws Exception {
         init(url, login, password, true);
     }
@@ -175,6 +178,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         ResteasyProviderFactory factory = ResteasyProviderFactory.getInstance();
         factory.register(new WildCardTypeReader());
         factory.register(new OctetStreamReader());
+        factory.register(new TaskResultReader());
 
         setApiClient(restApiClient);
 
