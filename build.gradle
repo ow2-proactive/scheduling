@@ -638,7 +638,7 @@ class CustomCreateStartScripts extends CreateStartScripts {
         generator.defaultJvmOpts = getDefaultJvmOpts()
         generator.optsEnvironmentVar = getOptsEnvironmentVar()
         generator.exitEnvironmentVar = getExitEnvironmentVar()
-        generator.classpath = ["dist/lib/*", "addons"]
+        generator.classpath = ["dist/lib/*", "addons", "addons/*"]
         generator.scriptRelPath = "bin/${getUnixScript().name}"
         generator.generateUnixScript(getUnixScript())
         generator.generateWindowsScript(getWindowsScript())
