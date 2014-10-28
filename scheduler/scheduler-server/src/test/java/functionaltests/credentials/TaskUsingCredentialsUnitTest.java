@@ -168,7 +168,7 @@ public class TaskUsingCredentialsUnitTest extends ProActiveTest {
         waitForResultNotification = PAActiveObject.turnActive(waitForResultNotification);
 
         NativeExecutableContainer executableContainer = new NativeExecutableContainer(new String[] {
-                "/usr/bin/test", "superpassword", "=", "$CREDENTIALS_MY_APP_PASSWORD" }, null, ".");
+                "test", "superpassword", "=", "$CREDENTIALS_MY_APP_PASSWORD" }, null, ".");
         executableContainer.setNodes(new NodeSet());
 
         Map<String, String> thirdPartyCredentials = new HashMap<String, String>();
