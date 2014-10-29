@@ -43,6 +43,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Properties;
 
+import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.util.ProActiveInet;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
@@ -84,6 +85,7 @@ public class JettyStarter {
         if ("true".equals(properties.getProperty("web.deploy", "true"))) {
             logger.info("Starting the web applications...");
             int restPort = Integer.parseInt(properties.getProperty("web.port", "8080"));
+            int maxThreads = Integer.parseInt(properties.getProperty("web.max_threads", "100"));
             boolean httpsEnabled = Boolean.parseBoolean(properties.getProperty("web.https", "false"));
             String httpProtocol = httpsEnabled ? "https" : "http";
 
@@ -99,6 +101,7 @@ public class JettyStarter {
             HandlerList handlerList = new HandlerList();
             addWarsToHandlerList(handlerList);
             server.setHandler(handlerList);
+            server.setThreadPool(new QueuedThreadPool(maxThreads));
 
             String schedulerHost = ProActiveInet.getInstance().getHostname();
             startServer(server, schedulerHost, restPort, httpProtocol);
