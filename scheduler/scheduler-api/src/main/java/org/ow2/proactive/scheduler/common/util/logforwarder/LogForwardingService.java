@@ -71,10 +71,6 @@ public final class LogForwardingService {
         loggingEventProcessor.addAppender(loggerName, appender);
     }
 
-    public void removeAppender(String loggerName, Appender appender) {
-        loggingEventProcessor.removeAppender(loggerName, appender);
-    }
-
     public void removeAllAppenders(String loggerName) {
         loggingEventProcessor.removeAllAppenders(loggerName);
     }
@@ -117,6 +113,7 @@ public final class LogForwardingService {
      * @throws LogForwardingException if the log server started by the LogForwardingProvider cannot be terminated.
      */
     public final synchronized void terminate() throws LogForwardingException {
+        this.loggingEventProcessor.removeAllAppenders();
         this.serverConnection = null;
         this.initialized = false;
         this.provider.terminateServer();

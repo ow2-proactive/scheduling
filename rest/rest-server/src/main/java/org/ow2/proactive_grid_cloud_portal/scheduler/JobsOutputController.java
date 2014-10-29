@@ -94,7 +94,7 @@ public class JobsOutputController {
     public synchronized void removeAppender(String jobId) {
         if (appenders.containsKey(jobId)) {
             JobOutputAppender appender = appenders.remove(jobId);
-            getLogForwardingService().removeAppender(Log4JTaskLogs.getLoggerName(jobId), appender);
+            getLogForwardingService().removeAllAppenders(Log4JTaskLogs.getLoggerName(jobId));
             appender.close();
         }
     }

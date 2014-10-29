@@ -211,7 +211,6 @@ public class TestListenJobLogs extends SchedulerConsecutive {
          * was called)
          */
         TestAppender appender2 = new TestAppender("appender2");
-        logForwardingService.removeAppender(loggerName, appender1);
         logForwardingService.addAppender(loggerName, appender2);
 
         scheduler.listenJobLogs(jobId, logForwardingService.getAppenderProvider());
