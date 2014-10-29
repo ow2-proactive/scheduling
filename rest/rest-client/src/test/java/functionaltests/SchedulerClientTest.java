@@ -315,7 +315,6 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         Files.write("non_admin_user_push_file_contents".getBytes(), tmpFile);
         ISchedulerClient client = SchedulerClient.createInstance();
         client.init(getRestServerUrl(), getNonAdminLogin(), getNonAdminLoginPassword());
-        client.getStatus();
         client.pushFile("USERSPACE", "/test_non_admin_user_push_file", "tmpfile.tmp",
                 tmpFile.getAbsolutePath());
         String destDirPath = URI.create(client.getUserSpaceURIs().get(0)).getPath();
