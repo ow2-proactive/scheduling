@@ -459,9 +459,10 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             Session session = sessionStore.get(sessionId);
 
             JobState jobState = scheduler.getJobState(jobId);
+            boolean isFinished = jobState!=null && jobState.isFinished();
             int availableLinesCount = session.getJobsOutputController().availableLinesCount(jobId);
 
-            if (!jobState.isFinished() || availableLinesCount > 0) {
+            if (!isFinished || availableLinesCount > 0) {
                 return session.getJobsOutputController().getNewLogs(jobId);
             } else {
                 session.getJobsOutputController().removeAppender(jobId);
