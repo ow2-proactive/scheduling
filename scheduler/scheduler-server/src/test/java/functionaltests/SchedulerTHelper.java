@@ -328,6 +328,7 @@ public class SchedulerTHelper {
     private static void cleanTMP() {
         File tmp = new File(System.getProperty("java.io.tmpdir"));
         for (File f : tmp.listFiles(new FilenameFilter() {
+            @Override
             public boolean accept(File dir, String name) {
                 return name.startsWith("PA_JVM");
             }
@@ -410,7 +411,7 @@ public class SchedulerTHelper {
 
     /**
      * Starts the scheduler or connected to existing one if in consecutive mode
-     * 
+     *
      * @throws Exception
      */
     public static void init() throws Exception {
@@ -865,6 +866,10 @@ public class SchedulerTHelper {
      */
     public static JobResult getJobResult(JobId id) throws Exception {
         return getSchedulerInterface().getJobResult(id);
+    }
+
+    public static TaskResult getTaskResult(JobId jobId, String taskName)throws Exception  {
+        return getSchedulerInterface().getTaskResult(jobId, taskName);
     }
 
     //---------------------------------------------------------------//

@@ -37,6 +37,7 @@
 package functionaltests;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
@@ -60,8 +61,17 @@ public class TestScriptTask extends SchedulerConsecutive {
     private static URL jobDescriptor = TestScriptTask.class
             .getResource("/functionaltests/descriptors/Job_script_task.xml");
 
+    private static URL job_null_returning_script_task = TestScriptTask.class
+            .getResource("/functionaltests/descriptors/Job_null_returning_script_task.xml");
+
+
     @Test
-    public void forkedTasks() throws Throwable {
+    public void run() throws Throwable {
+        forkedTasks();
+        test_getTaskResult_nullReturningScriptTask_shouldSucceed();
+    }
+
+    private void forkedTasks() throws Throwable {
         TaskFlowJob job = (TaskFlowJob) JobFactory_stax.getFactory().createJob(
                 new File(jobDescriptor.toURI()).getAbsolutePath());
 
@@ -123,4 +133,18 @@ public class TestScriptTask extends SchedulerConsecutive {
         TaskState killJVMTaskState = jobState.getHMTasks().get(killJVMTaskResult.getTaskId());
         assertEquals(TaskStatus.FAULTY, killJVMTaskState.getStatus());
     }
+
+    /**
+     * SCHEDULING-2199 NPE is thrown when retrieving the result of a ScriptTask,
+     *  if the result is 'null'.
+     */
+    private void test_getTaskResult_nullReturningScriptTask_shouldSucceed() throws Throwable{
+        TaskFlowJob job = (TaskFlowJob) JobFactory_stax.getFactory().createJob(
+                new File(job_null_returning_script_task.toURI()).getAbsolutePath());
+        JobId id = SchedulerTHelper.submitJob(job);
+        SchedulerTHelper.waitForEventJobFinished(id);
+        TaskResult taskResult = SchedulerTHelper.getTaskResult(id, "task");
+        assertNull(taskResult.value());
+    }
+
 }
