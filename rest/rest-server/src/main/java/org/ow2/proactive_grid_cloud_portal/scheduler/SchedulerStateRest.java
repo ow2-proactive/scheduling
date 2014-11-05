@@ -138,6 +138,7 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobUsageData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobValidationData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.SchedulerStatusData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.SchedulerUserData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskIdData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskResultData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskStateData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.UserJobData;
@@ -1123,8 +1124,15 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             PermissionRestException {
         try {
             Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/tasks/" + taskname + "/result");
-            TaskResult tr = s.getTaskResult(jobId, taskname);
-            return mapper.map(PAFuture.getFutureValue(tr), TaskResultData.class);
+            TaskResult taskResult = s.getTaskResult(jobId, taskname);
+            if (taskResult == null) {
+                TaskIdData taskIdData = new TaskIdData();
+                taskIdData.setReadableName(taskname);
+                TaskResultData taskResultData = new TaskResultData();
+                taskResultData.setId(taskIdData);
+                return taskResultData;
+            }
+            return mapper.map(PAFuture.getFutureValue(taskResult), TaskResultData.class);
         } catch (PermissionException e) {
             throw new PermissionRestException(e);
         } catch (UnknownJobException e) {

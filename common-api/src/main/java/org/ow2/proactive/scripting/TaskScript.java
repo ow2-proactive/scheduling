@@ -83,8 +83,9 @@ public class TaskScript extends Script<Serializable> {
     protected ScriptResult<Serializable> getResult(Bindings bindings) {
         if (bindings.containsKey(RESULT_VARIABLE)) {
             Object result = bindings.get(RESULT_VARIABLE);
-
-            if (result instanceof Serializable) {
+            if (result == null) {
+                return new ScriptResult<Serializable>(null);
+            } else if (result instanceof Serializable) {
                 return new ScriptResult<Serializable>((Serializable) result);
             } else {
                 return new ScriptResult<Serializable>(new Exception(
