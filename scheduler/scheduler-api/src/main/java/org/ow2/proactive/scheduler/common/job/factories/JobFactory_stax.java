@@ -54,7 +54,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.concurrent.TimeUnit;
 import java.util.zip.ZipFile;
 
 import javax.xml.stream.XMLInputFactory;
@@ -93,9 +92,7 @@ import org.ow2.proactive.scripting.TaskScript;
 import org.ow2.proactive.topology.descriptor.ThresholdProximityDescriptor;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.Tools;
-import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
 
 
 /**
@@ -134,16 +131,18 @@ public class JobFactory_stax extends JobFactory {
         xmlif.setProperty("javax.xml.stream.supportDTD", Boolean.FALSE);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Job createJob(String filePath) throws JobCreationException {
+        return createJob(filePath, null);
+    }
+
+    @Override
+    public Job createJob(String filePath, Map<String, String> updatedVariables) throws JobCreationException {
         clean();
         try {
-            //Check if the file exist
+            // Check if the file exist
             File f = new File(filePath);
-            return createJob(f);
+            return createJob(f, updatedVariables);
         } catch (JobCreationException jce) {
             throw jce;
         } catch (Exception e) {
@@ -151,16 +150,18 @@ public class JobFactory_stax extends JobFactory {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Job createJob(URI filePath) throws JobCreationException {
+        return createJob(filePath, null);
+    }
+
+    @Override
+    public Job createJob(URI filePath, Map<String,String> updatedVariables) throws JobCreationException {
         clean();
         try {
             //Check if the file exist
             File f = new File(filePath);
-            return createJob(f);
+            return createJob(f, updatedVariables);
         } catch (JobCreationException jce) {
             throw jce;
         } catch (Exception e) {
@@ -168,11 +169,14 @@ public class JobFactory_stax extends JobFactory {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Job createJobFromArchive(String archivePath) throws JobCreationException {
+        return createJobFromArchive(archivePath, null);
+    }
+
+    @Override
+    public Job createJobFromArchive(String archivePath, Map<String, String> updatedVariables)
+            throws JobCreationException {
         clean();
         try {
             //we intend to receive a zip/jar file, try to create it
@@ -230,7 +234,7 @@ public class JobFactory_stax extends JobFactory {
             }
             try {
                 //create the job and return it
-                return createJob(fjob);//can throw JobCreationException
+                return createJob(fjob, updatedVariables);//can throw JobCreationException
             } finally {
                 //remove temporary created directory : dest
                 ZipUtils.removeDir(dest);
@@ -240,7 +244,7 @@ public class JobFactory_stax extends JobFactory {
         }
     }
 
-    private Job createJob(File f) throws JobCreationException {
+    private Job createJob(File f, Map<String, String> updatedVariables) throws JobCreationException {
         try {
             //Check if the file exist
             if (!f.exists()) {
@@ -253,7 +257,7 @@ public class JobFactory_stax extends JobFactory {
             //create and get XML STAX reader
             XMLStreamReader xmlsr = xmlif.createXMLStreamReader(new FileReader(f));
             //Create the job starting at the first cursor position of the XML Stream reader
-            createJob(xmlsr);
+            createJob(xmlsr, updatedVariables);
             //Close the stream
             xmlsr.close();
             //make dependences
@@ -283,7 +287,8 @@ public class JobFactory_stax extends JobFactory {
      */
     private void validate(File file) throws XMLStreamException, JobCreationException,
             VerifierConfigurationException, SAXException, IOException {
-        InputStream schemaStream = this.getClass().getResourceAsStream(findSchemaByNamespaceUsed(file));
+        String findSchemaByNamespaceUsed = findSchemaByNamespaceUsed(file);
+        InputStream schemaStream = this.getClass().getResourceAsStream(findSchemaByNamespaceUsed);
         ValidationUtil.validate(file, schemaStream);
     }
 
@@ -317,7 +322,8 @@ public class JobFactory_stax extends JobFactory {
      *
      * @throws JobCreationException if an error occurred during job creation process.
      */
-    private void createJob(XMLStreamReader cursorRoot) throws JobCreationException {
+    private void createJob(XMLStreamReader cursorRoot, Map<String, String> updatedVariables)
+            throws JobCreationException {
         String current = null;
         //start parsing
         try {
@@ -328,14 +334,14 @@ public class JobFactory_stax extends JobFactory {
                     current = cursorRoot.getLocalName();
                     if (XMLTags.JOB.matches(current)) {
                         //first tag of the job.
-                        createAndFillJob(cursorRoot);
+                        createAndFillJob(cursorRoot, updatedVariables);
                     } else if (XMLTags.TASK.matches(current)) {
                         //once here, the job instance has been created
                         fillJobWithTasks(cursorRoot);
                     }
                 }
             }
-            //as the job attributes are declared before variable evaluation, 
+            //as the job attributes are declared before variable evaluation,
             //replace variables in this attributes after job creation (after variables evaluation)
             job.setName(replace(job.getName()));
             job.setProjectName(replace(job.getProjectName()));
@@ -351,13 +357,19 @@ public class JobFactory_stax extends JobFactory {
     }
 
     /**
-     * Create the real job and fill it with its property.
-     * Leave the method at the first tag that define the real type of job.
+     * Create the real job and fill it with its property. Leave the method at
+     * the first tag that define the real type of job.
      *
-     * @param cursorJob the streamReader with the cursor on the job element.
-     * @throws JobCreationException if an exception occurs during job creation.
+     * @param cursorJob
+     *            the streamReader with the cursor on the job element.
+     * @param updatedVariableMap
+     *            map of variables which has precedence over those that defined
+     *            in Job descriptor
+     * @throws JobCreationException
+     *             if an exception occurs during job creation.
      */
-    private void createAndFillJob(XMLStreamReader cursorJob) throws JobCreationException {
+    private void createAndFillJob(XMLStreamReader cursorJob, Map<String, String> updatedVariableMap)
+            throws JobCreationException {
         //create a job that will just temporary store the common properties of the job
         Job jtmp = new Job() {
 
@@ -402,6 +414,9 @@ public class JobFactory_stax extends JobFactory {
                         String current = cursorJob.getLocalName();
                         if (XMLTags.VARIABLES.matches(current)) {
                             createVariables(cursorJob);
+                            if (! (updatedVariableMap ==  null || updatedVariableMap.isEmpty())) {
+                                updateVariables(updatedVariableMap);
+                            }
                         } else if (XMLTags.COMMON_GENERIC_INFORMATION.matches(current)) {
                             jtmp.setGenericInformations(getGenericInformations(cursorJob));
                         } else if (XMLTags.JOB_CLASSPATHES.matches(current)) {
@@ -485,6 +500,10 @@ public class JobFactory_stax extends JobFactory {
             }
             throw new JobCreationException(cursorVariables.getLocalName(), attrtmp, e);
         }
+    }
+
+    private void updateVariables(Map<String, String> updatedVariables) {
+            this.variables.putAll(updatedVariables);
     }
 
     /**

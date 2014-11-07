@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job xmlns="urn:proactive:jobdescriptor:dev" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="urn:proactive:jobdescriptor:dev ../../../src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.xsd"
+    name="${job_name}" cancelJobOnError="false" priority="normal">
+    <variables>
+        <variable name="job_name" value="updated_job_name" />
+        <variable name="task_generic_info" value="updated_task_generic_info_value" />
+        <variable name="prescript_variable" value="value_of_prescript_variable" />
+        <variable name="script_variable" value="value_of_script_variable" />
+        <variable name="postscript_variable" value="value_of_postscript_vsariable" />
+    </variables>
+    <description>UpdateVariablesTestJob</description>
+    <taskFlow>
+        <task name="task1" preciousResult="true">
+            <genericInformation>
+                <info name="task_generic_info" value="${task_generic_info}" />
+            </genericInformation>
+            <pre>
+                <script>
+                    <code language="javascript">
+                        print('${prescript_variable}')
+                    </code>
+                </script>
+            </pre>
+            <scriptExecutable>
+                <script>
+                    <code language="javascript">
+                        print('${script_variable}')
+                    </code>
+                </script>
+            </scriptExecutable>
+            <post>
+                <script>
+                    <code language="javascript">
+                        print('${postscript_variable}')
+                    </code>
+                </script>
+            </post>
+        </task>
+    </taskFlow>
+</job>

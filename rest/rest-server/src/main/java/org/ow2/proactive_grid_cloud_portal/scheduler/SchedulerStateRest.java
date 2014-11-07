@@ -178,6 +178,8 @@ import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 import org.jboss.resteasy.util.GenericType;
 
+import com.google.common.collect.Maps;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 import static javax.ws.rs.core.MediaType.APPLICATION_XML_TYPE;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
@@ -1580,26 +1582,27 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
                 IOUtils.copy(is, new FileOutputStream(tmp));
 
-                Job j;
-                boolean isAnArchive = false;
-                if (part1.getMediaType().toString().toLowerCase().contains(
-                        MediaType.APPLICATION_XML.toLowerCase())) {
-                    // the job sent is the xml file
-                    j = JobFactory.getFactory().createJob(tmp.getAbsolutePath());
-                } else {
-                    // it is a job archive
-                    j = JobFactory.getFactory().createJobFromArchive(tmp.getAbsolutePath());
-                    isAnArchive = true;
-                }
-
+                Map<String, String> variables = null;
                 MultivaluedMap<String, String> matrixParams = pathSegment.getMatrixParameters();
                 if (matrixParams != null && !matrixParams.isEmpty()) {
-                    Map<String, String> variables = j.getVariables();
+                    variables = Maps.newHashMap();
                     for (String key : matrixParams.keySet()) {
                         if (variables.containsKey(key)) {
                             variables.put(key, matrixParams.getFirst(key));
                         }
                     }
+                }
+
+                Job j;
+                boolean isAnArchive = false;
+                if (part1.getMediaType().toString().toLowerCase()
+                        .contains(MediaType.APPLICATION_XML.toLowerCase())) {
+                    // the job sent is the xml file
+                    j = JobFactory.getFactory().createJob(tmp.getAbsolutePath(), variables);
+                } else {
+                    // it is a job archive
+                    j = JobFactory.getFactory().createJobFromArchive(tmp.getAbsolutePath(), variables);
+                    isAnArchive = true;
                 }
 
                 JobId jobid = s.submit(j);
