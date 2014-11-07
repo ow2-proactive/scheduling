@@ -77,6 +77,13 @@
         </servlet-class>
     </servlet>
 
+    <servlet>
+        <servlet-name>doc-servlet</servlet-name>
+        <servlet-class>
+            org.ow2.proactive_grid_cloud_portal.webapp.RestDocumentationServlet
+        </servlet-class>
+    </servlet>
+
     <servlet-mapping>
         <servlet-name>resteasy-servlet</servlet-name>
         <url-pattern>/scheduler/*</url-pattern>
@@ -95,6 +102,11 @@
     <servlet-mapping>
         <servlet-name>resteasy-servlet</servlet-name>
         <url-pattern>/data/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>doc-servlet</servlet-name>
+        <url-pattern>/doc/*</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>
