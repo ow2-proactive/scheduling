@@ -34,15 +34,25 @@
  */
 package org.ow2.proactive_grid_cloud_portal.scheduler;
 
+import java.io.File;
+import java.io.InputStream;
+import java.util.Collections;
+
 import org.ow2.proactive.scheduler.common.task.SimpleTaskLogs;
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
+import org.ow2.proactive.scheduler.job.InternalTaskFlowJob;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.job.JobResultImpl;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
+import org.ow2.proactive.scheduler.task.internal.InternalNativeTask;
 import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStoreTestUtils;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
@@ -54,6 +64,8 @@ public class SchedulerStateRestJobLogsTest {
     private SchedulerProxyUserInterface mockScheduler;
     private SchedulerStateRest restScheduler;
     private String validSessionId;
+    @Rule
+    public TemporaryFolder tempFolder = new TemporaryFolder();
 
     @Before
     public void setUp() throws Exception {
@@ -89,6 +101,33 @@ public class SchedulerStateRestJobLogsTest {
         String jobLogs = restScheduler.jobLogs(validSessionId, "123");
 
         assertEquals("HelloWorld", jobLogs);
+    }
+
+    @Test
+    public void job_full_logs_not_finished() throws Exception {
+        InternalTaskFlowJob jobState = new InternalTaskFlowJob();
+        jobState.addTask(new InternalNativeTask());
+        when(mockScheduler.getJobState("123")).thenReturn(jobState);
+
+        InputStream fullLogs = restScheduler.jobFullLogs(validSessionId, "123", validSessionId);
+
+        assertNull(fullLogs);
+    }
+
+    @Test
+    public void job_full_logs_finished() throws Exception {
+        InternalTaskFlowJob jobState = new InternalTaskFlowJob();
+        jobState.addTask(new InternalNativeTask());
+
+        File logFile = tempFolder.newFile("TaskLogs-123-0.log");
+        FileUtils.write(logFile, "logs");
+
+        when(mockScheduler.getJobState("123")).thenReturn(jobState);
+        when(mockScheduler.getUserSpaceURIs()).thenReturn(Collections.singletonList(logFile.getParent()));
+
+        InputStream fullLogs = restScheduler.jobFullLogs(validSessionId, "123", validSessionId);
+
+        assertEquals("logs", IOUtils.toString(fullLogs));
     }
 
     private JobResultImpl createJobResult(String taskOutput, String taskErrput) {
