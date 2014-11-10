@@ -60,23 +60,26 @@ public interface SchedulerUsage {
      * @param startDate must not be null, inclusive
      * @param endDate must not be null, inclusive
      * @return a list of {@link JobUsage} objects where job finished times are between start date and end date
-     * @throws NotConnectedException if the caller is not connecter
+     * @throws NotConnectedException if the caller is not connected
      * @throws PermissionException if the caller hasn't the permission to call this method
      */
     List<JobUsage> getMyAccountUsage(Date startDate, Date endDate) throws NotConnectedException,
             PermissionException;
 
     /**
-     * Returns details on job and task execution times for the caller's executions.
+     * Returns details on job and task execution times for a given user's executions.
      * <p>
      * Only the jobs finished between the start date and the end date will be returned:
      * i.e startDate <= job.finishedTime <= endDate.
      *</p>
-     * @param name of the user
+     * <p>
+     *     if user is the same as the caller, then it will fallback to to {@link #getMyAccountUsage(Date, Date)}
+     * </p>
+     * @param user must match a username as defined in the Scheduler's users
      * @param startDate must not be null, inclusive
      * @param endDate must not be null, inclusive
      * @return a list of {@link JobUsage} objects where job finished times are between start date and end date
-     * @throws NotConnectedException if the caller is not connecter
+     * @throws NotConnectedException if the caller is not connected
      * @throws PermissionException if the caller hasn't the permission to call this method
      */
     List<JobUsage> getAccountUsage(String user, Date startDate, Date endDate) throws NotConnectedException,
