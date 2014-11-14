@@ -60,7 +60,7 @@ public class RestFuncTUtils {
     private RestFuncTUtils() {
     }
 
-    public static void destory(Process process) throws Exception {
+    public static void destroy(Process process) throws Exception {
         process.destroy();
         close(process.getOutputStream());
         close(process.getInputStream());

@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<ProActiveUserProperties>
-	<properties>
-		<prop key="proactive.communication.protocol" value="pnp"/>
-		<!--<prop key="proactive.pnp.port" value="1099"/>-->
-	</properties>
-</ProActiveUserProperties>

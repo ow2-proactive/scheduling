@@ -89,13 +89,6 @@ public class RestFuncTHelper {
     final static URL schedHibernateConfig = RestFuncTHelper.class
             .getResource("config/schedHibernateConfig.xml");
 
-    final static URL defaultPAConfigFile = RestFuncTHelper.class.getResource("config/defaultPAConfig.xml");
-
-    final static URL allLog4JConfig = RestFuncTHelper.class.getResource("config/allLog4JConfig.properties");
-
-    final static URL forkedTaskLog4JConfig = RestFuncTHelper.class
-            .getResource("config/forkedTaskLog4JConfig.properties");
-
     final static int defaultNumberOfNodes = 1;
 
     private static String restServerUrl;
@@ -133,11 +126,6 @@ public class RestFuncTHelper {
             System.getProperty("scheduler.deploy.dropDB", "true"));
         cmd.add(PASchedulerProperties.SCHEDULER_DB_HIBERNATE_CONFIG.getCmdLine() +
             toPath(schedHibernateConfig));
-
-        cmd.add(CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getCmdLine() + toPath(defaultPAConfigFile));
-        cmd.add(CentralPAPropertyRepository.LOG4J.getCmdLine() + "file:" + toPath(allLog4JConfig));
-        cmd.add(PASchedulerProperties.SCHEDULER_DEFAULT_FJT_LOG4J.getCmdLine() + "file:" +
-            toPath(forkedTaskLog4JConfig));
 
         cmd.add(CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getCmdLine() + "pnp");
         cmd.add(PNPConfig.PA_PNP_PORT.getCmdLine() + "1200");
@@ -203,7 +191,7 @@ public class RestFuncTHelper {
         System.out.println("Shutting down scheduler process.");
         if (schedProcess != null) {
             try {
-                RestFuncTUtils.destory(schedProcess);
+                RestFuncTUtils.destroy(schedProcess);
             } catch (Throwable error) {
                 System.err.println("An error occurred while shutting down scheduler process:");
                 error.printStackTrace();
@@ -269,14 +257,9 @@ public class RestFuncTHelper {
     }
 
     private static String getClassPath() throws Exception {
-        StringBuilder classpath = new StringBuilder();
-        classpath.append(getRmHome() + File.separator + "dist" + File.separator + "lib" + File.separator +
-            "*");
-        classpath.append(File.pathSeparatorChar);
-        classpath.append(getRmHome() + File.separator + "addons" + File.separator + "*");
-        classpath.append(File.pathSeparatorChar);
-        classpath.append(System.getProperty("java.class.path"));
-        return classpath.toString();
+        return (getRmHome() + File.separator + "dist" + File.separator + "lib" + File.separator + "*") +
+            File.pathSeparatorChar + getRmHome() + File.separator + "addons" + File.separator + "*" +
+            File.pathSeparatorChar + System.getProperty("java.class.path");
     }
 
     public static String getRestServerUrl() {
