@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="urn:proactive:jobdescriptor:3.2"
+     xsi:schemaLocation="urn:proactive:jobdescriptor:3.2 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.2/schedulerjob.xsd"
+    name="Multi-Node Task" projectName="Advanced Workflows"
+    priority="normal"
+    cancelJobOnError="false">
+  <description>
+    <![CDATA[ A multinode task will reserve several nodes and expose them to the task.        It is often used to run MPI jobs or task that use the ProActive Java API. ]]>
+  </description>
+  <taskFlow>
+    <task name="MultiNodeTask">
+      <parallel numberOfNodes="4"></parallel>
+      <scriptExecutable>
+        <script>
+          <code language="groovy">
+            <![CDATA[
+println nodeset.size() + " nodes have been reserved"
+                        println "The reserved nodes are accessible there " + nodesurl
+]]>
+          </code>
+        </script>
+      </scriptExecutable>
+    </task>
+  </taskFlow>
+</job>

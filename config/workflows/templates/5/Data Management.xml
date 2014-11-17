@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="urn:proactive:jobdescriptor:3.2"
+     xsi:schemaLocation="urn:proactive:jobdescriptor:3.2 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.2/schedulerjob.xsd"
+    name="Data Management" projectName="Advanced Workflows"
+    priority="normal"
+    cancelJobOnError="false">
+  <description>
+    <![CDATA[ Dataspaces are automatically started with the Scheduler.        Here we write a file in a task and transfer it to the userspace.        Then in a dependent task, we transfer the file from the userspace and read it.        Patterns can be used to include or exclude input/output files. ]]>
+  </description>
+  <taskFlow>
+    <task name="create_file_in_userspace">
+      <scriptExecutable>
+        <script>
+          <code language="groovy">
+            <![CDATA[
+new File("a_file.txt") << "Hello World"
+]]>
+          </code>
+        </script>
+      </scriptExecutable>
+      <outputFiles>
+        <files  includes="a_file.txt" accessMode="transferToUserSpace"/>
+      </outputFiles>
+    </task>
+    <task name="read_file_from_userspace">
+      <depends>
+        <task ref="create_file_in_userspace"/>
+      </depends>
+      <inputFiles>
+        <files  includes="*.txt" accessMode="transferFromUserSpace"/>
+      </inputFiles>
+      <scriptExecutable>
+        <script>
+          <code language="groovy">
+            <![CDATA[
+println new File("a_file.txt").text
+]]>
+          </code>
+        </script>
+      </scriptExecutable>
+    </task>
+  </taskFlow>
+</job>
