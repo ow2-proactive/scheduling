@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="urn:proactive:jobdescriptor:3.2"
+     xsi:schemaLocation="urn:proactive:jobdescriptor:3.2 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.2/schedulerjob.xsd"
+    name="Cloud Automation" projectName="Advanced Workflows"
+    priority="normal"
+    cancelJobOnError="false">
+  <description>
+    <![CDATA[ A workflow that simulates cloud automation. ]]>
+  </description>
+  <taskFlow>
+    <task name="CreateDataBaseVM">
+      <description>
+        <![CDATA[ The simplest task, ran by a javascript engine. ]]>
+      </description>
+      <scriptExecutable>
+        <script>
+          <code language="javascript">
+            <![CDATA[
+print("creating database vm")
+]]>
+          </code>
+        </script>
+      </scriptExecutable>
+      <controlFlow block="none"></controlFlow>
+    </task>
+    <task name="CreateApplicationVM">
+      <description>
+        <![CDATA[ The simplest task, ran by a javascript engine. ]]>
+      </description>
+      <scriptExecutable>
+        <script>
+          <code language="javascript">
+            <![CDATA[
+print("creating applicaiton vm")
+]]>
+          </code>
+        </script>
+      </scriptExecutable>
+      <controlFlow block="none"></controlFlow>
+    </task>
+    <task name="ConfigureApplication">
+      <description>
+        <![CDATA[ The simplest task, ran by a javascript engine. ]]>
+      </description>
+      <depends>
+        <task ref="CreateApplicationVM"/>
+      </depends>
+      <scriptExecutable>
+        <script>
+          <code language="javascript">
+            <![CDATA[
+print("configuring application")
+]]>
+          </code>
+        </script>
+      </scriptExecutable>
+      <controlFlow block="none"></controlFlow>
+    </task>
+    <task name="RunApplication">
+      <description>
+        <![CDATA[ The simplest task, ran by a javascript engine. ]]>
+      </description>
+      <depends>
+        <task ref="ConfigDatabase"/>
+        <task ref="ConfigureApplication"/>
+      </depends>
+      <scriptExecutable>
+        <script>
+          <code language="javascript">
+            <![CDATA[
+print("running application")
+java.lang.Thread.sleep(60000)
+]]>
+          </code>
+        </script>
+      </scriptExecutable>
+      <controlFlow block="none"></controlFlow>
+    </task>
+    <task name="ConfigDatabase">
+      <description>
+        <![CDATA[ The simplest task, ran by a javascript engine. ]]>
+      </description>
+      <depends>
+        <task ref="CreateDataBaseVM"/>
+      </depends>
+      <scriptExecutable>
+        <script>
+          <code language="javascript">
+            <![CDATA[
+print("configuring database vm")
+]]>
+          </code>
+        </script>
+      </scriptExecutable>
+      <controlFlow block="none"></controlFlow>
+    </task>
+  </taskFlow>
+</job>
