@@ -37,6 +37,22 @@
 
 package org.ow2.proactive_grid_cloud_portal.cli;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.List;
+
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractLoginCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
+import org.ow2.proactive_grid_cloud_portal.cli.console.AbstractDevice;
+import org.ow2.proactive_grid_cloud_portal.cli.console.JLineDevice;
+import com.google.common.collect.ObjectArrays;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.GnuParser;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+import org.codehaus.jackson.map.ObjectMapper;
+
 import static org.codehaus.jackson.map.DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES;
 import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_UNAUTHORIZED_ACCESS;
 import static org.ow2.proactive_grid_cloud_portal.cli.RestConstants.DFLT_REST_SCHEDULER_URL;
@@ -45,34 +61,16 @@ import static org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractLoginCommand.P
 import static org.ow2.proactive_grid_cloud_portal.cli.utils.ExceptionUtility.debugMode;
 import static org.ow2.proactive_grid_cloud_portal.cli.utils.ExceptionUtility.stackTraceAsString;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.List;
-
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.GnuParser;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractLoginCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
-import org.ow2.proactive_grid_cloud_portal.cli.console.AbstractDevice;
-import org.ow2.proactive_grid_cloud_portal.cli.console.JLineDevice;
-import org.ow2.proactive_grid_cloud_portal.cli.utils.ExceptionUtility;
-
-import com.google.common.collect.ObjectArrays;
-
 
 public abstract class EntryPoint {
 
     protected abstract String resourceType();
 
-    protected void run(String... args) {
+    protected int run(String... args) {
 
         CommandFactory commandFactory = null;
-        CommandLine cli = null;
-        AbstractDevice console = null;
+        CommandLine cli;
+        AbstractDevice console;
 
         ApplicationContext currentContext = ApplicationContextImpl.currentContext();
 
@@ -89,7 +87,7 @@ public abstract class EntryPoint {
         } catch (IOException ioe) {
             System.err.println("An error occurred.");
             ioe.printStackTrace(System.err);
-            System.exit(1);
+            return 1;
 
         } catch (ParseException pe) {
             writeError(currentContext, pe.getMessage(), pe);
@@ -98,7 +96,7 @@ public abstract class EntryPoint {
             if (help != null) {
                 help.execute(currentContext);
             }
-            System.exit(1);
+            return 1;
         }
 
         currentContext.setObjectMapper(new ObjectMapper().configure(FAIL_ON_UNKNOWN_PROPERTIES, false));
@@ -107,12 +105,12 @@ public abstract class EntryPoint {
 
         // retrieve the (ordered) command list corresponding to command-line
         // arguments
-        List<Command> commands = null;
+        List<Command> commands;
         try {
             commands = commandFactory.getCommandList(cli, currentContext);
         } catch (CLIException e) {
             writeError(currentContext, "An error occurred.", e);
-            System.exit(1);
+            return 1;
         }
 
         boolean retryLogin = false;
@@ -124,11 +122,11 @@ public abstract class EntryPoint {
                 retryLogin = true;
             } else {
                 writeError(currentContext, "An error occurred.", error);
-                System.exit(1);
+                return 1;
             }
         } catch (Throwable e) {
             writeError(currentContext, "An error occurred.", e);
-            System.exit(1);
+            return 1;
         }
 
         /*
@@ -146,9 +144,10 @@ public abstract class EntryPoint {
                 executeCommandList(commands, currentContext);
             } catch (Throwable error) {
                 writeError(currentContext, "An error occurred while execution.", error);
-                System.exit(1);
+                return 1;
             }
         }
+        return 0;
     }
 
     private void executeCommandList(List<Command> commandList, ApplicationContext currentContext)
@@ -163,7 +162,7 @@ public abstract class EntryPoint {
         writer.printf("%n%s", errorMsg);
         if (cause != null) {
             if (cause.getMessage() != null) {
-                writer.printf("%n%nError Message: %s", cause.getMessage());
+                writer.printf("%n%nError Message: %s%n", cause.getMessage());
             }
 
             if (debugMode(currentContext)) {

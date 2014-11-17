@@ -48,7 +48,7 @@ public class CommonEntryPoint extends EntryPoint {
     }
 
     public static void main(String... args) {
-        (new CommonEntryPoint()).run(args);
+        System.exit((new CommonEntryPoint()).run(args));
     }
 
 }
