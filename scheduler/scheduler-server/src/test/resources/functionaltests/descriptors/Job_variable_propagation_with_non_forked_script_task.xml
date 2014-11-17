@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="urn:proactive:jobdescriptor:3.2"
+    xsi:schemaLocation="urn:proactive:jobdescriptor:3.2 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.2/schedulerjob.xsd"
+    name="variable_propagation_with_non_forked_script_task"
+    cancelJobOnError="true">
+    <variables>
+        <variable name="x" value="var_x" />
+    </variables>
+    <taskFlow>
+        <task name="task_A">
+            <pre>
+                <script>
+                    <code language="javascript">
+                        if ('var_x' != variables.get('x')) {
+                            throw 'Incorrect variable value (\'x\'): ' + variables.get('x') + ', expected \'var_x\'';
+                        }
+                        variables.put('x', 'pre_x');
+                    </code>
+                </script>
+            </pre>
+            <scriptExecutable>
+                <script>
+                    <code language="javascript">
+                        if ('pre_x' != variables.get('x')) {
+                        throw 'Incorrect variable value (\'x\'): ' + variables.get('x') + ', expected \'pre_x\'';
+                    }
+                    variables.put('x', 'script_x');
+                    </code>
+                </script>
+            </scriptExecutable>
+            <post>
+                <script>
+                    <code language="javascript">
+                        if ('script_x' != variables.get('x')) {
+                            throw 'Incorrect variable value (\'x\'): ' + variables.get('x') + ', expected \'script_x\'';
+                        }
+                        variables.put('x', 'post_x');
+                    </code>
+                </script>
+            </post>
+        </task>
+        <task name="task_B">
+            <depends>
+                <task ref="task_A" />
+            </depends>
+            <scriptExecutable>
+                <script>
+                    <code language="javascript">
+                        if ('post_x' != variables.get('x')) {
+                            throw 'Incorrect variable value (\'x\'): ' + variables.get('x') + ', expected \'post_x\'';
+                        }
+                    </code>
+                </script>
+            </scriptExecutable>
+        </task>
+    </taskFlow>
+</job>

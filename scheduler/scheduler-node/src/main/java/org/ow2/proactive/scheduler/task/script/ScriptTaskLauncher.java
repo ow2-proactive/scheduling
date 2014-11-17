@@ -150,7 +150,12 @@ public class ScriptTaskLauncher extends TaskLauncher {
             try {
                 userResult = executableGuard.execute(results);
                 this.flushStreams();
-
+                /*
+                 * update propagated variables map after task execution so that
+                 * any updates that occur during task execution will be visible
+                 * in post script execution.
+                 */
+                setPropagatedVariables(executableGuard.use().getVariables());
             } catch (Throwable t) {
                 exception = t;
             }
