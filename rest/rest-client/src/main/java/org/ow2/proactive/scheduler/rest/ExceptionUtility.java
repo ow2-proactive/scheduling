@@ -1,5 +1,5 @@
 /*
- *  
+ *
  * ProActive Parallel Suite(TM): The Java(TM) library for
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
@@ -36,6 +36,7 @@ package org.ow2.proactive.scheduler.rest;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.lang.reflect.Constructor;
 
 import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
@@ -52,6 +53,8 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SubmissionClosedR
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestException;
 
+import com.google.common.base.Strings;
+import com.google.common.base.Throwables;
 
 public class ExceptionUtility {
 
@@ -60,7 +63,7 @@ public class ExceptionUtility {
 
     public static void throwNCE(Exception e) throws NotConnectedException {
         if (e instanceof NotConnectedRestException) {
-            throw new NotConnectedException(e);
+            throw reconstructError(e, NotConnectedException.class);
         } else {
             throw new RuntimeException(e);
         }
@@ -69,7 +72,7 @@ public class ExceptionUtility {
     public static RuntimeException throwNCEOrPE(Exception e) throws NotConnectedException,
             PermissionException {
         if (e instanceof PermissionRestException) {
-            throw new PermissionException(e);
+            throw reconstructError(e, PermissionException.class);
         } else {
             throwNCE(e);
         }
@@ -79,7 +82,7 @@ public class ExceptionUtility {
     public static void throwUJEOrNCEOrPE(Exception e) throws UnknownJobException, NotConnectedException,
             PermissionException {
         if (e instanceof UnknownJobRestException) {
-            throw new UnknownJobException(e);
+            throw reconstructError(e, UnknownJobException.class);
         } else {
             throwNCEOrPE(e);
         }
@@ -88,7 +91,7 @@ public class ExceptionUtility {
     public static void throwUJEOrNCEOrPEOrUTE(Exception e) throws UnknownJobException, NotConnectedException,
             PermissionException, UnknownTaskException {
         if (e instanceof UnknownTaskRestException) {
-            throw new UnknownTaskException(e);
+            throw reconstructError(e, UnknownTaskException.class);
         } else {
             throwUJEOrNCEOrPE(e);
         }
@@ -97,9 +100,9 @@ public class ExceptionUtility {
     public static void throwNCEOrPEOrSCEOrJCE(Exception e) throws NotConnectedException, PermissionException,
             SubmissionClosedException, JobCreationException {
         if (e instanceof SubmissionClosedRestException) {
-            throw new SubmissionClosedException(e);
+            throw reconstructError(e , SubmissionClosedException.class);
         } else if (e instanceof JobCreationRestException) {
-            throw new JobCreationException(e);
+            throw reconstructError(e, JobCreationException.class);
         } else {
             throwNCEOrPE(e);
         }
@@ -108,7 +111,7 @@ public class ExceptionUtility {
     public static void throwJAFEOrUJEOrNCEOrPE(Exception e) throws JobAlreadyFinishedException,
             UnknownJobException, NotConnectedException, PermissionException {
         if (e instanceof JobAlreadyFinishedRestException) {
-            throw new JobAlreadyFinishedException(e);
+            throw reconstructError(e, JobAlreadyFinishedException.class);
         } else {
             throwUJEOrNCEOrPE(e);
         }
@@ -125,4 +128,29 @@ public class ExceptionUtility {
         return (t instanceof Exception) ? (Exception) t : new RuntimeException(t);
     }
 
+    private static <T extends Exception> T reconstructError(Exception source, Class<T> target) {
+        Throwable cause = source.getCause();
+        boolean found = false;
+        while (cause != null) {
+            if (Strings.nullToEmpty(cause.getMessage()).startsWith(target.getName())) {
+                found = true;
+                break;
+            }
+            cause = cause.getCause();
+        }
+        try {
+            Exception reconstructed = null;
+            if (found) {
+                Constructor<? extends Exception> ctor = target.getConstructor(String.class);
+                reconstructed = ctor.newInstance(cause.getMessage());
+                reconstructed.setStackTrace(cause.getStackTrace());
+            } else {
+                Constructor<? extends Exception> ctor = target.getConstructor(Throwable.class);
+                reconstructed = ctor.newInstance(source);
+            }
+            return target.cast(reconstructed);
+        } catch (Exception e) {
+            throw Throwables.propagate(e);
+        }
+    }
 }
