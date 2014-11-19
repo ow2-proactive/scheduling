@@ -71,7 +71,7 @@ public class ErrorCases {
     }
 
     private ErrorCases typeLine(String line) {
-        inputLines += line + "\n";
+        inputLines += line + System.getProperty("line.separator");
         return this;
     }
 
