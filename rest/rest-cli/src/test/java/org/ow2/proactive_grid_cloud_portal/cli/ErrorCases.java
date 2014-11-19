@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
+import jline.WindowsTerminal;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ssl.SslSelectChannelConnector;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
@@ -43,6 +44,7 @@ public class ErrorCases {
 
     @Before
     public void captureInputOutput() throws Exception {
+        System.setProperty(WindowsTerminal.DIRECT_CONSOLE, "false"); // to be able to type input on Windows
         inputLines = "";
         capturedOutput = new ByteArrayOutputStream();
         PrintStream captureOutput = new PrintStream(capturedOutput);
