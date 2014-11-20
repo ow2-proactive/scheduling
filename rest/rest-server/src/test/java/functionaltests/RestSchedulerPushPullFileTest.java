@@ -58,7 +58,9 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
@@ -77,6 +79,9 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest;
  * @author The ProActive Team
  */
 public class RestSchedulerPushPullFileTest extends AbstractRestFuncTestCase {
+
+    @Rule
+    public TemporaryFolder tmpFolder = new TemporaryFolder();
 
     @BeforeClass
     public static void beforeClass() throws Exception {
@@ -189,7 +194,7 @@ public class RestSchedulerPushPullFileTest extends AbstractRestFuncTestCase {
 
         InputStream is2 = response3.getEntity().getContent();
 
-        File answerFile = File.createTempFile("answer", ".xml");
+        File answerFile = tmpFolder.newFile();
         FileUtils.copyInputStreamToFile(is2, answerFile);
 
         Assert.assertTrue("Original file and result are equals for " + spaceName, FileUtils.contentEquals(
