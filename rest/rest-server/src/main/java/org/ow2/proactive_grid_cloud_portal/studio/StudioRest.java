@@ -37,23 +37,16 @@
 package org.ow2.proactive_grid_cloud_portal.studio;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyException;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import javax.security.auth.login.LoginException;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
@@ -61,16 +54,14 @@ import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.PathSegment;
 
+import org.apache.commons.io.FileUtils;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.node.NodeException;
 import org.ow2.proactive.resourcemanager.exception.RMException;
-import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
-import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 import org.ow2.proactive_grid_cloud_portal.common.Session;
 import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStore;
@@ -90,11 +81,8 @@ import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 
-
-@Path("/studio")
 public class StudioRest implements StudioInterface {
 
-    private static String PROJECT_NAME_PROPERTY = "proactive.projects.dir";
     private final static Logger logger = Logger.getLogger(StudioRest.class);
     private SchedulerStateRest schedulerRest = null;
 
@@ -102,86 +90,24 @@ public class StudioRest implements StudioInterface {
         if (schedulerRest == null) {
             schedulerRest = new SchedulerStateRest();
         }
-
         return schedulerRest;
     }
 
-    private String getProjectsDirName() {
-        String projectDir = System.getProperty(PROJECT_NAME_PROPERTY);
-        if (projectDir == null) {
-            projectDir = System.getProperty("java.io.tmpdir");
-        }
+    private static final FileStorageSupport fileStorage = new FileStorageSupport();
 
-        return projectDir;
-    }
 
     private String getUserName(String sessionId) throws NotConnectedException {
         Session ss = SharedSessionStore.getInstance().get(sessionId);
         if (ss == null) {
-            // logger.trace("not found a scheduler frontend for sessionId " +
-            // sessionId);
             throw new NotConnectedException("you are not connected to the scheduler, you should log on first");
         }
         return ss.getUserName();
     }
 
-    private void delete(File f) throws IOException {
-        if (f.isDirectory()) {
-            for (File c : f.listFiles()) {
-                logger.info("Deleting file " + c.getAbsolutePath());
-                delete(c);
-            }
-        }
-
-        logger.info("Deleting file " + f.getAbsolutePath());
-        if (!f.delete()) {
-            throw new FileNotFoundException("Failed to delete file: " + f);
-        }
-    }
-
-    private void writeFileContent(String fileName, String content) {
-        FileOutputStream outputStream = null;
-        try {
-            logger.info("Writing file " + fileName);
-            outputStream = new FileOutputStream(new File(fileName));
-            IOUtils.write(content, outputStream);
-        } catch (IOException e) {
-            logger.warn("Could not write file " + fileName, e);
-        } finally {
-            if (outputStream != null) {
-                try {
-                    outputStream.close();
-                } catch (IOException e) {
-                    logger.error(e.getMessage(), e);
-                }
-            }
-        }
-    }
-
-    private String getFileContent(String fileName) {
-        FileInputStream inputStream = null;
-        try {
-            inputStream = new FileInputStream(fileName);
-            return IOUtils.toString(inputStream);
-        } catch (Exception e) {
-            logger.warn("Could not read file " + fileName, e);
-        } finally {
-            if (inputStream != null) {
-                try {
-                    inputStream.close();
-                } catch (IOException e) {
-                    logger.error(e.getMessage(), e);
-                }
-            }
-        }
-
-        return "";
-    }
-
     @Override
     public String login(@FormParam("username")
-    String username, @FormParam("password")
-    String password) throws KeyException, LoginException, RMException, ActiveObjectCreationException,
+                        String username, @FormParam("password")
+                        String password) throws KeyException, LoginException, RMException, ActiveObjectCreationException,
             NodeException, SchedulerRestException {
         logger.info("Logging as " + username);
         return scheduler().login(username, password);
@@ -189,27 +115,22 @@ public class StudioRest implements StudioInterface {
 
     @Override
     public String loginWithCredential(@MultipartForm
-    LoginForm multipart) throws ActiveObjectCreationException, NodeException, KeyException, IOException,
+                                      LoginForm multipart) throws ActiveObjectCreationException, NodeException, KeyException, IOException,
             LoginException, RMException, SchedulerRestException {
         logger.info("Logging using credential file");
         return scheduler().loginWithCredential(multipart);
     }
 
-    @PUT
-    @Path("logout")
-    @Produces("application/json")
+    @Override
     public void logout(@HeaderParam("sessionid")
-    final String sessionId) throws PermissionRestException, NotConnectedRestException {
+                       final String sessionId) throws PermissionRestException, NotConnectedRestException {
         logger.info("logout");
         scheduler().disconnect(sessionId);
     }
 
     @Override
-    @GET
-    @Path("connected")
-    @Produces("application/json")
     public boolean isConnected(@HeaderParam("sessionid")
-    String sessionId) {
+                               String sessionId) {
         try {
             getUserName(sessionId);
             return true;
@@ -219,149 +140,71 @@ public class StudioRest implements StudioInterface {
     }
 
     @Override
-    @GET
-    @Path("workflows")
-    @Produces("application/json")
-    public ArrayList<Workflow> getWorkflows(@HeaderParam("sessionid")
-    String sessionId) throws NotConnectedException {
+    public List<Workflow> getWorkflows(@HeaderParam("sessionid")
+                                       String sessionId) throws NotConnectedException {
         String userName = getUserName(sessionId);
-        File workflowsDir = new File(getProjectsDirName() + "/" + userName + "/workflows");
-
-        if (!workflowsDir.exists()) {
-            logger.info("Creating dir " + workflowsDir.getAbsolutePath());
-            workflowsDir.mkdirs();
-        }
-
-        logger.info("Getting workflows as " + userName);
-        ArrayList<Workflow> projects = new ArrayList<Workflow>();
-        for (File f : workflowsDir.listFiles()) {
-            if (f.isDirectory()) {
-                File nameFile = new File(f.getAbsolutePath() + "/name");
-
-                if (nameFile.exists()) {
-
-                    Workflow wf = new Workflow();
-                    wf.setId(Integer.parseInt(f.getName()));
-                    wf.setName(getFileContent(nameFile.getAbsolutePath()));
-
-                    File xmlFile = new File(f.getAbsolutePath() + "/" + wf.getName() + ".xml");
-                    if (xmlFile.exists()) {
-                        wf.setXml(getFileContent(xmlFile.getAbsolutePath()));
-                    }
-                    File metadataFile = new File(f.getAbsolutePath() + "/metadata");
-                    if (metadataFile.exists()) {
-                        wf.setMetadata(getFileContent(metadataFile.getAbsolutePath()));
-                    }
-
-                    projects.add(wf);
-                }
-            }
-        }
-
-        logger.info(projects.size() + " workflows found");
-        return projects;
+        logger.info("Reading workflows as " + userName);
+        return fileStorage.getWorkflowStorage(userName).read();
     }
 
     @Override
-    @POST
-    @Path("workflows")
-    @Produces("application/json")
-    public long createWorkflow(@HeaderParam("sessionid")
-    String sessionId, @FormParam("name")
-    String name, @FormParam("xml")
-    String xml, @FormParam("metadata")
-    String metadata) throws NotConnectedException {
+    public Workflow createWorkflow(@HeaderParam("sessionid")
+                                   String sessionId, Workflow workflow) throws NotConnectedException {
         String userName = getUserName(sessionId);
-
         logger.info("Creating workflow as " + userName);
-        File workflowsDir = new File(getProjectsDirName() + "/" + userName + "/workflows");
-
-        if (!workflowsDir.exists()) {
-            logger.info("Creating dir " + workflowsDir.getAbsolutePath());
-            workflowsDir.mkdirs();
-        }
-
-        int projectId = 1;
-        while (new File(workflowsDir.getAbsolutePath() + "/" + projectId).exists()) {
-            projectId++;
-        }
-
-        File newWorkflowFile = new File(workflowsDir.getAbsolutePath() + "/" + projectId);
-        logger.info("Creating dir " + newWorkflowFile.getAbsolutePath());
-        newWorkflowFile.mkdirs();
-
-        writeFileContent(newWorkflowFile.getAbsolutePath() + "/name", name);
-        writeFileContent(newWorkflowFile.getAbsolutePath() + "/metadata", metadata);
-        writeFileContent(newWorkflowFile.getAbsolutePath() + "/" + name + ".xml", xml);
-
-        return projectId;
+        return fileStorage.getWorkflowStorage(userName).store(workflow);
     }
 
     @Override
-    @POST
-    @Path("workflows/{id}")
-    @Produces("application/json")
-    public boolean updateWorkflow(@HeaderParam("sessionid")
-    String sessionId, @PathParam("id")
-    String workflowId, @FormParam("name")
-    String name, @FormParam("xml")
-    String xml, @FormParam("metadata")
-    String metadata) throws NotConnectedException, IOException {
+    public Workflow updateWorkflow(@HeaderParam("sessionid")
+                                   String sessionId, @PathParam("id")
+                                   String workflowId, Workflow workflow) throws NotConnectedException, IOException {
         String userName = getUserName(sessionId);
-
         logger.info("Updating workflow " + workflowId + " as " + userName);
-        File workflowsDir = new File(getProjectsDirName() + "/" + userName + "/workflows/" + workflowId);
-
-        String oldJobName = getFileContent(workflowsDir.getAbsolutePath() + "/name");
-        if (name != null && !name.equals(oldJobName)) {
-            // new job name
-            logger.info("Updating job name from " + oldJobName + " to " + name);
-            writeFileContent(workflowsDir.getAbsolutePath() + "/name", name);
-            try {
-                delete(new File(workflowsDir.getAbsolutePath() + "/" + oldJobName + ".xml"));
-            } catch (Exception e) {
-                logger.error(e.getMessage(), e);
-            }
-        }
-
-        writeFileContent(workflowsDir.getAbsolutePath() + "/metadata", metadata);
-        writeFileContent(workflowsDir.getAbsolutePath() + "/" + name + ".xml", xml);
-
-        return true;
+        return fileStorage.getWorkflowStorage(userName).update(workflowId, workflow);
     }
 
     @Override
-    @DELETE
-    @Path("workflows/{id}")
-    @Produces("application/json")
-    public boolean deleteWorkflow(@HeaderParam("sessionid")
-    String sessionId, @PathParam("id")
-    String workflowId) throws NotConnectedException, IOException {
+    public void deleteWorkflow(@HeaderParam("sessionid")
+                               String sessionId, @PathParam("id")
+                               String workflowId) throws NotConnectedException, IOException {
         String userName = getUserName(sessionId);
-
         logger.info("Deleting workflow " + workflowId + " as " + userName);
-        File workflowsDir = new File(getProjectsDirName() + "/" + userName + "/workflows/" + workflowId);
-
-        if (workflowsDir.exists()) {
-            try {
-                delete(workflowsDir);
-            } catch (Exception e) {
-                logger.error(e.getMessage(), e);
-                return false;
-            }
-            return true;
-        }
-        return false;
+        fileStorage.getWorkflowStorage(userName).delete(workflowId);
     }
 
     @Override
-    @GET
-    @Path("scripts")
-    @Produces("application/json")
+    public List<Workflow> getTemplates(@HeaderParam("sessionid")
+                                       String sessionId) throws NotConnectedException {
+        return fileStorage.getTemplateStorage().read();
+    }
+
+    @Override
+    public Workflow createTemplate(@HeaderParam("sessionid")
+                                   String sessionId, Workflow template) throws NotConnectedException {
+        return fileStorage.getTemplateStorage().store(template);
+    }
+
+    @Override
+    public Workflow updateTemplate(@HeaderParam("sessionid")
+                                   String sessionId, @PathParam("id")
+                                   String templateId, Workflow template) throws NotConnectedException, IOException {
+        return fileStorage.getTemplateStorage().update(templateId, template);
+    }
+
+    @Override
+    public void deleteTemplate(@HeaderParam("sessionid")
+                               String sessionId, @PathParam("id")
+                               String templateId) throws NotConnectedException, IOException {
+        fileStorage.getTemplateStorage().delete(templateId);
+    }
+
+    @Override
     public ArrayList<Script> getScripts(@HeaderParam("sessionid")
-    String sessionId) throws NotConnectedException {
+                                        String sessionId) throws NotConnectedException {
         String userName = getUserName(sessionId);
-        File scriptDir = new File(getProjectsDirName() + "/" + userName + "/scripts");
+        File scriptDir = new File(fileStorage.getUserWorkflowsDir() + "/" + userName +
+                "/scripts");
 
         if (!scriptDir.exists()) {
             logger.info("Creating dir " + scriptDir.getAbsolutePath());
@@ -375,7 +218,7 @@ public class StudioRest implements StudioInterface {
 
             script.setName(f.getName());
             script.setAbsolutePath(f.getAbsolutePath());
-            script.setContent(getFileContent(f.getAbsolutePath()));
+            script.setContent(FileUtil.getFileContent(f.getAbsolutePath()));
             scripts.add(script);
         }
 
@@ -384,41 +227,34 @@ public class StudioRest implements StudioInterface {
     }
 
     @Override
-    @POST
-    @Path("scripts")
-    @Produces("application/json")
     public String createScript(@HeaderParam("sessionid")
-    String sessionId, @FormParam("name")
-    String name, @FormParam("content")
-    String content) throws NotConnectedException {
+                               String sessionId, @FormParam("name")
+                               String name, @FormParam("content")
+                               String content) throws NotConnectedException {
         String userName = getUserName(sessionId);
         logger.info("Creating script " + name + " as " + userName);
-        File scriptDir = new File(getProjectsDirName() + "/" + userName + "/scripts");
+        File scriptDir = new File(fileStorage.getUserWorkflowsDir() + "/" + userName +
+                "/scripts");
         String fileName = scriptDir.getAbsolutePath() + "/" + name;
-        writeFileContent(fileName, content);
+        FileUtil.writeFileContent(fileName, content);
         return fileName;
     }
 
     @Override
-    @POST
-    @Path("scripts/{name}")
-    @Produces("application/json")
     public String updateScript(@HeaderParam("sessionid")
-    String sessionId, @PathParam("name")
-    String name, @FormParam("content")
-    String content) throws NotConnectedException {
+                               String sessionId, @PathParam("name")
+                               String name, @FormParam("content")
+                               String content) throws NotConnectedException {
 
         return createScript(sessionId, name, content);
     }
 
     @Override
-    @GET
-    @Path("classes")
-    @Produces("application/json")
     public ArrayList<String> getClasses(@HeaderParam("sessionid")
-    String sessionId) throws NotConnectedException {
+                                        String sessionId) throws NotConnectedException {
         String userName = getUserName(sessionId);
-        File classesDir = new File(getProjectsDirName() + "/" + userName + "/classes");
+        File classesDir = new File(fileStorage.getUserWorkflowsDir() + "/" + userName +
+                "/classes");
 
         ArrayList<String> classes = new ArrayList<String>();
         if (classesDir.exists()) {
@@ -451,15 +287,13 @@ public class StudioRest implements StudioInterface {
 
     }
 
-    @POST
-    @Path("classes")
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
-    @Produces("application/json")
+    @Override
     public String createClass(@HeaderParam("sessionid")
-    String sessionId, MultipartFormDataInput input) throws NotConnectedException, IOException {
+                              String sessionId, MultipartFormDataInput input) throws NotConnectedException, IOException {
 
         String userName = getUserName(sessionId);
-        File classesDir = new File(getProjectsDirName() + "/" + userName + "/classes");
+        File classesDir = new File(fileStorage.getUserWorkflowsDir() + "/" + userName +
+                "/classes");
 
         if (!classesDir.exists()) {
             logger.info("Creating dir " + classesDir.getAbsolutePath());
@@ -482,7 +316,7 @@ public class StudioRest implements StudioInterface {
                 //constructs upload file path
                 fileName = classesDir.getAbsolutePath() + "/" + name;
 
-                writeFile(bytes, fileName);
+                FileUtils.writeByteArrayToFile(new File(fileName), bytes);
             } catch (IOException e) {
                 logger.warn("Could not read input part", e);
                 throw e;
@@ -493,24 +327,6 @@ public class StudioRest implements StudioInterface {
         return fileName;
     }
 
-    private void writeFile(byte[] content, String filename) throws IOException {
-
-        File file = new File(filename);
-
-        if (!file.exists()) {
-            file.createNewFile();
-        }
-
-        FileOutputStream fop = new FileOutputStream(file);
-
-        try {
-            fop.write(content);
-        } finally {
-            fop.flush();
-            fop.close();
-        }
-    }
-
     @Override
     public JobValidationData validate(MultipartFormDataInput multipart) {
         return scheduler().validate(multipart);
@@ -518,37 +334,33 @@ public class StudioRest implements StudioInterface {
 
     @Override
     public JobIdData submit(@HeaderParam("sessionid")
-    String sessionId, @PathParam("path")
-    PathSegment pathSegment, MultipartFormDataInput multipart) throws JobCreationRestException,
+                            String sessionId, @PathParam("path")
+                            PathSegment pathSegment, MultipartFormDataInput multipart) throws JobCreationRestException,
             NotConnectedRestException, PermissionRestException, SubmissionClosedRestException, IOException {
         return scheduler().submit(sessionId, pathSegment, multipart);
     }
 
-    @GET
-    @Path("visualizations/{id}")
-    @Produces("application/json")
+    @Override
     public String getVisualization(@HeaderParam("sessionid")
-    String sessionId, @PathParam("id")
-    String jobId) throws NotConnectedException {
+                                   String sessionId, @PathParam("id")
+                                   String jobId) throws NotConnectedException {
         File visualizationFile = new File(PortalConfiguration.jobIdToPath(jobId) + ".html");
         if (visualizationFile.exists()) {
-            return getFileContent(visualizationFile.getAbsolutePath());
+            return FileUtil.getFileContent(visualizationFile.getAbsolutePath());
         }
         return "";
     }
 
-    @POST
-    @Path("visualizations/{id}")
-    @Produces("application/json")
+    @Override
     public boolean updateVisualization(@HeaderParam("sessionid")
-    String sessionId, @PathParam("id")
-    String jobId, @FormParam("visualization")
-    String visualization) throws NotConnectedException {
+                                       String sessionId, @PathParam("id")
+                                       String jobId, @FormParam("visualization")
+                                       String visualization) throws NotConnectedException {
         File visualizationFile = new File(PortalConfiguration.jobIdToPath(jobId) + ".html");
         if (visualizationFile.exists()) {
             visualizationFile.delete();
         }
-        writeFileContent(visualizationFile.getAbsolutePath(), visualization);
+        FileUtil.writeFileContent(visualizationFile.getAbsolutePath(), visualization);
         return true;
     }
 }
