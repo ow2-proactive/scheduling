@@ -37,6 +37,8 @@ package org.ow2.proactive_grid_cloud_portal.studio;
 import java.io.IOException;
 import java.security.KeyException;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import javax.security.auth.login.LoginException;
 import javax.ws.rs.Consumes;
@@ -49,6 +51,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.PathSegment;
 
@@ -67,12 +70,14 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SubmissionClosedR
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+
 
 @Path("/studio")
+@Produces(APPLICATION_JSON)
 public interface StudioInterface {
     @POST
     @Path("login")
-    @Produces("application/json")
     String login(@FormParam("username")
     String username, @FormParam("password")
     String password) throws KeyException, LoginException, RMException, ActiveObjectCreationException,
@@ -81,64 +86,75 @@ public interface StudioInterface {
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Path("login")
-    @Produces("application/json")
     String loginWithCredential(@MultipartForm
     LoginForm multipart) throws ActiveObjectCreationException, NodeException, KeyException, IOException,
             LoginException, RMException, SchedulerRestException;
 
     @PUT
     @Path("logout")
-    @Produces("application/json")
     public void logout(@HeaderParam("sessionid")
     final String sessionId) throws PermissionRestException, NotConnectedRestException;
 
     @GET
     @Path("connected")
-    @Produces("application/json")
     boolean isConnected(@HeaderParam("sessionid")
     String sessionId);
 
     @GET
     @Path("workflows")
-    @Produces("application/json")
-    ArrayList<Workflow> getWorkflows(@HeaderParam("sessionid")
+    public List<Workflow> getWorkflows(@HeaderParam("sessionid")
     String sessionId) throws NotConnectedException;
 
     @POST
     @Path("workflows")
-    @Produces("application/json")
-    long createWorkflow(@HeaderParam("sessionid")
-    String sessionId, @FormParam("name")
-    String name, @FormParam("xml")
-    String xml, @FormParam("metadata")
-    String metadata) throws NotConnectedException;
+    @Consumes(APPLICATION_JSON)
+    Workflow createWorkflow(@HeaderParam("sessionid")
+                            String sessionId, Workflow workflow) throws NotConnectedException;
 
-    @POST
+    @PUT
     @Path("workflows/{id}")
-    @Produces("application/json")
-    boolean updateWorkflow(@HeaderParam("sessionid")
-    String sessionId, @PathParam("id")
-    String workflowId, @FormParam("name")
-    String name, @FormParam("xml")
-    String xml, @FormParam("metadata")
-    String metadata) throws NotConnectedException, IOException;
+    @Consumes(APPLICATION_JSON)
+    Workflow updateWorkflow(@HeaderParam("sessionid")
+                            String sessionId, @PathParam("id")
+                            String workflowId, Workflow workflow) throws NotConnectedException, IOException;
 
     @DELETE
     @Path("workflows/{id}")
-    @Produces("application/json")
-    boolean deleteWorkflow(@HeaderParam("sessionid")
-    String sessionId, @PathParam("id")
-    String workflowId) throws NotConnectedException, IOException;
+    void deleteWorkflow(@HeaderParam("sessionid")
+                        String sessionId, @PathParam("id")
+                        String workflowId) throws NotConnectedException, IOException;
+
+    @GET
+    @Path("templates")
+    public List<Workflow> getTemplates(@HeaderParam("sessionid")
+    String sessionId) throws NotConnectedException;
+
+    @POST
+    @Path("templates")
+    @Consumes(APPLICATION_JSON)
+    Workflow createTemplate(@HeaderParam("sessionid")
+                            String sessionId, Workflow template) throws NotConnectedException;
+
+    @PUT
+    @Path("templates/{id}")
+    @Consumes(APPLICATION_JSON)
+    Workflow updateTemplate(@HeaderParam("sessionid")
+                            String sessionId, @PathParam("id")
+                            String templateId, Workflow template) throws NotConnectedException, IOException;
+
+    @DELETE
+    @Path("templates/{id}")
+    void deleteTemplate(@HeaderParam("sessionid")
+                        String sessionId, @PathParam("id")
+                        String templateId) throws NotConnectedException, IOException;
 
     @GET
     @Path("scripts")
-    @Produces("application/json")
     ArrayList<Script> getScripts(@HeaderParam("sessionid")
     String sessionId) throws NotConnectedException;
 
     @POST
     @Path("scripts")
-    @Produces("application/json")
     String createScript(@HeaderParam("sessionid")
     String sessionId, @FormParam("name")
     String name, @FormParam("content")
@@ -146,7 +162,6 @@ public interface StudioInterface {
 
     @POST
     @Path("scripts/{name}")
-    @Produces("application/json")
     String updateScript(@HeaderParam("sessionid")
     String sessionId, @PathParam("name")
     String name, @FormParam("content")
@@ -154,14 +169,12 @@ public interface StudioInterface {
 
     @GET
     @Path("classes")
-    @Produces("application/json")
     ArrayList<String> getClasses(@HeaderParam("sessionid")
     String sessionId) throws NotConnectedException;
 
     @POST
     @Path("classes")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    @Produces("application/json")
     public String createClass(@HeaderParam("sessionid")
     String sessionId, MultipartFormDataInput multipart) throws NotConnectedException, IOException;
 
@@ -174,7 +187,6 @@ public interface StudioInterface {
     @POST
     @Path("validate")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    @Produces("application/json")
     public abstract JobValidationData validate(MultipartFormDataInput multipart);
 
     /**
@@ -186,7 +198,6 @@ public interface StudioInterface {
     @POST
     @Path("{path:submit}")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    @Produces("application/json")
     public JobIdData submit(@HeaderParam("sessionid")
     String sessionId, @PathParam("path")
     PathSegment pathSegment, MultipartFormDataInput multipart) throws JobCreationRestException,
@@ -194,14 +205,12 @@ public interface StudioInterface {
 
     @GET
     @Path("visualizations/{id}")
-    @Produces("application/json")
     String getVisualization(@HeaderParam("sessionid")
     String sessionId, @PathParam("id")
     String jobId) throws NotConnectedException;
 
     @POST
     @Path("visualizations/{id}")
-    @Produces("application/json")
     boolean updateVisualization(@HeaderParam("sessionid")
     String sessionId, @PathParam("id")
     String jobId, @FormParam("visualization")
