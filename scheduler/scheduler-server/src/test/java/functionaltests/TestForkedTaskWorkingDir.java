@@ -141,7 +141,7 @@ public class TestForkedTaskWorkingDir extends FunctionalTest {
         blockTaskFromTest.unlock();
 
         SchedulerTHelper.log("Waiting for job 1 to finish");
-        SchedulerTHelper.waitForEventJobFinished(idJ1, 30 * 1000);
+        SchedulerTHelper.waitForEventJobFinished(idJ1);
 
         String userSpaceUri = URI.create(SchedulerTHelper.getSchedulerInterface().getUserSpaceURIs().get(0))
                 .getPath();
