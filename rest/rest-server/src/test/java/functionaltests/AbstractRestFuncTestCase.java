@@ -221,20 +221,26 @@ public abstract class AbstractRestFuncTestCase {
         return jobId.value();
     }
 
-    protected void waitJobState(JobId jobId, JobStatus status, long timeout) throws Exception {
+    protected void waitJobState(JobId jobId, JobStatus expected, long timeout) throws Exception {
+        waitJobState(jobId.value(), expected, timeout);
+    }
+
+    protected void waitJobState(String jobId, JobStatus expected, long timeout) throws Exception {
         long stopTime = System.currentTimeMillis() + timeout;
 
         while (System.currentTimeMillis() < stopTime) {
-            JobState jobState = getScheduler().getJobState(jobId);
-            if (jobState.getStatus().equals(status)) {
+            JobStatus currentStatus = getScheduler().getJobState(jobId).getStatus();
+            if (currentStatus.equals(expected)) {
                 return;
+            } else if (!currentStatus.isJobAlive()) {
+                break;
             } else {
                 Thread.sleep(1000);
             }
         }
 
-        Assert.fail("Failed to wait when " + jobId + " is " + status + ", current status is " +
-            getScheduler().getJobState(jobId).getStatus());
+        Assert.fail("Failed to wait when " + jobId + " is " + expected + ", current status is "
+                + getScheduler().getJobState(jobId).getStatus());
     }
 
     protected String submitPendingJobId() throws Exception {

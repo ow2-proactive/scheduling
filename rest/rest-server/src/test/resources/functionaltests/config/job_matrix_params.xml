@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="urn:proactive:jobdescriptor:3.2"
+     xsi:schemaLocation="urn:proactive:jobdescriptor:3.2 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.2/schedulerjob.xsd"
+     name="job_matrix_param_test" cancelJobOnError="true">
+    <variables>
+        <variable name="var" value="dflt_val"/>
+    </variables>
+    <taskFlow>
+        <task name="script_task">
+            <scriptExecutable>
+                <script>
+                    <code language="javascript">
+                        <![CDATA[
+                          if (variables.get('var') != 'matrix_param_val') {
+                            throw 'Incorrect variable value (\'var\'): ' + variables.get('var') + ', expected \'matrix_param_val\'';
+                          }
+                        ]]>
+                    </code>
+                </script>
+            </scriptExecutable>
+        </task>
+     </taskFlow>
+</job>

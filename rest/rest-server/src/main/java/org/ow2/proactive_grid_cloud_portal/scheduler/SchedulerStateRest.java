@@ -1587,9 +1587,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                 if (matrixParams != null && !matrixParams.isEmpty()) {
                     variables = Maps.newHashMap();
                     for (String key : matrixParams.keySet()) {
-                        if (variables.containsKey(key)) {
-                            variables.put(key, matrixParams.getFirst(key));
-                        }
+                        variables.put(key, matrixParams.getFirst(key));
                     }
                 }
 

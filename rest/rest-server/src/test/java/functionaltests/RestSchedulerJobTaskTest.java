@@ -37,6 +37,7 @@
 package functionaltests;
 
 import functionaltests.utils.RestFuncTUtils;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
@@ -60,10 +61,11 @@ import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 
 import javax.ws.rs.core.MediaType;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.concurrent.TimeUnit;
 
 public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
 
@@ -130,6 +132,27 @@ public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
         assertHttpStatusOK(response);
         JSONObject jsonObj = toJsonObject(response);
         assertNotNull(jsonObj.get("id").toString());
+    }
+
+    @Test
+    public void urlMatrixParams_shouldReplace_jobVariabls() throws Exception {
+        File jobFile = new File(RestSchedulerJobTaskTest.class.getResource("config/job_matrix_params.xml")
+                .toURI());
+
+        String schedulerUrl = getResourceUrl("submit;var=matrix_param_val");
+        HttpPost httpPost = new HttpPost(schedulerUrl);
+        setSessionHeader(httpPost);
+        MultipartEntity multipartEntity = new MultipartEntity();
+        multipartEntity.addPart("", new FileBody(jobFile, MediaType.APPLICATION_XML));
+        httpPost.setEntity(multipartEntity);
+
+        HttpResponse response = executeUriRequest(httpPost);
+        assertHttpStatusOK(response);
+        JSONObject jsonObj = toJsonObject(response);
+        final String jobId = jsonObj.get("id").toString();
+        assertNotNull(jobId);
+
+        waitJobState(jobId, JobStatus.FINISHED, TimeUnit.MINUTES.toMillis(1));
     }
 
     @Test
