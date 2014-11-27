@@ -43,7 +43,7 @@ usr=$4
 crs=$5
 
 # create temp file for return value passing
-tmp=`mktemp`;
+tmp=`mktemp  2>/dev/null || mktemp  -t 'mytmpfile'`
 
 if [ "$?" != "0" ]; then
   # if I can not create a tempfile

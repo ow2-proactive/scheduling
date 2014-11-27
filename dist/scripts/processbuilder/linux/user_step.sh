@@ -52,10 +52,10 @@ if [ "$passw" == "" ]; then
     # PROACTIVE-970 : default env is used
     # Note that tmp is still used fo return value
     # export >> $tmp;
-    
+
     OLD_UMASK=`umask`
     umask 0177
-    keyfile=`mktemp`
+    keyfile=`mktemp  2>/dev/null || mktemp  -t 'mytmpkeyfile'`
     umask $OLD_UMASK
     echo "$keycont" > $keyfile
 
@@ -84,9 +84,15 @@ else
   # check if we are running on a 64bit arch, or a 32bit one. 
   # The only difference between the 'suer' executables is their
   # target architecture used at compilation time.
-  if [[ `uname -i` == *64* ]];
+  if [[ `uname -m` == *64* ]];
   then
-    echo "$passw" | ./suer64 $usr ./command_step.sh $token $tmp "$workdir" $args;
+    if [[ `uname -s` == *Darwin* ]];
+    then
+      # fallback on another suer for Mac
+      echo "$passw" | ./suermac64 $usr ./command_step.sh $token $tmp "$workdir" $args;
+    else
+      echo "$passw" | ./suer64 $usr ./command_step.sh $token $tmp "$workdir" $args;
+    fi
     exitc=$?
   else
     echo "$passw" | ./suer32 $usr ./command_step.sh $token $tmp "$workdir" $args;

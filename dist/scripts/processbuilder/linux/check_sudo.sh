@@ -17,7 +17,7 @@ if [ "$passw" == "" ]; then
     echo 0 | sudo -Su "$username" whoami
   else
     # use ssh
-    keyfile=`mktemp`
+    keyfile=`mktemp  2>/dev/null || mktemp  -t 'mytmpfile'`
     echo "$keycont" > $keyfile
     chmod 400 $keyfile
     echo $keyfile $username
@@ -27,14 +27,14 @@ if [ "$passw" == "" ]; then
     else 
       echo FAIL
     fi;
-    rm $keyfile
+    rm -f $keyfile
     exit 0;
   fi;
 else 
   # check if we are running on a 64bit arch, or a 32bit one. 
   # The only difference between the 'suer' executables is their
   # target architecture used at compilation time.
-  if [[ `uname -i` == *64* ]];
+  if [[ `uname -m` == *64* ]];
   then
     if [ ! -e "$2/suer64" ];
     then 
