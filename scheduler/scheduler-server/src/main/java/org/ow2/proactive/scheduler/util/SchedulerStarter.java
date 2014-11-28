@@ -73,6 +73,7 @@ import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.utils.FileToBytesConverter;
 import org.ow2.proactive.utils.JettyStarter;
+import org.ow2.proactive.utils.PAMRRouterStarter;
 import org.ow2.proactive.utils.Tools;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.GnuParser;
@@ -170,9 +171,8 @@ public class SchedulerStarter {
             int routerPort = PAMRConfig.PA_NET_ROUTER_PORT.getValue();
             config.setPort(routerPort);
             config.setNbWorkerThreads(Runtime.getRuntime().availableProcessors());
-            config.setReservedAgentConfigFile(new File(System
-                    .getProperty(PASchedulerProperties.SCHEDULER_HOME.getKey()) +
-                File.separator + "config" + File.separator + "router" + File.separator + "router.ini"));
+            config.setReservedAgentConfigFile(new File(
+              System.getProperty(PASchedulerProperties.SCHEDULER_HOME.getKey()) + PAMRRouterStarter.PATH_TO_ROUTER_CONFIG_FILE));
             Router.createAndStart(config);
             logger.info("The router created on " + ProActiveInet.getInstance().getHostname() + ":" +
                 routerPort);
