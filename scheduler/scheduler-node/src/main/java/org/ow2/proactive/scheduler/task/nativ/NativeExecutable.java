@@ -87,7 +87,7 @@ public class NativeExecutable extends Executable {
 
     public static final Logger logger = Logger.getLogger(NativeExecutable.class);
 
-    private static String GENERATION_SCRIPT_ERR = "\nNo command eligible was found by generation script.\n" +
+    private static final String GENERATION_SCRIPT_ERR = "\nNo command eligible was found by generation script.\n" +
         "A generation script must define a variable named '" + GenerationScript.RESULT_VARIABLE +
         "' or a variable named '" + GenerationScript.RESULTLIST_VARIABLE + "' which contains " +
         "the native command to launch. \n" + "Script details :\n";
@@ -96,13 +96,13 @@ public class NativeExecutable extends Executable {
      * Environment variable exported to the the process
      * used for kill the task
      */
-    private static String COOKIE_ENV = "PROACTIVE_COOKIE";
+    private static final String COOKIE_ENV = "PROACTIVE_COOKIE";
     /** Env var exported for the number and name of nodes */
-    private static String CORE_FILE_ENV = "PAS_NODESFILE";
-    private static String CORE_NB = "PAS_NODESNUMBER";
+    private static final String CORE_FILE_ENV = "PAS_NODESFILE";
+    private static final String CORE_NB = "PAS_NODESNUMBER";
     // BACKWARD COMPATIBILITY
-    private static String LEGACY_CORE_FILE_ENV = "PAS_NODEFILE";
-    private static String LEGACY_CORE_NB = "PAS_CORE_NB";
+    private static final String LEGACY_CORE_FILE_ENV = "PAS_NODEFILE";
+    private static final String LEGACY_CORE_NB = "PAS_CORE_NB";
 
     /** Process that start the native task */
     private transient Process process;
@@ -176,7 +176,6 @@ public class NativeExecutable extends Executable {
                 throw new UserException(GENERATION_SCRIPT_ERR + gs.getId());
             } else {
                 //generation script has defined a command, so set the command to launch
-                String commandLine = null;
                 if (generationScriptDefinedCommand instanceof String) {
                     command = Tools.parseCommandLine((String) generationScriptDefinedCommand);
                 } else {
@@ -191,7 +190,7 @@ public class NativeExecutable extends Executable {
             nodesFiles = File.createTempFile("pa_nodes", null);
             FileWriter outputWriter = new FileWriter(nodesFiles);
             for (String nodeHost : nodes) {
-                outputWriter.append(nodeHost + System.getProperty("line.separator"));
+                outputWriter.append(nodeHost).append(System.getProperty("line.separator"));
             }
             outputWriter.close();
         }
