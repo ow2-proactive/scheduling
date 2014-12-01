@@ -339,6 +339,9 @@ public class NativeExecutable extends Executable {
             }
 
             try {
+                // non interactive mode, close stdin to avoid blocking
+                process.getOutputStream().close();
+
                 // redirect streams
                 BufferedReader sout = new BufferedReader(new InputStreamReader(process.getInputStream()));
                 Thread tsout = new Thread(new ThreadReader(sout, System.out, this));

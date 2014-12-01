@@ -39,14 +39,17 @@ package functionaltests;
 import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
-import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
-import org.junit.Assert;
+import org.junit.Test;
+
+import static functionaltests.SchedulerTHelper.waitForEventTaskFinished;
+import static functionaltests.SchedulerTHelper.waitForEventTaskRunning;
+import static org.junit.Assert.*;
 
 
 /**
@@ -66,38 +69,42 @@ import org.junit.Assert;
  * task result is available (test 6).
  *
  * @author The ProActive Team
- * @date 2 jun 08
  * @since ProActive Scheduling 1.0
  */
 public class TestJobNativeSubmission extends SchedulerConsecutive {
 
-    /**
-     * Tests start here.
-     *
-     * @throws Throwable any exception that can be thrown during the test.
-     */
-    @org.junit.Test
+    @Test
     public void run() throws Throwable {
-        String task1Name = "task1";
-        String task2Name = "task2";
 
         //test submission and event reception
         TaskFlowJob job = new TaskFlowJob();
-        NativeTask task1 = new NativeTask();
-        task1.setName(task1Name);
+
+        NativeTask successfulTask = new NativeTask();
+        successfulTask.setName("successfulTask");
         if (OperatingSystem.getOperatingSystem() == OperatingSystem.windows) {
-            task1.setCommandLine("cmd", "/C", "ping 127.0.0.1 -n 10", ">", "NUL");
+            successfulTask.setCommandLine("cmd", "/C", "ping 127.0.0.1 -n 10", ">", "NUL");
         } else {
-            task1.setCommandLine("ping", "-c", "5", "127.0.0.1");
+            successfulTask.setCommandLine("ping", "-c", "5", "127.0.0.1");
         }
-        job.addTask(task1);
+        job.addTask(successfulTask);
 
-        NativeTask task2 = new NativeTask();
-        task2.setName(task2Name);
-        task2.addDependence(task1);
-        task2.setCommandLine("invalid_command");
+        NativeTask invalidCommandTask = new NativeTask();
+        invalidCommandTask.setName("invalidCommandTask");
+        invalidCommandTask.addDependence(successfulTask);
+        invalidCommandTask.setCommandLine("invalid_command");
 
-        job.addTask(task2);
+        job.addTask(invalidCommandTask);
+
+        // SCHEDULING-1987
+        NativeTask taskReadingInput = new NativeTask();
+        taskReadingInput.setName("taskReadingInput");
+        if (OperatingSystem.getOperatingSystem() == OperatingSystem.windows) {
+            taskReadingInput.setCommandLine("choice"); // wait for y/n
+        } else {
+            taskReadingInput.setCommandLine("cat"); // cat hangs for user's input
+        }
+
+        job.addTask(taskReadingInput);
 
         JobId id = SchedulerTHelper.submitJob(job);
 
@@ -106,30 +113,34 @@ public class TestJobNativeSubmission extends SchedulerConsecutive {
         SchedulerTHelper.log("Waiting for jobSubmitted Event");
         JobState receivedState = SchedulerTHelper.waitForEventJobSubmitted(id);
 
-        Assert.assertEquals(receivedState.getId(), id);
+        assertEquals(receivedState.getId(), id);
 
         SchedulerTHelper.log("Waiting for job running");
         JobInfo jInfo = SchedulerTHelper.waitForEventJobRunning(id);
-        Assert.assertEquals(jInfo.getJobId(), id);
-        Assert.assertEquals(JobStatus.RUNNING, jInfo.getStatus());
+        assertEquals(jInfo.getJobId(), id);
+        assertEquals(JobStatus.RUNNING, jInfo.getStatus());
 
-        SchedulerTHelper.waitForEventTaskRunning(id, task1Name);
-        TaskInfo tInfo = SchedulerTHelper.waitForEventTaskFinished(id, task1Name);
+        waitForEventTaskRunning(id, successfulTask.getName());
+        TaskInfo tInfo = waitForEventTaskFinished(id, successfulTask.getName());
 
-        Assert.assertEquals(TaskStatus.FINISHED, tInfo.getStatus());
+        assertEquals(TaskStatus.FINISHED, tInfo.getStatus());
 
-        SchedulerTHelper.waitForEventTaskRunning(id, task2Name);
-        tInfo = SchedulerTHelper.waitForEventTaskFinished(id, task2Name);
+        waitForEventTaskRunning(id, invalidCommandTask.getName());
+        tInfo = waitForEventTaskFinished(id, invalidCommandTask.getName());
 
-        Assert.assertEquals(TaskStatus.FAULTY, tInfo.getStatus());
+        assertEquals(TaskStatus.FAULTY, tInfo.getStatus());
+
+        TaskInfo taskReadingInputInfo = waitForEventTaskFinished(id, taskReadingInput.getName());
+
+        if (OperatingSystem.getOperatingSystem() == OperatingSystem.windows) {
+            assertEquals(TaskStatus.FAULTY, taskReadingInputInfo.getStatus()); // choice fails when input is closed
+        } else {
+            assertEquals(TaskStatus.FINISHED, taskReadingInputInfo.getStatus());
+        }
 
         SchedulerTHelper.waitForEventJobFinished(id);
-        JobResult res = SchedulerTHelper.getJobResult(id);
 
-        //check that there is one exception in results
-        Assert.assertTrue(res.getExceptionResults().size() == 1);
-
-        //remove job
+        // remove job
         SchedulerTHelper.removeJob(id);
         SchedulerTHelper.waitForEventJobRemoved(id);
     }
