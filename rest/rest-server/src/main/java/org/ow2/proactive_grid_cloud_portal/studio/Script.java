@@ -37,7 +37,17 @@
 
 package org.ow2.proactive_grid_cloud_portal.studio;
 
-public class Script {
+public class Script implements Named {
+
+    public Script(String name, String content) {
+        this.name = name;
+        this.content = content;
+    }
+
+    public Script(String name, String content, String absolutePath) {
+        this(name, content);
+        this.absolutePath = absolutePath;
+    }
 
     private String name;
     private String content;

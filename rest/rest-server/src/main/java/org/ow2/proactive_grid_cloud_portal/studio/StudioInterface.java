@@ -103,13 +103,13 @@ public interface StudioInterface {
     @GET
     @Path("workflows")
     public List<Workflow> getWorkflows(@HeaderParam("sessionid")
-    String sessionId) throws NotConnectedException;
+    String sessionId) throws NotConnectedException, IOException;
 
     @POST
     @Path("workflows")
     @Consumes(APPLICATION_JSON)
     Workflow createWorkflow(@HeaderParam("sessionid")
-                            String sessionId, Workflow workflow) throws NotConnectedException;
+                            String sessionId, Workflow workflow) throws NotConnectedException, IOException;
 
     @PUT
     @Path("workflows/{id}")
@@ -127,13 +127,13 @@ public interface StudioInterface {
     @GET
     @Path("templates")
     public List<Workflow> getTemplates(@HeaderParam("sessionid")
-    String sessionId) throws NotConnectedException;
+    String sessionId) throws NotConnectedException, IOException;
 
     @POST
     @Path("templates")
     @Consumes(APPLICATION_JSON)
     Workflow createTemplate(@HeaderParam("sessionid")
-                            String sessionId, Workflow template) throws NotConnectedException;
+                            String sessionId, Workflow template) throws NotConnectedException, IOException;
 
     @PUT
     @Path("templates/{id}")
@@ -150,22 +150,22 @@ public interface StudioInterface {
 
     @GET
     @Path("scripts")
-    ArrayList<Script> getScripts(@HeaderParam("sessionid")
-    String sessionId) throws NotConnectedException;
+    List<Script> getScripts(@HeaderParam("sessionid")
+                            String sessionId) throws NotConnectedException, IOException;
 
     @POST
     @Path("scripts")
     String createScript(@HeaderParam("sessionid")
     String sessionId, @FormParam("name")
     String name, @FormParam("content")
-    String content) throws NotConnectedException;
+    String content) throws NotConnectedException, IOException;
 
     @POST
     @Path("scripts/{name}")
     String updateScript(@HeaderParam("sessionid")
     String sessionId, @PathParam("name")
     String name, @FormParam("content")
-    String content) throws NotConnectedException;
+    String content) throws NotConnectedException, IOException;
 
     @GET
     @Path("classes")
@@ -207,13 +207,13 @@ public interface StudioInterface {
     @Path("visualizations/{id}")
     String getVisualization(@HeaderParam("sessionid")
     String sessionId, @PathParam("id")
-    String jobId) throws NotConnectedException;
+    String jobId) throws NotConnectedException, IOException;
 
     @POST
     @Path("visualizations/{id}")
     boolean updateVisualization(@HeaderParam("sessionid")
     String sessionId, @PathParam("id")
     String jobId, @FormParam("visualization")
-    String visualization) throws NotConnectedException;
+    String visualization) throws NotConnectedException, IOException;
 
 }

@@ -46,15 +46,9 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import javax.security.auth.login.LoginException;
-import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
-import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.PathSegment;
 
 import org.apache.commons.io.FileUtils;
@@ -74,6 +68,9 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestE
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SchedulerRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SubmissionClosedRestException;
+import org.ow2.proactive_grid_cloud_portal.studio.storage.FileStorage;
+import org.ow2.proactive_grid_cloud_portal.studio.storage.FileStorageSupport;
+import org.ow2.proactive_grid_cloud_portal.studio.storage.FileStorageSupportFactory;
 import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
@@ -92,9 +89,10 @@ public class StudioRest implements StudioInterface {
         }
         return schedulerRest;
     }
-
-    private static final FileStorageSupport fileStorage = new FileStorageSupport();
-
+    
+    public static FileStorageSupport getFileStorageSupport() {
+        return FileStorageSupportFactory.getInstance();
+    }
 
     private String getUserName(String sessionId) throws NotConnectedException {
         Session ss = SharedSessionStore.getInstance().get(sessionId);
@@ -141,18 +139,18 @@ public class StudioRest implements StudioInterface {
 
     @Override
     public List<Workflow> getWorkflows(@HeaderParam("sessionid")
-                                       String sessionId) throws NotConnectedException {
+                                       String sessionId) throws NotConnectedException, IOException {
         String userName = getUserName(sessionId);
         logger.info("Reading workflows as " + userName);
-        return fileStorage.getWorkflowStorage(userName).read();
+        return getFileStorageSupport().getWorkflowStorage(userName).readAll();
     }
 
     @Override
     public Workflow createWorkflow(@HeaderParam("sessionid")
-                                   String sessionId, Workflow workflow) throws NotConnectedException {
+                                   String sessionId, Workflow workflow) throws NotConnectedException, IOException {
         String userName = getUserName(sessionId);
         logger.info("Creating workflow as " + userName);
-        return fileStorage.getWorkflowStorage(userName).store(workflow);
+        return getFileStorageSupport().getWorkflowStorage(userName).store(workflow);
     }
 
     @Override
@@ -161,7 +159,7 @@ public class StudioRest implements StudioInterface {
                                    String workflowId, Workflow workflow) throws NotConnectedException, IOException {
         String userName = getUserName(sessionId);
         logger.info("Updating workflow " + workflowId + " as " + userName);
-        return fileStorage.getWorkflowStorage(userName).update(workflowId, workflow);
+        return getFileStorageSupport().getWorkflowStorage(userName).update(workflowId, workflow);
     }
 
     @Override
@@ -170,81 +168,58 @@ public class StudioRest implements StudioInterface {
                                String workflowId) throws NotConnectedException, IOException {
         String userName = getUserName(sessionId);
         logger.info("Deleting workflow " + workflowId + " as " + userName);
-        fileStorage.getWorkflowStorage(userName).delete(workflowId);
+        getFileStorageSupport().getWorkflowStorage(userName).delete(workflowId);
     }
 
     @Override
     public List<Workflow> getTemplates(@HeaderParam("sessionid")
-                                       String sessionId) throws NotConnectedException {
-        return fileStorage.getTemplateStorage().read();
+                                       String sessionId) throws NotConnectedException, IOException {
+        return getFileStorageSupport().getTemplateStorage().readAll();
     }
 
     @Override
     public Workflow createTemplate(@HeaderParam("sessionid")
-                                   String sessionId, Workflow template) throws NotConnectedException {
-        return fileStorage.getTemplateStorage().store(template);
+                                   String sessionId, Workflow template) throws NotConnectedException, IOException {
+        return getFileStorageSupport().getTemplateStorage().store(template);
     }
 
     @Override
     public Workflow updateTemplate(@HeaderParam("sessionid")
                                    String sessionId, @PathParam("id")
                                    String templateId, Workflow template) throws NotConnectedException, IOException {
-        return fileStorage.getTemplateStorage().update(templateId, template);
+        return getFileStorageSupport().getTemplateStorage().update(templateId, template);
     }
 
     @Override
     public void deleteTemplate(@HeaderParam("sessionid")
                                String sessionId, @PathParam("id")
                                String templateId) throws NotConnectedException, IOException {
-        fileStorage.getTemplateStorage().delete(templateId);
+        getFileStorageSupport().getTemplateStorage().delete(templateId);
     }
 
     @Override
-    public ArrayList<Script> getScripts(@HeaderParam("sessionid")
-                                        String sessionId) throws NotConnectedException {
+    public List<Script> getScripts(@HeaderParam("sessionid")
+                                   String sessionId) throws NotConnectedException, IOException {
         String userName = getUserName(sessionId);
-        File scriptDir = new File(fileStorage.getUserWorkflowsDir() + "/" + userName +
-                "/scripts");
-
-        if (!scriptDir.exists()) {
-            logger.info("Creating dir " + scriptDir.getAbsolutePath());
-            scriptDir.mkdirs();
-        }
-
-        ArrayList<Script> scripts = new ArrayList<Script>();
-        for (File f : scriptDir.listFiles()) {
-
-            Script script = new Script();
-
-            script.setName(f.getName());
-            script.setAbsolutePath(f.getAbsolutePath());
-            script.setContent(FileUtil.getFileContent(f.getAbsolutePath()));
-            scripts.add(script);
-        }
-
-        logger.info(scripts.size() + " scripts found");
-        return scripts;
+        return getFileStorageSupport().getScriptStorage(userName).readAll();
     }
 
     @Override
     public String createScript(@HeaderParam("sessionid")
                                String sessionId, @FormParam("name")
                                String name, @FormParam("content")
-                               String content) throws NotConnectedException {
+                               String content) throws NotConnectedException, IOException {
         String userName = getUserName(sessionId);
-        logger.info("Creating script " + name + " as " + userName);
-        File scriptDir = new File(fileStorage.getUserWorkflowsDir() + "/" + userName +
-                "/scripts");
-        String fileName = scriptDir.getAbsolutePath() + "/" + name;
-        FileUtil.writeFileContent(fileName, content);
-        return fileName;
+        FileStorage<Script> scriptStorage = getFileStorageSupport().getScriptStorage(userName);
+        Script storedScript = scriptStorage.store(new Script(name, content));
+        return storedScript.getAbsolutePath();
     }
 
     @Override
     public String updateScript(@HeaderParam("sessionid")
                                String sessionId, @PathParam("name")
                                String name, @FormParam("content")
-                               String content) throws NotConnectedException {
+                               String content) throws NotConnectedException, IOException {
 
         return createScript(sessionId, name, content);
     }
@@ -253,8 +228,7 @@ public class StudioRest implements StudioInterface {
     public ArrayList<String> getClasses(@HeaderParam("sessionid")
                                         String sessionId) throws NotConnectedException {
         String userName = getUserName(sessionId);
-        File classesDir = new File(fileStorage.getUserWorkflowsDir() + "/" + userName +
-                "/classes");
+        File classesDir = new File(getFileStorageSupport().getWorkflowsDir(userName), "classes");
 
         ArrayList<String> classes = new ArrayList<String>();
         if (classesDir.exists()) {
@@ -292,8 +266,7 @@ public class StudioRest implements StudioInterface {
                               String sessionId, MultipartFormDataInput input) throws NotConnectedException, IOException {
 
         String userName = getUserName(sessionId);
-        File classesDir = new File(fileStorage.getUserWorkflowsDir() + "/" + userName +
-                "/classes");
+        File classesDir = new File(getFileStorageSupport().getWorkflowsDir(userName), "classes");
 
         if (!classesDir.exists()) {
             logger.info("Creating dir " + classesDir.getAbsolutePath());
@@ -343,10 +316,10 @@ public class StudioRest implements StudioInterface {
     @Override
     public String getVisualization(@HeaderParam("sessionid")
                                    String sessionId, @PathParam("id")
-                                   String jobId) throws NotConnectedException {
+                                   String jobId) throws NotConnectedException, IOException {
         File visualizationFile = new File(PortalConfiguration.jobIdToPath(jobId) + ".html");
         if (visualizationFile.exists()) {
-            return FileUtil.getFileContent(visualizationFile.getAbsolutePath());
+            return FileUtils.readFileToString(new File(visualizationFile.getAbsolutePath()));
         }
         return "";
     }
@@ -355,12 +328,12 @@ public class StudioRest implements StudioInterface {
     public boolean updateVisualization(@HeaderParam("sessionid")
                                        String sessionId, @PathParam("id")
                                        String jobId, @FormParam("visualization")
-                                       String visualization) throws NotConnectedException {
+                                       String visualization) throws NotConnectedException, IOException {
         File visualizationFile = new File(PortalConfiguration.jobIdToPath(jobId) + ".html");
         if (visualizationFile.exists()) {
             visualizationFile.delete();
         }
-        FileUtil.writeFileContent(visualizationFile.getAbsolutePath(), visualization);
+        FileUtils.write(new File(visualizationFile.getAbsolutePath()), visualization);
         return true;
     }
 }
