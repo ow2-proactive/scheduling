@@ -36,7 +36,7 @@
  */
 package functionaltests.selectionscript;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 import java.net.URL;
@@ -154,19 +154,19 @@ public class SelectionWithSeveralScriptsTest2 extends RMConsecutive {
         //wait node selection
         PAFuture.waitFor(nodes);
 
-        assertTrue(nodes.size() == 1);
-        Assert.assertEquals(node2URL, nodes.get(0).getNodeInformation().getURL());
+        assertEquals(1, nodes.size());
+        assertEquals(node2URL, nodes.get(0).getNodeInformation().getURL());
 
         //wait for node busy event
         RMNodeEvent evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node2URL);
-        Assert.assertEquals(evt.getNodeState(), NodeState.BUSY);
-        assertTrue(resourceManager.getState().getFreeNodesNumber() == 1);
+        assertEquals(NodeState.BUSY, evt.getNodeState());
+        assertEquals(1, resourceManager.getState().getFreeNodesNumber());
 
         resourceManager.releaseNodes(nodes);
         //wait for node free event
         evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node2URL);
-        Assert.assertEquals(evt.getNodeState(), NodeState.FREE);
+        assertEquals(NodeState.FREE, evt.getNodeState());
 
-        assertTrue(resourceManager.getState().getFreeNodesNumber() == 2);
+        assertEquals(2, resourceManager.getState().getFreeNodesNumber());
     }
 }

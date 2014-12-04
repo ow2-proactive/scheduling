@@ -54,7 +54,7 @@ import functionaltests.RMConsecutive;
 import functionaltests.RMTHelper;
 import org.junit.Assert;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 
 /**
@@ -174,21 +174,21 @@ public class SelectionWithSeveralScriptsTest extends RMConsecutive {
         //wait node selection
         PAFuture.waitFor(nodes);
 
-        assertTrue(nodes.size() == 1);
-        assertTrue(nodes.get(0).getNodeInformation().getURL().equals(node1URL));
+        assertEquals(1, nodes.size());
+        assertEquals(node1URL, nodes.get(0).getNodeInformation().getURL());
 
         //wait for node busy event
         RMNodeEvent evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node1URL);
-        Assert.assertEquals(evt.getNodeState(), NodeState.BUSY);
+        assertEquals( NodeState.BUSY, evt.getNodeState());
 
-        assertTrue(resourceManager.getState().getFreeNodesNumber() == 2);
+        assertEquals(2, resourceManager.getState().getFreeNodesNumber());
 
         resourceManager.releaseNodes(nodes);
         //wait for node free event
         evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node1URL);
-        Assert.assertEquals(evt.getNodeState(), NodeState.FREE);
+        assertEquals(NodeState.FREE, evt.getNodeState());
 
-        assertTrue(resourceManager.getState().getFreeNodesNumber() == 3);
+        assertEquals(3, resourceManager.getState().getFreeNodesNumber());
 
         RMTHelper.log("Test 2");
 
@@ -197,7 +197,7 @@ public class SelectionWithSeveralScriptsTest extends RMConsecutive {
         //wait node selection
         PAFuture.waitFor(nodes);
 
-        assertTrue(nodes.size() == 0);
-        assertTrue(resourceManager.getState().getFreeNodesNumber() == 3);
+        assertEquals(0, nodes.size());
+        assertEquals(3, resourceManager.getState().getFreeNodesNumber());
     }
 }

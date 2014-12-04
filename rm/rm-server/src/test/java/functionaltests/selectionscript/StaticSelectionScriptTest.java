@@ -36,6 +36,8 @@
  */
 package functionaltests.selectionscript;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.File;
 import java.net.URL;
 import java.util.HashMap;
@@ -51,10 +53,6 @@ import org.junit.Assert;
 
 import functionaltests.RMConsecutive;
 import functionaltests.RMTHelper;
-
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.*;
-
 
 /**
  *
@@ -125,19 +123,19 @@ public class StaticSelectionScriptTest extends RMConsecutive {
         //wait node selection
         PAFuture.waitFor(nodes);
 
-        assertTrue(nodes.size() == 1);
-        assertTrue(resourceManager.getState().getFreeNodesNumber() == nodeNumber);
-        assertTrue(nodes.get(0).getNodeInformation().getURL().equals(node1URL));
+        assertEquals(1, nodes.size());
+        assertEquals(nodeNumber, resourceManager.getState().getFreeNodesNumber());
+        assertEquals(node1URL, nodes.get(0).getNodeInformation().getURL());
 
         //wait for node busy event
         RMNodeEvent evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node1URL);
-        Assert.assertEquals(evt.getNodeState(), NodeState.BUSY);
+        assertEquals(NodeState.BUSY, evt.getNodeState());
 
         resourceManager.releaseNode(nodes.get(0));
 
         //wait for node free event
         evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node1URL);
-        Assert.assertEquals(evt.getNodeState(), NodeState.FREE);
+        assertEquals(NodeState.FREE, evt.getNodeState());
 
         RMTHelper.log("Test 2");
 
@@ -146,19 +144,19 @@ public class StaticSelectionScriptTest extends RMConsecutive {
         //wait node selection
         PAFuture.waitFor(nodes);
 
-        assertTrue(nodes.size() == 1);
-        assertTrue(resourceManager.getState().getFreeNodesNumber() == nodeNumber);
-        assertTrue(nodes.get(0).getNodeInformation().getURL().equals(node1URL));
+        assertEquals(1, nodes.size());
+        assertEquals(nodeNumber, resourceManager.getState().getFreeNodesNumber());
+        assertEquals(node1URL, nodes.get(0).getNodeInformation().getURL());
 
         //wait for node busy event
         evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node1URL);
-        Assert.assertEquals(evt.getNodeState(), NodeState.BUSY);
+        assertEquals(NodeState.BUSY, evt.getNodeState());
 
         resourceManager.releaseNode(nodes.get(0));
 
         //wait for node free event
         evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node1URL);
-        Assert.assertEquals(evt.getNodeState(), NodeState.FREE);
+        assertEquals(NodeState.FREE, evt.getNodeState());
 
         RMTHelper.log("Test 3");
 
@@ -176,22 +174,22 @@ public class StaticSelectionScriptTest extends RMConsecutive {
         //wait node selection
         PAFuture.waitFor(nodes);
 
-        assertTrue(nodes.size() == 2);
-        assertTrue(resourceManager.getState().getFreeNodesNumber() == nodeNumber);
+        assertEquals(2, nodes.size());
+        assertEquals(nodeNumber, resourceManager.getState().getFreeNodesNumber());
 
         //wait for node busy event
         evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node1URL);
-        Assert.assertEquals(evt.getNodeState(), NodeState.BUSY);
+        assertEquals(NodeState.BUSY, evt.getNodeState());
         evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node2URL);
-        Assert.assertEquals(evt.getNodeState(), NodeState.BUSY);
+        assertEquals(NodeState.BUSY, evt.getNodeState());
 
         resourceManager.releaseNodes(nodes);
 
         //wait for nodes free event
         evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node1URL);
-        Assert.assertEquals(evt.getNodeState(), NodeState.FREE);
+        assertEquals(NodeState.FREE, evt.getNodeState());
         evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node2URL);
-        Assert.assertEquals(evt.getNodeState(), NodeState.FREE);
+        Assert.assertEquals(NodeState.FREE, evt.getNodeState());
 
         RMTHelper.log("Test 4");
 
@@ -207,8 +205,8 @@ public class StaticSelectionScriptTest extends RMConsecutive {
         //wait node selection
         PAFuture.waitFor(nodes);
 
-        assertTrue(nodes.size() == 0);
-        assertTrue(resourceManager.getState().getFreeNodesNumber() == nodeNumber);
+        assertEquals(0, nodes.size());
+        assertEquals(nodeNumber, resourceManager.getState().getFreeNodesNumber());
 
         RMTHelper.log("Test 5");
 
@@ -221,8 +219,8 @@ public class StaticSelectionScriptTest extends RMConsecutive {
         //wait node selection
         PAFuture.waitFor(nodes);
 
-        assertTrue(nodes.size() == 0);
-        assertTrue(resourceManager.getState().getFreeNodesNumber() == nodeNumber);
+        assertEquals(0, nodes.size());
+        assertEquals(nodeNumber, resourceManager.getState().getFreeNodesNumber());
 
         RMTHelper.log("Test 6");
 
@@ -235,7 +233,7 @@ public class StaticSelectionScriptTest extends RMConsecutive {
         //wait node selection
         PAFuture.waitFor(nodes);
 
-        assertTrue(nodes.size() == 0);
-        assertTrue(resourceManager.getState().getFreeNodesNumber() == nodeNumber);
+        assertEquals(0, nodes.size());
+        assertEquals(nodeNumber, resourceManager.getState().getFreeNodesNumber());
     }
 }

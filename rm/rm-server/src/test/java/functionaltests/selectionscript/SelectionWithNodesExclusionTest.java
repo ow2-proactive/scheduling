@@ -55,7 +55,7 @@ import org.junit.Assert;
 import functionaltests.RMConsecutive;
 import functionaltests.RMTHelper;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 
 /**
@@ -108,20 +108,20 @@ public class SelectionWithNodesExclusionTest extends RMConsecutive {
         //wait for node selection
         PAFuture.waitFor(nodeSetWithNodeToExclude);
 
-        assertTrue(nodeSetWithNodeToExclude.size() == 1);
-        assertTrue(resourceManager.getState().getFreeNodesNumber() == initialNodesNumber - 1);
+        assertEquals(1, nodeSetWithNodeToExclude.size());
+        assertEquals( initialNodesNumber - 1, resourceManager.getState().getFreeNodesNumber());
 
         //wait for node busy event
         RMNodeEvent evt = helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        Assert.assertEquals(evt.getNodeState(), NodeState.BUSY);
+        assertEquals(NodeState.BUSY, evt.getNodeState());
 
         resourceManager.releaseNodes(nodeSetWithNodeToExclude);
 
         //wait for node free event
         evt = helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        Assert.assertEquals(evt.getNodeState(), NodeState.FREE);
+        Assert.assertEquals(NodeState.FREE, evt.getNodeState());
 
-        assertTrue(resourceManager.getState().getFreeNodesNumber() == initialNodesNumber);
+        assertEquals(initialNodesNumber, resourceManager.getState().getFreeNodesNumber());
 
         //get nodes with the previous node excluded
         NodeSet nodes = resourceManager.getAtMostNodes(initialNodesNumber, new ArrayList<SelectionScript>(),
@@ -136,19 +136,19 @@ public class SelectionWithNodesExclusionTest extends RMConsecutive {
         }
 
         // booked all nodes minus the node to exclude
-        assertTrue(nodes.size() == initialNodesNumber - 1);
+        assertEquals(initialNodesNumber - 1, nodes.size());
         //excluded node stays in free state
-        assertTrue(resourceManager.getState().getFreeNodesNumber() == 1);
+        assertEquals(1, resourceManager.getState().getFreeNodesNumber());
 
         resourceManager.releaseNodes(nodes);
 
         //wait for nodes freed event
         for (int i = 0; i < initialNodesNumber - 1; i++) {
             evt = helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-            Assert.assertEquals(evt.getNodeState(), NodeState.FREE);
+            assertEquals(NodeState.FREE, evt.getNodeState());
         }
 
-        assertTrue(resourceManager.getState().getFreeNodesNumber() == initialNodesNumber);
+        assertEquals(initialNodesNumber, resourceManager.getState().getFreeNodesNumber());
 
         RMTHelper.log("Test 2");
 
@@ -166,23 +166,23 @@ public class SelectionWithNodesExclusionTest extends RMConsecutive {
         //wait for nodes busy event
         for (int i = 0; i < initialNodesNumber - 1; i++) {
             evt = helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-            Assert.assertEquals(evt.getNodeState(), NodeState.BUSY);
+            assertEquals(NodeState.BUSY, evt.getNodeState());
         }
 
         // booked all nodes minus the node to exclude
-        assertTrue(nodes.size() == initialNodesNumber - 1);
+        assertEquals(initialNodesNumber - 1, nodes.size());
         //excluded node stays in free state
-        assertTrue(resourceManager.getState().getFreeNodesNumber() == 1);
+        assertEquals(1, resourceManager.getState().getFreeNodesNumber());
 
         resourceManager.releaseNodes(nodes);
 
         //wait for nodes freed event
         for (int i = 0; i < initialNodesNumber - 1; i++) {
             evt = helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-            Assert.assertEquals(evt.getNodeState(), NodeState.FREE);
+            assertEquals(NodeState.FREE, evt.getNodeState());
         }
 
-        assertTrue(resourceManager.getState().getFreeNodesNumber() == initialNodesNumber);
+        assertEquals(initialNodesNumber, resourceManager.getState().getFreeNodesNumber());
 
         RMTHelper.log("Test 3");
 
@@ -200,23 +200,23 @@ public class SelectionWithNodesExclusionTest extends RMConsecutive {
         //wait for nodes busy event
         for (int i = 0; i < initialNodesNumber - 1; i++) {
             evt = helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-            Assert.assertEquals(evt.getNodeState(), NodeState.BUSY);
+            assertEquals(evt.getNodeState(), NodeState.BUSY);
         }
 
         // booked all nodes minus the node to exclude
-        assertTrue(nodes.size() == initialNodesNumber - 1);
+        assertEquals(initialNodesNumber - 1, nodes.size());
         //excluded node stays in free state
-        assertTrue(resourceManager.getState().getFreeNodesNumber() == 1);
+        assertEquals(1, resourceManager.getState().getFreeNodesNumber());
 
         resourceManager.releaseNodes(nodes);
 
         //wait for node free event
         for (int i = 0; i < initialNodesNumber - 1; i++) {
             evt = helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-            Assert.assertEquals(evt.getNodeState(), NodeState.FREE);
+            assertEquals(NodeState.FREE, evt.getNodeState());
         }
 
-        assertTrue(resourceManager.getState().getFreeNodesNumber() == initialNodesNumber);
+        assertEquals(initialNodesNumber, resourceManager.getState().getFreeNodesNumber());
 
         RMTHelper.log("Test 4");
 
@@ -240,7 +240,7 @@ public class SelectionWithNodesExclusionTest extends RMConsecutive {
         helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
         //wait for nodes added events
-        assertTrue(resourceManager.getState().getFreeNodesNumber() == initialNodesNumber + 2);
+        assertEquals(initialNodesNumber + 2, resourceManager.getState().getFreeNodesNumber());
 
         //create the dynamic selection script object
         SelectionScript checkPropDynamicSScript = new SelectionScript(new File(vmPropSelectionScriptpath
@@ -259,22 +259,22 @@ public class SelectionWithNodesExclusionTest extends RMConsecutive {
 
         //wait for nodes busy event
         evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node2URL);
-        Assert.assertEquals(evt.getNodeState(), NodeState.BUSY);
+        assertEquals(NodeState.BUSY, evt.getNodeState());
 
         // booked all nodes minus the node to exclude
-        assertTrue(nodes.size() == 1);
+        assertEquals(1, nodes.size());
         //excluded node stays in free state
-        assertTrue(resourceManager.getState().getFreeNodesNumber() == initialNodesNumber + 1);
+        assertEquals(initialNodesNumber + 1, resourceManager.getState().getFreeNodesNumber());
 
         //unique node got is node2
-        assertTrue(nodes.get(0).getNodeInformation().getURL().equals(node2URL));
+        assertEquals(node2URL, nodes.get(0).getNodeInformation().getURL());
 
         resourceManager.releaseNodes(nodes);
         //wait for node free event
         evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node2URL);
-        Assert.assertEquals(evt.getNodeState(), NodeState.FREE);
+        assertEquals(NodeState.FREE, evt.getNodeState());
 
-        assertTrue(resourceManager.getState().getFreeNodesNumber() == initialNodesNumber + 2);
+        assertEquals(initialNodesNumber + 2, resourceManager.getState().getFreeNodesNumber());
 
         RMTHelper.log("Test 5");
 
@@ -296,35 +296,35 @@ public class SelectionWithNodesExclusionTest extends RMConsecutive {
 
         //wait for nodes busy event
         evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node1URL);
-        Assert.assertEquals(evt.getNodeState(), NodeState.BUSY);
+        assertEquals(NodeState.BUSY, evt.getNodeState());
 
         // booked all nodes minus the node to exclude
-        assertTrue(nodes.size() == 1);
+        assertEquals(1, nodes.size());
         //excluded node stays in free state
-        assertTrue(resourceManager.getState().getFreeNodesNumber() == initialNodesNumber + 1);
+        assertEquals(initialNodesNumber + 1, resourceManager.getState().getFreeNodesNumber());
 
         //unique node got is node2
-        assertTrue(nodes.get(0).getNodeInformation().getURL().equals(node1URL));
+        assertEquals(node1URL, nodes.get(0).getNodeInformation().getURL());
 
         resourceManager.releaseNodes(nodes);
 
         //wait for node free event
         evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node1URL);
-        Assert.assertEquals(evt.getNodeState(), NodeState.FREE);
+        assertEquals(NodeState.FREE, evt.getNodeState());
 
-        assertTrue(resourceManager.getState().getFreeNodesNumber() == initialNodesNumber + 2);
+        assertEquals(initialNodesNumber + 2, resourceManager.getState().getFreeNodesNumber());
 
         RMTHelper.log("Test 6");
 
         nodeSetWithNodeToExclude.add(node1ToExclude);
 
-        //get nodes with the previous node1 excluded        
+        //get nodes with the previous node1 excluded
         nodes = resourceManager.getAtMostNodes(initialNodesNumber, checkPropStaticSScript,
                 nodeSetWithNodeToExclude);
 
         //wait for node selection
         PAFuture.waitFor(nodes);
 
-        assertTrue(resourceManager.getState().getFreeNodesNumber() == initialNodesNumber + 2);
+        assertEquals(initialNodesNumber + 2, resourceManager.getState().getFreeNodesNumber());
     }
 }

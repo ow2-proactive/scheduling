@@ -52,7 +52,7 @@ import org.junit.Assert;
 import functionaltests.RMConsecutive;
 import functionaltests.RMTHelper;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 
@@ -128,18 +128,18 @@ public class DynamicSelectionScriptTest extends RMConsecutive {
         //wait node selection
         PAFuture.waitFor(nodes);
 
-        assertTrue(nodes.size() == 1);
-        assertTrue(resourceManager.getState().getFreeNodesNumber() == nsSize);
-        assertTrue(nodes.get(0).getNodeInformation().getURL().equals(node1URL));
+        assertEquals(1, nodes.size());
+        assertEquals(nsSize, resourceManager.getState().getFreeNodesNumber());
+        assertEquals(node1URL, nodes.get(0).getNodeInformation().getURL());
 
         RMNodeEvent evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node1URL);
-        Assert.assertEquals(evt.getNodeState(), NodeState.BUSY);
+        assertEquals(NodeState.BUSY, evt.getNodeState());
 
         resourceManager.releaseNode(nodes.get(0));
 
         //wait for node free event
         evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node1URL);
-        Assert.assertEquals(evt.getNodeState(), NodeState.FREE);
+        assertEquals(NodeState.FREE, evt.getNodeState());
 
         RMTHelper.log("Test 2");
 
@@ -148,19 +148,19 @@ public class DynamicSelectionScriptTest extends RMConsecutive {
         //wait node selection
         PAFuture.waitFor(nodes);
 
-        assertTrue(nodes.size() == 1);
-        assertTrue(resourceManager.getState().getFreeNodesNumber() == nsSize);
-        assertTrue(nodes.get(0).getNodeInformation().getURL().equals(node1URL));
+        assertEquals(1, nodes.size());
+        assertEquals(nsSize, resourceManager.getState().getFreeNodesNumber());
+        assertEquals(node1URL, nodes.get(0).getNodeInformation().getURL());
 
         //wait for node busy event
         evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node1URL);
-        Assert.assertEquals(evt.getNodeState(), NodeState.BUSY);
+        assertEquals(NodeState.BUSY, evt.getNodeState());
 
         resourceManager.releaseNode(nodes.get(0));
 
         //wait for node free event
         evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node1URL);
-        Assert.assertEquals(evt.getNodeState(), NodeState.FREE);
+        assertEquals(NodeState.FREE, evt.getNodeState());
 
         RMTHelper.log("Test 3");
 
@@ -179,22 +179,22 @@ public class DynamicSelectionScriptTest extends RMConsecutive {
         //wait node selection
         PAFuture.waitFor(nodes);
 
-        assertTrue(nodes.size() == 2);
-        assertTrue(resourceManager.getState().getFreeNodesNumber() == nsSize);
+        assertEquals(2, nodes.size());
+        assertEquals(nsSize, resourceManager.getState().getFreeNodesNumber());
 
         //wait for nodes busy event
         evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node1URL);
-        Assert.assertEquals(evt.getNodeState(), NodeState.BUSY);
+        assertEquals(NodeState.BUSY, evt.getNodeState());
         evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node2URL);
-        Assert.assertEquals(evt.getNodeState(), NodeState.BUSY);
+        assertEquals(NodeState.BUSY, evt.getNodeState());
 
         resourceManager.releaseNodes(nodes);
 
         //wait for node free event
         evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node1URL);
-        Assert.assertEquals(evt.getNodeState(), NodeState.FREE);
+        assertEquals(NodeState.FREE, evt.getNodeState());
         evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node2URL);
-        Assert.assertEquals(evt.getNodeState(), NodeState.FREE);
+        assertEquals(NodeState.FREE, evt.getNodeState());
 
         RMTHelper.log("Test 4");
 
@@ -210,8 +210,8 @@ public class DynamicSelectionScriptTest extends RMConsecutive {
         //wait node selection
         PAFuture.waitFor(nodes);
 
-        assertTrue(nodes.size() == 0);
-        assertTrue(resourceManager.getState().getFreeNodesNumber() == nsSize);
+        assertEquals(0, nodes.size());
+        assertEquals(nsSize, resourceManager.getState().getFreeNodesNumber());
 
         RMTHelper.log("Test 5");
 
@@ -224,8 +224,8 @@ public class DynamicSelectionScriptTest extends RMConsecutive {
         //wait node selection
         PAFuture.waitFor(nodes);
 
-        assertTrue(nodes.size() == 0);
-        assertTrue(resourceManager.getState().getFreeNodesNumber() == nsSize);
+        assertEquals(0, nodes.size());
+        assertEquals(nsSize, resourceManager.getState().getFreeNodesNumber());
 
         RMTHelper.log("Test 6");
 
@@ -238,8 +238,8 @@ public class DynamicSelectionScriptTest extends RMConsecutive {
         //wait node selection
         PAFuture.waitFor(nodes);
 
-        assertTrue(nodes.size() == 0);
-        assertTrue(resourceManager.getState().getFreeNodesNumber() == nsSize);
+        assertEquals(0, nodes.size());
+        assertEquals(nsSize, resourceManager.getState().getFreeNodesNumber());
 
         RMTHelper.log("Test 7");
 
@@ -258,7 +258,7 @@ public class DynamicSelectionScriptTest extends RMConsecutive {
             new String[] { FILE_NAME }, true);
         System.out.println("The dynamic script checking is file exists must fail " + FILE_NAME);
         nodes = resourceManager.getAtMostNodes(1, fileCheck);
-        Assert.assertEquals(0, nodes.size());
+        assertEquals(0, nodes.size());
         System.out.println("Correct");
 
         System.out.println("Creating the file " + FILE_NAME);
@@ -266,14 +266,14 @@ public class DynamicSelectionScriptTest extends RMConsecutive {
 
         System.out.println("The dynamic script checking is file exists must not be executed " + FILE_NAME);
         nodes = resourceManager.getAtMostNodes(1, fileCheck);
-        Assert.assertEquals(0, nodes.size());
+        assertEquals(0, nodes.size());
         System.out.println("Correct");
 
         Thread.sleep(10000);
 
         System.out.println("The dynamic script checking is file exists must pass " + FILE_NAME);
         nodes = resourceManager.getAtMostNodes(1, fileCheck);
-        Assert.assertEquals(1, nodes.size());
+        assertEquals(1, nodes.size());
         System.out.println("Correct");
 
         new File(FILE_NAME).delete();
