@@ -39,6 +39,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
@@ -145,10 +147,11 @@ public class PAPropertiesLazyLoader {
      */
     public static void updateWithSystemProperties(Properties properties) {
         if (properties != null) {
-            for (Object o : System.getProperties().keySet()) {
-                String s = System.getProperty((String) o);
-                if (s != null) {
-                    properties.setProperty((String) o, s);
+            Iterator<Map.Entry<Object, Object>> iterator = System.getProperties().entrySet().iterator();
+            while (iterator.hasNext()) { // iterator needed to avoid concurrent modification exception
+                Map.Entry<Object, Object> property = iterator.next();
+                if (property.getValue() != null) {
+                    properties.setProperty(property.getKey().toString(), property.getValue().toString());
                 }
             }
         }
