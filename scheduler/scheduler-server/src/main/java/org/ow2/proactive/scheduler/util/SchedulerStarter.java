@@ -100,11 +100,13 @@ import static org.ow2.proactive.utils.ClasspathUtils.findSchedulerHome;
  * @since ProActive Scheduling 0.9
  */
 public class SchedulerStarter {
-    //shows how to run the scheduler
     private static Logger logger = Logger.getLogger(SchedulerStarter.class);
 
-    public static final int DEFAULT_NODES_NUMBER = 4;
-    public static final int DEFAULT_NODES_TIMEOUT = 30 * 1000;
+    private static final int DEFAULT_NODES_NUMBER = 4;
+    private static final int DEFAULT_NODES_TIMEOUT = 30 * 1000;
+    private static final int DISCOVERY_DEFAULT_PORT = 64739;
+
+    private static BroadcastDiscovery discoveryService;
 
     /**
      * Start the scheduler creation process.
@@ -145,7 +147,6 @@ public class SchedulerStarter {
             startRouter();
         }
 
-        String policyFullName = getPolicyFullName(commandLine);
         String rmUrl = getRmUrl(commandLine);
         setCleanDatabaseProperties(commandLine);
         setCleanNodesourcesProperty(commandLine);
@@ -156,7 +157,7 @@ public class SchedulerStarter {
             return;
         }
 
-        SchedulerAuthenticationInterface sai = startScheduler(policyFullName, rmUrl);
+        SchedulerAuthenticationInterface sai = startScheduler(commandLine, rmUrl);
 
         if (!commandLine.hasOption("no-rest")) {
             JettyStarter.runWars(rmUrl, sai.getHostURL());
@@ -209,12 +210,25 @@ public class SchedulerStarter {
             CentralPAPropertyRepository.PA_COMMUNICATION_ADDITIONAL_PROTOCOLS.getValue().contains("pamr");
     }
 
-    private static SchedulerAuthenticationInterface startScheduler(String policyFullName, String rmUrl)
+    private static SchedulerAuthenticationInterface startScheduler(CommandLine commandLine, String rmUrl)
             throws Exception {
+        String policyFullName = getPolicyFullName(commandLine);
         logger.info("Starting the scheduler...");
         SchedulerAuthenticationInterface sai = SchedulerFactory.startLocal(new URI(rmUrl), policyFullName);
+
+        startDiscovery(commandLine, rmUrl);
+
         logger.info("The scheduler created on " + sai.getHostURL());
         return sai;
+    }
+
+    private static void startDiscovery(CommandLine commandLine, String urlToDiscover) throws ParseException,
+            SocketException, UnknownHostException {
+        if (!commandLine.hasOption("no-discovery")) {
+            int discoveryPort = readIntOption(commandLine, "discovery-port", DISCOVERY_DEFAULT_PORT);
+            discoveryService = new BroadcastDiscovery(discoveryPort, urlToDiscover);
+            discoveryService.start();
+        }
     }
 
     private static String connectToOrStartResourceManager(CommandLine commandLine, String rmUrl)
@@ -284,6 +298,9 @@ public class SchedulerStarter {
             @Override
             public void run() {
                 logger.info("Shutting down...");
+                if (discoveryService != null) {
+                    discoveryService.stop();
+                }
             }
         }));
     }
@@ -291,7 +308,7 @@ public class SchedulerStarter {
     private static void displayHelp(Options options) {
         HelpFormatter hf = new HelpFormatter();
         hf.setWidth(120);
-        hf.printHelp("scheduler-start" + Tools.shellExtension(), options, true);
+        hf.printHelp("proactive-server" + Tools.shellExtension(), options, true);
     }
 
     private static Options getOptions() {
@@ -343,7 +360,14 @@ public class SchedulerStarter {
                 "do not deploy REST server and wars from dist/war (default: false)").create());
 
         options.addOption(OptionBuilder.withLongOpt("no-router").withDescription(
-                "do not deploy PAMR Router (default: false)").create());
+          "do not deploy PAMR Router (default: false)").create());
+
+        options.addOption(OptionBuilder.withLongOpt("no-discovery")
+                .withDescription("do not run discovery service for nodes (default: false)").create());
+        options.addOption(OptionBuilder
+                .withLongOpt("discovery-port")
+                .withDescription("discovery service port for nodes (default: " + DISCOVERY_DEFAULT_PORT + ")")
+                .hasArg().withArgName("port").create("dp"));
 
         return options;
     }

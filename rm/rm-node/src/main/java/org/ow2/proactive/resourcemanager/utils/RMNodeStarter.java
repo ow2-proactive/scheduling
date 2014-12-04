@@ -38,13 +38,11 @@ package org.ow2.proactive.resourcemanager.utils;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -58,8 +56,6 @@ import java.util.Properties;
 import java.util.Set;
 
 import javax.security.auth.login.LoginException;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
@@ -102,9 +98,6 @@ import org.apache.log4j.PatternLayout;
 import org.apache.log4j.PropertyConfigurator;
 import org.hyperic.sigar.Sigar;
 import org.hyperic.sigar.SigarLoader;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 import static org.ow2.proactive.utils.ClasspathUtils.findSchedulerHome;
 
@@ -193,6 +186,11 @@ public class RMNodeStarter {
     /** Name of the java property to set the node source name */
     protected final static String NODESOURCE_PROP_NAME = "proactive.node.nodesource";
 
+    private static int DISCOVERY_TIMEOUT_IN_MS = 3 * 1000;
+    private final static String DISCOVERY_TIMEOUT_IN_MS_NAME = "proactive.node.discovery.timeout";
+    private static int DISCOVERY_PORT = 64739;
+    private final static String DISCOVERY_PORT_NAME = "proactive.node.discovery.port";
+
     /** Name of the node property that stores the Sigar JMX connection URL*/
     public static final String JMX_URL = "proactive.node.jmx.sigar.";
 
@@ -210,17 +208,19 @@ public class RMNodeStarter {
     // Sigar JMX beans
     protected SigarExposer sigarExposer;
 
-    public static final char OPTION_CREDENTIAL_FILE = 'f';
-    public static final char OPTION_CREDENTIAL_ENV = 'e';
-    public static final char OPTION_CREDENTIAL_VAL = 'v';
-    public static final char OPTION_RM_URL = 'r';
-    public static final char OPTION_NODE_NAME = 'n';
-    public static final char OPTION_SOURCE_NAME = 's';
-    public static final char OPTION_WAIT_AND_JOIN_TIMEOUT = 'w';
-    public static final char OPTION_PING_DELAY = 'p';
-    public static final char OPTION_ADD_NODE_ATTEMPTS = 'a';
-    public static final char OPTION_ADD_NODE_ATTEMPTS_DELAY = 'd';
-    public static final char OPTION_HELP = 'h';
+    private static final char OPTION_CREDENTIAL_FILE = 'f';
+    private static final char OPTION_CREDENTIAL_ENV = 'e';
+    private static final char OPTION_CREDENTIAL_VAL = 'v';
+    private static final char OPTION_RM_URL = 'r';
+    private static final char OPTION_NODE_NAME = 'n';
+    private static final char OPTION_SOURCE_NAME = 's';
+    private static final char OPTION_WAIT_AND_JOIN_TIMEOUT = 'w';
+    private static final char OPTION_PING_DELAY = 'p';
+    private static final char OPTION_ADD_NODE_ATTEMPTS = 'a';
+    private static final char OPTION_ADD_NODE_ATTEMPTS_DELAY = 'd';
+    private static final String OPTION_DISCOVERY_PORT = "dp";
+    private static final String OPTION_DISCOVERY_TIMEOUT = "dt";
+    private static final char OPTION_HELP = 'h';
 
     public RMNodeStarter() {
     }
@@ -309,6 +309,20 @@ public class RMNodeStarter {
         addNodeAttemptsDelay.setRequired(false);
         addNodeAttemptsDelay.setArgName("millis");
         options.addOption(addNodeAttemptsDelay);
+        // The discovery port
+        final Option discoveryPort = new Option(OPTION_DISCOVERY_PORT,
+          "discoveryPort", true,
+          "port to use for RM discovery (default is " +
+            DISCOVERY_PORT + ")");
+        discoveryPort.setRequired(false);
+        options.addOption(discoveryPort);
+        // The discovery timeout
+        final Option discoveryTimeout = new Option(OPTION_DISCOVERY_TIMEOUT,
+          "discoveryTimeout", true,
+          "timeout to use for RM discovery (default is " +
+            DISCOVERY_TIMEOUT_IN_MS + "ms)");
+        discoveryTimeout.setRequired(false);
+        options.addOption(discoveryTimeout);
         // Displays the help
         final Option help = new Option(Character.toString(OPTION_HELP), "help", false, "to display this help");
         help.setRequired(false);
@@ -366,44 +380,60 @@ public class RMNodeStarter {
             System.setProperty(NODESOURCE_PROP_NAME, nodeSourceName);
         }
 
-        if (rmURL != null) {
-            ResourceManager rm = this.registerInRM(credentials, rmURL, nodeName);
+        if (rmURL == null) {
+            rmURL = tryBroadcastDiscoveryOrExit();
+        }
 
-            if (rm != null) {
-                logger.info("Connected to the resource manager at " + rmURL);
+        connectToResourceManager();
+    }
 
-                // NB_OF_ADD_NODE_ATTEMPTS is used here to disable pinging
-                if (PING_DELAY_IN_MS > 0 && NB_OF_ADD_NODE_ATTEMPTS > 0) {
+    private String tryBroadcastDiscoveryOrExit() {
+        try {
+            return new BroadcastDiscoveryClient(DISCOVERY_PORT).discover(DISCOVERY_TIMEOUT_IN_MS);
+        } catch (IOException e) {
+            logger.info("No URL to connect to was specified and discovery failed, please specify a URL with -r parameter.");
+            System.exit(ExitStatus.RM_NO_PING.exitCode);
+            return null;
+        }
+    }
 
-                    while (numberOfReconnectionAttemptsLeft >= 0) {
+    private void connectToResourceManager() {
+        ResourceManager rm = this.registerInRM(credentials, rmURL, nodeName);
+
+        if (rm != null) {
+            logger.info("Connected to the resource manager at " + rmURL);
+
+            // NB_OF_ADD_NODE_ATTEMPTS is used here to disable pinging
+            if (PING_DELAY_IN_MS > 0 && NB_OF_ADD_NODE_ATTEMPTS > 0) {
+
+                while (numberOfReconnectionAttemptsLeft >= 0) {
+                    try {
+                        pingNodeIndefinitely(rm);
+                    } catch (NotConnectedException e) {
+                        rm = reconnectToResourceManager();
+                    } catch (Throwable e) {
+                        logger.error(ExitStatus.RM_NO_PING.description, e);
+                    } finally {
                         try {
-                            pingNodeIndefinitely(rm);
-                        } catch (NotConnectedException e) {
-                            rm = reconnectToResourceManager();
-                        } catch (Throwable e) {
-                            logger.error(ExitStatus.RM_NO_PING.description, e);
-                        } finally {
-                            try {
-                                logger.warn("Disconnected from the resource manager");
-                                logger.warn("Node will try to reconnect in " + PING_DELAY_IN_MS + " ms");
-                                logger.warn("Number of attempts left " + numberOfReconnectionAttemptsLeft);
+                            logger.warn("Disconnected from the resource manager");
+                            logger.warn("Node will try to reconnect in " + PING_DELAY_IN_MS + " ms");
+                            logger.warn("Number of attempts left " + numberOfReconnectionAttemptsLeft);
 
-                                numberOfReconnectionAttemptsLeft--;
-                                Thread.sleep(PING_DELAY_IN_MS);
-                            } catch (InterruptedException ignored) {
-                            }
+                            numberOfReconnectionAttemptsLeft--;
+                            Thread.sleep(PING_DELAY_IN_MS);
+                        } catch (InterruptedException ignored) {
                         }
                     }
-
-                    // if we are here it means we lost the connection. just exit..
-                    logger.error(ExitStatus.RM_IS_SHUTDOWN.description);
-                    System.exit(ExitStatus.RM_IS_SHUTDOWN.exitCode);
                 }
-            } else {
-                // Force system exit to bypass daemon threads
-                logger.error(ExitStatus.RMNODE_EXIT_FORCED.description);
-                System.exit(ExitStatus.RMNODE_EXIT_FORCED.exitCode);
+
+                // if we are here it means we lost the connection. just exit..
+                logger.error(ExitStatus.RM_IS_SHUTDOWN.description);
+                System.exit(ExitStatus.RM_IS_SHUTDOWN.exitCode);
             }
+        } else {
+            // Force system exit to bypass daemon threads
+            logger.error(ExitStatus.RMNODE_EXIT_FORCED.description);
+            System.exit(ExitStatus.RMNODE_EXIT_FORCED.exitCode);
         }
     }
 
@@ -597,41 +627,39 @@ public class RMNodeStarter {
             }
 
             // if the user doesn't provide a rm URL, we don't care about the credentials
-            if (rmURL != null) {
-                // The path to the file that contains the credential
-                if (cl.hasOption(OPTION_CREDENTIAL_FILE)) {
-                    try {
-                        credentials = Credentials.getCredentials(cl.getOptionValue(OPTION_CREDENTIAL_FILE));
-                    } catch (KeyException ke) {
-                        logger.error(ExitStatus.CRED_UNREADABLE.description, ke);
-                        System.exit(ExitStatus.CRED_UNREADABLE.exitCode);
-                    }
-                    // The name of the env variable that contains
-                } else if (cl.hasOption(OPTION_CREDENTIAL_ENV)) {
-                    final String variableName = cl.getOptionValue(OPTION_CREDENTIAL_ENV);
-                    final String value = System.getenv(variableName);
-                    if (value == null) {
-                        logger.error(ExitStatus.CRED_ENVIRONMENT.description);
-                        System.exit(ExitStatus.CRED_ENVIRONMENT.exitCode);
-                    }
-                    try {
-                        credentials = Credentials.getCredentialsBase64(value.getBytes());
-                    } catch (KeyException ke) {
-                        logger.error(ExitStatus.CRED_DECODE.description, ke);
-                        System.exit(ExitStatus.CRED_DECODE.exitCode);
-                    }
-                    // Read the credentials directly from the command-line argument
-                } else if (cl.hasOption(OPTION_CREDENTIAL_VAL)) {
-                    final String str = cl.getOptionValue(OPTION_CREDENTIAL_VAL);
-                    try {
-                        credentials = Credentials.getCredentialsBase64(str.getBytes());
-                    } catch (KeyException ke) {
-                        logger.error(ExitStatus.CRED_DECODE.description, ke);
-                        System.exit(ExitStatus.CRED_DECODE.exitCode);
-                    }
-                } else {
-                    credentials = getDefaultCredentials();
+            // The path to the file that contains the credential
+            if (cl.hasOption(OPTION_CREDENTIAL_FILE)) {
+                try {
+                    credentials = Credentials.getCredentials(cl.getOptionValue(OPTION_CREDENTIAL_FILE));
+                } catch (KeyException ke) {
+                    logger.error(ExitStatus.CRED_UNREADABLE.description, ke);
+                    System.exit(ExitStatus.CRED_UNREADABLE.exitCode);
                 }
+                // The name of the env variable that contains
+            } else if (cl.hasOption(OPTION_CREDENTIAL_ENV)) {
+                final String variableName = cl.getOptionValue(OPTION_CREDENTIAL_ENV);
+                final String value = System.getenv(variableName);
+                if (value == null) {
+                    logger.error(ExitStatus.CRED_ENVIRONMENT.description);
+                    System.exit(ExitStatus.CRED_ENVIRONMENT.exitCode);
+                }
+                try {
+                    credentials = Credentials.getCredentialsBase64(value.getBytes());
+                } catch (KeyException ke) {
+                    logger.error(ExitStatus.CRED_DECODE.description, ke);
+                    System.exit(ExitStatus.CRED_DECODE.exitCode);
+                }
+                // Read the credentials directly from the command-line argument
+            } else if (cl.hasOption(OPTION_CREDENTIAL_VAL)) {
+                final String str = cl.getOptionValue(OPTION_CREDENTIAL_VAL);
+                try {
+                    credentials = Credentials.getCredentialsBase64(str.getBytes());
+                } catch (KeyException ke) {
+                    logger.error(ExitStatus.CRED_DECODE.description, ke);
+                    System.exit(ExitStatus.CRED_DECODE.exitCode);
+                }
+            } else {
+                credentials = getDefaultCredentials();
             }
 
             // Optional node name
@@ -667,6 +695,22 @@ public class RMNodeStarter {
                         .getOptionValue(OPTION_ADD_NODE_ATTEMPTS_DELAY));
                 RMNodeStarter.ADD_NODE_ATTEMPTS_DELAY_IN_MS_USER_SUPPLIED = true;
             }
+            
+            // Discovery
+            if (cl.hasOption(OPTION_DISCOVERY_PORT)) {
+                RMNodeStarter.DISCOVERY_PORT = Integer.valueOf(cl.getOptionValue(OPTION_DISCOVERY_PORT));
+            } else if (System.getProperty(DISCOVERY_PORT_NAME) != null) {
+                RMNodeStarter.DISCOVERY_PORT = Integer.valueOf(System.getProperty(DISCOVERY_PORT_NAME));
+            }
+
+            if (cl.hasOption(OPTION_DISCOVERY_TIMEOUT)) {
+                RMNodeStarter.DISCOVERY_TIMEOUT_IN_MS = Integer.valueOf(cl
+                        .getOptionValue(OPTION_DISCOVERY_TIMEOUT));
+            } else if (System.getProperty(DISCOVERY_TIMEOUT_IN_MS_NAME) != null) {
+                RMNodeStarter.DISCOVERY_PORT = Integer.valueOf(System
+                        .getProperty(DISCOVERY_TIMEOUT_IN_MS_NAME));
+            }
+
             // Optional help option
             if (cl.hasOption(OPTION_HELP)) {
                 printHelp = true;
@@ -1019,8 +1063,8 @@ public class RMNodeStarter {
         try {
             localNode = NodeFactory.createLocalNode(nodeName, false, null, null);
             if (localNode == null) {
-                logger.error(RMNodeStarter.ExitStatus.RMNODE_NULL.description);
-                System.exit(RMNodeStarter.ExitStatus.RMNODE_NULL.exitCode);
+                logger.error(ExitStatus.RMNODE_NULL.description);
+                System.exit(ExitStatus.RMNODE_NULL.exitCode);
             }
             // setting system properties to node (they will be accessible remotely)
             for (Object key : System.getProperties().keySet()) {
@@ -1028,7 +1072,7 @@ public class RMNodeStarter {
             }
         } catch (Throwable t) {
             logger.error("Unable to create the local node " + nodeName, t);
-            System.exit(RMNodeStarter.ExitStatus.RMNODE_ADD_ERROR.exitCode);
+            System.exit(ExitStatus.RMNODE_ADD_ERROR.exitCode);
         }
         return localNode;
     }
@@ -1274,43 +1318,6 @@ public class RMNodeStarter {
         }
 
         /**
-         * To set the PAproperties of the node. If a previsous call to
-         * {@link #setPaProperties(byte[])} or {@link #setPaProperties(File)} of {@link #setPaProperties(Map)} has already been made,
-         * this one will overide the previous call.
-         * @param ba the content of a valid ProActive xml configuration file.
-         */
-        public void setPaProperties(byte[] ba) {
-            this.paPropProperties = new Properties();
-            if (ba == null) {
-                return;
-            }
-            InputStream is = null;
-            try {
-                is = new ByteArrayInputStream(ba);
-                DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-                DocumentBuilder db = dbf.newDocumentBuilder();
-                Document doc = db.parse(is);
-                NodeList props = doc.getElementsByTagName("prop");
-                for (int i = 0; i < props.getLength(); i++) {
-                    Element prop = (Element) props.item(i);
-                    String key = prop.getAttribute("key");
-                    String value = prop.getAttribute("value");
-                    paPropProperties.put(key, value);
-                }
-            } catch (Exception e) {
-                throw new IllegalArgumentException("Cannot read ProActive configuration from supplied file.");
-            } finally {
-                try {
-                    if (is != null) {
-                        is.close();
-                    }
-                } catch (IOException e) {
-                    logger.warn(e);
-                }
-            }
-        }
-
-        /**
          * To retrieve the credentials file from a previous {@link #setCredentialsFileAndNullOthers(String)}. If no such call has already been made, will try to retrieve the credentials file path
          * from the PAProperties set thanks to the methods: {@link #setPaProperties(byte[])} or {@link #setPaProperties(File)} of {@link #setPaProperties(Map)}
          * @return The credentials file used to build the command line
@@ -1325,7 +1332,7 @@ public class RMNodeStarter {
                     if (paPropProperties != null && paPropProperties.getProperty(paRMKey) != null &&
                         !paPropProperties.getProperty(paRMKey).equals("")) {
                         logger.trace(paRMKey + " property retrieved from PA properties supplied by " +
-                            RMNodeStarter.CommandLineBuilder.class.getName());
+                            CommandLineBuilder.class.getName());
                         return paPropProperties.getProperty(paRMKey);
                     } else {
                         if (PAResourceManagerProperties.RM_CREDS.isSet()) {
@@ -1337,16 +1344,6 @@ public class RMNodeStarter {
                 }
             }
             return credentialsFile;
-        }
-
-        /**
-         * Sets the credentials file field to the supplied parameter and set
-         * the other field related to credentials setup to null;
-         */
-        public void setCredentialsFileAndNullOthers(String credentialsFile) {
-            this.credentialsFile = credentialsFile;
-            this.credentialsEnv = null;
-            this.credentialsValue = null;
         }
 
         /**
@@ -1565,7 +1562,7 @@ public class RMNodeStarter {
             try {
                 return buildCommandLine(false);
             } catch (IOException e) {
-                return RMNodeStarter.CommandLineBuilder.class.getName() + " with invalid configuration";
+                return CommandLineBuilder.class.getName() + " with invalid configuration";
             }
         }
     }
