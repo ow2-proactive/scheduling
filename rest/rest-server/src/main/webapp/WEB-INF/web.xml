@@ -22,19 +22,6 @@
         </param-value>
     </context-param>
 
-    <!-- JavaMelody monitoring, disabled by default (restricted access must be configured) -->
-    <!--<filter>-->
-        <!--<filter-name>monitoring</filter-name>-->
-        <!--<filter-class>net.bull.javamelody.MonitoringFilter</filter-class>-->
-    <!--</filter>-->
-    <!--<filter-mapping>-->
-        <!--<filter-name>monitoring</filter-name>-->
-        <!--<url-pattern>/*</url-pattern>-->
-    <!--</filter-mapping>-->
-    <!--<listener>-->
-        <!--<listener-class>net.bull.javamelody.SessionListener</listener-class>-->
-    <!--</listener>-->
-
     <listener>
         <listener-class>org.ow2.proactive_grid_cloud_portal.webapp.MyResteasyBootstrap</listener-class>
     </listener>

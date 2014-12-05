@@ -73,8 +73,6 @@ project(':rest:rest-server') {
         testCompile 'org.mockito:mockito-core:1.9.5'
         testCompile 'org.eclipse.jetty:test-jetty-servlet:8.1.15.v20140411'
 
-        runtime 'net.bull.javamelody:javamelody-core:1.46.0'
-
         runtime 'org.eclipse.jetty.aggregate:jetty-websocket:8.1.15.v20140411'
         runtime 'org.eclipse.jetty.aggregate:jetty-webapp:8.1.15.v20140411'
         runtime 'javax.servlet:javax.servlet-api:3.0.1'
