@@ -104,6 +104,11 @@ public class JavaTaskLauncherForked extends JavaTaskLauncher {
     }
 
     @Override
+    protected boolean isForkedTask() {
+        return true;
+    }
+
+    @Override
     protected void initDataSpaces() {
         super.initDataSpaces();
 
@@ -127,13 +132,6 @@ public class JavaTaskLauncherForked extends JavaTaskLauncher {
 
         } catch (Throwable e) {
             logger.warn("Exception occurred while executing kill on task " + taskId.value(), e);
-        } finally {
-            // clean ths guard, this
-            try {
-                killChildrenProcesses();
-            } catch (Throwable t) {
-                logger.warn("Exception when killing children processes", t);
-            }
         }
 
         // clean ths guard, this will kill processes, close node configuration etc

@@ -128,6 +128,8 @@ public class JavaTaskLauncherForker extends JavaTaskLauncher implements ForkerSt
             decrypter.setCredentials(executableContainer.getCredentials());
             fjei.setDecrypter(decrypter);
 
+            fjei.setTaskId(taskId);
+
             /*
              * Initialize dataspaces since it can be used in envScript.
              * 
@@ -252,15 +254,6 @@ public class JavaTaskLauncherForker extends JavaTaskLauncher implements ForkerSt
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.task.TaskLauncher#unsetEnv()
-     */
-    @Override
-    protected void unsetEnv() {
-        //cancel default behavior defined in taskLauncher
-        //it is useless to unset environment in forked tasklauncher
-    }
-
-    /**
      * {@inheritDoc}
      * 
      * @throws IllegalProgressException if the userExecutable.getProgress() method throws an exception
@@ -269,6 +262,7 @@ public class JavaTaskLauncherForker extends JavaTaskLauncher implements ForkerSt
     @Override
     @ImmediateService
     public int getProgress() throws ProgressPingerException {
+        resetLogContextForImmediateService();
         return executableGuard.getProgress();
     }
 
@@ -279,6 +273,8 @@ public class JavaTaskLauncherForker extends JavaTaskLauncher implements ForkerSt
      */
     @ImmediateService
     public void callback(Node n) {
+        resetLogContextForImmediateService();
+        logger.debug("Callback from node " + n.getNodeInformation().getURL());
         ((ForkerStarterCallback) executableGuard.use()).callback(n);
     }
 

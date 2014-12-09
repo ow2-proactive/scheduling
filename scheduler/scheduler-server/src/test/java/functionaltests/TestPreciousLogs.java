@@ -80,7 +80,6 @@ public class TestPreciousLogs extends SchedulerConsecutive {
 
         @Override
         public Serializable execute(TaskResult... results) throws Throwable {
-            System.out.println(TASK_OUTPUT);
             return TASK_OUTPUT;
         }
 
@@ -195,7 +194,7 @@ public class TestPreciousLogs extends SchedulerConsecutive {
             testPreciousLogs(false, false);
         }
 
-        System.out.println("Test java task");
+        System.out.println("Test script task");
         testPreciousLogs(true, false);
 
         System.out.println("Test forked java task");

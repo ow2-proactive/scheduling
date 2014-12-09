@@ -55,11 +55,10 @@ import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
-import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 import org.ow2.proactive.resourcemanager.rmnode.RMDeployingNode;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
-import org.ow2.proactive.resourcemanager.utils.RMNodeStarter;
-import org.ow2.proactive.resourcemanager.utils.RMNodeStarter.OperatingSystem;
+import org.ow2.proactive.resourcemanager.utils.CommandLineBuilder;
+import org.ow2.proactive.resourcemanager.utils.OperatingSystem;
 import org.apache.log4j.Logger;
 
 
@@ -331,7 +330,7 @@ public abstract class InfrastructureManager implements Serializable {
     //**********************************************************************************************\\
 
     /**
-     * This method returns a {@link RMNodeStarter.CommandLineBuilder} filled in with "default" settings.
+     * This method returns a {@link org.ow2.proactive.resourcemanager.utils.CommandLineBuilder} filled in with "default" settings.
      * That means that the returned CommandLineBuilder is useable as such.
      * <ul><li>
      * It tries to set the Java Path to use, either JAVA_HOME retrieved from your environment or java.home
@@ -345,8 +344,8 @@ public abstract class InfrastructureManager implements Serializable {
      * </li></ul>
      * @param targetOS the operating system on which one the node will be deployed
      */
-    protected final RMNodeStarter.CommandLineBuilder getDefaultCommandLineBuilder(OperatingSystem targetOS) {
-        RMNodeStarter.CommandLineBuilder result = new RMNodeStarter.CommandLineBuilder();
+    protected final CommandLineBuilder getDefaultCommandLineBuilder(OperatingSystem targetOS) {
+        CommandLineBuilder result = new CommandLineBuilder();
         String javaPath = (System.getenv("JAVA_HOME") != null ? System.getenv("JAVA_HOME") : System
                 .getProperty("java.home")) +
             targetOS.fs + "bin" + targetOS.fs + "java";
@@ -359,7 +358,7 @@ public abstract class InfrastructureManager implements Serializable {
                                 .getValue()));
             } catch (IOException e) {
                 logger.debug("Cannot set default pa configuration file for " +
-                    RMNodeStarter.CommandLineBuilder.class.getSimpleName(), e);
+                    CommandLineBuilder.class.getSimpleName(), e);
             }
         }
         result.setRmURL(this.rmUrl);
@@ -372,11 +371,11 @@ public abstract class InfrastructureManager implements Serializable {
     }
 
     /**
-     * Returns an empty {@link RMNodeStarter.CommandLineBuilder}
-     * @return Returns an empty {@link RMNodeStarter.CommandLineBuilder}
+     * Returns an empty {@link org.ow2.proactive.resourcemanager.utils.CommandLineBuilder}
+     * @return Returns an empty {@link org.ow2.proactive.resourcemanager.utils.CommandLineBuilder}
      */
-    protected final RMNodeStarter.CommandLineBuilder getEmptyCommandLineBuilder() {
-        return new RMNodeStarter.CommandLineBuilder();
+    protected final CommandLineBuilder getEmptyCommandLineBuilder() {
+        return new CommandLineBuilder();
     }
 
     /** Creates a new RMDeployingNode's, stores it in a local ArrayList and notify the

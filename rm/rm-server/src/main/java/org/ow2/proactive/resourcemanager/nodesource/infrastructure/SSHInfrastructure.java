@@ -41,7 +41,6 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.security.KeyException;
 
-import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.ssh.SSHClient;
@@ -50,10 +49,11 @@ import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
+import org.ow2.proactive.resourcemanager.utils.CommandLineBuilder;
+import org.ow2.proactive.resourcemanager.utils.OperatingSystem;
 import org.ow2.proactive.resourcemanager.utils.RMNodeStarter;
-import org.ow2.proactive.resourcemanager.utils.RMNodeStarter.CommandLineBuilder;
-import org.ow2.proactive.resourcemanager.utils.RMNodeStarter.OperatingSystem;
 import org.ow2.proactive.utils.Formatter;
+import org.apache.log4j.Logger;
 
 
 /**

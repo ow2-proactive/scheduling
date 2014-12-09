@@ -36,7 +36,11 @@
  */
 package org.ow2.proactive.resourcemanager.rmnode;
 
-import org.apache.log4j.Logger;
+import java.io.IOException;
+import java.io.Serializable;
+import java.security.Permission;
+import java.util.HashMap;
+
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
@@ -49,12 +53,12 @@ import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeDescriptor;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
-import org.ow2.proactive.scripting.*;
-
-import java.io.IOException;
-import java.io.Serializable;
-import java.security.Permission;
-import java.util.HashMap;
+import org.ow2.proactive.scripting.Script;
+import org.ow2.proactive.scripting.ScriptHandler;
+import org.ow2.proactive.scripting.ScriptLoader;
+import org.ow2.proactive.scripting.ScriptResult;
+import org.ow2.proactive.scripting.SelectionScript;
+import org.apache.log4j.Logger;
 
 
 /**

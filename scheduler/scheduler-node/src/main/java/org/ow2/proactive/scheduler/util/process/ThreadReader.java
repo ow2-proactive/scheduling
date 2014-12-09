@@ -36,11 +36,11 @@
  */
 package org.ow2.proactive.scheduler.util.process;
 
-import org.ow2.proactive.scheduler.common.task.executable.Executable;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintStream;
+
+import org.ow2.proactive.scheduler.common.task.executable.Executable;
 
 
 /** Pipe between two streams */
@@ -84,20 +84,11 @@ public class ThreadReader implements Runnable {
 
         while (readerThread.isAlive() && !executable.isKilled()) {
             try {
-                Thread.sleep(1000);
+                readerThread.join(1000);
             } catch (InterruptedException e) {
                 break;
             }
         }
 
-        //        String str = null;
-        //
-        //        try {
-        //            while ((str = in.readLine()) != null && !executable.isKilled()) {
-        //                out.println(str);
-        //            }
-        //        } catch (IOException e) {
-        //            e.printStackTrace();
-        //        }
     }
 }

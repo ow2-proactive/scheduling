@@ -36,6 +36,7 @@
  */
 package org.ow2.proactive.scripting;
 
+import java.io.PrintStream;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -66,11 +67,13 @@ public class ScriptHandler implements Serializable {
     /**
      * Execute a script
      * @param script a script to execute
+     * @param outputSink the output stream for the script
+     * @param errorSink the error stream for the script
      * @return a ScriptResult object containing the result.
      */
-    public <T> ScriptResult<T> handle(Script<T> script) {
+    public <T> ScriptResult<T> handle(Script<T> script, PrintStream outputSink, PrintStream errorSink) {
         try {
-            return script.execute(additionalBindings);
+            return script.execute(additionalBindings, outputSink, errorSink);
         } catch (Throwable t) {
             ScriptException se = new ScriptException("An exception occurred while executing the script " +
                 script.getClass().getSimpleName() +
@@ -79,6 +82,15 @@ public class ScriptHandler implements Serializable {
 
             return new ScriptResult<T>(se);
         }
+    }
+
+    /**
+     * Execute a script using {@link System.out} as the output.
+     * @param script a script to execute
+     * @return a ScriptResult object containing the result.
+     */
+    public <T> ScriptResult<T> handle(Script<T> script) {
+        return script.execute(additionalBindings, System.out, System.err);
     }
 
     /**
@@ -92,13 +104,5 @@ public class ScriptHandler implements Serializable {
             additionalBindings = new HashMap<String, Object>();
         }
         additionalBindings.put(name, value);
-    }
-
-    /**
-     * no implemented
-     */
-    public void destroy() {
-
-        //TODO gsigety probably something to do, like stop execution of the script ?
     }
 }

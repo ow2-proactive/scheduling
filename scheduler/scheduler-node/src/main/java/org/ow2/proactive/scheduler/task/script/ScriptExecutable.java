@@ -36,6 +36,7 @@
  */
 package org.ow2.proactive.scheduler.task.script;
 
+import java.io.PrintStream;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -70,6 +71,8 @@ public class ScriptExecutable extends JavaExecutable {
     private final AtomicInteger progress = new AtomicInteger(0);
 
     private Decrypter decrypter = null;
+    private PrintStream outputSink;
+    private PrintStream errorSink;
 
     /**
      * Initialize the executable using the given executable Initializer.
@@ -82,6 +85,8 @@ public class ScriptExecutable extends JavaExecutable {
     protected void internalInit(JavaExecutableInitializerImpl execInitializer) throws Exception {
         super.internalInit(execInitializer);
         this.decrypter = execInitializer.getDecrypter();
+        this.outputSink = execInitializer.getOutputSink();
+        this.errorSink = execInitializer.getErrorSink();
     }
 
     @Override
@@ -110,7 +115,7 @@ public class ScriptExecutable extends JavaExecutable {
         String resolvedScript = VariablesUtil.filterAndUpdate(oldScript, variables);
         script.setScript(resolvedScript);
 
-        ScriptResult<Serializable> scriptResult = handler.handle(script);
+        ScriptResult<Serializable> scriptResult = handler.handle(script, this.outputSink, this.errorSink);
 
         if (scriptResult.errorOccured()) {
             scriptResult.getException().printStackTrace();

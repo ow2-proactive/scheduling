@@ -84,7 +84,7 @@ import org.objectweb.proactive.extensions.dataspaces.vfs.selector.fast.FastSelec
 import org.objectweb.proactive.utils.NamedThreadFactory;
 import org.objectweb.proactive.utils.StackTraceUtil;
 import org.ow2.proactive.db.types.BigString;
-import org.ow2.proactive.rm.util.process.EnvironmentCookieBasedChildProcessKiller;
+import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.exception.UserException;
@@ -147,13 +147,8 @@ public abstract class TaskLauncher implements InitActive {
     //Scratch dir property : we cannot take the key property from DataSpaceNodeConfigurationAgent class in RM.
     //we should not depend from RM package in this class.
     public static final String NODE_DATASPACE_SCRATCHDIR = "node.dataspace.scratchdir";
-    public static final String IS_FORKED = "is.forked";
 
     public static final long CLEAN_TIMEOUT = 21 * 1000; // timeout used to control max time for the cleaning operation
-
-    // Standard out/err are stored to be restored after execution
-    public static final PrintStream SYSTEM_OUT = System.out;
-    public static final PrintStream SYSTEM_ERR = System.err;
 
     private boolean dataspaceInitialized = false;
 
@@ -220,8 +215,8 @@ public abstract class TaskLauncher implements InitActive {
     protected int iterationIndex = 0;
 
     // handle streams
-    protected transient PrintStream redirectedStdout;
-    protected transient PrintStream redirectedStderr;
+    protected transient PrintStream outputSink;
+    protected transient PrintStream errorSink;
 
     // default appender for log storage
     protected transient AsyncAppenderWithStorage logAppender;
@@ -314,14 +309,11 @@ public abstract class TaskLauncher implements InitActive {
         return output;
     }
 
-    /**
-     * Initialization
-     */
     private void init() {
-        // plug stdout/err into a socketAppender
-        this.initLoggers();
-        // set the cookie used to mark children processes
-        this.setEnvironmentCookie();
+        if (!isForkedTask()) {
+            // plug stdout/err into a socketAppender
+            this.initLoggers();
+        }
         // set scheduler defined env variables
         this.initEnv();
 
@@ -336,7 +328,7 @@ public abstract class TaskLauncher implements InitActive {
             taskLauncherBody = PAActiveObject.getBodyOnThis();
             executableGuard.setNode(node);
         } catch (Exception e) {
-            throw new IllegalStateException("Could not retrieve ProActive Node");
+            throw new IllegalStateException("Could not retrieve ProActive Node", e);
 
         }
     }
@@ -351,7 +343,6 @@ public abstract class TaskLauncher implements InitActive {
      * @param targetedClass the class on which to look for the private 'internal init' method
      * @param parameterType the type of the parameter describing the definition of the method to look for.
      * @param argument the argument passed to the invocation of the found method on the current executable.
-     * @throws Exception reported if something wrong occurs.
      */
     protected void callInternalInit(Class<?> targetedClass, Class<?> parameterType,
             ExecutableInitializer argument) throws InvocationTargetException, NoSuchMethodException,
@@ -393,12 +384,13 @@ public abstract class TaskLauncher implements InitActive {
      * Redirect stdout/err in the buffered appender.
      */
     @SuppressWarnings("unchecked")
-    protected void initLoggers() {
+    private void initLoggers() {
         logger.debug("Init loggers");
         // error about log should not be logged
         LogLog.setQuietMode(true);
         // create logger
-        Logger l = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + this.taskId.getJobId());
+        Logger l = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + this.taskId.getJobId() + "." +
+            taskId.value());
         l.setAdditivity(false);
         MDC.put(Log4JTaskLogs.MDC_TASK_ID, this.taskId.value());
         MDC.put(Log4JTaskLogs.MDC_TASK_NAME, this.taskId.getReadableName());
@@ -425,10 +417,8 @@ public abstract class TaskLauncher implements InitActive {
         }
         l.addAppender(this.logAppender);
         // redirect stdout and err
-        this.redirectedStdout = new PrintStream(new LoggingOutputStream(l, Log4JTaskLogs.STDOUT_LEVEL), true);
-        this.redirectedStderr = new PrintStream(new LoggingOutputStream(l, Log4JTaskLogs.STDERR_LEVEL), true);
-        System.setOut(redirectedStdout);
-        System.setErr(redirectedStderr);
+        this.outputSink = new PrintStream(new LoggingOutputStream(l, Log4JTaskLogs.STDOUT_LEVEL), true);
+        this.errorSink = new PrintStream(new LoggingOutputStream(l, Log4JTaskLogs.STDERR_LEVEL), true);
     }
 
     /**
@@ -440,10 +430,10 @@ public abstract class TaskLauncher implements InitActive {
             this.taskId.value() + ".log";
         // if IS_FORKED is set, it means that the forker task has already created a log file,
         // and we just append to it
-        if (!"true".equals(System.getProperty(IS_FORKED))) {
+        if (!isForkedTask()) {
             DataSpacesFileObject outlog = SCRATCH.resolveFile(TaskLauncher.LOG_FILE_PREFIX + "-" +
                 this.taskId.getJobId() + "-" + this.taskId.value() + ".log");
-            String outPath = null;
+            String outPath;
             try {
                 outPath = convertDataSpaceToFileIfPossible(outlog, true);
             } catch (Exception e) {
@@ -464,54 +454,20 @@ public abstract class TaskLauncher implements InitActive {
      * Set scheduler related variables for the current task. 
      */
     protected void initEnv() {
-        // set task vars
-        System.setProperty(SchedulerVars.JAVAENV_JOB_ID_VARNAME.toString(), this.taskId.getJobId().value());
-        System.setProperty(SchedulerVars.JAVAENV_JOB_NAME_VARNAME.toString(), this.taskId.getJobId()
-                .getReadableName());
-        System.setProperty(SchedulerVars.JAVAENV_TASK_ID_VARNAME.toString(), this.taskId.value());
-        System.setProperty(SchedulerVars.JAVAENV_TASK_NAME_VARNAME.toString(), this.taskId.getReadableName());
-        System.setProperty(SchedulerVars.JAVAENV_TASK_ITERATION.toString(), "" + this.iterationIndex);
-        System.setProperty(SchedulerVars.JAVAENV_TASK_REPLICATION.toString(), "" + this.replicationIndex);
-        System.setProperty(PASchedulerProperties.SCHEDULER_HOME.getKey(), CentralPAPropertyRepository.PA_HOME
-                .getValue());
-
-        // previously exported and propagated vars must be deleted
-        System.clearProperty(PropertyUtils.EXPORTED_PROPERTIES_VAR_NAME);
-        System.clearProperty(PropertyUtils.PROPAGATED_PROPERTIES_VAR_NAME);
-    }
-
-    /**
-     * This method sets a cookie among the system environment variables of this JVM.
-     * This cookie will be used later during the task termination to kill all children processes
-     */
-    protected void setEnvironmentCookie() {
-        String prefix = null;
-        if (taskId.value() != null) {
-            prefix = taskId.value() + "_";
+        if (isForkedTask()) {
+            // set task vars
+            System.setProperty(SchedulerVars.JAVAENV_JOB_ID_VARNAME.toString(), this.taskId.getJobId()
+                    .value());
+            System.setProperty(SchedulerVars.JAVAENV_JOB_NAME_VARNAME.toString(), this.taskId.getJobId()
+                    .getReadableName());
+            System.setProperty(SchedulerVars.JAVAENV_TASK_ID_VARNAME.toString(), this.taskId.value());
+            System.setProperty(SchedulerVars.JAVAENV_TASK_NAME_VARNAME.toString(), this.taskId
+                    .getReadableName());
+            System.setProperty(SchedulerVars.JAVAENV_TASK_ITERATION.toString(), "" + this.iterationIndex);
+            System.setProperty(SchedulerVars.JAVAENV_TASK_REPLICATION.toString(), "" + this.replicationIndex);
+            System.setProperty(PASchedulerProperties.SCHEDULER_HOME.getKey(),
+                    CentralPAPropertyRepository.PA_HOME.getValue());
         }
-        EnvironmentCookieBasedChildProcessKiller.setCookie(prefix);
-    }
-
-    /**
-     * This method kills all children processes possibly spawned by this task
-     * It makes sure it is called only once
-     */
-    @ImmediateService
-    public boolean killChildrenProcesses() {
-        EnvironmentCookieBasedChildProcessKiller.killChildProcesses();
-        return true;
-    }
-
-    /**
-     * Reset scheduler related variables value.
-     */
-    protected void unsetEnv() {
-        System.clearProperty(SchedulerVars.JAVAENV_JOB_ID_VARNAME.toString());
-        System.clearProperty(SchedulerVars.JAVAENV_JOB_NAME_VARNAME.toString());
-        System.clearProperty(SchedulerVars.JAVAENV_TASK_ID_VARNAME.toString());
-        System.clearProperty(SchedulerVars.JAVAENV_TASK_NAME_VARNAME.toString());
-        System.clearProperty(SchedulerVars.JAVAENV_TASK_ITERATION.toString());
-        System.clearProperty(SchedulerVars.JAVAENV_TASK_REPLICATION.toString());
     }
 
     /**
@@ -520,16 +476,18 @@ public abstract class TaskLauncher implements InitActive {
      * @see org.ow2.proactive.scripting.PropertyUtils
      */
     protected void setPropagatedProperties(TaskResult[] incomingResults) {
-        for (TaskResult incomingResult : incomingResults) {
-            Map<String, String> properties = incomingResult.getPropagatedProperties();
-            if (properties != null) {
-                logger.info("Incoming properties for task " + this.taskId + " are " + properties);
-                for (String key : properties.keySet()) {
-                    logger.debug("Value of Incoming property " + key + " is " + properties.get(key));
-                    System.setProperty(key, properties.get(key));
+        if (isForkedTask()) {
+            for (TaskResult incomingResult : incomingResults) {
+                Map<String, String> properties = incomingResult.getPropagatedProperties();
+                if (properties != null) {
+                    logger.info("Incoming properties for task " + this.taskId + " are " + properties);
+                    for (String key : properties.keySet()) {
+                        logger.debug("Value of Incoming property " + key + " is " + properties.get(key));
+                        System.setProperty(key, properties.get(key));
+                    }
+                } else {
+                    logger.info("No Incoming properties for task " + this.taskId);
                 }
-            } else {
-                logger.info("No Incoming properties for task " + this.taskId);
             }
         }
     }
@@ -589,12 +547,15 @@ public abstract class TaskLauncher implements InitActive {
         initializer.setOutputSpace(new RemoteSpaceAdapter(OUTPUT, SCRATCH));
         initializer.setGlobalSpace(new RemoteSpaceAdapter(GLOBAL, SCRATCH));
         initializer.setUserSpace(new RemoteSpaceAdapter(USER, SCRATCH));
+        initializer.setOutputSink(outputSink);
+        initializer.setErrorSink(errorSink);
 
         return initializer;
     }
 
     @ImmediateService
     public void getStoredLogs(AppenderProvider logSink) {
+        resetLogContextForImmediateService();
         Appender appender;
         try {
             appender = logSink.getAppender();
@@ -613,22 +574,15 @@ public abstract class TaskLauncher implements InitActive {
     @ImmediateService
     public void activateLogs(AppenderProvider logSink) {
         synchronized (this.loggersFinalized) {
+            resetLogContextForImmediateService();
+
             logger.info("Activating logs for task " + this.taskId + " (" + taskId.getReadableName() + ")");
             if (this.loggersActivated.get()) {
                 logger.info("Logs for task " + this.taskId + " are already activated");
                 return;
             }
             this.loggersActivated.set(true);
-            // should reset taskId because calling thread is not active thread (immediate service)
-            MDC.put(Log4JTaskLogs.MDC_TASK_ID, this.taskId.value());
-            MDC.put(Log4JTaskLogs.MDC_TASK_NAME, this.taskId.getReadableName());
 
-            try {
-                MDC.put(Log4JTaskLogs.MDC_HOST, PAActiveObject.getNode().getNodeInformation()
-                        .getVMInformation().getHostName());
-            } catch (NodeException e) {
-                MDC.put(Log4JTaskLogs.MDC_HOST, "Unknown host");
-            }
             // create appender
             Appender appender;
             try {
@@ -654,15 +608,22 @@ public abstract class TaskLauncher implements InitActive {
         }
     }
 
+    // need to reset MDC because calling thread is not active thread (immediate service)
+    protected void resetLogContextForImmediateService() {
+        MDC.put(Log4JTaskLogs.MDC_TASK_ID, this.taskId.value());
+        MDC.put(Log4JTaskLogs.MDC_TASK_NAME, this.taskId.getReadableName());
+        MDC.put(Log4JTaskLogs.MDC_HOST, getHostname());
+    }
+
     /**
      * Flush out and err streams.
      */
     protected void flushStreams() {
-        if (this.redirectedStdout != null) {
-            this.redirectedStdout.flush();
+        if (this.outputSink != null) {
+            this.outputSink.flush();
         }
-        if (this.redirectedStderr != null) {
-            this.redirectedStderr.flush();
+        if (this.errorSink != null) {
+            this.errorSink.flush();
         }
     }
 
@@ -673,6 +634,7 @@ public abstract class TaskLauncher implements InitActive {
      */
     @ImmediateService
     public TaskLogs getLogs() {
+        resetLogContextForImmediateService();
         this.flushStreams();
         return new Log4JTaskLogs(this.logAppender.getStorage(), this.taskId.getJobId().value());
     }
@@ -686,6 +648,7 @@ public abstract class TaskLauncher implements InitActive {
      */
     @ImmediateService
     public int getProgress() throws ProgressPingerException {
+        resetLogContextForImmediateService();
         return executableGuard.getProgress();
     }
 
@@ -705,7 +668,7 @@ public abstract class TaskLauncher implements InitActive {
         ScriptHandler handler = ScriptLoader.createLocalHandler();
         setPropagatedVariableBinding(this.propagatedVariables, handler);
         this.addDataspaceBinding(handler);
-        ScriptResult<String> res = handler.handle((Script<String>) pre);
+        ScriptResult<String> res = handler.handle((Script<String>) pre, outputSink, errorSink);
 
         if (res.errorOccured()) {
             res.getException().printStackTrace();
@@ -736,7 +699,7 @@ public abstract class TaskLauncher implements InitActive {
         setPropagatedVariableBinding(this.propagatedVariables, handler);
         this.addDataspaceBinding(handler);
         handler.addBinding(EXECUTION_SUCCEED_BINDING_NAME, executionSucceed);
-        ScriptResult<String> res = handler.handle((Script<String>) post);
+        ScriptResult<String> res = handler.handle((Script<String>) post, outputSink, errorSink);
 
         if (res.errorOccured()) {
             res.getException().printStackTrace();
@@ -763,7 +726,7 @@ public abstract class TaskLauncher implements InitActive {
         setPropagatedVariableBinding(this.propagatedVariables, handler);
         this.addDataspaceBinding(handler);
         handler.addBinding(FlowScript.resultVariable, res.value());
-        ScriptResult<FlowAction> sRes = handler.handle(flow);
+        ScriptResult<FlowAction> sRes = handler.handle(flow, outputSink, errorSink);
         this.flushStreams();
 
         if (sRes.errorOccured()) {
@@ -833,8 +796,6 @@ public abstract class TaskLauncher implements InitActive {
                 if (this.logAppender != null) {
                     this.logAppender.close();
                 }
-                System.setOut(TaskLauncher.SYSTEM_OUT);
-                System.setErr(TaskLauncher.SYSTEM_ERR);
                 logger.info("Terminated loggers for task " + this.taskId);
             }
         }
@@ -882,6 +843,7 @@ public abstract class TaskLauncher implements InitActive {
      */
     @ImmediateService
     public void terminate(boolean normalTermination) {
+        resetLogContextForImmediateService();
         if (normalTermination) {
             logger.info("Terminate message received for task " + taskId);
         } else {
@@ -913,11 +875,15 @@ public abstract class TaskLauncher implements InitActive {
      * if it does not finish before the walltime. If it does finish before the walltime then the timer will be canceled
      */
     protected void scheduleTimer() {
-        if (isWallTime() && !"true".equals(System.getProperty(TaskLauncher.IS_FORKED))) {
+        if (isWallTime() && !isForkedTask()) {
             logger.info("Execute timer because task '" + taskId + "' is walltimed (" + wallTime + " ms)");
             killTaskTimer = new KillTask(executableGuard, wallTime);
             killTaskTimer.schedule();
         }
+    }
+
+    protected boolean isForkedTask() {
+        return false;
     }
 
     /**
@@ -1494,7 +1460,7 @@ public abstract class TaskLauncher implements InitActive {
     protected List<OutputSelector> getTaskLogsSelectors(OutputAccessMode transferTo) {
         List<OutputSelector> result = new ArrayList<OutputSelector>(1);
         // Log file will be transferred by this task to the user or output space, only if it's not a forked task
-        if (!"true".equals(System.getProperty(IS_FORKED))) {
+        if (!isForkedTask()) {
             OutputSelector logFiles = new OutputSelector(
                 new FileSelector(TaskLauncher.LOG_FILE_PREFIX + "*"), transferTo);
             result.add(logFiles);
@@ -1515,24 +1481,26 @@ public abstract class TaskLauncher implements InitActive {
         String buri = SCRATCH.getVirtualURI();
         ArrayList<Future> transferFutures = new ArrayList<Future>();
 
-        for (DataSpacesFileObject dsfo : results) {
-            String relativePath = dsfo.getVirtualURI().replaceFirst(buri + "/?", "");
-            logger.debug("* " + relativePath);
+        if (results != null) {
+            for (DataSpacesFileObject dsfo : results) {
+                String relativePath = dsfo.getVirtualURI().replaceFirst(buri + "/?", "");
+                logger.debug("* " + relativePath);
 
-            final String finalRelativePath = relativePath;
-            final DataSpacesFileObject finaldsfo = dsfo;
-            final DataSpacesFileObject finalout = out;
-            transferFutures.add(executorTransfer.submit(new Callable<Boolean>() {
-                @Override
-                public Boolean call() throws FileSystemException {
-                    logger.info("Copying " + finaldsfo.getRealURI() + " to " + finalout.getRealURI() + "/" +
-                        finalRelativePath);
+                final String finalRelativePath = relativePath;
+                final DataSpacesFileObject finaldsfo = dsfo;
+                final DataSpacesFileObject finalout = out;
+                transferFutures.add(executorTransfer.submit(new Callable<Boolean>() {
+                    @Override
+                    public Boolean call() throws FileSystemException {
+                        logger.info("Copying " + finaldsfo.getRealURI() + " to " + finalout.getRealURI() +
+                            "/" + finalRelativePath);
 
-                    finalout.resolveFile(finalRelativePath).copyFrom(finaldsfo,
-                            org.objectweb.proactive.extensions.dataspaces.api.FileSelector.SELECT_SELF);
-                    return true;
-                }
-            }));
+                        finalout.resolveFile(finalRelativePath).copyFrom(finaldsfo,
+                                org.objectweb.proactive.extensions.dataspaces.api.FileSelector.SELECT_SELF);
+                        return true;
+                    }
+                }));
+            }
         }
 
         StringBuilder exceptionMsg = new StringBuilder();
@@ -1677,7 +1645,6 @@ public abstract class TaskLauncher implements InitActive {
      * @return the hostname of the local JVM
      */
     private String getHostname() {
-
         return ProActiveInet.getInstance().getInetAddress().getHostName();
     }
 
@@ -1690,6 +1657,26 @@ public abstract class TaskLauncher implements InitActive {
             Map<String, byte[]> variables = getPropagatedVariables(results);
             this.propagatedVariables = deserializeVariableMap(variables);
         }
+        this.propagatedVariables.putAll(contextVariables());
+    }
+
+    private Map<? extends String, ? extends Serializable> contextVariables() {
+        Map<String, String> variables = new HashMap<String, String>();
+        variables.put(SchedulerVars.JAVAENV_JOB_ID_VARNAME.toString(), this.taskId.getJobId().value());
+        variables.put(SchedulerVars.JAVAENV_JOB_NAME_VARNAME.toString(), this.taskId.getJobId()
+                .getReadableName());
+        variables.put(SchedulerVars.JAVAENV_TASK_ID_VARNAME.toString(), this.taskId.value());
+        variables.put(SchedulerVars.JAVAENV_TASK_NAME_VARNAME.toString(), this.taskId.getReadableName());
+        variables.put(SchedulerVars.JAVAENV_TASK_ITERATION.toString(), String.valueOf(this.iterationIndex));
+        variables.put(SchedulerVars.JAVAENV_TASK_REPLICATION.toString(), String
+                .valueOf(this.replicationIndex));
+        variables.put(PASchedulerProperties.SCHEDULER_HOME.getKey(), CentralPAPropertyRepository.PA_HOME
+                .getValue());
+        variables.put(PAResourceManagerProperties.RM_HOME.getKey(), PAResourceManagerProperties.RM_HOME
+                .getValueAsString());
+        variables.put(CentralPAPropertyRepository.PA_HOME.getName(), CentralPAPropertyRepository.PA_HOME
+                .getValueAsString());
+        return variables;
     }
 
     protected void attachPropagatedVariables(TaskResultImpl resultImpl) {
@@ -1726,8 +1713,6 @@ public abstract class TaskLauncher implements InitActive {
 
         @Override
         protected void internalClean() {
-            // kill all children processes
-            killChildrenProcesses();
 
             // finalize task in any cases (killed or not)
             terminateDataSpace();
@@ -1735,8 +1720,6 @@ public abstract class TaskLauncher implements InitActive {
             if (isWallTime()) {
                 cancelTimer();
             }
-
-            unsetEnv();
 
             try {
                 finalizeLoggers();

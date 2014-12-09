@@ -48,11 +48,10 @@ import java.security.KeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Random;
+import java.util.UUID;
 import java.util.concurrent.Callable;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -77,12 +76,9 @@ import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.exception.TaskAbortedException;
 import org.ow2.proactive.scheduler.common.exception.UserException;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
-import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
-import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
-import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.exception.ForkedJVMProcessException;
 import org.ow2.proactive.scheduler.exception.ProgressPingerException;
@@ -100,10 +96,8 @@ import org.ow2.proactive.scripting.ScriptLoader;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.utils.FileToBytesConverter;
 import org.ow2.proactive.utils.NodeSet;
-import org.apache.log4j.Appender;
-import org.apache.log4j.AppenderSkeleton;
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
-import org.apache.log4j.spi.LoggingEvent;
 
 import static org.ow2.proactive.scheduler.common.util.VariablesUtil.filterAndUpdate;
 
@@ -151,11 +145,12 @@ public class JavaForkerExecutable extends JavaExecutable implements ForkerStarte
 
     private Process process = null;
     private Node forkedNode = null;
-    private Boolean processStarted = false;
+    private volatile boolean processStarted = false;
 
     protected LauncherGuard launcherGuard = new LauncherGuard();
 
     final private TaskLauncher taskLauncherStub;
+    private TaskProcessTreeKiller taskProcessTreeKiller;
 
     /** Hibernate default constructor */
     public JavaForkerExecutable(TaskLauncher launcherStub) {
@@ -172,7 +167,10 @@ public class JavaForkerExecutable extends JavaExecutable implements ForkerStarte
     // WARNING WHEN REMOVE OR RENAME, called by task launcher by introspection
     private void internalInit(ForkedJavaExecutableInitializer execInitializer) throws Exception {
         this.execInitializer = execInitializer;
-        init();
+        forkedNodeName = UUID.randomUUID().toString();
+        Map<String, Serializable> propagatedVariables = SerializationUtil
+                .deserializeVariableMap(this.execInitializer.getPropagatedVariables());
+        setVariables(propagatedVariables);
     }
 
     /**
@@ -195,9 +193,6 @@ public class JavaForkerExecutable extends JavaExecutable implements ForkerStarte
             logger.debug("Create remote task launcher");
 
             launcherGuard.initialize(createForkedTaskLauncher());
-
-            // redirect tasks logs to local stdout/err
-            launcherGuard.use().activateLogs(new StdAppenderProvider());
 
             execInitializer.getJavaExecutableContainer().setNodes(new NodeSet(execInitializer.getNodes()));
 
@@ -254,8 +249,8 @@ public class JavaForkerExecutable extends JavaExecutable implements ForkerStarte
         // redirect streams to local stdout/err
         BufferedReader sout = new BufferedReader(new InputStreamReader(process.getInputStream()));
         BufferedReader serr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-        tsout = new Thread(new ThreadReader(sout, System.out, this));
-        tserr = new Thread(new ThreadReader(serr, System.err, this));
+        tsout = new Thread(new ThreadReader(sout, execInitializer.getOutputSink(), this));
+        tserr = new Thread(new ThreadReader(serr, execInitializer.getErrorSink(), this));
         tsout.start();
         tserr.start();
     }
@@ -374,7 +369,8 @@ public class JavaForkerExecutable extends JavaExecutable implements ForkerStarte
             handler.addBinding(TaskLauncher.DS_OUTPUT_BINDING_NAME, this.execInitializer.getOutput());
             handler.addBinding(TaskLauncher.DS_GLOBAL_BINDING_NAME, this.execInitializer.getGlobal());
 
-            ScriptResult<String> res = handler.handle(envScript);
+            ScriptResult<String> res = handler.handle(envScript, this.execInitializer.getOutputSink(),
+                    this.execInitializer.getErrorSink());
             //result
             if (res.errorOccured()) {
                 res.getException().printStackTrace();
@@ -389,19 +385,6 @@ public class JavaForkerExecutable extends JavaExecutable implements ForkerStarte
      */
     public int getProgress() {
         return launcherGuard.getProgress();
-    }
-
-    /**
-     * We need to set deployment ID. The new JVM will register itself in the current JVM.
-     * The current JVM will recognize it by this deployment ID.
-     */
-    private void init() throws Exception {
-        Random random = new Random((new Date()).getTime());
-        long deploymentID = random.nextInt(1000000);
-        forkedNodeName = "f" + deploymentID;
-        Map<String, Serializable> propagatedVariables = SerializationUtil
-                .deserializeVariableMap(this.execInitializer.getPropagatedVariables());
-        setVariables(propagatedVariables);
     }
 
     /**
@@ -474,7 +457,6 @@ public class JavaForkerExecutable extends JavaExecutable implements ForkerStarte
         command.add("-D" + FORKED_LOGS_HOME + "=" + logHome);
 
         command.add("-D" + FORKED_PARENT_NODE + "=" + nodeName);
-        command.add("-D" + TaskLauncher.IS_FORKED + "=" + "true");
 
         //set mandatory log4j file
         if (forkEnvironment == null || !contains("log4j.configuration", forkEnvironment.getJVMArguments())) {
@@ -493,7 +475,7 @@ public class JavaForkerExecutable extends JavaExecutable implements ForkerStarte
         if (forkEnvironment == null ||
             !contains("proactive.configuration", forkEnvironment.getJVMArguments())) {
             try {
-                fpaconfig = createTempFile("forked_jtp", ".xml");
+                fpaconfig = createTempFile("forked_jtp", ".properties");
                 PrintStream out = new PrintStream(fpaconfig);
                 out.print(execInitializer.getJavaTaskLauncherInitializer().getPaConfigContent());
                 out.close();
@@ -521,7 +503,7 @@ public class JavaForkerExecutable extends JavaExecutable implements ForkerStarte
     private void propagateProtocolProperties(List<String> command) {
         //TODO SCHEDULING-1302 : WORK AROUND
         //automatically propagate PAMR props to the forked JVM if defined on the forker.
-        PAProperty[] properitiesToPropagate = { PAMRConfig.PA_NET_ROUTER_ADDRESS,
+        PAProperty[] propertiesToPropagate = { PAMRConfig.PA_NET_ROUTER_ADDRESS,
                 PAMRConfig.PA_NET_ROUTER_PORT, AMQPConfig.PA_AMQP_BROKER_ADDRESS,
                 AMQPConfig.PA_AMQP_BROKER_PORT, AMQPConfig.PA_AMQP_BROKER_USER,
                 AMQPConfig.PA_AMQP_BROKER_PASSWORD, AMQPConfig.PA_AMQP_BROKER_VHOST,
@@ -532,7 +514,7 @@ public class JavaForkerExecutable extends JavaExecutable implements ForkerStarte
                 AMQPFederationConfig.PA_AMQP_FEDERATION_BROKER_VHOST,
                 AMQPFederationConfig.PA_AMQP_FEDERATION_BROKER_MAPPING_FILE };
 
-        for (PAProperty property : properitiesToPropagate) {
+        for (PAProperty property : propertiesToPropagate) {
             if (property.isSet()) {
                 command.add(property.getCmdLine() + property.getValueAsString());
             }
@@ -656,8 +638,8 @@ public class JavaForkerExecutable extends JavaExecutable implements ForkerStarte
                     } catch (IOException e) {
                         content = "Failed to get file content: " + e.getMessage();
                     }
-                    result.append("Temporary file '").append(file.getName()).append("' ").append(
-                            "(" + file.getAbsolutePath() + "). ");
+                    result.append("Temporary file '").append(file.getName()).append("' ").append("(").append(
+                            file.getAbsolutePath()).append("). ");
                     result.append("Content of the temporary file:\n").append(content).append('\n');
                 }
             }
@@ -676,9 +658,6 @@ public class JavaForkerExecutable extends JavaExecutable implements ForkerStarte
 
     /**
      * Create a new process builder with user credentials if needed
-     *
-     * @returns an OS Process Builder
-     * @throws IOException
      */
     private OSProcessBuilder createProcess() throws Exception {
         //check if it must be run under user and if so, apply the proper method
@@ -740,6 +719,10 @@ public class JavaForkerExecutable extends JavaExecutable implements ForkerStarte
     private void setSystemEnvironment(OSProcessBuilder ospb) {
         try {
             Map<String, String> env = ospb.environment();
+
+            taskProcessTreeKiller = new TaskProcessTreeKiller(execInitializer.getTaskId().value());
+            taskProcessTreeKiller.tagEnvironment(env);
+
             ForkEnvironment forkEnvironment = execInitializer.getForkEnvironment();
             if (forkEnvironment != null) {
                 Map<String, String> fenv = forkEnvironment.getSystemEnvironment();
@@ -751,7 +734,7 @@ public class JavaForkerExecutable extends JavaExecutable implements ForkerStarte
             }
         } catch (NotImplementedException e) {
             //normal behavior if user has not set any sys property in fork env
-            logger.info("OS ProcessBuilder environment could not be retreived : " + e.getMessage());
+            logger.info("OS ProcessBuilder environment could not be retrieved : " + e.getMessage());
         }
     }
 
@@ -836,46 +819,6 @@ public class JavaForkerExecutable extends JavaExecutable implements ForkerStarte
 
         // set the task status to killed
         super.kill();
-    }
-
-    /**
-     * Simple AppenderProvider that provides an appender that redirect all logs
-     * on REAL stdout/stderr, i.e. OUT and ERR defined by the system.
-     * @see TaskLauncher
-
-     */
-    public static class StdAppenderProvider implements AppenderProvider {
-
-        /**
-         * Returns an appender that redirect all logs on stdout/stderr depending on the level.
-         * @return an appender that redirect all logs on stdout/stderr depending on the level.
-         */
-        public Appender getAppender() throws LogForwardingException {
-            return new AppenderSkeleton() {
-
-                @Override
-                public boolean requiresLayout() {
-                    return false;
-                }
-
-                @Override
-                public void close() {
-                    this.closed = true;
-                }
-
-                @Override
-                protected void append(LoggingEvent event) {
-                    if (event.getLevel().equals(Log4JTaskLogs.STDOUT_LEVEL)) {
-                        TaskLauncher.SYSTEM_OUT.println(event.getMessage());
-                    } else if (event.getLevel().equals(Log4JTaskLogs.STDERR_LEVEL)) {
-                        TaskLauncher.SYSTEM_ERR.println(event.getMessage());
-                    } else {
-                        TaskLauncher.SYSTEM_ERR.println("[INCORRECT STREAM] " + event.getMessage());
-                    }
-
-                }
-            };
-        }
     }
 
     public class LauncherGuard extends Guard<JavaTaskLauncherForked> {
@@ -973,18 +916,14 @@ public class JavaForkerExecutable extends JavaExecutable implements ForkerStarte
                 }
 
                 //if tmp file have been set, destroy it.
-                if (fpolicy != null) {
-                    fpolicy.delete();
-                }
-                if (flog4j != null) {
-                    flog4j.delete();
-                }
-                if (fpaconfig != null) {
-                    fpaconfig.delete();
-                }
+                FileUtils.deleteQuietly(fpolicy);
+                FileUtils.deleteQuietly(flog4j);
+                FileUtils.deleteQuietly(fpaconfig);
+
                 if (process != null) {
                     process.destroy();
                 }
+                taskProcessTreeKiller.kill();
                 terminateStreamReaders();
             } catch (Exception e) {
                 logger.error("", e);

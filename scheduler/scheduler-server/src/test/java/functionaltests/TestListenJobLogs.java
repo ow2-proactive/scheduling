@@ -40,7 +40,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.collections.ListUtils;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.job.Job;
@@ -54,8 +53,8 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingService;
 import org.ow2.proactive.scheduler.common.util.logforwarder.providers.SocketBasedForwardingProvider;
+import org.apache.commons.collections.ListUtils;
 import org.apache.log4j.AppenderSkeleton;
-import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
 import org.junit.After;
 import org.junit.Assert;
@@ -118,7 +117,7 @@ public class TestListenJobLogs extends SchedulerConsecutive {
                 if (command.equals("stop")) {
                     break;
                 } else if (command.startsWith("output")) {
-                    System.out.println(command);
+                    getOut().println(command);
                 } else {
                     throw new IllegalArgumentException(command);
                 }

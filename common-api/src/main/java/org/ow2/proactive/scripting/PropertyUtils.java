@@ -40,9 +40,10 @@ package org.ow2.proactive.scripting;
  * This class defines utils for java property, e.g propagating java property, i.e. make this
  * property available for all dependent tasks.
  *
+ * @deprecated Use variable propagation instead
  * @since Scheduling 2.0
  */
-
+@Deprecated
 public class PropertyUtils {
 
     /** Name of the java property that contains the names of currently exported properties */
@@ -69,7 +70,7 @@ public class PropertyUtils {
     /**
      * This method allows to export a java property, i.e. make this property available in native and
      * forked java task. For native task, the property is exported
-     * @param key
+     * @param key the name of the exported property.
      * @throws IllegalArgumentException if the property key is not set.
      */
     public static void exportProperty(String key) {

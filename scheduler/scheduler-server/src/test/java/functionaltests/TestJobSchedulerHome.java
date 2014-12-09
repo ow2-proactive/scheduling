@@ -36,10 +36,6 @@
  */
 package functionaltests;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.scheduler.common.job.Job;
@@ -56,6 +52,10 @@ import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
 import org.ow2.tests.FunctionalTest;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 import functionaltests.executables.PAHomeExecutable;
 
@@ -74,7 +74,7 @@ public class TestJobSchedulerHome extends FunctionalTest {
     @Before
     public void init() throws Throwable {
         pahomeScript = new SimpleScript(
-            "prop = java.lang.System.getProperty(\"pa.home\"); \n"
+            "prop = variables.get(\"pa.scheduler.home\"); \n"
                 + "if (expectedHome != prop) throw new Error(\"Invalid java home, expected : \" + expectedHome + \", received : + \" + prop)\n",
             "javascript");
         SchedulerTHelper.startScheduler();

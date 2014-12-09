@@ -48,7 +48,7 @@ public class PrintAndReturn extends JavaExecutable {
 
     @Override
     public Serializable execute(TaskResult... results) throws Throwable {
-        System.out.println(variable);
+        getOut().println(variable);
         return variable;
     }
 

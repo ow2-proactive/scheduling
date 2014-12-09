@@ -76,7 +76,7 @@ import org.apache.log4j.Logger;
 public abstract class Script<E> implements Serializable {
 
     // default output size in chars
-    public static final int DEFAULT_OUTPUT_MAX_SIZE = 1 * 1024 * 1024 * 1024; // 1 million characters ~ 2 Mb
+    public static final int DEFAULT_OUTPUT_MAX_SIZE = 1024 * 1024; // 1 million characters ~ 2 Mb
 
     /** Loggers */
     public static final Logger logger = Logger.getLogger(Script.class);
@@ -281,11 +281,12 @@ public abstract class Script<E> implements Serializable {
 
     /**
      * Execute the script and return the ScriptResult corresponding.
+     * Will use {@link java.lang.System.out} for output.
      *
      * @return a ScriptResult object.
      */
     public ScriptResult<E> execute() {
-        return execute(null);
+        return execute(null, System.out, System.err);
     }
 
     /**
@@ -293,9 +294,12 @@ public abstract class Script<E> implements Serializable {
      * This method can add an additional user bindings if needed.
      *
      * @param aBindings the additional user bindings to add if needed. Can be null or empty.
+     * @param outputSink where the script output is printed to.
+     * @param errorSink where the script error stream is printed to.
      * @return a ScriptResult object.
      */
-    public ScriptResult<E> execute(Map<String, Object> aBindings) {
+    public ScriptResult<E> execute(Map<String, Object> aBindings, PrintStream outputSink,
+            PrintStream errorSink) {
         ScriptEngine engine = createScriptEngine();
 
         if (engine == null) {
@@ -304,10 +308,11 @@ public abstract class Script<E> implements Serializable {
         }
 
         // SCHEDULING-1532: redirect script output to a buffer (keep the latest DEFAULT_OUTPUT_MAX_SIZE)
-        // the output is still printed to stdout
-        BoundedStringWriter sw = new BoundedStringWriter(DEFAULT_OUTPUT_MAX_SIZE);
-        PrintWriter pw = new PrintWriter(sw);
-        engine.getContext().setWriter(pw);
+        BoundedStringWriter outputBoundedWriter = new BoundedStringWriter(outputSink, DEFAULT_OUTPUT_MAX_SIZE);
+        BoundedStringWriter errorBoundedWriter = new BoundedStringWriter(errorSink, DEFAULT_OUTPUT_MAX_SIZE);
+        engine.getContext().setWriter(new PrintWriter(outputBoundedWriter));
+        engine.getContext().setErrorWriter(new PrintWriter(errorBoundedWriter));
+
         engine.getContext().setAttribute(ScriptEngine.FILENAME, scriptName, ScriptContext.ENGINE_SCOPE);
 
         try {
@@ -323,7 +328,7 @@ public abstract class Script<E> implements Serializable {
 
             // Add output to the script result
             ScriptResult<E> result = this.getResult(bindings);
-            result.setOutput(sw.toString());
+            result.setOutput(outputBoundedWriter.toString());
 
             return result;
         } catch (Throwable e) {

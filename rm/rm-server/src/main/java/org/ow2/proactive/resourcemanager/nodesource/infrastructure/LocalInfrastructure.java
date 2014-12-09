@@ -18,8 +18,8 @@ import org.ow2.proactive.process.ProcessExecutor;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
-import org.ow2.proactive.resourcemanager.utils.RMNodeStarter.CommandLineBuilder;
-import org.ow2.proactive.resourcemanager.utils.RMNodeStarter.OperatingSystem;
+import org.ow2.proactive.resourcemanager.utils.CommandLineBuilder;
+import org.ow2.proactive.resourcemanager.utils.OperatingSystem;
 import org.ow2.proactive.utils.Tools;
 
 

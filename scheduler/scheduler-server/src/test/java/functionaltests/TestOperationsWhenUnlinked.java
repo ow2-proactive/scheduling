@@ -42,7 +42,6 @@ import java.io.FileOutputStream;
 import java.io.Serializable;
 import java.util.Properties;
 
-import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.scheduler.common.Scheduler;
@@ -56,10 +55,11 @@ import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.tests.FunctionalTest;
-import org.junit.Assert;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 
 /**
@@ -80,7 +80,6 @@ public class TestOperationsWhenUnlinked extends FunctionalTest {
 
         @Override
         public Serializable execute(TaskResult... results) throws Throwable {
-            System.out.println("OK");
             return "OK";
         }
 
@@ -111,7 +110,7 @@ public class TestOperationsWhenUnlinked extends FunctionalTest {
     }
 
     @Test
-    public void test() throws Exception {
+    public void test() throws Throwable {
 
         helper.startRM(null, RM_RMI_PORT);
 
@@ -124,7 +123,7 @@ public class TestOperationsWhenUnlinked extends FunctionalTest {
         testKillJob(rmUrl);
     }
 
-    private void testKillJob(String rmUrl) throws Exception {
+    private void testKillJob(String rmUrl) throws Throwable {
         Scheduler scheduler = SchedulerTHelper.getSchedulerInterface();
 
         System.out.println("Submitting job1");
@@ -144,11 +143,11 @@ public class TestOperationsWhenUnlinked extends FunctionalTest {
 
         System.out.println("Killing job1");
         if (!scheduler.killJob(jobId1)) {
-            Assert.fail("Failed to kill job " + jobId1);
+            fail("Failed to kill job " + jobId1);
         }
         System.out.println("Killing job2");
         if (!scheduler.killJob(jobId2)) {
-            Assert.fail("Failed to kill job " + jobId2);
+            fail("Failed to kill job " + jobId2);
         }
 
         SchedulerTHelper.waitForEventJobFinished(jobId1, EVENT_TIMEOUT);
@@ -158,7 +157,7 @@ public class TestOperationsWhenUnlinked extends FunctionalTest {
         checkJobResult(scheduler, jobId2, 0);
     }
 
-    private void testSubmitAndPause(String rmUrl) throws Exception {
+    private void testSubmitAndPause(String rmUrl) throws Throwable {
         Scheduler scheduler = SchedulerTHelper.getSchedulerInterface();
 
         System.out.println("Submitting job");
@@ -174,10 +173,10 @@ public class TestOperationsWhenUnlinked extends FunctionalTest {
         JobId jobId2 = scheduler.submit(createJob());
 
         if (!scheduler.pauseJob(jobId2)) {
-            Assert.fail("Failed to pause job " + jobId2);
+            fail("Failed to pause job " + jobId2);
         }
         if (!scheduler.resumeJob(jobId2)) {
-            Assert.fail("Failed to resume job " + jobId2);
+            fail("Failed to resume job " + jobId2);
         }
 
         System.out.println("Creating new RM");
@@ -190,7 +189,7 @@ public class TestOperationsWhenUnlinked extends FunctionalTest {
 
         System.out.println("Linking new RM");
         if (!scheduler.linkResourceManager(rmUrl)) {
-            Assert.fail("Failed to link another RM");
+            fail("Failed to link another RM");
         }
 
         System.out.println("Waiting when jobs finish");
@@ -201,21 +200,18 @@ public class TestOperationsWhenUnlinked extends FunctionalTest {
         checkJobResult(scheduler, jobId2, 1);
     }
 
-    private void checkJobResult(Scheduler scheduler, JobId jobId, int expectedTasksNumber) throws Exception {
+    private void checkJobResult(Scheduler scheduler, JobId jobId, int expectedTasksNumber) throws Throwable {
         JobResult jobResult = scheduler.getJobResult(jobId);
-        Assert.assertEquals("Unexpected number of task results", expectedTasksNumber, jobResult
-                .getAllResults().size());
+        assertEquals("Unexpected number of task results", expectedTasksNumber, jobResult.getAllResults()
+                .size());
         for (TaskResult taskResult : jobResult.getAllResults().values()) {
             System.out.println("Task " + taskResult.getTaskId());
             if (taskResult.getException() != null) {
                 taskResult.getException().printStackTrace();
-                Assert.assertNull("Unexpected task result exception", taskResult.getException());
+                assertNull("Unexpected task result exception", taskResult.getException());
             }
 
-            String output = taskResult.getOutput().getAllLogs(false);
-            System.out.println("Task output:");
-            System.out.println(output);
-            Assert.assertTrue("Unxepected output", output.contains("OK"));
+            assertEquals(taskResult.value(), "OK");
         }
     }
 

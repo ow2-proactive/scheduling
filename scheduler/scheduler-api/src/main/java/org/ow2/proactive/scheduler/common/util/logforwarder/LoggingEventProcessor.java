@@ -1,42 +1,40 @@
 package org.ow2.proactive.scheduler.common.util.logforwarder;
 
 import org.apache.log4j.Appender;
-import org.apache.log4j.AsyncAppender;
+import org.apache.log4j.Category;
+import org.apache.log4j.Hierarchy;
+import org.apache.log4j.Level;
 import org.apache.log4j.spi.LoggingEvent;
-
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+import org.apache.log4j.spi.RootLogger;
 
 
 public class LoggingEventProcessor {
-    private ConcurrentHashMap<String, AsyncAppender> appenders = new ConcurrentHashMap<String, AsyncAppender>();
+    Hierarchy h = new NoWarningHierarchy();
 
     public void addAppender(String loggerName, Appender appender) {
-        AsyncAppender sink = appenders.get(loggerName);
-        if (sink == null) {
-            sink = new AsyncAppender(); // new thread is created here
-            appenders.put(loggerName, sink);
-        }
-        sink.addAppender(appender);
+        h.getLogger(loggerName).addAppender(appender);
     }
 
     public void removeAllAppenders(String loggerName) {
-        AsyncAppender appender = appenders.remove(loggerName);
-        if (appender != null) appender.close();
+        h.getLogger(loggerName).removeAllAppenders();
     }
 
     public void removeAllAppenders() {
-        for(String loggerName: appenders.keySet()) {
-            removeAllAppenders(loggerName);
-        }
+        h.getRootLogger().removeAllAppenders();
     }
 
     public void processEvent(LoggingEvent event) {
-        String loggerName = event.getLoggerName();
-        AsyncAppender sink = appenders.get(loggerName);
-        if (sink != null) {
-            sink.append(event);
-        }
+        h.getLogger(event.getLoggerName()).callAppenders(event);
     }
 
+    private static class NoWarningHierarchy extends Hierarchy {
+        public NoWarningHierarchy() {
+            super(new RootLogger(Level.ALL));
+        }
+
+        @Override
+        public void emitNoAppenderWarning(Category cat) {
+
+        }
+    }
 }

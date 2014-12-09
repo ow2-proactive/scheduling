@@ -141,6 +141,8 @@ public class ScriptTaskLauncher extends TaskLauncher {
             decrypter.setCredentials(executableContainer.getCredentials());
             initializer.setDecrypter(decrypter);
 
+            initializer.setTaskId(taskId);
+
             setPropagatedVariables(initializer, getPropagatedVariables());
 
             executableGuard.callInternalInit(ScriptExecutable.class, JavaExecutableInitializerImpl.class,

@@ -37,13 +37,13 @@ package org.ow2.proactive.scheduler.task.utils;
 import java.io.Serializable;
 import java.util.concurrent.Callable;
 
-import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
+import org.apache.log4j.Logger;
 
 
 /**
@@ -273,9 +273,9 @@ public abstract class Guard<T> {
         if (this.state != GuardState.CLEANED) {
             if (activeExecutor != null) {
 
-                activeExecutor.setCallable(new Callable() {
+                activeExecutor.setCallable(new Callable<Serializable>() {
                     @Override
-                    public Object call() throws Exception {
+                    public Serializable call() throws Exception {
                         try {
                             internalClean();
                         } catch (Exception e) {

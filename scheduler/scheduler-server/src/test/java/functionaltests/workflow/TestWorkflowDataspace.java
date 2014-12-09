@@ -51,9 +51,10 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 import org.ow2.proactive.scheduler.common.task.flow.FlowBlock;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
+import org.junit.Assert;
+
 import functionaltests.SchedulerConsecutive;
 import functionaltests.SchedulerTHelper;
-import org.junit.Assert;
 
 
 /**

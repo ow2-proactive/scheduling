@@ -36,13 +36,10 @@
  */
 package org.ow2.proactive.scheduler.task.forked;
 
-import static org.ow2.proactive.utils.ClasspathUtils.findSchedulerHome;
-
 import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
@@ -51,6 +48,9 @@ import org.objectweb.proactive.core.node.NodeFactory;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.rm.util.process.EnvironmentCookieBasedChildProcessKiller;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.apache.log4j.Logger;
+
+import static org.ow2.proactive.utils.ClasspathUtils.findSchedulerHome;
 
 
 /**
@@ -75,7 +75,7 @@ public class ForkerStarter {
             System.exit(2);
         }
         configureRMAndProActiveHomes();
-        EnvironmentCookieBasedChildProcessKiller.registerKillChildProcessesOnShutdown();
+        EnvironmentCookieBasedChildProcessKiller.registerKillChildProcessesOnShutdown("forked");
         ForkerStarter fs = new ForkerStarter();
         Node n = fs.createLocalNode(args[1]);
         fs.callBack(args[0], n);

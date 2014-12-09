@@ -73,7 +73,7 @@ public class TestTaskRestartOnNodeFailure extends FunctionalTest {
 
         @Override
         public Serializable execute(TaskResult... results) throws Throwable {
-            System.out.println("OK");
+            getOut().println("OK");
             ProActiveLock communicationObject = PAActiveObject.lookupActive(ProActiveLock.class,
                     communicationObjectUrl);
 

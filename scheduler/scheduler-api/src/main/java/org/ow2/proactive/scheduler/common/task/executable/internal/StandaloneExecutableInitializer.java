@@ -34,9 +34,11 @@
  */
 package org.ow2.proactive.scheduler.common.task.executable.internal;
 
+import java.io.PrintStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.dataspaces.LocalSpace;
 import org.ow2.proactive.scheduler.common.task.dataspaces.RemoteSpace;
 
@@ -121,4 +123,14 @@ public interface StandaloneExecutableInitializer extends Serializable {
      * @param space user space interface
      */
     void setUserSpace(RemoteSpace space);
+
+    void setTaskId(TaskId taskId);
+
+    TaskId getTaskId();
+
+    PrintStream getOutputSink();
+
+    void setOutputSink(PrintStream redirectedStdout);
+
+    void setErrorSink(PrintStream redirectedError);
 }

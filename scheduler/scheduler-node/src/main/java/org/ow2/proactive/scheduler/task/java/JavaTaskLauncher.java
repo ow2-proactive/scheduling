@@ -149,6 +149,7 @@ public class JavaTaskLauncher extends TaskLauncher {
             decrypter.setCredentials(executableContainer.getCredentials());
             initializer.setDecrypter(decrypter);
 
+            initializer.setTaskId(taskId);
             Map<String, String> thirdPartyCredentials = decrypter.decrypt().getThirdPartyCredentials();
             ((JavaExecutableInitializerImpl) initializer).setThirdPartyCredentials(thirdPartyCredentials);
 

@@ -109,7 +109,7 @@ public class TestProcessTreeKiller extends SchedulerConsecutive {
     public void run() throws Throwable {
         SchedulerTHelper.getSchedulerAuth();
         RMTHelper rmHelper = RMTHelper.getDefaultInstance();
-        rmHelper.createNodeSource("extra", 3);
+        rmHelper.createNodeSource("extra", 2);
 
         org.apache.log4j.Logger.getLogger(ProcessTreeKiller.class).setLevel(Level.DEBUG);
         org.apache.log4j.Logger.getLogger(TaskLauncher.class).setLevel(Level.DEBUG);
@@ -138,23 +138,18 @@ public class TestProcessTreeKiller extends SchedulerConsecutive {
             job1.addTask(task1);
 
             String task2Name = "TestTK2";
-            TaskFlowJob job2 = createJavaExecutableJob(task2Name, false);
-
-            String task3Name = "TestTK3";
-            TaskFlowJob job3 = createJavaExecutableJob(task3Name, true);
+            TaskFlowJob job2 = createJavaExecutableJob(task2Name, true);
 
             SchedulerTHelper.log("************** Test with Job Killing *************");
             //submit three jobs
             JobId id1 = SchedulerTHelper.submitJob(job1);
             JobId id2 = SchedulerTHelper.submitJob(job2);
-            JobId id3 = SchedulerTHelper.submitJob(job3);
             SchedulerTHelper.waitForEventTaskRunning(id1, task1Name);
             SchedulerTHelper.waitForEventTaskRunning(id2, task2Name);
-            SchedulerTHelper.waitForEventTaskRunning(id3, task3Name);
 
-            SchedulerTHelper.log("************** All 3 tasks running *************");
-            TestProcessTreeKiller.waitUntilForkedProcessesAreRunning(detachedProcNumber * 3);
-            //we should have 3 times (3 jobs) number of detached processes
+            SchedulerTHelper.log("************** All 2 tasks running *************");
+            TestProcessTreeKiller.waitUntilForkedProcessesAreRunning(detachedProcNumber * 2);
+            //we should have 2 times (2 jobs) number of detached processes
 
             //kill the first job
             SchedulerTHelper
@@ -163,7 +158,7 @@ public class TestProcessTreeKiller extends SchedulerConsecutive {
             SchedulerTHelper.waitForEventJobFinished(id1);
             SchedulerTHelper.log("************** First job killed *************");
 
-            TestProcessTreeKiller.waitUntilForkedProcessesAreRunning(detachedProcNumber * 2);
+            TestProcessTreeKiller.waitUntilForkedProcessesAreRunning(detachedProcNumber);
 
             //kill the second job
             SchedulerTHelper
@@ -172,33 +167,17 @@ public class TestProcessTreeKiller extends SchedulerConsecutive {
             SchedulerTHelper.waitForEventJobFinished(id2);
             SchedulerTHelper.log("************** Second job killed *************");
 
-            TestProcessTreeKiller.waitUntilForkedProcessesAreRunning(detachedProcNumber);
-
-            //kill the third job
-            SchedulerTHelper
-                    .log("************** Waiting for the third job (JavaExecutableForker) to be killed *************");
-            SchedulerTHelper.getSchedulerInterface().killJob(id3);
-            SchedulerTHelper.waitForEventJobFinished(id3);
-            SchedulerTHelper.log("************** Third job killed *************");
-
             TestProcessTreeKiller.waitUntilForkedProcessesAreRunning(0);
 
-            // We make sure that the kill method for job 2 and job 3 have been killed
+            // We make sure that the kill method for job 2 has been called
             File killFileTask2 = new File(tmpDir, task2Name + ".tmp");
             assertTrue(killFileTask2 + " exists", killFileTask2.exists());
             FileUtils.deleteQuietly(killFileTask2);
-
-            File killFileTask3 = new File(tmpDir, task3Name + ".tmp");
-            assertTrue(killFileTask3 + " exists", killFileTask3.exists());
-            FileUtils.deleteQuietly(killFileTask3);
 
             JobResult res = SchedulerTHelper.getJobResult(id1);
             assertEquals(JobStatus.KILLED, res.getJobInfo().getStatus());
 
             res = SchedulerTHelper.getJobResult(id2);
-            assertEquals(JobStatus.KILLED, res.getJobInfo().getStatus());
-
-            res = SchedulerTHelper.getJobResult(id3);
             assertEquals(JobStatus.KILLED, res.getJobInfo().getStatus());
 
             SchedulerTHelper.log("************** Test with Normal Job termination *************");
@@ -224,46 +203,32 @@ public class TestProcessTreeKiller extends SchedulerConsecutive {
             //submit three jobs
             id1 = SchedulerTHelper.submitJob(job4);
             id2 = SchedulerTHelper.submitJob(job2);
-            id3 = SchedulerTHelper.submitJob(job3);
             SchedulerTHelper.waitForEventTaskRunning(id1, task4Name);
             SchedulerTHelper.waitForEventTaskRunning(id2, task2Name);
-            SchedulerTHelper.waitForEventTaskRunning(id3, task3Name);
 
-            SchedulerTHelper.log("************** All 3 tasks running *************");
+            SchedulerTHelper.log("************** All 2 tasks running *************");
 
-            TestProcessTreeKiller.waitUntilForkedProcessesAreRunning(detachedProcNumber * 2);
+            TestProcessTreeKiller.waitUntilForkedProcessesAreRunning(detachedProcNumber);
 
-            //we should have 2 times (3 jobs) number of detached processes as the first job won't spawn any process
+            //we should have 1 time (2 jobs) number of detached processes as the first job won't spawn any process
 
             SchedulerTHelper
                     .log("************** Waiting for first job (NativeExecutable) to finish *************");
             //wait for the first job to finish normally
 
-            if (res == null) {
-                SchedulerTHelper.waitForEventJobFinished(id1);
-            }
+            SchedulerTHelper.waitForEventJobFinished(id1);
+
             SchedulerTHelper.log("************** First job finished *************");
 
             int runningDetachedProcNumber = countProcesses();
             SchedulerTHelper.log("************** number of processes : " + runningDetachedProcNumber);
-            assertEquals(detachedProcNumber * 2, runningDetachedProcNumber);
+            assertEquals(detachedProcNumber, runningDetachedProcNumber);
 
             SchedulerTHelper
                     .log("************** Waiting for second job (JavaExecutable) to finish *************");
             //wait for the second job to finish normally
             SchedulerTHelper.waitForEventJobFinished(id2);
             SchedulerTHelper.log("************** Second job finished *************");
-
-            runningDetachedProcNumber = countProcesses();
-            SchedulerTHelper.log("************** number of processes : " + runningDetachedProcNumber);
-            assertEquals(detachedProcNumber, runningDetachedProcNumber);
-
-            SchedulerTHelper
-                    .log("************** Waiting for third job (JavaExecutableForker) to finish *************");
-            //wait for the last job to finish normally
-            // SchedulerTHelper.getSchedulerInterface().killJob(id3);
-            SchedulerTHelper.waitForEventJobFinished(id3);
-            SchedulerTHelper.log("************** Third job finished *************");
 
             runningDetachedProcNumber = countProcesses();
             SchedulerTHelper.log("************** number of processes : " + runningDetachedProcNumber);
@@ -275,8 +240,6 @@ public class TestProcessTreeKiller extends SchedulerConsecutive {
             res = SchedulerTHelper.getJobResult(id2);
             assertEquals(JobStatus.FINISHED, res.getJobInfo().getStatus());
 
-            res = SchedulerTHelper.getJobResult(id3);
-            assertEquals(JobStatus.FINISHED, res.getJobInfo().getStatus());
         }
     }
 

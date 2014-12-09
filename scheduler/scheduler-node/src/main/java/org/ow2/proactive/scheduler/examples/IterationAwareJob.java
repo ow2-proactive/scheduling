@@ -64,8 +64,8 @@ public class IterationAwareJob extends JavaExecutable {
 
     @Override
     public Serializable execute(TaskResult... results) throws Throwable {
-        report += "prop it " + System.getProperty("pas.task.iteration") + ":";
-        report += "prop dup " + System.getProperty("pas.task.replication") + ":";
+        report += "prop it " + getVariables().get("pas.task.iteration") + ":";
+        report += "prop dup " + getVariables().get("pas.task.replication") + ":";
 
         return report;
     }
