@@ -45,16 +45,13 @@ import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingService
 import org.ow2.tests.FunctionalTest;
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.spi.LoggingEvent;
+import org.junit.Test;
 
 import functionaltests.executables.Logging;
 
 import static org.junit.Assert.*;
 
 
-/**
- * @author cdelbe
- *
- */
 public class TestLoggers extends FunctionalTest {
 
     private static URL jobDescriptor = TestLoggers.class
@@ -62,12 +59,7 @@ public class TestLoggers extends FunctionalTest {
 
     private final static int TEST_TIMEOUT = 10000;
 
-    /**
-     * Tests start here.
-     *
-     * @throws Throwable any exception that can be thrown during the test.
-     */
-    @org.junit.Test
+    @Test
     public void run() throws Throwable {
 
         // socket loggers
@@ -115,7 +107,6 @@ public class TestLoggers extends FunctionalTest {
 
         @Override
         protected void append(LoggingEvent loggingevent) {
-            //System.out.println(">> AppenderTester.append() : " + loggingevent.getMessage());
             if (loggingevent.getLevel().equals(Log4JTaskLogs.STDERR_LEVEL)) {
                 return;
             } else if (!Logging.MSG.equals(loggingevent.getMessage())) {

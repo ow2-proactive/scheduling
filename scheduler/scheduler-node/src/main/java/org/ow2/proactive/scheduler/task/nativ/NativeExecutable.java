@@ -43,6 +43,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintStream;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -56,14 +57,15 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extensions.processbuilder.OSProcessBuilder;
 import org.objectweb.proactive.extensions.processbuilder.exception.NotImplementedException;
-import org.ow2.proactive.rm.util.process.ProcessTreeKiller;
 import org.ow2.proactive.scheduler.common.exception.UserException;
 import org.ow2.proactive.scheduler.common.task.Decrypter;
+import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.Executable;
 import org.ow2.proactive.scheduler.exception.RunningProcessException;
 import org.ow2.proactive.scheduler.exception.StartProcessException;
 import org.ow2.proactive.scheduler.task.SchedulerVars;
+import org.ow2.proactive.scheduler.task.forked.TaskProcessTreeKiller;
 import org.ow2.proactive.scheduler.task.utils.ForkerUtils;
 import org.ow2.proactive.scheduler.util.process.ThreadReader;
 import org.ow2.proactive.scripting.GenerationScript;
@@ -88,15 +90,13 @@ public class NativeExecutable extends Executable {
     public static final Logger logger = Logger.getLogger(NativeExecutable.class);
 
     private static final String GENERATION_SCRIPT_ERR = "\nNo command eligible was found by generation script.\n" +
-        "A generation script must define a variable named '" + GenerationScript.RESULT_VARIABLE +
-        "' or a variable named '" + GenerationScript.RESULTLIST_VARIABLE + "' which contains " +
+        "A generation script must define a variable named '" +
+        GenerationScript.RESULT_VARIABLE +
+        "' or a variable named '" +
+        GenerationScript.RESULTLIST_VARIABLE +
+        "' which contains " +
         "the native command to launch. \n" + "Script details :\n";
 
-    /**
-     * Environment variable exported to the the process
-     * used for kill the task
-     */
-    private static final String COOKIE_ENV = "PROACTIVE_COOKIE";
     /** Env var exported for the number and name of nodes */
     private static final String CORE_FILE_ENV = "PAS_NODESFILE";
     private static final String CORE_NB = "PAS_NODESNUMBER";
@@ -109,14 +109,6 @@ public class NativeExecutable extends Executable {
 
     /** file use to set the working dir of the native command */
     private File wDirFile;
-
-    /**
-     * HM of environment variables used
-     * for kill action of the task, processes that export
-     * theses environment variables will be killed.
-     * Used by ProcessTreeKiller
-     */
-    private Map<String, String> modelEnvVar = null;
 
     /**
      * additional environment variables
@@ -139,6 +131,10 @@ public class NativeExecutable extends Executable {
     private Decrypter decrypter = null;
 
     private boolean runAsUser;
+    private TaskId taskId;
+    private PrintStream outputSink;
+    private PrintStream errorSink;
+    private TaskProcessTreeKiller taskProcessTreeKiller;
 
     /**
      * Initialize the executable using the given executable container.
@@ -196,8 +192,12 @@ public class NativeExecutable extends Executable {
         }
         nodesNumber = nodes.size();
         //set decrypter
-        this.decrypter = execInitializer.getDecrypter();
-        this.runAsUser = execInitializer.isRunAsUser();
+        decrypter = execInitializer.getDecrypter();
+        runAsUser = execInitializer.isRunAsUser();
+
+        taskId = execInitializer.getTaskId();
+        outputSink = execInitializer.getOutputSink();
+        errorSink = execInitializer.getErrorSink();
     }
 
     /**
@@ -211,7 +211,7 @@ public class NativeExecutable extends Executable {
     private Object executeGenerationScript(GenerationScript script) throws ActiveObjectCreationException,
             NodeException, UserException {
         ScriptHandler handler = ScriptLoader.createHandler(PAActiveObject.getNode());
-        ScriptResult<Object> res = handler.handle(script);
+        ScriptResult<Object> res = handler.handle(script, this.outputSink, this.errorSink);
 
         if (res.errorOccured()) {
             res.getException().printStackTrace();
@@ -239,28 +239,20 @@ public class NativeExecutable extends Executable {
      * if env cannot be passed, throws exception if user intend to alter env.
      */
     private Map<String, String> buildEnvironmentVariables(boolean processEnvAvailable) {
-        //Set Model environment variable HashMap for the executable;
-        //if this process must be killed by ProcessTreeKiller
-        String cookie_value = ProcessTreeKiller.createCookie();
-        modelEnvVar = new HashMap<String, String>();
-        modelEnvVar.put(COOKIE_ENV, cookie_value);
 
         Map<String, String> envVarsTab = new HashMap<String, String>();
         //Set environment variables array used to launch the external native command,
         //with system environment variables, ProActive Scheduling environment variables,
         Map<String, String> taskEnvVariables = new Hashtable<String, String>(15);
-        taskEnvVariables.put(SchedulerVars.JAVAENV_JOB_ID_VARNAME.toString(), System
-                .getProperty(SchedulerVars.JAVAENV_JOB_ID_VARNAME.toString()));
-        taskEnvVariables.put(SchedulerVars.JAVAENV_JOB_NAME_VARNAME.toString(), System
-                .getProperty(SchedulerVars.JAVAENV_JOB_NAME_VARNAME.toString()));
-        taskEnvVariables.put(SchedulerVars.JAVAENV_TASK_ID_VARNAME.toString(), System
-                .getProperty(SchedulerVars.JAVAENV_TASK_ID_VARNAME.toString()));
-        taskEnvVariables.put(SchedulerVars.JAVAENV_TASK_NAME_VARNAME.toString(), System
-                .getProperty(SchedulerVars.JAVAENV_TASK_NAME_VARNAME.toString()));
-        taskEnvVariables.put(SchedulerVars.JAVAENV_TASK_ITERATION.toString(), System
-                .getProperty(SchedulerVars.JAVAENV_TASK_ITERATION.toString()));
-        taskEnvVariables.put(SchedulerVars.JAVAENV_TASK_REPLICATION.toString(), System
-                .getProperty(SchedulerVars.JAVAENV_TASK_REPLICATION.toString()));
+        taskEnvVariables.put(SchedulerVars.JAVAENV_JOB_ID_VARNAME.toString(), taskId.getJobId().value());
+        taskEnvVariables.put(SchedulerVars.JAVAENV_JOB_NAME_VARNAME.toString(), taskId.getJobId()
+                .getReadableName());
+        taskEnvVariables.put(SchedulerVars.JAVAENV_TASK_ID_VARNAME.toString(), taskId.value());
+        taskEnvVariables.put(SchedulerVars.JAVAENV_TASK_NAME_VARNAME.toString(), taskId.getReadableName());
+        taskEnvVariables.put(SchedulerVars.JAVAENV_TASK_ITERATION.toString(), Integer.toString(taskId
+                .getIterationIndex()));
+        taskEnvVariables.put(SchedulerVars.JAVAENV_TASK_REPLICATION.toString(), Integer.toString(taskId
+                .getReplicationIndex()));
         //add to the returnTab the task environment variables
         for (Map.Entry<String, String> entry : taskEnvVariables.entrySet()) {
             String name = entry.getKey();
@@ -314,8 +306,8 @@ public class NativeExecutable extends Executable {
         envVarsTab.put(CORE_NB, "" + this.nodesNumber);
         envVarsTab.put(LEGACY_CORE_NB, "" + this.nodesNumber);
 
-        //then the cookie used by ProcessTreeKiller
-        envVarsTab.put(COOKIE_ENV, cookie_value);
+        taskProcessTreeKiller = new TaskProcessTreeKiller(taskId.value());
+        taskProcessTreeKiller.tagEnvironment(envVarsTab);
 
         return envVarsTab;
     }
@@ -334,7 +326,7 @@ public class NativeExecutable extends Executable {
                 //in this case, the error is certainly due to the user (ie : command not found)
                 //we have to inform him about the cause.
                 logger.info("", e);
-                System.err.println(e);
+                errorSink.println(e);
                 throw new StartProcessException(e.getMessage(), e);
             }
 
@@ -344,7 +336,7 @@ public class NativeExecutable extends Executable {
 
                 // redirect streams
                 BufferedReader sout = new BufferedReader(new InputStreamReader(process.getInputStream()));
-                Thread tsout = new Thread(new ThreadReader(sout, System.out, this));
+                Thread tsout = new Thread(new ThreadReader(sout, outputSink, this));
                 tsout.start();
                 // wait for process completion
                 process.waitFor();
@@ -368,6 +360,7 @@ public class NativeExecutable extends Executable {
             if (nodesFiles != null) {
                 nodesFiles.delete();
             }
+            taskProcessTreeKiller.kill();
         }
     }
 
@@ -420,7 +413,7 @@ public class NativeExecutable extends Executable {
         super.kill();
         if (process != null) {
             try {
-                ProcessTreeKiller.get().kill(process, modelEnvVar);
+                taskProcessTreeKiller.kill();
                 // WARN jlscheef destroy() may be useless but it's not working
                 // yet without it.
                 // processTreeKiller seems not to kill current process...
@@ -479,7 +472,7 @@ public class NativeExecutable extends Executable {
             return super.getProgress();
         }
         //get taskId
-        String tid = System.getProperty(SchedulerVars.JAVAENV_TASK_ID_VARNAME.toString());
+        String tid = taskId.value();
         //get tmp file where to read the progress value
         File f = new File(DEFAULT_PATH, tid + ".progress");
         if (!f.exists()) {

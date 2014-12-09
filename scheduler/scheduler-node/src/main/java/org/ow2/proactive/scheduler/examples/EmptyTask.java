@@ -49,7 +49,7 @@ public class EmptyTask extends JavaExecutable {
     /**  */
     @Override
     public Serializable execute(TaskResult... results) {
-        System.out.println("Do nothing...");
+        getOut().println("Do nothing...");
         return "Nothing";
     }
 }

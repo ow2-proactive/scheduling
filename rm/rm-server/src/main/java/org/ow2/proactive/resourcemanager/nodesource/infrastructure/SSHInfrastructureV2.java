@@ -59,8 +59,8 @@ import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProper
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 import org.ow2.proactive.resourcemanager.utils.RMNodeStarter;
-import org.ow2.proactive.resourcemanager.utils.RMNodeStarter.CommandLineBuilder;
-import org.ow2.proactive.resourcemanager.utils.RMNodeStarter.OperatingSystem;
+import org.ow2.proactive.resourcemanager.utils.CommandLineBuilder;
+import org.ow2.proactive.resourcemanager.utils.OperatingSystem;
 import org.ow2.proactive.utils.Formatter;
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSch;

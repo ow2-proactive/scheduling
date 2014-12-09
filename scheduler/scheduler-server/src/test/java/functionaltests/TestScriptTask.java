@@ -36,15 +36,9 @@
  */
 package functionaltests;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
 import java.io.File;
 import java.net.URL;
 
-import org.junit.Assert;
-import org.junit.Test;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
@@ -54,6 +48,11 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.exception.ForkedJVMProcessException;
+import org.junit.Assert;
+import org.junit.Test;
+
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.junit.Assert.*;
 
 
 public class TestScriptTask extends SchedulerConsecutive {
@@ -63,7 +62,6 @@ public class TestScriptTask extends SchedulerConsecutive {
 
     private static URL job_null_returning_script_task = TestScriptTask.class
             .getResource("/functionaltests/descriptors/Job_null_returning_script_task.xml");
-
 
     @Test
     public void run() throws Throwable {
@@ -95,12 +93,14 @@ public class TestScriptTask extends SchedulerConsecutive {
         // pas properties are exposed in the script task
         TaskResult propertiesTaskResult = jobResult.getResult("properties");
         String logs = propertiesTaskResult.getOutput().getAllLogs(false);
-        assertTrue(logs.contains("pas.job.id=" + jobResult.getJobId().value()));
-        assertTrue(logs.contains("pas.job.name=" + jobResult.getName()));
-        assertTrue(logs.contains("pas.task.id=" + propertiesTaskResult.getTaskId().value()));
-        assertTrue(logs.contains("pas.task.name=properties"));
-        assertTrue(logs.contains("pas.task.iteration=0"));
-        assertTrue(logs.contains("pas.task.replication=0"));
+
+        assertThat(logs, containsString("pas.job.id=" + jobResult.getJobId().value()));
+        assertThat(logs, containsString("pas.job.id=" + jobResult.getJobId().value()));
+        assertThat(logs, containsString("pas.job.name=" + jobResult.getName()));
+        assertThat(logs, containsString("pas.task.id=" + propertiesTaskResult.getTaskId().value()));
+        assertThat(logs, containsString("pas.task.name=properties"));
+        assertThat(logs, containsString("pas.task.iteration=0"));
+        assertThat(logs, containsString("pas.task.replication=0"));
 
         // the script can be a file
         TaskResult fileTaskResult = jobResult.getResult("file");
@@ -138,7 +138,7 @@ public class TestScriptTask extends SchedulerConsecutive {
      * SCHEDULING-2199 NPE is thrown when retrieving the result of a ScriptTask,
      *  if the result is 'null'.
      */
-    private void test_getTaskResult_nullReturningScriptTask_shouldSucceed() throws Throwable{
+    private void test_getTaskResult_nullReturningScriptTask_shouldSucceed() throws Throwable {
         TaskFlowJob job = (TaskFlowJob) JobFactory_stax.getFactory().createJob(
                 new File(job_null_returning_script_task.toURI()).getAbsolutePath());
         JobId id = SchedulerTHelper.submitJob(job);

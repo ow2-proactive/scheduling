@@ -58,7 +58,7 @@ public class AbortJob extends JavaExecutable {
     @Override
     public Serializable execute(TaskResult... results) throws Throwable {
         try {
-            System.out.println("I will throw a runtime exception in 3 sec");
+            getOut().println("I will throw a runtime exception in 3 sec");
 
             Thread.sleep(3000);
 

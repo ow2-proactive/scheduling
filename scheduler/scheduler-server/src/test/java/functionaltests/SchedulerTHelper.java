@@ -44,8 +44,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Level;
-import org.junit.Assert;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
@@ -84,6 +82,8 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.utils.FileUtils;
+import org.apache.log4j.Level;
+import org.junit.Assert;
 
 import functionaltests.common.CommonTUtils;
 import functionaltests.common.InputStreamReaderThread;
@@ -135,6 +135,9 @@ import functionaltests.monitor.SchedulerMonitorsHandler;
  */
 public class SchedulerTHelper {
 
+    private static EnvironmentCookieBasedChildProcessKiller childProcessKiller = new EnvironmentCookieBasedChildProcessKiller(
+        "TEST");
+
     protected static URL functionalTestRMProperties = SchedulerTHelper.class
             .getResource("config/functionalTRMProperties.ini");
 
@@ -146,8 +149,6 @@ public class SchedulerTHelper {
         RMI_PORT + "/" + SchedulerConstants.SCHEDULER_DEFAULT_NAME;
 
     private static Process schedulerProcess;
-
-    public static String TEST_COOKIE = "TEST_";
 
     protected static SchedulerAuthenticationInterface schedulerAuth;
 
@@ -229,8 +230,6 @@ public class SchedulerTHelper {
             rmPropertiesFilePath = new File(functionalTestRMProperties.toURI()).getAbsolutePath();
         }
         cleanTMP();
-
-        EnvironmentCookieBasedChildProcessKiller.setCookie(TEST_COOKIE, TEST_COOKIE);
 
         List<String> commandLine = new ArrayList<String>();
         commandLine.add(System.getProperty("java.home") + File.separator + "bin" + File.separator + "java");
@@ -363,7 +362,7 @@ public class SchedulerTHelper {
      */
     public static void killSchedulerAndNodes() throws Exception {
         org.apache.log4j.Logger.getLogger(ProcessTreeKiller.class).setLevel(Level.DEBUG);
-        EnvironmentCookieBasedChildProcessKiller.killChildProcesses();
+        childProcessKiller.killChildProcesses();
         killScheduler();
     }
 
@@ -868,7 +867,7 @@ public class SchedulerTHelper {
         return getSchedulerInterface().getJobResult(id);
     }
 
-    public static TaskResult getTaskResult(JobId jobId, String taskName)throws Exception  {
+    public static TaskResult getTaskResult(JobId jobId, String taskName) throws Exception {
         return getSchedulerInterface().getTaskResult(jobId, taskName);
     }
 

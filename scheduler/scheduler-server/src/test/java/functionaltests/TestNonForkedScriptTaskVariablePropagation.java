@@ -51,6 +51,7 @@ import org.ow2.proactive.scheduler.common.job.factories.JobFactory_stax;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.tests.FunctionalTest;
 
+
 public class TestNonForkedScriptTaskVariablePropagation extends FunctionalTest {
     private static final long five_minutes = 5 * 60 * 1000;
 

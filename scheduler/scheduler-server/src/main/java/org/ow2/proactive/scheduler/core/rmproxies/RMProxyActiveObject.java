@@ -10,7 +10,6 @@ import java.util.concurrent.Future;
 
 import javax.security.auth.login.LoginException;
 
-import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.ImmediateService;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAEventProgramming;
@@ -28,6 +27,7 @@ import org.ow2.proactive.scripting.ScriptLoader;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
+import org.apache.log4j.Logger;
 
 
 @ActiveObject

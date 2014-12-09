@@ -36,6 +36,7 @@
  */
 package org.ow2.proactive.scheduler.common.task.executable;
 
+import java.io.PrintStream;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.List;
@@ -45,7 +46,6 @@ import java.util.Map.Entry;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.common.task.executable.internal.JavaStandaloneExecutableInitializer;
 import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
-import org.ow2.proactive.scheduler.task.SchedulerVars;
 
 
 /**
@@ -173,7 +173,7 @@ public abstract class AbstractJavaExecutable extends Executable {
      * @return the Iteration Index of this Task
      */
     public final int getIterationIndex() {
-        return Integer.parseInt(System.getProperty(SchedulerVars.JAVAENV_TASK_ITERATION.toString(), "0"));
+        return execInitializer.getTaskId().getIterationIndex();
     }
 
     /**
@@ -187,7 +187,7 @@ public abstract class AbstractJavaExecutable extends Executable {
      * @return the Replication Index of this Task
      */
     public final int getReplicationIndex() {
-        return Integer.parseInt(System.getProperty(SchedulerVars.JAVAENV_TASK_REPLICATION.toString(), "0"));
+        return execInitializer.getTaskId().getReplicationIndex();
     }
 
     /**
@@ -199,6 +199,22 @@ public abstract class AbstractJavaExecutable extends Executable {
      */
     protected String getThirdPartyCredential(String key) {
         return execInitializer.getThirdPartyCredentials().get(key);
+    }
+
+    /**
+     * When using non forked Java tasks, you should use this PrintStream instead of System.out.
+     * @return a stream that will write to the task's output stream
+     */
+    protected PrintStream getOut() {
+        return execInitializer.getOutputSink();
+    }
+
+    /**
+     * When using non forked Java tasks, you should use this PrintStream instead of System.err.
+     * @return a stream that will write to the task's error stream
+     */
+    protected PrintStream getErr() {
+        return execInitializer.getErrorSink();
     }
 
     private void updateVariables(Map<String, Serializable> old, Map<String, Serializable> updated) {

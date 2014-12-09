@@ -1,11 +1,10 @@
 /*
- * ################################################################
- *
+ *  *
  * ProActive Parallel Suite(TM): The Java(TM) library for
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2011 INRIA/University of
+ * Copyright (C) 1997-2014 INRIA/University of
  *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -31,43 +30,38 @@
  *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s):
  *
- * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ *  * $$ACTIVEEON_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.examples;
+package org.ow2.proactive.scheduler.task.forked;
 
-import java.io.Serializable;
+import java.util.Collections;
+import java.util.Map;
 
-import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
+import org.ow2.proactive.rm.util.process.ProcessTreeKiller;
+import org.apache.log4j.Logger;
 
 
-/**
- * KillJob is a task that will kill the JVM 5 seconds after start.<br />
- * Used only by Test classes.
- *
- * @author The ProActive Team
- *
- */
-public class KillJob extends JavaExecutable {
+public class TaskProcessTreeKiller {
 
-    public int exitcode;
+    private static final Logger logger = Logger.getLogger(TaskProcessTreeKiller.class);
 
-    /**
-     * @see org.ow2.proactive.scheduler.common.task.executable.Executable#execute(org.ow2.proactive.scheduler.common.task.TaskResult[])
-     */
-    @Override
-    public Serializable execute(TaskResult... results) throws Throwable {
+    private static final String PROCESS_KILLER_COOKIE = "PROCESS_KILLER_COOKIE";
+    private String ptkCookie;
 
+    public TaskProcessTreeKiller(String taskId) {
+        ptkCookie = taskId + "_" + ProcessTreeKiller.createCookie();
+    }
+
+    public void tagEnvironment(Map<String, String> env) {
+        env.put(PROCESS_KILLER_COOKIE, ptkCookie);
+    }
+
+    public void kill() {
         try {
-            getOut().println("I will kill in 5 sec the node on which i was started with exit code = " +
-                exitcode);
-
-            Thread.sleep(5000);
-
+            ProcessTreeKiller.get().kill(Collections.singletonMap(PROCESS_KILLER_COOKIE, ptkCookie));
         } catch (Exception e) {
+            logger.warn("Failed to kill child processes using cookie : " + ptkCookie, e);
         }
-        System.exit(exitcode);
-        return null;
+
     }
 }

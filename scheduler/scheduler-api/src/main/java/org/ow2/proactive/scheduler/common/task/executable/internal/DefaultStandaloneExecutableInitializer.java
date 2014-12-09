@@ -34,8 +34,10 @@
  */
 package org.ow2.proactive.scheduler.common.task.executable.internal;
 
+import java.io.PrintStream;
 import java.util.ArrayList;
 
+import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.dataspaces.LocalSpace;
 import org.ow2.proactive.scheduler.common.task.dataspaces.RemoteSpace;
 
@@ -48,6 +50,9 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.RemoteSpace;
 public class DefaultStandaloneExecutableInitializer implements StandaloneExecutableInitializer {
 
     protected ArrayList nodes;
+    protected TaskId taskId;
+    private PrintStream outputSink;
+    private PrintStream errorSink;
 
     @Override
     public ArrayList getNodesURL() {
@@ -106,4 +111,31 @@ public class DefaultStandaloneExecutableInitializer implements StandaloneExecuta
         this.userSpace = userSpace;
     }
 
+    @Override
+    public TaskId getTaskId() {
+        return taskId;
+    }
+
+    @Override
+    public void setTaskId(TaskId taskId) {
+        this.taskId = taskId;
+    }
+
+    @Override
+    public PrintStream getOutputSink() {
+        return outputSink;
+    }
+
+    @Override
+    public void setOutputSink(PrintStream redirectedStdout) {
+        this.outputSink = redirectedStdout;
+    }
+
+    public PrintStream getErrorSink() {
+        return errorSink;
+    }
+
+    public void setErrorSink(PrintStream errorSink) {
+        this.errorSink = errorSink;
+    }
 }

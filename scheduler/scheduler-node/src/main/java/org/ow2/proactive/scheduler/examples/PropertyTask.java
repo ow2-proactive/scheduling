@@ -62,7 +62,7 @@ public class PropertyTask extends JavaExecutable {
             e.printStackTrace();
         }
 
-        System.out.println("------> The property user.property1 has value '" +
+        getOut().println("------> The property user.property1 has value '" +
             System.getProperty("user.property1") + "'");
 
         return 0;

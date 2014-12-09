@@ -56,18 +56,18 @@ public class MonteCarloAverage extends JavaExecutable {
     public Serializable execute(TaskResult... results) throws Throwable {
         double avrg = 0;
         int count = 0;
-        System.out.print("Parameters are : ");
+        getOut().print("Parameters are : ");
 
         for (TaskResult res : results) {
             if (!res.hadException()) {
-                System.out.print(res.value() + " ");
+                getOut().print(res.value() + " ");
                 avrg += ((Double) (res.value())).doubleValue();
                 count++;
             }
         }
 
         Double result = new Double(avrg / count);
-        System.out.println("Average is : " + result);
+        getOut().println("Average is : " + result);
 
         return result;
     }

@@ -65,7 +65,7 @@ public class MultiNodeExample extends JavaExecutable {
 
     @Override
     public Serializable execute(TaskResult... results) {
-        System.out.println("Multi-node started !!");
+        getOut().println("Multi-node started !!");
 
         ArrayList<Node> nodes = getNodes();
 
@@ -87,7 +87,7 @@ public class MultiNodeExample extends JavaExecutable {
         Controller controller = new Controller(workers);
         int result = controller.findNthPrimeNumber(numberToFind);
 
-        System.out.println("last prime : " + result);
+        getOut().println("last prime : " + result);
 
         return result;
     }
@@ -131,7 +131,7 @@ public class MultiNodeExample extends JavaExecutable {
 
                 if (!answers.contains(flase)) {
                     workers.get(found % workers.size()).addPrimeNumber(n);
-                    System.out.println("--->" + n);
+                    getOut().println("--->" + n);
                     found++;
                 }
 
@@ -139,7 +139,7 @@ public class MultiNodeExample extends JavaExecutable {
             }
 
             long stopTime = System.currentTimeMillis();
-            System.out.println("Total time (ms) " + (stopTime - startTime));
+            getOut().println("Total time (ms) " + (stopTime - startTime));
 
             return n - 1;
         }

@@ -55,7 +55,7 @@ import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
-import org.ow2.proactive.resourcemanager.utils.RMNodeStarter.CommandLineBuilder;
+import org.ow2.proactive.resourcemanager.utils.CommandLineBuilder;
 
 
 /**

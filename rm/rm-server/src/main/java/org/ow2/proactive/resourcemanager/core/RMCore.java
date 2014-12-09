@@ -816,6 +816,11 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     public BooleanWrapper setNodeAvailable(String nodeUrl) {
         final RMNode node = this.allNodes.get(nodeUrl);
 
+        if (node == null) {
+            logger.warn(String.format("Cannot set node as available, node %s is unknown", nodeUrl));
+            return new BooleanWrapper(false);
+        }
+
         if (node.isDown()) {
             // down node came back, restore it's status
             NodeState previousNodeState = node.getLastEvent().getPreviousNodeState();
@@ -825,7 +830,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                 internalSetFree(node);
             }
         }
-        return new BooleanWrapper(node != null && !node.isDown());
+        return new BooleanWrapper(!node.isDown());
     }
 
     public NodeState getNodeState(String nodeUrl) {

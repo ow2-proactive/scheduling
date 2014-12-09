@@ -80,15 +80,15 @@ public class CopyFile extends JavaExecutable {
                 throw new IllegalStateException("No input file match the pattern : " + inputFile);
             }
             if (lfo.length > 1) {
-                System.out.println("Warning more than one file matched the pattern : " + inputFile);
+                getOut().println("Warning more than one file matched the pattern : " + inputFile);
             }
             ((VFSFileObjectAdapter) super.getLocalFile(outputFile)).getAdaptee().copyFrom(lfo[0],
                     Selectors.SELECT_SELF);
-            System.out.println("Copied " + lfo[0].getURL() + " to  " +
+            getOut().println("Copied " + lfo[0].getURL() + " to  " +
                 super.getLocalFile(outputFile).getRealURI());
         } else {
             super.getLocalFile(outputFile).copyFrom(super.getLocalFile(inputFile), FileSelector.SELECT_SELF);
-            System.out.println("Copied " + super.getLocalFile(inputFile).getRealURI() + " to  " +
+            getOut().println("Copied " + super.getLocalFile(inputFile).getRealURI() + " to  " +
                 super.getLocalFile(outputFile).getRealURI());
         }
 

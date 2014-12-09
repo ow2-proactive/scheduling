@@ -55,17 +55,17 @@ public class PAHomeExecutable extends JavaExecutable {
     @Override
     public Serializable execute(TaskResult... results) throws Throwable {
         File expectedFile = new File(expectedHome).getCanonicalFile();
-        String prop = System.getProperty("proactive.home");
+        String prop = getVariables().get("proactive.home").toString();
         if (!expectedFile.equals(new File(prop).getCanonicalFile())) {
             throw new IllegalStateException("Unexpected proactive.home value, expected " + expectedHome +
                 " received " + prop);
         }
-        prop = System.getProperty(PAResourceManagerProperties.RM_HOME.getKey());
+        prop = getVariables().get(PAResourceManagerProperties.RM_HOME.getKey()).toString();
         if (!expectedFile.equals(new File(prop).getCanonicalFile())) {
             throw new IllegalStateException("Unexpected pa.rm.home value, expected " + expectedHome +
                 " received " + prop);
         }
-        prop = System.getProperty(PASchedulerProperties.SCHEDULER_HOME.getKey());
+        prop = getVariables().get(PASchedulerProperties.SCHEDULER_HOME.getKey()).toString();
         if (!expectedFile.equals(new File(prop).getCanonicalFile())) {
             throw new IllegalStateException("Unexpected pa.scheduler.home value, expected " + expectedHome +
                 " received " + prop);

@@ -85,7 +85,7 @@ public class TaskUsingCredentialsTest extends SchedulerConsecutive {
 
         JobResult jobResult = SchedulerTHelper.getJobResult(jobId);
         for (TaskResult taskResult : jobResult.getAllResults().values()) {
-            assertTrue("task " + taskResult.getTaskId() + " did not print the credential", taskResult
+            assertTrue("task " + taskResult.getTaskId().getReadableName() + " did not print the credential", taskResult
                     .getOutput().getAllLogs(false).contains("superpassword"));
         }
     }

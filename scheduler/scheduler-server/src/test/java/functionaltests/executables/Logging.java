@@ -61,12 +61,12 @@ public class Logging extends JavaExecutable {
         if (this.stream.equals("out")) {
             for (int i = 0; i < numberOfLines; i++) {
                 Thread.sleep(this.sleepTime);
-                System.out.println(MSG);
+                getOut().println(MSG);
             }
         } else {
             for (int i = 0; i < numberOfLines; i++) {
                 Thread.sleep(this.sleepTime);
-                System.out.println(MSG);
+                getOut().println(MSG);
             }
         }
 

@@ -197,6 +197,7 @@ public class NativeTaskLauncher extends TaskLauncher {
 
             decrypter.setCredentials(executableContainer.getCredentials());
             execInit.setDecrypter(decrypter);
+            execInit.setTaskId(taskId);
 
             // if an exception occurs in init method, unwrapp the InvocationTargetException
             // the result of the execution is the user level exception

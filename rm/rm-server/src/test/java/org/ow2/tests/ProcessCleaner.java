@@ -190,7 +190,7 @@ public class ProcessCleaner {
         Set<Integer> pids = this.getAliveProcesses();
         for (int pid : pids) {
             try {
-                printStackTrace(pid);
+                // printStackTrace(pid);
                 pk.kill(pid);
                 System.err.println("Killed process " + pid);
             } catch (InterruptedException e) {

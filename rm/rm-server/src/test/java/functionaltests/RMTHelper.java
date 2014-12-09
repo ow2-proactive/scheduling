@@ -81,12 +81,12 @@ import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.resourcemanager.utils.RMNodeStarter;
 import org.ow2.proactive.utils.FileToBytesConverter;
 import org.ow2.tests.ProActiveSetup;
+import org.ow2.tests.ProcessCleaner;
 
 import functionaltests.common.CommonTUtils;
 import functionaltests.common.InputStreamReaderThread;
 import functionaltests.monitor.RMMonitorEventReceiver;
 import functionaltests.monitor.RMMonitorsHandler;
-import org.ow2.tests.ProcessCleaner;
 
 
 /**

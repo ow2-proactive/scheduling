@@ -64,8 +64,8 @@ public class WaitAndPrint extends JavaExecutable {
         String message = null;
 
         try {
-            System.err.println("Task " + number + " : Test STDERR");
-            System.out.println("Task " + number + " : Test STDOUT");
+            getErr().println("Task " + number + " : Test STDERR");
+            getOut().println("Task " + number + " : Test STDOUT");
 
             message = "Task " + number;
             int st = 0;
@@ -80,10 +80,10 @@ public class WaitAndPrint extends JavaExecutable {
 
         } catch (Exception e) {
             message = "crashed";
-            e.printStackTrace();
+            e.printStackTrace(getErr());
         }
 
-        System.out.println("Terminate task number " + number);
+        getOut().println("Terminate task number " + number);
 
         return ("No." + this.number + " hi from " + message + "\t slept for " + sleepTime + " Seconds");
     }

@@ -4,6 +4,8 @@ import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.tests.FunctionalTest;
 
+import org.junit.Test;
+
 import functionaltests.RMTHelper;
 import functionaltests.SchedulerTHelper;
 import functionaltests.TNode;
@@ -11,7 +13,7 @@ import functionaltests.TNode;
 
 public class TestChildProcessOfNodeKilled extends FunctionalTest {
 
-    @org.junit.Test
+    @Test
     public void childProcessesForkedByTaskAreCleanedUpWhenRMNodeStarterIsKilled() throws Throwable {
         TNode tNode = startSchedulerAndRMWithOneNode();
         startJobForkingProcesses();

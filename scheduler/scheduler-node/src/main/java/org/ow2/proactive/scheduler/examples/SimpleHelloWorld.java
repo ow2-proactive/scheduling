@@ -178,7 +178,7 @@ public class SimpleHelloWorld {
     private class InternalExec extends JavaExecutable {
         @Override
         public Serializable execute(TaskResult... results) {
-            System.out.println("Hello World !");
+            getOut().println("Hello World !");
 
             return "HelloWorld Sample host : " + ProActiveInet.getInstance().getHostname();
         }

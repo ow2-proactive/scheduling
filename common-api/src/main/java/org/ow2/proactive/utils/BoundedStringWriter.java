@@ -37,12 +37,13 @@
 package org.ow2.proactive.utils;
 
 import java.io.IOException;
+import java.io.PrintStream;
 import java.io.Writer;
 
 
 /**
  * BoundedStringWriter that keeps a limited amount (maxLength) of chars into
- * a sliding (elements are added and removed from the head) buffer and always prints them to stdout. 
+ * a sliding (elements are added and removed from the head) buffer and always prints them to an output sink.
  * It ensures the size is never greater than the maximum size given in the constructor.
  * Closing a <tt>BoundedStringWriter</tt> has no effect. The methods in this class
  * can be called after the stream has been closed without generating an
@@ -53,33 +54,35 @@ import java.io.Writer;
  */
 public class BoundedStringWriter extends Writer {
 
-    private final StringBuilder bld;
+    private final PrintStream outputSink;
+    private final StringBuilder content;
     private final int maxSize;
 
     /**
      * Create a new bounded string writer using the default maximum size.
      */
-    public BoundedStringWriter(final int maxSize) {
-        this.bld = new StringBuilder(this.maxSize);
+    public BoundedStringWriter(PrintStream outputSink, final int maxSize) {
+        this.outputSink = outputSink;
         this.maxSize = maxSize;
+        this.content = new StringBuilder();
     }
 
     /** {@inheritDoc} */
     @Override
     public void write(char[] c, int off, int len) {
-        int nextLen = this.bld.length() + len;
+        int nextLen = this.content.length() + len;
         if (nextLen <= this.maxSize) {
-            this.bld.append(c, off, len);
+            this.content.append(c, off, len);
         } else { // nextLen > this.maxSize    		
             if (len <= this.maxSize) {
-                this.bld.delete(0, nextLen - this.maxSize);
-                this.bld.append(c, off, len);
+                this.content.delete(0, nextLen - this.maxSize);
+                this.content.append(c, off, len);
             } else {
-                this.bld.delete(0, this.maxSize);
-                this.bld.append(c, len - this.maxSize, this.maxSize);
+                this.content.delete(0, this.maxSize);
+                this.content.append(c, len - this.maxSize, this.maxSize);
             }
         }
-        System.out.print(new String(c, off, len));
+        outputSink.print(new String(c, off, len));
     }
 
     /**
@@ -88,13 +91,13 @@ public class BoundedStringWriter extends Writer {
      * @return StringBuilder holding the current buffer value.
      */
     public StringBuilder getBuilder() {
-        return this.bld;
+        return this.content;
     }
 
     /** {@inheritDoc} */
     @Override
     public String toString() {
-        return this.bld.toString();
+        return this.content.toString();
     }
 
     /**
@@ -113,40 +116,4 @@ public class BoundedStringWriter extends Writer {
     public void flush() throws IOException {
     }
 
-    public static void main(String[] args) throws IOException {
-        { // test 0
-            BoundedStringWriter wr = new BoundedStringWriter(5);
-            wr.append("");
-            System.out.println("--> " + wr.toString() + " " + wr.toString().length());
-        }
-        { // test ==
-            BoundedStringWriter wr = new BoundedStringWriter(5);
-            wr.append("213");
-            System.out.println("--> " + wr.toString() + " " + wr.toString().length());
-            wr.append("22");
-            System.out.println("--> " + wr.toString() + " " + wr.toString().length());
-        }
-        { // test < 
-            BoundedStringWriter wr = new BoundedStringWriter(5);
-            wr.append("213");
-            System.out.println("--> " + wr.toString() + " " + wr.toString().length());
-            wr.append("2");
-            System.out.println("--> " + wr.toString() + " " + wr.toString().length());
-        }
-
-        { // test >
-            BoundedStringWriter wr = new BoundedStringWriter(5);
-            wr.append("213");
-            System.out.println("--> " + wr.toString() + " " + wr.toString().length());
-            wr.append("22222");
-            System.out.println("--> " + wr.toString() + " " + wr.toString().length());
-        }
-        { // test >>
-            BoundedStringWriter wr = new BoundedStringWriter(5);
-            wr.append("");
-            System.out.println("--> " + wr.toString() + " " + wr.toString().length());
-            wr.append("321321313213212222222222222222132");
-            System.out.println("--> " + wr.toString() + " " + wr.toString().length());
-        }
-    }
 }

@@ -71,7 +71,7 @@ public class FailTaskConditionally extends JavaExecutable {
     public Serializable execute(TaskResult... results) throws Throwable {
         if (replicationId == 1) {
             try {
-                System.out.println("I will throw a runtime exception in 3 sec");
+                getOut().println("I will throw a runtime exception in 3 sec");
                 Thread.sleep(3000);
             } catch (Exception e) {
             }
@@ -79,7 +79,7 @@ public class FailTaskConditionally extends JavaExecutable {
             throw new RuntimeException(EXCEPTION_MESSAGE);
 
         } else {
-            System.out.println("I will sleep for 30 seconds");
+            getOut().println("I will sleep for 30 seconds");
             Thread.sleep(30000);
             return "Nothing";
         }
