@@ -210,7 +210,7 @@ public class SchedulingService {
             }
             try {
                 infrastructure.getRMProxiesManager().getUserRMProxy(taskData.getUser(),
-                        taskData.getCredendtials()).releaseNodes(nodes,
+                        taskData.getCredentials()).releaseNodes(nodes,
                         taskData.getTask().getCleaningScript());
             } catch (Throwable t) {
                 logger.error("Failed to release nodes", t);

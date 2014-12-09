@@ -11,16 +11,16 @@ class RunningTaskData {
 
     private final String user;
 
-    private final Credentials credendtials;
+    private final Credentials credentials;
 
     private final TaskLauncher launcher;
 
     private int pingAttempts = 0;
 
-    RunningTaskData(InternalTask task, String user, Credentials credendtials, TaskLauncher launcher) {
+    RunningTaskData(InternalTask task, String user, Credentials credentials, TaskLauncher launcher) {
         this.task = task;
         this.user = user;
-        this.credendtials = credendtials;
+        this.credentials = credentials;
         this.launcher = launcher;
     }
 
@@ -36,8 +36,8 @@ class RunningTaskData {
         return user;
     }
 
-    Credentials getCredendtials() {
-        return credendtials;
+    Credentials getCredentials() {
+        return credentials;
     }
 
     public int increaseAndGetPingAttempts() {
