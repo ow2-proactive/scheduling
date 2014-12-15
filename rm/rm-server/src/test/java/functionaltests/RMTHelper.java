@@ -315,7 +315,7 @@ public class RMTHelper {
     public static TNode createRMNodeStarterNode(String nodeName) throws IOException, NodeException {
 
         JVMProcessImpl nodeProcess = createJvmProcess(RMNodeStarter.class.getName(), Arrays.asList("-n",
-                nodeName), null, null);
+                nodeName, "-r", getLocalUrl(), "-Dproactive.net.nolocal=false"), null, null);
         return createNode(nodeName, null, nodeProcess);
 
     }
