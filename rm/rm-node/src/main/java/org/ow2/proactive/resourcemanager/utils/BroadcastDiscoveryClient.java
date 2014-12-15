@@ -59,8 +59,9 @@ public class BroadcastDiscoveryClient {
     }
 
     public String discover(int timeoutInMs) throws IOException {
+        DatagramSocket broadcastSocket = null;
         try {
-            DatagramSocket broadcastSocket = new DatagramSocket();
+            broadcastSocket = new DatagramSocket();
             broadcastSocket.setBroadcast(true);
 
             broadcastToDefaultInterface(broadcastSocket);
@@ -70,6 +71,10 @@ public class BroadcastDiscoveryClient {
         } catch (IOException e) {
             logger.warn("Could not retrieve URL using broadcast discovery", e);
             throw e;
+        } finally {
+            if (broadcastSocket != null) {
+                broadcastSocket.close();
+            }
         }
     }
 
@@ -78,12 +83,13 @@ public class BroadcastDiscoveryClient {
         DatagramPacket replyPacket = new DatagramPacket(replyBuffer, replyBuffer.length);
         broadcastSocket.setSoTimeout(timeoutInMs);
         broadcastSocket.receive(replyPacket);
-        broadcastSocket.close();
 
         if (replyPacket.getLength() > 0) {
             return new String(replyPacket.getData(), 0, replyPacket.getLength(), BROADCAST_ENCODING);
         } else {
-            throw new IllegalStateException("Could not retrieve URL using broadcast discovery");
+            throw new IllegalStateException(
+                "Could not retrieve URL using broadcast discovery, received a malformed packet from " +
+                    replyPacket.getAddress());
         }
     }
 
