@@ -39,11 +39,13 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.Set;
 
+import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory_stax;
+import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.junit.Test;
 
@@ -70,6 +72,13 @@ public class TaskUsingCredentialsTest extends SchedulerConsecutive {
 
         TaskFlowJob job = (TaskFlowJob) JobFactory_stax.getFactory().createJob(
                 new File(jobDescriptor.toURI()).getAbsolutePath());
+
+        if (OperatingSystem.getOperatingSystem() == org.objectweb.proactive.utils.OperatingSystem.unix) {
+            NativeTask nativeTask = new NativeTask();
+            nativeTask.setCommandLine("echo", "$CREDENTIALS_MY_APP_PASSWORD");
+            job.addTask(nativeTask);
+        }
+
         JobId jobId = scheduler.submit(job);
 
         SchedulerTHelper.waitForEventJobFinished(jobId);
