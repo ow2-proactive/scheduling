@@ -2211,8 +2211,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             if ((username == null) || (password == null)) {
                 throw new LoginException("empty login/password");
             }
-            Session session = sessionStore.create();
-            session.setUserName(username);
+            Session session = sessionStore.create(username);
             session.connectToScheduler(new CredData(username, password));
             logger.info("binding user " + username + " to session " + session.getSessionId());
             return session.getSessionId();
@@ -2243,11 +2242,11 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     public String loginWithCredential(@MultipartForm
     LoginForm multipart) throws LoginException, KeyException, SchedulerRestException {
         try {
-            Session session = sessionStore.create();
-
+            Session session;
             if (multipart.getCredential() != null) {
                 Credentials credentials;
                 try {
+                    session = sessionStore.createUnnamedSession();
                     credentials = Credentials.getCredentials(multipart.getCredential());
                     session.connectToScheduler(credentials);
                 } catch (IOException e) {
@@ -2258,7 +2257,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                     throw new LoginException("empty login/password");
                 }
 
-                session.setUserName(multipart.getUsername());
+                session = sessionStore.create(multipart.getUsername());
                 CredData credData = new CredData(CredData.parseLogin(multipart.getUsername()), CredData
                         .parseDomain(multipart.getUsername()), multipart.getPassword(), multipart.getSshKey());
                 session.connectToScheduler(credData);

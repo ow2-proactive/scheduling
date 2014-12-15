@@ -45,10 +45,16 @@ public class SessionStore {
     private SchedulerRMProxyFactory schedulerRMProxyFactory = new SchedulerRMProxyFactory();
     private Clock clock = new Clock();
 
-    public Session create() {
+    public Session createUnnamedSession() {
         String sessionId = SessionIdGenerator.newSessionId();
         Session session = new Session(sessionId, schedulerRMProxyFactory, clock);
         sessions.put(sessionId, session);
+        return session;
+    }
+
+    public Session create(String username) {
+        Session session = createUnnamedSession();
+        session.setUserName(username);
         return session;
     }
 

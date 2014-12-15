@@ -60,7 +60,7 @@ public class SharedSessionStoreTestUtils {
         SharedSessionStore.getInstance().setSchedulerRMProxyFactory(schedulerFactory);
 
         // login
-        Session session = SharedSessionStore.getInstance().create();
+        Session session = SharedSessionStore.getInstance().createUnnamedSession();
         session.connectToRM(new CredData());
         return session.getSessionId();
     }
@@ -72,7 +72,7 @@ public class SharedSessionStoreTestUtils {
         SharedSessionStore.getInstance().setSchedulerRMProxyFactory(schedulerFactory);
 
         // login
-        Session session = SharedSessionStore.getInstance().create();
+        Session session = SharedSessionStore.getInstance().createUnnamedSession();
         session.connectToScheduler(new CredData());
         return session.getSessionId();
     }

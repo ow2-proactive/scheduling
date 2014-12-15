@@ -25,8 +25,9 @@ public class FileStorageSupportFactory {
         logger.info("Initializing the studio rest api directories");
 
         Properties properties = getProperties();
-        String userWorkflowsDir = properties.getProperty(USER_WORKFLOWS_PROPERTY);
-        String templateWorkflowsDir = properties.getProperty(TEMPLATE_WORKFLOWS_PROPERTY);
+        String userWorkflowsDir = properties.getProperty(USER_WORKFLOWS_PROPERTY, "data/defaultuser/");
+        String templateWorkflowsDir = properties.getProperty(TEMPLATE_WORKFLOWS_PROPERTY,
+                "config/workflows/templates/");
 
         userWorkflowsDir = relativeToHomeIfNotAbsolute(userWorkflowsDir);
         templateWorkflowsDir = relativeToHomeIfNotAbsolute(templateWorkflowsDir);

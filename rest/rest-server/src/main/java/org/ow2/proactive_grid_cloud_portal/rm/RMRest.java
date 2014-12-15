@@ -154,7 +154,7 @@ public class RMRest implements RMRestInterface {
     String password) throws KeyException, LoginException, RMException, ActiveObjectCreationException,
             NodeException {
 
-        Session session = sessionStore.create();
+        Session session = sessionStore.create(username);
         session.connectToRM(new CredData(CredData.parseLogin(username), CredData.parseDomain(username),
             password));
         return session.getSessionId();
@@ -195,12 +195,13 @@ public class RMRest implements RMRestInterface {
     LoginForm multipart) throws ActiveObjectCreationException, NodeException, KeyException, IOException,
             LoginException, RMException {
 
-        Session session = sessionStore.create();
-
+        Session session;
         if (multipart.getCredential() != null) {
+            session = sessionStore.createUnnamedSession();
             Credentials credentials = Credentials.getCredentials(multipart.getCredential());
             session.connectToRM(credentials);
         } else {
+            session = sessionStore.create(multipart.getUsername());
             CredData credData = new CredData(CredData.parseLogin(multipart.getUsername()), CredData
                     .parseDomain(multipart.getUsername()), multipart.getPassword(), multipart.getSshKey());
             session.connectToRM(credData);

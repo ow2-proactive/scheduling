@@ -44,13 +44,12 @@ import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStore;
 import org.ow2.proactive_grid_cloud_portal.rm.RMRest;
 import org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
+import org.ow2.proactive_grid_cloud_portal.studio.StudioRest;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Matchers;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -59,6 +58,7 @@ public class SessionSharingTest {
 
     private SchedulerStateRest schedulerRest;
     private RMRest rmRest;
+    private StudioRest studioRest;
 
     private RMProxyUserInterface rmMock;
     private SchedulerProxyUserInterface schedulerMock;
@@ -67,6 +67,7 @@ public class SessionSharingTest {
     public void setUp() throws Exception {
         schedulerRest = new SchedulerStateRest();
         rmRest = new RMRest();
+        studioRest = new StudioRest();
 
         SchedulerRMProxyFactory schedulerFactory = mock(SchedulerRMProxyFactory.class);
         rmMock = mock(RMProxyUserInterface.class);
@@ -109,6 +110,8 @@ public class SessionSharingTest {
     @Test
     public void sessions_are_shared_rm_login() throws Exception {
         String sessionId = rmRest.rmConnect("login", "pw");
+
+        assertTrue(studioRest.getWorkflows(sessionId).isEmpty());
 
         when(schedulerMock.freeze()).thenReturn(true);
         boolean frozen = schedulerRest.freezeScheduler(sessionId);
