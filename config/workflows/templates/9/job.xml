@@ -33,7 +33,7 @@ print("creating database vm")
         <script>
           <code language="javascript">
             <![CDATA[
-print("creating applicaiton vm")
+print("creating application vm")
 ]]>
           </code>
         </script>
