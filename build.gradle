@@ -710,3 +710,17 @@ createGenerateCredentialTask('Node', ['-F', 'config/authentication/keys/pub.key'
 
 task generateCredentials
 generateCredentials.dependsOn generateCredentialsAdmin, generateCredentialsScheduler, generateCredentialsRm, generateCredentialsNode
+
+def exportedProjects= [
+        ":common-api",
+        ":common-client",
+        ":scheduler:scheduler-api",
+        ":scheduler:scheduler-client",
+        ":rm:rm-client",
+]
+
+task alljavadoc(type: org.gradle.api.tasks.javadoc.Javadoc) {
+    source exportedProjects.collect { project(it).sourceSets.main.allJava }
+    classpath = files(exportedProjects.collect { project(it).sourceSets.main.compileClasspath })
+    destinationDir = file("${buildDir}/docs/javadoc")
+}
