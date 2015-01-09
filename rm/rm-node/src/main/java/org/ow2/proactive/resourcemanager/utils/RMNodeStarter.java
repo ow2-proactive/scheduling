@@ -187,8 +187,8 @@ public class RMNodeStarter {
     private int discoveryPort = 64739;
     private final static String DISCOVERY_PORT_NAME = "proactive.node.discovery.port";
 
-    private int capacity = 1;
-    private final static String CAPACITY_NAME = "proactive.node.capacity";
+    private int workers = 1;
+    private final static String NUMBER_OF_WORKERS_PROPERTY_NAME = "proactive.node.workers";
 
     // the rank of this node
     private int rank;
@@ -208,8 +208,8 @@ public class RMNodeStarter {
     private static final char OPTION_PING_DELAY = 'p';
     private static final char OPTION_ADD_NODE_ATTEMPTS = 'a';
     private static final char OPTION_ADD_NODE_ATTEMPTS_DELAY = 'd';
-    private static final char OPTION_WAIT_AND_JOIN_TIMEOUT = 'w';
-    static final String OPTION_CAPACITY = "c";
+    private static final String OPTION_WAIT_AND_JOIN_TIMEOUT = "wt";
+    static final String OPTION_WORKERS = "w";
     private static final String OPTION_DISCOVERY_PORT = "dp";
     private static final String OPTION_DISCOVERY_TIMEOUT = "dt";
     private static final char OPTION_HELP = 'h';
@@ -256,7 +256,7 @@ public class RMNodeStarter {
         sourceName.setArgName("name");
         options.addOption(sourceName);
         // The wait on join timeout in millis
-        final Option waitOnJoinTimeout = new Option(Character.toString(OPTION_WAIT_AND_JOIN_TIMEOUT),
+        final Option waitOnJoinTimeout = new Option(OPTION_WAIT_AND_JOIN_TIMEOUT,
             "waitOnJoinTimeout", true, "wait on join the resource manager timeout in millis (default is " +
                 WAIT_ON_JOIN_TIMEOUT_IN_MS + ")");
         waitOnJoinTimeout.setRequired(false);
@@ -268,7 +268,7 @@ public class RMNodeStarter {
             "pingDelay",
             true,
             "ping delay in millis used by RMPinger thread that calls System.exit(1) if the resource manager is down (default is " +
-                PING_DELAY_IN_MS + "). A nul or negative frequency means no ping at all.");
+                PING_DELAY_IN_MS + "). A null or negative frequency means no ping at all.");
         pingDelay.setRequired(false);
         pingDelay.setArgName("millis");
         options.addOption(pingDelay);
@@ -301,15 +301,15 @@ public class RMNodeStarter {
         discoveryTimeout.setRequired(false);
         options.addOption(discoveryTimeout);
 
-        // The node capacity
-        final Option nodeCapacity = new Option(
-            OPTION_CAPACITY,
-            "capacity",
+        // The number of workers
+        final Option workers = new Option(
+            OPTION_WORKERS,
+            "workers",
             true,
-            "Capacity, i.e number of tasks that can be executed in parallel on this node (default is 1). If no value specified, number of cores.");
-        nodeCapacity.setRequired(false);
-        nodeCapacity.setOptionalArg(true);
-        options.addOption(nodeCapacity);
+            "Number of workers, i.e number of tasks that can be executed in parallel on this node (default is 1). If no value specified, number of cores.");
+        workers.setRequired(false);
+        workers.setOptionalArg(true);
+        options.addOption(workers);
 
         // Displays the help
         final Option help = new Option(Character.toString(OPTION_HELP), "help", false, "to display this help");
@@ -372,9 +372,9 @@ public class RMNodeStarter {
 
     private List<Node> createNodes(String nodeName) {
         List<Node> nodes = new ArrayList<Node>();
-        for (int nodeIndex = 0; nodeIndex < capacity; nodeIndex++) {
+        for (int nodeIndex = 0; nodeIndex < workers; nodeIndex++) {
             String indexedNodeName = nodeName;
-            if (capacity > 1) {
+            if (workers > 1) {
                 indexedNodeName += "_" + nodeIndex;
             }
             Node node = createLocalNode(indexedNodeName);
@@ -728,7 +728,7 @@ public class RMNodeStarter {
                 discoveryPort = Integer.valueOf(System.getProperty(DISCOVERY_TIMEOUT_IN_MS_NAME));
             }
 
-            readCapacityOption(cl);
+            readWorkersOption(cl);
 
             // Optional help option
             if (cl.hasOption(OPTION_HELP)) {
@@ -754,28 +754,28 @@ public class RMNodeStarter {
     }
 
     // positive integer, empty (number of available cores or 1 (default if nothing specified)
-    private void readCapacityOption(CommandLine cl) throws Exception {
+    private void readWorkersOption(CommandLine cl) throws Exception {
         try {
-            if (cl.hasOption(OPTION_CAPACITY)) {
-                if (cl.getOptionValue(OPTION_CAPACITY) == null) {
-                    capacity = Runtime.getRuntime().availableProcessors();
+            if (cl.hasOption(OPTION_WORKERS)) {
+                if (cl.getOptionValue(OPTION_WORKERS) == null) {
+                    workers = Runtime.getRuntime().availableProcessors();
                 } else {
-                    capacity = Integer.valueOf(cl.getOptionValue(OPTION_CAPACITY));
+                    workers = Integer.valueOf(cl.getOptionValue(OPTION_WORKERS));
                 }
-            } else if (System.getProperty(CAPACITY_NAME) != null) {
-                if ("".equals(System.getProperty(CAPACITY_NAME))) {
-                    capacity = Runtime.getRuntime().availableProcessors();
+            } else if (System.getProperty(NUMBER_OF_WORKERS_PROPERTY_NAME) != null) {
+                if ("".equals(System.getProperty(NUMBER_OF_WORKERS_PROPERTY_NAME))) {
+                    workers = Runtime.getRuntime().availableProcessors();
                 } else {
-                    capacity = Integer.valueOf(System.getProperty(CAPACITY_NAME));
+                    workers = Integer.valueOf(System.getProperty(NUMBER_OF_WORKERS_PROPERTY_NAME));
                 }
             } else {
-                capacity = 1;
+                workers = 1;
             }
         } catch (NumberFormatException e) {
-            throw new Exception("Capacity should be a positive integer", e);
+            throw new Exception("Number of workers should be a positive integer", e);
         }
-        if (capacity <= 0) {
-            throw new Exception("Capacity should be at least 1, was " + capacity);
+        if (workers <= 0) {
+            throw new Exception("Number of workers should be at least 1, was " + workers);
         }
     }
 

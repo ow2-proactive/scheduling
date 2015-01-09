@@ -333,7 +333,7 @@ public final class CommandLineBuilder implements Cloneable {
             command.add("-" + RMNodeStarter.OPTION_RM_URL);
             command.add(rmurl);
         }
-        command.add("-" + RMNodeStarter.OPTION_CAPACITY + "1");
+        command.add("-" + RMNodeStarter.OPTION_WORKERS + "1");
         return command;
     }
 
