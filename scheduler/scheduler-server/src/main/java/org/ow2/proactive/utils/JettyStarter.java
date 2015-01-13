@@ -100,8 +100,16 @@ public class JettyStarter {
 
             HandlerList handlerList = new HandlerList();
             addWarsToHandlerList(handlerList);
+            handlerList.setParallelStart(true);
             server.setHandler(handlerList);
-            server.setThreadPool(new QueuedThreadPool(maxThreads));
+
+            QueuedThreadPool threadPool = new QueuedThreadPool(maxThreads);
+            try {
+                threadPool.start();
+            } catch (Exception e) {
+                logger.error("Could not start jetty thread pool", e);
+            }
+            server.setThreadPool(threadPool);
 
             String schedulerHost = ProActiveInet.getInstance().getHostname();
             startServer(server, schedulerHost, restPort, httpProtocol);
@@ -204,6 +212,11 @@ public class JettyStarter {
     private static void addExplodedWebApp(HandlerList handlerList, File file) {
         String contextPath = "/" + file.getName();
         WebAppContext webApp = createWebAppContext(contextPath);
+
+        // Don't scan classes for annotations. Saves 1 second at startup.
+        webApp.setAttribute("org.eclipse.jetty.server.webapp.WebInfIncludeJarPattern", "^$");
+        webApp.setAttribute("org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern", "^$");
+
         webApp.setDescriptor(new File(file, "/WEB-INF/web.xml").getAbsolutePath());
         webApp.setResourceBase(file.getAbsolutePath());
         handlerList.addHandler(webApp);
