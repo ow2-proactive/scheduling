@@ -36,6 +36,7 @@
  */
 package org.ow2.proactive.scheduler.task.script;
 
+import java.io.Serializable;
 import java.util.Collections;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -103,7 +104,7 @@ public class ForkedScriptExecutableContainer extends ForkedJavaExecutableContain
         return fjei;
     }
 
-    public Script getScript() {
+    public Script<Serializable> getScript() {
         return script;
     }
 }

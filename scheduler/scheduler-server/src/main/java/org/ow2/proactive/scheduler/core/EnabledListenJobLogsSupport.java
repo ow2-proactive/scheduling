@@ -1,7 +1,9 @@
 package org.ow2.proactive.scheduler.core;
 
-import org.apache.log4j.*;
-import org.apache.log4j.spi.LoggingEvent;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.ow2.proactive.scheduler.common.exception.InternalException;
 import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -13,13 +15,14 @@ import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingService;
 import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
-import org.ow2.proactive.scheduler.task.TaskLauncher;
+import org.ow2.proactive.scheduler.newimpl.TaskLauncher;
 import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.TaskLogger;
-
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import org.apache.log4j.Appender;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.apache.log4j.Priority;
+import org.apache.log4j.spi.LoggingEvent;
 
 
 class EnabledListenJobLogsSupport extends ListenJobLogsSupport {

@@ -62,7 +62,7 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.internal.ExecutableInitializer;
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
-import org.ow2.proactive.scheduler.task.TaskLauncher;
+import org.ow2.proactive.scheduler.task.TaskLauncherBak;
 import org.ow2.proactive.scheduler.task.TaskLauncherInitializer;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scripting.GenerationScript;
@@ -78,7 +78,7 @@ import static org.ow2.proactive.scheduler.common.util.VariablesUtil.filterAndUpd
  * @since ProActive Scheduling 0.9
  */
 @ActiveObject
-public class NativeTaskLauncher extends TaskLauncher {
+public class NativeTaskLauncher extends TaskLauncherBak {
 
     public static final Logger logger = Logger.getLogger(NativeTaskLauncher.class);
 

@@ -36,8 +36,6 @@
  */
 package org.ow2.proactive.scheduler.common.job.factories;
 
-import static org.ow2.proactive.scheduler.common.util.VariablesUtil.filterAndUpdate;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -61,8 +59,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.events.XMLEvent;
 
-import org.apache.log4j.Logger;
-import org.iso_relax.verifier.VerifierConfigurationException;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -92,7 +88,11 @@ import org.ow2.proactive.scripting.TaskScript;
 import org.ow2.proactive.topology.descriptor.ThresholdProximityDescriptor;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.Tools;
+import org.apache.log4j.Logger;
+import org.iso_relax.verifier.VerifierConfigurationException;
 import org.xml.sax.SAXException;
+
+import static org.ow2.proactive.scheduler.common.util.VariablesUtil.filterAndUpdate;
 
 
 /**
@@ -262,7 +262,7 @@ public class JobFactory_stax extends JobFactory {
             xmlsr.close();
             //make dependences
             makeDependences();
-            logger.info("Job successfully created !");
+            logger.debug("Job successfully created !");
             //debug mode only
             displayJobInfo();
             return job;

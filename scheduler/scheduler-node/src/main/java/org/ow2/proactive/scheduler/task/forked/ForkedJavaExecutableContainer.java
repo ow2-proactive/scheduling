@@ -40,15 +40,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.ow2.proactive.scheduler.common.exception.ExecutableCreationException;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
-import org.ow2.proactive.scheduler.common.task.executable.internal.JavaExecutableInitializerImpl;
 import org.ow2.proactive.scheduler.common.task.executable.Executable;
+import org.ow2.proactive.scheduler.common.task.executable.internal.JavaExecutableInitializerImpl;
 import org.ow2.proactive.scheduler.common.task.util.ByteArrayWrapper;
+import org.ow2.proactive.scheduler.newimpl.TaskLauncher;
 import org.ow2.proactive.scheduler.task.java.JavaExecutableContainer;
-import org.ow2.proactive.scheduler.task.TaskLauncher;
+import org.apache.log4j.Logger;
 
 
 /**

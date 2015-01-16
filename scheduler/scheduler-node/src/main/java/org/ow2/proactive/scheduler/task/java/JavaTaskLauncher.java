@@ -56,7 +56,7 @@ import org.ow2.proactive.scheduler.common.task.executable.internal.JavaStandalon
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
 import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
-import org.ow2.proactive.scheduler.task.TaskLauncher;
+import org.ow2.proactive.scheduler.task.TaskLauncherBak;
 import org.ow2.proactive.scheduler.task.TaskLauncherInitializer;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.apache.log4j.Logger;
@@ -68,7 +68,7 @@ import org.apache.log4j.Logger;
  * @author The ProActive Team
  */
 @ActiveObject
-public class JavaTaskLauncher extends TaskLauncher {
+public class JavaTaskLauncher extends TaskLauncherBak {
 
     public static final Logger logger = Logger.getLogger(JavaTaskLauncher.class);
 

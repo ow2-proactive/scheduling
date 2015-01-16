@@ -47,10 +47,9 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.ow2.proactive.scheduler.job.InternalJob;
-import org.ow2.proactive.scheduler.task.TaskLauncher;
+import org.ow2.proactive.scheduler.newimpl.TaskLauncher;
 import org.ow2.proactive.scheduler.task.TaskLauncherInitializer;
 import org.ow2.proactive.scheduler.task.nativ.NativeExecutableContainer;
-import org.ow2.proactive.scheduler.task.nativ.NativeTaskLauncher;
 import org.ow2.proactive.scheduler.util.TaskLogger;
 import org.ow2.proactive.scripting.Script;
 
@@ -89,11 +88,11 @@ public class InternalNativeTask extends InternalTask {
     @Override
     public TaskLauncher createLauncher(InternalJob job, Node node) throws ActiveObjectCreationException,
             NodeException {
-        NativeTaskLauncher launcher;
+        TaskLauncher launcher;
 
         logger.info(getTaskInfo().getTaskId(), "creating native task launcher");
         TaskLauncherInitializer tli = getDefaultTaskLauncherInitializer(job);
-        launcher = (NativeTaskLauncher) PAActiveObject.newActive(NativeTaskLauncher.class.getName(),
+        launcher = (TaskLauncher) PAActiveObject.newActive(TaskLauncher.class.getName(),
                 new Object[] { tli }, node);
 
         setExecuterInformations(new ExecuterInformations(launcher, node));

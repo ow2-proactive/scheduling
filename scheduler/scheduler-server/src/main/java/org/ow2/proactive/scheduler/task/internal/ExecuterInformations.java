@@ -40,7 +40,7 @@ import java.io.Serializable;
 import java.util.LinkedList;
 
 import org.objectweb.proactive.core.node.Node;
-import org.ow2.proactive.scheduler.task.TaskLauncher;
+import org.ow2.proactive.scheduler.newimpl.TaskLauncher;
 import org.ow2.proactive.utils.NodeSet;
 
 

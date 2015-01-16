@@ -53,7 +53,7 @@ import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
-import org.ow2.proactive.scheduler.task.TaskLauncher;
+import org.ow2.proactive.scheduler.newimpl.TaskLauncher;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Level;
 import org.junit.Rule;

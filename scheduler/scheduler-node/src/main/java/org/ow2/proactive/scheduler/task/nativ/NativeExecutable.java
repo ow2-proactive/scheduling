@@ -336,7 +336,7 @@ public class NativeExecutable extends Executable {
 
                 // redirect streams
                 BufferedReader sout = new BufferedReader(new InputStreamReader(process.getInputStream()));
-                Thread tsout = new Thread(new ThreadReader(sout, outputSink, this));
+                Thread tsout = new Thread(new ThreadReader(sout, outputSink));
                 tsout.start();
                 // wait for process completion
                 process.waitFor();
@@ -375,10 +375,10 @@ public class NativeExecutable extends Executable {
         OSProcessBuilder ospb;
         //check if it must be run under user and if so, apply the proper method
         if (runAsUser) {
-            ospb = ForkerUtils.getOSProcessBuilderFactory().getBuilder(
+            ospb = ForkerUtils.getOSProcessBuilderFactory("").getBuilder(
                     ForkerUtils.checkConfigAndGetUser(this.decrypter));
         } else {
-            ospb = ForkerUtils.getOSProcessBuilderFactory().getBuilder();
+            ospb = ForkerUtils.getOSProcessBuilderFactory("").getBuilder();
         }
         ospb.redirectErrorStream(true);
         //add command and directory

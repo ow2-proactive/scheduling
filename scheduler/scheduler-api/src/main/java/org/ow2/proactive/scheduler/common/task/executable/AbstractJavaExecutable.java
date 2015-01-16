@@ -69,7 +69,7 @@ public abstract class AbstractJavaExecutable extends Executable {
      * @throws Exception an exception if something goes wrong during executable initialization.
      */
     // WARNING WHEN REMOVE OR RENAME, called by task launcher by introspection
-    protected void internalInit(JavaStandaloneExecutableInitializer execInitializer) throws Exception {
+    public void internalInit(JavaStandaloneExecutableInitializer execInitializer) throws Exception {
         this.execInitializer = execInitializer;
         // at this point, the context class loader is the TaskClassLoader
         // see JavaExecutableContainer.getExecutable()

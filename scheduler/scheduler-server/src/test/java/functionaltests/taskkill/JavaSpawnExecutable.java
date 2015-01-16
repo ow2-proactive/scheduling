@@ -98,8 +98,8 @@ public class JavaSpawnExecutable extends JavaExecutable {
         BufferedReader sout = new BufferedReader(new InputStreamReader(process.getInputStream()));
         BufferedReader serr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
 
-        Thread tsout = new Thread(new ThreadReader(sout, System.out, this));
-        Thread tserr = new Thread(new ThreadReader(serr, System.err, this));
+        Thread tsout = new Thread(new ThreadReader(sout, System.out));
+        Thread tserr = new Thread(new ThreadReader(serr, System.err));
         tsout.setDaemon(true);
         tserr.setDaemon(true);
         tsout.start();

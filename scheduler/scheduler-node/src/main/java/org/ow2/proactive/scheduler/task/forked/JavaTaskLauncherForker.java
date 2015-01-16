@@ -245,7 +245,7 @@ public class JavaTaskLauncherForker extends JavaTaskLauncher implements ForkerSt
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.task.TaskLauncher#initEnv()
+     * @see org.ow2.proactive.scheduler.newimpl.TaskLauncher#initEnv()
      */
     @Override
     protected void initEnv() {

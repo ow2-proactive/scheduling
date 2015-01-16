@@ -43,7 +43,6 @@ import java.io.StringReader;
 import javax.script.Bindings;
 
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.apache.log4j.Logger;
 
 
 /**
@@ -54,9 +53,6 @@ import org.apache.log4j.Logger;
  */
 @PublicAPI
 public class TaskScript extends Script<Serializable> {
-    /** Loggers */
-    public static final Logger logger = Logger.getLogger(TaskScript.class);
-
     /**
      * The variable name which must be set after the evaluation
      * of a script task.

@@ -17,7 +17,7 @@ import org.ow2.proactive.scheduler.job.InternalJobFactory;
 import org.ow2.proactive.scheduler.policy.DefaultPolicy;
 import org.ow2.proactive.scheduler.task.internal.ExecuterInformations;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
-import org.ow2.proactive.scheduler.task.TaskLauncher;
+import org.ow2.proactive.scheduler.newimpl.TaskLauncher;
 import org.ow2.tests.ProActiveTest;
 import org.junit.After;
 import org.junit.Assert;

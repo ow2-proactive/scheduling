@@ -39,8 +39,8 @@ package org.ow2.proactive.scheduler.task.utils;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.ow2.proactive.scheduler.newimpl.TaskLauncher;
 import org.apache.log4j.Logger;
-import org.ow2.proactive.scheduler.task.TaskLauncher;
 
 
 /**

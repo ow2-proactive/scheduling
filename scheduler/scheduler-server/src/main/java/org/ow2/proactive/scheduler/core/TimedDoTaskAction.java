@@ -53,7 +53,7 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.descriptor.TaskDescriptor;
 import org.ow2.proactive.scheduler.job.InternalJob;
-import org.ow2.proactive.scheduler.task.TaskLauncher;
+import org.ow2.proactive.scheduler.newimpl.TaskLauncher;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.threading.CallableWithTimeoutAction;
 import org.apache.log4j.Logger;
@@ -133,7 +133,7 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
 
             fillContainer();
             // try launch the task
-            launcher.doTask(terminateNotification, task.getExecutableContainer(), params);
+            launcher.doTask(task.getExecutableContainer(), params, terminateNotification);
         } catch (Throwable e) {
             logger.warn("Failed to start task: " + e.getMessage(), e);
             restartTask();

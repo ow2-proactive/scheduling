@@ -256,6 +256,7 @@ project(':rm:rm-node') {
 
         compile project(':common-client')
         compile project(':rm:rm-client')
+        compile "de.ruedigermoeller:fst:2.19"
 
         runtime fileTree(dir: "${rootDir}/lib/node/sigar/", exclude: "*.jar")
 

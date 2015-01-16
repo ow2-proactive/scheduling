@@ -47,12 +47,11 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.common.task.executable.internal.JavaExecutableInitializerImpl;
 import org.ow2.proactive.scheduler.common.util.VariablesUtil;
-import org.ow2.proactive.scheduler.task.TaskLauncher;
+import org.ow2.proactive.scheduler.task.TaskLauncherBak;
 import org.ow2.proactive.scripting.ScriptHandler;
 import org.ow2.proactive.scripting.ScriptLoader;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.TaskScript;
-import org.apache.log4j.Logger;
 
 
 /**
@@ -64,7 +63,7 @@ import org.apache.log4j.Logger;
  */
 public class ScriptExecutable extends JavaExecutable {
 
-    public static final Logger logger = Logger.getLogger(ScriptExecutable.class);
+    //public static final Logger logger = Logger.getLogger(ScriptExecutable.class);
 
     private TaskScript script;
     /** execution progress value (between 0 and 100), can be updated by the script */
@@ -82,7 +81,7 @@ public class ScriptExecutable extends JavaExecutable {
      * @throws Exception an exception if something goes wrong during executable initialization.
      */
     // WARNING WHEN REMOVE OR RENAME, called by task launcher by introspection
-    protected void internalInit(JavaExecutableInitializerImpl execInitializer) throws Exception {
+    public void internalInit(JavaExecutableInitializerImpl execInitializer) throws Exception {
         super.internalInit(execInitializer);
         this.decrypter = execInitializer.getDecrypter();
         this.outputSink = execInitializer.getOutputSink();
@@ -91,17 +90,17 @@ public class ScriptExecutable extends JavaExecutable {
 
     @Override
     public Serializable execute(TaskResult... results) throws Throwable {
-        logger.info("Executing script");
+        //logger.info("Executing script");
         ScriptHandler handler = ScriptLoader.createLocalHandler();
 
-        handler.addBinding(TaskLauncher.DS_GLOBAL_BINDING_NAME, getGlobalSpace());
-        handler.addBinding(TaskLauncher.DS_INPUT_BINDING_NAME, getInputSpace());
-        handler.addBinding(TaskLauncher.DS_OUTPUT_BINDING_NAME, getOutputSpace());
-        handler.addBinding(TaskLauncher.DS_SCRATCH_BINDING_NAME, getLocalSpace());
-        handler.addBinding(TaskLauncher.DS_USER_BINDING_NAME, getUserSpace());
+        handler.addBinding(TaskLauncherBak.DS_GLOBAL_BINDING_NAME, getGlobalSpace());
+        handler.addBinding(TaskLauncherBak.DS_INPUT_BINDING_NAME, getInputSpace());
+        handler.addBinding(TaskLauncherBak.DS_OUTPUT_BINDING_NAME, getOutputSpace());
+        handler.addBinding(TaskLauncherBak.DS_SCRATCH_BINDING_NAME, getLocalSpace());
+        handler.addBinding(TaskLauncherBak.DS_USER_BINDING_NAME, getUserSpace());
 
-        handler.addBinding(TaskLauncher.MULTI_NODE_TASK_NODESET_BINDING_NAME, getNodes());
-        handler.addBinding(TaskLauncher.MULTI_NODE_TASK_NODESURL_BINDING_NAME, getNodesURL());
+        handler.addBinding(TaskLauncherBak.MULTI_NODE_TASK_NODESET_BINDING_NAME, getNodes());
+        handler.addBinding(TaskLauncherBak.MULTI_NODE_TASK_NODESURL_BINDING_NAME, getNodesURL());
 
         handler.addBinding(TaskScript.RESULTS_VARIABLE, results);
         handler.addBinding(TaskScript.PROGRESS_VARIABLE, progress);
@@ -110,7 +109,7 @@ public class ScriptExecutable extends JavaExecutable {
         handler.addBinding(TaskScript.CREDENTIALS_VARIABLE, thirdPartyCredentials);
 
         Map<String, Serializable> variables = getVariables();
-        handler.addBinding(TaskLauncher.VARIABLES_BINDING_NAME, variables);
+        handler.addBinding(TaskLauncherBak.VARIABLES_BINDING_NAME, variables);
         String oldScript = script.getScript();
         String resolvedScript = VariablesUtil.filterAndUpdate(oldScript, variables);
         script.setScript(resolvedScript);
@@ -119,7 +118,7 @@ public class ScriptExecutable extends JavaExecutable {
 
         if (scriptResult.errorOccured()) {
             scriptResult.getException().printStackTrace();
-            logger.error("Error on script occured : ", scriptResult.getException());
+            //logger.error("Error on script occured : ", scriptResult.getException());
             throw new UserException("Script has failed on the current node", scriptResult.getException());
         }
 

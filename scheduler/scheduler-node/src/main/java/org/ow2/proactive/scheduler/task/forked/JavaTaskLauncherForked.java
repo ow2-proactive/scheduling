@@ -49,7 +49,7 @@ import org.objectweb.proactive.extensions.dataspaces.core.BaseScratchSpaceConfig
 import org.objectweb.proactive.extensions.dataspaces.core.DataSpacesNodes;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.ow2.proactive.scheduler.task.TaskLauncher;
+import org.ow2.proactive.scheduler.task.TaskLauncherBak;
 import org.ow2.proactive.scheduler.task.TaskLauncherInitializer;
 import org.ow2.proactive.scheduler.task.java.JavaTaskLauncher;
 import org.ow2.proactive.utils.Formatter;
@@ -142,7 +142,7 @@ public class JavaTaskLauncherForked extends JavaTaskLauncher {
     @ImmediateService
     public void cleanForkedJavaTaskLauncher() {
 
-        executableGuard.clean(TaskLauncher.CLEAN_TIMEOUT);
+        executableGuard.clean(TaskLauncherBak.CLEAN_TIMEOUT);
 
         try {
             closeNodeConfiguration();

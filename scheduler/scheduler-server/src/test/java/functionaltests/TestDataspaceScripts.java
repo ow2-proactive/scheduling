@@ -48,7 +48,7 @@ import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
-import org.ow2.proactive.scheduler.task.TaskLauncher;
+import org.ow2.proactive.scheduler.task.TaskLauncherBak;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
@@ -161,21 +161,21 @@ public class TestDataspaceScripts extends SchedulerConsecutive {
         /**
          * check content of the files created by the script
          */
-        File preinFile = new File(results, "out_pre_" + TaskLauncher.DS_INPUT_BINDING_NAME);
-        File prescratchFile = new File(results, "out_pre_" + TaskLauncher.DS_SCRATCH_BINDING_NAME);
-        File preoutFile = new File(results, "out_pre_" + TaskLauncher.DS_OUTPUT_BINDING_NAME);
-        File preglobFile = new File(results, "out_pre_" + TaskLauncher.DS_GLOBAL_BINDING_NAME);
-        File preuserFile = new File(results, "out_pre_" + TaskLauncher.DS_USER_BINDING_NAME);
-        File postinFile = new File(results, "out_post_" + TaskLauncher.DS_INPUT_BINDING_NAME);
-        File postscratchFile = new File(results, "out_post_" + TaskLauncher.DS_SCRATCH_BINDING_NAME);
-        File postoutFile = new File(results, "out_post_" + TaskLauncher.DS_OUTPUT_BINDING_NAME);
-        File postglobFile = new File(results, "out_post_" + TaskLauncher.DS_GLOBAL_BINDING_NAME);
-        File postuserFile = new File(results, "out_post_" + TaskLauncher.DS_USER_BINDING_NAME);
-        File flowinFile = new File(results, "out_flow_" + TaskLauncher.DS_INPUT_BINDING_NAME);
-        File flowscratchFile = new File(results, "out_flow_" + TaskLauncher.DS_SCRATCH_BINDING_NAME);
-        File flowoutFile = new File(results, "out_flow_" + TaskLauncher.DS_OUTPUT_BINDING_NAME);
-        File flowglobFile = new File(results, "out_flow_" + TaskLauncher.DS_GLOBAL_BINDING_NAME);
-        File flowuserFile = new File(results, "out_flow_" + TaskLauncher.DS_USER_BINDING_NAME);
+        File preinFile = new File(results, "out_pre_" + TaskLauncherBak.DS_INPUT_BINDING_NAME);
+        File prescratchFile = new File(results, "out_pre_" + TaskLauncherBak.DS_SCRATCH_BINDING_NAME);
+        File preoutFile = new File(results, "out_pre_" + TaskLauncherBak.DS_OUTPUT_BINDING_NAME);
+        File preglobFile = new File(results, "out_pre_" + TaskLauncherBak.DS_GLOBAL_BINDING_NAME);
+        File preuserFile = new File(results, "out_pre_" + TaskLauncherBak.DS_USER_BINDING_NAME);
+        File postinFile = new File(results, "out_post_" + TaskLauncherBak.DS_INPUT_BINDING_NAME);
+        File postscratchFile = new File(results, "out_post_" + TaskLauncherBak.DS_SCRATCH_BINDING_NAME);
+        File postoutFile = new File(results, "out_post_" + TaskLauncherBak.DS_OUTPUT_BINDING_NAME);
+        File postglobFile = new File(results, "out_post_" + TaskLauncherBak.DS_GLOBAL_BINDING_NAME);
+        File postuserFile = new File(results, "out_post_" + TaskLauncherBak.DS_USER_BINDING_NAME);
+        File flowinFile = new File(results, "out_flow_" + TaskLauncherBak.DS_INPUT_BINDING_NAME);
+        File flowscratchFile = new File(results, "out_flow_" + TaskLauncherBak.DS_SCRATCH_BINDING_NAME);
+        File flowoutFile = new File(results, "out_flow_" + TaskLauncherBak.DS_OUTPUT_BINDING_NAME);
+        File flowglobFile = new File(results, "out_flow_" + TaskLauncherBak.DS_GLOBAL_BINDING_NAME);
+        File flowuserFile = new File(results, "out_flow_" + TaskLauncherBak.DS_USER_BINDING_NAME);
 
         checkFile(preinFile);
         checkFile(prescratchFile);

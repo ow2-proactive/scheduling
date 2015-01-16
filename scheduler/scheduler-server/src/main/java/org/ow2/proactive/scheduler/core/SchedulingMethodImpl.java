@@ -65,15 +65,13 @@ import org.ow2.proactive.scheduler.policy.Policy;
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.ExecutableContainerInitializer;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
-import org.ow2.proactive.scheduler.task.TaskLauncher;
+import org.ow2.proactive.scheduler.newimpl.TaskLauncher;
 import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.TaskLogger;
-import org.ow2.proactive.scripting.ScriptException;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.threading.TimeoutThreadPoolExecutor;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.Criteria;
-import org.ow2.proactive.utils.Formatter;
 import org.ow2.proactive.utils.NodeSet;
 
 import java.security.PrivateKey;

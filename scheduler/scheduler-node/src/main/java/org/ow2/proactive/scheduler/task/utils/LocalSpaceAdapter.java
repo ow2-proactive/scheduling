@@ -40,14 +40,14 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
 import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
 import org.objectweb.proactive.extensions.dataspaces.api.FileSelector;
 import org.objectweb.proactive.extensions.dataspaces.exceptions.DataSpacesException;
 import org.objectweb.proactive.utils.StackTraceUtil;
 import org.ow2.proactive.scheduler.common.task.dataspaces.FileSystemException;
 import org.ow2.proactive.scheduler.common.task.dataspaces.LocalSpace;
-import org.ow2.proactive.scheduler.task.TaskLauncher;
+import org.ow2.proactive.scheduler.task.TaskLauncherBak;
+import org.apache.log4j.Logger;
 
 
 /**
@@ -67,7 +67,7 @@ public class LocalSpaceAdapter implements LocalSpace {
 
     private File convertToRelative(File absolutePath) throws URISyntaxException, DataSpacesException {
         String relPath = absolutePath.getPath().replace(
-                TaskLauncher.convertDataSpaceToFileIfPossible(localDataSpace, true), "");
+                TaskLauncherBak.convertDataSpaceToFileIfPossible(localDataSpace, true), "");
         if (relPath.startsWith(File.separator)) {
             relPath = relPath.substring(1);
         }
@@ -78,7 +78,7 @@ public class LocalSpaceAdapter implements LocalSpace {
     public File getFile(String path) throws FileSystemException {
         try {
             DataSpacesFileObject fo = localDataSpace.resolveFile(RemoteSpaceAdapter.stripLeadingSlash(path));
-            return new File(TaskLauncher.convertDataSpaceToFileIfPossible(fo, true));
+            return new File(TaskLauncherBak.convertDataSpaceToFileIfPossible(fo, true));
         } catch (Exception e) {
             throw new FileSystemException(StackTraceUtil.getStackTrace(e));
         }
@@ -95,7 +95,7 @@ public class LocalSpaceAdapter implements LocalSpace {
             results = RemoteSpaceAdapter.getFilesFromPattern(localDataSpace, pattern);
 
             for (DataSpacesFileObject res : results) {
-                fileResuls.add(new File(TaskLauncher.convertDataSpaceToFileIfPossible(res, true)));
+                fileResuls.add(new File(TaskLauncherBak.convertDataSpaceToFileIfPossible(res, true)));
             }
         } catch (Exception e) {
             throw new FileSystemException(StackTraceUtil.getStackTrace(e));
@@ -136,7 +136,7 @@ public class LocalSpaceAdapter implements LocalSpace {
     @Override
     public File getLocalRoot() throws FileSystemException {
         try {
-            return new File(TaskLauncher.convertDataSpaceToFileIfPossible(localDataSpace, true));
+            return new File(TaskLauncherBak.convertDataSpaceToFileIfPossible(localDataSpace, true));
         } catch (Exception e) {
             throw new FileSystemException(StackTraceUtil.getStackTrace(e));
         }

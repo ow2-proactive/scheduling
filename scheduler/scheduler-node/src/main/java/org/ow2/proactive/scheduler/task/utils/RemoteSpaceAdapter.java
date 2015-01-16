@@ -42,7 +42,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
 import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
 import org.objectweb.proactive.extensions.dataspaces.api.FileSelector;
 import org.objectweb.proactive.extensions.dataspaces.api.FileType;
@@ -53,7 +52,8 @@ import org.objectweb.proactive.utils.OperatingSystem;
 import org.objectweb.proactive.utils.StackTraceUtil;
 import org.ow2.proactive.scheduler.common.task.dataspaces.FileSystemException;
 import org.ow2.proactive.scheduler.common.task.dataspaces.RemoteSpace;
-import org.ow2.proactive.scheduler.task.TaskLauncher;
+import org.ow2.proactive.scheduler.task.TaskLauncherBak;
+import org.apache.log4j.Logger;
 
 
 /**
@@ -111,7 +111,7 @@ public class RemoteSpaceAdapter implements RemoteSpace {
             }
             destination.copyFrom(source, FileSelector.SELECT_SELF);
 
-            return TaskLauncher.convertDataSpaceToFileIfPossible(destination, false);
+            return TaskLauncherBak.convertDataSpaceToFileIfPossible(destination, false);
 
         } catch (Exception e) {
             throw new FileSystemException(StackTraceUtil.getStackTrace(e));
@@ -127,7 +127,7 @@ public class RemoteSpaceAdapter implements RemoteSpace {
             }
             destination.copyFrom(source, FileSelector.SELECT_SELF);
 
-            return TaskLauncher.convertDataSpaceToFileIfPossible(destination, false);
+            return TaskLauncherBak.convertDataSpaceToFileIfPossible(destination, false);
         } catch (Exception e) {
             throw new FileSystemException(StackTraceUtil.getStackTrace(e));
         }
@@ -144,7 +144,7 @@ public class RemoteSpaceAdapter implements RemoteSpace {
             }
             destination.copyFrom(source, FileSelector.SELECT_ALL);
 
-            return TaskLauncher.convertDataSpaceToFileIfPossible(destination, false);
+            return TaskLauncherBak.convertDataSpaceToFileIfPossible(destination, false);
 
         } catch (Exception e) {
             throw new FileSystemException(StackTraceUtil.getStackTrace(e));
@@ -153,7 +153,7 @@ public class RemoteSpaceAdapter implements RemoteSpace {
 
     private File convertToRelative(File absolutePath) throws URISyntaxException, DataSpacesException {
         String relPath = absolutePath.getPath().replace(
-                TaskLauncher.convertDataSpaceToFileIfPossible(localDataSpace, true), "");
+                TaskLauncherBak.convertDataSpaceToFileIfPossible(localDataSpace, true), "");
         if (relPath.startsWith(File.separator)) {
             relPath = relPath.substring(1);
         }
@@ -263,7 +263,7 @@ public class RemoteSpaceAdapter implements RemoteSpace {
                     logger.debug("Copying " + source.getRealURI() + " to " + destination.getRealURI());
                 }
                 destination.copyFrom(source, FileSelector.SELECT_SELF);
-                filePulled.add(new File(TaskLauncher.convertDataSpaceToFileIfPossible(destination, false)));
+                filePulled.add(new File(TaskLauncherBak.convertDataSpaceToFileIfPossible(destination, false)));
             }
         } catch (Exception e) {
             throw new FileSystemException(StackTraceUtil.getStackTrace(e));

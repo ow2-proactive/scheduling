@@ -46,7 +46,7 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.java.JavaExecutableContainer;
 import org.ow2.proactive.scheduler.task.java.JavaTaskLauncher;
-import org.ow2.proactive.scheduler.task.TaskLauncher;
+import org.ow2.proactive.scheduler.newimpl.TaskLauncher;
 import org.ow2.proactive.scheduler.util.TaskLogger;
 
 

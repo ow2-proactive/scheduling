@@ -40,14 +40,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintStream;
 
-import org.ow2.proactive.scheduler.common.task.executable.Executable;
-
 
 /** Pipe between two streams */
 public class ThreadReader implements Runnable {
     private BufferedReader in;
     private PrintStream out;
-    private Executable executable;
 
     /**
      * Create a new instance of ThreadReader.
@@ -56,10 +53,9 @@ public class ThreadReader implements Runnable {
      * @param out output stream
      * @param executable Executable that is concerned by the read.
      */
-    public ThreadReader(BufferedReader in, PrintStream out, Executable executable) {
+    public ThreadReader(BufferedReader in, PrintStream out) {
         this.in = in;
         this.out = out;
-        this.executable = executable;
     }
 
     /**
@@ -82,7 +78,7 @@ public class ThreadReader implements Runnable {
         readerThread.setDaemon(true);
         readerThread.start();
 
-        while (readerThread.isAlive() && !executable.isKilled()) {
+        while (readerThread.isAlive()) {
             try {
                 readerThread.join(1000);
             } catch (InterruptedException e) {

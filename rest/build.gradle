@@ -132,7 +132,7 @@ project(':rest:rest-server') {
     functionalTest.dependsOn rootProject.dist
     clean.dependsOn rootProject.cleanDist
 
-    task proActiveWar(type: Sync, dependsOn: war) {
+    task proActiveWar(type: Sync, dependsOn: classes) {
         from "$webAppDirName"
 
         def schedulerNodeJar = project(":scheduler:scheduler-node").standaloneJar

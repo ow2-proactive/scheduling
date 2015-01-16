@@ -2,7 +2,7 @@ package org.ow2.proactive.scheduler.core;
 
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
-import org.ow2.proactive.scheduler.task.TaskLauncher;
+import org.ow2.proactive.scheduler.newimpl.TaskLauncher;
 
 
 class RunningTaskData {

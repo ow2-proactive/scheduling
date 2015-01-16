@@ -42,17 +42,16 @@ import java.io.FileReader;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 
-import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.InternalJob;
-import org.ow2.proactive.scheduler.task.TaskLauncher;
+import org.ow2.proactive.scheduler.newimpl.TaskLauncher;
 import org.ow2.proactive.scheduler.task.TaskLauncherInitializer;
 import org.ow2.proactive.scheduler.task.forked.ForkedJavaExecutableContainer;
-import org.ow2.proactive.scheduler.task.forked.JavaTaskLauncherForker;
+import org.apache.log4j.Logger;
 
 
 /**
@@ -102,7 +101,7 @@ public class InternalForkedJavaTask extends InternalJavaTask {
         tli.setLog4JContent(getLog4J());
         tli.setPaConfigContent(getPAConfiguration());
         logger.info("Create forked java task launcher");
-        TaskLauncher launcher = (TaskLauncher) PAActiveObject.newActive(JavaTaskLauncherForker.class
+        TaskLauncher launcher = (TaskLauncher) PAActiveObject.newActive(TaskLauncher.class
                 .getName(), new Object[] { tli }, node);
         setExecuterInformations(new ExecuterInformations(launcher, node));
 
