@@ -75,6 +75,7 @@ import javassist.CtNewMethod;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -296,6 +297,7 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
     }
 
     @Test(timeout = MAX_WAIT_TIME * 2)
+    @Ignore("REST events are disabled in the default config")
     public void testJobSubmissionEventLisntener() throws Exception {
         ISchedulerClient client = clientInstance();
         SchedulerEventListenerImpl listener = new SchedulerEventListenerImpl();
