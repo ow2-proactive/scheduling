@@ -60,7 +60,7 @@ do
     ps -p $xvnc_pid
     if [ $? -eq 0 ]; then
         # magic string to enable remote visualization
-        echo "PA_REMOTE_CONNECTION;$PAS_TASK_ID;vnc;$(hostname):$(($disp + 5900))"
+        echo "PA_REMOTE_CONNECTION;$PA_TASK_ID;vnc;$(hostname):$(($disp + 5900))"
         export DISPLAY=:$disp
         # RUN YOUR GUI BASED APPLICATION HERE (with nohup)
         xclock

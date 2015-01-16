@@ -167,7 +167,7 @@ fdelete();
 		  <generation>
 			<script>
 			  <code language="groovy"><![CDATA[
-def it = java.lang.System.getProperty("pas.task.iteration");
+def it = java.lang.System.getProperty("PA_TASK_ITERATION");
 command = "echo generated hello " + it;
 			  ]]></code>
 			</script>

@@ -1,11 +1,5 @@
 package functionaltests.service;
 
-import static org.mockito.Matchers.anyObject;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import java.util.List;
 import java.util.concurrent.AbstractExecutorService;
 import java.util.concurrent.Callable;
@@ -16,13 +10,8 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.junit.Assert;
-import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.core.DataSpaceServiceStarter;
-import org.ow2.proactive.scheduler.core.SchedulerClassServers;
 import org.ow2.proactive.scheduler.core.SchedulerSpacesSupport;
 import org.ow2.proactive.scheduler.core.SchedulingInfrastructure;
 import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
@@ -30,6 +19,15 @@ import org.ow2.proactive.scheduler.core.rmproxies.RMProxiesManager;
 import org.ow2.proactive.scheduler.core.rmproxies.RMProxy;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.utils.NodeSet;
+import org.junit.Assert;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+
+import static org.mockito.Matchers.anyObject;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 
 public class MockSchedulingInfrastructure implements SchedulingInfrastructure {
@@ -39,8 +37,6 @@ public class MockSchedulingInfrastructure implements SchedulingInfrastructure {
     private final ScheduledExecutorService scheduledExecutorService = new ScheduledThreadPoolExecutor(5);
 
     private final ExecutorService executorService;
-
-    private SchedulerClassServers classServers = Mockito.mock(SchedulerClassServers.class);
 
     private final DataSpaceServiceStarter dsStarter;
 
@@ -118,11 +114,6 @@ public class MockSchedulingInfrastructure implements SchedulingInfrastructure {
 
     public void shutdown() {
         scheduledExecutorService.shutdownNow();
-    }
-
-    @Override
-    public SchedulerClassServers getTaskClassServer() {
-        return classServers;
     }
 
     @Override

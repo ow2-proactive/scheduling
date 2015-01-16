@@ -17,7 +17,7 @@ var logToFile = false;
 //set this to true to enable debug mode
 var mode_debug= false;
 
-var task_id=System.getProperty("pas.task.id");
+var task_id=System.getProperty("PA_TASK_ID");
 var logsFile = "task_"+task_id+".log";
 
 

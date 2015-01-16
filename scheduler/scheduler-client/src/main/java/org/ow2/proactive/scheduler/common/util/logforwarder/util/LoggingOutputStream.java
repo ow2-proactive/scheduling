@@ -204,6 +204,7 @@ public class LoggingOutputStream extends OutputStream {
 
         System.arraycopy(buf, 0, theBytes, 0, count);
 
+        //logger.log(level, (new String(theBytes)).trim());
         logger.log(level, new String(theBytes));
 
         reset();

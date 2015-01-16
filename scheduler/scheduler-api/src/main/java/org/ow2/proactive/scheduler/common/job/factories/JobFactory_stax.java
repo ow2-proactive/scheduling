@@ -236,7 +236,7 @@ public class JobFactory_stax extends JobFactory {
             xmlsr.close();
             //make dependencies
             makeDependences();
-            logger.info("Job successfully created !");
+            logger.debug("Job successfully created !");
             //debug mode only
             displayJobInfo();
             return job;

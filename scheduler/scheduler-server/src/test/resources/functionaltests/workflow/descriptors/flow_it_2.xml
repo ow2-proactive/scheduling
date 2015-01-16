@@ -38,8 +38,8 @@ runs=2;
         <staticCommand value="${bin}/it.sh">
 		  <arguments>
 			<argument value="${java.io.tmpdir}/" />
-			<argument value="$IT" />
-			<argument value="$REP" />
+			<argument value="$PA_TASK_ITERATION" />
+			<argument value="$PA_TASK_REPLICATION" />
 		  </arguments>
 		</staticCommand>
 	  </nativeExecutable>

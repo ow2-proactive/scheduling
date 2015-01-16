@@ -25,8 +25,8 @@ import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
 import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
 import org.ow2.proactive.scheduler.exception.ForkedJVMProcessException;
-import org.ow2.proactive.scheduler.exception.ProgressPingerException;
 import org.ow2.proactive.scheduler.job.InternalJob;
+import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.policy.Policy;
 import org.ow2.proactive.scheduler.task.TaskInfoImpl;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
@@ -724,8 +724,6 @@ public class SchedulingService {
         try {
             listenJobLogsSupport.cleanLoggers(jobId);
 
-            infrastructure.getTaskClassServer().removeTaskClassServer(jobId);
-
             //auto remove
             if (SchedulingService.SCHEDULER_AUTO_REMOVED_JOB_DELAY > 0) {
                 scheduleJobRemove(jobId, SchedulingService.SCHEDULER_AUTO_REMOVED_JOB_DELAY);
@@ -765,22 +763,18 @@ public class SchedulingService {
 
     private void jobsRecovered(Collection<InternalJob> jobs) {
         DataSpaceServiceStarter dsStarter = infrastructure.getDataSpaceServiceStarter();
-        SchedulerClassServers classServers = infrastructure.getTaskClassServer();
         SchedulerSpacesSupport spacesSupport = infrastructure.getSpacesSupport();
 
         for (InternalJob job : jobs) {
             this.jobs.jobRecovered(job);
             switch (job.getStatus()) {
                 case PENDING:
-                    // restart classserver if needed
-                    classServers.createTaskClassServer(job, spacesSupport);
                     break;
                 case STALLED:
                 case RUNNING:
                     //start dataspace app for this job
                     job.startDataSpaceApplication(dsStarter.getNamingService());
                     // restart classServer if needed
-                    classServers.createTaskClassServer(job, spacesSupport);
                     break;
                 case FINISHED:
                 case CANCELED:
@@ -788,8 +782,6 @@ public class SchedulingService {
                 case KILLED:
                     break;
                 case PAUSED:
-                    // restart classserver if needed
-                    classServers.createTaskClassServer(job, spacesSupport);
             }
         }
     }
@@ -825,11 +817,6 @@ public class SchedulingService {
             //thrown by when user has overridden getProgress method and the method throws an exception
             // * if forked JVM process is dead
             //nothing to do in any case
-            if (tlogger.isTraceEnabled()) {
-                tlogger.trace(task.getId(), "getProgress failed", e);
-            }
-        } catch (ProgressPingerException e) {
-            //thrown by when forked JVM process is dead, which is a normal scenario at the end of the task
             if (tlogger.isTraceEnabled()) {
                 tlogger.trace(task.getId(), "getProgress failed", e);
             }

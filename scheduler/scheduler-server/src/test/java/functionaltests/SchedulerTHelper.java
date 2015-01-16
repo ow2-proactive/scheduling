@@ -314,14 +314,15 @@ public class SchedulerTHelper {
     }
 
     public static String testClasspath() {
-        String home = PASchedulerProperties.SCHEDULER_HOME.getValueAsString();
-        String classpathToLibFolderWithWildcard = home + File.separator + "dist" + File.separator + "lib" +
-            File.separator + "*";
-        if (OperatingSystem.getOperatingSystem().equals(OperatingSystem.windows)) {
-            // required by windows otherwise wildcard is expanded
-            classpathToLibFolderWithWildcard = "\"" + classpathToLibFolderWithWildcard + "\"";
-        }
-        return classpathToLibFolderWithWildcard;
+//        String home = PASchedulerProperties.SCHEDULER_HOME.getValueAsString();
+//        String classpathToLibFolderWithWildcard = home + File.separator + "dist" + File.separator + "lib" +
+//            File.separator + "*";
+//        if (OperatingSystem.getOperatingSystem().equals(OperatingSystem.windows)) {
+//            // required by windows otherwise wildcard is expanded
+//            classpathToLibFolderWithWildcard = "\"" + classpathToLibFolderWithWildcard + "\"";
+//        }
+//        return classpathToLibFolderWithWildcard;
+        return System.getProperty("java.class.path");
     }
 
     /* convenience method to clean TMP from dataspace when executing test */

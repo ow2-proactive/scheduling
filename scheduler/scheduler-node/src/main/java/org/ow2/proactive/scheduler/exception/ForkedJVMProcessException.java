@@ -42,16 +42,7 @@ package org.ow2.proactive.scheduler.exception;
  * @author The ProActive Team
  * @since ProActive Scheduling 3.0
  */
-public class ForkedJVMProcessException extends ProgressPingerException {
-
-    /**
-     * Create a new instance of ForkedJVMProcessException
-     *
-     * @param msg the message that causes the exception
-     */
-    public ForkedJVMProcessException(String msg) {
-        super(msg);
-    }
+public class ForkedJVMProcessException extends RuntimeException {
 
     /**
      * Create a new instance of ForkedJVMProcessException

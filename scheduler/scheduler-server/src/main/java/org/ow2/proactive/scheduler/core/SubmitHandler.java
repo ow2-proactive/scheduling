@@ -1,7 +1,7 @@
 package org.ow2.proactive.scheduler.core;
 
-import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.job.InternalJob;
+import org.apache.log4j.Logger;
 
 
 class SubmitHandler implements Runnable {
@@ -21,7 +21,7 @@ class SubmitHandler implements Runnable {
     public void run() {
         logger.info("Submitting a new job '" + job.getName() + "'");
 
-        service.jobs.jobSubmitted(job, service.infrastructure.getTaskClassServer(), service.infrastructure
+        service.jobs.jobSubmitted(job, service.infrastructure
                 .getSpacesSupport());
 
         service.wakeUpSchedulingThread();

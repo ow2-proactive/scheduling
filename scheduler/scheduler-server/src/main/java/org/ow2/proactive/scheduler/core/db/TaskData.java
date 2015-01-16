@@ -32,10 +32,7 @@ import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
-import org.ow2.proactive.scheduler.task.internal.InternalForkedJavaTask;
 import org.ow2.proactive.scheduler.task.internal.InternalForkedScriptTask;
-import org.ow2.proactive.scheduler.task.internal.InternalJavaTask;
-import org.ow2.proactive.scheduler.task.internal.InternalNativeTask;
 import org.ow2.proactive.scheduler.task.internal.InternalScriptTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scripting.SelectionScript;
@@ -333,18 +330,12 @@ public class TaskData {
 
         InternalTask internalTask;
 
-        if (taskType.equals(JAVA_TASK)) {
-            internalTask = new InternalJavaTask();
-        } else if (taskType.equals(FORKED_JAVA_TASK)) {
-            internalTask = new InternalForkedJavaTask();
-        } else if (taskType.equals(NATIVE_TASK)) {
-            internalTask = new InternalNativeTask();
-        } else if (taskType.equals(SCRIPT_TASK)) {
+        if (taskType.equals(SCRIPT_TASK)) {
             internalTask = new InternalScriptTask();
         } else if (taskType.equals(FORKED_SCRIPT_TASK)) {
             internalTask = new InternalForkedScriptTask();
         } else {
-            throw new IllegalStateException("Unexpecpected stored task type: " + taskType);
+            throw new IllegalStateException("Unexpected stored task type: " + taskType);
         }
 
         internalTask.setId(taskId);
@@ -533,13 +524,7 @@ public class TaskData {
     }
 
     void initTaskType(InternalTask task) {
-        if (task.getClass().equals(InternalJavaTask.class)) {
-            taskType = JAVA_TASK;
-        } else if (task.getClass().equals(InternalForkedJavaTask.class)) {
-            taskType = FORKED_JAVA_TASK;
-        } else if (task.getClass().equals(InternalNativeTask.class)) {
-            taskType = NATIVE_TASK;
-        } else if (task.getClass().equals(InternalForkedScriptTask.class)) {
+       if (task.getClass().equals(InternalForkedScriptTask.class)) {
             taskType = FORKED_SCRIPT_TASK;
         } else if (task.getClass().equals(InternalScriptTask.class)) {
             taskType = SCRIPT_TASK;

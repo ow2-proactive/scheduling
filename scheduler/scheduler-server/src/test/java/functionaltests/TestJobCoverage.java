@@ -39,7 +39,7 @@ package functionaltests;
 import java.io.File;
 import java.net.URL;
 
-import org.junit.Assert;
+import org.objectweb.proactive.utils.StackTraceUtil;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobResult;
@@ -51,6 +51,7 @@ import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.tests.FunctionalTest;
+import org.junit.Assert;
 
 
 /**
@@ -130,15 +131,14 @@ public class TestJobCoverage extends FunctionalTest {
         Assert.assertNotNull(result.getPreciousResults().get("task6"));
 
         Assert.assertEquals("Working", result.getPreciousResults().get("task1").value());
-        Assert.assertTrue(result.getResult("task2").getException().getMessage().contains(
-                "WorkingAt3rd - Status : Number is 1"));
+        Assert.assertTrue(StackTraceUtil.getStackTrace(result.getResult("task2").getException()).contains(
+          "WorkingAt3rd - Status : Number is 1"));
         Assert.assertTrue(result.getResult("task3").value().toString().contains(
-                "WorkingAt3rd - Status : OK / File deleted :"));
-        Assert.assertEquals("Throwing", result.getResult("task4").getException().getMessage());
-        Assert.assertEquals("Throwing", result.getResult("task5").getException().getMessage());
-        Assert.assertEquals(0, result.getPreciousResults().get("task6").value());
-        Assert.assertEquals(12, result.getResult("task7").value());
-        Assert.assertEquals(12, result.getResult("task8").value());
+          "WorkingAt3rd - Status : OK / File deleted :"));
+        Assert.assertTrue(result.getResult("task4").getException().getMessage().contains("Throwing"));
+        Assert.assertTrue(result.getResult("task5").getException().getMessage().contains("Throwing"));
+        Assert.assertNotNull(result.getResult("task7").getException());
+        Assert.assertNotNull(result.getResult("task8").getException());
         Assert.assertNotNull(result.getResult("task9").getException());
 
         //checking all processes

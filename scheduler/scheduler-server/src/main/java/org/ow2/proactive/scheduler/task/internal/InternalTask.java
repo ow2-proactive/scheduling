@@ -1053,8 +1053,8 @@ public abstract class InternalTask extends TaskState {
 
     /**
      *
-     * Return generic info replacing $PAS_JOB_NAME, $PAS_JOB_ID, $PAS_TASK_NAME, $PAS_TASK_ID, $PAS_TASK_ITERATION
-     * $PAS_TASK_REPLICATION by it's actual value
+     * Return generic info replacing $PA_JOB_NAME, $PA_JOB_ID, $PA_TASK_NAME, $PA_TASK_ID, $PA_TASK_ITERATION
+     * $PA_TASK_REPLICATION by it's actual value
      *
      */
     public Map<String, String> getGenericInformations() {
@@ -1067,16 +1067,16 @@ public abstract class InternalTask extends TaskState {
         Map<String, String> replacements = new HashMap<String, String>();
         JobId jobId = taskInfo.getJobId();
         if (jobId != null) {
-            replacements.put(SchedulerVars.JAVAENV_JOB_ID_VARNAME.toString(), jobId.toString());
-            replacements.put(SchedulerVars.JAVAENV_JOB_NAME_VARNAME.toString(), jobId.getReadableName());
+            replacements.put(SchedulerVars.PA_JOB_ID.toString(), jobId.toString());
+            replacements.put(SchedulerVars.PA_JOB_NAME.toString(), jobId.getReadableName());
         }
         TaskId taskId = taskInfo.getTaskId();
         if (taskId != null) {
-            replacements.put(SchedulerVars.JAVAENV_TASK_ID_VARNAME.toString(), taskId.toString());
-            replacements.put(SchedulerVars.JAVAENV_TASK_NAME_VARNAME.toString(), taskId.getReadableName());
+            replacements.put(SchedulerVars.PA_TASK_ID.toString(), taskId.toString());
+            replacements.put(SchedulerVars.PA_TASK_NAME.toString(), taskId.getReadableName());
         }
-        replacements.put(SchedulerVars.JAVAENV_TASK_ITERATION.toString(), String.valueOf(iteration));
-        replacements.put(SchedulerVars.JAVAENV_TASK_REPLICATION.toString(), String.valueOf(replication));
+        replacements.put(SchedulerVars.PA_TASK_ITERATION.toString(), String.valueOf(iteration));
+        replacements.put(SchedulerVars.PA_TASK_REPLICATION.toString(), String.valueOf(replication));
 
         return applyReplacementsOnGenericInformation(replacements);
     }

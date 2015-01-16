@@ -37,7 +37,7 @@
 package org.ow2.proactive.scheduler.examples;
 
 import java.io.Serializable;
-import java.util.Map;
+
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 
@@ -55,21 +55,10 @@ public class FailTaskConditionally extends JavaExecutable {
 
     public static final String EXCEPTION_MESSAGE = "Faulty task exception";
 
-    private int replicationId = 0;
-
-    @Override
-    public void init(Map<String, Serializable> args) {
-        if (args.containsKey("replicationId")) {
-            try {
-                replicationId = Integer.parseInt(args.get("replicationId").toString());
-            } catch (NumberFormatException e) {
-            }
-        }
-    }
-
     @Override
     public Serializable execute(TaskResult... results) throws Throwable {
-        if (replicationId == 1) {
+        getOut().println("it=" + getVariables());
+        if (getReplicationIndex() == 1) {
             try {
                 getOut().println("I will throw a runtime exception in 3 sec");
                 Thread.sleep(3000);
@@ -79,8 +68,8 @@ public class FailTaskConditionally extends JavaExecutable {
             throw new RuntimeException(EXCEPTION_MESSAGE);
 
         } else {
-            getOut().println("I will sleep for 30 seconds");
-            Thread.sleep(30000);
+            getOut().println("I will sleep for 10 seconds");
+            Thread.sleep(10000);
             return "Nothing";
         }
     }

@@ -13,8 +13,6 @@ public class SchedulingInfrastructureImpl implements SchedulingInfrastructure {
 
     private final SchedulerDBManager dbManager;
 
-    private final SchedulerClassServers classServers;
-
     private final ScheduledExecutorService scheduledExecutorService;
 
     private final ExecutorService clientExecutorService;
@@ -37,12 +35,6 @@ public class SchedulingInfrastructureImpl implements SchedulingInfrastructure {
         this.internalExecutorService = internalExecutorService;
         this.scheduledExecutorService = scheduledExecutorService;
         this.spacesSupport = new SchedulerSpacesSupport();
-        this.classServers = new SchedulerClassServers();
-    }
-
-    @Override
-    public SchedulerClassServers getTaskClassServer() {
-        return classServers;
     }
 
     @Override

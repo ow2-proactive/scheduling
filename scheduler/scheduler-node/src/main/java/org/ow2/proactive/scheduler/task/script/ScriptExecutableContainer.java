@@ -34,12 +34,13 @@
  */
 package org.ow2.proactive.scheduler.task.script;
 
+import java.io.Serializable;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.ow2.proactive.scheduler.common.exception.ExecutableCreationException;
-import org.ow2.proactive.scheduler.common.task.executable.Executable;
-import org.ow2.proactive.scheduler.common.task.executable.internal.JavaExecutableInitializerImpl;
-import org.ow2.proactive.scheduler.task.java.JavaExecutableContainer;
+import org.ow2.proactive.scheduler.common.task.util.ByteArrayWrapper;
+import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.TaskScript;
 
@@ -49,30 +50,24 @@ import org.ow2.proactive.scripting.TaskScript;
  * @author The ProActive Team
  * @since ProActive Scheduling 3.4
  */
-public class ScriptExecutableContainer extends JavaExecutableContainer {
+public class ScriptExecutableContainer extends ExecutableContainer {
+    /** Arguments of the task as a map */
+    protected final Map<String, ByteArrayWrapper> serializedArguments = new HashMap<String, ByteArrayWrapper>();
+
     private TaskScript script;
 
     public ScriptExecutableContainer(TaskScript script) {
-        super(ScriptExecutable.class.getName(), Collections.<String, byte[]> emptyMap());
+        for (Map.Entry<String, byte[]> e : Collections.<String, byte[]> emptyMap().entrySet()) {
+            this.serializedArguments.put(e.getKey(), new ByteArrayWrapper(e.getValue()));
+        }
         this.script = script;
     }
 
-    @Override
-    public Executable getExecutable() throws ExecutableCreationException {
-        ScriptExecutable executable = (ScriptExecutable) super.getExecutable();
-        executable.setScript(script);
-        return executable;
-    }
-
-    @Override
-    public JavaExecutableInitializerImpl createExecutableInitializer() {
-        ScriptExecutableInitializer scriptExecutableInitializer = new ScriptExecutableInitializer(super
-                .createExecutableInitializer());
-        scriptExecutableInitializer.setScript(script);
-        return scriptExecutableInitializer;
-    }
-
-    public Script getScript() {
+    public Script<Serializable> getScript() {
         return script;
+    }
+
+    public Map<String, ByteArrayWrapper> getSerializedArguments() {
+        return serializedArguments;
     }
 }

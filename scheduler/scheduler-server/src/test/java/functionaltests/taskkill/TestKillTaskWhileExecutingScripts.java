@@ -94,7 +94,7 @@ public class TestKillTaskWhileExecutingScripts extends FunctionalTest {
         javaTaskKillEndlessPostScript();
         javaTaskKillEndlessFlowScript();
         javaTaskKillEndlessJavaExecutable();
-        forkedJavaTaskKillEndlessEnvScript();
+//        forkedJavaTaskKillEndlessEnvScript();
         forkedJavaTaskKillEndlessJavaExecutable();
         killEndlessScriptTask();
     }

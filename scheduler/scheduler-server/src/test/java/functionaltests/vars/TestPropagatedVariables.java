@@ -38,12 +38,12 @@ package functionaltests.vars;
 
 import java.util.HashMap;
 
-import org.junit.Test;
 import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.scheduler.common.exception.UserException;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
+import org.junit.Test;
 
 import functionaltests.SchedulerConsecutive;
 import functionaltests.SchedulerTHelper;
@@ -94,7 +94,7 @@ public class TestPropagatedVariables extends SchedulerConsecutive {
                     .setCommandLine(
                             "/bin/bash",
                             "-c",
-                            "echo $propagated_var_Task_A_Var; if [ \"$propagated_var_Task_A_Var\" != \"Task_A_Val\" ]; then  exit 0; else exit 1; fi;");
+                            "echo $variables_Task_A_Var; test \"$variables_Task_A_Var\" == \"Task_A_Val\"");
             taskD.addDependence(taskC);
             flowJob.addTask(taskD);
         }

@@ -46,6 +46,7 @@ import java.util.Map.Entry;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.common.task.executable.internal.JavaStandaloneExecutableInitializer;
 import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
+import org.ow2.proactive.scheduler.task.SchedulerVars;
 
 
 /**
@@ -69,7 +70,7 @@ public abstract class AbstractJavaExecutable extends Executable {
      * @throws Exception an exception if something goes wrong during executable initialization.
      */
     // WARNING WHEN REMOVE OR RENAME, called by task launcher by introspection
-    protected void internalInit(JavaStandaloneExecutableInitializer execInitializer) throws Exception {
+    public void internalInit(JavaStandaloneExecutableInitializer execInitializer) throws Exception {
         this.execInitializer = execInitializer;
         // at this point, the context class loader is the TaskClassLoader
         // see JavaExecutableContainer.getExecutable()
@@ -173,7 +174,7 @@ public abstract class AbstractJavaExecutable extends Executable {
      * @return the Iteration Index of this Task
      */
     public final int getIterationIndex() {
-        return execInitializer.getTaskId().getIterationIndex();
+        return (Integer) getVariables().get(SchedulerVars.PA_TASK_ITERATION.toString());
     }
 
     /**
@@ -187,7 +188,7 @@ public abstract class AbstractJavaExecutable extends Executable {
      * @return the Replication Index of this Task
      */
     public final int getReplicationIndex() {
-        return execInitializer.getTaskId().getReplicationIndex();
+        return (Integer) getVariables().get(SchedulerVars.PA_TASK_REPLICATION.toString());
     }
 
     /**

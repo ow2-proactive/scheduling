@@ -11,9 +11,6 @@
             <pre>
                 <script>
                     <code language="javascript">
-                        if ('var-value' != '${var}') {
-                            throw 'Incorrect variable value (\'var\'): \'${var}\', expected \'var-value\'.';
-                        }
                         if ('var-value' != variables.get('var')) {
                             throw 'Incorrect variable value (\'var\') in variables map: \'' + variables.get('var') + '\', expected \'var-value\'.'; 
                         }

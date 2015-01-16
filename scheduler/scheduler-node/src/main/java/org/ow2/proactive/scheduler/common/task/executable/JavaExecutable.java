@@ -66,7 +66,7 @@ public abstract class JavaExecutable extends AbstractJavaExecutable {
      * @throws Exception an exception if something goes wrong during executable initialization.
      */
     // WARNING WHEN REMOVE OR RENAME, called by task launcher by introspection
-    protected void internalInit(JavaExecutableInitializerImpl execInitializer) throws Exception {
+    public void internalInit(JavaExecutableInitializerImpl execInitializer) throws Exception {
         super.internalInit(execInitializer);
     }
 

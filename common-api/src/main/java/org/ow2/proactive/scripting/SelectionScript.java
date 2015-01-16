@@ -38,6 +38,7 @@ package org.ow2.proactive.scripting;
 
 import java.io.File;
 import java.io.Reader;
+import java.io.Serializable;
 import java.io.StringReader;
 import java.net.URL;
 import java.security.MessageDigest;
@@ -124,7 +125,7 @@ public class SelectionScript extends Script<Boolean> {
      * @param dynamic tell if the script is dynamic or static
      * @throws InvalidScriptException if the creation fails.
      */
-    public SelectionScript(String script, String engineName, String[] parameters, boolean dynamic)
+    public SelectionScript(String script, String engineName, Serializable[] parameters, boolean dynamic)
             throws InvalidScriptException {
         super(script, engineName, parameters, "SelectionScript");
         this.dynamic = dynamic;
@@ -136,7 +137,7 @@ public class SelectionScript extends Script<Boolean> {
      * @param parameters script execution arguments.
      * @throws InvalidScriptException if the creation fails.
      */
-    public SelectionScript(File file, String[] parameters) throws InvalidScriptException {
+    public SelectionScript(File file, Serializable[] parameters) throws InvalidScriptException {
         super(file, parameters);
         buildSelectionScriptId();
     }
@@ -147,7 +148,7 @@ public class SelectionScript extends Script<Boolean> {
      * @param dynamic tell if script is dynamic or static
      * @throws InvalidScriptException if the creation fails.
      */
-    public SelectionScript(File file, String[] parameters, boolean dynamic) throws InvalidScriptException {
+    public SelectionScript(File file, Serializable[] parameters, boolean dynamic) throws InvalidScriptException {
         super(file, parameters);
         this.dynamic = dynamic;
         buildSelectionScriptId();
@@ -200,7 +201,7 @@ public class SelectionScript extends Script<Boolean> {
 
         //concatenate parameters if any
         if (this.parameters != null) {
-            for (String param : this.parameters) {
+            for (Serializable param : this.parameters) {
                 stringId += param;
             }
         }
@@ -232,7 +233,7 @@ public class SelectionScript extends Script<Boolean> {
      * @see org.ow2.proactive.scheduler.common.scripting.Script#getResult(javax.script.Bindings)
      */
     @Override
-    protected ScriptResult<Boolean> getResult(Bindings bindings) {
+    protected ScriptResult<Boolean> getResult(Object evalResult, Bindings bindings) {
         if (bindings.containsKey(RESULT_VARIABLE)) {
             Object result = bindings.get(RESULT_VARIABLE);
 

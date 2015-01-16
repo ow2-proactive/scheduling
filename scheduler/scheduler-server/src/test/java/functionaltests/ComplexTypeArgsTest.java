@@ -38,11 +38,11 @@ package functionaltests;
 
 import java.io.Serializable;
 
-import org.ow2.proactive.scheduler.common.job.JobEnvironment;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
+
 import functionaltests.executables.ComplexParamsExecutable;
 
 
@@ -58,10 +58,6 @@ public class ComplexTypeArgsTest extends SchedulerConsecutive {
         task.setExecutableClassName(ComplexParamsExecutable.class.getName());
         task.addArgument("param1", new UserTypeA(3));
         submittedJob.addTask(task);
-
-        JobEnvironment env = new JobEnvironment();
-        env.setJobClasspath(new String[] { SchedulerTHelper.testClasspath() });
-        submittedJob.setEnvironment(env);
 
         //test submission and event reception
         JobId id = SchedulerTHelper.testJobSubmission(submittedJob);

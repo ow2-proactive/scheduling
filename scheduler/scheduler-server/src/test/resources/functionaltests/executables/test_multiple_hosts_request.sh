@@ -5,7 +5,7 @@ function check_node_file {
 return 0 # TODO : this line causes the test to end without checking file content as it is not suitable today.
 # this function should be rewritten when test will be distributed
 HOST_IP=`hostname -f`
-for i in `cat $PAS_NODEFILE`
+for i in `cat $PA_NODEFILE`
 do
 	NODE_IP=$i
 	if [ "$NODE_IP" != "$HOST_IP" ]
@@ -21,40 +21,40 @@ return 0
 # $2 and $3 replaced environment variables
 if [ "$#" = "3" ]
 then
-    PAS_CORE_NB=$2
-    PAS_NODEFILE=$3
+    PA_CORE_NB=$2
+    PA_NODEFILE=$3
 fi
 
 TEST_RES=0
 
-if [ -z "$PAS_CORE_NB" ]
+if [ -z "$PA_CORE_NB" ]
 then
-	echo "Error 'PAS_CORE_NB' env variable is not defined"
+	echo "Error 'PA_CORE_NB' env variable is not defined"
 	TEST_RES=1
 fi
 
-if [ "$PAS_CORE_NB" != "$1" ]
+if [ "$PA_CORE_NB" != "$1" ]
 then
 	echo "Error : number of booked host is not $1"
 	TEST_RES=1
 fi
 
-if [ -z "$PAS_NODEFILE" ]
+if [ -z "$PA_NODEFILE" ]
 then
-	echo "Error 'PAS_NODEFILE' env variable is not defined"
+	echo "Error 'PA_NODEFILE' env variable is not defined"
 	TEST_RES=1
 fi
 
-if [ ! -r $PAS_NODEFILE ]
+if [ ! -r $PA_NODEFILE ]
 then
-	echo "Error cannot read 'PAS_NODEFILE'"
+	echo "Error cannot read 'PA_NODEFILE'"
 	TEST_RES=1
 else
-	NBS_LINES=`wc -l < $PAS_NODEFILE | tr -d ' '`
+	NBS_LINES=`wc -l < $PA_NODEFILE | tr -d ' '`
 	if [ "$NBS_LINES" != "$1" ]
 	then
-		echo "Error 'PAS_NODEFILE' must have $1 lines, it has $NBS_LINES"
-		cat $PAS_NODEFILE
+		echo "Error 'PA_NODEFILE' must have $1 lines, it has $NBS_LINES"
+		cat $PA_NODEFILE
 		TEST_RES=1
 	else
 		check_node_file

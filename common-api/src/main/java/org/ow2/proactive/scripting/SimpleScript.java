@@ -38,6 +38,7 @@ package org.ow2.proactive.scripting;
 
 import java.io.File;
 import java.io.Reader;
+import java.io.Serializable;
 import java.io.StringReader;
 import java.net.URL;
 
@@ -91,7 +92,7 @@ public class SimpleScript extends Script<Object> {
      * @param parameters execution parameters
      * @throws InvalidScriptException if the creation fails.
      */
-    public SimpleScript(String script, String engine, String[] parameters) throws InvalidScriptException {
+    public SimpleScript(String script, String engine, Serializable[] parameters) throws InvalidScriptException {
         super(script, engine, parameters);
     }
 
@@ -127,7 +128,7 @@ public class SimpleScript extends Script<Object> {
      * @see org.ow2.proactive.scheduler.common.scripting.Script#getResult(javax.script.Bindings)
      */
     @Override
-    protected ScriptResult<Object> getResult(Bindings bindings) {
+    protected ScriptResult<Object> getResult(Object evalResult, Bindings bindings) {
         // no significant result can be returned
         return new ScriptResult<Object>();
     }

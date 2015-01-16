@@ -38,6 +38,7 @@ package org.ow2.proactive.scripting;
 
 import java.io.File;
 import java.io.Reader;
+import java.io.Serializable;
 import java.io.StringReader;
 import java.net.URL;
 import java.util.ArrayList;
@@ -93,7 +94,7 @@ public class GenerationScript extends Script<Object> {
         super(script);
     }
 
-    public GenerationScript(String script, String engineName, String[] parameters)
+    public GenerationScript(String script, String engineName, Serializable[] parameters)
             throws InvalidScriptException {
         super(script, engineName, parameters, "GenerationScript");
     }
@@ -117,7 +118,7 @@ public class GenerationScript extends Script<Object> {
      * @param parameters scripts parameters (arguments)
      * @throws InvalidScriptException if the creation fails.
      */
-    public GenerationScript(File file, String[] parameters) throws InvalidScriptException {
+    public GenerationScript(File file, Serializable[] parameters) throws InvalidScriptException {
         super(file, parameters);
     }
 
@@ -126,7 +127,7 @@ public class GenerationScript extends Script<Object> {
      * @param parameters scripts parameters (arguments)
      * @throws InvalidScriptException if the creation fails.
      */
-    public GenerationScript(URL url, String[] parameters) throws InvalidScriptException {
+    public GenerationScript(URL url, Serializable[] parameters) throws InvalidScriptException {
         super(url, parameters);
     }
 
@@ -149,10 +150,10 @@ public class GenerationScript extends Script<Object> {
     }
 
     /**
-     * @see org.ow2.proactive.scripting.Script#getResult(javax.script.Bindings)
+     * @see Script#getResult(Object, javax.script.Bindings)
      */
     @Override
-    protected ScriptResult<Object> getResult(Bindings bindings) {
+    protected ScriptResult<Object> getResult(Object evalResult, Bindings bindings) {
         if (bindings.containsKey(RESULT_VARIABLE)) {
             Object result = bindings.get(RESULT_VARIABLE);
 

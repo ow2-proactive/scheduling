@@ -43,7 +43,6 @@ import java.io.StringReader;
 import javax.script.Bindings;
 
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.apache.log4j.Logger;
 
 
 /**
@@ -54,9 +53,6 @@ import org.apache.log4j.Logger;
  */
 @PublicAPI
 public class TaskScript extends Script<Serializable> {
-    /** Loggers */
-    public static final Logger logger = Logger.getLogger(TaskScript.class);
-
     /**
      * The variable name which must be set after the evaluation
      * of a script task.
@@ -80,7 +76,7 @@ public class TaskScript extends Script<Serializable> {
     }
 
     @Override
-    protected ScriptResult<Serializable> getResult(Bindings bindings) {
+    protected ScriptResult<Serializable> getResult(Object evalResult, Bindings bindings) {
         if (bindings.containsKey(RESULT_VARIABLE)) {
             Object result = bindings.get(RESULT_VARIABLE);
             if (result == null) {
@@ -92,8 +88,12 @@ public class TaskScript extends Script<Serializable> {
                     "Bad result format : awaited Serializable, found " + result.getClass().getName()));
             }
         } else {
-            // assuming script ran fine
-            return new ScriptResult<Serializable>(true);
+            if(evalResult != null && evalResult instanceof Serializable) {
+                return new ScriptResult<Serializable>((Serializable) evalResult);
+            } else {
+                // assuming script ran fine
+                return new ScriptResult<Serializable>(true);
+            }
         }
     }
 

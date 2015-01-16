@@ -680,7 +680,7 @@ public class Job2XMLTransformer {
         Element codeE = doc.createElementNS(Schemas.SCHEMA_LATEST.namespace, XMLTags.SCRIPT_CODE.getXMLName());
         setAttribute(codeE, XMLAttributes.LANGUAGE, script.getEngineName(), true);
         String scriptText = script.getScript();
-        String[] params = script.getParameters();
+        Serializable[] params = script.getParameters();
         if (params != null) {
 
             scriptText = inlineScriptParametersInText(scriptText, params);
@@ -701,9 +701,9 @@ public class Job2XMLTransformer {
      * "params"
      *
      */
-    public static String inlineScriptParametersInText(String scriptText, String[] params) {
+    public static String inlineScriptParametersInText(String scriptText, Serializable[] params) {
         String paramsLine = "var args=[";
-        for (String param : params) {
+        for (Serializable param : params) {
             paramsLine += "\"" + param + "\",";
         }
         paramsLine = paramsLine.substring(0, paramsLine.length() - 1) + "];";

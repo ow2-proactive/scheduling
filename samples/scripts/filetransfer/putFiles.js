@@ -16,7 +16,7 @@ importPackage(org.ow2.proactive.scripting.helper.filetransfer.initializer);
 var logToFile = false;
 //set this to true to ienable debug mode
 var mode_debug=false;
-var task_id=System.getProperty("pas.task.id");
+var task_id=System.getProperty("PA_TASK_ID");
 var logsFile = "task_"+task_id+".log";
 
      log ("Start Put Files Script");

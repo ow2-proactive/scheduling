@@ -13,7 +13,7 @@
                 <staticCommand value="/bin/bash">
                     <arguments>
                         <argument value="-c" />
-                        <argument value="echo $var_var" />
+                        <argument value="echo $variables_var" />
                     </arguments>
                 </staticCommand>
             </nativeExecutable>
@@ -25,7 +25,7 @@
             <scriptExecutable>
                 <script>
                     <code language="javascript">
-                        if ('var-value' != '${var}') {
+                        if ('var-value' != variables.get('var')) {
                             throw 'Incorrect variable value (\'var\'): \'${var}\', expected \'var-value\'.';
                         }
                     </code>

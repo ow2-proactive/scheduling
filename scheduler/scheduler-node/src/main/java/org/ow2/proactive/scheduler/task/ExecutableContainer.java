@@ -39,9 +39,6 @@ package org.ow2.proactive.scheduler.task;
 import java.io.Serializable;
 
 import org.ow2.proactive.authentication.crypto.Credentials;
-import org.ow2.proactive.scheduler.common.exception.ExecutableCreationException;
-import org.ow2.proactive.scheduler.common.task.executable.internal.ExecutableInitializer;
-import org.ow2.proactive.scheduler.common.task.executable.Executable;
 import org.ow2.proactive.utils.NodeSet;
 
 
@@ -58,29 +55,6 @@ public abstract class ExecutableContainer implements Serializable {
 
     protected Credentials credentials;
     private boolean runAsUser;
-
-    /**
-     * Create and return the contained executable
-     * @return the contained executable
-     * @throws ExecutableCreationException if the executable cannot be created
-     */
-    public abstract Executable getExecutable() throws ExecutableCreationException;
-
-    /**
-     * Generic init method for executable containers.
-     * This method is called by SchedulerCore just before sending the container
-     * on the node that will execute the contained executable.
-     *
-     * @param job the job owning the contained executable
-     */
-    public abstract void init(ExecutableContainerInitializer initializer);
-
-    /**
-     * Create the executable initializer and returns it.
-     *
-     * @return the created executable initializer
-     */
-    public abstract ExecutableInitializer createExecutableInitializer();
 
     /**
      * Set the nodes value to the given nodes value

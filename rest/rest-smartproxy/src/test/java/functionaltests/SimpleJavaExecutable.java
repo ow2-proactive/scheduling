@@ -1,11 +1,14 @@
 package functionaltests;
 
-import org.apache.log4j.Logger;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.Serializable;
+
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
-
-import java.io.*;
-import java.net.URI;
 
 
 /**
@@ -17,23 +20,20 @@ import java.net.URI;
  */
 public class SimpleJavaExecutable extends JavaExecutable {
 
-    private static final Logger log = Logger.getLogger(SimpleJavaExecutable.class.getName());
-
     @Override
     public Serializable execute(TaskResult... results) throws Throwable {
-        log.info("local space real uri: " + this.getLocalSpace().getRealURI());
-        log.info("local space virtual uri: " + this.getLocalSpace().getVirtualURI());
 
-        File localSpaceFolder = new File(URI.create(this.getLocalSpace().getRealURI()));
-        log.info("Using localspace folder " + localSpaceFolder.getAbsolutePath());
+        File localSpaceFolder = new File(".");
+        System.out.println("Using localspace folder " + localSpaceFolder.getAbsolutePath());
         File[] files = localSpaceFolder.listFiles();
 
         for (File file : files) {
+
             if (file.isFile()) {
-                log.info("Treating input file " + file.getAbsolutePath());
+                System.out.println("Treating input file " + file.getAbsolutePath());
 
             } else {
-                log.info(file.getAbsolutePath() + " is not a file. ");
+                System.out.println(file.getAbsolutePath() + " is not a file. ");
             }
 
             String new_name = file.getName().replace("input", "output");
@@ -50,12 +50,10 @@ public class SimpleJavaExecutable extends JavaExecutable {
             }
             bw.close();
             br.close();
+            System.out.println("Written file " + fout.getAbsolutePath());
+        }// for
 
-            log.info("Written file " + fout.getAbsolutePath());
-        }
-
-        log.info("Task End");
-
+        System.out.println("Task End");
         return "OK";
     }
 

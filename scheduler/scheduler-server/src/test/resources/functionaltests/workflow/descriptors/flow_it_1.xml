@@ -32,8 +32,8 @@ runs=2;
       </depends>
       <javaExecutable class="org.ow2.proactive.scheduler.examples.IterationAwareJob">
 		<parameters>
-		  <parameter name="it" value="$IT" />
-		  <parameter name="dup" value="$REP" />
+		  <parameter name="it" value="$PA_TASK_ITERATION" />
+		  <parameter name="dup" value="$PA_TASK_REPLICATION" />
 		</parameters>
       </javaExecutable>
     </task>

@@ -1,8 +1,6 @@
 package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.security.KeyException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -97,18 +95,18 @@ public class LocalInfrastructure extends InfrastructureManager {
             paPropList.add(CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getCmdLine() + rmHome + "config" +
                 os.fs + "security.java.policy-client");
         }
-        if (!this.paProperties.contains(CentralPAPropertyRepository.LOG4J.getName())) {
-            StringBuilder sb = new StringBuilder(CentralPAPropertyRepository.LOG4J.getCmdLine());
-
-            // log4j only understands urls
-            try {
-                sb.append((new File(rmHome)).toURI().toURL().toString()).append("config").append("/").append(
-                        "log").append("/").append("node.properties");
-            } catch (MalformedURLException e) {
-                throw new IllegalStateException(e);
-            }
-            paPropList.add(sb.toString());
-        }
+//        if (!this.paProperties.contains(CentralPAPropertyRepository.LOG4J.getName())) {
+//            StringBuilder sb = new StringBuilder(CentralPAPropertyRepository.LOG4J.getCmdLine());
+//
+//            // log4j only understands urls
+//            try {
+//                sb.append((new File(rmHome)).toURI().toURL().toString()).append("config").append("/").append(
+//                        "log").append("/").append("node.properties");
+//            } catch (MalformedURLException e) {
+//                throw new IllegalStateException(e);
+//            }
+//            paPropList.add(sb.toString());
+//        }
         if (!this.paProperties.contains(CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getName())) {
             paPropList.add(CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getCmdLine() + rmHome +
                 "config" + os.fs + "network" + os.fs + "node.ini");

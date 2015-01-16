@@ -94,13 +94,13 @@ public class TestScriptTask extends SchedulerConsecutive {
         TaskResult propertiesTaskResult = jobResult.getResult("properties");
         String logs = propertiesTaskResult.getOutput().getAllLogs(false);
 
-        assertThat(logs, containsString("pas.job.id=" + jobResult.getJobId().value()));
-        assertThat(logs, containsString("pas.job.id=" + jobResult.getJobId().value()));
-        assertThat(logs, containsString("pas.job.name=" + jobResult.getName()));
-        assertThat(logs, containsString("pas.task.id=" + propertiesTaskResult.getTaskId().value()));
-        assertThat(logs, containsString("pas.task.name=properties"));
-        assertThat(logs, containsString("pas.task.iteration=0"));
-        assertThat(logs, containsString("pas.task.replication=0"));
+        assertThat(logs, containsString("PA_JOB_ID=" + jobResult.getJobId().value()));
+        assertThat(logs, containsString("PA_JOB_ID=" + jobResult.getJobId().value()));
+        assertThat(logs, containsString("PA_JOB_NAME=" + jobResult.getName()));
+        assertThat(logs, containsString("PA_TASK_ID=" + propertiesTaskResult.getTaskId().value()));
+        assertThat(logs, containsString("PA_TASK_NAME=properties"));
+        assertThat(logs, containsString("PA_TASK_ITERATION=0"));
+        assertThat(logs, containsString("PA_TASK_REPLICATION=0"));
 
         // the script can be a file
         TaskResult fileTaskResult = jobResult.getResult("file");

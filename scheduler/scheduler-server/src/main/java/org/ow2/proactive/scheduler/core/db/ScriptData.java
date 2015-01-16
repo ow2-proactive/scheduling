@@ -1,5 +1,6 @@
 package org.ow2.proactive.scheduler.core.db;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 
@@ -16,10 +17,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.BatchSize;
-import org.hibernate.annotations.Parameter;
-import org.hibernate.annotations.Type;
-import org.hibernate.type.SerializableToBlobType;
 import org.ow2.proactive.db.DatabaseManagerException;
 import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
@@ -28,6 +25,10 @@ import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.scripting.SimpleScript;
+import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.Parameter;
+import org.hibernate.annotations.Type;
+import org.hibernate.type.SerializableToBlobType;
 
 
 @Entity
@@ -41,7 +42,7 @@ public class ScriptData {
 
     private String script;
 
-    private List<String> scriptParameters;
+    private List<Serializable> scriptParameters;
 
     private boolean selectionScriptDynamic;
 
@@ -122,9 +123,9 @@ public class ScriptData {
         return new SimpleScript(script, scriptEngine, parameters());
     }
 
-    private String[] parameters() {
+    private Serializable[] parameters() {
         if (scriptParameters != null) {
-            return scriptParameters.toArray(new String[scriptParameters.size()]);
+            return scriptParameters.toArray(new Serializable[scriptParameters.size()]);
         } else {
             return new String[] {};
         }
@@ -171,11 +172,11 @@ public class ScriptData {
 
     @Column(name = "PARAMETERS")
     @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object"))
-    public List<String> getScriptParameters() {
+    public List<Serializable> getScriptParameters() {
         return scriptParameters;
     }
 
-    public void setScriptParameters(List<String> scriptParameters) {
+    public void setScriptParameters(List<Serializable> scriptParameters) {
         this.scriptParameters = scriptParameters;
     }
 

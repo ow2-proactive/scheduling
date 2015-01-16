@@ -1296,8 +1296,8 @@ public abstract class InternalJob extends JobState {
 
     /**
      *
-     * Return generic info replacing $PAS_JOB_NAME, $PAS_JOB_ID, $PAS_TASK_NAME, $PAS_TASK_ID, $PAS_TASK_ITERATION
-     * $PAS_TASK_REPLICATION by it's actual value
+     * Return generic info replacing $PA_JOB_NAME, $PA_JOB_ID, $PA_TASK_NAME, $PA_TASK_ID, $PA_TASK_ITERATION
+     * $PA_TASK_REPLICATION by it's actual value
      *
      */
     public Map<String, String> getGenericInformations() {
@@ -1309,8 +1309,8 @@ public abstract class InternalJob extends JobState {
         Map<String, String> replacements = new HashMap<String, String>();
         JobId jobId = jobInfo.getJobId();
         if (jobId != null) {
-            replacements.put(SchedulerVars.JAVAENV_JOB_ID_VARNAME.toString(), jobId.toString());
-            replacements.put(SchedulerVars.JAVAENV_JOB_NAME_VARNAME.toString(), jobId.getReadableName());
+            replacements.put(SchedulerVars.PA_JOB_ID.toString(), jobId.toString());
+            replacements.put(SchedulerVars.PA_JOB_NAME.toString(), jobId.getReadableName());
         }
         return applyReplacementsOnGenericInformation(replacements);
     }

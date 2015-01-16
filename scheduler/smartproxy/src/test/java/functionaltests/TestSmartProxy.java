@@ -13,6 +13,7 @@ import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobEnvironment;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
@@ -120,6 +121,7 @@ public class TestSmartProxy extends SchedulerConsecutive {
             JavaTask testTask = new JavaTask();
             testTask.setName(TASK_NAME + i);
             testTask.setExecutableClassName(SimpleJavaExecutable.class.getName());
+            testTask.setForkEnvironment(new ForkEnvironment());
             // testTask.
             // ------------- create an input File ------------
             File inputFile = new File(inputLocalFolder, inputFileBaseName + "_" + i + inputFileExt);

@@ -1,8 +1,5 @@
 package functionaltests.schedulerdb;
 
-import org.junit.Assert;
-
-import org.junit.Test;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
@@ -10,10 +7,11 @@ import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.InternalJob;
-import org.ow2.proactive.scheduler.task.internal.InternalForkedJavaTask;
-import org.ow2.proactive.scheduler.task.internal.InternalJavaTask;
-import org.ow2.proactive.scheduler.task.internal.InternalNativeTask;
+import org.ow2.proactive.scheduler.task.internal.InternalForkedScriptTask;
+import org.ow2.proactive.scheduler.task.internal.InternalScriptTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
+import org.junit.Assert;
+import org.junit.Test;
 
 
 public class TestTaskRuntimeData extends BaseSchedulerDBTest {
@@ -32,9 +30,9 @@ public class TestTaskRuntimeData extends BaseSchedulerDBTest {
         jobDef.addTask(taskDef3);
 
         InternalJob job = defaultSubmitJobAndLoadInternal(false, jobDef);
-        Assert.assertEquals(InternalJavaTask.class, job.getTask("task1").getClass());
-        Assert.assertEquals(InternalForkedJavaTask.class, job.getTask("task2").getClass());
-        Assert.assertEquals(InternalNativeTask.class, job.getTask("task3").getClass());
+        Assert.assertEquals(InternalScriptTask.class, job.getTask("task1").getClass());
+        Assert.assertEquals(InternalForkedScriptTask.class, job.getTask("task2").getClass());
+        Assert.assertEquals(InternalForkedScriptTask.class, job.getTask("task3").getClass());
     }
 
     @Test

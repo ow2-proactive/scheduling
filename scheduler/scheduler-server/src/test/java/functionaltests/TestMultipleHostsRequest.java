@@ -56,7 +56,7 @@ import org.junit.Assert;
 /**
  * Test whether attribute reservation of several nodes for a native task
  * book correctly number a needed node (attribute coresNumber in nativeExecutable in a job SML descriptor)
- * Test whther PAS_NODEFILE and PAS_CORE_NB environment variables are correctly set
+ * Test whther PA_NODEFILE and PA_CORE_NB environment variables are correctly set
  *
  * @author The ProActive Team
  */

@@ -75,7 +75,7 @@ public class TaskUsingCredentialsTest extends SchedulerConsecutive {
 
         if (OperatingSystem.getOperatingSystem() == org.objectweb.proactive.utils.OperatingSystem.unix) {
             NativeTask nativeTask = new NativeTask();
-            nativeTask.setCommandLine("echo", "$CREDENTIALS_MY_APP_PASSWORD");
+            nativeTask.setCommandLine("echo", "$credentials_MY_APP_PASSWORD");
             job.addTask(nativeTask);
         }
 

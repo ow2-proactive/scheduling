@@ -43,6 +43,7 @@ import org.junit.rules.TemporaryFolder;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.job.*;
+import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
@@ -188,6 +189,7 @@ public final class RestSmartProxyTest extends AbstractRestFuncTestCase {
             JavaTask testTask = new JavaTask();
             testTask.setName(TASK_NAME + i);
             testTask.setExecutableClassName(SimpleJavaExecutable.class.getName());
+            testTask.setForkEnvironment(new ForkEnvironment());
             File inputFile = new File(inputLocalFolder, INPUT_FILE_BASE_NAME + "_" + i + INPUT_FILE_EXT);
             String outputFileName = OUTPUT_FILE_BASE_NAME + "_" + i + OUTPUT_FILE_EXT;
 

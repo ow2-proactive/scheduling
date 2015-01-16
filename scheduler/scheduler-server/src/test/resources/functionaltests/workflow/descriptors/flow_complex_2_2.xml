@@ -124,7 +124,7 @@ runs=3;
           <script>
             <code language="groovy">
 // <![CDATA[
-def ID   = 8 + "_" + $REP;
+def ID   = 8 + "_" + variables.get('PA_TASK_REPLICATION');
 def RUNS = 5;
 def f = new File(java.lang.System.getProperty("java.io.tmpdir"), "fc_2_2_1" + ID);
 def it = 0;
@@ -200,7 +200,7 @@ loop = false;
           <script>
             <code language="groovy">
 // <![CDATA[
-def ID   = 7 + "_" + $REP;
+def ID   = 7 + "_" + variables.get('PA_TASK_REPLICATION');
 def RUNS = 3;
 def f = new File(java.lang.System.getProperty("java.io.tmpdir"), "fc_2_2_2" + ID);
 def it = 0;
@@ -333,7 +333,7 @@ loop = false;
           <script>
             <code language="groovy">
 // <![CDATA[
-def ID   = 3 + "_" + $REP;
+def ID   = 3 + "_" + variables.get('PA_TASK_REPLICATION');
 def RUNS = 3;
 def f = new File(java.lang.System.getProperty("java.io.tmpdir"), "fc_2_2_3" + ID);
 def it = 0;
@@ -375,7 +375,7 @@ loop = false;
           <script>
             <code language="groovy">
 // <![CDATA[
-def ID   = 2 + "_" + $REP;
+def ID   = 2 + "_" + variables.get('PA_TASK_REPLICATION');
 def RUNS = 2;
 def f = new File(java.lang.System.getProperty("java.io.tmpdir"), "fc_2_2_4" + ID);
 def it = 0;
@@ -449,7 +449,7 @@ loop = false;
           <script>
             <code language="groovy">
 // <![CDATA[
-def ID   = 4 + "_" + $REP;
+def ID   = 4 + "_" + variables.get('PA_TASK_REPLICATION');
 def RUNS = 5;
 def f = new File(java.lang.System.getProperty("java.io.tmpdir"), "fc2_2_5" + ID);
 def it = 0;
@@ -500,7 +500,7 @@ loop = false;
           <script>
             <code language="groovy">
 // <![CDATA[
-def ID   = 5 + "_" + $REP;
+def ID   = 5 + "_" + variables.get('PA_TASK_REPLICATION');
 def RUNS = 5;
 def f = new File(java.lang.System.getProperty("java.io.tmpdir"), "fc_2_2_6" + ID);
 def it = 0;
@@ -573,7 +573,7 @@ runs = 2;
           <script>
             <code language="groovy">
 // <![CDATA[
-def ID   = 6 + "_" + $REP;
+def ID   = 6 + "_" + variables.get('PA_TASK_REPLICATION');
 def RUNS = 5;
 def f = new File(java.lang.System.getProperty("java.io.tmpdir"), "fc_2_2_7" + ID);
 def it = 0;

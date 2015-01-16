@@ -36,9 +36,11 @@
  */
 package org.ow2.proactive.scheduler.job;
 
+import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -58,17 +60,13 @@ import org.ow2.proactive.scheduler.common.task.ScriptTask;
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
-import org.ow2.proactive.scheduler.task.forked.ForkedJavaExecutableContainer;
-import org.ow2.proactive.scheduler.task.script.ForkedScriptExecutableContainer;
-import org.ow2.proactive.scheduler.task.java.JavaExecutableContainer;
-import org.ow2.proactive.scheduler.task.nativ.NativeExecutableContainer;
-import org.ow2.proactive.scheduler.task.script.ScriptExecutableContainer;
-import org.ow2.proactive.scheduler.task.internal.InternalForkedJavaTask;
 import org.ow2.proactive.scheduler.task.internal.InternalForkedScriptTask;
-import org.ow2.proactive.scheduler.task.internal.InternalJavaTask;
-import org.ow2.proactive.scheduler.task.internal.InternalNativeTask;
 import org.ow2.proactive.scheduler.task.internal.InternalScriptTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
+import org.ow2.proactive.scheduler.task.script.ForkedScriptExecutableContainer;
+import org.ow2.proactive.scheduler.task.script.ScriptExecutableContainer;
+import org.ow2.proactive.scripting.SimpleScript;
+import org.ow2.proactive.scripting.TaskScript;
 import org.apache.log4j.Logger;
 
 
@@ -272,29 +270,47 @@ public class InternalJobFactory {
      */
     @SuppressWarnings("unchecked")
     private static InternalTask createTask(Job userJob, JavaTask task) throws JobCreationException {
-        InternalJavaTask javaTask;
+        InternalTask javaTask= null;
 
         if (task.getExecutableClassName() != null) {
             // HACK HACK HACK : Get arguments for the task
-            Map<String, byte[]> args;
+            HashMap<String, byte[]> args;
             try {
                 Field f = JavaTask.class.getDeclaredField(JavaTask.ARGS_FIELD_NAME);
                 f.setAccessible(true);
-                args = (Map<String, byte[]>) f.get(task);
+                args = (HashMap<String, byte[]>) f.get(task);
             } catch (Exception e) {
                 // should not happen...
-                logger.fatal("Internal error : cannot retreive arguments for task " + task.getName(), e);
+                logger.fatal("Internal error : cannot retrieve arguments for task " + task.getName(), e);
                 throw new Error("Internal error : implementation must be revised.", e);
             }
 
+//            String groovyScript = "def executable = " +
+//              "new "+ task.getExecutableClassName()+ "(); " +
+//              "def initializer = org.ow2.proactive.scheduler.common.task.executable.internal.JavaStandaloneExecutableInitializer" +
+//              "executable.internalInit()" +
+//              "return executable.execute((org.ow2.proactive.scheduler.common.task.TaskResult[]) results);";
             if (task.isFork()) {
-                ForkedJavaExecutableContainer fjec = new ForkedJavaExecutableContainer(task
-                        .getExecutableClassName(), args);
-                fjec.setForkEnvironment(task.getForkEnvironment());
-                javaTask = new InternalForkedJavaTask(fjec);
+//                ForkedJavaExecutableContainer fjec = new ForkedJavaExecutableContainer(task
+//                        .getExecutableClassName(), args);
+//                fjec.setForkEnvironment(task.getForkEnvironment());
+//                javaTask = new InternalForkedJavaTask(fjec);
+                try {
+                    javaTask = new InternalForkedScriptTask(new ForkedScriptExecutableContainer(
+                      new TaskScript(new SimpleScript(task.getExecutableClassName(), "java", new Serializable[]{args}))));
+                } catch (Exception e) {
+                    throw new JobCreationException(e);
+                }
+
             } else {
-                javaTask = new InternalJavaTask(new JavaExecutableContainer(task.getExecutableClassName(),
-                    args));
+//                javaTask = new InternalJavaTask(new JavaExecutableContainer(task.getExecutableClassName(),
+//                  args));
+                try {
+                    javaTask = new InternalScriptTask(new ScriptExecutableContainer(
+                        new TaskScript(new SimpleScript(task.getExecutableClassName(), "java", new Serializable[]{args}))));
+                } catch (Exception e) {
+                    throw new JobCreationException(e);
+                }
             }
         } else {
             String msg = "You must specify your own executable task class to be launched (in every task) !";
@@ -325,15 +341,24 @@ public class InternalJobFactory {
             logger.info(msg);
             throw new JobCreationException(msg);
         }
-        InternalNativeTask nativeTask = new InternalNativeTask(new NativeExecutableContainer(task
-                .getCommandLine(), task.getGenerationScript(), task.getWorkingDir()));
-        //set task common properties
+//        InternalNativeTask nativeTask = new InternalNativeTask(new NativeExecutableContainer(task
+//                .getCommandLine(), task.getGenerationScript(), task.getWorkingDir()));
+
+        // TODO use native script engine
+        String cli = "";
+        for (String commandLinePart : task.getCommandLine()) {
+            cli += "\"" + commandLinePart + "\"" + " "; // TODO FIXME more testing
+        }
         try {
-            setTaskCommonProperties(userJob, task, nativeTask);
+            InternalTask scriptTask = new InternalForkedScriptTask(new ForkedScriptExecutableContainer(
+                new TaskScript(new SimpleScript(cli, "native")), task.getWorkingDir()));
+            //set task common properties
+            setTaskCommonProperties(userJob, task, scriptTask);
+            return scriptTask;
+
         } catch (Exception e) {
             throw new JobCreationException(e);
         }
-        return nativeTask;
     }
 
     private static InternalTask createTask(Job userJob, ScriptTask task) throws JobCreationException {

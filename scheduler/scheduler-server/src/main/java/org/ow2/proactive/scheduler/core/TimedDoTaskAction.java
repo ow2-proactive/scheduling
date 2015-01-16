@@ -133,7 +133,7 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
 
             fillContainer();
             // try launch the task
-            launcher.doTask(terminateNotification, task.getExecutableContainer(), params);
+            launcher.doTask(task.getExecutableContainer(), params, terminateNotification);
         } catch (Throwable e) {
             logger.warn("Failed to start task: " + e.getMessage(), e);
             restartTask();

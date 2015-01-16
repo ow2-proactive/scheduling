@@ -13,12 +13,12 @@
     <taskFlow>
         <task name="native_task">
             <nativeExecutable>
-                <staticCommand value="ping">
-                    <arguments>
-                        <argument value="-c"/>
-                        <argument value="${NUMBER_OF_PING}"/>
-                        <argument value="127.0.0.1"/>
-                    </arguments>
+                <staticCommand value="true">
+                    <!--<arguments>-->
+                        <!--<argument value="-c"/>-->
+                        <!--<argument value="${NUMBER_OF_PING}"/>-->
+                        <!--<argument value="127.0.0.1"/>-->
+                    <!--</arguments>-->
                 </staticCommand>
             </nativeExecutable>
         </task>

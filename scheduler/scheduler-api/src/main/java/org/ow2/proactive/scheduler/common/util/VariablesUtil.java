@@ -36,6 +36,7 @@
  */
 package org.ow2.proactive.scheduler.common.util;
 
+import java.io.Serializable;
 import java.util.Map;
 
 import org.ow2.proactive.scripting.Script;
@@ -132,10 +133,10 @@ public class VariablesUtil {
      */
     public static void filterAndUpdate(Script<?> script, Map variables) {
         script.setScript(filterAndUpdate(script.getScript(), variables));
-        String[] params = script.getParameters();
+        Serializable[] params = script.getParameters();
         if (params != null) {
             for (int i = 0; i < params.length; i++) {
-                params[i] = filterAndUpdate(params[i], variables);
+                params[i] = filterAndUpdate(params[i].toString(), variables);
             }
         }
     }

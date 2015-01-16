@@ -54,8 +54,8 @@ import org.junit.Test;
 
 
 /**
- * Checking that variables $PAS_JOB_NAME, $PAS_JOB_ID, $PAS_TASK_NAME, $PAS_TASK_ID, $PAS_TASK_ITERATION
- * $PAS_TASK_REPLICATION are replaced by it's actual value in generic information.
+ * Checking that variables $PA_JOB_NAME, $PA_JOB_ID, $PA_TASK_NAME, $PA_TASK_ID, $PA_TASK_ITERATION
+ * $PA_TASK_REPLICATION are replaced by it's actual value in generic information.
  * 
  */
 public class TestGenericInformation extends SchedulerConsecutive {
@@ -93,17 +93,17 @@ public class TestGenericInformation extends SchedulerConsecutive {
     }
 
     private void setGenericInfo(TaskFlowJob job) {
-        job.addGenericInformation("PAS_JOB_NAME", "$PAS_JOB_NAME");
-        job.addGenericInformation("PAS_JOB_ID", "$PAS_JOB_ID");
+        job.addGenericInformation("PA_JOB_NAME", "$PA_JOB_NAME");
+        job.addGenericInformation("PA_JOB_ID", "$PA_JOB_ID");
     }
 
     private static void setGenericInfo(JavaTask javaTask) {
-        javaTask.addGenericInformation("PAS_JOB_NAME", "$PAS_JOB_NAME");
-        javaTask.addGenericInformation("PAS_JOB_ID", "$PAS_JOB_ID");
-        javaTask.addGenericInformation("PAS_TASK_NAME", "$PAS_TASK_NAME");
-        javaTask.addGenericInformation("PAS_TASK_ID", "$PAS_TASK_ID");
-        javaTask.addGenericInformation("PAS_TASK_ITERATION", "$PAS_TASK_ITERATION");
-        javaTask.addGenericInformation("PAS_TASK_REPLICATION", "$PAS_TASK_REPLICATION");
+        javaTask.addGenericInformation("PA_JOB_NAME", "$PA_JOB_NAME");
+        javaTask.addGenericInformation("PA_JOB_ID", "$PA_JOB_ID");
+        javaTask.addGenericInformation("PA_TASK_NAME", "$PA_TASK_NAME");
+        javaTask.addGenericInformation("PA_TASK_ID", "$PA_TASK_ID");
+        javaTask.addGenericInformation("PA_TASK_ITERATION", "$PA_TASK_ITERATION");
+        javaTask.addGenericInformation("PA_TASK_REPLICATION", "$PA_TASK_REPLICATION");
     }
 
     public void testRegularJob() throws Throwable {
@@ -119,8 +119,8 @@ public class TestGenericInformation extends SchedulerConsecutive {
     public void checkJobState(JobState jobState) {
 
         HashMap<String, String> expected = new HashMap<String, String>();
-        expected.put("PAS_JOB_NAME", jobState.getId().getReadableName());
-        expected.put("PAS_JOB_ID", jobState.getId().toString());
+        expected.put("PA_JOB_NAME", jobState.getId().getReadableName());
+        expected.put("PA_JOB_ID", jobState.getId().toString());
 
         for (String key : expected.keySet()) {
             Assert.assertEquals("Wrong value for " + key, expected.get(key), jobState
@@ -132,12 +132,12 @@ public class TestGenericInformation extends SchedulerConsecutive {
     public void checkTaskState(TaskState taskState) {
 
         HashMap<String, String> expected = new HashMap<String, String>();
-        expected.put("PAS_JOB_NAME", taskState.getJobId().getReadableName());
-        expected.put("PAS_JOB_ID", taskState.getJobId().toString());
-        expected.put("PAS_TASK_NAME", taskState.getName());
-        expected.put("PAS_TASK_ID", taskState.getId().toString());
-        expected.put("PAS_TASK_ITERATION", String.valueOf(taskState.getIterationIndex()));
-        expected.put("PAS_TASK_REPLICATION", String.valueOf(taskState.getReplicationIndex()));
+        expected.put("PA_JOB_NAME", taskState.getJobId().getReadableName());
+        expected.put("PA_JOB_ID", taskState.getJobId().toString());
+        expected.put("PA_TASK_NAME", taskState.getName());
+        expected.put("PA_TASK_ID", taskState.getId().toString());
+        expected.put("PA_TASK_ITERATION", String.valueOf(taskState.getIterationIndex()));
+        expected.put("PA_TASK_REPLICATION", String.valueOf(taskState.getReplicationIndex()));
 
         for (String key : expected.keySet()) {
             Assert.assertEquals("Wrong value for " + key, expected.get(key), taskState

@@ -1,10 +1,14 @@
 package functionaltests;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.Serializable;
+
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
-
-import java.io.*;
-import java.net.URI;
 
 
 /**
@@ -20,10 +24,7 @@ public class SimpleJavaExecutable extends JavaExecutable {
     @Override
     public Serializable execute(TaskResult... results) throws Throwable {
 
-        System.out.println("local space real uri: " + this.getLocalSpace().getRealURI());
-        System.out.println("local space virtual uri: " + this.getLocalSpace().getVirtualURI());
-
-        File localSpaceFolder = new File(URI.create(this.getLocalSpace().getRealURI()));
+        File localSpaceFolder = new File(".");
         System.out.println("Using localspace folder " + localSpaceFolder.getAbsolutePath());
         File[] files = localSpaceFolder.listFiles();
 

@@ -21,7 +21,7 @@ task extractNativeBundle(type: Copy) {
 
 buildscript {
     repositories {
-        if (project.hasProperty('local')) mavenLocal()
+        /*if (project.hasProperty('local'))*/mavenLocal()
         mavenCentral()
         maven { url 'http://repository.activeeon.com/content/groups/proactive/' }
     }
@@ -84,6 +84,7 @@ configure(javaSubprojects) {
         compile 'com.google.guava:guava:18.0'
         runtime 'org.slf4j:slf4j-log4j12:1.6.6'
         testCompile 'junit:junit:4.11'
+        testCompile 'org.mockito:mockito-core:1.9.5'
     }
 
     test {
@@ -278,6 +279,7 @@ project(':rm:rm-node') {
 
         compile project(':common-client')
         compile project(':rm:rm-client')
+        compile "de.ruedigermoeller:fst:2.19"
 
         runtime fileTree(dir: project.nativeLibsDir, exclude: '*.jar')
 
@@ -292,7 +294,7 @@ project(':rm:rm-node') {
         runtime 'org.jruby:jruby-jline:1.7.4'
         runtime 'org.python:jython-jline:2.5.4-rc1'
         runtime 'org.codehaus.groovy:groovy-all:2.1.6'
-        runtime 'jsr223:jsr223-nativeshell:0.2'
+        runtime 'jsr223:jsr223-nativeshell:0.3'
     }
 
 }
@@ -339,7 +341,6 @@ project('scheduler:scheduler-server') {
         compile project(':rm:rm-server')
         compile project(':rm:rm-client')
 
-        testCompile 'org.mockito:mockito-core:1.9.5'
         testCompile 'org.hamcrest:hamcrest-all:1.3'
         testCompile 'com.h2database:h2:1.3.167'
         testCompile 'org.codehaus.groovy:groovy-all:2.1.6'
@@ -403,13 +404,6 @@ project('scheduler:scheduler-node') {
 
     task stub(type: StubTask) {
         classes = ['org.ow2.proactive.scheduler.common.TaskTerminateNotification',
-                   'org.ow2.proactive.scheduler.task.utils.TaskResultCallback',
-                   'org.ow2.proactive.scheduler.task.forked.JavaTaskLauncherForked',
-                   'org.ow2.proactive.scheduler.task.forked.JavaTaskLauncherForker',
-                   'org.ow2.proactive.scheduler.task.java.JavaTaskLauncher',
-                   'org.ow2.proactive.scheduler.task.nativ.NativeTaskLauncher',
-                   'org.ow2.proactive.scheduler.task.script.ScriptTaskLauncher',
-                   'org.ow2.proactive.scheduler.task.utils.ActiveObjectExecutor',
                    'org.ow2.proactive.scheduler.examples.MultiNodeExample',
                    'org.ow2.proactive.scheduler.examples.SchedulerClientEventsLogger']
     }

@@ -37,6 +37,7 @@ package org.ow2.proactive.scheduler.common.task.executable.internal;
 import java.io.PrintStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.dataspaces.LocalSpace;
@@ -55,14 +56,14 @@ public interface StandaloneExecutableInitializer extends Serializable {
      * Returns a list of ProActive Nodes url used by the task
      * @return list of nodes url
      */
-    ArrayList<String> getNodesURL();
+    List getNodesURL();
 
     /**
      * Set the value of nodes url
      *
      * @param nodes the nodes url to set
      */
-    public void setNodesURL(ArrayList<String> nodes);
+    public void setNodesURL(List<String> nodes);
 
     /**
      * Returns an interface to the task local space

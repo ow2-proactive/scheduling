@@ -148,8 +148,8 @@ public class TestListenJobLogs extends SchedulerConsecutive {
 
         if (fork) {
             ForkEnvironment env = new ForkEnvironment();
-            javaTask1.setForkEnvironment(env);
-            javaTask2.setForkEnvironment(env);
+//            javaTask1.setForkEnvironment(env);
+//            javaTask2.setForkEnvironment(env);
         }
 
         job.addTask(javaTask1);

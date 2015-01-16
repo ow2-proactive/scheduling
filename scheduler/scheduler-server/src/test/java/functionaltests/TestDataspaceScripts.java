@@ -45,10 +45,11 @@ import java.io.InputStreamReader;
 
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
+import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
-import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
@@ -71,13 +72,11 @@ public class TestDataspaceScripts extends SchedulerConsecutive {
     private static final String folderMacro = "!FOLDER";
 
     private static final String scriptContent = "" +
-        "def spaces = [input:input, localspace:localspace, output:output, user:user, global:global]; \n" +
-        "spaces.each { " + "  def f = it.value.resolveFile(\"" + fileName +
-        "\"); \n" //
+        "def spaces = ['input','output','global','user']; \n" +
+        "spaces.each { " + "  def f = new File('test_' + it); \n" //
         +
-        "  def br = new BufferedReader(new InputStreamReader(f.getContent().getInputStream())); \n" //
-        + "  def out = new PrintWriter(new BufferedWriter(new FileWriter(new File(new File('" + folderMacro +
-        "'),\"out_" + typeMacro + "_\"+it.key)))); \n" //
+        "  def br = new BufferedReader(new InputStreamReader(f.newInputStream())); \n" //
+        + "  def out = new PrintWriter(new BufferedWriter(new FileWriter(new File('res_"+ typeMacro + "' + f.name)))); \n" //
         + "  def line; \n" //
         + "  while ((line = br.readLine()) != null) { \n" //
         + "    out.println(line); \n" //
@@ -87,8 +86,7 @@ public class TestDataspaceScripts extends SchedulerConsecutive {
         + "loop=false;"; //
 
     /**
-     * Creates a task with a Pre/Post/Flow script that opens a file in
-     * the Input/Output/Local space, copies its content, and checks both are identical
+     * Creates a task with a Pre/Post/Flow scripts that copy files from input files to output files
      */
     @org.junit.Test
     public void run() throws Throwable {
@@ -106,16 +104,16 @@ public class TestDataspaceScripts extends SchedulerConsecutive {
          */
         BufferedOutputStream inout = new BufferedOutputStream(new FileOutputStream(new File(input
                 .getAbsolutePath() +
-            File.separator + fileName)));
+            File.separator + fileName + "_input")));
         BufferedOutputStream outout = new BufferedOutputStream(new FileOutputStream(new File(output
                 .getAbsolutePath() +
-            File.separator + fileName)));
+            File.separator + fileName+ "_output")));
         BufferedOutputStream globout = new BufferedOutputStream(new FileOutputStream(new File(global
                 .getAbsolutePath() +
-            File.separator + fileName)));
+            File.separator + fileName+ "_global")));
         BufferedOutputStream userout = new BufferedOutputStream(new FileOutputStream(new File(user
                 .getAbsolutePath() +
-            File.separator + fileName)));
+            File.separator + fileName+ "_user")));
         for (String line : fileContent) {
             inout.write((line + "\n").getBytes());
             outout.write((line + "\n").getBytes());
@@ -141,7 +139,14 @@ public class TestDataspaceScripts extends SchedulerConsecutive {
         job.setName(this.getClass().getSimpleName());
         t.setExecutableClassName("org.ow2.proactive.scheduler.examples.EmptyTask");
         t.setName("T");
-        t.addInputFiles(fileName, InputAccessMode.TransferFromInputSpace);
+        t.addInputFiles(fileName + "_input", InputAccessMode.TransferFromInputSpace);
+        t.addInputFiles(fileName + "_user", InputAccessMode.TransferFromUserSpace);
+        t.addInputFiles(fileName + "_global", InputAccessMode.TransferFromGlobalSpace);
+        t.addInputFiles(fileName + "_output", InputAccessMode.TransferFromOutputSpace);
+
+        t.addOutputFiles("res_*", OutputAccessMode.TransferToOutputSpace);
+        t.addOutputFiles("res_*", OutputAccessMode.TransferToUserSpace);
+        t.addOutputFiles("res_*", OutputAccessMode.TransferToGlobalSpace);
 
         File results = org.ow2.proactive.utils.FileUtils.createTempDirectory("test", ".results", null);
         String windowsReadyResultsPath = results.getAbsolutePath().replace("\\", "/"); // for the JS engine on Windows
@@ -152,6 +157,8 @@ public class TestDataspaceScripts extends SchedulerConsecutive {
         t.setFlowScript(FlowScript.createLoopFlowScript(scriptContentFiltered.replaceAll(typeMacro, "flow"),
                 "groovy", "T"));
 
+        t.setForkEnvironment(new ForkEnvironment());
+
         /**
          * job submission, wait on result, removal
          */
@@ -161,37 +168,26 @@ public class TestDataspaceScripts extends SchedulerConsecutive {
         /**
          * check content of the files created by the script
          */
-        File preinFile = new File(results, "out_pre_" + TaskLauncher.DS_INPUT_BINDING_NAME);
-        File prescratchFile = new File(results, "out_pre_" + TaskLauncher.DS_SCRATCH_BINDING_NAME);
-        File preoutFile = new File(results, "out_pre_" + TaskLauncher.DS_OUTPUT_BINDING_NAME);
-        File preglobFile = new File(results, "out_pre_" + TaskLauncher.DS_GLOBAL_BINDING_NAME);
-        File preuserFile = new File(results, "out_pre_" + TaskLauncher.DS_USER_BINDING_NAME);
-        File postinFile = new File(results, "out_post_" + TaskLauncher.DS_INPUT_BINDING_NAME);
-        File postscratchFile = new File(results, "out_post_" + TaskLauncher.DS_SCRATCH_BINDING_NAME);
-        File postoutFile = new File(results, "out_post_" + TaskLauncher.DS_OUTPUT_BINDING_NAME);
-        File postglobFile = new File(results, "out_post_" + TaskLauncher.DS_GLOBAL_BINDING_NAME);
-        File postuserFile = new File(results, "out_post_" + TaskLauncher.DS_USER_BINDING_NAME);
-        File flowinFile = new File(results, "out_flow_" + TaskLauncher.DS_INPUT_BINDING_NAME);
-        File flowscratchFile = new File(results, "out_flow_" + TaskLauncher.DS_SCRATCH_BINDING_NAME);
-        File flowoutFile = new File(results, "out_flow_" + TaskLauncher.DS_OUTPUT_BINDING_NAME);
-        File flowglobFile = new File(results, "out_flow_" + TaskLauncher.DS_GLOBAL_BINDING_NAME);
-        File flowuserFile = new File(results, "out_flow_" + TaskLauncher.DS_USER_BINDING_NAME);
 
-        checkFile(preinFile);
-        checkFile(prescratchFile);
-        checkFile(preoutFile);
-        checkFile(preglobFile);
-        checkFile(preuserFile);
-        checkFile(postinFile);
-        checkFile(postscratchFile);
-        checkFile(postoutFile);
-        checkFile(postglobFile);
-        checkFile(postuserFile);
-        checkFile(flowinFile);
-        checkFile(flowscratchFile);
-        checkFile(flowoutFile);
-        checkFile(flowglobFile);
-        checkFile(flowuserFile);
+        checkFile(new File(output, "res_" + "pre" + fileName + "_user"));
+        checkFile(new File(output, "res_" + "pre" + fileName + "_global"));
+        checkFile(new File(output, "res_" + "pre" + fileName + "_input"));
+        checkFile(new File(output, "res_" + "pre" + fileName + "_output"));
+
+        checkFile(new File(output, "res_" + "post" + fileName + "_user"));
+        checkFile(new File(output, "res_" + "post" + fileName + "_global"));
+        checkFile(new File(output, "res_" + "post" + fileName + "_input"));
+        checkFile(new File(output, "res_" + "post" + fileName + "_output"));
+
+        checkFile(new File(output, "res_" + "flow" + fileName + "_user"));
+        checkFile(new File(output, "res_" + "flow" + fileName + "_global"));
+        checkFile(new File(output, "res_" + "flow" + fileName + "_input"));
+        checkFile(new File(output, "res_" + "flow" + fileName + "_output"));
+
+        FileUtils.deleteQuietly(input);
+        FileUtils.deleteQuietly(output);
+        FileUtils.deleteQuietly(global);
+        FileUtils.deleteQuietly(user);
     }
 
     private void checkFile(File f) throws Throwable {
