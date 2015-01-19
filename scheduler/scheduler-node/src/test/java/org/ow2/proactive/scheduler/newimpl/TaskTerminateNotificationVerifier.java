@@ -34,21 +34,19 @@
  */
 package org.ow2.proactive.scheduler.newimpl;
 
-import java.io.PrintStream;
-import java.io.Serializable;
+import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
+import org.ow2.proactive.scheduler.common.task.TaskId;
+import org.ow2.proactive.scheduler.common.task.TaskResult;
 
-import org.ow2.proactive.scheduler.task.TaskResultImpl;
 
+public class TaskTerminateNotificationVerifier implements TaskTerminateNotification {
+    volatile TaskResult result;
 
-public interface TaskExecutor extends Serializable {
+    public TaskTerminateNotificationVerifier() {
+    }
 
-    // working dir, output/errput + TaskContext
-
-    // start
-
-    // waitfor
-
-    TaskResultImpl execute(TaskContext container, PrintStream output, PrintStream error);
-
-    // kill method ?
+    @Override
+    public void terminate(TaskId taskId, TaskResult taskResult) {
+        this.result = taskResult;
+    }
 }

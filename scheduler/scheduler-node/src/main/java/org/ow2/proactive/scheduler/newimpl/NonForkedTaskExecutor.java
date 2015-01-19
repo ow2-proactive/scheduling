@@ -48,6 +48,7 @@ import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scripting.ScriptHandler;
 import org.ow2.proactive.scripting.ScriptLoader;
 import org.ow2.proactive.scripting.ScriptResult;
+import org.ow2.proactive.scripting.TaskScript;
 
 
 public class NonForkedTaskExecutor implements TaskExecutor {
@@ -59,6 +60,19 @@ public class NonForkedTaskExecutor implements TaskExecutor {
         Map<String, Serializable> variables = contextVariables(container.getInitializer());
         if (container.getInitializer().getVariables() != null) {
             variables.putAll(container.getInitializer().getVariables());
+        }
+
+        if (container.getDecrypter() != null) {
+            try {
+                Map<String, String> thirdPartyCredentials = container.getDecrypter().decrypt()
+                        .getThirdPartyCredentials();
+                scriptHandler.addBinding(TaskScript.CREDENTIALS_VARIABLE, thirdPartyCredentials);
+
+            } catch (Exception e) {
+                e.printStackTrace(error);
+                return new TaskResultImpl(container.getTaskId(), new Exception(
+                    "Could read encrypted third party credentials", e), null, 0);
+            }
         }
         scriptHandler.addBinding(TaskLauncherBak.VARIABLES_BINDING_NAME, variables);
 
@@ -116,12 +130,12 @@ public class NonForkedTaskExecutor implements TaskExecutor {
                 String.valueOf(initializer.getIterationIndex()));
         variables.put(SchedulerVars.JAVAENV_TASK_REPLICATION.toString(),
                 String.valueOf(initializer.getReplicationIndex()));
-//        variables.put(PASchedulerProperties.SCHEDULER_HOME.getKey(),
-//                CentralPAPropertyRepository.PA_HOME.getValue());
-//        variables.put(PAResourceManagerProperties.RM_HOME.getKey(),
-//                PAResourceManagerProperties.RM_HOME.getValueAsString());
-//        variables.put(CentralPAPropertyRepository.PA_HOME.getName(),
-//                CentralPAPropertyRepository.PA_HOME.getValueAsString());
+        //        variables.put(PASchedulerProperties.SCHEDULER_HOME.getKey(),
+        //                CentralPAPropertyRepository.PA_HOME.getValue());
+        //        variables.put(PAResourceManagerProperties.RM_HOME.getKey(),
+        //                PAResourceManagerProperties.RM_HOME.getValueAsString());
+        //        variables.put(CentralPAPropertyRepository.PA_HOME.getName(),
+        //                CentralPAPropertyRepository.PA_HOME.getValueAsString());
         return variables;
     }
 

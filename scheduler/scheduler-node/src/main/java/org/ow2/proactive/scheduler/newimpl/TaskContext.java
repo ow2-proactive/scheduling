@@ -36,6 +36,7 @@ package org.ow2.proactive.scheduler.newimpl;
 
 import java.io.Serializable;
 
+import org.ow2.proactive.scheduler.common.task.Decrypter;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
 import org.ow2.proactive.scheduler.task.TaskLauncherInitializer;
@@ -46,6 +47,7 @@ import org.ow2.proactive.scripting.Script;
 public class TaskContext implements Serializable {
     private ForkedScriptExecutableContainer executableContainer;
     private TaskLauncherInitializer initializer;
+    private Decrypter decrypter;
 
 
     public TaskContext(ForkedScriptExecutableContainer executableContainer,
@@ -77,5 +79,13 @@ public class TaskContext implements Serializable {
 
     public TaskLauncherInitializer getInitializer() {
         return initializer;
+    }
+
+    public void setDecrypter(Decrypter decrypter) {
+        this.decrypter = decrypter;
+    }
+
+    public Decrypter getDecrypter() {
+        return decrypter;
     }
 }

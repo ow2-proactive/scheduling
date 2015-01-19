@@ -34,21 +34,29 @@
  */
 package org.ow2.proactive.scheduler.newimpl;
 
-import java.io.PrintStream;
-import java.io.Serializable;
-
-import org.ow2.proactive.scheduler.task.TaskResultImpl;
+import java.util.Timer;
+import java.util.TimerTask;
 
 
-public interface TaskExecutor extends Serializable {
+public class WallTimer {
+    private boolean wallTimed = false;
 
-    // working dir, output/errput + TaskContext
+    public WallTimer(final long walltime, final Thread threadToStop) {
+        if (walltime > 0) {
+            Timer timer = new Timer();
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    synchronized (this) {
+                        threadToStop.interrupt();
+                        wallTimed = true;
+                    }
+                }
+            }, walltime);
+        }
+    }
 
-    // start
-
-    // waitfor
-
-    TaskResultImpl execute(TaskContext container, PrintStream output, PrintStream error);
-
-    // kill method ?
+    public synchronized boolean hasWallTimed() {
+        return wallTimed;
+    }
 }

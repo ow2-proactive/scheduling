@@ -35,13 +35,14 @@
 package org.ow2.proactive.scheduler.newimpl;
 
 import java.io.File;
+import java.io.Serializable;
 
 import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
 import org.ow2.proactive.scheduler.common.task.Decrypter;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 
 
-public class TaskLauncherFactory {
+public class TaskLauncherFactory implements Serializable {
     public TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService) {
         return new TaskProActiveDataspaces(taskId, namingService);
     }

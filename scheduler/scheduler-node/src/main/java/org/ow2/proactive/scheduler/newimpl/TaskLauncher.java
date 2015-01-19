@@ -42,9 +42,15 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 
+import org.objectweb.proactive.Body;
+import org.objectweb.proactive.InitActive;
+import org.objectweb.proactive.annotation.ImmediateService;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
+import org.ow2.proactive.scheduler.common.exception.WalltimeExceededException;
+import org.ow2.proactive.scheduler.common.task.Decrypter;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
@@ -61,7 +67,7 @@ import org.apache.log4j.Logger;
  * @author The ProActive Team
  */
 @ActiveObject
-public class TaskLauncher {
+public class TaskLauncher implements InitActive {
 
     private static final Logger logger = Logger.getLogger(TaskLauncher.class);
 
@@ -71,9 +77,17 @@ public class TaskLauncher {
     private TaskId taskId;
     private TaskLauncherInitializer initializer;
     private TaskLogger taskLogger;
+    private Decrypter decrypter;
+
+    private Body taskLauncherBody;
 
     /** Needed for ProActive */
     public TaskLauncher() {
+    }
+
+    public TaskLauncher(TaskLauncherInitializer initializer, TaskLauncherFactory factory) {
+        this(initializer);
+        this.factory = factory;
     }
 
     public TaskLauncher(TaskLauncherInitializer initializer) {
@@ -83,15 +97,11 @@ public class TaskLauncher {
         taskLogger = new TaskLogger(taskId, getHostname());
     }
 
-    public TaskLauncher(TaskLauncherInitializer initializer, TaskLauncherFactory factory) {
-        this(initializer);
-        this.factory = factory;
-    }
-
     // should be execute(executable)
     public void doTask(ExecutableContainer executableContainer, TaskResult[] previousTasksResults,
             TaskTerminateNotification terminateNotification) {
 
+        WallTimer wallTimer = new WallTimer(initializer.getWalltime(), Thread.currentThread());
         try {
 
             // start wall time timer
@@ -103,18 +113,41 @@ public class TaskLauncher {
             TaskContext context = new TaskContext((ForkedScriptExecutableContainer) executableContainer,
                 initializer);
 
-            TaskResultImpl taskResult = factory.createTaskExecutor(dataspaces.getScratchFolder(), null).execute(context,
-              taskLogger.getOutputSink(), taskLogger.getErrorSink()); // TOO decrypter
+            if (decrypter != null) {
+                decrypter.setCredentials(executableContainer.getCredentials());
+                // TODO serialize private key + encrypted data
+                context.setDecrypter(decrypter);
+            }
 
+            TaskResultImpl taskResult = factory.createTaskExecutor(dataspaces.getScratchFolder(), decrypter)
+                    .execute(context, taskLogger.getOutputSink(), taskLogger.getErrorSink()); // TOO decrypter
+
+            if (wallTimer.hasWallTimed()) {
+                TaskResultImpl failedTaskResult = new TaskResultImpl(taskId, new WalltimeExceededException(
+                    "Walltime of " + initializer.getWalltime() + " ms reached on task " +
+                        taskId.getReadableName(), taskResult.getException()), taskLogger.getLogs(), 0);
+                sendResultToScheduler(terminateNotification, failedTaskResult);
+                return;
+            }
+
+            // TODO if exception occurred no need to copy output
             dataspaces.copyScratchDataToOutput(initializer.getTaskOutputFiles());
 
             taskResult.setLogs(taskLogger.getLogs()); // TODO close
 
             sendResultToScheduler(terminateNotification, taskResult);
         } catch (Throwable throwable) {
-            logger.warn("Failed to execute task", throwable);
-            TaskResultImpl failedTaskResult = new TaskResultImpl(taskId, throwable, taskLogger.getLogs(), 0);
-            sendResultToScheduler(terminateNotification, failedTaskResult);
+            if (wallTimer.hasWallTimed()) {
+                TaskResultImpl failedTaskResult = new TaskResultImpl(taskId, new WalltimeExceededException(
+                    "Walltime of " + initializer.getWalltime() + " ms reached on task " +
+                        taskId.getReadableName(), throwable), taskLogger.getLogs(), 0);
+                sendResultToScheduler(terminateNotification, failedTaskResult);
+            } else {
+                logger.warn("Failed to execute task", throwable);
+                TaskResultImpl failedTaskResult = new TaskResultImpl(taskId, throwable, taskLogger.getLogs(),
+                    0);
+                sendResultToScheduler(terminateNotification, failedTaskResult);
+            }
         }
         // kill what's left
 
@@ -123,7 +156,7 @@ public class TaskLauncher {
     }
 
     private void sendResultToScheduler(TaskTerminateNotification terminateNotification,
-      TaskResultImpl taskResult) {
+            TaskResultImpl taskResult) {
         // TODO retries / wait
         terminateNotification.terminate(taskId, taskResult);
     }
@@ -142,16 +175,48 @@ public class TaskLauncher {
         keyGen = KeyPairGenerator.getInstance("RSA");
         keyGen.initialize(1024, new SecureRandom());
         KeyPair keyPair = keyGen.generateKeyPair();
-        //connect to the authentication interface and ask for new cred
-        //        decrypter = new Decrypter(keyPair.getPrivate());
+        decrypter = new Decrypter(keyPair.getPrivate());
         return keyPair.getPublic();
     }
 
+    @ImmediateService
     public void terminate(boolean normalTermination) {
         // kill process for real
-
+//        resetLogContextForImmediateService();
+        if (normalTermination) {
+            logger.info("Terminate message received for task " + taskId);
+        } else {
+            logger.info("Kill message received for task " + taskId);
+        }
+//        if (!normalTermination) {
+//            // If this is a kill message, perfom all cleaning normally done by the finalize method
+//            try {
+//                executableGuard.kill(false);
+//
+//            } catch (Throwable e) {
+//                logger.warn("Exception occurred while executing kill on task " + taskId.value(), e);
+//            }
+//
+//            executableGuard.clean(TaskLauncherBak.CLEAN_TIMEOUT);
+//        }
+        try {
+            if (taskLauncherBody != null) {
+                taskLauncherBody.terminate(!normalTermination);
+            }
+        } catch (Exception e) {
+            logger.info("Exception when terminating task launcher active object", e);
+        }
+        logger.info("TaskLauncher terminated");
     }
 
+    public void initActivity(Body body) {
+        try {
+            taskLauncherBody = PAActiveObject.getBodyOnThis();
+        } catch (Exception e) {
+            throw new IllegalStateException("Could not retrieve ProActive Node", e);
+
+        }
+    }
     public int getProgress() {
         // not supported anymore
         return 0;

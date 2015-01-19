@@ -94,6 +94,7 @@ public class ForkedTaskExecutor implements TaskExecutor {
             OSProcessBuilder pb;
             String nativeScriptPath = PASchedulerProperties.SCHEDULER_HOME.getValueAsString(); // TODO inject
             if (isRunAsUser(context)) {
+                workingDir.setWritable(true); // TODO warning log
                 pb = ForkerUtils.getOSProcessBuilderFactory(nativeScriptPath).getBuilder(
                         ForkerUtils.checkConfigAndGetUser(decrypter));
             } else {
