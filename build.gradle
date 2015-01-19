@@ -264,6 +264,7 @@ project(':rm:rm-node') {
         runtime "org.objectweb.proactive:programming-extension-pnp:${programmingVersion}"
         runtime "org.objectweb.proactive:programming-extension-pnpssl:${programmingVersion}"
         runtime "org.objectweb.proactive:programming-extension-amqp:${programmingVersion}"
+        runtime "org.objectweb.proactive:programming-extension-pamr:${programmingVersion}"
 
         // script engines
         runtime 'org.jruby:jruby-jline:1.7.4'

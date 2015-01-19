@@ -56,6 +56,7 @@ import javax.security.auth.login.LoginException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
@@ -167,8 +168,10 @@ public class RMNodeStarter {
     /** Name of the java property to set the number of attempts performed to add a node to the resource manager */
     private final static String NB_OF_ADD_NODE_ATTEMPTS_PROP_NAME = "proactive.node.add.attempts";
 
-    /** The number of attempts to reconnect the node to the RM before quitting */
-    private static int NB_OF_RECONNECTION_ATTEMPTS = 2 * 60 * 24; // to make it 24 hours by default
+    /** The number of attempts to reconnect the node to the RM before quitting (interval between each attempt is
+     * given by {@link #PING_DELAY_IN_MS})
+     */
+    protected static int NB_OF_RECONNECTION_ATTEMPTS = 2 * 5; // so 5 minutes by default
 
     /** Name of the java property to set the number of attempts performed to add a node to the resource manager */
     private final static String NB_OF_RECONNECTION_ATTEMPTS_PROP_NAME = "proactive.node.reconnection.attempts";
@@ -195,7 +198,7 @@ public class RMNodeStarter {
     // if true, previous nodes with different URLs are removed from the RM
     private boolean removePrevious;
 
-    private int numberOfReconnectionAttemptsLeft = NB_OF_RECONNECTION_ATTEMPTS;
+    private int numberOfReconnectionAttemptsLeft;
 
     private static final long DATASPACE_CLOSE_TIMEOUT = 3 * 1000; // seconds
 
@@ -398,6 +401,7 @@ public class RMNodeStarter {
 
     private void connectToResourceManager(String nodeName, List<Node> nodes) {
         ResourceManager rm = this.registerInRM(credentials, rmURL, nodeName, nodes);
+        resetReconnectionAttemptsLeft();
         pingAllNodes(nodes, rm);
     }
 
@@ -413,6 +417,11 @@ public class RMNodeStarter {
                         pingAllNodesIndefinitely(nodes, rm);
                     } catch (NotConnectedException e) {
                         rm = reconnectToResourceManager();
+                    } catch (ProActiveRuntimeException e) {
+                        rm = reconnectToResourceManager();
+                    } catch (IllegalStateException e) {
+                        logger.error(ExitStatus.RMNODE_ILLEGAL_STATE.description);
+                        System.exit(ExitStatus.RMNODE_ILLEGAL_STATE.exitCode);
                     } catch (Throwable e) {
                         logger.error(ExitStatus.RM_NO_PING.description, e);
                     } finally {
@@ -455,7 +464,7 @@ public class RMNodeStarter {
     private ResourceManager reconnectToResourceManager() {
         try {
             // trying to reconnect to the resource manager
-            RMAuthentication auth = RMConnection.waitAndJoin(rmURL);
+            RMAuthentication auth = RMConnection.waitAndJoin(rmURL, WAIT_ON_JOIN_TIMEOUT_IN_MS);
             return auth.login(credentials);
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
@@ -464,11 +473,11 @@ public class RMNodeStarter {
     }
 
     private void pingAllNodesIndefinitely(List<Node> nodes, ResourceManager rm) {
-        while (rm != null && allNodesAreAvailable(nodes, rm)) {
+        while (allNodesAreAvailable(nodes, rm)) {
             try {
                 if (numberOfReconnectionAttemptsLeft < NB_OF_RECONNECTION_ATTEMPTS) {
                     logger.info("Node successfully reconnected to the resource manager");
-                    numberOfReconnectionAttemptsLeft = NB_OF_RECONNECTION_ATTEMPTS;
+                    resetReconnectionAttemptsLeft();
                 }
                 Thread.sleep(PING_DELAY_IN_MS);
             } catch (InterruptedException e) {
@@ -478,7 +487,14 @@ public class RMNodeStarter {
         }
     }
 
+    private void resetReconnectionAttemptsLeft() {
+        numberOfReconnectionAttemptsLeft = NB_OF_RECONNECTION_ATTEMPTS;
+    }
+
     private boolean allNodesAreAvailable(List<Node> nodes, ResourceManager rm) {
+        if (rm == null)
+            throw new NotConnectedException("No connection to RM");
+
         for (Iterator<Node> iterator = nodes.iterator(); iterator.hasNext();) {
             Node node = iterator.next();
             String url = node.getNodeInformation().getURL();
@@ -491,6 +507,10 @@ public class RMNodeStarter {
                 }
             }
         }
+
+        if (nodes.size() == 0)
+            throw new IllegalStateException("Cannot have zero nodes");
+
         return true;
     }
 
@@ -1203,12 +1223,13 @@ public class RMNodeStarter {
                 "Environment variable not set for credential but it should be."), RMNODE_NULL(300,
                 "NodeFactory returned null as RMNode."), RMAUTHENTICATION_NULL(301,
                 "RMAuthentication instance is null."), RM_NULL(302, "Resource Manager instance is null."), RMNODE_ADD_ERROR(
-                303, "Was not able to add RMNode the the Resource Manager."), RMNODE_PARSE_ERROR(304,
+                303, "Was not able to add RMNode to the Resource Manager."), RMNODE_PARSE_ERROR(304,
                 "Problem encountered while parsing " + RMNodeStarter.class.getName() + " command line."), RMNODE_EXIT_FORCED(
                 305,
-                "Was not able to add RMNode to the Resource Manager. Force system to exit to bypass daemon threads."), FAILED_TO_LAUNCH(
-                -1, RMNodeStarter.class.getSimpleName() + " process hasn't been started at all."), UNKNOWN(
-                -2, "Cannot determine exit status.");
+                "Was not able to add RMNode to the Resource Manager. Force system to exit to bypass daemon threads."), RMNODE_ILLEGAL_STATE(
+                306, "Illegal state of RMNode (no nodes left)."), FAILED_TO_LAUNCH(-1, RMNodeStarter.class
+                .getSimpleName() +
+            " process hasn't been started at all."), UNKNOWN(-2, "Cannot determine exit status.");
         public final int exitCode;
         public final String description;
 
