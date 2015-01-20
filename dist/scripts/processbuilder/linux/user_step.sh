@@ -63,7 +63,7 @@ if [ "$passw" == "" ]; then
       do
       args="${args} ""'"${i//\'/\'\"\'\"\'}"'"
     done
-    ssh -n -o PasswordAuthentication=no -i $keyfile $usr@localhost `pwd`/command_step.sh $token $tmp "$workdir" $args
+    ssh -n -o PasswordAuthentication=no -o StrictHostKeyChecking=no -i $keyfile $usr@localhost `pwd`/command_step.sh $token $tmp "$workdir" $args
     exitc=$?
     rm $keyfile
   fi;

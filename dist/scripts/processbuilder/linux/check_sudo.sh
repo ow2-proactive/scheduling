@@ -21,7 +21,7 @@ if [ "$passw" == "" ]; then
     echo "$keycont" > $keyfile
     chmod 400 $keyfile
     echo $keyfile $username
-    ssh -n -i $keyfile $username@localhost whoami
+    ssh -n -o PasswordAuthentication=no -o StrictHostKeyChecking=no -i $keyfile $username@localhost whoami
     if [ $? == 0 ]; then
       echo $usr
     else 
