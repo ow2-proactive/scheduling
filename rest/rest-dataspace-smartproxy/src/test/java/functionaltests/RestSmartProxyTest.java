@@ -49,6 +49,7 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -73,7 +74,7 @@ import org.ow2.proactive_grid_cloud_portal.ds.client.RestSmartProxyImpl;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 
-
+@Ignore
 public class RestSmartProxyTest extends AbstractRestFuncTestCase {
 
     private static final long ONE_SECOND_IN_MILLIS = TimeUnit.SECONDS.toMillis(1);
