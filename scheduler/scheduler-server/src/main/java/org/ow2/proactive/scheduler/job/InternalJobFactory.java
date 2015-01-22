@@ -299,6 +299,8 @@ public class InternalJobFactory {
                 fjec.setForkEnvironment(task.getForkEnvironment());
                 javaTask = new InternalForkedJavaTask(fjec);
             } else {
+//                javaTask = new InternalJavaTask(new JavaExecutableContainer(task.getExecutableClassName(),
+//                  args));
                 try {
                     javaTask = new InternalForkedScriptTask(new ForkedScriptExecutableContainer(
                         new TaskScript(new SimpleScript(task.getExecutableClassName(), "java", new Serializable[]{args}))));

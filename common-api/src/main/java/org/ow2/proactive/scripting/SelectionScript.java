@@ -125,7 +125,7 @@ public class SelectionScript extends Script<Boolean> {
      * @param dynamic tell if the script is dynamic or static
      * @throws InvalidScriptException if the creation fails.
      */
-    public SelectionScript(String script, String engineName, String[] parameters, boolean dynamic)
+    public SelectionScript(String script, String engineName, Serializable[] parameters, boolean dynamic)
             throws InvalidScriptException {
         super(script, engineName, parameters, "SelectionScript");
         this.dynamic = dynamic;
@@ -137,7 +137,7 @@ public class SelectionScript extends Script<Boolean> {
      * @param parameters script execution arguments.
      * @throws InvalidScriptException if the creation fails.
      */
-    public SelectionScript(File file, String[] parameters) throws InvalidScriptException {
+    public SelectionScript(File file, Serializable[] parameters) throws InvalidScriptException {
         super(file, parameters);
         buildSelectionScriptId();
     }
@@ -148,7 +148,7 @@ public class SelectionScript extends Script<Boolean> {
      * @param dynamic tell if script is dynamic or static
      * @throws InvalidScriptException if the creation fails.
      */
-    public SelectionScript(File file, String[] parameters, boolean dynamic) throws InvalidScriptException {
+    public SelectionScript(File file, Serializable[] parameters, boolean dynamic) throws InvalidScriptException {
         super(file, parameters);
         this.dynamic = dynamic;
         buildSelectionScriptId();

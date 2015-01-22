@@ -44,9 +44,8 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.ow2.proactive.scheduler.job.InternalJob;
-import org.ow2.proactive.scheduler.task.java.JavaExecutableContainer;
-import org.ow2.proactive.scheduler.task.java.JavaTaskLauncher;
 import org.ow2.proactive.scheduler.newimpl.TaskLauncher;
+import org.ow2.proactive.scheduler.task.java.JavaExecutableContainer;
 import org.ow2.proactive.scheduler.util.TaskLogger;
 
 
@@ -89,7 +88,7 @@ public class InternalJavaTask extends InternalTask {
             NodeException {
 
         logger.info(getTaskInfo().getTaskId(), "creating java task launcher");
-        TaskLauncher launcher = (TaskLauncher) PAActiveObject.newActive(JavaTaskLauncher.class.getName(),
+        TaskLauncher launcher = (TaskLauncher) PAActiveObject.newActive(TaskLauncher.class.getName(),
                 new Object[] { getDefaultTaskLauncherInitializer(job) }, node);
         setExecuterInformations(new ExecuterInformations(launcher, node));
 

@@ -99,8 +99,8 @@ public class NonForkedTaskExecutor implements TaskExecutor {
         TaskResultImpl taskResult;
         try {
             stopWatch.start();
-            ScriptResult<Serializable> result = executeScripts(container, output, error, scriptHandler);
-            taskResult = new TaskResultImpl(container.getTaskId(), result.getResult(), null, stopWatch.stop());
+            Serializable result = executeScripts(container, output, error, scriptHandler);
+            taskResult = new TaskResultImpl(container.getTaskId(), result, null, stopWatch.stop());
         } catch (Exception e) {
             e.printStackTrace(error);
             taskResult = new TaskResultImpl(container.getTaskId(), e, null, stopWatch.stop());
@@ -146,7 +146,7 @@ public class NonForkedTaskExecutor implements TaskExecutor {
         }
     }
 
-    private ScriptResult<Serializable> executeScripts(TaskContext container, PrintStream output, PrintStream error,
+    private Serializable executeScripts(TaskContext container, PrintStream output, PrintStream error,
             ScriptHandler scriptHandler) throws Exception {
         if (container.getPreScript() != null) {
             ScriptResult preScriptResult = scriptHandler.handle(container.getPreScript(), output, error);
@@ -155,10 +155,8 @@ public class NonForkedTaskExecutor implements TaskExecutor {
             }
         }
 
-        ScriptResult<Serializable> scriptResult = executeTask(container, output, error, scriptHandler);
-        if (scriptResult.errorOccured()) {
-            throw new Exception("Failed to execute task", scriptResult.getException());
-        }
+        Serializable scriptResult = executeTask(container, output, error, scriptHandler);
+
 
         if (container.getPostScript() != null) {
             ScriptResult postScriptResult = scriptHandler.handle(container.getPostScript(), output, error);
@@ -169,13 +167,45 @@ public class NonForkedTaskExecutor implements TaskExecutor {
         return scriptResult;
     }
 
-    protected ScriptResult<Serializable> executeTask(TaskContext container, PrintStream output, PrintStream error,
+    protected Serializable executeTask(TaskContext container, PrintStream output, PrintStream error,
             ScriptHandler scriptHandler) throws Exception {
+
+//        if(container.getExecutableContainer() instanceof ForkedScriptExecutableContainer) {
+
         ForkedScriptExecutableContainer executableContainer = (ForkedScriptExecutableContainer) container
                 .getExecutableContainer();
 
-        return scriptHandler.handle(executableContainer.getScript(),
-                output, error);
+            ScriptResult<Serializable> scriptResult = scriptHandler.handle(executableContainer.getScript(), output, error);
+
+            if (scriptResult.errorOccured()) {
+                throw new Exception("Failed to execute task", scriptResult.getException());
+            }
+
+            return scriptResult.getResult();
+//        }
+//        else {
+//
+//            JavaExecutableContainer javaContainer = (JavaExecutableContainer) container
+//              .getExecutableContainer();
+//
+//            AbstractJavaExecutable javaExecutable = (AbstractJavaExecutable) javaContainer.getExecutable();
+//
+//            JavaExecutableInitializerImpl initializer = javaContainer.createExecutableInitializer();
+//            initializer.setOutputSink(output);
+//            initializer.setErrorSink(error);
+//            initializer.setPropagatedVariables(new HashMap<String, byte[]>());
+//            // TODO probably more things
+//            javaExecutable.internalInit(initializer);
+//
+//            try {
+//                return javaExecutable.execute(new TaskResult[0]);
+//            } catch (Throwable throwable) {
+//                throw new Exception("Failed to execute Java task", throwable);
+//            }
+//
+//            //return scriptHandler.handle(javaContainer.getScript(), output, error);
+//
+//        }
     }
 
     private void executeFlowScript(Script<FlowAction> flowScript, ScriptHandler scriptHandler,

@@ -141,7 +141,7 @@ public abstract class Script<E> implements Serializable {
      * @throws InvalidScriptException if the creation fails.
      */
     public Script(String script, String engineName) throws InvalidScriptException {
-        this(script, engineName, (String[]) null);
+        this(script, engineName, (Serializable[]) null);
     }
 
     /** Directly create a script with a string.
@@ -160,7 +160,7 @@ public abstract class Script<E> implements Serializable {
      * @param parameters script's execution arguments.
      * @throws InvalidScriptException if the creation fails.
      */
-    public Script(File file, String[] parameters) throws InvalidScriptException {
+    public Script(File file, Serializable[] parameters) throws InvalidScriptException {
         this.scriptEngineLookup = FileUtils.getExtension(file.getPath());
 
         try {
@@ -186,7 +186,7 @@ public abstract class Script<E> implements Serializable {
      * @param parameters execution arguments.
      * @throws InvalidScriptException if the creation fails.
      */
-    public Script(URL url, String[] parameters) throws InvalidScriptException {
+    public Script(URL url, Serializable[] parameters) throws InvalidScriptException {
         this.scriptEngineLookup = FileUtils.getExtension(url.getFile());
 
         try {
