@@ -34,29 +34,21 @@
  */
 package org.ow2.proactive.scheduler.newimpl;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
+public class TaskKiller {
 
+    private Thread threadToKill; // extract in class
+    private boolean wasKilled = false;
 
-public class TestTaskOutput {
-    public PrintStream outputStream;
-    public PrintStream error;
-    private final ByteArrayOutputStream outputBytes;
-    private final ByteArrayOutputStream errorBytes;
-
-    public TestTaskOutput() {
-        outputBytes = new ByteArrayOutputStream();
-        outputStream = new PrintStream(outputBytes);
-
-        errorBytes = new ByteArrayOutputStream();
-        error = new PrintStream(errorBytes);
+    public TaskKiller(Thread threadToKill) { // executor service?
+        this.threadToKill = threadToKill;
     }
 
-    public String output() {
-        return outputBytes.toString();
+    public boolean wasKilled() {
+        return wasKilled;
     }
 
-    public String error() {
-        return errorBytes.toString();
+    public void kill() {
+        wasKilled = true;
+        threadToKill.interrupt();
     }
 }

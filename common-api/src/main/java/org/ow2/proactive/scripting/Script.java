@@ -94,7 +94,7 @@ public abstract class Script<E> implements Serializable {
     protected String id;
 
     /** The parameters of the script */
-    protected String[] parameters;
+    protected Serializable[] parameters;
 
     /** Name of the script **/
     private String scriptName;
@@ -109,7 +109,7 @@ public abstract class Script<E> implements Serializable {
      * @param parameters script's execution arguments.
      * @throws InvalidScriptException if the creation fails.
      */
-    public Script(String script, String engineName, String[] parameters) throws InvalidScriptException {
+    public Script(String script, String engineName, Serializable[] parameters) throws InvalidScriptException {
         this.scriptEngineLookup = engineName;
         this.script = script;
         this.id = script;
@@ -126,7 +126,7 @@ public abstract class Script<E> implements Serializable {
      * @param scriptName name of the script
      * @throws InvalidScriptException if the creation fails.
      */
-    public Script(String script, String engineName, String[] parameters, String scriptName)
+    public Script(String script, String engineName, Serializable[] parameters, String scriptName)
             throws InvalidScriptException {
         this.scriptEngineLookup = engineName;
         this.script = script;
@@ -265,7 +265,7 @@ public abstract class Script<E> implements Serializable {
      *
      * @return the parameters.
      */
-    public String[] getParameters() {
+    public Serializable[] getParameters() {
         return parameters;
     }
 
@@ -326,6 +326,9 @@ public abstract class Script<E> implements Serializable {
             prepareBindings(bindings);
             engine.eval(getReader());
 
+            engine.getContext().getErrorWriter().flush();
+            engine.getContext().getWriter().flush();
+
             // Add output to the script result
             ScriptResult<E> result = this.getResult(bindings);
             result.setOutput(outputBoundedWriter.toString());
@@ -340,7 +343,6 @@ public abstract class Script<E> implements Serializable {
             if (e.getMessage() != null) {
                 stack = e.getMessage() + System.getProperty("line.separator") + stack;
             }
-            logger.error(e.getMessage(), e);
             return new ScriptResult<E>(new Exception(stack));
         }
     }

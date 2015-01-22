@@ -48,6 +48,6 @@ public class TaskLauncherFactory implements Serializable {
     }
 
     public TaskExecutor createTaskExecutor(File workingDir, Decrypter decrypter){
-        return new ForkedTaskExecutor(workingDir, decrypter);
+        return new ForkerTaskExecutor(workingDir, decrypter);
     }
 }

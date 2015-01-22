@@ -45,7 +45,6 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
-import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scripting.Script;
 
 
@@ -90,7 +89,7 @@ public class TaskLauncherInitializer implements Serializable {
 
     private Map<String, String> variables;
     private int pingPeriod;
-    private int pingAttempts;
+    private int pingAttempts = 1;
 
     /**
      * Get the taskId

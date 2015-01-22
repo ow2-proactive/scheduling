@@ -55,7 +55,7 @@ public class TaskLoggerTest {
         // async appender, it gets buffered
         assertEquals("", stringAppender.toString());
 
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 1000; i++) {
             taskLogger.getOutputSink().println("hello");
         }
         assertNotEquals("", stringAppender.toString());

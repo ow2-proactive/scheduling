@@ -66,7 +66,7 @@ public class JavaTask extends Task {
 
     /** Arguments of the task as a map */
     // WARNING : this field is accessed by reflection from InternalJobFactory
-    private final Map<String, byte[]> serializedArguments = new HashMap<String, byte[]>();
+    private final HashMap<String, byte[]> serializedArguments = new HashMap<String, byte[]>();
 
     /** For internal use : name of the field that stores task arguments */
     public static final String ARGS_FIELD_NAME = "serializedArguments";

@@ -11,9 +11,9 @@ import org.objectweb.proactive.extensions.processbuilder.exception.OSUserExcepti
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.task.Decrypter;
+import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
-import org.ow2.proactive.scheduler.task.TaskIdPojo;
 import org.ow2.proactive.scheduler.task.TaskLauncherInitializer;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.script.ForkedScriptExecutableContainer;
@@ -28,45 +28,44 @@ import org.junit.rules.TemporaryFolder;
 import static org.junit.Assert.*;
 
 
-public class ForkedTaskExecutorTest {
+public class ForkerTaskExecutorTest {
 
     @Rule
     public TemporaryFolder tmpFolder = new TemporaryFolder();
     private String oldJavaHome;
 
     @Test
-    public void result() throws Throwable {
+    public void result_and_variables() throws Throwable {
         TestTaskOutput taskOutput = new TestTaskOutput();
 
-        ForkedTaskExecutor taskExecutor = new ForkedTaskExecutor(tmpFolder.newFolder(), null);
+        ForkerTaskExecutor taskExecutor = new ForkerTaskExecutor(tmpFolder.newFolder(), null);
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
-        initializer.setTaskId(TaskIdPojo.createTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"),
-                "job", 1000L, false)));
+        initializer.setTaskId((TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false)));
 
         TaskResultImpl result = taskExecutor.execute(new TaskContext(new ForkedScriptExecutableContainer(
-            new TaskScript(new SimpleScript("print('hello'); result='hello'", "javascript"))), initializer),
-                taskOutput.outputStream, taskOutput.error);
+            new TaskScript(new SimpleScript("print('hello'); variables.put('var','foo'); result='hello'",
+                "javascript"))), initializer), taskOutput.outputStream, taskOutput.error);
 
         assertEquals("hello\n", taskOutput.output());
         assertEquals("hello", result.value());
+        assertEquals("foo",
+                SerializationUtil.deserializeVariableMap(result.getPropagatedVariables()).get("var"));
     }
 
     @Test
     public void failToSerialize() throws Throwable {
         TestTaskOutput taskOutput = new TestTaskOutput();
 
-        ForkedTaskExecutor taskExecutor = new ForkedTaskExecutor(new File("non_existing_folder"), null);
+        ForkerTaskExecutor taskExecutor = new ForkerTaskExecutor(new File("non_existing_folder"), null);
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
-        initializer.setTaskId(TaskIdPojo.createTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"),
-                "job", 1000L, false)));
+        initializer.setTaskId((TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false)));
 
         TaskResultImpl result = taskExecutor.execute(new TaskContext(new ForkedScriptExecutableContainer(
             new TaskScript(new SimpleScript("print('hello'); result='hello'", "javascript"))), initializer),
                 taskOutput.outputStream, taskOutput.error);
 
-        assertNotEquals("", taskOutput.error());
         assertNotNull(result.getException());
     }
 
@@ -75,17 +74,15 @@ public class ForkedTaskExecutorTest {
         System.setProperty("java.home", "does not exist");
         TestTaskOutput taskOutput = new TestTaskOutput();
 
-        ForkedTaskExecutor taskExecutor = new ForkedTaskExecutor(new File("non_existing_folder"), null);
+        ForkerTaskExecutor taskExecutor = new ForkerTaskExecutor(new File("non_existing_folder"), null);
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
-        initializer.setTaskId(TaskIdPojo.createTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"),
-                "job", 1000L, false)));
+        initializer.setTaskId((TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false)));
 
         TaskResultImpl result = taskExecutor.execute(new TaskContext(new ForkedScriptExecutableContainer(
             new TaskScript(new SimpleScript("print('hello'); result='hello'", "javascript"))), initializer),
                 taskOutput.outputStream, taskOutput.error);
 
-        assertNotEquals("", taskOutput.error());
         assertNotNull(result.getException());
     }
 
@@ -95,21 +92,20 @@ public class ForkedTaskExecutorTest {
 
         Decrypter decrypter = createCredentials("somebody_that_does_not_exists");
 
-        ForkedTaskExecutor taskExecutor = new ForkedTaskExecutor(tmpFolder.newFolder(), decrypter);
+        ForkerTaskExecutor taskExecutor = new ForkerTaskExecutor(tmpFolder.newFolder(), decrypter);
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
-        initializer.setTaskId(TaskIdPojo.createTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"),
-                "job", 1000L, false)));
+        initializer.setTaskId((TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false)));
 
         ForkedScriptExecutableContainer container = new ForkedScriptExecutableContainer(new TaskScript(
             new SimpleScript("print('hello'); result='hello'", "javascript")));
 
         container.setRunAsUser(true);
 
-        TaskResultImpl result = taskExecutor.execute(new TaskContext(container, initializer),
-                taskOutput.outputStream, taskOutput.error);
+        TaskContext taskContext = new TaskContext(container, initializer);
+        taskContext.setDecrypter(decrypter);
+        TaskResultImpl result = taskExecutor.execute(taskContext, taskOutput.outputStream, taskOutput.error);
 
-        assertNotEquals("", taskOutput.error());
         assertEquals(OSUserException.class, result.getException().getCause().getClass());
     }
 

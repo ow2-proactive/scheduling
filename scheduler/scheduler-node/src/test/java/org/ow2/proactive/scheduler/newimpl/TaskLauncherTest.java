@@ -2,6 +2,8 @@ package org.ow2.proactive.scheduler.newimpl;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
 
 import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
@@ -14,6 +16,8 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
+import org.ow2.proactive.scheduler.common.util.Object2ByteConverter;
+import org.ow2.proactive.scheduler.examples.WaitAndPrint;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskLauncherInitializer;
@@ -53,6 +57,26 @@ public class TaskLauncherTest {
 
         assertEquals("hello", taskResult.value());
         assertEquals("pre\nhello\npost\n", taskResult.getOutput().getAllLogs(false));
+    }
+
+    @Test
+    public void javaTask() throws Throwable {
+        HashMap<String, byte[]> args = new HashMap<String, byte[]>();
+        args.put("number", Object2ByteConverter.convertObject2Byte(123));
+        ForkedScriptExecutableContainer executableContainer = new ForkedScriptExecutableContainer(
+          new TaskScript(new SimpleScript(WaitAndPrint.class.getName(), "java", new Serializable[]{
+            args
+          })));
+
+        TaskLauncherInitializer initializer = new TaskLauncherInitializer();
+
+        initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false));
+
+        TaskLauncher taskLauncher = new TaskLauncher(initializer, new TestTaskLauncherFactory());
+        TaskResult taskResult = runTaskLauncher(taskLauncher, executableContainer);
+
+        assertNotEquals("", taskResult.value());
+        assertTrue(taskResult.getOutput().getAllLogs(false).contains("123"));
     }
 
     @Test

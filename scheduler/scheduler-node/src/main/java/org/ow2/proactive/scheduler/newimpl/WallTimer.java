@@ -40,10 +40,11 @@ import java.util.TimerTask;
 
 public class WallTimer {
     private boolean wallTimed = false;
+    private Timer timer;
 
     public WallTimer(final long walltime, final Thread threadToStop) {
         if (walltime > 0) {
-            Timer timer = new Timer();
+            timer = new Timer();
             timer.schedule(new TimerTask() {
                 @Override
                 public void run() {
@@ -58,5 +59,11 @@ public class WallTimer {
 
     public synchronized boolean hasWallTimed() {
         return wallTimed;
+    }
+
+    public void stop() {
+        if (timer != null) {
+            timer.cancel();
+        }
     }
 }

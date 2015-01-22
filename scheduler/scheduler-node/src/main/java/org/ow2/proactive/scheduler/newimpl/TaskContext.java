@@ -38,26 +38,34 @@ import java.io.Serializable;
 
 import org.ow2.proactive.scheduler.common.task.Decrypter;
 import org.ow2.proactive.scheduler.common.task.TaskId;
+import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
+import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.TaskLauncherInitializer;
-import org.ow2.proactive.scheduler.task.script.ForkedScriptExecutableContainer;
 import org.ow2.proactive.scripting.Script;
 
 
 public class TaskContext implements Serializable {
-    private ForkedScriptExecutableContainer executableContainer;
+    private ExecutableContainer executableContainer;
     private TaskLauncherInitializer initializer;
     private Decrypter decrypter;
+    private TaskResult[] previousTasksResults;
 
-
-    public TaskContext(ForkedScriptExecutableContainer executableContainer,
-      TaskLauncherInitializer initializer) {
-        this.initializer = initializer;
-        this.executableContainer = executableContainer;
+    public TaskContext(ExecutableContainer executableContainer,
+            TaskLauncherInitializer initializer, TaskResult[] previousTasksResults) {
+        this(executableContainer, initializer);
+        this.previousTasksResults = previousTasksResults;
     }
 
+    public TaskContext(ExecutableContainer executableContainer,
+            TaskLauncherInitializer initializer) {
+        this.initializer = initializer; // copy?
+        initializer.setNamingService(null);
+        this.executableContainer = executableContainer;
 
-    public ForkedScriptExecutableContainer getExecutableContainer() {
+    }
+
+    public ExecutableContainer getExecutableContainer() {
         return executableContainer;
     }
 
@@ -87,5 +95,9 @@ public class TaskContext implements Serializable {
 
     public Decrypter getDecrypter() {
         return decrypter;
+    }
+
+    public TaskResult[] getPreviousTasksResults() {
+        return previousTasksResults;
     }
 }

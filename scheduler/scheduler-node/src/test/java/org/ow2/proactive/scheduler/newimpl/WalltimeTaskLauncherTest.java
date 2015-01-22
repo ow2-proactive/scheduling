@@ -1,7 +1,6 @@
 package org.ow2.proactive.scheduler.newimpl;
 
 import java.io.File;
-import java.io.Serializable;
 import java.util.List;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -26,7 +25,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 
-public class WalltimeTaskLauncherTest implements Serializable{
+public class WalltimeTaskLauncherTest {
 
     @Test(timeout = 5000)
     public void walltime_forked_task() throws Throwable {
@@ -114,7 +113,7 @@ public class WalltimeTaskLauncherTest implements Serializable{
 
         @Override
         public TaskExecutor createTaskExecutor(File workingDir, Decrypter decrypter) {
-            return new ForkedTaskExecutor(workingDir, decrypter);
+            return new ForkerTaskExecutor(workingDir, decrypter);
         }
 
     }

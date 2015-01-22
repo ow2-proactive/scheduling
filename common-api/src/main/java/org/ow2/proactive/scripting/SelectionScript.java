@@ -38,6 +38,7 @@ package org.ow2.proactive.scripting;
 
 import java.io.File;
 import java.io.Reader;
+import java.io.Serializable;
 import java.io.StringReader;
 import java.net.URL;
 import java.security.MessageDigest;
@@ -200,7 +201,7 @@ public class SelectionScript extends Script<Boolean> {
 
         //concatenate parameters if any
         if (this.parameters != null) {
-            for (String param : this.parameters) {
+            for (Serializable param : this.parameters) {
                 stringId += param;
             }
         }

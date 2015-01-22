@@ -1585,12 +1585,12 @@ public abstract class TaskLauncherBak implements InitActive {
             return;
         }
         String code = script.getScript();
-        String[] args = script.getParameters();
+        Serializable[] args = script.getParameters();
 
         code = replaceAllTags(code);
         if (args != null) {
             for (int i = 0; i < args.length; i++) {
-                args[i] = replaceAllTags(args[i]);
+                args[i] = replaceAllTags(args[i].toString());
             }
         }
 

@@ -60,7 +60,9 @@ public final class TaskIdImpl implements TaskId {
      * Multiplicative factor for job id (taskId will be :
      * this_factor*jobID+taskID)
      */
-    public static final int JOB_FACTOR = PASchedulerProperties.JOB_FACTOR.getValueAsInt();
+    public static int getJobFactor(){
+        return PASchedulerProperties.JOB_FACTOR.getValueAsInt();
+    }
 
     /** task id */
     private long id;
@@ -80,7 +82,7 @@ public final class TaskIdImpl implements TaskId {
     private TaskIdImpl(JobId jobId, long id, boolean applyJobFactor) {
         this.jobId = jobId;
         if (applyJobFactor) {
-            this.id = (jobId.hashCode() * JOB_FACTOR) + id;
+            this.id = (jobId.hashCode() * getJobFactor()) + id;
         } else {
             this.id = id;
         }

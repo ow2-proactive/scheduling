@@ -34,5 +34,37 @@
  */
 package org.ow2.proactive.scheduler.newimpl;
 
-public class VariablePropagator {
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
+
+import org.ow2.proactive.scheduler.util.process.ThreadReader;
+
+
+public class ProcessStreamsReader {
+
+    private final Thread threadReadingOutput;
+    private final Thread threadReadingError;
+
+    public ProcessStreamsReader(Process process, PrintStream outputSink, PrintStream errorSink) {
+        BufferedReader processOutput = new BufferedReader(new InputStreamReader(process.getInputStream()));
+        BufferedReader processError = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+        threadReadingOutput = new Thread(new ThreadReader(processOutput, outputSink));
+        threadReadingError = new Thread(new ThreadReader(processError, errorSink));
+        threadReadingOutput.start();
+        threadReadingError.start();
+    }
+
+    public void close() {
+        try {
+            // wait for log flush
+            if (threadReadingOutput != null) {
+                threadReadingOutput.join();
+            }
+            if (threadReadingError != null) {
+                threadReadingError.join();
+            }
+        } catch (InterruptedException ignored) {
+        }
+    }
 }

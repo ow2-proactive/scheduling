@@ -159,7 +159,9 @@ public abstract class ProcessTreeKiller {
 
         for (Entry<String, String> e : modelEnvVar.entrySet()) {
             String v = envVar.get(e.getKey());
-            logger.debug("Matching Env Var " + e.getKey() + " , expected: " + e.getValue() + " found: " + v);
+            if(logger.isTraceEnabled()){
+                logger.trace("Matching Env Var " + e.getKey() + " , expected: " + e.getValue() + " found: " + v);
+            }
             if (v == null || !v.equals(e.getValue()))
                 return false; // no match
         }

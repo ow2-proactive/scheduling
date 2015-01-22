@@ -34,6 +34,7 @@
  */
 package org.ow2.proactive.scheduler.common.task;
 
+import java.io.Serializable;
 import java.security.KeyException;
 import java.security.PrivateKey;
 
@@ -47,7 +48,7 @@ import org.ow2.proactive.authentication.crypto.Credentials;
  * @author The ProActive Team
  * @since ProActive Scheduling 2.2
  */
-public final class Decrypter {
+public final class Decrypter implements Serializable {
     private PrivateKey key = null;
     private Credentials credentials = null;
 

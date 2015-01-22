@@ -62,6 +62,7 @@ public class TaskLogger {
     private AsyncAppenderWithStorage taskLogAppender;
 
     private TaskId taskId;
+    private String hostname;
 
     private final PrintStream outputSink;
     private final PrintStream errorSink;
@@ -71,6 +72,8 @@ public class TaskLogger {
 
     public TaskLogger(TaskId taskId, String hostname) {
         this.taskId = taskId;
+        this.hostname = hostname;
+
         logger.debug("Create task logger");
         // error about log should not be logged
         LogLog.setQuietMode(true);
@@ -79,9 +82,9 @@ public class TaskLogger {
             taskId.value());
         taskLogger.setLevel(Log4JTaskLogs.STDOUT_LEVEL);
         taskLogger.setAdditivity(false);
-        MDC.put(Log4JTaskLogs.MDC_TASK_ID, taskId.value());
-        MDC.put(Log4JTaskLogs.MDC_TASK_NAME, taskId.getReadableName());
-        MDC.put(Log4JTaskLogs.MDC_HOST, hostname);
+
+        resetLogContextForImmediateService();
+
         taskLogger.removeAllAppenders();
 
         String logMaxSizeProp = System.getProperty(MAX_LOG_SIZE_PROPERTY);
@@ -179,4 +182,12 @@ public class TaskLogger {
         this.outputSink.flush();
         this.errorSink.flush();
     }
+
+    // need to reset MDC because calling thread is not active thread (immediate service)
+    public void resetLogContextForImmediateService() {
+        MDC.put(Log4JTaskLogs.MDC_TASK_ID, this.taskId.value());
+        MDC.put(Log4JTaskLogs.MDC_TASK_NAME, this.taskId.getReadableName());
+        MDC.put(Log4JTaskLogs.MDC_HOST, hostname);
+    }
+
 }

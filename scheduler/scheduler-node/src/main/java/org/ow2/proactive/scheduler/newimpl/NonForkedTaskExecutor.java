@@ -34,17 +34,23 @@
  */
 package org.ow2.proactive.scheduler.newimpl;
 
+import java.io.IOException;
 import java.io.PrintStream;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
 import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
 import org.ow2.proactive.scheduler.task.SchedulerVars;
 import org.ow2.proactive.scheduler.task.TaskLauncherBak;
 import org.ow2.proactive.scheduler.task.TaskLauncherInitializer;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
+import org.ow2.proactive.scheduler.task.script.ForkedScriptExecutableContainer;
+import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptHandler;
 import org.ow2.proactive.scripting.ScriptLoader;
 import org.ow2.proactive.scripting.ScriptResult;
@@ -57,61 +63,50 @@ public class NonForkedTaskExecutor implements TaskExecutor {
     public TaskResultImpl execute(TaskContext container, PrintStream output, PrintStream error) {
         ScriptHandler scriptHandler = ScriptLoader.createLocalHandler();
 
-        Map<String, Serializable> variables = contextVariables(container.getInitializer());
+        Map<String, Serializable> variables = new HashMap<String, Serializable>();
+
         if (container.getInitializer().getVariables() != null) {
             variables.putAll(container.getInitializer().getVariables());
         }
 
-        if (container.getDecrypter() != null) {
-            try {
-                Map<String, String> thirdPartyCredentials = container.getDecrypter().decrypt()
-                        .getThirdPartyCredentials();
-                scriptHandler.addBinding(TaskScript.CREDENTIALS_VARIABLE, thirdPartyCredentials);
+        variables.putAll(contextVariables(container.getInitializer()));
 
-            } catch (Exception e) {
-                e.printStackTrace(error);
-                return new TaskResultImpl(container.getTaskId(), new Exception(
-                    "Could read encrypted third party credentials", e), null, 0);
-            }
+        List<TaskResult> results = new ArrayList<TaskResult>();
+        try {
+            addResultsAndVariablesFromResults(container.getPreviousTasksResults(), variables, results);
+        } catch (Exception e) {
+            e.printStackTrace(error);
+            return new TaskResultImpl(container.getTaskId(), new Exception("Could deserialize variables", e),
+                null, 0);
         }
+
+        Map<String, String> thirdPartyCredentials = new HashMap<String, String>();
+        try {
+            if (container.getDecrypter() != null) {
+                thirdPartyCredentials.putAll(container.getDecrypter().decrypt().getThirdPartyCredentials());
+            }
+        } catch (Exception e) {
+            e.printStackTrace(error);
+            return new TaskResultImpl(container.getTaskId(), new Exception(
+                "Could read encrypted third party credentials", e), null, 0);
+        }
+
+        scriptHandler.addBinding(TaskScript.RESULTS_VARIABLE, results.toArray(new TaskResult[results.size()]));
+        scriptHandler.addBinding(TaskScript.CREDENTIALS_VARIABLE, thirdPartyCredentials);
         scriptHandler.addBinding(TaskLauncherBak.VARIABLES_BINDING_NAME, variables);
 
-        if (container.getPreScript() != null) {
-            ScriptResult preScriptResult = scriptHandler.handle(container.getPreScript(), output, error);
-            if (preScriptResult.errorOccured()) {
-                preScriptResult.getException().printStackTrace(error);
-                return new TaskResultImpl(container.getTaskId(), preScriptResult.getException(), null, 0);
-            }
+        StopWatch stopWatch = new StopWatch();
+        TaskResultImpl taskResult;
+        try {
+            stopWatch.start();
+            ScriptResult<Serializable> result = executeScripts(container, output, error, scriptHandler);
+            taskResult = new TaskResultImpl(container.getTaskId(), result.getResult(), null, stopWatch.stop());
+        } catch (Exception e) {
+            e.printStackTrace(error);
+            taskResult = new TaskResultImpl(container.getTaskId(), e, null, stopWatch.stop());
         }
 
-        ScriptResult<Serializable> scriptResult = scriptHandler.handle(container.getExecutableContainer()
-                .getScript(), output, error);
-
-        if (scriptResult.errorOccured()) {
-            scriptResult.getException().printStackTrace(error);
-            return new TaskResultImpl(container.getTaskId(), scriptResult.getException(), null, 0);
-        }
-        TaskResultImpl taskResult = new TaskResultImpl(container.getTaskId(), scriptResult.getResult(), null,
-            0);
-
-        if (container.getPostScript() != null) {
-            ScriptResult postScriptResult = scriptHandler.handle(container.getPostScript(), output, error);
-            if (postScriptResult.errorOccured()) {
-                postScriptResult.getException().printStackTrace(error);
-                return new TaskResultImpl(container.getTaskId(), postScriptResult.getException(), null, 0);
-            }
-        }
-
-        if (container.getControlFlowScript() != null) {
-            ScriptResult<FlowAction> flowScriptResult = scriptHandler.handle(
-                    container.getControlFlowScript(), output, error);
-            if (flowScriptResult.errorOccured()) {
-                flowScriptResult.getException().printStackTrace(error);
-                return new TaskResultImpl(container.getTaskId(), flowScriptResult.getException(), null, 0);
-            } else {
-                taskResult.setAction(flowScriptResult.getResult());
-            }
-        }
+        executeFlowScript(container.getControlFlowScript(), scriptHandler, output, error, taskResult);
 
         taskResult.setPropagatedVariables(SerializationUtil.serializeVariableMap(variables));
         return taskResult;
@@ -126,10 +121,8 @@ public class NonForkedTaskExecutor implements TaskExecutor {
         variables.put(SchedulerVars.JAVAENV_TASK_ID_VARNAME.toString(), initializer.getTaskId().value());
         variables.put(SchedulerVars.JAVAENV_TASK_NAME_VARNAME.toString(), initializer.getTaskId()
                 .getReadableName());
-        variables.put(SchedulerVars.JAVAENV_TASK_ITERATION.toString(),
-                String.valueOf(initializer.getIterationIndex()));
-        variables.put(SchedulerVars.JAVAENV_TASK_REPLICATION.toString(),
-                String.valueOf(initializer.getReplicationIndex()));
+        variables.put(SchedulerVars.JAVAENV_TASK_ITERATION.toString(), initializer.getIterationIndex());
+        variables.put(SchedulerVars.JAVAENV_TASK_REPLICATION.toString(), initializer.getReplicationIndex());
         //        variables.put(PASchedulerProperties.SCHEDULER_HOME.getKey(),
         //                CentralPAPropertyRepository.PA_HOME.getValue());
         //        variables.put(PAResourceManagerProperties.RM_HOME.getKey(),
@@ -137,6 +130,65 @@ public class NonForkedTaskExecutor implements TaskExecutor {
         //        variables.put(CentralPAPropertyRepository.PA_HOME.getName(),
         //                CentralPAPropertyRepository.PA_HOME.getValueAsString());
         return variables;
+    }
+
+    private void addResultsAndVariablesFromResults(TaskResult[] previousTasksResults,
+            Map<String, Serializable> variables, List<TaskResult> results) throws IOException,
+            ClassNotFoundException {
+        if (previousTasksResults != null) {
+            for (TaskResult taskResult : previousTasksResults) {
+                if (taskResult.getPropagatedVariables() != null) {
+                    variables.putAll(SerializationUtil.deserializeVariableMap(taskResult
+                            .getPropagatedVariables()));
+                }
+                results.add(taskResult);
+            }
+        }
+    }
+
+    private ScriptResult<Serializable> executeScripts(TaskContext container, PrintStream output, PrintStream error,
+            ScriptHandler scriptHandler) throws Exception {
+        if (container.getPreScript() != null) {
+            ScriptResult preScriptResult = scriptHandler.handle(container.getPreScript(), output, error);
+            if (preScriptResult.errorOccured()) {
+                throw new Exception("Failed to execute pre script", preScriptResult.getException());
+            }
+        }
+
+        ScriptResult<Serializable> scriptResult = executeTask(container, output, error, scriptHandler);
+        if (scriptResult.errorOccured()) {
+            throw new Exception("Failed to execute task", scriptResult.getException());
+        }
+
+        if (container.getPostScript() != null) {
+            ScriptResult postScriptResult = scriptHandler.handle(container.getPostScript(), output, error);
+            if (postScriptResult.errorOccured()) {
+                throw new Exception("Failed to execute post script", postScriptResult.getException());
+            }
+        }
+        return scriptResult;
+    }
+
+    protected ScriptResult<Serializable> executeTask(TaskContext container, PrintStream output, PrintStream error,
+            ScriptHandler scriptHandler) throws Exception {
+        ForkedScriptExecutableContainer executableContainer = (ForkedScriptExecutableContainer) container
+                .getExecutableContainer();
+
+        return scriptHandler.handle(executableContainer.getScript(),
+                output, error);
+    }
+
+    private void executeFlowScript(Script<FlowAction> flowScript, ScriptHandler scriptHandler,
+            PrintStream output, PrintStream error, TaskResultImpl taskResult) {
+        if (flowScript != null) {
+            ScriptResult<FlowAction> flowScriptResult = scriptHandler.handle(flowScript, output, error);
+            if (flowScriptResult.errorOccured()) {
+                flowScriptResult.getException().printStackTrace(error);
+                taskResult.setException(flowScriptResult.getException());
+            } else {
+                taskResult.setAction(flowScriptResult.getResult());
+            }
+        }
     }
 
 }
