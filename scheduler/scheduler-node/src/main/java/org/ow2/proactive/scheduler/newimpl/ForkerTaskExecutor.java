@@ -52,9 +52,11 @@ import org.ow2.proactive.scheduler.task.forked.ForkedJavaExecutableContainer;
 import org.ow2.proactive.scheduler.task.forked.TaskProcessTreeKiller;
 import org.ow2.proactive.scheduler.task.utils.ForkerUtils;
 import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Logger;
 
 
 public class ForkerTaskExecutor implements TaskExecutor {
+    private static final Logger logger = Logger.getLogger(ForkerTaskExecutor.class);
 
     private File workingDir;
     private Decrypter decrypter;
@@ -105,11 +107,18 @@ public class ForkerTaskExecutor implements TaskExecutor {
 
             int exitCode = process.waitFor();
             if (exitCode != 0) {
-                return new TaskResultImpl(context.getTaskId(),
-                    new Exception("Failed to execute forked task"), null, 0);
+                Throwable exception = null;
+                try {
+                    exception = (Throwable) deserializeTaskResult(serializedContext);
+                } catch (Throwable ignored) {
+                    return new TaskResultImpl(context.getTaskId(), new Exception("Failed to execute forked task",
+                      ignored), null, 0);
+                }
+                return new TaskResultImpl(context.getTaskId(), new Exception("Failed to execute forked task",
+                    exception), null, 0);
             }
 
-            return deserializeTaskResult(serializedContext);
+            return (TaskResultImpl) deserializeTaskResult(serializedContext);
         } catch (Throwable throwable) {
             return new TaskResultImpl(context.getTaskId(), new Exception("Failed to execute forked task",
                 throwable), null, 0);
@@ -177,10 +186,10 @@ public class ForkerTaskExecutor implements TaskExecutor {
     }
 
     // 4 called by forker
-    private static TaskResultImpl deserializeTaskResult(File pathToFile) throws IOException,
+    private static Object deserializeTaskResult(File pathToFile) throws IOException,
             ClassNotFoundException {
         ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(pathToFile));
-        TaskResultImpl scriptResult = (TaskResultImpl) inputStream.readObject();
+        Object scriptResult = inputStream.readObject();
         FileUtils.forceDelete(pathToFile);
         return scriptResult;
     }
@@ -201,8 +210,12 @@ public class ForkerTaskExecutor implements TaskExecutor {
 
             serializeTaskResult(result, contextPath);
         } catch (Throwable throwable) {
+            try {
+                serializeTaskResult(throwable, contextPath);
+            } catch (Throwable ignored){
+            }
             throwable.printStackTrace(System.err);
-            System.exit(-1);
+            System.exit(1);
         }
     }
 

@@ -139,7 +139,7 @@ public class JavaExecutableContainer extends ExecutableContainer {
     @Override
     public void init(ExecutableContainerInitializer initializer) {
         // get the classserver if any (can be null)
-        this.classServer = initializer.getClassServer();
+        // TODO FIXME this.classServer = initializer.getClassServer();
     }
 
     /**

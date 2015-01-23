@@ -8,7 +8,7 @@
 			<description>task WaitAndPrint - will sleep for 30s</description>
 			<javaExecutable class="org.ow2.proactive.scheduler.examples.WaitAndPrint">
 				<parameters>
-					<parameter name="sleepTime" value="30"/>
+					<parameter name="sleepTime" value="10"/>
 					<parameter name="number" value="1"/>
 				</parameters>
 			</javaExecutable>
@@ -33,9 +33,6 @@ runs=3;
 			<description>task with replication id = 1 will throw an exception</description>
 			<depends><task ref="task2replicate" /></depends>
 			<javaExecutable class="org.ow2.proactive.scheduler.examples.FailTaskConditionally">
-                <parameters>
-                    <parameter name="replicationId" value="$REP" />  
-                </parameters>
 			</javaExecutable>
 		</task>
         <task name="task2merge" preciousResult="true" cancelJobOnError="true">

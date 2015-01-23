@@ -101,13 +101,12 @@ public class TestGlobalSpace extends FunctionalTest {
         "def out;                                              \n" + //
         "def arr = " + inFileArr + ";                          \n" + //
         "for (def i=0; i < arr.size(); i++) {                  \n" + //
-        "  def input = localspace.resolveFile(arr[i]);         \n" + //
+        "  def input = new File(arr[i]);         \n" + //
         "  if (! input) continue;                              \n" + //
-        "  def br = input.getContent().getInputStream();       \n" + //
-        "  def ff = localspace.resolveFile(                    \n" + //
+        "  def br = input.newInputStream();       \n" + //
+        "  def ff = new File(                    \n" + //
         "     arr[i] + \".glob.A\");\n                         \n" + //
-        "  ff.createFile();                                    \n" + //
-        "  out = ff.getContent().getOutputStream();            \n" + //
+        "  out = ff.newOutputStream();            \n" + //
         "  def c;                                              \n" + //
         "  while ((c = br.read()) > 0) {                       \n" + //
         "    out.write(c);                                     \n" + //
@@ -121,16 +120,15 @@ public class TestGlobalSpace extends FunctionalTest {
         "def out;                                              \n" + //
         "def arr = " + inFileArr + ";                          \n" + //
         "for (def i=0; i < arr.size(); i++) {                  \n" + //
-        "  def input = localspace.resolveFile(                 \n" + //
+        "  def input = new File(                 \n" + //
         "      arr[i] + \".glob.A\");                          \n" + //
         "  if (! input.exists()) {                             \n" + //
         "    continue;                                         \n" + //
         "  }                                                   \n" + //
-        "  def br = input.getContent().getInputStream();       \n" + //
-        "  def ff = localspace.resolveFile(                    \n" + //
+        "  def br = input.newInputStream();       \n" + //
+        "  def ff = new File(                    \n" + //
         "     arr[i] + \".out\");\n                            \n" + //
-        "  ff.createFile();                                    \n" + //
-        "  out = ff.getContent().getOutputStream();            \n" + //
+        "  out = ff.newOutputStream();            \n" + //
         "  def c;                                              \n" + //
         "  while ((c = br.read()) > 0) {                       \n" + //
         "    out.write(c);                                     \n" + //

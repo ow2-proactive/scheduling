@@ -41,6 +41,8 @@ import java.io.Serializable;
 import java.net.URI;
 
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
+import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
@@ -180,6 +182,7 @@ public class TestForkedTaskWorkingDir extends FunctionalTest {
 
         @Override
         public Serializable execute(TaskResult... results) throws Throwable {
+            CentralPAPropertyRepository.PA_CLASSLOADING_USEHTTP.setValue(false);
             ProActiveLock blockTaskFromTest = PAActiveObject.lookupActive(ProActiveLock.class,
                     blockTaskFromTestUrl);
 
@@ -189,6 +192,8 @@ public class TestForkedTaskWorkingDir extends FunctionalTest {
             blockTestBeforeKillingNode.unlock();
             // for the first execution, the node will be killed here
             ProActiveLock.waitUntilUnlocked(blockTaskFromTest);
+
+            ProActiveRuntimeImpl.getProActiveRuntime().cleanJvmFromPA();
 
             return new File("output_file.txt").createNewFile();
         }

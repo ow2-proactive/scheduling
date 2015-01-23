@@ -150,10 +150,10 @@ public class GenerationScript extends Script<Object> {
     }
 
     /**
-     * @see org.ow2.proactive.scripting.Script#getResult(javax.script.Bindings)
+     * @see Script#getResult(Object, javax.script.Bindings)
      */
     @Override
-    protected ScriptResult<Object> getResult(Bindings bindings) {
+    protected ScriptResult<Object> getResult(Object evalResult, Bindings bindings) {
         if (bindings.containsKey(RESULT_VARIABLE)) {
             Object result = bindings.get(RESULT_VARIABLE);
 

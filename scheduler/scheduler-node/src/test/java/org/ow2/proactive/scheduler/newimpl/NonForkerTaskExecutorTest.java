@@ -2,12 +2,15 @@ package org.ow2.proactive.scheduler.newimpl;
 
 import java.io.Serializable;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
+import org.ow2.proactive.scheduler.task.SchedulerVars;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskLauncherInitializer;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
@@ -32,8 +35,8 @@ public class NonForkerTaskExecutorTest {
 
         TaskResultImpl result = new NonForkedTaskExecutor().execute(new TaskContext(
             new ForkedScriptExecutableContainer(new TaskScript(new SimpleScript(
-                "print('hello'); java.lang.Thread.sleep(5); result='hello'", "javascript"))), initializer), taskOutput.outputStream,
-                taskOutput.error);
+                "print('hello'); java.lang.Thread.sleep(5); result='hello'", "javascript"))), initializer),
+                taskOutput.outputStream, taskOutput.error);
 
         assertEquals("prehellopost", taskOutput.output());
         assertEquals("hello", result.value());
@@ -74,9 +77,8 @@ public class NonForkerTaskExecutorTest {
         initializer.setTaskId(TaskIdImpl.createTaskId(new JobIdImpl(1000, "job"), "task", 42L, false));
 
         TaskResultImpl result = new NonForkedTaskExecutor().execute(new TaskContext(
-            new ForkedScriptExecutableContainer(
-              new TaskScript(new SimpleScript(script, "javascript"))), initializer),
-          taskOutput.outputStream, taskOutput.error);
+            new ForkedScriptExecutableContainer(new TaskScript(new SimpleScript(script, "javascript"))),
+            initializer), taskOutput.outputStream, taskOutput.error);
 
         assertEquals(42.0, result.value());
     }
@@ -110,16 +112,19 @@ public class NonForkerTaskExecutorTest {
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
         initializer.setTaskId(TaskIdImpl.createTaskId(new JobIdImpl(1000, "job"), "task", 42L, false));
 
+        Map<String, Serializable> variablesFromParent = new HashMap<String, Serializable>();
+        variablesFromParent.put("var", "parent");
+        variablesFromParent.put(SchedulerVars.JAVAENV_TASK_ID_VARNAME.toString(), "1234");
+
         TaskResult[] previousTasksResults = { new TaskResultImpl(null, null, null, null, null,
-            SerializationUtil.serializeVariableMap(Collections.<String, Serializable> singletonMap("var",
-              "parent"))) };
+            SerializationUtil.serializeVariableMap(variablesFromParent)) };
 
-        TaskResultImpl result = new NonForkedTaskExecutor().execute(new TaskContext(
-            new ForkedScriptExecutableContainer(new TaskScript(new SimpleScript(
-                "print(variables.get('var'));", "javascript"))), initializer, previousTasksResults),
-                taskOutput.outputStream, taskOutput.error);
+        new NonForkedTaskExecutor().execute(new TaskContext(new ForkedScriptExecutableContainer(
+            new TaskScript(new SimpleScript(
+                "print(variables.get('var'));print(variables.get('pas.task.id'))", "javascript"))),
+            initializer, previousTasksResults), taskOutput.outputStream, taskOutput.error);
 
-        assertEquals("parent", taskOutput.output());
+        assertEquals("parent42", taskOutput.output());
     }
 
     @Test
@@ -131,10 +136,9 @@ public class NonForkerTaskExecutorTest {
 
         TaskResult[] previousTasksResults = { new TaskResultImpl(null, "aresult", null, 0) };
 
-        TaskResultImpl result = new NonForkedTaskExecutor().execute(new TaskContext(
-            new ForkedScriptExecutableContainer(new TaskScript(new SimpleScript(
-              "print(results[0]);", "javascript"))), initializer, previousTasksResults),
-          taskOutput.outputStream, taskOutput.error);
+        new NonForkedTaskExecutor().execute(new TaskContext(new ForkedScriptExecutableContainer(
+            new TaskScript(new SimpleScript("print(results[0]);", "javascript"))), initializer,
+            previousTasksResults), taskOutput.outputStream, taskOutput.error);
 
         assertEquals("aresult", taskOutput.output());
     }
@@ -146,9 +150,9 @@ public class NonForkerTaskExecutorTest {
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
         initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false));
 
-        TaskResultImpl result =new NonForkedTaskExecutor().execute(new TaskContext(new ForkedScriptExecutableContainer(
-            new TaskScript(new SimpleScript("return 10/0", "javascript"))), initializer),
-                taskOutput.outputStream, taskOutput.error);
+        TaskResultImpl result = new NonForkedTaskExecutor().execute(
+                new TaskContext(new ForkedScriptExecutableContainer(new TaskScript(new SimpleScript(
+                    "return 10/0", "javascript"))), initializer), taskOutput.outputStream, taskOutput.error);
 
         assertEquals("", taskOutput.output());
         assertNotEquals("", taskOutput.error());
@@ -163,9 +167,10 @@ public class NonForkerTaskExecutorTest {
         initializer.setPreScript(new SimpleScript("return 10/0", "javascript"));
         initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false));
 
-        TaskResultImpl result =new NonForkedTaskExecutor().execute(new TaskContext(new ForkedScriptExecutableContainer(
-            new TaskScript(new SimpleScript("print('hello'); result='hello'", "javascript"))), initializer),
-                taskOutput.outputStream, taskOutput.error);
+        TaskResultImpl result = new NonForkedTaskExecutor().execute(new TaskContext(
+            new ForkedScriptExecutableContainer(new TaskScript(new SimpleScript(
+                "print('hello'); result='hello'", "javascript"))), initializer), taskOutput.outputStream,
+                taskOutput.error);
 
         assertEquals("", taskOutput.output());
         assertNotEquals("", taskOutput.error());
@@ -216,9 +221,9 @@ public class NonForkerTaskExecutorTest {
         initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false));
 
         TaskResultImpl result = new NonForkedTaskExecutor().execute(new TaskContext(
-            new ForkedScriptExecutableContainer(
-              new TaskScript(new SimpleScript("print('hello'); result='hello'", "javascript"))), initializer),
-          taskOutput.outputStream, taskOutput.error);
+            new ForkedScriptExecutableContainer(new TaskScript(new SimpleScript(
+                "print('hello'); result='hello'", "javascript"))), initializer), taskOutput.outputStream,
+                taskOutput.error);
 
         assertEquals("hello", taskOutput.output());
         assertNotEquals("", taskOutput.error());

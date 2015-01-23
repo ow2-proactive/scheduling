@@ -14,7 +14,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
-import org.ow2.proactive.authentication.crypto.HybridEncryptionUtil;
 import org.ow2.proactive.db.DatabaseManagerException;
 import org.ow2.proactive.db.FilteredExceptionCallback;
 import org.ow2.proactive.db.SortParameter;
@@ -56,7 +55,6 @@ import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.task.java.JavaExecutableContainer;
 import org.ow2.proactive.scheduler.task.nativ.NativeExecutableContainer;
 import org.ow2.proactive.scheduler.task.script.ForkedScriptExecutableContainer;
-import org.ow2.proactive.scheduler.task.script.ScriptExecutableContainer;
 import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.utils.FileToBytesConverter;
 import org.apache.log4j.Logger;
@@ -1534,7 +1532,7 @@ public class SchedulerDBManager {
             ScriptTaskData scriptTaskData = ScriptTaskData.createScriptTaskData(taskRuntimeData, container);
             session.save(scriptTaskData);
         } else if (task.getClass().equals(InternalScriptTask.class)) {
-            ScriptExecutableContainer container = (ScriptExecutableContainer) task.getExecutableContainer();
+            ForkedScriptExecutableContainer container = (ForkedScriptExecutableContainer) task.getExecutableContainer();
             ScriptTaskData scriptTaskData = ScriptTaskData.createScriptTaskData(taskRuntimeData, container);
             session.save(scriptTaskData);
         } else {

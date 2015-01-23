@@ -45,8 +45,8 @@ public class ScriptTaskData {
         return scriptTaskData;
     }
 
-    ScriptExecutableContainer createExecutableContainer() throws InvalidScriptException {
-        return new ScriptExecutableContainer(new TaskScript(script.createSimpleScript()));
+    ForkedScriptExecutableContainer createExecutableContainer() throws InvalidScriptException {
+        return new ForkedScriptExecutableContainer(new TaskScript(script.createSimpleScript()));
     }
 
     ForkedScriptExecutableContainer createForkedExecutableContainer() throws InvalidScriptException {

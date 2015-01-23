@@ -17,8 +17,8 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scheduler.common.util.Object2ByteConverter;
-import org.ow2.proactive.scheduler.examples.WaitAndPrint;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
+import org.ow2.proactive.scheduler.newimpl.java.JavaScriptEngineFactoryTest;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskLauncherInitializer;
 import org.ow2.proactive.scheduler.task.script.ForkedScriptExecutableContainer;
@@ -64,13 +64,13 @@ public class TaskLauncherTest {
         HashMap<String, byte[]> args = new HashMap<String, byte[]>();
         args.put("number", Object2ByteConverter.convertObject2Byte(123));
         ForkedScriptExecutableContainer executableContainer = new ForkedScriptExecutableContainer(
-          new TaskScript(new SimpleScript(WaitAndPrint.class.getName(), "java", new Serializable[]{
+          new TaskScript(new SimpleScript(JavaScriptEngineFactoryTest.ReturnReplicationIndex .class.getName(), "java", new Serializable[]{
             args
           })));
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
 
-        initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false));
+        initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job*1", 1000L, false));
 
         TaskLauncher taskLauncher = new TaskLauncher(initializer, new TestTaskLauncherFactory());
         TaskResult taskResult = runTaskLauncher(taskLauncher, executableContainer);

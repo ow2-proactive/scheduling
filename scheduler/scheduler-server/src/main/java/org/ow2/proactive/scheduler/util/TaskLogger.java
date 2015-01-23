@@ -36,10 +36,10 @@
  */
 package org.ow2.proactive.scheduler.util;
 
-import org.apache.log4j.Logger;
-import org.apache.log4j.MDC;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.utils.appenders.FileAppender;
+import org.apache.log4j.Logger;
+import org.apache.log4j.MDC;
 
 
 public class TaskLogger {
@@ -58,45 +58,49 @@ public class TaskLogger {
         return instance;
     }
 
+    private String format(TaskId id, String message) {
+        return PREFIX + id + " (" + id.getReadableName() + ")" + " " + message;
+    }
+
     public void info(TaskId id, String message) {
         MDC.put(FileAppender.FILE_NAME, id);
-        logger.info(PREFIX + id + " " + message);
+        logger.info(format(id, message));
         MDC.remove(FileAppender.FILE_NAME);
     }
 
     public void info(TaskId id, String message, Throwable th) {
         MDC.put(FileAppender.FILE_NAME, id);
-        logger.info(PREFIX + id + " " + message, th);
+        logger.info(format(id, message), th);
         MDC.remove(FileAppender.FILE_NAME);
     }
 
     public void debug(TaskId id, String message) {
         MDC.put(FileAppender.FILE_NAME, id);
-        logger.debug(PREFIX + id + " " + message);
+        logger.debug(format(id, message));
         MDC.remove(FileAppender.FILE_NAME);
     }
 
     public void debug(TaskId id, String message, Throwable th) {
         MDC.put(FileAppender.FILE_NAME, id);
-        logger.debug(PREFIX + id + " " + message, th);
+        logger.debug(format(id, message), th);
         MDC.remove(FileAppender.FILE_NAME);
     }
 
     public void trace(TaskId id, String message) {
         MDC.put(FileAppender.FILE_NAME, id);
-        logger.trace(PREFIX + id + " " + message);
+        logger.trace(format(id, message));
         MDC.remove(FileAppender.FILE_NAME);
     }
 
     public void trace(TaskId id, String message, Throwable th) {
         MDC.put(FileAppender.FILE_NAME, id);
-        logger.trace(PREFIX + id + " " + message, th);
+        logger.trace(format(id, message), th);
         MDC.remove(FileAppender.FILE_NAME);
     }
 
     public void error(TaskId id, String message, Throwable th) {
         MDC.put(FileAppender.FILE_NAME, id);
-        logger.error(PREFIX + id + " " + message, th);
+        logger.error(format(id, message), th);
         MDC.remove(FileAppender.FILE_NAME);
     }
 

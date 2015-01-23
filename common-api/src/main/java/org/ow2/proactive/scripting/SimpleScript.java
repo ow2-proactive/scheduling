@@ -128,7 +128,7 @@ public class SimpleScript extends Script<Object> {
      * @see org.ow2.proactive.scheduler.common.scripting.Script#getResult(javax.script.Bindings)
      */
     @Override
-    protected ScriptResult<Object> getResult(Bindings bindings) {
+    protected ScriptResult<Object> getResult(Object evalResult, Bindings bindings) {
         // no significant result can be returned
         return new ScriptResult<Object>();
     }

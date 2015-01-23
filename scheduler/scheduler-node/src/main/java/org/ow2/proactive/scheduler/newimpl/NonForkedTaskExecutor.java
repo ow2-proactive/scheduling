@@ -65,20 +65,23 @@ public class NonForkedTaskExecutor implements TaskExecutor {
 
         Map<String, Serializable> variables = new HashMap<String, Serializable>();
 
+        // variables from workflow definition
         if (container.getInitializer().getVariables() != null) {
             variables.putAll(container.getInitializer().getVariables());
         }
 
-        variables.putAll(contextVariables(container.getInitializer()));
-
         List<TaskResult> results = new ArrayList<TaskResult>();
         try {
+            // variables from dependent tasks
             addResultsAndVariablesFromResults(container.getPreviousTasksResults(), variables, results);
         } catch (Exception e) {
             e.printStackTrace(error);
             return new TaskResultImpl(container.getTaskId(), new Exception("Could deserialize variables", e),
                 null, 0);
         }
+
+        // variables from current job/task context
+        variables.putAll(contextVariables(container.getInitializer()));
 
         Map<String, String> thirdPartyCredentials = new HashMap<String, String>();
         try {
@@ -101,7 +104,7 @@ public class NonForkedTaskExecutor implements TaskExecutor {
             stopWatch.start();
             Serializable result = executeScripts(container, output, error, scriptHandler);
             taskResult = new TaskResultImpl(container.getTaskId(), result, null, stopWatch.stop());
-        } catch (Exception e) {
+        } catch (Throwable e) {
             e.printStackTrace(error);
             taskResult = new TaskResultImpl(container.getTaskId(), e, null, stopWatch.stop());
         }
@@ -121,8 +124,8 @@ public class NonForkedTaskExecutor implements TaskExecutor {
         variables.put(SchedulerVars.JAVAENV_TASK_ID_VARNAME.toString(), initializer.getTaskId().value());
         variables.put(SchedulerVars.JAVAENV_TASK_NAME_VARNAME.toString(), initializer.getTaskId()
                 .getReadableName());
-        variables.put(SchedulerVars.JAVAENV_TASK_ITERATION.toString(), initializer.getIterationIndex());
-        variables.put(SchedulerVars.JAVAENV_TASK_REPLICATION.toString(), initializer.getReplicationIndex());
+        variables.put(SchedulerVars.JAVAENV_TASK_ITERATION.toString(), initializer.getTaskId().getIterationIndex());
+        variables.put(SchedulerVars.JAVAENV_TASK_REPLICATION.toString(), initializer.getTaskId().getReplicationIndex());
         //        variables.put(PASchedulerProperties.SCHEDULER_HOME.getKey(),
         //                CentralPAPropertyRepository.PA_HOME.getValue());
         //        variables.put(PAResourceManagerProperties.RM_HOME.getKey(),
@@ -178,7 +181,7 @@ public class NonForkedTaskExecutor implements TaskExecutor {
             ScriptResult<Serializable> scriptResult = scriptHandler.handle(executableContainer.getScript(), output, error);
 
             if (scriptResult.errorOccured()) {
-                throw new Exception("Failed to execute task", scriptResult.getException());
+                throw new Exception("Failed to execute task: "+scriptResult.getException().getMessage(), scriptResult.getException());
             }
 
             return scriptResult.getResult();

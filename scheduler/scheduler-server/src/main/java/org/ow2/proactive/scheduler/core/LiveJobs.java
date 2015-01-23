@@ -421,7 +421,7 @@ class LiveJobs {
             boolean errorOccurred;
             if (task instanceof InternalNativeTask) {
                 try {
-                    errorOccurred = handleNativeTaskResult((InternalNativeTask) task, result);
+                    errorOccurred = handleNativeTaskResult((InternalNativeTask) task, result); // TODO remove this
                 } catch (RunningProcessException e) {
                     //if res.value throws a RunningProcessException, user is not responsible
                     //change status and update GUI

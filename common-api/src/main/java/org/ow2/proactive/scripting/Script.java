@@ -312,7 +312,18 @@ public abstract class Script<E> implements Serializable {
         BoundedStringWriter errorBoundedWriter = new BoundedStringWriter(errorSink, DEFAULT_OUTPUT_MAX_SIZE);
         engine.getContext().setWriter(new PrintWriter(outputBoundedWriter));
         engine.getContext().setErrorWriter(new PrintWriter(errorBoundedWriter));
+        Reader closedInput = new Reader() {
+            @Override
+            public int read(char[] cbuf, int off, int len) throws IOException {
+                throw new IOException("closed");
+            }
 
+            @Override
+            public void close() throws IOException {
+
+            }
+        };
+        engine.getContext().setReader(closedInput);
         engine.getContext().setAttribute(ScriptEngine.FILENAME, scriptName, ScriptContext.ENGINE_SCOPE);
 
         try {
@@ -324,13 +335,13 @@ public abstract class Script<E> implements Serializable {
                 }
             }
             prepareBindings(bindings);
-            engine.eval(getReader());
+            Object evalResult = engine.eval(getReader());
 
             engine.getContext().getErrorWriter().flush();
             engine.getContext().getWriter().flush();
 
             // Add output to the script result
-            ScriptResult<E> result = this.getResult(bindings);
+            ScriptResult<E> result = this.getResult(evalResult, bindings);
             result.setOutput(outputBoundedWriter.toString());
 
             return result;
@@ -377,7 +388,7 @@ public abstract class Script<E> implements Serializable {
     protected abstract void prepareSpecialBindings(Bindings bindings);
 
     /** Return the variable awaited from the script execution */
-    protected abstract ScriptResult<E> getResult(Bindings bindings);
+    protected abstract ScriptResult<E> getResult(Object evalResult, Bindings bindings);
 
     /** Set parameters in bindings if any */
     protected final void prepareBindings(Bindings bindings) {

@@ -233,7 +233,7 @@ public class SelectionScript extends Script<Boolean> {
      * @see org.ow2.proactive.scheduler.common.scripting.Script#getResult(javax.script.Bindings)
      */
     @Override
-    protected ScriptResult<Boolean> getResult(Bindings bindings) {
+    protected ScriptResult<Boolean> getResult(Object evalResult, Bindings bindings) {
         if (bindings.containsKey(RESULT_VARIABLE)) {
             Object result = bindings.get(RESULT_VARIABLE);
 

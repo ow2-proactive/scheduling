@@ -60,10 +60,7 @@ import org.ow2.proactive.scheduler.common.task.ScriptTask;
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
-import org.ow2.proactive.scheduler.task.forked.ForkedJavaExecutableContainer;
-import org.ow2.proactive.scheduler.task.internal.InternalForkedJavaTask;
 import org.ow2.proactive.scheduler.task.internal.InternalForkedScriptTask;
-import org.ow2.proactive.scheduler.task.internal.InternalJavaTask;
 import org.ow2.proactive.scheduler.task.internal.InternalScriptTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.task.script.ForkedScriptExecutableContainer;
@@ -273,7 +270,7 @@ public class InternalJobFactory {
      */
     @SuppressWarnings("unchecked")
     private static InternalTask createTask(Job userJob, JavaTask task) throws JobCreationException {
-        InternalJavaTask javaTask= null;
+        InternalTask javaTask= null;
 
         if (task.getExecutableClassName() != null) {
             // HACK HACK HACK : Get arguments for the task
@@ -294,15 +291,22 @@ public class InternalJobFactory {
 //              "executable.internalInit()" +
 //              "return executable.execute((org.ow2.proactive.scheduler.common.task.TaskResult[]) results);";
             if (task.isFork()) {
-                ForkedJavaExecutableContainer fjec = new ForkedJavaExecutableContainer(task
-                        .getExecutableClassName(), args);
-                fjec.setForkEnvironment(task.getForkEnvironment());
-                javaTask = new InternalForkedJavaTask(fjec);
+//                ForkedJavaExecutableContainer fjec = new ForkedJavaExecutableContainer(task
+//                        .getExecutableClassName(), args);
+//                fjec.setForkEnvironment(task.getForkEnvironment());
+//                javaTask = new InternalForkedJavaTask(fjec);
+                try {
+                    javaTask = new InternalForkedScriptTask(new ForkedScriptExecutableContainer(
+                      new TaskScript(new SimpleScript(task.getExecutableClassName(), "java", new Serializable[]{args}))));
+                } catch (Exception e) {
+                    throw new JobCreationException(e);
+                }
+
             } else {
 //                javaTask = new InternalJavaTask(new JavaExecutableContainer(task.getExecutableClassName(),
 //                  args));
                 try {
-                    javaTask = new InternalForkedScriptTask(new ForkedScriptExecutableContainer(
+                    javaTask = new InternalScriptTask(new ForkedScriptExecutableContainer(
                         new TaskScript(new SimpleScript(task.getExecutableClassName(), "java", new Serializable[]{args}))));
                 } catch (Exception e) {
                     throw new JobCreationException(e);
@@ -343,7 +347,7 @@ public class InternalJobFactory {
         // TODO use native script engine
         String cli = "";
         for (String commandLinePart : task.getCommandLine()) {
-            cli += commandLinePart + " ";
+            cli += "\"" + commandLinePart + "\"" + " "; // TODO FIXME more testing
         }
         try {
             InternalTask scriptTask = new InternalForkedScriptTask(new ForkedScriptExecutableContainer(

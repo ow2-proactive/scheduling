@@ -40,6 +40,7 @@ import java.io.File;
 import java.net.URL;
 import java.util.Map;
 
+import org.objectweb.proactive.utils.StackTraceUtil;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
@@ -114,11 +115,11 @@ public class TestJobCanceledWithReplication extends SchedulerConsecutive {
         Assert.assertNotNull("Faulty task result should be an exception", results.get(faultyTaskName)
                 .getException());
 
-        Assert
-                .assertEquals(
-                        "The exception message extracted from the result should match the exception thrown by the task",
-                        FailTaskConditionally.EXCEPTION_MESSAGE, results.get(faultyTaskName).getException()
-                                .getMessage());
+        String stackTrace = StackTraceUtil.getStackTrace(results.get(faultyTaskName).getException());
+
+        Assert.assertTrue(
+                "The exception message extracted from the result should match the exception thrown by the task",
+                stackTrace.contains(FailTaskConditionally.EXCEPTION_MESSAGE));
 
         //remove jobs and check its event
         SchedulerTHelper.removeJob(id);

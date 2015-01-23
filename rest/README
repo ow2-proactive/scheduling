@@ -76,34 +76,34 @@ some command-line usage :
 
 # login 
 
-curl -d "username=demo&password=demo" http://localhost:8080/proactive_grid_cloud_portal/rest/scheduler/login
+curl -d "username=demo&password=demo" http://localhost:8080/rest/scheduler/login
 
 #submit a job
 
-curl -H "sessionid:1" -F 'file=<Job_2_tasks.xml' http://localhost:8080/proactive_grid_cloud_portal/rest/scheduler/submit
+curl -H "sessionid:1" -F 'file=<Job_2_tasks.xml' http://localhost:8080/rest/scheduler/submit
 
 
 #list jobs (pending, running, finished)
-curl -H "sessionid:1" -H "Accept: application/json" http://localhost:8080/proactive_grid_cloud_portal/rest/scheduler/jobs/ 
+curl -H "sessionid:1" -H "Accept: application/json" http://localhost:8080/rest/scheduler/jobs/
 
 # list job 10's tasks 
 
-curl -H "sessionid:1" -H "Accept: application/json" http://localhost:8080/proactive_grid_cloud_portal/rest/scheduler/jobs/12/tasks
+curl -H "sessionid:1" -H "Accept: application/json" http://localhost:8080/rest/scheduler/jobs/12/tasks
 
 
 #delete a job
 
-curl -X DELETE -H "sessionid:1" -H "Accept: application/json" http://localhost:8080/proactive_grid_cloud_portal/rest/scheduler/jobs/10
+curl -X DELETE -H "sessionid:1" -H "Accept: application/json" http://localhost:8080/rest/scheduler/jobs/10
 
 #result from a task 
-curl -H "sessionid:1" -H "Accept: application/json" http://localhost:8080/proactive_grid_cloud_portal/rest/scheduler/jobs/1/tasks/task1/result
+curl -H "sessionid:1" -H "Accept: application/json" http://localhost:8080/rest/scheduler/jobs/1/tasks/task1/result
 
 
   ### Resource Manager
 
-curl -d "username=admin&password=admin" http://localhost:8080/proactive_grid_cloud_portal/rest/rm/login
+curl -d "username=admin&password=admin" http://localhost:8080/rest/rm/login
 
-url -H "sessionid:1" -H "Accept: application/json" http://localhost:8080/proactive_grid_cloud_portal/rest/rm/state
+url -H "sessionid:1" -H "Accept: application/json" http://localhost:8080/rest/rm/state
 
-curl -H "sessionid:1" -H "Accept: application/json" http://localhost:8080/proactive_grid_cloud_portal/rest/rm/monitoring
+curl -H "sessionid:1" -H "Accept: application/json" http://localhost:8080/rest/rm/monitoring
 

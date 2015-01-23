@@ -34,6 +34,7 @@
  */
 package org.ow2.proactive.scheduler.task.script;
 
+import java.io.Serializable;
 import java.util.Collections;
 
 import org.ow2.proactive.scheduler.common.exception.ExecutableCreationException;
@@ -72,7 +73,7 @@ public class ScriptExecutableContainer extends JavaExecutableContainer {
         return scriptExecutableInitializer;
     }
 
-    public Script getScript() {
+    public Script<Serializable> getScript() {
         return script;
     }
 }
