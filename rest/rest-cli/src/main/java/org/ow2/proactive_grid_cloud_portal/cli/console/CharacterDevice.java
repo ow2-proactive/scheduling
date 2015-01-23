@@ -85,4 +85,14 @@ class CharacterDevice extends AbstractDevice {
     public boolean canRead() throws IOException {
         return in.ready();
     }
+
+    @Override
+    public int getHeight() {
+        return -1;
+    }
+
+    @Override
+    public int getWidth() {
+        return -1;
+    }
 }

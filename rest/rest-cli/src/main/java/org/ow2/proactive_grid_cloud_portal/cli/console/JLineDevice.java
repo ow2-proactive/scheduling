@@ -80,12 +80,14 @@ public class JLineDevice extends AbstractDevice {
         reader.setHistory(history);
 
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+            @Override
             public void run() {
                 writeHistory();
             }
         }));
     }
 
+    @Override
     public Writer getWriter() {
         return writer;
     }
@@ -162,4 +164,13 @@ public class JLineDevice extends AbstractDevice {
         return reader.getInput().available() > 0;
     }
 
+    @Override
+    public int getHeight() {
+        return reader.getTerminal().getHeight();
+    }
+
+    @Override
+    public int getWidth() {
+        return reader.getTerminal().getWidth();
+    }
 }

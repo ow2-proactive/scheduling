@@ -58,6 +58,10 @@ public abstract class AbstractDevice {
 
     public abstract Writer getWriter();
 
+    public abstract int getWidth();
+
+    public abstract int getHeight();
+
     public static AbstractDevice getConsole(int type) throws IOException {
         switch (type) {
             case STARDARD:

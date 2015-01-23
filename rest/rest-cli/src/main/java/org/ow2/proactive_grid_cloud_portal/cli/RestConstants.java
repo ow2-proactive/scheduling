@@ -55,6 +55,8 @@ public class RestConstants {
 
     public static final String DFLT_SESSION_FILE_EXT = "-session-id";
 
+    public static final int DFLT_PAGINATION_SIZE = 50;
+
     private RestConstants() {
     }
 }

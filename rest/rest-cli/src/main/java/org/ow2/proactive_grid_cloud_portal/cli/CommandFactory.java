@@ -269,6 +269,10 @@ public abstract class CommandFactory {
             } else if (entry.hasArgs() && entry.numOfArgs() == -1) {
                 option.setArgs(Integer.MAX_VALUE);
             }
+            if (entry.hasOptionalArg()) {
+                option.setOptionalArg(true);
+                option.setArgs(Integer.MAX_VALUE);
+            }
             if (entry.argNames() != null) {
                 option.setArgName(entry.argNames());
             }

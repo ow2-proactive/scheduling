@@ -78,4 +78,14 @@ class ConsoleDevice extends AbstractDevice {
     public int read() throws IOException {
         return console.reader().read();
     }
+
+    @Override
+    public int getHeight() {
+        return -1;
+    }
+
+    @Override
+    public int getWidth() {
+        return -1;
+    }
 }

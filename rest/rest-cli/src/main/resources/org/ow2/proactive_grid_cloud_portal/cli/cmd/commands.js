@@ -238,8 +238,14 @@ function jobstate(jobId) {
     execute(new GetJobStateCommand('' + jobId));
 }
 
-function listjobs() {
-    execute(new ListJobCommand());
+function listjobs(x, y) {
+    if (typeof x == 'undefined') {
+        execute(new ListJobCommand());
+    } else if (typeof y == 'undefined') {
+        execute(new ListJobCommand('latest=' + x));
+    } else {
+        execute(new ListJobCommand(['from=' + x, 'limit=' + y]));
+    }
 }
 
 function schedulerstats() {

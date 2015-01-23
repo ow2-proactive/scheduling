@@ -159,9 +159,28 @@ public class CommandSet {
             "linkrm").description("Reconnect a Resource Manager to the Scheduler").hasArgs(true).numOfArgs(1)
             .argNames("rm-url").jsCommand("linkrm(rm_url)").commandClass(LinkRmCommand.class).entry();
 
-    public static final CommandSet.Entry JOB_LIST = CommandSetEntryBuilder.newInstance().opt("lj").longOpt(
-            "listjobs").description("Retrieve a list of all jobs managed by the Scheduler").jsCommand(
-            "listjobs()").commandClass(ListJobCommand.class).entry();
+    public static final CommandSet.Entry JOB_LIST = CommandSetEntryBuilder
+            .newInstance()
+            .opt("lj")
+            .longOpt("listjobs")
+            .description(
+                    "Retrieve a list of jobs managed by the Scheduler. If specified the latest 'x' number of "
+                            + "jobs or 'z' maximum number of jobs starting from 'y'th job.")
+            .hasOptionalArg(true).argNames("[latest=x |(from=y limit=z)]").commandClass(ListJobCommand.class)
+            .entry();
+
+    public static final CommandSet.Entry JS_LIST_ALL = CommandSetEntryBuilder.newInstance().opt("")
+            .longOpt("").description("Retrieve a list of all jobs.").jsCommand("listjobs()")
+            .commandClass(ListJobCommand.class).entry();
+
+    public static final CommandSet.Entry JS_LIST_LATEST = CommandSetEntryBuilder.newInstance().opt("")
+            .longOpt("").description("Retrieves a list of the latest 'x' number of jobs.")
+            .jsCommand("listjobs(x)").commandClass(ListJobCommand.class).entry();
+
+    public static final CommandSet.Entry JS_LIST_FROM = CommandSetEntryBuilder.newInstance().opt("")
+            .longOpt("")
+            .description("Retrieves the list of 'y' (maximum) number of jobs, starting from the x'th job.")
+            .jsCommand("listjobs(x, y)").commandClass(ListJobCommand.class).entry();
 
     public static final CommandSet.Entry JOB_OUTPUT = CommandSetEntryBuilder.newInstance().opt("jo").longOpt(
             "joboutput").description("Retrieve the output of specified job").hasArgs(true).numOfArgs(1)
@@ -373,7 +392,8 @@ public class CommandSet {
             NODE_INFO, NODE_LOCK, NODE_UNLOCK, NODE_REMOVE, NS_CREATE, NS_LIST, NS_REMOVE, NS,
             INFRASTRUCTURE, INFRASTRUCTURE_LIST, POLICY, POLICY_LIST, TOPOLOGY, FORCE, RM_STATS, RM_HELP };
 
-    public static final Entry[] INTERACTIVE_COMMANDS = { EXIT, RM_JS_HELP, SCHED_JS_HELP, COMMON_JS_HELP };
+    public static final Entry[] INTERACTIVE_COMMANDS = { JS_LIST_ALL, JS_LIST_LATEST, JS_LIST_FROM, EXIT,
+            RM_JS_HELP, SCHED_JS_HELP, COMMON_JS_HELP };
 
     private CommandSet() {
     }
@@ -403,6 +423,10 @@ public class CommandSet {
          * Indicates whether this option has one or more arguments.
          */
         private boolean hasArgs = false;
+        /**
+         * Indicates whether this option has an optional argument.
+         */
+        private boolean hasOptionalArg = false;
         /**
          * Argument names of this option.
          */
@@ -510,6 +534,25 @@ public class CommandSet {
          */
         private void setHasArgs(boolean hasArgs) {
             this.hasArgs = hasArgs;
+        }
+
+        /**
+         * Return <tt> true</tt>, if this option has optional argument.
+         *
+         * @return <tt>true</tt>, if this option has optional argument
+         */
+        public boolean hasOptionalArg() {
+            return this.hasOptionalArg;
+        }
+
+        /**
+         * Sets whether this option has optional argument.
+         *
+         * @param hasOptionalArg
+         *            whether this option has optional argument
+         */
+        public void setHasOptionalArg(boolean hasOptionalArg) {
+            this.hasOptionalArg = hasOptionalArg;
         }
 
         /**
@@ -662,7 +705,12 @@ public class CommandSet {
             return this;
         }
 
-        public CommandSetEntryBuilder numOfArgs(int numOfArgs) {
+        public CommandSetEntryBuilder hasOptionalArg(boolean hasOptionalArg) {
+            entry.setHasOptionalArg(hasOptionalArg);
+            return this;
+        }
+
+       public CommandSetEntryBuilder numOfArgs(int numOfArgs) {
             entry.setNumOfArgs(numOfArgs);
             return this;
         }

@@ -49,6 +49,7 @@ import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 
 public abstract class AbstractIModeCommand extends AbstractCommand implements Command {
 
+    public static final String IMODE = "org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractIModeCommand.imode";
     public static final String TERMINATE = "org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractIModeCommand.terminate";
 
     public AbstractIModeCommand() {
@@ -56,6 +57,7 @@ public abstract class AbstractIModeCommand extends AbstractCommand implements Co
 
     @Override
     public void execute(ApplicationContext currentContext) throws CLIException {
+        currentContext.setProperty(IMODE, true);
         ScriptEngine engine = currentContext.getEngine();
         try {
             // load supported functions
