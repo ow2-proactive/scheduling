@@ -240,8 +240,8 @@ public class SelectionScript extends Script<Boolean> {
                 return new ScriptResult<Boolean>((Boolean) result);
             } else if (result instanceof Integer) {
                 return new ScriptResult<Boolean>((Integer) result != 0);
-            } else if (result instanceof String) {
-                return new ScriptResult<Boolean>(!(((String) result).equals("false") || ((String) result)
+            } else if (result instanceof CharSequence) {
+                return new ScriptResult<Boolean>(!(result.equals("false") || result
                         .equals("False")));
             } else {
                 return new ScriptResult<Boolean>(new Exception(

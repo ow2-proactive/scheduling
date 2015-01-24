@@ -6,7 +6,7 @@
 	<variables>
 		<!-- Relative path is from Scheduler root directory for the tests -->
 		<variable name="WORK_DIR" value="${pa.scheduler.home}/samples/scripts/misc"/>
-		<variable name="WORK_DIR2" value="${pa.scheduler.home}/samples/workflows/more/job_native_linux"/>
+		<variable name="WORK_DIR2" value="${pa.scheduler.home}/scheduler-server/src/test/resources/unitTests/descriptors"/>
 		<variable name="EXCLUSION_STRING" value="paquit"/>
 		<variable name="JAVA_HOME" value="/bin/java/jdk1.5"/>
 		<variable name="PROJECT" value="My_project"/>

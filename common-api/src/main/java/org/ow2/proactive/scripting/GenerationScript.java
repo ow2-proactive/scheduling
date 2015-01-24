@@ -156,7 +156,7 @@ public class GenerationScript extends Script<Object> {
         if (bindings.containsKey(RESULT_VARIABLE)) {
             Object result = bindings.get(RESULT_VARIABLE);
 
-            if (result instanceof String) {
+            if (result instanceof CharSequence) {
                 return new ScriptResult<Object>(result);
             } else {
                 String msg = "Bad result format : awaited String, found " + result.getClass().getName();

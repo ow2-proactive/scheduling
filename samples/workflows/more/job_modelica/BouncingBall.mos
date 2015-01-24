@@ -1,4 +1,0 @@
-loadModel(Modelica);
-loadFile("BouncingBall.mo");
-simulate(BouncingBall,stopTime = 2);
-plot({v,h});
