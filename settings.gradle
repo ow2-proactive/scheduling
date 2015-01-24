@@ -21,11 +21,6 @@ include 'rm:rm-infrastructure:rm-infrastructure-gcm'
 include 'rm:rm-infrastructure:rm-infrastructure-winhpc'
 include 'rm:rm-policy:rm-policy-scheduler'
 
-include 'doc'
-include 'doc:MapReduce'
-include 'doc:Resourcing'
-include 'doc:Scheduling'
-
 include 'performance'
 
 include 'rest'

@@ -12,10 +12,7 @@ buildscript {
     dependencies {
         classpath "org.objectweb.proactive:programming-build-utils:${programmingVersion}"
         // needed at runtime by AntStubGenerator...
-        classpath("org.objectweb.proactive:programming-core:${programmingVersion}") {
-            exclude module: 'xercesImpl' // messing with documentation plugin
-        }
-        classpath 'org.ow2.proactive:documentation:1.0.0-SNAPSHOT'
+        classpath("org.objectweb.proactive:programming-core:${programmingVersion}")
         classpath 'org.hsudbrock:gradle-trang:0.1-proactive'
         classpath 'com.github.rholder:gradle-one-jar:1.0.3'
         classpath 'org.ow2.proactive:serialver-gradle:1.0-SNAPSHOT'
@@ -538,12 +535,6 @@ project(':scheduler:dataspace-smartproxy') {
 
 
     task('functionalTest', type: Test).configure functionalTestConfiguration
-}
-
-project(':doc:Resourcing') {
-    dependencies {
-        compile project(':rm:rm-server')
-    }
 }
 
 project('performance') {

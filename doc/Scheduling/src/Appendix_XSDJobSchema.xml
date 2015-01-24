@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="XSDJobSchema">
-	<info>
-		<title xml:id="XSD_Job_Schema_42">XSD Job Schema</title>
-	</info>
-
-	<programlisting language="xml"><textobject><textdata fileref="../../../src/scheduler/src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.xsd"/></textobject></programlisting>
-</chapter>

@@ -1,7 +1,0 @@
-<task name="ScriptTask">
-	<scriptExecutable>
-		<script>
-			<file path="my_script.js" />
-		</script>
-	</scriptExecutable>
-</task>

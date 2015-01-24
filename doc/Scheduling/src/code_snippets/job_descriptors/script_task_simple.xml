@@ -1,9 +1,0 @@
-<task name="ScriptTask">
-	<scriptExecutable>
-		<script>
-			<code language="javascript">
-				print('Hello!')
-			</code>
-		</script>
-	</scriptExecutable>
-</task>
