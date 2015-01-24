@@ -21,12 +21,9 @@ include 'rm:rm-infrastructure:rm-infrastructure-gcm'
 include 'rm:rm-infrastructure:rm-infrastructure-winhpc'
 include 'rm:rm-policy:rm-policy-scheduler'
 
-include 'performance'
-
 include 'rest'
 include 'rest:rest-api'
 include 'rest:rest-cli'
 include 'rest:rest-server'
 include 'rest:rest-client'
 include 'rest:rest-dataspace-smartproxy'
-include 'rest:performance'

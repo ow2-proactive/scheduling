@@ -537,29 +537,6 @@ project(':scheduler:dataspace-smartproxy') {
     task('functionalTest', type: Test).configure functionalTestConfiguration
 }
 
-project('performance') {
-    dependencies {
-        compile 'logkit:logkit:2.0'
-        compile 'org.apache.jmeter:ApacheJMeter_java:2.9'
-        compile project(':common-client')
-        compile project(':scheduler:scheduler-api')
-        compile project(':scheduler:scheduler-client')
-        compile project(':scheduler:scheduler-node')
-        compile project(':scheduler:scheduler-server')
-        compile project(':rm:rm-client')
-        compile "org.objectweb.proactive:programming-extension-pamr:${programmingVersion}"
-        compile "org.objectweb.proactive:programming-extension-amqp:${programmingVersion}"
-        compile "org.objectweb.proactive:programming-extension-pnp:${programmingVersion}"
-    }
-    
-    task stub(type: StubTask) {
-        classes = [
-                'org.ow2.proactive.tests.performance.rm.RMTestListener',
-                'org.ow2.proactive.tests.performance.scheduler.SchedulerTestListener',
-        ]
-    }
-}
-
 configurations {
     restCli
     distLib {

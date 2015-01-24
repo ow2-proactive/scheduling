@@ -1,5 +1,0 @@
-
-task extras(type: Copy) {
-    from configurations.runtime
-    into file("apache-jmeter/lib/")
-}

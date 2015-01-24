@@ -1,9 +1,0 @@
-<?xml version="1.0"?>
-<ProActiveUserProperties>
-  <properties>
-    <!-- PAMR properties -->
-    <prop key="proactive.communication.protocol" value="pamr"/>
-    <prop key="proactive.pamr.router.address" value="@PA_NET_ROUTER_ADDRESS@" />
-    <prop key="proactive.pamr.router.port" value="@PA_NET_ROUTER_PORT@" />
-  </properties>
-</ProActiveUserProperties>
