@@ -292,28 +292,6 @@ project(':rm:rm-node-updater') {
     }
 }
 
-project(':rm:rm-cli') {
-    apply plugin: 'java-library-distribution'
-
-    dependencies {
-        compile "org.objectweb.proactive:programming-core:${programmingVersion}"
-
-        compile project(':common-client')
-        compile project(':rm:rm-client')
-        compile project(':common-cli')
-    }
-}
-
-project(':scheduler:scheduler-cli') {
-    apply plugin: 'java-library-distribution'
-    dependencies {
-        compile "org.objectweb.proactive:programming-core:${programmingVersion}"
-        compile project(':common-client')
-        compile project(':scheduler:scheduler-client')
-        compile project(':common-cli')
-    }
-}
-
 project('scheduler:scheduler-server') {
     apply plugin: 'java-library-distribution'
     dependencies {
@@ -422,13 +400,6 @@ project('scheduler:scheduler-node') {
     build.dependsOn standaloneJar
     artifacts {
         archives standaloneJar
-    }
-}
-
-project('common-cli') {
-    dependencies {
-        compile 'jline:jline:2.11'
-        compile project(':common-client')
     }
 }
 
@@ -549,10 +520,8 @@ dependencies {
         exclude group: 'javassist', module: 'javassist' // to avoid duplicate (artifact named differently)
     }
     distLib project('rm:rm-policy:rm-policy-scheduler')
-    distLib project(':scheduler:scheduler-cli')
     distLib project(':scheduler:scheduler-node')
     distLib project(':rm:rm-server')
-    distLib project(':rm:rm-cli')
     distLib project(':rm:rm-node-updater')
     distLib(project(':rest:rest-server')) {
         exclude group: 'javassist', module: 'javassist' // to avoid duplicate (artifact named differently)
@@ -661,7 +630,7 @@ artifacts {
 // credentials are generated during release process
 def createGenerateCredentialTask(String name, List<String> cliArgs) {
     project.tasks.create(name: ('generateCredentials' + name), type: JavaExec) {
-        classpath = project(':common-cli').sourceSets.main.runtimeClasspath
+        classpath = project(':common-client').sourceSets.main.runtimeClasspath
         main = 'org.ow2.proactive.authentication.crypto.CreateCredentials'
         args = cliArgs
     }

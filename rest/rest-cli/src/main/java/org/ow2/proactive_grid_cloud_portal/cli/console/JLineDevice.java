@@ -52,8 +52,6 @@ import jline.console.completer.ArgumentCompleter;
 import jline.console.completer.FileNameCompleter;
 import jline.console.history.FileHistory;
 
-import org.ow2.proactive.utils.console.jline1.ClassNameCompletor;
-import org.ow2.proactive.utils.console.jline1.SimpleCompletor;
 import org.ow2.proactive_grid_cloud_portal.cli.CommandSet;
 
 

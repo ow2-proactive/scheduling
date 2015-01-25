@@ -5,9 +5,7 @@
  * BSD license in the documentation provided with this software.
  */
 
-package org.ow2.proactive.utils.console.jline1;
-
-import org.ow2.proactive.utils.console.jline1.SimpleCompletor;
+package org.ow2.proactive_grid_cloud_portal.cli.console;
 
 import java.io.*;
 import java.net.*;

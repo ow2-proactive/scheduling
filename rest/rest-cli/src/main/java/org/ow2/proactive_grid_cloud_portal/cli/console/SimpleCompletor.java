@@ -5,7 +5,7 @@
  * BSD license in the documentation provided with this software.
  */
 
-package org.ow2.proactive.utils.console.jline1;
+package org.ow2.proactive_grid_cloud_portal.cli.console;
 
 import jline.console.completer.Completer;
 

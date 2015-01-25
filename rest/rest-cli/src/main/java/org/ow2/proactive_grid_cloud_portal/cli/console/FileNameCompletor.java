@@ -7,7 +7,7 @@
  * http://www.opensource.org/licenses/bsd-license.php
  */
 
-package org.ow2.proactive.utils.console.jline1;
+package org.ow2.proactive_grid_cloud_portal.cli.console;
 
 import java.io.*;
 import java.util.*;

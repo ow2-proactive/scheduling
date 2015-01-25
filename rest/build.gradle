@@ -166,8 +166,9 @@ project(':rest:rest-cli') {
         compile 'org.apache.httpcomponents:httpmime:4.2.1'
 
         compile project(":common-api")
-        compile project(":common-cli")
         compile project(':rest:rest-api')
+
+        testCompile 'org.eclipse.jetty:jetty-server:8.1.15.v20140411'
     }
 
 }
