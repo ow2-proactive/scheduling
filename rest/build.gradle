@@ -39,8 +39,6 @@ project(':rest:rest-api') {
 }
 
 project(':rest:rest-server') {
-    apply plugin: 'war'
-    apply plugin: 'jetty'
 
     configurations {
         jaxDoclet
@@ -92,7 +90,7 @@ project(':rest:rest-server') {
     task jaxbDoc(type: Javadoc) {
         enabled = System.getProperty("java.specification.version") != "1.8"
         source([project, project(':rest:rest-api')].collect { project -> project.sourceSets.main.allJava })
-        destinationDir = file("$webAppDirName/doc/jaxbdocs")
+        destinationDir = file("src/main/webapp/doc/jaxbdocs")
         options.docletpath = configurations.jaxDoclet.files.asType(List) + configurations.compile.files.asType(List)
         options.classpath = options.docletpath
         options.doclet = "com.lunatech.doclets.jax.jaxb.JAXBDoclet"
@@ -103,24 +101,13 @@ project(':rest:rest-server') {
     task jaxrsDoc(type: Javadoc, dependsOn: jaxbDoc) {
         enabled = System.getProperty("java.specification.version") != "1.8"
         source([project, project(':rest:rest-api')].collect { project -> project.sourceSets.main.allJava })
-        destinationDir = file("$webAppDirName/doc/jaxrsdocs")
+        destinationDir = file("src/main/webapp/doc/jaxrsdocs")
         options.links << '../jaxbdocs/'
         options.footer = 'Copyright 1997-2014 ActiveEon/INRIA/University of Nice-Sophia Antipolis'
         options.header = file('doc_header.html').text.replaceAll("[\r\n]+", " ")
         options.docletpath = configurations.jaxDoclet.files.asType(List) + configurations.compile.files.asType(List)
         options.classpath = options.docletpath
         options.doclet = "com.lunatech.doclets.jax.jaxrs.JAXRSDoclet"
-    }
-    war.dependsOn jaxrsDoc, stub
-
-    war {
-        def schedulerNodeJar = project(":scheduler:scheduler-node").standaloneJar
-        from schedulerNodeJar
-        rename(schedulerNodeJar.outputs.files.singleFile.name, 'node.jar')
-
-        filesMatching('**/*.html') {
-            it.filter(org.apache.tools.ant.filters.ReplaceTokens, tokens: ['rest_api.version': project.version])
-        }
     }
 
     test {
@@ -132,8 +119,8 @@ project(':rest:rest-server') {
     functionalTest.dependsOn rootProject.dist
     clean.dependsOn rootProject.cleanDist
 
-    task proActiveWar(type: Sync, dependsOn: war) {
-        from "$webAppDirName"
+    task proActiveWar(type: Sync, dependsOn: [ classes, jaxrsDoc, stub ]) {
+        from "src/main/webapp"
 
         def schedulerNodeJar = project(":scheduler:scheduler-node").standaloneJar
         from schedulerNodeJar
