@@ -85,7 +85,6 @@ configure(javaSubprojects) {
     format {
         configurationFile = file("$rootDir/eclipse_formatter_config.xml")
     }
-    build.dependsOn format
 
     jar {
         manifest {
