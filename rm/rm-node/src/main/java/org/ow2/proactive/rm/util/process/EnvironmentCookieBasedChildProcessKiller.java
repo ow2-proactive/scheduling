@@ -1,9 +1,9 @@
 package org.ow2.proactive.rm.util.process;
 
+import org.apache.log4j.Logger;
+
 import java.util.Collections;
 import java.util.Map;
-
-import org.apache.log4j.Logger;
 
 
 /**
@@ -25,7 +25,7 @@ public class EnvironmentCookieBasedChildProcessKiller {
     }
 
     public void killChildProcesses() {
-        logger.debug("Node terminating");
+        Environment.unsetenv(cookieName); // do not kill current JVM
         Map<String, String> environmentMap = Collections.singletonMap(cookieName, cookieValue);
         logger.debug("Killing all processes with environment: " + environmentMap);
         try {
