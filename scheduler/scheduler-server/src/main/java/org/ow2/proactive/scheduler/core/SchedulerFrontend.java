@@ -270,7 +270,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
 
             // run !!
         } catch (Exception e) {
-            logger.error("", e);
+            logger.error("Failed to start Scheduler", e);
             e.printStackTrace();
             System.exit(1);
         }

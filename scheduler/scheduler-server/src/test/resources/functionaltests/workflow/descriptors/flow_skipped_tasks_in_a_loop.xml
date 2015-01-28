@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="urn:proactive:jobdescriptor:3.2"
+        xsi:schemaLocation="urn:proactive:jobdescriptor:3.2 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.2/schedulerjob.xsd"
+        name="MoreComplex"
+        priority="normal"
+        cancelJobOnError="false">
+    <taskFlow>
+        <task name="Start">
+            <scriptExecutable>
+                <script>
+                    <code language="javascript">
+                        <![CDATA[
+print('Loop block start ' + java.lang.System.getProperty('pas.task.iteration'))
+]]>
+                    </code>
+                </script>
+            </scriptExecutable>
+            <controlFlow block="start"></controlFlow>
+        </task>
+        <task name="check">
+            <depends>
+                <task ref="Start"/>
+            </depends>
+            <scriptExecutable>
+                <script>
+                    <code language="javascript">
+                        <![CDATA[
+print('dooda')
+]]>
+                    </code>
+                </script>
+            </scriptExecutable>
+            <controlFlow >
+                <if target="first"
+                    else="NothingToDo"
+                    continuation="Loop">
+                    <script>
+                        <code language="groovy">
+                            <![CDATA[
+branch = "else"
+]]>
+                        </code>
+                    </script>
+                </if>
+            </controlFlow>
+        </task>
+        <task name="NothingToDo">
+            <scriptExecutable>
+                <script>
+                    <code language="javascript">
+                        <![CDATA[
+print('Nothing to do')
+]]>
+                    </code>
+                </script>
+            </scriptExecutable>
+        </task>
+        <task name="first">
+            <scriptExecutable>
+                <script>
+                    <code language="javascript">
+                        <![CDATA[
+print('Running Task')
+]]>
+                    </code>
+                </script>
+            </scriptExecutable>
+            <controlFlow block="start"></controlFlow>
+        </task>
+        <task name="second">
+            <depends>
+                <task ref="first"/>
+            </depends>
+            <scriptExecutable>
+                <script>
+                    <code language="javascript">
+                        <![CDATA[
+print('Running Task')
+]]>
+                    </code>
+                </script>
+            </scriptExecutable>
+            <controlFlow block="end"></controlFlow>
+        </task>
+        <task name="Loop">
+            <scriptExecutable>
+                <script>
+                    <code language="groovy">
+                        <![CDATA[
+
+while(!new File(System.getProperty("java.io.tmpdir"), "skipped_tasks_in_a_loop.lock").exists()){
+ Thread.sleep(100)
+ }
+]]>
+                    </code>
+                </script>
+            </scriptExecutable>
+            <controlFlow  block="end">
+                <loop target="Start">
+                    <script>
+                        <code language="javascript">
+                            <![CDATA[
+if($IT < 2) {
+									loop = true;
+								} else {
+									loop = false;
+								}
+]]>
+                        </code>
+                    </script>
+                </loop>
+            </controlFlow>
+        </task>
+    </taskFlow>
+</job>

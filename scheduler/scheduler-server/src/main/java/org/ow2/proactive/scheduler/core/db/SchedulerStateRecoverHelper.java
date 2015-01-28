@@ -3,6 +3,7 @@ package org.ow2.proactive.scheduler.core.db;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
@@ -13,9 +14,15 @@ import org.ow2.proactive.scheduler.core.SchedulerStateImpl;
 import org.ow2.proactive.scheduler.job.ClientJobState;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
+import org.ow2.proactive.scheduler.util.JobLogger;
+import org.apache.log4j.Logger;
 
 
 public class SchedulerStateRecoverHelper {
+
+    private static final Logger logger = Logger.getLogger(SchedulerStateRecoverHelper.class);
+
+    private static final JobLogger jobLogger = JobLogger.getInstance();
 
     private final SchedulerDBManager dbManager;
 
@@ -101,29 +108,45 @@ public class SchedulerStateRecoverHelper {
             }
         }
 
-        for (InternalJob job : runningJobs) {
-            ArrayList<InternalTask> tasksList = copyAndSort(job.getITasks());
+        Vector<InternalJob> finishedJobs = new Vector<InternalJob>();
+          
+        for (Iterator<InternalJob> iterator = runningJobs.iterator(); iterator.hasNext(); ) {
+            InternalJob job = iterator.next();
+            try {
+                ArrayList<InternalTask> tasksList = copyAndSort(job.getITasks());
 
-            //simulate the running execution to recreate the tree.
-            for (InternalTask task : tasksList) {
-                job.recoverTask(task.getId());
-            }
-
-            if ((job.getStatus() == JobStatus.RUNNING) || (job.getStatus() == JobStatus.PAUSED)) {
-                //set the status to stalled because the scheduler start in stopped mode.
-                if (job.getStatus() == JobStatus.RUNNING) {
-                    job.setStatus(JobStatus.STALLED);
+                //simulate the running execution to recreate the tree.
+                for (InternalTask task : tasksList) {
+                    job.recoverTask(task.getId());
                 }
 
-                //set the task to pause inside the job if it is paused.
-                if (job.getStatus() == JobStatus.PAUSED) {
-                    job.setStatus(JobStatus.STALLED);
-                    job.setPaused();
-                }
+                if ((job.getStatus() == JobStatus.RUNNING) || (job.getStatus() == JobStatus.PAUSED)) {
+                    //set the status to stalled because the scheduler start in stopped mode.
+                    if (job.getStatus() == JobStatus.RUNNING) {
+                        job.setStatus(JobStatus.STALLED);
+                    }
 
-                //update the count of pending and running task.
-                job.setNumberOfPendingTasks(job.getNumberOfPendingTasks() + job.getNumberOfRunningTasks());
-                job.setNumberOfRunningTasks(0);
+                    //set the task to pause inside the job if it is paused.
+                    if (job.getStatus() == JobStatus.PAUSED) {
+                        job.setStatus(JobStatus.STALLED);
+                        job.setPaused();
+                    }
+
+                    //update the count of pending and running task.
+                    job.setNumberOfPendingTasks(
+                      job.getNumberOfPendingTasks() + job.getNumberOfRunningTasks());
+                    job.setNumberOfRunningTasks(0);
+                }
+            } catch (Exception e) {
+                logger.error("Failed to recover job " + job.getId() + " " + job.getName() +
+                    " job might be in a inconsistent state", e);
+                jobLogger
+                        .error(job.getId(), "Failed to recover job, job might be in a inconsistent state", e);
+                // partially cancel job (not tasks) and move it to finished jobs to avoid running it
+                iterator.remove();
+                job.setStatus(JobStatus.CANCELED);
+                finishedJobs.add(job);
+                dbManager.updateJobAndTasksState(job);
             }
         }
 
@@ -135,8 +158,7 @@ public class SchedulerStateRecoverHelper {
             }
         }
 
-        Vector<InternalJob> finishedJobs = new Vector<InternalJob>(dbManager.loadFinishedJobs(false,
-                loadJobPeriod));
+        finishedJobs.addAll(dbManager.loadFinishedJobs(false, loadJobPeriod));
 
         return new RecoveredSchedulerState(pendingJobs, runningJobs, finishedJobs);
     }
@@ -177,12 +199,12 @@ public class SchedulerStateRecoverHelper {
         }
         //sort the finished task according to their finish time.
         //to be sure to be in the right tree browsing.
-        Collections.sort(tasksList, new FinishTimeComparator());
+        Collections.sort(tasksList, new ExecutionOrderComparator());
 
         return tasksList;
     }
 
-    private static class FinishTimeComparator implements Comparator<InternalTask> {
+    private static class ExecutionOrderComparator implements Comparator<InternalTask> {
         /**
          * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
          * @param o1 First InternalTask to be compared.
@@ -192,6 +214,13 @@ public class SchedulerStateRecoverHelper {
          *	       second. 
          */
         public int compare(InternalTask o1, InternalTask o2) {
+            if (o1.getFinishedTime() == o2.getFinishedTime()) { // skipped tasks might have same finished time
+                if (o1.dependsOn(o2)) {
+                    return 1;
+                } else {
+                    return -1;
+                }
+            }
             return (int) (o1.getFinishedTime() - o2.getFinishedTime());
         }
     }
