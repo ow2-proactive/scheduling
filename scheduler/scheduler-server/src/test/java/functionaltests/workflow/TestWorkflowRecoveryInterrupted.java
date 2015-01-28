@@ -48,10 +48,14 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.tests.FunctionalTest;
+import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
 import functionaltests.SchedulerTHelper;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 
 /**
@@ -83,6 +87,30 @@ public class TestWorkflowRecoveryInterrupted extends FunctionalTest {
         job2();
         job3();
         ifInALoop();
+        skippedTasksInALoop();
+    }
+
+    private void skippedTasksInALoop() throws Exception {
+        File lockFile = new File(System.getProperty("java.io.tmpdir"), "skipped_tasks_in_a_loop.lock");
+        lockFile.deleteOnExit();
+        FileUtils.deleteQuietly(lockFile);
+
+        JobId jobId = SchedulerTHelper.submitJob(new File(TestWorkflowRecoveryInterrupted.class.getResource(
+          "/functionaltests/workflow/descriptors/flow_skipped_tasks_in_a_loop.xml").toURI()).getAbsolutePath());
+
+        SchedulerTHelper.waitForEventTaskFinished(jobId, "NothingToDo");
+
+        SchedulerTHelper.log("Crashing scheduler before the job can finish");
+        SchedulerTHelper.killSchedulerAndNodesAndRestart(new File(SchedulerTHelper.class.getResource(
+          "config/functionalTSchedulerProperties-updateDB.ini").toURI()).getAbsolutePath());
+        SchedulerTHelper.getSchedulerInterface();
+
+        FileUtils.touch(lockFile);
+
+        SchedulerTHelper.log("Job should run successfully after restart");
+        SchedulerTHelper.waitForEventJobFinished(jobId);
+        JobResult res = SchedulerTHelper.getJobResult(jobId);
+        assertFalse(res.hadException());
     }
 
     // SCHEDULING-2224 If in a Loop workflow does not complete if Scheduler is restarted
@@ -174,8 +202,8 @@ public class TestWorkflowRecoveryInterrupted extends FunctionalTest {
             Assert
               .assertNotNull(path + ": Not expecting result for task '" + result.getKey() + "'",
                 expected);
-            Assert.assertTrue(path + ": Result for task '" + result.getKey() + "' is not an Long", result
-              .getValue().value() instanceof Long);
+            assertTrue(path + ": Result for task '" + result.getKey() + "' is not an Long",
+              result.getValue().value() instanceof Long);
             Assert.assertEquals(path + ": Invalid result for task '" + result.getKey() + "'", expected,
               result.getValue().value());
 
@@ -212,8 +240,8 @@ public class TestWorkflowRecoveryInterrupted extends FunctionalTest {
             Assert
                     .assertNotNull(path + ": Not expecting result for task '" + result.getKey() + "'",
                       expected);
-            Assert.assertTrue(path + ": Result for task '" + result.getKey() + "' is not an Long", result
-                    .getValue().value() instanceof Long);
+            assertTrue(path + ": Result for task '" + result.getKey() + "' is not an Long",
+              result.getValue().value() instanceof Long);
             Assert.assertEquals(path + ": Invalid result for task '" + result.getKey() + "'", expected,
               result.getValue().value());
 
