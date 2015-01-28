@@ -49,6 +49,7 @@ import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.tests.FunctionalTest;
 import org.junit.Assert;
+import org.junit.Test;
 
 import functionaltests.SchedulerTHelper;
 
@@ -76,89 +77,42 @@ public class TestWorkflowRecoveryInterrupted extends FunctionalTest {
             "T1#2*1 33 (T#2)", "T2#2*1 34 (T1#2*1)", "T1#2*2 33 (T#2)", "T2#2*2 34 (T1#2*2)",
             "T3#2 103 (T2#2 T2#2*1 T2#2*2)" };
 
-    @org.junit.Test
+    @Test
     public void run() throws Throwable {
+        job1();
+        job2();
+        job3();
+        ifInALoop();
+    }
 
-        /*** job 1 **/
-        String path = new File(TestWorkflowRecoveryInterrupted.class.getResource(job_prefix + "1.xml")
-                .toURI()).getAbsolutePath();
-        JobId id = SchedulerTHelper.submitJob(path);
-        SchedulerTHelper.log("Submitted job " + path);
-        SchedulerTHelper.waitForEventTaskFinished(id, "T1#1");
+    // SCHEDULING-2224 If in a Loop workflow does not complete if Scheduler is restarted
+    private void ifInALoop() throws Exception {
+        JobId jobId = SchedulerTHelper.submitJob(new File(TestWorkflowRecoveryInterrupted.class.getResource(
+                "/functionaltests/workflow/descriptors/flow_if_in_a_loop.xml").toURI()).getAbsolutePath());
 
-        SchedulerTHelper.log("Task T1#1 finished, crashing scheduler...");
+        SchedulerTHelper.log("Crashing scheduler before the job can start");
         SchedulerTHelper.killSchedulerAndNodesAndRestart(new File(SchedulerTHelper.class.getResource(
-                "config/functionalTSchedulerProperties-updateDB.ini").toURI()).getAbsolutePath());
+          "config/functionalTSchedulerProperties-updateDB.ini").toURI()).getAbsolutePath());
         SchedulerTHelper.getSchedulerInterface();
 
-        SchedulerTHelper.getSchedulerInterface().getJobState(id);
+        SchedulerTHelper.log("Job should run successfully after restart");
+        SchedulerTHelper.waitForEventJobFinished(jobId);
+    }
 
-        SchedulerTHelper.waitForEventJobFinished(id);
-        SchedulerTHelper.log("Job finished: " + id);
-
-        Map<String, Long> expectedResults = new HashMap<String, Long>();
-        for (int j = 0; j < job_1.length; j++) {
-            String[] val = job_1[j].split(" ");
-            expectedResults.put(val[0], Long.parseLong(val[1]));
-        }
-        JobResult results = SchedulerTHelper.getJobResult(id);
-        for (Entry<String, TaskResult> result : results.getAllResults().entrySet()) {
-            Long expected = expectedResults.get(result.getKey());
-            Assert
-                    .assertNotNull(path + ": Not expecting result for task '" + result.getKey() + "'",
-                            expected);
-            Assert.assertTrue(path + ": Result for task '" + result.getKey() + "' is not an Long", result
-                    .getValue().value() instanceof Long);
-            Assert.assertEquals(path + ": Invalid result for task '" + result.getKey() + "'", expected,
-                    (Long) result.getValue().value());
-
-        }
-        SchedulerTHelper.log("Job " + path + " checked");
-
-        /*** job 2 **/
-        path = new File(TestWorkflowRecoveryInterrupted.class.getResource(job_prefix + "2.xml").toURI())
-                .getAbsolutePath();
-        id = SchedulerTHelper.submitJob(path);
-        SchedulerTHelper.log("Submitted job " + path);
-        SchedulerTHelper.waitForEventTaskFinished(id, "T1#1");
-
-        SchedulerTHelper.log("Task T1#1 finished, crashing scheduler...");
-        SchedulerTHelper.killSchedulerAndNodesAndRestart(new File(SchedulerTHelper.class.getResource(
-                "config/functionalTSchedulerProperties-updateDB.ini").toURI()).getAbsolutePath());
-        SchedulerTHelper.getSchedulerInterface();
-
-        SchedulerTHelper.waitForEventJobFinished(id);
-        SchedulerTHelper.log("Job finished: " + path);
-
-        expectedResults = new HashMap<String, Long>();
-        for (int j = 0; j < job_2.length; j++) {
-            String[] val = job_2[j].split(" ");
-            expectedResults.put(val[0], Long.parseLong(val[1]));
-        }
-        results = SchedulerTHelper.getJobResult(id);
-        for (Entry<String, TaskResult> result : results.getAllResults().entrySet()) {
-            Long expected = expectedResults.get(result.getKey());
-            Assert
-                    .assertNotNull(path + ": Not expecting result for task '" + result.getKey() + "'",
-                            expected);
-            Assert.assertTrue(path + ": Result for task '" + result.getKey() + "' is not an Long", result
-                    .getValue().value() instanceof Long);
-            Assert.assertEquals(path + ": Invalid result for task '" + result.getKey() + "'", expected,
-                    (Long) result.getValue().value());
-
-        }
-        SchedulerTHelper.log("Job " + path + " checked");
+    private void job3() throws Exception {
+        String path;
+        JobId id;
 
         /*** job 3 : branching */
         path = new File(TestWorkflowRecoveryInterrupted.class.getResource(job_prefix + "3.xml").toURI())
-                .getAbsolutePath();
+          .getAbsolutePath();
         id = SchedulerTHelper.submitJob(path);
         SchedulerTHelper.log("Submitted job " + path);
         SchedulerTHelper.waitForEventTaskFinished(id, "A");
 
         SchedulerTHelper.log("Task A finished, crashing scheduler...");
         SchedulerTHelper.killSchedulerAndNodesAndRestart(new File(SchedulerTHelper.class.getResource(
-                "config/functionalTSchedulerProperties-updateDB.ini").toURI()).getAbsolutePath());
+          "config/functionalTSchedulerProperties-updateDB.ini").toURI()).getAbsolutePath());
         SchedulerTHelper.getSchedulerInterface();
 
         SchedulerTHelper.getSchedulerInterface().getJobState(id);
@@ -185,6 +139,85 @@ public class TestWorkflowRecoveryInterrupted extends FunctionalTest {
             }
         }
 
+        SchedulerTHelper.log("Job " + path + " checked");
+    }
+
+    private void job2() throws Throwable {
+        String path;
+        JobId id;
+        Map<String, Long> expectedResults;
+        JobResult results;
+
+        /*** job 2 **/
+        path = new File(TestWorkflowRecoveryInterrupted.class.getResource(job_prefix + "2.xml").toURI())
+          .getAbsolutePath();
+        id = SchedulerTHelper.submitJob(path);
+        SchedulerTHelper.log("Submitted job " + path);
+        SchedulerTHelper.waitForEventTaskFinished(id, "T1#1");
+
+        SchedulerTHelper.log("Task T1#1 finished, crashing scheduler...");
+        SchedulerTHelper.killSchedulerAndNodesAndRestart(new File(SchedulerTHelper.class.getResource(
+          "config/functionalTSchedulerProperties-updateDB.ini").toURI()).getAbsolutePath());
+        SchedulerTHelper.getSchedulerInterface();
+
+        SchedulerTHelper.waitForEventJobFinished(id);
+        SchedulerTHelper.log("Job finished: " + path);
+
+        expectedResults = new HashMap<String, Long>();
+        for (String aJob_2 : job_2) {
+            String[] val = aJob_2.split(" ");
+            expectedResults.put(val[0], Long.parseLong(val[1]));
+        }
+        results = SchedulerTHelper.getJobResult(id);
+        for (Entry<String, TaskResult> result : results.getAllResults().entrySet()) {
+            Long expected = expectedResults.get(result.getKey());
+            Assert
+              .assertNotNull(path + ": Not expecting result for task '" + result.getKey() + "'",
+                expected);
+            Assert.assertTrue(path + ": Result for task '" + result.getKey() + "' is not an Long", result
+              .getValue().value() instanceof Long);
+            Assert.assertEquals(path + ": Invalid result for task '" + result.getKey() + "'", expected,
+              result.getValue().value());
+
+        }
+        SchedulerTHelper.log("Job " + path + " checked");
+    }
+
+    private void job1() throws Throwable {
+        /*** job 1 **/
+        String path = new File(TestWorkflowRecoveryInterrupted.class.getResource(job_prefix + "1.xml")
+                .toURI()).getAbsolutePath();
+        JobId id = SchedulerTHelper.submitJob(path);
+        SchedulerTHelper.log("Submitted job " + path);
+        SchedulerTHelper.waitForEventTaskFinished(id, "T1#1");
+
+        SchedulerTHelper.log("Task T1#1 finished, crashing scheduler...");
+        SchedulerTHelper.killSchedulerAndNodesAndRestart(new File(SchedulerTHelper.class.getResource(
+                "config/functionalTSchedulerProperties-updateDB.ini").toURI()).getAbsolutePath());
+        SchedulerTHelper.getSchedulerInterface();
+
+        SchedulerTHelper.getSchedulerInterface().getJobState(id);
+
+        SchedulerTHelper.waitForEventJobFinished(id);
+        SchedulerTHelper.log("Job finished: " + id);
+
+        Map<String, Long> expectedResults = new HashMap<String, Long>();
+        for (String aJob_1 : job_1) {
+            String[] val = aJob_1.split(" ");
+            expectedResults.put(val[0], Long.parseLong(val[1]));
+        }
+        JobResult results = SchedulerTHelper.getJobResult(id);
+        for (Entry<String, TaskResult> result : results.getAllResults().entrySet()) {
+            Long expected = expectedResults.get(result.getKey());
+            Assert
+                    .assertNotNull(path + ": Not expecting result for task '" + result.getKey() + "'",
+                      expected);
+            Assert.assertTrue(path + ": Result for task '" + result.getKey() + "' is not an Long", result
+                    .getValue().value() instanceof Long);
+            Assert.assertEquals(path + ": Invalid result for task '" + result.getKey() + "'", expected,
+              result.getValue().value());
+
+        }
         SchedulerTHelper.log("Job " + path + " checked");
     }
 }

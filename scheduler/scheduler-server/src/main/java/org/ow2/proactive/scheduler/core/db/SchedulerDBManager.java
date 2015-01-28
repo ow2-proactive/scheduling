@@ -1498,10 +1498,10 @@ public class SchedulerDBManager {
             } else {
                 taskRuntimeData.setIfBranch(null);
             }
-            if (task.getJoinedBranches() != null && task.getJoinedBranches().isEmpty()) {
+            if (task.getJoinedBranches() != null && !task.getJoinedBranches().isEmpty()) {
                 List<DBTaskId> joinedBranches = new ArrayList<DBTaskId>(task.getJoinedBranches().size());
-                for (InternalTask joinedBrach : task.getJoinedBranches()) {
-                    joinedBranches.add(taskId(joinedBrach));
+                for (InternalTask joinedBranch : task.getJoinedBranches()) {
+                    joinedBranches.add(taskId(joinedBranch));
                 }
                 taskRuntimeData.setJoinedBranches(joinedBranches);
             } else {

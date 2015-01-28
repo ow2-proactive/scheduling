@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="urn:proactive:jobdescriptor:3.2"
+        xsi:schemaLocation="urn:proactive:jobdescriptor:3.2 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.2/schedulerjob.xsd"
+        name="Untitled Job"
+        priority="normal"
+        cancelJobOnError="false">
+    <description>
+
+    </description>
+    <taskFlow>
+        <task name="Start">
+            <scriptExecutable>
+                <script>
+                    <code language="javascript">
+                        <![CDATA[
+print('Loop block start ' + java.lang.System.getProperty('pas.task.iteration'))
+]]>
+                    </code>
+                </script>
+            </scriptExecutable>
+            <controlFlow block="start"></controlFlow>
+        </task>
+        <task name="IfOrElse">
+            <depends>
+                <task ref="Start"/>
+            </depends>
+            <scriptExecutable>
+                <script>
+                    <code language="groovy">
+                        <![CDATA[
+result = "true"
+]]>
+                    </code>
+                </script>
+            </scriptExecutable>
+            <controlFlow>
+                <if target="TaskToRunIf"
+                    else="NothingToDo"
+                    continuation="Loop">
+                    <script>
+                        <code language="javascript">
+                            <![CDATA[
+if("true".equals(result)){
+    branch = "if";
+} else {
+    branch = "else";
+}
+]]>
+                        </code>
+                    </script>
+                </if>
+            </controlFlow>
+        </task>
+        <task name="NothingToDo">
+            <scriptExecutable>
+                <script>
+                    <code language="javascript">
+                        <![CDATA[
+print('Nothing to do')
+]]>
+                    </code>
+                </script>
+            </scriptExecutable>
+        </task>
+        <task name="TaskToRunIf">
+            <scriptExecutable>
+                <script>
+                    <code language="javascript">
+                        <![CDATA[
+print('Running CRS')
+]]>
+                    </code>
+                </script>
+            </scriptExecutable>
+        </task>
+        <task name="Loop">
+            <scriptExecutable>
+                <script>
+                    <code language="javascript">
+                        <![CDATA[
+print('Loop block end ' + java.lang.System.getProperty('pas.task.iteration'))
+]]>
+                    </code>
+                </script>
+            </scriptExecutable>
+            <controlFlow block="end">
+                <loop target="Start">
+                    <script>
+                        <code language="javascript">
+                            <![CDATA[
+if($IT < 2) {
+						loop = true;
+					} else {
+						loop = false;
+					}
+]]>
+                        </code>
+                    </script>
+                </loop>
+            </controlFlow>
+        </task>
+    </taskFlow>
+</job>
