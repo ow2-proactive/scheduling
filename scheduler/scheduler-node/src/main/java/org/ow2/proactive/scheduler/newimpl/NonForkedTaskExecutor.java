@@ -42,6 +42,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
 import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
@@ -55,6 +56,7 @@ import org.ow2.proactive.scripting.ScriptHandler;
 import org.ow2.proactive.scripting.ScriptLoader;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.TaskScript;
+import org.ow2.proactive.utils.ClasspathUtils;
 
 
 public class NonForkedTaskExecutor implements TaskExecutor {
@@ -82,6 +84,10 @@ public class NonForkedTaskExecutor implements TaskExecutor {
 
         // variables from current job/task context
         variables.putAll(contextVariables(container.getInitializer()));
+
+        for (String v : new String[]{"proactive.home", "pa.scheduler.home", "pa.rm.home"}) {
+            variables.put(v, ClasspathUtils.findSchedulerHome());
+        }
 
         Map<String, String> thirdPartyCredentials = new HashMap<String, String>();
         try {

@@ -128,7 +128,7 @@ public class TaskLauncher {
             }
 
             TaskResultImpl taskResult = factory.createTaskExecutor(dataspaces.getScratchFolder(), decrypter)
-                    .execute(context, taskLogger.getOutputSink(), taskLogger.getErrorSink()); // TOO decrypter
+                    .execute(context, taskLogger.getOutputSink(), taskLogger.getErrorSink()); // TODO decrypter
 
             if (wallTimer.hasWallTimed()) {
                 taskLogger.getErrorSink().println(

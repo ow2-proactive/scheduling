@@ -48,6 +48,7 @@ import org.objectweb.proactive.extensions.dataspaces.vfs.VFSFactory;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
@@ -169,6 +170,7 @@ public class TestGlobalSpace extends FunctionalTest {
             A.addOutputFiles(file[0] + ".glob.A", OutputAccessMode.TransferToGlobalSpace);
         }
         A.setPreScript(new SimpleScript(scriptA, "groovy"));
+        A.setForkEnvironment(new ForkEnvironment());
         job.addTask(A);
 
         JavaTask B = new JavaTask();
@@ -180,6 +182,7 @@ public class TestGlobalSpace extends FunctionalTest {
             B.addOutputFiles(file[0] + ".out", OutputAccessMode.TransferToOutputSpace);
         }
         B.setPreScript(new SimpleScript(scriptB, "groovy"));
+        B.setForkEnvironment(new ForkEnvironment());
         job.addTask(B);
 
         Scheduler sched = SchedulerTHelper.getSchedulerInterface();

@@ -69,9 +69,9 @@ public class JavaScriptEngine extends AbstractScriptEngine {
             AbstractJavaExecutable javaExecutable = getExecutable(userExecutableClassName);
 
             JavaExecutableInitializerImpl execInitializer = new JavaExecutableInitializerImpl();
-            PrintStream output = new PrintStream(new WriterOutputStream(context.getWriter()));
+            PrintStream output = new PrintStream(new WriterOutputStream(context.getWriter()), true);
             execInitializer.setOutputSink(output);
-            PrintStream error = new PrintStream(new WriterOutputStream(context.getErrorWriter()));
+            PrintStream error = new PrintStream(new WriterOutputStream(context.getErrorWriter()), true);
             execInitializer.setErrorSink(error);
 
             if (context.getAttribute(TaskLauncherBak.VARIABLES_BINDING_NAME) != null) {

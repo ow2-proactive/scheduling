@@ -38,6 +38,7 @@ package org.ow2.proactive.scheduler.task.utils;
 
 import java.security.KeyException;
 
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.extensions.processbuilder.OSUser;
 import org.objectweb.proactive.extensions.processbuilder.PAOSProcessBuilderFactory;
 import org.ow2.proactive.authentication.crypto.CredData;
@@ -104,7 +105,11 @@ public final class ForkerUtils {
      */
     public static PAOSProcessBuilderFactory getOSProcessBuilderFactory(String nativeScriptPath) {
         if (OSBuilderFactory == null) {
-            OSBuilderFactory = new PAOSProcessBuilderFactory(nativeScriptPath);
+            try {
+                OSBuilderFactory = new PAOSProcessBuilderFactory(nativeScriptPath);
+            } catch (ProActiveException e) {
+                e.printStackTrace();
+            }
         }
         return OSBuilderFactory;
     }

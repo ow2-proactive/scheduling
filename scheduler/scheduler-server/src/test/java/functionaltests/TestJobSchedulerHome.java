@@ -150,9 +150,10 @@ public class TestJobSchedulerHome extends FunctionalTest {
         task1.setName(tname);
 
         if (OperatingSystem.getOperatingSystem() == OperatingSystem.windows) {
-            task1.setCommandLine("cmd.exe", "/c", "echo %PROACTIVE_HOME%");
+            task1.setCommandLine("cmd.exe", "/c", "echo %variables_proactive.home%");
         } else {
-            task1.setCommandLine("bash", "-c", "echo $PROACTIVE_HOME");
+            //task1.setCommandLine("bash", "-c", "echo ${variables_proactive.home}");
+            task1.setCommandLine("env");
         }
 
         job.addTask(task1);

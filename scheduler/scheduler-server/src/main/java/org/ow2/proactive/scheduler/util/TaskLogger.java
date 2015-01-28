@@ -41,6 +41,8 @@ import org.ow2.proactive.utils.appenders.FileAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.MDC;
 
+import java.util.regex.Pattern;
+
 
 public class TaskLogger {
 
