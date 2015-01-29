@@ -179,7 +179,7 @@ public class RMNodeStarter {
     protected final static String NB_OF_ADD_NODE_ATTEMPTS_PROP_NAME = "proactive.node.add.attempts";
 
     /** The number of attempts to reconnect the node to the RM before quitting */
-    protected static int NB_OF_RECONNECTION_ATTEMPTS = 2 * 60 * 24; // to make it 24 hours by default
+    protected static int NB_OF_RECONNECTION_ATTEMPTS = 2 * 5; // 5 minutes by default
 
     /** Name of the java property to set the number of attempts performed to add a node to the resource manager */
     protected final static String NB_OF_RECONNECTION_ATTEMPTS_PROP_NAME = "proactive.node.reconnection.attempts";
@@ -794,6 +794,7 @@ public class RMNodeStarter {
             logger.debug("Using default value for the number of reconnection attempts: " +
                 RMNodeStarter.NB_OF_RECONNECTION_ATTEMPTS);
         }
+        numberOfReconnectionAttemptsLeft = RMNodeStarter.NB_OF_RECONNECTION_ATTEMPTS;
 
         //the delay between two add node attempts
         if (!ADD_NODE_ATTEMPTS_DELAY_IN_MS_USER_SUPPLIED) {
