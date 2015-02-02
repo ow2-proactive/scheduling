@@ -130,6 +130,35 @@ public class SchedulerStateRestJobLogsTest {
         assertEquals("logs", IOUtils.toString(fullLogs));
     }
 
+    @Test
+    public void job_full_logs_sorted() throws Exception {
+        InternalTaskFlowJob jobState = new InternalTaskFlowJob();
+        addTask(jobState, 1, 10);
+        addTask(jobState, 10, 2);
+        addTask(jobState, 3, 3);
+
+        File logFile = tempFolder.newFile("TaskLogs-123-10.log");
+        FileUtils.write(logFile, "10");
+        logFile = tempFolder.newFile("TaskLogs-123-2.log");
+        FileUtils.write(logFile, "2");
+        logFile = tempFolder.newFile("TaskLogs-123-3.log");
+        FileUtils.write(logFile, "3");
+
+        when(mockScheduler.getJobState("123")).thenReturn(jobState);
+        when(mockScheduler.getUserSpaceURIs()).thenReturn(Collections.singletonList(logFile.getParent()));
+
+        InputStream fullLogs = restScheduler.jobFullLogs(validSessionId, "123", validSessionId);
+
+        assertEquals("1032", IOUtils.toString(fullLogs));
+    }
+
+    private static void addTask(InternalTaskFlowJob jobState, long finishedTime, long id) {
+        InternalNativeTask task = new InternalNativeTask();
+        task.setFinishedTime(finishedTime);
+        jobState.addTask(task);
+        task.setId(TaskIdImpl.createTaskId(new JobIdImpl(123, "job"), "task", id, false));
+    }
+
     private JobResultImpl createJobResult(String taskOutput, String taskErrput) {
         JobResultImpl jobResult = new JobResultImpl();
         jobResult.addTaskResult("OneTask", new TaskResultImpl(TaskIdImpl.createTaskId(JobIdImpl

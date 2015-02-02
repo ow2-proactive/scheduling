@@ -953,8 +953,10 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
             JobState jobState = s.getJobState(jobId);
 
-            Set<InputStream> streams = new HashSet<InputStream>();
-            for (TaskState ts : jobState.getTasks()) {
+            List<InputStream> streams = new ArrayList<InputStream>();
+            List<TaskState> tasks = jobState.getTasks();
+            Collections.sort(tasks, TaskState.COMPARE_BY_FINISHED_TIME_ASC);
+            for (TaskState ts : tasks) {
                 String fullTaskLogsFile = "TaskLogs-" + jobId + "-" + ts.getId() + ".log";
                 try {
                     InputStream logFileAsStream = pullFile(sessionId, SchedulerConstants.USERSPACE_NAME,
