@@ -1005,6 +1005,7 @@ public interface SchedulerRestInterface {
 
     @PUT
     @Path("jobs/{jobid}/tasks/{taskname}/restart")
+    @Produces("application/json")
     boolean restartTask(@HeaderParam("sessionid")
     String sessionId, @PathParam("jobid")
     String jobid, @PathParam("taskname")
@@ -1013,10 +1014,20 @@ public interface SchedulerRestInterface {
 
     @PUT
     @Path("jobs/{jobid}/tasks/{taskname}/preempt")
+    @Produces("application/json")
     boolean preemptTask(@HeaderParam("sessionid")
     String sessionId, @PathParam("jobid")
     String jobid, @PathParam("taskname")
     String taskname) throws NotConnectedRestException, UnknownJobRestException, UnknownTaskRestException,
+            PermissionRestException;
+
+    @PUT
+    @Path("jobs/{jobid}/tasks/{taskname}/kill")
+    @Produces("application/json")
+    public boolean killTask(@HeaderParam("sessionid")
+                            String sessionId, @PathParam("jobid")
+                            String jobid, @PathParam("taskname")
+                            String taskname) throws NotConnectedRestException, UnknownJobRestException, UnknownTaskRestException,
             PermissionRestException;
 
     /**

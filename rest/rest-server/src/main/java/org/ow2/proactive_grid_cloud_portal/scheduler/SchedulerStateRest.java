@@ -696,6 +696,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      */
     @PUT
     @Path("jobs/{jobid}/tasks/{taskname}/kill")
+    @Produces("application/json")
     public boolean killTask(@HeaderParam("sessionid")
     String sessionId, @PathParam("jobid")
     String jobid, @PathParam("taskname")
@@ -730,6 +731,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @Override
     @PUT
     @Path("jobs/{jobid}/tasks/{taskname}/preempt")
+    @Produces("application/json")
     public boolean preemptTask(@HeaderParam("sessionid")
     String sessionId, @PathParam("jobid")
     String jobid, @PathParam("taskname")
@@ -762,6 +764,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @Override
     @PUT
     @Path("jobs/{jobid}/tasks/{taskname}/restart")
+    @Produces("application/json")
     public boolean restartTask(@HeaderParam("sessionid")
     String sessionId, @PathParam("jobid")
     String jobid, @PathParam("taskname")
