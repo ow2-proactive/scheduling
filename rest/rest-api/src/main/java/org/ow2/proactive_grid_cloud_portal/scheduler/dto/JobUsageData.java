@@ -41,12 +41,30 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
 public class JobUsageData {
+    private String owner;
+    private String project;
     private String jobId;
     private String jobName;
     private long jobDuration;
     private List<TaskUsageData> taskUsages;
 
     public JobUsageData() {
+    }
+
+    public String getOwner() {
+        return owner;
+    }
+
+    public void setOwner(String owner) {
+        this.owner = owner;
+    }
+
+    public String getProject() {
+        return project;
+    }
+
+    public void setProject(String project) {
+        this.project = project;
     }
 
     public void setJobId(String jobId) {

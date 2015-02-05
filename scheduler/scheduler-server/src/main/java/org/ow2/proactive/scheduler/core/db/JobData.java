@@ -444,7 +444,7 @@ public class JobData {
 
     JobUsage toJobUsage() {
         JobIdImpl jobId = new JobIdImpl(getId(), getJobName());
-        JobUsage jobUsage = new JobUsage(jobId.value(), getJobName(), getFinishedTime() - getStartTime());
+        JobUsage jobUsage = new JobUsage(getOwner(), getProjectName(), jobId.value(), getJobName(), getFinishedTime() - getStartTime());
         for (TaskData taskData : getTasks()) {
             TaskUsage taskUsage = taskData.toTaskUsage(jobId);
             jobUsage.add(taskUsage);

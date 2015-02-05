@@ -52,13 +52,17 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @PublicAPI
 @XmlRootElement
 public class JobUsage implements Serializable {
+    private final String owner;
+    private final String project;
     private final String jobId;
     private final String jobName;
     private final long jobDuration;
 
     private List<TaskUsage> taskUsages = new ArrayList<TaskUsage>();
 
-    public JobUsage(String jobId, String jobName, long jobDuration) {
+    public JobUsage(String owner, String project, String jobId, String jobName, long jobDuration) {
+        this.owner = owner;
+        this.project = project;
         this.jobId = jobId;
         this.jobName = jobName;
         this.jobDuration = jobDuration;
@@ -74,6 +78,14 @@ public class JobUsage implements Serializable {
 
     public String getJobName() {
         return jobName;
+    }
+
+    public String getOwner() {
+        return owner;
+    }
+
+    public String getProject() {
+        return project;
     }
 
     public long getJobDuration() {

@@ -152,7 +152,7 @@ public class DataUtility {
     }
 
     public static JobUsage jobUsage(JobUsageData d) {
-        JobUsage impl = new JobUsage(d.getJobId(), d.getJobName(), d.getJobDuration());
+        JobUsage impl = new JobUsage(d.getOwner(), d.getProject(), d.getJobId(), d.getJobName(), d.getJobDuration());
         List<TaskUsageData> taskUsageDataList = d.getTaskUsages();
         for (TaskUsageData taskUsageData : taskUsageDataList) {
             impl.add(taskUsage(taskUsageData));
