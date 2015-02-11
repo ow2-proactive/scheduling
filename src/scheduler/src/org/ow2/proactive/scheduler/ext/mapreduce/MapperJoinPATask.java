@@ -59,10 +59,10 @@ public class MapperJoinPATask extends JavaExecutable {
          * This means that each replica tries to create the output directory.
          * This can lead to synchronization problems and one of the replica can
          * throw the following exception: Caused by:
-         * org.apache.commons.vfs.FileSystemException: << Could not create
+         * org.apache.commons.vfs2.FileSystemException: << Could not create
          * folder
          * "file:///auto/sop-nas2a/u/sop-nas2a/vol/home_oasis/eborelli/mapreduce/data/output/output"
-         * . at org.apache.commons.vfs.provider.AbstractFileObject.createFolder(
+         * . at org.apache.commons.vfs2.provider.AbstractFileObject.createFolder(
          * AbstractFileObject.java:933)) >> To avoid this exception we must
          * create the ReducerPATask replica independent part of the output path
          * in this MapperJoinPATask while each ReducerPATask replica will create its own

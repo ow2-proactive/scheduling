@@ -7,7 +7,7 @@ import java.net.URISyntaxException;
 
 import javax.security.auth.login.LoginException;
 
-import org.apache.commons.vfs.FileSystemException;
+import org.apache.commons.vfs2.FileSystemException;
 import org.apache.log4j.Level;
 import org.junit.Assert;
 import org.junit.Before;

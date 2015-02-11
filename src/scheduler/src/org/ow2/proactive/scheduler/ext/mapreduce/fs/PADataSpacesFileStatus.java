@@ -219,7 +219,7 @@ public class PADataSpacesFileStatus extends FileStatus {
              * so its size will be equal to the sum of size of all its children,
              * We have to notice that if we want to get the size of a
              * DataSpacesFileObject that is a directory we get an error as
-             * "org.apache.commons.vfs.FileSystemException: Could not determine the size of "
+             * "org.apache.commons.vfs2.FileSystemException: Could not determine the size of "
              * file:///..." because it is not a file
              */
             for (DataSpacesFileObject currentDataSpacesFileObject : childDataSpacesFileObjectList) {

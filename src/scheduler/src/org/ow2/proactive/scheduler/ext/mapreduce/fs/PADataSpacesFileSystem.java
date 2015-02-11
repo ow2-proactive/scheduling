@@ -193,7 +193,7 @@ public class PADataSpacesFileSystem extends FileSystem {
             /*
              * we must check that the ancestor of the file ( fString ) do not
              * exist because otherwise we get an
-             * org.apache.commons.vfs.FileSystemException and the file will be
+             * org.apache.commons.vfs2.FileSystemException and the file will be
              * not created. Hence we must not try to create the already existing
              * directories. To do this we can navigate in the file path until we
              * encounter a not existing directory and invoke the
