@@ -98,9 +98,18 @@ public class ForkerTaskExecutor implements TaskExecutor {
             }
 
             // TODO limit classpath to a bare minimum
-            pb.command(getJavaExecutablePath(context.getExecutableContainer()), "-Djava.security.policy=/home/sdolgov/proactive/repos/scheduling/config/security.java.policy-client", "-cp",
+            pb.command("docker ", "run", "tobwiens/proactive-executer", "-Djava.security.policy=/home/sdolgov/proactive/repos/scheduling/config/security.java.policy-client", "-cp",
                     System.getProperty("java.class.path"), taskExecutorClass.getName(),
                     serializedContext.getAbsolutePath()).directory(workingDir);
+
+            pb.command("/usr/bin/sudo",
+                    "/usr/bin/docker",
+                    "run" ,
+                    "-v",
+                    workingDir.getAbsolutePath()+":"+workingDir.getAbsolutePath(),
+                    "--name", context.getTaskId().toString(),
+                    "tobwiens/proactive-executer", taskExecutorClass.getName(),
+                    serializedContext.getAbsolutePath()  );
 
             process = pb.start();
             processStreamsReader = new ProcessStreamsReader(process, outputSink, errorSink);
