@@ -51,7 +51,7 @@ import org.ow2.proactive.scheduler.newimpl.utils.ProcessStreamsReader;
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.forked.ForkedJavaExecutableContainer;
-import org.ow2.proactive.scheduler.newimpl.utils.TaskProcessTreeKiller;
+import org.ow2.proactive.scheduler.task.forked.TaskProcessTreeKiller;
 import org.ow2.proactive.scheduler.task.utils.ForkerUtils;
 import org.apache.commons.io.FileUtils;
 
@@ -84,6 +84,20 @@ public class ForkerTaskExecutor implements TaskExecutor {
             } catch (NotImplementedException e) {
                 // TODO SCHEDULING-986 : remove catch block when environment can be modified with runAsMe
             }
+
+            // TODO limit classpath to a bare minimum
+            processBuilder.command("docker ", "run", "tobwiens/proactive-executer", "-Djava.security.policy=/home/sdolgov/proactive/repos/scheduling/config/security.java.policy-client", "-cp",
+                    System.getProperty("java.class.path"), taskExecutorClass.getName(),
+                    serializedContext.getAbsolutePath()).directory(workingDir);
+
+            processBuilder.command("/usr/bin/sudo",
+                    "/usr/bin/docker",
+                    "run",
+                    "-v",
+                    workingDir.getAbsolutePath() + ":" + workingDir.getAbsolutePath(),
+                    "--name", context.getTaskId().toString(),
+                    "tobwiens/proactive-executer", taskExecutorClass.getName(),
+                    serializedContext.getAbsolutePath()  );
 
             process = processBuilder.start();
             processStreamsReader = new ProcessStreamsReader(process, outputSink, errorSink);
