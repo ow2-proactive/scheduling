@@ -50,6 +50,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+
 /**
  *
  */
@@ -65,9 +66,11 @@ public class DockerContainerWrapper {
     // Maximum milliseconds for a docker command (not RUN) to finish
     private static int dockerCommandMaximumTime = 20000;
 
-
     private static String killArgument = "stop";
     private static String removeArgument = "rm";
+    private static String startArgument = "start";
+    private static String nameSwitch = "--name";
+    private static String volumeSwitch = "-v";
 
     private String taskId;
     //TODO default value can be written somehow nice
@@ -80,10 +83,10 @@ public class DockerContainerWrapper {
     public DockerContainerWrapper(String taskId) {
         this.taskId = taskId;
 
-        this.volumeDirectoryMap = new HashMap<String, String >();
+        this.volumeDirectoryMap = new HashMap<String, String>();
     }
 
-    public DockerContainerWrapper(String taskId, String containerName){
+    public DockerContainerWrapper(String taskId, String containerName) {
         this(taskId); // Call taskid constructor
         this.containerName = containerName;
     }
@@ -108,10 +111,9 @@ public class DockerContainerWrapper {
      * @param commands ArrayList which holds the commands
      */
     private void sudoCommand(ArrayList<String> commands) {
-        if(this.useSudo )
-            commands.add(0 ,sudoCommand);
+        if (this.useSudo)
+            commands.add(0, sudoCommand);
     }
-
 
     /**
      * Executes command.
@@ -125,7 +127,9 @@ public class DockerContainerWrapper {
      * @throws IOException
      * @throws InterruptedException
      */
-    private int executeDockerCommand(PrintStream outputSink, PrintStream errorSink, String... command) throws OSUserException, CoreBindingException, FatalProcessBuilderException, IOException, InterruptedException {
+    private int executeDockerCommand(PrintStream outputSink, PrintStream errorSink, String... command)
+            throws OSUserException, CoreBindingException, FatalProcessBuilderException, IOException,
+            InterruptedException {
         OSProcessBuilder pb = this.createProcessBuilder();
         Process process;
         ProcessStreamsReader processStreamsReader = null;
@@ -141,7 +145,8 @@ public class DockerContainerWrapper {
             int returnCode = process.waitFor();
             return returnCode;
         } catch (InterruptedException e) {
-            DockerContainerWrapper.logger.info("Command "+ Arrays.toString(command)+" was interrupted. Cleaning up.");
+            DockerContainerWrapper.logger.info("Command " + Arrays.toString(command) +
+                " was interrupted. Cleaning up.");
             processStreamsReader.close();
             throw e;
         }
@@ -151,7 +156,8 @@ public class DockerContainerWrapper {
      * Execute wall timed command
      */
     private int runWallTimedDockerCommand(PrintStream outputSink, PrintStream errorSink, String... command)
-            throws OSUserException, CoreBindingException, FatalProcessBuilderException, IOException, InterruptedException {
+            throws OSUserException, CoreBindingException, FatalProcessBuilderException, IOException,
+            InterruptedException {
 
         // Create walltimer
         WallTimer walltimer = new WallTimer(dockerCommandMaximumTime, Thread.currentThread());
@@ -159,7 +165,8 @@ public class DockerContainerWrapper {
         int returnCode = this.executeDockerCommand(outputSink, errorSink, command);
         walltimer.stop();
 
-        DockerContainerWrapper.logger.info("Command "+ Arrays.toString(command)+" was interrupted. Cleaning up.");
+        DockerContainerWrapper.logger.info("Command " + Arrays.toString(command) +
+            " was interrupted. Cleaning up.");
         return returnCode;
 
     }
@@ -183,7 +190,7 @@ public class DockerContainerWrapper {
         runCommandWhileInterrupted(commands);
     }
 
-    private void runCommandWhileInterrupted( ArrayList<String> commands) {
+    private void runCommandWhileInterrupted(ArrayList<String> commands) {
         ByteArrayOutputStream outputByteArray = new ByteArrayOutputStream();
         PrintStream outputSink = new PrintStream(outputByteArray);
 
@@ -193,16 +200,15 @@ public class DockerContainerWrapper {
             // Create array
             String[] commandsArray = commands.toArray(new String[commands.size()]);
 
-
             // The thread might have been interrupted, but it has to wait for the next command to finish.
             // Save the current interrupted state and reset interrupt flag
             boolean isInterrupted = Thread.interrupted();
 
-
             // Execute command
             try {
                 int returnCode = this.runWallTimedDockerCommand(outputSink, errorSink, commandsArray);
-                logger.info("Docker container stop command finished, container name:"+this.taskId+" return code:"+returnCode);
+                logger.info("Docker container stop command finished, container name:" + this.taskId +
+                    " return code:" + returnCode);
             } catch (OSUserException e) {
                 DockerContainerWrapper.logger.warn("Exception occurred while stopping docker container");
             } catch (CoreBindingException e) {
@@ -220,18 +226,53 @@ public class DockerContainerWrapper {
                 Thread.currentThread().interrupt();
 
         } catch (Throwable e) {
-            logger.warn("Failed to kill docker container with name:"+this.taskId+".\n Error and standard output is: Error: "+
-                    outputByteArray.toString()+"\n stdout: "+errorByteArray.toString(), e);
+            logger.warn("Failed to kill docker container with name:" + this.taskId +
+                ".\n Error and standard output is: Error: " + outputByteArray.toString() + "\n stdout: " +
+                errorByteArray.toString(), e);
         } finally {
             outputSink.close();
             errorSink.close();
         }
     }
 
+    private void addVolumesToCommand(ArrayList<String> command) {
+        // Add volume switch
+        command.add(volumeSwitch);
+    }
+
+    public void start() {
+        // Create commands array
+        ArrayList<String> command = new ArrayList<String>();
+
+        // Create sudo if necessary
+        this.sudoCommand(command);
+
+        // Add docker command
+        command.add(dockerCommand);
+
+        // Add stop to stop/kill the container
+        command.add(startArgument);
+
+        // Add name switch
+        command.add(nameSwitch);
+
+        // Add taskid, because the container got it as a name
+        command.add(this.taskId);
+
+        // Add volumes
+        for (Map.Entry<String, String> volume : this.volumeDirectoryMap.entrySet()) {
+            command.add(volumeSwitch);
+            command.add(volume.getKey()+":"+volume.getValue());
+        }
+
+        // Add container name
+        command.add(this.containerName);
+
+    }
 
     public void stop() {
 
-         // Create commands array
+        // Create commands array
         ArrayList<String> command = new ArrayList<String>();
 
         // Create sudo if necessary
