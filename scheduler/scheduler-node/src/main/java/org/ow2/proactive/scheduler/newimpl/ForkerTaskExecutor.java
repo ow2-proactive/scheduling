@@ -137,7 +137,12 @@ public class ForkerTaskExecutor implements TaskExecutor {
             if (process != null) {
                 process.destroy();
             }
-            container.kill();
+            // Stop container
+            container.stop();
+
+            // Remove container
+            container.remove();
+
             if (processStreamsReader != null) {
                 processStreamsReader.close();
             }
