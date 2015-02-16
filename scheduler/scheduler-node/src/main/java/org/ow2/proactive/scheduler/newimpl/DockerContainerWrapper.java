@@ -112,10 +112,20 @@ public class DockerContainerWrapper {
             commands.add(0 ,sudoCommand);
     }
 
-    // Execute wall timed command
-    private int runWallTimedDockerCommand(PrintStream outputSink, PrintStream errorSink, String... command)
-            throws OSUserException, CoreBindingException, FatalProcessBuilderException, IOException, InterruptedException {
 
+    /**
+     * Executes command.
+     * @param outputSink Standard output
+     * @param errorSink Error output
+     * @param command String array which represents the command
+     * @return The exit code of the command
+     * @throws OSUserException
+     * @throws CoreBindingException
+     * @throws FatalProcessBuilderException
+     * @throws IOException
+     * @throws InterruptedException
+     */
+    private int executeDockerCommand(PrintStream outputSink, PrintStream errorSink, String... command) throws OSUserException, CoreBindingException, FatalProcessBuilderException, IOException, InterruptedException {
         OSProcessBuilder pb = this.createProcessBuilder();
         Process process;
         ProcessStreamsReader processStreamsReader = null;
@@ -126,20 +136,30 @@ public class DockerContainerWrapper {
 
         // Attach stream readers
         processStreamsReader = new ProcessStreamsReader(process, outputSink, errorSink);
-        int returnCode = 0;
 
         try {
-            // Create walltimer
-            WallTimer walltimer = new WallTimer(dockerCommandMaximumTime, Thread.currentThread());
-            // Wait until executed
-            returnCode = process.waitFor();
-            walltimer.stop();
+            int returnCode = process.waitFor();
+            return returnCode;
         } catch (InterruptedException e) {
             DockerContainerWrapper.logger.info("Command "+ Arrays.toString(command)+" was interrupted. Cleaning up.");
             processStreamsReader.close();
             throw e;
         }
+    }
 
+    /**
+     * Execute wall timed command
+     */
+    private int runWallTimedDockerCommand(PrintStream outputSink, PrintStream errorSink, String... command)
+            throws OSUserException, CoreBindingException, FatalProcessBuilderException, IOException, InterruptedException {
+
+        // Create walltimer
+        WallTimer walltimer = new WallTimer(dockerCommandMaximumTime, Thread.currentThread());
+        // Execute command
+        int returnCode = this.executeDockerCommand(outputSink, errorSink, command);
+        walltimer.stop();
+
+        DockerContainerWrapper.logger.info("Command "+ Arrays.toString(command)+" was interrupted. Cleaning up.");
         return returnCode;
 
     }
