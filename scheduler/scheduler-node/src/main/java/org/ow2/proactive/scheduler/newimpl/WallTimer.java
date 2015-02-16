@@ -42,6 +42,11 @@ public class WallTimer {
     private boolean wallTimed = false;
     private Timer timer;
 
+    /**
+     *
+     * @param walltime Walltime in milliseconds
+     * @param threadToStop Thread which will be interrupted
+     */
     public WallTimer(final long walltime, final Thread threadToStop) {
         if (walltime > 0) {
             timer = new Timer();
