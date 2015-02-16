@@ -67,6 +67,7 @@ public class DockerContainerWrapper {
 
 
     private static String killArgument = "stop";
+    private static String removeArgument = "rm";
 
     private String taskId;
     //TODO default value can be written somehow nice
@@ -143,33 +144,33 @@ public class DockerContainerWrapper {
 
     }
 
-    public void kill() {
-        // Kill docker container, therefore execute a docker stop command
+    public void remove() {
+        // Create commands array
+        ArrayList<String> commands = new ArrayList<String>();
 
+        // Create sudo if necessary
+        this.sudoCommand(commands);
 
+        // Add docker command
+        commands.add(dockerCommand);
+
+        // Add stop to stop/kill the container
+        commands.add(removeArgument);
+
+        // Add taskid, because the container got it as a name
+        commands.add(this.taskId);
+
+        runCommandWhileInterrupted(commands);
+    }
+
+    private void runCommandWhileInterrupted( ArrayList<String> commands) {
         ByteArrayOutputStream outputByteArray = new ByteArrayOutputStream();
         PrintStream outputSink = new PrintStream(outputByteArray);
 
         ByteArrayOutputStream errorByteArray = new ByteArrayOutputStream();
         PrintStream errorSink = new PrintStream(errorByteArray);
         try {
-
-            // Create commands array
-            ArrayList<String> commands = new ArrayList<String>();
-
-            // Create sudo if necessary
-            this.sudoCommand(commands);
-
-            // Add docker command
-            commands.add(dockerCommand);
-
-            // Add stop to stop/kill the container
-            commands.add(killArgument);
-
-            // Add taskid, because the container got it as a name
-            commands.add(this.taskId);
-
-            // Finished building commands, now create array
+            // Create array
             String[] commandsArray = commands.toArray(new String[commands.size()]);
 
 
@@ -178,7 +179,7 @@ public class DockerContainerWrapper {
             boolean isInterrupted = Thread.interrupted();
 
 
-                // Execute command
+            // Execute command
             try {
                 int returnCode = this.runWallTimedDockerCommand(outputSink, errorSink, commandsArray);
                 logger.info("Docker container stop command finished, container name:"+this.taskId+" return code:"+returnCode);
@@ -198,9 +199,6 @@ public class DockerContainerWrapper {
             if (isInterrupted)
                 Thread.currentThread().interrupt();
 
-
-
-
         } catch (Throwable e) {
             logger.warn("Failed to kill docker container with name:"+this.taskId+".\n Error and standard output is: Error: "+
                     outputByteArray.toString()+"\n stdout: "+errorByteArray.toString(), e);
@@ -208,7 +206,27 @@ public class DockerContainerWrapper {
             outputSink.close();
             errorSink.close();
         }
+    }
 
+
+    public void stop() {
+
+         // Create commands array
+        ArrayList<String> command = new ArrayList<String>();
+
+        // Create sudo if necessary
+        this.sudoCommand(command);
+
+        // Add docker command
+        command.add(dockerCommand);
+
+        // Add stop to stop/kill the container
+        command.add(killArgument);
+
+        // Add taskid, because the container got it as a name
+        command.add(this.taskId);
+
+        this.runCommandWhileInterrupted(command);
     }
 
     private OSProcessBuilder createProcessBuilder() {
