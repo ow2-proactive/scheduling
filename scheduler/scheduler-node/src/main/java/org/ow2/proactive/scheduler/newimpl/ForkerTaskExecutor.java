@@ -49,7 +49,6 @@ import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.forked.ForkedJavaExecutableContainer;
-import org.ow2.proactive.scheduler.task.forked.TaskProcessTreeKiller;
 import org.ow2.proactive.scheduler.task.utils.ForkerUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
@@ -69,7 +68,11 @@ public class ForkerTaskExecutor implements TaskExecutor {
 
     // Called by forker to run create forked JVM
     public TaskResultImpl execute(TaskContext context, PrintStream outputSink, PrintStream errorSink) {
-        TaskProcessTreeKiller taskProcessTreeKiller = new TaskProcessTreeKiller(context.getTaskId().value());
+        // Create docker container
+        DockerContainerWrapper container = new DockerContainerWrapper(context.getTaskId().value());
+
+        // Map working directory inside container
+        container.addVolumeDirectory(workingDir.getAbsolutePath(), workingDir.getAbsolutePath());
 
         Process process = null;
         ProcessStreamsReader processStreamsReader = null;
@@ -91,12 +94,6 @@ public class ForkerTaskExecutor implements TaskExecutor {
                 pb = ForkerUtils.getOSProcessBuilderFactory(nativeScriptPath).getBuilder();
             }
 
-            try {
-                taskProcessTreeKiller.tagEnvironment(pb.environment());
-            } catch (NotImplementedException e) {
-                // TODO SCHEDULING-986 : remove catch block when environment can be modified with runAsMe
-            }
-
             // TODO limit classpath to a bare minimum
             pb.command("docker ", "run", "tobwiens/proactive-executer", "-Djava.security.policy=/home/sdolgov/proactive/repos/scheduling/config/security.java.policy-client", "-cp",
                     System.getProperty("java.class.path"), taskExecutorClass.getName(),
@@ -116,7 +113,7 @@ public class ForkerTaskExecutor implements TaskExecutor {
 
             int exitCode = process.waitFor();
             if (exitCode != 0) {
-                Throwable exception = null;
+                Throwable exception;
                 try {
                     exception = (Throwable) deserializeTaskResult(serializedContext);
                 } catch (Throwable ignored) {
@@ -140,7 +137,7 @@ public class ForkerTaskExecutor implements TaskExecutor {
             if (process != null) {
                 process.destroy();
             }
-            taskProcessTreeKiller.kill();
+            container.kill();
             if (processStreamsReader != null) {
                 processStreamsReader.close();
             }
