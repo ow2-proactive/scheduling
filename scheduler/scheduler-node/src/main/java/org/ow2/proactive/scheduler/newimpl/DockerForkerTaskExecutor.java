@@ -43,7 +43,6 @@ import java.io.ObjectOutputStream;
 import java.io.PrintStream;
 
 import org.objectweb.proactive.extensions.processbuilder.OSProcessBuilder;
-import org.objectweb.proactive.extensions.processbuilder.exception.NotImplementedException;
 import org.ow2.proactive.scheduler.common.task.Decrypter;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
@@ -54,14 +53,14 @@ import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
 
-public class ForkerTaskExecutor implements TaskExecutor {
-    private static final Logger logger = Logger.getLogger(ForkerTaskExecutor.class);
+public class DockerForkerTaskExecutor implements TaskExecutor {
+    private static final Logger logger = Logger.getLogger(DockerForkerTaskExecutor.class);
 
     private File workingDir;
     private Decrypter decrypter;
-    private Class<ForkerTaskExecutor> taskExecutorClass = ForkerTaskExecutor.class;
+    private Class<DockerForkerTaskExecutor> taskExecutorClass = DockerForkerTaskExecutor.class;
 
-    public ForkerTaskExecutor(File workingDir, Decrypter decrypter) {
+    public DockerForkerTaskExecutor(File workingDir, Decrypter decrypter) {
         this.workingDir = workingDir;
         this.decrypter = decrypter;
     }
