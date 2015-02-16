@@ -68,7 +68,11 @@ public class ForkerTaskExecutor implements TaskExecutor {
 
     // Called by forker to run create forked JVM
     public TaskResultImpl execute(TaskContext context, PrintStream outputSink, PrintStream errorSink) {
-        TaskProcessTreeKiller taskProcessTreeKiller = new TaskProcessTreeKiller(context.getTaskId().value());
+        // Create docker container
+        DockerContainerWrapper container = new DockerContainerWrapper(context.getTaskId().value());
+
+        // Map working directory inside container
+        container.addVolumeDirectory(workingDir.getAbsolutePath(), workingDir.getAbsolutePath());
 
         Process process = null;
         ProcessStreamsReader processStreamsReader = null;
@@ -105,6 +109,7 @@ public class ForkerTaskExecutor implements TaskExecutor {
             int exitCode = process.waitFor();
 
             if (exitCode != 0) {
+                Throwable exception;
                 try {
                     Throwable exception = (Throwable) deserializeTaskResult(serializedContext);
                     return new TaskResultImpl(context.getTaskId(), new ForkedJVMProcessException(
@@ -128,7 +133,7 @@ public class ForkerTaskExecutor implements TaskExecutor {
             if (process != null) {
                 process.destroy();
             }
-            taskProcessTreeKiller.kill();
+            container.kill();
             if (processStreamsReader != null) {
                 processStreamsReader.close();
             }
