@@ -34,7 +34,11 @@
  */
 package org.ow2.proactive.scheduler.newimpl.utils;
 
+import org.apache.log4j.Logger;
+
 public class TaskKiller {
+
+    private static final Logger logger = Logger.getLogger(TaskKiller.class);
 
     private Thread threadToKill; // extract in class
     private boolean wasKilled = false;
@@ -50,5 +54,8 @@ public class TaskKiller {
     public void kill() {
         wasKilled = true;
         threadToKill.interrupt();
+
+        logger.info("Thread/task execution was interrupted, now wait for thread to finish");
+
     }
 }
