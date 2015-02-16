@@ -32,25 +32,30 @@
  *
  *  * $$ACTIVEEON_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.newimpl.utils;
+package org.ow2.proactive.scheduler.newimpl;
 
 import java.util.Timer;
 import java.util.TimerTask;
 
 
 public class WallTimer {
+    private boolean wallTimed = false;
     private Timer timer;
-    private TaskKiller taskKiller;
 
-    public WallTimer(final long walltime, final TaskKiller taskKiller) {
-        this.taskKiller = taskKiller;
+    /**
+     *
+     * @param walltime Walltime in milliseconds
+     * @param threadToStop Thread which will be interrupted
+     */
+    public WallTimer(final long walltime, final Thread threadToStop) {
         if (walltime > 0) {
             timer = new Timer();
             timer.schedule(new TimerTask() {
                 @Override
                 public void run() {
                     synchronized (this) {
-                        taskKiller.kill();
+                        threadToStop.interrupt();
+                        wallTimed = true;
                     }
                 }
             }, walltime);
@@ -58,7 +63,7 @@ public class WallTimer {
     }
 
     public synchronized boolean hasWallTimed() {
-        return taskKiller.wasKilled();
+        return wallTimed;
     }
 
     public void stop() {
