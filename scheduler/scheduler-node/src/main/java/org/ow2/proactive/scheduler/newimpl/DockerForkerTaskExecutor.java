@@ -43,6 +43,7 @@ import java.io.ObjectOutputStream;
 import java.io.PrintStream;
 
 import org.objectweb.proactive.extensions.processbuilder.OSProcessBuilder;
+import org.ow2.proactive.scheduler.common.task.Decrypter;
 import org.objectweb.proactive.extensions.processbuilder.exception.NotImplementedException;
 import org.ow2.proactive.scheduler.newimpl.utils.Decrypter;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
@@ -56,12 +57,14 @@ import org.ow2.proactive.scheduler.task.utils.ForkerUtils;
 import org.apache.commons.io.FileUtils;
 
 
-public class ForkerTaskExecutor implements TaskExecutor {
+public class DockerForkerTaskExecutor implements TaskExecutor {
+    private static final Logger logger = Logger.getLogger(DockerForkerTaskExecutor.class);
 
     private File workingDir;
     private Decrypter decrypter;
+    private Class<DockerForkerTaskExecutor> taskExecutorClass = DockerForkerTaskExecutor.class;
 
-    public ForkerTaskExecutor(File workingDir, Decrypter decrypter) {
+    public DockerForkerTaskExecutor(File workingDir, Decrypter decrypter) {
         this.workingDir = workingDir;
         this.decrypter = decrypter;
     }
@@ -90,20 +93,20 @@ public class ForkerTaskExecutor implements TaskExecutor {
             }
 
             // TODO limit classpath to a bare minimum
-            processBuilder.command("docker ", "run", "tobwiens/proactive-executer", "-Djava.security.policy=/home/sdolgov/proactive/repos/scheduling/config/security.java.policy-client", "-cp",
+            pb.command("docker ", "run", "tobwiens/proactive-executer", "-Djava.security.policy=/home/sdolgov/proactive/repos/scheduling/config/security.java.policy-client", "-cp",
                     System.getProperty("java.class.path"), taskExecutorClass.getName(),
                     serializedContext.getAbsolutePath()).directory(workingDir);
 
-            processBuilder.command("/usr/bin/sudo",
+            pb.command("/usr/bin/sudo",
                     "/usr/bin/docker",
-                    "run",
+                    "run" ,
                     "-v",
-                    workingDir.getAbsolutePath() + ":" + workingDir.getAbsolutePath(),
+                    workingDir.getAbsolutePath()+":"+workingDir.getAbsolutePath(),
                     "--name", context.getTaskId().toString(),
                     "tobwiens/proactive-executer", taskExecutorClass.getName(),
                     serializedContext.getAbsolutePath()  );
 
-            process = processBuilder.start();
+            process = pb.start();
             processStreamsReader = new ProcessStreamsReader(process, outputSink, errorSink);
 
             int exitCode = process.waitFor();
@@ -127,7 +130,7 @@ public class ForkerTaskExecutor implements TaskExecutor {
         } finally {
             FileUtils.deleteQuietly(serializedContext);
 
-            outputSink.flush(); // TODO needed?
+            outputSink.flush();
             errorSink.flush();
 
             if (process != null) {
@@ -210,7 +213,8 @@ public class ForkerTaskExecutor implements TaskExecutor {
     }
 
     // 4 called by forker
-    private static Object deserializeTaskResult(File pathToFile) throws IOException, ClassNotFoundException {
+    private static Object deserializeTaskResult(File pathToFile) throws IOException,
+            ClassNotFoundException {
         ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(pathToFile));
         Object scriptResult = inputStream.readObject();
         FileUtils.forceDelete(pathToFile);
@@ -236,13 +240,11 @@ public class ForkerTaskExecutor implements TaskExecutor {
 
             serializeTaskResult(result, contextPath);
         } catch (Throwable throwable) {
-            throwable.printStackTrace(System.err);
             try {
                 serializeTaskResult(throwable, contextPath);
-            } catch (Throwable couldNotSerializeException) {
-                System.err.println("Could not serialize exception as task result");
-                couldNotSerializeException.printStackTrace(System.err);
+            } catch (Throwable ignored){
             }
+            throwable.printStackTrace(System.err);
             System.exit(1);
         }
     }
