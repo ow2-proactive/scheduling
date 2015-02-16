@@ -181,6 +181,11 @@ public class TaskLauncher {
 
         // copy output files ? task log files?
 
+        //try {
+        //    PAActiveObject.terminateActiveObject(!normalTermination);
+       // } catch (Exception e) {
+        //    logger.info("Exception when terminating task launcher active object", e);
+        //}
     }
 
     private void sendResultToScheduler(TaskTerminateNotification terminateNotification,
@@ -226,6 +231,7 @@ public class TaskLauncher {
 
     @ImmediateService
     public void terminate(boolean normalTermination) {
+        // The task killer will interrupt the current thread
         taskLogger.resetLogContextForImmediateService();
         if (normalTermination) {
             logger.info("Terminate message received for task " + taskId);
@@ -234,13 +240,9 @@ public class TaskLauncher {
             taskKiller.kill();
         }
 
-        try {
-            PAActiveObject.terminateActiveObject(!normalTermination);
-        } catch (Exception e) {
-            logger.info("Exception when terminating task launcher active object", e);
-        }
         logger.info("TaskLauncher terminated");
     }
+
 
     public int getProgress() {
         // not supported anymore
