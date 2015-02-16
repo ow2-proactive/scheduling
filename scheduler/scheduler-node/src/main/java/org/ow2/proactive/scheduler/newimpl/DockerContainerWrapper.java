@@ -36,12 +36,17 @@ package org.ow2.proactive.scheduler.newimpl;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.extensions.processbuilder.OSProcessBuilder;
+import org.objectweb.proactive.extensions.processbuilder.exception.CoreBindingException;
+import org.objectweb.proactive.extensions.processbuilder.exception.FatalProcessBuilderException;
+import org.objectweb.proactive.extensions.processbuilder.exception.OSUserException;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.task.utils.ForkerUtils;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -57,6 +62,9 @@ public class DockerContainerWrapper {
     private static String sudoCommand = "/usr/bin/sudo";
     private static String dockerCommand = "/usr/bin/docker";
 
+    // Maximum milliseconds for a docker command (not RUN) to finish
+    private static int dockerCommandMaximumTime = 20000;
+
 
     private static String killArgument = "stop";
 
@@ -71,7 +79,7 @@ public class DockerContainerWrapper {
     public DockerContainerWrapper(String taskId) {
         this.taskId = taskId;
 
-        this.volumeDirectoryMap = new HashMap< >();
+        this.volumeDirectoryMap = new HashMap<String, String >();
     }
 
     public DockerContainerWrapper(String taskId, String containerName){
@@ -103,11 +111,41 @@ public class DockerContainerWrapper {
             commands.add(0 ,sudoCommand);
     }
 
-    public void kill() {
+    // Execute wall timed command
+    private int runWallTimedDockerCommand(PrintStream outputSink, PrintStream errorSink, String... command)
+            throws OSUserException, CoreBindingException, FatalProcessBuilderException, IOException, InterruptedException {
 
+        OSProcessBuilder pb = this.createProcessBuilder();
+        Process process;
         ProcessStreamsReader processStreamsReader = null;
 
-        Process process;
+        // Set command and start process
+        pb.command(command);
+        process = pb.start();
+
+        // Attach stream readers
+        processStreamsReader = new ProcessStreamsReader(process, outputSink, errorSink);
+        int returnCode = 0;
+
+        try {
+            // Create walltimer
+            WallTimer walltimer = new WallTimer(dockerCommandMaximumTime, Thread.currentThread());
+            // Wait until executed
+            returnCode = process.waitFor();
+            walltimer.stop();
+        } catch (InterruptedException e) {
+            DockerContainerWrapper.logger.info("Command "+ Arrays.toString(command)+" was interrupted. Cleaning up.");
+            processStreamsReader.close();
+            throw e;
+        }
+
+        return returnCode;
+
+    }
+
+    public void kill() {
+        // Kill docker container, therefore execute a docker stop command
+
 
         ByteArrayOutputStream outputByteArray = new ByteArrayOutputStream();
         PrintStream outputSink = new PrintStream(outputByteArray);
@@ -115,11 +153,9 @@ public class DockerContainerWrapper {
         ByteArrayOutputStream errorByteArray = new ByteArrayOutputStream();
         PrintStream errorSink = new PrintStream(errorByteArray);
         try {
-            // Kill docker container, therefore execute a docker stop command
-            OSProcessBuilder pb = this.createProcessBuilder();
 
             // Create commands array
-            ArrayList<String> commands = new ArrayList< >();
+            ArrayList<String> commands = new ArrayList<String>();
 
             // Create sudo if necessary
             this.sudoCommand(commands);
@@ -136,36 +172,41 @@ public class DockerContainerWrapper {
             // Finished building commands, now create array
             String[] commandsArray = commands.toArray(new String[commands.size()]);
 
-            // Add commands to process builder and execute
-            pb.command(commandsArray);
-            process = pb.start();
-            processStreamsReader = new ProcessStreamsReader(process, outputSink, errorSink);
 
             // The thread might have been interrupted, but it has to wait for the next command to finish.
             // Save the current interrupted state and reset interrupt flag
             boolean isInterrupted = Thread.interrupted();
 
-            // Wait until executed
-            int returnCode = process.waitFor();
+
+                // Execute command
+            try {
+                int returnCode = this.runWallTimedDockerCommand(outputSink, errorSink, commandsArray);
+                logger.info("Docker container stop command finished, container name:"+this.taskId+" return code:"+returnCode);
+            } catch (OSUserException e) {
+                DockerContainerWrapper.logger.warn("Exception occurred while stopping docker container");
+            } catch (CoreBindingException e) {
+                DockerContainerWrapper.logger.warn("Exception occurred while stopping docker container");
+            } catch (FatalProcessBuilderException e) {
+                DockerContainerWrapper.logger.warn("Exception occurred while stopping docker container");
+            } catch (IOException e) {
+                DockerContainerWrapper.logger.warn("Exception occurred while stopping docker container");
+            } catch (InterruptedException e) {
+                DockerContainerWrapper.logger.warn("Docker container stop command was interrupted", e);
+            }
 
             // Restore interrupt state of thread
             if (isInterrupted)
                 Thread.currentThread().interrupt();
 
-            logger.info("Docker container successfully killed with name:"+this.taskId+" return code:"+returnCode);
 
 
-        } catch (Exception e) {
+
+        } catch (Throwable e) {
             logger.warn("Failed to kill docker container with name:"+this.taskId+".\n Error and standard output is: Error: "+
                     outputByteArray.toString()+"\n stdout: "+errorByteArray.toString(), e);
         } finally {
-
             outputSink.close();
             errorSink.close();
-
-            if (processStreamsReader != null) {
-                processStreamsReader.close();
-            }
         }
 
     }
