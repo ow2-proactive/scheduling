@@ -38,7 +38,7 @@ public class TimedCommandExecutorTest {
         TimedCommandExecutorImpl timedCommand = new TimedCommandExecutorImpl();
         timedCommand.factor = 2; //Wait two times longer than timeout
 
-        timedCommand.executeTimedCommand(null, null, null);
+        timedCommand.executeTimedCommand(null, null, (String[]) null);
     }
 
     @Test
@@ -48,7 +48,7 @@ public class TimedCommandExecutorTest {
         timedCommand.factor = 0;
 
         // Just return 0
-        assertEquals(0, timedCommand.executeCommand(null, null, null));
+        assertEquals(0, timedCommand.executeCommand(null, null, (String[]) null));
     }
 
     @Test
@@ -60,7 +60,7 @@ public class TimedCommandExecutorTest {
         Thread.currentThread().interrupt();
 
         // Just return 0
-        assertEquals(0, timedCommand.executeTimedWhileInterrupted(null, null, null));
+        assertEquals(0, timedCommand.executeTimedWhileInterrupted(null, null, (String[]) null));
 
         assertTrue("Interrupt status must be kept after executing while interrupted.", Thread.currentThread()
                 .isInterrupted());
@@ -72,7 +72,7 @@ public class TimedCommandExecutorTest {
         timedCommand.factor = 0;
 
         // Just return 0
-        assertEquals(0, timedCommand.executeTimedWhileInterrupted(null, null, null));
+        assertEquals(0, timedCommand.executeTimedWhileInterrupted(null, null, (String[]) null));
 
         assertFalse("Interrupt status must be kept after executing while interrupted.", Thread
                 .currentThread().isInterrupted());
@@ -84,7 +84,7 @@ public class TimedCommandExecutorTest {
         timedCommand.factor = 2;
 
         // Just return 0
-        assertEquals(0, timedCommand.executeTimedWhileInterrupted(null, null, null));
+        assertEquals(0, timedCommand.executeTimedWhileInterrupted(null, null, (String[]) null));
 
     }
 
@@ -97,7 +97,7 @@ public class TimedCommandExecutorTest {
         Thread.currentThread().interrupt();
 
         // Just return 0
-        assertEquals(0, timedCommand.executeTimedWhileInterrupted(null, null, null));
+        assertEquals(0, timedCommand.executeTimedWhileInterrupted(null, null, (String[]) null));
 
     }
 }
