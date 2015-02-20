@@ -16,6 +16,20 @@ import static org.junit.Assert.*;
 
 public class TaskLoggerTest {
 
+    /**
+     * Converts operating system dependent strings.
+     * @param stringToNormalize
+     * @return
+     */
+    private String normalize(String stringToNormalize) {
+        String returnString;
+
+        returnString = stringToNormalize.replaceAll("\\r\\n", "\n");
+        returnString = returnString.replaceAll("\\r", "\n");
+
+        return returnString;
+    }
+
     @Test
     public void printAndGetLogs() throws Exception {
 
@@ -25,12 +39,12 @@ public class TaskLoggerTest {
         assertEquals("", taskLogger.getLogs().getAllLogs(false));
 
         taskLogger.getOutputSink().println("hello");
-        assertEquals("hello\n", taskLogger.getLogs().getAllLogs(false));
-        assertEquals("hello\n", taskLogger.getLogs().getStdoutLogs(false));
+        assertEquals(normalize("hello\n"), normalize(taskLogger.getLogs().getAllLogs(false)));
+        assertEquals(normalize("hello\n"), normalize(taskLogger.getLogs().getStdoutLogs(false)));
 
         taskLogger.getErrorSink().println("error");
-        assertEquals("hello\nerror\n", taskLogger.getLogs().getAllLogs(false));
-        assertEquals("error\n", taskLogger.getLogs().getStderrLogs(false));
+        assertEquals(normalize("hello\nerror\n"), normalize(taskLogger.getLogs().getAllLogs(false)));
+        assertEquals(normalize("error\n"), normalize(taskLogger.getLogs().getStderrLogs(false)));
     }
 
     @Test
@@ -80,7 +94,7 @@ public class TaskLoggerTest {
         taskLogger.getOutputSink().println("hello");
 
         taskLogger.getStoredLogs(stringAppenderProvider);
-        assertEquals("hello\n", stringAppender.toString());
+        assertEquals(normalize("hello\n"), normalize(stringAppender.toString()));
     }
 
     @Test
@@ -91,12 +105,12 @@ public class TaskLoggerTest {
         assertEquals("", taskLogger.getLogs().getAllLogs(false));
 
         taskLogger.getOutputSink().println("hello");
-        assertTrue(taskLogger.getLogs().getAllLogs(true)
-                .matches("\\[42@myhost;[0-9][0-9]:[0-9][0-9]:[0-9][0-9]\\] hello \n"));
+        assertTrue(normalize(taskLogger.getLogs().getAllLogs(true)).matches(
+                "\\[42@myhost;[0-9][0-9]:[0-9][0-9]:[0-9][0-9]\\] hello \n"));
 
         taskLogger.getErrorSink().println("error");
-        assertTrue(taskLogger.getLogs().getStderrLogs(true)
-                .matches("\\[42@myhost;[0-9][0-9]:[0-9][0-9]:[0-9][0-9]\\] error \n"));
+        assertTrue(normalize(taskLogger.getLogs().getStderrLogs(true)).matches(
+                "\\[42@myhost;[0-9][0-9]:[0-9][0-9]:[0-9][0-9]\\] error \n"));
 
     }
 }

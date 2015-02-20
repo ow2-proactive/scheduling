@@ -34,19 +34,14 @@
  */
 package org.ow2.proactive.scheduler.newimpl;
 
-import org.apache.log4j.Logger;
-import org.objectweb.proactive.extensions.processbuilder.OSProcessBuilder;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.extensions.processbuilder.exception.CoreBindingException;
 import org.objectweb.proactive.extensions.processbuilder.exception.FatalProcessBuilderException;
 import org.objectweb.proactive.extensions.processbuilder.exception.OSUserException;
-import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
-import org.ow2.proactive.scheduler.task.utils.ForkerUtils;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -56,39 +51,72 @@ import java.util.Map;
  */
 public class DockerContainerWrapper {
 
-    private static final Logger logger = Logger.getLogger(DockerContainerWrapper.class);
-
     // CONSTANTS
     // TODO bring the, in config files
-    private static String sudoCommand = "/usr/bin/sudo";
-    private static String dockerCommand = "/usr/bin/docker";
+    public static String SUDO_COMMAND_PROPERTY = "SUDO_COMMAND";
+    public static String DOCKER_COMMAND_PROPERTY = "DOCKER_COMMAND";
 
-    // Maximum milliseconds for a docker command (not RUN) to finish
-    private static int dockerCommandMaximumTime = 20000;
+    public static String INSIDE_CONTAINER_SCHEDULING_HOME = "/data/scheduling";
+    public static String INSIDE_CONTAINER_JAVA_COMMAND = "java";
+    public static String INSIDE_CONTAINER_CLASSPATH_SWITCH = "-cp";
+    public static String INSIDE_CONTAINER_CLASSPATH = "/data/scheduling/dist/lib/*:scheduling/addons/*:scheduling/addons/";
+    public static String INSIDE_CONTAINER_SECURITY_POLICY =
+            "-Djava.security.policy="
+            +CentralPAPropertyRepository
+            .JAVA_SECURITY_POLICY
+            .getValue()
+            .replace(CentralPAPropertyRepository.PA_HOME.getValue(),INSIDE_CONTAINER_SCHEDULING_HOME);
 
-    private static String killArgument = "stop";
-    private static String removeArgument = "rm";
-    private static String startArgument = "start";
-    private static String nameSwitch = "--name";
-    private static String volumeSwitch = "-v";
 
-    private String taskId;
-    //TODO default value can be written somehow nice
-    private String containerName = "tobwiens/proactive-executer";
+    // :ro means to mount it as read-only -- IMPORTANT
+    public static String SCHEDULING_CONTAINER_HOME_MOUNT = INSIDE_CONTAINER_SCHEDULING_HOME +":ro";
+    public static String DOCKER_IMAGE_PROPERTY = "STANDARD_DOCKER_CONTAINER";
 
-    private Map<String, String> volumeDirectoryMap;
+    public static String KILL_ARGUMENT = "stop";
+    public static String REMOVE_ARGUMENT = "rm";
+    public static String START_ARGUMENT = "run";
+    public static String NAME_SWITCH = "--name";
+    public static String VOLUME_SWITCH = "-v";
+
+    private String name;
+    private String image;
+
+    static {// TODO Put that in config
+        System.setProperty(DockerContainerWrapper.SUDO_COMMAND_PROPERTY, "/usr/bin/sudo");
+        System.setProperty(DockerContainerWrapper.DOCKER_COMMAND_PROPERTY, "/usr/bin/docker");
+        System.setProperty(DockerContainerWrapper.DOCKER_IMAGE_PROPERTY, "dockerfile/java:oracle-java7");
+    }
 
     private boolean useSudo = true;
 
-    public DockerContainerWrapper(String taskId) {
-        this.taskId = taskId;
+    private Map<String, String> volumeDirectoryMap;
 
-        this.volumeDirectoryMap = new HashMap<String, String>();
+    public boolean isUseSudo() {
+        return useSudo;
     }
 
-    public DockerContainerWrapper(String taskId, String containerName) {
-        this(taskId); // Call taskid constructor
-        this.containerName = containerName;
+    public void setUseSudo(boolean useSudo) {
+        this.useSudo = useSudo;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public DockerContainerWrapper(String name) {
+        this.name = name;
+
+        this.image = System.getProperty(DockerContainerWrapper.DOCKER_IMAGE_PROPERTY);
+        this.volumeDirectoryMap = new HashMap<String, String>();
+
+        // Mount scheduling from disk -- add as volume
+        this.addVolumeDirectory(CentralPAPropertyRepository.PA_HOME.getValue(),
+                SCHEDULING_CONTAINER_HOME_MOUNT);
+    }
+
+    public DockerContainerWrapper(String name, String image) {
+        this(name); // Call taskid constructor
+        this.image = image;
     }
 
     public void addVolumeDirectory(String localPath, String containerPath) {
@@ -112,135 +140,43 @@ public class DockerContainerWrapper {
      */
     private void sudoCommand(ArrayList<String> commands) {
         if (this.useSudo)
-            commands.add(0, sudoCommand);
+            commands.add(0, System.getProperty(DockerContainerWrapper.SUDO_COMMAND_PROPERTY));
     }
 
     /**
-     * Executes command.
-     * @param outputSink Standard output
-     * @param errorSink Error output
-     * @param command String array which represents the command
-     * @return The exit code of the command
+     * Creates an remove command.
+     * @return Array of strings, which represent the command to remove the docker container.
+     */
+    public String[] remove() {
+        // Create commands array
+        ArrayList<String> command = new ArrayList<String>();
+
+        // Create sudo if necessary
+        this.sudoCommand(command);
+
+        // Add docker command
+        command.add(System.getProperty(DockerContainerWrapper.DOCKER_COMMAND_PROPERTY));
+
+        // Add stop to stop/kill the container
+        command.add(REMOVE_ARGUMENT);
+
+        // Add taskid, because the container got it as a name
+        command.add(this.name);
+
+        // Return command as array
+        return command.toArray(new String[command.size()]);
+    }
+
+    /**
+     * Starts a docker container and returns a string array which represents to start the docker container.
+     * @return String array, representing the start command.
      * @throws OSUserException
      * @throws CoreBindingException
      * @throws FatalProcessBuilderException
      * @throws IOException
-     * @throws InterruptedException
      */
-    private int executeDockerCommand(PrintStream outputSink, PrintStream errorSink, String... command)
-            throws OSUserException, CoreBindingException, FatalProcessBuilderException, IOException,
-            InterruptedException {
-        OSProcessBuilder pb = this.createProcessBuilder();
-        Process process;
-        ProcessStreamsReader processStreamsReader = null;
-
-        // Set command and start process
-        pb.command(command);
-        process = pb.start();
-
-        // Attach stream readers
-        processStreamsReader = new ProcessStreamsReader(process, outputSink, errorSink);
-
-        try {
-            int returnCode = process.waitFor();
-            return returnCode;
-        } catch (InterruptedException e) {
-            DockerContainerWrapper.logger.info("Command " + Arrays.toString(command) +
-                " was interrupted. Cleaning up.");
-            processStreamsReader.close();
-            throw e;
-        }
-    }
-
-    /**
-     * Execute wall timed command
-     */
-    private int runWallTimedDockerCommand(PrintStream outputSink, PrintStream errorSink, String... command)
-            throws OSUserException, CoreBindingException, FatalProcessBuilderException, IOException,
-            InterruptedException {
-
-        // Create walltimer
-        WallTimer walltimer = new WallTimer(dockerCommandMaximumTime, Thread.currentThread());
-        // Execute command
-        int returnCode = this.executeDockerCommand(outputSink, errorSink, command);
-        walltimer.stop();
-
-        DockerContainerWrapper.logger.info("Command " + Arrays.toString(command) +
-            " was interrupted. Cleaning up.");
-        return returnCode;
-
-    }
-
-    public void remove() {
-        // Create commands array
-        ArrayList<String> commands = new ArrayList<String>();
-
-        // Create sudo if necessary
-        this.sudoCommand(commands);
-
-        // Add docker command
-        commands.add(dockerCommand);
-
-        // Add stop to stop/kill the container
-        commands.add(removeArgument);
-
-        // Add taskid, because the container got it as a name
-        commands.add(this.taskId);
-
-        runCommandWhileInterrupted(commands);
-    }
-
-    private void runCommandWhileInterrupted(ArrayList<String> commands) {
-        ByteArrayOutputStream outputByteArray = new ByteArrayOutputStream();
-        PrintStream outputSink = new PrintStream(outputByteArray);
-
-        ByteArrayOutputStream errorByteArray = new ByteArrayOutputStream();
-        PrintStream errorSink = new PrintStream(errorByteArray);
-        try {
-            // Create array
-            String[] commandsArray = commands.toArray(new String[commands.size()]);
-
-            // The thread might have been interrupted, but it has to wait for the next command to finish.
-            // Save the current interrupted state and reset interrupt flag
-            boolean isInterrupted = Thread.interrupted();
-
-            // Execute command
-            try {
-                int returnCode = this.runWallTimedDockerCommand(outputSink, errorSink, commandsArray);
-                logger.info("Docker container stop command finished, container name:" + this.taskId +
-                    " return code:" + returnCode);
-            } catch (OSUserException e) {
-                DockerContainerWrapper.logger.warn("Exception occurred while stopping docker container");
-            } catch (CoreBindingException e) {
-                DockerContainerWrapper.logger.warn("Exception occurred while stopping docker container");
-            } catch (FatalProcessBuilderException e) {
-                DockerContainerWrapper.logger.warn("Exception occurred while stopping docker container");
-            } catch (IOException e) {
-                DockerContainerWrapper.logger.warn("Exception occurred while stopping docker container");
-            } catch (InterruptedException e) {
-                DockerContainerWrapper.logger.warn("Docker container stop command was interrupted", e);
-            }
-
-            // Restore interrupt state of thread
-            if (isInterrupted)
-                Thread.currentThread().interrupt();
-
-        } catch (Throwable e) {
-            logger.warn("Failed to kill docker container with name:" + this.taskId +
-                ".\n Error and standard output is: Error: " + outputByteArray.toString() + "\n stdout: " +
-                errorByteArray.toString(), e);
-        } finally {
-            outputSink.close();
-            errorSink.close();
-        }
-    }
-
-    private void addVolumesToCommand(ArrayList<String> command) {
-        // Add volume switch
-        command.add(volumeSwitch);
-    }
-
-    public void start() {
+    public String[] start(String classToExecute, String... arguments) throws OSUserException,
+            CoreBindingException, FatalProcessBuilderException, IOException {
         // Create commands array
         ArrayList<String> command = new ArrayList<String>();
 
@@ -248,29 +184,61 @@ public class DockerContainerWrapper {
         this.sudoCommand(command);
 
         // Add docker command
-        command.add(dockerCommand);
+        command.add(System.getProperty(DockerContainerWrapper.DOCKER_COMMAND_PROPERTY));
 
         // Add stop to stop/kill the container
-        command.add(startArgument);
+        command.add(START_ARGUMENT);
 
         // Add name switch
-        command.add(nameSwitch);
+        command.add(NAME_SWITCH);
 
         // Add taskid, because the container got it as a name
-        command.add(this.taskId);
+        command.add(this.name);
 
         // Add volumes
         for (Map.Entry<String, String> volume : this.volumeDirectoryMap.entrySet()) {
-            command.add(volumeSwitch);
-            command.add(volume.getKey()+":"+volume.getValue());
+            command.add(VOLUME_SWITCH);
+            command.add(volume.getKey() + ":" + volume.getValue());
         }
 
         // Add container name
-        command.add(this.containerName);
+        command.add(this.image);
 
+        // Add java command
+        command.add(INSIDE_CONTAINER_JAVA_COMMAND);
+
+
+        // TODO Add java security policy.
+        /**
+         * The CentralPAPropertyRepository
+         .JAVA_SECURITY_POLICY
+         .getValue()
+         return jar:file/path/to/jar!/config/java-client-policy, which has nothing to do with the
+         real location of the policy file. Therefore it is missing a possibility to find the policy file
+         and apply it to the client.
+         */
+        /*
+        // Add security policy
+        command.add(INSIDE_CONTAINER_SECURITY_POLICY);
+        */
+        // ADD classpath
+        command.add(INSIDE_CONTAINER_CLASSPATH_SWITCH);
+        command.add(INSIDE_CONTAINER_CLASSPATH);
+
+        // Add java class and arguments
+        command.add(classToExecute);
+
+        // Add all arguments
+        Collections.addAll(command, arguments);
+
+        return command.toArray(new String[command.size()]);
     }
 
-    public void stop() {
+    /**
+     * Creates a stop command.
+     * @return String array to stop the container.
+     */
+    public String[] stop() {
 
         // Create commands array
         ArrayList<String> command = new ArrayList<String>();
@@ -279,23 +247,15 @@ public class DockerContainerWrapper {
         this.sudoCommand(command);
 
         // Add docker command
-        command.add(dockerCommand);
+        command.add(System.getProperty(DockerContainerWrapper.DOCKER_COMMAND_PROPERTY));
 
         // Add stop to stop/kill the container
-        command.add(killArgument);
+        command.add(KILL_ARGUMENT);
 
         // Add taskid, because the container got it as a name
-        command.add(this.taskId);
+        command.add(this.name);
 
-        this.runCommandWhileInterrupted(command);
-    }
-
-    private OSProcessBuilder createProcessBuilder() {
-        OSProcessBuilder pb;
-        String nativeScriptPath = PASchedulerProperties.SCHEDULER_HOME.getValueAsString(); // TODO inject
-
-        pb = ForkerUtils.getOSProcessBuilderFactory(nativeScriptPath).getBuilder();
-
-        return pb;
+        // Return command as array
+        return command.toArray(new String[command.size()]);
     }
 }

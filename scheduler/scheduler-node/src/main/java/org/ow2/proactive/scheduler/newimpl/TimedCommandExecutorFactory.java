@@ -30,30 +30,44 @@
  *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s):
  *
- *  * $$ACTIVEEON_INITIAL_DEV$$
+ *  * Tobias Wiens
  */
 package org.ow2.proactive.scheduler.newimpl;
 
-import java.io.File;
-import java.io.Serializable;
-
-import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.extensions.processbuilder.OSProcessBuilder;
 import org.ow2.proactive.scheduler.common.task.Decrypter;
-import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.task.utils.ForkerUtils;
 
+import java.io.File;
 
-public class TaskLauncherFactory implements Serializable {
-    public TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService) {
-        return new TaskProActiveDataspaces(taskId, namingService);
+
+public class TimedCommandExecutorFactory {
+
+    public TimedCommandExecutor createTimedCommandExecutor(TaskContext context, File workingDir,
+            Decrypter decrypter) throws Exception {
+        return new PBCommandExecutor(this.getOsProcessBuilder(context, workingDir, decrypter));
     }
 
-    public TaskExecutor createTaskExecutor(TaskContext context, File workingDir) throws Exception {
-        TimedCommandExecutor executor = new TimedCommandExecutorFactory().createTimedCommandExecutor(context,
-                workingDir, context.getDecrypter());
-        return new DockerForkerTaskExecutor(workingDir, context.getDecrypter(), executor);
+    private boolean isRunAsUser(TaskContext context) {
+        return context.getExecutableContainer().isRunAsUser();
     }
 
+    private OSProcessBuilder getOsProcessBuilder(TaskContext context, File workingDir, Decrypter decrypter)
+            throws Exception {
+        OSProcessBuilder pb;
+        String nativeScriptPath = PASchedulerProperties.SCHEDULER_HOME.getValueAsString(); // TODO Maybe use PA_HOME ?
+        if (isRunAsUser(context)) {
+            boolean workingDirCanBeWrittenByForked = workingDir.setWritable(true);
+            if (!workingDirCanBeWrittenByForked) {
+                throw new Exception("Working directory will not be writable by runAsMe user");
+            }
+            pb = ForkerUtils.getOSProcessBuilderFactory(nativeScriptPath).getBuilder(
+                    ForkerUtils.checkConfigAndGetUser(decrypter));
+        } else {
+            pb = ForkerUtils.getOSProcessBuilderFactory(nativeScriptPath).getBuilder();
+        }
+        return pb;
+    }
 }

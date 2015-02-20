@@ -26,148 +26,151 @@ import static org.junit.Assert.*;
 
 
 public class WalltimeTaskLauncherTest {
+    /*
+     @Test(timeout = 5000)
+     public void walltime_forked_task() throws Throwable {
+     ForkedScriptExecutableContainer executableContainer = new ForkedScriptExecutableContainer(
+     new TaskScript(new SimpleScript("for(;;){}", "javascript")));
 
-    @Test(timeout = 5000)
-    public void walltime_forked_task() throws Throwable {
-        ForkedScriptExecutableContainer executableContainer = new ForkedScriptExecutableContainer(
-          new TaskScript(new SimpleScript("for(;;){}", "javascript")));
+     TaskLauncherInitializer initializer = new TaskLauncherInitializer();
+     initializer.setWalltime(500);
+     initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false));
 
-        TaskLauncherInitializer initializer = new TaskLauncherInitializer();
-        initializer.setWalltime(500);
-        initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false));
+     TaskLauncher taskLauncher = new TaskLauncher(initializer, new ForkingTaskLauncherFactory());
 
-        TaskLauncher taskLauncher = new TaskLauncher(initializer, new ForkingTaskLauncherFactory());
+     TaskResult taskResult = runTaskLauncher(taskLauncher, executableContainer);
 
-        TaskResult taskResult = runTaskLauncher(taskLauncher, executableContainer);
+     assertEquals(WalltimeExceededException.class, taskResult.getException().getClass());
+     }
 
-        assertEquals(WalltimeExceededException.class, taskResult.getException().getClass());
-    }
+     @Test(timeout = 5000)
+     public void walltime_during_task_execution() throws Throwable {
+     ForkedScriptExecutableContainer executableContainer = new ForkedScriptExecutableContainer(
+     new TaskScript(new SimpleScript("java.lang.Thread.sleep(10000)", "javascript")));
 
-    @Test(timeout = 5000)
-    public void walltime_during_task_execution() throws Throwable {
-        ForkedScriptExecutableContainer executableContainer = new ForkedScriptExecutableContainer(
-            new TaskScript(new SimpleScript("java.lang.Thread.sleep(10000)", "javascript")));
+     TaskLauncherInitializer initializer = new TaskLauncherInitializer();
+     initializer.setWalltime(500);
+     initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false));
 
-        TaskLauncherInitializer initializer = new TaskLauncherInitializer();
-        initializer.setWalltime(500);
-        initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false));
+     TaskLauncher taskLauncher = new TaskLauncher(initializer, new TestTaskLauncherFactory());
 
-        TaskLauncher taskLauncher = new TaskLauncher(initializer, new TestTaskLauncherFactory());
+     TaskResult taskResult = runTaskLauncher(taskLauncher, executableContainer);
 
-        TaskResult taskResult = runTaskLauncher(taskLauncher, executableContainer);
+     assertEquals(WalltimeExceededException.class, taskResult.getException().getClass());
+     }
 
-        assertEquals(WalltimeExceededException.class, taskResult.getException().getClass());
-    }
+     @Test(timeout = 5000)
+     public void walltime_during_file_copy() throws Throwable {
+     ForkedScriptExecutableContainer executableContainer = new ForkedScriptExecutableContainer(
+     new TaskScript(new SimpleScript("", "javascript")));
 
-    @Test(timeout = 5000)
-    public void walltime_during_file_copy() throws Throwable {
-        ForkedScriptExecutableContainer executableContainer = new ForkedScriptExecutableContainer(
-            new TaskScript(new SimpleScript("", "javascript")));
+     TaskLauncherInitializer initializer = new TaskLauncherInitializer();
+     initializer.setWalltime(500);
+     initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false));
 
-        TaskLauncherInitializer initializer = new TaskLauncherInitializer();
-        initializer.setWalltime(500);
-        initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false));
+     TaskLauncher taskLauncher = new TaskLauncher(initializer, new SlowDataspacesTaskLauncherFactory());
+     TaskResult taskResult = runTaskLauncher(taskLauncher, executableContainer);
 
-        TaskLauncher taskLauncher = new TaskLauncher(initializer, new SlowDataspacesTaskLauncherFactory());
-        TaskResult taskResult = runTaskLauncher(taskLauncher, executableContainer);
+     assertEquals(WalltimeExceededException.class, taskResult.getException().getClass());
+     }
 
-        assertEquals(WalltimeExceededException.class, taskResult.getException().getClass());
-    }
+     private TaskResult runTaskLauncher(TaskLauncher taskLauncher,
+     ForkedScriptExecutableContainer executableContainer) throws InterruptedException,
+     ActiveObjectCreationException, NodeException {
 
-    private TaskResult runTaskLauncher(TaskLauncher taskLauncher,
-            ForkedScriptExecutableContainer executableContainer) throws InterruptedException, ActiveObjectCreationException, NodeException {
+     TaskTerminateNotificationVerifier taskResult = new TaskTerminateNotificationVerifier();
+     taskLauncher.doTask(executableContainer, null, taskResult);
 
-        TaskTerminateNotificationVerifier taskResult = new TaskTerminateNotificationVerifier();
-        taskLauncher.doTask(executableContainer, null, taskResult);
+     return taskResult.result;
+     }
 
-        return taskResult.result;
-    }
+     private static class TaskTerminateNotificationVerifier implements TaskTerminateNotification {
+     TaskResult result;
 
-    private static class TaskTerminateNotificationVerifier implements TaskTerminateNotification {
-        TaskResult result;
+     @Override
+     public void terminate(TaskId taskId, TaskResult taskResult) {
+     this.result = taskResult;
+     }
+     }
 
-        @Override
-        public void terminate(TaskId taskId, TaskResult taskResult) {
-            this.result = taskResult;
-        }
-    }
+     private class TestTaskLauncherFactory extends TaskLauncherFactory {
+     @Override
+     public TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService) {
+     return new TaskFileDataspaces();
+     }
 
-    private class TestTaskLauncherFactory extends TaskLauncherFactory {
-        @Override
-        public TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService) {
-            return new TaskFileDataspaces();
-        }
+     @Override
+     public TaskExecutor createTaskExecutor(TaskContext context, File workingDir) {
+     return new NonForkedTaskExecutor();
+     }
 
-        @Override
-        public TaskExecutor createTaskExecutor(File workingDir, Decrypter decrypter) {
-            return new NonForkedTaskExecutor();
-        }
+     }
 
-    }
+     private class ForkingTaskLauncherFactory extends TaskLauncherFactory {
+     @Override
+     public TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService) {
+     return new TaskFileDataspaces();
+     }
 
-    private class ForkingTaskLauncherFactory extends TaskLauncherFactory {
-        @Override
-        public TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService) {
-            return new TaskFileDataspaces();
-        }
+     @Override
+     public TaskExecutor createTaskExecutor(TaskContext context, File workingDir) {
+     return new DockerForkerTaskExecutor(context, workingDir);
+     }
 
-        @Override
-        public TaskExecutor createTaskExecutor(File workingDir, Decrypter decrypter) {
-            return new ForkerTaskExecutor(workingDir, decrypter);
-        }
+     }
 
-    }
+     private class SlowDataspacesTaskLauncherFactory extends TaskLauncherFactory {
+     @Override
+     public TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService) {
+     return new SlowDataspaces();
+     }
 
-    private class SlowDataspacesTaskLauncherFactory extends TaskLauncherFactory {
-        @Override
-        public TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService) {
-            return new SlowDataspaces();
-        }
+     @Override
+     public TaskExecutor createTaskExecutor(File workingDir, Decrypter decrypter) {
+     return new NonForkedTaskExecutor();
+     }
 
-        @Override
-        public TaskExecutor createTaskExecutor(File workingDir, Decrypter decrypter) {
-            return new NonForkedTaskExecutor();
-        }
+     }
 
-    }
+     private class TaskFileDataspaces implements TaskDataspaces {
 
-    private class TaskFileDataspaces implements TaskDataspaces {
+     @Override
+     public File getScratchFolder() {
+     return new File(".");
+     }
 
-        @Override
-        public File getScratchFolder() {
-            return new File(".");
-        }
+     @Override
+     public void copyInputDataToScratch(List<InputSelector> inputFiles) throws FileSystemException {
 
-        @Override
-        public void copyInputDataToScratch(List<InputSelector> inputFiles) throws FileSystemException {
+     }
 
-        }
+     @Override
+     public void copyScratchDataToOutput(List<OutputSelector> outputFiles) throws FileSystemException {
 
-        @Override
-        public void copyScratchDataToOutput(List<OutputSelector> outputFiles) throws FileSystemException {
+     }
+     }
 
-        }
-    }
+     private class SlowDataspaces implements TaskDataspaces {
 
-    private class SlowDataspaces implements TaskDataspaces {
+     @Override
+     public File getScratchFolder() {
+     return new File(".");
+     }
 
-        @Override
-        public File getScratchFolder() {
-            return new File(".");
-        }
+     @Override
+     public void copyInputDataToScratch(List<InputSelector> inputFiles) throws FileSystemException {
+     try {
+     Thread.sleep(10000);
+     } catch (InterruptedException e) {
+     throw new RuntimeException(e);
+     }
+     }
 
-        @Override
-        public void copyInputDataToScratch(List<InputSelector> inputFiles) throws FileSystemException {
-            try {
-                Thread.sleep(10000);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        }
+     @Override
+     public void copyScratchDataToOutput(List<OutputSelector> outputFiles) throws FileSystemException {
 
-        @Override
-        public void copyScratchDataToOutput(List<OutputSelector> outputFiles) throws FileSystemException {
+     }
+     }
 
-        }
-    }
+     */
 }
