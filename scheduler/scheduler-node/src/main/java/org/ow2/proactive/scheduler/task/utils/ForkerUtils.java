@@ -104,8 +104,15 @@ public final class ForkerUtils {
      */
     public static PAOSProcessBuilderFactory getOSProcessBuilderFactory(String nativeScriptPath) {
         if (OSBuilderFactory == null) {
-            try {
+            /*try {
                 OSBuilderFactory = new PAOSProcessBuilderFactory(nativeScriptPath);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }*/
+            // TODO figure out if nativeScriptPath is necessary, it was empty anyways
+            try {
+                OSBuilderFactory = new PAOSProcessBuilderFactory();
             } catch (Exception e) {
                 e.printStackTrace();
             }
