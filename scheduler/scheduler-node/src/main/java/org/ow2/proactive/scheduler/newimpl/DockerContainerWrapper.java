@@ -53,30 +53,29 @@ public class DockerContainerWrapper {
 
     // CONSTANTS
     // TODO bring the, in config files
-    public static String SUDO_COMMAND_PROPERTY = "SUDO_COMMAND";
-    public static String DOCKER_COMMAND_PROPERTY = "DOCKER_COMMAND";
+    public static final String SUDO_COMMAND_PROPERTY = "SUDO_COMMAND";
+    public static final String DOCKER_COMMAND_PROPERTY = "DOCKER_COMMAND";
 
-    public static String INSIDE_CONTAINER_SCHEDULING_HOME = "/data/scheduling";
-    public static String INSIDE_CONTAINER_JAVA_COMMAND = "java";
-    public static String INSIDE_CONTAINER_CLASSPATH_SWITCH = "-cp";
-    public static String INSIDE_CONTAINER_CLASSPATH = "/data/scheduling/dist/lib/*:scheduling/addons/*:scheduling/addons/";
-    public static String INSIDE_CONTAINER_SECURITY_POLICY =
-            "-Djava.security.policy="
-            +CentralPAPropertyRepository
-            .JAVA_SECURITY_POLICY
-            .getValue()
-            .replace(CentralPAPropertyRepository.PA_HOME.getValue(),INSIDE_CONTAINER_SCHEDULING_HOME);
-
+    public static final String INSIDE_CONTAINER_SCHEDULING_HOME = "/data/scheduling";
+    public static final String INSIDE_CONTAINER_JAVA_COMMAND = "java";
+    public static final String INSIDE_CONTAINER_CLASSPATH_SWITCH = "-cp";
+    public static final String INSIDE_CONTAINER_CLASSPATH = "/data/scheduling/dist/lib/*:scheduling/addons/*:scheduling/addons/";
+    //public static final String INSIDE_CONTAINER_SECURITY_POLICY =
+    //        "-Djava.security.policy="
+    //        +CentralPAPropertyRepository
+    //        .JAVA_SECURITY_POLICY
+    //        .getValue()
+    //        .replace(CentralPAPropertyRepository.PA_HOME.getValue(),INSIDE_CONTAINER_SCHEDULING_HOME);
 
     // :ro means to mount it as read-only -- IMPORTANT
-    public static String SCHEDULING_CONTAINER_HOME_MOUNT = INSIDE_CONTAINER_SCHEDULING_HOME +":ro";
-    public static String DOCKER_IMAGE_PROPERTY = "STANDARD_DOCKER_CONTAINER";
+    public static final String SCHEDULING_CONTAINER_HOME_MOUNT = INSIDE_CONTAINER_SCHEDULING_HOME + ":ro";
+    public static final String DOCKER_IMAGE_PROPERTY = "STANDARD_DOCKER_CONTAINER";
 
-    public static String KILL_ARGUMENT = "stop";
-    public static String REMOVE_ARGUMENT = "rm";
-    public static String START_ARGUMENT = "run";
-    public static String NAME_SWITCH = "--name";
-    public static String VOLUME_SWITCH = "-v";
+    public static final String KILL_ARGUMENT = "stop";
+    public static final String REMOVE_ARGUMENT = "rm";
+    public static final String START_ARGUMENT = "run";
+    public static final String NAME_SWITCH = "--name";
+    public static final String VOLUME_SWITCH = "-v";
 
     private String name;
     private String image;
@@ -207,7 +206,6 @@ public class DockerContainerWrapper {
         // Add java command
         command.add(INSIDE_CONTAINER_JAVA_COMMAND);
 
-
         // TODO Add java security policy.
         /**
          * The CentralPAPropertyRepository
@@ -220,7 +218,7 @@ public class DockerContainerWrapper {
         /*
         // Add security policy
         command.add(INSIDE_CONTAINER_SECURITY_POLICY);
-        */
+         */
         // ADD classpath
         command.add(INSIDE_CONTAINER_CLASSPATH_SWITCH);
         command.add(INSIDE_CONTAINER_CLASSPATH);

@@ -22,10 +22,6 @@ import static org.junit.Assert.assertTrue;
 
 public class DockerContainerWrapperTest {
 
-    private static String sudoCommand = "sudo";
-    private static String dockerCommand = "docker";
-    private static String image = "image/test";
-
     private static String oldDocker;
     private static String oldSudo;
     private static String oldImage;
@@ -34,20 +30,28 @@ public class DockerContainerWrapperTest {
     public static void prepare() throws InvalidScriptException {
 
         //Set system properties
-        oldDocker = System.getProperty(DockerContainerWrapper.DOCKER_COMMAND_PROPERTY, "docker");
-        oldSudo = System.getProperty(DockerContainerWrapper.SUDO_COMMAND_PROPERTY, "sudo");
-        oldImage = System.getProperty(DockerContainerWrapper.DOCKER_IMAGE_PROPERTY, "test/image");
+        oldDocker = System.getProperty(DockerContainerWrapper.DOCKER_COMMAND_PROPERTY);
+        oldSudo = System.getProperty(DockerContainerWrapper.SUDO_COMMAND_PROPERTY);
+        oldImage = System.getProperty(DockerContainerWrapper.DOCKER_IMAGE_PROPERTY);
         System.setProperty(DockerContainerWrapper.DOCKER_COMMAND_PROPERTY, "docker");
         System.setProperty(DockerContainerWrapper.SUDO_COMMAND_PROPERTY, "sudo");
         System.setProperty(DockerContainerWrapper.DOCKER_IMAGE_PROPERTY, "test/image");
     }
 
+    private static void resetProperty(String key, String value) {
+        if (value != null) {
+            System.setProperty(key, value);
+        } else {
+            System.clearProperty(key);
+        }
+    }
+
     @AfterClass
     public static void tearDown() throws Exception {
         // Restore System properties
-        System.setProperty(DockerContainerWrapper.DOCKER_COMMAND_PROPERTY, oldDocker);
-        System.setProperty(DockerContainerWrapper.SUDO_COMMAND_PROPERTY, oldSudo);
-        System.setProperty(DockerContainerWrapper.DOCKER_IMAGE_PROPERTY, oldImage);
+        resetProperty(DockerContainerWrapper.DOCKER_COMMAND_PROPERTY, oldDocker);
+        resetProperty(DockerContainerWrapper.SUDO_COMMAND_PROPERTY, oldSudo);
+        resetProperty(DockerContainerWrapper.DOCKER_IMAGE_PROPERTY, oldImage);
     }
 
     @Test
@@ -77,10 +81,10 @@ public class DockerContainerWrapperTest {
 
         // Check if sudo was used
         if (useSudo) {
-            assertEquals(sudoCommand, command[index++]);
+            assertEquals(System.getProperty(DockerContainerWrapper.SUDO_COMMAND_PROPERTY), command[index++]);
         }
         // Check if docker command comes next
-        assertEquals(dockerCommand, command[index++]);
+        assertEquals(System.getProperty(DockerContainerWrapper.DOCKER_COMMAND_PROPERTY), command[index++]);
         // check if run comes next
         assertEquals(DockerContainerWrapper.START_ARGUMENT, command[index++].toLowerCase());
     }
@@ -99,10 +103,10 @@ public class DockerContainerWrapperTest {
 
         // Check if sudo was used
         if (useSudo) {
-            assertEquals(sudoCommand, command[index++]);
+            assertEquals(System.getProperty(DockerContainerWrapper.SUDO_COMMAND_PROPERTY), command[index++]);
         }
         // Check if docker command comes next
-        assertEquals(dockerCommand, command[index++]);
+        assertEquals(System.getProperty(DockerContainerWrapper.DOCKER_COMMAND_PROPERTY), command[index++]);
         // check if run comes next
         assertEquals(DockerContainerWrapper.KILL_ARGUMENT, command[index++].toLowerCase());
 
@@ -123,10 +127,10 @@ public class DockerContainerWrapperTest {
 
         // Check if sudo was used
         if (useSudo) {
-            assertEquals(sudoCommand, command[index++]);
+            assertEquals(System.getProperty(DockerContainerWrapper.SUDO_COMMAND_PROPERTY), command[index++]);
         }
         // Check if docker command comes next
-        assertEquals(dockerCommand, command[index++]);
+        assertEquals(System.getProperty(DockerContainerWrapper.DOCKER_COMMAND_PROPERTY), command[index++]);
         // check if run comes next
         assertEquals(DockerContainerWrapper.REMOVE_ARGUMENT, command[index++].toLowerCase());
 
@@ -194,7 +198,6 @@ public class DockerContainerWrapperTest {
             throws OSUserException, IOException, FatalProcessBuilderException, CoreBindingException {
         String name = "container";
         DockerContainerWrapper container = new DockerContainerWrapper(name);
-
 
         // The PA_HOME is always mounted inside the container, to provide the source for running the
         // task. Make sure it is mounted as read-only with the :ro options attached
