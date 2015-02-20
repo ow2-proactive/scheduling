@@ -89,10 +89,23 @@ public class WalltimeTaskLauncherTest {
         }
     }
 
-    private class ForkingTaskLauncherFactory extends ProActiveForkedTaskLauncherFactory {
+    private class TestTaskLauncherFactory extends TaskLauncherFactory {
         @Override
         public TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService) {
-            return new TestTaskLauncherFactory.TaskFileDataspaces();
+            return new TaskFileDataspaces();
+        }
+
+        @Override
+        public TaskExecutor createTaskExecutor(File workingDir, Decrypter decrypter) {
+            return new NonForkedTaskExecutor();
+        }
+
+    }
+
+    private class ForkingTaskLauncherFactory extends TaskLauncherFactory {
+        @Override
+        public TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService) {
+            return new TaskFileDataspaces();
         }
 
         @Override
@@ -102,4 +115,56 @@ public class WalltimeTaskLauncherTest {
 
     }
 
+    private class SlowDataspacesTaskLauncherFactory extends TaskLauncherFactory {
+        @Override
+        public TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService) {
+            return new SlowDataspaces();
+        }
+
+        @Override
+        public TaskExecutor createTaskExecutor(File workingDir, Decrypter decrypter) {
+            return new NonForkedTaskExecutor();
+        }
+
+    }
+
+    private class TaskFileDataspaces implements TaskDataspaces {
+
+        @Override
+        public File getScratchFolder() {
+            return new File(".");
+        }
+
+        @Override
+        public void copyInputDataToScratch(List<InputSelector> inputFiles) throws FileSystemException {
+
+        }
+
+        @Override
+        public void copyScratchDataToOutput(List<OutputSelector> outputFiles) throws FileSystemException {
+
+        }
+    }
+
+    private class SlowDataspaces implements TaskDataspaces {
+
+        @Override
+        public File getScratchFolder() {
+            return new File(".");
+        }
+
+        @Override
+        public void copyInputDataToScratch(List<InputSelector> inputFiles) throws FileSystemException {
+            try {
+                Thread.sleep(10000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        @Override
+        public void copyScratchDataToOutput(List<OutputSelector> outputFiles) throws FileSystemException {
+
+        }
+    }
 }

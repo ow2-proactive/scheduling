@@ -28,6 +28,20 @@ public class TaskLauncherTest {
     @Rule
     public TemporaryFolder tmpFolder = new TemporaryFolder();
 
+    /**
+     * Converts operating system dependent strings.
+     * @param stringToNormalize
+     * @return
+     */
+    private String normalize(String stringToNormalize) {
+        String returnString;
+
+        returnString = stringToNormalize.replaceAll("\\r\\n", "\n");
+        returnString = returnString.replaceAll("\\r", "\n");
+
+        return returnString;
+    }
+
     @Test
     public void emptyConstructorForProActiveExists() throws Exception {
         new TaskLauncher();
@@ -36,7 +50,7 @@ public class TaskLauncherTest {
     @Test
     public void simpleTask() throws Throwable {
         ForkedScriptExecutableContainer executableContainer = new ForkedScriptExecutableContainer(
-          new TaskScript(new SimpleScript("print('hello'); result='hello'", "javascript")));
+            new TaskScript(new SimpleScript("print('hello'); result='hello'", "javascript")));
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
 
@@ -47,8 +61,8 @@ public class TaskLauncherTest {
         TaskLauncher taskLauncher = new TaskLauncher(initializer, new TestTaskLauncherFactory());
         TaskResult taskResult = runTaskLauncher(taskLauncher, executableContainer);
 
-        assertEquals("hello", taskResult.value());
-        assertEquals("prehellopost\n", taskResult.getOutput().getAllLogs(false));
+        assertEquals(normalize("hello"), normalize(taskResult.value().toString()));
+        assertEquals(normalize("pre\nhello\npost\n"), normalize(taskResult.getOutput().getAllLogs(false)));
     }
 
     @Test
@@ -74,7 +88,7 @@ public class TaskLauncherTest {
     @Test
     public void failedTask() throws Throwable {
         ForkedScriptExecutableContainer executableContainer = new ForkedScriptExecutableContainer(
-          new TaskScript(new SimpleScript("failing task'", "javascript")));
+            new TaskScript(new SimpleScript("failing task'", "javascript")));
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
 
@@ -90,7 +104,7 @@ public class TaskLauncherTest {
     @Test
     public void thirdPartyCredentials() throws Throwable {
         ForkedScriptExecutableContainer executableContainer = new ForkedScriptExecutableContainer(
-          new TaskScript(new SimpleScript("print(credentials.get('password'))", "javascript")));
+            new TaskScript(new SimpleScript("print(credentials.get('password'))", "javascript")));
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
         initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false));
@@ -99,28 +113,12 @@ public class TaskLauncherTest {
 
         CredData credData = new CredData("john", "pwd");
         credData.addThirdPartyCredential("password", "r00t");
-        Credentials thirdPartyCredentials = Credentials.createCredentials(credData,
-          taskLauncher.generatePublicKey());
+        Credentials thirdPartyCredentials = Credentials.createCredentials(credData, taskLauncher.generatePublicKey());
         executableContainer.setCredentials(thirdPartyCredentials);
 
         TaskResult taskResult = runTaskLauncher(taskLauncher, executableContainer);
 
-        assertEquals("r00t\n", taskResult.getOutput().getAllLogs(false));
-    }
-
-    @Test
-    public void nativeTask_Working_Dir() throws Throwable {
-        ForkedScriptExecutableContainer executableContainer = new ForkedScriptExecutableContainer(
-          new TaskScript(new SimpleScript("pwd", "native")), "/tmp");
-
-        TaskLauncherInitializer initializer = new TaskLauncherInitializer();
-
-        initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false));
-
-        TaskLauncher taskLauncher = new TaskLauncher(initializer, new TestTaskLauncherFactory());
-        TaskResult taskResult = runTaskLauncher(taskLauncher, executableContainer);
-
-        assertEquals("/tmp\n", taskResult.getOutput().getAllLogs(false));
+        assertEquals(normalize("r00t\n"), normalize(taskResult.getOutput().getAllLogs(false)));
     }
 
     private TaskResult runTaskLauncher(TaskLauncher taskLauncher, ForkedScriptExecutableContainer executableContainer) {
@@ -140,4 +138,77 @@ public class TaskLauncherTest {
         }
     }
 
+    private class TestTaskLauncherFactory extends TaskLauncherFactory {
+        @Override
+        public TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService) {
+            return new TaskFileDataspaces();
+        }
+
+        @Override
+        public TaskExecutor createTaskExecutor(File workingDir, Decrypter decrypter) {
+            return new NonForkedTaskExecutor();
+        }
+
+    }
+
+    private class SlowDataspacesTaskLauncherFactory extends TaskLauncherFactory {
+        @Override
+        public TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService) {
+            return new SlowDataspaces();
+        }
+
+        @Override
+        public TaskExecutor createTaskExecutor(File workingDir, Decrypter decrypter) {
+            return new NonForkedTaskExecutor();
+        }
+
+    }
+
+    private class TaskFileDataspaces implements TaskDataspaces {
+
+        @Override
+        public File getScratchFolder() {
+            try {
+                return tmpFolder.newFolder();
+            } catch (IOException e){
+                throw new RuntimeException(e);
+            }
+        }
+
+        @Override
+        public void copyInputDataToScratch(List<InputSelector> inputFiles) throws FileSystemException {
+
+        }
+
+        @Override
+        public void copyScratchDataToOutput(List<OutputSelector> outputFiles) throws FileSystemException {
+
+        }
+    }
+
+    private class SlowDataspaces implements TaskDataspaces {
+
+        @Override
+        public File getScratchFolder() {
+            try {
+                return tmpFolder.newFolder();
+            } catch (IOException e){
+                throw new RuntimeException(e);
+            }
+        }
+
+        @Override
+        public void copyInputDataToScratch(List<InputSelector> inputFiles) throws FileSystemException {
+            try {
+                Thread.sleep(10000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        @Override
+        public void copyScratchDataToOutput(List<OutputSelector> outputFiles) throws FileSystemException {
+
+        }
+    }
 }

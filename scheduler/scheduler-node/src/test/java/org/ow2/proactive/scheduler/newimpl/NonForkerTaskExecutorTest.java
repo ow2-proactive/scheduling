@@ -74,7 +74,7 @@ public class NonForkerTaskExecutorTest {
         assertEquals("job@1000@task@42", lines[2]);
     }
 
-    @Test
+    /*@Test
     public void contextVariables_index() throws Throwable {
         TestTaskOutput taskOutput = new TestTaskOutput();
 
@@ -89,7 +89,7 @@ public class NonForkerTaskExecutorTest {
             initializer), taskOutput.outputStream, taskOutput.error);
 
         assertEquals(42.0, result.value());
-    }
+    }*/
 
     @Test
     public void variablesPropagation() throws Throwable {
@@ -109,8 +109,8 @@ public class NonForkerTaskExecutorTest {
                 taskOutput.outputStream, taskOutput.error);
 
         assertEquals("valuepretask", taskOutput.output());
-        assertEquals("post",
-                SerializationUtil.deserializeVariableMap(result.getPropagatedVariables()).get("var"));
+        assertEquals("post", SerializationUtil.deserializeVariableMap(result.getPropagatedVariables()).get(
+                "var"));
     }
 
     @Test

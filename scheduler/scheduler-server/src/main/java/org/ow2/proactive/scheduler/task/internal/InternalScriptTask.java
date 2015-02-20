@@ -84,9 +84,9 @@ public class InternalScriptTask extends InternalTask {
             NodeException {
         logger.info(getTaskInfo().getTaskId(), "creating script task launcher");
         TaskLauncher launcher = (TaskLauncher) PAActiveObject.newActive(TaskLauncher.class.getName(),
-                new Object[] { getDefaultTaskLauncherInitializer(job), new ProActiveForkedTaskLauncherFactory(){
+                new Object[] { getDefaultTaskLauncherInitializer(job), new TaskLauncherFactory() {
                     @Override
-                    public TaskExecutor createTaskExecutor(File workingDir, Decrypter decrypter) {
+                    public TaskExecutor createTaskExecutor(TaskContext context, File workingDir) {
                         return new NonForkedTaskExecutor();
                     }
                 } }, node);

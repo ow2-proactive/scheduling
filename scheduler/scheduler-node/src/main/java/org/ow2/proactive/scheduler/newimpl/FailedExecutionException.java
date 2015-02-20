@@ -30,32 +30,19 @@
  *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s):
  *
- *  * $$ACTIVEEON_INITIAL_DEV$$
+ *  * Tobias Wiens
  */
 package org.ow2.proactive.scheduler.newimpl;
 
-import java.io.File;
 import java.io.Serializable;
 
-import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
-import org.objectweb.proactive.extensions.processbuilder.OSProcessBuilder;
-import org.ow2.proactive.scheduler.common.task.Decrypter;
-import org.ow2.proactive.scheduler.newimpl.utils.Decrypter;
-import org.ow2.proactive.scheduler.common.task.TaskId;
-import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
-import org.ow2.proactive.scheduler.task.utils.ForkerUtils;
-import org.ow2.proactive.scheduler.newimpl.data.TaskDataspaces;
+/**
+ * CommandExecutor failed executing a command.
+ */
+public class FailedExecutionException extends Exception implements Serializable {
 
 
-public class TaskLauncherFactory implements Serializable {
-    public TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService) {
-        return new TaskProActiveDataspaces(taskId, namingService);
+    public FailedExecutionException(String description) {
+        super(description);
     }
-
-    public TaskExecutor createTaskExecutor(TaskContext context, File workingDir) throws Exception {
-        TimedCommandExecutor executor = new TimedCommandExecutorFactory().createTimedCommandExecutor(context,
-                workingDir, context.getDecrypter());
-        return new DockerForkerTaskExecutor(workingDir, context.getDecrypter(), executor);
-    }
-
 }

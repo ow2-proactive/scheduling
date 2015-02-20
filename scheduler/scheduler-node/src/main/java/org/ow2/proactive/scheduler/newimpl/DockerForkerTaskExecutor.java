@@ -42,7 +42,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintStream;
 
-import org.objectweb.proactive.extensions.processbuilder.OSProcessBuilder;
 import org.ow2.proactive.scheduler.common.task.Decrypter;
 import org.objectweb.proactive.extensions.processbuilder.exception.NotImplementedException;
 import org.ow2.proactive.scheduler.newimpl.utils.Decrypter;
@@ -60,128 +59,89 @@ import org.apache.commons.io.FileUtils;
 public class DockerForkerTaskExecutor implements TaskExecutor {
     private static final Logger logger = Logger.getLogger(DockerForkerTaskExecutor.class);
 
+    // TODO What to do with the decrypter it is contained in the context anyway
+
     private File workingDir;
     private Decrypter decrypter;
     private Class<DockerForkerTaskExecutor> taskExecutorClass = DockerForkerTaskExecutor.class;
+    private TimedCommandExecutor executor;
 
-    public DockerForkerTaskExecutor(File workingDir, Decrypter decrypter) {
+    public DockerForkerTaskExecutor(File workingDir, Decrypter decrypter, TimedCommandExecutor executor) {
         this.workingDir = workingDir;
         this.decrypter = decrypter;
+        this.executor = executor;
     }
 
-    // Called by forker to run create forked JVM
+    // Called by forker to run context inside docker container
     public TaskResultImpl execute(TaskContext context, PrintStream outputSink, PrintStream errorSink) {
         // Create docker container
         DockerContainerWrapper container = new DockerContainerWrapper(context.getTaskId().value());
 
+        String containerPathToContext = "/data/context/" + workingDir.getName();
+
         // Map working directory inside container
-        container.addVolumeDirectory(workingDir.getAbsolutePath(), workingDir.getAbsolutePath());
+        container.addVolumeDirectory(workingDir.getAbsolutePath(), containerPathToContext);
 
-        Process process = null;
-        ProcessStreamsReader processStreamsReader = null;
         File serializedContext = null;
-
         try {
             serializedContext = serializeContext(context, workingDir);
 
-            OSProcessBuilder processBuilder = createForkedProcess(context, serializedContext);
+            String pathToContextFile = containerPathToContext + "/" + serializedContext.getName();
+            // Create start command
+            String[] startCommand = container.start(this.taskExecutorClass.getName(), pathToContextFile);
 
-            try {
-                taskProcessTreeKiller.tagEnvironment(processBuilder.environment());
-            } catch (NotImplementedException e) {
-                // TODO SCHEDULING-986 : remove catch block when environment can be modified with runAsMe
-            }
+            // Execute command
+            int exitCode = this.executor.executeCommand(outputSink, errorSink, startCommand);
 
-            // TODO limit classpath to a bare minimum
-            pb.command("docker ", "run", "tobwiens/proactive-executer", "-Djava.security.policy=/home/sdolgov/proactive/repos/scheduling/config/security.java.policy-client", "-cp",
-                    System.getProperty("java.class.path"), taskExecutorClass.getName(),
-                    serializedContext.getAbsolutePath()).directory(workingDir);
-
-            pb.command("/usr/bin/sudo",
-                    "/usr/bin/docker",
-                    "run" ,
-                    "-v",
-                    workingDir.getAbsolutePath()+":"+workingDir.getAbsolutePath(),
-                    "--name", context.getTaskId().toString(),
-                    "tobwiens/proactive-executer", taskExecutorClass.getName(),
-                    serializedContext.getAbsolutePath()  );
-
-            process = pb.start();
-            processStreamsReader = new ProcessStreamsReader(process, outputSink, errorSink);
-
-            int exitCode = process.waitFor();
-
+            // If execution was not successful
             if (exitCode != 0) {
                 Throwable exception;
                 try {
-                    Throwable exception = (Throwable) deserializeTaskResult(serializedContext);
-                    return new TaskResultImpl(context.getTaskId(), new ForkedJVMProcessException(
-                        "Failed to execute task in a forked JVM", exception));
-                } catch (Throwable cannotDeserializeResult) {
-                    return new TaskResultImpl(context.getTaskId(), new ForkedJVMProcessException(
-                        "Failed to execute task in a forked JVM", cannotDeserializeResult));
+                    // Check if written result is
+                    Object resultContext = deserializeTaskResult(serializedContext);
+
+                    // If exception found in context, return it as task result
+                    if (resultContext instanceof Throwable) {
+                        exception = (Throwable) resultContext;
+                        return new TaskResultImpl(context.getTaskId(), new Exception(
+                            "Failed to execute forked task.", exception), null, 0);
+                    }
+                } catch (ClassNotFoundException ignored) {
+                    return new TaskResultImpl(context.getTaskId(), new Exception(
+                        "Failed to deserialize result.", ignored), null, 0);
                 }
+
             }
 
+            // Execution successful return task result
             return (TaskResultImpl) deserializeTaskResult(serializedContext);
         } catch (Throwable throwable) {
-            return new TaskResultImpl(context.getTaskId(), new ForkedJVMProcessException(
-                "Failed to execute task in a forked JVM", throwable));
+            return new TaskResultImpl(context.getTaskId(), new Exception("Failed to execute forked task",
+                throwable), null, 0);
         } finally {
+            // Clean up
             FileUtils.deleteQuietly(serializedContext);
 
             outputSink.flush();
             errorSink.flush();
 
-            if (process != null) {
-                process.destroy();
+            try {
+                // Stop container - Thread might have been interrupted
+                String[] stopCommand = container.stop();
+                this.executor.executeTimedWhileInterrupted(null, null, stopCommand);
+
+                // Remove container
+                String[] removeCommand = container.remove();
+                this.executor.executeTimedWhileInterrupted(null, null, removeCommand);
+            } catch (FailedExecutionException e) {
+                DockerForkerTaskExecutor.logger.warn("Failed to kill the running container.", e);
+            } catch (InterruptedException e) {
+                DockerForkerTaskExecutor.logger.warn("Killing of container " + container.getName() +
+                    " interrupted." + "It can be stopped and remove with: sudo docker rm -f " +
+                    container.getName(), e);
             }
-            // Stop container
-            container.stop();
 
-            // Remove container
-            container.remove();
-
-            if (processStreamsReader != null) {
-                processStreamsReader.close();
-            }
         }
-    }
-
-    private OSProcessBuilder createForkedProcess(TaskContext context, File serializedContext)
-            throws Exception {
-        OSProcessBuilder pb;
-        String nativeScriptPath = PASchedulerProperties.SCHEDULER_HOME.getValueAsString(); // TODO inject
-        if (context.isRunAsUser()) {
-            boolean workingDirCanBeWrittenByForked = workingDir.setWritable(true);
-            if (!workingDirCanBeWrittenByForked) {
-                throw new Exception("Working directory will not be writable by runAsMe user");
-            }
-            pb = ForkerUtils.getOSProcessBuilderFactory(nativeScriptPath).getBuilder(
-                    ForkerUtils.checkConfigAndGetUser(decrypter));
-        } else {
-            pb = ForkerUtils.getOSProcessBuilderFactory(nativeScriptPath).getBuilder();
-        }
-
-        pb.command(getJavaExecutablePath(context.getExecutableContainer()), "-cp",
-                System.getProperty("java.class.path"), ForkerTaskExecutor.class.getName(),
-                serializedContext.getAbsolutePath()).directory(workingDir);
-        return pb;
-    }
-
-    private String getJavaExecutablePath(ExecutableContainer executableContainer) {
-        String javaHome;
-        if (executableContainer instanceof ForkedJavaExecutableContainer &&
-            ((ForkedJavaExecutableContainer) executableContainer).getForkEnvironment() != null &&
-            ((ForkedJavaExecutableContainer) executableContainer).getForkEnvironment().getJavaHome() != null &&
-            !((ForkedJavaExecutableContainer) executableContainer).getForkEnvironment().getJavaHome()
-                    .isEmpty()) {
-            javaHome = ((ForkedJavaExecutableContainer) executableContainer).getForkEnvironment()
-                    .getJavaHome();
-        } else {
-            javaHome = System.getProperty("java.home");
-        }
-        return javaHome + File.separatorChar + "bin" + File.separatorChar + "java";
     }
 
     // 1 called by forker
@@ -213,8 +173,7 @@ public class DockerForkerTaskExecutor implements TaskExecutor {
     }
 
     // 4 called by forker
-    private static Object deserializeTaskResult(File pathToFile) throws IOException,
-            ClassNotFoundException {
+    private static Object deserializeTaskResult(File pathToFile) throws IOException, ClassNotFoundException {
         ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(pathToFile));
         Object scriptResult = inputStream.readObject();
         FileUtils.forceDelete(pathToFile);
@@ -242,7 +201,7 @@ public class DockerForkerTaskExecutor implements TaskExecutor {
         } catch (Throwable throwable) {
             try {
                 serializeTaskResult(throwable, contextPath);
-            } catch (Throwable ignored){
+            } catch (Throwable ignored) {
             }
             throwable.printStackTrace(System.err);
             System.exit(1);

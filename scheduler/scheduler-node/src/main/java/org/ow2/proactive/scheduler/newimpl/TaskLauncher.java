@@ -43,7 +43,6 @@ import java.security.PublicKey;
 import java.security.SecureRandom;
 
 import org.objectweb.proactive.annotation.ImmediateService;
-import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
@@ -118,8 +117,7 @@ public class TaskLauncher {
 
             dataspaces.copyInputDataToScratch(initializer.getTaskInputFiles()); // should handle interrupt
 
-            TaskContext context = new TaskContext(executableContainer,
-                initializer, previousTasksResults);
+            TaskContext context = new TaskContext(executableContainer, initializer, previousTasksResults);
 
             if (decrypter != null) {
                 decrypter.setCredentials(executableContainer.getCredentials());
@@ -127,7 +125,8 @@ public class TaskLauncher {
                 context.setDecrypter(decrypter);
             }
 
-            TaskResultImpl taskResult = factory.createTaskExecutor(dataspaces.getScratchFolder(), decrypter)
+            // Create task executor and execute the given task
+            TaskResultImpl taskResult = factory.createTaskExecutor(context, dataspaces.getScratchFolder())
                     .execute(context, taskLogger.getOutputSink(), taskLogger.getErrorSink()); // TODO decrypter
 
             if (wallTimer.hasWallTimed()) {
@@ -142,7 +141,8 @@ public class TaskLauncher {
             } else if (taskKiller.wasKilled()) {
                 taskLogger.getErrorSink().println("Task " + taskId.getReadableName() + " has been killed");
                 TaskResultImpl failedTaskResult = new TaskResultImpl(taskId, new TaskAbortedException(
-                    "Task " + taskId.getReadableName() + " has been killed"), taskLogger.getLogs(), stopWatch.stop());
+                    "Task " + taskId.getReadableName() + " has been killed"), taskLogger.getLogs(), stopWatch
+                        .stop());
                 sendResultToScheduler(terminateNotification, failedTaskResult);
                 return;
             }
@@ -163,14 +163,19 @@ public class TaskLauncher {
                 sendResultToScheduler(terminateNotification, failedTaskResult);
             } else if (taskKiller.wasKilled()) {
                 taskLogger.getErrorSink().println("Task " + taskId.getReadableName() + " has been killed");
-                TaskResultImpl failedTaskResult = new TaskResultImpl(taskId, new TaskAbortedException(
-                    "Task " + taskId.getReadableName() + " has been killed"), taskLogger.getLogs(), stopWatch.stop());
+                TaskResultImpl failedTaskResult = new TaskResultImpl(taskId,
+                        new TaskAbortedException(
+                    "Task " + taskId.getReadableName() + " has been killed"),
+                        taskLogger.getLogs(), stopWatch
+                        .stop());
                 sendResultToScheduler(terminateNotification, failedTaskResult);
             } else {
                 throwable.printStackTrace(taskLogger.getErrorSink());
                 logger.warn("Failed to execute task", throwable);
-                TaskResultImpl failedTaskResult = new TaskResultImpl(taskId, throwable, taskLogger.getLogs(),
-                  stopWatch.stop());
+                TaskResultImpl failedTaskResult = new TaskResultImpl(taskId,
+                        throwable,
+                        taskLogger.getLogs(),
+                        stopWatch.stop());
                 sendResultToScheduler(terminateNotification, failedTaskResult);
             }
         } finally {
@@ -183,7 +188,7 @@ public class TaskLauncher {
 
         //try {
         //    PAActiveObject.terminateActiveObject(!normalTermination);
-       // } catch (Exception e) {
+        // } catch (Exception e) {
         //    logger.info("Exception when terminating task launcher active object", e);
         //}
     }
@@ -242,7 +247,6 @@ public class TaskLauncher {
 
         logger.info("TaskLauncher terminated");
     }
-
 
     public int getProgress() {
         // not supported anymore
