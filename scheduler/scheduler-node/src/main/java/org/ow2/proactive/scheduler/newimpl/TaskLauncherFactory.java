@@ -52,7 +52,7 @@ public class TaskLauncherFactory implements Serializable {
 
     public TaskExecutor createTaskExecutor(TaskContext context, File workingDir) throws Exception {
         TimedCommandExecutor executor = new TimedCommandExecutorFactory().createTimedCommandExecutor(context,
-                workingDir, context.getDecrypter());
+                workingDir);
         return new DockerForkerTaskExecutor(workingDir, context.getDecrypter(), executor);
     }
 
