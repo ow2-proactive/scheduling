@@ -34,7 +34,6 @@
  */
 package org.ow2.proactive.scheduler.newimpl;
 
-import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.extensions.processbuilder.OSProcessBuilder;
 import org.ow2.proactive.scheduler.common.task.Decrypter;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
@@ -45,9 +44,9 @@ import java.io.File;
 
 public class TimedCommandExecutorFactory {
 
-    public TimedCommandExecutor createTimedCommandExecutor(TaskContext context, File workingDir,
-            Decrypter decrypter) throws Exception {
-        return new PBCommandExecutor(this.getOsProcessBuilder(context, workingDir, decrypter));
+    public TimedCommandExecutor createTimedCommandExecutor(TaskContext context, File workingDir)
+            throws Exception {
+        return new PBCommandExecutor(this.getOsProcessBuilder(context, workingDir, context.getDecrypter()));
     }
 
     private boolean isRunAsUser(TaskContext context) {
