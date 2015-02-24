@@ -38,11 +38,8 @@ import java.io.File;
 import java.io.Serializable;
 
 import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
-import org.objectweb.proactive.extensions.processbuilder.OSProcessBuilder;
-import org.ow2.proactive.scheduler.common.task.Decrypter;
 import org.ow2.proactive.scheduler.common.task.TaskId;
-import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
-import org.ow2.proactive.scheduler.task.utils.ForkerUtils;
+
 
 
 public class TaskLauncherFactory implements Serializable {
