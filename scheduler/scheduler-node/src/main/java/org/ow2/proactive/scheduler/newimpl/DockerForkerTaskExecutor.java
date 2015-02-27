@@ -69,7 +69,8 @@ public class DockerForkerTaskExecutor implements TaskExecutor {
         // Create docker container
         DockerContainerWrapper container = new DockerContainerWrapper(context.getTaskId().value());
 
-        String containerPathToContext = "/data/context/" + workingDir.getName();
+        //String containerPathToContext = "/data/context/" + workingDir.getName();
+        String containerPathToContext = "/data/context/";
 
         // Map working directory inside container
         container.addVolumeDirectory(workingDir.getAbsolutePath(), containerPathToContext);
