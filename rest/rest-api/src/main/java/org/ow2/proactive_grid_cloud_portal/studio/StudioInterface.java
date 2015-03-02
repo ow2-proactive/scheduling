@@ -54,11 +54,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.PathSegment;
-
-import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.core.node.NodeException;
-import org.ow2.proactive.resourcemanager.exception.RMException;
-import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobValidationData;
