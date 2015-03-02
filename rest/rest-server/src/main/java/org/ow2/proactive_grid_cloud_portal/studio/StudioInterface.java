@@ -80,15 +80,13 @@ public interface StudioInterface {
     @Path("login")
     String login(@FormParam("username")
     String username, @FormParam("password")
-    String password) throws KeyException, LoginException, RMException, ActiveObjectCreationException,
-            NodeException, SchedulerRestException;
+    String password) throws KeyException, LoginException, SchedulerRestException;
 
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Path("login")
     String loginWithCredential(@MultipartForm
-    LoginForm multipart) throws ActiveObjectCreationException, NodeException, KeyException, IOException,
-            LoginException, RMException, SchedulerRestException;
+    LoginForm multipart) throws IOException, KeyException, LoginException, SchedulerRestException;
 
     @PUT
     @Path("logout")
@@ -103,80 +101,80 @@ public interface StudioInterface {
     @GET
     @Path("workflows")
     public List<Workflow> getWorkflows(@HeaderParam("sessionid")
-    String sessionId) throws NotConnectedException, IOException;
+    String sessionId) throws NotConnectedRestException, IOException;
 
     @POST
     @Path("workflows")
     @Consumes(APPLICATION_JSON)
     Workflow createWorkflow(@HeaderParam("sessionid")
-                            String sessionId, Workflow workflow) throws NotConnectedException, IOException;
+    String sessionId, Workflow workflow) throws NotConnectedRestException, IOException;
 
     @PUT
     @Path("workflows/{id}")
     @Consumes(APPLICATION_JSON)
     Workflow updateWorkflow(@HeaderParam("sessionid")
-                            String sessionId, @PathParam("id")
-                            String workflowId, Workflow workflow) throws NotConnectedException, IOException;
+    String sessionId, @PathParam("id")
+    String workflowId, Workflow workflow) throws NotConnectedRestException, IOException;
 
     @DELETE
     @Path("workflows/{id}")
     void deleteWorkflow(@HeaderParam("sessionid")
-                        String sessionId, @PathParam("id")
-                        String workflowId) throws NotConnectedException, IOException;
+    String sessionId, @PathParam("id")
+    String workflowId) throws NotConnectedRestException, IOException;
 
     @GET
     @Path("templates")
     public List<Workflow> getTemplates(@HeaderParam("sessionid")
-    String sessionId) throws NotConnectedException, IOException;
+    String sessionId) throws NotConnectedRestException, IOException;
 
     @POST
     @Path("templates")
     @Consumes(APPLICATION_JSON)
     Workflow createTemplate(@HeaderParam("sessionid")
-                            String sessionId, Workflow template) throws NotConnectedException, IOException;
+    String sessionId, Workflow template) throws NotConnectedRestException, IOException;
 
     @PUT
     @Path("templates/{id}")
     @Consumes(APPLICATION_JSON)
     Workflow updateTemplate(@HeaderParam("sessionid")
-                            String sessionId, @PathParam("id")
-                            String templateId, Workflow template) throws NotConnectedException, IOException;
+    String sessionId, @PathParam("id")
+    String templateId, Workflow template) throws NotConnectedRestException, IOException;
 
     @DELETE
     @Path("templates/{id}")
     void deleteTemplate(@HeaderParam("sessionid")
-                        String sessionId, @PathParam("id")
-                        String templateId) throws NotConnectedException, IOException;
+    String sessionId, @PathParam("id")
+    String templateId) throws NotConnectedRestException, IOException;
 
     @GET
     @Path("scripts")
     List<Script> getScripts(@HeaderParam("sessionid")
-                            String sessionId) throws NotConnectedException, IOException;
+    String sessionId) throws NotConnectedRestException, IOException;
 
     @POST
     @Path("scripts")
     String createScript(@HeaderParam("sessionid")
     String sessionId, @FormParam("name")
     String name, @FormParam("content")
-    String content) throws NotConnectedException, IOException;
+    String content) throws NotConnectedRestException, IOException;
 
     @POST
     @Path("scripts/{name}")
     String updateScript(@HeaderParam("sessionid")
     String sessionId, @PathParam("name")
     String name, @FormParam("content")
-    String content) throws NotConnectedException, IOException;
+    String content) throws NotConnectedRestException, IOException;
 
     @GET
     @Path("classes")
     ArrayList<String> getClasses(@HeaderParam("sessionid")
-    String sessionId) throws NotConnectedException;
+    String sessionId) throws NotConnectedRestException;
 
     @POST
     @Path("classes")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     public String createClass(@HeaderParam("sessionid")
-    String sessionId, MultipartFormDataInput multipart) throws NotConnectedException, IOException;
+    String sessionId, MultipartFormDataInput multipart) throws NotConnectedRestException, IOException;
 
     /**
      * Validates a job.
@@ -207,13 +205,13 @@ public interface StudioInterface {
     @Path("visualizations/{id}")
     String getVisualization(@HeaderParam("sessionid")
     String sessionId, @PathParam("id")
-    String jobId) throws NotConnectedException, IOException;
+    String jobId) throws NotConnectedRestException, IOException;
 
     @POST
     @Path("visualizations/{id}")
     boolean updateVisualization(@HeaderParam("sessionid")
     String sessionId, @PathParam("id")
     String jobId, @FormParam("visualization")
-    String visualization) throws NotConnectedException, IOException;
+    String visualization) throws NotConnectedRestException, IOException;
 
 }
