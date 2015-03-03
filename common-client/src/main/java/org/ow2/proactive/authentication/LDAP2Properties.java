@@ -100,6 +100,9 @@ public class LDAP2Properties {
     /** password for the truststore defined by pa.ldap.truststore.path */
     public static final String LDAP_TRUSTSTORE_PASSWD = "pa.ldap2.truststore.passwd";
 
+    /** boolean defining whether the LDAP service provider has to use connection pooling or not */
+    public static final String LDAP_CONNECTION_POOLING = "pa.ldap2.connection.pooling";
+
     /**fall back property, check user/password and group in files if user is not found in LDAP.
      * true or false */
     public static final String FALLBACK_USER_AUTH = "pa.ldap2.authentication.fallback";
