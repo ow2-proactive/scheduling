@@ -100,8 +100,14 @@ public abstract class LDAP2LoginModule extends FileLoginModule implements Loggab
     /** LDAP used to perform authentication */
     private final String LDAP_URL = ldapProperties.getProperty(LDAP2Properties.LDAP_URL);
 
-    /** LDAP Subtree wherein users entries are searched*/
-    private final String BASE_DN = ldapProperties.getProperty(LDAP2Properties.LDAP_USERS_SUBTREE);
+    /** LDAP Subtree wherein users entries are searched */
+    private final String USERS_DN = ldapProperties.getProperty(LDAP2Properties.LDAP_USERS_SUBTREE);
+
+    /**
+     * LDAP Subtree wherein groups entries are searched
+     * If empty, then USERS_DN is used instead
+     */
+    private String GROUPS_DN = ldapProperties.getProperty(LDAP2Properties.LDAP_GROUPS_SUBTREE);
 
     /**
      * Authentication method used to bind to LDAP: none, simple,
@@ -131,6 +137,10 @@ public abstract class LDAP2LoginModule extends FileLoginModule implements Loggab
      * Creates a new instance of LDAPLoginModule
      */
     public LDAP2LoginModule() {
+        if (GROUPS_DN == null) {
+            GROUPS_DN = USERS_DN;
+        }
+
         if (fallbackUserAuth) {
             checkLoginFile();
             checkGroupFile();
@@ -295,7 +305,7 @@ public abstract class LDAP2LoginModule extends FileLoginModule implements Loggab
         }
 
         if (userDN == null) {
-            logger.info("user entry not found in subtree " + BASE_DN + " for user " + username);
+            logger.info("user entry not found in subtree " + USERS_DN + " for user " + username);
             if (fallbackUserAuth) {
                 logger.info("fall back to file authentication for user: " + username);
                 return super.logUser(username, password);
@@ -445,7 +455,7 @@ public abstract class LDAP2LoginModule extends FileLoginModule implements Loggab
             String filter = String.format(ldapProperties.getProperty(LDAP2Properties.LDAP_USER_FILTER),
                     username);
             // looking for the user dn (distinguish name)
-            NamingEnumeration<SearchResult> answer = ctx.search(BASE_DN, filter, sControl);
+            NamingEnumeration<SearchResult> answer = ctx.search(USERS_DN, filter, sControl);
             if (answer.hasMoreElements()) {
                 SearchResult result = (SearchResult) answer.next();
                 userDN = result.getNameInNamespace();
@@ -458,7 +468,7 @@ public abstract class LDAP2LoginModule extends FileLoginModule implements Loggab
                 String groupFilter = String.format(ldapProperties
                         .getProperty(LDAP2Properties.LDAP_GROUP_FILTER), userDN);
 
-                NamingEnumeration<SearchResult> groupResults = ctx.search(BASE_DN, groupFilter, sControl);
+                NamingEnumeration<SearchResult> groupResults = ctx.search(GROUPS_DN, groupFilter, sControl);
                 while (groupResults.hasMoreElements()) {
                     SearchResult res = (SearchResult) groupResults.next();
                     Attribute attr = res.getAttributes().get(
