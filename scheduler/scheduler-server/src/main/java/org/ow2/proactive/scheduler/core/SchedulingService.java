@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 
-import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
@@ -30,12 +29,13 @@ import org.ow2.proactive.scheduler.exception.ProgressPingerException;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.policy.Policy;
 import org.ow2.proactive.scheduler.task.TaskInfoImpl;
+import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
-import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.TaskLogger;
 import org.ow2.proactive.utils.NodeSet;
+import org.apache.log4j.Logger;
 
 
 public class SchedulingService {
@@ -575,10 +575,14 @@ public class SchedulingService {
         infrastructure.getInternalOperationsThreadPool().submit(new Runnable() {
             @Override
             public void run() {
-                TerminationData terminationData = jobs.taskTerminatedWithResult(taskId,
-                        (TaskResultImpl) taskResult);
-                terminationData.handleTermination(SchedulingService.this);
-                wakeUpSchedulingThread();
+                try {
+                    TerminationData terminationData = jobs.taskTerminatedWithResult(taskId,
+                            (TaskResultImpl) taskResult);
+                    terminationData.handleTermination(SchedulingService.this);
+                    wakeUpSchedulingThread();
+                } catch (Throwable e) {
+                    logger.error("Failed to terminate task " + taskId, e);
+                }
             }
         });
     }

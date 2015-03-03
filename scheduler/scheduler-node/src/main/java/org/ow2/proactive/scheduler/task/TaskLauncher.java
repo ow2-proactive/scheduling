@@ -822,6 +822,7 @@ public abstract class TaskLauncher implements InitActive {
          * send back the result (if the task was killed, the core is not accessible, but it is accessible
          * if the task was walltimed)
          */
+        boolean notifiedScheduler = false;
         if (!executableGuard.wasKilled() || executableGuard.wasWalltimed()) {
             if (terminateNotificationStub != null) {
                 // callback to scheduler core sending the result
@@ -829,6 +830,7 @@ public abstract class TaskLauncher implements InitActive {
                     try {
                         terminateNotificationStub.terminate(taskId, taskResult);
                         logger.debug("Successfully set results of task " + taskId);
+                        notifiedScheduler = true;
                         break;
                     } catch (Throwable th) {
                         logger.error("Cannot set results of task " + taskId, th);
@@ -841,6 +843,12 @@ public abstract class TaskLauncher implements InitActive {
                 }
             }
         }
+
+        if(!notifiedScheduler){
+            logger.info("Failed to notify set results of task " + taskId + ", terminating task launcher now");
+            terminate(false);
+        }
+
         logger.info("Task " + taskId + " finalized");
     }
 

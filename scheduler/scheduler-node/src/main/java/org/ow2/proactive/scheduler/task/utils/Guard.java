@@ -284,9 +284,8 @@ public abstract class Guard<T> {
                         return null;
                     }
                 });
-                taskExecutionFuture = stubActiveExecutor.call();
-
                 try {
+                    taskExecutionFuture = stubActiveExecutor.call();
                     waitCallable(timeout);
                 } catch (Throwable e) {
                     logger.warn(e);
@@ -303,6 +302,7 @@ public abstract class Guard<T> {
             try {
                 PAActiveObject.terminateActiveObject(stubActiveExecutor, immediate);
             } catch (Throwable t) {
+                logger.warn("Could not terminate guard active object", t);
                 // we eat any termination exceptions
             }
         }
