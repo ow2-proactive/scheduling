@@ -169,14 +169,40 @@ public class SchedulerStarter {
             RouterConfig config = new RouterConfig();
             int routerPort = PAMRConfig.PA_NET_ROUTER_PORT.getValue();
             config.setPort(routerPort);
+            config.setHeartbeatTimeout(getPAMRHeartbeatTimeout());
+            config.setClientEvictionTimeout(getPAMREvictionTimeout());
             config.setNbWorkerThreads(Runtime.getRuntime().availableProcessors());
             config.setReservedAgentConfigFile(new File(System
                     .getProperty(PASchedulerProperties.SCHEDULER_HOME.getKey()) +
-                File.separator + "config" + File.separator + "router" + File.separator + "router.ini"));
+                File.separator +
+                "config" +
+                File.separator + "router" + File.separator + "router.ini"));
             Router.createAndStart(config);
             logger.info("The router created on " + ProActiveInet.getInstance().getHostname() + ":" +
                 routerPort);
         }
+    }
+
+    private static int getPAMRHeartbeatTimeout() {
+        if (System.getProperty("proactive.pamr.router.heartbeat") != null) {
+            try {
+                return Integer.parseInt(System.getProperty("proactive.pamr.router.heartbeat"));
+            } catch (NumberFormatException e) {
+                logger.warn("An integer is expected for proactive.pamr.router.heartbeat property", e);
+            }
+        }
+        return 180000;
+    }
+
+    private static long getPAMREvictionTimeout() {
+        if (System.getProperty("proactive.pamr.router.eviction") != null) {
+            try {
+                return Long.parseLong(System.getProperty("proactive.pamr.router.eviction"));
+            } catch (NumberFormatException e) {
+                logger.warn("An long is expected for proactive.pamr.router.eviction property", e);
+            }
+        }
+        return 86400000L;
     }
 
     private static boolean needToStartRouter() {
