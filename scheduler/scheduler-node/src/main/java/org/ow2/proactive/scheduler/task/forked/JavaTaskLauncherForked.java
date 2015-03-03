@@ -190,6 +190,7 @@ public class JavaTaskLauncherForked extends JavaTaskLauncher {
         // if the task was killed, cleaning was performed by the killForkedJavaTaskLauncher call
         if (!executableGuard.wasKilled()) {
             super.finalizeTask(terminateNotificationStub, res);
+            PAActiveObject.terminateActiveObject(terminateNotificationStub, false);
         }
     }
 }

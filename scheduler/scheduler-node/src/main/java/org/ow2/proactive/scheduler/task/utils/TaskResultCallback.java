@@ -1,6 +1,5 @@
 package org.ow2.proactive.scheduler.task.utils;
 
-import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.task.TaskId;
@@ -23,6 +22,5 @@ public class TaskResultCallback implements TaskTerminateNotification {
     @Override
     public void terminate(TaskId taskId, TaskResult taskResult) {
         launcherGuard.setResult(taskResult);
-        PAActiveObject.terminateActiveObject(false);
     }
 }

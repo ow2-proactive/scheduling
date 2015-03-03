@@ -551,9 +551,13 @@ public class SchedulingService {
         infrastructure.getInternalOperationsThreadPool().submit(new Runnable() {
             @Override
             public void run() {
-                TerminationData terminationData = jobs.taskTerminatedWithResult(taskId,
-                        (TaskResultImpl) taskResult);
-                terminationData.handleTermination(SchedulingService.this);
+                try {
+                    TerminationData terminationData = jobs.taskTerminatedWithResult(taskId,
+                            (TaskResultImpl) taskResult);
+                    terminationData.handleTermination(SchedulingService.this);
+                } catch (Throwable e) {
+                    logger.error("Failed to terminate task " + taskId, e);
+                }
             }
         });
     }
