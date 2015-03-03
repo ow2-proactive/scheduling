@@ -61,8 +61,11 @@ public class LDAP2Properties {
     /** URL of a ldap used for authentication */
     public static final String LDAP_URL = "pa.ldap2.url";
 
-    /** path in the LDAP tree users containing*/
+    /** path in the LDAP tree users containing */
     public static final String LDAP_USERS_SUBTREE = "pa.ldap2.userssubtree";
+
+    /** path in the LDAP tree groups containing */
+    public static final String LDAP_GROUPS_SUBTREE = "pa.ldap2.groupssubtree";
 
     /** filter that allows to find the user dn given its scheduler login
      *  pa.ldap2.user.filter=(&(objectclass=inetOrgPerson)(uid=%s))
