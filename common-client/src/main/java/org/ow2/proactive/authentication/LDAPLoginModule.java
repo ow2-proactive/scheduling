@@ -273,26 +273,27 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
     }
 
     /**
-     * Check user and password from LDAP file. If user is authenticated,
-     * check group membership in LDAP groups.
-     *
-     * If user entry is not found in LDAP and file authentication fall back is activated
-     * {@link org.ow2.proactive.authentication.LDAPProperties#FALLBACK_USER_AUTH}, it tries authentication (login/password and group membership)
-     * with file login module.
-     *
-     * If no group is found in LDAP and group membership fall back is activated
-     * {@link org.ow2.proactive.authentication.LDAPProperties#FALLBACK_GROUP_MEMBERSHIP}, its group membership is checked with file login module.
+     * Check user and password from file, or authenticate with ldap.
      *
      * @param username user's login
      * @param password user's password
-     * @param reqGroup requested level
-     * @param groupsHierarchy Group hierarchy used for authentication.
      * @return true user login and password are correct, and requested group is authorized for the user
      * @throws LoginException if authentication and group membership fails.
      */
     @Override
     protected boolean logUser(String username, String password) throws LoginException {
+        try {
+            if (fallbackUserAuth) {
+                return super.logUser(username, password);
+            } else {
+                return internalLogUser(username, password);
+            }
+        } catch (LoginException ex) {
+            return internalLogUser(username, password);
+        }
+    }
 
+    private boolean internalLogUser(String username, String password) throws LoginException {
         // check the user name, get the RDN of the user
         // (null = not found)
         String userDN = null;
@@ -306,11 +307,7 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
 
         if (userDN == null) {
             logger.info("user entry not found in subtree " + USER_DN + " for user " + username);
-            if (fallbackUserAuth) {
-                logger.info("fall back to file authentication for user : " + username);
-                return super.logUser(username, password);
-            } else
-                throw new FailedLoginException("User name doesn't exists");
+            throw new FailedLoginException("User name doesn't exists");
         } else {
             // Check if the password match the user name
             passwordMatch = checkLDAPPassword(userDN, password);
