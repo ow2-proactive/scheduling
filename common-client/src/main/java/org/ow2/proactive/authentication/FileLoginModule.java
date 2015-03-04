@@ -228,7 +228,7 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
      * @return a String representing user's group, or null if no group is found for the user.
      * @throws LoginException if group file is not found or unreadable.
      */
-    private void groupMembershipFromFile(String username) throws LoginException {
+    protected void groupMembershipFromFile(String username) throws LoginException {
         Properties groups = new Properties();
         try {
             String line = null;
