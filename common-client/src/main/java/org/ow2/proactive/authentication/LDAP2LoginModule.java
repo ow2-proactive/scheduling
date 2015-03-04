@@ -308,7 +308,7 @@ public abstract class LDAP2LoginModule extends FileLoginModule implements Loggab
         }
 
         if (userDN == null) {
-            logger.info("user entry not found in subtree " + BASE_DN + " for user " + username);
+            logger.info("user entry not found in subtree " + USERS_DN + " for user " + username);
             throw new FailedLoginException("User name doesn't exists");
         } else {
             // Check if the password match the user name
