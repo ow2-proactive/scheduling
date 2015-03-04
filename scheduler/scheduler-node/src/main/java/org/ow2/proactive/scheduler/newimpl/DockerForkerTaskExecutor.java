@@ -187,18 +187,10 @@ public class DockerForkerTaskExecutor implements TaskExecutor {
     }
 
     private static void fromForkedJVM(String contextPath) {
-        // Create error and standard output
-        PrintStream standardStream = null;
-        PrintStream errorStream = null;
-
         try {
             TaskContext container = deserializeContext(contextPath);
 
-            // Create file streams
-            standardStream = new PrintStream(new FileOutputStream("standard.output"));
-            errorStream = new PrintStream(new FileOutputStream("error.output"));
-
-            TaskResultImpl result = new NonForkedTaskExecutor().execute(container, standardStream, errorStream);
+            TaskResultImpl result = new NonForkedTaskExecutor().execute(container, System.out, System.err);
             serializeTaskResult(result, contextPath);
 
 
@@ -207,18 +199,9 @@ public class DockerForkerTaskExecutor implements TaskExecutor {
                 serializeTaskResult(throwable, contextPath);
             } catch (Throwable ignored) {
             }
-            throwable.printStackTrace(errorStream);
+            throwable.printStackTrace(System.err);
             System.exit(1);
 
-        } finally {
-
-            // Close
-            if(standardStream != null) {
-                standardStream.close();
-            }
-            if(errorStream != null) {
-                errorStream.close();
-            }
         }
     }
 
