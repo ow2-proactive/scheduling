@@ -96,7 +96,7 @@ public class DockerContainerWrapper {
 
         System.setProperty(DockerContainerWrapper.SUDO_COMMAND_PROPERTY, "/usr/bin/sudo");
         System.setProperty(DockerContainerWrapper.DOCKER_COMMAND_PROPERTY, "/usr/bin/docker");
-        System.setProperty(DockerContainerWrapper.DOCKER_IMAGE_PROPERTY,  "tobwiens/proactive-executor");
+        System.setProperty(DockerContainerWrapper.DOCKER_IMAGE_PROPERTY,  "tobwiens/proactive-executor-r");
 
         // Those dummy values will now be overwritten with actual values - but if something goes wrong it is
         // visible in the logs. But the scheduler will show an uninformative null pointer exception. Those dummy values
