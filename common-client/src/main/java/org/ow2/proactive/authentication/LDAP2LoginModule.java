@@ -319,6 +319,10 @@ public abstract class LDAP2LoginModule extends FileLoginModule implements Loggab
             if (logger.isDebugEnabled()) {
                 logger.debug("authentication succeeded, checking group");
             }
+
+            if (fallbackGroupMembership) {
+                super.groupMembershipFromFile(username);
+            }
         } else {
             // authentication failed
             logger.info("password verification failed for user: " + username);
