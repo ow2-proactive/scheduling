@@ -79,7 +79,7 @@ public class SelectionScriptTimeOutTest extends RMConsecutive {
         ResourceManager resourceManager = helper.getResourceManager();
         helper.createNodeSource();
         int nodesNumber = resourceManager.getState().getTotalNodesNumber();
-        int scriptSleepingTime = 15000; //secs
+        int scriptSleepingTime = 25 * 1000;
 
         RMTHelper.log("Test 1 - selecting nodes with timeout script");
 
