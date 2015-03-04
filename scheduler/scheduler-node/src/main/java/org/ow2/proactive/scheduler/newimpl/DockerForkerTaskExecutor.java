@@ -78,13 +78,15 @@ public class DockerForkerTaskExecutor implements TaskExecutor {
         DockerContainerWrapper container = new DockerContainerWrapper(context.getTaskId().value());
 
         //String containerPathToContext = "/data/context/" + workingDir.getName();
-        String containerPathToContext = "/data/context/";
+        String containerPathToContext = "/data/context";
 
+        
         // Map working directory inside container
         container.addVolumeDirectory(workingDir.getAbsolutePath(), containerPathToContext);
 
         File serializedContext = null;
         try {
+            // Serialize locally - because container maps local directory
             serializedContext = serializeContext(context, workingDir);
 
             String pathToContextFile = containerPathToContext + "/" + serializedContext.getName();
@@ -190,22 +192,44 @@ public class DockerForkerTaskExecutor implements TaskExecutor {
             System.exit(-1);
         }
         fromForkedJVM(args[0]);
+
+        // R Engine might not exit so do it here
+        System.exit(0); // Reaching this point will always indicate successful execution
     }
 
     private static void fromForkedJVM(String contextPath) {
+        // Create error and standard output
+        PrintStream standardStream = null;
+        PrintStream errorStream = null;
+
         try {
             TaskContext container = deserializeContext(contextPath);
 
-            TaskResultImpl result = new NonForkedTaskExecutor().execute(container, System.out, System.err);
+            // Create file streams
+            standardStream = new PrintStream(new FileOutputStream("standard.output"));
+            errorStream = new PrintStream(new FileOutputStream("error.output"));
 
+            TaskResultImpl result = new NonForkedTaskExecutor().execute(container, standardStream, errorStream);
             serializeTaskResult(result, contextPath);
+
+
         } catch (Throwable throwable) {
             try {
                 serializeTaskResult(throwable, contextPath);
             } catch (Throwable ignored) {
             }
-            throwable.printStackTrace(System.err);
+            throwable.printStackTrace(errorStream);
             System.exit(1);
+
+        } finally {
+
+            // Close
+            if(standardStream != null) {
+                standardStream.close();
+            }
+            if(errorStream != null) {
+                errorStream.close();
+            }
         }
     }
 
