@@ -34,16 +34,15 @@
  */
 package org.ow2.proactive.scheduler.newimpl;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.extensions.processbuilder.exception.CoreBindingException;
 import org.objectweb.proactive.extensions.processbuilder.exception.FatalProcessBuilderException;
 import org.objectweb.proactive.extensions.processbuilder.exception.OSUserException;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.InputStream;
+import java.util.*;
 
 
 /**
@@ -51,15 +50,22 @@ import java.util.Map;
  */
 public class DockerContainerWrapper {
 
+    private static final Logger logger = Logger.getLogger(DockerContainerWrapper.class);
+
     // CONSTANTS
     // TODO bring the, in config files
     public static final String SUDO_COMMAND_PROPERTY = "SUDO_COMMAND";
     public static final String DOCKER_COMMAND_PROPERTY = "DOCKER_COMMAND";
 
+    public static final String DOCKER_SETTINGS_FILENAME = "docker-settings.ini";
+    public static final String DOCKER_SETTINGS_DOCKER_COMMAND = "docker.docker-command";
+    public static final String DOCKER_SETTINGS_SUDO_COMMAND = "docker.sudo-dommand";
+    public static final String DOCKER_SETTINGS_STANDARD_IMAGE = "docker.standard-image";
+
     public static final String INSIDE_CONTAINER_SCHEDULING_HOME = "/data/scheduling";
     public static final String INSIDE_CONTAINER_JAVA_COMMAND = "java";
     public static final String INSIDE_CONTAINER_CLASSPATH_SWITCH = "-cp";
-    public static final String INSIDE_CONTAINER_CLASSPATH = "/data/scheduling/dist/lib/*:scheduling/addons/*:scheduling/addons/";
+    public static final String INSIDE_CONTAINER_CLASSPATH = "/data/scheduling/dist/lib/*:/data/scheduling/addons/*:/data/scheduling/addons/";
     //public static final String INSIDE_CONTAINER_SECURITY_POLICY =
     //        "-Djava.security.policy="
     //        +CentralPAPropertyRepository
@@ -81,9 +87,43 @@ public class DockerContainerWrapper {
     private String image;
 
     static {// TODO Put that in config
+        DockerContainerWrapper.logger.info("Initialize docker container support.");
+        // Write dummy values - makes error clearer instead of having null in the properties
+        //TODO Find a way to get path for config and set those commands to dummies
+        //System.setProperty(DockerContainerWrapper.SUDO_COMMAND_PROPERTY, "sudo_cmd_not_set");
+        //System.setProperty(DockerContainerWrapper.DOCKER_COMMAND_PROPERTY, "docker_cmd_not_set");
+        //System.setProperty(DockerContainerWrapper.DOCKER_IMAGE_PROPERTY,  "standard_container_not_set");
+
         System.setProperty(DockerContainerWrapper.SUDO_COMMAND_PROPERTY, "/usr/bin/sudo");
         System.setProperty(DockerContainerWrapper.DOCKER_COMMAND_PROPERTY, "/usr/bin/docker");
-        System.setProperty(DockerContainerWrapper.DOCKER_IMAGE_PROPERTY, "dockerfile/java:oracle-java7");
+        System.setProperty(DockerContainerWrapper.DOCKER_IMAGE_PROPERTY,  "tobwiens/proactive-executor");
+
+        // Those dummy values will now be overwritten with actual values - but if something goes wrong it is
+        // visible in the logs. But the scheduler will show an uninformative null pointer exception. Those dummy values
+        // will throw exception which are more meaningful
+
+        InputStream dockerSettings = DockerContainerWrapper.class.getClassLoader().getResourceAsStream(DOCKER_SETTINGS_FILENAME);
+
+        if (dockerSettings != null) {
+            try {
+                Properties props = new Properties();
+                props.load(dockerSettings);
+                System.setProperty(DockerContainerWrapper.SUDO_COMMAND_PROPERTY, props.getProperty(DOCKER_SETTINGS_SUDO_COMMAND));
+                System.setProperty(DockerContainerWrapper.DOCKER_COMMAND_PROPERTY, props.getProperty(DOCKER_SETTINGS_DOCKER_COMMAND));
+                System.setProperty(DockerContainerWrapper.DOCKER_IMAGE_PROPERTY,  props.getProperty(DOCKER_SETTINGS_STANDARD_IMAGE));
+
+                dockerSettings.close();
+                DockerContainerWrapper.logger.info("Docker settings file found and properties successfully read");
+            } catch (IOException e) {
+                DockerContainerWrapper.logger.warn("Could not load docker-settings.ini in classpath.", e);
+            } catch (Throwable e) {
+                DockerContainerWrapper.logger.warn("Error during DockerContainerWrapper initialization.", e);
+            }
+        }  else {
+            DockerContainerWrapper.logger.warn("Could not find docker-settings.ini in classpath. " +
+                    "Docker containers won't work.");
+
+        }
     }
 
     private boolean useSudo = true;
@@ -169,13 +209,8 @@ public class DockerContainerWrapper {
     /**
      * Starts a docker container and returns a string array which represents to start the docker container.
      * @return String array, representing the start command.
-     * @throws OSUserException
-     * @throws CoreBindingException
-     * @throws FatalProcessBuilderException
-     * @throws IOException
      */
-    public String[] start(String classToExecute, String... arguments) throws OSUserException,
-            CoreBindingException, FatalProcessBuilderException, IOException {
+    public String[] start(String classToExecute, String... arguments)  {
         // Create commands array
         ArrayList<String> command = new ArrayList<String>();
 
@@ -200,6 +235,10 @@ public class DockerContainerWrapper {
             command.add(volume.getKey() + ":" + volume.getValue());
         }
 
+        // DEBUG forward debugging port
+        //command.add("-p");
+        //command.add("5007:5007");
+
         // Add container name
         command.add(this.image);
 
@@ -222,6 +261,10 @@ public class DockerContainerWrapper {
         // ADD classpath
         command.add(INSIDE_CONTAINER_CLASSPATH_SWITCH);
         command.add(INSIDE_CONTAINER_CLASSPATH);
+
+        // DEBUG - debug
+        //command.add("-Xdebug");
+        //command.add("-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5007");
 
         // Add java class and arguments
         command.add(classToExecute);
