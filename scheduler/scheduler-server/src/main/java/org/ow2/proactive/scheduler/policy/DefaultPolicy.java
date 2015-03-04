@@ -37,9 +37,11 @@
 package org.ow2.proactive.scheduler.policy;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Vector;
 
+import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
 import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
 
@@ -48,6 +50,7 @@ import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
  * Implementation of the policy according that :
  * <ul>
  * 	<li>Implementation of the policy using FIFO priority ordering.</li>
+ * 	<li>Relies on Job IDs for FIFO.</li>
  * </ul>
  *
  * @author The ProActive Team
@@ -73,8 +76,8 @@ public class DefaultPolicy extends Policy {
     @Override
     public Vector<EligibleTaskDescriptor> getOrderedTasks(List<JobDescriptor> jobs) {
         Vector<EligibleTaskDescriptor> toReturn = new Vector<EligibleTaskDescriptor>();
-        //sort jobs by priority
-        Collections.sort(jobs);
+
+        Collections.sort(jobs, FIFO_BY_PRIORITY_COMPARATOR);
 
         //add all sorted tasks to list of tasks
         for (JobDescriptor jd : jobs) {
@@ -84,5 +87,18 @@ public class DefaultPolicy extends Policy {
         //return sorted list of tasks
         return toReturn;
     }
+
+    public static final Comparator<JobDescriptor> FIFO_BY_PRIORITY_COMPARATOR = new Comparator<JobDescriptor>() {
+        @Override
+        public int compare(JobDescriptor job1, JobDescriptor job2) {
+            JobPriority job1Priority = job1.getInternal().getPriority();
+            JobPriority job2Priority = job2.getInternal().getPriority();
+            if (job1Priority.equals(job2Priority)) {
+                return job1.getJobId().compareTo(job2.getJobId());
+            } else {
+                return job2Priority.compareTo(job1Priority);
+            }
+        }
+    };
 
 }
