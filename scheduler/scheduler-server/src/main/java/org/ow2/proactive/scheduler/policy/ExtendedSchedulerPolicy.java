@@ -78,8 +78,9 @@ public class ExtendedSchedulerPolicy extends DefaultPolicy {
     public Vector<EligibleTaskDescriptor> getOrderedTasks(List<JobDescriptor> jobDescList) {
         Date now = new Date();
         Vector<EligibleTaskDescriptor> executionCycleTasks = new Vector<EligibleTaskDescriptor>();
-        // sorts the JobDescriptor list by 'priority'.
-        Collections.sort(jobDescList);
+
+        Collections.sort(jobDescList, FIFO_BY_PRIORITY_COMPARATOR);
+
         for (JobDescriptor jobDesc : jobDescList) {
             Collection<EligibleTaskDescriptor> eligibleTasks = jobDesc.getEligibleTasks();
             for (EligibleTaskDescriptor candidate : eligibleTasks) {
