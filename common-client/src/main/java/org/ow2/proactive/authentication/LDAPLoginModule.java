@@ -27,12 +27,12 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
+ *  Initial developer(s):               The ActiveEon Team
+ *                        http://www.activeeon.com/
  *  Contributor(s):
  *
  * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * $$ACTIVEEON_INITIAL_DEV$$
  */
 package org.ow2.proactive.authentication;
 
@@ -62,18 +62,13 @@ import org.ow2.proactive.authentication.principals.UserNamePrincipal;
 /**
  * Authentication based on LDAP system.
  *
- * This class extends FileLoginModule in order to use authentication fall back mechanism :
+ * Improved version of @see{LDAPLoginModule}
  *
- * If user entry is not found in LDAP and file authentication fall back is activated
- * {@link org.ow2.proactive.authentication.LDAPProperties#FALLBACK_USER_AUTH}, it tries authentication (login/password and group membership
- * with file login module.
- *
- * If no group is found in LDAP and group membership file checking fall back is activated
- * {@link org.ow2.proactive.authentication.LDAPProperties#FALLBACK_GROUP_MEMBERSHIP}, its group membership is checked with file login module.
+ * support custom filters for username and group
  *
  *
- * @author The ProActive Team
- * @since ProActive Scheduling 0.9.1
+ * @author The ActiveEon Team
+ * @since ProActive Scheduling 2.1.1
  */
 public abstract class LDAPLoginModule extends FileLoginModule implements Loggable {
 
@@ -82,7 +77,7 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
 
     /** LDAP configuration properties */
     private LDAPProperties ldapProperties = new LDAPProperties(getLDAPConfigFileName());
-    /** default value for Context.SECURITY_AUTHENTICATION 
+    /** default value for Context.SECURITY_AUTHENTICATION
      * that correspond to anonymous connection
     */
     private final String ANONYMOUS_LDAP_CONNECTION = "none";
@@ -99,21 +94,23 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
     /** name of trust store password java property */
     private final String SSL_TRUSTSTORE_PASSWD_PROPERTY = "javax.net.ssl.trustStorePassword";
 
+    /** boolean defining whether connection polling has to be used */
+    private final String LDAP_CONNECTION_POOLING = ldapProperties.getProperty(LDAPProperties.LDAP_CONNECTION_POOLING);
+
     /** LDAP used to perform authentication */
     private final String LDAP_URL = ldapProperties.getProperty(LDAPProperties.LDAP_URL);
 
-    /** LDAP Subtree wherein users entries are searched*/
-    private final String USER_DN = ldapProperties.getProperty(LDAPProperties.LDAP_USERS_SUBTREE);
+    /** LDAP Subtree wherein users entries are searched */
+    private final String USERS_DN = ldapProperties.getProperty(LDAPProperties.LDAP_USERS_SUBTREE);
 
-    /** object class of users in LDAP server configuration */
-    private final String USER_OBJECT_CLASS = ldapProperties
-            .getProperty(LDAPProperties.LDAP_USER_OBJECT_CLASS);
-
-    /** object class of groups in LDAP server configuration */
-    private final String GROUP_OBJECT_CLASS = ldapProperties
-            .getProperty(LDAPProperties.LDAP_GROUP_OBJECT_CLASS);
     /**
-     * Authentication method used to bind to LDAP : none, simple, 
+     * LDAP Subtree wherein groups entries are searched
+     * If empty, then USERS_DN is used instead
+     */
+    private String GROUPS_DN = ldapProperties.getProperty(LDAPProperties.LDAP_GROUPS_SUBTREE);
+
+    /**
+     * Authentication method used to bind to LDAP: none, simple,
      * or one of the SASL authentication methods
      */
     private final String AUTHENTICATION_METHOD = ldapProperties
@@ -140,26 +137,31 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
      * Creates a new instance of LDAPLoginModule
      */
     public LDAPLoginModule() {
+        if (GROUPS_DN == null) {
+            GROUPS_DN = USERS_DN;
+        }
+
         if (fallbackUserAuth) {
             checkLoginFile();
             checkGroupFile();
-            logger.info("Using Login file for fall back authentication at : " + loginFile);
-            logger.info("Using Group file for fall back group membership at : " + groupFile);
+            logger.info("Using Login file for fall back authentication at: " + loginFile);
+            logger.info("Using Group file for fall back group membership at: " + groupFile);
         } else if (fallbackGroupMembership) {
             checkGroupFile();
-            logger.info("Using Group file for fall back group membership at : " + groupFile);
+            logger.info("Using Group file for fall back group membership at: " + groupFile);
         }
 
         //initialize system properties for SSL/TLS connection
         String keyStore = ldapProperties.getProperty(LDAPProperties.LDAP_KEYSTORE_PATH);
-        if (!alreadyDefined(SSL_KEYSTORE_PATH_PROPERTY, keyStore)) {
+
+        if ((keyStore != null) && (!alreadyDefined(SSL_KEYSTORE_PATH_PROPERTY, keyStore))) {
             System.setProperty(SSL_KEYSTORE_PATH_PROPERTY, keyStore);
             System.setProperty(SSL_KEYSTORE_PASSWD_PROPERTY, ldapProperties
                     .getProperty(LDAPProperties.LDAP_KEYSTORE_PASSWD));
         }
 
         String trustStore = ldapProperties.getProperty(LDAPProperties.LDAP_TRUSTSTORE_PATH);
-        if (!alreadyDefined(SSL_TRUSTSTORE_PATH_PROPERTY, trustStore)) {
+        if ((trustStore != null) && (!alreadyDefined(SSL_TRUSTSTORE_PATH_PROPERTY, trustStore))) {
             System.setProperty(SSL_TRUSTSTORE_PATH_PROPERTY, trustStore);
             System.setProperty(SSL_TRUSTSTORE_PASSWD_PROPERTY, ldapProperties
                     .getProperty(LDAPProperties.LDAP_TRUSTSTORE_PASSWD));
@@ -214,7 +216,7 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
         this.callbackHandler = callbackHandler;
 
         if (logger.isDebugEnabled()) {
-            logger.debug("Using LDAP : " + LDAP_URL);
+            logger.debug("Using LDAP: " + LDAP_URL);
         }
     }
 
@@ -301,12 +303,12 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
         try {
             userDN = getLDAPUserDN(username);
         } catch (NamingException e) {
-            logger.error("", e);
+            logger.error("Cannot connect to LDAP server", e);
             throw new FailedLoginException("Cannot connect to LDAP server");
         }
 
         if (userDN == null) {
-            logger.info("user entry not found in subtree " + USER_DN + " for user " + username);
+            logger.info("user entry not found in subtree " + USERS_DN + " for user " + username);
             throw new FailedLoginException("User name doesn't exists");
         } else {
             // Check if the password match the user name
@@ -317,9 +319,13 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
             if (logger.isDebugEnabled()) {
                 logger.debug("authentication succeeded, checking group");
             }
+
+            if (fallbackGroupMembership) {
+                super.groupMembershipFromFile(username);
+            }
         } else {
             // authentication failed
-            logger.info("password verification failed for user : " + username);
+            logger.info("password verification failed for user: " + username);
             throw new FailedLoginException("Password Incorrect");
         }
 
@@ -401,15 +407,11 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
      * @return true if the authentication is successful, false otherwise.
      */
     private boolean checkLDAPPassword(String userDN, String password) {
-        // Secured connection to check the user password
-        Hashtable<String, String> env = new Hashtable<String, String>();
-        env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-
         if (logger.isDebugEnabled()) {
-            logger.debug("check password for user : " + userDN);
+            logger.debug("check password for user: " + userDN);
         }
 
-        env.put(Context.PROVIDER_URL, LDAP_URL);
+        Hashtable<String, String> env = createBasicEnvForInitalContext();
         env.put(Context.SECURITY_PRINCIPAL, userDN);
         env.put(Context.SECURITY_CREDENTIALS, password);
 
@@ -418,7 +420,7 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
             // Create the initial directory context
             ctx = new InitialDirContext(env);
         } catch (NamingException e) {
-            logger.error("Problem checkin user password, user password may be wrong : " + e);
+            logger.error("Problem checkin user password, user password may be wrong: " + e);
             return false;
         }
 
@@ -426,13 +428,13 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
         try {
             ctx.close();
         } catch (NamingException e) {
-            logger.error("Problem closing secure connection : " + e);
+            logger.error("Problem closing secure connection: " + e);
         }
         return true;
     }
 
     /**
-     * Connects anonymously to the LDAP server <code>url</code> and retreive
+     * Connects anonymously to the LDAP server <code>url</code> and retrieve
      * DN of the user <code>username</code>
      *
      * <p>
@@ -453,10 +455,10 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
             ctx = this.connectAndGetContext();
             SearchControls sControl = new SearchControls();
             sControl.setSearchScope(SearchControls.SUBTREE_SCOPE);
-            String filter = "(&(objectclass=" + USER_OBJECT_CLASS + ")(cn=" + username + "))";
-
+            String filter = String.format(ldapProperties.getProperty(LDAPProperties.LDAP_USER_FILTER),
+                    username);
             // looking for the user dn (distinguish name)
-            NamingEnumeration<SearchResult> answer = ctx.search(USER_DN, filter, sControl);
+            NamingEnumeration<SearchResult> answer = ctx.search(USERS_DN, filter, sControl);
             if (answer.hasMoreElements()) {
                 SearchResult result = (SearchResult) answer.next();
                 userDN = result.getNameInNamespace();
@@ -466,12 +468,14 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
                 subject.getPrincipals().add(new UserNamePrincipal(username));
 
                 // looking for the user groups
-                String groupFilter = "(&(objectclass=" + GROUP_OBJECT_CLASS + ")(uniqueMember=" + userDN +
-                    "))";
-                NamingEnumeration<SearchResult> groupResults = ctx.search(USER_DN, groupFilter, sControl);
+                String groupFilter = String.format(ldapProperties
+                        .getProperty(LDAPProperties.LDAP_GROUP_FILTER), userDN);
+
+                NamingEnumeration<SearchResult> groupResults = ctx.search(GROUPS_DN, groupFilter, sControl);
                 while (groupResults.hasMoreElements()) {
                     SearchResult res = (SearchResult) groupResults.next();
-                    Attribute attr = res.getAttributes().get("cn");
+                    Attribute attr = res.getAttributes().get(
+                            ldapProperties.getProperty(LDAPProperties.LDAP_GROUPNAME_ATTR));
                     if (attr != null) {
                         String groupName = attr.get().toString();
                         subject.getPrincipals().add(new GroupNamePrincipal(groupName));
@@ -487,7 +491,7 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
                 }
             }
         } catch (NamingException e) {
-            logger.error("Problem with the search in mode : " + AUTHENTICATION_METHOD + e);
+            logger.error("Problem with the search in mode: " + AUTHENTICATION_METHOD + e);
             throw e;
         } finally {
             try {
@@ -496,7 +500,7 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
                 }
             } catch (NamingException e) {
                 logger.error("", e);
-                logger.error("Problem closing LDAP connection : " + e.getMessage());
+                logger.error("Problem closing LDAP connection: " + e.getMessage());
             }
         }
 
@@ -509,15 +513,8 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
      * @throws NamingException
      */
     private DirContext connectAndGetContext() throws NamingException {
+        Hashtable<String, String> env = createBasicEnvForInitalContext();
 
-        // Secured connection to check the user password
-        Hashtable<String, String> env = new Hashtable<String, String>();
-
-        env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-        env.put(Context.SECURITY_AUTHENTICATION, AUTHENTICATION_METHOD);
-
-        // LDAP server URL
-        env.put(Context.PROVIDER_URL, LDAP_URL);
         if (!AUTHENTICATION_METHOD.equals(ANONYMOUS_LDAP_CONNECTION)) {
             env.put(Context.SECURITY_PRINCIPAL, BIND_LOGIN);
             env.put(Context.SECURITY_CREDENTIALS, BIND_PASSWD);
@@ -532,5 +529,15 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
      * @return name of the file with LDAP configuration.
      */
     protected abstract String getLDAPConfigFileName();
+
+    private Hashtable<String, String> createBasicEnvForInitalContext() {
+        Hashtable<String, String> env = new Hashtable<String, String>(6, 1f);
+        env.put("com.sun.jndi.ldap.connect.pool", LDAP_CONNECTION_POOLING);
+        env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
+        env.put(Context.SECURITY_AUTHENTICATION, AUTHENTICATION_METHOD);
+        env.put(Context.PROVIDER_URL, LDAP_URL);
+
+        return env;
+    }
 
 }

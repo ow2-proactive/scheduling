@@ -27,12 +27,12 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s): ActiveEon Team - http://www.activeeon.com
+ *  Initial developer(s):               The ActiveEon Team
+ *                        http://www.activeeon.com/
+ *  Contributor(s):
  *
  * ################################################################
- * $$ACTIVEEON_CONTRIBUTOR$$
+ * $$ACTIVEEON_INITIAL_DEV$$
  */
 package org.ow2.proactive.authentication;
 
@@ -46,13 +46,8 @@ import org.objectweb.proactive.annotation.PublicAPI;
 
 /**
  * LDAPProperties contains all LDAP configuration properties.
- * 
- * You must use provided methods in order to get these properties.
- * 
- * @author The ProActiveTeam
- * @date 11 june 08
- * @since ProActive 4.0
  *
+ * You must use provided methods in order to get these properties.
  */
 @PublicAPI
 public class LDAPProperties {
@@ -64,14 +59,26 @@ public class LDAPProperties {
     /** URL of a ldap used for authentication */
     public static final String LDAP_URL = "pa.ldap.url";
 
-    /** path in the LDAP tree users containing*/
+    /** path in the LDAP tree users containing */
     public static final String LDAP_USERS_SUBTREE = "pa.ldap.userssubtree";
 
-    /** object class of users in LDAP server configuration */
-    public static final String LDAP_USER_OBJECT_CLASS = "pa.ldap.user.objectclass";
+    /** path in the LDAP tree groups containing */
+    public static final String LDAP_GROUPS_SUBTREE = "pa.ldap.groupssubtree";
 
-    /** object class of groups in LDAP server configuration */
-    public static final String LDAP_GROUP_OBJECT_CLASS = "pa.ldap.group.objectclass";
+    /** filter that allows to find the user dn given its scheduler login
+     *  pa.ldap.user.filter=(&(objectclass=inetOrgPerson)(uid=%s))
+     *  the '%s' parameter is the login used during the scheduler authentication process
+     **/
+    public static final String LDAP_USER_FILTER = "pa.ldap.user.filter";
+
+    /** retrieves the group the user dn belongs to
+     *  pa.ldap.group.filter=(&(objectclass=groupOfUniqueNames)(uniqueMember=%s))
+     *  the '%s' parameter is the user dn
+     **/
+    public static final String LDAP_GROUP_FILTER = "pa.ldap.group.filter";
+
+    /** the attribute in the group entry that matches the jaas' group name */
+    public static final String LDAP_GROUPNAME_ATTR = "pa.ldap.group.name.attr";
 
     /** authentication method used to connect to LDAP : none, simple or a SASL method */
     public static final String LDAP_AUTHENTICATION_METHOD = "pa.ldap.authentication.method";
@@ -94,11 +101,14 @@ public class LDAPProperties {
     /** password for the truststore defined by pa.ldap.truststore.path */
     public static final String LDAP_TRUSTSTORE_PASSWD = "pa.ldap.truststore.passwd";
 
-    /**fall back property, check user/password and group in files if user is not found in LDAP.
+    /** boolean defining whether the LDAP service provider has to use connection pooling or not */
+    public static final String LDAP_CONNECTION_POOLING = "pa.ldap.connection.pooling";
+
+    /** fall back property, check user/password and group in files if user is not found in LDAP.
      * true or false */
     public static final String FALLBACK_USER_AUTH = "pa.ldap.authentication.fallback";
 
-    /**group fall back property, check user group membership group file if user is not found in corresponding LDAP group.
+    /** group fall back property, check user group membership group file if user is not found in corresponding LDAP group.
      * true or false */
     public static final String FALLBACK_GROUP_MEMBERSHIP = "pa.ldap.group.membership.fallback";
 
