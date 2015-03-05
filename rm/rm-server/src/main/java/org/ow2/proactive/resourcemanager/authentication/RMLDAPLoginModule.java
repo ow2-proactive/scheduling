@@ -27,12 +27,12 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
+ *  Initial developer(s):               The ActiveEon Team
+ *                        http://www.activeeon.com/
  *  Contributor(s):
  *
  * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * $$ACTIVEEON_INITIAL_DEV$$
  */
 package org.ow2.proactive.resourcemanager.authentication;
 
@@ -44,7 +44,7 @@ import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProper
 
 
 /**
- * 
+ *
  * LDAP login module implementation for resource manager. Extracts LDAP configurations file from
  * resource manager configuration and uses it to authenticate users.
  *
