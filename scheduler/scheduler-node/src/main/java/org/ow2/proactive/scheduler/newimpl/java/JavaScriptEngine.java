@@ -38,8 +38,10 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.io.Reader;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 
 import javax.script.AbstractScriptEngine;
 import javax.script.Bindings;
@@ -58,6 +60,8 @@ import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.TaskScript;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.WriterOutputStream;
+
+import static java.util.Collections.emptyList;
 
 
 public class JavaScriptEngine extends AbstractScriptEngine {
@@ -87,6 +91,13 @@ public class JavaScriptEngine extends AbstractScriptEngine {
                           Script.ARGUMENTS_NAME))[0]);
             } else {
                 execInitializer.setSerializedArguments(Collections.<String, byte[]> emptyMap());
+            }
+
+            if (context.getAttribute(TaskLauncherBak.MULTI_NODE_TASK_NODESURL_BINDING_NAME) != null) {
+                Set<String> nodesURLs = (Set<String>) context.getAttribute(TaskLauncherBak.MULTI_NODE_TASK_NODESURL_BINDING_NAME);
+                execInitializer.setNodesURL(new ArrayList<String>(nodesURLs));
+            } else {
+                execInitializer.setNodesURL(emptyList());
             }
 
             javaExecutable.internalInit(execInitializer);

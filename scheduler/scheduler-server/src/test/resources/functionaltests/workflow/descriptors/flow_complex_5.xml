@@ -81,7 +81,7 @@ runs = 2;
 // <![CDATA[
 
 
-def ID   = 9 + "_" + $REP;
+def ID   = 9 + "_" + variables.get('pas.task.replication');
 def RUNS = 2;
 def f = new File(java.lang.System.getProperty("java.io.tmpdir"), "fc5_1" + ID);
 def it = 0;
@@ -123,7 +123,7 @@ loop = false;
 // <![CDATA[
 
 
-def ID   = 4 + "_" + $REP;
+def ID   = 4 + "_" + variables.get('pas.task.replication');
 def RUNS = 2;
 def f = new File(java.lang.System.getProperty("java.io.tmpdir"), "fc5_2" + ID);
 def it = 0;

@@ -47,7 +47,18 @@ public interface TaskDataspaces extends Serializable {
 
     File getScratchFolder();
 
+    String getScratchURI();
+
+    String getInputURI();
+
+    String getOutputURI();
+
+    String getUserURI();
+
+    String getGlobalURI();
+
     void copyInputDataToScratch(List<InputSelector> inputFiles) throws FileSystemException;
 
     void copyScratchDataToOutput(List<OutputSelector> outputFiles) throws FileSystemException;
+
 }

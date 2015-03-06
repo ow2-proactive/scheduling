@@ -119,7 +119,7 @@ public class TaskLauncher {
             dataspaces.copyInputDataToScratch(initializer.getTaskInputFiles()); // should handle interrupt
 
             TaskContext context = new TaskContext(executableContainer,
-                initializer, previousTasksResults);
+                initializer, previousTasksResults, dataspaces.getScratchURI(), dataspaces.getInputURI(), dataspaces.getOutputURI(), dataspaces.getUserURI(), dataspaces.getGlobalURI());
 
             if (decrypter != null) {
                 decrypter.setCredentials(executableContainer.getCredentials());

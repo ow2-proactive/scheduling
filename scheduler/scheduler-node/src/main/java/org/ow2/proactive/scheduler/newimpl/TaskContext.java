@@ -35,33 +35,60 @@
 package org.ow2.proactive.scheduler.newimpl;
 
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
+import org.objectweb.proactive.core.node.Node;
 import org.ow2.proactive.scheduler.common.task.Decrypter;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.TaskLauncherInitializer;
+import org.ow2.proactive.scheduler.task.script.ForkedScriptExecutableContainer;
 import org.ow2.proactive.scripting.Script;
 
 
 public class TaskContext implements Serializable {
+    private final Set<String> nodesURLs;
     private ExecutableContainer executableContainer;
     private TaskLauncherInitializer initializer;
     private Decrypter decrypter;
     private TaskResult[] previousTasksResults;
 
+    private String scratchURI;
+    private final String inputURI;
+    private final String outputURI;
+    private final String userURI;
+    private final String globalURI;
+
+    public TaskContext(ExecutableContainer executableContainer, TaskLauncherInitializer initializer) {
+        this(executableContainer, initializer, null, "", "", "", "","");
+    }
+
     public TaskContext(ExecutableContainer executableContainer,
             TaskLauncherInitializer initializer, TaskResult[] previousTasksResults) {
-        this(executableContainer, initializer);
+        this(executableContainer, initializer, previousTasksResults, "", "", "", "","");
         this.previousTasksResults = previousTasksResults;
     }
 
     public TaskContext(ExecutableContainer executableContainer,
-            TaskLauncherInitializer initializer) {
+                       TaskLauncherInitializer initializer, TaskResult[] previousTasksResults, String scratchURI, String inputURI, String outputURI, String userURI, String globalURI) {
         this.initializer = initializer; // copy?
+        this.previousTasksResults = previousTasksResults;
+        this.scratchURI = scratchURI;
+        this.inputURI = inputURI;
+        this.outputURI = outputURI;
+        this.userURI = userURI;
+        this.globalURI = globalURI;
         initializer.setNamingService(null);
         this.executableContainer = executableContainer;
+
+        nodesURLs = new HashSet<String>();
+        for (Node node : executableContainer.getNodes()) {
+            nodesURLs.add(node.getNodeInformation().getURL());
+        }
+        executableContainer.setNodes(null);
 
     }
 
@@ -99,5 +126,29 @@ public class TaskContext implements Serializable {
 
     public TaskResult[] getPreviousTasksResults() {
         return previousTasksResults;
+    }
+
+    public Set<String> getNodesURLs() {
+        return nodesURLs;
+    }
+
+    public String getScratchURI() {
+        return scratchURI;
+    }
+
+    public String getInputURI() {
+        return inputURI;
+    }
+
+    public String getOutputURI() {
+        return outputURI;
+    }
+
+    public String getUserURI() {
+        return userURI;
+    }
+
+    public String getGlobalURI() {
+        return globalURI;
     }
 }

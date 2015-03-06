@@ -46,6 +46,7 @@ import org.objectweb.proactive.extensions.processbuilder.OSProcessBuilder;
 import org.objectweb.proactive.extensions.processbuilder.exception.NotImplementedException;
 import org.ow2.proactive.scheduler.common.task.Decrypter;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.proactive.scheduler.exception.ForkedJVMProcessException;
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.forked.ForkedJavaExecutableContainer;
@@ -111,16 +112,16 @@ public class ForkerTaskExecutor implements TaskExecutor {
                 try {
                     exception = (Throwable) deserializeTaskResult(serializedContext);
                 } catch (Throwable ignored) {
-                    return new TaskResultImpl(context.getTaskId(), new Exception("Failed to execute forked task",
+                    return new TaskResultImpl(context.getTaskId(), new ForkedJVMProcessException("Failed to execute forked task",
                       ignored), null, 0);
                 }
-                return new TaskResultImpl(context.getTaskId(), new Exception("Failed to execute forked task",
+                return new TaskResultImpl(context.getTaskId(), new ForkedJVMProcessException("Failed to execute forked task",
                     exception), null, 0);
             }
 
             return (TaskResultImpl) deserializeTaskResult(serializedContext);
         } catch (Throwable throwable) {
-            return new TaskResultImpl(context.getTaskId(), new Exception("Failed to execute forked task",
+            return new TaskResultImpl(context.getTaskId(), new ForkedJVMProcessException("Failed to execute forked task",
                 throwable), null, 0);
         } finally {
             FileUtils.deleteQuietly(serializedContext);

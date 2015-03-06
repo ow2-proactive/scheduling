@@ -37,14 +37,13 @@ package org.ow2.proactive.scheduler.newimpl;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
+import org.objectweb.proactive.core.node.Node;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
+import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
 import org.ow2.proactive.scheduler.task.SchedulerVars;
 import org.ow2.proactive.scheduler.task.TaskLauncherBak;
@@ -57,6 +56,7 @@ import org.ow2.proactive.scripting.ScriptLoader;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.TaskScript;
 import org.ow2.proactive.utils.ClasspathUtils;
+import org.ow2.proactive.utils.NodeSet;
 
 
 public class NonForkedTaskExecutor implements TaskExecutor {
@@ -79,7 +79,7 @@ public class NonForkedTaskExecutor implements TaskExecutor {
         } catch (Exception e) {
             e.printStackTrace(error);
             return new TaskResultImpl(container.getTaskId(), new Exception("Could deserialize variables", e),
-                null, 0);
+                    null, 0);
         }
 
         // variables from current job/task context
@@ -97,12 +97,23 @@ public class NonForkedTaskExecutor implements TaskExecutor {
         } catch (Exception e) {
             e.printStackTrace(error);
             return new TaskResultImpl(container.getTaskId(), new Exception(
-                "Could read encrypted third party credentials", e), null, 0);
+                    "Could read encrypted third party credentials", e), null, 0);
         }
 
         scriptHandler.addBinding(TaskScript.RESULTS_VARIABLE, results.toArray(new TaskResult[results.size()]));
         scriptHandler.addBinding(TaskScript.CREDENTIALS_VARIABLE, thirdPartyCredentials);
         scriptHandler.addBinding(TaskLauncherBak.VARIABLES_BINDING_NAME, variables);
+
+        scriptHandler.addBinding(TaskLauncherBak.DS_SCRATCH_BINDING_NAME, container.getScratchURI());
+        scriptHandler.addBinding(TaskLauncherBak.DS_INPUT_BINDING_NAME, container.getInputURI());
+        scriptHandler.addBinding(TaskLauncherBak.DS_OUTPUT_BINDING_NAME, container.getOutputURI());
+        scriptHandler.addBinding(TaskLauncherBak.DS_GLOBAL_BINDING_NAME, container.getGlobalURI());
+        scriptHandler.addBinding(TaskLauncherBak.DS_USER_BINDING_NAME, container.getUserURI());
+
+        Set<String> nodesUrls = container.getNodesURLs();
+        scriptHandler.addBinding(TaskLauncherBak.MULTI_NODE_TASK_NODESET_BINDING_NAME,
+                nodesUrls);
+        scriptHandler.addBinding(TaskLauncherBak.MULTI_NODE_TASK_NODESURL_BINDING_NAME, nodesUrls);
 
         StopWatch stopWatch = new StopWatch();
         TaskResultImpl taskResult;
@@ -119,6 +130,14 @@ public class NonForkedTaskExecutor implements TaskExecutor {
 
         taskResult.setPropagatedVariables(SerializationUtil.serializeVariableMap(variables));
         return taskResult;
+    }
+
+    private Set<String> getNodesURLs(TaskContext container) {
+        Set<String> nodesURLs = new HashSet<String>();
+        for (Node node : container.getExecutableContainer().getNodes()) {
+            nodesURLs.add(node.getNodeInformation().getURL());
+        }
+        return nodesURLs;
     }
 
     private Map<String, Serializable> contextVariables(TaskLauncherInitializer initializer) {
@@ -142,7 +161,7 @@ public class NonForkedTaskExecutor implements TaskExecutor {
     }
 
     private void addResultsAndVariablesFromResults(TaskResult[] previousTasksResults,
-            Map<String, Serializable> variables, List<TaskResult> results) throws IOException,
+                                                   Map<String, Serializable> variables, List<TaskResult> results) throws IOException,
             ClassNotFoundException {
         if (previousTasksResults != null) {
             for (TaskResult taskResult : previousTasksResults) {
@@ -156,7 +175,7 @@ public class NonForkedTaskExecutor implements TaskExecutor {
     }
 
     private Serializable executeScripts(TaskContext container, PrintStream output, PrintStream error,
-            ScriptHandler scriptHandler) throws Exception {
+                                        ScriptHandler scriptHandler) throws Exception {
         if (container.getPreScript() != null) {
             ScriptResult preScriptResult = scriptHandler.handle(container.getPreScript(), output, error);
             if (preScriptResult.errorOccured()) {
@@ -177,20 +196,20 @@ public class NonForkedTaskExecutor implements TaskExecutor {
     }
 
     protected Serializable executeTask(TaskContext container, PrintStream output, PrintStream error,
-            ScriptHandler scriptHandler) throws Exception {
+                                       ScriptHandler scriptHandler) throws Exception {
 
 //        if(container.getExecutableContainer() instanceof ForkedScriptExecutableContainer) {
 
         ForkedScriptExecutableContainer executableContainer = (ForkedScriptExecutableContainer) container
                 .getExecutableContainer();
 
-            ScriptResult<Serializable> scriptResult = scriptHandler.handle(executableContainer.getScript(), output, error);
+        ScriptResult<Serializable> scriptResult = scriptHandler.handle(executableContainer.getScript(), output, error);
 
-            if (scriptResult.errorOccured()) {
-                throw new Exception("Failed to execute task: "+scriptResult.getException().getMessage(), scriptResult.getException());
-            }
+        if (scriptResult.errorOccured()) {
+            throw new Exception("Failed to execute task: " + scriptResult.getException().getMessage(), scriptResult.getException());
+        }
 
-            return scriptResult.getResult();
+        return scriptResult.getResult();
 //        }
 //        else {
 //
@@ -218,8 +237,13 @@ public class NonForkedTaskExecutor implements TaskExecutor {
     }
 
     private void executeFlowScript(Script<FlowAction> flowScript, ScriptHandler scriptHandler,
-            PrintStream output, PrintStream error, TaskResultImpl taskResult) {
+                                   PrintStream output, PrintStream error, TaskResultImpl taskResult) {
         if (flowScript != null) {
+            try {
+                scriptHandler.addBinding(FlowScript.resultVariable, taskResult.value());
+            } catch (Throwable throwable) {
+                scriptHandler.addBinding(FlowScript.resultVariable, throwable);
+            }
             ScriptResult<FlowAction> flowScriptResult = scriptHandler.handle(flowScript, output, error);
             if (flowScriptResult.errorOccured()) {
                 flowScriptResult.getException().printStackTrace(error);

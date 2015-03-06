@@ -36,6 +36,7 @@ package org.ow2.proactive.scheduler.common.task.executable.internal;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.dataspaces.LocalSpace;
@@ -49,18 +50,18 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.RemoteSpace;
  **/
 public class DefaultStandaloneExecutableInitializer implements StandaloneExecutableInitializer {
 
-    protected ArrayList nodes;
+    protected List nodes;
     protected TaskId taskId;
     private PrintStream outputSink;
     private PrintStream errorSink;
 
     @Override
-    public ArrayList getNodesURL() {
+    public List getNodesURL() {
         return nodes;
     }
 
     @Override
-    public void setNodesURL(ArrayList nodes) {
+    public void setNodesURL(List nodes) {
         this.nodes = nodes;
     }
 

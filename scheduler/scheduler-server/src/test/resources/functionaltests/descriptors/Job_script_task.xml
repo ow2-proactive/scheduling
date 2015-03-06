@@ -71,11 +71,11 @@
 				<script>
 					<code language="groovy">
 						<![CDATA[
-						print('user=' + user.getVirtualURI())
-						print('global=' + global.getVirtualURI())
-						print('input=' + input.getVirtualURI())
-						print('output=' + output.getVirtualURI())
-						print('localspace=' + localspace.getVirtualURI())
+						print('user=' + user)
+						print('global=' + global)
+						print('input=' + input)
+						print('output=' + output)
+						print('localspace=' + localspace)
 						]]>
 					</code>
 				</script>

@@ -1,26 +1,17 @@
 package org.ow2.proactive.scheduler.newimpl;
 
-import java.io.File;
-import java.io.PrintStream;
 import java.io.Serializable;
-import java.util.List;
 import java.util.concurrent.Semaphore;
 
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
-import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
-import org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemException;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.exception.TaskAbortedException;
-import org.ow2.proactive.scheduler.common.task.Decrypter;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
-import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskLauncherInitializer;
-import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.script.ForkedScriptExecutableContainer;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
@@ -148,48 +139,6 @@ public class KillTaskLauncherTest {
         return launchTaskInBackground;
     }
 
-    private class TestTaskLauncherFactory extends TaskLauncherFactory {
-        private Semaphore taskRunning;
-
-        public TestTaskLauncherFactory(Semaphore taskRunning) {
-            this.taskRunning = taskRunning;
-        }
-
-        @Override
-        public TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService) {
-            return new TaskFileDataspaces();
-        }
-
-        @Override
-        public TaskExecutor createTaskExecutor(final File workingDir, final Decrypter decrypter) {
-            return new TaskExecutor() {
-                @Override
-                public TaskResultImpl execute(TaskContext container, PrintStream output, PrintStream error) {
-                    taskRunning.release();
-                    return new ForkerTaskExecutor(workingDir, decrypter).execute(container, output, error);
-                }
-            };
-        }
-    }
-
-    private class TaskFileDataspaces implements TaskDataspaces {
-
-        @Override
-        public File getScratchFolder() {
-            return new File(".");
-        }
-
-        @Override
-        public void copyInputDataToScratch(List<InputSelector> inputFiles) throws FileSystemException {
-
-        }
-
-        @Override
-        public void copyScratchDataToOutput(List<OutputSelector> outputFiles) throws FileSystemException {
-
-        }
-    }
-
     public class TaskResultWaiter {
         private volatile TaskResult taskResult;
 
@@ -229,51 +178,4 @@ public class KillTaskLauncherTest {
 
     }
 
-    private class SlowDataspacesTaskLauncherFactory extends TaskLauncherFactory {
-        private Semaphore taskRunning;
-
-        public SlowDataspacesTaskLauncherFactory(Semaphore taskRunning) {
-            this.taskRunning = taskRunning;
-        }
-
-        @Override
-        public TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService) {
-            return new SlowDataspaces(taskRunning);
-        }
-
-        @Override
-        public TaskExecutor createTaskExecutor(File workingDir, Decrypter decrypter) {
-            return new NonForkedTaskExecutor();
-        }
-
-    }
-
-    private class SlowDataspaces implements TaskDataspaces {
-
-        private Semaphore taskRunning;
-
-        public SlowDataspaces(Semaphore taskRunning) {
-            this.taskRunning = taskRunning;
-        }
-
-        @Override
-        public File getScratchFolder() {
-            return new File(".");
-        }
-
-        @Override
-        public void copyInputDataToScratch(List<InputSelector> inputFiles) throws FileSystemException {
-            taskRunning.release();
-            try {
-                Thread.sleep(10000);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        @Override
-        public void copyScratchDataToOutput(List<OutputSelector> outputFiles) throws FileSystemException {
-
-        }
-    }
 }

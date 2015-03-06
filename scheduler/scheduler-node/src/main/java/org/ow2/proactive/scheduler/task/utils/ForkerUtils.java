@@ -105,11 +105,11 @@ public final class ForkerUtils {
      */
     public static PAOSProcessBuilderFactory getOSProcessBuilderFactory(String nativeScriptPath) {
         if (OSBuilderFactory == null) {
-            try {
+//            try {
                 OSBuilderFactory = new PAOSProcessBuilderFactory(nativeScriptPath);
-            } catch (ProActiveException e) {
-                e.printStackTrace();
-            }
+//            } catch (ProActiveException e) {
+//                e.printStackTrace();
+//            }
         }
         return OSBuilderFactory;
     }
