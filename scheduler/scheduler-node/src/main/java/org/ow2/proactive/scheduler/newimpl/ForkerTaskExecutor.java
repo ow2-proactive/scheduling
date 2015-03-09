@@ -99,7 +99,7 @@ public class ForkerTaskExecutor implements TaskExecutor {
             }
 
             // TODO limit classpath to a bare minimum
-            pb.command(getJavaExecutablePath(context.getExecutableContainer()), "-Djava.security.policy=/home/sdolgov/proactive/repos/scheduling/config/security.java.policy-client", "-cp",
+            pb.command(getJavaExecutablePath(context.getExecutableContainer()), "-cp",
                     System.getProperty("java.class.path"), taskExecutorClass.getName(),
                     serializedContext.getAbsolutePath()).directory(workingDir);
 

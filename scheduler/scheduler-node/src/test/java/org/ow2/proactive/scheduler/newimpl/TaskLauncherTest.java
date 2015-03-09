@@ -1,24 +1,16 @@
 package org.ow2.proactive.scheduler.newimpl;
 
-import java.io.File;
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
-import java.util.List;
 
-import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
-import org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemException;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
-import org.ow2.proactive.scheduler.common.task.Decrypter;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
-import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scheduler.common.util.Object2ByteConverter;
+import org.ow2.proactive.scheduler.examples.WaitAndPrint;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
-import org.ow2.proactive.scheduler.newimpl.java.JavaScriptEngineFactoryTest;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskLauncherInitializer;
 import org.ow2.proactive.scheduler.task.script.ForkedScriptExecutableContainer;
@@ -56,7 +48,7 @@ public class TaskLauncherTest {
         TaskResult taskResult = runTaskLauncher(taskLauncher, executableContainer);
 
         assertEquals("hello", taskResult.value());
-        assertEquals("pre\nhello\npost\n", taskResult.getOutput().getAllLogs(false));
+        assertEquals("prehellopost\n", taskResult.getOutput().getAllLogs(false));
     }
 
     @Test
@@ -64,7 +56,7 @@ public class TaskLauncherTest {
         HashMap<String, byte[]> args = new HashMap<String, byte[]>();
         args.put("number", Object2ByteConverter.convertObject2Byte(123));
         ForkedScriptExecutableContainer executableContainer = new ForkedScriptExecutableContainer(
-          new TaskScript(new SimpleScript(JavaScriptEngineFactoryTest.ReturnReplicationIndex .class.getName(), "java", new Serializable[]{
+          new TaskScript(new SimpleScript(WaitAndPrint.class.getName(), "java", new Serializable[]{
             args
           })));
 

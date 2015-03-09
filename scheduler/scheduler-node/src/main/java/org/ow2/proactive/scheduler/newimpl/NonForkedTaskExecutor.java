@@ -201,8 +201,8 @@ public class NonForkedTaskExecutor implements TaskExecutor {
         variables.put(SchedulerVars.JAVAENV_TASK_ID_VARNAME.toString(), initializer.getTaskId().value());
         variables.put(SchedulerVars.JAVAENV_TASK_NAME_VARNAME.toString(), initializer.getTaskId()
                 .getReadableName());
-        variables.put(SchedulerVars.JAVAENV_TASK_ITERATION.toString(), initializer.getTaskId().getIterationIndex());
-        variables.put(SchedulerVars.JAVAENV_TASK_REPLICATION.toString(), initializer.getTaskId().getReplicationIndex());
+        variables.put(SchedulerVars.JAVAENV_TASK_ITERATION.toString(), initializer.getIterationIndex());
+        variables.put(SchedulerVars.JAVAENV_TASK_REPLICATION.toString(), initializer.getReplicationIndex());
         //        variables.put(PASchedulerProperties.SCHEDULER_HOME.getKey(),
         //                CentralPAPropertyRepository.PA_HOME.getValue());
         //        variables.put(PAResourceManagerProperties.RM_HOME.getKey(),
