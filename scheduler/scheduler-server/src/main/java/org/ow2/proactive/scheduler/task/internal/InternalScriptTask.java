@@ -52,7 +52,7 @@ import org.ow2.proactive.scheduler.newimpl.TaskExecutor;
 import org.ow2.proactive.scheduler.newimpl.TaskLauncher;
 import org.ow2.proactive.scheduler.newimpl.TaskLauncherFactory;
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
-import org.ow2.proactive.scheduler.task.script.ForkedScriptExecutableContainer;
+import org.ow2.proactive.scheduler.task.script.ScriptExecutableContainer;
 import org.ow2.proactive.scheduler.util.TaskLogger;
 import org.ow2.proactive.scripting.Script;
 
@@ -106,7 +106,7 @@ public class InternalScriptTask extends InternalTask {
     public String display() {
         String nl = System.getProperty("line.separator");
         String answer = super.display();
-        Script tscript = ((ForkedScriptExecutableContainer) executableContainer).getScript();
+        Script tscript = ((ScriptExecutableContainer) executableContainer).getScript();
         return answer + nl + "\tScript = " + ((tscript != null) ? tscript.display() : null);
     }
 

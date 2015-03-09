@@ -306,7 +306,7 @@ public class InternalJobFactory {
 //                javaTask = new InternalJavaTask(new JavaExecutableContainer(task.getExecutableClassName(),
 //                  args));
                 try {
-                    javaTask = new InternalScriptTask(new ForkedScriptExecutableContainer(
+                    javaTask = new InternalScriptTask(new ScriptExecutableContainer(
                         new TaskScript(new SimpleScript(task.getExecutableClassName(), "java", new Serializable[]{args}))));
                 } catch (Exception e) {
                     throw new JobCreationException(e);

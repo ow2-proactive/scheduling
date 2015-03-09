@@ -81,16 +81,23 @@ public class JavaScriptEngine extends AbstractScriptEngine {
             if (context.getAttribute(TaskLauncherBak.VARIABLES_BINDING_NAME) != null) {
                 execInitializer.setPropagatedVariables(SerializationUtil
                         .serializeVariableMap((Map<String, Serializable>) context.getAttribute(
-                          TaskLauncherBak.VARIABLES_BINDING_NAME)));
+                          TaskLauncherBak.VARIABLES_BINDING_NAME))); // TODO how to modify those? for propagation
             } else {
                 execInitializer.setPropagatedVariables(Collections.<String, byte[]> emptyMap());
             }
 
             if (context.getAttribute(Script.ARGUMENTS_NAME) != null) {
-                execInitializer.setSerializedArguments((Map<String, byte[]>) ((Serializable[])context.getAttribute(
-                          Script.ARGUMENTS_NAME))[0]);
+                execInitializer.setSerializedArguments(
+                  (Map<String, byte[]>) ((Serializable[]) context.getAttribute(Script.ARGUMENTS_NAME))[0]);
             } else {
-                execInitializer.setSerializedArguments(Collections.<String, byte[]> emptyMap());
+                execInitializer.setSerializedArguments(Collections.<String, byte[]>emptyMap());
+            }
+
+            if (context.getAttribute(TaskScript.CREDENTIALS_VARIABLE) != null) {
+                execInitializer.setThirdPartyCredentials(
+                  (Map<String, String>) context.getAttribute(TaskScript.CREDENTIALS_VARIABLE));
+            } else {
+                execInitializer.setThirdPartyCredentials(Collections.<String, String> emptyMap());
             }
 
             if (context.getAttribute(TaskLauncherBak.MULTI_NODE_TASK_NODESURL_BINDING_NAME) != null) {

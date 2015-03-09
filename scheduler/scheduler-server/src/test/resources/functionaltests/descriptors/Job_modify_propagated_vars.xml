@@ -11,9 +11,6 @@
             <pre>
                 <script>
                     <code language="javascript">
-                        if ('var-value' != '${var}') {
-                            throw 'Incorrect variable value (\'var\'): \'${var}\', expected \'var-value\'.';
-                        }
                         if ('var-value' != variables.get('var')) {
                             throw 'Incorrect variable value (\'var\') in variables map: \'' + variables.get('var') + '\', expected \'var-value\'.'; 
                         }
@@ -22,16 +19,10 @@
                 </script>
             </pre>
             <javaExecutable class="functionaltests.executables.ModifyPropagatedVariablesExec">
-                <parameters>
-                    <parameter name="var" value="${var}" />
-                </parameters>
             </javaExecutable>
             <post>
                 <script>
                     <code language="javascript">
-                        if ('propagate-var-exec2' != '${var}') {
-                            throw 'Incorrect variable value (\'var\'): \'${var}\', expected \'propagate-var-exec2\'';
-                        }
                         if ('propagate-var-exec2' != variables.get('var')) {
                             throw 'Incorrect variable value (\'var\') in variables map: \'' + variables.get('var') + '\', expected \'propagate-var-exec2\''; 
                         }
@@ -47,9 +38,6 @@
             <scriptExecutable>
                 <script>
                     <code language="javascript">
-                        if ('post-script-1' != '${var}') {
-                            throw 'Incorrect variable value (\'var\'): \'${var}\', expected \'post-script-1\'.';
-                        }
                         if ('post-script-1' != variables.get('var')) {
                             throw 'Incorrect variable value (\'var\') in variables map: ' + variables.get('var') + '\', expected \'post-script-1\'.'; 
                         }

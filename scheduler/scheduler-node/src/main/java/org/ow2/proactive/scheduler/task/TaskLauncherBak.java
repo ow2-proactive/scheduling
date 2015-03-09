@@ -256,7 +256,7 @@ public abstract class TaskLauncherBak implements InitActive {
      * Example: if one of the third-party credentials' key-value pairs is 'foo:bar',
      * then '$CREDENTIALS_foo' will be replaced by 'bar' in the arguments of the tasks.
      */
-    protected static final String CREDENTIALS_KEY_PREFIX = "$CREDENTIALS_";
+    public static final String CREDENTIALS_KEY_PREFIX = "$CREDENTIALS_";
 
     /** Propagated variables map */
     private Map<String, Serializable> propagatedVariables = new HashMap<String, Serializable>();

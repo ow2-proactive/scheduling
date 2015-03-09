@@ -42,10 +42,9 @@ import org.objectweb.proactive.core.node.Node;
 import org.ow2.proactive.scheduler.common.task.Decrypter;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
+import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.TaskLauncherInitializer;
-import org.ow2.proactive.scheduler.task.script.ForkedScriptExecutableContainer;
 import org.ow2.proactive.scripting.Script;
 
 
@@ -85,10 +84,12 @@ public class TaskContext implements Serializable {
         this.executableContainer = executableContainer;
 
         nodesURLs = new HashSet<String>();
-        for (Node node : executableContainer.getNodes()) {
-            nodesURLs.add(node.getNodeInformation().getURL());
+        if (executableContainer.getNodes() != null) {
+            for (Node node : executableContainer.getNodes()) {
+                nodesURLs.add(node.getNodeInformation().getURL());
+            }
+            executableContainer.setNodes(null);
         }
-        executableContainer.setNodes(null);
 
     }
 
@@ -104,7 +105,7 @@ public class TaskContext implements Serializable {
         return initializer.getPostScript();
     }
 
-    public Script<FlowAction> getControlFlowScript() {
+    public FlowScript getControlFlowScript() {
         return initializer.getControlFlowScript();
     }
 

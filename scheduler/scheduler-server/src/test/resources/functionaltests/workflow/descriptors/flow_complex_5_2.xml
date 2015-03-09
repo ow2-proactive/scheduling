@@ -27,7 +27,7 @@
             <code language="groovy">
 // <![CDATA[
 
-def ID   = 1 + "_" + $REP;
+def ID   = 1 + "_" + variables.get('pas.task.replication');
 def RUNS = 3;
 def f = new File(java.lang.System.getProperty("java.io.tmpdir"), "fc_5_2_1" + ID);
 def it = 0;
@@ -95,7 +95,7 @@ runs = 3;
 // <![CDATA[
 
 
-def ID   = 2 + "_" + $REP;
+def ID   = 2 + "_" + variables.get('pas.task.replication');
 def RUNS = 3;
 def f = new File(java.lang.System.getProperty("java.io.tmpdir"), "fc_5_2_2" + ID);
 def it = 0;

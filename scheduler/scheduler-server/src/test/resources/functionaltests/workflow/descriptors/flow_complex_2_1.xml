@@ -36,7 +36,7 @@ runs=3;
           <script>
             <code language="groovy">
 // <![CDATA[
-def ID   = 2 + "_" + $REP;
+def ID   = 2 + "_" + variables.get('pas.task.replication');
 def RUNS = 3;
 def f = new File(java.lang.System.getProperty("java.io.tmpdir"), "fc2_1_1" + ID);
 def it = 0;
@@ -88,7 +88,7 @@ loop = false;
           <script>
             <code language="groovy">
 // <![CDATA[
-def ID   = 1 + "_" + $REP;
+def ID   = 1 + "_" + variables.get('pas.task.replication');
 def RUNS = 3;
 def f = new File(java.lang.System.getProperty("java.io.tmpdir"), "fc2_1_2" + ID);
 def it = 0;

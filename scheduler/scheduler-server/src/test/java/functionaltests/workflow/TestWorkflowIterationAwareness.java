@@ -75,25 +75,12 @@ public class TestWorkflowIterationAwareness extends SchedulerConsecutive {
             .getResource("/functionaltests/workflow/descriptors/flow_it_2.xml");
 
     private static final String preScript = //
-    "def f = new File(\"" + System.getProperty("java.io.tmpdir") + "/PRE_$IT_$REP\"); \n" + //
-        "f.createNewFile(); \n";
-
-    private static final String preScriptWindows = //
-    "def f = new File(\"" + tmp_dir_Windows.replace("\\", "\\\\") + "PRE_$IT_$REP\"); \n" + //
-
+    "def f = new File(\"" + System.getProperty("java.io.tmpdir") + "/PRE_" + "\"+ variables.get('pas.task.iteration') + \" " + "_" + "\"+ variables.get('pas.task.replication') +\" " + "\"); \n" + //
         "f.createNewFile(); \n";
 
     private static final String postScript = //
-    "def f = new File(\"" //
-        +
-        System.getProperty("java.io.tmpdir") + "/POST_$IT_$REP\"); \n" //
-        + "f.createNewFile(); \n";
-
-    private static final String postScriptWindows = //
-    "def f = new File(\"" //
-        +
-        tmp_dir_Windows.replace("\\", "\\\\") + "POST_$IT_$REP\"); \n" //
-        + "f.createNewFile(); \n";
+      "def f = new File(\"" + System.getProperty("java.io.tmpdir") + "/POST_" + "\"+ variables.get('pas.task.iteration') + \" " + "_" + "\"+ variables.get('pas.task.replication') +\" " + "\"); \n" + //
+        "f.createNewFile(); \n";
 
     private static final String dupScript = "enabled = true; \n" + "runs = 2; \n";
 
@@ -144,18 +131,8 @@ public class TestWorkflowIterationAwareness extends SchedulerConsecutive {
 
         TaskFlowJob job = (TaskFlowJob) JobFactory_stax.getFactory().createJob(
                 new File(java_job.toURI()).getAbsolutePath());
-        switch (OperatingSystem.getOperatingSystem()) {
-            case windows:
-                ((JavaTask) job.getTask("T1")).setPreScript(new SimpleScript(preScriptWindows, "groovy"));
-                ((JavaTask) job.getTask("T1")).setPostScript(new SimpleScript(postScriptWindows, "groovy"));
-                break;
-            case unix:
-                ((JavaTask) job.getTask("T1")).setPreScript(new SimpleScript(preScript, "groovy"));
-                ((JavaTask) job.getTask("T1")).setPostScript(new SimpleScript(postScript, "groovy"));
-                break;
-            default:
-                throw new IllegalStateException("Unsupported operating system");
-        }
+        ((JavaTask) job.getTask("T1")).setPreScript(new SimpleScript(preScript, "groovy"));
+        ((JavaTask) job.getTask("T1")).setPostScript(new SimpleScript(postScript, "groovy"));
 
         JobId id = TWorkflowJobs.testJobSubmission(job, null);
         JobResult res = SchedulerTHelper.getJobResult(id);
@@ -190,8 +167,8 @@ public class TestWorkflowIterationAwareness extends SchedulerConsecutive {
                 new File(native_job.toURI()).getAbsolutePath());
         switch (OperatingSystem.getOperatingSystem()) {
             case windows:
-                ((NativeTask) job.getTask("T1")).setPreScript(new SimpleScript(preScriptWindows, "groovy"));
-                ((NativeTask) job.getTask("T1")).setPostScript(new SimpleScript(postScriptWindows, "groovy"));
+                ((NativeTask) job.getTask("T1")).setPreScript(new SimpleScript(preScript, "groovy"));
+                ((NativeTask) job.getTask("T1")).setPostScript(new SimpleScript(postScript, "groovy"));
                 String[] tab = ((NativeTask) job.getTask("T1")).getCommandLine();
                 tab[0] = "\"" + tab[0].replace("it.sh", "it.bat") + "\"";
                 tab[1] = tmp_dir_Windows;

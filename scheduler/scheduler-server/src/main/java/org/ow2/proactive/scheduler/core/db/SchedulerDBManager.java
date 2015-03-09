@@ -1532,7 +1532,7 @@ public class SchedulerDBManager {
             ScriptTaskData scriptTaskData = ScriptTaskData.createScriptTaskData(taskRuntimeData, container);
             session.save(scriptTaskData);
         } else if (task.getClass().equals(InternalScriptTask.class)) {
-            ForkedScriptExecutableContainer container = (ForkedScriptExecutableContainer) task.getExecutableContainer();
+            ScriptExecutableContainer container = (ScriptExecutableContainer) task.getExecutableContainer();
             ScriptTaskData scriptTaskData = ScriptTaskData.createScriptTaskData(taskRuntimeData, container);
             session.save(scriptTaskData);
         } else {

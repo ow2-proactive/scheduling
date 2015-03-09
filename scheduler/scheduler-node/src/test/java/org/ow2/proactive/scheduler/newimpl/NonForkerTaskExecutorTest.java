@@ -1,10 +1,18 @@
 package org.ow2.proactive.scheduler.newimpl;
 
 import java.io.Serializable;
+import java.security.KeyException;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.ow2.proactive.authentication.crypto.CredData;
+import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.scheduler.common.task.Decrypter;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
@@ -58,7 +66,7 @@ public class NonForkerTaskExecutorTest {
 
         new NonForkedTaskExecutor().execute(new TaskContext(new ForkedScriptExecutableContainer(
             new TaskScript(new SimpleScript(printEnvVariables, "javascript"))), initializer),
-                taskOutput.outputStream, taskOutput.error);
+          taskOutput.outputStream, taskOutput.error);
 
         String[] lines = taskOutput.output().split("\\n");
         assertEquals("job@1000@task@42", lines[0]);
@@ -90,8 +98,8 @@ public class NonForkerTaskExecutorTest {
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
         initializer.setPreScript(new SimpleScript("print(variables.get('var')); variables.put('var', 'pre')",
             "javascript"));
-        initializer.setPostScript(new SimpleScript(
-            "print(variables.get('var')); variables.put('var', 'post')", "javascript"));
+        initializer.setPostScript(
+          new SimpleScript("print(variables.get('var')); variables.put('var', 'post')", "javascript"));
         initializer.setTaskId(TaskIdImpl.createTaskId(new JobIdImpl(1000, "job"), "task", 42L, false));
         initializer.setVariables(Collections.singletonMap("var", "value"));
 
@@ -120,9 +128,8 @@ public class NonForkerTaskExecutorTest {
             SerializationUtil.serializeVariableMap(variablesFromParent)) };
 
         new NonForkedTaskExecutor().execute(new TaskContext(new ForkedScriptExecutableContainer(
-            new TaskScript(new SimpleScript(
-                "print(variables.get('var'));print(variables.get('pas.task.id'))", "javascript"))),
-            initializer, previousTasksResults), taskOutput.outputStream, taskOutput.error);
+          new TaskScript(new SimpleScript("print(variables.get('var'));print(variables.get('pas.task.id'))",
+            "javascript"))), initializer, previousTasksResults), taskOutput.outputStream, taskOutput.error);
 
         assertEquals("parent42", taskOutput.output());
     }
@@ -228,6 +235,58 @@ public class NonForkerTaskExecutorTest {
         assertEquals("hello", taskOutput.output());
         assertNotEquals("", taskOutput.error());
         assertNotNull(result.getException());
+    }
+
+    @Test
+    public void scriptArguments() throws Throwable {
+        TestTaskOutput taskOutput = new TestTaskOutput();
+
+        TaskLauncherInitializer initializer = new TaskLauncherInitializer();
+        String printEnvVariables = "print(args[0])";
+        initializer.setPreScript(
+          new SimpleScript(printEnvVariables, "javascript", new Serializable[] { "Hello" }));
+        initializer.setTaskId(TaskIdImpl.createTaskId(new JobIdImpl(1000, "job"), "task", 42L, false));
+
+        new NonForkedTaskExecutor().execute(new TaskContext(
+          new ForkedScriptExecutableContainer(new TaskScript(new SimpleScript("", "javascript"))),
+          initializer), taskOutput.outputStream, taskOutput.error);
+
+        assertEquals("Hello", taskOutput.output());
+    }
+
+    @Test
+    public void scriptArgumentsReplacements() throws Throwable {
+        TestTaskOutput taskOutput = new TestTaskOutput();
+
+        TaskLauncherInitializer initializer = new TaskLauncherInitializer();
+        String printEnvVariables = "print(args[0])";
+        initializer.setPreScript(
+          new SimpleScript(printEnvVariables, "javascript", new Serializable[] { "$CREDENTIALS_PASSWORD" }));
+        initializer.setPostScript(
+          new SimpleScript(printEnvVariables, "javascript", new Serializable[] { "$CREDENTIALS_PASSWORD" }));
+        initializer.setTaskId(TaskIdImpl.createTaskId(new JobIdImpl(1000, "job"), "task", 42L, false));
+
+        Decrypter decrypter = createCredentials("somebody_that_does_not_exists");
+        TaskContext taskContext = new TaskContext(new ForkedScriptExecutableContainer(
+            new TaskScript(new SimpleScript(printEnvVariables, "javascript",
+                new Serializable[] { "$CREDENTIALS_PASSWORD" }))), initializer);
+        taskContext.setDecrypter(decrypter);
+        new NonForkedTaskExecutor().execute(taskContext, taskOutput.outputStream, taskOutput.error);
+
+        assertEquals("p4ssw0rdp4ssw0rdp4ssw0rd", taskOutput.output()); // pre, task and post
+    }
+
+    private Decrypter createCredentials(String username) throws NoSuchAlgorithmException, KeyException {
+        CredData credData = new CredData(username, "pwd");
+        credData.addThirdPartyCredential("PASSWORD", "p4ssw0rd");
+        KeyPairGenerator keyGen;
+        keyGen = KeyPairGenerator.getInstance("RSA");
+        keyGen.initialize(512, new SecureRandom());
+        KeyPair keyPair = keyGen.generateKeyPair();
+        Decrypter decrypter = new Decrypter(keyPair.getPrivate());
+        Credentials credentials = Credentials.createCredentials(credData, keyPair.getPublic());
+        decrypter.setCredentials(credentials);
+        return decrypter;
     }
 
 }

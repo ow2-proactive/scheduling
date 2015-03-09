@@ -151,8 +151,6 @@ public class TaskLauncher {
 
             taskResult.setLogs(taskLogger.getLogs());
 
-            logger.fatal("@@@" + taskLogger.getLogs().getStderrLogs(false));
-
             sendResultToScheduler(terminateNotification, taskResult);
 
         } catch (Throwable throwable) {

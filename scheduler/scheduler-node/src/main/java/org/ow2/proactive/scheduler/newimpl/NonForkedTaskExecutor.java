@@ -37,9 +37,13 @@ package org.ow2.proactive.scheduler.newimpl;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
@@ -50,13 +54,13 @@ import org.ow2.proactive.scheduler.task.TaskLauncherBak;
 import org.ow2.proactive.scheduler.task.TaskLauncherInitializer;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.script.ForkedScriptExecutableContainer;
+import org.ow2.proactive.scheduler.task.script.ScriptExecutableContainer;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptHandler;
 import org.ow2.proactive.scripting.ScriptLoader;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.TaskScript;
 import org.ow2.proactive.utils.ClasspathUtils;
-import org.ow2.proactive.utils.NodeSet;
 
 
 public class NonForkedTaskExecutor implements TaskExecutor {
@@ -115,6 +119,46 @@ public class NonForkedTaskExecutor implements TaskExecutor {
                 nodesUrls);
         scriptHandler.addBinding(TaskLauncherBak.MULTI_NODE_TASK_NODESURL_BINDING_NAME, nodesUrls);
 
+
+
+        // parameters replacement
+
+        Map<String, String> replacements = new HashMap<String, String>();
+        for (Map.Entry<String, String> credentialEntry : thirdPartyCredentials.entrySet()) {
+            replacements.put(TaskLauncherBak.CREDENTIALS_KEY_PREFIX + credentialEntry.getKey(), credentialEntry
+              .getValue());
+        }
+
+        // TODO should be done after script is executed (like if pre changes on replacement, should it be resolved after)
+
+
+        Script<Serializable> taskScript;
+        if(container.getExecutableContainer() instanceof  ScriptExecutableContainer) {
+            taskScript = ((ScriptExecutableContainer) container.getExecutableContainer()).getScript();
+        } else {
+            taskScript = ((ForkedScriptExecutableContainer) container.getExecutableContainer()).getScript();
+        }
+        Script[] scripts = new Script[]{container.getPreScript(), container.getPostScript(), taskScript, container.getPostScript()};
+
+        for (Script script : scripts) {
+            if (script != null) {
+                Serializable[] args;
+                // TODO deal with java task
+//                if(script.getEngineName().equals("java")){
+//                    // args = (Map<>) script.getParameters()[0];
+//                } else {
+                    args =  script.getParameters();
+//                }
+                if (args != null) {
+                    for (int i = 0; i < args.length; i++) {
+                        if (args[i] instanceof String) {
+                            args[i] = replace((String) args[i], replacements);
+                        }
+                    }
+                }
+            }
+        }
+
         StopWatch stopWatch = new StopWatch();
         TaskResultImpl taskResult;
         try {
@@ -130,6 +174,14 @@ public class NonForkedTaskExecutor implements TaskExecutor {
 
         taskResult.setPropagatedVariables(SerializationUtil.serializeVariableMap(variables));
         return taskResult;
+    }
+
+    private static String replace(String input, Map<String, String> replacements) {
+        String output = input;
+        for (Map.Entry<String, String> replacement : replacements.entrySet()) {
+            output = output.replace(replacement.getKey(), replacement.getValue());
+        }
+        return output;
     }
 
     private Set<String> getNodesURLs(TaskContext container) {
@@ -177,7 +229,7 @@ public class NonForkedTaskExecutor implements TaskExecutor {
     private Serializable executeScripts(TaskContext container, PrintStream output, PrintStream error,
                                         ScriptHandler scriptHandler) throws Exception {
         if (container.getPreScript() != null) {
-            ScriptResult preScriptResult = scriptHandler.handle(container.getPreScript(), output, error);
+            ScriptResult preScriptResult = runAScript(scriptHandler, container.getPreScript(), output, error);
             if (preScriptResult.errorOccured()) {
                 throw new Exception("Failed to execute pre script", preScriptResult.getException());
             }
@@ -187,7 +239,8 @@ public class NonForkedTaskExecutor implements TaskExecutor {
 
 
         if (container.getPostScript() != null) {
-            ScriptResult postScriptResult = scriptHandler.handle(container.getPostScript(), output, error);
+            ScriptResult postScriptResult = runAScript(scriptHandler, container.getPostScript(), output,
+              error);
             if (postScriptResult.errorOccured()) {
                 throw new Exception("Failed to execute post script", postScriptResult.getException());
             }
@@ -200,43 +253,27 @@ public class NonForkedTaskExecutor implements TaskExecutor {
 
 //        if(container.getExecutableContainer() instanceof ForkedScriptExecutableContainer) {
 
-        ForkedScriptExecutableContainer executableContainer = (ForkedScriptExecutableContainer) container
-                .getExecutableContainer();
-
-        ScriptResult<Serializable> scriptResult = scriptHandler.handle(executableContainer.getScript(), output, error);
+        Script<Serializable> script;
+        if(container.getExecutableContainer() instanceof  ScriptExecutableContainer) {
+            script = ((ScriptExecutableContainer) container.getExecutableContainer()).getScript();
+        } else {
+            script = ((ForkedScriptExecutableContainer) container.getExecutableContainer()).getScript();
+        }
+        ScriptResult<Serializable> scriptResult = runAScript(scriptHandler, script, output, error);
 
         if (scriptResult.errorOccured()) {
             throw new Exception("Failed to execute task: " + scriptResult.getException().getMessage(), scriptResult.getException());
         }
 
         return scriptResult.getResult();
-//        }
-//        else {
-//
-//            JavaExecutableContainer javaContainer = (JavaExecutableContainer) container
-//              .getExecutableContainer();
-//
-//            AbstractJavaExecutable javaExecutable = (AbstractJavaExecutable) javaContainer.getExecutable();
-//
-//            JavaExecutableInitializerImpl initializer = javaContainer.createExecutableInitializer();
-//            initializer.setOutputSink(output);
-//            initializer.setErrorSink(error);
-//            initializer.setPropagatedVariables(new HashMap<String, byte[]>());
-//            // TODO probably more things
-//            javaExecutable.internalInit(initializer);
-//
-//            try {
-//                return javaExecutable.execute(new TaskResult[0]);
-//            } catch (Throwable throwable) {
-//                throw new Exception("Failed to execute Java task", throwable);
-//            }
-//
-//            //return scriptHandler.handle(javaContainer.getScript(), output, error);
-//
-//        }
     }
 
-    private void executeFlowScript(Script<FlowAction> flowScript, ScriptHandler scriptHandler,
+    private <T> ScriptResult<T> runAScript(ScriptHandler scriptHandler, Script<T> script,
+      PrintStream output, PrintStream error) {
+        return scriptHandler.handle(script, output, error);
+    }
+
+    private void executeFlowScript(FlowScript flowScript, ScriptHandler scriptHandler,
                                    PrintStream output, PrintStream error, TaskResultImpl taskResult) {
         if (flowScript != null) {
             try {
@@ -248,6 +285,7 @@ public class NonForkedTaskExecutor implements TaskExecutor {
             if (flowScriptResult.errorOccured()) {
                 flowScriptResult.getException().printStackTrace(error);
                 taskResult.setException(flowScriptResult.getException());
+                taskResult.setAction(FlowAction.getDefaultAction(flowScript));
             } else {
                 taskResult.setAction(flowScriptResult.getResult());
             }

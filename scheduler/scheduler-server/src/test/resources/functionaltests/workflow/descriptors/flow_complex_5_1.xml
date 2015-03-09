@@ -34,7 +34,7 @@ runs = 3;
             <code language="groovy">
 // <![CDATA[
 
-def ID   = 1 + "_" + $REP;
+def ID   = 1 + "_" + variables.get('pas.task.replication');
 def RUNS = 3;
 def f = new File(java.lang.System.getProperty("java.io.tmpdir"), "fc_5_1_1" + ID);
 def it = 0;
