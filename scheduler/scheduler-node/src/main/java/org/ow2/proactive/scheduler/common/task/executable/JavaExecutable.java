@@ -58,10 +58,6 @@ import org.ow2.proactive.utils.NodeSet;
 @PublicAPI
 public abstract class JavaExecutable extends AbstractJavaExecutable {
 
-    // this value is set only on worker node side !!
-    // see JavaTaskLauncher
-    private JavaExecutableInitializerImpl execInitializer;
-
     /**
      * Initialize the executable using the given executable Initializer.
      *
@@ -72,8 +68,6 @@ public abstract class JavaExecutable extends AbstractJavaExecutable {
     // WARNING WHEN REMOVE OR RENAME, called by task launcher by introspection
     protected void internalInit(JavaExecutableInitializerImpl execInitializer) throws Exception {
         super.internalInit(execInitializer);
-        this.execInitializer = execInitializer;
-
     }
 
     /**
@@ -86,7 +80,7 @@ public abstract class JavaExecutable extends AbstractJavaExecutable {
      * @return the list of nodes demanded by the user.
      */
     public final NodeSet getNodes() {
-        return execInitializer.getNodes();
+        return ((JavaExecutableInitializerImpl) execInitializer).getNodes();
     }
 
     /**
@@ -103,7 +97,7 @@ public abstract class JavaExecutable extends AbstractJavaExecutable {
      * 							   or if the INPUT space cannot be reached or has not be found.
      */
     public final DataSpacesFileObject getInputSpace() throws FileSystemException {
-        return execInitializer.getInputSpaceFileObject();
+        return ((JavaExecutableInitializerImpl) execInitializer).getInputSpaceFileObject();
     }
 
     /**
@@ -120,7 +114,7 @@ public abstract class JavaExecutable extends AbstractJavaExecutable {
      * 							   or if the OUTPUT space cannot be reached or has not be found.
      */
     public final DataSpacesFileObject getOutputSpace() throws FileSystemException {
-        return execInitializer.getOutputSpaceFileObject();
+        return ((JavaExecutableInitializerImpl) execInitializer).getOutputSpaceFileObject();
     }
 
     /**
@@ -137,7 +131,7 @@ public abstract class JavaExecutable extends AbstractJavaExecutable {
      *                             or if the GLOBAL space cannot be reached or has not be found.
      */
     public final DataSpacesFileObject getGlobalSpace() throws FileSystemException {
-        return execInitializer.getGlobalSpaceFileObject();
+        return ((JavaExecutableInitializerImpl) execInitializer).getGlobalSpaceFileObject();
     }
 
     /**
@@ -154,7 +148,7 @@ public abstract class JavaExecutable extends AbstractJavaExecutable {
      *                             or if the USER space cannot be reached or has not be found.
      */
     public final DataSpacesFileObject getUserSpace() throws FileSystemException {
-        return execInitializer.getUserSpaceFileObject();
+        return ((JavaExecutableInitializerImpl) execInitializer).getUserSpaceFileObject();
     }
 
     /**
@@ -169,7 +163,7 @@ public abstract class JavaExecutable extends AbstractJavaExecutable {
      * 							   or if the node is not properly configured.
      */
     public final DataSpacesFileObject getLocalSpace() throws FileSystemException {
-        return execInitializer.getLocalSpaceFileObject();
+        return ((JavaExecutableInitializerImpl) execInitializer).getLocalSpaceFileObject();
     }
 
     /**
