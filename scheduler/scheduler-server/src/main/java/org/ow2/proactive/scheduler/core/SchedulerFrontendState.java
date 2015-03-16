@@ -445,7 +445,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
      * 
      * @param id the uniqueID of the user
      */
-    private void disconnect(UniqueID id) {
+    private synchronized void disconnect(UniqueID id) {
         credentials.remove(id);
         ListeningUser ident = identifications.remove(id);
         if (ident != null) {

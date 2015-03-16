@@ -60,18 +60,18 @@ public class ProActiveTest {
 
     private static void configureSecurityManager() {
         if (System.getProperty("java.security.policy") == null) {
-            System.setProperty("java.security.policy", System.getProperty(PAResourceManagerProperties.RM_HOME
-                    .getKey()) +
-                "/config/security.java.policy-server");
+            System.setProperty("java.security.policy",
+                    System.getProperty(PAResourceManagerProperties.RM_HOME.getKey()) +
+                        "/config/security.java.policy-server");
 
             Policy.getPolicy().refresh();
         }
     }
 
     private static void configurePAHome() {
-        if (System.getProperty(CentralPAPropertyRepository.PA_HOME.getName()) == null) {
-            System.setProperty(CentralPAPropertyRepository.PA_HOME.getName(), System
-              .getProperty(PAResourceManagerProperties.RM_HOME.getKey()));
+        String rmHome = System.getProperty(PAResourceManagerProperties.RM_HOME.getKey());
+        if (System.getProperty(CentralPAPropertyRepository.PA_HOME.getName()) == null && rmHome != null) {
+            System.setProperty(CentralPAPropertyRepository.PA_HOME.getName(), rmHome);
         }
     }
 }
