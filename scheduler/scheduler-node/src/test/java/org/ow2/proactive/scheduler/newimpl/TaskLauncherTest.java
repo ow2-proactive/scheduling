@@ -99,12 +99,28 @@ public class TaskLauncherTest {
 
         CredData credData = new CredData("john", "pwd");
         credData.addThirdPartyCredential("password", "r00t");
-        Credentials thirdPartyCredentials = Credentials.createCredentials(credData, taskLauncher.generatePublicKey());
+        Credentials thirdPartyCredentials = Credentials.createCredentials(credData,
+          taskLauncher.generatePublicKey());
         executableContainer.setCredentials(thirdPartyCredentials);
 
         TaskResult taskResult = runTaskLauncher(taskLauncher, executableContainer);
 
         assertEquals("r00t\n", taskResult.getOutput().getAllLogs(false));
+    }
+
+    @Test
+    public void nativeTask_Working_Dir() throws Throwable {
+        ForkedScriptExecutableContainer executableContainer = new ForkedScriptExecutableContainer(
+          new TaskScript(new SimpleScript("pwd", "native")), "/tmp");
+
+        TaskLauncherInitializer initializer = new TaskLauncherInitializer();
+
+        initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false));
+
+        TaskLauncher taskLauncher = new TaskLauncher(initializer, new TestTaskLauncherFactory());
+        TaskResult taskResult = runTaskLauncher(taskLauncher, executableContainer);
+
+        assertEquals("/tmp\n", taskResult.getOutput().getAllLogs(false));
     }
 
     private TaskResult runTaskLauncher(TaskLauncher taskLauncher, ForkedScriptExecutableContainer executableContainer) {

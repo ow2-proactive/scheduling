@@ -5,6 +5,7 @@ import java.util.Collections;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
+import org.ow2.proactive.scheduler.newimpl.data.TaskProActiveDataspaces;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.junit.Test;
 

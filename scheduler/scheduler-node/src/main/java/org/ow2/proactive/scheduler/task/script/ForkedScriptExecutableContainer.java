@@ -68,10 +68,20 @@ public class ForkedScriptExecutableContainer extends ForkedJavaExecutableContain
     public static final Logger logger = Logger.getLogger(ForkedScriptExecutableContainer.class);
 
     private TaskScript script;
+    private String workingDir;
 
     public ForkedScriptExecutableContainer(TaskScript script) {
         super(JavaForkerExecutable.class.getName(), Collections.<String, byte[]> emptyMap());
         this.script = script;
+    }
+
+    public String getWorkingDir() {
+        return workingDir;
+    }
+
+    public ForkedScriptExecutableContainer(TaskScript script, String workingDir) {
+        this(script);
+        this.workingDir = workingDir;
     }
 
     /**
@@ -84,6 +94,7 @@ public class ForkedScriptExecutableContainer extends ForkedJavaExecutableContain
         super(JavaForkerExecutable.class.getName(), Collections.<String, byte[]> emptyMap());
         try {
             this.script = new TaskScript(cont.getScript());
+            this.workingDir = cont.workingDir;
         } catch (InvalidScriptException e) {
             throw new ExecutableCreationException("Could not copy script", e);
         }

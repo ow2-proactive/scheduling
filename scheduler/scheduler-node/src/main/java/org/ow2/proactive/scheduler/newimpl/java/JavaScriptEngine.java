@@ -78,10 +78,12 @@ public class JavaScriptEngine extends AbstractScriptEngine {
             PrintStream error = new PrintStream(new WriterOutputStream(context.getErrorWriter()), true);
             execInitializer.setErrorSink(error);
 
+            Map<String, byte[]> propagatedVariables = null;
             if (context.getAttribute(TaskLauncherBak.VARIABLES_BINDING_NAME) != null) {
-                execInitializer.setPropagatedVariables(SerializationUtil
-                        .serializeVariableMap((Map<String, Serializable>) context.getAttribute(
-                          TaskLauncherBak.VARIABLES_BINDING_NAME))); // TODO how to modify those? for propagation
+                propagatedVariables = SerializationUtil.serializeVariableMap(
+                  (Map<String, Serializable>) context.getAttribute(TaskLauncherBak.VARIABLES_BINDING_NAME));
+                execInitializer.setPropagatedVariables(propagatedVariables
+                ); // TODO how to modify those? for propagation
             } else {
                 execInitializer.setPropagatedVariables(Collections.<String, byte[]> emptyMap());
             }
@@ -113,6 +115,12 @@ public class JavaScriptEngine extends AbstractScriptEngine {
                     .getAttribute(TaskScript.RESULTS_VARIABLE));
 
             context.setAttribute(TaskScript.RESULT_VARIABLE, execute, ScriptContext.ENGINE_SCOPE);
+            if (propagatedVariables != null) {
+                context.setAttribute(TaskLauncherBak.VARIABLES_BINDING_NAME,
+                        SerializationUtil.deserializeVariableMap(propagatedVariables),
+                        ScriptContext.ENGINE_SCOPE);
+            }
+
             output.close();
             error.close();
             return execute;

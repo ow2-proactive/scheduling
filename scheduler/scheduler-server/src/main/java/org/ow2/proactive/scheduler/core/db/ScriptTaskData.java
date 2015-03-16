@@ -27,21 +27,23 @@ public class ScriptTaskData {
     private long id;
     private TaskData taskData;
     private ScriptData script;
+    private String workingDir;
 
     static ScriptTaskData createScriptTaskData(TaskData taskData, ForkedScriptExecutableContainer container) {
         Script script = container.getScript();
-        return createScriptTaskData(taskData, script);
+        return createScriptTaskData(taskData, script, container.getWorkingDir());
     }
 
     static ScriptTaskData createScriptTaskData(TaskData taskData, ScriptExecutableContainer container) {
         Script script = container.getScript();
-        return createScriptTaskData(taskData, script);
+        return createScriptTaskData(taskData, script, null);
     }
 
-    private static ScriptTaskData createScriptTaskData(TaskData taskData, Script script) {
+    private static ScriptTaskData createScriptTaskData(TaskData taskData, Script script, String workingDir) {
         ScriptTaskData scriptTaskData = new ScriptTaskData();
         scriptTaskData.setTaskData(taskData);
         scriptTaskData.setScript(ScriptData.createForScript(script));
+        scriptTaskData.setWorkingDir(workingDir);
         return scriptTaskData;
     }
 
@@ -50,7 +52,7 @@ public class ScriptTaskData {
     }
 
     ForkedScriptExecutableContainer createForkedExecutableContainer() throws InvalidScriptException {
-        return new ForkedScriptExecutableContainer(new TaskScript(script.createSimpleScript()));
+        return new ForkedScriptExecutableContainer(new TaskScript(script.createSimpleScript()), workingDir);
     }
 
     @Id
@@ -87,4 +89,12 @@ public class ScriptTaskData {
         this.script = script;
     }
 
+    @Column(name = "WORKING_DIR")
+    public String getWorkingDir() {
+        return workingDir;
+    }
+
+    public void setWorkingDir(String workingDir) {
+        this.workingDir = workingDir;
+    }
 }

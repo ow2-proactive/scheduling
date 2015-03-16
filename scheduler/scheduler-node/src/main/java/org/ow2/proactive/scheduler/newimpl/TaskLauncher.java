@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2011 INRIA/University of
+ * Copyright (C) 1997-2015 INRIA/University of
  *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -36,6 +36,7 @@
  */
 package org.ow2.proactive.scheduler.newimpl;
 
+import java.io.File;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
@@ -53,35 +54,34 @@ import org.ow2.proactive.scheduler.common.task.Decrypter;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
+import org.ow2.proactive.scheduler.newimpl.data.TaskDataspaces;
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.TaskLauncherInitializer;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
+import org.ow2.proactive.scheduler.task.script.ForkedScriptExecutableContainer;
 import org.apache.log4j.Logger;
 
 
 /**
- *
- * @author The ProActive Team
+ * The node side of task execution:
+ * - communicates with the Scheduler via ProActive
+ * - deals with data transfers
+ * - deals with task killing and walltime
+ * - sends result back to the Scheduler
  */
 @ActiveObject
 public class TaskLauncher {
 
     private static final Logger logger = Logger.getLogger(TaskLauncher.class);
 
-    /** For tests */
     private TaskLauncherFactory factory = new TaskLauncherFactory();
 
     private TaskId taskId;
     private TaskLauncherInitializer initializer;
 
-    private int pingAttempts;
-    private int pingPeriodMs;
-
     private TaskLogger taskLogger;
-
-    private Decrypter decrypter;
-
     private TaskKiller taskKiller;
+    private Decrypter decrypter;
 
     /** Needed for ProActive */
     public TaskLauncher() {
@@ -95,94 +95,112 @@ public class TaskLauncher {
     public TaskLauncher(TaskLauncherInitializer initializer) {
         this.initializer = initializer;
         this.taskId = initializer.getTaskId();
-        this.initializer.setTaskId(taskId);
-
-        this.pingAttempts = initializer.getPingAttempts();
-        this.pingPeriodMs = initializer.getPingPeriod() * 1000;
-
-        taskLogger = new TaskLogger(taskId, getHostname());
+        this.taskLogger = new TaskLogger(taskId, getHostname());
     }
 
-    // should be execute(executable)
     public void doTask(ExecutableContainer executableContainer, TaskResult[] previousTasksResults,
             TaskTerminateNotification terminateNotification) {
 
         taskKiller = new TaskKiller(Thread.currentThread()); // what about kill of a non yet started task?
-        WallTimer wallTimer = new WallTimer(initializer.getWalltime(), Thread.currentThread()); // stop when finished
+        WallTimer wallTimer = new WallTimer(initializer.getWalltime(), taskKiller);
 
-        StopWatch stopWatch = new StopWatch(); // for task failure cases
-        stopWatch.start();
+        StopWatch stopWatchWhenTaskFailed = new StopWatch();
+        stopWatchWhenTaskFailed.start();
 
         try {
             TaskDataspaces dataspaces = factory.createTaskDataspaces(taskId, initializer.getNamingService());
 
             dataspaces.copyInputDataToScratch(initializer.getTaskInputFiles()); // should handle interrupt
 
-            TaskContext context = new TaskContext(executableContainer,
-                initializer, previousTasksResults, dataspaces.getScratchURI(), dataspaces.getInputURI(), dataspaces.getOutputURI(), dataspaces.getUserURI(), dataspaces.getGlobalURI());
+            TaskContext context = new TaskContext(executableContainer, initializer, previousTasksResults,
+                dataspaces.getScratchURI(), dataspaces.getInputURI(), dataspaces.getOutputURI(),
+                dataspaces.getUserURI(), dataspaces.getGlobalURI());
 
             if (decrypter != null) {
                 decrypter.setCredentials(executableContainer.getCredentials());
-                // TODO serialize private key + encrypted data
                 context.setDecrypter(decrypter);
             }
 
-            TaskResultImpl taskResult = factory.createTaskExecutor(dataspaces.getScratchFolder(), decrypter)
-                    .execute(context, taskLogger.getOutputSink(), taskLogger.getErrorSink()); // TODO decrypter
+            File workingDir = getTaskWorkingDir(executableContainer, dataspaces);
 
-            if (wallTimer.hasWallTimed()) {
+            TaskResultImpl taskResult = factory.createTaskExecutor(workingDir, decrypter).execute(context,
+                    taskLogger.getOutputSink(), taskLogger.getErrorSink());
+
+            if (wallTimer.hasWallTimed()) { // still needed?
                 taskLogger.getErrorSink().println(
                         "Walltime of " + initializer.getWalltime() + " ms reached on task " +
                             taskId.getReadableName());
                 TaskResultImpl failedTaskResult = new TaskResultImpl(taskId, new WalltimeExceededException(
                     "Walltime of " + initializer.getWalltime() + " ms reached on task " +
-                        taskId.getReadableName()), taskLogger.getLogs(), stopWatch.stop());
+                        taskId.getReadableName()), taskLogger.getLogs(), stopWatchWhenTaskFailed.stop());
                 sendResultToScheduler(terminateNotification, failedTaskResult);
                 return;
+
             } else if (taskKiller.wasKilled()) {
                 taskLogger.getErrorSink().println("Task " + taskId.getReadableName() + " has been killed");
                 TaskResultImpl failedTaskResult = new TaskResultImpl(taskId, new TaskAbortedException(
-                    "Task " + taskId.getReadableName() + " has been killed"), taskLogger.getLogs(), stopWatch.stop());
+                    "Task " + taskId.getReadableName() + " has been killed"), taskLogger.getLogs(),
+                    stopWatchWhenTaskFailed.stop());
                 sendResultToScheduler(terminateNotification, failedTaskResult);
                 return;
             }
 
             dataspaces.copyScratchDataToOutput(initializer.getTaskOutputFiles());
 
-            taskResult.setLogs(taskLogger.getLogs());
+            taskResult.setLogs(taskLogger.getLogs()); // should it be done when killed or walltimed?
 
+            wallTimer.stop();
             sendResultToScheduler(terminateNotification, taskResult);
 
-        } catch (Throwable throwable) {
-            if (wallTimer.hasWallTimed()) {
-                TaskResultImpl failedTaskResult = new TaskResultImpl(taskId, new WalltimeExceededException(
-                    "Walltime of " + initializer.getWalltime() + " ms reached on task " +
-                        taskId.getReadableName(), throwable), taskLogger.getLogs(), stopWatch.stop());
-                sendResultToScheduler(terminateNotification, failedTaskResult);
-            } else if (taskKiller.wasKilled()) {
-                taskLogger.getErrorSink().println("Task " + taskId.getReadableName() + " has been killed");
-                TaskResultImpl failedTaskResult = new TaskResultImpl(taskId, new TaskAbortedException(
-                    "Task " + taskId.getReadableName() + " has been killed"), taskLogger.getLogs(), stopWatch.stop());
-                sendResultToScheduler(terminateNotification, failedTaskResult);
-            } else {
-                throwable.printStackTrace(taskLogger.getErrorSink());
-                logger.warn("Failed to execute task", throwable);
-                TaskResultImpl failedTaskResult = new TaskResultImpl(taskId, throwable, taskLogger.getLogs(),
-                  stopWatch.stop());
-                sendResultToScheduler(terminateNotification, failedTaskResult);
-            }
-        } finally {
+        } catch (Throwable taskFailure) {
             wallTimer.stop();
+
+            TaskResultImpl failedTaskResult;
+
+            if (wallTimer.hasWallTimed()) {
+                logger.debug("Walltime reached for task", taskFailure);
+                failedTaskResult = new TaskResultImpl(taskId, new WalltimeExceededException("Walltime of " +
+                    initializer.getWalltime() + " ms reached on task " + taskId.getReadableName(),
+                    taskFailure), taskLogger.getLogs(), stopWatchWhenTaskFailed.stop());
+
+            } else if (taskKiller.wasKilled()) {
+                logger.debug("Task has been killed", taskFailure);
+                failedTaskResult = new TaskResultImpl(taskId, new TaskAbortedException("Task " +
+                    taskId.getReadableName() + " has been killed"), taskLogger.getLogs(),
+                    stopWatchWhenTaskFailed.stop());
+
+            } else {
+                logger.info("Failed to execute task", taskFailure);// TODO level?
+                taskFailure.printStackTrace(taskLogger.getErrorSink());
+                failedTaskResult = new TaskResultImpl(taskId, taskFailure, taskLogger.getLogs(),
+                    stopWatchWhenTaskFailed.stop());
+            }
+
+            sendResultToScheduler(terminateNotification, failedTaskResult);
+        } finally {
             taskLogger.close();
         }
-        // finally kill what's left
+        // FIXME finally kill what's left
 
-        // copy output files ? task log files?
+        // FIXME copy task log files?
+    }
 
+    private File getTaskWorkingDir(ExecutableContainer executableContainer, TaskDataspaces dataspaces) {
+        File workingDir = dataspaces.getScratchFolder(); // hack for native working dir
+        if (executableContainer instanceof ForkedScriptExecutableContainer) {
+            String workingDirPath = ((ForkedScriptExecutableContainer) executableContainer).getWorkingDir();
+            if (workingDirPath != null) {
+                workingDir = new File(workingDirPath);
+            }
+        }
+        return workingDir;
     }
 
     private void sendResultToScheduler(TaskTerminateNotification terminateNotification,
             TaskResultImpl taskResult) {
+        int pingAttempts = initializer.getPingAttempts();
+        int pingPeriodMs = initializer.getPingPeriod() * 1000;
+
         for (int i = 0; i < pingAttempts; i++) {
             try {
                 terminateNotification.terminate(taskId, taskResult);
@@ -241,11 +259,11 @@ public class TaskLauncher {
     }
 
     public int getProgress() {
-        // not supported anymore
+        // not supported anymore, still needed for ping purpose
         return 0;
     }
 
-    private String getHostname() {
+    private static String getHostname() {
         return ProActiveInet.getInstance().getInetAddress().getHostName();
     }
 }

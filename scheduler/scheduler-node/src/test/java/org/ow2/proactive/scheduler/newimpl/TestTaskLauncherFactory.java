@@ -6,6 +6,7 @@ import org.ow2.proactive.scheduler.common.task.Decrypter;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
+import org.ow2.proactive.scheduler.newimpl.data.TaskDataspaces;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 
 import java.io.File;

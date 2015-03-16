@@ -39,18 +39,18 @@ import java.util.TimerTask;
 
 
 public class WallTimer {
-    private boolean wallTimed = false;
     private Timer timer;
+    private TaskKiller taskKiller;
 
-    public WallTimer(final long walltime, final Thread threadToStop) {
+    public WallTimer(final long walltime, final TaskKiller taskKiller) {
+        this.taskKiller = taskKiller;
         if (walltime > 0) {
             timer = new Timer();
             timer.schedule(new TimerTask() {
                 @Override
                 public void run() {
                     synchronized (this) {
-                        threadToStop.interrupt();
-                        wallTimed = true;
+                        taskKiller.kill();
                     }
                 }
             }, walltime);
@@ -58,7 +58,7 @@ public class WallTimer {
     }
 
     public synchronized boolean hasWallTimed() {
-        return wallTimed;
+        return taskKiller.wasKilled();
     }
 
     public void stop() {

@@ -351,7 +351,7 @@ public class InternalJobFactory {
         }
         try {
             InternalTask scriptTask = new InternalForkedScriptTask(new ForkedScriptExecutableContainer(
-                new TaskScript(new SimpleScript(cli, "bash"))));
+                new TaskScript(new SimpleScript(cli, "native")), task.getWorkingDir()));
             //set task common properties
             setTaskCommonProperties(userJob, task, scriptTask);
             return scriptTask;

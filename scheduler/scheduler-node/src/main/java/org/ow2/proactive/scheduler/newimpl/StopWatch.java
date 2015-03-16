@@ -47,7 +47,7 @@ public class StopWatch {
     }
 
     /**
-     * @return recorded time in milliseconds
+     * @return elapsed time in milliseconds since {@link #start()}
      */
     public long stop() {
         if (nanoTimeWhenStarted != 0) {

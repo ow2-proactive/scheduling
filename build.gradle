@@ -4,7 +4,8 @@ archivesBaseName = 'scheduling' // in case current folder is not named schedulin
 
 buildscript {
     repositories {
-        if (project.hasProperty('local')) mavenLocal()
+//        if (project.hasProperty('local'))
+            mavenLocal()
         mavenCentral()
         maven { url 'http://repo.activeeon.com/content/groups/proactive/' }
     }
