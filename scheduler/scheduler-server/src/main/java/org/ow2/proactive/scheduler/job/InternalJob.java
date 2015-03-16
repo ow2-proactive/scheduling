@@ -77,6 +77,7 @@ import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskInfoImpl;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
+import org.ow2.proactive.scheduler.util.Watch;
 import org.ow2.proactive.scheduler.util.policy.ISO8601DateUtil;
 import it.sauronsoftware.cron4j.InvalidPatternException;
 import it.sauronsoftware.cron4j.Predictor;
@@ -117,8 +118,12 @@ public abstract class InternalJob extends JobState {
     @XmlTransient
     private Credentials credentials = null;
 
+    @XmlTransient
+    private Watch submissionWatch;
+
     /** Hibernate default constructor */
     public InternalJob() {
+        this.submissionWatch = Watch.startNewWatch();
     }
 
     /**
@@ -132,10 +137,15 @@ public abstract class InternalJob extends JobState {
      */
 
     public InternalJob(String name, JobPriority priority, boolean cancelJobOnError, String description) {
+        this.submissionWatch = Watch.startNewWatch();
         this.name = name;
         this.jobInfo.setPriority(priority);
         this.setCancelJobOnError(cancelJobOnError);
         this.description = description;
+    }
+
+    public long getElapsedTimeSinceCreation() {
+        return this.submissionWatch.elapsedMilliseconds();
     }
 
     /**
@@ -926,6 +936,7 @@ public abstract class InternalJob extends JobState {
             TaskId newId = TaskIdImpl.createTaskId(getId(), td.getName(), id++, true);
             td.setId(newId);
             td.setJobInfo(getJobInfo());
+            td.setWatch(submissionWatch);
             tasks.put(newId, td);
         }
     }
@@ -1334,6 +1345,10 @@ public abstract class InternalJob extends JobState {
         String nl = System.getProperty("line.separator");
         String answer = super.display();
         return answer + nl + "\tTasks = " + displayAllTasks();
+    }
+
+    public Watch getSubmissionWatch() {
+        return submissionWatch;
     }
 
     private String displayAllTasks() {

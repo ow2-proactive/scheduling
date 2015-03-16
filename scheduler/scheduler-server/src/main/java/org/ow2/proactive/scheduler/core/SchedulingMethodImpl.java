@@ -67,7 +67,9 @@ import org.ow2.proactive.scheduler.task.ExecutableContainerInitializer;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.util.JobLogger;
+import org.ow2.proactive.scheduler.util.PerfLogger;
 import org.ow2.proactive.scheduler.util.TaskLogger;
+import org.ow2.proactive.scheduler.util.Watch;
 import org.ow2.proactive.scripting.ScriptException;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.threading.TimeoutThreadPoolExecutor;
@@ -162,11 +164,19 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
         //Number of time to retry an active object creation before leaving scheduling loop
         activeObjectCreationRetryTimeNumber = ACTIVEOBJECT_CREATION_RETRY_TIME_NUMBER;
 
+        //Watch scheduleMethodWatch = Watch.startNewWatch();
+
         //get job Descriptor list with eligible jobs (running and pending)
         Map<JobId, JobDescriptor> jobMap = schedulingService.lockJobsToSchedule();
+
         try {
             List<JobDescriptor> descriptors = new ArrayList<JobDescriptor>(jobMap.size());
             descriptors.addAll(jobMap.values());
+
+
+            for (JobDescriptor j: descriptors) {
+                PerfLogger.log(j.getJobId() + ": job added" , j.getInternal().getSubmissionWatch());
+            }
 
             //ask the policy all the tasks to be schedule according to the jobs list.
             //and filter them using internal policy
@@ -179,6 +189,10 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
             }
 
             logger.debug("eligible tasks : " + taskRetrivedFromPolicy.size());
+
+            for (EligibleTaskDescriptor d: taskRetrivedFromPolicy) {
+                PerfLogger.log(d.getJobId() + ":" + d.getTaskId() + ": task eligible" , d.getInternal().getWatch());
+            }
 
             while (!taskRetrivedFromPolicy.isEmpty()) {
                 //get rmState and update it in scheduling policy
@@ -200,6 +214,11 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                     neededResourcesNumber = getNextcompatibleTasks(jobMap, taskRetrivedFromPolicy,
                             freeResourcesNb, tasksToSchedule);
                 }
+
+                for (EligibleTaskDescriptor d: tasksToSchedule) {
+                    PerfLogger.log(d.getJobId() + ":" + d.getTaskId() + ": tasks compatible" , d.getInternal().getWatch());
+                }
+
                 logger.debug("required number of nodes : " + neededResourcesNumber);
                 if (neededResourcesNumber == 0) {
                     break;
@@ -207,22 +226,34 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
                 NodeSet nodeSet = getRMNodes(jobMap, neededResourcesNumber, tasksToSchedule);
 
+                for (EligibleTaskDescriptor d: tasksToSchedule) {
+                    PerfLogger.log(d.getJobId() + ":" + d.getTaskId() + ": "+ nodeSet.size() + " nodes chosen" , d.getInternal().getWatch());
+                }
+
                 //start selected tasks
-                Node node = null;
                 InternalJob currentJob = null;
                 try {
                     while (nodeSet != null && !nodeSet.isEmpty()) {
                         EligibleTaskDescriptor taskDescriptor = tasksToSchedule.removeFirst();
                         currentJob = jobMap.get(taskDescriptor.getJobId()).getInternal();
+                        Node node = nodeSet.remove(0);
+                        // originally nodeSet = 4, now nodeSet = 3
+
+                        //PerfLogger.log(taskDescriptor.getJobId() + " : " + taskDescriptor.getTaskId() + ": task picked", taskDescriptor.getInternal().getWatch());
+
                         InternalTask internalTask = currentJob.getIHMTasks().get(taskDescriptor.getTaskId());
 
                         // load and Initialize the executable container
                         loadAndInit(internalTask);
 
+                        PerfLogger.log(taskDescriptor.getJobId() + " : " + taskDescriptor.getTaskId() + ": task executable container", taskDescriptor.getInternal().getWatch());
+
                         //create launcher and try to start the task
-                        node = nodeSet.get(0);
+
                         numberOfTaskStarted++;
+                        //PerfLogger.log(taskDescriptor.getJobId() + " : " + taskDescriptor.getTaskId() + ": task ready", taskDescriptor.getInternal().getWatch());
                         createExecution(nodeSet, node, currentJob, internalTask, taskDescriptor);
+                        //PerfLogger.log(taskDescriptor.getJobId() + " : " + taskDescriptor.getTaskId() + ": task started", taskDescriptor.getInternal().getWatch());
 
                         //if every task that should be launched have been removed
                         if (tasksToSchedule.isEmpty()) {
@@ -448,7 +479,8 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
         TaskLauncher launcher = null;
 
         //enough nodes to be launched at same time for a communicating task
-        if (nodeSet.size() >= task.getNumberOfNodesNeeded()) {
+        // originally nodeSet = 4, now nodeSet = 3
+        if (nodeSet.size() + 1 >= task.getNumberOfNodesNeeded()) {
             //start dataspace app for this job
             DataSpaceServiceStarter dsStarter = schedulingService.getInfrastructure()
                     .getDataSpaceServiceStarter();
@@ -459,7 +491,9 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
             activeObjectCreationRetryTimeNumber = ACTIVEOBJECT_CREATION_RETRY_TIME_NUMBER;
 
-            nodeSet.remove(0);
+            // originally nodeSet = 4, now nodeSet = 3
+            //nodeSet.remove(0);
+            // originally nodeSet = 3, now nodeSet = 3
 
             NodeSet nodes = new NodeSet();
             try {

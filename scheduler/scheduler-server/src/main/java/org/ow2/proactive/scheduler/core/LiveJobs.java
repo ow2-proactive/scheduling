@@ -40,6 +40,7 @@ import org.ow2.proactive.scheduler.task.internal.InternalNativeTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.util.JobLogger;
+import org.ow2.proactive.scheduler.util.PerfLogger;
 import org.ow2.proactive.scheduler.util.TaskLogger;
 import org.apache.log4j.Logger;
 
@@ -207,12 +208,16 @@ class LiveJobs {
 
     void jobSubmitted(InternalJob job, SchedulerClassServers classServers,
             SchedulerSpacesSupport spacesSupport) {
+        PerfLogger.log(job.getId() + ": job arrived", job.getSubmissionWatch());
         job.prepareTasks();
         job.submitAction();
+        PerfLogger.log(job.getId() + ": job ready", job.getSubmissionWatch());
         dbManager.newJobSubmitted(job);
+        PerfLogger.log(job.getId() + ": job stored", job.getSubmissionWatch());
         classServers.createTaskClassServer(job, spacesSupport);
         ClientJobState clientJobState = new ClientJobState(job);
         jobs.put(job.getId(), new JobData(job));
+        PerfLogger.log(job.getId() + ": job queued", job.getSubmissionWatch());
         listener.jobSubmitted(clientJobState);
     }
 
@@ -221,6 +226,7 @@ class LiveJobs {
         for (Map.Entry<JobId, JobData> entry : jobs.entrySet()) {
             if (entry.getValue().jobLock.tryLock() && jobs.containsKey(entry.getKey())) {
                 result.put(entry.getValue().job.getId(), entry.getValue().job.getJobDescriptor());
+                //PerfLogger.log(entry.getValue().job.getId() + ": job locked", entry.getValue().job.getSubmissionWatch());
             }
         }
         return result;
@@ -230,6 +236,7 @@ class LiveJobs {
         for (JobDescriptor desc : jobDescriptors) {
             JobData jobData = checkJobAccess(desc.getJobId());
             jobData.unlock();
+            //PerfLogger.log(jobData.job.getId() + ": job unlocked", jobData.job.getSubmissionWatch());
         }
     }
 

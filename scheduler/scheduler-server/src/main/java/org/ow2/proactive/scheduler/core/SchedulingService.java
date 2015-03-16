@@ -34,6 +34,7 @@ import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.util.JobLogger;
+import org.ow2.proactive.scheduler.util.PerfLogger;
 import org.ow2.proactive.scheduler.util.TaskLogger;
 import org.ow2.proactive.utils.NodeSet;
 
@@ -326,6 +327,7 @@ public class SchedulingService {
     public void submitJob(InternalJob job) {
         try {
             infrastructure.getClientOperationsThreadPool().submit(new SubmitHandler(this, job)).get();
+            PerfLogger.log(job.getId() + ": job submission handler submitted", job.getSubmissionWatch());
         } catch (Exception e) {
             throw handleFutureWaitException(e);
         }

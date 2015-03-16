@@ -71,6 +71,7 @@ import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskInfoImpl;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.task.TaskLauncherInitializer;
+import org.ow2.proactive.scheduler.util.Watch;
 import org.ow2.proactive.utils.NodeSet;
 
 
@@ -132,6 +133,9 @@ public abstract class InternalTask extends TaskState {
 
     private transient InternalTask replicatedFrom;
 
+    @XmlTransient
+    private transient Watch watch;
+
     void setReplicatedFrom(InternalTask replicatedFrom) {
         this.replicatedFrom = replicatedFrom;
     }
@@ -139,6 +143,7 @@ public abstract class InternalTask extends TaskState {
     public InternalTask getReplicatedFrom() {
         return replicatedFrom;
     }
+
 
     /**
      * {@inheritDoc}
@@ -1093,5 +1098,13 @@ public abstract class InternalTask extends TaskState {
         } else {
             return super.getGenericInformations();
         }
+    }
+
+    public void setWatch(Watch watch) {
+        this.watch = watch;
+    }
+
+    public Watch getWatch() {
+        return this.watch;
     }
 }

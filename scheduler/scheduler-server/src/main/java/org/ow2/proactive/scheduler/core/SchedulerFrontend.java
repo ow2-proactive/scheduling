@@ -108,6 +108,7 @@ import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
 import org.ow2.proactive.scheduler.job.UserIdentificationImpl;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.util.JobLogger;
+import org.ow2.proactive.scheduler.util.PerfLogger;
 import org.ow2.proactive.scheduler.util.ServerJobAndTaskLogs;
 import org.ow2.proactive.utils.Tools;
 import org.apache.commons.lang3.StringUtils;
@@ -315,6 +316,8 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
                 "You do not have permission to submit a job !");
 
         InternalJob job = frontendState.createJob(userJob, ident);
+
+        PerfLogger.log(job.getId() + ": job created", job.getSubmissionWatch());
 
         schedulingService.submitJob(job);
 

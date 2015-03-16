@@ -2,6 +2,7 @@ package org.ow2.proactive.scheduler.core;
 
 import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.job.InternalJob;
+import org.ow2.proactive.scheduler.util.PerfLogger;
 
 
 class SubmitHandler implements Runnable {
@@ -21,6 +22,7 @@ class SubmitHandler implements Runnable {
     public void run() {
         logger.info("Submitting a new job '" + job.getName() + "'");
 
+        PerfLogger.log(job.getId() + ": handler working", job.getSubmissionWatch());
         service.jobs.jobSubmitted(job, service.infrastructure.getTaskClassServer(), service.infrastructure
                 .getSpacesSupport());
     }
