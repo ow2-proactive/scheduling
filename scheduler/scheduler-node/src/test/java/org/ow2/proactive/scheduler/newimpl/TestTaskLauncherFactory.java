@@ -1,5 +1,10 @@
 package org.ow2.proactive.scheduler.newimpl;
 
+import java.io.File;
+import java.io.PrintStream;
+import java.util.List;
+import java.util.concurrent.Semaphore;
+
 import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
 import org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemException;
 import org.ow2.proactive.scheduler.common.task.Decrypter;
@@ -9,12 +14,7 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scheduler.newimpl.data.TaskDataspaces;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 
-import java.io.File;
-import java.io.PrintStream;
-import java.util.List;
-import java.util.concurrent.Semaphore;
-
-public class TestTaskLauncherFactory extends TaskLauncherFactory {
+public class TestTaskLauncherFactory extends ProActiveForkedTaskLauncherFactory {
     private Semaphore taskRunning;
 
     public TestTaskLauncherFactory() {

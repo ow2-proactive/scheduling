@@ -89,7 +89,7 @@ public class WalltimeTaskLauncherTest {
         }
     }
 
-    private class ForkingTaskLauncherFactory extends TaskLauncherFactory {
+    private class ForkingTaskLauncherFactory extends ProActiveForkedTaskLauncherFactory {
         @Override
         public TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService) {
             return new TestTaskLauncherFactory.TaskFileDataspaces();

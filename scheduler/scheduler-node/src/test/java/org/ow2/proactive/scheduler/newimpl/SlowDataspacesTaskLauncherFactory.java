@@ -12,7 +12,7 @@ import java.io.File;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 
-public class SlowDataspacesTaskLauncherFactory extends TaskLauncherFactory {
+public class SlowDataspacesTaskLauncherFactory extends ProActiveForkedTaskLauncherFactory {
         private Semaphore taskRunning;
 
     public SlowDataspacesTaskLauncherFactory() {

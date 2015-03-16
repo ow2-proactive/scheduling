@@ -74,7 +74,7 @@ public class TaskLauncher {
 
     private static final Logger logger = Logger.getLogger(TaskLauncher.class);
 
-    private TaskLauncherFactory factory = new TaskLauncherFactory();
+    private ProActiveForkedTaskLauncherFactory factory = new ProActiveForkedTaskLauncherFactory();
 
     private TaskId taskId;
     private TaskLauncherInitializer initializer;
@@ -87,7 +87,7 @@ public class TaskLauncher {
     public TaskLauncher() {
     }
 
-    public TaskLauncher(TaskLauncherInitializer initializer, TaskLauncherFactory factory) {
+    public TaskLauncher(TaskLauncherInitializer initializer, ProActiveForkedTaskLauncherFactory factory) {
         this(initializer);
         this.factory = factory;
     }
@@ -102,7 +102,7 @@ public class TaskLauncher {
             TaskTerminateNotification terminateNotification) {
 
         taskKiller = new TaskKiller(Thread.currentThread()); // what about kill of a non yet started task?
-        WallTimer wallTimer = new WallTimer(initializer.getWalltime(), taskKiller);
+        WallTimer wallTimer = new WallTimer(initializer.getWalltime(), new TaskKiller(Thread.currentThread()));
 
         StopWatch stopWatchWhenTaskFailed = new StopWatch();
         stopWatchWhenTaskFailed.start();
@@ -180,7 +180,7 @@ public class TaskLauncher {
         } finally {
             taskLogger.close();
         }
-        // FIXME finally kill what's left
+        // FIXME finally kill what's left (especially in case of send result failure)
 
         // FIXME copy task log files?
     }
