@@ -352,6 +352,7 @@ class LiveJobs {
 
     void taskStarted(InternalJob job, InternalTask task, TaskLauncher launcher) {
         checkJobAccess(job.getId());
+        // TODO check
         if (runningTasksData.containsKey(task.getId())) {
             throw new IllegalStateException("Task is already started");
         }

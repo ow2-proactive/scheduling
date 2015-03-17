@@ -170,6 +170,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
         //int activeObjectCreationRetryTimeNumber = ACTIVEOBJECT_CREATION_RETRY_TIME_NUMBER;
 
         //Watch scheduleMethodWatch = Watch.startNewWatch();
+        boolean parallel = false;
 
         //get job Descriptor list with eligible jobs (running and pending)
         final Map<JobId, JobDescriptor> jobMap = schedulingService.lockJobsToSchedule();
@@ -245,15 +246,19 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
 
 
-                    //Callable<Integer> t = new Callable<Integer>() {
-                    //    @Override
-                    //    public Integer call() throws Exception {
-                    //        return submitTask(jobMap, nodeSet, task, node);
-                    //    }
-                    //};
+                    if (parallel) {
+                        Callable<Integer> t = new Callable<Integer>() {
+                            @Override
+                            public Integer call() throws Exception {
+                                return submitTask(jobMap, nodeSet, task, node);
+                            }
+                        };
 
-                    //futureArray.add(threadPool.submit(t));
-                    tasksExecuted += submitTask(jobMap, nodeSet, task, node);
+
+                        futureArray.add(threadPool.submit(t));
+                    } else {
+                        tasksExecuted += submitTask(jobMap, nodeSet, task, node);
+                    }
                 }
 
                 if (!nodeSet.isEmpty()) {
@@ -261,17 +266,18 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                 }
             }
 
-            /*
-            for (Future<Integer> f : futureArray) {
-                try {
-                    tasksExecuted += f.get();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } catch (ExecutionException e) {
-                    e.printStackTrace();
+            if (parallel) {
+                for (Future<Integer> f : futureArray) {
+                    try {
+                        tasksExecuted += f.get();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    } catch (ExecutionException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
-            */
+
             return tasksExecuted;
 
 
