@@ -10,7 +10,7 @@ import java.security.SecureRandom;
 import org.objectweb.proactive.extensions.processbuilder.exception.OSUserException;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
-import org.ow2.proactive.scheduler.common.task.Decrypter;
+import org.ow2.proactive.scheduler.newimpl.utils.Decrypter;
 import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;

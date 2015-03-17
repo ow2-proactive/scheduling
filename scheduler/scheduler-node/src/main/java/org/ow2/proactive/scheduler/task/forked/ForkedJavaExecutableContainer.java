@@ -40,13 +40,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.objectweb.proactive.api.PAActiveObject;
 import org.ow2.proactive.scheduler.common.exception.ExecutableCreationException;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
-import org.ow2.proactive.scheduler.common.task.executable.Executable;
 import org.ow2.proactive.scheduler.common.task.executable.internal.JavaExecutableInitializerImpl;
 import org.ow2.proactive.scheduler.common.task.util.ByteArrayWrapper;
-import org.ow2.proactive.scheduler.newimpl.TaskLauncher;
 import org.ow2.proactive.scheduler.task.java.JavaExecutableContainer;
 import org.apache.log4j.Logger;
 
@@ -86,32 +83,6 @@ public class ForkedJavaExecutableContainer extends JavaExecutableContainer {
             throws ExecutableCreationException {
         super(original);
         this.forkEnvironment = new ForkEnvironment(original.forkEnvironment);
-    }
-
-    /**
-     * @see org.ow2.proactive.scheduler.task.ExecutableContainer#getExecutable()
-     */
-    @Override
-    public Executable getExecutable() throws ExecutableCreationException {
-        return new JavaForkerExecutable((TaskLauncher) PAActiveObject.getStubOnThis());
-    }
-
-    /**
-     * @see org.ow2.proactive.scheduler.task.ExecutableContainer#createExecutableInitializer()
-     */
-    @Override
-    public ForkedJavaExecutableInitializer createExecutableInitializer() {
-        JavaExecutableInitializerImpl jei = super.createExecutableInitializer();
-        ForkedJavaExecutableInitializer fjei = new ForkedJavaExecutableInitializer(jei);
-        fjei.setForkEnvironment(forkEnvironment);
-        Map<String, byte[]> tmp = new HashMap<String, byte[]>();
-        for (Entry<String, ByteArrayWrapper> e : this.serializedArguments.entrySet()) {
-            tmp.put(e.getKey(), e.getValue().getByteArray());
-        }
-        JavaExecutableContainer newjec = new JavaExecutableContainer(this.userExecutableClassName, tmp);
-        newjec.setCredentials(this.getCredentials());
-        fjei.setJavaExecutableContainer(newjec);
-        return fjei;
     }
 
     /**

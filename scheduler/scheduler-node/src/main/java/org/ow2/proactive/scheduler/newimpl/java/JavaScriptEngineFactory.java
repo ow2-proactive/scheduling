@@ -34,7 +34,6 @@
  */
 package org.ow2.proactive.scheduler.newimpl.java;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -73,7 +72,7 @@ public class JavaScriptEngineFactory implements ScriptEngineFactory {
 
     @Override
     public List<String> getMimeTypes() {
-        return Arrays.asList("application/x-java");
+        return Collections.singletonList("application/x-java");
     }
 
     @Override

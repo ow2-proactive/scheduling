@@ -45,7 +45,7 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
-import org.ow2.proactive.scheduler.common.task.Decrypter;
+import org.ow2.proactive.scheduler.newimpl.utils.Decrypter;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.newimpl.NonForkedTaskExecutor;
 import org.ow2.proactive.scheduler.newimpl.TaskExecutor;

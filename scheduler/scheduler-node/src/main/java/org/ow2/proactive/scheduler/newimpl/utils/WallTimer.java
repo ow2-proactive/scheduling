@@ -1,11 +1,10 @@
 /*
- * ################################################################
- *
+ *  *
  * ProActive Parallel Suite(TM): The Java(TM) library for
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2011 INRIA/University of
+ * Copyright (C) 1997-2014 INRIA/University of
  *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -31,36 +30,40 @@
  *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s):
  *
- * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ *  * $$ACTIVEEON_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.task.script;
+package org.ow2.proactive.scheduler.newimpl.utils;
 
-import org.ow2.proactive.scheduler.common.task.executable.internal.JavaExecutableInitializerImpl;
-import org.ow2.proactive.scheduler.task.forked.ForkedJavaExecutableInitializer;
-import org.ow2.proactive.scripting.TaskScript;
+import java.util.Timer;
+import java.util.TimerTask;
 
 
-/**
- * ScriptExecutableInitializer is the class used to store context of script executable initialization.
- *
- * @author The ProActive Team
- * @since ProActive Scheduling 3.4
- */
-public class ScriptExecutableInitializer extends ForkedJavaExecutableInitializer {
+public class WallTimer {
+    private Timer timer;
+    private TaskKiller taskKiller;
 
-    private TaskScript script;
-
-    public ScriptExecutableInitializer(JavaExecutableInitializerImpl execInitializer) {
-        super(execInitializer);
+    public WallTimer(final long walltime, final TaskKiller taskKiller) {
+        this.taskKiller = taskKiller;
+        if (walltime > 0) {
+            timer = new Timer();
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    synchronized (this) {
+                        taskKiller.kill();
+                    }
+                }
+            }, walltime);
+        }
     }
 
-    public void setScript(TaskScript script) {
-        this.script = script;
+    public synchronized boolean hasWallTimed() {
+        return taskKiller.wasKilled();
     }
 
-    public TaskScript getScript() {
-        return script;
+    public void stop() {
+        if (timer != null) {
+            timer.cancel();
+        }
     }
-
 }

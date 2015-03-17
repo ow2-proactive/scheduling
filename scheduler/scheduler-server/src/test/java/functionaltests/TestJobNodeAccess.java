@@ -39,6 +39,9 @@ package functionaltests;
 import java.io.File;
 import java.net.URL;
 
+import org.junit.Assert;
+import org.junit.Rule;
+import org.junit.rules.TemporaryFolder;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
@@ -48,11 +51,7 @@ import org.ow2.proactive.resourcemanager.utils.RMNodeStarter;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
-import org.ow2.proactive.scheduler.task.forked.JavaForkerExecutableOld;
 import org.ow2.proactive.utils.FileToBytesConverter;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.rules.TemporaryFolder;
 
 
 /**

@@ -44,24 +44,22 @@ import java.io.PrintStream;
 
 import org.objectweb.proactive.extensions.processbuilder.OSProcessBuilder;
 import org.objectweb.proactive.extensions.processbuilder.exception.NotImplementedException;
-import org.ow2.proactive.scheduler.common.task.Decrypter;
+import org.ow2.proactive.scheduler.newimpl.utils.Decrypter;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.exception.ForkedJVMProcessException;
+import org.ow2.proactive.scheduler.newimpl.utils.ProcessStreamsReader;
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.forked.ForkedJavaExecutableContainer;
-import org.ow2.proactive.scheduler.task.forked.TaskProcessTreeKiller;
+import org.ow2.proactive.scheduler.newimpl.utils.TaskProcessTreeKiller;
 import org.ow2.proactive.scheduler.task.utils.ForkerUtils;
 import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
 
 
 public class ForkerTaskExecutor implements TaskExecutor {
-    private static final Logger logger = Logger.getLogger(ForkerTaskExecutor.class);
 
     private File workingDir;
     private Decrypter decrypter;
-    private Class<ForkerTaskExecutor> taskExecutorClass = ForkerTaskExecutor.class;
 
     public ForkerTaskExecutor(File workingDir, Decrypter decrypter) {
         this.workingDir = workingDir;
@@ -79,54 +77,38 @@ public class ForkerTaskExecutor implements TaskExecutor {
         try {
             serializedContext = serializeContext(context, workingDir);
 
-            OSProcessBuilder pb;
-            String nativeScriptPath = PASchedulerProperties.SCHEDULER_HOME.getValueAsString(); // TODO inject
-            if (isRunAsUser(context)) {
-                boolean workingDirCanBeWrittenByForked = workingDir.setWritable(true);
-                if (!workingDirCanBeWrittenByForked) {
-                    throw new Exception("Working directory will not be writable by runAsMe user");
-                }
-                pb = ForkerUtils.getOSProcessBuilderFactory(nativeScriptPath).getBuilder(
-                        ForkerUtils.checkConfigAndGetUser(decrypter));
-            } else {
-                pb = ForkerUtils.getOSProcessBuilderFactory(nativeScriptPath).getBuilder();
-            }
+            OSProcessBuilder processBuilder = createForkedProcess(context, serializedContext);
 
             try {
-                taskProcessTreeKiller.tagEnvironment(pb.environment());
+                taskProcessTreeKiller.tagEnvironment(processBuilder.environment());
             } catch (NotImplementedException e) {
                 // TODO SCHEDULING-986 : remove catch block when environment can be modified with runAsMe
             }
 
-            // TODO limit classpath to a bare minimum
-            pb.command(getJavaExecutablePath(context.getExecutableContainer()), "-cp",
-                    System.getProperty("java.class.path"), taskExecutorClass.getName(),
-                    serializedContext.getAbsolutePath()).directory(workingDir);
-
-            process = pb.start();
+            process = processBuilder.start();
             processStreamsReader = new ProcessStreamsReader(process, outputSink, errorSink);
 
             int exitCode = process.waitFor();
+
             if (exitCode != 0) {
-                Throwable exception = null;
                 try {
-                    exception = (Throwable) deserializeTaskResult(serializedContext);
-                } catch (Throwable ignored) {
-                    return new TaskResultImpl(context.getTaskId(), new ForkedJVMProcessException("Failed to execute forked task",
-                      ignored), null, 0);
+                    Throwable exception = (Throwable) deserializeTaskResult(serializedContext);
+                    return new TaskResultImpl(context.getTaskId(), new ForkedJVMProcessException(
+                        "Failed to execute task in a forked JVM", exception));
+                } catch (Throwable cannotDeserializeResult) {
+                    return new TaskResultImpl(context.getTaskId(), new ForkedJVMProcessException(
+                        "Failed to execute task in a forked JVM", cannotDeserializeResult));
                 }
-                return new TaskResultImpl(context.getTaskId(), new ForkedJVMProcessException("Failed to execute forked task",
-                    exception), null, 0);
             }
 
             return (TaskResultImpl) deserializeTaskResult(serializedContext);
         } catch (Throwable throwable) {
-            return new TaskResultImpl(context.getTaskId(), new ForkedJVMProcessException("Failed to execute forked task",
-                throwable), null, 0);
+            return new TaskResultImpl(context.getTaskId(), new ForkedJVMProcessException(
+                "Failed to execute task in a forked JVM", throwable));
         } finally {
             FileUtils.deleteQuietly(serializedContext);
 
-            outputSink.flush();
+            outputSink.flush(); // TODO needed?
             errorSink.flush();
 
             if (process != null) {
@@ -137,6 +119,27 @@ public class ForkerTaskExecutor implements TaskExecutor {
                 processStreamsReader.close();
             }
         }
+    }
+
+    private OSProcessBuilder createForkedProcess(TaskContext context, File serializedContext)
+            throws Exception {
+        OSProcessBuilder pb;
+        String nativeScriptPath = PASchedulerProperties.SCHEDULER_HOME.getValueAsString(); // TODO inject
+        if (context.isRunAsUser()) {
+            boolean workingDirCanBeWrittenByForked = workingDir.setWritable(true);
+            if (!workingDirCanBeWrittenByForked) {
+                throw new Exception("Working directory will not be writable by runAsMe user");
+            }
+            pb = ForkerUtils.getOSProcessBuilderFactory(nativeScriptPath).getBuilder(
+                    ForkerUtils.checkConfigAndGetUser(decrypter));
+        } else {
+            pb = ForkerUtils.getOSProcessBuilderFactory(nativeScriptPath).getBuilder();
+        }
+
+        pb.command(getJavaExecutablePath(context.getExecutableContainer()), "-cp",
+                System.getProperty("java.class.path"), ForkerTaskExecutor.class.getName(),
+                serializedContext.getAbsolutePath()).directory(workingDir);
+        return pb;
     }
 
     private String getJavaExecutablePath(ExecutableContainer executableContainer) {
@@ -152,10 +155,6 @@ public class ForkerTaskExecutor implements TaskExecutor {
             javaHome = System.getProperty("java.home");
         }
         return javaHome + File.separatorChar + "bin" + File.separatorChar + "java";
-    }
-
-    private boolean isRunAsUser(TaskContext context) {
-        return context.getExecutableContainer().isRunAsUser();
     }
 
     // 1 called by forker
@@ -187,14 +186,16 @@ public class ForkerTaskExecutor implements TaskExecutor {
     }
 
     // 4 called by forker
-    private static Object deserializeTaskResult(File pathToFile) throws IOException,
-            ClassNotFoundException {
+    private static Object deserializeTaskResult(File pathToFile) throws IOException, ClassNotFoundException {
         ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(pathToFile));
         Object scriptResult = inputStream.readObject();
         FileUtils.forceDelete(pathToFile);
         return scriptResult;
     }
 
+    /**
+     * Everything here and called from here should only use System.out and System.err
+     */
     public static void main(String[] args) throws Throwable {
         if (args.length != 1) {
             System.err.println("Path to serialized task context is expected");
@@ -211,11 +212,13 @@ public class ForkerTaskExecutor implements TaskExecutor {
 
             serializeTaskResult(result, contextPath);
         } catch (Throwable throwable) {
+            throwable.printStackTrace(System.err);
             try {
                 serializeTaskResult(throwable, contextPath);
-            } catch (Throwable ignored){
+            } catch (Throwable couldNotSerializeException) {
+                System.err.println("Could not serialize exception as task result");
+                couldNotSerializeException.printStackTrace(System.err);
             }
-            throwable.printStackTrace(System.err);
             System.exit(1);
         }
     }

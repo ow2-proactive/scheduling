@@ -42,13 +42,5 @@ import org.ow2.proactive.scheduler.task.TaskResultImpl;
 
 public interface TaskExecutor extends Serializable {
 
-    // working dir, output/errput + TaskContext
-
-    // start
-
-    // waitfor
-
     TaskResultImpl execute(TaskContext container, PrintStream output, PrintStream error);
-
-    // kill method ?
 }

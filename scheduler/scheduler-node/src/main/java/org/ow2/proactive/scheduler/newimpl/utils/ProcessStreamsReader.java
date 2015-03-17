@@ -32,36 +32,38 @@
  *
  *  * $$ACTIVEEON_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.task.forked;
+package org.ow2.proactive.scheduler.newimpl.utils;
 
-import java.util.Collections;
-import java.util.Map;
-
-import org.ow2.proactive.rm.util.process.ProcessTreeKiller;
-import org.apache.log4j.Logger;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
 
 
-public class TaskProcessTreeKiller {
+public class ProcessStreamsReader {
 
-    private static final Logger logger = Logger.getLogger(TaskProcessTreeKiller.class);
+    private final Thread threadReadingOutput;
+    private final Thread threadReadingError;
 
-    private static final String PROCESS_KILLER_COOKIE = "PROCESS_KILLER_COOKIE";
-    private String ptkCookie;
-
-    public TaskProcessTreeKiller(String taskId) {
-        ptkCookie = taskId + "_" + ProcessTreeKiller.createCookie();
+    public ProcessStreamsReader(Process process, PrintStream outputSink, PrintStream errorSink) {
+        BufferedReader processOutput = new BufferedReader(new InputStreamReader(process.getInputStream()));
+        BufferedReader processError = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+        threadReadingOutput = new Thread(new ThreadReader(processOutput, outputSink));
+        threadReadingError = new Thread(new ThreadReader(processError, errorSink));
+        threadReadingOutput.start();
+        threadReadingError.start();
     }
 
-    public void tagEnvironment(Map<String, String> env) {
-        env.put(PROCESS_KILLER_COOKIE, ptkCookie);
-    }
-
-    public void kill() {
+    public void close() {
         try {
-            ProcessTreeKiller.get().kill(Collections.singletonMap(PROCESS_KILLER_COOKIE, ptkCookie));
-        } catch (Exception e) {
-            logger.warn("Failed to kill child processes using cookie : " + ptkCookie, e);
+            // wait for log flush
+            if (threadReadingOutput != null) {
+                threadReadingOutput.join();
+            }
+            if (threadReadingError != null) {
+                threadReadingError.join();
+            }
+        } catch (InterruptedException ignored) {
+            Thread.currentThread().interrupt();
         }
-
     }
 }

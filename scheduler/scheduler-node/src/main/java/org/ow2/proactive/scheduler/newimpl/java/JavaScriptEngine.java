@@ -55,7 +55,7 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.AbstractJavaExecutable;
 import org.ow2.proactive.scheduler.common.task.executable.internal.JavaExecutableInitializerImpl;
 import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
-import org.ow2.proactive.scheduler.task.TaskLauncherBak;
+import org.ow2.proactive.scheduler.newimpl.NonForkedTaskExecutor;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.TaskScript;
 import org.apache.commons.io.IOUtils;
@@ -79,31 +79,32 @@ public class JavaScriptEngine extends AbstractScriptEngine {
             execInitializer.setErrorSink(error);
 
             Map<String, byte[]> propagatedVariables = null;
-            if (context.getAttribute(TaskLauncherBak.VARIABLES_BINDING_NAME) != null) {
-                propagatedVariables = SerializationUtil.serializeVariableMap(
-                  (Map<String, Serializable>) context.getAttribute(TaskLauncherBak.VARIABLES_BINDING_NAME));
-                execInitializer.setPropagatedVariables(propagatedVariables
-                ); // TODO how to modify those? for propagation
+            if (context.getAttribute(NonForkedTaskExecutor.VARIABLES_BINDING_NAME) != null) {
+                propagatedVariables = SerializationUtil
+                        .serializeVariableMap((Map<String, Serializable>) context.getAttribute(
+                          NonForkedTaskExecutor.VARIABLES_BINDING_NAME));
+                execInitializer.setPropagatedVariables(propagatedVariables); // TODO how to modify those? for propagation
             } else {
                 execInitializer.setPropagatedVariables(Collections.<String, byte[]> emptyMap());
             }
 
             if (context.getAttribute(Script.ARGUMENTS_NAME) != null) {
-                execInitializer.setSerializedArguments(
-                  (Map<String, byte[]>) ((Serializable[]) context.getAttribute(Script.ARGUMENTS_NAME))[0]);
+                execInitializer.setSerializedArguments((Map<String, byte[]>) ((Serializable[]) context
+                        .getAttribute(Script.ARGUMENTS_NAME))[0]);
             } else {
-                execInitializer.setSerializedArguments(Collections.<String, byte[]>emptyMap());
+                execInitializer.setSerializedArguments(Collections.<String, byte[]> emptyMap());
             }
 
             if (context.getAttribute(TaskScript.CREDENTIALS_VARIABLE) != null) {
-                execInitializer.setThirdPartyCredentials(
-                  (Map<String, String>) context.getAttribute(TaskScript.CREDENTIALS_VARIABLE));
+                execInitializer.setThirdPartyCredentials((Map<String, String>) context
+                        .getAttribute(TaskScript.CREDENTIALS_VARIABLE));
             } else {
                 execInitializer.setThirdPartyCredentials(Collections.<String, String> emptyMap());
             }
 
-            if (context.getAttribute(TaskLauncherBak.MULTI_NODE_TASK_NODESURL_BINDING_NAME) != null) {
-                Set<String> nodesURLs = (Set<String>) context.getAttribute(TaskLauncherBak.MULTI_NODE_TASK_NODESURL_BINDING_NAME);
+            if (context.getAttribute(NonForkedTaskExecutor.MULTI_NODE_TASK_NODESURL_BINDING_NAME) != null) {
+                Set<String> nodesURLs = (Set<String>) context
+                        .getAttribute(NonForkedTaskExecutor.MULTI_NODE_TASK_NODESURL_BINDING_NAME);
                 execInitializer.setNodesURL(new ArrayList<String>(nodesURLs));
             } else {
                 execInitializer.setNodesURL(emptyList());
@@ -116,7 +117,7 @@ public class JavaScriptEngine extends AbstractScriptEngine {
 
             context.setAttribute(TaskScript.RESULT_VARIABLE, execute, ScriptContext.ENGINE_SCOPE);
             if (propagatedVariables != null) {
-                context.setAttribute(TaskLauncherBak.VARIABLES_BINDING_NAME,
+                context.setAttribute(NonForkedTaskExecutor.VARIABLES_BINDING_NAME,
                         SerializationUtil.deserializeVariableMap(propagatedVariables),
                         ScriptContext.ENGINE_SCOPE);
             }

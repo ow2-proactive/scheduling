@@ -44,7 +44,6 @@ import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
 import org.ow2.proactive.scheduler.common.util.logforwarder.appenders.AsyncAppenderWithStorage;
 import org.ow2.proactive.scheduler.common.util.logforwarder.util.LoggingOutputStream;
-import org.ow2.proactive.scheduler.task.TaskLauncherBak;
 import org.apache.log4j.Appender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.MDC;
@@ -57,8 +56,10 @@ public class TaskLogger {
     private static final Logger logger = Logger.getLogger(TaskLogger.class);
 
     private static final String MAX_LOG_SIZE_PROPERTY = "pas.launcher.logs.maxsize";
+
     // default log size, counted in number of log events
     private static final int DEFAULT_LOG_MAX_SIZE = 1024;
+
     private AsyncAppenderWithStorage taskLogAppender;
 
     private TaskId taskId;
@@ -71,12 +72,19 @@ public class TaskLogger {
     private final AtomicBoolean loggersActivated = new AtomicBoolean(false);
 
     public TaskLogger(TaskId taskId, String hostname) {
+        logger.debug("Create task logger");
+
         this.taskId = taskId;
         this.hostname = hostname;
 
-        logger.debug("Create task logger");
-        // error about log should not be logged
-        LogLog.setQuietMode(true);
+        Logger taskLogger = createLog4jLogger(taskId);
+
+        outputSink = new PrintStream(new LoggingOutputStream(taskLogger, Log4JTaskLogs.STDOUT_LEVEL), true);
+        errorSink = new PrintStream(new LoggingOutputStream(taskLogger, Log4JTaskLogs.STDERR_LEVEL), true);
+    }
+
+    private Logger createLog4jLogger(TaskId taskId) {
+        LogLog.setQuietMode(true); // error about log should not be logged
 
         Logger taskLogger = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + taskId.getJobId() + "." +
             taskId.value());
@@ -87,6 +95,12 @@ public class TaskLogger {
 
         taskLogger.removeAllAppenders();
 
+        taskLogAppender = new AsyncAppenderWithStorage(getLogMaxSize(taskId));
+        taskLogger.addAppender(taskLogAppender);
+        return taskLogger;
+    }
+
+    private int getLogMaxSize(TaskId taskId) {
         String logMaxSizeProp = System.getProperty(MAX_LOG_SIZE_PROPERTY);
         int logMaxSize = DEFAULT_LOG_MAX_SIZE;
         if (logMaxSizeProp != null && !logMaxSizeProp.isEmpty()) {
@@ -95,14 +109,10 @@ public class TaskLogger {
             } catch (NumberFormatException e) {
                 logger.warn(MAX_LOG_SIZE_PROPERTY +
                     " property is not correctly defined. Logs size is bounded to default value " +
-                    TaskLauncherBak.DEFAULT_LOG_MAX_SIZE + " for task " + taskId, e);
+                    DEFAULT_LOG_MAX_SIZE + " for task " + taskId, e);
             }
         }
-        taskLogAppender = new AsyncAppenderWithStorage(logMaxSize);
-        taskLogger.addAppender(taskLogAppender);
-
-        outputSink = new PrintStream(new LoggingOutputStream(taskLogger, Log4JTaskLogs.STDOUT_LEVEL), true);
-        errorSink = new PrintStream(new LoggingOutputStream(taskLogger, Log4JTaskLogs.STDERR_LEVEL), true);
+        return logMaxSize;
     }
 
     public TaskLogs getLogs() {
@@ -160,11 +170,18 @@ public class TaskLogger {
         taskLogAppender.appendStoredEvents(appender);
     }
 
-    protected void close() {
+    // need to reset MDC because calling thread is not active thread (immediate service)
+    public void resetLogContextForImmediateService() {
+        MDC.put(Log4JTaskLogs.MDC_TASK_ID, this.taskId.value());
+        MDC.put(Log4JTaskLogs.MDC_TASK_NAME, this.taskId.getReadableName());
+        MDC.put(Log4JTaskLogs.MDC_HOST, hostname);
+    }
+
+    public void close() {
         synchronized (this.loggersFinalized) {
             if (!loggersFinalized.get()) {
-                logger.info("Terminating loggers for task " + this.taskId + " (" + taskId.getReadableName() +
-                    ")" + "...");
+                logger.debug("Terminating loggers for task " + this.taskId + " (" + taskId.getReadableName() +
+                  ")" + "...");
                 this.flushStreams();
 
                 this.loggersFinalized.set(true);
@@ -181,13 +198,6 @@ public class TaskLogger {
     private void flushStreams() {
         this.outputSink.flush();
         this.errorSink.flush();
-    }
-
-    // need to reset MDC because calling thread is not active thread (immediate service)
-    public void resetLogContextForImmediateService() {
-        MDC.put(Log4JTaskLogs.MDC_TASK_ID, this.taskId.value());
-        MDC.put(Log4JTaskLogs.MDC_TASK_NAME, this.taskId.getReadableName());
-        MDC.put(Log4JTaskLogs.MDC_HOST, hostname);
     }
 
 }

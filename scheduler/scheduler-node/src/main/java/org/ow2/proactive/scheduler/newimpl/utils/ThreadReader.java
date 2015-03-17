@@ -34,7 +34,7 @@
  * ################################################################
  * $$ACTIVEEON_CONTRIBUTOR$$
  */
-package org.ow2.proactive.scheduler.util.process;
+package org.ow2.proactive.scheduler.newimpl.utils;
 
 import java.io.BufferedReader;
 import java.io.IOException;

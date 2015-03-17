@@ -37,9 +37,6 @@ package org.ow2.proactive.scheduler.task.script;
 import java.io.Serializable;
 import java.util.Collections;
 
-import org.ow2.proactive.scheduler.common.exception.ExecutableCreationException;
-import org.ow2.proactive.scheduler.common.task.executable.Executable;
-import org.ow2.proactive.scheduler.common.task.executable.internal.JavaExecutableInitializerImpl;
 import org.ow2.proactive.scheduler.task.java.JavaExecutableContainer;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.TaskScript;
@@ -54,23 +51,8 @@ public class ScriptExecutableContainer extends JavaExecutableContainer {
     private TaskScript script;
 
     public ScriptExecutableContainer(TaskScript script) {
-        super(ScriptExecutable.class.getName(), Collections.<String, byte[]> emptyMap());
+        super("TODO", Collections.<String, byte[]> emptyMap());
         this.script = script;
-    }
-
-    @Override
-    public Executable getExecutable() throws ExecutableCreationException {
-        ScriptExecutable executable = (ScriptExecutable) super.getExecutable();
-        executable.setScript(script);
-        return executable;
-    }
-
-    @Override
-    public JavaExecutableInitializerImpl createExecutableInitializer() {
-        ScriptExecutableInitializer scriptExecutableInitializer = new ScriptExecutableInitializer(super
-                .createExecutableInitializer());
-        scriptExecutableInitializer.setScript(script);
-        return scriptExecutableInitializer;
     }
 
     public Script<Serializable> getScript() {

@@ -32,39 +32,28 @@
  *
  *  * $$ACTIVEEON_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.newimpl;
+package org.ow2.proactive.scheduler.newimpl.utils;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.PrintStream;
+/**
+ * Not thread safe.
+ */
+public class StopWatch {
 
-import org.ow2.proactive.scheduler.util.process.ThreadReader;
+    private long duration = 0;
+    private long nanoTimeWhenStarted = 0;
 
-
-public class ProcessStreamsReader {
-
-    private final Thread threadReadingOutput;
-    private final Thread threadReadingError;
-
-    public ProcessStreamsReader(Process process, PrintStream outputSink, PrintStream errorSink) {
-        BufferedReader processOutput = new BufferedReader(new InputStreamReader(process.getInputStream()));
-        BufferedReader processError = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-        threadReadingOutput = new Thread(new ThreadReader(processOutput, outputSink));
-        threadReadingError = new Thread(new ThreadReader(processError, errorSink));
-        threadReadingOutput.start();
-        threadReadingError.start();
+    public void start() {
+        nanoTimeWhenStarted = System.nanoTime();
     }
 
-    public void close() {
-        try {
-            // wait for log flush
-            if (threadReadingOutput != null) {
-                threadReadingOutput.join();
-            }
-            if (threadReadingError != null) {
-                threadReadingError.join();
-            }
-        } catch (InterruptedException ignored) {
+    /**
+     * @return elapsed time in milliseconds since {@link #start()}
+     */
+    public long stop() {
+        if (nanoTimeWhenStarted != 0) {
+            duration += System.nanoTime() - nanoTimeWhenStarted;
+            nanoTimeWhenStarted = 0;
         }
+        return duration / 1000000;
     }
 }

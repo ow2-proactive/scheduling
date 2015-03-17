@@ -11,7 +11,7 @@ import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.forked.ForkedJavaExecutableContainer;
-import org.ow2.proactive.scheduler.task.utils.InternalForkEnvironment;
+import unitTests.InternalForkEnvironment;
 import org.ow2.proactive.scripting.SimpleScript;
 
 

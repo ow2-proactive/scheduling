@@ -36,19 +36,9 @@
  */
 package org.ow2.proactive.scheduler.task.script;
 
-import java.io.Serializable;
-import java.util.Collections;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 
-import org.ow2.proactive.scheduler.common.exception.ExecutableCreationException;
-import org.ow2.proactive.scheduler.common.task.executable.internal.JavaExecutableInitializerImpl;
-import org.ow2.proactive.scheduler.task.forked.ForkedJavaExecutableContainer;
-import org.ow2.proactive.scheduler.task.forked.JavaForkerExecutable;
-import org.ow2.proactive.scheduler.task.java.JavaExecutableContainer;
-import org.ow2.proactive.scripting.InvalidScriptException;
-import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.TaskScript;
 import org.apache.log4j.Logger;
 
@@ -63,16 +53,14 @@ import org.apache.log4j.Logger;
  * @since ProActive Scheduling 3.4
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-public class ForkedScriptExecutableContainer extends ForkedJavaExecutableContainer {
+public class ForkedScriptExecutableContainer extends ScriptExecutableContainer {
 
     public static final Logger logger = Logger.getLogger(ForkedScriptExecutableContainer.class);
 
-    private TaskScript script;
     private String workingDir;
 
     public ForkedScriptExecutableContainer(TaskScript script) {
-        super(JavaForkerExecutable.class.getName(), Collections.<String, byte[]> emptyMap());
-        this.script = script;
+        super(script);
     }
 
     public String getWorkingDir() {
@@ -84,38 +72,4 @@ public class ForkedScriptExecutableContainer extends ForkedJavaExecutableContain
         this.workingDir = workingDir;
     }
 
-    /**
-     * Copy constructor
-     *
-     * @param cont original object to copy
-     */
-    public ForkedScriptExecutableContainer(ForkedScriptExecutableContainer cont)
-            throws ExecutableCreationException {
-        super(JavaForkerExecutable.class.getName(), Collections.<String, byte[]> emptyMap());
-        try {
-            this.script = new TaskScript(cont.getScript());
-            this.workingDir = cont.workingDir;
-        } catch (InvalidScriptException e) {
-            throw new ExecutableCreationException("Could not copy script", e);
-        }
-    }
-
-    /**
-     * @see org.ow2.proactive.scheduler.task.ExecutableContainer#createExecutableInitializer()
-     */
-    @Override
-    public ScriptExecutableInitializer createExecutableInitializer() {
-        JavaExecutableInitializerImpl jei = super.createExecutableInitializer();
-        ScriptExecutableInitializer fjei = new ScriptExecutableInitializer(jei);
-        fjei.setScript(script);
-        JavaExecutableContainer newjec = new ScriptExecutableContainer(script);
-        newjec.setCredentials(this.getCredentials());
-        newjec.setRunAsUser(this.isRunAsUser());
-        fjei.setJavaExecutableContainer(newjec);
-        return fjei;
-    }
-
-    public Script<Serializable> getScript() {
-        return script;
-    }
 }

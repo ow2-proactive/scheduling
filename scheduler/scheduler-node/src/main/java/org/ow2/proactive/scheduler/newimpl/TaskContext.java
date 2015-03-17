@@ -39,7 +39,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.objectweb.proactive.core.node.Node;
-import org.ow2.proactive.scheduler.common.task.Decrypter;
+import org.ow2.proactive.scheduler.newimpl.utils.Decrypter;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
@@ -151,5 +151,9 @@ public class TaskContext implements Serializable {
 
     public String getGlobalURI() {
         return globalURI;
+    }
+
+    public boolean isRunAsUser() {
+        return getExecutableContainer().isRunAsUser();
     }
 }

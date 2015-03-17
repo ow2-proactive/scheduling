@@ -1,7 +1,5 @@
 package org.ow2.proactive.scheduler.core.db;
 
-import static org.ow2.proactive.authentication.crypto.HybridEncryptionUtil.HybridEncryptedData;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -15,19 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
-import org.hibernate.Criteria;
-import org.hibernate.FetchMode;
-import org.hibernate.HibernateException;
-import org.hibernate.Query;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.cfg.Configuration;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Property;
-import org.hibernate.criterion.Restrictions;
-import org.hibernate.exception.ConstraintViolationException;
-import org.hibernate.transform.DistinctRootEntityResultTransformer;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.ow2.proactive.db.DatabaseManagerException;
 import org.ow2.proactive.db.FilteredExceptionCallback;
@@ -60,19 +45,28 @@ import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
-import org.ow2.proactive.scheduler.task.forked.ForkedJavaExecutableContainer;
-import org.ow2.proactive.scheduler.task.internal.InternalForkedJavaTask;
 import org.ow2.proactive.scheduler.task.internal.InternalForkedScriptTask;
-import org.ow2.proactive.scheduler.task.internal.InternalJavaTask;
-import org.ow2.proactive.scheduler.task.internal.InternalNativeTask;
 import org.ow2.proactive.scheduler.task.internal.InternalScriptTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
-import org.ow2.proactive.scheduler.task.java.JavaExecutableContainer;
-import org.ow2.proactive.scheduler.task.nativ.NativeExecutableContainer;
 import org.ow2.proactive.scheduler.task.script.ForkedScriptExecutableContainer;
 import org.ow2.proactive.scheduler.task.script.ScriptExecutableContainer;
 import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.utils.FileToBytesConverter;
+import org.apache.log4j.Logger;
+import org.hibernate.Criteria;
+import org.hibernate.FetchMode;
+import org.hibernate.HibernateException;
+import org.hibernate.Query;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Property;
+import org.hibernate.criterion.Restrictions;
+import org.hibernate.exception.ConstraintViolationException;
+import org.hibernate.transform.DistinctRootEntityResultTransformer;
+
+import static org.ow2.proactive.authentication.crypto.HybridEncryptionUtil.HybridEncryptedData;
 
 
 public class SchedulerDBManager {
@@ -162,7 +156,6 @@ public class SchedulerDBManager {
             configuration.addAnnotatedClass(JobClasspathContent.class);
             configuration.addAnnotatedClass(JavaTaskData.class);
             configuration.addAnnotatedClass(ForkedJavaTaskData.class);
-            configuration.addAnnotatedClass(NativeTaskData.class);
             configuration.addAnnotatedClass(ScriptTaskData.class);
             configuration.addAnnotatedClass(ScriptData.class);
             configuration.addAnnotatedClass(EnvironmentModifierData.class);
@@ -658,7 +651,6 @@ public class SchedulerDBManager {
                 .createQuery(
                         "delete from ScriptData where"
                             + " id in (select td.envScript from ForkedJavaTaskData td where td.taskData.id.jobId = :jobId)"
-                            + " or id in (select td.generationScript from NativeTaskData td where td.taskData.id.jobId = :jobId)"
                             + " or id in (select preScript from TaskData where id.jobId = :jobId)"
                             + " or id in (select postScript from TaskData where id.jobId = :jobId)"
                             + " or id in (select cleanScript from TaskData where id.jobId = :jobId)"
@@ -673,8 +665,6 @@ public class SchedulerDBManager {
         session.createQuery("delete from JavaTaskData where taskData.id.jobId = :jobId").setParameter(
                 "jobId", jobId).executeUpdate();
         session.createQuery("delete from ForkedJavaTaskData where taskData.id.jobId = :jobId").setParameter(
-                "jobId", jobId).executeUpdate();
-        session.createQuery("delete from NativeTaskData where taskData.id.jobId = :jobId").setParameter(
                 "jobId", jobId).executeUpdate();
         session.createQuery("delete from ScriptTaskData where taskData.id.jobId = :jobId").setParameter(
                 "jobId", jobId).executeUpdate();
@@ -1511,23 +1501,9 @@ public class SchedulerDBManager {
 
     private TaskData saveNewTask(Session session, JobData jobRuntimeData, InternalTask task) {
         TaskData taskRuntimeData = TaskData.createTaskData(jobRuntimeData, task);
-        session.save(taskRuntimeData);
+        session.save(taskRuntimeData);      
 
-        if (task.getClass().equals(InternalJavaTask.class)) {
-            JavaExecutableContainer container = (JavaExecutableContainer) task.getExecutableContainer();
-            JavaTaskData javaTaskData = JavaTaskData.createJavaTaskData(taskRuntimeData, container);
-            session.save(javaTaskData);
-        } else if (task.getClass().equals(InternalForkedJavaTask.class)) {
-            ForkedJavaExecutableContainer container = (ForkedJavaExecutableContainer) task
-                    .getExecutableContainer();
-            ForkedJavaTaskData forkedJavaTaskData = ForkedJavaTaskData.createForkedJavaTaskData(
-                    taskRuntimeData, container);
-            session.save(forkedJavaTaskData);
-        } else if (task.getClass().equals(InternalNativeTask.class)) {
-            NativeExecutableContainer container = (NativeExecutableContainer) task.getExecutableContainer();
-            NativeTaskData nativeTaskData = NativeTaskData.createNativeTaskData(taskRuntimeData, container);
-            session.save(nativeTaskData);
-        } else if (task.getClass().equals(InternalForkedScriptTask.class)) {
+       if (task.getClass().equals(InternalForkedScriptTask.class)) {
             ForkedScriptExecutableContainer container = (ForkedScriptExecutableContainer) task
                     .getExecutableContainer();
             ScriptTaskData scriptTaskData = ScriptTaskData.createScriptTaskData(taskRuntimeData, container);
@@ -1557,41 +1533,17 @@ public class SchedulerDBManager {
         try {
             ExecutableContainer container = null;
 
-            if (task.getClass().equals(InternalJavaTask.class)) {
-                JavaTaskData taskData = (JavaTaskData) session.createQuery(
-                        "from JavaTaskData td where td.taskData.id= :taskId").setParameter("taskId",
-                        taskId(task)).uniqueResult();
+            if (task.getClass().equals(InternalForkedScriptTask.class)) {
+                ScriptTaskData taskData = queryScriptTaskData(session, task);
 
                 if (taskData != null) {
-                    container = taskData.createExecutableContainer();
-                }
-            } else if (task.getClass().equals(InternalForkedJavaTask.class)) {
-                ForkedJavaTaskData taskData = (ForkedJavaTaskData) session.createQuery(
-                        "from ForkedJavaTaskData td where td.taskData.id = :taskId").setParameter("taskId",
-                        taskId(task)).uniqueResult();
-
-                if (taskData != null) {
-                    container = taskData.createExecutableContainer();
-                }
-            } else if (task.getClass().equals(InternalNativeTask.class)) {
-                NativeTaskData taskData = (NativeTaskData) session.createQuery(
-                        "from NativeTaskData td where td.taskData.id = :taskId").setParameter("taskId",
-                        taskId(task)).uniqueResult();
-
-                if (taskData != null) {
-                    container = taskData.createExecutableContainer();
+                    container = taskData.createForkedExecutableContainer();
                 }
             } else if (task.getClass().equals(InternalScriptTask.class)) {
                 ScriptTaskData taskData = queryScriptTaskData(session, task);
 
                 if (taskData != null) {
                     container = taskData.createExecutableContainer();
-                }
-            } else if (task.getClass().equals(InternalForkedScriptTask.class)) {
-                ScriptTaskData taskData = queryScriptTaskData(session, task);
-
-                if (taskData != null) {
-                    container = taskData.createForkedExecutableContainer();
                 }
             } else {
                 throw new IllegalArgumentException("Unexpected task class: " + task.getClass());

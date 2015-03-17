@@ -32,7 +32,7 @@
  *
  *  * $$ACTIVEEON_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.common.task;
+package org.ow2.proactive.scheduler.newimpl.utils;
 
 import java.io.Serializable;
 import java.security.KeyException;

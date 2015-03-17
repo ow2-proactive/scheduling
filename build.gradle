@@ -404,13 +404,6 @@ project('scheduler:scheduler-node') {
 
     task stub(type: StubTask) {
         classes = ['org.ow2.proactive.scheduler.common.TaskTerminateNotification',
-                   'org.ow2.proactive.scheduler.task.utils.TaskResultCallback',
-                   'org.ow2.proactive.scheduler.task.forked.JavaTaskLauncherForked',
-                   'org.ow2.proactive.scheduler.task.forked.JavaTaskLauncherForker',
-                   'org.ow2.proactive.scheduler.task.java.JavaTaskLauncher',
-                   'org.ow2.proactive.scheduler.task.nativ.NativeTaskLauncher',
-                   'org.ow2.proactive.scheduler.task.script.ScriptTaskLauncher',
-                   'org.ow2.proactive.scheduler.task.utils.ActiveObjectExecutor',
                    'org.ow2.proactive.scheduler.examples.MultiNodeExample',
                    'org.ow2.proactive.scheduler.examples.SchedulerClientEventsLogger']
     }

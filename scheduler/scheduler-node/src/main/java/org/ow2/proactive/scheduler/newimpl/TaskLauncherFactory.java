@@ -38,7 +38,7 @@ import java.io.File;
 import java.io.Serializable;
 
 import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
-import org.ow2.proactive.scheduler.common.task.Decrypter;
+import org.ow2.proactive.scheduler.newimpl.utils.Decrypter;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.newimpl.data.TaskDataspaces;
 

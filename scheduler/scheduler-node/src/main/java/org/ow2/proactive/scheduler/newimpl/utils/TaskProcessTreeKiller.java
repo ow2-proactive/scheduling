@@ -32,38 +32,36 @@
  *
  *  * $$ACTIVEEON_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.newimpl;
+package org.ow2.proactive.scheduler.newimpl.utils;
 
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.Collections;
+import java.util.Map;
+
+import org.ow2.proactive.rm.util.process.ProcessTreeKiller;
+import org.apache.log4j.Logger;
 
 
-public class WallTimer {
-    private Timer timer;
-    private TaskKiller taskKiller;
+public class TaskProcessTreeKiller {
 
-    public WallTimer(final long walltime, final TaskKiller taskKiller) {
-        this.taskKiller = taskKiller;
-        if (walltime > 0) {
-            timer = new Timer();
-            timer.schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    synchronized (this) {
-                        taskKiller.kill();
-                    }
-                }
-            }, walltime);
-        }
+    private static final Logger logger = Logger.getLogger(TaskProcessTreeKiller.class);
+
+    private static final String PROCESS_KILLER_COOKIE = "PROCESS_KILLER_COOKIE";
+    private String ptkCookie;
+
+    public TaskProcessTreeKiller(String taskId) {
+        ptkCookie = taskId + "_" + ProcessTreeKiller.createCookie();
     }
 
-    public synchronized boolean hasWallTimed() {
-        return taskKiller.wasKilled();
+    public void tagEnvironment(Map<String, String> env) {
+        env.put(PROCESS_KILLER_COOKIE, ptkCookie);
     }
 
-    public void stop() {
-        if (timer != null) {
-            timer.cancel();
+    public void kill() {
+        try {
+            ProcessTreeKiller.get().kill(Collections.singletonMap(PROCESS_KILLER_COOKIE, ptkCookie));
+        } catch (Exception e) {
+            logger.warn("Failed to kill child processes using cookie : " + ptkCookie, e);
         }
+
     }
 }

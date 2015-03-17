@@ -34,7 +34,7 @@
  * ################################################################
  * $$ACTIVEEON_CONTRIBUTOR$$
  */
-package org.ow2.proactive.scheduler.task.utils;
+package unitTests;
 
 import java.util.Map;
 

@@ -1,5 +1,6 @@
 package org.ow2.proactive.scheduler.newimpl;
 
+import org.ow2.proactive.scheduler.newimpl.utils.StopWatch;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
