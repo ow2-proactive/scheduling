@@ -144,7 +144,6 @@ public abstract class InternalTask extends TaskState {
         return replicatedFrom;
     }
 
-
     /**
      * {@inheritDoc}
      */

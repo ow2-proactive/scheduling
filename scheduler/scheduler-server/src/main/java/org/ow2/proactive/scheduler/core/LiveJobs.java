@@ -226,7 +226,6 @@ class LiveJobs {
         for (Map.Entry<JobId, JobData> entry : jobs.entrySet()) {
             if (entry.getValue().jobLock.tryLock() && jobs.containsKey(entry.getKey())) {
                 result.put(entry.getValue().job.getId(), entry.getValue().job.getJobDescriptor());
-                //PerfLogger.log(entry.getValue().job.getId() + ": job locked", entry.getValue().job.getSubmissionWatch());
             }
         }
         return result;
@@ -236,7 +235,6 @@ class LiveJobs {
         for (JobDescriptor desc : jobDescriptors) {
             JobData jobData = checkJobAccess(desc.getJobId());
             jobData.unlock();
-            //PerfLogger.log(jobData.job.getId() + ": job unlocked", jobData.job.getSubmissionWatch());
         }
     }
 

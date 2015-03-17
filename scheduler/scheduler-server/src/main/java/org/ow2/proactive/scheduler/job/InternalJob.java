@@ -145,10 +145,6 @@ public abstract class InternalJob extends JobState {
         this.description = description;
     }
 
-    public long getElapsedTimeSinceCreation() {
-        return this.submissionWatch.elapsedMilliseconds();
-    }
-
     /**
      * This method will do two things :<br />
      * First, it will update the job with the informations contained in the given taskInfo<br />
@@ -254,7 +250,7 @@ public abstract class InternalJob extends JobState {
      * Start dataspace configuration and application
      */
     public synchronized void startDataSpaceApplication(NamingService namingService) {
-        if (jobDataSpaceApplication == null) { // This is no longer null
+        if (jobDataSpaceApplication == null) {
             long appId = getJobInfo().getJobId().hashCode();
             jobDataSpaceApplication = new JobDataSpaceApplication(appId, namingService);
         }

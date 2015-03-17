@@ -69,7 +69,6 @@ import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.PerfLogger;
 import org.ow2.proactive.scheduler.util.TaskLogger;
-import org.ow2.proactive.scheduler.util.Watch;
 import org.ow2.proactive.scripting.ScriptException;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.threading.TimeoutThreadPoolExecutor;
@@ -552,11 +551,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
             }
 
         } else {
-            try {
-                throw new IllegalStateException("Condition not satisfied");
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            throw new IllegalStateException("Not expected");
         }
 
     }
