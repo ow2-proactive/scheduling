@@ -39,6 +39,7 @@ import org.objectweb.proactive.extensions.processbuilder.OSProcessBuilder;
 import org.objectweb.proactive.extensions.processbuilder.exception.CoreBindingException;
 import org.objectweb.proactive.extensions.processbuilder.exception.FatalProcessBuilderException;
 import org.objectweb.proactive.extensions.processbuilder.exception.OSUserException;
+import org.ow2.proactive.scheduler.newimpl.utils.ProcessStreamsReader;
 
 import java.io.IOException;
 import java.io.PrintStream;
