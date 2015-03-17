@@ -80,10 +80,7 @@ import org.ow2.proactive.utils.NodeSet;
 
 import java.security.PrivateKey;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 
 /**
@@ -165,16 +162,17 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
      * @return the number of tasks that have been started
      */
     public int schedule() {
+        int tasksExecuted = 0;
         Policy currentPolicy = schedulingService.getPolicy();
 
-        int numberOfTaskStarted = 0;
+        List<Future<Integer>> futureArray = new ArrayList<Future<Integer>>();
         //Number of time to retry an active object creation before leaving scheduling loop
         //int activeObjectCreationRetryTimeNumber = ACTIVEOBJECT_CREATION_RETRY_TIME_NUMBER;
 
         //Watch scheduleMethodWatch = Watch.startNewWatch();
 
         //get job Descriptor list with eligible jobs (running and pending)
-        Map<JobId, JobDescriptor> jobMap = schedulingService.lockJobsToSchedule();
+        final Map<JobId, JobDescriptor> jobMap = schedulingService.lockJobsToSchedule();
 
         try {
             List<JobDescriptor> descriptors = new ArrayList<JobDescriptor>(jobMap.size());
@@ -192,7 +190,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
             //if there is no task to scheduled, return
             if (taskRetrivedFromPolicy == null || taskRetrivedFromPolicy.size() == 0) {
-                return numberOfTaskStarted;
+                return 0;
             }
 
             logger.debug("eligible tasks : " + taskRetrivedFromPolicy.size());
@@ -231,7 +229,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                     break;
                 }
 
-                NodeSet nodeSet = getRMNodes(jobMap, neededResourcesNumber, tasksToSchedule); // Locked nodes for tasks to schedule, locked for each task's users
+                final NodeSet nodeSet = getRMNodes(jobMap, neededResourcesNumber, tasksToSchedule); // Locked nodes for tasks to schedule, locked for each task's users
 
                 for (EligibleTaskDescriptor d: tasksToSchedule) {
                     PerfLogger.log(d.getJobId() + ":" + d.getTaskId() + ": "+ nodeSet.size() + " nodes chosen" , d.getInternal().getWatch());
@@ -239,44 +237,44 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
                 //start selected tasks
 
-                for (EligibleTaskDescriptor task : tasksToSchedule) {
-                    //while (nodeSet != null && !nodeSet.isEmpty()) {
-                    // MJOST One task at a time (so One job at a time)
-                    // MJOST One node at a time
-
-                    // MJOST Amount of tasks might be bigger than amount of free resources.
-
-                    //EligibleTaskDescriptor taskDescriptor = tasksToSchedule.removeFirst();
-                    //Node node = nodeSet.remove(0);
+                for (final EligibleTaskDescriptor task : tasksToSchedule) {
                     if (nodeSet.isEmpty())
                         break;
 
-                    Node node = nodeSet.remove(0);
+                    final Node node = nodeSet.remove(0);
 
 
 
-                    numberOfTaskStarted = submitTask(jobMap, nodeSet, task, node);
-
-
-                    //if every task that should be launched have been removed
-                    //if (tasksToSchedule.isEmpty()) {
-                    //    //get back unused nodes to the RManager
-                    //    if (!nodeSet.isEmpty()) { // MJOST Nodes are locked (and can be used by a given user), so need to be released if not used
-                    //        releaseNodes(currentJob, nodeSet);
+                    //Callable<Integer> t = new Callable<Integer>() {
+                    //    @Override
+                    //    public Integer call() throws Exception {
+                    //        return submitTask(jobMap, nodeSet, task, node);
                     //    }
-                    //    //and leave the loop
-                    //    break;
-                    //}
+                    //};
 
-
-                    //}
+                    //futureArray.add(threadPool.submit(t));
+                    tasksExecuted += submitTask(jobMap, nodeSet, task, node);
                 }
 
                 if (!nodeSet.isEmpty()) {
                     throw new IllegalStateException("nodeSet should be empty!");
                 }
             }
-            return numberOfTaskStarted;
+
+            /*
+            for (Future<Integer> f : futureArray) {
+                try {
+                    tasksExecuted += f.get();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                }
+            }
+            */
+            return tasksExecuted;
+
+
         } finally {
             schedulingService.unlockJobsToSchedule(jobMap.values());
         }
@@ -286,12 +284,6 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
         InternalJob currentJob = null;
         try {
 
-            // originally nodeSet = 4, now nodeSet = 3
-
-            // 3 cases to handle:
-            // - nodesSet.size() > tasksToSchedule.size()
-            // - nodesSet.size() < tasksToSchedule.size()
-            // - nodesSet.size() = tasksToSchedule.size()
             currentJob = jobMap.get(taskDescriptor.getJobId()).getInternal();
             PerfLogger.log(taskDescriptor.getJobId() + " : " + taskDescriptor.getTaskId() + ": task picked", taskDescriptor.getInternal().getWatch());
             InternalTask internalTask = currentJob.getIHMTasks().get(taskDescriptor.getTaskId());
@@ -304,17 +296,6 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
             createExecution(nodeSet, node, currentJob, internalTask, taskDescriptor);
             PerfLogger.log(taskDescriptor.getJobId() + " : " + taskDescriptor.getTaskId() + ": task started", taskDescriptor.getInternal().getWatch());
 
-            // TODO HANDLE THIS MJOST Take task by task, if no tasks left, unlock nodes remaining (were locked)
-            //if every task that should be launched have been removed
-            //if (tasksToSchedule.isEmpty()) {
-            //    //get back unused nodes to the RManager
-            //    if (!nodeSet.isEmpty()) { // MJOST Nodes are locked (and can be used by a given user), so need to be released if not used
-            //        releaseNodes(currentJob, nodeSet);
-            //    }
-            //    //and leave the loop
-            //    break;
-            //}
-
         } catch (ActiveObjectCreationException e1) {
             //Something goes wrong with the active object creation (createLauncher)
             logger.warn("An exception occured while creating the task launcher.", e1);
@@ -324,10 +305,6 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
             } catch (Exception e2) {
                 logger.info("Unable to get back the nodeSet to the RM", e2);
             }
-            //if (--activeObjectCreationRetryTimeNumber == 0) {
-            //    return numberOfTaskStarted;
-            //}
-            // We will try to create active objects as much as possible!
             return 0;
         } catch (Exception e1) {
             //if we are here, it is that something append while launching the current task.
