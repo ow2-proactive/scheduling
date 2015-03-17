@@ -513,6 +513,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
         //enough nodes to be launched at same time for a communicating task
         // originally nodeSet = 4, now nodeSet = 3
         if (nodeSet.size() + 1 >= task.getNumberOfNodesNeeded()) {
+            PerfLogger.log("DataSpace for task: " +  task.getId(), task.getWatch());
             //start dataspace app for this job
             DataSpaceServiceStarter dsStarter = schedulingService.getInfrastructure()
                     .getDataSpaceServiceStarter();
@@ -534,7 +535,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                 if (task.isParallel()) {
                     nodes = new NodeSet(nodeSet);
                     task.getExecuterInformations().addNodes(nodes);
-                    nodeSet.clear();
+                    nodeSet.clear(); // TODO check why
                 }
 
                 //set nodes in the executable container
@@ -558,6 +559,12 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                 throw t;
             }
 
+        } else {
+            try {
+                throw new IllegalStateException("Condition not satisfied");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
     }
