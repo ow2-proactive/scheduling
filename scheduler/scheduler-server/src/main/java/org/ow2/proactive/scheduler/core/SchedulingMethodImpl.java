@@ -80,6 +80,9 @@ import org.ow2.proactive.utils.NodeSet;
 
 import java.security.PrivateKey;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 
@@ -102,11 +105,11 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
     protected static final int DOTASK_ACTION_TIMEOUT = PASchedulerProperties.SCHEDULER_STARTTASK_TIMEOUT
             .getValueAsInt();
 
-    protected int activeObjectCreationRetryTimeNumber;
-
     protected final SchedulingService schedulingService;
 
     protected TimeoutThreadPoolExecutor threadPool;
+
+    protected ExecutorService threadPoolSubmitter;
 
     protected PrivateKey corePrivateKey;
 
@@ -126,6 +129,10 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
         this.threadPool = TimeoutThreadPoolExecutor.newFixedThreadPool(
                 PASchedulerProperties.SCHEDULER_STARTTASK_THREADNUMBER.getValueAsInt(),
                 new NamedThreadFactory("DoTask_Action"));
+
+        this.threadPoolSubmitter = Executors.newFixedThreadPool(
+                PASchedulerProperties.SCHEDULER_STARTTASK_THREADNUMBER.getValueAsInt());
+
         this.internalPolicy = new InternalPolicy();
         this.corePrivateKey = Credentials.getPrivateKey(PASchedulerProperties
                 .getAbsolutePath(PASchedulerProperties.SCHEDULER_AUTH_PRIVKEY_PATH.getValueAsString()));
@@ -162,7 +169,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
         int numberOfTaskStarted = 0;
         //Number of time to retry an active object creation before leaving scheduling loop
-        activeObjectCreationRetryTimeNumber = ACTIVEOBJECT_CREATION_RETRY_TIME_NUMBER;
+        int activeObjectCreationRetryTimeNumber = ACTIVEOBJECT_CREATION_RETRY_TIME_NUMBER;
 
         //Watch scheduleMethodWatch = Watch.startNewWatch();
 
@@ -224,67 +231,75 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                     break;
                 }
 
-                NodeSet nodeSet = getRMNodes(jobMap, neededResourcesNumber, tasksToSchedule);
+                NodeSet nodeSet = getRMNodes(jobMap, neededResourcesNumber, tasksToSchedule); // Locked nodes for tasks to schedule, locked for each task's users
 
                 for (EligibleTaskDescriptor d: tasksToSchedule) {
                     PerfLogger.log(d.getJobId() + ":" + d.getTaskId() + ": "+ nodeSet.size() + " nodes chosen" , d.getInternal().getWatch());
                 }
 
                 //start selected tasks
-                InternalJob currentJob = null;
-                try {
-                    while (nodeSet != null && !nodeSet.isEmpty()) {
-                        EligibleTaskDescriptor taskDescriptor = tasksToSchedule.removeFirst();
-                        currentJob = jobMap.get(taskDescriptor.getJobId()).getInternal();
-                        Node node = nodeSet.remove(0);
+
+                while (nodeSet != null && !nodeSet.isEmpty()) {
+                    // MJOST One task at a time (so One job at a time)
+                    // MJOST One node at a time
+
+                    EligibleTaskDescriptor taskDescriptor = tasksToSchedule.removeFirst();
+                    Node node = nodeSet.remove(0);
+
+                    InternalJob currentJob = null;
+
+                    try {
+
                         // originally nodeSet = 4, now nodeSet = 3
 
-                        //PerfLogger.log(taskDescriptor.getJobId() + " : " + taskDescriptor.getTaskId() + ": task picked", taskDescriptor.getInternal().getWatch());
-
+                        // 3 cases to handle:
+                        // - nodesSet.size() > tasksToSchedule.size()
+                        // - nodesSet.size() < tasksToSchedule.size()
+                        // - nodesSet.size() = tasksToSchedule.size()
+                        currentJob = jobMap.get(taskDescriptor.getJobId()).getInternal();
+                        PerfLogger.log(taskDescriptor.getJobId() + " : " + taskDescriptor.getTaskId() + ": task picked", taskDescriptor.getInternal().getWatch());
                         InternalTask internalTask = currentJob.getIHMTasks().get(taskDescriptor.getTaskId());
-
                         // load and Initialize the executable container
                         loadAndInit(internalTask);
-
                         PerfLogger.log(taskDescriptor.getJobId() + " : " + taskDescriptor.getTaskId() + ": task executable container", taskDescriptor.getInternal().getWatch());
-
                         //create launcher and try to start the task
-
                         numberOfTaskStarted++;
-                        //PerfLogger.log(taskDescriptor.getJobId() + " : " + taskDescriptor.getTaskId() + ": task ready", taskDescriptor.getInternal().getWatch());
+                        PerfLogger.log(taskDescriptor.getJobId() + " : " + taskDescriptor.getTaskId() + ": task ready", taskDescriptor.getInternal().getWatch());
                         createExecution(nodeSet, node, currentJob, internalTask, taskDescriptor);
-                        //PerfLogger.log(taskDescriptor.getJobId() + " : " + taskDescriptor.getTaskId() + ": task started", taskDescriptor.getInternal().getWatch());
+                        PerfLogger.log(taskDescriptor.getJobId() + " : " + taskDescriptor.getTaskId() + ": task started", taskDescriptor.getInternal().getWatch());
 
+                        // MJOST Take task by task, if no tasks left, unlock nodes remaining (were locked)
                         //if every task that should be launched have been removed
                         if (tasksToSchedule.isEmpty()) {
                             //get back unused nodes to the RManager
-                            if (!nodeSet.isEmpty()) {
+                            if (!nodeSet.isEmpty()) { // MJOST Nodes are locked (and can be used by a given user), so need to be released if not used
                                 releaseNodes(currentJob, nodeSet);
                             }
                             //and leave the loop
                             break;
                         }
-                    }
-                } catch (ActiveObjectCreationException e1) {
-                    //Something goes wrong with the active object creation (createLauncher)
-                    logger.warn("An exception occured while creating the task launcher.", e1);
-                    //so try to get back every remaining nodes to the resource manager
-                    try {
-                        releaseNodes(currentJob, nodeSet);
-                    } catch (Exception e2) {
-                        logger.info("Unable to get back the nodeSet to the RM", e2);
-                    }
-                    if (--activeObjectCreationRetryTimeNumber == 0) {
-                        return numberOfTaskStarted;
-                    }
-                } catch (Exception e1) {
-                    //if we are here, it is that something append while launching the current task.
-                    logger.warn("An exception occured while starting task.", e1);
-                    //so try to get back every remaining nodes to the resource manager
-                    try {
-                        releaseNodes(currentJob, nodeSet);
-                    } catch (Exception e2) {
-                        logger.info("Unable to get back the nodeSet to the RM", e2);
+
+                    } catch (ActiveObjectCreationException e1) {
+                        //Something goes wrong with the active object creation (createLauncher)
+                        logger.warn("An exception occured while creating the task launcher.", e1);
+                        //so try to get back every remaining nodes to the resource manager
+                        try {
+                            releaseNodes(currentJob, nodeSet);
+                        } catch (Exception e2) {
+                            logger.info("Unable to get back the nodeSet to the RM", e2);
+                        }
+                        if (--activeObjectCreationRetryTimeNumber == 0) {
+                            return numberOfTaskStarted;
+                        }
+                    } catch (Exception e1) {
+                        //if we are here, it is that something append while launching the current task.
+                        logger.warn("An exception occured while starting task.", e1);
+                        //so try to get back every remaining nodes to the resource manager
+                        try {
+                            releaseNodes(currentJob, nodeSet);
+                        } catch (Exception e2) {
+                            logger.info("Unable to get back the nodeSet to the RM", e2);
+                        }
                     }
                 }
             }
@@ -489,7 +504,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
             // create launcher
             launcher = task.createLauncher(job, node);
 
-            activeObjectCreationRetryTimeNumber = ACTIVEOBJECT_CREATION_RETRY_TIME_NUMBER;
+            //activeObjectCreationRetryTimeNumber = ACTIVEOBJECT_CREATION_RETRY_TIME_NUMBER;
 
             // originally nodeSet = 4, now nodeSet = 3
             //nodeSet.remove(0);
