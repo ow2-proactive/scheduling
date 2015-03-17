@@ -36,26 +36,25 @@
  */
 package org.ow2.proactive.scheduler.newimpl;
 
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
-import java.security.PublicKey;
-import java.security.SecureRandom;
-
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.ImmediateService;
 import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.exception.TaskAbortedException;
 import org.ow2.proactive.scheduler.common.exception.WalltimeExceededException;
-import org.ow2.proactive.scheduler.common.task.Decrypter;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
+import org.ow2.proactive.scheduler.newimpl.data.TaskDataspaces;
+import org.ow2.proactive.scheduler.newimpl.utils.Decrypter;
+import org.ow2.proactive.scheduler.newimpl.utils.StopWatch;
+import org.ow2.proactive.scheduler.newimpl.utils.TaskKiller;
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.TaskLauncherInitializer;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
-import org.apache.log4j.Logger;
+
+import java.security.*;
 
 
 /**
@@ -107,7 +106,7 @@ public class TaskLauncher {
             TaskTerminateNotification terminateNotification) {
 
         taskKiller = new TaskKiller(Thread.currentThread()); // what about kill of a non yet started task?
-        WallTimer wallTimer = new WallTimer(initializer.getWalltime(), Thread.currentThread()); // stop when finished
+        org.ow2.proactive.scheduler.newimpl.WallTimer wallTimer = new org.ow2.proactive.scheduler.newimpl.WallTimer(initializer.getWalltime(), Thread.currentThread()); // stop when finished
 
         StopWatch stopWatch = new StopWatch(); // for task failure cases
         stopWatch.start();
