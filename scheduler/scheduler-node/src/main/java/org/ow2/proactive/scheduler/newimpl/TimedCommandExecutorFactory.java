@@ -35,8 +35,8 @@
 package org.ow2.proactive.scheduler.newimpl;
 
 import org.objectweb.proactive.extensions.processbuilder.OSProcessBuilder;
-import org.ow2.proactive.scheduler.common.task.Decrypter;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.proactive.scheduler.newimpl.utils.Decrypter;
 import org.ow2.proactive.scheduler.task.utils.ForkerUtils;
 
 import java.io.File;
