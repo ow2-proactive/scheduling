@@ -38,7 +38,7 @@ package org.ow2.proactive.tests.performance.utils;
 
 public class WaitFailedException extends Exception {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
 
     public WaitFailedException(String message) {
         super(message);

@@ -69,7 +69,7 @@ import org.ow2.proactive.resourcemanager.core.history.UserHistory;
  */
 public class Client implements Serializable {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
 
     /** The security entity that represents this client */
     private final Subject subject;

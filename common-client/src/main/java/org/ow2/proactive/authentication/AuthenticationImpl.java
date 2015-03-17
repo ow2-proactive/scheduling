@@ -63,7 +63,7 @@ import org.ow2.proactive.authentication.crypto.Credentials;
  */
 public abstract class AuthenticationImpl implements Authentication, RunActive {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
 
     /** Activation is used to control authentication during scheduling initialization */
     private boolean activated = false;

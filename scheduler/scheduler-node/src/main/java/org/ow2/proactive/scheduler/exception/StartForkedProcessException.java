@@ -45,7 +45,7 @@ package org.ow2.proactive.scheduler.exception;
  */
 public class StartForkedProcessException extends StartProcessException {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
 
     /**
      * Create a new instance of StartForkedProcessException

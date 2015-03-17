@@ -73,7 +73,7 @@ import org.apache.log4j.Logger;
 @ActiveObject
 public class SchedulerAuthentication extends AuthenticationImpl implements SchedulerAuthenticationInterface {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
 
     /** Scheduler logger */
     public static final Logger logger = Logger.getLogger(SchedulerAuthentication.class);

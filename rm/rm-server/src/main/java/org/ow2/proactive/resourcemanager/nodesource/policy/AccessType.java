@@ -67,7 +67,7 @@ import org.ow2.proactive.resourcemanager.authentication.Client;
  */
 public class AccessType implements Serializable {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
 
     private static Set<String> types = new HashSet<String>();
 

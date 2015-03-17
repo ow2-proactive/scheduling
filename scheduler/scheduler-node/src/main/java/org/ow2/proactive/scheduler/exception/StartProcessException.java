@@ -47,7 +47,7 @@ package org.ow2.proactive.scheduler.exception;
  */
 public class StartProcessException extends ProcessException {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
 
     /**
      * Attaches a message to the Exception

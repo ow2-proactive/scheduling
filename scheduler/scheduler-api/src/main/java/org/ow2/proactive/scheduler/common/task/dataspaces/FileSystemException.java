@@ -41,7 +41,7 @@ package org.ow2.proactive.scheduler.common.task.dataspaces;
  **/
 public class FileSystemException extends Exception {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
     public FileSystemException() {
         super();
     }

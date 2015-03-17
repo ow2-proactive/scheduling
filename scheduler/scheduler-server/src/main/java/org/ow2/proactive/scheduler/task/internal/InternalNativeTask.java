@@ -67,7 +67,7 @@ import org.ow2.proactive.scripting.Script;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class InternalNativeTask extends InternalTask {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
     public static final TaskLogger logger = TaskLogger.getInstance();
 
     /**

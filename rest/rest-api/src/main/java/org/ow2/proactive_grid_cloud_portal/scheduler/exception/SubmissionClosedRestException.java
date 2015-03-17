@@ -36,7 +36,7 @@ package org.ow2.proactive_grid_cloud_portal.scheduler.exception;
 
 public class SubmissionClosedRestException extends RestException {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
     public SubmissionClosedRestException(Throwable cause) {
         super(cause);
     }

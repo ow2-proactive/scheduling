@@ -48,7 +48,7 @@ import org.ow2.proactive.policy.ClientsPolicy;
  */
 public class ClientPermission extends BasicPermission {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
 
     public ClientPermission() {
         super("*");

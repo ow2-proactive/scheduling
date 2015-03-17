@@ -55,7 +55,7 @@ import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ParallelEnvironment implements Serializable {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
 
     /** Number of nodes asked by the user. */
     private int nodesNumber;

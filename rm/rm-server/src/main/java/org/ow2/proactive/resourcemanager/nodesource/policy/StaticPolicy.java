@@ -49,7 +49,7 @@ import org.ow2.proactive.resourcemanager.exception.RMException;
 @ActiveObject
 public class StaticPolicy extends NodeSourcePolicy {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
 
     /**
      * Configure a policy with given parameters.

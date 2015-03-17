@@ -64,7 +64,7 @@ import org.ow2.proactive.scheduler.util.policy.ISO8601DateUtil;
  */
 public class ExtendedSchedulerPolicy extends DefaultPolicy {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
 
     private static final Logger logger = Logger.getLogger(ExtendedSchedulerPolicy.class);
 

@@ -73,7 +73,7 @@ import org.ow2.proactive.resourcemanager.utils.RMNodeStarter.CommandLineBuilder;
  */
 public abstract class BatchJobInfrastructure extends InfrastructureManager {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
 
     /** The frequency in ms for the refresh of the node acquisition */
     private static final int NODE_ACQUISITION_CHECK_RATE = 1000;

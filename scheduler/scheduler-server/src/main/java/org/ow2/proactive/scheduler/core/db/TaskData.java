@@ -147,7 +147,7 @@ public class TaskData {
     @Embeddable
     public static class DBTaskId implements Serializable {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
 
         private long jobId;
 

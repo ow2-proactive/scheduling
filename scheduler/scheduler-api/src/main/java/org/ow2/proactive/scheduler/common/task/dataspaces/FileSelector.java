@@ -124,7 +124,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class FileSelector implements Serializable {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
 
     private String[] includes;
     private String[] excludes;

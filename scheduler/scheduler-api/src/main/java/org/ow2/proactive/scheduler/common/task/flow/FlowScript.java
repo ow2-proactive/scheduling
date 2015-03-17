@@ -79,7 +79,7 @@ import it.sauronsoftware.cron4j.Predictor;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class FlowScript extends Script<FlowAction> {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
 
     /** String representation of a FlowActionType
      * see {@link FlowActionType#parse(String)} */

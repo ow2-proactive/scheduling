@@ -62,7 +62,7 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class JobResultImpl implements JobResult {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
 
     /** List of every result */
     private Map<String, TaskResult> allResults = null;

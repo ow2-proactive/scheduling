@@ -51,7 +51,7 @@ import org.ow2.proactive.scripting.TaskScript;
  */
 public class ScriptExecutableContainer extends JavaExecutableContainer {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
     private TaskScript script;
 
     public ScriptExecutableContainer(TaskScript script) {

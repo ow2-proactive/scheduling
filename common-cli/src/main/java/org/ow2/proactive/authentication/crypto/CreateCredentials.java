@@ -230,7 +230,7 @@ public class CreateCredentials {
                 Connection<AuthenticationImpl> conn = new Connection<AuthenticationImpl>(
                         AuthenticationImpl.class) {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
                     public Logger getLogger() {
                         return Logger.getLogger("pa.scheduler.credentials");
                     }

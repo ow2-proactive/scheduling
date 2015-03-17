@@ -49,7 +49,7 @@ import org.ow2.proactive.permissions.ClientPermission;
  */
 public class GetOwnStateOnlyPermission extends ClientPermission {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
 
     private boolean fullStateAllowed = true;
 

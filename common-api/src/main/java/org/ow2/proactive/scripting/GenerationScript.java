@@ -62,7 +62,7 @@ import org.apache.log4j.Logger;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class GenerationScript extends Script<Object> {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
     /** Loggers */
     public static final Logger logger = Logger.getLogger(GenerationScript.class);
 

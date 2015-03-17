@@ -47,7 +47,7 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
  */
 public class AwaitedTask implements Serializable {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
 
     private String taskName;
 

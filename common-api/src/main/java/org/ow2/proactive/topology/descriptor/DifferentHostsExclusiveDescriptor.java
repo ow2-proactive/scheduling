@@ -57,7 +57,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @PublicAPI
 public class DifferentHostsExclusiveDescriptor extends TopologyDescriptor {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
 
     /**
      * Constructs a new instance of the class.

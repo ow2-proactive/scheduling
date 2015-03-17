@@ -68,7 +68,7 @@ import org.ow2.proactive.utils.FileToBytesConverter;
 @XmlRootElement(name = "pluginDescriptor")
 public class PluginDescriptor implements Serializable {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
 
     private String pluginName;
     private String pluginDescription;

@@ -38,7 +38,7 @@ import org.ow2.proactive.scheduler.common.task.TaskLogs;
 
 
 public class TaskLogsImpl implements TaskLogs {
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
 
     private String stdOutLogs;
     private String stdErrLogs;

@@ -77,7 +77,7 @@ import org.ow2.proactive.utils.Formatter;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class TaskResultImpl implements TaskResult {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
     public static final Logger logger = Logger.getLogger(TaskResultImpl.class);
 
     /** The task identification of the result */

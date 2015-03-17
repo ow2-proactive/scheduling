@@ -44,7 +44,7 @@ package org.ow2.proactive.scripting.helper.filetransfer.exceptions;
  */
 public class AuthentificationFailedException extends Exception {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
 
     public AuthentificationFailedException(String msg) {
         super(msg);

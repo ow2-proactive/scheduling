@@ -65,7 +65,7 @@ import org.ow2.proactive.jmx.provider.JMXProviderUtils;
  */
 public class ROConnector implements JMXConnector, NotificationListener, Serializable {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
     private static final Logger LOGGER = Logger.getLogger(ROConnector.class);
     /** To know if this connector is closed (false by default) */
     private transient boolean closed;

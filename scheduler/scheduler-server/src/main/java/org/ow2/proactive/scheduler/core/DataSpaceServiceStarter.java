@@ -70,7 +70,7 @@ import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
 public class DataSpaceServiceStarter implements Serializable {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
 
     public static final Logger logger = Logger.getLogger(SchedulingService.class);
 

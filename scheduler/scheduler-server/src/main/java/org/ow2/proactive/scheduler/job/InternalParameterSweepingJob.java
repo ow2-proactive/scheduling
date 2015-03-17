@@ -54,7 +54,7 @@ import org.ow2.proactive.scheduler.task.internal.InternalTask;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class InternalParameterSweepingJob extends InternalJob {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
 
     /**
      * ProActive empty constructor.

@@ -64,7 +64,7 @@ import org.objectweb.proactive.core.util.ProActiveInet;
  */
 public abstract class Connection<T extends Authentication> implements Loggable, Serializable {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
 
     /** Error msg */
     private static final String ERROR_CANNOT_LOOKUP_AUTH = "Cannot lookup authentication active object.";

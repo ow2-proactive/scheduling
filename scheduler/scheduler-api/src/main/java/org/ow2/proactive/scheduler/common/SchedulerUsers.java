@@ -60,7 +60,7 @@ import org.ow2.proactive.scheduler.common.job.UserIdentification;
 @PublicAPI
 public class SchedulerUsers implements Serializable {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
 
     /** 
      * List of connected user.

@@ -59,7 +59,7 @@ import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
 @XmlAccessorType(XmlAccessType.FIELD)
 public abstract class TaskState extends Task implements Comparable<TaskState> {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
 
     /** Sorting constant, this will allow the user to sort the descriptor. */
     public static final int SORT_BY_ID = 1;

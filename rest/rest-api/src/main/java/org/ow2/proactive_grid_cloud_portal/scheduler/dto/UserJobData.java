@@ -52,7 +52,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 public class UserJobData implements Serializable {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
 
     private JobInfoData jobInfo;
 

@@ -36,7 +36,7 @@ package org.ow2.proactive_grid_cloud_portal.scheduler.exception;
 
 public class RestException extends Exception {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
     public RestException(String message) {
         super(message);
     }

@@ -47,7 +47,7 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.RemoteSpace;
  **/
 public class DefaultStandaloneExecutableInitializer implements StandaloneExecutableInitializer {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
 
     protected ArrayList nodes;
 

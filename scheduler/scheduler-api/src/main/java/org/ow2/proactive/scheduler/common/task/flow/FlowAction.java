@@ -56,7 +56,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class FlowAction implements Serializable {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
 
     /** Type of the Action stored as a String for convenience,
      * see {@link FlowActionType#parse(String)} */

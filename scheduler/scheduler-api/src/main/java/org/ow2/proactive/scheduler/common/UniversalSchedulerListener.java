@@ -54,7 +54,7 @@ import org.ow2.proactive.scheduler.common.task.TaskInfo;
  */
 public class UniversalSchedulerListener implements SchedulerEventListener, Serializable {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
 
     // wrapped listener
     private final SchedulerEventListener internalListener;

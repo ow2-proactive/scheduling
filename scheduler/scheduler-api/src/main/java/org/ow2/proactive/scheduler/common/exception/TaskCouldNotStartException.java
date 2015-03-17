@@ -47,7 +47,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @PublicAPI
 public class TaskCouldNotStartException extends SchedulerException {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
 
     /**
      * Create a new instance of TaskCouldNotStartException

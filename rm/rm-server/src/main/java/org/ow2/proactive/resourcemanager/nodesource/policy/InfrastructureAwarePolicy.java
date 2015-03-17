@@ -48,5 +48,5 @@ import org.objectweb.proactive.extensions.annotation.ActiveObject;
 @ActiveObject
 public abstract class InfrastructureAwarePolicy extends NodeSourcePolicy {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
 }

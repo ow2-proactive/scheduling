@@ -44,7 +44,7 @@ package org.ow2.proactive.scheduler.exception;
  */
 public class IllegalProgressException extends ProgressPingerException {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
 
     /**
      * Create a new instance of IllegalProgressException

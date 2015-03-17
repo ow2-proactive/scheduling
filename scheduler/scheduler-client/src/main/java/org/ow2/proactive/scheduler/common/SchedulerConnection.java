@@ -53,7 +53,7 @@ import org.ow2.proactive.scheduler.common.exception.ConnectionException;
 @PublicAPI
 public class SchedulerConnection extends Connection<SchedulerAuthenticationInterface> {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
 
     /** Instance of the connection */
     private static SchedulerConnection instance;

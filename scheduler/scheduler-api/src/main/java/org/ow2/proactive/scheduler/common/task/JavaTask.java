@@ -61,7 +61,7 @@ import org.ow2.proactive.scheduler.common.util.Object2ByteConverter;
 @PublicAPI
 public class JavaTask extends Task {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
 
     /** Classname of the executable */
     protected String executableClassName = null;

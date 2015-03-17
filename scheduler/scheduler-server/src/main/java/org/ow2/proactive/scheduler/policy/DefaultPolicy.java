@@ -55,7 +55,7 @@ import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
  */
 public class DefaultPolicy extends Policy {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
 
     /**
      * {@inheritDoc}

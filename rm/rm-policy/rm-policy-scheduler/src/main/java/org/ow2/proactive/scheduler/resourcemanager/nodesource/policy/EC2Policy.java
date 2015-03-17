@@ -62,7 +62,7 @@ import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 @ActiveObject
 public class EC2Policy extends SchedulerLoadingPolicy {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
 
     {
         // 40 mn

@@ -94,7 +94,7 @@ import org.apache.log4j.Logger;
  */
 public abstract class InternalJob extends JobState {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
     public static final Logger logger = Logger.getLogger(InternalJob.class);
 
     /** List of every tasks in this job. */

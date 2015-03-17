@@ -61,7 +61,7 @@ import org.ow2.proactive.topology.descriptor.DistanceFunction;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class TopologyImpl implements Topology, Cloneable {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
 
     /**
      * Host -> Hosts -> Distance

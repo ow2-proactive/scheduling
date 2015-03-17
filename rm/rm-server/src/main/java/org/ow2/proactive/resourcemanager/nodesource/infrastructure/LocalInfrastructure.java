@@ -25,7 +25,7 @@ import org.ow2.proactive.utils.Tools;
 
 public class LocalInfrastructure extends InfrastructureManager {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
 
     @Configurable(description = "Absolute path to credentials file\nused to add the node to the Resource Manager", credential = true)
     private Credentials credentials;

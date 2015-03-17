@@ -56,7 +56,7 @@ import java.util.TreeMap;
  */
 public class EnvVars extends TreeMap<String, String> {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
 
     /**
      * Create a new instance of EnvVars.

@@ -79,7 +79,7 @@ import org.ow2.proactive.jmx.provider.JMXProviderUtils;
  */
 public class ROServerImpl implements Serializable {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
     private static final Logger LOGGER = Logger.getLogger(ROServerImpl.class);
     /** The current connection number */
     private static int connectionNumber;

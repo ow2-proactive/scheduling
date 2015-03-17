@@ -64,7 +64,7 @@ import org.apache.log4j.Logger;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ForkedScriptExecutableContainer extends ForkedJavaExecutableContainer {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
 
     public static final Logger logger = Logger.getLogger(ForkedScriptExecutableContainer.class);
 

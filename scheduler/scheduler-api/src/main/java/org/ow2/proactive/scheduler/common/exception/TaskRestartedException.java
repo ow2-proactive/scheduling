@@ -49,7 +49,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @PublicAPI
 public class TaskRestartedException extends SchedulerException {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
 
     /**
      * Create a new instance of TaskRestartedException

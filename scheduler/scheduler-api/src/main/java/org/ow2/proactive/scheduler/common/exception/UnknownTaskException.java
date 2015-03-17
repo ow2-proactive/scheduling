@@ -50,7 +50,7 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 @PublicAPI
 public class UnknownTaskException extends SchedulerException {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
 
     private JobId jobId;
 

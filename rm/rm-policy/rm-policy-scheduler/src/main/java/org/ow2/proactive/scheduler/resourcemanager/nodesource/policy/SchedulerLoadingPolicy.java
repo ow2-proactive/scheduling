@@ -71,7 +71,7 @@ import org.ow2.proactive.scheduler.common.task.TaskStatus;
 public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements InitActive, RunActive,
         RMEventListener {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
 
     protected static Logger logger = Logger.getLogger(SchedulerLoadingPolicy.class);
 

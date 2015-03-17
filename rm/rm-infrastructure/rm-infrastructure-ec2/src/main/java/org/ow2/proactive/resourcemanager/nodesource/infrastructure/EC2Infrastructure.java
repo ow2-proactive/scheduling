@@ -88,7 +88,7 @@ import com.xerox.amazonws.ec2.ReservationDescription.Instance;
  */
 public class EC2Infrastructure extends InfrastructureManager {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
 
     /**
      * The java home path on the ec2 instance

@@ -63,7 +63,7 @@ import java.util.HashMap;
  */
 public final class RMDeployingNode implements RMNode, Serializable {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
     static {
         InfrastructureManager.RMDeployingNodeAccessor.setDefault(new RMDeployingNodeAccessorImpl());
     }
@@ -494,7 +494,7 @@ public final class RMDeployingNode implements RMNode, Serializable {
  */
 class RMDeployingNodeAccessorImpl extends InfrastructureManager.RMDeployingNodeAccessor {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
 
     /** {@inheritDoc} */
     @Override

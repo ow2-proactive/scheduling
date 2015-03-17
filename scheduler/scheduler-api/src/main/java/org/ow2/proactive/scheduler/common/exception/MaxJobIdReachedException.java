@@ -50,7 +50,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @PublicAPI
 public class MaxJobIdReachedException extends InternalException {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
     /**
      * Create a new instance of MaxJobIdReachedException with the given message.
      *

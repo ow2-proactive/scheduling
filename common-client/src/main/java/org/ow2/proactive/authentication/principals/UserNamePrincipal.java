@@ -38,7 +38,7 @@ package org.ow2.proactive.authentication.principals;
 
 public class UserNamePrincipal extends IdentityPrincipal {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
 
     public UserNamePrincipal(String name) {
         super(name);

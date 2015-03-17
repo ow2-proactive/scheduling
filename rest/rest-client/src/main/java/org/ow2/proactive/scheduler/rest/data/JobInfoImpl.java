@@ -42,7 +42,7 @@ import org.ow2.proactive.scheduler.common.job.JobStatus;
 
 public class JobInfoImpl implements JobInfo {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
 
     private long submittedTime = -1;
     private long startTime = -1;

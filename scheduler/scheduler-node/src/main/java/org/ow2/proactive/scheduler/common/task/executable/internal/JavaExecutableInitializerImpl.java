@@ -53,7 +53,7 @@ import org.ow2.proactive.utils.NodeSet;
 public class JavaExecutableInitializerImpl extends JavaStandaloneExecutableInitializer implements
         ExecutableInitializer {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
 
     private NodeSet nodes;
 

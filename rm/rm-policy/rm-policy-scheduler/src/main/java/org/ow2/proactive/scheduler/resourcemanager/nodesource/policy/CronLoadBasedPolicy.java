@@ -54,7 +54,7 @@ import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 @ActiveObject
 public class CronLoadBasedPolicy extends SchedulerLoadingPolicy {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
     /**
      * Initial time for nodes acquisition
      */

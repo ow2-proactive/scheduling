@@ -80,7 +80,7 @@ import org.ow2.proactive.scripting.SelectionScript;
 @XmlRootElement(name = "task")
 public abstract class Task extends CommonAttribute {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
 
     /** Name of the task. */
     protected String name = SchedulerConstants.TASK_DEFAULT_NAME;

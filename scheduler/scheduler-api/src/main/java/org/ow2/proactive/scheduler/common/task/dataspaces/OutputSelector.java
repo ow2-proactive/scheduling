@@ -54,7 +54,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class OutputSelector implements Serializable {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
 
     private FileSelector outputFiles = null;
 

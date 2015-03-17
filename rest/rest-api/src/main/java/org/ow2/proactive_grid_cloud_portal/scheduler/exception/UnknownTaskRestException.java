@@ -36,7 +36,7 @@ package org.ow2.proactive_grid_cloud_portal.scheduler.exception;
 
 public class UnknownTaskRestException extends RestException {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
     public UnknownTaskRestException(Throwable cause) {
         super(cause);
     }

@@ -54,7 +54,7 @@ import org.ow2.proactive.scripting.GenerationScript;
 @PublicAPI
 public class NativeTask extends Task {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
 
     /** Command line for this native task */
     private String[] commandLine = null;

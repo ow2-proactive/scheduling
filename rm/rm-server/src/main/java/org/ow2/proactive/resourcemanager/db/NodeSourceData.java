@@ -18,7 +18,7 @@ import org.ow2.proactive.resourcemanager.authentication.Client;
 @Table(name = "NodeSourceData")
 public class NodeSourceData implements Serializable {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
 
     private String name;
     private String infrastructureType;

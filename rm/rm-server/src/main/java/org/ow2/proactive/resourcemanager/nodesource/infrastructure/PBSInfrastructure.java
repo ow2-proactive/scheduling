@@ -65,7 +65,7 @@ import java.util.regex.Pattern;
  */
 public class PBSInfrastructure extends BatchJobInfrastructure {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
 
     public PBSInfrastructure() {
         this.submitJobOpt = "-l \"nodes=1:ppn=1\"";

@@ -42,7 +42,7 @@ import java.util.regex.Pattern;
 
 public class LSFInfrastructure extends BatchJobInfrastructure {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
 
     public LSFInfrastructure() {
         this.submitJobOpt = "";

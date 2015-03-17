@@ -28,7 +28,7 @@ import org.ow2.proactive.scheduler.task.forked.ForkedJavaExecutableContainer;
 @Table(name = "FORKED_JAVA_TASK_DATA")
 public class ForkedJavaTaskData extends CommonJavaTaskData {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
 
     private String javaHome;
 

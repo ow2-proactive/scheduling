@@ -49,7 +49,7 @@ import org.ow2.proactive.scripting.TaskScript;
  */
 public class ScriptExecutableInitializer extends ForkedJavaExecutableInitializer {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
 
     private TaskScript script;
 

@@ -27,7 +27,7 @@ import org.ow2.proactive.scheduler.task.java.JavaExecutableContainer;
 @MappedSuperclass
 public class CommonJavaTaskData implements Serializable {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
 
     private long id;
 

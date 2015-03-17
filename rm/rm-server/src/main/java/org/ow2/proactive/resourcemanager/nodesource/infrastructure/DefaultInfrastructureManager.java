@@ -54,7 +54,7 @@ import org.apache.log4j.Logger;
  */
 public class DefaultInfrastructureManager extends InfrastructureManager {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
 
     /** logger*/
     protected static Logger logger = Logger.getLogger(DefaultInfrastructureManager.class);

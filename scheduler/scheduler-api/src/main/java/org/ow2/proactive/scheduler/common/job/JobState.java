@@ -57,7 +57,7 @@ import org.ow2.proactive.scheduler.common.task.TaskState;
 @PublicAPI
 public abstract class JobState extends Job implements Comparable<JobState> {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
 
     /** Used to sort by id */
     public static final int SORT_BY_ID = 1;

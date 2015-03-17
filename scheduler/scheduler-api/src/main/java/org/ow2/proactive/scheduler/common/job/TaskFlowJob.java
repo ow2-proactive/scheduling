@@ -61,7 +61,7 @@ import org.ow2.proactive.scheduler.common.task.Task;
 @PublicAPI
 public class TaskFlowJob extends Job {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
 
     /** Task count for unset task name */
     private int taskCountForUnSetTaskName = 1;

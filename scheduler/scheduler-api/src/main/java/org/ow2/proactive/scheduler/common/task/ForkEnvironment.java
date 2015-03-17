@@ -65,7 +65,7 @@ import org.ow2.proactive.scripting.SimpleScript;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ForkEnvironment implements Serializable {
 
-    private static final long serialVersionUID = 60L;
+    private static final long serialVersionUID = 61L;
 
     /**
      * Path to directory with Java installed, to this path '/bin/java' will be added.
