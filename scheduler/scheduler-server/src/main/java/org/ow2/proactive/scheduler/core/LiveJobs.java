@@ -351,10 +351,9 @@ class LiveJobs {
     }
 
     void taskStarted(InternalJob job, InternalTask task, TaskLauncher launcher) {
-        PerfLogger.log("taskStarted by thread: " + Thread.currentThread().getName() + " " + job, null);
         synchronized (job) {
             //checkJobAccess(job.getId());
-            // TODO check
+            // TODO check, big change
             if (runningTasksData.containsKey(task.getId())) {
                 throw new IllegalStateException("Task is already started");
             }

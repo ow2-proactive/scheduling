@@ -116,6 +116,8 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
     private String schedulerUrl = null;
 
+    private Boolean submitTasksInParallel = false;
+
     public SchedulingMethodImpl(SchedulingService schedulingService) throws Exception {
         this.schedulingService = schedulingService;
 
@@ -129,6 +131,8 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
         this.threadPoolSubmitter = Executors.newFixedThreadPool(
                 PASchedulerProperties.SCHEDULER_STARTTASK_THREADNUMBER.getValueAsInt());
+
+        this.submitTasksInParallel = PASchedulerProperties.SCHEDULER_STARTTASK_PARALLEL.getValueAsBoolean();
 
         this.internalPolicy = new InternalPolicy();
         this.corePrivateKey = Credentials.getPrivateKey(PASchedulerProperties
@@ -165,12 +169,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
         int tasksExecuted = 0;
         Policy currentPolicy = schedulingService.getPolicy();
 
-        List<Future<Integer>> futureArray = new ArrayList<Future<Integer>>();
-        //Number of time to retry an active object creation before leaving scheduling loop
-        //int activeObjectCreationRetryTimeNumber = ACTIVEOBJECT_CREATION_RETRY_TIME_NUMBER;
-
-        //Watch scheduleMethodWatch = Watch.startNewWatch();
-        boolean parallel = false;
+        List<Future<Integer>> futures = new ArrayList<Future<Integer>>();
 
         //get job Descriptor list with eligible jobs (running and pending)
         final Map<JobId, JobDescriptor> jobMap = schedulingService.lockJobsToSchedule();
@@ -244,18 +243,14 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
                     final Node node = nodeSet.remove(0);
 
-
-
-                    if (parallel) {
+                    if (submitTasksInParallel) {
                         Callable<Integer> t = new Callable<Integer>() {
                             @Override
                             public Integer call() throws Exception {
                                 return submitTask(jobMap, nodeSet, task, node);
                             }
                         };
-
-
-                        futureArray.add(threadPool.submit(t));
+                        futures.add(threadPool.submit(t));
                     } else {
                         tasksExecuted += submitTask(jobMap, nodeSet, task, node);
                     }
@@ -266,14 +261,12 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                 }
             }
 
-            if (parallel) {
-                for (Future<Integer> f : futureArray) {
+            if (submitTasksInParallel) {
+                for (Future<Integer> f : futures) {
                     try {
                         tasksExecuted += f.get();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    } catch (ExecutionException e) {
-                        e.printStackTrace();
+                    } catch (Exception e) {
+                        logger.warn("Failed to submit task", e);
                     }
                 }
             }
@@ -295,7 +288,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
             InternalTask internalTask = currentJob.getIHMTasks().get(taskDescriptor.getTaskId());
             // load and Initialize the executable container
             loadAndInit(internalTask);
-            PerfLogger.log(taskDescriptor.getJobId() + " : " + taskDescriptor.getTaskId() + ": task executable container", taskDescriptor.getInternal().getWatch());
+            PerfLogger.log(taskDescriptor.getJobId() + " : " + taskDescriptor.getTaskId() + ": task ex. container", taskDescriptor.getInternal().getWatch());
             //create launcher and try to start the task
 
             PerfLogger.log(taskDescriptor.getJobId() + " : " + taskDescriptor.getTaskId() + ": task ready", taskDescriptor.getInternal().getWatch());
@@ -513,7 +506,6 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
         //enough nodes to be launched at same time for a communicating task
         // originally nodeSet = 4, now nodeSet = 3
         if (nodeSet.size() + 1 >= task.getNumberOfNodesNeeded()) {
-            PerfLogger.log("DataSpace for task: " +  task.getId(), task.getWatch());
             //start dataspace app for this job
             DataSpaceServiceStarter dsStarter = schedulingService.getInfrastructure()
                     .getDataSpaceServiceStarter();
