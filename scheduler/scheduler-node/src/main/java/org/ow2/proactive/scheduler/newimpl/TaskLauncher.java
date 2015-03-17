@@ -66,8 +66,7 @@ public class TaskLauncher {
 
     private static final Logger logger = Logger.getLogger(TaskLauncher.class);
 
-    /** For tests */
-    private TaskLauncherFactory factory = new TaskLauncherFactory();
+    private ProActiveForkedTaskLauncherFactory factory = new ProActiveForkedTaskLauncherFactory();
 
     private TaskId taskId;
     private TaskLauncherInitializer initializer;
@@ -85,7 +84,7 @@ public class TaskLauncher {
     public TaskLauncher() {
     }
 
-    public TaskLauncher(TaskLauncherInitializer initializer, TaskLauncherFactory factory) {
+    public TaskLauncher(TaskLauncherInitializer initializer, ProActiveForkedTaskLauncherFactory factory) {
         this(initializer);
         this.factory = factory;
     }
@@ -125,7 +124,7 @@ public class TaskLauncher {
             }
 
             // Create task executor and execute the given task
-            TaskResultImpl taskResult = factory.createTaskExecutor(context, dataspaces.getScratchFolder())
+            TaskResultImpl taskResult = factory.createTaskExecutor(dataspaces.getScratchFolder(), decrypter)
                     .execute(context, taskLogger.getOutputSink(), taskLogger.getErrorSink()); // TODO decrypter
 
             if (wallTimer.hasWallTimed()) {
