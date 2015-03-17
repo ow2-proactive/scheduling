@@ -77,6 +77,7 @@ import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskInfoImpl;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
+import org.ow2.proactive.scheduler.util.PerfLogger;
 import org.ow2.proactive.scheduler.util.Watch;
 import org.ow2.proactive.scheduler.util.policy.ISO8601DateUtil;
 import it.sauronsoftware.cron4j.InvalidPatternException;
@@ -252,10 +253,18 @@ public abstract class InternalJob extends JobState {
     /**
      * Start dataspace configuration and application
      */
-    public void startDataSpaceApplication(NamingService namingService) {
-        if (jobDataSpaceApplication == null) {
+    public synchronized void startDataSpaceApplication(NamingService namingService) {
+        if (jobDataSpaceApplication == null) { // This is no longer null
             long appId = getJobInfo().getJobId().hashCode();
+            PerfLogger.log("Registering with appId: " + appId, null);
+            try {
+                throw new IllegalStateException("Should be called only once");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             jobDataSpaceApplication = new JobDataSpaceApplication(appId, namingService);
+        } else {
+            PerfLogger.log("Not registering with appId: x as jobDataSpaceApplication was null", null);
         }
         jobDataSpaceApplication.startDataSpaceApplication(getInputSpace(), getOutputSpace(),
                 getGlobalSpace(), getUserSpace(), getOwner(), getId());
