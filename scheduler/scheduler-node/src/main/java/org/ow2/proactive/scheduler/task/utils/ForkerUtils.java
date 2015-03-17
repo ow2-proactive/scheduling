@@ -41,8 +41,8 @@ import java.security.KeyException;
 import org.objectweb.proactive.extensions.processbuilder.OSUser;
 import org.objectweb.proactive.extensions.processbuilder.PAOSProcessBuilderFactory;
 import org.ow2.proactive.authentication.crypto.CredData;
-import org.ow2.proactive.scheduler.common.task.Decrypter;
 import org.apache.log4j.Logger;
+import org.ow2.proactive.scheduler.newimpl.utils.Decrypter;
 
 
 /**
