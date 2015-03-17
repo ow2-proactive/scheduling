@@ -42,17 +42,9 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintStream;
 
-import org.ow2.proactive.scheduler.common.task.Decrypter;
-import org.objectweb.proactive.extensions.processbuilder.exception.NotImplementedException;
+import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.newimpl.utils.Decrypter;
-import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
-import org.ow2.proactive.scheduler.exception.ForkedJVMProcessException;
-import org.ow2.proactive.scheduler.newimpl.utils.ProcessStreamsReader;
-import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
-import org.ow2.proactive.scheduler.task.forked.ForkedJavaExecutableContainer;
-import org.ow2.proactive.scheduler.task.forked.TaskProcessTreeKiller;
-import org.ow2.proactive.scheduler.task.utils.ForkerUtils;
 import org.apache.commons.io.FileUtils;
 
 
