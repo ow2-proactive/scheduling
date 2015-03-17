@@ -38,7 +38,6 @@ import java.io.PrintStream;
 
 
 
-
 public abstract class TimedCommandExecutor implements CommandExecutor {
 
     // Maximum milliseconds for a timed command to exit
@@ -77,7 +76,7 @@ public abstract class TimedCommandExecutor implements CommandExecutor {
             throws InterruptedException, FailedExecutionException {
 
         // Create walltimer
-        WallTimer walltimer = new WallTimer(commandMaximumTime, Thread.currentThread());
+         org.ow2.proactive.scheduler.newimpl.WallTimer walltimer = new org.ow2.proactive.scheduler.newimpl.WallTimer(commandMaximumTime, Thread.currentThread());
         // Execute command
         int returnCode = this.executeCommand(outputSink, errorSink, command);
         // Stop timer
