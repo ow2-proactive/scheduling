@@ -45,8 +45,12 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
+import org.ow2.proactive.scheduler.newimpl.utils.Decrypter;
 import org.ow2.proactive.scheduler.job.InternalJob;
-import org.ow2.proactive.scheduler.newimpl.*;
+import org.ow2.proactive.scheduler.newimpl.NonForkedTaskExecutor;
+import org.ow2.proactive.scheduler.newimpl.TaskExecutor;
+import org.ow2.proactive.scheduler.newimpl.TaskLauncher;
+import org.ow2.proactive.scheduler.newimpl.ProActiveForkedTaskLauncherFactory;
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.script.ScriptExecutableContainer;
 import org.ow2.proactive.scheduler.util.TaskLogger;
@@ -80,9 +84,9 @@ public class InternalScriptTask extends InternalTask {
             NodeException {
         logger.info(getTaskInfo().getTaskId(), "creating script task launcher");
         TaskLauncher launcher = (TaskLauncher) PAActiveObject.newActive(TaskLauncher.class.getName(),
-                new Object[] { getDefaultTaskLauncherInitializer(job), new TaskLauncherFactory() {
+                new Object[] { getDefaultTaskLauncherInitializer(job), new ProActiveForkedTaskLauncherFactory(){
                     @Override
-                    public TaskExecutor createTaskExecutor(TaskContext context, File workingDir) {
+                    public TaskExecutor createTaskExecutor(File workingDir, Decrypter decrypter) {
                         return new NonForkedTaskExecutor();
                     }
                 } }, node);
