@@ -109,11 +109,16 @@ public class JavaTaskLauncher extends TaskLauncher {
         long duration = -1;
         long sample;
 
+        /*
         // Executable result (res or ex)
         Throwable exception = null;
         Serializable userResult = null;
         // TaskResult produced by doTask
+        */
         TaskResultImpl res;
+        duration = 0;
+        System.out.println("Mocked!");
+        /*
         try {
             //init dataspace
             executableGuard.initDataSpaces();
@@ -215,7 +220,9 @@ public class JavaTaskLauncher extends TaskLauncher {
                 if (exception != null) {
                     res = new TaskResultImpl(taskId, exception, null, duration / 1000000, null);
                 } else {
-                    res = new TaskResultImpl(taskId, userResult, null, duration / 1000000, null);
+                */
+                    res = new TaskResultImpl(taskId, new byte[0], null, duration / 1000000, null);
+        /*
                 }
                 try {
                     // logs have to be retrieved after flowscript exec if any
@@ -237,10 +244,10 @@ public class JavaTaskLauncher extends TaskLauncher {
 
             // logs are set even if the task is killed
             res.setLogs(this.getLogs());
-
+*/
             finalizeTask(terminateNotificationStub, res);
 
-        }
+  //      }
     }
 
     protected void setPropagatedVariables(JavaExecutableInitializerImpl init,
