@@ -79,7 +79,7 @@ public class JobDataSpaceApplication implements Serializable {
      * @param username  the owner of the job
      * @param jobId     unique identifier for the current job; can used to separated GLOBAL space among jobs
      */
-    public synchronized void startDataSpaceApplication(String inputURL, String outputURL, String globalURL,
+    public void startDataSpaceApplication(String inputURL, String outputURL, String globalURL,
             String userURL, String username, JobId jobId) {
         if (!alreadyRegistered) {
             try {

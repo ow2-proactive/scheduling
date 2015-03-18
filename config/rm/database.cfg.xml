@@ -16,7 +16,15 @@
         <property name="connection.driver_class">org.apache.derby.jdbc.EmbeddedDriver</property>
         <property name="connection.url">jdbc:derby:${pa.rm.home}/data/RM_DB;create=true</property>
         <property name="dialect">org.hibernate.dialect.DerbyTenFiveDialect</property>
-
+        
+        <!--
+        <property name="hibernate.format_sql">false</property>
+        <property name="hibernate.hbm2ddl.auto">update</property>
+        <property name="hibernate.jdbc.batch_size">10000</property>
+        <property name="hibernate.cache.use_first_level_cache">true</property>
+        <property name="hibernate.cache.use_second_level_cache">false</property>
+        <property name="hibernate.transaction.flush_before_completion">true</property>
+        -->
 
         <!-- MYSQL -->
 		<!--
