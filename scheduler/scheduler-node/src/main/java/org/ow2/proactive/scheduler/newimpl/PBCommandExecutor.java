@@ -54,7 +54,7 @@ public class PBCommandExecutor extends TimedCommandExecutor {
     private static final Logger logger = Logger.getLogger(PBCommandExecutor.class);
 
     // Members
-    OSProcessBuilder processBuilder;
+    private OSProcessBuilder processBuilder;
 
     /**
      * Constructor.
@@ -80,13 +80,15 @@ public class PBCommandExecutor extends TimedCommandExecutor {
     @Override
     public int executeCommand(PrintStream outputSink, PrintStream errorSink, String... command)
             throws InterruptedException, FailedExecutionException {
+
         Process process;
         ProcessStreamsReader processStreamsReader = null;
 
-        // Set command and start process
-        this.processBuilder.command(command);
 
         try {
+            // Set command and start process
+            this.processBuilder.command(command);
+
             // Start process
             process = this.processBuilder.start();
 
@@ -120,6 +122,14 @@ public class PBCommandExecutor extends TimedCommandExecutor {
             }
 
         }
+    }
+
+    public OSProcessBuilder getProcessBuilder() {
+        return processBuilder;
+    }
+
+    public void setProcessBuilder(OSProcessBuilder processBuilder) {
+        this.processBuilder = processBuilder;
     }
 
 }
