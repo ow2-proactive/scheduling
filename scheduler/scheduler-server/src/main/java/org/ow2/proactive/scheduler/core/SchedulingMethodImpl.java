@@ -177,11 +177,6 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
             List<JobDescriptor> descriptors = new ArrayList<JobDescriptor>(jobMap.size());
             descriptors.addAll(jobMap.values());
 
-
-            for (JobDescriptor j: descriptors) {
-                PerfLogger.log(j.getJobId() + ": job added" , j.getInternal().getSubmissionWatch());
-            }
-
             //ask the policy all the tasks to be schedule according to the jobs list.
             //and filter them using internal policy
             LinkedList<EligibleTaskDescriptor> taskRetrivedFromPolicy = internalPolicy.filter(currentPolicy
@@ -196,6 +191,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
             for (EligibleTaskDescriptor d: taskRetrivedFromPolicy) {
                 PerfLogger.log(d.getJobId() + ":" + d.getTaskId() + ": task eligible" , d.getInternal().getWatch());
+                break;
             }
 
             while (!taskRetrivedFromPolicy.isEmpty()) {
@@ -221,6 +217,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
                 for (EligibleTaskDescriptor d: tasksToSchedule) {
                     PerfLogger.log(d.getJobId() + ":" + d.getTaskId() + ": tasks compatible" , d.getInternal().getWatch());
+                    break;
                 }
 
                 logger.debug("required number of nodes : " + neededResourcesNumber);
@@ -231,7 +228,9 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                 final NodeSet nodeSet = getRMNodes(jobMap, neededResourcesNumber, tasksToSchedule); // Locked nodes for tasks to schedule, locked for each task's users
 
                 for (EligibleTaskDescriptor d: tasksToSchedule) {
+                    d.getInternal().getWatch().reset();
                     PerfLogger.log(d.getJobId() + ":" + d.getTaskId() + ": "+ nodeSet.size() + " nodes chosen" , d.getInternal().getWatch());
+                    break;
                 }
 
                 //start selected tasks
@@ -249,7 +248,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                                 return submitTask(jobMap, nodeSet, task, node);
                             }
                         };
-                        futures.add(threadPool.submit(t));
+                        futures.add(threadPoolSubmitter.submit(t));
                     } else {
                         tasksExecuted += submitTask(jobMap, nodeSet, task, node);
                     }

@@ -20,6 +20,11 @@ public class Watch {
         return watch.elapsed(TimeUnit.MILLISECONDS);
     }
 
+    public void reset() {
+        watch.reset();
+        watch.start();
+    }
+
     public Watch getCopy() {
         Watch newInstance = new Watch();
         newInstance.watch = this.watch;
