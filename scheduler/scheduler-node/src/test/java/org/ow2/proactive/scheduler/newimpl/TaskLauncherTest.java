@@ -1,16 +1,25 @@
 package org.ow2.proactive.scheduler.newimpl;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.List;
 
+import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
+import org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemException;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
+import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scheduler.common.util.Object2ByteConverter;
 import org.ow2.proactive.scheduler.examples.WaitAndPrint;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
+import org.ow2.proactive.scheduler.newimpl.data.TaskDataspaces;
+import org.ow2.proactive.scheduler.newimpl.utils.Decrypter;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskLauncherInitializer;
 import org.ow2.proactive.scheduler.task.script.ForkedScriptExecutableContainer;
@@ -144,7 +153,6 @@ public class TaskLauncherTest {
             return new TaskFileDataspaces();
         }
 
-        @Override
         public TaskExecutor createTaskExecutor(File workingDir, Decrypter decrypter) {
             return new NonForkedTaskExecutor();
         }
@@ -157,7 +165,6 @@ public class TaskLauncherTest {
             return new SlowDataspaces();
         }
 
-        @Override
         public TaskExecutor createTaskExecutor(File workingDir, Decrypter decrypter) {
             return new NonForkedTaskExecutor();
         }
@@ -173,6 +180,31 @@ public class TaskLauncherTest {
             } catch (IOException e){
                 throw new RuntimeException(e);
             }
+        }
+
+        @Override
+        public String getScratchURI() {
+            return null;
+        }
+
+        @Override
+        public String getInputURI() {
+            return null;
+        }
+
+        @Override
+        public String getOutputURI() {
+            return null;
+        }
+
+        @Override
+        public String getUserURI() {
+            return null;
+        }
+
+        @Override
+        public String getGlobalURI() {
+            return null;
         }
 
         @Override
@@ -195,6 +227,31 @@ public class TaskLauncherTest {
             } catch (IOException e){
                 throw new RuntimeException(e);
             }
+        }
+
+        @Override
+        public String getScratchURI() {
+            return null;
+        }
+
+        @Override
+        public String getInputURI() {
+            return null;
+        }
+
+        @Override
+        public String getOutputURI() {
+            return null;
+        }
+
+        @Override
+        public String getUserURI() {
+            return null;
+        }
+
+        @Override
+        public String getGlobalURI() {
+            return null;
         }
 
         @Override

@@ -34,13 +34,13 @@
  */
 package org.ow2.proactive.scheduler.newimpl;
 
-import java.io.File;
-
 import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
-import org.ow2.proactive.scheduler.newimpl.utils.Decrypter;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.newimpl.data.TaskDataspaces;
 import org.ow2.proactive.scheduler.newimpl.data.TaskProActiveDataspaces;
+import org.ow2.proactive.scheduler.newimpl.utils.Decrypter;
+
+import java.io.File;
 
 
 public class ProActiveForkedTaskLauncherFactory implements TaskLauncherFactory {
@@ -51,6 +51,6 @@ public class ProActiveForkedTaskLauncherFactory implements TaskLauncherFactory {
 
     @Override
     public TaskExecutor createTaskExecutor(File workingDir, Decrypter decrypter){
-        return new ForkerTaskExecutor(workingDir, decrypter);
+        return new DockerForkerTaskExecutor(workingDir, decrypter);
     }
 }

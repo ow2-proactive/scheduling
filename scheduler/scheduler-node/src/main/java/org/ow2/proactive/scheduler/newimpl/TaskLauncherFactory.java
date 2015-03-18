@@ -4,7 +4,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2014 INRIA/University of
+ * Copyright (C) 1997-2015 INRIA/University of
  *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -34,24 +34,17 @@
  */
 package org.ow2.proactive.scheduler.newimpl;
 
+import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
+import org.ow2.proactive.scheduler.common.task.TaskId;
+import org.ow2.proactive.scheduler.newimpl.data.TaskDataspaces;
+import org.ow2.proactive.scheduler.newimpl.utils.Decrypter;
+
 import java.io.File;
 import java.io.Serializable;
 
-import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
-import org.ow2.proactive.scheduler.newimpl.data.TaskProActiveDataspaces;
-import org.ow2.proactive.scheduler.common.task.TaskId;
-import org.ow2.proactive.scheduler.newimpl.data.TaskDataspaces;
 
+public interface TaskLauncherFactory extends Serializable {
+    TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService);
 
-public class TaskLauncherFactory implements Serializable {
-    public TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService) {
-        return new TaskProActiveDataspaces(taskId, namingService);
-    }
-
-    public TaskExecutor createTaskExecutor(TaskContext context, File workingDir) throws Exception {
-        TimedCommandExecutor executor = new TimedCommandExecutorFactory().createTimedCommandExecutor(context,
-                workingDir);
-        return new DockerForkerTaskExecutor(workingDir, context.getDecrypter(), executor);
-    }
-
+    TaskExecutor createTaskExecutor(File workingDir, Decrypter decrypter);
 }

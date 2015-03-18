@@ -1,12 +1,16 @@
 package org.ow2.proactive.scheduler.newimpl;
 
 import java.io.File;
+import java.util.List;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
+import org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemException;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.exception.WalltimeExceededException;
+import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
+import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scheduler.newimpl.utils.Decrypter;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
@@ -95,7 +99,6 @@ public class WalltimeTaskLauncherTest {
             return new TaskFileDataspaces();
         }
 
-        @Override
         public TaskExecutor createTaskExecutor(File workingDir, Decrypter decrypter) {
             return new NonForkedTaskExecutor();
         }
@@ -108,7 +111,6 @@ public class WalltimeTaskLauncherTest {
             return new TaskFileDataspaces();
         }
 
-        @Override
         public TaskExecutor createTaskExecutor(File workingDir, Decrypter decrypter) {
             return new ForkerTaskExecutor(workingDir, decrypter);
         }
@@ -121,7 +123,6 @@ public class WalltimeTaskLauncherTest {
             return new SlowDataspaces();
         }
 
-        @Override
         public TaskExecutor createTaskExecutor(File workingDir, Decrypter decrypter) {
             return new NonForkedTaskExecutor();
         }
@@ -133,6 +134,31 @@ public class WalltimeTaskLauncherTest {
         @Override
         public File getScratchFolder() {
             return new File(".");
+        }
+
+        @Override
+        public String getScratchURI() {
+            return null;
+        }
+
+        @Override
+        public String getInputURI() {
+            return null;
+        }
+
+        @Override
+        public String getOutputURI() {
+            return null;
+        }
+
+        @Override
+        public String getUserURI() {
+            return null;
+        }
+
+        @Override
+        public String getGlobalURI() {
+            return null;
         }
 
         @Override
@@ -151,6 +177,31 @@ public class WalltimeTaskLauncherTest {
         @Override
         public File getScratchFolder() {
             return new File(".");
+        }
+
+        @Override
+        public String getScratchURI() {
+            return null;
+        }
+
+        @Override
+        public String getInputURI() {
+            return null;
+        }
+
+        @Override
+        public String getOutputURI() {
+            return null;
+        }
+
+        @Override
+        public String getUserURI() {
+            return null;
+        }
+
+        @Override
+        public String getGlobalURI() {
+            return null;
         }
 
         @Override
