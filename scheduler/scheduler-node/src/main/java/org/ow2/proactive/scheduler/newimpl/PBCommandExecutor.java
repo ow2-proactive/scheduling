@@ -98,7 +98,12 @@ public class PBCommandExecutor extends TimedCommandExecutor {
                 processStreamsReader = new ProcessStreamsReader(process, outputSink, errorSink);
             }
 
-            return process.waitFor();
+            int returnCode = process.waitFor();
+
+            // If execution was successful wait for streams to flush content.
+            processStreamsReader.close();
+
+            return returnCode;
 
         } catch (InterruptedException e) {
             PBCommandExecutor.logger.info("Command " + Arrays.toString(command) +
