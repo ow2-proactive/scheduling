@@ -36,6 +36,8 @@ package org.ow2.proactive.scheduler.newimpl.utils;
 
 import org.apache.log4j.Logger;
 
+import org.apache.log4j.Logger;
+
 public class TaskKiller {
 
     private static final Logger logger = Logger.getLogger(TaskKiller.class);
