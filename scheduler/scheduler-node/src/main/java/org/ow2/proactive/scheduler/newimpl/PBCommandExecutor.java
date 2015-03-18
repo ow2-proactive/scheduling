@@ -101,7 +101,9 @@ public class PBCommandExecutor extends TimedCommandExecutor {
             int returnCode = process.waitFor();
 
             // If execution was successful wait for streams to flush content.
-            processStreamsReader.close();
+            if (processStreamsReader != null) {
+                processStreamsReader.close();
+            }
 
             return returnCode;
 
