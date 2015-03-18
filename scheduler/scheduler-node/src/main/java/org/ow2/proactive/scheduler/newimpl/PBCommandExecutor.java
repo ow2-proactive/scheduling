@@ -76,6 +76,7 @@ public class PBCommandExecutor extends TimedCommandExecutor {
      * @param command    Command which will be executed.
      * @return Exit code of command
      * @throws InterruptedException         Thrown when thread is interrupted during command execution.
+     * @throws NullPointerException Thrown when processBuilder is not set before executing this method.
      */
     @Override
     public int executeCommand(PrintStream outputSink, PrintStream errorSink, String... command)
