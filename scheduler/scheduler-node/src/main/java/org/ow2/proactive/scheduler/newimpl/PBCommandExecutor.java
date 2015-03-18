@@ -63,7 +63,7 @@ public class PBCommandExecutor extends TimedCommandExecutor {
      *                       commands will be executed.
      */
     public PBCommandExecutor(OSProcessBuilder processBuilder) {
-        this.processBuilder = processBuilder;
+        this.setProcessBuilder(processBuilder);
 
     }
 
@@ -87,11 +87,11 @@ public class PBCommandExecutor extends TimedCommandExecutor {
 
 
         try {
-            // Set command and start process
-            this.processBuilder.command(command);
+            // Set command 
+            this.getProcessBuilder().command(command);
 
             // Start process
-            process = this.processBuilder.start();
+            process = this.getProcessBuilder().start();
 
             // Attach stream readers
             if (outputSink != null && errorSink != null) {
