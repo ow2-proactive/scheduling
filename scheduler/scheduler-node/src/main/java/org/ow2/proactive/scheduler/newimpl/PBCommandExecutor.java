@@ -87,7 +87,7 @@ public class PBCommandExecutor extends TimedCommandExecutor {
 
 
         try {
-            // Set command 
+            // Set command
             this.getProcessBuilder().command(command);
 
             // Start process

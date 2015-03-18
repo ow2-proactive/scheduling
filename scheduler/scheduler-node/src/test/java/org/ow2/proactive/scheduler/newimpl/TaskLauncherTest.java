@@ -1,11 +1,8 @@
 package org.ow2.proactive.scheduler.newimpl;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.List;
-
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
 import org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemException;
 import org.ow2.proactive.authentication.crypto.CredData;
@@ -25,9 +22,12 @@ import org.ow2.proactive.scheduler.task.TaskLauncherInitializer;
 import org.ow2.proactive.scheduler.task.script.ForkedScriptExecutableContainer;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -147,7 +147,7 @@ public class TaskLauncherTest {
         }
     }
 
-    private class TestTaskLauncherFactory extends TaskLauncherFactory {
+    private class TestTaskLauncherFactory implements TaskLauncherFactory {
         @Override
         public TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService) {
             return new TaskFileDataspaces();
@@ -159,7 +159,7 @@ public class TaskLauncherTest {
 
     }
 
-    private class SlowDataspacesTaskLauncherFactory extends TaskLauncherFactory {
+    private class SlowDataspacesTaskLauncherFactory implements TaskLauncherFactory {
         @Override
         public TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService) {
             return new SlowDataspaces();

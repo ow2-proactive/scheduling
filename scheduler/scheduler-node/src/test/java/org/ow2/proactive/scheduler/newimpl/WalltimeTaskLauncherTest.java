@@ -1,29 +1,29 @@
 package org.ow2.proactive.scheduler.newimpl;
 
-import java.io.File;
-import java.util.List;
-
+import org.junit.Test;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
 import org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemException;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.exception.WalltimeExceededException;
-import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
-import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
-import org.ow2.proactive.scheduler.newimpl.utils.Decrypter;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
+import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.newimpl.data.TaskDataspaces;
+import org.ow2.proactive.scheduler.newimpl.utils.Decrypter;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskLauncherInitializer;
 import org.ow2.proactive.scheduler.task.script.ForkedScriptExecutableContainer;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
-import org.junit.Test;
 
-import static org.junit.Assert.*;
+import java.io.File;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
 
 
 public class WalltimeTaskLauncherTest {
@@ -93,7 +93,7 @@ public class WalltimeTaskLauncherTest {
         }
     }
 
-    private class TestTaskLauncherFactory extends TaskLauncherFactory {
+    private class TestTaskLauncherFactory implements TaskLauncherFactory {
         @Override
         public TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService) {
             return new TaskFileDataspaces();
@@ -105,19 +105,19 @@ public class WalltimeTaskLauncherTest {
 
     }
 
-    private class ForkingTaskLauncherFactory extends TaskLauncherFactory {
+    private class ForkingTaskLauncherFactory implements TaskLauncherFactory {
         @Override
         public TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService) {
             return new TaskFileDataspaces();
         }
 
         public TaskExecutor createTaskExecutor(File workingDir, Decrypter decrypter) {
-            return new ForkerTaskExecutor(workingDir, decrypter);
+            return new DockerForkerTaskExecutor(workingDir, decrypter);
         }
 
     }
 
-    private class SlowDataspacesTaskLauncherFactory extends TaskLauncherFactory {
+    private class SlowDataspacesTaskLauncherFactory implements TaskLauncherFactory {
         @Override
         public TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService) {
             return new SlowDataspaces();

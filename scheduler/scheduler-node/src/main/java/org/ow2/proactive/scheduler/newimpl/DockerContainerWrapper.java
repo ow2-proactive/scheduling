@@ -4,7 +4,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2014 INRIA/University of
+ * Copyright (C) 1997-2015 INRIA/University of
  *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -36,9 +36,6 @@ package org.ow2.proactive.scheduler.newimpl;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
-import org.objectweb.proactive.extensions.processbuilder.exception.CoreBindingException;
-import org.objectweb.proactive.extensions.processbuilder.exception.FatalProcessBuilderException;
-import org.objectweb.proactive.extensions.processbuilder.exception.OSUserException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -46,7 +43,8 @@ import java.util.*;
 
 
 /**
- *
+ * Holds container and docker runtime information. It creates bash commands (String arrays)
+ * which can be used to start, stop or remove a container.
  */
 public class DockerContainerWrapper {
 
@@ -79,6 +77,7 @@ public class DockerContainerWrapper {
 
     public static final String KILL_ARGUMENT = "stop";
     public static final String REMOVE_ARGUMENT = "rm";
+    public static final String REMOVE_FORCE_ARGUMENT = "-f";
     public static final String START_ARGUMENT = "run";
     public static final String NAME_SWITCH = "--name";
     public static final String VOLUME_SWITCH = "-v";
@@ -150,7 +149,7 @@ public class DockerContainerWrapper {
 
         // Mount scheduling from disk -- add as volume
         this.addVolumeDirectory(CentralPAPropertyRepository.PA_HOME.getValue(),
-                SCHEDULING_CONTAINER_HOME_MOUNT);
+                DockerContainerWrapper.SCHEDULING_CONTAINER_HOME_MOUNT);
     }
 
     public DockerContainerWrapper(String name, String image) {
@@ -178,26 +177,47 @@ public class DockerContainerWrapper {
      * @param commands ArrayList which holds the commands
      */
     private void sudoCommand(ArrayList<String> commands) {
-        if (this.useSudo)
+        if (this.isUseSudo()) {
             commands.add(0, System.getProperty(DockerContainerWrapper.SUDO_COMMAND_PROPERTY));
+        }
+    }
+
+    /**
+     * Construct the docker command with or without sudo.
+     * @param command ArrayList as reference which will get the first elements set to a correct
+     *                docker command.
+     * @return
+     */
+    private void addDockerCommand(ArrayList<String> command) {
+        // Add sudo if wished
+       this.sudoCommand(command);
+
+        // Add docker command to correct position.
+        if (this.isUseSudo()) {
+            command.add(1, System.getProperty(DockerContainerWrapper.DOCKER_COMMAND_PROPERTY));
+        } else {
+            command.add(0, System.getProperty(DockerContainerWrapper.DOCKER_COMMAND_PROPERTY));
+        }
     }
 
     /**
      * Creates an remove command.
+     * @param force Defines whether container removal is forced or not.
      * @return Array of strings, which represent the command to remove the docker container.
      */
-    public String[] remove() {
+    public String[] remove(boolean force) {
         // Create commands array
         ArrayList<String> command = new ArrayList<String>();
 
-        // Create sudo if necessary
-        this.sudoCommand(command);
-
-        // Add docker command
-        command.add(System.getProperty(DockerContainerWrapper.DOCKER_COMMAND_PROPERTY));
+        // Add docker command with or without sudo
+        addDockerCommand(command);
 
         // Add stop to stop/kill the container
-        command.add(REMOVE_ARGUMENT);
+        command.add(DockerContainerWrapper.REMOVE_ARGUMENT);
+
+        if(force == true) {
+            command.add(DockerContainerWrapper.REMOVE_FORCE_ARGUMENT);
+        }
 
         // Add taskid, because the container got it as a name
         command.add(this.name);
@@ -214,24 +234,21 @@ public class DockerContainerWrapper {
         // Create commands array
         ArrayList<String> command = new ArrayList<String>();
 
-        // Create sudo if necessary
-        this.sudoCommand(command);
-
-        // Add docker command
-        command.add(System.getProperty(DockerContainerWrapper.DOCKER_COMMAND_PROPERTY));
+        // Add docker with or without sudo
+        addDockerCommand(command);
 
         // Add stop to stop/kill the container
-        command.add(START_ARGUMENT);
+        command.add(DockerContainerWrapper.START_ARGUMENT);
 
         // Add name switch
-        command.add(NAME_SWITCH);
+        command.add(DockerContainerWrapper.NAME_SWITCH);
 
         // Add taskid, because the container got it as a name
         command.add(this.name);
 
         // Add volumes
         for (Map.Entry<String, String> volume : this.volumeDirectoryMap.entrySet()) {
-            command.add(VOLUME_SWITCH);
+            command.add(DockerContainerWrapper.VOLUME_SWITCH);
             command.add(volume.getKey() + ":" + volume.getValue());
         }
 
@@ -243,7 +260,7 @@ public class DockerContainerWrapper {
         command.add(this.image);
 
         // Add java command
-        command.add(INSIDE_CONTAINER_JAVA_COMMAND);
+        command.add(DockerContainerWrapper.INSIDE_CONTAINER_JAVA_COMMAND);
 
         // TODO Add java security policy.
         /**
@@ -259,8 +276,8 @@ public class DockerContainerWrapper {
         command.add(INSIDE_CONTAINER_SECURITY_POLICY);
          */
         // ADD classpath
-        command.add(INSIDE_CONTAINER_CLASSPATH_SWITCH);
-        command.add(INSIDE_CONTAINER_CLASSPATH);
+        command.add(DockerContainerWrapper.INSIDE_CONTAINER_CLASSPATH_SWITCH);
+        command.add(DockerContainerWrapper.INSIDE_CONTAINER_CLASSPATH);
 
         // DEBUG - debug
         //command.add("-Xdebug");
@@ -284,14 +301,11 @@ public class DockerContainerWrapper {
         // Create commands array
         ArrayList<String> command = new ArrayList<String>();
 
-        // Create sudo if necessary
-        this.sudoCommand(command);
-
-        // Add docker command
-        command.add(System.getProperty(DockerContainerWrapper.DOCKER_COMMAND_PROPERTY));
+        // Add docker command with or without sudo
+        addDockerCommand(command);
 
         // Add stop to stop/kill the container
-        command.add(KILL_ARGUMENT);
+        command.add(DockerContainerWrapper.KILL_ARGUMENT);
 
         // Add taskid, because the container got it as a name
         command.add(this.name);

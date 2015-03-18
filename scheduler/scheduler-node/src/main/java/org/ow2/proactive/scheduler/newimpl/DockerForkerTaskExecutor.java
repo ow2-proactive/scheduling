@@ -127,7 +127,7 @@ public class DockerForkerTaskExecutor implements TaskExecutor {
 
         File serializedContext = null;
         try {
-            // Check if process builder was added with constructor and create it if neccessary
+            // Check if process builder was added with constructor and create it if necessary
             if( this.executor == null) {
                 this.executor = new PBCommandExecutor(this.createForkedProcess(context));
             }
@@ -180,7 +180,7 @@ public class DockerForkerTaskExecutor implements TaskExecutor {
                 this.executor.executeTimedWhileInterrupted(null, null, stopCommand);
 
                 // Remove container
-                String[] removeCommand = container.remove();
+                String[] removeCommand = container.remove(false);
                 this.executor.executeTimedWhileInterrupted(null, null, removeCommand);
             } catch (FailedExecutionException e) {
                 DockerForkerTaskExecutor.logger.warn("Failed to kill the running container.", e);

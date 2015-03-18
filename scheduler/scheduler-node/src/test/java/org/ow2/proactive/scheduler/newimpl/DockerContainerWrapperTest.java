@@ -63,8 +63,10 @@ public class DockerContainerWrapperTest {
         dockerStopSudo(true);
         dockerStopSudo(false);
 
-        dockerRemoveSudo(true);
-        dockerRemoveSudo(false);
+        dockerRemoveSudo(true, true);
+        dockerRemoveSudo(true, false);
+        dockerRemoveSudo(false, true);
+        dockerRemoveSudo(false, false);
     }
 
     public void dockerStartSudo(boolean useSudo) throws OSUserException, IOException,
@@ -113,14 +115,14 @@ public class DockerContainerWrapperTest {
         assertEquals(name, command[index++]);
     }
 
-    public void dockerRemoveSudo(boolean useSudo) throws OSUserException, IOException,
+    public void dockerRemoveSudo(boolean useSudo, boolean force) throws OSUserException, IOException,
             FatalProcessBuilderException, CoreBindingException {
         String name = "container";
         DockerContainerWrapper container = new DockerContainerWrapper(name);
 
         container.setUseSudo(useSudo);
 
-        String[] command = container.remove();
+        String[] command = container.remove(force);
 
         // Take a running index to go through commands and check for commands to be made correctly
         int index = 0;
@@ -133,6 +135,11 @@ public class DockerContainerWrapperTest {
         assertEquals(System.getProperty(DockerContainerWrapper.DOCKER_COMMAND_PROPERTY), command[index++]);
         // check if run comes next
         assertEquals(DockerContainerWrapper.REMOVE_ARGUMENT, command[index++].toLowerCase());
+
+        // When force is true the next argument must be the force switch
+        if(force == true) {
+            assertEquals(DockerContainerWrapper.REMOVE_FORCE_ARGUMENT, command[index++].toLowerCase());
+        }
 
         assertEquals(name, command[index++]);
     }

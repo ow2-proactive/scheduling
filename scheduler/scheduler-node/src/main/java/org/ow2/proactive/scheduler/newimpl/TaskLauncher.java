@@ -66,7 +66,7 @@ public class TaskLauncher {
 
     private static final Logger logger = Logger.getLogger(TaskLauncher.class);
 
-    private ProActiveForkedTaskLauncherFactory factory = new ProActiveForkedTaskLauncherFactory();
+    private TaskLauncherFactory factory = new ProActiveForkedTaskLauncherFactory();
 
     private TaskId taskId;
     private TaskLauncherInitializer initializer;
@@ -84,7 +84,7 @@ public class TaskLauncher {
     public TaskLauncher() {
     }
 
-    public TaskLauncher(TaskLauncherInitializer initializer, ProActiveForkedTaskLauncherFactory factory) {
+    public TaskLauncher(TaskLauncherInitializer initializer, TaskLauncherFactory factory) {
         this(initializer);
         this.factory = factory;
     }

@@ -1,18 +1,18 @@
 package org.ow2.proactive.scheduler.newimpl;
 
-import java.io.File;
-import java.io.PrintStream;
-import java.util.List;
-import java.util.concurrent.Semaphore;
-
 import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
 import org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemException;
-import org.ow2.proactive.scheduler.newimpl.utils.Decrypter;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scheduler.newimpl.data.TaskDataspaces;
+import org.ow2.proactive.scheduler.newimpl.utils.Decrypter;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
+
+import java.io.File;
+import java.io.PrintStream;
+import java.util.List;
+import java.util.concurrent.Semaphore;
 
 public class TestTaskLauncherFactory extends ProActiveForkedTaskLauncherFactory {
     private Semaphore taskRunning;
@@ -38,7 +38,7 @@ public class TestTaskLauncherFactory extends ProActiveForkedTaskLauncherFactory 
                 if(taskRunning != null){
                     taskRunning.release();
                 }
-                return new ForkerTaskExecutor(workingDir, decrypter).execute(container, output, error);
+                return new DockerForkerTaskExecutor(workingDir, decrypter).execute(container, output, error);
             }
         };
     }
