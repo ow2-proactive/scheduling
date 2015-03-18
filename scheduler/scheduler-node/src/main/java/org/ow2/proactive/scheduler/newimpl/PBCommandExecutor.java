@@ -115,12 +115,6 @@ public class PBCommandExecutor extends TimedCommandExecutor {
         } catch (IOException e) {
             PBCommandExecutor.logger.warn("Unable to execute command:\n" + Arrays.toString(command), e);
             throw new FailedExecutionException(e.getMessage());
-        } finally {
-            // Waits for content to be flushed
-            if (processStreamsReader != null) {
-                processStreamsReader.close();
-            }
-
         }
     }
 
