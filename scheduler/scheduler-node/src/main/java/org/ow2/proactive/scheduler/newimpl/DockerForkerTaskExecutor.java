@@ -55,16 +55,34 @@ public class DockerForkerTaskExecutor implements TaskExecutor {
     private Class<DockerForkerTaskExecutor> taskExecutorClass = DockerForkerTaskExecutor.class;
     private TimedCommandExecutor executor;
 
+    /**
+     * Constructor. This constructor sets the executor to null, which will generate a standard executor
+     * when execute method is called.
+     * @param workingDir Working directory for task.
+     * @param decrypter Decryper.
+     */
     public DockerForkerTaskExecutor(File workingDir, Decrypter decrypter) {
         this(workingDir, decrypter, null);
     }
 
+    /**
+     * Constructor.
+     * @param workingDir Working directory for task.
+     * @param decrypter Decryper.
+     * @param executor Command executor: will execute given commands in a different process.
+     */
     public DockerForkerTaskExecutor(File workingDir, Decrypter decrypter, TimedCommandExecutor executor) {
         this.workingDir = workingDir;
         this.decrypter = decrypter;
         this.executor = executor;
     }
 
+    /**
+     * Creates a standard process builder.
+     * @param context TaskContext, which holds all task's necessary information.
+     * @return Returns a valied process builder for the current operating system.
+     * @throws Exception
+     */
     private OSProcessBuilder createForkedProcess(TaskContext context)
             throws Exception {
         OSProcessBuilder pb;
@@ -84,6 +102,18 @@ public class DockerForkerTaskExecutor implements TaskExecutor {
     }
 
     // Called by forker to run context inside docker container
+
+    /**
+     * Executes given task withing a docker container, by writing task onto the hard disk and
+     * mounting that directory inside the container it will be executed in. After execution
+     * the task result will be written onto hard disk and being send to the
+     * scheduler.
+     * @param context TaskContext.
+     * @param outputSink Standard output.
+     * @param errorSink Error Output.
+     * @return A taskResult when successful or not. Might contains exceptions so that the scheduler
+     * can display the occurred error.
+     */
     public TaskResultImpl execute(TaskContext context, PrintStream outputSink, PrintStream errorSink) {
         // Create docker container
         DockerContainerWrapper container = new DockerContainerWrapper(context.getTaskId().value());
