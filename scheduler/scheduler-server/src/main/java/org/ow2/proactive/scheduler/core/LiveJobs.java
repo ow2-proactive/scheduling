@@ -349,35 +349,40 @@ class LiveJobs {
     }
 
     void taskStarted(InternalJob job, InternalTask task, TaskLauncher launcher) {
-        checkJobAccess(job.getId());
-        if (runningTasksData.containsKey(task.getId())) {
-            throw new IllegalStateException("Task is already started");
+        PerfLogger.log(task.getJobId() + " : " + task.getId() + ": locking", task.getWatch());
+        synchronized (job) {
+            //checkJobAccess(job.getId());
+            // TODO check, big change
+            if (runningTasksData.containsKey(task.getId())) {
+                throw new IllegalStateException("Task is already started");
+            }
+
+            runningTasksData.put(task.getId(), new RunningTaskData(task, job.getOwner(), job.getCredentials(),
+                    launcher));
+
+            boolean firstTaskStarted;
+
+            if (job.getStartTime() < 0) {
+                // if it is the first task of this job
+                job.start();
+                updateJobInSchedulerState(job, SchedulerEvent.JOB_PENDING_TO_RUNNING);
+                jlogger.info(job.getId(), "started");
+                firstTaskStarted = true;
+            } else {
+                firstTaskStarted = false;
+            }
+
+            // set the different informations on task
+            job.startTask(task);
+            dbManager.jobTaskStarted(job, task, firstTaskStarted);
+
+            listener.taskStateUpdated(job.getOwner(), new NotificationData<TaskInfo>(
+                    SchedulerEvent.TASK_PENDING_TO_RUNNING, new TaskInfoImpl((TaskInfoImpl) task.getTaskInfo())));
+
+            //fill previous task progress with 0, means task has started
+            task.setProgress(0);
         }
-
-        runningTasksData.put(task.getId(), new RunningTaskData(task, job.getOwner(), job.getCredentials(),
-            launcher));
-
-        boolean firstTaskStarted;
-
-        if (job.getStartTime() < 0) {
-            // if it is the first task of this job
-            job.start();
-            updateJobInSchedulerState(job, SchedulerEvent.JOB_PENDING_TO_RUNNING);
-            jlogger.info(job.getId(), "started");
-            firstTaskStarted = true;
-        } else {
-            firstTaskStarted = false;
-        }
-
-        // set the different informations on task
-        job.startTask(task);
-        dbManager.jobTaskStarted(job, task, firstTaskStarted);
-
-        listener.taskStateUpdated(job.getOwner(), new NotificationData<TaskInfo>(
-            SchedulerEvent.TASK_PENDING_TO_RUNNING, new TaskInfoImpl((TaskInfoImpl) task.getTaskInfo())));
-
-        //fill previous task progress with 0, means task has started
-        task.setProgress(0);
+        PerfLogger.log(task.getJobId() + " : " + task.getId() + ": releasing", task.getWatch());
     }
 
     TerminationData emptyResult(TaskId taskId) {

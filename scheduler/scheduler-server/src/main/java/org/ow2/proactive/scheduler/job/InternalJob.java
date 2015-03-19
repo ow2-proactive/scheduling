@@ -249,7 +249,7 @@ public abstract class InternalJob extends JobState {
     /**
      * Start dataspace configuration and application
      */
-    public void startDataSpaceApplication(NamingService namingService) {
+    public synchronized void startDataSpaceApplication(NamingService namingService) {
         if (jobDataSpaceApplication == null) {
             long appId = getJobInfo().getJobId().hashCode();
             jobDataSpaceApplication = new JobDataSpaceApplication(appId, namingService);

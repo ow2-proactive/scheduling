@@ -130,6 +130,9 @@ public enum PASchedulerProperties {
      * until the scheduling loop will block as well.*/
     SCHEDULER_STARTTASK_THREADNUMBER("pa.scheduler.core.starttask.threadnumber", PropertyType.INTEGER),
 
+    /** Allow submission of tasks in parallel.*/
+    SCHEDULER_STARTTASK_PARALLEL("pa.scheduler.core.starttask.parallel", PropertyType.BOOLEAN),
+
     /** Maximum number of threads used to send events to clients. This property defines the number of clients
      * than can block at the same time. If this number is reached, every clients won't receive events until
      * a thread unlock. */
