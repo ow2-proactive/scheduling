@@ -968,6 +968,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
      * {@inheritDoc}
      */
     @Override
+    @ImmediateService
     public List<JobUsage> getMyAccountUsage(Date startDate, Date endDate) throws NotConnectedException,
             PermissionException {
         UserIdentificationImpl ident = frontendState.checkPermission("getMyAccountUsage",
@@ -979,6 +980,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
      * {@inheritDoc}
      */
     @Override
+    @ImmediateService
     public List<JobUsage> getAccountUsage(String user, Date startDate, Date endDate)
             throws NotConnectedException, PermissionException {
         frontendState.checkPermission("getAccountUsage", "You don't have permissions to get usage data of " +
