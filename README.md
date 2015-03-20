@@ -22,10 +22,10 @@ To start a node:
 
 ## Documentation
 
-    http://doc.activeeon.com/
+http://doc.activeeon.com/
 
-## Known bugs and issues:
+## Known bugs and issues
 
-    http://bugs.activeeon.com/
+http://bugs.activeeon.com/
 
 Enjoy ProActive Workflows & Scheduling!
