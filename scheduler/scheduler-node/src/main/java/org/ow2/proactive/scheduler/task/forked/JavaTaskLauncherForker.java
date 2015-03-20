@@ -180,10 +180,8 @@ public class JavaTaskLauncherForker extends JavaTaskLauncher implements ForkerSt
                     logger.warn("Loggers are not shutdown !", e);
                 }
                 executableGuard
-                        .copyScratchDataToOutput(getTaskLogsSelectors(OutputAccessMode.TransferToOutputSpace));
+                        .copyScratchDataToOutput(getTaskLogsSelectors(OutputAccessMode.TransferToUserSpace));
             }
-            executableGuard
-                    .copyScratchDataToOutput(getTaskLogsSelectors(OutputAccessMode.TransferToUserSpace));
 
             if (userResult instanceof TaskResult) {
                 // Override the logs since they are stored on forker side
