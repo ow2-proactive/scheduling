@@ -432,6 +432,7 @@ public class JavaForkerExecutable extends JavaExecutable implements ForkerStarte
         if (forkEnvironment == null || !contains("java.security.policy", forkEnvironment.getJVMArguments())) {
             try {
                 fpolicy = createTempFile("forked_jts", null);
+                fpolicy.deleteOnExit();
                 PrintStream out = new PrintStream(fpolicy);
                 out.print(execInitializer.getJavaTaskLauncherInitializer().getPolicyContent());
                 out.close();
@@ -462,6 +463,7 @@ public class JavaForkerExecutable extends JavaExecutable implements ForkerStarte
         if (forkEnvironment == null || !contains("log4j.configuration", forkEnvironment.getJVMArguments())) {
             try {
                 flog4j = createTempFile("forked_jtl", null);
+                flog4j.deleteOnExit();
                 PrintStream out = new PrintStream(flog4j);
                 out.print(execInitializer.getJavaTaskLauncherInitializer().getLog4JContent());
                 out.close();
