@@ -217,11 +217,8 @@ public class SchedulerStateRecoverHelper {
             if (o1.getFinishedTime() == o2.getFinishedTime()) { // skipped tasks might have same finished time
                 if (o1.dependsOn(o2)) {
                     return 1;
-                } else if(o2.dependsOn(o1)) {
-                    return -1;
                 } else {
-                    // fallback on task id as no ordering can be computed
-                    return o1.getId().compareTo(o2.getId());
+                    return -1;
                 }
             }
             return (int) (o1.getFinishedTime() - o2.getFinishedTime());
