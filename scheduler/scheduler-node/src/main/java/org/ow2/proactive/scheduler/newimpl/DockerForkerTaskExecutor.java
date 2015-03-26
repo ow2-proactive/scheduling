@@ -186,10 +186,25 @@ public class DockerForkerTaskExecutor implements TaskExecutor {
                 DockerForkerTaskExecutor.logger.warn("Failed to kill the running container.", e);
             } catch (InterruptedException e) {
                 DockerForkerTaskExecutor.logger.warn("Killing of container " + container.getName() +
-                        " interrupted." + "It can be stopped and remove with: sudo docker rm -f " +
+                        " interrupted." + "Additional thread will be started to handle forceful container removal." +
                         container.getName(), e);
-            }
 
+                final String[] forceRemoveCommand = container.remove(true);
+                final String failureMessage = "Container "+container.getName()+" could not be removed. " +
+                        "It must be removed manually.";
+                // Last chance to remove container, start a thread which forces the removal of the container
+                new Thread() {
+                    public void run() {
+                        try {
+                            executor.executeCommand(null, null, forceRemoveCommand);
+                        } catch (FailedExecutionException ignored) {
+                            DockerForkerTaskExecutor.logger.warn(failureMessage);
+                        } catch (InterruptedException ignore) {
+                            DockerForkerTaskExecutor.logger.warn(failureMessage);
+                        }
+                    }
+                }.start();
+            } // Catch
         }
     }
 
