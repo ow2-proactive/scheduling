@@ -246,6 +246,7 @@ public class TaskLauncher {
         logger.info("TaskLauncher terminated");
     }
 
+    @ImmediateService
     public int getProgress() {
         // not supported anymore
         return 0;
