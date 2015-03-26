@@ -1,8 +1,6 @@
 package org.ow2.proactive.scheduler.core.db;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
@@ -197,32 +195,8 @@ public class SchedulerStateRecoverHelper {
                 task.setStatus(TaskStatus.PENDING);
             }
         }
-        //sort the finished task according to their finish time.
-        //to be sure to be in the right tree browsing.
-        Collections.sort(tasksList, new ExecutionOrderComparator());
-
-        return tasksList;
-    }
-
-    private static class ExecutionOrderComparator implements Comparator<InternalTask> {
-        /**
-         * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
-         * @param o1 First InternalTask to be compared.
-         * @param o2 Second InternalTask to be compared with the first.
-         * @return a negative integer, zero, or a positive integer as the
-         * 	       first argument is less than, equal to, or greater than the
-         *	       second. 
-         */
-        public int compare(InternalTask o1, InternalTask o2) {
-            if (o1.getFinishedTime() == o2.getFinishedTime()) { // skipped tasks might have same finished time
-                if (o1.dependsOn(o2)) {
-                    return 1;
-                } else {
-                    return -1;
-                }
-            }
-            return (int) (o1.getFinishedTime() - o2.getFinishedTime());
-        }
+        //sort parents before children
+        return TopologicalTaskSorter.sortInternalTasks(tasksList);
     }
 
 }
