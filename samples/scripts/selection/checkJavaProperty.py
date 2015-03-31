@@ -1,10 +1,8 @@
-#******************************************************
-#* EXEMPLE SCRIPT : Using a selection utils method to select a host
-#*****************************************************/
 from org.ow2.proactive.scripting.helper.selection import SelectionUtils
 
-#Check if java property 'a.jvm.property' value is 'toto'
-if SelectionUtils.checkJavaProperty("a.jvm.property", "toto"):
-	selected = true;
+# Check if java property 'java.vendor' value is 'Oracle Corporation'
+if SelectionUtils.checkJavaProperty("java.vendor", "Oracle Corporation"):
+    selected = True;
 else:
-	selected = false;
+    selected = False;
+

@@ -1,2 +1,3 @@
+architecture=x64
 ram=2048
-architecture=x86
+

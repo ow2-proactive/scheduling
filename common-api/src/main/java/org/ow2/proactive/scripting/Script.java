@@ -213,7 +213,7 @@ public abstract class Script<E> implements Serializable {
      * @throws InvalidScriptException if the creation fails.
      */
     public Script(Script<?> script2) throws InvalidScriptException {
-        this(script2.script, script2.scriptEngineLookup, script2.parameters, script2.scriptName);
+        this(script2.getScript(), script2.scriptEngineLookup, script2.getParameters(), script2.getScriptName());
     }
 
     /** Create a script from another script object
@@ -313,7 +313,7 @@ public abstract class Script<E> implements Serializable {
         engine.getContext().setWriter(new PrintWriter(outputBoundedWriter));
         engine.getContext().setErrorWriter(new PrintWriter(errorBoundedWriter));
 
-        engine.getContext().setAttribute(ScriptEngine.FILENAME, scriptName, ScriptContext.ENGINE_SCOPE);
+        engine.getContext().setAttribute(ScriptEngine.FILENAME, getScriptName(), ScriptContext.ENGINE_SCOPE);
 
         try {
             Bindings bindings = engine.getBindings(ScriptContext.ENGINE_SCOPE);
@@ -435,18 +435,18 @@ public abstract class Script<E> implements Serializable {
 
     @Override
     public String toString() {
-        return scriptName;
+        return getScriptName();
     }
 
     public String display() {
         String nl = System.getProperty("line.separator");
-        return " { " + nl + "Script '" + scriptName + '\'' + nl + "\tscriptEngineLookup = '" +
+        return " { " + nl + "Script '" + getScriptName() + '\'' + nl + "\tscriptEngineLookup = '" +
             scriptEngineLookup + '\'' + nl + "\tscript = " + nl + script + nl + "\tid = " + nl + id + nl +
             "\tparameters = " + Arrays.toString(parameters) + nl + '}';
     }
 
     public void overrideDefaultScriptName(String defaultScriptName) {
-        if (scriptName.equals(getDefaultScriptName())) {
+        if (getScriptName().equals(getDefaultScriptName())) {
             scriptName = defaultScriptName;
         }
     }
