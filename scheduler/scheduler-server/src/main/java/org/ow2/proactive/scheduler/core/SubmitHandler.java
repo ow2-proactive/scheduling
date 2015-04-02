@@ -23,6 +23,8 @@ class SubmitHandler implements Runnable {
 
         service.jobs.jobSubmitted(job, service.infrastructure.getTaskClassServer(), service.infrastructure
                 .getSpacesSupport());
+
+        service.wakeUpSchedulingThread();
     }
 
 }

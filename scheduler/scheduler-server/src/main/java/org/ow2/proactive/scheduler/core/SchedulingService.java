@@ -66,7 +66,9 @@ public class SchedulingService {
 
     private Thread pinger;
 
-    /** Url used to store the last url of the RM (used to try to reconnect to the rm when it is down)*/
+    /**
+     * Url used to store the last url of the RM (used to try to reconnect to the rm when it is down)
+     */
     private URI lastRmUrl;
 
     public SchedulingService(SchedulingInfrastructure infrastructure, SchedulerStateUpdate listener,
@@ -96,6 +98,7 @@ public class SchedulingService {
 
         schedulingThread = new SchedulingThread(schedulingMethod, this);
         schedulingThread.start();
+
         pinger = new NodePingThread(this);
         pinger.start();
     }
@@ -140,6 +143,7 @@ public class SchedulingService {
         status = SchedulerStatus.PAUSED;
         logger.info("Scheduler has just been paused !");
         listener.schedulerStateUpdated(SchedulerEvent.PAUSED);
+
         return true;
     }
 
@@ -162,6 +166,9 @@ public class SchedulingService {
         status = SchedulerStatus.STARTED;
         logger.info("Scheduler has just been resumed !");
         listener.schedulerStateUpdated(SchedulerEvent.RESUMED);
+
+        wakeUpSchedulingThread();
+
         return true;
     }
 
@@ -210,8 +217,8 @@ public class SchedulingService {
             }
             try {
                 infrastructure.getRMProxiesManager().getUserRMProxy(taskData.getUser(),
-                        taskData.getCredentials()).releaseNodes(nodes,
-                        taskData.getTask().getCleaningScript());
+                        taskData.getCredentials())
+                        .releaseNodes(nodes, taskData.getTask().getCleaningScript());
             } catch (Throwable t) {
                 logger.error("Failed to release nodes", t);
             }
@@ -353,9 +360,10 @@ public class SchedulingService {
             return infrastructure.getClientOperationsThreadPool().submit(new Callable<Boolean>() {
                 @Override
                 public Boolean call() throws Exception {
-                    return jobs.resumeJob(jobId);
+                    Boolean result = jobs.resumeJob(jobId);
+                    wakeUpSchedulingThread();
+                    return result;
                 }
-
             }).get();
         } catch (Exception e) {
             throw handleFutureWaitException(e);
@@ -372,6 +380,7 @@ public class SchedulingService {
                 public void run() {
                     jlogger.info(jobId, "request to change the priority to " + priority);
                     jobs.changeJobPriority(jobId, priority);
+                    wakeUpSchedulingThread();
                 }
             }).get();
         } catch (Exception e) {
@@ -401,6 +410,7 @@ public class SchedulingService {
             public void run() {
                 TerminationData terminationData = jobs.restartTaskOnNodeFailure(task);
                 terminationData.handleTermination(SchedulingService.this);
+                wakeUpSchedulingThread();
             }
         });
     }
@@ -423,16 +433,19 @@ public class SchedulingService {
             if (status.isUnusable()) {
                 return false;
             }
-            return infrastructure.getClientOperationsThreadPool().submit(new Callable<Boolean>() {
+            
+            Boolean result = infrastructure.getClientOperationsThreadPool().submit(new Callable<Boolean>() {
                 @Override
                 public Boolean call() throws Exception {
                     TerminationData terminationData = jobs.killJob(jobId);
                     boolean jobKilled = terminationData.jobTeminated(jobId);
                     submitTerminationDataHandler(terminationData);
+                    wakeUpSchedulingThread();
                     return jobKilled;
                 }
-
             }).get();
+
+            return result;
         } catch (Exception e) {
             throw handleFutureWaitException(e);
         }
@@ -451,15 +464,19 @@ public class SchedulingService {
             if (status.isUnusable()) {
                 return false;
             }
-            return infrastructure.getClientOperationsThreadPool().submit(new Callable<Boolean>() {
+
+            Boolean result = infrastructure.getClientOperationsThreadPool().submit(new Callable<Boolean>() {
                 @Override
                 public Boolean call() throws Exception {
                     TerminationData terminationData = jobs.killTask(jobId, taskName);
                     boolean taskKilled = terminationData.taskTeminated(jobId, taskName);
                     submitTerminationDataHandler(terminationData);
+                    wakeUpSchedulingThread();
                     return taskKilled;
                 }
             }).get();
+
+            return result;
         } catch (ExecutionException e) {
             if (e.getCause() instanceof UnknownTaskException) {
                 throw (UnknownTaskException) e.getCause();
@@ -479,15 +496,19 @@ public class SchedulingService {
             if (status.isUnusable()) {
                 return false;
             }
-            return infrastructure.getClientOperationsThreadPool().submit(new Callable<Boolean>() {
+
+            Boolean result = infrastructure.getClientOperationsThreadPool().submit(new Callable<Boolean>() {
                 @Override
                 public Boolean call() throws Exception {
                     TerminationData terminationData = jobs.restartTask(jobId, taskName, restartDelay);
                     boolean taskRestarted = terminationData.taskTeminated(jobId, taskName);
                     submitTerminationDataHandler(terminationData);
+                    wakeUpSchedulingThread();
                     return taskRestarted;
                 }
             }).get();
+
+            return result;
         } catch (ExecutionException e) {
             if (e.getCause() instanceof UnknownTaskException) {
                 throw (UnknownTaskException) e.getCause();
@@ -504,15 +525,18 @@ public class SchedulingService {
     public boolean preemptTask(final JobId jobId, final String taskName, final int restartDelay)
             throws UnknownJobException, UnknownTaskException {
         try {
-            return infrastructure.getClientOperationsThreadPool().submit(new Callable<Boolean>() {
+            Boolean result = infrastructure.getClientOperationsThreadPool().submit(new Callable<Boolean>() {
                 @Override
                 public Boolean call() throws Exception {
                     TerminationData terminationData = jobs.preemptTask(jobId, taskName, restartDelay);
                     boolean taskRestarted = terminationData.taskTeminated(jobId, taskName);
                     submitTerminationDataHandler(terminationData);
+                    wakeUpSchedulingThread();
                     return taskRestarted;
                 }
             }).get();
+
+            return result;
         } catch (ExecutionException e) {
             if (e.getCause() instanceof UnknownTaskException) {
                 throw (UnknownTaskException) e.getCause();
@@ -554,6 +578,7 @@ public class SchedulingService {
                 TerminationData terminationData = jobs.taskTerminatedWithResult(taskId,
                         (TaskResultImpl) taskResult);
                 terminationData.handleTermination(SchedulingService.this);
+                wakeUpSchedulingThread();
             }
         });
     }
@@ -578,6 +603,7 @@ public class SchedulingService {
      * - Enabling/Disabling automatic reconnection: pa.scheduler.core.rmconnection.autoconnect (default is true)
      * - Delay in ms between 2 consecutive attempts: pa.scheduler.core.rmconnection.timespan (default is 5000 ms)
      * - Maximum number of attempts: pa.scheduler.core.rmconnection.attempts (default is 10)
+     *
      * @return true if the RM is alive, false otherwise.
      */
     private boolean checkAndReconnectRM() {
@@ -815,6 +841,14 @@ public class SchedulingService {
                 }
             }
         }
+    }
+
+    protected void sleepSchedulingThread() throws InterruptedException {
+        schedulingThread.sleepSchedulingThread();
+    }
+
+    protected void wakeUpSchedulingThread() {
+        schedulingThread.wakeUpSchedulingThread();
     }
 
 }

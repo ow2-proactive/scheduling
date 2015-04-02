@@ -144,7 +144,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
      * 	<li>Get an ordered list of the selected tasks to be scheduled
      * 	<li>While returned tasks list is not empty :
      * 		<ul>
-     * 			<li>Get n first compatible tasks (same selection script, same node exclusion
+     * 			<li>Get n first compatible tasks (same selection script, same node exclusion)
      * 			<li>Ask nodes to RM according to the previous specification
      * 			<li>Try to start each tasks
      * 			<li>Job started event if needed
@@ -170,17 +170,17 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
             //ask the policy all the tasks to be schedule according to the jobs list.
             //and filter them using internal policy
-            LinkedList<EligibleTaskDescriptor> taskRetrivedFromPolicy = internalPolicy.filter(currentPolicy
+            LinkedList<EligibleTaskDescriptor> taskRetrievedFromPolicy = internalPolicy.filter(currentPolicy
                     .getOrderedTasks(descriptors));
 
             //if there is no task to scheduled, return
-            if (taskRetrivedFromPolicy == null || taskRetrivedFromPolicy.size() == 0) {
+            if (taskRetrievedFromPolicy == null || taskRetrievedFromPolicy.size() == 0) {
                 return numberOfTaskStarted;
             }
 
-            logger.debug("eligible tasks : " + taskRetrivedFromPolicy.size());
+            logger.debug("eligible tasks : " + taskRetrievedFromPolicy.size());
 
-            while (!taskRetrivedFromPolicy.isEmpty()) {
+            while (!taskRetrievedFromPolicy.isEmpty()) {
                 //get rmState and update it in scheduling policy
                 RMState rmState = getRMProxiesManager().getRmProxy().getState();
                 currentPolicy.setRMState(rmState);
@@ -195,9 +195,9 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                 //get the next compatible tasks from the whole returned policy tasks
                 LinkedList<EligibleTaskDescriptor> tasksToSchedule = new LinkedList<EligibleTaskDescriptor>();
                 int neededResourcesNumber = 0;
-                while (taskRetrivedFromPolicy.size() > 0 && neededResourcesNumber == 0) {
+                while (taskRetrievedFromPolicy.size() > 0 && neededResourcesNumber == 0) {
                     //the loop will search for next compatible task until it find something
-                    neededResourcesNumber = getNextcompatibleTasks(jobMap, taskRetrivedFromPolicy,
+                    neededResourcesNumber = getNextcompatibleTasks(jobMap, taskRetrievedFromPolicy,
                             freeResourcesNb, tasksToSchedule);
                 }
                 logger.debug("required number of nodes : " + neededResourcesNumber);
@@ -257,6 +257,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                     }
                 }
             }
+
             return numberOfTaskStarted;
         } finally {
             schedulingService.unlockJobsToSchedule(jobMap.values());

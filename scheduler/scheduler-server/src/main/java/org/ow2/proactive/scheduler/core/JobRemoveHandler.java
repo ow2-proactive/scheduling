@@ -50,6 +50,8 @@ class JobRemoveHandler implements Callable<Boolean> {
         service.listener.jobStateUpdated(job.getOwner(), new NotificationData<JobInfo>(
             SchedulerEvent.JOB_REMOVE_FINISHED, new JobInfoImpl((JobInfoImpl) job.getJobInfo())));
 
+        service.wakeUpSchedulingThread();
+
         return true;
     }
 
