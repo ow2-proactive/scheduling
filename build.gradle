@@ -59,7 +59,7 @@ configure(javaSubprojects) {
     apply plugin: 'java'
     apply plugin: 'format'
 
-    sourceCompatibility = 1.6
+    sourceCompatibility = 1.7
     compileJava.options.compilerArgs << '-Xlint:-options' // remove warning about bootstrap class path
 
     dependencies {
