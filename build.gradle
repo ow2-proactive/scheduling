@@ -241,19 +241,19 @@ project('rm:rm-client') {
 
 project(':rm:rm-node') {
     dependencies {
-        compile files("${rootDir}/lib/node/winp/winp-1.17-patched.jar")
+        compile 'org.jvnet.winp:winp:1.17-proactive'
         compile 'net.java.dev.jna:jna:3.4.0'
         compile 'commons-io:commons-io:2.4'
 
         compile 'commons-cli:commons-cli:1.1'
-        compile files("${rootDir}/lib/node/sigar/sigar.jar")
+        compile 'sigar:sigar:1.7.0-proactive'
 
         compile "org.objectweb.proactive:programming-extension-dataspaces:${programmingVersion}"
 
         compile project(':common-client')
         compile project(':rm:rm-client')
 
-        runtime fileTree(dir: "${rootDir}/lib/node/sigar/", exclude: "*.jar")
+        runtime 'sigar:sigar:1.7.0-proactive:native'
 
         // protocols
         runtime "org.objectweb.proactive:programming-extension-rmissl:${programmingVersion}"
@@ -317,7 +317,7 @@ project('scheduler:scheduler-server') {
         testCompile 'org.hamcrest:hamcrest-all:1.3'
         testCompile 'com.h2database:h2:1.3.167'
         testCompile 'org.codehaus.groovy:groovy-all:2.1.6'
-        testCompile 'winp:winp:1.17-patched'
+        testCompile 'org.jvnet.winp:winp:1.17-proactive'
         testCompile files("${System.properties['java.home']}/../lib/tools.jar")
 
         testCompile project(':rm:rm-server').sourceSets.test.output // to get shared test classes
@@ -345,9 +345,9 @@ project('scheduler:scheduler-server') {
 
     task stub(type: StubTask) {
         classes = ['org.ow2.proactive.scheduler.core.SchedulerFrontend',
-        'org.ow2.proactive.scheduler.authentication.SchedulerAuthentication',
-        'org.ow2.proactive.scheduler.core.rmproxies.RMProxyActiveObject',
-        'org.ow2.proactive.scheduler.core.TerminateNotification']
+                   'org.ow2.proactive.scheduler.authentication.SchedulerAuthentication',
+                   'org.ow2.proactive.scheduler.core.rmproxies.RMProxyActiveObject',
+                   'org.ow2.proactive.scheduler.core.TerminateNotification']
     }
 
     artifacts {
@@ -372,7 +372,7 @@ project('scheduler:scheduler-node') {
         runtime "org.objectweb.proactive:programming-extension-pnp:${programmingVersion}"
         // TODO add all protocols
 
-        runtime fileTree(dir: "${rootDir}/lib/node/winp/", exclude: "*.jar")
+        runtime 'org.jvnet.winp:winp:1.17-proactive:native'
     }
 
     task stub(type: StubTask) {
@@ -501,7 +501,7 @@ project(':scheduler:dataspace-smartproxy') {
 
     task stub(type: StubTask) {
         classes = ['org.ow2.proactive.scheduler.common.util.dsclient.SmartProxy',
-        'org.ow2.proactive.scheduler.common.util.CachingSchedulerProxyUserInterface']
+                   'org.ow2.proactive.scheduler.common.util.CachingSchedulerProxyUserInterface']
     }
 
 
