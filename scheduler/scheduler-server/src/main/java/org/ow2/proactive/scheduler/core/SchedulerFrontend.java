@@ -110,7 +110,6 @@ import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.ServerJobAndTaskLogs;
 import org.ow2.proactive.utils.Tools;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 
@@ -1038,7 +1037,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
             // try to fallback on my account usage if user is the caller
             UserIdentificationImpl ident = frontendState.checkPermission("getMyAccountUsage",
                     "You don't have permissions to get usage data of " + user);
-            if (StringUtils.equals(user, ident.getUsername())) {
+            if (user != null && user.equals(ident.getUsername())) {
                 return dbManager.getUsage(ident.getUsername(), startDate, endDate);
             }
             throw e;
