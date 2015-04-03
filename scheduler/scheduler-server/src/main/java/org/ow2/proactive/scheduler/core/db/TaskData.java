@@ -392,6 +392,7 @@ public class TaskData {
     }
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @Index(name = "JOB_ID_TASK_DATA_INDEX")
     @JoinColumn(name = "JOB_ID", nullable = false, updatable = false)
     public JobData getJobData() {
         return jobData;
@@ -512,6 +513,7 @@ public class TaskData {
     }
 
     @Column(nullable = false, name = "TASK_NAME")
+    @Index(name = "TASK_NAME_TASK_DATA_INDEX")
     public String getTaskName() {
         return taskName;
     }
