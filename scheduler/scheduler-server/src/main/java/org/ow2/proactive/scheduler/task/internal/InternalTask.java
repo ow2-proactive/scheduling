@@ -90,11 +90,11 @@ public abstract class InternalTask extends TaskState {
     @XmlTransient
     private transient List<InternalTask> ideps = null;
 
-    /** Informations about the launcher and node */
-    //These informations are not required during task process
+    /** Information about the launcher and node, mutable can change overtime, in case of restart for instance */
+    // These information are not required during task process
     private transient ExecuterInformations executerInformations;
 
-    /** Task information : this is the informations that can change during process. */
+    /** Task information : this is the information that can change during process. */
     private TaskInfoImpl taskInfo = new TaskInfoImpl();
 
     /** Node exclusion for this task if desired */
