@@ -14,6 +14,7 @@ build/
 !/dist/scripts
 /data
 /logs
+/lib
 /bin
 /tools
 !/tools/startup.groovy

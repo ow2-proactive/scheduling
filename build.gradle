@@ -2,6 +2,23 @@ apply plugin: 'java'
 
 archivesBaseName = 'scheduling' // in case current folder is not named scheduling
 
+project.ext.set('nativeLibsDir', "$rootDir/dist/lib/")
+
+configurations {
+    nativeBundle
+    restCli
+    distLib {
+        extendsFrom restCli
+    }
+}
+
+task extractNativeBundle(type: Copy) {
+    from {
+        configurations.nativeBundle.collect { zipTree(it) }
+    }
+    into file(project.nativeLibsDir)
+}
+
 buildscript {
     repositories {
         if (project.hasProperty('local')) mavenLocal()
@@ -109,6 +126,7 @@ def functionalTestConfiguration = {
     systemProperties << ['pa.tests.consecutive': System.getProperty("os.name").toLowerCase().indexOf('win') != -1 ? 'false' : 'true']
     systemProperties << ['proactive.test.timeout': 600000]
     systemProperties << ['java.awt.headless': 'true']
+
     testLogging {
         exceptionFormat = 'full'
     }
@@ -253,7 +271,7 @@ project(':rm:rm-node') {
         compile project(':common-client')
         compile project(':rm:rm-client')
 
-        runtime 'sigar:sigar:1.7.0-proactive:native'
+        runtime fileTree(dir: project.nativeLibsDir, exclude: '*.jar')
 
         // protocols
         runtime "org.objectweb.proactive:programming-extension-rmissl:${programmingVersion}"
@@ -372,7 +390,7 @@ project('scheduler:scheduler-node') {
         runtime "org.objectweb.proactive:programming-extension-pnp:${programmingVersion}"
         // TODO add all protocols
 
-        runtime 'org.jvnet.winp:winp:1.17-proactive:native'
+        runtime fileTree(dir: project.nativeLibsDir, exclude: '*.jar')
     }
 
     task stub(type: StubTask) {
@@ -388,9 +406,13 @@ project('scheduler:scheduler-node') {
                    'org.ow2.proactive.scheduler.examples.SchedulerClientEventsLogger']
     }
 
-    task standaloneJar(type: OneJar) {
+    task standaloneJarPrecondition {
+        finalizedBy extractNativeBundle
+    }
+
+    task standaloneJar(type: OneJar, dependsOn: standaloneJarPrecondition) {
         mainClass = 'org.ow2.proactive.resourcemanager.utils.RMNodeStarter'
-        binLib = fileTree(dir: "${rootDir}/lib/node/", exclude: "**/*.jar")
+        binLib = fileTree(dir: project.nativeLibsDir, exclude: '*.jar')
         additionalDir = file('src/main/resources')
         manifest {
             attributes 'One-Jar-URL-Factory': 'com.simontuffs.onejar.JarClassLoader$OneJarURLFactory'
@@ -508,13 +530,6 @@ project(':scheduler:dataspace-smartproxy') {
     task('functionalTest', type: Test).configure functionalTestConfiguration
 }
 
-configurations {
-    restCli
-    distLib {
-        extendsFrom restCli
-    }
-}
-
 dependencies {
     distLib(project(':scheduler:scheduler-server')) {
         exclude group: 'javassist', module: 'javassist' // to avoid duplicate (artifact named differently)
@@ -530,6 +545,9 @@ dependencies {
     distLib project(':rest:rest-client')
     distLib project(':rest:rest-dataspace-smartproxy')
     distLib project(':scheduler:dataspace-smartproxy')
+
+    nativeBundle 'org.jvnet.winp:winp:1.17-proactive:native'
+    nativeBundle 'sigar:sigar:1.7.0-proactive:native'
 
     compile 'org.codehaus.groovy:groovy-all:2.1.6'
     compile 'commons-io:commons-io:2.4'
@@ -553,6 +571,7 @@ build.dependsOn 'dist'
 
 task scripts
 dist.dependsOn scripts
+dist.finalizedBy extractNativeBundle
 
 task cleanScripts
 clean.dependsOn cleanScripts
