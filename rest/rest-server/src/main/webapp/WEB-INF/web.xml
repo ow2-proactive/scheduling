@@ -29,8 +29,6 @@
         <listener-class>org.ow2.proactive_grid_cloud_portal.webapp.NoVncBootstrap</listener-class>
     </listener>
 
-
-    <!--
     <servlet>
         <servlet-name>atmosphere</servlet-name>
         <servlet-class>org.atmosphere.cpr.AtmosphereServlet</servlet-class>
@@ -57,7 +55,6 @@
         <servlet-name>atmosphere</servlet-name>
         <url-pattern>/scheduler/events/*</url-pattern>
     </servlet-mapping>
-    -->
 
     <servlet>
         <servlet-name>resteasy-servlet</servlet-name>

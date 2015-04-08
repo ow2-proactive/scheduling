@@ -297,8 +297,7 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
     }
 
     @Test(timeout = MAX_WAIT_TIME * 2)
-    @Ignore("REST events are disabled in the default config")
-    public void testJobSubmissionEventLisntener() throws Exception {
+    public void testJobSubmissionEventListener() throws Exception {
         ISchedulerClient client = clientInstance();
         SchedulerEventListenerImpl listener = new SchedulerEventListenerImpl();
         client.addEventListener(listener, true, SchedulerEvent.JOB_SUBMITTED);
@@ -312,7 +311,7 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
     }
 
     @Test(timeout = MAX_WAIT_TIME)
-    public void test_pushFile_withNonAdminUserPwd_shouldSucceed() throws Exception {
+    public void testPushFileWithNonAdminUserPwdShouldSucceed() throws Exception {
         File tmpFile = testFolder.newFile();
         Files.write("non_admin_user_push_file_contents".getBytes(), tmpFile);
         ISchedulerClient client = SchedulerClient.createInstance();
