@@ -430,6 +430,7 @@ public class TaskData {
 
     @OneToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
+    @Index(name = "IF_BRANCH_TASK_DATA_INDEX")
     public TaskData getIfBranch() {
         return ifBranch;
     }
