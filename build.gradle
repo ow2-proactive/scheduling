@@ -126,6 +126,7 @@ def functionalTestConfiguration = {
     systemProperties << ['pa.tests.consecutive': System.getProperty("os.name").toLowerCase().indexOf('win') != -1 ? 'false' : 'true']
     systemProperties << ['proactive.test.timeout': 600000]
     systemProperties << ['java.awt.headless': 'true']
+    systemProperties << ['java.library.path': project.nativeLibsDir]
 
     testLogging {
         exceptionFormat = 'full'
@@ -139,6 +140,7 @@ def functionalTestConfiguration = {
         project.javaexec {
             main = "org.ow2.tests.ProcessCleaner"
             classpath = project.sourceSets.test.runtimeClasspath
+            systemProperty "java.library.path", project.nativeLibsDir
         }
     }
 
