@@ -5,10 +5,12 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinColumns;
 import javax.persistence.OneToOne;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import org.ow2.proactive.scheduler.task.script.ForkedScriptExecutableContainer;
@@ -54,7 +56,8 @@ public class ScriptTaskData {
     }
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SCRIPT_TASK_DATA_ID_SEQUENCE")
+    @SequenceGenerator(name = "SCRIPT_TASK_DATA_ID_SEQUENCE", sequenceName = "SCRIPT_TASK_DATA_ID_SEQUENCE")
     @Column(name = "ID")
     public long getId() {
         return id;

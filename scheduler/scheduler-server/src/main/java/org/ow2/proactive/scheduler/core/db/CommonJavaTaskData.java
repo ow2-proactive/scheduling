@@ -8,12 +8,14 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinColumns;
 import javax.persistence.Lob;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToOne;
+import javax.persistence.SequenceGenerator;
 
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -52,7 +54,8 @@ public class CommonJavaTaskData implements Serializable {
     }
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "C_JAVA_TASK_DATA_ID_SEQUENCE")
+    @SequenceGenerator(name = "C_JAVA_TASK_DATA_ID_SEQUENCE", sequenceName = "C_JAVA_TASK_DATA_ID_SEQUENCE")
     @Column(name = "ID")
     public long getId() {
         return id;

@@ -8,11 +8,13 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinColumns;
 import javax.persistence.Lob;
 import javax.persistence.OneToOne;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.OnDelete;
@@ -70,7 +72,8 @@ public class NativeTaskData {
     }
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "NATIVE_TASK_DATA_ID_SEQUENCE")
+    @SequenceGenerator(name = "NATIVE_TASK_DATA_ID_SEQUENCE", sequenceName = "NATIVE_TASK_DATA_ID_SEQUENCE")
     @Column(name = "ID")
     public long getId() {
         return id;

@@ -4,9 +4,11 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import org.ow2.proactive.scheduler.common.task.PropertyModifier;
@@ -39,7 +41,8 @@ public class EnvironmentModifierData {
     }
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ENV_MOD_DATA_ID_SEQUENCE")
+    @SequenceGenerator(name = "ENV_MOD_DATA_ID_SEQUENCE", sequenceName = "ENV_MOD_DATA_ID_SEQUENCE")
     @Column(name = "ID")
     public long getId() {
         return id;

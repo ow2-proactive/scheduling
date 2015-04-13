@@ -39,7 +39,9 @@ package org.ow2.proactive.resourcemanager.core.history;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -63,7 +65,8 @@ public class NodeHistory {
     public static final Logger logger = Logger.getLogger(NodeHistory.class);
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "NODE_HISTORY_ID_SEQUENCE")
+    @SequenceGenerator(name = "NODE_HISTORY_ID_SEQUENCE", sequenceName = "NODE_HISTORY_ID_SEQUENCE")
     @SuppressWarnings("unused")
     protected long id;
 
