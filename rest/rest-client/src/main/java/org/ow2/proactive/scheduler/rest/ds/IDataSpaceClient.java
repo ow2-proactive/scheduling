@@ -36,16 +36,17 @@
  */
 package org.ow2.proactive.scheduler.rest.ds;
 
+import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
+import org.ow2.proactive.scheduler.common.exception.PermissionException;
+import org.ow2.proactive.scheduler.common.task.dataspaces.RemoteSpace;
+import org.ow2.proactive_grid_cloud_portal.common.FileType;
+import org.ow2.proactive_grid_cloud_portal.dataspace.dto.ListFile;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
-
-import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
-import org.ow2.proactive.scheduler.common.exception.PermissionException;
-import org.ow2.proactive.scheduler.common.task.dataspaces.RemoteSpace;
-import org.ow2.proactive_grid_cloud_portal.dataspace.dto.ListFile;
 
 
 public interface IDataSpaceClient {
@@ -64,6 +65,18 @@ public interface IDataSpaceClient {
         }
     }
 
+    /**
+     * Creates a new file or folder in the specified dataspace <i>dataspace</i>.
+     *
+     * @param source the remote source used to identify the type of file to create and its location.
+     * @return {@code true} if the creation has succeeded, {@code false} otherwise.
+     *
+     * @throws NotConnectedException if the client is not logged in or the session has expired
+     * @throws PermissionException   if the user does not have permission to upload the file to
+     *                               the specified location in the server
+     */
+    public boolean create(IRemoteSource source) throws NotConnectedException, PermissionException;
+
     public boolean download(IRemoteSource source, ILocalDestination destination)
             throws NotConnectedException, PermissionException;
 
@@ -72,7 +85,7 @@ public interface IDataSpaceClient {
 
     /**
      * Returns a {@link ListFile} type object which contains the names of files
-     * and directories in the specified location the <i>dataspace</i>.
+     * and directories in the specified location of the <i>dataspace</i>.
      *
      * @throws NotConnectedException
      *             if the client is not logged in or the session has expired
@@ -130,6 +143,8 @@ public interface IDataSpaceClient {
         public List<String> getIncludes();
 
         public List<String> getExcludes();
+
+        public FileType getType();
     }
 
     public interface ILocalDestination {

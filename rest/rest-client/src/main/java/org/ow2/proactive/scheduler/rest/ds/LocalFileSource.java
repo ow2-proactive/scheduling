@@ -36,16 +36,15 @@
  */
 package org.ow2.proactive.scheduler.rest.ds;
 
-import static com.google.common.base.Preconditions.checkArgument;
+import com.google.common.io.Files;
+import org.ow2.proactive.scheduler.rest.ds.IDataSpaceClient.ILocalSource;
+import org.ow2.proactive_grid_cloud_portal.scheduler.client.utils.Zipper;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import org.ow2.proactive.scheduler.rest.ds.IDataSpaceClient.ILocalSource;
-import org.ow2.proactive_grid_cloud_portal.scheduler.client.utils.Zipper;
-
-import com.google.common.io.Files;
+import static com.google.common.base.Preconditions.checkArgument;
 
 
 public class LocalFileSource implements ILocalSource {
@@ -75,6 +74,13 @@ public class LocalFileSource implements ILocalSource {
     @Override
     public String getEncoding() throws IOException {
         return Zipper.isZipFile(file) ? null : "gzip";
+    }
+
+    @Override
+    public String toString() {
+        return "LocalFileSource{" +
+                "file=" + file +
+                '}';
     }
 
 }

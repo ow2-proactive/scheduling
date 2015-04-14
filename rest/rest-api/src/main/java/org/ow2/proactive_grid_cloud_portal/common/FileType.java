@@ -34,37 +34,22 @@
  * ################################################################
  * $$ACTIVEEON_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.rest.ds;
+package org.ow2.proactive_grid_cloud_portal.common;
 
-import org.ow2.proactive.scheduler.rest.ds.IDataSpaceClient.Dataspace;
+public enum FileType {
 
+    FILE("application/file"),
+    FOLDER("application/folder"),
+    UNKNOWN("application/unknown");
 
-public class RemoteDestination implements IDataSpaceClient.IRemoteDestination {
+    private final String mimeType;
 
-    private Dataspace dataspace;
-    private String path;
-
-    public RemoteDestination(Dataspace dataspace, String path) {
-        this.dataspace = dataspace;
-        this.path = path;
+    FileType(String mimeType) {
+        this.mimeType = mimeType;
     }
 
-    @Override
-    public Dataspace getDataspace() {
-        return dataspace;
-    }
-
-    @Override
-    public String getPath() {
-        return path;
-    }
-
-    @Override
-    public String toString() {
-        return "RemoteDestination{" +
-                "dataspace=" + dataspace +
-                ", path='" + path + '\'' +
-                '}';
+    public String getMimeType() {
+        return mimeType;
     }
 
 }

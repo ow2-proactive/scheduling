@@ -36,30 +36,6 @@
  */
 package org.ow2.proactive.scheduler.rest.ds;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.StreamingOutput;
-import javax.ws.rs.core.Variant;
-
-import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
-import org.ow2.proactive.scheduler.common.exception.PermissionException;
-import org.ow2.proactive.scheduler.common.task.dataspaces.RemoteSpace;
-import org.ow2.proactive.scheduler.rest.ISchedulerClient;
-import org.ow2.proactive.scheduler.rest.SchedulerClient;
-import org.ow2.proactive.scheduler.rest.utils.HttpUtility;
-import org.ow2.proactive_grid_cloud_portal.dataspace.dto.ListFile;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
 import org.jboss.resteasy.client.jaxrs.ClientHttpEngine;
@@ -67,6 +43,25 @@ import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 import org.jboss.resteasy.client.jaxrs.engines.ApacheHttpClient4Engine;
+import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
+import org.ow2.proactive.scheduler.common.exception.PermissionException;
+import org.ow2.proactive.scheduler.common.task.dataspaces.RemoteSpace;
+import org.ow2.proactive.scheduler.rest.ISchedulerClient;
+import org.ow2.proactive.scheduler.rest.SchedulerClient;
+import org.ow2.proactive.scheduler.rest.utils.HttpUtility;
+import org.ow2.proactive_grid_cloud_portal.dataspace.dto.ListFile;
+
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.Invocation;
+import javax.ws.rs.core.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 
 public class DataSpaceClient implements IDataSpaceClient {
@@ -77,6 +72,11 @@ public class DataSpaceClient implements IDataSpaceClient {
     private ClientHttpEngine httpEngine;
 
     public DataSpaceClient() {
+    }
+
+    public DataSpaceClient(String restServerUrl, ClientHttpEngine httpEngine) {
+        this.restDataspaceUrl = restDataspaceUrl(restServerUrl);
+        this.httpEngine = httpEngine;
     }
 
     public void init(String restServerUrl, ISchedulerClient client) {
@@ -94,11 +94,6 @@ public class DataSpaceClient implements IDataSpaceClient {
     public void renewSession() throws NotConnectedException {
         this.client.renewSession();
         this.sessionId = client.getSession();
-    }
-
-    public DataSpaceClient(String restServerUrl, ClientHttpEngine httpEngine) {
-        this.restDataspaceUrl = restDataspaceUrl(restServerUrl);
-        this.httpEngine = httpEngine;
     }
 
     @Override
@@ -130,6 +125,39 @@ public class DataSpaceClient implements IDataSpaceClient {
         } catch (IOException ioe) {
             throw Throwables.propagate(ioe);
         } finally {
+            if (response != null) {
+                response.close();
+            }
+        }
+    }
+
+    @Override
+    public boolean create(IRemoteSource source) throws NotConnectedException, PermissionException {
+        StringBuffer uriTmpl = (new StringBuffer()).append(restDataspaceUrl).append(
+                source.getDataspace().value());
+        ResteasyClient client = new ResteasyClientBuilder().httpEngine(httpEngine).build();
+        ResteasyWebTarget target =
+                client.target(uriTmpl.toString())
+                        .path(source.getPath());
+
+        Response response = null;
+        try {
+            Invocation.Builder request = target.request();
+            request.header("sessionid", sessionId);
+
+            Form form = new Form();
+            form.param("mimetype", source.getType().getMimeType());
+            response = request.post(Entity.form(form));
+
+            if (response.getStatus() != HttpURLConnection.HTTP_OK) {
+                if (response.getStatus() == HttpURLConnection.HTTP_UNAUTHORIZED) {
+                    throw new NotConnectedException("User not authenticated or session timeout.");
+                } else {
+                    throw new RuntimeException("Cannot create file(s). Status code:" + response.getStatus());
+                }
+            }
+            return true;
+        } finally{
             if (response != null) {
                 response.close();
             }
@@ -288,4 +316,5 @@ public class DataSpaceClient implements IDataSpaceClient {
         return (new StringBuffer()).append(restServerUrl).append((restServerUrl.endsWith("/") ? "" : "/"))
                 .append("data/").toString();
     }
+
 }

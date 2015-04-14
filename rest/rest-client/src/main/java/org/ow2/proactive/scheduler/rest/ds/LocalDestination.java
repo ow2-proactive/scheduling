@@ -36,18 +36,18 @@
  */
 package org.ow2.proactive.scheduler.rest.ds;
 
+import com.google.common.base.Strings;
+import com.google.common.io.Files;
+import org.ow2.proactive.scheduler.rest.ds.IDataSpaceClient.ILocalDestination;
+import org.ow2.proactive_grid_cloud_portal.scheduler.client.utils.Zipper;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.ow2.proactive.scheduler.rest.ds.IDataSpaceClient.ILocalDestination;
-import org.ow2.proactive_grid_cloud_portal.scheduler.client.utils.Zipper;
-
-import com.google.common.base.Strings;
-import com.google.common.io.Files;
-
 
 public class LocalDestination implements ILocalDestination {
+
     private File dest;
 
     public LocalDestination(File dest) {
@@ -66,4 +66,12 @@ public class LocalDestination implements ILocalDestination {
             throw new RuntimeException("Unkonwn content encoding type: " + encoding);
         }
     }
+
+    @Override
+    public String toString() {
+        return "LocalDestination{" +
+                "dest=" + dest +
+                '}';
+    }
+
 }

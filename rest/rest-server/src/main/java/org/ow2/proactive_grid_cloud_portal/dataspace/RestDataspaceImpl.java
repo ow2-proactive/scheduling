@@ -36,30 +36,8 @@
  */
 package org.ow2.proactive_grid_cloud_portal.dataspace;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static org.apache.commons.vfs2.Selectors.SELECT_SELF;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.List;
-
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.HEAD;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedHashMap;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.StreamingOutput;
-
+import com.google.common.base.Strings;
+import com.google.common.base.Throwables;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
@@ -74,8 +52,16 @@ import org.ow2.proactive_grid_cloud_portal.dataspace.util.VFSZipper;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException;
 
-import com.google.common.base.Strings;
-import com.google.common.base.Throwables;
+import javax.ws.rs.*;
+import javax.ws.rs.core.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.List;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static org.apache.commons.vfs2.Selectors.SELECT_ALL;
+import static org.apache.commons.vfs2.Selectors.SELECT_SELF;
 
 
 @Path("/data/")
@@ -172,6 +158,7 @@ public class RestDataspaceImpl {
         Session session = checkSessionValidity(sessionId);
         try {
             FileObject fo = resolveFile(session, dataspace, pathname);
+
             if (!fo.exists()) {
                 return notFoundRes();
             }
@@ -234,8 +221,10 @@ public class RestDataspaceImpl {
     List<String> excludes) throws NotConnectedRestException, PermissionRestException {
         checkPathParams(dataspace, pathname);
         Session session = checkSessionValidity(sessionId);
+
         try {
             FileObject fo = resolveFile(session, dataspace, pathname);
+
             if (!fo.exists()) {
                 return notFoundRes();
             }
@@ -277,9 +266,46 @@ public class RestDataspaceImpl {
                     .metadata(fo));
             return Response.ok().replaceAll(headers).build();
         } catch (Throwable error) {
-            logger.error(String.format("Cannot retrive metadata of %s in %s.", pathname, dataspacePath),
-                    error);
+            logger.error(String.format("Cannot retrieve metadata for %s in %s.", pathname, dataspacePath), error);
             throw rethrow(error);
+        }
+    }
+
+    @POST
+    @Path("/{dataspace}/{path-name:.*}")
+    public Response create(@HeaderParam("sessionid") String sessionId,
+                           @PathParam("dataspace") String dataspacePath,
+                           @PathParam("path-name") String pathname,
+                           @FormParam("mimetype") String mimeType)
+                                throws NotConnectedRestException, PermissionRestException {
+
+        checkPathParams(dataspacePath, pathname);
+        Session session = checkSessionValidity(sessionId);
+
+        try {
+            FileObject fileObject = resolveFile(session, dataspacePath, pathname);
+
+            if (mimeType.equals(org.ow2.proactive_grid_cloud_portal.common.FileType.FOLDER.getMimeType())) {
+                fileObject.createFolder();
+            } else if (mimeType.equals(org.ow2.proactive_grid_cloud_portal.common.FileType.FILE.getMimeType())) {
+                fileObject.createFile();
+            } else {
+                return serverErrorRes("Cannot create specified file since mimetype is not specified");
+            }
+
+            MultivaluedMap<String, Object> headers =
+                    new MultivaluedHashMap(FileSystem.metadata(fileObject));
+
+            return Response.ok().replaceAll(headers).build();
+        } catch (FileSystemException e) {
+            logger.error(String.format("Cannot create folder for %s in %s", pathname, dataspacePath), e);
+            throw rethrow(e);
+        } catch (Throwable e) {
+            logger.error(
+                    String.format(
+                            "Cannot retrieve metadata for %s in %s.",
+                            pathname, dataspacePath), e);
+            throw rethrow(e);
         }
     }
 
@@ -336,17 +362,15 @@ public class RestDataspaceImpl {
     private Response deleteDir(FileObject fo, List<String> includes, List<String> excludes)
             throws FileSystemException {
         if ((includes == null || includes.isEmpty()) && (excludes == null || excludes.isEmpty())) {
-            if (FileSystem.isEmpty(fo)) {
-                return (fo.delete()) ? noContentRes() : serverErrorRes("Cannot delete the folder: %s", fo
-                        .getName().getBaseName());
-            } else {
-                return serverErrorRes("Cannot delete a non-empty folder: %s", fo.getName().getBaseName());
-            }
+            fo.delete(SELECT_ALL);
+            fo.delete();
+            return noContentRes();
         } else {
             List<FileObject> children = FileSystem.findFiles(fo, includes, excludes);
             for (FileObject child : children) {
                 if (!child.delete()) {
-                    return serverErrorRes("Cannot delete the file: %s", fo.getName().getBaseName());
+                    child.delete(SELECT_ALL);
+                    child.delete();
                 }
             }
             return noContentRes();

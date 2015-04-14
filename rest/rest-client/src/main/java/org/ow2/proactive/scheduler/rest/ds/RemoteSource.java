@@ -36,24 +36,31 @@
  */
 package org.ow2.proactive.scheduler.rest.ds;
 
-import static com.google.common.base.Preconditions.checkArgument;
+import com.google.common.collect.Lists;
+import org.ow2.proactive.scheduler.rest.ds.IDataSpaceClient.Dataspace;
+import org.ow2.proactive.scheduler.rest.ds.IDataSpaceClient.IRemoteSource;
+import org.ow2.proactive_grid_cloud_portal.common.FileType;
 
 import java.util.List;
 
-import org.ow2.proactive.scheduler.rest.ds.IDataSpaceClient.Dataspace;
-import org.ow2.proactive.scheduler.rest.ds.IDataSpaceClient.IRemoteSource;
-
-import com.google.common.collect.Lists;
+import static com.google.common.base.Preconditions.checkArgument;
 
 
 public class RemoteSource implements IRemoteSource {
+
     private Dataspace dataspace;
     private String path;
 
     private List<String> includes;
     private List<String> excludes;
 
+    private FileType pathType = FileType.UNKNOWN;
+
     public RemoteSource() {
+    }
+
+    public RemoteSource(Dataspace dataspace) {
+        this.dataspace = dataspace;
     }
 
     public RemoteSource(Dataspace dataspace, String pathname) {
@@ -103,6 +110,24 @@ public class RemoteSource implements IRemoteSource {
     @Override
     public List<String> getExcludes() {
         return excludes;
+    }
+
+    public FileType getType() {
+        return pathType;
+    }
+
+    public void setType(FileType pathType) {
+        this.pathType = pathType;
+    }
+
+    @Override
+    public String toString() {
+        return "RemoteSource{" +
+                "dataspace=" + dataspace +
+                ", path='" + path + '\'' +
+                ", includes=" + includes +
+                ", excludes=" + excludes +
+                '}';
     }
 
 }
