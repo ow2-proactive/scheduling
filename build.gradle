@@ -524,8 +524,7 @@ project(':scheduler:dataspace-smartproxy') {
     }
 
     task stub(type: StubTask) {
-        classes = ['org.ow2.proactive.scheduler.common.util.dsclient.SmartProxy',
-                   'org.ow2.proactive.scheduler.common.util.CachingSchedulerProxyUserInterface']
+        classes = ['org.ow2.proactive.scheduler.common.util.dsclient.SmartProxy']
     }
 
 
