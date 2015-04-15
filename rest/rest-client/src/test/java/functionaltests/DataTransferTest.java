@@ -106,8 +106,7 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
     }
 
     @Test
-    public void testUploadSelectedFilesUsingRegex() throws Exception {
-        // regex
+    public void testUploadSelectedFilesUsingGlobPattern() throws Exception {
         File tempTextFile = tmpDir.newFile("tempFile.txt");
         Files.write("some random text ...".getBytes(), tempTextFile);
 
@@ -118,12 +117,12 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
 
         IDataSpaceClient client = clientInstance();
         LocalDirSource source = new LocalDirSource(tmpDir.getRoot());
-        source.setIncludes(".*\\.(txt)$");
-        RemoteDestination dest = new RemoteDestination(USER, "testUploadSelectedFilesUsingRegex");
+        source.setIncludes("*.txt");
+        RemoteDestination dest = new RemoteDestination(USER, "testUploadSelectedFilesUsingGlobPattern");
         assertTrue(client.upload(source, dest));
 
         String destRootUri = URI.create(getScheduler().getUserSpaceURIs().get(0)).getPath();
-        File[] destRootFiles = new File(destRootUri, "testUploadSelectedFilesUsingRegex").listFiles();
+        File[] destRootFiles = new File(destRootUri, "testUploadSelectedFilesUsingGlobPattern").listFiles();
         assertEquals(1, destRootFiles.length);
         assertTrue(Files.equal(tempTextFile, destRootFiles[0]));
     }
@@ -201,7 +200,7 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
     }
 
     @Test
-    public void testDownloadSelectedFilesUsingRegex() throws Exception {
+    public void testDownloadSelectedFilesUsingGlobPattern() throws Exception {
         String srcDirPath = URI.create(getScheduler().getUserSpaceURIs().get(0)).getPath();
         File srcDir = new File(srcDirPath, "testDownloadAllFilesInDirectory");
         if (srcDir.exists()) {
@@ -219,7 +218,7 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
 
         File destTempDir = tmpDir.newFolder("tempDir");
         RemoteSource source = new RemoteSource(USER, "testDownloadAllFilesInDirectory");
-        source.includes(".*\\.(txt)$");
+        source.includes("*.txt");
         LocalDestination dest = new LocalDestination(destTempDir);
         IDataSpaceClient client = clientInstance();
 

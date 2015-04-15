@@ -36,24 +36,6 @@
  */
 package org.ow2.proactive_grid_cloud_portal.scheduler.client.utils;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.List;
-import java.util.regex.Pattern;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
-import java.util.zip.ZipOutputStream;
-
 import com.google.common.base.Predicate;
 import com.google.common.base.Strings;
 import com.google.common.collect.FluentIterable;
@@ -61,6 +43,13 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Closer;
 import com.google.common.io.Files;
+import org.objectweb.proactive.utils.SelectorUtils;
+
+import java.io.*;
+import java.util.List;
+import java.util.zip.*;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 
 public class Zipper {
@@ -253,14 +242,16 @@ public class Zipper {
         }
 
         private boolean matches(File file, List<String> exprs) {
+            String filename = file.getName();
+
             boolean match = false;
             if (exprs == null || exprs.isEmpty()) {
                 return false;
             } else if (exprs.contains(file.getName())) {
-                match = true;
+                return true;
             } else {
                 for (String expr : exprs) {
-                    if (Pattern.matches(expr, file.getAbsolutePath())) {
+                    if (SelectorUtils.matchPath(expr, filename)) {
                         match = true;
                         break;
                     }

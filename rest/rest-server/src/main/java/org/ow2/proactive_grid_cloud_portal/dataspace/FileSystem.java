@@ -36,6 +36,18 @@
  */
 package org.ow2.proactive_grid_cloud_portal.dataspace;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.io.ByteStreams;
+import com.google.common.io.Closer;
+import org.apache.commons.vfs2.*;
+import org.objectweb.proactive.extensions.dataspaces.vfs.selector.GlobPatternFileSelector;
+import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
+import org.ow2.proactive.scheduler.common.exception.PermissionException;
+import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
+import org.ow2.proactive_grid_cloud_portal.dataspace.dto.ListFile;
+
+import javax.ws.rs.core.HttpHeaders;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,26 +55,6 @@ import java.io.OutputStream;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
-
-import javax.ws.rs.core.HttpHeaders;
-
-import org.apache.commons.vfs2.FileObject;
-import org.apache.commons.vfs2.FileSelectInfo;
-import org.apache.commons.vfs2.FileSelector;
-import org.apache.commons.vfs2.FileSystemException;
-import org.apache.commons.vfs2.FileSystemManager;
-import org.apache.commons.vfs2.FileType;
-import org.apache.commons.vfs2.VFS;
-import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
-import org.ow2.proactive.scheduler.common.exception.PermissionException;
-import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
-import org.ow2.proactive_grid_cloud_portal.dataspace.dto.ListFile;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.io.ByteStreams;
-import com.google.common.io.Closer;
 
 
 public class FileSystem {
@@ -153,7 +145,7 @@ public class FileSystem {
             throws FileSystemException {
         List<FileObject> files = Lists.newArrayList();
         FileSelector selector = (isNullOrEmpty(includes) && isNullOrEmpty(excludes)) ? new AllFilesSelector()
-                : new RegexFileSelector(includes, excludes);
+                : new GlobPatternFileSelector(includes, excludes);
         root.findFiles(selector, true, files);
         return files;
     }
@@ -223,50 +215,4 @@ public class FileSystem {
         }
     }
 
-    private static class RegexFileSelector implements FileSelector {
-
-        private List<String> includes;
-        private List<String> excludes;
-
-        private RegexFileSelector(List<String> includes, List<String> excludes) {
-            this.includes = includes;
-            this.excludes = excludes;
-        }
-
-        @Override
-        public boolean includeFile(FileSelectInfo info) throws Exception {
-            return !matches(info, excludes) && matches(info, includes);
-        }
-
-        @Override
-        public boolean traverseDescendents(FileSelectInfo selInfo) throws Exception {
-            return true;
-        }
-
-        private boolean matches(FileSelectInfo selInfo, List<String> exprs) {
-            boolean match = false;
-            if (exprs == null || exprs.isEmpty()) {
-                // match = false;
-            } else if (exprs.contains(fileName(selInfo))) {
-                match = true;
-            } else {
-                for (String expr : exprs) {
-                    if (Pattern.matches(expr, filePath(selInfo))) {
-                        match = true;
-                        break;
-                    }
-                }
-            }
-            return match;
-        }
-
-        private String fileName(FileSelectInfo selInfo) {
-            return selInfo.getFile().getName().getBaseName();
-        }
-
-        private String filePath(FileSelectInfo selInfo) {
-            return selInfo.getFile().getName().getPath();
-        }
-
-    }
 }

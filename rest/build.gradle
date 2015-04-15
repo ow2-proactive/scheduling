@@ -35,6 +35,7 @@ project(':rest:rest-api') {
         compile 'org.jboss.resteasy:jaxrs-api:3.0.6.Final'
         compile 'org.jboss.resteasy:resteasy-jackson-provider:3.0.6.Final'
         compile 'org.jboss.resteasy:resteasy-multipart-provider:3.0.6.Final'
+        compile "org.objectweb.proactive:programming-util:${programmingVersion}"
     }
 }
 
@@ -192,12 +193,10 @@ project(':rest:rest-client') {
     clean.dependsOn rootProject.cleanDist
 }
 
-project(':rest:rest-dataspace-smartproxy') {
+project(':rest:rest-smartproxy') {
     dependencies {
-        compile 'org.apache.commons:commons-vfs2:2.0'
-
-        compile project(':scheduler:dataspace-smartproxy')
         compile project(':rest:rest-client')
+        compile project(':scheduler:smartproxy-common')
 
         testCompile functionalTestDependencies
         testCompile project(':rest:rest-server').sourceSets.test.output
