@@ -194,6 +194,9 @@ project(':rest:rest-client') {
 }
 
 project(':rest:rest-smartproxy') {
+
+    apply plugin: 'java-library-distribution'
+
     dependencies {
         compile project(':rest:rest-client')
         compile project(':scheduler:smartproxy-common')
@@ -201,6 +204,14 @@ project(':rest:rest-smartproxy') {
         testCompile functionalTestDependencies
         testCompile project(':rest:rest-server').sourceSets.test.output
     }
+
+    task bundle(type: Zip) {
+        print configurations
+        from configurations.runtime.allArtifacts.files
+        from configurations.runtime
+        into (project.name + '-' + project.version + '-bundle')
+    }
+
     test {
         exclude 'functionaltests/**'
     }
