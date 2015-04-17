@@ -337,7 +337,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
      */
     @Override
     public List<String> getGlobalSpaceURIs() throws NotConnectedException, PermissionException {
-        frontendState.checkPermission("getGlobalSpaceURI",
+        frontendState.checkPermission("getGlobalSpaceURIs",
                 "You don't have permissions to read the GLOBAL Space URI");
         return this.spacesSupport.getGlobalSpaceURIs();
     }
