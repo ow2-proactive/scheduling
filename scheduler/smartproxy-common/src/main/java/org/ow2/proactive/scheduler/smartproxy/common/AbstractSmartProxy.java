@@ -24,13 +24,16 @@ import static com.google.common.base.Throwables.propagateIfInstanceOf;
 import static org.ow2.proactive.scheduler.common.SchedulerEvent.*;
 
 /**
- *  Asbtract implementation of smart proxy that factorizes code used by all smart proxy implementations.
+ * Asbtract implementation of smart proxy that factorizes code used by all smart proxy implementations.
+ * <p>
+ * Smart proxy is a proxy to the Scheduler with built-in support for automatic data pushing and
+ * pulling in order to provide disconnected mode for the dataspace layer.
  *
- *  @author The ProActive Team
+ * @author The ProActive Team
  */
-public abstract class AbstractSmartProxy {
+public abstract class AbstractSmartProxy<T extends JobTracker> implements SchedulerEventListener {
 
-    private static final Logger logger = Logger.getLogger(AbstractSmartProxy.class);
+    private static final Logger log = Logger.getLogger(AbstractSmartProxy.class);
 
     public static final String GENERIC_INFO_INPUT_FOLDER_PROPERTY_NAME = "client_input_data_folder";
     public static final String GENERIC_INFO_OUTPUT_FOLDER_PROPERTY_NAME = "client_output_data_folder";
@@ -40,11 +43,8 @@ public abstract class AbstractSmartProxy {
 
     public static final int MAX_NB_OF_DATA_TRANSFER_THREADS = 3 * Runtime.getRuntime().availableProcessors();
 
-    /**
-     * Thread factory for data transfer operations
-     */
     private ThreadFactory threadFactory =
-            new NamedThreadFactory("Data Transfer Thread");
+            new NamedThreadFactory("SmartProxyDataTransferThread");
 
     protected final ExecutorService threadPool =
             Executors.newFixedThreadPool(MAX_NB_OF_DATA_TRANSFER_THREADS, threadFactory);
@@ -54,22 +54,23 @@ public abstract class AbstractSmartProxy {
             JOB_RESUMED, TASK_PENDING_TO_RUNNING, KILLED, SHUTDOWN, SHUTTING_DOWN, STOPPED, RESUMED,
             TASK_RUNNING_TO_FINISHED};
 
-    protected JobTracker jobTracker;
+    protected T jobTracker;
 
-    /**
-     * last url used to connect to the scheduler
-     */
-    protected String schedulerUrl = null;
+    protected String schedulerUrl;
 
-    protected String schedulerLogin = null;
+    protected String schedulerLogin;
 
-    protected String schedulerPassword = null;
+    protected String schedulerPassword;
 
-    /**
-     * listeners registered to this proxy
-     */
     protected Set<SchedulerEventListenerExtended> eventListeners =
             Collections.synchronizedSet(new HashSet<SchedulerEventListenerExtended>());
+
+    public AbstractSmartProxy() {
+    }
+
+    public AbstractSmartProxy(T jobTracker) {
+        this.jobTracker = jobTracker;
+    }
 
     public void cleanDatabase() {
         jobTracker.cleanDataBase();
@@ -91,21 +92,13 @@ public abstract class AbstractSmartProxy {
         syncAwaitedJobs();
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * org.ow2.proactive.scheduler.common.util.dsclient.ISmartProxy#reconnect()
-     */
     public void reconnect() throws SchedulerException, LoginException {
         if (this.schedulerUrl == null) {
             throw new IllegalStateException("No connection to the scheduler has been established yet.");
         }
+
         disconnect();
         init(schedulerUrl, schedulerLogin, schedulerPassword);
-        registerAsListener();
-        jobTracker.loadJobs();
-        syncAwaitedJobs();
     }
 
     /**
@@ -126,7 +119,7 @@ public abstract class AbstractSmartProxy {
      * This method will synchronize this proxy with a remote Scheduler for the
      * given job
      *
-     * @param id jobId
+     * @param id job ID
      */
     private void syncAwaitedJob(String id) {
         AwaitedJob awaitedJob = jobTracker.getAwaitedJob(id);
@@ -141,67 +134,65 @@ public abstract class AbstractSmartProxy {
                     try {
                         tres = getTaskResult(id, tname);
                         if (tres != null) {
-                            logger.debug("Synchonizing task " + tname + " of job " + id);
+                            log.debug("Synchonizing task " + tname + " of job " + id);
                             taskStateUpdatedEvent(new NotificationData<TaskInfo>(
                                     SchedulerEvent.TASK_RUNNING_TO_FINISHED, ts.getTaskInfo()));
                         }
                     } catch (NotConnectedException e) {
                         e.printStackTrace();
                     } catch (UnknownJobException e) {
-                        logger.error("Could not retrieve output data for job " + id +
+                        log.error("Could not retrieve output data for job " + id +
                                 " because this job is not known by the Scheduler. \n ", e);
                     } catch (UnknownTaskException e) {
-                        logger.error("Could not retrieve output data for task " + tname + " of job " + id +
+                        log.error("Could not retrieve output data for task " + tname + " of job " + id +
                                 " because this task is not known by the Scheduler. \n ", e);
                     } catch (Exception e) {
-                        // logger.error("Unexpected error while getting the output data for task "
-                        // + tname
-                        // + " of job " + id, e);
+                        log.error("Unexpected error while getting the output data for task "
+                                + tname + " of job " + id, e);
                     }
                 }
             }
+
             if (js.isFinished()) {
                 jobStateUpdatedEvent(new NotificationData<JobInfo>(SchedulerEvent.JOB_RUNNING_TO_FINISHED, js
                         .getJobInfo()));
             }
-
         } catch (NotConnectedException e) {
-            logger
+            log
                     .error(
                             "A connection error occured while trying to download output data of Job " +
                                     id +
                                     ". This job will remain in the list of awaited jobs. Another attempt to dowload the output data will be made next time the application is initialized. ",
                             e);
         } catch (UnknownJobException e) {
-            logger.error("Could not retrieve output data for job " + id +
+            log.error("Could not retrieve output data for job " + id +
                     " because this job is not known by the Scheduler. \n ", e);
-            logger
+            log
                     .warn("Job  " +
                             id +
                             " will be removed from the known job list. The system will not attempt again to retrieve data for this job. You could try to manually copy the data from the location  " +
                             awaitedJob.getPullURL());
             jobTracker.removeAwaitedJob(id);
         } catch (PermissionException e) {
-            logger
+            log
                     .error(
                             "Could not retrieve output data for job " +
                                     id +
                                     " because you don't have permmission to access this job. You need to use the same connection credentials you used for submitting the job.  \n Another attempt to dowload the output data for this job will be made next time the application is initialized. ",
                             e);
         }
-
     }
 
     public JobId submit(TaskFlowJob job, String localInputFolderPath, String localOutputFolderPath,
                         boolean isolateTaskOutputs, boolean automaticTransfer) throws NotConnectedException,
-            PermissionException, SubmissionClosedException, JobCreationException {
+            PermissionException, SubmissionClosedException, JobCreationException, Exception {
         return submit(job, localInputFolderPath, null, localOutputFolderPath, null, isolateTaskOutputs,
                 automaticTransfer);
     }
 
     public JobId submit(TaskFlowJob job, String localInputFolderPath, String pushUrl,
                         String localOutputFolderPath, String pullUrl, boolean isolateTaskOutputs,
-                        boolean automaticTransfer) throws NotConnectedException, PermissionException,
+                        boolean automaticTransfer) throws Exception,
             SubmissionClosedException, JobCreationException {
         if (isNullOrEmpty(pushUrl)) {
             pushUrl = getUserSpaceURIs().get(0);
@@ -306,7 +297,7 @@ public abstract class AbstractSmartProxy {
 
             pull_url_updated = pull_url + "/" + outputFolder;
             String outputSpace_url_updated = outputSpace_url + "/" + outputFolder;
-            logger.debug("Output space of job " + job.getName() + " will be " + outputSpace_url_updated);
+            log.debug("Output space of job " + job.getName() + " will be " + outputSpace_url_updated);
 
             createFolder(pull_url_updated);
 
@@ -349,7 +340,7 @@ public abstract class AbstractSmartProxy {
      * @param job
      * @param localInputFolder path to the input folder on local machine if null, no actions
      *                         will be performed concerning the input data for this job
-     * @param pushURL         the url where input data is to be pushed before the job
+     * @param pushURL          the url where input data is to be pushed before the job
      *                         submission
      * @param newFolderName    name of the new folder to be created
      * @return String representing the updated value of the push_url
@@ -399,9 +390,10 @@ public abstract class AbstractSmartProxy {
         return newFolderName;
     }
 
-    // ******** Pushing and Pulling Data *********************** //
-
-    public void pullData(String jobId, String t_name, String localFolder) {
+    /**
+     * ************** Pushing and Pulling Data **********************
+     */
+    public void pullData(String jobId, String t_name, String localFolder) throws Exception {
 
         AwaitedJob awaitedjob = jobTracker.getAwaitedJob(jobId);
         if (awaitedjob == null) {
@@ -422,6 +414,7 @@ public abstract class AbstractSmartProxy {
             throw new IllegalArgumentException("The job " + awaitedjob.getJobId() +
                     " does not define an output folder on local machine, please provide an outputFolder.");
         }
+
         downloadTaskOutputFiles(awaitedjob, jobId, t_name, localOutFolderPath);
     }
 
@@ -533,22 +526,22 @@ public abstract class AbstractSmartProxy {
         JobStatus status = ((NotificationData<JobInfo>) notification).getData().getStatus();
         switch (status) {
             case KILLED: {
-                logger.debug("The job " + id + "has been killed.");
+                log.debug("The job " + id + "has been killed.");
                 jobTracker.removeAwaitedJob(id.toString());
                 break;
             }
             case FINISHED: {
-                logger.debug("The job " + id + " is finished.");
+                log.debug("The job " + id + " is finished.");
                 // removeAwaitedJob(id.toString());
                 break;
             }
             case CANCELED: {
-                logger.debug("The job " + id + " is canceled.");
+                log.debug("The job " + id + " is canceled.");
                 jobTracker.removeAwaitedJob(id.toString());
                 break;
             }
             case FAILED: {
-                logger.debug("The job " + id + " is failed.");
+                log.debug("The job " + id + " is failed.");
                 // removeAwaitedJob(id.toString());
                 break;
             }
@@ -564,7 +557,7 @@ public abstract class AbstractSmartProxy {
     protected void updateTask(NotificationData<TaskInfo> notification) {
 
         // am I interested in this task?
-        TaskInfo taskInfoData = ((NotificationData<TaskInfo>) notification).getData();
+        TaskInfo taskInfoData = notification.getData();
         JobId id = taskInfoData.getJobId();
         TaskId tid = taskInfoData.getTaskId();
         String tname = tid.getReadableName();
@@ -588,19 +581,19 @@ public abstract class AbstractSmartProxy {
             case NOT_RESTARTED:
             case NOT_STARTED:
             case SKIPPED: {
-                logger.debug("The task " + tname + " from job " + id +
+                log.debug("The task " + tname + " from job " + id +
                         " couldn't start. No data will be transfered");
                 jobTracker.removeAwaitedTask(id.toString(), tname);
                 break;
             }
             case FINISHED: {
-                logger.debug("The task " + tname + " from job " + id + " is finished.");
+                log.debug("The task " + tname + " from job " + id + " is finished.");
                 if (aj.isAutomaticTransfer()) {
-                    logger.debug("Transferring data for finished task " + tname + " from job " + id);
+                    log.debug("Transferring data for finished task " + tname + " from job " + id);
                     try {
                         downloadTaskOutputFiles(aj, id.toString(), tname, aj.getLocalOutputFolder());
                     } catch (Throwable t) {
-                        logger.error("Error while handling data for finished task " + tname + " for job " +
+                        log.error("Error while handling data for finished task " + tname + " for job " +
                                 id + ", task will be removed");
                         jobTracker.removeAwaitedTask(id.toString(), tname);
                     }
@@ -608,13 +601,13 @@ public abstract class AbstractSmartProxy {
                 break;
             }
             case FAULTY: {
-                logger.debug("The task " + tname + " from job " + id + " is faulty.");
+                log.debug("The task " + tname + " from job " + id + " is faulty.");
                 if (aj.isAutomaticTransfer()) {
-                    logger.debug("Transfering data for failed task " + tname + " from job " + id);
+                    log.debug("Transfering data for failed task " + tname + " from job " + id);
                     try {
                         downloadTaskOutputFiles(aj, id.toString(), tname, aj.getLocalOutputFolder());
                     } catch (Throwable t) {
-                        logger.error("Error while handling data for finished task " + tname + " for job " +
+                        log.error("Error while handling data for finished task " + tname + " for job " +
                                 id + ", task will be removed");
                         jobTracker.removeAwaitedTask(id.toString(), tname);
                     }
@@ -637,7 +630,7 @@ public abstract class AbstractSmartProxy {
 
     public abstract void init(String url, String user, String pwd) throws SchedulerException, LoginException;
 
-    public abstract void disconnect() throws PermissionException;
+    public abstract void disconnect() throws PermissionException, NotConnectedException;
 
     public abstract void registerAsListener() throws NotConnectedException, PermissionException;
 
@@ -653,10 +646,18 @@ public abstract class AbstractSmartProxy {
      * @throws PermissionException
      */
     public abstract boolean uploadInputfiles(TaskFlowJob job, String localInputFolderPath)
-            throws NotConnectedException, PermissionException;
+            throws Exception;
 
+    /**
+     * Pull the output files of the given task from the pull_url either to the localFolder defined for the job or to the localFolder specified as argument, if it is not null.
+     * The call to the method pullData is triggered by the user. If the job is configured to be handled asynchronously, call to this method will trigger a RuntimeException.
+     *
+     * @param jobId       job to pull data for
+     * @param t_name      name of the task
+     * @param localFolder local output folder, if not null, it overrides the folder specified as output folder for the job
+     */
     public abstract void downloadTaskOutputFiles(AwaitedJob awaitedjob, String jobId, String t_name,
-                                                 String localFolder);
+                                                 String localFolder) throws Exception;
 
     public abstract JobId submit(Job job) throws NotConnectedException, PermissionException,
             SubmissionClosedException, JobCreationException;
@@ -669,7 +670,9 @@ public abstract class AbstractSmartProxy {
 
     public abstract List<String> getUserSpaceURIs() throws NotConnectedException, PermissionException;
 
-    public abstract void addEventListener(SchedulerEventListener sel, boolean myEventsOnly,
+    public abstract List<String> getGlobalSpaceURIs() throws NotConnectedException, PermissionException;
+
+    public abstract void addEventListener(SchedulerEventListenerExtended listener, boolean myEventsOnly,
                                           SchedulerEvent[] events) throws NotConnectedException, PermissionException;
 
     protected abstract void removeJobIO(Job job, String pushURL, String pullURL, String newFolderName);

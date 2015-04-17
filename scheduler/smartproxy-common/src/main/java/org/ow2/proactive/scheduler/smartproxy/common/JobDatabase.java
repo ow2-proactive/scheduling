@@ -168,9 +168,7 @@ public class JobDatabase {
             recMan = RecordManagerFactory.createRecordManager(statusFile.getCanonicalPath());
             awaitedJobs = recMan.hashMap(STATUS_RECORD_NAME);
             // This empty loop triggers InvalidClassException in case of serial version uid problems
-            for (Map.Entry<String, AwaitedJob> job : awaitedJobs.entrySet()) {
-
-            }
+            for (Map.Entry<String, AwaitedJob> job : awaitedJobs.entrySet());
             recMan.commit();
         } catch (IOError e) {
             // we track invalid class exceptions

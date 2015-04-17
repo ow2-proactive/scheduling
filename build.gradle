@@ -524,7 +524,7 @@ project(':scheduler:smartproxy') {
     }
 
     task stub(type: StubTask) {
-        classes = ['org.ow2.proactive.scheduler.smartproxy.SmartProxy']
+        classes = ['org.ow2.proactive.scheduler.smartproxy.SmartProxyImpl']
     }
 
     task('functionalTest', type: Test).configure functionalTestConfiguration

@@ -68,11 +68,12 @@ import java.util.List;
 import static org.ow2.proactive.scheduler.rest.ds.IDataSpaceClient.Dataspace.USER;
 
 /**
- * Smart proxy implementation that relies on the REST API for communicating with dataspaces.
+ * Smart proxy implementation that relies on the REST API for communicating with dataspaces
+ * and websockets to push notifications to clients.
  *
  * @author The ProActive Team
  */
-public class RestSmartProxyImpl extends AbstractSmartProxy implements SchedulerEventListener {
+public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl> implements SchedulerEventListener {
 
     private static final Logger logger = Logger.getLogger(RestSmartProxyImpl.class);
 
@@ -81,13 +82,13 @@ public class RestSmartProxyImpl extends AbstractSmartProxy implements SchedulerE
     private IDataSpaceClient restDataSpaceClient;
 
     public RestSmartProxyImpl() {
-        super.jobTracker = new RestJobTrackerImpl();
+        super(new RestJobTrackerImpl());
     }
 
     @Override
     public void init(String url, String user, String pwd) throws SchedulerException, LoginException {
         try {
-            this.schedulerUrl= url;
+            this.schedulerUrl = url;
             this.schedulerLogin = user;
             this.schedulerPassword = pwd;
             this.restSchedulerClient = SchedulerClient.createInstance();
@@ -97,7 +98,7 @@ public class RestSmartProxyImpl extends AbstractSmartProxy implements SchedulerE
             restDsClient.init(url, restSchedulerClient);
             this.restDataSpaceClient = restDsClient;
 
-            ((RestJobTrackerImpl) super.jobTracker).setRestDataSpaceClient(restDataSpaceClient);
+            super.jobTracker.setRestDataSpaceClient(restDataSpaceClient);
 
             jobTracker.loadJobs();
             registerAsListener();
@@ -182,14 +183,19 @@ public class RestSmartProxyImpl extends AbstractSmartProxy implements SchedulerE
     }
 
     @Override
+    public List<String> getGlobalSpaceURIs() throws NotConnectedException, PermissionException {
+        return restSchedulerClient.getGlobalSpaceURIs();
+    }
+
+    @Override
     public List<String> getUserSpaceURIs() throws NotConnectedException, PermissionException {
         return restSchedulerClient.getUserSpaceURIs();
     }
 
     @Override
-    public void addEventListener(SchedulerEventListener sel, boolean myEventsOnly, SchedulerEvent... events)
+    public void addEventListener(SchedulerEventListenerExtended listener, boolean myEventsOnly, SchedulerEvent... events)
             throws NotConnectedException, PermissionException {
-        restSchedulerClient.addEventListener(sel, myEventsOnly, events);
+        restSchedulerClient.addEventListener(listener, myEventsOnly, events);
     }
 
     /**
@@ -345,7 +351,7 @@ public class RestSmartProxyImpl extends AbstractSmartProxy implements SchedulerE
                 }
                 File localDir = new File(localFolder);
                 LocalDestination dest = new LocalDestination(localDir);
-                System.out.println("downloadlocalDir --> " + source);
+
                 restDataSpaceClient.download(source, dest);
             } catch (Throwable error) {
 

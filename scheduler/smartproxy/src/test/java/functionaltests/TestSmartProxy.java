@@ -4,6 +4,7 @@ import functionaltests.monitor.EventMonitor;
 import org.apache.log4j.Level;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Test;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -16,7 +17,7 @@ import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
-import org.ow2.proactive.scheduler.smartproxy.SmartProxy;
+import org.ow2.proactive.scheduler.smartproxy.SmartProxyImpl;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -67,7 +68,7 @@ public class TestSmartProxy extends SchedulerConsecutive {
     public final static String outputFileExt = ".out";
 
     // the proxy to be tested
-    protected SmartProxy schedProxy;
+    protected SmartProxyImpl schedProxy;
     protected MyEventListener eventListener;
 
     public TestSmartProxy() throws MalformedURLException, URISyntaxException {
@@ -97,7 +98,7 @@ public class TestSmartProxy extends SchedulerConsecutive {
         // start scheduler and nodes
         SchedulerTHelper.init();
 
-        schedProxy = SmartProxy.getActiveInstance();
+        schedProxy = SmartProxyImpl.getActiveInstance();
 
         schedProxy.cleanDatabase();
 
@@ -205,7 +206,7 @@ public class TestSmartProxy extends SchedulerConsecutive {
         throw new ProActiveTimeoutException("timeout elapsed");
     }
 
-    @org.junit.Test
+    @Test
     public void run() throws Throwable {
         SchedulerTHelper
                 .log("***************************************************************************************************");
