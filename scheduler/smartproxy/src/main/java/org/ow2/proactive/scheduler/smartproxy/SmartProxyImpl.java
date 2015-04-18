@@ -10,6 +10,7 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.EndActive;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.body.request.BlockingRequestQueueImpl;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.objectweb.proactive.extensions.dataspaces.vfs.selector.GlobPatternFileSelector;
@@ -149,6 +150,8 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
 
     private transient static SmartProxyImpl activeInstance;
 
+    private transient static SmartProxyImpl instance;
+
     protected transient Scheduler schedulerProxy;
 
     private transient Credentials credentials;
@@ -160,9 +163,14 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
     private transient SmartProxyImpl stubOnThis;
 
     /**
+     * Thread of this active object's service
+     */
+    private transient Thread serviceThread;
+
+    /**
      * Empty constructor required by ProActive.
      *
-     * @deprecated Use {@link #getActiveInstance()}
+     * @deprecated Use {@link #getActiveInstance()} or {@link #getInstance()}
      */
     public SmartProxyImpl() {
         // Does not set job tracker instance to prevent useless object
@@ -182,10 +190,24 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
         if (!((activeInstance != null)
                 && activeInstance.bodyOnThis != null
                 && activeInstance.bodyOnThis.isActive())) {
-            activeInstance = PAActiveObject.newActive(SmartProxyImpl.class, new Object[0]);
+            instance = getInstance();
+            activeInstance = PAActiveObject.turnActive(instance);
         }
 
         return activeInstance;
+    }
+
+    /**
+     * Returns the real singleton instance of the proxy
+     *
+     * @return instance of the proxy
+     */
+    public static synchronized SmartProxyImpl getInstance() {
+        if (instance == null) {
+            instance = new SmartProxyImpl();
+        }
+
+        return instance;
     }
 
     @Override
@@ -527,10 +549,41 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
 
         bodyOnThis = PAActiveObject.getBodyOnThis();
         stubOnThis = (SmartProxyImpl) PAActiveObject.getStubOnThis();
+        serviceThread = Thread.currentThread();
     }
 
     @Override
     public void endActivity(Body body) {
+        jobTracker.close();
+    }
+
+    /**
+     * This method forcefully terminates the activity of the proxy
+     * This method should not be called via a proactive stub
+     */
+    public void terminateFast() {
+        // if the service thread is locked on a user-level Thread.sleep():
+        serviceThread.interrupt();
+
+        // destroy the request queue
+        BlockingRequestQueueImpl rq = (BlockingRequestQueueImpl) bodyOnThis.getRequestQueue();
+        rq.destroy();
+
+        // kill the body
+        try {
+            bodyOnThis.terminate(false);
+        } catch (Exception e) {
+
+        }
+
+        while (serviceThread.isAlive()) {
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
         jobTracker.close();
     }
 
