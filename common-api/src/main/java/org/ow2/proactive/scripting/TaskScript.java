@@ -54,6 +54,8 @@ import org.apache.log4j.Logger;
  */
 @PublicAPI
 public class TaskScript extends Script<Serializable> {
+
+    private static final long serialVersionUID = 62L;
     /** Loggers */
     public static final Logger logger = Logger.getLogger(TaskScript.class);
 

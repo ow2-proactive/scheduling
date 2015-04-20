@@ -67,6 +67,8 @@ import org.ow2.proactive.resourcemanager.nodesource.utils.NamesConvertor;
 @ActiveObject
 public abstract class NodeSourcePolicy implements Serializable {
 
+    private static final long serialVersionUID = 62L;
+
     /** logger */
     private static Logger logger = Logger.getLogger(NodeSourcePolicy.class);
 

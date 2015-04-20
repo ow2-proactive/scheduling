@@ -62,6 +62,8 @@ import org.apache.log4j.spi.LoggingEvent;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Log4JTaskLogs implements TaskLogs {
 
+    private static final long serialVersionUID = 62L;
+
     /** Prefix for job logger */
     public static final String JOB_LOGGER_PREFIX = "logger.scheduler.";
 

@@ -77,6 +77,8 @@ import org.apache.log4j.Logger;
  */
 public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
 
+    private static final long serialVersionUID = 62L;
+
     /**
      * class' logger
      */

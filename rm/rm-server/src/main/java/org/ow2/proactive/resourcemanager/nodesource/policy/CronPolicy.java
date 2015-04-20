@@ -60,6 +60,8 @@ import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
  */
 @ActiveObject
 public class CronPolicy extends NodeSourcePolicy implements InitActive {
+
+    private static final long serialVersionUID = 62L;
     protected static Logger logger = Logger.getLogger(CronPolicy.class);
 
     /**

@@ -52,6 +52,8 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @PublicAPI
 public class RMEvent implements Serializable, Cloneable {
 
+    private static final long serialVersionUID = 62L;
+
     /** Resource manager URL */
     private String RMUrl = null;
     protected RMEventType type;

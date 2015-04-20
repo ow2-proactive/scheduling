@@ -57,6 +57,8 @@ import org.apache.log4j.Logger;
 @ActiveObject
 public class RestartDownNodesPolicy extends NodeSourcePolicy {
 
+    private static final long serialVersionUID = 62L;
+
     private static Logger logger = Logger.getLogger(RestartDownNodesPolicy.class);
 
     private Timer timer = new Timer("RestartDownNodesPolicy node status check");

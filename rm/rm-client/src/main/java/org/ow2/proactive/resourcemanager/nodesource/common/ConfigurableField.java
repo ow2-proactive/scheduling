@@ -50,6 +50,8 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ConfigurableField implements Serializable {
+
+    private static final long serialVersionUID = 62L;
     private String name;
     private String value;
     @XmlJavaTypeAdapter(ConfigurableAdapter.class)

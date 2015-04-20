@@ -44,6 +44,8 @@ package org.ow2.proactive.scheduler.exception;
  */
 public class ProgressPingerException extends RuntimeException {
 
+    private static final long serialVersionUID = 62L;
+
     /**
      * Create a new instance of ProgressPingerException
      *

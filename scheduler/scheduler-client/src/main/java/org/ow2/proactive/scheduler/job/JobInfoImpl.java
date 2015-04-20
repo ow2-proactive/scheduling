@@ -67,6 +67,8 @@ import org.ow2.proactive.scheduler.task.ClientTaskState;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class JobInfoImpl implements JobInfo {
 
+    private static final long serialVersionUID = 62L;
+
     /** job id  : must be initialize to a value in order to create temp taskId */
     private JobId jobId = JobIdImpl.makeJobId("0");
 

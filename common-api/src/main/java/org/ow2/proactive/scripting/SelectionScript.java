@@ -69,6 +69,8 @@ import org.apache.log4j.Logger;
  */
 @PublicAPI
 public class SelectionScript extends Script<Boolean> {
+
+    private static final long serialVersionUID = 62L;
     /** Loggers */
     public static final Logger logger = Logger.getLogger(SelectionScript.class);
 

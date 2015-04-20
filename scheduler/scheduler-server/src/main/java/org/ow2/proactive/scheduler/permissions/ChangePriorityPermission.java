@@ -50,6 +50,8 @@ import org.ow2.proactive.permissions.ClientPermission;
  */
 public class ChangePriorityPermission extends ClientPermission {
 
+    private static final long serialVersionUID = 62L;
+
     int[] priorities;
 
     /**

@@ -53,6 +53,8 @@ import org.ow2.proactive.utils.NodeSet;
  */
 public abstract class ExecutableContainer implements Serializable {
 
+    private static final long serialVersionUID = 62L;
+
     // node set : not DB managed
     protected NodeSet nodes;
 

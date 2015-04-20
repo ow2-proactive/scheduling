@@ -59,6 +59,8 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @PublicAPI
 public class UpdatableProperties<T> implements Serializable {
 
+    private static final long serialVersionUID = 62L;
+
     /** The value of this property. */
     @XmlValue
     private T value = null;

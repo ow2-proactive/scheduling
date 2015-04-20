@@ -8,6 +8,8 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @PublicAPI
 public class JobFilterCriteria implements Serializable {
 
+    private static final long serialVersionUID = 62L;
+
     private final boolean myJobsOnly;
 
     private final boolean pending;

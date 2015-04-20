@@ -50,6 +50,8 @@ import org.objectweb.proactive.annotation.PublicAPI;
  */
 @PublicAPI
 public class ByteArrayWrapper implements Serializable {
+
+    private static final long serialVersionUID = 62L;
     private byte[] byteArray;
 
     /**

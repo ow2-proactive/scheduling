@@ -52,6 +52,8 @@ import javax.xml.bind.annotation.XmlAccessorType;
 @XmlAccessorType(XmlAccessType.FIELD)
 public final class PropertyModifier implements Serializable {
 
+    private static final long serialVersionUID = 62L;
+
     private String name = null;
 
     private String value = null;

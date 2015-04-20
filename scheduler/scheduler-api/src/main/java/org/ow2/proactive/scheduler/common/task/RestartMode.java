@@ -56,6 +56,8 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class RestartMode implements java.io.Serializable {
 
+    private static final long serialVersionUID = 62L;
+
     /**
      * The task will be restarted according to its possible resources.
      */

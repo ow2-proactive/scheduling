@@ -44,7 +44,7 @@ public class CLIException extends RuntimeException {
     public static final int REASON_INVALID_ARGUMENTS = 3;
     public static final int REASON_OTHER = 4;
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 62L;
     private final int reason;
     private String stackTrace;
 

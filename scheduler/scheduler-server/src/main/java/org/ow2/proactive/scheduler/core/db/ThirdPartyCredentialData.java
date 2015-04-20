@@ -47,6 +47,8 @@ import javax.persistence.Table;
 @Table(name = "THIRD_PARTY_CREDENTIAL_DATA")
 public class ThirdPartyCredentialData implements Serializable {
 
+    private static final long serialVersionUID = 62L;
+
     @Id
     @Column(name = "USERNAME")
     String username;

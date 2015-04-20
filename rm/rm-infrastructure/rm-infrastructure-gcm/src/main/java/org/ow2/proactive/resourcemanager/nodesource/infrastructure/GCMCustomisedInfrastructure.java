@@ -64,6 +64,8 @@ import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 @Deprecated
 public class GCMCustomisedInfrastructure extends GCMInfrastructure {
 
+    private static final long serialVersionUID = 62L;
+
     /** hosts list */
     HashMap<String, DeploymentData> hosts = new HashMap<String, DeploymentData>();
     /** path to the file with host names */

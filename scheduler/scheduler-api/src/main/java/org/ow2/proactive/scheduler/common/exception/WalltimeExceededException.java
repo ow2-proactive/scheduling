@@ -42,6 +42,8 @@ package org.ow2.proactive.scheduler.common.exception;
  */
 public class WalltimeExceededException extends SchedulerException {
 
+    private static final long serialVersionUID = 62L;
+
     public WalltimeExceededException(String msg) {
         super(msg);
     }

@@ -53,6 +53,8 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @PublicAPI
 public class CredData implements Serializable {
 
+    private static final long serialVersionUID = 62L;
+
     /**
      * thirdPartyCredentials can contain the SSH key used for runAsMe tasks under this specific key
      */

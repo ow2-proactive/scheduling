@@ -54,6 +54,8 @@ import org.eclipse.jetty.util.resource.URLResource;
  * Default Jetty FileResource won't escape curly braces that are used in our REST documentation URLs.
  */
 public class RestDocumentationServlet extends DefaultServlet {
+
+    private static final long serialVersionUID = 62L;
     private ResourceEscapingBraces resourceEscapingBraces;
 
     @Override

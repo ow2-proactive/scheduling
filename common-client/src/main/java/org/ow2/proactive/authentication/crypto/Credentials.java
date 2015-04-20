@@ -88,6 +88,8 @@ import org.apache.commons.codec.binary.Base64;
 @PublicAPI
 public class Credentials implements Serializable {
 
+    private static final long serialVersionUID = 62L;
+
     /** Default credentials location */
     private static final String DEFAULT_CREDS = System.getProperty("user.home") + File.separator +
         ".proactive" + File.separator + "security" + File.separator + "creds.enc";

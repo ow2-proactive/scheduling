@@ -27,6 +27,8 @@ import org.ow2.proactive.utils.Formatter;
  */
 public class CLIInfrastructure extends HostsFileBasedInfrastructureManager {
 
+    private static final long serialVersionUID = 62L;
+
     @Configurable(description = "An interpreter that executes the script")
     protected String interpreter = "bash";
 

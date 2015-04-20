@@ -146,6 +146,8 @@ import java.util.concurrent.Future;
 @ActiveObject
 public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implements InitActive, EndActive, Serializable {
 
+    private static final long serialVersionUID = 62L;
+
     private static final Logger log = Logger.getLogger(SmartProxyImpl.class);
 
     private transient static SmartProxyImpl activeInstance;

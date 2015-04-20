@@ -48,6 +48,8 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @PublicAPI
 public class TaskUsage implements Serializable {
 
+    private static final long serialVersionUID = 62L;
+
     private final String taskId;
     private final String taskName;
     private final long taskStartTime;

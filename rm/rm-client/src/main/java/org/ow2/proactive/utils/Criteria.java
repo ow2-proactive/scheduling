@@ -57,6 +57,8 @@ import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 @PublicAPI
 public class Criteria implements Serializable {
 
+    private static final long serialVersionUID = 62L;
+
     // required number of nodes
     private int size;
 

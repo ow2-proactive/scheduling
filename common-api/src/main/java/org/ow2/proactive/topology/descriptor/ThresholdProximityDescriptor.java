@@ -47,6 +47,8 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @PublicAPI
 public class ThresholdProximityDescriptor extends BestProximityDescriptor {
 
+    private static final long serialVersionUID = 62L;
+
     private long threshold = 0;
 
     /**

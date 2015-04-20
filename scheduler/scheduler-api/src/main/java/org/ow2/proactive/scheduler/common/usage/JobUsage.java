@@ -52,6 +52,8 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @PublicAPI
 @XmlRootElement
 public class JobUsage implements Serializable {
+
+    private static final long serialVersionUID = 62L;
     private final String owner;
     private final String project;
     private final String jobId;

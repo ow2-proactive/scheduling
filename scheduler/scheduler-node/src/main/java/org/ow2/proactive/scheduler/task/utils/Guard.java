@@ -309,6 +309,8 @@ public abstract class Guard<T> {
     }
 
     public static class ToUnwrapException extends RuntimeException {
+
+    private static final long serialVersionUID = 62L;
         public ToUnwrapException(Throwable e) {
             super(e);
         }

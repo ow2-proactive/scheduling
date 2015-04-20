@@ -51,7 +51,7 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskResultData;
 
 
 public class JobResultImpl implements JobResult {
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 62L;
 
     private JobId jobId;
     private Map<String, TaskResult> allResults;

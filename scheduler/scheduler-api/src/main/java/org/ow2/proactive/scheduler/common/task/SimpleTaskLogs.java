@@ -51,6 +51,8 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class SimpleTaskLogs implements TaskLogs {
 
+    private static final long serialVersionUID = 62L;
+
     // logs on standard output
     private String standardLogs;
 

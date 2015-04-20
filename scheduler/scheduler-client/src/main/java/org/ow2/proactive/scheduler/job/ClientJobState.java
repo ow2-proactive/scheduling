@@ -34,6 +34,8 @@ import org.ow2.proactive.scheduler.task.TaskInfoImpl;
  */
 public final class ClientJobState extends JobState {
 
+    private static final long serialVersionUID = 62L;
+
     private JobInfoImpl jobInfo;
     private String owner;
     private JobType type;

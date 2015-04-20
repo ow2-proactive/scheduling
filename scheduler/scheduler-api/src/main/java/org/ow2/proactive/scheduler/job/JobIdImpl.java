@@ -55,6 +55,8 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 @XmlAccessorType(XmlAccessType.FIELD)
 public final class JobIdImpl implements JobId {
 
+    private static final long serialVersionUID = 62L;
+
     /** Default job name */
     public static final String DEFAULT_JOB_NAME = SchedulerConstants.JOB_DEFAULT_NAME;
 

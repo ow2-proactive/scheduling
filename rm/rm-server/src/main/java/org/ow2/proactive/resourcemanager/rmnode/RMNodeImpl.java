@@ -84,6 +84,8 @@ import org.apache.log4j.Logger;
  */
 public class RMNodeImpl implements RMNode, Serializable {
 
+    private static final long serialVersionUID = 62L;
+
     private final static Logger logger = Logger.getLogger(RMNodeImpl.class);
 
     /** HashMap associates a selection Script to its result on the node */

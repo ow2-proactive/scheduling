@@ -222,6 +222,8 @@ public class CreateCredentials {
             try {
                 Connection<AuthenticationImpl> conn = new Connection<AuthenticationImpl>(
                         AuthenticationImpl.class) {
+
+    private static final long serialVersionUID = 62L;
                     public Logger getLogger() {
                         return Logger.getLogger("pa.scheduler.credentials");
                     }

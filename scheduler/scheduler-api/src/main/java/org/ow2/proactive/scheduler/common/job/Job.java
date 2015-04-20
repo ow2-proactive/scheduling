@@ -66,6 +66,8 @@ import org.ow2.proactive.scheduler.common.task.CommonAttribute;
 @PublicAPI
 public abstract class Job extends CommonAttribute {
 
+    private static final long serialVersionUID = 62L;
+
     /** Name of the job */
     protected String name = SchedulerConstants.JOB_DEFAULT_NAME;
 

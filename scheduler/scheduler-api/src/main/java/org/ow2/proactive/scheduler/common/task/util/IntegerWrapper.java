@@ -56,6 +56,8 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class IntegerWrapper implements Serializable {
 
+    private static final long serialVersionUID = 62L;
+
     @XmlValue
     private Integer value;
 

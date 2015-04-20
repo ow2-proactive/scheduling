@@ -31,6 +31,8 @@ import org.ow2.proactive.scripting.SelectionScript;
  */
 public final class ClientTaskState extends TaskState {
 
+    private static final long serialVersionUID = 62L;
+
     private TaskInfo taskInfo;
     private int maxNumberOfExecutionOnFailure;
     private List<TaskId> dependenceIds = new ArrayList<TaskId>();

@@ -35,6 +35,8 @@
 package org.ow2.proactive_grid_cloud_portal.scheduler.exception;
 
 public class LogForwardingRestException extends RestException {
+
+    private static final long serialVersionUID = 62L;
     public LogForwardingRestException(Throwable cause) {
         super(cause);
     }

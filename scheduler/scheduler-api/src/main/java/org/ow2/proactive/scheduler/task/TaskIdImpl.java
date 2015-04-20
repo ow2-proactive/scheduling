@@ -56,6 +56,8 @@ import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 @XmlAccessorType(XmlAccessType.FIELD)
 public final class TaskIdImpl implements TaskId {
 
+    private static final long serialVersionUID = 62L;
+
     /**
      * Multiplicative factor for job id (taskId will be :
      * this_factor*jobID+taskID)

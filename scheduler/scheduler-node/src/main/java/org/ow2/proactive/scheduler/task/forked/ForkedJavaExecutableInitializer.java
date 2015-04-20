@@ -52,6 +52,8 @@ import org.ow2.proactive.scheduler.task.java.JavaExecutableContainer;
  */
 public class ForkedJavaExecutableInitializer extends JavaExecutableInitializerImpl {
 
+    private static final long serialVersionUID = 62L;
+
     /** Environment of a new dedicated JVM */
     private ForkEnvironment forkEnvironment = null;
 

@@ -60,6 +60,8 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @PublicAPI
 public class SingleHostExclusiveDescriptor extends SingleHostDescriptor {
 
+    private static final long serialVersionUID = 62L;
+
     /**
      * Constructs the new instance of this class.
      */

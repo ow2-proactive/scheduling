@@ -51,6 +51,8 @@ import org.ow2.proactive.scripting.Script;
  */
 public final class InternalForkEnvironment extends ForkEnvironment {
 
+    private static final long serialVersionUID = 62L;
+
     private boolean envReadOnly = false;
 
     /**

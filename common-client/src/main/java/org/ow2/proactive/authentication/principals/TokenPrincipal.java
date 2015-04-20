@@ -38,6 +38,8 @@ package org.ow2.proactive.authentication.principals;
 
 public class TokenPrincipal extends IdentityPrincipal {
 
+    private static final long serialVersionUID = 62L;
+
     public TokenPrincipal(String token) {
         super(token);
     }

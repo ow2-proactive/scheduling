@@ -54,6 +54,8 @@ import org.apache.log4j.Logger;
  */
 public class DefaultInfrastructureManager extends InfrastructureManager {
 
+    private static final long serialVersionUID = 62L;
+
     /** logger*/
     protected static Logger logger = Logger.getLogger(DefaultInfrastructureManager.class);
     /** registered nodes number */

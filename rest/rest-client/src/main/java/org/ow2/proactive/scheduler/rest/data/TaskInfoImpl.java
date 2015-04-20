@@ -43,6 +43,8 @@ import org.ow2.proactive.scheduler.common.task.TaskStatus;
 
 public class TaskInfoImpl implements TaskInfo {
 
+    private static final long serialVersionUID = 62L;
+
     private static final String[] EMPTY_STRING_ARRAY = new String[] {};
 
     private long executionDuration = -1;

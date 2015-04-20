@@ -61,6 +61,8 @@ import org.apache.log4j.Logger;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class NativeExecutableContainer extends ExecutableContainer {
 
+    private static final long serialVersionUID = 62L;
+
     public static final Logger logger = Logger.getLogger(NativeExecutableContainer.class);
 
     // actual executable data

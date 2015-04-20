@@ -27,6 +27,8 @@ import java.util.Properties;
  */
 public class AutoUpdateInfrastructure extends HostsFileBasedInfrastructureManager {
 
+    private static final long serialVersionUID = 62L;
+
     public static final String CLI_FILE_PROPERTY = "cli.file.property";
     public static final String NODE_NAME = "node.name";
     public static final String HOST_NAME = "host.name";

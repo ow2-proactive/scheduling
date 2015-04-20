@@ -59,6 +59,8 @@ import org.ow2.proactive.scheduler.util.TaskLogger;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class InternalJavaTask extends InternalTask {
 
+    private static final long serialVersionUID = 62L;
+
     public static final TaskLogger logger = TaskLogger.getInstance();
 
     /**

@@ -49,7 +49,7 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskResultData;
 
 
 public class TaskResultImpl implements TaskResult {
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 62L;
 
     private TaskId id;
     private byte[] serializedValue;
