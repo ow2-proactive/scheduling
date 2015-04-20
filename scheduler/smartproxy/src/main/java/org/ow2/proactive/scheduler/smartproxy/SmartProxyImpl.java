@@ -269,6 +269,11 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
     }
 
     @Override
+    public Scheduler getScheduler() {
+        return schedulerProxy;
+    }
+
+    @Override
     public void reconnect() throws SchedulerException, LoginException {
         if (super.schedulerUrl == null) {
             throw new IllegalStateException("No connection to the scheduler has been established yet.");

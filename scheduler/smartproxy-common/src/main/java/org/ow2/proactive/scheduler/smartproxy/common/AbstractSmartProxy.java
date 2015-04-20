@@ -2,10 +2,7 @@ package org.ow2.proactive.scheduler.smartproxy.common;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.utils.NamedThreadFactory;
-import org.ow2.proactive.scheduler.common.NotificationData;
-import org.ow2.proactive.scheduler.common.SchedulerConstants;
-import org.ow2.proactive.scheduler.common.SchedulerEvent;
-import org.ow2.proactive.scheduler.common.SchedulerEventListener;
+import org.ow2.proactive.scheduler.common.*;
 import org.ow2.proactive.scheduler.common.exception.*;
 import org.ow2.proactive.scheduler.common.job.*;
 import org.ow2.proactive.scheduler.common.task.*;
@@ -631,6 +628,13 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
     public abstract void init(String url, String user, String pwd) throws SchedulerException, LoginException;
 
     public abstract void disconnect() throws PermissionException, NotConnectedException;
+
+    /**
+     * Returns a proxy instance to the Scheduler.
+     *
+     * @return a proxy instance to the Scheduler.
+     */
+    public abstract Scheduler getScheduler();
 
     public abstract void registerAsListener() throws NotConnectedException, PermissionException;
 

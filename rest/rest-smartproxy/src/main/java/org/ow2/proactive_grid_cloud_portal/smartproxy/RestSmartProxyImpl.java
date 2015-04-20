@@ -37,6 +37,7 @@ package org.ow2.proactive_grid_cloud_portal.smartproxy;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import org.apache.log4j.Logger;
+import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
@@ -115,6 +116,11 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl> i
         } catch (NotConnectedException e) {
 
         }
+    }
+
+    @Override
+    public Scheduler getScheduler() {
+        return restSchedulerClient;
     }
 
     @Override
