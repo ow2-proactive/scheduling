@@ -1662,7 +1662,10 @@ public abstract class TaskLauncher implements InitActive {
     protected void updatePropagatedVariables(TaskResult... results) throws Exception {
         if (results != null && results.length > 0) {
             Map<String, byte[]> variables = getPropagatedVariables(results);
-            this.propagatedVariables = deserializeVariableMap(variables);
+            if (propagatedVariables == null) {
+                propagatedVariables = new HashMap<String, Serializable>();
+            }
+            propagatedVariables.putAll(deserializeVariableMap(variables));
         }
         this.propagatedVariables.putAll(contextVariables());
     }
@@ -1687,13 +1690,13 @@ public abstract class TaskLauncher implements InitActive {
     }
 
     protected void attachPropagatedVariables(TaskResultImpl resultImpl) {
-        if (this.propagatedVariables != null) {
-            resultImpl.setPropagatedVariables(serializeVariableMap(this.propagatedVariables));
+        if (propagatedVariables != null) {
+            resultImpl.setPropagatedVariables(serializeVariableMap(propagatedVariables));
         }
     }
 
     protected Map<String, Serializable> getPropagatedVariables() {
-        return this.propagatedVariables;
+        return propagatedVariables;
     }
 
     protected void setPropagatedVariables(Map<String, Serializable> propagatedVariables) {
