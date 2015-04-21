@@ -36,10 +36,6 @@
  */
 package org.ow2.proactive.scheduler.task;
 
-import static org.ow2.proactive.scheduler.common.task.util.SerializationUtil.deserializeVariableMap;
-import static org.ow2.proactive.scheduler.common.task.util.SerializationUtil.serializeVariableMap;
-import static org.ow2.proactive.scheduler.common.util.VariablesUtil.filterAndUpdate;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -68,12 +64,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.apache.log4j.Appender;
-import org.apache.log4j.FileAppender;
-import org.apache.log4j.Logger;
-import org.apache.log4j.MDC;
-import org.apache.log4j.helpers.LogLog;
-import org.apache.log4j.spi.LoggingEvent;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
@@ -128,6 +118,16 @@ import org.ow2.proactive.scripting.ScriptHandler;
 import org.ow2.proactive.scripting.ScriptLoader;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.utils.Formatter;
+import org.apache.log4j.Appender;
+import org.apache.log4j.FileAppender;
+import org.apache.log4j.Logger;
+import org.apache.log4j.MDC;
+import org.apache.log4j.helpers.LogLog;
+import org.apache.log4j.spi.LoggingEvent;
+
+import static org.ow2.proactive.scheduler.common.task.util.SerializationUtil.deserializeVariableMap;
+import static org.ow2.proactive.scheduler.common.task.util.SerializationUtil.serializeVariableMap;
+import static org.ow2.proactive.scheduler.common.util.VariablesUtil.filterAndUpdate;
 
 
 /**
@@ -1681,18 +1681,21 @@ public abstract class TaskLauncher implements InitActive {
     protected void updatePropagatedVariables(TaskResult... results) throws Exception {
         if (results != null && results.length > 0) {
             Map<String, byte[]> variables = getPropagatedVariables(results);
-            this.propagatedVariables = deserializeVariableMap(variables);
+            if (propagatedVariables == null) {
+                propagatedVariables = new HashMap<String, Serializable>();
+            }
+            propagatedVariables.putAll(deserializeVariableMap(variables));
         }
     }
 
     protected void attachPropagatedVariables(TaskResultImpl resultImpl) {
-        if (this.propagatedVariables != null) {
-            resultImpl.setPropagatedVariables(serializeVariableMap(this.propagatedVariables));
+        if (propagatedVariables != null) {
+            resultImpl.setPropagatedVariables(serializeVariableMap(propagatedVariables));
         }
     }
 
     protected Map<String, Serializable> getPropagatedVariables() {
-        return this.propagatedVariables;
+        return propagatedVariables;
     }
 
     protected void setPropagatedVariables(Map<String, Serializable> propagatedVariables) {
