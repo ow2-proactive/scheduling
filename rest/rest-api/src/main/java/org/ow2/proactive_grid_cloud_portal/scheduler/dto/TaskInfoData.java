@@ -51,6 +51,7 @@ public class TaskInfoData {
     private String executionHostName;
     private int numberOfExecutionLeft;
     private int numberOfExecutionOnFailureLeft;
+    private int progress;
 
     public TaskIdData getTaskId() {
         return taskId;
@@ -114,6 +115,14 @@ public class TaskInfoData {
 
     public void setNumberOfExecutionOnFailureLeft(int numberOfExecutionOnFailureLeft) {
         this.numberOfExecutionOnFailureLeft = numberOfExecutionOnFailureLeft;
+    }
+
+    public int getProgress() {
+        return progress;
+    }
+
+    public void setProgress(int progress) {
+        this.progress = progress;
     }
 
     public long getExecutionDuration() {

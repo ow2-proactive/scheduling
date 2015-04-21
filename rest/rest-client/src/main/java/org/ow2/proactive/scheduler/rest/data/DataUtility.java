@@ -120,6 +120,8 @@ public class DataUtility {
         impl.setNumberOfExecutionOnFailureLeft(d.getNumberOfExecutionOnFailureLeft());
         impl.setStartTime(d.getStartTime());
         impl.setStatus(TaskStatus.valueOf(d.getTaskStatus().name()));
+        impl.setName(d.getTaskId().getReadableName());
+        impl.setProgress(d.getProgress());
         return impl;
     }
 

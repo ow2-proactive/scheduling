@@ -100,6 +100,7 @@ public class SchedulerEventBroadcaster implements SchedulerEventListener {
     @Override
     public void taskStateUpdatedEvent(NotificationData<TaskInfo> notification) {
         TaskInfoData taskInfoData = dozerMapper.map(notification.getData(), TaskInfoData.class);
+
         broadcast(new EventNotification(EventNotification.Action.TASK_STATE_UPDATED,
             eventTypeName(notification), taskInfoData));
     }
