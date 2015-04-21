@@ -382,7 +382,7 @@ public class TaskData {
     }
 
     @Column(name = "GENERIC_INFO", updatable = false)
-    @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object"))
+    @Type(type = "org.ow2.proactive.scheduler.core.db.NonEmptyMapToBlobType", parameters = @Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object"))
     public Map<String, String> getGenericInformation() {
         return genericInformation;
     }
