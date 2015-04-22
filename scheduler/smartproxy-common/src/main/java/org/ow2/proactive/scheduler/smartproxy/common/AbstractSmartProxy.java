@@ -211,7 +211,14 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
         try {
             id = submit(job);
         } catch (Exception e) {
-            removeJobIO(job, pushUrl, pullUrl, newFolderName);
+            log.error("Error while submitting job", e);
+
+            try {
+                removeJobIO(job, pushUrl, pullUrl, newFolderName);
+            } catch (Exception e2) {
+                log.error("Error while removing job IO", e2);
+            }
+
             propagateIfInstanceOf(e, NotConnectedException.class);
             propagateIfInstanceOf(e, PermissionException.class);
             propagateIfInstanceOf(e, SubmissionClosedException.class);
