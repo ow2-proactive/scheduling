@@ -36,8 +36,6 @@
  */
 package org.ow2.proactive.scheduler.task.forked;
 
-import static org.ow2.proactive.scheduler.common.util.VariablesUtil.filterAndUpdate;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -54,10 +52,6 @@ import java.util.Map.Entry;
 import java.util.Random;
 import java.util.concurrent.Callable;
 
-import org.apache.log4j.Appender;
-import org.apache.log4j.AppenderSkeleton;
-import org.apache.log4j.Logger;
-import org.apache.log4j.spi.LoggingEvent;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
@@ -101,6 +95,12 @@ import org.ow2.proactive.scripting.ScriptLoader;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.utils.FileToBytesConverter;
 import org.ow2.proactive.utils.NodeSet;
+import org.apache.log4j.Appender;
+import org.apache.log4j.AppenderSkeleton;
+import org.apache.log4j.Logger;
+import org.apache.log4j.spi.LoggingEvent;
+
+import static org.ow2.proactive.scheduler.common.util.VariablesUtil.filterAndUpdate;
 
 
 /**
@@ -478,6 +478,7 @@ public class JavaForkerExecutable extends JavaExecutable implements ForkerStarte
             !contains("proactive.configuration", forkEnvironment.getJVMArguments())) {
             try {
                 fpaconfig = createTempFile("forked_jtp", ".xml");
+                fpaconfig.deleteOnExit();
                 PrintStream out = new PrintStream(fpaconfig);
                 out.print(execInitializer.getJavaTaskLauncherInitializer().getPaConfigContent());
                 out.close();
