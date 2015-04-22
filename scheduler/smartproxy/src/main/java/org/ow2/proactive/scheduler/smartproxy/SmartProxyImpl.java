@@ -269,7 +269,7 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
     }
 
     @Override
-    public Scheduler getScheduler() {
+    protected Scheduler _getScheduler() {
         return schedulerProxy;
     }
 

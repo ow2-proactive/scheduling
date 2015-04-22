@@ -2,13 +2,18 @@ package org.ow2.proactive.scheduler.smartproxy.common;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.utils.NamedThreadFactory;
+import org.ow2.proactive.db.SortParameter;
 import org.ow2.proactive.scheduler.common.*;
 import org.ow2.proactive.scheduler.common.exception.*;
 import org.ow2.proactive.scheduler.common.job.*;
 import org.ow2.proactive.scheduler.common.task.*;
+import org.ow2.proactive.scheduler.common.usage.JobUsage;
+import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
+import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
 
 import javax.security.auth.login.LoginException;
 import java.io.File;
+import java.security.KeyException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
@@ -28,7 +33,7 @@ import static org.ow2.proactive.scheduler.common.SchedulerEvent.*;
  *
  * @author The ProActive Team
  */
-public abstract class AbstractSmartProxy<T extends JobTracker> implements SchedulerEventListener {
+public abstract class AbstractSmartProxy<T extends JobTracker> implements Scheduler, SchedulerEventListener {
 
     private static final Logger log = Logger.getLogger(AbstractSmartProxy.class);
 
@@ -629,12 +634,61 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
 
     public abstract void disconnect() throws PermissionException, NotConnectedException;
 
+    @Override
+    public boolean isConnected() {
+        return getScheduler().isConnected();
+    }
+
+    @Override
+    public void renewSession() throws NotConnectedException {
+        getScheduler().renewSession();
+    }
+
+    @Override
+    public String getJobServerLogs(String id) throws UnknownJobException, NotConnectedException, PermissionException {
+        return getScheduler().getJobServerLogs(id);
+    }
+
+    @Override
+    public String getTaskServerLogs(String id, String taskName) throws UnknownJobException, UnknownTaskException, NotConnectedException, PermissionException {
+        return getScheduler().getTaskServerLogs(id, taskName);
+    }
+
+    @Override
+    public List<JobInfo> getJobs(int offset, int limit, JobFilterCriteria filterCriteria, List<SortParameter<JobSortParameter>> sortParameters) throws NotConnectedException, PermissionException {
+        return getScheduler().getJobs(offset, limit, filterCriteria, sortParameters);
+    }
+
+    @Override
+    public List<SchedulerUserInfo> getUsers() throws NotConnectedException, PermissionException {
+        return getScheduler().getUsers();
+    }
+
+    @Override
+    public List<SchedulerUserInfo> getUsersWithJobs() throws NotConnectedException, PermissionException {
+        return getScheduler().getUsersWithJobs();
+    }
+
     /**
      * Returns a proxy instance to the Scheduler.
+     * <p>
+     * /!\ This method must not be exposed remotely since remote calls
+     * to the proxy that is returned will fail with permission failures.
      *
      * @return a proxy instance to the Scheduler.
      */
-    public abstract Scheduler getScheduler();
+    protected abstract Scheduler _getScheduler();
+
+    private Scheduler getScheduler() {
+        Scheduler scheduler = _getScheduler();
+
+        if (scheduler == null) {
+            throw new IllegalStateException("No connection to the scheduler has been established yet. " +
+                    "Have you initialized the smartproxy with a call to the init method?");
+        }
+
+        return scheduler;
+    }
 
     public abstract void registerAsListener() throws NotConnectedException, PermissionException;
 
@@ -643,7 +697,7 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
      * location specified by PUSH_URL.
      *
      * @param job                  job to push data for
-     * @param localInputFolderPath local input folder
+     * @param localInp    utFolderPath local input folder
      * @return true if all input files are uploaded to the location specified by
      * the PUSH_URL.
      * @throws NotConnectedException
@@ -666,15 +720,215 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
     public abstract JobId submit(Job job) throws NotConnectedException, PermissionException,
             SubmissionClosedException, JobCreationException;
 
+    @Override
+    public JobResult getJobResult(String jobId) throws NotConnectedException, PermissionException, UnknownJobException {
+        return getScheduler().getJobResult(jobId);
+    }
+
     public abstract JobState getJobState(String jobId) throws NotConnectedException, UnknownJobException,
             PermissionException;
+
+    @Override
+    public SchedulerStatus getStatus() throws NotConnectedException, PermissionException {
+        return getScheduler().getStatus();
+    }
+
+    @Override
+    public JobState getJobState(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
+        return getScheduler().getJobState(jobId);
+    }
+
+    @Override
+    public SchedulerState getState() throws NotConnectedException, PermissionException {
+        return getScheduler().getState();
+    }
+
+    @Override
+    public SchedulerState getState(boolean myJobsOnly) throws NotConnectedException, PermissionException {
+        return getScheduler().getState(myJobsOnly);
+    }
+
+    @Override
+    public void addEventListener(SchedulerEventListener sel, boolean myEventsOnly, SchedulerEvent... events) throws NotConnectedException, PermissionException {
+        getScheduler().addEventListener(sel, myEventsOnly, events);
+    }
+
+    @Override
+    public SchedulerState addEventListener(SchedulerEventListener sel, boolean myEventsOnly, boolean getCurrentState, SchedulerEvent... events) throws NotConnectedException, PermissionException {
+        return getScheduler().addEventListener(sel, myEventsOnly, getCurrentState, events);
+    }
+
+    @Override
+    public void removeEventListener() throws NotConnectedException, PermissionException {
+        getScheduler().removeEventListener();
+    }
 
     public abstract TaskResult getTaskResult(String jobId, String taskName) throws NotConnectedException,
             UnknownJobException, UnknownTaskException, PermissionException;
 
+    @Override
+    public TaskResult getTaskResult(JobId jobId, String taskName) throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
+        return getScheduler().getTaskResult(jobId, taskName);
+    }
+
+    @Override
+    public TaskResult getTaskResultFromIncarnation(String jobId, String taskName, int inc) throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
+        return getScheduler().getTaskResultFromIncarnation(jobId, taskName, inc);
+    }
+
+    @Override
+    public boolean removeJob(String jobId) throws NotConnectedException, UnknownJobException, PermissionException {
+        return getScheduler().removeJob(jobId);
+    }
+
+    @Override
+    public void listenJobLogs(String jobId, AppenderProvider appenderProvider) throws NotConnectedException, UnknownJobException, PermissionException {
+        getScheduler().listenJobLogs(jobId, appenderProvider);
+    }
+
+    @Override
+    public boolean killJob(String jobId) throws NotConnectedException, UnknownJobException, PermissionException {
+        return getScheduler().killJob(jobId);
+    }
+
+    @Override
+    public boolean killTask(String jobId, String taskName) throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
+        return getScheduler().killTask(jobId, taskName);
+    }
+
+    @Override
+    public boolean restartTask(String jobId, String taskName, int restartDelay) throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
+        return getScheduler().restartTask(jobId, taskName, restartDelay);
+    }
+
+    @Override
+    public boolean preemptTask(String jobId, String taskName, int restartDelay) throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
+        return getScheduler().preemptTask(jobId, taskName, restartDelay);
+    }
+
+    @Override
+    public boolean pauseJob(String jobId) throws NotConnectedException, UnknownJobException, PermissionException {
+        return getScheduler().pauseJob(jobId);
+    }
+
+    @Override
+    public boolean resumeJob(String jobId) throws NotConnectedException, UnknownJobException, PermissionException {
+        return getScheduler().resumeJob(jobId);
+    }
+
+    @Override
+    public void changeJobPriority(String jobId, JobPriority priority) throws NotConnectedException, UnknownJobException, PermissionException, JobAlreadyFinishedException {
+        getScheduler().changeJobPriority(jobId, priority);
+    }
+
     public abstract List<String> getUserSpaceURIs() throws NotConnectedException, PermissionException;
 
     public abstract List<String> getGlobalSpaceURIs() throws NotConnectedException, PermissionException;
+
+    @Override
+    public JobResult getJobResult(JobId jobId) throws NotConnectedException, PermissionException, UnknownJobException {
+        return getScheduler().getJobResult(jobId);
+    }
+
+    @Override
+    public TaskResult getTaskResultFromIncarnation(JobId jobId, String taskName, int inc) throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
+        return getScheduler().getTaskResultFromIncarnation(jobId, taskName, inc);
+    }
+
+    @Override
+    public boolean killTask(JobId jobId, String taskName) throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
+        return getScheduler().killTask(jobId, taskName);
+    }
+
+    @Override
+    public boolean restartTask(JobId jobId, String taskName, int restartDelay) throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
+        return getScheduler().restartTask(jobId, taskName, restartDelay);
+    }
+
+    @Override
+    public boolean preemptTask(JobId jobId, String taskName, int restartDelay) throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
+        return getScheduler().preemptTask(jobId, taskName, restartDelay);
+    }
+
+    @Override
+    public boolean removeJob(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
+        return getScheduler().removeJob(jobId);
+    }
+
+    @Override
+    public void listenJobLogs(JobId jobId, AppenderProvider appenderProvider) throws NotConnectedException, UnknownJobException, PermissionException {
+        getScheduler().listenJobLogs(jobId, appenderProvider);
+    }
+
+    @Override
+    public boolean killJob(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
+        return getScheduler().killJob(jobId);
+    }
+
+    @Override
+    public boolean pauseJob(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
+        return getScheduler().pauseJob(jobId);
+    }
+
+    @Override
+    public boolean resumeJob(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
+        return getScheduler().resumeJob(jobId);
+    }
+
+    @Override
+    public void changeJobPriority(JobId jobId, JobPriority priority) throws NotConnectedException, UnknownJobException, PermissionException, JobAlreadyFinishedException {
+        getScheduler().changeJobPriority(jobId, priority);
+    }
+
+    @Override
+    public boolean changePolicy(String policyClassName) throws NotConnectedException, PermissionException {
+        return getScheduler().changePolicy(policyClassName);
+    }
+
+    @Override
+    public boolean start() throws NotConnectedException, PermissionException {
+        return getScheduler().start();
+    }
+
+    @Override
+    public boolean stop() throws NotConnectedException, PermissionException {
+        return getScheduler().stop();
+    }
+
+    @Override
+    public boolean pause() throws NotConnectedException, PermissionException {
+        return getScheduler().pause();
+    }
+
+    @Override
+    public boolean freeze() throws NotConnectedException, PermissionException {
+        return getScheduler().freeze();
+    }
+
+    @Override
+    public boolean resume() throws NotConnectedException, PermissionException {
+        return getScheduler().resume();
+    }
+
+    @Override
+    public boolean shutdown() throws NotConnectedException, PermissionException {
+        return getScheduler().shutdown();
+    }
+
+    @Override
+    public boolean kill() throws NotConnectedException, PermissionException {
+        return getScheduler().kill();
+    }
+
+    @Override
+    public boolean linkResourceManager(String rmURL) throws NotConnectedException, PermissionException {
+        return getScheduler().linkResourceManager(rmURL);
+    }
+
+    @Override
+    public boolean reloadPolicyConfiguration() throws NotConnectedException, PermissionException {
+        return getScheduler().reloadPolicyConfiguration();
+    }
 
     public abstract void addEventListener(SchedulerEventListenerExtended listener, boolean myEventsOnly,
                                           SchedulerEvent[] events) throws NotConnectedException, PermissionException;
@@ -682,5 +936,30 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
     protected abstract void removeJobIO(Job job, String pushURL, String pullURL, String newFolderName);
 
     protected abstract void createFolder(String fUri) throws NotConnectedException, PermissionException;
+
+    @Override
+    public List<JobUsage> getMyAccountUsage(Date startDate, Date endDate) throws NotConnectedException, PermissionException {
+        return getScheduler().getMyAccountUsage(startDate, endDate);
+    }
+
+    @Override
+    public List<JobUsage> getAccountUsage(String user, Date startDate, Date endDate) throws NotConnectedException, PermissionException {
+        return getScheduler().getAccountUsage(user, startDate, endDate);
+    }
+
+    @Override
+    public void putThirdPartyCredential(String key, String value) throws NotConnectedException, PermissionException, KeyException {
+        getScheduler().putThirdPartyCredential(key, value);
+    }
+
+    @Override
+    public Set<String> thirdPartyCredentialsKeySet() throws NotConnectedException, PermissionException {
+        return getScheduler().thirdPartyCredentialsKeySet();
+    }
+
+    @Override
+    public void removeThirdPartyCredential(String key) throws NotConnectedException, PermissionException {
+        getScheduler().removeThirdPartyCredential(key);
+    }
 
 }

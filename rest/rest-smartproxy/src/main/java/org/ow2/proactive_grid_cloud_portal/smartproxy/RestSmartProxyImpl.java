@@ -119,7 +119,7 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl> i
     }
 
     @Override
-    public Scheduler getScheduler() {
+    protected Scheduler _getScheduler() {
         return restSchedulerClient;
     }
 
