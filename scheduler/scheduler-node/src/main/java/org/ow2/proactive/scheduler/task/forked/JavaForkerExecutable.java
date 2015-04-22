@@ -235,7 +235,7 @@ public class JavaForkerExecutable extends JavaExecutable implements ForkerStarte
     }
 
     private void reEncryptForForkedLauncher() throws NoSuchAlgorithmException, IllegalAccessException,
-            KeyException {
+      KeyException {
         PublicKey publicKey = launcherGuard.use().generatePublicKey();
         CredData decrypted = execInitializer.getDecrypter().decrypt();
         Credentials credentialsForForkedLauncher = Credentials.createCredentials(decrypted, publicKey);
@@ -478,6 +478,7 @@ public class JavaForkerExecutable extends JavaExecutable implements ForkerStarte
             !contains("proactive.configuration", forkEnvironment.getJVMArguments())) {
             try {
                 fpaconfig = createTempFile("forked_jtp", ".properties");
+                fpaconfig.deleteOnExit();
                 PrintStream out = new PrintStream(fpaconfig);
                 out.print(execInitializer.getJavaTaskLauncherInitializer().getPaConfigContent());
                 out.close();

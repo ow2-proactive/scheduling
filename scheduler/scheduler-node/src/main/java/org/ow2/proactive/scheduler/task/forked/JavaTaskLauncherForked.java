@@ -34,6 +34,7 @@
  */
 package org.ow2.proactive.scheduler.task.forked;
 
+import java.io.File;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -91,7 +92,7 @@ public class JavaTaskLauncherForked extends JavaTaskLauncher {
      */
     public void configureNode(String sharedForkerForkedDataspaceUri) {
         try {
-            String scratchDir = System.getProperty("java.io.tmpdir");
+            String scratchDir = new File(".").getAbsolutePath();
             BaseScratchSpaceConfiguration scratchConf = new BaseScratchSpaceConfiguration((String) null,
                 scratchDir);
             DataSpacesNodes.configureNode(PAActiveObject.getActiveObjectNode(PAActiveObject.getStubOnThis()),
