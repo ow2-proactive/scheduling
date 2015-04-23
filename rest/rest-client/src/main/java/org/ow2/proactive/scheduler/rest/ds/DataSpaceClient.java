@@ -38,6 +38,7 @@ package org.ow2.proactive.scheduler.rest.ds;
 
 import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
+import org.apache.log4j.Logger;
 import org.jboss.resteasy.client.jaxrs.ClientHttpEngine;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
@@ -65,6 +66,8 @@ import java.util.Map;
 
 
 public class DataSpaceClient implements IDataSpaceClient {
+
+    private static final Logger log = Logger.getLogger(DataSpaceClient.class);
 
     private String restDataspaceUrl;
     private ISchedulerClient client;
@@ -99,6 +102,11 @@ public class DataSpaceClient implements IDataSpaceClient {
     @Override
     public boolean upload(final ILocalSource source, final IRemoteDestination destination)
             throws NotConnectedException, PermissionException {
+
+        if (log.isDebugEnabled()) {
+            log.debug("Uploading from " + source + " to " + destination);
+        }
+
         StringBuffer uriTmpl = (new StringBuffer()).append(restDataspaceUrl).append(
                 destination.getDataspace().value());
         ResteasyClient client = new ResteasyClientBuilder().httpEngine(httpEngine).build();
@@ -114,6 +122,7 @@ public class DataSpaceClient implements IDataSpaceClient {
                         }
                     }, new Variant(MediaType.APPLICATION_OCTET_STREAM_TYPE, (Locale) null, source
                             .getEncoding())));
+
             if (response.getStatus() != HttpURLConnection.HTTP_CREATED) {
                 if (response.getStatus() == HttpURLConnection.HTTP_UNAUTHORIZED) {
                     throw new NotConnectedException("User not authenticated or session timeout.");
@@ -121,6 +130,11 @@ public class DataSpaceClient implements IDataSpaceClient {
                     throw new RuntimeException("File upload failed. Status code:" + response.getStatus());
                 }
             }
+
+            if (log.isDebugEnabled()) {
+                log.debug("Upload from " + source + " to " + destination + " performed with success");
+            }
+
             return true;
         } catch (IOException ioe) {
             throw Throwables.propagate(ioe);
@@ -133,6 +147,10 @@ public class DataSpaceClient implements IDataSpaceClient {
 
     @Override
     public boolean create(IRemoteSource source) throws NotConnectedException, PermissionException {
+        if (log.isDebugEnabled()) {
+            log.debug("Trying to create file " + source);
+        }
+
         StringBuffer uriTmpl = (new StringBuffer()).append(restDataspaceUrl).append(
                 source.getDataspace().value());
         ResteasyClient client = new ResteasyClientBuilder().httpEngine(httpEngine).build();
@@ -156,6 +174,11 @@ public class DataSpaceClient implements IDataSpaceClient {
                     throw new RuntimeException("Cannot create file(s). Status code:" + response.getStatus());
                 }
             }
+
+            if (log.isDebugEnabled()) {
+                log.debug("File creation " + source + " performed with success");
+            }
+
             return true;
         } finally{
             if (response != null) {
@@ -167,6 +190,10 @@ public class DataSpaceClient implements IDataSpaceClient {
     @Override
     public boolean download(IRemoteSource source, ILocalDestination destination)
             throws NotConnectedException, PermissionException {
+        if (log.isDebugEnabled()) {
+            log.debug("Downloading from " + source + " to " + destination);
+        }
+
         StringBuffer uriTmpl = (new StringBuffer()).append(restDataspaceUrl).append(
                 source.getDataspace().value());
         ResteasyClient client = new ResteasyClientBuilder().httpEngine(httpEngine).build();
@@ -201,6 +228,11 @@ public class DataSpaceClient implements IDataSpaceClient {
                 throw new RuntimeException(String.format("%s in %s is empty.", source.getDataspace(), source
                         .getPath()));
             }
+
+            if (log.isDebugEnabled()) {
+                log.debug("Download from " + source + " to " + destination + " performed with success");
+            }
+
             return true;
         } catch (IOException ioe) {
             throw Throwables.propagate(ioe);
@@ -249,18 +281,25 @@ public class DataSpaceClient implements IDataSpaceClient {
 
     @Override
     public boolean delete(IRemoteSource source) throws NotConnectedException, PermissionException {
+        if (log.isDebugEnabled()) {
+            log.debug("Trying to delete " + source);
+        }
+
         StringBuffer uriTmpl = (new StringBuffer()).append(restDataspaceUrl).append(
                 source.getDataspace().value());
         ResteasyClient client = new ResteasyClientBuilder().httpEngine(httpEngine).build();
         ResteasyWebTarget target = client.target(uriTmpl.toString()).path(source.getPath());
+
         List<String> includes = source.getIncludes();
         if (includes != null && !includes.isEmpty()) {
             target = target.queryParam("includes", includes.toArray(new Object[includes.size()]));
         }
+
         List<String> excludes = source.getExcludes();
         if (excludes != null && !excludes.isEmpty()) {
             target = target.queryParam("excludes", excludes.toArray(new Object[excludes.size()]));
         }
+
         Response response = null;
         try {
             response = target.request().header("sessionid", sessionId).delete();
@@ -271,6 +310,11 @@ public class DataSpaceClient implements IDataSpaceClient {
                     throw new RuntimeException("Cannot delete file(s). Status code:" + response.getStatus());
                 }
             }
+
+            if (log.isDebugEnabled()) {
+                log.debug("Removal of " + source + " performed with success");
+            }
+
             return true;
         } finally {
             if (response != null) {

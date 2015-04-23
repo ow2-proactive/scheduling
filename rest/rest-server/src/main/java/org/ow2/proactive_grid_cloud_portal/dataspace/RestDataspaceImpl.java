@@ -66,6 +66,7 @@ import static org.apache.commons.vfs2.Selectors.SELECT_SELF;
 
 @Path("/data/")
 public class RestDataspaceImpl {
+
     private static final Logger logger = Logger.getLogger(RestDataspaceImpl.class);
 
     private static SessionStore sessions = SharedSessionStore.getInstance();

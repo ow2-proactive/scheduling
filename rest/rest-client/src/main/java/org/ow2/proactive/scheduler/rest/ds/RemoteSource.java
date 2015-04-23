@@ -127,6 +127,7 @@ public class RemoteSource implements IRemoteSource {
                 ", path='" + path + '\'' +
                 ", includes=" + includes +
                 ", excludes=" + excludes +
+                ", pathType=" + pathType +
                 '}';
     }
 
