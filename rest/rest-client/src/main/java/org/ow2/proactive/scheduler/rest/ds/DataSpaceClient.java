@@ -303,15 +303,20 @@ public class DataSpaceClient implements IDataSpaceClient {
         Response response = null;
         try {
             response = target.request().header("sessionid", sessionId).delete();
+
+            boolean noContent = false;
             if (response.getStatus() != HttpURLConnection.HTTP_NO_CONTENT) {
                 if (response.getStatus() == HttpURLConnection.HTTP_UNAUTHORIZED) {
                     throw new NotConnectedException("User not authenticated or session timeout.");
                 } else {
                     throw new RuntimeException("Cannot delete file(s). Status code:" + response.getStatus());
                 }
+            } else {
+                noContent = true;
+                log.debug("No action performed for deletion since source " + source + " was not found remotely");
             }
 
-            if (log.isDebugEnabled()) {
+            if (!noContent && log.isDebugEnabled()) {
                 log.debug("Removal of " + source + " performed with success");
             }
 

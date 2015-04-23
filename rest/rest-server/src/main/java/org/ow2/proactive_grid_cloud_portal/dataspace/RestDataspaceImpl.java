@@ -227,7 +227,7 @@ public class RestDataspaceImpl {
             FileObject fo = resolveFile(session, dataspace, pathname);
 
             if (!fo.exists()) {
-                return notFoundRes();
+                return Response.status(Response.Status.NO_CONTENT).build();
             }
             if (fo.getType() == FileType.FOLDER) {
                 return deleteDir(fo, includes, excludes);
