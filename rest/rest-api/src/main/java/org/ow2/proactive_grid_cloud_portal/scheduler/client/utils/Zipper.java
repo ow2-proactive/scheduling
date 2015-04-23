@@ -109,7 +109,7 @@ public class Zipper {
             FluentIterable<File> fi = Files.fileTreeTraverser().postOrderTraversal(root);
             ImmutableList<File> fileList = nullOrEmpty(includes) && nullOrEmpty(excludes) ? fi.filter(
                     new FilesOnlyPredicate()).toList() : fi.filter(
-                    new FileSelectionPredicate(includes, excludes)).toList();
+                    new FileSelectionPredicate(root, includes, excludes)).toList();
             zipFiles(fileList, root.getAbsolutePath(), os);
         }
 
@@ -228,36 +228,40 @@ public class Zipper {
     }
 
     private static class FileSelectionPredicate implements Predicate<File> {
+
+        private File root;
         private List<String> includes;
         private List<String> excludes;
 
-        public FileSelectionPredicate(List<String> includes, List<String> excludes) {
+        public FileSelectionPredicate(File root, List<String> includes, List<String> excludes) {
+            this.root = root;
             this.includes = includes;
             this.excludes = excludes;
         }
 
         @Override
         public boolean apply(File file) {
-            return !file.isDirectory() && !matches(file, excludes) && matches(file, includes);
+            File filePathRelativeToRoot = root.toPath().relativize(file.toPath()).toFile();
+
+            return !file.isDirectory()
+                        && !matches(filePathRelativeToRoot, excludes)
+                        && matches(filePathRelativeToRoot, includes);
         }
 
         private boolean matches(File file, List<String> exprs) {
-            String filename = file.getName();
-
-            boolean match = false;
             if (exprs == null || exprs.isEmpty()) {
                 return false;
             } else if (exprs.contains(file.getName())) {
                 return true;
             } else {
                 for (String expr : exprs) {
-                    if (SelectorUtils.matchPath(expr, filename)) {
-                        match = true;
-                        break;
+                    if (SelectorUtils.matchPath(expr, file.toString())) {
+                        return true;
                     }
                 }
             }
-            return match;
+
+            return false;
         }
     }
 
