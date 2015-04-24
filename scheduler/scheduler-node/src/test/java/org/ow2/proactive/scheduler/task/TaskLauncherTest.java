@@ -1,9 +1,11 @@
 package org.ow2.proactive.scheduler.task;
 
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.List;
-
+import com.google.common.base.Charsets;
+import com.google.common.io.CharStreams;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+import org.mockito.Matchers;
 import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
@@ -18,15 +20,14 @@ import org.ow2.proactive.scheduler.task.data.TaskDataspaces;
 import org.ow2.proactive.scheduler.task.script.ForkedScriptExecutableContainer;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.mockito.Matchers;
+
+import java.io.InputStreamReader;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.List;
 
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 
 public class TaskLauncherTest {
@@ -59,7 +60,7 @@ public class TaskLauncherTest {
 
     @Test
     public void javaTask() throws Throwable {
-        HashMap<String, byte[]> args = new HashMap<String, byte[]>();
+        HashMap<String, byte[]> args = new HashMap<>();
         args.put("number", Object2ByteConverter.convertObject2Byte(123));
         ForkedScriptExecutableContainer executableContainer = new ForkedScriptExecutableContainer(
           new TaskScript(new SimpleScript(WaitAndPrint.class.getName(), "java", new Serializable[]{
@@ -105,8 +106,8 @@ public class TaskLauncherTest {
 
         CredData credData = new CredData("john", "pwd");
         credData.addThirdPartyCredential("password", "r00t");
-        Credentials thirdPartyCredentials = Credentials.createCredentials(credData,
-          taskLauncher.generatePublicKey());
+        Credentials thirdPartyCredentials =
+                Credentials.createCredentials(credData, taskLauncher.generatePublicKey());
         executableContainer.setCredentials(thirdPartyCredentials);
 
         TaskResult taskResult = runTaskLauncher(taskLauncher, executableContainer);
@@ -173,6 +174,30 @@ public class TaskLauncherTest {
         runTaskLauncher(taskLauncher, executableContainer);
 
         verify(dataspacesMock, times(1)).copyScratchDataToOutput(Matchers.<List<OutputSelector>>any());
+    }
+
+    @Test
+    public void testProgressFileReaderIntegration() throws Throwable {
+        int nbIterations = 3;
+
+        String taskScript = CharStreams.toString(new InputStreamReader(
+                getClass().getResourceAsStream("/task-report-progress.py"), Charsets.UTF_8));
+
+        ForkedScriptExecutableContainer executableContainer = new ForkedScriptExecutableContainer(
+                new TaskScript(new SimpleScript(taskScript, "python",
+                        new String [] {Integer.toString(nbIterations)})));
+
+        TaskLauncherInitializer initializer = new TaskLauncherInitializer();
+        initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("42"), "job", 1000L, false));
+
+        TaskLauncher taskLauncher = new TaskLauncher(initializer, new TestTaskLauncherFactory());
+        TaskResult taskResult = runTaskLauncher(taskLauncher, executableContainer);
+
+        List result = (List) taskResult.value();
+
+        for (int i=1; i<=result.size(); i++) {
+            assertEquals(i * (100 / nbIterations), result.get(i-1));
+        }
     }
 
     private TaskResult runTaskLauncher(TaskLauncher taskLauncher, ForkedScriptExecutableContainer executableContainer) {

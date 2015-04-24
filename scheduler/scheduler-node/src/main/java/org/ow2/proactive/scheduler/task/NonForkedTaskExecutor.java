@@ -174,6 +174,7 @@ public class NonForkedTaskExecutor implements TaskExecutor {
         variables.put(SchedulerVars.PA_NODESFILE.toString(), writeNodesFile(container.getNodesHosts()));
 
         variables.put(SchedulerVars.PA_SCHEDULER_HOME.toString(), container.getSchedulerHome());
+        variables.put(SchedulerVars.PA_TASK_PROGRESS_FILE.toString(), container.getProgressFilePath());
 
         return variables;
     }

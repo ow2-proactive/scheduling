@@ -36,14 +36,8 @@
  */
 package org.ow2.proactive.scheduler.task;
 
-import java.io.File;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
-import java.security.PublicKey;
-import java.security.SecureRandom;
-import java.util.Collections;
-
+import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.ImmediateService;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.ProActiveInet;
@@ -64,8 +58,10 @@ import org.ow2.proactive.scheduler.task.utils.Decrypter;
 import org.ow2.proactive.scheduler.task.utils.StopWatch;
 import org.ow2.proactive.scheduler.task.utils.TaskKiller;
 import org.ow2.proactive.scheduler.task.utils.WallTimer;
-import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
+
+import java.io.File;
+import java.security.*;
+import java.util.Collections;
 
 
 /**
@@ -89,6 +85,8 @@ public class TaskLauncher {
     private TaskKiller taskKiller;
     private Decrypter decrypter;
 
+    private ProgressFileReader progressFileReader;
+
     /** Needed for ProActive */
     public TaskLauncher() {
     }
@@ -102,6 +100,7 @@ public class TaskLauncher {
         this.initializer = initializer;
         this.taskId = initializer.getTaskId();
         this.taskLogger = new TaskLogger(taskId, getHostname());
+        this.progressFileReader = new ProgressFileReader();
     }
 
     public void doTask(ExecutableContainer executableContainer, TaskResult[] previousTasksResults,
@@ -121,16 +120,18 @@ public class TaskLauncher {
 
             dataspaces.copyInputDataToScratch(initializer.getTaskInputFiles()); // should handle interrupt
 
+            File workingDir = getTaskWorkingDir(executableContainer, dataspaces);
+
+            progressFileReader.start(workingDir, taskId);
+
             TaskContext context = new TaskContext(executableContainer, initializer, previousTasksResults,
                 dataspaces.getScratchURI(), dataspaces.getInputURI(), dataspaces.getOutputURI(),
-                dataspaces.getUserURI(), dataspaces.getGlobalURI());
+                dataspaces.getUserURI(), dataspaces.getGlobalURI(), progressFileReader.getProgressFile().toString());
 
             if (decrypter != null) {
                 decrypter.setCredentials(executableContainer.getCredentials());
                 context.setDecrypter(decrypter);
             }
-
-            File workingDir = getTaskWorkingDir(executableContainer, dataspaces);
 
             TaskResultImpl taskResult = factory.createTaskExecutor(workingDir, decrypter).execute(context,
                     taskLogger.getOutputSink(), taskLogger.getErrorSink());
@@ -263,7 +264,10 @@ public class TaskLauncher {
 
     @ImmediateService
     public void terminate(boolean normalTermination) {
+        progressFileReader.stop();
+
         taskLogger.resetLogContextForImmediateService();
+
         if (normalTermination) {
             logger.info("Terminate message received for task " + taskId);
         } else {
@@ -279,12 +283,13 @@ public class TaskLauncher {
         logger.info("TaskLauncher terminated");
     }
 
+    @ImmediateService
     public int getProgress() {
-        // not supported anymore, still needed for ping purpose
-        return 0;
+        return progressFileReader.getProgress();
     }
 
     private static String getHostname() {
         return ProActiveInet.getInstance().getInetAddress().getHostName();
     }
+
 }
