@@ -250,7 +250,7 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl> i
     }
 
     @Override
-    public void downloadTaskOutputFiles(AwaitedJob awaitedjob, String jobId, String taskName, String localFolder) {
+    protected void downloadTaskOutputFiles(AwaitedJob awaitedjob, String jobId, String taskName, String localFolder) throws NotConnectedException, PermissionException {
         AwaitedTask atask = awaitedjob.getAwaitedTask(taskName);
         if (atask == null) {
             throw new IllegalArgumentException("The task " + taskName + " does not belong to job " + jobId +
@@ -286,6 +286,8 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl> i
             }
         }
 
+        jobTracker.setTaskTransferring(jobId, taskName, true);
+
         if (awaitedjob.isAutomaticTransfer()) {
             threadPool.submit(new DownloadHandler(jobId, taskName, sourceFile, includes, excludes, localFolder));
         } else {
@@ -300,14 +302,16 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl> i
                 File localDir = new File(localFolder);
                 LocalDestination dest = new LocalDestination(localDir);
                 restDataSpaceClient.download(source, dest);
-            } catch (Throwable error) {
+            } catch (NotConnectedException | PermissionException e) {
                 logger.error(String.format(
                         "Cannot download files, jobId=%s, taskId=%s, source=%s, destination=%s", jobId,
-                        taskName, sourceFile, localFolder), error);
+                        taskName, sourceFile, localFolder), e);
+                throw e;
+            } finally {
+                jobTracker.setTaskTransferring(jobId, taskName, false);
+                jobTracker.removeAwaitedTask(jobId, taskName);
             }
-            jobTracker.removeAwaitedTask(jobId, taskName);
         }
-        jobTracker.setTaskTransferring(jobId, taskName, true);
 
     }
 

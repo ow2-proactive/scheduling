@@ -721,7 +721,7 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
      * @param t_name      name of the task
      * @param localFolder local output folder, if not null, it overrides the folder specified as output folder for the job
      */
-    public abstract void downloadTaskOutputFiles(AwaitedJob awaitedjob, String jobId, String t_name,
+    protected abstract void downloadTaskOutputFiles(AwaitedJob awaitedjob, String jobId, String t_name,
                                                  String localFolder) throws Exception;
 
     public abstract JobId submit(Job job) throws NotConnectedException, PermissionException,

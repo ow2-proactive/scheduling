@@ -367,7 +367,7 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
     }
 
     @Override
-    public void downloadTaskOutputFiles(AwaitedJob awaitedjob, String jobId, String t_name, String localFolder) throws Exception {
+    protected void downloadTaskOutputFiles(AwaitedJob awaitedjob, String jobId, String t_name, String localFolder) throws Exception {
         AwaitedTask atask = awaitedjob.getAwaitedTask(t_name);
         if (atask == null) {
             throw new IllegalArgumentException("The task " + t_name + " does not belong to job " + jobId +
@@ -446,10 +446,19 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
             threadPool.submit((Runnable) dtp);
         } else {
             log.debug("Copying files from " + sourceUrl + " to " + destUrl);
-            localfolderFO.copyFrom(remotePullFolderFO, fileSelector);
+
+            try {
+                localfolderFO.copyFrom(remotePullFolderFO, fileSelector);
+            } catch (FileSystemException e) {
+                log.error(e);
+                throw e;
+            } finally {
+                jobTracker.setTaskTransferring(jobId, t_name, false);
+                jobTracker.removeAwaitedTask(jobId, t_name);
+            }
+
             log.debug("Finished copying files from " + sourceUrl + " to " + destUrl);
             // ok we can remove the task
-            jobTracker.removeAwaitedTask(jobId, t_name);
         }
     }
 
