@@ -539,7 +539,6 @@ project(':scheduler:smartproxy-common') {
         testCompile project(':rm:rm-server').sourceSets.test.output // to get shared test classes
     }
 
-    task('functionalTest', type: Test).configure functionalTestConfiguration
 }
 
 dependencies {
