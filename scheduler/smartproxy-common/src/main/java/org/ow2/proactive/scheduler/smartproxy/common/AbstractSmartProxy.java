@@ -54,7 +54,7 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
     protected static final SchedulerEvent[] PROXY_SCHED_EVENTS = new SchedulerEvent[]{
             JOB_RUNNING_TO_FINISHED, JOB_PENDING_TO_RUNNING, JOB_PENDING_TO_FINISHED, JOB_PAUSED,
             JOB_RESUMED, TASK_PENDING_TO_RUNNING, KILLED, SHUTDOWN, SHUTTING_DOWN, STOPPED, RESUMED,
-            TASK_RUNNING_TO_FINISHED};
+            TASK_RUNNING_TO_FINISHED, TASK_PROGRESS};
 
     protected T jobTracker;
 
