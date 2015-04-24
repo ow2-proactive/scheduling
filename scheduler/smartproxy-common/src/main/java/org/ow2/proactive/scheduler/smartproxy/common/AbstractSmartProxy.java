@@ -197,10 +197,10 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
                         boolean automaticTransfer) throws Exception,
             SubmissionClosedException, JobCreationException {
         if (isNullOrEmpty(pushUrl)) {
-            pushUrl = getUserSpaceURIs().get(0);
+            pushUrl = getLocalUserSpace();
         }
         if (isNullOrEmpty(pullUrl)) {
-            pullUrl = getUserSpaceURIs().get(0);
+            pullUrl = getLocalUserSpace();
         }
         String newFolderName = createNewFolderName();
         String pushUrlUpdate = prepareJobInput(job, localInputFolderPath, pushUrl, newFolderName);
@@ -238,6 +238,18 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
         jobTracker.putAwaitedJob(id.toString(), awaitedJob);
 
         return id;
+    }
+
+    protected String getLocalUserSpace() throws NotConnectedException, PermissionException {
+        List<String> userSpaceURIS = getUserSpaceURIs();
+
+        for (String userSpaceURI : userSpaceURIS) {
+            if (userSpaceURI.startsWith("file:")) {
+                return userSpaceURI;
+            }
+        }
+
+        return null;
     }
 
     /**

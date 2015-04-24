@@ -213,7 +213,7 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl> i
     public boolean uploadInputfiles(TaskFlowJob job, String localInputFolderPath)
             throws NotConnectedException, PermissionException {
 
-        String userSpace = getUserSpaceURIs().get(0);
+        String userSpace = getLocalUserSpace();
         String inputSpace = job.getInputSpace();
 
         if (!inputSpace.startsWith(userSpace)) {
@@ -264,7 +264,7 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl> i
         String outputSpace = awaitedjob.getOutputSpaceURL();
         String sourceFile;
         try {
-            String userSpace = getUserSpaceURIs().get(0);
+            String userSpace = getLocalUserSpace();
             if (!outputSpace.startsWith(userSpace)) {
                 logger.warn("RestSmartProxy does not support data transfers outside USERSPACE.");
             }
