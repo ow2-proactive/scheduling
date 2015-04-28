@@ -34,26 +34,19 @@
  */
 package org.ow2.proactive.scheduler.task;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
+import com.google.common.base.Stopwatch;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
-import org.ow2.proactive.scheduler.task.utils.StopWatch;
 import org.ow2.proactive.scheduler.task.script.ScriptExecutableContainer;
-import org.ow2.proactive.scripting.Script;
-import org.ow2.proactive.scripting.ScriptHandler;
-import org.ow2.proactive.scripting.ScriptLoader;
-import org.ow2.proactive.scripting.ScriptResult;
-import org.ow2.proactive.scripting.TaskScript;
+import org.ow2.proactive.scripting.*;
+
+import java.io.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -108,16 +101,20 @@ public class NonForkedTaskExecutor implements TaskExecutor {
             scriptHandler.addBinding(MULTI_NODE_TASK_NODESET_BINDING_NAME, nodesUrls);
             scriptHandler.addBinding(MULTI_NODE_TASK_NODESURL_BINDING_NAME, nodesUrls);
 
-            StopWatch stopWatch = new StopWatch();
+            Stopwatch stopwatch = Stopwatch.createUnstarted();
             TaskResultImpl taskResult;
             try {
-                stopWatch.start();
+                stopwatch.start();
                 Serializable result = execute(container, output, error, scriptHandler, thirdPartyCredentials,
                         variables);
-                taskResult = new TaskResultImpl(container.getTaskId(), result, null, stopWatch.stop());
+                stopwatch.stop();
+                taskResult = new TaskResultImpl(
+                        container.getTaskId(), result, null, stopwatch.elapsed(TimeUnit.MILLISECONDS));
             } catch (Throwable e) {
+                stopwatch.stop();
                 e.printStackTrace(error);
-                taskResult = new TaskResultImpl(container.getTaskId(), e, null, stopWatch.stop());
+                taskResult = new TaskResultImpl(
+                        container.getTaskId(), e, null, stopwatch.elapsed(TimeUnit.MILLISECONDS));
             }
 
             executeFlowScript(container.getControlFlowScript(), scriptHandler, output, error, taskResult);
