@@ -42,10 +42,7 @@ import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
 import org.ow2.proactive.scheduler.common.exception.*;
-import org.ow2.proactive.scheduler.common.job.Job;
-import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobState;
-import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.job.*;
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.dataspaces.FileSelector;
@@ -65,16 +62,22 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeoutException;
 
 import static org.ow2.proactive.scheduler.rest.ds.IDataSpaceClient.Dataspace.USER;
 
 /**
  * Smart proxy implementation that relies on the REST API for communicating with dataspaces
  * and websockets to push notifications to clients.
+ * <p>
+ * Any instance of this class must be initialized by calling the {@link #init(String, String, String)}
+ * or {@link #initInsecure(String, String, String)} method before executing any subsequent method. Not
+ * respecting this rule may lead to an NPE or an unexpected behaviour.
  *
  * @author The ProActive Team
  */
-public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl> implements SchedulerEventListener {
+public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl> implements ISchedulerClient, SchedulerEventListener {
 
     private static final Logger logger = Logger.getLogger(RestSmartProxyImpl.class);
 
@@ -88,20 +91,29 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl> i
 
     @Override
     public void init(String url, String user, String pwd) throws SchedulerException, LoginException {
+       init(url, user, pwd, false);
+    }
+
+    private void init(String url, String user, String pwd, boolean insecureConnection) {
         try {
             this.schedulerUrl = url;
             this.schedulerLogin = user;
             this.schedulerPassword = pwd;
             this.restSchedulerClient = SchedulerClient.createInstance();
 
-            restSchedulerClient.init(url, user, pwd);
+            if (insecureConnection) {
+                this.restSchedulerClient.initInsecure(url, user, pwd);
+            } else {
+                this.restSchedulerClient.init(url, user, pwd);
+            }
+
             DataSpaceClient restDsClient = new DataSpaceClient();
-            restDsClient.init(url, restSchedulerClient);
+            restDsClient.init(url, this.restSchedulerClient);
             this.restDataSpaceClient = restDsClient;
 
-            super.jobTracker.setRestDataSpaceClient(restDataSpaceClient);
+            super.jobTracker.setRestDataSpaceClient(this.restDataSpaceClient);
 
-            jobTracker.loadJobs();
+            this.jobTracker.loadJobs();
             registerAsListener();
             syncAwaitedJobs();
         } catch (Exception e) {
@@ -328,6 +340,95 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl> i
     @Override
     public void registerAsListener() throws NotConnectedException, PermissionException {
         restSchedulerClient.addEventListener(this, true, PROXY_SCHED_EVENTS);
+    }
+
+    /*
+     * Implementation of the ISchedulerClient interface
+     */
+
+    @Override
+    public void initInsecure(String url, String user, String pwd) throws Exception {
+        init(url, user, pwd, true);
+    }
+
+    @Override
+    public void setSession(String sid) {
+        restSchedulerClient.setSession(sid);
+    }
+
+    @Override
+    public String getSession() {
+        return restSchedulerClient.getSession();
+    }
+
+    @Override
+    public boolean isJobFinished(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
+        return restSchedulerClient.isJobFinished(jobId);
+    }
+
+    @Override
+    public boolean isJobFinished(String jobId) throws NotConnectedException, UnknownJobException, PermissionException {
+        return restSchedulerClient.isJobFinished(jobId);
+    }
+
+    @Override
+    public JobResult waitForJob(JobId jobId, long timeout) throws NotConnectedException, UnknownJobException, PermissionException, TimeoutException {
+        return restSchedulerClient.waitForJob(jobId, timeout);
+    }
+
+    @Override
+    public JobResult waitForJob(String jobId, long timeout) throws NotConnectedException, UnknownJobException, PermissionException, TimeoutException {
+        return restSchedulerClient.waitForJob(jobId, timeout);
+    }
+
+    @Override
+    public boolean isTaskFinished(String jobId, String taskName) throws UnknownJobException, NotConnectedException, PermissionException, UnknownTaskException {
+        return restSchedulerClient.isTaskFinished(jobId, taskName);
+    }
+
+    @Override
+    public TaskResult waitForTask(String jobId, String taskName, long timeout) throws UnknownJobException, NotConnectedException, PermissionException, UnknownTaskException, TimeoutException {
+        return restSchedulerClient.waitForTask(jobId, taskName, timeout);
+    }
+
+    @Override
+    public List<JobResult> waitForAllJobs(List<String> jobIds, long timeout) throws NotConnectedException, UnknownJobException, PermissionException, TimeoutException {
+        return restSchedulerClient.waitForAllJobs(jobIds, timeout);
+    }
+
+    @Override
+    public Map.Entry<String, JobResult> waitForAnyJob(List<String> jobIds, long timeout) throws NotConnectedException, UnknownJobException, PermissionException, TimeoutException {
+        return restSchedulerClient.waitForAnyJob(jobIds, timeout);
+    }
+
+    @Override
+    public Map.Entry<String, TaskResult> waitForAnyTask(String jobId, List<String> taskNames, long timeout) throws UnknownJobException, NotConnectedException, PermissionException, UnknownTaskException, TimeoutException {
+        return restSchedulerClient.waitForAnyTask(jobId, taskNames, timeout);
+    }
+
+    @Override
+    public List<Map.Entry<String, TaskResult>> waitForAllTasks(String jobId, List<String> taskNames, long timeout) throws UnknownJobException, NotConnectedException, PermissionException, UnknownTaskException, TimeoutException {
+        return restSchedulerClient.waitForAllTasks(jobId, taskNames, timeout);
+    }
+
+    @Override
+    public boolean pushFile(String spacename, String pathname, String filename, String file) throws NotConnectedException, PermissionException {
+        return restSchedulerClient.pushFile(spacename, pathname, filename, file);
+    }
+
+    @Override
+    public void pullFile(String space, String pathname, String outputFile) throws NotConnectedException, PermissionException {
+        restSchedulerClient.pullFile(space, pathname, outputFile);
+    }
+
+    @Override
+    public boolean deleteFile(String space, String pathname) throws NotConnectedException, PermissionException {
+        return restSchedulerClient.deleteFile(space, pathname);
+    }
+
+    @Override
+    public JobId submitAsJobArchive(Job job) throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
+        return restSchedulerClient.submitAsJobArchive(job);
     }
 
     private class DownloadHandler implements Runnable {

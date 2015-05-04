@@ -161,7 +161,6 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
 
     /**
      * Initialize this instance. Retrieves a new session from the server.
-     * @param insecure true to disable HTTPS certificate checking
      */
     @Override
     public void initInsecure(String url, String login, String password) throws Exception {
