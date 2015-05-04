@@ -70,7 +70,6 @@ public class DataSpaceClient implements IDataSpaceClient {
     private static final Logger log = Logger.getLogger(DataSpaceClient.class);
 
     private String restDataspaceUrl;
-    private ISchedulerClient client;
     private String sessionId;
     private ClientHttpEngine httpEngine;
 
@@ -78,25 +77,20 @@ public class DataSpaceClient implements IDataSpaceClient {
     }
 
     public DataSpaceClient(String restServerUrl, ClientHttpEngine httpEngine) {
-        this.restDataspaceUrl = restDataspaceUrl(restServerUrl);
         this.httpEngine = httpEngine;
+        this.restDataspaceUrl = restDataspaceUrl(restServerUrl);
     }
 
     public void init(String restServerUrl, ISchedulerClient client) {
+        this.httpEngine = new ApacheHttpClient4Engine(HttpUtility.threadSafeClient());
         this.restDataspaceUrl = restDataspaceUrl(restServerUrl);
         this.sessionId = client.getSession();
-        this.httpEngine = new ApacheHttpClient4Engine(HttpUtility.threadSafeClient());
     }
 
     public void init(String restServerUrl, String login, String password) throws Exception {
         ISchedulerClient client = SchedulerClient.createInstance();
         client.init(restServerUrl, login, password);
         init(restServerUrl, client);
-    }
-
-    public void renewSession() throws NotConnectedException {
-        this.client.renewSession();
-        this.sessionId = client.getSession();
     }
 
     @Override
