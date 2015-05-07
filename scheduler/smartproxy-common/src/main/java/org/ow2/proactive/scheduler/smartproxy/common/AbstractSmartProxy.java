@@ -716,7 +716,7 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
      * location specified by PUSH_URL.
      *
      * @param job                  job to push data for
-     * @param localInp    utFolderPath local input folder
+     * @param localInputFolderPath    utFolderPath local input folder
      * @return true if all input files are uploaded to the location specified by
      * the PUSH_URL.
      * @throws NotConnectedException

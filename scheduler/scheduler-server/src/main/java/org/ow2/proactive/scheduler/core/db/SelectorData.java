@@ -1,26 +1,16 @@
 package org.ow2.proactive.scheduler.core.db;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinColumns;
-import javax.persistence.ManyToOne;
-import javax.persistence.SequenceGenerator;
-import javax.persistence.Table;
-import javax.persistence.Transient;
-
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
-import org.hibernate.type.SerializableToBlobType;
-import org.ow2.proactive.scheduler.common.task.dataspaces.FileSelector;
+import org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
+import org.ow2.proactive.scheduler.core.db.types.PatternType;
+
+import javax.persistence.*;
+import java.util.Set;
 
 
 @Entity
@@ -33,17 +23,15 @@ public class SelectorData {
 
     private long id;
 
-    private String[] includes;
+    private Set<String> includes;
 
-    private String[] excludes;
+    private Set<String> excludes;
 
     private TaskData taskData;
 
     private String accessMode;
 
     private String type;
-
-    private boolean caseSensitive;
 
     static SelectorData createForInputSelector(InputSelector selector, TaskData task) {
         SelectorData selectorData = new SelectorData();
@@ -64,7 +52,6 @@ public class SelectorData {
     }
 
     private void setFileSelector(FileSelector selector) {
-        setCaseSensitive(selector.isCaseSensitive());
         setIncludes(selector.getIncludes());
         setExcludes(selector.getExcludes());
     }
@@ -73,9 +60,10 @@ public class SelectorData {
         if (!type.equals(INPUT_TYPE)) {
             throw new IllegalStateException("Not input selector: " + type);
         }
+
         FileSelector fileSelector = new FileSelector(getIncludes(), getExcludes());
-        fileSelector.setCaseSensitive(isCaseSensitive());
         InputSelector selector = new InputSelector(fileSelector, InputAccessMode.valueOf(getAccessMode()));
+
         return selector;
     }
 
@@ -83,8 +71,8 @@ public class SelectorData {
         if (!type.equals(OUTPUT_TYPE)) {
             throw new IllegalStateException("Not output selector: " + type);
         }
+
         FileSelector fileSelector = new FileSelector(getIncludes(), getExcludes());
-        fileSelector.setCaseSensitive(isCaseSensitive());
         OutputSelector selector = new OutputSelector(fileSelector, OutputAccessMode.valueOf(getAccessMode()));
         return selector;
     }
@@ -139,32 +127,23 @@ public class SelectorData {
     }
 
     @Column(name = "INCLUDES")
-    @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object"))
-    public String[] getIncludes() {
+    @Type(type = "org.ow2.proactive.scheduler.core.db.types.PatternType", parameters = @Parameter(name = PatternType.CLASS_NAME, value = "java.lang.Object"))
+    public Set<String> getIncludes() {
         return includes;
     }
 
-    public void setIncludes(String[] includes) {
+    public void setIncludes(Set<String> includes) {
         this.includes = includes;
     }
 
     @Column(name = "EXCLUDES")
-    @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object"))
-    public String[] getExcludes() {
+    @Type(type = "org.ow2.proactive.scheduler.core.db.types.PatternType", parameters = @Parameter(name = PatternType.CLASS_NAME, value = "java.lang.Object"))
+    public Set<String> getExcludes() {
         return excludes;
     }
 
-    public void setExcludes(String[] excludes) {
+    public void setExcludes(Set<String> excludes) {
         this.excludes = excludes;
-    }
-
-    @Column(name = "CASE_SENSITIVE")
-    public boolean isCaseSensitive() {
-        return caseSensitive;
-    }
-
-    public void setCaseSensitive(boolean caseSensitive) {
-        this.caseSensitive = caseSensitive;
     }
 
 }

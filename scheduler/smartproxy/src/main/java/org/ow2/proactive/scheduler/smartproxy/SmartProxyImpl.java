@@ -13,7 +13,6 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.body.request.BlockingRequestQueueImpl;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
-import org.objectweb.proactive.extensions.dataspaces.vfs.selector.GlobPatternFileSelector;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.*;
@@ -36,7 +35,6 @@ import java.io.Serializable;
 import java.security.KeyException;
 import java.security.PublicKey;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -308,21 +306,22 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
         String jname = job.getName();
         log.debug("Pushing files for job " + jname + " from " + localfolder + " to " + remoteFolder);
 
-        List<DataTransferProcessor> transferCallables = new ArrayList<DataTransferProcessor>();
+        List<DataTransferProcessor> transferCallables = new ArrayList<>();
         TaskFlowJob tfj = job;
         for (Task t : tfj.getTasks()) {
             log.debug("Pushing files for task " + t.getName());
             List<InputSelector> inputFileSelectors = t.getInputFilesList();
             //create the selector
-            GlobPatternFileSelector fileSelector = new GlobPatternFileSelector();
+            org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector fileSelector = new org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector();
             for (InputSelector is : inputFileSelectors) {
-                org.ow2.proactive.scheduler.common.task.dataspaces.FileSelector fs = is.getInputFiles();
-                if (fs.getIncludes() != null)
-                    fileSelector.addIncludes(Arrays.asList(fs.getIncludes()));
+                org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector fs = is.getInputFiles();
+                if (!fs.getIncludes().isEmpty()) {
+                    fileSelector.addIncludes(fs.getIncludes());
+                }
 
-                if (fs.getExcludes() != null)
-                    fileSelector.addExcludes(Arrays.asList(fs.getExcludes()));
-
+                if (!fs.getExcludes().isEmpty()) {
+                    fileSelector.addExcludes(fs.getExcludes());
+                }
                 //We should check if a pattern exist in both includes and excludes. But that would be a user mistake.
             }
             DataTransferProcessor dtp = new DataTransferProcessor(localfolder, remoteFolder, tfj.getName(), t
@@ -330,7 +329,7 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
             transferCallables.add(dtp);
         }
 
-        List<Future<Boolean>> futures = null;
+        List<Future<Boolean>> futures;
         try {
             futures = threadPool.invokeAll(transferCallables);
         } catch (InterruptedException e) {
@@ -394,21 +393,24 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
         String sourceUrl = remotePullFolderFO.getURL().toString();
         String destUrl = localfolderFO.getURL().toString();
 
-        GlobPatternFileSelector fileSelector = new GlobPatternFileSelector();
+        org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector fileSelector =
+                new org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector();
 
         List<OutputSelector> ouputFileSelectors = atask.getOutputSelectors();
         for (OutputSelector os : ouputFileSelectors) {
-            org.ow2.proactive.scheduler.common.task.dataspaces.FileSelector fs = os.getOutputFiles();
-            if (fs.getIncludes() != null)
-                fileSelector.addIncludes(Arrays.asList(fs.getIncludes()));
+            org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector fs = os.getOutputFiles();
+            if (!fs.getIncludes().isEmpty()) {
+                fileSelector.addIncludes(fs.getIncludes());
+            }
 
-            if (fs.getExcludes() != null)
-                fileSelector.addExcludes(Arrays.asList(fs.getExcludes()));
+            if (!fs.getExcludes().isEmpty()) {
+                fileSelector.addExcludes(fs.getExcludes());
+            }
         }
 
         if (log.isDebugEnabled()) {
-            log.debug("Looking at files in " + sourceUrl + " with " + fileSelector.getIncludes() + "-" +
-                    fileSelector.getExcludes());
+            log.debug("Looking at files in " + sourceUrl + " with "
+                    + fileSelector.getIncludes() + "-" + fileSelector.getExcludes());
             boolean goon = true;
             int cpt = 0;
             FileObject[] fos = null;
@@ -420,7 +422,7 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
                     try {
                         Thread.sleep(100);
                     } catch (InterruptedException e) {
-
+                        Thread.currentThread().interrupt();
                     }
                 }
             }
@@ -430,8 +432,8 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
                     log.debug("Found " + fo.getName());
                 }
             } else {
-                log.warn("Couldn't find " + fileSelector.getIncludes() + "-" + fileSelector.getExcludes() +
-                        " in " + sourceUrl);
+                log.warn("Couldn't find " + fileSelector.getIncludes()
+                        + "-" + fileSelector.getExcludes() + " in " + sourceUrl);
             }
         }
         if (awaitedjob.isAutomaticTransfer()) {

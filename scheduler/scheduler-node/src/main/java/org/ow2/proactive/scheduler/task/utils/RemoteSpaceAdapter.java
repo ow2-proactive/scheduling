@@ -34,6 +34,17 @@
  */
 package org.ow2.proactive.scheduler.task.utils;
 
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.extensions.dataspaces.Utils;
+import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
+import org.objectweb.proactive.extensions.dataspaces.api.FileSelector;
+import org.objectweb.proactive.extensions.dataspaces.api.FileType;
+import org.objectweb.proactive.extensions.dataspaces.exceptions.DataSpacesException;
+import org.objectweb.proactive.utils.StackTraceUtil;
+import org.ow2.proactive.scheduler.common.task.dataspaces.FileSystemException;
+import org.ow2.proactive.scheduler.common.task.dataspaces.RemoteSpace;
+import org.ow2.proactive.scheduler.task.TaskLauncher;
+
 import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -41,19 +52,6 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
-
-import org.apache.log4j.Logger;
-import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
-import org.objectweb.proactive.extensions.dataspaces.api.FileSelector;
-import org.objectweb.proactive.extensions.dataspaces.api.FileType;
-import org.objectweb.proactive.extensions.dataspaces.exceptions.DataSpacesException;
-import org.objectweb.proactive.extensions.dataspaces.vfs.selector.fast.FastFileSelector;
-import org.objectweb.proactive.extensions.dataspaces.vfs.selector.fast.FastSelector;
-import org.objectweb.proactive.utils.OperatingSystem;
-import org.objectweb.proactive.utils.StackTraceUtil;
-import org.ow2.proactive.scheduler.common.task.dataspaces.FileSystemException;
-import org.ow2.proactive.scheduler.common.task.dataspaces.RemoteSpace;
-import org.ow2.proactive.scheduler.task.TaskLauncher;
 
 
 /**
@@ -65,9 +63,9 @@ public class RemoteSpaceAdapter implements RemoteSpace {
 
     protected static final Logger logger = Logger.getLogger(RemoteSpaceAdapter.class);
 
-    protected DataSpacesFileObject remoteDataSpace;
+    protected final DataSpacesFileObject remoteDataSpace;
 
-    protected DataSpacesFileObject localDataSpace;
+    protected final DataSpacesFileObject localDataSpace;
 
     public RemoteSpaceAdapter(DataSpacesFileObject remoteDataSpace, DataSpacesFileObject localDataSpace) {
         this.remoteDataSpace = remoteDataSpace;
@@ -91,15 +89,12 @@ public class RemoteSpaceAdapter implements RemoteSpace {
     public static ArrayList<DataSpacesFileObject> getFilesFromPattern(DataSpacesFileObject root,
             String pattern)
             throws org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemException {
-        FastFileSelector fast = new FastFileSelector();
-        fast.setIncludes(new String[] { pattern });
-        if (OperatingSystem.getOperatingSystem() == OperatingSystem.unix) {
-            fast.setCaseSensitive(true);
-        } else {
-            fast.setCaseSensitive(false);
-        }
-        ArrayList<DataSpacesFileObject> results = new ArrayList<DataSpacesFileObject>();
-        FastSelector.findFiles(root, fast, true, results);
+        org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector selector =
+                new org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector();
+        selector.addIncludes(pattern);
+
+        ArrayList<DataSpacesFileObject> results = new ArrayList<>();
+        Utils.findFiles(root, selector, results);
         return results;
     }
 
@@ -250,7 +245,7 @@ public class RemoteSpaceAdapter implements RemoteSpace {
 
     @Override
     public Set<File> pullFiles(String pattern, String localPath) throws FileSystemException {
-        HashSet<File> filePulled = new HashSet<File>();
+        HashSet<File> filePulled = new HashSet<>();
         try {
             localPath = stripLeadingSlash(localPath);
             ArrayList<DataSpacesFileObject> sources = getFilesFromPattern(remoteDataSpace, pattern);

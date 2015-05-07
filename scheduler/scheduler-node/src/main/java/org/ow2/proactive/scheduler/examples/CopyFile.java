@@ -34,8 +34,6 @@
  */
 package org.ow2.proactive.scheduler.examples;
 
-import java.io.Serializable;
-
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSelectInfo;
 import org.apache.commons.vfs2.Selectors;
@@ -43,6 +41,8 @@ import org.objectweb.proactive.extensions.dataspaces.api.FileSelector;
 import org.objectweb.proactive.extensions.dataspaces.vfs.adapter.VFSFileObjectAdapter;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
+
+import java.io.Serializable;
 
 
 /**
@@ -67,8 +67,7 @@ public class CopyFile extends JavaExecutable {
                 @Override
                 public boolean includeFile(FileSelectInfo fileSelectInfo) throws Exception {
                     String name = fileSelectInfo.getFile().getName().getBaseName();
-                    boolean answer = name.matches(inputFile);
-                    return answer;
+                    return name.matches(inputFile);
                 }
 
                 @Override

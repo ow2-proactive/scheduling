@@ -43,9 +43,10 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Closer;
 import com.google.common.io.Files;
-import org.objectweb.proactive.utils.SelectorUtils;
+import org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector;
 
 import java.io.*;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.zip.*;
 
@@ -152,7 +153,7 @@ public class Zipper {
             }
         }
 
-        public static void unzip(InputStream is, File outFile) throws FileNotFoundException, IOException {
+        public static void unzip(InputStream is, File outFile) throws IOException {
             Closer closer = Closer.create();
             try {
                 ZipInputStream zis = new ZipInputStream(is);
@@ -241,28 +242,14 @@ public class Zipper {
 
         @Override
         public boolean apply(File file) {
-            File filePathRelativeToRoot = root.toPath().relativize(file.toPath()).toFile();
+            Path pathRelativeToRoot = root.toPath().relativize(file.toPath());
+
+            FileSelector selector = new FileSelector(includes, excludes);
 
             return !file.isDirectory()
-                        && !matches(filePathRelativeToRoot, excludes)
-                        && matches(filePathRelativeToRoot, includes);
+                        && selector.matches(pathRelativeToRoot);
         }
 
-        private boolean matches(File file, List<String> exprs) {
-            if (exprs == null || exprs.isEmpty()) {
-                return false;
-            } else if (exprs.contains(file.getName())) {
-                return true;
-            } else {
-                for (String expr : exprs) {
-                    if (SelectorUtils.matchPath(expr, file.toString())) {
-                        return true;
-                    }
-                }
-            }
-
-            return false;
-        }
     }
 
 }

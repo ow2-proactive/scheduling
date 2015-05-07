@@ -36,12 +36,12 @@
  */
 package org.ow2.proactive.scheduler.common.task.dataspaces;
 
-import java.io.Serializable;
+import org.objectweb.proactive.annotation.PublicAPI;
+import org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-
-import org.objectweb.proactive.annotation.PublicAPI;
+import java.io.Serializable;
 
 
 /**

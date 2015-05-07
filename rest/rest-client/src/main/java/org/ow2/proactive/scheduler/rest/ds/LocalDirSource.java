@@ -46,6 +46,7 @@ import java.io.OutputStream;
 import java.util.List;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 
 public class LocalDirSource implements ILocalSource {
@@ -64,23 +65,23 @@ public class LocalDirSource implements ILocalSource {
     }
 
     public void setIncludes(List<String> includes) {
-        checkArgument(includes != null && !includes.isEmpty());
-        this.includes = includes;
+        checkNotNull(includes);
+        this.includes = Lists.newArrayList(includes);
     }
 
-    public void setIncludes(String... include) {
-        checkArgument(include != null && include.length > 0);
-        this.includes = Lists.newArrayList(include);
+    public void setIncludes(String... includes) {
+        checkNotNull(includes);
+        this.includes = Lists.newArrayList(includes);
     }
 
     public void setExcludes(List<String> excludes) {
-        checkArgument(excludes != null && !excludes.isEmpty());
-        this.excludes = excludes;
+        checkNotNull(excludes);
+        this.excludes = Lists.newArrayList(excludes);
     }
 
-    public void setExcludes(String... exclude) {
-        checkArgument(exclude != null && exclude.length > 0);
-        this.excludes = Lists.newArrayList(exclude);
+    public void setExcludes(String... excludes) {
+        checkNotNull(excludes);
+        this.excludes = Lists.newArrayList(excludes);
     }
 
     @Override

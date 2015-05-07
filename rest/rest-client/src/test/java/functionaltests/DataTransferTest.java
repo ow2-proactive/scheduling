@@ -85,7 +85,7 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
     public void testUploadAllFilesInDirectory() throws Exception {
         // entire folder
         File tempTextFile = tmpDir.newFile("tempFile.txt");
-        Files.write("some random text ...".getBytes(), tempTextFile);
+        Files.write("some text ...".getBytes(), tempTextFile);
 
         File tempDir = tmpDir.newFolder("tempDir");
         File tempFile = new File(tempDir, "tempFile.tmp");
@@ -108,7 +108,7 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
     @Test
     public void testUploadSelectedFilesUsingGlobPattern() throws Exception {
         File tempTextFile = tmpDir.newFile("tempFile.txt");
-        Files.write("some random text ...".getBytes(), tempTextFile);
+        Files.write("some text ...".getBytes(), tempTextFile);
 
         File tempDir = tmpDir.newFolder("tempDir");
         File tempFile = new File(tempDir, "tempFile.tmp");
@@ -130,7 +130,7 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
     @Test
     public void testUploadSelectedFilesUsingFilenames() throws Exception {
         File tempTextFile = tmpDir.newFile("tempFile.txt");
-        Files.write("some random text ...".getBytes(), tempTextFile);
+        Files.write("some text ...".getBytes(), tempTextFile);
 
         File tempDir = tmpDir.newFolder("tempDir");
         File tempFile = new File(tempDir, "tempFile.tmp");
@@ -139,7 +139,7 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
 
         IDataSpaceClient client = clientInstance();
         LocalDirSource source = new LocalDirSource(tmpDir.getRoot());
-        source.setIncludes("tempFile.tmp");
+        source.setIncludes("**/tempFile.tmp");
         RemoteDestination dest = new RemoteDestination(USER, "testUploadSelectedFilesUsingFilenames");
         assertTrue(client.upload(source, dest));
 
@@ -181,7 +181,7 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
 
         File srcTextFile = new File(srcDir, "tempFile.txt");
         Files.createParentDirs(srcTextFile);
-        Files.write("some random text ...".getBytes(), srcTextFile);
+        Files.write("some text ...".getBytes(), srcTextFile);
 
         File srcTempDir = new File(srcDir, "tempDir");
         File srcTempFile = new File(srcTempDir, "tempFile.tmp");
@@ -209,7 +209,7 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
 
         File srcTextFile = new File(srcDir, "tempFile.txt");
         Files.createParentDirs(srcTextFile);
-        Files.write("some random text ...".getBytes(), srcTextFile);
+        Files.write("some text ...".getBytes(), srcTextFile);
 
         File srcTempDir = new File(srcDir, "tempDir");
         File srcTempFile = new File(srcTempDir, "tempFile.tmp");
@@ -218,7 +218,7 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
 
         File destTempDir = tmpDir.newFolder("tempDir");
         RemoteSource source = new RemoteSource(USER, "testDownloadAllFilesInDirectory");
-        source.includes("*.txt");
+        source.setIncludes("*.txt");
         LocalDestination dest = new LocalDestination(destTempDir);
         IDataSpaceClient client = clientInstance();
 
@@ -240,7 +240,7 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
 
         File srcTextFile = new File(srcDir, "tempFile.txt");
         Files.createParentDirs(srcTextFile);
-        Files.write("some random text ...".getBytes(), srcTextFile);
+        Files.write("some text ...".getBytes(), srcTextFile);
 
         File srcTempDir = new File(srcDir, "tempDir");
         File srcTempFile = new File(srcTempDir, "tempFile.tmp");
@@ -314,8 +314,6 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
 
     @Test(expected = Exception.class)
     public void testCreateFolderWithoutSpecifyingFileType() throws Exception {
-        URI srcDirPath = URI.create(getScheduler().getUserSpaceURIs().get(0));
-
         String folderName = "testcreatefolder";
 
         RemoteSource source = new RemoteSource(USER, folderName);

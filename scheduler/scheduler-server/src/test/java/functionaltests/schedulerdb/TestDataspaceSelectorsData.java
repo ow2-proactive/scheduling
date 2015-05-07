@@ -1,14 +1,17 @@
 package functionaltests.schedulerdb;
 
+import com.google.common.collect.Sets;
 import org.junit.Assert;
 import org.junit.Test;
+import org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
-import org.ow2.proactive.scheduler.common.task.dataspaces.FileSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
+
+import java.util.Set;
 
 
 public class TestDataspaceSelectorsData extends BaseSchedulerDBTest {
@@ -18,31 +21,29 @@ public class TestDataspaceSelectorsData extends BaseSchedulerDBTest {
         TaskFlowJob jobDef = new TaskFlowJob();
         JavaTask task = createDefaultTask("task1");
 
-        String[] inInclude1 = { "inInclude1_1", "inInclude1_2" };
-        String[] inExclude1 = { "inExclude1_1", "inExclude1_2" };
+        Set<String> inInclude1 = Sets.newHashSet("inInclude1_1", "inInclude1_2");
+        Set<String> inExclude1 = Sets.newHashSet("inExclude1_1", "inExclude1_2");
 
-        String[] outInclude1 = { "outInclude1_1", "outInclude1_2" };
-        String[] outExclude1 = { "outExclude1_1", "outExclude1_2" };
+        Set<String> outInclude1 = Sets.newHashSet("outInclude1_1", "outInclude1_2");
+        Set<String> outExclude1 = Sets.newHashSet("outExclude1_1", "outExclude1_2");
 
-        String[] inInclude2 = { "inInclude" + createString(500) };
-        String[] inExclude2 = { "inExclude" + createString(500) };
+        Set<String> inInclude2 = Sets.newHashSet("inInclude" + createString(500));
+        Set<String> inExclude2 = Sets.newHashSet("inExclude" + createString(500));
 
-        String[] outInclude2 = { "outInclude" + createString(500) };
-        String[] outExclude2 = { "outExclude" + createString(500) };
+        Set<String> outInclude2 = Sets.newHashSet("outInclude" + createString(500));
+        Set<String> outExclude2 = Sets.newHashSet("outExclude" + createString(500));
 
         FileSelector fileSelector;
 
         task.addInputFiles(new FileSelector(inInclude1, inExclude1), InputAccessMode.TransferFromGlobalSpace);
         task.addInputFiles(new FileSelector(inInclude1, inExclude1), InputAccessMode.TransferFromUserSpace);
         fileSelector = new FileSelector(inInclude2, inExclude2);
-        fileSelector.setCaseSensitive(false);
         task.addInputFiles(fileSelector, InputAccessMode.TransferFromInputSpace);
 
         task.addOutputFiles(new FileSelector(outInclude1, outExclude1),
                 OutputAccessMode.TransferToGlobalSpace);
         task.addOutputFiles(new FileSelector(outInclude1, outExclude1), OutputAccessMode.TransferToUserSpace);
         fileSelector = new FileSelector(outInclude2, outExclude2);
-        fileSelector.setCaseSensitive(false);
         task.addOutputFiles(fileSelector, OutputAccessMode.TransferToOutputSpace);
 
         jobDef.addTask(task);
@@ -65,10 +66,9 @@ public class TestDataspaceSelectorsData extends BaseSchedulerDBTest {
         checkSelector(task1.getOutputFilesList().get(2).getOutputFiles(), outInclude2, outExclude2, false);
     }
 
-    private void checkSelector(FileSelector selector, String[] inc, String[] exc, boolean cs) {
-        Assert.assertArrayEquals(inc, selector.getIncludes());
-        Assert.assertArrayEquals(exc, selector.getExcludes());
-        Assert.assertEquals(cs, selector.isCaseSensitive());
+    private void checkSelector(FileSelector selector, Set<String> inc, Set<String> exc, boolean cs) {
+        Assert.assertEquals(inc, selector.getIncludes());
+        Assert.assertEquals(exc, selector.getExcludes());
     }
 
     @Test

@@ -34,7 +34,7 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.core.db.schedulerType;
+package org.ow2.proactive.scheduler.core.db.types;
 
 import java.io.Serializable;
 import java.sql.PreparedStatement;
