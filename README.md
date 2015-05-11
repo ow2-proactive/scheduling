@@ -1,5 +1,9 @@
 # ProActive Workflows & Scheduling
 
+You can download binaries and access a trial platform for free at:
+
+http://activeeon.com/register/web-download
+
 ## Quick start
 
 To run ProActive Scheduler (server part):
@@ -22,10 +26,7 @@ To start a node:
 
 ## Documentation
 
-http://doc.activeeon.com/
-
-## Known bugs and issues
-
-http://bugs.activeeon.com/
+http://doc.activeeon.com
 
 Enjoy ProActive Workflows & Scheduling!
+
