@@ -77,14 +77,14 @@ public class SigarProcesses implements SigarProcessesMXBean {
             long pid = pids[i];
             try {
                 @SuppressWarnings("rawtypes")
-                List info = Ps.getInfo(sigar, pid); // Add standard info. 
-                info.add(sigar.getProcArgs(pid)); // Add also arguments of each process. 
+                List info = Ps.getInfo(sigar, pid); // Add standard info.
+                info.add(sigar.getProcArgs(pid)); // Add also arguments of each process.
                 info.add(sigar.getProcCpu(pid).getPercent()); // Add cpu usage (perc.).
 
                 result.add(new ProcessInfo(info));
             } catch (SigarException e) {
                 // Ignore it, probably the process does not exist anymore.
-                logger.warn("Could not get information for PID: " + pid, e);
+                logger.warn("Could not get information for PID " + pid + ": " + e.getMessage());
             }
 
             // TODO see why sigar.getProcCpu(pid).getPercent()

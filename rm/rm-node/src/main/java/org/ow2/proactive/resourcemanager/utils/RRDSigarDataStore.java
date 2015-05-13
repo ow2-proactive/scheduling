@@ -60,10 +60,10 @@ import java.util.Set;
  */
 public class RRDSigarDataStore extends RRDDataStore {
 
-    private final String[] objectNames = { "java.lang:type=OperatingSystem", "java.lang:type=Memory",
+    private final String[] objectNames = {"java.lang:type=OperatingSystem", "java.lang:type=Memory",
             "java.lang:type=Threading", "java.lang:type=ClassLoading", "sigar:Type=CpuCoreUsage,Name=*",
             "sigar:Type=FileSystem,Name=*", "sigar:Type=CpuUsage", "sigar:Type=Mem",
-            "sigar:Type=NetInterface,Name=*", "sigar:Type=Swap" };
+            "sigar:Type=NetInterface,Name=*", "sigar:Type=Swap"};
 
     private HashMap<String, String> compositeTypes = new HashMap<String, String>();
 
@@ -72,9 +72,9 @@ public class RRDSigarDataStore extends RRDDataStore {
     /**
      * Initializes a new RRD data base if it's not exist.
      *
-     * @param mbean is the source of chronological data
+     * @param mbean            is the source of chronological data
      * @param dataBaseFilePath is the path to the file with the rrd data base
-     * @param step is the data base refresh period
+     * @param step             is the data base refresh period
      * @throws java.io.IOException is thrown when the data base exists but cannot be read
      */
     public RRDSigarDataStore(MBeanServer mbs, String dataBaseFilePath, int step, Logger logger)
@@ -149,50 +149,54 @@ public class RRDSigarDataStore extends RRDDataStore {
             logger.debug("RRD data base configuration:\n" + dataBase.getRrdDef().dump());
 
             while (!terminate) {
-                try {
-                    synchronized (dataSources) {
+                synchronized (dataSources) {
 
-                        dataSources.wait(step * 1000);
+                    dataSources.wait(step * 1000);
 
-                        if (terminate) {
-                            break;
-                        }
-
-                        // updating the data base
-                        for (String dataSource : dataSources.keySet()) {
-                            String fullName = dataSources.get(dataSource);
-                            String[] names = fullName.split("-");
-                            String attrName = names[0];
-                            String objectName = names[1];
-
-                            Object attrValue = mbs.getAttribute(new ObjectName(objectName), attrName);
-                            try {
-                                if (attrValue instanceof CompositeDataSupport &&
-                                    compositeTypes.get(fullName) != null) {
-                                    Object val = ((CompositeDataSupport) attrValue).get(compositeTypes
-                                            .get(fullName));
-                                    if (val != null) {
-                                        attrValue = val;
-                                    }
-                                }
-                                sample.setValue(dataSource, Double.parseDouble(attrValue.toString()));
-                                logger.trace(System.currentTimeMillis() / 1000 + " sampling: " + dataSource +
-                                    " / " + fullName + " " + Double.parseDouble(attrValue.toString()));
-                            } catch (NumberFormatException ex) {
-                                // do not save non-numeric values
-                                logger.trace("Ignoring non numeric value " + attrValue.toString() + " for " +
-                                    dataSource + " / " + fullName);
-                            }
-                        }
-
-                        sample.setTime(System.currentTimeMillis() / 1000);
-                        sample.update();
+                    if (terminate) {
+                        break;
                     }
-                } catch (Exception e) {
-                    logger.error(e.getMessage(), e);
+
+                    // updating the data base
+                    for (String dataSource : dataSources.keySet()) {
+                        String fullName = dataSources.get(dataSource);
+                        String[] names = fullName.split("-");
+                        String attrName = names[0];
+                        String objectName = names[1];
+
+                        try {
+                            Object attrValue = mbs.getAttribute(new ObjectName(objectName), attrName);
+
+                            if (attrValue instanceof CompositeDataSupport &&
+                                    compositeTypes.get(fullName) != null) {
+                                Object val = ((CompositeDataSupport) attrValue).get(compositeTypes
+                                        .get(fullName));
+                                if (val != null) {
+                                    attrValue = val;
+                                }
+                            }
+                            sample.setValue(dataSource, Double.parseDouble(attrValue.toString()));
+                            logger.trace(System.currentTimeMillis() / 1000 + " sampling: " + dataSource +
+                                    " / " + fullName + " " + Double.parseDouble(attrValue.toString()));
+                        } catch (NumberFormatException ex) {
+                            // do not save non-numeric values
+                            logger.trace("Non numeric value for " +
+                                    dataSource + " / " + fullName + ": " + ex.getMessage());
+
+                        } catch (Exception e) {
+                            logger.warn("Cannot read attribute " + attrName + " for object " + objectName + ": " + e.getMessage());
+                        }
+
+                        try {
+                            sample.setTime(System.currentTimeMillis() / 1000);
+                            sample.update();
+                        } catch (Exception e) {
+                            logger.warn("Cannot updated rrd database: " + e.getMessage());
+                        }
+                    }
                 }
+                dataBase.close();
             }
-            dataBase.close();
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
