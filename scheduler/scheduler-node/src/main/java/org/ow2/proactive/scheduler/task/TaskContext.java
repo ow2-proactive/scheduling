@@ -34,10 +34,6 @@
  */
 package org.ow2.proactive.scheduler.task;
 
-import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
-
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
@@ -47,6 +43,10 @@ import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scheduler.task.utils.Decrypter;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.utils.ClasspathUtils;
+
+import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 
 public class TaskContext implements Serializable {
@@ -103,6 +103,12 @@ public class TaskContext implements Serializable {
             executableContainer.setNodes(null);
         }
 
+    }
+
+    public TaskContext(TaskContext context, ExecutableContainer container) throws NodeException {
+        this(container, context.initializer, context.previousTasksResults,
+                context.scratchURI, context.inputURI, context.outputURI, context.userURI, context.globalURI,
+                context.progressFilePath);
     }
 
     public ExecutableContainer getExecutableContainer() {

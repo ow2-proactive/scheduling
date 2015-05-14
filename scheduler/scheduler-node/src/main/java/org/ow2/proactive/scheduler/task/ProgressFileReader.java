@@ -54,7 +54,7 @@ public class ProgressFileReader {
         return start(workingDir, progressFileName);
     }
 
-    public boolean start(File workingDir, String filename) {
+    boolean start(File workingDir, String filename) {
         try {
             createProgressFile(workingDir, filename);
 
@@ -89,7 +89,7 @@ public class ProgressFileReader {
             // ignore file already exists exception
         }
 
-        logger.info("Progress file '" + progressFile + "' created");
+        logger.debug("Progress file '" + progressFile + "' created");
     }
 
     public int getProgress() {
@@ -109,16 +109,18 @@ public class ProgressFileReader {
     }
 
     public void stop() {
-        try {
-            watchService.close();
-            watchServiceThread.join();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            logger.error(e);
-        } catch (IOException e) {
-            logger.error(e);
-        } finally {
-            removeProgressFileDir();
+        if(watchService != null) {
+            try {
+                watchService.close();
+                watchServiceThread.join();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                logger.error(e);
+            } catch (IOException e) {
+                logger.error(e);
+            } finally {
+                removeProgressFileDir();
+            }
         }
     }
 
@@ -126,7 +128,7 @@ public class ProgressFileReader {
         try {
             FileUtils.deleteRecursively(progressFileDir);
         } catch (IOException e) {
-            logger.error("Cannot delete progress file dir: " + progressFileDir, e);
+            logger.warn("Cannot delete progress file dir: " + progressFileDir, e);
         }
     }
 
@@ -178,10 +180,10 @@ public class ProgressFileReader {
                     watchKey.reset();
                 }
             } catch (InterruptedException e) {
-                logger.error(e);
+                logger.warn(e);
                 Thread.currentThread().interrupt();
             } catch (IOException e) {
-                logger.error(e);
+                logger.warn(e);
             } catch (ClosedWatchServiceException e) {
                 logger.debug("Watch service closed");
             }
@@ -213,13 +215,13 @@ public class ProgressFileReader {
                             logger.debug("New progress value read: " + value);
                         }
                     } else {
-                        logger.error("Invalid progress value: " + value);
+                        logger.warn("Invalid progress value: " + value);
                     }
                 } catch (NumberFormatException e) {
-                    logger.error("Progress value is a not a numeric value: " + line);
+                    logger.warn("Progress value is a not a numeric value: " + line);
                 }
             } catch (IOException e) {
-                logger.error("Error while reading the first line of " + progressFile);
+                logger.warn("Error while reading the first line of " + progressFile);
             }
         }
 

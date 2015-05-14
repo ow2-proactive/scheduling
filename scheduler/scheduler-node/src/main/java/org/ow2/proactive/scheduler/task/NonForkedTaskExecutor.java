@@ -83,23 +83,8 @@ public class NonForkedTaskExecutor implements TaskExecutor {
 
         try {
             Map<String, Serializable> variables = taskVariables(container);
-            scriptHandler.addBinding(VARIABLES_BINDING_NAME, variables);
-
-            TaskResult[] results = tasksResults(container);
-            scriptHandler.addBinding(TaskScript.RESULTS_VARIABLE, results);
-
             Map<String, String> thirdPartyCredentials = thirdPartyCredentials(container);
-            scriptHandler.addBinding(TaskScript.CREDENTIALS_VARIABLE, thirdPartyCredentials);
-
-            scriptHandler.addBinding(DS_SCRATCH_BINDING_NAME, container.getScratchURI());
-            scriptHandler.addBinding(DS_INPUT_BINDING_NAME, container.getInputURI());
-            scriptHandler.addBinding(DS_OUTPUT_BINDING_NAME, container.getOutputURI());
-            scriptHandler.addBinding(DS_GLOBAL_BINDING_NAME, container.getGlobalURI());
-            scriptHandler.addBinding(DS_USER_BINDING_NAME, container.getUserURI());
-
-            Set<String> nodesUrls = container.getNodesURLs();
-            scriptHandler.addBinding(MULTI_NODE_TASK_NODESET_BINDING_NAME, nodesUrls);
-            scriptHandler.addBinding(MULTI_NODE_TASK_NODESURL_BINDING_NAME, nodesUrls);
+            createBindings(container, scriptHandler, variables, thirdPartyCredentials);
 
             Stopwatch stopwatch = Stopwatch.createUnstarted();
             TaskResultImpl taskResult;
@@ -128,7 +113,26 @@ public class NonForkedTaskExecutor implements TaskExecutor {
         }
     }
 
-    private String writeNodesFile(Set<String> nodesHosts) throws IOException {
+    static void createBindings(TaskContext container, ScriptHandler scriptHandler, Map<String, Serializable> variables, Map<String, String> thirdPartyCredentials) {
+        scriptHandler.addBinding(VARIABLES_BINDING_NAME, variables);
+
+        TaskResult[] results = tasksResults(container);
+        scriptHandler.addBinding(TaskScript.RESULTS_VARIABLE, results);
+
+        scriptHandler.addBinding(TaskScript.CREDENTIALS_VARIABLE, thirdPartyCredentials);
+
+        scriptHandler.addBinding(DS_SCRATCH_BINDING_NAME, container.getScratchURI());
+        scriptHandler.addBinding(DS_INPUT_BINDING_NAME, container.getInputURI());
+        scriptHandler.addBinding(DS_OUTPUT_BINDING_NAME, container.getOutputURI());
+        scriptHandler.addBinding(DS_GLOBAL_BINDING_NAME, container.getGlobalURI());
+        scriptHandler.addBinding(DS_USER_BINDING_NAME, container.getUserURI());
+
+        Set<String> nodesUrls = container.getNodesURLs();
+        scriptHandler.addBinding(MULTI_NODE_TASK_NODESET_BINDING_NAME, nodesUrls);
+        scriptHandler.addBinding(MULTI_NODE_TASK_NODESURL_BINDING_NAME, nodesUrls);
+    }
+
+    static String writeNodesFile(Set<String> nodesHosts) throws IOException {
         if (nodesHosts.isEmpty()) {
             return "";
         } else {
@@ -142,7 +146,7 @@ public class NonForkedTaskExecutor implements TaskExecutor {
         }
     }
 
-    private Map<String, Serializable> taskVariables(TaskContext container) throws Exception {
+    static Map<String, Serializable> taskVariables(TaskContext container) throws Exception {
         Map<String, Serializable> variables = new HashMap<String, Serializable>();
 
         // variables from workflow definition
@@ -176,7 +180,7 @@ public class NonForkedTaskExecutor implements TaskExecutor {
         return variables;
     }
 
-    private TaskResult[] tasksResults(TaskContext container) {
+    static TaskResult[] tasksResults(TaskContext container) {
         TaskResult[] previousTasksResults = container.getPreviousTasksResults();
         if (previousTasksResults != null) {
             return previousTasksResults;
@@ -185,7 +189,7 @@ public class NonForkedTaskExecutor implements TaskExecutor {
         }
     }
 
-    private Map<String, Serializable> contextVariables(TaskLauncherInitializer initializer) {
+    static Map<String, Serializable> contextVariables(TaskLauncherInitializer initializer) {
         Map<String, Serializable> variables = new HashMap<String, Serializable>();
         variables.put(SchedulerVars.PA_JOB_ID.toString(), initializer.getTaskId().getJobId().value());
         variables.put(SchedulerVars.PA_JOB_NAME.toString(), initializer.getTaskId().getJobId()
@@ -197,7 +201,7 @@ public class NonForkedTaskExecutor implements TaskExecutor {
         return variables;
     }
 
-    private Map<String, String> thirdPartyCredentials(TaskContext container) throws Exception {
+    static Map<String, String> thirdPartyCredentials(TaskContext container) throws Exception {
         try {
             Map<String, String> thirdPartyCredentials = new HashMap<String, String>();
             if (container.getDecrypter() != null) {
@@ -209,7 +213,7 @@ public class NonForkedTaskExecutor implements TaskExecutor {
         }
     }
 
-    private void replaceScriptParameters(Script script, Map<String, String> thirdPartyCredentials,
+    static void replaceScriptParameters(Script script, Map<String, String> thirdPartyCredentials,
       Map<String, Serializable> variables) {
 
         Map<String, String> replacements = new HashMap<String, String>();
@@ -225,7 +229,7 @@ public class NonForkedTaskExecutor implements TaskExecutor {
         performReplacements(script, replacements);
     }
 
-    private void performReplacements(Script script, Map<String, String> replacements) {
+    static void performReplacements(Script script, Map<String, String> replacements) {
         if (script != null) {
             if ("java".equals(script.getEngineName())) {
                 try {
@@ -271,11 +275,7 @@ public class NonForkedTaskExecutor implements TaskExecutor {
             ScriptHandler scriptHandler, Map<String, String> thirdPartyCredentials,
             Map<String, Serializable> variables) throws Exception {
         if (container.getPreScript() != null) {
-            replaceScriptParameters(container.getPreScript(), thirdPartyCredentials, variables);
-            ScriptResult preScriptResult = scriptHandler.handle(container.getPreScript(), output, error);
-            if (preScriptResult.errorOccured()) {
-                throw new Exception("Failed to execute pre script", preScriptResult.getException());
-            }
+            executeScript(output, error, scriptHandler, thirdPartyCredentials, variables, container.getPreScript());
         }
 
         Script<Serializable> script = ((ScriptExecutableContainer) container.getExecutableContainer())
@@ -296,6 +296,15 @@ public class NonForkedTaskExecutor implements TaskExecutor {
             }
         }
         return scriptResult.getResult();
+    }
+
+    static ScriptResult executeScript(PrintStream output, PrintStream error, ScriptHandler scriptHandler, Map<String, String> thirdPartyCredentials, Map<String, Serializable> variables, Script<?> script) throws Exception {
+        replaceScriptParameters(script, thirdPartyCredentials, variables);
+        ScriptResult scriptResult = scriptHandler.handle(script, output, error);
+        if (scriptResult.errorOccured()) {
+            throw new Exception("Failed to execute script", scriptResult.getException());
+        }
+        return scriptResult;
     }
 
     private void executeFlowScript(FlowScript flowScript, ScriptHandler scriptHandler, PrintStream output,

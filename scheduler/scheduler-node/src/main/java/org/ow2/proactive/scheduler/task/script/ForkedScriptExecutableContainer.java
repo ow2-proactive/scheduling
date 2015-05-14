@@ -36,11 +36,12 @@
  */
 package org.ow2.proactive.scheduler.task.script;
 
+import org.apache.log4j.Logger;
+import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
+import org.ow2.proactive.scripting.TaskScript;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-
-import org.ow2.proactive.scripting.TaskScript;
-import org.apache.log4j.Logger;
 
 
 /**
@@ -57,19 +58,29 @@ public class ForkedScriptExecutableContainer extends ScriptExecutableContainer {
 
     public static final Logger logger = Logger.getLogger(ForkedScriptExecutableContainer.class);
 
-    private String workingDir;
+    /** Environment of a new dedicated JVM */
+    protected ForkEnvironment forkEnvironment = new ForkEnvironment();
 
     public ForkedScriptExecutableContainer(TaskScript script) {
         super(script);
     }
 
-    public String getWorkingDir() {
-        return workingDir;
-    }
-
     public ForkedScriptExecutableContainer(TaskScript script, String workingDir) {
         this(script);
-        this.workingDir = workingDir;
+        this.forkEnvironment = new ForkEnvironment();
+        this.forkEnvironment.setWorkingDir(workingDir);
     }
 
+    public ForkedScriptExecutableContainer(TaskScript script, ForkEnvironment forkEnvironment) {
+        super(script);
+        this.forkEnvironment = forkEnvironment;
+    }
+
+    public String getWorkingDir() {
+        return forkEnvironment.getWorkingDir();
+    }
+
+    public ForkEnvironment getForkEnvironment() {
+        return forkEnvironment;
+    }
 }

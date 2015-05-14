@@ -1,27 +1,25 @@
 package org.ow2.proactive.scheduler.task;
 
-import java.io.File;
-import java.security.KeyException;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.task.script.ForkedScriptExecutableContainer;
 import org.ow2.proactive.scheduler.task.utils.Decrypter;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 
-import static org.junit.Assert.*;
+import java.io.File;
+import java.security.*;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 
 public class ForkerTaskExecutorTest {
@@ -40,8 +38,8 @@ public class ForkerTaskExecutorTest {
         initializer.setTaskId((TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false)));
 
         TaskResultImpl result = taskExecutor.execute(new TaskContext(new ForkedScriptExecutableContainer(
-            new TaskScript(new SimpleScript("print('hello'); variables.put('var','foo'); result='hello'",
-                "javascript"))), initializer), taskOutput.outputStream, taskOutput.error);
+                new TaskScript(new SimpleScript("print('hello'); variables.put('var','foo'); result='hello'",
+                        "javascript"))), initializer), taskOutput.outputStream, taskOutput.error);
 
         assertEquals("hello\n", taskOutput.output());
         assertEquals("hello", result.value());
@@ -59,7 +57,7 @@ public class ForkerTaskExecutorTest {
         initializer.setTaskId((TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false)));
 
         TaskResultImpl result = taskExecutor.execute(new TaskContext(new ForkedScriptExecutableContainer(
-            new TaskScript(new SimpleScript("print('hello'); result='hello'", "javascript"))), initializer),
+                        new TaskScript(new SimpleScript("print('hello'); result='hello'", "javascript"))), initializer),
                 taskOutput.outputStream, taskOutput.error);
 
         assertNotNull(result.getException());
@@ -76,7 +74,7 @@ public class ForkerTaskExecutorTest {
         initializer.setTaskId((TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false)));
 
         TaskResultImpl result = taskExecutor.execute(new TaskContext(new ForkedScriptExecutableContainer(
-            new TaskScript(new SimpleScript("print('hello'); result='hello'", "javascript"))), initializer),
+                        new TaskScript(new SimpleScript("print('hello'); result='hello'", "javascript"))), initializer),
                 taskOutput.outputStream, taskOutput.error);
 
         assertNotNull(result.getException());
@@ -94,7 +92,7 @@ public class ForkerTaskExecutorTest {
         initializer.setTaskId((TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false)));
 
         ForkedScriptExecutableContainer container = new ForkedScriptExecutableContainer(new TaskScript(
-            new SimpleScript("print('hello'); result='hello'", "javascript")));
+                new SimpleScript("print('hello'); result='hello'", "javascript")));
 
         container.setRunAsUser(true);
 
@@ -103,6 +101,30 @@ public class ForkerTaskExecutorTest {
         TaskResultImpl result = taskExecutor.execute(taskContext, taskOutput.outputStream, taskOutput.error);
 
         assertNotNull(result.getException());
+    }
+
+    @Test
+    public void forkEnvironment() throws Exception {
+        TestTaskOutput taskOutput = new TestTaskOutput();
+
+        File workingDir = tmpFolder.newFolder();
+
+        ForkerTaskExecutor taskExecutor = new ForkerTaskExecutor(workingDir, null);
+
+        TaskLauncherInitializer initializer = new TaskLauncherInitializer();
+        initializer.setTaskId((TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false)));
+
+        ForkEnvironment forkEnvironment = new ForkEnvironment();
+        forkEnvironment.addSystemEnvironmentVariable("envVar", "envValue", true);
+        forkEnvironment.addJVMArgument("-DjvmArg=jvmValue");
+
+        taskExecutor.execute(new TaskContext(new ForkedScriptExecutableContainer(
+                new TaskScript(new SimpleScript("println System.getenv('envVar'); " +
+                        "println System.getProperty('jvmArg'); " +
+                        "println new File('.').getAbsolutePath()", "groovy")),
+                forkEnvironment), initializer), taskOutput.outputStream, taskOutput.error);
+
+        assertEquals("envValue\njvmValue\n" + new File(workingDir, ".").getAbsolutePath() + "\n", taskOutput.output());
     }
 
     private Decrypter createCredentials(String username) throws NoSuchAlgorithmException, KeyException {

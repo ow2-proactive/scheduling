@@ -36,14 +36,7 @@
  */
 package org.ow2.proactive.scheduler.core;
 
-import java.security.PrivateKey;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
@@ -68,9 +61,9 @@ import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptorImpl;
 import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
 import org.ow2.proactive.scheduler.descriptor.TaskDescriptor;
 import org.ow2.proactive.scheduler.job.InternalJob;
-import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.policy.Policy;
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
+import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.TaskLogger;
@@ -79,7 +72,10 @@ import org.ow2.proactive.threading.TimeoutThreadPoolExecutor;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
-import org.apache.log4j.Logger;
+
+import java.security.PrivateKey;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -225,9 +221,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                         //create launcher and try to start the task
                         node = nodeSet.get(0);
                         numberOfTaskStarted++;
-                        System.out.println("" + (System.currentTimeMillis() - s) + " creating execution for " + taskDescriptor.getTaskId());
                         createExecution(nodeSet, node, currentJob, internalTask, taskDescriptor);
-                        System.out.println("" + (System.currentTimeMillis() - s) + " created execution for " + taskDescriptor.getTaskId());
 
                         //if every task that should be launched have been removed
                         if (tasksToSchedule.isEmpty()) {

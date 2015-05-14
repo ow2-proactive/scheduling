@@ -34,15 +34,14 @@
  */
 package org.ow2.proactive.scheduler.task.script;
 
-import java.io.Serializable;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.ow2.proactive.scheduler.common.task.util.ByteArrayWrapper;
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.TaskScript;
+
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -51,15 +50,13 @@ import org.ow2.proactive.scripting.TaskScript;
  * @since ProActive Scheduling 3.4
  */
 public class ScriptExecutableContainer extends ExecutableContainer {
+
     /** Arguments of the task as a map */
     protected final Map<String, ByteArrayWrapper> serializedArguments = new HashMap<String, ByteArrayWrapper>();
 
     private TaskScript script;
 
     public ScriptExecutableContainer(TaskScript script) {
-        for (Map.Entry<String, byte[]> e : Collections.<String, byte[]> emptyMap().entrySet()) {
-            this.serializedArguments.put(e.getKey(), new ByteArrayWrapper(e.getValue()));
-        }
         this.script = script;
     }
 

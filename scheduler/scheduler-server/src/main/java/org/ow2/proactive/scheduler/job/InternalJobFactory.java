@@ -297,7 +297,7 @@ public class InternalJobFactory {
 //                javaTask = new InternalForkedJavaTask(fjec);
                 try {
                     javaTask = new InternalForkedScriptTask(new ForkedScriptExecutableContainer(
-                      new TaskScript(new SimpleScript(task.getExecutableClassName(), "java", new Serializable[]{args}))));
+                      new TaskScript(new SimpleScript(task.getExecutableClassName(), "java", new Serializable[]{args})),task.getForkEnvironment()));
                 } catch (Exception e) {
                     throw new JobCreationException(e);
                 }

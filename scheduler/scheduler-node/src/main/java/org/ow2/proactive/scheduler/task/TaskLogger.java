@@ -34,18 +34,6 @@
  */
 package org.ow2.proactive.scheduler.task;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
-import org.ow2.proactive.scheduler.common.task.TaskId;
-import org.ow2.proactive.scheduler.common.task.TaskLogs;
-import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
-import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
-import org.ow2.proactive.scheduler.common.util.logforwarder.appenders.AsyncAppenderWithStorage;
-import org.ow2.proactive.scheduler.common.util.logforwarder.util.LoggingOutputStream;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Appender;
 import org.apache.log4j.FileAppender;
@@ -53,6 +41,18 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.MDC;
 import org.apache.log4j.helpers.LogLog;
 import org.apache.log4j.spi.LoggingEvent;
+import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
+import org.ow2.proactive.scheduler.common.task.TaskId;
+import org.ow2.proactive.scheduler.common.task.TaskLogs;
+import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
+import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
+import org.ow2.proactive.scheduler.common.util.logforwarder.appenders.AsyncAppenderWithStorage;
+import org.ow2.proactive.scheduler.common.util.logforwarder.util.LoggingOutputStream;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 
 public class TaskLogger {
@@ -210,7 +210,7 @@ public class TaskLogger {
                 if (taskLogAppender != null) {
                     taskLogAppender.close();
                 }
-                logger.info("Terminated loggers for task " + this.taskId);
+                logger.debug("Task logger closed");
             }
         }
     }

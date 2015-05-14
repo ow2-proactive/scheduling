@@ -43,12 +43,12 @@ public class TaskLauncherTest {
     @Test
     public void simpleTask() throws Throwable {
         ForkedScriptExecutableContainer executableContainer = new ForkedScriptExecutableContainer(
-          new TaskScript(new SimpleScript("print('hello'); result='hello'", "javascript")));
+          new TaskScript(new SimpleScript("print('hello'); result='hello'", "groovy")));
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
 
-        initializer.setPreScript(new SimpleScript("print('pre')", "javascript"));
-        initializer.setPostScript(new SimpleScript("print('post')", "javascript"));
+        initializer.setPreScript(new SimpleScript("print('pre')", "groovy"));
+        initializer.setPostScript(new SimpleScript("print('post')", "groovy"));
         initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false));
 
         TaskLauncher taskLauncher = new TaskLauncher(initializer, new TestTaskLauncherFactory());
@@ -81,7 +81,7 @@ public class TaskLauncherTest {
     @Test
     public void failedTask() throws Throwable {
         ForkedScriptExecutableContainer executableContainer = new ForkedScriptExecutableContainer(
-          new TaskScript(new SimpleScript("failing task'", "javascript")));
+          new TaskScript(new SimpleScript("failing task'", "groovy")));
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
 
@@ -97,7 +97,7 @@ public class TaskLauncherTest {
     @Test
     public void thirdPartyCredentials() throws Throwable {
         ForkedScriptExecutableContainer executableContainer = new ForkedScriptExecutableContainer(
-          new TaskScript(new SimpleScript("print(credentials.get('password'))", "javascript")));
+          new TaskScript(new SimpleScript("print(credentials.get('password'))", "groovy")));
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
         initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false));
@@ -133,7 +133,7 @@ public class TaskLauncherTest {
     @Test
     public void taskLogsAreCopiedToUserSpace() throws Exception {
         ForkedScriptExecutableContainer executableContainer = new ForkedScriptExecutableContainer(
-          new TaskScript(new SimpleScript("print('hello'); result='hello'", "javascript")));
+          new TaskScript(new SimpleScript("print('hello'); result='hello'", "groovy")));
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
 
@@ -141,6 +141,8 @@ public class TaskLauncherTest {
         initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false));
 
         final TaskDataspaces dataspacesMock = mock(TaskDataspaces.class);
+        when(dataspacesMock.getScratchFolder()).thenReturn(tmpFolder.newFolder());
+
         TaskLauncher taskLauncher = new TaskLauncher(initializer, new TestTaskLauncherFactory(){
 
             @Override
@@ -156,7 +158,7 @@ public class TaskLauncherTest {
     @Test
     public void taskLogsAreNotCopiedToUserSpace_PreciousLogsDisabled() throws Exception {
         ForkedScriptExecutableContainer executableContainer = new ForkedScriptExecutableContainer(
-          new TaskScript(new SimpleScript("print('hello'); result='hello'", "javascript")));
+          new TaskScript(new SimpleScript("print('hello'); result='hello'", "groovy")));
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
 
@@ -164,6 +166,8 @@ public class TaskLauncherTest {
         initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false));
 
         final TaskDataspaces dataspacesMock = mock(TaskDataspaces.class);
+        when(dataspacesMock.getScratchFolder()).thenReturn(tmpFolder.newFolder());
+
         TaskLauncher taskLauncher = new TaskLauncher(initializer, new TestTaskLauncherFactory(){
 
             @Override

@@ -34,25 +34,30 @@
  */
 package org.ow2.proactive.scheduler.task;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.PrintStream;
-
+import com.google.common.base.Strings;
+import org.apache.commons.io.FileUtils;
 import org.objectweb.proactive.extensions.processbuilder.OSProcessBuilder;
 import org.objectweb.proactive.extensions.processbuilder.exception.NotImplementedException;
+import org.ow2.proactive.resourcemanager.utils.OneJar;
+import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.exception.ForkedJVMProcessException;
+import org.ow2.proactive.scheduler.task.script.ForkedScriptExecutableContainer;
 import org.ow2.proactive.scheduler.task.utils.Decrypter;
 import org.ow2.proactive.scheduler.task.utils.ForkerUtils;
 import org.ow2.proactive.scheduler.task.utils.ProcessStreamsReader;
 import org.ow2.proactive.scheduler.task.utils.TaskProcessTreeKiller;
-import org.apache.commons.io.FileUtils;
+import org.ow2.proactive.scripting.ScriptHandler;
+import org.ow2.proactive.scripting.ScriptLoader;
+
+import java.io.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 
 public class ForkerTaskExecutor implements TaskExecutor {
+
+    private static final String FORKENV_BINDING_NAME = "forkEnvironment";
 
     private File workingDir;
     private Decrypter decrypter;
@@ -73,7 +78,7 @@ public class ForkerTaskExecutor implements TaskExecutor {
         try {
             serializedContext = serializeContext(context, workingDir);
 
-            OSProcessBuilder processBuilder = createForkedProcess(context, serializedContext);
+            OSProcessBuilder processBuilder = createForkedProcess(context, serializedContext, outputSink, errorSink);
 
             try {
                 taskProcessTreeKiller.tagEnvironment(processBuilder.environment());
@@ -88,19 +93,19 @@ public class ForkerTaskExecutor implements TaskExecutor {
 
             if (exitCode != 0) {
                 try {
-                    Throwable exception = (Throwable) deserializeTaskResult(serializedContext);
+                    Throwable exception = (Throwable) deserializeTaskResult(serializedContext); // TODO ClassCastException
                     return new TaskResultImpl(context.getTaskId(), new ForkedJVMProcessException(
-                        "Failed to execute task in a forked JVM", exception));
+                            "Failed to execute task in a forked JVM", exception));
                 } catch (Throwable cannotDeserializeResult) {
                     return new TaskResultImpl(context.getTaskId(), new ForkedJVMProcessException(
-                        "Failed to execute task in a forked JVM", cannotDeserializeResult));
+                            "Failed to execute task in a forked JVM", cannotDeserializeResult));
                 }
             }
 
             return (TaskResultImpl) deserializeTaskResult(serializedContext);
         } catch (Throwable throwable) {
             return new TaskResultImpl(context.getTaskId(), new ForkedJVMProcessException(
-                "Failed to execute task in a forked JVM", throwable));
+                    "Failed to execute task in a forked JVM", throwable));
         } finally {
             FileUtils.deleteQuietly(serializedContext);
 
@@ -114,7 +119,7 @@ public class ForkerTaskExecutor implements TaskExecutor {
         }
     }
 
-    private OSProcessBuilder createForkedProcess(TaskContext context, File serializedContext)
+    private OSProcessBuilder createForkedProcess(TaskContext context, File serializedContext, PrintStream outputSink, PrintStream errorSink)
             throws Exception {
         OSProcessBuilder pb;
         String nativeScriptPath = context.getSchedulerHome();
@@ -129,14 +134,61 @@ public class ForkerTaskExecutor implements TaskExecutor {
             pb = ForkerUtils.getOSProcessBuilderFactory(nativeScriptPath).getBuilder();
         }
 
-        pb.command(getJavaExecutablePath(context.getExecutableContainer()), "-cp",
-                System.getProperty("java.class.path"), ForkerTaskExecutor.class.getName(),
-                serializedContext.getAbsolutePath()).directory(workingDir);
-        return pb;
-    }
 
-    private String getJavaExecutablePath(ExecutableContainer executableContainer) {
-        return System.getProperty("java.home") + File.separatorChar + "bin" + File.separatorChar + "java";
+        String javaHome = System.getProperty("java.home");
+
+        String jvmArguments = "";
+        StringBuilder classpath = new StringBuilder("." + File.pathSeparatorChar);
+        classpath.append(System.getProperty("java.class.path", ""));
+
+        for (String classpathEntry : OneJar.getClasspath()) {
+            classpath.append(File.pathSeparatorChar).append(classpathEntry);
+        }
+
+        if (context.getExecutableContainer() instanceof ForkedScriptExecutableContainer) {
+            ForkedScriptExecutableContainer forkedExecutable = (ForkedScriptExecutableContainer) context.getExecutableContainer();
+
+            ForkEnvironment forkEnvironment = forkedExecutable.getForkEnvironment();
+
+            if (forkEnvironment.getEnvScript() != null) {
+
+                ScriptHandler scriptHandler = ScriptLoader.createLocalHandler();
+                Map<String, Serializable> variables = NonForkedTaskExecutor.taskVariables(context);
+                Map<String, String> thirdPartyCredentials = NonForkedTaskExecutor.thirdPartyCredentials(context);
+                NonForkedTaskExecutor.createBindings(context, scriptHandler, variables, thirdPartyCredentials);
+
+                scriptHandler.addBinding(FORKENV_BINDING_NAME, forkEnvironment);
+                NonForkedTaskExecutor.executeScript(outputSink, errorSink, scriptHandler, thirdPartyCredentials, variables, forkEnvironment.getEnvScript());
+            }
+
+            for (String jvmArgument : forkEnvironment.getJVMArguments()) {
+                jvmArguments += jvmArgument;
+            }
+
+            if (!Strings.isNullOrEmpty(forkEnvironment.getJavaHome())) {
+                javaHome = forkEnvironment.getJavaHome();
+            }
+
+            for (String classpathEntry : forkEnvironment.getAdditionalClasspath()) {
+                classpath.append(File.pathSeparatorChar).append(classpathEntry);
+            }
+
+            pb.environment().putAll(forkEnvironment.getSystemEnvironment());
+        }
+
+        List<String> javaCommand = pb.command();
+        javaCommand.add(javaHome + File.separatorChar + "bin" + File.separatorChar + "java");
+        javaCommand.add("-cp");
+        javaCommand.add(classpath.toString());
+        if(!Objects.equals(jvmArguments, "")){
+            javaCommand.add(jvmArguments);
+        }
+        javaCommand.add(ForkerTaskExecutor.class.getName());
+        javaCommand.add(serializedContext.getAbsolutePath());
+
+        // TODO add fork env
+        pb.directory(workingDir);
+        return pb;
     }
 
     // 1 called by forker
