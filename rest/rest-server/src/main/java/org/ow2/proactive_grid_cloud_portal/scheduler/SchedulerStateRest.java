@@ -36,134 +36,11 @@
  */
 package org.ow2.proactive_grid_cloud_portal.scheduler;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.io.SequenceInputStream;
-import java.io.Serializable;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.security.KeyException;
-import java.security.PublicKey;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-
-import javax.security.auth.login.LoginException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.FormParam;
-import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.PathSegment;
-import javax.ws.rs.core.Response;
-
-import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.api.PAFuture;
-import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.extensions.dataspaces.vfs.VFSFactory;
-import org.objectweb.proactive.utils.StackTraceUtil;
-import org.ow2.proactive.authentication.crypto.CredData;
-import org.ow2.proactive.authentication.crypto.Credentials;
-import org.ow2.proactive.db.SortOrder;
-import org.ow2.proactive.db.SortParameter;
-import org.ow2.proactive.scheduler.common.JobFilterCriteria;
-import org.ow2.proactive.scheduler.common.JobSortParameter;
-import org.ow2.proactive.scheduler.common.Scheduler;
-import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
-import org.ow2.proactive.scheduler.common.SchedulerConnection;
-import org.ow2.proactive.scheduler.common.SchedulerConstants;
-import org.ow2.proactive.scheduler.common.exception.ConnectionException;
-import org.ow2.proactive.scheduler.common.exception.InternalSchedulerException;
-import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
-import org.ow2.proactive.scheduler.common.exception.JobCreationException;
-import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
-import org.ow2.proactive.scheduler.common.exception.PermissionException;
-import org.ow2.proactive.scheduler.common.exception.SchedulerException;
-import org.ow2.proactive.scheduler.common.exception.SubmissionClosedException;
-import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
-import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
-import org.ow2.proactive.scheduler.common.job.Job;
-import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobInfo;
-import org.ow2.proactive.scheduler.common.job.JobPriority;
-import org.ow2.proactive.scheduler.common.job.JobResult;
-import org.ow2.proactive.scheduler.common.job.JobState;
-import org.ow2.proactive.scheduler.common.job.factories.FlatJobFactory;
-import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
-import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.ow2.proactive.scheduler.common.task.TaskState;
-import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
-import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
-import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
-import org.ow2.proactive_grid_cloud_portal.common.Session;
-import org.ow2.proactive_grid_cloud_portal.common.SessionStore;
-import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStore;
-import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobInfoData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobResultData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobStateData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobUsageData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobValidationData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.SchedulerStatusData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.SchedulerUserData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskIdData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskResultData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskStateData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.UserJobData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.eventing.EventNotification;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.eventing.EventSubscription;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.JobAlreadyFinishedRestException;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.JobCreationRestException;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.LogForwardingRestException;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SchedulerRestException;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SubmissionClosedRestException;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestException;
-import org.ow2.proactive_grid_cloud_portal.scheduler.util.EventUtil;
-import org.ow2.proactive_grid_cloud_portal.webapp.DateFormatter;
-import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
+import com.google.common.collect.Maps;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.vfs2.FileObject;
-import org.apache.commons.vfs2.FileSystemException;
-import org.apache.commons.vfs2.FileSystemManager;
-import org.apache.commons.vfs2.FileType;
-import org.apache.commons.vfs2.Selectors;
+import org.apache.commons.vfs2.*;
 import org.apache.log4j.Logger;
 import org.atmosphere.cpr.AtmosphereResource;
 import org.atmosphere.cpr.AtmosphereResourceFactory;
@@ -177,8 +54,54 @@ import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 import org.jboss.resteasy.util.GenericType;
+import org.objectweb.proactive.ActiveObjectCreationException;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PAFuture;
+import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extensions.dataspaces.vfs.VFSFactory;
+import org.objectweb.proactive.utils.StackTraceUtil;
+import org.ow2.proactive.authentication.crypto.CredData;
+import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.db.SortOrder;
+import org.ow2.proactive.db.SortParameter;
+import org.ow2.proactive.scheduler.common.*;
+import org.ow2.proactive.scheduler.common.exception.*;
+import org.ow2.proactive.scheduler.common.job.*;
+import org.ow2.proactive.scheduler.common.job.factories.FlatJobFactory;
+import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
+import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.task.TaskState;
+import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
+import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
+import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
+import org.ow2.proactive_grid_cloud_portal.common.Session;
+import org.ow2.proactive_grid_cloud_portal.common.SessionStore;
+import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStore;
+import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.*;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.eventing.EventNotification;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.eventing.EventSubscription;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.*;
+import org.ow2.proactive_grid_cloud_portal.scheduler.util.EventUtil;
+import org.ow2.proactive_grid_cloud_portal.webapp.DateFormatter;
+import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
 
-import com.google.common.collect.Maps;
+import javax.security.auth.login.LoginException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import javax.ws.rs.*;
+import javax.ws.rs.core.*;
+import java.io.*;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.security.KeyException;
+import java.security.PublicKey;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static javax.ws.rs.core.MediaType.APPLICATION_XML_TYPE;
@@ -265,12 +188,12 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     /**
-     * call a method on the scheduler's frontend in order to renew the lease the
+     * Call a method on the scheduler's frontend in order to renew the lease the
      * user has on this frontend. see PORTAL-70
      *
      * @throws NotConnectedRestException
      */
-    private void renewLeaseForClient(Scheduler scheduler) throws NotConnectedRestException {
+    protected void renewLeaseForClient(Scheduler scheduler) throws NotConnectedRestException {
         try {
             scheduler.renewSession();
         } catch (NotConnectedException e) {
@@ -400,8 +323,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @Produces( { "application/json", "application/xml" })
     public long schedulerStateRevision(@HeaderParam("sessionid")
     String sessionId) throws NotConnectedRestException {
-        Scheduler s = checkAccess(sessionId, "/scheduler/revision");
-        renewLeaseForClient(s);
+        checkAccess(sessionId, "/scheduler/revision");
         return SchedulerStateListener.getInstance().getSchedulerStateRevision();
     }
 
@@ -1407,19 +1329,23 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      */
     private SchedulerProxyUserInterface checkAccess(String sessionId, String path)
             throws NotConnectedRestException {
-        Session ss = sessionStore.get(sessionId);
-        if (ss == null) {
+        Session session = sessionStore.get(sessionId);
+
+        if (session == null) {
             throw new NotConnectedRestException(
-                "you are not connected to the scheduler, you should log on first");
+                "You are not connected to the scheduler, you should log on first");
         }
 
-        SchedulerProxyUserInterface s = ss.getScheduler();
+        SchedulerProxyUserInterface schedulerProxy = session.getScheduler();
 
-        if (s == null) {
+        if (schedulerProxy == null) {
             throw new NotConnectedRestException(
-                "you are not connected to the scheduler, you should log on first");
+                "You are not connected to the scheduler, you should log on first");
         }
-        return s;
+
+        renewLeaseForClient(schedulerProxy);
+
+        return schedulerProxy;
     }
 
     private SchedulerProxyUserInterface checkAccess(String sessionId) throws NotConnectedRestException {
@@ -2086,9 +2012,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     final String sessionId) throws NotConnectedRestException, PermissionRestException {
         try {
             Scheduler s = checkAccess(sessionId, "status");
-            renewLeaseForClient(s);
-            return SchedulerStatusData.valueOf(SchedulerStateListener.getInstance().getSchedulerStatus(s)
-                    .name());
+            return SchedulerStatusData.valueOf(
+                    SchedulerStateListener.getInstance().getSchedulerStatus(s).name());
         } catch (PermissionException e) {
             throw new PermissionRestException(e);
         } catch (NotConnectedException e) {
