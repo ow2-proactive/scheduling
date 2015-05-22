@@ -81,8 +81,6 @@ public class SchedulerStateRestRenewLeaseForClientTest extends RestTestServer {
 
     private SchedulerProxyUserInterface scheduler;
 
-    private String sessionId;
-
     private Method methodToTest;
 
     public SchedulerStateRestRenewLeaseForClientTest(String testName, Method methodToTest) {
@@ -121,11 +119,10 @@ public class SchedulerStateRestRenewLeaseForClientTest extends RestTestServer {
 
     @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
-
         schedulerStateRest = spy(new SchedulerStateRest());
         scheduler = mock(SchedulerProxyUserInterface.class);
-        sessionId = SharedSessionStoreTestUtils.createValidSession(scheduler);
+
+        String sessionId = SharedSessionStoreTestUtils.createValidSession(scheduler);
 
         defaultParameterValues.put(Character.class, '\0');
         defaultParameterValues.put(Integer.class, 0);
