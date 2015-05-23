@@ -319,7 +319,7 @@
   </define>
   <define name="preciousLogs">
     <attribute name="preciousLogs">
-      <doc:documentation>Do we keep the logs as file on LOCALSPACE</doc:documentation>
+      <doc:documentation>Do we keep the logs as file on USERSPACE</doc:documentation>
       <choice>
         <data type="boolean"/>
         <ref name="variableRefType"/>

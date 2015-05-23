@@ -293,7 +293,7 @@
           </xs:attribute>
           <xs:attribute name="preciousLogs">
             <xs:annotation>
-              <xs:documentation>Do we keep the logs as file on LOCALSPACE</xs:documentation>
+              <xs:documentation>Do we keep the logs as file on USERSPACE</xs:documentation>
             </xs:annotation>
             <xs:simpleType>
               <xs:union memberTypes="xs:boolean jd:variableRefType"/>
@@ -387,7 +387,7 @@
   <xs:attributeGroup name="preciousLogs">
     <xs:attribute name="preciousLogs" use="required">
       <xs:annotation>
-        <xs:documentation>Do we keep the logs as file on LOCALSPACE</xs:documentation>
+        <xs:documentation>Do we keep the logs as file on USERSPACE</xs:documentation>
       </xs:annotation>
       <xs:simpleType>
         <xs:union memberTypes="xs:boolean jd:variableRefType"/>
