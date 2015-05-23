@@ -105,8 +105,8 @@ public class TestKilledJobResult extends SchedulerConsecutive {
         Assert.assertTrue(taskState0.getStartTime() > 0);
         Assert.assertTrue(taskState0.getFinishedTime() > 0);
         Assert.assertTrue(taskState0.getExecutionDuration() >= 0);
-        Assert.assertTrue(taskState0.getExecutionDuration() < taskState1.getFinishedTime() -
-            taskState1.getStartTime());
+        Assert.assertTrue(taskState0.getExecutionDuration() <= taskState0.getFinishedTime() -
+                taskState0.getStartTime());
 
         Assert.assertTrue(taskState1.getStartTime() > 0);
         Assert.assertTrue(taskState1.getFinishedTime() > 0);
