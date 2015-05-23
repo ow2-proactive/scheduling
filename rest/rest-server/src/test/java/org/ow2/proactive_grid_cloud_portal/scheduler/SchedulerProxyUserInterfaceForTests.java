@@ -34,6 +34,7 @@
  */
 package org.ow2.proactive_grid_cloud_portal.scheduler;
 
+import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
 
 
@@ -45,4 +46,12 @@ public class SchedulerProxyUserInterfaceForTests extends SchedulerProxyUserInter
     public SchedulerProxyUserInterfaceForTests() {
 
     }
+
+    @Override
+    public void renewSession() throws NotConnectedException {
+        if (uischeduler != null) {
+            super.renewSession();
+        }
+    }
+
 }
