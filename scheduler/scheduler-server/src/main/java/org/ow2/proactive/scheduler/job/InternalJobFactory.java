@@ -341,10 +341,10 @@ public class InternalJobFactory {
             logger.info(msg);
             throw new JobCreationException(msg);
         }
-//        InternalNativeTask nativeTask = new InternalNativeTask(new NativeExecutableContainer(task
-//                .getCommandLine(), task.getGenerationScript(), task.getWorkingDir()));
+        if(task.getGenerationScript() != null){
+            throw new JobCreationException("Generation script not supported anymore");
+        }
 
-        // TODO use native script engine
         String cli = "";
         for (String commandLinePart : task.getCommandLine()) {
             cli += "\"" + commandLinePart + "\"" + " "; // TODO FIXME more testing
