@@ -44,12 +44,12 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemException;
+import org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.exception.TaskAbortedException;
 import org.ow2.proactive.scheduler.common.exception.WalltimeExceededException;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.ow2.proactive.scheduler.common.task.dataspaces.FileSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
@@ -60,8 +60,10 @@ import org.ow2.proactive.scheduler.task.utils.TaskKiller;
 import org.ow2.proactive.scheduler.task.utils.WallTimer;
 
 import java.io.File;
+import java.io.Serializable;
 import java.security.*;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
 
@@ -110,7 +112,7 @@ public class TaskLauncher {
                        TaskTerminateNotification terminateNotification) {
 
         taskKiller = new TaskKiller(Thread.currentThread()); // what about kill of a non yet started task?
-        WallTimer wallTimer = WallTimer.startWalltime(initializer.getWalltime(),
+        WallTimer wallTimer = WallTimer.startWallTime(initializer.getWalltime(),
                 new TaskKiller(Thread.currentThread()));
 
         Stopwatch stopwatchWhenTaskFailed = Stopwatch.createStarted();
@@ -120,7 +122,7 @@ public class TaskLauncher {
 
             File taskLogFile = taskLogger.createFileAppender(dataspaces.getScratchFolder());
 
-            dataspaces.copyInputDataToScratch(initializer.getTaskInputFiles()); // should handle interrupt
+            dataspaces.copyInputDataToScratch(initializer.getFilteredInputFiles(fileSelectorsFilters(initializer))); // should handle interrupt
 
             File workingDir = getTaskWorkingDir(executableContainer, dataspaces);
 
@@ -163,7 +165,7 @@ public class TaskLauncher {
                 return;
             }
 
-            dataspaces.copyScratchDataToOutput(initializer.getTaskOutputFiles());
+            dataspaces.copyScratchDataToOutput(initializer.getFilteredOutputFiles(fileSelectorsFilters(initializer)));
 
             copyTaskLogsToUserSpace(taskLogFile, dataspaces);
             FileUtils.deleteQuietly(taskLogFile);
@@ -203,6 +205,20 @@ public class TaskLauncher {
         } finally {
             taskLogger.close();
         }
+    }
+
+    private HashMap<String, Serializable> fileSelectorsFilters(TaskLauncherInitializer initializer) {
+        HashMap<String, Serializable> replacements = new HashMap<>();
+
+        replacements.put(SchedulerVars.PA_JOB_ID.toString(), initializer.getTaskId().getJobId().value());
+        replacements.put(SchedulerVars.PA_JOB_NAME.toString(), initializer.getTaskId().getJobId()
+                .getReadableName());
+        replacements.put(SchedulerVars.PA_TASK_ID.toString(), initializer.getTaskId().value());
+        replacements.put(SchedulerVars.PA_TASK_NAME.toString(), initializer.getTaskId().getReadableName());
+        replacements.put(SchedulerVars.PA_TASK_ITERATION.toString(), Integer.toString(initializer.getIterationIndex()));
+        replacements.put(SchedulerVars.PA_TASK_REPLICATION.toString(), Integer.toString(initializer.getReplicationIndex()));
+
+        return replacements;
     }
 
     private void copyTaskLogsToUserSpace(File taskLogFile, TaskDataspaces dataspaces) {

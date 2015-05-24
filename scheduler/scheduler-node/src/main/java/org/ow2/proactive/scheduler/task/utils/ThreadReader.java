@@ -46,21 +46,11 @@ public class ThreadReader implements Runnable {
     private BufferedReader in;
     private PrintStream out;
 
-    /**
-     * Create a new instance of ThreadReader.
-     *
-     * @param in input stream.
-     * @param out output stream
-     * @param executable Executable that is concerned by the read.
-     */
     public ThreadReader(BufferedReader in, PrintStream out) {
         this.in = in;
         this.out = out;
     }
 
-    /**
-     * @see java.lang.Runnable#run()
-     */
     public void run() {
         Thread readerThread = new Thread() {
             @Override

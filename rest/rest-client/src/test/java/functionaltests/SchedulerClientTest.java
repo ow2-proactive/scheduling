@@ -36,28 +36,21 @@
  */
 package functionaltests;
 
-import java.io.File;
-import java.io.Serializable;
-import java.net.URI;
-import java.util.Map;
-import java.util.Stack;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
+import com.google.common.io.Files;
+import javassist.ClassPool;
+import javassist.CtClass;
+import javassist.CtMethod;
+import javassist.CtNewMethod;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
-import org.ow2.proactive.scheduler.common.job.Job;
-import org.ow2.proactive.scheduler.common.job.JobEnvironment;
-import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobInfo;
-import org.ow2.proactive.scheduler.common.job.JobResult;
-import org.ow2.proactive.scheduler.common.job.JobState;
-import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
-import org.ow2.proactive.scheduler.common.job.UserIdentification;
-import org.ow2.proactive.scheduler.common.task.JavaTask;
-import org.ow2.proactive.scheduler.common.task.ScriptTask;
+import org.ow2.proactive.scheduler.common.job.*;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.Executable;
@@ -65,22 +58,12 @@ import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.common.util.JarUtils;
 import org.ow2.proactive.scheduler.rest.ISchedulerClient;
 import org.ow2.proactive.scheduler.rest.SchedulerClient;
-import org.ow2.proactive.scripting.SimpleScript;
-import org.ow2.proactive.scripting.TaskScript;
 
-import javassist.ClassPool;
-import javassist.CtClass;
-import javassist.CtMethod;
-import javassist.CtNewMethod;
-
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-
-import com.google.common.io.Files;
+import java.io.File;
+import java.net.URI;
+import java.util.Stack;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import static functionaltests.RestFuncTHelper.getRestServerUrl;
 
@@ -164,136 +147,6 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         // Delete the file in the user space
         // client.deleteFile("USERSPACE", emptyFile.getName()); TODO: TEST THIS
         // LATER
-    }
-
-    /**
-     * Test for SCHEDULING-2020: the REST java client should offer a way to
-     * submit a job archive
-     */
-    @Test(timeout = MAX_WAIT_TIME * 2)
-    public void testSubmitAsJobArchive() throws Throwable {
-        ISchedulerClient client = clientInstance();
-        TaskFlowJob job = new TaskFlowJob();
-
-        // First value to test in the java task
-        Integer value1 = 1;
-        String className1 = "test.Worker" + value1;
-        File destDir1 = testFolder.newFolder(className1);
-        SchedulerClientTest.createClass(className1, value1, destDir1);
-
-        // Second value to test in the script task
-        Integer value2 = 2;
-        String className2 = "test.Worker" + value2;
-        File destDir2 = testFolder.newFolder(className2);
-        SchedulerClientTest.createClass(className2, value2, destDir2);
-
-        // Create a jar and specify it as a jobclasspath
-        File jarFile = testFolder.newFile("testSubmitAsJobArchive.jar");
-        JarUtils.jar(new String[] { destDir2.getAbsolutePath() }, jarFile, null, null, null, null);
-
-        JobEnvironment jobEnv = new JobEnvironment();
-        jobEnv.setJobClasspath(new String[] { destDir1.getAbsolutePath(), jarFile.getAbsolutePath() });
-        job.setEnvironment(jobEnv);
-
-        // The java task will use the first class as executable
-        JavaTask javaTask = new JavaTask();
-        javaTask.setName("javaTask");
-        javaTask.setExecutableClassName(className1);
-        job.addTask(javaTask);
-
-        // The script task will intiatiate the second class and call execute
-        ScriptTask scriptTask = new ScriptTask();
-        scriptTask.setName("scriptTask");
-        String code = "def e = new " + className2 + "(); result = e.execute(null);";
-        SimpleScript ss = new SimpleScript(code, "groovy");
-        scriptTask.setScript(new TaskScript(ss));
-        job.addTask(scriptTask);
-
-        // Submit as job archive and wait until job finished
-        JobId jobId = client.submitAsJobArchive(job);
-        client.waitForJob(jobId, TimeUnit.SECONDS.toMillis(60 * 5));
-
-        JobResult jr = client.getJobResult(jobId);
-        Map<String, TaskResult> allResults = jr.getAllResults();
-
-        // Check that java task returned the correct value
-        TaskResult javaTaskResult = allResults.get(javaTask.getName());
-        Serializable ser1 = javaTaskResult.value();
-        Assert.assertEquals(
-                "The value returned by the "
-                        + className1
-                        + "#execute() method is incorrect, maybe "
-                        + "the SchedulerClient#submitAsJobArchive() method incorrectly packs the class into the job archive",
-                value1, ser1);
-
-        // Check that script task returned the correct value
-        TaskResult scriptTaskResult = allResults.get(scriptTask.getName());
-        Serializable ser2 = scriptTaskResult.value();
-        Assert.assertEquals(
-                "The value returned by the "
-                        + className2
-                        + "#execute() method is incorrect, maybe "
-                        + "the SchedulerClient#submitAsJobArchive() method incorrectly packs the jar containing the class into the job archive",
-                value2, ser2);
-    }
-
-    /**
-     * Test for SCHEDULING-2025: Add support for $USERSPACE and $GLOBALSPACE in
-     * job classpath
-     */
-    @Test(timeout = MAX_WAIT_TIME * 2)
-    public void testJobClasspathRelativeToUserspaceOrGlobalSpace() throws Throwable {
-        ISchedulerClient client = clientInstance();
-        TaskFlowJob job = new TaskFlowJob();
-
-        // Push the jar containing a test class into the globalspace
-        Integer value1 = 1;
-        String className1 = "test1.WorkerFromGlobalSpace";
-        File jarFile1 = createClassInsideJar(value1, className1);
-        client.pushFile("GLOBALSPACE", "", jarFile1.getName(), jarFile1.getCanonicalPath());
-
-        // Push the jar containing a test class into the userspace
-        Integer value2 = 2;
-        String className2 = "test2.WorkerFromUserSpace";
-        File jarFile2 = createClassInsideJar(value2, className2);
-        client.pushFile("USERSPACE", "", jarFile2.getName(), jarFile2.getCanonicalPath());
-
-        // Push the jar containing a test class into the userspace
-        Integer value3 = 3;
-        String className3 = "test3.WorkerFromJobArchive";
-        File jarFile3 = createClassInsideJar(value3, className3);
-
-        JobEnvironment jobEnv = new JobEnvironment();
-        jobEnv.setJobClasspath(new String[] { "$GLOBALSPACE/" + jarFile1.getName(),
-                "$USERSPACE/" + jarFile2.getName(), jarFile3.getAbsolutePath() });
-        job.setEnvironment(jobEnv);
-
-        JavaTask t1 = new JavaTask();
-        t1.setName("t1");
-        t1.setExecutableClassName(className1);
-        job.addTask(t1);
-
-        JavaTask t2 = new JavaTask();
-        t2.setName("t2");
-        t2.setExecutableClassName(className2);
-        job.addTask(t2);
-
-        JavaTask t3 = new JavaTask();
-        t3.setName("t3");
-        t3.setExecutableClassName(className3);
-        job.addTask(t3);
-
-        // Submit as job archive and wait until job finished
-        JobId jobId = client.submitAsJobArchive(job);
-        client.waitForJob(jobId, TimeUnit.SECONDS.toMillis(60 * 5));
-
-        JobResult jr = client.getJobResult(jobId);
-        Map<String, TaskResult> allResults = jr.getAllResults();
-
-        // Print the task exception in the assertion messag in case of failure
-        checkForValueInResult(allResults.get(t1.getName()), value1, jarFile1);
-        checkForValueInResult(allResults.get(t2.getName()), value2, jarFile2);
-        checkForValueInResult(allResults.get(t3.getName()), value3, jarFile3);
     }
 
     @Test(timeout = MAX_WAIT_TIME * 2)

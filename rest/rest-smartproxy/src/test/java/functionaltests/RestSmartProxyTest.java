@@ -219,17 +219,7 @@ public final class RestSmartProxyTest extends AbstractRestFuncTestCase {
         job.setInputSpace(userspace);
         job.setOutputSpace(userspace);
 
-        setJobClassPath(job);
         return job;
-    }
-
-    private void setJobClassPath(Job job) throws Exception {
-        File appMainFolder = new File(this.getClass().getProtectionDomain().getCodeSource().getLocation()
-                .toURI());
-        String appClassPath = appMainFolder.getAbsolutePath();
-        JobEnvironment je = new JobEnvironment();
-        je.setJobClasspath(new String[] { appClassPath });
-        job.setEnvironment(je);
     }
 
     private String uniqueSessionId() {

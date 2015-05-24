@@ -42,9 +42,9 @@ public class WallTimer {
     private Timer timer;
     private TaskKiller taskKiller;
 
-    private WallTimer(final long walltime, final TaskKiller taskKiller) {
+    private WallTimer(final long wallTimeDuration, final TaskKiller taskKiller) {
         this.taskKiller = taskKiller;
-        if (walltime > 0) {
+        if (wallTimeDuration > 0) {
             timer = new Timer();
             timer.schedule(new TimerTask() {
                 @Override
@@ -53,11 +53,11 @@ public class WallTimer {
                         taskKiller.kill();
                     }
                 }
-            }, walltime);
+            }, wallTimeDuration);
         }
     }
 
-    public static WallTimer startWalltime(final long walltime, final TaskKiller taskKiller) {
+    public static WallTimer startWallTime(final long walltime, final TaskKiller taskKiller) {
         return new WallTimer(walltime, taskKiller);
     }
 

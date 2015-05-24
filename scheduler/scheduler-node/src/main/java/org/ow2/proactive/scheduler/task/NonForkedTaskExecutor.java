@@ -35,6 +35,7 @@
 package org.ow2.proactive.scheduler.task;
 
 import com.google.common.base.Stopwatch;
+import org.apache.commons.io.FileUtils;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
@@ -52,18 +53,18 @@ import java.util.concurrent.TimeUnit;
 /**
  * Run a task through a script handler.
  * Responsible for:
- *  - running the different scripts
- *  - variable propagation
- *  - replacement for variables/
- *  - getting the task result or user code exceptions
+ * - running the different scripts
+ * - variable propagation
+ * - replacement for variables/
+ * - getting the task result or user code exceptions
  */
 public class NonForkedTaskExecutor implements TaskExecutor {
 
     private static final String DS_SCRATCH_BINDING_NAME = "localspace";
-    private static final String DS_INPUT_BINDING_NAME = "input";
-    private static final String DS_OUTPUT_BINDING_NAME = "output";
-    private static final String DS_GLOBAL_BINDING_NAME = "global";
-    private static final String DS_USER_BINDING_NAME = "user";
+    private static final String DS_INPUT_BINDING_NAME = "inputspace";
+    private static final String DS_OUTPUT_BINDING_NAME = "outputspace";
+    private static final String DS_GLOBAL_BINDING_NAME = "globalspace";
+    private static final String DS_USER_BINDING_NAME = "userspace";
 
     private static final String MULTI_NODE_TASK_NODESET_BINDING_NAME = "nodeset";
     public static final String MULTI_NODE_TASK_NODESURL_BINDING_NAME = "nodesurl";
@@ -80,8 +81,9 @@ public class NonForkedTaskExecutor implements TaskExecutor {
     @Override
     public TaskResultImpl execute(TaskContext container, PrintStream output, PrintStream error) {
         ScriptHandler scriptHandler = ScriptLoader.createLocalHandler();
-
+        String nodesFile = null;
         try {
+            nodesFile = writeNodesFile(container.getNodesHosts());
             Map<String, Serializable> variables = taskVariables(container);
             Map<String, String> thirdPartyCredentials = thirdPartyCredentials(container);
             createBindings(container, scriptHandler, variables, thirdPartyCredentials);
@@ -110,6 +112,10 @@ public class NonForkedTaskExecutor implements TaskExecutor {
         } catch (Throwable e) {
             e.printStackTrace(error);
             return new TaskResultImpl(container.getTaskId(), e);
+        } finally {
+            if (nodesFile != null && !nodesFile.isEmpty()) {
+                FileUtils.deleteQuietly(new File(nodesFile));
+            }
         }
     }
 
@@ -135,8 +141,9 @@ public class NonForkedTaskExecutor implements TaskExecutor {
     static String writeNodesFile(Set<String> nodesHosts) throws IOException {
         if (nodesHosts.isEmpty()) {
             return "";
-        } else {
+        } else { // TODO should delete it, check why it is there even if empty
             File nodesFiles = File.createTempFile("pa_nodes", null);
+            nodesFiles.deleteOnExit();
             FileWriter outputWriter = new FileWriter(nodesFiles);
             for (String nodeHost : nodesHosts) {
                 outputWriter.append(nodeHost).append(System.getProperty("line.separator"));
@@ -147,7 +154,7 @@ public class NonForkedTaskExecutor implements TaskExecutor {
     }
 
     static Map<String, Serializable> taskVariables(TaskContext container) throws Exception {
-        Map<String, Serializable> variables = new HashMap<String, Serializable>();
+        Map<String, Serializable> variables = new HashMap<>();
 
         // variables from workflow definition
         if (container.getInitializer().getVariables() != null) {
@@ -171,7 +178,7 @@ public class NonForkedTaskExecutor implements TaskExecutor {
         // variables from current job/task context
         variables.putAll(contextVariables(container.getInitializer()));
 
-        variables.put(SchedulerVars.PA_NODESNUMBER.toString(), container.getNodesURLs().size());
+        variables.put(SchedulerVars.PA_NODESNUMBER.toString(), container.getNodesURLs().size() + 1);
         variables.put(SchedulerVars.PA_NODESFILE.toString(), writeNodesFile(container.getNodesHosts()));
 
         variables.put(SchedulerVars.PA_SCHEDULER_HOME.toString(), container.getSchedulerHome());
@@ -190,7 +197,7 @@ public class NonForkedTaskExecutor implements TaskExecutor {
     }
 
     static Map<String, Serializable> contextVariables(TaskLauncherInitializer initializer) {
-        Map<String, Serializable> variables = new HashMap<String, Serializable>();
+        Map<String, Serializable> variables = new HashMap<>();
         variables.put(SchedulerVars.PA_JOB_ID.toString(), initializer.getTaskId().getJobId().value());
         variables.put(SchedulerVars.PA_JOB_NAME.toString(), initializer.getTaskId().getJobId()
                 .getReadableName());
@@ -203,7 +210,7 @@ public class NonForkedTaskExecutor implements TaskExecutor {
 
     static Map<String, String> thirdPartyCredentials(TaskContext container) throws Exception {
         try {
-            Map<String, String> thirdPartyCredentials = new HashMap<String, String>();
+            Map<String, String> thirdPartyCredentials = new HashMap<>();
             if (container.getDecrypter() != null) {
                 thirdPartyCredentials.putAll(container.getDecrypter().decrypt().getThirdPartyCredentials());
             }
@@ -216,17 +223,25 @@ public class NonForkedTaskExecutor implements TaskExecutor {
     static void replaceScriptParameters(Script script, Map<String, String> thirdPartyCredentials,
       Map<String, Serializable> variables) {
 
-        Map<String, String> replacements = new HashMap<String, String>();
-        for (Map.Entry<String, Serializable> variable : variables.entrySet()) {
-            replacements.put("$" + variable.getKey(), variable.getValue().toString());
-            replacements.put("${" + variable.getKey() + "}", variable.getValue().toString());
-        }
+        Map<String, String> replacements = buildReplacements(variables);
 
         for (Map.Entry<String, String> credentialEntry : thirdPartyCredentials.entrySet()) {
             replacements.put(CREDENTIALS_KEY_PREFIX + credentialEntry.getKey(), credentialEntry.getValue());
         }
 
         performReplacements(script, replacements);
+    }
+
+    // TODO to extract
+    public static Map<String, String> buildReplacements(Map<String, Serializable> variables) {
+        Map<String, String> replacements = new HashMap<>();
+        if (variables != null) {
+            for (Map.Entry<String, Serializable> variable : variables.entrySet()) {
+                replacements.put("$" + variable.getKey(), variable.getValue().toString());
+                replacements.put("${" + variable.getKey() + "}", variable.getValue().toString());
+            }
+        }
+        return replacements;
     }
 
     static void performReplacements(Script script, Map<String, String> replacements) {
@@ -241,8 +256,8 @@ public class NonForkedTaskExecutor implements TaskExecutor {
                               replace((String) deserializedArg.getValue(), replacements));
                         }
                     }
-                    script.getParameters()[0] = new HashMap<String, byte[]>(
-                        SerializationUtil.serializeVariableMap(deserializedArgs));
+                    script.getParameters()[0] = new HashMap<>(
+                            SerializationUtil.serializeVariableMap(deserializedArgs));
                 } catch (Exception e) {
                     System.err.println("Could read Java parameters");
                     e.printStackTrace(System.err);
@@ -263,7 +278,8 @@ public class NonForkedTaskExecutor implements TaskExecutor {
         }
     }
 
-    private static String replace(String input, Map<String, String> replacements) {
+    // TODO to extract
+    public static String replace(String input, Map<String, String> replacements) {
         String output = input;
         for (Map.Entry<String, String> replacement : replacements.entrySet()) {
             output = output.replace(replacement.getKey(), replacement.getValue());

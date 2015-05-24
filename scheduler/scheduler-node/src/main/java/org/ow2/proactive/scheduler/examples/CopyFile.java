@@ -34,20 +34,18 @@
  */
 package org.ow2.proactive.scheduler.examples;
 
-import org.apache.commons.vfs2.FileObject;
-import org.apache.commons.vfs2.FileSelectInfo;
-import org.apache.commons.vfs2.Selectors;
-import org.objectweb.proactive.extensions.dataspaces.api.FileSelector;
-import org.objectweb.proactive.extensions.dataspaces.vfs.adapter.VFSFileObjectAdapter;
+import org.apache.commons.io.FileUtils;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 
+import java.io.File;
+import java.io.FilenameFilter;
 import java.io.Serializable;
 
 
 /**
  * CopyFile, copy a single input File to an output File
- *
+ * <p/>
  * A wildcard can be used if parts of the names of the input file is not known
  *
  * @author The ProActive Team
@@ -60,35 +58,21 @@ public class CopyFile extends JavaExecutable {
     @Override
     public Serializable execute(TaskResult... results) throws Throwable {
         if (inputFile.contains("*")) {
-            inputFile = inputFile.replace("*", ".*").replace("?", ".");
-            FileObject space = ((VFSFileObjectAdapter) getLocalSpace()).getAdaptee();
 
-            FileObject[] lfo = space.findFiles(new org.apache.commons.vfs2.FileSelector() {
+            inputFile = inputFile.replace("*", ".*").replace("?", ".");
+
+            File[] matchedFiles = new File(".").listFiles(new FilenameFilter() {
                 @Override
-                public boolean includeFile(FileSelectInfo fileSelectInfo) throws Exception {
-                    String name = fileSelectInfo.getFile().getName().getBaseName();
+                public boolean accept(File dir, String name) {
                     return name.matches(inputFile);
                 }
-
-                @Override
-                public boolean traverseDescendents(FileSelectInfo fileSelectInfo) throws Exception {
-                    return true;
-                }
             });
-            if (lfo.length == 0) {
-                throw new IllegalStateException("No input file match the pattern : " + inputFile);
+
+            for (File matchedFile : matchedFiles) {
+                FileUtils.copyFile(matchedFile, new File(outputFile));
             }
-            if (lfo.length > 1) {
-                getOut().println("Warning more than one file matched the pattern : " + inputFile);
-            }
-            ((VFSFileObjectAdapter) super.getLocalFile(outputFile)).getAdaptee().copyFrom(lfo[0],
-                    Selectors.SELECT_SELF);
-            getOut().println("Copied " + lfo[0].getURL() + " to  " +
-                super.getLocalFile(outputFile).getRealURI());
         } else {
-            super.getLocalFile(outputFile).copyFrom(super.getLocalFile(inputFile), FileSelector.SELECT_SELF);
-            getOut().println("Copied " + super.getLocalFile(inputFile).getRealURI() + " to  " +
-                super.getLocalFile(outputFile).getRealURI());
+            FileUtils.copyFile(new File(inputFile), new File(outputFile));
         }
 
         return true;

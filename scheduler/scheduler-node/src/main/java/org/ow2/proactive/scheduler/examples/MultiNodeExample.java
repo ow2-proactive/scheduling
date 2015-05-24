@@ -36,18 +36,10 @@
  */
 package org.ow2.proactive.scheduler.examples;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Vector;
-
-import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.api.PAFuture;
-import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
+
+import java.io.Serializable;
 
 
 /**
@@ -55,93 +47,15 @@ import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 1.1
- *
  */
 public class MultiNodeExample extends JavaExecutable {
-    //default value : 5003
-    //if argument is set in descriptor, automatic assignment will be perform
-    //as it is a primitive type and the name of the field is the same as the argument
-    private int numberToFind = 5003;
 
     @Override
     public Serializable execute(TaskResult... results) {
-        getOut().println("Multi-node started !!");
-
-        ArrayList<Node> nodes = getNodes();
-
-        // create workers (on local node)
-        Vector<Worker> workers = new Vector<Worker>();
-
-        for (Node node : nodes) {
-            try {
-                Worker w = (Worker) PAActiveObject.newActive(Worker.class.getName(), new Object[] {}, node);
-                workers.add(w);
-            } catch (ActiveObjectCreationException e) {
-                e.printStackTrace();
-            } catch (NodeException e) {
-                e.printStackTrace();
-            }
+        if (getNodesURL().isEmpty()) {
+            throw new RuntimeException("More than 1 node URL expected for this task, got" + getNodesURL());
         }
 
-        // create controller
-        Controller controller = new Controller(workers);
-        int result = controller.findNthPrimeNumber(numberToFind);
-
-        getOut().println("last prime : " + result);
-
-        return result;
-    }
-
-    private class Controller {
-        // Managed workers
-        private Vector<Worker> workers;
-
-        /**
-         * Create a new instance of Controller.
-         *
-         * @param workers
-         */
-        public Controller(Vector<Worker> workers) {
-            this.workers = workers;
-        }
-
-        // start computation
-        /**
-         * Find the Nth prime number.
-         *
-         * @param nth the prime number to find
-         * @return the Nth prime number.
-         */
-        public int findNthPrimeNumber(int nth) {
-            long startTime = System.currentTimeMillis();
-            BooleanWrapper flase = new BooleanWrapper(false);
-            int found = 0;
-            int n = 2;
-
-            while (found < nth) {
-                Vector<BooleanWrapper> answers = new Vector<BooleanWrapper>();
-
-                // send requests
-                for (Worker worker : workers) {
-                    BooleanWrapper resp = worker.isPrime(n);
-                    answers.add(resp);
-                }
-
-                PAFuture.waitForAll(answers);
-
-                if (!answers.contains(flase)) {
-                    workers.get(found % workers.size()).addPrimeNumber(n);
-                    getOut().println("--->" + n);
-                    found++;
-                }
-
-                n++;
-            }
-
-            long stopTime = System.currentTimeMillis();
-            getOut().println("Total time (ms) " + (stopTime - startTime));
-
-            return n - 1;
-        }
+        return "ok";
     }
 }

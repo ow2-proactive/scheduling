@@ -108,17 +108,6 @@ public class JavaSpawnExecutable extends JavaExecutable {
         return true;
     }
 
-    @Override
-    public void kill() {
-        System.out.println(this.getClass() + " KILL method called !");
-        try {
-            killFile.createNewFile();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        super.kill();
-    }
-
     /**
      * Returns the path to the native launcher script
      * In case of Native Executable normal termination test, we use a set of alternate scripts which will not run a

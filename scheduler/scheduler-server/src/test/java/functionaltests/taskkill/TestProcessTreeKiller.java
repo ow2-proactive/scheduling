@@ -170,11 +170,6 @@ public class TestProcessTreeKiller extends SchedulerConsecutive {
 
             TestProcessTreeKiller.waitUntilForkedProcessesAreRunning(0);
 
-            // We make sure that the kill method for job 2 has been called
-            File killFileTask2 = new File(tmpDir, task2Name + ".tmp");
-            assertTrue(killFileTask2 + " exists", killFileTask2.exists());
-            FileUtils.deleteQuietly(killFileTask2);
-
             JobResult res = SchedulerTHelper.getJobResult(id1);
             assertEquals(JobStatus.KILLED, res.getJobInfo().getStatus());
 

@@ -71,10 +71,10 @@
 				<script>
 					<code language="groovy">
 						<![CDATA[
-						print('user=' + user)
-						print('global=' + global)
-						print('input=' + input)
-						print('output=' + output)
+						print('user=' + userspace)
+						print('global=' + globalspace)
+						print('input=' + inputspace)
+						print('output=' + outputspace)
 						print('localspace=' + localspace)
 						]]>
 					</code>

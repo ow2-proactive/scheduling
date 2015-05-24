@@ -12,7 +12,7 @@
                 <script>
                     <code language="javascript">
                         <![CDATA[
-print('Loop block start ' + java.lang.System.getProperty('pas.task.iteration'))
+print('Loop block start ' + java.lang.System.getProperty('PA_TASK_ITERATION'))
 ]]>
                     </code>
                 </script>
@@ -102,7 +102,7 @@ while(!new File(System.getProperty("java.io.tmpdir"), "skipped_tasks_in_a_loop.l
                     <script>
                         <code language="javascript">
                             <![CDATA[
-if($IT < 2) {
+if(variables.get('PA_TASK_ITERATION') < 2) {
     loop = true;
 } else {
     loop = false;

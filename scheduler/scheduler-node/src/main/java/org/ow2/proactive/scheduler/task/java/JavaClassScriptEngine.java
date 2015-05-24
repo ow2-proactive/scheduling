@@ -105,7 +105,7 @@ public class JavaClassScriptEngine extends AbstractScriptEngine {
             if (context.getAttribute(NonForkedTaskExecutor.MULTI_NODE_TASK_NODESURL_BINDING_NAME) != null) {
                 Set<String> nodesURLs = (Set<String>) context
                         .getAttribute(NonForkedTaskExecutor.MULTI_NODE_TASK_NODESURL_BINDING_NAME);
-                execInitializer.setNodesURL(new ArrayList<String>(nodesURLs));
+                execInitializer.setNodesURL(new ArrayList<>(nodesURLs));
             } else {
                 execInitializer.setNodesURL(emptyList());
             }

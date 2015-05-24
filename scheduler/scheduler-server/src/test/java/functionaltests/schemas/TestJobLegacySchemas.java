@@ -36,18 +36,18 @@
  */
 package functionaltests.schemas;
 
-import java.io.File;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.net.URL;
-
+import functionaltests.SchedulerConsecutive;
+import functionaltests.SchedulerTHelper;
 import org.apache.commons.io.FileUtils;
+import org.junit.Test;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
 
-import functionaltests.SchedulerConsecutive;
-import functionaltests.SchedulerTHelper;
+import java.io.File;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.net.URL;
 
 
 /**
@@ -78,7 +78,7 @@ public class TestJobLegacySchemas extends SchedulerConsecutive {
         }
     }
 
-    @org.junit.Test
+    @Test
     public void run() throws Throwable {
         for (URL jobDescriptor : jobDescriptors) {
             logger.info("Testing submission of job descriptor : " + jobDescriptor);

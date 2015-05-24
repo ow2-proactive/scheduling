@@ -36,31 +36,25 @@
  */
 package functionaltests;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.net.URI;
-
-import org.objectweb.proactive.extensions.dataspaces.vfs.VFSFactory;
-import org.objectweb.proactive.utils.OperatingSystem;
-import org.ow2.proactive.scheduler.common.Scheduler;
-import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobResult;
-import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
-import org.ow2.proactive.scheduler.common.task.JavaTask;
-import org.ow2.proactive.scheduler.common.task.NativeTask;
-import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
-import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
-import org.ow2.proactive.scripting.SimpleScript;
-import org.ow2.tests.FunctionalTest;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileSystemManager;
 import org.junit.Assert;
+import org.objectweb.proactive.extensions.dataspaces.vfs.VFSFactory;
+import org.ow2.proactive.scheduler.common.Scheduler;
+import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobResult;
+import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
+import org.ow2.proactive.scheduler.common.task.JavaTask;
+import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
+import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
+import org.ow2.proactive.scripting.SimpleScript;
+import org.ow2.tests.FunctionalTest;
+
+import java.io.*;
+import java.net.URI;
 
 
 /**
@@ -106,18 +100,11 @@ public class TestUserSpace extends FunctionalTest {
         "def out;                                              \n" + //
         "def arr = " + inFileArr + ";                          \n" + //
         "for (def i=0; i < arr.size(); i++) {                  \n" + //
-        "  def input = localspace.resolveFile(arr[i]);         \n" + //
-        "  if (! input) continue;                              \n" + //
-        "  def br = input.getContent().getInputStream();       \n" + //
-        "  def ff = localspace.resolveFile(                    \n" + //
+        "  def input = new File(arr[i]);         \n" + //
+        "  def br = input.newInputStream();       \n" + //
+        "  def ff = new File(                    \n" + //
         "     arr[i] + \".glob.A\");\n                         \n" + //
-        "  ff.createFile();                                    \n" + //
-        "  out = ff.getContent().getOutputStream();            \n" + //
-        "  def c;                                              \n" + //
-        "  while ((c = br.read()) > 0) {                       \n" + //
-        "    out.write(c);                                     \n" + //
-        "  }                                                   \n" + //
-        "  out.close();                                        \n" + //
+        "  ff.text = input.text;                                        \n" + //
         "}                                                     \n" + //
         "                                                      \n" + //
         "";
@@ -126,32 +113,14 @@ public class TestUserSpace extends FunctionalTest {
         "def out;                                              \n" + //
         "def arr = " + inFileArr + ";                          \n" + //
         "for (def i=0; i < arr.size(); i++) {                  \n" + //
-        "  def input = localspace.resolveFile(                 \n" + //
+        "  def input =new File(                 \n" + //
         "      arr[i] + \".glob.A\");                          \n" + //
-        "  if (! input.exists()) {                             \n" + //
-        "    continue;                                         \n" + //
-        "  }                                                   \n" + //
-        "  def br = input.getContent().getInputStream();       \n" + //
-        "  def ff = localspace.resolveFile(                    \n" + //
+        "  def ff = new File(                    \n" + //
         "     arr[i] + \".out\");\n                            \n" + //
-        "  ff.createFile();                                    \n" + //
-        "  out = ff.getContent().getOutputStream();            \n" + //
-        "  def c;                                              \n" + //
-        "  while ((c = br.read()) > 0) {                       \n" + //
-        "    out.write(c);                                     \n" + //
-        "  }                                                   \n" + //
-        "  out.close();                                        \n" + //
+        "  ff.text = input.text;            \n" + //
         "}                                                     \n" + //
         "                                                      \n" + //
         "";
-
-    private static final String TestEnvFile = "TestEnv";
-    private static final String scriptCLinux = "testenv.sh";
-    private static final String scriptCLinuxContent = "echo user space is : $USERSPACE \necho HELLO > $USERSPACE/" +
-        TestEnvFile + "\n";
-    private static final String scriptCWindows = "testenv.bat";
-    private static final String scriptCWindowsContent = "echo user space is : %USERSPACE% \necho HELLO > %USERSPACE%\\" +
-        TestEnvFile + "\n";
 
     @org.junit.Test
     public void run() throws Throwable {
@@ -185,12 +154,8 @@ public class TestUserSpace extends FunctionalTest {
 
         FileObject pathReplaceFO = fsManager.resolveFile(userURI + "/" + pathReplaceFile);
 
-        FileObject envFO = fsManager.resolveFile(userURI + "/" + TestEnvFile);
         if (pathReplaceFO.exists()) {
             pathReplaceFO.delete();
-        }
-        if (envFO.exists()) {
-            envFO.delete();
         }
 
         /**
@@ -204,23 +169,6 @@ public class TestUserSpace extends FunctionalTest {
         out2.print(pathReplaceFile);
         out2.close();
 
-        File scriptTestEnv = null;
-        if (OperatingSystem.getOperatingSystem() == OperatingSystem.unix) {
-            scriptTestEnv = new File(inPath + File.separator + scriptCLinux);
-            scriptTestEnv.createNewFile();
-            PrintWriter out3 = new PrintWriter(new BufferedWriter(new OutputStreamWriter(
-                new FileOutputStream(scriptTestEnv))));
-            out3.print(scriptCLinuxContent);
-            out3.close();
-        } else {
-            scriptTestEnv = new File(inPath + File.separator + scriptCWindows);
-            scriptTestEnv.createNewFile();
-            PrintWriter out3 = new PrintWriter(new BufferedWriter(new OutputStreamWriter(
-                new FileOutputStream(scriptTestEnv))));
-            out3.print(scriptCWindowsContent);
-            out3.close();
-        }
-
         TaskFlowJob job = new TaskFlowJob();
         job.setName(this.getClass().getSimpleName());
         job.setInputSpace(in.toURI().toURL().toString());
@@ -228,6 +176,7 @@ public class TestUserSpace extends FunctionalTest {
 
         JavaTask A = new JavaTask();
         A.setExecutableClassName("org.ow2.proactive.scheduler.examples.EmptyTask");
+        A.setForkEnvironment(new ForkEnvironment());
         A.setName("A");
         for (String[] file : inFiles) {
             A.addInputFiles(file[0], InputAccessMode.TransferFromInputSpace);
@@ -238,6 +187,7 @@ public class TestUserSpace extends FunctionalTest {
 
         JavaTask B = new JavaTask();
         B.setExecutableClassName("org.ow2.proactive.scheduler.examples.EmptyTask");
+        B.setForkEnvironment(new ForkEnvironment());
         B.setName("B");
         B.addDependence(A);
         for (String[] file : inFiles) {
@@ -246,46 +196,6 @@ public class TestUserSpace extends FunctionalTest {
         }
         B.setPreScript(new SimpleScript(scriptB, "groovy"));
         job.addTask(B);
-
-        // testing $USERSPACE_pattern
-        NativeTask C = new NativeTask();
-        C.setName("C");
-        C.addInputFiles(pathReplaceFile, InputAccessMode.TransferFromInputSpace);
-        switch (OperatingSystem.getOperatingSystem()) {
-            case windows:
-                C.setCommandLine(new String[] { "cmd", "/C",
-                        "type $LOCALSPACE\\" + pathReplaceFile + " > $USERSPACE\\" + pathReplaceFile });
-                break;
-            case unix:
-                C.setCommandLine(new String[] { "/bin/bash", "-c",
-                        "cat $LOCALSPACE/" + pathReplaceFile + " > $USERSPACE/" + pathReplaceFile });
-                break;
-            default:
-                throw new IllegalStateException("Unsupported operating system");
-        }
-        job.addTask(C);
-
-        // testing $USERSPACE environment variable
-        NativeTask D = new NativeTask();
-        D.setName("D");
-        if (OperatingSystem.getOperatingSystem() == OperatingSystem.unix) {
-            D.addInputFiles(scriptCLinux, InputAccessMode.TransferFromInputSpace);
-        } else {
-            D.addInputFiles(scriptCWindows, InputAccessMode.TransferFromInputSpace);
-        }
-        switch (OperatingSystem.getOperatingSystem()) {
-            case windows:
-                D.setCommandLine(new String[] { "cmd", "/C", scriptCWindows });
-                break;
-            case unix:
-                D.setCommandLine(new String[] { "/bin/bash", "-c",
-                        "chmod u+x $LOCALSPACE/" + scriptCLinux + ";$LOCALSPACE/" + scriptCLinux });
-                break;
-            default:
-                throw new IllegalStateException("Unsupported operating system");
-        }
-        D.setWorkingDir("$LOCALSPACE");
-        job.addTask(D);
 
         JobId id = sched.submit(job);
         while (true) {
@@ -326,16 +236,6 @@ public class TestUserSpace extends FunctionalTest {
             System.out.println("Checking existence of " + outFile2);
             Assert.assertTrue(outFile2 + " exists", outFile2.exists());
         }
-
-        pathReplaceFO.refresh();
-        System.out.println(jr.getAllResults().get("C").getOutput().getAllLogs(true));
-        System.out.println("Checking existence of " + pathReplaceFO.getURL());
-        Assert.assertTrue(pathReplaceFO.getURL() + " exists", pathReplaceFO.exists());
-
-        envFO.refresh();
-        System.out.println(jr.getAllResults().get("D").getOutput().getAllLogs(true));
-        System.out.println("Checking existence of " + envFO.getURL());
-        Assert.assertTrue(envFO.getURL() + " exists", envFO.exists());
 
     }
 

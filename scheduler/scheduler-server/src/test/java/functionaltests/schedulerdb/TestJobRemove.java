@@ -1,14 +1,9 @@
 package functionaltests.schedulerdb;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-
+import org.hibernate.Session;
+import org.hibernate.metadata.ClassMetadata;
+import org.junit.Assert;
+import org.junit.Test;
 import org.ow2.proactive.db.types.BigString;
 import org.ow2.proactive.scheduler.common.job.JobEnvironment;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
@@ -26,13 +21,13 @@ import org.ow2.proactive.scheduler.core.db.TaskData;
 import org.ow2.proactive.scheduler.core.db.TaskResultData;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
-import org.ow2.proactive.scripting.GenerationScript;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.scripting.SimpleScript;
-import org.junit.Assert;
-import org.hibernate.Session;
-import org.hibernate.metadata.ClassMetadata;
-import org.junit.Test;
+
+import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 
 public class TestJobRemove extends BaseSchedulerDBTest {
@@ -210,8 +205,6 @@ public class TestJobRemove extends BaseSchedulerDBTest {
 
             NativeTask task3 = new NativeTask();
             task3.setName("nativeTask-" + i);
-            task3.setGenerationScript(new GenerationScript("gen script", "javascript", new String[] {
-                    "param1", "param2" }));
             task3.setCommandLine("command1", "command2", "command3");
             setAttributes(task3);
 

@@ -648,7 +648,8 @@ public class SchedulerDBManager {
         session
                 .createQuery(
                         "delete from ScriptData where"
-                            + " id in (select preScript from TaskData where id.jobId = :jobId)"
+                            + " id in (select td.envScript from ScriptTaskData td where td.taskData.id.jobId = :jobId)"
+                            + " or id in (select preScript from TaskData where id.jobId = :jobId)"
                             + " or id in (select postScript from TaskData where id.jobId = :jobId)"
                             + " or id in (select cleanScript from TaskData where id.jobId = :jobId)"
                             + " or id in (select flowScript from TaskData where id.jobId = :jobId)"
