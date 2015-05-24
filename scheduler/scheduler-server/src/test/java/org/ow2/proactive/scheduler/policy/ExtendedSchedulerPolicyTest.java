@@ -36,23 +36,19 @@
  */
 package org.ow2.proactive.scheduler.policy;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Vector;
-
+import org.junit.Before;
+import org.junit.Test;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
 import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
 import org.ow2.proactive.scheduler.descriptor.JobDescriptorImpl;
 import org.ow2.proactive.scheduler.job.InternalTaskFlowJob;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
-import org.ow2.proactive.scheduler.task.internal.InternalNativeTask;
+import org.ow2.proactive.scheduler.task.internal.InternalScriptTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.util.policy.ISO8601DateUtil;
-import org.junit.Before;
-import org.junit.Test;
+
+import java.util.*;
 
 import static org.junit.Assert.*;
 import static org.ow2.proactive.scheduler.common.task.CommonAttribute.GENERIC_INFO_START_AT_KEY;
@@ -212,8 +208,8 @@ public class ExtendedSchedulerPolicyTest {
         return new JobDescriptorImpl(taskFlowJob);
     }
 
-    private InternalNativeTask createTask(String taskStartAt) {
-        InternalNativeTask task1 = new InternalNativeTask();
+    private InternalScriptTask createTask(String taskStartAt) {
+        InternalScriptTask task1 = new InternalScriptTask();
         if (taskStartAt != null) {
             task1.addGenericInformation("START_AT", taskStartAt);
         }

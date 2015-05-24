@@ -388,7 +388,7 @@ public abstract class Script<E> implements Serializable {
     protected abstract void prepareSpecialBindings(Bindings bindings);
 
     /** Return the variable awaited from the script execution */
-    protected abstract ScriptResult<E> getResult(Bindings bindings);
+    protected abstract ScriptResult<E> getResult(Object evalResult, Bindings bindings);
 
     /** Set parameters in bindings if any */
     protected final void prepareBindings(Bindings bindings) {
