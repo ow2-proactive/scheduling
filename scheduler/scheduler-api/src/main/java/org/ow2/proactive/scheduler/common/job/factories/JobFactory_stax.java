@@ -36,63 +36,37 @@
  */
 package org.ow2.proactive.scheduler.common.job.factories;
 
-import static org.ow2.proactive.scheduler.common.util.VariablesUtil.filterAndUpdate;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.net.URI;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.zip.ZipFile;
-
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.events.XMLEvent;
-
 import org.apache.log4j.Logger;
 import org.iso_relax.verifier.VerifierConfigurationException;
+import org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
-import org.ow2.proactive.scheduler.common.job.Job;
-import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobPriority;
-import org.ow2.proactive.scheduler.common.job.JobType;
-import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
-import org.ow2.proactive.scheduler.common.task.CommonAttribute;
-import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
-import org.ow2.proactive.scheduler.common.task.JavaTask;
-import org.ow2.proactive.scheduler.common.task.NativeTask;
-import org.ow2.proactive.scheduler.common.task.ParallelEnvironment;
-import org.ow2.proactive.scheduler.common.task.RestartMode;
-import org.ow2.proactive.scheduler.common.task.ScriptTask;
-import org.ow2.proactive.scheduler.common.task.Task;
-import org.ow2.proactive.scheduler.common.task.dataspaces.FileSelector;
+import org.ow2.proactive.scheduler.common.job.*;
+import org.ow2.proactive.scheduler.common.task.*;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
 import org.ow2.proactive.scheduler.common.task.flow.FlowBlock;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scheduler.common.util.ZipUtils;
-import org.ow2.proactive.scripting.GenerationScript;
-import org.ow2.proactive.scripting.Script;
-import org.ow2.proactive.scripting.SelectionScript;
-import org.ow2.proactive.scripting.SimpleScript;
-import org.ow2.proactive.scripting.TaskScript;
+import org.ow2.proactive.scripting.*;
 import org.ow2.proactive.topology.descriptor.ThresholdProximityDescriptor;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.Tools;
 import org.xml.sax.SAXException;
+
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.events.XMLEvent;
+import java.io.*;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.net.URI;
+import java.net.URL;
+import java.util.*;
+import java.util.zip.ZipFile;
+
+import static org.ow2.proactive.scheduler.common.util.VariablesUtil.filterAndUpdate;
 
 
 /**
@@ -110,13 +84,13 @@ public class JobFactory_stax extends JobFactory {
     /** XML input factory */
     private XMLInputFactory xmlif = null;
     /** Instance variables of the XML files. */
-    private HashMap<String, String> variables = new HashMap<String, String>();
+    private HashMap<String, String> variables = new HashMap<>();
     /** Job instance : to be sent to the user once created. */
     private Job job = null;
     /** file relative path (relative file path (js and jobClassPath) given in XML will be relative to this path) */
     private String relativePathRoot = "./";
-    /** Instance that will temporary store the dependences between tasks */
-    private HashMap<String, ArrayList<String>> dependences = null;
+    /** Instance that will temporary store the dependencies between tasks */
+    private HashMap<String, ArrayList<String>> dependencies = null;
 
     /**
      * Create a new instance of JobFactory_stax.
@@ -260,7 +234,7 @@ public class JobFactory_stax extends JobFactory {
             createJob(xmlsr, updatedVariables);
             //Close the stream
             xmlsr.close();
-            //make dependences
+            //make dependencies
             makeDependences();
             logger.info("Job successfully created !");
             //debug mode only
@@ -279,7 +253,7 @@ public class JobFactory_stax extends JobFactory {
     private void clean() {
         this.variables = new HashMap<String, String>();
         this.job = null;
-        this.dependences = null;
+        this.dependencies = null;
     }
 
     /*
@@ -897,16 +871,16 @@ public class JobFactory_stax extends JobFactory {
     }
 
     /**
-     * Add the dependences to the current task.
+     * Add the dependencies to the current task.
      * Leave this method at the end of the 'ELEMENT_TASK_DEPENDENCES' tag.
      *
      * @param cursorDepends the streamReader with the cursor on the 'ELEMENT_TASK_DEPENDENCES' tag.
-     * @param t the task on which to apply the dependences.
+     * @param t the task on which to apply the dependencies.
      */
     private void createdependences(XMLStreamReader cursorDepends, Task t) throws JobCreationException {
         try {
-            if (dependences == null) {
-                dependences = new HashMap<String, ArrayList<String>>();
+            if (dependencies == null) {
+                dependencies = new HashMap<String, ArrayList<String>>();
             }
             ArrayList<String> depends = new ArrayList<String>(0);
             int eventType;
@@ -920,7 +894,7 @@ public class JobFactory_stax extends JobFactory {
                         break;
                     case XMLEvent.END_ELEMENT:
                         if (XMLTags.TASK_DEPENDENCES.matches(cursorDepends.getLocalName())) {
-                            dependences.put(t.getName(), depends);
+                            dependencies.put(t.getName(), depends);
                             return;
                         }
 
@@ -1562,16 +1536,16 @@ public class JobFactory_stax extends JobFactory {
     }
 
     /**
-     * Construct the dependences between tasks.
+     * Construct the dependencies between tasks.
      *
-     * @throws JobCreationException if a dependences name is unknown.
+     * @throws JobCreationException if a dependencies name is unknown.
      */
     private void makeDependences() throws JobCreationException {
-        if (dependences != null && dependences.size() > 0) {
+        if (dependencies != null && dependencies.size() > 0) {
             if (job.getType() == JobType.TASKSFLOW) {
                 TaskFlowJob tfj = (TaskFlowJob) job;
                 for (Task t : tfj.getTasks()) {
-                    ArrayList<String> names = dependences.get(t.getName());
+                    ArrayList<String> names = dependencies.get(t.getName());
                     if (names != null) {
                         for (String name : names) {
                             if (tfj.getTask(name) == null) {

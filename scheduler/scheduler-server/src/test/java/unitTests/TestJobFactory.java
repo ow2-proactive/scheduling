@@ -158,28 +158,28 @@ public class TestJobFactory {
         Assert.assertEquals(tfJob.getTask("task2").getWallTime(), 0);
         Assert.assertEquals(tfJob.getTask("task2").isWallTimeSet(), false);
         Assert.assertEquals(tfJob.getTask("task2").getGenericInformations().size(), 0);
-        Assert.assertEquals("tata*", tfJob.getTask("task2").getInputFilesList().get(0).getInputFiles()
-                .getIncludes()[0]);
-        Assert.assertEquals("tata*1", tfJob.getTask("task2").getInputFilesList().get(0).getInputFiles()
-                .getExcludes()[0]);
+        Assert.assertTrue(tfJob.getTask("task2").getInputFilesList().get(0).getInputFiles()
+                .getIncludes().contains("tata*"));
+        Assert.assertTrue(tfJob.getTask("task2").getInputFilesList().get(0).getInputFiles()
+                .getExcludes().contains("tata*1"));
         Assert.assertEquals(InputAccessMode.TransferFromInputSpace, tfJob.getTask("task2")
                 .getInputFilesList().get(0).getMode());
-        Assert.assertEquals("toto*.txt", tfJob.getTask("task2").getInputFilesList().get(1).getInputFiles()
-                .getIncludes()[0]);
-        Assert.assertEquals("toto*2.txt", tfJob.getTask("task2").getInputFilesList().get(1).getInputFiles()
-                .getExcludes()[0]);
+        Assert.assertTrue(tfJob.getTask("task2").getInputFilesList().get(1).getInputFiles()
+                .getIncludes().contains("toto*.txt"));
+        Assert.assertTrue(tfJob.getTask("task2").getInputFilesList().get(1).getInputFiles()
+                .getExcludes().contains("toto*2.txt"));
         Assert.assertEquals(InputAccessMode.TransferFromOutputSpace, tfJob.getTask("task2")
                 .getInputFilesList().get(1).getMode());
-        Assert.assertEquals("titi*", tfJob.getTask("task2").getOutputFilesList().get(0).getOutputFiles()
-                .getIncludes()[0]);
-        Assert.assertEquals("titi*1", tfJob.getTask("task2").getOutputFilesList().get(0).getOutputFiles()
-                .getExcludes()[0]);
+        Assert.assertTrue(tfJob.getTask("task2").getOutputFilesList().get(0).getOutputFiles()
+                .getIncludes().contains("titi*"));
+        Assert.assertTrue(tfJob.getTask("task2").getOutputFilesList().get(0).getOutputFiles()
+                .getExcludes().contains("titi*1"));
         Assert.assertEquals(OutputAccessMode.TransferToOutputSpace, tfJob.getTask("task2")
                 .getOutputFilesList().get(0).getMode());
-        Assert.assertEquals("titi*.txt", tfJob.getTask("task2").getOutputFilesList().get(1).getOutputFiles()
-                .getIncludes()[0]);
-        Assert.assertEquals("titi*3.txt", tfJob.getTask("task2").getOutputFilesList().get(1).getOutputFiles()
-                .getExcludes()[0]);
+        Assert.assertTrue(tfJob.getTask("task2").getOutputFilesList().get(1).getOutputFiles()
+                .getIncludes().contains("titi*.txt"));
+        Assert.assertTrue(tfJob.getTask("task2").getOutputFilesList().get(1).getOutputFiles()
+                .getExcludes().contains("titi*3.txt"));
         Assert.assertEquals(OutputAccessMode.TransferToOutputSpace, tfJob.getTask("task2")
                 .getOutputFilesList().get(1).getMode());
         Assert.assertEquals(((JavaTask) tfJob.getTask("task2")).getArgument("sleepTime"), "12");
@@ -247,9 +247,9 @@ public class TestJobFactory {
         Assert.assertEquals(tfJob.getTask("task3").isWallTimeSet(), true);
         Assert.assertEquals(tfJob.getTask("task3").getGenericInformations().size(), 0);
         Assert.assertEquals(1, tfJob.getTask("task3").getInputFilesList().size());
-        Assert.assertEquals("tata*", tfJob.getTask("task3").getInputFilesList().get(0).getInputFiles()
-                .getIncludes()[0]);
-        Assert.assertNull(tfJob.getTask("task3").getInputFilesList().get(0).getInputFiles().getExcludes());
+        Assert.assertTrue(tfJob.getTask("task3").getInputFilesList().get(0).getInputFiles()
+                .getIncludes().contains("tata*"));
+        Assert.assertTrue(tfJob.getTask("task3").getInputFilesList().get(0).getInputFiles().getExcludes().isEmpty());
         Assert
                 .assertEquals(InputAccessMode.none, tfJob.getTask("task3").getInputFilesList().get(0)
                         .getMode());
@@ -283,25 +283,25 @@ public class TestJobFactory {
         Assert.assertEquals(tfJob.getTask("task4").getGenericInformations().get("n22"), "v22");
         Assert.assertNull(tfJob.getTask("task4").getInputFilesList());
         Assert.assertEquals(5, tfJob.getTask("task4").getOutputFilesList().size());
-        Assert.assertEquals("a", tfJob.getTask("task4").getOutputFilesList().get(0).getOutputFiles()
-                .getIncludes()[0]);
-        Assert.assertEquals("b", tfJob.getTask("task4").getOutputFilesList().get(1).getOutputFiles()
-                .getIncludes()[0]);
-        Assert.assertEquals("c", tfJob.getTask("task4").getOutputFilesList().get(2).getOutputFiles()
-                .getIncludes()[0]);
-        Assert.assertEquals("d", tfJob.getTask("task4").getOutputFilesList().get(3).getOutputFiles()
-                .getIncludes()[0]);
-        Assert.assertEquals("e", tfJob.getTask("task4").getOutputFilesList().get(4).getOutputFiles()
-                .getIncludes()[0]);
-        Assert.assertEquals("f", tfJob.getTask("task4").getOutputFilesList().get(0).getOutputFiles()
-                .getExcludes()[0]);
-        Assert.assertEquals("g", tfJob.getTask("task4").getOutputFilesList().get(1).getOutputFiles()
-                .getExcludes()[0]);
-        Assert.assertNull(tfJob.getTask("task4").getOutputFilesList().get(2).getOutputFiles().getExcludes());
-        Assert.assertEquals("h", tfJob.getTask("task4").getOutputFilesList().get(3).getOutputFiles()
-                .getExcludes()[0]);
-        Assert.assertEquals("i", tfJob.getTask("task4").getOutputFilesList().get(4).getOutputFiles()
-                .getExcludes()[0]);
+        Assert.assertTrue(tfJob.getTask("task4").getOutputFilesList().get(0).getOutputFiles()
+                .getIncludes().contains("a"));
+        Assert.assertTrue(tfJob.getTask("task4").getOutputFilesList().get(1).getOutputFiles()
+                .getIncludes().contains("b"));
+        Assert.assertTrue(tfJob.getTask("task4").getOutputFilesList().get(2).getOutputFiles()
+                .getIncludes().contains("c"));
+        Assert.assertTrue(tfJob.getTask("task4").getOutputFilesList().get(3).getOutputFiles()
+                .getIncludes().contains("d"));
+        Assert.assertTrue(tfJob.getTask("task4").getOutputFilesList().get(4).getOutputFiles()
+                .getIncludes().contains("e"));
+        Assert.assertTrue(tfJob.getTask("task4").getOutputFilesList().get(0).getOutputFiles()
+                .getExcludes().contains("f"));
+        Assert.assertTrue(tfJob.getTask("task4").getOutputFilesList().get(1).getOutputFiles()
+                .getExcludes().contains("g"));
+        Assert.assertTrue(tfJob.getTask("task4").getOutputFilesList().get(2).getOutputFiles().getExcludes().isEmpty());
+        Assert.assertTrue(tfJob.getTask("task4").getOutputFilesList().get(3).getOutputFiles()
+                .getExcludes().contains("h"));
+        Assert.assertTrue(tfJob.getTask("task4").getOutputFilesList().get(4).getOutputFiles()
+                .getExcludes().contains("i"));
         Assert.assertEquals(OutputAccessMode.TransferToOutputSpace, tfJob.getTask("task4")
                 .getOutputFilesList().get(0).getMode());
         Assert.assertEquals(OutputAccessMode.none, tfJob.getTask("task4").getOutputFilesList().get(1)

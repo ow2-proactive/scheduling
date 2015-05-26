@@ -36,6 +36,7 @@ project(':rest:rest-api') {
         compile 'org.jboss.resteasy:resteasy-jackson-provider:3.0.6.Final'
         compile 'org.jboss.resteasy:resteasy-multipart-provider:3.0.6.Final'
         compile "org.objectweb.proactive:programming-util:${programmingVersion}"
+        compile "org.objectweb.proactive:programming-extension-dataspaces:${programmingVersion}"
     }
 }
 

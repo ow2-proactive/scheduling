@@ -43,7 +43,7 @@ import org.ow2.proactive_grid_cloud_portal.common.FileType;
 
 import java.util.List;
 
-import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 
 public class RemoteSource implements IRemoteSource {
@@ -83,13 +83,13 @@ public class RemoteSource implements IRemoteSource {
     }
 
     public void setIncludes(List<String> includes) {
-        checkArgument(includes != null && !includes.isEmpty());
-        this.includes = includes;
+        checkNotNull(includes);
+        this.includes = Lists.newArrayList(includes);
     }
 
-    public void includes(String... include) {
-        checkArgument(include != null && include.length > 0);
-        this.includes = Lists.newArrayList(include);
+    public void setIncludes(String... includes) {
+        checkNotNull(includes);
+        this.includes = Lists.newArrayList(includes);
     }
 
     @Override
@@ -98,13 +98,13 @@ public class RemoteSource implements IRemoteSource {
     }
 
     public void setExcludes(List<String> excludes) {
-        checkArgument(includes != null && !includes.isEmpty());
-        this.excludes = excludes;
+        checkNotNull(excludes);
+        this.excludes = Lists.newArrayList(excludes);
     }
 
-    public void setExcludes(String... exclude) {
-        checkArgument(exclude != null && exclude.length > 0);
-        this.excludes = Lists.newArrayList(exclude);
+    public void setExcludes(String... excludes) {
+        checkNotNull(excludes);
+        this.excludes = Lists.newArrayList(excludes);
     }
 
     @Override

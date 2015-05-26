@@ -545,21 +545,19 @@ public class JobComparator {
                 if (!is1.getMode().equals(is2.getMode())) {
                     continue;
                 }
-                List<String> i1 = Arrays.asList(is1.getInputFiles().getIncludes());
-                List<String> i2 = Arrays.asList(is2.getInputFiles().getIncludes());
-                if (i1 == null ^ i2 == null) {
-                    continue;
-                } else if (i1 != null && !CollectionUtils.isEqualCollection(i1, i2)) {
-                    continue;
-                }
-                String[] e1 = is1.getInputFiles().getExcludes();
-                String[] e2 = is2.getInputFiles().getExcludes();
-                if (e1 == null ^ e2 == null) {
-                    continue;
-                } else if (e1 != null &&
-                    !CollectionUtils.isEqualCollection(Arrays.asList(e1), Arrays.asList(e2))) {
+
+                Set<String> i1 = is1.getInputFiles().getIncludes();
+                Set<String> i2 = is2.getInputFiles().getIncludes();
+                if (!i1.equals(i2)) {
                     continue;
                 }
+
+                Set<String> e1 = is1.getInputFiles().getExcludes();
+                Set<String> e2 = is2.getInputFiles().getExcludes();
+                if (!e1.equals(e2)) {
+                    continue;
+                }
+
                 found = true;
                 break;
             }
@@ -595,22 +593,19 @@ public class JobComparator {
                 if (!os1.getMode().equals(os2.getMode())) {
                     continue;
                 }
-                String[] i1 = os1.getOutputFiles().getIncludes();
-                String[] i2 = os2.getOutputFiles().getIncludes();
-                if (i1 == null ^ i2 == null) {
-                    continue;
-                } else if (i1 != null &&
-                    !CollectionUtils.isEqualCollection(Arrays.asList(i1), Arrays.asList(i2))) {
+
+                Set<String> i1 = os1.getOutputFiles().getIncludes();
+                Set<String> i2 = os2.getOutputFiles().getIncludes();
+                if (!i1.equals(i2)) {
                     continue;
                 }
-                String[] e1 = os1.getOutputFiles().getExcludes();
-                String[] e2 = os2.getOutputFiles().getExcludes();
-                if (e1 == null ^ e2 == null) {
-                    continue;
-                } else if (e1 != null &&
-                    !CollectionUtils.isEqualCollection(Arrays.asList(e1), Arrays.asList(e2))) {
+
+                Set<String> e1 = os1.getOutputFiles().getExcludes();
+                Set<String> e2 = os2.getOutputFiles().getExcludes();
+                if (!e1.equals(e2)) {
                     continue;
                 }
+
                 found = true;
                 break;
             }

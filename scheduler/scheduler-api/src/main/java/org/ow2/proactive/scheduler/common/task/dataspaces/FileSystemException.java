@@ -40,6 +40,7 @@ package org.ow2.proactive.scheduler.common.task.dataspaces;
  * @author The ProActive Team
  **/
 public class FileSystemException extends Exception {
+
     public FileSystemException() {
         super();
     }
@@ -55,4 +56,5 @@ public class FileSystemException extends Exception {
     public FileSystemException(Throwable cause) {
         super(cause);
     }
+
 }

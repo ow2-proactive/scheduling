@@ -37,6 +37,7 @@ package org.ow2.proactive_grid_cloud_portal.smartproxy;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
@@ -45,7 +46,6 @@ import org.ow2.proactive.scheduler.common.exception.*;
 import org.ow2.proactive.scheduler.common.job.*;
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.ow2.proactive.scheduler.common.task.dataspaces.FileSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scheduler.rest.ISchedulerClient;
@@ -59,7 +59,6 @@ import org.ow2.proactive_grid_cloud_portal.common.FileType;
 
 import javax.security.auth.login.LoginException;
 import java.io.File;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -247,12 +246,9 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl> i
                 addfileSelection(is.getInputFiles(), includes, excludes);
             }
             LocalDirSource source = new LocalDirSource(localInputFolderPath);
-            if (!includes.isEmpty()) {
-                source.setIncludes(includes);
-            }
-            if (!excludes.isEmpty()) {
-                source.setExcludes(excludes);
-            }
+            source.setIncludes(includes);
+            source.setExcludes(excludes);
+
             RemoteDestination dest = new RemoteDestination(USER, remotePath);
             restDataSpaceClient.upload(source, dest);
         }
@@ -305,12 +301,9 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl> i
         } else {
             try {
                 RemoteSource source = new RemoteSource(USER, sourceFile);
-                if (!includes.isEmpty()) {
-                    source.setIncludes(includes);
-                }
-                if (!excludes.isEmpty()) {
-                    source.setExcludes(excludes);
-                }
+                source.setIncludes(includes);
+                source.setExcludes(excludes);
+
                 File localDir = new File(localFolder);
                 LocalDestination dest = new LocalDestination(localDir);
                 restDataSpaceClient.download(source, dest);
@@ -328,13 +321,8 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl> i
     }
 
     private void addfileSelection(FileSelector fs, List<String> includes, List<String> excludes) {
-        if (fs.getIncludes() != null && fs.getIncludes().length > 0) {
-            includes.addAll(Arrays.asList(fs.getIncludes()));
-        }
-        if (fs.getExcludes() != null && fs.getExcludes().length > 0) {
-            excludes.addAll(Arrays.asList(fs.getExcludes()));
-        }
-
+        includes.addAll(fs.getIncludes());
+        excludes.addAll(fs.getExcludes());
     }
 
     @Override
@@ -454,12 +442,9 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl> i
         public void run() {
             try {
                 RemoteSource source = new RemoteSource(USER, sourceFile);
-                if (!includes.isEmpty()) {
-                    source.setIncludes(includes);
-                }
-                if (!excludes.isEmpty()) {
-                    source.setExcludes(excludes);
-                }
+                source.setIncludes(includes);
+                source.setExcludes(excludes);
+
                 File localDir = new File(localFolder);
                 LocalDestination dest = new LocalDestination(localDir);
 

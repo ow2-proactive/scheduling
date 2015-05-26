@@ -36,11 +36,11 @@
  */
 package functionaltests.executables;
 
-import java.io.Serializable;
-
 import org.objectweb.proactive.extensions.dataspaces.api.FileSelector;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
+
+import java.io.Serializable;
 
 
 public class DSWorker extends JavaExecutable {

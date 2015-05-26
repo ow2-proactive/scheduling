@@ -36,34 +36,14 @@
  */
 package org.ow2.proactive.scheduler.task;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.io.Serializable;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
-import java.security.PublicKey;
-import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.StringTokenizer;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.atomic.AtomicBoolean;
-
+import com.google.common.base.Function;
+import com.google.common.base.Stopwatch;
+import org.apache.log4j.Appender;
+import org.apache.log4j.FileAppender;
+import org.apache.log4j.Logger;
+import org.apache.log4j.MDC;
+import org.apache.log4j.helpers.LogLog;
+import org.apache.log4j.spi.LoggingEvent;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
@@ -73,14 +53,14 @@ import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.ProActiveInet;
+import org.objectweb.proactive.extensions.dataspaces.Utils;
 import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
+import org.objectweb.proactive.extensions.dataspaces.api.FileSelector;
 import org.objectweb.proactive.extensions.dataspaces.api.PADataSpaces;
 import org.objectweb.proactive.extensions.dataspaces.core.DataSpacesNodes;
 import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
 import org.objectweb.proactive.extensions.dataspaces.exceptions.DataSpacesException;
 import org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemException;
-import org.objectweb.proactive.extensions.dataspaces.vfs.selector.fast.FastFileSelector;
-import org.objectweb.proactive.extensions.dataspaces.vfs.selector.fast.FastSelector;
 import org.objectweb.proactive.utils.NamedThreadFactory;
 import org.objectweb.proactive.utils.StackTraceUtil;
 import org.ow2.proactive.db.types.BigString;
@@ -88,12 +68,7 @@ import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProper
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.exception.UserException;
-import org.ow2.proactive.scheduler.common.task.Decrypter;
-import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
-import org.ow2.proactive.scheduler.common.task.TaskId;
-import org.ow2.proactive.scheduler.common.task.TaskLogs;
-import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.ow2.proactive.scheduler.common.task.dataspaces.FileSelector;
+import org.ow2.proactive.scheduler.common.task.*;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
@@ -112,18 +87,21 @@ import org.ow2.proactive.scheduler.task.utils.Guard;
 import org.ow2.proactive.scheduler.task.utils.KillTask;
 import org.ow2.proactive.scheduler.task.utils.LocalSpaceAdapter;
 import org.ow2.proactive.scheduler.task.utils.RemoteSpaceAdapter;
-import org.ow2.proactive.scripting.PropertyUtils;
-import org.ow2.proactive.scripting.Script;
-import org.ow2.proactive.scripting.ScriptHandler;
-import org.ow2.proactive.scripting.ScriptLoader;
-import org.ow2.proactive.scripting.ScriptResult;
+import org.ow2.proactive.scripting.*;
 import org.ow2.proactive.utils.Formatter;
-import org.apache.log4j.Appender;
-import org.apache.log4j.FileAppender;
-import org.apache.log4j.Logger;
-import org.apache.log4j.MDC;
-import org.apache.log4j.helpers.LogLog;
-import org.apache.log4j.spi.LoggingEvent;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.security.*;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.ow2.proactive.scheduler.common.task.util.SerializationUtil.deserializeVariableMap;
 import static org.ow2.proactive.scheduler.common.task.util.SerializationUtil.serializeVariableMap;
@@ -458,7 +436,7 @@ public abstract class TaskLauncher implements InitActive {
     }
 
     /**
-     * Set scheduler related variables for the current task. 
+     * Set scheduler related variables for the current task.
      */
     protected void initEnv() {
         if (isForkedTask()) {
@@ -721,8 +699,8 @@ public abstract class TaskLauncher implements InitActive {
      * Execute the control flow script on the local node and set the flow action in res.
      *
      * @param res TaskResult of this launcher's task, input of the script.
-     * @throws Throwable if an exception occurred in the flow script. 
-     *      TaskResult#setAction(FlowAction) will NOT be called on res 
+     * @throws Throwable if an exception occurred in the flow script.
+     *      TaskResult#setAction(FlowAction) will NOT be called on res
      */
     protected void executeFlowScript(TaskResult res) throws Throwable {
         // replace script variables with updated values
@@ -942,48 +920,52 @@ public abstract class TaskLauncher implements InitActive {
             return;
         }
 
+        INPUT = initDataSpace(new Callable<DataSpacesFileObject>() {
+            @Override
+            public DataSpacesFileObject call() throws Exception {
+                return PADataSpaces.resolveDefaultInput();
+            }
+        }, "INPUT", true);
+
+        OUTPUT = initDataSpace(new Callable<DataSpacesFileObject>() {
+            @Override
+            public DataSpacesFileObject call() throws Exception {
+                return PADataSpaces.resolveDefaultOutput();
+            }
+        }, "OUTPUT", false);
+
+        GLOBAL = initDataSpace(new Callable<DataSpacesFileObject>() {
+            @Override
+            public DataSpacesFileObject call() throws Exception {
+                return PADataSpaces.resolveOutput(SchedulerConstants.GLOBALSPACE_NAME);
+            }
+        }, "GLOBAL", false);
+
+        USER = initDataSpace(new Callable<DataSpacesFileObject>() {
+            @Override
+            public DataSpacesFileObject call() throws Exception {
+                return PADataSpaces.resolveOutput(SchedulerConstants.USERSPACE_NAME);
+            }
+        }, "USER", false);
+
+        dataspaceInitialized = true;
+    }
+
+    private DataSpacesFileObject initDataSpace(Callable<DataSpacesFileObject> dataSpaceBuilder, String dataSpaceName, boolean input) {
+
+        DataSpacesFileObject result = null;
+
         try {
-            INPUT = PADataSpaces.resolveDefaultInput();
-            INPUT = resolveToExisting(INPUT, "INPUT", true);
-            INPUT = createTaskIdFolder(INPUT, "INPUT");
+            result = dataSpaceBuilder.call();
+            result = resolveToExisting(result, dataSpaceName, input);
+            result = createTaskIdFolder(result, dataSpaceName);
         } catch (Throwable t) {
-            logger.warn("INPUT space is disabled");
-            logger.warn("", t);
-            this.logDataspacesStatus("INPUT space is disabled", DataspacesStatusLevel.WARNING);
-            this.logDataspacesStatus(Formatter.stackTraceToString(t), DataspacesStatusLevel.WARNING);
-        }
-        try {
-            OUTPUT = PADataSpaces.resolveDefaultOutput();
-            OUTPUT = resolveToExisting(OUTPUT, "OUTPUT", false);
-            OUTPUT = createTaskIdFolder(OUTPUT, "OUTPUT");
-        } catch (Throwable t) {
-            logger.warn("OUTPUT space is disabled");
-            logger.warn("", t);
-            this.logDataspacesStatus("OUTPUT space is disabled", DataspacesStatusLevel.WARNING);
+            logger.warn(dataSpaceName + " space is disabled", t);
+            this.logDataspacesStatus(dataSpaceName + " space is disabled", DataspacesStatusLevel.WARNING);
             this.logDataspacesStatus(Formatter.stackTraceToString(t), DataspacesStatusLevel.WARNING);
         }
 
-        try {
-            GLOBAL = PADataSpaces.resolveOutput(SchedulerConstants.GLOBALSPACE_NAME);
-            GLOBAL = resolveToExisting(GLOBAL, "GLOBAL", false);
-            GLOBAL = createTaskIdFolder(GLOBAL, "GLOBAL");
-        } catch (Throwable t) {
-            logger.warn("GLOBAL space is disabled");
-            logger.warn("", t);
-            this.logDataspacesStatus("GLOBAL space is disabled", DataspacesStatusLevel.WARNING);
-            this.logDataspacesStatus(Formatter.stackTraceToString(t), DataspacesStatusLevel.WARNING);
-        }
-        try {
-            USER = PADataSpaces.resolveOutput(SchedulerConstants.USERSPACE_NAME);
-            USER = resolveToExisting(USER, "USER", false);
-            USER = createTaskIdFolder(USER, "USER");
-        } catch (Throwable t) {
-            logger.warn("USER space is disabled");
-            logger.warn("", t);
-            this.logDataspacesStatus("USER space is disabled", DataspacesStatusLevel.WARNING);
-            this.logDataspacesStatus(Formatter.stackTraceToString(t), DataspacesStatusLevel.WARNING);
-        }
-        dataspaceInitialized = true;
+        return result;
     }
 
     protected int getDataSpacesApplicationId() {
@@ -1066,141 +1048,40 @@ public abstract class TaskLauncher implements InitActive {
             }
 
             // will contain all files coming from input space
-            ArrayList<DataSpacesFileObject> inResults = new ArrayList<DataSpacesFileObject>();
+            ArrayList<DataSpacesFileObject> inResults = new ArrayList<>();
             // will contain all files coming from output space
-            ArrayList<DataSpacesFileObject> outResults = new ArrayList<DataSpacesFileObject>();
+            ArrayList<DataSpacesFileObject> outResults = new ArrayList<>();
             // will contain all files coming from global space
-            ArrayList<DataSpacesFileObject> globResults = new ArrayList<DataSpacesFileObject>();
+            ArrayList<DataSpacesFileObject> globResults = new ArrayList<>();
             // will contain all files coming from user space
-            ArrayList<DataSpacesFileObject> userResults = new ArrayList<DataSpacesFileObject>();
+            ArrayList<DataSpacesFileObject> userResults = new ArrayList<>();
 
             FileSystemException toBeThrown = null;
+
             for (InputSelector is : inputFiles) {
-                //fill fast file selector
-                FastFileSelector fast = new FastFileSelector();
-                fast.setIncludes(is.getInputFiles().getIncludes());
-                fast.setExcludes(is.getInputFiles().getExcludes());
-                fast.setCaseSensitive(is.getInputFiles().isCaseSensitive());
+                org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector selector =
+                        new org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector();
+                selector.setIncludes(is.getInputFiles().getIncludes());
+                selector.setExcludes(is.getInputFiles().getExcludes());
+
+                logger.debug("Selector used is " + selector);
+
                 switch (is.getMode()) {
                     case TransferFromInputSpace:
-                        if (!checkInputSpaceConfigured(INPUT, "INPUT", is))
-                            continue;
-
-                        //search in INPUT
-                        try {
-                            int s = inResults.size();
-                            FastSelector.findFiles(INPUT, fast, true, inResults);
-                            if (s == inResults.size()) {
-                                // we detected that there was no new file in the list
-                                this.logDataspacesStatus("No file is transferred from INPUT space at " +
-                                    INPUT.getRealURI() + "  for selector " + is,
-                                        DataspacesStatusLevel.WARNING);
-                                logger.warn("No file is transferred from INPUT space at " +
-                                    INPUT.getRealURI() + " for selector " + is);
-                            }
-                        } catch (FileSystemException fse) {
-
-                            toBeThrown = new FileSystemException("Could not contact INPUT space at " +
-                                INPUT.getRealURI() + ". An error occured while resolving selector " + is);
-                            this.logDataspacesStatus("Could not contact INPUT space at " +
-                                INPUT.getRealURI() + " for selector " + is, DataspacesStatusLevel.ERROR);
-                            this.logDataspacesStatus(Formatter.stackTraceToString(fse),
-                                    DataspacesStatusLevel.ERROR);
-                            logger.error("Could not contact INPUT space at " + INPUT.getRealURI() +
-                                ". An error occured while resolving selector " + is, fse);
-                        } catch (NullPointerException npe) {
-                            // nothing to do
-                        }
+                        toBeThrown =
+                                copyInputDataToScratch(INPUT, "INPUT", is, selector, inResults);
                         break;
                     case TransferFromOutputSpace:
-                        if (!checkInputSpaceConfigured(OUTPUT, "OUTPUT", is))
-                            continue;
-                        //search in OUTPUT
-                        try {
-                            int s = outResults.size();
-                            FastSelector.findFiles(OUTPUT, fast, true, outResults);
-                            if (s == outResults.size()) {
-                                // we detected that there was no new file in the list
-                                this.logDataspacesStatus("No file is transferred from OUPUT space at " +
-                                    OUTPUT.getRealURI() + "  for selector " + is,
-                                        DataspacesStatusLevel.WARNING);
-                                logger.warn("No file is transferred from OUPUT space at " +
-                                    OUTPUT.getRealURI() + "  for selector " + is);
-                            }
-                        } catch (FileSystemException fse) {
-                            toBeThrown = new FileSystemException("Could not contact OUTPUT space at " +
-                                OUTPUT.getRealURI() + ". An error occured while resolving selector " + is);
-                            this.logDataspacesStatus("Could not contact OUTPUT space at " +
-                                OUTPUT.getRealURI() + " for selector " + is, DataspacesStatusLevel.ERROR);
-                            this.logDataspacesStatus(Formatter.stackTraceToString(fse),
-                                    DataspacesStatusLevel.ERROR);
-                            logger.error("Could not contact OUTPUT space at " + OUTPUT.getRealURI() +
-                                ". An error occured while resolving selector " + is, fse);
-                        } catch (NullPointerException npe) {
-                            // nothing to do
-                        }
+                        toBeThrown =
+                                copyInputDataToScratch(OUTPUT, "OUTPUT", is, selector, outResults);
                         break;
                     case TransferFromGlobalSpace:
-                        if (!checkInputSpaceConfigured(GLOBAL, "GLOBAL", is))
-                            continue;
-                        try {
-                            int s = globResults.size();
-                            FastSelector.findFiles(GLOBAL, fast, true, globResults);
-                            if (s == globResults.size()) {
-                                // we detected that there was no new file in the list
-                                this.logDataspacesStatus("No file is transferred from GLOBAL space at " +
-                                    GLOBAL.getRealURI() + "  for selector " + is,
-                                        DataspacesStatusLevel.WARNING);
-                                logger.warn("No file is transferred from GLOBAL space at " +
-                                    GLOBAL.getRealURI() + "  for selector " + is);
-                            }
-                        } catch (FileSystemException fse) {
-                            logger.info("", fse);
-                            toBeThrown = new FileSystemException("Could not contact GLOBAL space at " +
-                                GLOBAL.getRealURI() + ". An error occurred while resolving selector " + is);
-                            this.logDataspacesStatus("Could not contact GLOBAL space at " +
-                                GLOBAL.getRealURI() + ". An error occurred while resolving selector " + is,
-                                    DataspacesStatusLevel.ERROR);
-                            this.logDataspacesStatus(Formatter.stackTraceToString(fse),
-                                    DataspacesStatusLevel.ERROR);
-                            logger.error("Could not contact GLOBAL space at " + GLOBAL.getRealURI() +
-                                ". An error occurred while resolving selector " + is, fse);
-
-                        } catch (NullPointerException npe) {
-                            // nothing to do
-                        }
+                        toBeThrown =
+                                copyInputDataToScratch(GLOBAL, "GLOBAL", is, selector, globResults);
                         break;
                     case TransferFromUserSpace:
-                        if (!checkInputSpaceConfigured(USER, "USER", is))
-                            continue;
-                        try {
-                            int s = userResults.size();
-                            FastSelector.findFiles(USER, fast, true, userResults);
-                            if (s == userResults.size()) {
-                                // we detected that there was no new file in the list
-                                this
-                                        .logDataspacesStatus("No file is transferred from USER space at " +
-                                            USER.getRealURI() + "  for selector " + is,
-                                                DataspacesStatusLevel.WARNING);
-                                logger.warn("No file is transferred from USER space at " + USER.getRealURI() +
-                                    "  for selector " + is);
-                            }
-                        } catch (FileSystemException fse) {
-                            logger.info("", fse);
-                            toBeThrown = new FileSystemException("Could not contact USER space at " +
-                                USER.getRealURI() + ". An error occurred while resolving selector " + is);
-                            this.logDataspacesStatus("Could not contact USER space at " + USER.getRealURI() +
-                                ". An error occurred while resolving selector " + is,
-                                    DataspacesStatusLevel.ERROR);
-                            this.logDataspacesStatus(Formatter.stackTraceToString(fse),
-                                    DataspacesStatusLevel.ERROR);
-                            logger.error("Could not contact USER space at " + USER.getRealURI() +
-                                ". An error occurred while resolving selector " + is, fse);
-
-                        } catch (NullPointerException npe) {
-                            // nothing to do
-                        }
-                        break;
+                        toBeThrown =
+                                copyInputDataToScratch(USER, "USER", is, selector, userResults);
                     case none:
                         //do nothing
                         break;
@@ -1216,15 +1097,15 @@ public abstract class TaskLauncher implements InitActive {
             String useruri = (USER == null) ? "" : USER.getVirtualURI();
             String inuri = (INPUT == null) ? "" : INPUT.getVirtualURI();
 
-            Set<String> relPathes = new HashSet<String>();
+            Set<String> relPathes = new HashSet<>();
 
-            ArrayList<DataSpacesFileObject> results = new ArrayList<DataSpacesFileObject>();
+            ArrayList<DataSpacesFileObject> results = new ArrayList<>();
             results.addAll(inResults);
             results.addAll(outResults);
             results.addAll(globResults);
             results.addAll(userResults);
 
-            ArrayList<Future> transferFutures = new ArrayList<Future>();
+            ArrayList<Future> transferFutures = new ArrayList<>();
             for (DataSpacesFileObject dsfo : results) {
                 String relativePath;
                 if (inResults.contains(dsfo)) {
@@ -1253,7 +1134,7 @@ public abstract class TaskLauncher implements InitActive {
                                     .resolveFile(finalRelativePath)
                                     .copyFrom(
                                             finaldsfo,
-                                            org.objectweb.proactive.extensions.dataspaces.api.FileSelector.SELECT_SELF);
+                                            FileSelector.SELECT_SELF);
                             return true;
                         }
                     }));
@@ -1267,10 +1148,7 @@ public abstract class TaskLauncher implements InitActive {
             for (Future f : transferFutures) {
                 try {
                     f.get();
-                } catch (InterruptedException e) {
-                    logger.error("", e);
-                    exceptionMsg.append(StackTraceUtil.getStackTrace(e)).append(nl);
-                } catch (ExecutionException e) {
+                } catch (InterruptedException | ExecutionException e) {
                     logger.error("", e);
                     exceptionMsg.append(StackTraceUtil.getStackTrace(e)).append(nl);
                 }
@@ -1289,13 +1167,58 @@ public abstract class TaskLauncher implements InitActive {
         }
     }
 
+    private FileSystemException copyInputDataToScratch(
+            DataSpacesFileObject space, String spaceName, InputSelector inputSelector,
+            org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector selector, List<DataSpacesFileObject> results) {
+
+        if (!checkInputSpaceConfigured(space, spaceName, inputSelector)) {
+            return null;
+        }
+
+        try {
+            int oldSize = results.size();
+
+            Utils.findFiles(space, selector, results);
+
+            if (results.size() == oldSize) {
+                // we detected that there was no new file in the list
+                this.logDataspacesStatus(
+                        "No file is transferred from " + spaceName + " space at " +
+                                space.getRealURI() + "  for selector " + inputSelector,
+                                DataspacesStatusLevel.WARNING);
+                logger.warn(
+                        "No file is transferred from " + spaceName + " space at "
+                                + space.getRealURI() + "  for selector " + inputSelector);
+            }
+        } catch (FileSystemException e) {
+            logger.warn("Error occurred while transferring files", e);
+
+            this.logDataspacesStatus("Could not contact " + spaceName + " space at " + space.getRealURI() +
+                            ". An error occurred while resolving selector " + inputSelector,
+                    DataspacesStatusLevel.ERROR);
+            this.logDataspacesStatus(Formatter.stackTraceToString(e),
+                    DataspacesStatusLevel.ERROR);
+
+            logger.error("Could not contact " + spaceName + " space at " + space.getRealURI() +
+                    ". An error occurred while resolving selector " + inputSelector, e);
+
+            return new FileSystemException("Could not contact " + spaceName + " space at " +
+                    space.getRealURI() + ". An error occurred while resolving selector " + inputSelector);
+        } catch (NullPointerException e) {
+            // nothing to do
+            return null;
+        }
+
+        return null;
+    }
+
     private boolean checkInputSpaceConfigured(DataSpacesFileObject space, String spaceName, InputSelector is) {
         if (space == null) {
             logger.error("Job " + spaceName +
-                " space is not defined or not properly configured while input files are specified : ");
+                    " space is not defined or not properly configured while input files are specified : ");
 
             this.logDataspacesStatus("Job " + spaceName +
-                " space is not defined or not properly configured while input files are specified : ",
+                            " space is not defined or not properly configured while input files are specified : ",
                     DataspacesStatusLevel.ERROR);
 
             logger.error("--> " + is);
@@ -1309,9 +1232,9 @@ public abstract class TaskLauncher implements InitActive {
     private boolean checkOuputSpaceConfigured(DataSpacesFileObject space, String spaceName, OutputSelector os) {
         if (space == null) {
             logger.debug("Job " + spaceName +
-                " space is not defined or not properly configured, while output files are specified :");
+                    " space is not defined or not properly configured, while output files are specified :");
             this.logDataspacesStatus("Job " + spaceName +
-                " space is not defined or not properly configured, while output files are specified :",
+                            " space is not defined or not properly configured, while output files are specified :",
                     DataspacesStatusLevel.ERROR);
             this.logDataspacesStatus("--> " + os, DataspacesStatusLevel.ERROR);
             return false;
@@ -1350,83 +1273,29 @@ public abstract class TaskLauncher implements InitActive {
                 logger.warn("Loggers are not shutdown !", e);
             }
 
-            ArrayList<DataSpacesFileObject> results = new ArrayList<DataSpacesFileObject>();
+            ArrayList<DataSpacesFileObject> results = new ArrayList<>();
             FileSystemException toBeThrown = null;
 
             for (OutputSelector os : outputFiles) {
-                //fill fast file selector
-                FastFileSelector fast = new FastFileSelector();
-                fast.setIncludes(os.getOutputFiles().getIncludes());
-                fast.setExcludes(os.getOutputFiles().getExcludes());
-                fast.setCaseSensitive(os.getOutputFiles().isCaseSensitive());
+                org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector selector =
+                        new org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector();
+                selector.setIncludes(os.getOutputFiles().getIncludes());
+                selector.setExcludes(os.getOutputFiles().getExcludes());
+
                 switch (os.getMode()) {
                     case TransferToOutputSpace:
                         if (OUTPUT != null) {
-                            try {
-                                int s = results.size();
-                                handleOutput(OUTPUT, fast, results);
-                                if (results.size() == s) {
-                                    this.logDataspacesStatus("No file is transferred to OUTPUT space at " +
-                                        OUTPUT.getRealURI() + " for selector " + os,
-                                            DataspacesStatusLevel.WARNING);
-                                    logger.warn("No file is transferred to OUTPUT space at " +
-                                        OUTPUT.getRealURI() + " for selector " + os);
-                                }
-                            } catch (FileSystemException fse) {
-                                toBeThrown = fse;
-                                this.logDataspacesStatus("Error while transferring to OUTPUT space at " +
-                                    OUTPUT.getRealURI() + " for selector " + os, DataspacesStatusLevel.ERROR);
-                                this.logDataspacesStatus(Formatter.stackTraceToString(fse),
-                                        DataspacesStatusLevel.ERROR);
-                                logger.error("Error while transferring to OUTPUT space at " +
-                                    OUTPUT.getRealURI() + " for selector " + os, fse);
-                            }
+                            toBeThrown = copyScratchDataToOutput(OUTPUT, "OUTPUT", os, selector, results);
                         }
                         break;
                     case TransferToGlobalSpace:
                         if (GLOBAL != null) {
-                            try {
-                                int s = results.size();
-                                handleOutput(GLOBAL, fast, results);
-                                if (results.size() == s) {
-                                    this.logDataspacesStatus("No file is transferred to GLOBAL space at " +
-                                        GLOBAL.getRealURI() + " for selector " + os,
-                                            DataspacesStatusLevel.WARNING);
-                                    logger.warn("No file is transferred to GLOBAL space at " +
-                                        GLOBAL.getRealURI() + " for selector " + os);
-                                }
-                            } catch (FileSystemException fse) {
-                                toBeThrown = fse;
-                                this.logDataspacesStatus("Error while transferring to GLOBAL space at " +
-                                    GLOBAL.getRealURI() + " for selector " + os, DataspacesStatusLevel.ERROR);
-                                this.logDataspacesStatus(Formatter.stackTraceToString(fse),
-                                        DataspacesStatusLevel.ERROR);
-                                logger.error("Error while transferring to GLOBAL space at " +
-                                    GLOBAL.getRealURI() + " for selector " + os, fse);
-                            }
+                            toBeThrown = copyScratchDataToOutput(GLOBAL, "GLOBAL", os, selector, results);
                         }
                         break;
                     case TransferToUserSpace:
                         if (USER != null) {
-                            try {
-                                int s = results.size();
-                                handleOutput(USER, fast, results);
-                                if (results.size() == s) {
-                                    this.logDataspacesStatus("No file is transferred to USER space at " +
-                                        USER.getRealURI() + " for selector " + os,
-                                            DataspacesStatusLevel.WARNING);
-                                    logger.warn("No file is transferred to USER space at " +
-                                        USER.getRealURI() + " for selector " + os);
-                                }
-                            } catch (FileSystemException fse) {
-                                toBeThrown = fse;
-                                this.logDataspacesStatus("Error while transferring to USER space at " +
-                                    USER.getRealURI() + " for selector " + os, DataspacesStatusLevel.ERROR);
-                                this.logDataspacesStatus(Formatter.stackTraceToString(fse),
-                                        DataspacesStatusLevel.ERROR);
-                                logger.error("Error while transferring to USER space at " +
-                                    USER.getRealURI() + " for selector " + os, fse);
-                            }
+                            toBeThrown = copyScratchDataToOutput(USER, "USER", os, selector, results);
                             break;
                         }
                     case none:
@@ -1444,6 +1313,32 @@ public abstract class TaskLauncher implements InitActive {
             displayDataspacesStatus();
         }
     }
+
+    private FileSystemException copyScratchDataToOutput(DataSpacesFileObject space, String spaceName, OutputSelector outputSelector,
+                                                        org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector selector, List<DataSpacesFileObject> results) {
+        try {
+            int s = results.size();
+            handleOutput(space, selector, results);
+            if (results.size() == s) {
+                this.logDataspacesStatus("No file is transferred to " + spaceName + " space at " +
+                                space.getRealURI() + " for selector " + outputSelector,
+                        DataspacesStatusLevel.WARNING);
+                logger.warn("No file is transferred to " + spaceName + " space at " +
+                        space.getRealURI() + " for selector " + outputSelector);
+            }
+        } catch (FileSystemException fse) {
+            this.logDataspacesStatus("Error while transferring to " + spaceName + " space at " +
+                    space.getRealURI() + " for selector " + outputSelector, DataspacesStatusLevel.ERROR);
+            this.logDataspacesStatus(Formatter.stackTraceToString(fse),
+                    DataspacesStatusLevel.ERROR);
+            logger.error("Error while transferring to " + spaceName + " space at " +
+                    space.getRealURI() + " for selector " + outputSelector, fse);
+            return fse;
+        }
+
+        return null;
+    }
+
 
     protected void copyScratchDataToOutput() throws FileSystemException {
 
@@ -1477,15 +1372,15 @@ public abstract class TaskLauncher implements InitActive {
         // Log file will be transferred by this task to the user or output space, only if it's not a forked task
         if (!isForkedTask()) {
             OutputSelector logFiles = new OutputSelector(
-                new FileSelector(TaskLauncher.LOG_FILE_PREFIX + "*"), transferTo);
+                new org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector(TaskLauncher.LOG_FILE_PREFIX + "*"), transferTo);
             result.add(logFiles);
         }
         return result;
     }
 
-    private void handleOutput(DataSpacesFileObject out, FastFileSelector fast,
-            ArrayList<DataSpacesFileObject> results) throws FileSystemException {
-        FastSelector.findFiles(SCRATCH, fast, true, results);
+    private void handleOutput(DataSpacesFileObject out, org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector selector,
+            List<DataSpacesFileObject> results) throws FileSystemException {
+        Utils.findFiles(SCRATCH, selector, results);
         if (logger.isDebugEnabled()) {
             if (results == null || results.size() == 0) {
                 logger.debug("No file found to copy from LOCAL space to OUTPUT space");
@@ -1494,7 +1389,7 @@ public abstract class TaskLauncher implements InitActive {
             }
         }
         String buri = SCRATCH.getVirtualURI();
-        ArrayList<Future> transferFutures = new ArrayList<Future>();
+        ArrayList<Future> transferFutures = new ArrayList<>();
 
         if (results != null) {
             for (DataSpacesFileObject dsfo : results) {
@@ -1511,7 +1406,7 @@ public abstract class TaskLauncher implements InitActive {
                             "/" + finalRelativePath);
 
                         finalout.resolveFile(finalRelativePath).copyFrom(finaldsfo,
-                                org.objectweb.proactive.extensions.dataspaces.api.FileSelector.SELECT_SELF);
+                                FileSelector.SELECT_SELF);
                         return true;
                     }
                 }));
@@ -1523,10 +1418,7 @@ public abstract class TaskLauncher implements InitActive {
         for (Future f : transferFutures) {
             try {
                 f.get();
-            } catch (InterruptedException e) {
-                logger.error("", e);
-                exceptionMsg.append(StackTraceUtil.getStackTrace(e)).append(nl);
-            } catch (ExecutionException e) {
+            } catch (InterruptedException | ExecutionException  e) {
                 logger.error("", e);
                 exceptionMsg.append(StackTraceUtil.getStackTrace(e)).append(nl);
             }
@@ -1541,44 +1433,24 @@ public abstract class TaskLauncher implements InitActive {
      * Replace iteration and replication helper tags in the dataspace's input and output descriptions
      */
     protected void replaceTagsInDataspaces() {
+        Function<String, String> replaceAllTagsFunction =
+                new Function<String, String>() {
+                    @Override
+                    public String apply(String input) {
+                        return replaceAllTags(input);
+                    }
+                };
+
         if (inputFiles != null) {
             for (InputSelector is : inputFiles) {
-                String[] inc = is.getInputFiles().getIncludes();
-                String[] exc = is.getInputFiles().getExcludes();
-
-                if (inc != null) {
-                    for (int i = 0; i < inc.length; i++) {
-                        inc[i] = replaceAllTags(inc[i]);
-                    }
-                }
-                if (exc != null) {
-                    for (int i = 0; i < exc.length; i++) {
-                        exc[i] = replaceAllTags(exc[i]);
-                    }
-                }
-
-                is.getInputFiles().setIncludes(inc);
-                is.getInputFiles().setExcludes(exc);
+                is.getInputFiles().transformIncludes(replaceAllTagsFunction);
+                is.getInputFiles().transformExcludes(replaceAllTagsFunction);
             }
         }
         if (outputFiles != null) {
             for (OutputSelector os : outputFiles) {
-                String[] inc = os.getOutputFiles().getIncludes();
-                String[] exc = os.getOutputFiles().getExcludes();
-
-                if (inc != null) {
-                    for (int i = 0; i < inc.length; i++) {
-                        inc[i] = replaceAllTags(inc[i]);
-                    }
-                }
-                if (exc != null) {
-                    for (int i = 0; i < exc.length; i++) {
-                        exc[i] = replaceAllTags(exc[i]);
-                    }
-                }
-
-                os.getOutputFiles().setIncludes(inc);
-                os.getOutputFiles().setExcludes(exc);
+                os.getOutputFiles().transformIncludes(replaceAllTagsFunction);
+                os.getOutputFiles().transformExcludes(replaceAllTagsFunction);
             }
         }
     }
@@ -1617,7 +1489,7 @@ public abstract class TaskLauncher implements InitActive {
     }
 
     /**
-     * Add a message to the dataspaces status buffer. This buffer is displayed at the end 
+     * Add a message to the dataspaces status buffer. This buffer is displayed at the end
      * of the task if non empty.
      */
     protected void logDataspacesStatus(String message, DataspacesStatusLevel level) {
@@ -1671,7 +1543,7 @@ public abstract class TaskLauncher implements InitActive {
         if (results != null && results.length > 0) {
             Map<String, byte[]> variables = getPropagatedVariables(results);
             if (propagatedVariables == null) {
-                propagatedVariables = new HashMap<String, Serializable>();
+                propagatedVariables = new HashMap<>();
             }
             propagatedVariables.putAll(deserializeVariableMap(variables));
         }
@@ -1838,7 +1710,7 @@ public abstract class TaskLauncher implements InitActive {
          * @throws Exception
          */
         public void copyInputDataToScratch() throws Throwable {
-            long sample = System.nanoTime();
+            Stopwatch stopwatch = Stopwatch.createStarted();
             submitACallable(new Callable<Boolean>() {
                 @Override
                 public Boolean call() throws Exception {
@@ -1851,8 +1723,8 @@ public abstract class TaskLauncher implements InitActive {
                 }
             }, true);
             waitCallable();
-            logger.info("Time spent copying INPUT datas to SCRATCH : " +
-                timeElapsedSinceInMilliseconds(sample) + " ms");
+            logger.info("Time spent copying INPUT data to SCRATCH: " +
+                    stopwatch.elapsed(TimeUnit.MILLISECONDS) + " ms");
         }
 
         /**
@@ -1860,7 +1732,7 @@ public abstract class TaskLauncher implements InitActive {
          * @throws Exception
          */
         public void copyScratchDataToOutput() throws Throwable {
-            long sample = System.nanoTime();
+            Stopwatch stopwatch = Stopwatch.createStarted();
             submitACallable(new Callable<Boolean>() {
                 @Override
                 public Boolean call() throws Exception {
@@ -1874,7 +1746,7 @@ public abstract class TaskLauncher implements InitActive {
             }, true);
             waitCallable();
             logger.info("Time spent copying SCRATCH datas to OUTPUT : " +
-                timeElapsedSinceInMilliseconds(sample) + " ms");
+                    stopwatch.elapsed(TimeUnit.MILLISECONDS) + " ms");
         }
 
         /**
@@ -1965,7 +1837,4 @@ public abstract class TaskLauncher implements InitActive {
         }
     }
 
-    private long timeElapsedSinceInMilliseconds(long sinceInNanoSeconds) {
-        return Math.round(Math.ceil((System.nanoTime() - sinceInNanoSeconds) / 1000000));
-    }
 }

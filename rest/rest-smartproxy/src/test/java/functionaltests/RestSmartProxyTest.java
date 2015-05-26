@@ -75,8 +75,6 @@ public final class RestSmartProxyTest extends AbstractRestFuncTestCase {
     protected String pushUrl;
     protected String pullUrl;
 
-    protected static final String TEST_SESSION_NAME = "TestDSSupport";
-
     protected static final String TASK_NAME = "TestJavaTask";
 
     public final static String INPUT_FILE_BASE_NAME = "input";

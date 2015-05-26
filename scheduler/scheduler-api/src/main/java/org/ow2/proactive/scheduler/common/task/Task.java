@@ -36,17 +36,9 @@
  */
 package org.ow2.proactive.scheduler.common.task;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
-
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
-import org.ow2.proactive.scheduler.common.task.dataspaces.FileSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
@@ -56,6 +48,13 @@ import org.ow2.proactive.scheduler.common.task.flow.FlowBlock;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.SelectionScript;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -575,9 +574,11 @@ public abstract class Task extends CommonAttribute {
         if (files == null) {
             throw new IllegalArgumentException("Argument files is null");
         }
+
         if (inputFiles == null) {
             inputFiles = new ArrayList<InputSelector>();
         }
+
         inputFiles.add(new InputSelector(files, mode));
     }
 
@@ -593,9 +594,11 @@ public abstract class Task extends CommonAttribute {
         if (files == null) {
             throw new IllegalArgumentException("Argument files is null");
         }
+
         if (outputFiles == null) {
             outputFiles = new ArrayList<OutputSelector>();
         }
+
         outputFiles.add(new OutputSelector(files, mode));
     }
 
@@ -616,7 +619,7 @@ public abstract class Task extends CommonAttribute {
         if (inputFiles == null) {
             inputFiles = new ArrayList<InputSelector>();
         }
-        inputFiles.add(new InputSelector(new FileSelector(new String[] { filesToInclude }), mode));
+        inputFiles.add(new InputSelector(new FileSelector(filesToInclude), mode));
     }
 
     /**
@@ -636,7 +639,7 @@ public abstract class Task extends CommonAttribute {
         if (outputFiles == null) {
             outputFiles = new ArrayList<OutputSelector>();
         }
-        outputFiles.add(new OutputSelector(new FileSelector(new String[] { filesToInclude }), mode));
+        outputFiles.add(new OutputSelector(new FileSelector(filesToInclude), mode));
     }
 
     /**

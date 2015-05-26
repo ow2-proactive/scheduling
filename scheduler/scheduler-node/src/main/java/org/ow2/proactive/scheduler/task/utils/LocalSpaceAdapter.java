@@ -34,12 +34,6 @@
  */
 package org.ow2.proactive.scheduler.task.utils;
 
-import java.io.File;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
 import org.objectweb.proactive.extensions.dataspaces.api.FileSelector;
@@ -48,6 +42,12 @@ import org.objectweb.proactive.utils.StackTraceUtil;
 import org.ow2.proactive.scheduler.common.task.dataspaces.FileSystemException;
 import org.ow2.proactive.scheduler.common.task.dataspaces.LocalSpace;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
+
+import java.io.File;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 
 /**
@@ -59,7 +59,7 @@ public class LocalSpaceAdapter implements LocalSpace {
 
     public static final Logger logger = Logger.getLogger(RemoteSpaceAdapter.class);
 
-    private DataSpacesFileObject localDataSpace;
+    private final DataSpacesFileObject localDataSpace;
 
     public LocalSpaceAdapter(DataSpacesFileObject localDataSpace) {
         this.localDataSpace = localDataSpace;

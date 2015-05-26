@@ -41,7 +41,6 @@ import com.google.common.collect.Maps;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Closer;
 import org.apache.commons.vfs2.*;
-import org.objectweb.proactive.extensions.dataspaces.vfs.selector.GlobPatternFileSelector;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
@@ -79,7 +78,6 @@ public class FileSystem {
 
     public FileObject resolveFile(String dirPath, String pathname) throws FileSystemException {
         return fsm.resolveFile(dirPath + (dirPath.endsWith(File.separator) ? "" : File.separator) + pathname);
-
     }
 
     public FileObject createFile(String pathname) throws FileSystemException {
@@ -144,8 +142,10 @@ public class FileSystem {
     public static List<FileObject> findFiles(FileObject root, List<String> includes, List<String> excludes)
             throws FileSystemException {
         List<FileObject> files = Lists.newArrayList();
-        FileSelector selector = (isNullOrEmpty(includes) && isNullOrEmpty(excludes)) ? new AllFilesSelector()
-                : new GlobPatternFileSelector(includes, excludes);
+        FileSelector selector =
+                (isNullOrEmpty(includes) && isNullOrEmpty(excludes)) ?
+                        new AllFilesSelector() :
+                        new org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector(includes, excludes);
         root.findFiles(selector, true, files);
         return files;
     }
@@ -203,7 +203,7 @@ public class FileSystem {
         }
     }
 
-    private static class AllFilesSelector implements FileSelector {
+    private static final class AllFilesSelector implements FileSelector {
         @Override
         public boolean includeFile(FileSelectInfo selInfo) throws Exception {
             return FileType.FILE == selInfo.getFile().getName().getType();

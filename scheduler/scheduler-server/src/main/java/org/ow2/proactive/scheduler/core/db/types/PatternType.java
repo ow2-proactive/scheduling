@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2011 INRIA/University of
+ * Copyright (C) 1997-2015 INRIA/University of
  *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -34,56 +34,30 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.core.db.schedulerType;
+package org.ow2.proactive.scheduler.core.db.types;
 
-import java.sql.Types;
+import com.google.common.collect.ImmutableSet;
+import org.hibernate.type.SerializableToBlobType;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
- * Hibernate natively maps clob columns to java.sql.Clob.<br />
- * However, it's sometimes useful to read the whole clob into memory and deal with it as a String array.<br />
- * CharacterLargeOBject is made to fix this issue.
- *
- * @author The ProActive Team
- * @since ProActive Scheduling 0.9.1
+ * This class is in charge of converting old blob types to the correct object
+ * type used with the current version of the product. It is there for backward
+ * compatibility only.
  */
-public class CharacterLargeOBject extends BinaryLargeOBject {
+public class PatternType extends SerializableToBlobType {
 
-    /**
-     * @see org.hibernate.usertype.UserType#sqlTypes()
-     */
     @Override
-    public int[] sqlTypes() {
-        return new int[] { Types.BLOB };
-    }
+    public Object get(ResultSet rs, String name) throws SQLException {
+        Object result = super.get(rs, name);
 
-    /**
-     * @see org.hibernate.usertype.UserType#returnedClass()
-     */
-    @Override
-    public Class<?> returnedClass() {
-        return String[].class;
-    }
-
-    /**
-     * @see org.hibernate.usertype.UserType#equals(java.lang.Object, java.lang.Object)
-     */
-    @Override
-    public boolean equals(Object x, Object y) {
-        return (x == y) || (x != null && y != null && java.util.Arrays.equals((String[]) x, (String[]) y));
-    }
-
-    /**
-     * @see org.hibernate.usertype.UserType#deepCopy(java.lang.Object)
-     */
-    @Override
-    public Object deepCopy(Object value) {
-        if (value == null)
-            return null;
-
-        String[] strs = (String[]) value;
-        String[] result = new String[strs.length];
-        System.arraycopy(strs, 0, result, 0, strs.length);
+        // in the past includes and excludes patterns
+        // were stored as String[]
+        if (result instanceof String[]) {
+            return ImmutableSet.copyOf((String[]) result);
+        }
 
         return result;
     }

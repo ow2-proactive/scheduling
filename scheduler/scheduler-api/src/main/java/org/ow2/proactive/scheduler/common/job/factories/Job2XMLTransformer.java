@@ -36,15 +36,24 @@
  */
 package org.ow2.proactive.scheduler.common.job.factories;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Serializable;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector;
+import org.ow2.proactive.scheduler.common.job.JobEnvironment;
+import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.task.*;
+import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
+import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
+import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
+import org.ow2.proactive.scheduler.common.task.flow.FlowBlock;
+import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
+import org.ow2.proactive.scripting.GenerationScript;
+import org.ow2.proactive.scripting.Script;
+import org.ow2.proactive.scripting.SelectionScript;
+import org.ow2.proactive.topology.descriptor.*;
+import org.w3c.dom.CDATASection;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Text;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -55,41 +64,11 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-
-import org.ow2.proactive.scheduler.common.job.JobEnvironment;
-import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
-import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
-import org.ow2.proactive.scheduler.common.task.JavaTask;
-import org.ow2.proactive.scheduler.common.task.NativeTask;
-import org.ow2.proactive.scheduler.common.task.ParallelEnvironment;
-import org.ow2.proactive.scheduler.common.task.PropertyModifier;
-import org.ow2.proactive.scheduler.common.task.ScriptTask;
-import org.ow2.proactive.scheduler.common.task.Task;
-import org.ow2.proactive.scheduler.common.task.UpdatableProperties;
-import org.ow2.proactive.scheduler.common.task.dataspaces.FileSelector;
-import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
-import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
-import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
-import org.ow2.proactive.scheduler.common.task.flow.FlowBlock;
-import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
-import org.ow2.proactive.scheduler.common.task.util.BooleanWrapper;
-import org.ow2.proactive.scripting.GenerationScript;
-import org.ow2.proactive.scripting.Script;
-import org.ow2.proactive.scripting.SelectionScript;
-import org.ow2.proactive.topology.descriptor.ArbitraryTopologyDescriptor;
-import org.ow2.proactive.topology.descriptor.BestProximityDescriptor;
-import org.ow2.proactive.topology.descriptor.DifferentHostsExclusiveDescriptor;
-import org.ow2.proactive.topology.descriptor.MultipleHostsExclusiveDescriptor;
-import org.ow2.proactive.topology.descriptor.SingleHostDescriptor;
-import org.ow2.proactive.topology.descriptor.SingleHostExclusiveDescriptor;
-import org.ow2.proactive.topology.descriptor.ThresholdProximityDescriptor;
-import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
-import org.ow2.proactive.utils.Tools;
-import org.apache.log4j.Logger;
-import org.w3c.dom.CDATASection;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Text;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -455,10 +434,10 @@ public class Job2XMLTransformer {
                 Element filesE = doc.createElementNS(Schemas.SCHEMA_LATEST.namespace, XMLTags.DS_FILES.getXMLName());
                 // the xml only supports one value for the includes/excludes
                 // pattern
-                if (fs.getIncludes() != null)
-                    setAttribute(filesE, XMLAttributes.DS_INCLUDES, fs.getIncludes()[0], true);
-                if (fs.getExcludes() != null)
-                    setAttribute(filesE, XMLAttributes.DS_EXCLUDES, fs.getExcludes()[0], true);
+                if (!fs.getIncludes().isEmpty())
+                    setAttribute(filesE, XMLAttributes.DS_INCLUDES, fs.getIncludes().iterator().next(), true);
+                if (!fs.getExcludes().isEmpty())
+                    setAttribute(filesE, XMLAttributes.DS_EXCLUDES, fs.getExcludes().iterator().next(), true);
                 if (inputSelector.getMode() != null) {
                     setAttribute(filesE, XMLAttributes.DS_ACCESSMODE, inputSelector.getMode().toString(),
                             true);
@@ -536,10 +515,10 @@ public class Job2XMLTransformer {
                 Element filesE = doc.createElementNS(Schemas.SCHEMA_LATEST.namespace, XMLTags.DS_FILES.getXMLName());
                 // the xml only supports one value for the includes/excludes
                 // pattern
-                if (fs.getIncludes() != null)
-                    setAttribute(filesE, XMLAttributes.DS_INCLUDES, fs.getIncludes()[0], true);
-                if (fs.getExcludes() != null)
-                    setAttribute(filesE, XMLAttributes.DS_EXCLUDES, fs.getExcludes()[0], true);
+                if (!fs.getIncludes().isEmpty())
+                    setAttribute(filesE, XMLAttributes.DS_INCLUDES, fs.getIncludes().iterator().next(), true);
+                if (!fs.getExcludes().isEmpty())
+                    setAttribute(filesE, XMLAttributes.DS_EXCLUDES, fs.getExcludes().iterator().next(), true);
                 if (outputSelector.getMode() != null) {
                     setAttribute(filesE, XMLAttributes.DS_ACCESSMODE, outputSelector.getMode().toString(),
                             true);

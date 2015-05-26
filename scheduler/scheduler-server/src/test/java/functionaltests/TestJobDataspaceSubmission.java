@@ -36,13 +36,9 @@
  */
 package functionaltests;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.net.URI;
-import java.util.Map.Entry;
-
+import functionaltests.executables.DSWorker;
+import org.junit.Assert;
+import org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector;
 import org.objectweb.proactive.extensions.vfsprovider.FileSystemServerDeployer;
 import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.scheduler.common.job.JobEnvironment;
@@ -52,11 +48,15 @@ import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.ow2.proactive.scheduler.common.task.dataspaces.FileSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
-import functionaltests.executables.DSWorker;
-import org.junit.Assert;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.net.URI;
+import java.util.Map.Entry;
 
 
 /**
@@ -200,7 +200,7 @@ public class TestJobDataspaceSubmission extends SchedulerConsecutive {
         NativeTask t10 = new NativeTask();
         t10.addDependence(t2);
         t10.addInputFiles(in1, InputAccessMode.TransferFromInputSpace);
-        t10.addInputFiles(new FileSelector(new String[] { "*b.txt" }),
+        t10.addInputFiles(new FileSelector("*b.txt"),
                 InputAccessMode.TransferFromOutputSpace);
         t10.addOutputFiles("*aa.txt", OutputAccessMode.TransferToOutputSpace);
         t10.setName("native_java10");
@@ -221,7 +221,7 @@ public class TestJobDataspaceSubmission extends SchedulerConsecutive {
         NativeTask t11 = new NativeTask();
         t11.addDependence(t3);
         t11.addInputFiles(in1, InputAccessMode.TransferFromInputSpace);
-        t11.addInputFiles(new FileSelector(new String[] { "*c.txt" }),
+        t11.addInputFiles(new FileSelector("*c.txt"),
                 InputAccessMode.TransferFromGlobalSpace);
         t11.addOutputFiles("*bb.txt", OutputAccessMode.TransferToGlobalSpace);
         t11.setName("native_java11");
@@ -242,7 +242,7 @@ public class TestJobDataspaceSubmission extends SchedulerConsecutive {
         NativeTask t12 = new NativeTask();
         t12.addDependence(t4);
         t12.addInputFiles(in1, InputAccessMode.TransferFromInputSpace);
-        t12.addInputFiles(new FileSelector(new String[] { "*d.txt" }), InputAccessMode.TransferFromUserSpace);
+        t12.addInputFiles(new FileSelector("*d.txt"), InputAccessMode.TransferFromUserSpace);
         t12.addOutputFiles("*cc.txt", OutputAccessMode.TransferToUserSpace);
         t12.setName("native_java7");
         switch (OperatingSystem.getOperatingSystem()) {
