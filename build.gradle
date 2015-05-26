@@ -603,7 +603,7 @@ class CustomCreateStartScripts extends CreateStartScripts {
         def generator = new org.gradle.api.internal.plugins.StartScriptGenerator()
         generator.applicationName = getApplicationName()
         generator.mainClassName = getMainClassName()
-        generator.defaultJvmOpts = getDefaultJvmOpts()
+        generator.defaultJvmOpts = ["-server"]
         generator.optsEnvironmentVar = getOptsEnvironmentVar()
         generator.exitEnvironmentVar = getExitEnvironmentVar()
         generator.classpath = ["dist/lib/*", "addons", "addons/*"]
