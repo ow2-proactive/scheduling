@@ -389,9 +389,7 @@ project('scheduler:scheduler-server') {
         compile 'javax.mail:mail:1.4.7'
         compile 'org.hibernate.javax.persistence:hibernate-jpa-2.0-api:1.0.1.Final'
         compile 'org.hibernate:hibernate-core:4.1.7.Final'
-        compile 'org.eclipse.jetty:jetty-webapp:8.1.15.v20140411'
-
-
+        compile 'org.eclipse.jetty:jetty-webapp:9.2.13.v20150730'
         compile "org.objectweb.proactive:programming-core:${programmingVersion}"
 
         compile project(':common-api')

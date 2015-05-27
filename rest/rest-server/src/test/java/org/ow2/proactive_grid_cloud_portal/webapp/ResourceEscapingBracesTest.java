@@ -1,56 +1,69 @@
 package org.ow2.proactive_grid_cloud_portal.webapp;
 
+import org.eclipse.jetty.client.HttpClient;
+import org.eclipse.jetty.client.api.ContentResponse;
+import org.eclipse.jetty.client.api.Request;
+import org.eclipse.jetty.http.HttpMethod;
+import org.eclipse.jetty.http.HttpVersion;
+import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.DefaultServlet;
-import org.eclipse.jetty.testing.HttpTester;
-import org.eclipse.jetty.testing.ServletTester;
+import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 
 public class ResourceEscapingBracesTest {
 
-    private static ServletTester servletTester;
+    private static Server server;
 
     @BeforeClass
     public static void startServer() throws Exception {
-        servletTester = new ServletTester();
-        servletTester.setResourceBase(ResourceEscapingBracesTest.class.getResource("doctest").toString());
-        servletTester.addServlet(DefaultServlet.class, "/rest_not_fixed/*");
-        servletTester.addServlet(RestDocumentationServlet.class, "/rest_fixed/*");
-        servletTester.start();
+        // using 0 forces Jetty to pick a port that is free at random
+        server = new Server(0);
+
+        ServletContextHandler handler = new ServletContextHandler();
+        handler.setContextPath("/");
+        handler.setResourceBase(ResourceEscapingBracesTest.class.getResource("doctest").toString());
+        handler.addServlet(DefaultServlet.class, "/rest_not_fixed/*");
+        handler.addServlet(RestDocumentationServlet.class, "/rest_fixed/*");
+
+        server.setHandler(handler);
+
+        server.start();
     }
 
     @AfterClass
     public static void stopServer() throws Exception {
-        servletTester.stop();
+        server.stop();
     }
 
     @Test
     public void without_fix() throws Exception {
-        HttpTester response = get("/rest_not_fixed/{test}/file.txt");
+        ContentResponse response = get(server.getURI() + "rest_not_fixed/%7Btest%7D/file.txt");
 
         assertEquals(404, response.getStatus());
     }
 
     @Test
     public void curly_braces_are_escaped() throws Exception {
-        HttpTester response = get("/rest_fixed/{test}/file.txt");
+        ContentResponse response = get(server.getURI() + "rest_fixed/%7Btest%7D/file.txt");
 
         assertEquals(200, response.getStatus());
     }
 
-    private HttpTester get(String uri) throws Exception {
-        HttpTester request = new HttpTester();
-        HttpTester response = new HttpTester();
-        request.setMethod("GET");
-        request.setVersion("HTTP/1.0");
-        request.setHeader("Host", "127.0.0.1");
-        request.setURI(uri);
+    private ContentResponse get(String uri) throws Exception {
+        HttpClient httpClient = new HttpClient();
+        httpClient.start();
 
-        response.parse(servletTester.getResponses(request.generate()));
-        return response;
+        Request request = httpClient.newRequest(uri);
+        request.header("Host", "127.0.0.1");
+        request.method(HttpMethod.GET);
+        request.version(HttpVersion.HTTP_1_0);
+
+        return request.send();
     }
+
 }

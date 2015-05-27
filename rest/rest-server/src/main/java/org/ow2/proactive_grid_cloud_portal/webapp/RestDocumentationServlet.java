@@ -79,8 +79,8 @@ public class RestDocumentationServlet extends DefaultServlet {
             super(url);
         }
 
-        public Resource addPath(String path) throws IOException, MalformedURLException {
-            URLResource r;
+        public Resource addPath(String path) throws IOException {
+            Resource r;
             String url;
 
             path = org.eclipse.jetty.util.URIUtil.canonicalPath(path);
@@ -88,7 +88,7 @@ public class RestDocumentationServlet extends DefaultServlet {
             if ("/".equals(path))
                 return this;
             else if (!isDirectory()) {
-                r = (FileResource) super.addPath(path);
+                r = super.addPath(path);
             } else {
                 if (path == null)
                     throw new MalformedURLException();
@@ -100,8 +100,8 @@ public class RestDocumentationServlet extends DefaultServlet {
 
                 String encodedPath = URIUtil.encodePath(rel);
                 encodedPath = encodedPath.replaceAll("\\{", "%7B").replaceAll("\\}", "%7D");
-                url = URIUtil.addPaths(_urlString, encodedPath);
-                r = (URLResource) Resource.newResource(url);
+                url = URIUtil.addPaths(super.toString(), encodedPath);
+                r = Resource.newResource(url);
             }
             return r;
         }
