@@ -525,7 +525,7 @@ project('rm:rm-server') {
         testCompile project(':rm:rm-infrastructure:rm-infrastructure-gcm')
         testCompile 'org.jruby:jruby-jline:1.7.4'
         testCompile 'org.python:jython-jline:2.5.4-rc1'
-        testCompile 'org.apache.sshd:sshd-core:0.12.0'
+        testCompile 'org.apache.sshd:sshd-core:0.14.0'
 
         runtime 'org.hibernate:hibernate-c3p0:4.1.7.Final'
         runtime 'org.apache.derby:derby:10.11.1.1'
