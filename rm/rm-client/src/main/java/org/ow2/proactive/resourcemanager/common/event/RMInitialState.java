@@ -38,6 +38,7 @@ package org.ow2.proactive.resourcemanager.common.event;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -79,7 +80,7 @@ public class RMInitialState implements Serializable {
 
     /**
      * Creates an InitialState object.
-     * 
+     *
      * @param nodesEventList RM's node events.
      * @param nodeSourcesList RM's node sources list.
      */
@@ -102,5 +103,30 @@ public class RMInitialState implements Serializable {
      */
     public ArrayList<RMNodeSourceEvent> getNodeSource() {
         return this.nodeSources;
+    }
+
+    public void nodeStateChanged(RMNodeEvent stateChangedEvent) {
+        int size = nodesList.size();
+        for (int i = 0; i < size; i++) {
+            if (stateChangedEvent.getNodeUrl().equals(nodesList.get(i).getNodeUrl())) {
+                nodesList.set(i, stateChangedEvent);
+                break;
+            }
+        }
+    }
+
+    public void nodeRemoved(RMNodeEvent removedEvent) {
+        Iterator<RMNodeEvent> events = nodesList.iterator();
+        while (events.hasNext()) {
+            RMNodeEvent nodeEvent = events.next();
+            if (removedEvent.getNodeUrl().equals(nodeEvent.getNodeUrl())) {
+                events.remove();
+                break;
+            }
+        }
+    }
+
+    public void nodeAdded(RMNodeEvent event) {
+        nodesList.add(event);
     }
 }
