@@ -416,7 +416,6 @@ project('scheduler:scheduler-server') {
 
         runtime 'org.hibernate:hibernate-c3p0:4.1.7.Final'
         runtime 'org.apache.derby:derby:10.11.1.1'
-        runtime 'mysql:mysql-connector-java:5.1.16'
         runtime "org.objectweb.proactive:programming-extension-pnp:${programmingVersion}"
         runtime "org.objectweb.proactive:programming-extension-pamr:${programmingVersion}"
 
@@ -530,7 +529,6 @@ project('rm:rm-server') {
 
         runtime 'org.hibernate:hibernate-c3p0:4.1.7.Final'
         runtime 'org.apache.derby:derby:10.11.1.1'
-        runtime 'mysql:mysql-connector-java:5.1.16'
         runtime "org.objectweb.proactive:programming-extension-pnp:${programmingVersion}"
     }
 
