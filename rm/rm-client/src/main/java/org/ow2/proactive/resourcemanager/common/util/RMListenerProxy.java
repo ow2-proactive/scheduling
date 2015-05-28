@@ -48,7 +48,6 @@ import javax.management.AttributeList;
 import javax.management.InstanceNotFoundException;
 import javax.management.IntrospectionException;
 import javax.management.MBeanException;
-import javax.management.MBeanInfo;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
@@ -186,23 +185,13 @@ public class RMListenerProxy extends RMGroupEventListener {
     public void nodeEvent(RMNodeEvent event) {
         switch (event.getEventType()) {
             case NODE_REMOVED:
-                for (int i = 0; i < rmInitialState.getNodesEvents().size(); i++) {
-                    if (event.getNodeUrl().equals(rmInitialState.getNodesEvents().get(i).getNodeUrl())) {
-                        rmInitialState.getNodesEvents().remove(i);
-                        break;
-                    }
-                }
+                rmInitialState.nodeRemoved(event);
                 break;
             case NODE_ADDED:
-                rmInitialState.getNodesEvents().add(event);
+                rmInitialState.nodeAdded(event);
                 break;
             case NODE_STATE_CHANGED:
-                for (int i = 0; i < rmInitialState.getNodesEvents().size(); i++) {
-                    if (event.getNodeUrl().equals(rmInitialState.getNodesEvents().get(i).getNodeUrl())) {
-                        rmInitialState.getNodesEvents().set(i, event);
-                        break;
-                    }
-                }
+                rmInitialState.nodeStateChanged(event);
                 break;
 
         }
