@@ -36,14 +36,8 @@
  */
 package functionaltests;
 
-import java.io.File;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
+import org.apache.log4j.Level;
+import org.junit.Assert;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
@@ -51,12 +45,13 @@ import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.utils.OperatingSystem;
+
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.process_tree_killer.ProcessTree;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.rm.util.process.EnvironmentCookieBasedChildProcessKiller;
-import org.ow2.proactive.rm.util.process.ProcessTreeKiller;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
@@ -82,8 +77,13 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.utils.FileUtils;
-import org.apache.log4j.Level;
-import org.junit.Assert;
+import java.io.File;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import functionaltests.common.CommonTUtils;
 import functionaltests.common.InputStreamReaderThread;
@@ -361,7 +361,7 @@ public class SchedulerTHelper {
      * Kill the forked Scheduler and all nodes.
      */
     public static void killSchedulerAndNodes() throws Exception {
-        org.apache.log4j.Logger.getLogger(ProcessTreeKiller.class).setLevel(Level.DEBUG);
+        org.apache.log4j.Logger.getLogger(ProcessTree.class).setLevel(Level.DEBUG);
         childProcessKiller.killChildProcesses();
         killScheduler();
     }

@@ -36,14 +36,13 @@
  */
 package functionaltests.taskkill;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
-
+import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Level;
+import org.junit.Rule;
+import org.junit.rules.Timeout;
 import org.objectweb.proactive.utils.OperatingSystem;
-import org.ow2.proactive.rm.util.process.ProcessTreeKiller;
+
+import org.ow2.proactive.process_tree_killer.ProcessTree;
 import org.ow2.proactive.scheduler.common.exception.UserException;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
@@ -54,16 +53,17 @@ import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
-import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Level;
-import org.junit.Rule;
-import org.junit.rules.Timeout;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
 
 import functionaltests.RMTHelper;
 import functionaltests.SchedulerConsecutive;
 import functionaltests.SchedulerTHelper;
-
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 
 /**
@@ -111,7 +111,7 @@ public class TestProcessTreeKiller extends SchedulerConsecutive {
         RMTHelper rmHelper = RMTHelper.getDefaultInstance();
         rmHelper.createNodeSource("extra", 2);
 
-        org.apache.log4j.Logger.getLogger(ProcessTreeKiller.class).setLevel(Level.DEBUG);
+        org.apache.log4j.Logger.getLogger(ProcessTree.class).setLevel(Level.DEBUG);
         org.apache.log4j.Logger.getLogger(TaskLauncher.class).setLevel(Level.DEBUG);
         for (int i = 0; i < NB_ITERATIONS; i++) {
             SchedulerTHelper.log("***************************************************");
