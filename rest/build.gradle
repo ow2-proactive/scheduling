@@ -39,9 +39,8 @@ subprojects {
 
 project(':rest:rest-api') {
     dependencies {
-        compile 'org.jboss.resteasy:jaxrs-api:3.0.6.Final'
-        compile 'org.jboss.resteasy:resteasy-jackson-provider:3.0.6.Final'
-        compile 'org.jboss.resteasy:resteasy-multipart-provider:3.0.6.Final'
+        compile 'org.jboss.resteasy:resteasy-jackson-provider:3.0.13.Final'
+        compile 'org.jboss.resteasy:resteasy-multipart-provider:3.0.13.Final'
         compile "org.objectweb.proactive:programming-util:${programmingVersion}"
         compile "org.objectweb.proactive:programming-extension-dataspaces:${programmingVersion}"
     }
@@ -53,9 +52,8 @@ project(':rest:rest-server') {
         jaxDoclet
     }
     dependencies {
-        compile 'org.jboss.resteasy:jaxrs-api:3.0.6.Final'
-        compile 'org.jboss.resteasy:resteasy-jackson-provider:3.0.6.Final'
-        compile 'org.jboss.resteasy:resteasy-multipart-provider:3.0.6.Final'
+        compile 'org.jboss.resteasy:resteasy-jackson-provider:3.0.13.Final'
+        compile 'org.jboss.resteasy:resteasy-multipart-provider:3.0.13.Final'
 
         compile 'org.rrd4j:rrd4j:2.2.1'
         compile 'net.sf.dozer:dozer:5.4.0'
@@ -75,8 +73,10 @@ project(':rest:rest-server') {
         compile project(':rest:rest-api')
 
         testCompile functionalTestDependencies
-        testCompile 'org.apache.httpcomponents:httpmime:4.2.1'
-        testCompile 'org.jboss.resteasy:tjws:3.0.6.Final'
+
+        testCompile 'org.apache.httpcomponents:httpmime:4.2.6'
+        testCompile 'org.jboss.resteasy:tjws:3.0.13.Final'
+
         testCompile 'org.mockito:mockito-core:1.10.19'
         testCompile 'org.eclipse.jetty:jetty-client:9.2.13.v20150730'
 
@@ -155,8 +155,8 @@ project(':rest:rest-cli') {
         compile 'commons-io:commons-io:2.4'
         compile 'jline:jline:2.11'
 
-        compile 'org.apache.httpcomponents:httpclient:4.2.1'
-        compile 'org.apache.httpcomponents:httpmime:4.2.1'
+        compile 'org.apache.httpcomponents:httpclient:4.2.6'
+        compile 'org.apache.httpcomponents:httpmime:4.2.6'
 
         compile project(":common-api")
         compile project(':rest:rest-api')
@@ -174,8 +174,8 @@ project(':rest:rest-client') {
         compile 'commons-cli:commons-cli:1.2'
         compile 'commons-io:commons-io:2.4'
         compile 'jline:jline:2.11'
-        compile 'org.apache.httpcomponents:httpclient:4.2.1'
-        compile 'org.apache.httpcomponents:httpmime:4.2.1'
+        compile 'org.apache.httpcomponents:httpclient:4.2.6'
+        compile 'org.apache.httpcomponents:httpmime:4.2.6'
         compile 'org.atmosphere:wasync:1.4.3'
 
         compile project(":common-api")
