@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE web-app
-        PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
-        "http://java.sun.com/dtd/web-app_2_3.dtd">
 
-<web-app>
+<web-app version="3.0" xmlns="http://java.sun.com/xml/ns/javaee"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
 
     <display-name>Scheduler's Rest API</display-name>
 
@@ -28,10 +27,14 @@
     <listener>
         <listener-class>org.ow2.proactive_grid_cloud_portal.webapp.NoVncBootstrap</listener-class>
     </listener>
+    <listener>
+        <listener-class>org.atmosphere.cpr.SessionSupport</listener-class>
+    </listener>
 
     <servlet>
         <servlet-name>atmosphere</servlet-name>
         <servlet-class>org.atmosphere.cpr.AtmosphereServlet</servlet-class>
+
         <init-param>
             <param-name>org.atmosphere.cpr.sessionSupport</param-name>
             <param-value>true</param-value>
@@ -42,15 +45,28 @@
         </init-param>
         <init-param>
             <param-name>org.atmosphere.websocket.bufferSize</param-name>
-            <param-value>102400</param-value>
+            <!-- Maximum value allowed by Jetty -->
+            <!-- See class org.eclipse.jetty.websocket.api.WebSocketPolicy.setInputBufferSize -->
+            <param-value>32768</param-value>
         </init-param>
         <init-param>
             <param-name>org.atmosphere.websocket.maxTextMessageSize</param-name>
             <param-value>102400</param-value>
         </init-param>
+        <init-param>
+            <param-name>org.atmosphere.cpr.asyncSupport</param-name>
+            <param-value>org.atmosphere.container.Jetty9AsyncSupportWithWebSocket</param-value>
+        </init-param>
+        <init-param>
+            <!-- https://github.com/Atmosphere/atmosphere/wiki/Understanding-BroadcasterCache -->
+            <param-name>org.atmosphere.cpr.broadcasterCacheClass</param-name>
+            <param-value>org.atmosphere.cache.UUIDBroadcasterCache</param-value>
+        </init-param>
+
         <load-on-startup>0</load-on-startup>
         <async-supported>true</async-supported>
     </servlet>
+
     <servlet-mapping>
         <servlet-name>atmosphere</servlet-name>
         <url-pattern>/scheduler/events/*</url-pattern>

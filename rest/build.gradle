@@ -63,7 +63,7 @@ project(':rest:rest-server') {
         compile 'com.netiq:websockify:1.6-proactive'
         compile 'io.netty:netty:3.3.0.Final'
 
-        compile 'org.atmosphere:atmosphere-runtime:2.2.6'
+        compile 'org.atmosphere:atmosphere-runtime:2.3.4'
 
         compile project(":scheduler:scheduler-client")
         compile project(":rm:rm-client")
@@ -174,9 +174,10 @@ project(':rest:rest-client') {
         compile 'commons-cli:commons-cli:1.2'
         compile 'commons-io:commons-io:2.4'
         compile 'jline:jline:2.11'
+
         compile 'org.apache.httpcomponents:httpclient:4.2.6'
         compile 'org.apache.httpcomponents:httpmime:4.2.6'
-        compile 'org.atmosphere:wasync:1.4.3'
+        compile 'org.atmosphere:wasync:2.1.2'
 
         compile project(":common-api")
         compile project(":scheduler:scheduler-api")
