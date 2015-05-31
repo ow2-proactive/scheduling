@@ -339,7 +339,7 @@ project(':rm:rm-node') {
         compile 'net.java.dev.jna:jna:4.1.0'
         compile 'commons-io:commons-io:2.4'
 
-        compile 'commons-cli:commons-cli:1.1'
+        compile 'commons-cli:commons-cli:1.3'
         compile 'sigar:sigar:1.7.0-proactive'
 
         compile "org.objectweb.proactive:programming-extension-dataspaces:${programmingVersion}"
@@ -386,7 +386,7 @@ project(':rm:rm-node-updater') {
 project('scheduler:scheduler-server') {
     apply plugin: 'java-library-distribution'
     dependencies {
-        compile 'commons-cli:commons-cli:1.1'
+        compile 'commons-cli:commons-cli:1.3'
         compile 'commons-io:commons-io:2.4'
         compile 'javax.mail:mail:1.4.7'
         compile 'org.hibernate.javax.persistence:hibernate-jpa-2.1-api:1.0.0.Final'
@@ -509,7 +509,7 @@ project('rm:rm-server') {
     apply plugin: 'java-library-distribution'
     dependencies {
         compile(
-                'commons-cli:commons-cli:1.1',
+                'commons-cli:commons-cli:1.3',
                 'it.sauronsoftware.cron4j:cron4j:2.2.5',
                 'org.hibernate:hibernate-core:4.3.11.Final',
                 'org.hibernate.javax.persistence:hibernate-jpa-2.1-api:1.0.0.Final',

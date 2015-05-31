@@ -36,20 +36,27 @@
  */
 package org.ow2.proactive.authentication.crypto;
 
-import org.apache.commons.cli.*;
-import org.apache.log4j.Logger;
-import org.objectweb.proactive.utils.SecurityManagerConfigurator;
-import org.ow2.proactive.authentication.AuthenticationImpl;
-import org.ow2.proactive.authentication.Connection;
-import org.ow2.proactive.utils.FileToBytesConverter;
-import org.ow2.proactive.utils.Tools;
-
 import java.io.Console;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.KeyException;
 import java.security.PublicKey;
+
+import org.objectweb.proactive.utils.SecurityManagerConfigurator;
+import org.ow2.proactive.authentication.AuthenticationImpl;
+import org.ow2.proactive.authentication.Connection;
+import org.ow2.proactive.utils.FileToBytesConverter;
+import org.ow2.proactive.utils.Tools;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.OptionGroup;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+import org.apache.log4j.Logger;
 
 
 /**
@@ -158,7 +165,7 @@ public class CreateCredentials {
         opt.setRequired(false);
         options.addOption(opt);
 
-        Parser parser = new GnuParser();
+        CommandLineParser parser = new DefaultParser();
         CommandLine cmd = null;
         try {
             cmd = parser.parse(options, args);

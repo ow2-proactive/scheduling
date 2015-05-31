@@ -76,13 +76,12 @@ import org.ow2.proactive.utils.JettyStarter;
 import org.ow2.proactive.utils.PAMRRouterStarter;
 import org.ow2.proactive.utils.Tools;
 import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.GnuParser;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
-import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.Parser;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
@@ -136,7 +135,7 @@ public class SchedulerStarter {
     }
 
     private static CommandLine getCommandLine(String[] args, Options options) throws ParseException {
-        Parser parser = new GnuParser();
+        CommandLineParser parser = new DefaultParser();
         return parser.parse(options, args);
     }
 
@@ -349,25 +348,24 @@ public class SchedulerStarter {
         options.addOption(new Option("c", "clean", false,
             "clean scheduler and resource manager databases (default: false)"));
 
-        options.addOption(OptionBuilder.withLongOpt("clean-nodesources").withDescription(
+        options.addOption(Option.builder().longOpt("clean-nodesources").desc(
                 "drop all previously created nodesources from resource manager database (default: false)")
-                .create());
+                .build());
 
-        options.addOption(OptionBuilder.withLongOpt("rm-only").withDescription(
-                "start only resource manager (implies --no-rest; default: false)").create());
+        options.addOption(Option.builder().longOpt("rm-only").desc(
+                "start only resource manager (implies --no-rest; default: false)").build());
 
-        options.addOption(OptionBuilder.withLongOpt("no-rest").withDescription(
-                "do not deploy REST server and wars from dist/war (default: false)").create());
+        options.addOption(Option.builder().longOpt("no-rest").desc(
+                "do not deploy REST server and wars from dist/war (default: false)").build());
 
-        options.addOption(OptionBuilder.withLongOpt("no-router").withDescription(
-          "do not deploy PAMR Router (default: false)").create());
+        options.addOption(Option.builder().longOpt("no-router").desc(
+          "do not deploy PAMR Router (default: false)").build());
 
-        options.addOption(OptionBuilder.withLongOpt("no-discovery")
-                .withDescription("do not run discovery service for nodes (default: false)").create());
-        options.addOption(OptionBuilder
-                .withLongOpt("discovery-port")
-                .withDescription("discovery service port for nodes (default: " + DISCOVERY_DEFAULT_PORT + ")")
-                .hasArg().withArgName("port").create("dp"));
+        options.addOption(Option.builder().longOpt("no-discovery")
+                .desc("do not run discovery service for nodes (default: false)").build());
+        options.addOption(Option.builder("dp").longOpt("discovery-port")
+                .desc("discovery service port for nodes (default: " + DISCOVERY_DEFAULT_PORT + ")")
+                .hasArg().argName("port").build());
 
         return options;
     }

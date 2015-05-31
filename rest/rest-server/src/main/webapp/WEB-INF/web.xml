@@ -82,7 +82,7 @@
     <servlet>
         <servlet-name>doc-servlet</servlet-name>
         <servlet-class>
-            org.ow2.proactive_grid_cloud_portal.webapp.RestDocumentationServlet
+            org.eclipse.jetty.servlet.DefaultServlet
         </servlet-class>
     </servlet>
 

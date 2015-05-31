@@ -47,10 +47,37 @@ project(':rest:rest-api') {
 }
 
 project(':rest:rest-server') {
+    apply plugin: 'miredot'
 
-    configurations {
-        jaxDoclet
+    miredot {
+        source = sourceSets.main.allJava
+        destination = sourceSets.main.output
+        output {
+            formats {
+                'html' {
+                    hideIssuesTab = true
+                    hideLogoOnTop = true
+                    initialCollapseLevel = 2
+                    intro = file('doc_header.html')
+                    location = file("src/main/webapp/doc/")
+                }
+            }
+            title = 'ProActive Workflows & Scheduling - REST API v' + version
+        }
+        // expires friday june 16th, 2017
+        licence = 'cHJvamVjdHxvcmcub3cyLnByb2FjdGl2ZV9ncmlkX2Nsb3VkX3BvcnRhbC5yZXN0LXNlcnZlcnwyMDE3LTA2LTE2fHRydWV8LTEjTUMwQ0ZRQ0hRb08zcDNWb080Z05mZkNscnRHZ3IzM09xQUlVZTBCbkYrR2ZKenJzNUtaRFI3dlhoc3hQaDNVPQ=='
+        restModel{
+            restFramework {
+                name = 'jax-rs'
+            }
+            titleNamingStrategies = [
+                    'tag: summary',
+                    'tag: title',
+                    'firstsentence'
+            ]
+        }
     }
+
     dependencies {
         compile 'org.jboss.resteasy:resteasy-jackson-provider:3.0.13.Final'
         compile 'org.jboss.resteasy:resteasy-multipart-provider:3.0.13.Final'
@@ -85,35 +112,10 @@ project(':rest:rest-server') {
         runtime 'javax.servlet:javax.servlet-api:3.0.1'
 
         runtime "org.objectweb.proactive:programming-extension-pamr:${programmingVersion}"
-
-        jaxDoclet 'com.lunatech.jax-doclets:doclets:0.10.1-proactive'
     }
 
     task stub(type: StubTask) {
         classes = ['org.ow2.proactive_grid_cloud_portal.scheduler.EventListener']
-    }
-
-    task jaxbDoc(type: Javadoc) {
-        enabled = System.getProperty("java.specification.version") != "1.8"
-        source([project, project(':rest:rest-api')].collect { project -> project.sourceSets.main.allJava })
-        destinationDir = file("src/main/webapp/doc/jaxbdocs")
-        options.docletpath = configurations.jaxDoclet.files.asType(List) + configurations.compile.files.asType(List)
-        options.classpath = options.docletpath
-        options.doclet = "com.lunatech.doclets.jax.jaxb.JAXBDoclet"
-        options.footer = 'Copyright 1997-2014 ActiveEon/INRIA/University of Nice-Sophia Antipolis'
-        options.header = file('doc_header.html').text.replaceAll("[\r\n]+", " ")
-    }
-
-    task jaxrsDoc(type: Javadoc, dependsOn: jaxbDoc) {
-        enabled = System.getProperty("java.specification.version") != "1.8"
-        source([project, project(':rest:rest-api')].collect { project -> project.sourceSets.main.allJava })
-        destinationDir = file("src/main/webapp/doc/jaxrsdocs")
-        options.links << '../jaxbdocs/'
-        options.footer = 'Copyright 1997-2014 ActiveEon/INRIA/University of Nice-Sophia Antipolis'
-        options.header = file('doc_header.html').text.replaceAll("[\r\n]+", " ")
-        options.docletpath = configurations.jaxDoclet.files.asType(List) + configurations.compile.files.asType(List)
-        options.classpath = options.docletpath
-        options.doclet = "com.lunatech.doclets.jax.jaxrs.JAXRSDoclet"
     }
 
     test {
@@ -125,7 +127,7 @@ project(':rest:rest-server') {
     functionalTest.dependsOn rootProject.dist
     clean.dependsOn rootProject.cleanDist
 
-    task proActiveWar(type: Sync, dependsOn: [classes, jaxrsDoc, stub]) {
+    task proActiveWar(type: Sync, dependsOn: [classes, stub, tasks.miredot]) {
         from "src/main/webapp"
 
         def schedulerNodeJar = project(":scheduler:scheduler-node").standaloneJar
@@ -151,7 +153,7 @@ project(':rest:rest-server') {
 project(':rest:rest-cli') {
 
     dependencies {
-        compile 'commons-cli:commons-cli:1.2'
+        compile 'commons-cli:commons-cli:1.3'
         compile 'commons-io:commons-io:2.4'
         compile 'jline:jline:2.11'
 
@@ -171,7 +173,7 @@ project(':rest:rest-client') {
     apply plugin: 'java-library-distribution'
 
     dependencies {
-        compile 'commons-cli:commons-cli:1.2'
+        compile 'commons-cli:commons-cli:1.3'
         compile 'commons-io:commons-io:2.4'
         compile 'jline:jline:2.11'
 
