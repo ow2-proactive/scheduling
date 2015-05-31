@@ -201,16 +201,16 @@ project(':scheduler:scheduler-api') {
         compile "org.objectweb.proactive:programming-extension-dataspaces:${programmingVersion}"
 
         compile 'it.sauronsoftware.cron4j:cron4j:2.2.5'
-        compile 'isorelax:isorelax:20030108'
         compile 'org.apache.commons:commons-collections4:4.0'
+        compile 'msv:isorelax:20050913'
         compile 'msv:msv:20050913'
         compile 'commons-io:commons-io:2.4'
 
         compile project(':common-api')
 
         runtime 'org.codehaus.woodstox:woodstox-core-lgpl:4.1.2'
+        runtime 'msv:relaxngDatatype:20050913'
         runtime 'msv:xsdlib:20050913'
-        runtime 'msv:relaxngDatatype:20030807'
         runtime 'xerces:xercesImpl:2.11.0'
     }
 
