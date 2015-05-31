@@ -183,7 +183,7 @@ project(':rest:rest-client') {
         compile project(":scheduler:scheduler-api")
         compile project(':rest:rest-api')
 
-        runtime 'xerces:xercesImpl:2.8.1'
+        runtime 'xerces:xercesImpl:2.11.0'
 
         testCompile functionalTestDependencies
         testCompile project(':rest:rest-server').sourceSets.test.output
