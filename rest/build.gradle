@@ -58,7 +58,7 @@ project(':rest:rest-server') {
         compile 'org.rrd4j:rrd4j:2.2.1'
         compile 'net.sf.dozer:dozer:5.4.0'
         compile 'commons-io:commons-io:2.4'
-        compile 'commons-codec:commons-codec:1.6'
+        compile 'commons-codec:commons-codec:1.10'
 
         compile 'com.netiq:websockify:1.6-proactive'
         compile 'io.netty:netty:3.3.0.Final'
