@@ -287,6 +287,7 @@ public class SchedulerTHelper {
 
         ProcessBuilder processBuilder = new ProcessBuilder(commandLine);
         processBuilder.redirectErrorStream(true);
+        processBuilder.environment().put(childProcessKiller.getCookieName(), childProcessKiller.getCookieValue());
         schedulerProcess = processBuilder.start();
 
         InputStreamReaderThread outputReader = new InputStreamReaderThread(schedulerProcess.getInputStream(),

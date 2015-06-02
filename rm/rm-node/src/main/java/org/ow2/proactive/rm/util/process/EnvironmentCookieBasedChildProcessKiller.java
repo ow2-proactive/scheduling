@@ -54,4 +54,11 @@ public class EnvironmentCookieBasedChildProcessKiller {
         });
     }
 
+    public String getCookieName() {
+        return cookieName;
+    }
+
+    public String getCookieValue() {
+        return cookieValue;
+    }
 }
