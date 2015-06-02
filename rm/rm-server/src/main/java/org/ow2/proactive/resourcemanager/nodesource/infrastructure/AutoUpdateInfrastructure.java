@@ -2,17 +2,11 @@ package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
 
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.ProActiveCounter;
-import org.ow2.proactive.authentication.crypto.Credentials;
-import org.ow2.proactive.resourcemanager.db.NodeSourceData;
-import org.ow2.proactive.resourcemanager.db.RMDBManager;
+
+import org.ow2.proactive.process_tree_killer.ProcessTree;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
-import org.ow2.proactive.resourcemanager.utils.RMNodeStarter;
-import org.ow2.proactive.rm.util.process.ProcessTreeKiller;
 import org.ow2.proactive.utils.Formatter;
-
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.security.KeyException;
@@ -128,7 +122,11 @@ public class AutoUpdateInfrastructure extends HostsFileBasedInfrastructureManage
             if (super.checkNodeIsAcquiredAndDo(nodeName, null, null)) {
                 //registration is ok, we destroy the process
                 logger.debug("Destroying the process: " + p);
-                ProcessTreeKiller.get().kill(p);
+                try {
+                    ProcessTree.get().get(p).kill();
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
                 return;
             }
 

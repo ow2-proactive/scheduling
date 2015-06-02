@@ -67,13 +67,13 @@ public class Environment {
      */
 
     public interface WinLibC extends Library {
-        public int _putenv(String name);
+        int _putenv(String name);
     }
 
     public interface LinuxLibC extends Library {
-        public int setenv(String name, String value, int overwrite);
+        int setenv(String name, String value, int overwrite);
 
-        public int unsetenv(String name);
+        int unsetenv(String name);
     }
 
     public static class POSIX {

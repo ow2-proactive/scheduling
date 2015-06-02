@@ -34,6 +34,14 @@
  */
 package functionaltests.taskkill;
 
+import org.apache.log4j.Level;
+
+import org.ow2.proactive.process_tree_killer.ProcessTree;
+import org.ow2.proactive.rm.util.process.OperatingSystem;
+import org.ow2.proactive.rm.util.process.OperatingSystemFamily;
+import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
+import org.ow2.proactive.scheduler.util.process.ThreadReader;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -41,14 +49,6 @@ import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.net.URISyntaxException;
 import java.util.Map;
-
-import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
-import org.ow2.proactive.rm.util.process.OperatingSystem;
-import org.ow2.proactive.rm.util.process.OperatingSystemFamily;
-import org.ow2.proactive.rm.util.process.ProcessTreeKiller;
-import org.ow2.proactive.scheduler.util.process.ThreadReader;
-import org.apache.log4j.Level;
 
 
 /**
@@ -88,7 +88,7 @@ public class JavaSpawnExecutable extends JavaExecutable {
     @Override
     public Serializable execute(TaskResult... results) throws Throwable {
 
-        org.apache.log4j.Logger.getLogger(ProcessTreeKiller.class).setLevel(Level.DEBUG);
+        org.apache.log4j.Logger.getLogger(ProcessTree.class).setLevel(Level.DEBUG);
         Process process = null;
 
         process = Runtime.getRuntime().exec(getNativeExecLauncher(false), null,

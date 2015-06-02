@@ -34,11 +34,12 @@
  */
 package org.ow2.proactive.scheduler.task.forked;
 
+import org.apache.log4j.Logger;
+
+import org.ow2.proactive.process_tree_killer.ProcessTree;
 import java.util.Collections;
 import java.util.Map;
-
-import org.ow2.proactive.rm.util.process.ProcessTreeKiller;
-import org.apache.log4j.Logger;
+import java.util.UUID;
 
 
 public class TaskProcessTreeKiller {
@@ -49,7 +50,7 @@ public class TaskProcessTreeKiller {
     private String ptkCookie;
 
     public TaskProcessTreeKiller(String taskId) {
-        ptkCookie = taskId + "_" + ProcessTreeKiller.createCookie();
+        ptkCookie = taskId + "_" + UUID.randomUUID().toString();
     }
 
     public void tagEnvironment(Map<String, String> env) {
@@ -58,7 +59,7 @@ public class TaskProcessTreeKiller {
 
     public void kill() {
         try {
-            ProcessTreeKiller.get().kill(Collections.singletonMap(PROCESS_KILLER_COOKIE, ptkCookie));
+            ProcessTree.get().killAll(Collections.singletonMap(PROCESS_KILLER_COOKIE, ptkCookie));
         } catch (Exception e) {
             logger.warn("Failed to kill child processes using cookie : " + ptkCookie, e);
         }
