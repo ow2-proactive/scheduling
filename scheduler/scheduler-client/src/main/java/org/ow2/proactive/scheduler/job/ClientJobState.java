@@ -93,6 +93,9 @@ public final class ClientJobState extends JobState {
                 "This task info is not applicable to this job. (expected job id is '" + getId() +
                     "' but got '" + taskInfo.getJobId() + "'");
         }
+        jobInfo.setNumberOfFinishedTasks(taskInfo.getJobInfo().getNumberOfFinishedTasks());
+        jobInfo.setNumberOfPendingTasks(taskInfo.getJobInfo().getNumberOfPendingTasks());
+        jobInfo.setNumberOfRunningTasks(taskInfo.getJobInfo().getNumberOfRunningTasks());
         try {
             tasks.get(taskInfo.getTaskId()).update(taskInfo);
         } catch (NullPointerException e) {
