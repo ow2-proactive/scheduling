@@ -36,10 +36,10 @@
  */
 package org.ow2.proactive.resourcemanager.utils;
 
-import org.apache.log4j.Logger;
-import org.ow2.proactive.jmx.RRDDataStore;
-import org.rrd4j.core.RrdDb;
-import org.rrd4j.core.Sample;
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Set;
 
 import javax.management.InstanceNotFoundException;
 import javax.management.IntrospectionException;
@@ -49,10 +49,11 @@ import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
 import javax.management.openmbean.CompositeDataSupport;
-import java.io.File;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Set;
+
+import org.ow2.proactive.jmx.RRDDataStore;
+import org.apache.log4j.Logger;
+import org.rrd4j.core.RrdDb;
+import org.rrd4j.core.Sample;
 
 
 /**
@@ -60,19 +61,19 @@ import java.util.Set;
  */
 public class RRDSigarDataStore extends RRDDataStore {
 
-    private final String[] objectNames = {"java.lang:type=OperatingSystem", "java.lang:type=Memory",
+    private static final String[] OBJECT_NAMES = { "java.lang:type=OperatingSystem", "java.lang:type=Memory",
             "java.lang:type=Threading", "java.lang:type=ClassLoading", "sigar:Type=CpuCoreUsage,Name=*",
             "sigar:Type=FileSystem,Name=*", "sigar:Type=CpuUsage", "sigar:Type=Mem",
-            "sigar:Type=NetInterface,Name=*", "sigar:Type=Swap"};
+            "sigar:Type=NetInterface,Name=*", "sigar:Type=Swap" };
 
-    private HashMap<String, String> compositeTypes = new HashMap<String, String>();
+    private HashMap<String, String> compositeTypes = new HashMap<>();
 
     private MBeanServer mbs;
 
     /**
      * Initializes a new RRD data base if it's not exist.
      *
-     * @param mbean            is the source of chronological data
+     * @param mbs            is the source of chronological data
      * @param dataBaseFilePath is the path to the file with the rrd data base
      * @param step             is the data base refresh period
      * @throws java.io.IOException is thrown when the data base exists but cannot be read
@@ -86,7 +87,7 @@ public class RRDSigarDataStore extends RRDDataStore {
 
         this.mbs = mbs;
 
-        for (String objectName : objectNames) {
+        for (String objectName : OBJECT_NAMES) {
             Set<ObjectName> realNames = mbs.queryNames(new ObjectName(objectName), null);
 
             for (ObjectName realObjectName : realNames) {
@@ -144,9 +145,8 @@ public class RRDSigarDataStore extends RRDDataStore {
         try {
 
             RrdDb dataBase = new RrdDb(dataBaseFile);
-            Sample sample = dataBase.createSample();
 
-            logger.debug("RRD data base configuration:\n" + dataBase.getRrdDef().dump());
+            logger.debug("RRD database configuration:\n" + dataBase.getRrdDef().dump());
 
             while (!terminate) {
                 synchronized (dataSources) {
@@ -156,49 +156,56 @@ public class RRDSigarDataStore extends RRDDataStore {
                     if (terminate) {
                         break;
                     }
-
-                    // updating the data base
-                    for (String dataSource : dataSources.keySet()) {
-                        String fullName = dataSources.get(dataSource);
-                        String[] names = fullName.split("-");
-                        String attrName = names[0];
-                        String objectName = names[1];
-
-                        try {
-                            Object attrValue = mbs.getAttribute(new ObjectName(objectName), attrName);
-
-                            if (attrValue instanceof CompositeDataSupport &&
-                                    compositeTypes.get(fullName) != null) {
-                                Object val = ((CompositeDataSupport) attrValue).get(compositeTypes
-                                        .get(fullName));
-                                if (val != null) {
-                                    attrValue = val;
-                                }
-                            }
-                            sample.setValue(dataSource, Double.parseDouble(attrValue.toString()));
-                            logger.trace(System.currentTimeMillis() / 1000 + " sampling: " + dataSource +
-                                    " / " + fullName + " " + Double.parseDouble(attrValue.toString()));
-                        } catch (NumberFormatException ex) {
-                            // do not save non-numeric values
-                            logger.trace("Non numeric value for " +
-                                    dataSource + " / " + fullName + ": " + ex.getMessage());
-
-                        } catch (Exception e) {
-                            logger.warn("Cannot read attribute " + attrName + " for object " + objectName + ": " + e.getMessage());
-                        }
-
-                        try {
-                            sample.setTime(System.currentTimeMillis() / 1000);
-                            sample.update();
-                        } catch (Exception e) {
-                            logger.warn("Cannot updated rrd database: " + e.getMessage());
-                        }
-                    }
+                    sample(dataBase, System.currentTimeMillis());
                 }
-                dataBase.close();
             }
+            dataBase.close();
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
+        }
+    }
+
+    // package protected for testing
+    void sample(RrdDb dataBase, long timeInMs) throws IOException {
+        Sample sample = dataBase.createSample();
+
+        // updating the data base
+        for (String dataSource : dataSources.keySet()) {
+            String fullName = dataSources.get(dataSource);
+            String[] names = fullName.split("-");
+            String attrName = names[0];
+            String objectName = names[1];
+
+            try {
+                Object attrValue = mbs.getAttribute(new ObjectName(objectName), attrName);
+
+                if (attrValue instanceof CompositeDataSupport && compositeTypes.get(fullName) != null) {
+                    Object val = ((CompositeDataSupport) attrValue).get(compositeTypes.get(fullName));
+                    if (val != null) {
+                        attrValue = val;
+                    }
+                }
+                sample.setValue(dataSource, Double.parseDouble(attrValue.toString()));
+                if (logger.isTraceEnabled()) {
+                    logger.trace(timeInMs / 1000 + " sampling: " + dataSource + " / " + fullName + " " +
+                        Double.parseDouble(attrValue.toString()));
+                }
+            } catch (NumberFormatException ex) {
+                // do not save non-numeric values
+                if (logger.isTraceEnabled()) {
+                    logger.trace("Non numeric value for " + dataSource + " / " + fullName + ": " +
+                        ex.getMessage());
+                }
+            } catch (Exception e) {
+                logger.warn("Cannot read attribute " + attrName + " for object " + objectName + ": " +
+                    e.getMessage());
+            }
+        }
+        try {
+            sample.setTime(timeInMs / 1000);
+            sample.update();
+        } catch (Exception e) {
+            logger.warn("Cannot update RRD database: " + e.getMessage());
         }
     }
 

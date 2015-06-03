@@ -62,7 +62,7 @@ public class RRDDataStore extends Thread {
     private StandardMBean mbean;
     protected int step = DEFAULT_STEP_IN_SECONDS; //secs
     protected String dataBaseFile;
-    protected HashMap<String, String> dataSources = new HashMap<String, String>();
+    protected final HashMap<String, String> dataSources = new HashMap<String, String>();
     protected volatile boolean terminate = false;
     protected Logger logger;
 
@@ -205,7 +205,7 @@ public class RRDDataStore extends Thread {
      */
     public byte[] getBytes() throws IOException {
         synchronized (dataSources) {
-            return FileToBytesConverter.convertFileToByteArray(new File(dataBaseFile.toString()));
+            return FileToBytesConverter.convertFileToByteArray(new File(dataBaseFile));
         }
     }
 
