@@ -603,6 +603,29 @@ public interface SchedulerRestInterface {
             NotConnectedRestException, PermissionRestException, SubmissionClosedRestException, IOException;
 
     /**
+     * Submits a workflow to the scheduler from a workflow URL,
+     * creating hence a new job resource.
+     *
+     * @param sessionId a valid session id
+     * @param url url to the workflow content
+     * @param pathSegment variables of the workflow
+     * @return the <code>jobid</code> of the newly created job
+     * @throws NotConnectedRestException
+     * @throws IOException
+     * @throws JobCreationRestException
+     * @throws PermissionRestException
+     * @throws SubmissionClosedRestException
+     */
+    @POST
+    @Path("jobs")
+    @Produces("application/json")
+    public JobIdData submitFromUrl(@HeaderParam("sessionid")
+    String sessionId, @HeaderParam("link")
+    String url, @PathParam("path")
+    PathSegment pathSegment) throws JobCreationRestException, NotConnectedRestException,
+    PermissionRestException, SubmissionClosedRestException, IOException;
+
+    /**
      * Pushes a file from the local file system into the given DataSpace
      * @param sessionId a valid session id
      * @param spaceName the name of the DataSpace

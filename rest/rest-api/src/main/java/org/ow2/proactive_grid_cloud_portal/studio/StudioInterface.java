@@ -104,6 +104,18 @@ public interface StudioInterface {
     Workflow createWorkflow(@HeaderParam("sessionid")
     String sessionId, Workflow workflow) throws NotConnectedRestException, IOException;
 
+    @GET
+    @Path("workflows/{id}")
+    @Produces(APPLICATION_JSON)
+    Workflow getWorkflow(@HeaderParam("sessionid")
+    String sessionId, @PathParam("id") String workflowId) throws NotConnectedRestException, IOException;
+
+    @GET
+    @Path("workflows/{id}/content")
+    @Produces(APPLICATION_JSON)
+    String getWorkflowContent(@HeaderParam("sessionid")
+    String sessionId, @PathParam("id") String workflowId) throws NotConnectedRestException, IOException;
+
     @PUT
     @Path("workflows/{id}")
     @Consumes(APPLICATION_JSON)
@@ -127,6 +139,18 @@ public interface StudioInterface {
     @Consumes(APPLICATION_JSON)
     Workflow createTemplate(@HeaderParam("sessionid")
     String sessionId, Workflow template) throws NotConnectedRestException, IOException;
+
+    @GET
+    @Path("templates/{id}")
+    @Produces(APPLICATION_JSON)
+    Workflow getTemplate(@HeaderParam("sessionid")
+    String sessionId, @PathParam("id") String templateId) throws NotConnectedRestException, IOException;
+
+    @GET
+    @Path("templates/{id}/content")
+    @Produces(APPLICATION_JSON)
+    String getTemplateContent(@HeaderParam("sessionid")
+    String sessionId, @PathParam("id") String templateId) throws NotConnectedRestException, IOException;
 
     @PUT
     @Path("templates/{id}")
