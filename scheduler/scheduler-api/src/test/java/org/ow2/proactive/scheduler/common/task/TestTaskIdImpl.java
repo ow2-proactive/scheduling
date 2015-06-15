@@ -64,7 +64,11 @@ public class TestTaskIdImpl {
 
         TaskId taskId = TaskIdImpl.createTaskId(jobId, "task", 1, true);
 
-        Assert.assertEquals(Long.toString(jobIdValue * scaleFactorValue + 1), taskId.value());
+        long expectedValue = jobIdValue * scaleFactorValue + 1;
+
+        Assert.assertTrue(expectedValue > 0);
+        Assert.assertTrue(Long.parseLong(taskId.value()) > 0);
+        Assert.assertEquals(Long.toString(expectedValue), taskId.value());
     }
 
 }
