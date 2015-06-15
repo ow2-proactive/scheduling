@@ -167,48 +167,28 @@ public class SchedulerRestWorkflowFromCatalogExecutionTest extends RestTestServe
     }
 
 
-    @Test
+    @Test(expected = JobCreationRestException.class)
     public void testWhenSubmittingACorruptWorkflowThenThrowException() throws Exception {
         String workflowUrl = getBaseUriTestWorkflowsServer() + "/corrupt";
-        try {
-            schedulerRest.submitFromUrl(sessionId, workflowUrl, getEmptyPathSegment());
-            fail();
-        } catch (JobCreationRestException e) {
-            // Expected
-        }
+        schedulerRest.submitFromUrl(sessionId, workflowUrl, getEmptyPathSegment());
     }
 
-    @Test
+    @Test(expected = IOException.class)
     public void testWhenSubmittingUsingAnInvalidWorkflowUrlThenThrowException() throws Exception {
         String workflowUrl = getBaseUriTestWorkflowsServer() + "/nonexistent";
-        try {
-            schedulerRest.submitFromUrl(sessionId, workflowUrl, getEmptyPathSegment());
-            fail();
-        } catch (IOException e) {
-            // Expected
-        }
+        schedulerRest.submitFromUrl(sessionId, workflowUrl, getEmptyPathSegment());
     }
 
-    @Test
+    @Test(expected = JobCreationRestException.class)
     public void testWhenSubmittingUsingANullWorkflowUrlThenThrowException() throws Exception {
         String workflowUrl = null;
-        try {
-            schedulerRest.submitFromUrl(sessionId, workflowUrl, getEmptyPathSegment());
-            fail();
-        } catch (JobCreationRestException e) {
-            // Expected
-        }
+        schedulerRest.submitFromUrl(sessionId, workflowUrl, getEmptyPathSegment());
     }
 
-    @Test
+    @Test(expected = NotConnectedRestException.class)
     public void testWhenExceptionSubmittingATemplateWithoutValidSessionIdThenThrowException() throws Exception {
         String sessionId = "invalidSessionId";
-        try {
-            schedulerRest.submitFromUrl(sessionId, null, getEmptyPathSegment());
-            fail();
-        } catch (NotConnectedRestException e) {
-            // Expected
-        }
+        schedulerRest.submitFromUrl(sessionId, null, getEmptyPathSegment());
     }
 
     private String getBaseUriTestWorkflowsServer() {

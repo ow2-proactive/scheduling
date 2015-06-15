@@ -48,7 +48,7 @@ import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 
-public class WorkflowDownloader {
+public class HttpResourceDownloader {
 
     private static final Integer CONNECTION_POOL_SIZE = 5;
 
@@ -68,7 +68,8 @@ public class WorkflowDownloader {
             ResteasyWebTarget target = client.target(url);
             response = target.request().header("sessionid", sessionId).get();
             if (responseIsNotHttpOk(response)) {
-                throw new IOException(String.format("Cannot access resource %s: code %d", url, response.getStatus()));
+                throw new IOException(String.format(
+                        "Cannot access resource %s: code %d", url, response.getStatus()));
             }
             return (T) response.readEntity(clazz);
         } finally {

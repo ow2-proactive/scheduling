@@ -40,6 +40,7 @@ import com.google.common.collect.Maps;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.vfs2.*;
 import org.apache.log4j.Logger;
 import org.atmosphere.cpr.AtmosphereResource;
@@ -1493,7 +1494,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      */
     @Override
     @POST
-    @Path("jobs")
+    @Path("{path:jobs}")
     @Produces("application/json")
     public JobIdData submitFromUrl(
             @HeaderParam("sessionid") String sessionId,
@@ -1515,11 +1516,10 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
             return mapper.map(jobId, JobIdData.class);
         } catch (IOException e) {
-            throw new IOException("I/O Error: " + e.getMessage(), e);
+            throw new IOException("Cannot save temporary job file on submission: " +
+                    e.getMessage(), e);
         } finally {
-            if (tmpWorkflowFile != null) {
-                tmpWorkflowFile.delete();
-            }
+            FileUtils.deleteQuietly(tmpWorkflowFile);
         }
     }
 
@@ -2570,10 +2570,10 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             String sessionId,
             String workflowUrl
     ) throws JobCreationRestException, IOException {
-        WorkflowDownloader workflowDownloader = new WorkflowDownloader();
-        if (workflowUrl == null || workflowUrl.isEmpty())
-            throw new JobCreationRestException("Cannot create workflow without workflowUrl");
-        return workflowDownloader.getResource(sessionId, workflowUrl, String.class);
+        if (StringUtils.isBlank(workflowUrl))
+            throw new JobCreationRestException("Cannot create workflow without url");
+        HttpResourceDownloader httpResourceDownloader = new HttpResourceDownloader();
+        return httpResourceDownloader.getResource(sessionId, workflowUrl, String.class);
     }
 
     private Map<String, String> getWorkflowVariablesFromPathSegment(PathSegment pathSegment) {
@@ -2588,8 +2588,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         return variables;
     }
 
-    private boolean isXmlWorkflow(InputPart part1) {
-        return part1.getMediaType().toString().toLowerCase().contains(MediaType.APPLICATION_XML.toLowerCase());
+    private boolean isXmlWorkflow(InputPart fileInputPart) {
+        return fileInputPart.getMediaType().toString().
+                toLowerCase().contains(MediaType.APPLICATION_XML.toLowerCase());
     }
 
 }
