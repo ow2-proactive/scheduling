@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2012 INRIA/University of
+ * Copyright (C) 1997-2015 INRIA/University of
  *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -32,39 +32,43 @@
  *  Contributor(s):
  *
  * ################################################################
- * $$ACTIVEEON_INITIAL_DEV$$
+ * $$PROACTIVE_INITIAL_DEV$$
  */
+package org.ow2.proactive.scheduler.common.task;
 
-package org.ow2.proactive_grid_cloud_portal.scheduler.dto;
+import org.junit.Assert;
+import org.junit.Test;
 
-public class TaskIdData {
+import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.proactive.scheduler.job.JobIdImpl;
+import org.ow2.proactive.scheduler.task.TaskIdImpl;
 
-    private long id;
 
-    private String readableName;
+public class TestTaskIdImpl {
 
-    public long getId() {
-        return id;
-    }
+    /**
+     * Test related to issue ow2-proactive/scheduling#1993
+     * <p/>
+     * Integer overflow can occur if scaleFactor or jobId is not a long.
+     */
+    @Test
+    public void testIntegerOverflowWithTaskId() {
+        long jobIdValue = 4;
+        int scaleFactorValue = 1073741823;
 
-    public void setId(long id) {
-        this.id = id;
-    }
+        PASchedulerProperties.JOB_FACTOR.updateProperty(Integer.toString(scaleFactorValue));
 
-    public String getReadableName() {
-        return readableName;
-    }
+        JobId jobId =
+                new JobIdImpl(jobIdValue, "job");
 
-    public void setReadableName(String readableName) {
-        this.readableName = readableName;
-    }
+        TaskId taskId = TaskIdImpl.createTaskId(jobId, "task", 1, true);
 
-    @Override
-    public String toString() {
-        return "TaskIdData{" +
-                "id=" + id +
-                ", readableName='" + readableName + '\'' +
-                '}';
+        long expectedValue = jobIdValue * scaleFactorValue + 1;
+
+        Assert.assertTrue(expectedValue > 0);
+        Assert.assertTrue(Long.parseLong(taskId.value()) > 0);
+        Assert.assertEquals(Long.toString(expectedValue), taskId.value());
     }
 
 }
