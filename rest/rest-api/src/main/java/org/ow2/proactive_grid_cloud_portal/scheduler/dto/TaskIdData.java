@@ -40,6 +40,7 @@ package org.ow2.proactive_grid_cloud_portal.scheduler.dto;
 public class TaskIdData {
 
     private long id;
+
     private String readableName;
 
     public long getId() {
@@ -57,4 +58,13 @@ public class TaskIdData {
     public void setReadableName(String readableName) {
         this.readableName = readableName;
     }
+
+    @Override
+    public String toString() {
+        return "TaskIdData{" +
+                "id=" + id +
+                ", readableName='" + readableName + '\'' +
+                '}';
+    }
+
 }
