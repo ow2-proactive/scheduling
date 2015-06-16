@@ -156,7 +156,7 @@ public class StudioRest implements StudioInterface {
     }
 
     @Override
-    public String getWorkflowContent(@HeaderParam("sessionid") String sessionId,
+    public String getWorkflowXmlContent(@HeaderParam("sessionid") String sessionId,
     @PathParam("id") String workflowId) throws NotConnectedRestException, IOException {
         String userName = getUserName(sessionId);
         return getFileStorageSupport().getWorkflowStorage(userName).read(workflowId).getXml();
@@ -199,7 +199,7 @@ public class StudioRest implements StudioInterface {
     }
 
     @Override
-    public String getTemplateContent(@HeaderParam("sessionid") String sessionId,
+    public String getTemplateXmlContent(@HeaderParam("sessionid") String sessionId,
     @PathParam("id") String templateId) throws NotConnectedRestException, IOException {
         return getFileStorageSupport().getTemplateStorage().read(templateId).getXml();
     }
