@@ -26,6 +26,16 @@ To start a node:
 
     $> ./bin/proactive-node -r SCHEDULER_URL
 
+## Building from sources
+
+You can build a distribution that contains all binaries with `gradle build`.
+
+This will produce the following archives:
+
+    build/distributions/
+    ├── scheduling-XXXXX-SNAPSHOT.tar
+    └── scheduling-XXXXX-SNAPSHOT.zip
+
 ## Documentation
 
 http://doc.activeeon.com
