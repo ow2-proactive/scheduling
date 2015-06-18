@@ -52,10 +52,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.PathSegment;
 
 import org.apache.commons.io.FileUtils;
-import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.core.node.NodeException;
-import org.ow2.proactive.resourcemanager.exception.RMException;
-import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 import org.ow2.proactive_grid_cloud_portal.common.Session;
 import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStore;
@@ -153,6 +149,20 @@ public class StudioRest implements StudioInterface {
     }
 
     @Override
+    public Workflow getWorkflow(@HeaderParam("sessionid") String sessionId,
+    @PathParam("id") String workflowId) throws NotConnectedRestException, IOException {
+        String userName = getUserName(sessionId);
+        return getFileStorageSupport().getWorkflowStorage(userName).read(workflowId);
+    }
+
+    @Override
+    public String getWorkflowXmlContent(@HeaderParam("sessionid") String sessionId,
+    @PathParam("id") String workflowId) throws NotConnectedRestException, IOException {
+        String userName = getUserName(sessionId);
+        return getFileStorageSupport().getWorkflowStorage(userName).read(workflowId).getXml();
+    }
+
+    @Override
     public Workflow updateWorkflow(@HeaderParam("sessionid")
     String sessionId, @PathParam("id")
     String workflowId, Workflow workflow) throws NotConnectedRestException, IOException {
@@ -180,6 +190,18 @@ public class StudioRest implements StudioInterface {
     public Workflow createTemplate(@HeaderParam("sessionid")
     String sessionId, Workflow template) throws NotConnectedRestException, IOException {
         return getFileStorageSupport().getTemplateStorage().store(template);
+    }
+
+    @Override
+    public Workflow getTemplate(@HeaderParam("sessionid") String sessionId,
+    @PathParam("id") String templateId) throws NotConnectedRestException, IOException {
+        return getFileStorageSupport().getTemplateStorage().read(templateId);
+    }
+
+    @Override
+    public String getTemplateXmlContent(@HeaderParam("sessionid") String sessionId,
+    @PathParam("id") String templateId) throws NotConnectedRestException, IOException {
+        return getFileStorageSupport().getTemplateStorage().read(templateId).getXml();
     }
 
     @Override

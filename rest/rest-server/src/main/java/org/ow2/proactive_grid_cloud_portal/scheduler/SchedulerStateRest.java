@@ -40,6 +40,7 @@ import com.google.common.collect.Maps;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.vfs2.*;
 import org.apache.log4j.Logger;
 import org.atmosphere.cpr.AtmosphereResource;
@@ -69,7 +70,6 @@ import org.ow2.proactive.scheduler.common.*;
 import org.ow2.proactive.scheduler.common.exception.*;
 import org.ow2.proactive.scheduler.common.job.*;
 import org.ow2.proactive.scheduler.common.job.factories.FlatJobFactory;
-import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
@@ -1479,6 +1479,51 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     /**
+     * Submits a workflow to the scheduler from a workflow URL,
+     * creating hence a new job resource.
+     *
+     * @param sessionId a valid session id
+     * @param url url to the workflow content
+     * @param pathSegment variables of the workflow
+     * @return the <code>jobid</code> of the newly created job
+     * @throws NotConnectedRestException
+     * @throws IOException
+     * @throws JobCreationRestException
+     * @throws PermissionRestException
+     * @throws SubmissionClosedRestException
+     */
+    @Override
+    @POST
+    @Path("{path:jobs}")
+    @Produces("application/json")
+    public JobIdData submitFromUrl(
+            @HeaderParam("sessionid") String sessionId,
+            @HeaderParam("link") String url,
+            @PathParam("path") PathSegment pathSegment
+    ) throws JobCreationRestException, NotConnectedRestException, PermissionRestException, SubmissionClosedRestException, IOException {
+        Scheduler s = checkAccess(sessionId, "jobs");
+
+        File tmpWorkflowFile = null;
+        try {
+            String jobXml = downloadWorkflowContent(sessionId, url);
+            tmpWorkflowFile = File.createTempFile("job", "d");
+            IOUtils.write(jobXml, new FileOutputStream(tmpWorkflowFile));
+
+            WorkflowSubmitter workflowSubmitter = new WorkflowSubmitter(s);
+            JobId jobId = workflowSubmitter.submit(
+                    tmpWorkflowFile,
+                    getWorkflowVariablesFromPathSegment(pathSegment));
+
+            return mapper.map(jobId, JobIdData.class);
+        } catch (IOException e) {
+            throw new IOException("Cannot save temporary job file on submission: " +
+                    e.getMessage(), e);
+        } finally {
+            FileUtils.deleteQuietly(tmpWorkflowFile);
+        }
+    }
+
+    /**
      * Submits a job to the scheduler
      *
      * @param sessionId
@@ -1502,74 +1547,33 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             Map<String, List<InputPart>> formDataMap = multipart.getFormDataMap();
 
             String name = formDataMap.keySet().iterator().next();
-            File tmp = null;
+            File tmpJobFile = null;
             try {
 
                 InputPart part1 = multipart.getFormDataMap().get(name).get(0); // "file"
                 // is the name of the browser's input field
-                InputStream is = part1.getBody(new GenericType<InputStream>() {
-                });
-                tmp = File.createTempFile("job", "d");
+                InputStream is = part1.getBody(new GenericType<InputStream>() {});
+                tmpJobFile = File.createTempFile("job", "d");
 
-                IOUtils.copy(is, new FileOutputStream(tmp));
+                IOUtils.copy(is, new FileOutputStream(tmpJobFile));
 
-                Map<String, String> variables = null;
-                MultivaluedMap<String, String> matrixParams = pathSegment.getMatrixParameters();
-                if (matrixParams != null && !matrixParams.isEmpty()) {
-                    variables = Maps.newHashMap();
-                    for (String key : matrixParams.keySet()) {
-                        variables.put(key, matrixParams.getFirst(key));
-                    }
-                }
+                Map<String, String> jobVariables = getWorkflowVariablesFromPathSegment(pathSegment);
+                Boolean isXml = isXmlWorkflow(part1);
 
-                Job j;
-                boolean isAnArchive = false;
-                if (part1.getMediaType().toString().toLowerCase()
-                        .contains(MediaType.APPLICATION_XML.toLowerCase())) {
-                    // the job sent is the xml file
-                    j = JobFactory.getFactory().createJob(tmp.getAbsolutePath(), variables);
-                } else {
-                    // it is a job archive
-                    j = JobFactory.getFactory().createJobFromArchive(tmp.getAbsolutePath(), variables);
-                    isAnArchive = true;
-                }
+                WorkflowSubmitter workflowSubmitter = new WorkflowSubmitter(s);
 
-                JobId jobid = s.submit(j);
+                JobId jobId = workflowSubmitter.submit(tmpJobFile, isXml, jobVariables);
 
-                File archiveToStore = new File(PortalConfiguration.jobIdToPath(jobid.value()));
-                if (isAnArchive) {
-                    logger.debug("saving archive to " + archiveToStore.getAbsolutePath());
-                    tmp.renameTo(archiveToStore);
-                } else {
-                    // the job is not an archive, however an archive file can
-                    // exist for this new job (due to an old submission)
-                    // In that case, we remove the existing file preventing erronous
-                    // access
-                    // to this previously submitted archive.
-
-                    if (archiveToStore.exists()) {
-                        archiveToStore.delete();
-                    }
-                }
-
-                return mapper.map(jobid, JobIdData.class);
+                return mapper.map(jobId, JobIdData.class);
 
             } finally {
-                if (tmp != null) {
+                if (tmpJobFile != null) {
                     // clean the temporary file
-                    tmp.delete();
+                    tmpJobFile.delete();
                 }
             }
         } catch (IOException e) {
             throw new IOException("I/O Error: " + e.getMessage(), e);
-        } catch (JobCreationException e) {
-            throw new JobCreationRestException(e);
-        } catch (NotConnectedException e) {
-            throw new NotConnectedRestException(e);
-        } catch (SubmissionClosedException e) {
-            throw new SubmissionClosedRestException(e);
-        } catch (PermissionException e) {
-            throw new PermissionRestException(e);
         }
     }
 
@@ -2561,4 +2565,32 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     public Response index() throws URISyntaxException {
         return Response.seeOther(new URI("doc/jaxrsdocs/scheduler/index.html")).build();
     }
+
+    private String downloadWorkflowContent(
+            String sessionId,
+            String workflowUrl
+    ) throws JobCreationRestException, IOException {
+        if (StringUtils.isBlank(workflowUrl))
+            throw new JobCreationRestException("Cannot create workflow without url");
+        HttpResourceDownloader httpResourceDownloader = new HttpResourceDownloader();
+        return httpResourceDownloader.getResource(sessionId, workflowUrl, String.class);
+    }
+
+    private Map<String, String> getWorkflowVariablesFromPathSegment(PathSegment pathSegment) {
+        Map<String, String> variables = null;
+        MultivaluedMap<String, String> matrixParams = pathSegment.getMatrixParameters();
+        if (matrixParams != null && !matrixParams.isEmpty()) {
+            variables = Maps.newHashMap();
+            for (String key : matrixParams.keySet()) {
+                variables.put(key, matrixParams.getFirst(key));
+            }
+        }
+        return variables;
+    }
+
+    private boolean isXmlWorkflow(InputPart fileInputPart) {
+        return fileInputPart.getMediaType().toString().
+                toLowerCase().contains(MediaType.APPLICATION_XML.toLowerCase());
+    }
+
 }

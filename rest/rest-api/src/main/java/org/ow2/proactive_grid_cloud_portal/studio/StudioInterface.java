@@ -51,7 +51,6 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.PathSegment;
 import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
@@ -66,6 +65,7 @@ import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import static javax.ws.rs.core.MediaType.APPLICATION_XML;
 
 
 @Path("/studio")
@@ -104,6 +104,18 @@ public interface StudioInterface {
     Workflow createWorkflow(@HeaderParam("sessionid")
     String sessionId, Workflow workflow) throws NotConnectedRestException, IOException;
 
+    @GET
+    @Path("workflows/{id}")
+    @Produces(APPLICATION_JSON)
+    Workflow getWorkflow(@HeaderParam("sessionid")
+    String sessionId, @PathParam("id") String workflowId) throws NotConnectedRestException, IOException;
+
+    @GET
+    @Path("workflows/{id}/xml")
+    @Produces(APPLICATION_XML)
+    String getWorkflowXmlContent(@HeaderParam("sessionid")
+    String sessionId, @PathParam("id") String workflowId) throws NotConnectedRestException, IOException;
+
     @PUT
     @Path("workflows/{id}")
     @Consumes(APPLICATION_JSON)
@@ -127,6 +139,18 @@ public interface StudioInterface {
     @Consumes(APPLICATION_JSON)
     Workflow createTemplate(@HeaderParam("sessionid")
     String sessionId, Workflow template) throws NotConnectedRestException, IOException;
+
+    @GET
+    @Path("templates/{id}")
+    @Produces(APPLICATION_JSON)
+    Workflow getTemplate(@HeaderParam("sessionid")
+    String sessionId, @PathParam("id") String templateId) throws NotConnectedRestException, IOException;
+
+    @GET
+    @Path("templates/{id}/xml")
+    @Produces(APPLICATION_XML)
+    String getTemplateXmlContent(@HeaderParam("sessionid")
+    String sessionId, @PathParam("id") String templateId) throws NotConnectedRestException, IOException;
 
     @PUT
     @Path("templates/{id}")
