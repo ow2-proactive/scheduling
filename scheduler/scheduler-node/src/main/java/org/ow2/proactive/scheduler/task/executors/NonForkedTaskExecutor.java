@@ -45,6 +45,7 @@ import org.ow2.proactive.scheduler.task.TaskContext;
 import org.ow2.proactive.scheduler.task.TaskLauncherInitializer;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.script.ScriptExecutableContainer;
+import org.ow2.proactive.scheduler.task.utils.Substitutor;
 import org.ow2.proactive.scripting.*;
 
 import java.io.*;
@@ -226,70 +227,51 @@ public class NonForkedTaskExecutor implements TaskExecutor {
     }
 
     static void replaceScriptParameters(Script script, Map<String, String> thirdPartyCredentials,
-      Map<String, Serializable> variables) {
+                                        Map<String, Serializable> variables, PrintStream errorStream) {
 
-        Map<String, String> replacements = buildReplacements(variables);
+        Map<String, String> replacements = Substitutor.buildSubstitutes(variables);
 
         for (Map.Entry<String, String> credentialEntry : thirdPartyCredentials.entrySet()) {
             replacements.put(CREDENTIALS_KEY_PREFIX + credentialEntry.getKey(), credentialEntry.getValue());
         }
 
-        performReplacements(script, replacements);
+        replace(script, replacements, errorStream);
     }
 
-    // TODO to extract
-    public static Map<String, String> buildReplacements(Map<String, Serializable> variables) {
-        Map<String, String> replacements = new HashMap<>();
-        if (variables != null) {
-            for (Map.Entry<String, Serializable> variable : variables.entrySet()) {
-                replacements.put("$" + variable.getKey(), variable.getValue().toString());
-                replacements.put("${" + variable.getKey() + "}", variable.getValue().toString());
-            }
-        }
-        return replacements;
-    }
-
-    static void performReplacements(Script script, Map<String, String> replacements) {
+    public static void replace(Script script, Map<String, String> substitutes, PrintStream errorStream) {
         if (script != null) {
             if ("java".equals(script.getEngineName())) {
                 try {
-                    Map<String, Serializable> deserializedArgs = SerializationUtil
-                            .deserializeVariableMap((Map<String, byte[]>) script.getParameters()[0]);
+                    @SuppressWarnings("unchecked")
+                    Map<String, Serializable> deserializedArgs =
+                            SerializationUtil.deserializeVariableMap(
+                                    (Map<String, byte[]>) script.getParameters()[0]);
                     for (Map.Entry<String, Serializable> deserializedArg : deserializedArgs.entrySet()) {
                         if (deserializedArg.getValue() instanceof String) {
                             deserializedArg.setValue(
-                              replace((String) deserializedArg.getValue(), replacements));
+                                    Substitutor.replace((String) deserializedArg.getValue(), substitutes));
                         }
                     }
                     script.getParameters()[0] = new HashMap<>(
                             SerializationUtil.serializeVariableMap(deserializedArgs));
                 } catch (Exception e) {
-                    System.err.println("Could read Java parameters");
-                    e.printStackTrace(System.err);
+                    errorStream.println("Cannot read Java parameters");
+                    e.printStackTrace(errorStream);
                 }
             } else if ("native".equals(script.getEngineName())) { // to replace script arguments
-                script.setScript(replace(script.getScript(), replacements));
+                script.setScript(Substitutor.replace(script.getScript(), substitutes));
             } else {
                 Serializable[] args = script.getParameters();
 
                 if (args != null) {
                     for (int i = 0; i < args.length; i++) {
                         if (args[i] instanceof String) {
-                            args[i] = replace((String) args[i], replacements);
+                            args[i] = Substitutor.replace((String) args[i], substitutes);
                         }
                     }
                 }
             }
         }
-    }
-
-    // TODO to extract
-    public static String replace(String input, Map<String, String> replacements) {
-        String output = input;
-        for (Map.Entry<String, String> replacement : replacements.entrySet()) {
-            output = output.replace(replacement.getKey(), replacement.getValue());
-        }
-        return output;
     }
 
     private Serializable execute(TaskContext container, PrintStream output, PrintStream error,
@@ -301,7 +283,7 @@ public class NonForkedTaskExecutor implements TaskExecutor {
 
         Script<Serializable> script = ((ScriptExecutableContainer) container.getExecutableContainer())
                 .getScript();
-        replaceScriptParameters(script, thirdPartyCredentials, variables);
+        replaceScriptParameters(script, thirdPartyCredentials, variables, error);
         ScriptResult<Serializable> scriptResult = scriptHandler.handle(script, output, error);
 
         if (scriptResult.errorOccured()) {
@@ -310,7 +292,7 @@ public class NonForkedTaskExecutor implements TaskExecutor {
         }
 
         if (container.getPostScript() != null) {
-            replaceScriptParameters(container.getPostScript(), thirdPartyCredentials, variables);
+            replaceScriptParameters(container.getPostScript(), thirdPartyCredentials, variables, error);
             ScriptResult postScriptResult = scriptHandler.handle(container.getPostScript(), output, error);
             if (postScriptResult.errorOccured()) {
                 throw new Exception("Failed to execute post script", postScriptResult.getException());
@@ -320,7 +302,7 @@ public class NonForkedTaskExecutor implements TaskExecutor {
     }
 
     static ScriptResult executeScript(PrintStream output, PrintStream error, ScriptHandler scriptHandler, Map<String, String> thirdPartyCredentials, Map<String, Serializable> variables, Script<?> script) throws Exception {
-        replaceScriptParameters(script, thirdPartyCredentials, variables);
+        replaceScriptParameters(script, thirdPartyCredentials, variables, error);
         ScriptResult scriptResult = scriptHandler.handle(script, output, error);
         if (scriptResult.errorOccured()) {
             throw new Exception("Failed to execute script", scriptResult.getException());

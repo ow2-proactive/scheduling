@@ -41,7 +41,7 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
-import org.ow2.proactive.scheduler.task.executors.NonForkedTaskExecutor;
+import org.ow2.proactive.scheduler.task.utils.Substitutor;
 import org.ow2.proactive.scripting.Script;
 
 import java.io.Serializable;
@@ -377,7 +377,7 @@ public class TaskLauncherInitializer implements Serializable {
         List<InputSelector> filteredTaskInputFiles = new ArrayList<>();
         if (taskInputFiles != null) {
 
-            Map<String, String> replacements = NonForkedTaskExecutor.buildReplacements(variables);
+            Map<String, String> replacements = Substitutor.buildSubstitutes(variables);
             for (InputSelector is : taskInputFiles) {
                 InputSelector filteredInputSelector = new InputSelector(is.getInputFiles(), is.getMode());
                 Set<String> includes = filteredInputSelector.getInputFiles().getIncludes();
@@ -398,7 +398,7 @@ public class TaskLauncherInitializer implements Serializable {
         Set<String> filteredIncludes = new HashSet<>();
         if (selectors != null) {
             for (String include : selectors) {
-                filteredIncludes.add(NonForkedTaskExecutor.replace(include, replacements));
+                filteredIncludes.add(Substitutor.replace(include, replacements));
             }
         }
         return filteredIncludes;
@@ -408,7 +408,7 @@ public class TaskLauncherInitializer implements Serializable {
         List<OutputSelector> filteredTaskOutputFiles = new ArrayList<>();
         if (taskOutputFiles != null) {
 
-            Map<String, String> replacements = NonForkedTaskExecutor.buildReplacements(variables);
+            Map<String, String> replacements = Substitutor.buildSubstitutes(variables);
             for (OutputSelector is : taskOutputFiles) {
                 OutputSelector filteredOutputSelector = new OutputSelector(is.getOutputFiles(), is.getMode());
                 Set<String> includes = filteredOutputSelector.getOutputFiles().getIncludes();
