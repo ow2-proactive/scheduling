@@ -36,44 +36,39 @@
  */
 package org.ow2.proactive.scheduler.examples;
 
-import javax.swing.JPanel;
-
-import org.ow2.proactive.scheduler.common.task.ResultPreview;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.ow2.proactive.scheduler.common.task.util.ResultPreviewTool;
-import org.ow2.proactive.scheduler.common.task.util.ResultPreviewTool.SimpleImagePanel;
+import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
+import java.io.Serializable;
 
 
 /**
+ * Throw RuntimeException if replicationId argument is 1, otherwise sleep for 30
+ * seconds and exit normally.
+ * 
  * @author The ProActive Team
- * @since 2.2
+ * @since ProActive Scheduling 3.1
  */
-public class DenoisePreview extends ResultPreview {
-    private static final String MATCH_PATTERN = "Saving output image '";
+public class FailTaskConditionally extends JavaExecutable {
 
-    /**
-     * @see org.ow2.proactive.scheduler.common.task.ResultPreview#getGraphicalDescription(org.ow2.proactive.scheduler.common.task.TaskResult)
-     */
+    public static final String EXCEPTION_MESSAGE = "Faulty task exception";
+
     @Override
-    public JPanel getGraphicalDescription(TaskResult r) {
-        String path = this.getPathToImage(r.getOutput().getStderrLogs(false));
-        System.out.println("[RESULT_DESCRIPTOR] Displaying " + path);
-        return new SimpleImagePanel(path);
+    public Serializable execute(TaskResult... results) throws Throwable {
+        getOut().println("it=" + getVariables());
+
+        if (getReplicationIndex() == 1) {
+            try {
+                getOut().println("I will throw a runtime exception in 3 sec");
+                Thread.sleep(3000);
+            } finally {
+                throw new RuntimeException(EXCEPTION_MESSAGE);
+            }
+
+        } else {
+            getOut().println("I will sleep for 10 seconds");
+            Thread.sleep(10000);
+            return "Nothing";
+        }
     }
 
-    /**
-     * @see org.ow2.proactive.scheduler.common.task.ResultPreview#getTextualDescription(org.ow2.proactive.scheduler.common.task.TaskResult)
-     */
-    @Override
-    public String getTextualDescription(TaskResult r) {
-        return this.getPathToImage(r.getOutput().getStderrLogs(false));
-    }
-
-    private String getPathToImage(String output) {
-        int pos = output.indexOf(MATCH_PATTERN, 0);
-        pos += MATCH_PATTERN.length();
-        String extracted = output.substring(pos, output.indexOf('\'', pos));
-        extracted = ResultPreviewTool.getSystemCompliantPath(extracted);
-        return extracted;
-    }
 }

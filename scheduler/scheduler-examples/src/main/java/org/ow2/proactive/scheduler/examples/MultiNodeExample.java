@@ -27,44 +27,35 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  *
- *  Initial developer(s):               The ActiveEon Team
- *                        http://www.activeeon.com/
+ *  Initial developer(s):               The ProActive Team
+ *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s):
  *
  * ################################################################
- * $$ACTIVEEON_INITIAL_DEV$$
+ * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.ow2.proactive.scheduler.examples;
 
-import java.io.Serializable;
-
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
+import java.io.Serializable;
 
 
 /**
- * Simple executable that returns <code>1 + sum(parameters)</code> as result
- * 
- * 
+ * Multi-nodes Example.
+ *
  * @author The ProActive Team
- * @since ProActive Scheduling 2.2
- * 
+ * @since ProActive Scheduling 1.1
  */
-public class IncrementJob extends JavaExecutable {
+public class MultiNodeExample extends JavaExecutable {
 
     @Override
-    public Serializable execute(TaskResult... results) throws Throwable {
-        Long res = new Long(0);
-        if (results.length > 0) {
-            for (int i = 0; i < results.length; i++) {
-                try {
-                    res += (Long) results[i].value();
-                } catch (Exception e) {
-                    // not an int
-                }
-            }
-            res++;
+    public Serializable execute(TaskResult... results) {
+        if (getNodesURL().isEmpty()) {
+            throw new RuntimeException("More than 1 node URL expected for this task, got" + getNodesURL());
         }
-        return res;
+
+        return "ok";
     }
+
 }

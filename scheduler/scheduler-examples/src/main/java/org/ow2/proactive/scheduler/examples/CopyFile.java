@@ -1,6 +1,5 @@
 /*
- * ################################################################
- *
+ *  *
  * ProActive Parallel Suite(TM): The Java(TM) library for
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
@@ -31,44 +30,53 @@
  *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s):
  *
- * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ *  * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.ow2.proactive.scheduler.examples;
 
-import java.io.Serializable;
+import org.apache.commons.io.FileUtils;
 
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
+import java.io.File;
+import java.io.FilenameFilter;
+import java.io.Serializable;
 
 
 /**
- * MonteCarloAverage compute PI using MonteCarlo method.
+ * CopyFile, copy a single input File to an output File
+ * <p/>
+ * A wildcard can be used if parts of the names of the input file is not known
  *
  * @author The ProActive Team
- *
  */
-public class MonteCarloAverage extends JavaExecutable {
-    /**
-     * @see org.ow2.proactive.scheduler.common.task.executable.Executable#execute(org.ow2.proactive.scheduler.common.task.TaskResult[])
-     */
+public class CopyFile extends JavaExecutable {
+
+    protected String inputFile;
+
+    protected String outputFile;
+
     @Override
     public Serializable execute(TaskResult... results) throws Throwable {
-        double avrg = 0;
-        int count = 0;
-        getOut().print("Parameters are : ");
+        if (inputFile.contains("*")) {
 
-        for (TaskResult res : results) {
-            if (!res.hadException()) {
-                getOut().print(res.value() + " ");
-                avrg += ((Double) (res.value())).doubleValue();
-                count++;
+            inputFile = inputFile.replace("*", ".*").replace("?", ".");
+
+            File[] matchedFiles = new File(".").listFiles(new FilenameFilter() {
+                @Override
+                public boolean accept(File dir, String name) {
+                    return name.matches(inputFile);
+                }
+            });
+
+            for (File matchedFile : matchedFiles) {
+                FileUtils.copyFile(matchedFile, new File(outputFile));
             }
+        } else {
+            FileUtils.copyFile(new File(inputFile), new File(outputFile));
         }
 
-        Double result = new Double(avrg / count);
-        getOut().println("Average is : " + result);
-
-        return result;
+        return true;
     }
+
 }

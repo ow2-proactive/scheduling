@@ -37,25 +37,38 @@
 package org.ow2.proactive.scheduler.examples;
 
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.task.executable.Executable;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
-
 import java.io.Serializable;
 
 
 /**
- * Multi-nodes Example.
+ * MonteCarloAverage compute PI using MonteCarlo method.
  *
  * @author The ProActive Team
- * @since ProActive Scheduling 1.1
  */
-public class MultiNodeExample extends JavaExecutable {
-
+public class MonteCarloAverage extends JavaExecutable {
+    /**
+     * @see Executable#execute(org.ow2.proactive.scheduler.common.task.TaskResult[])
+     */
     @Override
-    public Serializable execute(TaskResult... results) {
-        if (getNodesURL().isEmpty()) {
-            throw new RuntimeException("More than 1 node URL expected for this task, got" + getNodesURL());
+    public Serializable execute(TaskResult... results) throws Throwable {
+        double avrg = 0;
+        int count = 0;
+        getOut().print("Parameters are : ");
+
+        for (TaskResult res : results) {
+            if (!res.hadException()) {
+                getOut().print(res.value() + " ");
+                avrg += ((Double) (res.value())).doubleValue();
+                count++;
+            }
         }
 
-        return "ok";
+        Double result = new Double(avrg / count);
+        getOut().println("Average is : " + result);
+
+        return result;
     }
+
 }

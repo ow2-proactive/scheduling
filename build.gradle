@@ -351,6 +351,7 @@ project('scheduler:scheduler-server') {
         testCompile project(':rm:rm-server').sourceSets.test.output // to get shared test classes
         testCompile project(':rm:rm-infrastructure:rm-infrastructure-gcm')
         testCompile project(':rm:rm-policy:rm-policy-scheduler')
+        testCompile project(':scheduler:scheduler-examples')
 
         runtime 'org.hibernate:hibernate-c3p0:4.1.7.Final'
         runtime 'org.apache.derby:derby:10.8.2.2'
@@ -401,12 +402,12 @@ project('scheduler:scheduler-node') {
         // TODO add all protocols
 
         runtime fileTree(dir: project.nativeLibsDir, exclude: '*.jar')
+
+        testCompile project(':scheduler:scheduler-examples')
     }
 
     task stub(type: StubTask) {
-        classes = ['org.ow2.proactive.scheduler.common.TaskTerminateNotification',
-                   'org.ow2.proactive.scheduler.examples.MultiNodeExample',
-                   'org.ow2.proactive.scheduler.examples.SchedulerClientEventsLogger']
+        classes = ['org.ow2.proactive.scheduler.common.TaskTerminateNotification']
     }
     serialver.dependsOn stub
 
@@ -426,6 +427,18 @@ project('scheduler:scheduler-node') {
     build.dependsOn standaloneJar
     artifacts {
         archives standaloneJar
+    }
+}
+
+project(':scheduler:scheduler-examples') {
+    dependencies {
+        compile(
+                project(':scheduler:scheduler-node'),
+        )
+    }
+
+    task stub(type: StubTask) {
+        classes = ['org.ow2.proactive.scheduler.examples.MultiNodeExample']
     }
 }
 

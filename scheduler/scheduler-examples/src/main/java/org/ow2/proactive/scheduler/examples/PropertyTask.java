@@ -36,38 +36,33 @@
  */
 package org.ow2.proactive.scheduler.examples;
 
-import java.io.Serializable;
-
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
+import java.io.Serializable;
 
 
 /**
- * KillJob is a task that will kill the JVM 5 seconds after start.<br />
- * Used only by Test classes.
+ * PropertyTask is a task that can display a property.<br/>
+ * It will also wait for 10 seconds before.
  *
  * @author The ProActive Team
- *
+ * @since ProActive 4.0
  */
-public class KillJob extends JavaExecutable {
+public class PropertyTask extends JavaExecutable {
 
-    public int exitcode;
-
-    /**
-     * @see org.ow2.proactive.scheduler.common.task.executable.Executable#execute(org.ow2.proactive.scheduler.common.task.TaskResult[])
-     */
+    /**  */
     @Override
-    public Serializable execute(TaskResult... results) throws Throwable {
-
+    public Serializable execute(TaskResult... results) {
         try {
-            getOut().println("I will kill in 5 sec the node on which i was started with exit code = " +
-                exitcode);
-
-            Thread.sleep(5000);
-
-        } catch (Exception e) {
+            Thread.sleep(10000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
-        System.exit(exitcode);
-        return null;
+
+        getOut().println("------> The property user.property1 has value '" +
+            System.getProperty("user.property1") + "'");
+
+        return 0;
     }
+
 }

@@ -27,47 +27,30 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  *
- *  Initial developer(s):               The ActiveEon Team
- *                        http://www.activeeon.com/
+ *  Initial developer(s):               The ProActive Team
+ *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s):
  *
  * ################################################################
- * $$ACTIVEEON_INITIAL_DEV$$
+ * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.ow2.proactive.scheduler.examples;
 
-import java.io.Serializable;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
+import java.io.Serializable;
 
 
 /**
- * Prints iteration and replication exported properties for testing purposes
- * 
- * @author The ProActive Team
- * @since ProActive Scheduling 2.2
- * 
+ * Do nothing...
  */
-public class IterationAwareJob extends JavaExecutable {
-
-    private String report = "";
+public class EmptyTask extends JavaExecutable {
 
     @Override
-    public void init(Map<String, Serializable> args) {
-        for (Entry<String, Serializable> entry : args.entrySet()) {
-            report += "arg " + entry.getKey() + " " + entry.getValue() + ":";
-        }
-    }
-
-    @Override
-    public Serializable execute(TaskResult... results) throws Throwable {
-        report += "prop it " + getIterationIndex() + ":";
-        report += "prop dup " + getReplicationIndex() + ":";
-
-        return report;
+    public Serializable execute(TaskResult... results) {
+        getOut().println(System.getenv());
+        getOut().println(System.getProperties());
+        return "Nothing";
     }
 
 }

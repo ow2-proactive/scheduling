@@ -36,6 +36,9 @@
  */
 package org.ow2.proactive.scheduler.examples;
 
+import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.task.executable.Executable;
+import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -43,16 +46,12 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.Random;
 
-import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
-
 
 /**
  * MonteCarlo compute PI using MonteCarlo method.
  * This task can be launched with parameters.
  *
  * @author The ProActive Team
- *
  */
 public class MonteCarlo extends JavaExecutable {
 
@@ -64,7 +63,7 @@ public class MonteCarlo extends JavaExecutable {
     private String file = null;
 
     /**
-     * @see org.ow2.proactive.scheduler.common.task.executable.JavaExecutable#init(java.util.Map)
+     * @see JavaExecutable#init(Map)
      */
     @Override
     public void init(Map<String, Serializable> args) {
@@ -88,7 +87,7 @@ public class MonteCarlo extends JavaExecutable {
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.task.executable.Executable#execute(org.ow2.proactive.scheduler.common.task.TaskResult[])
+     * @see Executable#execute(org.ow2.proactive.scheduler.common.task.TaskResult[])
      */
     @Override
     public Serializable execute(TaskResult... results) {
@@ -139,4 +138,5 @@ public class MonteCarlo extends JavaExecutable {
         }
         return result;
     }
+
 }

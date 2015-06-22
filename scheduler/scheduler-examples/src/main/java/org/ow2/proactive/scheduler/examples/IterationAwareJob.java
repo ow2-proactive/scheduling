@@ -27,43 +27,45 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
+ *  Initial developer(s):               The ActiveEon Team
+ *                        http://www.activeeon.com/
  *  Contributor(s):
  *
  * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * $$ACTIVEEON_INITIAL_DEV$$
  */
 package org.ow2.proactive.scheduler.examples;
 
-import java.io.Serializable;
-
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
+import java.io.Serializable;
+import java.util.Map;
+import java.util.Map.Entry;
 
 
 /**
- * AbortJob is a task behavior that will throw an exception 3s after starting.
- *
+ * Prints iteration and replication exported properties for testing purposes
+ * 
  * @author The ProActive Team
- * @since ProActive 4.0
- *
- * $Id$
+ * @since ProActive Scheduling 2.2
  */
-public class AbortJob extends JavaExecutable {
+public class IterationAwareJob extends JavaExecutable {
 
-    /**
-     * @see org.ow2.proactive.scheduler.common.task.executable.Executable#execute(org.ow2.proactive.scheduler.common.task.TaskResult[])
-     */
+    private String report = "";
+
+    @Override
+    public void init(Map<String, Serializable> args) {
+        for (Entry<String, Serializable> entry : args.entrySet()) {
+            report += "arg " + entry.getKey() + " " + entry.getValue() + ":";
+        }
+    }
+
     @Override
     public Serializable execute(TaskResult... results) throws Throwable {
-        try {
-            getOut().println("I will throw a runtime exception in 3 sec");
+        report += "prop it " + getIterationIndex() + ":";
+        report += "prop dup " + getReplicationIndex() + ":";
 
-            Thread.sleep(3000);
-
-        } catch (Exception e) {
-        }
-        throw new RuntimeException("Aborted job exception");
+        return report;
     }
+
 }

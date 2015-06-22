@@ -36,10 +36,10 @@
  */
 package org.ow2.proactive.scheduler.examples;
 
-import java.io.Serializable;
-
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.task.executable.Executable;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
+import java.io.Serializable;
 
 
 /**
@@ -47,7 +47,6 @@ import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
  * Also use for test.
  *
  * @author The ProActive Team
- *
  */
 public class WaitAndPrint extends JavaExecutable {
 
@@ -57,7 +56,7 @@ public class WaitAndPrint extends JavaExecutable {
     public int number;
 
     /**
-     * @see org.ow2.proactive.scheduler.common.task.executable.Executable#execute(org.ow2.proactive.scheduler.common.task.TaskResult[])
+     * @see Executable#execute(TaskResult[])
      */
     @Override
     public Serializable execute(TaskResult... results) throws Throwable {

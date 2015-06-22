@@ -37,20 +37,31 @@
 package org.ow2.proactive.scheduler.examples;
 
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.task.executable.Executable;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
-
 import java.io.Serializable;
 
 
 /**
- * Do nothing...
+ * AbortJob is a task behavior that will throw an exception 3s after starting.
+ *
+ * @author The ProActive Team
+ * @since ProActive 4.0
  */
-public class EmptyTask extends JavaExecutable {
-    /**  */
+public class AbortJob extends JavaExecutable {
+
+    /**
+     * @see Executable#execute(TaskResult[])
+     */
     @Override
-    public Serializable execute(TaskResult... results) {
-        getOut().println(System.getenv());
-        getOut().println(System.getProperties());
-        return "Nothing";
+    public Serializable execute(TaskResult... results) throws Throwable {
+        try {
+            getOut().println("I will throw a runtime exception in 3 sec");
+
+            Thread.sleep(3000);
+        } finally {
+            throw new RuntimeException("Aborted job exception");
+        }
     }
+
 }

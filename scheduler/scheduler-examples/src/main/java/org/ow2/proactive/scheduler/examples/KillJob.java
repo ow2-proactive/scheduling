@@ -1,5 +1,6 @@
 /*
- *  *
+ * ################################################################
+ *
  * ProActive Parallel Suite(TM): The Java(TM) library for
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
@@ -30,51 +31,42 @@
  *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s):
  *
- *  * $$PROACTIVE_INITIAL_DEV$$
+ * ################################################################
+ * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.ow2.proactive.scheduler.examples;
 
-import org.apache.commons.io.FileUtils;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.task.executable.Executable;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
-
-import java.io.File;
-import java.io.FilenameFilter;
 import java.io.Serializable;
 
 
 /**
- * CopyFile, copy a single input File to an output File
- * <p/>
- * A wildcard can be used if parts of the names of the input file is not known
+ * KillJob is a task that will kill the JVM 5 seconds after start.<br />
+ * Used only by Test classes.
  *
  * @author The ProActive Team
  */
-public class CopyFile extends JavaExecutable {
+public class KillJob extends JavaExecutable {
 
-    protected String inputFile;
-    protected String outputFile;
+    public int exitcode;
 
+    /**
+     * @see Executable#execute(TaskResult[])
+     */
     @Override
     public Serializable execute(TaskResult... results) throws Throwable {
-        if (inputFile.contains("*")) {
 
-            inputFile = inputFile.replace("*", ".*").replace("?", ".");
+        try {
+            getOut().println("I will kill in 5 sec the node on which i was started with exit code = " +
+                exitcode);
 
-            File[] matchedFiles = new File(".").listFiles(new FilenameFilter() {
-                @Override
-                public boolean accept(File dir, String name) {
-                    return name.matches(inputFile);
-                }
-            });
-
-            for (File matchedFile : matchedFiles) {
-                FileUtils.copyFile(matchedFile, new File(outputFile));
-            }
-        } else {
-            FileUtils.copyFile(new File(inputFile), new File(outputFile));
+            Thread.sleep(5000);
+        } finally {
+            System.exit(exitcode);
+            return null;
         }
-
-        return true;
     }
+
 }

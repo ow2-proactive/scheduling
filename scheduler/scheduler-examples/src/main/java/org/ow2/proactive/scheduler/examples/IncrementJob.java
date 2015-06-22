@@ -27,42 +27,42 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
+ *  Initial developer(s):               The ActiveEon Team
+ *                        http://www.activeeon.com/
  *  Contributor(s):
  *
  * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * $$ACTIVEEON_INITIAL_DEV$$
  */
 package org.ow2.proactive.scheduler.examples;
 
-import java.util.Random;
+import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
+import java.io.Serializable;
 
 
 /**
- * NativeTestWithRandomDefault is a class that should test native process generating random error code.
- *
+ * Simple executable that returns <code>1 + sum(parameters)</code> as result
+ * 
  * @author The ProActive Team
- * @since ProActive Scheduling 0.9.1
+ * @since ProActive Scheduling 2.2
  */
-public class NativeTestWithRandomDefault {
+public class IncrementJob extends JavaExecutable {
 
-    /**
-     * Task that will wait randomly from 1 to 30 milliseconds
-     * And will then return an error code 3 times on 5.
-     *
-     * @param args
-     */
-    public static void main(String[] args) {
-        Random exit = new Random(System.currentTimeMillis());
-        int exitStatus = exit.nextInt(5);
-        if (exitStatus >= 3) {
-            System.out.println("Exit code is : " + (exitStatus - 1));
-            System.exit(exitStatus - 1);
-        } else {
-            System.out.println("Exit code is : 0");
-            System.exit(0);
+    @Override
+    public Serializable execute(TaskResult... results) throws Throwable {
+        Long res = new Long(0);
+        if (results.length > 0) {
+            for (int i = 0; i < results.length; i++) {
+                try {
+                    res += (Long) results[i].value();
+                } catch (Exception e) {
+                    // not an int
+                }
+            }
+            res++;
         }
+        return res;
     }
 
 }

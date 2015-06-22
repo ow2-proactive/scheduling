@@ -36,25 +36,34 @@
  */
 package org.ow2.proactive.scheduler.examples;
 
-import java.io.Serializable;
-
-import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
+import java.util.Random;
 
 
 /**
- * WaitAndPrint is a task that will wait and print something.<br/>
- * Also use for test.
+ * NativeTestWithRandomDefault is a class that should test native process generating random error code.
  *
  * @author The ProActive Team
- *
+ * @since ProActive Scheduling 0.9.1
  */
-public class TestTask extends JavaExecutable {
+public class NativeTestWithRandomDefault {
 
-    @Override
-    public Serializable execute(TaskResult... results) throws Throwable {
-        System.out.printf("1 %s 2:%s%n", "a", "b");
-        return "done";
+    /**
+     * Task that will wait randomly from 1 to 30 milliseconds
+     * And will then return an error code 3 times on 5.
+     *
+     * @param args
+     */
+    public static void main(String[] args) {
+        Random exit = new Random(System.currentTimeMillis());
+        int exitStatus = exit.nextInt(5);
+
+        if (exitStatus >= 3) {
+            System.out.println("Exit code is : " + (exitStatus - 1));
+            System.exit(exitStatus - 1);
+        } else {
+            System.out.println("Exit code is : 0");
+            System.exit(0);
+        }
     }
 
 }
