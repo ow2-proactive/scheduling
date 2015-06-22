@@ -51,7 +51,7 @@ public class JavaClassScriptEngineFactory implements ScriptEngineFactory {
         PARAMETERS.put(ScriptEngine.NAME, "java");
         PARAMETERS.put(ScriptEngine.ENGINE, "java");
         PARAMETERS.put(ScriptEngine.ENGINE_VERSION, "1.0");
-        PARAMETERS.put(ScriptEngine.LANGUAGE, "java");
+        PARAMETERS.put(ScriptEngine.LANGUAGE, "Java");
         PARAMETERS.put(ScriptEngine.LANGUAGE_VERSION, System.getProperty("java.version"));
     }
 
@@ -82,12 +82,12 @@ public class JavaClassScriptEngineFactory implements ScriptEngineFactory {
 
     @Override
     public String getLanguageName() {
-        return "java";
+        return "Java";
     }
 
     @Override
     public String getLanguageVersion() {
-        return "1.7";
+        return (String) PARAMETERS.get(ScriptEngine.LANGUAGE_VERSION);
     }
 
     @Override
@@ -114,4 +114,5 @@ public class JavaClassScriptEngineFactory implements ScriptEngineFactory {
     public ScriptEngine getScriptEngine() {
         return new JavaClassScriptEngine();
     }
+
 }
