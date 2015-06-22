@@ -52,7 +52,7 @@ public class JavaClassScriptEngineFactory implements ScriptEngineFactory {
         PARAMETERS.put(ScriptEngine.ENGINE, "java");
         PARAMETERS.put(ScriptEngine.ENGINE_VERSION, "1.0");
         PARAMETERS.put(ScriptEngine.LANGUAGE, "java");
-        PARAMETERS.put(ScriptEngine.LANGUAGE_VERSION, "1.7");
+        PARAMETERS.put(ScriptEngine.LANGUAGE_VERSION, System.getProperty("java.version"));
     }
 
     @Override
