@@ -38,6 +38,7 @@ package org.ow2.proactive.scheduler.common.task;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector;
+
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
@@ -48,7 +49,6 @@ import org.ow2.proactive.scheduler.common.task.flow.FlowBlock;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.SelectionScript;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -148,6 +148,8 @@ public abstract class Task extends CommonAttribute {
 
     /** maximum execution time of the task (in milliseconds), the variable is only valid if isWallTime is true */
     protected long wallTime = 0;
+
+    protected ForkEnvironment forkEnvironment;
 
     /**
      * Add a dependence to the task. <font color="red">Warning : the dependence order is very
@@ -499,9 +501,9 @@ public abstract class Task extends CommonAttribute {
     }
 
     /**
-     * To get the list of dependences of the task.
+     * To get the list of dependencies of the task.
      *
-     * @return the the list of dependences of the task.
+     * @return the the list of dependencies of the task.
      */
     @XmlTransient
     public List<Task> getDependencesList() {
@@ -509,11 +511,13 @@ public abstract class Task extends CommonAttribute {
     }
 
     /**
-     * Get the number of nodes needed for this task. (by default : 1)
+     * Get the number of nodes needed for this task (by default: 1).
      *
-     * The method is deprecated. Use {@link Task.getParallelEnvironment().getNodesNumber()}
-     * @return the number Of Nodes Needed
+     * The method is deprecated. Use {@link Task#getParallelEnvironment()#getNumberOfNodesNeeded()}
+     *
+     * @return the number of Nodes Needed
      */
+    @Deprecated
     public int getNumberOfNodesNeeded() {
         return isParallel() ? getParallelEnvironment().getNodesNumber() : 1;
     }
@@ -699,6 +703,14 @@ public abstract class Task extends CommonAttribute {
         }
         answer += " }";
         return answer;
+    }
+
+    public ForkEnvironment getForkEnvironment() {
+        return forkEnvironment;
+    }
+
+    public void setForkEnvironment(ForkEnvironment forkEnvironment) {
+        this.forkEnvironment = forkEnvironment;
     }
 
 }

@@ -36,22 +36,11 @@
  */
 package org.ow2.proactive.scheduler.task.internal;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlTransient;
-
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.converter.ProActiveMakeDeepCopy;
+
 import org.ow2.proactive.scheduler.common.exception.ExecutableCreationException;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
@@ -72,6 +61,16 @@ import org.ow2.proactive.scheduler.task.TaskInfoImpl;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.task.TaskLauncherInitializer;
 import org.ow2.proactive.utils.NodeSet;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlTransient;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 /**
@@ -86,7 +85,7 @@ import org.ow2.proactive.utils.NodeSet;
 @XmlAccessorType(XmlAccessType.FIELD)
 public abstract class InternalTask extends TaskState {
 
-    /** Parents list : null if no dependences */
+    /** Parents list: null if no dependency */
     @XmlTransient
     private transient List<InternalTask> ideps = null;
 
@@ -253,7 +252,7 @@ public abstract class InternalTask extends TaskState {
      * @param acc accumulator
      * @param target end condition
      * @param loopAction true if the action performed is a LOOP, false is it is a replicate
-     * @param initDupIndex replication index threshold if <code>ifAction == true</code>
+     * @param dupIndex replication index threshold if <code>ifAction == true</code>
      *                 replication index to set to the old tasks if <code>ifAction == false</code>
      * @param itIndex iteration index threshold it <code>ifAction == true</code>
      *
@@ -310,7 +309,7 @@ public abstract class InternalTask extends TaskState {
      * @param acc accumulator
      * @param target end condition
      * @param loopAction true if the action performed is an if, false is it is a replicate
-     * @param initDupIndex replication index threshold if <code>ifAction == true</code>
+     * @param dupIndex replication index threshold if <code>ifAction == true</code>
      *                 replication index to set to the old tasks if <code>ifAction == false</code>
      * @param itIndex iteration index threshold it <code>ifAction == true</code>
      *
@@ -841,18 +840,18 @@ public abstract class InternalTask extends TaskState {
      * @param fullTaskName name with the iteration and replication suffixes
      * @return the original task name, without the added suffixes for iteration and replication
      */
-    public static String getInitialName(String fullTaskname) {
+    public static String getInitialName(String fullTaskName) {
         String taskName = null;
 
         Matcher matcher = null;
         for (Pattern pat : namePatterns) {
-            matcher = pat.matcher(fullTaskname);
+            matcher = pat.matcher(fullTaskName);
             if (matcher.find()) {
                 taskName = matcher.group(1);
                 return taskName;
             }
         }
-        throw new RuntimeException("Could not extract task name: " + fullTaskname);
+        throw new RuntimeException("Could not extract task name: " + fullTaskName);
     }
 
     /**
@@ -1024,6 +1023,8 @@ public abstract class InternalTask extends TaskState {
         tli.setNamingService(job.getJobDataSpaceApplication().getNamingServiceStub());
         tli.setIterationIndex(getIterationIndex());
         tli.setReplicationIndex(getReplicationIndex());
+
+        tli.setForkEnvironment(getForkEnvironment());
         if (isWallTimeSet()) {
             tli.setWalltime(wallTime);
         }

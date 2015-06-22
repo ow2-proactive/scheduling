@@ -36,6 +36,10 @@
  */
 package org.ow2.proactive.scheduler.common.task;
 
+import org.objectweb.proactive.annotation.PublicAPI;
+
+import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.util.Object2ByteConverter;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Collections;
@@ -43,12 +47,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.objectweb.proactive.annotation.PublicAPI;
-import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
-import org.ow2.proactive.scheduler.common.util.Object2ByteConverter;
-
-
-//import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 
 /**
  * Use this class to build a java task that will use a {@link JavaExecutable} and be integrated in a {@link TaskFlowJob}.<br>
@@ -65,14 +63,11 @@ public class JavaTask extends Task {
     protected String executableClassName = null;
 
     /** Arguments of the task as a map */
-    // WARNING : this field is accessed by reflection from InternalJobFactory
-    private final HashMap<String, byte[]> serializedArguments = new HashMap<String, byte[]>();
+    // WARNING: this field is accessed by reflection from InternalJobFactory
+    private final HashMap<String, byte[]> serializedArguments = new HashMap<>();
 
-    /** For internal use : name of the field that stores task arguments */
+    /** For internal use: name of the field that stores task arguments */
     public static final String ARGS_FIELD_NAME = "serializedArguments";
-
-    /** Environment of a new dedicated JVM */
-    private ForkEnvironment forkEnvironment = null;
 
     /**
      * Empty constructor.
@@ -97,12 +92,12 @@ public class JavaTask extends Task {
      */
     public void setExecutableClassName(String executableClassName) {
         if (executableClassName == null) {
-            throw new IllegalArgumentException("Executable class name must be set for JavaTask : " +
+            throw new IllegalArgumentException("Executable class name must be set for JavaTask: " +
                 this.name);
         }
         if (executableClassName.length() > 255) {
             throw new IllegalArgumentException(
-                "Class name is too long, it must have 255 chars length max : " + executableClassName);
+                "Class name is too long, it must have 255 chars length max: " + executableClassName);
         }
         this.executableClassName = executableClassName;
     }
@@ -133,7 +128,7 @@ public class JavaTask extends Task {
      */
     public void addArgument(String name, Serializable value) {
         if (name != null && name.length() > 255) {
-            throw new IllegalArgumentException("Key is too long, it must have 255 chars length max : " + name);
+            throw new IllegalArgumentException("Key is too long, it must have 255 chars length max: " + name);
         } else {
             byte[] serialized = null;
             try {

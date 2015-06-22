@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job xmlns="urn:proactive:jobdescriptor:3.3"
+     name="ScriptTask">
+    <taskFlow>
+        <task name="single">
+            <forkEnvironment>
+                <jvmArgs>
+                    <jvmArg value="-DenvVar=foo"/>
+                </jvmArgs>
+            </forkEnvironment>
+            <scriptExecutable>
+                <script>
+                    <code language="groovy">
+                        assert System.getProperty('envVar') == 'foo'
+                    </code>
+                </script>
+            </scriptExecutable>
+        </task>
+    </taskFlow>
+</job>

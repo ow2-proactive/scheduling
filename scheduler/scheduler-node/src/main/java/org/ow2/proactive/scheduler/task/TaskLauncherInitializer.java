@@ -37,15 +37,20 @@
 package org.ow2.proactive.scheduler.task;
 
 import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
+
+import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scheduler.task.utils.Substitutor;
 import org.ow2.proactive.scripting.Script;
-
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -90,6 +95,8 @@ public class TaskLauncherInitializer implements Serializable {
     private Map<String, String> variables;
     private int pingPeriod;
     private int pingAttempts = 1;
+
+    private ForkEnvironment forkEnvironment;
 
     /**
      * Get the taskId
@@ -424,4 +431,13 @@ public class TaskLauncherInitializer implements Serializable {
         }
         return filteredTaskOutputFiles;
     }
+
+    public ForkEnvironment getForkEnvironment() {
+        return forkEnvironment;
+    }
+
+    public void setForkEnvironment(ForkEnvironment forkEnvironment) {
+        this.forkEnvironment = forkEnvironment;
+    }
+
 }

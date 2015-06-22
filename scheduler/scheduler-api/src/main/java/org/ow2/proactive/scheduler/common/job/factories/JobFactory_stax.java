@@ -36,35 +36,61 @@
  */
 package org.ow2.proactive.scheduler.common.job.factories;
 
-import org.apache.log4j.Logger;
-import org.iso_relax.verifier.VerifierConfigurationException;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.net.URI;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.zip.ZipFile;
+
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.events.XMLEvent;
+
 import org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
-import org.ow2.proactive.scheduler.common.job.*;
-import org.ow2.proactive.scheduler.common.task.*;
+import org.ow2.proactive.scheduler.common.job.Job;
+import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobPriority;
+import org.ow2.proactive.scheduler.common.job.JobType;
+import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.task.CommonAttribute;
+import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
+import org.ow2.proactive.scheduler.common.task.JavaTask;
+import org.ow2.proactive.scheduler.common.task.NativeTask;
+import org.ow2.proactive.scheduler.common.task.ParallelEnvironment;
+import org.ow2.proactive.scheduler.common.task.RestartMode;
+import org.ow2.proactive.scheduler.common.task.ScriptTask;
+import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
 import org.ow2.proactive.scheduler.common.task.flow.FlowBlock;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scheduler.common.util.ZipUtils;
-import org.ow2.proactive.scripting.*;
+import org.ow2.proactive.scripting.GenerationScript;
+import org.ow2.proactive.scripting.Script;
+import org.ow2.proactive.scripting.SelectionScript;
+import org.ow2.proactive.scripting.SimpleScript;
+import org.ow2.proactive.scripting.TaskScript;
 import org.ow2.proactive.topology.descriptor.ThresholdProximityDescriptor;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.Tools;
+import org.apache.log4j.Logger;
+import org.iso_relax.verifier.VerifierConfigurationException;
 import org.xml.sax.SAXException;
-
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.events.XMLEvent;
-import java.io.*;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.net.URI;
-import java.net.URL;
-import java.util.*;
-import java.util.zip.ZipFile;
 
 import static org.ow2.proactive.scheduler.common.util.VariablesUtil.filterAndUpdate;
 
@@ -734,6 +760,8 @@ public class JobFactory_stax extends JobFactory {
                             tmpTask.setParallelEnvironment(createParallelEnvironment(cursorTask));
                         } else if (XMLTags.SCRIPT_SELECTION.matches(current)) {
                             tmpTask.setSelectionScripts(createSelectionScript(cursorTask));
+                        } else if (XMLTags.FORK_ENVIRONMENT.matches(current)) {
+                            tmpTask.setForkEnvironment(createForkEnvironment(cursorTask));
                         } else if (XMLTags.SCRIPT_PRE.matches(current)) {
                             tmpTask.setPreScript(createScript(cursorTask));
                         } else if (XMLTags.SCRIPT_POST.matches(current)) {

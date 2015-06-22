@@ -56,7 +56,6 @@
         </xs:annotation>
       </xs:attribute>
       <xs:attribute ref="xsi:schemaLocation"/>
-      <xs:attribute ref="xsi:schemaLocation"/>
     </xs:complexType>
   </xs:element>
   <xs:attributeGroup name="jobName">

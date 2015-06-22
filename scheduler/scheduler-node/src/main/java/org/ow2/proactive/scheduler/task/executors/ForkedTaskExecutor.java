@@ -38,6 +38,7 @@ import com.google.common.base.Strings;
 import org.apache.commons.io.FileUtils;
 import org.objectweb.proactive.extensions.processbuilder.OSProcessBuilder;
 import org.objectweb.proactive.extensions.processbuilder.exception.NotImplementedException;
+
 import org.ow2.proactive.resourcemanager.utils.OneJar;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.exception.ForkedJVMProcessException;
@@ -50,8 +51,14 @@ import org.ow2.proactive.scheduler.task.utils.ProcessStreamsReader;
 import org.ow2.proactive.scheduler.task.utils.TaskProcessTreeKiller;
 import org.ow2.proactive.scripting.ScriptHandler;
 import org.ow2.proactive.scripting.ScriptLoader;
-
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.PrintStream;
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -64,7 +71,7 @@ import java.util.Objects;
  */
 public class ForkedTaskExecutor implements TaskExecutor {
 
-    private static final String FORKENV_BINDING_NAME = "forkEnvironment";
+    private static final String FORK_ENVIRONMENT_BINDING_NAME = "forkEnvironment";
 
     private File workingDir;
     private Decrypter decrypter;
@@ -127,21 +134,21 @@ public class ForkedTaskExecutor implements TaskExecutor {
 
     private OSProcessBuilder createForkedProcess(TaskContext context, File serializedContext, PrintStream outputSink, PrintStream errorSink)
             throws Exception {
-        OSProcessBuilder pb;
+        OSProcessBuilder processBuilder;
         String nativeScriptPath = context.getSchedulerHome();
+
         if (context.isRunAsUser()) {
             boolean workingDirCanBeWrittenByForked = workingDir.setWritable(true);
             if (!workingDirCanBeWrittenByForked) {
                 throw new Exception("Working directory will not be writable by runAsMe user");
             }
-            pb = ForkerUtils.getOSProcessBuilderFactory(nativeScriptPath).getBuilder(
+            processBuilder = ForkerUtils.getOSProcessBuilderFactory(nativeScriptPath).getBuilder(
                     ForkerUtils.checkConfigAndGetUser(decrypter));
         } else {
-            pb = ForkerUtils.getOSProcessBuilderFactory(nativeScriptPath).getBuilder();
+            processBuilder = ForkerUtils.getOSProcessBuilderFactory(nativeScriptPath).getBuilder();
         }
 
         String javaHome = System.getProperty("java.home");
-
         String jvmArguments = "";
         StringBuilder classpath = new StringBuilder("." + File.pathSeparatorChar);
         classpath.append(System.getProperty("java.class.path", ""));
@@ -151,37 +158,36 @@ public class ForkedTaskExecutor implements TaskExecutor {
         }
 
         if (context.getExecutableContainer() instanceof ForkedScriptExecutableContainer) {
-            ForkedScriptExecutableContainer forkedExecutable = (ForkedScriptExecutableContainer) context.getExecutableContainer();
+            ForkEnvironment forkEnvironment = context.getInitializer().getForkEnvironment();
 
-            ForkEnvironment forkEnvironment = forkedExecutable.getForkEnvironment();
+            if (forkEnvironment != null) {
+                if (forkEnvironment.getEnvScript() != null) {
+                    ScriptHandler scriptHandler = ScriptLoader.createLocalHandler();
+                    Map<String, Serializable> variables = NonForkedTaskExecutor.taskVariables(context);
+                    Map<String, String> thirdPartyCredentials = NonForkedTaskExecutor.thirdPartyCredentials(context);
+                    NonForkedTaskExecutor.createBindings(context, scriptHandler, variables, thirdPartyCredentials);
 
-            if (forkEnvironment.getEnvScript() != null) {
+                    scriptHandler.addBinding(FORK_ENVIRONMENT_BINDING_NAME, forkEnvironment);
+                    NonForkedTaskExecutor.executeScript(outputSink, errorSink, scriptHandler, thirdPartyCredentials, variables, forkEnvironment.getEnvScript());
+                }
 
-                ScriptHandler scriptHandler = ScriptLoader.createLocalHandler();
-                Map<String, Serializable> variables = NonForkedTaskExecutor.taskVariables(context);
-                Map<String, String> thirdPartyCredentials = NonForkedTaskExecutor.thirdPartyCredentials(context);
-                NonForkedTaskExecutor.createBindings(context, scriptHandler, variables, thirdPartyCredentials);
+                for (String jvmArgument : forkEnvironment.getJVMArguments()) {
+                    jvmArguments += jvmArgument;
+                }
 
-                scriptHandler.addBinding(FORKENV_BINDING_NAME, forkEnvironment);
-                NonForkedTaskExecutor.executeScript(outputSink, errorSink, scriptHandler, thirdPartyCredentials, variables, forkEnvironment.getEnvScript());
+                if (!Strings.isNullOrEmpty(forkEnvironment.getJavaHome())) {
+                    javaHome = forkEnvironment.getJavaHome();
+                }
+
+                for (String classpathEntry : forkEnvironment.getAdditionalClasspath()) {
+                    classpath.append(File.pathSeparatorChar).append(classpathEntry);
+                }
+
+                processBuilder.environment().putAll(forkEnvironment.getSystemEnvironment());
             }
-
-            for (String jvmArgument : forkEnvironment.getJVMArguments()) {
-                jvmArguments += jvmArgument;
-            }
-
-            if (!Strings.isNullOrEmpty(forkEnvironment.getJavaHome())) {
-                javaHome = forkEnvironment.getJavaHome();
-            }
-
-            for (String classpathEntry : forkEnvironment.getAdditionalClasspath()) {
-                classpath.append(File.pathSeparatorChar).append(classpathEntry);
-            }
-
-            pb.environment().putAll(forkEnvironment.getSystemEnvironment());
         }
 
-        List<String> javaCommand = pb.command();
+        List<String> javaCommand = processBuilder.command();
         javaCommand.add(javaHome + File.separatorChar + "bin" + File.separatorChar + "java");
         javaCommand.add("-cp");
         javaCommand.add(classpath.toString());
@@ -192,8 +198,8 @@ public class ForkedTaskExecutor implements TaskExecutor {
         javaCommand.add(serializedContext.getAbsolutePath());
 
         // TODO add fork env
-        pb.directory(workingDir);
-        return pb;
+        processBuilder.directory(workingDir);
+        return processBuilder;
     }
 
     // 1 called by forker

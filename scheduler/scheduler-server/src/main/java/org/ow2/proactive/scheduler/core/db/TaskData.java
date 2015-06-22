@@ -1,26 +1,19 @@
 package org.ow2.proactive.scheduler.core.db;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
+import org.hibernate.annotations.ForeignKey;
+import org.hibernate.annotations.Index;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+import org.hibernate.annotations.Parameter;
+import org.hibernate.annotations.Type;
+import org.hibernate.type.SerializableToBlobType;
 
-import javax.persistence.CollectionTable;
-import javax.persistence.Column;
-import javax.persistence.ElementCollection;
-import javax.persistence.Embeddable;
-import javax.persistence.EmbeddedId;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
-import javax.persistence.Transient;
-
+import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.ParallelEnvironment;
+import org.ow2.proactive.scheduler.common.task.PropertyModifier;
 import org.ow2.proactive.scheduler.common.task.RestartMode;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
@@ -35,6 +28,7 @@ import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalForkedScriptTask;
 import org.ow2.proactive.scheduler.task.internal.InternalScriptTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
+import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.topology.descriptor.ArbitraryTopologyDescriptor;
 import org.ow2.proactive.topology.descriptor.BestProximityDescriptor;
@@ -44,16 +38,25 @@ import org.ow2.proactive.topology.descriptor.SingleHostDescriptor;
 import org.ow2.proactive.topology.descriptor.SingleHostExclusiveDescriptor;
 import org.ow2.proactive.topology.descriptor.ThresholdProximityDescriptor;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
-import org.hibernate.annotations.BatchSize;
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
-import org.hibernate.annotations.ForeignKey;
-import org.hibernate.annotations.Index;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
-import org.hibernate.annotations.Parameter;
-import org.hibernate.annotations.Type;
-import org.hibernate.type.SerializableToBlobType;
+import javax.persistence.CollectionTable;
+import javax.persistence.Column;
+import javax.persistence.ElementCollection;
+import javax.persistence.Embeddable;
+import javax.persistence.EmbeddedId;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 @Entity
@@ -61,10 +64,8 @@ import org.hibernate.type.SerializableToBlobType;
 		"TASK_ID_JOB", "TASK_NAME" }) }*/)
 public class TaskData {
 
-    private static final String JAVA_TASK = "JAVA_TASK";
-    private static final String FORKED_JAVA_TASK = "FORKED_JAVA_TASK";
-    private static final String NATIVE_TASK = "NATIVE_TASK";
     private static final String SCRIPT_TASK = "SCRIPT_TASK";
+
     private static final String FORKED_SCRIPT_TASK = "FORKED_SCRIPT_TASK";
 
     private DBTaskId id;
@@ -140,6 +141,115 @@ public class TaskData {
     private String topologyDescriptor;
 
     private long topologyDescriptorThreshold;
+
+    /* Fork environment parameters */
+
+    private String javaHome;
+    private List<String> jvmArguments;
+    private List<String> additionalClasspath;
+    private ScriptData envScript;
+    private List<EnvironmentModifierData> envModifiers;
+    private String workingDir;
+
+    @Column(name = "JAVA_HOME", length = Integer.MAX_VALUE)
+    @Lob
+    public String getJavaHome() {
+        return javaHome;
+    }
+
+    public void setJavaHome(String javaHome) {
+        this.javaHome = javaHome;
+    }
+
+    @Column(name = "JVM_ARGUMENTS")
+    @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @org.hibernate.annotations.Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object"))
+    public List<String> getJvmArguments() {
+        return jvmArguments;
+    }
+
+    public void setJvmArguments(List<String> jvmArguments) {
+        this.jvmArguments = jvmArguments;
+    }
+
+    @Column(name = "CLASSPATH")
+    @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @org.hibernate.annotations.Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object"))
+    public List<String> getAdditionalClasspath() {
+        return additionalClasspath;
+    }
+
+    public void setAdditionalClasspath(List<String> additionalClasspath) {
+        this.additionalClasspath = additionalClasspath;
+    }
+
+    @Cascade(org.hibernate.annotations.CascadeType.ALL)
+    @OneToOne
+    @JoinColumn(name = "ENV_SCRIPT_ID")
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    public ScriptData getEnvScript() {
+        return envScript;
+    }
+
+    public void setEnvScript(ScriptData envScript) {
+        this.envScript = envScript;
+    }
+
+    @Cascade(org.hibernate.annotations.CascadeType.ALL)
+    @OneToMany(mappedBy = "taskData")
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    public List<EnvironmentModifierData> getEnvModifiers() {
+        return envModifiers;
+    }
+
+    public void setEnvModifiers(List<EnvironmentModifierData> envModifiers) {
+        this.envModifiers = envModifiers;
+    }
+
+    @Column(name = "WORKING_DIR")
+    public String getWorkingDir() {
+        return workingDir;
+    }
+
+    public void setWorkingDir(String workingDir) {
+        this.workingDir = workingDir;
+    }
+
+    public ForkEnvironment createForkEnvironment() throws InvalidScriptException {
+        ForkEnvironment forkEnv = new ForkEnvironment();
+        forkEnv.setJavaHome(javaHome);
+        forkEnv.setWorkingDir(workingDir);
+
+        List<String> additionalClasspath = getAdditionalClasspath();
+        if (additionalClasspath != null) {
+            for (String classpath : additionalClasspath) {
+                forkEnv.addAdditionalClasspath(classpath);
+            }
+        }
+
+        List<String> jvmArguments = getJvmArguments();
+        if (jvmArguments != null) {
+            for (String jvmArg : jvmArguments) {
+                forkEnv.addJVMArgument(jvmArg);
+            }
+        }
+
+        List<EnvironmentModifierData> envModifiers = getEnvModifiers();
+
+        if (envModifiers != null) {
+            for (EnvironmentModifierData envModifier : envModifiers) {
+                if (envModifier.getAppendChar() != 0) {
+                    forkEnv.addSystemEnvironmentVariable(envModifier.getName(), envModifier.getValue(),
+                            envModifier.getAppendChar());
+                } else {
+                    forkEnv.addSystemEnvironmentVariable(envModifier.getName(), envModifier.getValue(),
+                            envModifier.isAppend());
+                }
+            }
+        }
+        if (envScript != null) {
+            forkEnv.setEnvScript(envScript.createSimpleScript());
+        }
+        return forkEnv;
+    }
 
     @Embeddable
     public static class DBTaskId implements Serializable {
@@ -316,6 +426,30 @@ public class TaskData {
         }
         taskData.setDataspaceSelectors(selectorsData);
 
+        ForkEnvironment forkEnvironment = task.getForkEnvironment();
+        if (forkEnvironment != null) {
+            taskData.setJavaHome(forkEnvironment.getJavaHome());
+            taskData.setJvmArguments(forkEnvironment.getJVMArguments());
+            taskData.setAdditionalClasspath(forkEnvironment.getAdditionalClasspath());
+
+            if (forkEnvironment.getEnvScript() != null) {
+                taskData.setEnvScript(ScriptData.createForScript(forkEnvironment.getEnvScript()));
+            }
+
+            if (forkEnvironment.getPropertyModifiers() != null) {
+                List<PropertyModifier> propertyModifiers =
+                        forkEnvironment.getPropertyModifiers();
+                List<EnvironmentModifierData> envModifiers =
+                        new ArrayList<>(propertyModifiers.size());
+
+                for (PropertyModifier propertyModifier : propertyModifiers) {
+                    envModifiers.add(EnvironmentModifierData.create(propertyModifier, taskData));
+                }
+
+                taskData.setEnvModifiers(envModifiers);
+            }
+        }
+
         taskData.initTaskType(task);
 
         return taskData;
@@ -325,7 +459,7 @@ public class TaskData {
         return TaskIdImpl.createTaskId(internalJob.getId(), getTaskName(), getId().getTaskId(), false);
     }
 
-    InternalTask toInternalTask(InternalJob internalJob) {
+    InternalTask toInternalTask(InternalJob internalJob) throws InvalidScriptException {
         TaskId taskId = createTaskId(internalJob);
 
         InternalTask internalTask;
@@ -359,6 +493,42 @@ public class TaskData {
         internalTask.setIterationIndex(getIteration());
         internalTask.setReplicationIndex(getReplication());
         internalTask.setMatchingBlock(getMatchingBlock());
+
+        ForkEnvironment forkEnv = new ForkEnvironment();
+        forkEnv.setJavaHome(javaHome);
+
+        List<String> additionalClasspath = getAdditionalClasspath();
+        if (additionalClasspath != null) {
+            for (String classpath : additionalClasspath) {
+                forkEnv.addAdditionalClasspath(classpath);
+            }
+        }
+
+        List<String> jvmArguments = getJvmArguments();
+        if (jvmArguments != null) {
+            for (String jvmArg : jvmArguments) {
+                forkEnv.addJVMArgument(jvmArg);
+            }
+        }
+
+        List<EnvironmentModifierData> envModifiers = getEnvModifiers();
+
+        if (envModifiers != null) {
+            for (EnvironmentModifierData envModifier : envModifiers) {
+                if (envModifier.getAppendChar() != 0) {
+                    forkEnv.addSystemEnvironmentVariable(envModifier.getName(), envModifier.getValue(),
+                      envModifier.getAppendChar());
+                } else {
+                    forkEnv.addSystemEnvironmentVariable(envModifier.getName(), envModifier.getValue(),
+                      envModifier.isAppend());
+                }
+            }
+        }
+        if (envScript != null) {
+            forkEnv.setEnvScript(envScript.createSimpleScript());
+        }
+
+        internalTask.setForkEnvironment(forkEnv);
 
         return internalTask;
     }

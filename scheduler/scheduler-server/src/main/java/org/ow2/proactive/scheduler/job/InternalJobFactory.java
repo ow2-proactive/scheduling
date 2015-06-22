@@ -36,15 +36,7 @@
  */
 package org.ow2.proactive.scheduler.job;
 
-import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
+import org.apache.log4j.Logger;
 
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.exception.InternalException;
@@ -67,13 +59,21 @@ import org.ow2.proactive.scheduler.task.script.ForkedScriptExecutableContainer;
 import org.ow2.proactive.scheduler.task.script.ScriptExecutableContainer;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
-import org.apache.log4j.Logger;
+import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 
 /**
  * This is the factory to build Internal job with a job (user).
  * For the moment it performs a simple copy from userJob to InternalJob
- * and recreate the dependences if needed.
+ * and recreate the dependencies if needed.
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
@@ -120,7 +120,7 @@ public class InternalJobFactory {
     /**
      * Create an internalTaskFlow job with the given task flow job (user)
      *
-     * @param job the user job that will be used to create the internal job.
+     * @param userJob the user job that will be used to create the internal job.
      * @return the created internal job.
      * @throws JobCreationException an exception if the factory cannot create the given job.
      */
@@ -247,18 +247,18 @@ public class InternalJobFactory {
     }
 
     private static InternalTask createTask(Job userJob, Task task) throws JobCreationException {
-        //dispatch task creation
+        // TODO: avoid branching with double dispatch
         if (task instanceof NativeTask) {
             return createTask(userJob, (NativeTask) task);
         } else if (task instanceof JavaTask) {
             return createTask(userJob, (JavaTask) task);
         } else if (task instanceof ScriptTask) {
             return createTask(userJob, (ScriptTask) task);
-        } else {
-            String msg = "The task you intend to add is unknown ! (type : " + task.getClass().getName() + ")";
-            logger.info(msg);
-            throw new JobCreationException(msg);
         }
+
+        String msg = "Unknown task type: " + task.getClass().getName();
+        logger.info(msg);
+        throw new JobCreationException(msg);
     }
 
     /**
@@ -270,7 +270,7 @@ public class InternalJobFactory {
      */
     @SuppressWarnings("unchecked")
     private static InternalTask createTask(Job userJob, JavaTask task) throws JobCreationException {
-        InternalTask javaTask= null;
+        InternalTask javaTask = null;
 
         if (task.getExecutableClassName() != null) {
             // HACK HACK HACK : Get arguments for the task
@@ -281,8 +281,8 @@ public class InternalJobFactory {
                 args = (HashMap<String, byte[]>) f.get(task);
             } catch (Exception e) {
                 // should not happen...
-                logger.fatal("Internal error : cannot retrieve arguments for task " + task.getName(), e);
-                throw new Error("Internal error : implementation must be revised.", e);
+                logger.fatal("Internal error: cannot retrieve arguments for task " + task.getName(), e);
+                throw new Error("Internal error: implementation must be revised.", e);
             }
 
 //            String groovyScript = "def executable = " +
@@ -313,7 +313,7 @@ public class InternalJobFactory {
                 }
             }
         } else {
-            String msg = "You must specify your own executable task class to be launched (in every task) !";
+            String msg = "You must specify your own executable task class to be launched (in every task)!";
             logger.info(msg);
             throw new JobCreationException(msg);
         }
