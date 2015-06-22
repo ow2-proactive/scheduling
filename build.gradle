@@ -32,7 +32,7 @@ buildscript {
         classpath("org.objectweb.proactive:programming-core:${programmingVersion}")
         classpath 'org.hsudbrock:gradle-trang:0.1-proactive'
         classpath 'com.github.rholder:gradle-one-jar:1.0.3'
-        classpath 'org.ow2.proactive:serialver-gradle:1.0-SNAPSHOT'
+        classpath 'org.ow2.proactive:gradle-serialver:2.0'
         classpath 'org.gradle.api.plugins:gradle-format-plugin:1.1'
     }
 }
@@ -92,7 +92,7 @@ configure(javaSubprojects) {
         exclude 'unitTests/**'
     }
 
-    task serialver(type: InsertSerialVersionUIDTask) {
+    task serialver(type: serialver.InsertSerialVersionUIDTask) {
         serialver = rootProject.serialver
     }
 
@@ -191,6 +191,7 @@ project(':scheduler:scheduler-api') {
     task stub(type: StubTask) {
         classes = ['org.ow2.proactive.scheduler.common.Scheduler']
     }
+    serialver.dependsOn stub
 }
 
 project('common-api') {
@@ -202,6 +203,7 @@ project('common-api') {
     task stub(type: StubTask) {
         classes = ['org.ow2.proactive.scripting.ScriptResult']
     }
+    serialver.dependsOn stub
 }
 
 
@@ -216,6 +218,7 @@ project(':scheduler:scheduler-client') {
     task stub(type: StubTask) {
         classes = ['org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface']
     }
+    serialver.dependsOn stub
 }
 
 project('common-client') {
@@ -234,6 +237,7 @@ project('common-client') {
                    'org.ow2.proactive.jmx.provider.ro.ROServerImpl',
                    'org.ow2.proactive.jmx.provider.ro.ROConnection']
     }
+    serialver.dependsOn stub
 }
 
 project('rm:rm-client') {
@@ -257,6 +261,7 @@ project('rm:rm-client') {
                    'org.ow2.proactive.resourcemanager.frontend.topology.pinging.Pinger',
                    'org.ow2.proactive.resourcemanager.frontend.RMMonitoring']
     }
+    serialver.dependsOn stub
 }
 
 project(':rm:rm-node') {
@@ -408,6 +413,7 @@ project('scheduler:scheduler-node') {
                    'org.ow2.proactive.scheduler.examples.MultiNodeExample',
                    'org.ow2.proactive.scheduler.examples.SchedulerClientEventsLogger']
     }
+    serialver.dependsOn stub
 
     task standaloneJarPrecondition {
         finalizedBy extractNativeBundle
@@ -476,6 +482,7 @@ project('rm:rm-server') {
                 'org.ow2.proactive.resourcemanager.cleaning.NodesCleaner'
         ]
     }
+    serialver.dependsOn stub
 
     task testJar(type: Jar) {
         classifier = 'tests'
@@ -527,6 +534,7 @@ project(':scheduler:smartproxy') {
     task stub(type: StubTask) {
         classes = ['org.ow2.proactive.scheduler.smartproxy.SmartProxyImpl']
     }
+    serialver.dependsOn stub
 
     task('functionalTest', type: Test).configure functionalTestConfiguration
 }
