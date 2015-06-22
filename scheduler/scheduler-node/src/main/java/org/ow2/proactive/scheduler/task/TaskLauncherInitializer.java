@@ -41,6 +41,7 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
+import org.ow2.proactive.scheduler.task.executors.NonForkedTaskExecutor;
 import org.ow2.proactive.scripting.Script;
 
 import java.io.Serializable;

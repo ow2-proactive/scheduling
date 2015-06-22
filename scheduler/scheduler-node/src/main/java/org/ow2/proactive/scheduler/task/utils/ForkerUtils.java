@@ -82,7 +82,7 @@ public final class ForkerUtils {
         NONE("none"), PWD("pwd"), KEY("key");
         private String value;
 
-        private ForkMethod(String value) {
+        ForkMethod(String value) {
             this.value = value;
         }
 
@@ -156,4 +156,5 @@ public final class ForkerUtils {
             throw new IllegalArgumentException("Decrypter could not be null");
         }
     }
+
 }

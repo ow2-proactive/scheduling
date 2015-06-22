@@ -32,8 +32,10 @@
  *
  *  * $$ACTIVEEON_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.task;
+package org.ow2.proactive.scheduler.task.executors;
 
+import org.ow2.proactive.scheduler.task.TaskContext;
+import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import java.io.PrintStream;
 import java.io.Serializable;
 

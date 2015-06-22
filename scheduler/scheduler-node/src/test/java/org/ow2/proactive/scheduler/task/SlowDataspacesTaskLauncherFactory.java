@@ -7,9 +7,8 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scheduler.task.data.TaskDataspaces;
-import org.ow2.proactive.scheduler.task.NonForkedTaskExecutor;
-import org.ow2.proactive.scheduler.task.ProActiveForkedTaskLauncherFactory;
-import org.ow2.proactive.scheduler.task.TaskExecutor;
+import org.ow2.proactive.scheduler.task.executors.NonForkedTaskExecutor;
+import org.ow2.proactive.scheduler.task.executors.TaskExecutor;
 
 import java.io.File;
 import java.util.List;

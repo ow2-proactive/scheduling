@@ -79,7 +79,7 @@ public class TaskLauncher {
 
     private static final Logger logger = Logger.getLogger(TaskLauncher.class);
 
-    private ProActiveForkedTaskLauncherFactory factory = new ProActiveForkedTaskLauncherFactory();
+    private ProActiveForkedTaskLauncherFactory factory;
 
     private TaskId taskId;
     private TaskLauncherInitializer initializer;
@@ -91,7 +91,7 @@ public class TaskLauncher {
     private ProgressFileReader progressFileReader;
 
     /**
-     * Needed for ProActive
+     * Needed for ProActive but should never be used manually to create an instance of the object.
      */
     public TaskLauncher() {
     }
@@ -173,14 +173,13 @@ public class TaskLauncher {
             taskResult.setLogs(taskLogger.getLogs()); // should it be done when killed or walltimed?
 
             wallTimer.stop();
-            sendResultToScheduler(terminateNotification, taskResult);
 
+            sendResultToScheduler(terminateNotification, taskResult);
         } catch (Throwable taskFailure) {
             wallTimer.stop();
 
             TaskResultImpl failedTaskResult;
             stopwatchWhenTaskFailed.stop();
-
 
             if (wallTimer.hasWallTimed()) {
                 logger.debug("Walltime reached for task", taskFailure);
@@ -211,8 +210,7 @@ public class TaskLauncher {
         HashMap<String, Serializable> replacements = new HashMap<>();
 
         replacements.put(SchedulerVars.PA_JOB_ID.toString(), initializer.getTaskId().getJobId().value());
-        replacements.put(SchedulerVars.PA_JOB_NAME.toString(), initializer.getTaskId().getJobId()
-                .getReadableName());
+        replacements.put(SchedulerVars.PA_JOB_NAME.toString(), initializer.getTaskId().getJobId().getReadableName());
         replacements.put(SchedulerVars.PA_TASK_ID.toString(), initializer.getTaskId().value());
         replacements.put(SchedulerVars.PA_TASK_NAME.toString(), initializer.getTaskId().getReadableName());
         replacements.put(SchedulerVars.PA_TASK_ITERATION.toString(), Integer.toString(initializer.getIterationIndex()));

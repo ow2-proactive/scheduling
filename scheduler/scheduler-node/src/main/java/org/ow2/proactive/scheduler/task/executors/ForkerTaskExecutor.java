@@ -32,7 +32,7 @@
  *
  *  * $$ACTIVEEON_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.task;
+package org.ow2.proactive.scheduler.task.executors;
 
 import com.google.common.base.Strings;
 import org.apache.commons.io.FileUtils;
@@ -41,6 +41,8 @@ import org.objectweb.proactive.extensions.processbuilder.exception.NotImplemente
 import org.ow2.proactive.resourcemanager.utils.OneJar;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.exception.ForkedJVMProcessException;
+import org.ow2.proactive.scheduler.task.TaskContext;
+import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.script.ForkedScriptExecutableContainer;
 import org.ow2.proactive.scheduler.task.utils.Decrypter;
 import org.ow2.proactive.scheduler.task.utils.ForkerUtils;
@@ -54,7 +56,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-
+/**
+ * Executor in charge to fork a new process for running a non forked task in a dedicated JVM.
+ *
+ * @see ForkerTaskExecutor#fromForkedJVM(String)
+ * @see NonForkedTaskExecutor
+ */
 public class ForkerTaskExecutor implements TaskExecutor {
 
     private static final String FORKENV_BINDING_NAME = "forkEnvironment";
@@ -67,7 +74,6 @@ public class ForkerTaskExecutor implements TaskExecutor {
         this.decrypter = decrypter;
     }
 
-    // Called by forker to run create forked JVM
     public TaskResultImpl execute(TaskContext context, PrintStream outputSink, PrintStream errorSink) {
         TaskProcessTreeKiller taskProcessTreeKiller = new TaskProcessTreeKiller(context.getTaskId().value());
 
@@ -133,7 +139,6 @@ public class ForkerTaskExecutor implements TaskExecutor {
         } else {
             pb = ForkerUtils.getOSProcessBuilderFactory(nativeScriptPath).getBuilder();
         }
-
 
         String javaHome = System.getProperty("java.home");
 
@@ -235,6 +240,7 @@ public class ForkerTaskExecutor implements TaskExecutor {
             System.err.println("Path to serialized task context is expected");
             System.exit(-1);
         }
+
         fromForkedJVM(args[0]);
     }
 

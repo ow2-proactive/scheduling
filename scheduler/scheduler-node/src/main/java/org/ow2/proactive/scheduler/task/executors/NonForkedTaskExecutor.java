@@ -32,7 +32,7 @@
  *
  *  * $$ACTIVEEON_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.task;
+package org.ow2.proactive.scheduler.task.executors;
 
 import com.google.common.base.Stopwatch;
 import org.apache.commons.io.FileUtils;
@@ -40,6 +40,10 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
+import org.ow2.proactive.scheduler.task.SchedulerVars;
+import org.ow2.proactive.scheduler.task.TaskContext;
+import org.ow2.proactive.scheduler.task.TaskLauncherInitializer;
+import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.script.ScriptExecutableContainer;
 import org.ow2.proactive.scripting.*;
 
@@ -52,6 +56,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Run a task through a script handler.
+ * </p>
  * Responsible for:
  * - running the different scripts
  * - variable propagation

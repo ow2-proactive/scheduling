@@ -59,7 +59,6 @@ import org.ow2.proactive.scripting.SimpleScript;
  * or can be executed in a dedicated JVM with additional options specified like javaHome, java Arguments, classpath, ...
  *
  * @author ProActive team
- *
  */
 @PublicAPI
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -98,7 +97,7 @@ public class ForkEnvironment implements Serializable {
     private List<BigString> additionalClasspath = null;
 
     /**
-     * EnvScript : can be used to initialize environment just before JVM fork.
+     * EnvScript: can be used to initialize environment just before JVM fork.
      */
     private Script<?> script = null;
 
