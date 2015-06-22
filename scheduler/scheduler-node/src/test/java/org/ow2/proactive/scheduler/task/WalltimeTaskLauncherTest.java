@@ -7,7 +7,7 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.exception.WalltimeExceededException;
-import org.ow2.proactive.scheduler.task.executors.ForkerTaskExecutor;
+import org.ow2.proactive.scheduler.task.executors.ForkedTaskExecutor;
 import org.ow2.proactive.scheduler.task.executors.TaskExecutor;
 import org.ow2.proactive.scheduler.task.utils.Decrypter;
 import org.ow2.proactive.scheduler.common.task.TaskId;
@@ -97,7 +97,7 @@ public class WalltimeTaskLauncherTest {
 
         @Override
         public TaskExecutor createTaskExecutor(File workingDir, Decrypter decrypter) {
-            return new ForkerTaskExecutor(workingDir, decrypter);
+            return new ForkedTaskExecutor(workingDir, decrypter);
         }
 
     }

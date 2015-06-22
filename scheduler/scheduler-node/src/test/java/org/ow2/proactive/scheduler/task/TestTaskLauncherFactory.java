@@ -7,7 +7,7 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scheduler.task.data.TaskDataspaces;
-import org.ow2.proactive.scheduler.task.executors.ForkerTaskExecutor;
+import org.ow2.proactive.scheduler.task.executors.ForkedTaskExecutor;
 import org.ow2.proactive.scheduler.task.executors.TaskExecutor;
 import org.ow2.proactive.scheduler.task.utils.Decrypter;
 
@@ -55,7 +55,7 @@ public class TestTaskLauncherFactory extends ProActiveForkedTaskLauncherFactory 
                 if (taskRunning != null) {
                     taskRunning.release();
                 }
-                return new ForkerTaskExecutor(workingDir, decrypter).execute(container, output, error);
+                return new ForkedTaskExecutor(workingDir, decrypter).execute(container, output, error);
             }
         };
     }

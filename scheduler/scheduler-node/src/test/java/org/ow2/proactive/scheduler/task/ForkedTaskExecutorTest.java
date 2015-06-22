@@ -10,7 +10,7 @@ import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
-import org.ow2.proactive.scheduler.task.executors.ForkerTaskExecutor;
+import org.ow2.proactive.scheduler.task.executors.ForkedTaskExecutor;
 import org.ow2.proactive.scheduler.task.script.ForkedScriptExecutableContainer;
 import org.ow2.proactive.scheduler.task.utils.Decrypter;
 import org.ow2.proactive.scripting.SimpleScript;
@@ -23,7 +23,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 
-public class ForkerTaskExecutorTest {
+public class ForkedTaskExecutorTest {
 
     @Rule
     public TemporaryFolder tmpFolder = new TemporaryFolder();
@@ -33,7 +33,7 @@ public class ForkerTaskExecutorTest {
     public void result_and_variables() throws Throwable {
         TestTaskOutput taskOutput = new TestTaskOutput();
 
-        ForkerTaskExecutor taskExecutor = new ForkerTaskExecutor(tmpFolder.newFolder(), null);
+        ForkedTaskExecutor taskExecutor = new ForkedTaskExecutor(tmpFolder.newFolder(), null);
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
         initializer.setTaskId((TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false)));
@@ -52,7 +52,7 @@ public class ForkerTaskExecutorTest {
     public void failToSerialize() throws Throwable {
         TestTaskOutput taskOutput = new TestTaskOutput();
 
-        ForkerTaskExecutor taskExecutor = new ForkerTaskExecutor(new File("non_existing_folder"), null);
+        ForkedTaskExecutor taskExecutor = new ForkedTaskExecutor(new File("non_existing_folder"), null);
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
         initializer.setTaskId((TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false)));
@@ -69,7 +69,7 @@ public class ForkerTaskExecutorTest {
         System.setProperty("java.home", "does not exist");
         TestTaskOutput taskOutput = new TestTaskOutput();
 
-        ForkerTaskExecutor taskExecutor = new ForkerTaskExecutor(new File("non_existing_folder"), null);
+        ForkedTaskExecutor taskExecutor = new ForkedTaskExecutor(new File("non_existing_folder"), null);
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
         initializer.setTaskId((TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false)));
@@ -87,7 +87,7 @@ public class ForkerTaskExecutorTest {
 
         Decrypter decrypter = createCredentials("somebody_that_does_not_exists");
 
-        ForkerTaskExecutor taskExecutor = new ForkerTaskExecutor(tmpFolder.newFolder(), decrypter);
+        ForkedTaskExecutor taskExecutor = new ForkedTaskExecutor(tmpFolder.newFolder(), decrypter);
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
         initializer.setTaskId((TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false)));
@@ -110,7 +110,7 @@ public class ForkerTaskExecutorTest {
 
         File workingDir = tmpFolder.newFolder();
 
-        ForkerTaskExecutor taskExecutor = new ForkerTaskExecutor(workingDir, null);
+        ForkedTaskExecutor taskExecutor = new ForkedTaskExecutor(workingDir, null);
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
         initializer.setTaskId((TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false)));

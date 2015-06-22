@@ -59,17 +59,17 @@ import java.util.Objects;
 /**
  * Executor in charge to fork a new process for running a non forked task in a dedicated JVM.
  *
- * @see ForkerTaskExecutor#fromForkedJVM(String)
+ * @see ForkedTaskExecutor#fromForkedJVM(String)
  * @see NonForkedTaskExecutor
  */
-public class ForkerTaskExecutor implements TaskExecutor {
+public class ForkedTaskExecutor implements TaskExecutor {
 
     private static final String FORKENV_BINDING_NAME = "forkEnvironment";
 
     private File workingDir;
     private Decrypter decrypter;
 
-    public ForkerTaskExecutor(File workingDir, Decrypter decrypter) {
+    public ForkedTaskExecutor(File workingDir, Decrypter decrypter) {
         this.workingDir = workingDir;
         this.decrypter = decrypter;
     }
@@ -188,7 +188,7 @@ public class ForkerTaskExecutor implements TaskExecutor {
         if(!Objects.equals(jvmArguments, "")){
             javaCommand.add(jvmArguments);
         }
-        javaCommand.add(ForkerTaskExecutor.class.getName());
+        javaCommand.add(ForkedTaskExecutor.class.getName());
         javaCommand.add(serializedContext.getAbsolutePath());
 
         // TODO add fork env
