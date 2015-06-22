@@ -58,6 +58,6 @@ public interface TaskTerminateNotification extends Serializable {
      *
      * @param taskId the identification of the executed task.
      */
-    public void terminate(TaskId taskId, TaskResult taskResult);
+    void terminate(TaskId taskId, TaskResult taskResult);
 
 }

@@ -54,87 +54,87 @@ public interface ExecutableInitializer extends StandaloneExecutableInitializer {
      * Returns a list of ProActive Nodes used by the task
      * @return list of nodes
      */
-    public NodeSet getNodes();
+    NodeSet getNodes();
 
     /**
      * Set the nodes list value to the given nodes value
      *
      * @param nodes the nodes to set
      */
-    public void setNodes(NodeSet nodes);
+    void setNodes(NodeSet nodes);
 
     /**
      * Set the decrypter value to the given decrypter value
      *
      * @param decrypter the decrypter to set
      */
-    public void setDecrypter(Decrypter decrypter);
+    void setDecrypter(Decrypter decrypter);
 
     /**
      * Get the decrypter from this initializer
      *
      * @return the decrypter from this initializer
      */
-    public Decrypter getDecrypter();
+    Decrypter getDecrypter();
 
     /**
      * Returns the DataSpaceFileObject of the local space
      * @return
      */
-    public DataSpacesFileObject getLocalSpaceFileObject();
+    DataSpacesFileObject getLocalSpaceFileObject();
 
     /**
      * Sets the task local space
      * @param space local space file object
      */
-    public void setLocalSpaceFileObject(DataSpacesFileObject space);
+    void setLocalSpaceFileObject(DataSpacesFileObject space);
 
     /**
      * Returns the DataSpaceFileObject of the input space
      * @return
      */
-    public DataSpacesFileObject getInputSpaceFileObject();
+    DataSpacesFileObject getInputSpaceFileObject();
 
     /**
      * Sets the task input space
      * @param space input space file object
      */
-    public void setInputSpaceFileObject(DataSpacesFileObject space);
+    void setInputSpaceFileObject(DataSpacesFileObject space);
 
     /**
      * Returns the DataSpaceFileObject of the output space
      * @return
      */
-    public DataSpacesFileObject getOutputSpaceFileObject();
+    DataSpacesFileObject getOutputSpaceFileObject();
 
     /**
      * Sets the task output space
      * @param space output space file object
      */
-    public void setOutputSpaceFileObject(DataSpacesFileObject space);
+    void setOutputSpaceFileObject(DataSpacesFileObject space);
 
     /**
      * Returns the DataSpaceFileObject of the global space
      * @return
      */
-    public DataSpacesFileObject getGlobalSpaceFileObject();
+    DataSpacesFileObject getGlobalSpaceFileObject();
 
     /**
      * Sets the task global space
      * @param space global space file object
      */
-    public void setGlobalSpaceFileObject(DataSpacesFileObject space);
+    void setGlobalSpaceFileObject(DataSpacesFileObject space);
 
     /**
      * Returns the DataSpaceFileObject of the user space
      * @return
      */
-    public DataSpacesFileObject getUserSpaceFileObject();
+    DataSpacesFileObject getUserSpaceFileObject();
 
     /**
      * Sets the task user space
      * @param space user space file object
      */
-    public void setUserSpaceFileObject(DataSpacesFileObject space);
+    void setUserSpaceFileObject(DataSpacesFileObject space);
 
 }
