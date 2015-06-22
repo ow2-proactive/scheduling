@@ -1,19 +1,18 @@
 package org.ow2.proactive.scheduler.task;
 
+import com.google.common.collect.ImmutableSet;
 import org.junit.Before;
 import org.junit.Test;
 import org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector;
+
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
-
 import java.io.Serializable;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 
-import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 
@@ -35,8 +34,8 @@ public class TaskLauncherInitializerTest {
                 Collections.<String, Serializable>singletonMap("TEST", "folder"));
 
         InputSelector selector = filteredInputFiles.get(0);
-        assertEquals(new HashSet<>(asList("folder/a", "b")), selector.getInputFiles().getIncludes());
-        assertEquals(new HashSet<>(singletonList("folder/excluded")), selector.getInputFiles().getExcludes());
+        assertEquals(ImmutableSet.of("folder/a", "b"), selector.getInputFiles().getIncludes());
+        assertEquals(ImmutableSet.of("folder/excluded"), selector.getInputFiles().getExcludes());
     }
 
     @Test
@@ -48,8 +47,8 @@ public class TaskLauncherInitializerTest {
                 Collections.<String, Serializable>singletonMap("TEST", "folder"));
 
         OutputSelector selector = filteredOutputFiles.get(0);
-        assertEquals(new HashSet<>(asList("folder/a", "b")), selector.getOutputFiles().getIncludes());
-        assertEquals(new HashSet<>(singletonList("folder/excluded")), selector.getOutputFiles().getExcludes());
+        assertEquals(ImmutableSet.of("folder/a", "b"), selector.getOutputFiles().getIncludes());
+        assertEquals(ImmutableSet.of("folder/excluded"), selector.getOutputFiles().getExcludes());
     }
 
     @Test
@@ -60,7 +59,7 @@ public class TaskLauncherInitializerTest {
                 Collections.<String, Serializable>emptyMap());
 
         OutputSelector selector = filteredOutputFiles.get(0);
-        assertEquals(new HashSet<>(asList("$TEST/a", "b")), selector.getOutputFiles().getIncludes());
+        assertEquals(ImmutableSet.of("$TEST/a", "b"), selector.getOutputFiles().getIncludes());
     }
 
     @Test
@@ -71,7 +70,7 @@ public class TaskLauncherInitializerTest {
                 Collections.<String, Serializable>emptyMap());
 
         InputSelector selector = filteredInputFiles.get(0);
-        assertEquals(new HashSet<>(asList("$TEST/a", "b")), selector.getInputFiles().getIncludes());
+        assertEquals(ImmutableSet.of("$TEST/a", "b"), selector.getInputFiles().getIncludes());
     }
 
     @Test
@@ -81,7 +80,7 @@ public class TaskLauncherInitializerTest {
         List<InputSelector> filteredInputFiles = initializer.getFilteredInputFiles(null);
 
         InputSelector selector = filteredInputFiles.get(0);
-        assertEquals(new HashSet<>(asList("$TEST/a", "b")), selector.getInputFiles().getIncludes());
+        assertEquals(ImmutableSet.of("$TEST/a", "b"), selector.getInputFiles().getIncludes());
     }
 
     @Test
@@ -91,7 +90,7 @@ public class TaskLauncherInitializerTest {
         List<OutputSelector> filteredOutputFiles = initializer.getFilteredOutputFiles(null);
 
         OutputSelector selector = filteredOutputFiles.get(0);
-        assertEquals(new HashSet<>(asList("$TEST/a", "b")), selector.getOutputFiles().getIncludes());
+        assertEquals(ImmutableSet.of("$TEST/a", "b"), selector.getOutputFiles().getIncludes());
     }
 
     private List<InputSelector> inputSelectors(String... selectors) {
