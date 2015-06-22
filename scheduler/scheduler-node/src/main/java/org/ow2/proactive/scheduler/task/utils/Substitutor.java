@@ -59,6 +59,9 @@ public class Substitutor {
     }
 
     public static String replace(String input, Map<String, String> substitutes) {
+        // TODO provide better substitution
+        // http://commons.apache.org/proper/commons-lang/javadocs/api-3.1/org/apache/commons/lang3/text/StrSubstitutor.html
+
         String output = input;
 
         for (Map.Entry<String, String> replacement : substitutes.entrySet()) {
