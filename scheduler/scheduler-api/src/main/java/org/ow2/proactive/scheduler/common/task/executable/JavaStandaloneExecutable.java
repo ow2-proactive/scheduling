@@ -54,10 +54,6 @@ import org.ow2.proactive.scheduler.common.task.executable.internal.JavaStandalon
  **/
 public abstract class JavaStandaloneExecutable extends AbstractJavaExecutable {
 
-    public void internalInit(JavaStandaloneExecutableInitializer execInitializer) throws Exception {
-        super.internalInit(execInitializer);
-    }
-
     /**
      * Retrieve the interface to the LOCAL space. This allow you to resolve files, copy, move, delete, etc...
      * from and to other defined spaces.<br />

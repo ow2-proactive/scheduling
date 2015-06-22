@@ -59,18 +59,6 @@ import org.ow2.proactive.utils.NodeSet;
 public abstract class JavaExecutable extends AbstractJavaExecutable {
 
     /**
-     * Initialize the executable using the given executable Initializer.
-     *
-     * @param execInitializer the executable Initializer used to init the executable itself
-     *
-     * @throws Exception an exception if something goes wrong during executable initialization.
-     */
-    // WARNING WHEN REMOVE OR RENAME, called by task launcher by introspection
-    public void internalInit(JavaExecutableInitializerImpl execInitializer) throws Exception {
-        super.internalInit(execInitializer);
-    }
-
-    /**
      * Use this method for a multi-node task. It returns the list of nodes demanded by the user
      * while describing the task.<br>
      * In a task, one node is used to start the task itself, the other are returned by this method.<br>
