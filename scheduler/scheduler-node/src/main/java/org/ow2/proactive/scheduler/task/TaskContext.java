@@ -34,6 +34,10 @@
  */
 package org.ow2.proactive.scheduler.task;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
@@ -45,14 +49,10 @@ import org.ow2.proactive.scheduler.task.utils.Decrypter;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.utils.ClasspathUtils;
 
-import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
-
 
 public class TaskContext implements Serializable {
-    private final Set<String> nodesURLs;
-    private final Set<String> nodesHosts;
+    private final List<String> nodesURLs;
+    private final List<String> nodesHosts;
 
     private ExecutableContainer executableContainer;
     private TaskLauncherInitializer initializer;
@@ -93,8 +93,8 @@ public class TaskContext implements Serializable {
         initializer.setNamingService(null);
         this.executableContainer = executableContainer;
 
-        nodesURLs = new HashSet<String>();
-        nodesHosts = new HashSet<String>();
+        nodesURLs = new ArrayList<>();
+        nodesHosts = new ArrayList<>();
         if (executableContainer.getNodes() != null) {
             nodesHosts.add(PAActiveObject.getNode().getNodeInformation().getVMInformation().getHostName());
             for (Node node : executableContainer.getNodes()) {
@@ -148,7 +148,7 @@ public class TaskContext implements Serializable {
         return previousTasksResults;
     }
 
-    public Set<String> getNodesURLs() {
+    public List<String> getNodesURLs() {
         return nodesURLs;
     }
 
@@ -184,7 +184,7 @@ public class TaskContext implements Serializable {
         return schedulerHome;
     }
 
-    public Set<String> getNodesHosts() {
+    public List<String> getNodesHosts() {
         return nodesHosts;
     }
 }

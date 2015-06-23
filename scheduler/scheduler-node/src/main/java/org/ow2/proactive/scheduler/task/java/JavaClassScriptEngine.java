@@ -38,10 +38,9 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.io.Reader;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.script.AbstractScriptEngine;
 import javax.script.Bindings;
@@ -103,9 +102,9 @@ public class JavaClassScriptEngine extends AbstractScriptEngine {
             }
 
             if (context.getAttribute(NonForkedTaskExecutor.MULTI_NODE_TASK_NODESURL_BINDING_NAME) != null) {
-                Set<String> nodesURLs = (Set<String>) context
+                List<String> nodesURLs = (List<String>) context
                         .getAttribute(NonForkedTaskExecutor.MULTI_NODE_TASK_NODESURL_BINDING_NAME);
-                execInitializer.setNodesURL(new ArrayList<>(nodesURLs));
+                execInitializer.setNodesURL(nodesURLs);
             } else {
                 execInitializer.setNodesURL(emptyList());
             }

@@ -139,12 +139,12 @@ public class NonForkedTaskExecutor implements TaskExecutor {
         scriptHandler.addBinding(DS_GLOBAL_BINDING_NAME, container.getGlobalURI());
         scriptHandler.addBinding(DS_USER_BINDING_NAME, container.getUserURI());
 
-        Set<String> nodesUrls = container.getNodesURLs();
+        List<String> nodesUrls = container.getNodesURLs();
         scriptHandler.addBinding(MULTI_NODE_TASK_NODESET_BINDING_NAME, nodesUrls);
         scriptHandler.addBinding(MULTI_NODE_TASK_NODESURL_BINDING_NAME, nodesUrls);
     }
 
-    static String writeNodesFile(Set<String> nodesHosts) throws IOException {
+    static String writeNodesFile(List<String> nodesHosts) throws IOException {
         if (nodesHosts.isEmpty()) {
             return "";
         } else { // TODO should delete it, check why it is there even if empty
