@@ -34,7 +34,17 @@
  */
 package org.ow2.proactive.scheduler.task.data;
 
-import org.apache.log4j.Logger;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.extensions.dataspaces.Utils;
 import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
@@ -50,13 +60,7 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.utils.Formatter;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.*;
+import org.apache.log4j.Logger;
 
 
 public class TaskProActiveDataspaces implements TaskDataspaces {
@@ -562,9 +566,7 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
      */
     private void displayDataspacesStatus() {
         if (this.clientLogs.length() != 0) {
-            System.err.println("");
-            System.err.println(this.clientLogs);
-            System.err.flush();
+            logger.warn(clientLogs);
             this.clientLogs = new StringBuffer();
         }
     }
