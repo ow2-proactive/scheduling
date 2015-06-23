@@ -34,25 +34,34 @@
  */
 package org.ow2.proactive.scheduler.task.executors;
 
-import com.google.common.base.Stopwatch;
-import org.apache.commons.io.FileUtils;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
+import org.ow2.proactive.scheduler.common.util.VariablesUtil;
 import org.ow2.proactive.scheduler.task.SchedulerVars;
 import org.ow2.proactive.scheduler.task.TaskContext;
 import org.ow2.proactive.scheduler.task.TaskLauncherInitializer;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
-import org.ow2.proactive.scheduler.task.utils.Substitutor;
-import org.ow2.proactive.scripting.*;
 
-import java.io.*;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
+import org.ow2.proactive.scripting.Script;
+import org.ow2.proactive.scripting.ScriptHandler;
+import org.ow2.proactive.scripting.ScriptLoader;
+import org.ow2.proactive.scripting.ScriptResult;
+import org.ow2.proactive.scripting.TaskScript;
+import com.google.common.base.Stopwatch;
+import org.apache.commons.io.FileUtils;
 
 
 /**
@@ -82,7 +91,7 @@ public class NonForkedTaskExecutor implements TaskExecutor {
      * Example: if one of the third-party credentials' key-value pairs is 'foo:bar',
      * then '$CREDENTIALS_foo' will be replaced by 'bar' in the arguments of the tasks.
      */
-    private static final String CREDENTIALS_KEY_PREFIX = "$CREDENTIALS_";
+    private static final String CREDENTIALS_KEY_PREFIX = "CREDENTIALS_";
 
     @Override
     public TaskResultImpl execute(TaskContext container, PrintStream output, PrintStream error) {
@@ -99,15 +108,15 @@ public class NonForkedTaskExecutor implements TaskExecutor {
             try {
                 stopwatch.start();
                 Serializable result = execute(container, output, error, scriptHandler, thirdPartyCredentials,
-                        variables);
+                  variables);
                 stopwatch.stop();
                 taskResult = new TaskResultImpl(
-                        container.getTaskId(), result, null, stopwatch.elapsed(TimeUnit.MILLISECONDS));
+                  container.getTaskId(), result, null, stopwatch.elapsed(TimeUnit.MILLISECONDS));
             } catch (Throwable e) {
                 stopwatch.stop();
                 e.printStackTrace(error);
                 taskResult = new TaskResultImpl(
-                        container.getTaskId(), e, null, stopwatch.elapsed(TimeUnit.MILLISECONDS));
+                  container.getTaskId(), e, null, stopwatch.elapsed(TimeUnit.MILLISECONDS));
             }
 
             executeFlowScript(container.getControlFlowScript(), scriptHandler, output, error, taskResult);
@@ -173,7 +182,7 @@ public class NonForkedTaskExecutor implements TaskExecutor {
                 for (TaskResult taskResult : container.getPreviousTasksResults()) {
                     if (taskResult.getPropagatedVariables() != null) {
                         variables.putAll(SerializationUtil.deserializeVariableMap(taskResult
-                                .getPropagatedVariables()));
+                          .getPropagatedVariables()));
                     }
                 }
             }
@@ -206,7 +215,7 @@ public class NonForkedTaskExecutor implements TaskExecutor {
         Map<String, Serializable> variables = new HashMap<>();
         variables.put(SchedulerVars.PA_JOB_ID.toString(), initializer.getTaskId().getJobId().value());
         variables.put(SchedulerVars.PA_JOB_NAME.toString(), initializer.getTaskId().getJobId()
-                .getReadableName());
+          .getReadableName());
         variables.put(SchedulerVars.PA_TASK_ID.toString(), initializer.getTaskId().value());
         variables.put(SchedulerVars.PA_TASK_NAME.toString(), initializer.getTaskId().getReadableName());
         variables.put(SchedulerVars.PA_TASK_ITERATION.toString(), initializer.getIterationIndex());
@@ -227,46 +236,47 @@ public class NonForkedTaskExecutor implements TaskExecutor {
     }
 
     static void replaceScriptParameters(Script script, Map<String, String> thirdPartyCredentials,
-                                        Map<String, Serializable> variables, PrintStream errorStream) {
+      Map<String, Serializable> variables, PrintStream errorStream) {
 
-        Map<String, String> replacements = Substitutor.buildSubstitutes(variables);
+        Map<String, Serializable> variablesAndCredentials = new HashMap<>(variables);
 
         for (Map.Entry<String, String> credentialEntry : thirdPartyCredentials.entrySet()) {
-            replacements.put(CREDENTIALS_KEY_PREFIX + credentialEntry.getKey(), credentialEntry.getValue());
+            variablesAndCredentials.put(CREDENTIALS_KEY_PREFIX + credentialEntry.getKey(), credentialEntry.getValue());
         }
 
-        replace(script, replacements, errorStream);
+        replace(script, variablesAndCredentials, errorStream);
     }
 
-    public static void replace(Script script, Map<String, String> substitutes, PrintStream errorStream) {
+    public static void replace(Script script, Map<String, Serializable> substitutes, PrintStream errorStream) {
         if (script != null) {
             if ("java".equals(script.getEngineName())) {
                 try {
                     @SuppressWarnings("unchecked")
                     Map<String, Serializable> deserializedArgs =
-                            SerializationUtil.deserializeVariableMap(
-                                    (Map<String, byte[]>) script.getParameters()[0]);
+                      SerializationUtil.deserializeVariableMap(
+                        (Map<String, byte[]>) script.getParameters()[0]);
                     for (Map.Entry<String, Serializable> deserializedArg : deserializedArgs.entrySet()) {
                         if (deserializedArg.getValue() instanceof String) {
                             deserializedArg.setValue(
-                                    Substitutor.replace((String) deserializedArg.getValue(), substitutes));
+                              VariablesUtil.filterAndUpdate((String) deserializedArg.getValue(), 
+                                substitutes));
                         }
                     }
                     script.getParameters()[0] = new HashMap<>(
-                            SerializationUtil.serializeVariableMap(deserializedArgs));
+                      SerializationUtil.serializeVariableMap(deserializedArgs));
                 } catch (Exception e) {
                     errorStream.println("Cannot read Java parameters");
                     e.printStackTrace(errorStream);
                 }
             } else if ("native".equals(script.getEngineName())) { // to replace script arguments
-                script.setScript(Substitutor.replace(script.getScript(), substitutes));
+                script.setScript(VariablesUtil.filterAndUpdate(script.getScript(), substitutes));
             } else {
                 Serializable[] args = script.getParameters();
 
                 if (args != null) {
                     for (int i = 0; i < args.length; i++) {
                         if (args[i] instanceof String) {
-                            args[i] = Substitutor.replace((String) args[i], substitutes);
+                            args[i] = VariablesUtil.filterAndUpdate((String) args[i], substitutes);
                         }
                     }
                 }
@@ -275,20 +285,20 @@ public class NonForkedTaskExecutor implements TaskExecutor {
     }
 
     private Serializable execute(TaskContext container, PrintStream output, PrintStream error,
-            ScriptHandler scriptHandler, Map<String, String> thirdPartyCredentials,
-            Map<String, Serializable> variables) throws Exception {
+      ScriptHandler scriptHandler, Map<String, String> thirdPartyCredentials,
+      Map<String, Serializable> variables) throws Exception {
         if (container.getPreScript() != null) {
             executeScript(output, error, scriptHandler, thirdPartyCredentials, variables, container.getPreScript());
         }
 
         Script<Serializable> script = ((ScriptExecutableContainer) container.getExecutableContainer())
-                .getScript();
+          .getScript();
         replaceScriptParameters(script, thirdPartyCredentials, variables, error);
         ScriptResult<Serializable> scriptResult = scriptHandler.handle(script, output, error);
 
         if (scriptResult.errorOccured()) {
             throw new Exception("Failed to execute task: " + scriptResult.getException().getMessage(),
-                scriptResult.getException());
+              scriptResult.getException());
         }
 
         if (container.getPostScript() != null) {
@@ -311,7 +321,7 @@ public class NonForkedTaskExecutor implements TaskExecutor {
     }
 
     private void executeFlowScript(FlowScript flowScript, ScriptHandler scriptHandler, PrintStream output,
-            PrintStream error, TaskResultImpl taskResult) {
+      PrintStream error, TaskResultImpl taskResult) {
         if (flowScript != null) {
             try {
                 scriptHandler.addBinding(FlowScript.resultVariable, taskResult.value());

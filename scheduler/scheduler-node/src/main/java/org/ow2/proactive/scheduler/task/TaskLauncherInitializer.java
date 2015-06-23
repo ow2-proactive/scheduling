@@ -36,6 +36,13 @@
  */
 package org.ow2.proactive.scheduler.task;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
 
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
@@ -43,14 +50,8 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
-import org.ow2.proactive.scheduler.task.utils.Substitutor;
+import org.ow2.proactive.scheduler.common.util.VariablesUtil;
 import org.ow2.proactive.scripting.Script;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 
 /**
@@ -384,14 +385,13 @@ public class TaskLauncherInitializer implements Serializable {
         List<InputSelector> filteredTaskInputFiles = new ArrayList<>();
         if (taskInputFiles != null) {
 
-            Map<String, String> replacements = Substitutor.buildSubstitutes(variables);
             for (InputSelector is : taskInputFiles) {
                 InputSelector filteredInputSelector = new InputSelector(is.getInputFiles(), is.getMode());
                 Set<String> includes = filteredInputSelector.getInputFiles().getIncludes();
                 Set<String> excludes = filteredInputSelector.getInputFiles().getExcludes();
 
-                Set<String> filteredIncludes = filteredSelector(includes, replacements);
-                Set<String> filteredExcludes = filteredSelector(excludes, replacements);
+                Set<String> filteredIncludes = filteredSelector(includes, variables);
+                Set<String> filteredExcludes = filteredSelector(excludes, variables);
 
                 filteredInputSelector.getInputFiles().setIncludes(filteredIncludes);
                 filteredInputSelector.getInputFiles().setExcludes(filteredExcludes);
@@ -401,11 +401,11 @@ public class TaskLauncherInitializer implements Serializable {
         return filteredTaskInputFiles;
     }
 
-    private Set<String> filteredSelector(Set<String> selectors, Map<String, String> replacements) {
+    private Set<String> filteredSelector(Set<String> selectors, Map<String, Serializable> variables) {
         Set<String> filteredIncludes = new HashSet<>();
         if (selectors != null) {
             for (String include : selectors) {
-                filteredIncludes.add(Substitutor.replace(include, replacements));
+                filteredIncludes.add(VariablesUtil.filterAndUpdate(include, variables));
             }
         }
         return filteredIncludes;
@@ -415,14 +415,13 @@ public class TaskLauncherInitializer implements Serializable {
         List<OutputSelector> filteredTaskOutputFiles = new ArrayList<>();
         if (taskOutputFiles != null) {
 
-            Map<String, String> replacements = Substitutor.buildSubstitutes(variables);
             for (OutputSelector is : taskOutputFiles) {
                 OutputSelector filteredOutputSelector = new OutputSelector(is.getOutputFiles(), is.getMode());
                 Set<String> includes = filteredOutputSelector.getOutputFiles().getIncludes();
                 Set<String> excludes = filteredOutputSelector.getOutputFiles().getExcludes();
 
-                Set<String> filteredIncludes = filteredSelector(includes, replacements);
-                Set<String> filteredExcludes = filteredSelector(excludes, replacements);
+                Set<String> filteredIncludes = filteredSelector(includes, variables);
+                Set<String> filteredExcludes = filteredSelector(excludes, variables);
 
                 filteredOutputSelector.getOutputFiles().setIncludes(filteredIncludes);
                 filteredOutputSelector.getOutputFiles().setExcludes(filteredExcludes);

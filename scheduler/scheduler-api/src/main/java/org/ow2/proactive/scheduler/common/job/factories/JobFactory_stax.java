@@ -324,6 +324,8 @@ public class JobFactory_stax extends JobFactory {
      */
     private void createJob(XMLStreamReader cursorRoot, Map<String, String> updatedVariables)
             throws JobCreationException {
+        addSystemPropertiesToVariables();
+
         String current = null;
         //start parsing
         try {
@@ -353,6 +355,12 @@ public class JobFactory_stax extends JobFactory {
             throw jce;
         } catch (Exception e) {
             throw new JobCreationException(current, null, e);
+        }
+    }
+
+    private void addSystemPropertiesToVariables() {
+        for (Map.Entry o : System.getProperties().entrySet()) {
+            variables.put(o.getKey().toString(), o.getValue().toString());
         }
     }
 
@@ -523,8 +531,8 @@ public class JobFactory_stax extends JobFactory {
                 switch (eventType) {
                     case XMLEvent.START_ELEMENT:
                         if (XMLTags.COMMON_INFO.matches(cursorInfo.getLocalName())) {
-                            infos.put(cursorInfo.getAttributeValue(0), replace(cursorInfo
-                                    .getAttributeValue(1)));
+                            infos.put(cursorInfo.getAttributeValue(0),
+                              replace(cursorInfo.getAttributeValue(1)));
                         }
                         break;
                     case XMLEvent.END_ELEMENT:
@@ -1163,7 +1171,7 @@ public class JobFactory_stax extends JobFactory {
                             }
                             //goto script content
                             if (cursorScript.next() == XMLEvent.CHARACTERS) {
-                                content = replace(cursorScript.getText(), true);
+                                content = cursorScript.getText();
                             }
                             toReturn = new SimpleScript(content, language);
                         } else if (XMLTags.SCRIPT_FILE.matches(current)) {
@@ -1296,7 +1304,7 @@ public class JobFactory_stax extends JobFactory {
                     switch (eventType) {
                         case XMLEvent.START_ELEMENT:
                             if (XMLTags.SCRIPT_ARGUMENT.matches(cursorArgs.getLocalName())) {
-                                args.add(replace(cursorArgs.getAttributeValue(0), true));
+                                args.add(cursorArgs.getAttributeValue(0));
                             }
                             break;
                         case XMLEvent.END_ELEMENT:
@@ -1307,9 +1315,6 @@ public class JobFactory_stax extends JobFactory {
                     }
                 }
                 return args.toArray(new String[args.size()]);
-            } catch (JobCreationException jce) {
-                jce.pushTag(cursorArgs.getLocalName());
-                throw jce;
             } catch (Exception e) {
                 String attrtmp = null;
                 if (cursorArgs.isStartElement() && cursorArgs.getAttributeCount() == 1) {
@@ -1456,8 +1461,8 @@ public class JobFactory_stax extends JobFactory {
                             ForkEnvironment forkEnv = createForkEnvironment(cursorExec);
                             javaTask.setForkEnvironment(forkEnv);
                         } else if (XMLTags.TASK_PARAMETER.matches(current)) {
-                            javaTask.addArgument(replace(cursorExec.getAttributeValue(0)), replace(cursorExec
-                                    .getAttributeValue(1)));
+                            javaTask.addArgument(replace(cursorExec.getAttributeValue(0)),
+                              replace(cursorExec.getAttributeValue(1)));
                         }
                         break;
                     case XMLEvent.END_ELEMENT:
@@ -1598,11 +1603,7 @@ public class JobFactory_stax extends JobFactory {
      * @throws JobCreationException if a Variable has not been found
      */
     private String replace(String str) throws JobCreationException {
-        return replace(str, false);
-    }
-
-    private String replace(String str, boolean dryRun) throws JobCreationException {
-        return filterAndUpdate(str, dryRun, this.variables);
+        return filterAndUpdate(str, this.variables);
     }
 
     /**

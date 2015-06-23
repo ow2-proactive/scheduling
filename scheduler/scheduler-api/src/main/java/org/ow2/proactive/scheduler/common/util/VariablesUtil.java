@@ -37,6 +37,7 @@
 package org.ow2.proactive.scheduler.common.util;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.ow2.proactive.scripting.Script;
@@ -44,14 +45,11 @@ import org.ow2.proactive.scripting.Script;
 
 /**
  * Utility class which facilitates the filtering of variables defined in strings
- * and scripts by using a variable map. These variables should have ${...}
+ * and scripts by using a variable map. These variables should have ${...} or $...
  * format. They will be replace with corresponding values specified in the
  * variable map.
  */
 public class VariablesUtil {
-
-    /** Variables pattern definition */
-    private static final String variablesPattern = "\\$\\{[^\\}]+\\}";
 
     // non-instantiable
     private VariablesUtil() {
@@ -63,62 +61,26 @@ public class VariablesUtil {
      * 
      * @see VariablesUtil#filterAndUpdate(String, boolean, Map)
      * 
-     * @param string
+     * @param input
      *            the string which need to be filtered
      * @param variables
      *            a map which contains variable values
      * @return the filtered string
      */
-    public static String filterAndUpdate(String string, Map variables) {
-        return filterAndUpdate(string, false, variables);
-    }
+    public static String filterAndUpdate(String input, Map<? extends Serializable, ? extends Serializable> variables) {
+        if (input == null || input.isEmpty()) {
+            return input;
+        }
 
-    /**
-     * Filters the specified string and replaces the variables with values
-     * specified in the map. <br />
-     * If a variable is not present in the map, but is available as a system
-     * property, it will be replaced and the map will also be updated. <br />
-     * If dryrun flag is set, this method will check only whether it can filter
-     * the string without any errors.
-     * 
-     * @param string
-     *            the string which need to be filtered
-     * @param dryrun
-     *            an indicator which decides whether only to test the filtering.
-     * @param variables
-     *            a map which contains variable values
-     * @return the filtered string
-     */
-    public static String filterAndUpdate(String string, boolean dryrun, Map variables) {
-        if (string == null || string.isEmpty()) {
-            return string;
+        // TODO provide better substitution
+        // http://commons.apache.org/proper/commons-lang/javadocs/api-3.1/org/apache/commons/lang3/text/StrSubstitutor.html
+
+        String output = input;
+        for (Map.Entry<String, String> replacement : buildSubstitutes(variables).entrySet()) {
+            output = output.replace(replacement.getKey(), replacement.getValue());
         }
-        string = string.trim();
-        String[] defs = RegexpMatcher.matches(variablesPattern, string);
-        String value;
-        if (defs.length != 0) {
-            // for each entry
-            for (String def : defs) {
-                // remove ${ and }
-                def = def.substring(2, def.length() - 1);
-                // search the key (first in variables)
-                value = System.getProperty(def);
-                if (value != null) {
-                    variables.put(def, value);
-                } else {
-                    value = getValueAsString(def, variables);
-                    if (value == null) {
-                        throw new IllegalArgumentException("Variable '" + def +
-                            "' not found in the definition (${" + def + "})");
-                    }
-                }
-                if (!dryrun) {
-                    value = value.replaceAll("\\\\", "\\\\\\\\");
-                    string = string.replaceFirst("\\$\\{" + def + "\\}", value);
-                }
-            }
-        }
-        return string;
+
+        return output;
     }
 
     /**
@@ -131,7 +93,7 @@ public class VariablesUtil {
      * @param variables
      *            a map which contains variables values
      */
-    public static void filterAndUpdate(Script<?> script, Map variables) {
+    public static void filterAndUpdate(Script<?> script, Map<? extends Serializable, ? extends Serializable> variables) {
         script.setScript(filterAndUpdate(script.getScript(), variables));
         Serializable[] params = script.getParameters();
         if (params != null) {
@@ -141,11 +103,18 @@ public class VariablesUtil {
         }
     }
 
-    /*
-     * Returns the value contained in the map as a string.
-     */
-    private static String getValueAsString(String key, Map variables) {
-        Object valObj = variables.get(key);
-        return (valObj == null) ? null : String.valueOf(valObj);
+    public static Map<String, String> buildSubstitutes(
+      Map<? extends Serializable, ? extends Serializable> variables) {
+        Map<String, String> replacements = new HashMap<>();
+
+        if (variables != null) {
+            for (Map.Entry<? extends Serializable, ? extends Serializable> variable : variables.entrySet()) {
+                replacements.put("$" + variable.getKey().toString(), variable.getValue().toString());
+                replacements.put("${" + variable.getKey().toString() + "}", variable.getValue().toString());
+            }
+        }
+
+        return replacements;
     }
+
 }
