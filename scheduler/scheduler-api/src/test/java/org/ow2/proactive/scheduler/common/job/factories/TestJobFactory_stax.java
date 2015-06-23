@@ -36,19 +36,17 @@
  */
 package org.ow2.proactive.scheduler.common.job.factories;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 import java.net.URI;
 import java.util.Map;
 
+import org.ow2.proactive.scheduler.common.job.Job;
+import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import com.google.common.collect.Maps;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.ow2.proactive.scheduler.common.job.Job;
-import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 
-import com.google.common.collect.Maps;
+import static org.junit.Assert.*;
 
 public class TestJobFactory_stax {
 
@@ -90,6 +88,7 @@ public class TestJobFactory_stax {
     public void test_create_job_should_use_job_variables_to_replace_task_generic_info_variables()
             throws Exception {
         TaskFlowJob testJob = (TaskFlowJob) factory.createJob(job_descriptor_uri);
+
         assertEquals("updated_task_generic_info_value", testJob.getTask("task1").getGenericInformations()
                 .get("task_generic_info"));
     }
@@ -99,15 +98,30 @@ public class TestJobFactory_stax {
             throws Exception {
         Map<String, String> variablesMap = Maps.newHashMap();
         variablesMap.put("task_generic_info", "updated_task_generic_info_value2");
+
         TaskFlowJob testJob = (TaskFlowJob) factory.createJob(job_descriptor_uri, variablesMap);
+
         assertEquals("updated_task_generic_info_value2", testJob.getTask("task1").getGenericInformations()
                 .get("task_generic_info"));
     }
 
     @Test
+    public void test_create_job_should_use_variable_map_parameter_to_replace_variable_value()
+      throws Exception {
+        Map<String, String> variablesMap = Maps.newHashMap();
+        variablesMap.put("from_create_job_parameter", "from_create_job_parameter_value");
+
+        TaskFlowJob testJob = (TaskFlowJob) factory.createJob(job_descriptor_uri, variablesMap);
+
+        assertEquals("from_create_job_parameter_value", testJob.getVariables().get("from_create_job_parameter"));
+    }
+
+    @Test
     public void test_create_job_should_use_sysprops_to_replace_variables() throws Exception{
         System.setProperty("system_property", "system_property_value");
+
         Job testJob = factory.createJob(job_descriptor_sys_props_uri);
+
         assertEquals("system_property_value", testJob.getVariables().get("system_property"));
     }
 }

@@ -324,7 +324,6 @@ public class JobFactory_stax extends JobFactory {
      */
     private void createJob(XMLStreamReader cursorRoot, Map<String, String> updatedVariables)
             throws JobCreationException {
-        addSystemPropertiesToVariables();
 
         String current = null;
         //start parsing
@@ -355,12 +354,6 @@ public class JobFactory_stax extends JobFactory {
             throw jce;
         } catch (Exception e) {
             throw new JobCreationException(current, null, e);
-        }
-    }
-
-    private void addSystemPropertiesToVariables() {
-        for (Map.Entry o : System.getProperties().entrySet()) {
-            variables.put(o.getKey().toString(), o.getValue().toString());
         }
     }
 
@@ -421,6 +414,9 @@ public class JobFactory_stax extends JobFactory {
                     case XMLEvent.START_ELEMENT:
                         String current = cursorJob.getLocalName();
                         if (XMLTags.VARIABLES.matches(current)) {
+                            if (! (updatedVariableMap ==  null || updatedVariableMap.isEmpty())) {
+                                updateVariables(updatedVariableMap);
+                            }
                             createVariables(cursorJob);
                             if (! (updatedVariableMap ==  null || updatedVariableMap.isEmpty())) {
                                 updateVariables(updatedVariableMap);
@@ -866,14 +862,14 @@ public class JobFactory_stax extends JobFactory {
                                     if (selector == null) {
                                         selector = new FileSelector();
                                     }
-                                    selector.setIncludes(replace(cursorTask.getAttributeValue(i)));
+                                    selector.setIncludes(cursorTask.getAttributeValue(i));
                                 } else if (XMLAttributes.DS_EXCLUDES.matches(attrName)) {
                                     if (selector == null) {
                                         selector = new FileSelector();
                                     }
                                     selector.setExcludes(replace(cursorTask.getAttributeValue(i)));
                                 } else if (XMLAttributes.DS_ACCESSMODE.matches(attrName)) {
-                                    accessMode = replace(cursorTask.getAttributeValue(i));
+                                    accessMode = cursorTask.getAttributeValue(i);
                                 }
                                 if (selector != null && accessMode != null) {
                                     if (XMLTags.DS_INPUTFILES.matches(endTag)) {
@@ -1352,10 +1348,10 @@ public class JobFactory_stax extends JobFactory {
                         String attrName = cursorExec.getAttributeLocalName(i);
                         attr_ = attrName;
                         if (XMLAttributes.TASK_COMMAND_VALUE.matches(attrName)) {
-                            command.add(replace(cursorExec.getAttributeValue(i)));
+                            command.add(cursorExec.getAttributeValue(i));
                         }
                         if (XMLAttributes.TASK_WORKDING_DIR.matches(attrName)) {
-                            nativeTask.setWorkingDir(replace(cursorExec.getAttributeValue(i)));
+                            nativeTask.setWorkingDir(cursorExec.getAttributeValue(i));
                         }
                     }
 
@@ -1366,7 +1362,7 @@ public class JobFactory_stax extends JobFactory {
                             case XMLEvent.START_ELEMENT:
                                 current_ = cursorExec.getLocalName();
                                 if (XMLTags.SCRIPT_ARGUMENT.matches(cursorExec.getLocalName())) {
-                                    command.add(replace(cursorExec.getAttributeValue(0)));
+                                    command.add((cursorExec.getAttributeValue(0)));
                                 }
                                 break;
                             case XMLEvent.END_ELEMENT:
@@ -1377,9 +1373,6 @@ public class JobFactory_stax extends JobFactory {
                                 break;
                         }
                     }
-                } catch (JobCreationException jce) {
-                    jce.pushTag(current_);
-                    throw jce;
                 } catch (Exception e) {
                     throw new JobCreationException(current_, attr_, e);
                 }
@@ -1603,7 +1596,12 @@ public class JobFactory_stax extends JobFactory {
      * @throws JobCreationException if a Variable has not been found
      */
     private String replace(String str) throws JobCreationException {
-        return filterAndUpdate(str, this.variables);
+        Map<String, String> replacements = new HashMap<String, String>();
+        for (Map.Entry o : System.getProperties().entrySet()) {
+            variables.put(o.getKey().toString(), o.getValue().toString());
+        }
+        replacements.putAll(this.variables);
+        return filterAndUpdate(str, replacements);
     }
 
     /**
