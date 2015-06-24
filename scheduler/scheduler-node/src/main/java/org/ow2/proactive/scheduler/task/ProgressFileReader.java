@@ -1,17 +1,25 @@
 package org.ow2.proactive.scheduler.task;
 
-import org.apache.log4j.Logger;
-import org.ow2.proactive.scheduler.common.task.TaskId;
-import org.ow2.proactive.utils.FileUtils;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.nio.file.*;
+import java.nio.file.ClosedWatchServiceException;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardWatchEventKinds;
+import java.nio.file.WatchEvent;
+import java.nio.file.WatchKey;
+import java.nio.file.WatchService;
 import java.nio.file.attribute.FileTime;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+
+import org.ow2.proactive.scheduler.common.task.TaskId;
+import org.ow2.proactive.utils.FileUtils;
+import org.apache.log4j.Logger;
 
 /**
  * ProgressFileReader is in charge of: - creating a progress file in the
@@ -200,25 +208,27 @@ public class ProgressFileReader {
                         com.google.common.io.Files.readFirstLine(
                                 progressFile.toFile(), Charset.defaultCharset());
 
-                try {
-                    // try to parse double to allow int + double
-                    int value = (int) Double.parseDouble(line);
+                if (line != null) {
+                    try {
+                        // try to parse double to allow int + double
+                        int value = (int) Double.parseDouble(line);
 
-                    if (value >= 0 && value <= 100) {
-                        progress = value;
+                        if (value >= 0 && value <= 100) {
+                            progress = value;
 
-                        for (Listener observer : observers) {
-                            observer.onProgressUpdate(progress);
+                            for (Listener observer : observers) {
+                                observer.onProgressUpdate(progress);
+                            }
+
+                            if (logger.isDebugEnabled()) {
+                                logger.debug("New progress value read: " + value);
+                            }
+                        } else {
+                            logger.warn("Invalid progress value: " + value);
                         }
-
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("New progress value read: " + value);
-                        }
-                    } else {
-                        logger.warn("Invalid progress value: " + value);
+                    } catch (NumberFormatException e) {
+                        logger.warn("Progress value is a not a numeric value: " + line);
                     }
-                } catch (NumberFormatException e) {
-                    logger.warn("Progress value is a not a numeric value: " + line);
                 }
             } catch (IOException e) {
                 logger.warn("Error while reading the first line of " + progressFile);
