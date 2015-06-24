@@ -1,6 +1,12 @@
 package org.ow2.proactive.scheduler.task;
 
-import org.apache.commons.io.FileUtils;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.Semaphore;
+
 import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
 import org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemException;
 import org.ow2.proactive.scheduler.common.task.TaskId;
@@ -10,17 +16,10 @@ import org.ow2.proactive.scheduler.task.data.TaskDataspaces;
 import org.ow2.proactive.scheduler.task.executors.ForkedTaskExecutor;
 import org.ow2.proactive.scheduler.task.executors.TaskExecutor;
 import org.ow2.proactive.scheduler.task.utils.Decrypter;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.Semaphore;
+import org.apache.commons.io.FileUtils;
 
 public class TestTaskLauncherFactory extends ProActiveForkedTaskLauncherFactory {
     private Semaphore taskRunning;
-    private File dataspacesRootFolder;
 
     private TaskFileDataspaces dataSpaces;
 
@@ -34,7 +33,6 @@ public class TestTaskLauncherFactory extends ProActiveForkedTaskLauncherFactory 
     }
 
     public TestTaskLauncherFactory(File dataspacesRootFolder) {
-        this.dataspacesRootFolder = dataspacesRootFolder;
         this.dataSpaces = new TaskFileDataspaces(dataspacesRootFolder);
     }
 
@@ -73,20 +71,22 @@ public class TestTaskLauncherFactory extends ProActiveForkedTaskLauncherFactory 
         }
 
         public TaskFileDataspaces(File rootFolder) {
-            scratchFolder = new File(rootFolder, "scratch");
-            userspaceFolder = new File(rootFolder, "userspace");
-            globalspaceFolder = new File(rootFolder, "globalspace");
-            inputspaceFolder = new File(rootFolder, "inputspace");
-            outputspaceFolder = new File(rootFolder, "outputspace");
+            scratchFolder = createDataspaceFolder(rootFolder, "scratch");
+            userspaceFolder = createDataspaceFolder(rootFolder, "userspace");
+            globalspaceFolder = createDataspaceFolder(rootFolder, "globalspace");
+            inputspaceFolder = createDataspaceFolder(rootFolder, "inputspace");
+            outputspaceFolder = createDataspaceFolder(rootFolder, "outputspace");
+        }
+
+        private File createDataspaceFolder(File rootFolder, String dsName) {
+            File dsFolder = new File(rootFolder, dsName);
+            dsFolder.deleteOnExit();
             try {
-                FileUtils.forceMkdir(scratchFolder);
-                FileUtils.forceMkdir(userspaceFolder);
-                FileUtils.forceMkdir(globalspaceFolder);
-                FileUtils.forceMkdir(inputspaceFolder);
-                FileUtils.forceMkdir(outputspaceFolder);
+                FileUtils.forceMkdir(dsFolder);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
+            return dsFolder;
         }
 
         // implement a fake one with files

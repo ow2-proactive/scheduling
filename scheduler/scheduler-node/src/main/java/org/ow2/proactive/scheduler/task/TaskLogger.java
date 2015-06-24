@@ -34,13 +34,11 @@
  */
 package org.ow2.proactive.scheduler.task;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Appender;
-import org.apache.log4j.FileAppender;
-import org.apache.log4j.Logger;
-import org.apache.log4j.MDC;
-import org.apache.log4j.helpers.LogLog;
-import org.apache.log4j.spi.LoggingEvent;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskLogs;
@@ -48,11 +46,13 @@ import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
 import org.ow2.proactive.scheduler.common.util.logforwarder.appenders.AsyncAppenderWithStorage;
 import org.ow2.proactive.scheduler.common.util.logforwarder.util.LoggingOutputStream;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.util.concurrent.atomic.AtomicBoolean;
+import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Appender;
+import org.apache.log4j.FileAppender;
+import org.apache.log4j.Logger;
+import org.apache.log4j.MDC;
+import org.apache.log4j.helpers.LogLog;
+import org.apache.log4j.spi.LoggingEvent;
 
 
 public class TaskLogger {
@@ -66,6 +66,8 @@ public class TaskLogger {
 
     // default log size, counted in number of log events
     private static final int DEFAULT_LOG_MAX_SIZE = 1024;
+
+    private static final String FILE_APPENDER_NAME = "TASK_LOGGER_FILE_APPENDER";
 
     private AsyncAppenderWithStorage taskLogAppender;
 
@@ -134,6 +136,7 @@ public class TaskLogger {
         logFile.setWritable(true, false);
 
         FileAppender fap = new FileAppender(Log4JTaskLogs.getTaskLogLayout(), logFile.getAbsolutePath(), false);
+        fap.setName(FILE_APPENDER_NAME);
         taskLogAppender.addAppender(fap);
 
         return logFile;
@@ -206,13 +209,21 @@ public class TaskLogger {
 
                 this.loggersFinalized.set(true);
                 this.loggersActivated.set(false);
-                //Unhandle loggers
+
+                removeTaskLogFile();
+
+                // Unhandle loggers
                 if (taskLogAppender != null) {
                     taskLogAppender.close();
                 }
                 logger.debug("Task logger closed");
             }
         }
+    }
+
+    private void removeTaskLogFile() {
+        FileAppender fileAppender = (FileAppender) taskLogAppender.getAppender(FILE_APPENDER_NAME);
+        FileUtils.deleteQuietly(new File(fileAppender.getFile()));
     }
 
     private void flushStreams() {

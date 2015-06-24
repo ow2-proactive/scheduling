@@ -212,6 +212,7 @@ public class TaskLauncher {
 
             sendResultToScheduler(terminateNotification, failedTaskResult);
         } finally {
+            progressFileReader.stop();
             taskLogger.close();
         }
     }
@@ -294,8 +295,6 @@ public class TaskLauncher {
 
     @ImmediateService
     public void terminate(boolean normalTermination) {
-        progressFileReader.stop();
-
         taskLogger.resetLogContextForImmediateService();
 
         if (normalTermination) {
