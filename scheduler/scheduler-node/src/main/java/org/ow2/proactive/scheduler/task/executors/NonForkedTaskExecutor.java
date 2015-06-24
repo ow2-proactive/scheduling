@@ -54,7 +54,6 @@ import org.ow2.proactive.scheduler.task.TaskContext;
 import org.ow2.proactive.scheduler.task.TaskLauncherInitializer;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
-
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptHandler;
 import org.ow2.proactive.scripting.ScriptLoader;
@@ -168,7 +167,8 @@ public class NonForkedTaskExecutor implements TaskExecutor {
         }
     }
 
-    static Map<String, Serializable> taskVariables(TaskContext container) throws Exception {
+    public static Map<String, Serializable> taskVariables(TaskContext container, TaskResult taskResult)
+      throws Exception {
         Map<String, Serializable> variables = new HashMap<>();
 
         // variables from workflow definition
@@ -176,18 +176,25 @@ public class NonForkedTaskExecutor implements TaskExecutor {
             variables.putAll(container.getInitializer().getVariables());
         }
 
-        // variables from previous tasks
         try {
+            // variables from previous tasks
             if (container.getPreviousTasksResults() != null) {
-                for (TaskResult taskResult : container.getPreviousTasksResults()) {
-                    if (taskResult.getPropagatedVariables() != null) {
-                        variables.putAll(SerializationUtil.deserializeVariableMap(taskResult
+                for (TaskResult previousTaskResult : container.getPreviousTasksResults()) {
+                    if (previousTaskResult.getPropagatedVariables() != null) {
+                        variables.putAll(SerializationUtil.deserializeVariableMap(previousTaskResult
                           .getPropagatedVariables()));
                     }
                 }
             }
+            // and from this task execution
+            if (taskResult != null) {
+                if (taskResult.getPropagatedVariables() != null) {
+                    variables.putAll(SerializationUtil.deserializeVariableMap(taskResult
+                      .getPropagatedVariables()));
+                }
+            }
         } catch (Exception e) {
-            throw new Exception("Could deserialize variables", e);
+            throw new Exception("Could not deserialize variables", e);
         }
 
         // variables from current job/task context
@@ -202,6 +209,10 @@ public class NonForkedTaskExecutor implements TaskExecutor {
         return variables;
     }
 
+    public static Map<String, Serializable> taskVariables(TaskContext container) throws Exception {
+        return taskVariables(container, null);
+    }
+
     static TaskResult[] tasksResults(TaskContext container) {
         TaskResult[] previousTasksResults = container.getPreviousTasksResults();
         if (previousTasksResults != null) {
@@ -211,7 +222,7 @@ public class NonForkedTaskExecutor implements TaskExecutor {
         }
     }
 
-    static Map<String, Serializable> contextVariables(TaskLauncherInitializer initializer) {
+    public static Map<String, Serializable> contextVariables(TaskLauncherInitializer initializer) {
         Map<String, Serializable> variables = new HashMap<>();
         variables.put(SchedulerVars.PA_JOB_ID.toString(), initializer.getTaskId().getJobId().value());
         variables.put(SchedulerVars.PA_JOB_NAME.toString(), initializer.getTaskId().getJobId()
@@ -258,7 +269,7 @@ public class NonForkedTaskExecutor implements TaskExecutor {
                     for (Map.Entry<String, Serializable> deserializedArg : deserializedArgs.entrySet()) {
                         if (deserializedArg.getValue() instanceof String) {
                             deserializedArg.setValue(
-                              VariablesUtil.filterAndUpdate((String) deserializedArg.getValue(), 
+                              VariablesUtil.filterAndUpdate((String) deserializedArg.getValue(),
                                 substitutes));
                         }
                     }

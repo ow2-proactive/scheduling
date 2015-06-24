@@ -44,7 +44,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.objectweb.proactive.annotation.ImmediateService;
@@ -62,7 +62,7 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.task.data.TaskDataspaces;
-import org.ow2.proactive.scheduler.task.containers.ExecutableContainer;
+import org.ow2.proactive.scheduler.task.executors.NonForkedTaskExecutor;
 import org.ow2.proactive.scheduler.task.containers.ForkedScriptExecutableContainer;
 import org.ow2.proactive.scheduler.task.utils.Decrypter;
 import org.ow2.proactive.scheduler.task.utils.TaskKiller;
@@ -114,11 +114,11 @@ public class TaskLauncher {
     }
 
     public void doTask(ExecutableContainer executableContainer, TaskResult[] previousTasksResults,
-                       TaskTerminateNotification terminateNotification) {
+      TaskTerminateNotification terminateNotification) {
 
         taskKiller = new TaskKiller(Thread.currentThread()); // what about kill of a non yet started task?
         WallTimer wallTimer = WallTimer.startWallTime(initializer.getWalltime(),
-                new TaskKiller(Thread.currentThread()));
+          new TaskKiller(Thread.currentThread()));
 
         Stopwatch stopwatchWhenTaskFailed = Stopwatch.createStarted();
 
@@ -127,15 +127,17 @@ public class TaskLauncher {
 
             File taskLogFile = taskLogger.createFileAppender(dataspaces.getScratchFolder());
 
-            dataspaces.copyInputDataToScratch(initializer.getFilteredInputFiles(fileSelectorsFilters(initializer))); // should handle interrupt
 
             File workingDir = getTaskWorkingDir(executableContainer, dataspaces);
 
             progressFileReader.start(workingDir, taskId);
 
             TaskContext context = new TaskContext(executableContainer, initializer, previousTasksResults,
-                    dataspaces.getScratchURI(), dataspaces.getInputURI(), dataspaces.getOutputURI(),
-                    dataspaces.getUserURI(), dataspaces.getGlobalURI(), progressFileReader.getProgressFile().toString());
+              dataspaces.getScratchURI(), dataspaces.getInputURI(), dataspaces.getOutputURI(),
+              dataspaces.getUserURI(), dataspaces.getGlobalURI(), progressFileReader.getProgressFile()
+              .toString());
+
+            dataspaces.copyInputDataToScratch(initializer.getFilteredInputFiles(fileSelectorsFilters(context))); // should handle interrupt
 
             if (decrypter != null) {
                 decrypter.setCredentials(executableContainer.getCredentials());
@@ -143,17 +145,18 @@ public class TaskLauncher {
             }
 
             TaskResultImpl taskResult = factory.createTaskExecutor(workingDir, decrypter).execute(context,
-                    taskLogger.getOutputSink(), taskLogger.getErrorSink());
+              taskLogger.getOutputSink(), taskLogger.getErrorSink());
 
             if (wallTimer.hasWallTimed()) { // still needed?
                 stopwatchWhenTaskFailed.stop();
 
                 taskLogger.getErrorSink().println(
-                        "Walltime of " + initializer.getWalltime() + " ms reached on task " +
-                                taskId.getReadableName());
+                  "Walltime of " + initializer.getWalltime() + " ms reached on task " +
+                    taskId.getReadableName());
                 TaskResultImpl failedTaskResult = new TaskResultImpl(taskId, new WalltimeExceededException(
-                        "Walltime of " + initializer.getWalltime() + " ms reached on task " +
-                                taskId.getReadableName()), taskLogger.getLogs(), stopwatchWhenTaskFailed.elapsed(TimeUnit.MILLISECONDS));
+                  "Walltime of " + initializer.getWalltime() + " ms reached on task " +
+                    taskId.getReadableName()), taskLogger.getLogs(),
+                  stopwatchWhenTaskFailed.elapsed(TimeUnit.MILLISECONDS));
 
                 sendResultToScheduler(terminateNotification, failedTaskResult);
                 return;
@@ -163,14 +166,15 @@ public class TaskLauncher {
 
                 taskLogger.getErrorSink().println("Task " + taskId.getReadableName() + " has been killed");
                 TaskResultImpl failedTaskResult = new TaskResultImpl(taskId, new TaskAbortedException(
-                        "Task " + taskId.getReadableName() + " has been killed"), taskLogger.getLogs(),
-                        stopwatchWhenTaskFailed.elapsed(TimeUnit.MILLISECONDS));
+                  "Task " + taskId.getReadableName() + " has been killed"), taskLogger.getLogs(),
+                  stopwatchWhenTaskFailed.elapsed(TimeUnit.MILLISECONDS));
 
                 sendResultToScheduler(terminateNotification, failedTaskResult);
                 return;
             }
 
-            dataspaces.copyScratchDataToOutput(initializer.getFilteredOutputFiles(fileSelectorsFilters(initializer)));
+            dataspaces.copyScratchDataToOutput(initializer.getFilteredOutputFiles(fileSelectorsFilters(
+              context, taskResult)));
 
             copyTaskLogsToUserSpace(taskLogFile, dataspaces);
             FileUtils.deleteQuietly(taskLogFile);
@@ -189,20 +193,21 @@ public class TaskLauncher {
             if (wallTimer.hasWallTimed()) {
                 logger.debug("Walltime reached for task", taskFailure);
                 failedTaskResult = new TaskResultImpl(taskId, new WalltimeExceededException("Walltime of " +
-                        initializer.getWalltime() + " ms reached on task " + taskId.getReadableName(),
-                        taskFailure), taskLogger.getLogs(), stopwatchWhenTaskFailed.elapsed(TimeUnit.MILLISECONDS));
+                  initializer.getWalltime() + " ms reached on task " + taskId.getReadableName(),
+                  taskFailure), taskLogger.getLogs(),
+                  stopwatchWhenTaskFailed.elapsed(TimeUnit.MILLISECONDS));
 
             } else if (taskKiller.wasKilled()) {
                 logger.debug("Task has been killed", taskFailure);
                 failedTaskResult = new TaskResultImpl(taskId, new TaskAbortedException("Task " +
-                        taskId.getReadableName() + " has been killed"), taskLogger.getLogs(),
-                        stopwatchWhenTaskFailed.elapsed(TimeUnit.MILLISECONDS));
+                  taskId.getReadableName() + " has been killed"), taskLogger.getLogs(),
+                  stopwatchWhenTaskFailed.elapsed(TimeUnit.MILLISECONDS));
 
             } else {
                 logger.info("Failed to execute task", taskFailure);
                 taskFailure.printStackTrace(taskLogger.getErrorSink());
                 failedTaskResult = new TaskResultImpl(taskId, taskFailure, taskLogger.getLogs(),
-                        stopwatchWhenTaskFailed.elapsed(TimeUnit.MILLISECONDS));
+                  stopwatchWhenTaskFailed.elapsed(TimeUnit.MILLISECONDS));
             }
 
             sendResultToScheduler(terminateNotification, failedTaskResult);
@@ -211,24 +216,19 @@ public class TaskLauncher {
         }
     }
 
-    private HashMap<String, Serializable> fileSelectorsFilters(TaskLauncherInitializer initializer) {
-        HashMap<String, Serializable> replacements = new HashMap<>();
+    private Map<String, Serializable> fileSelectorsFilters(TaskContext taskContext, TaskResult taskResult) throws Exception {
+        return NonForkedTaskExecutor.taskVariables(taskContext, taskResult);
+    }
 
-        replacements.put(SchedulerVars.PA_JOB_ID.toString(), initializer.getTaskId().getJobId().value());
-        replacements.put(SchedulerVars.PA_JOB_NAME.toString(), initializer.getTaskId().getJobId().getReadableName());
-        replacements.put(SchedulerVars.PA_TASK_ID.toString(), initializer.getTaskId().value());
-        replacements.put(SchedulerVars.PA_TASK_NAME.toString(), initializer.getTaskId().getReadableName());
-        replacements.put(SchedulerVars.PA_TASK_ITERATION.toString(), Integer.toString(initializer.getIterationIndex()));
-        replacements.put(SchedulerVars.PA_TASK_REPLICATION.toString(), Integer.toString(initializer.getReplicationIndex()));
-
-        return replacements;
+    private Map<String, Serializable> fileSelectorsFilters(TaskContext taskContext) throws Exception {
+        return NonForkedTaskExecutor.taskVariables(taskContext);
     }
 
     private void copyTaskLogsToUserSpace(File taskLogFile, TaskDataspaces dataspaces) {
         if (initializer.isPreciousLogs()) {
             try {
                 dataspaces.copyScratchDataToOutput(Collections.singletonList(new OutputSelector(
-                        new FileSelector(taskLogFile.getName()), OutputAccessMode.TransferToUserSpace)));
+                  new FileSelector(taskLogFile.getName()), OutputAccessMode.TransferToUserSpace)));
             } catch (FileSystemException e) {
                 logger.warn("Cannot copy logs of task to user data spaces", e);
             }
@@ -247,7 +247,7 @@ public class TaskLauncher {
     }
 
     private void sendResultToScheduler(TaskTerminateNotification terminateNotification,
-                                       TaskResultImpl taskResult) {
+      TaskResultImpl taskResult) {
         int pingAttempts = initializer.getPingAttempts();
         int pingPeriodMs = initializer.getPingPeriod() * 1000;
 
@@ -258,7 +258,7 @@ public class TaskLauncher {
                 return;
             } catch (Throwable th) {
                 logger.warn("Cannot notify task termination " + taskId + ", will try again in " +
-                        pingPeriodMs + " ms", th);
+                  pingPeriodMs + " ms", th);
                 try {
                     Thread.sleep(pingPeriodMs);
                 } catch (InterruptedException e) {
@@ -266,7 +266,8 @@ public class TaskLauncher {
                 }
             }
         }
-        logger.error("Cannot notify task termination " + taskId + " after " + pingAttempts + " attempts, terminating task launcher now");
+        logger.error("Cannot notify task termination " + taskId + " after " + pingAttempts +
+          " attempts, terminating task launcher now");
         terminate(true);
     }
 
