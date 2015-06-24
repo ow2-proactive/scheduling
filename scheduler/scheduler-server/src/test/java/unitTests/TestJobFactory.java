@@ -255,8 +255,6 @@ public class TestJobFactory {
                         .getMode());
         Assert.assertNull(tfJob.getTask("task3").getOutputFilesList());
         Assert.assertEquals(((NativeTask) tfJob.getTask("task3")).getCommandLine().length, 5);
-        Assert.assertEquals(((NativeTask) tfJob.getTask("task3")).getCommandLine()[0], URLbegin +
-            "scheduler-server/src/test/resources/unitTests/descriptors/nativTask");
         Assert.assertEquals(((NativeTask) tfJob.getTask("task3")).getCommandLine()[1], "1");
         Assert.assertEquals(((NativeTask) tfJob.getTask("task3")).getCommandLine()[2], "2 2");
         Assert.assertEquals(((NativeTask) tfJob.getTask("task3")).getCommandLine()[3], "3");
@@ -315,7 +313,7 @@ public class TestJobFactory {
         Assert.assertEquals(((NativeTask) tfJob.getTask("task4")).getWorkingDir(), "task4workingDir");
         Assert.assertEquals(((NativeTask) tfJob.getTask("task4")).getNumberOfNodesNeeded(), 10);
         Assert.assertEquals(((NativeTask) tfJob.getTask("task4")).getGenerationScript().getScript(),
-                "command=args[0]+\" 12\";");
+                "command=args[0]+\" 12\";\n");
         Assert.assertEquals(((NativeTask) tfJob.getTask("task4")).getGenerationScript().getParameters()[0],
                 URLbegin + "scheduler-server/src/test/resources/unitTests/descriptors/nativTask");
         Assert.assertEquals(URLbegin +

@@ -1348,10 +1348,10 @@ public class JobFactory_stax extends JobFactory {
                         String attrName = cursorExec.getAttributeLocalName(i);
                         attr_ = attrName;
                         if (XMLAttributes.TASK_COMMAND_VALUE.matches(attrName)) {
-                            command.add(cursorExec.getAttributeValue(i));
+                            command.add(replace(cursorExec.getAttributeValue(i)));
                         }
                         if (XMLAttributes.TASK_WORKDING_DIR.matches(attrName)) {
-                            nativeTask.setWorkingDir(cursorExec.getAttributeValue(i));
+                            nativeTask.setWorkingDir(replace(cursorExec.getAttributeValue(i)));
                         }
                     }
 
@@ -1362,7 +1362,7 @@ public class JobFactory_stax extends JobFactory {
                             case XMLEvent.START_ELEMENT:
                                 current_ = cursorExec.getLocalName();
                                 if (XMLTags.SCRIPT_ARGUMENT.matches(cursorExec.getLocalName())) {
-                                    command.add((cursorExec.getAttributeValue(0)));
+                                    command.add(replace(cursorExec.getAttributeValue(0)));
                                 }
                                 break;
                             case XMLEvent.END_ELEMENT:
@@ -1596,9 +1596,9 @@ public class JobFactory_stax extends JobFactory {
      * @throws JobCreationException if a Variable has not been found
      */
     private String replace(String str) throws JobCreationException {
-        Map<String, String> replacements = new HashMap<String, String>();
+        Map<String, String> replacements = new HashMap<>();
         for (Map.Entry o : System.getProperties().entrySet()) {
-            variables.put(o.getKey().toString(), o.getValue().toString());
+            replacements.put(o.getKey().toString(), o.getValue().toString());
         }
         replacements.putAll(this.variables);
         return filterAndUpdate(str, replacements);

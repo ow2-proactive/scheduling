@@ -11,9 +11,7 @@
 		<variable name="JAVA_HOME" value="/bin/java/jdk1.5"/>
 		<variable name="PROJECT" value="My_project"/>
 	</variables>
-	<description>
-			No ${EXCLUSION_STRING} in its HostName.
-	</description>
+	<description>No ${EXCLUSION_STRING} in its HostName.</description>
 	<inputSpace url="input/space"/>
 	<outputSpace url="output/space"/>
 	<taskFlow>
