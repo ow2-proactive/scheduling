@@ -38,21 +38,32 @@ package functionaltests;
 
 import java.io.File;
 
+import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.tests.FunctionalTest;
 import org.junit.Test;
 
-
+/**
+ * Tests used to check that {@code forkEnvironment} element is allowed
+ * in {@code task} element for Jobs Schema in version 3.3 but not longer
+ * in {@code javaExecutable} element.
+ */
 public class TestScriptForkEnvironment extends FunctionalTest {
 
     @Test
-    public void test() throws Throwable {
-        SchedulerTHelper.testJobSubmission(new File(TestScriptForkEnvironment.class.getResource(
-          "/functionaltests/descriptors/Job_script_task_fork_environment.xml").toURI())
-                .getAbsolutePath());
+    public void testValidForkEnvironmentPositionWithSchemaVersion3_3() throws Throwable {
+        testJobSubmissionWithJobDefinedUsingSchema3_3("Job_script_task_fork_environment_valid.xml");
     }
 
+    @Test(expected = JobCreationException.class)
+    public void testInvalidForkEnvironmentPositionWithSchemaVersion3_3() throws Throwable {
+        testJobSubmissionWithJobDefinedUsingSchema3_3("Job_script_task_fork_environment_invalid.xml");
+    }
 
-
+    private void testJobSubmissionWithJobDefinedUsingSchema3_3(String filename) throws Exception {
+        SchedulerTHelper.testJobSubmission(new File(TestScriptForkEnvironment.class.getResource(
+                "/functionaltests/descriptors/" + filename).toURI())
+                .getAbsolutePath());
+    }
 
 }
 
