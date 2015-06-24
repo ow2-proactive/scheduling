@@ -1348,10 +1348,10 @@ public class JobFactory_stax extends JobFactory {
                         String attrName = cursorExec.getAttributeLocalName(i);
                         attr_ = attrName;
                         if (XMLAttributes.TASK_COMMAND_VALUE.matches(attrName)) {
-                            command.add(replace(cursorExec.getAttributeValue(i)));
+                            command.add((cursorExec.getAttributeValue(i)));
                         }
                         if (XMLAttributes.TASK_WORKDING_DIR.matches(attrName)) {
-                            nativeTask.setWorkingDir(replace(cursorExec.getAttributeValue(i)));
+                            nativeTask.setWorkingDir((cursorExec.getAttributeValue(i)));
                         }
                     }
 
@@ -1362,7 +1362,7 @@ public class JobFactory_stax extends JobFactory {
                             case XMLEvent.START_ELEMENT:
                                 current_ = cursorExec.getLocalName();
                                 if (XMLTags.SCRIPT_ARGUMENT.matches(cursorExec.getLocalName())) {
-                                    command.add(replace(cursorExec.getAttributeValue(0)));
+                                    command.add((cursorExec.getAttributeValue(0)));
                                 }
                                 break;
                             case XMLEvent.END_ELEMENT:
