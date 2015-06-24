@@ -98,7 +98,7 @@ public class NonForkedTaskExecutor implements TaskExecutor {
         String nodesFile = null;
         try {
             nodesFile = writeNodesFile(container.getNodesHosts());
-            Map<String, Serializable> variables = taskVariables(container);
+            Map<String, Serializable> variables = taskVariables(container, nodesFile);
             Map<String, String> thirdPartyCredentials = thirdPartyCredentials(container);
             createBindings(container, scriptHandler, variables, thirdPartyCredentials);
 
@@ -107,15 +107,15 @@ public class NonForkedTaskExecutor implements TaskExecutor {
             try {
                 stopwatch.start();
                 Serializable result = execute(container, output, error, scriptHandler, thirdPartyCredentials,
-                  variables);
+                        variables);
                 stopwatch.stop();
                 taskResult = new TaskResultImpl(
-                  container.getTaskId(), result, null, stopwatch.elapsed(TimeUnit.MILLISECONDS));
+                        container.getTaskId(), result, null, stopwatch.elapsed(TimeUnit.MILLISECONDS));
             } catch (Throwable e) {
                 stopwatch.stop();
                 e.printStackTrace(error);
                 taskResult = new TaskResultImpl(
-                  container.getTaskId(), e, null, stopwatch.elapsed(TimeUnit.MILLISECONDS));
+                        container.getTaskId(), e, null, stopwatch.elapsed(TimeUnit.MILLISECONDS));
             }
 
             executeFlowScript(container.getControlFlowScript(), scriptHandler, output, error, taskResult);
@@ -167,8 +167,20 @@ public class NonForkedTaskExecutor implements TaskExecutor {
         }
     }
 
-    public static Map<String, Serializable> taskVariables(TaskContext container, TaskResult taskResult)
-      throws Exception {
+    private static Map<String, Serializable> taskVariables(TaskContext container, TaskResult taskResult, String nodesFile)
+            throws Exception {
+        Map<String, Serializable> variables = taskVariables(container, taskResult);
+
+        variables.put(SchedulerVars.PA_NODESNUMBER.toString(), container.getNodesURLs().size() + 1);
+        variables.put(SchedulerVars.PA_NODESFILE.toString(), nodesFile);
+
+        variables.put(SchedulerVars.PA_TASK_PROGRESS_FILE.toString(), container.getProgressFilePath());
+
+        return variables;
+    }
+
+    public static Map<String, Serializable> taskVariables(TaskContext container,
+      TaskResult taskResult) throws Exception {
         Map<String, Serializable> variables = new HashMap<>();
 
         // variables from workflow definition
@@ -181,8 +193,8 @@ public class NonForkedTaskExecutor implements TaskExecutor {
             if (container.getPreviousTasksResults() != null) {
                 for (TaskResult previousTaskResult : container.getPreviousTasksResults()) {
                     if (previousTaskResult.getPropagatedVariables() != null) {
-                        variables.putAll(SerializationUtil.deserializeVariableMap(previousTaskResult
-                          .getPropagatedVariables()));
+                        variables.putAll(SerializationUtil.deserializeVariableMap(
+                          previousTaskResult.getPropagatedVariables()));
                     }
                 }
             }
@@ -190,7 +202,7 @@ public class NonForkedTaskExecutor implements TaskExecutor {
             if (taskResult != null) {
                 if (taskResult.getPropagatedVariables() != null) {
                     variables.putAll(SerializationUtil.deserializeVariableMap(taskResult
-                      .getPropagatedVariables()));
+                            .getPropagatedVariables()));
                 }
             }
         } catch (Exception e) {
@@ -200,17 +212,16 @@ public class NonForkedTaskExecutor implements TaskExecutor {
         // variables from current job/task context
         variables.putAll(contextVariables(container.getInitializer()));
 
-        variables.put(SchedulerVars.PA_NODESNUMBER.toString(), container.getNodesURLs().size() + 1);
-        variables.put(SchedulerVars.PA_NODESFILE.toString(), writeNodesFile(container.getNodesHosts()));
-
         variables.put(SchedulerVars.PA_SCHEDULER_HOME.toString(), container.getSchedulerHome());
-        variables.put(SchedulerVars.PA_TASK_PROGRESS_FILE.toString(), container.getProgressFilePath());
-
         return variables;
     }
 
     public static Map<String, Serializable> taskVariables(TaskContext container) throws Exception {
-        return taskVariables(container, null);
+        return taskVariables(container, (TaskResult) null);
+    }
+
+    public static Map<String, Serializable> taskVariables(TaskContext container, String nodesFile) throws Exception {
+        return taskVariables(container, null, nodesFile);
     }
 
     static TaskResult[] tasksResults(TaskContext container) {
@@ -226,7 +237,7 @@ public class NonForkedTaskExecutor implements TaskExecutor {
         Map<String, Serializable> variables = new HashMap<>();
         variables.put(SchedulerVars.PA_JOB_ID.toString(), initializer.getTaskId().getJobId().value());
         variables.put(SchedulerVars.PA_JOB_NAME.toString(), initializer.getTaskId().getJobId()
-          .getReadableName());
+                .getReadableName());
         variables.put(SchedulerVars.PA_TASK_ID.toString(), initializer.getTaskId().value());
         variables.put(SchedulerVars.PA_TASK_NAME.toString(), initializer.getTaskId().getReadableName());
         variables.put(SchedulerVars.PA_TASK_ITERATION.toString(), initializer.getIterationIndex());
@@ -247,7 +258,7 @@ public class NonForkedTaskExecutor implements TaskExecutor {
     }
 
     static void replaceScriptParameters(Script script, Map<String, String> thirdPartyCredentials,
-      Map<String, Serializable> variables, PrintStream errorStream) {
+                                        Map<String, Serializable> variables, PrintStream errorStream) {
 
         Map<String, Serializable> variablesAndCredentials = new HashMap<>(variables);
 
@@ -264,8 +275,8 @@ public class NonForkedTaskExecutor implements TaskExecutor {
                 try {
                     @SuppressWarnings("unchecked")
                     Map<String, Serializable> deserializedArgs =
-                      SerializationUtil.deserializeVariableMap(
-                        (Map<String, byte[]>) script.getParameters()[0]);
+                            SerializationUtil.deserializeVariableMap(
+                                    (Map<String, byte[]>) script.getParameters()[0]);
                     for (Map.Entry<String, Serializable> deserializedArg : deserializedArgs.entrySet()) {
                         if (deserializedArg.getValue() instanceof String) {
                             deserializedArg.setValue(
@@ -274,7 +285,7 @@ public class NonForkedTaskExecutor implements TaskExecutor {
                         }
                     }
                     script.getParameters()[0] = new HashMap<>(
-                      SerializationUtil.serializeVariableMap(deserializedArgs));
+                            SerializationUtil.serializeVariableMap(deserializedArgs));
                 } catch (Exception e) {
                     errorStream.println("Cannot read Java parameters");
                     e.printStackTrace(errorStream);
@@ -296,20 +307,20 @@ public class NonForkedTaskExecutor implements TaskExecutor {
     }
 
     private Serializable execute(TaskContext container, PrintStream output, PrintStream error,
-      ScriptHandler scriptHandler, Map<String, String> thirdPartyCredentials,
-      Map<String, Serializable> variables) throws Exception {
+            ScriptHandler scriptHandler, Map<String, String> thirdPartyCredentials,
+            Map<String, Serializable> variables) throws Exception {
         if (container.getPreScript() != null) {
             executeScript(output, error, scriptHandler, thirdPartyCredentials, variables, container.getPreScript());
         }
 
         Script<Serializable> script = ((ScriptExecutableContainer) container.getExecutableContainer())
-          .getScript();
+                .getScript();
         replaceScriptParameters(script, thirdPartyCredentials, variables, error);
         ScriptResult<Serializable> scriptResult = scriptHandler.handle(script, output, error);
 
         if (scriptResult.errorOccured()) {
             throw new Exception("Failed to execute task: " + scriptResult.getException().getMessage(),
-              scriptResult.getException());
+                scriptResult.getException());
         }
 
         if (container.getPostScript() != null) {
@@ -332,7 +343,7 @@ public class NonForkedTaskExecutor implements TaskExecutor {
     }
 
     private void executeFlowScript(FlowScript flowScript, ScriptHandler scriptHandler, PrintStream output,
-      PrintStream error, TaskResultImpl taskResult) {
+            PrintStream error, TaskResultImpl taskResult) {
         if (flowScript != null) {
             try {
                 scriptHandler.addBinding(FlowScript.resultVariable, taskResult.value());

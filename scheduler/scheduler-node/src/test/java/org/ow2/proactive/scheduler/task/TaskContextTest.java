@@ -1,6 +1,6 @@
 package org.ow2.proactive.scheduler.task;
 
-import org.ow2.proactive.scheduler.task.script.ScriptExecutableContainer;
+import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
 import org.junit.Test;
