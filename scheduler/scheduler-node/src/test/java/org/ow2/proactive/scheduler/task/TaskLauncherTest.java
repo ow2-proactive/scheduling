@@ -1,11 +1,10 @@
 package org.ow2.proactive.scheduler.task;
 
-import com.google.common.base.Charsets;
-import com.google.common.io.CharStreams;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.mockito.Matchers;
+import java.io.InputStreamReader;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.List;
+
 import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
@@ -20,14 +19,19 @@ import org.ow2.proactive.scheduler.task.data.TaskDataspaces;
 import org.ow2.proactive.scheduler.task.containers.ForkedScriptExecutableContainer;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
+import com.google.common.base.Charsets;
+import com.google.common.io.CharStreams;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+import org.mockito.Matchers;
 
-import java.io.InputStreamReader;
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.List;
-
+import static java.util.Collections.singletonMap;
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 
 public class TaskLauncherTest {
@@ -116,11 +120,27 @@ public class TaskLauncherTest {
     }
 
     @Test
-    public void nativeTask_Working_Dir() throws Throwable {
+    public void nativeTask_WorkingDir() throws Throwable {
         ForkedScriptExecutableContainer executableContainer = new ForkedScriptExecutableContainer(
           new TaskScript(new SimpleScript("pwd", "native")), "/tmp");
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
+
+        initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false));
+
+        TaskLauncher taskLauncher = new TaskLauncher(initializer, new TestTaskLauncherFactory());
+        TaskResult taskResult = runTaskLauncher(taskLauncher, executableContainer);
+
+        assertEquals("/tmp\n", taskResult.getOutput().getAllLogs(false));
+    }
+
+    @Test
+    public void nativeTask_WorkingDir_WithVariableReplacement() throws Throwable {
+        ForkedScriptExecutableContainer executableContainer = new ForkedScriptExecutableContainer(
+          new TaskScript(new SimpleScript("pwd", "native")), "$folder");
+
+        TaskLauncherInitializer initializer = new TaskLauncherInitializer();
+        initializer.setVariables(singletonMap("folder", "/tmp"));
 
         initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false));
 

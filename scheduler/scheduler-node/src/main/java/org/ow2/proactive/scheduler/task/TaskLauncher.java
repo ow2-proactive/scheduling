@@ -60,10 +60,12 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
+import org.ow2.proactive.scheduler.common.util.VariablesUtil;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
+import org.ow2.proactive.scheduler.task.containers.ExecutableContainer;
+import org.ow2.proactive.scheduler.task.containers.ForkedScriptExecutableContainer;
 import org.ow2.proactive.scheduler.task.data.TaskDataspaces;
 import org.ow2.proactive.scheduler.task.executors.NonForkedTaskExecutor;
-import org.ow2.proactive.scheduler.task.containers.ForkedScriptExecutableContainer;
 import org.ow2.proactive.scheduler.task.utils.Decrypter;
 import org.ow2.proactive.scheduler.task.utils.TaskKiller;
 import org.ow2.proactive.scheduler.task.utils.WallTimer;
@@ -127,15 +129,14 @@ public class TaskLauncher {
 
             File taskLogFile = taskLogger.createFileAppender(dataspaces.getScratchFolder());
 
-
-            File workingDir = getTaskWorkingDir(executableContainer, dataspaces);
-
-            progressFileReader.start(workingDir, taskId);
+            progressFileReader.start(dataspaces.getScratchFolder(), taskId);
 
             TaskContext context = new TaskContext(executableContainer, initializer, previousTasksResults,
-              dataspaces.getScratchURI(), dataspaces.getInputURI(), dataspaces.getOutputURI(),
-              dataspaces.getUserURI(), dataspaces.getGlobalURI(), progressFileReader.getProgressFile()
-              .toString());
+                dataspaces.getScratchURI(), dataspaces.getInputURI(), dataspaces.getOutputURI(),
+                dataspaces.getUserURI(), dataspaces.getGlobalURI(), progressFileReader.getProgressFile()
+                        .toString());
+
+            File workingDir = getTaskWorkingDir(context, dataspaces);
 
             dataspaces.copyInputDataToScratch(initializer.getFilteredInputFiles(fileSelectorsFilters(context))); // should handle interrupt
 
@@ -236,11 +237,12 @@ public class TaskLauncher {
         }
     }
 
-    private File getTaskWorkingDir(ExecutableContainer executableContainer, TaskDataspaces dataspaces) {
+    private File getTaskWorkingDir(TaskContext taskContext, TaskDataspaces dataspaces) throws Exception {
         File workingDir = dataspaces.getScratchFolder(); // hack for native working dir
-        if (executableContainer instanceof ForkedScriptExecutableContainer) {
-            String workingDirPath = ((ForkedScriptExecutableContainer) executableContainer).getWorkingDir();
+        if (taskContext.getExecutableContainer() instanceof ForkedScriptExecutableContainer) {
+            String workingDirPath = ((ForkedScriptExecutableContainer) taskContext.getExecutableContainer()).getWorkingDir();
             if (workingDirPath != null) {
+                workingDirPath = VariablesUtil.filterAndUpdate(workingDirPath, NonForkedTaskExecutor.taskVariables(taskContext));
                 workingDir = new File(workingDirPath);
             }
         }
