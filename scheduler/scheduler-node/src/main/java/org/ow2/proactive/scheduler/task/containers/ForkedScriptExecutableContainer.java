@@ -34,7 +34,7 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.task.script;
+package org.ow2.proactive.scheduler.task.containers;
 
 import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
