@@ -36,9 +36,17 @@
  */
 package org.ow2.proactive.scheduler.task;
 
-import com.google.common.base.Stopwatch;
-import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
+import java.io.File;
+import java.io.Serializable;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
+import java.security.SecureRandom;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.concurrent.TimeUnit;
+
 import org.objectweb.proactive.annotation.ImmediateService;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.ProActiveInet;
@@ -59,13 +67,9 @@ import org.ow2.proactive.scheduler.task.containers.ForkedScriptExecutableContain
 import org.ow2.proactive.scheduler.task.utils.Decrypter;
 import org.ow2.proactive.scheduler.task.utils.TaskKiller;
 import org.ow2.proactive.scheduler.task.utils.WallTimer;
-
-import java.io.File;
-import java.io.Serializable;
-import java.security.*;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.concurrent.TimeUnit;
+import com.google.common.base.Stopwatch;
+import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Logger;
 
 
 /**
@@ -80,7 +84,7 @@ public class TaskLauncher {
 
     private static final Logger logger = Logger.getLogger(TaskLauncher.class);
 
-    private ProActiveForkedTaskLauncherFactory factory;
+    private TaskLauncherFactory factory;
 
     private TaskId taskId;
     private TaskLauncherInitializer initializer;
@@ -97,7 +101,7 @@ public class TaskLauncher {
     public TaskLauncher() {
     }
 
-    public TaskLauncher(TaskLauncherInitializer initializer, ProActiveForkedTaskLauncherFactory factory) {
+    public TaskLauncher(TaskLauncherInitializer initializer, TaskLauncherFactory factory) {
         this(initializer);
         this.factory = factory;
     }
