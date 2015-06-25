@@ -1497,6 +1497,7 @@ public class SchedulerDBManager {
         TaskData taskRuntimeData = TaskData.createTaskData(jobRuntimeData, task);
         session.save(taskRuntimeData);      
 
+        // TODO: use double dispatch to prevent branching
        if (task.getClass().equals(InternalForkedScriptTask.class)) {
             ForkedScriptExecutableContainer container = (ForkedScriptExecutableContainer) task
                     .getExecutableContainer();
@@ -1564,7 +1565,6 @@ public class SchedulerDBManager {
             public ExecutableContainer executeWork(Session session) {
                 return loadExecutableContainer(session, task);
             }
-
         });
     }
 

@@ -75,7 +75,7 @@ import java.util.regex.Pattern;
 
 /**
  * Internal and global description of a task.
- * This class contains all informations about the task to launch.
+ * This class contains all information about the task to launch.
  * It also provides methods to create its own launcher and manage the content regarding the scheduling order.<br/>
  * Specific internal task may extend this abstract class.
  *

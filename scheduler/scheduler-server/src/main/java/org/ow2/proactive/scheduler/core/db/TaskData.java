@@ -428,9 +428,10 @@ public class TaskData {
 
         ForkEnvironment forkEnvironment = task.getForkEnvironment();
         if (forkEnvironment != null) {
+            taskData.setAdditionalClasspath(forkEnvironment.getAdditionalClasspath());
             taskData.setJavaHome(forkEnvironment.getJavaHome());
             taskData.setJvmArguments(forkEnvironment.getJVMArguments());
-            taskData.setAdditionalClasspath(forkEnvironment.getAdditionalClasspath());
+            taskData.setWorkingDir(forkEnvironment.getWorkingDir());
 
             if (forkEnvironment.getEnvScript() != null) {
                 taskData.setEnvScript(ScriptData.createForScript(forkEnvironment.getEnvScript()));

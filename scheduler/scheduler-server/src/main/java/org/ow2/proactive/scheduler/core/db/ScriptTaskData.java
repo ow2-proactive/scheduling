@@ -1,5 +1,8 @@
 package org.ow2.proactive.scheduler.core.db;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -13,12 +16,13 @@ import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
+import org.ow2.proactive.scheduler.common.task.PropertyModifier;
 import org.ow2.proactive.scheduler.task.containers.ForkedScriptExecutableContainer;
 import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
 import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.TaskScript;
-
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -31,13 +35,40 @@ public class ScriptTaskData {
     private TaskData taskData;
     private ScriptData script;
 
-    static ScriptTaskData createScriptTaskData(TaskData taskData, ScriptExecutableContainer container) {
+    public static ScriptTaskData createScriptTaskData(TaskData taskData, ForkedScriptExecutableContainer container) {
         Script script = container.getScript();
-        return createScriptTaskData(taskData, script);
+        return createScriptTaskData(taskData, script, container.getForkEnvironment());
     }
 
-    private static ScriptTaskData createScriptTaskData(TaskData taskData, Script script) {
+    public static ScriptTaskData createScriptTaskData(TaskData taskData, ScriptExecutableContainer container) {
+        Script script = container.getScript();
+        return createScriptTaskData(taskData, script, null);
+    }
+
+    private static ScriptTaskData createScriptTaskData(TaskData taskData, Script script, ForkEnvironment forkEnvironment) {
         ScriptTaskData scriptTaskData = new ScriptTaskData();
+
+        if (forkEnvironment != null) {
+            taskData.setAdditionalClasspath(forkEnvironment.getAdditionalClasspath());
+            taskData.setJavaHome(forkEnvironment.getJavaHome());
+            taskData.setJvmArguments(forkEnvironment.getJVMArguments());
+            taskData.setWorkingDir(forkEnvironment.getWorkingDir());
+
+            if (forkEnvironment.getEnvScript() != null) {
+                taskData.setEnvScript(ScriptData.createForScript(forkEnvironment.getEnvScript()));
+            }
+
+            if (forkEnvironment.getPropertyModifiers() != null) {
+                List<PropertyModifier> modifiers = forkEnvironment.getPropertyModifiers();
+
+                List<EnvironmentModifierData> envModifiers = new ArrayList<>(modifiers.size());
+                for (PropertyModifier propertyModifier : modifiers) {
+                    envModifiers.add(EnvironmentModifierData.create(propertyModifier, taskData));
+                }
+                taskData.setEnvModifiers(envModifiers);
+            }
+        }
+
         scriptTaskData.setTaskData(taskData);
         scriptTaskData.setScript(ScriptData.createForScript(script));
 

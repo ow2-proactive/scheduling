@@ -63,7 +63,6 @@ import org.junit.Before;
  * compared using {@link JobComparator}.
  *
  * @author esalagea
- *
  */
 public class TestXMLTransformer extends FunctionalTest {
 
