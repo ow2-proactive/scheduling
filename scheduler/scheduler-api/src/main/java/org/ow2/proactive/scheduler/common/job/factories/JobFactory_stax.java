@@ -686,17 +686,6 @@ public class JobFactory_stax extends JobFactory {
     }
 
     /**
-     * Create the task that is at the given cursorTask.
-     * Leave the method with the cursor at the end of 'ELEMENT_TASK' tag.
-     *
-     * @param cursorTask the streamReader with the cursor on the 'ELEMENT_TASK' tag.
-     * @return The newly created task that can be any type.
-     */
-    private Task createTask(XMLStreamReader cursorTask) throws JobCreationException {
-        return createTask(cursorTask, null);
-    }
-
-    /**
      * Fill the given task by the information that are at the given cursorTask.
      * Leave the method with the cursor at the end of 'ELEMENT_TASK' tag.
      *
@@ -704,15 +693,14 @@ public class JobFactory_stax extends JobFactory {
      * @param taskToFill the task to fill. (This method won't create a new one if this parameter is not null)
      * @return The newly created task that can be any type.
      */
-    private Task createTask(XMLStreamReader cursorTask, Task taskToFill) throws JobCreationException {
+    private Task createTask(XMLStreamReader cursorTask) throws JobCreationException {
         int i = 0;
         XMLTags currentTag = null;
         String current = null;
         String taskName = null;
         try {
             Task toReturn = null;
-            Task tmpTask = (taskToFill != null) ? taskToFill : new Task() {
-            };
+            Task tmpTask = new Task() {};
             //parse job attributes and fill the temporary one
             int attrLen = cursorTask.getAttributeCount();
             for (i = 0; i < attrLen; i++) {
@@ -778,13 +766,13 @@ public class JobFactory_stax extends JobFactory {
                             currentTag = XMLTags.TASK_DEPENDENCES;
                             createdependences(cursorTask, tmpTask);
                         } else if (XMLTags.JAVA_EXECUTABLE.matches(current)) {
-                            toReturn = (taskToFill != null) ? taskToFill : new JavaTask();
+                            toReturn = new JavaTask();
                             setJavaExecutable((JavaTask) toReturn, cursorTask);
                         } else if (XMLTags.NATIVE_EXECUTABLE.matches(current)) {
-                            toReturn = (taskToFill != null) ? taskToFill : new NativeTask();
+                            toReturn = new NativeTask();
                             setNativeExecutable((NativeTask) toReturn, cursorTask);
                         } else if (XMLTags.SCRIPT_EXECUTABLE.matches(current)) {
-                            toReturn = (taskToFill != null) ? taskToFill : new ScriptTask();
+                            toReturn = new ScriptTask();
                             ((ScriptTask) toReturn).setScript(new TaskScript(createScript(cursorTask)));
                         }
                         break;
@@ -797,9 +785,9 @@ public class JobFactory_stax extends JobFactory {
                 }
             }
             //fill the real task with common attribute if it is a new one
-            if (taskToFill == null) {
-                autoCopyfields(CommonAttribute.class, tmpTask, toReturn);
-                autoCopyfields(Task.class, tmpTask, toReturn);
+            autoCopyfields(CommonAttribute.class, tmpTask, toReturn);
+            autoCopyfields(Task.class, tmpTask, toReturn);
+            if(toReturn != null){
                 //set the following properties only if it is needed.
                 if (toReturn.getCancelJobOnErrorProperty().isSet()) {
                     toReturn.setCancelJobOnError(toReturn.isCancelJobOnError());
@@ -1734,7 +1722,10 @@ public class JobFactory_stax extends JobFactory {
         for (Field f : klass.getDeclaredFields()) {
             if (!Modifier.isStatic(f.getModifiers())) {
                 f.setAccessible(true);
-                f.set(to, f.get(from));
+                Object newValue = f.get(from);
+                if (newValue != null || f.get(to) == null) {
+                    f.set(to, newValue);
+                }
             }
         }
     }

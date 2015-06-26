@@ -36,16 +36,16 @@
  */
 package org.ow2.proactive.scheduler.common.task;
 
-import org.objectweb.proactive.annotation.PublicAPI;
-
-import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
-import org.ow2.proactive.scheduler.common.util.Object2ByteConverter;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
+import org.objectweb.proactive.annotation.PublicAPI;
+import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.util.Object2ByteConverter;
 
 
 /**
@@ -177,24 +177,6 @@ public class JavaTask extends Task {
      */
     public boolean isFork() {
         return this.forkEnvironment != null || super.isWallTimeSet() || super.isRunAsMe();
-    }
-
-    /**
-     * Returns the forkEnvironment.
-     *
-     * @return the forkEnvironment.
-     */
-    public ForkEnvironment getForkEnvironment() {
-        return forkEnvironment;
-    }
-
-    /**
-     * Sets the forkEnvironment to the given forkEnvironment value.
-     *
-     * @param forkEnvironment the forkEnvironment to set.
-     */
-    public void setForkEnvironment(ForkEnvironment forkEnvironment) {
-        this.forkEnvironment = forkEnvironment;
     }
 
     @Override
