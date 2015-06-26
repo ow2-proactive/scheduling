@@ -254,7 +254,7 @@
 
         <task name="Static">
             <nativeExecutable>
-                <staticCommand 	value="hostname" workingDir="$PROACTIVE_HOME">
+                <staticCommand 	value="hostname" workingDir="$PA_SCHEDULER_HOME">
                 </staticCommand>
             </nativeExecutable>
         </task>
