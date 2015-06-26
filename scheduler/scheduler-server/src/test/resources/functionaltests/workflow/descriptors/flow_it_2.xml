@@ -6,6 +6,7 @@
 
   <variables>
     <variable name="bin" value="${pa.scheduler.home}/scheduler/scheduler-server/src/test/resources/functionaltests/workflow" />
+    <variable name="tmp_folder" value="${java.io.tmpdir}/" />
   </variables>
 
   <taskFlow>
@@ -37,7 +38,7 @@ runs=2;
 	  <nativeExecutable>
         <staticCommand value="${bin}/it.sh">
 		  <arguments>
-			<argument value="${java.io.tmpdir}/" />
+			<argument value="$tmp_folder" />
 			<argument value="$PA_TASK_ITERATION" />
 			<argument value="$PA_TASK_REPLICATION" />
 		  </arguments>
