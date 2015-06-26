@@ -983,7 +983,7 @@ public class SchedulerTHelper {
         } catch (UnknownJobException ignored) {
         }
         if (jobState != null && jobState.getStatus().equals(jobStatusAfterEvent)) {
-            System.err.println("Job is already finished - do not wat for the 'job finished' event");
+            System.err.println("Job is already finished - do not wait for the 'job finished' event");
             return jobState.getJobInfo();
         } else {
             try {
