@@ -35,7 +35,6 @@
 package org.ow2.proactive.scheduler.rest;
 
 import java.io.Closeable;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.Serializable;
@@ -66,7 +65,6 @@ import org.ow2.proactive.scheduler.common.exception.SubmissionClosedException;
 import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
 import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
 import org.ow2.proactive.scheduler.common.job.Job;
-import org.ow2.proactive.scheduler.common.job.JobEnvironment;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
@@ -77,13 +75,12 @@ import org.ow2.proactive.scheduler.common.job.factories.Job2XMLTransformer;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.usage.JobUsage;
-import org.ow2.proactive.scheduler.common.util.JarUtils;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
 import org.ow2.proactive.scheduler.rest.data.DataUtility;
 import org.ow2.proactive.scheduler.rest.data.TaskResultImpl;
-import org.ow2.proactive.scheduler.rest.readers.TaskResultReader;
 import org.ow2.proactive.scheduler.rest.readers.OctetStreamReader;
+import org.ow2.proactive.scheduler.rest.readers.TaskResultReader;
 import org.ow2.proactive.scheduler.rest.readers.WildCardTypeReader;
 import org.ow2.proactive.scheduler.rest.utils.HttpUtility;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
@@ -100,7 +97,6 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.dto.UserJobData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SchedulerRestException;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.client.HttpClient;
 import org.jboss.resteasy.client.jaxrs.engines.ApacheHttpClient4Engine;
@@ -602,109 +598,6 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
             throwNCEOrPEOrSCEOrJCE(e);
         }
         return jobId(jobIdData);
-    }
-
-    @Override
-    public JobId submitAsJobArchive(Job job) throws NotConnectedException, PermissionException,
-            SubmissionClosedException, JobCreationException {
-        String archiveName = String.valueOf(job.hashCode());
-        File archiveDir = null;
-        try {
-            try {
-                archiveDir = File.createTempFile(archiveName, "");
-                FileUtils.forceDelete(archiveDir);
-
-                if (!archiveDir.mkdir()) {
-                    throw new IOException("Unable to create the dir " + archiveDir);
-                }
-            } catch (IOException e) {
-                throw new JobCreationException("Unable to create the archive dir for " + archiveName, e);
-            }
-
-            // The xml job descriptor
-            File jobXmlFile = new File(archiveDir, "job.xml");
-
-            // The lib.jar that will contain all non jar classpath entries
-            final String libJarName = "lib.jar";
-            File libJar = new File(archiveDir, libJarName);
-
-            // The self-contained job archive
-            File jobArchive = new File(archiveDir, archiveName + ".jobarch");
-
-            // Job archive entries
-            ArrayList<String> archiveEntries = new ArrayList<String>();
-            archiveEntries.add(jobXmlFile.getAbsolutePath());
-            archiveEntries.add(libJar.getAbsolutePath());
-
-            // Jar names that will be pathElement tags in the xml job descriptor
-            ArrayList<String> jarsNames = new ArrayList<String>();
-            jarsNames.add(libJarName);
-
-            // All dirs that will go inside the lib.jar
-            ArrayList<String> dirs = new ArrayList<String>();
-
-            // Get job classpath from job environment
-            JobEnvironment originalJobEnv = job.getEnvironment();
-            for (String pathElement : originalJobEnv.getJobClasspath()) {
-                // Skip pathElement relative to $USERSPACE etc ..
-                if (pathElement.startsWith("$")) {
-                    jarsNames.add(pathElement);
-                } else {
-                    if (pathElement.endsWith(".jar")) {
-                        archiveEntries.add(pathElement);
-                        jarsNames.add(new File(pathElement).getName());
-                    } else {
-                        dirs.add(pathElement);
-                    }
-                }
-            }
-
-            try { // Jar all non jared dirs
-                JarUtils.jar(dirs.toArray(new String[dirs.size()]), libJar, null, null, null, null);
-            } catch (IOException e) {
-                throw new JobCreationException("Unable to jar non-jared directories " + dirs, e);
-            }
-
-            // Add all jars as relative path entries to the unified job env and
-            // specify them when packing the self contained jar
-            JobEnvironment unifiedJobEnv = new JobEnvironment();
-            try {
-                unifiedJobEnv.setJobClasspath(jarsNames.toArray(new String[jarsNames.size()]));
-            } catch (IOException e) {
-                throw new JobCreationException("Unable to set the job classpath of the unified job env", e);
-            }
-
-            // Set the unified env before dumping the job xml
-            job.setEnvironment(unifiedJobEnv);
-
-            try {// Dump the xml job descriptor
-                (new Job2XMLTransformer()).job2xmlFile((TaskFlowJob) job, jobXmlFile);
-            } catch (Exception e) {
-                throw new JobCreationException("Unable to create the xml job descriptor", e);
-            }
-            // Set back the original env to keep the job unmodified to the caller
-            job.setEnvironment(originalJobEnv);
-
-            try { // Pack all archive entries into the self-contained jobarchive
-                JarUtils.zip(archiveEntries.toArray(new String[archiveEntries.size()]), jobArchive, null);
-            } catch (IOException e) {
-                throw new JobCreationException("Unable to create the job archive", e);
-            }
-
-            FileInputStream fis = null;
-            JobIdData jobIdData = null;
-            try {
-                fis = new FileInputStream(jobArchive);
-                jobIdData = restApiClient().submitJobArchive(sid, fis);
-            } catch (Exception e) {
-                throwNCEOrPEOrSCEOrJCE(e);
-            } finally {
-                IOUtils.closeQuietly(fis);
-            }
-            return jobId(jobIdData);
-        } finally {
-            FileUtils.deleteQuietly(archiveDir);
-        }
     }
 
     @Override
