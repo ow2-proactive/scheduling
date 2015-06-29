@@ -328,18 +328,6 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         //get the internal job.
         InternalJob job = InternalJobFactory.createJob(userJob, this.credentials.get(id));
 
-        if (!PASchedulerProperties.ALLOW_JAVA_TASKS.getValueAsBoolean()) {
-            // java tasks that are executed in nodes are prohibited
-            // reject the submission of jobs with java tasks
-            for (InternalTask it : job.getITasks()) {
-                if (it.getClass().equals(InternalScriptTask.class)) {
-                    logger.warn("Attempt to submit a java task when it's disactivated");
-                    throw new JobCreationException("Usage of java tasks is prohibited (please replace task " +
-                        it.getName() + " by forked java task)");
-                }
-            }
-        }
-
         //setting job informations
         if (job.getTasks().size() == 0) {
             String msg = "This job does not contain Tasks !! Insert tasks before submitting job";
