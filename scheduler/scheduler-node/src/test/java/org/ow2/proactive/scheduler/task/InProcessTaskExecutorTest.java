@@ -21,7 +21,7 @@ import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.task.containers.ForkedScriptExecutableContainer;
-import org.ow2.proactive.scheduler.task.executors.NonForkedTaskExecutor;
+import org.ow2.proactive.scheduler.task.executors.InProcessTaskExecutor;
 import org.ow2.proactive.scheduler.task.utils.Decrypter;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
@@ -37,7 +37,7 @@ import static org.mockito.Mockito.when;
 import static org.ow2.proactive.scheduler.task.TaskAssertions.assertTaskResultOk;
 
 
-public class NonForkedTaskExecutorTest {
+public class InProcessTaskExecutorTest {
 
     @Rule
     public TemporaryFolder tmpFolder = new TemporaryFolder();
@@ -51,7 +51,7 @@ public class NonForkedTaskExecutorTest {
         initializer.setPostScript(new SimpleScript("println('post')", "groovy"));
         initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false));
 
-        TaskResultImpl result = new NonForkedTaskExecutor().execute(new TaskContext(
+        TaskResultImpl result = new InProcessTaskExecutor().execute(new TaskContext(
             new ForkedScriptExecutableContainer(new TaskScript(
               new SimpleScript("println('hello'); java.lang.Thread.sleep(5); result='hello'", "groovy"))),
             initializer), taskOutput.outputStream, taskOutput.error);
@@ -74,7 +74,7 @@ public class NonForkedTaskExecutorTest {
         initializer.setPostScript(new SimpleScript(printEnvVariables, "groovy"));
         initializer.setTaskId(TaskIdImpl.createTaskId(new JobIdImpl(1000, "job"), "task", 42L, false));
 
-        new NonForkedTaskExecutor().execute(new TaskContext(new ForkedScriptExecutableContainer(
+        new InProcessTaskExecutor().execute(new TaskContext(new ForkedScriptExecutableContainer(
             new TaskScript(new SimpleScript(printEnvVariables, "groovy"))), initializer),
           taskOutput.outputStream, taskOutput.error);
 
@@ -94,7 +94,7 @@ public class NonForkedTaskExecutorTest {
         String script = "result = variables.get('PA_TASK_ITERATION') * variables.get('PA_TASK_REPLICATION')";
         initializer.setTaskId(TaskIdImpl.createTaskId(new JobIdImpl(1000, "job"), "task", 42L, false));
 
-        TaskResultImpl result = new NonForkedTaskExecutor().execute(new TaskContext(
+        TaskResultImpl result = new InProcessTaskExecutor().execute(new TaskContext(
             new ForkedScriptExecutableContainer(new TaskScript(new SimpleScript(script, "groovy"))),
             initializer), taskOutput.outputStream, taskOutput.error);
 
@@ -113,7 +113,7 @@ public class NonForkedTaskExecutorTest {
         initializer.setTaskId(TaskIdImpl.createTaskId(new JobIdImpl(1000, "job"), "task", 42L, false));
         initializer.setVariables(Collections.singletonMap("var", "value"));
 
-        TaskResultImpl result = new NonForkedTaskExecutor().execute(new TaskContext(
+        TaskResultImpl result = new InProcessTaskExecutor().execute(new TaskContext(
             new ForkedScriptExecutableContainer(new TaskScript(new SimpleScript(
                 "print(variables.get('var')); variables.put('var', 'task')", "groovy"))), initializer),
                 taskOutput.outputStream, taskOutput.error);
@@ -137,7 +137,7 @@ public class NonForkedTaskExecutorTest {
         TaskResult[] previousTasksResults = { new TaskResultImpl(null, null, null, null, null,
             SerializationUtil.serializeVariableMap(variablesFromParent)) };
 
-        new NonForkedTaskExecutor().execute(new TaskContext(new ForkedScriptExecutableContainer(
+        new InProcessTaskExecutor().execute(new TaskContext(new ForkedScriptExecutableContainer(
             new TaskScript(new SimpleScript("print(variables.get('var'));print(variables.get('PA_TASK_ID'))",
                 "groovy"))), initializer, previousTasksResults), taskOutput.outputStream, taskOutput.error);
 
@@ -153,7 +153,7 @@ public class NonForkedTaskExecutorTest {
 
         TaskResult[] previousTasksResults = { new TaskResultImpl(null, "aresult", null, 0) };
 
-        new NonForkedTaskExecutor().execute(new TaskContext(new ForkedScriptExecutableContainer(
+        new InProcessTaskExecutor().execute(new TaskContext(new ForkedScriptExecutableContainer(
           new TaskScript(new SimpleScript("print(results[0]);", "groovy"))), initializer,
           previousTasksResults), taskOutput.outputStream, taskOutput.error);
 
@@ -167,7 +167,7 @@ public class NonForkedTaskExecutorTest {
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
         initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false));
 
-        TaskResultImpl result = new NonForkedTaskExecutor().execute(new TaskContext(
+        TaskResultImpl result = new InProcessTaskExecutor().execute(new TaskContext(
             new ForkedScriptExecutableContainer(new TaskScript(new SimpleScript("return 10/0", "groovy"))),
             initializer), taskOutput.outputStream, taskOutput.error);
 
@@ -184,7 +184,7 @@ public class NonForkedTaskExecutorTest {
         initializer.setPreScript(new SimpleScript("return 10/0", "groovy"));
         initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false));
 
-        TaskResultImpl result = new NonForkedTaskExecutor().execute(new TaskContext(
+        TaskResultImpl result = new InProcessTaskExecutor().execute(new TaskContext(
             new ForkedScriptExecutableContainer(new TaskScript(new SimpleScript(
                 "print('hello'); result='hello'", "groovy"))), initializer), taskOutput.outputStream,
                 taskOutput.error);
@@ -202,7 +202,7 @@ public class NonForkedTaskExecutorTest {
         initializer.setPostScript(new SimpleScript("return 10/0", "groovy"));
         initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false));
 
-        TaskResultImpl result = new NonForkedTaskExecutor().execute(new TaskContext(
+        TaskResultImpl result = new InProcessTaskExecutor().execute(new TaskContext(
             new ForkedScriptExecutableContainer(new TaskScript(new SimpleScript(
                 "print('hello'); result='hello'", "groovy"))), initializer), taskOutput.outputStream,
                 taskOutput.error);
@@ -221,7 +221,7 @@ public class NonForkedTaskExecutorTest {
                 "groovy"));
         initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false));
 
-        TaskResultImpl result = new NonForkedTaskExecutor().execute(new TaskContext(
+        TaskResultImpl result = new InProcessTaskExecutor().execute(new TaskContext(
             new ForkedScriptExecutableContainer(new TaskScript(new SimpleScript(
                 "print('hello'); result='hello'", "groovy"))), initializer), taskOutput.outputStream,
                 taskOutput.error);
@@ -238,7 +238,7 @@ public class NonForkedTaskExecutorTest {
         initializer.setControlFlowScript(FlowScript.createReplicateFlowScript(""));
         initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false));
 
-        TaskResultImpl result = new NonForkedTaskExecutor().execute(new TaskContext(
+        TaskResultImpl result = new InProcessTaskExecutor().execute(new TaskContext(
             new ForkedScriptExecutableContainer(new TaskScript(new SimpleScript(
                 "print('hello'); result='hello'", "groovy"))), initializer), taskOutput.outputStream,
                 taskOutput.error);
@@ -258,7 +258,7 @@ public class NonForkedTaskExecutorTest {
                 .setPreScript(new SimpleScript(printEnvVariables, "groovy", new Serializable[] { "Hello" }));
         initializer.setTaskId(TaskIdImpl.createTaskId(new JobIdImpl(1000, "job"), "task", 42L, false));
 
-        new NonForkedTaskExecutor().execute(new TaskContext(new ForkedScriptExecutableContainer(
+        new InProcessTaskExecutor().execute(new TaskContext(new ForkedScriptExecutableContainer(
             new TaskScript(new SimpleScript("", "groovy"))), initializer), taskOutput.outputStream,
                 taskOutput.error);
 
@@ -282,7 +282,7 @@ public class NonForkedTaskExecutorTest {
             new SimpleScript(printArgs, "groovy", new Serializable[] { "$CREDENTIALS_PASSWORD",
                     "${PA_JOB_ID}" }))), initializer);
         taskContext.setDecrypter(decrypter);
-        new NonForkedTaskExecutor().execute(taskContext, taskOutput.outputStream, taskOutput.error);
+        new InProcessTaskExecutor().execute(taskContext, taskOutput.outputStream, taskOutput.error);
 
         assertEquals("p4ssw0rd1000\np4ssw0rd1000\np4ssw0rd1000\n", taskOutput.output()); // pre, task and post
     }
@@ -294,7 +294,7 @@ public class NonForkedTaskExecutorTest {
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
         initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false));
 
-        new NonForkedTaskExecutor().execute(new TaskContext(new ForkedScriptExecutableContainer(
+        new InProcessTaskExecutor().execute(new TaskContext(new ForkedScriptExecutableContainer(
           new TaskScript(new SimpleScript("print(variables.get('PA_SCHEDULER_HOME'))", "groovy"))),
           initializer), taskOutput.outputStream, taskOutput.error);
 
@@ -314,7 +314,7 @@ public class NonForkedTaskExecutorTest {
 
         TaskContext context = new TaskContext(printNodesFileTask, initializer, null, tmpFolder.newFolder()
                 .toURI().toString(), "", "", "", "", "", "thisHost");
-        TaskResultImpl taskResult = new NonForkedTaskExecutor().execute(context, taskOutput.outputStream,
+        TaskResultImpl taskResult = new InProcessTaskExecutor().execute(context, taskOutput.outputStream,
           taskOutput.error);
 
         assertTaskResultOk(taskResult);

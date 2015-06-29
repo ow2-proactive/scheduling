@@ -34,23 +34,6 @@
  */
 package org.ow2.proactive.scheduler.task.executors;
 
-import com.google.common.base.Strings;
-import org.apache.commons.io.FileUtils;
-import org.objectweb.proactive.extensions.processbuilder.OSProcessBuilder;
-import org.objectweb.proactive.extensions.processbuilder.exception.NotImplementedException;
-
-import org.ow2.proactive.resourcemanager.utils.OneJar;
-import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
-import org.ow2.proactive.scheduler.exception.ForkedJVMProcessException;
-import org.ow2.proactive.scheduler.task.TaskContext;
-import org.ow2.proactive.scheduler.task.TaskResultImpl;
-import org.ow2.proactive.scheduler.task.containers.ForkedScriptExecutableContainer;
-import org.ow2.proactive.scheduler.task.utils.Decrypter;
-import org.ow2.proactive.scheduler.task.utils.ForkerUtils;
-import org.ow2.proactive.scheduler.task.utils.ProcessStreamsReader;
-import org.ow2.proactive.scheduler.task.utils.TaskProcessTreeKiller;
-import org.ow2.proactive.scripting.ScriptHandler;
-import org.ow2.proactive.scripting.ScriptLoader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -63,11 +46,28 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import org.objectweb.proactive.extensions.processbuilder.OSProcessBuilder;
+import org.objectweb.proactive.extensions.processbuilder.exception.NotImplementedException;
+import org.ow2.proactive.resourcemanager.utils.OneJar;
+import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
+import org.ow2.proactive.scheduler.exception.ForkedJVMProcessException;
+import org.ow2.proactive.scheduler.task.TaskContext;
+import org.ow2.proactive.scheduler.task.TaskResultImpl;
+import org.ow2.proactive.scheduler.task.containers.ForkedScriptExecutableContainer;
+import org.ow2.proactive.scheduler.task.utils.Decrypter;
+import org.ow2.proactive.scheduler.task.utils.ForkerUtils;
+import org.ow2.proactive.scheduler.task.utils.ProcessStreamsReader;
+import org.ow2.proactive.scheduler.task.utils.TaskProcessTreeKiller;
+import org.ow2.proactive.scripting.ScriptHandler;
+import org.ow2.proactive.scripting.ScriptLoader;
+import com.google.common.base.Strings;
+import org.apache.commons.io.FileUtils;
+
 /**
  * Executor in charge to fork a new process for running a non forked task in a dedicated JVM.
  *
  * @see ForkedTaskExecutor#fromForkedJVM(String)
- * @see NonForkedTaskExecutor
+ * @see InProcessTaskExecutor
  */
 public class ForkedTaskExecutor implements TaskExecutor {
 
@@ -106,7 +106,7 @@ public class ForkedTaskExecutor implements TaskExecutor {
 
             if (exitCode != 0) {
                 try {
-                    Throwable exception = (Throwable) deserializeTaskResult(serializedContext); // TODO ClassCastException
+                    Throwable exception = (Throwable) deserializeTaskResult(serializedContext);
                     return new TaskResultImpl(context.getTaskId(), new ForkedJVMProcessException(
                             "Failed to execute task in a forked JVM", exception));
                 } catch (Throwable cannotDeserializeResult) {
@@ -163,12 +163,15 @@ public class ForkedTaskExecutor implements TaskExecutor {
             if (forkEnvironment != null) {
                 if (forkEnvironment.getEnvScript() != null) {
                     ScriptHandler scriptHandler = ScriptLoader.createLocalHandler();
-                    Map<String, Serializable> variables = NonForkedTaskExecutor.taskVariables(context);
-                    Map<String, String> thirdPartyCredentials = NonForkedTaskExecutor.thirdPartyCredentials(context);
-                    NonForkedTaskExecutor.createBindings(context, scriptHandler, variables, thirdPartyCredentials);
+                    Map<String, Serializable> variables = InProcessTaskExecutor.taskVariables(context);
+                    Map<String, String> thirdPartyCredentials = InProcessTaskExecutor.thirdPartyCredentials(
+                      context);
+                    InProcessTaskExecutor.createBindings(context, scriptHandler, variables,
+                      thirdPartyCredentials);
 
                     scriptHandler.addBinding(FORK_ENVIRONMENT_BINDING_NAME, forkEnvironment);
-                    NonForkedTaskExecutor.executeScript(outputSink, errorSink, scriptHandler, thirdPartyCredentials, variables, forkEnvironment.getEnvScript());
+                    InProcessTaskExecutor.executeScript(outputSink, errorSink, scriptHandler,
+                      thirdPartyCredentials, variables, forkEnvironment.getEnvScript());
                 }
 
                 for (String jvmArgument : forkEnvironment.getJVMArguments()) {
@@ -253,7 +256,7 @@ public class ForkedTaskExecutor implements TaskExecutor {
         try {
             TaskContext container = deserializeContext(contextPath);
 
-            TaskResultImpl result = new NonForkedTaskExecutor().execute(container, System.out, System.err);
+            TaskResultImpl result = new InProcessTaskExecutor().execute(container, System.out, System.err);
 
             serializeTaskResult(result, contextPath);
         } catch (Throwable throwable) {

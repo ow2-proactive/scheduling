@@ -65,7 +65,7 @@ import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.task.containers.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.containers.ForkedScriptExecutableContainer;
 import org.ow2.proactive.scheduler.task.data.TaskDataspaces;
-import org.ow2.proactive.scheduler.task.executors.NonForkedTaskExecutor;
+import org.ow2.proactive.scheduler.task.executors.InProcessTaskExecutor;
 import org.ow2.proactive.scheduler.task.utils.Decrypter;
 import org.ow2.proactive.scheduler.task.utils.TaskKiller;
 import org.ow2.proactive.scheduler.task.utils.WallTimer;
@@ -220,11 +220,11 @@ public class TaskLauncher {
     }
 
     private Map<String, Serializable> fileSelectorsFilters(TaskContext taskContext, TaskResult taskResult) throws Exception {
-        return NonForkedTaskExecutor.taskVariables(taskContext, taskResult);
+        return InProcessTaskExecutor.taskVariables(taskContext, taskResult);
     }
 
     private Map<String, Serializable> fileSelectorsFilters(TaskContext taskContext) throws Exception {
-        return NonForkedTaskExecutor.taskVariables(taskContext);
+        return InProcessTaskExecutor.taskVariables(taskContext);
     }
 
     private void copyTaskLogsToUserSpace(File taskLogFile, TaskDataspaces dataspaces) {
@@ -243,7 +243,8 @@ public class TaskLauncher {
         if (taskContext.getExecutableContainer() instanceof ForkedScriptExecutableContainer) {
             String workingDirPath = ((ForkedScriptExecutableContainer) taskContext.getExecutableContainer()).getWorkingDir();
             if (workingDirPath != null) {
-                workingDirPath = VariablesUtil.filterAndUpdate(workingDirPath, NonForkedTaskExecutor.taskVariables(taskContext));
+                workingDirPath = VariablesUtil.filterAndUpdate(workingDirPath, InProcessTaskExecutor.taskVariables(
+                  taskContext));
                 workingDir = new File(workingDirPath);
             }
         }

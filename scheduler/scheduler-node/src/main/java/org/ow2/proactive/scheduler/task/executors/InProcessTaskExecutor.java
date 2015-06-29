@@ -73,7 +73,7 @@ import org.apache.commons.io.FileUtils;
  * - replacement for variables/
  * - getting the task result or user code exceptions
  */
-public class NonForkedTaskExecutor implements TaskExecutor {
+public class InProcessTaskExecutor implements TaskExecutor {
 
     private static final String DS_SCRATCH_BINDING_NAME = "localspace";
     private static final String DS_INPUT_BINDING_NAME = "inputspace";

@@ -7,7 +7,7 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scheduler.task.data.TaskDataspaces;
-import org.ow2.proactive.scheduler.task.executors.NonForkedTaskExecutor;
+import org.ow2.proactive.scheduler.task.executors.InProcessTaskExecutor;
 import org.ow2.proactive.scheduler.task.executors.TaskExecutor;
 
 import java.io.File;
@@ -31,7 +31,7 @@ public class SlowDataspacesTaskLauncherFactory extends ProActiveForkedTaskLaunch
 
         @Override
         public TaskExecutor createTaskExecutor(File workingDir, Decrypter decrypter) {
-            return new NonForkedTaskExecutor();
+            return new InProcessTaskExecutor();
         }
 
 

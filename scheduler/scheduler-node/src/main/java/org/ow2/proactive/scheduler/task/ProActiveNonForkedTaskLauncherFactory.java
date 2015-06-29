@@ -39,7 +39,7 @@ import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.task.data.TaskDataspaces;
 import org.ow2.proactive.scheduler.task.data.TaskProActiveDataspaces;
-import org.ow2.proactive.scheduler.task.executors.NonForkedTaskExecutor;
+import org.ow2.proactive.scheduler.task.executors.InProcessTaskExecutor;
 import org.ow2.proactive.scheduler.task.executors.TaskExecutor;
 import org.ow2.proactive.scheduler.task.utils.Decrypter;
 import java.io.File;
@@ -54,7 +54,7 @@ public class ProActiveNonForkedTaskLauncherFactory implements TaskLauncherFactor
 
     @Override
     public TaskExecutor createTaskExecutor(File workingDir, Decrypter decrypter){
-        return new NonForkedTaskExecutor();
+        return new InProcessTaskExecutor();
     }
 
 }
