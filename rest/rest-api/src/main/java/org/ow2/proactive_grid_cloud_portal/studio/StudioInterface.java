@@ -38,7 +38,6 @@ import java.io.IOException;
 import java.security.KeyException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import javax.security.auth.login.LoginException;
 import javax.ws.rs.Consumes;
@@ -53,6 +52,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.PathSegment;
+
 import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobValidationData;
@@ -197,9 +197,8 @@ public interface StudioInterface {
 
     /**
      * Validates a job.
-     * @param multipart a HTTP multipart form which contains the job-descriptor or the job archive file
+     * @param multipart a HTTP multipart form which contains the job-descriptor
      * @return the result of job validation
-     *
      */
     @POST
     @Path("validate")
