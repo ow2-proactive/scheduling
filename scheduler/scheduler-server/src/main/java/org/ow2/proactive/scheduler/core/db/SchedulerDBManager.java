@@ -645,20 +645,22 @@ public class SchedulerDBManager {
     }
 
     private void removeJobScripts(Session session, long jobId) {
-        session
-                .createQuery(
-                        "delete from ScriptData where"
-                            + " id in (select td.taskData.envScript from ScriptTaskData td where td.taskData.id.jobId = :jobId)"
-                            + " or id in (select preScript from TaskData where id.jobId = :jobId)"
-                            + " or id in (select postScript from TaskData where id.jobId = :jobId)"
-                            + " or id in (select cleanScript from TaskData where id.jobId = :jobId)"
-                            + " or id in (select flowScript from TaskData where id.jobId = :jobId)"
-                            + " or id in (select td.script from ScriptTaskData td where td.taskData.id.jobId = :jobId)"
-                            + " or taskData.id.jobId = :jobId").setParameter("jobId", jobId).executeUpdate();
+        session.createQuery(
+                "delete from ScriptData where"
+                    + " id in (select envScript from TaskData td where td.id.jobId = :jobId)"
+                    + " or id in (select preScript from TaskData td where td.id.jobId = :jobId)"
+                    + " or id in (select postScript from TaskData td where td.id.jobId = :jobId)"
+                    + " or id in (select cleanScript from TaskData td where td.id.jobId = :jobId)"
+                    + " or id in (select flowScript from TaskData td where td.id.jobId = :jobId)"
+                    + " or id in (select td.script from ScriptTaskData td where td.taskData.id.jobId = :jobId)"
+                    + " or taskData.id.jobId = :jobId").setParameter("jobId", jobId).executeUpdate();
     }
 
     private void removeJobRuntimeData(Session session, long jobId) {
         removeJobScripts(session, jobId);
+
+        session.createQuery("delete from EnvironmentModifierData where taskData.id.jobId = :jobId").setParameter(
+          "jobId", jobId).executeUpdate();
 
         session.createQuery("delete from ScriptTaskData where taskData.id.jobId = :jobId").setParameter(
                 "jobId", jobId).executeUpdate();
