@@ -345,11 +345,8 @@ public class InternalJobFactory {
             throw new JobCreationException("Generation script not supported anymore");
         }
 
-        String cli = "";
-        for (String commandLinePart : task.getCommandLine()) {
-            cli += "\"" + commandLinePart + "\"" + " "; // TODO FIXME more testing
-        }
         try {
+            String cli = Joiner.on(' ').join(task.getCommandLine());
             InternalTask scriptTask = new InternalForkedScriptTask(new ForkedScriptExecutableContainer(
                 new TaskScript(new SimpleScript(cli, "native")), task.getWorkingDir()));
             //set task common properties

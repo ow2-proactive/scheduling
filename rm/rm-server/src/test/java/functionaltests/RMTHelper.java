@@ -267,12 +267,10 @@ public class RMTHelper {
         return nodes;
     }
 
-    // TODO REMOVE THIS METHOD
     public void createNodeSource(int rmiPort, int nodesNumber) throws Exception {
         createNodeSource(rmiPort, nodesNumber, null);
     }
 
-    // TODO REMOVE THIS METHOD
     public void createNodeSource(int rmiPort, int nodesNumber, List<String> vmOptions) throws Exception {
         Map<String, String> map = new HashMap<String, String>();
         map.put(CentralPAPropertyRepository.PA_RMI_PORT.getName(), String.valueOf(rmiPort));

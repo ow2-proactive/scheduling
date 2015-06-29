@@ -81,7 +81,7 @@ public abstract class Executable {
      * Should be overridden to kill subprocesses if any. 
      */
     public void kill() {
-        this.killed = true; // TODO unsupported
+        this.killed = true;
     }
 
     /**

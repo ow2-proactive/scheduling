@@ -197,7 +197,6 @@ public class ForkedTaskExecutor implements TaskExecutor {
         javaCommand.add(ForkedTaskExecutor.class.getName());
         javaCommand.add(serializedContext.getAbsolutePath());
 
-        // TODO add fork env
         processBuilder.directory(workingDir);
         return processBuilder;
     }

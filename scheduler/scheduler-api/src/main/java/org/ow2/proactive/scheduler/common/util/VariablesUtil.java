@@ -72,9 +72,6 @@ public class VariablesUtil {
             return input;
         }
 
-        // TODO provide better substitution
-        // http://commons.apache.org/proper/commons-lang/javadocs/api-3.1/org/apache/commons/lang3/text/StrSubstitutor.html
-
         String output = input;
         for (Map.Entry<String, String> replacement : buildSubstitutes(variables).entrySet()) {
             output = output.replace(replacement.getKey(), replacement.getValue());

@@ -47,6 +47,8 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.tests.FunctionalTest;
 import org.junit.Assert;
 
+import static org.junit.Assert.fail;
+
 
 /**
  * This class tests the way a task can kill a node.
@@ -100,17 +102,12 @@ public class TestJobKilled extends FunctionalTest {
         SchedulerTHelper.log("Waiting for job finished");
         SchedulerTHelper.waitForEventJobFinished(id);
 
-        //task 3 should not be started
-        boolean task3tarted = false;
-
         try {
             SchedulerTHelper.waitForEventTaskRunning(id, task3Name, 1000);
-            task3tarted = true;
-        } catch (ProActiveTimeoutException e) {
-            // TODO Auto-generated catch block
+            fail("Task 3 should not be started");
+        } catch (ProActiveTimeoutException expected) {
+            // expected
         }
-
-        Assert.assertFalse(task3tarted);
 
         JobResult res = SchedulerTHelper.getJobResult(id);
         Map<String, TaskResult> results = res.getAllResults();

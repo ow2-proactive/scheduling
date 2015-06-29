@@ -224,8 +224,6 @@ public class TestGlobalSpace extends FunctionalTest {
             try {
                 fsManager = VFSFactory.createDefaultFileSystemManager();
             } catch (FileSystemException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
                 logger.error("Could not create Default FileSystem Manager", e);
             }
         }
