@@ -26,6 +26,7 @@ import org.junit.rules.TemporaryFolder;
 import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
 import static org.junit.Assert.*;
+import static org.ow2.proactive.scheduler.task.TaskAssertions.assertTaskResultOk;
 
 
 public class TaskLauncherDataSpacesTest {
@@ -47,8 +48,9 @@ public class TaskLauncherDataSpacesTest {
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
         initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false));
-        initializer.setTaskInputFiles(singletonList(new InputSelector(
-            new FileSelector("input_$PA_JOB_ID.txt"), InputAccessMode.TransferFromInputSpace)));
+        initializer.setTaskInputFiles(singletonList(
+          new InputSelector(new FileSelector("input_$PA_JOB_ID.txt"),
+            InputAccessMode.TransferFromInputSpace)));
 
         File inputFile = new File(taskLauncherFactory.getDataSpaces().getInputURI(), "input_1000.txt");
         assertTrue(inputFile.createNewFile());
@@ -68,8 +70,9 @@ public class TaskLauncherDataSpacesTest {
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
         initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false));
-        initializer.setTaskOutputFiles(singletonList(new OutputSelector(new FileSelector(
-            "output_${PA_TASK_ID}.txt"), OutputAccessMode.TransferToGlobalSpace)));
+        initializer.setTaskOutputFiles(singletonList(
+          new OutputSelector(new FileSelector("output_${PA_TASK_ID}.txt"),
+            OutputAccessMode.TransferToGlobalSpace)));
 
         TaskLauncher taskLauncher = new TaskLauncher(initializer, taskLauncherFactory);
         TaskResult taskResult = runTaskLauncher(taskLauncher, executableContainer);
@@ -87,8 +90,9 @@ public class TaskLauncherDataSpacesTest {
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
         initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false));
         initializer.setVariables(singletonMap("aVar", "foo"));
-        initializer.setTaskInputFiles(singletonList(new InputSelector(new FileSelector(
-            "input_${aVar}_${aResultVar}.txt"), InputAccessMode.TransferFromInputSpace)));
+        initializer.setTaskInputFiles(singletonList(
+          new InputSelector(new FileSelector("input_${aVar}_${aResultVar}.txt"),
+            InputAccessMode.TransferFromInputSpace)));
 
         File inputFile = new File(taskLauncherFactory.getDataSpaces().getInputURI(), "input_foo_bar.txt");
         assertTrue(inputFile.createNewFile());
@@ -122,12 +126,6 @@ public class TaskLauncherDataSpacesTest {
         assertTaskResultOk(taskResult);
         assertTrue(new File(taskLauncherFactory.getDataSpaces().getGlobalURI(), "output_foo_bar.txt")
                 .exists());
-    }
-
-    private void assertTaskResultOk(TaskResult taskResult) throws Throwable {
-        if (taskResult.hadException()) {
-            throw new AssertionError("Task failed", taskResult.getException());
-        }
     }
 
     private TaskResult runTaskLauncher(TaskLauncher taskLauncher,

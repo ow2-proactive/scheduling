@@ -39,6 +39,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.Serializable;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -97,7 +98,7 @@ public class NonForkedTaskExecutor implements TaskExecutor {
         ScriptHandler scriptHandler = ScriptLoader.createLocalHandler();
         String nodesFile = null;
         try {
-            nodesFile = writeNodesFile(container.getNodesHosts());
+            nodesFile = writeNodesFile(container);
             Map<String, Serializable> variables = taskVariables(container, nodesFile);
             Map<String, String> thirdPartyCredentials = thirdPartyCredentials(container);
             createBindings(container, scriptHandler, variables, thirdPartyCredentials);
@@ -152,11 +153,12 @@ public class NonForkedTaskExecutor implements TaskExecutor {
         scriptHandler.addBinding(MULTI_NODE_TASK_NODESURL_BINDING_NAME, nodesUrls);
     }
 
-    static String writeNodesFile(List<String> nodesHosts) throws IOException {
+    private static String writeNodesFile(TaskContext context) throws IOException, URISyntaxException {
+        List<String> nodesHosts = context.getNodesHosts();
         if (nodesHosts.isEmpty()) {
             return "";
-        } else { // TODO should delete it, check why it is there even if empty
-            File nodesFiles = File.createTempFile("pa_nodes", null);
+        } else {
+            File nodesFiles = File.createTempFile(".pa_nodes", null, new File("."));
             nodesFiles.deleteOnExit();
             FileWriter outputWriter = new FileWriter(nodesFiles);
             for (String nodeHost : nodesHosts) {
@@ -281,7 +283,7 @@ public class NonForkedTaskExecutor implements TaskExecutor {
                         if (deserializedArg.getValue() instanceof String) {
                             deserializedArg.setValue(
                               VariablesUtil.filterAndUpdate((String) deserializedArg.getValue(),
-                                substitutes));
+                                      substitutes));
                         }
                     }
                     script.getParameters()[0] = new HashMap<>(

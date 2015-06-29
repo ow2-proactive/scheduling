@@ -132,9 +132,10 @@ public class TaskLauncher {
             progressFileReader.start(dataspaces.getScratchFolder(), taskId);
 
             TaskContext context = new TaskContext(executableContainer, initializer, previousTasksResults,
-                dataspaces.getScratchURI(), dataspaces.getInputURI(), dataspaces.getOutputURI(),
-                dataspaces.getUserURI(), dataspaces.getGlobalURI(), progressFileReader.getProgressFile()
-                        .toString());
+              dataspaces.getScratchURI(), dataspaces.getInputURI(), dataspaces.getOutputURI(),
+              dataspaces.getUserURI(), dataspaces.getGlobalURI(),
+              progressFileReader.getProgressFile().toString(),
+              getHostname());
 
             File workingDir = getTaskWorkingDir(context, dataspaces);
 

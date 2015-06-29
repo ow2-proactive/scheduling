@@ -70,17 +70,19 @@ public class TaskContext implements Serializable {
 
     public TaskContext(ExecutableContainer executableContainer, TaskLauncherInitializer initializer) throws
       NodeException {
-        this(executableContainer, initializer, null, "", "", "", "", "", "");
+        this(executableContainer, initializer, null, "", "", "", "", "", "",
+          "");
     }
 
     public TaskContext(ExecutableContainer executableContainer,
             TaskLauncherInitializer initializer, TaskResult[] previousTasksResults) throws NodeException {
-        this(executableContainer, initializer, previousTasksResults, "", "", "", "", "", "");
+        this(executableContainer, initializer, previousTasksResults, "", "", "", "", "", "",
+          "");
     }
 
     public TaskContext(ExecutableContainer executableContainer, TaskLauncherInitializer initializer,
-            TaskResult[] previousTasksResults, String scratchURI, String inputURI, String outputURI,
-            String userURI, String globalURI, String progressFilePath) throws NodeException {
+      TaskResult[] previousTasksResults, String scratchURI, String inputURI, String outputURI, String userURI,
+      String globalURI, String progressFilePath, String currentNodeHostname) throws NodeException {
         this.initializer = initializer; // copy?
         this.previousTasksResults = previousTasksResults;
         this.scratchURI = scratchURI;
@@ -96,7 +98,7 @@ public class TaskContext implements Serializable {
         nodesURLs = new ArrayList<>();
         nodesHosts = new ArrayList<>();
         if (executableContainer.getNodes() != null) {
-            nodesHosts.add(PAActiveObject.getNode().getNodeInformation().getVMInformation().getHostName());
+            nodesHosts.add(currentNodeHostname);
             for (Node node : executableContainer.getNodes()) {
                 nodesURLs.add(node.getNodeInformation().getURL());
                 nodesHosts.add(node.getNodeInformation().getVMInformation().getHostName());
@@ -109,7 +111,8 @@ public class TaskContext implements Serializable {
     public TaskContext(TaskContext context, ExecutableContainer container) throws NodeException {
         this(container, context.initializer, context.previousTasksResults,
                 context.scratchURI, context.inputURI, context.outputURI, context.userURI, context.globalURI,
-                context.progressFilePath);
+                context.progressFilePath,
+          PAActiveObject.getNode().getNodeInformation().getVMInformation().getHostName());
     }
 
     public ExecutableContainer getExecutableContainer() {

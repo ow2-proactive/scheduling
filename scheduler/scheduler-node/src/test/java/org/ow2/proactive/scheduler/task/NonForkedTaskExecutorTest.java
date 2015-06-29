@@ -1,6 +1,18 @@
 package org.ow2.proactive.scheduler.task;
 
-import org.junit.Test;
+import java.io.Serializable;
+import java.security.KeyException;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.objectweb.proactive.core.node.NodeImpl;
+import org.objectweb.proactive.core.runtime.ProActiveRuntime;
+import org.objectweb.proactive.core.runtime.VMInformation;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
@@ -8,23 +20,27 @@ import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
-import org.ow2.proactive.scheduler.task.executors.NonForkedTaskExecutor;
 import org.ow2.proactive.scheduler.task.containers.ForkedScriptExecutableContainer;
+import org.ow2.proactive.scheduler.task.executors.NonForkedTaskExecutor;
 import org.ow2.proactive.scheduler.task.utils.Decrypter;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
 import org.ow2.proactive.utils.ClasspathUtils;
-
-import java.io.Serializable;
-import java.security.*;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import org.ow2.proactive.utils.NodeSet;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.ow2.proactive.scheduler.task.TaskAssertions.assertTaskResultOk;
 
 
 public class NonForkedTaskExecutorTest {
+
+    @Rule
+    public TemporaryFolder tmpFolder = new TemporaryFolder();
 
     @Test
     public void simpleScriptTask() throws Throwable {
@@ -122,8 +138,8 @@ public class NonForkedTaskExecutorTest {
             SerializationUtil.serializeVariableMap(variablesFromParent)) };
 
         new NonForkedTaskExecutor().execute(new TaskContext(new ForkedScriptExecutableContainer(
-          new TaskScript(new SimpleScript("print(variables.get('var'));print(variables.get('PA_TASK_ID'))",
-            "groovy"))), initializer, previousTasksResults), taskOutput.outputStream, taskOutput.error);
+            new TaskScript(new SimpleScript("print(variables.get('var'));print(variables.get('PA_TASK_ID'))",
+                "groovy"))), initializer, previousTasksResults), taskOutput.outputStream, taskOutput.error);
 
         assertEquals("parent42", taskOutput.output());
     }
@@ -151,9 +167,9 @@ public class NonForkedTaskExecutorTest {
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
         initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false));
 
-        TaskResultImpl result = new NonForkedTaskExecutor().execute(
-                new TaskContext(new ForkedScriptExecutableContainer(new TaskScript(new SimpleScript(
-                    "return 10/0", "groovy"))), initializer), taskOutput.outputStream, taskOutput.error);
+        TaskResultImpl result = new NonForkedTaskExecutor().execute(new TaskContext(
+            new ForkedScriptExecutableContainer(new TaskScript(new SimpleScript("return 10/0", "groovy"))),
+            initializer), taskOutput.outputStream, taskOutput.error);
 
         assertEquals("", taskOutput.output());
         assertNotEquals("", taskOutput.error());
@@ -201,7 +217,8 @@ public class NonForkedTaskExecutorTest {
         TestTaskOutput taskOutput = new TestTaskOutput();
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
-        initializer.setControlFlowScript(FlowScript.createReplicateFlowScript("print('flow'); runs=5", "groovy"));
+        initializer.setControlFlowScript(FlowScript.createReplicateFlowScript("print('flow'); runs=5",
+                "groovy"));
         initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false));
 
         TaskResultImpl result = new NonForkedTaskExecutor().execute(new TaskContext(
@@ -237,13 +254,13 @@ public class NonForkedTaskExecutorTest {
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
         String printEnvVariables = "print(args[0])";
-        initializer.setPreScript(
-          new SimpleScript(printEnvVariables, "groovy", new Serializable[] { "Hello" }));
+        initializer
+                .setPreScript(new SimpleScript(printEnvVariables, "groovy", new Serializable[] { "Hello" }));
         initializer.setTaskId(TaskIdImpl.createTaskId(new JobIdImpl(1000, "job"), "task", 42L, false));
 
-        new NonForkedTaskExecutor().execute(new TaskContext(
-          new ForkedScriptExecutableContainer(new TaskScript(new SimpleScript("", "groovy"))),
-          initializer), taskOutput.outputStream, taskOutput.error);
+        new NonForkedTaskExecutor().execute(new TaskContext(new ForkedScriptExecutableContainer(
+            new TaskScript(new SimpleScript("", "groovy"))), initializer), taskOutput.outputStream,
+                taskOutput.error);
 
         assertEquals("Hello", taskOutput.output());
     }
@@ -254,16 +271,16 @@ public class NonForkedTaskExecutorTest {
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
         String printArgs = "println(args[0] + args[1]);";
-        initializer.setPreScript(
-          new SimpleScript(printArgs, "groovy", new Serializable[] { "$CREDENTIALS_PASSWORD", "$PA_JOB_ID" }));
-        initializer.setPostScript(new SimpleScript(printArgs, "groovy",
-          new Serializable[] { "$CREDENTIALS_PASSWORD", "$PA_JOB_ID" }));
+        initializer.setPreScript(new SimpleScript(printArgs, "groovy", new Serializable[] {
+                "$CREDENTIALS_PASSWORD", "$PA_JOB_ID" }));
+        initializer.setPostScript(new SimpleScript(printArgs, "groovy", new Serializable[] {
+                "$CREDENTIALS_PASSWORD", "$PA_JOB_ID" }));
         initializer.setTaskId(TaskIdImpl.createTaskId(new JobIdImpl(1000, "job"), "task", 42L, false));
 
         Decrypter decrypter = createCredentials("somebody_that_does_not_exists");
-        TaskContext taskContext = new TaskContext(new ForkedScriptExecutableContainer(
-            new TaskScript(new SimpleScript(printArgs, "groovy",
-                new Serializable[] { "$CREDENTIALS_PASSWORD", "${PA_JOB_ID}" }))), initializer);
+        TaskContext taskContext = new TaskContext(new ForkedScriptExecutableContainer(new TaskScript(
+            new SimpleScript(printArgs, "groovy", new Serializable[] { "$CREDENTIALS_PASSWORD",
+                    "${PA_JOB_ID}" }))), initializer);
         taskContext.setDecrypter(decrypter);
         new NonForkedTaskExecutor().execute(taskContext, taskOutput.outputStream, taskOutput.error);
 
@@ -282,6 +299,36 @@ public class NonForkedTaskExecutorTest {
           initializer), taskOutput.outputStream, taskOutput.error);
 
         assertEquals(ClasspathUtils.findSchedulerHome(), taskOutput.output());
+    }
+
+    @Test
+    public void nodesFileIsCreated() throws Throwable {
+        TestTaskOutput taskOutput = new TestTaskOutput();
+
+        TaskLauncherInitializer initializer = new TaskLauncherInitializer();
+        initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false));
+
+        ForkedScriptExecutableContainer printNodesFileTask = new ForkedScriptExecutableContainer(
+            new TaskScript(new SimpleScript("print new File(variables.get('PA_NODESFILE')).text", "groovy")));
+        printNodesFileTask.setNodes(mockedNodeSet());
+
+        TaskContext context = new TaskContext(printNodesFileTask, initializer, null, tmpFolder.newFolder()
+                .toURI().toString(), "", "", "", "", "", "thisHost");
+        TaskResultImpl taskResult = new NonForkedTaskExecutor().execute(context, taskOutput.outputStream,
+          taskOutput.error);
+
+        assertTaskResultOk(taskResult);
+        assertEquals("thisHost\ndummyhost\n", taskOutput.output());
+    }
+
+    private NodeSet mockedNodeSet() {
+        NodeSet nodes = new NodeSet();
+        ProActiveRuntime proActiveRuntime = mock(ProActiveRuntime.class);
+        VMInformation vmInformation = mock(VMInformation.class);
+        when(vmInformation.getHostName()).thenReturn("dummyhost");
+        when(proActiveRuntime.getVMInformation()).thenReturn(vmInformation);
+        nodes.add(new NodeImpl(proActiveRuntime, "dummyhost"));
+        return nodes;
     }
 
     private Decrypter createCredentials(String username) throws NoSuchAlgorithmException, KeyException {
