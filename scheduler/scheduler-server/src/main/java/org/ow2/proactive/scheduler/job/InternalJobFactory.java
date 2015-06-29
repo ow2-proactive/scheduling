@@ -289,13 +289,12 @@ public class InternalJobFactory {
             }
 
             try {
-                if (task.isFork()) {
+                if (isForkingTask()) {
                     javaTask = new InternalForkedScriptTask(new ScriptExecutableContainer(
                         new TaskScript(new SimpleScript(task.getExecutableClassName(),
                             JavaClassScriptEngineFactory.JAVA_CLASS_SCRIPT_ENGINE_NAME,
                             new Serializable[] { args }))));
                     javaTask.setForkEnvironment(task.getForkEnvironment());
-
                 } else {
                     javaTask = new InternalScriptTask(new ScriptExecutableContainer(new TaskScript(
                         new SimpleScript(task.getExecutableClassName(),
@@ -340,8 +339,14 @@ public class InternalJobFactory {
 
         try {
             String cli = Joiner.on(' ').join(task.getCommandLine());
-            InternalTask scriptTask = new InternalForkedScriptTask(new ScriptExecutableContainer(
-                new TaskScript(new SimpleScript(cli, "native"))));
+            InternalTask scriptTask;
+            if (isForkingTask()) {
+                scriptTask = new InternalForkedScriptTask(new ScriptExecutableContainer(new TaskScript(
+                    new SimpleScript(cli, "native"))));
+            } else {
+                scriptTask = new InternalScriptTask(new ScriptExecutableContainer(new TaskScript(
+                    new SimpleScript(cli, "native"))));
+            }
             ForkEnvironment forkEnvironment = new ForkEnvironment(task.getWorkingDir());
             scriptTask.setForkEnvironment(forkEnvironment);
             //set task common properties
@@ -355,7 +360,7 @@ public class InternalJobFactory {
 
     private static InternalTask createTask(Job userJob, ScriptTask task) throws JobCreationException {
         InternalTask scriptTask;
-        if (PASchedulerProperties.TASK_FORK.getValueAsBoolean()) {
+        if (isForkingTask()) {
             scriptTask = new InternalForkedScriptTask(new ScriptExecutableContainer(task.getScript()));
         } else {
             scriptTask = new InternalScriptTask(new ScriptExecutableContainer(task.getScript()));
@@ -367,6 +372,10 @@ public class InternalJobFactory {
             throw new JobCreationException(e);
         }
         return scriptTask;
+    }
+
+    private static boolean isForkingTask() {
+        return PASchedulerProperties.TASK_FORK.getValueAsBoolean();
     }
 
     /**
