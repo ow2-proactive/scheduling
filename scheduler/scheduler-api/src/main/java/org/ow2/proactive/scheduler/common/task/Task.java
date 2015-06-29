@@ -36,9 +36,16 @@
  */
 package org.ow2.proactive.scheduler.common.task;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
+
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector;
-
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
@@ -49,12 +56,6 @@ import org.ow2.proactive.scheduler.common.task.flow.FlowBlock;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.SelectionScript;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
-import java.util.ArrayList;
-import java.util.List;
 
 
 /**
@@ -682,7 +683,8 @@ public abstract class Task extends CommonAttribute {
             "\tDescription = '" + description + "'" + nl + "\tResultPreview = '" + resultPreview + "'" + nl +
             "\tInputFiles = " + inputFiles + nl + "\tOutputFiles = " + outputFiles + nl +
             "\tParallelEnvironment = " + parallelEnvironment + nl + "\tSelectionScripts = " +
-            displaySelectionScripts() + nl + "\tPreScript = " +
+            displaySelectionScripts() + nl + "\tForkEnvironment = " +
+          forkEnvironment + nl + "\tPreScript = " +
             ((preScript != null) ? preScript.display() : null) + nl + "\tPostScript = " +
             ((postScript != null) ? postScript.display() : null) + nl + "\tCleanScript = " +
             ((cScript != null) ? cScript.display() : null) + nl + "\tFlowScript = " +
