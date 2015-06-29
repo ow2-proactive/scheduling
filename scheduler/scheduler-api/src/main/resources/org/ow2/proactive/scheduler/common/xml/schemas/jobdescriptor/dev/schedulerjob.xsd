@@ -224,13 +224,13 @@
         </xs:annotation>
         <xs:complexType>
           <xs:sequence>
-            <xs:element minOccurs="0" ref="jd:forkEnvironment"/>
             <xs:group minOccurs="0" ref="jd:taskDescription"/>
             <xs:element minOccurs="0" ref="jd:genericInformation"/>
             <xs:element minOccurs="0" ref="jd:depends"/>
             <xs:element minOccurs="0" ref="jd:inputFiles"/>
             <xs:element minOccurs="0" ref="jd:parallel"/>
             <xs:element minOccurs="0" ref="jd:selection"/>
+            <xs:element minOccurs="0" ref="jd:forkEnvironment"/>
             <xs:element minOccurs="0" ref="jd:pre"/>
             <xs:element ref="jd:executable"/>
             <xs:element minOccurs="0" ref="jd:controlFlow"/>

@@ -66,7 +66,6 @@ taskFlow = ## A job composed of a flow of tasks with or without dependencies
 task = ## A task is the smallest computation unit for the scheduler 
     element task {
         taskName,
-        forkEnvironment?,
         nodesNumber_t?,
         cancelJobOnError_t?,
         restartTaskOnError_t?,
@@ -82,6 +81,7 @@ task = ## A task is the smallest computation unit for the scheduler
         inputFiles?,
         parallel?,
         selection?,
+        forkEnvironment?,
         pre?,
         executable,
         flow?,
