@@ -149,7 +149,6 @@ public class TestXMLTransformer extends FunctionalTest {
      * 4. Compare job1 and job2
      */
     private void transformAndCompare(File xmlFile) throws Exception {
-        System.out.println("TestXMLTransformer.transformAndCompare() " + xmlFile.getAbsolutePath());
         // xml to java => job1
         TaskFlowJob job1 = (TaskFlowJob) (JobFactory.getFactory().createJob(xmlFile.getAbsolutePath()));
 
