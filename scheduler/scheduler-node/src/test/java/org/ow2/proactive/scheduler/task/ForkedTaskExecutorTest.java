@@ -1,26 +1,29 @@
 package org.ow2.proactive.scheduler.task;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import java.io.File;
+import java.security.KeyException;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
-import org.ow2.proactive.scheduler.task.executors.ForkedTaskExecutor;
 import org.ow2.proactive.scheduler.task.containers.ForkedScriptExecutableContainer;
+import org.ow2.proactive.scheduler.task.executors.ForkedTaskExecutor;
 import org.ow2.proactive.scheduler.task.utils.Decrypter;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
-import java.io.File;
-import java.security.*;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 
 public class ForkedTaskExecutorTest {
@@ -118,14 +121,37 @@ public class ForkedTaskExecutorTest {
         ForkEnvironment forkEnvironment = new ForkEnvironment();
         forkEnvironment.addSystemEnvironmentVariable("envVar", "envValue", true);
         forkEnvironment.addJVMArgument("-DjvmArg=jvmValue");
+        initializer.setForkEnvironment(forkEnvironment);
 
-        taskExecutor.execute(new TaskContext(new ForkedScriptExecutableContainer(
-                new TaskScript(new SimpleScript("println System.getenv('envVar'); " +
-                        "println System.getProperty('jvmArg'); " +
-                        "println new File('.').getAbsolutePath()", "groovy")),
-                forkEnvironment), initializer), taskOutput.outputStream, taskOutput.error);
+        taskExecutor.execute(new TaskContext(new ForkedScriptExecutableContainer(new TaskScript(
+            new SimpleScript("println System.getenv('envVar'); " + "println System.getProperty('jvmArg'); "
+                + "println new File('.').getAbsolutePath()", "groovy")), forkEnvironment), initializer),
+                taskOutput.outputStream, taskOutput.error);
 
-        assertEquals("envValue\njvmValue\n" + new File(workingDir, ".").getAbsolutePath() + "\n", taskOutput.output());
+        assertEquals("envValue\njvmValue\n" + new File(workingDir, ".").getAbsolutePath() + "\n",
+                taskOutput.output());
+    }
+
+    @Test
+    public void forkEnvironment_failingEnvScript() throws Exception {
+        TestTaskOutput taskOutput = new TestTaskOutput();
+
+        File workingDir = tmpFolder.newFolder();
+
+        ForkedTaskExecutor taskExecutor = new ForkedTaskExecutor(workingDir, null);
+
+        TaskLauncherInitializer initializer = new TaskLauncherInitializer();
+        initializer.setTaskId((TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false)));
+
+        ForkEnvironment forkEnvironment = new ForkEnvironment();
+        forkEnvironment.setEnvScript(new SimpleScript("should fail execution", "groovy"));
+        initializer.setForkEnvironment(forkEnvironment);
+
+        TaskResultImpl taskResult = taskExecutor.execute(new TaskContext(
+          new ForkedScriptExecutableContainer(new TaskScript(new SimpleScript("", "groovy")),
+            forkEnvironment), initializer), taskOutput.outputStream, taskOutput.error);
+
+        assertTrue(taskResult.hadException());
     }
 
     private Decrypter createCredentials(String username) throws NoSuchAlgorithmException, KeyException {
