@@ -159,6 +159,10 @@ public class ForkEnvironment implements Serializable {
         }
     }
 
+    public ForkEnvironment(String workingDir) {
+        this.workingDir = workingDir;
+    }
+
     /**
      * Returns the javaHome.
      *

@@ -680,9 +680,8 @@ public abstract class Task extends CommonAttribute {
             "\tDescription = '" + description + "'" + nl + "\tResultPreview = '" + resultPreview + "'" + nl +
             "\tInputFiles = " + inputFiles + nl + "\tOutputFiles = " + outputFiles + nl +
             "\tParallelEnvironment = " + parallelEnvironment + nl + "\tSelectionScripts = " +
-            displaySelectionScripts() + nl + "\tForkEnvironment = " +
-          forkEnvironment + nl + "\tPreScript = " +
-            ((preScript != null) ? preScript.display() : null) + nl + "\tPostScript = " +
+            displaySelectionScripts() + nl + "\tForkEnvironment = " + forkEnvironment + nl +
+            "\tPreScript = " + ((preScript != null) ? preScript.display() : null) + nl + "\tPostScript = " +
             ((postScript != null) ? postScript.display() : null) + nl + "\tCleanScript = " +
             ((cScript != null) ? cScript.display() : null) + nl + "\tFlowScript = " +
             ((flowScript != null) ? flowScript.display() : null) + nl + "\tPreciousResult = " +

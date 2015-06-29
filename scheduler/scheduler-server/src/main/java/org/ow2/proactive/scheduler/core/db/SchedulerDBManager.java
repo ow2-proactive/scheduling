@@ -42,14 +42,13 @@ import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.job.JobResultImpl;
 import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
-import org.ow2.proactive.scheduler.task.containers.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
+import org.ow2.proactive.scheduler.task.containers.ExecutableContainer;
+import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
 import org.ow2.proactive.scheduler.task.internal.InternalForkedScriptTask;
 import org.ow2.proactive.scheduler.task.internal.InternalScriptTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
-import org.ow2.proactive.scheduler.task.containers.ForkedScriptExecutableContainer;
-import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
 import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.utils.FileToBytesConverter;
 import org.apache.log4j.Logger;
@@ -1500,12 +1499,7 @@ public class SchedulerDBManager {
         session.save(taskRuntimeData);      
 
         // TODO: use double dispatch to prevent branching
-       if (task.getClass().equals(InternalForkedScriptTask.class)) {
-            ForkedScriptExecutableContainer container = (ForkedScriptExecutableContainer) task
-                    .getExecutableContainer();
-            ScriptTaskData scriptTaskData = ScriptTaskData.createScriptTaskData(taskRuntimeData, container);
-            session.save(scriptTaskData);
-        } else if (task.getClass().equals(InternalScriptTask.class)) {
+       if (task.getClass().equals(InternalForkedScriptTask.class) || task.getClass().equals(InternalScriptTask.class)) {
             ScriptExecutableContainer container = (ScriptExecutableContainer) task.getExecutableContainer();
             ScriptTaskData scriptTaskData = ScriptTaskData.createScriptTaskData(taskRuntimeData, container);
             session.save(scriptTaskData);
@@ -1534,7 +1528,7 @@ public class SchedulerDBManager {
                 ScriptTaskData taskData = queryScriptTaskData(session, task);
 
                 if (taskData != null) {
-                    container = taskData.createForkedExecutableContainer();
+                    container = taskData.createExecutableContainer();
                 }
             } else if (task.getClass().equals(InternalScriptTask.class)) {
                 ScriptTaskData taskData = queryScriptTaskData(session, task);

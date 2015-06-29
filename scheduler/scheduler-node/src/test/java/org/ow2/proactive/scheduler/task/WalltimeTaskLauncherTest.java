@@ -14,7 +14,7 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.task.data.TaskDataspaces;
-import org.ow2.proactive.scheduler.task.containers.ForkedScriptExecutableContainer;
+import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
 import org.junit.Test;
@@ -26,7 +26,7 @@ public class WalltimeTaskLauncherTest {
 
     @Test(timeout = 5000)
     public void walltime_forked_task() throws Throwable {
-        ForkedScriptExecutableContainer executableContainer = new ForkedScriptExecutableContainer(
+        ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(
           new TaskScript(new SimpleScript("for(;;){}", "javascript")));
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
@@ -42,7 +42,7 @@ public class WalltimeTaskLauncherTest {
 
     @Test(timeout = 5000)
     public void walltime_during_task_execution() throws Throwable {
-        ForkedScriptExecutableContainer executableContainer = new ForkedScriptExecutableContainer(
+        ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(
             new TaskScript(new SimpleScript("java.lang.Thread.sleep(10000)", "javascript")));
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
@@ -58,7 +58,7 @@ public class WalltimeTaskLauncherTest {
 
     @Test(timeout = 5000)
     public void walltime_during_file_copy() throws Throwable {
-        ForkedScriptExecutableContainer executableContainer = new ForkedScriptExecutableContainer(
+        ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(
             new TaskScript(new SimpleScript("", "javascript")));
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
@@ -72,7 +72,7 @@ public class WalltimeTaskLauncherTest {
     }
 
     private TaskResult runTaskLauncher(TaskLauncher taskLauncher,
-            ForkedScriptExecutableContainer executableContainer) throws InterruptedException, ActiveObjectCreationException, NodeException {
+            ScriptExecutableContainer executableContainer) throws InterruptedException, ActiveObjectCreationException, NodeException {
 
         TaskTerminateNotificationVerifier taskResult = new TaskTerminateNotificationVerifier();
         taskLauncher.doTask(executableContainer, null, taskResult);

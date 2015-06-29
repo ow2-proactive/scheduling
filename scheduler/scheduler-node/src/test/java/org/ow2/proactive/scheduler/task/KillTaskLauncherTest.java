@@ -10,7 +10,7 @@ import org.ow2.proactive.scheduler.common.exception.TaskAbortedException;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
-import org.ow2.proactive.scheduler.task.containers.ForkedScriptExecutableContainer;
+import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
 import org.junit.Before;
@@ -29,7 +29,7 @@ public class KillTaskLauncherTest {
     @Test(timeout = 5000)
     public void kill_while_sleeping_in_task() throws Exception {
 
-        final ForkedScriptExecutableContainer executableContainer = new ForkedScriptExecutableContainer(
+        final ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(
             new TaskScript(new SimpleScript("java.lang.Thread.sleep(10000)", "javascript")));
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
@@ -53,7 +53,7 @@ public class KillTaskLauncherTest {
     @Test(timeout = 5000)
     public void kill_while_looping_in_task() throws Exception {
 
-        final ForkedScriptExecutableContainer executableContainer = new ForkedScriptExecutableContainer(
+        final ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(
           new TaskScript(new SimpleScript("for(;;){}", "javascript")));
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
@@ -76,7 +76,7 @@ public class KillTaskLauncherTest {
     @Test(timeout = 5000)
     public void kill_when_finished() throws Throwable {
 
-        final ForkedScriptExecutableContainer executableContainer = new ForkedScriptExecutableContainer(
+        final ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(
           new TaskScript(new SimpleScript("result='done'", "javascript")));
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
@@ -98,7 +98,7 @@ public class KillTaskLauncherTest {
     @Test(timeout = 5000)
     public void kill_when_copying() throws Throwable {
 
-        final ForkedScriptExecutableContainer executableContainer = new ForkedScriptExecutableContainer(
+        final ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(
           new TaskScript(new SimpleScript("result='done'", "javascript")));
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
@@ -118,7 +118,7 @@ public class KillTaskLauncherTest {
         assertEquals(TaskAbortedException.class, taskResultWaiter.getTaskResult().getException().getClass());
     }
 
-    private Thread runTaskLauncher(final ForkedScriptExecutableContainer executableContainer,
+    private Thread runTaskLauncher(final ScriptExecutableContainer executableContainer,
       final TaskLauncher taskLauncherPA, final TaskResultWaiter taskResultWaiter) {
         Thread launchTaskInBackground = new Thread(new Runnable() {
             @Override

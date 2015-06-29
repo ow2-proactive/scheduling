@@ -63,7 +63,6 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scheduler.common.util.VariablesUtil;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.task.containers.ExecutableContainer;
-import org.ow2.proactive.scheduler.task.containers.ForkedScriptExecutableContainer;
 import org.ow2.proactive.scheduler.task.data.TaskDataspaces;
 import org.ow2.proactive.scheduler.task.executors.InProcessTaskExecutor;
 import org.ow2.proactive.scheduler.task.utils.Decrypter;
@@ -240,11 +239,11 @@ public class TaskLauncher {
 
     private File getTaskWorkingDir(TaskContext taskContext, TaskDataspaces dataspaces) throws Exception {
         File workingDir = dataspaces.getScratchFolder(); // hack for native working dir
-        if (taskContext.getExecutableContainer() instanceof ForkedScriptExecutableContainer) {
-            String workingDirPath = ((ForkedScriptExecutableContainer) taskContext.getExecutableContainer()).getWorkingDir();
+        if (taskContext.getInitializer().getForkEnvironment() != null) {
+            String workingDirPath = taskContext.getInitializer().getForkEnvironment().getWorkingDir();
             if (workingDirPath != null) {
-                workingDirPath = VariablesUtil.filterAndUpdate(workingDirPath, InProcessTaskExecutor.taskVariables(
-                  taskContext));
+                workingDirPath = VariablesUtil.filterAndUpdate(workingDirPath,
+                        InProcessTaskExecutor.taskVariables(taskContext));
                 workingDir = new File(workingDirPath);
             }
         }

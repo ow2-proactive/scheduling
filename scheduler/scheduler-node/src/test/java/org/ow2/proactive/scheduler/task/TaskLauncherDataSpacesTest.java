@@ -15,7 +15,7 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
-import org.ow2.proactive.scheduler.task.containers.ForkedScriptExecutableContainer;
+import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
 import org.junit.Before;
@@ -43,7 +43,7 @@ public class TaskLauncherDataSpacesTest {
 
     @Test
     public void input_file_using_job_id_in_its_selector() throws Throwable {
-        ForkedScriptExecutableContainer executableContainer = new ForkedScriptExecutableContainer(
+        ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(
             new TaskScript(new SimpleScript("println new File('.').listFiles();", "groovy")));
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
@@ -64,7 +64,7 @@ public class TaskLauncherDataSpacesTest {
 
     @Test
     public void output_file_using_task_id_in_its_selector() throws Throwable {
-        ForkedScriptExecutableContainer executableContainer = new ForkedScriptExecutableContainer(
+        ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(
             new TaskScript(new SimpleScript(
                 "new File('output_' + variables.get('PA_TASK_ID') + '.txt').text = 'hello'", "groovy")));
 
@@ -84,7 +84,7 @@ public class TaskLauncherDataSpacesTest {
 
     @Test
     public void input_file_using_variable_in_its_selector() throws Throwable {
-        ForkedScriptExecutableContainer executableContainer = new ForkedScriptExecutableContainer(
+        ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(
             new TaskScript(new SimpleScript("println new File('.').listFiles();", "groovy")));
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
@@ -108,7 +108,7 @@ public class TaskLauncherDataSpacesTest {
 
     @Test
     public void output_file_using_variable_in_its_selector() throws Throwable {
-        ForkedScriptExecutableContainer createAFileAndWriteVariable = new ForkedScriptExecutableContainer(
+        ScriptExecutableContainer createAFileAndWriteVariable = new ScriptExecutableContainer(
             new TaskScript(new SimpleScript(
                 "new File('output_foo_bar.txt').text = 'hello'; variables.put('aVar', 'foo')", "groovy")));
 
@@ -129,7 +129,7 @@ public class TaskLauncherDataSpacesTest {
     }
 
     private TaskResult runTaskLauncher(TaskLauncher taskLauncher,
-            ForkedScriptExecutableContainer executableContainer) {
+            ScriptExecutableContainer executableContainer) {
         TaskTerminateNotificationVerifier taskResult = new TaskTerminateNotificationVerifier();
 
         taskLauncher.doTask(executableContainer, null, taskResult);
@@ -138,7 +138,7 @@ public class TaskLauncherDataSpacesTest {
     }
 
     private TaskResult runTaskLauncher(TaskLauncher taskLauncher,
-            ForkedScriptExecutableContainer executableContainer, TaskResult... taskResults) {
+            ScriptExecutableContainer executableContainer, TaskResult... taskResults) {
         TaskTerminateNotificationVerifier taskResult = new TaskTerminateNotificationVerifier();
 
         taskLauncher.doTask(executableContainer, taskResults, taskResult);

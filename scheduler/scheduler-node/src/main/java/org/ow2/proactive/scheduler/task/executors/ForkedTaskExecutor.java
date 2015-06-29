@@ -53,7 +53,6 @@ import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.exception.ForkedJVMProcessException;
 import org.ow2.proactive.scheduler.task.TaskContext;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
-import org.ow2.proactive.scheduler.task.containers.ForkedScriptExecutableContainer;
 import org.ow2.proactive.scheduler.task.utils.Decrypter;
 import org.ow2.proactive.scheduler.task.utils.ForkerUtils;
 import org.ow2.proactive.scheduler.task.utils.ProcessStreamsReader;
@@ -157,37 +156,35 @@ public class ForkedTaskExecutor implements TaskExecutor {
             classpath.append(File.pathSeparatorChar).append(classpathEntry);
         }
 
-        if (context.getExecutableContainer() instanceof ForkedScriptExecutableContainer) {
-            ForkEnvironment forkEnvironment = context.getInitializer().getForkEnvironment();
+        ForkEnvironment forkEnvironment = context.getInitializer().getForkEnvironment();
 
-            if (forkEnvironment != null) {
-                if (forkEnvironment.getEnvScript() != null) {
-                    ScriptHandler scriptHandler = ScriptLoader.createLocalHandler();
-                    Map<String, Serializable> variables = InProcessTaskExecutor.taskVariables(context);
-                    Map<String, String> thirdPartyCredentials = InProcessTaskExecutor.thirdPartyCredentials(
-                      context);
-                    InProcessTaskExecutor.createBindings(context, scriptHandler, variables,
-                      thirdPartyCredentials);
+        if (forkEnvironment != null) {
+            if (forkEnvironment.getEnvScript() != null) {
+                ScriptHandler scriptHandler = ScriptLoader.createLocalHandler();
+                Map<String, Serializable> variables = InProcessTaskExecutor.taskVariables(context);
+                Map<String, String> thirdPartyCredentials = InProcessTaskExecutor
+                        .thirdPartyCredentials(context);
+                InProcessTaskExecutor
+                        .createBindings(context, scriptHandler, variables, thirdPartyCredentials);
 
-                    scriptHandler.addBinding(FORK_ENVIRONMENT_BINDING_NAME, forkEnvironment);
-                    InProcessTaskExecutor.executeScript(outputSink, errorSink, scriptHandler,
-                      thirdPartyCredentials, variables, forkEnvironment.getEnvScript());
-                }
-
-                for (String jvmArgument : forkEnvironment.getJVMArguments()) {
-                    jvmArguments += jvmArgument;
-                }
-
-                if (!Strings.isNullOrEmpty(forkEnvironment.getJavaHome())) {
-                    javaHome = forkEnvironment.getJavaHome();
-                }
-
-                for (String classpathEntry : forkEnvironment.getAdditionalClasspath()) {
-                    classpath.append(File.pathSeparatorChar).append(classpathEntry);
-                }
-
-                processBuilder.environment().putAll(forkEnvironment.getSystemEnvironment());
+                scriptHandler.addBinding(FORK_ENVIRONMENT_BINDING_NAME, forkEnvironment);
+                InProcessTaskExecutor.executeScript(outputSink, errorSink, scriptHandler,
+                        thirdPartyCredentials, variables, forkEnvironment.getEnvScript());
             }
+
+            for (String jvmArgument : forkEnvironment.getJVMArguments()) {
+                jvmArguments += jvmArgument;
+            }
+
+            if (!Strings.isNullOrEmpty(forkEnvironment.getJavaHome())) {
+                javaHome = forkEnvironment.getJavaHome();
+            }
+
+            for (String classpathEntry : forkEnvironment.getAdditionalClasspath()) {
+                classpath.append(File.pathSeparatorChar).append(classpathEntry);
+            }
+
+            processBuilder.environment().putAll(forkEnvironment.getSystemEnvironment());
         }
 
         List<String> javaCommand = processBuilder.command();

@@ -54,13 +54,13 @@ import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.job.factories.FlowChecker;
 import org.ow2.proactive.scheduler.common.job.factories.FlowError;
 import org.ow2.proactive.scheduler.common.task.CommonAttribute;
+import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.common.task.ScriptTask;
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
-import org.ow2.proactive.scheduler.task.containers.ForkedScriptExecutableContainer;
 import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
 import org.ow2.proactive.scheduler.task.internal.InternalForkedScriptTask;
 import org.ow2.proactive.scheduler.task.internal.InternalScriptTask;
@@ -290,10 +290,11 @@ public class InternalJobFactory {
 
             try {
                 if (task.isFork()) {
-                    javaTask = new InternalForkedScriptTask(new ForkedScriptExecutableContainer(
+                    javaTask = new InternalForkedScriptTask(new ScriptExecutableContainer(
                         new TaskScript(new SimpleScript(task.getExecutableClassName(),
                             JavaClassScriptEngineFactory.JAVA_CLASS_SCRIPT_ENGINE_NAME,
-                            new Serializable[] { args })), task.getForkEnvironment()));
+                            new Serializable[] { args }))));
+                    javaTask.setForkEnvironment(task.getForkEnvironment());
 
                 } else {
                     javaTask = new InternalScriptTask(new ScriptExecutableContainer(new TaskScript(
@@ -339,8 +340,10 @@ public class InternalJobFactory {
 
         try {
             String cli = Joiner.on(' ').join(task.getCommandLine());
-            InternalTask scriptTask = new InternalForkedScriptTask(new ForkedScriptExecutableContainer(
-                new TaskScript(new SimpleScript(cli, "native")), task.getWorkingDir()));
+            InternalTask scriptTask = new InternalForkedScriptTask(new ScriptExecutableContainer(
+                new TaskScript(new SimpleScript(cli, "native"))));
+            ForkEnvironment forkEnvironment = new ForkEnvironment(task.getWorkingDir());
+            scriptTask.setForkEnvironment(forkEnvironment);
             //set task common properties
             setTaskCommonProperties(userJob, task, scriptTask);
             return scriptTask;
@@ -353,7 +356,7 @@ public class InternalJobFactory {
     private static InternalTask createTask(Job userJob, ScriptTask task) throws JobCreationException {
         InternalTask scriptTask;
         if (PASchedulerProperties.TASK_FORK.getValueAsBoolean()) {
-            scriptTask = new InternalForkedScriptTask(new ForkedScriptExecutableContainer(task.getScript()));
+            scriptTask = new InternalForkedScriptTask(new ScriptExecutableContainer(task.getScript()));
         } else {
             scriptTask = new InternalScriptTask(new ScriptExecutableContainer(task.getScript()));
         }
@@ -428,7 +431,10 @@ public class InternalJobFactory {
         for (Field f : klass.getDeclaredFields()) {
             if (!Modifier.isPrivate(f.getModifiers()) && !Modifier.isStatic(f.getModifiers())) {
                 f.setAccessible(true);
-                f.set(to, f.get(from));
+                Object newValue = f.get(from);
+                if (newValue != null || f.get(to) == null) {
+                    f.set(to, newValue);
+                }
             }
         }
     }

@@ -9,6 +9,7 @@ import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
+import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
@@ -16,7 +17,7 @@ import org.ow2.proactive.scheduler.common.util.Object2ByteConverter;
 import org.ow2.proactive.scheduler.examples.WaitAndPrint;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.task.data.TaskDataspaces;
-import org.ow2.proactive.scheduler.task.containers.ForkedScriptExecutableContainer;
+import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
 import com.google.common.base.Charsets;
@@ -46,7 +47,7 @@ public class TaskLauncherTest {
 
     @Test
     public void simpleTask() throws Throwable {
-        ForkedScriptExecutableContainer executableContainer = new ForkedScriptExecutableContainer(
+        ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(
           new TaskScript(new SimpleScript("print('hello'); result='hello'", "groovy")));
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
@@ -66,7 +67,7 @@ public class TaskLauncherTest {
     public void javaTask() throws Throwable {
         HashMap<String, byte[]> args = new HashMap<>();
         args.put("number", Object2ByteConverter.convertObject2Byte(123));
-        ForkedScriptExecutableContainer executableContainer = new ForkedScriptExecutableContainer(
+        ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(
           new TaskScript(new SimpleScript(WaitAndPrint.class.getName(), "java", new Serializable[]{
             args
           })));
@@ -84,7 +85,7 @@ public class TaskLauncherTest {
 
     @Test
     public void failedTask() throws Throwable {
-        ForkedScriptExecutableContainer executableContainer = new ForkedScriptExecutableContainer(
+        ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(
           new TaskScript(new SimpleScript("failing task'", "groovy")));
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
@@ -100,7 +101,7 @@ public class TaskLauncherTest {
 
     @Test
     public void thirdPartyCredentials() throws Throwable {
-        ForkedScriptExecutableContainer executableContainer = new ForkedScriptExecutableContainer(
+        ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(
           new TaskScript(new SimpleScript("print(credentials.get('password'))", "groovy")));
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
@@ -121,10 +122,11 @@ public class TaskLauncherTest {
 
     @Test
     public void nativeTask_WorkingDir() throws Throwable {
-        ForkedScriptExecutableContainer executableContainer = new ForkedScriptExecutableContainer(
-          new TaskScript(new SimpleScript("pwd", "native")), "/tmp");
+        ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(
+          new TaskScript(new SimpleScript("pwd", "native")));
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
+        initializer.setForkEnvironment(new ForkEnvironment("/tmp"));
 
         initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false));
 
@@ -136,11 +138,12 @@ public class TaskLauncherTest {
 
     @Test
     public void nativeTask_WorkingDir_WithVariableReplacement() throws Throwable {
-        ForkedScriptExecutableContainer executableContainer = new ForkedScriptExecutableContainer(
-          new TaskScript(new SimpleScript("pwd", "native")), "$folder");
+        ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(
+          new TaskScript(new SimpleScript("pwd", "native")));
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
         initializer.setVariables(singletonMap("folder", "/tmp"));
+        initializer.setForkEnvironment(new ForkEnvironment("$folder"));
 
         initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false));
 
@@ -152,7 +155,7 @@ public class TaskLauncherTest {
 
     @Test
     public void taskLogsAreCopiedToUserSpace() throws Exception {
-        ForkedScriptExecutableContainer executableContainer = new ForkedScriptExecutableContainer(
+        ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(
           new TaskScript(new SimpleScript("print('hello'); result='hello'", "groovy")));
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
@@ -177,7 +180,7 @@ public class TaskLauncherTest {
 
     @Test
     public void taskLogsAreNotCopiedToUserSpace_PreciousLogsDisabled() throws Exception {
-        ForkedScriptExecutableContainer executableContainer = new ForkedScriptExecutableContainer(
+        ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(
           new TaskScript(new SimpleScript("print('hello'); result='hello'", "groovy")));
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
@@ -207,7 +210,7 @@ public class TaskLauncherTest {
         String taskScript = CharStreams.toString(new InputStreamReader(
                 getClass().getResourceAsStream("/task-report-progress.py"), Charsets.UTF_8));
 
-        ForkedScriptExecutableContainer executableContainer = new ForkedScriptExecutableContainer(
+        ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(
                 new TaskScript(new SimpleScript(taskScript, "python",
                         new String [] {Integer.toString(nbIterations)})));
 
@@ -224,7 +227,7 @@ public class TaskLauncherTest {
         }
     }
 
-    private TaskResult runTaskLauncher(TaskLauncher taskLauncher, ForkedScriptExecutableContainer executableContainer) {
+    private TaskResult runTaskLauncher(TaskLauncher taskLauncher, ScriptExecutableContainer executableContainer) {
         TaskTerminateNotificationVerifier taskResult = new TaskTerminateNotificationVerifier();
 
         taskLauncher.doTask(executableContainer, null, taskResult);

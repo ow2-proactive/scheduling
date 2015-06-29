@@ -13,7 +13,6 @@ import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
-import org.ow2.proactive.scheduler.task.containers.ForkedScriptExecutableContainer;
 import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
 import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.scripting.Script;
@@ -44,12 +43,6 @@ public class ScriptTaskData {
 
     ScriptExecutableContainer createExecutableContainer() throws InvalidScriptException {
         return new ScriptExecutableContainer(new TaskScript(script.createSimpleScript()));
-    }
-
-    ForkedScriptExecutableContainer createForkedExecutableContainer() throws InvalidScriptException {
-        return new ForkedScriptExecutableContainer(
-                    new TaskScript(script.createSimpleScript()),
-                        taskData.createForkEnvironment());
     }
 
     @Id
