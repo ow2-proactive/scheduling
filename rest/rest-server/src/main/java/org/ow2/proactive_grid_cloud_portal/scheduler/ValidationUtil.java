@@ -37,8 +37,6 @@ package org.ow2.proactive_grid_cloud_portal.scheduler;
  * $$ACTIVEEON_INITIAL_DEV$$
  */
 
-import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
-
 import java.io.File;
 import java.util.ArrayList;
 
@@ -51,30 +49,24 @@ import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobValidationData;
 
+import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
+
 
 public class ValidationUtil {
 
     private ValidationUtil() {
     }
 
-    public static JobValidationData validateJobArchive(File archiveFile) {
-        return validateJob(archiveFile.getAbsolutePath(), false);
-    }
-
     public static JobValidationData validateJobDescriptor(File jobDescFile) {
-        return validateJob(jobDescFile.getAbsolutePath(), true);
+        return validateJob(jobDescFile.getAbsolutePath());
     }
 
-    private static JobValidationData validateJob(String jobFilePath, boolean isXml) {
+    private static JobValidationData validateJob(String jobFilePath) {
         JobValidationData data = new JobValidationData();
         try {
             JobFactory factory = JobFactory.getFactory();
-            Job job = null;
-            if (isXml) {
-                job = factory.createJob(jobFilePath);
-            } else {
-                job = factory.createJobFromArchive(jobFilePath);
-            }
+            Job job = factory.createJob(jobFilePath);
+
             if (job instanceof TaskFlowJob) {
                 validateJob((TaskFlowJob) job, data);
             } else {

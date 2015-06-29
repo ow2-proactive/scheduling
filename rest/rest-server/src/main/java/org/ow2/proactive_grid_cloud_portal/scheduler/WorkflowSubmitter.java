@@ -37,7 +37,9 @@
 
 package org.ow2.proactive_grid_cloud_portal.scheduler;
 
-import org.apache.log4j.Logger;
+import java.io.File;
+import java.util.Map;
+
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
@@ -52,9 +54,7 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestE
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SubmissionClosedRestException;
 import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
-
-import java.io.File;
-import java.util.Map;
+import org.apache.log4j.Logger;
 
 public class WorkflowSubmitter {
 
@@ -64,24 +64,6 @@ public class WorkflowSubmitter {
 
     public WorkflowSubmitter(Scheduler scheduler) {
         this.scheduler = scheduler;
-    }
-
-    /**
-     * Submits an XML workflow to the scheduler.
-     *
-     * @param workflowFile a workflow file (xml or archive)
-     * @param variables    variables to be replaced in the job before submission
-     * @return
-     * @throws JobCreationException
-     * @throws NotConnectedException
-     * @throws PermissionException
-     * @throws SubmissionClosedException
-     */
-    public JobId submit(
-            File workflowFile,
-            Map<String, String> variables
-    ) throws PermissionRestException, JobCreationRestException, SubmissionClosedRestException, NotConnectedRestException {
-        return submit(workflowFile, true, variables);
     }
 
     /**
@@ -98,13 +80,14 @@ public class WorkflowSubmitter {
      */
     public JobId submit(
             File workflowFile,
-            Boolean isXml,
             Map<String, String> variables
     ) throws NotConnectedRestException, PermissionRestException, SubmissionClosedRestException, JobCreationRestException {
 
         JobId jobId;
         try {
-            jobId = scheduler.submit(createJobObject(workflowFile, isXml, variables));
+            jobId = scheduler.submit(createJobObject(workflowFile, variables));
+            storeWorkflowFile(jobId);
+            return jobId;
         } catch (NotConnectedException e) {
             throw new NotConnectedRestException(e);
         } catch (PermissionException e) {
@@ -114,32 +97,15 @@ public class WorkflowSubmitter {
         } catch (JobCreationException e) {
             throw new JobCreationRestException(e);
         }
-
-        storeWorkflowFile(workflowFile, !isXml, jobId);
-
-        return jobId;
     }
 
-    private Job createJobObject(
-            File jobFile,
-            Boolean isApplicationXmlJob,
-            Map<String, String> jobVariables
-    ) throws JobCreationException {
-        Job jobObject;
-        if (isApplicationXmlJob) {
-            jobObject = JobFactory.getFactory().createJob(jobFile.getAbsolutePath(), jobVariables);
-        } else {
-            jobObject = JobFactory.getFactory().createJobFromArchive(jobFile.getAbsolutePath(), jobVariables);
-        }
-        return jobObject;
+    private Job createJobObject(File jobFile, Map<String, String> jobVariables)
+            throws JobCreationException {
+        return JobFactory.getFactory().createJob(jobFile.getAbsolutePath(), jobVariables);
     }
 
-    private void storeWorkflowFile(File workflowFile, boolean isAnArchive, JobId jobid) {
+    private void storeWorkflowFile(JobId jobid) {
         File archiveToStore = new File(PortalConfiguration.jobIdToPath(jobid.value()));
-        if (isAnArchive) {
-            logger.debug("saving archive to " + archiveToStore.getAbsolutePath());
-            workflowFile.renameTo(archiveToStore);
-        } else {
             // the job is not an archive, however an archive file can
             // exist for this new job (due to an old submission)
             // In that case, we remove the existing file preventing erronous
@@ -148,7 +114,6 @@ public class WorkflowSubmitter {
 
             if (archiveToStore.exists()) {
                 archiveToStore.delete();
-            }
         }
     }
 

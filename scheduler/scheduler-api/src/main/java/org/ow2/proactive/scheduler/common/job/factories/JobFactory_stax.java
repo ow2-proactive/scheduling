@@ -37,7 +37,6 @@
 package org.ow2.proactive.scheduler.common.job.factories;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -51,8 +50,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
-import java.util.zip.ZipFile;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -79,7 +76,6 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
 import org.ow2.proactive.scheduler.common.task.flow.FlowBlock;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
-import org.ow2.proactive.scheduler.common.util.ZipUtils;
 import org.ow2.proactive.scripting.GenerationScript;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.SelectionScript;
@@ -165,81 +161,6 @@ public class JobFactory_stax extends JobFactory {
         } catch (JobCreationException jce) {
             throw jce;
         } catch (Exception e) {
-            throw new JobCreationException(e);
-        }
-    }
-
-    @Override
-    public Job createJobFromArchive(String archivePath) throws JobCreationException {
-        return createJobFromArchive(archivePath, null);
-    }
-
-    @Override
-    public Job createJobFromArchive(String archivePath, Map<String, String> updatedVariables)
-            throws JobCreationException {
-        clean();
-        try {
-            //we intend to receive a zip/jar file, try to create it
-            ZipFile zip = new ZipFile(archivePath);
-            //get temporary directory
-            String strDest = System.getProperty(JOBFACTORY_TMPDIR_PROPERTY);
-            if (strDest == null || "".equals(strDest)) {
-                strDest = System.getProperty("java.io.tmpdir");
-            }
-            //check if temporary dir exist
-            File dest = new File(strDest);
-            if (!dest.exists()) {
-                throw new JobCreationException(
-                    "Temporary targeted path to extract the archive does not exist : '" + strDest + "'");
-            }
-            //create random directory inside to store job archive content : random avoid conflicts with previous one
-            dest = ZipUtils.createTempDirectory("jobarch", null, dest);
-            //unzip archive in the newly created destination
-            ZipUtils.unzip(zip, dest);
-            //search if there is a manifest to find the xml relative path
-            String xmlJobRelativePath;
-            File manifest = new File(dest, ARCHIVE_MANIFEST_DIRECTORY + File.separator +
-                ARCHIVE_MANIFEST_FILE);
-            if (manifest.exists() && manifest.isFile()) {
-                //manifest found, try to get the property
-                Properties manifestProp = new Properties();
-                try {
-                    FileInputStream fis = new FileInputStream(manifest);
-                    manifestProp.load(fis);
-                    fis.close();
-                } catch (IOException ioe) {
-                    throw new JobCreationException("Cannot read archive manifest file", ioe);
-                }
-                xmlJobRelativePath = manifestProp.getProperty(ARCHIVE_MANIFEST_PROPERTY_XMLFILE);
-                if (xmlJobRelativePath == null) {
-                    //property not found
-                    throw new JobCreationException("Cannot find property '" +
-                        ARCHIVE_MANIFEST_PROPERTY_XMLFILE + "' in archive manifest file.");
-                }
-            } else {
-                xmlJobRelativePath = ARCHIVE_DEFAULT_XMLFILE;
-            }
-            //append the xml job relative path, job must contain xml job descriptor
-            File fjob = new File(dest, xmlJobRelativePath);
-            //error message if needed
-            if (!fjob.exists() || !fjob.isFile()) {
-                if (ARCHIVE_DEFAULT_XMLFILE.equals(xmlJobRelativePath)) {
-                    throw new JobCreationException(
-                        "Manifest file not found in this archive OR default XML file '" +
-                            ARCHIVE_DEFAULT_XMLFILE + "' not found (at the root of the archive).");
-                } else {
-                    throw new JobCreationException(
-                        "XML file not found (relative to the root of the archive) : " + xmlJobRelativePath);
-                }
-            }
-            try {
-                //create the job and return it
-                return createJob(fjob, updatedVariables);//can throw JobCreationException
-            } finally {
-                //remove temporary created directory : dest
-                ZipUtils.removeDir(dest);
-            }
-        } catch (IOException e) {
             throw new JobCreationException(e);
         }
     }
@@ -690,7 +611,6 @@ public class JobFactory_stax extends JobFactory {
      * Leave the method with the cursor at the end of 'ELEMENT_TASK' tag.
      *
      * @param cursorTask the streamReader with the cursor on the 'ELEMENT_TASK' tag.
-     * @param taskToFill the task to fill. (This method won't create a new one if this parameter is not null)
      * @return The newly created task that can be any type.
      */
     private Task createTask(XMLStreamReader cursorTask) throws JobCreationException {
