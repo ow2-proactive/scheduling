@@ -194,7 +194,7 @@ public enum PASchedulerProperties {
     NUMBER_OF_EXECUTION_ON_FAILURE("pa.scheduler.task.numberofexecutiononfailure", PropertyType.INTEGER),
 
     /** If true script tasks are ran in a forked JVM, if false they are ran in the node's JVM */
-    FORKED_SCRIPT_TASKS("pa.scheduler.task.scripttasks.fork", PropertyType.BOOLEAN),
+    TASK_FORK("pa.scheduler.task.fork", PropertyType.BOOLEAN),
 
     /* ***************************************************************** */
     /* ********************** DATASPACES PROPERTIES ******************** */

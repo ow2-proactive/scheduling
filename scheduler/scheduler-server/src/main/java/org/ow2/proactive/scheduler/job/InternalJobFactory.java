@@ -363,7 +363,7 @@ public class InternalJobFactory {
 
     private static InternalTask createTask(Job userJob, ScriptTask task) throws JobCreationException {
         InternalTask scriptTask;
-        if (PASchedulerProperties.FORKED_SCRIPT_TASKS.getValueAsBoolean()) {
+        if (PASchedulerProperties.TASK_FORK.getValueAsBoolean()) {
             scriptTask = new InternalForkedScriptTask(new ForkedScriptExecutableContainer(task.getScript()));
         } else {
             scriptTask = new InternalScriptTask(new ScriptExecutableContainer(task.getScript()));
