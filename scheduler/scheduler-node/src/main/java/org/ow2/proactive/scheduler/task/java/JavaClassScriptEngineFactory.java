@@ -45,11 +45,13 @@ import javax.script.ScriptEngineFactory;
 
 public class JavaClassScriptEngineFactory implements ScriptEngineFactory {
 
-    private static final Map<String, Object> PARAMETERS = new HashMap<String, Object>();
+    public static final String JAVA_CLASS_SCRIPT_ENGINE_NAME = "java";
+
+    private static final Map<String, Object> PARAMETERS = new HashMap<>();
 
     static {
-        PARAMETERS.put(ScriptEngine.NAME, "java");
-        PARAMETERS.put(ScriptEngine.ENGINE, "java");
+        PARAMETERS.put(ScriptEngine.NAME, JAVA_CLASS_SCRIPT_ENGINE_NAME);
+        PARAMETERS.put(ScriptEngine.ENGINE, JAVA_CLASS_SCRIPT_ENGINE_NAME);
         PARAMETERS.put(ScriptEngine.ENGINE_VERSION, "1.0");
         PARAMETERS.put(ScriptEngine.LANGUAGE, "Java");
         PARAMETERS.put(ScriptEngine.LANGUAGE_VERSION, System.getProperty("java.version"));
@@ -77,7 +79,7 @@ public class JavaClassScriptEngineFactory implements ScriptEngineFactory {
 
     @Override
     public List<String> getNames() {
-        return Collections.singletonList("java");
+        return Collections.singletonList(JAVA_CLASS_SCRIPT_ENGINE_NAME);
     }
 
     @Override

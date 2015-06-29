@@ -36,7 +36,15 @@
  */
 package org.ow2.proactive.scheduler.job;
 
-import org.apache.log4j.Logger;
+import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.exception.InternalException;
@@ -52,22 +60,17 @@ import org.ow2.proactive.scheduler.common.task.ScriptTask;
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.proactive.scheduler.task.containers.ForkedScriptExecutableContainer;
+import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
 import org.ow2.proactive.scheduler.task.internal.InternalForkedScriptTask;
 import org.ow2.proactive.scheduler.task.internal.InternalScriptTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
-import org.ow2.proactive.scheduler.task.containers.ForkedScriptExecutableContainer;
-import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
+import org.ow2.proactive.scheduler.task.java.JavaClassScriptEngineFactory;
+import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
-import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
+import com.google.common.base.Joiner;
+import org.apache.log4j.Logger;
 
 
 /**
@@ -137,7 +140,7 @@ public class InternalJobFactory {
         }
 
         // validate taskflow
-        List<FlowChecker.Block> blocks = new ArrayList<FlowChecker.Block>();
+        List<FlowChecker.Block> blocks = new ArrayList<>();
         FlowError err = FlowChecker.validate(userJob, blocks);
         if (err != null) {
             String e = "";
@@ -148,7 +151,7 @@ public class InternalJobFactory {
         }
 
         InternalJob job = new InternalTaskFlowJob();
-        Map<Task, InternalTask> tasksList = new LinkedHashMap<Task, InternalTask>();
+        Map<Task, InternalTask> tasksList = new LinkedHashMap<>();
         boolean hasPreciousResult = false;
 
         for (Task t : userJob.getTasks()) {
@@ -190,7 +193,7 @@ public class InternalJobFactory {
                 String ifBranch = it.getFlowScript().getActionTarget();
                 String elseBranch = it.getFlowScript().getActionTargetElse();
                 String join = it.getFlowScript().getActionContinuation();
-                List<InternalTask> joinedBranches = new ArrayList<InternalTask>();
+                List<InternalTask> joinedBranches = new ArrayList<>();
 
                 // find the ifBranch task
                 for (InternalTask it2 : tasksList.values()) {
@@ -270,7 +273,7 @@ public class InternalJobFactory {
      */
     @SuppressWarnings("unchecked")
     private static InternalTask createTask(Job userJob, JavaTask task) throws JobCreationException {
-        InternalTask javaTask = null;
+        InternalTask javaTask;
 
         if (task.getExecutableClassName() != null) {
             // HACK HACK HACK : Get arguments for the task
@@ -285,32 +288,21 @@ public class InternalJobFactory {
                 throw new Error("Internal error: implementation must be revised.", e);
             }
 
-//            String groovyScript = "def executable = " +
-//              "new "+ task.getExecutableClassName()+ "(); " +
-//              "def initializer = org.ow2.proactive.scheduler.common.task.executable.internal.JavaStandaloneExecutableInitializer" +
-//              "executable.internalInit()" +
-//              "return executable.execute((org.ow2.proactive.scheduler.common.task.TaskResult[]) results);";
-            if (task.isFork()) {
-//                ForkedJavaExecutableContainer fjec = new ForkedJavaExecutableContainer(task
-//                        .getExecutableClassName(), args);
-//                fjec.setForkEnvironment(task.getForkEnvironment());
-//                javaTask = new InternalForkedJavaTask(fjec);
-                try {
+            try {
+                if (task.isFork()) {
                     javaTask = new InternalForkedScriptTask(new ForkedScriptExecutableContainer(
-                      new TaskScript(new SimpleScript(task.getExecutableClassName(), "java", new Serializable[]{args})),task.getForkEnvironment()));
-                } catch (Exception e) {
-                    throw new JobCreationException(e);
-                }
+                        new TaskScript(new SimpleScript(task.getExecutableClassName(),
+                            JavaClassScriptEngineFactory.JAVA_CLASS_SCRIPT_ENGINE_NAME,
+                            new Serializable[] { args })), task.getForkEnvironment()));
 
-            } else {
-//                javaTask = new InternalJavaTask(new JavaExecutableContainer(task.getExecutableClassName(),
-//                  args));
-                try {
-                    javaTask = new InternalScriptTask(new ScriptExecutableContainer(
-                        new TaskScript(new SimpleScript(task.getExecutableClassName(), "java", new Serializable[]{args}))));
-                } catch (Exception e) {
-                    throw new JobCreationException(e);
+                } else {
+                    javaTask = new InternalScriptTask(new ScriptExecutableContainer(new TaskScript(
+                        new SimpleScript(task.getExecutableClassName(),
+                            JavaClassScriptEngineFactory.JAVA_CLASS_SCRIPT_ENGINE_NAME,
+                            new Serializable[] { args }))));
                 }
+            } catch (InvalidScriptException e) {
+                throw new JobCreationException(e);
             }
         } else {
             String msg = "You must specify your own executable task class to be launched (in every task)!";
