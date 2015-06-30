@@ -114,7 +114,7 @@ public class InProcessTaskExecutor implements TaskExecutor {
                         container.getTaskId(), result, null, stopwatch.elapsed(TimeUnit.MILLISECONDS));
             } catch (Throwable e) {
                 stopwatch.stop();
-                e.printStackTrace(error);
+                error.print(e.getMessage());
                 taskResult = new TaskResultImpl(
                         container.getTaskId(), e, null, stopwatch.elapsed(TimeUnit.MILLISECONDS));
             }
@@ -125,7 +125,7 @@ public class InProcessTaskExecutor implements TaskExecutor {
 
             return taskResult;
         } catch (Throwable e) {
-            e.printStackTrace(error);
+            error.print(e.getMessage());
             return new TaskResultImpl(container.getTaskId(), e);
         } finally {
             if (nodesFile != null && !nodesFile.isEmpty()) {
@@ -356,7 +356,7 @@ public class InProcessTaskExecutor implements TaskExecutor {
             ScriptResult<FlowAction> flowScriptResult = scriptHandler.handle(flowScript, output, error);
 
             if (flowScriptResult.errorOccured()) {
-                flowScriptResult.getException().printStackTrace(error);
+                error.println(flowScriptResult.getException().getMessage());
                 taskResult.setException(flowScriptResult.getException());
                 taskResult.setAction(FlowAction.getDefaultAction(flowScript));
             } else {

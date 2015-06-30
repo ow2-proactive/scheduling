@@ -62,6 +62,22 @@ public class InProcessTaskExecutorTest {
     }
 
     @Test
+    public void failingScript() throws Throwable {
+        TestTaskOutput taskOutput = new TestTaskOutput();
+
+        TaskLauncherInitializer initializer = new TaskLauncherInitializer();
+        initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false));
+
+        TaskResultImpl result = new InProcessTaskExecutor().execute(new TaskContext(
+          new ScriptExecutableContainer(new TaskScript(
+            new SimpleScript("dsfsdfsdf", "groovy"))),
+          initializer), taskOutput.outputStream, taskOutput.error);
+
+        assertTrue(result.hadException());
+        assertFalse(taskOutput.error().isEmpty());
+    }
+
+    @Test
     public void contextVariables() throws Throwable {
         TestTaskOutput taskOutput = new TestTaskOutput();
 
@@ -130,7 +146,7 @@ public class InProcessTaskExecutorTest {
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
         initializer.setTaskId(TaskIdImpl.createTaskId(new JobIdImpl(1000, "job"), "task", 42L, false));
 
-        Map<String, Serializable> variablesFromParent = new HashMap<String, Serializable>();
+        Map<String, Serializable> variablesFromParent = new HashMap<>();
         variablesFromParent.put("var", "parent");
         variablesFromParent.put(SchedulerVars.PA_TASK_ID.toString(), "1234");
 

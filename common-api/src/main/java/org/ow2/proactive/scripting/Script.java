@@ -37,7 +37,6 @@
 package org.ow2.proactive.scripting;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -56,10 +55,12 @@ import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineFactory;
 import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.utils.BoundedStringWriter;
 import org.ow2.proactive.utils.FileUtils;
+import com.google.common.base.Throwables;
 import org.apache.log4j.Logger;
 
 
@@ -234,15 +235,6 @@ public abstract class Script<E> implements Serializable {
     }
 
     /**
-     * Sets the script name to the given value.
-     *
-     * @param scriptName the new script name.
-     */
-    public void setScriptName(String scriptName) {
-        this.scriptName = scriptName;
-    }
-
-    /**
      * Get the script name.
      *
      * @return the script name.
@@ -270,18 +262,8 @@ public abstract class Script<E> implements Serializable {
     }
 
     /**
-     * Add a binding to the script that will be handle by this handler.
-     *
-     * @param name the name of the variable
-     * @param value the value of the variable
-     */
-    public void addBinding(String name, Object value) {
-
-    }
-
-    /**
      * Execute the script and return the ScriptResult corresponding.
-     * Will use {@link java.lang.System.out} for output.
+     * Will use {@link java.lang.System#out} for output.
      *
      * @return a ScriptResult object.
      */
@@ -302,10 +284,9 @@ public abstract class Script<E> implements Serializable {
             PrintStream errorSink) {
         ScriptEngine engine = createScriptEngine();
 
-        if (engine == null) {
-            return new ScriptResult<E>(new Exception("No Script Engine Found for name or extension " +
-                scriptEngineLookup));
-        }
+        if (engine == null)
+            return new ScriptResult<>(
+              new Exception("No Script Engine Found for name or extension " + scriptEngineLookup));
 
         // SCHEDULING-1532: redirect script output to a buffer (keep the latest DEFAULT_OUTPUT_MAX_SIZE)
         BoundedStringWriter outputBoundedWriter = new BoundedStringWriter(outputSink, DEFAULT_OUTPUT_MAX_SIZE);
@@ -345,16 +326,18 @@ public abstract class Script<E> implements Serializable {
             result.setOutput(outputBoundedWriter.toString());
 
             return result;
-        } catch (Throwable e) {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            PrintStream ps = new PrintStream(baos);
-            e.printStackTrace(ps);
-            ps.flush();
-            String stack = baos.toString();
-            if (e.getMessage() != null) {
-                stack = e.getMessage() + System.getProperty("line.separator") + stack;
+        } catch (javax.script.ScriptException e) {
+            // drop exception cause as it might not be serializable
+            ScriptException scriptException = new ScriptException(e.getMessage(), e.getFileName(),
+                e.getLineNumber(), e.getColumnNumber());
+            scriptException.setStackTrace(e.getStackTrace());
+            return new ScriptResult<>(scriptException);
+        } catch (Throwable t) {
+            String stack = Throwables.getStackTraceAsString(t);
+            if (t.getMessage() != null) {
+                stack = t.getMessage() + System.getProperty("line.separator") + stack;
             }
-            return new ScriptResult<E>(new Exception(stack));
+            return new ScriptResult<>(new Exception(stack));
         }
     }
 
