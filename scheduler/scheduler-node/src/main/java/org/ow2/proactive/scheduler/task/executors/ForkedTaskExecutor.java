@@ -231,10 +231,16 @@ public class ForkedTaskExecutor implements TaskExecutor {
 
     // 4 called by forker
     private static Object deserializeTaskResult(File pathToFile) throws IOException, ClassNotFoundException {
-        ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(pathToFile));
-        Object scriptResult = inputStream.readObject();
-        FileUtils.forceDelete(pathToFile);
-        return scriptResult;
+        try {
+            ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(pathToFile));
+            Object scriptResult = inputStream.readObject();
+            FileUtils.forceDelete(pathToFile);
+            return scriptResult;
+        } catch (IOException e) {
+            throw new ForkedJVMProcessException(
+                "Could not read serialized task result (forked JVM may have been killed by the task or could not write to local space)",
+                e);
+        }
     }
 
     /**
