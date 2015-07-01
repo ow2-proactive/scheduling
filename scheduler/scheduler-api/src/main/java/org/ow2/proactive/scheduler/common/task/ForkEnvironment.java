@@ -82,7 +82,7 @@ public class ForkEnvironment implements Serializable {
     private transient Map<String, String> baseSystemEnvironment = null;
 
     /**
-     * User custom system environment : can modify base env or create new variable
+     * User custom system environment: can modify base env or create new variable
      */
     private List<PropertyModifier> systemEnvironment = null;
 
@@ -106,7 +106,7 @@ public class ForkEnvironment implements Serializable {
 
     /**
      * This constructor is used for internal stuff only.
-     * It allows an internal subtype to create a ForkEnvironement with a base env.
+     * It allows an internal subtype to create a ForkEnvironment with a base env.
      *
      * @param forkEnv the fork environment that should be decorated with a base env, if null, empty fork env will be used
      * @param baseEnv the environment on witch to base the user env.

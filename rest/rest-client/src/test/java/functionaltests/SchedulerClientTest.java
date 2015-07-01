@@ -176,25 +176,6 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         assertTrue(Files.equal(tmpFile, destFile));
     }
 
-    private File createClassInsideJar(Integer testValue, String className) throws Exception {
-        File destDir = testFolder.newFolder(className);
-        SchedulerClientTest.createClass(className, testValue, destDir);
-        File jarFile = testFolder.newFile("testJar" + testValue + ".jar");
-        JarUtils.jar(new String[] { destDir.getAbsolutePath() }, jarFile, null, null, null, null);
-        return jarFile;
-    }
-
-    private void checkForValueInResult(TaskResult taskResult, Integer value, File jarFile) throws Throwable {
-        String message = "";
-        if (taskResult.hadException()) {
-            message = taskResult.getException().getMessage();
-        }
-        Assert.assertFalse("The task failure reason: " + message, taskResult.hadException());
-        Assert.assertEquals("The executable class in " + jarFile
-                + " is not returning the correct value, the jobclasspath is broken", value,
-                taskResult.value());
-    }
-
     private ISchedulerClient clientInstance() throws Exception {
         ISchedulerClient client = SchedulerClient.createInstance();
         client.init(getRestServerUrl(), getLogin(), getPassword());

@@ -371,7 +371,7 @@ public class TaskResultImpl implements TaskResult {
     public JPanel getGraphicalDescription() {
         boolean instanciation = false;
         try {
-            instanciation = this.instanciateDescriptor();
+            instanciation = this.instantiateDescriptor();
         } catch (ClassNotFoundException e) {
             return new SimpleTextPanel(
                 "[ERROR] Previewer classes cannot be found. Cannot create graphical previewer: " +
@@ -396,7 +396,7 @@ public class TaskResultImpl implements TaskResult {
     public String getTextualDescription() {
         boolean instanciation = false;
         try {
-            instanciation = this.instanciateDescriptor();
+            instanciation = this.instantiateDescriptor();
         } catch (ClassNotFoundException e) {
             return "[ERROR] Previewer classes cannot be found. Cannot create textual previewer: " +
                 System.lineSeparator() + e;
@@ -417,20 +417,19 @@ public class TaskResultImpl implements TaskResult {
 
     /**
      * Create the descriptor instance if descriptor class is available.
-     * This descriptor is instanciated in a dedicated URLClassloader build on
-     * the job classpath.
+     *
      * @return true if the creation occurs, false otherwise
      */
-    private boolean instanciateDescriptor() throws InstantiationException, IllegalAccessException,
+    private boolean instantiateDescriptor() throws InstantiationException, IllegalAccessException,
             IOException, ClassNotFoundException {
         if (this.descriptor == null) {
             ClassLoader cl = this.getTaskClassLoader();
-            boolean isInstanciated = false;
-            // if a specific previewer is defined, instanciate it
+            boolean isInstantiated = false;
+            // if a specific previewer is defined, instantiate it
             if (this.previewerClassName != null) {
                 Class<?> previewClass = Class.forName(this.previewerClassName, true, cl);
                 this.descriptor = (ResultPreview) (previewClass.newInstance());
-                isInstanciated = true;
+                isInstantiated = true;
             }
             // in any case, instanciate value and exception
             if (this.serializedException != null) {
@@ -438,7 +437,7 @@ public class TaskResultImpl implements TaskResult {
             } else {
                 this.value = this.instanciateValue(cl);
             }
-            return isInstanciated;
+            return isInstantiated;
         } else {
             return true;
         }

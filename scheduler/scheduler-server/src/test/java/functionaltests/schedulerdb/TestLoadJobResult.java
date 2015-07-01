@@ -123,11 +123,6 @@ public class TestLoadJobResult extends BaseSchedulerDBTest {
         Assert.assertEquals(internalJob.getId(), result.getJobId());
         Assert.assertEquals(5, result.getJobInfo().getTotalNumberOfTasks());
 
-        // TODO check how to replace
-//        for (TaskResult taskResult : result.getAllResults().values()) {
-//            Assert.assertArrayEquals(classpath, ((TaskResultImpl) taskResult).getJobClasspath());
-//        }
-
         TestResult taskResultValue;
 
         taskResultValue = (TestResult) result.getResult("task1").value();
