@@ -47,7 +47,6 @@ import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory_stax;
-import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.tests.FunctionalTest;
@@ -81,10 +80,6 @@ import org.junit.Assert;
  * </p>
  * <p>
  * task8 : Native task that end with error code 12, expected number of execution is 2, RESULT (CODE 12) is expected at the end.
- * </p>
- * <p>
- * task9 : Started after every other tasks, Kill the runtime, expected number of execution is 2 (set by admin)
- * 			EXCEPTION is expected at the end.
  * </p>
  *
  * @author The ProActive Team
@@ -125,7 +120,7 @@ public class TestJobCoverage extends FunctionalTest {
         //checking results
         SchedulerTHelper.log("Checking results...");
         JobResult result = SchedulerTHelper.getJobResult(id);
-        Assert.assertEquals(9, result.getAllResults().size());
+        Assert.assertEquals(8, result.getAllResults().size());
         Assert.assertEquals(2, result.getPreciousResults().size());
         Assert.assertNotNull(result.getPreciousResults().get("task1"));
         Assert.assertNotNull(result.getPreciousResults().get("task6"));
@@ -135,11 +130,10 @@ public class TestJobCoverage extends FunctionalTest {
           "WorkingAt3rd - Status : Number is 1"));
         Assert.assertTrue(result.getResult("task3").value().toString().contains(
           "WorkingAt3rd - Status : OK / File deleted :"));
-        Assert.assertTrue(result.getResult("task4").getException().getMessage().contains("Throwing"));
-        Assert.assertTrue(result.getResult("task5").getException().getMessage().contains("Throwing"));
+        Assert.assertTrue(result.getResult("task4").getException().getCause().getMessage().contains("Throwing"));
+        Assert.assertTrue(result.getResult("task5").getException().getCause().getMessage().contains("Throwing"));
         Assert.assertNotNull(result.getResult("task7").getException());
         Assert.assertNotNull(result.getResult("task8").getException());
-        Assert.assertNotNull(result.getResult("task9").getException());
 
         //checking all processes
         SchedulerTHelper.log("Checking all received events :");
@@ -281,51 +275,19 @@ public class TestJobCoverage extends FunctionalTest {
         jstate.update(tinfo);
         Assert.assertEquals(TaskStatus.FAULTY, tinfo.getStatus());
 
-        //checking task 9
-        SchedulerTHelper.log("Checking task9 process...");
-        tinfo = SchedulerTHelper.waitForEventTaskRunning(id, "task9");
-        jstate.update(tinfo);
-        Assert.assertEquals(TaskStatus.RUNNING, tinfo.getStatus());
-
-        if (!((JavaTask) job.getTask("task9")).isFork()) {
-            tinfo = SchedulerTHelper.waitForEventTaskWaitingForRestart(id, "task9");
-            jstate.update(tinfo);
-            Assert.assertEquals(TaskStatus.WAITING_ON_FAILURE, tinfo.getStatus());
-
-            tinfo = SchedulerTHelper.waitForEventTaskRunning(id, "task9");
-            jstate.update(tinfo);
-            Assert.assertEquals(TaskStatus.RUNNING, tinfo.getStatus());
-
-            tinfo = SchedulerTHelper.waitForEventTaskFinished(id, "task9");
-            jstate.update(tinfo);
-            Assert.assertEquals(TaskStatus.FAILED, tinfo.getStatus());
-        } else {
-            tinfo = SchedulerTHelper.waitForEventTaskFinished(id, "task9");
-            jstate.update(tinfo);
-            Assert.assertEquals(TaskStatus.FAULTY, tinfo.getStatus());
-        }
-
         //checking end of the job...
         jstate.update(jinfo);
         Assert.assertEquals(0, jinfo.getNumberOfPendingTasks());
         Assert.assertEquals(0, jinfo.getNumberOfRunningTasks());
-        Assert.assertEquals(9, jinfo.getNumberOfFinishedTasks());
-        Assert.assertEquals(9, jinfo.getTotalNumberOfTasks());
-        if (!((JavaTask) job.getTask("task9")).isFork()) {
-            Assert.assertEquals(JobStatus.FAILED, jinfo.getStatus());
-        } else {
-            Assert.assertEquals(JobStatus.FINISHED, jinfo.getStatus());
-        }
+        Assert.assertEquals(8, jinfo.getNumberOfFinishedTasks());
+        Assert.assertEquals(8, jinfo.getTotalNumberOfTasks());
+        Assert.assertEquals(JobStatus.FINISHED, jinfo.getStatus());
 
         Assert.assertEquals(0, jstate.getNumberOfPendingTasks());
         Assert.assertEquals(0, jstate.getNumberOfRunningTasks());
-        Assert.assertEquals(9, jstate.getNumberOfFinishedTasks());
-        Assert.assertEquals(9, jstate.getTotalNumberOfTasks());
-        if (!((JavaTask) job.getTask("task9")).isFork()) {
-            Assert.assertEquals(JobStatus.FAILED, jstate.getStatus());
-        } else {
-            Assert.assertEquals(JobStatus.FINISHED, jstate.getStatus());
-        }
+        Assert.assertEquals(8, jstate.getNumberOfFinishedTasks());
+        Assert.assertEquals(8, jstate.getTotalNumberOfTasks());
+        Assert.assertEquals(JobStatus.FINISHED, jstate.getStatus());
 
     }
 

@@ -36,6 +36,7 @@
  */
 package functionaltests;
 
+import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,13 +47,13 @@ import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
-import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingService;
 import org.ow2.proactive.scheduler.common.util.logforwarder.providers.SocketBasedForwardingProvider;
+import org.ow2.tests.FunctionalTest;
 import org.apache.commons.collections.ListUtils;
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.spi.LoggingEvent;
@@ -75,7 +76,7 @@ import org.junit.Test;
  * @author ProActive team
  *
  */
-public class TestListenJobLogs extends SchedulerConsecutive {
+public class TestListenJobLogs extends FunctionalTest {
 
     static final long LOG_EVENT_TIMEOUT = 30000;
 
@@ -128,7 +129,7 @@ public class TestListenJobLogs extends SchedulerConsecutive {
 
     }
 
-    private TaskFlowJob createJob(String communicationObjectUrl1, String communicationObjectUrl2, boolean fork)
+    private TaskFlowJob createJob(String communicationObjectUrl1, String communicationObjectUrl2)
             throws Exception {
         TaskFlowJob job = new TaskFlowJob();
         job.setName(this.getClass().getSimpleName());
@@ -145,12 +146,6 @@ public class TestListenJobLogs extends SchedulerConsecutive {
 
         // task 2 starts after task1
         javaTask2.addDependence(javaTask1);
-
-        if (fork) {
-            ForkEnvironment env = new ForkEnvironment();
-//            javaTask1.setForkEnvironment(env);
-//            javaTask2.setForkEnvironment(env);
-        }
 
         job.addTask(javaTask1);
         job.addTask(javaTask2);
@@ -175,12 +170,13 @@ public class TestListenJobLogs extends SchedulerConsecutive {
 
     @Test
     public void test() throws Exception {
-        testLogs(false);
+        SchedulerTHelper.startScheduler(new File(SchedulerTHelper.class.getResource(
+          "config/scheduler-nonforkedscripttasks.ini").toURI()).getAbsolutePath());
 
-        testLogs(true);
+        testLogs();
     }
 
-    public void testLogs(boolean forkJavaTask) throws Exception {
+    public void testLogs() throws Exception {
         CommunicationObject communicationObject1 = PAActiveObject.newActive(CommunicationObject.class,
                 new Object[] {});
         String communicationObjectUrl1 = PAActiveObject.getUrl(communicationObject1);
@@ -191,7 +187,7 @@ public class TestListenJobLogs extends SchedulerConsecutive {
 
         Scheduler scheduler = SchedulerTHelper.getSchedulerInterface();
 
-        Job job = createJob(communicationObjectUrl1, communicationObjectUrl2, forkJavaTask);
+        Job job = createJob(communicationObjectUrl1, communicationObjectUrl2);
         JobId jobId = scheduler.submit(job);
 
         SchedulerTHelper.waitForEventTaskRunning(jobId, TASK_NAME1);

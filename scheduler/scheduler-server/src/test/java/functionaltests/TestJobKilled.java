@@ -74,6 +74,8 @@ public class TestJobKilled extends FunctionalTest {
      */
     @org.junit.Test
     public void run() throws Throwable {
+        SchedulerTHelper.startScheduler(new File(SchedulerTHelper.class.getResource(
+          "config/scheduler-nonforkedscripttasks.ini").toURI()).getAbsolutePath());
 
         String task1Name = "task1";
         String task2Name = "task2";
