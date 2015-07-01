@@ -48,7 +48,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-public class TestJobFactory_stax {
+public class TestStaxJobFactory {
 
     private static final String impl = StaxJobFactory.class.getName();
     private static URI job_descriptor_uri;
@@ -58,9 +58,9 @@ public class TestJobFactory_stax {
 
     @BeforeClass
     public static void setJobDescriptorcUri() throws Exception {
-        job_descriptor_uri = TestJobFactory_stax.class.getResource(
+        job_descriptor_uri = TestStaxJobFactory.class.getResource(
                 "/org/ow2/proactive/scheduler/common/job/factories/job_update_variables.xml").toURI();
-        job_descriptor_sys_props_uri = TestJobFactory_stax.class.getResource(
+        job_descriptor_sys_props_uri = TestStaxJobFactory.class.getResource(
                 "/org/ow2/proactive/scheduler/common/job/factories/job_update_variables_using_system_properties.xml")
                 .toURI();
     }
