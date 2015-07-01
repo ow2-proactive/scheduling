@@ -46,6 +46,7 @@ import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.tests.FunctionalTest;
 import org.junit.Assert;
+import org.junit.Test;
 
 import static org.junit.Assert.fail;
 
@@ -72,7 +73,7 @@ public class TestJobKilled extends FunctionalTest {
      *
      * @throws Throwable any exception that can be thrown during the test.
      */
-    @org.junit.Test
+    @Test
     public void run() throws Throwable {
         SchedulerTHelper.startScheduler(new File(SchedulerTHelper.class.getResource(
           "config/scheduler-nonforkedscripttasks.ini").toURI()).getAbsolutePath());
@@ -80,9 +81,10 @@ public class TestJobKilled extends FunctionalTest {
         String task1Name = "task1";
         String task2Name = "task2";
         String task3Name = "task3";
-        //cannot use SchedulerTHelper.testJobsubmission because
-        //task 3 is never executed so no event can received
-        //regarding this task.
+
+        // cannot use SchedulerTHelper.testJobsubmission because
+        // task 3 is never executed so no event can be received
+        // regarding this task.
         JobId id = SchedulerTHelper.submitJob(new File(jobDescriptor.toURI()).getAbsolutePath(),
                 ExecutionMode.normal);
         //check events reception
@@ -117,4 +119,5 @@ public class TestJobKilled extends FunctionalTest {
         Assert.assertNotNull(results.get("task1").value());
         Assert.assertNotNull(results.get("task2").getException());
     }
+
 }

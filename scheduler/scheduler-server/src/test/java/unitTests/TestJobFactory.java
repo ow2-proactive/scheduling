@@ -311,7 +311,7 @@ public class TestJobFactory {
                 .getMode());
         Assert.assertEquals(((NativeTask) tfJob.getTask("task4")).getWorkingDir(), "task4workingDir");
         Assert.assertEquals((tfJob.getTask("task4")).getParallelEnvironment().getNodesNumber(), 10);
-        
+
         log("Test Job MULTI_NODES");
         TaskFlowJob mnJob = getJob(jobMultiNodesDescriptor, impl);
         //Check job properties

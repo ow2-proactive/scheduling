@@ -29,9 +29,11 @@ public class TestTaskRuntimeData extends BaseSchedulerDBTest {
         jobDef.addTask(taskDef3);
 
         InternalJob job = defaultSubmitJobAndLoadInternal(false, jobDef);
-        Assert.assertEquals(InternalForkedScriptTask.class, job.getTask("task1").getClass());
-        Assert.assertEquals(InternalForkedScriptTask.class, job.getTask("task2").getClass());
-        Assert.assertEquals(InternalForkedScriptTask.class, job.getTask("task3").getClass());
+
+        // by default all tasks are executed in a forked JVM
+        for (int i = 1; i <= 3; i++) {
+            Assert.assertEquals(InternalForkedScriptTask.class, job.getTask("task" + i).getClass());
+        }
     }
 
     @Test

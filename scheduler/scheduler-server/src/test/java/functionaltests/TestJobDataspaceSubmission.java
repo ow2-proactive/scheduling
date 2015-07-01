@@ -69,8 +69,9 @@ import org.junit.Assert;
  */
 public class TestJobDataspaceSubmission extends SchedulerConsecutive {
 
-    private static String IOSPACE = System.getProperty("java.io.tmpdir") + File.separator + "scheduler_test" +
-            File.separator;
+    private static String IOSPACE =
+            System.getProperty("java.io.tmpdir") + File.separator + "scheduler_test" + File.separator;
+
     private static String IN = "input";
     private static String OUT = "output";
     private static String GLOB = "global";
@@ -373,15 +374,9 @@ public class TestJobDataspaceSubmission extends SchedulerConsecutive {
     }
 
     private String getContent(File f) throws Exception {
-        FileReader fr = null;
-        BufferedReader br = null;
-        try {
-            fr = new FileReader(f);
-            br = new BufferedReader(fr);
+        try (FileReader fr = new FileReader(f); BufferedReader br = new BufferedReader(fr)) {
             return br.readLine();
-        } finally {
-            fr.close();
-            br.close();
         }
     }
+
 }
