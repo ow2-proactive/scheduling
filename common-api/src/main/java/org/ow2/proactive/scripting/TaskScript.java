@@ -63,10 +63,6 @@ public class TaskScript extends Script<Serializable> {
      */
     public static final String RESULTS_VARIABLE = "results";
     /**
-     * The variable name to set the progress during task execution.
-     */
-    public static final String PROGRESS_VARIABLE = "progress";
-    /**
      * The variable name to access the user's third party credentials.
      */
     public static final String CREDENTIALS_VARIABLE = "credentials";
@@ -80,16 +76,18 @@ public class TaskScript extends Script<Serializable> {
         if (bindings.containsKey(RESULT_VARIABLE)) {
             Object result = bindings.get(RESULT_VARIABLE);
             if (result == null) {
-                return new ScriptResult<Serializable>(null);
-            } else if (result instanceof Serializable) {
-                return new ScriptResult<Serializable>((Serializable) result);
+                return new ScriptResult<>(null);
             } else {
-                return new ScriptResult<Serializable>(new Exception(
-                    "Bad result format : awaited Serializable, found " + result.getClass().getName()));
+                if (result instanceof Serializable) {
+                    return new ScriptResult<>((Serializable) result);
+                } else {
+                    return new ScriptResult<>(new Exception(
+                      "Bad result format : awaited Serializable, found " + result.getClass().getName()));
+                }
             }
         } else {
             if(evalResult != null && evalResult instanceof Serializable) {
-                return new ScriptResult<Serializable>((Serializable) evalResult);
+                return new ScriptResult<>((Serializable) evalResult);
             } else {
                 // assuming script ran fine
                 return new ScriptResult<Serializable>(true);
