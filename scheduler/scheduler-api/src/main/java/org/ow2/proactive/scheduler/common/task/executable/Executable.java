@@ -38,10 +38,11 @@ package org.ow2.proactive.scheduler.common.task.executable;
 
 import java.io.Serializable;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.task.SchedulerVars;
+import org.ow2.proactive.scripting.helper.progress.ProgressFile;
 
 
 /**
@@ -59,9 +60,6 @@ public abstract class Executable {
 
     /** Executable state. True if the executable has been killed */
     private volatile boolean killed = false;
-
-    /** execution progress value (between 0 and 100) */
-    private final AtomicInteger progress = new AtomicInteger(0);
 
     private Map<String, Serializable> propagatedVariables;
 
@@ -107,7 +105,10 @@ public abstract class Executable {
         if (newValue < 0 || newValue > 100) {
             throw new IllegalArgumentException("Progress value must be ranged between 0 and 100");
         }
-        return this.progress.getAndSet(newValue);
+        String progressFilePath = (String) getVariables().get(SchedulerVars.PA_TASK_PROGRESS_FILE.toString());
+        int previousValue = ProgressFile.getProgress(progressFilePath);
+        ProgressFile.setProgress(progressFilePath, newValue);
+        return previousValue;
     }
 
     /*
@@ -119,7 +120,8 @@ public abstract class Executable {
      * @return the current progress value for this executable.
      */
     public int getProgress() {
-        return this.progress.get();
+        return ProgressFile.getProgress((String) getVariables().get(
+                SchedulerVars.PA_TASK_PROGRESS_FILE.toString()));
     }
 
     public Map<String, Serializable> getVariables() {
