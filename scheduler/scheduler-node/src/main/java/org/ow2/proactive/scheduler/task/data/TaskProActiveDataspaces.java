@@ -125,8 +125,8 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
             logger.info("No existing " + spaceName + " space found");
             logger.info(spaceName + " space is disabled");
         } else {
-            logger.info(spaceName + " space is " + space.getRealURI());
-            logger.info("(other available urls for " + spaceName + " space are " + space.getAllRealURIs() +
+            logger.debug(spaceName + " space is " + space.getRealURI());
+            logger.debug("(other available urls for " + spaceName + " space are " + space.getAllRealURIs() +
               " )");
         }
         return space;
@@ -142,7 +142,7 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
                     .getStubOnThis()), id, namingService);
 
             SCRATCH = PADataSpaces.resolveScratchForAO();
-            logger.info("SCRATCH space is " + SCRATCH.getRealURI());
+            logger.debug("SCRATCH space is " + SCRATCH.getRealURI());
 
         } catch (Throwable t) {
             logger.error("There was a problem while initializing dataSpaces, they are not activated", t);
