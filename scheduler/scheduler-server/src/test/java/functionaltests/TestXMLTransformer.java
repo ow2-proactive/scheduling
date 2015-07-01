@@ -45,7 +45,7 @@ import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.job.factories.Job2XMLTransformer;
 import org.ow2.proactive.scheduler.common.job.factories.JobComparator;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
-import org.ow2.proactive.scheduler.common.job.factories.JobFactory_stax;
+import org.ow2.proactive.scheduler.common.job.factories.StaxJobFactory;
 import org.ow2.tests.FunctionalTest;
 import org.junit.Assert;
 import org.apache.commons.io.FileUtils;
@@ -55,11 +55,11 @@ import org.junit.Test;
 
 /**
  * This class tests the coherence between the {@link Job2XMLTransformer} and the
- * {@link JobFactory_stax}. For each job descriptor in the
+ * {@link StaxJobFactory}. For each job descriptor in the
  * "/functionaltests/descriptors/" and
  * "$pa.scheduler.home/samples/workflows/" folders (except if the file descriptor
  * contains the keyword 'invalid') it creates a {@link TaskFlowJob} object using
- * the {@link JobFactory_stax}. The java job is then serialized to xml using the
+ * the {@link StaxJobFactory}. The java job is then serialized to xml using the
  * {@link Job2XMLTransformer} and then a new {@link TaskFlowJob} is created.
  * Both {@link TaskFlowJob} objects are then compared using {@link JobComparator}.
  *

@@ -43,7 +43,7 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
-import org.ow2.proactive.scheduler.common.job.factories.JobFactory_stax;
+import org.ow2.proactive.scheduler.common.job.factories.StaxJobFactory;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
@@ -70,7 +70,7 @@ public class TestScriptTask extends SchedulerConsecutive {
     }
 
     private void forkedTasks() throws Throwable {
-        TaskFlowJob job = (TaskFlowJob) JobFactory_stax.getFactory().createJob(
+        TaskFlowJob job = (TaskFlowJob) StaxJobFactory.getFactory().createJob(
                 new File(jobDescriptor.toURI()).getAbsolutePath());
 
         JobId id = SchedulerTHelper.submitJob(job);
@@ -139,7 +139,7 @@ public class TestScriptTask extends SchedulerConsecutive {
      *  if the result is 'null'.
      */
     private void test_getTaskResult_nullReturningScriptTask_shouldSucceed() throws Throwable {
-        TaskFlowJob job = (TaskFlowJob) JobFactory_stax.getFactory().createJob(
+        TaskFlowJob job = (TaskFlowJob) StaxJobFactory.getFactory().createJob(
                 new File(job_null_returning_script_task.toURI()).getAbsolutePath());
         JobId id = SchedulerTHelper.submitJob(job);
         SchedulerTHelper.waitForEventJobFinished(id);

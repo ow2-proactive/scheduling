@@ -46,7 +46,7 @@ import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
-import org.ow2.proactive.scheduler.common.job.factories.JobFactory_stax;
+import org.ow2.proactive.scheduler.common.job.factories.StaxJobFactory;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
@@ -103,7 +103,7 @@ public class TestMultipleHostsRequest extends SchedulerConsecutive {
         //System.setProperty(executablePathPropertyName, new File(executablePath.toURI()).getAbsolutePath());
 
         //test submission and event reception
-        TaskFlowJob job = (TaskFlowJob) JobFactory_stax.getFactory().createJob(
+        TaskFlowJob job = (TaskFlowJob) StaxJobFactory.getFactory().createJob(
                 new File(jobDescriptor.toURI()).getAbsolutePath());
 
         //must add /bin/sh at beginning of task1 command line on Linux OS in runAsMe mode

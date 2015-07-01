@@ -44,7 +44,7 @@ import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
-import org.ow2.proactive.scheduler.common.job.factories.JobFactory_stax;
+import org.ow2.proactive.scheduler.common.job.factories.StaxJobFactory;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.junit.Test;
@@ -70,7 +70,7 @@ public class TaskUsingCredentialsTest extends SchedulerConsecutive {
 
         scheduler.putThirdPartyCredential("MY_APP_PASSWORD", "superpassword");
 
-        TaskFlowJob job = (TaskFlowJob) JobFactory_stax.getFactory().createJob(
+        TaskFlowJob job = (TaskFlowJob) StaxJobFactory.getFactory().createJob(
                 new File(jobDescriptor.toURI()).getAbsolutePath());
 
         if (OperatingSystem.getOperatingSystem() == org.objectweb.proactive.utils.OperatingSystem.unix) {

@@ -50,7 +50,7 @@ import static org.junit.Assert.*;
 
 public class TestJobFactory_stax {
 
-    private static final String impl = JobFactory_stax.class.getName();
+    private static final String impl = StaxJobFactory.class.getName();
     private static URI job_descriptor_uri;
     private static URI job_descriptor_sys_props_uri;
 

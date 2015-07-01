@@ -91,16 +91,16 @@ import static org.ow2.proactive.scheduler.common.util.VariablesUtil.filterAndUpd
 
 
 /**
- * JobFactory_stax provide an implementation of the JobFactory using StAX
+ * StaxJobFactory provide an implementation of the JobFactory using StAX
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9.1
  *
  * $Id$
  */
-public class JobFactory_stax extends JobFactory {
+public class StaxJobFactory extends JobFactory {
 
-    public static Logger logger = Logger.getLogger(JobFactory_stax.class);
+    public static Logger logger = Logger.getLogger(StaxJobFactory.class);
 
     /** XML input factory */
     private XMLInputFactory xmlif = null;
@@ -114,9 +114,9 @@ public class JobFactory_stax extends JobFactory {
     private HashMap<String, ArrayList<String>> dependencies = null;
 
     /**
-     * Create a new instance of JobFactory_stax.
+     * Create a new instance of StaxJobFactory.
      */
-    JobFactory_stax() {
+    StaxJobFactory() {
         System.setProperty("javax.xml.stream.XMLInputFactory", "com.ctc.wstx.stax.WstxInputFactory");
         //System.setProperty("javax.xml.stream.XMLOutputFactory", "com.ctc.wstx.stax.WstxOutputFactory");
         xmlif = XMLInputFactory.newInstance();

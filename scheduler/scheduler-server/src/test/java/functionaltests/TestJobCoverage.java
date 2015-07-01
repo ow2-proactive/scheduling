@@ -46,7 +46,7 @@ import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
-import org.ow2.proactive.scheduler.common.job.factories.JobFactory_stax;
+import org.ow2.proactive.scheduler.common.job.factories.StaxJobFactory;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.tests.FunctionalTest;
@@ -109,7 +109,7 @@ public class TestJobCoverage extends FunctionalTest {
 
         //job submission
         SchedulerTHelper.log("Submitting job...");
-        TaskFlowJob job = (TaskFlowJob) JobFactory_stax.getFactory().createJob(
+        TaskFlowJob job = (TaskFlowJob) StaxJobFactory.getFactory().createJob(
                 new File(jobDescriptor.toURI()).getAbsolutePath());
         JobId id = SchedulerTHelper.submitJob(job);
 

@@ -63,7 +63,7 @@ public abstract class JobFactory {
     public static final String JOBFACTORY_TMPDIR_PROPERTY = "pas.jobfactory.tmpdir";
 
     /** List of job factory implementation */
-    private static final String[] CURRENT_IMPL = new String[] { "org.ow2.proactive.scheduler.common.job.factories.JobFactory_stax" };
+    private static final String[] CURRENT_IMPL = new String[] { "org.ow2.proactive.scheduler.common.job.factories.StaxJobFactory" };
 
     /** Archive special manifest directory, file, property */
     public static final String ARCHIVE_DEFAULT_XMLFILE = "job.xml";

@@ -49,7 +49,7 @@ import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
-import org.ow2.proactive.scheduler.common.job.factories.JobFactory_stax;
+import org.ow2.proactive.scheduler.common.job.factories.StaxJobFactory;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
@@ -80,7 +80,7 @@ public class TestForkedTaskWorkingDir extends FunctionalTest {
 
         FileUtils.touch(new File(input, "inputFile_script.txt"));
 
-        TaskFlowJob job = (TaskFlowJob) JobFactory_stax.getFactory().createJob(
+        TaskFlowJob job = (TaskFlowJob) StaxJobFactory.getFactory().createJob(
                 new File(TestForkedTaskWorkingDir.class.getResource(
                         "/functionaltests/descriptors/Job_forked_script_task_working_dir.xml").toURI())
                         .getAbsolutePath());
@@ -101,7 +101,7 @@ public class TestForkedTaskWorkingDir extends FunctionalTest {
 
             FileUtils.touch(new File(input, "inputFile_native.txt"));
 
-            TaskFlowJob job = (TaskFlowJob) JobFactory_stax.getFactory().createJob(
+            TaskFlowJob job = (TaskFlowJob) StaxJobFactory.getFactory().createJob(
                     new File(TestForkedTaskWorkingDir.class.getResource(
                             "/functionaltests/descriptors/Job_forked_native_task_working_dir.xml").toURI())
                             .getAbsolutePath());

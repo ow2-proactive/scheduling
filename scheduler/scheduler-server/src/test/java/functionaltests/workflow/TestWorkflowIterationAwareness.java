@@ -46,7 +46,7 @@ import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
-import org.ow2.proactive.scheduler.common.job.factories.JobFactory_stax;
+import org.ow2.proactive.scheduler.common.job.factories.StaxJobFactory;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
@@ -106,7 +106,7 @@ public class TestWorkflowIterationAwareness extends SchedulerConsecutive {
      */
     private static void testJavaJob() throws Throwable {
 
-        TaskFlowJob job = (TaskFlowJob) JobFactory_stax.getFactory().createJob(
+        TaskFlowJob job = (TaskFlowJob) StaxJobFactory.getFactory().createJob(
                 new File(java_job.toURI()).getAbsolutePath());
         ((JavaTask) job.getTask("T1")).setPreScript(new SimpleScript(preScript, "groovy"));
         ((JavaTask) job.getTask("T1")).setPostScript(new SimpleScript(postScript, "groovy"));
@@ -140,7 +140,7 @@ public class TestWorkflowIterationAwareness extends SchedulerConsecutive {
      * native task through xml
      */
     private static void testNativeJob() throws Throwable {
-        TaskFlowJob job = (TaskFlowJob) JobFactory_stax.getFactory().createJob(
+        TaskFlowJob job = (TaskFlowJob) StaxJobFactory.getFactory().createJob(
                 new File(native_job.toURI()).getAbsolutePath());
         switch (OperatingSystem.getOperatingSystem()) {
             case windows:

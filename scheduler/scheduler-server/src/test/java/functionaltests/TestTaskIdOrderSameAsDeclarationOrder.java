@@ -46,7 +46,7 @@ import java.util.TreeMap;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
-import org.ow2.proactive.scheduler.common.job.factories.JobFactory_stax;
+import org.ow2.proactive.scheduler.common.job.factories.StaxJobFactory;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.junit.Test;
@@ -66,7 +66,7 @@ public class TestTaskIdOrderSameAsDeclarationOrder extends SchedulerConsecutive 
 
     @Test
     public void task_ids_should_be_ordered_as_task_declaration_order() throws Throwable {
-        TaskFlowJob job = (TaskFlowJob) JobFactory_stax.getFactory().createJob(
+        TaskFlowJob job = (TaskFlowJob) StaxJobFactory.getFactory().createJob(
                 new File(jobDescriptor.toURI()).getAbsolutePath());
 
         JobId id = submitJob(job);
