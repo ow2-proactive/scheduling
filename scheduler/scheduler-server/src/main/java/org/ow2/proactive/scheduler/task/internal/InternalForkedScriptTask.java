@@ -47,9 +47,7 @@ import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.ProActiveForkedTaskLauncherFactory;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.task.containers.ExecutableContainer;
-import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
 import org.ow2.proactive.scheduler.util.TaskLogger;
-import org.ow2.proactive.scripting.Script;
 
 
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -84,14 +82,6 @@ public class InternalForkedScriptTask extends InternalScriptTask {
         setExecuterInformations(new ExecuterInformations(launcher, node));
 
         return launcher;
-    }
-
-    @Override
-    public String display() {
-        String nl = System.lineSeparator();
-        String answer = super.display();
-        Script tscript = ((ScriptExecutableContainer) executableContainer).getScript();
-        return answer + nl + "\tScript = " + ((tscript != null) ? tscript.display() : null);
     }
 
 }
