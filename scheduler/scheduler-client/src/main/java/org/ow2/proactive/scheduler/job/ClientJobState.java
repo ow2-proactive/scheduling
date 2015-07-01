@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.ow2.proactive.scheduler.common.Scheduler;
-import org.ow2.proactive.scheduler.common.job.JobEnvironment;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobType;
@@ -20,7 +19,6 @@ import org.ow2.proactive.scheduler.task.TaskInfoImpl;
 
 
 /**
- * 
  * This class is a client view of a {@link JobState}. A client will receive an
  * instance of this class when connecting to the scheduler front-end and ask for
  * a JobState (for instance by using {@link Scheduler#getJobState(String)}).
@@ -30,7 +28,6 @@ import org.ow2.proactive.scheduler.task.TaskInfoImpl;
  * RuntimeException. See the public method's javadoc for more details.
  * 
  * @author esalagea
- * 
  */
 public final class ClientJobState extends JobState {
 
@@ -162,15 +159,6 @@ public final class ClientJobState extends JobState {
         for (ClientTaskState ts : newTasks) {
             ts.restoreDependences(tasks);
         }
-    }
-
-    /**
-     * This property is not available for this implementation. Calling this
-     * method will throw a RuntimeException
-     */
-    @Override
-    public JobEnvironment getEnvironment() {
-        throw new RuntimeException("Not implemented: the job environment is not available on client side.");
     }
 
     /**

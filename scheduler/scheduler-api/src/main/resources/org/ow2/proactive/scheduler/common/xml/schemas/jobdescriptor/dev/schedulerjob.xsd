@@ -9,7 +9,6 @@
       <xs:sequence>
         <xs:element minOccurs="0" ref="jd:variables"/>
         <xs:group minOccurs="0" ref="jd:jobDescription"/>
-        <xs:element minOccurs="0" ref="jd:jobClasspath"/>
         <xs:element minOccurs="0" ref="jd:genericInformation"/>
         <xs:element minOccurs="0" ref="jd:inputSpace"/>
         <xs:element minOccurs="0" ref="jd:outputSpace"/>
@@ -140,16 +139,6 @@
       </xs:simpleType>
     </xs:attribute>
   </xs:attributeGroup>
-  <xs:element name="jobClasspath">
-    <xs:annotation>
-      <xs:documentation>The classPath where to find the dependences of your job. It must contain path element</xs:documentation>
-    </xs:annotation>
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element maxOccurs="unbounded" ref="jd:pathElement"/>
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
   <xs:element name="pathElement">
     <xs:annotation>
       <xs:documentation>Path element (one pathElement for each classpath entry)</xs:documentation>

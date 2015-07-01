@@ -108,7 +108,7 @@ public class JobFactory_stax extends JobFactory {
     private HashMap<String, String> variables = new HashMap<>();
     /** Job instance : to be sent to the user once created. */
     private Job job = null;
-    /** file relative path (relative file path (js and jobClassPath) given in XML will be relative to this path) */
+    /** file relative path (relative file path (js) given in XML will be relative to this path) */
     private String relativePathRoot = "./";
     /** Instance that will temporary store the dependencies between tasks */
     private HashMap<String, ArrayList<String>> dependencies = null;
@@ -343,8 +343,6 @@ public class JobFactory_stax extends JobFactory {
                             }
                         } else if (XMLTags.COMMON_GENERIC_INFORMATION.matches(current)) {
                             jtmp.setGenericInformations(getGenericInformations(cursorJob));
-                        } else if (XMLTags.JOB_CLASSPATHES.matches(current)) {
-                            jtmp.getEnvironment().setJobClasspath(getClasspath(cursorJob));
                         } else if (XMLTags.COMMON_DESCRIPTION.matches(current)) {
                             jtmp.setDescription(getDescription(cursorJob));
                         } else if (XMLTags.DS_INPUTSPACE.matches(current)) {
@@ -364,7 +362,6 @@ public class JobFactory_stax extends JobFactory {
             }
             //if this point is reached, fill the real job using the temporary one
             job.setDescription(jtmp.getDescription());
-            job.setEnvironment(jtmp.getEnvironment());
             job.setName(jtmp.getName());
             job.setPriority(jtmp.getPriority());
             job.setProjectName(jtmp.getProjectName());
@@ -468,45 +465,6 @@ public class JobFactory_stax extends JobFactory {
                 attrtmp = cursorInfo.getAttributeLocalName(0);
             }
             throw new JobCreationException(cursorInfo.getLocalName(), attrtmp, e);
-        }
-    }
-
-    /**
-     * Get the defined classPath.
-     * Leave the method at the end of 'ELEMENT_JOB_CLASSPATHES' tag.
-     *
-     * @param cursorClasspath the streamReader with the cursor on the 'ELEMENT_JOB_CLASSPATHES' tag.
-     * @return the list of classPath entries as an array of string.
-     */
-    private String[] getClasspath(XMLStreamReader cursorClasspath) throws JobCreationException {
-        try {
-            ArrayList<String> pathEntries = new ArrayList<String>(0);
-            int eventType;
-            while (cursorClasspath.hasNext()) {
-                eventType = cursorClasspath.next();
-                switch (eventType) {
-                    case XMLEvent.START_ELEMENT:
-                        if (XMLTags.JOB_PATH_ELEMENT.matches(cursorClasspath.getLocalName())) {
-                            pathEntries.add(checkPath(cursorClasspath.getAttributeValue(0)));
-                        }
-                        break;
-                    case XMLEvent.END_ELEMENT:
-                        if (XMLTags.JOB_CLASSPATHES.matches(cursorClasspath.getLocalName())) {
-                            return pathEntries.toArray(new String[] {});
-                        }
-                        break;
-                }
-            }
-            return pathEntries.toArray(new String[pathEntries.size()]);
-        } catch (JobCreationException jce) {
-            jce.pushTag(cursorClasspath.getLocalName());
-            throw jce;
-        } catch (Exception e) {
-            String attrtmp = null;
-            if (cursorClasspath.isStartElement() && cursorClasspath.getAttributeCount() == 1) {
-                attrtmp = cursorClasspath.getAttributeLocalName(0);
-            }
-            throw new JobCreationException(cursorClasspath.getLocalName(), attrtmp, e);
         }
     }
 
@@ -1513,14 +1471,6 @@ public class JobFactory_stax extends JobFactory {
             logger.debug("mnoe : " + job.getMaxNumberOfExecution());
             logger.debug("insp : " + job.getInputSpace());
             logger.debug("ousp : " + job.getOutputSpace());
-            logger.debug("cp   : ");
-            if (job.getEnvironment().getJobClasspath() != null) {
-                String cp = "cp   : ";
-                for (String s : job.getEnvironment().getJobClasspath()) {
-                    cp += (s + ":");
-                }
-                logger.debug(cp);
-            }
             logger.debug("info : " + job.getGenericInformations());
             logger.debug("TASKS ------------------------------------------------");
             ArrayList<Task> tasks = new ArrayList<Task>();
@@ -1572,21 +1522,25 @@ public class JobFactory_stax extends JobFactory {
                         logger.debug("Cannot get args  : " + e.getMessage(), e);
                     }
                     logger.debug("fork  : " + ((JavaTask) t).isFork());
-                    if (((JavaTask) t).getForkEnvironment() != null) {
-                        logger.debug("forkJ  : " + ((JavaTask) t).getForkEnvironment().getJavaHome());
-                        logger
-                                .debug("forkSys: " +
-                                    ((JavaTask) t).getForkEnvironment().getSystemEnvironment());
-                        logger.debug("forkJVM: " + ((JavaTask) t).getForkEnvironment().getJVMArguments());
-                        logger.debug("forkCP : " +
-                            ((JavaTask) t).getForkEnvironment().getAdditionalClasspath());
-                        logger.debug("forkScr: " + ((JavaTask) t).getForkEnvironment().getEnvScript());
-                    }
                 } else if (t instanceof NativeTask) {
                     logger.debug("cmd   : " + Arrays.toString(((NativeTask) t).getCommandLine()));
                 } else if (t instanceof ScriptTask) {
                     logger.debug("script   : " + ((ScriptTask) t).getScript());
                 }
+
+                ForkEnvironment forkEnvironment = t.getForkEnvironment();
+
+                if (forkEnvironment != null) {
+                    logger.debug("forkJ  : " + forkEnvironment.getJavaHome());
+                    logger
+                            .debug("forkSys: " +
+                                    forkEnvironment.getSystemEnvironment());
+                    logger.debug("forkJVM: " + forkEnvironment.getJVMArguments());
+                    logger.debug("forkCP : " +
+                            forkEnvironment.getAdditionalClasspath());
+                    logger.debug("forkScr: " + forkEnvironment.getEnvScript());
+                }
+
                 logger.debug("--------------------------------------------------");
             }
         }

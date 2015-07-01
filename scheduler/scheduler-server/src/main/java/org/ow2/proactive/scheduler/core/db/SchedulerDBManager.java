@@ -18,7 +18,6 @@ import org.ow2.proactive.db.DatabaseManagerException;
 import org.ow2.proactive.db.FilteredExceptionCallback;
 import org.ow2.proactive.db.SortParameter;
 import org.ow2.proactive.scheduler.common.JobSortParameter;
-import org.ow2.proactive.scheduler.common.job.JobEnvironment;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
@@ -62,7 +61,6 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
-import org.hibernate.exception.ConstraintViolationException;
 import org.hibernate.transform.DistinctRootEntityResultTransformer;
 
 import static org.ow2.proactive.authentication.crypto.HybridEncryptionUtil.HybridEncryptedData;
@@ -152,7 +150,6 @@ public class SchedulerDBManager {
             configuration.addAnnotatedClass(JobData.class);
             configuration.addAnnotatedClass(TaskData.class);
             configuration.addAnnotatedClass(TaskResultData.class);
-            configuration.addAnnotatedClass(JobClasspathContent.class);
             configuration.addAnnotatedClass(ScriptTaskData.class);
             configuration.addAnnotatedClass(ScriptData.class);
             configuration.addAnnotatedClass(EnvironmentModifierData.class);
@@ -819,11 +816,6 @@ public class SchedulerDBManager {
 
         for (JobData jobData : jobsList) {
             InternalJob internalJob = jobData.toInternalJob();
-            if (fullState) {
-                String[] classpath = jobData.getClasspath();
-                JobEnvironment env = new JobEnvironment(classpath);
-                internalJob.setEnvironment(env);
-            }
             internalJob.setTasks(toInternalTasks(fullState, internalJob, tasksMap.get(jobData.getId())));
 
             jobs.add(internalJob);
@@ -946,8 +938,8 @@ public class SchedulerDBManager {
 
                 session.createQuery(taskUpdate).setParameter("taskStatus", taskInfo.getStatus())
                         .setParameter("startTime", taskInfo.getStartTime()).setParameter("finishedTime",
-                                taskInfo.getFinishedTime()).setParameter("executionHostName",
-                                taskInfo.getExecutionHostName()).setParameter("taskId", taskId)
+                        taskInfo.getFinishedTime()).setParameter("executionHostName",
+                        taskInfo.getExecutionHostName()).setParameter("taskId", taskId)
                         .executeUpdate();
 
                 return null;
@@ -963,8 +955,8 @@ public class SchedulerDBManager {
                 long jobId = jobId(job);
 
                 String jobUpdate = "update JobData set status = :status, "
-                    + "numberOfPendingTasks = :numberOfPendingTasks, "
-                    + "numberOfRunningTasks = :numberOfRunningTasks where id = :jobId";
+                        + "numberOfPendingTasks = :numberOfPendingTasks, "
+                        + "numberOfRunningTasks = :numberOfRunningTasks where id = :jobId";
 
                 JobInfo jobInfo = job.getJobInfo();
 
@@ -976,9 +968,9 @@ public class SchedulerDBManager {
                 TaskData.DBTaskId taskId = taskId(task);
 
                 String taskUpdate = "update TaskData set taskStatus = :taskStatus, "
-                    + "numberOfExecutionLeft = :numberOfExecutionLeft,"
-                    + "numberOfExecutionOnFailureLeft = :numberOfExecutionOnFailureLeft"
-                    + " where id = :taskId";
+                        + "numberOfExecutionLeft = :numberOfExecutionLeft,"
+                        + "numberOfExecutionOnFailureLeft = :numberOfExecutionOnFailureLeft"
+                        + " where id = :taskId";
 
                 TaskInfo taskInfo = task.getTaskInfo();
 
@@ -1005,10 +997,10 @@ public class SchedulerDBManager {
             @Override
             public Void executeWork(Session session) {
                 String jobUpdate = "update JobData set status = :status, "
-                    + "finishedTime = :finishedTime, numberOfPendingTasks = :numberOfPendingTasks, "
-                    + "numberOfFinishedTasks = :numberOfFinishedTasks, "
-                    + "numberOfRunningTasks = :numberOfRunningTasks, "
-                    + "totalNumberOfTasks =:totalNumberOfTasks where id = :jobId";
+                        + "finishedTime = :finishedTime, numberOfPendingTasks = :numberOfPendingTasks, "
+                        + "numberOfFinishedTasks = :numberOfFinishedTasks, "
+                        + "numberOfRunningTasks = :numberOfRunningTasks, "
+                        + "totalNumberOfTasks =:totalNumberOfTasks where id = :jobId";
 
                 long jobId = jobId(job);
 
@@ -1025,7 +1017,7 @@ public class SchedulerDBManager {
 
                 List<DBTaskId> taskIds = new ArrayList<TaskData.DBTaskId>(changesInfo.getSkippedTasks()
                         .size() +
-                    changesInfo.getUpdatedTasks().size());
+                        changesInfo.getUpdatedTasks().size());
                 for (TaskId id : changesInfo.getSkippedTasks()) {
                     taskIds.add(taskId(id));
                 }
@@ -1130,9 +1122,9 @@ public class SchedulerDBManager {
                 long jobId = jobId(job);
 
                 String jobUpdate = "update JobData set status = :status, "
-                    + "finishedTime = :finishedTime, numberOfPendingTasks = :numberOfPendingTasks, "
-                    + "numberOfFinishedTasks = :numberOfFinishedTasks, "
-                    + "numberOfRunningTasks = :numberOfRunningTasks where id = :jobId";
+                        + "finishedTime = :finishedTime, numberOfPendingTasks = :numberOfPendingTasks, "
+                        + "numberOfFinishedTasks = :numberOfFinishedTasks, "
+                        + "numberOfRunningTasks = :numberOfRunningTasks where id = :jobId";
 
                 JobInfo jobInfo = job.getJobInfo();
 
@@ -1143,8 +1135,8 @@ public class SchedulerDBManager {
                         jobInfo.getNumberOfRunningTasks()).setParameter("jobId", jobId).executeUpdate();
 
                 String taskUpdate = "update TaskData task set task.taskStatus = :taskStatus, "
-                    + "task.finishedTime = :finishedTime, " + "task.executionDuration = :executionDuration "
-                    + "where task.id = :taskId";
+                        + "task.finishedTime = :finishedTime, " + "task.executionDuration = :executionDuration "
+                        + "where task.id = :taskId";
 
                 Query taskUpdateQuery = session.createQuery(taskUpdate);
 
@@ -1310,7 +1302,6 @@ public class SchedulerDBManager {
             return jobResult;
         }
 
-        String[] jobClasspath = job.getClasspath();
         int counter = 0;
 
         for (Object[] result : resultList) {
@@ -1322,7 +1313,7 @@ public class SchedulerDBManager {
             boolean nextTask = !dbTaskId.equals(currentTaskId);
             if (nextTask) {
                 TaskId taskId = TaskIdImpl.createTaskId(jobId, taskName, dbTaskId.getTaskId(), false);
-                jobResult.addTaskResult(taskName, resultData.toTaskResult(taskId, jobClasspath),
+                jobResult.addTaskResult(taskName, resultData.toTaskResult(taskId),
                         preciousResult);
                 currentTaskId = dbTaskId;
             }
@@ -1392,31 +1383,7 @@ public class SchedulerDBManager {
         if (results.isEmpty()) {
             return null;
         } else {
-            String[] classpath = (String[]) session.createQuery(
-                    "select job.classpath from JobData job where job.id =:jobId").setParameter("jobId",
-                    jobId(taskId.getJobId())).uniqueResult();
-
-            return results.get(0).toTaskResult(taskId, classpath);
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    private void saveClasspathContentIfNeeded(Session session, JobEnvironment jobEnv) {
-        if (jobEnv != null && jobEnv.getJobClasspath() != null) {
-            List<Long> existing = session.createQuery(
-                    "select crc from JobClasspathContent as ce where ce.crc = :crc").setLong("crc",
-                    jobEnv.getJobClasspathCRC()).list();
-            if (existing.isEmpty()) {
-                JobClasspathContent classpathEntry = new JobClasspathContent();
-                classpathEntry.setClasspathContent(jobEnv.getJobClasspathContent());
-                classpathEntry.setCrc(jobEnv.getJobClasspathCRC());
-                classpathEntry.setContainsJarFiles(jobEnv.containsJarFile());
-                try {
-                    session.save(classpathEntry);
-                } catch (ConstraintViolationException e) {
-                    debugLogger.warn("Failed to save classpath entry", e);
-                }
-            }
+            return results.get(0).toTaskResult(taskId);
         }
     }
 
@@ -1425,9 +1392,6 @@ public class SchedulerDBManager {
 
             @Override
             public JobData executeWork(Session session) {
-                JobEnvironment jobEnv = job.getEnvironment();
-                saveClasspathContentIfNeeded(session, jobEnv);
-
                 JobData jobRuntimeData = JobData.createJobData(job);
                 session.save(jobRuntimeData);
 
@@ -1508,16 +1472,6 @@ public class SchedulerDBManager {
         }
 
         return taskRuntimeData;
-    }
-
-    public JobClasspathContent loadJobClasspathContent(final long crc) {
-        return runWithoutTransaction(new SessionWork<JobClasspathContent>() {
-            @Override
-            public JobClasspathContent executeWork(Session session) {
-                return (JobClasspathContent) session.get(JobClasspathContent.class, crc);
-            }
-
-        });
     }
 
     private ExecutableContainer loadExecutableContainer(Session session, InternalTask task) {

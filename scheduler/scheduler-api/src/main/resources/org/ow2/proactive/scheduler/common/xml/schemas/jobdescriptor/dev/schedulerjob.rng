@@ -12,9 +12,6 @@
       <optional>
         <ref name="jobDescription"/>
       </optional>
-      <optional>
-        <ref name="jobClasspath"/>
-      </optional>
       <ref name="jobName"/>
       <optional>
         <ref name="priority"/>
@@ -122,14 +119,6 @@
         <ref name="variableRefType"/>
       </choice>
     </attribute>
-  </define>
-  <define name="jobClasspath">
-    <element name="jobClasspath">
-      <doc:documentation>The classPath where to find the dependences of your job. It must contain path element</doc:documentation>
-      <oneOrMore>
-        <ref name="pathElement"/>
-      </oneOrMore>
-    </element>
   </define>
   <define name="pathElement">
     <element name="pathElement">

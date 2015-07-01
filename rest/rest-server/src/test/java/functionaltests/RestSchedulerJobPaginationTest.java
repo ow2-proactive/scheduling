@@ -36,8 +36,19 @@
  */
 package functionaltests;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import org.ow2.proactive.scheduler.common.Scheduler;
+import org.ow2.proactive.scheduler.common.SchedulerState;
+import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobPriority;
+import org.ow2.proactive.scheduler.common.job.JobState;
+import org.ow2.proactive.scheduler.common.job.JobStatus;
 import functionaltests.jobs.NonTerminatingJob;
-import functionaltests.utils.RestFuncTUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPut;
@@ -47,21 +58,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.ow2.proactive.scheduler.common.Scheduler;
-import org.ow2.proactive.scheduler.common.SchedulerState;
-import org.ow2.proactive.scheduler.common.job.JobEnvironment;
-import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobPriority;
-import org.ow2.proactive.scheduler.common.job.JobState;
-import org.ow2.proactive.scheduler.common.job.JobStatus;
-import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
-import org.ow2.proactive.scheduler.common.task.JavaTask;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 
 /**
@@ -83,7 +79,7 @@ public class RestSchedulerJobPaginationTest extends AbstractRestFuncTestCase {
     public void setUp() throws Exception {
         Scheduler scheduler = RestFuncTHelper.getScheduler();
         SchedulerState state = scheduler.getState();
-        List<JobState> jobStates = new ArrayList<JobState>();
+        List<JobState> jobStates = new ArrayList<>();
         jobStates.addAll(state.getPendingJobs());
         jobStates.addAll(state.getRunningJobs());
         jobStates.addAll(state.getFinishedJobs());
@@ -98,7 +94,7 @@ public class RestSchedulerJobPaginationTest extends AbstractRestFuncTestCase {
     public void testJobsPagination() throws Exception {
         Assert.assertEquals("Test expects only one node", 1, RestFuncTHelper.defaultNumberOfNodes);
 
-        JobId jobId1 = getScheduler().submit(createJob());
+        JobId jobId1 = getScheduler().submit(createJob(NonTerminatingJob.class));
         waitJobState(jobId1, JobStatus.RUNNING, 30000);
 
         JobId jobId2 = submitDefaultJob();
@@ -253,25 +249,6 @@ public class RestSchedulerJobPaginationTest extends AbstractRestFuncTestCase {
         return toJsonObject(response);
     }
 
-    private TaskFlowJob createJob() throws Exception {
-        TaskFlowJob job = new TaskFlowJob();
-        job.setName("RestSchedulerJobPaginationTest job");
-
-        JavaTask javaTask = new JavaTask();
-        javaTask.setExecutableClassName(NonTerminatingJob.class.getName());
-        javaTask.setName("Test task");
-
-        JobEnvironment jobEnv = new JobEnvironment();
-        String classpath = RestFuncTUtils.getClassPath(NonTerminatingJob.class);
-        jobEnv.setJobClasspath(new String[] { classpath });
-        job.setEnvironment(jobEnv);
-
-        job.setCancelJobOnError(true);
-        job.addTask(javaTask);
-
-        return job;
-    }
-
     private void checkPagingRequests1() throws Exception {
         checkJobIds(false, 0, 0, "1", "2", "3");
         checkJobIds(true, 0, 10, "1", "2", "3");
@@ -288,8 +265,8 @@ public class RestSchedulerJobPaginationTest extends AbstractRestFuncTestCase {
             throws Exception {
         JSONArray jobs;
 
-        Set<String> expected = new HashSet<String>(Arrays.asList(expectedIds));
-        Set<String> actual = new HashSet<String>();
+        Set<String> expected = new HashSet<>(Arrays.asList(expectedIds));
+        Set<String> actual = new HashSet<>();
 
         String url;
 
@@ -329,8 +306,8 @@ public class RestSchedulerJobPaginationTest extends AbstractRestFuncTestCase {
     }
 
     private void checkRevisionJobsInfo(String url, String... expectedIds) throws Exception {
-        Set<String> expected = new HashSet<String>(Arrays.asList(expectedIds));
-        Set<String> actual = new HashSet<String>();
+        Set<String> expected = new HashSet<>(Arrays.asList(expectedIds));
+        Set<String> actual = new HashSet<>();
 
         JSONObject map = getRequestJSONObject(url);
         Assert.assertEquals(1, map.keySet().size());

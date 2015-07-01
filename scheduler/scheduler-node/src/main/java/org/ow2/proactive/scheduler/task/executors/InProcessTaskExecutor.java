@@ -70,7 +70,7 @@ import org.apache.commons.io.FileUtils;
  * Responsible for:
  * - running the different scripts
  * - variable propagation
- * - replacement for variables/
+ * - replacement for variables
  * - getting the task result or user code exceptions
  */
 public class InProcessTaskExecutor implements TaskExecutor {

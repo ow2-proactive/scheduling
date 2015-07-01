@@ -8,8 +8,7 @@ start = job
 job = ## Definition of a job for the scheduler 
     element job { 
         variables?, 
-        jobDescription?, 
-        jobClasspath?, 
+        jobDescription?,
         jobName,
         priority?, 
         cancelJobOnError_j?, 
@@ -42,8 +41,6 @@ restartTaskOnError_j = ## For each task, where does the task restart if an error
     attribute restartTaskOnError {restartTaskType | variableRefType}
 numberOfExecution_j = ## Maximum number of execution for each task (default=1)
     attribute maxNumberOfExecution {xsd:nonNegativeInteger | variableRefType}
-jobClasspath = ## The classPath where to find the dependences of your job. It must contain path element
-	element jobClasspath {pathElement+}
 pathElement = ## Path element (one pathElement for each classpath entry)
 	element pathElement { attribute path {xsd:string} }
 genericInformation = ## Definition of any information you would like to get in the policy

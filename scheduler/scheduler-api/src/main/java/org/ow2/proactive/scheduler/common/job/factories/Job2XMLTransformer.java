@@ -57,7 +57,6 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector;
-import org.ow2.proactive.scheduler.common.job.JobEnvironment;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
@@ -196,12 +195,6 @@ public class Job2XMLTransformer {
             rootJob.appendChild(descrNode);
         }
 
-        // <ref name="jobClasspath"/>
-        Element jobClasspath = createJobClasspath(doc, job);
-        if (jobClasspath != null) {
-            rootJob.appendChild(jobClasspath);
-        }
-
         // <ref name="genericInformation"/>
         if ((job.getGenericInformations() != null) && (job.getGenericInformations().size() > 0)) {
             Element genericInfo = createGenericInformation(doc, job.getGenericInformations());
@@ -255,31 +248,6 @@ public class Job2XMLTransformer {
         if (elementText != null) {
             Text text = doc.createTextNode(elementText);
             el.appendChild(text);
-        }
-        return el;
-    }
-
-    /**
-     * Creates a job classpath element for the given job corresponding to
-     * <define name="jobClasspath">
-     *
-     * @return the job classpath element, if exists, null otherwise
-     */
-    private Element createJobClasspath(Document doc, TaskFlowJob job) {
-        JobEnvironment env = job.getEnvironment();
-        if (env == null)
-            return null;
-
-        String[] classpath = env.getJobClasspath();
-        if ((classpath == null) || (classpath.length == 0))
-            return null;
-
-        Element el = doc.createElementNS(Schemas.SCHEMA_LATEST.namespace, XMLTags.JOB_CLASSPATHES.getXMLName());
-        for (String path : classpath) {
-            // <ref name="pathElement"/>
-            Element pathEntry = createElement(doc, XMLTags.JOB_PATH_ELEMENT.getXMLName(), null,
-                    new Attribute(XMLAttributes.PATH.getXMLName(), path));
-            el.appendChild(pathEntry);
         }
         return el;
     }

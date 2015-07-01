@@ -1,11 +1,15 @@
 package functionaltests.schedulerdb;
 
-import org.hibernate.Session;
-import org.hibernate.metadata.ClassMetadata;
-import org.junit.Assert;
-import org.junit.Test;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
 import org.ow2.proactive.db.types.BigString;
-import org.ow2.proactive.scheduler.common.job.JobEnvironment;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
@@ -15,7 +19,6 @@ import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
-import org.ow2.proactive.scheduler.core.db.JobClasspathContent;
 import org.ow2.proactive.scheduler.core.db.JobData;
 import org.ow2.proactive.scheduler.core.db.TaskData;
 import org.ow2.proactive.scheduler.core.db.TaskResultData;
@@ -23,11 +26,10 @@ import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.scripting.SimpleScript;
-
-import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import org.hibernate.Session;
+import org.hibernate.metadata.ClassMetadata;
+import org.junit.Assert;
+import org.junit.Test;
 
 
 public class TestJobRemove extends BaseSchedulerDBTest {
@@ -160,22 +162,24 @@ public class TestJobRemove extends BaseSchedulerDBTest {
     }
 
     private TaskFlowJob createJob(int tasksNumber) throws Exception {
-        JobEnvironment env = new JobEnvironment();
-        env.setJobClasspath(new String[] { "lib/ProActive/ProActive.jar", "compile/lib/ant.jar" });
+        ForkEnvironment forkEnvironment = new ForkEnvironment();
+        forkEnvironment.addAdditionalClasspath("lib/ProActive/ProActive.jar", "compile/lib/ant.jar");
 
         TaskFlowJob jobDef = new TaskFlowJob();
-        jobDef.setEnvironment(env);
         jobDef.addGenericInformation("k1", "v1");
         jobDef.addGenericInformation("k2", "v2");
 
         // add data with non-null ifBranch
         JavaTask A = createDefaultTask("A");
+        A.setForkEnvironment(forkEnvironment);
         FlowScript ifScript = FlowScript.createIfFlowScript("branch = \"if\";", "B", "C", null);
         A.setFlowScript(ifScript);
         jobDef.addTask(A);
         JavaTask B = createDefaultTask("B");
+        B.setForkEnvironment(forkEnvironment);
         jobDef.addTask(B);
         JavaTask C = createDefaultTask("C");
+        C.setForkEnvironment(forkEnvironment);
         jobDef.addTask(C);
 
         for (int i = 0; i < tasksNumber; i++) {
@@ -210,6 +214,10 @@ public class TestJobRemove extends BaseSchedulerDBTest {
 
             task1.addDependence(task2);
             task3.addDependence(task2);
+
+            task1.setForkEnvironment(forkEnvironment);
+            task2.setForkEnvironment(forkEnvironment);
+            task3.setForkEnvironment(forkEnvironment);
 
             jobDef.addTask(task1);
             jobDef.addTask(task2);
@@ -278,7 +286,6 @@ public class TestJobRemove extends BaseSchedulerDBTest {
 
     private void checkAllEntitiesDeleted(String... skipClasses) {
         List<String> skip = new ArrayList<String>(Arrays.asList(skipClasses));
-        skip.add(JobClasspathContent.class.getName());
 
         Session session = dbManager.getSessionFactory().openSession();
         try {

@@ -49,7 +49,7 @@ import java.util.Map;
 public enum XMLTags {
     // Are define only the needed tags. If more are needed, just create them.
     // JOBS
-    JOB("job"), TASKFLOW("taskFlow"), JOB_CLASSPATHES("jobClasspath"), JOB_PATH_ELEMENT("pathElement"),
+    JOB("job"), TASKFLOW("taskFlow"), JOB_PATH_ELEMENT("pathElement"),
     // COMMON
     COMMON_DESCRIPTION("description"), COMMON_GENERIC_INFORMATION("genericInformation"), COMMON_INFO("info"),
     // VARIABLES
@@ -81,7 +81,7 @@ public enum XMLTags {
 
     private String xmlName;
 
-    private XMLTags(String xmlName) {
+    XMLTags(String xmlName) {
         this.xmlName = xmlName;
     }
 

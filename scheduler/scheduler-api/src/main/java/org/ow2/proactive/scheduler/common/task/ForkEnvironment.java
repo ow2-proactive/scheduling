@@ -56,7 +56,7 @@ import org.ow2.proactive.scripting.SimpleScript;
 /**
  * Class representing a forked environment of a JVM created specifically for an execution of a Java Task.
  * A Java Task can be executed in the current JVM - then all Java Tasks are dependent on the same JVM (provider) and JVM options (like memory),
- * or can be executed in a dedicated JVM with additional options specified like javaHome, java Arguments, classpath, ...
+ * or can be executed in a dedicated JVM with additional options specified like {@code javaHome}, {@code javaArguments}, {@code classpath}, ...
  *
  * @author ProActive team
  */
@@ -124,7 +124,7 @@ public class ForkEnvironment implements Serializable {
     }
 
     /**
-     * Copy constructor
+     * Copy constructor.
      * 
      * @param f the object to copy
      * @throws ExecutableCreationException script copy failed
@@ -182,16 +182,16 @@ public class ForkEnvironment implements Serializable {
     }
 
     /**
-     * Return the working Directory
+     * Return the working Directory.
      *
-     * @return the working Directory
+     * @return the working Directory.
      */
     public String getWorkingDir() {
         return workingDir;
     }
 
     /**
-     * Set the working directory value to the given workingDir value
+     * Set the working directory value to the given workingDir value.
      *
      * @param workingDir the working directory to set
      */
@@ -311,8 +311,8 @@ public class ForkEnvironment implements Serializable {
     /**
      * Add a new JVM argument value. (-Dname=value, -Xmx=.., -server)
      *
-     * @param value the value of the property to be added
-     * @throws IllegalArgumentException if value is null
+     * @param value the value of the property to be added.
+     * @throws IllegalArgumentException if value is null.
      */
     public void addJVMArgument(String value) {
         if (value == null) {
@@ -340,11 +340,17 @@ public class ForkEnvironment implements Serializable {
         return l;
     }
 
+    public void addAdditionalClasspath(String... values) {
+        for (String value : values) {
+            addAdditionalClasspath(value);
+        }
+    }
+
     /**
-     * Add a new additional Classpath value
+     * Add a new additional Classpath value.
      *
-     * @param value the additional Classpath to add
-     * @throws IllegalArgumentException if value is null
+     * @param value the additional Classpath to add.
+     * @throws IllegalArgumentException if value is null.
      */
     public void addAdditionalClasspath(String value) {
         if (value == null) {
@@ -357,9 +363,9 @@ public class ForkEnvironment implements Serializable {
     }
 
     /**
-     * Get the environment script
+     * Get the environment script.
      *
-     * @return the environment script
+     * @return the environment script.
      */
     public Script<?> getEnvScript() {
         return script;
@@ -389,4 +395,5 @@ public class ForkEnvironment implements Serializable {
             "\tadditionalClasspath = " + additionalClasspath + nl + "\tscript = " +
             (script != null ? script.display() : null) + nl + '}';
     }
+
 }

@@ -36,27 +36,27 @@
  */
 package functionaltests;
 
-import functionaltests.executables.DSWorker;
-import org.junit.Assert;
-import org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector;
-import org.objectweb.proactive.extensions.vfsprovider.FileSystemServerDeployer;
-import org.objectweb.proactive.utils.OperatingSystem;
-import org.ow2.proactive.scheduler.common.job.JobEnvironment;
-import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobResult;
-import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
-import org.ow2.proactive.scheduler.common.task.JavaTask;
-import org.ow2.proactive.scheduler.common.task.NativeTask;
-import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
-import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.net.URI;
 import java.util.Map;
+
+import org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector;
+import org.objectweb.proactive.extensions.vfsprovider.FileSystemServerDeployer;
+import org.objectweb.proactive.utils.OperatingSystem;
+import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobResult;
+import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
+import org.ow2.proactive.scheduler.common.task.JavaTask;
+import org.ow2.proactive.scheduler.common.task.NativeTask;
+import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
+import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
+import functionaltests.executables.DSWorker;
+import org.junit.Assert;
 
 
 /**
@@ -271,11 +271,12 @@ public class TestJobDataspaceSubmission extends SchedulerConsecutive {
         jt.addArgument("paaa", out20);
         jt.addArgument("pbbb", out21);
         jt.addArgument("pccc", out22);
-//        job.addTask(jt);
-        JobEnvironment env = new JobEnvironment();
+
         final URI uri = DSWorker.class.getProtectionDomain().getCodeSource().getLocation().toURI();
-        env.setJobClasspath(new String[] { new File(uri).getAbsolutePath() });
-        job.setEnvironment(env);
+        ForkEnvironment forkEnvironment = new ForkEnvironment();
+        forkEnvironment.addAdditionalClasspath(new File(uri).getAbsolutePath());
+
+        jt.setForkEnvironment(forkEnvironment);
 
         JobId id = SchedulerTHelper.testJobSubmission(job);
 

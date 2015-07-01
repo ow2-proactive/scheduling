@@ -36,16 +36,20 @@
  */
 package functionaltests;
 
-import org.apache.log4j.Level;
-import org.junit.Assert;
+import java.io.File;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.ProActiveInet;
-import org.objectweb.proactive.utils.OperatingSystem;
-
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.process_tree_killer.ProcessTree;
@@ -77,22 +81,15 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.utils.FileUtils;
-import java.io.File;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import functionaltests.common.CommonTUtils;
 import functionaltests.common.InputStreamReaderThread;
 import functionaltests.monitor.MonitorEventReceiver;
 import functionaltests.monitor.SchedulerMonitorsHandler;
+import org.apache.log4j.Level;
+import org.junit.Assert;
 
 
 /**
- *
  * Static helpers that provide main operations for Scheduler functional test.
  *
  * - helpers for launching a scheduler and a RM in a forked JVM, and deploys 5 local ProActive nodes :
@@ -125,13 +122,11 @@ import functionaltests.monitor.SchedulerMonitorsHandler;
  * This method can also be used for testing for job submission with killing and restarting
  * Scheduler.
  *
- * WARNING, you cannot get Scheduler user interface and Administrator interface twice ;
+ * WARNING, you cannot get Scheduler user interface and Administrator interface twice;
  * //TODO solve this, one connection per body allowed
- *
  *
  * @author ProActive team
  * @since ProActive Scheduling 1.0
- *
  */
 public class SchedulerTHelper {
 
@@ -1280,7 +1275,7 @@ public class SchedulerTHelper {
                     if (!((JavaTask) task).isFork()) {
                         ForkEnvironment forkedEnv = new ForkEnvironment();
                         forkedEnv.addJVMArgument("-Dproactive.test=true");
-                        ((JavaTask) task).setForkEnvironment(forkedEnv);
+                        task.setForkEnvironment(forkedEnv);
                     }
                 }
             }

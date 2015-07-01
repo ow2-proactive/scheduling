@@ -36,12 +36,9 @@
  */
 package org.ow2.proactive.scheduler.task;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.Serializable;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
@@ -99,9 +96,6 @@ public class TaskResultImpl implements TaskResult {
 
     /** An instance that describe how to display the result of this task. */
     private transient ResultPreview descriptor = null;
-
-    // this classpath is used on client side to instantiate the previewer (can be null)
-    private String[] jobClasspath;
 
     /** result of the FlowScript if there was one, or null */
     private FlowAction flowAction = null;
@@ -371,15 +365,6 @@ public class TaskResultImpl implements TaskResult {
     }
 
     /**
-     * Set the classpath of the job that contained the corresponding task.
-     *
-     * @param jcp the classpath of the job
-     */
-    public void setJobClasspath(String[] jcp) {
-        this.jobClasspath = jcp;
-    }
-
-    /**
      * @see org.ow2.proactive.scheduler.common.task.TaskResult#getGraphicalDescription()
      */
     @XmlTransient
@@ -495,28 +480,16 @@ public class TaskResultImpl implements TaskResult {
     }
 
     /**
-     * Return the classloader for the given jobclasspath if any.
-     * @return on worker node, the taskClassLoader. On client side, an URL classloader created from the jobclasspath,
-     * or the ClassLoader that has loaded the current class if no jobclasspath is set.
+     * Return the classloader to use for tasks.
+     * @return on worker node, the taskClassLoader. On client side, the ClassLoader that has loaded the current class.
      * @throws IOException if the classloader cannot be created.
      */
     private ClassLoader getTaskClassLoader() throws IOException {
         ClassLoader currentCCL = Thread.currentThread().getContextClassLoader();
-        // Check if this code is running on the scheduler node side
         if (currentCCL instanceof TaskClassLoader) {
             return currentCCL;
         } else {
-            ClassLoader thisClassLoader = this.getClass().getClassLoader();
-            if (this.jobClasspath != null) {
-                //we are not on a worker and jcp is set...
-                URL[] urls = new URL[this.jobClasspath.length];
-                for (int i = 0; i < this.jobClasspath.length; i++) {
-                    urls[i] = new File(this.jobClasspath[i]).toURI().toURL();
-                }
-                return new URLClassLoader(urls, thisClassLoader);
-            } else {
-                return thisClassLoader;
-            }
+            return this.getClass().getClassLoader();
         }
     }
 
@@ -552,15 +525,6 @@ public class TaskResultImpl implements TaskResult {
      */
     public String getPreviewerClassName() {
         return previewerClassName;
-    }
-
-    /**
-     * Get the jobClasspath.
-     *
-     * @return the jobClasspath.
-     */
-    public String[] getJobClasspath() {
-        return jobClasspath;
     }
 
     /**

@@ -46,7 +46,7 @@ import org.apache.log4j.Logger;
 
 /**
  * ForkerUtils is a helper to cache OSBuilder factory and provide
- * some helping methods to launcher and executable
+ * some helping methods to launcher and executable.
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 2.2
@@ -110,7 +110,7 @@ public final class ForkerUtils {
 
     /**
      * If the process must be run under a specific user,
-     * check the configuration of '{@value #FORK_METHOD_KEY}' property and proceed as follow :
+     * check the configuration of '{@value #FORK_METHOD_KEY}' property and proceed as follow:
      * <ul>
      * 	<li><b>if {@value #FORK_METHOD_KEY}=none :</b> throws IllegalAccessException</li>
      * 	<li><b>if {@value #FORK_METHOD_KEY}=pwd :</b> return the user using its login and password</li>
@@ -128,6 +128,8 @@ public final class ForkerUtils {
             KeyException {
         if (decrypter != null) {
             CredData data = decrypter.decrypt();
+
+            // TODO: use polymorphism to avoid branches
             if (ForkMethod.PWD == FORK_METHOD_VALUE) {
                 if (data.getPassword() == null) {
                     throw new IllegalAccessException(

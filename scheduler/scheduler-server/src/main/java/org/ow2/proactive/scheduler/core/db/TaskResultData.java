@@ -52,13 +52,12 @@ public class TaskResultData {
 
     private TaskLogs logs;
 
-    TaskResultImpl toTaskResult(TaskId taskId, String[] jobClasspath) {
+    TaskResultImpl toTaskResult(TaskId taskId) {
 
         TaskResultImpl result = new TaskResultImpl(taskId, getSerializedValue(), getSerializedException(),
             getLogs(), getPropagatedProperties(), getPropagatedVariables());
 
         result.setPreviewerClassName(getPreviewerClassName());
-        result.setJobClasspath(jobClasspath);
         FlowActionData actionData = getFlowAction();
         if (actionData != null) {
             FlowAction action = new FlowAction(actionData.getType());

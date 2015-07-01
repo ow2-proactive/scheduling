@@ -158,16 +158,6 @@ public enum PASchedulerProperties {
     SCHEDULER_LOGIN_METHOD("pa.scheduler.core.authentication.loginMethod", PropertyType.STRING),
 
     /* ***************************************************************** */
-    /* ******************** CLASSLOADING PROPERTIES ******************** */
-    /* ***************************************************************** */
-
-    /** Cache classes definition in task class servers  */
-    SCHEDULER_CLASSSERVER_USECACHE("pa.scheduler.classserver.usecache", PropertyType.BOOLEAN),
-
-    /** Temporary directory for jobclasspathes  */
-    SCHEDULER_CLASSSERVER_TMPDIR("pa.scheduler.classserver.tmpdir", PropertyType.STRING),
-
-    /* ***************************************************************** */
     /* ************************* JOBS PROPERTIES *********************** */
     /* ***************************************************************** */
 

@@ -44,7 +44,6 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 
 
 /**
- *
  * Interface that can be notified of a task termination
  *
  * @author The ProActive Team

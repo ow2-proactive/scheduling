@@ -36,10 +36,12 @@
  */
 package functionaltests.workflow;
 
-import functionaltests.SchedulerConsecutive;
-import functionaltests.SchedulerTHelper;
-import org.junit.Assert;
-import org.ow2.proactive.scheduler.common.job.JobEnvironment;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
@@ -48,8 +50,10 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 import org.ow2.proactive.scheduler.common.task.flow.FlowBlock;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
-
-import java.io.*;
+import functionaltests.SchedulerConsecutive;
+import functionaltests.SchedulerTHelper;
+import org.junit.Assert;
+import org.junit.Test;
 
 
 /**
@@ -60,7 +64,7 @@ import java.io.*;
  */
 public class TestWorkflowDataspace extends SchedulerConsecutive {
 
-    @org.junit.Test
+    @Test
     public void run() throws Throwable {
         testJavaTask();
     }
@@ -87,19 +91,21 @@ public class TestWorkflowDataspace extends SchedulerConsecutive {
         job.setName(TestWorkflowDataspace.class.getSimpleName());
         job.setInputSpace(inputSpace.toURI().toURL().toString());
         job.setOutputSpace(outputSpace.toURI().toURL().toString());
-        JobEnvironment env = new JobEnvironment();
-        env.setJobClasspath(new String[] { SchedulerTHelper.testClasspath() });
-        job.setEnvironment(env);
+
+        ForkEnvironment forkEnvironment = new ForkEnvironment();
+        forkEnvironment.addAdditionalClasspath(SchedulerTHelper.testClasspath());
 
         JavaTask t = new JavaTask();
         t.setName("T");
         t.setExecutableClassName("org.ow2.proactive.scheduler.examples.EmptyTask");
         t.setFlowScript(FlowScript.createReplicateFlowScript("runs = 3;"));
         t.setFlowBlock(FlowBlock.START);
+        t.setForkEnvironment(forkEnvironment);
         job.addTask(t);
 
         JavaTask t1 = new JavaTask();
         t1.setName("T1");
+        t1.setForkEnvironment(forkEnvironment);
         t1.setExecutableClassName(JobWorkflowDataspace.class.getCanonicalName());
         t1.setForkEnvironment(new ForkEnvironment());
         t1.addDependence(t);
@@ -109,6 +115,7 @@ public class TestWorkflowDataspace extends SchedulerConsecutive {
 
         JavaTask t2 = new JavaTask();
         t2.setName("T2");
+        t2.setForkEnvironment(forkEnvironment);
         t2.setExecutableClassName("org.ow2.proactive.scheduler.examples.EmptyTask");
         t2.addDependence(t1);
         t2.setFlowScript(FlowScript.createLoopFlowScript(//

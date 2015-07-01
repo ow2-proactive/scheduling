@@ -39,14 +39,13 @@ package functionaltests;
 import java.io.File;
 
 import org.objectweb.proactive.api.PAActiveObject;
-import org.ow2.proactive.scheduler.common.job.JobEnvironment;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
+import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.tests.FunctionalTest;
-
-import org.junit.Test;
-
 import functionaltests.utils.ProActiveLock;
+import org.junit.Test;
 
 import static functionaltests.TestPauseJobRecover.createJob;
 
@@ -59,9 +58,13 @@ public class TestJobRecoverClasspathInUserSpace extends FunctionalTest {
         ProActiveLock controlJobExecution = PAActiveObject.newActive(ProActiveLock.class, new Object[] {});
 
         TaskFlowJob job = createJob(PAActiveObject.getUrl(controlJobExecution));
-        JobEnvironment env = new JobEnvironment();
-        env.setJobClasspath(new String[] { "$USERSPACE/test.jar" });
-        job.setEnvironment(env);
+
+        ForkEnvironment forkEnvironment = new ForkEnvironment();
+        forkEnvironment.addAdditionalClasspath("$USERSPACE/test.jar");
+
+        for (Task task : job.getTasks()) {
+            task.setForkEnvironment(forkEnvironment);
+        }
 
         JobId idJ1 = SchedulerTHelper.submitJob(job);
         SchedulerTHelper.waitForEventJobRunning(idJ1);

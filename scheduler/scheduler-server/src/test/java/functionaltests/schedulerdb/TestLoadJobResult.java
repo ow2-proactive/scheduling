@@ -3,22 +3,22 @@ package functionaltests.schedulerdb;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Test;
 import org.ow2.proactive.db.types.BigString;
-import org.ow2.proactive.scheduler.common.job.JobEnvironment;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
+import org.junit.Assert;
+import org.junit.Test;
 
 
-public class TestLoadJobResut extends BaseSchedulerDBTest {
+public class TestLoadJobResult extends BaseSchedulerDBTest {
 
     @Test
     public void testEmptyResult() throws Throwable {
@@ -47,18 +47,26 @@ public class TestLoadJobResut extends BaseSchedulerDBTest {
     @Test
     public void testLoadJobResult() throws Throwable {
         TaskFlowJob job = new TaskFlowJob();
-        JobEnvironment env = new JobEnvironment();
-        String[] classpath = { "/path1/path1", "/path2/path2" };
-        env.setJobClasspath(classpath);
-        job.setEnvironment(env);
+
+        ForkEnvironment forkEnvironment = new ForkEnvironment();
+        forkEnvironment.addAdditionalClasspath("/path1/path1");
+        forkEnvironment.addAdditionalClasspath("/path2/path2");
+
         JavaTask javaTask1 = createDefaultTask("task1");
         javaTask1.setPreciousResult(true);
+        javaTask1.setForkEnvironment(forkEnvironment);
+
         job.addTask(javaTask1);
-        job.addTask(createDefaultTask("task2"));
-        job.addTask(createDefaultTask("task3"));
-        job.addTask(createDefaultTask("task4"));
+
+        for (int i = 2; i <= 4; i++) {
+            JavaTask task = createDefaultTask("task" + i);
+            task.setForkEnvironment(forkEnvironment);
+            job.addTask(task);
+        }
+
         JavaTask javaTask5 = createDefaultTask("task5");
         javaTask5.setPreciousResult(true);
+        javaTask5.setForkEnvironment(forkEnvironment);
         job.addTask(javaTask5);
 
         InternalJob internalJob = defaultSubmitJobAndLoadInternal(true, job);
@@ -115,9 +123,10 @@ public class TestLoadJobResut extends BaseSchedulerDBTest {
         Assert.assertEquals(internalJob.getId(), result.getJobId());
         Assert.assertEquals(5, result.getJobInfo().getTotalNumberOfTasks());
 
-        for (TaskResult taskResult : result.getAllResults().values()) {
-            Assert.assertArrayEquals(classpath, ((TaskResultImpl) taskResult).getJobClasspath());
-        }
+        // TODO check how to replace
+//        for (TaskResult taskResult : result.getAllResults().values()) {
+//            Assert.assertArrayEquals(classpath, ((TaskResultImpl) taskResult).getJobClasspath());
+//        }
 
         TestResult taskResultValue;
 
@@ -137,12 +146,12 @@ public class TestLoadJobResut extends BaseSchedulerDBTest {
         TaskResult taskResult;
 
         taskResult = result.getResult("task1");
-        Assert.assertEquals(2, taskResult.getPropagatedProperties().size());
-        Assert.assertEquals("value1", taskResult.getPropagatedProperties().get("property1"));
-        Assert.assertEquals("value2", taskResult.getPropagatedProperties().get("property2"));
+        Assert.assertEquals(2, taskResult.getPropagatedVariables().size());
+        Assert.assertEquals("value1", taskResult.getPropagatedVariables().get("property1"));
+        Assert.assertEquals("value2", taskResult.getPropagatedVariables().get("property2"));
 
         taskResult = result.getResult("task2");
-        Assert.assertEquals(4, taskResult.getPropagatedProperties().size());
+        Assert.assertEquals(4, taskResult.getPropagatedVariables().size());
 
         System.out.println("Load job result2");
         result = dbManager.loadJobResult(internalJob2.getId());

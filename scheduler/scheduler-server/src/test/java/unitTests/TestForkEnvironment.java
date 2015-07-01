@@ -39,11 +39,10 @@ package unitTests;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Assert;
-
-import org.junit.Test;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scripting.SimpleScript;
+import org.junit.Assert;
+import org.junit.Test;
 
 
 /**
@@ -78,7 +77,7 @@ public class TestForkEnvironment {
         fe.addSystemEnvironmentVariable("tata", "789", '#');
         Assert.assertEquals(2, fe.getSystemEnvironment().size());
         Assert.assertEquals("456#789", fe.getSystemEnvironmentVariable("tata"));
-        Map<String, String> baseEnv = new HashMap<String, String>();
+        Map<String, String> baseEnv = new HashMap<>();
         baseEnv.put("tata", "123");
         baseEnv.put("titi", "#@");
         baseEnv.put("toto", "eue");
@@ -124,7 +123,7 @@ public class TestForkEnvironment {
         Assert.assertEquals("c", fe.getAdditionalClasspath().get(2));
         Assert.assertFalse(fe.getAdditionalClasspath() == fe.getAdditionalClasspath());
         try {
-            fe.addAdditionalClasspath(null);
+            fe.addAdditionalClasspath((String) null);
             throw new RuntimeException(
                 "fe.addAdditionalClasspath(null) did not throw an IllegalArgumentException");
         } catch (IllegalArgumentException e) {
@@ -148,7 +147,6 @@ public class TestForkEnvironment {
         Assert.assertEquals(fe.getWorkingDir(), ife.getWorkingDir());
         Assert.assertEquals(fe.getEnvScript(), ife.getEnvScript());
         Assert.assertEquals(fe.getJVMArguments(), ife.getJVMArguments());
-
     }
 
 }

@@ -6,14 +6,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.log4j.spi.LoggingEvent;
-import org.junit.Assert;
-import org.junit.Test;
 import org.ow2.proactive.db.DatabaseManagerException;
 import org.ow2.proactive.db.types.BigString;
-import org.ow2.proactive.scheduler.common.job.JobEnvironment;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
 import org.ow2.proactive.scheduler.common.task.SimpleTaskLogs;
@@ -26,6 +20,11 @@ import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.apache.log4j.spi.LoggingEvent;
+import org.junit.Assert;
+import org.junit.Test;
 
 
 public class TestTaskResultData extends BaseSchedulerDBTest {
@@ -160,7 +159,7 @@ public class TestTaskResultData extends BaseSchedulerDBTest {
         dbManager.updateAfterTaskFinished(job1, job1.getTask("task1"), new TaskResultImpl(null,
             new TestResult(0, "job1Res"), null, 0));
         dbManager.updateAfterTaskFinished(job2, job2.getTask("task1"), new TaskResultImpl(null,
-            new TestResult(0, "job2Res"), null, 0));
+                new TestResult(0, "job2Res"), null, 0));
 
         TestResult result;
 
@@ -169,29 +168,6 @@ public class TestTaskResultData extends BaseSchedulerDBTest {
 
         result = (TestResult) dbManager.loadTaskResult(job2.getId(), "task1", 0).value();
         Assert.assertEquals("job2Res", result.getB());
-    }
-
-    @Test
-    public void testJobClasspath() throws Exception {
-        TaskFlowJob jobDef = new TaskFlowJob();
-        JobEnvironment env = new JobEnvironment();
-        String[] classpath = { "/path1/path1", "/path2/path2" };
-        env.setJobClasspath(classpath);
-        jobDef.setEnvironment(env);
-        jobDef.addTask(createDefaultTask("task"));
-
-        InternalJob job = defaultSubmitJobAndLoadInternal(true, jobDef);
-        InternalTask task = (InternalTask) job.getTasks().get(0);
-        dbManager.updateAfterTaskFinished(job, task, new TaskResultImpl(null, new TestResult(10, "12345"),
-            null, 0));
-
-        System.out.println("Load task result");
-        TaskResultImpl restoredResult = (TaskResultImpl) dbManager.loadLastTaskResult(task.getId());
-        Assert.assertArrayEquals(classpath, restoredResult.getJobClasspath());
-
-        System.out.println("Load task result(2)");
-        restoredResult = (TaskResultImpl) dbManager.loadTaskResult(job.getId(), "task", 0);
-        Assert.assertArrayEquals(classpath, restoredResult.getJobClasspath());
     }
 
     @Test
