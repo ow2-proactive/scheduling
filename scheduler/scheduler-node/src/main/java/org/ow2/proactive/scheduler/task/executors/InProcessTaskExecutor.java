@@ -89,9 +89,9 @@ public class InProcessTaskExecutor implements TaskExecutor {
     /**
      * Will be replaced by the matching third-party credential
      * Example: if one of the third-party credentials' key-value pairs is 'foo:bar',
-     * then '$CREDENTIALS_foo' will be replaced by 'bar' in the arguments of the tasks.
+     * then '$credentials_foo' will be replaced by 'bar' in the arguments of the tasks.
      */
-    private static final String CREDENTIALS_KEY_PREFIX = "CREDENTIALS_";
+    private static final String CREDENTIALS_KEY_PREFIX = "credentials_";
 
     @Override
     public TaskResultImpl execute(TaskContext container, PrintStream output, PrintStream error) {

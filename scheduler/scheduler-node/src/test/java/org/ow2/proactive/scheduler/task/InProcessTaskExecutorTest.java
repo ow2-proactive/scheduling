@@ -288,14 +288,14 @@ public class InProcessTaskExecutorTest {
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
         String printArgs = "println(args[0] + args[1]);";
         initializer.setPreScript(new SimpleScript(printArgs, "groovy", new Serializable[] {
-                "$CREDENTIALS_PASSWORD", "$PA_JOB_ID" }));
+                "$credentials_PASSWORD", "$PA_JOB_ID" }));
         initializer.setPostScript(new SimpleScript(printArgs, "groovy", new Serializable[] {
-                "$CREDENTIALS_PASSWORD", "$PA_JOB_ID" }));
+                "$credentials_PASSWORD", "$PA_JOB_ID" }));
         initializer.setTaskId(TaskIdImpl.createTaskId(new JobIdImpl(1000, "job"), "task", 42L, false));
 
         Decrypter decrypter = createCredentials("somebody_that_does_not_exists");
         TaskContext taskContext = new TaskContext(new ScriptExecutableContainer(new TaskScript(
-            new SimpleScript(printArgs, "groovy", new Serializable[] { "$CREDENTIALS_PASSWORD",
+            new SimpleScript(printArgs, "groovy", new Serializable[] { "$credentials_PASSWORD",
                     "${PA_JOB_ID}" }))), initializer);
         taskContext.setDecrypter(decrypter);
         new InProcessTaskExecutor().execute(taskContext, taskOutput.outputStream, taskOutput.error);
