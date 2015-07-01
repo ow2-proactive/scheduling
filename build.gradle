@@ -440,6 +440,12 @@ project(':scheduler:scheduler-examples') {
     task stub(type: StubTask) {
         classes = ['org.ow2.proactive.scheduler.examples.MultiNodeExample']
     }
+
+    task schedulerExamplesJar(type: Jar)
+
+    artifacts {
+        archives schedulerExamplesJar
+    }
 }
 
 project('rm:rm-server') {
@@ -586,10 +592,13 @@ task dist(type: Sync) {
     from configurations.runtime
     from jar
 
-    [project(':rm:rm-server'), project(':scheduler:scheduler-server')].each {
+    [project(':rm:rm-server'), project(':scheduler:scheduler-server'), project(':scheduler:scheduler-examples')].each {
         from it.configurations.archives.artifacts.files.files
-        if (it.tasks.findByName('testJar'))
+        if (it.tasks.findByName('testJar')) {
             from it.testJar.outputs
+        } else if (it.tasks.findByName('schedulerExamplesJar')) {
+            from it.schedulerExamplesJar.outputs
+        }
     }
     into file("$rootDir/dist/lib")
 }
