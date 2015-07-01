@@ -71,7 +71,6 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
 import org.ow2.proactive.scheduler.common.task.flow.FlowBlock;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
-import org.ow2.proactive.scripting.GenerationScript;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.topology.descriptor.ArbitraryTopologyDescriptor;
@@ -865,18 +864,6 @@ public class Job2XMLTransformer {
                 staticCmdE.appendChild(argsE);
             }
             nativeExecE.appendChild(staticCmdE);
-        } else if (t.getGenerationScript() != null) {
-            // <element name="dynamicCommand">
-            Element dynamicCmdE = doc.createElementNS(Schemas.SCHEMA_LATEST.namespace, XMLTags.NATIVE_EXECUTABLE_DYNAMICCOMMAND.getXMLName());
-            setAttribute(dynamicCmdE, XMLAttributes.TASK_WORKDING_DIR, t.getWorkingDir(), true);
-            // <element name="generation">
-            Element generationE = doc.createElementNS(Schemas.SCHEMA_LATEST.namespace, XMLTags.SCRIPT_GENERATION.getXMLName());
-            // <ref name="script"/>
-            GenerationScript gs = t.getGenerationScript();
-            Element genScriptE = createScriptElement(doc, gs);
-            generationE.appendChild(genScriptE);
-            dynamicCmdE.appendChild(generationE);
-            nativeExecE.appendChild(dynamicCmdE);
         } else {
             logger.error("The task " + t.getName() + " does not define a command");
         }

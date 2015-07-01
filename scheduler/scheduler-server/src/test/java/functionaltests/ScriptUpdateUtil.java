@@ -42,7 +42,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
-import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.SelectionScript;
@@ -75,9 +74,6 @@ public class ScriptUpdateUtil {
             resolveScript(task.getPreScript(), variables);
             resolveScript(task.getPostScript(), variables);
             resolveScript(task.getCleaningScript(), variables);
-            if (task instanceof NativeTask) {
-                resolveScript(((NativeTask) task).getGenerationScript(), variables);
-            }
         }
         return job;
     }

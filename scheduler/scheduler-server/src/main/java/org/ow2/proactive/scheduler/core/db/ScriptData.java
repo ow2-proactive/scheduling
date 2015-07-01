@@ -20,7 +20,6 @@ import javax.persistence.Table;
 import org.ow2.proactive.db.DatabaseManagerException;
 import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
-import org.ow2.proactive.scripting.GenerationScript;
 import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.SelectionScript;
@@ -113,10 +112,6 @@ public class ScriptData {
 
     SelectionScript createSelectionScript() throws InvalidScriptException {
         return new SelectionScript(getScript(), getScriptEngine(), parameters(), isSelectionScriptDynamic());
-    }
-
-    GenerationScript createGenerationScript() throws InvalidScriptException {
-        return new GenerationScript(script, scriptEngine, parameters());
     }
 
     SimpleScript createSimpleScript() throws InvalidScriptException {

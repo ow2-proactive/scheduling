@@ -327,14 +327,10 @@ public class InternalJobFactory {
      * @throws JobCreationException an exception if the factory cannot create the given task.
      */
     private static InternalTask createTask(Job userJob, NativeTask task) throws JobCreationException {
-        if (((task.getCommandLine() == null) || (task.getCommandLine().length == 0)) &&
-            (task.getGenerationScript() == null)) {
+        if (((task.getCommandLine() == null) || (task.getCommandLine().length == 0))) {
             String msg = "The command line is null or empty and not generated !";
             logger.info(msg);
             throw new JobCreationException(msg);
-        }
-        if(task.getGenerationScript() != null){
-            throw new JobCreationException("Generation script not supported anymore");
         }
 
         try {

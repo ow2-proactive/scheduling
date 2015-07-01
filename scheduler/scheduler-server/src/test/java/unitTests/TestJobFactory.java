@@ -312,13 +312,6 @@ public class TestJobFactory {
                 .getMode());
         Assert.assertEquals(((NativeTask) tfJob.getTask("task4")).getWorkingDir(), "task4workingDir");
         Assert.assertEquals(((NativeTask) tfJob.getTask("task4")).getNumberOfNodesNeeded(), 10);
-        Assert.assertEquals(((NativeTask) tfJob.getTask("task4")).getGenerationScript().getScript(),
-                "command=args[0]+\" 12\";\n");
-        Assert.assertEquals(((NativeTask) tfJob.getTask("task4")).getGenerationScript().getParameters()[0],
-                URLbegin + "scheduler-server/src/test/resources/unitTests/descriptors/nativTask");
-        Assert.assertEquals(URLbegin +
-                "scheduler-server/src/test/resources/unitTests/descriptors/nativTask 12",
-                ((NativeTask) tfJob.getTask("task4")).getGenerationScript().execute().getResult().toString());
 
         log("Test Job MULTI_NODES");
         TaskFlowJob mnJob = getJob(jobMultiNodesDescriptor, impl);

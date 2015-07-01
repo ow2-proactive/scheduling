@@ -76,7 +76,6 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
 import org.ow2.proactive.scheduler.common.task.flow.FlowBlock;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
-import org.ow2.proactive.scripting.GenerationScript;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.scripting.SimpleScript;
@@ -1284,39 +1283,6 @@ public class JobFactory_stax extends JobFactory {
                 } catch (Exception e) {
                     throw new JobCreationException(current_, attr_, e);
                 }
-            } else if (XMLTags.NATIVE_EXECUTABLE_DYNAMICCOMMAND.matches(cursorExec.getLocalName())) {
-                String attr_ = null;
-                String current_ = null;
-                try {
-                    for (i = 0; i < cursorExec.getAttributeCount(); i++) {
-                        String attrName = cursorExec.getAttributeLocalName(i);
-                        attr_ = attrName;
-                        if (XMLAttributes.TASK_WORKDING_DIR.matches(attrName)) {
-                            nativeTask.setWorkingDir(replace(cursorExec.getAttributeValue(i)));
-                        }
-                    }
-
-                    //one step ahead to go to the generation tag
-                    while (cursorExec.next() != XMLEvent.START_ELEMENT)
-                        ;
-                    current_ = cursorExec.getLocalName();
-                    //create generation script
-                    Script<?> script = createScript(cursorExec);
-                    GenerationScript gscript = new GenerationScript(script);
-                    nativeTask.setGenerationScript(gscript);
-                    //goto the end of native executable tag
-                    while (cursorExec.hasNext()) {
-                        if (cursorExec.next() == XMLEvent.END_ELEMENT &&
-                            XMLTags.NATIVE_EXECUTABLE.matches(cursorExec.getLocalName())) {
-                            return;
-                        }
-                    }
-                } catch (JobCreationException jce) {
-                    jce.pushTag(current_);
-                    throw jce;
-                } catch (Exception e) {
-                    throw new JobCreationException(current_, attr_, e);
-                }
             } else {
                 throw new RuntimeException("Unknow command type : " + cursorExec.getLocalName());
             }
@@ -1618,7 +1584,6 @@ public class JobFactory_stax extends JobFactory {
                     }
                 } else if (t instanceof NativeTask) {
                     logger.debug("cmd   : " + Arrays.toString(((NativeTask) t).getCommandLine()));
-                    logger.debug("gensc : " + ((NativeTask) t).getGenerationScript());
                 } else if (t instanceof ScriptTask) {
                     logger.debug("script   : " + ((ScriptTask) t).getScript());
                 }

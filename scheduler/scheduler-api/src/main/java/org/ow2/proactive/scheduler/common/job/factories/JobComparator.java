@@ -46,7 +46,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.ow2.proactive.scheduler.common.job.JobEnvironment;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.CommonAttribute;
@@ -64,6 +63,7 @@ import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.topology.descriptor.ThresholdProximityDescriptor;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
+import org.apache.commons.collections.CollectionUtils;
 
 
 public class JobComparator {
@@ -372,9 +372,6 @@ public class JobComparator {
                 }
             }
 
-            if (!isEqualScript(nt1.getGenerationScript(), nt2.getGenerationScript())) {
-                return false;
-            }
         }
 
         if (t1 instanceof ScriptTask) {

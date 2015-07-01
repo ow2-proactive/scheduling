@@ -8,7 +8,6 @@ import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.internal.InternalForkedScriptTask;
-import org.ow2.proactive.scheduler.task.internal.InternalScriptTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.junit.Assert;
 import org.junit.Test;
@@ -30,7 +29,7 @@ public class TestTaskRuntimeData extends BaseSchedulerDBTest {
         jobDef.addTask(taskDef3);
 
         InternalJob job = defaultSubmitJobAndLoadInternal(false, jobDef);
-        Assert.assertEquals(InternalScriptTask.class, job.getTask("task1").getClass());
+        Assert.assertEquals(InternalForkedScriptTask.class, job.getTask("task1").getClass());
         Assert.assertEquals(InternalForkedScriptTask.class, job.getTask("task2").getClass());
         Assert.assertEquals(InternalForkedScriptTask.class, job.getTask("task3").getClass());
     }

@@ -144,17 +144,7 @@
 				<task ref="task3"/>
 			</depends>
 			<nativeExecutable>
-				<dynamicCommand workingDir="task4workingDir">
-					<generation>
-						<script>
-							<file path="${WORK_DIR}/gene.js">
-								<arguments>
-									<argument value="${WORK_DIR2}/nativTask"/>
-								</arguments>
-							</file>
-						</script>
-					</generation>
-				</dynamicCommand>
+				<staticCommand value="true" workingDir="task4workingDir"/>
 			</nativeExecutable>
 			<outputFiles>
 				<files includes="a" excludes="f" accessMode="transferToOutputSpace"/>
