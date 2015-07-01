@@ -1721,7 +1721,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             logger.info("[pullFile] reading directory content from " + sourcefo.getURL());
             // if it's a folder we return an InputStream listing its content
             StringBuilder sb = new StringBuilder();
-            String nl = System.getProperty("line.separator");
+            String nl = System.lineSeparator();
             for (FileObject fo : sourcefo.getChildren()) {
                 sb.append(fo.getName().getBaseName() + nl);
 

@@ -285,7 +285,7 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
         // at this point, the ssh process should have already exited because it
         // only handle the job submission, not the execution... furthermore
         // the "id" is defined
-        String lf = System.getProperty("line.separator");
+        String lf = System.lineSeparator();
         final long timeout = nodeTimeOut;
         long t1 = System.currentTimeMillis();
         boolean isJobIDValid = false;//Hack. SSHClient fails but qSub succeeds. Tries to wait for this node registration...
@@ -642,7 +642,7 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
         StringBuilder sb = new StringBuilder();
         String line = null;
         try {
-            String lf = System.getProperty("line.separator");
+            String lf = System.lineSeparator();
             while (br.ready()) {
                 if ((line = br.readLine()) != null) {
                     sb.append(line);
@@ -677,7 +677,7 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
             command = "Cannot determine the command used to start the node.";
         }
         String lostNode = super.addDeployingNode(clb.getNodeName(), command,
-                "Cannot deploy the node because of an error:" + System.getProperty("line.separator") + error,
+                "Cannot deploy the node because of an error:" + System.lineSeparator() + error,
                 60000);
         super.declareDeployingNodeLost(lostNode, null);
         throw new RMException("The deployment failed because of an error", e);

@@ -257,7 +257,7 @@ public class WinHPCInfrastructure extends DefaultInfrastructureManager {
             if (currentStatus != null && !currentStatus.equals(statusString)) {
                 statusString = currentStatus;
                 super.updateDeployingNodeDescription(dNode, "Node deployment on Windows HPC" +
-                    System.getProperty("line.separator") + "job's status: " + statusString);
+                    System.lineSeparator() + "job's status: " + statusString);
             }
 
             if (super.checkNodeIsAcquiredAndDo(nodeName, null, null)) {
@@ -328,7 +328,7 @@ public class WinHPCInfrastructure extends DefaultInfrastructureManager {
     private void handleFailedDeployment(String dNode, CommandLineBuilder clb, Throwable e) throws RMException {
         String error = Utils.getStacktrace(e);
         super.declareDeployingNodeLost(dNode, "The deployment failed because of an error: " +
-            System.getProperty("line.separator") + error);
+            System.lineSeparator() + error);
         String nodeName = clb.getNodeName();
         this.submittedJobs.remove(nodeName);
         this.dnTimeout.remove(dNode);
@@ -351,7 +351,7 @@ public class WinHPCInfrastructure extends DefaultInfrastructureManager {
             command = "Cannot determine the command used to start the node.";
         }
         String lostNode = super.addDeployingNode(clb.getNodeName(), command,
-                "Cannot deploy the node because of an error:" + System.getProperty("line.separator") + error,
+                "Cannot deploy the node because of an error:" + System.lineSeparator() + error,
                 60000);
         super.declareDeployingNodeLost(lostNode, null);
         String nodeName = clb.getNodeName();

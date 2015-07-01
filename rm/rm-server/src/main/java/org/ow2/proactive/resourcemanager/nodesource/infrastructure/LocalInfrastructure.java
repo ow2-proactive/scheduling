@@ -152,7 +152,7 @@ public class LocalInfrastructure extends InfrastructureManager {
 
             this.nodeNameToProcess.put(nodeName, processExecutor);
         } catch (IOException e) {
-            String lf = System.getProperty("line.separator");
+            String lf = System.lineSeparator();
             String mess = "Cannot launch rm node " + nodeName + lf + Utils.getStacktrace(e);
             this.declareDeployingNodeLost(depNodeURL, mess);
             return;
@@ -166,7 +166,7 @@ public class LocalInfrastructure extends InfrastructureManager {
             if (processExecutor.isProcessFinished()) {
                 int exit = processExecutor.getExitCode();
                 if (exit != 0) {
-                    String lf = System.getProperty("line.separator");
+                    String lf = System.lineSeparator();
                     String message = "RMNode exit code == " + exit + lf;
                     message += "Command: " + obfuscatedCmd + lf;
                     String out = Tools.join(processExecutor.getOutput(), "\n");
@@ -217,7 +217,7 @@ public class LocalInfrastructure extends InfrastructureManager {
      */
     private void createLostNode(String name, String message, Throwable e) {
         this.isNodeAcquired.remove(name);
-        String lf = System.getProperty("line.separator");
+        String lf = System.lineSeparator();
         String url = super.addDeployingNode(name, "deployed as daemon",
                 "Deploying a new windows azure insance", this.nodeTimeout);
         String st = Utils.getStacktrace(e);

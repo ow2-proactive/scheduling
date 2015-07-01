@@ -88,7 +88,7 @@ public class InternalForkedScriptTask extends InternalScriptTask {
 
     @Override
     public String display() {
-        String nl = System.getProperty("line.separator");
+        String nl = System.lineSeparator();
         String answer = super.display();
         Script tscript = ((ScriptExecutableContainer) executableContainer).getScript();
         return answer + nl + "\tScript = " + ((tscript != null) ? tscript.display() : null);

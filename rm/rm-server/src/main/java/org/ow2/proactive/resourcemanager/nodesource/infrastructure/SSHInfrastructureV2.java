@@ -294,7 +294,7 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
 
     private void declareLostAndThrow(String errMsg, String pnURL, ChannelExec chan,
             ByteArrayOutputStream baos, Exception e) throws RMException {
-        String lf = System.getProperty("line.separator");
+        String lf = System.lineSeparator();
         StringBuilder sb = new StringBuilder(errMsg);
         sb.append(lf).append(" > Process exit code: ").append(chan.getExitStatus());
         sb.append(lf).append(" > Process output: ").append(lf).append(new String(baos.toByteArray()));

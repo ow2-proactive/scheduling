@@ -162,7 +162,7 @@ public class InProcessTaskExecutor implements TaskExecutor {
             nodesFiles.deleteOnExit();
             FileWriter outputWriter = new FileWriter(nodesFiles);
             for (String nodeHost : nodesHosts) {
-                outputWriter.append(nodeHost).append(System.getProperty("line.separator"));
+                outputWriter.append(nodeHost).append(System.lineSeparator());
             }
             outputWriter.close();
             return nodesFiles.getAbsolutePath();

@@ -320,7 +320,7 @@ public class RMNodeImpl implements RMNode, Serializable {
      * @return a String showing informations about the node.
      */
     public String getNodeInfo() {
-        String newLine = System.getProperty("line.separator");
+        String newLine = System.lineSeparator();
         String nodeInfo = "Node " + nodeName + newLine;
         nodeInfo += "URL : " + nodeURL + newLine;
         nodeInfo += "Node source : " + nodeSourceName + newLine;

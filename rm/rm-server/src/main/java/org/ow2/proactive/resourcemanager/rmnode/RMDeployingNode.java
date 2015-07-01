@@ -423,7 +423,7 @@ public final class RMDeployingNode implements RMNode, Serializable {
 
     @Override
     public String getNodeInfo() {
-        String newLine = System.getProperty("line.separator");
+        String newLine = System.lineSeparator();
         String nodeInfo = "Node " + this.getNodeName() + newLine;
         nodeInfo += "URL : " + this.getNodeURL() + newLine;
         nodeInfo += "Node source : " + this.getNodeSourceName() + newLine;

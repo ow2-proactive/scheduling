@@ -510,7 +510,7 @@ public final class PAAgentServiceRMStarter {
             }
             BufferedWriter out = new BufferedWriter(new FileWriter(f));
             out.write(nodeURL);
-            out.write(System.getProperty("line.separator"));
+            out.write(System.lineSeparator());
             out.close();
         } catch (IOException e) {
             System.out.println("[WARNING] NodeURL cannot be created.");

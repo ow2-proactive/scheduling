@@ -93,7 +93,7 @@ public class NativeTask extends Task {
 
     @Override
     public String display() {
-        String nl = System.getProperty("line.separator");
+        String nl = System.lineSeparator();
         String answer = super.display();
         return answer + nl + "\tCommandLine = " + Arrays.toString(commandLine) + nl +
             "\tWorkingDir = '" + workingDir + '\'';

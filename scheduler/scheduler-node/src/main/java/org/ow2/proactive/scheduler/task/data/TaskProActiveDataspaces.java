@@ -255,7 +255,7 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
     private StringBuffer clientLogs = new StringBuffer();
 
     protected void logDataspacesStatus(String message, DataspacesStatusLevel level) {
-        final String eol = System.getProperty("line.separator");
+        final String eol = System.lineSeparator();
         final boolean hasEol = message.endsWith(eol);
         if (level == DataspacesStatusLevel.ERROR) {
             this.clientLogs.append("[DATASPACES-ERROR] ").append(message).append(hasEol ? "" : eol);
@@ -388,7 +388,7 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
             }
 
             StringBuilder exceptionMsg = new StringBuilder();
-            String nl = System.getProperty("line.separator");
+            String nl = System.lineSeparator();
             for (Future f : transferFutures) {
                 try {
                     f.get();
@@ -607,7 +607,7 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
         }
 
         StringBuilder exceptionMsg = new StringBuilder();
-        String nl = System.getProperty("line.separator");
+        String nl = System.lineSeparator();
         for (Future f : transferFutures) {
             try {
                 f.get();

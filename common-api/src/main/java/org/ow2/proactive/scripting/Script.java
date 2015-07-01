@@ -335,7 +335,7 @@ public abstract class Script<E> implements Serializable {
         } catch (Throwable t) {
             String stack = Throwables.getStackTraceAsString(t);
             if (t.getMessage() != null) {
-                stack = t.getMessage() + System.getProperty("line.separator") + stack;
+                stack = t.getMessage() + System.lineSeparator() + stack;
             }
             return new ScriptResult<>(new Exception(stack));
         }
@@ -435,7 +435,7 @@ public abstract class Script<E> implements Serializable {
     }
 
     public String display() {
-        String nl = System.getProperty("line.separator");
+        String nl = System.lineSeparator();
         return " { " + nl + "Script '" + getScriptName() + '\'' + nl + "\tscriptEngineLookup = '" +
             scriptEngineLookup + '\'' + nl + "\tscript = " + nl + script + nl + "\tid = " + nl + id + nl +
             "\tparameters = " + Arrays.toString(parameters) + nl + '}';

@@ -213,7 +213,7 @@ public class GCMCustomisedInfrastructure extends GCMInfrastructure {
      */
     private void handleExceptionAtDeployment(String dnURL, Throwable t) {
         if (dnURL != null) {
-            String lf = System.getProperty("line.separator");
+            String lf = System.lineSeparator();
             super.declareDeployingNodeLost(dnURL, "An exception occurred during node deployment:" + lf +
                 Utils.getStacktrace(t));
         } else {

@@ -262,7 +262,7 @@ public abstract class Job extends CommonAttribute {
     }
 
     public String display() {
-        String nl = System.getProperty("line.separator");
+        String nl = System.lineSeparator();
 
         return "Job '" + name + "' : " + nl + "\tDescription = '" +
             description + '\'' + nl + "\tProjectName = '" + projectName + '\'' + nl + "\tPriority = " +

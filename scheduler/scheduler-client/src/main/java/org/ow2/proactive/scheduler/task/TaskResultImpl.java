@@ -375,10 +375,10 @@ public class TaskResultImpl implements TaskResult {
         } catch (ClassNotFoundException e) {
             return new SimpleTextPanel(
                 "[ERROR] Previewer classes cannot be found. Cannot create graphical previewer: " +
-                    System.getProperty("line.separator") + e);
+                    System.lineSeparator() + e);
         } catch (Exception e) {
             return new SimpleTextPanel("[ERROR] Cannot create graphical previewer: " +
-                System.getProperty("line.separator") + e);
+                System.lineSeparator() + e);
         }
         if (instanciation) {
             JPanel ret = this.descriptor.getGraphicalDescription(this);
@@ -399,9 +399,9 @@ public class TaskResultImpl implements TaskResult {
             instanciation = this.instanciateDescriptor();
         } catch (ClassNotFoundException e) {
             return "[ERROR] Previewer classes cannot be found. Cannot create textual previewer: " +
-                System.getProperty("line.separator") + e;
+                System.lineSeparator() + e;
         } catch (Exception e) {
-            return "[ERROR] Cannot create textual previewer: " + System.getProperty("line.separator") + e;
+            return "[ERROR] Cannot create textual previewer: " + System.lineSeparator() + e;
         }
         if (instanciation) {
             String ret = this.descriptor.getTextualDescription(this);
