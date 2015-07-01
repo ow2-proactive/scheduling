@@ -34,6 +34,8 @@
  */
 package org.ow2.proactive.scheduler.task.java;
 
+import static java.util.Collections.emptyList;
+
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.Reader;
@@ -49,18 +51,17 @@ import javax.script.ScriptEngineFactory;
 import javax.script.ScriptException;
 import javax.script.SimpleBindings;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.output.WriterOutputStream;
 import org.ow2.proactive.scheduler.common.exception.ExecutableCreationException;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.AbstractJavaExecutable;
 import org.ow2.proactive.scheduler.common.task.executable.internal.JavaExecutableInitializerImpl;
 import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
 import org.ow2.proactive.scheduler.task.executors.InProcessTaskExecutor;
+import org.ow2.proactive.scheduler.task.executors.TaskException;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.TaskScript;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.output.WriterOutputStream;
-
-import static java.util.Collections.emptyList;
 
 
 public class JavaClassScriptEngine extends AbstractScriptEngine {
@@ -124,7 +125,7 @@ public class JavaClassScriptEngine extends AbstractScriptEngine {
             return execute;
 
         } catch (Throwable e) {
-            throw new RuntimeException("Failed to execute Java executable", e);
+            throw new ScriptException(new TaskException(e.getMessage(), e));
         }
     }
 

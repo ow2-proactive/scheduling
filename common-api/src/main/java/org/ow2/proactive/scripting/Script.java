@@ -55,7 +55,6 @@ import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineFactory;
 import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.utils.BoundedStringWriter;
@@ -328,8 +327,7 @@ public abstract class Script<E> implements Serializable {
             return result;
         } catch (javax.script.ScriptException e) {
             // drop exception cause as it might not be serializable
-            ScriptException scriptException = new ScriptException(e.getMessage(), e.getFileName(),
-                e.getLineNumber(), e.getColumnNumber());
+            ScriptException scriptException = new ScriptException(e.getMessage());
             scriptException.setStackTrace(e.getStackTrace());
             return new ScriptResult<>(scriptException);
         } catch (Throwable t) {

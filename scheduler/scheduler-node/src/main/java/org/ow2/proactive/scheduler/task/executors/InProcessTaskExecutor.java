@@ -114,7 +114,7 @@ public class InProcessTaskExecutor implements TaskExecutor {
                         container.getTaskId(), result, null, stopwatch.elapsed(TimeUnit.MILLISECONDS));
             } catch (Throwable e) {
                 stopwatch.stop();
-                error.println(e.getMessage());
+                e.printStackTrace(error);
                 taskResult = new TaskResultImpl(
                         container.getTaskId(), e, null, stopwatch.elapsed(TimeUnit.MILLISECONDS));
             }
@@ -125,7 +125,7 @@ public class InProcessTaskExecutor implements TaskExecutor {
 
             return taskResult;
         } catch (Throwable e) {
-            error.println(e.getMessage());
+            e.printStackTrace(error);
             return new TaskResultImpl(container.getTaskId(), e);
         } finally {
             if (nodesFile != null && !nodesFile.isEmpty()) {
@@ -310,9 +310,15 @@ public class InProcessTaskExecutor implements TaskExecutor {
 
     private Serializable execute(TaskContext container, PrintStream output, PrintStream error,
             ScriptHandler scriptHandler, Map<String, String> thirdPartyCredentials,
-            Map<String, Serializable> variables) throws Exception {
+            Map<String, Serializable> variables) throws Throwable {
         if (container.getPreScript() != null) {
-            executeScript(output, error, scriptHandler, thirdPartyCredentials, variables, container.getPreScript());
+            Script<?> script = container.getPreScript();
+            replaceScriptParameters(script, thirdPartyCredentials, variables, error);
+            ScriptResult preScriptResult = scriptHandler.handle(script, output, error);
+            if (preScriptResult.errorOccured()) {
+                throw new TaskException("Failed to execute pre script: " +
+                    preScriptResult.getException().getMessage(), preScriptResult.getException());
+            }
         }
 
         Script<Serializable> script = ((ScriptExecutableContainer) container.getExecutableContainer())
@@ -321,7 +327,7 @@ public class InProcessTaskExecutor implements TaskExecutor {
         ScriptResult<Serializable> scriptResult = scriptHandler.handle(script, output, error);
 
         if (scriptResult.errorOccured()) {
-            throw new Exception("Failed to execute task",
+            throw new TaskException("Failed to execute task: " + scriptResult.getException().getMessage(),
                 scriptResult.getException());
         }
 
@@ -329,19 +335,11 @@ public class InProcessTaskExecutor implements TaskExecutor {
             replaceScriptParameters(container.getPostScript(), thirdPartyCredentials, variables, error);
             ScriptResult postScriptResult = scriptHandler.handle(container.getPostScript(), output, error);
             if (postScriptResult.errorOccured()) {
-                throw new Exception("Failed to execute post script", postScriptResult.getException());
+                throw new TaskException("Failed to execute post script: " +
+                    postScriptResult.getException().getMessage(), postScriptResult.getException());
             }
         }
         return scriptResult.getResult();
-    }
-
-    static ScriptResult executeScript(PrintStream output, PrintStream error, ScriptHandler scriptHandler, Map<String, String> thirdPartyCredentials, Map<String, Serializable> variables, Script<?> script) throws Exception {
-        replaceScriptParameters(script, thirdPartyCredentials, variables, error);
-        ScriptResult scriptResult = scriptHandler.handle(script, output, error);
-        if (scriptResult.errorOccured()) {
-            throw new Exception("Failed to execute script", scriptResult.getException());
-        }
-        return scriptResult;
     }
 
     private void executeFlowScript(FlowScript flowScript, ScriptHandler scriptHandler, PrintStream output,

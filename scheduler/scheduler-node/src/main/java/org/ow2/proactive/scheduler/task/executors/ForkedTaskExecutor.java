@@ -57,8 +57,10 @@ import org.ow2.proactive.scheduler.task.utils.Decrypter;
 import org.ow2.proactive.scheduler.task.utils.ForkerUtils;
 import org.ow2.proactive.scheduler.task.utils.ProcessStreamsReader;
 import org.ow2.proactive.scheduler.task.utils.TaskProcessTreeKiller;
+import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptHandler;
 import org.ow2.proactive.scripting.ScriptLoader;
+import org.ow2.proactive.scripting.ScriptResult;
 import com.google.common.base.Strings;
 import org.apache.commons.io.FileUtils;
 
@@ -168,8 +170,15 @@ public class ForkedTaskExecutor implements TaskExecutor {
                         .createBindings(context, scriptHandler, variables, thirdPartyCredentials);
 
                 scriptHandler.addBinding(FORK_ENVIRONMENT_BINDING_NAME, forkEnvironment);
-                InProcessTaskExecutor.executeScript(outputSink, errorSink, scriptHandler,
-                        thirdPartyCredentials, variables, forkEnvironment.getEnvScript());
+                Script<?> script = forkEnvironment.getEnvScript();
+
+                InProcessTaskExecutor.replaceScriptParameters(script, thirdPartyCredentials, variables,
+                        errorSink);
+                ScriptResult scriptResult = scriptHandler.handle(script, outputSink, errorSink);
+                if (scriptResult.errorOccured()) {
+                    throw new Exception("Failed to execute fork environment script",
+                        scriptResult.getException());
+                }
             }
 
             for (String jvmArgument : forkEnvironment.getJVMArguments()) {
