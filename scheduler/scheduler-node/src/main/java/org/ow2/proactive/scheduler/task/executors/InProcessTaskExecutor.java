@@ -114,7 +114,7 @@ public class InProcessTaskExecutor implements TaskExecutor {
                         container.getTaskId(), result, null, stopwatch.elapsed(TimeUnit.MILLISECONDS));
             } catch (Throwable e) {
                 stopwatch.stop();
-                error.print(e.getMessage());
+                error.println(e.getMessage());
                 taskResult = new TaskResultImpl(
                         container.getTaskId(), e, null, stopwatch.elapsed(TimeUnit.MILLISECONDS));
             }
@@ -125,7 +125,7 @@ public class InProcessTaskExecutor implements TaskExecutor {
 
             return taskResult;
         } catch (Throwable e) {
-            error.print(e.getMessage());
+            error.println(e.getMessage());
             return new TaskResultImpl(container.getTaskId(), e);
         } finally {
             if (nodesFile != null && !nodesFile.isEmpty()) {
@@ -321,7 +321,7 @@ public class InProcessTaskExecutor implements TaskExecutor {
         ScriptResult<Serializable> scriptResult = scriptHandler.handle(script, output, error);
 
         if (scriptResult.errorOccured()) {
-            throw new Exception("Failed to execute task: " + scriptResult.getException().getMessage(),
+            throw new Exception("Failed to execute task",
                 scriptResult.getException());
         }
 

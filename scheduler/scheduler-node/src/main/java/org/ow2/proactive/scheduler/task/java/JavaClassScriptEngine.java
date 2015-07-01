@@ -124,7 +124,7 @@ public class JavaClassScriptEngine extends AbstractScriptEngine {
             return execute;
 
         } catch (Throwable e) {
-            throw new ScriptException(new Exception("Failed to execute Java executable", e));
+            throw new RuntimeException("Failed to execute Java executable", e);
         }
     }
 
@@ -135,18 +135,18 @@ public class JavaClassScriptEngine extends AbstractScriptEngine {
             Class<?> userExecutableClass = tcl.loadClass(userExecutableClassName);
             return (AbstractJavaExecutable) userExecutableClass.newInstance();
         } catch (ClassNotFoundException e) {
-            throw new ExecutableCreationException("Unable to instanciate JavaExecutable. " +
+            throw new ExecutableCreationException("Unable to instantiate JavaExecutable. " +
                 userExecutableClassName + " class cannot be found", e);
         } catch (InstantiationException e) {
-            throw new ExecutableCreationException("Unable to instanciate JavaExecutable. " +
+            throw new ExecutableCreationException("Unable to instantiate JavaExecutable. " +
                 userExecutableClassName + " might not define no-args constructor", e);
         } catch (ClassCastException e) {
-            throw new ExecutableCreationException("Unable to instanciate JavaExecutable. " +
+            throw new ExecutableCreationException("Unable to instantiate JavaExecutable. " +
                 userExecutableClassName +
                 " might not inherit from org.ow2.proactive.scheduler.common.task.executable.JavaExecutable",
                 e);
         } catch (Throwable e) {
-            throw new ExecutableCreationException("Unable to instanciate JavaExecutable", e);
+            throw new ExecutableCreationException("Unable to instantiate JavaExecutable", e);
         }
     }
 
