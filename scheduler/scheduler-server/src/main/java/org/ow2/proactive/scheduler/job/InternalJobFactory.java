@@ -334,14 +334,14 @@ public class InternalJobFactory {
         }
 
         try {
-            String cli = Joiner.on(' ').join(task.getCommandLine());
+            String commandAndArguments = "\"" + Joiner.on("\" \"").join(task.getCommandLine()) + "\"";
             InternalTask scriptTask;
             if (isForkingTask()) {
                 scriptTask = new InternalForkedScriptTask(new ScriptExecutableContainer(new TaskScript(
-                    new SimpleScript(cli, "native"))));
+                    new SimpleScript(commandAndArguments, "native"))));
             } else {
                 scriptTask = new InternalScriptTask(new ScriptExecutableContainer(new TaskScript(
-                    new SimpleScript(cli, "native"))));
+                    new SimpleScript(commandAndArguments, "native"))));
             }
             ForkEnvironment forkEnvironment = new ForkEnvironment(task.getWorkingDir());
             scriptTask.setForkEnvironment(forkEnvironment);
