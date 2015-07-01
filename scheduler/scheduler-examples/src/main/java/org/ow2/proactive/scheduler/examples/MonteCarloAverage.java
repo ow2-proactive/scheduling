@@ -48,6 +48,7 @@ import java.io.Serializable;
  * @author The ProActive Team
  */
 public class MonteCarloAverage extends JavaExecutable {
+
     /**
      * @see Executable#execute(org.ow2.proactive.scheduler.common.task.TaskResult[])
      */
@@ -55,7 +56,7 @@ public class MonteCarloAverage extends JavaExecutable {
     public Serializable execute(TaskResult... results) throws Throwable {
         double avrg = 0;
         int count = 0;
-        getOut().print("Parameters are : ");
+        getOut().print("Parameters are: ");
 
         for (TaskResult res : results) {
             if (!res.hadException()) {
@@ -66,7 +67,7 @@ public class MonteCarloAverage extends JavaExecutable {
         }
 
         Double result = new Double(avrg / count);
-        getOut().println("Average is : " + result);
+        getOut().println("Average is: " + result);
 
         return result;
     }

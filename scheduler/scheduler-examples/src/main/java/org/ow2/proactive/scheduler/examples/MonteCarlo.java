@@ -55,7 +55,6 @@ import java.util.Random;
  */
 public class MonteCarlo extends JavaExecutable {
 
-    /**  */
     private static final long DEFAULT_STEPS = 10;
     private static final long DEFAULT_ITERATIONS = 10000;
     private long iterations = DEFAULT_ITERATIONS;
@@ -99,8 +98,11 @@ public class MonteCarlo extends JavaExecutable {
 
         while (n > 0) {
             if (print < 0) {
-                getOut().println("Calcul intermediaire (" + (100 - ((n * 100) / iterations)) +
-                    "%) : Pi = " + ((4 * res) / (((++nbPrint) * iterations) / steps)));
+                String progress = String.format("%02d", 100 - ((n * 100) / iterations));
+
+                getOut().println("Intermediate value computed (" + progress +
+                    "%) for π is " + ((4 * res) / (((++nbPrint) * iterations) / steps)));
+
                 print = iterations / steps;
             }
 
@@ -124,7 +126,7 @@ public class MonteCarlo extends JavaExecutable {
                 f = new FileOutputStream(file);
 
                 PrintStream ps = new PrintStream(f);
-                ps.println("Le resultat de Pi par Montecarlo est : " + result);
+                ps.println("Computed π value using Montecarlo is: " + result);
                 ps.close();
             } catch (Exception e) {
                 e.printStackTrace();
