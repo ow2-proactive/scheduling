@@ -343,6 +343,11 @@ public class JobFactory_stax extends JobFactory {
                             }
                         } else if (XMLTags.COMMON_GENERIC_INFORMATION.matches(current)) {
                             jtmp.setGenericInformations(getGenericInformations(cursorJob));
+                        } else if (XMLTags.JOB_CLASSPATHES.matches(current)) {
+                            logger.warn(
+                                    "Element " + XMLTags.JOB_CLASSPATHES.getXMLName() +
+                                            " is no longer supported. Please define a " +
+                                            XMLTags.FORK_ENVIRONMENT.getXMLName() + " per task if needed.");
                         } else if (XMLTags.COMMON_DESCRIPTION.matches(current)) {
                             jtmp.setDescription(getDescription(cursorJob));
                         } else if (XMLTags.DS_INPUTSPACE.matches(current)) {
