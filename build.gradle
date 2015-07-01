@@ -389,17 +389,17 @@ project('scheduler:scheduler-node') {
     apply plugin: 'gradle-one-jar'
     dependencies {
         compile(
-                "org.objectweb.proactive:programming-extension-amqp:${programmingVersion}",
-                "org.objectweb.proactive:programming-extension-pamr:${programmingVersion}",
                 "org.objectweb.proactive:programming-extension-processbuilder:${programmingVersion}",
                 "org.objectweb.proactive:programming-extension-dataspaces:${programmingVersion}",
 
                 project(':scheduler:scheduler-client'),
                 project(':rm:rm-node'),
         )
-        // required by ForkedJavaExecutable
-        runtime "org.objectweb.proactive:programming-extension-pnp:${programmingVersion}"
-        // TODO add all protocols
+
+        runtime (
+                "org.objectweb.proactive:programming-extension-pamr:${programmingVersion}",
+                "org.objectweb.proactive:programming-extension-pnp:${programmingVersion}",
+        )
 
         runtime fileTree(dir: project.nativeLibsDir, exclude: '*.jar')
 
