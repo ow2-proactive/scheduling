@@ -127,8 +127,7 @@ public class TaskLauncher implements InitActive {
             TaskTerminateNotification terminateNotification) {
         logger.info("Task started");
 
-        WallTimer wallTimer =
-                WallTimer.startWallTime(initializer.getWalltime(), taskKiller);
+        WallTimer wallTimer = new WallTimer(initializer.getWalltime(), taskKiller);
 
         Stopwatch taskStopwatchForFailures = Stopwatch.createUnstarted();
 
@@ -150,6 +149,8 @@ public class TaskLauncher implements InitActive {
                             progressFileReader.getProgressFile().toString(), getHostname());
 
             File workingDir = getTaskWorkingDir(context, dataspaces);
+
+            wallTimer.start();
 
             dataspaces.copyInputDataToScratch(initializer.getFilteredInputFiles(fileSelectorsFilters(context))); // should handle interrupt
 
@@ -178,11 +179,11 @@ public class TaskLauncher implements InitActive {
             dataspaces.copyScratchDataToOutput(initializer.getFilteredOutputFiles(fileSelectorsFilters(
               context, taskResult)));
 
+            wallTimer.stop();
+
             copyTaskLogsToUserSpace(taskLogFile, dataspaces);
             FileUtils.deleteQuietly(taskLogFile);
             taskResult.setLogs(taskLogger.getLogs()); // should it be done when killed or walltimed?
-
-            wallTimer.stop();
 
             sendResultToScheduler(terminateNotification, taskResult);
         } catch (Throwable taskFailure) {

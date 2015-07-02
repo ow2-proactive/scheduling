@@ -44,11 +44,23 @@ public class WallTimer {
 
     private final TaskKiller taskKiller;
 
-    private WallTimer(final long wallTimeDuration, final TaskKiller taskKiller) {
-        this.taskKiller = taskKiller;
+    private final long wallTimeDuration;
 
+    /**
+     * Create and start a WallTimer instance.
+     *
+     * @param wallTimeDuration the maximum timeout period to wait for (in ms).
+     * @param taskKiller the task killer used to kill the task once the timeout is reached.
+     */
+    public WallTimer(final long wallTimeDuration, final TaskKiller taskKiller) {
+        this.wallTimeDuration = wallTimeDuration;
+        this.taskKiller = taskKiller;
+        this.timer = new Timer();
+    }
+
+
+    public void start() {
         if (wallTimeDuration > 0) {
-            timer = new Timer();
             timer.schedule(new TimerTask() {
                 @Override
                 public void run() {
@@ -58,18 +70,6 @@ public class WallTimer {
                 }
             }, wallTimeDuration);
         }
-    }
-
-    /**
-     * Create and start a WallTimer instance.
-     *
-     * @param walltime the maximum timeout period to wait for (in ms).
-     * @param taskKiller the task killer used to kill the task once the timeout is reached.
-     *
-     * @return a created and initialized WallTimer instance.
-     */
-    public static WallTimer startWallTime(final long walltime, final TaskKiller taskKiller) {
-        return new WallTimer(walltime, taskKiller);
     }
 
     public synchronized boolean hasWallTimed() {
