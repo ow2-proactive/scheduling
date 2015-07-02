@@ -23,7 +23,7 @@ import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.InternalJobFactory;
-import org.ow2.proactive.scheduler.task.internal.ExecuterInformations;
+import org.ow2.proactive.scheduler.task.internal.ExecuterInformation;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.tests.FunctionalTest;
 import org.ow2.tests.ProActiveTest;
@@ -438,7 +438,7 @@ public class BaseSchedulerDBTest extends ProActiveTest {
     }
 
     protected InternalTask startTask(InternalJob internalJob, InternalTask internalTask) throws Exception {
-        internalTask.setExecuterInformations(new ExecuterInformations(null, NodeFactory.getDefaultNode()));
+        internalTask.setExecuterInformation(new ExecuterInformation(null, NodeFactory.getDefaultNode()));
         internalJob.startTask(internalTask);
         return internalTask;
     }

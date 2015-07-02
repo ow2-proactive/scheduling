@@ -461,7 +461,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                 // we will need to update this code once topology will be allowed for single-node task
                 if (task.isParallel()) {
                     nodes = new NodeSet(nodeSet);
-                    task.getExecuterInformations().addNodes(nodes);
+                    task.getExecuterInformation().addNodes(nodes);
                     nodeSet.clear();
                 }
 

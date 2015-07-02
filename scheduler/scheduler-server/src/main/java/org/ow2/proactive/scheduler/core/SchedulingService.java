@@ -208,7 +208,7 @@ public class SchedulingService {
 
         logger.info("Killing all running task processes...");
         for (RunningTaskData taskData : jobs.getRunningTasks()) {
-            NodeSet nodes = taskData.getTask().getExecuterInformations().getNodes();
+            NodeSet nodes = taskData.getTask().getExecuterInformation().getNodes();
             try {
                 taskData.getLauncher().terminate(false);
             } catch (Throwable t) {

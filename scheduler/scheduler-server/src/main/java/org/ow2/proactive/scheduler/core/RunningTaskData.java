@@ -18,7 +18,7 @@ class RunningTaskData {
     RunningTaskData(InternalTask task, String user, Credentials credentials, TaskLauncher launcher) {
         this.task = task;
         // keep track of nodes that executed the task, can change in case of restarts
-        this.nodes = task.getExecuterInformations().getNodes();
+        this.nodes = task.getExecuterInformation().getNodes();
         this.user = user;
         this.credentials = credentials;
         this.launcher = launcher;
@@ -49,7 +49,7 @@ class RunningTaskData {
 
     /**
      * @return Nodes that were used to run this particular instance of the task
-     *  (those in {@link InternalTask#getExecuterInformations()} could have changed in case of restarts)
+     *  (those in {@link InternalTask#getExecuterInformation()} could have changed in case of restarts)
      */
     public NodeSet getNodes() {
         return nodes;

@@ -52,7 +52,7 @@ import org.ow2.proactive.utils.NodeSet;
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */
-public class ExecuterInformations implements Serializable {
+public class ExecuterInformation implements Serializable {
 
     /** Reference to the launcher of this task. */
     private TaskLauncher launcher;
@@ -72,7 +72,7 @@ public class ExecuterInformations implements Serializable {
      * @param launcher the active object on which the task has been launched
      * @param node the node on which the active object has been launched.
      */
-    public ExecuterInformations(TaskLauncher launcher, Node node) {
+    public ExecuterInformation(TaskLauncher launcher, Node node) {
         this.launcher = launcher;
         this.nodes = new NodeSet();
         this.nodes.add(node);

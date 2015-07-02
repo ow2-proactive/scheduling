@@ -80,7 +80,7 @@ public class InternalScriptTask extends InternalTask {
         logger.info(getTaskInfo().getTaskId(), "creating script task launcher");
         TaskLauncher launcher = (TaskLauncher) PAActiveObject.newActive(TaskLauncher.class.getName(),
                 new Object[] { getDefaultTaskLauncherInitializer(job), new ProActiveNonForkedTaskLauncherFactory()}, node);
-        setExecuterInformations(new ExecuterInformations(launcher, node));
+        setExecuterInformation(new ExecuterInformation(launcher, node));
 
         return launcher;
     }

@@ -304,7 +304,7 @@ class LiveJobs {
 
         logger.debug("Node Exclusion : restart mode is '" + task.getRestartTaskOnError() + "'");
         if (task.getRestartTaskOnError().equals(RestartMode.ELSEWHERE)) {
-            task.setNodeExclusion(task.getExecuterInformations().getNodes());
+            task.setNodeExclusion(task.getExecuterInformation().getNodes());
         }
         task.setStatus(status);
         job.newWaitingTask();

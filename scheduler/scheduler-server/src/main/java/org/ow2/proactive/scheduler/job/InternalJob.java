@@ -235,8 +235,8 @@ public abstract class InternalJob extends JobState {
         td.setStatus(TaskStatus.RUNNING);
         td.setStartTime(System.currentTimeMillis());
         td.setFinishedTime(-1);
-        td.setExecutionHostName(td.getExecuterInformations().getHostName() + " (" +
-            td.getExecuterInformations().getNodeName() + ")");
+        td.setExecutionHostName(td.getExecuterInformation().getHostName() + " (" +
+            td.getExecuterInformation().getNodeName() + ")");
     }
 
     /**

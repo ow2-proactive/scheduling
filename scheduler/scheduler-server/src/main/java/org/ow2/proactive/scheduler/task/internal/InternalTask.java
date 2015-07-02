@@ -91,7 +91,7 @@ public abstract class InternalTask extends TaskState {
 
     /** Information about the launcher and node, mutable can change overtime, in case of restart for instance */
     // These information are not required during task process
-    private transient ExecuterInformations executerInformations;
+    private transient ExecuterInformation executerInformation;
 
     /** Task information : this is the information that can change during process. */
     private TaskInfoImpl taskInfo = new TaskInfoImpl();
@@ -660,19 +660,19 @@ public abstract class InternalTask extends TaskState {
     /**
      * To get the executer informations
      *
-     * @return the executerInformations
+     * @return the executerInformation
      */
-    public ExecuterInformations getExecuterInformations() {
-        return executerInformations;
+    public ExecuterInformation getExecuterInformation() {
+        return executerInformation;
     }
 
     /**
      * To set the executer informations.
      *
-     * @param executerInformations the executerInformations to set
+     * @param executerInformation the executerInformation to set
      */
-    public void setExecuterInformations(ExecuterInformations executerInformations) {
-        this.executerInformations = executerInformations;
+    public void setExecuterInformation(ExecuterInformation executerInformation) {
+        this.executerInformation = executerInformation;
     }
 
     /**
