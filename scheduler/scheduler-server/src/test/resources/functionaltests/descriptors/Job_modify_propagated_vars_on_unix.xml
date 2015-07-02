@@ -4,6 +4,7 @@
     name="job_propagate_vars_on_unix" cancelJobOnError="false" priority="normal">
     <variables>
         <variable name="var" value="var-value" />
+        <variable name="home" value="${pa.scheduler.home}" />
     </variables>
     <description>PropagateVariablesOnUnix</description>
     <taskFlow>
@@ -19,7 +20,7 @@
                 </script>
             </pre>
             <nativeExecutable>
-                <staticCommand value="${PA_SCHEDULER_HOME}/scheduler/scheduler-server/build/resources/test/functionaltests/vars/test-vars.sh" />
+                <staticCommand value="${home}/scheduler/scheduler-server/build/resources/test/functionaltests/vars/test-vars.sh" />
             </nativeExecutable>
         </task>
     </taskFlow>
