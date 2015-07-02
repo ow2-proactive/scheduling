@@ -141,12 +141,12 @@ public class TestLoadJobResult extends BaseSchedulerDBTest {
         TaskResult taskResult;
 
         taskResult = result.getResult("task1");
-        Assert.assertEquals(2, taskResult.getPropagatedVariables().size());
-        Assert.assertEquals("value1", taskResult.getPropagatedVariables().get("property1"));
-        Assert.assertEquals("value2", taskResult.getPropagatedVariables().get("property2"));
+        Assert.assertEquals(2, taskResult.getPropagatedProperties().size());
+        Assert.assertEquals("value1", taskResult.getPropagatedProperties().get("property1"));
+        Assert.assertEquals("value2", taskResult.getPropagatedProperties().get("property2"));
 
         taskResult = result.getResult("task2");
-        Assert.assertEquals(4, taskResult.getPropagatedVariables().size());
+        Assert.assertEquals(4, taskResult.getPropagatedProperties().size());
 
         System.out.println("Load job result2");
         result = dbManager.loadJobResult(internalJob2.getId());
