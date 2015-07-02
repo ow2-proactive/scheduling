@@ -36,8 +36,15 @@ package org.ow2.proactive.scheduler.task.utils;
 
 public class TaskKiller {
 
+    public enum Status {
+        KILLED_MANUALLY, WALLTIME_REACHED, NOT_YET_KILLED;
+    }
+
     private Thread threadToKill;
+
     private boolean wasKilled = false;
+
+    private Status status = Status.NOT_YET_KILLED;
 
     public TaskKiller(Thread threadToKill) { // executor service?
         this.threadToKill = threadToKill;
@@ -47,9 +54,14 @@ public class TaskKiller {
         return wasKilled;
     }
 
-    public synchronized void kill() {
+    public synchronized void kill(Status status) {
         wasKilled = true;
+        this.status = status;
         threadToKill.interrupt();
+    }
+
+    public Status getStatus() {
+        return status;
     }
 
 }

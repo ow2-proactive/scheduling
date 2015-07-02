@@ -53,7 +53,7 @@ public class WallTimer {
                 @Override
                 public void run() {
                     synchronized (this) {
-                        taskKiller.kill();
+                        taskKiller.kill(TaskKiller.Status.WALLTIME_REACHED);
                     }
                 }
             }, wallTimeDuration);
