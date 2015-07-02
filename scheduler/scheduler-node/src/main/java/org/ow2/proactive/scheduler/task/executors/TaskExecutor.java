@@ -43,4 +43,5 @@ import java.io.Serializable;
 public interface TaskExecutor extends Serializable {
 
     TaskResultImpl execute(TaskContext container, PrintStream output, PrintStream error);
+
 }

@@ -53,7 +53,7 @@ public class ScriptExecutableContainer extends ExecutableContainer {
     /** Arguments of the task as a map */
     protected final Map<String, ByteArrayWrapper> serializedArguments = new HashMap<String, ByteArrayWrapper>();
 
-    private TaskScript script;
+    private final TaskScript script;
 
     public ScriptExecutableContainer(TaskScript script) {
         this.script = script;
@@ -66,4 +66,5 @@ public class ScriptExecutableContainer extends ExecutableContainer {
     public Map<String, ByteArrayWrapper> getSerializedArguments() {
         return serializedArguments;
     }
+
 }

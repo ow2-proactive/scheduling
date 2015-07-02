@@ -52,6 +52,7 @@ import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
 import org.ow2.proactive.scheduler.common.util.VariablesUtil;
 import org.ow2.proactive.scheduler.task.SchedulerVars;
 import org.ow2.proactive.scheduler.task.TaskContext;
+import org.ow2.proactive.scheduler.task.exceptions.TaskException;
 import org.ow2.proactive.scheduler.task.TaskLauncherInitializer;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
@@ -84,6 +85,8 @@ public class InProcessTaskExecutor implements TaskExecutor {
     private static final String MULTI_NODE_TASK_NODESET_BINDING_NAME = "nodeset";
     public static final String MULTI_NODE_TASK_NODESURL_BINDING_NAME = "nodesurl";
 
+    private static final String NODES_FILE_DIRECTORY_NAME = ".pa_nodes";
+
     public static final String VARIABLES_BINDING_NAME = "variables";
 
     /**
@@ -106,9 +109,11 @@ public class InProcessTaskExecutor implements TaskExecutor {
             Stopwatch stopwatch = Stopwatch.createUnstarted();
             TaskResultImpl taskResult;
             try {
+                Serializable result;
                 stopwatch.start();
-                Serializable result = execute(container, output, error, scriptHandler, thirdPartyCredentials,
-                        variables);
+                result =
+                        execute(
+                                container, output, error, scriptHandler, thirdPartyCredentials, variables);
                 stopwatch.stop();
                 taskResult = new TaskResultImpl(
                         container.getTaskId(), result, null, stopwatch.elapsed(TimeUnit.MILLISECONDS));
@@ -155,17 +160,20 @@ public class InProcessTaskExecutor implements TaskExecutor {
 
     private static String writeNodesFile(TaskContext context) throws IOException, URISyntaxException {
         List<String> nodesHosts = context.getNodesHosts();
+
         if (nodesHosts.isEmpty()) {
             return "";
         } else {
-            File nodesFiles = File.createTempFile(".pa_nodes", null, new File("."));
-            nodesFiles.deleteOnExit();
-            FileWriter outputWriter = new FileWriter(nodesFiles);
+            File nodesFile = File.createTempFile(NODES_FILE_DIRECTORY_NAME, null, new File("."));
+            nodesFile.deleteOnExit();
+
+            FileWriter outputWriter = new FileWriter(nodesFile);
             for (String nodeHost : nodesHosts) {
                 outputWriter.append(nodeHost).append(System.lineSeparator());
             }
             outputWriter.close();
-            return nodesFiles.getAbsolutePath();
+
+            return nodesFile.getAbsolutePath();
         }
     }
 
@@ -308,11 +316,11 @@ public class InProcessTaskExecutor implements TaskExecutor {
         }
     }
 
-    private Serializable execute(TaskContext container, PrintStream output, PrintStream error,
+    private Serializable execute(TaskContext taskContext, PrintStream output, PrintStream error,
             ScriptHandler scriptHandler, Map<String, String> thirdPartyCredentials,
             Map<String, Serializable> variables) throws Throwable {
-        if (container.getPreScript() != null) {
-            Script<?> script = container.getPreScript();
+        if (taskContext.getPreScript() != null) {
+            Script<?> script = taskContext.getPreScript();
             replaceScriptParameters(script, thirdPartyCredentials, variables, error);
             ScriptResult preScriptResult = scriptHandler.handle(script, output, error);
             if (preScriptResult.errorOccured()) {
@@ -321,7 +329,7 @@ public class InProcessTaskExecutor implements TaskExecutor {
             }
         }
 
-        Script<Serializable> script = ((ScriptExecutableContainer) container.getExecutableContainer())
+        Script<Serializable> script = ((ScriptExecutableContainer) taskContext.getExecutableContainer())
                 .getScript();
         replaceScriptParameters(script, thirdPartyCredentials, variables, error);
         ScriptResult<Serializable> scriptResult = scriptHandler.handle(script, output, error);
@@ -331,9 +339,9 @@ public class InProcessTaskExecutor implements TaskExecutor {
                 scriptResult.getException());
         }
 
-        if (container.getPostScript() != null) {
-            replaceScriptParameters(container.getPostScript(), thirdPartyCredentials, variables, error);
-            ScriptResult postScriptResult = scriptHandler.handle(container.getPostScript(), output, error);
+        if (taskContext.getPostScript() != null) {
+            replaceScriptParameters(taskContext.getPostScript(), thirdPartyCredentials, variables, error);
+            ScriptResult postScriptResult = scriptHandler.handle(taskContext.getPostScript(), output, error);
             if (postScriptResult.errorOccured()) {
                 throw new TaskException("Failed to execute post script: " +
                     postScriptResult.getException().getMessage(), postScriptResult.getException());

@@ -43,6 +43,7 @@ import java.io.PrintStream;
 
 /** Pipe between two streams */
 public class ThreadReader implements Runnable {
+
     private BufferedReader in;
     private PrintStream out;
 
@@ -55,7 +56,8 @@ public class ThreadReader implements Runnable {
         Thread readerThread = new Thread() {
             @Override
             public void run() {
-                String str = null;
+                String str;
+
                 try {
                     while ((str = in.readLine()) != null) {
                         out.println(str);
@@ -75,6 +77,6 @@ public class ThreadReader implements Runnable {
                 break;
             }
         }
-
     }
+
 }

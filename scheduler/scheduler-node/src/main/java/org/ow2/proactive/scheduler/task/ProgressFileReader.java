@@ -22,10 +22,11 @@ import org.ow2.proactive.utils.FileUtils;
 import org.apache.log4j.Logger;
 
 /**
- * ProgressFileReader is in charge of: - creating a progress file in the
- * specified working directory - detecting changes on a progress file
- * efficiently - reading new value and saving it in memory - exposing the last
- * read value
+ * ProgressFileReader is in charge of:
+ * - creating a progress file in the specified working directory
+ * - detecting changes on a progress file efficiently
+ * - reading new value and saving it in memory
+ * - exposing the last read value
  * <p/>
  * Instances of this class are NOT thread-safe.
  *

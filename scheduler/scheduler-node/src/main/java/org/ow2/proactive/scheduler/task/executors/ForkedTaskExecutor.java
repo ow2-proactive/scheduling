@@ -50,7 +50,7 @@ import org.objectweb.proactive.extensions.processbuilder.OSProcessBuilder;
 import org.objectweb.proactive.extensions.processbuilder.exception.NotImplementedException;
 import org.ow2.proactive.resourcemanager.utils.OneJar;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
-import org.ow2.proactive.scheduler.exception.ForkedJVMProcessException;
+import org.ow2.proactive.scheduler.task.exceptions.ForkedJvmProcessException;
 import org.ow2.proactive.scheduler.task.TaskContext;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.utils.Decrypter;
@@ -108,18 +108,15 @@ public class ForkedTaskExecutor implements TaskExecutor {
             if (exitCode != 0) {
                 try {
                     Throwable exception = (Throwable) deserializeTaskResult(serializedContext);
-                    return new TaskResultImpl(context.getTaskId(), new ForkedJVMProcessException(
-                            "Failed to execute task in a forked JVM", exception));
+                    return createTaskResult(context, exception);
                 } catch (Throwable cannotDeserializeResult) {
-                    return new TaskResultImpl(context.getTaskId(), new ForkedJVMProcessException(
-                            "Failed to execute task in a forked JVM", cannotDeserializeResult));
+                    return createTaskResult(context, cannotDeserializeResult);
                 }
             }
 
             return (TaskResultImpl) deserializeTaskResult(serializedContext);
         } catch (Throwable throwable) {
-            return new TaskResultImpl(context.getTaskId(), new ForkedJVMProcessException(
-                    "Failed to execute task in a forked JVM", throwable));
+            return createTaskResult(context, throwable);
         } finally {
             FileUtils.deleteQuietly(serializedContext);
 
@@ -131,6 +128,11 @@ public class ForkedTaskExecutor implements TaskExecutor {
                 processStreamsReader.close();
             }
         }
+    }
+
+    private TaskResultImpl createTaskResult(TaskContext context, Throwable throwable) {
+        return new TaskResultImpl(context.getTaskId(), new ForkedJvmProcessException(
+                "Failed to execute task in a forked JVM", throwable));
     }
 
     private OSProcessBuilder createForkedProcess(TaskContext context, File serializedContext, PrintStream outputSink, PrintStream errorSink)
@@ -246,7 +248,7 @@ public class ForkedTaskExecutor implements TaskExecutor {
             FileUtils.forceDelete(pathToFile);
             return scriptResult;
         } catch (IOException e) {
-            throw new ForkedJVMProcessException(
+            throw new ForkedJvmProcessException(
                 "Could not read serialized task result (forked JVM may have been killed by the task or could not write to local space)",
                 e);
         }

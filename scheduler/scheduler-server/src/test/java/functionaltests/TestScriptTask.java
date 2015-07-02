@@ -47,7 +47,7 @@ import org.ow2.proactive.scheduler.common.job.factories.StaxJobFactory;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
-import org.ow2.proactive.scheduler.exception.ForkedJVMProcessException;
+import org.ow2.proactive.scheduler.task.exceptions.ForkedJvmProcessException;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -128,7 +128,7 @@ public class TestScriptTask extends SchedulerConsecutive {
         // script task should be forked by default, ie it will not kill the scheduler on system.exit
         JobState jobState = SchedulerTHelper.getSchedulerInterface().getJobState(id);
         TaskResult killJVMTaskResult = jobResult.getResult("killJVM");
-        Assert.assertTrue(killJVMTaskResult.getException() instanceof ForkedJVMProcessException);
+        Assert.assertTrue(killJVMTaskResult.getException() instanceof ForkedJvmProcessException);
 
         TaskState killJVMTaskState = jobState.getHMTasks().get(killJVMTaskResult.getTaskId());
         assertEquals(TaskStatus.FAULTY, killJVMTaskState.getStatus());

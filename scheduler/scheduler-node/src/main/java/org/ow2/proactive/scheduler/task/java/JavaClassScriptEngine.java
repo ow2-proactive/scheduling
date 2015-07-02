@@ -59,7 +59,7 @@ import org.ow2.proactive.scheduler.common.task.executable.AbstractJavaExecutable
 import org.ow2.proactive.scheduler.common.task.executable.internal.JavaExecutableInitializerImpl;
 import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
 import org.ow2.proactive.scheduler.task.executors.InProcessTaskExecutor;
-import org.ow2.proactive.scheduler.task.executors.TaskException;
+import org.ow2.proactive.scheduler.task.exceptions.TaskException;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.TaskScript;
 

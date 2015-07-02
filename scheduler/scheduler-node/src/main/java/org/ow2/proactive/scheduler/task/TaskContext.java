@@ -51,6 +51,7 @@ import org.ow2.proactive.utils.ClasspathUtils;
 
 
 public class TaskContext implements Serializable {
+
     private final List<String> nodesURLs;
     private final List<String> nodesHosts;
 

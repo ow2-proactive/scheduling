@@ -47,22 +47,24 @@ public class TaskProcessTreeKiller {
     private static final Logger logger = Logger.getLogger(TaskProcessTreeKiller.class);
 
     private static final String PROCESS_KILLER_COOKIE = "PROCESS_KILLER_COOKIE";
-    private String ptkCookie;
+
+    private String cookieName;
 
     public TaskProcessTreeKiller(String taskId) {
-        ptkCookie = taskId + "_" + UUID.randomUUID().toString();
+        cookieName = taskId + "_" + UUID.randomUUID().toString();
     }
 
     public void tagEnvironment(Map<String, String> env) {
-        env.put(PROCESS_KILLER_COOKIE, ptkCookie);
+        env.put(PROCESS_KILLER_COOKIE, cookieName);
     }
 
     public void kill() {
         try {
-            ProcessTree.get().killAll(Collections.singletonMap(PROCESS_KILLER_COOKIE, ptkCookie));
+            ProcessTree.get().killAll(Collections.singletonMap(PROCESS_KILLER_COOKIE, cookieName));
         } catch (Exception e) {
-            logger.warn("Failed to kill child processes using cookie : " + ptkCookie, e);
+            logger.warn("Failed to kill child processes using cookie: " + cookieName, e);
         }
 
     }
+
 }

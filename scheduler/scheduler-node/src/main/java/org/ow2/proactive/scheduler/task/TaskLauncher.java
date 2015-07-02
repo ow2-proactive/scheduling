@@ -119,8 +119,11 @@ public class TaskLauncher {
         logger.info("Task started");
 
         taskKiller = new TaskKiller(Thread.currentThread()); // what about kill of a non yet started task?
-        WallTimer wallTimer = WallTimer.startWallTime(initializer.getWalltime(),
-          new TaskKiller(Thread.currentThread()));
+
+        WallTimer wallTimer =
+                WallTimer.startWallTime(
+                        initializer.getWalltime(),
+                        new TaskKiller(Thread.currentThread()));
 
         Stopwatch stopwatchWhenTaskFailed = Stopwatch.createStarted();
 
@@ -131,11 +134,13 @@ public class TaskLauncher {
 
             progressFileReader.start(dataspaces.getScratchFolder(), taskId);
 
-            TaskContext context = new TaskContext(executableContainer, initializer, previousTasksResults,
-              dataspaces.getScratchURI(), dataspaces.getInputURI(), dataspaces.getOutputURI(),
-              dataspaces.getUserURI(), dataspaces.getGlobalURI(),
-              progressFileReader.getProgressFile().toString(),
-              getHostname());
+            TaskContext context =
+                    new TaskContext(
+                            executableContainer, initializer, previousTasksResults,
+                            dataspaces.getScratchURI(), dataspaces.getInputURI(),
+                            dataspaces.getOutputURI(), dataspaces.getUserURI(),
+                            dataspaces.getGlobalURI(),
+                            progressFileReader.getProgressFile().toString(), getHostname());
 
             File workingDir = getTaskWorkingDir(context, dataspaces);
 
@@ -146,8 +151,9 @@ public class TaskLauncher {
                 context.setDecrypter(decrypter);
             }
 
-            TaskResultImpl taskResult = factory.createTaskExecutor(workingDir, decrypter).execute(context,
-              taskLogger.getOutputSink(), taskLogger.getErrorSink());
+            TaskResultImpl taskResult =
+                    factory.createTaskExecutor(workingDir, decrypter)
+                            .execute(context, taskLogger.getOutputSink(), taskLogger.getErrorSink());
 
             if (wallTimer.hasWallTimed()) { // still needed?
                 stopwatchWhenTaskFailed.stop();

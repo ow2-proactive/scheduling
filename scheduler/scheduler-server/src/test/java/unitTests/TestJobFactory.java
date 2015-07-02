@@ -259,7 +259,7 @@ public class TestJobFactory {
         Assert.assertEquals(((NativeTask) tfJob.getTask("task3")).getCommandLine()[3], "3");
         Assert.assertEquals(((NativeTask) tfJob.getTask("task3")).getCommandLine()[4], "12");
         Assert.assertEquals(((NativeTask) tfJob.getTask("task3")).getWorkingDir(), "task3workingDir");
-        Assert.assertEquals((tfJob.getTask("task3")).getParallelEnvironment().getNodesNumber(), 3);
+        Assert.assertEquals((tfJob.getTask("task3")).getNumberOfNodesNeeded(), 3);
         //Check task 4 properties
         Assert.assertEquals(tfJob.getTask("task4").getName(), "task4");
         Assert.assertEquals(tfJob.getTask("task4").isCancelJobOnError(), true);
@@ -310,7 +310,7 @@ public class TestJobFactory {
         Assert.assertEquals(OutputAccessMode.none, tfJob.getTask("task4").getOutputFilesList().get(4)
                 .getMode());
         Assert.assertEquals(((NativeTask) tfJob.getTask("task4")).getWorkingDir(), "task4workingDir");
-        Assert.assertEquals((tfJob.getTask("task4")).getParallelEnvironment().getNodesNumber(), 10);
+        Assert.assertEquals((tfJob.getTask("task4")).getNumberOfNodesNeeded(), 10);
 
         log("Test Job MULTI_NODES");
         TaskFlowJob mnJob = getJob(jobMultiNodesDescriptor, impl);
@@ -339,7 +339,7 @@ public class TestJobFactory {
         Assert.assertEquals(jt.getGenericInformations().get("n22"), "v22");
         Assert.assertEquals(jt.getMaxNumberOfExecution(), 1);
         Assert.assertEquals(jt.getName(), "Controller");
-        Assert.assertEquals(jt.getParallelEnvironment().getNodesNumber(), 3);
+        Assert.assertEquals(jt.getNumberOfNodesNeeded(), 3);
         Assert.assertEquals(jt.getPreScript(), null);
         Assert.assertEquals(jt.getPostScript(), null);
         Assert.assertEquals(jt.getRestartTaskOnError(), RestartMode.ANYWHERE);

@@ -1,11 +1,10 @@
 /*
- * ################################################################
- *
+ *  *
  * ProActive Parallel Suite(TM): The Java(TM) library for
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2011 INRIA/University of
+ * Copyright (C) 1997-2015 INRIA/University of
  *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -31,27 +30,20 @@
  *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s):
  *
- * ################################################################
- * $ACTIVEEON_INITIAL_DEV$
+ *  * $$ACTIVEEON_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.exception;
+package org.ow2.proactive.scheduler.task.exceptions;
 
-/**
- * ForkedJVMProcessException is thrown when forkedJavaProcess is not responding anymore.
- *
- * @author The ProActive Team
- * @since ProActive Scheduling 3.0
- */
-public class ForkedJVMProcessException extends RuntimeException {
+public class TaskException extends Exception {
 
-    /**
-     * Create a new instance of ForkedJVMProcessException
-     *
-     * @param msg the message that causes the exception
-     * @param cause the optionnal cause of the exception
-     */
-    public ForkedJVMProcessException(String msg, Throwable cause) {
-        super(msg, cause);
+    public TaskException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    @Override
+    public String toString() {
+        String message = getLocalizedMessage();
+        return message != null ? message : "";
     }
 
 }

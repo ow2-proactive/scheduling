@@ -511,11 +511,8 @@ public abstract class Task extends CommonAttribute {
     /**
      * Get the number of nodes needed for this task (by default: 1).
      *
-     * The method is deprecated. Use {@link Task#getParallelEnvironment()#getNumberOfNodesNeeded()}
-     *
      * @return the number of Nodes Needed
      */
-    @Deprecated
     public int getNumberOfNodesNeeded() {
         return isParallel() ? getParallelEnvironment().getNodesNumber() : 1;
     }

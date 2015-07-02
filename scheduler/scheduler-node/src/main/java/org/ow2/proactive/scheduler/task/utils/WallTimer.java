@@ -39,11 +39,14 @@ import java.util.TimerTask;
 
 
 public class WallTimer {
+
     private Timer timer;
-    private TaskKiller taskKiller;
+
+    private final TaskKiller taskKiller;
 
     private WallTimer(final long wallTimeDuration, final TaskKiller taskKiller) {
         this.taskKiller = taskKiller;
+
         if (wallTimeDuration > 0) {
             timer = new Timer();
             timer.schedule(new TimerTask() {
@@ -57,6 +60,14 @@ public class WallTimer {
         }
     }
 
+    /**
+     * Create and start a WallTimer instance.
+     *
+     * @param walltime the maximum timeout period to wait for (in ms).
+     * @param taskKiller the task killer used to kill the task once the timeout is reached.
+     *
+     * @return a created and initialized WallTimer instance.
+     */
     public static WallTimer startWallTime(final long walltime, final TaskKiller taskKiller) {
         return new WallTimer(walltime, taskKiller);
     }
@@ -70,4 +81,5 @@ public class WallTimer {
             timer.cancel();
         }
     }
+
 }
