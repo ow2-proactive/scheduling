@@ -67,6 +67,7 @@ import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.task.containers.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.data.TaskDataspaces;
 import org.ow2.proactive.scheduler.task.executors.InProcessTaskExecutor;
+import org.ow2.proactive.scheduler.task.executors.TaskExecutor;
 import org.ow2.proactive.scheduler.task.utils.Decrypter;
 import org.ow2.proactive.scheduler.task.utils.TaskKiller;
 import org.ow2.proactive.scheduler.task.utils.WallTimer;
@@ -130,7 +131,7 @@ public class TaskLauncher implements InitActive {
                         initializer.getWalltime(),
                         new TaskKiller(Thread.currentThread()));
 
-        Stopwatch stopwatchWhenTaskFailed = Stopwatch.createStarted();
+        Stopwatch taskStopwatchForFailures = Stopwatch.createUnstarted();
 
         try {
             TaskDataspaces dataspaces = factory.createTaskDataspaces(taskId, initializer.getNamingService());
@@ -156,31 +157,32 @@ public class TaskLauncher implements InitActive {
                 context.setDecrypter(decrypter);
             }
 
+            TaskExecutor taskExecutor = factory.createTaskExecutor(workingDir, decrypter);
+
+            taskStopwatchForFailures.start();
+
             TaskResultImpl taskResult =
-                    factory.createTaskExecutor(workingDir, decrypter)
-                            .execute(context, taskLogger.getOutputSink(), taskLogger.getErrorSink());
+                    taskExecutor.execute(context, taskLogger.getOutputSink(), taskLogger.getErrorSink());
+
+            taskStopwatchForFailures.stop();
 
             if (wallTimer.hasWallTimed()) { // still needed?
-                stopwatchWhenTaskFailed.stop();
-
                 taskLogger.getErrorSink().println(
                   "Walltime of " + initializer.getWalltime() + " ms reached on task " +
                     taskId.getReadableName());
                 TaskResultImpl failedTaskResult = new TaskResultImpl(taskId, new WalltimeExceededException(
-                  "Walltime of " + initializer.getWalltime() + " ms reached on task " +
-                    taskId.getReadableName()), taskLogger.getLogs(),
-                  stopwatchWhenTaskFailed.elapsed(TimeUnit.MILLISECONDS));
+                    "Walltime of " + initializer.getWalltime() + " ms reached on task " +
+                        taskId.getReadableName()), taskLogger.getLogs(),
+                    taskStopwatchForFailures.elapsed(TimeUnit.MILLISECONDS));
 
                 sendResultToScheduler(terminateNotification, failedTaskResult);
                 return;
 
             } else if (taskKiller.wasKilled()) {
-                stopwatchWhenTaskFailed.stop();
-
                 taskLogger.getErrorSink().println("Task " + taskId.getReadableName() + " has been killed");
                 TaskResultImpl failedTaskResult = new TaskResultImpl(taskId, new TaskAbortedException(
-                  "Task " + taskId.getReadableName() + " has been killed"), taskLogger.getLogs(),
-                  stopwatchWhenTaskFailed.elapsed(TimeUnit.MILLISECONDS));
+                    "Task " + taskId.getReadableName() + " has been killed"), taskLogger.getLogs(),
+                    taskStopwatchForFailures.elapsed(TimeUnit.MILLISECONDS));
 
                 sendResultToScheduler(terminateNotification, failedTaskResult);
                 return;
@@ -201,26 +203,25 @@ public class TaskLauncher implements InitActive {
             wallTimer.stop();
 
             TaskResultImpl failedTaskResult;
-            stopwatchWhenTaskFailed.stop();
 
             if (wallTimer.hasWallTimed()) {
                 logger.debug("Walltime reached for task", taskFailure);
                 failedTaskResult = new TaskResultImpl(taskId, new WalltimeExceededException("Walltime of " +
-                  initializer.getWalltime() + " ms reached on task " + taskId.getReadableName(),
-                  taskFailure), taskLogger.getLogs(),
-                  stopwatchWhenTaskFailed.elapsed(TimeUnit.MILLISECONDS));
+                    initializer.getWalltime() + " ms reached on task " + taskId.getReadableName(),
+                    taskFailure), taskLogger.getLogs(),
+                    taskStopwatchForFailures.elapsed(TimeUnit.MILLISECONDS));
 
             } else if (taskKiller.wasKilled()) {
                 logger.debug("Task has been killed", taskFailure);
                 failedTaskResult = new TaskResultImpl(taskId, new TaskAbortedException("Task " +
-                  taskId.getReadableName() + " has been killed"), taskLogger.getLogs(),
-                  stopwatchWhenTaskFailed.elapsed(TimeUnit.MILLISECONDS));
+                    taskId.getReadableName() + " has been killed"), taskLogger.getLogs(),
+                    taskStopwatchForFailures.elapsed(TimeUnit.MILLISECONDS));
 
             } else {
                 logger.info("Failed to execute task", taskFailure);
                 taskFailure.printStackTrace(taskLogger.getErrorSink());
                 failedTaskResult = new TaskResultImpl(taskId, taskFailure, taskLogger.getLogs(),
-                  stopwatchWhenTaskFailed.elapsed(TimeUnit.MILLISECONDS));
+                    taskStopwatchForFailures.elapsed(TimeUnit.MILLISECONDS));
             }
 
             sendResultToScheduler(terminateNotification, failedTaskResult);
