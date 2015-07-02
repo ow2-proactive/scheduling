@@ -37,7 +37,7 @@ public class KillTaskLauncherTest {
 
         Semaphore taskRunning = new Semaphore(0);
 
-        final TaskLauncher taskLauncher = new TaskLauncher(initializer, new TestTaskLauncherFactory(taskRunning));
+        final TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer, new TestTaskLauncherFactory(taskRunning));
         final TaskLauncher taskLauncherPA = PAActiveObject.turnActive(taskLauncher);
 
         TaskResultWaiter taskResultWaiter = new TaskResultWaiter();
@@ -60,7 +60,7 @@ public class KillTaskLauncherTest {
         initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false));
 
         Semaphore taskRunning = new Semaphore(0);
-        final TaskLauncher taskLauncher = new TaskLauncher(initializer, new TestTaskLauncherFactory(taskRunning));
+        final TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer, new TestTaskLauncherFactory(taskRunning));
         final TaskLauncher taskLauncherPA = PAActiveObject.turnActive(taskLauncher);
 
         TaskResultWaiter taskResultWaiter = new TaskResultWaiter();
@@ -82,7 +82,7 @@ public class KillTaskLauncherTest {
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
         initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false));
 
-        final TaskLauncher taskLauncher = new TaskLauncher(initializer, new TestTaskLauncherFactory(
+        final TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer, new TestTaskLauncherFactory(
           new Semaphore(0)));
         final TaskLauncher taskLauncherPA = PAActiveObject.turnActive(taskLauncher);
 
@@ -105,7 +105,7 @@ public class KillTaskLauncherTest {
         initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false));
 
         Semaphore taskRunning = new Semaphore(0);
-        final TaskLauncher taskLauncher = new TaskLauncher(initializer, new SlowDataspacesTaskLauncherFactory(taskRunning));
+        final TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer, new SlowDataspacesTaskLauncherFactory(taskRunning));
         final TaskLauncher taskLauncherPA = PAActiveObject.turnActive(taskLauncher);
 
         TaskResultWaiter taskResultWaiter = new TaskResultWaiter();

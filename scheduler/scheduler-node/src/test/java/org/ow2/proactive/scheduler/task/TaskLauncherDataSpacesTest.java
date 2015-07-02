@@ -55,7 +55,7 @@ public class TaskLauncherDataSpacesTest {
         File inputFile = new File(taskLauncherFactory.getDataSpaces().getInputURI(), "input_1000.txt");
         assertTrue(inputFile.createNewFile());
 
-        TaskLauncher taskLauncher = new TaskLauncher(initializer, taskLauncherFactory);
+        TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer, taskLauncherFactory);
         TaskResult taskResult = runTaskLauncher(taskLauncher, executableContainer);
 
         assertFalse(taskResult.hadException());
@@ -74,7 +74,7 @@ public class TaskLauncherDataSpacesTest {
           new OutputSelector(new FileSelector("output_${PA_TASK_ID}.txt"),
             OutputAccessMode.TransferToGlobalSpace)));
 
-        TaskLauncher taskLauncher = new TaskLauncher(initializer, taskLauncherFactory);
+        TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer, taskLauncherFactory);
         TaskResult taskResult = runTaskLauncher(taskLauncher, executableContainer);
 
         assertTaskResultOk(taskResult);
@@ -97,7 +97,7 @@ public class TaskLauncherDataSpacesTest {
         File inputFile = new File(taskLauncherFactory.getDataSpaces().getInputURI(), "input_foo_bar.txt");
         assertTrue(inputFile.createNewFile());
 
-        TaskLauncher taskLauncher = new TaskLauncher(initializer, taskLauncherFactory);
+        TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer, taskLauncherFactory);
         TaskResultImpl previousTaskResult = taskResult(Collections.<String, Serializable> singletonMap(
                 "aResultVar", "bar"));
         TaskResult taskResult = runTaskLauncher(taskLauncher, executableContainer, previousTaskResult);
@@ -118,7 +118,7 @@ public class TaskLauncherDataSpacesTest {
           new OutputSelector(new FileSelector("output_${aVar}_${aResultVar}.txt"),
             OutputAccessMode.TransferToGlobalSpace)));
 
-        TaskLauncher taskLauncher = new TaskLauncher(copyOutputFile, taskLauncherFactory);
+        TaskLauncher taskLauncher = TaskLauncherUtils.create(copyOutputFile, taskLauncherFactory);
         TaskResultImpl previousTaskResult = taskResult(Collections.<String, Serializable> singletonMap(
           "aResultVar", "bar"));
         TaskResult taskResult = runTaskLauncher(taskLauncher, createAFileAndWriteVariable, previousTaskResult);

@@ -47,6 +47,8 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import org.objectweb.proactive.Body;
+import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.annotation.ImmediateService;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.ProActiveInet;
@@ -81,7 +83,7 @@ import org.apache.log4j.Logger;
  * - sends result back to the Scheduler
  */
 @ActiveObject
-public class TaskLauncher {
+public class TaskLauncher implements InitActive {
 
     private static final Logger logger = Logger.getLogger(TaskLauncher.class);
 
@@ -109,16 +111,19 @@ public class TaskLauncher {
 
     public TaskLauncher(TaskLauncherInitializer initializer) {
         this.initializer = initializer;
+    }
+
+    @Override
+    public void initActivity(Body body) {
         this.taskId = initializer.getTaskId();
         this.taskLogger = new TaskLogger(taskId, getHostname());
         this.progressFileReader = new ProgressFileReader();
+        this.taskKiller = new TaskKiller(Thread.currentThread());
     }
 
     public void doTask(ExecutableContainer executableContainer, TaskResult[] previousTasksResults,
             TaskTerminateNotification terminateNotification) {
         logger.info("Task started");
-
-        taskKiller = new TaskKiller(Thread.currentThread()); // what about kill of a non yet started task?
 
         WallTimer wallTimer =
                 WallTimer.startWallTime(
@@ -278,7 +283,7 @@ public class TaskLauncher {
             }
         }
         logger.error("Cannot notify task termination " + taskId + " after " + pingAttempts +
-          " attempts, terminating task launcher now");
+                " attempts, terminating task launcher now");
         terminate(true);
     }
 

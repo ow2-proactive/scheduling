@@ -549,7 +549,7 @@ class LiveJobs {
 
             if (task.isCancelJobOnError()) {
                 endJob(jobData, terminationData, task, taskResult, "The task has been manually killed. "
-                    + "You also ask to cancel the job in such a situation !", JobStatus.CANCELED);
+                    + "You also ask to cancel the job in such a situation!", JobStatus.CANCELED);
             } else {
                 terminateTask(jobData, task, true, taskResult, terminationData);
             }
