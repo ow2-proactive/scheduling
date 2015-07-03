@@ -40,11 +40,11 @@ public class TestJobRemove extends BaseSchedulerDBTest {
         InternalJob job = defaultSubmitJobAndLoadInternal(false, jobDef);
 
         dbManager.updateAfterTaskFinished(job, job.getTask("javaTask-0"), new TaskResultImpl(null, "OK1",
-            null, 0, null));
+            null, 0));
         dbManager.updateAfterTaskFinished(job, job.getTask("forkedJavaTask-0"), new TaskResultImpl(null,
-            "OK2", null, 0, null));
+            "OK2", null, 0));
         dbManager.updateAfterTaskFinished(job, job.getTask("nativeTask-0"), new TaskResultImpl(null, "OK3",
-            null, 0, null));
+            null, 0));
 
         job.setStatus(JobStatus.FINISHED);
 
@@ -80,11 +80,11 @@ public class TestJobRemove extends BaseSchedulerDBTest {
                 public void run() {
                     try {
                         dbManager.updateAfterTaskFinished(job, job.getTask("javaTask-0"), new TaskResultImpl(
-                            null, "OK1", null, 0, null));
+                            null, "OK1", null, 0));
                         dbManager.updateAfterTaskFinished(job, job.getTask("forkedJavaTask-0"),
-                                new TaskResultImpl(null, "OK2", null, 0, null));
+                                new TaskResultImpl(null, "OK2", null, 0));
                         dbManager.updateAfterTaskFinished(job, job.getTask("nativeTask-0"),
-                                new TaskResultImpl(null, "OK3", null, 0, null));
+                                new TaskResultImpl(null, "OK3", null, 0));
 
                         job.setStatus(JobStatus.FINISHED);
 
@@ -200,8 +200,8 @@ public class TestJobRemove extends BaseSchedulerDBTest {
             forkEnv.addJVMArgument("jvmArg2");
             forkEnv.addSystemEnvironmentVariable("e1", "v1", false);
             forkEnv.addSystemEnvironmentVariable("e2", "v2", true);
-            forkEnv.setEnvScript(new SimpleScript("env script", "javascript", new String[] { "param1",
-                    "param2" }));
+            forkEnv.setEnvScript(
+              new SimpleScript("env script", "javascript", new String[] { "param1", "param2" }));
             task2.setForkEnvironment(forkEnv);
             task2.addArgument("arg1", "arg1");
             task2.addArgument("arg2", "arg2");
@@ -237,17 +237,17 @@ public class TestJobRemove extends BaseSchedulerDBTest {
 
         for (int i = 0; i < tasksNumber; i++) {
             dbManager.updateAfterTaskFinished(job, job.getTask("javaTask-" + i), new TaskResultImpl(null,
-                "OK", null, 0, resProperties));
+                "OK", null, 0));
             dbManager.updateAfterTaskFinished(job, job.getTask("javaTask-" + i), new TaskResultImpl(null,
-                "OK", null, 0, resProperties));
+                "OK", null, 0));
             dbManager.updateAfterTaskFinished(job, job.getTask("forkedJavaTask-" + i), new TaskResultImpl(
-                null, "OK", null, 0, resProperties));
+                null, "OK", null, 0));
             dbManager.updateAfterTaskFinished(job, job.getTask("forkedJavaTask-" + i), new TaskResultImpl(
-                null, "OK", null, 0, resProperties));
+                null, "OK", null, 0));
             dbManager.updateAfterTaskFinished(job, job.getTask("nativeTask-" + i), new TaskResultImpl(null,
-                "OK", null, 0, resProperties));
+                "OK", null, 0));
             dbManager.updateAfterTaskFinished(job, job.getTask("nativeTask-" + i), new TaskResultImpl(null,
-                "OK", null, 0, resProperties));
+                "OK", null, 0));
         }
 
         System.out.println("Remove job");

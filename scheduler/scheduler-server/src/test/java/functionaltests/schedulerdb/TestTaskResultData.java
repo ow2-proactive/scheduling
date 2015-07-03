@@ -1,13 +1,11 @@
 package functionaltests.schedulerdb;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import org.ow2.proactive.db.DatabaseManagerException;
-import org.ow2.proactive.db.types.BigString;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
 import org.ow2.proactive.scheduler.common.task.SimpleTaskLogs;
@@ -217,7 +215,6 @@ public class TestTaskResultData extends BaseSchedulerDBTest {
         Assert.assertEquals(10, value.getA());
         Assert.assertEquals("12345", value.getB());
         Assert.assertEquals(previewer, restoredResult.getPreviewerClassName());
-        Assert.assertNull(restoredResult.getPropagatedProperties());
         Assert.assertNull(restoredResult.getAction());
     }
 
@@ -239,31 +236,7 @@ public class TestTaskResultData extends BaseSchedulerDBTest {
             Assert.fail("Exception is expected");
         } catch (TestException e) {
         }
-        Assert.assertNull(restoredResult.getPropagatedProperties());
         Assert.assertNull(restoredResult.getOutput());
-    }
-
-    @Test
-    public void testPropagatedProperties() throws Exception {
-        StringBuilder longString = new StringBuilder();
-        for (int i = 0; i < 100; i++) {
-            longString.append("0123456789abcdefghijklmnopqrstuvwxyz");
-        }
-        Map<String, BigString> properties = new HashMap<String, BigString>();
-        properties.put("longProperty", new BigString(longString.toString()));
-        properties.put("property", new BigString("value"));
-
-        InternalJob job = saveSingleTask(createDefaultTask("task"));
-        InternalTask task = (InternalTask) job.getTasks().get(0);
-
-        TaskResultImpl result = new TaskResultImpl(null, "result", null, 0, properties);
-        dbManager.updateAfterTaskFinished(job, task, result);
-
-        TaskResult restoredResult = dbManager.loadLastTaskResult(task.getId());
-        Assert.assertNotNull(restoredResult.getPropagatedProperties());
-        Assert.assertEquals(longString.toString(), restoredResult.getPropagatedProperties().get(
-                "longProperty"));
-        Assert.assertEquals("value", restoredResult.getPropagatedProperties().get("property"));
     }
 
     @Test

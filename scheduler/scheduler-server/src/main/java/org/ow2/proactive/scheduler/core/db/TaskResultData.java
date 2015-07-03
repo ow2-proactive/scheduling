@@ -44,8 +44,6 @@ public class TaskResultData {
 
     private String previewerClassName;
 
-    private Map<String, String> propagatedProperties;
-
     private Map<String, byte[]> propagatedVariables;
 
     private FlowActionData flowAction;
@@ -55,7 +53,7 @@ public class TaskResultData {
     TaskResultImpl toTaskResult(TaskId taskId) {
 
         TaskResultImpl result = new TaskResultImpl(taskId, getSerializedValue(), getSerializedException(),
-            getLogs(), getPropagatedProperties(), getPropagatedVariables());
+            getLogs(), getPropagatedVariables());
 
         result.setPreviewerClassName(getPreviewerClassName());
         FlowActionData actionData = getFlowAction();
@@ -76,7 +74,6 @@ public class TaskResultData {
         resultData.setTaskRuntimeData(taskRuntimeData);
         resultData.setLogs(result.getOutput());
         resultData.setPreviewerClassName(result.getPreviewerClassName());
-        resultData.setPropagatedProperties(result.getPropagatedProperties());
         resultData.setPropagatedVariables(result.getPropagatedVariables());
         resultData.setSerializedException(result.getSerializedException());
         resultData.setSerializedValue(result.getSerializedValue());
@@ -175,16 +172,6 @@ public class TaskResultData {
 
     public void setPreviewerClassName(String previewerClassName) {
         this.previewerClassName = previewerClassName;
-    }
-
-    @Column(name = "PROPAGATED_PROPERTIES", updatable = false)
-    @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object"))
-    public Map<String, String> getPropagatedProperties() {
-        return propagatedProperties;
-    }
-
-    public void setPropagatedProperties(Map<String, String> propagatedProperties) {
-        this.propagatedProperties = propagatedProperties;
     }
 
     @Column(name = "PROPAGATED_VARIABLES")

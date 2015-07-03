@@ -39,8 +39,6 @@ package org.ow2.proactive.scheduler.task;
 import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Map;
 
 import javax.swing.JPanel;
@@ -50,7 +48,6 @@ import javax.xml.bind.annotation.XmlTransient;
 
 import org.objectweb.proactive.core.util.converter.ByteToObjectConverter;
 import org.objectweb.proactive.core.util.converter.ObjectToByteConverter;
-import org.ow2.proactive.db.types.BigString;
 import org.ow2.proactive.scheduler.common.exception.InternalSchedulerException;
 import org.ow2.proactive.scheduler.common.task.ResultPreview;
 import org.ow2.proactive.scheduler.common.task.TaskId;
@@ -103,9 +100,6 @@ public class TaskResultImpl implements TaskResult {
     //Managed by taskInfo, this field is here only to bring taskDuration to core AO
     private long taskDuration = -1;
 
-    /** All the properties propagated through Exporter.propagateProperty() */
-    private Map<String, BigString> propagatedProperties;
-
     /**
      * A map which contains the propagated variables of the previous (dependent)
      * tasks.
@@ -113,22 +107,15 @@ public class TaskResultImpl implements TaskResult {
     private Map<String, byte[]> propagatedVariables;
 
     public TaskResultImpl(TaskId id, byte[] serializedValue, byte[] serializedException, TaskLogs output,
-            Map<String, String> propergatedProperties, Map<String, byte[]> propagatedVariables) {
-        this(id, serializedValue, serializedException, output, propergatedProperties);
+            Map<String, byte[]> propagatedVariables) {
+        this(id, serializedValue, serializedException, output);
         this.propagatedVariables = propagatedVariables;
     }
 
-    public TaskResultImpl(TaskId id, byte[] serializedValue, byte[] serializedException, TaskLogs output,
-            Map<String, String> propagatedProperties) {
+    public TaskResultImpl(TaskId id, byte[] serializedValue, byte[] serializedException, TaskLogs output) {
         this(id, output);
         this.serializedValue = serializedValue;
         this.serializedException = serializedException;
-        if (propagatedProperties != null) {
-            this.propagatedProperties = new HashMap<String, BigString>(propagatedProperties.size());
-            for (Map.Entry<String, String> prop : propagatedProperties.entrySet()) {
-                this.propagatedProperties.put(prop.getKey(), new BigString(prop.getValue()));
-            }
-        }
         this.output = output;
     }
 
@@ -137,6 +124,10 @@ public class TaskResultImpl implements TaskResult {
         this.output = output;
     }
 
+    public TaskResultImpl(TaskId id, Throwable exception) {
+        this(id, exception, null, 0);
+    }
+
     /**
      * Return a new instance of task result represented by a task id, its result and its output.
      *
@@ -144,44 +135,11 @@ public class TaskResultImpl implements TaskResult {
      * @param value the result of the task.
      * @param output the output of the task.
      * @param execDuration the execution duration of the task itself
-     * @throws IOException
      */
     public TaskResultImpl(TaskId id, Serializable value, TaskLogs output, long execDuration) {
-        this(id, value, output, execDuration, null);
-    }
-
-    public TaskResultImpl(TaskId id, Throwable exception) {
-        this(id, exception, null, 0, null);
-    }
-
-    /**
-     * Return a new instance of task result represented by a task id and its exception.
-     *
-     * @param id the identification of the task that send this result.
-     * @param exception the exception that occurred in the task.
-     * @param output the output of the task.
-     * @param execDuration the execution duration of the task itself
-     */
-    public TaskResultImpl(TaskId id, Throwable exception, TaskLogs output, long execDuration) {
-        this(id, exception, output, execDuration, null);
-    }
-
-    /**
-     * Return a new instance of task result represented by a task id, its result and its output.
-     *
-     * @param id the identification of the task that send this result.
-     * @param value the result of the task.
-     * @param output the output of the task.
-     * @param execDuration the execution duration of the task itself
-     * @param propagatedProperties the map of all properties that has been propagated through Exporter.propagateProperty
-     * @throws IOException
-     */
-    public TaskResultImpl(TaskId id, Serializable value, TaskLogs output, long execDuration,
-            Map<String, BigString> propagatedProperties) {
         this(id, output);
         this.taskDuration = execDuration;
         this.value = value;
-        this.propagatedProperties = propagatedProperties;
         try {
             //try to serialize user result
             this.serializedValue = ObjectToByteConverter.ObjectStream.convert(value);
@@ -214,14 +172,11 @@ public class TaskResultImpl implements TaskResult {
      * @param exception the exception that occurred in the task.
      * @param output the output of the task.
      * @param execDuration the execution duration of the task itself
-     * @param propagatedProperties the map of all properties that has been propagated through Exporter.propagateProperty
      */
-    public TaskResultImpl(TaskId id, Throwable exception, TaskLogs output, long execDuration,
-            Map<String, BigString> propagatedProperties) {
+    public TaskResultImpl(TaskId id, Throwable exception, TaskLogs output, long execDuration) {
         this(id, output);
         this.taskDuration = execDuration;
         this.exception = exception;
-        this.propagatedProperties = propagatedProperties;
         this.serializedException = computeSerializedException(exception);
     }
 
@@ -250,7 +205,7 @@ public class TaskResultImpl implements TaskResult {
      * If a FlowScript was executed on this task, its result
      * is stored so that the action can be performed later when
      * processed by the core.
-     * 
+     *
      * return the Action to perform for this task
      */
     public FlowAction getAction() {
@@ -261,7 +216,7 @@ public class TaskResultImpl implements TaskResult {
      * If a FlowScript was executed on this task, its result
      * is stored so that the action can be performed later when
      * processed by the core.
-     * 
+     *
      * @param act an Control Flow action to embed in this TaskResult
      */
     public void setAction(FlowAction act) {
@@ -273,13 +228,6 @@ public class TaskResultImpl implements TaskResult {
      */
     public void setLogs(TaskLogs l) {
         this.output = l;
-    }
-
-    /**
-     * @param props the map of all properties that has been propagated through Exporter.propagateProperty
-     */
-    public void setPropagatedProperties(Map<String, BigString> props) {
-        this.propagatedProperties = props;
     }
 
     /**
@@ -450,8 +398,8 @@ public class TaskResultImpl implements TaskResult {
      * @param cl the classloader where to instanciate the object. Can be null : object is instanciated 
      * in the default caller classloader. 
      * @return the exception that has been thrown if any.
-     * @throws ClassNotFoundException 
-     * @throws IOException 
+     * @throws ClassNotFoundException
+     * @throws IOException
      */
     private Throwable instanciateException(ClassLoader cl) throws IOException, ClassNotFoundException {
         if (this.serializedException != null && this.exception == null) {
@@ -468,8 +416,8 @@ public class TaskResultImpl implements TaskResult {
      * @param cl the classloader where to instanciate the object. Can be null : object is instanciated 
      * in the default caller classloader. 
      * @return the value if no exception has been thown.
-     * @throws ClassNotFoundException 
-     * @throws IOException 
+     * @throws ClassNotFoundException
+     * @throws IOException
      */
     private Serializable instanciateValue(ClassLoader cl) throws IOException, ClassNotFoundException {
         if (this.serializedValue != null && this.value == null) {
@@ -528,7 +476,7 @@ public class TaskResultImpl implements TaskResult {
 
     /**
      * Get the real task duration. This duration is the CPU time usage of the associated executable.
-     * 
+     *
      * @return the real task duration.
      */
     public long getTaskDuration() {
@@ -552,25 +500,8 @@ public class TaskResultImpl implements TaskResult {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    public Map<String, String> getPropagatedProperties() {
-        // null if no prop has been propagated
-        if (this.propagatedProperties == null) {
-            return null;
-        } else {
-            Map<String, String> convertedProperties = new Hashtable<String, String>(this.propagatedProperties
-                    .size());
-            for (String k : this.propagatedProperties.keySet()) {
-                convertedProperties.put(k, this.propagatedProperties.get(k).getValue());
-            }
-            return convertedProperties;
-        }
-    }
-
-    /**
      * Sets the propagated variables.
-     * 
+     *
      * @param propagatedVariables a map of propagated variables
      */
     public void setPropagatedVariables(Map<String, byte[]> propagatedVariables) {

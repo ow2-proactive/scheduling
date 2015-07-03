@@ -109,11 +109,9 @@ public class InProcessTaskExecutor implements TaskExecutor {
             Stopwatch stopwatch = Stopwatch.createUnstarted();
             TaskResultImpl taskResult;
             try {
-                Serializable result;
                 stopwatch.start();
-                result =
-                        execute(
-                                container, output, error, scriptHandler, thirdPartyCredentials, variables);
+                Serializable result = execute(container, output, error, scriptHandler, thirdPartyCredentials,
+                        variables);
                 stopwatch.stop();
                 taskResult = new TaskResultImpl(
                         container.getTaskId(), result, null, stopwatch.elapsed(TimeUnit.MILLISECONDS));

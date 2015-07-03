@@ -34,8 +34,6 @@
  */
 package org.ow2.proactive.scheduler.rest.data;
 
-import static org.ow2.proactive_grid_cloud_portal.utils.ObjectUtility.object;
-
 import java.io.Serializable;
 import java.util.Map;
 
@@ -46,6 +44,8 @@ import org.ow2.proactive.scheduler.common.task.TaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskResultData;
+
+import static org.ow2.proactive_grid_cloud_portal.utils.ObjectUtility.object;
 
 
 public class TaskResultImpl implements TaskResult {
@@ -84,11 +84,6 @@ public class TaskResultImpl implements TaskResult {
     @Override
     public TaskLogs getOutput() {
         return taskLogs;
-    }
-
-    @Override
-    public Map<String, String> getPropagatedProperties() {
-        throw new UnsupportedOperationException();
     }
 
     @Override

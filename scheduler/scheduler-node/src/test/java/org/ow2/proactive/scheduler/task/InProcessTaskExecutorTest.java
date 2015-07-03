@@ -150,8 +150,7 @@ public class InProcessTaskExecutorTest {
         variablesFromParent.put("var", "parent");
         variablesFromParent.put(SchedulerVars.PA_TASK_ID.toString(), "1234");
 
-        TaskResult[] previousTasksResults = { new TaskResultImpl(null, null, null, null, null,
-            SerializationUtil.serializeVariableMap(variablesFromParent)) };
+        TaskResult[] previousTasksResults = { new TaskResultImpl(null, null, null, null,SerializationUtil.serializeVariableMap(variablesFromParent)) };
 
         new InProcessTaskExecutor().execute(new TaskContext(new ScriptExecutableContainer(
             new TaskScript(new SimpleScript("print(variables.get('var'));print(variables.get('PA_TASK_ID'))",
