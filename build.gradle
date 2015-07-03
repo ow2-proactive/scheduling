@@ -12,13 +12,6 @@ configurations {
     }
 }
 
-task extractNativeBundle(type: Copy) {
-    from {
-        configurations.nativeBundle.collect { zipTree(it) }
-    }
-    into file(project.nativeLibsDir)
-}
-
 buildscript {
     repositories {
         /*if (project.hasProperty('local'))*/mavenLocal()
@@ -411,18 +404,16 @@ project('scheduler:scheduler-node') {
     }
     serialver.dependsOn stub
 
-    task standaloneJarPrecondition {
-        finalizedBy extractNativeBundle
+    ext.oneJarManifest = manifest {
+        attributes 'One-Jar-URL-Factory': 'com.simontuffs.onejar.JarClassLoader$OneJarURLFactory'
+        attributes 'One-Jar-Expand': 'lib,binlib,main' // expand jars for subprocesses (forked tasks)
     }
 
-    task standaloneJar(type: OneJar, dependsOn: standaloneJarPrecondition) {
+    task standaloneJar(type: OneJar) {
         mainClass = 'org.ow2.proactive.resourcemanager.utils.RMNodeStarter'
-        binLib = fileTree(dir: project.nativeLibsDir, exclude: '*.jar')
+        binLib = files({ rootProject.configurations.nativeBundle.collect { zipTree(it) } })
         additionalDir = file('src/main/resources')
-        manifest {
-            attributes 'One-Jar-URL-Factory': 'com.simontuffs.onejar.JarClassLoader$OneJarURLFactory'
-            attributes 'One-Jar-Expand': 'lib,binlib,main' // expand jars for subprocesses (forked tasks)
-        }
+        manifest = oneJarManifest
     }
     build.dependsOn standaloneJar
     artifacts {
@@ -593,6 +584,11 @@ task dist(type: Sync) {
             from it.testJar.outputs
         }
     }
+
+    from {
+        configurations.nativeBundle.collect { zipTree(it) }
+    }
+
     into file("$rootDir/dist/lib")
 }
 
@@ -601,7 +597,6 @@ build.dependsOn 'dist'
 
 task scripts
 dist.dependsOn scripts
-dist.finalizedBy extractNativeBundle
 
 task cleanScripts
 clean.dependsOn cleanScripts
