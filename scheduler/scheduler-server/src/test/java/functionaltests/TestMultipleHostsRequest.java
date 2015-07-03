@@ -99,9 +99,6 @@ public class TestMultipleHostsRequest extends SchedulerConsecutive {
                 throw new IllegalStateException("Unsupported operating system");
         }
 
-        //set system Property for executable path
-        //System.setProperty(executablePathPropertyName, new File(executablePath.toURI()).getAbsolutePath());
-
         //test submission and event reception
         TaskFlowJob job = (TaskFlowJob) StaxJobFactory.getFactory().createJob(
                 new File(jobDescriptor.toURI()).getAbsolutePath());

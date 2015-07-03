@@ -93,7 +93,6 @@ public class TestWorkflowDataspace extends SchedulerConsecutive {
         job.setOutputSpace(outputSpace.toURI().toURL().toString());
 
         ForkEnvironment forkEnvironment = new ForkEnvironment();
-        forkEnvironment.addAdditionalClasspath(SchedulerTHelper.testClasspath());
 
         JavaTask t = new JavaTask();
         t.setName("T");

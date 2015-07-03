@@ -150,7 +150,7 @@ public class TestJobSchedulerHome extends FunctionalTest {
         task1.setName(tname);
 
         if (OperatingSystem.getOperatingSystem() == OperatingSystem.windows) {
-            task1.setCommandLine("cmd.exe", "/c", "echo %variables_PA_SCHEDULER_HOMEe%");
+            task1.setCommandLine("cmd.exe", "/c", "echo %variables_PA_SCHEDULER_HOME%");
         } else {
             //task1.setCommandLine("bash", "-c", "echo ${variables_proactive.home}");
             task1.setCommandLine("env");
