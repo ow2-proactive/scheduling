@@ -632,8 +632,14 @@ def createStartScripts(className, name, String outputFolder) {
     def scriptTask = project.tasks.create(name: ('script' + name), type: CustomCreateStartScripts) {
         mainClassName className
         applicationName name
-        outputDir project.file(outputFolder)
+        outputDir project.file("build/" + outputFolder)
         classpath = project.configurations.distLib // will be replaced with CustomCreateStartScripts
+    }
+    scriptTask.doLast { // otherwise outputDir would get deleted by clean tasks
+        project.copy {
+            from project.file("build/" + outputFolder)
+            into project.file(outputFolder)
+        }
     }
     project.scripts.dependsOn scriptTask
     project.cleanScripts.dependsOn 'cleanScript' + name
