@@ -215,10 +215,9 @@ public class ForkedTaskExecutor implements TaskExecutor {
     // 1 called by forker
     private static File serializeContext(TaskContext context, File directory) throws IOException {
         File file = File.createTempFile(context.getTaskId().value(), null, directory);
-
-        ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(file));
-        objectOutputStream.writeObject(context);
-        objectOutputStream.close();
+        try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(file))) {
+            objectOutputStream.writeObject(context);
+        }
         return file;
     }
 
@@ -226,31 +225,31 @@ public class ForkedTaskExecutor implements TaskExecutor {
     private static TaskContext deserializeContext(String pathToFile) throws IOException,
             ClassNotFoundException {
         File f = new File(pathToFile);
-        ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(f));
-        TaskContext container = (TaskContext) inputStream.readObject();
-        FileUtils.forceDelete(f);
-        return container;
+        try(ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(f))){
+            return (TaskContext) inputStream.readObject();
+        } finally {
+            FileUtils.forceDelete(f);
+        }
     }
 
     // 3 called by forked
     private static void serializeTaskResult(Object result, String contextPath) throws IOException {
         File file = new File(contextPath);
-        ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(file));
-        objectOutputStream.writeObject(result);
-        objectOutputStream.close();
+        try(ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(file))){
+            objectOutputStream.writeObject(result);
+        }
     }
 
     // 4 called by forker
     private static Object deserializeTaskResult(File pathToFile) throws IOException, ClassNotFoundException {
-        try {
-            ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(pathToFile));
-            Object scriptResult = inputStream.readObject();
-            FileUtils.forceDelete(pathToFile);
-            return scriptResult;
+        try (ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(pathToFile))) {
+            return inputStream.readObject();
         } catch (IOException e) {
             throw new ForkedJvmProcessException(
-                "Could not read serialized task result (forked JVM may have been killed by the task or could not write to local space)",
-                e);
+                    "Could not read serialized task result (forked JVM may have been killed by the task or could not write to local space)",
+                    e);
+        } finally {
+            FileUtils.forceDelete(pathToFile);
         }
     }
 
