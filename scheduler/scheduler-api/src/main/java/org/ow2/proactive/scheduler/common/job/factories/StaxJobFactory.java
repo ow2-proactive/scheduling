@@ -1346,8 +1346,7 @@ public class StaxJobFactory extends JobFactory {
                         current = cursorExec.getLocalName();
                         if (XMLTags.FORK_SYSTEM_PROPERTY.matches(current)) {
                             attrCount = cursorExec.getAttributeCount();
-                            boolean append = false;
-                            char ac = 0;
+
                             String name = null, value = null;
                             for (i = 0; i < attrCount; i++) {
                                 String attrName = cursorExec.getAttributeLocalName(i);
@@ -1357,19 +1356,9 @@ public class StaxJobFactory extends JobFactory {
                                 if (XMLAttributes.COMMON_VALUE.matches(attrName)) {
                                     value = replace(cursorExec.getAttributeValue(i));
                                 }
-                                if (XMLAttributes.FORK_APPEND.matches(attrName)) {
-                                    append = "true"
-                                            .equalsIgnoreCase(replace(cursorExec.getAttributeValue(i)));
-                                }
-                                if (XMLAttributes.FORK_APPENDCHAR.matches(attrName)) {
-                                    ac = cursorExec.getAttributeValue(i).charAt(0);
-                                }
                             }
-                            if (ac != 0) {
-                                forkEnv.addSystemEnvironmentVariable(name, value, ac);
-                            } else {
-                                forkEnv.addSystemEnvironmentVariable(name, value, append);
-                            }
+
+                            forkEnv.addSystemEnvironmentVariable(name, value);
                         } else if (XMLTags.FORK_JVM_ARG.matches(current)) {
                             forkEnv.addJVMArgument(replace(cursorExec.getAttributeValue(0)));
                         } else if (XMLTags.JOB_PATH_ELEMENT.matches(current)) {

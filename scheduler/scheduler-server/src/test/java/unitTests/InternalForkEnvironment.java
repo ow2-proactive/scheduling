@@ -36,8 +36,7 @@
  */
 package unitTests;
 
-import java.util.Map;
-
+import org.ow2.proactive.scheduler.common.exception.ExecutableCreationException;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scripting.Script;
 
@@ -75,22 +74,20 @@ public final class InternalForkEnvironment extends ForkEnvironment {
      * <br/>
      *
      * @param forkEnv the user side fork environment, if null, an empty fork environment is used
-     * @param baseEnv a base environment on which the user on will be computed
      */
-    public InternalForkEnvironment(ForkEnvironment forkEnv, Map<String, String> baseEnv) {
-        this(forkEnv, baseEnv, false);
+    public InternalForkEnvironment(ForkEnvironment forkEnv) throws ExecutableCreationException {
+        this(forkEnv, false);
     }
 
     /**
      * Create a new instance of InternalForkEnvironment
      *
      * @param forkEnv the user side fork environment, if null, an empty fork environment is used
-     * @param baseEnv a base environment on which the user on will be computed
      * @param envReadOnly true if the system environment is read only, false if it can be modified.
      * 			if read only, methods that could modify system env will throw an UnsupportedOperationException
      */
-    public InternalForkEnvironment(ForkEnvironment forkEnv, Map<String, String> baseEnv, boolean envReadOnly) {
-        super(forkEnv, baseEnv);
+    public InternalForkEnvironment(ForkEnvironment forkEnv, boolean envReadOnly) throws ExecutableCreationException {
+        super(forkEnv);
         this.envReadOnly = envReadOnly;
     }
 
@@ -98,22 +95,12 @@ public final class InternalForkEnvironment extends ForkEnvironment {
      * {@inheritDoc}
      */
     @Override
-    public void addSystemEnvironmentVariable(String name, String value, boolean append) {
+    public String addSystemEnvironmentVariable(String name, String value) {
         if (envReadOnly) {
             throw new UnsupportedOperationException("System environment is read only, you cannot modify it.");
         }
-        super.addSystemEnvironmentVariable(name, value, append);
-    }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void addSystemEnvironmentVariable(String name, String value, char appendChar) {
-        if (envReadOnly) {
-            throw new UnsupportedOperationException("System environment is read only, you cannot modify it.");
-        }
-        super.addSystemEnvironmentVariable(name, value, appendChar);
+        return super.addSystemEnvironmentVariable(name, value);
     }
 
     /**
@@ -123,4 +110,5 @@ public final class InternalForkEnvironment extends ForkEnvironment {
     public void setEnvScript(Script<?> script) {
         throw new UnsupportedOperationException("Environment script should not be modified in this context.");
     }
+
 }

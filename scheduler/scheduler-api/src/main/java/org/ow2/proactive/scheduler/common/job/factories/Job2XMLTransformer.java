@@ -746,21 +746,16 @@ public class Job2XMLTransformer {
         if ((fe.getSystemEnvironment() != null) && (fe.getSystemEnvironment().keySet().size() > 0)) {
             // <element name="SystemEnvironment">
             Element sysEnvE = doc.createElementNS(Schemas.SCHEMA_LATEST.namespace, XMLTags.FORK_SYSTEM_PROPERTIES.getXMLName());
-            if (fe.getPropertyModifiers() != null) {
+            if (fe.getSystemEnvironment() != null) {
 
                 // <oneOrMore>
                 // <ref name="sysProp"/>
                 // </oneOrMore>
-                for (PropertyModifier pm : fe.getPropertyModifiers()) {
+                for (Map.Entry<String, String> entry : fe.getSystemEnvironment().entrySet()) {
                     Element variableE = doc.createElementNS(Schemas.SCHEMA_LATEST.namespace, XMLTags.VARIABLE.getXMLName());
-                    setAttribute(variableE, XMLAttributes.COMMON_NAME, pm.getName(), true);
-                    setAttribute(variableE, XMLAttributes.COMMON_VALUE, pm.getValue(), true);
-                    if (pm.isAppend())
-                        setAttribute(variableE, XMLAttributes.FORK_APPEND, "true");
+                    setAttribute(variableE, XMLAttributes.COMMON_NAME, entry.getKey());
+                    setAttribute(variableE, XMLAttributes.COMMON_VALUE, entry.getValue());
 
-                    if (pm.getAppendChar() != 0)
-                        setAttribute(variableE, XMLAttributes.FORK_APPENDCHAR, Character.toString(pm
-                                .getAppendChar()), true);
                     sysEnvE.appendChild(variableE);
                 }
             }

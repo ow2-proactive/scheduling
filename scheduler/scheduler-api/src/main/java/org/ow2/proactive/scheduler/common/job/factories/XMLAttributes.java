@@ -64,7 +64,7 @@ public enum XMLAttributes {
     //SCRIPTS
     SCRIPT_URL("url"),
     //FORK ENVIRONMENT
-    FORK_JAVAHOME("javaHome"), FORK_APPENDCHAR("appendChar"), FORK_APPEND("append"),
+    FORK_JAVAHOME("javaHome"),
     // FLOW CONTROL
     FLOW_BLOCK("block"), FLOW_TARGET("target"), FLOW_ELSE("else"), FLOW_CONTINUATION("continuation"),
     //DATASPACES

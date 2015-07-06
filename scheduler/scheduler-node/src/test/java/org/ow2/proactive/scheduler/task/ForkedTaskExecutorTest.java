@@ -119,7 +119,7 @@ public class ForkedTaskExecutorTest {
         initializer.setTaskId((TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false)));
 
         ForkEnvironment forkEnvironment = new ForkEnvironment();
-        forkEnvironment.addSystemEnvironmentVariable("envVar", "envValue", true);
+        forkEnvironment.addSystemEnvironmentVariable("envVar", "envValue");
         forkEnvironment.addJVMArgument("-DjvmArg=jvmValue");
         initializer.setForkEnvironment(forkEnvironment);
 

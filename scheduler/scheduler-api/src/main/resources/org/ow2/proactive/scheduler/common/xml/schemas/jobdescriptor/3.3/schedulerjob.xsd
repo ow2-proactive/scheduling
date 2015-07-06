@@ -797,40 +797,10 @@
         <xs:complexType>
           <xs:attribute name="name" use="required" type="xs:string"/>
           <xs:attribute name="value" use="required" type="xs:string"/>
-          <xs:attribute name="append">
-            <xs:annotation>
-              <xs:documentation>append or not this property to a previous declared or to the system one</xs:documentation>
-            </xs:annotation>
-            <xs:simpleType>
-              <xs:union memberTypes="xs:boolean jd:variableRefType"/>
-            </xs:simpleType>
-          </xs:attribute>
-          <xs:attribute name="appendChar" type="jd:propertyAppendChar">
-            <xs:annotation>
-              <xs:documentation>append character, if set, append mode is ON</xs:documentation>
-            </xs:annotation>
-          </xs:attribute>
         </xs:complexType>
       </xs:element>
     </xs:sequence>
   </xs:group>
-  <xs:attributeGroup name="sysPropAppend">
-    <xs:attribute name="append" use="required">
-      <xs:annotation>
-        <xs:documentation>append or not this property to a previous declared or to the system one</xs:documentation>
-      </xs:annotation>
-      <xs:simpleType>
-        <xs:union memberTypes="xs:boolean jd:variableRefType"/>
-      </xs:simpleType>
-    </xs:attribute>
-  </xs:attributeGroup>
-  <xs:attributeGroup name="sysPropAppendChar">
-    <xs:attribute name="appendChar" use="required" type="jd:propertyAppendChar">
-      <xs:annotation>
-        <xs:documentation>append character, if set, append mode is ON</xs:documentation>
-      </xs:annotation>
-    </xs:attribute>
-  </xs:attributeGroup>
   <xs:element name="jvmArgs">
     <xs:annotation>
       <xs:documentation>A list of java properties or options</xs:documentation>

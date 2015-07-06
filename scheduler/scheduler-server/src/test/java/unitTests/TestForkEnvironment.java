@@ -36,9 +36,7 @@
  */
 package unitTests;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import org.ow2.proactive.scheduler.common.exception.ExecutableCreationException;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.scripting.SimpleScript;
@@ -84,12 +82,11 @@ public class TestForkEnvironment {
         Assert.assertEquals("-Dtoto=tata", forkEnvironment.getJVMArguments().get(1));
         Assert.assertEquals("-Dtoto=titi", forkEnvironment.getJVMArguments().get(2));
         Assert.assertFalse(forkEnvironment.getJVMArguments() == forkEnvironment.getJVMArguments());
+    }
 
-        try {
-            forkEnvironment.addJVMArgument(null);
-            throw new RuntimeException("forkEnvironment.addJVMArgument(null) did not throw an IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-        }
+    @Test(expected = NullPointerException.class)
+    public void testAddNullJvmArgument() {
+        forkEnvironment.addJVMArgument(null);
     }
 
     @Test
@@ -107,13 +104,11 @@ public class TestForkEnvironment {
         Assert.assertEquals("c", forkEnvironment.getAdditionalClasspath().get(2));
         Assert.assertFalse(
                 forkEnvironment.getAdditionalClasspath() == forkEnvironment.getAdditionalClasspath());
+    }
 
-        try {
-            forkEnvironment.addAdditionalClasspath((String) null);
-            throw new RuntimeException(
-                    "forkEnvironment.addAdditionalClasspath(null) did not throw an IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-        }
+    @Test(expected = NullPointerException.class)
+    public void testAddNullAdditionalClasspath() {
+        forkEnvironment.addJVMArgument(null);
     }
 
     @Test
@@ -137,43 +132,32 @@ public class TestForkEnvironment {
     }
 
     @Test
-    public void testSystemProperties() {
-        forkEnvironment.addSystemEnvironmentVariable("toto", "ioi", true);
+    public void testSystemProperties() throws ExecutableCreationException {
+        forkEnvironment.addSystemEnvironmentVariable("toto", "ioi");
         Assert.assertEquals(1, forkEnvironment.getSystemEnvironment().size());
         Assert.assertEquals("ioi", forkEnvironment.getSystemEnvironmentVariable("toto"));
 
-        forkEnvironment.addSystemEnvironmentVariable("toto", "oio", true);
+        forkEnvironment.addSystemEnvironmentVariable("toto", "oio");
         Assert.assertEquals(1, forkEnvironment.getSystemEnvironment().size());
-        Assert.assertEquals("ioioio", forkEnvironment.getSystemEnvironmentVariable("toto"));
+        Assert.assertEquals("oio", forkEnvironment.getSystemEnvironmentVariable("toto"));
 
-        forkEnvironment.addSystemEnvironmentVariable("toto", "123", false);
+        forkEnvironment.addSystemEnvironmentVariable("toto", "123");
         Assert.assertEquals(1, forkEnvironment.getSystemEnvironment().size());
         Assert.assertEquals("123", forkEnvironment.getSystemEnvironmentVariable("toto"));
 
-        forkEnvironment.addSystemEnvironmentVariable("tata", "456", false);
+        forkEnvironment.addSystemEnvironmentVariable("tata", "456");
         Assert.assertEquals(2, forkEnvironment.getSystemEnvironment().size());
         Assert.assertFalse(forkEnvironment.getSystemEnvironment() == forkEnvironment.getSystemEnvironment());
 
-        forkEnvironment.addSystemEnvironmentVariable("tata", "789", '#');
-        Assert.assertEquals(2, forkEnvironment.getSystemEnvironment().size());
-        Assert.assertEquals("456#789", forkEnvironment.getSystemEnvironmentVariable("tata"));
-
-        Map<String, String> baseEnv = new HashMap<>();
-        baseEnv.put("tata", "123");
-        baseEnv.put("titi", "#@");
-        baseEnv.put("toto", "eue");
-        ForkEnvironment internalForkEnvironment = new InternalForkEnvironment(forkEnvironment, baseEnv);
-        Assert.assertEquals(3, internalForkEnvironment.getSystemEnvironment().size());
-        Assert.assertEquals("456#789", internalForkEnvironment.getSystemEnvironmentVariable("tata"));
-        Assert.assertEquals("#@", internalForkEnvironment.getSystemEnvironmentVariable("titi"));
+        ForkEnvironment internalForkEnvironment = new InternalForkEnvironment(forkEnvironment);
+        Assert.assertEquals(2, internalForkEnvironment.getSystemEnvironment().size());
+        Assert.assertEquals("456", internalForkEnvironment.getSystemEnvironmentVariable("tata"));
+        Assert.assertEquals(null, internalForkEnvironment.getSystemEnvironmentVariable("titi"));
         Assert.assertEquals("123", internalForkEnvironment.getSystemEnvironmentVariable("toto"));
 
-        internalForkEnvironment.addSystemEnvironmentVariable("titi", "@#", ':');
-        Assert.assertEquals("#@:@#", internalForkEnvironment.getSystemEnvironmentVariable("titi"));
-
         try {
-            internalForkEnvironment.addSystemEnvironmentVariable("toto", null, false);
-            forkEnvironment.addSystemEnvironmentVariable(null, "tata", false);
+            internalForkEnvironment.addSystemEnvironmentVariable("toto", null);
+            forkEnvironment.addSystemEnvironmentVariable(null, "tata");
             throw new RuntimeException(
                     "forkEnvironment.addSystemEnvironmentVariable(null,value) did not throw an IllegalArgumentException");
         } catch (IllegalArgumentException e) {
@@ -181,8 +165,8 @@ public class TestForkEnvironment {
     }
 
     @Test
-    public void testEquality() {
-        InternalForkEnvironment internalForkEnvironment = new InternalForkEnvironment(forkEnvironment, null);
+    public void testEquality() throws ExecutableCreationException {
+        InternalForkEnvironment internalForkEnvironment = new InternalForkEnvironment(forkEnvironment);
         Assert.assertEquals(forkEnvironment.getAdditionalClasspath(),
                 internalForkEnvironment.getAdditionalClasspath());
         Assert.assertEquals(forkEnvironment.getJavaHome(), internalForkEnvironment.getJavaHome());

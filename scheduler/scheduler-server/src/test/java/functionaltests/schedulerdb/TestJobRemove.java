@@ -198,10 +198,11 @@ public class TestJobRemove extends BaseSchedulerDBTest {
             forkEnv.addAdditionalClasspath("compile/lib/ant.jar");
             forkEnv.addJVMArgument("jvmArg1");
             forkEnv.addJVMArgument("jvmArg2");
-            forkEnv.addSystemEnvironmentVariable("e1", "v1", false);
-            forkEnv.addSystemEnvironmentVariable("e2", "v2", true);
-            forkEnv.setEnvScript(
-              new SimpleScript("env script", "javascript", new String[] { "param1", "param2" }));
+            forkEnv.addSystemEnvironmentVariable("e1", "v1");
+            forkEnv.addSystemEnvironmentVariable("e2", "v2");
+            forkEnv.setEnvScript(new SimpleScript("env script", "javascript", new String[] { "param1",
+                    "param2" }));
+
             task2.setForkEnvironment(forkEnv);
             task2.addArgument("arg1", "arg1");
             task2.addArgument("arg2", "arg2");

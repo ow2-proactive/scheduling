@@ -238,13 +238,7 @@ public class TaskData {
 
         if (envModifiers != null) {
             for (EnvironmentModifierData envModifier : envModifiers) {
-                if (envModifier.getAppendChar() != 0) {
-                    forkEnv.addSystemEnvironmentVariable(envModifier.getName(), envModifier.getValue(),
-                            envModifier.getAppendChar());
-                } else {
-                    forkEnv.addSystemEnvironmentVariable(envModifier.getName(), envModifier.getValue(),
-                            envModifier.isAppend());
-                }
+                forkEnv.addSystemEnvironmentVariable(envModifier.getName(), envModifier.getValue());
             }
         }
         if (envScript != null) {
@@ -439,14 +433,16 @@ public class TaskData {
                 taskData.setEnvScript(ScriptData.createForScript(forkEnvironment.getEnvScript()));
             }
 
-            if (forkEnvironment.getPropertyModifiers() != null) {
-                List<PropertyModifier> propertyModifiers =
-                        forkEnvironment.getPropertyModifiers();
-                List<EnvironmentModifierData> envModifiers =
-                        new ArrayList<>(propertyModifiers.size());
+            Map<String, String> systemEnvironment = forkEnvironment.getSystemEnvironment();
 
-                for (PropertyModifier propertyModifier : propertyModifiers) {
-                    envModifiers.add(EnvironmentModifierData.create(propertyModifier, taskData));
+            if (systemEnvironment != null) {
+                List<EnvironmentModifierData> envModifiers =
+                        new ArrayList<>(systemEnvironment.size());
+
+                for (Map.Entry<String, String> entry : systemEnvironment.entrySet()) {
+                    envModifiers.add(
+                            EnvironmentModifierData.create(
+                                    new PropertyModifier(entry.getKey(), entry.getValue()), taskData));
                 }
 
                 taskData.setEnvModifiers(envModifiers);
@@ -518,15 +514,10 @@ public class TaskData {
 
         if (envModifiers != null) {
             for (EnvironmentModifierData envModifier : envModifiers) {
-                if (envModifier.getAppendChar() != 0) {
-                    forkEnv.addSystemEnvironmentVariable(envModifier.getName(), envModifier.getValue(),
-                      envModifier.getAppendChar());
-                } else {
-                    forkEnv.addSystemEnvironmentVariable(envModifier.getName(), envModifier.getValue(),
-                      envModifier.isAppend());
-                }
+                forkEnv.addSystemEnvironmentVariable(envModifier.getName(), envModifier.getValue());
             }
         }
+
         if (envScript != null) {
             forkEnv.setEnvScript(envScript.createSimpleScript());
         }

@@ -192,11 +192,7 @@ javaHome = ## Path to installed java directory, to this path '/bin/java' will be
 sysProps = ## a list of sysProp
 	element SystemEnvironment { sysProp+ }
 sysProp = ## A parameter in the form of key/value pair
-    element variable { attribute name { xsd:string }, attribute value { xsd:string }, sysPropAppend?, sysPropAppendChar? }
-sysPropAppend = ## append or not this property to a previous declared or to the system one
-	attribute append { xsd:boolean | variableRefType }
-sysPropAppendChar = ## append character, if set, append mode is ON
-	attribute appendChar { propertyAppendChar }
+    element variable { attribute name { xsd:string }, attribute value { xsd:string } }
 jvmArgs = ## A list of java properties or options
     element jvmArgs { jvmArg+ }
 jvmArg = ## A list of java properties or options

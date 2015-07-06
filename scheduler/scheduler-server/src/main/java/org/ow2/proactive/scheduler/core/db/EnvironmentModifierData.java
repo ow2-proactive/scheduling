@@ -23,18 +23,12 @@ public class EnvironmentModifierData {
 
     private String value;
 
-    private boolean append;
-
-    private char appendChar;
-
     private TaskData taskData;
 
     static EnvironmentModifierData create(PropertyModifier propertyModifier, TaskData taskData) {
         EnvironmentModifierData data = new EnvironmentModifierData();
         data.setName(propertyModifier.getName());
         data.setValue(propertyModifier.getValue());
-        data.setAppend(propertyModifier.isAppend());
-        data.setAppendChar(propertyModifier.getAppendChar());
         data.setTaskData(taskData);
         return data;
     }
@@ -77,24 +71,6 @@ public class EnvironmentModifierData {
 
     public void setValue(String value) {
         this.value = value;
-    }
-
-    @Column(name = "APPEND")
-    public boolean isAppend() {
-        return append;
-    }
-
-    public void setAppend(boolean append) {
-        this.append = append;
-    }
-
-    @Column(name = "APPEND_CHAR")
-    public char getAppendChar() {
-        return appendChar;
-    }
-
-    public void setAppendChar(char appendChar) {
-        this.appendChar = appendChar;
     }
 
 }

@@ -671,28 +671,7 @@
       <attribute name="value">
         <data type="string"/>
       </attribute>
-      <optional>
-        <ref name="sysPropAppend"/>
-      </optional>
-      <optional>
-        <ref name="sysPropAppendChar"/>
-      </optional>
     </element>
-  </define>
-  <define name="sysPropAppend">
-    <attribute name="append">
-      <doc:documentation>append or not this property to a previous declared or to the system one</doc:documentation>
-      <choice>
-        <data type="boolean"/>
-        <ref name="variableRefType"/>
-      </choice>
-    </attribute>
-  </define>
-  <define name="sysPropAppendChar">
-    <attribute name="appendChar">
-      <doc:documentation>append character, if set, append mode is ON</doc:documentation>
-      <ref name="propertyAppendChar"/>
-    </attribute>
   </define>
   <define name="jvmArgs">
     <element name="jvmArgs">
