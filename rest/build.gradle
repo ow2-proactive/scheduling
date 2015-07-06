@@ -207,7 +207,6 @@ project(':rest:rest-smartproxy') {
     }
 
     task bundle(type: Zip) {
-        print configurations
         from configurations.runtime.allArtifacts.files
         from configurations.runtime
         into (project.name + '-' + project.version + '-bundle')
