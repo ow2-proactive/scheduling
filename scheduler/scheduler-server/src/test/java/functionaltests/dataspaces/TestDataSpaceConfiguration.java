@@ -95,6 +95,8 @@ public class TestDataSpaceConfiguration extends ProActiveTest {
         File spFileWithUserDir = new File(IOSPACE, username);
         spFile.mkdirs();
         spFileWithUserDir.mkdirs();
+        spFileWithUserDir.deleteOnExit();
+        spFile.deleteOnExit();
 
         filesServerIn = new FileSystemServerDeployer("space", IOSPACE, true, true);
         String[] spaceurls = filesServerIn.getVFSRootURLs();
