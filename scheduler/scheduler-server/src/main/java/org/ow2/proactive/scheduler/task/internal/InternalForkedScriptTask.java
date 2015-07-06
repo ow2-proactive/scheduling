@@ -75,7 +75,7 @@ public class InternalForkedScriptTask extends InternalScriptTask {
     @Override
     public TaskLauncher createLauncher(InternalJob job, Node node) throws ActiveObjectCreationException,
             NodeException {
-        logger.info(getTaskInfo().getTaskId(), "creating forked script task launcher");
+        logger.info(getTaskInfo().getTaskId(), "creating forked task launcher");
         TaskLauncher launcher = (TaskLauncher) PAActiveObject.newActive(TaskLauncher.class.getName(),
                 new Object[] { getDefaultTaskLauncherInitializer(job),
                         new ProActiveForkedTaskLauncherFactory() }, node);

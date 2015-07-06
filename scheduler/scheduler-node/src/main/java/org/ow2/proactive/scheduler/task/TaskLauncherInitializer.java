@@ -55,8 +55,8 @@ import org.ow2.proactive.scripting.Script;
 
 
 /**
- * TaskLauncherInitializer is used to initialize the different task launcher.<br>
- * It contains every information that can be used by the launchers. It's a kind of contract
+ * TaskLauncherInitializer is used to initialize the task launcher.<br>
+ * It contains every information that can be used by the launcher. It's a kind of contract
  * so that each launcher must use its required information coming from this class. 
  *
  * @author The ProActive Team
@@ -74,12 +74,6 @@ public class TaskLauncherInitializer implements Serializable {
     private FlowScript flowScript;
     /** The walltime defined for the task (it is considered as defined if it is > 0) */
     private long walltime;
-    /** policy content to be prepared before being sent to node */
-    private String policyContent;
-    /** log4j content to be prepared before being sent to node */
-    private String log4JContent;
-    /** PAConfiguration content to be prepared before being sent to node */
-    private String paConfigContent;
 
     /** replication index: task was replicated in parallel */
     private int replicationIndex = 0;
@@ -90,7 +84,6 @@ public class TaskLauncherInitializer implements Serializable {
     private List<InputSelector> taskInputFiles = null;
     private List<OutputSelector> taskOutputFiles = null;
     private NamingService namingService;
-    private String owner;
     private boolean preciousLogs;
 
     private Map<String, String> variables;
@@ -187,78 +180,6 @@ public class TaskLauncherInitializer implements Serializable {
      */
     public long getWalltime() {
         return walltime;
-    }
-
-    /**
-     * Set the policyContent value to the given policyContent value
-     * 
-     * @param policyContent the policyContent to set
-     */
-    public void setPolicyContent(String policyContent) {
-        this.policyContent = policyContent;
-    }
-
-    /**
-     * Get the policyContent
-     *
-     * @return the policyContent
-     */
-    public String getPolicyContent() {
-        return policyContent;
-    }
-
-    /**
-     * Get the log4JContent
-     *
-     * @return the log4JContent
-     */
-    public String getLog4JContent() {
-        return log4JContent;
-    }
-
-    /**
-     * Set the log4JContent value to the given log4jContent value
-     *
-     * @param log4jContent the log4JContent to set
-     */
-    public void setLog4JContent(String log4jContent) {
-        log4JContent = log4jContent;
-    }
-
-    /**
-     * Get the paConfiguration content
-     *
-     * @return the paConfiguration content
-     */
-    public String getPaConfigContent() {
-        return paConfigContent;
-    }
-
-    /**
-     * Set the paConfiguration content value to the given paConfigContent value
-     *
-     * @param paConfigContent content the paConfigContent to set
-     */
-    public void setPaConfigContent(String paConfigContent) {
-        this.paConfigContent = paConfigContent;
-    }
-
-    /**
-     * Get the owner
-     *
-     * @return the owner
-     */
-    public String getOwner() {
-        return owner;
-    }
-
-    /**
-     * Set the owner value to the given owner value
-     *
-     * @param owner the owner to set
-     */
-    public void setOwner(String owner) {
-        this.owner = owner;
     }
 
     /**

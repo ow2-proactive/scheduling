@@ -36,20 +36,20 @@
  */
 package org.ow2.proactive.scheduler.task.internal;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
-
 import org.ow2.proactive.scheduler.job.InternalJob;
-import org.ow2.proactive.scheduler.task.containers.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.ProActiveNonForkedTaskLauncherFactory;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
+import org.ow2.proactive.scheduler.task.containers.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
 import org.ow2.proactive.scheduler.util.TaskLogger;
 import org.ow2.proactive.scripting.Script;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
 
 
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -77,7 +77,7 @@ public class InternalScriptTask extends InternalTask {
     @Override
     public TaskLauncher createLauncher(InternalJob job, Node node) throws ActiveObjectCreationException,
             NodeException {
-        logger.info(getTaskInfo().getTaskId(), "creating script task launcher");
+        logger.info(getTaskInfo().getTaskId(), "creating non forked task launcher");
         TaskLauncher launcher = (TaskLauncher) PAActiveObject.newActive(TaskLauncher.class.getName(),
                 new Object[] { getDefaultTaskLauncherInitializer(job), new ProActiveNonForkedTaskLauncherFactory()}, node);
         setExecuterInformation(new ExecuterInformation(launcher, node));

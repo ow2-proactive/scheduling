@@ -129,6 +129,9 @@ public class TaskLogger {
     }
 
     public File createFileAppender(File pathToFolder) throws IOException {
+        if (taskLogAppender.getAppender(FILE_APPENDER_NAME) != null) {
+            throw new IllegalStateException("Only one file appender can be created");
+        }
         String logFileName = LOG_FILE_PREFIX + "-" + taskId.getJobId() + "-" + taskId.value() + ".log";
 
         File logFile = new File(pathToFolder, logFileName);

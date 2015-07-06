@@ -84,7 +84,8 @@ public class TaskContext implements Serializable {
     public TaskContext(ExecutableContainer executableContainer, TaskLauncherInitializer initializer,
       TaskResult[] previousTasksResults, String scratchURI, String inputURI, String outputURI, String userURI,
       String globalURI, String progressFilePath, String currentNodeHostname) throws NodeException {
-        this.initializer = initializer; // copy?
+        this.initializer = initializer;
+        initializer.setNamingService(null);
         this.previousTasksResults = previousTasksResults;
         this.scratchURI = scratchURI;
         this.inputURI = inputURI;
@@ -93,7 +94,6 @@ public class TaskContext implements Serializable {
         this.globalURI = globalURI;
         this.progressFilePath = progressFilePath;
         this.schedulerHome = ClasspathUtils.findSchedulerHome();
-        initializer.setNamingService(null);
         this.executableContainer = executableContainer;
 
         nodesURLs = new ArrayList<>();

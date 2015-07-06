@@ -57,7 +57,6 @@ import org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemExcept
 import org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
-import org.ow2.proactive.scheduler.common.exception.TaskAbortedException;
 import org.ow2.proactive.scheduler.common.exception.WalltimeExceededException;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
@@ -73,7 +72,6 @@ import org.ow2.proactive.scheduler.task.utils.Decrypter;
 import org.ow2.proactive.scheduler.task.utils.TaskKiller;
 import org.ow2.proactive.scheduler.task.utils.WallTimer;
 import com.google.common.base.Stopwatch;
-import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
 
@@ -97,7 +95,6 @@ public class TaskLauncher implements InitActive {
     private TaskLogger taskLogger;
     private TaskKiller taskKiller;
     private Decrypter decrypter;
-
     private ProgressFileReader progressFileReader;
 
     /**
@@ -181,8 +178,7 @@ public class TaskLauncher implements InitActive {
             wallTimer.stop();
 
             copyTaskLogsToUserSpace(taskLogFile, dataspaces);
-            FileUtils.deleteQuietly(taskLogFile);
-            taskResult.setLogs(taskLogger.getLogs()); // should it be done when killed or walltimed?
+            taskResult.setLogs(taskLogger.getLogs());
 
             sendResultToScheduler(terminateNotification, taskResult);
         } catch (Throwable taskFailure) {
@@ -219,12 +215,6 @@ public class TaskLauncher implements InitActive {
         return getTaskResult(taskStopwatchForFailures, new WalltimeExceededException(message));
     }
 
-    private TaskResultImpl getAbortedTaskResult(Stopwatch taskStopwatchForFailures) {
-        String message = "Task " + taskId.getReadableName() + " has been killed";
-
-        return getTaskResult(taskStopwatchForFailures, new TaskAbortedException(message));
-    }
-
     private TaskResultImpl getTaskResult(Stopwatch taskStopwatchForFailures, SchedulerException exception) {
         taskLogger.getErrorSink().println(exception.getMessage());
 
@@ -252,7 +242,7 @@ public class TaskLauncher implements InitActive {
     }
 
     private File getTaskWorkingDir(TaskContext taskContext, TaskDataspaces dataspaces) throws Exception {
-        File workingDir = dataspaces.getScratchFolder(); // hack for native working dir
+        File workingDir = dataspaces.getScratchFolder();
         if (taskContext.getInitializer().getForkEnvironment() != null) {
             String workingDirPath = taskContext.getInitializer().getForkEnvironment().getWorkingDir();
             if (workingDirPath != null) {
@@ -307,7 +297,7 @@ public class TaskLauncher implements InitActive {
         keyGen = KeyPairGenerator.getInstance("RSA");
         keyGen.initialize(1024, new SecureRandom());
         KeyPair keyPair = keyGen.generateKeyPair();
-        decrypter = new Decrypter(keyPair.getPrivate()); // in constructor?
+        decrypter = new Decrypter(keyPair.getPrivate());
         return keyPair.getPublic();
     }
 
