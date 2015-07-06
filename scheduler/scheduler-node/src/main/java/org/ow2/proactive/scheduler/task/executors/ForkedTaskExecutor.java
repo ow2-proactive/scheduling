@@ -50,9 +50,9 @@ import org.objectweb.proactive.extensions.processbuilder.OSProcessBuilder;
 import org.objectweb.proactive.extensions.processbuilder.exception.NotImplementedException;
 import org.ow2.proactive.resourcemanager.utils.OneJar;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
-import org.ow2.proactive.scheduler.task.exceptions.ForkedJvmProcessException;
 import org.ow2.proactive.scheduler.task.TaskContext;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
+import org.ow2.proactive.scheduler.task.exceptions.ForkedJvmProcessException;
 import org.ow2.proactive.scheduler.task.utils.Decrypter;
 import org.ow2.proactive.scheduler.task.utils.ForkerUtils;
 import org.ow2.proactive.scheduler.task.utils.ProcessStreamsReader;
@@ -74,8 +74,12 @@ public class ForkedTaskExecutor implements TaskExecutor {
 
     private static final String FORK_ENVIRONMENT_BINDING_NAME = "forkEnvironment";
 
-    private File workingDir;
-    private Decrypter decrypter;
+    private final File workingDir;
+    private final Decrypter decrypter;
+
+    public ForkedTaskExecutor(File workingDir) {
+        this(workingDir, null);
+    }
 
     public ForkedTaskExecutor(File workingDir, Decrypter decrypter) {
         this.workingDir = workingDir;

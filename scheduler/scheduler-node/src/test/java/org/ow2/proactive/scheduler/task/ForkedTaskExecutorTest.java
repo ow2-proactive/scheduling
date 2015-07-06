@@ -36,7 +36,7 @@ public class ForkedTaskExecutorTest {
     public void result_and_variables() throws Throwable {
         TestTaskOutput taskOutput = new TestTaskOutput();
 
-        ForkedTaskExecutor taskExecutor = new ForkedTaskExecutor(tmpFolder.newFolder(), null);
+        ForkedTaskExecutor taskExecutor = new ForkedTaskExecutor(tmpFolder.newFolder());
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
         initializer.setTaskId((TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false)));
@@ -55,7 +55,7 @@ public class ForkedTaskExecutorTest {
     public void failToSerialize() throws Throwable {
         TestTaskOutput taskOutput = new TestTaskOutput();
 
-        ForkedTaskExecutor taskExecutor = new ForkedTaskExecutor(new File("non_existing_folder"), null);
+        ForkedTaskExecutor taskExecutor = new ForkedTaskExecutor(new File("non_existing_folder"));
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
         initializer.setTaskId((TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false)));
@@ -72,7 +72,7 @@ public class ForkedTaskExecutorTest {
         System.setProperty("java.home", "does not exist");
         TestTaskOutput taskOutput = new TestTaskOutput();
 
-        ForkedTaskExecutor taskExecutor = new ForkedTaskExecutor(new File("non_existing_folder"), null);
+        ForkedTaskExecutor taskExecutor = new ForkedTaskExecutor(new File("non_existing_folder"));
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
         initializer.setTaskId((TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false)));
@@ -113,7 +113,7 @@ public class ForkedTaskExecutorTest {
 
         File workingDir = tmpFolder.newFolder();
 
-        ForkedTaskExecutor taskExecutor = new ForkedTaskExecutor(workingDir, null);
+        ForkedTaskExecutor taskExecutor = new ForkedTaskExecutor(workingDir);
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
         initializer.setTaskId((TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false)));
@@ -138,7 +138,7 @@ public class ForkedTaskExecutorTest {
 
         File workingDir = tmpFolder.newFolder();
 
-        ForkedTaskExecutor taskExecutor = new ForkedTaskExecutor(workingDir, null);
+        ForkedTaskExecutor taskExecutor = new ForkedTaskExecutor(workingDir);
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
         initializer.setTaskId((TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false)));
