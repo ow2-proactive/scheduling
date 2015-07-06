@@ -26,12 +26,12 @@ public class TaskLoggerTest {
         assertEquals("", taskLogger.getLogs().getAllLogs(false));
 
         taskLogger.getOutputSink().println("hello");
-        assertEquals("hello\n", taskLogger.getLogs().getAllLogs(false));
-        assertEquals("hello\n", taskLogger.getLogs().getStdoutLogs(false));
+        assertEquals(String.format("hello%n"), taskLogger.getLogs().getAllLogs(false));
+        assertEquals(String.format("hello%n"), taskLogger.getLogs().getStdoutLogs(false));
 
         taskLogger.getErrorSink().println("error");
-        assertEquals("hello\nerror\n", taskLogger.getLogs().getAllLogs(false));
-        assertEquals("error\n", taskLogger.getLogs().getStderrLogs(false));
+        assertEquals(String.format("hello%nerror%n"), taskLogger.getLogs().getAllLogs(false));
+        assertEquals(String.format("error%n"), taskLogger.getLogs().getStderrLogs(false));
     }
 
     @Test
@@ -81,7 +81,7 @@ public class TaskLoggerTest {
         taskLogger.getOutputSink().println("hello");
 
         taskLogger.getStoredLogs(stringAppenderProvider);
-        assertEquals("hello\n", stringAppender.toString());
+        assertEquals(String.format("hello%n"), stringAppender.toString());
     }
 
     @Test
@@ -93,11 +93,11 @@ public class TaskLoggerTest {
 
         taskLogger.getOutputSink().println("hello");
         assertTrue(taskLogger.getLogs().getAllLogs(true)
-                .matches("\\[42@myhost;[0-9][0-9]:[0-9][0-9]:[0-9][0-9]\\] hello \n"));
+                .matches("\\[42@myhost;[0-9][0-9]:[0-9][0-9]:[0-9][0-9]\\] hello \r?\n"));
 
         taskLogger.getErrorSink().println("error");
         assertTrue(taskLogger.getLogs().getStderrLogs(true)
-                .matches("\\[42@myhost;[0-9][0-9]:[0-9][0-9]:[0-9][0-9]\\] error \n"));
+                .matches("\\[42@myhost;[0-9][0-9]:[0-9][0-9]:[0-9][0-9]\\] error \r?\n"));
 
     }
 }

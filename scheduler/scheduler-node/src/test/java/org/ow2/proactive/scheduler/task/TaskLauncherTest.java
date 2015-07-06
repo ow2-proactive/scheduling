@@ -48,7 +48,7 @@ public class TaskLauncherTest {
     @Test
     public void simpleTask() throws Throwable {
         ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(
-          new TaskScript(new SimpleScript("print('hello'); result='hello'", "groovy")));
+                new TaskScript(new SimpleScript("print('hello'); result='hello'", "groovy")));
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
 
@@ -60,7 +60,7 @@ public class TaskLauncherTest {
         TaskResult taskResult = runTaskLauncher(taskLauncher, executableContainer);
 
         assertEquals("hello", taskResult.value());
-        assertEquals("prehellopost\n", taskResult.getOutput().getAllLogs(false));
+        assertEquals(String.format("prehellopost%n"), taskResult.getOutput().getAllLogs(false));
     }
 
     @Test
@@ -117,32 +117,34 @@ public class TaskLauncherTest {
 
         TaskResult taskResult = runTaskLauncher(taskLauncher, executableContainer);
 
-        assertEquals("r00t\n", taskResult.getOutput().getAllLogs(false));
+        assertEquals(String.format("r00t%n"), taskResult.getOutput().getAllLogs(false));
     }
 
     @Test
     public void nativeTask_WorkingDir() throws Throwable {
+        String tempFolder = tmpFolder.newFolder().getAbsolutePath();
         ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(
-          new TaskScript(new SimpleScript("pwd", "native")));
+                new TaskScript(new SimpleScript(pwdCommand(), "native")));
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
-        initializer.setForkEnvironment(new ForkEnvironment("/tmp"));
+        initializer.setForkEnvironment(new ForkEnvironment(tempFolder));
 
         initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false));
 
         TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer, new TestTaskLauncherFactory());
         TaskResult taskResult = runTaskLauncher(taskLauncher, executableContainer);
 
-        assertEquals("/tmp\n", taskResult.getOutput().getAllLogs(false));
+        assertEquals(String.format("%s%n", tempFolder), taskResult.getOutput().getAllLogs(false));
     }
 
     @Test
     public void nativeTask_WorkingDir_WithVariableReplacement() throws Throwable {
+        String tempFolder = tmpFolder.newFolder().getAbsolutePath();
         ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(
-          new TaskScript(new SimpleScript("pwd", "native")));
+                new TaskScript(new SimpleScript(pwdCommand(), "native")));
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
-        initializer.setVariables(singletonMap("folder", "/tmp"));
+        initializer.setVariables(singletonMap("folder", tempFolder));
         initializer.setForkEnvironment(new ForkEnvironment("$folder"));
 
         initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false));
@@ -150,13 +152,21 @@ public class TaskLauncherTest {
         TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer, new TestTaskLauncherFactory());
         TaskResult taskResult = runTaskLauncher(taskLauncher, executableContainer);
 
-        assertEquals("/tmp\n", taskResult.getOutput().getAllLogs(false));
+        assertEquals(String.format("%s%n", tempFolder), taskResult.getOutput().getAllLogs(false));
+    }
+
+    private String pwdCommand() {
+        if (System.getProperty("os.name").contains("Windows")) {
+            return "cmd.exe /c cd ,";
+        } else {
+            return "pwd";
+        }
     }
 
     @Test
     public void taskLogsAreCopiedToUserSpace() throws Exception {
         ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(
-          new TaskScript(new SimpleScript("print('hello'); result='hello'", "groovy")));
+                new TaskScript(new SimpleScript("print('hello'); result='hello'", "groovy")));
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
 
@@ -166,7 +176,7 @@ public class TaskLauncherTest {
         final TaskDataspaces dataspacesMock = mock(TaskDataspaces.class);
         when(dataspacesMock.getScratchFolder()).thenReturn(tmpFolder.newFolder());
 
-        TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer, new TestTaskLauncherFactory(){
+        TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer, new TestTaskLauncherFactory() {
 
             @Override
             public TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService) {

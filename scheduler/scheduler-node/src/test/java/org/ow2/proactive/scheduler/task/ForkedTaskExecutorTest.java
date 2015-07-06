@@ -45,7 +45,7 @@ public class ForkedTaskExecutorTest {
             new TaskScript(new SimpleScript("print('hello'); variables.put('var','foo'); result='hello'",
                 "javascript"))), initializer), taskOutput.outputStream, taskOutput.error);
 
-        assertEquals("hello\n", taskOutput.output());
+        assertEquals(String.format("hello%n"), taskOutput.output());
         assertEquals("hello", result.value());
         assertEquals("foo",
                 SerializationUtil.deserializeVariableMap(result.getPropagatedVariables()).get("var"));
@@ -128,7 +128,7 @@ public class ForkedTaskExecutorTest {
                 + "println new File('.').getAbsolutePath()", "groovy"))), initializer),
                 taskOutput.outputStream, taskOutput.error);
 
-        assertEquals("envValue\njvmValue\n" + new File(workingDir, ".").getAbsolutePath() + "\n",
+        assertEquals(String.format("envValue%njvmValue%n%s%n", new File(workingDir, ".").getAbsolutePath()),
                 taskOutput.output());
     }
 

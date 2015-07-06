@@ -56,7 +56,7 @@ public class InProcessTaskExecutorTest {
               new SimpleScript("println('hello'); java.lang.Thread.sleep(5); result='hello'", "groovy"))),
             initializer), taskOutput.outputStream, taskOutput.error);
 
-        assertEquals("pre\nhello\npost\n", taskOutput.output());
+        assertEquals(String.format("pre%nhello%npost%n"), taskOutput.output());
         assertEquals("hello", result.value());
         assertTrue("Task duration should be at least 5", result.getTaskDuration() >= 5);
     }
@@ -299,7 +299,7 @@ public class InProcessTaskExecutorTest {
         taskContext.setDecrypter(decrypter);
         new InProcessTaskExecutor().execute(taskContext, taskOutput.outputStream, taskOutput.error);
 
-        assertEquals("p4ssw0rd1000\np4ssw0rd1000\np4ssw0rd1000\n", taskOutput.output()); // pre, task and post
+        assertEquals(String.format("p4ssw0rd1000%np4ssw0rd1000%np4ssw0rd1000%n"), taskOutput.output()); // pre, task and post
     }
 
     @Test
@@ -333,7 +333,7 @@ public class InProcessTaskExecutorTest {
           taskOutput.error);
 
         assertTaskResultOk(taskResult);
-        assertEquals("thisHost\ndummyhost\n", taskOutput.output());
+        assertEquals(String.format("thisHost%ndummyhost%n"), taskOutput.output());
     }
 
     private NodeSet mockedNodeSet() {
