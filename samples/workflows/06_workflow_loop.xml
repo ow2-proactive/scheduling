@@ -13,7 +13,7 @@
                 <script >
                     <code language="javascript">
                         <![CDATA[
-print('Loop block start ' + java.lang.System.getProperty('PA_TASK_ITERATION'))
+print('Loop block start ' + variables.get('PA_TASK_ITERATION'))
 ]]>
                     </code>
                 </script>
@@ -28,7 +28,7 @@ print('Loop block start ' + java.lang.System.getProperty('PA_TASK_ITERATION'))
                 <script >
                     <code language="javascript">
                         <![CDATA[
-print('Loop block end ' + java.lang.System.getProperty('PA_TASK_ITERATION'))
+print('Loop block end ' + variables.get('PA_TASK_ITERATION'))
 ]]>
                     </code>
                 </script>
@@ -38,7 +38,7 @@ print('Loop block end ' + java.lang.System.getProperty('PA_TASK_ITERATION'))
                     <script >
                         <code language="javascript">
                             <![CDATA[
-if($IT < 5) {
+if(variables.get('PA_TASK_ITERATION') < 5) {
     loop = true;
 } else {
     loop = false;

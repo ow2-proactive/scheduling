@@ -44,7 +44,7 @@ runs=2
                 <script>
                     <code language="groovy">
                         <![CDATA[
-int replication = Integer.parseInt(System.getProperty('PA_TASK_REPLICATION'))
+int replication = variables.get('PA_TASK_REPLICATION')
 input = results[0].value()[replication]
 result = input.toUpperCase()
 ]]>
