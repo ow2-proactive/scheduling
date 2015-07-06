@@ -222,6 +222,10 @@ public abstract class TWorkflowJobs extends SchedulerConsecutive {
      */
     public void testJob(String jobPath, Map<String, Long> expectedResults,
             Map<String, Set<String>> expectedDependences) throws Throwable {
+
+        SchedulerTHelper.startScheduler(new File(SchedulerTHelper.class.getResource(
+          "config/scheduler-nonforkedscripttasks.ini").toURI()).getAbsolutePath());
+
         List<String> skip = new ArrayList<String>();
         for (Entry<String, Long> er : expectedResults.entrySet()) {
             if (er.getValue() < 0) {

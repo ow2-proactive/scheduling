@@ -112,6 +112,8 @@ public class TRepJobs extends SchedulerConsecutive {
     }
 
     void testJobs(TRepCase... testCases) throws Throwable {
+        SchedulerTHelper.startScheduler(new File(SchedulerTHelper.class.getResource(
+          "config/scheduler-nonforkedscripttasks.ini").toURI()).getAbsolutePath());
         for (TRepCase tcase : testCases) {
             String path = new File(TWorkflowJobs.class.getResource(tcase.jobPath).toURI()).getAbsolutePath();
             Job job = JobFactory.getFactory().createJob(path);
