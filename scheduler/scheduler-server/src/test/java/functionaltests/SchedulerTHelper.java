@@ -81,12 +81,13 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.utils.FileUtils;
+import org.apache.log4j.Level;
+import org.junit.Assert;
+
 import functionaltests.common.CommonTUtils;
 import functionaltests.common.InputStreamReaderThread;
 import functionaltests.monitor.MonitorEventReceiver;
 import functionaltests.monitor.SchedulerMonitorsHandler;
-import org.apache.log4j.Level;
-import org.junit.Assert;
 
 
 /**
@@ -226,7 +227,7 @@ public class SchedulerTHelper {
         }
         cleanTMP();
 
-        List<String> commandLine = new ArrayList<String>();
+        List<String> commandLine = new ArrayList<>();
         commandLine.add(System.getProperty("java.home") + File.separator + "bin" + File.separator + "java");
         commandLine.add("-Djava.security.manager");
         //commandLine.add("-agentlib:jdwp=transport=dt_socket,server=y,address=9009,suspend=y");
@@ -269,6 +270,7 @@ public class SchedulerTHelper {
 
         commandLine.add("-cp");
         commandLine.add(testClasspath());
+        commandLine.add("-Djava.library.path=" + System.getProperty("java.library.path"));
         commandLine.add(CentralPAPropertyRepository.PA_TEST.getCmdLine() + "true");
         commandLine.add(SchedulerTStarter.class.getName());
         commandLine.add(String.valueOf(localnodes));
@@ -286,7 +288,7 @@ public class SchedulerTHelper {
         schedulerProcess = processBuilder.start();
 
         InputStreamReaderThread outputReader = new InputStreamReaderThread(schedulerProcess.getInputStream(),
-            "[Scheduler VM output]: ");
+            "[Scheduler output]: ");
         outputReader.start();
 
         System.out.println("Waiting for the Scheduler using URL: " + schedulerUrl);
@@ -555,7 +557,6 @@ public class SchedulerTHelper {
 
     /**
      * Kills a job
-     * @param jobId
      * @return success or failure at killing the job
      * @throws Exception
      */
@@ -805,8 +806,8 @@ public class SchedulerTHelper {
         log("Job submitted, id " + id.toString());
 
         log("Waiting for jobSubmitted");
-        JobState receivedstate = SchedulerTHelper.waitForEventJobSubmitted(id);
-        Assert.assertEquals(id, receivedstate.getId());
+        JobState receivedState = SchedulerTHelper.waitForEventJobSubmitted(id);
+        Assert.assertEquals(id, receivedState.getId());
 
         log("Waiting for job running");
         JobInfo jInfo = SchedulerTHelper.waitForEventJobRunning(id);

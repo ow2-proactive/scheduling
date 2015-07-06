@@ -90,29 +90,20 @@ public class LocalInfrastructure extends InfrastructureManager {
         CommandLineBuilder clb = this.getDefaultCommandLineBuilder(os);
         //RM_Home set in bin/unix/env script
         clb.setRmHome(rmHome);
-        ArrayList<String> paPropList = new ArrayList<String>();
+        ArrayList<String> paPropList = new ArrayList<>();
         if (!this.paProperties.contains(CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getName())) {
             paPropList.add(CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getCmdLine() + rmHome + "config" +
                 os.fs + "security.java.policy-client");
         }
-//        if (!this.paProperties.contains(CentralPAPropertyRepository.LOG4J.getName())) {
-//            StringBuilder sb = new StringBuilder(CentralPAPropertyRepository.LOG4J.getCmdLine());
-//
-//            // log4j only understands urls
-//            try {
-//                sb.append((new File(rmHome)).toURI().toURL().toString()).append("config").append("/").append(
-//                        "log").append("/").append("node.properties");
-//            } catch (MalformedURLException e) {
-//                throw new IllegalStateException(e);
-//            }
-//            paPropList.add(sb.toString());
-//        }
         if (!this.paProperties.contains(CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getName())) {
             paPropList.add(CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getCmdLine() + rmHome +
                 "config" + os.fs + "network" + os.fs + "node.ini");
         }
         if (!this.paProperties.contains(PAResourceManagerProperties.RM_HOME.getKey())) {
             paPropList.add(PAResourceManagerProperties.RM_HOME.getCmdLine() + rmHome);
+        }
+        if (!this.paProperties.contains("java.library.path")) {
+            paPropList.add("-Djava.library.path=" + System.getProperty("java.library.path"));
         }
         if (!paProperties.isEmpty()) {
             Collections.addAll(paPropList, this.paProperties.split(" "));
@@ -232,9 +223,9 @@ public class LocalInfrastructure extends InfrastructureManager {
      */
     @Override
     protected void configure(Object... args) {
-        this.isDeployingNodeLost = new Hashtable<String, Boolean>();
-        this.nodeNameToProcess = new Hashtable<String, ProcessExecutor>();
-        this.isNodeAcquired = new Hashtable<String, Boolean>();
+        this.isDeployingNodeLost = new Hashtable<>();
+        this.nodeNameToProcess = new Hashtable<>();
+        this.isNodeAcquired = new Hashtable<>();
         int index = 0;
         try {
             this.credentials = Credentials.getCredentialsBase64((byte[]) args[index++]);

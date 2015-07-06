@@ -243,7 +243,7 @@ public class RMTHelper {
             ExecutionException, InterruptedException {
 
         ExecutorService executorService = Executors.newFixedThreadPool(number);
-        ArrayList<Future<TNode>> futureNodes = new ArrayList<Future<TNode>>(number);
+        ArrayList<Future<TNode>> futureNodes = new ArrayList<>(number);
         for (int i = 0; i < number; i++) {
             final int index = i;
             futureNodes.add(executorService.submit(new Callable<TNode>() {
@@ -259,7 +259,7 @@ public class RMTHelper {
             }));
         }
 
-        ArrayList nodes = new ArrayList(number);
+        ArrayList<TNode> nodes = new ArrayList<>(number);
         for (int i = 0; i < number; i++) {
             nodes.add(futureNodes.get(i).get());
         }
@@ -272,7 +272,7 @@ public class RMTHelper {
     }
 
     public void createNodeSource(int rmiPort, int nodesNumber, List<String> vmOptions) throws Exception {
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put(CentralPAPropertyRepository.PA_RMI_PORT.getName(), String.valueOf(rmiPort));
         map
                 .put(CentralPAPropertyRepository.PA_HOME.getName(), CentralPAPropertyRepository.PA_HOME
@@ -359,10 +359,10 @@ public class RMTHelper {
             new org.objectweb.proactive.core.process.AbstractExternalProcess.StandardOutputMessageLogger());
         nodeProcess.setClassname(className);
 
-        ArrayList<String> jvmParameters = new ArrayList<String>();
+        ArrayList<String> jvmParameters = new ArrayList<>();
 
         if (vmParameters == null) {
-            vmParameters = new HashMap<String, String>();
+            vmParameters = new HashMap<>();
         }
 
         if (!vmParameters.containsKey(CentralPAPropertyRepository.PA_RMI_PORT.getName())) {
@@ -406,7 +406,7 @@ public class RMTHelper {
         }
         PAResourceManagerProperties.updateProperties(configurationFile);
 
-        List<String> commandLine = new ArrayList<String>();
+        List<String> commandLine = new ArrayList<>();
         commandLine.add(System.getProperty("java.home") + File.separator + "bin" + File.separator + "java");
         commandLine.add("-Djava.security.manager");
 
@@ -435,6 +435,7 @@ public class RMTHelper {
 
         commandLine.add("-cp");
         commandLine.add(testClasspath());
+        commandLine.add("-Djava.library.path=" + System.getProperty("java.library.path"));
         commandLine.add(CentralPAPropertyRepository.PA_TEST.getCmdLine() + "true");
         commandLine.add("-Djava.awt.headless=true"); // For Mac builds
         commandLine.add(CentralPAPropertyRepository.PA_RMI_PORT.getCmdLine() + rmiPort);
@@ -448,7 +449,7 @@ public class RMTHelper {
         rmProcess = processBuilder.start();
 
         InputStreamReaderThread outputReader = new InputStreamReaderThread(rmProcess.getInputStream(),
-            "[RM VM output]: ");
+            "[RM output]: ");
         outputReader.start();
 
         String url = getLocalUrl(rmiPort);
@@ -474,22 +475,8 @@ public class RMTHelper {
      * @return list of ProActive Nodes
      */
     public List<Node> listAliveNodes() throws Exception {
-        ArrayList<Node> nodes = new ArrayList<Node>();
+        ArrayList<Node> nodes = new ArrayList<>();
         Set<String> urls = getResourceManager().listAliveNodeUrls();
-        for (String url : urls) {
-            nodes.add(NodeFactory.getNode(url));
-        }
-        return nodes;
-    }
-
-    /**
-     * Returns the alive Nodes accessible by the RM in the given node sources
-     * @param  nodeSourceNames
-     * @return list of ProActive Nodes
-     */
-    public List<Node> listAliveNodes(Set<String> nodeSourceNames) throws Exception {
-        ArrayList<Node> nodes = new ArrayList<Node>();
-        Set<String> urls = getResourceManager().listAliveNodeUrls(nodeSourceNames);
         for (String url : urls) {
             nodes.add(NodeFactory.getNode(url));
         }
@@ -502,15 +489,6 @@ public class RMTHelper {
      */
     public Set<String> listAliveNodesUrls() throws Exception {
         return getResourceManager().listAliveNodeUrls();
-    }
-
-    /**
-     * Returns the list of alive Nodes in the given nodeSources
-     * @param nodeSourceNames
-     * @return list of ProActive Nodes urls
-     */
-    public Set<String> listAliveNodesUrls(Set<String> nodeSourceNames) throws Exception {
-        return getResourceManager().listAliveNodeUrls(nodeSourceNames);
     }
 
     /**
@@ -541,33 +519,6 @@ public class RMTHelper {
         auth = null;
         resourceManager = null;
         eventReceiver = null;
-    }
-
-    /**
-     * Wait for an event regarding Scheduler state : started, resumed, stopped...
-     * If a corresponding event has been already thrown by scheduler, returns immediately,
-     * otherwise wait for reception of the corresponding event.
-     * @param event awaited event.
-     */
-    public void waitForRMStateEvent(RMEventType event) {
-        try {
-            waitForRMStateEvent(event, 0);
-        } catch (ProActiveTimeoutException e) {
-            //unreachable block, 0 means infinite, no timeout
-            //log sthing ?
-        }
-    }
-
-    /**
-     * Wait for an event regarding RM state : started, resumed, stopped...
-     * If a corresponding event has been already thrown by scheduler, returns immediately,
-     * otherwise wait for reception of the corresponding event.
-     * @param eventType awaited event.
-     * @param timeout in milliseconds
-     * @throws ProActiveTimeoutException if timeout is reached
-     */
-    public void waitForRMStateEvent(RMEventType eventType, long timeout) throws ProActiveTimeoutException {
-        getMonitorsHandler().waitForRMStateEvent(eventType, timeout);
     }
 
     /**
@@ -689,7 +640,7 @@ public class RMTHelper {
             */
             System.out.println("Initializing new event receiver");
             RMMonitorEventReceiver passiveEventReceiver = new RMMonitorEventReceiver(mHandler);
-            eventReceiver = (RMMonitorEventReceiver) PAActiveObject.turnActive(passiveEventReceiver);
+            eventReceiver = PAActiveObject.turnActive(passiveEventReceiver);
             PAFuture.waitFor(resourceManager.getMonitoring().addRMEventListener(eventReceiver));
         }
     }
