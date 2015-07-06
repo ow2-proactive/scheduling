@@ -135,7 +135,8 @@ public class TaskLogger {
         FileUtils.touch(logFile);
         logFile.setWritable(true, false);
 
-        FileAppender fap = new FileAppender(Log4JTaskLogs.getTaskLogLayout(), logFile.getAbsolutePath(), false);
+        FileAppender fap = new FileAppender(Log4JTaskLogs.getTaskLogLayout(), logFile.getAbsolutePath(),
+            false);
         fap.setName(FILE_APPENDER_NAME);
         taskLogAppender.addAppender(fap);
 
@@ -204,7 +205,7 @@ public class TaskLogger {
         synchronized (this.loggersFinalized) {
             if (!loggersFinalized.get()) {
                 logger.debug("Terminating loggers for task " + this.taskId + " (" + taskId.getReadableName() +
-                  ")" + "...");
+                    ")" + "...");
                 this.flushStreams();
 
                 this.loggersFinalized.set(true);
@@ -223,7 +224,9 @@ public class TaskLogger {
 
     private void removeTaskLogFile() {
         FileAppender fileAppender = (FileAppender) taskLogAppender.getAppender(FILE_APPENDER_NAME);
-        FileUtils.deleteQuietly(new File(fileAppender.getFile()));
+        if (fileAppender != null && fileAppender.getFile() != null) {
+            FileUtils.deleteQuietly(new File(fileAppender.getFile()));
+        }
     }
 
     private void flushStreams() {

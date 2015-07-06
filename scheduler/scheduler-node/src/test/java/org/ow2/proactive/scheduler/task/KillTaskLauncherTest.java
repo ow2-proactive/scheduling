@@ -6,7 +6,6 @@ import java.util.concurrent.Semaphore;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
-import org.ow2.proactive.scheduler.common.exception.TaskAbortedException;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
@@ -16,7 +15,7 @@ import org.ow2.proactive.scripting.TaskScript;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 
 public class KillTaskLauncherTest {
@@ -29,55 +28,76 @@ public class KillTaskLauncherTest {
     @Test(timeout = 5000)
     public void kill_while_sleeping_in_task() throws Exception {
 
-        final ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(
-            new TaskScript(new SimpleScript("java.lang.Thread.sleep(10000)", "javascript")));
+        final ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(new TaskScript(
+            new SimpleScript("java.lang.Thread.sleep(10000)", "javascript")));
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
         initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false));
 
         Semaphore taskRunning = new Semaphore(0);
 
-        final TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer, new TestTaskLauncherFactory(taskRunning));
+        final TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer,
+          new TestTaskLauncherFactory(taskRunning));
         final TaskLauncher taskLauncherPA = PAActiveObject.turnActive(taskLauncher);
 
-        TaskResultWaiter taskResultWaiter = new TaskResultWaiter();
-        Thread launchTaskInBackground = runTaskLauncher(executableContainer, taskLauncherPA, taskResultWaiter);
+        taskLauncherPA.doTask(executableContainer, null, null);
 
         taskRunning.acquire();
-        taskLauncher.terminate(false);
+        taskLauncherPA.terminate(false);
 
-        launchTaskInBackground.join();
-        assertEquals(TaskAbortedException.class, taskResultWaiter.getTaskResult().getException().getClass());
+        assertTaskLauncherIsTerminated(taskLauncherPA);
     }
 
     @Test(timeout = 5000)
     public void kill_while_looping_in_task() throws Exception {
 
-        final ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(
-          new TaskScript(new SimpleScript("for(;;){}", "javascript")));
+        final ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(new TaskScript(
+            new SimpleScript("for(;;){}", "javascript")));
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
         initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false));
 
         Semaphore taskRunning = new Semaphore(0);
-        final TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer, new TestTaskLauncherFactory(taskRunning));
+        final TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer, new TestTaskLauncherFactory(
+          taskRunning));
+        final TaskLauncher taskLauncherPA = PAActiveObject.turnActive(taskLauncher);
+
+        taskLauncherPA.doTask(executableContainer, null, null);
+
+        taskRunning.acquire();
+        taskLauncherPA.terminate(false);
+
+        assertTaskLauncherIsTerminated(taskLauncherPA);
+    }
+
+    @Test(timeout = 5000)
+    public void finished_but_terminate_not_called_back() throws Throwable {
+
+        final ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(new TaskScript(
+            new SimpleScript("result='done'", "javascript")));
+
+        TaskLauncherInitializer initializer = new TaskLauncherInitializer();
+        initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false));
+
+        final TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer, new TestTaskLauncherFactory(
+            new Semaphore(0)));
         final TaskLauncher taskLauncherPA = PAActiveObject.turnActive(taskLauncher);
 
         TaskResultWaiter taskResultWaiter = new TaskResultWaiter();
-        Thread launchTaskInBackground = runTaskLauncher(executableContainer, taskLauncherPA, taskResultWaiter);
+        WaitForResultNotification waitForResultNotification = new WaitForResultNotification(taskResultWaiter);
+        waitForResultNotification = PAActiveObject.turnActive(waitForResultNotification);
+        taskLauncherPA.doTask(executableContainer, null, waitForResultNotification);
 
-        taskRunning.acquire();
-        taskLauncher.terminate(false);
+        assertEquals("done", taskResultWaiter.getTaskResult().value());
 
-        launchTaskInBackground.join();
-        assertEquals(TaskAbortedException.class, taskResultWaiter.getTaskResult().getException().getClass());
+        assertTaskLauncherIsTerminated(taskLauncherPA);
     }
 
     @Test(timeout = 5000)
     public void kill_when_finished() throws Throwable {
 
-        final ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(
-          new TaskScript(new SimpleScript("result='done'", "javascript")));
+        final ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(new TaskScript(
+          new SimpleScript("result='done'", "javascript")));
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
         initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false));
@@ -87,54 +107,73 @@ public class KillTaskLauncherTest {
         final TaskLauncher taskLauncherPA = PAActiveObject.turnActive(taskLauncher);
 
         TaskResultWaiter taskResultWaiter = new TaskResultWaiter();
-        Thread launchTaskInBackground = runTaskLauncher(executableContainer, taskLauncherPA, taskResultWaiter);
-
-        launchTaskInBackground.join();
-        taskLauncher.terminate(false);
+        WaitForResultNotification waitForResultNotification = new WaitForResultNotification(taskResultWaiter);
+        waitForResultNotification = PAActiveObject.turnActive(waitForResultNotification);
+        taskLauncherPA.doTask(executableContainer, null, waitForResultNotification);
 
         assertEquals("done", taskResultWaiter.getTaskResult().value());
+
+        taskLauncherPA.terminate(false);
+
+        assertTaskLauncherIsTerminated(taskLauncherPA);
     }
+
+//    @Test(timeout = 5000)
+//    public void normal() throws Throwable {
+//
+//        final ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(new TaskScript(
+//          new SimpleScript("result='done'", "javascript")));
+//
+//        TaskLauncherInitializer initializer = new TaskLauncherInitializer();
+//        initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false));
+//
+//        final TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer, new TestTaskLauncherFactory(
+//          new Semaphore(0)));
+//        final TaskLauncher taskLauncherPA = PAActiveObject.turnActive(taskLauncher);
+//
+//        TaskResultWaiter taskResultWaiter = new TaskResultWaiter();
+//        WaitForResultNotification waitForResultNotification = new WaitForResultNotification(taskResultWaiter);
+//        waitForResultNotification = PAActiveObject.turnActive(waitForResultNotification);
+//        taskLauncherPA.doTask(executableContainer, null, waitForResultNotification);
+//
+//        assertEquals("done", taskResultWaiter.getTaskResult().value());
+//
+//        Thread.sleep(1000);
+//        taskLauncherPA.terminate(true);
+//
+//        assertTaskLauncherIsTerminated(taskLauncherPA);
+//    }
 
     @Test(timeout = 5000)
     public void kill_when_copying() throws Throwable {
 
-        final ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(
-          new TaskScript(new SimpleScript("result='done'", "javascript")));
+        final ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(new TaskScript(
+            new SimpleScript("result='done'", "javascript")));
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
         initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false));
 
         Semaphore taskRunning = new Semaphore(0);
-        final TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer, new SlowDataspacesTaskLauncherFactory(taskRunning));
+        final TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer,
+                new SlowDataspacesTaskLauncherFactory(taskRunning));
         final TaskLauncher taskLauncherPA = PAActiveObject.turnActive(taskLauncher);
 
-        TaskResultWaiter taskResultWaiter = new TaskResultWaiter();
-        Thread launchTaskInBackground = runTaskLauncher(executableContainer, taskLauncherPA, taskResultWaiter);
+        taskLauncherPA.doTask(executableContainer, null, null);
 
         taskRunning.acquire();
-        taskLauncher.terminate(false);
-        launchTaskInBackground.join();
+        taskLauncherPA.terminate(false);
 
-        assertEquals(TaskAbortedException.class, taskResultWaiter.getTaskResult().getException().getClass());
+        assertTaskLauncherIsTerminated(taskLauncherPA);
     }
 
-    private Thread runTaskLauncher(final ScriptExecutableContainer executableContainer,
-      final TaskLauncher taskLauncherPA, final TaskResultWaiter taskResultWaiter) {
-        Thread launchTaskInBackground = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    WaitForResultNotification waitForResultNotification = new WaitForResultNotification(taskResultWaiter);
-                    waitForResultNotification = PAActiveObject.turnActive(waitForResultNotification);
-                    taskLauncherPA.doTask(executableContainer, null, waitForResultNotification);
-                    taskResultWaiter.getTaskResult();
-                } catch (Throwable e) {
-                    e.printStackTrace();
-                }
+    private void assertTaskLauncherIsTerminated(TaskLauncher taskLauncherPA) throws InterruptedException {
+        try {
+            while (PAActiveObject.pingActiveObject(taskLauncherPA)) {
+                Thread.sleep(10);
             }
-        });
-        launchTaskInBackground.start();
-        return launchTaskInBackground;
+        } catch (Throwable expected) {
+            // expected when PA object dies
+        }
     }
 
     public class TaskResultWaiter {

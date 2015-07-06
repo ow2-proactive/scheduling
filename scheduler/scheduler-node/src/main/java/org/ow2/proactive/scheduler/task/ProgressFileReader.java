@@ -124,7 +124,7 @@ public class ProgressFileReader {
                 watchServiceThread.join();
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
-                logger.error(e);
+                logger.info(e);
             } catch (IOException e) {
                 logger.error(e);
             } finally {

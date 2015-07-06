@@ -102,7 +102,9 @@ final class TerminationData {
         for (TaskTerminationData taskToTerminate : tasksToTerminate.values()) {
             RunningTaskData taskData = taskToTerminate.taskData;
             try {
-                taskData.getLauncher().terminate(taskToTerminate.normalTermination);
+                if(!taskToTerminate.normalTermination){
+                    taskData.getLauncher().terminate(false);
+                }
             } catch (Throwable t) {
                 logger
                         .info("Cannot terminate task launcher for task '" + taskData.getTask().getId() + "'",
