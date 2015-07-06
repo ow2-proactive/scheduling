@@ -7,12 +7,10 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.ow2.proactive.scripting.helper.progress.ProgressFile;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import static org.hamcrest.Matchers.hasSize;
@@ -84,14 +82,14 @@ public class ProgressFileReaderTest {
 
     private static class ProgressFileReaderHistory implements ProgressFileReader.Listener {
 
-        private final List<Integer> values = new ArrayList<>(NB_UPDATES);
+        private final Set<Integer> values = new HashSet<>(NB_UPDATES);
 
         @Override
         public void onProgressUpdate(int newValue) {
             values.add(newValue);
         }
 
-        public List<Integer> getValues() {
+        public Set<Integer> getValues() {
             return values;
         }
 
