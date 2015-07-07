@@ -377,7 +377,6 @@ public class TaskData {
         taskData.setRestartMode(task.getRestartTaskOnError());
         taskData.setPreciousLogs(task.isPreciousLogs());
         taskData.setPreciousResult(task.isPreciousResult());
-        taskData.setResultPreview(task.getResultPreview());
         taskData.setRunAsMe(task.isRunAsMe());
         taskData.setWallTime(task.getWallTime());
         taskData.setCancelJobOnError(task.isCancelJobOnError());
@@ -483,7 +482,6 @@ public class TaskData {
         internalTask.setCancelJobOnError(isCancelJobOnError());
         internalTask.setPreciousLogs(isPreciousLogs());
         internalTask.setPreciousResult(isPreciousResult());
-        internalTask.setResultPreview(getResultPreview());
         internalTask.setRunAsMe(isRunAsMe());
         internalTask.setWallTime(getWallTime());
         internalTask.setMaxNumberOfExecution(getMaxNumberOfExecution());

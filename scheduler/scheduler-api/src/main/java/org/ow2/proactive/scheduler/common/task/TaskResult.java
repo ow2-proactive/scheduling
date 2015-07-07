@@ -112,19 +112,6 @@ public interface TaskResult extends Serializable {
      */
     public TaskLogs getOutput();
 
-    /**
-     * Return a swing panel describing this result.
-     *
-     * @return a swing panel describing this result.
-     */
-    public JPanel getGraphicalDescription();
-
-    /**
-     * Return a string describing this result.
-     *
-     * @return a string describing this result.
-     */
-    public String getTextualDescription();
-
     public Map<String, byte[]> getPropagatedVariables();
+
 }

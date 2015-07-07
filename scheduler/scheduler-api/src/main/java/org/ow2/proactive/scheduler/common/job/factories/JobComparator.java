@@ -218,10 +218,7 @@ public class JobComparator {
             stack.push("description");
             return false;
         }
-        if (!isEqualString(t1.getResultPreview(), t2.getResultPreview())) {
-            stack.push("result preview");
-            return false;
-        }
+
         if (t1.getWallTime() != t2.getWallTime()) {
             stack.push("walltime");
             return false;

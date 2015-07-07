@@ -602,8 +602,6 @@ public class StaxJobFactory extends JobFactory {
                 } else if (XMLAttributes.COMMON_MAXNUMBEROFEXECUTION.matches(attrName)) {
                     tmpTask.setMaxNumberOfExecution(Integer
                             .parseInt(replace(cursorTask.getAttributeValue(i))));
-                } else if (XMLAttributes.TASK_RESULTPREVIEW.matches(attrName)) {
-                    tmpTask.setResultPreview(replace(cursorTask.getAttributeValue(i)));
                 } else if (XMLAttributes.TASK_PRECIOUSRESULT.matches(attrName)) {
                     tmpTask.setPreciousResult(Boolean.parseBoolean(replace(cursorTask.getAttributeValue(i))));
                 } else if (XMLAttributes.TASK_PRECIOUSLOGS.matches(attrName)) {
@@ -1487,7 +1485,6 @@ public class StaxJobFactory extends JobFactory {
                 logger.debug("rtoe  : " + t.getRestartTaskOnError());
                 logger.debug("mnoe  : " + t.getMaxNumberOfExecution());
                 logger.debug("wall  : " + t.getWallTime());
-                logger.debug("prev  : " + t.getResultPreview());
                 logger.debug("selec : " + t.getSelectionScripts());
                 logger.debug("pre   : " + t.getPreScript());
                 logger.debug("post  : " + t.getPostScript());

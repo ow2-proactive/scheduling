@@ -152,7 +152,6 @@ public class TestLoadSchedulerClientState extends BaseSchedulerDBTest {
         task1.setPreciousLogs(true);
         task1.setPreciousResult(true);
         task1.setRunAsMe(true);
-        task1.setResultPreview("aaa");
         task1.setWallTime(440000);
         JavaTask task2 = createDefaultTask("task2");
         task2.setDescription("d2");
@@ -161,7 +160,6 @@ public class TestLoadSchedulerClientState extends BaseSchedulerDBTest {
         task2.setPreciousLogs(false);
         task2.setPreciousResult(false);
         task2.setRunAsMe(false);
-        task2.setResultPreview("bbb");
         task2.setWallTime(240000);
         JavaTask task3 = createDefaultTask("task3");
         task1.addDependence(task2);
@@ -214,7 +212,6 @@ public class TestLoadSchedulerClientState extends BaseSchedulerDBTest {
         Assert.assertEquals(expected.isPreciousLogs(), taskState.isPreciousLogs());
         Assert.assertEquals(expected.isPreciousResult(), taskState.isPreciousResult());
         Assert.assertEquals(expected.isRunAsMe(), taskState.isRunAsMe());
-        Assert.assertEquals(expected.getResultPreview(), taskState.getResultPreview());
         Assert.assertEquals(expected.getWallTime(), taskState.getWallTime());
 
         Assert.assertEquals("Unexpected number of dependencies", dependences.length, taskState

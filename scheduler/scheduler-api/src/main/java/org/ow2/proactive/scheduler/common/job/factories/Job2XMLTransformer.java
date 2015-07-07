@@ -62,7 +62,6 @@ import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.common.task.ParallelEnvironment;
-import org.ow2.proactive.scheduler.common.task.PropertyModifier;
 import org.ow2.proactive.scheduler.common.task.ScriptTask;
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
@@ -366,7 +365,6 @@ public class Job2XMLTransformer {
         }
 
         // *** task attributes ***
-        setAttribute(taskE, XMLAttributes.TASK_RESULTPREVIEW, task.getResultPreview(), true);
         if (task.getWallTime() != 0) {
             setAttribute(taskE, XMLAttributes.TASK_WALLTIME, formatDate(task.getWallTime()));
         }

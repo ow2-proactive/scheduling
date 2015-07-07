@@ -46,7 +46,6 @@ public final class ClientTaskState extends TaskState {
         this.setName(taskState.getName());
 
         this.setDescription(taskState.getDescription());
-        this.setResultPreview(taskState.getResultPreview());
         this.setRunAsMe(taskState.isRunAsMe());
 
         this.setWallTime(taskState.getWallTime());

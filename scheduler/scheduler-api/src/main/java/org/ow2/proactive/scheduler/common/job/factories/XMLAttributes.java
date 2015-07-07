@@ -49,32 +49,57 @@ import java.util.Map;
 public enum XMLAttributes {
 
     //JOBS
-    JOB_PRIORITY("priority"), JOB_PROJECTNAME("projectName"),
+    JOB_PRIORITY("priority"),
+    JOB_PROJECTNAME("projectName"),
+
     //COMMON
-    COMMON_CANCELJOBONERROR("cancelJobOnError"), COMMON_RESTARTTASKONERROR("restartTaskOnError"), COMMON_MAXNUMBEROFEXECUTION(
-            "maxNumberOfExecution"), COMMON_NAME("name"), COMMON_VALUE("value"),
+    COMMON_CANCELJOBONERROR("cancelJobOnError"),
+    COMMON_MAXNUMBEROFEXECUTION("maxNumberOfExecution"),
+    COMMON_RESTARTTASKONERROR("restartTaskOnError"),
+    COMMON_NAME("name"),
+    COMMON_VALUE("value"),
+
     //TASKS
-    TASK_RESULTPREVIEW("resultPreviewClass"), TASK_PRECIOUSRESULT("preciousResult"), TASK_PRECIOUSLOGS(
-            "preciousLogs"), TASK_CLASSNAME("class"), TASK_WALLTIME("walltime"), TASK_RUNASME("runAsMe"), TASK_DEPENDS_REF(
-            "ref"),
+    TASK_PRECIOUSRESULT("preciousResult"),
+    TASK_PRECIOUSLOGS("preciousLogs"),
+    TASK_CLASSNAME("class"),
+    TASK_WALLTIME("walltime"),
+    TASK_RUNASME("runAsMe"),
+    TASK_DEPENDS_REF("ref"),
+
     //NATIVE TASK ATTRIBUTES
-    TASK_NB_NODES("numberOfNodes"), TASK_COMMAND_VALUE("value"), TASK_WORKDING_DIR("workingDir"),
+    TASK_COMMAND_VALUE("value"),
+    TASK_NB_NODES("numberOfNodes"),
+    TASK_WORKDING_DIR("workingDir"),
+
     //TOPOLOGY
     TOPOLOGY_THRESHOLD("threshold"),
+
     //SCRIPTS
     SCRIPT_URL("url"),
+
     //FORK ENVIRONMENT
     FORK_JAVAHOME("javaHome"),
+
     // FLOW CONTROL
-    FLOW_BLOCK("block"), FLOW_TARGET("target"), FLOW_ELSE("else"), FLOW_CONTINUATION("continuation"),
+    FLOW_BLOCK("block"),
+    FLOW_TARGET("target"),
+    FLOW_ELSE("else"),
+    FLOW_CONTINUATION("continuation"),
+
     //DATASPACES
-    DS_INCLUDES("includes"), DS_EXCLUDES("excludes"), DS_ACCESSMODE("accessMode"), DS_URL("url"),
+    DS_INCLUDES("includes"),
+    DS_EXCLUDES("excludes"),
+    DS_ACCESSMODE("accessMode"),
+    DS_URL("url"),
+
     //NOT USED IN XML FACTORY BUT USED IN XML DESCRIPTION
-    PATH("path"), LANGUAGE("language");
+    PATH("path"),
+    LANGUAGE("language");
 
     private String xmlName;
 
-    private XMLAttributes(String xmlName) {
+    XMLAttributes(String xmlName) {
         this.xmlName = xmlName;
     }
 

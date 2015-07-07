@@ -72,11 +72,6 @@ public class TaskResultImpl implements TaskResult {
         throw new UnsupportedOperationException();
     }
 
-    @Override
-    public JPanel getGraphicalDescription() {
-        throw new UnsupportedOperationException();
-    }
-
     public void setOutput(TaskLogs taskLogs) {
         this.taskLogs = taskLogs;
     }
@@ -99,11 +94,6 @@ public class TaskResultImpl implements TaskResult {
     @Override
     public TaskId getTaskId() {
         return id;
-    }
-
-    @Override
-    public String getTextualDescription() {
-        throw new UnsupportedOperationException();
     }
 
     public void setHadException(boolean hadException) {

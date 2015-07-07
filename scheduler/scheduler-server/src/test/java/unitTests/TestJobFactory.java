@@ -54,10 +54,9 @@ import org.ow2.proactive.scheduler.common.task.RestartMode;
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
+import functionaltests.ScriptUpdateUtil;
 import org.junit.Assert;
 import org.junit.Test;
-
-import functionaltests.ScriptUpdateUtil;
 
 
 /**
@@ -119,13 +118,12 @@ public class TestJobFactory {
                 "Beginning of Pre-Script"));
         Assert.assertTrue(tfJob.getTask("task1").getPostScript().getScript().contains(
                 "Content is equals to " + URLbegin + "samples/scripts/misc/unset.js"));
-        Assert.assertEquals(tfJob.getTask("task1").getPostScript().getParameters(), null);
+        Assert.assertNull(tfJob.getTask("task1").getPostScript().getParameters());
         Assert.assertTrue(tfJob.getTask("task1").getCleaningScript().getScript().contains(
                 "Beginning of clean script"));
-        Assert.assertEquals(tfJob.getTask("task1").getCleaningScript().getParameters(), null);
+        Assert.assertNull(tfJob.getTask("task1").getCleaningScript().getParameters());
         Assert.assertEquals(tfJob.getTask("task1").getDependencesList(), null);
         Assert.assertEquals(tfJob.getTask("task1").getNumberOfNodesNeeded(), 1);
-        Assert.assertEquals(tfJob.getTask("task1").getResultPreview(), null);
         Assert.assertEquals(tfJob.getTask("task1").getWallTime(), 12 * 1000);
         Assert.assertEquals(tfJob.getTask("task1").isWallTimeSet(), true);
         Assert.assertEquals(tfJob.getTask("task1").getGenericInformations().size(), 0);
@@ -154,7 +152,6 @@ public class TestJobFactory {
         Assert.assertEquals(tfJob.getTask("task2").getCleaningScript(), null);
         Assert.assertEquals(tfJob.getTask("task2").getDependencesList(), null);
         Assert.assertEquals(tfJob.getTask("task2").getNumberOfNodesNeeded(), 1);
-        Assert.assertEquals(tfJob.getTask("task2").getResultPreview(), null);
         Assert.assertEquals(tfJob.getTask("task2").getWallTime(), 0);
         Assert.assertEquals(tfJob.getTask("task2").isWallTimeSet(), false);
         Assert.assertEquals(tfJob.getTask("task2").getGenericInformations().size(), 0);
@@ -240,14 +237,14 @@ public class TestJobFactory {
         Assert.assertEquals(tfJob.getTask("task3").getDependencesList().size(), 2);
         Assert.assertEquals(tfJob.getTask("task3").getDependencesList().get(0).getName(), "task1");
         Assert.assertEquals(tfJob.getTask("task3").getDependencesList().get(1).getName(), "task2");
-        Assert.assertEquals(tfJob.getTask("task3").getResultPreview(), null);
         Assert.assertEquals(tfJob.getTask("task3").getWallTime(), 10 * 60 * 1000 + 53 * 1000);
         Assert.assertEquals(tfJob.getTask("task3").isWallTimeSet(), true);
         Assert.assertEquals(tfJob.getTask("task3").getGenericInformations().size(), 0);
         Assert.assertEquals(1, tfJob.getTask("task3").getInputFilesList().size());
         Assert.assertTrue(tfJob.getTask("task3").getInputFilesList().get(0).getInputFiles()
                 .getIncludes().contains("tata*"));
-        Assert.assertTrue(tfJob.getTask("task3").getInputFilesList().get(0).getInputFiles().getExcludes().isEmpty());
+        Assert.assertTrue(
+                tfJob.getTask("task3").getInputFilesList().get(0).getInputFiles().getExcludes().isEmpty());
         Assert
                 .assertEquals(InputAccessMode.none, tfJob.getTask("task3").getInputFilesList().get(0)
                         .getMode());
@@ -272,7 +269,6 @@ public class TestJobFactory {
         Assert.assertEquals(tfJob.getTask("task4").getCleaningScript(), null);
         Assert.assertEquals(tfJob.getTask("task4").getDependencesList().size(), 1);
         Assert.assertEquals(tfJob.getTask("task4").getDependencesList().get(0).getName(), "task3");
-        Assert.assertEquals(tfJob.getTask("task4").getResultPreview(), "tadzaam");
         Assert.assertEquals(tfJob.getTask("task4").getWallTime(), 0);
         Assert.assertEquals(tfJob.getTask("task4").isWallTimeSet(), false);
         Assert.assertEquals(tfJob.getTask("task4").getGenericInformations().get("n11"), "v11");
@@ -342,7 +338,6 @@ public class TestJobFactory {
         Assert.assertEquals(jt.getPreScript(), null);
         Assert.assertEquals(jt.getPostScript(), null);
         Assert.assertEquals(jt.getRestartTaskOnError(), RestartMode.ANYWHERE);
-        Assert.assertEquals(jt.getResultPreview(), "path.to.package.class");
         Assert.assertEquals(jt.getSelectionScripts(), null);
         Assert.assertTrue(jt.isPreciousResult());
 

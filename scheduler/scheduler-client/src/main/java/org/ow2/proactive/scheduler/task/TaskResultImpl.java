@@ -41,21 +41,16 @@ import java.io.NotSerializableException;
 import java.io.Serializable;
 import java.util.Map;
 
-import javax.swing.JPanel;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlTransient;
 
 import org.objectweb.proactive.core.util.converter.ByteToObjectConverter;
 import org.objectweb.proactive.core.util.converter.ObjectToByteConverter;
 import org.ow2.proactive.scheduler.common.exception.InternalSchedulerException;
-import org.ow2.proactive.scheduler.common.task.ResultPreview;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
-import org.ow2.proactive.scheduler.common.task.util.ResultPreviewTool.SimpleTextPanel;
-import org.ow2.proactive.utils.Formatter;
 import org.apache.log4j.Logger;
 
 
@@ -90,9 +85,6 @@ public class TaskResultImpl implements TaskResult {
 
     /** Description definition of this result */
     private String previewerClassName = null;
-
-    /** An instance that describe how to display the result of this task. */
-    private transient ResultPreview descriptor = null;
 
     /** result of the FlowScript if there was one, or null */
     private FlowAction flowAction = null;
@@ -309,85 +301,6 @@ public class TaskResultImpl implements TaskResult {
             throw new RuntimeException("Previewer class cannot be changed");
         } else {
             this.previewerClassName = descClass;
-        }
-    }
-
-    /**
-     * @see org.ow2.proactive.scheduler.common.task.TaskResult#getGraphicalDescription()
-     */
-    @XmlTransient
-    public JPanel getGraphicalDescription() {
-        boolean instanciation = false;
-        try {
-            instanciation = this.instantiateDescriptor();
-        } catch (ClassNotFoundException e) {
-            return new SimpleTextPanel(
-                "[ERROR] Previewer classes cannot be found. Cannot create graphical previewer: " +
-                    System.lineSeparator() + e);
-        } catch (Exception e) {
-            return new SimpleTextPanel("[ERROR] Cannot create graphical previewer: " +
-                System.lineSeparator() + e);
-        }
-        if (instanciation) {
-            JPanel ret = this.descriptor.getGraphicalDescription(this);
-            return ret != null ? ret : new SimpleTextPanel(
-                "[ERROR] Graphical preview returned by previewer " + this.descriptor.getClass().getName() +
-                    " is null");
-        } else {
-            return new SimpleTextPanel(this.getTextualDescription());
-        }
-    }
-
-    /**
-     * @see org.ow2.proactive.scheduler.common.task.TaskResult#getTextualDescription()
-     */
-    public String getTextualDescription() {
-        boolean instanciation = false;
-        try {
-            instanciation = this.instantiateDescriptor();
-        } catch (ClassNotFoundException e) {
-            return "[ERROR] Previewer classes cannot be found. Cannot create textual previewer: " +
-                System.lineSeparator() + e;
-        } catch (Exception e) {
-            return "[ERROR] Cannot create textual previewer: " + System.lineSeparator() + e;
-        }
-        if (instanciation) {
-            String ret = this.descriptor.getTextualDescription(this);
-            return ret != null ? ret : "[ERROR] Textual preview returned by previewer " +
-                this.descriptor.getClass().getName() + " is null";
-        } else if (!this.hadException()) {
-            return "[DEFAULT DESCRIPTION] " + value;
-        } else {
-            // yes, Guillaume, I know...
-            return "[DEFAULT DESCRIPTION] " + Formatter.stackTraceToString(exception);
-        }
-    }
-
-    /**
-     * Create the descriptor instance if descriptor class is available.
-     *
-     * @return true if the creation occurs, false otherwise
-     */
-    private boolean instantiateDescriptor() throws InstantiationException, IllegalAccessException,
-            IOException, ClassNotFoundException {
-        if (this.descriptor == null) {
-            ClassLoader cl = this.getTaskClassLoader();
-            boolean isInstantiated = false;
-            // if a specific previewer is defined, instantiate it
-            if (this.previewerClassName != null) {
-                Class<?> previewClass = Class.forName(this.previewerClassName, true, cl);
-                this.descriptor = (ResultPreview) (previewClass.newInstance());
-                isInstantiated = true;
-            }
-            // in any case, instanciate value and exception
-            if (this.serializedException != null) {
-                this.exception = this.instanciateException(cl);
-            } else {
-                this.value = this.instanciateValue(cl);
-            }
-            return isInstantiated;
-        } else {
-            return true;
         }
     }
 

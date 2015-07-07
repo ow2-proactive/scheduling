@@ -90,9 +90,6 @@ public abstract class Task extends CommonAttribute {
     /** Description of the task. */
     protected String description = null;
 
-    /** Description of the result of the task */
-    protected String resultPreview;
-
     /** DataSpace inputFiles */
     protected List<InputSelector> inputFiles = null;
 
@@ -200,25 +197,6 @@ public abstract class Task extends CommonAttribute {
      */
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    /**
-     * Return the result preview of this task.
-     *
-     * @return the result preview of this task.
-     */
-    public String getResultPreview() {
-        return resultPreview;
-    }
-
-    /**
-     * Set the result preview of this task.
-     *
-     * @param resultPreview
-     *            the result preview  to set.
-     */
-    public void setResultPreview(String resultPreview) {
-        this.resultPreview = resultPreview;
     }
 
     /**
@@ -674,7 +652,7 @@ public abstract class Task extends CommonAttribute {
         String nl = System.lineSeparator();
 
         return "Task \'" + name + "\' : " + nl + "\tFlowBlock = '" + flowBlock + "'" + nl +
-            "\tDescription = '" + description + "'" + nl + "\tResultPreview = '" + resultPreview + "'" + nl +
+            "\tDescription = '" + description + "'" + nl +
             "\tInputFiles = " + inputFiles + nl + "\tOutputFiles = " + outputFiles + nl +
             "\tParallelEnvironment = " + parallelEnvironment + nl + "\tSelectionScripts = " +
             displaySelectionScripts() + nl + "\tForkEnvironment = " + forkEnvironment + nl +
