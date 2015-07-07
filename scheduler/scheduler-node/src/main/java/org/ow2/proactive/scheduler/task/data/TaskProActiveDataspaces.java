@@ -202,31 +202,49 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
 
     @Override
     public File getScratchFolder() {
+        if (SCRATCH == null) {
+            return new File(".");
+        }
         return new File(SCRATCH.getPath());
     }
 
     @Override
     public String getScratchURI() {
+        if (SCRATCH == null) {
+            return new File(".").getAbsolutePath();
+        }
         return SCRATCH.getVirtualURI();
     }
 
     @Override
     public String getInputURI() {
+        if(INPUT == null){
+            return "";
+        }
         return INPUT.getVirtualURI();
     }
 
     @Override
     public String getOutputURI() {
+        if(OUTPUT == null){
+            return "";
+        }
         return OUTPUT.getVirtualURI();
     }
 
     @Override
     public String getUserURI() {
+        if(USER == null){
+            return "";
+        }
         return USER.getVirtualURI();
     }
 
     @Override
     public String getGlobalURI() {
+        if(GLOBAL == null){
+            return "";
+        }
         return GLOBAL.getVirtualURI();
     }
 
