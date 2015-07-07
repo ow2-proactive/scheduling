@@ -74,7 +74,7 @@ public class BaseServiceTest extends ProActiveTest {
 
     static ExecutorService executorService = Executors.newCachedThreadPool();
 
-    static interface TestRunnable {
+    interface TestRunnable {
         void run() throws Exception;
     }
 

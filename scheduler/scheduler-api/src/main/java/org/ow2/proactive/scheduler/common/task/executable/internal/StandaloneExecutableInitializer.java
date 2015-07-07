@@ -63,7 +63,7 @@ public interface StandaloneExecutableInitializer extends Serializable {
      *
      * @param nodes the nodes url to set
      */
-    public void setNodesURL(List<String> nodes);
+    void setNodesURL(List<String> nodes);
 
     /**
      * Returns an interface to the task local space

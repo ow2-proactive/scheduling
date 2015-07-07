@@ -55,5 +55,5 @@ public interface CallableWithTimeoutAction<V> extends Callable<V> {
      * this method must be non-blocking.<br>
      * Note that this method should also be called while the {@link CallableWithTimeoutAction#call()} method is being executed.
      */
-    public void timeoutAction();
+    void timeoutAction();
 }

@@ -64,14 +64,14 @@ public interface TaskResult extends Serializable {
      *
      * @return true if an exception occurred, false if not.
      */
-    public boolean hadException();
+    boolean hadException();
 
     /**
      * To get the id of the task.
      *
      * @return the id of the task.
      */
-    public TaskId getTaskId();
+    TaskId getTaskId();
 
     /**
      * Get the value of the task. Throw the exception if the task generate
@@ -79,7 +79,7 @@ public interface TaskResult extends Serializable {
      * @return the value of the task.
      * @throws Throwable If the value has generate an exception.
      */
-    public Serializable value() throws Throwable;
+    Serializable value() throws Throwable;
 
     /**
      * Get the serialized value of the task.
@@ -95,7 +95,7 @@ public interface TaskResult extends Serializable {
      * 
      * @return the Control Flow action embedded in this TaskResult
      */
-    public FlowAction getAction();
+    FlowAction getAction();
 
     /**
      * Retrieve the exception threw by the task.
@@ -103,15 +103,15 @@ public interface TaskResult extends Serializable {
      *
      * @return the exception threw by the task.
      */
-    public Throwable getException();
+    Throwable getException();
 
     /**
      * Return the output of the execution, including stdout and stderr.
      *
      * @return the output of the execution, including stdout and stderr.
      */
-    public TaskLogs getOutput();
+    TaskLogs getOutput();
 
-    public Map<String, byte[]> getPropagatedVariables();
+    Map<String, byte[]> getPropagatedVariables();
 
 }

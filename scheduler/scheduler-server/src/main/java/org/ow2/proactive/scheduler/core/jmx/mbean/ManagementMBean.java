@@ -48,32 +48,32 @@ public interface ManagementMBean {
      * Returns the accounting cache valid time in seconds.
      * @return refresh rate in seconds 
      */
-    public int getAccountingCacheValidityTimeInSeconds();
+    int getAccountingCacheValidityTimeInSeconds();
 
     /**
      * Sets a new accounting cache valid time in seconds.  
      * @param timeInSeconds the new cache refresh rate in seconds
      */
-    public void setAccountingCacheValidityTimeInSeconds(int timeInSeconds);
+    void setAccountingCacheValidityTimeInSeconds(int timeInSeconds);
 
     /**
      * Sets the cache refresh rate to the one defined in the configuration file.
      */
-    public void setDefaultAccountingCacheValidityTimeInSeconds();
+    void setDefaultAccountingCacheValidityTimeInSeconds();
 
     /**
      * Clears the cache (all precomputed accounts)
      */
-    public void clearAccoutingCache();
+    void clearAccoutingCache();
 
     /**
      * Returns the last duration in milliseconds of account refresh.
      * @return the last refresh duration in milliseconds
      */
-    public long getLastRefreshDurationInMilliseconds();
+    long getLastRefreshDurationInMilliseconds();
 
     /**
      * Reload the resource manager configuration, permissions, and log4j config.
      */
-    public void refreshConfiguration();
+    void refreshConfiguration();
 }

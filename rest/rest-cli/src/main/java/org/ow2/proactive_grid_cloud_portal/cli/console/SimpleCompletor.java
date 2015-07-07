@@ -187,12 +187,12 @@ public class SimpleCompletor implements Completer, Cloneable {
      *
      *  @author  <a href="mailto:mwp1@cornell.edu">Marc Prud'hommeaux</a>
      */
-    public static interface SimpleCompletorFilter {
+    public interface SimpleCompletorFilter {
         /**
          *  Filter the specified String. To not filter it, return the
          *  same String as the parameter. To exclude it, return null.
          */
-        public String filter(String element);
+        String filter(String element);
     }
 
     public static class NoOpFilter implements SimpleCompletorFilter {

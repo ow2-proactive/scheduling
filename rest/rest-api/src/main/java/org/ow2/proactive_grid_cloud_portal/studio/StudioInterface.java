@@ -85,7 +85,7 @@ public interface StudioInterface {
 
     @PUT
     @Path("logout")
-    public void logout(@HeaderParam("sessionid")
+    void logout(@HeaderParam("sessionid")
     final String sessionId) throws PermissionRestException, NotConnectedRestException;
 
     @GET
@@ -95,7 +95,7 @@ public interface StudioInterface {
 
     @GET
     @Path("workflows")
-    public List<Workflow> getWorkflows(@HeaderParam("sessionid")
+    List<Workflow> getWorkflows(@HeaderParam("sessionid")
     String sessionId) throws NotConnectedRestException, IOException;
 
     @POST
@@ -131,7 +131,7 @@ public interface StudioInterface {
 
     @GET
     @Path("templates")
-    public List<Workflow> getTemplates(@HeaderParam("sessionid")
+    List<Workflow> getTemplates(@HeaderParam("sessionid")
     String sessionId) throws NotConnectedRestException, IOException;
 
     @POST
@@ -192,7 +192,7 @@ public interface StudioInterface {
     @POST
     @Path("classes")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public String createClass(@HeaderParam("sessionid")
+    String createClass(@HeaderParam("sessionid")
     String sessionId, MultipartFormDataInput multipart) throws NotConnectedRestException, IOException;
 
     /**
@@ -203,7 +203,7 @@ public interface StudioInterface {
     @POST
     @Path("validate")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public abstract JobValidationData validate(MultipartFormDataInput multipart);
+    JobValidationData validate(MultipartFormDataInput multipart);
 
     /**
      * Submits a job to the scheduler
@@ -214,7 +214,7 @@ public interface StudioInterface {
     @POST
     @Path("{path:submit}")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public JobIdData submit(@HeaderParam("sessionid")
+    JobIdData submit(@HeaderParam("sessionid")
     String sessionId, @PathParam("path")
     PathSegment pathSegment, MultipartFormDataInput multipart) throws JobCreationRestException,
             NotConnectedRestException, PermissionRestException, SubmissionClosedRestException, IOException;

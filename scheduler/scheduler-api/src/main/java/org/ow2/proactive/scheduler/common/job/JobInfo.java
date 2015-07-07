@@ -56,90 +56,90 @@ public interface JobInfo extends Serializable {
      *
      * @return the jobId
      */
-    public JobId getJobId();
+    JobId getJobId();
 
     /**
      * Get job owner 
      * 
      * @return job owner
      */
-    public String getJobOwner();
+    String getJobOwner();
 
     /**
      * To get the finishedTime
      *
      * @return the finishedTime
      */
-    public long getFinishedTime();
+    long getFinishedTime();
 
     /**
      * To get the removedTime
      *
      * @return the removedTime
      */
-    public long getRemovedTime();
+    long getRemovedTime();
 
     /**
      * To get the startTime
      *
      * @return the startTime
      */
-    public long getStartTime();
+    long getStartTime();
 
     /**
      * To get the submittedTime
      *
      * @return the submittedTime
      */
-    public long getSubmittedTime();
+    long getSubmittedTime();
 
     /**
      * To get the totalNumberOfTasks
      *
      * @return the totalNumberOfTasks
      */
-    public int getTotalNumberOfTasks();
+    int getTotalNumberOfTasks();
 
     /**
      * To get the numberOfFinishedTasks
      *
      * @return the numberOfFinishedTasks
      */
-    public int getNumberOfFinishedTasks();
+    int getNumberOfFinishedTasks();
 
     /**
      * To get the numberOfPendingTasks
      *
      * @return the numberOfPendingTasks
      */
-    public int getNumberOfPendingTasks();
+    int getNumberOfPendingTasks();
 
     /**
      * To get the numberOfRunningTasks
      *
      * @return the numberOfRunningTasks
      */
-    public int getNumberOfRunningTasks();
+    int getNumberOfRunningTasks();
 
     /**
      * To get the priority.
      *
      * @return the priority.
      */
-    public JobPriority getPriority();
+    JobPriority getPriority();
 
     /**
      * Return the status of the job.
      *
      * @return the status of the job.
      */
-    public JobStatus getStatus();
+    JobStatus getStatus();
 
     /**
      * Get the toBeRemoved property.
      *
      * @return the toBeRemoved property.
      */
-    public boolean isToBeRemoved();
+    boolean isToBeRemoved();
 
 }

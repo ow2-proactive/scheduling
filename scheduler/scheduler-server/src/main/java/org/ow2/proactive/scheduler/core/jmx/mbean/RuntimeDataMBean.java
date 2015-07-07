@@ -53,85 +53,85 @@ public interface RuntimeDataMBean {
      *
      * @return The state of the scheduler.
      */
-    public String getStatus();
+    String getStatus();
 
     /**
      * Returns the number of users connected to the scheduler.
      *
      * @return the number of users connected to the scheduler.
      */
-    public int getConnectedUsersCount();
+    int getConnectedUsersCount();
 
     /**
      * Returns the total number of jobs.
      *
      * @return the total number of jobs.
      */
-    public int getTotalJobsCount();
+    int getTotalJobsCount();
 
     /**
      * Returns the number of pending jobs of the scheduler.
      *
      * @return The number of pending jobs of the scheduler.
      */
-    public int getPendingJobsCount();
+    int getPendingJobsCount();
 
     /**
      * Returns the number of running jobs of the scheduler.
      *
      * @return The number of running jobs of the scheduler.
      */
-    public int getRunningJobsCount();
+    int getRunningJobsCount();
 
     /**
      * Returns the number of finished jobs of the scheduler.
      *
      * @return The number of finished jobs of the scheduler.
      */
-    public int getFinishedJobsCount();
+    int getFinishedJobsCount();
 
     /**
      * Returns the total number of Tasks.
      *
      * @return the total number of Tasks.
      */
-    public int getTotalTasksCount();
+    int getTotalTasksCount();
 
     /**
      * Returns the number of pending Tasks of the scheduler.
      *
      * @return The number of pending Tasks of the scheduler.
      */
-    public int getPendingTasksCount();
+    int getPendingTasksCount();
 
     /**
      * Returns the number of running Tasks of the scheduler.
      *
      * @return The number of running Tasks of the scheduler.
      */
-    public int getRunningTasksCount();
+    int getRunningTasksCount();
 
     /**
      * Returns the number of finished Tasks of the scheduler.
      *
      * @return The number of finished Tasks of the scheduler.
      */
-    public int getFinishedTasksCount();
+    int getFinishedTasksCount();
 
     /**
      * @return current mean job pending time as integer
      */
-    public int getMeanJobPendingTime();
+    int getMeanJobPendingTime();
 
     /**
      * @return current mean job execution time as integer
      */
-    public int getMeanJobExecutionTime();
+    int getMeanJobExecutionTime();
 
     /**
      * @return current mean job submitting period as integer
      */
-    public int getJobSubmittingPeriod();
+    int getJobSubmittingPeriod();
 
     /**
      * Returns the Key Performance Indicator related to the average of pending
@@ -139,7 +139,7 @@ public interface RuntimeDataMBean {
      *
      * @return A string representing the average pending time for a job.
      */
-    public String getFormattedMeanJobPendingTime();
+    String getFormattedMeanJobPendingTime();
 
     /**
      * Returns the Key Performance Indicator related to the average of executing
@@ -147,7 +147,7 @@ public interface RuntimeDataMBean {
      *
      * @return A string representing the average executing time for a job.
      */
-    public String getFormattedMeanJobExecutionTime();
+    String getFormattedMeanJobExecutionTime();
 
     /**
      * Returns the Key Performance Indicator related to the average period of
@@ -155,7 +155,7 @@ public interface RuntimeDataMBean {
      *
      * @return A string representing the average submitting period for a job.
      */
-    public String getFormattedJobSubmittingPeriod();
+    String getFormattedJobSubmittingPeriod();
 
     /**
      * This method represents a possible Operation to Invoke on the MBean. It
@@ -166,7 +166,7 @@ public interface RuntimeDataMBean {
      * @return a representation as long of the duration of the pending time for
      *         the given job.
      */
-    public long getJobPendingTime(String jobId);
+    long getJobPendingTime(String jobId);
 
     /**
      * This method gives the running time for a given Job.
@@ -176,7 +176,7 @@ public interface RuntimeDataMBean {
      * @return a representation as long of the duration of the running time for
      *         the given job.
      */
-    public long getJobRunningTime(String jobId);
+    long getJobRunningTime(String jobId);
 
     /**
      * This method gives the mean task pending time for a given Job
@@ -186,7 +186,7 @@ public interface RuntimeDataMBean {
      * @return a representation as long of the duration of the mean task pending
      *         time for the given job.
      */
-    public long getMeanTaskPendingTime(String jobId);
+    long getMeanTaskPendingTime(String jobId);
 
     /**
      * This method gives the mean task running time for a given Job
@@ -196,7 +196,7 @@ public interface RuntimeDataMBean {
      * @return a representation as long of the duration of the mean task running
      *         time for the given job.
      */
-    public long getMeanTaskRunningTime(String jobId);
+    long getMeanTaskRunningTime(String jobId);
 
     /**
      * This method gives the total number of nodes used by a given Job
@@ -205,7 +205,7 @@ public interface RuntimeDataMBean {
      *            the id of the Job to check
      * @return the total number of nodes used by the given job.
      */
-    public int getTotalNumberOfNodesUsed(String jobId);
+    int getTotalNumberOfNodesUsed(String jobId);
 
     /**
      * This method represents a possible Operation to Invoke on the MBean. It
@@ -216,7 +216,7 @@ public interface RuntimeDataMBean {
      * @return a representation as long of the duration of the pending time for
      *         the given job.
      */
-    public String getFormattedJobPendingTime(String jobId);
+    String getFormattedJobPendingTime(String jobId);
 
     /**
      * This method gives the running time for a given Job as String
@@ -226,7 +226,7 @@ public interface RuntimeDataMBean {
      * @return a representation as long of the duration of the running time for
      *         the given job.
      */
-    public String getFormattedJobRunningTime(String jobId);
+    String getFormattedJobRunningTime(String jobId);
 
     /**
      * This method gives the mean task pending time for a given Job as String
@@ -236,7 +236,7 @@ public interface RuntimeDataMBean {
      * @return a representation as long of the duration of the mean task pending
      *         time for the given job.
      */
-    public String getFormattedMeanTaskPendingTime(String jobId);
+    String getFormattedMeanTaskPendingTime(String jobId);
 
     /**
      * This method gives the mean task running time for a given Job as String
@@ -246,7 +246,7 @@ public interface RuntimeDataMBean {
      * @return a representation as long of the duration of the mean task running
      *         time for the given job.
      */
-    public String getFormattedMeanTaskRunningTime(String jobId);
+    String getFormattedMeanTaskRunningTime(String jobId);
 
     /**
      * Sends the statistics accumulated in the RRD data base
@@ -254,5 +254,5 @@ public interface RuntimeDataMBean {
      * @return data base file converted to bytes
      * @throws IOException when data base cannot be read
      */
-    public byte[] getStatisticHistory() throws IOException;
+    byte[] getStatisticHistory() throws IOException;
 }

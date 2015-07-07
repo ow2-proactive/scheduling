@@ -12,8 +12,8 @@ import org.ow2.proactive.scheduler.common.SchedulerEventListener;
 public interface SchedulerEventListenerExtended extends SchedulerEventListener {
 
     //	public void pushDataFinished(String jobId, String pushLocation_URL);
-    public void pullDataFinished(String jobId, String taskName, String localFolderPath);
+    void pullDataFinished(String jobId, String taskName, String localFolderPath);
 
-    public void pullDataFailed(String jobId, String taskName, String remoteFolder_URL, Throwable t);
+    void pullDataFailed(String jobId, String taskName, String remoteFolder_URL, Throwable t);
 
 }

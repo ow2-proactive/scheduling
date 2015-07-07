@@ -61,41 +61,41 @@ public interface Topology extends Serializable {
      *
      * @return the distance between 2 nodes
      */
-    public Long getDistance(Node node, Node node2);
+    Long getDistance(Node node, Node node2);
 
     /**
      * Returns the distance between 2 hosts identified by their inet addresses.
      *
      * @return the distance between 2 nodes
      */
-    public Long getDistance(InetAddress hostAddress, InetAddress hostAddress2);
+    Long getDistance(InetAddress hostAddress, InetAddress hostAddress2);
 
     /**
      * Returns the distance between 2 hosts identified by their domain names.
      *
      * @return the distance between 2 nodes
      */
-    public Long getDistance(String hostName, String hostName2);
+    Long getDistance(String hostName, String hostName2);
 
     /**
      * Checks if 2 nodes are on the sane host.
      * @return true if 2 nodes are on the same hosts, false otherwise
      */
-    public boolean onSameHost(Node node, Node node2);
+    boolean onSameHost(Node node, Node node2);
 
     /**
      * Checks if the information about host is presented in the topology records.
      * @param hostAddress the address of the host
      * @return true if the host is known, false otherwise
      */
-    public boolean knownHost(InetAddress hostAddress);
+    boolean knownHost(InetAddress hostAddress);
 
     /**
      * Gets the set of hosts handled by resource manager.
      *
      * @return the set of hosts handled by resource manager
      */
-    public Set<InetAddress> getHosts();
+    Set<InetAddress> getHosts();
 
     /**
      * Gets the distances associated to the host.
@@ -105,7 +105,7 @@ public interface Topology extends Serializable {
      * @param hostAddress - inet address of the host
      * @return distances map to nodes added before this one
      */
-    public HashMap<InetAddress, Long> getHostTopology(InetAddress hostAddress);
+    HashMap<InetAddress, Long> getHostTopology(InetAddress hostAddress);
 
     /**
      * Clustirizes hosts into clusters based on their proximity
@@ -114,5 +114,5 @@ public interface Topology extends Serializable {
      * @param distanceFunction the function for distances recalculation
      * @return the list of host clusters
      */
-    public List<Cluster<String>> clusterize(int numberOfClusters, DistanceFunction distanceFunction);
+    List<Cluster<String>> clusterize(int numberOfClusters, DistanceFunction distanceFunction);
 }

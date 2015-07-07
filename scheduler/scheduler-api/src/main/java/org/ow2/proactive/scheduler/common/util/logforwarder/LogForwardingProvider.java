@@ -53,19 +53,19 @@ public interface LogForwardingProvider {
      * @return a container for an appender.
      * @throws LogForwardingException if the provider cannot be created.
      */
-    public AppenderProvider createAppenderProvider(URI serverURI) throws LogForwardingException;
+    AppenderProvider createAppenderProvider(URI serverURI) throws LogForwardingException;
 
     /**
      * Create locally a server that is able to receive logging events from the appender created by createAppenderProvider.
      * @return the URI to reach this server.
      * @throws LogForwardingException if the server cannot be created.
      */
-    public URI createServer(LoggingEventProcessor eventProcessor) throws LogForwardingException;
+    URI createServer(LoggingEventProcessor eventProcessor) throws LogForwardingException;
 
     /**
      * Terminate the server created by createServer().
      * @throws LogForwardingException if the server cannot be terminated.
      */
-    public void terminateServer() throws LogForwardingException;
+    void terminateServer() throws LogForwardingException;
 
 }

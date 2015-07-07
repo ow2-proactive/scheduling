@@ -10,5 +10,5 @@ public interface FilteredExceptionCallback {
      *
      * @param dme the DatabaseManagerException containing the cause.
      */
-    public void notify(DatabaseManagerException dme);
+    void notify(DatabaseManagerException dme);
 }

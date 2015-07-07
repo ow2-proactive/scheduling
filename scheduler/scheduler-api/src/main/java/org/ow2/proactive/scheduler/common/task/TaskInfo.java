@@ -59,49 +59,49 @@ public interface TaskInfo extends Serializable {
      *
      * @return the jobInfo
      */
-    public JobInfo getJobInfo();
+    JobInfo getJobInfo();
 
     /**
      * To get the finishedTime
      *
      * @return the finishedTime
      */
-    public long getFinishedTime();
+    long getFinishedTime();
 
     /**
      * To get the jobId
      *
      * @return the jobId
      */
-    public JobId getJobId();
+    JobId getJobId();
 
     /**
      * Get the name of the task
      *
      * @return the name of the task
      */
-    public String getName();
+    String getName();
 
     /**
      * To get the startTime
      *
      * @return the startTime
      */
-    public long getStartTime();
+    long getStartTime();
 
     /**
      * To get the taskId
      *
      * @return the taskId
      */
-    public TaskId getTaskId();
+    TaskId getTaskId();
 
     /**
      * To get the taskStatus
      *
      * @return the taskStatus
      */
-    public TaskStatus getStatus();
+    TaskStatus getStatus();
 
     /*
      * <B>This method always returns 0 in Scheduling 2.2.0.</B>
@@ -112,14 +112,14 @@ public interface TaskInfo extends Serializable {
      *
      * @return the latest progress value for this task.
      */
-    public int getProgress();
+    int getProgress();
 
     /**
      * Get the last execution HostName of the task.
      *
      * @return the last execution HostName.
      */
-    public String getExecutionHostName();
+    String getExecutionHostName();
 
     /**
      * To get the list of execution hosts name.
@@ -127,27 +127,27 @@ public interface TaskInfo extends Serializable {
      *
      * @return the execution Host Name list.
      */
-    public String[] getExecutionHostNameList();
+    String[] getExecutionHostNameList();
 
     /**
      * Get the number of execution left.
      *
      * @return the number of execution left.
      */
-    public int getNumberOfExecutionLeft();
+    int getNumberOfExecutionLeft();
 
     /**
      * Get the numberOfExecutionOnFailureLeft value.
      * 
      * @return the numberOfExecutionOnFailureLeft value.
      */
-    public int getNumberOfExecutionOnFailureLeft();
+    int getNumberOfExecutionOnFailureLeft();
 
     /**
      * Get the execution duration of the task. It is the real execution time, CPU usage.
      *
      * @return the execution duration in millis
      */
-    public long getExecutionDuration();
+    long getExecutionDuration();
 
 }

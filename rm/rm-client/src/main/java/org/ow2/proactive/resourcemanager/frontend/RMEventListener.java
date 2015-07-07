@@ -62,15 +62,15 @@ public interface RMEventListener {
     /** RM is shutting down
      * @param event object representing the event.
      */
-    public void rmEvent(RMEvent event);
+    void rmEvent(RMEvent event);
 
     /** new node source available in RM.
      * @param event node source event containing new {@link NodeSource} properties.
      */
-    public void nodeSourceEvent(RMNodeSourceEvent event);
+    void nodeSourceEvent(RMNodeSourceEvent event);
 
     /** new node available in RM.
      * @param event node event containing new {@link RMNode} properties.
      */
-    public void nodeEvent(RMNodeEvent event);
+    void nodeEvent(RMNodeEvent event);
 }

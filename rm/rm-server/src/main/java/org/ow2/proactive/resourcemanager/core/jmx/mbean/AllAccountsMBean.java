@@ -48,12 +48,12 @@ public interface AllAccountsMBean extends MyAccountMBean {
      * Shows the account of associated to the specified username.
      * @param username The username of the account to see
      */
-    public void setUsername(String username);
+    void setUsername(String username);
 
     /**
      * Returns the username of the current account. 
      * @return The username of the current account
      */
-    public String getUsername();
+    String getUsername();
 
 }

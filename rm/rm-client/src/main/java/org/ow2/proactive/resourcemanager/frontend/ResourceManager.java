@@ -92,7 +92,7 @@ public interface ResourceManager {
      * @param policyParameters parameters for policy creation
      * @return true if a new node source was created successfully, runtime exception otherwise
      */
-    public BooleanWrapper createNodeSource(String nodeSourceName, String infrastructureType,
+    BooleanWrapper createNodeSource(String nodeSourceName, String infrastructureType,
             Object[] infrastructureParameters, String policyType, Object[] policyParameters);
 
     /**
@@ -103,21 +103,21 @@ public interface ResourceManager {
      * @param preempt if true remove the node immediately without waiting while it will be freed.
      * @return true if the node source was removed successfully, runtime exception otherwise
      */
-    public BooleanWrapper removeNodeSource(String sourceName, boolean preempt);
+    BooleanWrapper removeNodeSource(String sourceName, boolean preempt);
 
     /**
      * Returns the list of supported node source infrastructures descriptors.
      *
      * @return the list of supported node source infrastructures descriptors
      */
-    public Collection<PluginDescriptor> getSupportedNodeSourceInfrastructures();
+    Collection<PluginDescriptor> getSupportedNodeSourceInfrastructures();
 
     /**
      * Returns the list of supported node source policies descriptors.
      *
      * @return the list of supported node source policies descriptors
      */
-    public Collection<PluginDescriptor> getSupportedNodeSourcePolicies();
+    Collection<PluginDescriptor> getSupportedNodeSourcePolicies();
 
     /**
      * Each node source scan its nodes periodically to check their states.
@@ -127,7 +127,7 @@ public interface ResourceManager {
      * @param sourceName name of the node source to set the frequency
      * @return true if ping frequency is successfully changed, runtime exception otherwise
      */
-    public BooleanWrapper setNodeSourcePingFrequency(int frequency, String sourceName);
+    BooleanWrapper setNodeSourcePingFrequency(int frequency, String sourceName);
 
     /**
      * Returns the ping frequency of a node source.
@@ -135,7 +135,7 @@ public interface ResourceManager {
      * @param sourceName name of the node source
      * @return the ping frequency
      */
-    public IntWrapper getNodeSourcePingFrequency(String sourceName);
+    IntWrapper getNodeSourcePingFrequency(String sourceName);
 
     /**
      * Adds an existing node to the default node source of the resource manager.
@@ -143,7 +143,7 @@ public interface ResourceManager {
      * @param nodeUrl URL of the node to add.
      * @return true if new node is added successfully, runtime exception otherwise
      */
-    public BooleanWrapper addNode(String nodeUrl);
+    BooleanWrapper addNode(String nodeUrl);
 
     /**
      * Adds an existing node to the particular node source.
@@ -152,7 +152,7 @@ public interface ResourceManager {
      * @param sourceName name of the static node source that will handle the node
      * @return true if new node is added successfully, runtime exception otherwise
      */
-    public BooleanWrapper addNode(String nodeUrl, String sourceName);
+    BooleanWrapper addNode(String nodeUrl, String sourceName);
 
     /**
      * Removes a node from the resource manager.
@@ -161,7 +161,7 @@ public interface ResourceManager {
      * @param preempt if true remove the node immediately without waiting while it will be freed.
      * @return true if the node is removed successfully, false or exception otherwise
      */
-    public BooleanWrapper removeNode(String nodeUrl, boolean preempt);
+    BooleanWrapper removeNode(String nodeUrl, boolean preempt);
 
     /**
      * Locks the set of nodes and makes them not available for others.
@@ -178,7 +178,7 @@ public interface ResourceManager {
      * @return true if all the nodes become locked, false otherwise
      *
      */
-    public BooleanWrapper lockNodes(Set<String> urls);
+    BooleanWrapper lockNodes(Set<String> urls);
 
     /**
      * Unlock nodes and makes them free. The specified nodes become
@@ -191,7 +191,7 @@ public interface ResourceManager {
      *
      * @return true if all the nodes become free, false otherwise
      */
-    public BooleanWrapper unlockNodes(Set<String> urls);
+    BooleanWrapper unlockNodes(Set<String> urls);
 
     /**
      * Returns true if the node nodeUrl is registered (i.e. known by the RM) and not down.
@@ -199,7 +199,7 @@ public interface ResourceManager {
      * @param nodeUrl of node to ping.
      * @return true if the node nodeUrl is registered and not down.
      */
-    public BooleanWrapper nodeIsAvailable(String nodeUrl);
+    BooleanWrapper nodeIsAvailable(String nodeUrl);
 
     /**
      * Mark node as available is the resource manager.
@@ -207,7 +207,7 @@ public interface ResourceManager {
      * @param nodeUrl of a node.
      * @return true successfully set as available.
      */
-    public BooleanWrapper setNodeAvailable(String nodeUrl);
+    BooleanWrapper setNodeAvailable(String nodeUrl);
 
     /**
      * Returns true if the resource manager is operational and a client is connected.
@@ -215,7 +215,7 @@ public interface ResourceManager {
      * Throws SecurityException if client is not connected.
      * @return true if the resource manager is operational, false otherwise
      */
-    public BooleanWrapper isActive();
+    BooleanWrapper isActive();
 
     /**
      * Returns the resource manager summary state.
@@ -223,27 +223,27 @@ public interface ResourceManager {
      *
      * @return the resource manager summary state.
      */
-    public RMState getState();
+    RMState getState();
 
     /**
      * Returns the monitoring interface to manager listeners of the resource manager.
      *
      * @return the resource manager monitoring interface
      */
-    public RMMonitoring getMonitoring();
+    RMMonitoring getMonitoring();
 
     /**
      * Returns a list of all alive Nodes Urls. Alive means neither down nor currently deploying.
      * @return list of node urls
      */
-    public Set<String> listAliveNodeUrls();
+    Set<String> listAliveNodeUrls();
 
     /**
      * Returns a list of all alive Nodes Urls associated with the given node sources.
      * @param nodeSourceNames set of node sources containing the nodes.
      * @return list of node urls
      */
-    public Set<String> listAliveNodeUrls(Set<String> nodeSourceNames);
+    Set<String> listAliveNodeUrls(Set<String> nodeSourceNames);
 
     /**
      * Finds "number" nodes for computations according to the selection script.
@@ -258,7 +258,7 @@ public interface ResourceManager {
      * @return a list of nodes
      */
     @Deprecated
-    public NodeSet getAtMostNodes(int number, SelectionScript selectionScript);
+    NodeSet getAtMostNodes(int number, SelectionScript selectionScript);
 
     /**
      * Finds "number" nodes for computations according to the selection script.
@@ -274,7 +274,7 @@ public interface ResourceManager {
      * @return a list of nodes
      */
     @Deprecated
-    public NodeSet getAtMostNodes(int number, SelectionScript selectionScript, NodeSet exclusion);
+    NodeSet getAtMostNodes(int number, SelectionScript selectionScript, NodeSet exclusion);
 
     /**
      * Finds "number" nodes for computations according to the selection scripts
@@ -291,7 +291,7 @@ public interface ResourceManager {
      * @return a list of nodes
      */
     @Deprecated
-    public NodeSet getAtMostNodes(int number, List<SelectionScript> selectionScriptsList, NodeSet exclusion);
+    NodeSet getAtMostNodes(int number, List<SelectionScript> selectionScriptsList, NodeSet exclusion);
 
     /**
      * Finds "number" nodes for computations according to the selection scripts
@@ -310,7 +310,7 @@ public interface ResourceManager {
      * @return a list of nodes
      */
     @Deprecated
-    public NodeSet getAtMostNodes(int number, TopologyDescriptor descriptor,
+    NodeSet getAtMostNodes(int number, TopologyDescriptor descriptor,
             List<SelectionScript> selectionScriptsList, NodeSet exclusion);
 
     /**
@@ -335,7 +335,7 @@ public interface ResourceManager {
      * @return a list of nodes
      */
     @Deprecated
-    public NodeSet getNodes(int number, TopologyDescriptor descriptor,
+    NodeSet getNodes(int number, TopologyDescriptor descriptor,
             List<SelectionScript> selectionScriptsList, NodeSet exclusion, boolean bestEffort);
 
     /**
@@ -346,7 +346,7 @@ public interface ResourceManager {
      * @see {@link Criteria}
      * @return a list of nodes according to the criteria
      */
-    public NodeSet getNodes(Criteria criteria);
+    NodeSet getNodes(Criteria criteria);
 
     /**
      * Releases the node after computations. The specified node is marked as free and become
@@ -357,7 +357,7 @@ public interface ResourceManager {
      * {@link SecurityException} may be thrown if the user does not have right to release the node or it tries to release
      * a foreign node.
      */
-    public BooleanWrapper releaseNode(Node node);
+    BooleanWrapper releaseNode(Node node);
 
     /**
      * Releases nodes after computations. The specified node is marked as free and become
@@ -368,14 +368,14 @@ public interface ResourceManager {
      * {@link SecurityException} may be thrown if the user does not have right to release one of nodes or it tries to release
      * a foreign node.
      */
-    public BooleanWrapper releaseNodes(NodeSet nodes);
+    BooleanWrapper releaseNodes(NodeSet nodes);
 
     /**
      * Disconnects from resource manager and releases all the nodes taken by user for computations.
      *
      * @return true if successfully disconnected, runtime exception otherwise
      */
-    public BooleanWrapper disconnect();
+    BooleanWrapper disconnect();
 
     /**
      * Initiate the shutdowns the resource manager. During the shutdown resource manager
@@ -385,25 +385,25 @@ public interface ResourceManager {
      *
      * @return true if the shutdown process is successfully triggered, runtime exception otherwise
      */
-    public BooleanWrapper shutdown(boolean preempt);
+    BooleanWrapper shutdown(boolean preempt);
 
     /**
      * Returns the topology information of nodes.
      * @return nodes topology
      */
-    public Topology getTopology();
+    Topology getTopology();
 
     /**
      * Checks if the currently connected user is the node administrator
      * @return true if yes, false otherwise
      */
-    public BooleanWrapper isNodeAdmin(String nodeUrl);
+    BooleanWrapper isNodeAdmin(String nodeUrl);
 
     /**
      * Checks if the currently connected user can use node for computations
      * @return true if yes, false otherwise
      */
-    public BooleanWrapper isNodeUser(String nodeUrl);
+    BooleanWrapper isNodeUser(String nodeUrl);
 
     /**
      * Executes the script on the specified targets depending on the target type.
@@ -414,7 +414,7 @@ public interface ResourceManager {
      *
      * @return the {@link ScriptResult} corresponding to the script execution.
      */
-    public <T> List<ScriptResult<T>> executeScript(Script<T> script, String targetType, Set<String> targets);
+    <T> List<ScriptResult<T>> executeScript(Script<T> script, String targetType, Set<String> targets);
 
     /**
      * Executes the script on the specified targets depending on the target type.
@@ -425,6 +425,6 @@ public interface ResourceManager {
      * @param targets are names of particular resources
      * @return the {@link ScriptResult} corresponding to the script execution.
      */
-    public List<ScriptResult<Object>> executeScript(String script, String scriptEngine, String targetType,
+    List<ScriptResult<Object>> executeScript(String script, String scriptEngine, String targetType,
             Set<String> targets);
 }

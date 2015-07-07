@@ -44,7 +44,7 @@ package org.ow2.proactive.scheduler.core.jmx.mbean;
  */
 public interface AllAccountsMBean extends MyAccountMBean {
 
-    public void setUsername(String username);
+    void setUsername(String username);
 
-    public String getUsername();
+    String getUsername();
 }

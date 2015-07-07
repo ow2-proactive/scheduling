@@ -52,21 +52,21 @@ import org.objectweb.proactive.annotation.PublicAPI;
 public interface RMConstants {
 
     /** name of RMCore AO registered in RMI register */
-    public static final String NAME_ACTIVE_OBJECT_RMCORE = "RMCORE";
+    String NAME_ACTIVE_OBJECT_RMCORE = "RMCORE";
 
     /** name of RMAdmin AO registered in RMI register */
-    public static final String NAME_ACTIVE_OBJECT_RMADMIN = "RMADMIN";
+    String NAME_ACTIVE_OBJECT_RMADMIN = "RMADMIN";
 
     /** name of RMUser AO registered in RMI register */
-    public static final String NAME_ACTIVE_OBJECT_RMUSER = "RMUSER";
+    String NAME_ACTIVE_OBJECT_RMUSER = "RMUSER";
 
     /** name of RMMonitoring AO registered in RMI register */
-    public static final String NAME_ACTIVE_OBJECT_RMMONITORING = "RMMONITORING";
+    String NAME_ACTIVE_OBJECT_RMMONITORING = "RMMONITORING";
 
     /** name of RMAuthentication AO registered in RMI register */
-    public static final String NAME_ACTIVE_OBJECT_RMAUTHENTICATION = "RMAUTHENTICATION";
+    String NAME_ACTIVE_OBJECT_RMAUTHENTICATION = "RMAUTHENTICATION";
 
     /** The default name of the static node source created  at Resource manager Startup */
-    public static final String DEFAULT_STATIC_SOURCE_NAME = "Default";
+    String DEFAULT_STATIC_SOURCE_NAME = "Default";
 
 }

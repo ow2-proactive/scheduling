@@ -48,23 +48,23 @@ public interface MyAccountMBean {
      * The total count of jobs completed by the current user. 
      * @return the total job count
      */
-    public int getTotalJobCount();
+    int getTotalJobCount();
 
     /**
      * The total time duration in milliseconds of jobs completed by the current user. 
      * @return the total job duration in milliseconds
      */
-    public long getTotalJobDuration();
+    long getTotalJobDuration();
 
     /**
      * The total count of tasks completed by the current user. 
      * @return the total task count
      */
-    public int getTotalTaskCount();
+    int getTotalTaskCount();
 
     /**
      * The total time duration in milliseconds of tasks completed by the current user. 
      * @return the total task duration in milliseconds
      */
-    public long getTotalTaskDuration();
+    long getTotalTaskDuration();
 }
