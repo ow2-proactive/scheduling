@@ -260,7 +260,7 @@ public class TestTaskResultData extends BaseSchedulerDBTest {
         InternalJob job = saveSingleTask(createDefaultTask("task"));
         InternalTask task = (InternalTask) job.getTasks().get(0);
 
-        LinkedList<LoggingEvent> events = new LinkedList<LoggingEvent>();
+        LinkedList<LoggingEvent> events = new LinkedList<>();
         for (int i = 0; i < 3; i++) {
             events.add(new LoggingEvent("", Logger.getLogger(TestTaskResultData.class), Level.INFO, "info" +
                 i, null));

@@ -798,7 +798,7 @@ public class SchedulingService {
                 task.setProgress(progress);//(1)
                 //if progress != previously set progress (0 by default) -> update
                 listener.taskStateUpdated(taskData.getUser(), new NotificationData<TaskInfo>(
-                    SchedulerEvent.TASK_PROGRESS, new TaskInfoImpl((TaskInfoImpl) task.getTaskInfo())));
+                        SchedulerEvent.TASK_PROGRESS, new TaskInfoImpl((TaskInfoImpl) task.getTaskInfo())));
             }
         } catch (NullPointerException e) {
             //should not happened, but avoid restart if execInfo or launcher is null

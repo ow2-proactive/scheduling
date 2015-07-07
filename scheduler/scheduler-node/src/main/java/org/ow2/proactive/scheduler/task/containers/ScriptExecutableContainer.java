@@ -51,7 +51,7 @@ import java.util.Map;
 public class ScriptExecutableContainer extends ExecutableContainer {
 
     /** Arguments of the task as a map */
-    protected final Map<String, ByteArrayWrapper> serializedArguments = new HashMap<String, ByteArrayWrapper>();
+    protected final Map<String, ByteArrayWrapper> serializedArguments = new HashMap<>();
 
     private final TaskScript script;
 

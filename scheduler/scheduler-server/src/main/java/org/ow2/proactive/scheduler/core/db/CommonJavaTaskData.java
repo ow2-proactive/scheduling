@@ -43,7 +43,7 @@ public class CommonJavaTaskData implements Serializable {
         Map<String, ByteArrayWrapper> args = container.getSerializedArguments();
 
         if (args != null) {
-            Map<String, byte[]> convertedArgs = new HashMap<String, byte[]>(args.size());
+            Map<String, byte[]> convertedArgs = new HashMap<>(args.size());
             for (Map.Entry<String, ByteArrayWrapper> argEntry : args.entrySet()) {
                 convertedArgs.put(argEntry.getKey(), argEntry.getValue().getByteArray());
             }

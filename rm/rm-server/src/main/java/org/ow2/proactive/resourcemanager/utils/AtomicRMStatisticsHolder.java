@@ -73,7 +73,7 @@ public final class AtomicRMStatisticsHolder {
      */
     public AtomicRMStatisticsHolder() {
         this.writeonlyStatistics = new RMStatistics();
-        this.readonlyStatistics = new AtomicReference<RMStatistics>(new RMStatistics());
+        this.readonlyStatistics = new AtomicReference<>(new RMStatistics());
     }
 
     /**

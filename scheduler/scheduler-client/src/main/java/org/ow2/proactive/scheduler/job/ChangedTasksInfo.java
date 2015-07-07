@@ -10,11 +10,11 @@ import org.ow2.proactive.scheduler.common.task.TaskState;
 
 public class ChangedTasksInfo {
 
-    private final Set<TaskId> updatedTasks = new TreeSet<TaskId>();
+    private final Set<TaskId> updatedTasks = new TreeSet<>();
 
-    private final Set<TaskId> skippedTasks = new TreeSet<TaskId>();
+    private final Set<TaskId> skippedTasks = new TreeSet<>();
 
-    private final Set<TaskId> newTasks = new TreeSet<TaskId>();
+    private final Set<TaskId> newTasks = new TreeSet<>();
 
     public void newTasksAdded(Collection<? extends TaskState> tasks) {
         for (TaskState task : tasks) {

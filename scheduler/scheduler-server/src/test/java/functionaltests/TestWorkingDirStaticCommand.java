@@ -102,7 +102,7 @@ public class TestWorkingDirStaticCommand extends SchedulerConsecutive {
                 //test submission and event reception
                 TaskFlowJob job = (TaskFlowJob) StaxJobFactory.getFactory().createJob(
                         new File(jobDescriptor.toURI()).getAbsolutePath());
-                List<String> command = new ArrayList<String>();
+                List<String> command = new ArrayList<>();
                 command.add("cmd");
                 command.add("/C");
                 String[] tabCommand = ((NativeTask) job.getTask("task1")).getCommandLine();

@@ -34,7 +34,7 @@ public final class ClientJobState extends JobState {
     private JobInfoImpl jobInfo;
     private String owner;
     private JobType type;
-    private Map<TaskId, TaskState> tasks = new HashMap<TaskId, TaskState>();
+    private Map<TaskId, TaskState> tasks = new HashMap<>();
 
     private boolean cancelJobOnError;
     private int maxNumberOfExecution;
@@ -57,9 +57,9 @@ public final class ClientJobState extends JobState {
         this.cancelJobOnError = jobState.isCancelJobOnError();
         this.maxNumberOfExecution = jobState.getMaxNumberOfExecution();
 
-        this.genericInformations = new HashMap<String, String>(jobState.getGenericInformations());
+        this.genericInformations = new HashMap<>(jobState.getGenericInformations());
 
-        List<ClientTaskState> taskStates = new ArrayList<ClientTaskState>();
+        List<ClientTaskState> taskStates = new ArrayList<>();
         for (TaskState ts : jobState.getTasks()) {
             taskStates.add(new ClientTaskState(ts));
         }
@@ -134,7 +134,7 @@ public final class ClientJobState extends JobState {
 
     @Override
     public ArrayList<TaskState> getTasks() {
-        return new ArrayList<TaskState>(tasks.values());
+        return new ArrayList<>(tasks.values());
     }
 
     @Override

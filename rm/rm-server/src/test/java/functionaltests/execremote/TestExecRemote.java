@@ -90,7 +90,7 @@ public final class TestExecRemote extends RMConsecutive {
         helper.createNodeSource(nsName);
 
         String hostname = null;
-        HashSet<String> nodesUrls = new HashSet<String>();
+        HashSet<String> nodesUrls = new HashSet<>();
         RMInitialState state = helper.getResourceManager().getMonitoring().getState();
         for (RMNodeEvent ne : state.getNodesEvents()) {
             nodesUrls.add(ne.getNodeUrl());
@@ -192,7 +192,7 @@ public final class TestExecRemote extends RMConsecutive {
         {
             RMTHelper.log("Test 6 - Execute script on a specified nodesource name");
             SimpleScript script = new SimpleScript(TestExecRemote.simpleScriptContent, "javascript");
-            HashSet<String> targets = new HashSet<String>(1);
+            HashSet<String> targets = new HashSet<>(1);
             targets.add(nsName);
             List<ScriptResult<Object>> results = helper.getResourceManager().executeScript(script,
                     TargetType.NODESOURCE_NAME.toString(), targets);
@@ -210,7 +210,7 @@ public final class TestExecRemote extends RMConsecutive {
         {
             RMTHelper.log("Test 7 - Execute script with hostname as target");
             SimpleScript script = new SimpleScript(TestExecRemote.simpleScriptContent, "javascript");
-            HashSet<String> targets = new HashSet<String>(1);
+            HashSet<String> targets = new HashSet<>(1);
             targets.add(hostname);
             List<ScriptResult<Object>> results = helper.getResourceManager().executeScript(script,
                     TargetType.HOSTNAME.toString(), targets);

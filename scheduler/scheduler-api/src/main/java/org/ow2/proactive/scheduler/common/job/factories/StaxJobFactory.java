@@ -197,7 +197,7 @@ public class StaxJobFactory extends JobFactory {
     }
 
     private void clean() {
-        this.variables = new HashMap<String, String>();
+        this.variables = new HashMap<>();
         this.job = null;
         this.dependencies = null;
     }
@@ -441,7 +441,7 @@ public class StaxJobFactory extends JobFactory {
      */
     private HashMap<String, String> getGenericInformations(XMLStreamReader cursorInfo)
             throws JobCreationException {
-        HashMap<String, String> infos = new HashMap<String, String>();
+        HashMap<String, String> infos = new HashMap<>();
         try {
             int eventType;
             while (cursorInfo.hasNext()) {
@@ -780,9 +780,9 @@ public class StaxJobFactory extends JobFactory {
     private void createdependences(XMLStreamReader cursorDepends, Task t) throws JobCreationException {
         try {
             if (dependencies == null) {
-                dependencies = new HashMap<String, ArrayList<String>>();
+                dependencies = new HashMap<>();
             }
-            ArrayList<String> depends = new ArrayList<String>(0);
+            ArrayList<String> depends = new ArrayList<>(0);
             int eventType;
             while (cursorDepends.hasNext()) {
                 eventType = cursorDepends.next();
@@ -1098,7 +1098,7 @@ public class StaxJobFactory extends JobFactory {
      */
     private List<SelectionScript> createSelectionScript(XMLStreamReader cursorScript)
             throws JobCreationException {
-        List<SelectionScript> scripts = new ArrayList<SelectionScript>(0);
+        List<SelectionScript> scripts = new ArrayList<>(0);
         String selectionTag = cursorScript.getLocalName();
         String current = null;
         try {
@@ -1160,7 +1160,7 @@ public class StaxJobFactory extends JobFactory {
      */
     private String[] getArguments(XMLStreamReader cursorArgs) throws JobCreationException {
         if (XMLTags.SCRIPT_ARGUMENTS.matches(cursorArgs.getLocalName())) {
-            ArrayList<String> args = new ArrayList<String>(0);
+            ArrayList<String> args = new ArrayList<>(0);
             try {
                 int eventType;
                 while (cursorArgs.hasNext()) {
@@ -1207,7 +1207,7 @@ public class StaxJobFactory extends JobFactory {
             while (cursorExec.next() != XMLEvent.START_ELEMENT)
                 ;
             current = cursorExec.getLocalName();
-            ArrayList<String> command = new ArrayList<String>(0);
+            ArrayList<String> command = new ArrayList<>(0);
             if (XMLTags.NATIVE_TASK_STATICCOMMAND.matches(cursorExec.getLocalName())) {
                 String attr_ = null;
                 String current_ = null;
@@ -1467,7 +1467,7 @@ public class StaxJobFactory extends JobFactory {
             logger.debug("ousp : " + job.getOutputSpace());
             logger.debug("info : " + job.getGenericInformations());
             logger.debug("TASKS ------------------------------------------------");
-            ArrayList<Task> tasks = new ArrayList<Task>();
+            ArrayList<Task> tasks = new ArrayList<>();
             switch (job.getType()) {
                 case TASKSFLOW:
                     tasks.addAll(((TaskFlowJob) job).getTasks());

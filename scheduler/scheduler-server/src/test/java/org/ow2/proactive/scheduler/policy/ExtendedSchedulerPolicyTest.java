@@ -196,7 +196,7 @@ public class ExtendedSchedulerPolicyTest {
         InternalTaskFlowJob taskFlowJob = new InternalTaskFlowJob("test", JobPriority.NORMAL, true, "");
         taskFlowJob.setId(JobIdImpl.makeJobId(Integer.toString(jobId++)));
 
-        ArrayList<InternalTask> tasks = new ArrayList<InternalTask>();
+        ArrayList<InternalTask> tasks = new ArrayList<>();
         tasks.add(createTask(oneTaskStartAt));
         tasks.add(createTask(otherTaskStartAt));
         taskFlowJob.addTasks(tasks);

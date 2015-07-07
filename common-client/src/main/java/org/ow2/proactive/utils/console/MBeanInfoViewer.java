@@ -80,7 +80,7 @@ public final class MBeanInfoViewer {
      */
     public MBeanInfoViewer(final Authentication auth, final String user, final Credentials creds) {
         this.auth = auth;
-        this.env = new HashMap<String, Object>(2);
+        this.env = new HashMap<>(2);
         // Fill the env with credentials 
         this.env.put(JMXConnector.CREDENTIALS, new Object[] { (user == null ? "" : user), creds });
     }
@@ -208,7 +208,7 @@ public final class MBeanInfoViewer {
      * @return the informations about the MBean as a formatted string
      */
     public Map<String, String> getMappedInfo(final String mbeanNameAsString) {
-        HashMap<String, String> result = new HashMap<String, String>();
+        HashMap<String, String> result = new HashMap<>();
         // Lazy initial connection
         this.lazyConnect();
         try {
@@ -217,7 +217,7 @@ public final class MBeanInfoViewer {
                 this.mbeanName = new ObjectName(mbeanNameAsString);
                 final MBeanAttributeInfo[] attrs = this.connection.getMBeanInfo(this.mbeanName)
                         .getAttributes();
-                List<String> attrNames = new ArrayList<String>(attrs.length - 1);
+                List<String> attrNames = new ArrayList<>(attrs.length - 1);
                 for (int i = 0; i < attrs.length; i++) {
                     // reading only primitive or string-type attributes
                     if (isPrimitive(attrs[i].getType()) || String.class.getName().equals(attrs[i].getType())) {

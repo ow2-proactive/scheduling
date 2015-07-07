@@ -81,7 +81,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     /** Stores methods that will be called on clients */
     private static final Map<String, Method> eventMethods;
     static {
-        eventMethods = new HashMap<String, Method>();
+        eventMethods = new HashMap<>();
         for (Method m : SchedulerEventListener.class.getMethods()) {
             eventMethods.put(m.getName(), m);
         }
@@ -111,12 +111,12 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     private final Map<JobId, JobState> jobsMap;
 
     SchedulerFrontendState(SchedulerStateImpl sState, SchedulerJMXHelper jmxHelper) {
-        this.identifications = new HashMap<UniqueID, ListeningUser>();
-        this.credentials = new HashMap<UniqueID, Credentials>();
-        this.dirtyList = new HashSet<UniqueID>();
+        this.identifications = new HashMap<>();
+        this.credentials = new HashMap<>();
+        this.dirtyList = new HashSet<>();
         this.jmxHelper = jmxHelper;
-        this.jobsMap = new HashMap<JobId, JobState>();
-        this.jobs = new HashMap<JobId, IdentifiedJob>();
+        this.jobsMap = new HashMap<>();
+        this.jobs = new HashMap<>();
         this.sessionTimer = new Timer("SessionTimer");
         this.sState = sState;
         recover(sState);
@@ -129,7 +129,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
      */
     private void recover(SchedulerStateImpl sState) {
         //default state = started
-        Set<JobState> jobStates = new HashSet<JobState>();
+        Set<JobState> jobStates = new HashSet<>();
         if (logger.isInfoEnabled()) {
             logger.info("#Pending jobs: " + sState.getPendingJobs().size() + " #Running jobs: " +
                 sState.getRunningJobs().size() + " #Finished jobs: " + sState.getFinishedJobs().size());
@@ -486,7 +486,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         if (jobState == null) {
             return Collections.emptySet();
         } else {
-            Set<TaskId> tasks = new HashSet<TaskId>(jobState.getTasks().size());
+            Set<TaskId> tasks = new HashSet<>(jobState.getTasks().size());
             for (TaskState task : jobState.getTasks()) {
                 tasks.add(task.getId());
             }
@@ -600,7 +600,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
             if (dirtyList.isEmpty()) {
                 return;
             }
-            toRemove = new HashSet<UniqueID>(dirtyList);
+            toRemove = new HashSet<>(dirtyList);
             dirtyList.clear();
         }
 
@@ -927,7 +927,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     }
 
     synchronized List<SchedulerUserInfo> getUsers() {
-        List<SchedulerUserInfo> users = new ArrayList<SchedulerUserInfo>(identifications.size());
+        List<SchedulerUserInfo> users = new ArrayList<>(identifications.size());
         for (ListeningUser listeningUser : identifications.values()) {
             UserIdentificationImpl user = listeningUser.getUser();
             users.add(new SchedulerUserInfo(user.getHostName(), user.getUsername(), user.getConnectionTime(),

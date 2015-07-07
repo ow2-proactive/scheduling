@@ -87,7 +87,7 @@ public class StatHistoryCaching {
     private static StatHistoryCaching instance = null;
 
     private StatHistoryCaching() {
-        this.statHistoryCache = new HashMap<String, StatHistoryCacheEntry>();
+        this.statHistoryCache = new HashMap<>();
     }
 
     public static synchronized StatHistoryCaching getInstance() {

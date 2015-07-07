@@ -26,7 +26,7 @@ public class DebugHelper {
     public List<String> getDebuggedVMOptions() {
         String listenerOption = String.format(
                 "-agentlib:jdwp=transport=dt_socket,server=y,address=%d,suspend=n", debugPort);
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
         result.add(listenerOption);
         return result;
     }

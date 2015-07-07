@@ -180,8 +180,8 @@ public class JobComparator {
         }
         // the order of the tasks may not be the same
         // the tasks have unique name inside a job
-        Map<String, Task> map1 = new HashMap<String, Task>();
-        Map<String, Task> map2 = new HashMap<String, Task>();
+        Map<String, Task> map1 = new HashMap<>();
+        Map<String, Task> map2 = new HashMap<>();
 
         for (int k = 0; k < tasks1.size(); k++) {
             map1.put(tasks1.get(k).getName(), tasks1.get(k));
@@ -241,8 +241,8 @@ public class JobComparator {
             }
 
             // we only compare the names in the 2 dependencies lists
-            Set<String> names1 = new HashSet<String>();
-            Set<String> names2 = new HashSet<String>();
+            Set<String> names1 = new HashSet<>();
+            Set<String> names2 = new HashSet<>();
             for (int k = 0; k < dep1.size(); k++) {
                 names1.add(dep1.get(k).getName());
                 names2.add(dep2.get(k).getName());

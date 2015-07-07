@@ -169,7 +169,7 @@ public class UserIdentificationImpl extends UserIdentification {
             userEvents = null;
             return;
         }
-        userEvents = new HashSet<SchedulerEvent>();
+        userEvents = new HashSet<>();
         //protect from duplicated events
         for (SchedulerEvent e : events) {
             userEvents.add(e);

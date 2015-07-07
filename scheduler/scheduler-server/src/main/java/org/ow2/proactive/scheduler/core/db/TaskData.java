@@ -302,7 +302,7 @@ public class TaskData {
     private static final Map<Class<? extends TopologyDescriptor>, String> topologyDescMapping;
 
     static {
-        topologyDescMapping = new HashMap<Class<? extends TopologyDescriptor>, String>();
+        topologyDescMapping = new HashMap<>();
         topologyDescMapping.put(ArbitraryTopologyDescriptor.class, "ARBITRARY");
         topologyDescMapping.put(BestProximityDescriptor.class, "BEST_PROXIMITY");
         topologyDescMapping.put(ThresholdProximityDescriptor.class, "THRESHOLD");
@@ -389,7 +389,7 @@ public class TaskData {
         taskData.updateMutableAttributes(task);
 
         if (task.getSelectionScripts() != null) {
-            List<ScriptData> scripts = new ArrayList<ScriptData>(task.getSelectionScripts().size());
+            List<ScriptData> scripts = new ArrayList<>(task.getSelectionScripts().size());
             for (SelectionScript selectionScript : task.getSelectionScripts()) {
                 scripts.add(ScriptData.createForSelectionScript(selectionScript, taskData));
             }
@@ -408,7 +408,7 @@ public class TaskData {
             taskData.setFlowScript(ScriptData.createForFlowScript(task.getFlowScript()));
         }
 
-        List<SelectorData> selectorsData = new ArrayList<SelectorData>();
+        List<SelectorData> selectorsData = new ArrayList<>();
         if (task.getInputFilesList() != null) {
             for (InputSelector selector : task.getInputFilesList()) {
                 selectorsData.add(SelectorData.createForInputSelector(selector, taskData));

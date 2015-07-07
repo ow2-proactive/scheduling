@@ -83,7 +83,7 @@ public class DataSpaceServiceStarter implements Serializable {
     private static final String DEFAULT_LOCAL_USER = DEFAULT_LOCAL + File.separator + "defaultuser";
     private static final String DEFAULT_LOCAL_SCRATCH = DEFAULT_LOCAL + File.separator + "scratch";
 
-    private static HashMap<Long, HashSet<String>> spacesConfigurations = new HashMap<Long, HashSet<String>>();
+    private static HashMap<Long, HashSet<String>> spacesConfigurations = new HashMap<>();
 
     /**
      * Naming service
@@ -114,7 +114,7 @@ public class DataSpaceServiceStarter implements Serializable {
     /**
      * Dataspace servers
      */
-    private ArrayList<FileSystemServerDeployer> servers = new ArrayList<FileSystemServerDeployer>(4);
+    private ArrayList<FileSystemServerDeployer> servers = new ArrayList<>(4);
 
     private DataSpaceServiceStarter() {
     }
@@ -212,7 +212,7 @@ public class DataSpaceServiceStarter implements Serializable {
             }
         }
 
-        Set<SpaceInstanceInfo> predefinedSpaces = new HashSet<SpaceInstanceInfo>();
+        Set<SpaceInstanceInfo> predefinedSpaces = new HashSet<>();
         namingService.registerApplication(SchedulerConstants.SCHEDULER_DATASPACE_APPLICATION_ID,
                 predefinedSpaces);
 
@@ -292,7 +292,7 @@ public class DataSpaceServiceStarter implements Serializable {
         InputOutputSpaceConfiguration spaceConf = null;
 
         // Converts the property to an ArrayList
-        ArrayList<String> finalurls = new ArrayList<String>(Arrays
+        ArrayList<String> finalurls = new ArrayList<>(Arrays
                 .asList(dsConfigPropertyToUrls(urlsproperty)));
 
         if (inputConfiguration) {
@@ -390,7 +390,7 @@ public class DataSpaceServiceStarter implements Serializable {
             // the pattern uses positive look-behind and look-ahead
             final String[] outputWithQuotes = property.trim().split("(?<=\") +(?=\")");
             // removing quotes
-            ArrayList<String> output = new ArrayList<String>();
+            ArrayList<String> output = new ArrayList<>();
             for (String outputWithQuote : outputWithQuotes) {
                 int len = outputWithQuote.length();
                 if (outputWithQuote.length() > 2) {

@@ -275,12 +275,12 @@ public class TestListenJobLogs extends FunctionalTest {
 
         TestAppender(String name) {
             this.name = name;
-            this.actualMessages = new ArrayList<String>();
+            this.actualMessages = new ArrayList<>();
         }
 
         synchronized void waitForLoggingEvent(long timeout, String... expectedMessages)
                 throws InterruptedException {
-            List<String> expectedMessagesList = new ArrayList<String>();
+            List<String> expectedMessagesList = new ArrayList<>();
             for (String message : expectedMessages) {
                 expectedMessagesList.add(message);
             }

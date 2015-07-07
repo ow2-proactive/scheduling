@@ -100,7 +100,7 @@ public final class AddGetReleaseRemoveTest extends RMConsecutive {
 
         final JMXServiceURL jmxRmiServiceURL = new JMXServiceURL(auth
                 .getJMXConnectorURL(JMXTransportProtocol.RMI));
-        final HashMap<String, Object> env = new HashMap<String, Object>(1);
+        final HashMap<String, Object> env = new HashMap<>(1);
         env.put(JMXConnector.CREDENTIALS, new Object[] { adminLogin, adminCreds });
 
         // Connect to the JMX RMI Connector Server

@@ -71,7 +71,7 @@ public class SigarProcesses implements SigarProcessesMXBean {
         Sigar sigar = new Sigar();
         long[] pids = sigar.getProcList();
 
-        List<ProcessInfo> result = new ArrayList<ProcessInfo>(pids.length);
+        List<ProcessInfo> result = new ArrayList<>(pids.length);
 
         for (int i = 0; i < pids.length; i++) {
             long pid = pids[i];

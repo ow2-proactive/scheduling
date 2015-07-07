@@ -57,8 +57,8 @@ final class TerminationData {
 
     static TerminationData newTerminationData() {
         return new TerminationData(new HashSet<JobId>(),
-            new HashMap<TaskId, TerminationData.TaskTerminationData>(),
-            new HashMap<TaskId, TerminationData.TaskRestartData>());
+                new HashMap<TaskId, TaskTerminationData>(),
+                new HashMap<TaskId, TaskRestartData>());
     }
 
     private TerminationData(Set<JobId> jobsToTerminate, Map<TaskId, TaskTerminationData> tasksToTerminate,

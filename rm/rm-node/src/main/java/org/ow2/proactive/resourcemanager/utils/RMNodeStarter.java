@@ -374,7 +374,7 @@ public class RMNodeStarter {
     }
 
     private List<Node> createNodes(String nodeName) {
-        List<Node> nodes = new ArrayList<Node>();
+        List<Node> nodes = new ArrayList<>();
         for (int nodeIndex = 0; nodeIndex < workers; nodeIndex++) {
             String indexedNodeName = nodeName;
             if (workers > 1) {

@@ -89,7 +89,7 @@ public class NodeSourcePriorityPolicy implements SelectionPolicy {
                 lastModified = config.lastModified();
 
                 logger.debug("Reading the NodeSourcePriorityPolicy config file");
-                nodeSources = new LinkedList<String>();
+                nodeSources = new LinkedList<>();
 
                 try {
                     BufferedReader br = new BufferedReader(new FileReader(config));
@@ -128,7 +128,7 @@ public class NodeSourcePriorityPolicy implements SelectionPolicy {
 
         logger.debug("Arranging nodes according to node sources priorities");
 
-        HashMap<String, List<RMNode>> nodesMap = new HashMap<String, List<RMNode>>();
+        HashMap<String, List<RMNode>> nodesMap = new HashMap<>();
         for (RMNode node : nodes) {
             if (!nodesMap.containsKey(node.getNodeSourceName())) {
                 nodesMap.put(node.getNodeSourceName(), new LinkedList<RMNode>());
@@ -136,7 +136,7 @@ public class NodeSourcePriorityPolicy implements SelectionPolicy {
             nodesMap.get(node.getNodeSourceName()).add(node);
         }
 
-        List<RMNode> arranged = new LinkedList<RMNode>();
+        List<RMNode> arranged = new LinkedList<>();
         for (String ns : nodeSources) {
             if (nodesMap.containsKey(ns)) {
                 logger.debug("Adding " + nodesMap.get(ns).size() + " nodes from " + ns);

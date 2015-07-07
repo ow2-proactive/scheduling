@@ -226,7 +226,7 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
     }
 
     private static class SchedulerEventListenerImpl implements SchedulerEventListener {
-        private Stack<JobState> jobStateStack = new Stack<JobState>();
+        private Stack<JobState> jobStateStack = new Stack<>();
 
         @Override
         public void jobSubmittedEvent(JobState jobState) {

@@ -116,7 +116,7 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
             int resultSize = taskDescriptor.getParents().size();
             if ((job.getType() == JobType.TASKSFLOW) && (resultSize > 0) && task.handleResultsArguments()) {
                 params = new TaskResult[resultSize];
-                List<TaskId> parentIds = new ArrayList<TaskId>(resultSize);
+                List<TaskId> parentIds = new ArrayList<>(resultSize);
                 for (int i = 0; i < resultSize; i++) {
                     parentIds.add(taskDescriptor.getParents().get(i).getTaskId());
                 }

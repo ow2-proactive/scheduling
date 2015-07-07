@@ -96,7 +96,7 @@ public class RestJobTrackerImpl extends JobTracker {
             }
         }
 
-        Set<Path> foldersToDelete = new HashSet<Path>();
+        Set<Path> foldersToDelete = new HashSet<>();
         foldersToDelete.add(remotePullFolder.getParent());
         if (!remotePullFolder.getParent().equals(remotePushFolder.getParent())) {
             foldersToDelete.add(remotePushFolder.getParent());

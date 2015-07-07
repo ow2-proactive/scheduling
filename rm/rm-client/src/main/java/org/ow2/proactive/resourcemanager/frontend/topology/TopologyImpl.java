@@ -66,13 +66,13 @@ public class TopologyImpl implements Topology, Cloneable {
      * Store here only half of matrix - each host have distances to hosts added before.
      * Assume that they are symmetrical.
      */
-    private HashMap<InetAddress, HashMap<InetAddress, Long>> distances = new HashMap<InetAddress, HashMap<InetAddress, Long>>();
+    private HashMap<InetAddress, HashMap<InetAddress, Long>> distances = new HashMap<>();
     /**
      * This map is needed to store the dependency between host name and address.
      * All listeners of the RM receive only host name in events, so for them it's simpler to
      * operate with strings.
      */
-    private HashMap<String, InetAddress> hosts = new HashMap<String, InetAddress>();
+    private HashMap<String, InetAddress> hosts = new HashMap<>();
 
     /**
      * {@inheritDoc}

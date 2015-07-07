@@ -157,7 +157,7 @@ public abstract class AuthenticationImpl implements Authentication, RunActive {
             // Verify that this user//password can connect to this existing scheduler
             getLogger().info(username + " is trying to connect");
 
-            Map<String, Object> params = new HashMap<String, Object>(4);
+            Map<String, Object> params = new HashMap<>(4);
             //user name to check
             params.put("username", username);
             //password to check

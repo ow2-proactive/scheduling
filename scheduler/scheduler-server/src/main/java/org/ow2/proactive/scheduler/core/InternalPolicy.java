@@ -69,7 +69,7 @@ class InternalPolicy {
     /** Maximum number of tasks returned by the policy in each loop */
     private int NB_TASKS_PER_LOOP = PASchedulerProperties.SCHEDULER_POLICY_NBTASKPERLOOP.getValueAsInt();
 
-    private Set<TaskId> ids = new HashSet<TaskId>();
+    private Set<TaskId> ids = new HashSet<>();
     private int previousFreeNodeNumber = 0;
     RMState RMState = null;
 
@@ -94,7 +94,7 @@ class InternalPolicy {
             freeNodeNb = RMState.getFreeNodesNumber();
         }
 
-        LinkedList<EligibleTaskDescriptor> toReturn = new LinkedList<EligibleTaskDescriptor>();
+        LinkedList<EligibleTaskDescriptor> toReturn = new LinkedList<>();
 
         //fill list of task to be returned by the policy
         //max number of returned tasks will be the number of tasks per loop

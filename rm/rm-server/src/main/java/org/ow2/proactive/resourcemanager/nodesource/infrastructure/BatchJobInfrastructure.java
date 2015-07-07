@@ -149,7 +149,7 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
     /**
      * nodes currently up and running, nodeName -> jobID
      */
-    private Hashtable<String, String> currentNodes = new Hashtable<String, String>();
+    private Hashtable<String, String> currentNodes = new Hashtable<>();
     /**
      * the number of pending nodes
      */
@@ -157,7 +157,7 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
     /**
      * To notify the control loop of the pending node timeout
      */
-    private ConcurrentHashMap<String, Boolean> pnTimeout = new ConcurrentHashMap<String, Boolean>();
+    private ConcurrentHashMap<String, Boolean> pnTimeout = new ConcurrentHashMap<>();
 
     /**
      * Acquires as much nodes as possible, making one distinct reservation per node

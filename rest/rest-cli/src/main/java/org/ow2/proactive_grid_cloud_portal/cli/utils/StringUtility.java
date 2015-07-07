@@ -101,7 +101,7 @@ public class StringUtility {
         formatter.setMaxColumnLength(80);
         formatter.setSpace(4);
 
-        List<String> titles = new ArrayList<String>();
+        List<String> titles = new ArrayList<>();
         titles.add("Host");
         titles.add("Distance (µs)");
         titles.add("Host");
@@ -113,7 +113,7 @@ public class StringUtility {
             Map<String, String> hostTopology = topology.getDistances().get(host);
             if (hostTopology != null) {
                 for (String anotherHost : hostTopology.keySet()) {
-                    line = new ArrayList<String>();
+                    line = new ArrayList<>();
                     line.add(host);
                     line.add(hostTopology.get(anotherHost));
                     line.add(anotherHost);
@@ -131,7 +131,7 @@ public class StringUtility {
         formatter.setMaxColumnLength(80);
         formatter.setSpace(4);
 
-        List<String> titles = new ArrayList<String>();
+        List<String> titles = new ArrayList<>();
         titles.add("SOURCE_NAME");
         titles.add("HOST_NAME");
         titles.add("STATE");
@@ -145,7 +145,7 @@ public class StringUtility {
 
         if (nodeEvents != null) {
             for (NodeEventView nodeEvent : nodeEvents) {
-                List<String> line = new ArrayList<String>();
+                List<String> line = new ArrayList<>();
                 line.add(nodeEvent.getNodeSource());
                 line.add(nodeEvent.getHostName());
                 line.add(nodeEvent.getNodeState());
@@ -169,7 +169,7 @@ public class StringUtility {
         formatter.setMaxColumnLength(80);
         formatter.setSpace(4);
 
-        List<String> titles = new ArrayList<String>();
+        List<String> titles = new ArrayList<>();
         titles.add("SOURCE_NAME");
         titles.add("DESCRIPTION");
         titles.add("ADMINISTRATOR");
@@ -178,7 +178,7 @@ public class StringUtility {
         formatter.addEmptyLine();
 
         for (NodeSourceView ns : nodeSources) {
-            List<String> line = new ArrayList<String>();
+            List<String> line = new ArrayList<>();
             line.add(ns.getSourceName());
             line.add(ns.getSourceDescription());
             line.add(ns.getNodeSourceAdmin());
@@ -191,13 +191,13 @@ public class StringUtility {
         ObjectArrayFormatter formatter = new ObjectArrayFormatter();
         formatter.setMaxColumnLength(80);
         formatter.setSpace(4);
-        List<String> titles = new ArrayList<String>();
+        List<String> titles = new ArrayList<>();
         titles.add("Stats:");
         titles.add("");
         formatter.setTitle(titles);
         formatter.addEmptyLine();
         for (MBeanInfoView infoView : infoViews) {
-            List<String> line = new ArrayList<String>();
+            List<String> line = new ArrayList<>();
             line.add("" + infoView.getName());
             line.add("" + infoView.getValue());
             formatter.addLine(line);
@@ -230,7 +230,7 @@ public class StringUtility {
         // space between column
         formatter.setSpace(4);
         // title line
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
         list.add("ID");
         list.add("NAME");
         list.add("ITER");
@@ -250,7 +250,7 @@ public class StringUtility {
         // TaskState.setSortingBy(sort);
         // Collections.sort(tasks);
         for (TaskStateData taskState : tasks) {
-            list = new ArrayList<String>();
+            list = new ArrayList<>();
             TaskInfoData taskInfo = taskState.getTaskInfo();
             TaskIdData taskId = taskInfo.getTaskId();
 
@@ -286,7 +286,7 @@ public class StringUtility {
         formatter.setMaxColumnLength(30);
         formatter.setSpace(4);
 
-        List<String> columnNames = new ArrayList<String>();
+        List<String> columnNames = new ArrayList<>();
         columnNames.add("ID");
         columnNames.add("NAME");
         columnNames.add("OWNER");
@@ -324,7 +324,7 @@ public class StringUtility {
     private static List<String> rowList(UserJobData userJobInfo) {
         org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobInfoData jobInfo = userJobInfo.getJobInfo();
 
-        List<String> row = new ArrayList<String>();
+        List<String> row = new ArrayList<>();
         row.add(String.valueOf(jobInfo.getJobId().getId()));
         row.add(jobInfo.getJobId().getReadableName());
         row.add(userJobInfo.getJobOwner());
@@ -351,12 +351,12 @@ public class StringUtility {
         ObjectArrayFormatter formatter = new ObjectArrayFormatter();
         formatter.setMaxColumnLength(80);
         formatter.setSpace(2);
-        List<String> columnNames = new ArrayList<String>();
+        List<String> columnNames = new ArrayList<>();
         columnNames.add("");
         columnNames.add("");
         formatter.setTitle(columnNames);
         for (Entry<String, String> e : stats.entrySet()) {
-            List<String> row = new ArrayList<String>();
+            List<String> row = new ArrayList<>();
             row.add(e.getKey());
             row.add(e.getValue());
             formatter.addLine(row);

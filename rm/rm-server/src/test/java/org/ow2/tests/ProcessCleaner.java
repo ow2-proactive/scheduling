@@ -101,7 +101,7 @@ public class ProcessCleaner {
         Sigar sigar = new Sigar();
         try {
             long[] pids = new ProcessFinder(sigar).find("State.Name.eq=java,Args.*.re=" + pattern);
-            Set<Integer> setOfPids = new HashSet<Integer>();
+            Set<Integer> setOfPids = new HashSet<>();
             for (long pid : pids) {
                 setOfPids.add((int) pid);
                 if (printProcesses)
@@ -118,7 +118,7 @@ public class ProcessCleaner {
         pb.redirectErrorStream(true);
         Process p = pb.start();
 
-        Set<Integer> pids = new HashSet<Integer>();
+        Set<Integer> pids = new HashSet<>();
 
         Reader r = new InputStreamReader(p.getInputStream());
         BufferedReader br = new BufferedReader(r);
@@ -162,7 +162,7 @@ public class ProcessCleaner {
                 pb.redirectErrorStream(true);
                 Process p = pb.start();
 
-                Set<Integer> pids = new HashSet<Integer>();
+                Set<Integer> pids = new HashSet<>();
 
                 Reader r = new InputStreamReader(p.getInputStream());
                 BufferedReader br = new BufferedReader(r);

@@ -74,14 +74,14 @@ public class DefaultPolicyTest {
     private JobDescriptorImpl createSingleTaskJob(JobPriority jobPriority) {
         InternalTaskFlowJob taskFlowJob = new InternalTaskFlowJob("test", jobPriority, true, "");
         taskFlowJob.setId(JobIdImpl.makeJobId(Integer.toString(jobId++)));
-        ArrayList<InternalTask> tasks = new ArrayList<InternalTask>();
+        ArrayList<InternalTask> tasks = new ArrayList<>();
         tasks.add(new InternalScriptTask());
         taskFlowJob.addTasks(tasks);
         return new JobDescriptorImpl(taskFlowJob);
     }
 
     private List<JobDescriptor> submitJobs(JobDescriptorImpl... jobs) {
-        List<JobDescriptor> submittedJobs = new ArrayList<JobDescriptor>();
+        List<JobDescriptor> submittedJobs = new ArrayList<>();
         Collections.addAll(submittedJobs, jobs);
         return submittedJobs;
     }

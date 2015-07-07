@@ -67,7 +67,7 @@ public class ListPolicyCommand extends AbstractCommand implements Command {
                 }, currentContext);
                 resultStack(currentContext).push(
                         pluginViewList.toArray(new PluginView[pluginViewList.size()]));
-                knownPolicyMap = new HashMap<String, PluginView>();
+                knownPolicyMap = new HashMap<>();
                 for (PluginView pluginView : pluginViewList) {
                     knownPolicyMap.put(pluginView.getPluginName(), pluginView);
                 }

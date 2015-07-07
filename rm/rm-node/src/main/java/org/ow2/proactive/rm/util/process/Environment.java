@@ -180,7 +180,7 @@ public class Environment {
         } catch (Exception e) {
             logger.debug("Error when reading the JVM System Environment Cache : " + e.getMessage());
         }
-        return new HashMap<String, String>();
+        return new HashMap<>();
     }
 
     @SuppressWarnings("unchecked")
@@ -194,7 +194,7 @@ public class Environment {
         } catch (Exception ex2) {
             logger.debug("Error when reading the JVM System Environment Cache : " + ex2.getMessage());
         }
-        return new HashMap<String, String>();
+        return new HashMap<>();
     }
 
     public static void main(String[] args) throws InterruptedException {

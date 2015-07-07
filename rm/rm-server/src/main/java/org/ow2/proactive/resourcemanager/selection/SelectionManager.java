@@ -132,7 +132,7 @@ public abstract class SelectionManager {
             logger.info("The resource manager will accept only selection scripts from " + dirName);
             File folder = new File(dirName);
             if (folder.exists() && folder.isDirectory()) {
-                authorizedSelectionScripts = new HashSet<String>();
+                authorizedSelectionScripts = new HashSet<>();
                 for (File file : folder.listFiles()) {
                     if (file.isFile()) {
                         try {
@@ -255,7 +255,7 @@ public abstract class SelectionManager {
         } else {
             // run scripts not on all nodes, but always on missing number of nodes
             // until required node set is found
-            matchedNodes = new LinkedList<Node>();
+            matchedNodes = new LinkedList<>();
             while (matchedNodes.size() < criteria.getSize()) {
                 int requiredNodesNumber = criteria.getSize() - matchedNodes.size();
                 int numberOfNodesForScriptExecution = requiredNodesNumber;
@@ -303,7 +303,7 @@ public abstract class SelectionManager {
         }
 
         // the nodes are selected, now mark them as busy.
-        for (Node node : new LinkedList<Node>(selectedNodes)) {
+        for (Node node : new LinkedList<>(selectedNodes)) {
             try {
                 // Synchronous call
                 rmcore.setBusyNode(node.getNodeInformation().getURL(), client);
@@ -315,7 +315,7 @@ public abstract class SelectionManager {
         }
         // marking extra selected nodes as busy
         if (selectedNodes.size() > 0 && selectedNodes.getExtraNodes() != null) {
-            for (Node node : new LinkedList<Node>(selectedNodes.getExtraNodes())) {
+            for (Node node : new LinkedList<>(selectedNodes.getExtraNodes())) {
                 try {
                     // synchronous call
                     rmcore.setBusyNode(node.getNodeInformation().getURL(), client);
@@ -365,14 +365,14 @@ public abstract class SelectionManager {
      * @return nodes matched to all scripts
      */
     private List<Node> runScripts(List<RMNode> candidates, Criteria criteria) {
-        List<Node> matched = new LinkedList<Node>();
+        List<Node> matched = new LinkedList<>();
 
         if (candidates.size() == 0) {
             return matched;
         }
 
         // creating script executors object to be run in dedicated thread pool
-        List<Callable<Node>> scriptExecutors = new LinkedList<Callable<Node>>();
+        List<Callable<Node>> scriptExecutors = new LinkedList<>();
         synchronized (inProgress) {
             if (inProgress.size() > 0) {
                 logger.warn(inProgress.size() + " nodes are in process of script execution");
@@ -451,7 +451,7 @@ public abstract class SelectionManager {
             client.getSubject().getPrincipals().add(tokenPrincipal);
         }
 
-        List<RMNode> filteredList = new ArrayList<RMNode>();
+        List<RMNode> filteredList = new ArrayList<>();
 
         for (RMNode node : freeNodes) {
             // checking the permission
@@ -493,8 +493,8 @@ public abstract class SelectionManager {
     public <T> List<ScriptResult<T>> executeScript(final Script<T> script, final Collection<RMNode> nodes) {
         // TODO: add a specific timeout for script execution
         final int timeout = PAResourceManagerProperties.RM_EXECUTE_SCRIPT_TIMEOUT.getValueAsInt();
-        final ArrayList<Callable<ScriptResult<T>>> scriptExecutors = new ArrayList<Callable<ScriptResult<T>>>(
-            nodes.size());
+        final ArrayList<Callable<ScriptResult<T>>> scriptExecutors = new ArrayList<>(
+                nodes.size());
 
         // Execute the script on each selected node
         for (final RMNode node : nodes) {
@@ -537,7 +537,7 @@ public abstract class SelectionManager {
             Thread.currentThread().interrupt();
         }
 
-        final List<ScriptResult<T>> results = new LinkedList<ScriptResult<T>>();
+        final List<ScriptResult<T>> results = new LinkedList<>();
 
         int index = 0;
         // waiting for the results
@@ -547,16 +547,16 @@ public abstract class SelectionManager {
             try {
                 result = future.get();
             } catch (CancellationException e) {
-                result = new ScriptResult<T>(new ScriptException("Cancelled due to timeout expiration when " +
-                    description, e));
+                result = new ScriptResult<>(new ScriptException("Cancelled due to timeout expiration when " +
+                        description, e));
             } catch (InterruptedException e) {
-                result = new ScriptResult<T>(new ScriptException("Cancelled due to interruption when " +
-                    description));
+                result = new ScriptResult<>(new ScriptException("Cancelled due to interruption when " +
+                        description));
             } catch (ExecutionException e) {
                 // Unwrap the root exception 
                 Throwable rex = e.getCause();
-                result = new ScriptResult<T>(new ScriptException("Exception occured in script call when " +
-                    description, rex));
+                result = new ScriptResult<>(new ScriptException("Exception occured in script call when " +
+                        description, rex));
             }
             results.add(result);
         }

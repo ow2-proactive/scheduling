@@ -16,7 +16,7 @@ import org.junit.Assert;
 
 public class MockSchedulingListener implements SchedulerStateUpdate {
 
-    private List<SchedulerEvent> events = new ArrayList<SchedulerEvent>();
+    private List<SchedulerEvent> events = new ArrayList<>();
 
     @Override
     public void schedulerStateUpdated(SchedulerEvent eventType) {

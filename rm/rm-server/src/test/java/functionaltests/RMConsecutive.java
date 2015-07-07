@@ -34,7 +34,7 @@ public class RMConsecutive extends FunctionalTest {
             ResourceManager rm = helper.getResourceManager(null, RM_USER_TEST, RM_PASS_TEST);
             int nodeNumber = rm.getState().getTotalNodesNumber();
 
-            List<String> sources = new ArrayList<String>();
+            List<String> sources = new ArrayList<>();
             RMInitialState state = rm.getMonitoring().getState();
             for (RMNodeSourceEvent sourceEvent : state.getNodeSource()) {
                 sources.add(sourceEvent.getSourceName());

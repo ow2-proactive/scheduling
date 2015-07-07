@@ -238,23 +238,23 @@ public class SelectionScript extends Script<Boolean> {
             Object result = bindings.get(RESULT_VARIABLE);
 
             if (result instanceof Boolean) {
-                return new ScriptResult<Boolean>((Boolean) result);
+                return new ScriptResult<>((Boolean) result);
             } else if (result instanceof Integer) {
-                return new ScriptResult<Boolean>((Integer) result != 0);
+                return new ScriptResult<>((Integer) result != 0);
             } else if (result instanceof CharSequence) {
-                return new ScriptResult<Boolean>(!(result.equals("false") || result
+                return new ScriptResult<>(!(result.equals("false") || result
                         .equals("False")));
             } else {
-                return new ScriptResult<Boolean>(new Exception(
-                    "Bad result format : awaited Boolean (or Integer when not existing), found " +
-                        result.getClass().getName()));
+                return new ScriptResult<>(new Exception(
+                        "Bad result format : awaited Boolean (or Integer when not existing), found " +
+                                result.getClass().getName()));
             }
         } else {
             String msg = "No binding for key : " + RESULT_VARIABLE +
                 "\na Selection script must define a variable named '" + RESULT_VARIABLE +
                 "' set to true or false";
             logger.error(msg);
-            return new ScriptResult<Boolean>(new Exception(msg));
+            return new ScriptResult<>(new Exception(msg));
         }
     }
 

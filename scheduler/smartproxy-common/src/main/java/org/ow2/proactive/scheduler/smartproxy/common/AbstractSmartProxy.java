@@ -137,7 +137,7 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
                         tres = getTaskResult(id, tname);
                         if (tres != null) {
                             log.debug("Synchonizing task " + tname + " of job " + id);
-                            taskStateUpdatedEvent(new NotificationData<TaskInfo>(
+                            taskStateUpdatedEvent(new NotificationData<>(
                                     SchedulerEvent.TASK_RUNNING_TO_FINISHED, ts.getTaskInfo()));
                         }
                     } catch (NotConnectedException e) {
@@ -156,7 +156,7 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
             }
 
             if (js.isFinished()) {
-                jobStateUpdatedEvent(new NotificationData<JobInfo>(SchedulerEvent.JOB_RUNNING_TO_FINISHED, js
+                jobStateUpdatedEvent(new NotificationData<>(SchedulerEvent.JOB_RUNNING_TO_FINISHED, js
                         .getJobInfo()));
             }
         } catch (NotConnectedException e) {
@@ -227,7 +227,7 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
             propagate(e);
         }
 
-        HashMap<String, AwaitedTask> awaitedTaskMap = new HashMap<String, AwaitedTask>();
+        HashMap<String, AwaitedTask> awaitedTaskMap = new HashMap<>();
         for (Task t : job.getTasks()) {
             awaitedTaskMap.put(t.getName(), new AwaitedTask(t.getName(), t.getOutputFilesList()));
         }

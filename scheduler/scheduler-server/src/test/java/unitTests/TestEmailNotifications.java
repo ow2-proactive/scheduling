@@ -65,7 +65,7 @@ public class TestEmailNotifications extends ProActiveTest {
 
     private static NotificationData<JobInfo> getNotification(JobState js, SchedulerEvent event) {
         JobInfo jobInfo = new JobInfoImpl((JobInfoImpl) js.getJobInfo());
-        return new NotificationData<JobInfo>(event, jobInfo);
+        return new NotificationData<>(event, jobInfo);
     }
 
     private static void setSenderAddress(String address) {

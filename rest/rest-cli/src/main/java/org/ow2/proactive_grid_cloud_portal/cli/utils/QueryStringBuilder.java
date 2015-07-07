@@ -51,7 +51,7 @@ import org.apache.http.message.BasicNameValuePair;
 
 public class QueryStringBuilder {
 
-    private List<NameValuePair> parameters = new ArrayList<NameValuePair>();
+    private List<NameValuePair> parameters = new ArrayList<>();
 
     public QueryStringBuilder add(String name, String value) {
         parameters.add(new BasicNameValuePair(name, value));

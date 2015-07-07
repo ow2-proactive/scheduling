@@ -102,7 +102,7 @@ public class HAC {
         if (from.size() == 0) {
             // no nodes after selection scripts execution
             // return empty list
-            return new LinkedList<Node>();
+            return new LinkedList<>();
         }
 
         // initializing cluster distances map
@@ -120,13 +120,13 @@ public class HAC {
             // fixed orientation clustering
             Iterator<Node> it = pivot.iterator();
             Node pivotNode = it.next();
-            target = new Cluster<Node>(getNodeId(pivotNode), pivotNode);
+            target = new Cluster<>(getNodeId(pivotNode), pivotNode);
             // merging pivot nodes into one cluster and recalculating distances
             logger.debug("Merging pivot nodes into one cluster");
             while (it.hasNext()) {
                 // merging clusters and recalculating distances between others
                 pivotNode = it.next();
-                Cluster<Node> pivotCluster = new Cluster<Node>(getNodeId(pivotNode), pivotNode);
+                Cluster<Node> pivotCluster = new Cluster<>(getNodeId(pivotNode), pivotNode);
                 target = recalculateDistances(target, pivotCluster, clusterDistances);
             }
 
@@ -228,18 +228,18 @@ public class HAC {
 
     private HashMap<Cluster<Node>, HashMap<Cluster<Node>, Long>> initClusterDistances(List<Node> from) {
         if (pivot.size() > 0) {
-            from = new LinkedList<Node>(from);
+            from = new LinkedList<>(from);
             for (Node piv : pivot) {
                 if (!from.contains(piv))
                     from.add(piv);
             }
         }
 
-        HashMap<Cluster<Node>, HashMap<Cluster<Node>, Long>> clusterDistances = new HashMap<Cluster<Node>, HashMap<Cluster<Node>, Long>>();
+        HashMap<Cluster<Node>, HashMap<Cluster<Node>, Long>> clusterDistances = new HashMap<>();
 
         for (Node node : from) {
-            Cluster<Node> newCluster = new Cluster<Node>(getNodeId(node), node);
-            HashMap<Cluster<Node>, Long> dist = new HashMap<Cluster<Node>, Long>();
+            Cluster<Node> newCluster = new Cluster<>(getNodeId(node), node);
+            HashMap<Cluster<Node>, Long> dist = new HashMap<>();
             for (Cluster<Node> cluster : clusterDistances.keySet()) {
                 dist.put(cluster, getDistance(node, cluster.getElements().get(0)));
             }
@@ -375,11 +375,11 @@ public class HAC {
         }
 
         logger.debug("Initializing clusters map");
-        HashMap<Cluster<String>, HashMap<Cluster<String>, Long>> clusterDistances = new HashMap<Cluster<String>, HashMap<Cluster<String>, Long>>();
+        HashMap<Cluster<String>, HashMap<Cluster<String>, Long>> clusterDistances = new HashMap<>();
 
         for (String host : hosts) {
-            Cluster<String> newCluster = new Cluster<String>(host, host);
-            HashMap<Cluster<String>, Long> dist = new HashMap<Cluster<String>, Long>();
+            Cluster<String> newCluster = new Cluster<>(host, host);
+            HashMap<Cluster<String>, Long> dist = new HashMap<>();
             for (Cluster<String> cluster : clusterDistances.keySet()) {
                 dist.put(cluster, topology.getDistance(host, cluster.getElements().get(0)));
             }
@@ -398,6 +398,6 @@ public class HAC {
             recalculateDistances(clustersToMerge[0], clustersToMerge[1], clusterDistances);
         }
 
-        return new LinkedList<Cluster<String>>(clusterDistances.keySet());
+        return new LinkedList<>(clusterDistances.keySet());
     }
 }

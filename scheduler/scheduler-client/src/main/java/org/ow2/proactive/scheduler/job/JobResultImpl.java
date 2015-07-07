@@ -75,8 +75,8 @@ public class JobResultImpl implements JobResult {
      * ProActive empty constructor
      */
     public JobResultImpl() {
-        allResults = new HashMap<String, TaskResult>();
-        preciousResults = new HashMap<String, TaskResult>();
+        allResults = new HashMap<>();
+        preciousResults = new HashMap<>();
     }
 
     /**
@@ -150,7 +150,7 @@ public class JobResultImpl implements JobResult {
      * @return a new filtered map
      */
     private Map<String, TaskResult> filterNullResults(Map<String, TaskResult> trs) {
-        Map<String, TaskResult> tmp = new HashMap<String, TaskResult>();
+        Map<String, TaskResult> tmp = new HashMap<>();
         for (Entry<String, TaskResult> e : trs.entrySet()) {
             if (e.getValue() != null) {
                 tmp.put(e.getKey(), e.getValue());
@@ -163,7 +163,7 @@ public class JobResultImpl implements JobResult {
      * @see org.ow2.proactive.scheduler.common.job.JobResult#getExceptionResults()
      */
     public Map<String, TaskResult> getExceptionResults() {
-        Map<String, TaskResult> exceptions = new HashMap<String, TaskResult>();
+        Map<String, TaskResult> exceptions = new HashMap<>();
         for (Entry<String, TaskResult> e : allResults.entrySet()) {
             if (e.getValue() != null && e.getValue().hadException()) {
                 exceptions.put(e.getKey(), e.getValue());

@@ -92,7 +92,7 @@ public class RestSchedulerPushPullFileTest extends AbstractRestFuncTestCase {
     public void setUp() throws Exception {
         Scheduler scheduler = RestFuncTHelper.getScheduler();
         SchedulerState state = scheduler.getState();
-        List<JobState> jobStates = new ArrayList<JobState>();
+        List<JobState> jobStates = new ArrayList<>();
         jobStates.addAll(state.getPendingJobs());
         jobStates.addAll(state.getRunningJobs());
         jobStates.addAll(state.getFinishedJobs());
@@ -173,7 +173,7 @@ public class RestSchedulerPushPullFileTest extends AbstractRestFuncTestCase {
 
         InputStream is = response2.getEntity().getContent();
         List<String> lines = IOUtils.readLines(is);
-        HashSet<String> content = new HashSet<String>(lines);
+        HashSet<String> content = new HashSet<>(lines);
         System.out.println(lines);
         Assert.assertTrue("Pushed file correctly listed", content.contains(testPushFile.getName()));
 

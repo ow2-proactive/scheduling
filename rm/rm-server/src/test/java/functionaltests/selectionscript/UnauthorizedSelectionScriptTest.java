@@ -73,7 +73,7 @@ public class UnauthorizedSelectionScriptTest extends FunctionalTest {
         Criteria criteria = new Criteria(1);
 
         URL vmPropSelectionScriptpath = this.getClass().getResource("dummySelectionScript.js");
-        List<SelectionScript> scripts = new ArrayList<SelectionScript>();
+        List<SelectionScript> scripts = new ArrayList<>();
         scripts.add(new SelectionScript(new File(vmPropSelectionScriptpath.toURI()), null, true));
         criteria.setScripts(scripts);
         try {
@@ -88,7 +88,7 @@ public class UnauthorizedSelectionScriptTest extends FunctionalTest {
 
         String authorizedScriptPath = PAResourceManagerProperties.RM_HOME.getValueAsString() +
             "/samples/scripts/selection/checkPhysicalFreeMem.js";
-        scripts = new ArrayList<SelectionScript>();
+        scripts = new ArrayList<>();
         scripts.add(new SelectionScript(new File(authorizedScriptPath), new String[] { "1" }, true));
         criteria.setScripts(scripts);
         NodeSet ns = rm.getNodes(criteria);

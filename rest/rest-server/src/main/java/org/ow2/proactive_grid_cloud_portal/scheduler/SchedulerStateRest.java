@@ -57,6 +57,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.security.auth.login.LoginException;
@@ -208,8 +209,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     @SuppressWarnings("unchecked")
     private static final List<SortParameter<JobSortParameter>> DEFAULT_JOB_SORT_PARAMS = Arrays.asList(
-      new SortParameter<JobSortParameter>(JobSortParameter.STATE, SortOrder.ASC),
-      new SortParameter<JobSortParameter>(JobSortParameter.ID, SortOrder.DESC));
+            new SortParameter<>(JobSortParameter.STATE, SortOrder.ASC),
+            new SortParameter<>(JobSortParameter.ID, SortOrder.DESC));
 
     private static final Mapper mapper = new DozerBeanMapper(Collections
             .singletonList("org/ow2/proactive_grid_cloud_portal/scheduler/dozer-mappings.xml"));
@@ -242,7 +243,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
             List<JobInfo> jobs = s.getJobs(index, range, new JobFilterCriteria(false, true, true, true),
                     DEFAULT_JOB_SORT_PARAMS);
-            List<String> ids = new ArrayList<String>(jobs.size());
+            List<String> ids = new ArrayList<>(jobs.size());
             for (JobInfo jobInfo : jobs) {
                 ids.add(jobInfo.getJobId().value());
             }
@@ -299,7 +300,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
             List<JobInfo> jobInfoList = s.getJobs(index, range,
                     new JobFilterCriteria(false, true, true, true), DEFAULT_JOB_SORT_PARAMS);
-            List<UserJobData> userJobInfoList = new ArrayList<UserJobData>(jobInfoList.size());
+            List<UserJobData> userJobInfoList = new ArrayList<>(jobInfoList.size());
             for (JobInfo jobInfo : jobInfoList) {
                 userJobInfoList.add(new UserJobData(mapper.map(jobInfo, JobInfoData.class)));
             }
@@ -363,12 +364,12 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
             List<JobInfo> jobsInfo = s.getJobs(index, range, new JobFilterCriteria(onlyUserJobs, pending,
                 running, finished), DEFAULT_JOB_SORT_PARAMS);
-            List<UserJobData> jobs = new ArrayList<UserJobData>(jobsInfo.size());
+            List<UserJobData> jobs = new ArrayList<>(jobsInfo.size());
             for (JobInfo jobInfo : jobsInfo) {
                 jobs.add(new UserJobData(mapper.map(jobInfo, JobInfoData.class)));
             }
 
-            HashMap<Long, List<UserJobData>> map = new HashMap<Long, List<UserJobData>>(1);
+            HashMap<Long, List<UserJobData>> map = new HashMap<>(1);
             map.put(SchedulerStateListener.getInstance().getSchedulerStateRevision(), jobs);
             return map;
         } catch (PermissionException e) {
@@ -574,8 +575,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                 return null;
             }
             Map<String, TaskResult> allResults = jobResult.getAllResults();
-            Map<String, String> res = new HashMap<String, String>(allResults.size());
-            for (final Map.Entry<String, TaskResult> entry : allResults.entrySet()) {
+            Map<String, String> res = new HashMap<>(allResults.size());
+            for (final Entry<String, TaskResult> entry : allResults.entrySet()) {
                 TaskResult taskResult = entry.getValue();
                 String value = getTaskResultValueAsStringOrExceptionStackTrace(taskResult);
                 res.put(entry.getKey(), value);
@@ -795,7 +796,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/tasks");
 
             JobState jobState = s.getJobState(jobId);
-            List<String> tasksName = new ArrayList<String>(jobState.getTasks().size());
+            List<String> tasksName = new ArrayList<>(jobState.getTasks().size());
             for (TaskState ts : jobState.getTasks()) {
                 tasksName.add(ts.getId().getReadableName());
             }
@@ -879,7 +880,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
             JobState jobState = s.getJobState(jobId);
 
-            List<InputStream> streams = new ArrayList<InputStream>();
+            List<InputStream> streams = new ArrayList<>();
             List<TaskState> tasks = jobState.getTasks();
             Collections.sort(tasks, TaskState.COMPARE_BY_FINISHED_TIME_ASC);
             for (TaskState ts : tasks) {
@@ -2309,7 +2310,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     private static <T> List<T> map(List<?> toMaps, Class<T> type) {
-        List<T> result = new ArrayList<T>();
+        List<T> result = new ArrayList<>();
         for (Object toMap : toMaps) {
             result.add(mapper.map(toMap, type));
         }

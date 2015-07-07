@@ -220,13 +220,13 @@ public abstract class InternalTask extends TaskState {
     public void replicateTree(Map<TaskId, InternalTask> acc, TaskId target, boolean loopAction, int dupIndex,
             int itIndex) throws ExecutableCreationException {
 
-        Map<TaskId, InternalTask> tmp = new HashMap<TaskId, InternalTask>();
+        Map<TaskId, InternalTask> tmp = new HashMap<>();
 
         // replicate the tasks
         internalReplicateTree(tmp, target, loopAction, dupIndex, itIndex);
 
         // remove replicates from nested LOOP action
-        Map<String, Entry<TaskId, InternalTask>> map = new HashMap<String, Entry<TaskId, InternalTask>>();
+        Map<String, Entry<TaskId, InternalTask>> map = new HashMap<>();
         for (Entry<TaskId, InternalTask> it : tmp.entrySet()) {
             String name = it.getValue().getAmbiguousName();
             if (map.containsKey(name)) {
@@ -276,7 +276,7 @@ public abstract class InternalTask extends TaskState {
             // recursive call
             if (!this.getTaskInfo().getTaskId().equals(target)) {
                 if (this.getIDependences() != null) {
-                    Map<String, InternalTask> deps = new HashMap<String, InternalTask>();
+                    Map<String, InternalTask> deps = new HashMap<>();
                     for (InternalTask parent : this.getIDependences()) {
                         // filter out replicated tasks
                         if (deps.containsKey(parent.getAmbiguousName())) {
@@ -324,7 +324,7 @@ public abstract class InternalTask extends TaskState {
 
         InternalTask nt = acc.get(this.getId());
 
-        Map<String, InternalTask> ideps = new HashMap<String, InternalTask>();
+        Map<String, InternalTask> ideps = new HashMap<>();
         int deptype = 0;
         if (this.getIfBranch() != null) {
             deptype = 1;
@@ -394,7 +394,7 @@ public abstract class InternalTask extends TaskState {
                         break;
                     case 2:
                         if (nt.getJoinedBranches() == null) {
-                            List<InternalTask> jb = new ArrayList<InternalTask>();
+                            List<InternalTask> jb = new ArrayList<>();
                             nt.setJoinedBranches(jb);
                         }
                         for (InternalTask it : nt.getJoinedBranches()) {
@@ -497,7 +497,7 @@ public abstract class InternalTask extends TaskState {
      */
     public void addDependence(InternalTask task) {
         if (ideps == null) {
-            ideps = new ArrayList<InternalTask>();
+            ideps = new ArrayList<>();
         }
         ideps.add(task);
     }
@@ -642,7 +642,7 @@ public abstract class InternalTask extends TaskState {
             ideps = null;
             return null;
         }
-        List<TaskState> tmp = new ArrayList<TaskState>(ideps.size());
+        List<TaskState> tmp = new ArrayList<>(ideps.size());
         for (TaskState ts : ideps) {
             tmp.add(ts);
         }
@@ -1062,10 +1062,10 @@ public abstract class InternalTask extends TaskState {
 
         if (taskInfo == null || genericInformations == null) {
             // task is not yet properly initialized
-            return new HashMap<String, String>();
+            return new HashMap<>();
         }
 
-        Map<String, String> replacements = new HashMap<String, String>();
+        Map<String, String> replacements = new HashMap<>();
         JobId jobId = taskInfo.getJobId();
         if (jobId != null) {
             replacements.put(SchedulerVars.PA_JOB_ID.toString(), jobId.toString());

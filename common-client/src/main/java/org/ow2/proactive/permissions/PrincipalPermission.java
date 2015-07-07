@@ -71,7 +71,7 @@ import org.ow2.proactive.authentication.principals.IdentityPrincipal;
  */
 public class PrincipalPermission extends ClientPermission {
 
-    private List<IdentityPrincipal> principals = new LinkedList<IdentityPrincipal>();
+    private List<IdentityPrincipal> principals = new LinkedList<>();
 
     public PrincipalPermission(IdentityPrincipal principal) {
         super(principal.getName());
@@ -115,7 +115,7 @@ final class PrincipalPermissionCollection extends PermissionCollection implement
     private transient List<Permission> permissions;
 
     public PrincipalPermissionCollection() {
-        permissions = new LinkedList<Permission>();
+        permissions = new LinkedList<>();
     }
 
     @Override

@@ -238,7 +238,7 @@ public class Tools {
      */
     public static String[] parseCommandLine(String cmdLine) {
         final char specialToken = '%';
-        ArrayList<String> tokens = new ArrayList<String>();
+        ArrayList<String> tokens = new ArrayList<>();
         int i = 0;
         StringBuilder tmp = new StringBuilder();
         char[] cs = cmdLine.toCharArray();
@@ -377,7 +377,7 @@ public class Tools {
     public static void logAvailableScriptEngines(Logger logger) {
         ScriptEngineManager mgr = new ScriptEngineManager();
         List<ScriptEngineFactory> factories = mgr.getEngineFactories();
-        List<String> engineNames = new ArrayList<String>();
+        List<String> engineNames = new ArrayList<>();
         for (ScriptEngineFactory factory : factories) {
             engineNames.add(String.format("%s(%s)", factory.getEngineName(), factory.getEngineVersion()));
         }

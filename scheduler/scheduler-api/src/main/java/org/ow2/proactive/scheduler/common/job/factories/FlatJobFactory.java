@@ -150,7 +150,7 @@ public class FlatJobFactory {
             int task_number = 0;
 
             BufferedReader reader = new BufferedReader(new FileReader(commandFile));
-            ArrayList<String> commandList = new ArrayList<String>();
+            ArrayList<String> commandList = new ArrayList<>();
             while ((commandLine = reader.readLine()) != null) {
                 commandLine = commandLine.trim();
                 if (!commandLine.startsWith(CMD_FILE_COMMENT_CHAR, 0) && !"".equals(commandLine)) {

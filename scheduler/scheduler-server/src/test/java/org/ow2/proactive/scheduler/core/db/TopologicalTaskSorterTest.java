@@ -19,7 +19,7 @@ public class TopologicalTaskSorterTest {
     static class TestEntry implements Entry {
 
         private final int id;
-        List<Entry> parents = new ArrayList<Entry>();
+        List<Entry> parents = new ArrayList<>();
 
         public TestEntry(int i) {
             id = i;
@@ -122,7 +122,7 @@ public class TopologicalTaskSorterTest {
 
     @Ignore("Should work when TopologicalTaskSorter will use an iterative method")
     public void testBigGraph() throws Exception {
-        List<Entry> entries = new ArrayList<Entry>();
+        List<Entry> entries = new ArrayList<>();
         TestEntry e = new TestEntry(0);
         entries.add(e);
         for (int i = 1; i < 1000000; i++) {

@@ -116,8 +116,8 @@ public class ROServerImpl implements Serializable {
         this.mbeanServer = mbs;
         this.env = env;
         this.context = AccessController.getContext();
-        this.connections = new ConcurrentHashMap<String, WeakReference<RemoteObjectExposer<ROConnection>>>();
-        this.roe = new RemoteObjectExposer<ROServerImpl>(ROServerImpl.class.getName(), this);
+        this.connections = new ConcurrentHashMap<>();
+        this.roe = new RemoteObjectExposer<>(ROServerImpl.class.getName(), this);
     }
 
     /**
@@ -149,10 +149,10 @@ public class ROServerImpl implements Serializable {
             final ROConnection connection = new ROConnection(this.mbeanServer, connectionId, this, subject,
                 this.context);
             // Create a remote object exposer for this object			
-            final RemoteObjectExposer<ROConnection> roe = new RemoteObjectExposer<ROConnection>(
-                ROConnection.class.getName(), connection);
+            final RemoteObjectExposer<ROConnection> roe = new RemoteObjectExposer<>(
+                    ROConnection.class.getName(), connection);
             // Use a weak reference and put it in the hash map  			
-            this.connections.put(connectionId, new WeakReference<RemoteObjectExposer<ROConnection>>(roe));
+            this.connections.put(connectionId, new WeakReference<>(roe));
             // Get the default base uri for all remote objects
             final URI baseURI = JMXProviderUtils.getBaseURI();
             // Generate the uri (default base uri + class simple name + connection number)

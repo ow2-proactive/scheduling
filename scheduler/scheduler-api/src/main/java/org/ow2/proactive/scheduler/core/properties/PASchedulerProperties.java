@@ -444,7 +444,7 @@ public enum PASchedulerProperties {
      */
     public List<String> getValueAsList(String separator) {
         Properties prop = propertiesLoader.getProperties();
-        ArrayList<String> valueList = new ArrayList<String>();
+        ArrayList<String> valueList = new ArrayList<>();
         if (prop.containsKey(key)) {
             String value = prop.getProperty(key);
             for (String val : value.split(Pattern.quote(separator))) {

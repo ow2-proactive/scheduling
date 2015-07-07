@@ -227,7 +227,7 @@ public class RMListenerProxy extends RMGroupEventListener {
             return nodeConnector.getMBeanServerConnection().getMBeanInfo(new ObjectName(objectName));
         } else {
 
-            List<Object> result = new LinkedList<Object>();
+            List<Object> result = new LinkedList<>();
             AttributeList attributes = nodeConnector.getMBeanServerConnection().getAttributes(
                     new ObjectName(objectName), attrs.toArray(new String[attrs.size()]));
 
@@ -277,7 +277,7 @@ public class RMListenerProxy extends RMGroupEventListener {
      * Converts MXBean composite data to json serializable values 
      */
     private Object convertCompositeData(CompositeData compositeData) {
-        HashMap<String, Object> vals = new HashMap<String, Object>();
+        HashMap<String, Object> vals = new HashMap<>();
         for (Object key : compositeData.getCompositeType().keySet()) {
             vals.put(key.toString(), compositeData.get(key.toString()));
         }
@@ -302,7 +302,7 @@ public class RMListenerProxy extends RMGroupEventListener {
         Set<ObjectName> beans = nodeConnector.getMBeanServerConnection().queryNames(
                 new ObjectName(objectNames), null);
 
-        HashMap<String, Object> results = new HashMap<String, Object>();
+        HashMap<String, Object> results = new HashMap<>();
         for (ObjectName bean : beans) {
             results
                     .put(bean.getCanonicalName(),
@@ -321,7 +321,7 @@ public class RMListenerProxy extends RMGroupEventListener {
         Set<ObjectName> beans = nodeConnector.getMBeanServerConnection().queryNames(
                 new ObjectName(objectNames), null);
 
-        HashMap<String, Object> results = new HashMap<String, Object>();
+        HashMap<String, Object> results = new HashMap<>();
         for (ObjectName bean : beans) {
             results.put(bean.getCanonicalName(), getNodeMBeanHistory(nodeJmxUrl, bean.getCanonicalName(),
                     attrs, range));
@@ -361,7 +361,7 @@ public class RMListenerProxy extends RMGroupEventListener {
             nodeConnector = null;
         }
 
-        final HashMap<String, Object> env = new HashMap<String, Object>(2);
+        final HashMap<String, Object> env = new HashMap<>(2);
         env.put(JMXConnector.CREDENTIALS, new Object[] { "", credentials });
         if (url.startsWith("service:jmx:ro")) {
             env.put(JMXConnectorFactory.PROTOCOL_PROVIDER_PACKAGES, JMXProviderUtils.RO_PROVIDER_PKGS);

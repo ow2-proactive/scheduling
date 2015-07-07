@@ -118,7 +118,7 @@ public class TestGenericInformation extends SchedulerConsecutive {
 
     public void checkJobState(JobState jobState) {
 
-        HashMap<String, String> expected = new HashMap<String, String>();
+        HashMap<String, String> expected = new HashMap<>();
         expected.put("PA_JOB_NAME", jobState.getId().getReadableName());
         expected.put("PA_JOB_ID", jobState.getId().toString());
 
@@ -131,7 +131,7 @@ public class TestGenericInformation extends SchedulerConsecutive {
 
     public void checkTaskState(TaskState taskState) {
 
-        HashMap<String, String> expected = new HashMap<String, String>();
+        HashMap<String, String> expected = new HashMap<>();
         expected.put("PA_JOB_NAME", taskState.getJobId().getReadableName());
         expected.put("PA_JOB_ID", taskState.getJobId().toString());
         expected.put("PA_TASK_NAME", taskState.getName());

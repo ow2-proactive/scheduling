@@ -66,7 +66,7 @@ public class TestJobRemove extends BaseSchedulerDBTest {
         int THREAD_COUNT = 4;
         ExecutorService executorService = Executors.newCachedThreadPool();
 
-        List<InternalJob> jobs = new ArrayList<InternalJob>();
+        List<InternalJob> jobs = new ArrayList<>();
         TaskFlowJob jobDef;
         for (int i = 0; i < THREAD_COUNT; i++) {
             jobDef = createJob(2);
@@ -232,7 +232,7 @@ public class TestJobRemove extends BaseSchedulerDBTest {
         TaskFlowJob jobDef = createJob(tasksNumber);
         InternalJob job = defaultSubmitJobAndLoadInternal(false, jobDef);
 
-        Map<String, BigString> resProperties = new HashMap<String, BigString>();
+        Map<String, BigString> resProperties = new HashMap<>();
         resProperties.put("property1", new BigString("value1"));
         resProperties.put("property2", new BigString("value2"));
 
@@ -286,7 +286,7 @@ public class TestJobRemove extends BaseSchedulerDBTest {
     }
 
     private void checkAllEntitiesDeleted(String... skipClasses) {
-        List<String> skip = new ArrayList<String>(Arrays.asList(skipClasses));
+        List<String> skip = new ArrayList<>(Arrays.asList(skipClasses));
 
         Session session = dbManager.getSessionFactory().openSession();
         try {

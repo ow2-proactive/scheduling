@@ -125,7 +125,7 @@ public enum XMLAttributes {
     public static XMLAttributes getFromXMLName(String xmlName) {
         String toCheck = xmlName.toUpperCase();
         if (namesToEnum == null) {
-            namesToEnum = new HashMap<String, XMLAttributes>();
+            namesToEnum = new HashMap<>();
             for (XMLAttributes attr : values()) {
                 namesToEnum.put(attr.getXMLName().toUpperCase(), attr);
             }

@@ -89,7 +89,7 @@ public class SetInfrastructureCommand extends AbstractCommand implements Command
             HttpGet request = new HttpGet(currentContext.getResourceUrl("infrastructures"));
             HttpResponseWrapper response = execute(request, currentContext);
             if (statusCode(OK) == statusCode(response)) {
-                infrastructures = new HashMap<String, PluginView>();
+                infrastructures = new HashMap<>();
                 List<PluginView> pluginViewList = readValue(response, new TypeReference<List<PluginView>>() {
                 }, currentContext);
                 for (PluginView pluginView : pluginViewList) {

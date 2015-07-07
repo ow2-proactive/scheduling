@@ -113,11 +113,11 @@ public class SchedulerMonitorsHandler {
      * @param userInterface
      */
     public SchedulerMonitorsHandler() {
-        jobsEvents = new HashMap<JobId, List<JobEventMonitor>>();
-        tasksEvents = new HashMap<TaskId, List<TaskEventMonitor>>();
-        schedulerStateEvents = new ArrayList<SchedulerEvent>();
-        finishedJobs = new ArrayList<JobId>();
-        eventsMonitors = new ArrayList<EventMonitor>();
+        jobsEvents = new HashMap<>();
+        tasksEvents = new HashMap<>();
+        schedulerStateEvents = new ArrayList<>();
+        finishedJobs = new ArrayList<>();
+        eventsMonitors = new ArrayList<>();
     }
 
     /**
@@ -263,7 +263,7 @@ public class SchedulerMonitorsHandler {
      */
     private void addJobEvent(SchedulerEvent event, JobInfo jInfo) {
         if (!jobsEvents.containsKey(jInfo.getJobId())) {
-            List<JobEventMonitor> list = new ArrayList<JobEventMonitor>();
+            List<JobEventMonitor> list = new ArrayList<>();
             jobsEvents.put(jInfo.getJobId(), list);
         }
         jobsEvents.get(jInfo.getJobId()).add(new JobEventMonitor(event, jInfo));
@@ -278,7 +278,7 @@ public class SchedulerMonitorsHandler {
      */
     private void addJobEvent(SchedulerEvent event, JobState jState) {
         if (!jobsEvents.containsKey(jState.getId())) {
-            List<JobEventMonitor> list = new ArrayList<JobEventMonitor>();
+            List<JobEventMonitor> list = new ArrayList<>();
             jobsEvents.put(jState.getId(), list);
         }
         jobsEvents.get(jState.getId()).add(new JobEventMonitor(event, jState));
@@ -291,7 +291,7 @@ public class SchedulerMonitorsHandler {
      */
     private void addTaskEvent(SchedulerEvent event, TaskInfo tInfo) {
         if (!tasksEvents.containsKey(tInfo.getTaskId())) {
-            List<TaskEventMonitor> list = new ArrayList<TaskEventMonitor>();
+            List<TaskEventMonitor> list = new ArrayList<>();
             tasksEvents.put(tInfo.getTaskId(), list);
         }
         tasksEvents.get(tInfo.getTaskId()).add(new TaskEventMonitor(event, tInfo));

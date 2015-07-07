@@ -78,7 +78,7 @@ public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
     public void setUp() throws Exception {
         Scheduler scheduler = RestFuncTHelper.getScheduler();
         SchedulerState state = scheduler.getState();
-        List<JobState> jobStates = new ArrayList<JobState>();
+        List<JobState> jobStates = new ArrayList<>();
         jobStates.addAll(state.getPendingJobs());
         jobStates.addAll(state.getRunningJobs());
         jobStates.addAll(state.getFinishedJobs());

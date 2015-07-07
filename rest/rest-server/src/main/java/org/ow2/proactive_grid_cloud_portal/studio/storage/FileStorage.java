@@ -32,7 +32,7 @@ public class FileStorage<T extends Named> {
     }
 
     public List<T> readAll() throws IOException {
-        ArrayList<T> entities = new ArrayList<T>();
+        ArrayList<T> entities = new ArrayList<>();
         for (File f : rootDir.listFiles()) {
             entities.add(read(f.getName()));
         }

@@ -99,7 +99,7 @@ public class SelectionScriptTimeOutTest extends RMConsecutive {
         RMTHelper.log("Test 2 - selecting nodes with script which is timed out only on some hosts");
         String nodeName = "timeoutNode";
 
-        HashMap<String, String> vmProperties = new HashMap<String, String>();
+        HashMap<String, String> vmProperties = new HashMap<>();
         vmProperties.put(nodeName, "dummy");
 
         String nodeURL = helper.createNode(nodeName, vmProperties).getNode().getNodeInformation().getURL();

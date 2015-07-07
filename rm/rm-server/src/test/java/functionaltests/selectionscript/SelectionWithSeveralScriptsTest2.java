@@ -106,7 +106,7 @@ public class SelectionWithSeveralScriptsTest2 extends RMConsecutive {
         //create a first node with one VM property
         //---------------------------------------------------
 
-        HashMap<String, String> vmProp1 = new HashMap<String, String>();
+        HashMap<String, String> vmProp1 = new HashMap<>();
         vmProp1.put(this.vmPropKey1, this.vmPropValue1);
 
         String node1URL = helper.createNode(node1Name, vmProp1).getNode().getNodeInformation().getURL();
@@ -121,7 +121,7 @@ public class SelectionWithSeveralScriptsTest2 extends RMConsecutive {
         //create a second node with two VM properties
         //---------------------------------------------------
 
-        HashMap<String, String> vmTwoProperties = new HashMap<String, String>();
+        HashMap<String, String> vmTwoProperties = new HashMap<>();
         vmTwoProperties.put(this.vmPropKey1, this.vmPropValue1);
         vmTwoProperties.put(this.vmPropKey2, this.vmPropValue2);
 
@@ -144,7 +144,7 @@ public class SelectionWithSeveralScriptsTest2 extends RMConsecutive {
 
         RMTHelper.log("Test 1");
 
-        ArrayList<SelectionScript> scriptsList = new ArrayList<SelectionScript>();
+        ArrayList<SelectionScript> scriptsList = new ArrayList<>();
 
         scriptsList.add(sScript1);
         scriptsList.add(sScript2);

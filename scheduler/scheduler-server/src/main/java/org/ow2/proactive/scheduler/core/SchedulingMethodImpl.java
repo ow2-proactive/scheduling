@@ -164,7 +164,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
         //get job Descriptor list with eligible jobs (running and pending)
         Map<JobId, JobDescriptor> jobMap = schedulingService.lockJobsToSchedule();
         try {
-            List<JobDescriptor> descriptors = new ArrayList<JobDescriptor>(jobMap.size());
+            List<JobDescriptor> descriptors = new ArrayList<>(jobMap.size());
             descriptors.addAll(jobMap.values());
 
             //ask the policy all the tasks to be schedule according to the jobs list.
@@ -192,7 +192,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                 }
 
                 //get the next compatible tasks from the whole returned policy tasks
-                LinkedList<EligibleTaskDescriptor> tasksToSchedule = new LinkedList<EligibleTaskDescriptor>();
+                LinkedList<EligibleTaskDescriptor> tasksToSchedule = new LinkedList<>();
                 int neededResourcesNumber = 0;
                 while (taskRetrievedFromPolicy.size() > 0 && neededResourcesNumber == 0) {
                     //the loop will search for next compatible task until it find something
@@ -385,7 +385,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                             SchedulerConstants.NODE_ACCESS_TOKEN));
                 }
 
-                Collection<String> computationDescriptors = new ArrayList<String>(tasksToSchedule.size());
+                Collection<String> computationDescriptors = new ArrayList<>(tasksToSchedule.size());
                 for (EligibleTaskDescriptor task : tasksToSchedule) {
                     computationDescriptors.add(task.getTaskId().toString());
                 }

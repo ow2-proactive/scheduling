@@ -130,7 +130,7 @@ public class SimpleScript extends Script<Object> {
     @Override
     protected ScriptResult<Object> getResult(Object evalResult, Bindings bindings) {
         // no significant result can be returned
-        return new ScriptResult<Object>();
+        return new ScriptResult<>();
     }
 
     /**

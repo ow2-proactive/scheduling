@@ -112,7 +112,7 @@ public enum XMLTags {
         }
         String toCheck = xmlName.toUpperCase();
         if (namesToEnum == null) {
-            namesToEnum = new HashMap<String, XMLTags>();
+            namesToEnum = new HashMap<>();
             for (XMLTags tag : values()) {
                 namesToEnum.put(tag.getXMLName().toUpperCase(), tag);
             }

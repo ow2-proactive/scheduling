@@ -98,7 +98,7 @@ public class NodeSet extends ArrayList<Node> {
         super(another);
         // coping the extra nodes
         if (another.getExtraNodes() != null) {
-            this.extraNodes = new LinkedList<Node>(another.getExtraNodes());
+            this.extraNodes = new LinkedList<>(another.getExtraNodes());
         }
     }
 

@@ -62,7 +62,7 @@ public class RRDDataStore extends Thread {
     private StandardMBean mbean;
     protected int step = DEFAULT_STEP_IN_SECONDS; //secs
     protected String dataBaseFile;
-    protected final HashMap<String, String> dataSources = new HashMap<String, String>();
+    protected final HashMap<String, String> dataSources = new HashMap<>();
     protected volatile boolean terminate = false;
     protected Logger logger;
 

@@ -85,14 +85,14 @@ public class TestPreciousLogs extends SchedulerConsecutive {
         TaskFlowJob job = new TaskFlowJob();
         job.setName(this.getClass().getSimpleName());
 
-        Map<String, List<String>> expectedOutput = new LinkedHashMap<String, List<String>>();
+        Map<String, List<String>> expectedOutput = new LinkedHashMap<>();
 
         for (int i = 0; i < 3; i++) {
             String forkOutput = "forkOutput-" + i;
             String preOutput = "preOutput-" + i;
             String postOutput = "postOutput-" + i;
 
-            List<String> expectedTaskOutput = new ArrayList<String>();
+            List<String> expectedTaskOutput = new ArrayList<>();
             expectedTaskOutput.add(TASK_OUTPUT);
             expectedTaskOutput.add(preOutput);
             expectedTaskOutput.add(postOutput);

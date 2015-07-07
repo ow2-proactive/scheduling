@@ -671,7 +671,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     public List<JobResult> waitForAllJobs(List<String> jobIds, long timeout) throws NotConnectedException,
             UnknownJobException, PermissionException, TimeoutException {
         long timestamp = 0;
-        List<JobResult> results = new ArrayList<JobResult>();
+        List<JobResult> results = new ArrayList<>();
         for (String jobId : jobIds) {
             timestamp = currentTimeMillis();
             results.add(waitForJob(jobId, timeout));
@@ -725,7 +725,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
             throws UnknownJobException, NotConnectedException, PermissionException, UnknownTaskException,
             TimeoutException {
         long timestamp = 0;
-        List<Map.Entry<String, TaskResult>> taskResults = new ArrayList<Map.Entry<String, TaskResult>>();
+        List<Map.Entry<String, TaskResult>> taskResults = new ArrayList<>();
         for (String taskName : taskNames) {
             timestamp = currentTimeMillis();
             Entry<String, TaskResult> taskResultEntry = toEntry(taskName, waitForTask(jobId, taskName,
@@ -854,7 +854,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     private <K, V> Map.Entry<K, V> toEntry(final K k, final V v) {
-        return new AbstractMap.SimpleEntry<K, V>(k, v);
+        return new AbstractMap.SimpleEntry<>(k, v);
 
     }
 

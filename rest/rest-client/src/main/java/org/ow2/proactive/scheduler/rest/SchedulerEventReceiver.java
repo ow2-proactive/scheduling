@@ -233,12 +233,12 @@ public class SchedulerEventReceiver {
                             .toJobState((JobStateData) eventData.getData()));
                     break;
                 case JOB_STATE_UPDATED:
-                    eventListener.jobStateUpdatedEvent(new NotificationData<JobInfo>(SchedulerEvent
+                    eventListener.jobStateUpdatedEvent(new NotificationData<>(SchedulerEvent
                             .valueOf(eventData.getSchedulerEvent()), DataUtility
                             .toJobInfo((JobInfoData) eventData.getData())));
                     break;
                 case TASK_STATE_UPDATED:
-                    eventListener.taskStateUpdatedEvent(new NotificationData<TaskInfo>(SchedulerEvent
+                    eventListener.taskStateUpdatedEvent(new NotificationData<>(SchedulerEvent
                             .valueOf(eventData.getSchedulerEvent()), DataUtility
                             .taskInfo((TaskInfoData) eventData.getData())));
                     break;

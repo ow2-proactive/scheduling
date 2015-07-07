@@ -29,7 +29,7 @@ class EnabledListenJobLogsSupport extends ListenJobLogsSupport {
 
     private static final JobLogger jlogger = JobLogger.getInstance();
     private static final TaskLogger tlogger = TaskLogger.getInstance();
-    private final Set<JobId> jobsToBeLogged = new HashSet<JobId>();
+    private final Set<JobId> jobsToBeLogged = new HashSet<>();
 
     private final SchedulerDBManager dbManager;
 

@@ -53,23 +53,23 @@ public class TestTaskIdGeneration extends BaseSchedulerDBTest {
     private void checkIds(JobState job) throws Exception {
         long jobId = Long.valueOf(job.getId().value());
 
-        Set<String> expected = new HashSet<String>(3);
+        Set<String> expected = new HashSet<>(3);
         expected.add(String.valueOf(jobId * TaskIdImpl.getJobFactor()));
         expected.add(String.valueOf(jobId * TaskIdImpl.getJobFactor() + 1));
         expected.add(String.valueOf(jobId * TaskIdImpl.getJobFactor() + 2));
 
-        Set<String> actual = new HashSet<String>();
+        Set<String> actual = new HashSet<>();
         actual.add(findTask(job, "task1").getId().value());
         actual.add(findTask(job, "task2").getId().value());
         actual.add(findTask(job, "task3").getId().value());
 
         Assert.assertEquals(expected, actual);
 
-        actual = new HashSet<String>();
+        actual = new HashSet<>();
         actual.add(findTask(job, "task1").getId().getReadableName());
         actual.add(findTask(job, "task2").getId().getReadableName());
         actual.add(findTask(job, "task3").getId().getReadableName());
-        expected = new HashSet<String>(3);
+        expected = new HashSet<>(3);
         expected.add("task1");
         expected.add("task2");
         expected.add("task3");

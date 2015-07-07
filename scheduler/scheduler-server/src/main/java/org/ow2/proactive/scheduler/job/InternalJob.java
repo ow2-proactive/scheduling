@@ -96,7 +96,7 @@ public abstract class InternalJob extends JobState {
     public static final Logger logger = Logger.getLogger(InternalJob.class);
 
     /** List of every tasks in this job. */
-    protected Map<TaskId, InternalTask> tasks = new HashMap<TaskId, InternalTask>();
+    protected Map<TaskId, InternalTask> tasks = new HashMap<>();
 
     /** Informations (that can be modified) about job execution */
     protected JobInfoImpl jobInfo = new JobInfoImpl();
@@ -450,7 +450,7 @@ public abstract class InternalJob extends JobState {
 
                     // the other branch will not be executed
                     // first, find the concerned tasks
-                    List<InternalTask> elseTasks = new ArrayList<InternalTask>();
+                    List<InternalTask> elseTasks = new ArrayList<>();
                     //  elseTasks.add(targetElse);
                     for (InternalTask t : this.tasks.values()) {
                         if (t.dependsOn(targetElse)) {
@@ -486,8 +486,8 @@ public abstract class InternalJob extends JobState {
                     this.jobInfo.setTasksChanges(changesInfo, this);
                     // notify frontend that tasks were modified
                     if (frontend != null) {
-                        frontend.jobStateUpdated(this.getOwner(), new NotificationData<JobInfo>(
-                            SchedulerEvent.TASK_SKIPPED, this.getJobInfo()));
+                        frontend.jobStateUpdated(this.getOwner(), new NotificationData<>(
+                                SchedulerEvent.TASK_SKIPPED, this.getJobInfo()));
                     }
                     this.jobInfo.clearTasksChanges();
 
@@ -512,7 +512,7 @@ public abstract class InternalJob extends JobState {
                     }
 
                     logger.info("Control Flow Action REPLICATE (runs:" + runs + ")");
-                    List<InternalTask> toReplicate = new ArrayList<InternalTask>();
+                    List<InternalTask> toReplicate = new ArrayList<>();
 
                     // find the tasks that need to be replicated
                     for (InternalTask ti : tasks.values()) {
@@ -558,7 +558,7 @@ public abstract class InternalJob extends JobState {
                         for (int i = 1; i < runs; i++) {
 
                             // accumulates the tasks between the initiator and the target
-                            Map<TaskId, InternalTask> dup = new HashMap<TaskId, InternalTask>();
+                            Map<TaskId, InternalTask> dup = new HashMap<>();
                             // replicate the tasks between the initiator and the target
                             try {
                                 target.replicateTree(dup, todup.getId(), false, initiator
@@ -605,7 +605,7 @@ public abstract class InternalJob extends JobState {
                                 if (target.getId().equals(it.getKey())) {
                                     newEnd = nt;
 
-                                    List<InternalTask> toAdd = new ArrayList<InternalTask>();
+                                    List<InternalTask> toAdd = new ArrayList<>();
                                     // find the merge tasks ; can be multiple
                                     for (InternalTask t : tasks.values()) {
                                         List<InternalTask> pdeps = t.getIDependences();
@@ -635,8 +635,8 @@ public abstract class InternalJob extends JobState {
                     // notify frontend that tasks were added to the job
                     this.jobInfo.setTasksChanges(changesInfo, this);
                     if (frontend != null) {
-                        frontend.jobStateUpdated(this.getOwner(), new NotificationData<JobInfo>(
-                            SchedulerEvent.TASK_REPLICATED, this.getJobInfo()));
+                        frontend.jobStateUpdated(this.getOwner(), new NotificationData<>(
+                                SchedulerEvent.TASK_REPLICATED, this.getJobInfo()));
                     }
                     this.jobInfo.clearTasksChanges();
 
@@ -700,7 +700,7 @@ public abstract class InternalJob extends JobState {
         logger.info("LOOP (init:" + initiator.getId() + ";target:" + target.getId() + ")");
 
         // accumulates the tasks between the initiator and the target
-        Map<TaskId, InternalTask> dup = new HashMap<TaskId, InternalTask>();
+        Map<TaskId, InternalTask> dup = new HashMap<>();
 
         // replicate the tasks between the initiator and the target
         try {
@@ -750,7 +750,7 @@ public abstract class InternalJob extends JobState {
         changesInfo.taskUpdated(newTarget);
 
         // connect mergers
-        List<InternalTask> mergers = new ArrayList<InternalTask>();
+        List<InternalTask> mergers = new ArrayList<>();
         for (InternalTask t : this.tasks.values()) {
             if (t.getIDependences() != null) {
 
@@ -775,7 +775,7 @@ public abstract class InternalJob extends JobState {
         this.jobInfo.setTasksChanges(changesInfo, this);
         // notify frontend that tasks were added and modified
         frontend.jobStateUpdated(this.getOwner(), new NotificationData<JobInfo>(
-            SchedulerEvent.TASK_REPLICATED, new JobInfoImpl(jobInfo)));
+                SchedulerEvent.TASK_REPLICATED, new JobInfoImpl(jobInfo)));
         this.jobInfo.clearTasksChanges();
 
         return true;
@@ -802,7 +802,7 @@ public abstract class InternalJob extends JobState {
      */
     private InternalTask findTaskUp(String name, InternalTask down) {
         InternalTask ret = null;
-        List<InternalTask> ideps = new ArrayList<InternalTask>();
+        List<InternalTask> ideps = new ArrayList<>();
         if (down.getIDependences() != null) {
             ideps.addAll(down.getIDependences());
         }
@@ -862,7 +862,7 @@ public abstract class InternalJob extends JobState {
         setStatus(jobStatus);
 
         //creating list of status
-        Set<TaskId> updatedTasks = new HashSet<TaskId>();
+        Set<TaskId> updatedTasks = new HashSet<>();
 
         for (InternalTask td : tasks.values()) {
             if (!td.getId().equals(taskId)) {
@@ -941,7 +941,7 @@ public abstract class InternalJob extends JobState {
         setNumberOfRunningTasks(0);
         setStatus(JobStatus.RUNNING);
 
-        HashMap<TaskId, TaskStatus> taskStatus = new HashMap<TaskId, TaskStatus>();
+        HashMap<TaskId, TaskStatus> taskStatus = new HashMap<>();
 
         for (InternalTask td : getITasks()) {
             td.setStatus(TaskStatus.PENDING);
@@ -970,7 +970,7 @@ public abstract class InternalJob extends JobState {
      * @return true if the job has correctly been paused, false if not.
      */
     public Set<TaskId> setPaused() {
-        Set<TaskId> updatedTasks = new HashSet<TaskId>();
+        Set<TaskId> updatedTasks = new HashSet<>();
 
         if (jobInfo.getStatus() == JobStatus.PAUSED) {
             return updatedTasks;
@@ -997,7 +997,7 @@ public abstract class InternalJob extends JobState {
      * @return true if the job has correctly been unpaused, false if not.
      */
     public Set<TaskId> setUnPause() {
-        Set<TaskId> updatedTasks = new HashSet<TaskId>();
+        Set<TaskId> updatedTasks = new HashSet<>();
 
         if (jobInfo.getStatus() != JobStatus.PAUSED) {
             return updatedTasks;
@@ -1047,7 +1047,7 @@ public abstract class InternalJob extends JobState {
     }
 
     public void setTasks(Collection<InternalTask> tasksList) {
-        tasks = new HashMap<TaskId, InternalTask>(tasksList.size());
+        tasks = new HashMap<>(tasksList.size());
         for (InternalTask task : tasksList) {
             tasks.put(task.getId(), task);
         }
@@ -1058,7 +1058,7 @@ public abstract class InternalJob extends JobState {
      */
     @Override
     public Map<TaskId, TaskState> getHMTasks() {
-        Map<TaskId, TaskState> tmp = new HashMap<TaskId, TaskState>();
+        Map<TaskId, TaskState> tmp = new HashMap<>();
         for (Entry<TaskId, InternalTask> e : tasks.entrySet()) {
             tmp.put(e.getKey(), e.getValue());
         }
@@ -1071,7 +1071,7 @@ public abstract class InternalJob extends JobState {
      * @return the tasks
      */
     public ArrayList<InternalTask> getITasks() {
-        return new ArrayList<InternalTask>(tasks.values());
+        return new ArrayList<>(tasks.values());
     }
 
     /**
@@ -1303,10 +1303,10 @@ public abstract class InternalJob extends JobState {
     public Map<String, String> getGenericInformations() {
         if (genericInformations == null) {
             // task is not yet properly initialized
-            return new HashMap<String, String>();
+            return new HashMap<>();
         }
 
-        Map<String, String> replacements = new HashMap<String, String>();
+        Map<String, String> replacements = new HashMap<>();
         JobId jobId = jobInfo.getJobId();
         if (jobId != null) {
             replacements.put(SchedulerVars.PA_JOB_ID.toString(), jobId.toString());

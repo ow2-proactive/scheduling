@@ -96,7 +96,7 @@ public class DozerMappingTest {
 
             @Override
             public ArrayList<TaskState> getTasks() {
-                return new ArrayList<TaskState>(getHMTasks().values());
+                return new ArrayList<>(getHMTasks().values());
             }
 
             @Override

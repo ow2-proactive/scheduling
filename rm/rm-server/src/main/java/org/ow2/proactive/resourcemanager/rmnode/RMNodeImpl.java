@@ -158,7 +158,7 @@ public class RMNodeImpl implements RMNode, Serializable {
         this.nodeURL = node.getNodeInformation().getURL();
         this.hostName = node.getNodeInformation().getVMInformation().getHostName();
         this.jvmName = node.getProActiveRuntime().getURL();
-        this.scriptStatus = new HashMap<SelectionScript, Integer>();
+        this.scriptStatus = new HashMap<>();
         this.state = NodeState.FREE;
         this.stateChangeTime = System.currentTimeMillis();
         this.addEvent = null;
@@ -362,7 +362,7 @@ public class RMNodeImpl implements RMNode, Serializable {
         try {
             this.initHandler();
         } catch (NodeException e) {
-            return new ScriptResult<T>(e);
+            return new ScriptResult<>(e);
         }
         return this.handler.handle(script);
     }

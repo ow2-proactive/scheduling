@@ -125,11 +125,11 @@ public class WinHPCInfrastructure extends DefaultInfrastructureManager {
     /** the path of the trust store which holds hpc server's certificate */
     private String trustStorePath;
     /** the list of submitted jobs */
-    private Map<String, EndpointReferenceType[]> submittedJobs = new Hashtable<String, EndpointReferenceType[]>();
+    private Map<String, EndpointReferenceType[]> submittedJobs = new Hashtable<>();
     /** ensures that the deploying node's timeout is not finished */
-    private Map<String, Boolean> dnTimeout = new Hashtable<String, Boolean>();
+    private Map<String, Boolean> dnTimeout = new Hashtable<>();
     /** to retrieve job's data from deploying node's url */
-    private Map<String, EndpointReferenceType[]> deployingNodeToEndpoint = new Hashtable<String, EndpointReferenceType[]>();
+    private Map<String, EndpointReferenceType[]> deployingNodeToEndpoint = new Hashtable<>();
     /** the deployer instance */
     private transient org.ow2.proactive.resourcemanager.nodesource.infrastructure.WinHPCDeployer deployer;
     /** the refresh rate of the job's state in ms */

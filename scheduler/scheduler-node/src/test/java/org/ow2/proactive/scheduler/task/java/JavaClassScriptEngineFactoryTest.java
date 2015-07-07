@@ -49,7 +49,7 @@ public class JavaClassScriptEngineFactoryTest {
         engine.getContext().setWriter(output);
         engine.getContext().setErrorWriter(new PrintWriter(error));
 
-        Map<String, Integer> variables = new HashMap<String, Integer>();
+        Map<String, Integer> variables = new HashMap<>();
         variables.put(SchedulerVars.PA_TASK_REPLICATION.toString(), 42);
         engine.getContext().setAttribute("variables",
           variables,

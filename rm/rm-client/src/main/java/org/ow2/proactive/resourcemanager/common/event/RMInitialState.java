@@ -67,10 +67,10 @@ import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
 public class RMInitialState implements Serializable {
 
     /** Nodes events */
-    private ArrayList<RMNodeEvent> nodesList = new ArrayList<RMNodeEvent>();
+    private ArrayList<RMNodeEvent> nodesList = new ArrayList<>();
 
     /** Nodes sources AO living in RM */
-    private ArrayList<RMNodeSourceEvent> nodeSources = new ArrayList<RMNodeSourceEvent>();
+    private ArrayList<RMNodeSourceEvent> nodeSources = new ArrayList<>();
 
     /**
      * ProActive empty constructor

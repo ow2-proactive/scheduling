@@ -116,7 +116,7 @@ public class NodeSourcePolicyFactory {
      */
     public static Collection<Class<?>> getSupportedPolicies() {
         // reload file each time as it can be updated while the rm is running
-        supportedPolicies = new ArrayList<Class<?>>();
+        supportedPolicies = new ArrayList<>();
         Properties properties = new Properties();
         try {
             String propFileName = PAResourceManagerProperties.RM_NODESOURCE_POLICY_FILE.getValueAsString();

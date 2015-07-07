@@ -85,13 +85,13 @@ public class TestTaskIdOrderSameAsDeclarationOrder extends SchedulerConsecutive 
     }
 
     private List<TaskState> sortTasksById(JobState jobState) {
-        TreeMap<TaskId, TaskState> sortedTasks = new TreeMap<TaskId, TaskState>(new Comparator<TaskId>() {
+        TreeMap<TaskId, TaskState> sortedTasks = new TreeMap<>(new Comparator<TaskId>() {
             @Override
             public int compare(TaskId o1, TaskId o2) {
                 return Integer.parseInt(o1.value()) - Integer.parseInt(o2.value());
             }
         });
         sortedTasks.putAll(jobState.getHMTasks());
-        return new ArrayList<TaskState>(sortedTasks.values());
+        return new ArrayList<>(sortedTasks.values());
     }
 }

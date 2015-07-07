@@ -49,7 +49,7 @@ import java.util.List;
 public class ObjectArrayFormatter {
 
     private List<String> title;
-    private List<List<String>> lines = new ArrayList<List<String>>();
+    private List<List<String>> lines = new ArrayList<>();
     private int spaces;
     private int maxColumnLength = 20;
 

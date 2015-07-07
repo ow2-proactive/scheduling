@@ -62,7 +62,7 @@ public class SchedulerStateRecoverHelper {
         }
 
         private Vector<JobState> convertToClientJobState(List<InternalJob> jobs) {
-            Vector<JobState> result = new Vector<JobState>(jobs.size());
+            Vector<JobState> result = new Vector<>(jobs.size());
             for (InternalJob internalJob : jobs) {
                 result.add(new ClientJobState(internalJob));
             }
@@ -78,8 +78,8 @@ public class SchedulerStateRecoverHelper {
     public RecoveredSchedulerState recover(long loadJobPeriod) {
         List<InternalJob> notFinishedJobs = dbManager.loadNotFinishedJobs(true);
 
-        Vector<InternalJob> pendingJobs = new Vector<InternalJob>();
-        Vector<InternalJob> runningJobs = new Vector<InternalJob>();
+        Vector<InternalJob> pendingJobs = new Vector<>();
+        Vector<InternalJob> runningJobs = new Vector<>();
 
         for (InternalJob job : notFinishedJobs) {
             job.getJobDescriptor();
@@ -106,7 +106,7 @@ public class SchedulerStateRecoverHelper {
             }
         }
 
-        Vector<InternalJob> finishedJobs = new Vector<InternalJob>();
+        Vector<InternalJob> finishedJobs = new Vector<>();
           
         for (Iterator<InternalJob> iterator = runningJobs.iterator(); iterator.hasNext(); ) {
             InternalJob job = iterator.next();
@@ -178,7 +178,7 @@ public class SchedulerStateRecoverHelper {
      * @return the sorted copy of the given argument.
      */
     private ArrayList<InternalTask> copyAndSort(ArrayList<InternalTask> tasks) {
-        ArrayList<InternalTask> tasksList = new ArrayList<InternalTask>();
+        ArrayList<InternalTask> tasksList = new ArrayList<>();
 
         //copy the list with only the finished task.
         for (InternalTask task : tasks) {

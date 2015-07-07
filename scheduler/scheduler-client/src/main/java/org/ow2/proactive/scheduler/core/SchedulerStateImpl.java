@@ -66,13 +66,13 @@ import org.ow2.proactive.scheduler.common.task.TaskInfo;
 public final class SchedulerStateImpl implements SchedulerState {
 
     /** Pending jobs */
-    private Vector<JobState> pendingJobs = new Vector<JobState>();
+    private Vector<JobState> pendingJobs = new Vector<>();
 
     /** Running jobs */
-    private Vector<JobState> runningJobs = new Vector<JobState>();
+    private Vector<JobState> runningJobs = new Vector<>();
 
     /** Finished jobs */
-    private Vector<JobState> finishedJobs = new Vector<JobState>();
+    private Vector<JobState> finishedJobs = new Vector<>();
 
     /** Scheduler status */
     private SchedulerStatus status = SchedulerStatus.STARTED;
@@ -84,7 +84,7 @@ public final class SchedulerStateImpl implements SchedulerState {
      * keep a map of all jobs (pending, running finished) to facilitate
      * their updates
      */
-    Map<JobId, JobState> jobs = new HashMap<JobId, JobState>();
+    Map<JobId, JobState> jobs = new HashMap<>();
 
     /**
      * indicates if the <code>jobs</code> field has already been
@@ -198,7 +198,7 @@ public final class SchedulerStateImpl implements SchedulerState {
         ssi.setState(getStatus());
         ssi.setUsers(getUsers());
         //pending
-        Vector<JobState> tmp = new Vector<JobState>();
+        Vector<JobState> tmp = new Vector<>();
         for (JobState js : getPendingJobs()) {
             if (js.getOwner().equals(name)) {
                 tmp.add(js);
@@ -206,7 +206,7 @@ public final class SchedulerStateImpl implements SchedulerState {
         }
         ssi.setPendingJobs(tmp);
         //running
-        tmp = new Vector<JobState>();
+        tmp = new Vector<>();
         for (JobState js : getRunningJobs()) {
             if (js.getOwner().equals(name)) {
                 tmp.add(js);
@@ -214,7 +214,7 @@ public final class SchedulerStateImpl implements SchedulerState {
         }
         ssi.setRunningJobs(tmp);
         //finished
-        tmp = new Vector<JobState>();
+        tmp = new Vector<>();
         for (JobState js : getFinishedJobs()) {
             if (js.getOwner().equals(name)) {
                 tmp.add(js);

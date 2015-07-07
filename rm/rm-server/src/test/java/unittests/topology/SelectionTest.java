@@ -141,14 +141,14 @@ public class SelectionTest extends FunctionalTest {
         // creating the selection script object
         SelectionScript script = new SelectionScript(new File(vmPropSelectionScriptpath), new String[] {
                 this.vmPropKey1, this.vmPropValue1 }, true);
-        List<SelectionScript> scriptList = new LinkedList<SelectionScript>();
+        List<SelectionScript> scriptList = new LinkedList<>();
         scriptList.add(script);
 
         ResourceManager resourceManager = helper.getResourceManager();
         String node1 = "node1";
 
         //a node with the VM properties
-        HashMap<String, String> vmProperties = new HashMap<String, String>();
+        HashMap<String, String> vmProperties = new HashMap<>();
         vmProperties.put(this.vmPropKey1, this.vmPropValue1);
 
         String node1URL = helper.createNode(node1, vmProperties).getNode().getNodeInformation().getURL();

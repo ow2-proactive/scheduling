@@ -117,7 +117,7 @@ public class SchedulerTStarter implements Serializable {
             Credentials creds = Credentials.getCredentials(PAResourceManagerProperties
                     .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString()));
             ResourceManager rmAdmin = rmAuth.login(creds);
-            Map<String, String> params = new HashMap<String, String>();
+            Map<String, String> params = new HashMap<>();
             if (System.getProperty("pas.launcher.forkas.method") != null) {
                 params.put("pas.launcher.forkas.method", System.getProperty("pas.launcher.forkas.method"));
             }

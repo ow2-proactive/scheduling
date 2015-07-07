@@ -135,10 +135,10 @@ public class JobInfoImpl implements JobInfo {
         this.status = jobInfo.getStatus();
         this.toBeRemoved = jobInfo.toBeRemoved;
         if (jobInfo.getTasksSkipped() != null) {
-            this.tasksSkipped = new HashSet<TaskId>(jobInfo.getTasksSkipped());
+            this.tasksSkipped = new HashSet<>(jobInfo.getTasksSkipped());
         }
         if (jobInfo.getModifiedTasks() != null) {
-            this.modifiedTasks = new ArrayList<ClientTaskState>(jobInfo.getModifiedTasks());
+            this.modifiedTasks = new ArrayList<>(jobInfo.getModifiedTasks());
         }
     }
 
@@ -350,15 +350,15 @@ public class JobInfoImpl implements JobInfo {
     }
 
     public void setTasksChanges(ChangedTasksInfo changesInfo, JobState job) {
-        this.modifiedTasks = new ArrayList<ClientTaskState>(changesInfo.getNewTasks().size() +
-            changesInfo.getUpdatedTasks().size());
+        this.modifiedTasks = new ArrayList<>(changesInfo.getNewTasks().size() +
+                changesInfo.getUpdatedTasks().size());
         for (TaskId id : changesInfo.getNewTasks()) {
             modifiedTasks.add(new ClientTaskState(job.getHMTasks().get(id)));
         }
         for (TaskId id : changesInfo.getUpdatedTasks()) {
             modifiedTasks.add(new ClientTaskState(job.getHMTasks().get(id)));
         }
-        this.tasksSkipped = new HashSet<TaskId>(changesInfo.getSkippedTasks());
+        this.tasksSkipped = new HashSet<>(changesInfo.getSkippedTasks());
     }
 
     public void clearTasksChanges() {

@@ -211,7 +211,7 @@ public class TestRMProxy extends FunctionalTest {
     private void requestReleaseAllNodes(RMProxy proxy, ResourceManager rm) throws Exception {
         System.out.println("Request and release all nodes");
 
-        List<NodeSet> nodeSets = new ArrayList<NodeSet>();
+        List<NodeSet> nodeSets = new ArrayList<>();
         for (int i = 0; i < NODES_NUMBER; i++) {
             nodeSets.add(proxy.getNodes(new Criteria(1)));
         }

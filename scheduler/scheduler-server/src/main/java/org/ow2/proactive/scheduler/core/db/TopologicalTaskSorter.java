@@ -56,10 +56,10 @@ public class TopologicalTaskSorter {
     }
 
     private TopologicalTaskSorter(Collection<Entry> entries) {
-        unmarked = new HashSet<Entry>(entries);
-        markedTemporarily = new HashSet<Entry>();
+        unmarked = new HashSet<>(entries);
+        markedTemporarily = new HashSet<>();
         entryChildren = findEntryChildren(entries);
-        result = new LinkedList<Entry>();
+        result = new LinkedList<>();
     }
 
     private List<Entry> sort() {
@@ -89,12 +89,12 @@ public class TopologicalTaskSorter {
     }
 
     private static Map<Entry, Set<Entry>> findEntryChildren(Collection<Entry> entries) {
-        Map<Entry, Set<Entry>> entryChildren = new HashMap<Entry, Set<Entry>>();
+        Map<Entry, Set<Entry>> entryChildren = new HashMap<>();
         for (Entry task : entries) {
             for (Entry parent : task.getParents()) {
                 Set<Entry> children = entryChildren.get(parent);
                 if (children == null) {
-                    children = new HashSet<Entry>();
+                    children = new HashSet<>();
                     entryChildren.put(parent, children);
                 }
                 children.add(task);
@@ -113,7 +113,7 @@ public class TopologicalTaskSorter {
 
         @Override
         public Collection<Entry> getParents() {
-            ArrayList<InternalTask> allParents = new ArrayList<InternalTask>();
+            ArrayList<InternalTask> allParents = new ArrayList<>();
             List<InternalTask> parents = task.getIDependences();
             if (parents != null) {
                 allParents.addAll(parents);
@@ -146,7 +146,7 @@ public class TopologicalTaskSorter {
         }
 
         public static Collection<Entry> fromInternalTasks(List<InternalTask> tasks) {
-            Collection<Entry> result = new ArrayList<Entry>(tasks.size());
+            Collection<Entry> result = new ArrayList<>(tasks.size());
             for (InternalTask task : tasks) {
                 result.add(new InternalTaskEntry(task));
             }
@@ -154,7 +154,7 @@ public class TopologicalTaskSorter {
         }
 
         public static ArrayList<InternalTask> toInternalTasks(List<Entry> entries) {
-            ArrayList<InternalTask> result = new ArrayList<InternalTask>(entries.size());
+            ArrayList<InternalTask> result = new ArrayList<>(entries.size());
             for (Entry entry : entries) {
                 result.add(((InternalTaskEntry) entry).task);
             }

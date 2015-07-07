@@ -77,7 +77,7 @@ public class SchedulerDBManager {
     private static final Set<JobStatus> finishedJobStatuses;
 
     static {
-        finishedJobStatuses = new HashSet<JobStatus>();
+        finishedJobStatuses = new HashSet<>();
         finishedJobStatuses.add(JobStatus.CANCELED);
         finishedJobStatuses.add(JobStatus.FAILED);
         finishedJobStatuses.add(JobStatus.KILLED);
@@ -87,14 +87,14 @@ public class SchedulerDBManager {
     private static final Set<JobStatus> pendingJobStatuses;
 
     static {
-        pendingJobStatuses = new HashSet<JobStatus>();
+        pendingJobStatuses = new HashSet<>();
         pendingJobStatuses.add(JobStatus.PENDING);
     }
 
     private static final Set<JobStatus> runningJobStatuses;
 
     static {
-        runningJobStatuses = new HashSet<JobStatus>();
+        runningJobStatuses = new HashSet<>();
         runningJobStatuses.add(JobStatus.PAUSED);
         runningJobStatuses.add(JobStatus.STALLED);
         runningJobStatuses.add(JobStatus.RUNNING);
@@ -103,7 +103,7 @@ public class SchedulerDBManager {
     private static final Set<JobStatus> notFinishedJobStatuses;
 
     static {
-        notFinishedJobStatuses = new HashSet<JobStatus>();
+        notFinishedJobStatuses = new HashSet<>();
         notFinishedJobStatuses.addAll(runningJobStatuses);
         notFinishedJobStatuses.addAll(pendingJobStatuses);
     }
@@ -119,7 +119,7 @@ public class SchedulerDBManager {
             File configFile = new File(PASchedulerProperties
                     .getAbsolutePath(PASchedulerProperties.SCHEDULER_DB_HIBERNATE_CONFIG.getValueAsString()));
 
-            Map<String, String> propertiesToReplace = new HashMap<String, String>(2);
+            Map<String, String> propertiesToReplace = new HashMap<>(2);
             propertiesToReplace.put("${proactive.home}", CentralPAPropertyRepository.PA_HOME.getValue());
             propertiesToReplace.put("${pa.scheduler.home}", PASchedulerProperties.SCHEDULER_HOME
                     .getValueAsString());
@@ -199,7 +199,7 @@ public class SchedulerDBManager {
                 }
                 boolean allJobs = pending && runnning && finished;
                 if (!allJobs) {
-                    Set<JobStatus> status = new HashSet<JobStatus>();
+                    Set<JobStatus> status = new HashSet<>();
                     if (pending) {
                         status.addAll(pendingJobStatuses);
                     }
@@ -242,7 +242,7 @@ public class SchedulerDBManager {
                 }
 
                 List<JobData> jobsList = criteria.list();
-                List<JobInfo> result = new ArrayList<JobInfo>(jobsList.size());
+                List<JobInfo> result = new ArrayList<>(jobsList.size());
                 for (JobData jobData : jobsList) {
                     JobInfo jobInfo = jobData.toJobInfo();
                     result.add(jobInfo);
@@ -282,7 +282,7 @@ public class SchedulerDBManager {
 
                 List<JobData> jobsList = criteria.list();
 
-                List<JobUsage> result = new ArrayList<JobUsage>(jobsList.size());
+                List<JobUsage> result = new ArrayList<>(jobsList.size());
                 for (JobData jobData : jobsList) {
                     JobUsage jobUsage = jobData.toJobUsage();
                     result.add(jobUsage);
@@ -735,7 +735,7 @@ public class SchedulerDBManager {
             public InternalJob executeWork(Session session) {
                 Query jobQuery = session
                         .createQuery("from JobData as job where job.id in (:ids) and job.removedTime = -1");
-                List<InternalJob> result = new ArrayList<InternalJob>(1);
+                List<InternalJob> result = new ArrayList<>(1);
                 batchLoadJobs(session, false, jobQuery, Collections.singletonList(jobId(id)), result);
                 if (result.isEmpty()) {
                     return null;
@@ -751,7 +751,7 @@ public class SchedulerDBManager {
         return runWithoutTransaction(new SessionWork<List<InternalJob>>() {
             @Override
             public List<InternalJob> executeWork(Session session) {
-                List<Long> ids = new ArrayList<Long>(jobIds.length);
+                List<Long> ids = new ArrayList<>(jobIds.length);
                 for (JobId jobId : jobIds) {
                     ids.add(jobId(jobId));
                 }
@@ -769,7 +769,7 @@ public class SchedulerDBManager {
                 .setParameterList("ids", jobIds).setResultTransformer(
                         DistinctRootEntityResultTransformer.INSTANCE);
 
-        Map<Long, List<TaskData>> tasksMap = new HashMap<Long, List<TaskData>>(jobIds.size());
+        Map<Long, List<TaskData>> tasksMap = new HashMap<>(jobIds.size());
         for (Long id : jobIds) {
             tasksMap.put(id, new ArrayList<TaskData>());
         }
@@ -785,11 +785,11 @@ public class SchedulerDBManager {
     private List<InternalJob> loadInternalJobs(boolean fullState, Session session, List<Long> ids) {
         Query jobQuery = session.createQuery("from JobData as job where job.id in (:ids)");
 
-        List<InternalJob> result = new ArrayList<InternalJob>(ids.size());
+        List<InternalJob> result = new ArrayList<>(ids.size());
 
         final int BATCH_SIZE = 100;
 
-        List<Long> batchLoadIds = new ArrayList<Long>(BATCH_SIZE);
+        List<Long> batchLoadIds = new ArrayList<>(BATCH_SIZE);
 
         for (Long id : ids) {
             batchLoadIds.add(id);
@@ -824,7 +824,7 @@ public class SchedulerDBManager {
 
     private Collection<InternalTask> toInternalTasks(boolean loadFullState, InternalJob internalJob,
             List<TaskData> taskRuntimeDataList) {
-        Map<DBTaskId, InternalTask> tasks = new HashMap<DBTaskId, InternalTask>(taskRuntimeDataList.size());
+        Map<DBTaskId, InternalTask> tasks = new HashMap<>(taskRuntimeDataList.size());
 
         try {
             for (TaskData taskData : taskRuntimeDataList) {
@@ -875,7 +875,7 @@ public class SchedulerDBManager {
                     internalTask.setIfBranch(tasks.get(taskData.getIfBranch().getId()));
                 }
                 if (!taskData.getJoinedBranches().isEmpty()) {
-                    List<InternalTask> branches = new ArrayList<InternalTask>(taskData.getJoinedBranches()
+                    List<InternalTask> branches = new ArrayList<>(taskData.getJoinedBranches()
                             .size());
                     for (DBTaskId joinedBranch : taskData.getJoinedBranches()) {
                         branches.add(tasks.get(joinedBranch));
@@ -1015,7 +1015,7 @@ public class SchedulerDBManager {
 
                 JobData jobRuntimeData = (JobData) session.load(JobData.class, jobId);
 
-                List<DBTaskId> taskIds = new ArrayList<TaskData.DBTaskId>(changesInfo.getSkippedTasks()
+                List<DBTaskId> taskIds = new ArrayList<>(changesInfo.getSkippedTasks()
                         .size() +
                         changesInfo.getUpdatedTasks().size());
                 for (TaskId id : changesInfo.getSkippedTasks()) {
@@ -1025,8 +1025,8 @@ public class SchedulerDBManager {
                     taskIds.add(taskId(id));
                 }
 
-                List<TaskData> taskRuntimeDataList = new ArrayList<TaskData>();
-                List<InternalTask> tasks = new ArrayList<InternalTask>();
+                List<TaskData> taskRuntimeDataList = new ArrayList<>();
+                List<InternalTask> tasks = new ArrayList<>();
 
                 Query tasksQuery = session.createQuery("from TaskData where id in (:ids)").setParameterList(
                         "ids", taskIds);
@@ -1213,7 +1213,7 @@ public class SchedulerDBManager {
                     throw new DatabaseManagerException("Invalid job id: " + jobId);
                 }
 
-                List<TaskData.DBTaskId> dbTaskIds = new ArrayList<TaskData.DBTaskId>(taskIds.size());
+                List<TaskData.DBTaskId> dbTaskIds = new ArrayList<>(taskIds.size());
                 for (TaskId taskId : taskIds) {
                     dbTaskIds.add(taskId(taskId));
                 }
@@ -1233,7 +1233,7 @@ public class SchedulerDBManager {
                         " (job: " + jobId + ")");
                 }
 
-                Map<TaskId, TaskResult> resultsMap = new HashMap<TaskId, TaskResult>(taskIds.size());
+                Map<TaskId, TaskResult> resultsMap = new HashMap<>(taskIds.size());
                 for (TaskId taskId : taskIds) {
                     TaskResult taskResult = null;
                     for (TaskResult result : jobResult.getAllResults().values()) {
@@ -1397,7 +1397,7 @@ public class SchedulerDBManager {
 
                 job.setId(new JobIdImpl(jobRuntimeData.getId(), job.getName()));
 
-                List<InternalTask> tasksWithNewIds = new ArrayList<InternalTask>();
+                List<InternalTask> tasksWithNewIds = new ArrayList<>();
                 for (int i = 0; i < job.getITasks().size(); i++) {
                     InternalTask task = job.getITasks().get(i);
                     task.setId(TaskIdImpl.createTaskId(job.getId(), task.getTaskInfo().getTaskId()
@@ -1410,7 +1410,7 @@ public class SchedulerDBManager {
                 }
 
                 List<InternalTask> tasks = job.getITasks();
-                List<TaskData> taskRuntimeDataList = new ArrayList<TaskData>(tasks.size());
+                List<TaskData> taskRuntimeDataList = new ArrayList<>(tasks.size());
                 for (InternalTask task : tasks) {
                     taskRuntimeDataList.add(saveNewTask(session, jobRuntimeData, task));
                 }
@@ -1432,7 +1432,7 @@ public class SchedulerDBManager {
             InternalTask task = tasks.get(i);
             TaskData taskRuntimeData = taskRuntimeDataList.get(i);
             if (task.hasDependences()) {
-                List<DBTaskId> dependencies = new ArrayList<DBTaskId>(task.getDependences().size());
+                List<DBTaskId> dependencies = new ArrayList<>(task.getDependences().size());
                 for (Task dependency : task.getDependences()) {
                     dependencies.add(taskId((InternalTask) dependency));
                 }
@@ -1447,7 +1447,7 @@ public class SchedulerDBManager {
                 taskRuntimeData.setIfBranch(null);
             }
             if (task.getJoinedBranches() != null && !task.getJoinedBranches().isEmpty()) {
-                List<DBTaskId> joinedBranches = new ArrayList<DBTaskId>(task.getJoinedBranches().size());
+                List<DBTaskId> joinedBranches = new ArrayList<>(task.getJoinedBranches().size());
                 for (InternalTask joinedBranch : task.getJoinedBranches()) {
                     joinedBranches.add(taskId(joinedBranch));
                 }
@@ -1522,7 +1522,7 @@ public class SchedulerDBManager {
         return runWithoutTransaction(new SessionWork<List<SchedulerUserInfo>>() {
             @Override
             public List<SchedulerUserInfo> executeWork(Session session) {
-                List<SchedulerUserInfo> users = new ArrayList<SchedulerUserInfo>();
+                List<SchedulerUserInfo> users = new ArrayList<>();
                 Query query = session
                         .createQuery("select owner, count(owner), max(submittedTime) from JobData group by owner");
 
@@ -1614,7 +1614,7 @@ public class SchedulerDBManager {
                         "select key from ThirdPartyCredentialData where username = :username").setParameter(
                         "username", username);
                 List<String> keys = query.list();
-                return new HashSet<String>(keys);
+                return new HashSet<>(keys);
 
             }
         });
@@ -1643,8 +1643,8 @@ public class SchedulerDBManager {
                             + "from ThirdPartyCredentialData " + "where username = :username").setParameter(
                         "username", username);
                 List<Object[]> rows = query.list();
-                Map<String, HybridEncryptedData> thirdPartyCredentialsMap = new HashMap<String, HybridEncryptedData>(
-                    rows.size());
+                Map<String, HybridEncryptedData> thirdPartyCredentialsMap = new HashMap<>(
+                        rows.size());
                 for (Object[] row : rows) {
                     String key = (String) row[0];
                     byte[] encryptedSymmetricKey = (byte[]) row[1];

@@ -71,12 +71,12 @@ public class TestReplicateTaskRestore extends FunctionalTest {
                 System.out.println("Error, unexpected number of results: " + results.length);
                 return "Failed";
             }
-            Set<String> expectedResults = new HashSet<String>();
+            Set<String> expectedResults = new HashSet<>();
             for (int i = 0; i < REPLICATED_NUMBER; i++) {
                 expectedResults.add("Replicated result " + i);
             }
 
-            Set<String> actualResults = new HashSet<String>();
+            Set<String> actualResults = new HashSet<>();
             for (int i = 0; i < results.length; i++) {
                 System.out.println("Received result: " + results[i].value());
                 actualResults.add(results[i].value().toString());

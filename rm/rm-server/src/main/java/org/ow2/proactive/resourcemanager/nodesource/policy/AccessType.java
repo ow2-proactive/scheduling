@@ -67,7 +67,7 @@ import org.ow2.proactive.resourcemanager.authentication.Client;
  */
 public class AccessType implements Serializable {
 
-    private static Set<String> types = new HashSet<String>();
+    private static Set<String> types = new HashSet<>();
 
     public static final AccessType ME = new AccessType("ME");
     @Deprecated
@@ -109,7 +109,7 @@ public class AccessType implements Serializable {
 
             // parsing the string in the following format
             // users=name1,name2;groups=group1,group2
-            HashMap<String, String[]> values = new HashMap<String, String[]>();
+            HashMap<String, String[]> values = new HashMap<>();
             String[] semicolon = type.split(";");
             if (semicolon.length == 0) {
                 throw new IllegalArgumentException("Incorrect parameter value " + type);
@@ -174,7 +174,7 @@ public class AccessType implements Serializable {
             return client.getSubject().getPrincipals(GroupNamePrincipal.class);
         }
 
-        Set<IdentityPrincipal> identities = new HashSet<IdentityPrincipal>();
+        Set<IdentityPrincipal> identities = new HashSet<>();
         if (users != null) {
             for (String user : users) {
                 identities.add(new UserNamePrincipal(user));

@@ -169,7 +169,7 @@ public class TestLoadSchedulerClientState extends BaseSchedulerDBTest {
         job1.addTask(task2);
         job1.addTask(task3);
         job1.setPriority(JobPriority.LOW);
-        Map<String, String> genericInfo = new HashMap<String, String>();
+        Map<String, String> genericInfo = new HashMap<>();
         genericInfo.put("p1", "v1");
         genericInfo.put("p2", "v2");
         job1.setGenericInformations(genericInfo);
@@ -216,11 +216,11 @@ public class TestLoadSchedulerClientState extends BaseSchedulerDBTest {
 
         Assert.assertEquals("Unexpected number of dependencies", dependences.length, taskState
                 .getDependences().size());
-        Set<String> dependenciesSet = new HashSet<String>();
+        Set<String> dependenciesSet = new HashSet<>();
         for (String dependecy : dependences) {
             dependenciesSet.add(dependecy);
         }
-        Set<String> actualDependenciesSet = new HashSet<String>();
+        Set<String> actualDependenciesSet = new HashSet<>();
         for (TaskState task : taskState.getDependences()) {
             actualDependenciesSet.add(task.getName());
         }

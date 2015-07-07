@@ -236,7 +236,7 @@ public final class RestSmartProxyTest extends AbstractRestFuncTestCase {
 
     private static final class DataTransferNotifier implements SchedulerEventListenerExtended {
 
-        private final BlockingQueue<String> finishedTask = new ArrayBlockingQueue<String>(NB_TASKS);
+        private final BlockingQueue<String> finishedTask = new ArrayBlockingQueue<>(NB_TASKS);
 
         @Override
         public void pullDataFailed(String jobId, String taskName, String localFolderPath, Throwable error) {

@@ -26,7 +26,7 @@ public class MultipleRMTBase extends FunctionalTest {
 
     protected File config2;
 
-    private List<File> tempFiles = new ArrayList<File>();
+    private List<File> tempFiles = new ArrayList<>();
 
     @Before
     public void initConfigs() throws Exception {
