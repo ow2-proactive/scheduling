@@ -54,9 +54,10 @@ import org.ow2.proactive.scheduler.common.task.RestartMode;
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
-import functionaltests.ScriptUpdateUtil;
 import org.junit.Assert;
 import org.junit.Test;
+
+import functionaltests.ScriptUpdateUtil;
 
 
 /**
@@ -200,16 +201,13 @@ public class TestJobFactory {
                 "-djhome=/bin/java/jdk1.5");
         Map<String, String> props = ( tfJob.getTask("task2")).getForkEnvironment()
                 .getSystemEnvironment();
-        Assert.assertEquals(3, props.size());
-        Assert.assertEquals("ioioio#123:456", props.get("toto"));
+        Assert.assertEquals(2, props.size());
+        Assert.assertEquals("ioi", props.get("toto"));
         Assert.assertEquals("456", props.get("tata"));
-        Assert.assertEquals("123!456", props.get("titi"));
-        Assert.assertEquals("ioioio#123:456", ( tfJob.getTask("task2")).getForkEnvironment()
+        Assert.assertEquals("ioi", ( tfJob.getTask("task2")).getForkEnvironment()
                 .getSystemEnvironmentVariable("toto"));
         Assert.assertEquals("456", ( tfJob.getTask("task2")).getForkEnvironment()
                 .getSystemEnvironmentVariable("tata"));
-        Assert.assertEquals("123!456", (tfJob.getTask("task2")).getForkEnvironment()
-                .getSystemEnvironmentVariable("titi"));
         List<String> addcp = (tfJob.getTask("task2")).getForkEnvironment()
                 .getAdditionalClasspath();
         Assert.assertEquals(2, addcp.size());
