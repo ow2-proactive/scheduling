@@ -688,11 +688,6 @@
     <xs:complexType>
       <xs:group minOccurs="0" ref="jd:commandArguments"/>
       <xs:attribute name="value" use="required" type="xs:string"/>
-      <xs:attribute name="workingDir" type="xs:string">
-        <xs:annotation>
-          <xs:documentation>working dir for native command to execute (ie launching dir, pwd...)</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
     </xs:complexType>
   </xs:element>
   <xs:attributeGroup name="workingDir_t">

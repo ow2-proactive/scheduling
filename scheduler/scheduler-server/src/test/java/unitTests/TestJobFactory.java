@@ -204,6 +204,7 @@ public class TestJobFactory {
         Assert.assertEquals(2, props.size());
         Assert.assertEquals("ioi", props.get("toto"));
         Assert.assertEquals("456", props.get("tata"));
+
         Assert.assertEquals("ioi", ( tfJob.getTask("task2")).getForkEnvironment()
                 .getSystemEnvironmentVariable("toto"));
         Assert.assertEquals("456", ( tfJob.getTask("task2")).getForkEnvironment()
@@ -256,7 +257,7 @@ public class TestJobFactory {
         Assert.assertEquals(((NativeTask) tfJob.getTask("task3")).getCommandLine()[2], "2 2");
         Assert.assertEquals(((NativeTask) tfJob.getTask("task3")).getCommandLine()[3], "3");
         Assert.assertEquals(((NativeTask) tfJob.getTask("task3")).getCommandLine()[4], "12");
-        Assert.assertEquals(((NativeTask) tfJob.getTask("task3")).getWorkingDir(), "task3workingDir");
+        Assert.assertNull(((NativeTask) tfJob.getTask("task3")).getWorkingDir());
         Assert.assertEquals((tfJob.getTask("task3")).getNumberOfNodesNeeded(), 3);
         //Check task 4 properties
         Assert.assertEquals(tfJob.getTask("task4").getName(), "task4");
@@ -307,7 +308,7 @@ public class TestJobFactory {
                 .getOutputFilesList().get(3).getMode());
         Assert.assertEquals(OutputAccessMode.none, tfJob.getTask("task4").getOutputFilesList().get(4)
                 .getMode());
-        Assert.assertEquals(((NativeTask) tfJob.getTask("task4")).getWorkingDir(), "task4workingDir");
+        Assert.assertNull(((NativeTask) tfJob.getTask("task4")).getWorkingDir());
         Assert.assertEquals((tfJob.getTask("task4")).getNumberOfNodesNeeded(), 10);
 
         log("Test Job MULTI_NODES");

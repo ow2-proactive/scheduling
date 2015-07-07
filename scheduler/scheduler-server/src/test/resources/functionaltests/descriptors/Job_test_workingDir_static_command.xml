@@ -11,8 +11,9 @@
 	<description>functional tests : a native job that tests multiple hosts reservation</description>
 	<taskFlow>
 		<task name="task1">
+			<forkEnvironment workingDir="${WDIR}" />
 			<nativeExecutable>
-				<staticCommand 	value="${EXEC_PATH}" workingDir="${WDIR}">
+				<staticCommand 	value="${EXEC_PATH}">
 					<arguments>
 						<argument value="${WDIR}"/>
 					</arguments>

@@ -1221,7 +1221,9 @@ public class StaxJobFactory extends JobFactory {
                             command.add((cursorExec.getAttributeValue(i)));
                         }
                         if (XMLAttributes.TASK_WORKDING_DIR.matches(attrName)) {
-                            nativeTask.setWorkingDir((cursorExec.getAttributeValue(i)));
+                            logger.warn(
+                                    XMLAttributes.TASK_WORKDING_DIR.getXMLName()
+                                            + " attribute no longer supported. Please use a forkEnvironment for defining a working directory.");
                         }
                     }
 

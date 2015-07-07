@@ -812,7 +812,6 @@ public class Job2XMLTransformer {
             // <element name="staticCommand">
             Element staticCmdE = doc.createElementNS(Schemas.SCHEMA_LATEST.namespace, XMLTags.NATIVE_TASK_STATICCOMMAND.getXMLName());
             setAttribute(staticCmdE, XMLAttributes.TASK_COMMAND_VALUE, cmd[0], true);
-            setAttribute(staticCmdE, XMLAttributes.TASK_WORKDING_DIR, t.getWorkingDir(), true);
 
             // <ref name="commandArguments"/>
             if (cmd.length > 1) {

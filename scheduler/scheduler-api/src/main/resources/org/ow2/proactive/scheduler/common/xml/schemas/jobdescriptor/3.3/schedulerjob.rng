@@ -576,9 +576,6 @@
         <data type="string"/>
       </attribute>
       <optional>
-        <ref name="workingDir_t"/>
-      </optional>
-      <optional>
         <ref name="commandArguments"/>
       </optional>
     </element>
