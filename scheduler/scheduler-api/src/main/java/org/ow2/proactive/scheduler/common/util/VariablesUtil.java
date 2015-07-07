@@ -56,11 +56,29 @@ public class VariablesUtil {
     }
 
     /**
+     * Replaces variables in {@code input} map values using keys defined in {@code substitutes} map.
+     *
+     * @param input the map that may contain values to replace.
+     * @param substitutes the map containing substitutes.
+     */
+    public static Map<String, String> filterAndUpdate(
+            Map<String, String> input, Map<String, String> substitutes) {
+
+        Map<String, String> result = new HashMap<>(substitutes.size());
+
+        for (Map.Entry<String, String> entry : input.entrySet()) {
+            result.put(entry.getKey(), filterAndUpdate(entry.getValue(), substitutes));
+        }
+
+        return result;
+    }
+
+    /**
      * Filters the specified string and replaces the variables with values
      * specified in the map.
-     * 
+     *
      * @see VariablesUtil#filterAndUpdate(String, boolean, Map)
-     * 
+     *
      * @param input
      *            the string which need to be filtered
      * @param variables
@@ -84,7 +102,7 @@ public class VariablesUtil {
      * Filters the specified script object. It replaces the variables in the
      * script content and parameter array with the values specified in the
      * variable map.
-     * 
+     *
      * @param script
      *            the script to filter
      * @param variables
