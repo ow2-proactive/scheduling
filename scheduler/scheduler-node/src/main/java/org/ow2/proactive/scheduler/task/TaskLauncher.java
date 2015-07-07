@@ -62,7 +62,7 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
-import org.ow2.proactive.scheduler.common.util.VariablesUtil;
+import org.ow2.proactive.scheduler.common.util.VariableSubstitutor;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.task.containers.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.data.TaskDataspaces;
@@ -246,7 +246,7 @@ public class TaskLauncher implements InitActive {
         if (taskContext.getInitializer().getForkEnvironment() != null) {
             String workingDirPath = taskContext.getInitializer().getForkEnvironment().getWorkingDir();
             if (workingDirPath != null) {
-                workingDirPath = VariablesUtil.filterAndUpdate(workingDirPath,
+                workingDirPath = VariableSubstitutor.filterAndUpdate(workingDirPath,
                         InProcessTaskExecutor.taskVariables(taskContext));
                 workingDir = new File(workingDirPath);
             }

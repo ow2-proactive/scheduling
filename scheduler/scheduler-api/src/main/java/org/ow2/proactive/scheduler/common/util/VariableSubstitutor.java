@@ -49,25 +49,25 @@ import org.ow2.proactive.scripting.Script;
  * format. They will be replace with corresponding values specified in the
  * variable map.
  */
-public class VariablesUtil {
+public class VariableSubstitutor {
 
     // non-instantiable
-    private VariablesUtil() {
+    private VariableSubstitutor() {
     }
 
     /**
-     * Replaces variables in {@code input} map values using keys defined in {@code substitutes} map.
+     * Replaces variables in {@code input} map values using keys defined in {@code variables} map.
      *
-     * @param input the map that may contain values to replace.
-     * @param substitutes the map containing substitutes.
+     * @param input     a map that may contain values to replace.
+     * @param variables a map which contains variable name and value pairs.
      */
     public static Map<String, String> filterAndUpdate(
-            Map<String, String> input, Map<String, String> substitutes) {
+            Map<String, String> input, Map<String, String> variables) {
 
-        Map<String, String> result = new HashMap<>(substitutes.size());
+        Map<String, String> result = new HashMap<>(variables.size());
 
         for (Map.Entry<String, String> entry : input.entrySet()) {
-            result.put(entry.getKey(), filterAndUpdate(entry.getValue(), substitutes));
+            result.put(entry.getKey(), filterAndUpdate(entry.getValue(), variables));
         }
 
         return result;
@@ -77,15 +77,13 @@ public class VariablesUtil {
      * Filters the specified string and replaces the variables with values
      * specified in the map.
      *
-     * @see VariablesUtil#filterAndUpdate(String, boolean, Map)
-     *
-     * @param input
-     *            the string which need to be filtered
-     * @param variables
-     *            a map which contains variable values
+     * @param input     the string which need to be filtered
+     * @param variables a map which contains variable values
      * @return the filtered string
+     * @see VariableSubstitutor#filterAndUpdate(String, Map)
      */
-    public static String filterAndUpdate(String input, Map<? extends Serializable, ? extends Serializable> variables) {
+    public static String filterAndUpdate(String input,
+            Map<? extends Serializable, ? extends Serializable> variables) {
         if (input == null || input.isEmpty()) {
             return input;
         }
@@ -103,12 +101,11 @@ public class VariablesUtil {
      * script content and parameter array with the values specified in the
      * variable map.
      *
-     * @param script
-     *            the script to filter
-     * @param variables
-     *            a map which contains variables values
+     * @param script    the script to filter
+     * @param variables a map which contains variables values
      */
-    public static void filterAndUpdate(Script<?> script, Map<? extends Serializable, ? extends Serializable> variables) {
+    public static void filterAndUpdate(Script<?> script,
+            Map<? extends Serializable, ? extends Serializable> variables) {
         script.setScript(filterAndUpdate(script.getScript(), variables));
         Serializable[] params = script.getParameters();
         if (params != null) {
@@ -119,7 +116,7 @@ public class VariablesUtil {
     }
 
     public static Map<String, String> buildSubstitutes(
-      Map<? extends Serializable, ? extends Serializable> variables) {
+            Map<? extends Serializable, ? extends Serializable> variables) {
         Map<String, String> replacements = new HashMap<>();
 
         if (variables != null) {

@@ -50,7 +50,7 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
-import org.ow2.proactive.scheduler.common.util.VariablesUtil;
+import org.ow2.proactive.scheduler.common.util.VariableSubstitutor;
 import org.ow2.proactive.scripting.Script;
 
 
@@ -326,7 +326,7 @@ public class TaskLauncherInitializer implements Serializable {
         Set<String> filteredIncludes = new HashSet<>();
         if (selectors != null) {
             for (String include : selectors) {
-                filteredIncludes.add(VariablesUtil.filterAndUpdate(include, variables));
+                filteredIncludes.add(VariableSubstitutor.filterAndUpdate(include, variables));
             }
         }
         return filteredIncludes;

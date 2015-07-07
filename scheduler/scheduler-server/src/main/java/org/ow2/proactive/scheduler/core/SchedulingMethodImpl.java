@@ -51,7 +51,7 @@ import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.exception.ConnectionException;
 import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.util.VariablesUtil;
+import org.ow2.proactive.scheduler.common.util.VariableSubstitutor;
 import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.core.rmproxies.RMProxiesManager;
@@ -519,7 +519,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
             return null;
         }
         for (SelectionScript script : selectionScripts) {
-            VariablesUtil.filterAndUpdate(script, variables);
+            VariableSubstitutor.filterAndUpdate(script, variables);
         }
         return selectionScripts;
     }

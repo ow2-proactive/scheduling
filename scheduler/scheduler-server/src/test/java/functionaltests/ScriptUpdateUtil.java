@@ -46,7 +46,7 @@ import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.SelectionScript;
 
-import static org.ow2.proactive.scheduler.common.util.VariablesUtil.filterAndUpdate;
+import static org.ow2.proactive.scheduler.common.util.VariableSubstitutor.filterAndUpdate;
 
 
 /**

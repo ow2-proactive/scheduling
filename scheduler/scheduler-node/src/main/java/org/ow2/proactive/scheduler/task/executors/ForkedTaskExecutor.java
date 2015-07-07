@@ -50,7 +50,7 @@ import org.objectweb.proactive.extensions.processbuilder.OSProcessBuilder;
 import org.objectweb.proactive.extensions.processbuilder.exception.NotImplementedException;
 import org.ow2.proactive.resourcemanager.utils.OneJar;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
-import org.ow2.proactive.scheduler.common.util.VariablesUtil;
+import org.ow2.proactive.scheduler.common.util.VariableSubstitutor;
 import org.ow2.proactive.scheduler.task.TaskContext;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.exceptions.ForkedJvmProcessException;
@@ -203,7 +203,7 @@ public class ForkedTaskExecutor implements TaskExecutor {
             processBuilder.environment().putAll(
                     // replace variables in defined system environment values
                     // by existing environment variables
-                    VariablesUtil.filterAndUpdate(
+                    VariableSubstitutor.filterAndUpdate(
                             forkEnvironment.getSystemEnvironment(), System.getenv()));
         }
 

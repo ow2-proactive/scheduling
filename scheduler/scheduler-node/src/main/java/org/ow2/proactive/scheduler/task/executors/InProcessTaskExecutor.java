@@ -49,7 +49,7 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
-import org.ow2.proactive.scheduler.common.util.VariablesUtil;
+import org.ow2.proactive.scheduler.common.util.VariableSubstitutor;
 import org.ow2.proactive.scheduler.task.SchedulerVars;
 import org.ow2.proactive.scheduler.task.TaskContext;
 import org.ow2.proactive.scheduler.task.exceptions.TaskException;
@@ -288,7 +288,7 @@ public class InProcessTaskExecutor implements TaskExecutor {
                     for (Map.Entry<String, Serializable> deserializedArg : deserializedArgs.entrySet()) {
                         if (deserializedArg.getValue() instanceof String) {
                             deserializedArg.setValue(
-                              VariablesUtil.filterAndUpdate((String) deserializedArg.getValue(),
+                              VariableSubstitutor.filterAndUpdate((String) deserializedArg.getValue(),
                                       substitutes));
                         }
                     }
@@ -299,14 +299,14 @@ public class InProcessTaskExecutor implements TaskExecutor {
                     e.printStackTrace(errorStream);
                 }
             } else if ("native".equals(script.getEngineName())) { // to replace script arguments
-                script.setScript(VariablesUtil.filterAndUpdate(script.getScript(), substitutes));
+                script.setScript(VariableSubstitutor.filterAndUpdate(script.getScript(), substitutes));
             } else {
                 Serializable[] args = script.getParameters();
 
                 if (args != null) {
                     for (int i = 0; i < args.length; i++) {
                         if (args[i] instanceof String) {
-                            args[i] = VariablesUtil.filterAndUpdate((String) args[i], substitutes);
+                            args[i] = VariableSubstitutor.filterAndUpdate((String) args[i], substitutes);
                         }
                     }
                 }

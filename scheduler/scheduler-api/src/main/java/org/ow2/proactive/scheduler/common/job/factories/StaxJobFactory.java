@@ -87,7 +87,7 @@ import org.apache.log4j.Logger;
 import org.iso_relax.verifier.VerifierConfigurationException;
 import org.xml.sax.SAXException;
 
-import static org.ow2.proactive.scheduler.common.util.VariablesUtil.filterAndUpdate;
+import static org.ow2.proactive.scheduler.common.util.VariableSubstitutor.filterAndUpdate;
 
 
 /**
