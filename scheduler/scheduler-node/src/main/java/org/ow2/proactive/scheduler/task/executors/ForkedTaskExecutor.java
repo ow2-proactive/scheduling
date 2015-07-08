@@ -42,9 +42,13 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintStream;
 import java.io.Serializable;
+import java.nio.file.Files;
+import java.nio.file.attribute.PosixFilePermission;
+import java.nio.file.attribute.PosixFilePermissions;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import org.objectweb.proactive.extensions.processbuilder.OSProcessBuilder;
 import org.objectweb.proactive.extensions.processbuilder.exception.NotImplementedException;
@@ -65,6 +69,7 @@ import org.ow2.proactive.scripting.ScriptResult;
 import com.google.common.base.Strings;
 import org.apache.commons.io.FileUtils;
 
+
 /**
  * Executor in charge to fork a new process for running a non forked task in a dedicated JVM.
  *
@@ -74,6 +79,8 @@ import org.apache.commons.io.FileUtils;
 public class ForkedTaskExecutor implements TaskExecutor {
 
     private static final String FORK_ENVIRONMENT_BINDING_NAME = "forkEnvironment";
+    private static final Set<PosixFilePermission> SHARED_FOLDER_PERMISSIONS = PosixFilePermissions.fromString(
+      "rwxrwxrwx");
 
     private final File workingDir;
     private final Decrypter decrypter;
@@ -97,7 +104,8 @@ public class ForkedTaskExecutor implements TaskExecutor {
         try {
             serializedContext = serializeContext(context, workingDir);
 
-            OSProcessBuilder processBuilder = createForkedProcess(context, serializedContext, outputSink, errorSink);
+            OSProcessBuilder processBuilder = createForkedProcess(context, serializedContext, outputSink,
+                    errorSink);
 
             try {
                 taskProcessTreeKiller.tagEnvironment(processBuilder.environment());
@@ -112,8 +120,15 @@ public class ForkedTaskExecutor implements TaskExecutor {
 
             if (exitCode != 0) {
                 try {
-                    Throwable exception = (Throwable) deserializeTaskResult(serializedContext);
-                    return createTaskResult(context, exception);
+                    Object error = deserializeTaskResult(serializedContext);
+                    if (error instanceof TaskContext) {
+                        return createTaskResult(context, new IOException(
+                            "Forked task failed to remove serialized task context, " +
+                                "probably a permission issue on folder " + workingDir));
+                    } else {
+                        Throwable exception = (Throwable) error;
+                        return createTaskResult(context, exception);
+                    }
                 } catch (Throwable cannotDeserializeResult) {
                     return createTaskResult(context, cannotDeserializeResult);
                 }
@@ -137,19 +152,16 @@ public class ForkedTaskExecutor implements TaskExecutor {
 
     private TaskResultImpl createTaskResult(TaskContext context, Throwable throwable) {
         return new TaskResultImpl(context.getTaskId(), new ForkedJvmProcessException(
-                "Failed to execute task in a forked JVM", throwable));
+            "Failed to execute task in a forked JVM", throwable));
     }
 
-    private OSProcessBuilder createForkedProcess(TaskContext context, File serializedContext, PrintStream outputSink, PrintStream errorSink)
-            throws Exception {
+    private OSProcessBuilder createForkedProcess(TaskContext context, File serializedContext,
+            PrintStream outputSink, PrintStream errorSink) throws Exception {
         OSProcessBuilder processBuilder;
         String nativeScriptPath = context.getSchedulerHome();
 
         if (context.isRunAsUser()) {
-            boolean workingDirCanBeWrittenByForked = workingDir.setWritable(true);
-            if (!workingDirCanBeWrittenByForked) {
-                throw new Exception("Working directory will not be writable by runAsMe user");
-            }
+            shareWorkingDirWithRunAsMeUser(workingDir);
             processBuilder = ForkerUtils.getOSProcessBuilderFactory(nativeScriptPath).getBuilder(
                     ForkerUtils.checkConfigAndGetUser(decrypter));
         } else {
@@ -200,18 +212,24 @@ public class ForkedTaskExecutor implements TaskExecutor {
                 classpath.append(File.pathSeparatorChar).append(classpathEntry);
             }
 
-            processBuilder.environment().putAll(
-                    // replace variables in defined system environment values
-                    // by existing environment variables
-                    VariableSubstitutor.filterAndUpdate(
-                            forkEnvironment.getSystemEnvironment(), System.getenv()));
+            try {
+                processBuilder.environment().putAll(
+                // replace variables in defined system environment values
+                // by existing environment variables
+                        VariableSubstitutor.filterAndUpdate(forkEnvironment.getSystemEnvironment(),
+                                System.getenv()));
+            } catch (IllegalArgumentException processEnvironmentReadOnly) {
+                throw new IllegalStateException(
+                    "Cannot use runAsMe mode and set system environment properties",
+                    processEnvironmentReadOnly);
+            }
         }
 
         List<String> javaCommand = processBuilder.command();
         javaCommand.add(javaHome + File.separatorChar + "bin" + File.separatorChar + "java");
         javaCommand.add("-cp");
         javaCommand.add(classpath.toString());
-        if(!Objects.equals(jvmArguments, "")){
+        if (!Objects.equals(jvmArguments, "")) {
             javaCommand.add(jvmArguments);
         }
         javaCommand.add(ForkedTaskExecutor.class.getName());
@@ -219,6 +237,16 @@ public class ForkedTaskExecutor implements TaskExecutor {
 
         processBuilder.directory(workingDir);
         return processBuilder;
+    }
+
+    private void shareWorkingDirWithRunAsMeUser(File workingDir) throws IOException {
+        try {
+            Files.setPosixFilePermissions(workingDir.toPath(), SHARED_FOLDER_PERMISSIONS);
+        } catch (IOException e) {
+            throw new IOException("Working directory will not be writable by runAsMe user", e);
+        } catch (UnsupportedOperationException ignored) {
+            // ignored, could be running on Windows
+        }
     }
 
     // 1 called by forker
@@ -234,7 +262,7 @@ public class ForkedTaskExecutor implements TaskExecutor {
     private static TaskContext deserializeContext(String pathToFile) throws IOException,
             ClassNotFoundException {
         File f = new File(pathToFile);
-        try(ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(f))){
+        try (ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(f))) {
             return (TaskContext) inputStream.readObject();
         } finally {
             FileUtils.forceDelete(f);
@@ -244,7 +272,7 @@ public class ForkedTaskExecutor implements TaskExecutor {
     // 3 called by forked
     private static void serializeTaskResult(Object result, String contextPath) throws IOException {
         File file = new File(contextPath);
-        try(ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(file))){
+        try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(file))) {
             objectOutputStream.writeObject(result);
         }
     }
@@ -255,8 +283,8 @@ public class ForkedTaskExecutor implements TaskExecutor {
             return inputStream.readObject();
         } catch (IOException e) {
             throw new ForkedJvmProcessException(
-                    "Could not read serialized task result (forked JVM may have been killed by the task or could not write to local space)",
-                    e);
+                "Could not read serialized task result (forked JVM may have been killed by the task or could not write to local space)",
+                e);
         } finally {
             FileUtils.forceDelete(pathToFile);
         }

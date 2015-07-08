@@ -85,7 +85,7 @@ public class ForkedTaskExecutorTest {
     }
 
     @Test
-    public void runAsMe() throws Throwable {
+    public void runAsMe_userDoesNotExist() throws Throwable {
         TestTaskOutput taskOutput = new TestTaskOutput();
 
         Decrypter decrypter = createCredentials("somebody_that_does_not_exists");
