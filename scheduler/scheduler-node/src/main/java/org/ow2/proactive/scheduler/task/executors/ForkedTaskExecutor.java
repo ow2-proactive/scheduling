@@ -45,6 +45,7 @@ import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -180,11 +181,10 @@ public class ForkedTaskExecutor implements TaskExecutor {
         ForkEnvironment forkEnvironment = context.getInitializer().getForkEnvironment();
 
         if (forkEnvironment != null) {
+            Map<String, Serializable> variables = InProcessTaskExecutor.taskVariables(context);
+            Map<String, String> thirdPartyCredentials = InProcessTaskExecutor.thirdPartyCredentials(context);
             if (forkEnvironment.getEnvScript() != null) {
                 ScriptHandler scriptHandler = ScriptLoader.createLocalHandler();
-                Map<String, Serializable> variables = InProcessTaskExecutor.taskVariables(context);
-                Map<String, String> thirdPartyCredentials = InProcessTaskExecutor
-                        .thirdPartyCredentials(context);
                 InProcessTaskExecutor
                         .createBindings(context, scriptHandler, variables, thirdPartyCredentials);
 
@@ -201,23 +201,28 @@ public class ForkedTaskExecutor implements TaskExecutor {
             }
 
             for (String jvmArgument : forkEnvironment.getJVMArguments()) {
-                jvmArguments += jvmArgument;
+                jvmArguments += VariableSubstitutor.filterAndUpdate(jvmArgument, variables);
             }
 
             if (!Strings.isNullOrEmpty(forkEnvironment.getJavaHome())) {
-                javaHome = forkEnvironment.getJavaHome();
+                javaHome = VariableSubstitutor.filterAndUpdate(forkEnvironment.getJavaHome(), variables);
             }
 
             for (String classpathEntry : forkEnvironment.getAdditionalClasspath()) {
-                classpath.append(File.pathSeparatorChar).append(classpathEntry);
+                classpath.append(File.pathSeparatorChar).append(
+                        VariableSubstitutor.filterAndUpdate(classpathEntry, variables));
             }
 
             try {
+                HashMap<String, Serializable> systemEnvironmentVariables = new HashMap<String, Serializable>(
+                    System.getenv());
+                systemEnvironmentVariables.putAll(variables);
+                systemEnvironmentVariables.putAll(thirdPartyCredentials);
                 processBuilder.environment().putAll(
                 // replace variables in defined system environment values
-                // by existing environment variables
+                // by existing environment variables, variables and credentials
                         VariableSubstitutor.filterAndUpdate(forkEnvironment.getSystemEnvironment(),
-                                System.getenv()));
+                                systemEnvironmentVariables));
             } catch (IllegalArgumentException processEnvironmentReadOnly) {
                 throw new IllegalStateException(
                     "Cannot use runAsMe mode and set system environment properties",

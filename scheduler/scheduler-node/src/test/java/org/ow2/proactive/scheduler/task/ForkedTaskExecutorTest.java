@@ -6,6 +6,7 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.util.Collections;
 
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
@@ -124,12 +125,38 @@ public class ForkedTaskExecutorTest {
         initializer.setForkEnvironment(forkEnvironment);
 
         taskExecutor.execute(new TaskContext(new ScriptExecutableContainer(new TaskScript(new SimpleScript(
-            "println System.getenv('envVar'); " + "println System.getProperty('jvmArg'); "
-                + "println new File('.').getAbsolutePath()", "groovy"))), initializer),
-                taskOutput.outputStream, taskOutput.error);
+            "println System.getenv('envVar'); " + "println System.getProperty('jvmArg'); " +
+              "println new File('.').getAbsolutePath()", "groovy"))), initializer), taskOutput.outputStream,
+          taskOutput.error);
 
         assertEquals(String.format("envValue%njvmValue%n%s%n", new File(workingDir, ".").getAbsolutePath()),
-                taskOutput.output());
+          taskOutput.output());
+    }
+
+    @Test
+    public void forkEnvironment_WithVariables() throws Exception {
+        TestTaskOutput taskOutput = new TestTaskOutput();
+
+        File workingDir = tmpFolder.newFolder();
+
+        ForkedTaskExecutor taskExecutor = new ForkedTaskExecutor(workingDir);
+
+        TaskLauncherInitializer initializer = new TaskLauncherInitializer();
+        initializer.setTaskId((TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false)));
+        initializer.setVariables(Collections.singletonMap("aVar","aValue"));
+
+        ForkEnvironment forkEnvironment = new ForkEnvironment();
+        forkEnvironment.addSystemEnvironmentVariable("envVar", "$aVar");
+        forkEnvironment.addJVMArgument("-DjvmArg=$aVar");
+        initializer.setForkEnvironment(forkEnvironment);
+
+        taskExecutor.execute(new TaskContext(new ScriptExecutableContainer(new TaskScript(new SimpleScript(
+            "println System.getenv('envVar'); " + "println System.getProperty('jvmArg'); "
+              + "println new File('.').getAbsolutePath()", "groovy"))), initializer),
+          taskOutput.outputStream, taskOutput.error);
+
+        assertEquals(String.format("aValue%naValue%n%s%n", new File(workingDir, ".").getAbsolutePath()),
+          taskOutput.output());
     }
 
     @Test

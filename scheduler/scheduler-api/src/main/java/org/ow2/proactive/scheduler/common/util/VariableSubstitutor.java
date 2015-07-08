@@ -62,7 +62,7 @@ public class VariableSubstitutor {
      * @param variables a map which contains variable name and value pairs.
      */
     public static Map<String, String> filterAndUpdate(
-            Map<String, String> input, Map<String, String> variables) {
+            Map<String, String> input, Map<String, ? extends Serializable> variables) {
 
         Map<String, String> result = new HashMap<>(variables.size());
 
