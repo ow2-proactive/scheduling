@@ -56,9 +56,6 @@ public class NativeTask extends Task {
     /** Command line for this native task */
     private String[] commandLine = null;
 
-    /* native executable launching directory (pwd) */
-    private String workingDir = null;
-
     /**
      * Empty constructor.
      */
@@ -83,19 +80,12 @@ public class NativeTask extends Task {
         this.commandLine = commandLine;
     }
 
-    public String getWorkingDir() {
-        return workingDir;
-    }
-
-    public void setWorkingDir(String workingDir) {
-        this.workingDir = workingDir;
-    }
-
     @Override
     public String display() {
         String nl = System.lineSeparator();
-        String answer = super.display();
-        return answer + nl + "\tCommandLine = " + Arrays.toString(commandLine) + nl +
-            "\tWorkingDir = '" + workingDir + '\'';
+
+        return super.display() + nl
+                + "\tCommandLine=" + Arrays.toString(commandLine);
     }
+
 }

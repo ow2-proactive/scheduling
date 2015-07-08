@@ -47,6 +47,7 @@ import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
@@ -157,7 +158,7 @@ public class TestNativeTaskPaths extends FunctionalTest {
             default:
                 throw new IllegalStateException("Unsupported operating system");
         }
-        D.setWorkingDir("$LOCALSPACE");
+        D.setForkEnvironment(new ForkEnvironment("$LOCALSPACE"));
         job.addTask(D);
 
         Scheduler sched = SchedulerTHelper.getSchedulerInterface();

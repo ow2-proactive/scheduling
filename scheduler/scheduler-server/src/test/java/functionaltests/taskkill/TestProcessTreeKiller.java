@@ -132,7 +132,7 @@ public class TestProcessTreeKiller extends SchedulerConsecutive {
 
             String workingDir = new File(TestProcessTreeKiller.launchersDir.toURI()).getParentFile()
                     .getCanonicalPath();
-            task1.setWorkingDir(workingDir);
+            task1.setForkEnvironment(new ForkEnvironment(workingDir));
             JavaSpawnExecutable executable = new JavaSpawnExecutable();
             executable.home = PASchedulerProperties.SCHEDULER_HOME.getValueAsString();
             task1.setCommandLine(executable.getNativeExecLauncher(false));
@@ -192,7 +192,7 @@ public class TestProcessTreeKiller extends SchedulerConsecutive {
             String task4Name = "TestPTK4";
             task4.setName(task4Name);
 
-            task4.setWorkingDir(workingDir);
+            task4.setForkEnvironment(new ForkEnvironment(workingDir));
             task4.setCommandLine(executable.getNativeExecLauncher(true));
             job4.addTask(task4);
 

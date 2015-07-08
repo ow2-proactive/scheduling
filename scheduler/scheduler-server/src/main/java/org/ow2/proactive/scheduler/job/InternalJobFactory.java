@@ -343,7 +343,7 @@ public class InternalJobFactory {
                 scriptTask = new InternalScriptTask(new ScriptExecutableContainer(new TaskScript(
                     new SimpleScript(commandAndArguments, "native"))));
             }
-            ForkEnvironment forkEnvironment = new ForkEnvironment(task.getWorkingDir());
+            ForkEnvironment forkEnvironment = new ForkEnvironment();
             scriptTask.setForkEnvironment(forkEnvironment);
             //set task common properties
             setTaskCommonProperties(userJob, task, scriptTask);

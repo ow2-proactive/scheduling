@@ -503,6 +503,19 @@ public abstract class Task extends CommonAttribute {
     }
 
     /**
+     * Return the working Directory.
+     *
+     * @return the working Directory.
+     */
+    public String getWorkingDir() {
+        if (forkEnvironment == null) {
+            return null;
+        }
+
+        return forkEnvironment.getWorkingDir();
+    }
+
+    /**
      * Set the wall time to the task in millisecond.
      * 
      * @param walltime the walltime to set in millisecond.
