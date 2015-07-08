@@ -96,17 +96,23 @@ public class TaskContext implements Serializable {
         this.schedulerHome = ClasspathUtils.findSchedulerHome();
         this.executableContainer = executableContainer;
 
-        nodesURLs = new ArrayList<>();
-        nodesHosts = new ArrayList<>();
         if (executableContainer.getNodes() != null) {
+            int nbNodes = executableContainer.getNodes().size();
+
+            nodesURLs = new ArrayList<>(nbNodes);
+            nodesHosts = new ArrayList<>(nbNodes + 1);
+
             nodesHosts.add(currentNodeHostname);
             for (Node node : executableContainer.getNodes()) {
                 nodesURLs.add(node.getNodeInformation().getURL());
                 nodesHosts.add(node.getNodeInformation().getVMInformation().getHostName());
             }
-            executableContainer.setNodes(null);
-        }
 
+            executableContainer.setNodes(null);
+        } else {
+            nodesURLs = new ArrayList<>(0);
+            nodesHosts = new ArrayList<>(0);
+        }
     }
 
     public TaskContext(TaskContext context, ExecutableContainer container) throws NodeException {
