@@ -118,6 +118,10 @@ public class JavaTask extends Task {
         return Collections.unmodifiableMap(deserialized);
     }
 
+    public HashMap<String, byte[]> getSerializedArguments() {
+        return new HashMap<>(serializedArguments);
+    }
+
     /**
      * Add an argument to the list of arguments. Note that the value is serialized and stored
      * in the JavaTask.

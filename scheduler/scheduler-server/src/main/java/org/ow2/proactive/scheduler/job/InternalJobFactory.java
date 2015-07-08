@@ -276,17 +276,7 @@ public class InternalJobFactory {
         InternalTask javaTask;
 
         if (task.getExecutableClassName() != null) {
-            // HACK HACK HACK : Get arguments for the task
-            HashMap<String, byte[]> args;
-            try {
-                Field f = JavaTask.class.getDeclaredField(JavaTask.ARGS_FIELD_NAME);
-                f.setAccessible(true);
-                args = (HashMap<String, byte[]>) f.get(task);
-            } catch (Exception e) {
-                // should not happen...
-                logger.fatal("Internal error: cannot retrieve arguments for task " + task.getName(), e);
-                throw new Error("Internal error: implementation must be revised.", e);
-            }
+            HashMap<String, byte[]> args = task.getSerializedArguments();
 
             try {
                 if (isForkingTask()) {
