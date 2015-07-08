@@ -137,19 +137,17 @@ public class TaskLauncher implements InitActive {
 
             progressFileReader.start(dataspaces.getScratchFolder(), taskId);
 
-            TaskContext context =
-                    new TaskContext(
-                            executableContainer, initializer, previousTasksResults,
-                            dataspaces.getScratchURI(), dataspaces.getInputURI(),
-                            dataspaces.getOutputURI(), dataspaces.getUserURI(),
-                            dataspaces.getGlobalURI(),
-                            progressFileReader.getProgressFile().toString(), getHostname());
+            TaskContext context = new TaskContext(executableContainer, initializer, previousTasksResults,
+                dataspaces.getScratchURI(), dataspaces.getInputURI(), dataspaces.getOutputURI(),
+                dataspaces.getUserURI(), dataspaces.getGlobalURI(), progressFileReader.getProgressFile()
+                        .toString(), getHostname());
 
             File workingDir = getTaskWorkingDir(context, dataspaces);
 
             wallTimer.start();
 
-            dataspaces.copyInputDataToScratch(initializer.getFilteredInputFiles(fileSelectorsFilters(context))); // should handle interrupt
+            dataspaces.copyInputDataToScratch(initializer
+                    .getFilteredInputFiles(fileSelectorsFilters(context))); // should handle interrupt
 
             if (decrypter != null) {
                 decrypter.setCredentials(executableContainer.getCredentials());
@@ -173,7 +171,7 @@ public class TaskLauncher implements InitActive {
             }
 
             dataspaces.copyScratchDataToOutput(initializer.getFilteredOutputFiles(fileSelectorsFilters(
-              context, taskResult)));
+                    context, taskResult)));
 
             wallTimer.stop();
 
@@ -196,7 +194,7 @@ public class TaskLauncher implements InitActive {
                     logger.info("Failed to execute task", taskFailure);
                     taskFailure.printStackTrace(taskLogger.getErrorSink());
                     taskResult = new TaskResultImpl(taskId, taskFailure, taskLogger.getLogs(),
-                            taskStopwatchForFailures.elapsed(TimeUnit.MILLISECONDS));
+                        taskStopwatchForFailures.elapsed(TimeUnit.MILLISECONDS));
                     sendResultToScheduler(terminateNotification, taskResult);
 
             }
@@ -208,9 +206,8 @@ public class TaskLauncher implements InitActive {
     }
 
     private TaskResultImpl getWalltimedTaskResult(Stopwatch taskStopwatchForFailures) {
-        String message =
-                "Walltime of " + initializer.getWalltime()
-                        + " ms reached on task " + taskId.getReadableName();
+        String message = "Walltime of " + initializer.getWalltime() + " ms reached on task " +
+            taskId.getReadableName();
 
         return getTaskResult(taskStopwatchForFailures, new WalltimeExceededException(message));
     }
@@ -219,10 +216,11 @@ public class TaskLauncher implements InitActive {
         taskLogger.getErrorSink().println(exception.getMessage());
 
         return new TaskResultImpl(taskId, exception, taskLogger.getLogs(),
-                taskStopwatchForFailures.elapsed(TimeUnit.MILLISECONDS));
+            taskStopwatchForFailures.elapsed(TimeUnit.MILLISECONDS));
     }
 
-    private Map<String, Serializable> fileSelectorsFilters(TaskContext taskContext, TaskResult taskResult) throws Exception {
+    private Map<String, Serializable> fileSelectorsFilters(TaskContext taskContext, TaskResult taskResult)
+            throws Exception {
         return InProcessTaskExecutor.taskVariables(taskContext, taskResult);
     }
 
@@ -263,7 +261,7 @@ public class TaskLauncher implements InitActive {
             try {
                 terminateNotification.terminate(taskId, taskResult);
                 logger.debug("Successfully notified task termination " + taskId);
-                terminate(true);
+                terminate();
                 return;
             } catch (Throwable th) {
                 logger.warn("Cannot notify task termination " + taskId + ", will try again in " +
@@ -276,8 +274,8 @@ public class TaskLauncher implements InitActive {
             }
         }
         logger.error("Cannot notify task termination " + taskId + " after " + pingAttempts +
-                " attempts, terminating task launcher now");
-        terminate(true);
+            " attempts, terminating task launcher now");
+        terminate();
     }
 
     @ImmediateService
@@ -302,16 +300,14 @@ public class TaskLauncher implements InitActive {
     }
 
     @ImmediateService
-    public void terminate(boolean normalTermination) {
+    public void kill() {
         taskLogger.resetLogContextForImmediateService();
+        logger.info("Kill received for task");
+        taskKiller.kill(TaskKiller.Status.KILLED_MANUALLY);
+        terminate();
+    }
 
-        if (normalTermination) {
-            logger.debug("Terminate message received for task " + taskId);
-        } else {
-            logger.debug("Kill message received for task " + taskId);
-            taskKiller.kill(TaskKiller.Status.KILLED_MANUALLY);
-        }
-
+    private void terminate() {
         try {
             if (PAActiveObject.isInActiveObject()) {
                 PAActiveObject.terminateActiveObject(false);

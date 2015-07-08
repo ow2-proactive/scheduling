@@ -103,7 +103,7 @@ final class TerminationData {
             RunningTaskData taskData = taskToTerminate.taskData;
             try {
                 if(!taskToTerminate.normalTermination){
-                    taskData.getLauncher().terminate(false);
+                    taskData.getLauncher().kill();
                 }
             } catch (Throwable t) {
                 logger

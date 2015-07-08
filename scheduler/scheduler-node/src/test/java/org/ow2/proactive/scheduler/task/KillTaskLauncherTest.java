@@ -43,7 +43,7 @@ public class KillTaskLauncherTest {
         taskLauncherPA.doTask(executableContainer, null, null);
 
         taskRunning.acquire();
-        taskLauncherPA.terminate(false);
+        taskLauncherPA.kill();
 
         assertTaskLauncherIsTerminated(taskLauncherPA);
     }
@@ -65,7 +65,7 @@ public class KillTaskLauncherTest {
         taskLauncherPA.doTask(executableContainer, null, null);
 
         taskRunning.acquire();
-        taskLauncherPA.terminate(false);
+        taskLauncherPA.kill();
 
         assertTaskLauncherIsTerminated(taskLauncherPA);
     }
@@ -113,7 +113,7 @@ public class KillTaskLauncherTest {
 
         assertEquals("done", taskResultWaiter.getTaskResult().value());
 
-        taskLauncherPA.terminate(false);
+        taskLauncherPA.kill();
 
         assertTaskLauncherIsTerminated(taskLauncherPA);
     }
@@ -161,7 +161,7 @@ public class KillTaskLauncherTest {
         taskLauncherPA.doTask(executableContainer, null, null);
 
         taskRunning.acquire();
-        taskLauncherPA.terminate(false);
+        taskLauncherPA.kill();
 
         assertTaskLauncherIsTerminated(taskLauncherPA);
     }

@@ -210,7 +210,7 @@ public class SchedulingService {
         for (RunningTaskData taskData : jobs.getRunningTasks()) {
             NodeSet nodes = taskData.getTask().getExecuterInformation().getNodes();
             try {
-                taskData.getLauncher().terminate(false);
+                taskData.getLauncher().kill();
             } catch (Throwable t) {
                 logger.error("Failed to terminate launcher", t);
             }
