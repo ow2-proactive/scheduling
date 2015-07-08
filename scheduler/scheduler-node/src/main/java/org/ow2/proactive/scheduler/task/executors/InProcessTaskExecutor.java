@@ -82,7 +82,6 @@ public class InProcessTaskExecutor implements TaskExecutor {
     private static final String DS_GLOBAL_BINDING_NAME = "globalspace";
     private static final String DS_USER_BINDING_NAME = "userspace";
 
-    private static final String MULTI_NODE_TASK_NODESET_BINDING_NAME = "nodeset";
     public static final String MULTI_NODE_TASK_NODESURL_BINDING_NAME = "nodesurl";
 
     private static final String NODES_FILE_DIRECTORY_NAME = ".pa_nodes";
@@ -151,8 +150,7 @@ public class InProcessTaskExecutor implements TaskExecutor {
         scriptHandler.addBinding(DS_GLOBAL_BINDING_NAME, container.getGlobalURI());
         scriptHandler.addBinding(DS_USER_BINDING_NAME, container.getUserURI());
 
-        List<String> nodesUrls = container.getNodesURLs();
-        scriptHandler.addBinding(MULTI_NODE_TASK_NODESET_BINDING_NAME, nodesUrls);
+        List<String> nodesUrls = container.getOtherNodesURLs();
         scriptHandler.addBinding(MULTI_NODE_TASK_NODESURL_BINDING_NAME, nodesUrls);
     }
 
@@ -179,7 +177,7 @@ public class InProcessTaskExecutor implements TaskExecutor {
             throws Exception {
         Map<String, Serializable> variables = taskVariables(container, taskResult);
 
-        variables.put(SchedulerVars.PA_NODESNUMBER.toString(), container.getNodesURLs().size() + 1);
+        variables.put(SchedulerVars.PA_NODESNUMBER.toString(), container.getOtherNodesURLs().size() + 1);
         variables.put(SchedulerVars.PA_NODESFILE.toString(), nodesFile);
 
         variables.put(SchedulerVars.PA_TASK_PROGRESS_FILE.toString(), container.getProgressFilePath());

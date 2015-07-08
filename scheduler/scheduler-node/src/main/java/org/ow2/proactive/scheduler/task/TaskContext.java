@@ -38,7 +38,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.ow2.proactive.scheduler.common.task.TaskId;
@@ -52,7 +51,7 @@ import org.ow2.proactive.utils.ClasspathUtils;
 
 public class TaskContext implements Serializable {
 
-    private final List<String> nodesURLs;
+    private final List<String> otherNodesURLs;
     private final List<String> nodesHosts;
 
     private ExecutableContainer executableContainer;
@@ -98,28 +97,19 @@ public class TaskContext implements Serializable {
 
         if (executableContainer.getNodes() != null) {
             int nbNodes = executableContainer.getNodes().size();
-
-            nodesURLs = new ArrayList<>(nbNodes);
+            otherNodesURLs = new ArrayList<>(nbNodes);
             nodesHosts = new ArrayList<>(nbNodes + 1);
 
             nodesHosts.add(currentNodeHostname);
             for (Node node : executableContainer.getNodes()) {
-                nodesURLs.add(node.getNodeInformation().getURL());
+                otherNodesURLs.add(node.getNodeInformation().getURL());
                 nodesHosts.add(node.getNodeInformation().getVMInformation().getHostName());
             }
-
             executableContainer.setNodes(null);
         } else {
-            nodesURLs = new ArrayList<>(0);
+            otherNodesURLs = new ArrayList<>(0);
             nodesHosts = new ArrayList<>(0);
         }
-    }
-
-    public TaskContext(TaskContext context, ExecutableContainer container) throws NodeException {
-        this(container, context.initializer, context.previousTasksResults,
-                context.scratchURI, context.inputURI, context.outputURI, context.userURI, context.globalURI,
-                context.progressFilePath,
-          PAActiveObject.getNode().getNodeInformation().getVMInformation().getHostName());
     }
 
     public ExecutableContainer getExecutableContainer() {
@@ -158,8 +148,8 @@ public class TaskContext implements Serializable {
         return previousTasksResults;
     }
 
-    public List<String> getNodesURLs() {
-        return nodesURLs;
+    public List<String> getOtherNodesURLs() {
+        return otherNodesURLs;
     }
 
     public String getScratchURI() {

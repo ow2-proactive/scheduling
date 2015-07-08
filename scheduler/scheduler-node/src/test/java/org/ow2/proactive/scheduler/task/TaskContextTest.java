@@ -15,9 +15,9 @@ public class TaskContextTest {
         TaskContext context = new TaskContext(new ScriptExecutableContainer(
           new TaskScript(new SimpleScript("", "javascript"))), new TaskLauncherInitializer());
 
-        context.getNodesURLs().add("host1");
-        context.getNodesURLs().add("host1");
-        assertEquals(2, context.getNodesURLs().size());
+        context.getOtherNodesURLs().add("host1");
+        context.getOtherNodesURLs().add("host1");
+        assertEquals(2, context.getOtherNodesURLs().size());
 
         context.getNodesHosts().add("host1");
         context.getNodesHosts().add("host1");

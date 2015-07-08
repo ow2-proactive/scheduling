@@ -85,7 +85,6 @@
 			<scriptExecutable>
 				<script>
 					<code language="groovy">
-						print 'nodeset='+nodeset.size()
 						print 'nodesurl='+nodesurl.size()
 					</code>
 				</script>

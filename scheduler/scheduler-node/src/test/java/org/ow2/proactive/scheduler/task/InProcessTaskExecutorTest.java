@@ -90,9 +90,9 @@ public class InProcessTaskExecutorTest {
         initializer.setPostScript(new SimpleScript(printEnvVariables, "groovy"));
         initializer.setTaskId(TaskIdImpl.createTaskId(new JobIdImpl(1000, "job"), "task", 42L, false));
 
-        new InProcessTaskExecutor().execute(new TaskContext(new ScriptExecutableContainer(
-            new TaskScript(new SimpleScript(printEnvVariables, "groovy"))), initializer),
-          taskOutput.outputStream, taskOutput.error);
+        new InProcessTaskExecutor().execute(new TaskContext(
+            new ScriptExecutableContainer(new TaskScript(new SimpleScript(printEnvVariables, "groovy"))),
+            initializer), taskOutput.outputStream, taskOutput.error);
 
         String[] lines = taskOutput.output().split("\\n");
         assertEquals("job@1000@task@42", lines[0]);
@@ -152,9 +152,9 @@ public class InProcessTaskExecutorTest {
 
         TaskResult[] previousTasksResults = { new TaskResultImpl(null, null, null, null,SerializationUtil.serializeVariableMap(variablesFromParent)) };
 
-        new InProcessTaskExecutor().execute(new TaskContext(new ScriptExecutableContainer(
-            new TaskScript(new SimpleScript("print(variables.get('var'));print(variables.get('PA_TASK_ID'))",
-                "groovy"))), initializer, previousTasksResults), taskOutput.outputStream, taskOutput.error);
+        new InProcessTaskExecutor().execute(new TaskContext(new ScriptExecutableContainer(new TaskScript(
+          new SimpleScript("print(variables.get('var'));print(variables.get('PA_TASK_ID'))", "groovy"))),
+          initializer, previousTasksResults), taskOutput.outputStream, taskOutput.error);
 
         assertEquals("parent42", taskOutput.output());
     }
@@ -273,9 +273,9 @@ public class InProcessTaskExecutorTest {
                 .setPreScript(new SimpleScript(printEnvVariables, "groovy", new Serializable[] { "Hello" }));
         initializer.setTaskId(TaskIdImpl.createTaskId(new JobIdImpl(1000, "job"), "task", 42L, false));
 
-        new InProcessTaskExecutor().execute(new TaskContext(new ScriptExecutableContainer(
-            new TaskScript(new SimpleScript("", "groovy"))), initializer), taskOutput.outputStream,
-                taskOutput.error);
+        new InProcessTaskExecutor().execute(
+          new TaskContext(new ScriptExecutableContainer(new TaskScript(new SimpleScript("", "groovy"))),
+            initializer), taskOutput.outputStream, taskOutput.error);
 
         assertEquals("Hello", taskOutput.output());
     }
@@ -334,6 +334,26 @@ public class InProcessTaskExecutorTest {
 
         assertTaskResultOk(taskResult);
         assertEquals(String.format("thisHost%ndummyhost%n"), taskOutput.output());
+    }
+
+    @Test
+    public void multiNodesURLsAreBounded() throws Throwable {
+        TestTaskOutput taskOutput = new TestTaskOutput();
+
+        TaskLauncherInitializer initializer = new TaskLauncherInitializer();
+        initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false));
+
+        ScriptExecutableContainer printNodesFileTask = new ScriptExecutableContainer(
+          new TaskScript(new SimpleScript("println nodesurl.size()", "groovy")));
+        printNodesFileTask.setNodes(mockedNodeSet());
+
+        TaskContext context = new TaskContext(printNodesFileTask, initializer, null, tmpFolder.newFolder()
+          .toURI().toString(), "", "", "", "", "", "thisHost");
+        TaskResultImpl taskResult = new InProcessTaskExecutor().execute(context, taskOutput.outputStream,
+          taskOutput.error);
+
+        assertTaskResultOk(taskResult);
+        assertEquals(String.format("1%n"), taskOutput.output());
     }
 
     private NodeSet mockedNodeSet() {
