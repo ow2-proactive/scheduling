@@ -36,7 +36,14 @@
  */
 package org.ow2.proactive.scheduler.core;
 
-import org.apache.log4j.Logger;
+import java.security.PrivateKey;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
@@ -62,8 +69,8 @@ import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
 import org.ow2.proactive.scheduler.descriptor.TaskDescriptor;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.policy.Policy;
-import org.ow2.proactive.scheduler.task.containers.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
+import org.ow2.proactive.scheduler.task.containers.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.TaskLogger;
@@ -72,10 +79,7 @@ import org.ow2.proactive.threading.TimeoutThreadPoolExecutor;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
-
-import java.security.PrivateKey;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
+import org.apache.log4j.Logger;
 
 
 /**
@@ -317,7 +321,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                 } else {
                     //check if the task is compatible with the other previous one
                     if (referent.equals(new SchedulingTaskComparator(internalTask, currentJob.getOwner()))) {
-                        tlogger.info(internalTask.getId(), "scheduling");
+                        tlogger.debug(internalTask.getId(), "scheduling");
                         neededResource += neededNodes;
                         maxResource -= neededNodes;
                         toFill.add(etd);
@@ -468,7 +472,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                 //set nodes in the executable container
                 task.getExecutableContainer().setNodes(nodes);
 
-                tlogger.info(task.getId(), "deploying");
+                tlogger.debug(task.getId(), "deploying");
 
                 finalizeStarting(job, task, node, launcher);
 

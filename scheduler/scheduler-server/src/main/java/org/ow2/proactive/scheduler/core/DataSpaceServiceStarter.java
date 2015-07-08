@@ -47,8 +47,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
@@ -66,11 +64,13 @@ import org.objectweb.proactive.extensions.vfsprovider.FileSystemServerDeployer;
 import org.objectweb.proactive.extensions.vfsprovider.util.URIHelper;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Logger;
 
 
 public class DataSpaceServiceStarter implements Serializable {
 
-    public static final Logger logger = Logger.getLogger(SchedulingService.class);
+    public static final Logger logger = Logger.getLogger(DataSpaceServiceStarter.class);
 
     /**
      * Default Local Paths
@@ -306,7 +306,7 @@ public class DataSpaceServiceStarter implements Serializable {
         namingService.register(new SpaceInstanceInfo(appID, spaceConf));
 
         spacesConfigurations.get(appID).add(spaceConf.getName());
-        logger.info("Space " + name + " for appid = " + appID + " with urls = " + finalurls + " registered");
+        logger.debug("Space " + name + " for appid = " + appID + " with urls = " + finalurls + " registered");
 
     }
 

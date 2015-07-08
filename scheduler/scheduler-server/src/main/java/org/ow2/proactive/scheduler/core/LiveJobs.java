@@ -566,7 +566,7 @@ class LiveJobs {
         InternalJob job = jobData.job;
         TaskId taskId = task.getId();
 
-        tlogger.info(taskId, "result added to job " + job.getId());
+        tlogger.debug(taskId, "result added to job " + job.getId());
         //to be done before terminating the task, once terminated it is not running anymore..
         job.getRunningTaskDescriptor(taskId);
         ChangedTasksInfo changesInfo = job.terminateTask(errorOccurred, taskId, listener, result.getAction(),
@@ -578,7 +578,7 @@ class LiveJobs {
         if (jobFinished) {
             //terminating job
             job.terminate();
-            jlogger.info(job.getId(), "terminated");
+            jlogger.debug(job.getId(), "terminated");
             jobs.remove(job.getId());
             terminationData.addJobToTermiante(job.getId());
         }
