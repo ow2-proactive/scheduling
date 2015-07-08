@@ -396,7 +396,7 @@ public class SchedulerDBManager {
             public Long executeWork(Session session) {
                 Query query = session.createQuery(
                         "select count(*) from TaskData task where taskStatus in (:taskStatus) "
-                            + "and task.jobData.status in (:jobStatus) and task.jobData.removedTime = -1")
+                                + "and task.jobData.status in (:jobStatus) and task.jobData.removedTime = -1")
                         .setParameterList("jobStatus", notFinishedJobStatuses).setParameterList("taskStatus",
                                 Arrays.asList(TaskStatus.RUNNING));
 
@@ -1339,12 +1339,13 @@ public class SchedulerDBManager {
 
                 Object[] taskSearchResult = (Object[]) session.createQuery(
                         "select id, taskName from TaskData where "
-                            + "taskName = :taskName and jobData = :job").setParameter("taskName", taskName)
+                                + "taskName = :taskName and jobData = :job").setParameter("taskName",
+                        taskName)
                         .setParameter("job", session.load(JobData.class, id)).uniqueResult();
 
                 if (taskSearchResult == null) {
                     throw new DatabaseManagerException("Failed to load result for task '" + taskName +
-                        ", job: " + jobId);
+                            ", job: " + jobId);
                 }
 
                 DBTaskId dbTaskId = (DBTaskId) taskSearchResult[0];
@@ -1524,7 +1525,8 @@ public class SchedulerDBManager {
             public List<SchedulerUserInfo> executeWork(Session session) {
                 List<SchedulerUserInfo> users = new ArrayList<>();
                 Query query = session
-                        .createQuery("select owner, count(owner), max(submittedTime) from JobData group by owner");
+                        .createQuery(
+                                "select owner, count(owner), max(submittedTime) from JobData group by owner");
 
                 for (Object obj : query.list()) {
                     Object[] nameAndCount = (Object[]) obj;
@@ -1657,4 +1659,18 @@ public class SchedulerDBManager {
             }
         });
     }
+
+    public boolean hasThirdPartyCredentials(final String jobOwner) {
+        return runWithoutTransaction(new SessionWork<Boolean>() {
+            @Override
+            public Boolean executeWork(Session session) {
+                Long count = (Long) session.createQuery(
+                        "select count(*) from ThirdPartyCredentialData where username = :username")
+                            .setParameter("username", jobOwner).uniqueResult();
+
+                return count > 0;
+            }
+        });
+    }
+
 }

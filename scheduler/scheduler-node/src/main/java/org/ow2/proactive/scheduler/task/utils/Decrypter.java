@@ -49,8 +49,9 @@ import org.ow2.proactive.authentication.crypto.Credentials;
  * @since ProActive Scheduling 2.2
  */
 public final class Decrypter implements Serializable {
-    private PrivateKey key = null;
-    private Credentials credentials = null;
+
+    private PrivateKey key;
+    private Credentials credentials;
 
     /**
      * Create a new instance of Decrypter
@@ -84,10 +85,7 @@ public final class Decrypter implements Serializable {
      * @throws java.security.KeyException decryption failure, malformed data
      */
     public CredData decrypt() throws IllegalAccessException, KeyException {
-        if (this.credentials == null) {
-            throw new IllegalAccessException("Cannot decrypt credentials !");
-        }
-        if (this.key == null) {
+        if (this.credentials == null || this.key == null) {
             throw new IllegalAccessException("Cannot decrypt credentials !");
         }
         return this.credentials.decrypt(this.key);

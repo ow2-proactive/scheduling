@@ -121,8 +121,8 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
                     parentIds.add(taskDescriptor.getParents().get(i).getTaskId());
                 }
                 Map<TaskId, TaskResult> taskResults = schedulingService.getInfrastructure().getDBManager()
-                  .loadTasksResults(
-                  job.getId(), parentIds);
+                        .loadTasksResults(
+                                job.getId(), parentIds);
                 for (int i = 0; i < resultSize; i++) {
                     params[i] = taskResults.get(taskDescriptor.getParents().get(i).getTaskId());
                 }
@@ -141,19 +141,31 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
         return null;
     }
 
-    private void fillContainer() throws KeyException, NoSuchAlgorithmException {
-        if (task.isRunAsMe()) {
-            task.getExecutableContainer().setRunAsUser(true);
-        }
+    protected void fillContainer() throws KeyException, NoSuchAlgorithmException {
+        boolean isRunAsMeEnabled = task.isRunAsMe();
 
+        task.getExecutableContainer().setRunAsUser(isRunAsMeEnabled);
+
+        if (isRunAsMeEnabled || areThirdPartyCredentialsDefined()) {
+            createAndSetCredentials();
+        }
+    }
+
+    private void createAndSetCredentials() throws KeyException, NoSuchAlgorithmException {
         CredData decryptedUserCredentials = job.getCredentials().decrypt(corePrivateKey);
 
         enrichWithThirdPartyCredentials(decryptedUserCredentials);
 
         PublicKey nodePublicKey = launcher.generatePublicKey();
-        Credentials nodeEncryptedUserCredentials = Credentials.createCredentials(decryptedUserCredentials,
-                nodePublicKey);
+        Credentials nodeEncryptedUserCredentials =
+                Credentials.createCredentials(decryptedUserCredentials, nodePublicKey);
+
         task.getExecutableContainer().setCredentials(nodeEncryptedUserCredentials);
+    }
+
+    protected boolean areThirdPartyCredentialsDefined() {
+        return schedulingService.getInfrastructure().getDBManager().hasThirdPartyCredentials(
+                job.getJobInfo().getJobOwner());
     }
 
     private void enrichWithThirdPartyCredentials(CredData decryptedUserCredentials) throws KeyException {
