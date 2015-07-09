@@ -50,9 +50,10 @@ import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
-
+@Ignore
 public class TestLinkAnotherRM extends MultipleRMTBase {
 
     private static final int NODES_NUMBER = 2;
