@@ -1,11 +1,10 @@
 /*
- * ################################################################
- *
+ *  *
  * ProActive Parallel Suite(TM): The Java(TM) library for
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2011 INRIA/University of
+ * Copyright (C) 1997-2015 INRIA/University of
  *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -29,36 +28,11 @@
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s): ActiveEon Team - http://www.activeeon.com
+ *  Contributor(s):
  *
- * ################################################################
- * $$ACTIVEEON_CONTRIBUTOR$$
+ *  * $$ACTIVEEON_INITIAL_DEV$$
  */
-package functionaltests.executables;
+package functionaltests;
 
-import org.objectweb.proactive.extensions.dataspaces.api.FileSelector;
-import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
-
-import java.io.Serializable;
-
-
-public class DSWorker extends JavaExecutable {
-
-    //set automatically by java executable
-    private String paa;
-    private String pbb;
-    private String pcc;
-    private String paaa;
-    private String pbbb;
-    private String pccc;
-
-    @Override
-    public Serializable execute(TaskResult... results) throws Throwable {
-        getOutputFile(paaa).copyFrom(getOutputFile(paa), FileSelector.SELECT_SELF);
-        getGlobalFile(pbbb).copyFrom(getGlobalFile(pbb), FileSelector.SELECT_SELF);
-        getUserFile(pccc).copyFrom(getUserFile(pcc), FileSelector.SELECT_SELF);
-        return 0;
-    }
-
+public class Test {
 }

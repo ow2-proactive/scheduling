@@ -36,15 +36,15 @@
  */
 package org.ow2.proactive.scheduler.examples;
 
-import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.ow2.proactive.scheduler.common.task.executable.Executable;
-import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.Random;
+
+import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 
 
 /**
@@ -86,7 +86,7 @@ public class MonteCarlo extends JavaExecutable {
     }
 
     /**
-     * @see Executable#execute(org.ow2.proactive.scheduler.common.task.TaskResult[])
+     * @see JavaExecutable#execute(org.ow2.proactive.scheduler.common.task.TaskResult[])
      */
     @Override
     public Serializable execute(TaskResult... results) {

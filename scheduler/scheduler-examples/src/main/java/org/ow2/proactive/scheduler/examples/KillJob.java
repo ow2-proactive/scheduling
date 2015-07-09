@@ -36,10 +36,10 @@
  */
 package org.ow2.proactive.scheduler.examples;
 
-import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.ow2.proactive.scheduler.common.task.executable.Executable;
-import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import java.io.Serializable;
+
+import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 
 
 /**
@@ -53,7 +53,7 @@ public class KillJob extends JavaExecutable {
     public int exitcode;
 
     /**
-     * @see Executable#execute(TaskResult[])
+     * @see JavaExecutable#execute(TaskResult[])
      */
     @Override
     public Serializable execute(TaskResult... results) throws Throwable {

@@ -40,7 +40,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.net.URI;
 import java.util.Map;
 
 import org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector;
@@ -49,13 +48,10 @@ import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
-import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
-import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
-import functionaltests.executables.DSWorker;
 import org.junit.Assert;
 
 
@@ -89,10 +85,6 @@ public class TestJobDataspaceSubmission extends SchedulerConsecutive {
     private static String out10 = "paa.txt";
     private static String out11 = "pbb.txt";
     private static String out12 = "pcc.txt";
-
-    private static String out20 = "paaa.txt";
-    private static String out21 = "pbbb.txt";
-    private static String out22 = "pccc.txt";
 
     File inputDir;
     File outputDir;
@@ -259,25 +251,6 @@ public class TestJobDataspaceSubmission extends SchedulerConsecutive {
                 throw new IllegalStateException("Unsupported operating system");
         }
         job.addTask(t12);
-
-        JavaTask jt = new JavaTask();
-        jt.addDependence(t10);
-        jt.addDependence(t11);
-        jt.addDependence(t12);
-        jt.setName("java_task");
-        jt.setExecutableClassName(DSWorker.class.getName());
-        jt.addArgument("paa", out10);
-        jt.addArgument("pbb", out11);
-        jt.addArgument("pcc", out12);
-        jt.addArgument("paaa", out20);
-        jt.addArgument("pbbb", out21);
-        jt.addArgument("pccc", out22);
-
-        final URI uri = DSWorker.class.getProtectionDomain().getCodeSource().getLocation().toURI();
-        ForkEnvironment forkEnvironment = new ForkEnvironment();
-        forkEnvironment.addAdditionalClasspath(new File(uri).getAbsolutePath());
-
-        jt.setForkEnvironment(forkEnvironment);
 
         JobId id = SchedulerTHelper.testJobSubmission(job);
 

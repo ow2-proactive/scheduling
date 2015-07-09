@@ -34,8 +34,6 @@
  */
 package org.ow2.proactive.scheduler.task.java;
 
-import static java.util.Collections.emptyList;
-
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.Reader;
@@ -51,17 +49,17 @@ import javax.script.ScriptEngineFactory;
 import javax.script.ScriptException;
 import javax.script.SimpleBindings;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.output.WriterOutputStream;
 import org.ow2.proactive.scheduler.common.exception.ExecutableCreationException;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.ow2.proactive.scheduler.common.task.executable.AbstractJavaExecutable;
-import org.ow2.proactive.scheduler.common.task.executable.internal.JavaExecutableInitializerImpl;
+import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
+import org.ow2.proactive.scheduler.common.task.executable.internal.JavaStandaloneExecutableInitializer;
 import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
-import org.ow2.proactive.scheduler.task.executors.InProcessTaskExecutor;
 import org.ow2.proactive.scheduler.task.exceptions.TaskException;
+import org.ow2.proactive.scheduler.task.executors.InProcessTaskExecutor;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.TaskScript;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.output.WriterOutputStream;
 
 
 public class JavaClassScriptEngine extends AbstractScriptEngine {
@@ -70,9 +68,9 @@ public class JavaClassScriptEngine extends AbstractScriptEngine {
     public Object eval(String userExecutableClassName, ScriptContext context) throws ScriptException {
 
         try {
-            AbstractJavaExecutable javaExecutable = getExecutable(userExecutableClassName);
+            JavaExecutable javaExecutable = getExecutable(userExecutableClassName);
 
-            JavaExecutableInitializerImpl execInitializer = new JavaExecutableInitializerImpl();
+            JavaStandaloneExecutableInitializer execInitializer = new JavaStandaloneExecutableInitializer();
             PrintStream output = new PrintStream(new WriterOutputStream(context.getWriter()), true);
             execInitializer.setOutputSink(output);
             PrintStream error = new PrintStream(new WriterOutputStream(context.getErrorWriter()), true);
@@ -107,7 +105,7 @@ public class JavaClassScriptEngine extends AbstractScriptEngine {
                         .getAttribute(InProcessTaskExecutor.MULTI_NODE_TASK_NODESURL_BINDING_NAME);
                 execInitializer.setNodesURL(nodesURLs);
             } else {
-                execInitializer.setNodesURL(emptyList());
+                execInitializer.setNodesURL(Collections.<String>emptyList());
             }
 
             javaExecutable.internalInit(execInitializer);
@@ -129,12 +127,12 @@ public class JavaClassScriptEngine extends AbstractScriptEngine {
         }
     }
 
-    private AbstractJavaExecutable getExecutable(String userExecutableClassName)
+    private JavaExecutable getExecutable(String userExecutableClassName)
             throws ExecutableCreationException {
         try {
             ClassLoader tcl = Thread.currentThread().getContextClassLoader();
             Class<?> userExecutableClass = tcl.loadClass(userExecutableClassName);
-            return (AbstractJavaExecutable) userExecutableClass.newInstance();
+            return (JavaExecutable) userExecutableClass.newInstance();
         } catch (ClassNotFoundException e) {
             throw new ExecutableCreationException("Unable to instantiate JavaExecutable. " +
                 userExecutableClassName + " class cannot be found", e);

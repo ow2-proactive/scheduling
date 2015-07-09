@@ -36,34 +36,30 @@
  */
 package functionaltests;
 
-import com.google.common.io.Files;
-import javassist.ClassPool;
-import javassist.CtClass;
-import javassist.CtMethod;
-import javassist.CtNewMethod;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.ow2.proactive.scheduler.common.NotificationData;
-import org.ow2.proactive.scheduler.common.SchedulerEvent;
-import org.ow2.proactive.scheduler.common.SchedulerEventListener;
-import org.ow2.proactive.scheduler.common.SchedulerStatus;
-import org.ow2.proactive.scheduler.common.job.*;
-import org.ow2.proactive.scheduler.common.task.TaskInfo;
-import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.ow2.proactive.scheduler.common.task.executable.Executable;
-import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
-import org.ow2.proactive.scheduler.common.util.JarUtils;
-import org.ow2.proactive.scheduler.rest.ISchedulerClient;
-import org.ow2.proactive.scheduler.rest.SchedulerClient;
-
 import java.io.File;
 import java.net.URI;
 import java.util.Stack;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+
+import org.ow2.proactive.scheduler.common.NotificationData;
+import org.ow2.proactive.scheduler.common.SchedulerEvent;
+import org.ow2.proactive.scheduler.common.SchedulerEventListener;
+import org.ow2.proactive.scheduler.common.SchedulerStatus;
+import org.ow2.proactive.scheduler.common.job.Job;
+import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobInfo;
+import org.ow2.proactive.scheduler.common.job.JobState;
+import org.ow2.proactive.scheduler.common.job.UserIdentification;
+import org.ow2.proactive.scheduler.common.task.TaskInfo;
+import org.ow2.proactive.scheduler.rest.ISchedulerClient;
+import org.ow2.proactive.scheduler.rest.SchedulerClient;
+import com.google.common.io.Files;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import static functionaltests.RestFuncTHelper.getRestServerUrl;
 
@@ -184,45 +180,6 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
 
     private JobId submitJob(Job job, ISchedulerClient client) throws Exception {
         return client.submit(job);
-    }
-
-    /**
-     * Creates a class that inherits from JavaExecutable and implements the
-     * execute method that returns the value to test.
-     *
-     * @param className
-     *            the className of the class to create
-     * @param valueToReturn
-     *            the int value to return
-     * @param insideDir
-     *            the dir that will contain the created class
-     * @throws Exception
-     *             If the classes cannot be created
-     */
-    public static void createClass(String className, int valueToReturn, File insideDir) throws Exception {
-        ClassPool pool = ClassPool.getDefault();
-        // create new classes
-        CtClass cc1 = pool.makeClass(className);
-        CtClass serializableClass = pool.get("java.io.Serializable");
-
-        // get super-type and super-super-type
-        CtClass upper = pool.get(JavaExecutable.class.getName());
-        CtClass upupper = pool.get(Executable.class.getName());
-
-        // get Executable 'execute' method
-        CtMethod absExec = upupper.getMethod("execute",
-                "([Lorg/ow2/proactive/scheduler/common/task/TaskResult;)Ljava/io/Serializable;");
-
-        // set superclass of new classes
-        cc1.setSuperclass(upper);
-        cc1.addInterface(serializableClass);
-
-        // create method for first class
-        CtMethod exec1 = CtNewMethod.make(serializableClass, absExec.getName(), absExec.getParameterTypes(),
-                absExec.getExceptionTypes(), "return new java.lang.Integer(" + valueToReturn + ");", cc1);
-        cc1.addMethod(exec1);
-
-        cc1.writeFile(insideDir.getAbsolutePath());
     }
 
     private static class SchedulerEventListenerImpl implements SchedulerEventListener {

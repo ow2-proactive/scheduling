@@ -37,9 +37,12 @@
 package org.ow2.proactive.scheduler.common.task.executable.internal;
 
 import java.io.IOException;
+import java.io.PrintStream;
 import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
 
+import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
 
 
@@ -49,15 +52,19 @@ import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
  * @author The ProActive Team
  * @since ProActive Scheduling 1.0
  */
-public class JavaStandaloneExecutableInitializer extends DefaultStandaloneExecutableInitializer {
+public class JavaStandaloneExecutableInitializer {
 
     /** Arguments of the java task */
     protected Map<String, byte[]> serializedArguments;
 
     /** Propagated variables from parent tasks */
     protected Map<String, byte[]> propagatedVariables;
+    protected List<String> nodes;
+    protected TaskId taskId;
 
     private Map<String, String> thirdPartyCredentials;
+    private PrintStream outputSink;
+    private PrintStream errorSink;
 
     /**
      * @throws java.io.IOException if the deserialization of the value cannot be performed.
@@ -65,25 +72,6 @@ public class JavaStandaloneExecutableInitializer extends DefaultStandaloneExecut
      */
     public Map<String, Serializable> getArguments(ClassLoader cl) throws IOException, ClassNotFoundException {
         return SerializationUtil.deserializeVariableMap(this.serializedArguments, cl);
-    }
-
-    /**
-     * Return a map containing all the task arguments serialized as byte[].
-     *
-     * @return the serialized arguments map.
-     */
-    public Map<String, byte[]> getSerializedArguments() {
-        return serializedArguments;
-    }
-
-    /**
-     * Set an argument
-     *
-     * @param key key of the argument to set
-     * @param arg de-serialized version of the argument
-     */
-    public void setArgument(String key, Serializable arg) {
-        SerializationUtil.serializeAndSetVariable(key, arg, this.serializedArguments);
     }
 
     /**
@@ -122,4 +110,35 @@ public class JavaStandaloneExecutableInitializer extends DefaultStandaloneExecut
         this.thirdPartyCredentials = thirdPartyCredentials;
     }
 
+    public List<String> getNodesURL() {
+        return nodes;
+    }
+
+    public void setNodesURL(List<String> nodes) {
+        this.nodes = nodes;
+    }
+
+    public TaskId getTaskId() {
+        return taskId;
+    }
+
+    public void setTaskId(TaskId taskId) {
+        this.taskId = taskId;
+    }
+
+    public PrintStream getOutputSink() {
+        return outputSink;
+    }
+
+    public void setOutputSink(PrintStream redirectedStdout) {
+        this.outputSink = redirectedStdout;
+    }
+
+    public PrintStream getErrorSink() {
+        return errorSink;
+    }
+
+    public void setErrorSink(PrintStream errorSink) {
+        this.errorSink = errorSink;
+    }
 }

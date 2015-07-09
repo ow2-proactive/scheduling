@@ -44,9 +44,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.internal.JavaStandaloneExecutableInitializer;
 import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
 import org.ow2.proactive.scheduler.task.SchedulerVars;
+import org.ow2.proactive.scripting.helper.progress.ProgressFile;
 
 
 /**
@@ -56,11 +58,13 @@ import org.ow2.proactive.scheduler.task.SchedulerVars;
  * @since ProActive Scheduling 0.9
  */
 @PublicAPI
-public abstract class AbstractJavaExecutable extends Executable {
+public abstract class JavaExecutable {
 
     // this value is set only on worker node side !!
     // see JavaTaskLauncher
     protected JavaStandaloneExecutableInitializer execInitializer;
+
+    private Map<String, Serializable> propagatedVariables;
 
     /**
      * Initialize the executable using the given executable Initializer.
@@ -106,7 +110,7 @@ public abstract class AbstractJavaExecutable extends Executable {
             return;
         }
         Class<?> current = this.getClass();
-        while (AbstractJavaExecutable.class.isAssignableFrom(current)) {
+        while (JavaExecutable.class.isAssignableFrom(current)) {
             for (Entry<String, Serializable> e : args.entrySet()) {
                 try {
                     Field f = current.getDeclaredField(e.getKey());
@@ -223,5 +227,51 @@ public abstract class AbstractJavaExecutable extends Executable {
                 old.put(k, updated.get(k));
             }
         }
+    }
+
+    /**
+     * The content of this method will be executed once after being scheduled.<br>
+     * This may generate a result as an {@link Object}. It can be whatever you want.<br>
+     * The results list order correspond to the order in the dependence list.
+     *
+     * @param results the results (as a taskResult) from parent tasks.
+     * @throws Throwable any exception thrown by the user's code
+     * @return any serializable object from the user.
+     */
+    public abstract Serializable execute(TaskResult... results) throws Throwable;
+
+    /**
+     * Set the progress value for this Executable. Progress value must be ranged
+     * between 0 and 100.
+     * @param newValue the new progress value
+     * @return the previous progress value
+     * @throws IllegalArgumentException if the value is not ranged between 0 and 100.
+     */
+    protected final int setProgress(int newValue) throws IllegalArgumentException {
+        if (newValue < 0 || newValue > 100) {
+            throw new IllegalArgumentException("Progress value must be ranged between 0 and 100");
+        }
+        String progressFilePath = (String) getVariables().get(SchedulerVars.PA_TASK_PROGRESS_FILE.toString());
+        int previousValue = ProgressFile.getProgress(progressFilePath);
+        ProgressFile.setProgress(progressFilePath, newValue);
+        return previousValue;
+    }
+
+    /**
+     * Return the current progress value for this executable, ranged between 0 and 100.
+     *
+     * @return the current progress value for this executable.
+     */
+    public int getProgress() {
+        return ProgressFile.getProgress((String) getVariables().get(
+                SchedulerVars.PA_TASK_PROGRESS_FILE.toString()));
+    }
+
+    public Map<String, Serializable> getVariables() {
+        return this.propagatedVariables;
+    }
+
+    public void setVariables(Map<String, Serializable> propagatedVariables) {
+        this.propagatedVariables = propagatedVariables;
     }
 }
