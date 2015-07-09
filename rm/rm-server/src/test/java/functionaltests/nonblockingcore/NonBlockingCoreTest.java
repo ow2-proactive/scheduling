@@ -42,13 +42,11 @@ import java.net.URL;
 import javax.security.auth.login.LoginException;
 
 import org.objectweb.proactive.api.PAFuture;
-import org.objectweb.proactive.core.util.ProActiveInet;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
-import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.utils.NodeSet;
@@ -82,7 +80,7 @@ public class NonBlockingCoreTest extends RMConsecutive {
     public void action() throws Exception {
         String rmconf = new File(RMTHelper.class.getResource(
                 "/functionaltests/config/rm-default-script-timeout.ini").toURI()).getAbsolutePath();
-        RMTHelper.getDefaultInstance().startRM(rmconf, RMTHelper.PA_RMI_PORT);
+        RMTHelper.getDefaultInstance().startRM(rmconf, RMTHelper.PA_PNP_PORT);
         RMTHelper helper = RMTHelper.getDefaultInstance();
 
         ResourceManager resourceManager = helper.getResourceManager();

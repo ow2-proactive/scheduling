@@ -42,6 +42,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
+import org.objectweb.proactive.extensions.pnp.PNPConfig;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.RMFactory;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
@@ -93,7 +94,7 @@ public class SchedulerTStarter implements Serializable {
     }
 
     private static void createRMAndScheduler(String[] args) throws Exception {
-        boolean localnodes = Boolean.valueOf(args[0]);
+        final boolean localnodes = Boolean.valueOf(args[0]);
         String schedPropPath = args[1];
         String RMPropPath = args[2];
 
@@ -102,40 +103,56 @@ public class SchedulerTStarter implements Serializable {
 
         //Starting a local RM
         RMFactory.setOsJavaProperty();
-        RMFactory.startLocal();
 
-        schedulerUrl = "rmi://localhost:" + CentralPAPropertyRepository.PA_RMI_PORT.getValue() + "/";
+        final Thread rmStarter = new Thread() {
+            public void run() {
+                try {
+                    RMFactory.startLocal();
 
-        // waiting the initialization
-        RMAuthentication rmAuth = RMConnection.waitAndJoin(schedulerUrl);
+                    // waiting the initialization
+                    RMAuthentication rmAuth = RMConnection.waitAndJoin(schedulerUrl);
+
+                    if (localnodes) {
+                        Credentials creds = Credentials.getCredentials(PAResourceManagerProperties
+                                .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString()));
+                        ResourceManager rmAdmin = rmAuth.login(creds);
+                        Map<String, String> params = new HashMap<>();
+                        if (System.getProperty("pas.launcher.forkas.method") != null) {
+                            params.put("pas.launcher.forkas.method",
+                                    System.getProperty("pas.launcher.forkas.method"));
+                        }
+                        if (System.getProperty("proactive.test.runAsMe") != null) {
+                            params.put("proactive.test.runAsMe", "true");
+                        }
+
+                        rmAdmin.createNodeSource(
+                                RM_NODE_NAME,
+                                LocalInfrastructure.class.getName(),
+                                new Object[] {
+                                        creds.getBase64(),
+                                        RM_NODE_NUMBER,
+                                        RM_NODE_DEPLOYMENT_TIMEOUT,
+                                        "-Dproactive.test=true " +
+                                            CentralPAPropertyRepository.PA_RUNTIME_PING.getCmdLine() + false },
+
+                                StaticPolicy.class.getName(), new Object[] { "ALL", "ALL" });
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        rmStarter.start();
+
+        schedulerUrl = "pnp://localhost:" + PNPConfig.PA_PNP_PORT.getValue() + "/";
+
+
 
         SchedulerFactory.createScheduler(new URI(schedulerUrl),
                 PASchedulerProperties.SCHEDULER_DEFAULT_POLICY.getValueAsString());
 
         SchedulerConnection.waitAndJoin(schedulerUrl);
-        if (localnodes) {
-            Credentials creds = Credentials.getCredentials(PAResourceManagerProperties
-                    .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString()));
-            ResourceManager rmAdmin = rmAuth.login(creds);
-            Map<String, String> params = new HashMap<>();
-            if (System.getProperty("pas.launcher.forkas.method") != null) {
-                params.put("pas.launcher.forkas.method", System.getProperty("pas.launcher.forkas.method"));
-            }
-            if (System.getProperty("proactive.test.runAsMe") != null) {
-                params.put("proactive.test.runAsMe", "true");
-            }
 
-            rmAdmin.createNodeSource(RM_NODE_NAME, LocalInfrastructure.class.getName(), new Object[] {
-                    creds.getBase64(),
-                    RM_NODE_NUMBER,
-                    RM_NODE_DEPLOYMENT_TIMEOUT,
-                    "-Dproactive.test=true " +
-                        CentralPAPropertyRepository.PA_RMI_PORT.getCmdLine() +
-                        CentralPAPropertyRepository.PA_RMI_PORT.getValue() + " " +
-                        CentralPAPropertyRepository.PA_RUNTIME_PING.getCmdLine() + false },
-
-            StaticPolicy.class.getName(), new Object[] { "ALL", "ALL" });
-        }
     }
 
     private static void createWithExistingRM(String[] args) throws Exception {

@@ -40,7 +40,6 @@ import java.io.File;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 
-import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
@@ -55,9 +54,10 @@ import org.ow2.proactive.scheduler.common.SchedulerConnection;
 import org.ow2.proactive.scheduler.resourcemanager.nodesource.policy.ReleaseResourcesWhenSchedulerIdle;
 import org.ow2.proactive.utils.FileToBytesConverter;
 import org.ow2.tests.FunctionalTest;
+import org.junit.Assert;
+
 import functionaltests.RMTHelper;
 import functionaltests.SchedulerTHelper;
-import org.junit.Assert;
 
 
 public class TestBrokenNodeSourceRemoval extends FunctionalTest {
@@ -65,7 +65,7 @@ public class TestBrokenNodeSourceRemoval extends FunctionalTest {
     protected byte[] GCMDeploymentData;
 
     protected int defaultDescriptorNodesNb = 1;
-    private RMTHelper helper = RMTHelper.getDefaultInstance();
+    private RMTHelper helper = RMTHelper.getDefaultInstance(SchedulerTHelper.PNP_PORT);
 
     protected Object[] getPolicyParams() throws Exception {
         SchedulerAuthenticationInterface auth = SchedulerConnection.join(SchedulerTHelper.schedulerUrl);
@@ -94,7 +94,7 @@ public class TestBrokenNodeSourceRemoval extends FunctionalTest {
         helper.reset();
         String rmconf = new File(PAResourceManagerProperties.getAbsolutePath(getClass().getResource(
                 "/functionaltests/config/rm-with-db.ini").getFile())).getAbsolutePath();
-        helper.startRM(rmconf, CentralPAPropertyRepository.PA_RMI_PORT.getValue());
+        helper.startRM(rmconf, SchedulerTHelper.PNP_PORT);
         return helper.getResourceManager();
     }
 

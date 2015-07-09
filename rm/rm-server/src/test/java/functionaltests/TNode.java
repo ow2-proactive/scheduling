@@ -59,4 +59,7 @@ public class TNode {
         return node;
     }
 
+    public String getNodeURL() {
+        return node.getNodeInformation().getURL();
+    }
 }

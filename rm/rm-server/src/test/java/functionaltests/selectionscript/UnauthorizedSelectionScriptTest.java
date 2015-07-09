@@ -41,15 +41,15 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
 import org.ow2.tests.FunctionalTest;
-import functionaltests.RMTHelper;
 import org.junit.Assert;
+
+import functionaltests.RMTHelper;
 
 
 /**
@@ -64,7 +64,7 @@ public class UnauthorizedSelectionScriptTest extends FunctionalTest {
                 "/functionaltests/config/rm-authorized-selection-script.ini").getFile())).getAbsolutePath();
 
         RMTHelper helper = RMTHelper.getDefaultInstance();
-        helper.startRM(rmconf, CentralPAPropertyRepository.PA_RMI_PORT.getValue());
+        helper.startRM(rmconf, RMTHelper.PA_PNP_PORT);
         ResourceManager rm = helper.getResourceManager();
 
         helper.createNodeSource("Dummy", 1);

@@ -195,7 +195,7 @@ public class TestJobWalltime extends FunctionalTest {
 
         // Make sure that the task has been properly killed
 
-        RMTHelper rm = RMTHelper.getDefaultInstance();
+        RMTHelper rm = RMTHelper.getDefaultInstance(SchedulerTHelper.PNP_PORT);
 
         List<Node> nodes = rm.listAliveNodes();
         // We wait until no active object remain on the nodes.

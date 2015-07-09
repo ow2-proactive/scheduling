@@ -41,9 +41,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.concurrent.TimeUnit;
 
 import org.objectweb.proactive.utils.OperatingSystem;
-
 import org.ow2.proactive.process_tree_killer.ProcessTree;
 import org.ow2.proactive.scheduler.common.exception.UserException;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -55,7 +55,6 @@ import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
-import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Level;
 import org.junit.Rule;
 import org.junit.rules.Timeout;
@@ -96,10 +95,8 @@ public class TestProcessTreeKiller extends SchedulerConsecutive {
     private static final String unixSleepName = "sleep";
     private static final String windowsSleepName = "TestSleep.exe";
 
-    String tmpDir = System.getProperty("java.io.tmpdir");
-
     @Rule
-    public Timeout testTimeout = new Timeout(600000);
+    public Timeout testTimeout = new Timeout(10, TimeUnit.MINUTES);
 
     /**
      * Tests start here.
@@ -109,7 +106,7 @@ public class TestProcessTreeKiller extends SchedulerConsecutive {
     @org.junit.Test
     public void run() throws Throwable {
         SchedulerTHelper.getSchedulerAuth();
-        RMTHelper rmHelper = RMTHelper.getDefaultInstance();
+        RMTHelper rmHelper = RMTHelper.getDefaultInstance(SchedulerTHelper.PNP_PORT);
         rmHelper.createNodeSource("extra", 2);
 
         org.apache.log4j.Logger.getLogger(ProcessTree.class).setLevel(Level.DEBUG);

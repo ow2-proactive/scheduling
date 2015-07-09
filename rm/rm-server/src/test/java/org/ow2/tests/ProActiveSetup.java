@@ -129,7 +129,7 @@ public class ProActiveSetup {
         jvmParameters.add(CentralPAPropertyRepository.PA_HOME.getCmdLine() +
             CentralPAPropertyRepository.PA_HOME.getValue());
         jvmParameters.add(CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getCmdLine() +
-            CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getValue());
+            "pnp");
 
         if (PAMRRemoteObjectFactory.PROTOCOL_ID.equals(CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL
                 .getValue())) {

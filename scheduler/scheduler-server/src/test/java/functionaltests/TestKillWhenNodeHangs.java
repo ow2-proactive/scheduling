@@ -3,7 +3,6 @@ package functionaltests;
 import java.io.Serializable;
 import java.util.List;
 
-import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
@@ -55,11 +54,11 @@ public class TestKillWhenNodeHangs extends FunctionalTest {
         DebugHelper debugHelper = new DebugHelper();
 
         // create RM and node source with one node, node JVM listens for debugger connections
-        int rmiPort = CentralPAPropertyRepository.PA_RMI_PORT.getValue();
-        RMTHelper rmHelper = RMTHelper.getDefaultInstance();
-        String rmUrl = rmHelper.startRM(null, rmiPort);
+        int pnpPort = 1199;
+        RMTHelper rmHelper = RMTHelper.getDefaultInstance(SchedulerTHelper.PNP_PORT);
+        String rmUrl = rmHelper.startRM(null, pnpPort);
         List<String> vmOptions = debugHelper.getDebuggedVMOptions();
-        rmHelper.createNodeSource(rmiPort, 1, vmOptions);
+        rmHelper.createNodeSource(1, vmOptions);
 
         SchedulerTHelper.startScheduler(false, null, null, rmUrl);
         Scheduler scheduler = SchedulerTHelper.getSchedulerInterface();

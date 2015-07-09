@@ -74,7 +74,7 @@ public class TestOperationsWhenUnlinked extends FunctionalTest {
     static final String TASK_NAME = "Test task";
 
     static final long EVENT_TIMEOUT = 30000;
-    private static final int RM_RMI_PORT = 1299;
+    private static final int RM_PNP_PORT = 1199;
 
     public static class TestJavaTask extends JavaExecutable {
 
@@ -112,18 +112,18 @@ public class TestOperationsWhenUnlinked extends FunctionalTest {
     @Test
     public void test() throws Throwable {
 
-        helper.startRM(null, RM_RMI_PORT);
+        helper.startRM(null, RM_PNP_PORT);
 
-        String rmUrl = helper.getLocalUrl(RM_RMI_PORT);
+        String rmUrl = helper.getLocalUrl(RM_PNP_PORT);
 
         SchedulerTHelper.startScheduler(false, config.getAbsolutePath(), null, rmUrl);
 
         testSubmitAndPause(rmUrl);
 
-        testKillJob(rmUrl);
+        testKillJob();
     }
 
-    private void testKillJob(String rmUrl) throws Throwable {
+    private void testKillJob() throws Throwable {
         Scheduler scheduler = SchedulerTHelper.getSchedulerInterface();
 
         System.out.println("Submitting job1");
@@ -181,7 +181,7 @@ public class TestOperationsWhenUnlinked extends FunctionalTest {
 
         System.out.println("Creating new RM");
 
-        helper.startRM(null, RM_RMI_PORT);
+        helper.startRM(null, RM_PNP_PORT);
         ResourceManager rm = helper.getResourceManager();
         String nodeUrl = helper.createNode("test-node").getNode().getNodeInformation().getURL();
         rm.addNode(nodeUrl);

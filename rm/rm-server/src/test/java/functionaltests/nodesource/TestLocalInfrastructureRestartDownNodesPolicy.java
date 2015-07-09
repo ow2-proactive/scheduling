@@ -77,7 +77,7 @@ public class TestLocalInfrastructureRestartDownNodesPolicy extends RMConsecutive
                 sourceName,
                 LocalInfrastructure.class.getName(),
                 new Object[] { creds, defaultDescriptorNodesNb, RMTHelper.defaultNodesTimeout,
-                        CentralPAPropertyRepository.PA_RMI_PORT.getCmdLine() + RMTHelper.PA_RMI_PORT },
+                        CentralPAPropertyRepository.PA_RMI_PORT.getCmdLine() + RMTHelper.PA_PNP_PORT },
                 RestartDownNodesPolicy.class.getName(), policyParameters);
 
         helper.waitForNodeSourceCreation(sourceName, defaultDescriptorNodesNb);

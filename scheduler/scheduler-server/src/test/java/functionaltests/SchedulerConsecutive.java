@@ -36,11 +36,11 @@
  */
 package functionaltests;
 
-import org.junit.After;
 import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.tests.Consecutive;
 import org.ow2.tests.FunctionalTest;
+import org.junit.After;
 
 
 /**
@@ -60,12 +60,12 @@ public class SchedulerConsecutive extends FunctionalTest {
         if (shouldBeExecutedInConsecutiveMode(this.getClass())) {
 
             try {
-                RMTHelper.getDefaultInstance().getResourceManager().removeNodeSource("extra", true)
+                RMTHelper.getDefaultInstance(SchedulerTHelper.PNP_PORT).getResourceManager().removeNodeSource("extra", true)
                         .getBooleanValue();
             } catch (IllegalArgumentException e) {
                 // ns extra not found
             }
-            RMInitialState state = RMTHelper.getDefaultInstance().getResourceManager().getMonitoring()
+            RMInitialState state = RMTHelper.getDefaultInstance(SchedulerTHelper.PNP_PORT).getResourceManager().getMonitoring()
                     .getState();
             System.out.println("RMState after the test execution");
             for (RMNodeEvent nodeEvent : state.getNodesEvents()) {

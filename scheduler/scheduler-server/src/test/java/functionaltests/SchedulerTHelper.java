@@ -50,6 +50,7 @@ import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.ProActiveInet;
+import org.objectweb.proactive.extensions.pnp.PNPConfig;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.process_tree_killer.ProcessTree;
@@ -140,9 +141,9 @@ public class SchedulerTHelper {
     protected static URL functionalTestSchedulerProperties = SchedulerTHelper.class
             .getResource("config/functionalTSchedulerProperties.ini");
 
-    public static final int RMI_PORT = 1199;
-    public static String schedulerUrl = "rmi://" + ProActiveInet.getInstance().getHostname() + ":" +
-        RMI_PORT + "/" + SchedulerConstants.SCHEDULER_DEFAULT_NAME;
+    public static final int PNP_PORT = 1299;
+    public static String schedulerUrl = "pnp://" + ProActiveInet.getInstance().getHostname() + ":" +
+      PNP_PORT + "/" + SchedulerConstants.SCHEDULER_DEFAULT_NAME;
 
     private static Process schedulerProcess;
 
@@ -240,7 +241,8 @@ public class SchedulerTHelper {
 
         commandLine.add(CentralPAPropertyRepository.PA_HOME.getCmdLine() + proactiveHome);
 
-        commandLine.add(CentralPAPropertyRepository.PA_RMI_PORT.getCmdLine() + RMI_PORT);
+        commandLine.add(CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getCmdLine() + "pnp");
+        commandLine.add(PNPConfig.PA_PNP_PORT.getCmdLine() + PNP_PORT);
 
         String securityPolicy = CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getValue();
         if (!CentralPAPropertyRepository.JAVA_SECURITY_POLICY.isSet()) {
@@ -300,7 +302,7 @@ public class SchedulerTHelper {
             // Without waiting test can finish earlier than nodes are added.
             // It leads to test execution hang up on windows due to running processes.
 
-            RMTHelper rmHelper = RMTHelper.getDefaultInstance();
+            RMTHelper rmHelper = RMTHelper.getDefaultInstance(PNP_PORT);
             ResourceManager rm = rmHelper.getResourceManager();
             while (rm.getState().getTotalAliveNodesNumber() < SchedulerTStarter.RM_NODE_NUMBER) {
                 System.out.println("Waiting for nodes deployment");
@@ -353,7 +355,7 @@ public class SchedulerTHelper {
         }
         schedulerAuth = null;
         adminSchedInterface = null;
-        RMTHelper.getDefaultInstance().reset();
+        RMTHelper.getDefaultInstance(PNP_PORT).reset();
     }
 
     /**
