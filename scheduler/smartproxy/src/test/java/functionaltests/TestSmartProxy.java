@@ -1,29 +1,28 @@
 package functionaltests;
 
-import functionaltests.monitor.EventMonitor;
-import org.apache.log4j.Level;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import java.io.File;
+import java.io.FileWriter;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.utils.TimeoutAccounter;
 import org.ow2.proactive.scheduler.common.job.Job;
-import org.ow2.proactive.scheduler.common.job.JobEnvironment;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
 import org.ow2.proactive.scheduler.smartproxy.SmartProxyImpl;
-
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
+import functionaltests.monitor.EventMonitor;
+import org.apache.log4j.Level;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 
 /**
@@ -116,10 +115,15 @@ public class TestSmartProxy extends SchedulerConsecutive {
     protected TaskFlowJob createTestJob(boolean isolateOutputs) throws Exception {
         TaskFlowJob job = new TaskFlowJob();
         job.setName(this.getClass().getSimpleName());
+
+        ForkEnvironment forkEnvironment = new ForkEnvironment();
+        forkEnvironment.addAdditionalClasspath(getClasspath(job));
+
         for (int i = 0; i < NB_TASKS; i++) {
             JavaTask testTask = new JavaTask();
             testTask.setName(TASK_NAME + i);
             testTask.setExecutableClassName(SimpleJavaExecutable.class.getName());
+            testTask.setForkEnvironment(forkEnvironment);
             // testTask.
             // ------------- create an input File ------------
             File inputFile = new File(inputLocalFolder, inputFileBaseName + "_" + i + inputFileExt);
@@ -148,7 +152,6 @@ public class TestSmartProxy extends SchedulerConsecutive {
         job.setInputSpace(dataServerURI);
         job.setOutputSpace(dataServerURI);
 
-        setJobClassPath(job);
         return job;
     }
 
@@ -157,13 +160,13 @@ public class TestSmartProxy extends SchedulerConsecutive {
      *
      * @param job
      */
-    protected void setJobClassPath(Job job) {
+    protected String getClasspath(Job job) {
         String appClassPath = "";
         try {
             File appMainFolder = new File(this.getClass().getProtectionDomain().getCodeSource().getLocation()
                     .toURI());
-            appClassPath = appMainFolder.getAbsolutePath();
 
+            return appMainFolder.getAbsolutePath();
         } catch (URISyntaxException e1) {
             SchedulerTHelper
                     .log("Preview of the partial results will not be possible as some resources could not be found by the system. \nThis will not alterate your results in any way. ");
@@ -171,17 +174,7 @@ public class TestSmartProxy extends SchedulerConsecutive {
                     .log("JobCreator: The bin folder of the project is null. It is needed to set the job environment. ");
             SchedulerTHelper.log(e1);
         }
-
-        JobEnvironment je = new JobEnvironment();
-        try {
-            je.setJobClasspath(new String[] { appClassPath });
-        } catch (IOException e) {
-            SchedulerTHelper
-                    .log("Preview of the partial results will not be possible as the job classpath could not be loaded. \nThis will not alterate your results in any way.");
-            SchedulerTHelper.log("Could not add classpath to the job. ");
-            SchedulerTHelper.log(e);
-        }
-        job.setEnvironment(je);
+        return appClassPath;
     }
 
     protected void waitWithMonitor(EventMonitor monitor, long timeout) throws ProActiveTimeoutException {

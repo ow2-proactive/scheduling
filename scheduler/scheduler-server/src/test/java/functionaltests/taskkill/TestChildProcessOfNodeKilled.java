@@ -18,7 +18,7 @@ public class TestChildProcessOfNodeKilled extends FunctionalTest {
         TNode tNode = startSchedulerAndRMWithOneNode();
         startJobForkingProcesses();
 
-        RMTHelper.getDefaultInstance().killNode(tNode.getNode().getNodeInformation().getURL());
+        RMTHelper.getDefaultInstance(SchedulerTHelper.PNP_PORT).killNode(tNode.getNode().getNodeInformation().getURL());
 
         TestProcessTreeKiller.waitUntilAllForkedProcessesAreKilled();
     }
@@ -31,7 +31,7 @@ public class TestChildProcessOfNodeKilled extends FunctionalTest {
 
     private static TNode startSchedulerAndRMWithOneNode() throws Exception {
         SchedulerTHelper.startSchedulerWithEmptyResourceManager();
-        ResourceManager resourceManager = RMTHelper.getDefaultInstance().getResourceManager();
+        ResourceManager resourceManager = RMTHelper.getDefaultInstance(SchedulerTHelper.PNP_PORT).getResourceManager();
         TNode tNode = RMTHelper.createRMNodeStarterNode("test1");
         resourceManager.addNode(tNode.getNode().getNodeInformation().getURL());
         return tNode;

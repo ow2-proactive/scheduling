@@ -47,5 +47,5 @@ public interface PermissionChecker {
      *
      * @return true if it has, throw {@link SecurityException} otherwise with specified error message
      */
-    public boolean checkPermission(Credentials cred);
+    boolean checkPermission(Credentials cred);
 }

@@ -98,7 +98,7 @@ public class JLineDevice extends AbstractDevice {
     }
 
     private String[] getCommandsAsArray(CommandSet.Entry[] entries) {
-        List<String> cmds = new ArrayList<String>();
+        List<String> cmds = new ArrayList<>();
         for (CommandSet.Entry entry : entries) {
             if (entry.jsCommand() != null) {
                 String jsCommand = entry.jsCommand();

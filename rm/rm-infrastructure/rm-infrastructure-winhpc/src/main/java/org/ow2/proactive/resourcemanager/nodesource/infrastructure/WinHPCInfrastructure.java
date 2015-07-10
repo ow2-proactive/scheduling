@@ -125,11 +125,11 @@ public class WinHPCInfrastructure extends DefaultInfrastructureManager {
     /** the path of the trust store which holds hpc server's certificate */
     private String trustStorePath;
     /** the list of submitted jobs */
-    private Map<String, EndpointReferenceType[]> submittedJobs = new Hashtable<String, EndpointReferenceType[]>();
+    private Map<String, EndpointReferenceType[]> submittedJobs = new Hashtable<>();
     /** ensures that the deploying node's timeout is not finished */
-    private Map<String, Boolean> dnTimeout = new Hashtable<String, Boolean>();
+    private Map<String, Boolean> dnTimeout = new Hashtable<>();
     /** to retrieve job's data from deploying node's url */
-    private Map<String, EndpointReferenceType[]> deployingNodeToEndpoint = new Hashtable<String, EndpointReferenceType[]>();
+    private Map<String, EndpointReferenceType[]> deployingNodeToEndpoint = new Hashtable<>();
     /** the deployer instance */
     private transient org.ow2.proactive.resourcemanager.nodesource.infrastructure.WinHPCDeployer deployer;
     /** the refresh rate of the job's state in ms */
@@ -257,7 +257,7 @@ public class WinHPCInfrastructure extends DefaultInfrastructureManager {
             if (currentStatus != null && !currentStatus.equals(statusString)) {
                 statusString = currentStatus;
                 super.updateDeployingNodeDescription(dNode, "Node deployment on Windows HPC" +
-                    System.getProperty("line.separator") + "job's status: " + statusString);
+                    System.lineSeparator() + "job's status: " + statusString);
             }
 
             if (super.checkNodeIsAcquiredAndDo(nodeName, null, null)) {
@@ -328,7 +328,7 @@ public class WinHPCInfrastructure extends DefaultInfrastructureManager {
     private void handleFailedDeployment(String dNode, CommandLineBuilder clb, Throwable e) throws RMException {
         String error = Utils.getStacktrace(e);
         super.declareDeployingNodeLost(dNode, "The deployment failed because of an error: " +
-            System.getProperty("line.separator") + error);
+            System.lineSeparator() + error);
         String nodeName = clb.getNodeName();
         this.submittedJobs.remove(nodeName);
         this.dnTimeout.remove(dNode);
@@ -351,7 +351,7 @@ public class WinHPCInfrastructure extends DefaultInfrastructureManager {
             command = "Cannot determine the command used to start the node.";
         }
         String lostNode = super.addDeployingNode(clb.getNodeName(), command,
-                "Cannot deploy the node because of an error:" + System.getProperty("line.separator") + error,
+                "Cannot deploy the node because of an error:" + System.lineSeparator() + error,
                 60000);
         super.declareDeployingNodeLost(lostNode, null);
         String nodeName = clb.getNodeName();

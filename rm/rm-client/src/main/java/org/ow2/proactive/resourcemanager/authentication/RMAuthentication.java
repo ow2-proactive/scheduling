@@ -57,5 +57,5 @@ public interface RMAuthentication extends Authentication {
      * @return the resource manager interface if the login is successful
      * @throws LoginException if user does not exist or password is incorrect
      */
-    public ResourceManager login(Credentials credentials) throws LoginException;
+    ResourceManager login(Credentials credentials) throws LoginException;
 }

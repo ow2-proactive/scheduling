@@ -47,8 +47,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
@@ -66,11 +64,13 @@ import org.objectweb.proactive.extensions.vfsprovider.FileSystemServerDeployer;
 import org.objectweb.proactive.extensions.vfsprovider.util.URIHelper;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Logger;
 
 
 public class DataSpaceServiceStarter implements Serializable {
 
-    public static final Logger logger = Logger.getLogger(SchedulingService.class);
+    public static final Logger logger = Logger.getLogger(DataSpaceServiceStarter.class);
 
     /**
      * Default Local Paths
@@ -83,7 +83,7 @@ public class DataSpaceServiceStarter implements Serializable {
     private static final String DEFAULT_LOCAL_USER = DEFAULT_LOCAL + File.separator + "defaultuser";
     private static final String DEFAULT_LOCAL_SCRATCH = DEFAULT_LOCAL + File.separator + "scratch";
 
-    private static HashMap<Long, HashSet<String>> spacesConfigurations = new HashMap<Long, HashSet<String>>();
+    private static HashMap<Long, HashSet<String>> spacesConfigurations = new HashMap<>();
 
     /**
      * Naming service
@@ -114,7 +114,7 @@ public class DataSpaceServiceStarter implements Serializable {
     /**
      * Dataspace servers
      */
-    private ArrayList<FileSystemServerDeployer> servers = new ArrayList<FileSystemServerDeployer>(4);
+    private ArrayList<FileSystemServerDeployer> servers = new ArrayList<>(4);
 
     private DataSpaceServiceStarter() {
     }
@@ -212,7 +212,7 @@ public class DataSpaceServiceStarter implements Serializable {
             }
         }
 
-        Set<SpaceInstanceInfo> predefinedSpaces = new HashSet<SpaceInstanceInfo>();
+        Set<SpaceInstanceInfo> predefinedSpaces = new HashSet<>();
         namingService.registerApplication(SchedulerConstants.SCHEDULER_DATASPACE_APPLICATION_ID,
                 predefinedSpaces);
 
@@ -292,7 +292,7 @@ public class DataSpaceServiceStarter implements Serializable {
         InputOutputSpaceConfiguration spaceConf = null;
 
         // Converts the property to an ArrayList
-        ArrayList<String> finalurls = new ArrayList<String>(Arrays
+        ArrayList<String> finalurls = new ArrayList<>(Arrays
                 .asList(dsConfigPropertyToUrls(urlsproperty)));
 
         if (inputConfiguration) {
@@ -306,7 +306,7 @@ public class DataSpaceServiceStarter implements Serializable {
         namingService.register(new SpaceInstanceInfo(appID, spaceConf));
 
         spacesConfigurations.get(appID).add(spaceConf.getName());
-        logger.info("Space " + name + " for appid = " + appID + " with urls = " + finalurls + " registered");
+        logger.debug("Space " + name + " for appid = " + appID + " with urls = " + finalurls + " registered");
 
     }
 
@@ -390,7 +390,7 @@ public class DataSpaceServiceStarter implements Serializable {
             // the pattern uses positive look-behind and look-ahead
             final String[] outputWithQuotes = property.trim().split("(?<=\") +(?=\")");
             // removing quotes
-            ArrayList<String> output = new ArrayList<String>();
+            ArrayList<String> output = new ArrayList<>();
             for (String outputWithQuote : outputWithQuotes) {
                 int len = outputWithQuote.length();
                 if (outputWithQuote.length() > 2) {

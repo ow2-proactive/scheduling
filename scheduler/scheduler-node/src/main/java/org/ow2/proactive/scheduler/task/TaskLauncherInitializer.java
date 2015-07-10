@@ -37,21 +37,26 @@
 package org.ow2.proactive.scheduler.task;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
+
+import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
-import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.proactive.scheduler.common.util.VariableSubstitutor;
 import org.ow2.proactive.scripting.Script;
 
 
 /**
- * TaskLauncherInitializer is used to initialize the different task launcher.<br>
- * It contains every information that can be used by the launchers. It's a kind of contract
+ * TaskLauncherInitializer is used to initialize the task launcher.<br>
+ * It contains every information that can be used by the launcher. It's a kind of contract
  * so that each launcher must use its required information coming from this class. 
  *
  * @author The ProActive Team
@@ -69,12 +74,6 @@ public class TaskLauncherInitializer implements Serializable {
     private FlowScript flowScript;
     /** The walltime defined for the task (it is considered as defined if it is > 0) */
     private long walltime;
-    /** policy content to be prepared before being sent to node */
-    private String policyContent;
-    /** log4j content to be prepared before being sent to node */
-    private String log4JContent;
-    /** PAConfiguration content to be prepared before being sent to node */
-    private String paConfigContent;
 
     /** replication index: task was replicated in parallel */
     private int replicationIndex = 0;
@@ -85,12 +84,13 @@ public class TaskLauncherInitializer implements Serializable {
     private List<InputSelector> taskInputFiles = null;
     private List<OutputSelector> taskOutputFiles = null;
     private NamingService namingService;
-    private String owner;
     private boolean preciousLogs;
 
     private Map<String, String> variables;
     private int pingPeriod;
-    private int pingAttempts;
+    private int pingAttempts = 1;
+
+    private ForkEnvironment forkEnvironment;
 
     /**
      * Get the taskId
@@ -183,78 +183,6 @@ public class TaskLauncherInitializer implements Serializable {
     }
 
     /**
-     * Set the policyContent value to the given policyContent value
-     * 
-     * @param policyContent the policyContent to set
-     */
-    public void setPolicyContent(String policyContent) {
-        this.policyContent = policyContent;
-    }
-
-    /**
-     * Get the policyContent
-     *
-     * @return the policyContent
-     */
-    public String getPolicyContent() {
-        return policyContent;
-    }
-
-    /**
-     * Get the log4JContent
-     *
-     * @return the log4JContent
-     */
-    public String getLog4JContent() {
-        return log4JContent;
-    }
-
-    /**
-     * Set the log4JContent value to the given log4jContent value
-     *
-     * @param log4jContent the log4JContent to set
-     */
-    public void setLog4JContent(String log4jContent) {
-        log4JContent = log4jContent;
-    }
-
-    /**
-     * Get the paConfiguration content
-     *
-     * @return the paConfiguration content
-     */
-    public String getPaConfigContent() {
-        return paConfigContent;
-    }
-
-    /**
-     * Set the paConfiguration content value to the given paConfigContent value
-     *
-     * @param paConfigContent content the paConfigContent to set
-     */
-    public void setPaConfigContent(String paConfigContent) {
-        this.paConfigContent = paConfigContent;
-    }
-
-    /**
-     * Get the owner
-     *
-     * @return the owner
-     */
-    public String getOwner() {
-        return owner;
-    }
-
-    /**
-     * Set the owner value to the given owner value
-     *
-     * @param owner the owner to set
-     */
-    public void setOwner(String owner) {
-        this.owner = owner;
-    }
-
-    /**
      * Get the namingService Stub
      *
      * @return the namingService
@@ -339,7 +267,6 @@ public class TaskLauncherInitializer implements Serializable {
     /**
      * @return the preciousLogs
      */
-    @Deprecated
     public boolean isPreciousLogs() {
         return preciousLogs;
     }
@@ -347,7 +274,6 @@ public class TaskLauncherInitializer implements Serializable {
     /**
      * @param preciousLogs the preciousLogs to set
      */
-    @Deprecated
     public void setPreciousLogs(boolean preciousLogs) {
         this.preciousLogs = preciousLogs;
     }
@@ -375,4 +301,63 @@ public class TaskLauncherInitializer implements Serializable {
     public int getPingAttempts() {
         return pingAttempts;
     }
+
+    public List<InputSelector> getFilteredInputFiles(Map<String, Serializable> variables) {
+        List<InputSelector> filteredTaskInputFiles = new ArrayList<>();
+        if (taskInputFiles != null) {
+
+            for (InputSelector is : taskInputFiles) {
+                InputSelector filteredInputSelector = new InputSelector(is.getInputFiles(), is.getMode());
+                Set<String> includes = filteredInputSelector.getInputFiles().getIncludes();
+                Set<String> excludes = filteredInputSelector.getInputFiles().getExcludes();
+
+                Set<String> filteredIncludes = filteredSelector(includes, variables);
+                Set<String> filteredExcludes = filteredSelector(excludes, variables);
+
+                filteredInputSelector.getInputFiles().setIncludes(filteredIncludes);
+                filteredInputSelector.getInputFiles().setExcludes(filteredExcludes);
+                filteredTaskInputFiles.add(filteredInputSelector);
+            }
+        }
+        return filteredTaskInputFiles;
+    }
+
+    private Set<String> filteredSelector(Set<String> selectors, Map<String, Serializable> variables) {
+        Set<String> filteredIncludes = new HashSet<>();
+        if (selectors != null) {
+            for (String include : selectors) {
+                filteredIncludes.add(VariableSubstitutor.filterAndUpdate(include, variables));
+            }
+        }
+        return filteredIncludes;
+    }
+
+    public List<OutputSelector> getFilteredOutputFiles(Map<String, Serializable> variables) {
+        List<OutputSelector> filteredTaskOutputFiles = new ArrayList<>();
+        if (taskOutputFiles != null) {
+
+            for (OutputSelector is : taskOutputFiles) {
+                OutputSelector filteredOutputSelector = new OutputSelector(is.getOutputFiles(), is.getMode());
+                Set<String> includes = filteredOutputSelector.getOutputFiles().getIncludes();
+                Set<String> excludes = filteredOutputSelector.getOutputFiles().getExcludes();
+
+                Set<String> filteredIncludes = filteredSelector(includes, variables);
+                Set<String> filteredExcludes = filteredSelector(excludes, variables);
+
+                filteredOutputSelector.getOutputFiles().setIncludes(filteredIncludes);
+                filteredOutputSelector.getOutputFiles().setExcludes(filteredExcludes);
+                filteredTaskOutputFiles.add(filteredOutputSelector);
+            }
+        }
+        return filteredTaskOutputFiles;
+    }
+
+    public ForkEnvironment getForkEnvironment() {
+        return forkEnvironment;
+    }
+
+    public void setForkEnvironment(ForkEnvironment forkEnvironment) {
+        this.forkEnvironment = forkEnvironment;
+    }
+
 }

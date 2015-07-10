@@ -30,7 +30,7 @@
           <script>
             <code language="javascript">
               // <![CDATA[
-              runs = (2 - parseInt($REP));
+              runs = (2 - parseInt(variables.get('PA_TASK_REPLICATION')));
               // ]]>
             </code>
           </script>

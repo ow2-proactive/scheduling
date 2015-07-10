@@ -16,8 +16,8 @@
         <script>
           <code language="groovy">
             <![CDATA[
-println nodeset.size() + " nodes have been reserved"
-                        println "The reserved nodes are accessible there " + nodesurl
+println (nodesurl.size() + 1) + " nodes have been reserved"
+                        println "The other reserved nodes are accessible there " + nodesurl
 ]]>
           </code>
         </script>

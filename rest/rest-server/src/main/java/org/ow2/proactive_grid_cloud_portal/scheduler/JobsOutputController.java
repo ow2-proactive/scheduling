@@ -65,8 +65,8 @@ public class JobsOutputController {
 
     private LogForwardingService logForwardingService;
 
-    private Map<String, JobOutputAppender> appenders = new HashMap<String, JobOutputAppender>();
-    private Set<String> listeningTo = new HashSet<String>();
+    private Map<String, JobOutputAppender> appenders = new HashMap<>();
+    private Set<String> listeningTo = new HashSet<>();
     private final Session session;
 
     public JobsOutputController(Session session) {

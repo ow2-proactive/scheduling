@@ -76,7 +76,7 @@ public class JobStateImpl extends JobState {
 
     @Override
     public ArrayList<TaskState> getTasks() {
-        ArrayList<TaskState> taskStateList = new ArrayList<TaskState>();
+        ArrayList<TaskState> taskStateList = new ArrayList<>();
         Map<String, TaskStateData> taskStateMap = d.getTasks();
         for (TaskStateData ts : taskStateMap.values()) {
             taskStateList.add(DataUtility.taskState(ts));

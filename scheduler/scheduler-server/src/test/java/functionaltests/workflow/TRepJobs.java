@@ -97,8 +97,8 @@ public class TRepJobs extends SchedulerConsecutive {
         private void readArg(String param) {
             String[] arr = param.split(" ");
 
-            this.tasks = new HashMap<String, Long>(arr.length);
-            this.results = new HashMap<String, Long>(arr.length);
+            this.tasks = new HashMap<>(arr.length);
+            this.results = new HashMap<>(arr.length);
 
             for (String str : arr) {
                 String[] split = str.split(",");
@@ -112,6 +112,8 @@ public class TRepJobs extends SchedulerConsecutive {
     }
 
     void testJobs(TRepCase... testCases) throws Throwable {
+        SchedulerTHelper.startScheduler(new File(SchedulerTHelper.class.getResource(
+          "config/scheduler-nonforkedscripttasks.ini").toURI()).getAbsolutePath());
         for (TRepCase tcase : testCases) {
             String path = new File(TWorkflowJobs.class.getResource(tcase.jobPath).toURI()).getAbsolutePath();
             Job job = JobFactory.getFactory().createJob(path);
@@ -136,9 +138,9 @@ public class TRepJobs extends SchedulerConsecutive {
             Assert.assertEquals(tcase.total, js.getTasks().size());
 
             // to be checked against this.tasks
-            HashMap<String, Long> finalTaskCount = new HashMap<String, Long>();
+            HashMap<String, Long> finalTaskCount = new HashMap<>();
             // to be checked against this.results
-            HashMap<String, Long> finalResSum = new HashMap<String, Long>();
+            HashMap<String, Long> finalResSum = new HashMap<>();
             for (TaskState ts : js.getTasks()) {
                 String baseName = InternalTask.getInitialName(ts.getName());
                 long count = 0;

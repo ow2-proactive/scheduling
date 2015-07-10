@@ -77,9 +77,6 @@ project(':rest:rest-server') {
         runtime 'org.eclipse.jetty.aggregate:jetty-webapp:8.1.15.v20140411'
         runtime 'javax.servlet:javax.servlet-api:3.0.1'
 
-        runtime "org.objectweb.proactive:programming-extension-rmissl:${programmingVersion}"
-        runtime "org.objectweb.proactive:programming-extension-pnpssl:${programmingVersion}"
-        runtime "org.objectweb.proactive:programming-extension-amqp:${programmingVersion}"
         runtime "org.objectweb.proactive:programming-extension-pamr:${programmingVersion}"
 
         jaxDoclet 'com.lunatech.jax-doclets:doclets:0.10.1-proactive'
@@ -207,7 +204,6 @@ project(':rest:rest-smartproxy') {
     }
 
     task bundle(type: Zip) {
-        print configurations
         from configurations.runtime.allArtifacts.files
         from configurations.runtime
         into (project.name + '-' + project.version + '-bundle')

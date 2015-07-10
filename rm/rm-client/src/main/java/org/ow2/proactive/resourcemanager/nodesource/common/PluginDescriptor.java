@@ -71,7 +71,7 @@ public class PluginDescriptor implements Serializable {
     private String pluginName;
     private String pluginDescription;
 
-    private Collection<ConfigurableField> configurableFields = new LinkedList<ConfigurableField>();
+    private Collection<ConfigurableField> configurableFields = new LinkedList<>();
     private Map<String, String> defaultValues;
 
     public PluginDescriptor() {
@@ -149,7 +149,7 @@ public class PluginDescriptor implements Serializable {
      * @throws RMException when error occurs
      */
     public Object[] packParameters(Object[] parameters) throws RMException {
-        List<Object> resultParams = new ArrayList<Object>();
+        List<Object> resultParams = new ArrayList<>();
 
         if (parameters.length != configurableFields.size()) {
             throw new RMException("Incorrect number of parameters: expected " + configurableFields.size() +

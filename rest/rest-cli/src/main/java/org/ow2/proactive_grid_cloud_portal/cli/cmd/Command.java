@@ -54,6 +54,6 @@ public interface Command {
      * @throws Exception
      *             if an error occurred while executing the command.
      */
-    public void execute(ApplicationContext currentContext) throws CLIException;
+    void execute(ApplicationContext currentContext) throws CLIException;
 
 }

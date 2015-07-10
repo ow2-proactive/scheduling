@@ -39,6 +39,7 @@ package functionaltests;
 import java.io.File;
 import java.net.URL;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
@@ -55,10 +56,7 @@ import org.ow2.proactive.scripting.SelectionScript;
 import org.junit.Assert;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 
 /**
@@ -102,8 +100,8 @@ public class TestJobServerLogs extends SchedulerConsecutive {
         String taskLogs = SchedulerTHelper.getSchedulerInterface().getTaskServerLogs(simpleJobId.toString(),
                 taskName);
 
-        if (!taskLogs.contains("task " + ti.getTaskId() + " scheduling")) {
-            System.out.println("Incorrect task server logs");
+        if (!taskLogs.contains("task " + ti.getTaskId() + " (" + ti.getTaskId().getReadableName() + ")" + " started")) {
+            System.out.println("Incorrect task server logs:");
             System.out.println(taskLogs);
             Assert.fail("Task " + ti.getTaskId() + " was not scheduled");
         }
@@ -111,12 +109,12 @@ public class TestJobServerLogs extends SchedulerConsecutive {
         SchedulerTHelper.waitForEventJobFinished(simpleJobId);
         String jobLogs = SchedulerTHelper.getSchedulerInterface().getJobServerLogs(simpleJobId.toString());
         for (int i = 0; i < TASKS_IN_SIMPLE_JOB; i++) {
-            if (!jobLogs.contains("task " + simpleJobId + "000" + i + " scheduling")) {
+        if (!matchLine(jobLogs, "task " + simpleJobId + "000" + i + " \\(task[12]\\) started")) {
                 System.out.println("Incorrect job server logs");
                 System.out.println(jobLogs);
                 Assert.fail("Task " + simpleJobId + "000" + i + " was not scheduled");
             }
-            if (!jobLogs.contains("task " + simpleJobId + "000" + i + " finished")) {
+            if (!matchLine(jobLogs, "task " + simpleJobId + "000" + i + " \\(task[12]\\) finished")) {
                 System.out.println("Incorrect job server logs");
                 System.out.println(jobLogs);
                 Assert.fail("Task " + simpleJobId + "000" + i + " was not finished");
@@ -128,7 +126,7 @@ public class TestJobServerLogs extends SchedulerConsecutive {
         JobId pendingJobId = SchedulerTHelper.submitJob(createPendingJob());
         Thread.sleep(5000);
         jobLogs = SchedulerTHelper.getSchedulerInterface().getJobServerLogs(pendingJobId.toString());
-        if (!jobLogs.contains("0 nodes found after scripts execution")) {
+        if (!jobLogs.contains("will get 0 nodes")) {
             System.out.println("Incorrect job server logs");
             System.out.println(jobLogs);
             Assert.fail("RM output is not correct");
@@ -184,6 +182,11 @@ public class TestJobServerLogs extends SchedulerConsecutive {
         String message = String.format("Log file %s should %s", jobLogFile, shouldExist ? "exist"
                 : "not exist");
         assertEquals(message, shouldExist, jobLogFile.exists());
+    }
+
+    public static boolean matchLine(String text, String regex) {
+        Pattern pattern = Pattern.compile(regex, Pattern.MULTILINE);
+        return pattern.matcher(text).find();
     }
 
 }

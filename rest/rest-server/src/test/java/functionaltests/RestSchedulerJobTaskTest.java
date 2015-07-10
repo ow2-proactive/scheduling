@@ -78,7 +78,7 @@ public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
     public void setUp() throws Exception {
         Scheduler scheduler = RestFuncTHelper.getScheduler();
         SchedulerState state = scheduler.getState();
-        List<JobState> jobStates = new ArrayList<JobState>();
+        List<JobState> jobStates = new ArrayList<>();
         jobStates.addAll(state.getPendingJobs());
         jobStates.addAll(state.getRunningJobs());
         jobStates.addAll(state.getFinishedJobs());
@@ -177,7 +177,7 @@ public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
         HttpResponse response = executeUriRequest(httpGet);
         assertHttpStatusOK(response);
         JSONObject jsonObject = toJsonObject(response);
-        String taskResult = getTaskResult(jsonObject, "Test-Job-Task");
+        String taskResult = getTaskResult(jsonObject, getDefaultTaskName());
         assertNotNull(taskResult);
     }
 
@@ -190,7 +190,7 @@ public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
         HttpResponse response = executeUriRequest(httpGet);
         assertHttpStatusOK(response);
         JSONObject jsonObject = toJsonObject(response);
-        assertEquals("TEST-JOB", jsonObject.get("Test-Job-Task").toString());
+        assertEquals("TEST-JOB", jsonObject.get(getDefaultTaskName()).toString());
     }
 
     @Test(expected = UnknownJobException.class)
@@ -230,7 +230,7 @@ public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
         HttpResponse response = executeUriRequest(httpGet);
         assertHttpStatusOK(response);
         JSONArray jsonArray = toJsonArray(response);
-        assertEquals("Test-Job-Task", jsonArray.get(0).toString());
+        assertEquals(getDefaultTaskName(), jsonArray.get(0).toString());
     }
 
     @Test

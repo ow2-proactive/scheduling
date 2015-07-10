@@ -53,7 +53,7 @@ public class Cluster<Element> {
 
     private String id = "";
     private int hashCode = 0;
-    private LinkedList<Element> elements = new LinkedList<Element>();
+    private LinkedList<Element> elements = new LinkedList<>();
 
     public Cluster(String id, Element element) {
         elements.add(element);

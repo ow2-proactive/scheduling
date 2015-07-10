@@ -11,10 +11,10 @@ then
 exit 1;
 fi
 
-echo TID $PAS_TASK_ID
-echo TIN $PAS_TASK_NAME
-echo JID $PAS_JOB_ID
-echo JIN $PAS_JOB_NAME
+echo TID $PA_TASK_ID
+echo TIN $PA_TASK_NAME
+echo JID $PA_JOB_ID
+echo JIN $PA_JOB_NAME
 
 exit 0;
 

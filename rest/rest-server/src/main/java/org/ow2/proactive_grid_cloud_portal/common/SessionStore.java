@@ -41,7 +41,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class SessionStore {
 
-    private final Map<String, Session> sessions = new ConcurrentHashMap<String, Session>();
+    private final Map<String, Session> sessions = new ConcurrentHashMap<>();
     private SchedulerRMProxyFactory schedulerRMProxyFactory = new SchedulerRMProxyFactory();
     private Clock clock = new Clock();
 

@@ -17,13 +17,13 @@ import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 
+import org.ow2.proactive.scheduler.common.task.util.ByteArrayWrapper;
+import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
 import org.hibernate.type.SerializableToBlobType;
-import org.ow2.proactive.scheduler.common.task.util.ByteArrayWrapper;
-import org.ow2.proactive.scheduler.task.java.JavaExecutableContainer;
 
 
 @MappedSuperclass
@@ -37,15 +37,13 @@ public class CommonJavaTaskData implements Serializable {
 
     private String userExecutableClassName;
 
-    protected void initProperties(TaskData taskData, JavaExecutableContainer container) {
+    protected void initProperties(TaskData taskData, ScriptExecutableContainer container) {
         setTaskData(taskData);
-
-        setUserExecutableClassName(container.getUserExecutableClassName());
 
         Map<String, ByteArrayWrapper> args = container.getSerializedArguments();
 
         if (args != null) {
-            Map<String, byte[]> convertedArgs = new HashMap<String, byte[]>(args.size());
+            Map<String, byte[]> convertedArgs = new HashMap<>(args.size());
             for (Map.Entry<String, ByteArrayWrapper> argEntry : args.entrySet()) {
                 convertedArgs.put(argEntry.getKey(), argEntry.getValue().getByteArray());
             }

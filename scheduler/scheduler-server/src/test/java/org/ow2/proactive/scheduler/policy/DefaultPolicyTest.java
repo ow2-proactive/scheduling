@@ -1,19 +1,19 @@
 package org.ow2.proactive.scheduler.policy;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Vector;
-
+import org.junit.Test;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
 import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
 import org.ow2.proactive.scheduler.descriptor.JobDescriptorImpl;
 import org.ow2.proactive.scheduler.job.InternalTaskFlowJob;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
-import org.ow2.proactive.scheduler.task.internal.InternalNativeTask;
+import org.ow2.proactive.scheduler.task.internal.InternalScriptTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
-import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Vector;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -74,14 +74,14 @@ public class DefaultPolicyTest {
     private JobDescriptorImpl createSingleTaskJob(JobPriority jobPriority) {
         InternalTaskFlowJob taskFlowJob = new InternalTaskFlowJob("test", jobPriority, true, "");
         taskFlowJob.setId(JobIdImpl.makeJobId(Integer.toString(jobId++)));
-        ArrayList<InternalTask> tasks = new ArrayList<InternalTask>();
-        tasks.add(new InternalNativeTask());
+        ArrayList<InternalTask> tasks = new ArrayList<>();
+        tasks.add(new InternalScriptTask());
         taskFlowJob.addTasks(tasks);
         return new JobDescriptorImpl(taskFlowJob);
     }
 
     private List<JobDescriptor> submitJobs(JobDescriptorImpl... jobs) {
-        List<JobDescriptor> submittedJobs = new ArrayList<JobDescriptor>();
+        List<JobDescriptor> submittedJobs = new ArrayList<>();
         Collections.addAll(submittedJobs, jobs);
         return submittedJobs;
     }

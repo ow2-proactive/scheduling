@@ -12,9 +12,8 @@ import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.junit.Test;
 
 import static functionaltests.SchedulerTHelper.submitJob;
-import static functionaltests.SchedulerTHelper.waitForEventJobFinished;
 import static functionaltests.SchedulerTHelper.waitForEventTaskFinished;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.ow2.proactive.scheduler.common.task.TaskStatus.FAULTY;
 
 
@@ -31,7 +30,9 @@ public class TestCronErrorTask extends CronCheckBase {
         jobId = submitJob(errorJob);
         TaskInfo taskInfo = waitForEventTaskFinished(jobId, "CronErrorTask", task_timeout);
         assertEquals(FAULTY, taskInfo.getStatus());
-        waitForEventJobFinished(jobId, job_timeout);
+
+        TaskInfo taskInfo2 = waitForEventTaskFinished(jobId, "CronErrorTask#1", task_timeout);
+        assertEquals(FAULTY, taskInfo2.getStatus());
     }
 
     private Job createJob() throws Exception {

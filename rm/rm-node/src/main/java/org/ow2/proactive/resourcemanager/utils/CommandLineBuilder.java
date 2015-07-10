@@ -247,7 +247,7 @@ public final class CommandLineBuilder implements Cloneable {
      * @throws java.io.IOException if you supplied a ProActive Configuration file that doesn't exist.
      */
     public List<String> buildCommandLineAsList(boolean displayCredentials) throws IOException {
-        final ArrayList<String> command = new ArrayList<String>();
+        final ArrayList<String> command = new ArrayList<>();
         final OperatingSystem os = targetOS;
         final Properties paProp = paPropProperties;
 
@@ -299,7 +299,7 @@ public final class CommandLineBuilder implements Cloneable {
         for (File file : files) {
             classpath.append(os.ps).append(file.getAbsolutePath());
         }
-        command.add(classpath.toString());
+        command.add(System.getProperty("java.class.path"));
         command.add(RMNodeStarter.class.getName());
 
         //appending options

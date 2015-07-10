@@ -75,7 +75,7 @@ public class TestWorkflowRecoveryFinished extends FunctionalTest {
     @org.junit.Test
     public void run() throws Throwable {
 
-        Map<Integer, JobId> jobs = new HashMap<Integer, JobId>();
+        Map<Integer, JobId> jobs = new HashMap<>();
         for (int i = 0; i < jobs_1.length; i++) {
             String job = new File(TestWorkflowRecoveryFinished.class.getResource(
                     job_prefix + (i + 1) + ".xml").toURI()).getAbsolutePath();
@@ -96,7 +96,7 @@ public class TestWorkflowRecoveryFinished extends FunctionalTest {
 
         for (Entry<Integer, JobId> job : jobs.entrySet()) {
             JobResult results = SchedulerTHelper.getJobResult(job.getValue());
-            Map<String, Long> expectedResults = new HashMap<String, Long>();
+            Map<String, Long> expectedResults = new HashMap<>();
             for (int j = 0; j < jobs_1[job.getKey()].length; j++) {
                 String[] val = jobs_1[job.getKey()][j].split(" ");
                 expectedResults.put(val[0], Long.parseLong(val[1]));

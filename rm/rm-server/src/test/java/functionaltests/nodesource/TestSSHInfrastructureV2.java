@@ -40,6 +40,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.utils.OperatingSystem;
@@ -78,6 +80,7 @@ public class TestSSHInfrastructureV2 extends RMConsecutive {
 
         String javaExePath = System.getProperty("java.home") + File.separator + "bin" + File.separator +
             (OsUtils.isWin32() ? "java.exe" : "java");
+        javaExePath = "\"" + javaExePath + "\"";
 
         Object[] infraParams = new Object[] { "localhost 1\n".getBytes(), //hosts
                 60000, //timeout
@@ -124,7 +127,7 @@ public class TestSSHInfrastructureV2 extends RMConsecutive {
                     ProcessShellFactory.TtyOptions.ONlCr)));
         }
 
-        List<NamedFactory<UserAuth>> userAuthFactories = new ArrayList<NamedFactory<UserAuth>>();
+        List<NamedFactory<UserAuth>> userAuthFactories = new ArrayList<>();
         userAuthFactories.add(new UserAuthPassword.Factory());
         sshd.setUserAuthFactories(userAuthFactories);
 
@@ -145,13 +148,22 @@ public class TestSSHInfrastructureV2 extends RMConsecutive {
                     ttyOptions = EnumSet.of(ProcessShellFactory.TtyOptions.Echo,
                             ProcessShellFactory.TtyOptions.ICrNl, ProcessShellFactory.TtyOptions.ONlCr);
                 }
-                return new ProcessShellFactory(command.split(" "), ttyOptions).create();
+                return new ProcessShellFactory(splitCommand(command), ttyOptions).create();
             }
         }));
 
         sshd.start();
 
         this.port = sshd.getPort();
+    }
+
+    public static String[] splitCommand(String command) {
+        List<String> list = new ArrayList<>();
+        Matcher m = Pattern.compile("([^\\\\\"]\\S*|\\\\\".+?\\\\\")\\s*").matcher(command);
+        while (m.find()) {
+            list.add(m.group(1).replaceAll("\\\\\"",""));
+        }
+        return list.toArray(new String[list.size()]);
     }
 
     @org.junit.After

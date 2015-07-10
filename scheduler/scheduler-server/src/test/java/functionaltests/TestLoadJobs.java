@@ -107,14 +107,14 @@ public class TestLoadJobs extends FunctionalTest {
         jobs = scheduler.getJobs(0, 10, criteria(true, true, true, true), null);
         checkJobs(jobs, 1, 2, 3);
 
-        List<SortParameter<JobSortParameter>> sortParameters = new ArrayList<SortParameter<JobSortParameter>>();
+        List<SortParameter<JobSortParameter>> sortParameters = new ArrayList<>();
 
-        sortParameters.add(new SortParameter<JobSortParameter>(JobSortParameter.ID, SortOrder.ASC));
+        sortParameters.add(new SortParameter<>(JobSortParameter.ID, SortOrder.ASC));
         jobs = scheduler.getJobs(0, 10, criteria(true, true, true, true), sortParameters);
         checkJobs(jobs, 1, 2, 3);
 
         sortParameters.clear();
-        sortParameters.add(new SortParameter<JobSortParameter>(JobSortParameter.ID, SortOrder.DESC));
+        sortParameters.add(new SortParameter<>(JobSortParameter.ID, SortOrder.DESC));
         jobs = scheduler.getJobs(0, 10, criteria(true, true, true, true), sortParameters);
         checkJobs(jobs, 3, 2, 1);
 
@@ -198,8 +198,8 @@ public class TestLoadJobs extends FunctionalTest {
 
         monitorsHandler = new SchedulerMonitorsHandler();
         eventReceiver = new MonitorEventReceiver(monitorsHandler);
-        eventReceiver = (MonitorEventReceiver) PAActiveObject.turnActive(eventReceiver);
-        state = scheduler.addEventListener((SchedulerEventListener) eventReceiver, true, true);
+        eventReceiver = PAActiveObject.turnActive(eventReceiver);
+        state = scheduler.addEventListener(eventReceiver, true, true);
         monitorsHandler.init(state);
 
         JobId myjob = scheduler.submit(createJob(communicationObjectUrl));
@@ -216,7 +216,7 @@ public class TestLoadJobs extends FunctionalTest {
     }
 
     private void checkJobs(List<JobInfo> jobs, Integer... expectedIds) {
-        List<Integer> ids = new ArrayList<Integer>();
+        List<Integer> ids = new ArrayList<>(jobs.size());
         for (JobInfo job : jobs) {
             ids.add(Integer.valueOf(job.getJobId().value()));
         }

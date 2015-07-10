@@ -23,7 +23,7 @@ import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.InternalJobFactory;
-import org.ow2.proactive.scheduler.task.internal.ExecuterInformations;
+import org.ow2.proactive.scheduler.task.internal.ExecuterInformation;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.tests.FunctionalTest;
 import org.ow2.tests.ProActiveTest;
@@ -84,9 +84,9 @@ public class BaseSchedulerDBTest extends ProActiveTest {
 
     static class StateMatcher extends TypeSafeMatcher<SchedulerState> {
 
-        private final List<JobStateMatcher> pending = new ArrayList<JobStateMatcher>();
-        private final List<JobStateMatcher> running = new ArrayList<JobStateMatcher>();
-        private final List<JobStateMatcher> finished = new ArrayList<JobStateMatcher>();
+        private final List<JobStateMatcher> pending = new ArrayList<>();
+        private final List<JobStateMatcher> running = new ArrayList<>();
+        private final List<JobStateMatcher> finished = new ArrayList<>();
 
         @Override
         public void describeTo(Description description) {
@@ -151,7 +151,7 @@ public class BaseSchedulerDBTest extends ProActiveTest {
         return state;
     }
 
-    static Set<JobStatus> finishedJobStatus = new HashSet<JobStatus>();
+    static Set<JobStatus> finishedJobStatus = new HashSet<>();
 
     static {
         finishedJobStatus.add(JobStatus.CANCELED);
@@ -164,13 +164,13 @@ public class BaseSchedulerDBTest extends ProActiveTest {
 
         private final JobId id;
 
-        private final List<TaskStateMatcher> pending = new ArrayList<TaskStateMatcher>();
+        private final List<TaskStateMatcher> pending = new ArrayList<>();
 
-        private final List<TaskStateMatcher> running = new ArrayList<TaskStateMatcher>();
+        private final List<TaskStateMatcher> running = new ArrayList<>();
 
-        private final List<TaskStateMatcher> finished = new ArrayList<TaskStateMatcher>();
+        private final List<TaskStateMatcher> finished = new ArrayList<>();
 
-        private final Set<String> eligibleTasks = new HashSet<String>();
+        private final Set<String> eligibleTasks = new HashSet<>();
 
         private final JobStatus status;
 
@@ -241,7 +241,7 @@ public class BaseSchedulerDBTest extends ProActiveTest {
             Assert.assertEquals("Running tasks for " + id, running.size(), item.getNumberOfRunningTasks());
             Assert.assertEquals("Finished tasks for " + id, finishedNumber, item.getNumberOfFinishedTasks());
 
-            Collection<TaskStateMatcher> all = new ArrayList<TaskStateMatcher>();
+            Collection<TaskStateMatcher> all = new ArrayList<>();
             all.addAll(pending);
             all.addAll(running);
             all.addAll(finished);
@@ -259,7 +259,7 @@ public class BaseSchedulerDBTest extends ProActiveTest {
                 InternalJob internalJob = (InternalJob) item;
 
                 if (!finishedJobStatus.contains(status)) {
-                    Set<String> actualEligible = new HashSet<String>();
+                    Set<String> actualEligible = new HashSet<>();
                     for (EligibleTaskDescriptor desc : internalJob.getJobDescriptor().getEligibleTasks()) {
                         actualEligible.add(desc.getTaskId().getReadableName());
                     }
@@ -438,7 +438,7 @@ public class BaseSchedulerDBTest extends ProActiveTest {
     }
 
     protected InternalTask startTask(InternalJob internalJob, InternalTask internalTask) throws Exception {
-        internalTask.setExecuterInformations(new ExecuterInformations(null, NodeFactory.getDefaultNode()));
+        internalTask.setExecuterInformation(new ExecuterInformation(null, NodeFactory.getDefaultNode()));
         internalJob.startTask(internalTask);
         return internalTask;
     }

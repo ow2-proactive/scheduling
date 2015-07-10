@@ -122,7 +122,7 @@ public abstract class TWorkflowJobs extends SchedulerConsecutive {
          * 
          */
         for (int i = 0; i < jobs.length; i++) {
-            Map<String, Long> tasks = new HashMap<String, Long>();
+            Map<String, Long> tasks = new HashMap<>();
             for (int j = 0; j < jobs[i].length; j++) {
                 String[] val = jobs[i][j].split(" ");
                 try {
@@ -134,13 +134,13 @@ public abstract class TWorkflowJobs extends SchedulerConsecutive {
             }
 
             // parse dependences info, if present
-            Map<String, Set<String>> dependences = new HashMap<String, Set<String>>();
+            Map<String, Set<String>> dependences = new HashMap<>();
             for (int j = 0; j < jobs[i].length; j++) {
                 String[] val = jobs[i][j].split(" ", 3);
                 if (val.length == 3) {
                     try {
                         String deps = val[2].substring(1, val[2].length() - 1);
-                        dependences.put(val[0], new HashSet<String>(Arrays.asList(deps.split(" "))));
+                        dependences.put(val[0], new HashSet<>(Arrays.asList(deps.split(" "))));
                     } catch (Throwable t) {
                         throw new RuntimeException("Error parsing dependencies for entry: " + jobs[i][j], t);
                     }
@@ -222,7 +222,11 @@ public abstract class TWorkflowJobs extends SchedulerConsecutive {
      */
     public void testJob(String jobPath, Map<String, Long> expectedResults,
             Map<String, Set<String>> expectedDependences) throws Throwable {
-        List<String> skip = new ArrayList<String>();
+
+        SchedulerTHelper.startScheduler(new File(SchedulerTHelper.class.getResource(
+          "config/scheduler-nonforkedscripttasks.ini").toURI()).getAbsolutePath());
+
+        List<String> skip = new ArrayList<>();
         for (Entry<String, Long> er : expectedResults.entrySet()) {
             if (er.getValue() < 0) {
                 skip.add(er.getKey());
@@ -284,7 +288,7 @@ public abstract class TWorkflowJobs extends SchedulerConsecutive {
                 Set<String> expected = expectedDependences.get(taskName);
                 // actual dependences of this task
                 List<TaskState> actualDepTasks = ts.getDependences();
-                Set<String> actual = new HashSet<String>();
+                Set<String> actual = new HashSet<>();
                 if (actualDepTasks != null && actualDepTasks.size() != 0) {
                     for (TaskState d : actualDepTasks) {
                         actual.add(d.getId().getReadableName());

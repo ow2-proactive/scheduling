@@ -67,49 +67,49 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
         List<JobInfo> jobs;
 
         jobs = dbManager.getJobs(0, 10, null, true, true, true,
-                sortParameters(new SortParameter<JobSortParameter>(JobSortParameter.ID, SortOrder.ASC)));
+                sortParameters(new SortParameter<>(JobSortParameter.ID, SortOrder.ASC)));
         checkJobs(jobs, 1, 2, 3, 4, 5, 6);
 
         jobs = dbManager.getJobs(0, 10, null, true, true, true,
-                sortParameters(new SortParameter<JobSortParameter>(JobSortParameter.ID, SortOrder.DESC)));
+                sortParameters(new SortParameter<>(JobSortParameter.ID, SortOrder.DESC)));
         checkJobs(jobs, 6, 5, 4, 3, 2, 1);
 
         jobs = dbManager.getJobs(0, 10, null, true, true, true, sortParameters(
-                new SortParameter<JobSortParameter>(JobSortParameter.NAME, SortOrder.ASC),
-                new SortParameter<JobSortParameter>(JobSortParameter.ID, SortOrder.ASC)));
+                new SortParameter<>(JobSortParameter.NAME, SortOrder.ASC),
+                new SortParameter<>(JobSortParameter.ID, SortOrder.ASC)));
         checkJobs(jobs, 1, 4, 2, 5, 3, 6);
 
         jobs = dbManager.getJobs(0, 10, null, true, true, true, sortParameters(
-                new SortParameter<JobSortParameter>(JobSortParameter.NAME, SortOrder.ASC),
-                new SortParameter<JobSortParameter>(JobSortParameter.ID, SortOrder.DESC)));
+                new SortParameter<>(JobSortParameter.NAME, SortOrder.ASC),
+                new SortParameter<>(JobSortParameter.ID, SortOrder.DESC)));
         checkJobs(jobs, 4, 1, 5, 2, 6, 3);
 
         jobs = dbManager.getJobs(0, 10, null, true, true, true,
-                sortParameters(new SortParameter<JobSortParameter>(JobSortParameter.OWNER, SortOrder.ASC)));
+                sortParameters(new SortParameter<>(JobSortParameter.OWNER, SortOrder.ASC)));
         checkJobs(jobs, 1, 2, 3, 4, 5, 6);
 
         jobs = dbManager.getJobs(0, 10, null, true, true, true,
-                sortParameters(new SortParameter<JobSortParameter>(JobSortParameter.OWNER, SortOrder.DESC)));
+                sortParameters(new SortParameter<>(JobSortParameter.OWNER, SortOrder.DESC)));
         checkJobs(jobs, 6, 5, 4, 3, 2, 1);
 
         jobs = dbManager
-                .getJobs(0, 10, null, true, true, true, sortParameters(new SortParameter<JobSortParameter>(
-                    JobSortParameter.PRIORITY, SortOrder.ASC)));
+                .getJobs(0, 10, null, true, true, true, sortParameters(new SortParameter<>(
+                        JobSortParameter.PRIORITY, SortOrder.ASC)));
         checkJobs(jobs, 1, 2, 3, 4, 5, 6);
 
         jobs = dbManager
-                .getJobs(0, 10, null, true, true, true, sortParameters(new SortParameter<JobSortParameter>(
-                    JobSortParameter.PRIORITY, SortOrder.DESC)));
+                .getJobs(0, 10, null, true, true, true, sortParameters(new SortParameter<>(
+                        JobSortParameter.PRIORITY, SortOrder.DESC)));
         checkJobs(jobs, 6, 5, 4, 3, 2, 1);
 
         jobs = dbManager.getJobs(0, 10, null, true, true, true, sortParameters(
-                new SortParameter<JobSortParameter>(JobSortParameter.STATE, SortOrder.ASC),
-                new SortParameter<JobSortParameter>(JobSortParameter.ID, SortOrder.ASC)));
+                new SortParameter<>(JobSortParameter.STATE, SortOrder.ASC),
+                new SortParameter<>(JobSortParameter.ID, SortOrder.ASC)));
         checkJobs(jobs, 2, 4, 6, 3, 5, 1);
 
         jobs = dbManager.getJobs(0, 10, null, true, true, true, sortParameters(
-                new SortParameter<JobSortParameter>(JobSortParameter.STATE, SortOrder.DESC),
-                new SortParameter<JobSortParameter>(JobSortParameter.ID, SortOrder.ASC)));
+                new SortParameter<>(JobSortParameter.STATE, SortOrder.DESC),
+                new SortParameter<>(JobSortParameter.ID, SortOrder.ASC)));
         checkJobs(jobs, 1, 3, 5, 2, 4, 6);
     }
 
@@ -143,11 +143,11 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
         job.start();
         task = startTask(job, job.getITasks().get(0));
         dbManager.jobTaskStarted(job, task, true);
-        TaskResultImpl result = new TaskResultImpl(null, new TestResult(0, "result"), null, 0, null);
+        TaskResultImpl result = new TaskResultImpl(null, new TestResult(0, "result"), null, 0);
         job.terminateTask(false, task.getId(), null, null, result);
         job.terminate();
         dbManager.updateAfterTaskFinished(job, task, new TaskResultImpl(null, new TestResult(0, "result"),
-            null, 0, null));
+            null, 0));
 
         // canceled job - 7
         job = defaultSubmitJob(createJob());
@@ -160,8 +160,8 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
 
         List<JobInfo> jobs;
 
-        List<SortParameter<JobSortParameter>> sortParameters = new ArrayList<SortParameter<JobSortParameter>>();
-        sortParameters.add(new SortParameter<JobSortParameter>(JobSortParameter.ID, SortOrder.ASC));
+        List<SortParameter<JobSortParameter>> sortParameters = new ArrayList<>();
+        sortParameters.add(new SortParameter<>(JobSortParameter.ID, SortOrder.ASC));
 
         jobs = dbManager.getJobs(5, 1, null, true, true, true, sortParameters);
         JobInfo jobInfo = jobs.get(0);
@@ -244,7 +244,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
     }
 
     private void checkJobs(List<JobInfo> jobs, Integer... expectedIds) {
-        List<Integer> ids = new ArrayList<Integer>();
+        List<Integer> ids = new ArrayList<>();
         for (JobInfo job : jobs) {
             ids.add(Integer.valueOf(job.getJobId().value()));
         }

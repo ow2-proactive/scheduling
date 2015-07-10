@@ -46,7 +46,7 @@ import java.util.TreeMap;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
-import org.ow2.proactive.scheduler.common.job.factories.JobFactory_stax;
+import org.ow2.proactive.scheduler.common.job.factories.StaxJobFactory;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.junit.Test;
@@ -66,7 +66,7 @@ public class TestTaskIdOrderSameAsDeclarationOrder extends SchedulerConsecutive 
 
     @Test
     public void task_ids_should_be_ordered_as_task_declaration_order() throws Throwable {
-        TaskFlowJob job = (TaskFlowJob) JobFactory_stax.getFactory().createJob(
+        TaskFlowJob job = (TaskFlowJob) StaxJobFactory.getFactory().createJob(
                 new File(jobDescriptor.toURI()).getAbsolutePath());
 
         JobId id = submitJob(job);
@@ -85,13 +85,13 @@ public class TestTaskIdOrderSameAsDeclarationOrder extends SchedulerConsecutive 
     }
 
     private List<TaskState> sortTasksById(JobState jobState) {
-        TreeMap<TaskId, TaskState> sortedTasks = new TreeMap<TaskId, TaskState>(new Comparator<TaskId>() {
+        TreeMap<TaskId, TaskState> sortedTasks = new TreeMap<>(new Comparator<TaskId>() {
             @Override
             public int compare(TaskId o1, TaskId o2) {
                 return Integer.parseInt(o1.value()) - Integer.parseInt(o2.value());
             }
         });
         sortedTasks.putAll(jobState.getHMTasks());
-        return new ArrayList<TaskState>(sortedTasks.values());
+        return new ArrayList<>(sortedTasks.values());
     }
 }

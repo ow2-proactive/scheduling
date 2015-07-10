@@ -50,9 +50,10 @@ import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
-
+@Ignore
 public class TestLinkAnotherRM extends MultipleRMTBase {
 
     private static final int NODES_NUMBER = 2;
@@ -139,11 +140,11 @@ public class TestLinkAnotherRM extends MultipleRMTBase {
 
         String rmUrl1 = helper1.startRM(config1.getAbsolutePath(), rmiPort1,
                 PAResourceManagerProperties.RM_JMX_PORT.getCmdLine() + jmxPort1);
-        helper1.createNodeSource(rmiPort1, NODES_NUMBER);
+        helper1.createNodeSource(NODES_NUMBER);
 
         String rmUrl2 = helper2.startRM(config2.getAbsolutePath(), rmiPort2,
                 PAResourceManagerProperties.RM_JMX_PORT.getCmdLine() + jmxPort2);
-        helper2.createNodeSource(rmiPort2, NODES_NUMBER);
+        helper2.createNodeSource(NODES_NUMBER);
 
         checkFreeNodes(helper1.getResourceManager(), NODES_NUMBER);
         checkFreeNodes(helper2.getResourceManager(), NODES_NUMBER);

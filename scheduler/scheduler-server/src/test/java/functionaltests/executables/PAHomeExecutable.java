@@ -37,10 +37,8 @@ package functionaltests.executables;
 import java.io.File;
 import java.io.Serializable;
 
-import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
-import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
 
 /**
@@ -55,19 +53,10 @@ public class PAHomeExecutable extends JavaExecutable {
     @Override
     public Serializable execute(TaskResult... results) throws Throwable {
         File expectedFile = new File(expectedHome).getCanonicalFile();
-        String prop = getVariables().get("proactive.home").toString();
+        System.out.println("=================== " + getVariables());
+        String prop = getVariables().get("PA_SCHEDULER_HOME").toString();
         if (!expectedFile.equals(new File(prop).getCanonicalFile())) {
             throw new IllegalStateException("Unexpected proactive.home value, expected " + expectedHome +
-                " received " + prop);
-        }
-        prop = getVariables().get(PAResourceManagerProperties.RM_HOME.getKey()).toString();
-        if (!expectedFile.equals(new File(prop).getCanonicalFile())) {
-            throw new IllegalStateException("Unexpected pa.rm.home value, expected " + expectedHome +
-                " received " + prop);
-        }
-        prop = getVariables().get(PASchedulerProperties.SCHEDULER_HOME.getKey()).toString();
-        if (!expectedFile.equals(new File(prop).getCanonicalFile())) {
-            throw new IllegalStateException("Unexpected pa.scheduler.home value, expected " + expectedHome +
                 " received " + prop);
         }
         return true;

@@ -48,6 +48,7 @@ import org.objectweb.proactive.extensions.dataspaces.vfs.VFSFactory;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
@@ -101,13 +102,12 @@ public class TestGlobalSpace extends FunctionalTest {
         "def out;                                              \n" + //
         "def arr = " + inFileArr + ";                          \n" + //
         "for (def i=0; i < arr.size(); i++) {                  \n" + //
-        "  def input = localspace.resolveFile(arr[i]);         \n" + //
+        "  def input = new File(arr[i]);         \n" + //
         "  if (! input) continue;                              \n" + //
-        "  def br = input.getContent().getInputStream();       \n" + //
-        "  def ff = localspace.resolveFile(                    \n" + //
+        "  def br = input.newInputStream();       \n" + //
+        "  def ff = new File(                    \n" + //
         "     arr[i] + \".glob.A\");\n                         \n" + //
-        "  ff.createFile();                                    \n" + //
-        "  out = ff.getContent().getOutputStream();            \n" + //
+        "  out = ff.newOutputStream();            \n" + //
         "  def c;                                              \n" + //
         "  while ((c = br.read()) > 0) {                       \n" + //
         "    out.write(c);                                     \n" + //
@@ -121,16 +121,15 @@ public class TestGlobalSpace extends FunctionalTest {
         "def out;                                              \n" + //
         "def arr = " + inFileArr + ";                          \n" + //
         "for (def i=0; i < arr.size(); i++) {                  \n" + //
-        "  def input = localspace.resolveFile(                 \n" + //
+        "  def input = new File(                 \n" + //
         "      arr[i] + \".glob.A\");                          \n" + //
         "  if (! input.exists()) {                             \n" + //
         "    continue;                                         \n" + //
         "  }                                                   \n" + //
-        "  def br = input.getContent().getInputStream();       \n" + //
-        "  def ff = localspace.resolveFile(                    \n" + //
+        "  def br = input.newInputStream();       \n" + //
+        "  def ff = new File(                    \n" + //
         "     arr[i] + \".out\");\n                            \n" + //
-        "  ff.createFile();                                    \n" + //
-        "  out = ff.getContent().getOutputStream();            \n" + //
+        "  out = ff.newOutputStream();            \n" + //
         "  def c;                                              \n" + //
         "  while ((c = br.read()) > 0) {                       \n" + //
         "    out.write(c);                                     \n" + //
@@ -171,6 +170,7 @@ public class TestGlobalSpace extends FunctionalTest {
             A.addOutputFiles(file[0] + ".glob.A", OutputAccessMode.TransferToGlobalSpace);
         }
         A.setPreScript(new SimpleScript(scriptA, "groovy"));
+        A.setForkEnvironment(new ForkEnvironment());
         job.addTask(A);
 
         JavaTask B = new JavaTask();
@@ -182,6 +182,7 @@ public class TestGlobalSpace extends FunctionalTest {
             B.addOutputFiles(file[0] + ".out", OutputAccessMode.TransferToOutputSpace);
         }
         B.setPreScript(new SimpleScript(scriptB, "groovy"));
+        B.setForkEnvironment(new ForkEnvironment());
         job.addTask(B);
 
         Scheduler sched = SchedulerTHelper.getSchedulerInterface();
@@ -223,8 +224,6 @@ public class TestGlobalSpace extends FunctionalTest {
             try {
                 fsManager = VFSFactory.createDefaultFileSystemManager();
             } catch (FileSystemException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
                 logger.error("Could not create Default FileSystem Manager", e);
             }
         }

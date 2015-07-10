@@ -4,7 +4,7 @@
      xsi:schemaLocation="urn:proactive:jobdescriptor:3.2 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.2/schedulerjob.xsd"
      name="05_workflow_replication">
     <description>
-        A sample workflow that solves an classic split/process/merge problem.
+        A sample workflow that solves a classic split/process/merge problem.
     </description>
     <taskFlow>
         <task name="Split">
@@ -44,7 +44,7 @@ runs=2
                 <script>
                     <code language="groovy">
                         <![CDATA[
-int replication = Integer.parseInt(System.getProperty('pas.task.replication'))
+int replication = variables.get('PA_TASK_REPLICATION')
 input = results[0].value()[replication]
 result = input.toUpperCase()
 ]]>

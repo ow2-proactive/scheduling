@@ -71,5 +71,5 @@ public interface SelectionPolicy {
      * 
      * @return the sorted list of nodes.
      */
-    public List<RMNode> arrangeNodes(int number, List<RMNode> nodes, Client client);
+    List<RMNode> arrangeNodes(int number, List<RMNode> nodes, Client client);
 }

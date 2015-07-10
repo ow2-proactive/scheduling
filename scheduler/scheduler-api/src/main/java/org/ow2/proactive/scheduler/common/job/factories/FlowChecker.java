@@ -89,20 +89,20 @@ public class FlowChecker {
      */
     public static class TaskTree {
         // top-down dependencies
-        public List<TaskTree> children = new ArrayList<TaskTree>();
+        public List<TaskTree> children = new ArrayList<>();
         // bottom-up dependencies
-        public List<TaskTree> parents = new ArrayList<TaskTree>();
+        public List<TaskTree> parents = new ArrayList<>();
         // enclosed Task
         public Task element = null;
 
         // if / else top-down links
-        public List<TaskTree> targets = new ArrayList<TaskTree>();
+        public List<TaskTree> targets = new ArrayList<>();
         // if / else bottom-up links
         public TaskTree targetOf = null;
         // join top-down target
         public TaskTree targetJoin = null;
         // join bottom-up links
-        public List<TaskTree> joins = new ArrayList<TaskTree>();
+        public List<TaskTree> joins = new ArrayList<>();
         // join top-down link
         public TaskTree joinedBy = null;
 
@@ -150,7 +150,7 @@ public class FlowChecker {
         if (blocks != null) {
             this.blocks = blocks;
         } else {
-            this.blocks = new ArrayList<Block>();
+            this.blocks = new ArrayList<>();
         }
         this.blocks.clear();
         createTaskTree(job);
@@ -207,7 +207,7 @@ public class FlowChecker {
      * @throws FlowError
      */
     private void checkNames() throws FlowError {
-        HashSet<String> tasks = new HashSet<String>();
+        HashSet<String> tasks = new HashSet<>();
         for (Task task : job.getTasks()) {
             String name = task.getName();
 
@@ -236,7 +236,7 @@ public class FlowChecker {
      */
     private void checkRecursion() throws FlowError {
         for (TaskTree tree : this.roots) {
-            LinkedList<TaskTree> env = new LinkedList<TaskTree>();
+            LinkedList<TaskTree> env = new LinkedList<>();
             internalCheckRecursion(env, tree);
         }
     }
@@ -253,18 +253,18 @@ public class FlowChecker {
 
         if (cur.children != null && cur.children.size() > 0) {
             for (TaskTree child : cur.children) {
-                LinkedList<TaskTree> n = new LinkedList<TaskTree>(env);
+                LinkedList<TaskTree> n = new LinkedList<>(env);
                 internalCheckRecursion(n, child);
             }
         }
         if (cur.targets != null && cur.targets.size() > 0) {
             for (TaskTree child : cur.targets) {
-                LinkedList<TaskTree> n = new LinkedList<TaskTree>(env);
+                LinkedList<TaskTree> n = new LinkedList<>(env);
                 internalCheckRecursion(n, child);
             }
         }
         if (cur.joinedBy != null) {
-            LinkedList<TaskTree> n = new LinkedList<TaskTree>(env);
+            LinkedList<TaskTree> n = new LinkedList<>(env);
             internalCheckRecursion(n, cur.joinedBy);
         }
     }
@@ -276,8 +276,8 @@ public class FlowChecker {
      * @return FlowError
      */
     private void checkReachable() throws FlowError {
-        HashSet<Task> tasks = new HashSet<Task>();
-        HashSet<Task> reached = new HashSet<Task>();
+        HashSet<Task> tasks = new HashSet<>();
+        HashSet<Task> reached = new HashSet<>();
         for (Task t : job.getTasks()) {
             if (t.getDependencesList() == null) {
                 reached.add(t);
@@ -315,11 +315,11 @@ public class FlowChecker {
      * @throws FlowError
      */
     private void checkBlocks() throws FlowError {
-        Set<String> done = new HashSet<String>();
+        Set<String> done = new HashSet<>();
         // detect blocks
         for (TaskTree tt : roots) {
-            Stack<TaskTree> env = new Stack<TaskTree>();
-            Stack<TaskTree> join = new Stack<TaskTree>();
+            Stack<TaskTree> env = new Stack<>();
+            Stack<TaskTree> join = new Stack<>();
 
             dfsBlocks(tt, done, env, join);
             if (env.size() > 0) {
@@ -384,7 +384,7 @@ public class FlowChecker {
                 break;
         }
 
-        List<TaskTree> children = new ArrayList<TaskTree>();
+        List<TaskTree> children = new ArrayList<>();
         children.addAll(tree.children);
 
         if (tree.children.size() == 0) {
@@ -418,9 +418,9 @@ public class FlowChecker {
      */
     private void createTaskTree(TaskFlowJob job) throws FlowError {
         // list of roots
-        List<TaskTree> roots = new ArrayList<TaskTree>();
+        List<TaskTree> roots = new ArrayList<>();
         // all tree nodes
-        Map<String, TaskTree> tasks = new HashMap<String, TaskTree>();
+        Map<String, TaskTree> tasks = new HashMap<>();
 
         for (Task t : job.getTasks()) {
             TaskTree tt = new TaskTree(t);
@@ -483,13 +483,13 @@ public class FlowChecker {
 
                     TaskTree ifT = tasks.get(tree.element.getFlowScript().getActionTarget());
                     TaskTree elseT = tasks.get(tree.element.getFlowScript().getActionTargetElse());
-                    List<TaskTree> tgs = new ArrayList<TaskTree>();
+                    List<TaskTree> tgs = new ArrayList<>();
                     tgs.add(ifT);
                     tgs.add(elseT);
                     for (TaskTree tree2 : tgs) {
 
                         TaskTree target = tree2, target2 = null;
-                        Stack<String> jOpen = new Stack<String>();
+                        Stack<String> jOpen = new Stack<>();
                         TaskTree joinTask = tasks.get(tJ);
 
                         do {
@@ -522,7 +522,7 @@ public class FlowChecker {
             }
         }
 
-        this.tasksFlat = new ArrayList<TaskTree>();
+        this.tasksFlat = new ArrayList<>();
         for (TaskTree t : tasks.values()) {
             tasksFlat.add(t);
         }
@@ -539,7 +539,7 @@ public class FlowChecker {
      * @throws FlowError
      */
     private static void checkBlockDown(TaskTree endBlock, TaskTree node) throws FlowError {
-        List<TaskTree> children = new ArrayList<TaskTree>();
+        List<TaskTree> children = new ArrayList<>();
         children.addAll(node.children);
 
         children.addAll(node.targets);
@@ -570,7 +570,7 @@ public class FlowChecker {
      * @throws FlowError
      */
     private static void checkBlockUp(TaskTree startBlock, TaskTree node) throws FlowError {
-        List<TaskTree> parents = new ArrayList<TaskTree>();
+        List<TaskTree> parents = new ArrayList<>();
         parents.addAll(node.parents);
 
         parents.addAll(node.joins);
@@ -696,13 +696,13 @@ public class FlowChecker {
                             targetElse.element.getName());
                     }
 
-                    List<TaskTree> targets = new ArrayList<TaskTree>();
+                    List<TaskTree> targets = new ArrayList<>();
                     targets.add(targetIf);
                     targets.add(targetElse);
 
                     for (TaskTree target : targets) {
-                        Map<String, TaskTree> ifTasks = new HashMap<String, TaskTree>();
-                        Stack<TaskTree> stack = new Stack<TaskTree>();
+                        Map<String, TaskTree> ifTasks = new HashMap<>();
+                        Stack<TaskTree> stack = new Stack<>();
                         stack.push(target);
                         while (stack.size() > 0) {
                             TaskTree cur = stack.pop();

@@ -24,12 +24,11 @@ import org.ow2.proactive.scheduler.core.db.SchedulerStateRecoverHelper;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
 import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
-import org.ow2.proactive.scheduler.exception.ForkedJVMProcessException;
-import org.ow2.proactive.scheduler.exception.ProgressPingerException;
+import org.ow2.proactive.scheduler.task.exceptions.ForkedJvmProcessException;
 import org.ow2.proactive.scheduler.job.InternalJob;
+import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.policy.Policy;
 import org.ow2.proactive.scheduler.task.TaskInfoImpl;
-import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.util.JobLogger;
@@ -209,9 +208,9 @@ public class SchedulingService {
 
         logger.info("Killing all running task processes...");
         for (RunningTaskData taskData : jobs.getRunningTasks()) {
-            NodeSet nodes = taskData.getTask().getExecuterInformations().getNodes();
+            NodeSet nodes = taskData.getTask().getExecuterInformation().getNodes();
             try {
-                taskData.getLauncher().terminate(false);
+                taskData.getLauncher().kill();
             } catch (Throwable t) {
                 logger.error("Failed to terminate launcher", t);
             }
@@ -724,8 +723,6 @@ public class SchedulingService {
         try {
             listenJobLogsSupport.cleanLoggers(jobId);
 
-            infrastructure.getTaskClassServer().removeTaskClassServer(jobId);
-
             //auto remove
             if (SchedulingService.SCHEDULER_AUTO_REMOVED_JOB_DELAY > 0) {
                 scheduleJobRemove(jobId, SchedulingService.SCHEDULER_AUTO_REMOVED_JOB_DELAY);
@@ -765,22 +762,18 @@ public class SchedulingService {
 
     private void jobsRecovered(Collection<InternalJob> jobs) {
         DataSpaceServiceStarter dsStarter = infrastructure.getDataSpaceServiceStarter();
-        SchedulerClassServers classServers = infrastructure.getTaskClassServer();
         SchedulerSpacesSupport spacesSupport = infrastructure.getSpacesSupport();
 
         for (InternalJob job : jobs) {
             this.jobs.jobRecovered(job);
             switch (job.getStatus()) {
                 case PENDING:
-                    // restart classserver if needed
-                    classServers.createTaskClassServer(job, spacesSupport);
                     break;
                 case STALLED:
                 case RUNNING:
                     //start dataspace app for this job
                     job.startDataSpaceApplication(dsStarter.getNamingService());
                     // restart classServer if needed
-                    classServers.createTaskClassServer(job, spacesSupport);
                     break;
                 case FINISHED:
                 case CANCELED:
@@ -788,8 +781,6 @@ public class SchedulingService {
                 case KILLED:
                     break;
                 case PAUSED:
-                    // restart classserver if needed
-                    classServers.createTaskClassServer(job, spacesSupport);
             }
         }
     }
@@ -807,7 +798,7 @@ public class SchedulingService {
                 task.setProgress(progress);//(1)
                 //if progress != previously set progress (0 by default) -> update
                 listener.taskStateUpdated(taskData.getUser(), new NotificationData<TaskInfo>(
-                    SchedulerEvent.TASK_PROGRESS, new TaskInfoImpl((TaskInfoImpl) task.getTaskInfo())));
+                        SchedulerEvent.TASK_PROGRESS, new TaskInfoImpl((TaskInfoImpl) task.getTaskInfo())));
             }
         } catch (NullPointerException e) {
             //should not happened, but avoid restart if execInfo or launcher is null
@@ -821,15 +812,10 @@ public class SchedulingService {
             if (tlogger.isDebugEnabled()) {
                 tlogger.debug(task.getId(), "getProgress failed", e);
             }
-        } catch (ForkedJVMProcessException e) {
+        } catch (ForkedJvmProcessException e) {
             //thrown by when user has overridden getProgress method and the method throws an exception
             // * if forked JVM process is dead
             //nothing to do in any case
-            if (tlogger.isTraceEnabled()) {
-                tlogger.trace(task.getId(), "getProgress failed", e);
-            }
-        } catch (ProgressPingerException e) {
-            //thrown by when forked JVM process is dead, which is a normal scenario at the end of the task
             if (tlogger.isTraceEnabled()) {
                 tlogger.trace(task.getId(), "getProgress failed", e);
             }

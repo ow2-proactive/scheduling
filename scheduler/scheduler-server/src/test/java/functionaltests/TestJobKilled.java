@@ -46,6 +46,9 @@ import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.tests.FunctionalTest;
 import org.junit.Assert;
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 
 /**
@@ -70,15 +73,18 @@ public class TestJobKilled extends FunctionalTest {
      *
      * @throws Throwable any exception that can be thrown during the test.
      */
-    @org.junit.Test
+    @Test
     public void run() throws Throwable {
+        SchedulerTHelper.startScheduler(new File(SchedulerTHelper.class.getResource(
+          "config/scheduler-nonforkedscripttasks.ini").toURI()).getAbsolutePath());
 
         String task1Name = "task1";
         String task2Name = "task2";
         String task3Name = "task3";
-        //cannot use SchedulerTHelper.testJobsubmission because
-        //task 3 is never executed so no event can received
-        //regarding this task.
+
+        // cannot use SchedulerTHelper.testJobsubmission because
+        // task 3 is never executed so no event can be received
+        // regarding this task.
         JobId id = SchedulerTHelper.submitJob(new File(jobDescriptor.toURI()).getAbsolutePath(),
                 ExecutionMode.normal);
         //check events reception
@@ -100,17 +106,12 @@ public class TestJobKilled extends FunctionalTest {
         SchedulerTHelper.log("Waiting for job finished");
         SchedulerTHelper.waitForEventJobFinished(id);
 
-        //task 3 should not be started
-        boolean task3tarted = false;
-
         try {
             SchedulerTHelper.waitForEventTaskRunning(id, task3Name, 1000);
-            task3tarted = true;
-        } catch (ProActiveTimeoutException e) {
-            // TODO Auto-generated catch block
+            fail("Task 3 should not be started");
+        } catch (ProActiveTimeoutException expected) {
+            // expected
         }
-
-        Assert.assertFalse(task3tarted);
 
         JobResult res = SchedulerTHelper.getJobResult(id);
         Map<String, TaskResult> results = res.getAllResults();
@@ -118,4 +119,5 @@ public class TestJobKilled extends FunctionalTest {
         Assert.assertNotNull(results.get("task1").value());
         Assert.assertNotNull(results.get("task2").getException());
     }
+
 }

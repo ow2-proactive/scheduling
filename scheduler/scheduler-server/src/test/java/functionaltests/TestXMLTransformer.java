@@ -45,25 +45,25 @@ import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.job.factories.Job2XMLTransformer;
 import org.ow2.proactive.scheduler.common.job.factories.JobComparator;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
-import org.ow2.proactive.scheduler.common.job.factories.JobFactory_stax;
+import org.ow2.proactive.scheduler.common.job.factories.StaxJobFactory;
 import org.ow2.tests.FunctionalTest;
 import org.junit.Assert;
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
+import org.junit.Test;
 
 
 /**
  * This class tests the coherence between the {@link Job2XMLTransformer} and the
- * {@link JobFactory_stax}. For each job descriptor in the
+ * {@link StaxJobFactory}. For each job descriptor in the
  * "/functionaltests/descriptors/" and
- * "$pa.scheduler.home/samples/workflows/" folders it creates a
- * {@link TaskFlowJob} object using the {@link JobFactory_stax}. The java job is
- * then serialized to xml using the {@link Job2XMLTransformer} and then a new
- * {@link TaskFlowJob} is created. The 2 {@link TaskFlowJob} objects are then
- * compared using {@link JobComparator}.
+ * "$pa.scheduler.home/samples/workflows/" folders (except if the file descriptor
+ * contains the keyword 'invalid') it creates a {@link TaskFlowJob} object using
+ * the {@link StaxJobFactory}. The java job is then serialized to xml using the
+ * {@link Job2XMLTransformer} and then a new {@link TaskFlowJob} is created.
+ * Both {@link TaskFlowJob} objects are then compared using {@link JobComparator}.
  *
  * @author esalagea
- *
  */
 public class TestXMLTransformer extends FunctionalTest {
 
@@ -98,7 +98,7 @@ public class TestXMLTransformer extends FunctionalTest {
 
     }
 
-    @org.junit.Test
+    @Test
     public void run() throws Throwable {
 
         File folder = new File(jobDescriptorsFolder.toURI());
@@ -115,6 +115,11 @@ public class TestXMLTransformer extends FunctionalTest {
         System.out.println("Treating " + samples.size() + " job descriptors.");
 
         for (File file : samples) {
+            // skip descriptor files which are there to test invalid job description
+            if (file.getName().contains("invalid")) {
+                continue;
+            }
+
             try {
                 transformAndCompare(file);
             } catch (Exception e) {
@@ -133,7 +138,7 @@ public class TestXMLTransformer extends FunctionalTest {
     }
 
     /**
-     * This opertations are performed:
+     * The following operations are performed:
      *
      * 1. xmlFile to java => job1
      *
@@ -142,10 +147,8 @@ public class TestXMLTransformer extends FunctionalTest {
      * 3. xmlFile2 to java => job2
      *
      * 4. Compare job1 and job2
-     *
      */
     private void transformAndCompare(File xmlFile) throws Exception {
-        System.out.println("TestXMLTransformer.transformAndCompare() " + xmlFile.getAbsolutePath());
         // xml to java => job1
         TaskFlowJob job1 = (TaskFlowJob) (JobFactory.getFactory().createJob(xmlFile.getAbsolutePath()));
 

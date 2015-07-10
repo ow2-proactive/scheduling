@@ -59,7 +59,7 @@ public class SchedulerSpacesSupport {
     private final Map<String, DataSpacesFileObject> userGlobalSpaces;
 
     public SchedulerSpacesSupport() {
-        this.userGlobalSpaces = new ConcurrentHashMap<String, DataSpacesFileObject>();
+        this.userGlobalSpaces = new ConcurrentHashMap<>();
 
         // get Global Space
         try {

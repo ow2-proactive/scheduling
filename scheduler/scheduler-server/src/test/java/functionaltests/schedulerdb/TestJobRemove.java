@@ -10,7 +10,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import org.ow2.proactive.db.types.BigString;
-import org.ow2.proactive.scheduler.common.job.JobEnvironment;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
@@ -20,18 +19,16 @@ import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
-import org.ow2.proactive.scheduler.core.db.JobClasspathContent;
 import org.ow2.proactive.scheduler.core.db.JobData;
 import org.ow2.proactive.scheduler.core.db.TaskData;
 import org.ow2.proactive.scheduler.core.db.TaskResultData;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
-import org.ow2.proactive.scripting.GenerationScript;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.scripting.SimpleScript;
-import org.junit.Assert;
 import org.hibernate.Session;
 import org.hibernate.metadata.ClassMetadata;
+import org.junit.Assert;
 import org.junit.Test;
 
 
@@ -43,11 +40,11 @@ public class TestJobRemove extends BaseSchedulerDBTest {
         InternalJob job = defaultSubmitJobAndLoadInternal(false, jobDef);
 
         dbManager.updateAfterTaskFinished(job, job.getTask("javaTask-0"), new TaskResultImpl(null, "OK1",
-            null, 0, null));
+            null, 0));
         dbManager.updateAfterTaskFinished(job, job.getTask("forkedJavaTask-0"), new TaskResultImpl(null,
-            "OK2", null, 0, null));
+            "OK2", null, 0));
         dbManager.updateAfterTaskFinished(job, job.getTask("nativeTask-0"), new TaskResultImpl(null, "OK3",
-            null, 0, null));
+            null, 0));
 
         job.setStatus(JobStatus.FINISHED);
 
@@ -69,7 +66,7 @@ public class TestJobRemove extends BaseSchedulerDBTest {
         int THREAD_COUNT = 4;
         ExecutorService executorService = Executors.newCachedThreadPool();
 
-        List<InternalJob> jobs = new ArrayList<InternalJob>();
+        List<InternalJob> jobs = new ArrayList<>();
         TaskFlowJob jobDef;
         for (int i = 0; i < THREAD_COUNT; i++) {
             jobDef = createJob(2);
@@ -83,11 +80,11 @@ public class TestJobRemove extends BaseSchedulerDBTest {
                 public void run() {
                     try {
                         dbManager.updateAfterTaskFinished(job, job.getTask("javaTask-0"), new TaskResultImpl(
-                            null, "OK1", null, 0, null));
+                            null, "OK1", null, 0));
                         dbManager.updateAfterTaskFinished(job, job.getTask("forkedJavaTask-0"),
-                                new TaskResultImpl(null, "OK2", null, 0, null));
+                                new TaskResultImpl(null, "OK2", null, 0));
                         dbManager.updateAfterTaskFinished(job, job.getTask("nativeTask-0"),
-                                new TaskResultImpl(null, "OK3", null, 0, null));
+                                new TaskResultImpl(null, "OK3", null, 0));
 
                         job.setStatus(JobStatus.FINISHED);
 
@@ -165,22 +162,24 @@ public class TestJobRemove extends BaseSchedulerDBTest {
     }
 
     private TaskFlowJob createJob(int tasksNumber) throws Exception {
-        JobEnvironment env = new JobEnvironment();
-        env.setJobClasspath(new String[] { "lib/ProActive/ProActive.jar", "compile/lib/ant.jar" });
+        ForkEnvironment forkEnvironment = new ForkEnvironment();
+        forkEnvironment.addAdditionalClasspath("lib/ProActive/ProActive.jar", "compile/lib/ant.jar");
 
         TaskFlowJob jobDef = new TaskFlowJob();
-        jobDef.setEnvironment(env);
         jobDef.addGenericInformation("k1", "v1");
         jobDef.addGenericInformation("k2", "v2");
 
         // add data with non-null ifBranch
         JavaTask A = createDefaultTask("A");
+        A.setForkEnvironment(forkEnvironment);
         FlowScript ifScript = FlowScript.createIfFlowScript("branch = \"if\";", "B", "C", null);
         A.setFlowScript(ifScript);
         jobDef.addTask(A);
         JavaTask B = createDefaultTask("B");
+        B.setForkEnvironment(forkEnvironment);
         jobDef.addTask(B);
         JavaTask C = createDefaultTask("C");
+        C.setForkEnvironment(forkEnvironment);
         jobDef.addTask(C);
 
         for (int i = 0; i < tasksNumber; i++) {
@@ -199,10 +198,11 @@ public class TestJobRemove extends BaseSchedulerDBTest {
             forkEnv.addAdditionalClasspath("compile/lib/ant.jar");
             forkEnv.addJVMArgument("jvmArg1");
             forkEnv.addJVMArgument("jvmArg2");
-            forkEnv.addSystemEnvironmentVariable("e1", "v1", false);
-            forkEnv.addSystemEnvironmentVariable("e2", "v2", true);
+            forkEnv.addSystemEnvironmentVariable("e1", "v1");
+            forkEnv.addSystemEnvironmentVariable("e2", "v2");
             forkEnv.setEnvScript(new SimpleScript("env script", "javascript", new String[] { "param1",
                     "param2" }));
+
             task2.setForkEnvironment(forkEnv);
             task2.addArgument("arg1", "arg1");
             task2.addArgument("arg2", "arg2");
@@ -210,13 +210,15 @@ public class TestJobRemove extends BaseSchedulerDBTest {
 
             NativeTask task3 = new NativeTask();
             task3.setName("nativeTask-" + i);
-            task3.setGenerationScript(new GenerationScript("gen script", "javascript", new String[] {
-                    "param1", "param2" }));
             task3.setCommandLine("command1", "command2", "command3");
             setAttributes(task3);
 
             task1.addDependence(task2);
             task3.addDependence(task2);
+
+            task1.setForkEnvironment(forkEnvironment);
+            task2.setForkEnvironment(forkEnvironment);
+            task3.setForkEnvironment(forkEnvironment);
 
             jobDef.addTask(task1);
             jobDef.addTask(task2);
@@ -230,23 +232,23 @@ public class TestJobRemove extends BaseSchedulerDBTest {
         TaskFlowJob jobDef = createJob(tasksNumber);
         InternalJob job = defaultSubmitJobAndLoadInternal(false, jobDef);
 
-        Map<String, BigString> resProperties = new HashMap<String, BigString>();
+        Map<String, BigString> resProperties = new HashMap<>();
         resProperties.put("property1", new BigString("value1"));
         resProperties.put("property2", new BigString("value2"));
 
         for (int i = 0; i < tasksNumber; i++) {
             dbManager.updateAfterTaskFinished(job, job.getTask("javaTask-" + i), new TaskResultImpl(null,
-                "OK", null, 0, resProperties));
+                "OK", null, 0));
             dbManager.updateAfterTaskFinished(job, job.getTask("javaTask-" + i), new TaskResultImpl(null,
-                "OK", null, 0, resProperties));
+                "OK", null, 0));
             dbManager.updateAfterTaskFinished(job, job.getTask("forkedJavaTask-" + i), new TaskResultImpl(
-                null, "OK", null, 0, resProperties));
+                null, "OK", null, 0));
             dbManager.updateAfterTaskFinished(job, job.getTask("forkedJavaTask-" + i), new TaskResultImpl(
-                null, "OK", null, 0, resProperties));
+                null, "OK", null, 0));
             dbManager.updateAfterTaskFinished(job, job.getTask("nativeTask-" + i), new TaskResultImpl(null,
-                "OK", null, 0, resProperties));
+                "OK", null, 0));
             dbManager.updateAfterTaskFinished(job, job.getTask("nativeTask-" + i), new TaskResultImpl(null,
-                "OK", null, 0, resProperties));
+                "OK", null, 0));
         }
 
         System.out.println("Remove job");
@@ -284,8 +286,7 @@ public class TestJobRemove extends BaseSchedulerDBTest {
     }
 
     private void checkAllEntitiesDeleted(String... skipClasses) {
-        List<String> skip = new ArrayList<String>(Arrays.asList(skipClasses));
-        skip.add(JobClasspathContent.class.getName());
+        List<String> skip = new ArrayList<>(Arrays.asList(skipClasses));
 
         Session session = dbManager.getSessionFactory().openSession();
         try {

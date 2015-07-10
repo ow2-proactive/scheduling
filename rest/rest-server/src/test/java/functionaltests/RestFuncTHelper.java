@@ -107,7 +107,7 @@ public class RestFuncTHelper {
         org.ow2.proactive.rm.util.process.EnvironmentCookieBasedChildProcessKiller
                 .registerKillChildProcessesOnShutdown("rest_tests");
 
-        List<String> cmd = new ArrayList<String>();
+        List<String> cmd = new ArrayList<>();
         String javaPath = RestFuncTUtils.getJavaPathFromSystemProperties();
         cmd.add(javaPath);
         cmd.add("-Djava.security.manager");

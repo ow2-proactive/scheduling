@@ -191,7 +191,7 @@ public class TestWorkflowRecoveryInterrupted extends FunctionalTest {
         SchedulerTHelper.waitForEventJobFinished(id);
         SchedulerTHelper.log("Job finished: " + path);
 
-        expectedResults = new HashMap<String, Long>();
+        expectedResults = new HashMap<>();
         for (String aJob_2 : job_2) {
             String[] val = aJob_2.split(" ");
             expectedResults.put(val[0], Long.parseLong(val[1]));
@@ -229,7 +229,7 @@ public class TestWorkflowRecoveryInterrupted extends FunctionalTest {
         SchedulerTHelper.waitForEventJobFinished(id);
         SchedulerTHelper.log("Job finished: " + id);
 
-        Map<String, Long> expectedResults = new HashMap<String, Long>();
+        Map<String, Long> expectedResults = new HashMap<>();
         for (String aJob_1 : job_1) {
             String[] val = aJob_1.split(" ");
             expectedResults.put(val[0], Long.parseLong(val[1]));

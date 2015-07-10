@@ -79,7 +79,7 @@ public final class JMXClientHelper {
      */
     public JMXClientHelper(final Authentication auth, final Object[] creds) {
         this.auth = auth;
-        final HashMap<String, Object> environment = new HashMap<String, Object>(2); // 2 because creds + portential RO fallback    	
+        final HashMap<String, Object> environment = new HashMap<>(2); // 2 because creds + portential RO fallback
         environment.put(JMXConnector.CREDENTIALS, creds);
         this.env = environment;
     }

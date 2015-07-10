@@ -36,31 +36,30 @@
  */
 package functionaltests.schemas;
 
+import functionaltests.SchedulerConsecutive;
+import functionaltests.SchedulerTHelper;
+import org.apache.commons.io.FileUtils;
+import org.junit.Test;
+import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
+import org.ow2.proactive.scheduler.common.job.Job;
+import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
+
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.URL;
 
-import org.apache.commons.io.FileUtils;
-import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
-import org.ow2.proactive.scheduler.common.job.Job;
-import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
-
-import functionaltests.SchedulerConsecutive;
-import functionaltests.SchedulerTHelper;
-
 
 /**
- * This class tests a job submission to the scheduler, but with job descriptors of older scheduling releases
- *
- * The jobs are created to cover the most features as possible, somehow to check backward compability of features from
+ * This class tests a job submission to the scheduler, but with job descriptors of older scheduling releases.
+ * <p>
+ * The jobs are created to cover the most features as possible, somehow to check backward compatibility of features from
  * older schema versions.
- *
- * If this test breaks, there are two possible scenarios :
+ * <p>
+ * If this test breaks, there are two possible scenarios:
  * - enforce backward compatibility by supporting both the old and the new behavior
- * - declares the
+ * - declares the version of the schema that should be supported
  *
- * 
  * @author The ProActive Team
  * @since ProActive Scheduling 3.4.0
  */
@@ -74,11 +73,11 @@ public class TestJobLegacySchemas extends SchedulerConsecutive {
     {
         for (int i = 0; i < jobDescriptorsLoc.length; i++) {
             jobDescriptors[i] = TestJobLegacySchemas.class.getResource("/functionaltests/schemas/" +
-                jobDescriptorsLoc[i]);
+                    jobDescriptorsLoc[i]);
         }
     }
 
-    @org.junit.Test
+    @Test
     public void run() throws Throwable {
         for (URL jobDescriptor : jobDescriptors) {
             logger.info("Testing submission of job descriptor : " + jobDescriptor);
@@ -93,7 +92,7 @@ public class TestJobLegacySchemas extends SchedulerConsecutive {
 
     private void prepareDataspaceFolder() throws IOException {
         File ds = new File(PAResourceManagerProperties.RM_HOME.getValueAsString(),
-            "/scheduler/scheduler-server/build/JobLegacySchemas_dataspace");
+                "/scheduler/scheduler-server/build/JobLegacySchemas_dataspace");
 
         if (ds.exists()) {
             File[] filesToDelete = ds.listFiles(new FilenameFilter() {
@@ -109,4 +108,5 @@ public class TestJobLegacySchemas extends SchedulerConsecutive {
             FileUtils.forceMkdir(ds);
         }
     }
+
 }

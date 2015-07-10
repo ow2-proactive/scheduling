@@ -51,58 +51,58 @@ import org.codehaus.jackson.map.ObjectMapper;
 
 public interface ApplicationContext {
 
-    public void setDevice(AbstractDevice device);
+    void setDevice(AbstractDevice device);
 
-    public AbstractDevice getDevice();
+    AbstractDevice getDevice();
 
-    public void setRestServerUrl(String restServerUrl);
+    void setRestServerUrl(String restServerUrl);
 
-    public String getRestServerUrl();
+    String getRestServerUrl();
 
-    public String getResourceUrl(String resource);
+    String getResourceUrl(String resource);
 
-    public void setObjectMapper(ObjectMapper mapper);
+    void setObjectMapper(ObjectMapper mapper);
 
-    public ObjectMapper getObjectMapper();
+    ObjectMapper getObjectMapper();
 
-    public String getSessionId();
+    String getSessionId();
 
-    public void setSessionId(String sessionId);
+    void setSessionId(String sessionId);
 
-    public boolean canInsecureAccess();
+    boolean canInsecureAccess();
 
-    public void setInsecureAccess(boolean allow);
+    void setInsecureAccess(boolean allow);
 
-    public ScriptEngine getEngine();
+    ScriptEngine getEngine();
 
-    public void setResourceType(String resourceType);
+    void setResourceType(String resourceType);
 
-    public String getResourceType();
+    String getResourceType();
 
-    public Map<String, PluginView> getInfrastructures();
+    Map<String, PluginView> getInfrastructures();
 
-    public void setInfrastructures(Map<String, PluginView> infrastructures);
+    void setInfrastructures(Map<String, PluginView> infrastructures);
 
-    public Map<String, PluginView> getPolicies();
+    Map<String, PluginView> getPolicies();
 
-    public void setPolicies(Map<String, PluginView> policies);
+    void setPolicies(Map<String, PluginView> policies);
 
-    public void setProperty(String key, Object value);
+    void setProperty(String key, Object value);
 
-    public <T> T getProperty(String key, Class<T> type);
+    <T> T getProperty(String key, Class<T> type);
 
-    public <T> T getProperty(String key, Class<T> type, T dflt);
+    <T> T getProperty(String key, Class<T> type, T dflt);
 
-    public boolean isForced();
+    boolean isForced();
 
-    public void setForced(boolean forced);
+    void setForced(boolean forced);
 
-    public boolean isSilent();
+    boolean isSilent();
 
-    public void setSilent(boolean silent);
+    void setSilent(boolean silent);
 
     @SuppressWarnings("rawtypes")
-    public Stack resultStack();
+    Stack resultStack();
 
     SchedulerRestClient getRestClient();
 }

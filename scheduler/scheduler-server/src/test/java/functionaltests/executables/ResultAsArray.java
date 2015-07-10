@@ -52,7 +52,7 @@ public class ResultAsArray extends JavaExecutable {
 
     @Override
     public Serializable execute(TaskResult... results) throws Throwable {
-        final ArrayList<RenderedBucket> renderedBucketList = new ArrayList<RenderedBucket>(size);
+        final ArrayList<RenderedBucket> renderedBucketList = new ArrayList<>(size);
         for (int i = 0; i < size; i++) {
             float[] tab = new float[3 * 32 * 32]; // 3072 color component test
             Arrays.fill(tab, (float) Math.random());

@@ -36,33 +36,22 @@
  */
 package org.ow2.proactive.scheduler.task;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.Serializable;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Map;
 
-import javax.swing.JPanel;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlTransient;
 
-import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.converter.ByteToObjectConverter;
 import org.objectweb.proactive.core.util.converter.ObjectToByteConverter;
-import org.ow2.proactive.db.types.BigString;
 import org.ow2.proactive.scheduler.common.exception.InternalSchedulerException;
-import org.ow2.proactive.scheduler.common.task.ResultPreview;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
-import org.ow2.proactive.scheduler.common.task.util.ResultPreviewTool.SimpleTextPanel;
-import org.ow2.proactive.utils.Formatter;
+import org.apache.log4j.Logger;
 
 
 /**
@@ -97,20 +86,11 @@ public class TaskResultImpl implements TaskResult {
     /** Description definition of this result */
     private String previewerClassName = null;
 
-    /** An instance that describe how to display the result of this task. */
-    private transient ResultPreview descriptor = null;
-
-    // this classpath is used on client side to instantiate the previewer (can be null)
-    private String[] jobClasspath;
-
     /** result of the FlowScript if there was one, or null */
     private FlowAction flowAction = null;
 
     //Managed by taskInfo, this field is here only to bring taskDuration to core AO
     private long taskDuration = -1;
-
-    /** All the properties propagated through Exporter.propagateProperty() */
-    private Map<String, BigString> propagatedProperties;
 
     /**
      * A map which contains the propagated variables of the previous (dependent)
@@ -119,22 +99,15 @@ public class TaskResultImpl implements TaskResult {
     private Map<String, byte[]> propagatedVariables;
 
     public TaskResultImpl(TaskId id, byte[] serializedValue, byte[] serializedException, TaskLogs output,
-            Map<String, String> propergatedProperties, Map<String, byte[]> propagatedVariables) {
-        this(id, serializedValue, serializedException, output, propergatedProperties);
+            Map<String, byte[]> propagatedVariables) {
+        this(id, serializedValue, serializedException, output);
         this.propagatedVariables = propagatedVariables;
     }
 
-    public TaskResultImpl(TaskId id, byte[] serializedValue, byte[] serializedException, TaskLogs output,
-            Map<String, String> propagatedProperties) {
+    public TaskResultImpl(TaskId id, byte[] serializedValue, byte[] serializedException, TaskLogs output) {
         this(id, output);
         this.serializedValue = serializedValue;
         this.serializedException = serializedException;
-        if (propagatedProperties != null) {
-            this.propagatedProperties = new HashMap<String, BigString>(propagatedProperties.size());
-            for (Map.Entry<String, String> prop : propagatedProperties.entrySet()) {
-                this.propagatedProperties.put(prop.getKey(), new BigString(prop.getValue()));
-            }
-        }
         this.output = output;
     }
 
@@ -143,6 +116,10 @@ public class TaskResultImpl implements TaskResult {
         this.output = output;
     }
 
+    public TaskResultImpl(TaskId id, Throwable exception) {
+        this(id, exception, null, 0);
+    }
+
     /**
      * Return a new instance of task result represented by a task id, its result and its output.
      *
@@ -150,40 +127,11 @@ public class TaskResultImpl implements TaskResult {
      * @param value the result of the task.
      * @param output the output of the task.
      * @param execDuration the execution duration of the task itself
-     * @throws IOException
      */
     public TaskResultImpl(TaskId id, Serializable value, TaskLogs output, long execDuration) {
-        this(id, value, output, execDuration, null);
-    }
-
-    /**
-     * Return a new instance of task result represented by a task id and its exception.
-     *
-     * @param id the identification of the task that send this result.
-     * @param exception the exception that occurred in the task.
-     * @param output the output of the task.
-     * @param execDuration the execution duration of the task itself
-     */
-    public TaskResultImpl(TaskId id, Throwable exception, TaskLogs output, long execDuration) {
-        this(id, exception, output, execDuration, null);
-    }
-
-    /**
-     * Return a new instance of task result represented by a task id, its result and its output.
-     *
-     * @param id the identification of the task that send this result.
-     * @param value the result of the task.
-     * @param output the output of the task.
-     * @param execDuration the execution duration of the task itself
-     * @param propagatedProperties the map of all properties that has been propagated through Exporter.propagateProperty
-     * @throws IOException
-     */
-    public TaskResultImpl(TaskId id, Serializable value, TaskLogs output, long execDuration,
-            Map<String, BigString> propagatedProperties) {
         this(id, output);
         this.taskDuration = execDuration;
         this.value = value;
-        this.propagatedProperties = propagatedProperties;
         try {
             //try to serialize user result
             this.serializedValue = ObjectToByteConverter.ObjectStream.convert(value);
@@ -216,14 +164,11 @@ public class TaskResultImpl implements TaskResult {
      * @param exception the exception that occurred in the task.
      * @param output the output of the task.
      * @param execDuration the execution duration of the task itself
-     * @param propagatedProperties the map of all properties that has been propagated through Exporter.propagateProperty
      */
-    public TaskResultImpl(TaskId id, Throwable exception, TaskLogs output, long execDuration,
-            Map<String, BigString> propagatedProperties) {
+    public TaskResultImpl(TaskId id, Throwable exception, TaskLogs output, long execDuration) {
         this(id, output);
         this.taskDuration = execDuration;
         this.exception = exception;
-        this.propagatedProperties = propagatedProperties;
         this.serializedException = computeSerializedException(exception);
     }
 
@@ -252,7 +197,7 @@ public class TaskResultImpl implements TaskResult {
      * If a FlowScript was executed on this task, its result
      * is stored so that the action can be performed later when
      * processed by the core.
-     * 
+     *
      * return the Action to perform for this task
      */
     public FlowAction getAction() {
@@ -263,7 +208,7 @@ public class TaskResultImpl implements TaskResult {
      * If a FlowScript was executed on this task, its result
      * is stored so that the action can be performed later when
      * processed by the core.
-     * 
+     *
      * @param act an Control Flow action to embed in this TaskResult
      */
     public void setAction(FlowAction act) {
@@ -275,13 +220,6 @@ public class TaskResultImpl implements TaskResult {
      */
     public void setLogs(TaskLogs l) {
         this.output = l;
-    }
-
-    /**
-     * @param props the map of all properties that has been propagated through Exporter.propagateProperty
-     */
-    public void setPropagatedProperties(Map<String, BigString> props) {
-        this.propagatedProperties = props;
     }
 
     /**
@@ -367,103 +305,14 @@ public class TaskResultImpl implements TaskResult {
     }
 
     /**
-     * Set the classpath of the job that contained the corresponding task.
-     *
-     * @param jcp the classpath of the job
-     */
-    public void setJobClasspath(String[] jcp) {
-        this.jobClasspath = jcp;
-    }
-
-    /**
-     * @see org.ow2.proactive.scheduler.common.task.TaskResult#getGraphicalDescription()
-     */
-    @XmlTransient
-    public JPanel getGraphicalDescription() {
-        boolean instanciation = false;
-        try {
-            instanciation = this.instanciateDescriptor();
-        } catch (ClassNotFoundException e) {
-            return new SimpleTextPanel(
-                "[ERROR] Previewer classes cannot be found. Cannot create graphical previewer: " +
-                    System.getProperty("line.separator") + e);
-        } catch (Exception e) {
-            return new SimpleTextPanel("[ERROR] Cannot create graphical previewer: " +
-                System.getProperty("line.separator") + e);
-        }
-        if (instanciation) {
-            JPanel ret = this.descriptor.getGraphicalDescription(this);
-            return ret != null ? ret : new SimpleTextPanel(
-                "[ERROR] Graphical preview returned by previewer " + this.descriptor.getClass().getName() +
-                    " is null");
-        } else {
-            return new SimpleTextPanel(this.getTextualDescription());
-        }
-    }
-
-    /**
-     * @see org.ow2.proactive.scheduler.common.task.TaskResult#getTextualDescription()
-     */
-    public String getTextualDescription() {
-        boolean instanciation = false;
-        try {
-            instanciation = this.instanciateDescriptor();
-        } catch (ClassNotFoundException e) {
-            return "[ERROR] Previewer classes cannot be found. Cannot create textual previewer: " +
-                System.getProperty("line.separator") + e;
-        } catch (Exception e) {
-            return "[ERROR] Cannot create textual previewer: " + System.getProperty("line.separator") + e;
-        }
-        if (instanciation) {
-            String ret = this.descriptor.getTextualDescription(this);
-            return ret != null ? ret : "[ERROR] Textual preview returned by previewer " +
-                this.descriptor.getClass().getName() + " is null";
-        } else if (!this.hadException()) {
-            return "[DEFAULT DESCRIPTION] " + value;
-        } else {
-            // yes, Guillaume, I know...
-            return "[DEFAULT DESCRIPTION] " + Formatter.stackTraceToString(exception);
-        }
-    }
-
-    /**
-     * Create the descriptor instance if descriptor class is available.
-     * This descriptor is instanciated in a dedicated URLClassloader build on
-     * the job classpath.
-     * @return true if the creation occurs, false otherwise
-     */
-    private boolean instanciateDescriptor() throws InstantiationException, IllegalAccessException,
-            IOException, ClassNotFoundException {
-        if (this.descriptor == null) {
-            ClassLoader cl = this.getTaskClassLoader();
-            boolean isInstanciated = false;
-            // if a specific previewer is defined, instanciate it
-            if (this.previewerClassName != null) {
-                Class<?> previewClass = Class.forName(this.previewerClassName, true, cl);
-                this.descriptor = (ResultPreview) (previewClass.newInstance());
-                isInstanciated = true;
-            }
-            // in any case, instanciate value and exception
-            if (this.serializedException != null) {
-                this.exception = this.instanciateException(cl);
-            } else {
-                this.value = this.instanciateValue(cl);
-            }
-            return isInstanciated;
-        } else {
-            return true;
-        }
-    }
-
-    /**
      * Instanciate thrown exception if any from the serialized version.
      * This instanciation must not be performed in a dedicated classloader to
      * avoid ClassCastException with the user's code.
      * @param cl the classloader where to instanciate the object. Can be null : object is instanciated 
      * in the default caller classloader. 
      * @return the exception that has been thrown if any.
-     * @throws ClassNotFoundException 
-     * @throws IOException 
+     * @throws ClassNotFoundException
+     * @throws IOException
      */
     private Throwable instanciateException(ClassLoader cl) throws IOException, ClassNotFoundException {
         if (this.serializedException != null && this.exception == null) {
@@ -480,8 +329,8 @@ public class TaskResultImpl implements TaskResult {
      * @param cl the classloader where to instanciate the object. Can be null : object is instanciated 
      * in the default caller classloader. 
      * @return the value if no exception has been thown.
-     * @throws ClassNotFoundException 
-     * @throws IOException 
+     * @throws ClassNotFoundException
+     * @throws IOException
      */
     private Serializable instanciateValue(ClassLoader cl) throws IOException, ClassNotFoundException {
         if (this.serializedValue != null && this.value == null) {
@@ -491,28 +340,16 @@ public class TaskResultImpl implements TaskResult {
     }
 
     /**
-     * Return the classloader for the given jobclasspath if any.
-     * @return on worker node, the taskClassLoader. On client side, an URL classloader created from the jobclasspath,
-     * or the ClassLoader that has loaded the current class if no jobclasspath is set.
+     * Return the classloader to use for tasks.
+     * @return on worker node, the taskClassLoader. On client side, the ClassLoader that has loaded the current class.
      * @throws IOException if the classloader cannot be created.
      */
     private ClassLoader getTaskClassLoader() throws IOException {
         ClassLoader currentCCL = Thread.currentThread().getContextClassLoader();
-        // Check if this code is running on the scheduler node side
         if (currentCCL instanceof TaskClassLoader) {
             return currentCCL;
         } else {
-            ClassLoader thisClassLoader = this.getClass().getClassLoader();
-            if (this.jobClasspath != null) {
-                //we are not on a worker and jcp is set...
-                URL[] urls = new URL[this.jobClasspath.length];
-                for (int i = 0; i < this.jobClasspath.length; i++) {
-                    urls[i] = new File(this.jobClasspath[i]).toURI().toURL();
-                }
-                return new URLClassLoader(urls, thisClassLoader);
-            } else {
-                return thisClassLoader;
-            }
+            return this.getClass().getClassLoader();
         }
     }
 
@@ -551,17 +388,8 @@ public class TaskResultImpl implements TaskResult {
     }
 
     /**
-     * Get the jobClasspath.
-     *
-     * @return the jobClasspath.
-     */
-    public String[] getJobClasspath() {
-        return jobClasspath;
-    }
-
-    /**
      * Get the real task duration. This duration is the CPU time usage of the associated executable.
-     * 
+     *
      * @return the real task duration.
      */
     public long getTaskDuration() {
@@ -585,25 +413,8 @@ public class TaskResultImpl implements TaskResult {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    public Map<String, String> getPropagatedProperties() {
-        // null if no prop has been propagated
-        if (this.propagatedProperties == null) {
-            return null;
-        } else {
-            Map<String, String> convertedProperties = new Hashtable<String, String>(this.propagatedProperties
-                    .size());
-            for (String k : this.propagatedProperties.keySet()) {
-                convertedProperties.put(k, this.propagatedProperties.get(k).getValue());
-            }
-            return convertedProperties;
-        }
-    }
-
-    /**
      * Sets the propagated variables.
-     * 
+     *
      * @param propagatedVariables a map of propagated variables
      */
     public void setPropagatedVariables(Map<String, byte[]> propagatedVariables) {

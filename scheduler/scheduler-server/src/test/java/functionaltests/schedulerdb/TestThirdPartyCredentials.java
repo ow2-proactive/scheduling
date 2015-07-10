@@ -35,14 +35,14 @@ public class TestThirdPartyCredentials extends BaseSchedulerDBTest {
         assertArrayEquals("superpassword_2".getBytes(), dbManager.thirdPartyCredentialsMap("existing_user")
                 .get("existing_key_2").getEncryptedData());
 
-        assertEquals(new HashSet<String>(Arrays.asList("existing_key", "existing_key_2")), dbManager
+        assertEquals(new HashSet<>(Arrays.asList("existing_key", "existing_key_2")), dbManager
                 .thirdPartyCredentialsKeySet("existing_user"));
         assertEquals(Collections.<String> emptySet(), dbManager
                 .thirdPartyCredentialsKeySet("non_existing_user"));
 
         dbManager.removeThirdPartyCredential("existing_user", "non_existing_key");
         dbManager.removeThirdPartyCredential("non_existing_user", "non_existing_key");
-        assertEquals(new HashSet<String>(Arrays.asList("existing_key", "existing_key_2")), dbManager
+        assertEquals(new HashSet<>(Arrays.asList("existing_key", "existing_key_2")), dbManager
                 .thirdPartyCredentialsKeySet("existing_user"));
 
         dbManager.removeThirdPartyCredential("existing_user", "existing_key");

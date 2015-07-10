@@ -151,8 +151,7 @@ public class TestJobWalltime extends FunctionalTest {
         task1.setWallTime(5000);
 
         if (OperatingSystem.getOperatingSystem() == OperatingSystem.windows) {
-            task1.setCommandLine("$JAVA_HOME\\..\\bin\\jrunscript.exe", "-e",
-                    "java.lang.Thread.sleep(300000)");
+            task1.setCommandLine("ping", "127.0.0.1", "-n", "10000");
             // task1.setCommandLine("timeout", "10000"); // if we launch it on windows it give an error that redirection is not supported
         } else {
             task1.setCommandLine("sleep", "10000");
@@ -196,7 +195,7 @@ public class TestJobWalltime extends FunctionalTest {
 
         // Make sure that the task has been properly killed
 
-        RMTHelper rm = RMTHelper.getDefaultInstance();
+        RMTHelper rm = RMTHelper.getDefaultInstance(SchedulerTHelper.PNP_PORT);
 
         List<Node> nodes = rm.listAliveNodes();
         // We wait until no active object remain on the nodes.

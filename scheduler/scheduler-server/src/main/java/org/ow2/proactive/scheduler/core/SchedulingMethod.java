@@ -47,6 +47,6 @@ public interface SchedulingMethod {
     /**
      * Scheduling process.
      */
-    public int schedule();
+    int schedule();
 
 }

@@ -10,12 +10,12 @@ import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
+import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
 import static functionaltests.SchedulerTHelper.submitJob;
-import static functionaltests.SchedulerTHelper.waitForEventJobFinished;
 import static functionaltests.SchedulerTHelper.waitForEventTaskFinished;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.ow2.proactive.scheduler.common.task.TaskStatus.FAULTY;
 import static org.ow2.proactive.scheduler.common.task.TaskStatus.FINISHED;
 
@@ -28,12 +28,10 @@ public class TestUnstableCronTask extends CronCheckBase {
 
     private static final String tmpFile = "unstable-executable.tmp";
 
-    @Override
     public void setUp() throws Exception {
-        super.setUp();
         File file = new File(System.getProperty("java.io.tmpdir"), tmpFile);
         if (file.exists()) {
-            file.delete();
+            FileUtils.forceDelete(file);
         }
     }
 
@@ -50,7 +48,6 @@ public class TestUnstableCronTask extends CronCheckBase {
         TaskInfo taskInfo2 = waitForEventTaskFinished(jobId, "UnstableCronTask#1", task_timeout);
         assertEquals(FAULTY, taskInfo2.getStatus());
 
-        waitForEventJobFinished(jobId, job_timeout);
     }
 
     private Job createUnstableCronTaskJob() throws Exception {
@@ -71,7 +68,7 @@ public class TestUnstableCronTask extends CronCheckBase {
         public Serializable execute(TaskResult... results) throws Throwable {
             File file = new File(System.getProperty("java.io.tmpdir"), tmpFile);
             if (file.exists()) {
-                file.delete();
+                FileUtils.forceDelete(file);
                 throw new Exception("Unstable task exeception.");
             }
             file.createNewFile();

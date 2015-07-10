@@ -9,8 +9,6 @@ import org.ow2.proactive.scheduler.core.rmproxies.RMProxiesManager;
 
 public interface SchedulingInfrastructure {
 
-    SchedulerClassServers getTaskClassServer();
-
     RMProxiesManager getRMProxiesManager();
 
     SchedulerDBManager getDBManager();

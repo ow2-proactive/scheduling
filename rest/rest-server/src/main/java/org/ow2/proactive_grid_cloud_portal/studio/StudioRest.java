@@ -251,7 +251,7 @@ public class StudioRest implements StudioInterface {
         String userName = getUserName(sessionId);
         File classesDir = new File(getFileStorageSupport().getWorkflowsDir(userName), "classes");
 
-        ArrayList<String> classes = new ArrayList<String>();
+        ArrayList<String> classes = new ArrayList<>();
         if (classesDir.exists()) {
             File[] jars = classesDir.listFiles(new FilenameFilter() {
                 public boolean accept(File dir, String name) {

@@ -36,6 +36,7 @@
  */
 package functionaltests;
 
+import java.io.File;
 import java.io.Serializable;
 
 import org.objectweb.proactive.api.PAActiveObject;
@@ -94,7 +95,8 @@ public class TestTaskRestartOnNodeFailure extends FunctionalTest {
 
         System.out.println("Start scheduler");
         String rmUrl = rmHelper.getLocalUrl();
-        SchedulerTHelper.startScheduler(false, null, null, rmUrl);
+        SchedulerTHelper.startScheduler(false, new File(SchedulerTHelper.class.getResource(
+          "config/scheduler-nonforkedscripttasks.ini").toURI()).getAbsolutePath(), null, rmUrl);
 
         ProActiveLock communicationObject = PAActiveObject.newActive(ProActiveLock.class, new Object[] {});
 

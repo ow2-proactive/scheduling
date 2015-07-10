@@ -46,7 +46,7 @@ import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
-import org.ow2.proactive.scheduler.common.job.factories.JobFactory_stax;
+import org.ow2.proactive.scheduler.common.job.factories.StaxJobFactory;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
@@ -56,7 +56,7 @@ import org.junit.Assert;
 /**
  * Test whether attribute reservation of several nodes for a native task
  * book correctly number a needed node (attribute coresNumber in nativeExecutable in a job SML descriptor)
- * Test whther PAS_NODEFILE and PAS_CORE_NB environment variables are correctly set
+ * Test whther PA_NODEFILE and PA_CORE_NB environment variables are correctly set
  *
  * @author The ProActive Team
  */
@@ -99,11 +99,8 @@ public class TestMultipleHostsRequest extends SchedulerConsecutive {
                 throw new IllegalStateException("Unsupported operating system");
         }
 
-        //set system Property for executable path
-        //System.setProperty(executablePathPropertyName, new File(executablePath.toURI()).getAbsolutePath());
-
         //test submission and event reception
-        TaskFlowJob job = (TaskFlowJob) JobFactory_stax.getFactory().createJob(
+        TaskFlowJob job = (TaskFlowJob) StaxJobFactory.getFactory().createJob(
                 new File(jobDescriptor.toURI()).getAbsolutePath());
 
         //must add /bin/sh at beginning of task1 command line on Linux OS in runAsMe mode
@@ -122,7 +119,7 @@ public class TestMultipleHostsRequest extends SchedulerConsecutive {
         }
 
         JobId id = SchedulerTHelper.submitJob(job);
-        RMTHelper rmHelper = RMTHelper.getDefaultInstance();
+        RMTHelper rmHelper = RMTHelper.getDefaultInstance(SchedulerTHelper.PNP_PORT);
         rmHelper.createNodeSource("extra", 3);
 
         SchedulerTHelper.log("Job submitted, id " + id.toString());

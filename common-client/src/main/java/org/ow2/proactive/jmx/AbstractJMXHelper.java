@@ -244,7 +244,7 @@ public abstract class AbstractJMXHelper {
                 jmxConnectorServerURL, e);
             return false;
         }
-        final HashMap<String, Object> env = new HashMap<String, Object>(1);
+        final HashMap<String, Object> env = new HashMap<>(1);
         env.put(JMXConnectorServer.AUTHENTICATOR, authenticator);
         // Create the connector server
         try {
@@ -279,7 +279,7 @@ public abstract class AbstractJMXHelper {
                 jmxConnectorServerURL, e);
             return false;
         }
-        final HashMap<String, Object> env = new HashMap<String, Object>(2);
+        final HashMap<String, Object> env = new HashMap<>(2);
         env.put(JMXConnectorServer.AUTHENTICATOR, authenticator);
         env.put(JMXConnectorServerFactory.PROTOCOL_PROVIDER_PACKAGES, JMXProviderUtils.RO_PROVIDER_PKGS);
         // Create the connector server

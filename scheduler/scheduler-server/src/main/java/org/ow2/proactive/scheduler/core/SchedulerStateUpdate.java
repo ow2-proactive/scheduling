@@ -57,14 +57,14 @@ public interface SchedulerStateUpdate {
      *
      * @param eventType the type of the event received.
      */
-    public void schedulerStateUpdated(SchedulerEvent eventType);
+    void schedulerStateUpdated(SchedulerEvent eventType);
 
     /**
      * Invoked each time a new job has been submitted to the Scheduler and validated.
      *
      * @param job the newly submitted job.
      */
-    public void jobSubmitted(JobState job);
+    void jobSubmitted(JobState job);
 
     /**
      * Invoked each time the state of a job has changed.<br>
@@ -73,7 +73,7 @@ public interface SchedulerStateUpdate {
      * @param owner the owner of this job
      * @param notification the data composed of the type of the event and the information that have change in the job.
      */
-    public void jobStateUpdated(String owner, NotificationData<JobInfo> notification);
+    void jobStateUpdated(String owner, NotificationData<JobInfo> notification);
 
     /**
      * Invoked each time the state of a task has changed.
@@ -82,13 +82,13 @@ public interface SchedulerStateUpdate {
      * @param owner the owner of this task
      * @param notification the data composed of the type of the event and the information that have change in the task.
      */
-    public void taskStateUpdated(String owner, NotificationData<TaskInfo> notification);
+    void taskStateUpdated(String owner, NotificationData<TaskInfo> notification);
 
     /**
      * Invoked each time something change about users.
      *
      * @param notification the data composed of the type of the event and the data linked to the change.
      */
-    public void usersUpdated(NotificationData<UserIdentification> notification);
+    void usersUpdated(NotificationData<UserIdentification> notification);
 
 }

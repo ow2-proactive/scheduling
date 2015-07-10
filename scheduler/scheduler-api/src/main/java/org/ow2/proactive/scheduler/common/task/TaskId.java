@@ -57,14 +57,14 @@ public interface TaskId extends Comparable<TaskId>, Serializable {
      *
      * @return the jobId.
      */
-    public JobId getJobId();
+    JobId getJobId();
 
     /**
      * Return the human readable name associated to this id.
      *
      * @return the human readable name associated to this id.
      */
-    public String getReadableName();
+    String getReadableName();
 
     /**
      * Get the value of the TaskId.<br />
@@ -74,7 +74,7 @@ public interface TaskId extends Comparable<TaskId>, Serializable {
      *
      * @return the textual representation of this TaskId
      */
-    public String value();
+    String value();
 
     /**
      * When Control Flow actions are performed on Tasks, some tasks are replicated. 
@@ -85,7 +85,7 @@ public interface TaskId extends Comparable<TaskId>, Serializable {
      * 
      * @return the iteration number of this task if it was replicated by a IF flow operation (>= 0)
      */
-    public int getIterationIndex();
+    int getIterationIndex();
 
     /**
      * When Control Flow actions are performed on Tasks, some tasks are replicated. 
@@ -96,11 +96,11 @@ public interface TaskId extends Comparable<TaskId>, Serializable {
      * 
      * @return the iteration number of this task if it was replicated by a IF flow operation (>= 0)
      */
-    public int getReplicationIndex();
+    int getReplicationIndex();
 
     /** string separator in the task name for indicating the replication index */
-    public final static String replicationSeparator = "*";
+    String replicationSeparator = "*";
 
     /** string separator in the task name for indicating the iteration index */
-    public final static String iterationSeparator = "#";
+    String iterationSeparator = "#";
 }

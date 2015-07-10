@@ -36,9 +36,11 @@
  */
 package org.ow2.proactive.scheduler.job;
 
+import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,30 +54,29 @@ import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.job.factories.FlowChecker;
 import org.ow2.proactive.scheduler.common.job.factories.FlowError;
 import org.ow2.proactive.scheduler.common.task.CommonAttribute;
+import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.common.task.ScriptTask;
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
-import org.ow2.proactive.scheduler.task.forked.ForkedJavaExecutableContainer;
-import org.ow2.proactive.scheduler.task.script.ForkedScriptExecutableContainer;
-import org.ow2.proactive.scheduler.task.java.JavaExecutableContainer;
-import org.ow2.proactive.scheduler.task.nativ.NativeExecutableContainer;
-import org.ow2.proactive.scheduler.task.script.ScriptExecutableContainer;
-import org.ow2.proactive.scheduler.task.internal.InternalForkedJavaTask;
+import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
 import org.ow2.proactive.scheduler.task.internal.InternalForkedScriptTask;
-import org.ow2.proactive.scheduler.task.internal.InternalJavaTask;
-import org.ow2.proactive.scheduler.task.internal.InternalNativeTask;
 import org.ow2.proactive.scheduler.task.internal.InternalScriptTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
+import org.ow2.proactive.scheduler.task.java.JavaClassScriptEngineFactory;
+import org.ow2.proactive.scripting.InvalidScriptException;
+import org.ow2.proactive.scripting.SimpleScript;
+import org.ow2.proactive.scripting.TaskScript;
+import com.google.common.base.Joiner;
 import org.apache.log4j.Logger;
 
 
 /**
  * This is the factory to build Internal job with a job (user).
  * For the moment it performs a simple copy from userJob to InternalJob
- * and recreate the dependences if needed.
+ * and recreate the dependencies if needed.
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
@@ -122,7 +123,7 @@ public class InternalJobFactory {
     /**
      * Create an internalTaskFlow job with the given task flow job (user)
      *
-     * @param job the user job that will be used to create the internal job.
+     * @param userJob the user job that will be used to create the internal job.
      * @return the created internal job.
      * @throws JobCreationException an exception if the factory cannot create the given job.
      */
@@ -139,7 +140,7 @@ public class InternalJobFactory {
         }
 
         // validate taskflow
-        List<FlowChecker.Block> blocks = new ArrayList<FlowChecker.Block>();
+        List<FlowChecker.Block> blocks = new ArrayList<>();
         FlowError err = FlowChecker.validate(userJob, blocks);
         if (err != null) {
             String e = "";
@@ -150,7 +151,7 @@ public class InternalJobFactory {
         }
 
         InternalJob job = new InternalTaskFlowJob();
-        Map<Task, InternalTask> tasksList = new LinkedHashMap<Task, InternalTask>();
+        Map<Task, InternalTask> tasksList = new LinkedHashMap<>();
         boolean hasPreciousResult = false;
 
         for (Task t : userJob.getTasks()) {
@@ -192,7 +193,7 @@ public class InternalJobFactory {
                 String ifBranch = it.getFlowScript().getActionTarget();
                 String elseBranch = it.getFlowScript().getActionTargetElse();
                 String join = it.getFlowScript().getActionContinuation();
-                List<InternalTask> joinedBranches = new ArrayList<InternalTask>();
+                List<InternalTask> joinedBranches = new ArrayList<>();
 
                 // find the ifBranch task
                 for (InternalTask it2 : tasksList.values()) {
@@ -249,18 +250,18 @@ public class InternalJobFactory {
     }
 
     private static InternalTask createTask(Job userJob, Task task) throws JobCreationException {
-        //dispatch task creation
+        // TODO: avoid branching with double dispatch
         if (task instanceof NativeTask) {
             return createTask(userJob, (NativeTask) task);
         } else if (task instanceof JavaTask) {
             return createTask(userJob, (JavaTask) task);
         } else if (task instanceof ScriptTask) {
             return createTask(userJob, (ScriptTask) task);
-        } else {
-            String msg = "The task you intend to add is unknown ! (type : " + task.getClass().getName() + ")";
-            logger.info(msg);
-            throw new JobCreationException(msg);
         }
+
+        String msg = "Unknown task type: " + task.getClass().getName();
+        logger.info(msg);
+        throw new JobCreationException(msg);
     }
 
     /**
@@ -272,32 +273,29 @@ public class InternalJobFactory {
      */
     @SuppressWarnings("unchecked")
     private static InternalTask createTask(Job userJob, JavaTask task) throws JobCreationException {
-        InternalJavaTask javaTask;
+        InternalTask javaTask;
 
         if (task.getExecutableClassName() != null) {
-            // HACK HACK HACK : Get arguments for the task
-            Map<String, byte[]> args;
-            try {
-                Field f = JavaTask.class.getDeclaredField(JavaTask.ARGS_FIELD_NAME);
-                f.setAccessible(true);
-                args = (Map<String, byte[]>) f.get(task);
-            } catch (Exception e) {
-                // should not happen...
-                logger.fatal("Internal error : cannot retreive arguments for task " + task.getName(), e);
-                throw new Error("Internal error : implementation must be revised.", e);
-            }
+            HashMap<String, byte[]> args = task.getSerializedArguments();
 
-            if (task.isFork()) {
-                ForkedJavaExecutableContainer fjec = new ForkedJavaExecutableContainer(task
-                        .getExecutableClassName(), args);
-                fjec.setForkEnvironment(task.getForkEnvironment());
-                javaTask = new InternalForkedJavaTask(fjec);
-            } else {
-                javaTask = new InternalJavaTask(new JavaExecutableContainer(task.getExecutableClassName(),
-                    args));
+            try {
+                if (isForkingTask()) {
+                    javaTask = new InternalForkedScriptTask(new ScriptExecutableContainer(
+                        new TaskScript(new SimpleScript(task.getExecutableClassName(),
+                            JavaClassScriptEngineFactory.JAVA_CLASS_SCRIPT_ENGINE_NAME,
+                            new Serializable[] { args }))));
+                    javaTask.setForkEnvironment(task.getForkEnvironment());
+                } else {
+                    javaTask = new InternalScriptTask(new ScriptExecutableContainer(new TaskScript(
+                        new SimpleScript(task.getExecutableClassName(),
+                            JavaClassScriptEngineFactory.JAVA_CLASS_SCRIPT_ENGINE_NAME,
+                            new Serializable[] { args }))));
+                }
+            } catch (InvalidScriptException e) {
+                throw new JobCreationException(e);
             }
         } else {
-            String msg = "You must specify your own executable task class to be launched (in every task) !";
+            String msg = "You must specify your own executable task class to be launched (in every task)!";
             logger.info(msg);
             throw new JobCreationException(msg);
         }
@@ -319,27 +317,37 @@ public class InternalJobFactory {
      * @throws JobCreationException an exception if the factory cannot create the given task.
      */
     private static InternalTask createTask(Job userJob, NativeTask task) throws JobCreationException {
-        if (((task.getCommandLine() == null) || (task.getCommandLine().length == 0)) &&
-            (task.getGenerationScript() == null)) {
+        if (((task.getCommandLine() == null) || (task.getCommandLine().length == 0))) {
             String msg = "The command line is null or empty and not generated !";
             logger.info(msg);
             throw new JobCreationException(msg);
         }
-        InternalNativeTask nativeTask = new InternalNativeTask(new NativeExecutableContainer(task
-                .getCommandLine(), task.getGenerationScript(), task.getWorkingDir()));
-        //set task common properties
+
         try {
-            setTaskCommonProperties(userJob, task, nativeTask);
+            String commandAndArguments = "\"" + Joiner.on("\" \"").join(task.getCommandLine()) + "\"";
+            InternalTask scriptTask;
+            if (isForkingTask()) {
+                scriptTask = new InternalForkedScriptTask(new ScriptExecutableContainer(new TaskScript(
+                    new SimpleScript(commandAndArguments, "native"))));
+            } else {
+                scriptTask = new InternalScriptTask(new ScriptExecutableContainer(new TaskScript(
+                    new SimpleScript(commandAndArguments, "native"))));
+            }
+            ForkEnvironment forkEnvironment = new ForkEnvironment();
+            scriptTask.setForkEnvironment(forkEnvironment);
+            //set task common properties
+            setTaskCommonProperties(userJob, task, scriptTask);
+            return scriptTask;
+
         } catch (Exception e) {
             throw new JobCreationException(e);
         }
-        return nativeTask;
     }
 
     private static InternalTask createTask(Job userJob, ScriptTask task) throws JobCreationException {
         InternalTask scriptTask;
-        if (PASchedulerProperties.FORKED_SCRIPT_TASKS.getValueAsBoolean()) {
-            scriptTask = new InternalForkedScriptTask(new ForkedScriptExecutableContainer(task.getScript()));
+        if (isForkingTask()) {
+            scriptTask = new InternalForkedScriptTask(new ScriptExecutableContainer(task.getScript()));
         } else {
             scriptTask = new InternalScriptTask(new ScriptExecutableContainer(task.getScript()));
         }
@@ -350,6 +358,10 @@ public class InternalJobFactory {
             throw new JobCreationException(e);
         }
         return scriptTask;
+    }
+
+    private static boolean isForkingTask() {
+        return PASchedulerProperties.TASK_FORK.getValueAsBoolean();
     }
 
     /**
@@ -414,7 +426,10 @@ public class InternalJobFactory {
         for (Field f : klass.getDeclaredFields()) {
             if (!Modifier.isPrivate(f.getModifiers()) && !Modifier.isStatic(f.getModifiers())) {
                 f.setAccessible(true);
-                f.set(to, f.get(from));
+                Object newValue = f.get(from);
+                if (newValue != null || f.get(to) == null) {
+                    f.set(to, newValue);
+                }
             }
         }
     }

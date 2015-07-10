@@ -143,7 +143,7 @@ public final class ResourceManagerJMXTest extends RMConsecutive {
         {
             RMTHelper.log("Test invalid JMX auth with null login/password creds (expect SecurityException)");
             // Create the environment
-            final HashMap<String, Object> env = new HashMap<String, Object>(1);
+            final HashMap<String, Object> env = new HashMap<>(1);
             env.put(JMXConnector.CREDENTIALS, new Object[] { null, null });
             try {
                 JMXConnectorFactory.connect(jmxRmiServiceURL, env);
@@ -158,7 +158,7 @@ public final class ResourceManagerJMXTest extends RMConsecutive {
         {
             RMTHelper.log("Test invalid JMX auth with bad login/password creds");
             // Create the environment
-            final HashMap<String, Object> env = new HashMap<String, Object>(1);
+            final HashMap<String, Object> env = new HashMap<>(1);
             env.put(JMXConnector.CREDENTIALS, new Object[] { "abra", "cadabra" });
             try {
                 JMXConnectorFactory.connect(jmxRmiServiceURL, env);
@@ -174,7 +174,7 @@ public final class ResourceManagerJMXTest extends RMConsecutive {
         {
             RMTHelper.log("Test as user 1 - Auth with login/pass over RMI and check connection");
             // Create the environment
-            final HashMap<String, Object> env = new HashMap<String, Object>(1);
+            final HashMap<String, Object> env = new HashMap<>(1);
             env.put(JMXConnector.CREDENTIALS, new Object[] { userLogin, userPassword });
             // Connect to the JMX RMI Connector Server
             final JMXConnector jmxConnector = JMXConnectorFactory.connect(jmxRmiServiceURL, env);
@@ -261,7 +261,7 @@ public final class ResourceManagerJMXTest extends RMConsecutive {
         {
             RMTHelper.log("Test as admin 1, auth with login/creds over RO and check connection");
             // Create the environment
-            final HashMap<String, Object> env = new HashMap<String, Object>(1);
+            final HashMap<String, Object> env = new HashMap<>(1);
             env.put(JMXConnector.CREDENTIALS, new Object[] { adminLogin, adminCreds });
             env.put(JMXConnectorFactory.PROTOCOL_PROVIDER_PACKAGES, JMXProviderUtils.RO_PROVIDER_PKGS);
             // Connect to the JMX RO Connector Server
@@ -307,7 +307,7 @@ public final class ResourceManagerJMXTest extends RMConsecutive {
         // Test simultaneous RMI and RO connections
         {
             RMTHelper.log("Test simultaneous JMX-RMI and JMX-RO connections as admin");
-            final HashMap<String, Object> env = new HashMap<String, Object>(1);
+            final HashMap<String, Object> env = new HashMap<>(1);
             env.put(JMXConnector.CREDENTIALS, new Object[] { adminLogin, adminCreds });
             // Connect to the JMX-RMI Connector Server
             final JMXConnector jmxRmiConnector = JMXConnectorFactory.connect(jmxRmiServiceURL, env);

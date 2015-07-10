@@ -115,7 +115,7 @@ public class TestTaskRestore extends FunctionalTest {
         String tmp = System.getProperty("java.io.tmpdir");
         long finishTime = System.currentTimeMillis() + 60000;
 
-        List<File> expectedFiles = new ArrayList<File>();
+        List<File> expectedFiles = new ArrayList<>();
         for (String fileName : CREATED_FILES_NAMES) {
             expectedFiles.add(new File(tmp, fileName));
         }

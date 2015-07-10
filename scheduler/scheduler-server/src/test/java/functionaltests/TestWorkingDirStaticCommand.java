@@ -48,7 +48,7 @@ import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
-import org.ow2.proactive.scheduler.common.job.factories.JobFactory_stax;
+import org.ow2.proactive.scheduler.common.job.factories.StaxJobFactory;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
@@ -100,9 +100,9 @@ public class TestWorkingDirStaticCommand extends SchedulerConsecutive {
                         .setProperty(WorkingDirPropertyName, new File(workingDirPath.toURI())
                                 .getAbsolutePath());
                 //test submission and event reception
-                TaskFlowJob job = (TaskFlowJob) JobFactory_stax.getFactory().createJob(
+                TaskFlowJob job = (TaskFlowJob) StaxJobFactory.getFactory().createJob(
                         new File(jobDescriptor.toURI()).getAbsolutePath());
-                List<String> command = new ArrayList<String>();
+                List<String> command = new ArrayList<>();
                 command.add("cmd");
                 command.add("/C");
                 String[] tabCommand = ((NativeTask) job.getTask("task1")).getCommandLine();

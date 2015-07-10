@@ -59,7 +59,7 @@ public class JobResultImpl implements JobResult {
     JobResultImpl(JobResultData data) {
         JobIdData id = data.getId();
         jobId = new JobIdImpl(id.getId(), id.getReadableName());
-        allResults = new HashMap<String, TaskResult>();
+        allResults = new HashMap<>();
         Map<String, TaskResultData> allResultsData = data.getAllResults();
         for (String taskName : allResultsData.keySet()) {
             TaskResultData taskResultData = allResultsData.get(taskName);

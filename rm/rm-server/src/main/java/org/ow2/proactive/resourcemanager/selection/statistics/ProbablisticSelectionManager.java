@@ -84,14 +84,14 @@ public class ProbablisticSelectionManager extends SelectionManager {
     //	  need to store the time, update it each time, then sort when removing
     //    the system will be too CPU consuming working on the limit
     // 3. Removed the oldest added script. For this we have this queue. 
-    private LinkedList<String> digestQueue = new LinkedList<String>();
+    private LinkedList<String> digestQueue = new LinkedList<>();
 
     public ProbablisticSelectionManager() {
     }
 
     public ProbablisticSelectionManager(RMCore rmcore) {
         super(rmcore);
-        this.probabilities = new HashMap<String, HashMap<String, Probability>>();
+        this.probabilities = new HashMap<>();
     }
 
     /**
@@ -116,7 +116,7 @@ public class ProbablisticSelectionManager extends SelectionManager {
 
         try {
             // finding intersection
-            HashMap<RMNode, Probability> intersectionMap = new HashMap<RMNode, Probability>();
+            HashMap<RMNode, Probability> intersectionMap = new HashMap<>();
             for (RMNode rmnode : nodes) {
                 boolean intersection = true;
                 double intersectionProbability = 1;
@@ -142,7 +142,7 @@ public class ProbablisticSelectionManager extends SelectionManager {
             }
 
             // sorting results based on calculated probability
-            List<RMNode> res = new ArrayList<RMNode>();
+            List<RMNode> res = new ArrayList<>();
             res.addAll(intersectionMap.keySet());
             Collections.sort(res, new NodeProbabilityComparator(intersectionMap));
 
@@ -160,7 +160,7 @@ public class ProbablisticSelectionManager extends SelectionManager {
             return res;
         } catch (NoSuchAlgorithmException e) {
             logger.error(e.getMessage(), e);
-            return new ArrayList<RMNode>();
+            return new ArrayList<>();
         }
     }
 

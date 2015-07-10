@@ -71,118 +71,118 @@ public interface RuntimeDataMBean {
      * Returns the current status of the resource manager.
      * @return the current status of the resource manager
      */
-    public String getStatus();
+    String getStatus();
 
     /**
      * Returns the current number of available nodes.
      * @return the current number of available nodes
      */
-    public int getAvailableNodesCount();
+    int getAvailableNodesCount();
 
     /**
      * Returns the current number of nodes in {@link NodeState#CONFIGURING} state.
      * @return the current number of nodes in {@link NodeState#CONFIGURING} state.
      */
-    public int getConfiguringNodesCount();
+    int getConfiguringNodesCount();
 
     /**
      * Returns the current number of nodes in {@link NodeState#DEPLOYING} state.
      * @return the current number of nodes in {@link NodeState#DEPLOYING} state.
      */
-    public int getDeployingNodesCount();
+    int getDeployingNodesCount();
 
     /**
      * Returns the current number of nodes in {@link NodeState#LOST} state.
      * @return the current number of nodes in {@link NodeState#LOST} state.
      */
-    public int getLostNodesCount();
+    int getLostNodesCount();
 
     /**
      * Returns the current number of nodes in {@link NodeState#FREE} state.
      * @return the current number of free nodes
      */
-    public int getFreeNodesCount();
+    int getFreeNodesCount();
 
     /**
      * Returns the current number of nodes in {@link NodeState#BUSY} state.
      * @return the current number of busy nodes
      */
-    public int getBusyNodesCount();
+    int getBusyNodesCount();
 
     /**
      * Returns the current number of nodes in {@link NodeState#TO_BE_RELEASED} state.
      * @return the current number of busy nodes
      */
-    public int getToBeReleasedNodesCount();
+    int getToBeReleasedNodesCount();
 
     /**
      * Returns the current number of nodes in {@link NodeState#DOWN} state.
      * @return the current number of down nodes
      */
-    public int getDownNodesCount();
+    int getDownNodesCount();
 
     /**
      * Returns the maximum number of nodes in {@link NodeState#CONFIGURING} state.
      *
      * @return the maximum number of nodes in {@link NodeState#CONFIGURING} state.
      */
-    public int getMaxConfiguringNodes();
+    int getMaxConfiguringNodes();
 
     /**
      * Returns the maximum number of nodes in {@link NodeState#DEPLOYING} state.
      *
      * @return the maximum number of nodes in {@link NodeState#DEPLOYING} state.
      */
-    public int getMaxDeployingNodes();
+    int getMaxDeployingNodes();
 
     /**
      * Returns the maximum number of nodes in {@link NodeState#LOST} state.
      *
      * @return the maximum number of nodes in {@link NodeState#LOST} state.
      */
-    public int getMaxLostNodes();
+    int getMaxLostNodes();
 
     /**
      * Returns the maximum number of nodes in {@link NodeState#FREE} state.
      *
      * @return the maximum number of free nodes
      */
-    public int getMaxFreeNodes();
+    int getMaxFreeNodes();
 
     /**
      * Returns the maximum number of nodes in {@link NodeState#BUSY} state.
      *
      * @return the maximum number of busy nodes
      */
-    public int getMaxBusyNodes();
+    int getMaxBusyNodes();
 
     /**
      * Returns the maximum number of nodes in {@link NodeState#TO_BE_RELEASED} state.
      *
      * @return the maximum number of busy nodes
      */
-    public int getMaxToBeReleasedNodes();
+    int getMaxToBeReleasedNodes();
 
     /**
      * Returns the maximum number of nodes in {@link NodeState#FREE} state.
      *
      * @return the maximum number of down nodes
      */
-    public int getMaxDownNodes();
+    int getMaxDownNodes();
 
     /**
      * Returns the average activity percentage.
      *
      * @return the average activity percentage
      */
-    public double getAverageActivity();
+    double getAverageActivity();
 
     /**
      * Returns the average inactivity percentage.
      *
      * @return the average inactivity percentage
      */
-    public double getAverageInactivity();
+    double getAverageInactivity();
 
     /**
      * Sends the statistics accumulated in the RRD data base
@@ -190,6 +190,6 @@ public interface RuntimeDataMBean {
      * @return data base file converted to bytes
      * @throws IOException when data base cannot be read
      */
-    public byte[] getStatisticHistory() throws IOException;
+    byte[] getStatisticHistory() throws IOException;
 
 }

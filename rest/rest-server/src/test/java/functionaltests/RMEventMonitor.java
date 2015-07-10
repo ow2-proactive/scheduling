@@ -52,7 +52,7 @@ import org.ow2.proactive.resourcemanager.frontend.RMEventListener;
 
 public class RMEventMonitor implements RMEventListener {
 
-    private List<RMEventMonitor.RMWaitCondition> waitConditions = new ArrayList<RMEventMonitor.RMWaitCondition>();
+    private List<RMEventMonitor.RMWaitCondition> waitConditions = new ArrayList<>();
 
     public void addWaitCondition(RMEventMonitor.RMWaitCondition waitCondition) {
         synchronized (waitConditions) {
@@ -123,7 +123,7 @@ public class RMEventMonitor implements RMEventListener {
         private String nodeSource;
         private int expectedNumOfNodes;
 
-        private Set<String> deployedNodes = new HashSet<String>();
+        private Set<String> deployedNodes = new HashSet<>();
         private boolean nodesDeploymentFailed = false;
 
         public RMNodesDeployedWaitCondition(String nodeSource, int expectedNumOfNodes) {

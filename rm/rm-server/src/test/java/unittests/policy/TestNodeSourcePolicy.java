@@ -288,7 +288,7 @@ public class TestNodeSourcePolicy extends FunctionalTest {
         /**
          * Creating an artificial list of nodes
          */
-        List<RMNode> nodes = new LinkedList<RMNode>();
+        List<RMNode> nodes = new LinkedList<>();
         for (int i = 0; i < 20; i++) {
             for (int j = 0; j < 20; j++) {
                 nodes.add(new Node(String.valueOf(j), String.valueOf(j)));

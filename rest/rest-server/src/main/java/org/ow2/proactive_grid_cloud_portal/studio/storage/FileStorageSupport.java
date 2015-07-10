@@ -26,19 +26,20 @@ public class FileStorageSupport {
 
     public FileStorage<Workflow> getTemplateStorage() {
         templateWorkflowsDir.mkdirs();
-        return new FileStorage<Workflow>(templateWorkflowsDir, new WorkflowSerializer(), new SmallestAvailableIdGenerator());
+        return new FileStorage<>(templateWorkflowsDir, new WorkflowSerializer(),
+                new SmallestAvailableIdGenerator());
     }
 
     public FileStorage<Workflow> getWorkflowStorage(String userName) {
         File workflowsDir = new File(getWorkflowsDir(userName), "workflows");
         workflowsDir.mkdirs();
-        return new FileStorage<Workflow>(workflowsDir, new WorkflowSerializer(), new SmallestAvailableIdGenerator());
+        return new FileStorage<>(workflowsDir, new WorkflowSerializer(), new SmallestAvailableIdGenerator());
     }
 
     public FileStorage<Script> getScriptStorage(String userName) {
         File scriptsDir = new File(getWorkflowsDir(userName), "scripts");
         scriptsDir.mkdirs();
-        return new FileStorage<Script>(scriptsDir, new ScriptSerializer(), new NameAsIdGenerator());
+        return new FileStorage<>(scriptsDir, new ScriptSerializer(), new NameAsIdGenerator());
 
     }
 }

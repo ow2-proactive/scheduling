@@ -35,7 +35,7 @@ public class ApplicationContextImpl implements ApplicationContext {
     private String resourceType;
     private boolean forced;
     private boolean silent = false;
-    private Map<String, Object> properties = new HashMap<String, Object>();
+    private Map<String, Object> properties = new HashMap<>();
 
     public static ApplicationContext currentContext() {
         return threadLocalContext.get();

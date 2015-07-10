@@ -126,7 +126,7 @@ public class SchedulerFixture extends ActiveFixture {
 
         logger.trace("# of available nodes: " + this.nodes.size());
         logger.trace("Deploying the scheduler users...");
-        List<AbstractSchedulerUser<V>> connectedUsers = new LinkedList<AbstractSchedulerUser<V>>();
+        List<AbstractSchedulerUser<V>> connectedUsers = new LinkedList<>();
         int userCredsIndex = 0;
         for (Node node : nodes) {
             AbstractSchedulerUser<V> schedulerUser = PAActiveObject.newActive(schedulerUserClass,

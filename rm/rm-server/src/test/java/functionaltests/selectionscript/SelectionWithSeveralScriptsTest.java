@@ -111,7 +111,7 @@ public class SelectionWithSeveralScriptsTest extends RMConsecutive {
         //create a first node with the two VM properties
         //---------------------------------------------------
 
-        HashMap<String, String> vmTwoProperties = new HashMap<String, String>();
+        HashMap<String, String> vmTwoProperties = new HashMap<>();
         vmTwoProperties.put(this.vmPropKey1, this.vmPropValue1);
         vmTwoProperties.put(this.vmPropKey2, this.vmPropValue2);
 
@@ -128,7 +128,7 @@ public class SelectionWithSeveralScriptsTest extends RMConsecutive {
         //create a second node with only the first VM property
         //---------------------------------------------------
 
-        HashMap<String, String> vmProp1 = new HashMap<String, String>();
+        HashMap<String, String> vmProp1 = new HashMap<>();
         vmProp1.put(this.vmPropKey1, this.vmPropValue1);
 
         String node2URL = helper.createNode(node2Name, vmProp1).getNode().getNodeInformation().getURL();
@@ -143,7 +143,7 @@ public class SelectionWithSeveralScriptsTest extends RMConsecutive {
         //create a third node with only the second VM property
         //---------------------------------------------------
 
-        HashMap<String, String> vmProp2 = new HashMap<String, String>();
+        HashMap<String, String> vmProp2 = new HashMap<>();
         vmProp1.put(this.vmPropKey2, this.vmPropValue2);
 
         String node3URL = helper.createNode(node3Name, vmProp2).getNode().getNodeInformation().getURL();
@@ -164,7 +164,7 @@ public class SelectionWithSeveralScriptsTest extends RMConsecutive {
 
         RMTHelper.log("Test 1");
 
-        ArrayList<SelectionScript> scriptsList = new ArrayList<SelectionScript>();
+        ArrayList<SelectionScript> scriptsList = new ArrayList<>();
 
         scriptsList.add(sScript1);
         scriptsList.add(sScript2);

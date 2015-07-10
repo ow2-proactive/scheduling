@@ -36,32 +36,23 @@
  */
 package functionaltests;
 
-import static org.junit.Assert.assertEquals;
-
 import java.io.File;
 import java.net.URL;
-import java.util.concurrent.TimeUnit;
 
+import org.ow2.tests.FunctionalTest;
 import org.junit.Before;
 import org.junit.Test;
-import org.ow2.proactive.scheduler.common.job.Job;
-import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobResult;
-import org.ow2.proactive.scheduler.common.job.factories.JobFactory_stax;
-import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.ow2.tests.FunctionalTest;
 
 
 public class TestNonForkedScriptTaskVariablePropagation extends FunctionalTest {
     private static final long five_minutes = 5 * 60 * 1000;
 
-    private String configPath;
     private String jobDescPath;
 
     @Before
     public void setup() throws Exception {
-        configPath = absolutePath(SchedulerTHelper.class
-                .getResource("config/scheduler-nonforkedscripttasks.ini"));
+        String configPath = absolutePath(
+          SchedulerTHelper.class.getResource("config/scheduler-nonforkedscripttasks.ini"));
         jobDescPath = absolutePath(TestNonForkedScriptTaskVariablePropagation.class
                 .getResource("/functionaltests/descriptors/Job_variable_propagation_with_non_forked_script_task.xml"));
         SchedulerTHelper.startScheduler(configPath);

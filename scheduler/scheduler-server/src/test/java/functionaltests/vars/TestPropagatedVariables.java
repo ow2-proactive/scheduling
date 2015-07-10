@@ -38,12 +38,12 @@ package functionaltests.vars;
 
 import java.util.HashMap;
 
-import org.junit.Test;
 import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.scheduler.common.exception.UserException;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
+import org.junit.Test;
 
 import functionaltests.SchedulerConsecutive;
 import functionaltests.SchedulerTHelper;
@@ -62,7 +62,7 @@ public class TestPropagatedVariables extends SchedulerConsecutive {
         TaskFlowJob flowJob = new TaskFlowJob();
         JavaTask taskA = new JavaTask();
         taskA.setName("Task_A");
-        HashMap<String, String> setA = new HashMap<String, String>();
+        HashMap<String, String> setA = new HashMap<>();
         setA.put("Task_A_Var", "Task_A_Val");
         taskA.addArgument("set", setA);
         taskA.setExecutableClassName(PropagateVariablesExec.class.getName());
@@ -70,7 +70,7 @@ public class TestPropagatedVariables extends SchedulerConsecutive {
 
         JavaTask taskB = new JavaTask();
         taskB.setName("Task_B");
-        HashMap<String, String> setB = new HashMap<String, String>();
+        HashMap<String, String> setB = new HashMap<>();
         setB.put("Task_B_Var", "Task_B_Val");
         taskB.addArgument("set", setB);
         taskB.setExecutableClassName(PropagateVariablesExec.class.getName());
@@ -80,7 +80,7 @@ public class TestPropagatedVariables extends SchedulerConsecutive {
         taskC.setName("Task_C");
         taskC.addDependence(taskA);
         taskC.addDependence(taskB);
-        HashMap<String, String> checkC = new HashMap<String, String>();
+        HashMap<String, String> checkC = new HashMap<>();
         checkC.put("Task_A_Var", "Task_A_Val");
         checkC.put("Task_B_Var", "Task_B_Val");
         taskC.addArgument("check", checkC);
@@ -94,7 +94,7 @@ public class TestPropagatedVariables extends SchedulerConsecutive {
                     .setCommandLine(
                             "/bin/bash",
                             "-c",
-                            "echo $propagated_var_Task_A_Var; if [ \"$propagated_var_Task_A_Var\" != \"Task_A_Val\" ]; then  exit 0; else exit 1; fi;");
+                            "echo $variables_Task_A_Var; test \"$variables_Task_A_Var\" == \"Task_A_Val\"");
             taskD.addDependence(taskC);
             flowJob.addTask(taskD);
         }

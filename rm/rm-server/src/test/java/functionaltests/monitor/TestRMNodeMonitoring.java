@@ -64,7 +64,7 @@ import org.junit.Assert;
  */
 public class TestRMNodeMonitoring extends RMConsecutive {
 
-    public static Map<String, String[]> mbeans = new HashMap<String, String[]>();
+    public static Map<String, String[]> mbeans = new HashMap<>();
 
     /* set of MBeans and its attributes to be checked. */
     static {
@@ -131,7 +131,7 @@ public class TestRMNodeMonitoring extends RMConsecutive {
     }
 
     private JMXConnector connectToRMNode(String jmxurl) throws Exception {
-        Map<String, Object> env = new HashMap<String, Object>();
+        Map<String, Object> env = new HashMap<>();
         String[] creds = { RM_USER_TEST, RM_PASS_TEST };
         env.put(JMXConnector.CREDENTIALS, creds);
         JMXConnector jmxConnector = JMXConnectorFactory.connect(new JMXServiceURL(jmxurl), env);

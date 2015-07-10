@@ -38,7 +38,7 @@ public class RMProxyActiveObject {
     protected ResourceManager rm;
 
     /** list of nodes and clean script being executed */
-    private Map<Node, ScriptResult<?>> nodes = new HashMap<Node, ScriptResult<?>>();
+    private Map<Node, ScriptResult<?>> nodes = new HashMap<>();
 
     public RMProxyActiveObject() {
     }
@@ -102,7 +102,7 @@ public class RMProxyActiveObject {
 
     @ImmediateService
     public boolean isNodeSetForThisRM(NodeSet nodeSet) {
-        List<Node> allNodes = new ArrayList<Node>(nodeSet);
+        List<Node> allNodes = new ArrayList<>(nodeSet);
         if (nodeSet.getExtraNodes() != null) {
             allNodes.addAll(nodeSet.getExtraNodes());
         }

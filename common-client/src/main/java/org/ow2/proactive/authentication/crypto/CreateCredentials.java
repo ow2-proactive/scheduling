@@ -62,7 +62,7 @@ import java.security.PublicKey;
  */
 public class CreateCredentials {
 
-    private static final String newline = System.getProperty("line.separator");
+    private static final String newline = System.lineSeparator();
 
     /**
      * Entry point

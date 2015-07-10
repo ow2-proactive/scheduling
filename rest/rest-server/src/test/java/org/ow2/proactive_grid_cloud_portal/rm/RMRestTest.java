@@ -180,7 +180,7 @@ public class RMRestTest extends RestTestServer {
         reset(rm);
         when(rm.addNode(anyString(), anyString())).thenReturn(new BooleanWrapper(true));
 
-        List<NameValuePair> secondCall = new ArrayList<NameValuePair>();
+        List<NameValuePair> secondCall = new ArrayList<>();
         secondCall.add(new BasicNameValuePair("nodeurl", "urlwithnsname"));
         secondCall.add(new BasicNameValuePair("nodesource", "ns"));
         callHttpPostMethod("node", sessionId, secondCall);

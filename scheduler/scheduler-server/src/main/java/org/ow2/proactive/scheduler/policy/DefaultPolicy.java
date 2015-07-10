@@ -75,7 +75,7 @@ public class DefaultPolicy extends Policy {
      */
     @Override
     public Vector<EligibleTaskDescriptor> getOrderedTasks(List<JobDescriptor> jobs) {
-        Vector<EligibleTaskDescriptor> toReturn = new Vector<EligibleTaskDescriptor>();
+        Vector<EligibleTaskDescriptor> toReturn = new Vector<>();
 
         Collections.sort(jobs, FIFO_BY_PRIORITY_COMPARATOR);
 

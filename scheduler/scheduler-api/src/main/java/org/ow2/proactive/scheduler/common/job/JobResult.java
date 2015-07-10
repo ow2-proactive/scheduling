@@ -65,21 +65,21 @@ public interface JobResult extends Serializable {
      *
      * @return the id of the job corresponding to this result.
      */
-    public JobId getJobId();
+    JobId getJobId();
 
     /**
      * To get the name of the job that has generate this result.
      *
      * @return the name of the job that has generate this result.
      */
-    public String getName();
+    String getName();
 
     /**
      * Return the information of the corresponding job
      *
      * @return the information of the corresponding job
      */
-    public JobInfo getJobInfo();
+    JobInfo getJobInfo();
 
     /**
      * Return every task results of this job as a mapping between
@@ -89,7 +89,7 @@ public interface JobResult extends Serializable {
      *
      * @return the task result as a map.
      */
-    public Map<String, TaskResult> getAllResults();
+    Map<String, TaskResult> getAllResults();
 
     /**
      * Return only the precious results of this job as a mapping between
@@ -98,7 +98,7 @@ public interface JobResult extends Serializable {
      *
      * @return the precious results as a map.
      */
-    public Map<String, TaskResult> getPreciousResults();
+    Map<String, TaskResult> getPreciousResults();
 
     /**
      * Return only the task results that have generated an exception.<br>
@@ -106,7 +106,7 @@ public interface JobResult extends Serializable {
      *
      * @return the precious results as a map.
      */
-    public Map<String, TaskResult> getExceptionResults();
+    Map<String, TaskResult> getExceptionResults();
 
     /**
      * Return the task Result corresponding to the given name.
@@ -117,7 +117,7 @@ public interface JobResult extends Serializable {
      * @return the result corresponding to the given task name, null if not found or not finished.
      * @throws UnknownTaskException if the given task name does not exist in this job
      */
-    public TaskResult getResult(String taskName) throws UnknownTaskException;
+    TaskResult getResult(String taskName) throws UnknownTaskException;
 
     /**
      * Remove the result of the given task in this jobResult.
@@ -125,12 +125,12 @@ public interface JobResult extends Serializable {
      * @param taskName the identification name of the task.
      * @throws UnknownTaskException if the given task name does not exist in this job
      */
-    public void removeResult(String taskName) throws UnknownTaskException;
+    void removeResult(String taskName) throws UnknownTaskException;
 
     /**
      * Returns true  if the job has generated an exception, false if not.
      *
      * @return true if the job has generated an exception.
      */
-    public boolean hadException();
+    boolean hadException();
 }

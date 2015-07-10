@@ -36,16 +36,21 @@
  */
 package functionaltests;
 
-import org.apache.log4j.Level;
-import org.junit.Assert;
+import java.io.File;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.ProActiveInet;
-import org.objectweb.proactive.utils.OperatingSystem;
-
+import org.objectweb.proactive.extensions.pnp.PNPConfig;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.process_tree_killer.ProcessTree;
@@ -77,13 +82,8 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.utils.FileUtils;
-import java.io.File;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import org.apache.log4j.Level;
+import org.junit.Assert;
 
 import functionaltests.common.CommonTUtils;
 import functionaltests.common.InputStreamReaderThread;
@@ -92,7 +92,6 @@ import functionaltests.monitor.SchedulerMonitorsHandler;
 
 
 /**
- *
  * Static helpers that provide main operations for Scheduler functional test.
  *
  * - helpers for launching a scheduler and a RM in a forked JVM, and deploys 5 local ProActive nodes :
@@ -125,13 +124,11 @@ import functionaltests.monitor.SchedulerMonitorsHandler;
  * This method can also be used for testing for job submission with killing and restarting
  * Scheduler.
  *
- * WARNING, you cannot get Scheduler user interface and Administrator interface twice ;
+ * WARNING, you cannot get Scheduler user interface and Administrator interface twice;
  * //TODO solve this, one connection per body allowed
- *
  *
  * @author ProActive team
  * @since ProActive Scheduling 1.0
- *
  */
 public class SchedulerTHelper {
 
@@ -144,9 +141,9 @@ public class SchedulerTHelper {
     protected static URL functionalTestSchedulerProperties = SchedulerTHelper.class
             .getResource("config/functionalTSchedulerProperties.ini");
 
-    public static final int RMI_PORT = 1199;
-    public static String schedulerUrl = "rmi://" + ProActiveInet.getInstance().getHostname() + ":" +
-        RMI_PORT + "/" + SchedulerConstants.SCHEDULER_DEFAULT_NAME;
+    public static final int PNP_PORT = 1299;
+    public static String schedulerUrl = "pnp://" + ProActiveInet.getInstance().getHostname() + ":" +
+      PNP_PORT + "/" + SchedulerConstants.SCHEDULER_DEFAULT_NAME;
 
     private static Process schedulerProcess;
 
@@ -231,7 +228,7 @@ public class SchedulerTHelper {
         }
         cleanTMP();
 
-        List<String> commandLine = new ArrayList<String>();
+        List<String> commandLine = new ArrayList<>();
         commandLine.add(System.getProperty("java.home") + File.separator + "bin" + File.separator + "java");
         commandLine.add("-Djava.security.manager");
         //commandLine.add("-agentlib:jdwp=transport=dt_socket,server=y,address=9009,suspend=y");
@@ -244,7 +241,8 @@ public class SchedulerTHelper {
 
         commandLine.add(CentralPAPropertyRepository.PA_HOME.getCmdLine() + proactiveHome);
 
-        commandLine.add(CentralPAPropertyRepository.PA_RMI_PORT.getCmdLine() + RMI_PORT);
+        commandLine.add(CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getCmdLine() + "pnp");
+        commandLine.add(PNPConfig.PA_PNP_PORT.getCmdLine() + PNP_PORT);
 
         String securityPolicy = CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getValue();
         if (!CentralPAPropertyRepository.JAVA_SECURITY_POLICY.isSet()) {
@@ -274,6 +272,7 @@ public class SchedulerTHelper {
 
         commandLine.add("-cp");
         commandLine.add(testClasspath());
+        commandLine.add("-Djava.library.path=" + System.getProperty("java.library.path"));
         commandLine.add(CentralPAPropertyRepository.PA_TEST.getCmdLine() + "true");
         commandLine.add(SchedulerTStarter.class.getName());
         commandLine.add(String.valueOf(localnodes));
@@ -291,7 +290,7 @@ public class SchedulerTHelper {
         schedulerProcess = processBuilder.start();
 
         InputStreamReaderThread outputReader = new InputStreamReaderThread(schedulerProcess.getInputStream(),
-            "[Scheduler VM output]: ");
+            "[Scheduler output]: ");
         outputReader.start();
 
         System.out.println("Waiting for the Scheduler using URL: " + schedulerUrl);
@@ -303,7 +302,7 @@ public class SchedulerTHelper {
             // Without waiting test can finish earlier than nodes are added.
             // It leads to test execution hang up on windows due to running processes.
 
-            RMTHelper rmHelper = RMTHelper.getDefaultInstance();
+            RMTHelper rmHelper = RMTHelper.getDefaultInstance(PNP_PORT);
             ResourceManager rm = rmHelper.getResourceManager();
             while (rm.getState().getTotalAliveNodesNumber() < SchedulerTStarter.RM_NODE_NUMBER) {
                 System.out.println("Waiting for nodes deployment");
@@ -314,14 +313,15 @@ public class SchedulerTHelper {
     }
 
     public static String testClasspath() {
-        String home = PASchedulerProperties.SCHEDULER_HOME.getValueAsString();
-        String classpathToLibFolderWithWildcard = home + File.separator + "dist" + File.separator + "lib" +
-            File.separator + "*";
-        if (OperatingSystem.getOperatingSystem().equals(OperatingSystem.windows)) {
-            // required by windows otherwise wildcard is expanded
-            classpathToLibFolderWithWildcard = "\"" + classpathToLibFolderWithWildcard + "\"";
-        }
-        return classpathToLibFolderWithWildcard;
+//        String home = PASchedulerProperties.SCHEDULER_HOME.getValueAsString();
+//        String classpathToLibFolderWithWildcard = home + File.separator + "dist" + File.separator + "lib" +
+//            File.separator + "*";
+//        if (OperatingSystem.getOperatingSystem().equals(OperatingSystem.windows)) {
+//            // required by windows otherwise wildcard is expanded
+//            classpathToLibFolderWithWildcard = "\"" + classpathToLibFolderWithWildcard + "\"";
+//        }
+//        return classpathToLibFolderWithWildcard;
+        return System.getProperty("java.class.path");
     }
 
     /* convenience method to clean TMP from dataspace when executing test */
@@ -355,7 +355,7 @@ public class SchedulerTHelper {
         }
         schedulerAuth = null;
         adminSchedInterface = null;
-        RMTHelper.getDefaultInstance().reset();
+        RMTHelper.getDefaultInstance(PNP_PORT).reset();
     }
 
     /**
@@ -559,7 +559,6 @@ public class SchedulerTHelper {
 
     /**
      * Kills a job
-     * @param jobId
      * @return success or failure at killing the job
      * @throws Exception
      */
@@ -809,8 +808,8 @@ public class SchedulerTHelper {
         log("Job submitted, id " + id.toString());
 
         log("Waiting for jobSubmitted");
-        JobState receivedstate = SchedulerTHelper.waitForEventJobSubmitted(id);
-        Assert.assertEquals(id, receivedstate.getId());
+        JobState receivedState = SchedulerTHelper.waitForEventJobSubmitted(id);
+        Assert.assertEquals(id, receivedState.getId());
 
         log("Waiting for job running");
         JobInfo jInfo = SchedulerTHelper.waitForEventJobRunning(id);
@@ -982,7 +981,7 @@ public class SchedulerTHelper {
         } catch (UnknownJobException ignored) {
         }
         if (jobState != null && jobState.getStatus().equals(jobStatusAfterEvent)) {
-            System.err.println("Job is already finished - do not wat for the 'job finished' event");
+            System.err.println("Job is already finished - do not wait for the 'job finished' event");
             return jobState.getJobInfo();
         } else {
             try {
@@ -1279,7 +1278,7 @@ public class SchedulerTHelper {
                     if (!((JavaTask) task).isFork()) {
                         ForkEnvironment forkedEnv = new ForkEnvironment();
                         forkedEnv.addJVMArgument("-Dproactive.test=true");
-                        ((JavaTask) task).setForkEnvironment(forkedEnv);
+                        task.setForkEnvironment(forkedEnv);
                     }
                 }
             }

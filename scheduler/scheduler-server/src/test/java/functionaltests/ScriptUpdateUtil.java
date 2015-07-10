@@ -36,17 +36,17 @@
  */
 package functionaltests;
 
-import static org.ow2.proactive.scheduler.common.util.VariablesUtil.filterAndUpdate;
-
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
-import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.SelectionScript;
+
+import static org.ow2.proactive.scheduler.common.util.VariableSubstitutor.filterAndUpdate;
 
 
 /**
@@ -74,9 +74,6 @@ public class ScriptUpdateUtil {
             resolveScript(task.getPreScript(), variables);
             resolveScript(task.getPostScript(), variables);
             resolveScript(task.getCleaningScript(), variables);
-            if (task instanceof NativeTask) {
-                resolveScript(((NativeTask) task).getGenerationScript(), variables);
-            }
         }
         return job;
     }
@@ -84,10 +81,10 @@ public class ScriptUpdateUtil {
     private static void resolveScript(Script script, Map variables) {
         if (script != null) {
             script.setScript(filterAndUpdate(script.getScript(), variables));
-            String[] parameters = script.getParameters();
+            Serializable[] parameters = script.getParameters();
             if (parameters != null) {
                 for (int i = 0; i < parameters.length; i++) {
-                    parameters[i] = filterAndUpdate(parameters[i], variables);
+                    parameters[i] = filterAndUpdate(parameters[i].toString(), variables);
                 }
             }
         }

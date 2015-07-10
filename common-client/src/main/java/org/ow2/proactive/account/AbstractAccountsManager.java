@@ -62,7 +62,7 @@ public abstract class AbstractAccountsManager<E extends Account> {
     private volatile long lastRefreshDurationInMilliseconds;
 
     protected AbstractAccountsManager(final String refreshThreadName, final Logger logger) {
-        this.accountsMap = new HashMap<String, E>();
+        this.accountsMap = new HashMap<>();
         this.cacheValidTimeInSeconds = this.getDefaultCacheValidityTimeInSeconds();
         this.logger = logger;
     }

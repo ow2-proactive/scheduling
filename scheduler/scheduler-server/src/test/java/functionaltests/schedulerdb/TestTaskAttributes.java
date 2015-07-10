@@ -81,7 +81,7 @@ public class TestTaskAttributes extends BaseSchedulerDBTest {
 
         Assert.assertEquals(3, task.getSelectionScripts().size());
 
-        Set<String> scripts = new HashSet<String>();
+        Set<String> scripts = new HashSet<>();
         for (SelectionScript script : task.getSelectionScripts()) {
             scripts.add(script.getScript());
             if (script.getScript().equals("selection1")) {
@@ -94,7 +94,7 @@ public class TestTaskAttributes extends BaseSchedulerDBTest {
                 Assert.assertArrayEquals(new String[] {}, script.getParameters());
             }
         }
-        Set<String> expected = new HashSet<String>();
+        Set<String> expected = new HashSet<>();
         expected.add("selection1");
         expected.add("selection2");
         expected.add("selection3");
@@ -188,14 +188,14 @@ public class TestTaskAttributes extends BaseSchedulerDBTest {
         Map<String, String> genericInfo;
         InternalTask taskData;
 
-        genericInfo = new HashMap<String, String>();
+        genericInfo = new HashMap<>();
         task.setGenericInformations(genericInfo);
         taskData = saveSingleTask(task).getTask(task.getName());
 
         Assert.assertNotNull(taskData.getGenericInformations());
         Assert.assertTrue(taskData.getGenericInformations().isEmpty());
 
-        genericInfo = new HashMap<String, String>();
+        genericInfo = new HashMap<>();
         genericInfo.put("p1", "v1");
         genericInfo.put("p2", "v2");
         task.setGenericInformations(genericInfo);
@@ -208,7 +208,7 @@ public class TestTaskAttributes extends BaseSchedulerDBTest {
         for (int i = 0; i < 100; i++) {
             longString.append("0123456789abcdefghijklmnopqrstuvwxyz");
         }
-        genericInfo = new HashMap<String, String>();
+        genericInfo = new HashMap<>();
         genericInfo.put("longProperty", longString.toString());
         task.setGenericInformations(genericInfo);
         taskData = saveSingleTask(task).getTask(task.getName());

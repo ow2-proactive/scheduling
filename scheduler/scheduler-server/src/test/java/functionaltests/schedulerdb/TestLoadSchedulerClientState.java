@@ -152,7 +152,6 @@ public class TestLoadSchedulerClientState extends BaseSchedulerDBTest {
         task1.setPreciousLogs(true);
         task1.setPreciousResult(true);
         task1.setRunAsMe(true);
-        task1.setResultPreview("aaa");
         task1.setWallTime(440000);
         JavaTask task2 = createDefaultTask("task2");
         task2.setDescription("d2");
@@ -161,7 +160,6 @@ public class TestLoadSchedulerClientState extends BaseSchedulerDBTest {
         task2.setPreciousLogs(false);
         task2.setPreciousResult(false);
         task2.setRunAsMe(false);
-        task2.setResultPreview("bbb");
         task2.setWallTime(240000);
         JavaTask task3 = createDefaultTask("task3");
         task1.addDependence(task2);
@@ -171,7 +169,7 @@ public class TestLoadSchedulerClientState extends BaseSchedulerDBTest {
         job1.addTask(task2);
         job1.addTask(task3);
         job1.setPriority(JobPriority.LOW);
-        Map<String, String> genericInfo = new HashMap<String, String>();
+        Map<String, String> genericInfo = new HashMap<>();
         genericInfo.put("p1", "v1");
         genericInfo.put("p2", "v2");
         job1.setGenericInformations(genericInfo);
@@ -214,16 +212,15 @@ public class TestLoadSchedulerClientState extends BaseSchedulerDBTest {
         Assert.assertEquals(expected.isPreciousLogs(), taskState.isPreciousLogs());
         Assert.assertEquals(expected.isPreciousResult(), taskState.isPreciousResult());
         Assert.assertEquals(expected.isRunAsMe(), taskState.isRunAsMe());
-        Assert.assertEquals(expected.getResultPreview(), taskState.getResultPreview());
         Assert.assertEquals(expected.getWallTime(), taskState.getWallTime());
 
         Assert.assertEquals("Unexpected number of dependencies", dependences.length, taskState
                 .getDependences().size());
-        Set<String> dependenciesSet = new HashSet<String>();
+        Set<String> dependenciesSet = new HashSet<>();
         for (String dependecy : dependences) {
             dependenciesSet.add(dependecy);
         }
-        Set<String> actualDependenciesSet = new HashSet<String>();
+        Set<String> actualDependenciesSet = new HashSet<>();
         for (TaskState task : taskState.getDependences()) {
             actualDependenciesSet.add(task.getName());
         }

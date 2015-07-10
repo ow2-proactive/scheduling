@@ -40,6 +40,8 @@ import java.net.URI;
 
 public class ClasspathUtils {
 
+    private static String SCHEDULER_HOME;
+
     /**
      * Used for instance when looking for SCHEDULER_HOME using jars location.
      * We know that the JAR is in dist/lib so we can find SCHEDULER_HOME by using 'dist' as childDirectoryName
@@ -65,6 +67,9 @@ public class ClasspathUtils {
     }
 
     public static String findSchedulerHome() {
-        return findBaseDirectoryFromJarLocation("dist");
+        if (SCHEDULER_HOME == null) {
+            SCHEDULER_HOME = findBaseDirectoryFromJarLocation("dist");
+        }
+        return SCHEDULER_HOME;
     }
 }

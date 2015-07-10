@@ -81,24 +81,24 @@ public interface RMNode extends Comparable<RMNode> {
      * @param script a selection script to execute.
      * @return the {@link ScriptResult} corresponding to the script execution.
      */
-    public <T> ScriptResult<T> executeScript(Script<T> script);
+    <T> ScriptResult<T> executeScript(Script<T> script);
 
     /**
      * Get a map of all selection scripts already tested on this node,
      * and the responses given.
      * @return the map of Script and status
      */
-    public HashMap<SelectionScript, Integer> getScriptStatus();
+    HashMap<SelectionScript, Integer> getScriptStatus();
 
     /**
      * Cleaning method : remove all active objects on this node.
      */
-    public void clean() throws NodeException;
+    void clean() throws NodeException;
 
     /**
      * @return a string describing the RMNode (status, vnode, host, pad, ...)
      */
-    public String getNodeInfo();
+    String getNodeInfo();
 
     // ---------------------------------------------------------------------//
     // GET
@@ -107,72 +107,72 @@ public interface RMNode extends Comparable<RMNode> {
     /**
      * @return the name of the node
      */
-    public String getNodeName();
+    String getNodeName();
 
     /** Gives the node object related. 
      * @return a node Object.
      * @throws NodeException if the node is down.
      */
-    public Node getNode();
+    Node getNode();
 
     /**
      * @return the name of the virtual node
      */
-    public String getVNodeName();
+    String getVNodeName();
 
     /**
      * This method call nodeInformation.getHostName();
      *
      * @return the name of the host machine
      */
-    public String getHostName();
+    String getHostName();
 
     /**
      * This method call nodeInformation.getDescriptorVMName();
      *
      * @return the name of the virtual machine
      */
-    public String getDescriptorVMName();
+    String getDescriptorVMName();
 
     /**
      * @return the {@link NodeSource} name of the source that handle the node
      */
-    public String getNodeSourceName();
+    String getNodeSourceName();
 
     /**
      * @return the URL of the node.
      */
-    public String getNodeURL();
+    String getNodeURL();
 
     /** Get the node source object that handle the node
      * @return the stub of the node source active object
      */
-    public NodeSource getNodeSource();
+    NodeSource getNodeSource();
 
     /**
      * Returns the node state
      * @return the node state
      */
-    public NodeState getState();
+    NodeState getState();
 
     /**
      * Returns the time of the last node state change.
      *  
      * @return the time of the last node state change
      */
-    public long getStateChangeTime();
+    long getStateChangeTime();
 
     /**
      * Gets the provider of the node (who created and deployed it)
      * @return the node provider
      */
-    public Client getProvider();
+    Client getProvider();
 
     /**
      * Gets the owner of the node (who currently running computations on it)
      * @return the node owner
      */
-    public Client getOwner();
+    Client getOwner();
 
     /**
      * Gets the permission which defines who can user this node.
@@ -181,24 +181,24 @@ public interface RMNode extends Comparable<RMNode> {
      *
      * @return node usage permission
      */
-    public Permission getUserPermission();
+    Permission getUserPermission();
 
     /**
      * Gets the permission which defines who can remove this node.
      */
-    public Permission getAdminPermission();
+    Permission getAdminPermission();
 
     /**
      * Returns the id of the add event {@link RMNodeEvent}.
      * @return the id of the add event
      */
-    public RMNodeEvent getAddEvent();
+    RMNodeEvent getAddEvent();
 
     /**
      * Returns the id of the last event {@link RMNodeEvent}.
      * @return the id of the last event
      */
-    public RMNodeEvent getLastEvent();
+    RMNodeEvent getLastEvent();
 
     // ---------------------------------------------------------------------//
     // IS
@@ -207,32 +207,32 @@ public interface RMNode extends Comparable<RMNode> {
     /**
      * @return true if the node is free, false otherwise.
      */
-    public boolean isFree();
+    boolean isFree();
 
     /**
      * @return true if the node is down, false otherwise.
      */
-    public boolean isDown();
+    boolean isDown();
 
     /**
      * @return true if the node has to be released, false otherwise.
      */
-    public boolean isToRemove();
+    boolean isToRemove();
 
     /**
      * @return true if the node is busy, false otherwise.
      */
-    public boolean isBusy();
+    boolean isBusy();
 
     /**
      * @return true if the node is configuring, false otherwise.
      */
-    public boolean isConfiguring();
+    boolean isConfiguring();
 
     /**
      * @return true if the node is locked, false otherwise.
      */
-    public boolean isLocked();
+    boolean isLocked();
 
     // ---------------------------------------------------------------------//
     // SET
@@ -241,44 +241,44 @@ public interface RMNode extends Comparable<RMNode> {
     /**
      * change the node's status to free
      */
-    public void setFree();
+    void setFree();
 
     /**
      * change the node's status to busy.
      * @param owner
      */
-    public void setBusy(Client owner);
+    void setBusy(Client owner);
 
     /**
      *  * change the node's status to 'to release'.
      */
-    public void setToRemove();
+    void setToRemove();
 
     /**
      * change the node's status to down.
      */
-    public void setDown();
+    void setDown();
 
     /**
      * change the node's status to configuring
      */
-    public void setConfiguring(Client owner);
+    void setConfiguring(Client owner);
 
     /**
      * Changes the node status to locked
      * @param owner
      */
-    public void lock(Client owner);
+    void lock(Client owner);
 
     /**
      * Change the {@link NodeSource} from where the node is.
      * @param nodeSource
      */
-    public void setNodeSource(NodeSource nodeSource);
+    void setNodeSource(NodeSource nodeSource);
 
-    public void setAddEvent(final RMNodeEvent addEvent);
+    void setAddEvent(final RMNodeEvent addEvent);
 
-    public void setLastEvent(final RMNodeEvent lastEvent);
+    void setLastEvent(final RMNodeEvent lastEvent);
 
     /**
      * Sets the jmx url of the node.
@@ -287,7 +287,7 @@ public interface RMNode extends Comparable<RMNode> {
      * @param address url of the jmx server
      * 
      */
-    public void setJMXUrl(JMXTransportProtocol protocol, String address);
+    void setJMXUrl(JMXTransportProtocol protocol, String address);
 
     /**
      * Gets the JMX url of the node.
@@ -296,12 +296,12 @@ public interface RMNode extends Comparable<RMNode> {
      * 
      * @return a jmx url 
      */
-    public String getJMXUrl(JMXTransportProtocol protocol);
+    String getJMXUrl(JMXTransportProtocol protocol);
 
     /**
      * @return true if node is protected with token 
      */
-    public boolean isProtectedByToken();
+    boolean isProtectedByToken();
 
     RMNodeEvent createNodeEvent(RMEventType eventType, NodeState previousNodeState, String initiator);
 

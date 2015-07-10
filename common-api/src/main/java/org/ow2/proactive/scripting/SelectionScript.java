@@ -38,6 +38,7 @@ package org.ow2.proactive.scripting;
 
 import java.io.File;
 import java.io.Reader;
+import java.io.Serializable;
 import java.io.StringReader;
 import java.net.URL;
 import java.security.MessageDigest;
@@ -124,7 +125,7 @@ public class SelectionScript extends Script<Boolean> {
      * @param dynamic tell if the script is dynamic or static
      * @throws InvalidScriptException if the creation fails.
      */
-    public SelectionScript(String script, String engineName, String[] parameters, boolean dynamic)
+    public SelectionScript(String script, String engineName, Serializable[] parameters, boolean dynamic)
             throws InvalidScriptException {
         super(script, engineName, parameters, "SelectionScript");
         this.dynamic = dynamic;
@@ -136,7 +137,7 @@ public class SelectionScript extends Script<Boolean> {
      * @param parameters script execution arguments.
      * @throws InvalidScriptException if the creation fails.
      */
-    public SelectionScript(File file, String[] parameters) throws InvalidScriptException {
+    public SelectionScript(File file, Serializable[] parameters) throws InvalidScriptException {
         super(file, parameters);
         buildSelectionScriptId();
     }
@@ -147,7 +148,7 @@ public class SelectionScript extends Script<Boolean> {
      * @param dynamic tell if script is dynamic or static
      * @throws InvalidScriptException if the creation fails.
      */
-    public SelectionScript(File file, String[] parameters, boolean dynamic) throws InvalidScriptException {
+    public SelectionScript(File file, Serializable[] parameters, boolean dynamic) throws InvalidScriptException {
         super(file, parameters);
         this.dynamic = dynamic;
         buildSelectionScriptId();
@@ -200,7 +201,7 @@ public class SelectionScript extends Script<Boolean> {
 
         //concatenate parameters if any
         if (this.parameters != null) {
-            for (String param : this.parameters) {
+            for (Serializable param : this.parameters) {
                 stringId += param;
             }
         }
@@ -232,28 +233,28 @@ public class SelectionScript extends Script<Boolean> {
      * @see org.ow2.proactive.scheduler.common.scripting.Script#getResult(javax.script.Bindings)
      */
     @Override
-    protected ScriptResult<Boolean> getResult(Bindings bindings) {
+    protected ScriptResult<Boolean> getResult(Object evalResult, Bindings bindings) {
         if (bindings.containsKey(RESULT_VARIABLE)) {
             Object result = bindings.get(RESULT_VARIABLE);
 
             if (result instanceof Boolean) {
-                return new ScriptResult<Boolean>((Boolean) result);
+                return new ScriptResult<>((Boolean) result);
             } else if (result instanceof Integer) {
-                return new ScriptResult<Boolean>((Integer) result != 0);
+                return new ScriptResult<>((Integer) result != 0);
             } else if (result instanceof CharSequence) {
-                return new ScriptResult<Boolean>(!(result.equals("false") || result
+                return new ScriptResult<>(!(result.equals("false") || result
                         .equals("False")));
             } else {
-                return new ScriptResult<Boolean>(new Exception(
-                    "Bad result format : awaited Boolean (or Integer when not existing), found " +
-                        result.getClass().getName()));
+                return new ScriptResult<>(new Exception(
+                        "Bad result format : awaited Boolean (or Integer when not existing), found " +
+                                result.getClass().getName()));
             }
         } else {
             String msg = "No binding for key : " + RESULT_VARIABLE +
                 "\na Selection script must define a variable named '" + RESULT_VARIABLE +
                 "' set to true or false";
             logger.error(msg);
-            return new ScriptResult<Boolean>(new Exception(msg));
+            return new ScriptResult<>(new Exception(msg));
         }
     }
 

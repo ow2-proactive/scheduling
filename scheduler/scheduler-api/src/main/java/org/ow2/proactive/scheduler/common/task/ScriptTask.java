@@ -62,7 +62,7 @@ public class ScriptTask extends Task {
 
     @Override
     public String display() {
-        String nl = System.getProperty("line.separator");
+        String nl = System.lineSeparator();
         String answer = super.display();
         return answer + nl + "\tScript = " + ((script != null) ? script.display() : null);
     }

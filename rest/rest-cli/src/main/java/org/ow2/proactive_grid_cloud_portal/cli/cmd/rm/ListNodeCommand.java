@@ -76,7 +76,7 @@ public class ListNodeCommand extends AbstractCommand implements Command {
                 if (nodeSource == null) {
                     selectedNodeEvents = nodeEvents;
                 } else {
-                    List<NodeEventView> selectedList = new ArrayList<NodeEventView>();
+                    List<NodeEventView> selectedList = new ArrayList<>();
                     for (NodeEventView nodeEvent : nodeEvents) {
                         if (!nodeSource.equals(nodeEvent.getNodeSource())) {
                             // node source doesn't match

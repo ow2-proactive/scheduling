@@ -107,7 +107,7 @@ public class TestUsageData extends BaseSchedulerDBTest {
 
     private void finishTask(InternalJob job, InternalTask task) throws Exception {
         Thread.sleep(10);
-        TaskResultImpl res = new TaskResultImpl(null, "ok", null, 42, null);
+        TaskResultImpl res = new TaskResultImpl(null, "ok", null, 42);
         job.terminateTask(false, task.getId(), null, null, res);
         if (job.isFinished()) {
             job.terminate();

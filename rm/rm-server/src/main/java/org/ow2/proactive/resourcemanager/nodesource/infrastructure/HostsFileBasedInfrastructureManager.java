@@ -75,17 +75,17 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
      */
     private List<InetAddress> freeHosts = Collections.synchronizedList(new ArrayList<InetAddress>());
     /** Maintains tresholds per hosts to be able to know if the deployment fails and to retry a given number of time */
-    private Hashtable<InetAddress, Integer> hostsThresholds = new Hashtable<InetAddress, Integer>();
+    private Hashtable<InetAddress, Integer> hostsThresholds = new Hashtable<>();
 
     /**
      * The set of nodes for which one the registerAcquiredNode has been run.
      */
-    private Hashtable<String, InetAddress> registeredNodes = new Hashtable<String, InetAddress>();
+    private Hashtable<String, InetAddress> registeredNodes = new Hashtable<>();
 
     /**
      * To notify the control loop of the deploying node timeout
      */
-    protected ConcurrentHashMap<String, Boolean> pnTimeout = new ConcurrentHashMap<String, Boolean>();
+    protected ConcurrentHashMap<String, Boolean> pnTimeout = new ConcurrentHashMap<>();
 
     /**
      * Acquire one node per available host

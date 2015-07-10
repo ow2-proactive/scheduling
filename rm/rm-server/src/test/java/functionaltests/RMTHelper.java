@@ -38,6 +38,7 @@ package functionaltests;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.ServerSocket;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -65,6 +66,7 @@ import org.objectweb.proactive.core.node.StartNode;
 import org.objectweb.proactive.core.process.JVMProcess;
 import org.objectweb.proactive.core.process.JVMProcessImpl;
 import org.objectweb.proactive.core.util.ProActiveInet;
+import org.objectweb.proactive.extensions.pnp.PNPConfig;
 import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
@@ -107,7 +109,7 @@ public class RMTHelper {
     // default RMI port
     // do not use the one from proactive config to be able to
     // keep the RM running after the test with rmi registry is killed
-    public static final int PA_RMI_PORT = 1199;
+    public static int PA_PNP_PORT = 1199;
 
     /**
      * Timeout for local infrastructure
@@ -157,6 +159,11 @@ public class RMTHelper {
         return defaultInstance;
     }
 
+    public static RMTHelper getDefaultInstance(int pnpPort) {
+        PA_PNP_PORT = pnpPort;
+        return defaultInstance;
+    }
+
     /**
      * Log a String for tests.
      *
@@ -194,12 +201,14 @@ public class RMTHelper {
         //first emtpy im parameter is default rm url
         byte[] creds = FileToBytesConverter.convertFileToByteArray(new File(PAResourceManagerProperties
                 .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
-        rm.createNodeSource(name, LocalInfrastructure.class.getName(), new Object[] {
-                creds,
-                nodeNumber,
-                RMTHelper.defaultNodesTimeout,
-                setup.getJvmParameters() + " " + CentralPAPropertyRepository.PA_RMI_PORT.getCmdLine() +
-                    RMTHelper.PA_RMI_PORT }, StaticPolicy.class.getName(), null);
+        rm.createNodeSource(name, LocalInfrastructure.class.getName(),
+                new Object[] {
+                        creds,
+                        nodeNumber,
+                        RMTHelper.defaultNodesTimeout,
+                        setup.getJvmParameters() + " " +
+                            CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getCmdLine() + "pnp" },
+                StaticPolicy.class.getName(), null);
         rm.setNodeSourcePingFrequency(5000, name);
 
         waitForNodeSourceCreation(name, nodeNumber);
@@ -226,31 +235,36 @@ public class RMTHelper {
      * This method can be used to test adding nodes mechanism
      * with already deploy ProActive nodes.
      * @param nodeName node's name to create
-     * @return created node object
+     * @return created node URL
      * @throws IOException if the external JVM cannot be created
      * @throws NodeException if lookup of the new node fails.
      */
     public TNode createNode(String nodeName) throws IOException, NodeException {
-        return createNode(nodeName, null);
+        return createNode(nodeName, new HashMap<String, String>());
     }
 
     public TNode createNode(String nodeName, Map<String, String> vmParameters) throws IOException,
             NodeException {
-        return createNode(nodeName, null, vmParameters, null);
+        return createNode(nodeName, vmParameters, null);
+    }
+
+    private TNode createNode(String nodeName, int pnpPort) throws IOException, NodeException {
+        return createNode(nodeName, new HashMap<String, String>(), new ArrayList<String>(), pnpPort);
     }
 
     public List<TNode> createNodes(final String nodeName, int number) throws IOException, NodeException,
             ExecutionException, InterruptedException {
 
         ExecutorService executorService = Executors.newFixedThreadPool(number);
-        ArrayList<Future<TNode>> futureNodes = new ArrayList<Future<TNode>>(number);
+        ArrayList<Future<TNode>> futureNodes = new ArrayList<>(number);
+        final List<Integer> freePNPPorts = findFreePorts(number);
         for (int i = 0; i < number; i++) {
             final int index = i;
             futureNodes.add(executorService.submit(new Callable<TNode>() {
                 @Override
                 public TNode call() {
                     try {
-                        return createNode(nodeName + index, null);
+                        return createNode(nodeName + index, freePNPPorts.get(index));
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -259,7 +273,7 @@ public class RMTHelper {
             }));
         }
 
-        ArrayList nodes = new ArrayList(number);
+        ArrayList<TNode> nodes = new ArrayList<>(number);
         for (int i = 0; i < number; i++) {
             nodes.add(futureNodes.get(i).get());
         }
@@ -267,28 +281,50 @@ public class RMTHelper {
         return nodes;
     }
 
-    // TODO REMOVE THIS METHOD
-    public void createNodeSource(int rmiPort, int nodesNumber) throws Exception {
-        createNodeSource(rmiPort, nodesNumber, null);
+    public void createNodeSource(int nodesNumber) throws Exception {
+        createNodeSource(nodesNumber, new ArrayList<String>());
     }
 
-    // TODO REMOVE THIS METHOD
-    public void createNodeSource(int rmiPort, int nodesNumber, List<String> vmOptions) throws Exception {
-        Map<String, String> map = new HashMap<String, String>();
-        map.put(CentralPAPropertyRepository.PA_RMI_PORT.getName(), String.valueOf(rmiPort));
-        map
-                .put(CentralPAPropertyRepository.PA_HOME.getName(), CentralPAPropertyRepository.PA_HOME
-                        .getValue());
+    public void createNodeSource(int nodesNumber, List<String> vmOptions) throws Exception {
+        Map<String, String> map = new HashMap<>();
+        map.put(CentralPAPropertyRepository.PA_HOME.getName(), CentralPAPropertyRepository.PA_HOME.getValue());
         for (int i = 0; i < nodesNumber; i++) {
             String nodeName = "node-" + i;
-            String nodeUrl = "rmi://localhost:" + rmiPort + "/" + nodeName;
-            createNode(nodeName, nodeUrl, map, vmOptions);
-            getResourceManager().addNode(nodeUrl);
+
+            TNode node = createNode(nodeName, map, vmOptions);
+            getResourceManager().addNode(node.getNode().getNodeInformation().getURL());
         }
         waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.DEFAULT);
         for (int i = 0; i < nodesNumber; i++) {
             waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         }
+    }
+
+    private static int findFreePort() throws IOException {
+        ServerSocket server = new ServerSocket(0);
+        int port = server.getLocalPort();
+        server.close();
+        return port;
+    }
+
+    private static List<Integer> findFreePorts(int nbOfFreePorts) throws IOException {
+        List<Integer> freePorts = new ArrayList<>();
+        List<ServerSocket> socketsToClose = new ArrayList<>();
+        for (int i = 0; i < nbOfFreePorts; i++) {
+            ServerSocket server = new ServerSocket(0);
+            int port = server.getLocalPort();
+            freePorts.add(port);
+            socketsToClose.add(server);
+        }
+        for (ServerSocket socket : socketsToClose) {
+            socket.close();
+        }
+        return freePorts;
+    }
+
+    private TNode createNode(String nodeName, Map<String, String> vmParameters, List<String> vmOptions)
+            throws IOException, NodeException {
+        return createNode(nodeName, vmParameters, vmOptions, 0);
     }
 
     /**
@@ -299,24 +335,34 @@ public class RMTHelper {
      * @param nodeName node's name to create
      * @param vmParameters an HashMap containing key and value String
      * of type :-Dkey=value
-     * @return created node object
+     * @return created node URL
      * @throws IOException if the external JVM cannot be created
      * @throws NodeException if lookup of the new node fails.
      */
-    public TNode createNode(String nodeName, String expectedUrl, Map<String, String> vmParameters,
-            List<String> vmOptions) throws IOException, NodeException {
+    private TNode createNode(String nodeName, Map<String, String> vmParameters, List<String> vmOptions,
+            int pnpPort) throws IOException, NodeException {
 
-        JVMProcessImpl nodeProcess = createJvmProcess(StartNode.class.getName(), Arrays.asList(nodeName),
-                vmParameters, vmOptions);
-        return createNode(nodeName, expectedUrl, nodeProcess);
+        if (pnpPort <= 0) {
+            pnpPort = findFreePort();
+        }
+        String nodeUrl = "pnp://localhost:" + pnpPort + "/" + nodeName;
+        vmParameters.put(PNPConfig.PA_PNP_PORT.getName(), Integer.toString(pnpPort));
+        JVMProcessImpl nodeProcess = createJvmProcess(StartNode.class.getName(),
+                Collections.singletonList(nodeName), vmParameters, vmOptions);
+        return createNode(nodeName, nodeUrl, nodeProcess);
 
     }
 
     public static TNode createRMNodeStarterNode(String nodeName) throws IOException, NodeException {
 
-        JVMProcessImpl nodeProcess = createJvmProcess(RMNodeStarter.class.getName(), Arrays.asList("-n",
-                nodeName, "-r", getLocalUrl(), "-Dproactive.net.nolocal=false"), null, null);
-        return createNode(nodeName, null, nodeProcess);
+        int pnpPort = findFreePort();
+        String nodeUrl = "pnp://localhost:" + pnpPort + "/" + nodeName;
+        Map<String, String> vmParameters = new HashMap<>();
+        vmParameters.put(PNPConfig.PA_PNP_PORT.getName(), Integer.toString(pnpPort));
+        JVMProcessImpl nodeProcess = createJvmProcess(RMNodeStarter.class.getName(),
+                Arrays.asList("-n", nodeName, "-r", getLocalUrl(), "-Dproactive.net.nolocal=false"),
+                vmParameters, null);
+        return createNode(nodeName, nodeUrl, nodeProcess);
 
     }
 
@@ -324,7 +370,7 @@ public class RMTHelper {
             throws IOException, NodeException {
 
         if (expectedUrl == null) {
-            expectedUrl = "rmi://" + ProActiveInet.getInstance().getHostname() + ":" + PA_RMI_PORT + "/" +
+            expectedUrl = "pnp://" + ProActiveInet.getInstance().getHostname() + ":" + PA_PNP_PORT + "/" +
                 nodeName;
         }
 
@@ -361,15 +407,13 @@ public class RMTHelper {
             new org.objectweb.proactive.core.process.AbstractExternalProcess.StandardOutputMessageLogger());
         nodeProcess.setClassname(className);
 
-        ArrayList<String> jvmParameters = new ArrayList<String>();
+        ArrayList<String> jvmParameters = new ArrayList<>();
 
         if (vmParameters == null) {
-            vmParameters = new HashMap<String, String>();
+            vmParameters = new HashMap<>();
         }
 
-        if (!vmParameters.containsKey(CentralPAPropertyRepository.PA_RMI_PORT.getName())) {
-            vmParameters.put(CentralPAPropertyRepository.PA_RMI_PORT.getName(), String.valueOf(PA_RMI_PORT));
-        }
+        vmParameters.put(CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getName(), "pnp");
         if (!vmParameters.containsKey(CentralPAPropertyRepository.PA_HOME.getName())) {
             vmParameters.put(CentralPAPropertyRepository.PA_HOME.getName(),
                     CentralPAPropertyRepository.PA_HOME.getValue());
@@ -402,13 +446,13 @@ public class RMTHelper {
      * 			null to use the default one.
      * @throws Exception if an error occurs.
      */
-    public String startRM(String configurationFile, int rmiPort, String... jvmArgs) throws Exception {
+    public String startRM(String configurationFile, int pnpPort, String... jvmArgs) throws Exception {
         if (configurationFile == null) {
             configurationFile = new File(functionalTestRMProperties.toURI()).getAbsolutePath();
         }
         PAResourceManagerProperties.updateProperties(configurationFile);
 
-        List<String> commandLine = new ArrayList<String>();
+        List<String> commandLine = new ArrayList<>();
         commandLine.add(System.getProperty("java.home") + File.separator + "bin" + File.separator + "java");
         commandLine.add("-Djava.security.manager");
 
@@ -416,6 +460,9 @@ public class RMTHelper {
         if (!CentralPAPropertyRepository.PA_HOME.isSet()) {
             proactiveHome = PAResourceManagerProperties.RM_HOME.getValueAsString();
         }
+        commandLine.add(CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getCmdLine() + "pnp");
+        commandLine.add(PNPConfig.PA_PNP_PORT.getCmdLine() + pnpPort);
+
         commandLine.add(CentralPAPropertyRepository.PA_HOME.getCmdLine() + proactiveHome);
 
         String securityPolicy = CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getValue();
@@ -437,9 +484,9 @@ public class RMTHelper {
 
         commandLine.add("-cp");
         commandLine.add(testClasspath());
+        commandLine.add("-Djava.library.path=" + System.getProperty("java.library.path"));
         commandLine.add(CentralPAPropertyRepository.PA_TEST.getCmdLine() + "true");
         commandLine.add("-Djava.awt.headless=true"); // For Mac builds
-        commandLine.add(CentralPAPropertyRepository.PA_RMI_PORT.getCmdLine() + rmiPort);
         Collections.addAll(commandLine, jvmArgs);
         commandLine.add(RMTStarter.class.getName());
         commandLine.add(configurationFile);
@@ -450,10 +497,10 @@ public class RMTHelper {
         rmProcess = processBuilder.start();
 
         InputStreamReaderThread outputReader = new InputStreamReaderThread(rmProcess.getInputStream(),
-            "[RM VM output]: ");
+            "[RM output]: ");
         outputReader.start();
 
-        String url = getLocalUrl(rmiPort);
+        String url = getLocalUrl(pnpPort);
 
         System.out.println("Waiting for the RM using URL: " + url);
         auth = RMConnection.waitAndJoin(url);
@@ -476,22 +523,8 @@ public class RMTHelper {
      * @return list of ProActive Nodes
      */
     public List<Node> listAliveNodes() throws Exception {
-        ArrayList<Node> nodes = new ArrayList<Node>();
+        ArrayList<Node> nodes = new ArrayList<>();
         Set<String> urls = getResourceManager().listAliveNodeUrls();
-        for (String url : urls) {
-            nodes.add(NodeFactory.getNode(url));
-        }
-        return nodes;
-    }
-
-    /**
-     * Returns the alive Nodes accessible by the RM in the given node sources
-     * @param  nodeSourceNames
-     * @return list of ProActive Nodes
-     */
-    public List<Node> listAliveNodes(Set<String> nodeSourceNames) throws Exception {
-        ArrayList<Node> nodes = new ArrayList<Node>();
-        Set<String> urls = getResourceManager().listAliveNodeUrls(nodeSourceNames);
         for (String url : urls) {
             nodes.add(NodeFactory.getNode(url));
         }
@@ -504,15 +537,6 @@ public class RMTHelper {
      */
     public Set<String> listAliveNodesUrls() throws Exception {
         return getResourceManager().listAliveNodeUrls();
-    }
-
-    /**
-     * Returns the list of alive Nodes in the given nodeSources
-     * @param nodeSourceNames
-     * @return list of ProActive Nodes urls
-     */
-    public Set<String> listAliveNodesUrls(Set<String> nodeSourceNames) throws Exception {
-        return getResourceManager().listAliveNodeUrls(nodeSourceNames);
     }
 
     /**
@@ -543,33 +567,6 @@ public class RMTHelper {
         auth = null;
         resourceManager = null;
         eventReceiver = null;
-    }
-
-    /**
-     * Wait for an event regarding Scheduler state : started, resumed, stopped...
-     * If a corresponding event has been already thrown by scheduler, returns immediately,
-     * otherwise wait for reception of the corresponding event.
-     * @param event awaited event.
-     */
-    public void waitForRMStateEvent(RMEventType event) {
-        try {
-            waitForRMStateEvent(event, 0);
-        } catch (ProActiveTimeoutException e) {
-            //unreachable block, 0 means infinite, no timeout
-            //log sthing ?
-        }
-    }
-
-    /**
-     * Wait for an event regarding RM state : started, resumed, stopped...
-     * If a corresponding event has been already thrown by scheduler, returns immediately,
-     * otherwise wait for reception of the corresponding event.
-     * @param eventType awaited event.
-     * @param timeout in milliseconds
-     * @throws ProActiveTimeoutException if timeout is reached
-     */
-    public void waitForRMStateEvent(RMEventType eventType, long timeout) throws ProActiveTimeoutException {
-        getMonitorsHandler().waitForRMStateEvent(eventType, timeout);
     }
 
     /**
@@ -691,7 +688,7 @@ public class RMTHelper {
             */
             System.out.println("Initializing new event receiver");
             RMMonitorEventReceiver passiveEventReceiver = new RMMonitorEventReceiver(mHandler);
-            eventReceiver = (RMMonitorEventReceiver) PAActiveObject.turnActive(passiveEventReceiver);
+            eventReceiver = PAActiveObject.turnActive(passiveEventReceiver);
             PAFuture.waitFor(resourceManager.getMonitoring().addRMEventListener(eventReceiver));
         }
     }
@@ -733,11 +730,11 @@ public class RMTHelper {
             if (auth == null) {
                 try {
                     // trying to connect to the existing RM first
-                    auth = RMConnection.waitAndJoin(getLocalUrl(PA_RMI_PORT), 1);
-                    System.out.println("Connected to the RM on " + getLocalUrl(PA_RMI_PORT));
+                    auth = RMConnection.waitAndJoin(getLocalUrl(PA_PNP_PORT), 1);
+                    System.out.println("Connected to the RM on " + getLocalUrl(PA_PNP_PORT));
                 } catch (Exception e) {
                     // creating a new RM and default node source
-                    startRM(propertyFile, PA_RMI_PORT);
+                    startRM(propertyFile, PA_PNP_PORT);
                 }
             }
             authentificate(user, pass);
@@ -748,18 +745,19 @@ public class RMTHelper {
     }
 
     public static String getLocalUrl(int rmiPort) {
-        return "rmi://localhost:" + rmiPort + "/";
+        return "pnp://localhost:" + rmiPort + "/";
     }
 
     public static String getLocalUrl() {
-        return getLocalUrl(PA_RMI_PORT);
+        return getLocalUrl(PA_PNP_PORT);
     }
 
     private void authentificate(String user, String pass) throws Exception {
         connectedUserName = user;
         connectedUserPassword = pass;
-        connectedUserCreds = Credentials.createCredentials(new CredData(CredData.parseLogin(user), CredData
-                .parseDomain(connectedUserName), pass), auth.getPublicKey());
+        connectedUserCreds = Credentials.createCredentials(
+                new CredData(CredData.parseLogin(user), CredData.parseDomain(connectedUserName), pass),
+                auth.getPublicKey());
 
         System.out.println("Authentificating as user " + user);
         resourceManager = auth.login(connectedUserCreds);

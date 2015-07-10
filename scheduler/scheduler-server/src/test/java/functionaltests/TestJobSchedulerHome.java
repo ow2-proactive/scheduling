@@ -36,7 +36,6 @@
  */
 package functionaltests;
 
-import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -51,6 +50,7 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
+import org.ow2.proactive.utils.ClasspathUtils;
 import org.ow2.tests.FunctionalTest;
 import org.junit.After;
 import org.junit.Assert;
@@ -74,11 +74,11 @@ public class TestJobSchedulerHome extends FunctionalTest {
     @Before
     public void init() throws Throwable {
         pahomeScript = new SimpleScript(
-            "prop = variables.get(\"pa.scheduler.home\"); \n"
+            "prop = variables.get(\"PA_SCHEDULER_HOME\"); \n"
                 + "if (expectedHome != prop) throw new Error(\"Invalid java home, expected : \" + expectedHome + \", received : + \" + prop)\n",
             "javascript");
         SchedulerTHelper.startScheduler();
-        pahome = CentralPAPropertyRepository.PA_HOME.getValue();
+        pahome = ClasspathUtils.findSchedulerHome();
     }
 
     @After
@@ -150,9 +150,10 @@ public class TestJobSchedulerHome extends FunctionalTest {
         task1.setName(tname);
 
         if (OperatingSystem.getOperatingSystem() == OperatingSystem.windows) {
-            task1.setCommandLine("cmd.exe", "/c", "echo %PROACTIVE_HOME%");
+            task1.setCommandLine("cmd.exe", "/c", "echo %variables_PA_SCHEDULER_HOME%");
         } else {
-            task1.setCommandLine("bash", "-c", "echo $PROACTIVE_HOME");
+            //task1.setCommandLine("bash", "-c", "echo ${variables_proactive.home}");
+            task1.setCommandLine("env");
         }
 
         job.addTask(task1);

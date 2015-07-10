@@ -36,6 +36,14 @@
  */
 package org.ow2.proactive.scheduler.common.task;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
+
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
@@ -48,13 +56,6 @@ import org.ow2.proactive.scheduler.common.task.flow.FlowBlock;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.SelectionScript;
-
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
-import java.util.ArrayList;
-import java.util.List;
 
 
 /**
@@ -88,9 +89,6 @@ public abstract class Task extends CommonAttribute {
 
     /** Description of the task. */
     protected String description = null;
-
-    /** Description of the result of the task */
-    protected String resultPreview;
 
     /** DataSpace inputFiles */
     protected List<InputSelector> inputFiles = null;
@@ -136,8 +134,7 @@ public abstract class Task extends CommonAttribute {
     /** Tell whether this task has a precious result or not. */
     protected boolean preciousResult;
 
-    /** If true, the stdout/err of this tasks are stored in a file in LOCALSPACE */
-    @Deprecated
+    /** If true, the stdout/err of this tasks are stored in a file in LOCALSPACE and copied back to USERSPACE */
     protected boolean preciousLogs;
 
     protected boolean runAsMe;
@@ -148,6 +145,8 @@ public abstract class Task extends CommonAttribute {
 
     /** maximum execution time of the task (in milliseconds), the variable is only valid if isWallTime is true */
     protected long wallTime = 0;
+
+    protected ForkEnvironment forkEnvironment;
 
     /**
      * Add a dependence to the task. <font color="red">Warning : the dependence order is very
@@ -201,25 +200,6 @@ public abstract class Task extends CommonAttribute {
     }
 
     /**
-     * Return the result preview of this task.
-     *
-     * @return the result preview of this task.
-     */
-    public String getResultPreview() {
-        return resultPreview;
-    }
-
-    /**
-     * Set the result preview of this task.
-     *
-     * @param resultPreview
-     *            the result preview  to set.
-     */
-    public void setResultPreview(String resultPreview) {
-        this.resultPreview = resultPreview;
-    }
-
-    /**
      * To know if the result of this task is precious.
      *
      * @return true if the result is precious, false if not.
@@ -242,7 +222,6 @@ public abstract class Task extends CommonAttribute {
      *
      * @return true if the logs are precious, false if not.
      */
-    @Deprecated
     public boolean isPreciousLogs() {
         return preciousLogs;
     }
@@ -252,7 +231,6 @@ public abstract class Task extends CommonAttribute {
      *
      * @param preciousLogs true if the logs of this task are precious, false if not.
      */
-    @Deprecated
     public void setPreciousLogs(boolean preciousLogs) {
         this.preciousLogs = preciousLogs;
     }
@@ -499,9 +477,9 @@ public abstract class Task extends CommonAttribute {
     }
 
     /**
-     * To get the list of dependences of the task.
+     * To get the list of dependencies of the task.
      *
-     * @return the the list of dependences of the task.
+     * @return the the list of dependencies of the task.
      */
     @XmlTransient
     public List<Task> getDependencesList() {
@@ -509,10 +487,9 @@ public abstract class Task extends CommonAttribute {
     }
 
     /**
-     * Get the number of nodes needed for this task. (by default : 1)
+     * Get the number of nodes needed for this task (by default: 1).
      *
-     * The method is deprecated. Use {@link Task.getParallelEnvironment().getNodesNumber()}
-     * @return the number Of Nodes Needed
+     * @return the number of Nodes Needed
      */
     public int getNumberOfNodesNeeded() {
         return isParallel() ? getParallelEnvironment().getNodesNumber() : 1;
@@ -523,6 +500,19 @@ public abstract class Task extends CommonAttribute {
      */
     public long getWallTime() {
         return wallTime;
+    }
+
+    /**
+     * Return the working Directory.
+     *
+     * @return the working Directory.
+     */
+    public String getWorkingDir() {
+        if (forkEnvironment == null) {
+            return null;
+        }
+
+        return forkEnvironment.getWorkingDir();
     }
 
     /**
@@ -672,14 +662,14 @@ public abstract class Task extends CommonAttribute {
     }
 
     public String display() {
-        String nl = System.getProperty("line.separator");
+        String nl = System.lineSeparator();
 
         return "Task \'" + name + "\' : " + nl + "\tFlowBlock = '" + flowBlock + "'" + nl +
-            "\tDescription = '" + description + "'" + nl + "\tResultPreview = '" + resultPreview + "'" + nl +
+            "\tDescription = '" + description + "'" + nl +
             "\tInputFiles = " + inputFiles + nl + "\tOutputFiles = " + outputFiles + nl +
             "\tParallelEnvironment = " + parallelEnvironment + nl + "\tSelectionScripts = " +
-            displaySelectionScripts() + nl + "\tPreScript = " +
-            ((preScript != null) ? preScript.display() : null) + nl + "\tPostScript = " +
+            displaySelectionScripts() + nl + "\tForkEnvironment = " + forkEnvironment + nl +
+            "\tPreScript = " + ((preScript != null) ? preScript.display() : null) + nl + "\tPostScript = " +
             ((postScript != null) ? postScript.display() : null) + nl + "\tCleanScript = " +
             ((cScript != null) ? cScript.display() : null) + nl + "\tFlowScript = " +
             ((flowScript != null) ? flowScript.display() : null) + nl + "\tPreciousResult = " +
@@ -699,6 +689,14 @@ public abstract class Task extends CommonAttribute {
         }
         answer += " }";
         return answer;
+    }
+
+    public ForkEnvironment getForkEnvironment() {
+        return forkEnvironment;
+    }
+
+    public void setForkEnvironment(ForkEnvironment forkEnvironment) {
+        this.forkEnvironment = forkEnvironment;
     }
 
 }

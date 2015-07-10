@@ -36,43 +36,36 @@
  */
 package functionaltests;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
+import org.junit.Assert;
+import org.junit.Test;
 import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
-import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
-import org.ow2.proactive.scheduler.common.task.JavaTask;
-import org.ow2.proactive.scheduler.common.task.NativeTask;
-import org.ow2.proactive.scheduler.common.task.Task;
-import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.task.*;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.utils.FileToBytesConverter;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+
+import java.io.File;
+import java.io.Serializable;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 
 /**
  * Test checks that if task is created with 'preciousLogs' attribute set then task output is copied
- * into the job output space.
+ * into the user space.
  * <p/>
  * Test creates jobs with native, java and forked java tasks and checks that task log
- * was copied into output data space ant log file contains task output and output
- * of pre- and post- scripts (and fork environment script for forked java task). 
- * 
- * @author ProActive team
+ * was copied into user data space ant log file contains task output and output
+ * of pre- and post- scripts (and fork environment script for forked java task).
  *
+ * @author ProActive team
  */
 public class TestPreciousLogs extends SchedulerConsecutive {
 
@@ -86,34 +79,20 @@ public class TestPreciousLogs extends SchedulerConsecutive {
 
     }
 
-    private File output;
-
-    @Before
-    public void createDataSpacesDirs() throws IOException {
-        output = createTmpDir("output");
-        System.out.println("Tmp output dir: " + output.getAbsolutePath());
-    }
-
-    @After
-    public void removeDataSpacesDirs() throws IOException {
-        removeDir(output);
-    }
-
     static final String TASK_OUTPUT = "TestTaskOutput";
 
     private void testPreciousLogs(boolean createJavaTask, boolean forkEnv) throws Exception {
         TaskFlowJob job = new TaskFlowJob();
         job.setName(this.getClass().getSimpleName());
-        job.setOutputSpace(output.toURI().toString());
 
-        Map<String, List<String>> expectedOutput = new LinkedHashMap<String, List<String>>();
+        Map<String, List<String>> expectedOutput = new LinkedHashMap<>();
 
         for (int i = 0; i < 3; i++) {
             String forkOutput = "forkOutput-" + i;
             String preOutput = "preOutput-" + i;
             String postOutput = "postOutput-" + i;
 
-            List<String> expectedTaskOutput = new ArrayList<String>();
+            List<String> expectedTaskOutput = new ArrayList<>();
             expectedTaskOutput.add(TASK_OUTPUT);
             expectedTaskOutput.add(preOutput);
             expectedTaskOutput.add(postOutput);
@@ -155,24 +134,18 @@ public class TestPreciousLogs extends SchedulerConsecutive {
             job.addTask(task);
         }
 
-        JobId jobId = SchedulerTHelper.submitJob(job);
-        SchedulerTHelper.waitForEventJobFinished(jobId);
+        JobId jobId = SchedulerTHelper.testJobSubmission(job);
 
         Scheduler scheduler = SchedulerTHelper.getSchedulerInterface();
+
+        String userURI = scheduler.getUserSpaceURIs().get(0);
+        String userPath = new File(new URI(userURI)).getAbsolutePath();
+
         JobResult jobResult = scheduler.getJobResult(jobId);
         Map<String, TaskResult> results = jobResult.getAllResults();
-        for (TaskResult taskResult : results.values()) {
-            if (taskResult.getException() != null) {
-                taskResult.getException().printStackTrace();
-                Assert.fail("Task failed with exception " + taskResult.getException());
-            }
-            System.out.println("Task output:");
-            System.out.println(taskResult.getOutput().getAllLogs(false));
-        }
-
         for (String taskName : expectedOutput.keySet()) {
 
-            File taskLog = new File(output, String.format("TaskLogs-%s-%s.log", jobId.value(), results.get(
+            File taskLog = new File(userPath, String.format("TaskLogs-%s-%s.log", jobId.value(), results.get(
                     taskName).getTaskId().value()));
             if (!taskLog.exists()) {
                 Assert.fail("Task log file " + taskLog.getAbsolutePath() + " doesn't exist");
@@ -204,31 +177,6 @@ public class TestPreciousLogs extends SchedulerConsecutive {
 
     static SimpleScript createScript(String scriptOutput) throws Exception {
         return new SimpleScript(String.format("print('%s')", scriptOutput), "js");
-    }
-
-    static void removeDir(File dir) throws IOException {
-        if (dir == null) {
-            return;
-        }
-        for (File file : dir.listFiles()) {
-            if (!file.delete()) {
-                throw new IOException("Failed to delete file " + file.getAbsolutePath());
-            }
-        }
-        if (!dir.delete()) {
-            throw new IOException("Failed to delete dir " + dir.getAbsolutePath());
-        }
-    }
-
-    static File createTmpDir(String suffix) throws IOException {
-        File file = File.createTempFile("test", ".input");
-        if (!file.delete()) {
-            throw new IOException("Failed to delete file " + file.getAbsolutePath());
-        }
-        if (!file.mkdir()) {
-            throw new IOException("Failed to crete dir " + file.getAbsolutePath());
-        }
-        return file;
     }
 
 }

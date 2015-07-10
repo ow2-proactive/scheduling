@@ -37,7 +37,6 @@
 package org.ow2.proactive.scripting;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -60,6 +59,7 @@ import javax.script.ScriptEngineManager;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.utils.BoundedStringWriter;
 import org.ow2.proactive.utils.FileUtils;
+import com.google.common.base.Throwables;
 import org.apache.log4j.Logger;
 
 
@@ -94,7 +94,7 @@ public abstract class Script<E> implements Serializable {
     protected String id;
 
     /** The parameters of the script */
-    protected String[] parameters;
+    protected Serializable[] parameters;
 
     /** Name of the script **/
     private String scriptName;
@@ -109,7 +109,7 @@ public abstract class Script<E> implements Serializable {
      * @param parameters script's execution arguments.
      * @throws InvalidScriptException if the creation fails.
      */
-    public Script(String script, String engineName, String[] parameters) throws InvalidScriptException {
+    public Script(String script, String engineName, Serializable[] parameters) throws InvalidScriptException {
         this.scriptEngineLookup = engineName;
         this.script = script;
         this.id = script;
@@ -126,7 +126,7 @@ public abstract class Script<E> implements Serializable {
      * @param scriptName name of the script
      * @throws InvalidScriptException if the creation fails.
      */
-    public Script(String script, String engineName, String[] parameters, String scriptName)
+    public Script(String script, String engineName, Serializable[] parameters, String scriptName)
             throws InvalidScriptException {
         this.scriptEngineLookup = engineName;
         this.script = script;
@@ -141,7 +141,7 @@ public abstract class Script<E> implements Serializable {
      * @throws InvalidScriptException if the creation fails.
      */
     public Script(String script, String engineName) throws InvalidScriptException {
-        this(script, engineName, (String[]) null);
+        this(script, engineName, (Serializable[]) null);
     }
 
     /** Directly create a script with a string.
@@ -160,7 +160,7 @@ public abstract class Script<E> implements Serializable {
      * @param parameters script's execution arguments.
      * @throws InvalidScriptException if the creation fails.
      */
-    public Script(File file, String[] parameters) throws InvalidScriptException {
+    public Script(File file, Serializable[] parameters) throws InvalidScriptException {
         this.scriptEngineLookup = FileUtils.getExtension(file.getPath());
 
         try {
@@ -186,7 +186,7 @@ public abstract class Script<E> implements Serializable {
      * @param parameters execution arguments.
      * @throws InvalidScriptException if the creation fails.
      */
-    public Script(URL url, String[] parameters) throws InvalidScriptException {
+    public Script(URL url, Serializable[] parameters) throws InvalidScriptException {
         this.scriptEngineLookup = FileUtils.getExtension(url.getFile());
 
         try {
@@ -234,15 +234,6 @@ public abstract class Script<E> implements Serializable {
     }
 
     /**
-     * Sets the script name to the given value.
-     *
-     * @param scriptName the new script name.
-     */
-    public void setScriptName(String scriptName) {
-        this.scriptName = scriptName;
-    }
-
-    /**
      * Get the script name.
      *
      * @return the script name.
@@ -265,23 +256,13 @@ public abstract class Script<E> implements Serializable {
      *
      * @return the parameters.
      */
-    public String[] getParameters() {
+    public Serializable[] getParameters() {
         return parameters;
     }
 
     /**
-     * Add a binding to the script that will be handle by this handler.
-     *
-     * @param name the name of the variable
-     * @param value the value of the variable
-     */
-    public void addBinding(String name, Object value) {
-
-    }
-
-    /**
      * Execute the script and return the ScriptResult corresponding.
-     * Will use {@link java.lang.System.out} for output.
+     * Will use {@link java.lang.System#out} for output.
      *
      * @return a ScriptResult object.
      */
@@ -302,18 +283,28 @@ public abstract class Script<E> implements Serializable {
             PrintStream errorSink) {
         ScriptEngine engine = createScriptEngine();
 
-        if (engine == null) {
-            return new ScriptResult<E>(new Exception("No Script Engine Found for name or extension " +
-                scriptEngineLookup));
-        }
+        if (engine == null)
+            return new ScriptResult<>(
+              new Exception("No Script Engine Found for name or extension " + scriptEngineLookup));
 
         // SCHEDULING-1532: redirect script output to a buffer (keep the latest DEFAULT_OUTPUT_MAX_SIZE)
         BoundedStringWriter outputBoundedWriter = new BoundedStringWriter(outputSink, DEFAULT_OUTPUT_MAX_SIZE);
         BoundedStringWriter errorBoundedWriter = new BoundedStringWriter(errorSink, DEFAULT_OUTPUT_MAX_SIZE);
         engine.getContext().setWriter(new PrintWriter(outputBoundedWriter));
         engine.getContext().setErrorWriter(new PrintWriter(errorBoundedWriter));
+        Reader closedInput = new Reader() {
+            @Override
+            public int read(char[] cbuf, int off, int len) throws IOException {
+                throw new IOException("closed");
+            }
 
-        engine.getContext().setAttribute(ScriptEngine.FILENAME, getScriptName(), ScriptContext.ENGINE_SCOPE);
+            @Override
+            public void close() throws IOException {
+
+            }
+        };
+        engine.getContext().setReader(closedInput);
+        engine.getContext().setAttribute(ScriptEngine.FILENAME, scriptName, ScriptContext.ENGINE_SCOPE);
 
         try {
             Bindings bindings = engine.getBindings(ScriptContext.ENGINE_SCOPE);
@@ -324,24 +315,27 @@ public abstract class Script<E> implements Serializable {
                 }
             }
             prepareBindings(bindings);
-            engine.eval(getReader());
+            Object evalResult = engine.eval(getReader());
+
+            engine.getContext().getErrorWriter().flush();
+            engine.getContext().getWriter().flush();
 
             // Add output to the script result
-            ScriptResult<E> result = this.getResult(bindings);
+            ScriptResult<E> result = this.getResult(evalResult, bindings);
             result.setOutput(outputBoundedWriter.toString());
 
             return result;
-        } catch (Throwable e) {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            PrintStream ps = new PrintStream(baos);
-            e.printStackTrace(ps);
-            ps.flush();
-            String stack = baos.toString();
-            if (e.getMessage() != null) {
-                stack = e.getMessage() + System.getProperty("line.separator") + stack;
+        } catch (javax.script.ScriptException e) {
+            // drop exception cause as it might not be serializable
+            ScriptException scriptException = new ScriptException(e.getMessage());
+            scriptException.setStackTrace(e.getStackTrace());
+            return new ScriptResult<>(scriptException);
+        } catch (Throwable t) {
+            String stack = Throwables.getStackTraceAsString(t);
+            if (t.getMessage() != null) {
+                stack = t.getMessage() + System.lineSeparator() + stack;
             }
-            logger.error(e.getMessage(), e);
-            return new ScriptResult<E>(new Exception(stack));
+            return new ScriptResult<>(new Exception(stack));
         }
     }
 
@@ -375,7 +369,7 @@ public abstract class Script<E> implements Serializable {
     protected abstract void prepareSpecialBindings(Bindings bindings);
 
     /** Return the variable awaited from the script execution */
-    protected abstract ScriptResult<E> getResult(Bindings bindings);
+    protected abstract ScriptResult<E> getResult(Object evalResult, Bindings bindings);
 
     /** Set parameters in bindings if any */
     protected final void prepareBindings(Bindings bindings) {
@@ -439,7 +433,7 @@ public abstract class Script<E> implements Serializable {
     }
 
     public String display() {
-        String nl = System.getProperty("line.separator");
+        String nl = System.lineSeparator();
         return " { " + nl + "Script '" + getScriptName() + '\'' + nl + "\tscriptEngineLookup = '" +
             scriptEngineLookup + '\'' + nl + "\tscript = " + nl + script + nl + "\tid = " + nl + id + nl +
             "\tparameters = " + Arrays.toString(parameters) + nl + '}';

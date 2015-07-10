@@ -95,16 +95,18 @@ public class TestDataSpaceConfiguration extends ProActiveTest {
         File spFileWithUserDir = new File(IOSPACE, username);
         spFile.mkdirs();
         spFileWithUserDir.mkdirs();
+        spFileWithUserDir.deleteOnExit();
+        spFile.deleteOnExit();
 
         filesServerIn = new FileSystemServerDeployer("space", IOSPACE, true, true);
         String[] spaceurls = filesServerIn.getVFSRootURLs();
 
         String[] userdirUrls = DataSpaceServiceStarter.urlsWithUserDir(spaceurls, username);
 
-        ArrayList<String> expected = new ArrayList<String>();
+        ArrayList<String> expected = new ArrayList<>();
         expected.addAll(Arrays.asList(spaceurls));
 
-        ArrayList<String> expectedWithUserDir = new ArrayList<String>();
+        ArrayList<String> expectedWithUserDir = new ArrayList<>();
         expectedWithUserDir.addAll(Arrays.asList(userdirUrls));
 
         PASchedulerProperties.DATASPACE_DEFAULTINPUT_URL.updateProperty(DataSpaceServiceStarter
@@ -130,7 +132,7 @@ public class TestDataSpaceConfiguration extends ProActiveTest {
         DataSpaceServiceStarter dsServiceStarter = DataSpaceServiceStarter.getDataSpaceServiceStarter();
         dsServiceStarter.startNamingService();
 
-        Set<SpaceInstanceInfo> predefinedSpaces = new HashSet<SpaceInstanceInfo>();
+        Set<SpaceInstanceInfo> predefinedSpaces = new HashSet<>();
         NamingService namingService = dsServiceStarter.getNamingService();
 
         JobDataSpaceApplication jdsa = new JobDataSpaceApplication(appid, dsServiceStarter.getNamingService());

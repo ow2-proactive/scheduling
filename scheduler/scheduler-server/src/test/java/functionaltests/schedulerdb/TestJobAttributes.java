@@ -77,13 +77,13 @@ public class TestJobAttributes extends BaseSchedulerDBTest {
         Map<String, String> genericInfo;
         InternalJob jobData;
 
-        genericInfo = new HashMap<String, String>();
+        genericInfo = new HashMap<>();
         job.setGenericInformations(genericInfo);
         jobData = defaultSubmitJobAndLoadInternal(false, job);
         Assert.assertNotNull(jobData.getGenericInformations());
         Assert.assertTrue(jobData.getGenericInformations().isEmpty());
 
-        genericInfo = new HashMap<String, String>();
+        genericInfo = new HashMap<>();
         genericInfo.put("p1", "v1");
         genericInfo.put("p2", "v2");
         job.setGenericInformations(genericInfo);
@@ -96,7 +96,7 @@ public class TestJobAttributes extends BaseSchedulerDBTest {
         for (int i = 0; i < 100; i++) {
             longString.append("0123456789abcdefghijklmnopqrstuvwxyz");
         }
-        genericInfo = new HashMap<String, String>();
+        genericInfo = new HashMap<>();
         genericInfo.put("longProperty", longString.toString());
         job.setGenericInformations(genericInfo);
         jobData = defaultSubmitJobAndLoadInternal(false, job);

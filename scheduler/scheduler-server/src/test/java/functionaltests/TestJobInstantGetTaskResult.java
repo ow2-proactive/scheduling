@@ -40,12 +40,12 @@ import java.io.File;
 import java.net.URI;
 
 import org.objectweb.proactive.api.PAActiveObject;
-import org.ow2.proactive.scheduler.common.job.JobEnvironment;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
-
 import functionaltests.executables.ResultAsArray;
+import org.junit.Test;
 
 
 /**
@@ -61,11 +61,11 @@ import functionaltests.executables.ResultAsArray;
 public class TestJobInstantGetTaskResult extends SchedulerConsecutive {
 
     /**
-    * Tests start here.
-    *
-    * @throws Throwable any exception that can be thrown during the test.
-    */
-    @org.junit.Test
+     * Tests start here.
+     *
+     * @throws Throwable any exception that can be thrown during the test.
+     */
+    @Test
     public void run() throws Throwable {
         //create Scheduler client as an active object
         SubmitJob client = (SubmitJob) PAActiveObject.newActive(SubmitJob.class.getName(), new Object[] {});
@@ -74,19 +74,17 @@ public class TestJobInstantGetTaskResult extends SchedulerConsecutive {
 
         //create job
         TaskFlowJob job = new TaskFlowJob();
-        try {
-            final JobEnvironment je = new JobEnvironment();
-            final URI uri = ResultAsArray.class.getProtectionDomain().getCodeSource().getLocation().toURI();
-            je.setJobClasspath(new String[] { new File(uri).getAbsolutePath() });
-            job.setEnvironment(je);
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
+
+        final URI uri = ResultAsArray.class.getProtectionDomain().getCodeSource().getLocation().toURI();
+
+        ForkEnvironment forkEnvironment = new ForkEnvironment();
+        forkEnvironment.addAdditionalClasspath(new File(uri).getAbsolutePath());
 
         for (int i = 0; i < 50; i++) {
             JavaTask t = new JavaTask();
             t.setExecutableClassName(ResultAsArray.class.getName());
             t.setName("task" + i);
+            t.setForkEnvironment(forkEnvironment);
             job.addTask(t);
         }
 
@@ -95,4 +93,5 @@ public class TestJobInstantGetTaskResult extends SchedulerConsecutive {
 
         SchedulerTHelper.waitForEventJobRemoved(id);
     }
+
 }

@@ -531,7 +531,7 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
     protected abstract String getLDAPConfigFileName();
 
     private Hashtable<String, String> createBasicEnvForInitalContext() {
-        Hashtable<String, String> env = new Hashtable<String, String>(6, 1f);
+        Hashtable<String, String> env = new Hashtable<>(6, 1f);
         env.put("com.sun.jndi.ldap.connect.pool", LDAP_CONNECTION_POOLING);
         env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
         env.put(Context.SECURITY_AUTHENTICATION, AUTHENTICATION_METHOD);

@@ -86,7 +86,7 @@ public class AutoUpdateInfrastructure extends HostsFileBasedInfrastructureManage
             throw new RMException("Cannot run command: " + filledCommand, e1);
         }
 
-        String lf = System.getProperty("line.separator");
+        String lf = System.lineSeparator();
 
         int circuitBreakerThreshold = 5;
         while (!this.pnTimeout.get(pnURL) && circuitBreakerThreshold > 0) {

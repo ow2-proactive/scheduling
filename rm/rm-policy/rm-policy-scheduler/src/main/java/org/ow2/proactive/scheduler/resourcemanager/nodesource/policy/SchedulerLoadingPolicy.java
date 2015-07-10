@@ -108,7 +108,7 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
         super.configure(policyParameters);
 
         try {
-            activeTasks = new HashMap<JobId, Integer>();
+            activeTasks = new HashMap<>();
 
             int index = 4;
             refreshTime = Integer.parseInt(policyParameters[index++].toString());

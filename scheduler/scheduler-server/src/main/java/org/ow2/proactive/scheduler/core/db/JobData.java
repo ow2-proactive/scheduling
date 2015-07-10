@@ -14,14 +14,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.Index;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
-import org.hibernate.annotations.Parameter;
-import org.hibernate.annotations.Type;
-import org.hibernate.type.SerializableToBlobType;
 import org.ow2.proactive.authentication.crypto.Credentials;
-import org.ow2.proactive.scheduler.common.job.JobEnvironment;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
@@ -32,6 +25,12 @@ import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.InternalTaskFlowJob;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.job.JobInfoImpl;
+import org.hibernate.annotations.Index;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+import org.hibernate.annotations.Parameter;
+import org.hibernate.annotations.Type;
+import org.hibernate.type.SerializableToBlobType;
 
 
 @Entity
@@ -47,8 +46,6 @@ public class JobData {
     private Map<String, String> genericInformation;
 
     private Map<String, String> variables;
-
-    private String[] classpath;
 
     private String owner;
 
@@ -91,8 +88,6 @@ public class JobData {
     private String description;
 
     private String projectName;
-
-    private long classpathCrc;
 
     JobInfoImpl createJobInfo(JobId jobId) {
         JobInfoImpl jobInfo = new JobInfoImpl();
@@ -171,23 +166,7 @@ public class JobData {
         jobRuntimeData.setNumberOfFinishedTasks(job.getNumberOfFinishedTasks());
         jobRuntimeData.setTotalNumberOfTasks(job.getTotalNumberOfTasks());
 
-        JobEnvironment jobEnv = job.getEnvironment();
-        if (jobEnv != null && jobEnv.getJobClasspath() != null) {
-            jobRuntimeData.setClasspath(jobEnv.getJobClasspath());
-            jobRuntimeData.setClasspathCrc(jobEnv.getJobClasspathCRC());
-        }
-
         return jobRuntimeData;
-    }
-
-    @Column(name = "JOB_CLASSPATH")
-    @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object"))
-    public String[] getClasspath() {
-        return classpath;
-    }
-
-    public void setClasspath(String[] classpath) {
-        this.classpath = classpath;
     }
 
     @Column(name = "GENERIC_INFO")
@@ -208,15 +187,6 @@ public class JobData {
 
     public void setVariables(Map<String, String> variables) {
         this.variables = variables;
-    }
-
-    @Column(updatable = false, name = "CLASSPATH_CRC")
-    public long getClasspathCrc() {
-        return classpathCrc;
-    }
-
-    public void setClasspathCrc(long classpathCrc) {
-        this.classpathCrc = classpathCrc;
     }
 
     @Id

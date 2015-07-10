@@ -48,9 +48,10 @@ import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.utils.NodeSet;
+import org.junit.Assert;
+
 import functionaltests.RMConsecutive;
 import functionaltests.RMTHelper;
-import org.junit.Assert;
 
 
 /**
@@ -95,8 +96,7 @@ public class TestAdminAddingNodes extends RMConsecutive {
 
         RMTHelper.log("Test 1");
         String node1Name = "node1";
-        String node1URL = RMTHelper.getLocalUrl() + node1Name;
-        helper.createNode(node1Name);
+        String node1URL = helper.createNode(node1Name).getNodeURL();
 
         resourceManager.addNode(node1URL, NS_NAME);
 
@@ -121,8 +121,7 @@ public class TestAdminAddingNodes extends RMConsecutive {
 
         RMTHelper.log("Test 3");
         String node2Name = "node2";
-        String node2URL = RMTHelper.getLocalUrl() + node2Name;
-        helper.createNode(node2Name);
+        String node2URL = helper.createNode(node2Name).getNodeURL();
 
         resourceManager.addNode(node2URL, NS_NAME);
 
@@ -146,18 +145,15 @@ public class TestAdminAddingNodes extends RMConsecutive {
         Assert.assertEquals(0, resourceManager.getState().getTotalAliveNodesNumber());
 
         //create another node with the same URL, and add it to Resource manager
-        helper.createNode(node2Name);
+        node2URL = helper.createNode(node2Name).getNodeURL();
         resourceManager.addNode(node2URL, NS_NAME);
-
-        //wait for removal of the previous down node with the same URL
-        helper.waitForNodeEvent(RMEventType.NODE_REMOVED, node2URL);
 
         //wait the node added event
         helper.waitForNodeEvent(RMEventType.NODE_ADDED, node2URL);
         //wait for the node to be in free state
         helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
-        Assert.assertEquals(1, resourceManager.getState().getTotalNodesNumber());
+        Assert.assertEquals(2, resourceManager.getState().getTotalNodesNumber());
         Assert.assertEquals(1, resourceManager.getState().getFreeNodesNumber());
         Assert.assertEquals(1, resourceManager.getState().getTotalAliveNodesNumber());
 
@@ -173,11 +169,8 @@ public class TestAdminAddingNodes extends RMConsecutive {
         helper.killNode(node2URL);
 
         //create another node with the same URL, and add it to Resource manager
-        helper.createNode(node2Name);
+        node2URL = helper.createNode(node2Name).getNodeURL();
         resourceManager.addNode(node2URL, NS_NAME);
-
-        //wait for removal of the previous free node with the same URL
-        helper.waitForNodeEvent(RMEventType.NODE_REMOVED, node2URL);
 
         try {
             NodeFactory.getNode(node2URL);
@@ -188,9 +181,9 @@ public class TestAdminAddingNodes extends RMConsecutive {
         //wait the node added event, node added is configuring
         helper.waitForNodeEvent(RMEventType.NODE_ADDED, node2URL);
         //wait for the node to be in free state
-        helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        Assert.assertEquals(1, resourceManager.getState().getTotalNodesNumber());
-        Assert.assertEquals(1, resourceManager.getState().getFreeNodesNumber());
+        helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node2URL);
+        Assert.assertEquals(3, resourceManager.getState().getTotalNodesNumber());
+        Assert.assertEquals(2, resourceManager.getState().getFreeNodesNumber());
 
         RMTHelper.log("Test 5");
 
@@ -202,18 +195,16 @@ public class TestAdminAddingNodes extends RMConsecutive {
         evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node2URL);
         Assert.assertEquals(evt.getNodeState(), NodeState.BUSY);
 
-        Assert.assertEquals(1, resourceManager.getState().getTotalNodesNumber());
+        Assert.assertEquals(3, resourceManager.getState().getTotalNodesNumber());
         Assert.assertEquals(0, resourceManager.getState().getFreeNodesNumber());
 
         //node2 is busy, kill the node
         helper.killNode(node2URL);
 
         //create another node with the same URL, and add it to Resource manager
-        helper.createNode(node2Name);
+        node2URL = helper.createNode(node2Name).getNodeURL();
         resourceManager.addNode(node2URL, NS_NAME);
 
-        //wait for removal of the previous free node with the same URL
-        helper.waitForNodeEvent(RMEventType.NODE_REMOVED, node2URL);
         try {
             NodeFactory.getNode(node2URL);
         } catch (Exception e) {
@@ -223,8 +214,8 @@ public class TestAdminAddingNodes extends RMConsecutive {
         //wait the node added event, node added is configuring
         helper.waitForNodeEvent(RMEventType.NODE_ADDED, node2URL);
         //wait for the node to be in free state
-        helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        Assert.assertEquals(1, resourceManager.getState().getTotalNodesNumber());
+        helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node2URL);
+        Assert.assertEquals(4, resourceManager.getState().getTotalNodesNumber());
         Assert.assertEquals(1, resourceManager.getState().getFreeNodesNumber());
 
         RMTHelper.log("Test 6");
@@ -237,7 +228,7 @@ public class TestAdminAddingNodes extends RMConsecutive {
         evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node2URL);
         Assert.assertEquals(evt.getNodeState(), NodeState.BUSY);
 
-        Assert.assertEquals(1, resourceManager.getState().getTotalNodesNumber());
+        Assert.assertEquals(4, resourceManager.getState().getTotalNodesNumber());
         Assert.assertEquals(0, resourceManager.getState().getFreeNodesNumber());
 
         //put the node in to Release state
@@ -247,18 +238,16 @@ public class TestAdminAddingNodes extends RMConsecutive {
         evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node2URL);
         Assert.assertEquals(evt.getNodeState(), NodeState.TO_BE_REMOVED);
 
-        Assert.assertEquals(1, resourceManager.getState().getTotalNodesNumber());
+        Assert.assertEquals(4, resourceManager.getState().getTotalNodesNumber());
         Assert.assertEquals(0, resourceManager.getState().getFreeNodesNumber());
 
         //node2 is to release, kill the node
         helper.killNode(node2URL);
 
         //create another node with the same URL, and add it to Resource manager
-        helper.createNode(node2Name);
+        node2URL = helper.createNode(node2Name).getNodeURL();
         resourceManager.addNode(node2URL, NS_NAME);
 
-        //wait for removal of the previous down node with the same URL
-        helper.waitForNodeEvent(RMEventType.NODE_REMOVED, node2URL);
         try {
             NodeFactory.getNode(node2URL);
         } catch (Exception e) {
@@ -268,8 +257,9 @@ public class TestAdminAddingNodes extends RMConsecutive {
         //wait the node added event, node added is configuring
         helper.waitForNodeEvent(RMEventType.NODE_ADDED, node2URL);
         //wait for the node to be in free state
-        helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        Assert.assertEquals(1, resourceManager.getState().getTotalNodesNumber());
+        evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node2URL);
+        Assert.assertEquals(evt.getNodeState(), NodeState.FREE);
+        Assert.assertEquals(5, resourceManager.getState().getTotalNodesNumber());
         Assert.assertEquals(1, resourceManager.getState().getFreeNodesNumber());
 
         RMTHelper.log("Test 7");

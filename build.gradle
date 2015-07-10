@@ -12,13 +12,6 @@ configurations {
     }
 }
 
-task extractNativeBundle(type: Copy) {
-    from {
-        configurations.nativeBundle.collect { zipTree(it) }
-    }
-    into file(project.nativeLibsDir)
-}
-
 buildscript {
     repositories {
         if (project.hasProperty('local')) mavenLocal()
@@ -83,7 +76,9 @@ configure(javaSubprojects) {
         compile 'log4j:log4j:1.2.14'
         compile 'com.google.guava:guava:18.0'
         runtime 'org.slf4j:slf4j-log4j12:1.6.6'
-        testCompile 'junit:junit:4.11'
+        testCompile 'junit:junit:4.12'
+        testCompile 'org.hamcrest:hamcrest-junit:2.0.0.0'
+        testCompile 'org.mockito:mockito-core:1.9.5'
     }
 
     test {
@@ -167,7 +162,7 @@ project(':scheduler:scheduler-api') {
 
     apply plugin: 'trang'
     task convertSchemas
-    ['3.0', '3.1', '3.2', 'dev'].each { schemaVersion ->
+    ['3.0', '3.1', '3.2', '3.3', 'dev'].each { schemaVersion ->
         task("convertSchemasXsd-$schemaVersion", type: org.hsudbrock.tranggradleplugin.TrangTask) {
             sourceDirectory = project.file("src/main/resources/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/${schemaVersion}")
             targetDirectory = sourceDirectory
@@ -282,17 +277,14 @@ project(':rm:rm-node') {
         runtime fileTree(dir: project.nativeLibsDir, exclude: '*.jar')
 
         // protocols
-        runtime "org.objectweb.proactive:programming-extension-rmissl:${programmingVersion}"
         runtime "org.objectweb.proactive:programming-extension-pnp:${programmingVersion}"
-        runtime "org.objectweb.proactive:programming-extension-pnpssl:${programmingVersion}"
-        runtime "org.objectweb.proactive:programming-extension-amqp:${programmingVersion}"
         runtime "org.objectweb.proactive:programming-extension-pamr:${programmingVersion}"
 
         // script engines
         runtime 'org.jruby:jruby-jline:1.7.4'
         runtime 'org.python:jython-jline:2.5.4-rc1'
         runtime 'org.codehaus.groovy:groovy-all:2.1.6'
-        runtime 'jsr223:jsr223-nativeshell:0.2'
+        runtime 'jsr223:jsr223-nativeshell:0.3'
     }
 
 }
@@ -339,7 +331,7 @@ project('scheduler:scheduler-server') {
         compile project(':rm:rm-server')
         compile project(':rm:rm-client')
 
-        testCompile 'org.mockito:mockito-core:1.9.5'
+        testCompile "org.objectweb.proactive:programming-extension-pnp:${programmingVersion}"
         testCompile 'org.hamcrest:hamcrest-all:1.3'
         testCompile 'com.h2database:h2:1.3.167'
         testCompile 'org.codehaus.groovy:groovy-all:2.1.6'
@@ -349,14 +341,12 @@ project('scheduler:scheduler-server') {
         testCompile project(':rm:rm-server').sourceSets.test.output // to get shared test classes
         testCompile project(':rm:rm-infrastructure:rm-infrastructure-gcm')
         testCompile project(':rm:rm-policy:rm-policy-scheduler')
+        testCompile project(':scheduler:scheduler-examples')
 
         runtime 'org.hibernate:hibernate-c3p0:4.1.7.Final'
         runtime 'org.apache.derby:derby:10.8.2.2'
         runtime 'mysql:mysql-connector-java:5.1.16'
-        runtime "org.objectweb.proactive:programming-extension-rmissl:${programmingVersion}"
         runtime "org.objectweb.proactive:programming-extension-pnp:${programmingVersion}"
-        runtime "org.objectweb.proactive:programming-extension-pnpssl:${programmingVersion}"
-        runtime "org.objectweb.proactive:programming-extension-amqp:${programmingVersion}"
         runtime "org.objectweb.proactive:programming-extension-pamr:${programmingVersion}"
 
         runtime project(':rest:rest-server')
@@ -386,51 +376,54 @@ project('scheduler:scheduler-node') {
     apply plugin: 'gradle-one-jar'
     dependencies {
         compile(
-                "org.objectweb.proactive:programming-extension-amqp:${programmingVersion}",
-                "org.objectweb.proactive:programming-extension-pamr:${programmingVersion}",
                 "org.objectweb.proactive:programming-extension-processbuilder:${programmingVersion}",
                 "org.objectweb.proactive:programming-extension-dataspaces:${programmingVersion}",
 
                 project(':scheduler:scheduler-client'),
                 project(':rm:rm-node'),
         )
-        // required by ForkedJavaExecutable
-        runtime "org.objectweb.proactive:programming-extension-pnp:${programmingVersion}"
-        // TODO add all protocols
+
+        runtime (
+                "org.objectweb.proactive:programming-extension-pamr:${programmingVersion}",
+                "org.objectweb.proactive:programming-extension-pnp:${programmingVersion}",
+        )
 
         runtime fileTree(dir: project.nativeLibsDir, exclude: '*.jar')
+
+        testCompile project(':scheduler:scheduler-examples')
     }
 
     task stub(type: StubTask) {
-        classes = ['org.ow2.proactive.scheduler.common.TaskTerminateNotification',
-                   'org.ow2.proactive.scheduler.task.utils.TaskResultCallback',
-                   'org.ow2.proactive.scheduler.task.forked.JavaTaskLauncherForked',
-                   'org.ow2.proactive.scheduler.task.forked.JavaTaskLauncherForker',
-                   'org.ow2.proactive.scheduler.task.java.JavaTaskLauncher',
-                   'org.ow2.proactive.scheduler.task.nativ.NativeTaskLauncher',
-                   'org.ow2.proactive.scheduler.task.script.ScriptTaskLauncher',
-                   'org.ow2.proactive.scheduler.task.utils.ActiveObjectExecutor',
-                   'org.ow2.proactive.scheduler.examples.MultiNodeExample',
-                   'org.ow2.proactive.scheduler.examples.SchedulerClientEventsLogger']
+        classes = ['org.ow2.proactive.scheduler.common.TaskTerminateNotification']
     }
     serialver.dependsOn stub
 
-    task standaloneJarPrecondition {
-        finalizedBy extractNativeBundle
+    ext.oneJarManifest = manifest {
+        attributes 'One-Jar-URL-Factory': 'com.simontuffs.onejar.JarClassLoader$OneJarURLFactory'
+        attributes 'One-Jar-Expand': 'lib,binlib,main' // expand jars for subprocesses (forked tasks)
     }
 
-    task standaloneJar(type: OneJar, dependsOn: standaloneJarPrecondition) {
+    task standaloneJar(type: OneJar) {
         mainClass = 'org.ow2.proactive.resourcemanager.utils.RMNodeStarter'
-        binLib = fileTree(dir: project.nativeLibsDir, exclude: '*.jar')
+        binLib = files({ rootProject.configurations.nativeBundle.collect { zipTree(it) } })
         additionalDir = file('src/main/resources')
-        manifest {
-            attributes 'One-Jar-URL-Factory': 'com.simontuffs.onejar.JarClassLoader$OneJarURLFactory'
-            attributes 'One-Jar-Expand': 'lib,binlib,main' // expand jars for subprocesses (forked tasks)
-        }
+        manifest = oneJarManifest
     }
     build.dependsOn standaloneJar
     artifacts {
         archives standaloneJar
+    }
+}
+
+project(':scheduler:scheduler-examples') {
+    dependencies {
+        compile(
+                project(':scheduler:scheduler-node'),
+        )
+    }
+
+    task stub(type: StubTask) {
+        classes = ['org.ow2.proactive.scheduler.examples.MultiNodeExample']
     }
 }
 
@@ -451,6 +444,7 @@ project('rm:rm-server') {
                 project(':rm:rm-client'),
                 project(':rm:rm-node'),
         )
+        testCompile "org.objectweb.proactive:programming-extension-pnp:${programmingVersion}"
         testCompile project(':rm:rm-infrastructure:rm-infrastructure-gcm')
         testCompile 'org.jruby:jruby-jline:1.7.4'
         testCompile 'org.python:jython-jline:2.5.4-rc1'
@@ -459,10 +453,7 @@ project('rm:rm-server') {
         runtime 'org.hibernate:hibernate-c3p0:4.1.7.Final'
         runtime 'org.apache.derby:derby:10.8.2.2'
         runtime 'mysql:mysql-connector-java:5.1.16'
-        runtime "org.objectweb.proactive:programming-extension-rmissl:${programmingVersion}"
         runtime "org.objectweb.proactive:programming-extension-pnp:${programmingVersion}"
-        runtime "org.objectweb.proactive:programming-extension-pnpssl:${programmingVersion}"
-        runtime "org.objectweb.proactive:programming-extension-amqp:${programmingVersion}"
     }
 
 
@@ -556,6 +547,7 @@ dependencies {
     }
     distLib project('rm:rm-policy:rm-policy-scheduler')
     distLib project(':scheduler:scheduler-node')
+    distLib project(':scheduler:scheduler-examples')
     distLib project(':rm:rm-server')
     distLib project(':rm:rm-node-updater')
     distLib(project(':rest:rest-server')) {
@@ -580,9 +572,15 @@ task dist(type: Sync) {
 
     [project(':rm:rm-server'), project(':scheduler:scheduler-server')].each {
         from it.configurations.archives.artifacts.files.files
-        if (it.tasks.findByName('testJar'))
+        if (it.tasks.findByName('testJar')) {
             from it.testJar.outputs
+        }
     }
+
+    from {
+        configurations.nativeBundle.collect { zipTree(it) }
+    }
+
     into file("$rootDir/dist/lib")
 }
 
@@ -591,7 +589,6 @@ build.dependsOn 'dist'
 
 task scripts
 dist.dependsOn scripts
-dist.finalizedBy extractNativeBundle
 
 task cleanScripts
 clean.dependsOn cleanScripts
@@ -627,8 +624,14 @@ def createStartScripts(className, name, String outputFolder) {
     def scriptTask = project.tasks.create(name: ('script' + name), type: CustomCreateStartScripts) {
         mainClassName className
         applicationName name
-        outputDir project.file(outputFolder)
+        outputDir project.file("build/" + outputFolder)
         classpath = project.configurations.distLib // will be replaced with CustomCreateStartScripts
+    }
+    scriptTask.doLast { // otherwise outputDir would get deleted by clean tasks
+        project.copy {
+            from project.file("build/" + outputFolder)
+            into project.file(outputFolder)
+        }
     }
     project.scripts.dependsOn scriptTask
     project.cleanScripts.dependsOn 'cleanScript' + name

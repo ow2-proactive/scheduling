@@ -124,7 +124,6 @@ public class TestPreemptiveRemoval extends RMConsecutive {
         try {
             helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, n1.getNodeInformation().getURL(), 4000);
         } catch (ProActiveTimeoutException e) {
-            // TODO Auto-generated catch block
             timeouted = true;
         }
 

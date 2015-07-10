@@ -85,7 +85,7 @@ public class SetPolicyCommand extends AbstractCommand implements Command {
             HttpGet request = new HttpGet(currentContext.getResourceUrl("policies"));
             HttpResponseWrapper response = execute(request, currentContext);
             if (statusCode(OK) == statusCode(response)) {
-                knownPolicies = new HashMap<String, PluginView>();
+                knownPolicies = new HashMap<>();
                 List<PluginView> pluginViewList = readValue(response, new TypeReference<List<PluginView>>() {
                 }, currentContext);
                 for (PluginView pluginView : pluginViewList) {

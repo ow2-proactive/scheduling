@@ -4,9 +4,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.junit.Assert;
-
-import org.junit.Test;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.core.db.SchedulerStateRecoverHelper;
@@ -15,6 +12,8 @@ import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.InternalJobFactory;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
+import org.junit.Assert;
+import org.junit.Test;
 
 
 public class TestTaskIdGeneration extends BaseSchedulerDBTest {
@@ -54,23 +53,23 @@ public class TestTaskIdGeneration extends BaseSchedulerDBTest {
     private void checkIds(JobState job) throws Exception {
         long jobId = Long.valueOf(job.getId().value());
 
-        Set<String> expected = new HashSet<String>(3);
-        expected.add(String.valueOf(jobId * TaskIdImpl.JOB_FACTOR));
-        expected.add(String.valueOf(jobId * TaskIdImpl.JOB_FACTOR + 1));
-        expected.add(String.valueOf(jobId * TaskIdImpl.JOB_FACTOR + 2));
+        Set<String> expected = new HashSet<>(3);
+        expected.add(String.valueOf(jobId * TaskIdImpl.getJobFactor()));
+        expected.add(String.valueOf(jobId * TaskIdImpl.getJobFactor() + 1));
+        expected.add(String.valueOf(jobId * TaskIdImpl.getJobFactor() + 2));
 
-        Set<String> actual = new HashSet<String>();
+        Set<String> actual = new HashSet<>();
         actual.add(findTask(job, "task1").getId().value());
         actual.add(findTask(job, "task2").getId().value());
         actual.add(findTask(job, "task3").getId().value());
 
         Assert.assertEquals(expected, actual);
 
-        actual = new HashSet<String>();
+        actual = new HashSet<>();
         actual.add(findTask(job, "task1").getId().getReadableName());
         actual.add(findTask(job, "task2").getId().getReadableName());
         actual.add(findTask(job, "task3").getId().getReadableName());
-        expected = new HashSet<String>(3);
+        expected = new HashSet<>(3);
         expected.add("task1");
         expected.add("task2");
         expected.add("task3");

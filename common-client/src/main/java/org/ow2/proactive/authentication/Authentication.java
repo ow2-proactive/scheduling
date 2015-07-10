@@ -61,7 +61,7 @@ public interface Authentication extends Loggable, Serializable {
      * 
      * @return true if it is activated.
      */
-    public boolean isActivated();
+    boolean isActivated();
 
     /**
      * Request this Authentication's public key for credentials encryption
@@ -69,7 +69,7 @@ public interface Authentication extends Loggable, Serializable {
      * @return this Authentication's public key
      * @throws LoginException the key could not be retrieved
      */
-    public PublicKey getPublicKey() throws LoginException;
+    PublicKey getPublicKey() throws LoginException;
 
     /**
      * Return the JMX connector server URL used to contact this instance.
@@ -77,7 +77,7 @@ public interface Authentication extends Loggable, Serializable {
      * @return the string representation of the JMX connector server URL
      * @throws JMException if the JMX connector server could not be started
      */
-    public String getJMXConnectorURL() throws JMException;
+    String getJMXConnectorURL() throws JMException;
 
     /**
      * Returns the address of the JMX connector server depending on the specified protocol.
@@ -86,7 +86,7 @@ public interface Authentication extends Loggable, Serializable {
      * @return the address of the anonymous connector server
      * @throws JMException in case of boot sequence failure
      */
-    public String getJMXConnectorURL(final JMXTransportProtocol protocol) throws JMException;
+    String getJMXConnectorURL(final JMXTransportProtocol protocol) throws JMException;
 
     /**
      * Return the URL of this Instance.
@@ -94,7 +94,7 @@ public interface Authentication extends Loggable, Serializable {
      *
      * @return the URL of this Instance.
      */
-    public String getHostURL();
+    String getHostURL();
 
     /**
      * Performs login
@@ -105,6 +105,6 @@ public interface Authentication extends Loggable, Serializable {
      * @return the name of the user logged
      * @throws LoginException if username or password is incorrect.
      */
-    public Subject authenticate(Credentials cred) throws LoginException;
+    Subject authenticate(Credentials cred) throws LoginException;
 
 }

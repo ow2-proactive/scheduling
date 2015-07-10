@@ -215,7 +215,7 @@ public class SchedulerAuthenticationGUIHelper {
         private boolean cancel = false;
         private String defaultURL = "";
         private String defaultUserName = "";
-        private Set<String> URLs = new HashSet<String>();
+        private Set<String> URLs = new HashSet<>();
 
         public void windowActivated(WindowEvent e) {
         }

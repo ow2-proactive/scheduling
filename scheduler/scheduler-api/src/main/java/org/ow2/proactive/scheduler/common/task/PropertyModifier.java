@@ -37,7 +37,6 @@
 package org.ow2.proactive.scheduler.common.task;
 
 import java.io.Serializable;
-import java.util.Map;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -52,81 +51,19 @@ import javax.xml.bind.annotation.XmlAccessorType;
 @XmlAccessorType(XmlAccessType.FIELD)
 public final class PropertyModifier implements Serializable {
 
-    private String name = null;
+    private final String name;
 
-    private String value = null;
-
-    private boolean append = false;
-
-    private char appendChar = 0;
+    private String value;
 
     /**
      * Create a new instance of PropertyModifier
      *
      * @param name
      * @param value
-     * @param append
      */
-    public PropertyModifier(String name, String value, boolean append) {
+    public PropertyModifier(String name, String value) {
         this.name = name;
         this.value = value;
-        this.append = append;
-    }
-
-    /**
-     * Create a new instance of PropertyModifier
-     *
-     * @param name
-     * @param value
-     * @param appendChar
-     */
-    public PropertyModifier(String name, String value, char appendChar) {
-        this(name, value, true);
-        this.appendChar = appendChar;
-    }
-
-    /**
-     * Update the given StringBuilder with this property.<br/>
-     * Create, overwrite or append the value in the given stringBuilder as it is describe in this property.
-     *
-     * @param sb the stringBuilder to be updated, cannot be null
-     * @throws IllegalArgumentException if sb is null
-     */
-    public void update(StringBuilder sb) {
-        if (sb == null) {
-            throw new IllegalArgumentException("Given string builder cannot be null");
-        }
-        if (append || appendChar != 0) {
-            if (appendChar != 0 && sb.length() > 0) {
-                sb.append(appendChar);
-            }
-            sb.append(value);
-        } else {
-            sb.delete(0, sb.length());
-            sb.append(value);
-        }
-    }
-
-    /**
-     * Update the given map with this property.<br/>
-     * Put or update the entry denoted by this property name.
-     * Create, overwrite or append the value as it is describe in this property.
-     *
-     * @param props the map in which to add the property, cannot be null
-     * @throws IllegalArgumentException if sb is null
-     */
-    public void update(Map<String, String> props) {
-        if (props == null) {
-            throw new IllegalArgumentException("Given map cannot be null");
-        }
-        if (props.get(name) != null && (append || appendChar != 0)) {
-            if (appendChar != 0 && props.get(name).length() > 0) {
-                props.put(name, props.get(name) + appendChar);
-            }
-            props.put(name, props.get(name) + value);
-        } else {
-            props.put(name, value);
-        }
     }
 
     /**
@@ -147,22 +84,8 @@ public final class PropertyModifier implements Serializable {
         return value;
     }
 
-    /**
-     * Get the append
-     *
-     * @return the append
-     */
-    public boolean isAppend() {
-        return append;
-    }
-
-    /**
-     * Get the appendChar
-     *
-     * @return the appendChar
-     */
-    public char getAppendChar() {
-        return appendChar;
+    public void setValue(String value) {
+        this.value = value;
     }
 
 }

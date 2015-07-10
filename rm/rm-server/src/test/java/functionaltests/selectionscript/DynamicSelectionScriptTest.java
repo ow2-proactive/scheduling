@@ -106,7 +106,7 @@ public class DynamicSelectionScriptTest extends RMConsecutive {
         String node1Name = "node1";
         String node2Name = "node2";
 
-        HashMap<String, String> vmProperties = new HashMap<String, String>();
+        HashMap<String, String> vmProperties = new HashMap<>();
         vmProperties.put(this.vmPropKey, this.vmPropValue);
 
         String node1URL = helper.createNode(node1Name, vmProperties).getNode().getNodeInformation().getURL();

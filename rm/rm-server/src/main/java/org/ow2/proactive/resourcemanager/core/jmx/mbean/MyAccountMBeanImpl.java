@@ -79,7 +79,7 @@ public class MyAccountMBeanImpl extends StandardMBean implements MyAccountMBean 
             throws NotCompliantMBeanException {
         super(mbeanInterface);
         this.accountsManager = accountsManager;
-        this.perThreadAccount = new ThreadLocal<RMAccount>();
+        this.perThreadAccount = new ThreadLocal<>();
     }
 
     public long getUsedNodeTime() {

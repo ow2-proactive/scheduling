@@ -62,21 +62,21 @@ public interface SchedulerState extends Serializable {
      *
      * @return the finished Jobs list
      */
-    public Vector<JobState> getFinishedJobs();
+    Vector<JobState> getFinishedJobs();
 
     /**
      * Get the pending Jobs list
      *
      * @return the pending Jobs list
      */
-    public Vector<JobState> getPendingJobs();
+    Vector<JobState> getPendingJobs();
 
     /**
      * Get the running Jobs list
      *
      * @return the running Jobs list
      */
-    public Vector<JobState> getRunningJobs();
+    Vector<JobState> getRunningJobs();
 
     /**
      * Get the status of the scheduler
@@ -84,27 +84,27 @@ public interface SchedulerState extends Serializable {
      * @return the status of the scheduler
      */
     @XmlElement(name = "status")
-    public SchedulerStatus getStatus();
+    SchedulerStatus getStatus();
 
     /**
      * Returns the list of connected users.
      *
      * @return the list of connected users.
      */
-    public SchedulerUsers getUsers();
+    SchedulerUsers getUsers();
 
     /**
      * Updates the scheduler state given the event passed as a parameter
      */
-    public void update(SchedulerEvent eventType);
+    void update(SchedulerEvent eventType);
 
     /**
      * Updates the scheduler state given the event passed as a parameter
      */
-    public void update(NotificationData<?> notification);
+    void update(NotificationData<?> notification);
 
     /**
      * Updates the scheduler state given the event passed as a parameter
      */
-    public void update(JobState jobState);
+    void update(JobState jobState);
 }

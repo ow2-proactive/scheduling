@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<job xmlns="urn:proactive:jobdescriptor:dev" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="urn:proactive:jobdescriptor:dev ../../../src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.xsd"
+<job xmlns="urn:proactive:jobdescriptor:3.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:proactive:jobdescriptor:3.2 ../../../src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/3.2/schedulerjob.xsd"
 	name="${jobName}" cancelJobOnError="true" maxNumberOfExecution="2" projectName="${PROJECT}" restartTaskOnError="elsewhere">
 	<!-- ${jobName} is set as JVM parameter in the TestJobFactory -->
 	<variables>
@@ -11,9 +11,7 @@
 		<variable name="JAVA_HOME" value="/bin/java/jdk1.5"/>
 		<variable name="PROJECT" value="My_project"/>
 	</variables>
-	<description>
-			No ${EXCLUSION_STRING} in its HostName.
-	</description>
+	<description>No ${EXCLUSION_STRING} in its HostName.</description>
 	<inputSpace url="input/space"/>
 	<outputSpace url="output/space"/>
 	<taskFlow>
@@ -79,13 +77,7 @@
 				<forkEnvironment javaHome="${JAVA_HOME}" workingDir="${JAVA_HOME}/toto">
 					<SystemEnvironment>
 						<variable name="toto" value="ioi"/>
-						<variable name="toto" value="oio" append="true"/>
-						<variable name="toto" appendChar="#" value="123" />
-						<variable name="toto" append="false" appendChar=":" value="456" />
-						<variable name="tata" appendChar="#" value="123" />
 						<variable name="tata" value="456"/>
-						<variable name="titi" value="123" appendChar="!"/>
-						<variable name="titi" value="456" appendChar="!"/>
 					</SystemEnvironment>
 					<jvmArgs>
 						<jvmArg value="-dparam=12"/>
@@ -146,17 +138,7 @@
 				<task ref="task3"/>
 			</depends>
 			<nativeExecutable>
-				<dynamicCommand workingDir="task4workingDir">
-					<generation>
-						<script>
-							<file path="${WORK_DIR}/gene.js">
-								<arguments>
-									<argument value="${WORK_DIR2}/nativTask"/>
-								</arguments>
-							</file>
-						</script>
-					</generation>
-				</dynamicCommand>
+				<staticCommand value="true" workingDir="task4workingDir"/>
 			</nativeExecutable>
 			<outputFiles>
 				<files includes="a" excludes="f" accessMode="transferToOutputSpace"/>

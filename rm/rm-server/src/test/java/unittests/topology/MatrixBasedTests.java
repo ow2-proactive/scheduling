@@ -60,7 +60,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class MatrixBasedTests {
 
-    protected static HashMap<Node, HashMap<Node, Long>> distances = new HashMap<Node, HashMap<Node, Long>>();
+    protected static HashMap<Node, HashMap<Node, Long>> distances = new HashMap<>();
     protected static DummyNode[][][] gridMatrix;
     protected static int gridWidth;
     protected static int gridHeight;
@@ -119,7 +119,7 @@ public class MatrixBasedTests {
      * @return
      */
     protected static List<Node> initDistances(int width, int height, String matrix, String pivotMatrix) {
-        distances = new HashMap<Node, HashMap<Node, Long>>();
+        distances = new HashMap<>();
         gridMatrix = new DummyNode[width][height][9];
         gridWidth = width;
         gridHeight = height;
@@ -146,7 +146,7 @@ public class MatrixBasedTests {
             // similar to the one before, but the number shows
             // how many nodes we add to the pivot from a given host
             if (pivotMatrix != null) {
-                pivots = new ArrayList<Node>();
+                pivots = new ArrayList<>();
                 ;
                 for (int j = 0; j < height; j++) {
                     for (int i = 0; i < width; i++) {
@@ -261,7 +261,7 @@ public class MatrixBasedTests {
         List<Node> pivots = initDistances(width, height, matrix, pivotMatrix);
 
         HAC cfPivot = new HAC(new LocalTopology(), pivots, BestProximityDescriptor.AVG, threshold);
-        List<Node> cliqueRes = cfPivot.select(cliqueSize, new LinkedList<Node>(distances.keySet()));
+        List<Node> cliqueRes = cfPivot.select(cliqueSize, new LinkedList<>(distances.keySet()));
 
         int resultSize = cliqueRes.size();
         boolean didFail = cliqueSize != resultSize;

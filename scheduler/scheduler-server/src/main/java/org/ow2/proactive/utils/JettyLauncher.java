@@ -79,7 +79,7 @@ public class JettyLauncher {
         PrintStream sysout = System.out;
 
         try {
-            ArrayList<File> apps = new ArrayList<File>();
+            ArrayList<File> apps = new ArrayList<>();
             int port = 8080;
             File logFile = null;
 

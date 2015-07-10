@@ -61,7 +61,7 @@ import org.junit.Assert;
  */
 public class HACTest extends FunctionalTest {
 
-    protected static HashMap<Node, HashMap<Node, Long>> distances = new HashMap<Node, HashMap<Node, Long>>();
+    protected static HashMap<Node, HashMap<Node, Long>> distances = new HashMap<>();
 
     private class LocalTopology implements Topology {
 
@@ -128,14 +128,14 @@ public class HACTest extends FunctionalTest {
         HAC hacPivot = new HAC(new LocalTopology(), Collections.singletonList(n1),
             BestProximityDescriptor.AVG, Long.MAX_VALUE);
         RMTHelper.log("Test 1: [no pivot], graph [1 -(2)- 2 , 1 -(4)- 3]");
-        List<Node> result = hac.select(20, new LinkedList<Node>(distances.keySet()));
+        List<Node> result = hac.select(20, new LinkedList<>(distances.keySet()));
         Assert.assertTrue("Selection size is not 2", result.size() == 2);
         if (!(result.contains(new DummyNode("1")) && result.contains(new DummyNode("2")))) {
             Assert.assertTrue("Selection is incorrect", false);
         }
 
         RMTHelper.log("Test 2: [pivot - node 1], graph [1 -(2)- 2 , 1 -(4)- 3]");
-        result = hacPivot.select(3, new LinkedList<Node>(distances.keySet()));
+        result = hacPivot.select(3, new LinkedList<>(distances.keySet()));
         Assert.assertTrue("Selection size is not 1", result.size() == 1);
         if (!result.contains(new DummyNode("2"))) {
             Assert.assertTrue("Selection is incorrect", false);
@@ -143,11 +143,11 @@ public class HACTest extends FunctionalTest {
 
         distances.get(n2).put(n3, new Long(10));
         RMTHelper.log("Test 3: [no pivot], graph [1 -(2)- 2 , 1 -(4)- 3, 2 -(10)- 3]");
-        result = hac.select(3, new LinkedList<Node>(distances.keySet()));
+        result = hac.select(3, new LinkedList<>(distances.keySet()));
         Assert.assertTrue("Selection size is not 3", result.size() == 3);
 
         RMTHelper.log("Test 4: [pivot - node 1], graph [1 -(2)- 2 , 1 -(4)- 3, 2 -(10)- 3]");
-        result = hacPivot.select(3, new LinkedList<Node>(distances.keySet()));
+        result = hacPivot.select(3, new LinkedList<>(distances.keySet()));
         Assert.assertTrue("Selection size is not 2", result.size() == 2);
         if (!(result.contains(new DummyNode("2")) && result.contains(new DummyNode("3")))) {
             Assert.assertTrue("Selection is incorrect", false);
@@ -159,13 +159,13 @@ public class HACTest extends FunctionalTest {
         distances.get(n3).put(n4, new Long(3));
         distances.get(n1).put(n4, new Long(-1));
         RMTHelper.log("Test 5: [no pivot], graph [1 -(2)- 2 , 1 -(4)- 3, 2 -(10)- 3, 2 -(1)- 4, 3 -(3)- 4]");
-        result = hac.select(4, new LinkedList<Node>(distances.keySet()));
+        result = hac.select(4, new LinkedList<>(distances.keySet()));
         // HAC cannot cluster 3 nodes together so the expected result is 2
         Assert.assertTrue("Selection size is not 2", result.size() == 2);
 
         RMTHelper
                 .log("Test 6: [pivot - node 1], graph [1 -(2)- 2 , 1 -(4)- 3, 2 -(10)- 3, 2 -(1)- 4, 3 -(3)- 4]");
-        result = hacPivot.select(3, new LinkedList<Node>(distances.keySet()));
+        result = hacPivot.select(3, new LinkedList<>(distances.keySet()));
         Assert.assertTrue("Selection size is not 2", result.size() == 2);
         if (!(result.contains(new DummyNode("2")) && result.contains(new DummyNode("3")))) {
             Assert.assertTrue("Selection is incorrect", false);
@@ -174,12 +174,12 @@ public class HACTest extends FunctionalTest {
         distances.get(n1).put(n4, new Long(3));
         RMTHelper
                 .log("Test 7: [no pivot], graph [1 -(2)- 2 , 1 -(4)- 3, 2 -(10)- 3, 2 -(1)- 4, 3 -(3)- 4, 1 -(3)- 4]]");
-        result = hac.select(4, new LinkedList<Node>(distances.keySet()));
+        result = hac.select(4, new LinkedList<>(distances.keySet()));
         Assert.assertTrue("Selection size is not 4", result.size() == 4);
 
         RMTHelper
                 .log("Test 8 - optimal: [no pivot], graph [1 -(2)- 2 , 1 -(4)- 3, 2 -(10)- 3, 2 -(1)- 4, 3 -(3)- 4, 1 -(3)- 4]]");
-        result = hac.select(3, new LinkedList<Node>(distances.keySet()));
+        result = hac.select(3, new LinkedList<>(distances.keySet()));
         Assert.assertTrue("Selection size is not 3", result.size() == 3);
         if (!(result.contains(new DummyNode("1")) && result.contains(new DummyNode("2")) && result
                 .contains(new DummyNode("4")))) {
@@ -188,7 +188,7 @@ public class HACTest extends FunctionalTest {
 
         RMTHelper
                 .log("Test 8: [pivot - node 1], graph [1 -(2)- 2 , 1 -(4)- 3, 2 -(10)- 3, 2 -(1)- 4, 3 -(3)- 4, 1 -(3)- 4]]");
-        result = hacPivot.select(2, new LinkedList<Node>(distances.keySet()));
+        result = hacPivot.select(2, new LinkedList<>(distances.keySet()));
         Assert.assertTrue("Selection size is not 2", result.size() == 2);
         if (!(result.contains(new DummyNode("2")) && result.contains(new DummyNode("4")))) {
             Assert.assertTrue("Selection is incorrect", false);
@@ -197,7 +197,7 @@ public class HACTest extends FunctionalTest {
         distances.get(n1).put(n4, new Long(30));
         RMTHelper
                 .log("Test 9 - optimal: [no pivot], graph [1 -(2)- 2 , 1 -(4)- 3, 2 -(10)- 3, 2 -(1)- 4, 3 -(3)- 4, 1 -(30)- 4]");
-        result = hac.select(3, new LinkedList<Node>(distances.keySet()));
+        result = hac.select(3, new LinkedList<>(distances.keySet()));
         Assert.assertTrue("Selection size is not 3", result.size() == 3);
         if (!(result.contains(new DummyNode("2")) && result.contains(new DummyNode("3")) && result
                 .contains(new DummyNode("4")))) {
@@ -215,7 +215,7 @@ public class HACTest extends FunctionalTest {
         distances.get(n5).put(n4, new Long(10));
         RMTHelper
                 .log("Test 10: [pivot - node 5], graph [1 -(2)- 2 , 1 -(4)- 3, 2 -(10)- 3, 2 -(1)- 4, 3 -(3)- 4, 1 -(30)- 4, 5 -(10)- 3, 5 -(10)- 4]");
-        result = hacPivot.select(4, new LinkedList<Node>(distances.keySet()));
+        result = hacPivot.select(4, new LinkedList<>(distances.keySet()));
         Assert.assertTrue("Selection size is not 2", result.size() == 2);
         if (!(result.contains(new DummyNode("3")) && result.contains(new DummyNode("4")))) {
             Assert.assertTrue("Selection is incorrect", false);

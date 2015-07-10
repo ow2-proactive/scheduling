@@ -39,6 +39,7 @@ package functionaltests.executables;
 import java.io.Serializable;
 import java.util.Map;
 
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 
@@ -57,6 +58,7 @@ public class Logging extends JavaExecutable {
 
     @Override
     public Serializable execute(TaskResult... results) throws Throwable {
+        CentralPAPropertyRepository.PA_CLASSLOADING_USEHTTP.setValue(false);
 
         if (this.stream.equals("out")) {
             for (int i = 0; i < numberOfLines; i++) {
@@ -66,7 +68,7 @@ public class Logging extends JavaExecutable {
         } else {
             for (int i = 0; i < numberOfLines; i++) {
                 Thread.sleep(this.sleepTime);
-                getOut().println(MSG);
+                getErr().println(MSG);
             }
         }
 

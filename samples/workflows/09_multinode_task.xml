@@ -13,7 +13,7 @@
             <scriptExecutable>
                 <script>
                     <code language="groovy">
-                        println nodeset.size() + " nodes have been reserved"
+                        println nodesurl.size() + " nodes have been reserved"
                         println "The reserved nodes are accessible there " + nodesurl
                     </code>
                 </script>

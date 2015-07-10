@@ -43,11 +43,11 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
-import org.ow2.proactive.scheduler.common.job.factories.JobFactory_stax;
+import org.ow2.proactive.scheduler.common.job.factories.StaxJobFactory;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
-import org.ow2.proactive.scheduler.exception.ForkedJVMProcessException;
+import org.ow2.proactive.scheduler.task.exceptions.ForkedJvmProcessException;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -70,7 +70,7 @@ public class TestScriptTask extends SchedulerConsecutive {
     }
 
     private void forkedTasks() throws Throwable {
-        TaskFlowJob job = (TaskFlowJob) JobFactory_stax.getFactory().createJob(
+        TaskFlowJob job = (TaskFlowJob) StaxJobFactory.getFactory().createJob(
                 new File(jobDescriptor.toURI()).getAbsolutePath());
 
         JobId id = SchedulerTHelper.submitJob(job);
@@ -94,13 +94,13 @@ public class TestScriptTask extends SchedulerConsecutive {
         TaskResult propertiesTaskResult = jobResult.getResult("properties");
         String logs = propertiesTaskResult.getOutput().getAllLogs(false);
 
-        assertThat(logs, containsString("pas.job.id=" + jobResult.getJobId().value()));
-        assertThat(logs, containsString("pas.job.id=" + jobResult.getJobId().value()));
-        assertThat(logs, containsString("pas.job.name=" + jobResult.getName()));
-        assertThat(logs, containsString("pas.task.id=" + propertiesTaskResult.getTaskId().value()));
-        assertThat(logs, containsString("pas.task.name=properties"));
-        assertThat(logs, containsString("pas.task.iteration=0"));
-        assertThat(logs, containsString("pas.task.replication=0"));
+        assertThat(logs, containsString("PA_JOB_ID=" + jobResult.getJobId().value()));
+        assertThat(logs, containsString("PA_JOB_ID=" + jobResult.getJobId().value()));
+        assertThat(logs, containsString("PA_JOB_NAME=" + jobResult.getName()));
+        assertThat(logs, containsString("PA_TASK_ID=" + propertiesTaskResult.getTaskId().value()));
+        assertThat(logs, containsString("PA_TASK_NAME=properties"));
+        assertThat(logs, containsString("PA_TASK_ITERATION=0"));
+        assertThat(logs, containsString("PA_TASK_REPLICATION=0"));
 
         // the script can be a file
         TaskResult fileTaskResult = jobResult.getResult("file");
@@ -112,7 +112,6 @@ public class TestScriptTask extends SchedulerConsecutive {
         // dataspaces binding should be available
         TaskResult dataspacesTaskResult = jobResult.getResult("dataspaces");
         String dataspacesLogs = dataspacesTaskResult.getOutput().getAllLogs(false);
-        assertTrue(dataspacesLogs.contains("localspace=vfs://"));
         assertTrue(dataspacesLogs.contains("global=vfs://"));
         assertTrue(dataspacesLogs.contains("user=vfs://"));
         assertTrue(dataspacesLogs.contains("input=vfs://"));
@@ -120,15 +119,13 @@ public class TestScriptTask extends SchedulerConsecutive {
 
         TaskResult multiNodeTaskResult = jobResult.getResult("multi-node");
         String mnLogs = multiNodeTaskResult.getOutput().getAllLogs(false);
-        assertTrue("Invalid binding for nodeset", mnLogs.contains("nodeset=" +
-            (SchedulerTStarter.RM_NODE_NUMBER - 1)));
         assertTrue("Invalid binding for nodesurl", mnLogs.contains("nodesurl=" +
             (SchedulerTStarter.RM_NODE_NUMBER - 1)));
 
         // script task should be forked by default, ie it will not kill the scheduler on system.exit
         JobState jobState = SchedulerTHelper.getSchedulerInterface().getJobState(id);
         TaskResult killJVMTaskResult = jobResult.getResult("killJVM");
-        Assert.assertTrue(killJVMTaskResult.getException() instanceof ForkedJVMProcessException);
+        Assert.assertTrue(killJVMTaskResult.getException() instanceof ForkedJvmProcessException);
 
         TaskState killJVMTaskState = jobState.getHMTasks().get(killJVMTaskResult.getTaskId());
         assertEquals(TaskStatus.FAULTY, killJVMTaskState.getStatus());
@@ -139,7 +136,7 @@ public class TestScriptTask extends SchedulerConsecutive {
      *  if the result is 'null'.
      */
     private void test_getTaskResult_nullReturningScriptTask_shouldSucceed() throws Throwable {
-        TaskFlowJob job = (TaskFlowJob) JobFactory_stax.getFactory().createJob(
+        TaskFlowJob job = (TaskFlowJob) StaxJobFactory.getFactory().createJob(
                 new File(job_null_returning_script_task.toURI()).getAbsolutePath());
         JobId id = SchedulerTHelper.submitJob(job);
         SchedulerTHelper.waitForEventJobFinished(id);

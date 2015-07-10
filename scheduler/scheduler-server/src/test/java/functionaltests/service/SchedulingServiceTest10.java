@@ -65,7 +65,7 @@ public class SchedulingServiceTest10 extends ProActiveTest {
         service.submitJob(BaseServiceTest.createJob(createTestJob()));
         jobsMap = service.lockJobsToSchedule();
         Assert.assertEquals(2, jobsMap.size());
-        List<EligibleTaskDescriptor> tasks = new ArrayList<EligibleTaskDescriptor>(jobsMap.entrySet()
+        List<EligibleTaskDescriptor> tasks = new ArrayList<>(jobsMap.entrySet()
                 .iterator().next().getValue().getEligibleTasks());
         service.simulateJobStartAndCancelIt(tasks, "");
         service.unlockJobsToSchedule(jobsMap.values());

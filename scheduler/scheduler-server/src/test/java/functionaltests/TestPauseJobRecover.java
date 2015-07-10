@@ -63,6 +63,9 @@ public class TestPauseJobRecover extends FunctionalTest {
 
     @Test
     public void runTest() throws Throwable {
+        SchedulerTHelper.startScheduler(new File(SchedulerTHelper.class.getResource(
+          "config/scheduler-nonforkedscripttasks.ini").toURI()).getAbsolutePath());
+
         pause_resume_recover();
         recover_paused_job_with_finished_tasks();
     }
@@ -114,7 +117,7 @@ public class TestPauseJobRecover extends FunctionalTest {
         log("Kill&Restart the scheduler");
 
         SchedulerTHelper.killSchedulerAndNodesAndRestart(new File(SchedulerTHelper.class.getResource(
-                "config/functionalTSchedulerProperties-updateDB.ini").toURI()).getAbsolutePath());
+                "config/functionalTSchedulerProperties-updateDB-nonforkedtasks.ini").toURI()).getAbsolutePath());
 
         log("Resume the job " + jobId);
         SchedulerTHelper.getSchedulerInterface().resumeJob(jobId);

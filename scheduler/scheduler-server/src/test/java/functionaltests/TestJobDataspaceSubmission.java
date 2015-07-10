@@ -36,27 +36,23 @@
  */
 package functionaltests;
 
-import functionaltests.executables.DSWorker;
-import org.junit.Assert;
-import org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector;
-import org.objectweb.proactive.extensions.vfsprovider.FileSystemServerDeployer;
-import org.objectweb.proactive.utils.OperatingSystem;
-import org.ow2.proactive.scheduler.common.job.JobEnvironment;
-import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobResult;
-import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
-import org.ow2.proactive.scheduler.common.task.JavaTask;
-import org.ow2.proactive.scheduler.common.task.NativeTask;
-import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
-import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.net.URI;
-import java.util.Map.Entry;
+import java.util.Map;
+
+import org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector;
+import org.objectweb.proactive.extensions.vfsprovider.FileSystemServerDeployer;
+import org.objectweb.proactive.utils.OperatingSystem;
+import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobResult;
+import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.task.NativeTask;
+import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
+import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
+import org.junit.Assert;
 
 
 /**
@@ -69,8 +65,9 @@ import java.util.Map.Entry;
  */
 public class TestJobDataspaceSubmission extends SchedulerConsecutive {
 
-    private static String IOSPACE = System.getProperty("java.io.tmpdir") + File.separator + "scheduler_test" +
-        File.separator;
+    private static String IOSPACE =
+            System.getProperty("java.io.tmpdir") + File.separator + "scheduler_test" + File.separator;
+
     private static String IN = "input";
     private static String OUT = "output";
     private static String GLOB = "global";
@@ -89,20 +86,16 @@ public class TestJobDataspaceSubmission extends SchedulerConsecutive {
     private static String out11 = "pbb.txt";
     private static String out12 = "pcc.txt";
 
-    private static String out20 = "paaa.txt";
-    private static String out21 = "pbbb.txt";
-    private static String out22 = "pccc.txt";
-
     File inputDir;
     File outputDir;
     File globalDir;
     File userDir;
 
     /**
-    * Tests start here.
-    *
-    * @throws Throwable any exception that can be thrown during the test.
-    */
+     * Tests start here.
+     *
+     * @throws Throwable any exception that can be thrown during the test.
+     */
     @org.junit.Test
     public void run() throws Throwable {
 
@@ -131,11 +124,11 @@ public class TestJobDataspaceSubmission extends SchedulerConsecutive {
         switch (OperatingSystem.getOperatingSystem()) {
             case windows:
                 t1.setCommandLine(new String[] { "cmd", "/C",
-                        "type $LOCALSPACE\\" + in1 + " > $LOCALSPACE\\" + out1 });
+                        "type " + in1 + " > " + out1 });
                 break;
             case unix:
                 t1.setCommandLine(new String[] { "/bin/bash", "-c",
-                        "cat $LOCALSPACE/" + in1 + " > $LOCALSPACE/" + out1 });
+                        "cat " + in1 + " > " + out1 });
                 break;
             default:
                 throw new IllegalStateException("Unsupported operating system");
@@ -150,11 +143,11 @@ public class TestJobDataspaceSubmission extends SchedulerConsecutive {
         switch (OperatingSystem.getOperatingSystem()) {
             case windows:
                 t2.setCommandLine(new String[] { "cmd", "/C",
-                        "type $LOCALSPACE\\" + in2 + " > $LOCALSPACE\\" + out2 });
+                        "type " + in2 + " > " + out2 });
                 break;
             case unix:
                 t2.setCommandLine(new String[] { "/bin/bash", "-c",
-                        "cat $LOCALSPACE/" + in2 + " > $LOCALSPACE/" + out2 });
+                        "cat " + in2 + " > " + out2 });
                 break;
             default:
                 throw new IllegalStateException("Unsupported operating system");
@@ -168,11 +161,11 @@ public class TestJobDataspaceSubmission extends SchedulerConsecutive {
         switch (OperatingSystem.getOperatingSystem()) {
             case windows:
                 t3.setCommandLine(new String[] { "cmd", "/C",
-                        "type $LOCALSPACE\\" + in3 + " > $LOCALSPACE\\" + out3 });
+                        "type " + in3 + " > " + out3 });
                 break;
             case unix:
                 t3.setCommandLine(new String[] { "/bin/bash", "-c",
-                        "cat $LOCALSPACE/" + in3 + " > $LOCALSPACE/" + out3 });
+                        "cat " + in3 + " > " + out3 });
                 break;
             default:
                 throw new IllegalStateException("Unsupported operating system");
@@ -186,11 +179,11 @@ public class TestJobDataspaceSubmission extends SchedulerConsecutive {
         switch (OperatingSystem.getOperatingSystem()) {
             case windows:
                 t4.setCommandLine(new String[] { "cmd", "/C",
-                        "type $LOCALSPACE\\" + in4 + " > $LOCALSPACE\\" + out4 });
+                        "type " + in4 + " > " + out4 });
                 break;
             case unix:
                 t4.setCommandLine(new String[] { "/bin/bash", "-c",
-                        "cat $LOCALSPACE/" + in4 + " > $LOCALSPACE/" + out4 });
+                        "cat " + in4 + " > " + out4 });
                 break;
             default:
                 throw new IllegalStateException("Unsupported operating system");
@@ -207,11 +200,11 @@ public class TestJobDataspaceSubmission extends SchedulerConsecutive {
         switch (OperatingSystem.getOperatingSystem()) {
             case windows:
                 t10.setCommandLine(new String[] { "cmd", "/C",
-                        "type $LOCALSPACE\\" + in1 + " $LOCALSPACE\\" + out2 + " > $LOCALSPACE\\" + out10 });
+                        "type " + in1 + " " + out2 + " > " + out10 });
                 break;
             case unix:
                 t10.setCommandLine(new String[] { "/bin/bash", "-c",
-                        "cat $LOCALSPACE/" + in1 + " $LOCALSPACE/" + out2 + " > $LOCALSPACE/" + out10 });
+                        "cat " + in1 + " " + out2 + " > " + out10 });
                 break;
             default:
                 throw new IllegalStateException("Unsupported operating system");
@@ -228,11 +221,11 @@ public class TestJobDataspaceSubmission extends SchedulerConsecutive {
         switch (OperatingSystem.getOperatingSystem()) {
             case windows:
                 t11.setCommandLine(new String[] { "cmd", "/C",
-                        "type $LOCALSPACE\\" + in1 + " $LOCALSPACE\\" + out3 + " > $LOCALSPACE\\" + out11 });
+                        "type " + in1 + " " + out3 + " > " + out11 });
                 break;
             case unix:
                 t11.setCommandLine(new String[] { "/bin/bash", "-c",
-                        "cat $LOCALSPACE/" + in1 + " $LOCALSPACE/" + out3 + " > $LOCALSPACE/" + out11 });
+                        "cat " + in1 + " " + out3 + " > " + out11 });
                 break;
             default:
                 throw new IllegalStateException("Unsupported operating system");
@@ -248,41 +241,23 @@ public class TestJobDataspaceSubmission extends SchedulerConsecutive {
         switch (OperatingSystem.getOperatingSystem()) {
             case windows:
                 t12.setCommandLine(new String[] { "cmd", "/C",
-                        "type $LOCALSPACE\\" + in1 + " $LOCALSPACE\\" + out4 + " > $LOCALSPACE\\" + out12 });
+                        "type " + in1 + " " + out4 + " > " + out12 });
                 break;
             case unix:
                 t12.setCommandLine(new String[] { "/bin/bash", "-c",
-                        "cat $LOCALSPACE/" + in1 + " $LOCALSPACE/" + out4 + " > $LOCALSPACE/" + out12 });
+                        "cat " + in1 + " " + out4 + " > " + out12 });
                 break;
             default:
                 throw new IllegalStateException("Unsupported operating system");
         }
         job.addTask(t12);
 
-        JavaTask jt = new JavaTask();
-        jt.addDependence(t10);
-        jt.addDependence(t11);
-        jt.addDependence(t12);
-        jt.setName("java_task");
-        jt.setExecutableClassName(DSWorker.class.getName());
-        jt.addArgument("paa", out10);
-        jt.addArgument("pbb", out11);
-        jt.addArgument("pcc", out12);
-        jt.addArgument("paaa", out20);
-        jt.addArgument("pbbb", out21);
-        jt.addArgument("pccc", out22);
-        job.addTask(jt);
-        JobEnvironment env = new JobEnvironment();
-        final URI uri = DSWorker.class.getProtectionDomain().getCodeSource().getLocation().toURI();
-        env.setJobClasspath(new String[] { new File(uri).getAbsolutePath() });
-        job.setEnvironment(env);
-
         JobId id = SchedulerTHelper.testJobSubmission(job);
 
         // check results are 0
         JobResult res = SchedulerTHelper.getJobResult(id);
         Assert.assertFalse(SchedulerTHelper.getJobResult(id).hadException());
-        for (Entry<String, TaskResult> entry : res.getAllResults().entrySet()) {
+        for (Map.Entry<String, TaskResult> entry : res.getAllResults().entrySet()) {
             Assert.assertEquals(0, entry.getValue().value());
         }
 
@@ -307,12 +282,12 @@ public class TestJobDataspaceSubmission extends SchedulerConsecutive {
         fout = new File(userDir.getAbsolutePath() + File.separator + out12);
         Assert.assertEquals(in1 + in4, getContent(fout));
 
-        fout = new File(outputDir.getAbsolutePath() + File.separator + out20);
-        Assert.assertEquals(in1 + in2, getContent(fout));
-        fout = new File(globalDir.getAbsolutePath() + File.separator + out21);
-        Assert.assertEquals(in1 + in3, getContent(fout));
-        fout = new File(userDir.getAbsolutePath() + File.separator + out22);
-        Assert.assertEquals(in1 + in4, getContent(fout));
+//        fout = new File(outputDir.getAbsolutePath() + File.separator + out20);
+//        Assert.assertEquals(in1 + in2, getContent(fout));
+//        fout = new File(globalDir.getAbsolutePath() + File.separator + out21);
+//        Assert.assertEquals(in1 + in3, getContent(fout));
+//        fout = new File(userDir.getAbsolutePath() + File.separator + out22);
+//        Assert.assertEquals(in1 + in4, getContent(fout));
 
         filesServerIn.terminate();
         filesServerOut.terminate();
@@ -372,15 +347,9 @@ public class TestJobDataspaceSubmission extends SchedulerConsecutive {
     }
 
     private String getContent(File f) throws Exception {
-        FileReader fr = null;
-        BufferedReader br = null;
-        try {
-            fr = new FileReader(f);
-            br = new BufferedReader(fr);
+        try (FileReader fr = new FileReader(f); BufferedReader br = new BufferedReader(fr)) {
             return br.readLine();
-        } finally {
-            fr.close();
-            br.close();
         }
     }
+
 }

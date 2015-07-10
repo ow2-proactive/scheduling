@@ -103,7 +103,7 @@ public class AsyncAppenderWithStorage extends AsyncAppender {
         super();
         this.name = name;
         this.storageSize = storageSize;
-        this.storage = new LinkedList<LoggingEvent>();
+        this.storage = new LinkedList<>();
     }
 
     /* (non-Javadoc)

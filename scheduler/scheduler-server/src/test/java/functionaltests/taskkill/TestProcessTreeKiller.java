@@ -36,12 +36,14 @@
  */
 package functionaltests.taskkill;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Level;
-import org.junit.Rule;
-import org.junit.rules.Timeout;
-import org.objectweb.proactive.utils.OperatingSystem;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.util.concurrent.TimeUnit;
 
+import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.process_tree_killer.ProcessTree;
 import org.ow2.proactive.scheduler.common.exception.UserException;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -53,17 +55,15 @@ import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
+import org.apache.log4j.Level;
+import org.junit.Rule;
+import org.junit.rules.Timeout;
 
 import functionaltests.RMTHelper;
 import functionaltests.SchedulerConsecutive;
 import functionaltests.SchedulerTHelper;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+
+import static org.junit.Assert.*;
 
 
 /**
@@ -95,10 +95,8 @@ public class TestProcessTreeKiller extends SchedulerConsecutive {
     private static final String unixSleepName = "sleep";
     private static final String windowsSleepName = "TestSleep.exe";
 
-    String tmpDir = System.getProperty("java.io.tmpdir");
-
     @Rule
-    public Timeout testTimeout = new Timeout(600000);
+    public Timeout testTimeout = new Timeout(10, TimeUnit.MINUTES);
 
     /**
      * Tests start here.
@@ -108,7 +106,7 @@ public class TestProcessTreeKiller extends SchedulerConsecutive {
     @org.junit.Test
     public void run() throws Throwable {
         SchedulerTHelper.getSchedulerAuth();
-        RMTHelper rmHelper = RMTHelper.getDefaultInstance();
+        RMTHelper rmHelper = RMTHelper.getDefaultInstance(SchedulerTHelper.PNP_PORT);
         rmHelper.createNodeSource("extra", 2);
 
         org.apache.log4j.Logger.getLogger(ProcessTree.class).setLevel(Level.DEBUG);
@@ -131,7 +129,7 @@ public class TestProcessTreeKiller extends SchedulerConsecutive {
 
             String workingDir = new File(TestProcessTreeKiller.launchersDir.toURI()).getParentFile()
                     .getCanonicalPath();
-            task1.setWorkingDir(workingDir);
+            task1.setForkEnvironment(new ForkEnvironment(workingDir));
             JavaSpawnExecutable executable = new JavaSpawnExecutable();
             executable.home = PASchedulerProperties.SCHEDULER_HOME.getValueAsString();
             task1.setCommandLine(executable.getNativeExecLauncher(false));
@@ -169,11 +167,6 @@ public class TestProcessTreeKiller extends SchedulerConsecutive {
 
             TestProcessTreeKiller.waitUntilForkedProcessesAreRunning(0);
 
-            // We make sure that the kill method for job 2 has been called
-            File killFileTask2 = new File(tmpDir, task2Name + ".tmp");
-            assertTrue(killFileTask2 + " exists", killFileTask2.exists());
-            FileUtils.deleteQuietly(killFileTask2);
-
             JobResult res = SchedulerTHelper.getJobResult(id1);
             assertEquals(JobStatus.KILLED, res.getJobInfo().getStatus());
 
@@ -196,7 +189,7 @@ public class TestProcessTreeKiller extends SchedulerConsecutive {
             String task4Name = "TestPTK4";
             task4.setName(task4Name);
 
-            task4.setWorkingDir(workingDir);
+            task4.setForkEnvironment(new ForkEnvironment(workingDir));
             task4.setCommandLine(executable.getNativeExecLauncher(true));
             job4.addTask(task4);
 

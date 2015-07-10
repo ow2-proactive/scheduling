@@ -129,7 +129,7 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
     protected void startNodeImpl(final InetAddress host) throws RMException {
         String fs = this.targetOSObj.fs;
         //we set the java security policy file
-        ArrayList<String> sb = new ArrayList<String>();
+        ArrayList<String> sb = new ArrayList<>();
         final boolean containsSpace = schedulingPath.contains(" ");
         if (containsSpace) {
             sb.add("-Dproactive.home=\"" + schedulingPath + "\"");
@@ -294,7 +294,7 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
 
     private void declareLostAndThrow(String errMsg, String pnURL, ChannelExec chan,
             ByteArrayOutputStream baos, Exception e) throws RMException {
-        String lf = System.getProperty("line.separator");
+        String lf = System.lineSeparator();
         StringBuilder sb = new StringBuilder(errMsg);
         sb.append(lf).append(" > Process exit code: ").append(chan.getExitStatus());
         sb.append(lf).append(" > Process output: ").append(lf).append(new String(baos.toByteArray()));

@@ -46,8 +46,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.ow2.proactive.scheduler.common.job.JobEnvironment;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.CommonAttribute;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
@@ -64,6 +62,7 @@ import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.topology.descriptor.ThresholdProximityDescriptor;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
+import org.apache.commons.collections.CollectionUtils;
 
 
 public class JobComparator {
@@ -92,7 +91,7 @@ public class JobComparator {
      */
     public boolean isEqualJob(TaskFlowJob job1, TaskFlowJob job2) throws IOException, ClassNotFoundException {
 
-        stack = new Stack<String>();
+        stack = new Stack<>();
         stack.push("job");
 
         stack.push("Job attributes");
@@ -130,11 +129,6 @@ public class JobComparator {
             stack.push("Output Space");
             return false;
         }
-
-        stack.push("Job Environment");
-        if (!isEqualJobEnvironment(job1.getEnvironment(), job2.getEnvironment()))
-            return false;
-        stack.pop();
 
         stack.push("stackflow");
         if (!isTaskFlowEqual(job1, job2))
@@ -186,8 +180,8 @@ public class JobComparator {
         }
         // the order of the tasks may not be the same
         // the tasks have unique name inside a job
-        Map<String, Task> map1 = new HashMap<String, Task>();
-        Map<String, Task> map2 = new HashMap<String, Task>();
+        Map<String, Task> map1 = new HashMap<>();
+        Map<String, Task> map2 = new HashMap<>();
 
         for (int k = 0; k < tasks1.size(); k++) {
             map1.put(tasks1.get(k).getName(), tasks1.get(k));
@@ -224,10 +218,7 @@ public class JobComparator {
             stack.push("description");
             return false;
         }
-        if (!isEqualString(t1.getResultPreview(), t2.getResultPreview())) {
-            stack.push("result preview");
-            return false;
-        }
+
         if (t1.getWallTime() != t2.getWallTime()) {
             stack.push("walltime");
             return false;
@@ -250,8 +241,8 @@ public class JobComparator {
             }
 
             // we only compare the names in the 2 dependencies lists
-            Set<String> names1 = new HashSet<String>();
-            Set<String> names2 = new HashSet<String>();
+            Set<String> names1 = new HashSet<>();
+            Set<String> names2 = new HashSet<>();
             for (int k = 0; k < dep1.size(); k++) {
                 names1.add(dep1.get(k).getName());
                 names2.add(dep2.get(k).getName());
@@ -366,15 +357,11 @@ public class JobComparator {
                 return false;
 
             } else if (cl1 != null) {
-                boolean equals = Arrays.equals(cl1, cl2);
                 if (!CollectionUtils.isEqualCollection(Arrays.asList(cl1), Arrays.asList(cl2))) {
                     return false;
                 }
             }
 
-            if (!isEqualScript(nt1.getGenerationScript(), nt2.getGenerationScript())) {
-                return false;
-            }
         }
 
         if (t1 instanceof ScriptTask) {
@@ -523,7 +510,6 @@ public class JobComparator {
     /**
      * Compares the element in the 2 lists in the exact order they appear in the
      * lists
-     * 
      */
     private boolean isEqualInputFiles(List<InputSelector> l1, List<InputSelector> l2) {
         if ((l1 == null) && (l2 == null))
@@ -572,7 +558,6 @@ public class JobComparator {
      * Compares the element in the 2 lists in the exact order they appear in the
      * lists FIXME: bad object design in the data space layer provides us to
      * unify the similar code in this method and isEqualInputFiles
-     * 
      */
     private boolean isEqualOutputFiles(List<OutputSelector> l1, List<OutputSelector> l2) {
         if ((l1 == null) && (l2 == null))
@@ -663,35 +648,6 @@ public class JobComparator {
         return true;
     }
 
-    private boolean isEqualJobEnvironment(JobEnvironment e1, JobEnvironment e2) {
-        if ((e1 == null) && (e2 == null))
-            return true;
-
-        if ((e1 == null) ^ (e2 == null)) {
-            stack.push("One null value out of 2");
-            return false;
-        }
-
-        String[] cp1 = e1.getJobClasspath();
-        String[] cp2 = e2.getJobClasspath();
-
-        if ((cp1 == null) && (cp2 == null))
-            return true;
-
-        if ((cp1 == null) ^ (cp2 == null)) {
-            stack.push("One null value out of 2");
-            return false;
-        }
-
-        if (!CollectionUtils.isEqualCollection(Arrays.asList(cp1), Arrays.asList(cp2))) {
-            stack.push("classpath1 = " + Arrays.asList(e1.getJobClasspath()) + " ---- " + "classpath 2 = " +
-                Arrays.asList(e2.getJobClasspath()));
-            return false;
-        } else
-            return true;
-
-    }
-
     private boolean isEqualMap(Map<?, ?> m1, Map<?, ?> m2) {
         if ((m1 == null) && (m2 == null))
             return true;
@@ -712,4 +668,5 @@ public class JobComparator {
         return clazz1.getName().equals(clazz2.getName());
 
     }
+
 }

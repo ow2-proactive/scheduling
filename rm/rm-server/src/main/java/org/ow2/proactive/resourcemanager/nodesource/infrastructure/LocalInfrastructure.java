@@ -1,8 +1,6 @@
 package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.security.KeyException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -92,22 +90,10 @@ public class LocalInfrastructure extends InfrastructureManager {
         CommandLineBuilder clb = this.getDefaultCommandLineBuilder(os);
         //RM_Home set in bin/unix/env script
         clb.setRmHome(rmHome);
-        ArrayList<String> paPropList = new ArrayList<String>();
+        ArrayList<String> paPropList = new ArrayList<>();
         if (!this.paProperties.contains(CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getName())) {
             paPropList.add(CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getCmdLine() + rmHome + "config" +
                 os.fs + "security.java.policy-client");
-        }
-        if (!this.paProperties.contains(CentralPAPropertyRepository.LOG4J.getName())) {
-            StringBuilder sb = new StringBuilder(CentralPAPropertyRepository.LOG4J.getCmdLine());
-
-            // log4j only understands urls
-            try {
-                sb.append((new File(rmHome)).toURI().toURL().toString()).append("config").append("/").append(
-                        "log").append("/").append("node.properties");
-            } catch (MalformedURLException e) {
-                throw new IllegalStateException(e);
-            }
-            paPropList.add(sb.toString());
         }
         if (!this.paProperties.contains(CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getName())) {
             paPropList.add(CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getCmdLine() + rmHome +
@@ -115,6 +101,9 @@ public class LocalInfrastructure extends InfrastructureManager {
         }
         if (!this.paProperties.contains(PAResourceManagerProperties.RM_HOME.getKey())) {
             paPropList.add(PAResourceManagerProperties.RM_HOME.getCmdLine() + rmHome);
+        }
+        if (!this.paProperties.contains("java.library.path")) {
+            paPropList.add("-Djava.library.path=" + System.getProperty("java.library.path"));
         }
         if (!paProperties.isEmpty()) {
             Collections.addAll(paPropList, this.paProperties.split(" "));
@@ -154,7 +143,7 @@ public class LocalInfrastructure extends InfrastructureManager {
 
             this.nodeNameToProcess.put(nodeName, processExecutor);
         } catch (IOException e) {
-            String lf = System.getProperty("line.separator");
+            String lf = System.lineSeparator();
             String mess = "Cannot launch rm node " + nodeName + lf + Utils.getStacktrace(e);
             this.declareDeployingNodeLost(depNodeURL, mess);
             return;
@@ -168,7 +157,7 @@ public class LocalInfrastructure extends InfrastructureManager {
             if (processExecutor.isProcessFinished()) {
                 int exit = processExecutor.getExitCode();
                 if (exit != 0) {
-                    String lf = System.getProperty("line.separator");
+                    String lf = System.lineSeparator();
                     String message = "RMNode exit code == " + exit + lf;
                     message += "Command: " + obfuscatedCmd + lf;
                     String out = Tools.join(processExecutor.getOutput(), "\n");
@@ -219,7 +208,7 @@ public class LocalInfrastructure extends InfrastructureManager {
      */
     private void createLostNode(String name, String message, Throwable e) {
         this.isNodeAcquired.remove(name);
-        String lf = System.getProperty("line.separator");
+        String lf = System.lineSeparator();
         String url = super.addDeployingNode(name, "deployed as daemon",
                 "Deploying a new windows azure insance", this.nodeTimeout);
         String st = Utils.getStacktrace(e);
@@ -234,9 +223,9 @@ public class LocalInfrastructure extends InfrastructureManager {
      */
     @Override
     protected void configure(Object... args) {
-        this.isDeployingNodeLost = new Hashtable<String, Boolean>();
-        this.nodeNameToProcess = new Hashtable<String, ProcessExecutor>();
-        this.isNodeAcquired = new Hashtable<String, Boolean>();
+        this.isDeployingNodeLost = new Hashtable<>();
+        this.nodeNameToProcess = new Hashtable<>();
+        this.isNodeAcquired = new Hashtable<>();
         int index = 0;
         try {
             this.credentials = Credentials.getCredentialsBase64((byte[]) args[index++]);

@@ -616,7 +616,7 @@ public class NodeSource implements InitActive, RunActive {
      */
     @ImmediateService
     public LinkedList<Node> getAliveNodes() {
-        LinkedList<Node> nodes = new LinkedList<Node>();
+        LinkedList<Node> nodes = new LinkedList<>();
         nodes.addAll(this.nodes.values());
         return nodes;
     }
@@ -627,7 +627,7 @@ public class NodeSource implements InitActive, RunActive {
      */
     @ImmediateService
     public LinkedList<Node> getDownNodes() {
-        LinkedList<Node> downNodes = new LinkedList<Node>();
+        LinkedList<Node> downNodes = new LinkedList<>();
         downNodes.addAll(this.downNodes.values());
         return downNodes;
     }
@@ -638,7 +638,7 @@ public class NodeSource implements InitActive, RunActive {
      */
     @ImmediateService
     public LinkedList<RMDeployingNode> getDeployingNodes() {
-        LinkedList<RMDeployingNode> result = new LinkedList<RMDeployingNode>();
+        LinkedList<RMDeployingNode> result = new LinkedList<>();
         result.addAll(this.infrastructureManager.getDeployingNodes());
         return result;
     }

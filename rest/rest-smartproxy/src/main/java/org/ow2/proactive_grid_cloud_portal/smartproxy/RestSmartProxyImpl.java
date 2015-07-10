@@ -414,11 +414,6 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl> i
         return restSchedulerClient.deleteFile(space, pathname);
     }
 
-    @Override
-    public JobId submitAsJobArchive(Job job) throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
-        return restSchedulerClient.submitAsJobArchive(job);
-    }
-
     private class DownloadHandler implements Runnable {
 
         private String jobId;

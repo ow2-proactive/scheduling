@@ -13,7 +13,7 @@ public class Log4JTaskLogsTest {
 
     @Test
     public void one_line_one_event() throws Exception {
-        LinkedList<LoggingEvent> logEvents = new LinkedList<LoggingEvent>();
+        LinkedList<LoggingEvent> logEvents = new LinkedList<>();
         logEvents.add(new LoggingEvent(null, Logger.getLogger("test"), Log4JTaskLogs.STDERR_LEVEL, "error",
             null));
         logEvents.add(new LoggingEvent(null, Logger.getLogger("test"), Log4JTaskLogs.STDOUT_LEVEL, "output",

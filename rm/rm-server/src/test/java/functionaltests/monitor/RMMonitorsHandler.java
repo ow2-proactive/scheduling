@@ -76,10 +76,10 @@ public class RMMonitorsHandler {
     private List<RMEventMonitor> eventsMonitors;
 
     public RMMonitorsHandler() {
-        stateEvents = new ArrayList<RMEventType>();
-        nodeSourcesEvent = new ArrayList<NodeSourceEventMonitor>();
-        nodesEvent = new ArrayList<NodeEventMonitor>();
-        eventsMonitors = new ArrayList<RMEventMonitor>();
+        stateEvents = new ArrayList<>();
+        nodeSourcesEvent = new ArrayList<>();
+        nodesEvent = new ArrayList<>();
+        eventsMonitors = new ArrayList<>();
     }
 
     public void waitForRMStateEvent(RMEventType eventType, long timeout) throws ProActiveTimeoutException {

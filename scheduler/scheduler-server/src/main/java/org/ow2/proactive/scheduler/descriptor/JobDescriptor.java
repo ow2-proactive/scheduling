@@ -60,21 +60,21 @@ public interface JobDescriptor extends Comparable<JobDescriptor> {
      * @param taskId the id representing the real task.
      * @return true if the task represented by the given taskId has children, false if not.
      */
-    public boolean hasChildren(TaskId taskId);
+    boolean hasChildren(TaskId taskId);
 
     /**
      * To get the tasks.
      *
      * @return the tasks.
      */
-    public Collection<EligibleTaskDescriptor> getEligibleTasks();
+    Collection<EligibleTaskDescriptor> getEligibleTasks();
 
     /**
      * Get the job id
      *
      * @return the job id
      */
-    public JobId getJobId();
+    JobId getJobId();
 
     /**
      * Return the internal representation of the job.
@@ -82,20 +82,20 @@ public interface JobDescriptor extends Comparable<JobDescriptor> {
      *
      * @return the internal representation of the job.
      */
-    public InternalJob getInternal();
+    InternalJob getInternal();
 
     /**
      * Return the list of running tasks
      *
      * @return the list of running tasks
      */
-    public Map<TaskId, TaskDescriptor> getRunningTasks();
+    Map<TaskId, TaskDescriptor> getRunningTasks();
 
     /**
      * Return the list of paused tasks
      *
      * @return the list of paused tasks
      */
-    public Map<TaskId, ? extends TaskDescriptor> getPausedTasks();
+    Map<TaskId, ? extends TaskDescriptor> getPausedTasks();
 
 }

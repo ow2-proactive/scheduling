@@ -79,21 +79,21 @@ public class JobDescriptorImpl implements JobDescriptor {
     private InternalJob internalJob;
 
     /** List that knows which task has children and which have not */
-    private Set<TaskId> hasChildren = new HashSet<TaskId>();
+    private Set<TaskId> hasChildren = new HashSet<>();
 
     /** Job tasks to be able to be schedule */
     @XmlTransient
-    private Map<TaskId, EligibleTaskDescriptor> eligibleTasks = new ConcurrentHashMap<TaskId, EligibleTaskDescriptor>();
+    private Map<TaskId, EligibleTaskDescriptor> eligibleTasks = new ConcurrentHashMap<>();
 
     /** Those are not directly eligible, and will be triggered by an IF control flow action */
     @XmlTransient
-    private Map<TaskId, EligibleTaskDescriptor> branchTasks = new ConcurrentHashMap<TaskId, EligibleTaskDescriptor>();
+    private Map<TaskId, EligibleTaskDescriptor> branchTasks = new ConcurrentHashMap<>();
 
     /** Job running tasks */
-    private Map<TaskId, TaskDescriptor> runningTasks = new ConcurrentHashMap<TaskId, TaskDescriptor>();
+    private Map<TaskId, TaskDescriptor> runningTasks = new ConcurrentHashMap<>();
 
     /** Job paused tasks */
-    private Map<TaskId, EligibleTaskDescriptor> pausedTasks = new HashMap<TaskId, EligibleTaskDescriptor>();
+    private Map<TaskId, EligibleTaskDescriptor> pausedTasks = new HashMap<>();
 
     /**
      * Create a new instance of job descriptor using an internal job.
@@ -125,7 +125,7 @@ public class JobDescriptorImpl implements JobDescriptor {
      * This list represents the ordered TaskDescriptor list of its parent tasks.
      */
     private void makeTree(InternalJob job) {
-        Map<InternalTask, TaskDescriptor> mem = new HashMap<InternalTask, TaskDescriptor>();
+        Map<InternalTask, TaskDescriptor> mem = new HashMap<>();
 
         //create task descriptor list
         for (InternalTask td : job.getITasks()) {
@@ -245,7 +245,7 @@ public class JobDescriptorImpl implements JobDescriptor {
      */
     public void doLoop(TaskId initiator, Map<TaskId, InternalTask> tree, InternalTask target,
             InternalTask newInit) {
-        Map<TaskId, EligibleTaskDescriptorImpl> acc = new HashMap<TaskId, EligibleTaskDescriptorImpl>();
+        Map<TaskId, EligibleTaskDescriptorImpl> acc = new HashMap<>();
 
         // create new EligibleTasks and accumulate it
         for (Entry<TaskId, InternalTask> it : tree.entrySet()) {
@@ -271,7 +271,7 @@ public class JobDescriptorImpl implements JobDescriptor {
             TaskId itId = it.getValue().getTaskInfo().getTaskId();
             EligibleTaskDescriptorImpl down = acc.get(itId);
 
-            List<InternalTask> ideps = new ArrayList<InternalTask>();
+            List<InternalTask> ideps = new ArrayList<>();
             int deptype = 0;
             if (it.getValue().hasDependences()) {
                 ideps.addAll(it.getValue().getIDependences());
@@ -345,7 +345,7 @@ public class JobDescriptorImpl implements JobDescriptor {
         // the join task is optional
         if (join != null) {
             for (EligibleTaskDescriptor td : branchTasks.values()) {
-                LinkedList<EligibleTaskDescriptorImpl> q = new LinkedList<EligibleTaskDescriptorImpl>();
+                LinkedList<EligibleTaskDescriptorImpl> q = new LinkedList<>();
                 q.offer((EligibleTaskDescriptorImpl) td);
 
                 // find the matching end block task
@@ -379,7 +379,7 @@ public class JobDescriptorImpl implements JobDescriptor {
 
         for (InternalTask it : elseTasks) {
             EligibleTaskDescriptorImpl td = (EligibleTaskDescriptorImpl) branchTasks.remove(it.getId());
-            LinkedList<EligibleTaskDescriptorImpl> q = new LinkedList<EligibleTaskDescriptorImpl>();
+            LinkedList<EligibleTaskDescriptorImpl> q = new LinkedList<>();
             if (td != null) {
                 q.clear();
                 q.offer(td);
@@ -408,7 +408,7 @@ public class JobDescriptorImpl implements JobDescriptor {
      */
     public void doReplicate(TaskId initiator, Map<TaskId, InternalTask> tree, InternalTask target,
             TaskId oldEnd, TaskId newEnd) {
-        Map<TaskId, EligibleTaskDescriptorImpl> acc = new HashMap<TaskId, EligibleTaskDescriptorImpl>();
+        Map<TaskId, EligibleTaskDescriptorImpl> acc = new HashMap<>();
 
         // create new EligibleTasks and accumulate it
         for (Entry<TaskId, InternalTask> it : tree.entrySet()) {
@@ -422,7 +422,7 @@ public class JobDescriptorImpl implements JobDescriptor {
             TaskId itId = it.getValue().getTaskInfo().getTaskId();
             EligibleTaskDescriptorImpl down = acc.get(itId);
 
-            List<InternalTask> ideps = new ArrayList<InternalTask>();
+            List<InternalTask> ideps = new ArrayList<>();
             int deptype = 0;
             if (it.getValue().hasDependences()) {
                 ideps.addAll(it.getValue().getIDependences());
@@ -461,7 +461,7 @@ public class JobDescriptorImpl implements JobDescriptor {
         if (oldTask == null) {
             oldTask = (EligibleTaskDescriptorImpl) eligibleTasks.get(initiator);
         }
-        HashSet<TaskId> excl = new HashSet<TaskId>();
+        HashSet<TaskId> excl = new HashSet<>();
         EligibleTaskDescriptorImpl endTask = (EligibleTaskDescriptorImpl) findTask(oldTask, oldEnd, excl);
         if (endTask == null) {
             // findTask cannot walk weak dependencies (IF/ELSE) down, lets walk these branches ourselves
@@ -604,7 +604,7 @@ public class JobDescriptorImpl implements JobDescriptor {
      */
     @XmlTransient
     public Collection<EligibleTaskDescriptor> getEligibleTasks() {
-        return new Vector<EligibleTaskDescriptor>(eligibleTasks.values());
+        return new Vector<>(eligibleTasks.values());
     }
 
     /**

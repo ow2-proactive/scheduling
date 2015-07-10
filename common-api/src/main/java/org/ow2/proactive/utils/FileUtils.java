@@ -38,6 +38,11 @@ package org.ow2.proactive.utils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 
@@ -69,6 +74,27 @@ public class FileUtils {
     }
 
     /**
+     * Deletes a file or directory and all contents recursively.
+     *
+     * @param path the file to delete.
+     */
+    public static void deleteRecursively(Path path) throws IOException {
+        Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                Files.delete(file);
+                return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                Files.delete(dir);
+                return FileVisitResult.CONTINUE;
+            }
+        });
+    }
+
+    /**
      * Creates a new temp directory in the specified directory, using the given prefix and suffix strings to generate its name.<br/>
      * If this method returns successfully then it is guaranteed that the directory is created.<br/>
      * <br/>
@@ -78,7 +104,7 @@ public class FileUtils {
      * <br/>
      * @param prefix The prefix string to be used in generating the directory's name; must be at least three characters long
      * @param suffix The suffix string to be used in generating the directory's name; may be null, in which case the suffix ".tmpdir" will be used
-     * @param Directory The directory in which the temp directory is to be created, or null if the default temporary-file directory is to be used
+     * @param directory The directory in which the temp directory is to be created, or null if the default temporary-file directory is to be used
      * @throw IOException if the directory cannot be created
      * @return the created temp directory
      */
