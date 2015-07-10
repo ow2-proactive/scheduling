@@ -213,7 +213,7 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
         if (SCRATCH == null) {
             return new File(".").getAbsolutePath();
         }
-        return SCRATCH.getVirtualURI();
+        return SCRATCH.getPath();
     }
 
     @Override

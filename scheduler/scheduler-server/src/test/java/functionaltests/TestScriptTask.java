@@ -112,7 +112,6 @@ public class TestScriptTask extends SchedulerConsecutive {
         // dataspaces binding should be available
         TaskResult dataspacesTaskResult = jobResult.getResult("dataspaces");
         String dataspacesLogs = dataspacesTaskResult.getOutput().getAllLogs(false);
-        assertTrue(dataspacesLogs.contains("localspace=vfs://"));
         assertTrue(dataspacesLogs.contains("global=vfs://"));
         assertTrue(dataspacesLogs.contains("user=vfs://"));
         assertTrue(dataspacesLogs.contains("input=vfs://"));
