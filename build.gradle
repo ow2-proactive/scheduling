@@ -404,6 +404,7 @@ project('scheduler:scheduler-node') {
     }
 
     task standaloneJar(type: OneJar) {
+        logging.captureStandardOutput LogLevel.INFO
         mainClass = 'org.ow2.proactive.resourcemanager.utils.RMNodeStarter'
         binLib = files({ rootProject.configurations.nativeBundle.collect { zipTree(it) } })
         additionalDir = file('src/main/resources')
