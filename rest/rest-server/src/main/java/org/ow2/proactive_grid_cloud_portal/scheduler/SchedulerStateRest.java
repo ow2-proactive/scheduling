@@ -115,6 +115,8 @@ import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.factories.FlatJobFactory;
+import org.ow2.proactive.scheduler.common.task.Task;
+import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
@@ -876,21 +878,42 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
 
         try {
-            Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/log/full");
+            Scheduler scheduler = checkAccess(sessionId, "jobs/" + jobId + "/log/full");
 
-            JobState jobState = s.getJobState(jobId);
+            JobState jobState = scheduler.getJobState(jobId);
 
-            List<InputStream> streams = new ArrayList<>();
             List<TaskState> tasks = jobState.getTasks();
+            List<InputStream> streams = new ArrayList<>(tasks.size());
+
             Collections.sort(tasks, TaskState.COMPARE_BY_FINISHED_TIME_ASC);
-            for (TaskState ts : tasks) {
-                String fullTaskLogsFile = "TaskLogs-" + jobId + "-" + ts.getId() + ".log";
+
+            for (TaskState taskState : tasks) {
+
+                InputStream inputStream = null;
+
                 try {
-                    InputStream logFileAsStream = pullFile(sessionId, SchedulerConstants.USERSPACE_NAME,
-                            fullTaskLogsFile);
-                    streams.add(logFileAsStream);
+                    if (taskState.isPreciousLogs()) {
+                        inputStream =
+                                retrieveTaskLogsUsingDataspaces(sessionId, jobId, taskState.getId());
+                    } else {
+                        String taskLogs = retrieveTaskLogsUsingDatabase(sessionId, jobId,
+                                taskState.getName());
+
+                        if (!taskLogs.isEmpty()) {
+                            inputStream =
+                                    IOUtils.toInputStream(taskLogs);
+                        }
+
+                        logger.warn("Retrieving truncated logs for task '" + taskState.getId() + "'");
+                    }
                 } catch (Exception e) {
-                    logger.info("Could not retrieve task log (could be a non finished or killed task)", e);
+                    logger.error(
+                            "Could not retrieve logs for task " + taskState.getId()
+                                    + " (could be a non finished or killed task)", e);
+                }
+
+                if (inputStream != null) {
+                    streams.add(inputStream);
                 }
             }
 
@@ -906,6 +929,11 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         } catch (NotConnectedException e) {
             throw new NotConnectedRestException(e);
         }
+    }
+
+    public InputStream retrieveTaskLogsUsingDataspaces(String sessionId, String jobId, TaskId taskId) throws PermissionRestException, IOException, NotConnectedRestException {
+        String fullTaskLogsFile = "TaskLogs-" + jobId + "-" + taskId + ".log";
+        return pullFile(sessionId, SchedulerConstants.USERSPACE_NAME, fullTaskLogsFile);
     }
 
     /**
@@ -1101,13 +1129,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     String taskname) throws NotConnectedRestException, UnknownJobRestException, UnknownTaskRestException,
             PermissionRestException {
         try {
-            Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/tasks/" + taskname + "/result/log/all");
-            TaskResult tr = s.getTaskResult(jobId, taskname);
-            if ((tr != null) && (tr.getOutput() != null)) {
-                return tr.getOutput().getAllLogs(true);
-            } else {
-                return "";
-            }
+            return retrieveTaskLogsUsingDatabase(sessionId, jobId, taskname);
         } catch (PermissionException e) {
             throw new PermissionRestException(e);
         } catch (UnknownJobException e) {
@@ -1117,6 +1139,19 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         } catch (UnknownTaskException e) {
             throw new UnknownTaskRestException(e);
         }
+    }
+
+    private String retrieveTaskLogsUsingDatabase(String sessionId, String jobId, String taskName) throws NotConnectedRestException, UnknownJobException, UnknownTaskException, NotConnectedException, PermissionException, PermissionRestException {
+        Scheduler scheduler = checkAccess(sessionId,
+                "jobs/" + jobId + "/tasks/" + taskName + "/result/log/all");
+
+        TaskResult taskResult = scheduler.getTaskResult(jobId, taskName);
+
+        if (taskResult != null && taskResult.getOutput() != null) {
+            return taskResult.getOutput().getAllLogs(true);
+        }
+
+        return "";
     }
 
     /**
@@ -1243,8 +1278,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     /**
-     * Returns full logs generated by the task from user data spaces.
-     *
+     * Returns full logs generated by the task from user data spaces if task was run using the precious
+     * logs option. Otherwise, logs are retrieved from the database. In this last case they may be truncated.
      *
      * @param sessionId
      *            a valid session id
@@ -1272,12 +1307,26 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                 sessionId = session;
             }
 
-            Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/tasks/" + taskname + "/result/log/all");
-            TaskResult tr = s.getTaskResult(jobId, taskname);
+            Scheduler scheduler = checkAccess(sessionId, "jobs/" + jobId + "/tasks/" + taskname + "/result/log/all");
+            TaskResult taskResult = scheduler.getTaskResult(jobId, taskname);
 
-            if (tr != null) {
-                String fullTaskLogsFile = "TaskLogs-" + jobId + "-" + tr.getTaskId() + ".log";
-                return pullFile(sessionId, SchedulerConstants.USERSPACE_NAME, fullTaskLogsFile);
+            if (taskResult != null) {
+                JobState jobState = scheduler.getJobState(taskResult.getTaskId().getJobId());
+
+                boolean hasPreciousLogs = false;
+                for (Task task : jobState.getTasks()) {
+                    if (task.getName().equals(taskname)) {
+                        hasPreciousLogs = task.isPreciousLogs();
+                        break;
+                    }
+                }
+
+                if (hasPreciousLogs) {
+                    return retrieveTaskLogsUsingDataspaces(sessionId, jobId, taskResult.getTaskId());
+                } else {
+                    logger.warn("Retrieving truncated logs for task '" + taskname + "'");
+                    return IOUtils.toInputStream(retrieveTaskLogsUsingDatabase(sessionId, jobId, taskname));
+                }
             } else {
                 return null;
             }
