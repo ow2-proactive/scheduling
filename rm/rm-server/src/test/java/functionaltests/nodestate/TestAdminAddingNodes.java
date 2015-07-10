@@ -36,6 +36,8 @@
  */
 package functionaltests.nodestate;
 
+import java.net.URI;
+
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.node.NodeFactory;
@@ -52,6 +54,7 @@ import org.junit.Assert;
 
 import functionaltests.RMConsecutive;
 import functionaltests.RMTHelper;
+import functionaltests.TNode;
 
 
 /**
@@ -145,7 +148,8 @@ public class TestAdminAddingNodes extends RMConsecutive {
         Assert.assertEquals(0, resourceManager.getState().getTotalAliveNodesNumber());
 
         //create another node with the same URL, and add it to Resource manager
-        node2URL = helper.createNode(node2Name).getNodeURL();
+        TNode node = helper.createNode(node2Name);
+        node2URL = node.getNodeURL();
         resourceManager.addNode(node2URL, NS_NAME);
 
         //wait the node added event
@@ -169,21 +173,17 @@ public class TestAdminAddingNodes extends RMConsecutive {
         helper.killNode(node2URL);
 
         //create another node with the same URL, and add it to Resource manager
-        node2URL = helper.createNode(node2Name).getNodeURL();
+        node2URL = helper.createNode(node2Name, new URI(node2URL).getPort()).getNodeURL();
         resourceManager.addNode(node2URL, NS_NAME);
 
-        try {
-            NodeFactory.getNode(node2URL);
-        } catch (Exception e) {
-            Assert.assertEquals("Runtime of the new node was killed", false);
-        }
+        NodeFactory.getNode(node2URL);
 
         //wait the node added event, node added is configuring
         helper.waitForNodeEvent(RMEventType.NODE_ADDED, node2URL);
         //wait for the node to be in free state
         helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node2URL);
-        Assert.assertEquals(3, resourceManager.getState().getTotalNodesNumber());
-        Assert.assertEquals(2, resourceManager.getState().getFreeNodesNumber());
+        Assert.assertEquals(2, resourceManager.getState().getTotalNodesNumber());
+        Assert.assertEquals(1, resourceManager.getState().getFreeNodesNumber());
 
         RMTHelper.log("Test 5");
 
@@ -195,7 +195,7 @@ public class TestAdminAddingNodes extends RMConsecutive {
         evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node2URL);
         Assert.assertEquals(evt.getNodeState(), NodeState.BUSY);
 
-        Assert.assertEquals(3, resourceManager.getState().getTotalNodesNumber());
+        Assert.assertEquals(2, resourceManager.getState().getTotalNodesNumber());
         Assert.assertEquals(0, resourceManager.getState().getFreeNodesNumber());
 
         //node2 is busy, kill the node
@@ -215,7 +215,7 @@ public class TestAdminAddingNodes extends RMConsecutive {
         helper.waitForNodeEvent(RMEventType.NODE_ADDED, node2URL);
         //wait for the node to be in free state
         helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node2URL);
-        Assert.assertEquals(4, resourceManager.getState().getTotalNodesNumber());
+        Assert.assertEquals(3, resourceManager.getState().getTotalNodesNumber());
         Assert.assertEquals(1, resourceManager.getState().getFreeNodesNumber());
 
         RMTHelper.log("Test 6");
@@ -228,7 +228,7 @@ public class TestAdminAddingNodes extends RMConsecutive {
         evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node2URL);
         Assert.assertEquals(evt.getNodeState(), NodeState.BUSY);
 
-        Assert.assertEquals(4, resourceManager.getState().getTotalNodesNumber());
+        Assert.assertEquals(3, resourceManager.getState().getTotalNodesNumber());
         Assert.assertEquals(0, resourceManager.getState().getFreeNodesNumber());
 
         //put the node in to Release state
@@ -238,7 +238,7 @@ public class TestAdminAddingNodes extends RMConsecutive {
         evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node2URL);
         Assert.assertEquals(evt.getNodeState(), NodeState.TO_BE_REMOVED);
 
-        Assert.assertEquals(4, resourceManager.getState().getTotalNodesNumber());
+        Assert.assertEquals(3, resourceManager.getState().getTotalNodesNumber());
         Assert.assertEquals(0, resourceManager.getState().getFreeNodesNumber());
 
         //node2 is to release, kill the node
@@ -259,7 +259,7 @@ public class TestAdminAddingNodes extends RMConsecutive {
         //wait for the node to be in free state
         evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node2URL);
         Assert.assertEquals(evt.getNodeState(), NodeState.FREE);
-        Assert.assertEquals(5, resourceManager.getState().getTotalNodesNumber());
+        Assert.assertEquals(4, resourceManager.getState().getTotalNodesNumber());
         Assert.assertEquals(1, resourceManager.getState().getFreeNodesNumber());
 
         RMTHelper.log("Test 7");

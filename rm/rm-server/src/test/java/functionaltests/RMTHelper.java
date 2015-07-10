@@ -248,7 +248,7 @@ public class RMTHelper {
         return createNode(nodeName, vmParameters, null);
     }
 
-    private TNode createNode(String nodeName, int pnpPort) throws IOException, NodeException {
+    public TNode createNode(String nodeName, int pnpPort) throws IOException, NodeException {
         return createNode(nodeName, new HashMap<String, String>(), new ArrayList<String>(), pnpPort);
     }
 
