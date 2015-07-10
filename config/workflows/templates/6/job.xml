@@ -9,7 +9,7 @@
   <taskFlow>
     <task name="cron_task">
       <description>
-        <![CDATA[ Will run every minutes ]]>
+        <![CDATA[ Cron task running every minute ]]>
       </description>
       <scriptExecutable>
         <script>

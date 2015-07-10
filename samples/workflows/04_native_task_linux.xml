@@ -8,7 +8,7 @@
     </variables>
     <description>
         Here a native command will be executed, with an argument.
-        We also define a variable above and use it a parameter.
+        We also define a variable above and use it as parameter.
     </description>
     <taskFlow>
         <task name="native_task">

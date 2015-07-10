@@ -4,7 +4,7 @@
      xsi:schemaLocation="urn:proactive:jobdescriptor:3.2 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.2/schedulerjob.xsd"
      name="05_workflow_replication">
     <description>
-        A sample workflow that solves an classic split/process/merge problem.
+        A sample workflow that solves a classic split/process/merge problem.
     </description>
     <taskFlow>
         <task name="Split">

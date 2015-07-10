@@ -7,7 +7,7 @@
     priority="normal"
     cancelJobOnError="true">
   <description>
-    <![CDATA[ Computing PI according to MonteCarlo method. This job will launch 6 MonteCarlo        task, then 2 tasks will average 3 results each. So a last task will average the 2 last        result. Finally this last task will be the final result. ]]>
+    <![CDATA[ Computing PI according to MonteCarlo method. This job will launch 6 MonteCarlo tasks, then 2 tasks will average 3 results each. So a last task will average the 2 last        result. Finally this last task will be the final result. ]]>
   </description>
   <taskFlow>
     <task name="Computation1">
