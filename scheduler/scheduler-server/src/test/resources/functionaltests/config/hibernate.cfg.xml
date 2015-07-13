@@ -6,21 +6,22 @@
 <hibernate-configuration>
 
     <session-factory>
-        <property name="connection.driver_class">org.apache.derby.jdbc.EmbeddedDriver</property>
-        <property name="connection.url">jdbc:derby:build/TEST_SCHEDULER_DB;create=true</property>
-        <property name="dialect">org.hibernate.dialect.DerbyTenSevenDialect</property>
-        <property name="connection.username">scheduler</property>
-        <property name="connection.password"></property>
+        <property name="hibernate.connection.driver_class">org.apache.derby.jdbc.EmbeddedDriver</property>
+        <property name="hibernate.connection.url">jdbc:derby:build/tmp/TEST_SCHEDULER_DB;create=true</property>
+        <property name="hibernate.dialect">org.hibernate.dialect.DerbyTenSevenDialect</property>
 
-        <property name="connection.provider_class">org.hibernate.service.jdbc.connections.internal.C3P0ConnectionProvider</property>
-        <property name="c3p0.max_size">5</property>
-        <property name="c3p0.min_size">5</property>
-        <property name="c3p0.timeout">60</property> <!-- seconds -->
+        <!-- Username and password -->
+        <property name="hibernate.connection.username">scheduler</property>
+        <property name="hibernate.connection.password"></property>
 
-        <property name="show_sql">false</property>
-        <property name="format_sql">true</property>
+        <!-- JDBC connection pool -->
+        <property name="hibernate.connection.provider_class">org.hibernate.hikaricp.internal.HikariCPConnectionProvider</property>
+        <property name="hibernate.hikari.transactionIsolation">TRANSACTION_READ_COMMITTED</property>
 
-        <property name="hbm2ddl.auto">create</property>
+        <property name="hibernate.show_sql">false</property>
+        <property name="hibernate.format_sql">true</property>
+
+        <property name="hibernate.hbm2ddl.auto">create</property>
     </session-factory>
 
 </hibernate-configuration>

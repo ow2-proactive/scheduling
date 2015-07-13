@@ -7,46 +7,29 @@
 
     <session-factory>
 
-        <!-- Database connection settings.
-        INFO :  To change the database provider, change the driver (connection.driver_class)
-			the URL (connection.url), and don't forget the dialect (<property name="dialect">) -->
-
-		<!-- JAVA EMBEDDED DATABASE : DERBY -->
-
-        <property name="connection.driver_class">org.apache.derby.jdbc.EmbeddedDriver</property>
-        <property name="connection.url">jdbc:derby:build/tmp/RM_DB;create=true</property>
-        <property name="dialect">org.hibernate.dialect.DerbyTenSevenDialect</property>
-
-
-        <!-- MYSQL -->
-		<!--
-        <property name="connection.driver_class">org.gjt.mm.mysql.Driver</property>
-        <property name="connection.url">jdbc:mysql://localhost:3306/RM_DB</property>
-        <property name="dialect">org.hibernate.dialect.MySQL5InnoDBDialect</property>
-		-->
+        <property name="hibernate.connection.driver_class">org.apache.derby.jdbc.EmbeddedDriver</property>
+        <property name="hibernate.connection.url">jdbc:derby:build/tmp/RM_DB;create=true</property>
+        <property name="hibernate.dialect">org.hibernate.dialect.DerbyTenSevenDialect</property>
 
         <!-- Username and password -->
-        <property name="connection.username">rm</property>
-        <property name="connection.password"></property>
+        <property name="hibernate.connection.username">rm</property>
+        <property name="hibernate.connection.password"></property>
 
-        <!-- JDBC connection pool (use c3p0) -->
-        <property name="connection.provider_class">org.hibernate.connection.C3P0ConnectionProvider</property>
-        <property name="c3p0.max_size">5</property>
-        <property name="c3p0.min_size">5</property>
-        <property name="c3p0.timeout">60</property> <!-- seconds -->
+        <!-- JDBC connection pool -->
+        <property name="hibernate.connection.provider_class">org.hibernate.hikaricp.internal.HikariCPConnectionProvider</property>
+        <property name="hibernate.hikari.transactionIsolation">TRANSACTION_READ_COMMITTED</property>
 
         <!-- Enable Hibernate's automatic session context management -->
-        <property name="current_session_context_class">thread</property>
+        <property name="hibernate.current_session_context_class">thread</property>
 
         <!-- Echo all executed SQL to stdout. -->
-        <property name="show_sql">false</property>
+        <property name="hibernate.show_sql">false</property>
 
         <!-- Behavior of the database schema on startup : validate | update | create | create-drop -->
-        <property name="hbm2ddl.auto">update</property>
+        <property name="hibernate.hbm2ddl.auto">update</property>
 
         <!--  use stream method for binary object : use to store bigger object -->
-        <property name="jdbc.use_streams_for_binary">true</property>
-
+        <property name="hibernate.jdbc.use_streams_for_binary">true</property>
 
         <!-- Here are every type describe by hibernate's annotations.
         Each Hibernate entity class must be referenced here. -->

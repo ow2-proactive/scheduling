@@ -409,7 +409,9 @@ project('scheduler:scheduler-server') {
         testCompile 'org.mockito:mockito-core:1.10.19'
         testCompile 'org.hamcrest:hamcrest-all:1.3'
         testCompile 'com.h2database:h2:1.3.167'
+
         testCompile 'org.codehaus.groovy:groovy-all:2.4.4'
+
         testCompile 'org.jvnet.winp:winp:1.23-proactive'
         testCompile files("${System.properties['java.home']}/../lib/tools.jar")
 
@@ -418,7 +420,10 @@ project('scheduler:scheduler-server') {
         testCompile project(':rm:rm-policy:rm-policy-scheduler')
         testCompile project(':scheduler:scheduler-examples')
 
-        runtime 'org.hibernate:hibernate-c3p0:4.1.7.Final'
+        runtime('org.hibernate:hibernate-hikaricp:4.3.11.Final') {
+            exclude group: 'org.javassist', module: 'javassist'
+        }
+
         runtime 'org.apache.derby:derby:10.11.1.1'
         runtime "org.objectweb.proactive:programming-extension-pnp:${programmingVersion}"
         runtime "org.objectweb.proactive:programming-extension-pamr:${programmingVersion}"
@@ -531,7 +536,10 @@ project('rm:rm-server') {
         testCompile 'org.python:jython-jline:2.5.4-rc1'
         testCompile 'org.apache.sshd:sshd-core:0.14.0'
 
-        runtime 'org.hibernate:hibernate-c3p0:4.1.7.Final'
+        runtime('org.hibernate:hibernate-hikaricp:4.3.11.Final') {
+            exclude group: 'org.javassist', module: 'javassist'
+        }
+
         runtime 'org.apache.derby:derby:10.11.1.1'
         runtime "org.objectweb.proactive:programming-extension-pnp:${programmingVersion}"
     }
