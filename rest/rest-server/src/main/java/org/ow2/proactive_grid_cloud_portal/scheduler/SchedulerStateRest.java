@@ -907,7 +907,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                         logger.warn("Retrieving truncated logs for task '" + taskState.getId() + "'");
                     }
                 } catch (Exception e) {
-                    logger.error(
+                    logger.info(
                             "Could not retrieve logs for task " + taskState.getId()
                                     + " (could be a non finished or killed task)", e);
                 }
