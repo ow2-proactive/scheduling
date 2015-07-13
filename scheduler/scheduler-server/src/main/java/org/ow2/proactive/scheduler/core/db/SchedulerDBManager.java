@@ -61,6 +61,8 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.service.ServiceRegistry;
+import org.hibernate.service.ServiceRegistryBuilder;
 import org.hibernate.transform.DistinctRootEntityResultTransformer;
 
 import static org.ow2.proactive.authentication.crypto.HybridEncryptionUtil.HybridEncryptedData;
@@ -163,7 +165,9 @@ public class SchedulerDBManager {
             configuration.setProperty("hibernate.jdbc.use_streams_for_binary", "true");
             configuration.setProperty("hibernate.connection.isolation", "2");
 
-            sessionFactory = configuration.buildSessionFactory();
+            ServiceRegistry serviceRegistry = new ServiceRegistryBuilder().applySettings(
+                    configuration.getProperties()).buildServiceRegistry();
+            sessionFactory = configuration.buildSessionFactory(serviceRegistry);
         } catch (Throwable ex) {
             debugLogger.error("Initial SessionFactory creation failed", ex);
             throw new DatabaseManagerException("Initial SessionFactory creation failed", ex);
@@ -173,13 +177,13 @@ public class SchedulerDBManager {
     }
 
     public List<JobInfo> getJobs(final int offset, final int limit, final String user, final boolean pending,
-            final boolean runnning, final boolean finished,
+            final boolean running, final boolean finished,
             final List<SortParameter<JobSortParameter>> sortParameters) {
         if (limit == 0) {
             throw new IllegalArgumentException("Range can't be 0");
         }
 
-        if (!pending && !runnning && !finished) {
+        if (!pending && !running && !finished) {
             return Collections.emptyList();
         }
 
@@ -197,13 +201,13 @@ public class SchedulerDBManager {
                 if (user != null) {
                     criteria.add(Restrictions.eq("owner", user));
                 }
-                boolean allJobs = pending && runnning && finished;
+                boolean allJobs = pending && running && finished;
                 if (!allJobs) {
                     Set<JobStatus> status = new HashSet<>();
                     if (pending) {
                         status.addAll(pendingJobStatuses);
                     }
-                    if (runnning) {
+                    if (running) {
                         status.addAll(runningJobStatuses);
                     }
                     if (finished) {
@@ -329,8 +333,7 @@ public class SchedulerDBManager {
             @Override
             public Long executeWork(Session session) {
                 Query query = session.createQuery("select count(*) from JobData where removedTime = -1");
-                Long count = (Long) query.uniqueResult();
-                return count;
+                return (Long) query.uniqueResult();
             }
 
         });
@@ -345,8 +348,7 @@ public class SchedulerDBManager {
                         "select count(*) from JobData where status in (:status) and removedTime = -1")
                         .setParameterList("status", status);
 
-                Long count = (Long) query.uniqueResult();
-                return count;
+                return (Long) query.uniqueResult();
             }
 
         });
@@ -362,8 +364,8 @@ public class SchedulerDBManager {
                                 "select count(*) from TaskData task where taskStatus in (:taskStatus) and task.jobData.removedTime = -1")
                         .setParameterList("taskStatus", Arrays.asList(TaskStatus.FINISHED, TaskStatus.FAULTY));
 
-                Long count = (Long) query.uniqueResult();
-                return count;
+
+                return (Long) query.uniqueResult();
             }
 
         });
@@ -382,8 +384,7 @@ public class SchedulerDBManager {
                         .setParameterList("jobStatus", notFinishedJobStatuses).setParameterList("taskStatus",
                                 taskStatus);
 
-                Long count = (Long) query.uniqueResult();
-                return count;
+                return (Long) query.uniqueResult();
             }
 
         });
@@ -398,10 +399,9 @@ public class SchedulerDBManager {
                         "select count(*) from TaskData task where taskStatus in (:taskStatus) "
                                 + "and task.jobData.status in (:jobStatus) and task.jobData.removedTime = -1")
                         .setParameterList("jobStatus", notFinishedJobStatuses).setParameterList("taskStatus",
-                                Arrays.asList(TaskStatus.RUNNING));
+                    Collections.singletonList(TaskStatus.RUNNING));
 
-                Long count = (Long) query.uniqueResult();
-                return count;
+                return (Long) query.uniqueResult();
             }
 
         });
@@ -585,8 +585,7 @@ public class SchedulerDBManager {
                                 "select count(distinct executionHostName) from TaskData task where task.jobData.id = :id")
                         .setParameter("id", id);
 
-                Long result = (Long) query.uniqueResult();
-                return result;
+                return (Long) query.uniqueResult();
             }
 
         });
