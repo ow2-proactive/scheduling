@@ -35,11 +35,14 @@ import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
+import org.ow2.proactive.scheduler.task.containers.ExecutableContainer;
+import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
 import org.ow2.proactive.scheduler.task.internal.InternalForkedScriptTask;
 import org.ow2.proactive.scheduler.task.internal.InternalScriptTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.scripting.SelectionScript;
+import org.ow2.proactive.scripting.TaskScript;
 import org.ow2.proactive.topology.descriptor.ArbitraryTopologyDescriptor;
 import org.ow2.proactive.topology.descriptor.BestProximityDescriptor;
 import org.ow2.proactive.topology.descriptor.DifferentHostsExclusiveDescriptor;
@@ -81,7 +84,7 @@ public class TaskData {
 
     private Map<String, String> genericInformation;
 
-    private List<ScriptData> selectionScripts;
+    private List<SelectionScriptData> selectionScripts;
 
     private List<SelectorData> dataspaceSelectors;
 
@@ -92,6 +95,8 @@ public class TaskData {
     private ScriptData cleanScript;
 
     private ScriptData flowScript;
+
+    private ScriptData script;
 
     private String taskName;
 
@@ -185,7 +190,7 @@ public class TaskData {
     @Cascade(org.hibernate.annotations.CascadeType.ALL)
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ENV_SCRIPT_ID")
-    @ForeignKey(name = "none")
+    @ForeignKey(name = "none") // disable foreign key, to be able to remove runtime data
     @Index(name = "TASK_ENV_SCRIPT")
     public ScriptData getEnvScript() {
         return envScript;
@@ -193,6 +198,19 @@ public class TaskData {
 
     public void setEnvScript(ScriptData envScript) {
         this.envScript = envScript;
+    }
+
+    @Cascade(org.hibernate.annotations.CascadeType.ALL)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "SCRIPT_ID")
+    @ForeignKey(name = "none") // disable foreign key, to be able to remove runtime data
+    @Index(name = "TASK_SCRIPT")
+    public ScriptData getScript() {
+        return script;
+    }
+
+    public void setScript(ScriptData script) {
+        this.script = script;
     }
 
     @Cascade(org.hibernate.annotations.CascadeType.ALL)
@@ -245,6 +263,10 @@ public class TaskData {
             forkEnv.setEnvScript(envScript.createSimpleScript());
         }
         return forkEnv;
+    }
+
+    public ExecutableContainer createExecutableContainer() throws InvalidScriptException {
+        return new ScriptExecutableContainer(new TaskScript(script.createSimpleScript()));
     }
 
     @Embeddable
@@ -363,7 +385,7 @@ public class TaskData {
         setExecutionDuration(task.getExecutionDuration());
     }
 
-    static TaskData createTaskData(JobData jobRuntimeData, InternalTask task) {
+    static TaskData createTaskData(JobData jobRuntimeData, InternalScriptTask task) {
         TaskData taskData = new TaskData();
 
         TaskData.DBTaskId taskId = new DBTaskId();
@@ -389,23 +411,27 @@ public class TaskData {
         taskData.updateMutableAttributes(task);
 
         if (task.getSelectionScripts() != null) {
-            List<ScriptData> scripts = new ArrayList<>(task.getSelectionScripts().size());
+            List<SelectionScriptData> scripts = new ArrayList<>(task.getSelectionScripts().size());
             for (SelectionScript selectionScript : task.getSelectionScripts()) {
-                scripts.add(ScriptData.createForSelectionScript(selectionScript, taskData));
+                scripts.add(SelectionScriptData.createForSelectionScript(selectionScript, taskData));
             }
             taskData.setSelectionScripts(scripts);
         }
+        if (task.getExecutableContainer() != null) {
+            taskData.setScript(ScriptData.createForScript(
+                    ((ScriptExecutableContainer) task.getExecutableContainer()).getScript(), taskData));
+        }
         if (task.getPreScript() != null) {
-            taskData.setPreScript(ScriptData.createForScript(task.getPreScript()));
+            taskData.setPreScript(ScriptData.createForScript(task.getPreScript(), taskData));
         }
         if (task.getPostScript() != null) {
-            taskData.setPostScript(ScriptData.createForScript(task.getPostScript()));
+            taskData.setPostScript(ScriptData.createForScript(task.getPostScript(), taskData));
         }
         if (task.getCleaningScript() != null) {
-            taskData.setCleanScript(ScriptData.createForScript(task.getCleaningScript()));
+            taskData.setCleanScript(ScriptData.createForScript(task.getCleaningScript(), taskData));
         }
         if (task.getFlowScript() != null) {
-            taskData.setFlowScript(ScriptData.createForFlowScript(task.getFlowScript()));
+            taskData.setFlowScript(ScriptData.createForFlowScript(task.getFlowScript(), taskData));
         }
 
         List<SelectorData> selectorsData = new ArrayList<>();
@@ -429,7 +455,7 @@ public class TaskData {
             taskData.setWorkingDir(forkEnvironment.getWorkingDir());
 
             if (forkEnvironment.getEnvScript() != null) {
-                taskData.setEnvScript(ScriptData.createForScript(forkEnvironment.getEnvScript()));
+                taskData.setEnvScript(ScriptData.createForScript(forkEnvironment.getEnvScript(), taskData));
             }
 
             Map<String, String> systemEnvironment = forkEnvironment.getSystemEnvironment();
@@ -595,11 +621,11 @@ public class TaskData {
     @Cascade(CascadeType.ALL)
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "taskData")
     @OnDelete(action = OnDeleteAction.CASCADE)
-    public List<ScriptData> getSelectionScripts() {
+    public List<SelectionScriptData> getSelectionScripts() {
         return selectionScripts;
     }
 
-    public void setSelectionScripts(List<ScriptData> selectionScripts) {
+    public void setSelectionScripts(List<SelectionScriptData> selectionScripts) {
         this.selectionScripts = selectionScripts;
     }
 
@@ -617,7 +643,7 @@ public class TaskData {
     @Cascade(CascadeType.ALL)
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "PRE_SCRIPT_ID")
-    @ForeignKey(name = "none")
+    @ForeignKey(name = "none") // disable foreign key, to be able to remove runtime data
     @Index(name = "TASK_PRE_SCRIPT")
     public ScriptData getPreScript() {
         return preScript;
@@ -630,7 +656,7 @@ public class TaskData {
     @Cascade(CascadeType.ALL)
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "POST_SCRIPT_ID")
-    @ForeignKey(name = "none")
+    @ForeignKey(name = "none") // disable foreign key, to be able to remove runtime data
     @Index(name = "TASK_POST_SCRIPT")
     public ScriptData getPostScript() {
         return postScript;
@@ -643,7 +669,7 @@ public class TaskData {
     @Cascade(CascadeType.ALL)
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CLEAN_SCRIPT_ID")
-    @ForeignKey(name = "none")
+    @ForeignKey(name = "none") // disable foreign key, to be able to remove runtime data
     @Index(name = "TASK_CLEAN_SCRIPT")
     public ScriptData getCleanScript() {
         return cleanScript;
@@ -656,7 +682,7 @@ public class TaskData {
     @Cascade(CascadeType.ALL)
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "FLOW_SCRIPT_ID")
-    @ForeignKey(name = "none")
+    @ForeignKey(name = "none") // disable foreign key, to be able to remove runtime data
     @Index(name = "TASK_FLOW_SCRIPT")
     public ScriptData getFlowScript() {
         return flowScript;
