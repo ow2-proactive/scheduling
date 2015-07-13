@@ -258,7 +258,7 @@ project('common-api') {
         compile "org.objectweb.proactive:programming-util:${programmingVersion}"
 
         testRuntime 'org.jruby:jruby-complete:9.0.1.0'
-        testRuntime 'org.python:jython-jline:2.5.4-rc1'
+        testRuntime 'org.python:jython-standalone:2.7.0'
         testRuntime 'org.codehaus.groovy:groovy-all:2.1.6'
         testRuntime 'jsr223:jsr223-nativeshell:0.3'
         testCompile 'junit:junit:4.11'
@@ -358,7 +358,8 @@ project(':rm:rm-node') {
 
         // script engines
         runtime 'org.jruby:jruby-complete:9.0.1.0'
-        runtime 'org.python:jython-jline:2.5.4-rc1'
+        runtime 'org.python:jython-standalone:2.7.0'
+
         runtime 'org.codehaus.groovy:groovy-all:2.4.4'
         runtime 'jsr223:jsr223-nativeshell:0.3'
     }
@@ -532,8 +533,10 @@ project('rm:rm-server') {
         )
         testCompile "org.objectweb.proactive:programming-extension-pnp:${programmingVersion}"
         testCompile project(':rm:rm-infrastructure:rm-infrastructure-gcm')
+
         testCompile 'org.jruby:jruby-complete:9.0.1.0'
-        testCompile 'org.python:jython-jline:2.5.4-rc1'
+        testCompile 'org.python:jython-standalone:2.7.0'
+
         testCompile 'org.apache.sshd:sshd-core:0.14.0'
 
         runtime('org.hibernate:hibernate-hikaricp:4.3.11.Final') {
