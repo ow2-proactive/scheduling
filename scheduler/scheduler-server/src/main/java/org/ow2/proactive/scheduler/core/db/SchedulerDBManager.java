@@ -2,6 +2,7 @@ package org.ow2.proactive.scheduler.core.db;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -11,6 +12,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
@@ -1558,12 +1560,23 @@ public class SchedulerDBManager {
                 configContent = configContent.replace(property.getKey(), property.getValue());
             }
 
-            Configuration configuration;
+            Configuration configuration = new Configuration();
 
             File modifiedFile = File.createTempFile("dbconfig", "tmp");
             try {
                 FileToBytesConverter.convertByteArrayToFile(configContent.getBytes(), modifiedFile);
-                configuration = new Configuration().configure(modifiedFile);
+
+                if (configFile.getName().endsWith(".xml")) {
+                    configuration.configure(configFile);
+                } else {
+                    try {
+                        Properties properties = new Properties();
+                        properties.load(Files.newBufferedReader(configFile.toPath()));
+                        configuration.addProperties(properties);
+                    } catch (IOException e) {
+                        throw new IllegalArgumentException(e);
+                    }
+                }
             } finally {
                 modifiedFile.delete();
             }
