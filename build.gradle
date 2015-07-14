@@ -211,7 +211,10 @@ project(':scheduler:scheduler-client') {
     }
 
     task stub(type: StubTask) {
-        classes = ['org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface']
+        classes = [
+                'org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface',
+                'org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface'
+        ]
     }
     serialver.dependsOn stub
 }
@@ -360,10 +363,17 @@ project('scheduler:scheduler-server') {
     }
 
     task stub(type: StubTask) {
-        classes = ['org.ow2.proactive.scheduler.core.SchedulerFrontend',
-                   'org.ow2.proactive.scheduler.authentication.SchedulerAuthentication',
-                   'org.ow2.proactive.scheduler.core.rmproxies.RMProxyActiveObject',
-                   'org.ow2.proactive.scheduler.core.TerminateNotification']
+        classes = [
+                'java.lang.Object',
+                'java.util.ArrayList',
+                'java.util.Collection',
+                'java.util.HashMap',
+                'java.util.LinkedList',
+                'org.ow2.proactive.scheduler.authentication.SchedulerAuthentication',
+                'org.ow2.proactive.scheduler.core.rmproxies.RMProxyActiveObject',
+                'org.ow2.proactive.scheduler.core.SchedulerFrontend',
+                'org.ow2.proactive.scheduler.core.TerminateNotification'
+        ]
     }
 
     artifacts {
@@ -394,7 +404,10 @@ project('scheduler:scheduler-node') {
     }
 
     task stub(type: StubTask) {
-        classes = ['org.ow2.proactive.scheduler.common.TaskTerminateNotification']
+        classes = [
+                'org.ow2.proactive.scheduler.common.TaskTerminateNotification',
+                'org.ow2.proactive.scheduler.task.TaskLauncher'
+        ]
     }
     serialver.dependsOn stub
 
@@ -462,16 +475,21 @@ project('rm:rm-server') {
 
     task stub(type: StubTask) {
         classes = [
+                'org.ow2.proactive.resourcemanager.authentication.Client',
                 'org.ow2.proactive.resourcemanager.authentication.RMAuthenticationImpl',
-                'org.ow2.proactive.resourcemanager.frontend.RMMonitoringImpl',
-                'org.ow2.proactive.resourcemanager.selection.statistics.ProbablisticSelectionManager',
-                'org.ow2.proactive.resourcemanager.nodesource.NodeSource',
-                'org.ow2.proactive.resourcemanager.nodesource.dataspace.DataSpaceNodeConfigurationAgent',
+                'org.ow2.proactive.resourcemanager.cleaning.NodesCleaner',
                 'org.ow2.proactive.resourcemanager.core.RMCore',
+                'org.ow2.proactive.resourcemanager.frontend.RMMonitoringImpl',
+                'org.ow2.proactive.resourcemanager.nodesource.dataspace.DataSpaceNodeConfigurationAgent',
+                'org.ow2.proactive.resourcemanager.nodesource.policy.CronPolicy',
                 'org.ow2.proactive.resourcemanager.nodesource.policy.NodeSourcePolicy',
+                'org.ow2.proactive.resourcemanager.nodesource.policy.RestartDownNodesPolicy',
+                'org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy',
+                'org.ow2.proactive.resourcemanager.nodesource.policy.TimeSlotPolicy',
+                'org.ow2.proactive.resourcemanager.nodesource.NodeSource',
                 'org.ow2.proactive.resourcemanager.nodesource.RMNodeConfigurator',
-                'org.ow2.proactive.resourcemanager.utils.ClientPinger',
-                'org.ow2.proactive.resourcemanager.cleaning.NodesCleaner'
+                'org.ow2.proactive.resourcemanager.selection.statistics.ProbablisticSelectionManager',
+                'org.ow2.proactive.resourcemanager.utils.ClientPinger'
         ]
     }
     serialver.dependsOn stub
